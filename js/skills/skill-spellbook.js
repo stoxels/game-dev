@@ -1,3 +1,9 @@
+﻿import { LANG, t } from '../translation/translations.js';
+import { hideHUDTooltip } from '../classes/class-hud.js';
+import { CHARM_SLOT_COUNT, getCharmSlottedRank, initCharmPanelInteractions, isSkillCharmSlotted, isSkillCharmUnlocked, renderSpellbookCharmPanel } from './skill-charms.js';
+import { _isGameScreenActive, renderSkillHotbar, setHotbarAboveModal, startSkillDrag } from './skill-hotbar.js';
+import { SKILL_HOTBAR_SIZE, getPassiveSkillDef, getPassiveSkillImage, getPlayerPassiveSkillIds, getPlayerTraits, getSkillDef, getSkillImage, getSkillLevel, getSkillName, isSkillMovable, isSkillOnHotbar, isSkillUsableNow } from './skill-registry.js';
+import { UNIVERSAL_SPELL_MAP, isUniversalMovementSpell, isUniversalSupportSpell } from './universal-spells.js';
 // skill-spellbook.js
 //------------------------------------------------------------------------
 //-----------------------------SPELL BOOK---------------------------------
@@ -25,7 +31,7 @@
 //------------------------------------------------------------------------
 
 // Returns the spell book overlay, creating it on first use.
-function _ensureSpellbookOverlay() {
+export function _ensureSpellbookOverlay() {
     let overlay = document.getElementById('spellbook-overlay');
     if (overlay) return overlay;
 
@@ -67,28 +73,28 @@ function _ensureSpellbookOverlay() {
 //------------------------------------------------------------------------
 
 // True while the spell book overlay is visible.
-function isSpellbookOpen() {
+export function isSpellbookOpen() {
     return !!document.getElementById('spellbook-overlay')?.classList.contains('show');
 }
 
 // True while the book itself is the reason the game is paused, so closing it
 // can hand control back (see openSpellbook / closeSpellbook).
-let _spellbookAutoPaused = false;
+export let _spellbookAutoPaused = false;
 
 // True when the book was opened from the pause menu, so closing it brings the
 // pause menu back. A SILENT engine pause (tutorial lesson, chain interstitial)
 // must not pop the pause screen open when the book closes.
-let _spellbookOpenedFromPauseMenu = false;
+export let _spellbookOpenedFromPauseMenu = false;
 
 // Opens the spell book (rendering fresh contents).
-function openSpellbook() {
+export function openSpellbook() {
     // Pre-class characters cast universal charm spells (found in the world),
     // so the book opens for them too - it then shows the slotted universals
     // plus the charm inventory/slots panel. Class/ascendency sections are
     // simply empty until a class is chosen. (The tutorial's puzzle 3 used to
     // be the only classless exception - Fireball before any class.)
-    if (typeof STATE === 'undefined' || !STATE) return;
-    const tqActive = (typeof _tqIsTutorialActive === 'function') && _tqIsTutorialActive();
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return;
+    const tqActive = (typeof globalThis._tqIsTutorialActive === 'function') && globalThis._tqIsTutorialActive();
     const overlay = _ensureSpellbookOverlay();
     renderSpellbook();
     overlay.classList.add('show');
@@ -106,11 +112,11 @@ function openSpellbook() {
     if (!tqActive && inLiveLevel) {
         const pauseElNow = document.getElementById('pause-overlay');
         const pauseMenuShown = !!(pauseElNow && pauseElNow.classList.contains('show'));
-        const wasPaused = (typeof _gamePaused !== 'undefined') && _gamePaused === true;
-        if (!wasPaused && typeof pauseGame === 'function') {
-            try { pauseGame(); } catch (e) { /* pause is best-effort */ }
+        const wasPaused = (typeof globalThis._gamePaused !== 'undefined') && globalThis._gamePaused === true;
+        if (!wasPaused && typeof globalThis.pauseGame === 'function') {
+            try { globalThis.pauseGame(); } catch (e) { /* pause is best-effort */ }
         }
-        _spellbookAutoPaused = !wasPaused && (typeof _gamePaused !== 'undefined') && _gamePaused === true;
+        _spellbookAutoPaused = !wasPaused && (typeof globalThis._gamePaused !== 'undefined') && globalThis._gamePaused === true;
         _spellbookOpenedFromPauseMenu = wasPaused && pauseMenuShown;
     } else {
         // The tutorial owns its own silent pause - never touch it here. Same
@@ -143,13 +149,13 @@ function openSpellbook() {
 // Re-evaluates the hotbar's visibility for the book's open/closed state.
 // Safe to call anywhere: renderSkillHotbar() no-ops when the bar should be
 // hidden and the host element does not exist yet.
-function _refreshHotbarForSpellbook() {
+export function _refreshHotbarForSpellbook() {
     if (typeof renderSkillHotbar !== 'function') return;
     try { renderSkillHotbar(); } catch (e) { /* bar is best-effort */ }
 }
 
 // Closes the spell book and any floating tooltip.
-function closeSpellbook() {
+export function closeSpellbook() {
     const overlay = document.getElementById('spellbook-overlay');
     if (overlay) overlay.classList.remove('show');
     document.body.classList.remove('spellbook-open');
@@ -163,7 +169,7 @@ function closeSpellbook() {
     if (_spellbookAutoPaused) {
         _spellbookAutoPaused = false;
         _spellbookOpenedFromPauseMenu = false;
-        if (typeof unpauseGame === 'function') { try { unpauseGame(); } catch (e) { /* best-effort */ } }
+        if (typeof globalThis.unpauseGame === 'function') { try { globalThis.unpauseGame(); } catch (e) { /* best-effort */ } }
         return;
     }
     // Otherwise: if the book was opened FROM the pause menu, bring the pause
@@ -172,7 +178,7 @@ function closeSpellbook() {
     const restorePauseMenu = _spellbookOpenedFromPauseMenu;
     _spellbookOpenedFromPauseMenu = false;
     try {
-        if (restorePauseMenu && typeof _gamePaused !== 'undefined' && _gamePaused) {
+        if (restorePauseMenu && typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) {
             const pauseEl = document.getElementById('pause-overlay');
             if (pauseEl && !pauseEl.classList.contains('show')) pauseEl.classList.add('show');
         }
@@ -180,7 +186,7 @@ function closeSpellbook() {
 }
 
 // Toggles the spell book.
-function toggleSpellbook() {
+export function toggleSpellbook() {
     if (isSpellbookOpen()) closeSpellbook();
     else openSpellbook();
 }
@@ -194,7 +200,7 @@ function toggleSpellbook() {
 // slots row, each spell group and the charm panel. Art: the gold banner from
 // images/Spellbook/spellbook_category_header.webp (same asset the book's
 // title plaque wears).
-function buildSpellbookHeadHTML(title, sub) {
+export function buildSpellbookHeadHTML(title, sub) {
     return `<div class="sb3-head">`
         + `<span class="sb3-head-text">${title}</span>`
         + `</div>`
@@ -204,7 +210,7 @@ function buildSpellbookHeadHTML(title, sub) {
 // Builds the HTML for one spell entry: a spell stone (drag source + hover
 // tooltip). Art: images/Spellbook/spell_stone.webp, element glow via the
 // group's data-school (css/spellbook-redesign.css).
-function _buildSpellbookEntryHTML(skillId) {
+export function _buildSpellbookEntryHTML(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return '';
     // A spell is only unlocked while its charm sits in one of the spell
@@ -241,7 +247,7 @@ function _buildSpellbookEntryHTML(skillId) {
 // Builds the locked (non-draggable) passive section: the class passive plus
 // the character's innate traits, which are always-on abilities and therefore
 // also live on this side of the book.
-function _buildSpellbookPassivesHTML() {
+export function _buildSpellbookPassivesHTML() {
     const entries = [];
 
     for (const id of getPlayerPassiveSkillIds()) {
@@ -301,12 +307,12 @@ function _buildSpellbookPassivesHTML() {
 // SPELLBOOK_SCHOOL_ORDER doubles as the display order of the school sections
 // (elemental first, physical last). Themes are read defensively:
 // universal-spells.js loads after the registry in some load orders.
-const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'nature', 'holy', 'shadow', 'arcane', 'physical'];
+export const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'nature', 'holy', 'shadow', 'arcane', 'physical'];
 
 // Bilingual section titles for the school bars. Like the universal-spells
 // group titles (_uspGroupTitle & co.) these are resolved directly so no
 // translation keys are required.
-function _sbSchoolTitle(school) {
+export function _sbSchoolTitle(school) {
     const EN = { fire: 'Fire', frost: 'Frost', lightning: 'Lightning', nature: 'Nature', holy: 'Holy', shadow: 'Shadow', arcane: 'Arcane', physical: 'Physical' };
     const DE = { fire: 'Feuer', frost: 'Frost', lightning: 'Blitz', nature: 'Natur', holy: 'Heilig', shadow: 'Schatten', arcane: 'Arkan', physical: 'Physisch' };
     return (typeof LANG !== 'undefined' && LANG === 'de') ? (DE[school] || school) : (EN[school] || school);
@@ -315,7 +321,7 @@ function _sbSchoolTitle(school) {
 // The offensive school of a universal spell id, or null when the spell is
 // not an offensive universal (support / movement live in their own sections;
 // class / ascendency / heartbloom keep their ownership groups).
-function _sbSpellSchool(skillId) {
+export function _sbSpellSchool(skillId) {
     if (typeof UNIVERSAL_SPELL_MAP === 'undefined' || !UNIVERSAL_SPELL_MAP[skillId]) return null;
     const spell = UNIVERSAL_SPELL_MAP[skillId];
     if (typeof isUniversalSupportSpell === 'function' && isUniversalSupportSpell(spell)) return null;
@@ -327,7 +333,7 @@ function _sbSpellSchool(skillId) {
 
 // Display rank of an entry for sorting: the slotted charm's rank (what the
 // player actually casts) or, before a charm is slotted, the trained rank.
-function _sbSortRank(skillId) {
+export function _sbSortRank(skillId) {
     const charmRank = (typeof getCharmSlottedRank === 'function') ? getCharmSlottedRank(skillId) : null;
     return charmRank || getSkillLevel(skillId) || 1;
 }
@@ -335,7 +341,7 @@ function _sbSortRank(skillId) {
 // Element/school of a skill for the stone glow. Universal spells read their
 // damageKind (design key: fire/cold/lightning/...), class + ascendency skills
 // fall back to the class colour as data-school so the glow follows the class.
-function _sbSpellSchoolKey(skillId) {
+export function _sbSpellSchoolKey(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return '';
     if (typeof UNIVERSAL_SPELL_MAP !== 'undefined' && UNIVERSAL_SPELL_MAP[skillId]) {
@@ -344,14 +350,14 @@ function _sbSpellSchoolKey(skillId) {
         const school = _sbSpellSchool(skillId);
         if (school) return school;
     }
-    if (def.slotKind === 'base1' || def.slotKind === 'base2') return STATE.playerClass || '';
-    if (def.slotKind === 'asc1' || def.slotKind === 'asc2') return STATE.playerAscendency || '';
+    if (def.slotKind === 'base1' || def.slotKind === 'base2') return globalThis.STATE.playerClass || '';
+    if (def.slotKind === 'asc1' || def.slotKind === 'asc2') return globalThis.STATE.playerAscendency || '';
     return '';
 }
 
 // One curated section: gold banner + stone grid. data-school on the section
 // carries the element into the CSS glow (see css/spellbook-redesign.css).
-function _spellbookGroupHTML(title, ids, school) {
+export function _spellbookGroupHTML(title, ids, school) {
     const entries = ids.map(_buildSpellbookEntryHTML).join('');
     const attr = school ? ` data-school="${school}"` : '';
     return `<div class="spellbook-group"${attr}>`
@@ -364,17 +370,17 @@ function _spellbookGroupHTML(title, ids, school) {
 
 // Rebuilds the spell book contents from the player's current class
 // (or, pre-class, from their slotted universal charms).
-function renderSpellbook() {
+export function renderSpellbook() {
     const content = document.getElementById('spellbook-content');
     if (!content) return;
-    if (typeof STATE === 'undefined' || !STATE) { content.innerHTML = ''; return; }
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) { content.innerHTML = ''; return; }
 
     // Only EQUIPPED spells are listed: a spell appears here exactly while its
     // charm sits in one of the 10 spell slots (js/skills/skill-charms.js).
     // The full arsenal (100+ universal spells) is never dumped into the book -
     // it lives in the charm inventory until the player slots it.
     const equipped = (typeof isSkillCharmSlotted === 'function') ? isSkillCharmSlotted : () => true;
-    const groups = getPlayerSkillGroups()
+    const groups = globalThis.getPlayerSkillGroups()
         .map((group) => ({ ...group, ids: (group.ids || []).filter(equipped) }))
         .filter((group) => group.ids.length);
 
@@ -408,8 +414,8 @@ function renderSpellbook() {
         // empty otherwise (neutral stones).
         let school = '';
         if (group.labelKey === 'spellbook_group_class'
-            || group.labelKey === 'tq_spellbook_group') school = STATE.playerClass || '';
-        else if (group.labelKey === 'spellbook_group_ascendency') school = STATE.playerAscendency || '';
+            || group.labelKey === 'tq_spellbook_group') school = globalThis.STATE.playerClass || '';
+        else if (group.labelKey === 'spellbook_group_ascendency') school = globalThis.STATE.playerAscendency || '';
         else if (group.labelKey === 'spellbook_group_endgame') school = 'holy';
         else if (group.labelKey === 'spellbook_group_support') school = 'nature';
         else if (group.labelKey === 'spellbook_group_movement') school = 'arcane';
@@ -436,10 +442,10 @@ function renderSpellbook() {
     // player can see at a glance whether there is room left.
     const footer = document.getElementById('spellbook-footer');
     if (footer) {
-        const slots = Array.isArray(STATE.skillHotbar) ? STATE.skillHotbar : [];
+        const slots = Array.isArray(globalThis.STATE.skillHotbar) ? globalThis.STATE.skillHotbar : [];
         const used = slots.filter(Boolean).length;
         const total = (typeof SKILL_HOTBAR_SIZE === 'number') ? SKILL_HOTBAR_SIZE : 10;
-        const charmSlots = Array.isArray(STATE.charmSlots) ? STATE.charmSlots : [];
+        const charmSlots = Array.isArray(globalThis.STATE.charmSlots) ? globalThis.STATE.charmSlots : [];
         const charmUsed = charmSlots.filter(Boolean).length;
         const charmTotal = (typeof CHARM_SLOT_COUNT === 'number') ? CHARM_SLOT_COUNT : 10;
         // Left: the spell slots the charms go into. Right: how full the
@@ -458,13 +464,13 @@ function renderSpellbook() {
 }
 
 // Wires pointerdown drag + double-click quick-assign on the entries.
-function _initSpellbookDrag(content) {
+export function _initSpellbookDrag(content) {
     content.querySelectorAll('.sb3-stone[data-skill]').forEach((el) => {
         const skillId = el.getAttribute('data-skill');
         el.addEventListener('pointerdown', (e) => {
             e.preventDefault();
             if (typeof isSkillCharmUnlocked === 'function' && !isSkillCharmUnlocked(skillId)) {
-                if (typeof showToast === 'function') showToast(t('charm_locked_toast'), '#ff6b9d');
+                if (typeof globalThis.showToast === 'function') globalThis.showToast(t('charm_locked_toast'), '#ff6b9d');
                 return;
             }
             if (typeof startSkillDrag === 'function') startSkillDrag(skillId, e, null);
@@ -476,26 +482,26 @@ function _initSpellbookDrag(content) {
     content.querySelectorAll('.sb3-stone[data-passive], .sb3-stone[data-trait]').forEach((el) => {
         el.addEventListener('pointerdown', (e) => {
             e.preventDefault();
-            if (typeof showToast === 'function') showToast(t('skill_passive_not_movable'));
+            if (typeof globalThis.showToast === 'function') globalThis.showToast(t('skill_passive_not_movable'));
         });
     });
 }
 
 // Double-click convenience: drop the spell into the first free hotbar slot,
 // or the first slot when the bar is full.
-function _quickAssignSkill(skillId) {
+export function _quickAssignSkill(skillId) {
     if (typeof isSkillCharmUnlocked === 'function' && !isSkillCharmUnlocked(skillId)) {
-        if (typeof showToast === 'function') showToast(t('charm_locked_toast'), '#ff6b9d');
+        if (typeof globalThis.showToast === 'function') globalThis.showToast(t('charm_locked_toast'), '#ff6b9d');
         return;
     }
     if (typeof isSkillMovable === 'function' && !isSkillMovable(skillId)) {
-        if (typeof showToast === 'function') showToast(t('skill_passive_not_movable'));
+        if (typeof globalThis.showToast === 'function') globalThis.showToast(t('skill_passive_not_movable'));
         return;
     }
-    ensureSkillHotbar();
-    let index = STATE.skillHotbar.indexOf(null);
+    globalThis.ensureSkillHotbar();
+    let index = globalThis.STATE.skillHotbar.indexOf(null);
     if (index === -1) index = 0;
-    setHotbarSlot(index, skillId);
+    globalThis.setHotbarSlot(index, skillId);
     renderSpellbook();
     renderSkillHotbar();
 }

@@ -1,4 +1,14 @@
-﻿//------------------------------------------------------------------------
+﻿import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
+import { stopTimer, timesUp, updTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { _setAbilityMode } from './class-abilities.js';
+import { cooldownState } from './class-cooldown-state.js';
+import { hideLsClassTooltip } from './class-hud-levelselect-tooltip.js';
+import { buildClassHUD, hideHUDTooltip } from './class-hud.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+//------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
 //-------------------------------BAYESIAN CLASS---------------------------
 //------------------------------------------------------------------------
@@ -9,9 +19,9 @@
 //----------------------------------CONSTANTS-----------------------------
 //------------------------------------------------------------------------
 
-const BAYES_FUSE_SECONDS = 7;  // seconds the player has to place all traps before detonation
-const BAYES_FUSE_PENALTY = 60;  // seconds deducted per unplaced trap at detonation
-const BAYES_ELIMINATION_REACH = 5;   // how many cells the elimination trap scans in each cardinal direction
+export const BAYES_FUSE_SECONDS = 7;  // seconds the player has to place all traps before detonation
+export const BAYES_FUSE_PENALTY = 60;  // seconds deducted per unplaced trap at detonation
+export const BAYES_ELIMINATION_REACH = 5;   // how many cells the elimination trap scans in each cardinal direction
 
 
 
@@ -36,7 +46,7 @@ const BAYES_ELIMINATION_REACH = 5;   // how many cells the elimination trap scan
 
 // Returns the display metadata for a given trap type string.
 // Used by UI builders and effect handlers throughout the file.
-function _bayesTrapTypeInfo(type) {
+export function _bayesTrapTypeInfo(type) {
     const defs = {
         reveal: {
             icon: '🪤',
@@ -68,7 +78,7 @@ function _bayesTrapTypeInfo(type) {
 
 // Builds the HTML for the "already chosen" queue summary shown above the type buttons.
 // Returns an empty string if nothing has been chosen yet.
-function _buildQueuedTrapsHTML(trapsQueue) {
+export function _buildQueuedTrapsHTML(trapsQueue) {
     if (trapsQueue.length === 0) return '';
 
     const chips = trapsQueue.map(t => {
@@ -86,7 +96,7 @@ function _buildQueuedTrapsHTML(trapsQueue) {
 }
 
 // Builds one selection button per available trap type.
-function _buildTrapTypeButtonsHTML(availableTraps) {
+export function _buildTrapTypeButtonsHTML(availableTraps) {
     return `<div class="bayes-trap-list">` + availableTraps.map(type => {
         const info = _bayesTrapTypeInfo(type);
         return `
@@ -99,7 +109,7 @@ function _buildTrapTypeButtonsHTML(availableTraps) {
 }
 
 // Assembles the full inner HTML for the trap selection overlay modal.
-function _buildSelectOverlayHTML(state) {
+export function _buildSelectOverlayHTML(state) {
     const title = t('cls_bayes_traps_title');
     const selected = state.trapsQueue.length;
     const prompt = t('cls_trap_prompt')
@@ -128,7 +138,7 @@ function _buildSelectOverlayHTML(state) {
 
 // Shows the type-selection overlay for the next trap slot.
 // Called on entry and again after each selection until all slots are filled.
-function _bayesTrapsShowSelectPhase() {
+export function _bayesTrapsShowSelectPhase() {
     document.getElementById('bayes-traps-overlay')?.remove();
 
     const state = window._bayesTrapsState;
@@ -146,7 +156,7 @@ function _bayesTrapsShowSelectPhase() {
 
 // Called by the type buttons in the overlay.
 // Adds the chosen type to the queue and either shows the next slot or starts placement.
-function _bayesTrapsSelectType(type) {
+export function _bayesTrapsSelectType(type) {
     const state = window._bayesTrapsState;
     if (!state || state.phase !== 'select') return;
 
@@ -167,14 +177,14 @@ function _bayesTrapsSelectType(type) {
 
 // Ticks every second while the fuse burns.
 // Updates both the cursor follower and the per-cell countdown labels.
-function _bayesTrapsTickFuseDisplay() {
+export function _bayesTrapsTickFuseDisplay() {
     _bayesTrapsUpdateCursorFollower();
     _bayesTrapsRefreshGridIndicators();
 }
 
 // Starts the fuse countdown interval.
 // Calls _bayesTrapsDetonateUnplaced when time runs out.
-function _bayesTrapsStartFuse() {
+export function _bayesTrapsStartFuse() {
     const state = window._bayesTrapsState;
     if (!state) return;
 
@@ -201,7 +211,7 @@ function _bayesTrapsStartFuse() {
 
 // Transitions from the selection overlay to the grid placement phase.
 // Removes the overlay, switches state.phase, spawns the cursor follower, and starts the fuse.
-function _bayesTrapsStartPlacementPhase() {
+export function _bayesTrapsStartPlacementPhase() {
     document.getElementById('bayes-traps-overlay')?.remove();
 
     const state = window._bayesTrapsState;
@@ -214,7 +224,7 @@ function _bayesTrapsStartPlacementPhase() {
     _bayesTrapsCreateCursorFollower();
 
     const firstTrap = _bayesTrapTypeInfo(state.trapsQueue[0].type);
-    showToast(t('cls_trap_place_first')
+    globalThis.showToast(t('cls_trap_place_first')
         .replace('{b}', state.trapCount)
         .replace('{l}', `${firstTrap.icon} ${firstTrap.label}`)
         .replace('{f}', BAYES_FUSE_SECONDS));
@@ -222,7 +232,7 @@ function _bayesTrapsStartPlacementPhase() {
 
 // Called from Mousebutton_Handlers.js when the player clicks a grid cell during placement.
 // Returns true if the click was consumed (caller should return early).
-function _bayesTrapPlacementClick(row, col) {
+export function _bayesTrapPlacementClick(row, col) {
     const state = window._bayesTrapsState;
     if (!state || state.phase !== 'place') return false;
 
@@ -243,12 +253,12 @@ function _bayesTrapPlacementClick(row, col) {
     if (state.currentTrapIdx >= state.trapCount) {
         // All traps placed - remove the hand follower but keep the fuse ticking on the grid
         document.getElementById('bayes-trap-cursor-follower')?.remove();
-        showToast(t('cls_traps_placed').replace('{n}', state.placedCount));
+        globalThis.showToast(t('cls_traps_placed').replace('{n}', state.placedCount));
         trackAchStat('bayesTrapsAllPlaced');
     } else {
         // Prompt for the next trap in the queue
         const nextInfo = _bayesTrapTypeInfo(state.trapsQueue[state.currentTrapIdx].type);
-        showToast(t('cls_trap_next')
+        globalThis.showToast(t('cls_trap_next')
             .replace('{a}', state.currentTrapIdx + 1)
             .replace('{b}', state.trapCount)
             .replace('{l}', `${nextInfo.icon} ${nextInfo.label}`));
@@ -265,7 +275,7 @@ function _bayesTrapPlacementClick(row, col) {
 //------------------------------------------------------------------------
 
 // Fires explosion animations and activates game effects for all traps that were placed on the grid.
-function _bayesTrapsFirePlacedTraps(trapsQueue) {
+export function _bayesTrapsFirePlacedTraps(trapsQueue) {
     trapsQueue
         .filter(t => t.placed && t.r !== null)
         .forEach(trap => {
@@ -276,18 +286,18 @@ function _bayesTrapsFirePlacedTraps(trapsQueue) {
 
 // Applies the time penalty for each trap that was never placed, then shows feedback.
 // Returns the number of unplaced traps (0 if all were placed).
-function _bayesTrapsApplyUnplacedPenalty(trapsQueue) {
+export function _bayesTrapsApplyUnplacedPenalty(trapsQueue) {
     const unplaced = trapsQueue.filter(t => !t.placed).length;
     if (unplaced === 0) {
-        showToast(t('cls_traps_detonated'));
+        globalThis.showToast(t('cls_traps_detonated'));
         return 0;
     }
 
     const penalty = unplaced * BAYES_FUSE_PENALTY;
-    timerSecs = Math.max(0, timerSecs - penalty);
+    globalThis.timerSecs = Math.max(0, globalThis.timerSecs - penalty);
     updTimer();
 
-    showToast(t('cls_traps_inhand')
+    globalThis.showToast(t('cls_traps_inhand')
         .replace('{n}', unplaced)
         .replace('{p}', penalty));
 
@@ -309,7 +319,7 @@ function _bayesTrapsApplyUnplacedPenalty(trapsQueue) {
 
 // Triggered when the fuse reaches zero.
 // Fires all placed traps, penalises unplaced ones, then resolves win/death state.
-function _bayesTrapsDetonateUnplaced() {
+export function _bayesTrapsDetonateUnplaced() {
     const state = window._bayesTrapsState;
     if (!state) return;
 
@@ -319,10 +329,10 @@ function _bayesTrapsDetonateUnplaced() {
     _bayesTrapsCleanup(true);
     Audio_Manager.playSFX('bayesTrapExplosion');
 
-    checkWin();
+    globalThis.checkWin();
 
-    if (timerSecs <= 0 && !dead) {
-        dead = true;
+    if (globalThis.timerSecs <= 0 && !globalThis.dead) {
+        globalThis.dead = true;
         stopTimer();
         timesUp();
     }
@@ -335,7 +345,7 @@ function _bayesTrapsDetonateUnplaced() {
 //------------------------------------------------------------------------
 
 // Player-initiated cancel. Applies the unplaced penalty if already in placement phase.
-function _bayesTrapsCancel() {
+export function _bayesTrapsCancel() {
     document.getElementById('bayes-traps-overlay')?.remove();
 
     const state = window._bayesTrapsState;
@@ -349,7 +359,7 @@ function _bayesTrapsCancel() {
         const cd = cooldownState['active3'];
         if (cd?.interval) { clearInterval(cd.interval); cd.interval = null; }
         if (cd) cd.remaining = 0;
-        showToast(`🧪 ${t('cls_cancelled')}`);
+        globalThis.showToast(`🧪 ${t('cls_cancelled')}`);
     }
 
     _bayesTrapsCleanup(true);
@@ -357,7 +367,7 @@ function _bayesTrapsCancel() {
 
 // Full teardown: clears the fuse timer, removes all DOM nodes, and resets ability mode.
 // Pass buildHUD=false during the initial setup cancel to avoid an unnecessary HUD rebuild.
-function _bayesTrapsCleanup(buildHUD = true) {
+export function _bayesTrapsCleanup(buildHUD = true) {
     const state = window._bayesTrapsState;
     if (state?.fuseTimer) {
         clearInterval(state.fuseTimer);
@@ -392,8 +402,8 @@ function _bayesTrapsCleanup(buildHUD = true) {
 
 // Starts the Bayes Traps ability flow.
 // Resets any lingering previous activation, initialises state, then opens the selection overlay.
-function _executeBayesTraps(trapCount, availableTraps) {
-    if (!cur) return;
+export function _executeBayesTraps(trapCount, availableTraps) {
+    if (!globalThis.cur) return;
     if (typeof hideHUDTooltip === 'function') hideHUDTooltip();
     if (typeof hideLsClassTooltip === 'function') hideLsClassTooltip();
 
@@ -422,7 +432,7 @@ function _executeBayesTraps(trapCount, availableTraps) {
 //------------------------------------------------------------------------
 
 // Routes detonation to the correct effect handler based on trap type.
-function _bayesTrapActivate(type, row, col) {
+export function _bayesTrapActivate(type, row, col) {
     switch (type) {
         case 'reveal': _bayesTrapReveal(row, col); break;
         case 'elimination': _bayesTrapElimination(row, col); break;
@@ -437,9 +447,9 @@ function _bayesTrapActivate(type, row, col) {
 //------------------------------------------------------------------------
 
 // Reveal Trap: fills in correct unfilled cells within a 1-step radius (8 neighbours + self).
-function _bayesTrapReveal(row, col) {
-    if (!cur) return;
-    const sol = cur.grid;
+export function _bayesTrapReveal(row, col) {
+    if (!globalThis.cur) return;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const affected = [];
@@ -448,9 +458,9 @@ function _bayesTrapReveal(row, col) {
         for (let dc = -1; dc <= 1; dc++) {
             const r = row + dr, c = col + dc;
             if (r < 0 || r >= rows || c < 0 || c >= cols) continue;
-            if (sol[r][c] === 1 && !revealedGrid[r][c] && userGrid[r][c] !== 1) {
-                revealedGrid[r][c] = true;
-                userGrid[r][c] = 1;
+            if (sol[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1) {
+                globalThis.revealedGrid[r][c] = true;
+                globalThis.userGrid[r][c] = 1;
                 renderCell(r, c);
                 updClues(r, c);
                 affected.push(`g-${r}-${c}`);
@@ -459,11 +469,11 @@ function _bayesTrapReveal(row, col) {
     }
 
     if (affected.length > 0) {
-        _applyCellEffect(affected, 'reveal');
+        globalThis._applyCellEffect(affected, 'reveal');
         trackAchStat('tilesRevealed', affected.length);
-        questStat_classRevealUsed(affected.length);
-        updateQuestStats('classAbilityUsedThisLevel', {});
-        checkWin();
+        globalThis.questStat_classRevealUsed(affected.length);
+        globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+        globalThis.checkWin();
     }
 
     // Refresh adjacency matrix overlay if the passive skill is active
@@ -474,9 +484,9 @@ function _bayesTrapReveal(row, col) {
 
 // Elimination Trap: marks wrong empty cells (sol===0) in the four cardinal directions,
 // up to BAYES_ELIMINATION_REACH steps away from the detonation cell.
-function _bayesTrapElimination(row, col) {
-    if (!cur) return;
-    const sol = cur.grid;
+export function _bayesTrapElimination(row, col) {
+    if (!globalThis.cur) return;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
@@ -488,9 +498,9 @@ function _bayesTrapElimination(row, col) {
             if (r < 0 || r >= rows || c < 0 || c >= cols) break;
 
             // Only mark cells that are empty/unflagged and not already confirmed wrong
-            if (sol[r][c] === 0 && (userGrid[r][c] === 0 || userGrid[r][c] === 3) && !wrongGrid[r][c]) {
-                userGrid[r][c] = 2; // ✕ mark
-                questStat_classMarkUsed(1);
+            if (sol[r][c] === 0 && (globalThis.userGrid[r][c] === 0 || globalThis.userGrid[r][c] === 3) && !globalThis.wrongGrid[r][c]) {
+                globalThis.userGrid[r][c] = 2; // ✕ mark
+                globalThis.questStat_classMarkUsed(1);
                 renderCell(r, c);
                 trackAchStat('tilesMarkedWrong', 1);
             }
@@ -500,7 +510,7 @@ function _bayesTrapElimination(row, col) {
 
 // Protection Trap: registers the row and column of the placement cell as protected lines.
 // Protected lines intercept the next wrong fill on that row/col (see _bayesTrapProtectionIntercept).
-function _bayesTrapProtection(row, col) {
+export function _bayesTrapProtection(row, col) {
     if (!window._bayesTrapProtectedLines) window._bayesTrapProtectedLines = new Set();
 
     const rowKey = `row:${row}`;
@@ -523,7 +533,7 @@ function _bayesTrapProtection(row, col) {
 //------------------------------------------------------------------------
 
 // Adds the shield icon span to a single cell element if it doesn't already have one.
-function _bayesTrapAddShieldIconToCell(el) {
+export function _bayesTrapAddShieldIconToCell(el) {
     if (el.querySelector('.bayes-trap-indicator-protection')) return;
 
     const info = _bayesTrapTypeInfo('protection');
@@ -542,9 +552,9 @@ function _bayesTrapAddShieldIconToCell(el) {
 }
 
 // Adds shield icons to every cell in the given row or column.
-function _bayesTrapApplyProtectionVisual(type, idx) {
-    if (!cur) return;
-    const sol = cur.grid;
+export function _bayesTrapApplyProtectionVisual(type, idx) {
+    if (!globalThis.cur) return;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -564,9 +574,9 @@ function _bayesTrapApplyProtectionVisual(type, idx) {
 // Removes protection visuals from every cell in the given row or column.
 // Respects overlapping protections: a cell that is still covered by the other axis
 // keeps its shield icon.
-function _bayesTrapRemoveProtectionVisual(type, idx) {
-    if (!cur) return;
-    const sol = cur.grid;
+export function _bayesTrapRemoveProtectionVisual(type, idx) {
+    if (!globalThis.cur) return;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const lines = window._bayesTrapProtectedLines || new Set();
@@ -596,7 +606,7 @@ function _bayesTrapRemoveProtectionVisual(type, idx) {
 
 // Called from mousebutton_handlers.js before registering a wrong fill.
 // Returns true if a Protection Trap intercepted the mistake (caller should skip the error logic).
-function _bayesTrapProtectionIntercept(row, col) {
+export function _bayesTrapProtectionIntercept(row, col) {
     const lines = window._bayesTrapProtectedLines;
     if (!lines || lines.size === 0) return false;
 
@@ -606,10 +616,10 @@ function _bayesTrapProtectionIntercept(row, col) {
     if (!matchKey) return false;
 
     // Auto-mark the wrong cell with ✕ instead of counting a mistake
-    if (userGrid[row][col] === 0) {
-        userGrid[row][col] = 2;
+    if (globalThis.userGrid[row][col] === 0) {
+        globalThis.userGrid[row][col] = 2;
         renderCell(row, col);
-        questStat_classMarkUsed(1);
+        globalThis.questStat_classMarkUsed(1);
     }
 
     // Consume this line's protection (one protection = one intercept)
@@ -618,7 +628,7 @@ function _bayesTrapProtectionIntercept(row, col) {
     _bayesTrapRemoveProtectionVisual(type, parseInt(idxStr, 10));
 
     const lineWord = (type === 'row' ? t('cls_row_word') : t('cls_col_word')) + ' ' + (parseInt(idxStr, 10) + 1);
-    showToast(t('cls_protect_triggered').replace('{line}', lineWord));
+    globalThis.showToast(t('cls_protect_triggered').replace('{line}', lineWord));
 
     Audio_Manager.playSFX('varianceShield'); // window guard removed: module import is always present
     return true;
@@ -632,7 +642,7 @@ function _bayesTrapProtectionIntercept(row, col) {
 
 // Draws the countdown + icon overlay on a cell immediately after it is planted.
 // The countdown label is updated each second by _bayesTrapsRefreshGridIndicators.
-function _bayesTrapDrawIndicator(row, col, type) {
+export function _bayesTrapDrawIndicator(row, col, type) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
 
@@ -665,7 +675,7 @@ function _bayesTrapDrawIndicator(row, col, type) {
 
 // Updates only the countdown text on every already-placed indicator.
 // Called every second by _bayesTrapsTickFuseDisplay to avoid full redraws.
-function _bayesTrapsRefreshGridIndicators() {
+export function _bayesTrapsRefreshGridIndicators() {
     const state = window._bayesTrapsState;
     if (!state) return;
 
@@ -685,7 +695,7 @@ function _bayesTrapsRefreshGridIndicators() {
 //------------------------------------------------------------------------
 
 // Builds the innerHTML string for the cursor follower (timer + icon stacked vertically).
-function _buildCursorFollowerHTML(info, fuseRemaining) {
+export function _buildCursorFollowerHTML(info, fuseRemaining) {
     return `
         <div style="font-size:14px; font-family:var(--PX, monospace); color:#e74c3c;
                     margin-bottom:4px; text-shadow:1px 1px 2px rgba(0,0,0,0.8);">
@@ -697,7 +707,7 @@ function _buildCursorFollowerHTML(info, fuseRemaining) {
 
 // Creates the cursor-following trap icon and attaches the mousemove listener.
 // The follower displays the current trap type and remaining fuse time.
-function _bayesTrapsCreateCursorFollower() {
+export function _bayesTrapsCreateCursorFollower() {
     document.getElementById('bayes-trap-cursor-follower')?.remove();
 
     const follower = document.createElement('div');
@@ -730,7 +740,7 @@ function _bayesTrapsCreateCursorFollower() {
 
 // Refreshes the follower's content (type icon + fuse countdown).
 // Removes the follower if all traps have already been placed.
-function _bayesTrapsUpdateCursorFollower() {
+export function _bayesTrapsUpdateCursorFollower() {
     const follower = document.getElementById('bayes-trap-cursor-follower');
     const state = window._bayesTrapsState;
 
@@ -750,7 +760,7 @@ function _bayesTrapsUpdateCursorFollower() {
 
 // Injects the shared CSS keyframe block for all trap explosion types.
 // Only runs once per page; subsequent calls are no-ops.
-function _bayesTrapsInjectExplosionStyles() {
+export function _bayesTrapsInjectExplosionStyles() {
     if (document.getElementById('bayes-explosion-styles')) return;
 
     const styleNode = document.createElement('style');
@@ -776,7 +786,7 @@ function _bayesTrapsInjectExplosionStyles() {
 }
 
 // Builds a typed visual effect container element for the given trap type.
-function _bayesTrapBuildExplosionFX(type) {
+export function _bayesTrapBuildExplosionFX(type) {
     const fxContainer = document.createElement('div');
     fxContainer.style.cssText = `
         position: absolute; top: 50%; left: 50%;
@@ -816,7 +826,7 @@ function _bayesTrapBuildExplosionFX(type) {
 }
 
 // Spawns a type-specific visual explosion directly over the detonated cell and auto-removes it.
-function _bayesTrapAnimateExplosion(row, col, type) {
+export function _bayesTrapAnimateExplosion(row, col, type) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
@@ -847,9 +857,9 @@ function _bayesTrapAnimateExplosion(row, col, type) {
 //------------------------------------------------------------------------
 
 // Returns a shuffled list of every empty (sol===0), unrevealed, unshielded cell on the grid.
-function _typeIGetEligibleCells() {
-    if (!cur) return [];
-    const sol = cur.grid;
+export function _typeIGetEligibleCells() {
+    if (!globalThis.cur) return [];
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const shielded = window._typeIShieldedCells || new Set();
@@ -858,7 +868,7 @@ function _typeIGetEligibleCells() {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             if (sol[r][c] === 0
-                && revealedGrid[r][c] !== true
+                && globalThis.revealedGrid[r][c] !== true
                 && !shielded.has(`${r}-${c}`)) {
                 eligible.push([r, c]);
             }
@@ -876,7 +886,7 @@ function _typeIGetEligibleCells() {
 
 // Registers and animates a set of cells as shielded.
 // Each cell gets a staggered matrix-flash animation on placement.
-function _typeISeedShieldedCells(cells) {
+export function _typeISeedShieldedCells(cells) {
     cells.forEach(([r, c], index) => {
         window._typeIShieldedCells.add(`${r}-${c}`);
 
@@ -899,7 +909,7 @@ function _typeISeedShieldedCells(cells) {
 }
 
 // Injects a unique CSS keyframe for a single shard's trajectory and returns the animation name.
-function _typeIInjectShardKeyframe(row, col, shardIndex, tx, ty, rotation) {
+export function _typeIInjectShardKeyframe(row, col, shardIndex, tx, ty, rotation) {
     const animName = `shard-fly-${row}-${col}-${shardIndex}`;
     if (!document.getElementById(animName)) {
         const style = document.createElement('style');
@@ -916,7 +926,7 @@ function _typeIInjectShardKeyframe(row, col, shardIndex, tx, ty, rotation) {
 }
 
 // Creates a single glowing shard element flying outward at the given angle and velocity.
-function _typeICreateShardElement(row, col, shardIndex) {
+export function _typeICreateShardElement(row, col, shardIndex) {
     const angle = (shardIndex / 8) * 2 * Math.PI + (Math.random() * 0.4 - 0.2);
     const velocity = 30 + Math.random() * 30;
     const tx = Math.cos(angle) * velocity;
@@ -945,8 +955,8 @@ function _typeICreateShardElement(row, col, shardIndex) {
 //------------------------------------------------------------------------
 
 // Activates the shield: picks eligible empty cells, seeds them, and plays the animation.
-function _executeTypeIShield(seedCount, bonusReveal) {
-    if (!cur) return;
+export function _executeTypeIShield(seedCount, bonusReveal) {
+    if (!globalThis.cur) return;
 
     if (!window._typeIShieldedCells) window._typeIShieldedCells = new Set();
     window._typeIBonusReveal = bonusReveal;
@@ -954,7 +964,7 @@ function _executeTypeIShield(seedCount, bonusReveal) {
     const eligible = _typeIGetEligibleCells();
 
     if (eligible.length === 0) {
-        showToast(t('cls_typei_none'));
+        globalThis.showToast(t('cls_typei_none'));
         _setAbilityMode(false);
         const cd = cooldownState['active4'];
         if (cd?.interval) { clearInterval(cd.interval); cd.interval = null; }
@@ -970,7 +980,7 @@ function _executeTypeIShield(seedCount, bonusReveal) {
         ? t('cls_typei_bonus_note')
         : '';
 
-    showToast(t('cls_typei_seeded')
+    globalThis.showToast(t('cls_typei_seeded')
         .replace('{n}', toSeed.length)
         .replace('{bonus}', bonusNote));
 
@@ -981,7 +991,7 @@ function _executeTypeIShield(seedCount, bonusReveal) {
 
 // Called from mousebutton_handlers.js before registering a wrong fill.
 // Returns true if a shielded cell intercepted the mistake (caller should skip the error logic).
-function _typeIShieldIntercept(row, col) {
+export function _typeIShieldIntercept(row, col) {
     const cells = window._typeIShieldedCells;
     if (!cells || cells.size === 0) return false;
 
@@ -990,13 +1000,13 @@ function _typeIShieldIntercept(row, col) {
 
     cells.delete(key);
 
-    userGrid[row][col] = 2; // ✕
+    globalThis.userGrid[row][col] = 2; // ✕
     renderCell(row, col);
     trackAchStat('tilesMarkedWrong', 1);
 
     _typeIShowShieldBreakEffect(row, col);
 
-    showToast(t('cls_typei_triggered'));
+    globalThis.showToast(t('cls_typei_triggered'));
 
     Audio_Manager.playSFX('type1errorShieldBreak');
     trackAchStat('type1Intercepts');
@@ -1009,7 +1019,7 @@ function _typeIShieldIntercept(row, col) {
 }
 
 // Spawns the particle shatter explosion when a hidden shield breaks.
-function _typeIShowShieldBreakEffect(row, col) {
+export function _typeIShowShieldBreakEffect(row, col) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
@@ -1046,39 +1056,39 @@ function _typeIShowShieldBreakEffect(row, col) {
 
 // Reveals one random correct cell on the same row or column as the triggered shield.
 // Runs only when the shield was set up with bonusReveal=true.
-function _typeIBonusRevealCell(row, col) {
-    if (!cur) return;
-    const sol = cur.grid;
+export function _typeIBonusRevealCell(row, col) {
+    if (!globalThis.cur) return;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const candidates = [];
 
     // Collect unrevealed correct cells in the same row
     for (let c = 0; c < cols; c++) {
-        if (sol[row][c] === 1 && !revealedGrid[row][c] && userGrid[row][c] !== 1)
+        if (sol[row][c] === 1 && !globalThis.revealedGrid[row][c] && globalThis.userGrid[row][c] !== 1)
             candidates.push([row, c]);
     }
     // Collect unrevealed correct cells in the same column
     for (let r = 0; r < rows; r++) {
         if (r === row) continue;
-        if (sol[r][col] === 1 && !revealedGrid[r][col] && userGrid[r][col] !== 1)
+        if (sol[r][col] === 1 && !globalThis.revealedGrid[r][col] && globalThis.userGrid[r][col] !== 1)
             candidates.push([r, col]);
     }
 
     if (!candidates.length) return;
 
     const [r, c] = candidates[Math.floor(Math.random() * candidates.length)];
-    revealedGrid[r][c] = true;
-    userGrid[r][c] = 1;
+    globalThis.revealedGrid[r][c] = true;
+    globalThis.userGrid[r][c] = 1;
     renderCell(r, c);
     updClues(r, c);
     trackAchStat('tilesRevealed', 1);
-    _applyCellEffect([`g-${r}-${c}`], 'reveal');
+    globalThis._applyCellEffect([`g-${r}-${c}`], 'reveal');
 
-    showToast(t('cls_typei_bonus'));
+    globalThis.showToast(t('cls_typei_bonus'));
 
-    questStat_classRevealUsed(1);
-    updateQuestStats('classAbilityUsedThisLevel', {});
+    globalThis.questStat_classRevealUsed(1);
+    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
 
-    checkWin();
+    globalThis.checkWin();
 }

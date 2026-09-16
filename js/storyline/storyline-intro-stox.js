@@ -1,4 +1,9 @@
-﻿// =============================================================================
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+// =============================================================================
 // storyline-intro-stox.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // Character intro data for Stox ("The Analyst").
@@ -6,7 +11,7 @@
 // DEFAULT_SLIDE_DURATION_MS etc.) - must load AFTER that file.
 
 // Folder where Stox's intro images live (relative to your index.html)
-const STOX_INTRO_IMAGE_PATH = "images/Intro/Stox_Intro/";
+export const STOX_INTRO_IMAGE_PATH = "images/Intro/Stox_Intro/";
 
 
 // ---------------------------------------------------------------------------
@@ -31,7 +36,7 @@ const STOX_INTRO_IMAGE_PATH = "images/Intro/Stox_Intro/";
 // before slot 26, since "He is finished waiting" lands earlier in the song
 // than "The archive kept its secrets..."). If you regenerate or reorder any
 // images, keep this array sorted by ascending `time`.
-const STOX_INTRO_SONG = {
+export const STOX_INTRO_SONG = {
     audio: "audio/Intro/Stox_Intro_Song.ogg",
     imagePath: STOX_INTRO_IMAGE_PATH,
 

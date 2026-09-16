@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE BARRAGE (boss_barrage)---------------------------
 //------------------------------------------------------------------------
 // TIER 8 REWORK - "The War-Machine Brute". artillery barrage theming. The
@@ -36,8 +44,8 @@
 
 // DEBUG: slow The Barrage's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_BAR_DEBUG_SLOW = true;
-const _EG_BAR_DEBUG_MULT = _EG_BAR_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_BAR_DEBUG_SLOW = true;
+export const _EG_BAR_DEBUG_MULT = _EG_BAR_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_barrage: {
@@ -73,8 +81,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_BAR_TOUCH_CD_MS = 700;       // shared touch cooldown
-const EG_BAR_HEAL_PCT    = 0.15;      // %maxHP crate-clear heal (proven reward pattern)
+export const EG_BAR_TOUCH_CD_MS = 700;       // shared touch cooldown
+export const EG_BAR_HEAL_PCT    = 0.15;      // %maxHP crate-clear heal (proven reward pattern)
 
 
 //------------------------------------------------------------------------
@@ -83,8 +91,8 @@ const EG_BAR_HEAL_PCT    = 0.15;      // %maxHP crate-clear heal (proven reward 
 
 // Touch damage helper shared by all Barrage hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egBarHitCd = 0;
-function _egBarTouch(pct, level, label) {
+export let _egBarHitCd = 0;
+export function _egBarTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egBarHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -96,15 +104,15 @@ function _egBarTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egBarPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egBarPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Proven reward pattern (Siren echo zones / Swarm royal jelly): heals go
 // through a guarded clamp + rerender.
-function _egBarHeal(amount) {
+export function _egBarHeal(amount) {
     if (typeof playerCurrentHP === 'undefined') return;
-    const before = playerCurrentHP;
-    playerCurrentHP = Math.min(playerMaxHP || before, before + amount);
-    if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    const before = globalThis.playerCurrentHP;
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + amount);
+    if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
 
@@ -115,11 +123,11 @@ function _egBarHeal(amount) {
 // The telegraph stays visible while it rolls - fight INSIDE the barrage.
 // Phase 3: a second curtain sweeps from the top edge simultaneously, so the
 // safe wedge is a moving diagonal.
-const EG_BAR_CURTAIN_W   = 120;        // splash band width (px)
-const EG_BAR_CURTAIN_DMG = [0, 0.13, 0.15, 0.17];  // %maxHP standing in the wall
-const EG_BAR_CURTAIN_ROWS = [0, 4, 6]; // splash rows per cast, by phase
+export const EG_BAR_CURTAIN_W   = 120;        // splash band width (px)
+export const EG_BAR_CURTAIN_DMG = [0, 0.13, 0.15, 0.17];  // %maxHP standing in the wall
+export const EG_BAR_CURTAIN_ROWS = [0, 4, 6]; // splash rows per cast, by phase
 
-function _egMechBarCurtain(monster, phase) {
+export function _egMechBarCurtain(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -188,13 +196,13 @@ function _egMechBarCurtain(monster, phase) {
 // artillery JAMMER that lobs slow mortar shells at your last position.
 // Destructible: step into one to smash it (small heal - proven reward
 // pattern). Two crates in phase 2, three in phase 3.
-const EG_BAR_DROP_WARN_MS  = 1500;
-const EG_BAR_JAMMER_LIFE   = 12000;     // ms a jammer stays live
-const EG_BAR_JAMMER_SHELL_DMG = [0, 0, 0.09, 0.10];
-const EG_BAR_JAMMER_SHELL_SPD = 150;    // px/s
-const EG_BAR_JAMMER_LOB_MS = 2600;      // ms between mortar lobs
+export const EG_BAR_DROP_WARN_MS  = 1500;
+export const EG_BAR_JAMMER_LIFE   = 12000;     // ms a jammer stays live
+export const EG_BAR_JAMMER_SHELL_DMG = [0, 0, 0.09, 0.10];
+export const EG_BAR_JAMMER_SHELL_SPD = 150;    // px/s
+export const EG_BAR_JAMMER_LOB_MS = 2600;      // ms between mortar lobs
 
-function _egMechBarSupplyDrop(monster, phase) {
+export function _egMechBarSupplyDrop(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -308,14 +316,14 @@ function _egMechBarSupplyDrop(monster, phase) {
 //------------------------------------------------------------------------
 // Heavy shells fall on telegraphed rings; each burst scatters hot shrapnel
 // that keeps travelling. Impact ring + fragment lanes - read both.
-const EG_BAR_SHELL_COUNT  = [0, 0, 3, 4];
-const EG_BAR_SHELL_WARN_MS = 1600;
-const EG_BAR_SHELL_DMG    = [0, 0, 0.15, 0.17];   // %maxHP caught in the ring
-const EG_BAR_SHRAP_DMG    = [0, 0, 0.055, 0.065]; // %maxHP shrapnel touch
-const EG_BAR_SHRAP_SPD    = 190;                  // px/s
-const EG_BAR_SHRAP_LIFE   = 2600;                 // ms shrapnel stays hot
+export const EG_BAR_SHELL_COUNT  = [0, 0, 3, 4];
+export const EG_BAR_SHELL_WARN_MS = 1600;
+export const EG_BAR_SHELL_DMG    = [0, 0, 0.15, 0.17];   // %maxHP caught in the ring
+export const EG_BAR_SHRAP_DMG    = [0, 0, 0.055, 0.065]; // %maxHP shrapnel touch
+export const EG_BAR_SHRAP_SPD    = 190;                  // px/s
+export const EG_BAR_SHRAP_LIFE   = 2600;                 // ms shrapnel stays hot
 
-function _egMechBarShotShells(monster, phase) {
+export function _egMechBarShotShells(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -386,7 +394,7 @@ function _egMechBarShotShells(monster, phase) {
         return pending || shrap.length > 0;
     });
 }
-let _egBarShrapCd = 0;
+export let _egBarShrapCd = 0;
 
 
 //------------------------------------------------------------------------
@@ -396,25 +404,25 @@ let _egBarShrapCd = 0;
 // one at a time (each a widening volley of safe gaps), then the ALL-OUT
 // SALVO detonates everything except the single untouched safe tile. Charge
 // bar frozen (gate in _egTickPlayer via _egBarFinalActive).
-const EG_BAR_VOLLEYS   = 3;       // big strikes before the salvo
-const EG_BAR_VOLLEY_GAP = 4600;   // ms between strikes
+export const EG_BAR_VOLLEYS   = 3;       // big strikes before the salvo
+export const EG_BAR_VOLLEY_GAP = 4600;   // ms between strikes
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egBarFinal = null;
+export let _egBarFinal = null;
 
-function _egBarFinalActive() {
+export function _egBarFinalActive() {
     return !!_egBarFinal && !_egBarFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egBarOnPhaseEnter(monster, newPhase) {
+export function _egBarOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egBarStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egBarStartFinalWatcher(monster) {
+export function _egBarStartFinalWatcher(monster) {
     if (!monster || _egBarFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -432,7 +440,7 @@ function _egBarStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-function _egBarAfter(g, ms, fn) {
+export function _egBarAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egBarFinal) return;
@@ -443,7 +451,7 @@ function _egBarAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egBarFinalStart(monster) {
+export function _egBarFinalStart(monster) {
     if (_egBarFinal || !monster) return;
 
     // The guns go quiet for everything else: kill every other run of this
@@ -599,7 +607,7 @@ function _egBarFinalStart(monster) {
 //-------------------FINALE END--------------------------------------------
 //------------------------------------------------------------------------
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egBarFinalEnd(g, monster) {
+export function _egBarFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -617,7 +625,7 @@ function _egBarFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -629,7 +637,7 @@ function _egBarFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egBarTeardown() {
+export function _egBarTeardown() {
     if (_egBarFinal) { try { _egBarFinalEnd(_egBarFinal, null); } catch (e) {} _egBarFinal = null; }
     document.querySelectorAll('.eg-bar-curtain, .eg-bar-splash, .eg-bar-drop-warn, .eg-bar-jammer, ' +
         '.eg-bar-mortar, .eg-bar-mortar-boom, .eg-bar-shell-warn, .eg-bar-shell-boom, .eg-bar-shrap, ' +
@@ -654,7 +662,7 @@ if (typeof window !== 'undefined') {
     window._EG_BAR_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_barrage') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_barrage') : null;
             if (!monster) return 'no barrage alive';
             const fn = name === 'curtain' ? _egMechBarCurtain
                 : name === 'supply' ? _egMechBarSupplyDrop
@@ -666,7 +674,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_barrage') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_barrage') : null;
             if (!monster) return 'no barrage alive';
             _egBarFinalStart(monster);
             return 'FINAL BOMBARDMENT started';

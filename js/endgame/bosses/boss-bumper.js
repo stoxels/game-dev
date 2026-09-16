@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE BUMPER (boss_bumper)------------------------
 //------------------------------------------------------------------------
 // Carnival-ring fight: the arena becomes a pinball table that fights you.
@@ -59,53 +68,53 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Carnival tuning ─────────────────────────────────────────────────────
 // Roaming bumpers
-const EG_BUMP_BUMPER_N = [0, 2, 3, 3];      // alive at once per boss phase
-const EG_BUMP_BUMPER_R = 30;                // bumper visual radius (el at b.x - 30)
-const EG_BUMP_BUMPER_SPEED = [0, 34, 46, 60]; // px/s drift
-const EG_BUMP_FLING = [0, 150, 180, 210];   // px fling impulse per thwack
-const EG_BUMP_THWACK_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP per bumper touch
-const EG_BUMP_THWACK_CD_MS = 900;           // per-bumper touch cooldown
+export const EG_BUMP_BUMPER_N = [0, 2, 3, 3];      // alive at once per boss phase
+export const EG_BUMP_BUMPER_R = 30;                // bumper visual radius (el at b.x - 30)
+export const EG_BUMP_BUMPER_SPEED = [0, 34, 46, 60]; // px/s drift
+export const EG_BUMP_FLING = [0, 150, 180, 210];   // px fling impulse per thwack
+export const EG_BUMP_THWACK_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP per bumper touch
+export const EG_BUMP_THWACK_CD_MS = 900;           // per-bumper touch cooldown
 // Pinball shower
-const EG_BUMP_SHOWER_INTERVAL_MS = [0, 4600, 3600, 2700]; // per boss phase
-const EG_BUMP_BALL_SPEED = [0, 230, 280, 330]; // px/s
-const EG_BUMP_BALL_DMG = 0.05;              // %maxHP per ball touch (physical)
-const EG_BUMP_BALL_CD_MS = 450;             // global ball-hit cooldown
-const EG_BUMP_BALL_R = 26;                  // ball radius
-const EG_BUMP_BALL_BOUNCE_BOOST = 55;       // px/s kick when bouncing off a bumper
-const EG_BUMP_BALL_MAX_SPEED = 640;         // px/s hard cap - kicks can't snowball
+export const EG_BUMP_SHOWER_INTERVAL_MS = [0, 4600, 3600, 2700]; // per boss phase
+export const EG_BUMP_BALL_SPEED = [0, 230, 280, 330]; // px/s
+export const EG_BUMP_BALL_DMG = 0.05;              // %maxHP per ball touch (physical)
+export const EG_BUMP_BALL_CD_MS = 450;             // global ball-hit cooldown
+export const EG_BUMP_BALL_R = 26;                  // ball radius
+export const EG_BUMP_BALL_BOUNCE_BOOST = 55;       // px/s kick when bouncing off a bumper
+export const EG_BUMP_BALL_MAX_SPEED = 640;         // px/s hard cap - kicks can't snowball
 // Slingshots: the two diagonal kickers in the bottom corners - real
 // pinball-table physics for pinballs that hit them.
-const EG_BUMP_SLING_LEN = 300;              // kicker length (px)
-const EG_BUMP_SLING_T = 46;                 // collision half-thickness (px)
-const EG_BUMP_SLING_KICK = 340;             // px/s normal-speed boost on a kick
-const EG_BUMP_SLING_TILT_KICK = 430;        // px/s during TILT enrage
+export const EG_BUMP_SLING_LEN = 300;              // kicker length (px)
+export const EG_BUMP_SLING_T = 46;                 // collision half-thickness (px)
+export const EG_BUMP_SLING_KICK = 340;             // px/s normal-speed boost on a kick
+export const EG_BUMP_SLING_TILT_KICK = 430;        // px/s during TILT enrage
 // Tilt! Flipper Frenzy (60% gate)
-const EG_BUMP_FLIP_MS = 9000;               // whole frenzy duration
-const EG_BUMP_FLIP_WARN_MS = 1000;          // arc band telegraph before a slap
-const EG_BUMP_FLIP_STRIKE_MS = 380;         // the slap is live
-const EG_BUMP_FLIP_CYCLE_MS = 1700;         // one flipper slaps per cycle (alternating)
-const EG_BUMP_FLIP_DMG = 0.13;              // %maxHP per slap (physical)
-const EG_BUMP_TILT_MS = 6500;               // bumper enrage while flippers rage
+export const EG_BUMP_FLIP_MS = 9000;               // whole frenzy duration
+export const EG_BUMP_FLIP_WARN_MS = 1000;          // arc band telegraph before a slap
+export const EG_BUMP_FLIP_STRIKE_MS = 380;         // the slap is live
+export const EG_BUMP_FLIP_CYCLE_MS = 1700;         // one flipper slaps per cycle (alternating)
+export const EG_BUMP_FLIP_DMG = 0.13;              // %maxHP per slap (physical)
+export const EG_BUMP_TILT_MS = 6500;               // bumper enrage while flippers rage
 // Multiball Rush (30% gate)
-const EG_BUMP_MULTIBALL_N = [0, 0, 0, 6];   // balls released (phase 3 gate)
-const EG_BUMP_MULTIBALL_MS = 12000;         // rush duration
-const EG_BUMP_MULTIBALL_SPEED = 340;        // px/s ricochet speed
+export const EG_BUMP_MULTIBALL_N = [0, 0, 0, 6];   // balls released (phase 3 gate)
+export const EG_BUMP_MULTIBALL_MS = 12000;         // rush duration
+export const EG_BUMP_MULTIBALL_SPEED = 340;        // px/s ricochet speed
 // Bumper Slam (charge attack)
-const EG_BUMP_SLAM_WARN_MS = 1050;          // target-ring telegraph
-const EG_BUMP_SLAM_RING_MS = 420;           // shockwave flash after impact
-const EG_BUMP_SLAM_R = 130;                 // slam radius (visual + hit)
-const EG_BUMP_SLAM_DMG = [0, 0.12, 0.15, 0.18]; // %maxHP by boss phase
-const EG_BUMP_SLAM_FLING = 220;             // px fling away from impact
+export const EG_BUMP_SLAM_WARN_MS = 1050;          // target-ring telegraph
+export const EG_BUMP_SLAM_RING_MS = 420;           // shockwave flash after impact
+export const EG_BUMP_SLAM_R = 130;                 // slam radius (visual + hit)
+export const EG_BUMP_SLAM_DMG = [0, 0.12, 0.15, 0.18]; // %maxHP by boss phase
+export const EG_BUMP_SLAM_FLING = 220;             // px fling away from impact
 
 
-let _egBumpWatcher = null; // per-fight carnival state
-let _egBumpSlamActive = false; // a slam set-piece is running
+export let _egBumpWatcher = null; // per-fight carnival state
+export let _egBumpSlamActive = false; // a slam set-piece is running
 
 
 // Hard cap on pinball speed. Sling kicks and bumper boosts ADD velocity on
 // every hit, so without a cap a ball ricocheting around the table could
 // snowball to unbounded speed. Clamp the magnitude after any boost.
-function _egBumpCapBallSpeed(b) {
+export function _egBumpCapBallSpeed(b) {
     const s = Math.hypot(b.vx, b.vy);
     if (s > EG_BUMP_BALL_MAX_SPEED) {
         const k = EG_BUMP_BALL_MAX_SPEED / s;
@@ -116,7 +125,7 @@ function _egBumpCapBallSpeed(b) {
 
 
 // Sweep every carnival overlay off the screen. Safe to call twice.
-function _egBumperSweep() {
+export function _egBumperSweep() {
     _egBumpSlamActive = false;
     try {
         document.querySelectorAll('.eg-bump-bumper, .eg-bump-ball, .eg-bump-flip, .eg-bump-slam-ring, .eg-bump-slam-core, .eg-bump-rail').forEach(el => el.remove());
@@ -125,7 +134,7 @@ function _egBumperSweep() {
 
 
 // Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-function _egBumperTeardown() {
+export function _egBumperTeardown() {
     const st = _egBumpWatcher;
     _egBumpWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
@@ -138,7 +147,7 @@ function _egBumperTeardown() {
 // One thwack: fling the player away from (x, y) and deal the touch damage.
 // The fling is animated (decaying slide + tumble + impact burst) so the
 // bump visually reads as a physical bounce instead of a teleport.
-function _egBumpFlingHit(st, x, y, flingPx, dmgPct, label) {
+export function _egBumpFlingHit(st, x, y, flingPx, dmgPct, label) {
     const c = _egNkPlayerCenter();
     if (c) {
         const dx = c.x - x, dy = c.y - y;
@@ -153,7 +162,7 @@ function _egBumpFlingHit(st, x, y, flingPx, dmgPct, label) {
 // Spawns the two diagonal slingshot kickers (bottom-left and bottom-right,
 // slanted up-inward like a real table's out-lane guides). Registered on the
 // run so boss death removes them with everything else.
-function _egBumpSpawnSlings(st, run) {
+export function _egBumpSpawnSlings(st, run) {
     const W = window.innerWidth, H = window.innerHeight;
     const defs = [
         { side: 'left', x0: 26, y0: H - 60, ang: -42 },   // up-inward from bottom-left
@@ -187,7 +196,7 @@ function _egBumpSpawnSlings(st, run) {
 // (segment + half-thickness). On contact, reflect the velocity about the
 // inward normal (like hitting a wall at an angle) and add the kick boost -
 // the ball gets shot back into the playfield, exactly like a real machine.
-function _egBumpSlingBall(st, b, now, tilting) {
+export function _egBumpSlingBall(st, b, now, tilting) {
     st.slings.forEach(sl => {
         // Project the ball onto the kicker segment.
         const rx = b.x - sl.x0, ry = b.y - sl.y0;
@@ -222,7 +231,7 @@ function _egBumpSlingBall(st, b, now, tilting) {
 }
 
 
-function _egBumperArenaInit(monster) {
+export function _egBumperArenaInit(monster) {
     if (_egBumpWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -255,8 +264,8 @@ function _egBumperArenaInit(monster) {
     };
 
     _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-            ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -409,7 +418,7 @@ function _egBumperArenaInit(monster) {
 // Flippers rage in the bottom corners; each slap sweeps a telegraphed arc
 // band across the lower arena. Bumpers go TILT for the duration.
 
-function _egBumperFlipperFrenzy(st, now) {
+export function _egBumperFlipperFrenzy(st, now) {
     if (st.flip) return;
     const slaps = [];
     const n = Math.floor(EG_BUMP_FLIP_MS / EG_BUMP_FLIP_CYCLE_MS);
@@ -431,7 +440,7 @@ function _egBumperFlipperFrenzy(st, now) {
 
 // Spawns one flipper's arc band: warn (dashed) → hot strike → fade.
 // A wide rotated strip pivoting from a bottom corner, sweeping up-inward.
-function _egBumperSpawnBand(st, slap, W, H) {
+export function _egBumperSpawnBand(st, slap, W, H) {
     const pivotX = slap.side === 0 ? 60 : W - 60;
     const pivotY = H - 80;
     const len = Math.min(W * 0.62, 620);
@@ -459,7 +468,7 @@ function _egBumperSpawnBand(st, slap, W, H) {
 // ── 30% gate: Multiball Rush ────────────────────────────────────────────
 // The machine coughs up a storm of live pinballs that ricochet everywhere.
 
-function _egBumperMultiball(st, now) {
+export function _egBumperMultiball(st, now) {
     if (st.rushDone) return;
     st.rushDone = true;
     const W = window.innerWidth, H = window.innerHeight;
@@ -486,7 +495,7 @@ function _egBumperMultiball(st, now) {
 // telegraphed target ring at the player's position, flinging and hitting
 // everything inside. Wired from _egFireMonsterAttack (endgame-encounter.js).
 
-function _egBumperSlam(monster) {
+export function _egBumperSlam(monster) {
     if (_egBumpSlamActive || _egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
     const level = monster ? monster.level : 1;
@@ -528,4 +537,4 @@ function _egBumperSlam(monster) {
 //------------------------------------------------------------------------
 // The old scheduled mechanic is now the persistent arena - keep the handler
 // name alive so any stale schedule entry no-ops instead of erroring.
-function _egMechBumperParty() { void 0; }
+export function _egMechBumperParty() { void 0; }

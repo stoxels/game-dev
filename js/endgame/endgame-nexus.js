@@ -1,3 +1,12 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { switchScreen } from '../screens/screens.js';
+import { t } from '../translation/translations.js';
+
 'use strict';
 
 //========================================================================
@@ -30,7 +39,7 @@
 //------------------------------------------------------------------------
 
 // Builds the top navigation bar with back button and Nexus title.
-function _egnBuildTopbarHTML() {
+export function _egnBuildTopbarHTML() {
     return `
 <div class="egn-topbar">
     <button class="back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
@@ -39,7 +48,7 @@ function _egnBuildTopbarHTML() {
 }
 
 // Builds one large "door" card of the Nexus.
-function _egnBuildDoorHTML(icon, labelKey, onclick) {
+export function _egnBuildDoorHTML(icon, labelKey, onclick) {
     return `
 <div class="egn-door" onclick="${onclick}">
     <div class="egn-door-icon">${icon}</div>
@@ -49,7 +58,7 @@ function _egnBuildDoorHTML(icon, labelKey, onclick) {
 
 // Assembles the complete Nexus screen layout:
 // topbar → row with the four endgame doors.
-function _egnBuildFullScreenHTML() {
+export function _egnBuildFullScreenHTML() {
     return `
 <div class="egn-hub-layout">
     ${_egnBuildTopbarHTML()}
@@ -70,7 +79,7 @@ function _egnBuildFullScreenHTML() {
 // Injected via JS, same pattern as _egtEnsureStyles() in
 // endgame-testing-screen.js - avoids needing to touch the (large) main CSS file.
 
-function _egnEnsureStyles() {
+export function _egnEnsureStyles() {
     if (document.getElementById('egn-nexus-style')) return;
 
     const style = document.createElement('style');
@@ -140,7 +149,7 @@ function _egnEnsureStyles() {
 //-------------------SCREEN BOOTSTRAP----------------------------------------
 //------------------------------------------------------------------------
 
-function _egnCreateScreen() {
+export function _egnCreateScreen() {
     _egnEnsureStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-nexus';
@@ -149,14 +158,14 @@ function _egnCreateScreen() {
     document.body.appendChild(screen);
 }
 
-function ensureEndgameNexusScreen() {
+export function ensureEndgameNexusScreen() {
     if (!document.getElementById('screen-endgame-nexus')) _egnCreateScreen();
 }
 
 // Entry point - call this to show the Nexus of Worlds screen.
 // (History push to 'screen-mode-select' happens in launchEndgameTestMode()
 // in screens.js on entry from the mode select screen.)
-function showEndgameNexus() {
+export function showEndgameNexus() {
     // Leaving any boss-test context behind - a forfeit to the Nexus must
     // not leak the flag into a later campaign run's goToLevelSelect().
     window._egIsBossTestRun = false;

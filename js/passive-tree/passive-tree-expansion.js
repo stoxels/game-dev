@@ -1,3 +1,9 @@
+﻿import { _isColSolved, _isRowSolved, clues, renderCell, updClues } from '../grid.js';
+import { save } from '../state.js';
+import { _calcEmergencyScanDuration, _trackTimerDelta, updTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { _executeFieldScan } from '../classes/class-probabilist.js';
+import { ptHasSkill } from './passive-tree-state-points.js';
 //----------------------------------------------------------------------------------------
 //-------------------PASSIVE TREE EXPANSION (nodes 303-402)-------------------------------
 //----------------------------------------------------------------------------------------
@@ -19,6 +25,13 @@
 //----------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------
 
+// Phase 3 step 5: as a module this file evaluates BEFORE the concatenated
+// game code, but patch() needs every wrapped function to exist already.
+// Defer the whole expansion to DOMContentLoaded (same pattern as
+// tutorial-quest.js). Module-export targets are on globalThis by then via
+// their owner modules' write-through accessors; window bridges globalThis,
+// so window[name] resolves for both module and concatenated targets.
+export function _ptxRunExpansion() {
 (function () {
     'use strict';
 
@@ -77,7 +90,7 @@
     }
 
     function elapsedSecs() {
-        return Math.floor((Date.now() - levelStartTime) / 1000);
+        return Math.floor((Date.now() - globalThis.levelStartTime) / 1000);
     }
 
     //--------------------------------------------------------------------------
@@ -85,26 +98,26 @@
     //--------------------------------------------------------------------------
 
     function addSecs(n) {
-        if (!cur || dead || n <= 0) return;
-        const before = timerSecs;
-        timerSecs = Math.min(7200, timerSecs + n);
-        if (typeof _trackTimerDelta === 'function') _trackTimerDelta(before, timerSecs);
+        if (!globalThis.cur || globalThis.dead || n <= 0) return;
+        const before = globalThis.timerSecs;
+        globalThis.timerSecs = Math.min(7200, globalThis.timerSecs + n);
+        if (typeof _trackTimerDelta === 'function') _trackTimerDelta(before, globalThis.timerSecs);
         updTimer();
     }
 
     function loseSecs(n) {
-        if (!cur || dead || n <= 0) return;
-        const before = timerSecs;
-        timerSecs = Math.max(0, timerSecs - n);
-        if (typeof _trackTimerDelta === 'function') _trackTimerDelta(before, timerSecs);
+        if (!globalThis.cur || globalThis.dead || n <= 0) return;
+        const before = globalThis.timerSecs;
+        globalThis.timerSecs = Math.max(0, globalThis.timerSecs - n);
+        if (typeof _trackTimerDelta === 'function') _trackTimerDelta(before, globalThis.timerSecs);
         updTimer();
     }
 
     function freeze(ms) {
-        if (!cur || dead) return;
-        timerFrozen = true;
+        if (!globalThis.cur || globalThis.dead) return;
+        globalThis.timerFrozen = true;
         updTimer();
-        setTimeout(() => { timerFrozen = false; updTimer(); }, ms);
+        setTimeout(() => { globalThis.timerFrozen = false; updTimer(); }, ms);
     }
 
     // Start-of-level luck roll with all +% chance nodes applied.
@@ -115,7 +128,7 @@
         if (has('law_of_averages')) p += 0.05;
         if (has('meta_analysis')) p += 0.10;
         if (has('dream_logic')) {
-            const above = !baseTime() || timerSecs > baseTime() * 0.5;
+            const above = !baseTime() || globalThis.timerSecs > baseTime() * 0.5;
             if (above && !markSide) p += 0.05;
             if (!above && markSide) p += 0.05;
         }
@@ -124,38 +137,38 @@
 
     // Reveals one specific solution cell (guards included).
     function revealAt(r, c) {
-        if (!cur) return false;
-        const sol = cur.grid;
+        if (!globalThis.cur) return false;
+        const sol = globalThis.cur.grid;
         if (sol[r][c] !== 1) return false;
-        if (userGrid[r][c] === 1 || revealedGrid[r][c]) return false;
-        revealedGrid[r][c] = true;
-        userGrid[r][c] = 1;
+        if (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c]) return false;
+        globalThis.revealedGrid[r][c] = true;
+        globalThis.userGrid[r][c] = 1;
         renderCell(r, c);
         updClues(r, c);
         // Endgame: fire a projectile from this auto-reveal toward the targeted monster.
         // Queued if the encounter hasn't started yet (start-of-puzzle passives).
-        if (typeof _egOnProgrammaticReveal === 'function') _egOnProgrammaticReveal([`g-${r}-${c}`]);
-        checkWin();
+        if (typeof globalThis._egOnProgrammaticReveal === 'function') globalThis._egOnProgrammaticReveal([`g-${r}-${c}`]);
+        globalThis.checkWin();
         return true;
     }
 
     // Marks one specific truly-empty cell.
     function markAt(r, c) {
-        if (!cur) return false;
-        const sol = cur.grid;
+        if (!globalThis.cur) return false;
+        const sol = globalThis.cur.grid;
         if (sol[r][c] !== 0) return false;
-        if (userGrid[r][c] !== 0 && userGrid[r][c] !== 3) return false;
-        if (wrongGrid[r][c]) return false;
-        userGrid[r][c] = 2;
-        systemMarkedGrid[r][c] = true;
+        if (globalThis.userGrid[r][c] !== 0 && globalThis.userGrid[r][c] !== 3) return false;
+        if (globalThis.wrongGrid[r][c]) return false;
+        globalThis.userGrid[r][c] = 2;
+        globalThis.systemMarkedGrid[r][c] = true;
         renderCell(r, c);
         return true;
     }
 
     // Returns [r,c] of a random candidate satisfying pick(), or null.
     function randomCell(pick) {
-        if (!cur) return null;
-        const sol = cur.grid;
+        if (!globalThis.cur) return null;
+        const sol = globalThis.cur.grid;
         const pool = [];
         for (let r = 0; r < sol.length; r++)
             for (let c = 0; c < sol[0].length; c++)
@@ -166,12 +179,12 @@
 
     const ORTHO = [[-1, 0], [1, 0], [0, -1], [0, 1]];
     function inGrid(r, c) {
-        return cur && r >= 0 && c >= 0 && r < cur.grid.length && c < cur.grid[0].length;
+        return globalThis.cur && r >= 0 && c >= 0 && r < globalThis.cur.grid.length && c < globalThis.cur.grid[0].length;
     }
 
     // Line fill stats copied from timer.js semantics.
     function lineFillStats(index, isRow) {
-        const sol = cur.grid;
+        const sol = globalThis.cur.grid;
         const other = isRow ? sol[0].length : sol.length;
         let filled = 0, total = 0;
         for (let i = 0; i < other; i++) {
@@ -179,14 +192,14 @@
             const c = isRow ? i : index;
             if (sol[r][c] === 1) {
                 total++;
-                if (userGrid[r][c] === 1 || revealedGrid[r][c]) filled++;
+                if (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c]) filled++;
             }
         }
         return { filled, total };
     }
 
     function toast(msg) {
-        if (typeof showToast === 'function') showToast(msg);
+        if (typeof globalThis.showToast === 'function') globalThis.showToast(msg);
     }
 
     //--------------------------------------------------------------------------
@@ -221,9 +234,9 @@
 
     const PENALTY_MODS = [
         // Final Theorem: below 10% starting time → immune.
-        pen => (has('final_theorem') && baseTime() > 0 && timerSecs < baseTime() * 0.1) ? 0 : pen,
+        pen => (has('final_theorem') && baseTime() > 0 && globalThis.timerSecs < baseTime() * 0.1) ? 0 : pen,
         // Rune Insurance / Outlier Immunity: first mistake free.
-        pen => ((has('rune_insurance') || has('outlier_immunity')) && mistakeCount === 1) ? 0 : pen,
+        pen => ((has('rune_insurance') || has('outlier_immunity')) && globalThis.mistakeCount === 1) ? 0 : pen,
         // Ergodic Recall: 3 charges per level absorb penalties entirely.
         pen => {
             if (has('ergodic_recall') && pen > 0 && (window._ptxRecallLeft === undefined || window._ptxRecallLeft > 0)) {
@@ -271,7 +284,7 @@
 
     ON_START.push(() => {   // Stratosphere Read (304)
         if (!has('stratosphere_read')) return;
-        const lastRow = cur.grid.length - 1;
+        const lastRow = globalThis.cur.grid.length - 1;
         const cell = randomCell((r, c) => r === lastRow);
         if (cell && revealAt(cell[0], cell[1])) toast('🎈 Stratosphere Read');
     });
@@ -284,14 +297,14 @@
 
     ON_START.push(() => {   // Zenith Glimpse (306)
         if (!has('zenith_glimpse')) return;
-        const lastCol = cur.grid[0].length - 1;
+        const lastCol = globalThis.cur.grid[0].length - 1;
         const cell = randomCell((r, c) => c === lastCol);
         if (cell && markAt(cell[0], cell[1])) toast('☀️ Zenith Glimpse');
     });
 
     ON_START.push(() => {   // Cartographer's Oath keystone (307)
         if (!has('keystone_cartographers_oath')) return;
-        const sol = cur.grid;
+        const sol = globalThis.cur.grid;
         const rows = sol.length, cols = sol[0].length;
         let touched = 0;
         const walk = (r, c) => {
@@ -306,20 +319,20 @@
     // Simple rolls ----------------------------------------------------------------
 
     ON_START.push(() => {   // Socratic Method (308)
-        if (has('socratic_method') && roll(0.25, false)) revealTiles(1);
+        if (has('socratic_method') && roll(0.25, false)) globalThis.revealTiles(1);
     });
 
     ON_START.push(() => {   // Fair Coin (382)
         if (!has('fair_coin')) return;
-        if (roll(0.10, false)) revealTiles(1);
-        if (roll(0.10, true)) markWrongTiles(1);
+        if (roll(0.10, false)) globalThis.revealTiles(1);
+        if (roll(0.10, true)) globalThis.markWrongTiles(1);
     });
 
     // Information-theory cluster -----------------------------------------------
 
     ON_START.push(() => {   // Entropy Observer (312)
         if (!has('entropy_observer')) return;
-        const sol = cur.grid;
+        const sol = globalThis.cur.grid;
         let sparsest = 0, min = Infinity;
         for (let r = 0; r < sol.length; r++) {
             const f = sol[r].filter(v => v === 1).length;
@@ -331,7 +344,7 @@
 
     ON_START.push(() => {   // Prior Art (366)
         if (!has('prior_art')) return;
-        const sol = cur.grid;
+        const sol = globalThis.cur.grid;
         let densest = 0, max = -1;
         for (let r = 0; r < sol.length; r++) {
             const f = sol[r].filter(v => v === 1).length;
@@ -344,26 +357,26 @@
     ON_START.push(() => {   // Shannon Bound (313)
         if (!has('shannon_bound')) return;
         const target = randomCell((r, c) =>
-            cur.grid[r][c] === 0 && userGrid[r][c] === 0 &&
-            ORTHO.some(([dr, dc]) => inGrid(r + dr, c + dc) && revealedGrid[r + dr][c + dc]));
+            globalThis.cur.grid[r][c] === 0 && globalThis.userGrid[r][c] === 0 &&
+            ORTHO.some(([dr, dc]) => inGrid(r + dr, c + dc) && globalThis.revealedGrid[r + dr][c + dc]));
         if (target && markAt(target[0], target[1])) toast('📶 Shannon Bound');
     });
 
     ON_START.push(() => {   // Mutual Information (314)
         if (!has('mutual_information')) return;
         const target = randomCell((r, c) =>
-            cur.grid[r][c] === 1 && userGrid[r][c] !== 1 && !revealedGrid[r][c] &&
+            globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c] &&
             (rowHasRevealed(r) || colHasRevealed(c)));
         if (target) { revealAt(target[0], target[1]); toast('🔗 Mutual Information'); }
-        else revealTiles(1);
+        else globalThis.revealTiles(1);
     });
 
     function rowHasRevealed(r) {
-        for (let c = 0; c < cur.grid[0].length; c++) if (revealedGrid[r][c]) return true;
+        for (let c = 0; c < globalThis.cur.grid[0].length; c++) if (globalThis.revealedGrid[r][c]) return true;
         return false;
     }
     function colHasRevealed(c) {
-        for (let r = 0; r < cur.grid.length; r++) if (revealedGrid[r][c]) return true;
+        for (let r = 0; r < globalThis.cur.grid.length; r++) if (globalThis.revealedGrid[r][c]) return true;
         return false;
     }
 
@@ -371,7 +384,7 @@
 
     ON_START.push(() => {   // Umbral Survey (337)
         if (!has('umbral_survey')) return;
-        const rows = cur.grid.length, cols = cur.grid[0].length;
+        const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
         const midR = Math.floor(rows / 2), midC = Math.floor(cols / 2);
         const quads = [
             [0, midR, 0, midC], [0, midR, midC, cols],
@@ -381,7 +394,7 @@
         quads.forEach(([r0, r1, c0, c1]) => {
             const cell = randomCell((r, c) =>
                 r >= r0 && r < r1 && c >= c0 && c < c1 &&
-                cur.grid[r][c] === 0 && userGrid[r][c] === 0);
+                globalThis.cur.grid[r][c] === 0 && globalThis.userGrid[r][c] === 0);
             if (cell && markAt(cell[0], cell[1])) marked++;
         });
         if (marked) toast('🌑 Umbral Survey');
@@ -389,42 +402,42 @@
 
     // Generic +reveal / +mark start nodes ---------------------------------------
 
-    ON_START.push(() => { if (has('interdisciplinary')) revealTiles(1); });          // 360
-    ON_START.push(() => { if (has('cross_faculty')) markWrongTiles(1); });           // 361
-    ON_START.push(() => { if (has('margin_notes')) revealTiles(1); });               // 377
-    ON_START.push(() => { if (has('study_group')) markWrongTiles(1); });             // 378
-    ON_START.push(() => { if (has('dark_adaptation')) markWrongTiles(1); });         // 390
-    ON_START.push(() => { if (has('corollary')) revealTiles(1); });                  // 401
+    ON_START.push(() => { if (has('interdisciplinary')) globalThis.revealTiles(1); });          // 360
+    ON_START.push(() => { if (has('cross_faculty')) globalThis.markWrongTiles(1); });           // 361
+    ON_START.push(() => { if (has('margin_notes')) globalThis.revealTiles(1); });               // 377
+    ON_START.push(() => { if (has('study_group')) globalThis.markWrongTiles(1); });             // 378
+    ON_START.push(() => { if (has('dark_adaptation')) globalThis.markWrongTiles(1); });         // 390
+    ON_START.push(() => { if (has('corollary')) globalThis.revealTiles(1); });                  // 401
     ON_START.push(() => {                                                            // 393 Thesis Defense
         if (!has('thesis_defense')) return;
-        revealTiles(1); markWrongTiles(1);
+        globalThis.revealTiles(1); globalThis.markWrongTiles(1);
     });
-    ON_START.push(() => { if (has('night_vision')) markWrongTiles(2); });            // 338
+    ON_START.push(() => { if (has('night_vision')) globalThis.markWrongTiles(2); });            // 338
 
     // Persistent pending bonuses (Hour Vault / Cold Reading) ----------------------
 
     ON_START.push(() => {
         let pending = 0;
-        if (typeof STATE !== 'undefined') {
-            if (STATE.ptxSavingsReveals > 0) { pending += STATE.ptxSavingsReveals; STATE.ptxSavingsReveals = 0; }
-            if (STATE.ptxColdReading) { pending += 1; STATE.ptxColdReading = false; }
+        if (typeof globalThis.STATE !== 'undefined') {
+            if (globalThis.STATE.ptxSavingsReveals > 0) { pending += globalThis.STATE.ptxSavingsReveals; globalThis.STATE.ptxSavingsReveals = 0; }
+            if (globalThis.STATE.ptxColdReading) { pending += 1; globalThis.STATE.ptxColdReading = false; }
         }
-        if (pending > 0) { revealTiles(pending); toast(`🏦 Banked insight: ${pending} reveal${pending > 1 ? 's' : ''}`); }
+        if (pending > 0) { globalThis.revealTiles(pending); toast(`🏦 Banked insight: ${pending} reveal${pending > 1 ? 's' : ''}`); }
     });
 
     // Census (385) ------------------------------------------------------------------
 
     ON_START.push(() => {
-        if (!has('census') || !cur) return;
-        const total = cur.grid.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
+        if (!has('census') || !globalThis.cur) return;
+        const total = globalThis.cur.grid.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
         toast(`🗂️ Census: ${total} filled cells in total`);
     });
 
     // Measure Zero (343) --------------------------------------------------------------
 
     ON_START.push(() => {
-        if (!has('measure_zero') || !cur) return;
-        const sol = cur.grid;
+        if (!has('measure_zero') || !globalThis.cur) return;
+        const sol = globalThis.cur.grid;
         const rows = sol.length, cols = sol[0].length;
         let done = 0;
         for (let r = 0; r < rows; r++) {
@@ -477,15 +490,15 @@
     ON_FILL.push(() => {   // Coding Theory (316) & Gnostic Echo (311) & Serendipity Seed (384)
         S.fillCount++;
         if (has('coding_theory') && S.fillCount % 20 === 0) {
-            revealTiles(1);
+            globalThis.revealTiles(1);
             toast('🧮 Coding Theory');
         }
         if (has('gnostic_echo') && S.fillCount % 10 === 0 && Math.random() < 0.15) {
-            revealTiles(1);
+            globalThis.revealTiles(1);
             toast('🔁 Gnostic Echo');
         }
         if (has('serendipity_seed') && S.fillCount === 1 && roll(0.25, false)) {
-            revealTiles(1);
+            globalThis.revealTiles(1);
             toast('🌰 Serendipity Seed');
         }
     });
@@ -598,7 +611,7 @@
         if (type !== 'col' || !has('collapse_point')) return;
         [-1, 1].forEach(dc => {
             const nc = idx + dc;
-            if (nc < 0 || nc >= cur.grid[0].length) return;
+            if (nc < 0 || nc >= globalThis.cur.grid[0].length) return;
             const cell = randomCell((r, c) => c === nc);
             if (cell) revealAt(cell[0], cell[1]);
         });
@@ -627,21 +640,21 @@
     });
 
     TICKS.push(() => {   // Eclipse Focus (339)
-        if (has('eclipse_focus') && S.tick % 240 === 0 && S.tick > 0) revealTiles(1);
+        if (has('eclipse_focus') && S.tick % 240 === 0 && S.tick > 0) globalThis.revealTiles(1);
     });
 
     TICKS.push(() => {   // Wiener Process (318)
         if (!has('wiener_process') || S.tick % 90 !== 0 || S.tick === 0) return;
-        const cell = randomCell((r, c) => cur.grid[r][c] === 1 && userGrid[r][c] !== 1 && !revealedGrid[r][c]);
+        const cell = randomCell((r, c) => globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]);
         if (!cell) return;
         const [r, c] = cell;
-        const prev = userGrid[r][c];
-        userGrid[r][c] = 1;
+        const prev = globalThis.userGrid[r][c];
+        globalThis.userGrid[r][c] = 1;
         renderCell(r, c);
         setTimeout(() => {
-            if (!cur) return;
-            if (userGrid[r][c] === 1 && !revealedGrid[r][c]) {
-                userGrid[r][c] = prev;
+            if (!globalThis.cur) return;
+            if (globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c]) {
+                globalThis.userGrid[r][c] = prev;
                 renderCell(r, c);
             }
         }, 2000);
@@ -657,13 +670,13 @@
     });
 
     TICKS.push(() => {   // Hypothesis Testing (368) / Expected Shortfall (402) / Stationary State (356) / Axiom of Choice (344)
-        if (!cur || !baseTime()) return;
+        if (!globalThis.cur || !baseTime()) return;
 
-        const frac = timerSecs / baseTime();
+        const frac = globalThis.timerSecs / baseTime();
 
         if (has('hypothesis_testing')) {
-            if (!S.hypo75 && frac <= 0.75) { S.hypo75 = true; revealTiles(1); toast('📐 Hypothesis Test: reveal'); }
-            if (!S.hypo50 && frac <= 0.50) { S.hypo50 = true; markWrongTiles(1); toast('📐 Hypothesis Test: mark'); }
+            if (!S.hypo75 && frac <= 0.75) { S.hypo75 = true; globalThis.revealTiles(1); toast('📐 Hypothesis Test: reveal'); }
+            if (!S.hypo50 && frac <= 0.50) { S.hypo50 = true; globalThis.markWrongTiles(1); toast('📐 Hypothesis Test: mark'); }
         }
 
         if (has('expected_shortfall') && !S.shortfallUsed && frac <= 0.5) {
@@ -672,7 +685,7 @@
             toast('📉 Expected Shortfall +45s');
         }
 
-        if (has('stationary_state') && !S.stationaryUsed && timerSecs > 0 && timerSecs < 60) {
+        if (has('stationary_state') && !S.stationaryUsed && globalThis.timerSecs > 0 && globalThis.timerSecs < 60) {
             S.stationaryUsed = true;
             freeze(15000);
             toast('⏸️ Stationary State: frozen 15s');
@@ -681,21 +694,21 @@
         if (has('keystone_axiom_of_choice') && !S.axiomUsed && frac <= 0.25) {
             S.axiomUsed = true;
             let remaining = 0;
-            for (let r = 0; r < cur.grid.length; r++)
-                for (let c = 0; c < cur.grid[0].length; c++)
-                    if (cur.grid[r][c] === 1 && userGrid[r][c] !== 1 && !revealedGrid[r][c]) remaining++;
+            for (let r = 0; r < globalThis.cur.grid.length; r++)
+                for (let c = 0; c < globalThis.cur.grid[0].length; c++)
+                    if (globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]) remaining++;
             const n = Math.ceil(remaining * 0.05);
-            if (n > 0) { revealTiles(n); toast(`🎲 Axiom of Choice: ${n} cells revealed`); }
+            if (n > 0) { globalThis.revealTiles(n); toast(`🎲 Axiom of Choice: ${n} cells revealed`); }
         }
     });
 
     TICKS.push(() => {   // Power Analysis (369): second Emergency Scan at ≤2 minutes
         if (!has('power_analysis') || !has('emergency_scan_1')) return;
         if (!window._emergencyScanFired || S.powerScan2Fired) return;
-        if (timerSecs > 120 || timerSecs <= 0) return;
+        if (globalThis.timerSecs > 120 || globalThis.timerSecs <= 0) return;
         S.powerScan2Fired = true;
-        const fullSize = Math.max(cur.grid.length, cur.grid[0].length);
-        _executeFieldScan(Math.floor(cur.grid.length / 2), Math.floor(cur.grid[0].length / 2), fullSize, _calcEmergencyScanDuration());
+        const fullSize = Math.max(globalThis.cur.grid.length, globalThis.cur.grid[0].length);
+        _executeFieldScan(Math.floor(globalThis.cur.grid.length / 2), Math.floor(globalThis.cur.grid[0].length / 2), fullSize, _calcEmergencyScanDuration());
         toast('💪 Power Analysis: scan re-fired');
     });
 
@@ -704,7 +717,7 @@
     //--------------------------------------------------------------------------
 
     ON_LUCKY_CLAIM.push(() => {   // Fortune Well (324)
-        if (has('fortune_well')) { revealTiles(1); toast('🕳️ Fortune Well'); }
+        if (has('fortune_well')) { globalThis.revealTiles(1); toast('🕳️ Fortune Well'); }
     });
 
     ON_LUCKY_CLAIM.push(() => {   // Gilded Cage (326)
@@ -714,7 +727,7 @@
     ON_LUCKY_CLAIM.push(() => {   // Philosopher's Grid keystone (327)
         if (has('keystone_philosophers_grid')) {
             addSecs(60);
-            revealTiles(2);
+            globalThis.revealTiles(2);
             toast("🧪 Philosopher's Grid +60s");
         }
     });
@@ -733,7 +746,7 @@
 
     ON_ITEM_USE.push(() => {   // Open Bazaar keystone (353)
         if (has('keystone_open_bazaar')) {
-            revealTiles(2);
+            globalThis.revealTiles(2);
             addSecs(5);
             toast('🏪 Open Bazaar: 2 reveals, +5s');
         }
@@ -746,8 +759,8 @@
     // Priority: Kolmogorov > Uniform Prior > Nightfall (only one applies).
 
     function applyKolmogorov() {
-        if (!cur) return;
-        const sol = cur.grid;
+        if (!globalThis.cur) return;
+        const sol = globalThis.cur.grid;
         for (let r = 0; r < sol.length; r++) {
             const runs = clues(sol[r]);
             const txt = compressRuns(runs);
@@ -768,8 +781,8 @@
     }
 
     function applyUniformPrior() {
-        if (!cur) return;
-        const rows = cur.grid.length, cols = cur.grid[0].length;
+        if (!globalThis.cur) return;
+        const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
         S.clueOriginals = { rows: {}, cols: {} };
 
         // Backup originals
@@ -797,8 +810,8 @@
     }
 
     function applyNightfall() {
-        if (!cur) return;
-        const rows = cur.grid.length, cols = cur.grid[0].length;
+        if (!globalThis.cur) return;
+        const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
         S.clueOriginals = { rows: {}, cols: {} };
         for (let r = 0; r < rows; r++) {
             S.clueOriginals.rows[r] = readLineSpans('row', r);
@@ -811,11 +824,11 @@
         toast('🌃 Nightfall Protocol: clues hidden for 2 minutes');
 
         setTimeout(() => {
-            if (!cur || !S.clueOriginals) return;
+            if (!globalThis.cur || !S.clueOriginals) return;
             for (const r of Object.keys(S.clueOriginals.rows)) writeLineSpans('row', Number(r), S.clueOriginals.rows[r]);
             for (const c of Object.keys(S.clueOriginals.cols)) writeLineSpans('col', Number(c), S.clueOriginals.cols[c]);
             S.clueOriginals = null;
-            revealTiles(3);
+            globalThis.revealTiles(3);
             toast('🌅 Night lifts - clues restored, 3 reveals granted');
         }, 120000);
     }
@@ -825,13 +838,13 @@
     //--------------------------------------------------------------------------
 
     function snapshotLines() {
-        if (!cur) { S.rowsPrimed = new Set(); S.colsPrimed = new Set(); return; }
+        if (!globalThis.cur) { S.rowsPrimed = new Set(); S.colsPrimed = new Set(); return; }
         S.rowsPrimed = new Set();
         S.colsPrimed = new Set();
-        for (let r = 0; r < cur.grid.length; r++)
-            if (_isRowSolved(cur.grid, r)) S.rowsPrimed.add(r);
-        for (let c = 0; c < cur.grid[0].length; c++)
-            if (_isColSolved(cur.grid, c)) S.colsPrimed.add(c);
+        for (let r = 0; r < globalThis.cur.grid.length; r++)
+            if (_isRowSolved(globalThis.cur.grid, r)) S.rowsPrimed.add(r);
+        for (let c = 0; c < globalThis.cur.grid[0].length; c++)
+            if (_isColSolved(globalThis.cur.grid, c)) S.colsPrimed.add(c);
     }
 
     function fireIfNewlyDone(type, idx, primed) {
@@ -862,7 +875,7 @@
     });
 
     function runClueFX() {
-        if (!cur || dead) return;
+        if (!globalThis.cur || globalThis.dead) return;
         if (has('keystone_kolmogorov')) { applyKolmogorov(); return; }
         if (has('keystone_uniform_prior')) { applyUniformPrior(); return; }
         if (has('keystone_nightfall_protocol')) { applyNightfall(); return; }
@@ -887,7 +900,7 @@
 
     patch('_initTimer', function (orig, args) {
         const result = orig(...args);
-        if (window._egSuppressEncounterStop || !cur) return result;
+        if (window._egSuppressEncounterStop || !globalThis.cur) return result;
 
         const FLATS = [
             ['wind_tunnel', 10], ['jet_stream', 15], ['cum_laude', 25],
@@ -897,17 +910,17 @@
         let add = 0;
         FLATS.forEach(([key, val]) => { if (has(key)) add += val; });
 
-        if (typeof STATE !== 'undefined' && STATE.ptxSavingsSecs > 0) {
-            add += STATE.ptxSavingsSecs;
-            STATE.ptxSavingsSecs = 0;
+        if (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.ptxSavingsSecs > 0) {
+            add += globalThis.STATE.ptxSavingsSecs;
+            globalThis.STATE.ptxSavingsSecs = 0;
         }
 
-        if (add > 0) timerSecs += add;
+        if (add > 0) globalThis.timerSecs += add;
 
         // Scholar's Debt keystone: double total starting time.
-        if (has('keystone_scholars_debt')) timerSecs += timerSecs;
+        if (has('keystone_scholars_debt')) globalThis.timerSecs += globalThis.timerSecs;
 
-        window._ptxBaseTime = timerSecs;
+        window._ptxBaseTime = globalThis.timerSecs;
         updTimer();
         return result;
     });
@@ -922,10 +935,10 @@
     });
 
     patch('applyPenalty', function (orig, args) {
-        const before = mistakeCount;
+        const before = globalThis.mistakeCount;
         const result = orig(...args);
-        const counted = mistakeCount > before;
-        if (counted && cur && !dead) {
+        const counted = globalThis.mistakeCount > before;
+        if (counted && globalThis.cur && !globalThis.dead) {
             if (has('drift_correction')) S.driftMistakes++;
             ON_MISTAKE.forEach(fn => { try { fn(args[0], args[1]); } catch (e) { /* ignore */ } });
         }
@@ -936,7 +949,7 @@
 
     patch('fireCorrectFillHooks', function (orig, args) {
         const result = orig(...args);
-        if (cur && !dead) {
+        if (globalThis.cur && !globalThis.dead) {
             ON_FILL.forEach(fn => { try { fn(args[0], args[1]); } catch (e) { /* ignore */ } });
         }
         return result;
@@ -946,15 +959,15 @@
 
     patch('updClues', function (orig, args) {
         const [row, col, isInitial] = args;
-        if (isInitial || !cur) return orig(...args);
+        if (isInitial || !globalThis.cur) return orig(...args);
 
         const rowWasDone = S.rowsPrimed ? S.rowsPrimed.has(row) : true;
         const colWasDone = S.colsPrimed ? S.colsPrimed.has(col) : true;
 
         const result = orig(...args);
 
-        const rowDone = _isRowSolved(cur.grid, row);
-        const colDone = _isColSolved(cur.grid, col);
+        const rowDone = _isRowSolved(globalThis.cur.grid, row);
+        const colDone = _isColSolved(globalThis.cur.grid, col);
         if (rowDone && !rowWasDone) fireIfNewlyDone('row', row, false);
         else if (rowDone && S.rowsPrimed) S.rowsPrimed.add(row);
         if (colDone && !colWasDone) fireIfNewlyDone('col', col, false);
@@ -970,8 +983,8 @@
     function startTickLoop() {
         stopTickLoop();
         tickInterval = setInterval(() => {
-            if (!cur || dead) return;
-            if (timerFrozen) return;
+            if (!globalThis.cur || globalThis.dead) return;
+            if (globalThis.timerFrozen) return;
             S.tick++;
             TICKS.forEach(fn => { try { fn(); } catch (e) { /* ignore */ } });
         }, 1000);
@@ -993,7 +1006,7 @@
 
     patch('handleLuckyTileClaim', function (orig, args) {
         const result = orig(...args);
-        if (cur && !dead) {
+        if (globalThis.cur && !globalThis.dead) {
             ON_LUCKY_CLAIM.forEach(fn => { try { fn(args[0], args[1]); } catch (e) { /* ignore */ } });
         }
         return result;
@@ -1003,8 +1016,8 @@
         const [isLarge, isMassive, isLargeOrMassive] = args;
         let count = orig(...args);
         if (has('karmic_residue') && count > 0 && Math.random() < 0.10) count += 1;
-        if (has('probability_well') && count === 0 && !isLargeOrMassive && cur) {
-            const cells = cur.grid.length * cur.grid[0].length;
+        if (has('probability_well') && count === 0 && !isLargeOrMassive && globalThis.cur) {
+            const cells = globalThis.cur.grid.length * globalThis.cur.grid[0].length;
             if (cells >= 100) count = 1;   // medium grids get exactly one lucky tile
         }
         return count;
@@ -1013,7 +1026,7 @@
     // Philosopher's Grid: strip the shimmer so tiles stay invisible.
     patch('renderCell', function (orig, args) {
         const result = orig(...args);
-        if (has('keystone_philosophers_grid') && cur) {
+        if (has('keystone_philosophers_grid') && globalThis.cur) {
             const el = document.getElementById(`g-${args[0]}-${args[1]}`);
             if (el) el.classList.remove('cell-lucky', 'cell-lucky-focus');
         }
@@ -1029,11 +1042,11 @@
 
     patch('resolveRightClickValue', function (orig, args) {
         const value = orig(...args);
-        if (value === 2 && !S.typeIUsed && has('keystone_type_i_error') && cur && !dead) {
+        if (value === 2 && !S.typeIUsed && has('keystone_type_i_error') && globalThis.cur && !globalThis.dead) {
             S.typeIUsed = true;
             const [row, col] = args;
             let n = 0;
-            const rows = cur.grid.length, cols = cur.grid[0].length;
+            const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
             for (let c = 0; c < cols; c++) if (c !== col && markAt(row, c)) n++;
             for (let r = 0; r < rows; r++) if (r !== row && markAt(r, col)) n++;
             if (n > 0) toast(`🚨 Type I Error: ${n} cells mass-marked`);
@@ -1045,7 +1058,7 @@
 
     patch('useItem', function (orig, args) {
         const result = orig(...args);
-        if (cur && !dead) {
+        if (globalThis.cur && !globalThis.dead) {
             ON_ITEM_USE.forEach(fn => { try { fn(); } catch (e) { /* ignore */ } });
         }
         return result;
@@ -1055,16 +1068,16 @@
 
     patch('tryAbsorbWithShield', function (orig, args) {
         const result = orig(...args);
-        if (result === true && cur && !dead) {
+        if (result === true && globalThis.cur && !globalThis.dead) {
             if (has('glyph_ward')) { addSecs(15); toast('🔱 Glyph Ward +15s'); }
-            if (has('symmetric_shield')) { markWrongTiles(2); toast('🪞 Symmetric Shield'); }
+            if (has('symmetric_shield')) { globalThis.markWrongTiles(2); toast('🪞 Symmetric Shield'); }
         }
         return result;
     });
 
     patch('tryAbsorbWithConfidenceInterval', function (orig, args) {
         const result = orig(...args);
-        if (result === true && cur && !dead && has('asymptotic_freedom')) {
+        if (result === true && globalThis.cur && !globalThis.dead && has('asymptotic_freedom')) {
             addSecs(15);
             toast('🕊️ Asymptotic Freedom +15s');
         }
@@ -1075,7 +1088,7 @@
 
     patch('_triggerLawOfLargeNumbers', function (orig, args) {
         const result = orig(...args);
-        if (cur && !dead && has('limit_theorem') && has('keystone_law_of_large_numbers')) {
+        if (globalThis.cur && !globalThis.dead && has('limit_theorem') && has('keystone_law_of_large_numbers')) {
             addSecs(5);
             toast('📈 Limit Theorem +5s');
         }
@@ -1085,8 +1098,8 @@
     // ---- Streak threshold reduction (334) ----------------------------------------------------------------
 
     patch('checkStreakBonus', function (orig, args) {
-        if (has('truly_large_numbers') && typeof _streakBonusFills !== 'undefined' && _streakBonusFills === 9) {
-            _streakBonusFills = 14;   // the upcoming fill becomes #10 and hits the hardcoded >=15 trigger
+        if (has('truly_large_numbers') && typeof globalThis._streakBonusFills !== 'undefined' && globalThis._streakBonusFills === 9) {
+            globalThis._streakBonusFills = 14;   // the upcoming fill becomes #10 and hits the hardcoded >=15 trigger
         }
         return orig(...args);
     });
@@ -1094,16 +1107,16 @@
     // ---- Dead Reckoning threshold reduction (386) -----------------------------------------------------------
 
     patch('_deadReckoningCheckUnlock', function (orig, args) {
-        if (!has('sampling_frame') || !window._deadReckoningActive || window._deadReckoningUnlocked || !cur) {
+        if (!has('sampling_frame') || !window._deadReckoningActive || window._deadReckoningUnlocked || !globalThis.cur) {
             return orig(...args);
         }
-        const sol = cur.grid;
+        const sol = globalThis.cur.grid;
         const rows = sol.length, cols = sol[0].length;
         const totalFilled = sol.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
         let playerFilled = 0;
         for (let r = 0; r < rows; r++)
             for (let c = 0; c < cols; c++)
-                if (sol[r][c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])) playerFilled++;
+                if (sol[r][c] === 1 && (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c])) playerFilled++;
 
         if (playerFilled < Math.ceil(totalFilled * 0.15)) return;
 
@@ -1120,7 +1133,7 @@
                 if (span) span.textContent = val;
             });
         }
-        showToast(`🧭 ${t('cg_dead_reckoning')} (15%)`);
+        globalThis.showToast(`🧭 ${t('cg_dead_reckoning')} (15%)`);
     });
 
     // ---- Tutor auto-answer boost (392) ---------------------------------------------------------------------
@@ -1134,20 +1147,20 @@
 
     patch('checkWin', function (orig, args) {
         const result = orig(...args);
-        if (S.bankedThisLevel || typeof STATE === 'undefined') return result;
+        if (S.bankedThisLevel || typeof globalThis.STATE === 'undefined') return result;
         const ov = document.getElementById('ov-win');
         if (!ov || !ov.classList.contains('show')) return result;
         S.bankedThisLevel = true;
 
-        if (has('hour_vault') && timerSecs > 300) {
+        if (has('hour_vault') && globalThis.timerSecs > 300) {
             const cap = has('safety_deposit') ? 240 : 120;
-            const amount = Math.min(cap, Math.round(timerSecs * 0.10));
-            STATE.ptxSavingsSecs = Math.min(cap, (STATE.ptxSavingsSecs || 0) + amount);
+            const amount = Math.min(cap, Math.round(globalThis.timerSecs * 0.10));
+            globalThis.STATE.ptxSavingsSecs = Math.min(cap, (globalThis.STATE.ptxSavingsSecs || 0) + amount);
             if (amount > 0) toast(`🏦 Hour Vault: banked ${amount}s for next level`);
         }
-        if (has('compound_interest')) STATE.ptxSavingsReveals = Math.max(1, STATE.ptxSavingsReveals || 0);
-        if (has('safety_deposit')) STATE.ptxSavingsReveals = Math.max(2, STATE.ptxSavingsReveals || 0);
-        if (has('cold_reading') && mistakeCount >= 3) STATE.ptxColdReading = true;
+        if (has('compound_interest')) globalThis.STATE.ptxSavingsReveals = Math.max(1, globalThis.STATE.ptxSavingsReveals || 0);
+        if (has('safety_deposit')) globalThis.STATE.ptxSavingsReveals = Math.max(2, globalThis.STATE.ptxSavingsReveals || 0);
+        if (has('cold_reading') && globalThis.mistakeCount >= 3) globalThis.STATE.ptxColdReading = true;
 
         save();
         return result;
@@ -1169,7 +1182,7 @@
 
         // Wavefunction Spread (346) + Law of Total Probability (394) post-reveal procs
         // revealTiles returns [{row, col}, ...]
-        if (Array.isArray(result) && result.length > 0 && cur && !dead) {
+        if (Array.isArray(result) && result.length > 0 && globalThis.cur && !globalThis.dead) {
             result.forEach(({ row: r, col: c }) => {
                 if (has('wavefunction_spread') && Math.random() < 0.20) {
                     const dirs = shuffleArr([...ORTHO]);
@@ -1180,7 +1193,7 @@
                 if (has('total_probability') && Math.random() < 0.25) {
                     const dirs = shuffleArr([...ORTHO]);
                     for (const [dr, dc] of dirs) {
-                        if (inGrid(r + dr, c + dc) && cur.grid[r + dr][c + dc] === 1 && revealAt(r + dr, c + dc)) { toast('➗ Total Probability cascade'); break; }
+                        if (inGrid(r + dr, c + dc) && globalThis.cur.grid[r + dr][c + dc] === 1 && revealAt(r + dr, c + dc)) { toast('➗ Total Probability cascade'); break; }
                     }
                 }
             });
@@ -1192,7 +1205,7 @@
 
     patch('markWrongTiles', function (orig, args) {
         const result = orig(...args);
-        if (Array.isArray(result) && result.length > 0 && cur && !dead && has('peripheral_vision')) {
+        if (Array.isArray(result) && result.length > 0 && globalThis.cur && !globalThis.dead && has('peripheral_vision')) {
             result.forEach(([r, c]) => {
                 if (Math.random() >= 0.25) return;
                 [[0, -1], [0, 1]].forEach(([dr, dc]) => {
@@ -1210,7 +1223,7 @@
     window.revealTiles = function (...args) {
         if (window._ptxInSwap) return revealAfterProcs(...args);
         const result = revealAfterProcs(...args);
-        if (Array.isArray(result) && result.length > 0 && cur && !dead && ptHasSkill('variance_swap') && Math.random() < 0.10) {
+        if (Array.isArray(result) && result.length > 0 && globalThis.cur && !globalThis.dead && ptHasSkill('variance_swap') && Math.random() < 0.10) {
             window._ptxInSwap = true;
             try { revealAfterProcs(result.length); toast('🎚️ Variance Swap: reveal doubled'); } finally { window._ptxInSwap = false; }
         }
@@ -1218,3 +1231,14 @@
     };
 
 })();
+}
+// Deferred to DOMContentLoaded: the patch targets live in concatenated code
+// (and module accessor prologues) that does not exist yet during the import
+// phase. NOTE: deferred module scripts execute at readyState 'interactive',
+// so 'loading' alone would run this inside the import phase and the wraps
+// would capture undefined targets (the skill-hotbar P bug was this class).
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _ptxRunExpansion);
+} else {
+    _ptxRunExpansion();
+}

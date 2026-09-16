@@ -1,4 +1,4 @@
-// universal-spell-fx.js
+﻿// universal-spell-fx.js
 //------------------------------------------------------------------------
 //-------------------UNIVERSAL SPELL VISUAL EFFECTS-----------------------
 //------------------------------------------------------------------------
@@ -20,7 +20,7 @@
 //---------------------------PROJECTILE SHAPES----------------------------
 //------------------------------------------------------------------------
 
-const USP_THEME_PROJ = {
+export const USP_THEME_PROJ = {
     fire: {
         cssClass: 'usp-proj-fire', duration: 750, easing: 'ease-in', rotOffset: 0,
         build(root) {
@@ -132,7 +132,7 @@ const USP_THEME_PROJ = {
     },
 };
 
-function _uspProjDefFor(spell) {
+export function _uspProjDefFor(spell) {
     const theme = (spell && spell.theme) || 'arcane';
     return USP_THEME_PROJ[theme] || USP_THEME_PROJ.arcane;
 }
@@ -143,7 +143,7 @@ function _uspProjDefFor(spell) {
 //------------------------------------------------------------------------
 
 // Appends a themed overlay div to a monster card; auto-removes after ms.
-function _uspCardOverlay(monsterId, className, ms) {
+export function _uspCardOverlay(monsterId, className, ms) {
     try {
         const card = document.getElementById(`eg-card-${monsterId}`);
         if (!card) return null;
@@ -157,7 +157,7 @@ function _uspCardOverlay(monsterId, className, ms) {
 
 // Impact flash + expanding ring in the spell's theme. Big hits (Meteor,
 // Chaos Bolt, crits) get the .is-big treatment.
-function _uspImpact(spell, monsterId, opts) {
+export function _uspImpact(spell, monsterId, opts) {
     const theme = (spell && spell.theme) || 'arcane';
     const big = (opts && (opts.isBig || opts.isCrit)) ? ' is-big' : '';
     _uspCardOverlay(monsterId, `usp-impact usp-impact-${theme}${big}`, opts && opts.isBig ? 900 : 650);
@@ -167,13 +167,13 @@ function _uspImpact(spell, monsterId, opts) {
 }
 
 // Lingering burn / corruption / consecration sizzle on DoT ticks.
-function _uspDotTick(spell, monsterId) {
+export function _uspDotTick(spell, monsterId) {
     const theme = (spell && spell.theme) || 'arcane';
     _uspCardOverlay(monsterId, `usp-dot usp-dot-${theme}`, 850);
 }
 
 // Meteor / delayed-spell warning marker on the target card.
-function _uspTelegraph(spell, monsterId, delayMs) {
+export function _uspTelegraph(spell, monsterId, delayMs) {
     const theme = (spell && spell.theme) || 'fire';
     _uspCardOverlay(monsterId, `usp-telegraph usp-telegraph-${theme}`, Math.max(300, (delayMs || 900) + 250));
 }
@@ -185,8 +185,8 @@ function _uspTelegraph(spell, monsterId, delayMs) {
 
 // Source anchor: chain jumps fly card→card; sky strikes fall from above the
 // card; everything else launches from the player avatar (the caster).
-function _uspResolveStart(spell, targetCard, opts) {
-    const centre = (typeof _egGetElementCentre === 'function') ? _egGetElementCentre : null;
+export function _uspResolveStart(spell, targetCard, opts) {
+    const centre = (typeof globalThis._egGetElementCentre === 'function') ? globalThis._egGetElementCentre : null;
     if (opts && opts.fromMonsterId && centre) {
         const from = document.getElementById(`eg-card-${opts.fromMonsterId}`);
         if (from) return centre(from);
@@ -215,18 +215,18 @@ function _uspResolveStart(spell, targetCard, opts) {
 
 // Resolves the avatar centre in viewport coordinates, or null when the avatar
 // is not on screen (then the callers just skip the cosmetic layer).
-function _uspSupportAnchor() {
-    if (typeof _egGetElementCentre !== 'function') return null;
+export function _uspSupportAnchor() {
+    if (typeof globalThis._egGetElementCentre !== 'function') return null;
     const avatar = document.getElementById('player-avatar-wrapper')
         || document.getElementById('class-hud-drag-handle')
         || document.getElementById('ptable');
     if (!avatar) return null;
-    try { return _egGetElementCentre(avatar); } catch (e) { return null; }
+    try { return globalThis._egGetElementCentre(avatar); } catch (e) { return null; }
 }
 
 // Ring pulse + floating label over the player. `flavor` is one of
 // 'heal' | 'shield' | 'buff' | 'wasted' and only tints the label.
-function _uspSupportCastFX(spell, text, flavor) {
+export function _uspSupportCastFX(spell, text, flavor) {
     const anchor = _uspSupportAnchor();
     if (!anchor) return;
     const theme = (spell && spell.theme) || 'holy';
@@ -259,7 +259,7 @@ function _uspSupportCastFX(spell, text, flavor) {
 
 // Light ring-only pulse - used by heal-over-time ticks and other repeats so
 // the periodic effect is visible without spamming a number every second.
-function _uspSupportPulseFX(spell) {
+export function _uspSupportPulseFX(spell) {
     _uspSupportCastFX(spell, '', 'heal');
 }
 
@@ -278,7 +278,7 @@ function _uspSupportPulseFX(spell) {
 // is wider than the sprite, so drawing FX at the raw position would smear the
 // streak off the character. Measured live so it also holds on the simple
 // (level-select style) avatar, which has neither.
-function _uspMoveSpriteOffset() {
+export function _uspMoveSpriteOffset() {
     const wrap = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     const img = document.getElementById('avatar-sprite-img')
@@ -300,7 +300,7 @@ function _uspMoveSpriteOffset() {
 // Streak from the cast origin to the landing point, in wrapper coordinates.
 // `soft` is the travelling version (Dash / Disengage): thinner and dimmer, so
 // a Blink still reads as the bigger event at a glance.
-function _uspBlinkFX(spell, fromX, fromY, toX, toY, soft) {
+export function _uspBlinkFX(spell, fromX, fromY, toX, toY, soft) {
     const off = _uspMoveSpriteOffset();
     const x1 = fromX + off.x;
     const y1 = fromY + off.y;
@@ -325,13 +325,13 @@ function _uspBlinkFX(spell, fromX, fromY, toX, toY, soft) {
 // The armed Rift Anchor's world marker. One at a time (a second anchor
 // replaces the first, matching the spell), removed on recall, on expiry and
 // when the encounter ends.
-let _uspAnchorMarkerEl = null;
+export let _uspAnchorMarkerEl = null;
 
 // Where the sprite's FEET are, as an offset from the wrapper's top-left. The
 // anchor is a ground point, and the marker must stay visible - centred on the
 // sprite it would sit behind the character art, so it is pinned at the feet,
 // just below the body, where the ground contact actually is.
-function _uspMoveSpriteFootOffset() {
+export function _uspMoveSpriteFootOffset() {
     const wrap = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     const img = document.getElementById('avatar-sprite-img')
@@ -352,7 +352,7 @@ function _uspMoveSpriteFootOffset() {
     }
 }
 
-function _uspAnchorMarkerShow(spell, x, y, secs) {
+export function _uspAnchorMarkerShow(spell, x, y, secs) {
     _uspAnchorMarkerClear();
     const off = _uspMoveSpriteFootOffset();
     const el = document.createElement('div');
@@ -364,7 +364,7 @@ function _uspAnchorMarkerShow(spell, x, y, secs) {
     _uspAnchorMarkerEl = el;
 }
 
-function _uspAnchorMarkerClear() {
+export function _uspAnchorMarkerClear() {
     if (_uspAnchorMarkerEl) {
         try { _uspAnchorMarkerEl.remove(); } catch (e) { /* already gone */ }
     }
@@ -375,9 +375,9 @@ function _uspAnchorMarkerClear() {
 // Fires one themed projectile; damage lands via _egDamageTargetById so
 // resistances, ailments, echo and kill detection all apply. DoT ticks skip
 // the flight and sizzle directly on the card.
-function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
+export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
     opts = opts || {};
-    const damageFn = (typeof _egDamageTargetById === 'function') ? _egDamageTargetById : null;
+    const damageFn = (typeof globalThis._egDamageTargetById === 'function') ? globalThis._egDamageTargetById : null;
     if (!damageFn) return;
 
     // DoT ticks: no travel time, just the themed sizzle + damage.
@@ -399,15 +399,15 @@ function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
     };
 
     // No visual path (card hidden / missing anchor) - apply instantly.
-    if (!start || !targetCard || typeof _egFireProjectile !== 'function') {
+    if (!start || !targetCard || typeof globalThis._egFireProjectile !== 'function') {
         impact();
         return;
     }
 
-    const centre = _egGetElementCentre(targetCard);
+    const centre = globalThis._egGetElementCentre(targetCard);
     const scale = opts.isBig ? 1.8 : (opts.volleyIndex ? 1.1 : 1.4);
     try {
-        _egFireProjectile(
+        globalThis._egFireProjectile(
             projDef, projDef.cssClass,
             start, centre,
             opts.fromSky ? 550 : projDef.duration,

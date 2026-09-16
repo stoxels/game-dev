@@ -1,4 +1,22 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { getCharmCastingDamageMult } from '../skills/skill-charms.js';
+import { _egCalcPlayerDamage, _egLastHitElements, _egScaleElements } from './endgame-combat-calculations.js';
+import { _egAnimatePlayerProjectile } from './endgame-encounter.js';
+import { _egMapAbilityRevealMult, _egMapItemRevealMult } from './endgame-map-launch.js';
+import { _egComputePlayerStats } from './endgame-player-stats.js';
+import { _egIsActive } from './endgame-state.js';
+
+//------------------------------------------------------------------------
+// Phase 3 step 7: live globalThis accessors for externally-mutated state.
+// (derived from write-site audit by dev/scratch/convert-endgame.mjs)
+//------------------------------------------------------------------------
+try { Object.defineProperty(globalThis, '_egPendingRevealQueue', { get() { return _egPendingRevealQueue; }, set(v) { _egPendingRevealQueue = v; }, configurable: true }); } catch (e) {}
+
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA DEFINITIONS-------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -19,7 +37,7 @@
 //   spin      - optional ms for a continuous inner tumble while flying
 //               (outer transform stays aimed at the target)
 //   build(el) - populates the projectile root with the shape's DOM
-const EG_CLASS_PROJECTILES = {
+export const EG_CLASS_PROJECTILES = {
     // 🎯 Probabilist - golden hunting dart: needle shaft, steel tip, fletching
     probabilist: {
         cssClass: 'eg-proj-arrow', duration: 900, easing: 'linear', rotOffset: 0,
@@ -166,15 +184,15 @@ const EG_CLASS_PROJECTILES = {
 // Reveal-triggered projectiles: item / passive / class-ability reveals during
 // an active endgame encounter fire reduced-damage projectiles from every
 // revealed cell toward the currently targeted monster.
-const EG_REVEAL_PROJECTILE_DAMAGE_PCT = 30; // % of a full correct-fill hit
-const EG_REVEAL_PROJECTILE_MAX = 12;        // safety cap per reveal event
-const EG_REVEAL_PROJECTILE_STAGGER_MS = 60; // delay between consecutive shots
+export const EG_REVEAL_PROJECTILE_DAMAGE_PCT = 30; // % of a full correct-fill hit
+export const EG_REVEAL_PROJECTILE_MAX = 12;        // safety cap per reveal event
+export const EG_REVEAL_PROJECTILE_STAGGER_MS = 60; // delay between consecutive shots
 
 // Spell Damage scales how hard reveal projectiles hit, on top of the base %:
 //   flat Spell Damage      → +0.5 percentage points per point
 //   increased Spell Damage → +1 percentage point per 1%
-const EG_REVEAL_PCT_PER_FLAT_SPELL_DMG = 0.5;
-const EG_REVEAL_PCT_PER_INC_SPELL_DMG = 1;
+export const EG_REVEAL_PCT_PER_FLAT_SPELL_DMG = 0.5;
+export const EG_REVEAL_PCT_PER_INC_SPELL_DMG = 1;
 
 // Queue for reveals that fired before the encounter was active (start-of-puzzle
 // passives run before _egStartEncounter). Flushed once the encounter goes live.
@@ -182,7 +200,7 @@ let _egPendingRevealQueue = [];
 
 // Resolves the current reveal-projectile damage percentage from the player's
 // live gear stats (recomputed on demand, so equips apply instantly).
-function _egGetRevealProjectileDamagePct() {
+export function _egGetRevealProjectileDamagePct() {
     const stats = _egComputePlayerStats();
     return EG_REVEAL_PROJECTILE_DAMAGE_PCT
         + (stats.spellDamageFlat || 0) * EG_REVEAL_PCT_PER_FLAT_SPELL_DMG
@@ -196,15 +214,15 @@ function _egGetRevealProjectileDamagePct() {
 
 // Returns the projectile definition for the player's current class.
 // Falls back to _default when class is null or unrecognised.
-function _egGetProjectileDef() {
-    const cls = (typeof STATE !== 'undefined' && STATE.playerClass)
-        ? STATE.playerClass.toLowerCase()
+export function _egGetProjectileDef() {
+    const cls = (typeof STATE !== 'undefined' && globalThis.STATE.playerClass)
+        ? globalThis.STATE.playerClass.toLowerCase()
         : '_default';
     return EG_CLASS_PROJECTILES[cls] || EG_CLASS_PROJECTILES._default;
 }
 
 // Returns the screen-centre coordinates of a DOM element as { x, y }.
-function _egGetElementCentre(el) {
+export function _egGetElementCentre(el) {
     const rect = el.getBoundingClientRect();
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
@@ -224,7 +242,7 @@ function _egGetElementCentre(el) {
 // Optional startScale overrides the launch size (used by charged shots that
 // grow while stacking). It is applied as a uniform scale in the flight
 // keyframes, so it works identically for emoji and code-built visuals.
-function _egFireProjectile(visual, cssClass, start, end, duration, easing, onArrive, orient, startScale) {
+export function _egFireProjectile(visual, cssClass, start, end, duration, easing, onArrive, orient, startScale) {
     const proj = document.createElement('div');
     proj.className = `eg-projectile ${cssClass}`;
     proj.style.left = '0px';
@@ -270,11 +288,11 @@ function _egFireProjectile(visual, cssClass, start, end, duration, easing, onArr
 // cell launches one reduced-damage projectile at the current target; queues
 // while no endgame encounter is running (start-of-puzzle passives) and flushes
 // once the encounter goes live.
-function _egOnProgrammaticReveal(cellIds, source) {
+export function _egOnProgrammaticReveal(cellIds, source) {
     if (!Array.isArray(cellIds) || !cellIds.length) return;
     if (typeof _egIsActive !== 'function' || !_egIsActive()) {
         // Queue start-of-puzzle auto-reveals so they still shoot once monsters spawn.
-        if (cur && (cur.isMonsterLevel || cur.isChainedPuzzle)) {
+        if (globalThis.cur && (globalThis.cur.isMonsterLevel || globalThis.cur.isChainedPuzzle)) {
             _egPendingRevealQueue.push({ ids: cellIds.slice(0, EG_REVEAL_PROJECTILE_MAX), source });
         }
         return;
@@ -282,8 +300,8 @@ function _egOnProgrammaticReveal(cellIds, source) {
 
     // If active but no monster is alive yet (spawn stagger / respawn gap),
     // queue and retry so damage is not lost to a null target.
-    if (!_egMonsters || _egMonsters.length === 0) {
-        if (cur && (cur.isMonsterLevel || cur.isChainedPuzzle)) {
+    if (!globalThis._egMonsters || globalThis._egMonsters.length === 0) {
+        if (globalThis.cur && (globalThis.cur.isMonsterLevel || globalThis.cur.isChainedPuzzle)) {
             _egPendingRevealQueue.push({ ids: cellIds.slice(0, EG_REVEAL_PROJECTILE_MAX), source });
             setTimeout(() => _egFlushPendingRevealProjectiles(), 300);
         }
@@ -317,9 +335,9 @@ function _egOnProgrammaticReveal(cellIds, source) {
             const elements = _egScaleElements(_egLastHitElements, revealPct);
             // Use current target, fall back to first live monster if none selected yet
             // (happens for start-of-puzzle reveals that flush before auto-target fires).
-            let targetIdAtFire = _egTargetId;
-            if (!targetIdAtFire && _egMonsters && _egMonsters.length) {
-                targetIdAtFire = _egMonsters[0].id;
+            let targetIdAtFire = globalThis._egTargetId;
+            if (!targetIdAtFire && globalThis._egMonsters && globalThis._egMonsters.length) {
+                targetIdAtFire = globalThis._egMonsters[0].id;
             }
             _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, undefined, elements);
         }, i * EG_REVEAL_PROJECTILE_STAGGER_MS);
@@ -330,12 +348,12 @@ function _egOnProgrammaticReveal(cellIds, source) {
 // went live. Called from _egStartEncounter and from the chain transition.
 // Retries until at least one monster exists so damage is never lost to a
 // null target on the very first puzzle's 500ms spawn stagger.
-function _egFlushPendingRevealProjectiles() {
+export function _egFlushPendingRevealProjectiles() {
     if (!_egPendingRevealQueue.length) return;
     if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
     // If no monster has spawned yet, defer flush - projectiles with null target
     // would deal no damage (see _egDamageTargetById guard). Retry shortly.
-    if (!_egMonsters || _egMonsters.length === 0) {
+    if (!globalThis._egMonsters || globalThis._egMonsters.length === 0) {
         setTimeout(() => _egFlushPendingRevealProjectiles(), 250);
         return;
     }

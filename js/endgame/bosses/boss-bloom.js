@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../../translation/translations.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE BLOOM (boss_bloom)-------------------------------
 //------------------------------------------------------------------------
 // TIER 8 REWORK - "The Garden's Verdict". Malenia homage, deepened: the
@@ -40,8 +49,8 @@
 
 // DEBUG: slow The Bloom's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_BLM_DEBUG_SLOW = true;
-const _EG_BLM_DEBUG_MULT = _EG_BLM_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_BLM_DEBUG_SLOW = true;
+export const _EG_BLM_DEBUG_MULT = _EG_BLM_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_bloom: {
@@ -79,8 +88,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_BLM_TOUCH_CD_MS = 700;      // shared touch cooldown
-const EG_BLM_MAX_GARDENS = 6;        // hard cap on live rot gardens
+export const EG_BLM_TOUCH_CD_MS = 700;      // shared touch cooldown
+export const EG_BLM_MAX_GARDENS = 6;        // hard cap on live rot gardens
 
 
 //------------------------------------------------------------------------
@@ -89,8 +98,8 @@ const EG_BLM_MAX_GARDENS = 6;        // hard cap on live rot gardens
 
 // Touch damage helper shared by all Bloom hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egBlmHitCd = 0;
-function _egBlmTouch(pct, level, label) {
+export let _egBlmHitCd = 0;
+export function _egBlmTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egBlmHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -102,7 +111,7 @@ function _egBlmTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egBlmPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egBlmPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 
 //------------------------------------------------------------------------
@@ -116,29 +125,29 @@ function _egBlmPC() { const c = _egNkPlayerCenter(); return c || { x: window.inn
 //
 // Phase 3: blooms spawn as CHASING PAIRS - two trackers converge on you and
 // freeze the instant they MEET (not when you stop).
-const EG_BLM_FREEZE_MS   = 2600;               // ms the marker tracks before freezing
-const EG_BLM_PAIR_FALLBACK_MS = 7000;          // pair failsafe freeze
-const EG_BLM_WARN_MS     = 700;                // burst delay after freeze
-const EG_BLM_RADIUS      = 105;
-const EG_BLM_BURST_DMG   = [0, 0.17, 0.20, 0.23]; // %maxHP standing in a burst
-const EG_BLM_ROT_DPS     = [0, 7, 8.5, 10];       // %/s standing in a rot garden
-const EG_BLM_ROTOR_DMG   = [0, 0.10, 0.12, 0.14]; // %maxHP stamen rotor hit
-const EG_BLM_ROTOR_SPD   = 0.9;                   // rad/s stamen sweep
-const EG_BLM_GARDEN_R    = 170;                   // garden + rotor reach
-const EG_BLM_CRIT_AT     = 6500;                  // ms garden age before critical mass
-const EG_BLM_WITHER_AT   = 14000;                 // ms garden lifespan
-const EG_BLM_POD_DMG     = [0, 0.06, 0.07, 0.08]; // %maxHP seed pod touch
-const EG_BLM_POD_SPD     = 150;                   // px/s pod drift
-const EG_BLM_PODS        = 5;                     // pods per critical burst
-const EG_BLM_POD_PLANTS  = 2;                     // pods that plant new gardens
+export const EG_BLM_FREEZE_MS   = 2600;               // ms the marker tracks before freezing
+export const EG_BLM_PAIR_FALLBACK_MS = 7000;          // pair failsafe freeze
+export const EG_BLM_WARN_MS     = 700;                // burst delay after freeze
+export const EG_BLM_RADIUS      = 105;
+export const EG_BLM_BURST_DMG   = [0, 0.17, 0.20, 0.23]; // %maxHP standing in a burst
+export const EG_BLM_ROT_DPS     = [0, 7, 8.5, 10];       // %/s standing in a rot garden
+export const EG_BLM_ROTOR_DMG   = [0, 0.10, 0.12, 0.14]; // %maxHP stamen rotor hit
+export const EG_BLM_ROTOR_SPD   = 0.9;                   // rad/s stamen sweep
+export const EG_BLM_GARDEN_R    = 170;                   // garden + rotor reach
+export const EG_BLM_CRIT_AT     = 6500;                  // ms garden age before critical mass
+export const EG_BLM_WITHER_AT   = 14000;                 // ms garden lifespan
+export const EG_BLM_POD_DMG     = [0, 0.06, 0.07, 0.08]; // %maxHP seed pod touch
+export const EG_BLM_POD_SPD     = 150;                   // px/s pod drift
+export const EG_BLM_PODS        = 5;                     // pods per critical burst
+export const EG_BLM_POD_PLANTS  = 2;                     // pods that plant new gardens
 
 // Live rot-garden registry (for the cap). Each garden owns its own PASSIVE
 // dodge run (tier-scaled clock, never trips _egNkDodgeBusy - the Puddle
 // persistent-watcher pattern) so gardens keep ticking after their planting
 // mechanic's run has ended.
-const _egBlmGardens = [];
+export const _egBlmGardens = [];
 
-function _egMechBlmBlooms(monster, phase) {
+export function _egMechBlmBlooms(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -233,7 +242,7 @@ function _egMechBlmBlooms(monster, phase) {
 // Plants a rot garden at (x,y): dot floor + stamen rotor beam + critical-
 // mass seed burst once (~6.5s of age), then withers (~14s). Each garden
 // owns a passive dodge run so it survives its planter's run.
-function _egBlmPlantGarden(bossId, x, y, p, level) {
+export function _egBlmPlantGarden(bossId, x, y, p, level) {
     // Garden cap: the oldest garden withers when the registry overflows.
     while (_egBlmGardens.length >= EG_BLM_MAX_GARDENS) {
         const old = _egBlmGardens.shift();
@@ -287,7 +296,7 @@ function _egBlmPlantGarden(bossId, x, y, p, level) {
 
 // Is the player hit by garden g's stamen beam (a line from the centre out
 // to EG_BLM_GARDEN_R at angle rotorA, ~14px wide)?
-function _egBlmRotorHit(g, pc) {
+export function _egBlmRotorHit(g, pc) {
     const ex = g.x + Math.cos(g.rotorA) * EG_BLM_GARDEN_R;
     const ey = g.y + Math.sin(g.rotorA) * EG_BLM_GARDEN_R;
     return _egPtSegDist(pc.x, pc.y, g.x, g.y, ex, ey) < 14;
@@ -295,7 +304,7 @@ function _egBlmRotorHit(g, pc) {
 
 // Critical-mass burst: pods scatter outward; the first POD_PLANTS pods that
 // settle plant new rot gardens where they land.
-function _egBlmSeedBurst(g) {
+export function _egBlmSeedBurst(g) {
     const run = g.run;
     const pods = [];
     for (let i = 0; i < EG_BLM_PODS; i++) {
@@ -345,9 +354,9 @@ function _egBlmSeedBurst(g) {
 //------------------------------------------------------------------------
 // Three seed pods arc across the arena and plant three fresh rot gardens
 // in a line toward you - the garden is coming to YOU.
-const EG_BLM_VOLLEY_N = 3;
+export const EG_BLM_VOLLEY_N = 3;
 
-function _egMechBlmVolley(monster, phase) {
+export function _egMechBlmVolley(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -410,11 +419,11 @@ function _egMechBlmVolley(monster, phase) {
 // The Scarlet Veil, upgraded: the puzzle grid hides behind a blooming veil.
 // Every cell you FILL wilts the veil (it thins - visible progress); every
 // MISTAKE regrows it (petals rain back). The puzzle is the pruning.
-function _egMechBlmVeil(monster, phase) {
-    if (typeof _egVeilActive === 'undefined' || _egVeilActive) return;
+export function _egMechBlmVeil(monster, phase) {
+    if (typeof _egVeilActive === 'undefined' || globalThis._egVeilActive) return;
     // Shared veil machinery: create the overlay element the framework's
     // typeof-guarded _egRemoveVeil call resolves to.
-    _egVeilActive = true;
+    globalThis._egVeilActive = true;
     const tbl = document.getElementById('ptable');
     if (tbl) {
         const parent = tbl.parentElement;
@@ -431,7 +440,7 @@ function _egMechBlmVeil(monster, phase) {
             veil.classList.add('eg-blm-veil-tinted');
         }
     }
-    showToast(t('eg_mech_blm_veil'));
+    globalThis.showToast(t('eg_mech_blm_veil'));
 
     // Wilting state chip: fill = wilt, mistake = regrow.
     let wilt = 0; // 0 = full veil, 100 = fully wilted
@@ -488,24 +497,24 @@ function _egMechBlmVeil(monster, phase) {
 // Each dodge carves one SCAR - three scars open the ONE TRUE GAP (a wide
 // safe wedge). THE LAST BLOOM detonates everything outside it. Charge bar
 // frozen (gate in _egTickPlayer via _egBlmFinalActive).
-const EG_BLM_JUDGMENTS = 3;
+export const EG_BLM_JUDGMENTS = 3;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egBlmFinal = null;
+export let _egBlmFinal = null;
 
-function _egBlmFinalActive() {
+export function _egBlmFinalActive() {
     return !!_egBlmFinal && !_egBlmFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egBlmOnPhaseEnter(monster, newPhase) {
+export function _egBlmOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egBlmStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egBlmStartFinalWatcher(monster) {
+export function _egBlmStartFinalWatcher(monster) {
     if (!monster || _egBlmFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -522,7 +531,7 @@ function _egBlmStartFinalWatcher(monster) {
 }
 
 // Pause-safe timeout (mirrors the other finales).
-function _egBlmAfter(g, ms, fn) {
+export function _egBlmAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egBlmFinal) return;
@@ -533,7 +542,7 @@ function _egBlmAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egBlmFinalStart(monster) {
+export function _egBlmFinalStart(monster) {
     if (_egBlmFinal || !monster) return;
 
     // The garden goes quiet for everything else: kill every other run of
@@ -703,7 +712,7 @@ function _egBlmFinalStart(monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egBlmFinalEnd(g, monster) {
+export function _egBlmFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.curRun) _egNkKillRun(g.curRun); } catch (e) {}
@@ -721,7 +730,7 @@ function _egBlmFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -733,7 +742,7 @@ function _egBlmFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egBlmTeardown() {
+export function _egBlmTeardown() {
     if (_egBlmFinal) { try { _egBlmFinalEnd(_egBlmFinal, null); } catch (e) {} _egBlmFinal = null; }
     // Kill every garden's run (removes its elements with it).
     _egBlmGardens.slice().forEach(gg => { try { _egNkKillRun(gg.run); } catch (e) {} });
@@ -766,7 +775,7 @@ if (typeof window !== 'undefined') {
     window._EG_BLM_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_bloom') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_bloom') : null;
             if (!monster) return 'no bloom alive';
             const fn = name === 'blooms' ? _egMechBlmBlooms
                 : name === 'volley' ? _egMechBlmVolley
@@ -778,7 +787,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_bloom') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_bloom') : null;
             if (!monster) return 'no bloom alive';
             _egBlmFinalStart(monster);
             return 'FULMINATION started';

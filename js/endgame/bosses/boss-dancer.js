@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE DANCER (boss_dancer)-----------------------
 //------------------------------------------------------------------------
 // The ballroom never closes: a rework of the old one-shot Dance Steps
@@ -70,78 +79,78 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Ballroom tuning ──────────────────────────────────────────────────────
 // Mirror ball
-const EG_DAN_BALL_R = 46;                    // ball visual radius (el at r)
-const EG_DAN_WALTZ_SPEED = [0, 26, 34, 44];  // px/s drift per phase
-const EG_DAN_WALTZ_REPICK_MS = 7000;         // max time on one waltz target
-const EG_DAN_TWIRL_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the ball
-const EG_DAN_TWIRL_CD_MS = 1000;             // per-ball touch cooldown
-const EG_DAN_TWIRL_FLING = [0, 120, 145, 170];  // px fling per twirl
+export const EG_DAN_BALL_R = 46;                    // ball visual radius (el at r)
+export const EG_DAN_WALTZ_SPEED = [0, 26, 34, 44];  // px/s drift per phase
+export const EG_DAN_WALTZ_REPICK_MS = 7000;         // max time on one waltz target
+export const EG_DAN_TWIRL_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the ball
+export const EG_DAN_TWIRL_CD_MS = 1000;             // per-ball touch cooldown
+export const EG_DAN_TWIRL_FLING = [0, 120, 145, 170];  // px fling per twirl
 // Spotlight steps (persistent dance floor)
-const EG_DAN_STEPS_N = [0, 4, 5, 6];         // steps per sequence per phase
-const EG_DAN_BEAT_MS = [0, 2600, 2250, 1900]; // per-step beat window
-const EG_DAN_STEP_SEQ_GAP_MS = 2600;         // pause between sequences
-const EG_DAN_STEP_DMG = [0, 0.08, 0.10, 0.12]; // %maxHP missing a beat
-const EG_DAN_STEP_HEAL = 8;                  // flat HP per danced step
+export const EG_DAN_STEPS_N = [0, 4, 5, 6];         // steps per sequence per phase
+export const EG_DAN_BEAT_MS = [0, 2600, 2250, 1900]; // per-step beat window
+export const EG_DAN_STEP_SEQ_GAP_MS = 2600;         // pause between sequences
+export const EG_DAN_STEP_DMG = [0, 0.08, 0.10, 0.12]; // %maxHP missing a beat
+export const EG_DAN_STEP_HEAL = 8;                  // flat HP per danced step
 // Rhythm ribbons (rotating light beams)
-const EG_DAN_RIBBON_N = [0, 2, 3, 4];        // max beams alive per phase
-const EG_DAN_RIBBON_WARN_MS = 900;           // dashed arc before a sweep
-const EG_DAN_RIBBON_SWEEP_MS = 1500;         // live sweep duration
-const EG_DAN_RIBBON_GAP_MS = 2400;           // rest between spawns
-const EG_DAN_RIBBON_DMG = [0, 0.11, 0.13, 0.16]; // %maxHP in a live ribbon
-const EG_DAN_RIBBON_HIT_CD_MS = 700;         // per-ribbon damage cooldown
-const EG_DAN_RIBBON_HALF_W = 26;             // beam half-width for hits
+export const EG_DAN_RIBBON_N = [0, 2, 3, 4];        // max beams alive per phase
+export const EG_DAN_RIBBON_WARN_MS = 900;           // dashed arc before a sweep
+export const EG_DAN_RIBBON_SWEEP_MS = 1500;         // live sweep duration
+export const EG_DAN_RIBBON_GAP_MS = 2400;           // rest between spawns
+export const EG_DAN_RIBBON_DMG = [0, 0.11, 0.13, 0.16]; // %maxHP in a live ribbon
+export const EG_DAN_RIBBON_HIT_CD_MS = 700;         // per-ribbon damage cooldown
+export const EG_DAN_RIBBON_HALF_W = 26;             // beam half-width for hits
 // Curtain Call (60% gate)
-const EG_DAN_CURTAIN_N = [0, 5, 6, 8];       // curtain drops per gate
-const EG_DAN_CURTAIN_WARN_MS = 1100;         // per-drop telegraph
-const EG_DAN_CURTAIN_DMG = 0.12;             // %maxHP under a drop
-const EG_DAN_CURTAIN_R = 70;                 // drop impact radius
-const EG_DAN_CURTAIN_SLOW_MS = 4200;         // backstage patch lifetime
-const EG_DAN_CURTAIN_DRAG = 46;              // px/s pull inside a patch
-const EG_DAN_CURTAIN_PULL_R = 130;           // patch pull radius
+export const EG_DAN_CURTAIN_N = [0, 5, 6, 8];       // curtain drops per gate
+export const EG_DAN_CURTAIN_WARN_MS = 1100;         // per-drop telegraph
+export const EG_DAN_CURTAIN_DMG = 0.12;             // %maxHP under a drop
+export const EG_DAN_CURTAIN_R = 70;                 // drop impact radius
+export const EG_DAN_CURTAIN_SLOW_MS = 4200;         // backstage patch lifetime
+export const EG_DAN_CURTAIN_DRAG = 46;              // px/s pull inside a patch
+export const EG_DAN_CURTAIN_PULL_R = 130;           // patch pull radius
 // Petal Storm (30% gate)
-const EG_DAN_PETAL_WAVES = 4;                // waves in the storm
-const EG_DAN_PETAL_PER_WAVE = [0, 6, 7, 9];  // petals per wave
-const EG_DAN_PETAL_WAVE_GAP_MS = 1800;       // between waves
-const EG_DAN_PETAL_SPEED = 250;              // px/s
-const EG_DAN_PETAL_DMG = 0.07;               // %maxHP per petal (shadow)
-const EG_DAN_PETAL_MS = 8000;                // whole storm budget
-const EG_DAN_PETAL_AMBIENT_MS = 3400;        // P3 ambient petal cadence
+export const EG_DAN_PETAL_WAVES = 4;                // waves in the storm
+export const EG_DAN_PETAL_PER_WAVE = [0, 6, 7, 9];  // petals per wave
+export const EG_DAN_PETAL_WAVE_GAP_MS = 1800;       // between waves
+export const EG_DAN_PETAL_SPEED = 250;              // px/s
+export const EG_DAN_PETAL_DMG = 0.07;               // %maxHP per petal (shadow)
+export const EG_DAN_PETAL_MS = 8000;                // whole storm budget
+export const EG_DAN_PETAL_AMBIENT_MS = 3400;        // P3 ambient petal cadence
 // Pirouette (charge attack)
-const EG_DAN_PIRO_MS = 2100;                 // whole spin
-const EG_DAN_PIRO_WARN_MS = 950;             // flash before the turns start
-const EG_DAN_PIRO_RING_R = 420;              // max ring expansion (px)
-const EG_DAN_PIRO_RING_TRAVEL_MS = 950;      // ring expansion time
-const EG_DAN_PIRO_RING_GAP_MS = 500;         // between ring blooms
-const EG_DAN_PIRO_RINGS = 3;                 // expanding rings
-const EG_DAN_PIRO_EDGE = 30;                 // ring edge half-thickness
-const EG_DAN_PIRO_RING_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP per ring touch
-const EG_DAN_PIRO_HIT_CD_MS = 800;           // global ring-hit cooldown
+export const EG_DAN_PIRO_MS = 2100;                 // whole spin
+export const EG_DAN_PIRO_WARN_MS = 950;             // flash before the turns start
+export const EG_DAN_PIRO_RING_R = 420;              // max ring expansion (px)
+export const EG_DAN_PIRO_RING_TRAVEL_MS = 950;      // ring expansion time
+export const EG_DAN_PIRO_RING_GAP_MS = 500;         // between ring blooms
+export const EG_DAN_PIRO_RINGS = 3;                 // expanding rings
+export const EG_DAN_PIRO_EDGE = 30;                 // ring edge half-thickness
+export const EG_DAN_PIRO_RING_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP per ring touch
+export const EG_DAN_PIRO_HIT_CD_MS = 800;           // global ring-hit cooldown
 
 
-let _egDancerWatcher = null; // per-fight ballroom state
+export let _egDancerWatcher = null; // per-fight ballroom state
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
-function _egDanPhase(st) {
+export function _egDanPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
-        const m = _egMonsters.find(x => x && x.id === st.monsterId);
+        const m = globalThis._egMonsters.find(x => x && x.id === st.monsterId);
         if (m) return Math.max(1, Math.min(3, Number(m.bossPhase) || 1));
     }
     return 1;
 }
 
 // Flat heal + HUD refresh (no shared helper exists - hearts do it inline).
-function _egDanHeal(amount) {
+export function _egDanHeal(amount) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
-        if (playerCurrentHP <= 0) return;
-        const before = playerCurrentHP;
-        playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + amount);
-        if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+        if (globalThis.playerCurrentHP <= 0) return;
+        const before = globalThis.playerCurrentHP;
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + amount);
+        if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }
 
 // Removes every ballroom overlay (registered in boss-framework teardown).
-function _egDancerTeardown() {
+export function _egDancerTeardown() {
     if (_egDancerWatcher) {
         const st = _egDancerWatcher;
         _egDancerWatcher = null;
@@ -157,7 +166,7 @@ function _egDancerTeardown() {
 
 
 // ── Persistent arena: mirror ball waltz + spotlight steps + ribbons ─────
-function _egDancerArenaInit(monster) {
+export function _egDancerArenaInit(monster) {
     if (_egDancerWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -196,7 +205,7 @@ function _egDancerArenaInit(monster) {
 
     _egNkLoop(run, (dtS, now) => {
         if (_egDancerWatcher !== st) return false;
-        const live = _egMonsters ? _egMonsters.find(m => m.id === st.monsterId) : null;
+        const live = globalThis._egMonsters ? globalThis._egMonsters.find(m => m.id === st.monsterId) : null;
         if (!live) return false;
         const W = window.innerWidth, H = window.innerHeight;
         const c = _egNkPlayerCenter();
@@ -287,7 +296,7 @@ function _egDancerArenaInit(monster) {
 
 
 // ── Spotlight steps: one sequence of N sequenced footprints ─────────────
-function _egDancerStartSteps(st, p) {
+export function _egDancerStartSteps(st, p) {
     const steps = EG_DAN_STEPS_N[p];
     const radius = 55;
     const pts = [];
@@ -312,7 +321,7 @@ function _egDancerStartSteps(st, p) {
 
 // Ticks the active step sequence: light the current step, reward dancing
 // on it (small heal), zap on a missed beat.
-function _egDancerTickSteps(st, dtS, c, p) {
+export function _egDancerTickSteps(st, dtS, c, p) {
     const seq = st.stepSeq;
     if (!seq) return;
     if (seq.idx >= seq.els.length) { st.stepSeq = null; return; }
@@ -348,7 +357,7 @@ function _egDancerTickSteps(st, dtS, c, p) {
 
 
 // ── Rhythm ribbons: one dashed arc → rotating live beam ─────────────────
-function _egDancerSpawnRibbon(st) {
+export function _egDancerSpawnRibbon(st) {
     const W = window.innerWidth, H = window.innerHeight;
     const b = st.ball;
     const ang = Math.random() * Math.PI * 2;
@@ -362,7 +371,7 @@ function _egDancerSpawnRibbon(st) {
 
 
 // Ticks ribbons: warn → live sweep (rotating) → fade; damage in the beam.
-function _egDancerTickRibbons(st, dtS, pr, p) {
+export function _egDancerTickRibbons(st, dtS, pr, p) {
     const b = st.ball;
     for (let i = st.ribbons.length - 1; i >= 0; i--) {
         const rb = st.ribbons[i];
@@ -400,7 +409,7 @@ function _egDancerTickRibbons(st, dtS, pr, p) {
 
 
 // Point-in-beam test: player rect vs a ray from (x,y) at angle ang.
-function _egDancerBeamHit(rb, pr) {
+export function _egDancerBeamHit(rb, pr) {
     const cx = rb.srcX, cy = rb.srcY;
     const ux = Math.cos(rb.ang), uy = Math.sin(rb.ang);
     const corners = [
@@ -421,7 +430,7 @@ function _egDancerBeamHit(rb, pr) {
 // The stage lights cut: N curtain drops telegraph staggered across the
 // floor, each leaving a lingering dim backstage patch that drags the
 // player toward its center while it lingers.
-function _egDancerCurtainCall(st, now) {
+export function _egDancerCurtainCall(st, now) {
     if (st.curtain) return;
     const p = _egDanPhase(st);
     const n = EG_DAN_CURTAIN_N[p];
@@ -441,7 +450,7 @@ function _egDancerCurtainCall(st, now) {
 
 // Ticks curtain drops: warn → red curtain falls (damage circle) → lingering
 // backstage patch that gently drags the player in (slow zone).
-function _egDancerTickCurtains(st, dtS, c, pr) {
+export function _egDancerTickCurtains(st, dtS, c, pr) {
     const cc = st.curtain;
     if (cc) {
         cc.t += dtS * 1000;
@@ -497,7 +506,7 @@ function _egDancerTickCurtains(st, dtS, c, pr) {
 // ── 30% gate: Petal Storm ────────────────────────────────────────────────
 // The finale: v-waves of 🌸 petals cross the screen while the ball spins
 // faster. Petals are small shadow hits - numerous, not heavy.
-function _egDancerPetalStorm(st, now) {
+export function _egDancerPetalStorm(st, now) {
     if (st.storm) return;
     st.storm = { wave: 0, t: 0 };
     _egNkToast('eg_dancer_storm', '🌸 PETAL STORM! The finale begins!');
@@ -506,7 +515,7 @@ function _egDancerPetalStorm(st, now) {
 
 
 // Ticks the storm scheduler + phase-3 ambient drizzle.
-function _egDancerTickStorm(st, dtS, pr, p) {
+export function _egDancerTickStorm(st, dtS, pr, p) {
     const sm = st.storm;
     if (!sm) {
         if (p >= 3) {
@@ -529,7 +538,7 @@ function _egDancerTickStorm(st, dtS, pr, p) {
 
 
 // Petal bodies: advance, drift on a sine, hit the player, expire.
-function _egDancerTickPetals(st, dtS, pr) {
+export function _egDancerTickPetals(st, dtS, pr) {
     for (let i = st.petals.length - 1; i >= 0; i--) {
         const pt = st.petals[i];
         pt.t += dtS * 1000;
@@ -552,7 +561,7 @@ function _egDancerTickPetals(st, dtS, pr) {
 }
 
 
-function _egDancerSpawnPetal(st) {
+export function _egDancerSpawnPetal(st) {
     const W = window.innerWidth, H = window.innerHeight;
     const fromLeft = Math.random() < 0.5;
     const el = _egNkEl(st.run, 'div', 'eg-dan-petal', '🌸');
@@ -571,7 +580,7 @@ function _egDancerSpawnPetal(st) {
 // ── Charge attack: Pirouette ─────────────────────────────────────────────
 // Dispatched from _egFireMonsterAttack: the ball flashes, then 3 expanding
 // lightning rings bloom from it - dodge the rings, stand in the gaps.
-function _egDancerPirouette(monster) {
+export function _egDancerPirouette(monster) {
     const st = _egDancerWatcher;
     if (!st || _egNkDodgeBusy() || _egNkFrozen()) return;
     if (st.piro) return;
@@ -586,7 +595,7 @@ function _egDancerPirouette(monster) {
 // Blooms one expanding lightning ring from the live ball.
 // Damage is on the ring's traveling edge, gated by a global cooldown so a
 // ring can't multi-tick while it passes over the player.
-function _egDancerPiroRing(st, pi, p) {
+export function _egDancerPiroRing(st, pi, p) {
     const x = st.ball.x, y = st.ball.y;
     // Own run per ring: a run supports exactly ONE rAF loop - registering
     // the ring loop on the watcher run would overwrite its raf handle AND
@@ -624,4 +633,4 @@ function _egDancerPiroRing(st, pi, p) {
 // The old scheduled mechanic is now the persistent spotlight steps - keep
 // the handler name alive so any stale schedule entry no-ops instead of
 // erroring.
-function _egMechDanceSteps(monster, phase) { void monster; void phase; }
+export function _egMechDanceSteps(monster, phase) { void monster; void phase; }

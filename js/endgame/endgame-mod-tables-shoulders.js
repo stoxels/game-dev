@@ -1,3 +1,8 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
 //  endgame-mod-tables-shoulders.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
@@ -13,7 +18,7 @@
 // Values match helmet scale since both are major armour slots.
 // No elemental damage, no crit, no status effect chances, no leech.
 
-const EG_MOD_TABLE_SHOULDERS = {
+export const EG_MOD_TABLE_SHOULDERS = {
     prefixes: {
 
         // --- LIFE & MANA ---

@@ -1,4 +1,16 @@
-﻿// =============================================================================
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { SETTINGS, loadSettingsUI, saveSettings } from '../settings.js';
+import { getActiveSlot } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { REPLAY_GALLERY_ENTRIES, STORY_BEATS } from './storyline-beats.js';
+import { INTRO_CINEMATIC_IMAGE_PATH } from './storyline-intro.js';
+
+// =============================================================================
 // storyline-engine.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // The rendering engine for story beats: text pages, image slideshows, and
@@ -87,10 +99,10 @@
 
 // Default time each slide stays on screen (ms) for image-slideshow beats.
 // Override per-slide via the optional `duration` field on a slide object.
-const DEFAULT_SLIDE_DURATION_MS = 10000;
+export const DEFAULT_SLIDE_DURATION_MS = 10000;
 
 // How long the text/image fade transition takes (ms) for slideshow beats.
-const SLIDE_FADE_MS = 500;
+export const SLIDE_FADE_MS = 500;
 
 // _wordsFromLine - PLACEHOLDER-STYLE timestamp generator for karaoke song
 // beats. Splits a line into words and spaces their "fully revealed" times
@@ -99,7 +111,7 @@ const SLIDE_FADE_MS = 500;
 // sync - only the word-by-word pace within a line is estimated/even, since
 // SRT files don't carry per-word timestamps. Swap in literal per-word
 // timestamps for any line where you have them.
-function _wordsFromLine(text, lineStartMs, lineEndMs) {
+export function _wordsFromLine(text, lineStartMs, lineEndMs) {
     const words = text.split(' ').filter(Boolean);
     const span = lineEndMs - lineStartMs;
     return words.map((word, i) => ({
@@ -110,9 +122,9 @@ function _wordsFromLine(text, lineStartMs, lineEndMs) {
 
 
 
-const _imgCache = new Map(); // url -> Promise<HTMLImageElement>
+export const _imgCache = new Map(); // url -> Promise<HTMLImageElement>
 
-function _preloadImage(url) {
+export function _preloadImage(url) {
     if (_imgCache.has(url)) return _imgCache.get(url);
     const img = new Image();
     const p = new Promise((resolve) => {
@@ -133,7 +145,7 @@ function _preloadImage(url) {
 // RENDERER
 // ---------------------------------------------------------------------------
 
-const StorylineRenderer = (() => {
+export const StorylineRenderer = (() => {
 
     // -- Styling constants --
     const STYLES = {
@@ -1219,8 +1231,11 @@ const StorylineRenderer = (() => {
         }).catch(() => {
             // Autoplay blocked - resume on first user interaction, same
             // pattern as Audio_Manager's BGM autoplay-resume fallback.
+            // Null-guard (like the video/narration resumes below): skipping
+            // the beat nulls songAudioEl via stopSong(), but these listeners
+            // persist - without the guard the next click/keydown throws.
             const resume = () => {
-                songAudioEl.play().then(() => {
+                if (songAudioEl) songAudioEl.play().then(() => {
                     songRafId = requestAnimationFrame(_songSyncTick);
                 }).catch(() => { });
                 document.removeEventListener('click', resume);
@@ -1767,7 +1782,7 @@ const StorylineRenderer = (() => {
 // SEEN-STATE - uses localStorage so beats only show once per save
 // ---------------------------------------------------------------------------
 
-function _seenKey(beatId, options = {}) {
+export function _seenKey(beatId, options = {}) {
     const suffix = options.character ? `_${options.character}`
         : options.className ? `_${options.className}`
             : options.ascendencyClass ? `_${options.ascendencyClass}` : '';
@@ -1775,7 +1790,7 @@ function _seenKey(beatId, options = {}) {
     return `storyline_seen_slot${slot}_${beatId}${suffix}`;
 }
 
-function hasSeen(beatId, options = {}) {
+export function hasSeen(beatId, options = {}) {
     try {
         return localStorage.getItem(_seenKey(beatId, options)) === '1';
     } catch (e) {
@@ -1783,7 +1798,7 @@ function hasSeen(beatId, options = {}) {
     }
 }
 
-function markSeen(beatId, options = {}) {
+export function markSeen(beatId, options = {}) {
     try {
         localStorage.setItem(_seenKey(beatId, options), '1');
     } catch (e) { /* storage unavailable */ }
@@ -1800,11 +1815,11 @@ function markSeen(beatId, options = {}) {
 // the per-save "already seen" state.
 // ---------------------------------------------------------------------------
 
-function _replayGlobalKey(entryId) {
+export function _replayGlobalKey(entryId) {
     return `replay_unlocked_${entryId}`;
 }
 
-function _isReplayGloballyUnlocked(entryId) {
+export function _isReplayGloballyUnlocked(entryId) {
     try {
         return localStorage.getItem(_replayGlobalKey(entryId)) === '1';
     } catch (e) {
@@ -1812,7 +1827,7 @@ function _isReplayGloballyUnlocked(entryId) {
     }
 }
 
-function _setReplayGloballyUnlocked(entryId) {
+export function _setReplayGloballyUnlocked(entryId) {
     try {
         localStorage.setItem(_replayGlobalKey(entryId), '1');
     } catch (e) { /* storage unavailable */ }
@@ -1823,7 +1838,7 @@ function _setReplayGloballyUnlocked(entryId) {
 // OR carries a persisted global unlock flag, OR has been seen in the
 // current save. Intro cutscenes are meant to be available forever, so they
 // short-circuit to true.
-function isReplayEntryUnlocked(entry) {
+export function isReplayEntryUnlocked(entry) {
     if (!entry) return false;
     if (entry.globalUnlock) return true;
     if (entry.id && _isReplayGloballyUnlocked(entry.id)) return true;
@@ -1834,7 +1849,7 @@ function isReplayEntryUnlocked(entry) {
 // the start-of-game character select. Unlocks every gallery entry flagged
 // `globalUnlock` (the opening cinematic + the three character intros) for
 // good, across all save slots.
-function unlockReplayIntroBundle() {
+export function unlockReplayIntroBundle() {
     if (typeof REPLAY_GALLERY_ENTRIES === 'undefined') return;
     REPLAY_GALLERY_ENTRIES
         .filter(entry => entry.globalUnlock && entry.id)
@@ -1843,7 +1858,7 @@ function unlockReplayIntroBundle() {
 
 // getUnlockedReplayEntries - subset of REPLAY_GALLERY_ENTRIES (storyline-beats.js)
 // the player can replay. Used by the title screen's Replay panel.
-function getUnlockedReplayEntries() {
+export function getUnlockedReplayEntries() {
     if (typeof REPLAY_GALLERY_ENTRIES === 'undefined') return [];
     return REPLAY_GALLERY_ENTRIES.filter(entry => isReplayEntryUnlocked(entry));
 }
@@ -1851,14 +1866,14 @@ function getUnlockedReplayEntries() {
 
 
 // Allow resetting a specific beat (useful for testing)
-function resetBeat(beatId, options = {}) {
+export function resetBeat(beatId, options = {}) {
     try {
         localStorage.removeItem(_seenKey(beatId, options));
     } catch (e) { /* noop */ }
 }
 
 // Reset all story beats at once (e.g. new game)
-function resetAllBeats() {
+export function resetAllBeats() {
     try {
         Object.keys(localStorage)
             .filter(k => k.startsWith('storyline_seen_'))
@@ -1866,7 +1881,7 @@ function resetAllBeats() {
     } catch (e) { /* noop */ }
 }
 
-function resetAllBeatsForSlot(slotNum) {
+export function resetAllBeatsForSlot(slotNum) {
     try {
         Object.keys(localStorage)
             .filter(k => k.startsWith(`storyline_seen_slot${slotNum}_`))
@@ -1904,6 +1919,6 @@ function resetAllBeatsForSlot(slotNum) {
  * final clip's last frame (and whatever its audio was doing), and the
  * corner button switches from "skip" to "continue" once that happens.
  */
-function showBeat(beatId, options = {}) {
+export function showBeat(beatId, options = {}) {
     StorylineRenderer.show(beatId, options);
 }

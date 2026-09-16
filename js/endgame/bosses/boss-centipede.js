@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egFlingBurst, _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE CENTIPEDE (boss_centipede)------------------
 //------------------------------------------------------------------------
 // Arcade-siege fight: the colony INFESTS the arena and keeps coming no
@@ -68,55 +77,55 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Colony tuning ───────────────────────────────────────────────────────
 // The winding colony
-const EG_CENT_SEGS = [0, 5, 7, 9];        // segments per boss phase
-const EG_CENT_SEG_GAP = 36;               // px between segments
-const EG_CENT_SPEED = [0, 95, 120, 150];  // px/s winding speed
-const EG_CENT_MOLT_SPEED = 1.35;          // main body speed × after molt
-const EG_CENT_SEG_DMG = [0, 0.05, 0.06, 0.07]; // %maxHP per segment touch
-const EG_CENT_SEG_CD_MS = 700;            // global segment-touch cooldown
+export const EG_CENT_SEGS = [0, 5, 7, 9];        // segments per boss phase
+export const EG_CENT_SEG_GAP = 36;               // px between segments
+export const EG_CENT_SPEED = [0, 95, 120, 150];  // px/s winding speed
+export const EG_CENT_MOLT_SPEED = 1.35;          // main body speed × after molt
+export const EG_CENT_SEG_DMG = [0, 0.05, 0.06, 0.07]; // %maxHP per segment touch
+export const EG_CENT_SEG_CD_MS = 700;            // global segment-touch cooldown
 // Burrow holes (post-molt): safe holes that bait the molt mini-centipede
 // into burying itself. Standing on one is harmless - but the hole collapses
 // when the mini buries (or expires) and reopens after a while.
-const EG_CENT_MOUND_INTERVAL_MS = [0, 8000, 6200, 4600]; // per boss phase
-const EG_CENT_MOUND_R = 58;               // hole radius (visual + bait check)
-const EG_CENT_MOUND_LIFE_MS = 9000;       // how long a hole stays open
-const EG_CENT_MOUND_CLOSED_MS = 6000;     // collapsed hole reopens after this
-const EG_CENT_MOLT_BURY_MS = 15000;       // the mini-centipede is buried for 15s
-const EG_CENT_RESURFACE_WARN_MS = 1000;   // dirt-mound telegraph before it pops out
-const EG_CENT_RESURFACE_DMG = 0.07;       // %maxHP burst if you stand on the pop-out
-const EG_CENT_RESURF_BAIT_R = 280;        // stand within this of the mound to bait the pop-out
-const EG_CENT_RESURF_BAIT_LOCK_MS = 600;  // committed straight-line charge at the baiter
+export const EG_CENT_MOUND_INTERVAL_MS = [0, 8000, 6200, 4600]; // per boss phase
+export const EG_CENT_MOUND_R = 58;               // hole radius (visual + bait check)
+export const EG_CENT_MOUND_LIFE_MS = 9000;       // how long a hole stays open
+export const EG_CENT_MOUND_CLOSED_MS = 6000;     // collapsed hole reopens after this
+export const EG_CENT_MOLT_BURY_MS = 15000;       // the mini-centipede is buried for 15s
+export const EG_CENT_RESURFACE_WARN_MS = 1000;   // dirt-mound telegraph before it pops out
+export const EG_CENT_RESURFACE_DMG = 0.07;       // %maxHP burst if you stand on the pop-out
+export const EG_CENT_RESURF_BAIT_R = 280;        // stand within this of the mound to bait the pop-out
+export const EG_CENT_RESURF_BAIT_LOCK_MS = 600;  // committed straight-line charge at the baiter
 // Exoskeleton (60% gate)
-const EG_CENT_SHELL_MS = 8000;            // whole shell set-piece duration
-const EG_CENT_SHELL_WAVES = 2;            // rotating spiral waves
-const EG_CENT_SHELL_N = 8;                // plates per wave
-const EG_CENT_SHELL_DMG = 0.11;           // %maxHP per plate hit (physical)
-const EG_CENT_SHELL_CD_MS = 500;          // global plate-hit cooldown
+export const EG_CENT_SHELL_MS = 8000;            // whole shell set-piece duration
+export const EG_CENT_SHELL_WAVES = 2;            // rotating spiral waves
+export const EG_CENT_SHELL_N = 8;                // plates per wave
+export const EG_CENT_SHELL_DMG = 0.11;           // %maxHP per plate hit (physical)
+export const EG_CENT_SHELL_CD_MS = 500;          // global plate-hit cooldown
 // Molt (30% gate)
-const EG_CENT_MOLT_SWELL_MS = 2200;       // visible swell telegraph
-const EG_CENT_MOLT_MINI_SEGS = 4;         // the detached back half
-const EG_CENT_MOLT_MINI_SPEED = 175;      // px/s - faster than base phase 1
+export const EG_CENT_MOLT_SWELL_MS = 2200;       // visible swell telegraph
+export const EG_CENT_MOLT_MINI_SEGS = 4;         // the detached back half
+export const EG_CENT_MOLT_MINI_SPEED = 175;      // px/s - faster than base phase 1
 // Venom
-const EG_CENT_VENOM_INTERVAL_MS = [0, 11000, 8500, 6000]; // per boss phase
-const EG_CENT_VENOM_WARN_MS = 1050;       // target ring telegraph
-const EG_CENT_VENOM_R = 110;              // splash radius
-const EG_CENT_VENOM_BLOBS = 5;            // blobs per burst
-const EG_CENT_VENOM_DMG = 0.08;           // %maxHP per blob hit (physical)
-const EG_CENT_POOL_DPS = 6;               // %maxHP/s standing in a pool
-const EG_CENT_POOL_MS = 4200;             // pool lifetime
+export const EG_CENT_VENOM_INTERVAL_MS = [0, 11000, 8500, 6000]; // per boss phase
+export const EG_CENT_VENOM_WARN_MS = 1050;       // target ring telegraph
+export const EG_CENT_VENOM_R = 110;              // splash radius
+export const EG_CENT_VENOM_BLOBS = 5;            // blobs per burst
+export const EG_CENT_VENOM_DMG = 0.08;           // %maxHP per blob hit (physical)
+export const EG_CENT_POOL_DPS = 6;               // %maxHP/s standing in a pool
+export const EG_CENT_POOL_MS = 4200;             // pool lifetime
 // Stampede (charge attack)
-const EG_CENT_STAMPEDE_WARN_MS = 1050;    // band telegraph
-const EG_CENT_STAMPEDE_STRIKE_MS = 400;   // the dash is live
-const EG_CENT_STAMPEDE_H = 72;            // band height
-const EG_CENT_STAMPEDE_DMG = [0, 0.12, 0.15, 0.18]; // %maxHP by phase
+export const EG_CENT_STAMPEDE_WARN_MS = 1050;    // band telegraph
+export const EG_CENT_STAMPEDE_STRIKE_MS = 400;   // the dash is live
+export const EG_CENT_STAMPEDE_H = 72;            // band height
+export const EG_CENT_STAMPEDE_DMG = [0, 0.12, 0.15, 0.18]; // %maxHP by phase
 
 
-let _egCentWatcher = null; // per-fight colony state
-let _egCentStampedeActive = false; // a stampede set-piece is running
+export let _egCentWatcher = null; // per-fight colony state
+export let _egCentStampedeActive = false; // a stampede set-piece is running
 
 
 // Sweep every colony overlay off the screen. Safe to call twice.
-function _egCentipedeSweep() {
+export function _egCentipedeSweep() {
     _egCentStampedeActive = false;
     try {
         document.querySelectorAll('.eg-cent-seg, .eg-cent-mini, .eg-cent-mound, .eg-cent-resurf, .eg-cent-ring, .eg-cent-blob, .eg-cent-pool, .eg-cent-stampede, .eg-cent-shell').forEach(el => el.remove());
@@ -125,7 +134,7 @@ function _egCentipedeSweep() {
 
 
 // Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-function _egCentipedeTeardown() {
+export function _egCentipedeTeardown() {
     const st = _egCentWatcher;
     _egCentWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
@@ -136,7 +145,7 @@ function _egCentipedeTeardown() {
 
 
 // Spawns one centipede body (main or molt mini). Returns its part objects.
-function _egCentSpawnBody(st, cls, n, label, anchor) {
+export function _egCentSpawnBody(st, cls, n, label, anchor) {
     const parts = [];
     const ax = (anchor && anchor.x != null) ? anchor.x : window.innerWidth * (0.25 + Math.random() * 0.5);
     const ay = (anchor && anchor.y != null) ? anchor.y : window.innerHeight * (0.2 + Math.random() * 0.5);
@@ -153,7 +162,7 @@ function _egCentSpawnBody(st, cls, n, label, anchor) {
 // body.lock (set on a baited resurface) makes the head charge STRAIGHT at
 // the locked point at full speed - no wobble, no turn delay - so a player
 // who baited the pop-out gets a crisp, funnelable charge out of it.
-function _egCentAdvance(st, body, dtS, now, pr, speed, hitPct) {
+export function _egCentAdvance(st, body, dtS, now, pr, speed, hitPct) {
     const W = window.innerWidth, H = window.innerHeight;
     const head = body.parts[0];
     const c = _egNkPlayerCenter();
@@ -207,7 +216,7 @@ function _egCentAdvance(st, body, dtS, now, pr, speed, hitPct) {
 }
 
 
-function _egCentipedeArenaInit(monster) {
+export function _egCentipedeArenaInit(monster) {
     if (_egCentWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -234,8 +243,8 @@ function _egCentipedeArenaInit(monster) {
     st.body = _egCentSpawnBody(st, 'eg-cent-seg', EG_CENT_SEGS[1], 'Colony');
 
     _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-            ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -441,7 +450,7 @@ function _egCentipedeArenaInit(monster) {
 
 
 // ── Burrow holes ────────────────────────────────────────────────────────
-function _egCentMound(st, now) {
+export function _egCentMound(st, now) {
     const W = window.innerWidth, H = window.innerHeight;
     const x = 90 + Math.random() * Math.max(120, W - 180);
     const y = 90 + Math.random() * Math.max(120, H - 180);
@@ -460,7 +469,7 @@ function _egCentMound(st, now) {
 
 // A hole collapses shut (mini buried in it, or it expired empty). It
 // reopens as a fresh hole after EG_CENT_MOUND_CLOSED_MS.
-function _egCentCloseMound(m) {
+export function _egCentCloseMound(m) {
     if (m.closed) return;
     m.closed = true;
     m.t = 0;
@@ -470,7 +479,7 @@ function _egCentCloseMound(m) {
 
 
 // Does any part of the body sit inside an open burrow hole? Returns it or null.
-function _egCentMoundHit(st, body) {
+export function _egCentMoundHit(st, body) {
     for (let i = 0; i < st.mounds.length; i++) {
         const m = st.mounds[i];
         if (m.closed) continue;
@@ -485,7 +494,7 @@ function _egCentMoundHit(st, body) {
 
 // ── 60% gate: Exoskeleton ───────────────────────────────────────────────
 // Chitin plates orbit the boss, then spiral outward - weave the gaps.
-function _egCentShell(st, now) {
+export function _egCentShell(st, now) {
     if (st.shell) return;
     const c = _egNkPlayerCenter();
     const cx = c ? c.x : window.innerWidth / 2;
@@ -514,7 +523,7 @@ function _egCentShell(st, now) {
 // ── 30% gate: Molt ──────────────────────────────────────────────────────
 // The body stops and swells, then the back half detaches into a faster
 // mini-centipede while the main body enrages.
-function _egCentMolt(st, now) {
+export function _egCentMolt(st, now) {
     if (st.molted) return;
     st.molted = true;
     // Visible swell: pulse every living segment.
@@ -539,7 +548,7 @@ function _egCentMolt(st, now) {
 
 
 // ── Venom burst ─────────────────────────────────────────────────────────
-function _egCentVenomBurst(st, now) {
+export function _egCentVenomBurst(st, now) {
     const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     _egNkToast('eg_cent_venom', '🟢 VENOM BURST! Clear the ring - the splash leaves pools!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('cent_venom'); } catch (e) {}
@@ -574,7 +583,7 @@ function _egCentVenomBurst(st, now) {
 // band telegraphs at the player's row, then the colony stampedes across.
 // Wired from _egFireMonsterAttack (endgame-encounter.js).
 
-function _egCentStampede(monster) {
+export function _egCentStampede(monster) {
     if (_egCentStampedeActive || _egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
     const level = monster ? monster.level : 1;
@@ -615,4 +624,4 @@ function _egCentStampede(monster) {
 //------------------------------------------------------------------------
 // The old scheduled crossing is now the persistent arena - keep the handler
 // name alive so any stale schedule entry no-ops instead of erroring.
-function _egMechCentipedeCross() { void 0; }
+export function _egMechCentipedeCross() { void 0; }

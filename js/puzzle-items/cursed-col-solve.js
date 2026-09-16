@@ -1,9 +1,23 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _resolveCursedColErasureDownside } from './shared/cursed-downside.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+import { solveCols } from './shared/grid-actions.js';
+import { _getPreFilledCols } from './shared/puzzle-helpers.js';
+import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+
+//------------------------------------------------------------------------
 //-------------------CURSED COL SOLVE - VORTEX----------------------
 //------------------------------------------------------------------------
 
 // cursedColSolve - solves 3 columns; downside erases 1 pre-existing column.
-function _useCursedColSolve(id, def) {
+export function _useCursedColSolve(id, def) {
     _trackWitchImmuneCursedUse();
 
     const preFilledCols = _getPreFilledCols();
@@ -11,7 +25,7 @@ function _useCursedColSolve(id, def) {
     const erased = _resolveCursedColErasureDownside(1, preFilledCols);
 
     playItemEffect(id);
-    if (revealed > 0) checkWin();
+    if (revealed > 0) globalThis.checkWin();
     return `🌪️ ${t('item_cursed_col_both').replace('{r}', revealed).replace('{e}', erased)}`;
 }
 
@@ -20,8 +34,8 @@ function _useCursedColSolve(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the dark "sucked in" column strips for Vortex.
-function _fxMakeVortexStrips(container, r) {
-    const cols = cur?.grid?.[0]?.length || 5;
+export function _fxMakeVortexStrips(container, r) {
+    const cols = globalThis.cur?.grid?.[0]?.length || 5;
     const colW = r.width / cols;
 
     for (let i = 0; i < Math.min(cols, 8); i++) {
@@ -35,7 +49,7 @@ function _fxMakeVortexStrips(container, r) {
 }
 
 // 🌪️ Vortex - spinning tornado sweeps columns.
-function _fxVortex() {
+export function _fxVortex() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

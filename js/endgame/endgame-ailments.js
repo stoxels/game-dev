@@ -1,4 +1,21 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { renderCell } from '../grid.js';
+import { applyCell } from '../mouse-button-handlers.js';
+import { _uspBuildSupportStatusIconsHTML, _uspSupportStatusSignature } from '../skills/universal-spells.js';
+import { _egFireProjectile, _egGetElementCentre } from './endgame-class-projectiles.js';
+import { _egMaybeShowAbsorptionBroken } from './endgame-encounter-overlays.js';
+import { EG_MONSTER_PROJ_DURATION_MS, _egGameOver, _egHideBlockLockoutOverlay, _egKillMonster, _egPlayerTakeDamage, _egShowDamageNumber } from './endgame-encounter.js';
+import { _egGetActiveMapModValue, _egHasActiveMapMod } from './endgame-map-launch.js';
+import { _egComputePlayerStats } from './endgame-player-stats.js';
+import { _egIsActive } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------ELEMENTAL AILMENTS SYSTEM----------------------------
 //------------------------------------------------------------------------
 // Central runtime system for elemental status effects (ailments).
@@ -26,40 +43,40 @@
 //-------------------TUNING CONSTANTS------------------------------------
 //------------------------------------------------------------------------
 
-const EG_AIL_TICK_INTERVAL_S = 1.0;     // DoT tick every second
-const EG_AIL_IGNITE_DURATION_S = 5;
-const EG_AIL_IGNITE_DMG_SHARE = 0.15;   // dps = share of the triggering hit
-const EG_AIL_CHILL_DURATION_S = 8;
-const EG_AIL_CHARGE_SLOW_MULT = 0.5;    // chilled attack bar fills at 50%
-const EG_AIL_FROZEN_DURATION_S = 0;     // player freeze removed; retained for compatibility
-const EG_AIL_SHOCK_DURATION_S = 5;
-const EG_AIL_SHOCK_AMP_PCT = 25;        // +damage taken while shocked
-const EG_AIL_SHADOWBURN_DURATION_S = 4;
-const EG_AIL_SHADOWBURN_DMG_SHARE = 0.2;
-const EG_AIL_POLYMORPH_DURATION_S = 6;  // legacy conversion status
-const EG_AIL_SHADOW_DURATION_S = 6;
-const EG_AIL_BLIND_HIT_CHANCE = 0.7;
-const EG_AIL_CONFUSION_DURATION_S = 6;
-const EG_AIL_CONFUSION_SELF_HIT_CHANCE = 0.08;
-const EG_AIL_PLAYER_FIRE_DROP_INTERVAL_MS = 1000;
-const EG_AIL_PLAYER_GROUND_DURATION_MS = 5000;
-const EG_AIL_PLAYER_FIRE_GROUND_DMG_PCT = 8;   // % of playerMaxHP per second while standing in burning ground (fire resistance mitigates)
-const EG_AIL_PLAYER_FIRE_GROUND_TICK_S = 1.0;
-const EG_AIL_PLAYER_FIRE_RADIUS_PX = 41;       // matches .eg-player-ground-fire 82px circle
-const EG_AIL_PLAYER_SHADOW_RADIUS_PX = 55;     // approximate radius for shadow cloud (150x85 ellipse)
+export const EG_AIL_TICK_INTERVAL_S = 1.0;     // DoT tick every second
+export const EG_AIL_IGNITE_DURATION_S = 5;
+export const EG_AIL_IGNITE_DMG_SHARE = 0.15;   // dps = share of the triggering hit
+export const EG_AIL_CHILL_DURATION_S = 8;
+export const EG_AIL_CHARGE_SLOW_MULT = 0.5;    // chilled attack bar fills at 50%
+export const EG_AIL_FROZEN_DURATION_S = 0;     // player freeze removed; retained for compatibility
+export const EG_AIL_SHOCK_DURATION_S = 5;
+export const EG_AIL_SHOCK_AMP_PCT = 25;        // +damage taken while shocked
+export const EG_AIL_SHADOWBURN_DURATION_S = 4;
+export const EG_AIL_SHADOWBURN_DMG_SHARE = 0.2;
+export const EG_AIL_POLYMORPH_DURATION_S = 6;  // legacy conversion status
+export const EG_AIL_SHADOW_DURATION_S = 6;
+export const EG_AIL_BLIND_HIT_CHANCE = 0.7;
+export const EG_AIL_CONFUSION_DURATION_S = 6;
+export const EG_AIL_CONFUSION_SELF_HIT_CHANCE = 0.08;
+export const EG_AIL_PLAYER_FIRE_DROP_INTERVAL_MS = 1000;
+export const EG_AIL_PLAYER_GROUND_DURATION_MS = 5000;
+export const EG_AIL_PLAYER_FIRE_GROUND_DMG_PCT = 8;   // % of playerMaxHP per second while standing in burning ground (fire resistance mitigates)
+export const EG_AIL_PLAYER_FIRE_GROUND_TICK_S = 1.0;
+export const EG_AIL_PLAYER_FIRE_RADIUS_PX = 41;       // matches .eg-player-ground-fire 82px circle
+export const EG_AIL_PLAYER_SHADOW_RADIUS_PX = 55;     // approximate radius for shadow cloud (150x85 ellipse)
 
-const EG_MONSTER_AILMENT_CHANCE_PCT = 15;     // monster hit → player ailment
-const EG_COLD_INNATE_CHILL_CHANCE_PCT = 10;   // cold hits chill even w/o mods
-const EG_AIL_MIN_DOT_DAMAGE = 2;              // floor for DoT ticks
+export const EG_MONSTER_AILMENT_CHANCE_PCT = 15;     // monster hit → player ailment
+export const EG_COLD_INNATE_CHILL_CHANCE_PCT = 10;   // cold hits chill even w/o mods
+export const EG_AIL_MIN_DOT_DAMAGE = 2;              // floor for DoT ticks
 
 // Puzzle-side tuning
-const EG_PUZZLE_ATTACK_CHANCE_PCT = 5;        // monster attack → grid instead of player
-const EG_PUZZLE_EFFECT_DURATION_MS = 10000;
-const EG_PUZZLE_HAZARD_CELLS = 6;             // lava / ice patch size
-const EG_ICE_SLIP_CHANCE = 0.4;               // click slips to a neighbour
-const EG_SHOCK_MARK_STRIP_CHANCE = 0.35;      // per reveal, strips a random ✕ anywhere
+export const EG_PUZZLE_ATTACK_CHANCE_PCT = 5;        // monster attack → grid instead of player
+export const EG_PUZZLE_EFFECT_DURATION_MS = 10000;
+export const EG_PUZZLE_HAZARD_CELLS = 6;             // lava / ice patch size
+export const EG_ICE_SLIP_CHANCE = 0.4;               // click slips to a neighbour
+export const EG_SHOCK_MARK_STRIP_CHANCE = 0.35;      // per reveal, strips a random ✕ anywhere
 
-const EG_AILMENT_ICONS = {
+export const EG_AILMENT_ICONS = {
     ignite: '🔥',
     chill: '❄️',
     frozen: '🧊',
@@ -72,7 +89,7 @@ const EG_AILMENT_ICONS = {
 
 // The display name of an ailment. Only shadowburn needs the mapping (it is
 // one word in the data and two on screen); everything else title-cases.
-function _egAilmentLabel(key) {
+export function _egAilmentLabel(key) {
     if (key === 'shadowburn') return 'Shadow Burn';
     return String(key || '').charAt(0).toUpperCase() + String(key || '').slice(1);
 }
@@ -82,36 +99,36 @@ function _egAilmentLabel(key) {
 //------------------------------------------------------------------------
 
 // Player afflictions: key → { until, dps, acc } (acc = DoT tick accumulator)
-let _egPlayerStatuses = {};
+export let _egPlayerStatuses = {};
 
 // Active puzzle ailments: [{ type, until, timer, cells?, line? }]
-let _egPuzzleEffects = [];
+export let _egPuzzleEffects = [];
 
 // Recursion guard for chained ice slips
-let _egIceRedirectDepth = 0;
+export let _egIceRedirectDepth = 0;
 
 // Shocked-cursor follower node + listener handles
-let _egSparkFollowerEl = null;
-let _egSparkMoveHandler = null;
-let _egSparkSpawnTimer = null;
-let _egSparkLastX = 0;
-let _egSparkLastY = 0;
-const EG_SPARK_GLYPHS = ['⚡', '✦', '✧', '＊'];
+export let _egSparkFollowerEl = null;
+export let _egSparkMoveHandler = null;
+export let _egSparkSpawnTimer = null;
+export let _egSparkLastX = 0;
+export let _egSparkLastY = 0;
+export const EG_SPARK_GLYPHS = ['⚡', '✦', '✧', '＊'];
 
 // Accumulator for ground-fire damage tick (10 Hz → 1 s)
-let _egGroundFireAcc = 0;
+export let _egGroundFireAcc = 0;
 
 
 //------------------------------------------------------------------------
 //-------------------GENERIC STATUS HELPERS------------------------------
 //------------------------------------------------------------------------
 
-function _egHasStatus(statusMap, key) {
+export function _egHasStatus(statusMap, key) {
     const st = statusMap[key];
     return !!(st && st.until > Date.now());
 }
 
-function _egApplyStatusToMap(statusMap, key, durationS, dps) {
+export function _egApplyStatusToMap(statusMap, key, durationS, dps) {
     // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev-testing.js):
     // ×1 = exact shipped behaviour. Scaled centrally so every ailment
     // (player + monster) becomes observable in tests at once.
@@ -125,7 +142,7 @@ function _egApplyStatusToMap(statusMap, key, durationS, dps) {
 }
 
 // Applies an ailment to a monster (or refreshes an existing one).
-function _egApplyMonsterAilment(monster, key, dps) {
+export function _egApplyMonsterAilment(monster, key, dps) {
     if (!monster) return;
     // Active map run: monsters may avoid ailments entirely (PoE purity).
     if ((monster.avoidAilmentPct || 0) > 0 && Math.random() * 100 < monster.avoidAilmentPct) return;
@@ -150,7 +167,7 @@ function _egApplyMonsterAilment(monster, key, dps) {
 }
 
 // Applies an ailment to the player (or refreshes an existing one).
-function _egApplyPlayerAilment(key, dps) {
+export function _egApplyPlayerAilment(key, dps) {
     const durationS = ({
         ignite: EG_AIL_IGNITE_DURATION_S,
         chill: EG_AIL_CHILL_DURATION_S,
@@ -176,7 +193,7 @@ function _egApplyPlayerAilment(key, dps) {
     _egShowPlayerAilmentOverlay(key);
     if (key === 'ignite') _egStartPlayerFireDrops();
     if (key === 'shadow') _egStartPlayerShadowClouds();
-    showToast(`${EG_AILMENT_ICONS[key] || ''} ${key === 'shadowburn' ? 'Shadow Burn' : key === 'polymorph' ? 'Polymorph - the encounter turns chaotic!' : key.charAt(0).toUpperCase() + key.slice(1)}!`);
+    globalThis.showToast(`${EG_AILMENT_ICONS[key] || ''} ${key === 'shadowburn' ? 'Shadow Burn' : key === 'polymorph' ? 'Polymorph - the encounter turns chaotic!' : key.charAt(0).toUpperCase() + key.slice(1)}!`);
 }
 
 
@@ -189,10 +206,10 @@ function _egApplyPlayerAilment(key, dps) {
 //------------------------------------------------------------------------
 
 // 100 ms ticker that refreshes ailment chip countdowns.
-let _egPlayerStatusBarTicker = null;
+export let _egPlayerStatusBarTicker = null;
 
 // Creates (or returns) the shared player status bar container.
-function _egEnsurePlayerStatusBar() {
+export function _egEnsurePlayerStatusBar() {
     let bar = document.getElementById('eg-player-status-bar');
     if (!bar) {
         bar = document.createElement('div');
@@ -202,14 +219,14 @@ function _egEnsurePlayerStatusBar() {
     return bar;
 }
 
-function _egStartPlayerStatusBarTicker() {
+export function _egStartPlayerStatusBarTicker() {
     if (_egPlayerStatusBarTicker) return;
     _egPlayerStatusBarTicker = setInterval(_egRenderPlayerAilmentChips, 100);
     _egRenderPlayerAilmentChips();
 }
 
 // Syncs the ailment chips with _egPlayerStatuses; stops itself when empty.
-function _egRenderPlayerAilmentChips() {
+export function _egRenderPlayerAilmentChips() {
     if (!_egIsActive()) { _egStopPlayerStatusBarTicker(); return; }
 
     const bar = document.getElementById('eg-player-status-bar');
@@ -236,7 +253,7 @@ function _egRenderPlayerAilmentChips() {
             chip = document.createElement('div');
             chip.id = `eg-status-ail-${key}`;
             chip.className = `eg-status-chip eg-status-chip-${key}`;
-            chip.setAttribute('data-tip', _tipAttr(_egAilmentLabel(key)));
+            chip.setAttribute('data-tip', globalThis._tipAttr(_egAilmentLabel(key)));
             chip.innerHTML = `
                 <div class="eg-lockout-icon">${EG_AILMENT_ICONS[key] || ''}</div>
                 <div class="eg-lockout-countdown"></div>`;
@@ -251,7 +268,7 @@ function _egRenderPlayerAilmentChips() {
     }
 }
 
-function _egStopPlayerStatusBarTicker() {
+export function _egStopPlayerStatusBarTicker() {
     if (_egPlayerStatusBarTicker) {
         clearInterval(_egPlayerStatusBarTicker);
         _egPlayerStatusBarTicker = null;
@@ -262,25 +279,25 @@ function _egStopPlayerStatusBarTicker() {
 
 // True while the player is polymorphed: monsters attack each other and the
 // player's charged reveal shots hit themself.
-function _egIsPolymorphActive() {
+export function _egIsPolymorphActive() {
     if (!_egIsActive()) return false;
     return _egPlayerHasAilment('polymorph');
 }
 
 // Picks a random OTHER living monster for polymorph friendly fire.
 // Returns the monster object or null when alone (then attacks land normally).
-function _egGetPolymorphVictim(attackerId) {
-    const others = _egMonsters.filter(m => m.id !== attackerId && m.currentHP > 0);
+export function _egGetPolymorphVictim(attackerId) {
+    const others = globalThis._egMonsters.filter(m => m.id !== attackerId && m.currentHP > 0);
     if (others.length === 0) return null;
     return others[Math.floor(Math.random() * others.length)];
 }
 
-function _egPlayerHasAilment(key) {
+export function _egPlayerHasAilment(key) {
     return _egHasStatus(_egPlayerStatuses, key);
 }
 
 // Charge-bar rate multiplier for the PLAYER (chill/frozen).
-function _egGetPlayerChargeMultiplier() {
+export function _egGetPlayerChargeMultiplier() {
     if (!_egIsActive()) return 1;
     if (_egPlayerHasAilment('frozen')) return 0;
     // Active map run: a permanent icy aura chills the player.
@@ -294,7 +311,7 @@ function _egGetPlayerChargeMultiplier() {
 // Charge-bar rate multiplier for a MONSTER (chill/frozen, plus Brutus's
 // sacrificial-feed haste: every zombie a ground slam devours stacks a
 // charge-up REDUCTION on Brutus for 15s, making his attack bar fill faster).
-function _egGetMonsterChargeMultiplier(m) {
+export function _egGetMonsterChargeMultiplier(m) {
     let mult = 1;
     if (!m || !m.statuses) {
         // no statuses - fall through so the feed haste below still applies
@@ -304,24 +321,24 @@ function _egGetMonsterChargeMultiplier(m) {
         mult = EG_AIL_CHARGE_SLOW_MULT;
     }
     if (mult > 0 && typeof _egBossFeedChargeMult === 'function') {
-        const feed = _egBossFeedChargeMult(m);
+        const feed = globalThis._egBossFeedChargeMult(m);
         if (feed > 0) mult *= feed;
     }
     return mult;
 }
 
 // +shock damage-taken amplification for a MONSTER target.
-function _egApplyAilmentShockAmpOnMonster(target, amount) {
+export function _egApplyAilmentShockAmpOnMonster(target, amount) {
     if (!target || !target.statuses || !_egHasStatus(target.statuses, 'shocked')) return amount;
     return amount * (1 + EG_AIL_SHOCK_AMP_PCT / 100);
 }
 
 // +shock damage-taken amplification for the PLAYER.
-function _egPlayerHitChanceMultiplier() {
+export function _egPlayerHitChanceMultiplier() {
     return _egPlayerHasAilment('shadow') && _egIsPlayerInsideCloud() ? EG_AIL_BLIND_HIT_CHANCE : 1;
 }
 
-function _egApplyPlayerShockAmp(amount) {
+export function _egApplyPlayerShockAmp(amount) {
     if (!_egIsActive()) return amount;
     if (!_egPlayerHasAilment('shocked')) return amount;
     return amount * (1 + EG_AIL_SHOCK_AMP_PCT / 100);
@@ -336,7 +353,7 @@ function _egApplyPlayerShockAmp(amount) {
 // `amount` is the actual damage dealt and `elements` the per-element share.
 //------------------------------------------------------------------------
 
-function _egRollPlayerHitAilments(target, amount, elements) {
+export function _egRollPlayerHitAilments(target, amount, elements) {
     if (!_egIsActive() || !target || target.currentHP <= 0) return;
     const stats = _egComputePlayerStats();
     const _achPreHas = {};
@@ -372,7 +389,7 @@ function _egRollPlayerHitAilments(target, amount, elements) {
 // attack actually deals damage. Called from _egPlayerTakeDamage.
 //------------------------------------------------------------------------
 
-function _egRollMonsterHitAilment(element, dealt) {
+export function _egRollMonsterHitAilment(element, dealt) {
     if (!_egIsActive() || !element || !(dealt > 0)) return;
     // Active map run: "Monster Hits have +#% chance to inflict Ailments".
     const ailChance = EG_MONSTER_AILMENT_CHANCE_PCT +
@@ -407,8 +424,8 @@ function _egRollMonsterHitAilment(element, dealt) {
 // Shadow Burn ignores the shield entirely and burns straight from HP.
 //------------------------------------------------------------------------
 
-function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
-    if (typeof dead !== 'undefined' && dead) return;
+export function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
+    if (typeof dead !== 'undefined' && globalThis.dead) return;
 
     let amount = rawAmount;
 
@@ -418,13 +435,13 @@ function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
         if (dotPct > 0) amount *= (1 + dotPct / 100);
     }
 
-    if (!ignoreShield && _egPlayerAbsorptionCurrent > 0) {
-        const prevAbs = _egPlayerAbsorptionCurrent;
-        const absorbed = Math.min(_egPlayerAbsorptionCurrent, amount);
-        _egPlayerAbsorptionCurrent -= absorbed;
+    if (!ignoreShield && globalThis._egPlayerAbsorptionCurrent > 0) {
+        const prevAbs = globalThis._egPlayerAbsorptionCurrent;
+        const absorbed = Math.min(globalThis._egPlayerAbsorptionCurrent, amount);
+        globalThis._egPlayerAbsorptionCurrent -= absorbed;
         amount -= absorbed;
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('player_shield_damage_taken');
-        if (typeof _egMaybeShowAbsorptionBroken === 'function') _egMaybeShowAbsorptionBroken(prevAbs, _egPlayerAbsorptionCurrent);
+        if (typeof _egMaybeShowAbsorptionBroken === 'function') _egMaybeShowAbsorptionBroken(prevAbs, globalThis._egPlayerAbsorptionCurrent);
     }
 
     amount = Math.round(Math.max(0, amount));
@@ -440,15 +457,15 @@ function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
     }
 
     if (amount <= 0) {
-        if (typeof dead !== 'undefined' && dead) return;
+        if (typeof dead !== 'undefined' && globalThis.dead) return;
         if (typeof _egIsActive === 'function' && !_egIsActive()) return;
-        if (typeof _renderPlayerAvatar === 'function') _renderPlayerAvatar();
+        if (typeof _renderPlayerAvatar === 'function') globalThis._renderPlayerAvatar();
         return;
     }
 
-    playerCurrentHP = Math.max(0, playerCurrentHP - amount);
-    if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
-    if (playerCurrentHP <= 0 && typeof _egGameOver === 'function') _egGameOver();
+    globalThis.playerCurrentHP = Math.max(0, globalThis.playerCurrentHP - amount);
+    if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+    if (globalThis.playerCurrentHP <= 0 && typeof _egGameOver === 'function') _egGameOver();
 }
 
 
@@ -456,13 +473,13 @@ function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
 //-------------------AILMENTS TICK (called at 10Hz)----------------------
 //------------------------------------------------------------------------
 
-function _egExpireFromMap(statusMap, now) {
+export function _egExpireFromMap(statusMap, now) {
     Object.keys(statusMap).forEach(key => {
         if (statusMap[key].until <= now) delete statusMap[key];
     });
 }
 
-function _egTickAilments() {
+export function _egTickAilments() {
     if (!_egIsActive()) return;
     const now = Date.now();
     const deltaS = 0.1; // 10Hz tick
@@ -491,7 +508,7 @@ function _egTickAilments() {
     if (_egGroundFireAcc >= EG_AIL_PLAYER_FIRE_GROUND_TICK_S) {
         _egGroundFireAcc -= EG_AIL_PLAYER_FIRE_GROUND_TICK_S;
         if (_egIsPlayerInsideFire()) {
-            const maxHP = (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
+            const maxHP = (typeof playerMaxHP !== 'undefined' && globalThis.playerMaxHP > 0) ? globalThis.playerMaxHP : 100;
             const rawAmount = Math.max(EG_AIL_MIN_DOT_DAMAGE, Math.round(maxHP * EG_AIL_PLAYER_FIRE_GROUND_DMG_PCT / 100));
             if (typeof _egPlayerTakeDamage === 'function') {
                 _egPlayerTakeDamage(rawAmount, true, 'fire');
@@ -503,7 +520,7 @@ function _egTickAilments() {
 
     // --- Monster statuses ---
     const deadIds = [];
-    _egMonsters.forEach(m => {
+    globalThis._egMonsters.forEach(m => {
         if (!m.statuses) return;
         _egExpireFromMap(m.statuses, now);
 
@@ -528,8 +545,8 @@ function _egTickAilments() {
     // Kill DoT victims after iteration (loot/xp pipeline runs normally)
     deadIds.forEach(id => {
         if (typeof _egBossCheckPhase === 'function') {
-            const target = _egMonsters.find(mm => mm.id === id);
-            if (target && target.isBoss) _egBossCheckPhase(target);
+            const target = globalThis._egMonsters.find(mm => mm.id === id);
+            if (target && target.isBoss) globalThis._egBossCheckPhase(target);
         }
         if (typeof _egKillMonster === 'function') _egKillMonster(id);
     });
@@ -541,7 +558,7 @@ function _egTickAilments() {
 //------------------------------------------------------------------------
 
 // Builds "🔥5 ❄️3" style signature so icons only rebuild when they change.
-function _egStatusSignature(statusMap) {
+export function _egStatusSignature(statusMap) {
     const now = Date.now();
     return Object.keys(statusMap)
         .filter(key => statusMap[key].until > now)
@@ -550,16 +567,16 @@ function _egStatusSignature(statusMap) {
         .join(',');
 }
 
-function _egBuildStatusIconsHTML(statusMap) {
+export function _egBuildStatusIconsHTML(statusMap) {
     const now = Date.now();
     return Object.keys(statusMap)
         .filter(key => statusMap[key].until > now)
-        .map(key => `<span class="eg-status-icon st-${key}" data-tip="${_tipAttr(_egAilmentLabel(key))}">${EG_AILMENT_ICONS[key] || '?'}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`)
+        .map(key => `<span class="eg-status-icon st-${key}" data-tip="${globalThis._tipAttr(_egAilmentLabel(key))}">${EG_AILMENT_ICONS[key] || '?'}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`)
         .join('');
 }
 
 // Per-monster icon strip - cheap DOM update driven by _egUpdateMonsterBars.
-function _egRenderMonsterStatusStrip(m) {
+export function _egRenderMonsterStatusStrip(m) {
     if (!m || !m.statuses) return;
     const strip = document.getElementById(`eg-status-${m.id}`);
     if (!strip) return;
@@ -570,7 +587,7 @@ function _egRenderMonsterStatusStrip(m) {
 }
 
 // Player icon strip above the avatar - created lazily, refreshed per tick.
-function _egRefreshPlayerStatusIcons() {
+export function _egRefreshPlayerStatusIcons() {
     if (!_egIsActive()) return;
     let strip = document.getElementById('eg-player-status-strip');
     const hud = document.getElementById('player-avatar-wrapper');
@@ -602,7 +619,7 @@ function _egRefreshPlayerStatusIcons() {
 // never a sudden unfair hit.
 //------------------------------------------------------------------------
 
-function _egMaybePuzzleAttack(monster) {
+export function _egMaybePuzzleAttack(monster) {
     if (!_egIsActive()) return false;
     if (!monster || !monster.element) return false;
     // Active map run: "Monster Attacks have +#% chance to strike the Puzzle".
@@ -614,7 +631,7 @@ function _egMaybePuzzleAttack(monster) {
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
     const grid = document.getElementById('ptable');
     if (!sourceCard || !grid || typeof _egFireProjectile !== 'function') return false;
-    if (typeof cur === 'undefined' || !cur || !cur.grid || !cur.grid.length) return false;
+    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid || !globalThis.cur.grid.length) return false;
 
     const start = (typeof _egGetElementCentre === 'function') ? _egGetElementCentre(sourceCard) : null;
     const end = (typeof _egGetElementCentre === 'function') ? _egGetElementCentre(grid) : null;
@@ -627,7 +644,7 @@ function _egMaybePuzzleAttack(monster) {
     return true;
 }
 
-function _egApplyPuzzleAilment(element) {
+export function _egApplyPuzzleAilment(element) {
     if (!_egIsActive()) return;
     switch (element) {
         case 'fire': _egPuzzleLava(); break;
@@ -640,9 +657,9 @@ function _egApplyPuzzleAilment(element) {
 }
 
 // Picks a random valid cell for hazard placement (unfilled, unrevealed).
-function _egPickHazardCell(existingKeys, radiusCenter) {
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+export function _egPickHazardCell(existingKeys, radiusCenter) {
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
     for (let tries = 0; tries < 40; tries++) {
         let r, c;
         if (radiusCenter && tries < 20) {
@@ -656,13 +673,13 @@ function _egPickHazardCell(existingKeys, radiusCenter) {
         if (r < 0 || c < 0 || r >= rows || c >= cols) continue;
         const key = `${r}-${c}`;
         if (existingKeys.has(key)) continue;
-        if (revealedGrid[r][c] || userGrid[r][c] === 1) continue;
+        if (globalThis.revealedGrid[r][c] || globalThis.userGrid[r][c] === 1) continue;
         return { r, c, key };
     }
     return null;
 }
 
-function _egRegisterPuzzleEffect(effect) {
+export function _egRegisterPuzzleEffect(effect) {
     effect.until = Date.now() + EG_PUZZLE_EFFECT_DURATION_MS;
     // Natural expiry (vs. encounter cleanup / map swaps) so expiry cues like the
     // soft veil-lift tone only play when the effect actually runs out.
@@ -670,7 +687,7 @@ function _egRegisterPuzzleEffect(effect) {
     _egPuzzleEffects.push(effect);
 }
 
-function _egRemovePuzzleEffect(effect, natural) {
+export function _egRemovePuzzleEffect(effect, natural) {
     clearTimeout(effect.timer);
     _egPuzzleEffects = _egPuzzleEffects.filter(e => e !== effect);
 
@@ -689,7 +706,7 @@ function _egRemovePuzzleEffect(effect, natural) {
 }
 
 // Removes ALL active puzzle ailments (encounter stop / new map).
-function _egClearAllPuzzleEffects() {
+export function _egClearAllPuzzleEffects() {
     _egPuzzleEffects.slice().forEach(_egRemovePuzzleEffect);
 }
 
@@ -701,9 +718,9 @@ function _egClearAllPuzzleEffects() {
 // The doubling itself lives in penalty.js (_egIsLavaCell check).
 //------------------------------------------------------------------------
 
-function _egPuzzleLava() {
+export function _egPuzzleLava() {
     if (_egPuzzleEffects.some(e => e.type === 'lava')) return;
-    const rows = cur.grid.length, cols = cur.grid[0].length;
+    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
     const center = { r: Math.floor(rows / 2), c: Math.floor(cols / 2) };
     const cells = new Map(); // key → overlay span id
 
@@ -722,10 +739,10 @@ function _egPuzzleLava() {
 
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'lava', cells });
-    showToast('🌋 The monster scorched the grid - lava cells punish wrong clicks doubly!');
+    globalThis.showToast('🌋 The monster scorched the grid - lava cells punish wrong clicks doubly!');
 }
 
-function _egIsLavaCell(row, col) {
+export function _egIsLavaCell(row, col) {
     return _egPuzzleEffects.some(e => e.type === 'lava' && e.cells.has(`${row}-${col}`));
 }
 
@@ -737,9 +754,9 @@ function _egIsLavaCell(row, col) {
 // Registered as a click intercept in mouse-button-handlers.js.
 //------------------------------------------------------------------------
 
-function _egPuzzleIce() {
+export function _egPuzzleIce() {
     if (_egPuzzleEffects.some(e => e.type === 'ice')) return;
-    const rows = cur.grid.length, cols = cur.grid[0].length;
+    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
     const center = { r: Math.floor(rows / 2), c: Math.floor(cols / 2) };
     const cells = new Map();
 
@@ -758,16 +775,16 @@ function _egPuzzleIce() {
 
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'ice', cells });
-    showToast('🧊 Ice spreads across the grid - clicks may slip!');
+    globalThis.showToast('🧊 Ice spreads across the grid - clicks may slip!');
 }
 
-function _egIsIceCell(row, col) {
+export function _egIsIceCell(row, col) {
     return _egPuzzleEffects.some(e => e.type === 'ice' && e.cells.has(`${row}-${col}`));
 }
 
 // Click intercept: slip the click to a random orthogonal neighbour.
 // Returns true when the click was consumed by the slip.
-function _egPuzzleIceRedirect(row, col) {
+export function _egPuzzleIceRedirect(row, col) {
     if (!_egIsActive() || _egIceRedirectDepth >= 2) return false;
     if (!_egIsIceCell(row, col)) return false;
     if (Math.random() >= EG_ICE_SLIP_CHANCE) return false;
@@ -775,13 +792,13 @@ function _egPuzzleIceRedirect(row, col) {
     const neighbours = [
         [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1],
     ].filter(([r, c]) =>
-        r >= 0 && c >= 0 && r < cur.grid.length && c < cur.grid[0].length
-        && !revealedGrid[r][c]
+        r >= 0 && c >= 0 && r < globalThis.cur.grid.length && c < globalThis.cur.grid[0].length
+        && !globalThis.revealedGrid[r][c]
     );
     if (neighbours.length === 0) return false;
 
     const [nr, nc] = neighbours[Math.floor(Math.random() * neighbours.length)];
-    showToast('🧊 Slippery! Your click slid to another cell.');
+    globalThis.showToast('🧊 Slippery! Your click slid to another cell.');
     _egIceRedirectDepth++;
     try {
         applyCell(nr, nc); // reuses the same pval → same click type on neighbour
@@ -800,14 +817,14 @@ function _egPuzzleIceRedirect(row, col) {
 // the grid, regardless of its distance from the revealed cell.
 //------------------------------------------------------------------------
 
-function _egPuzzleShockedCursor() {
+export function _egPuzzleShockedCursor() {
     if (_egPuzzleEffects.some(e => e.type === 'shockcursor')) return;
     _egStartShockedCursor();
     _egRegisterPuzzleEffect({ type: 'shockcursor' });
-    showToast('⚡ Your cursor is shocked - reveals may scatter your ✕ marks!');
+    globalThis.showToast('⚡ Your cursor is shocked - reveals may scatter your ✕ marks!');
 }
 
-function _egStartShockedCursor() {
+export function _egStartShockedCursor() {
     if (_egSparkFollowerEl) return;
     document.body.classList.add('eg-cursor-shocked');
     _egSparkFollowerEl = document.createElement('div');
@@ -831,7 +848,7 @@ function _egStartShockedCursor() {
     }, 110);
 }
 
-function _egSpawnCursorSpark(x = _egSparkLastX, y = _egSparkLastY) {
+export function _egSpawnCursorSpark(x = _egSparkLastX, y = _egSparkLastY) {
     const spark = document.createElement('div');
     spark.className = 'eg-spark-particle';
     spark.textContent = EG_SPARK_GLYPHS[Math.floor(Math.random() * EG_SPARK_GLYPHS.length)];
@@ -850,7 +867,7 @@ function _egSpawnCursorSpark(x = _egSparkLastX, y = _egSparkLastY) {
 }
 
 // Lightning-zap burst on a ✕ mark that was just stripped by the shocked cursor.
-function _egSpawnCrossZapFX(row, col) {
+export function _egSpawnCrossZapFX(row, col) {
     const cell = document.getElementById(`g-${row}-${col}`);
     if (!cell) return;
     const rect = cell.getBoundingClientRect();
@@ -871,7 +888,7 @@ function _egSpawnCrossZapFX(row, col) {
     for (let i = 0; i < 5; i++) _egSpawnCursorSpark(cx, cy);
 }
 
-function _egStopShockedCursor() {
+export function _egStopShockedCursor() {
     document.body.classList.remove('eg-cursor-shocked');
     if (_egSparkSpawnTimer) { clearInterval(_egSparkSpawnTimer); _egSparkSpawnTimer = null; }
     if (_egSparkFollowerEl) { _egSparkFollowerEl.remove(); _egSparkFollowerEl = null; }
@@ -880,26 +897,26 @@ function _egStopShockedCursor() {
 
 // Called from handleCorrectFill - while the cursor is shocked, each reveal has
 // a chance to strip a random ✕ mark anywhere on the grid (distance irrelevant).
-function _egOnCorrectCellPuzzleFX(row, col) {
+export function _egOnCorrectCellPuzzleFX(row, col) {
     if (!_egIsActive()) return;
     if (!_egPuzzleEffects.some(e => e.type === 'shockcursor')) return;
     if (Math.random() >= EG_SHOCK_MARK_STRIP_CHANCE) return;
 
     // Collect all currently ✕-marked cells, regardless of distance from reveal
     const marked = [];
-    for (let r = 0; r < cur.grid.length; r++) {
-        for (let c = 0; c < cur.grid[0].length; c++) {
-            if (userGrid[r][c] === 2) marked.push([r, c]);
+    for (let r = 0; r < globalThis.cur.grid.length; r++) {
+        for (let c = 0; c < globalThis.cur.grid[0].length; c++) {
+            if (globalThis.userGrid[r][c] === 2) marked.push([r, c]);
         }
     }
     if (!marked.length) return;
 
     const [r, c] = marked[Math.floor(Math.random() * marked.length)];
-    userGrid[r][c] = 0;
-    systemMarkedGrid[r][c] = false;
+    globalThis.userGrid[r][c] = 0;
+    globalThis.systemMarkedGrid[r][c] = false;
     renderCell(r, c);
     _egSpawnCrossZapFX(r, c);
-    showToast('⚡ A spark zapped one of your ✕ marks!');
+    globalThis.showToast('⚡ A spark zapped one of your ✕ marks!');
 }
 
 
@@ -910,7 +927,7 @@ function _egOnCorrectCellPuzzleFX(row, col) {
 // Scoped variant of the boss-wide Clue Blackout mechanic.
 //------------------------------------------------------------------------
 
-function _egShowPlayerAilmentOverlay(key) {
+export function _egShowPlayerAilmentOverlay(key) {
     const text = { ignite: 'BURNING', chill: 'CHILLED', shocked: 'SHOCKED', shadow: 'BLINDED', confused: 'CONFUSED' }[key];
     if (!text) return;
     const old = document.getElementById('eg-player-ailment-overlay');
@@ -923,24 +940,24 @@ function _egShowPlayerAilmentOverlay(key) {
     setTimeout(() => { if (el.isConnected) el.remove(); }, 1800);
 }
 
-function _egGetPlayerRectForAilment() {
+export function _egGetPlayerRectForAilment() {
     const el = document.getElementById('player-avatar-wrapper');
     return el ? el.getBoundingClientRect() : null;
 }
-function _egCircleOverlapsRect(cx, cy, radius, rect) {
+export function _egCircleOverlapsRect(cx, cy, radius, rect) {
     const closestX = Math.max(rect.left, Math.min(cx, rect.right));
     const closestY = Math.max(rect.top, Math.min(cy, rect.bottom));
     const dx = cx - closestX;
     const dy = cy - closestY;
     return dx * dx + dy * dy <= radius * radius;
 }
-function _egIsPlayerInsideFire() {
+export function _egIsPlayerInsideFire() {
     const r = _egGetPlayerRectForAilment();
     if (!r) return false;
     return _egPuzzleEffects.some(e => e.type === 'playerfire' &&
         _egCircleOverlapsRect(e.x, e.y, EG_AIL_PLAYER_FIRE_RADIUS_PX, r));
 }
-function _egIsPlayerInsideCloud() {
+export function _egIsPlayerInsideCloud() {
     const r = _egGetPlayerRectForAilment();
     if (!r) return false;
     return _egPuzzleEffects.some(e => {
@@ -949,7 +966,7 @@ function _egIsPlayerInsideCloud() {
         return false;
     });
 }
-function _egDropPlayerGround(type) {
+export function _egDropPlayerGround(type) {
     const r = _egGetPlayerRectForAilment();
     if (!r) return;
     const el = document.createElement('div');
@@ -961,16 +978,16 @@ function _egDropPlayerGround(type) {
     _egPuzzleEffects.push(effect);
     setTimeout(() => { el.remove(); _egPuzzleEffects = _egPuzzleEffects.filter(e => e !== effect); }, EG_AIL_PLAYER_GROUND_DURATION_MS);
 }
-function _egStartPlayerFireDrops() {
+export function _egStartPlayerFireDrops() {
     _egDropPlayerGround('fire');
     setTimeout(() => { if (_egPlayerHasAilment('ignite')) _egStartPlayerFireDrops(); }, EG_AIL_PLAYER_FIRE_DROP_INTERVAL_MS);
 }
-function _egStartPlayerShadowClouds() {
+export function _egStartPlayerShadowClouds() {
     _egDropPlayerGround('shadow');
     setTimeout(() => { if (_egPlayerHasAilment('shadow')) _egStartPlayerShadowClouds(); }, EG_AIL_PLAYER_FIRE_DROP_INTERVAL_MS);
 }
 
-function _egApplyPuzzleArcaneBomb() {
+export function _egApplyPuzzleArcaneBomb() {
     if (!_egIsActive() || _egPuzzleEffects.some(e => e.type === 'arcanebomb')) return;
     const pick = _egPickHazardCell(new Set());
     if (!pick) return;
@@ -983,18 +1000,18 @@ function _egApplyPuzzleArcaneBomb() {
     const bomb = { type: 'arcanebomb', row: pick.r, col: pick.c, until: Date.now() + EG_PUZZLE_EFFECT_DURATION_MS, el: icon };
     bomb.timer = setTimeout(() => {
         const adjacent = [[pick.r-1,pick.c-1],[pick.r-1,pick.c],[pick.r-1,pick.c+1],[pick.r,pick.c-1],[pick.r,pick.c+1],[pick.r+1,pick.c-1],[pick.r+1,pick.c],[pick.r+1,pick.c+1]];
-        const marks = adjacent.filter(([r,c]) => r >= 0 && c >= 0 && r < cur.grid.length && c < cur.grid[0].length && userGrid[r][c] === 2).length;
+        const marks = adjacent.filter(([r,c]) => r >= 0 && c >= 0 && r < globalThis.cur.grid.length && c < globalThis.cur.grid[0].length && globalThis.userGrid[r][c] === 2).length;
         const amount = Math.max(1, marks * 8);
         _egPlayerTakeDamage(amount, true, 'arcane');
         _egRemovePuzzleEffect(bomb);
     }, EG_PUZZLE_EFFECT_DURATION_MS);
     _egPuzzleEffects.push(bomb);
-    showToast('🔮 An arcane bomb appeared - remove adjacent ✕ marks before it detonates!');
+    globalThis.showToast('🔮 An arcane bomb appeared - remove adjacent ✕ marks before it detonates!');
 }
 
-function _egPuzzleShadowBlackout() {
+export function _egPuzzleShadowBlackout() {
     if (_egPuzzleEffects.some(e => e.type === 'shadowline')) return;
-    const rows = cur.grid.length, cols = cur.grid[0].length;
+    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
     const isRow = Math.random() < 0.5;
     const idx = isRow ? Math.floor(Math.random() * rows) : Math.floor(Math.random() * cols);
     const prefix = isRow ? `rn-${idx}-` : `cn-${idx}-`;
@@ -1010,10 +1027,10 @@ function _egPuzzleShadowBlackout() {
     });
 
     _egRegisterPuzzleEffect({ type: 'shadowline', line });
-    showToast(`🌑 Shadow veils a ${isRow ? 'row' : 'column'} of clue numbers!`);
+    globalThis.showToast(`🌑 Shadow veils a ${isRow ? 'row' : 'column'} of clue numbers!`);
 }
 
-function _egRestoreLineClues(line) {
+export function _egRestoreLineClues(line) {
     if (!line) return;
     const prefix = line.dir === 'row' ? `rn-${line.idx}-` : `cn-${line.idx}-`;
     document.querySelectorAll(`[id^="${prefix}"]`).forEach(span => {
@@ -1031,7 +1048,7 @@ function _egRestoreLineClues(line) {
 //------------------------------------------------------------------------
 
 // Full reset - called when a fresh encounter starts.
-function _egAilmentsReset() {
+export function _egAilmentsReset() {
     _egPlayerStatuses = {};
     _egClearAllPuzzleEffects();
     _egIceRedirectDepth = 0;
@@ -1044,7 +1061,7 @@ function _egAilmentsReset() {
 }
 
 // Cleanup - called when the encounter stops (also covers game over).
-function _egAilmentsCleanup() {
+export function _egAilmentsCleanup() {
     _egPlayerStatuses = {};
     _egClearAllPuzzleEffects();
     _egGroundFireAcc = 0;

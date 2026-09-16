@@ -1,4 +1,15 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egGameOver, _egRenderPanel } from '../endgame-encounter.js';
+import { _egBossCorrupted } from '../endgame-state.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egTeleportAvatarTo } from './boss-wormhole.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egRemoveCellCorruption } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE DEMOLITIONIST (boss_demolitionist)-------------------
 //------------------------------------------------------------------------
 // The Demolitionist - a three-act demolition show:
@@ -57,30 +68,30 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning ───────────────────────────────────────────────────────────
-const EG_CRASH_DMG = [0, 0.13, 0.15, 0.17];      // per small sticky bomb, by phase (p≥3 → 0.17)
-const EG_CRASH_STICKY_BLAST_R = 96;              // small-bomb damage radius (px)
+export const EG_CRASH_DMG = [0, 0.13, 0.15, 0.17];      // per small sticky bomb, by phase (p≥3 → 0.17)
+export const EG_CRASH_STICKY_BLAST_R = 96;              // small-bomb damage radius (px)
 
-const EG_CRASH_MEGA_DMG = [0, 0, 0.22, 0.26];    // per mega bomb, by phase
-const EG_CRASH_MEGA_WARN_MS = 1750;              // ring telegraph before detonation
-const EG_CRASH_MEGA_BLAST_R = 185;               // mega-bomb damage radius (px)
-const EG_CRASH_MEGA_R_MIN_PLAYER = 150;          // never arm closer than this to the avatar
-const EG_CRASH_CELL_CHAIN_DMG = [0, 0, 0.16, 0.19];
-const EG_CRASH_CELL_CHAIN_R = 150;               // corrupted-cell detonation radius (px)
-const EG_CRASH_CELL_CHAIN_DELAY = [1100, 2000];  // ms window after the mega bomb pops
+export const EG_CRASH_MEGA_DMG = [0, 0, 0.22, 0.26];    // per mega bomb, by phase
+export const EG_CRASH_MEGA_WARN_MS = 1750;              // ring telegraph before detonation
+export const EG_CRASH_MEGA_BLAST_R = 185;               // mega-bomb damage radius (px)
+export const EG_CRASH_MEGA_R_MIN_PLAYER = 150;          // never arm closer than this to the avatar
+export const EG_CRASH_CELL_CHAIN_DMG = [0, 0, 0.16, 0.19];
+export const EG_CRASH_CELL_CHAIN_R = 150;               // corrupted-cell detonation radius (px)
+export const EG_CRASH_CELL_CHAIN_DELAY = [1100, 2000];  // ms window after the mega bomb pops
 
 
 // Phase value tables are indexed by boss phase (clamped 1–3 for the rows
 // that predate the new 4-phase structure).
-function _egCrashP(phase) {
+export function _egCrashP(phase) {
     return Math.max(1, Math.min(3, Number(phase) || 1));
 }
 
-function _egCrashRand(a, b) {
+export function _egCrashRand(a, b) {
     return a + Math.random() * (b - a);
 }
 
 // Center of a grid cell (g-{r}-{c}) in viewport coords, or null.
-function _egCrashCellCenter(r, c) {
+export function _egCrashCellCenter(r, c) {
     const el = document.getElementById('g-' + r + '-' + c);
     if (!el || !el.isConnected) return null;
     const b = el.getBoundingClientRect();
@@ -89,10 +100,10 @@ function _egCrashCellCenter(r, c) {
 }
 
 // Center of the whole playable grid (from the corner cells), or null.
-function _egCrashGridRect() {
-    if (typeof cur === 'undefined' || !cur || !cur.grid || !cur.grid.length || !cur.grid[0]) return null;
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+export function _egCrashGridRect() {
+    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid || !globalThis.cur.grid.length || !globalThis.cur.grid[0]) return null;
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
     const a = document.getElementById('g-0-0');
     const b = document.getElementById('g-' + (rows - 1) + '-' + (cols - 1));
     if (!a || !b || !a.isConnected || !b.isConnected) return null;
@@ -109,7 +120,7 @@ function _egCrashGridRect() {
 // The wrapper is sized to `radius` - the REAL blast disc - so the flash
 // and ring visibly mark the area that just hit. Pass pct > 0 to damage the
 // player (fire %maxHP) when their hitbox overlaps the disc.
-function _egCrashBoom(run, x, y, radius, pct, level, label) {
+export function _egCrashBoom(run, x, y, radius, pct, level, label) {
     const R = Math.max(10, radius);
     // Orphan booms (run == null) are not owned by an nk run, so they survive
     // the run being killed in the same frame (the super-bomb catch / end
@@ -155,7 +166,7 @@ function _egCrashBoom(run, x, y, radius, pct, level, label) {
 }
 
 // Places a visible bomb dot + its dashed danger ring at (x, y).
-function _egCrashArmDot(run, x, y, cls, sizePx, ringR, text) {
+export function _egCrashArmDot(run, x, y, cls, sizePx, ringR, text) {
     const el = _egNkEl(run, 'div', 'eg-nk-dot ' + cls, text || '💣');
     el.style.width = sizePx + 'px';
     el.style.height = sizePx + 'px';
@@ -177,7 +188,7 @@ function _egCrashArmDot(run, x, y, cls, sizePx, ringR, text) {
 //   P1–P2 - three quick sticks around you (3 short volleys).
 //   P3+   - five sticks, one lobbed every ~2 s at wherever you are right
 //           then; every bomb shows its blast ring while it fuses.
-function _egMechStickyBombs(monster, phase) {
+export function _egMechStickyBombs(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = _egCrashP(phase);
     const level = monster ? monster.level : 1;
@@ -248,7 +259,7 @@ function _egMechStickyBombs(monster, phase) {
 // cells caught inside the radius re-fuse for a beat and then blow up on
 // their own (dispelling one before its fuse ends defuses it).
 //   P2 - one mega bomb.   P3+ - two, kept far enough apart to thread.
-function _egMechBigBomb(monster, phase) {
+export function _egMechBigBomb(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = _egCrashP(phase);
     if (p < 2) return;
@@ -299,16 +310,16 @@ function _egMechBigBomb(monster, phase) {
 // Picks `count` bomb landing spots biased near the avatar but on-grid, and
 // kept far enough apart (and from the avatar) that a player never faces an
 // overlapping double ring with no way out.
-function _egCrashPickMegaSpots(count, blastR) {
+export function _egCrashPickMegaSpots(count, blastR) {
     const spots = [];
     const minSep = blastR * 2 + 50;
     const pc = _egNkPlayerCenter();
 
     // Candidate cell centers (or viewport points when the grid is gone).
     const cands = [];
-    if (typeof cur !== 'undefined' && cur && cur.grid) {
-        const rows = cur.grid.length;
-        const cols = cur.grid[0].length;
+    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
+        const rows = globalThis.cur.grid.length;
+        const cols = globalThis.cur.grid[0].length;
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 const cc = _egCrashCellCenter(r, c);
@@ -359,12 +370,12 @@ function _egCrashPickMegaSpots(count, blastR) {
 // are saved). Each blast removes the corruption and deals fire damage.
 // `chainDelays` (optional) collects each delay so the caller's run can stay
 // alive until every detonation has fired.
-function _egCrashChainCells(run, x, y, r, level, phase, chainDelays) {
+export function _egCrashChainCells(run, x, y, r, level, phase, chainDelays) {
     if (!_egBossCorrupted || _egBossCorrupted.size === 0) return;
-    if (typeof cur === 'undefined' || !cur || !cur.grid) return;
+    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid) return;
     const p = Math.max(2, _egCrashP(phase));
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
     const inside = [];
     for (const key of Array.from(_egBossCorrupted.keys())) {
         const [cr, cc] = key.split('-').map(Number);
@@ -427,28 +438,28 @@ function _egCrashChainCells(run, x, y, r, level, phase, chainDelays) {
 // (and resumes its phase-4 schedule) when the maze resolves.
 //------------------------------------------------------------------------
 
-const EG_CRASH_MAZE_CD_MS = 800;              // per countdown tick
-const EG_CRASH_MAZE_TICKS = 5;                // 5 … 1
-const EG_CRASH_MAZE_GRACE_MS = 1300;          // wave waits this long at the start
+export const EG_CRASH_MAZE_CD_MS = 800;              // per countdown tick
+export const EG_CRASH_MAZE_TICKS = 5;                // 5 … 1
+export const EG_CRASH_MAZE_GRACE_MS = 1300;          // wave waits this long at the start
 // Chase speed (~87% of the avatar's 320 px/s top speed, tier-scaled clock).
 // Slow enough that a moving player always gains ground, fast enough that the
 // detonation wave rides their heels the whole corridor: standing still for
 // ~1.3 s lets it catch you; a clean sprint finishes with the wave ~1.5 s
 // (3-4 tiles of popping bombs) behind you at the goal.
-const EG_CRASH_MAZE_WAVE_PXPS = 280;
-const EG_CRASH_MAZE_WALL_DMG_PCT = 0.09;      // contact damage per wall bump
-const EG_CRASH_MAZE_BLAST_DMG_PCT = 0.14;     // caught-in-the-wave damage
-const EG_CRASH_MAZE_HIT_CD_MS = 800;          // shared cooldown for maze damage
-const EG_CRASH_MAZE_CONTACT_PAD_PX = 7;       // forgiveness for wall contact
-const EG_CRASH_MAZE_BLAST_R_MULT = 1.3;       // wave blast radius × pitch
-const EG_CRASH_MAZE_PAD = 70;                 // maze sits this far outside the grid
-const EG_CRASH_MAZE_PITCH_TARGET = 138;       // preferred corridor tile pitch
-const EG_CRASH_MAZE_PITCH_MIN = 104;          // smallest pitch before shrinking the maze
-const EG_CRASH_MAZE_PITCH_ABS_MIN = 92;       // hard floor (tiny screens)
-const EG_CRASH_MAZE_REGION_MIN_W = 560;
-const EG_CRASH_MAZE_REGION_MIN_H = 420;
-const EG_CRASH_MAZE_FINALE_WALL_MS = 42;      // cascade spacing during the finale
-const EG_CRASH_MAZE_FINALE_TAIL_MS = 900;     // hold after the last cascade pop
+export const EG_CRASH_MAZE_WAVE_PXPS = 280;
+export const EG_CRASH_MAZE_WALL_DMG_PCT = 0.09;      // contact damage per wall bump
+export const EG_CRASH_MAZE_BLAST_DMG_PCT = 0.14;     // caught-in-the-wave damage
+export const EG_CRASH_MAZE_HIT_CD_MS = 800;          // shared cooldown for maze damage
+export const EG_CRASH_MAZE_CONTACT_PAD_PX = 7;       // forgiveness for wall contact
+export const EG_CRASH_MAZE_BLAST_R_MULT = 1.3;       // wave blast radius × pitch
+export const EG_CRASH_MAZE_PAD = 70;                 // maze sits this far outside the grid
+export const EG_CRASH_MAZE_PITCH_TARGET = 138;       // preferred corridor tile pitch
+export const EG_CRASH_MAZE_PITCH_MIN = 104;          // smallest pitch before shrinking the maze
+export const EG_CRASH_MAZE_PITCH_ABS_MIN = 92;       // hard floor (tiny screens)
+export const EG_CRASH_MAZE_REGION_MIN_W = 560;
+export const EG_CRASH_MAZE_REGION_MIN_H = 420;
+export const EG_CRASH_MAZE_FINALE_WALL_MS = 42;      // cascade spacing during the finale
+export const EG_CRASH_MAZE_FINALE_TAIL_MS = 900;     // hold after the last cascade pop
 
 // ── The SUPER BOMB ────────────────────────────────────────────────────────
 // ~1s after the maze starts, the boss hurls a giant bomb onto the START
@@ -458,25 +469,25 @@ const EG_CRASH_MAZE_FINALE_TAIL_MS = 900;     // hold after the last cascade pop
 // reaches the player, that's instant defeat. Outrun it to the goal; once
 // the maze resolves it keeps rolling and detonates at the end as the
 // finale's closing bang.
-const EG_CRASH_SUPER_DROP_MS = 1000;     // internal-clock ms after GO: slams onto the start tile
-const EG_CRASH_SUPER_FALL_PX = 420;      // spawn height above the start (falling telegraph)
-const EG_CRASH_SUPER_SIZE_MULT = 1.18;   // bomb diameter × tile pitch (giant)
-const EG_CRASH_SUPER_CATCH_MULT = 0.75;  // along-path gap (× pitch) at which it catches you
-const EG_CRASH_SUPER_BOOM_MULT = 2.4;    // catch / end-of-maze detonation radius × pitch
+export const EG_CRASH_SUPER_DROP_MS = 1000;     // internal-clock ms after GO: slams onto the start tile
+export const EG_CRASH_SUPER_FALL_PX = 420;      // spawn height above the start (falling telegraph)
+export const EG_CRASH_SUPER_SIZE_MULT = 1.18;   // bomb diameter × tile pitch (giant)
+export const EG_CRASH_SUPER_CATCH_MULT = 0.75;  // along-path gap (× pitch) at which it catches you
+export const EG_CRASH_SUPER_BOOM_MULT = 2.4;    // catch / end-of-maze detonation radius × pitch
 
-let _egCrashMaze = null;
+export let _egCrashMaze = null;
 // { monsterId, phase: 'countdown'|'run'|'finale', cdTimer, overlay, banner,
 //   tint, shieldCard, finished, startedAt, wT, wavePx, walls, floors,
 //   path, goal, P, hitCdUntil, ... }
 
 // True from countdown start until the maze resolves. Read by _egTickPlayer
 // (endgame-encounter.js) to freeze the auto-attack charge bar.
-function _egCrashMazeActive() {
+export function _egCrashMazeActive() {
     return !!_egCrashMaze && !_egCrashMaze.finished;
 }
 
 // Toggles the charge-bar pause style (visual twin of the charge freeze).
-function _egCrashSetChargePause(active) {
+export function _egCrashSetChargePause(active) {
     const bar = document.getElementById('avatar-charge-fill');
     if (bar) bar.classList.toggle('eg-charge-paused', !!active);
     const alt = document.getElementById('eg-player-charge-bar');
@@ -485,7 +496,7 @@ function _egCrashSetChargePause(active) {
 
 // Card shield: amber/red "immune dome" over the boss while the maze runs,
 // so the long immunity is readable at a glance (same pattern as Snail).
-function _egCrashMazeSetShield(on) {
+export function _egCrashMazeSetShield(on) {
     if (!_egCrashMaze) return;
     const card = document.getElementById('eg-card-' + _egCrashMaze.monsterId);
     const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
@@ -495,7 +506,7 @@ function _egCrashMazeSetShield(on) {
 // Arena rect for the maze: the puzzle grid inflated by a pad (falling back
 // to a large viewport zone when the grid is tiny or missing), clamped to
 // the screen with room for the top HUD.
-function _egCrashMazeRegion() {
+export function _egCrashMazeRegion() {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const g = _egCrashGridRect();
@@ -523,7 +534,7 @@ function _egCrashMazeRegion() {
 
 // Fits the serpentine tile grid into the arena. Returns pitch P, corridor
 // count C and interior row count R (the maze is 2C+1 lanes × R+2 rows).
-function _egCrashMazeGeometry(region) {
+export function _egCrashMazeGeometry(region) {
     let C = 3;
     let R = Math.max(3, Math.min(6, Math.round((region.bh - 2 * EG_CRASH_MAZE_PITCH_TARGET) / EG_CRASH_MAZE_PITCH_TARGET)));
     let P = Math.min(EG_CRASH_MAZE_PITCH_TARGET,
@@ -548,7 +559,7 @@ function _egCrashMazeGeometry(region) {
 // tile centers not on the path (each tagged with the path index of its
 // nearest path tile - that index drives the chase explosion wave).
 // Expects g.lanes / g.rows (set by _egCrashMazeGo) alongside g.P.
-function _egCrashMazeBuild(g) {
+export function _egCrashMazeBuild(g) {
     const { P, lanes, rows } = g;
     const R = rows - 2; // interior rows (1 .. R, borders at 0 and rows-1)
     const x0 = g.originX + P / 2;
@@ -616,7 +627,7 @@ function _egCrashMazeBuild(g) {
 }
 
 // Phase-enter hook: phase 4 (≤25% HP) is the Bomb Maze takeover.
-function _egCrashOnPhaseEnter(monster, newPhase) {
+export function _egCrashOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 4) return false;
     try {
         _egCrashMazeStart(monster);
@@ -633,7 +644,7 @@ function _egCrashOnPhaseEnter(monster, newPhase) {
 
 // Starts the countdown; the boss stays immune (set by the phase
 // transition) until the whole set-piece finishes.
-function _egCrashMazeStart(monster) {
+export function _egCrashMazeStart(monster) {
     if (_egCrashMaze || !monster) return;
 
     // No half-finished hazards of our own during the set-piece: kill any
@@ -702,7 +713,7 @@ function _egCrashMazeStart(monster) {
 
 // Countdown finished: drop the player at the top-left, build the maze and
 // start the chase.
-function _egCrashMazeGo(g, monster) {
+export function _egCrashMazeGo(g, monster) {
     if (!g || g.finished) return;
     g.phase = 'run';
     g.region = _egCrashMazeRegion();
@@ -1026,7 +1037,7 @@ function _egCrashMazeGo(g, monster) {
 // (path.length-1)*P = the goal tile centre). The path is Manhattan - every
 // consecutive tile sits exactly one pitch away on a single axis - so a lerp
 // along the segment is exact.
-function _egCrashSuperPos(g, px) {
+export function _egCrashSuperPos(g, px) {
     const path = g.path, P = g.P;
     const maxPx = (path.length - 1) * P;
     const q = Math.max(0, Math.min(maxPx, px));
@@ -1040,7 +1051,7 @@ function _egCrashSuperPos(g, px) {
 // projecting the avatar centre onto the nearest path segment. The maze is a
 // single lane, so this is the fair distance a rolling bomb must close (a
 // raw Euclidean gap would cut corners and kill "through" a bend).
-function _egCrashPlayerPathPx(g, x, y) {
+export function _egCrashPlayerPathPx(g, x, y) {
     const path = g.path, P = g.P;
     let bestD2 = Infinity, bestPx = 0;
     for (let i = 0; i < path.length - 1; i++) {
@@ -1056,7 +1067,7 @@ function _egCrashPlayerPathPx(g, x, y) {
 }
 
 // Parks the bomb element at its current roll position; returns that point.
-function _egCrashSuperMove(g) {
+export function _egCrashSuperMove(g) {
     const sup = g.super;
     const p = _egCrashSuperPos(g, sup.rollPx);
     if (sup.el) {
@@ -1067,7 +1078,7 @@ function _egCrashSuperMove(g) {
 }
 
 // Impact: the bomb slams onto the start tile and starts rolling.
-function _egCrashSuperLand(g, level) {
+export function _egCrashSuperLand(g, level) {
     const sup = g.super;
     if (!sup || sup.landed) return;
     sup.landed = true;
@@ -1089,7 +1100,7 @@ function _egCrashSuperLand(g, level) {
 // the absorption shield can eat part of it), then a hard kill guarantees
 // the outcome - no shield, ward or mitigation edge case survives the super
 // bomb. Godmode stays exempt (dev/test toggle).
-function _egCrashSuperCatch(g, level) {
+export function _egCrashSuperCatch(g, level) {
     const sup = g.super;
     if (!sup || sup.caught || !g || g.finished) return;
     sup.caught = true;
@@ -1101,10 +1112,10 @@ function _egCrashSuperCatch(g, level) {
         '#f87171');
     if (!window._egGodMode) {
         try { _egNkHit(2.5, 'fire', level); } catch (e) {}
-        const stillAlive = (typeof playerCurrentHP !== 'undefined' && playerCurrentHP > 0);
+        const stillAlive = (typeof playerCurrentHP !== 'undefined' && globalThis.playerCurrentHP > 0);
         if (stillAlive) {
             try {
-                playerCurrentHP = 0;
+                globalThis.playerCurrentHP = 0;
                 if (typeof window._egRenderPlayerHealth === 'function') window._egRenderPlayerHealth();
             } catch (e) {}
             if (typeof _egGameOver === 'function') { try { _egGameOver(); } catch (e) {} }
@@ -1114,7 +1125,7 @@ function _egCrashSuperCatch(g, level) {
 
 // Fireworks finale: every remaining wall detonates from the start to the
 // end of the maze (visual-only), then the set-piece ends.
-function _egCrashMazeFinale(g, won) {
+export function _egCrashMazeFinale(g, won) {
     if (!g || g.phase === 'finale') return;
     g.phase = 'finale';
     g.won = !!won;
@@ -1132,7 +1143,7 @@ function _egCrashMazeFinale(g, won) {
 
 // Ends the set-piece and hands the phase back to the boss. Safe on every
 // path: normal finish, boss death mid-maze, encounter stop, teardown.
-function _egCrashMazeEnd(g) {
+export function _egCrashMazeEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -1142,7 +1153,7 @@ function _egCrashMazeEnd(g) {
     if (g.run) { try { _egNkKillRun(g.run); } catch (e) {} g.run = null; }
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossPhase === 4 && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -1159,7 +1170,7 @@ function _egCrashMazeEnd(g) {
 
 // Defensive teardown for any mid-set-piece death/stop. Registered in
 // boss-framework.js cleanup.
-function _egCrashTeardown() {
+export function _egCrashTeardown() {
     if (!_egCrashMaze) return;
     const g = _egCrashMaze;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -1175,7 +1186,7 @@ function _egCrashTeardown() {
 
 // ── Countdown / banner overlays ───────────────────────────────────────────
 
-function _egCrashMazeShowOverlay(g) {
+export function _egCrashMazeShowOverlay(g) {
     const ov = document.createElement('div');
     ov.className = 'eg-crash-cd';
     ov.id = 'eg-crash-cd';
@@ -1190,7 +1201,7 @@ function _egCrashMazeShowOverlay(g) {
     ov.style.top = Math.round(r.cy) + 'px';
 }
 
-function _egCrashMazeShowBanner(g) {
+export function _egCrashMazeShowBanner(g) {
     const r = g.region;
     const banner = document.createElement('div');
     banner.className = 'eg-crash-run-banner';

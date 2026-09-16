@@ -1,3 +1,8 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
 //  endgame-mod-tables-gloves.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
@@ -21,7 +26,7 @@
 // no chain/splash, no spell damage multiplier, no crit, no status effect
 // chance applications (those are bracers), no precision (that's chest).
 
-const EG_MOD_TABLE_GLOVES = {
+export const EG_MOD_TABLE_GLOVES = {
     prefixes: {
 
         // --- LIFE & MANA ---

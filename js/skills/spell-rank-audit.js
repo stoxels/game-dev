@@ -1,3 +1,14 @@
+﻿import { switchScreen } from '../screens/screens.js';
+import { t } from '../translation/translations.js';
+import { ASCENDENCY_DEFS } from '../classes/ascendency-defs.js';
+import { ASCENDENCY_LIST } from '../classes/class-cooldown-state.js';
+import { CLASS_DEFS, CLASS_LIST } from '../classes/class-defs.js';
+import { _scaleAbilityManaCost } from '../classes/class-mana.js';
+import { _clsGetLocalizedName } from '../classes/class-ui.js';
+import { SPELL_MAX_RANK, getCharmSlottedRank, getSkillCastRankFull, getSkillMaxRank, getSpellRankDamageMult, getSpellRankManaMult } from './skill-charms.js';
+import { HEARTBLOOM_SKILL_ID, getSkillDamage, getSkillDef, getSkillEffect, getSkillImage, getSkillManaCost, getSkillName } from './skill-registry.js';
+import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspProjDefFor } from './universal-spell-fx.js';
+import { UNIVERSAL_SPELL_DEFS, USP_WARD_MIN_HIT_PCT, _uspCalcAbsorb, _uspCalcArmourPct, _uspCalcDodgePct, _uspCalcDrPct, _uspCalcHeal, _uspCalcHotTick, _uspCalcThornsPct, _uspCalcWardCharges, _uspHealingPower, _uspMaxAbsorption, _uspMaxLife, _uspRankAdditive, getUniversalSpellDef, isUniversalMovementSpell, isUniversalSupportSpell, isUspAnchorArmed } from './universal-spells.js';
 // spell-rank-audit.js
 //------------------------------------------------------------------------
 //-------------------SPELL RANK AUDIT (dev screen)------------------------
@@ -68,7 +79,7 @@
 // Every registered castable skill, in the same order the spell book uses:
 // class actives → ascendency actives → Heartbloom → the spell arsenal.
 
-function _sraPushRosterEntry(rows, id, group, ownerId) {
+export function _sraPushRosterEntry(rows, id, group, ownerId) {
     if (typeof getSkillDef !== 'function' || !getSkillDef(id)) return;
     rows.push({
         id,
@@ -79,7 +90,7 @@ function _sraPushRosterEntry(rows, id, group, ownerId) {
     });
 }
 
-function _sraRoster() {
+export function _sraRoster() {
     const rows = [];
     const classIds = (typeof CLASS_LIST !== 'undefined' && Array.isArray(CLASS_LIST))
         ? CLASS_LIST : Object.keys(typeof CLASS_DEFS !== 'undefined' ? CLASS_DEFS : {});
@@ -122,44 +133,44 @@ function _sraRoster() {
 //------------------------------------------------------------------------
 // Pure, rank-parametric. Nothing here touches STATE.
 
-function _sraUniversal(spellId) {
+export function _sraUniversal(spellId) {
     return (typeof getUniversalSpellDef === 'function') ? getUniversalSpellDef(spellId) : null;
 }
 
-function _sraDef(spellId) {
+export function _sraDef(spellId) {
     return (typeof getSkillDef === 'function') ? getSkillDef(spellId) : null;
 }
 
-function _sraMaxRank(spellId) {
+export function _sraMaxRank(spellId) {
     if (typeof getSkillMaxRank === 'function') return getSkillMaxRank(spellId);
     return (typeof SPELL_MAX_RANK === 'number') ? SPELL_MAX_RANK : 10;
 }
 
 // Length of the AUTHORED effect table (class actives ship 3 rows). 0 = the
 // spell has no authored table and scales purely by curve.
-function _sraAuthoredLevels(spellId) {
+export function _sraAuthoredLevels(spellId) {
     const def = _sraDef(spellId);
     return (def && Array.isArray(def.levels) && def.levels.length) ? def.levels.length : 0;
 }
 
-function _sraDmgMult(rank) {
+export function _sraDmgMult(rank) {
     return (typeof getSpellRankDamageMult === 'function') ? getSpellRankDamageMult(rank) : 1;
 }
 
-function _sraManaMult(rank) {
+export function _sraManaMult(rank) {
     return (typeof getSpellRankManaMult === 'function') ? getSpellRankManaMult(rank) : 1;
 }
 
 // The authored additive curve is a pure primitive the game already exports -
 // call it rather than restating it (see _uspRankAdditive).
-function _sraRankAdditive(base, perRank, cap, rank) {
+export function _sraRankAdditive(base, perRank, cap, rank) {
     return _uspRankAdditive(base, perRank, cap, rank);
 }
 
 // Mana at an arbitrary rank, derived from the shipped resolver so the ladder
 // inherits gear/map cost scaling and the Blood Magic swap rather than
 // re-deriving them. Falls back to the authored base when the live value is 0.
-function _sraMana(spellId, rank) {
+export function _sraMana(spellId, rank) {
     const usp = _sraUniversal(spellId);
     const def = _sraDef(spellId);
     const liveRank = (typeof getSkillCastRankFull === 'function') ? getSkillCastRankFull(spellId) : 1;
@@ -178,7 +189,7 @@ function _sraMana(spellId, rank) {
 // Damage at an arbitrary rank, mirroring getSkillDamage()'s baseline path
 // (perHit[0] is the rank-1 reference and the rank curve supplies the rest).
 // Returns null for spells with no damage payload at all.
-function _sraDamage(spellId, rank) {
+export function _sraDamage(spellId, rank) {
     const usp = _sraUniversal(spellId);
     const def = _sraDef(spellId);
     const mult = _sraDmgMult(rank);
@@ -220,7 +231,7 @@ function _sraDamage(spellId, rank) {
 
 // The spell's non-damage axes at one rank, mirroring the runtime calculators
 // in universal-spells.js (which read the slotted rank, hence the mirror).
-function _sraEffects(spellId, rank) {
+export function _sraEffects(spellId, rank) {
     const usp = _sraUniversal(spellId);
     if (!usp) return [];
     const rows = [];
@@ -310,7 +321,7 @@ function _sraEffects(spellId, rank) {
     }
 
     if (isMove) {
-        const walk = (typeof AVATAR_MOVE_SPEED_PX_PER_SEC === 'number') ? AVATAR_MOVE_SPEED_PX_PER_SEC : 320;
+        const walk = (typeof globalThis.AVATAR_MOVE_SPEED_PX_PER_SEC === 'number') ? globalThis.AVATAR_MOVE_SPEED_PX_PER_SEC : 320;
         if (usp.moveBasePx) {
             const dist = Math.round(_sraRankAdditive(usp.moveBasePx, usp.movePxPerRank || 0, usp.movePxCap || 0, rank));
             rows.push({ label: t('sra_distance'), value: `${dist}px`, num: dist, emphasis: 'max' });
@@ -353,7 +364,7 @@ function _sraEffects(spellId, rank) {
 // Every row of the ladder, already evaluated for each rank. `emphasis` marks
 // which cell in the row is the "best" one so the audit eye lands there;
 // `group` inserts a section bar.
-function _sraBuildModel(spellId) {
+export function _sraBuildModel(spellId) {
     const maxRank = _sraMaxRank(spellId);
     // A universal spell's `levels` is a one-row DESCRIPTIONS stub (see
     // skill-registry), not an authored effect ladder - its magnitudes scale by
@@ -505,7 +516,7 @@ function _sraBuildModel(spellId) {
 }
 
 // True when the spell has any effect rows at all (support / movement).
-function authorsEffects(spellId) {
+export function authorsEffects(spellId) {
     for (let r = 1; r <= 2; r++) if (_sraEffects(spellId, r).length) return true;
     return false;
 }
@@ -515,11 +526,11 @@ function authorsEffects(spellId) {
 //---------------------------STATE---------------------------------------
 //------------------------------------------------------------------------
 
-let _sraSelected = null;   // spell id
-let _sraRank = 1;          // rank shown / played in the sandbox
-let _sraFxTimers = [];
+export let _sraSelected = null;   // spell id
+export let _sraRank = 1;          // rank shown / played in the sandbox
+export let _sraFxTimers = [];
 
-function _sraRankClampFor(spellId, rank) {
+export function _sraRankClampFor(spellId, rank) {
     return Math.max(1, Math.min(Number(rank) || 1, _sraMaxRank(spellId)));
 }
 
@@ -528,9 +539,9 @@ function _sraRankClampFor(spellId, rank) {
 //---------------------------RENDERING------------------------------------
 //------------------------------------------------------------------------
 
-function _sraEl(id) { return document.getElementById(id); }
+export function _sraEl(id) { return document.getElementById(id); }
 
-function _sraBuildLayoutHTML() {
+export function _sraBuildLayoutHTML() {
     return `
 <div class="sra-layout">
     <div class="sra-bar">
@@ -573,7 +584,7 @@ function _sraBuildLayoutHTML() {
 // The chrome (title, buttons, panel captions) is built once with the screen,
 // so a language toggle while it is open would leave it in the old language.
 // Re-stamping the few static labels on every render keeps EN/DE honest.
-function _sraRefreshChrome() {
+export function _sraRefreshChrome() {
     const set = (id, key) => { const el = _sraEl(id); if (el) el.textContent = t(key); };
     set('sra-title', 'sra_title');
     set('sra-btn-back', 'sra_btn_back');
@@ -586,7 +597,7 @@ function _sraRefreshChrome() {
     set('sra-actor-target', 'sra_target');
 }
 
-function _sraRender() {
+export function _sraRender() {
     const spellId = _sraSelected;
     if (!spellId) return;
     _sraRefreshChrome();
@@ -638,7 +649,7 @@ function _sraRender() {
             const outTxt = hasDamage && d ? `${d.totalMin}\u2013${d.totalMax}` : `${output[i]}`;
             const tip = `${t('sra_rank')} ${i + 1} \u00b7 ${t('sra_row_mana')} ${m}`
                 + ` \u00b7 ${hasDamage ? t('sra_row_total') : (model.primaryLabel || '')} ${outTxt}`;
-            return `<div class="sra-bar-col" data-tip="${_tipAttr(tip)}">
+            return `<div class="sra-bar-col" data-tip="${globalThis._tipAttr(tip)}">
                 <div class="sra-bar-stack">
                     <div class="sra-bar sra-bar-dmg" style="height:${Math.max(2, outPct)}%"></div>
                     <div class="sra-bar sra-bar-mana" style="height:${Math.max(2, manaPct)}%"></div>
@@ -710,7 +721,7 @@ function _sraRender() {
 
 // The footer's cross-check: when the audited rank is the rank the game would
 // actually cast, compare this screen's numbers against the shipped resolvers.
-function _sraFooterHTML(spellId, model) {
+export function _sraFooterHTML(spellId, model) {
     const liveRank = (typeof getSkillCastRankFull === 'function') ? getSkillCastRankFull(spellId) : null;
     const idx = _sraRank - 1;
     const mine = model.mana[idx];
@@ -735,7 +746,7 @@ function _sraFooterHTML(spellId, model) {
 }
 
 // Which real FX the sandbox can replay for this spell.
-function _sraFxNote(spellId) {
+export function _sraFxNote(spellId) {
     const usp = _sraUniversal(spellId);
     if (!usp) return t('sra_fx_class');
     if (typeof isUniversalSupportSpell === 'function' && isUniversalSupportSpell(usp)) return t('sra_fx_support');
@@ -759,7 +770,7 @@ function _sraFxNote(spellId) {
 // an encounter being live.
 //------------------------------------------------------------------------
 
-function _sraStagePoints() {
+export function _sraStagePoints() {
     const stage = _sraEl('sra-stage');
     const target = _sraEl('sra-target');
     if (!stage) return null;
@@ -773,7 +784,7 @@ function _sraStagePoints() {
     return { start, end, targetEl: target, stage };
 }
 
-function _sraClearStage() {
+export function _sraClearStage() {
     _sraFxTimers.forEach((id) => clearTimeout(id));
     _sraFxTimers = [];
     document.querySelectorAll('.eg-projectile').forEach((el) => { try { el.remove(); } catch (e) {} });
@@ -784,13 +795,13 @@ function _sraClearStage() {
     }
 }
 
-function _sraAfter(ms, fn) {
+export function _sraAfter(ms, fn) {
     _sraFxTimers.push(setTimeout(fn, ms));
 }
 
 // Overlay on the sandbox target - same class names the game appends to a
 // monster card, so the real keyframes play.
-function _sraStageOverlay(className, ms) {
+export function _sraStageOverlay(className, ms) {
     const target = _sraEl('sra-target');
     if (!target) return;
     const el = document.createElement('div');
@@ -799,26 +810,26 @@ function _sraStageOverlay(className, ms) {
     _sraAfter(ms || 900, () => { try { el.remove(); } catch (e) {} });
 }
 
-function _sraHitBurst(x, y, color, isCrit) {
-    if (typeof EG_HIT_ELEMENT_COLORS === 'undefined') return;
+export function _sraHitBurst(x, y, color, isCrit) {
+    if (typeof globalThis.EG_HIT_ELEMENT_COLORS === 'undefined') return;
     const burst = document.createElement('div');
     burst.className = 'eg-hit-burst sra-fx';
     burst.style.left = `${x}px`;
     burst.style.top = `${y}px`;
     const ring = document.createElement('div');
     ring.className = 'eg-hit-ring';
-    ring.style.setProperty('--eg-hit-color', color || EG_HIT_ELEMENT_COLORS.physical);
+    ring.style.setProperty('--eg-hit-color', color || globalThis.EG_HIT_ELEMENT_COLORS.physical);
     if (isCrit) {
         ring.style.transform = 'scale(1.35)';
         ring.style.borderWidth = '4px';
         ring.style.filter = 'brightness(1.5)';
     }
     burst.appendChild(ring);
-    const sparkCount = (typeof EG_HIT_BURST_SPARK_COUNT === 'number') ? EG_HIT_BURST_SPARK_COUNT : 8;
+    const sparkCount = (typeof globalThis.EG_HIT_BURST_SPARK_COUNT === 'number') ? globalThis.EG_HIT_BURST_SPARK_COUNT : 8;
     for (let i = 0; i < sparkCount; i++) {
         const spark = document.createElement('div');
         spark.className = 'eg-hit-spark';
-        spark.style.setProperty('--eg-hit-color', color || EG_HIT_ELEMENT_COLORS.physical);
+        spark.style.setProperty('--eg-hit-color', color || globalThis.EG_HIT_ELEMENT_COLORS.physical);
         const angle = (Math.PI * 2 * i) / sparkCount;
         spark.style.setProperty('--eg-hit-dx', `${Math.cos(angle) * 22}px`);
         spark.style.setProperty('--eg-hit-dy', `${Math.sin(angle) * 22}px`);
@@ -829,11 +840,11 @@ function _sraHitBurst(x, y, color, isCrit) {
 }
 
 // Class / ascendency projectile art, keyed by owner id.
-function _sraClassProjDef(spellId) {
-    if (typeof EG_CLASS_PROJECTILES === 'undefined') return null;
+export function _sraClassProjDef(spellId) {
+    if (typeof globalThis.EG_CLASS_PROJECTILES === 'undefined') return null;
     const def = _sraDef(spellId);
     const owner = (def && def.source && def.source.ownerId) || null;
-    return EG_CLASS_PROJECTILES[owner] || EG_CLASS_PROJECTILES._default || null;
+    return globalThis.EG_CLASS_PROJECTILES[owner] || globalThis.EG_CLASS_PROJECTILES._default || null;
 }
 
 // Fires ONE real projectile and OWNS its lifetime.
@@ -846,10 +857,10 @@ function _sraClassProjDef(spellId) {
 // from here instead: the impact fires at `dur`, and whichever element the call
 // created is removed just after. If onfinish ALSO fires (it does for class
 // spells), both paths are no-ops and the result is identical.
-function _sraFireFlight(projDef, start, end, dur, easing, scale, onArrive) {
+export function _sraFireFlight(projDef, start, end, dur, easing, scale, onArrive) {
     const before = new Set(document.querySelectorAll('.eg-projectile'));
     try {
-        _egFireProjectile(projDef, projDef.cssClass, start, end, dur, easing, () => {}, null, scale);
+        globalThis._egFireProjectile(projDef, projDef.cssClass, start, end, dur, easing, () => {}, null, scale);
     } catch (e) {
         return null; // flight is cosmetic - never let the sandbox throw
     }
@@ -859,7 +870,7 @@ function _sraFireFlight(projDef, start, end, dur, easing, scale, onArrive) {
     return created[0] || null;
 }
 
-function _sraPlayVisual() {
+export function _sraPlayVisual() {
     if (!_sraSelected) return;
     _sraClearStage();
     const pts = _sraStagePoints();
@@ -870,13 +881,13 @@ function _sraPlayVisual() {
     const hits = row ? Math.max(1, Math.min(row.count, 6)) : 1;
 
     // ── universal offensive: themed projectile + its own impact overlays ──
-    if (usp && usp.dmg && typeof _egFireProjectile === 'function') {
+    if (usp && usp.dmg && typeof globalThis._egFireProjectile === 'function') {
         const projDef = (typeof _uspProjDefFor === 'function') ? _uspProjDefFor(usp) : null;
         if (projDef) {
             const big = usp.behavior === 'single' && (usp.dmg[0] >= 40);
             const fromSky = !!usp.fromSky || usp.behavior === 'delayed' || usp.behavior === 'starfall';
             for (let i = 0; i < hits; i++) {
-                _sraAfter(i * (typeof EG_REVEAL_PROJECTILE_STAGGER_MS === 'number' ? EG_REVEAL_PROJECTILE_STAGGER_MS : 60), () => {
+                _sraAfter(i * (typeof globalThis.EG_REVEAL_PROJECTILE_STAGGER_MS === 'number' ? globalThis.EG_REVEAL_PROJECTILE_STAGGER_MS : 60), () => {
                     const p = _sraStagePoints();
                     if (!p) return;
                     const start = fromSky ? { x: p.end.x, y: p.end.y - 300 } : p.start;
@@ -904,8 +915,8 @@ function _sraPlayVisual() {
     // ── class / ascendency / Heartbloom: the class's own projectile art ───
     if (!usp) {
         const projDef = _sraClassProjDef(spellId);
-        if (projDef && typeof _egFireProjectile === 'function') {
-            const color = (typeof EG_HIT_ELEMENT_COLORS !== 'undefined') ? EG_HIT_ELEMENT_COLORS.physical : '#ffffff';
+        if (projDef && typeof globalThis._egFireProjectile === 'function') {
+            const color = (typeof globalThis.EG_HIT_ELEMENT_COLORS !== 'undefined') ? globalThis.EG_HIT_ELEMENT_COLORS.physical : '#ffffff';
             for (let i = 0; i < hits; i++) {
                 _sraAfter(i * 90, () => {
                     const p = _sraStagePoints();
@@ -977,7 +988,7 @@ function _sraPlayVisual() {
 // Every value here comes from the same shipped calculator the TABLE used, so
 // the floating number and the ladder cell are the same number by construction
 // (gear included) instead of by two matching transcriptions.
-function _sraSupportLabelText(usp, rank) {
+export function _sraSupportLabelText(usp, rank) {
     switch (usp.behavior) {
         case 'heal':
             return { text: `+${_uspCalcHeal(usp, rank)}`, color: '#7fe0b0' };
@@ -1002,7 +1013,7 @@ function _sraSupportLabelText(usp, rank) {
 }
 
 // Small transient note inside the pane when a visual cannot be sourced.
-function _sraStageFlash(text) {
+export function _sraStageFlash(text) {
     const stage = _sraEl('sra-stage');
     if (!stage) return;
     const el = document.createElement('div');
@@ -1017,7 +1028,7 @@ function _sraStageFlash(text) {
 //---------------------------INTERACTION---------------------------------
 //------------------------------------------------------------------------
 
-function _sraPickerOptionsHTML() {
+export function _sraPickerOptionsHTML() {
     const roster = _sraRoster();
     const groups = [];
     for (const entry of roster) {
@@ -1030,12 +1041,12 @@ function _sraPickerOptionsHTML() {
         + `</optgroup>`).join('');
 }
 
-function _sraSyncPicker() {
+export function _sraSyncPicker() {
     const picker = _sraEl('sra-picker');
     if (picker) picker.innerHTML = _sraPickerOptionsHTML();
 }
 
-function _sraOnPick(spellId) {
+export function _sraOnPick(spellId) {
     if (!spellId) return;
     _sraSelected = spellId;
     // Default the sandbox to the rank the player would actually cast, so the
@@ -1046,7 +1057,7 @@ function _sraOnPick(spellId) {
     _sraRender();
 }
 
-function _sraStep(delta) {
+export function _sraStep(delta) {
     const roster = _sraRoster();
     if (!roster.length) return;
     let i = roster.findIndex((e) => e.id === _sraSelected);
@@ -1058,7 +1069,7 @@ function _sraStep(delta) {
 }
 
 // Clicking a rank column header focuses that rank (and moves the sandbox).
-function _sraSetRank(rank) {
+export function _sraSetRank(rank) {
     if (!_sraSelected) return;
     _sraRank = _sraRankClampFor(_sraSelected, rank);
     _sraRender();
@@ -1069,7 +1080,7 @@ function _sraSetRank(rank) {
 //---------------------------STYLES--------------------------------------
 //------------------------------------------------------------------------
 
-function _sraEnsureStyles() {
+export function _sraEnsureStyles() {
     if (document.getElementById('sra-style')) return;
     const style = document.createElement('style');
     style.id = 'sra-style';
@@ -1176,7 +1187,7 @@ function _sraEnsureStyles() {
 //---------------------------BOOTSTRAP-----------------------------------
 //------------------------------------------------------------------------
 
-function _sraCreateScreen() {
+export function _sraCreateScreen() {
     _sraEnsureStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-spell-rank-audit';
@@ -1194,14 +1205,14 @@ function _sraCreateScreen() {
     });
 }
 
-function ensureSpellRankAuditScreen() {
+export function ensureSpellRankAuditScreen() {
     if (!document.getElementById('screen-spell-rank-audit')) _sraCreateScreen();
     return document.getElementById('screen-spell-rank-audit');
 }
 
 // Entry point. `spellId` optional (falls back to the first roster entry, or
 // the last one you looked at); `rank` optional.
-function showSpellRankAudit(spellId, rank) {
+export function showSpellRankAudit(spellId, rank) {
     ensureSpellRankAuditScreen();
     const roster = _sraRoster();
     if (!roster.length) return;
@@ -1226,14 +1237,27 @@ function showSpellRankAudit(spellId, rank) {
 //---------------------------DEV WIRING----------------------------------
 //------------------------------------------------------------------------
 
-if (typeof DevTest !== 'undefined' && DevTest) {
+// Phase 3 step 5: as a module this file evaluates before dev-testing.js
+// (which owns DevTest), so the typeof guard would be false at eval time and
+// the .ranks augmentation would silently vanish. Defer to DOMContentLoaded.
+export function _sraWireDevTest() {
+    if (typeof globalThis.DevTest !== 'undefined' && globalThis.DevTest) {
     // DevTest.ranks()                       → the audit screen
     // DevTest.ranks('usp_blizzard')         → one spell
     // DevTest.ranks('usp_blizzard', 10)     → …at a given rank
-    DevTest.ranks = function (spellId, rank) {
+    globalThis.DevTest.ranks = function (spellId, rank) {
         showSpellRankAudit(spellId || null, rank);
         return { spell: _sraSelected, rank: _sraRank, roster: _sraRoster().length };
     };
+    }
+}
+// Deferred to DOMContentLoaded (module-eval timing: deferred module scripts
+// execute at readyState 'interactive', so 'loading' alone would run this
+// inside the import phase - the skill-hotbar P bug was this exact miss).
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _sraWireDevTest);
+} else {
+    _sraWireDevTest();
 }
 
 // ?spellaudit=usp_blizzard&rank=10  (spell / rank both optional).

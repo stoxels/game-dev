@@ -1,3 +1,16 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { switchScreen } from '../screens/screens.js';
+import { t } from '../translation/translations.js';
+import { EG_ART } from './endgame-art.js';
+import { _egBuildChainPool, _egSpawnNextArenaBoss, _egUpdateObjectivesHUD } from './endgame-encounter-chain.js';
+import { _egEnsureLoseOverlayEndgameUI } from './endgame-encounter-overlays.js';
+import { _egMapTierMonsterLevel, _egRollMapTier } from './endgame-maps.js';
+import { _egCreateGeneratedLevel } from './endgame-puzzle-generator.js';
+
 'use strict';
 
 //========================================================================
@@ -32,21 +45,21 @@
 //------------------------------------------------------------------------
 
 // Generous time budget for a single test fight (1 hour, in seconds).
-const EG_BOSS_TEST_TIME_LIMIT = 3600;
+export const EG_BOSS_TEST_TIME_LIMIT = 3600;
 
 // Fallback monster level per map tier (T1–T16), used when
 // _egMapTierMonsterLevel() (endgame-maps.js) is unavailable. Mirrors
 // EG_MAP_TIER_MONSTER_LEVELS.
-const EG_BOSS_TEST_TIER_LEVELS = [3, 6, 10, 14, 19, 24, 30, 36, 43, 50, 57, 64, 71, 78, 84, 90];
+export const EG_BOSS_TEST_TIER_LEVELS = [3, 6, 10, 14, 19, 24, 30, 36, 43, 50, 57, 64, 71, 78, 84, 90];
 
 // Fallback test level for bosses with no atlas region assigned.
-const EG_BOSS_TEST_DEFAULT_LEVEL = 50;
+export const EG_BOSS_TEST_DEFAULT_LEVEL = 50;
 
 // Arena board caps - mirrors EG_BOSS_ARENA_MAX_ROWS/COLS in
 // endgame-encounter-chain.js so fights feel like real boss arenas.
-const EG_BOSS_TEST_ARENA_MAX_ROWS = 15;
-const EG_BOSS_TEST_ARENA_MAX_COLS = 25;
-const EG_BOSS_TEST_ARENA_MIN_CELLS = 36;
+export const EG_BOSS_TEST_ARENA_MAX_ROWS = 15;
+export const EG_BOSS_TEST_ARENA_MAX_COLS = 25;
+export const EG_BOSS_TEST_ARENA_MIN_CELLS = 36;
 
 
 //------------------------------------------------------------------------
@@ -58,7 +71,7 @@ const EG_BOSS_TEST_ARENA_MIN_CELLS = 36;
 // including when the seed is still `cur` (forfeiting mid-first-arena is
 // the common case when testing, and there is no same-level retry flow
 // that would need the fields preserved).
-function _egCleanupBossTestSeedLevel() {
+export function _egCleanupBossTestSeedLevel() {
     // Launch guard: _egChainCleanup also fires from _egStopEncounter
     // during the launch's own startLevel() call - wiping the stamp there
     // would kill the run before the first encounter begins (same pattern
@@ -69,7 +82,7 @@ function _egCleanupBossTestSeedLevel() {
     window._egBossTestSeedGi = null;
     if (seedGi == null) return;
 
-    const level = (typeof ALL !== 'undefined') ? ALL[seedGi] : null;
+    const level = (typeof ALL !== 'undefined') ? globalThis.ALL[seedGi] : null;
     if (!level) return;
 
     delete level.isBossTestSeed;
@@ -88,10 +101,10 @@ function _egCleanupBossTestSeedLevel() {
 // Returns the atlas map tier (1–16) a boss belongs to, via
 // EG_ATLAS_REGION_BOSSES (boss-rosters.js: region `atlas_t{tier}_{slot}`
 // → boss id). Returns 0 when the boss has no assigned region.
-function _egbtBossTier(bossId) {
+export function _egbtBossTier(bossId) {
     if (typeof EG_ATLAS_REGION_BOSSES === 'undefined') return 0;
-    for (const regionId of Object.keys(EG_ATLAS_REGION_BOSSES)) {
-        if (EG_ATLAS_REGION_BOSSES[regionId] !== bossId) continue;
+    for (const regionId of Object.keys(globalThis.EG_ATLAS_REGION_BOSSES)) {
+        if (globalThis.EG_ATLAS_REGION_BOSSES[regionId] !== bossId) continue;
         const m = /^atlas_t(\d+)_/.exec(regionId);
         if (m) return Math.max(1, Math.min(16, parseInt(m[1], 10)));
     }
@@ -99,7 +112,7 @@ function _egbtBossTier(bossId) {
 }
 
 // Monster level a boss of the given tier fights at on real maps.
-function _egbtTierMonsterLevel(tier) {
+export function _egbtTierMonsterLevel(tier) {
     if (typeof _egMapTierMonsterLevel === 'function') {
         try { return Math.max(1, Math.round(_egMapTierMonsterLevel(tier))); } catch (e) {}
     }
@@ -108,7 +121,7 @@ function _egbtTierMonsterLevel(tier) {
 
 // Test level for one boss: its tier's monster level, or the default for
 // bosses with no assigned region.
-function _egbtLevelForBoss(bossId) {
+export function _egbtLevelForBoss(bossId) {
     const tier = _egbtBossTier(bossId);
     return tier > 0 ? _egbtTierMonsterLevel(tier) : EG_BOSS_TEST_DEFAULT_LEVEL;
 }
@@ -120,9 +133,9 @@ function _egbtLevelForBoss(bossId) {
 
 // Builds a tooltip HTML string for a boss, listing its phases, mechanics,
 // and estimated damage at the given level. Uses showGameTooltip from tooltips-hud.js.
-function _egbtBuildBossTooltipHTML(def, level) {
+export function _egbtBuildBossTooltipHTML(def, level) {
     const preview = _egbtScaledPreview(def, level);
-    const mechDef = (typeof EG_BOSS_MECHANICS !== 'undefined') ? EG_BOSS_MECHANICS[def.id] : null;
+    const mechDef = (typeof EG_BOSS_MECHANICS !== 'undefined') ? globalThis.EG_BOSS_MECHANICS[def.id] : null;
     if (!mechDef) return null;
 
     const bossIcon = (typeof EG_ART !== 'undefined' && EG_ART.html)
@@ -155,12 +168,12 @@ function _egbtBuildBossTooltipHTML(def, level) {
     // Mirrors the live fight values: cap = P2 spread ceiling / P3 relentless ceiling.
     if (mechDef.mechanics && mechDef.mechanics.some(m => (m.handler || '').includes('CorruptCells'))) {
         const norm = (typeof _egBossTierNorm === 'function')
-            ? (() => { try { return _egBossTierNorm({ level }); } catch (e) { return 0.5; } })()
+            ? (() => { try { return globalThis._egBossTierNorm({ level }); } catch (e) { return 0.5; } })()
             : 0.5;
         const cap2 = (typeof _egCorruptSpreadCap === 'function')
-            ? _egCorruptSpreadCap({ p: 2, norm }) : null;
+            ? globalThis._egCorruptSpreadCap({ p: 2, norm }) : null;
         const cap3 = (typeof _egCorruptSpreadCap === 'function')
-            ? _egCorruptSpreadCap({ p: 3, norm }) : null;
+            ? globalThis._egCorruptSpreadCap({ p: 3, norm }) : null;
         if (cap2 != null && cap3 != null) {
             html += `<div style="font-size:11px;margin-bottom:8px;">
                 <span style="color:#7fb8ff;">🧫 Corruption cap:</span>
@@ -223,8 +236,8 @@ function _egbtBuildBossTooltipHTML(def, level) {
 
     // Soft enrage note
     if (typeof EG_BOSS_SOFT_ENRAGE_DELAY_MS !== 'undefined') {
-        const delayMin = EG_BOSS_SOFT_ENRAGE_DELAY_MS / 60000;
-        const stepPct = Math.round(EG_BOSS_SOFT_ENRAGE_DMG_STEP * 100);
+        const delayMin = globalThis.EG_BOSS_SOFT_ENRAGE_DELAY_MS / 60000;
+        const stepPct = Math.round(globalThis.EG_BOSS_SOFT_ENRAGE_DMG_STEP * 100);
         html += `<div style="margin-top:8px;font-size:10px;opacity:0.6;">
             ${t('eg_boss_test_soft_enrage').replace('{delay}', delayMin).replace('{step}', stepPct)}
         </div>`;
@@ -237,7 +250,7 @@ function _egbtBuildBossTooltipHTML(def, level) {
 // Translation lookup with a real fallback: t() returns the key itself when
 // a translation is missing (truthy), so `t(k) || fb` never falls back.
 // This helper returns the fallback English text in that case.
-function _egbtTr(key, fallback) {
+export function _egbtTr(key, fallback) {
     try {
         const v = (typeof t === 'function') ? t(key) : key;
         return (v && v !== key) ? v : fallback;
@@ -249,7 +262,7 @@ function _egbtTr(key, fallback) {
 // never appear in the EG_BOSS_MECHANICS schedule - without these entries
 // the tooltip only shows the scheduled mechanics and hides the signature
 // of the fight. Covers all Tier 1–4 bosses.
-function _egbtGetSpecialPhaseInfo(bossId) {
+export function _egbtGetSpecialPhaseInfo(bossId) {
     switch (bossId) {
         // ── Tier 1 ──
         case 'boss_ember':
@@ -583,28 +596,28 @@ function _egbtGetSpecialPhaseInfo(bossId) {
 
 // Test HP boost: scales boss to ~500k max HP while keeping phase thresholds
 // and damage unchanged.
-function _egbtCalcTestHPMultiplier(def, level) {
+export function _egbtCalcTestHPMultiplier(def, level) {
     const preview = _egbtScaledPreview(def, level);
     const targetHP = 500000;
     return preview.hp > 0 ? targetHP / preview.hp : 1;
 }
 
 // Shows the boss tooltip on mouseenter.
-function _egbtShowTooltip(cardEl, e) {
+export function _egbtShowTooltip(cardEl, e) {
     const bossId = cardEl.dataset.bossId;
     const level = Number(cardEl.dataset.bossLevel);
     if (!bossId || !level) return;
-    const def = (typeof EG_BOSS_DEFS !== 'undefined') ? EG_BOSS_DEFS[bossId] : null;
+    const def = (typeof EG_BOSS_DEFS !== 'undefined') ? globalThis.EG_BOSS_DEFS[bossId] : null;
     if (!def) return;
     const html = _egbtBuildBossTooltipHTML(def, level);
-    if (html) showGameTooltip(html, e);
+    if (html) globalThis.showGameTooltip(html, e);
 }
 
 // Toggles the 500k HP test mode checkbox. Rebinds the card and Fight
 // button handlers so the launch carries the boost (or drops it again on
 // uncheck). Handlers are real functions, not string attributes, so the
 // rebind works identically in every environment.
-function _egbtToggleTestHP(checkbox, bossId, level, hpMult) {
+export function _egbtToggleTestHP(checkbox, bossId, level, hpMult) {
     const card = checkbox.closest('.egbt-boss-card');
     if (!card) return;
     const newHpMult = checkbox.checked ? hpMult : 1;
@@ -621,7 +634,7 @@ function _egbtToggleTestHP(checkbox, bossId, level, hpMult) {
     }
     const statsEl = card.querySelector('.egbt-boss-stats');
     if (statsEl) {
-        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? EG_BOSS_DEFS[bossId] : null;
+        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? globalThis.EG_BOSS_DEFS[bossId] : null;
         if (def) {
             const p = _egbtScaledPreview(def, level);
             const hp = checkbox.checked ? Math.round(p.hp * hpMult) : p.hp;
@@ -641,11 +654,11 @@ function _egbtToggleTestHP(checkbox, bossId, level, hpMult) {
 // and a fixed HUD chip shows "GODMODE ON" wherever you are - no console
 // access needed. The chip also guards against accidentally leaving it on
 // during a real map run.
-let _egbtGodModeOn = false;
+export let _egbtGodModeOn = false;
 
 
 // Applies the flag, persists it, and re-syncs every godmode UI element.
-function _egbtApplyGodMode(on) {
+export function _egbtApplyGodMode(on) {
     _egbtGodModeOn = !!on;
     window._egGodMode = _egbtGodModeOn;
     try { localStorage.setItem('_egbtGodMode', _egbtGodModeOn ? '1' : '0'); } catch (e) {}
@@ -655,7 +668,7 @@ function _egbtApplyGodMode(on) {
 
 // Restores the persisted state (called when the boss-test screen opens and
 // once at script load, so the chip is correct even outside the screen).
-function _egbtInitGodMode() {
+export function _egbtInitGodMode() {
     let on = false;
     try { on = localStorage.getItem('_egbtGodMode') === '1'; } catch (e) {}
     _egbtApplyGodMode(on);
@@ -663,14 +676,14 @@ function _egbtInitGodMode() {
 
 
 // Checkbox handler (inline onchange).
-function _egbtToggleGodMode(checkbox) {
+export function _egbtToggleGodMode(checkbox) {
     _egbtApplyGodMode(checkbox && checkbox.checked);
 }
 
 
 // Keeps every godmode UI element in sync: the settings checkbox + state
 // badge on the boss-test screen, and the always-visible in-game chip.
-function _egbtSyncGodModeUI() {
+export function _egbtSyncGodModeUI() {
     const on = _egbtGodModeOn;
     document.querySelectorAll('.egbt-godmode-checkbox').forEach(cb => { cb.checked = on; });
     const badge = document.getElementById('egbt-godmode-badge');
@@ -698,7 +711,7 @@ function _egbtSyncGodModeUI() {
 
 // Picks a small generated puzzle for the test arena. Falls back to a
 // small story puzzle when generation is unavailable.
-function _egbtPickArenaGi() {
+export function _egbtPickArenaGi() {
     if (typeof _egCreateGeneratedLevel === 'function') {
         const gi = _egCreateGeneratedLevel({
             mode: 'mixed',
@@ -717,7 +730,7 @@ function _egbtPickArenaGi() {
             avoidRecent: false,
         });
         if (typeof isGatedLevel === 'function') {
-            pool = pool.filter(level => !isGatedLevel(level.gIdx));
+            pool = pool.filter(level => !globalThis.isGatedLevel(level.gIdx));
         }
         if (pool.length > 0) {
             return pool[Math.floor(Math.random() * pool.length)].gIdx;
@@ -736,19 +749,19 @@ function _egbtPickArenaGi() {
 // Falls back to the boss's tier level when no explicit level is passed.
 // hpMult: optional multiplier applied to boss max HP only (e.g., ~500k HP
 // test mode). Damage is left at its normal scaled value.
-function _egLaunchBossTest(bossId, level, hpMult) {
-    if (typeof EG_BOSS_DEFS === 'undefined' || !EG_BOSS_DEFS[bossId]) return;
+export function _egLaunchBossTest(bossId, level, hpMult) {
+    if (typeof EG_BOSS_DEFS === 'undefined' || !globalThis.EG_BOSS_DEFS[bossId]) return;
 
     const lvl = Math.max(1, Math.min(95, Math.round(level != null ? level : _egbtLevelForBoss(bossId))));
     const boost = hpMult && hpMult > 1 ? hpMult : 1;
 
     const gi = _egbtPickArenaGi();
     if (gi === null) {
-        if (typeof showToast === 'function') showToast(t('eg_no_more_puzzles'));
+        if (typeof showToast === 'function') globalThis.showToast(t('eg_no_more_puzzles'));
         return;
     }
 
-    const seed = ALL[gi];
+    const seed = globalThis.ALL[gi];
     seed.isMonsterLevel = true;
     seed.isBossTestSeed = true;
     seed.isBossArena = true;
@@ -784,7 +797,7 @@ function _egLaunchBossTest(bossId, level, hpMult) {
 
     window._egBossTestLaunching = true;
     try {
-        startLevel(gi);
+        globalThis.startLevel(gi);
     } finally {
         window._egBossTestLaunching = false;
     }
@@ -793,10 +806,10 @@ function _egLaunchBossTest(bossId, level, hpMult) {
     // transition. _egMapDef is already `cur` (set by _egResetEncounterState).
     // hpMult rides the queue entry so _egSpawnNextArenaBoss applies the
     // 500k test boost to the spawned boss (entry.hpMult || 1).
-    _egBossPhaseQueue = [{ id: bossId, level: lvl, hpMult: boost, isBossSpawn: true }];
-    _egBossTotalCount = 1;
-    _egBossKilledCount = 0;
-    _egBossPhaseActive = true;
+    globalThis._egBossPhaseQueue = [{ id: bossId, level: lvl, hpMult: boost, isBossSpawn: true }];
+    globalThis._egBossTotalCount = 1;
+    globalThis._egBossKilledCount = 0;
+    globalThis._egBossPhaseActive = true;
 
     if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();
     if (typeof _egSpawnNextArenaBoss === 'function') _egSpawnNextArenaBoss();
@@ -810,11 +823,11 @@ function _egLaunchBossTest(bossId, level, hpMult) {
 // Side-effect-free preview of a boss's HP at the test level. Mirrors the
 // scaling formula in _egBuildBoss (boss-framework.js) without touching
 // the spawn counter.
-function _egbtScaledPreview(def, level) {
+export function _egbtScaledPreview(def, level) {
     const lvl = Math.max(1, Math.round(level || 1));
-    const baseHpScale = 1 + EG_BOSS_LEVEL_HP_SCALE * (lvl - 1);
-    const lateMult = (typeof _egGetBossLateHpMult === 'function') ? _egGetBossLateHpMult(lvl) : 1;
-    const dmgScale = 1 + EG_BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
+    const baseHpScale = 1 + globalThis.EG_BOSS_LEVEL_HP_SCALE * (lvl - 1);
+    const lateMult = (typeof _egGetBossLateHpMult === 'function') ? globalThis._egGetBossLateHpMult(lvl) : 1;
+    const dmgScale = 1 + globalThis.EG_BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
     return {
         hp: Math.round(def.baseHP * baseHpScale * lateMult),
         dmg: Math.round(def.baseDamage * dmgScale),
@@ -826,14 +839,14 @@ function _egbtScaledPreview(def, level) {
 //-------------------HTML BUILDERS------------------------------------------
 //------------------------------------------------------------------------
 
-function _egbtBossIconHTML(def) {
+export function _egbtBossIconHTML(def) {
     // Real boss art when it exists (see images/endgame/monsters/boss_*.jpeg),
     // otherwise the emoji fallback - same helper the arena cards use.
     if (typeof EG_ART !== 'undefined' && EG_ART.html) return EG_ART.html('monster', def.id, def.emoji || '💀');
     return def.emoji || '💀';
 }
 
-function _egbtBuildBossCardHTML(def, level) {
+export function _egbtBuildBossCardHTML(def, level) {
     const preview = _egbtScaledPreview(def, level);
     const hpMult = _egbtCalcTestHPMultiplier(def, level);
     return `
@@ -864,8 +877,8 @@ function _egbtBuildBossCardHTML(def, level) {
 
 // Groups boss defs into tier sections (1–16, then unassigned as tier 0),
 // honouring the search query. Empty tiers are omitted.
-function _egbtBuildSections() {
-    const all = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.values(EG_BOSS_DEFS) : [];
+export function _egbtBuildSections() {
+    const all = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.values(globalThis.EG_BOSS_DEFS) : [];
     const query = String(window._egBossTestSearch || '').trim().toLowerCase();
     const matches = def => !query
         || String(def.name || '').toLowerCase().includes(query)
@@ -886,7 +899,7 @@ function _egbtBuildSections() {
     return sections;
 }
 
-function _egbtBuildSectionHTML(section) {
+export function _egbtBuildSectionHTML(section) {
     const level = section.tier > 0 ? _egbtTierMonsterLevel(section.tier) : EG_BOSS_TEST_DEFAULT_LEVEL;
     const title = section.tier > 0
         ? `${t('eg_boss_test_tier').replace('{n}', section.tier)} · ${t('eg_boss_test_tier_level').replace('{lv}', level)}`
@@ -898,7 +911,7 @@ function _egbtBuildSectionHTML(section) {
 </div>`;
 }
 
-function _egbtRenderGrid() {
+export function _egbtRenderGrid() {
     const container = document.getElementById('egbt-boss-grid');
     if (!container) return;
     const sections = _egbtBuildSections();
@@ -910,7 +923,7 @@ function _egbtRenderGrid() {
     if (count) count.textContent = t('eg_boss_test_count').replace('{n}', total);
 }
 
-function _egbtBuildFullScreenHTML() {
+export function _egbtBuildFullScreenHTML() {
     return `
 <div class="egbt-hub-layout">
     <div class="egbt-topbar">
@@ -941,7 +954,7 @@ function _egbtBuildFullScreenHTML() {
 // Injected via JS, same pattern as _egtEnsureStyles() in
 // endgame-testing-screen.js - avoids needing to touch the main CSS files.
 
-function _egbtEnsureStyles() {
+export function _egbtEnsureStyles() {
     if (document.getElementById('egbt-boss-test-style')) return;
 
     const style = document.createElement('style');
@@ -1068,7 +1081,7 @@ function _egbtEnsureStyles() {
 //-------------------SCREEN BOOTSTRAP----------------------------------------
 //------------------------------------------------------------------------
 
-function _egbtCreateScreen() {
+export function _egbtCreateScreen() {
     _egbtEnsureStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-boss-test';
@@ -1077,12 +1090,12 @@ function _egbtCreateScreen() {
     document.body.appendChild(screen);
 }
 
-function ensureEndgameBossTestScreen() {
+export function ensureEndgameBossTestScreen() {
     if (!document.getElementById('screen-endgame-boss-test')) _egbtCreateScreen();
 }
 
 // Entry point - call this to show the boss selection screen.
-function showEndgameBossTest() {
+export function showEndgameBossTest() {
     ensureEndgameBossTestScreen();
     // Rebuild the shell so stale tier content is dropped, keeping the
     // search box for a fresh pick.

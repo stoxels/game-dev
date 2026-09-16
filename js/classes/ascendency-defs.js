@@ -6,7 +6,7 @@
 // Each base class has exactly 2 ascendency options.
 // Each ascendency has 2 active skills, each with 3 ranks.
 
-const ASCENDENCY_DEFS = {
+export const ASCENDENCY_DEFS = {
 
     // ── STATISTICIAN ASCENDENCIES ────────────────────────────────────────
 
@@ -459,7 +459,7 @@ const ASCENDENCY_DEFS = {
 
 // Per-skill locker icons for the ascendency-upgrade screen.
 // Keyed by ascendencyId -> 'active1' | 'active2'.
-const ASCENDENCY_SPELL_ICONS = {
+export const ASCENDENCY_SPELL_ICONS = {
     outlier: { active1: '🩸', active2: '⚡' },   // Tail Risk / SPEEDFORCE
     actuary: { active1: '⏱️', active2: '🚧' },   // Regression to Prior / Significance Threshold
     recursionist: { active1: '🗿', active2: '♾️' },   // Residual / Degrees of Freedom

@@ -1,4 +1,13 @@
-﻿/*
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { keybindMatches } from './keybinds.js';
+import { switchScreen } from './screens/screens.js';
+import { _getPlayerCharacterImage } from './sprite/player_sprite.js';
+
+/*
     ========================================================================
     ADVENTURE-MODE.JS
     ========================================================================
@@ -18,10 +27,10 @@
 'use strict';
 
 // Pixels moved per WASD keypress inside the sandbox canvas.
-const ADV_MOVE_STEP = 16;
+export const ADV_MOVE_STEP = 16;
 
 // Keydown handler reference, so we can remove it cleanly when leaving the screen.
-let _advWASDHandler = null;
+export let _advWASDHandler = null;
 
 
 //------------------------------------------------------------------------
@@ -29,7 +38,7 @@ let _advWASDHandler = null;
 //------------------------------------------------------------------------
 
 // Builds the player sprite element used in the sandbox.
-function _advBuildSprite() {
+export function _advBuildSprite() {
     const sprite = document.createElement('img');
     sprite.id = 'adv-player-sprite';
     sprite.className = 'adv-player-sprite';
@@ -43,7 +52,7 @@ function _advBuildSprite() {
 }
 
 // Moves the sprite by (dx, dy) pixels, clamped to the canvas bounds.
-function _advMoveSprite(dx, dy) {
+export function _advMoveSprite(dx, dy) {
     const canvas = document.getElementById('adv-canvas-wrap');
     const sprite = document.getElementById('adv-player-sprite');
     if (!canvas || !sprite) return;
@@ -62,7 +71,7 @@ function _advMoveSprite(dx, dy) {
 }
 
 // Registers the WASD keydown listener for the sandbox.
-function _advInitWASD() {
+export function _advInitWASD() {
     if (_advWASDHandler) document.removeEventListener('keydown', _advWASDHandler);
 
     _advWASDHandler = (e) => {
@@ -95,7 +104,7 @@ function _advInitWASD() {
 }
 
 // Removes the WASD listener (call when leaving the screen, to avoid leaks).
-function _advTeardownWASD() {
+export function _advTeardownWASD() {
     if (_advWASDHandler) {
         document.removeEventListener('keydown', _advWASDHandler);
         _advWASDHandler = null;
@@ -108,7 +117,7 @@ function _advTeardownWASD() {
 //------------------------------------------------------------------------
 
 // Builds (or rebuilds) the sandbox canvas and shows the Adventure Mode screen.
-function showAdventureMode() {
+export function showAdventureMode() {
     const wrap = document.getElementById('adv-canvas-wrap');
     if (!wrap) return;
 

@@ -1,3 +1,13 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../translation/translations.js';
+import { _egEndMapDefeated } from './endgame-encounter-chain.js';
+import { _egGetMistakesRemaining } from './endgame-encounter-tick.js';
+import { _egIsActive } from './endgame-state.js';
+
 //  endgame-encounter-overlays.js
 //  WARNINGS & FAIL OVERLAYS - extracted 2026-09-10 from
 //  endgame-encounter.js (mistakes / low-health / absorption-broken
@@ -5,9 +15,9 @@
 //  endgame-encounter-tick.js (uses its _egClearCenterGridBanners
 //  fallback guard).
 //
-function _egShowMistakesWarningBanner(remaining) {
+export function _egShowMistakesWarningBanner(remaining) {
     // Dismiss any other center-grid banner so concurrent events don't stack
-    _egClearCenterGridBanners('eg-mistakes-warning-banner');
+    globalThis._egClearCenterGridBanners('eg-mistakes-warning-banner');
     // Remove any stale banner so a rapid 3→2→1 cascade always shows the newest count
     const old = document.getElementById('eg-mistakes-warning-banner');
     if (old) old.remove();
@@ -44,38 +54,38 @@ function _egShowMistakesWarningBanner(remaining) {
     const toastFallback = el.textContent;
     const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
     const toastColors = { 3: '#facc15', 2: '#fb923c', 1: '#f87171', 0: '#ef4444' };
-    if (typeof showToast === 'function') showToast(toastText, toastColors[sev] || '#f87171');
+    if (typeof showToast === 'function') globalThis.showToast(toastText, toastColors[sev] || '#f87171');
 
     setTimeout(() => el.remove(), 2500);
 }
 
-function _egMaybeShowMistakesWarning() {
+export function _egMaybeShowMistakesWarning() {
     if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
     const remaining = _egGetMistakesRemaining();
     if (remaining == null || remaining < 0) {
         // No limit or already over - keep last remaining for next comparison
-        _egLastMistakesRemaining = remaining;
+        globalThis._egLastMistakesRemaining = remaining;
         return;
     }
-    const prev = _egLastMistakesRemaining;
-    _egLastMistakesRemaining = remaining;
+    const prev = globalThis._egLastMistakesRemaining;
+    globalThis._egLastMistakesRemaining = remaining;
 
     if (remaining > 3) {
         // Out of the 3/2/1/0 window - clear the dedup so re-entering can fire again
-        _egLastMistakesWarningShown = null;
+        globalThis._egLastMistakesWarningShown = null;
         return;
     }
     // Only warn when the count *decreased* into / within the window.
     // Increases (eraser) update the tracker but do not re-fire the overlay.
     if (prev != null && remaining >= prev) return;
-    if (remaining === _egLastMistakesWarningShown) return;
-    _egLastMistakesWarningShown = remaining;
+    if (remaining === globalThis._egLastMistakesWarningShown) return;
+    globalThis._egLastMistakesWarningShown = remaining;
     _egShowMistakesWarningBanner(remaining);
 }
 
-function _egResetMistakesWarningState() {
-    _egLastMistakesWarningShown = null;
-    _egLastMistakesRemaining = null;
+export function _egResetMistakesWarningState() {
+    globalThis._egLastMistakesWarningShown = null;
+    globalThis._egLastMistakesRemaining = null;
     const banner = document.getElementById('eg-mistakes-warning-banner');
     if (banner) banner.remove();
 }
@@ -84,21 +94,21 @@ function _egResetMistakesWarningState() {
 //-------------------LOW HEALTH WARNING-----------------------------------
 //------------------------------------------------------------------------
 
-let _egLastHealthPct = null;
-let _egLastLowHealthWarningShown = null;
+export let _egLastHealthPct = null;
+export let _egLastLowHealthWarningShown = null;
 
-function _egGetHealthPct() {
-    if (typeof playerMaxHP === 'undefined' || playerMaxHP <= 0) return 1;
-    return playerCurrentHP / playerMaxHP;
+export function _egGetHealthPct() {
+    if (typeof playerMaxHP === 'undefined' || globalThis.playerMaxHP <= 0) return 1;
+    return globalThis.playerCurrentHP / globalThis.playerMaxHP;
 }
 
-function _egGetLowHealthWarningTier(pct) {
+export function _egGetLowHealthWarningTier(pct) {
     if (pct <= 0.35) return 35;
     return null;
 }
 
-function _egShowLowHealthWarningBanner() {
-    _egClearCenterGridBanners('eg-low-health-warning-banner');
+export function _egShowLowHealthWarningBanner() {
+    globalThis._egClearCenterGridBanners('eg-low-health-warning-banner');
     const old = document.getElementById('eg-low-health-warning-banner');
     if (old) old.remove();
 
@@ -126,15 +136,15 @@ function _egShowLowHealthWarningBanner() {
     const toastRaw = (typeof t === 'function') ? t(toastKey) : '';
     const toastFallback = el.textContent;
     const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
-    if (typeof showToast === 'function') showToast(toastText, '#facc15');
+    if (typeof showToast === 'function') globalThis.showToast(toastText, '#facc15');
 
     setTimeout(() => el.remove(), 2500);
 }
 
-function _egMaybeShowLowHealthWarning() {
+export function _egMaybeShowLowHealthWarning() {
     if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
     if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
-    if (playerCurrentHP <= 0) return;
+    if (globalThis.playerCurrentHP <= 0) return;
 
     const pct = _egGetHealthPct();
     const prev = _egLastHealthPct;
@@ -153,7 +163,7 @@ function _egMaybeShowLowHealthWarning() {
     _egShowLowHealthWarningBanner();
 }
 
-function _egResetLowHealthWarningState() {
+export function _egResetLowHealthWarningState() {
     _egLastHealthPct = null;
     _egLastLowHealthWarningShown = null;
     const banner = document.getElementById('eg-low-health-warning-banner');
@@ -166,8 +176,8 @@ function _egResetLowHealthWarningState() {
 // Only fires when the absorption shield transitions from >0 to 0 (broken),
 // not at percentage thresholds like the health warning.
 
-function _egShowAbsorptionBrokenBanner() {
-    _egClearCenterGridBanners('eg-absorption-broken-banner');
+export function _egShowAbsorptionBrokenBanner() {
+    globalThis._egClearCenterGridBanners('eg-absorption-broken-banner');
     const old = document.getElementById('eg-absorption-broken-banner');
     if (old) old.remove();
 
@@ -194,19 +204,19 @@ function _egShowAbsorptionBrokenBanner() {
     const toastRaw = (typeof t === 'function') ? t(toastKey) : '';
     const toastFallback = el.textContent;
     const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
-    if (typeof showToast === 'function') showToast(toastText, '#7dd3fc');
+    if (typeof showToast === 'function') globalThis.showToast(toastText, '#7dd3fc');
 
     setTimeout(() => el.remove(), 2500);
 }
 
-function _egMaybeShowAbsorptionBroken(prevAbsorption, nextAbsorption) {
+export function _egMaybeShowAbsorptionBroken(prevAbsorption, nextAbsorption) {
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     if (prevAbsorption > 0 && nextAbsorption <= 0) {
         _egShowAbsorptionBrokenBanner();
     }
 }
 
-function _egResetAbsorptionBrokenState() {
+export function _egResetAbsorptionBrokenState() {
     const banner = document.getElementById('eg-absorption-broken-banner');
     if (banner) banner.remove();
 }
@@ -223,7 +233,7 @@ function _egResetAbsorptionBrokenState() {
 // screen (see _egEndMapDefeated in endgame-encounter-chain.js), which keeps
 // everything collected during the run. Endgame-specific deaths (mistake
 // limit reached, HP zero) call _egEndMapDefeated directly.
-function _egEnsureLoseOverlayEndgameUI() {
+export function _egEnsureLoseOverlayEndgameUI() {
     const ov = document.getElementById('ov-lose');
     if (!ov || ov.dataset.egFailUiBound) return;
     ov.dataset.egFailUiBound = '1';

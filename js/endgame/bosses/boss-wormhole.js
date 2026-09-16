@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE WORMHOLE (boss_wormhole)-------------------------
 //------------------------------------------------------------------------
 // Portal homage: two wormholes tear open - step into one and you fall out
@@ -37,19 +45,19 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egTeleportAvatarTo(x, y) {
+export function _egTeleportAvatarTo(x, y) {
     const el = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (!el) return;
     if (typeof _setAvatarPos === 'function') {
-        try { _setAvatarPos(el, Math.round(x), Math.round(y)); } catch (e) {}
+        try { globalThis._setAvatarPos(el, Math.round(x), Math.round(y)); } catch (e) {}
     } else {
         el.style.left = Math.round(x) + 'px';
         el.style.top = Math.round(y) + 'px';
     }
 }
 
-function _egMechPortalWisp(monster, phase) {
+export function _egMechPortalWisp(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const wispSpeed = [0, 85, 100, 118][p];

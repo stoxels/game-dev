@@ -1,4 +1,18 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { ASCENDENCY_LIST } from '../classes/class-cooldown-state.js';
+import { CLASS_LIST } from '../classes/class-defs.js';
+import { buildClassHUD } from '../classes/class-hud.js';
+import { showToast } from '../puzzle-items/toasts-and-popups.js';
+import { hideModal, showModal } from '../screens/screens.js';
+import { save } from '../state.js';
+import { _tipAttr } from '../tooltips-hud.js';
+import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _animSetDefaultDownImage, _animWarmCacheFor, _playAvatarWalkAnimation, _stopAvatarWalkAnimation } from './sprite_animations.js';
+
+//------------------------------------------------------------------------
 //-------------------CHEAT: CHARACTER LAB----------------------------------
 //------------------------------------------------------------------------
 // Dev cheat for testing every character / class / ascendency combination
@@ -26,10 +40,10 @@
 'use strict';
 
 // Character roster for the lab (same ids the rest of the game uses).
-const _CHAR_LAB_CHARS = ['stox', 'trix', 'syla'];
+export const _CHAR_LAB_CHARS = ['stox', 'trix', 'syla'];
 
 // The 10 sprite variants in display order: no class, base classes, ascendencies.
-const _CHAR_LAB_VARIANTS = [
+export const _CHAR_LAB_VARIANTS = [
     'noclass',
     'statistician', 'mathmagician', 'probabilist',
     'outlier', 'actuary', 'recursionist', 'markovian', 'bayesian', 'random_walker',
@@ -37,14 +51,14 @@ const _CHAR_LAB_VARIANTS = [
 
 // Display names + emoji (label only - defs stay the single source of truth
 // for behaviour; the lab just needs stable pretty labels).
-const _CHAR_LAB_LABELS = {
+export const _CHAR_LAB_LABELS = {
     stox: 'Stox', trix: 'Trix', syla: 'Syla',
     noclass: 'No Class',
     statistician: 'Statistician', mathmagician: 'Mathmagician', probabilist: 'Probabilist',
     outlier: 'Outlier', actuary: 'Actuary', recursionist: 'Recursionist',
     markovian: 'Markovian', bayesian: 'Bayesian', random_walker: 'Random Walker',
 };
-const _CHAR_LAB_ICONS = {
+export const _CHAR_LAB_ICONS = {
     noclass: '🧍', statistician: '📊', mathmagician: '🪄', probabilist: '🎯',
     outlier: '📈', actuary: '📉', recursionist: '🔁',
     markovian: '🔗', bayesian: '🛡️', random_walker: '🎲',
@@ -52,7 +66,7 @@ const _CHAR_LAB_ICONS = {
 
 // Which variants belong to which base class (drives the "requires class X"
 // hint and the auto-parenting when applying an ascendency).
-function _charLabParentOf(variant) {
+export function _charLabParentOf(variant) {
     for (const base of (typeof CLASS_LIST !== 'undefined' ? CLASS_LIST : [])) {
         if ((typeof ASCENDENCY_LIST !== 'undefined') && (ASCENDENCY_LIST[base] || []).indexOf(variant) !== -1) return base;
     }
@@ -60,7 +74,7 @@ function _charLabParentOf(variant) {
 }
 
 // Menu portrait for a combo (all 30 exist on disk).
-function _charLabPortraitSrc(charId, variant) {
+export function _charLabPortraitSrc(charId, variant) {
     const cap = charId.charAt(0).toUpperCase() + charId.slice(1);
     return `images/sprites/${cap}_${variant}.webp`;
 }
@@ -68,7 +82,7 @@ function _charLabPortraitSrc(charId, variant) {
 // Is this combo's directional walk art present on disk (already discovered)?
 // Used for the little art-coverage badge on each combo card - the whole
 // point of the lab is spotting which combos still need art.
-function _charLabArtState(charId, variant) {
+export function _charLabArtState(charId, variant) {
     if (typeof _animHasDirectionalWalkSync !== 'function') return '';
     for (const d of (typeof ANIM_DIRECTIONS !== 'undefined' ? ANIM_DIRECTIONS : [])) {
         if (_animHasDirectionalWalkSync(charId, variant, d)) return 'full';
@@ -81,7 +95,7 @@ function _charLabArtState(charId, variant) {
 //-------------------MODAL-------------------------------------------------
 //------------------------------------------------------------------------
 
-function showCharLab() {
+export function showCharLab() {
     if (!document.getElementById('charlab-modal')) return;
     _charLabRenderGrid();
     _charLabRenderPreview();
@@ -98,19 +112,19 @@ function showCharLab() {
     setTimeout(_charLabRefreshBadges, 6000);
 }
 
-function closeCharLab() {
+export function closeCharLab() {
     hideModal('charlab-modal');
     _charLabStopPreview();
 }
 
 // The one place the directional-walk-art badge text lives, so the rendered
 // grid and the in-place refresh above can never disagree.
-function _charLabArtTip(full) {
+export function _charLabArtTip(full) {
     return full ? 'Directional walk art found' : 'No directional walk art (omni fallback)';
 }
 
 // Updates the ◉/○ art badges in place (no grid rebuild - keeps scroll).
-function _charLabRefreshBadges() {
+export function _charLabRefreshBadges() {
     document.querySelectorAll('.cl-combo').forEach(b => {
         const badge = b.querySelector('.cl-art');
         if (!badge) return;
@@ -122,7 +136,7 @@ function _charLabRefreshBadges() {
 }
 
 // One click-to-apply card per combo, grouped by character.
-function _charLabRenderGrid() {
+export function _charLabRenderGrid() {
     const grid = document.getElementById('charlab-grid');
     if (!grid) return;
     let html = '';
@@ -157,31 +171,31 @@ function _charLabRenderGrid() {
 // (same skill-level fields confirmClassSelection/confirmAscendencySelection
 // set), refreshes the animation cache, and updates the live preview.
 // Never persists - "SAVE INTO CURRENT SLOT" does that explicitly.
-function _charLabApply(charId, variant) {
-    if (!STATE) return;
-    STATE.playerCharacter = charId;
+export function _charLabApply(charId, variant) {
+    if (!globalThis.STATE) return;
+    globalThis.STATE.playerCharacter = charId;
 
     const parent = _charLabParentOf(variant);
     if (variant === 'noclass') {
-        STATE.playerClass = null;
-        STATE.playerAscendency = null;
+        globalThis.STATE.playerClass = null;
+        globalThis.STATE.playerAscendency = null;
     } else if (parent) {
         // Ascendency: keep the parent base class selected too.
-        STATE.playerClass = parent;
-        STATE.playerAscendency = variant;
+        globalThis.STATE.playerClass = parent;
+        globalThis.STATE.playerAscendency = variant;
     } else {
-        STATE.playerClass = variant;
-        STATE.playerAscendency = null;
+        globalThis.STATE.playerClass = variant;
+        globalThis.STATE.playerAscendency = null;
     }
 
     // The same rank-1 fields the real selection flows initialise.
-    STATE.classPassiveLevel = 1;
-    STATE.classActive1Level = 1;
-    STATE.classActive2Level = 1;
-    STATE.classActiveLevel = 1;
-    STATE.classActiveChoice = 'active1';
-    STATE.ascendencySkill1Level = 1;
-    STATE.ascendencySkill2Level = 1;
+    globalThis.STATE.classPassiveLevel = 1;
+    globalThis.STATE.classActive1Level = 1;
+    globalThis.STATE.classActive2Level = 1;
+    globalThis.STATE.classActiveLevel = 1;
+    globalThis.STATE.classActiveChoice = 'active1';
+    globalThis.STATE.ascendencySkill1Level = 1;
+    globalThis.STATE.ascendencySkill2Level = 1;
 
     // Re-discover animation art for the new combo (drops stale cache).
     if (typeof _animRefreshCacheFor === 'function') _animRefreshCacheFor(charId, variant);
@@ -195,8 +209,8 @@ function _charLabApply(charId, variant) {
 }
 
 // Opt-in persistence: writes the currently previewed combo into the save.
-function _charLabSaveCurrent() {
-    if (!STATE || !STATE.playerCharacter) return;
+export function _charLabSaveCurrent() {
+    if (!globalThis.STATE || !globalThis.STATE.playerCharacter) return;
     if (typeof save === 'function') save();
     if (typeof showToast === 'function') showToast('💾 Saved current slot');
 }
@@ -208,16 +222,16 @@ function _charLabSaveCurrent() {
 
 // Drives a real walk loop (the same _playAvatarWalkAnimation the game uses)
 // on a dedicated preview <img> so testers see actual in-game animation.
-const _charLabPreview = { dir: 'down', walking: false, keepAlive: null };
+export const _charLabPreview = { dir: 'down', walking: false, keepAlive: null };
 
-function _charLabRenderPreview() {
+export function _charLabRenderPreview() {
     const img = document.getElementById('charlab-preview-img');
     const portrait = document.getElementById('charlab-preview-portrait');
     const label = document.getElementById('charlab-preview-label');
-    if (!img || !STATE || !STATE.playerCharacter) return;
+    if (!img || !globalThis.STATE || !globalThis.STATE.playerCharacter) return;
 
-    const charId = STATE.playerCharacter;
-    const variant = STATE.playerAscendency || STATE.playerClass || 'noclass';
+    const charId = globalThis.STATE.playerCharacter;
+    const variant = globalThis.STATE.playerAscendency || globalThis.STATE.playerClass || 'noclass';
     _charLabPreview.char = charId;
     _charLabPreview.variant = variant;
 
@@ -241,7 +255,7 @@ function _charLabRenderPreview() {
     if (_charLabPreview.walking) _charLabStartWalk();
 }
 
-function _charLabStartWalk() {
+export function _charLabStartWalk() {
     _charLabPreview.walking = true;
     const img = document.getElementById('charlab-preview-img');
     if (!img) return;
@@ -262,7 +276,7 @@ function _charLabStartWalk() {
     if (badge) badge.textContent = `walking ${_charLabPreview.dir}`;
 }
 
-function _charLabStopPreview() {
+export function _charLabStopPreview() {
     _charLabPreview.walking = false;
     if (_charLabPreview.keepAlive) {
         clearInterval(_charLabPreview.keepAlive);
@@ -273,7 +287,7 @@ function _charLabStopPreview() {
     if (badge) badge.textContent = 'idle (move-down)';
 }
 
-function _charLabWalkDir(dir) {
+export function _charLabWalkDir(dir) {
     _charLabPreview.dir = dir;
     _charLabStartWalk();
 }

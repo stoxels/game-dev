@@ -1,3 +1,23 @@
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { curMods } from './difficulty-modifiers.js';
+import { _egGetMaxAllowedMistakes } from './endgame/endgame-encounter-tick.js';
+import { _egActiveMapItem } from './endgame/endgame-map-launch.js';
+import { _egGetMapRewardBonuses, _egMapModAffects, _egResolveMapBoss } from './endgame/endgame-maps.js';
+import { _egBuildMergedModLines } from './endgame/endgame-player-stats.js';
+import { _egIsActive } from './endgame/endgame-state.js';
+import { ALL, lvText } from './levels/levels.js';
+import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
+import { _getAsymptoticMasteryReduction, _getPenaltySecondsAtCount } from './penalty.js';
+import { RESHUFFLE_GOAL } from './puzzle-items/inventory-reshuffle.js';
+import { rarityColors } from './puzzle-items/item-pool.js';
+import { _getLevelSpecialStatus } from './scoring.js';
+import { _getGridSizeTier } from './start-level-passives.js';
+import { t } from './translation/translations.js';
+
 // tooltips-hud.js
 // Generic floating tooltip engine (visual twin of class-hud.js's tooltip)
 // + content builders + wiring for: mistakes, timer, levels-back button,
@@ -18,7 +38,7 @@
 // when the topmost element at the cursor is the trigger itself (or a
 // descendant). For pointer-events:none triggers the pass-through is the
 // whole point, so the plain rect test decides for them.
-function _wireHoverByRect(el, builder) {
+export function _wireHoverByRect(el, builder) {
     if (!el) return;
     let isOver = false;
 
@@ -51,7 +71,7 @@ function _wireHoverByRect(el, builder) {
 //----------------------------TOOLTIP ENGINE-------------------------------
 //------------------------------------------------------------------------
 
-function getGameTooltip() {
+export function getGameTooltip() {
     let tip = document.getElementById('ghud-floating-tip');
     if (!tip) {
         tip = document.createElement('div');
@@ -82,7 +102,7 @@ function getGameTooltip() {
     return tip;
 }
 
-function _calcGameTooltipPos(e, w, h) {
+export function _calcGameTooltipPos(e, w, h) {
     let x = e.clientX + 14;
     let y = e.clientY + 14;
     if (x + w > window.innerWidth - 8) x = e.clientX - w - 10;
@@ -94,7 +114,7 @@ function _calcGameTooltipPos(e, w, h) {
     return { x, y };
 }
 
-function showGameTooltip(html, e) {
+export function showGameTooltip(html, e) {
     const tip = getGameTooltip();
     tip.innerHTML = html;
     tip.style.opacity = '1';
@@ -103,7 +123,7 @@ function showGameTooltip(html, e) {
     tip.style.top = y + 'px';
 }
 
-function moveGameTooltip(e) {
+export function moveGameTooltip(e) {
     const tip = getGameTooltip();
     if (tip.style.opacity !== '1') return;
     const { x, y } = _calcGameTooltipPos(e, tip.offsetWidth || 220, tip.offsetHeight || 60);
@@ -111,7 +131,7 @@ function moveGameTooltip(e) {
     tip.style.top = y + 'px';
 }
 
-function hideGameTooltip() {
+export function hideGameTooltip() {
     const tip = document.getElementById('ghud-floating-tip');
     if (tip) tip.style.opacity = '0';
 }
@@ -136,12 +156,12 @@ function hideGameTooltip() {
 // `data-tip` deliberately takes priority over `data-tip-t` so a caller can
 // hand over rich markup (dynamic numbers, an item's own name) where a
 // translation key would be a lie.
-const _TIP_SELECTOR = '[data-tip-t],[data-tip]';
+export const _TIP_SELECTOR = '[data-tip-t],[data-tip]';
 
 // Escapes dynamic text before it goes into a data-tip attribute. Quotes are
 // required for the attribute itself; &< > are required because the resolver
 // feeds the value to innerHTML (a save-slot name is player-typed text).
-function _tipAttr(text) {
+export function _tipAttr(text) {
     return String(text == null ? '' : text)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -149,7 +169,7 @@ function _tipAttr(text) {
         .replace(/"/g, '&quot;');
 }
 
-function _resolveTipHTML(el) {
+export function _resolveTipHTML(el) {
     const raw = el.getAttribute('data-tip');
     if (raw) return raw;
     const key = el.getAttribute('data-tip-t');
@@ -174,9 +194,9 @@ function _resolveTipHTML(el) {
 //     to a bespoke-tooltip element never leaves our tip on top of theirs.
 //   • we only ever hide a tooltip this engine itself put up. A bespoke
 //     tooltip that is already showing is left alone.
-let _tipCurrentEl = null;
+export let _tipCurrentEl = null;
 
-function _installDelegatedTips() {
+export function _installDelegatedTips() {
     document.addEventListener('mousemove', (e) => {
         const el = (e.target && e.target.closest) ? e.target.closest(_TIP_SELECTOR) : null;
         if (el === _tipCurrentEl) {
@@ -199,7 +219,7 @@ function _installDelegatedTips() {
 
 // Formats a whole number of seconds as "Xm Ys" (e.g. 125 -> "2m 5s").
 // Falls back to "0s" for 0/negative input.
-function _fmtSecsAsMinSec(totalSecs) {
+export function _fmtSecsAsMinSec(totalSecs) {
     const safeSecs = Math.max(0, Math.round(totalSecs));
     const m = Math.floor(safeSecs / 60);
     const s = safeSecs % 60;
@@ -209,9 +229,9 @@ function _fmtSecsAsMinSec(totalSecs) {
 
 
 // 1. Mistakes
-function _buildMistakesTooltipHTML() {
+export function _buildMistakesTooltipHTML() {
     const base = typeof _getPenaltySecondsAtCount === 'function'
-        ? _getPenaltySecondsAtCount(mistakeCount + 1)
+        ? _getPenaltySecondsAtCount(globalThis.mistakeCount + 1)
         : 0;
     const reduction = typeof _getAsymptoticMasteryReduction === 'function' ? _getAsymptoticMasteryReduction() : 0;
     const nextPenalty = Math.max(0, base - reduction);
@@ -221,21 +241,21 @@ function _buildMistakesTooltipHTML() {
     if (isHardcore) {
         html += `<br><span style="color:#ff5555;font-weight:700;">${t('hc_fail_title') || 'HARDCORE'}</span> - <span style="color:#ff7777;">${t('eg_too_many_mistakes') || '0 mistakes allowed - next mistake ends the run!'}</span>`;
         // When hardcore is active also show the 0-limit explicitly
-        html += `<br>${t('cg_tt_total_level')} <b>${mistakeCount} / 0</b>`;
+        html += `<br>${t('cg_tt_total_level')} <b>${globalThis.mistakeCount} / 0</b>`;
     } else {
-        html += `<br>${t('cg_tt_total_level')} <b>${mistakeCount}</b>`;
+        html += `<br>${t('cg_tt_total_level')} <b>${globalThis.mistakeCount}</b>`;
     }
-    if (typeof absorbedMistakes !== 'undefined' && absorbedMistakes > 0) {
-        html += `<br>${t('cg_tt_absorbed')} <b>${absorbedMistakes}</b>`;
+    if (typeof absorbedMistakes !== 'undefined' && globalThis.absorbedMistakes > 0) {
+        html += `<br>${t('cg_tt_absorbed')} <b>${globalThis.absorbedMistakes}</b>`;
     }
-    if (typeof _levelMistakesErased !== 'undefined' && _levelMistakesErased > 0) {
-        html += `<br>${t('cg_tt_erased')} <b>${_levelMistakesErased}</b>`;
+    if (typeof _levelMistakesErased !== 'undefined' && globalThis._levelMistakesErased > 0) {
+        html += `<br>${t('cg_tt_erased')} <b>${globalThis._levelMistakesErased}</b>`;
     }
     // Endgame: show remaining vs max when a limit exists (hardcore already shown above)
     if (!isHardcore && typeof _egIsActive === 'function' && _egIsActive() && typeof _egGetMaxAllowedMistakes === 'function') {
         const max = _egGetMaxAllowedMistakes();
         if (max != null) {
-            const remaining = Math.max(0, max - (typeof mistakeCount !== 'undefined' ? mistakeCount : 0));
+            const remaining = Math.max(0, max - (typeof mistakeCount !== 'undefined' ? globalThis.mistakeCount : 0));
             html += `<br><span style="opacity:.7;">${t('eg_stat_allowed_mistakes') || 'Allowed'}: <b>${max}</b> - ${remaining} ${t('eg_mistakes_warning_1') ? '' : 'remaining'}</span>`;
         }
     }
@@ -248,26 +268,26 @@ function _buildMistakesTooltipHTML() {
 }
 
 // 2. Timer
-function _buildTimerTooltipHTML() {
+export function _buildTimerTooltipHTML() {
     let html = `<strong style="color:var(--accent,#66fcf1)">${t('cg_tt_timer')}</strong>`;
-    html += `<br>${t('cg_tt_time_added')} <b>+${_fmtSecsAsMinSec(_levelTimeAdded || 0)}</b>`;
-    html += `<br>${t('cg_tt_time_lost')} <b>−${_fmtSecsAsMinSec(_levelTimeLost || 0)}</b>`;
+    html += `<br>${t('cg_tt_time_added')} <b>+${_fmtSecsAsMinSec(globalThis._levelTimeAdded || 0)}</b>`;
+    html += `<br>${t('cg_tt_time_lost')} <b>−${_fmtSecsAsMinSec(globalThis._levelTimeLost || 0)}</b>`;
     html += `<br><span style="opacity:.55;font-size:.85em">${t('cg_tt_includes')}</span>`;
     return html;
 }
 
 // 3. Levels/back button
-function _buildLevelsButtonTooltipHTML() {
+export function _buildLevelsButtonTooltipHTML() {
     return t('cg_return_levels');
 }
 
 // 4. Level name
-const _MOD_SHORT = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
+export const _MOD_SHORT = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
 
 // Builds the mod lines of an active map-device run map, grouped by their
 // affects category with the same colors as the map item tooltip:
 // monster → orange, player → red, puzzle → blue.
-function _buildActiveMapModsHTML(map) {
+export function _buildActiveMapModsHTML(map) {
     const colors = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
     let html = '';
     let hasMods = false;
@@ -298,7 +318,7 @@ function _buildActiveMapModsHTML(map) {
 // HUD displays the launched map's name instead of the seed level's hint.
 // Contains ONLY the map identity (rarity-colored) + its rolled modifiers
 // + the reward bonuses (xp / quantity / rarity) the run grants.
-function _buildMapRunTooltipHTML() {
+export function _buildMapRunTooltipHTML() {
     const map = (typeof _egActiveMapItem !== 'undefined') ? _egActiveMapItem : null;
     if (!map) return '';
     const rc = (typeof rarityColors === 'function') ? rarityColors(map.rarity) : null;
@@ -337,7 +357,7 @@ function _buildMapRunTooltipHTML() {
     return html;
 }
 
-function _buildLevelNameTooltipHTML() {
+export function _buildLevelNameTooltipHTML() {
     // Endgame map-device run: the corner HUD shows the map's name, so the
     // tooltip shows ONLY the map identity + its rolled launch modifiers.
     if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem
@@ -345,13 +365,13 @@ function _buildLevelNameTooltipHTML() {
         return _buildMapRunTooltipHTML();
     }
 
-    if (!cur) return '';
-    const gi = cur.gIdx;
-    const hs = STATE.levelHS[gi];
-    const bonusDone = STATE.bonusDone.includes(gi);
-    const bonusHintText = lvText(cur, 'bonusHint') || '';
+    if (!globalThis.cur) return '';
+    const gi = globalThis.cur.gIdx;
+    const hs = globalThis.STATE.levelHS[gi];
+    const bonusDone = globalThis.STATE.bonusDone.includes(gi);
+    const bonusHintText = lvText(globalThis.cur, 'bonusHint') || '';
 
-    let html = `<strong>${t('lvl_prefix')} ${cur.world}-${cur.li}</strong>`;
+    let html = `<strong>${t('lvl_prefix')} ${globalThis.cur.world}-${globalThis.cur.li}</strong>`;
     html += `<br>${t('cg_tt_bonus').replace('{x}', bonusHintText)}`;
     html += `<br>${t('cg_tt_bonus_claimed')} <b style="color:${bonusDone ? '#2ecc71' : '#e74c3c'}">${bonusDone ? t('cg_yes') : t('cg_no')}</b>`;
 
@@ -366,17 +386,17 @@ function _buildLevelNameTooltipHTML() {
         html += `<br><span style="opacity:.6">${t('cg_tt_not_cleared')}</span>`;
     }
 
-    if (STATE.levelMistakes && STATE.levelMistakes[gi] !== undefined) {
-        html += `<br>${t('cg_tt_best_mistakes')} <b>${STATE.levelMistakes[gi]}</b>`;
+    if (globalThis.STATE.levelMistakes && globalThis.STATE.levelMistakes[gi] !== undefined) {
+        html += `<br>${t('cg_tt_best_mistakes')} <b>${globalThis.STATE.levelMistakes[gi]}</b>`;
     }
 
     if (ptHasSkill('grid_awareness')) {
         const tierLabels = { small: 'cg_grid_small', medium: 'cg_grid_medium', large: 'cg_grid_large', massive: 'cg_grid_massive' };
-        const tier = _getGridSizeTier(cur.grid.length, cur.grid[0].length);
+        const tier = _getGridSizeTier(globalThis.cur.grid.length, globalThis.cur.grid[0].length);
         html += `<br>${t('cg_tt_grid_class')} <b>${t(tierLabels[tier])}</b>`;
     }
 
-    const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
+    const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(globalThis.cur);
     if (isNexusPoint) html += `<br><span style="color:#7fd4ff">${t('scr_nexus_point_badge')}</span>`;
     else if (isAscension) html += `<br><span style="color:#c080ff">${t('cg_ascension_lvl')}</span>`;
     if (isConvergence) html += `<br><span style="color:#6dbf40">${t('cg_convergence_lvl')}</span>`;
@@ -385,7 +405,7 @@ function _buildLevelNameTooltipHTML() {
 }
 
 // 5. Inventory label
-function _buildInventoryLabelTooltipHTML() {
+export function _buildInventoryLabelTooltipHTML() {
     return `<strong>${t('inv_title')}</strong>`
         + `<br>${t('cg_inv_reshuffle_hint')}`
         + `<br>${t('cg_inv_reward_pick').replace('{n}', typeof RESHUFFLE_GOAL !== 'undefined' ? RESHUFFLE_GOAL : 3)}`;
@@ -396,7 +416,7 @@ function _buildInventoryLabelTooltipHTML() {
 // is selected (.mod-per-desc), but as a hover tooltip so the effect can
 // also be read before activating it. Reads the live sibling span, so a
 // language switch is always reflected.
-function _buildModTombstoneTooltipHTML(btn) {
+export function _buildModTombstoneTooltipHTML(btn) {
     const desc = btn.parentElement.querySelector(':scope > .mod-per-desc');
     return desc ? desc.innerHTML : '';
 }
@@ -406,7 +426,7 @@ function _buildModTombstoneTooltipHTML(btn) {
 // Expansion 2 "Rise of the Beasts" (current), Expansion 1
 // "Cartographers of Chance" (characters, cutscenes, world map,
 // large visual overhaul), Base Game.
-function _buildExpansionHistoryTooltipHTML() {
+export function _buildExpansionHistoryTooltipHTML() {
     return `<strong style="color:#d4b8ff">${t('scr_expansion_tooltip_title')}</strong>`
         + `<br><br><span style="color:#c39bd3">• ${t('scr_expansion_2_badge')}: ${t('scr_expansion_2_name')}</span>`
         + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_2_note')}</span>`
@@ -501,30 +521,30 @@ document.addEventListener('DOMContentLoaded', () => {
 //----------------------------SAVE SLOT TOOLTIP----------------------------
 //------------------------------------------------------------------------
 
-function _fmtPlaytime(totalSecs) {
+export function _fmtPlaytime(totalSecs) {
     const h = Math.floor(totalSecs / 3600);
     const m = Math.floor((totalSecs % 3600) / 60);
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
-const _SAVE_SLOT_ALL_MODS = ['timetrial', 'hardcore', 'ironman', 'classless', 'treeless'];
+export const _SAVE_SLOT_ALL_MODS = ['timetrial', 'hardcore', 'ironman', 'classless', 'treeless'];
 
 // Counts levels whose recorded highscore was set on Hard difficulty
 // with every optional modifier active.
-function _countHardAllModsClears(levelHS) {
+export function _countHardAllModsClears(levelHS) {
     return Object.values(levelHS || {}).filter(hs =>
         hs && hs.diff === 'hard' && _SAVE_SLOT_ALL_MODS.every(m => hs.mods && hs.mods[m])
     ).length;
 }
 
-function _pctOf(part, total) {
+export function _pctOf(part, total) {
     if (!total) return '0%';
     return `${Math.round((part / total) * 100)}%`;
 }
 
 // Builds the lifetime-stats tooltip for a save-slot card.
 // `summary` comes from getSlotSummary() in state.js.
-function _buildSaveSlotTooltipHTML(summary) {
+export function _buildSaveSlotTooltipHTML(summary) {
     const totalLevels = (typeof ALL !== 'undefined' && ALL.length) ? ALL.length : 0;
 
     const upgradesAchieved =

@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE CREEPER (boss_creeper)---------------------
 //------------------------------------------------------------------------
 // REWORK - green-thing homage. The boss is a nest mother: it sics packs of
@@ -41,8 +50,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_CRP_DEBUG_SLOW = true;
-const _EG_CRP_DEBUG_MULT = _EG_CRP_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_CRP_DEBUG_SLOW = true;
+export const _EG_CRP_DEBUG_MULT = _EG_CRP_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_creeper: {
@@ -71,12 +80,12 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_CRP_PACK_DMG = [0, 0.20, 0.24, 0.28];      // per creeper blast, by phase
-const EG_CRP_PACK_DMG_CHARGED = 0.34;               // charged creeper blast (P3)
-const EG_CRP_TNT_DMG = [0, 0, 0.15, 0.18];          // per TNT block, by phase
-const EG_CRP_POUNCE_DMG = [0, 0.17, 0.20, 0.23];    // per pounce blast, by phase
-const EG_CRP_FINAL_DMG = 0.32;                      // SSSS…BOOM mega blast
-const EG_CRP_HIT_CD_MS = 700;                       // shared blast-hit cooldown
+export const EG_CRP_PACK_DMG = [0, 0.20, 0.24, 0.28];      // per creeper blast, by phase
+export const EG_CRP_PACK_DMG_CHARGED = 0.34;               // charged creeper blast (P3)
+export const EG_CRP_TNT_DMG = [0, 0, 0.15, 0.18];          // per TNT block, by phase
+export const EG_CRP_POUNCE_DMG = [0, 0.17, 0.20, 0.23];    // per pounce blast, by phase
+export const EG_CRP_FINAL_DMG = 0.32;                      // SSSS…BOOM mega blast
+export const EG_CRP_HIT_CD_MS = 700;                       // shared blast-hit cooldown
 
 
 //------------------------------------------------------------------------
@@ -84,10 +93,10 @@ const EG_CRP_HIT_CD_MS = 700;                       // shared blast-hit cooldown
 //------------------------------------------------------------------------
 
 // Center of the playable grid (from corner cells), or viewport fallback.
-function _egCrpGridCenter() {
-    if (typeof cur !== 'undefined' && cur && cur.grid && cur.grid.length && cur.grid[0]) {
+export function _egCrpGridCenter() {
+    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid && globalThis.cur.grid.length && globalThis.cur.grid[0]) {
         const a = document.getElementById('g-0-0');
-        const b = document.getElementById('g-' + (cur.grid.length - 1) + '-' + (cur.grid[0].length - 1));
+        const b = document.getElementById('g-' + (globalThis.cur.grid.length - 1) + '-' + (globalThis.cur.grid[0].length - 1));
         if (a && b && a.isConnected && b.isConnected) {
             const ra = a.getBoundingClientRect();
             const rb = b.getBoundingClientRect();
@@ -104,7 +113,7 @@ function _egCrpGridCenter() {
 // body-level (run-independent) so the visuals survive the run ending in
 // the same frame - the layer self-removes. pct > 0 damages the player when
 // their hitbox overlaps the blast disc.
-function _egCrpBoom(x, y, radius, pct, level, label) {
+export function _egCrpBoom(x, y, radius, pct, level, label) {
     const R = Math.max(10, radius);
     const layer = document.createElement('div');
     layer.className = 'eg-crp-burst';
@@ -154,7 +163,7 @@ function _egCrpBoom(x, y, radius, pct, level, label) {
 // Builds one creeper sprite: a fixed outer dot (translate-positioned) with
 // the classic green cube + face as CHILD elements (scale/filter animations
 // run on the child - never on the fixed wrapper).
-function _egCrpSprite(run, charged) {
+export function _egCrpSprite(run, charged) {
     const dot = _egNkEl(run, 'div', 'eg-nk-dot eg-crp-creeper' + (charged ? ' eg-crp-charged' : ''));
     const body = document.createElement('div');
     body.className = 'eg-crp-body';
@@ -164,7 +173,7 @@ function _egCrpSprite(run, charged) {
 
 // Updates a creeper sprite from its fuse (0..1): swell + white flash as the
 // fuse climbs. All style writes go on the body child.
-function _egCrpFuseVisual(sprite, fuse) {
+export function _egCrpFuseVisual(sprite, fuse) {
     if (!sprite.body) return;
     const swell = 1 + fuse * 0.4;
     sprite.body.style.scale = swell.toFixed(3);
@@ -179,7 +188,7 @@ function _egCrpFuseVisual(sprite, fuse) {
 
 // Teardown - registered in boss-framework.js cleanup chain (startsWith
 // 'boss_creeper'; runtime ids are suffixed). Clears the set-piece.
-function _egCrpTeardown() {
+export function _egCrpTeardown() {
     if (_egCrpFinal) _egCrpFinalEnd(_egCrpFinal);
     document.body.classList.remove('eg-crp-flash');
     document.querySelectorAll('.eg-crp-flying').forEach(el => el.classList.remove('eg-crp-flying'));
@@ -194,15 +203,15 @@ function _egCrpTeardown() {
 // COOLS while they keep their distance. Fuse ≥ 1 → detonation. Standing
 // still = surrounded by simultaneous booms; perfect kiting = they cool off
 // and wander away when the pack window ends.
-const EG_CRP_PACK_COUNT = [0, 2, 3, 4];
-const EG_CRP_PACK_SPEED = [0, 80, 95, 112];
-const EG_CRP_PACK_HEAT_RATE = [0, 0.40, 0.50, 0.62];    // fuse/s inside range
-const EG_CRP_PACK_COOL_RATE = 0.35;                     // fuse/s outside range
-const EG_CRP_PACK_RANGE = 130;
-const EG_CRP_PACK_BLAST_R = [0, 150, 170, 190];
-const EG_CRP_PACK_DUR_MS = 14000;
+export const EG_CRP_PACK_COUNT = [0, 2, 3, 4];
+export const EG_CRP_PACK_SPEED = [0, 80, 95, 112];
+export const EG_CRP_PACK_HEAT_RATE = [0, 0.40, 0.50, 0.62];    // fuse/s inside range
+export const EG_CRP_PACK_COOL_RATE = 0.35;                     // fuse/s outside range
+export const EG_CRP_PACK_RANGE = 130;
+export const EG_CRP_PACK_BLAST_R = [0, 150, 170, 190];
+export const EG_CRP_PACK_DUR_MS = 14000;
 
-function _egMechCreeperPack(monster, phase) {
+export function _egMechCreeperPack(monster, phase) {
     if (_egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -282,11 +291,11 @@ function _egMechCreeperPack(monster, phase) {
 // A creeper leaps from above onto your CURRENT position: a shadow marker
 // grows while it falls, it lands, hisses (fast white blink + swell) for a
 // short fuse, then blows. One pounce per trigger; two staggered in P3.
-const EG_CRP_POUNCE_FALL_MS = 550;
-const EG_CRP_POUNCE_FUSE_MS = 1500;
-const EG_CRP_POUNCE_BLAST_R = 140;
+export const EG_CRP_POUNCE_FALL_MS = 550;
+export const EG_CRP_POUNCE_FUSE_MS = 1500;
+export const EG_CRP_POUNCE_BLAST_R = 140;
 
-function _egMechCreeperPounce(monster, phase) {
+export function _egMechCreeperPounce(monster, phase) {
     if (_egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -358,13 +367,13 @@ function _egMechCreeperPounce(monster, phase) {
 // blocks flash faster and faster during the wind-up, then detonate in a
 // rolling CHAIN REACTION outward from the centre block (~85 ms steps).
 // The blast wave travels visibly - leave the cluster entirely.
-const EG_CRP_TNT_COUNT = [0, 0, 6, 9];
-const EG_CRP_TNT_CLUSTER_R = [0, 0, 190, 230];
-const EG_CRP_TNT_WINDUP_MS = 2100;
-const EG_CRP_TNT_CASCADE_MS = 85;
-const EG_CRP_TNT_BLAST_R = 110;
+export const EG_CRP_TNT_COUNT = [0, 0, 6, 9];
+export const EG_CRP_TNT_CLUSTER_R = [0, 0, 190, 230];
+export const EG_CRP_TNT_WINDUP_MS = 2100;
+export const EG_CRP_TNT_CASCADE_MS = 85;
+export const EG_CRP_TNT_BLAST_R = 110;
 
-function _egMechTntChain(monster, phase) {
+export function _egMechTntChain(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -431,26 +440,26 @@ function _egMechTntChain(monster, phase) {
 // (huge radius + screen flash + a long-lasting crater) and the immunity
 // releases. The auto-attack charge bar freezes for the whole set-piece
 // (gate in _egTickPlayer, endgame-encounter.js - _egCrpFinalActive).
-const EG_CRP_FINAL_CD_TICK_MS = 800;
-const EG_CRP_FINAL_CD_TICKS = 3;
-const EG_CRP_FINAL_BLAST_R_PCT = 0.42;              // of min(vw, vh)
+export const EG_CRP_FINAL_CD_TICK_MS = 800;
+export const EG_CRP_FINAL_CD_TICKS = 3;
+export const EG_CRP_FINAL_BLAST_R_PCT = 0.42;              // of min(vw, vh)
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egCrpFinal = null;
+export let _egCrpFinal = null;
 
-function _egCrpFinalActive() {
+export function _egCrpFinalActive() {
     return !!_egCrpFinal && !_egCrpFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egCrpOnPhaseEnter(monster, newPhase) {
+export function _egCrpOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egCrpStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egCrpStartFinalWatcher(monster) {
+export function _egCrpStartFinalWatcher(monster) {
     if (!monster || _egCrpFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -466,7 +475,7 @@ function _egCrpStartFinalWatcher(monster) {
     });
 }
 
-function _egCrpFinalStart(monster) {
+export function _egCrpFinalStart(monster) {
     if (_egCrpFinal || !monster) return;
 
     // The arena goes quiet: kill every other run of this boss.
@@ -565,7 +574,7 @@ function _egCrpFinalStart(monster) {
 
 // The BOOM: one gigantic blast around the boss position + screen flash +
 // a long crater. Damage test once, globally (outside the ring = hit).
-function _egCrpFinalBang(g, monster) {
+export function _egCrpFinalBang(g, monster) {
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(g.monsterId, true);
     g.run = run;
@@ -597,7 +606,7 @@ function _egCrpFinalBang(g, monster) {
     run.timers.push(id2);
 }
 
-function _egCrpFinalEnd(g) {
+export function _egCrpFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -612,7 +621,7 @@ function _egCrpFinalEnd(g) {
     document.querySelectorAll('.eg-crp-flying').forEach(el => el.classList.remove('eg-crp-flying'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -634,7 +643,7 @@ if (typeof window !== 'undefined') {
     window._EG_CRP_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_creeper') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_creeper') : null;
             if (!monster) return 'no creeper alive';
             const fn = name === 'pack' ? _egMechCreeperPack
                 : name === 'chain' ? _egMechTntChain
@@ -646,7 +655,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_creeper') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_creeper') : null;
             if (!monster) return 'no creeper alive';
             _egCrpFinalStart(monster);
             return 'SSSS…BOOM started';

@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE SERAPH (boss_seraph)-----------------------------
 //------------------------------------------------------------------------
 // Pinnacle judgment: pillars of light strike at random across the arena -
@@ -38,7 +46,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechJudgmentPillars(monster, phase) {
+export function _egMechJudgmentPillars(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const strikes = [0, 7, 9, 11][p];
@@ -94,7 +102,7 @@ function _egMechJudgmentPillars(monster, phase) {
     });
 }
 
-function _egMechRadiantFans(monster, phase) {
+export function _egMechRadiantFans(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const volleys = [0, 3, 4, 5][p];

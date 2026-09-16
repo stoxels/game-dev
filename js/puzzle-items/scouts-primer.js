@@ -1,4 +1,23 @@
-﻿//========================================================================
+//------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { _egOnProgrammaticReveal } from '../endgame/endgame-class-projectiles.js';
+import { renderCell, updClues } from '../grid.js';
+import { PT } from '../passive-tree/passive-tree.js';
+import { questStat_mcWrongAnswerEliminated, questStat_primerRowsColsRevealed, questStat_tutorAnsweredCorrect, updateQuestStats } from '../quests/quests-stats.js';
+import { _refreshQuestionModalFlag } from '../screens/screens.js';
+import { save } from '../state.js';
+import { pauseTimer, resumeTimer } from '../timer.js';
+import { LANG, t } from '../translation/translations.js';
+import { buildInventoryPanel } from './inventory-panel.js';
+import { shuffle } from './shared/puzzle-helpers.js';
+import { showToast } from './toasts-and-popups.js';
+
+//========================================================================
 //  scouts-primer.js
 //  Scout's Primer - pre-game bonus question chain that rewards the player
 //  with pre-solved rows and columns before the nonogram starts.
@@ -11,27 +30,27 @@
 //------------------------------------------------------------------------
 
 // Maximum number of questions in a single primer chain.
-const PRIMER_MAX = 5;
+export const PRIMER_MAX = 5;
 
 // The question object currently displayed in the primer modal.
-let primerQuestion = null;
+export let primerQuestion = null;
 
 // How many questions the player has answered correctly in the current chain.
-let primerStreak = 0;
+export let primerStreak = 0;
 
 // Colour palette used for cell-flare animations, indexed by streak tier.
 // Tier 1 = blue, 2 = teal, 3 = orange, 4 = pink/purple, 5 = gold (perfect).
-const PRIMER_TIER_COLOURS = ['#4fc3f7', '#26c6a6', '#ffa040', '#e040fb', '#ffd700'];
+export const PRIMER_TIER_COLOURS = ['#4fc3f7', '#26c6a6', '#ffa040', '#e040fb', '#ffd700'];
 
 // Tutor item IDs, in ascending tier order (lowest tier consumed first).
-const PRIMER_TUTOR_ITEM_ORDER = ['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll'];
+export const PRIMER_TUTOR_ITEM_ORDER = ['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll'];
 
 // Set of question strings already shown in the current primer chain.
 // Cleared at the start of each new chain (streak === 0).
-let primerUsedQuestions = new Set();
+export let primerUsedQuestions = new Set();
 
 // Passive-tree bonus-row nodes: [skillId, chance, rowsGranted]. Each node rolls independently.
-const PRIMER_ROW_BONUS_TABLE = [
+export const PRIMER_ROW_BONUS_TABLE = [
     ['expanding_front', 0.500, 1],
     ['widened_formation', 0.250, 2],
     ['extended_horizon', 0.125, 3],
@@ -39,7 +58,7 @@ const PRIMER_ROW_BONUS_TABLE = [
 ];
 
 // Passive-tree bonus-column nodes: [skillId, chance, colsGranted]. Each node rolls independently.
-const PRIMER_COL_BONUS_TABLE = [
+export const PRIMER_COL_BONUS_TABLE = [
     ['vertical_insight', 0.500, 1],
     ['rising_structure', 0.250, 2],
     ['elevated_scope', 0.125, 3],
@@ -54,7 +73,7 @@ const PRIMER_COL_BONUS_TABLE = [
 
 // Builds a normalised multiple-choice question object from a raw quiz pool entry.
 // Shuffles the answer options and flags which one is correct.
-function _primerBuildMultiChoiceQuestion(raw) {
+export function _primerBuildMultiChoiceQuestion(raw) {
     const q = (LANG === 'de' && raw.qDE) ? raw.qDE : raw.q;
     const opts = (LANG === 'de' && raw.optsDE) ? raw.optsDE : raw.opts;
     const optsWithFlag = opts.map((o, i) => ({ text: o, isCorrect: i === raw.correct }));
@@ -63,7 +82,7 @@ function _primerBuildMultiChoiceQuestion(raw) {
 }
 
 // Builds a normalised free-text (numeric) question object from a raw math-gate entry.
-function _primerBuildNumericQuestion(raw) {
+export function _primerBuildNumericQuestion(raw) {
     const q = (LANG === 'de' && raw.qDE) ? raw.qDE : raw.q;
     return {
         q,
@@ -78,14 +97,14 @@ function _primerBuildNumericQuestion(raw) {
 
 // Picks a random question from the combined pool of quiz questions and math-gate
 // questions (50/50 split). Returns a normalised question object ready for display.
-function getPrimerQuestion() {
-    const gateQs = Object.values(MATH_GATE_POOLS).flat();
+export function getPrimerQuestion() {
+    const gateQs = Object.values(globalThis.MATH_GATE_POOLS).flat();
     const maxAttempts = 20;
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         let raw, built;
-        if (Math.random() < 0.5 && BONUS_QUIZ_POOLS.length) {
-            raw = BONUS_QUIZ_POOLS[Math.floor(Math.random() * BONUS_QUIZ_POOLS.length)];
+        if (Math.random() < 0.5 && globalThis.BONUS_QUIZ_POOLS.length) {
+            raw = globalThis.BONUS_QUIZ_POOLS[Math.floor(Math.random() * globalThis.BONUS_QUIZ_POOLS.length)];
             built = _primerBuildMultiChoiceQuestion(raw);
         } else {
             raw = gateQs[Math.floor(Math.random() * gateQs.length)];
@@ -118,14 +137,14 @@ function getPrimerQuestion() {
 
 // Returns the progress label string shown above the streak dots.
 // e.g. "Question 2 of 5 - On correct answer: +1 row & +1 column pre-solved"
-function _primerBuildProgressLabel(streak) {
+export function _primerBuildProgressLabel(streak) {
     return t('itm_primer_progress_full')
         .replace('{n}', streak + 1)
         .replace('{m}', PRIMER_MAX);
 }
 
 // Returns HTML for the row of coloured dots showing current streak progress.
-function _primerBuildStreakDots(streak) {
+export function _primerBuildStreakDots(streak) {
     return Array.from({ length: PRIMER_MAX }, (_, i) =>
         `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;margin:0 3px;` +
         `background:${i < streak ? 'var(--green)' : 'var(--border2)'}"></span>`
@@ -133,14 +152,14 @@ function _primerBuildStreakDots(streak) {
 }
 
 // Returns HTML for the footer hint text at the bottom of the modal.
-function _primerBuildFooterText(streak) {
+export function _primerBuildFooterText(streak) {
     if (streak === 0) return t('itm_primer_footer_full_start');
     return t('itm_primer_footer_full_streak').replace('{n}', streak);
 }
 
 // Returns HTML for the answer area: multiple-choice option container or
 // numeric input row, depending on the current question type.
-function _primerBuildAnswerHtml(question) {
+export function _primerBuildAnswerHtml(question) {
     if (question.isMultiChoice) {
         return `<div class="quiz-opts" id="primer-opts" style="margin-top:14px;"></div>`;
     }
@@ -166,7 +185,7 @@ function _primerBuildAnswerHtml(question) {
 // on the top-left gem, and a minimal "n/m" counter chip on the top frame band
 // between the portrait and the close button. No bottom button row and no
 // streak dots - the counter chip carries all the progress info.
-function _primerBuildModalHtml(question, streak) {
+export function _primerBuildModalHtml(question, streak) {
     const counterLabel = `${streak + 1}/${PRIMER_MAX}`;
 
     const title = t('itm_primer_title');
@@ -214,8 +233,8 @@ function _primerBuildModalHtml(question, streak) {
 
 // Tries to auto-eliminate one wrong answer option via the passive tree.
 // Marks the removed option as visually struck-through and disabled.
-function _primerTryEliminateWrongOption(optsEl) {
-    const elimChance = _quizCalcEliminationChance();
+export function _primerTryEliminateWrongOption(optsEl) {
+    const elimChance = globalThis._quizCalcEliminationChance();
     if (elimChance <= 0 || Math.random() >= elimChance) return;
 
     const wrongBtns = Array.from(optsEl.children).filter(b => b.dataset.isCorrect !== '1');
@@ -231,7 +250,7 @@ function _primerTryEliminateWrongOption(optsEl) {
 
 // Creates and appends all option buttons into the MC options container,
 // then applies the optional passive-tree wrong-answer elimination.
-function _primerPopulateMultiChoiceOptions(optsEl) {
+export function _primerPopulateMultiChoiceOptions(optsEl) {
     primerQuestion.opts.forEach(opt => {
         const btn = document.createElement('button');
         btn.className = 'quiz-opt';
@@ -246,7 +265,7 @@ function _primerPopulateMultiChoiceOptions(optsEl) {
 
 // Attaches the Enter-key listener to the numeric input field,
 // so the player can submit without clicking the button.
-function _primerBindNumericInputEnterKey() {
+export function _primerBindNumericInputEnterKey() {
     setTimeout(() => {
         const inp = document.getElementById('primer-input');
         if (inp) {
@@ -267,7 +286,7 @@ function _primerBindNumericInputEnterKey() {
 // Builds and injects the primer modal overlay into the DOM.
 // The overlay is removed (not just hidden) when dismissed, so it is always
 // freshly constructed for each question in the chain.
-function showPrimerModal(streak = 0) {
+export function showPrimerModal(streak = 0) {
     if (streak === 0) primerUsedQuestions = new Set();
     pauseTimer();
     primerStreak = streak;
@@ -285,7 +304,7 @@ function showPrimerModal(streak = 0) {
     // Inject character portrait
     const primerPortrait = document.getElementById('primer-portrait');
     if (primerPortrait && typeof _getPlayerCharacterImage === 'function') {
-        primerPortrait.innerHTML = `<img src="${_getPlayerCharacterImage()}" alt="">`;
+        primerPortrait.innerHTML = `<img src="${globalThis._getPlayerCharacterImage()}" alt="">`;
     }
 
     // Wire up interactive elements depending on question type
@@ -302,13 +321,13 @@ function showPrimerModal(streak = 0) {
 // Removes the primer overlay from the DOM and resumes the game timer.
 // Also hides any corner-chip tooltip left open by the cursor (the overlay
 // is removed entirely, so the mouseout delegation on it dies with it).
-function closePrimerModal() {
+export function closePrimerModal() {
     const el = document.getElementById('primer-overlay');
     if (el) el.remove();
     if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
     primerQuestion = null;
-    if (typeof hideGameTooltip === 'function') hideGameTooltip();
-    if (typeof timerInterval !== 'undefined' && !dead) resumeTimer();
+    if (typeof hideGameTooltip === 'function') globalThis.hideGameTooltip();
+    if (typeof timerInterval !== 'undefined' && !globalThis.dead) resumeTimer();
 }
 
 
@@ -319,7 +338,7 @@ function closePrimerModal() {
 
 // Locks all MC option buttons, highlights the correct one (and the wrong
 // clicked one if applicable), then passes the result to showPrimerResult.
-function submitPrimerMCQ(correct, optsEl, clickedBtn) {
+export function submitPrimerMCQ(correct, optsEl, clickedBtn) {
     // Remove all click handlers first to prevent double-submission
     Array.from(optsEl.children).forEach(btn => btn.onclick = null);
 
@@ -334,8 +353,8 @@ function submitPrimerMCQ(correct, optsEl, clickedBtn) {
 
 // Tries to display a hint in the modal after a wrong numeric answer,
 // but only if the passive tree has unlocked hint-on-first-failure.
-function _primerTryShowHint() {
-    const hintThreshold = mgCalcHintThreshold();
+export function _primerTryShowHint() {
+    const hintThreshold = globalThis.mgCalcHintThreshold();
     // The primer allows only one attempt, so the threshold must be 1 or less
     if (hintThreshold === null || hintThreshold > 1) return;
 
@@ -347,7 +366,7 @@ function _primerTryShowHint() {
 
 // Reads and validates the numeric input field, then passes the result to
 // showPrimerResult. Displays an inline error if the input is not a number.
-function submitPrimerAnswer() {
+export function submitPrimerAnswer() {
     const raw = (document.getElementById('primer-input').value || '').trim().replace(',', '.');
     const entered = parseFloat(raw);
     const fb = document.getElementById('primer-feedback');
@@ -374,7 +393,7 @@ function submitPrimerAnswer() {
 // If the chain is complete, triggers the perfect reveal; otherwise chains to
 // the next question. (Exercise questions no longer roll bonus items - the
 // quiz/math-gate item rewards were removed in the Leveling Rework cleanup.)
-function _primerHandleCorrectAnswer(fb, newStreak) {
+export function _primerHandleCorrectAnswer(fb, newStreak) {
     fb.className = 'qr-result ok';
     Audio_Manager.playSFX('quizCorrect');
     trackAchStat('primerCorrect');
@@ -403,7 +422,7 @@ function _primerHandleCorrectAnswer(fb, newStreak) {
 
 // Handles a wrong answer. If the player built up any streak before this miss,
 // that partial headstart is applied; otherwise the primer closes with nothing.
-function _primerHandleWrongAnswer(fb) {
+export function _primerHandleWrongAnswer(fb) {
     fb.className = 'qr-result bad';
     Audio_Manager.playSFX('quizWrong');
 
@@ -421,7 +440,7 @@ function _primerHandleWrongAnswer(fb) {
 
 // Central result dispatcher: hides the skip/close button, then routes to the
 // correct/wrong handler based on the outcome of the just-submitted answer.
-function showPrimerResult(correct) {
+export function showPrimerResult(correct) {
     const fb = document.getElementById('primer-feedback');
     const skipBtn = document.getElementById('primer-skip-btn');
     if (skipBtn) skipBtn.style.display = 'none';
@@ -440,7 +459,7 @@ function showPrimerResult(correct) {
 
 // Called when the player presses the Skip button.
 // Applies any partial headstart already earned, or simply closes if none.
-function skipPrimer() {
+export function skipPrimer() {
     if (primerStreak > 0) {
         closePrimerModal();
         applyPrimerHeadstart(primerStreak);
@@ -458,7 +477,7 @@ function skipPrimer() {
 // Rolls independent bonuses from a [skillId, chance, amount] table and sums
 // the amounts for every node that is owned and rolls successfully. Shared by
 // the row-bonus and column-bonus calculators below (they only differ by table).
-function _primerCalcBonusFromTable(table) {
+export function _primerCalcBonusFromTable(table) {
     let bonus = 0;
     for (const [skillId, chance, amount] of table) {
         if (PT.hasSkill(skillId) && Math.random() < chance) bonus += amount;
@@ -468,20 +487,20 @@ function _primerCalcBonusFromTable(table) {
 
 // Rolls extra bonus rows from passive tree nodes. Each node is independent.
 // Returns the total number of additional rows to reveal.
-function _primerCalcBonusRows() {
+export function _primerCalcBonusRows() {
     return _primerCalcBonusFromTable(PRIMER_ROW_BONUS_TABLE);
 }
 
 // Rolls extra bonus columns from passive tree nodes. Each node is independent.
 // Returns the total number of additional columns to reveal.
-function _primerCalcBonusCols() {
+export function _primerCalcBonusCols() {
     return _primerCalcBonusFromTable(PRIMER_COL_BONUS_TABLE);
 }
 
 // Calculates the final row and column counts to reveal for a given streak,
 // after applying passive tree bonuses and the primed_scout doubling.
 // Returns { totalRows, totalCols } clamped to grid dimensions.
-function _primerCalcRevealCounts(streakCount, gridRows, gridCols) {
+export function _primerCalcRevealCounts(streakCount, gridRows, gridCols) {
     let totalRows = streakCount + _primerCalcBonusRows();
     let totalCols = streakCount + _primerCalcBonusCols();
 
@@ -506,28 +525,28 @@ function _primerCalcRevealCounts(streakCount, gridRows, gridCols) {
 // re-renders it. Filled cells (=1) in the solution are marked as correctly
 // revealed; empty cells that are still blank are marked as crossed out (=2).
 // Shared by the row-wise and column-wise reveal helpers below.
-function _primerRevealCell(r, c, sol) {
-    const wasRevealed = (sol[r][c] === 1) && !revealedGrid[r][c] && userGrid[r][c] !== 1;
-    if (sol[r][c] === 1) { revealedGrid[r][c] = true; userGrid[r][c] = 1; }
-    else if (userGrid[r][c] === 0) { userGrid[r][c] = 2; }
+export function _primerRevealCell(r, c, sol) {
+    const wasRevealed = (sol[r][c] === 1) && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1;
+    if (sol[r][c] === 1) { globalThis.revealedGrid[r][c] = true; globalThis.userGrid[r][c] = 1; }
+    else if (globalThis.userGrid[r][c] === 0) { globalThis.userGrid[r][c] = 2; }
     renderCell(r, c);
     updClues(r, c);
     if (wasRevealed && typeof _egOnProgrammaticReveal === 'function') _egOnProgrammaticReveal([`g-${r}-${c}`]);
 }
 
 // Applies the headstart reveal to every cell in the given row.
-function _primerApplyRevealRow(r, sol, cols) {
+export function _primerApplyRevealRow(r, sol, cols) {
     for (let c = 0; c < cols; c++) _primerRevealCell(r, c, sol);
 }
 
 // Applies the headstart reveal to every cell in the given column.
-function _primerApplyRevealCol(c, sol, rows) {
+export function _primerApplyRevealCol(c, sol, rows) {
     for (let r = 0; r < rows; r++) _primerRevealCell(r, c, sol);
 }
 
 // Applies game-state changes for all rows and columns in the headstart reveal,
 // synchronously and silently (no animations yet).
-function _primerApplyAllRevealState(rowIdxs, colIdxs, sol, rows, cols) {
+export function _primerApplyAllRevealState(rowIdxs, colIdxs, sol, rows, cols) {
     rowIdxs.forEach(r => _primerApplyRevealRow(r, sol, cols));
     colIdxs.forEach(c => _primerApplyRevealCol(c, sol, rows));
 }
@@ -540,7 +559,7 @@ function _primerApplyAllRevealState(rowIdxs, colIdxs, sol, rows, cols) {
 
 // Returns a reference to the board element used for glow animations,
 // falling back through several common selectors to document.body.
-function _primerGetBoardElement() {
+export function _primerGetBoardElement() {
     return document.querySelector('.grid-container')
         || document.getElementById('grid')
         || document.querySelector('.board')
@@ -551,7 +570,7 @@ function _primerGetBoardElement() {
 // The element removes itself after its CSS animation completes (~900ms).
 // colour: CSS colour string for the --flare-colour custom property.
 // extraClass: additional class string applied to the element (e.g. 'scout-flare-row').
-function _primerSpawnCellFlare(r, c, colour, extraClass) {
+export function _primerSpawnCellFlare(r, c, colour, extraClass) {
     const cellEl = document.getElementById(`g-${r}-${c}`);
     if (!cellEl) return;
     const rect = cellEl.getBoundingClientRect();
@@ -575,7 +594,7 @@ function _primerSpawnCellFlare(r, c, colour, extraClass) {
 
 // Plays a tick sound at the given delay, but only for every other sweep
 // (sweepIndex 0, 2, 4, ...). Shared by the row and column flare schedulers.
-function _primerScheduleTickSound(sweepIndex, delay) {
+export function _primerScheduleTickSound(sweepIndex, delay) {
     if (sweepIndex % 2 !== 0) return;
     setTimeout(() => {
         if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('tick');
@@ -586,7 +605,7 @@ function _primerScheduleTickSound(sweepIndex, delay) {
 // cell-by-cell 18ms apart. axis: 'row' sweeps across columns at fixed row
 // `index`; 'col' sweeps down rows at fixed column `index`. Returns the delay
 // at which the next row/column sweep should begin.
-function _primerScheduleAxisFlares(axis, index, sweepLength, colour, extraClass, baseDelay, cellDelay, sweepIndex) {
+export function _primerScheduleAxisFlares(axis, index, sweepLength, colour, extraClass, baseDelay, cellDelay, sweepIndex) {
     for (let i = 0; i < sweepLength; i++) {
         const r = axis === 'row' ? index : i;
         const c = axis === 'row' ? i : index;
@@ -597,19 +616,19 @@ function _primerScheduleAxisFlares(axis, index, sweepLength, colour, extraClass,
 }
 
 // Schedules a left-to-right flare sweep across all cells of a single row.
-function _primerScheduleRowFlares(r, cols, colour, baseDelay, cellDelay, rowIndex) {
+export function _primerScheduleRowFlares(r, cols, colour, baseDelay, cellDelay, rowIndex) {
     return _primerScheduleAxisFlares('row', r, cols, colour, 'scout-flare-row', baseDelay, cellDelay, rowIndex);
 }
 
 // Schedules a top-to-bottom flare sweep down all cells of a single column.
-function _primerScheduleColFlares(c, rows, colour, baseDelay, cellDelay, colIndex) {
+export function _primerScheduleColFlares(c, rows, colour, baseDelay, cellDelay, colIndex) {
     return _primerScheduleAxisFlares('col', c, rows, colour, 'scout-flare-col', baseDelay, cellDelay, colIndex);
 }
 
 // Schedules the full sweep animation across all revealed rows and columns.
 // Returns the total accumulated delay so callers can schedule post-animation logic.
 // cellDelay controls how long each row/column sweep takes before the next starts.
-function _primerScheduleAllFlares(rowIdxs, colIdxs, rows, cols, colour, cellDelay) {
+export function _primerScheduleAllFlares(rowIdxs, colIdxs, rows, cols, colour, cellDelay) {
     let delay = 0;
 
     rowIdxs.forEach((r, ri) => {
@@ -626,7 +645,7 @@ function _primerScheduleAllFlares(rowIdxs, colIdxs, rows, cols, colour, cellDela
 // Applies a board-level CSS glow animation scaled to the current streak tier.
 // count 1 = soft, 2-3 = mid, 4+ = strong. Automatically removes the class
 // after the animation duration so it can be re-applied next time.
-function _primerApplyBoardGlow(boardEl, colour, count) {
+export function _primerApplyBoardGlow(boardEl, colour, count) {
     const glowClass = count >= 4 ? 'primer-glow-strong'
         : count >= 2 ? 'primer-glow-mid'
             : 'primer-glow-soft';
@@ -645,10 +664,10 @@ function _primerApplyBoardGlow(boardEl, colour, count) {
 // Immediately updates game state for all target rows/columns, then plays a
 // staggered per-cell flare animation sweep and a board-level glow.
 // count: the number of correct answers that were given before the chain ended.
-function applyPrimerHeadstart(count) {
-    if (!cur || count <= 0) return;
+export function applyPrimerHeadstart(count) {
+    if (!globalThis.cur || count <= 0) return;
 
-    const sol = cur.grid;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -678,9 +697,9 @@ function applyPrimerHeadstart(count) {
             .replace('{c}', totalCols);
         showToast(msg);
         questStat_primerRowsColsRevealed(rowIdxs.length, colIdxs.length);
-        checkWin();
-        if (dead) trackAchStat('primerSolvedAll');
-        if (dead) updateQuestStats('primerFullSolve', {});
+        globalThis.checkWin();
+        if (globalThis.dead) trackAchStat('primerSolvedAll');
+        if (globalThis.dead) updateQuestStats('primerFullSolve', {});
     }, totalDelay + 100);
 }
 
@@ -693,7 +712,7 @@ function applyPrimerHeadstart(count) {
 // Creates and schedules a single gold flare overlay for one cell.
 // Position is read at fire-time (inside the setTimeout) so the grid
 // is guaranteed to be laid out and have real pixel dimensions.
-function _primerSpawnPerfectFlare(r, c) {
+export function _primerSpawnPerfectFlare(r, c) {
     _primerSpawnCellFlare(r, c, '#ffd700', 'scout-flare-perfect');
 }
 
@@ -701,7 +720,7 @@ function _primerSpawnPerfectFlare(r, c) {
 // _primerScheduleAxisFlares, but with the perfect-reveal's fixed 20ms
 // spacing and constant 80ms gap between sweeps). Returns the delay at which
 // the next sweep should begin.
-function _primerSchedulePerfectAxisFlares(axis, index, sweepLength, baseDelay, sweepIndex) {
+export function _primerSchedulePerfectAxisFlares(axis, index, sweepLength, baseDelay, sweepIndex) {
     for (let i = 0; i < sweepLength; i++) {
         const r = axis === 'row' ? index : i;
         const c = axis === 'row' ? i : index;
@@ -714,7 +733,7 @@ function _primerSchedulePerfectAxisFlares(axis, index, sweepLength, baseDelay, s
 // Schedules staggered gold flare sweeps across all revealed rows and columns,
 // identical to the partial sweep but using the perfect gold colour and flare class.
 // Returns the accumulated total delay.
-function _primerSchedulePerfectFlares(rowIdxs, colIdxs, rows, cols) {
+export function _primerSchedulePerfectFlares(rowIdxs, colIdxs, rows, cols) {
     let delay = 60; // small head-start so board glow is visible before flares
 
     rowIdxs.forEach((r, ri) => {
@@ -737,10 +756,10 @@ function _primerSchedulePerfectFlares(rowIdxs, colIdxs, rows, cols) {
 //   2. Board glow and toast fire immediately.
 //   3. Per-cell gold flares are staggered via setTimeout after state is set.
 //   4. Win check runs after all animations finish.
-function applyPerfectPrimerReveal() {
-    if (!cur) return;
+export function applyPerfectPrimerReveal() {
+    if (!globalThis.cur) return;
 
-    const sol = cur.grid;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -769,9 +788,9 @@ function applyPerfectPrimerReveal() {
     // 4. Win check after all animations complete
     setTimeout(() => {
         questStat_primerRowsColsRevealed(rowIdxs.length, colIdxs.length);
-        checkWin();
-        if (dead) trackAchStat('primerSolvedAll');
-        if (dead) updateQuestStats('primerFullSolve', {});
+        globalThis.checkWin();
+        if (globalThis.dead) trackAchStat('primerSolvedAll');
+        if (globalThis.dead) updateQuestStats('primerFullSolve', {});
     }, totalDelay + 300);
 }
 
@@ -783,8 +802,8 @@ function applyPerfectPrimerReveal() {
 
 // Counts how many tutor items (any tier of mistakeEraser) the player currently
 // holds in their inventory.
-function _primerCountTutorItems() {
-    return STATE.inventory.filter(i =>
+export function _primerCountTutorItems() {
+    return globalThis.STATE.inventory.filter(i =>
         i.defId === 'mistakeEraser' ||
         i.defId === 'mistakeEraser4' ||
         i.defId === 'mistakeEraser6' ||
@@ -795,26 +814,26 @@ function _primerCountTutorItems() {
 // Finds the lowest-tier available tutor item in the player's inventory,
 // following the priority order defined in PRIMER_TUTOR_ITEM_ORDER.
 // Returns the item object, or undefined if none is available.
-function _primerFindLowestTierTutorItem() {
+export function _primerFindLowestTierTutorItem() {
     return PRIMER_TUTOR_ITEM_ORDER
-        .flatMap(id => STATE.inventory.filter(i => i.defId === id))
+        .flatMap(id => globalThis.STATE.inventory.filter(i => i.defId === id))
         .find(Boolean);
 }
 
 // Calculates the tutor's base + passive-tree-bonus success chance.
-function _primerCalcTutorSuccessChance() {
+export function _primerCalcTutorSuccessChance() {
     let chance = 0.10;
     if (PT.hasSkill('stochastics_tutor')) chance += 0.10;
     if (PT.hasSkill('statistics_tutor')) chance += 0.10;
     if (PT.hasSkill('maths_tutor')) chance += 0.10;
     if (PT.hasSkill('professor_tutor')) chance += 0.20;
-    if (_charIs('trix')) chance += 0.10;
+    if (globalThis._charIs('trix')) chance += 0.10;
     return chance;
 }
 
 // Calculates the chance that a tutor item is NOT consumed on use.
 // Passive tree nodes increase the no-consume chance.
-function _primerCalcTutorNoConsumeChance() {
+export function _primerCalcTutorNoConsumeChance() {
     let noConsumeChance = 0;
     if (PT.hasSkill('careful_study')) noConsumeChance += 0.10;
     if (PT.hasSkill('efficient_tutoring')) noConsumeChance += 0.15;
@@ -824,15 +843,15 @@ function _primerCalcTutorNoConsumeChance() {
 }
 
 // Consumes one tutor item from the inventory (removes it, saves, rebuilds UI).
-function _primerConsumeTutorItem(item) {
-    STATE.inventory = STATE.inventory.filter(i => i.uid !== item.uid);
+export function _primerConsumeTutorItem(item) {
+    globalThis.STATE.inventory = globalThis.STATE.inventory.filter(i => i.uid !== item.uid);
     save();
     buildInventoryPanel();
 }
 
 // Locks the MC option buttons and visually highlights the correct answer
 // after the tutor succeeds on a multiple-choice question.
-function _primerTutorLockMultiChoice() {
+export function _primerTutorLockMultiChoice() {
     const optsEl = document.getElementById('primer-opts');
     if (!optsEl) return;
     Array.from(optsEl.children).forEach(btn => {
@@ -846,10 +865,10 @@ function _primerTutorLockMultiChoice() {
 // Fills the correct answer (formatted via the question's tolerance, see
 // mgFormatTutorAnswer in mathgate.js) before locking, so the player sees
 // WHAT the tutor solved instead of just a "solved" message.
-function _primerTutorLockNumericInput() {
+export function _primerTutorLockNumericInput() {
     const inp = document.getElementById('primer-input');
     if (inp && primerQuestion) {
-        const fill = (typeof mgFormatTutorAnswer === 'function') ? mgFormatTutorAnswer(primerQuestion) : '';
+        const fill = (typeof mgFormatTutorAnswer === 'function') ? globalThis.mgFormatTutorAnswer(primerQuestion) : '';
         if (fill !== '') inp.value = fill;
     }
     if (inp) inp.disabled = true;
@@ -859,7 +878,7 @@ function _primerTutorLockNumericInput() {
 
 // Handles a successful tutor attempt: plays audio, shows feedback, locks the
 // question UI, and chains to showPrimerResult(true).
-function _primerHandleTutorSuccess(fb) {
+export function _primerHandleTutorSuccess(fb) {
     questStat_tutorAnsweredCorrect();
     Audio_Manager.playSFX('tutorSuccess');
     fb.className = 'qr-result ok';
@@ -876,7 +895,7 @@ function _primerHandleTutorSuccess(fb) {
 
 // Handles a failed tutor attempt: plays audio and shows feedback.
 // The question remains active so the player can still answer manually.
-function _primerHandleTutorFailure(fb) {
+export function _primerHandleTutorFailure(fb) {
     Audio_Manager.playSFX('tutorFail');
     fb.className = 'qr-result bad';
     fb.textContent = t('itm_tutor_fail');
@@ -886,13 +905,13 @@ function _primerHandleTutorFailure(fb) {
 // modal: corner chip with 🎓 (📚 + unlimited uses when the super-tutor modifier
 // is active), and the item-count detail lives in the hover tooltip, not the
 // chip label.
-function _primerRefreshTutorButton() {
+export function _primerRefreshTutorButton() {
     const btn = document.getElementById('primer-tutor-btn');
     if (!btn) return;
 
-    const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
+    const superTutorEnabled = !!(typeof curMods !== 'undefined' && globalThis.curMods.superTutor);
     const tutorCount = _primerCountTutorItems();
-    const canUseTutor = superTutorEnabled || PT.hasSkill('tutor_enable') || _charIs('trix');
+    const canUseTutor = superTutorEnabled || PT.hasSkill('tutor_enable') || globalThis._charIs('trix');
 
     if (canUseTutor && (superTutorEnabled || tutorCount > 0)) {
         btn.style.display = 'flex';
@@ -909,10 +928,10 @@ function _primerRefreshTutorButton() {
 // succeeds; otherwise it finds the lowest-tier available tutor item, rolls
 // for consumption and success independently, then delegates to the success
 // or failure handler. Reuses the same mechanics as the math gate and quiz tutors.
-function primerUseTutor() {
+export function primerUseTutor() {
     if (!primerQuestion) return;
 
-    const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
+    const superTutorEnabled = !!(typeof curMods !== 'undefined' && globalThis.curMods.superTutor);
     const tutorItem = superTutorEnabled ? null : _primerFindLowestTierTutorItem();
     if (!superTutorEnabled && !tutorItem) return;
 

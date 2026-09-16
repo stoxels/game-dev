@@ -1,3 +1,12 @@
+﻿import { Audio_Manager } from '../audio/audio.js';
+import { save } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { _getGlobalCooldownReduction } from '../classes/class-cooldown-state.js';
+import { _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost, spendMana } from '../classes/class-mana.js';
+import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill } from './skill-charms.js';
+import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
+import { SKILL_REGISTRY } from './skill-registry.js';
+import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspBlinkFX, _uspFireThemedProjectile, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph } from './universal-spell-fx.js';
 // universal-spells.js
 //------------------------------------------------------------------------
 //--------------------UNIVERSAL SPELL ARSENAL-----------------------------
@@ -48,7 +57,7 @@
 // DoT ticks, channel ticks; AoE uses perTarget:true → "to each enemy").
 //------------------------------------------------------------------------
 
-const UNIVERSAL_SPELL_DEFS = [
+export const UNIVERSAL_SPELL_DEFS = [
     // ── FIRE ────────────────────────────────────────────────────────────
     {
         id: 'usp_pyroblast', icon: '☄️', theme: 'fire', element: 'fire', damageKind: 'fire',
@@ -771,19 +780,19 @@ const UNIVERSAL_SPELL_DEFS = [
     },
 ];
 
-const UNIVERSAL_SPELL_MAP = {};
+export const UNIVERSAL_SPELL_MAP = {};
 UNIVERSAL_SPELL_DEFS.forEach((d) => { UNIVERSAL_SPELL_MAP[d.id] = d; });
 
 // Group label fallback (used directly so no translation keys are required).
 // No emoji here - the spell book prefixes the section icon itself
 // (GROUP_ICONS in js/skills/skill-spellbook.js), so embedding one would
 // render it twice.
-function _uspGroupTitle() {
+export function _uspGroupTitle() {
     return (typeof LANG !== 'undefined' && LANG === 'de') ? 'Zauber' : 'Spells';
 }
 
 // Spellbook section header for the defensive family.
-function _uspSupportGroupTitle() {
+export function _uspSupportGroupTitle() {
     return (typeof LANG !== 'undefined' && LANG === 'de') ? 'Unterstützungszauber' : 'Support Spells';
 }
 
@@ -822,33 +831,33 @@ function _uspSupportGroupTitle() {
 //------------------------------------------------------------------------
 
 // Behaviours handled as self-casts (no monster target required).
-const USP_SUPPORT_BEHAVIORS = ['heal', 'hot', 'shield', 'guard', 'evade', 'ward', 'thorns'];
+export const USP_SUPPORT_BEHAVIORS = ['heal', 'hot', 'shield', 'guard', 'evade', 'ward', 'thorns'];
 
 // Sweep cadence. Also the paused-clock compensation step (the whole sweep is
 // skipped while paused and every expiry is pushed forward by one tick instead).
-const USP_BUFF_TICK_MS = 250;
+export const USP_BUFF_TICK_MS = 250;
 
 // Aegis Ward only spends a charge on a hit worth at least this share of the
 // player's maximum Life. Without it, a 5-damage ignite tick or a chip hazard
 // would silently eat a charge that was meant for the boss slam - the ward
 // would read as broken. Documented in the spell's description and tooltip.
-const USP_WARD_MIN_HIT_PCT = 5;
+export const USP_WARD_MIN_HIT_PCT = 5;
 
 // Active support buffs: { spellId, kind, icon, until, ...payload }.
-let _uspActiveBuffs = [];
-let _uspBuffSweepInterval = null;
+export let _uspActiveBuffs = [];
+export let _uspBuffSweepInterval = null;
 // Remaining full-hit negations from the Aegis Ward.
-let _uspWardCharges = 0;
+export let _uspWardCharges = 0;
 
 // True when the spell (id or def) is part of the defensive family.
-function isUniversalSupportSpell(spellOrId) {
+export function isUniversalSupportSpell(spellOrId) {
     const spell = (typeof spellOrId === 'string') ? UNIVERSAL_SPELL_MAP[spellOrId] : spellOrId;
     return !!spell && USP_SUPPORT_BEHAVIORS.indexOf(spell.behavior) !== -1;
 }
 
 // Cast rank: the slotted charm's rank, else the trained rank (js/skills/
 // skill-charms.js). Falls back to 1 before the charm system loads.
-function _uspCastRank(spellId) {
+export function _uspCastRank(spellId) {
     if (typeof getSkillCastRankFull === 'function') {
         try {
             const r = getSkillCastRankFull(spellId);
@@ -859,7 +868,7 @@ function _uspCastRank(spellId) {
 }
 
 // Rank multiplier for support magnitudes (the offensive curve).
-function _uspSupportRankMult(spellId) {
+export function _uspSupportRankMult(spellId) {
     if (typeof getSpellRankDamageMultForSkill === 'function') {
         try {
             const m = getSpellRankDamageMultForSkill(spellId);
@@ -878,12 +887,12 @@ function _uspSupportRankMult(spellId) {
 // supplied it answers "what would rank N be?" - which is what the spell rank
 // audit screen (js/skills/spell-rank-audit.js) asks. Keeping ONE calculator
 // for both means the audit tool cannot drift from the real cast.
-function _uspRankFor(spellId, rank) {
+export function _uspRankFor(spellId, rank) {
     if (rank != null) return Math.max(1, Math.round(Number(rank) || 1));
     return _uspCastRank(spellId);
 }
 
-function _uspSupportRankMultFor(spellId, rank) {
+export function _uspSupportRankMultFor(spellId, rank) {
     if (rank != null) {
         if (typeof getSpellRankDamageMult === 'function') {
             try {
@@ -909,10 +918,10 @@ function _uspSupportRankMultFor(spellId, rank) {
 // scaling those from gear would quietly raise a ceiling that exists to keep
 // boss specials fair. Healing power buys throughput inside the existing
 // limits, never a new one.
-function _uspHealingPower() {
+export function _uspHealingPower() {
     try {
-        if (typeof _egComputePlayerStats === 'function') {
-            const s = _egComputePlayerStats() || {};
+        if (typeof globalThis._egComputePlayerStats === 'function') {
+            const s = globalThis._egComputePlayerStats() || {};
             return {
                 flat: Math.max(0, Number(s.healingPowerFlat) || 0),
                 incPct: Math.max(0, Number(s.healingPowerIncPct) || 0),
@@ -922,28 +931,28 @@ function _uspHealingPower() {
     return { flat: 0, incPct: 0 };
 }
 
-function _uspApplyHealingPower(amount) {
+export function _uspApplyHealingPower(amount) {
     const hp = _uspHealingPower();
     return Math.max(1, Math.round(amount * (1 + hp.incPct / 100)) + hp.flat);
 }
 
 // base + perRank × (rank - 1), hard-capped. Used for every buff axis.
-function _uspRankAdditive(base, perRank, cap, rank) {
+export function _uspRankAdditive(base, perRank, cap, rank) {
     const value = (base || 0) + (perRank || 0) * (Math.max(1, rank) - 1);
     return (cap != null) ? Math.min(cap, value) : value;
 }
 
 // The player's Life pool (100 baseline before any gear).
-function _uspMaxLife() {
-    return (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
+export function _uspMaxLife() {
+    return (typeof globalThis.playerMaxHP !== 'undefined' && globalThis.playerMaxHP > 0) ? globalThis.playerMaxHP : 100;
 }
 
 // The player's Absorption pool - 0 without absorption gear, in which case
 // Barrier has nothing to refill and says so instead of silently no-oping.
-function _uspMaxAbsorption() {
+export function _uspMaxAbsorption() {
     try {
-        if (typeof _egComputePlayerStats === 'function') {
-            return Math.max(0, Math.round(_egComputePlayerStats().absorption || 0));
+        if (typeof globalThis._egComputePlayerStats === 'function') {
+            return Math.max(0, Math.round(globalThis._egComputePlayerStats().absorption || 0));
         }
     } catch (e) { /* outside an endgame level - no shield */ }
     return 0;
@@ -956,52 +965,52 @@ function _uspMaxAbsorption() {
 // The authored magnitude BEFORE healing power - flat×rank + %×pool. Kept
 // separate so the audit screen can show what the spell alone is worth and
 // what the player's gear adds on top of it.
-function _uspBaseHeal(spell, rank) {
+export function _uspBaseHeal(spell, rank) {
     const flat = Math.round((spell.healFlat || 0) * _uspSupportRankMultFor(spell.id, rank));
     const pct = Math.round(_uspMaxLife() * ((spell.healPct || 0) / 100));
     return Math.max(1, flat + pct);
 }
 
-function _uspBaseHotTick(spell, rank) {
+export function _uspBaseHotTick(spell, rank) {
     const flat = Math.round((spell.healTickFlat || 0) * _uspSupportRankMultFor(spell.id, rank));
     const pct = Math.round(_uspMaxLife() * ((spell.healTickPct || 0) / 100));
     return Math.max(1, flat + pct);
 }
 
-function _uspBaseAbsorb(spell, rank) {
+export function _uspBaseAbsorb(spell, rank) {
     const flat = Math.round((spell.absorbFlat || 0) * _uspSupportRankMultFor(spell.id, rank));
     const pct = Math.round(_uspMaxAbsorption() * ((spell.absorbPct || 0) / 100));
     return Math.max(1, flat + pct);
 }
 
 // The numbers the game actually casts with (authored magnitude + gear).
-function _uspCalcHeal(spell, rank) {
+export function _uspCalcHeal(spell, rank) {
     return _uspApplyHealingPower(_uspBaseHeal(spell, rank));
 }
 
-function _uspCalcHotTick(spell, rank) {
+export function _uspCalcHotTick(spell, rank) {
     return _uspApplyHealingPower(_uspBaseHotTick(spell, rank));
 }
 
-function _uspCalcAbsorb(spell, rank) {
+export function _uspCalcAbsorb(spell, rank) {
     return _uspApplyHealingPower(_uspBaseAbsorb(spell, rank));
 }
 
 // Rank-scaled buff axes (capped additively). No healing power here - see the
 // note above _uspHealingPower() for why the caps stay untouched.
-function _uspCalcDrPct(spell, rank) {
+export function _uspCalcDrPct(spell, rank) {
     return Math.round(_uspRankAdditive(spell.drPct, spell.drPctPerRank, spell.drPctCap, _uspRankFor(spell.id, rank)));
 }
-function _uspCalcArmourPct(spell, rank) {
+export function _uspCalcArmourPct(spell, rank) {
     return Math.round(_uspRankAdditive(spell.armourPct, spell.armourPctPerRank, spell.armourPctCap, _uspRankFor(spell.id, rank)));
 }
-function _uspCalcDodgePct(spell, rank) {
+export function _uspCalcDodgePct(spell, rank) {
     return Math.round(_uspRankAdditive(spell.dodgePct, spell.dodgePctPerRank, spell.dodgePctCap, _uspRankFor(spell.id, rank)));
 }
-function _uspCalcThornsPct(spell, rank) {
+export function _uspCalcThornsPct(spell, rank) {
     return Math.round(_uspRankAdditive(spell.thornsPct, spell.thornsPctPerRank, spell.thornsPctCap, _uspRankFor(spell.id, rank)));
 }
-function _uspCalcWardCharges(spell, rank) {
+export function _uspCalcWardCharges(spell, rank) {
     const raw = _uspRankAdditive(spell.wardCharges, spell.wardChargesPerRank, spell.wardChargesCap, _uspRankFor(spell.id, rank));
     return Math.max(1, Math.floor(raw));
 }
@@ -1011,39 +1020,39 @@ function _uspCalcWardCharges(spell, rank) {
 // ---------------------------------------------------------------------
 
 // Heals the player; returns the amount actually restored (0 at full Life).
-function _uspHealPlayer(amount) {
-    if (typeof playerCurrentHP !== 'undefined' && typeof playerMaxHP !== 'undefined') {
-        const before = playerCurrentHP;
-        playerCurrentHP = Math.min(playerMaxHP, before + Math.max(0, Math.round(amount)));
-        const gained = playerCurrentHP - before;
-        if (gained > 0 && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+export function _uspHealPlayer(amount) {
+    if (typeof globalThis.playerCurrentHP !== 'undefined' && typeof globalThis.playerMaxHP !== 'undefined') {
+        const before = globalThis.playerCurrentHP;
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, before + Math.max(0, Math.round(amount)));
+        const gained = globalThis.playerCurrentHP - before;
+        if (gained > 0 && typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         return gained;
     }
     return 0;
 }
 
 // Adds to the absorption shield; returns the amount actually gained.
-function _uspRestoreAbsorption(amount) {
-    if (typeof _egPlayerAbsorptionCurrent === 'undefined') return 0;
+export function _uspRestoreAbsorption(amount) {
+    if (typeof globalThis._egPlayerAbsorptionCurrent === 'undefined') return 0;
     const max = _uspMaxAbsorption();
     if (max <= 0) return 0;
-    const before = _egPlayerAbsorptionCurrent;
-    _egPlayerAbsorptionCurrent = Math.min(max, before + Math.max(0, Math.round(amount)));
-    return _egPlayerAbsorptionCurrent - before;
+    const before = globalThis._egPlayerAbsorptionCurrent;
+    globalThis._egPlayerAbsorptionCurrent = Math.min(max, before + Math.max(0, Math.round(amount)));
+    return globalThis._egPlayerAbsorptionCurrent - before;
 }
 
 // ---------------------------------------------------------------------
 // Buff registry (sweep, expiry, pause handling)
 // ---------------------------------------------------------------------
 
-function _uspStartBuffSweep() {
+export function _uspStartBuffSweep() {
     if (_uspBuffSweepInterval) return;
     _uspBuffSweepInterval = setInterval(_uspSweepSupportBuffs, USP_BUFF_TICK_MS);
 }
 
-function _uspSweepSupportBuffs() {
+export function _uspSweepSupportBuffs() {
     // Death ends every buff immediately - a corpse must not keep its ward.
-    if (typeof dead !== 'undefined' && dead) {
+    if (typeof globalThis.dead !== 'undefined' && globalThis.dead) {
         if (_uspActiveBuffs.length) _uspClearSupportBuffs();
         return;
     }
@@ -1053,7 +1062,7 @@ function _uspSweepSupportBuffs() {
     // letting wall-clock time eat the buff while the player reads a tooltip.
     // The armed Rift Anchor is a buff for exactly this reason: opening the
     // spell book must not eat the window you set up.
-    if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+    if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) {
         if (_uspAnchor) _uspAnchor.until += USP_BUFF_TICK_MS;
         if (!_uspActiveBuffs.length) return;
         for (const b of _uspActiveBuffs) {
@@ -1097,7 +1106,7 @@ function _uspSweepSupportBuffs() {
 
 // Adds (or refreshes) a buff. The payload carries the pre-computed, already
 // rank-scaled axis values so the combat hooks never re-derive anything.
-function _uspAddBuff(spell, payload) {
+export function _uspAddBuff(spell, payload) {
     const until = Date.now() + Math.max(1, spell.buffSeconds || 8) * 1000;
     const existing = _uspActiveBuffs.find((b) => b.spellId === spell.id);
     if (existing) {
@@ -1117,7 +1126,7 @@ function _uspAddBuff(spell, payload) {
 // a support buff must never carry into the next puzzle. The movement family
 // rides the same registry, so a Windstep and an armed Rift Anchor are cleared
 // here for free.
-function _uspClearSupportBuffs() {
+export function _uspClearSupportBuffs() {
     _uspActiveBuffs = [];
     _uspWardCharges = 0;
     _uspAnchor = null;
@@ -1131,7 +1140,7 @@ function _uspClearSupportBuffs() {
 // combat path pays nothing when no support buff is active.
 // ---------------------------------------------------------------------
 
-function _uspBuffSum(kind, field) {
+export function _uspBuffSum(kind, field) {
     let total = 0;
     for (const b of _uspActiveBuffs) if (b.kind === kind) total += (b[field] || 0);
     return total;
@@ -1141,7 +1150,7 @@ function _uspBuffSum(kind, field) {
 // returns non-null whenever ANY buff is up - the ward and Retribution have no
 // mitigation axes, so gating this on dodge/dr/armour would silently disable
 // them (they are read as separate fields by their own call sites).
-function _uspGetSupportMitigation() {
+export function _uspGetSupportMitigation() {
     if (!_uspActiveBuffs.length) return null;
     return {
         dodgePct: _uspBuffSum('evade', 'dodgePct'),
@@ -1153,7 +1162,7 @@ function _uspGetSupportMitigation() {
 
 // Flat + percentage damage reduction, applied after armour mitigation and
 // before the absorption shield (so a Bulwark also stretches the shield).
-function _uspApplySupportMitigation(mitigated) {
+export function _uspApplySupportMitigation(mitigated) {
     const p = _uspGetSupportMitigation();
     if (!p || !p.drPct) return mitigated;
     return Math.max(0, mitigated * (1 - p.drPct / 100));
@@ -1164,7 +1173,7 @@ function _uspApplySupportMitigation(mitigated) {
 // `incoming` is the raw pre-mitigation amount; hits below the threshold
 // (USP_WARD_MIN_HIT_PCT of max Life) pass through so chip damage cannot
 // waste a charge, and a charge is never spent by a zero-damage call.
-function _uspTryWardNegate(incoming) {
+export function _uspTryWardNegate(incoming) {
     if (_uspWardCharges <= 0) return false;
     if (!(incoming > 0)) return false;
     if (incoming < _uspMaxLife() * (USP_WARD_MIN_HIT_PCT / 100)) return false;
@@ -1174,9 +1183,9 @@ function _uspTryWardNegate(incoming) {
     }
     _uspWardCharges -= 1;
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
-    if (typeof showToast === 'function') {
+    if (typeof globalThis.showToast === 'function') {
         const left = _uspWardCharges > 0 ? ` (${_uspWardCharges} ${de ? 'übrig' : 'left'})` : '';
-        showToast(`${de ? '✨ Ägis-Schutz absorbiert den Treffer!' : '✨ Aegis Ward absorbed the hit!'}${left}`, '#ffe082');
+        globalThis.showToast(`${de ? '✨ Ägis-Schutz absorbiert den Treffer!' : '✨ Aegis Ward absorbed the hit!'}${left}`, '#ffe082');
     }
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
         try { Audio_Manager.playSFX('player_shield_damage_taken'); } catch (e) { /* audio is best-effort */ }
@@ -1188,21 +1197,21 @@ function _uspTryWardNegate(incoming) {
 // Reflects a share of an incoming hit back at its attacker. `incoming` is
 // the PRE-mitigation amount, so Retribution scales with the size of the hit
 // rather than with how well the player happened to mitigate it.
-function _uspReflectThorns(attacker, incoming) {
+export function _uspReflectThorns(attacker, incoming) {
     if (!attacker || !attacker.id) return;
     const pct = _uspBuffSum('thorns', 'thornsPct');
     if (pct <= 0 || !(incoming > 0)) return;
-    if (typeof _egDamageTargetById !== 'function') return;
+    if (typeof globalThis._egDamageTargetById !== 'function') return;
     const dealt = Math.max(1, Math.round(incoming * pct / 100));
     try {
-        _egDamageTargetById(attacker.id, dealt, {}, {});
+        globalThis._egDamageTargetById(attacker.id, dealt, {}, {});
         const de = (typeof LANG !== 'undefined' && LANG === 'de');
-        if (typeof showToast === 'function') showToast(`🔥 ${de ? 'Vergeltung' : 'Retribution'} (-${dealt})`, '#ff8a65');
+        if (typeof globalThis.showToast === 'function') globalThis.showToast(`🔥 ${de ? 'Vergeltung' : 'Retribution'} (-${dealt})`, '#ff8a65');
     } catch (e) { /* reflection is best-effort - never break the damage path */ }
 }
 
 // True while any support buff is up (used by the tooltip / icon strip).
-function isUspSupportBuffActive(kind) {
+export function isUspSupportBuffActive(kind) {
     const now = Date.now();
     return _uspActiveBuffs.some((b) => b.until > now && (!kind || b.kind === kind));
 }
@@ -1211,7 +1220,7 @@ function isUspSupportBuffActive(kind) {
 // Player status-strip icons (js/endgame/endgame-ailments.js appends this)
 // ---------------------------------------------------------------------
 
-function _uspSupportStatusSignature() {
+export function _uspSupportStatusSignature() {
     const now = Date.now();
     return _uspActiveBuffs
         .filter((b) => b.until > now)
@@ -1219,7 +1228,7 @@ function _uspSupportStatusSignature() {
         .join(',');
 }
 
-function _uspBuildSupportStatusIconsHTML() {
+export function _uspBuildSupportStatusIconsHTML() {
     const now = Date.now();
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     return _uspActiveBuffs
@@ -1228,14 +1237,14 @@ function _uspBuildSupportStatusIconsHTML() {
             const secs = Math.ceil((b.until - now) / 1000);
             const label = de ? (b.nameDE || b.nameEn) : b.nameEn;
             const charges = (b.kind === 'ward' && _uspWardCharges > 0) ? `×${_uspWardCharges} ` : '';
-            return `<span class="eg-status-icon usp-buff-icon usp-buff-${b.kind}" data-tip="${_tipAttr(label)}">${b.icon}${charges}${secs}</span>`;
+            return `<span class="eg-status-icon usp-buff-icon usp-buff-${b.kind}" data-tip="${globalThis._tipAttr(label)}">${b.icon}${charges}${secs}</span>`;
         })
         .join('');
 }
 
 // Forces the shared player status strip to rebuild on its next tick without
 // waiting for an ailment change (the sentinel never matches a real signature).
-function _uspForceBuffIconRefresh() {
+export function _uspForceBuffIconRefresh() {
     const strip = document.getElementById('eg-player-status-strip');
     if (strip) strip.dataset.sig = '__usp_dirty__';
 }
@@ -1246,7 +1255,7 @@ function _uspForceBuffIconRefresh() {
 
 // Applies a support spell's effect. Called from castUniversalSpell once the
 // mana and the cooldown are committed. Returns a short toast-ready summary.
-function _uspApplySupportSpell(spell) {
+export function _uspApplySupportSpell(spell) {
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     switch (spell.behavior) {
         case 'heal': {
@@ -1277,8 +1286,8 @@ function _uspApplySupportSpell(spell) {
                 // No absorption gear → there is no shield to refill. The cast
                 // still cost mana and started its cooldown, so say so plainly
                 // rather than pretending it worked.
-                if (typeof showToast === 'function') {
-                    showToast(de ? '🔷 Keine Absorptionsausrüstung - kein Schild zum Auffüllen!' : '🔷 No absorption gear - nothing to refill!', '#ff8a65');
+                if (typeof globalThis.showToast === 'function') {
+                    globalThis.showToast(de ? '🔷 Keine Absorptionsausrüstung - kein Schild zum Auffüllen!' : '🔷 No absorption gear - nothing to refill!', '#ff8a65');
                 }
                 return de ? 'kein Schild' : 'no shield';
             }
@@ -1325,7 +1334,7 @@ function _uspApplySupportSpell(spell) {
 
 // Tooltip/estimate payload for a support spell: exactly what the cast will
 // deliver at the current rank and pools, so the book never lies.
-function getUniversalSpellSupportEstimate(spellId) {
+export function getUniversalSpellSupportEstimate(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell || !isUniversalSupportSpell(spell)) return null;
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
@@ -1403,42 +1412,42 @@ function getUniversalSpellSupportEstimate(spellId) {
 //------------------------------------------------------------------------
 
 // Behaviours handled as self-casts that reposition the player.
-const USP_MOVEMENT_BEHAVIORS = ['blink', 'dash', 'disengage', 'windstep', 'anchor'];
+export const USP_MOVEMENT_BEHAVIORS = ['blink', 'dash', 'disengage', 'windstep', 'anchor'];
 
 // The four walking directions, as unit vectors.
-const USP_DIR_VECTORS = {
+export const USP_DIR_VECTORS = {
     up: { x: 0, y: -1 }, down: { x: 0, y: 1 },
     left: { x: -1, y: 0 }, right: { x: 1, y: 0 },
 };
 
 // Armed Rift Anchor: { x, y, until } or null. One at a time, by design - a
 // second anchor replaces the first rather than stacking escapes.
-let _uspAnchor = null;
+export let _uspAnchor = null;
 
 // Supersede token for in-flight glides: a newer movement cast cancels the
 // glide it was cast during instead of fighting it for the avatar's position.
-let _uspGlideSeq = 0;
+export let _uspGlideSeq = 0;
 
 // True when the spell (id or def) is part of the movement family.
-function isUniversalMovementSpell(spellOrId) {
+export function isUniversalMovementSpell(spellOrId) {
     const spell = (typeof spellOrId === 'string') ? UNIVERSAL_SPELL_MAP[spellOrId] : spellOrId;
     return !!spell && USP_MOVEMENT_BEHAVIORS.indexOf(spell.behavior) !== -1;
 }
 
 // True for the families that need a live encounter but no monster target.
-function _uspIsSelfCastSpell(spell) {
+export function _uspIsSelfCastSpell(spell) {
     return isUniversalSupportSpell(spell) || isUniversalMovementSpell(spell);
 }
 
 // Jump distance at the charm's cast rank.
-function _uspCalcMoveDistance(spell) {
+export function _uspCalcMoveDistance(spell) {
     return Math.round(_uspRankAdditive(
         spell.moveBasePx || 0, spell.movePxPerRank || 0, spell.movePxCap || 0,
         _uspCastRank(spell.id)));
 }
 
 // Movement-speed share granted by Windstep / Disengage, at the cast rank.
-function _uspCalcMoveSpeedPct(spell) {
+export function _uspCalcMoveSpeedPct(spell) {
     return Math.round(_uspRankAdditive(
         spell.speedPct || 0, spell.speedPctPerRank || 0, spell.speedPctCap || 0,
         _uspCastRank(spell.id)));
@@ -1448,7 +1457,7 @@ function _uspCalcMoveSpeedPct(spell) {
 // _avatarGetMoveSpeed() in js/sprite/player_sprite.js - typeof-guarded there,
 // so the sprite is independent of this file. Returns exactly 1 when nothing
 // is up, so walking pays nothing for the check.
-function _uspMovementSpeedMult() {
+export function _uspMovementSpeedMult() {
     if (!_uspActiveBuffs.length) return 1;
     let pct = 0;
     for (const b of _uspActiveBuffs) if (b.speedPct) pct += b.speedPct;
@@ -1460,7 +1469,7 @@ function _uspMovementSpeedMult() {
 // ---------------------------------------------------------------------
 
 // The live player sprite, or null when the avatar is not on screen.
-function _uspAvatarEl() {
+export function _uspAvatarEl() {
     return document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
 }
@@ -1468,7 +1477,7 @@ function _uspAvatarEl() {
 // Current sprite position in viewport coordinates. Precedence matches the
 // walk loop's own (js/sprite/player_sprite.js): float accumulator → inline
 // style → rendered rect, so a blink never starts from a stale corner.
-function _uspAvatarPos() {
+export function _uspAvatarPos() {
     const el = _uspAvatarEl();
     if (!el) return null;
     let x = parseFloat(el.dataset.avatarFx);
@@ -1489,9 +1498,9 @@ function _uspAvatarPos() {
 // snapping back to the pre-cast value. Returns the CLAMPED position that was
 // actually achieved - _setAvatarPos() keeps the sprite inside the viewport,
 // and the FX/toast should report where you really ended up.
-function _uspAvatarWrite(el, x, y, dir) {
-    if (typeof _setAvatarPos === 'function') {
-        try { _setAvatarPos(el, x, y, dir || null); } catch (e) { /* fall through to the raw write */ }
+export function _uspAvatarWrite(el, x, y, dir) {
+    if (typeof globalThis._setAvatarPos === 'function') {
+        try { globalThis._setAvatarPos(el, x, y, dir || null); } catch (e) { /* fall through to the raw write */ }
     } else {
         const w = el.offsetWidth || 72;
         const h = el.offsetHeight || 90;
@@ -1508,7 +1517,7 @@ function _uspAvatarWrite(el, x, y, dir) {
 
 // The direction the sprite's art is mirrored towards ('left' / 'right'), used
 // only until the player has walked once. Null when neither sprite exists.
-function _uspMirrorDir() {
+export function _uspMirrorDir() {
     const img = document.getElementById('avatar-sprite-img')
         || document.getElementById('avatar-sprite-img-simple');
     if (!img || !img.style) return null;
@@ -1519,10 +1528,10 @@ function _uspMirrorDir() {
 }
 
 // Which way this cast goes: last walked direction → mirrored facing → 'right'.
-function _uspAimDir() {
+export function _uspAimDir() {
     let dir = null;
-    if (typeof getAvatarLastMoveDir === 'function') {
-        try { dir = getAvatarLastMoveDir(); } catch (e) { dir = null; }
+    if (typeof globalThis.getAvatarLastMoveDir === 'function') {
+        try { dir = globalThis.getAvatarLastMoveDir(); } catch (e) { dir = null; }
     }
     if (!USP_DIR_VECTORS[dir]) dir = _uspMirrorDir();
     return USP_DIR_VECTORS[dir] ? dir : 'right';
@@ -1533,7 +1542,7 @@ function _uspAimDir() {
 // once on the first frame (that is what _setAvatarPos does when handed a
 // direction); intermediate frames pass no direction so the running cycle is
 // not restarted 60 times a second.
-function _uspGlide(el, fromX, fromY, toX, toY, ms, dir) {
+export function _uspGlide(el, fromX, fromY, toX, toY, ms, dir) {
     const seq = ++_uspGlideSeq;
     const dur = Math.max(60, ms || 200);
     const t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
@@ -1554,17 +1563,17 @@ function _uspGlide(el, fromX, fromY, toX, toY, ms, dir) {
 // Rift Anchor state
 // ---------------------------------------------------------------------
 
-function isUspAnchorArmed() {
+export function isUspAnchorArmed() {
     return !!(_uspAnchor && _uspAnchor.until > Date.now());
 }
 
-function getUspAnchorRemainingSeconds() {
+export function getUspAnchorRemainingSeconds() {
     if (!isUspAnchorArmed()) return 0;
     return Math.max(1, Math.ceil((_uspAnchor.until - Date.now()) / 1000));
 }
 
 // Drops the armed anchor (and its world marker). Safe to call unconditionally.
-function _uspClearAnchor() {
+export function _uspClearAnchor() {
     _uspAnchor = null;
     _uspActiveBuffs = _uspActiveBuffs.filter((b) => b.kind !== 'anchor');
     if (typeof _uspAnchorMarkerClear === 'function') _uspAnchorMarkerClear();
@@ -1577,7 +1586,7 @@ function _uspClearAnchor() {
 // Applies a movement spell. Returns { text, flavor, cooldown? } - `cooldown`
 // overrides the spell's normal cooldown for this cast (the Rift Anchor's
 // PLACE cast is deliberately cheap so the recall can follow).
-function _uspApplyMovementSpell(spell) {
+export function _uspApplyMovementSpell(spell) {
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     const pos = _uspAvatarPos();
     if (!pos) return { text: de ? 'kein Spielersprite' : 'no player sprite', flavor: 'wasted' };
@@ -1665,7 +1674,7 @@ function _uspApplyMovementSpell(spell) {
 // Tooltip/estimate payload for a movement spell: the concrete jump and window
 // at the current rank, plus the armed-anchor state so the tooltip can tell you
 // what the NEXT cast will do rather than what the spell does in general.
-function getUniversalSpellMovementEstimate(spellId) {
+export function getUniversalSpellMovementEstimate(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell || !isUniversalMovementSpell(spell)) return null;
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
@@ -1724,7 +1733,7 @@ function getUniversalSpellMovementEstimate(spellId) {
 }
 
 // Movement-spell section header for the spell book.
-function _uspMovementGroupTitle() {
+export function _uspMovementGroupTitle() {
     return (typeof LANG !== 'undefined' && LANG === 'de') ? 'Bewegungszauber' : 'Movement Spells';
 }
 
@@ -1739,28 +1748,28 @@ function _uspMovementGroupTitle() {
 // When you design the gating system later, just write the array (and call
 // refreshSkillUI()). Helpers below cover the rest.
 
-function getUniversalSpellUnlockList() {
+export function getUniversalSpellUnlockList() {
     try {
-        if (typeof STATE !== 'undefined' && Array.isArray(STATE.universalSpellsUnlocked)) {
-            return STATE.universalSpellsUnlocked;
+        if (typeof globalThis.STATE !== 'undefined' && Array.isArray(globalThis.STATE.universalSpellsUnlocked)) {
+            return globalThis.STATE.universalSpellsUnlocked;
         }
     } catch (e) { /* no gating configured */ }
     return null; // null = all unlocked
 }
 
-function isUniversalSpellUnlocked(spellId) {
+export function isUniversalSpellUnlocked(spellId) {
     const list = getUniversalSpellUnlockList();
     if (!list) return true;
     return list.indexOf(spellId) !== -1;
 }
 
 // Unlock one spell (persists via save()).
-function unlockUniversalSpell(spellId) {
-    if (typeof STATE === 'undefined' || !STATE) return false;
+export function unlockUniversalSpell(spellId) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return false;
     if (!UNIVERSAL_SPELL_MAP[spellId]) return false;
-    if (!Array.isArray(STATE.universalSpellsUnlocked)) STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
-    if (STATE.universalSpellsUnlocked.indexOf(spellId) === -1) {
-        STATE.universalSpellsUnlocked.push(spellId);
+    if (!Array.isArray(globalThis.STATE.universalSpellsUnlocked)) globalThis.STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
+    if (globalThis.STATE.universalSpellsUnlocked.indexOf(spellId) === -1) {
+        globalThis.STATE.universalSpellsUnlocked.push(spellId);
         if (typeof save === 'function') save();
         if (typeof refreshSkillUI === 'function') refreshSkillUI();
     }
@@ -1768,27 +1777,27 @@ function unlockUniversalSpell(spellId) {
 }
 
 // (Re-)lock one spell - used by the future gating system / testing.
-function lockUniversalSpell(spellId) {
-    if (typeof STATE === 'undefined' || !STATE) return false;
-    if (!Array.isArray(STATE.universalSpellsUnlocked)) STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
-    const i = STATE.universalSpellsUnlocked.indexOf(spellId);
+export function lockUniversalSpell(spellId) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return false;
+    if (!Array.isArray(globalThis.STATE.universalSpellsUnlocked)) globalThis.STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
+    const i = globalThis.STATE.universalSpellsUnlocked.indexOf(spellId);
     if (i !== -1) {
-        STATE.universalSpellsUnlocked.splice(i, 1);
+        globalThis.STATE.universalSpellsUnlocked.splice(i, 1);
         if (typeof save === 'function') save();
         if (typeof refreshSkillUI === 'function') refreshSkillUI();
     }
     return true;
 }
 
-function isUniversalSpellId(skillId) {
+export function isUniversalSpellId(skillId) {
     return !!UNIVERSAL_SPELL_MAP[skillId];
 }
 
-function getUniversalSpellDef(spellId) {
+export function getUniversalSpellDef(spellId) {
     return UNIVERSAL_SPELL_MAP[spellId] || null;
 }
 
-function _uspUnlockHint(spell) {
+export function _uspUnlockHint(spell) {
     if (!spell) return '';
     if (typeof LANG !== 'undefined' && LANG === 'de') {
         return spell.unlockHintDE || 'Dieser Zauber ist noch versiegelt. Die Bedingung wird später enthüllt.';
@@ -1808,7 +1817,7 @@ function _uspUnlockHint(spell) {
 //   spell.damageKind: fire|cold|lightning|shadow|arcane|holy|nature|physical
 //   spell.scalingTags: spell + kind + area|projectile|dot|chain|channel
 
-function getUniversalSpellDamageBonus(spell) {
+export function getUniversalSpellDamageBonus(spell) {
     let flat = 0;
     let incPct = 0;
     try {
@@ -1826,7 +1835,7 @@ function getUniversalSpellDamageBonus(spell) {
 //-------------------------MANA & COOLDOWN--------------------------------
 //------------------------------------------------------------------------
 
-function getUniversalSpellManaCost(spellId) {
+export function getUniversalSpellManaCost(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell) return 0;
     let cost = spell.manaCost || 0;
@@ -1840,7 +1849,7 @@ function getUniversalSpellManaCost(spellId) {
     return cost;
 }
 
-function canAffordUniversalSpell(spellId) {
+export function canAffordUniversalSpell(spellId) {
     const cost = getUniversalSpellManaCost(spellId);
     if (!cost || cost <= 0) return true;
     try {
@@ -1851,7 +1860,7 @@ function canAffordUniversalSpell(spellId) {
     return (typeof canAffordMana === 'function') ? canAffordMana(cost) : true;
 }
 
-function getUniversalSpellEffectiveCooldown(spellId) {
+export function getUniversalSpellEffectiveCooldown(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell) return 0;
     const base = spell.cooldownSeconds || 0;
@@ -1866,7 +1875,7 @@ function getUniversalSpellEffectiveCooldown(spellId) {
 }
 
 // Per-spell live cooldowns (session-only, like the legacy slots).
-const _uspCooldowns = {}; // spellId → { remaining, interval }
+export const _uspCooldowns = {}; // spellId → { remaining, interval }
 
 // ---------------------------------------------------------------------
 // CHARGE-BASED COOLDOWNS
@@ -1889,17 +1898,17 @@ const _uspCooldowns = {}; // spellId → { remaining, interval }
 // a pause-aware interval, exactly like the plain-cooldown tick below: the
 // sweep skips while _gamePaused / dead, so pausing (spell book open) does
 // not burn recharge time.
-const _uspCharges = {}; // spellId → charge state
+export const _uspCharges = {}; // spellId → charge state
 
 // Charge config for a spell, or null when the spell is plain-cooldown.
-function _uspChargeConfig(spellOrId) {
+export function _uspChargeConfig(spellOrId) {
     const spell = (typeof spellOrId === 'string') ? getUniversalSpellDef(spellOrId) : spellOrId;
     if (!spell || !spell.chargeMax || spell.chargeMax < 1) return null;
     return { max: spell.chargeMax, recharge: spell.chargeRechargeSeconds || spell.cooldownSeconds || 0 };
 }
 
 // Live charge pool for a spell (session-only): starts full, never persists.
-function _uspChargeState(spellId, cfg) {
+export function _uspChargeState(spellId, cfg) {
     let st = _uspCharges[spellId];
     if (!st) {
         st = _uspCharges[spellId] = { current: cfg.max, pending: [], interval: null };
@@ -1910,7 +1919,7 @@ function _uspChargeState(spellId, cfg) {
 // Schedules one spent charge for recharge and starts the shared ticker.
 // Recharge intentionally ignores cooldown-reduction passives (flat seconds
 // like Celerity would zero out short pools) - it uses the authored time.
-function _uspScheduleRecharge(spellId, cfg) {
+export function _uspScheduleRecharge(spellId, cfg) {
     const st = _uspChargeState(spellId, cfg);
     const scale = (typeof window !== 'undefined' && window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)
         ? window.STOX_EFFECT_TIME_SCALE : 1;
@@ -1918,8 +1927,8 @@ function _uspScheduleRecharge(spellId, cfg) {
     if (st.interval) return;
     st.interval = setInterval(() => {
         try {
-            if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
-            if (typeof dead !== 'undefined' && dead) return;
+            if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return;
+            if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return;
         } catch (e) {}
         const liveCfg = _uspChargeConfig(spellId);
         const live = _uspCharges[spellId];
@@ -1947,7 +1956,7 @@ function _uspScheduleRecharge(spellId, cfg) {
 }
 
 // Charges currently held (null for plain-cooldown spells).
-function getUniversalSpellCharges(spellId) {
+export function getUniversalSpellCharges(spellId) {
     const cfg = _uspChargeConfig(spellId);
     if (!cfg) return null;
     const st = _uspChargeState(spellId, cfg);
@@ -1955,7 +1964,7 @@ function getUniversalSpellCharges(spellId) {
 }
 
 // Seconds until the NEXT charge returns, or 0 when the pool is full.
-function getUniversalSpellChargeRechargeRemaining(spellId) {
+export function getUniversalSpellChargeRechargeRemaining(spellId) {
     const cfg = _uspChargeConfig(spellId);
     if (!cfg) return 0;
     const st = _uspChargeState(spellId, cfg);
@@ -1963,7 +1972,7 @@ function getUniversalSpellChargeRechargeRemaining(spellId) {
 }
 
 // Consumes one charge; returns false when the pool is empty (cast is refused).
-function _uspConsumeCharge(spellId) {
+export function _uspConsumeCharge(spellId) {
     const cfg = _uspChargeConfig(spellId);
     if (!cfg) return true; // not a charge spell - nothing to spend
     const st = _uspChargeState(spellId, cfg);
@@ -1978,7 +1987,7 @@ function _uspConsumeCharge(spellId) {
 
 // Empties the charge pools (round-end reset). Clears the tickers so a reset
 // cannot leave an interval counting down against a dead pool.
-function _uspClearAllCharges() {
+export function _uspClearAllCharges() {
     Object.keys(_uspCharges).forEach((id) => {
         const st = _uspCharges[id];
         if (st.interval) { clearInterval(st.interval); st.interval = null; }
@@ -1991,7 +2000,7 @@ function _uspClearAllCharges() {
 // cooldown reads as the wait for the NEXT charge (0 while any charge left,
 // which mirrors the old single-cooldown behaviour where casting again was
 // only blocked while the one cooldown ran).
-function getUniversalSpellCooldownRemaining(spellId) {
+export function getUniversalSpellCooldownRemaining(spellId) {
     const charges = getUniversalSpellCharges(spellId);
     if (charges) {
         return charges.current > 0 ? 0 : getUniversalSpellChargeRechargeRemaining(spellId);
@@ -2004,7 +2013,7 @@ function getUniversalSpellCooldownRemaining(spellId) {
 // Rift Anchor's `secondsOverride` shortens this one cast's cooldown - used
 // by its PLACE cast, which must be cheap (3s) so the recall can actually
 // follow it; the recall itself takes the spell's full cooldown.
-function startUniversalSpellCooldown(spellId, secondsOverride) {
+export function startUniversalSpellCooldown(spellId, secondsOverride) {
     // Charge-based spells are committed through _uspConsumeCharge (see the
     // cast path). A call here is a deliberate no-op so a late re-time (the
     // Rift Anchor's PLACE cast re-cooldown) can never double-spend a charge.
@@ -2025,8 +2034,8 @@ function startUniversalSpellCooldown(spellId, secondsOverride) {
     }
     state.interval = setInterval(() => {
         try {
-            if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
-            if (typeof dead !== 'undefined' && dead) return;
+            if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return;
+            if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return;
         } catch (e) {}
         state.remaining -= 1;
         if (state.remaining <= 0) {
@@ -2055,18 +2064,18 @@ function startUniversalSpellCooldown(spellId, secondsOverride) {
 // Physical spells scale with physical gear (physFlat/physIncPct) instead
 // of spell damage - warrior gear, not caster gear.
 
-function _uspRollCritMult() {
+export function _uspRollCritMult() {
     try {
-        if (typeof _egComputePlayerStats === 'function' && typeof _egRollCrit === 'function') {
-            return _egRollCrit(_egComputePlayerStats());
+        if (typeof globalThis._egComputePlayerStats === 'function' && typeof globalThis._egRollCrit === 'function') {
+            return globalThis._egRollCrit(globalThis._egComputePlayerStats());
         }
     } catch (e) { /* no crit backend - normal hit */ }
     return 1;
 }
 
-function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
-    const stats = (typeof _egComputePlayerStats === 'function')
-        ? _egComputePlayerStats() : {};
+export function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
+    const stats = (typeof globalThis._egComputePlayerStats === 'function')
+        ? globalThis._egComputePlayerStats() : {};
     const tree = getUniversalSpellDamageBonus(spell);
     const isPhys = spell.damageKind === 'physical';
 
@@ -2082,13 +2091,13 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
     const critMult = _uspRollCritMult();
     const isCrit = critMult > 1;
     dmg *= critMult;
-    if (isCrit && typeof showToast === 'function') {
-        try { showToast('💥 Critical Hit!'); } catch (e) { /* toast is best-effort */ }
+    if (isCrit && typeof globalThis.showToast === 'function') {
+        try { globalThis.showToast('💥 Critical Hit!'); } catch (e) { /* toast is best-effort */ }
     }
 
     try {
-        if (typeof _egMapPlayerDamageMult === 'function') dmg *= _egMapPlayerDamageMult();
-        if (typeof _egQuizDamageBuffMult === 'function') dmg *= _egQuizDamageBuffMult();
+        if (typeof globalThis._egMapPlayerDamageMult === 'function') dmg *= globalThis._egMapPlayerDamageMult();
+        if (typeof globalThis._egQuizDamageBuffMult === 'function') dmg *= globalThis._egQuizDamageBuffMult();
         // Charm orbs applied to this spell's charm: +1% damage each
         // (js/skills/skill-charms.js).
         if (typeof getCharmSkillDamageMult === 'function') dmg *= getCharmSkillDamageMult(spell.id);
@@ -2104,11 +2113,11 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
 
     // Life leech mirrors the weapon channels (heal on spell hits too).
     try {
-        if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
+        if (stats.lifeLeechPct > 0 && typeof globalThis.playerCurrentHP !== 'undefined') {
             const heal = Math.round(amount * (stats.lifeLeechPct / 100));
-            if (heal > 0 && typeof playerMaxHP !== 'undefined') {
-                playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
-                if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+            if (heal > 0 && typeof globalThis.playerMaxHP !== 'undefined') {
+                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+                if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
             }
         }
     } catch (e) { /* leech is best-effort */ }
@@ -2117,7 +2126,7 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
 }
 
 // Tooltip estimate (outside encounters gear still applies via stats).
-function getUniversalSpellDamageEstimate(spellId) {
+export function getUniversalSpellDamageEstimate(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell) return null;
     // Support spells carry no damage payload at all - their numbers live in
@@ -2146,7 +2155,7 @@ function getUniversalSpellDamageEstimate(spellId) {
 //------------------------------CASTING-----------------------------------
 //------------------------------------------------------------------------
 
-function _uspPlaySfx(spell) {
+export function _uspPlaySfx(spell) {
     try {
         if (spell && spell.sfx && typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
             Audio_Manager.playSFX(spell.sfx);
@@ -2154,15 +2163,15 @@ function _uspPlaySfx(spell) {
     } catch (e) { /* audio is best-effort */ }
 }
 
-function _uspLivingMonsters() {
+export function _uspLivingMonsters() {
     try {
-        if (typeof _egMonsters === 'undefined' || !_egMonsters) return [];
-        return _egMonsters.filter((m) => m && m.currentHP > 0);
+        if (typeof globalThis._egMonsters === 'undefined' || !globalThis._egMonsters) return [];
+        return globalThis._egMonsters.filter((m) => m && m.currentHP > 0);
     } catch (e) { return []; }
 }
 
-function _uspNoTargetToast(spell) {
-    if (typeof showToast !== 'function') return;
+export function _uspNoTargetToast(spell) {
+    if (typeof globalThis.showToast !== 'function') return;
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     // Self-cast families never need a monster - if they got here it is because
     // there is no fight running, so say that instead of blaming the target.
@@ -2171,36 +2180,36 @@ function _uspNoTargetToast(spell) {
     const msg = selfCast
         ? (de ? `✋ ${name} braucht einen laufenden Kampf!` : `✋ ${name} needs a live encounter!`)
         : (de ? `🔮 ${name} braucht ein Monster als Ziel!` : `🔮 ${name} needs a monster target!`);
-    showToast(msg, '#7fb3ff');
+    globalThis.showToast(msg, '#7fb3ff');
 }
 
 // Deals one rolled hit to a monster id (FX first, damage on impact).
-function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
+export function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
     if (!monsterId) return;
     const hit = calcUniversalSpellHit(spell, dmgMin, dmgMax);
     const fxOpts = Object.assign({ isCrit: hit.isCrit }, opts || {});
     try {
         if (typeof _uspFireThemedProjectile === 'function') {
             _uspFireThemedProjectile(spell, monsterId, hit, fxOpts);
-        } else if (typeof _egDamageTargetById === 'function') {
-            _egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true });
+        } else if (typeof globalThis._egDamageTargetById === 'function') {
+            globalThis._egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true });
         }
     } catch (e) {
-        try { _egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true }); } catch (e2) {}
+        try { globalThis._egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true }); } catch (e2) {}
     }
 }
 
 // Main entry: cast a universal spell by id. Returns true if cast.
-function castUniversalSpell(spellId) {
+export function castUniversalSpell(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell) return false;
     try {
-        if (typeof dead !== 'undefined' && dead) return false;
+        if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return false;
     } catch (e) {}
 
     // Locked (future gating) - show the requirement, spend nothing.
     if (!isUniversalSpellUnlocked(spellId)) {
-        if (typeof showToast === 'function') showToast('🔒 ' + _uspUnlockHint(spell), '#aaa');
+        if (typeof globalThis.showToast === 'function') globalThis.showToast('🔒 ' + _uspUnlockHint(spell), '#aaa');
         return false;
     }
 
@@ -2210,12 +2219,12 @@ function castUniversalSpell(spellId) {
     // lands). Cost and cooldown are NOT consumed when the cast is refused
     // (mirrors the Fireball rule).
     let encounterOn = false;
-    try { encounterOn = (typeof _egIsActive === 'function') && _egIsActive(); } catch (e) {}
+    try { encounterOn = (typeof globalThis._egIsActive === 'function') && globalThis._egIsActive(); } catch (e) {}
     const isSupport = isUniversalSupportSpell(spell);
     const isMovement = isUniversalMovementSpell(spell);
     const living = _uspLivingMonsters();
     let target = null;
-    try { target = (typeof _egGetTarget === 'function') ? _egGetTarget() : null; } catch (e) {}
+    try { target = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null; } catch (e) {}
     if (!encounterOn || (!(isSupport || isMovement) && (living.length === 0 || !target))) {
         _uspNoTargetToast(spell);
         return false;
@@ -2225,8 +2234,8 @@ function castUniversalSpell(spellId) {
     // Checked HERE, before mana and cooldown are committed, so a hidden
     // avatar costs nothing (the apply path can only find it at cast time).
     if (isMovement && !_uspAvatarEl()) {
-        if (typeof showToast === 'function') {
-            showToast((typeof LANG !== 'undefined' && LANG === 'de')
+        if (typeof globalThis.showToast === 'function') {
+            globalThis.showToast((typeof LANG !== 'undefined' && LANG === 'de')
                 ? '✋ Kein Spielersprite auf dem Bildschirm!'
                 : '✋ No player sprite on screen!', '#ff8a65');
         }
@@ -2244,18 +2253,18 @@ function castUniversalSpell(spellId) {
     const cost = getUniversalSpellManaCost(spellId);
     if (typeof payAbilityCost === 'function') {
         if (!payAbilityCost(cost)) {
-            if (typeof showToast === 'function') {
+            if (typeof globalThis.showToast === 'function') {
                 let noMana = 'cls_no_mana';
                 try {
                     if (typeof _bloodMagicActive === 'function' && _bloodMagicActive()) noMana = 'cls_no_life';
                 } catch (e) {}
-                showToast(t(noMana));
+                globalThis.showToast(t(noMana));
             }
             return false;
         }
     } else if (typeof spendMana === 'function') {
         if (!spendMana(cost)) {
-            if (typeof showToast === 'function') showToast(t('cls_no_mana'));
+            if (typeof globalThis.showToast === 'function') globalThis.showToast(t('cls_no_mana'));
             return false;
         }
     }
@@ -2269,17 +2278,17 @@ function castUniversalSpell(spellId) {
     }
     _uspPlaySfx(spell);
     try {
-        if (typeof updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
-        if (typeof triggerSkillBanter === 'function') triggerSkillBanter(spellId);
+        if (typeof globalThis.updateQuestStats === 'function') globalThis.updateQuestStats('classAbilityUsed', {});
+        if (typeof globalThis.triggerSkillBanter === 'function') globalThis.triggerSkillBanter(spellId);
     } catch (e) { /* non-combat progress is best-effort */ }
 
     // Support family: the effect lands on the player, not on a monster, so it
     // bypasses the projectile/strike machinery entirely.
     if (isSupport) {
         const summary = _uspApplySupportSpell(spell);
-        if (typeof showToast === 'function') {
+        if (typeof globalThis.showToast === 'function') {
             const label = (typeof LANG !== 'undefined' && LANG === 'de') ? spell.nameDE : spell.nameEn;
-            if (summary) showToast(`${spell.icon} ${label} - ${summary}`, '#7fe0b0');
+            if (summary) globalThis.showToast(`${spell.icon} ${label} - ${summary}`, '#7fe0b0');
         }
         if (typeof renderSkillHotbar === 'function') {
             try { renderSkillHotbar(); } catch (e) {}
@@ -2295,9 +2304,9 @@ function castUniversalSpell(spellId) {
         // recall can follow inside the armed window; the recall keeps the full
         // one started above.
         if (res.cooldown) startUniversalSpellCooldown(spellId, res.cooldown);
-        if (typeof showToast === 'function') {
+        if (typeof globalThis.showToast === 'function') {
             const label = (typeof LANG !== 'undefined' && LANG === 'de') ? spell.nameDE : spell.nameEn;
-            if (res.text) showToast(`${spell.icon} ${label} - ${res.text}`, '#7fd9ff');
+            if (res.text) globalThis.showToast(`${spell.icon} ${label} - ${res.text}`, '#7fd9ff');
         }
         if (typeof renderSkillHotbar === 'function') {
             try { renderSkillHotbar(); } catch (e) {}
@@ -2313,7 +2322,7 @@ function castUniversalSpell(spellId) {
             for (let i = 0; i < n; i++) {
                 setTimeout(() => {
                     try {
-                        if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+                        if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                     } catch (e) { return; }
                     _uspStrike(spell, targetId, spell.dmg[0], spell.dmg[1], { volleyIndex: i });
                 }, i * step);
@@ -2330,7 +2339,7 @@ function castUniversalSpell(spellId) {
                         const pool = _uspLivingMonsters();
                         if (!pool.length) return;
                         try {
-                            if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+                            if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                         } catch (e) { return; }
                         const victim = pool[Math.floor(Math.random() * pool.length)];
                         _uspStrike(spell, victim.id, spell.dmg[0], spell.dmg[1], { fromSky: true });
@@ -2342,7 +2351,7 @@ function castUniversalSpell(spellId) {
                 pool.forEach((m, i) => {
                     setTimeout(() => {
                         try {
-                            if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+                            if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                         } catch (e) { return; }
                         _uspStrike(spell, m.id, spell.dmg[0], spell.dmg[1], { isAoE: true });
                     }, i * 70);
@@ -2359,7 +2368,7 @@ function castUniversalSpell(spellId) {
             for (let i = 0; i < total; i++) {
                 setTimeout(() => {
                     try {
-                        if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+                        if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                     } catch (e) { return; }
                     if (hitAll) {
                         _uspLivingMonsters().slice(0, 8).forEach((m) => {
@@ -2399,7 +2408,7 @@ function castUniversalSpell(spellId) {
                 if (depth + 1 < maxJumps) {
                     setTimeout(() => {
                         try {
-                            if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+                            if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                         } catch (e) { return; }
                         jump(victim.id, depth + 1);
                     }, 200);
@@ -2424,13 +2433,13 @@ function castUniversalSpell(spellId) {
             } catch (e) { /* telegraph is cosmetic */ }
             setTimeout(() => {
                 try {
-                    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+                    if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                 } catch (e) { return; }
                 if (spell.hitsAll) {
                     _uspLivingMonsters().slice(0, 8).forEach((m, i) => {
                         setTimeout(() => {
                             try {
-                                if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+                                if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                             } catch (e) { return; }
                             _uspStrike(spell, m.id, spell.dmg[0], spell.dmg[1], { fromSky: true, isAoE: true });
                         }, i * 70);
@@ -2453,7 +2462,7 @@ function castUniversalSpell(spellId) {
                     const pool = _uspLivingMonsters();
                     if (!pool.length) return;
                     try {
-                        if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+                        if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                     } catch (e) { return; }
                     const victim = pool[Math.floor(Math.random() * pool.length)];
                     _uspStrike(spell, victim.id, spell.dmg[0], spell.dmg[1], { wildIndex: i });
@@ -2484,7 +2493,7 @@ function castUniversalSpell(spellId) {
 // code. skill-registry.js delegates mana / cooldown / usability / damage
 // lookups for these ids back into this file (typeof-guarded).
 
-function _registerUniversalSpells() {
+export function _registerUniversalSpells() {
     if (typeof SKILL_REGISTRY === 'undefined') return;
     for (const spell of UNIVERSAL_SPELL_DEFS) {
         if (SKILL_REGISTRY[spell.id]) continue;
@@ -2525,7 +2534,7 @@ function _registerUniversalSpells() {
 
 // "Scales with" line: Spell Damage (or Attack Damage for physical) + the
 // design damage kind + the behaviour tags the future dev tree hooks onto.
-function _uspScalingLine(spell) {
+export function _uspScalingLine(spell) {
     // Support spells do not scale off damage stats - they scale off the charm
     // rank plus the max Life / Absorption pool they refill (see SUPPORT
     // SPELLS). Saying "Scales with: Spell Damage" on a heal would be a lie.
@@ -2559,7 +2568,11 @@ function _uspScalingLine(spell) {
     return parts;
 }
 
-_registerUniversalSpells();
+// NOTE: registration is driven by skill-registry.js (bootstrap section)
+// after buildSkillRegistry(). A top-level call here would run during the
+// skill-registry <-> universal-spells import cycle, while SKILL_REGISTRY
+// is still in its temporal dead zone (typeof on a TDZ import binding
+// THROWS - it is not a soft guard like it was for classic globals).
 
 
 //------------------------------------------------------------------------
@@ -2569,10 +2582,11 @@ _registerUniversalSpells();
 // (resetActiveCooldown in class-cooldown-state.js). Spell cooldowns follow
 // the same rule so a fresh puzzle never starts with dead hotbar slots.
 
-if (typeof resetActiveCooldown === 'function' && !window._uspWrappedReset) {
+function _uspWireRoundEndReset() {
+    if (window._uspWrappedReset) return;
     window._uspWrappedReset = true;
-    const _origResetActiveCooldown = resetActiveCooldown;
-    resetActiveCooldown = function () {
+    const _origResetActiveCooldown = globalThis.resetActiveCooldown;
+    globalThis.resetActiveCooldown = function () {
         try {
             Object.keys(_uspCooldowns).forEach((id) => {
                 const cd = _uspCooldowns[id];
@@ -2586,3 +2600,14 @@ if (typeof resetActiveCooldown === 'function' && !window._uspWrappedReset) {
         return _origResetActiveCooldown();
     };
 }
+// Deferred: at module-eval time the owner's globalThis accessor may not
+// exist yet (import-cycle timing), so the old typeof guard silently
+// skipped the wrap. After load everything is in place. NOTE: deferred module
+// scripts execute at readyState 'interactive' - 'loading' alone would run
+// this inside the import phase (the skill-hotbar P bug was this exact miss).
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _uspWireRoundEndReset);
+} else {
+    _uspWireRoundEndReset();
+}
+

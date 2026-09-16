@@ -1,4 +1,14 @@
-﻿// =============================================================================
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { STOX_INTRO_SONG } from './storyline-intro-stox.js';
+import { SYLA_INTRO_SONG } from './storyline-intro-syla.js';
+import { TRIX_INTRO_SONG } from './storyline-intro-trix.js';
+import { INTRO_SONG } from './storyline-intro.js';
+
+// =============================================================================
 // storyline-beats.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // STORY_BEATS - the registry of every story beat in the game, keyed by
@@ -9,7 +19,7 @@
 // STORY BEATS
 // ---------------------------------------------------------------------------
 
-const STORY_BEATS = {
+export const STORY_BEATS = {
 
     // -------------------------------------------------------------------------
     // OPENING FLOW - image slideshow cinematic
@@ -49,7 +59,7 @@ const STORY_BEATS = {
 // each world's level design/pacing is finalized. Must not exceed the number
 // of levels actually defined for that world in level-world-data.js.
 // ---------------------------------------------------------------------------
-const REGION_BEAT_TRIGGER_LEVEL = {
+export const REGION_BEAT_TRIGGER_LEVEL = {
 
     /*
 
@@ -134,7 +144,7 @@ const REGION_BEAT_TRIGGER_LEVEL = {
 // the whole clip sequence. Set every number by hand per line, per region.
 // Caption timing is independent of per-clip audio - a caption line does not
 // need to "belong" to any particular clip.
-function _captions(entries) {
+export function _captions(entries) {
     return entries.map(([key, start]) => ({ textKey: key, start }));
 }
 
@@ -158,7 +168,7 @@ function _captions(entries) {
 // voiceover for that clip finishes with a little headroom before the next
 // clip's own audio starts, instead of running out of words early and
 // leaving several seconds of silence over still-playing video.
-function _regionClips(n) {
+export function _regionClips(n) {
     return [
         { videoFile: `video/Regions/region_${n}_part1.mp4`, audio: `audio/Regions/region_${n}_part1_audio.ogg`, gapAfterMs: 0 },
         { videoFile: `video/Regions/region_${n}_part2.mp4`, audio: `audio/Regions/region_${n}_part2_audio.ogg`, gapAfterMs: 0 },
@@ -367,7 +377,7 @@ STORY_BEATS.region_14 = {
 // a new entry here any time a new story beat should show up in that panel.
 // `options` must match whatever showBeat(beatId, options) expects.
 // ---------------------------------------------------------------------------
-const REPLAY_GALLERY_ENTRIES = [
+export const REPLAY_GALLERY_ENTRIES = [
     // `id` is a stable, save-slot-independent key used for the global unlock
     // flags (see storyline-engine.js). `thumb` is the artwork shown in the
     // row; `descKey` resolves to a translated subtitle. Entries flagged

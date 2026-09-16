@@ -1,4 +1,19 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { EG_ART } from './endgame-art.js';
+import { _egCloseCraftingBench, _egRefreshCraftingBench, _egSetCraftingBenchItem } from './endgame-crafting-bench.js';
+import { _egEssenceIdForSlot, _egRenderEssenceCell } from './endgame-essences.js';
+import { _egRenderMapSlot, _egRenderMapStash, _egRenderMapStashCell, _egSwitchMapStashTier } from './endgame-gate.js';
+import { _egClearTooltip } from './endgame-hub-tooltips.js';
+import { _egAddUniqueToCollection, _egUpdateUniqueTabBadge } from './endgame-hub-uniques.js';
+import { EG_CURRENCY_COLS, EG_INV_COLS, EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_ROMANS, _egAddItemToStash, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencySlotForId, _egCurrencyStash, _egEnsureInvRows, _egEnsureMapTierRows, _egEquipped, _egFindFreeInvCell, _egFindFreeMapCellForTier, _egGetInvRows, _egGetMapTierGrid, _egInventory, _egMapStash, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egRenderUniqueStash, _egShowStashInfo, _egStashTab, _egSwitchStashTab, _egUpdateCraftingBenchLauncherSlot, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
+import { _egCanEquipInSlot, _egCheckUnequipSlot, _egGetWeaponHands, _egIsTwoHandedWeapon, _egShowRequirementsToast, _egSimulateAndCheck, _egTryAutoUnequipOffhandForTwoHander } from './endgame-requirements.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME HUB DRAG AND DROP---------------------------
 //------------------------------------------------------------------------
 // Custom mouse-based drag-and-drop system for the Endgame Hub.
@@ -29,7 +44,7 @@
 
 // Maps each inventory zone type to the set of item categories it accepts.
 // A drop is rejected if the dragged item's category is not in the target zone's set.
-const EG_ZONE_CATEGORIES = {
+export const EG_ZONE_CATEGORIES = {
     equip: new Set(['equip']),     // main stash + paperdoll char slots
     map: new Set(['map']),       // map device orb slot + map stash
     currency: new Set(['currency']), // runes & orbs strip
@@ -42,7 +57,7 @@ const EG_ZONE_CATEGORIES = {
 // are impossible); weapon2 takes shields or ONE-handed weapons (dual-wield).
 // The 1H/2H distinction is enforced hand-aware in _dndSlotAcceptsItem below
 // (see _egGetWeaponHands in endgame-requirements.js), not by this table alone.
-const EG_SLOT_ACCEPTS = {
+export const EG_SLOT_ACCEPTS = {
     head: 'head',
     shoulders: 'shoulders',
     cloak: 'cloak',
@@ -71,7 +86,7 @@ const EG_SLOT_ACCEPTS = {
 
 // Tracks the full state of the current drag operation.
 // Reset to its default shape by _dndReset() at the end of every drop or cancel.
-let _dnd = {
+export let _dnd = {
     active: false,  // true while an item is being carried
     item: null,   // full item object being dragged
     sourceZone: null,   // 'inv' | 'equip' | 'map' | 'currency' | 'mapstash'
@@ -82,7 +97,7 @@ let _dnd = {
 };
 
 // The floating ghost div that follows the cursor during a drag.
-let _dndGhost = null;
+export let _dndGhost = null;
 
 
 //------------------------------------------------------------------------
@@ -91,7 +106,7 @@ let _dndGhost = null;
 
 // Resets the drag session to its inactive default state.
 // Always called as the final step of a drop or a cancel.
-function _dndReset() {
+export function _dndReset() {
     _dnd = {
         active: false,
         item: null,
@@ -104,7 +119,7 @@ function _dndReset() {
 }
 
 // Returns true when the current dragged item is allowed into the given target zone.
-function _dndZoneAccepts(targetZone) {
+export function _dndZoneAccepts(targetZone) {
     if (!_dnd.item) return false;
     const itemCat = _dnd.item.category;
     // Equipment may go to both the main stash and the paperdoll char slots.
@@ -125,7 +140,7 @@ function _dndZoneAccepts(targetZone) {
 // Returns true when the dragged item's slotType matches what the given char slot accepts.
 // weapon1: melee weapons only (any hands, never shields).
 // weapon2: shields or ONE-handed weapons only (dual-wield off-hand; 2H rejected).
-function _dndSlotAcceptsItem(slotId) {
+export function _dndSlotAcceptsItem(slotId) {
     if (!_dnd.item || _dnd.item.category !== 'equip') return false;
     if (slotId === 'weapon1') return _dnd.item.slotType === 'weapon';
     if (slotId === 'weapon2') {
@@ -148,7 +163,7 @@ function _dndSlotAcceptsItem(slotId) {
 // Creates the floating ghost div and appends it to the body.
 // The ghost shows the item icon so the player can see what they are carrying.
 // Any existing ghost is destroyed first to ensure there is never more than one.
-function _dndCreateGhost(item) {
+export function _dndCreateGhost(item) {
     _dndDestroyGhost();
 
     _dndGhost = document.createElement('div');
@@ -175,14 +190,14 @@ function _dndCreateGhost(item) {
 
 // Moves the ghost to the given screen coordinates.
 // Called on every mousemove event while a drag is active.
-function _dndMoveGhost(clientX, clientY) {
+export function _dndMoveGhost(clientX, clientY) {
     if (!_dndGhost) return;
     _dndGhost.style.left = clientX + 'px';
     _dndGhost.style.top = clientY + 'px';
 }
 
 // Removes the ghost element from the DOM and clears the reference.
-function _dndDestroyGhost() {
+export function _dndDestroyGhost() {
     if (_dndGhost) {
         _dndGhost.remove();
         _dndGhost = null;
@@ -198,7 +213,7 @@ function _dndDestroyGhost() {
 // Returns a partial _dnd descriptor, or null if no recognised zone was found.
 // Currency and map-stash cells must be checked before generic inv-cells
 // because they share the eg-inv-cell class.
-function _dndResolvePickupZone(chip) {
+export function _dndResolvePickupZone(chip) {
     const currencyCell = chip.closest('.eg-currency-cell');
     const essenceCell = chip.closest('.eg-essence-cell');
     const mapStashCell = chip.closest('.eg-map-stash-cell');
@@ -219,13 +234,13 @@ function _dndResolvePickupZone(chip) {
         const r = +essenceCell.dataset.row, c = +essenceCell.dataset.col;
         return {
             sourceZone: 'essence', sourceRow: r, sourceCol: c, sourceSlot: null,
-            item: _egEssenceStash[r][c],
-            clearFn: () => { _egEssenceStash[r][c] = null; _egRenderEssenceCell(r, c); }
+            item: globalThis._egEssenceStash[r][c],
+            clearFn: () => { globalThis._egEssenceStash[r][c] = null; _egRenderEssenceCell(r, c); }
         };
     }
     if (mapStashCell) {
         const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
-        const tier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+        const tier = (typeof _egMapStashActiveTier !== 'undefined' ? globalThis._egMapStashActiveTier : 1);
         let item = null;
         try {
             if (typeof _egGetMapTierGrid === 'function') item = _egGetMapTierGrid(tier)[r][c];
@@ -246,16 +261,16 @@ function _dndResolvePickupZone(chip) {
     if (mapSlot) {
         return {
             sourceZone: 'map', sourceRow: null, sourceCol: null, sourceSlot: null,
-            item: _egMapSlotItem,
-            clearFn: () => { _egMapSlotItem = null; _egRenderMapSlot(); }
+            item: globalThis._egMapSlotItem,
+            clearFn: () => { globalThis._egMapSlotItem = null; _egRenderMapSlot(); }
         };
     }
     if (craftingSlot && typeof _egCraftingBenchItem !== 'undefined') {
         return {
             sourceZone: 'crafting', sourceRow: null, sourceCol: null, sourceSlot: null,
-            item: _egCraftingBenchItem,
+            item: globalThis._egCraftingBenchItem,
             clearFn: () => {
-                _egCraftingBenchItem = null;
+                globalThis._egCraftingBenchItem = null;
                 if (typeof _egRefreshCraftingBench === 'function') _egRefreshCraftingBench();
                 if (typeof _egUpdateCraftingBenchLauncherSlot === 'function') _egUpdateCraftingBenchLauncherSlot();
                 if (typeof _egCloseCraftingBench === 'function') _egCloseCraftingBench();
@@ -283,7 +298,7 @@ function _dndResolvePickupZone(chip) {
 
 // Starts a drag session from the clicked item chip.
 // Clears the item from its origin cell immediately and spawns the ghost.
-function _dndPickUp(e, chip) {
+export function _dndPickUp(e, chip) {
     if (e.button !== 0) return; // left-click only
 
     const resolved = _dndResolvePickupZone(chip);
@@ -316,7 +331,7 @@ function _dndPickUp(e, chip) {
 
 // Writes the dragged item into a grid cell, swapping any displaced occupant
 // back to the drag source. renderFn(row, col) re-renders the affected cell.
-function _dndDropOnCell(grid, renderFn, row, col) {
+export function _dndDropOnCell(grid, renderFn, row, col) {
     const displaced = grid[row][col];
     grid[row][col] = _dnd.item;
     renderFn(row, col);
@@ -328,7 +343,7 @@ function _dndDropOnCell(grid, renderFn, row, col) {
 
 // Scans a grid for the first empty cell and places the item there.
 // Unlimited main stash: grows by one row if the grid is the main stash and is full.
-function _dndPlaceInFirstFreeSlot(item, grid, renderFn, rows, cols) {
+export function _dndPlaceInFirstFreeSlot(item, grid, renderFn, rows, cols) {
     // Use actual grid length for stash (may have grown beyond passed rows)
     const actualRows = (grid === _egInventory && typeof _egGetInvRows === 'function') ? _egGetInvRows() : rows;
     for (let r = 0; r < actualRows; r++) {
@@ -353,7 +368,7 @@ function _dndPlaceInFirstFreeSlot(item, grid, renderFn, rows, cols) {
 
 // Returns the dragged item to the zone it was picked up from.
 // Used when a drop is invalid or the drag is cancelled.
-function _dndReturnToSource() {
+export function _dndReturnToSource() {
     if (!_dnd.item) return;
     _dndReturnDisplacedToSource(_dnd.item);
 }
@@ -361,7 +376,7 @@ function _dndReturnToSource() {
 // Writes any item back to the current drag session's source location.
 // Used both for returning the dragged item on cancel, and for sending
 // a displaced item back when a swap happens.
-function _dndReturnDisplacedToSource(item) {
+export function _dndReturnDisplacedToSource(item) {
     const { sourceZone, sourceRow, sourceCol, sourceSlot, sourceTier } = _dnd;
 
     if (sourceZone === 'inv') {
@@ -370,11 +385,11 @@ function _dndReturnDisplacedToSource(item) {
         _egInventory[sourceRow][sourceCol] = item; _egRenderInventoryCell(sourceRow, sourceCol);
     }
     else if (sourceZone === 'equip') { _egEquipped[sourceSlot] = item; _egRenderEquipSlot(sourceSlot); }
-    else if (sourceZone === 'map') { _egMapSlotItem = item; _egRenderMapSlot(); }
+    else if (sourceZone === 'map') { globalThis._egMapSlotItem = item; _egRenderMapSlot(); }
     else if (sourceZone === 'currency') { _egCurrencyStash[sourceRow][sourceCol] = item; _egRenderCurrencyCell(sourceRow, sourceCol); }
-    else if (sourceZone === 'essence') { _egEssenceStash[sourceRow][sourceCol] = item; _egRenderEssenceCell(sourceRow, sourceCol); }
+    else if (sourceZone === 'essence') { globalThis._egEssenceStash[sourceRow][sourceCol] = item; _egRenderEssenceCell(sourceRow, sourceCol); }
     else if (sourceZone === 'crafting') {
-        _egCraftingBenchItem = item;
+        globalThis._egCraftingBenchItem = item;
         if (typeof _egRefreshCraftingBench === 'function') _egRefreshCraftingBench();
         if (typeof _egUpdateCraftingBenchLauncherSlot === 'function') _egUpdateCraftingBenchLauncherSlot();
     }
@@ -384,7 +399,7 @@ function _dndReturnDisplacedToSource(item) {
                 if (typeof _egEnsureMapTierRows === 'function') _egEnsureMapTierRows(sourceTier, sourceRow + 1);
                 _egGetMapTierGrid(sourceTier)[sourceRow][sourceCol] = item;
             } else if (typeof _egGetMapTierGrid === 'function' && typeof _egMapStashActiveTier !== 'undefined') {
-                const t = _egMapStashActiveTier;
+                const t = globalThis._egMapStashActiveTier;
                 if (typeof _egEnsureMapTierRows === 'function') _egEnsureMapTierRows(t, sourceRow + 1);
                 _egGetMapTierGrid(t)[sourceRow][sourceCol] = item;
             } else {
@@ -402,7 +417,7 @@ function _dndReturnDisplacedToSource(item) {
 
 // Briefly flashes a red reject animation on the given element,
 // then returns the dragged item to its source.
-function _dndShowRejectFlash(el) {
+export function _dndShowRejectFlash(el) {
     el.classList.add('eg-slot-reject');
     setTimeout(() => el.classList.remove('eg-slot-reject'), 600);
     _dndReturnToSource();
@@ -413,7 +428,7 @@ function _dndShowRejectFlash(el) {
 // items are flagged as requirement-blocked (red cells).
 // Also re-renders the map device slot and map stash - those elements live on
 // the Probability Gate screen and no-op when that screen is not in the DOM.
-function _dndFinalizeDrop() {
+export function _dndFinalizeDrop() {
     egSaveHubState();
     _dndReset();
     _egUpdateInvCount();
@@ -434,13 +449,13 @@ function _dndFinalizeDrop() {
 
 // Resolves the drop target from the mouse position and routes to the correct
 // zone handler. If no valid target is found, the item is returned to its source.
-function egDropOnCraftingBench(event) {
+export function egDropOnCraftingBench(event) {
     // The global mouseup router handles custom dragging; this prevents the
     // browser's native drop behavior from navigating the page.
     event.preventDefault();
 }
 
-function _dndDrop(e) {
+export function _dndDrop(e) {
     if (!_dnd.active) return;
 
     _dndDestroyGhost();
@@ -477,13 +492,13 @@ function _dndDrop(e) {
 
     } else if (mapStashCell && _dndZoneAccepts('mapstash')) {
         const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
-        const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+        const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? globalThis._egMapStashActiveTier : 1);
         const dragTier = (_dnd.item && _dnd.item.mapTier != null) ? _dnd.item.mapTier : null;
         if (dragTier != null && dragTier !== activeTier) {
             const roman = (typeof EG_MAP_TIER_ROMANS !== 'undefined' ? EG_MAP_TIER_ROMANS[activeTier - 1] : activeTier);
             const msg = `⚠️ This stash only holds Tier ${roman} maps (Tier ${dragTier} not allowed)`;
             if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-            else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+            else if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
             mapStashCell.classList.add('eg-slot-reject');
             setTimeout(() => mapStashCell.classList.remove('eg-slot-reject'), 600);
             // return to source, handled below via !dropped
@@ -514,7 +529,7 @@ function _dndDrop(e) {
             const nm = _dnd.item.name || 'This unique item';
             const msg = `⚠️ ${nm} is unique and cannot be placed on the Crafting Bench`;
             if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-            else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+            else if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
             if (craftingSlotEl.classList) {
                 craftingSlotEl.classList.add('eg-slot-reject');
                 setTimeout(() => craftingSlotEl.classList.remove('eg-slot-reject'), 600);
@@ -524,7 +539,7 @@ function _dndDrop(e) {
             // Dropping onto the bench consumes the source location but keeps the
             // same object in the bench slot. The bench chip remains draggable.
             // If there's already an item in the bench, displace it to the stash.
-            const existingBenchItem = _egCraftingBenchItem;
+            const existingBenchItem = globalThis._egCraftingBenchItem;
             dropped = typeof _egSetCraftingBenchItem === 'function' && _egSetCraftingBenchItem(_dnd.item);
             if (dropped && existingBenchItem) {
                 const free = _dndFirstFreeInvCell();
@@ -536,8 +551,8 @@ function _dndDrop(e) {
         }
 
     } else if (mapSlotEl && _dndZoneAccepts('map')) {
-        const displaced = _egMapSlotItem;
-        _egMapSlotItem = _dnd.item;
+        const displaced = globalThis._egMapSlotItem;
+        globalThis._egMapSlotItem = _dnd.item;
         _egRenderMapSlot();
         if (displaced) {
             // A map displaced from the device must never be dumped into a stash
@@ -555,7 +570,7 @@ function _dndDrop(e) {
                     const pos = _egFindFreeMapCellForTier(displacedTier);
                     _egGetMapTierGrid(displacedTier)[pos.r][pos.c] = displaced;
                     // Only the active tier's grid is in the DOM, so render there
-                    if (displacedTier === _egMapStashActiveTier) _egRenderMapStashCell(pos.r, pos.c);
+                    if (displacedTier === globalThis._egMapStashActiveTier) _egRenderMapStashCell(pos.r, pos.c);
                 } catch (e) {
                     _dndReturnDisplacedToSource(displaced);
                 }
@@ -585,9 +600,9 @@ function _dndDrop(e) {
                 // Auto-switch to uniques tab so the user sees the result
                 if (typeof _egSwitchStashTab === 'function') _egSwitchStashTab('uniques');
             } else if (typeof _egUniqueStash !== 'undefined') {
-                if (!_egUniqueStash[uid]) _egUniqueStash[uid] = [];
-                _egUniqueStash[uid].push(_dnd.item);
-                if (typeof _egUniqueCollected !== 'undefined' && _egUniqueCollected.add) _egUniqueCollected.add(uid);
+                if (!globalThis._egUniqueStash[uid]) globalThis._egUniqueStash[uid] = [];
+                globalThis._egUniqueStash[uid].push(_dnd.item);
+                if (typeof _egUniqueCollected !== 'undefined' && globalThis._egUniqueCollected.add) globalThis._egUniqueCollected.add(uid);
                 if (typeof _egRenderUniqueStash === 'function') _egRenderUniqueStash();
                 if (typeof _egUpdateUniqueTabBadge === 'function') _egUpdateUniqueTabBadge();
                 if (typeof egSaveHubState === 'function') egSaveHubState();
@@ -616,7 +631,7 @@ function _dndDrop(e) {
             if (displaced && EG_SLOT_ACCEPTS[_dnd.sourceSlot] !== displaced.slotType) {
                 const msg = `⚠️ Cannot unequip ${_dnd.item.name || '?'} - ${displaced.name || '?'} does not fit there`;
                 if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-                else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+                else if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
                 blocked = true;
             } else {
                 const gate = _egSimulateAndCheck(sim => {
@@ -647,7 +662,7 @@ function _dndDrop(e) {
 // Handles dropping onto a currency cell (PoE fixed-slot tab).
 // Only the assigned currency id for that slot is accepted; otherwise reject.
 // Same-id drops merge stack counts.
-function _dndDropOnCurrencyCell(currencyCell) {
+export function _dndDropOnCurrencyCell(currencyCell) {
     const r = +currencyCell.dataset.row, c = +currencyCell.dataset.col;
     const assignedId = (typeof _egCurrencyIdForSlot === 'function') ? _egCurrencyIdForSlot(r, c) : null;
     // Unassigned decorative cells never accept drops
@@ -679,7 +694,7 @@ function _dndDropOnCurrencyCell(currencyCell) {
 // Handles dropping onto an essence tab cell (fixed-slot tab, like Orbs & Shards).
 // Only the assigned essence id for that slot is accepted; otherwise reject.
 // Same-id drops merge stack counts.
-function _dndDropOnEssenceCell(essenceCell) {
+export function _dndDropOnEssenceCell(essenceCell) {
     const r = +essenceCell.dataset.row, c = +essenceCell.dataset.col;
     const assignedId = (typeof _egEssenceIdForSlot === 'function') ? _egEssenceIdForSlot(r, c) : null;
     if (!assignedId) {
@@ -690,17 +705,17 @@ function _dndDropOnEssenceCell(essenceCell) {
         _dndShowRejectFlash(essenceCell);
         return false;
     }
-    const existing = _egEssenceStash[r][c];
+    const existing = globalThis._egEssenceStash[r][c];
     if (existing && existing.id === _dnd.item.id) {
         existing.count = (existing.count || 1) + (_dnd.item.count || 1);
-        _egEssenceStash[r][c] = existing;
+        globalThis._egEssenceStash[r][c] = existing;
         _egRenderEssenceCell(r, c);
     } else if (!existing) {
-        _egEssenceStash[r][c] = _dnd.item;
+        globalThis._egEssenceStash[r][c] = _dnd.item;
         _egRenderEssenceCell(r, c);
     } else {
         existing.count = (existing.count || 1) + (_dnd.item.count || 1);
-        _egEssenceStash[r][c] = existing;
+        globalThis._egEssenceStash[r][c] = existing;
         _egRenderEssenceCell(r, c);
     }
     return true;
@@ -712,13 +727,13 @@ function _dndDropOnEssenceCell(essenceCell) {
 // endgame-requirements.js). Shows a reject flash and returns to source when
 // either check fails.
 // Returns true when the drop was accepted.
-function _dndDropOnEquipSlot(equipSlotEl) {
+export function _dndDropOnEquipSlot(equipSlotEl) {
     const slotId = equipSlotEl.dataset.slotId;
     if (!slotId || !_dndSlotAcceptsItem(slotId)) {
         const name = (_dnd.item && _dnd.item.name) || '?';
         const msg = `⚠️ ${name} cannot go into that slot`;
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-        else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+        else if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
         _dndShowRejectFlash(equipSlotEl);
         return false;
     }
@@ -758,7 +773,7 @@ function _dndDropOnEquipSlot(equipSlotEl) {
 // weapon1/weapon2, else the first slot whose gate accepts the swap;
 // shields → weapon2 only. Other slots use EG_SLOT_ACCEPTS directly.
 // Returns the slot id string, or null when no matching slot exists.
-function _dndFindTargetSlot(item) {
+export function _dndFindTargetSlot(item) {
     if (item && item.category === 'equip' && item.slotType === 'weapon') {
         const isTwo = (typeof _egGetWeaponHands === 'function')
             ? _egGetWeaponHands(item) === 2 : item.hands === 2;
@@ -798,7 +813,7 @@ function _dndFindTargetSlot(item) {
 
 // Finds the first empty cell in the main equipment stash.
 // Unlimited stash: always returns a cell (expands by one row if needed).
-function _dndFirstFreeInvCell() {
+export function _dndFirstFreeInvCell() {
     if (typeof _egFindFreeInvCell === 'function') return _egFindFreeInvCell();
     for (let r = 0; r < _egInventory.length; r++) {
         for (let c = 0; c < EG_INV_COLS; c++) {
@@ -815,7 +830,7 @@ function _dndFirstFreeInvCell() {
 // Stat requirements are checked against the simulated final loadout first
 // (see endgame-requirements.js). The displaced item (if any) is placed back
 // into the source stash cell.
-function _dndQuickEquipFromStash(invCell) {
+export function _dndQuickEquipFromStash(invCell) {
     const r = +invCell.dataset.row, c = +invCell.dataset.col;
     const item = _egInventory[r][c];
     if (!item || item.category !== 'equip') return;
@@ -858,7 +873,7 @@ function _dndQuickEquipFromStash(invCell) {
 
 // Right-click on a paperdoll slot item → send it to the first free stash cell.
 // Unlimited stash: always has room (grows on demand).
-function _dndQuickUnequipToStash(equipSlotEl) {
+export function _dndQuickUnequipToStash(equipSlotEl) {
     const slotId = equipSlotEl.dataset.slotId;
     const item = _egEquipped[slotId] || null;
     if (!item) return;
@@ -887,7 +902,7 @@ function _dndQuickUnequipToStash(equipSlotEl) {
 // Contextmenu handler - dispatches to quick-equip or quick-unequip based on
 // which zone the right-clicked chip belongs to. On the Probability Gate
 // screen, maps are quick-moved between the map stash and the map device slot.
-function _dndHandleRightClick(e) {
+export function _dndHandleRightClick(e) {
     const chip = e.target.closest('.eg-item-chip');
     if (!chip) return;
     const screenEl = _dndChipScreenEl(chip);
@@ -919,10 +934,10 @@ function _dndHandleRightClick(e) {
 // Tier check: only allow if displaced (if any) belongs to the active tier's stash?
 // Actually device can hold any tier, so stash->device always allowed; device->stash via swap
 // checks tier of displaced map vs active tier.
-function _dndQuickLoadMapToDevice(mapStashCell) {
+export function _dndQuickLoadMapToDevice(mapStashCell) {
     if (typeof _egMapStash === 'undefined') return;
     const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
-    const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+    const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? globalThis._egMapStashActiveTier : 1);
     let map = null;
     try {
         if (typeof _egGetMapTierGrid === 'function') map = _egGetMapTierGrid(activeTier)[r][c];
@@ -930,7 +945,7 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
     } catch (e) { map = null; }
     if (!map || map.category !== 'map') return;
 
-    const displaced = _egMapSlotItem || null;
+    const displaced = globalThis._egMapSlotItem || null;
     // If device holds a map and we swap it into the clicked stash cell, ensure it matches stash tier
     if (displaced && displaced.mapTier != null && displaced.mapTier !== activeTier) {
         // Instead of swapping into mismatched cell, try to place displaced into its own tier's free slot
@@ -949,18 +964,18 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
         if (!placed) {
             const msg = `⚠️ Cannot swap - device holds Tier ${displaced.mapTier} but stash is on Tier ${activeTier}`;
             if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
-            else if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+            else if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
             return;
         }
         // clear clicked cell
         try { _egGetMapTierGrid(activeTier)[r][c] = null; } catch (e) { }
-        _egMapSlotItem = map;
+        globalThis._egMapSlotItem = map;
         _egRenderMapSlot();
         _egRenderMapStashCell(r, c);
         egSaveHubState();
         return;
     }
-    _egMapSlotItem = map;
+    globalThis._egMapSlotItem = map;
     try {
         if (typeof _egGetMapTierGrid === 'function') _egGetMapTierGrid(activeTier)[r][c] = displaced;
         else _egMapStash[r][c] = displaced;
@@ -972,18 +987,18 @@ function _dndQuickLoadMapToDevice(mapStashCell) {
 
 // Right-click on a map in the map device slot → return it to the first free
 // map stash cell of its own tier (infinite, so always succeeds - expands if needed).
-function _dndQuickUnloadMapFromDevice() {
-    if (typeof _egMapSlotItem === 'undefined' || !_egMapSlotItem) return;
-    const map = _egMapSlotItem;
-    const tier = (map.mapTier != null ? map.mapTier : (_egMapStashActiveTier || 1));
+export function _dndQuickUnloadMapFromDevice() {
+    if (typeof _egMapSlotItem === 'undefined' || !globalThis._egMapSlotItem) return;
+    const map = globalThis._egMapSlotItem;
+    const tier = (map.mapTier != null ? map.mapTier : (globalThis._egMapStashActiveTier || 1));
     try {
         if (typeof _egFindFreeMapCellForTier === 'function' && typeof _egGetMapTierGrid === 'function') {
             const pos = _egFindFreeMapCellForTier(tier);
             _egGetMapTierGrid(tier)[pos.r][pos.c] = map;
-            _egMapSlotItem = null;
+            globalThis._egMapSlotItem = null;
             _egRenderMapSlot();
             // if the map's tier is not the active tab, switch to it so the player sees it
-            if (tier !== _egMapStashActiveTier && typeof _egSwitchMapStashTier === 'function') {
+            if (tier !== globalThis._egMapStashActiveTier && typeof _egSwitchMapStashTier === 'function') {
                 _egSwitchMapStashTier(tier);
             } else {
                 _egRenderMapStashCell(pos.r, pos.c);
@@ -996,7 +1011,7 @@ function _dndQuickUnloadMapFromDevice() {
         for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
             if (!_egMapStash[r][c]) {
                 _egMapStash[r][c] = map;
-                _egMapSlotItem = null;
+                globalThis._egMapSlotItem = null;
                 _egRenderMapSlot();
                 _egRenderMapStashCell(r, c);
                 egSaveHubState();
@@ -1013,7 +1028,7 @@ function _dndQuickUnloadMapFromDevice() {
 
 // Builds the chip HTML for a currency cell, adding a stack-count badge
 // when the stack count is greater than 1.
-function _dndBuildCurrencyChipHTML(item) {
+export function _dndBuildCurrencyChipHTML(item) {
     if (!item) return '';
     const rarityClass = `eg-rarity-${item.rarity || 'currency'}`;
     const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
@@ -1034,7 +1049,7 @@ function _dndBuildCurrencyChipHTML(item) {
 // Renders BOTH twin grids - hub's left tab (eg-currency-cell-*) and the
 // Probability Gate's strip (eg-gate-currency-cell-*) - because both read
 // from the same _egCurrencyStash. Empty assigned slots get a dashed placeholder.
-function _egRenderCurrencyCell(row, col) {
+export function _egRenderCurrencyCell(row, col) {
     const item = _egCurrencyStash[row][col];
     const assignedId = (typeof _egCurrencyIdForSlot === 'function') ? _egCurrencyIdForSlot(row, col) : null;
     const def = assignedId && (typeof _egCurrencyDefForId === 'function') ? _egCurrencyDefForId(assignedId) : null;
@@ -1077,7 +1092,7 @@ function _egRenderCurrencyCell(row, col) {
 // Adds `amount` of a currency type to the currency stash (fixed PoE-style slots).
 // Each currency id has a pre-assigned slot; stacks simply increment there.
 // Returns true on success, false if the id has no assigned slot or no def for a new stack.
-function egAddCurrency(id, amount = 1, def = null) {
+export function egAddCurrency(id, amount = 1, def = null) {
     const pos = (typeof _egCurrencySlotForId === 'function') ? _egCurrencySlotForId(id) : null;
     if (!pos) {
         console.warn(`[DND] egAddCurrency: no fixed slot for "${id}".`);
@@ -1132,7 +1147,7 @@ function egAddCurrency(id, amount = 1, def = null) {
 // Injects the minimal CSS rules required for drag visuals.
 // Runs once on init - skips injection if the style tag already exists.
 // These rules can be moved to a .css file if preferred.
-function _dndInjectStyles() {
+export function _dndInjectStyles() {
     if (document.getElementById('eg-dnd-styles')) return;
 
     const style = document.createElement('style');
@@ -1230,7 +1245,7 @@ function _dndInjectStyles() {
 // Returns the managed screen element (#screen-endgame-hub or
 // #screen-endgame-gate) that contains the given chip, or null. The DnD and
 // currency systems operate on both screens - they share the same state.
-function _dndChipScreenEl(chip) {
+export function _dndChipScreenEl(chip) {
     if (!chip || typeof chip.closest !== 'function') return null;
     // The crafting bench overlay is appended directly to document.body (see
     // _egEnsureCraftingBenchOverlay), so it sits outside both screen roots.
@@ -1243,7 +1258,7 @@ function _dndChipScreenEl(chip) {
 // Uses capture-phase mousedown so it fires before any chip's own handlers.
 // Mousemove and mouseup are on window so the ghost and drop work even if
 // the pointer leaves the hub container during a fast drag.
-function _dndBindListeners() {
+export function _dndBindListeners() {
     // Pick-up: left-click on any item chip inside the hub or gate screen.
     document.addEventListener('mousedown', e => {
         const chip = e.target.closest('.eg-item-chip');
@@ -1329,7 +1344,7 @@ function _dndBindListeners() {
 // Native drag events (from draggable="true" on chips) are allowed to fire
 // but are neutralised here to avoid conflicts with the custom system.
 
-function egDragOver(event) {
+export function egDragOver(event) {
     event.preventDefault();
 }
 
@@ -1338,13 +1353,13 @@ function egDragOver(event) {
 //------------------------------------------------------------------------
 
 // Entry point - called once after the hub screen DOM has been created.
-function initEndgameHubDnD() {
+export function initEndgameHubDnD() {
     _dndInjectStyles();
     _dndBindListeners();
 }
 
 // Called from endgame-hub.js _egCreateScreen() - alias so the hub bootstrap
 // doesn't need to know whether it's calling the init function or the bind function.
-function _egBindDragEvents() {
+export function _egBindDragEvents() {
     initEndgameHubDnD();
 }

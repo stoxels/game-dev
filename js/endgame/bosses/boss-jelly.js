@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE JELLY (boss_jelly)-------------------------------
 //------------------------------------------------------------------------
 // Dragon-Quest homage and first-steps fight - a cold-element blob boss
@@ -55,55 +64,55 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared hop-blob tuning ──────────────────────────────────────────────────
-const EG_JELLY_HOP_ARC_PX = 90;           // arc height of a hop flight
-const EG_JELLY_SLIP_TO_BOSS_MS = 750;     // glide duration once a blob slips on ice
-const EG_JELLY_SLIP_ARC_PX = 70;          // second small arc of the slip launch
+export const EG_JELLY_HOP_ARC_PX = 90;           // arc height of a hop flight
+export const EG_JELLY_SLIP_TO_BOSS_MS = 750;     // glide duration once a blob slips on ice
+export const EG_JELLY_SLIP_ARC_PX = 70;          // second small arc of the slip launch
 
 // Ice Shell (P2) knobs. Times are run-clock ms - dodge runs run on the
 // tier-scaled clock (gentler on tier 1, see _egNkNewRun), so these feel
 // the same on every boss tier.
-const EG_JELLY_GATE_DMG_PCT = 0.12;       // damage when a shell-phase blob lands on you
-const EG_JELLY_GATE_REST_MS = 1100;       // blob squishes in place before it locks a target
-const EG_JELLY_GATE_WARN_MS = 950;        // shadow telegraph + flight duration
-const EG_JELLY_GATE_RADIUS = 60;          // mark radius + landing hitbox
-const EG_JELLY_GATE_FIRST_BLOB_MS = 2600; // first blob after the shell goes up
-const EG_JELLY_GATE_BLOB_GAP_MS = [3600, 5200]; // gap between blobs after one resolves
-const EG_JELLY_ICE_TARGET = 3;            // icy cells kept on the floor while shielded
-const EG_JELLY_ICE_LIFETIME_MS = 15000;   // before a patch of ice melts
-const EG_JELLY_ICE_REFILL_MS = [2200, 3400];    // delay before re-icing under target
+export const EG_JELLY_GATE_DMG_PCT = 0.12;       // damage when a shell-phase blob lands on you
+export const EG_JELLY_GATE_REST_MS = 1100;       // blob squishes in place before it locks a target
+export const EG_JELLY_GATE_WARN_MS = 950;        // shadow telegraph + flight duration
+export const EG_JELLY_GATE_RADIUS = 60;          // mark radius + landing hitbox
+export const EG_JELLY_GATE_FIRST_BLOB_MS = 2600; // first blob after the shell goes up
+export const EG_JELLY_GATE_BLOB_GAP_MS = [3600, 5200]; // gap between blobs after one resolves
+export const EG_JELLY_ICE_TARGET = 3;            // icy cells kept on the floor while shielded
+export const EG_JELLY_ICE_LIFETIME_MS = 15000;   // before a patch of ice melts
+export const EG_JELLY_ICE_REFILL_MS = [2200, 3400];    // delay before re-icing under target
 
 // Jelly Army (P3) knobs
-const EG_JELLY_ARMY_COUNT = 10;           // blobs spawned per army
-const EG_JELLY_ARMY_STAGGER_MS = 780;     // delay between consecutive spawns
-const EG_JELLY_ARMY_DMG_PCT = 0.085;      // per-blob damage when one lands on you
-const EG_JELLY_ARMY_REST_MS = 420;        // blob readies itself before targeting
-const EG_JELLY_ARMY_WARN_MS = 850;        // shadow telegraph + flight duration
-const EG_JELLY_ARMY_RADIUS = 46;          // tighter mark/hitbox - a weave, not a single jump
+export const EG_JELLY_ARMY_COUNT = 10;           // blobs spawned per army
+export const EG_JELLY_ARMY_STAGGER_MS = 780;     // delay between consecutive spawns
+export const EG_JELLY_ARMY_DMG_PCT = 0.085;      // per-blob damage when one lands on you
+export const EG_JELLY_ARMY_REST_MS = 420;        // blob readies itself before targeting
+export const EG_JELLY_ARMY_WARN_MS = 850;        // shadow telegraph + flight duration
+export const EG_JELLY_ARMY_RADIUS = 46;          // tighter mark/hitbox - a weave, not a single jump
 
 
 // ── Module-level state ──────────────────────────────────────────────────────
 // One jelly fight at a time. Both fields are torn down through their run's
 // onKill (boss death / encounter stop) or by their own completion paths.
-let _egJellyGate = null; // { monsterId, run, ice: Map, bubble, blob, blobAt, refillAt, pruneAt }
-let _egJellyArmy = null; // { run, blobs: [], spawned, nextSpawnAt, monsterId }
+export let _egJellyGate = null; // { monsterId, run, ice: Map, bubble, blob, blobAt, refillAt, pruneAt }
+export let _egJellyArmy = null; // { run, blobs: [], spawned, nextSpawnAt, monsterId }
 
 
 // Small helpers ---------------------------------------------------------------
 
-function _egJellyRand(range) {
+export function _egJellyRand(range) {
     return range[0] + Math.random() * (range[1] - range[0]);
 }
 
 
 // Finds the live monster behind a jelly run (boss may be re-identified).
-function _egJellyMonsterById(id) {
+export function _egJellyMonsterById(id) {
     if (!id || typeof _egMonsters === 'undefined') return null;
-    return _egMonsters.find(m => m.id === id) || null;
+    return globalThis._egMonsters.find(m => m.id === id) || null;
 }
 
 
 // Centre of the boss card on screen (falls back to a mid-screen point).
-function _egJellyBossCenter(monster) {
+export function _egJellyBossCenter(monster) {
     const id = monster && monster.id;
     if (!id) return null;
     const card = document.getElementById('eg-card-' + id);
@@ -122,7 +131,7 @@ function _egJellyBossCenter(monster) {
 // hops there in an arc. Step it from a _egNkLoop tick via _egJellyStepBlob.
 // slipOk (Ice Shell blobs): if the blob lands ON an icy cell it slips on the
 // frost and launches itself at the boss instead of striking the player.
-function _egJellySpawnBlob(run, monster, x, y, restMs, warnMs, radius, dmgPct) {
+export function _egJellySpawnBlob(run, monster, x, y, restMs, warnMs, radius, dmgPct) {
     const body = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-jelly', '🟢');
     body.style.transform = 'translate(' + Math.round(x - 22) + 'px,' + Math.round(y - 22) + 'px)';
     const mark = _egNkEl(run, 'div', 'eg-nk-mark');
@@ -142,7 +151,7 @@ function _egJellySpawnBlob(run, monster, x, y, restMs, warnMs, radius, dmgPct) {
 
 // Advances one blob by dtMs (run-scaled). Returns true while the blob still
 // needs stepping, false once it resolved (landed, slipped or removed).
-function _egJellyStepBlob(b, dtMs, slipOk) {
+export function _egJellyStepBlob(b, dtMs, slipOk) {
     if (b.gone) return false;
     b.t += dtMs;
 
@@ -224,9 +233,9 @@ function _egJellyStepBlob(b, dtMs, slipOk) {
 // one slips. Ice melts on a timer and is topped back up so the player always
 // has a patch to lure a blob onto.
 
-function _egJellyIcePickTargets(gate, count) {
-    if (!cur || !cur.grid || typeof userGrid === 'undefined') return [];
-    const sol = cur.grid;
+export function _egJellyIcePickTargets(gate, count) {
+    if (!globalThis.cur || !globalThis.cur.grid || typeof userGrid === 'undefined') return [];
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const clean = [];   // untouched cells - ideal ice spots
@@ -234,8 +243,8 @@ function _egJellyIcePickTargets(gate, count) {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             if (gate.ice.has(r + '-' + c)) continue;
-            if (userGrid[r][c] === 0
-                && (typeof revealedGrid === 'undefined' || !revealedGrid[r][c])) clean.push([r, c]);
+            if (globalThis.userGrid[r][c] === 0
+                && (typeof revealedGrid === 'undefined' || !globalThis.revealedGrid[r][c])) clean.push([r, c]);
             else any.push([r, c]);
         }
     }
@@ -250,7 +259,7 @@ function _egJellyIcePickTargets(gate, count) {
 }
 
 
-function _egJellyTopUpIce(gate, count) {
+export function _egJellyTopUpIce(gate, count) {
     if (!gate || !count || count <= 0) return;
     _egJellyIcePickTargets(gate, count).forEach(([r, c]) => {
         const cell = document.getElementById('g-' + r + '-' + c);
@@ -268,7 +277,7 @@ function _egJellyTopUpIce(gate, count) {
 
 
 // Melts expired patches and decrements the rest (called on a short cadence).
-function _egJellyPruneIce(gate, dtMs) {
+export function _egJellyPruneIce(gate, dtMs) {
     if (!gate) return;
     gate.ice.forEach((entry, key) => {
         entry.remain -= dtMs;
@@ -282,7 +291,7 @@ function _egJellyPruneIce(gate, dtMs) {
 
 // Finds the icy patch (if any) sitting under the point (x, y) - with
 // forgiving padding so a blob landing at a cell's edge still slips.
-function _egJellyIceAt(x, y) {
+export function _egJellyIceAt(x, y) {
     const g = _egJellyGate;
     if (!g || g.ice.size === 0) return null;
     const pad = 8;
@@ -299,13 +308,13 @@ function _egJellyIceAt(x, y) {
 
 
 // True when the point (x, y) sits on an icy cell (with forgiving padding).
-function _egJellyIceContains(x, y) {
+export function _egJellyIceContains(x, y) {
     return !!_egJellyIceAt(x, y);
 }
 
 
 // Removes the green hold-spot marker from every icy patch.
-function _egJellyClearSafeMark(g) {
+export function _egJellyClearSafeMark(g) {
     if (!g) return;
     g.ice.forEach(entry => {
         if (entry.el) entry.el.classList.remove('eg-jelly-ice-safe');
@@ -314,13 +323,13 @@ function _egJellyClearSafeMark(g) {
 
 
 // Hides the "stand here" guide pill (if any).
-function _egJellyHideGuide(g) {
+export function _egJellyHideGuide(g) {
     if (g && g.guide) g.guide.style.display = 'none';
 }
 
 
 // Shows the "stand here" guide pill hovering just above an icy cell.
-function _egJellyShowGuide(g, entry) {
+export function _egJellyShowGuide(g, entry) {
     const el = g && g.guide;
     if (!el) return;
     if (!entry) { el.style.display = 'none'; return; }
@@ -341,7 +350,7 @@ function _egJellyShowGuide(g, entry) {
 // player stands, so that patch is where it will land and slip. Once the
 // blob locks (warn/fly) it marks the locked landing cell, so the player
 // sees exactly where the blob will slip. No marker = not on ice.
-function _egJellySyncSafeMark(g) {
+export function _egJellySyncSafeMark(g) {
     if (!g || !g.blob) return;
     const b = g.blob;
     _egJellyClearSafeMark(g);
@@ -369,7 +378,7 @@ function _egJellySyncSafeMark(g) {
 
 // A shell blob just locked onto the player (its shadow mark appeared): every
 // icy patch pulses once - "a hop is incoming - ice is where it breaks".
-function _egJellyBlobLockedCue() {
+export function _egJellyBlobLockedCue() {
     const g = _egJellyGate;
     if (!g || !g.ice || g.ice.size === 0) return;
     g.ice.forEach(entry => {
@@ -390,7 +399,7 @@ function _egJellyBlobLockedCue() {
 // the boss and the shell shatters → bossImmune drops and the normal phase-2
 // mechanic schedule (hops + probability shift) starts.
 
-function _egJellyStartShieldGate(monster) {
+export function _egJellyStartShieldGate(monster) {
     if (!monster || monster.jellyShieldUp) return;
     monster.bossImmune = true;              // the transition set this - keep it held
     monster.jellyShieldUp = true;
@@ -483,7 +492,7 @@ function _egJellyStartShieldGate(monster) {
 
 
 // Green immunity bubble hugging the Jelly's card (survives panel re-renders).
-function _egJellyPlaceBubble(g) {
+export function _egJellyPlaceBubble(g) {
     const b = g && g.bubble;
     if (!b) return;
     const card = document.getElementById('eg-card-' + g.monsterId);
@@ -501,7 +510,7 @@ function _egJellyPlaceBubble(g) {
 
 
 // A hop blob slipped on the ice and slammed into the boss - break the shell.
-function _egJellyShieldBroken(monster, run) {
+export function _egJellyShieldBroken(monster, run) {
     if (!monster) return;
     monster.bossImmune = false;
     monster.jellyShieldUp = false;
@@ -519,7 +528,7 @@ function _egJellyShieldBroken(monster, run) {
 
 // Tears down a gate's visuals + state. Called by the run's onKill and when
 // the shell breaks (the run is killed right after, so this is idempotent).
-function _egJellyDropGateVisuals(gate) {
+export function _egJellyDropGateVisuals(gate) {
     if (_egJellyGate === gate) _egJellyGate = null;
     if (!gate) return;
     _egJellyHideGuide(gate);
@@ -530,7 +539,7 @@ function _egJellyDropGateVisuals(gate) {
 
 
 // Expanding green shatter ring where the boss was struck by the slipping blob.
-function _egJellyShatterBurst(monster) {
+export function _egJellyShatterBurst(monster) {
     const p = _egJellyBossCenter(monster)
         || { x: window.innerWidth / 2, y: window.innerHeight * 0.2 };
     const s = document.createElement('div');
@@ -547,7 +556,7 @@ function _egJellyShatterBurst(monster) {
 // between spawns), each leaping at the player with the usual hop-blob
 // mechanic. Runs once, on top of the standard phase-3 transition.
 
-function _egJellyStartArmy(monster) {
+export function _egJellyStartArmy(monster) {
     if (!monster || _egJellyArmy) return;
     const run = _egNkNewRun(monster.id, true);
     const army = { run, monsterId: monster.id, blobs: [], spawned: 0, nextSpawnAt: 0 };
@@ -590,7 +599,7 @@ function _egJellyStartArmy(monster) {
 // The Jelly's phases line up with its signature moments. Returning true from
 // phase 2 hands phase ownership to the Ice Shell gate: the framework skips
 // its generic immunity timer and the gate releases immunity itself.
-function _egJellyOnPhaseEnter(monster, newPhase) {
+export function _egJellyOnPhaseEnter(monster, newPhase) {
     if (!monster) return false;
     if (newPhase === 2) {
         _egJellyStartShieldGate(monster);
@@ -609,7 +618,7 @@ function _egJellyOnPhaseEnter(monster, newPhase) {
 // leave before it lands. Not used while the Ice Shell holds - the shell
 // phase only lobs single hop blobs (see _egJellyStartShieldGate).
 
-function _egMechJellyHops(monster, phase) {
+export function _egMechJellyHops(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const hops = [0, 3, 3, 4][p];

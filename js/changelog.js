@@ -1,4 +1,11 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { LANG } from './translation/translations.js';
+
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -10,7 +17,7 @@
 // via LANG at render time, see _changelogLangIndex below). Version
 // numbers and dates are language-neutral literals. To add an entry,
 // just append a pair.
-const CHANGELOG_DATA = [
+export const CHANGELOG_DATA = [
 
 
     {
@@ -262,13 +269,13 @@ const CHANGELOG_DATA = [
 
 // Picks the language index for changelog pairs: 0 = English, 1 = German.
 // LANG is defined in js/translation/translations.js ('en' / 'de').
-function _changelogLangIndex() {
+export function _changelogLangIndex() {
     return LANG === "de" ? 1 : 0;
 }
 
 // Renders one category group (e.g. "Bug Fixes") as a labeled <ul> block.
 // Category label and items are ["english", "german"] string pairs.
-function _buildCategoryGroupHtml(group) {
+export function _buildCategoryGroupHtml(group) {
     const langIdx = _changelogLangIndex();
     const label = group.category[langIdx];
     const items = group.items
@@ -284,7 +291,7 @@ function _buildCategoryGroupHtml(group) {
 
 // Renders one full version entry (header + all its category groups).
 // Version numbers and dates are language-neutral literals.
-function _buildVersionBlockHtml(update) {
+export function _buildVersionBlockHtml(update) {
     const categoryGroupsHtml = update.changes
         .map(_buildCategoryGroupHtml)
         .join("");
@@ -301,7 +308,7 @@ function _buildVersionBlockHtml(update) {
 
 // Renders the full changelog into the DOM. Re-renders every time so a
 // mid-session language switch is reflected on the next modal open.
-function renderChangelog() {
+export function renderChangelog() {
     const container = document.getElementById("changelog-content");
 
     container.innerHTML = CHANGELOG_DATA
@@ -316,7 +323,7 @@ function renderChangelog() {
 //------------------------------------------------------------------------
 
 // Opens the changelog modal, rendering its content first if needed.
-function openChangelog() {
+export function openChangelog() {
     renderChangelog();
     document.getElementById("changelog-modal").classList.add("show");
 }

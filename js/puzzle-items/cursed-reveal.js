@@ -1,13 +1,28 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { renderCell } from '../grid.js';
+import { questStat_revealItemUsed } from '../quests/quests-stats.js';
+import { t } from '../translation/translations.js';
+import { _applyCellEffect } from './cell-effects.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _cursedDownsideDuration } from './shared/cursed-downside.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+
+//------------------------------------------------------------------------
 //-------------------CURSED REVEAL - CURSED LENS----------------------
 //------------------------------------------------------------------------
 
 // cursedReveal - reveals 6 cells; downside clears all wrong marks.
-function _useCursedReveal(id, def) {
+export function _useCursedReveal(id, def) {
     _trackWitchImmuneCursedUse();
     questStat_revealItemUsed();
 
-    revealTiles(6, 'item');
+    globalThis.revealTiles(6, 'item');
 
     // Route the downside through the shared curse helpers so Witch immunity,
     // Curse Embrace and the first-use protection of Veil of Purity all apply
@@ -21,13 +36,13 @@ function _useCursedReveal(id, def) {
     }
 
     // Downside: clear every wrong mark the player has placed
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
     const unmarked = [];
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            if (userGrid[r][c] === 2) {
-                userGrid[r][c] = 0;
+            if (globalThis.userGrid[r][c] === 2) {
+                globalThis.userGrid[r][c] = 0;
                 renderCell(r, c);
                 unmarked.push(`g-${r}-${c}`);
             }
@@ -44,7 +59,7 @@ function _useCursedReveal(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the sickly green tint rect over the grid.
-function _fxMakeCursedTint(container, r) {
+export function _fxMakeCursedTint(container, r) {
     _fxMakeElement(container, `
         position:absolute;
         left:${r.left}px; top:${r.top}px;
@@ -53,7 +68,7 @@ function _fxMakeCursedTint(container, r) {
 }
 
 // ☠️ Cursed Reveal - sickly green skull flash + ✕ marks dissolve.
-function _fxCursedReveal() {
+export function _fxCursedReveal() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

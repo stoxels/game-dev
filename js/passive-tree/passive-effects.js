@@ -1,14 +1,15 @@
-﻿// Residual Analysis
+﻿import { Audio_Manager } from '../audio/audio.js';
+// Residual Analysis
 
 
 
 // ⚡🔬 Residual Analysis: High-Voltage Lightning Strike Effect
-function playResidualAnalysisEffect(row, col) {
+export function playResidualAnalysisEffect(row, col) {
     const wrap = document.getElementById('puzzle-scaler');
     const cell = document.getElementById(`g-${row}-${col}`);
     if (!wrap || !cell) return;
 
-    const zoom = currentZoom || 1;
+    const zoom = globalThis.currentZoom || 1;
     const wRect = wrap.getBoundingClientRect();
     const cRect = cell.getBoundingClientRect();
 
@@ -17,7 +18,7 @@ function playResidualAnalysisEffect(row, col) {
     const cy = (cRect.top - wRect.top + cRect.height / 2) / zoom;
 
     // Allocate a longer overlay window (1.2 seconds) to let sparks crackle out
-    const overlay = _fxOverlay(wrap, 1200);
+    const overlay = globalThis._fxOverlay(wrap, 1200);
 
     // --- STEP 1: GENERATE JAGGED LIGHTNING SVG ---
     const svgNS = "http://www.w3.org/2000/svg";
@@ -68,7 +69,7 @@ function playResidualAnalysisEffect(row, col) {
 
     // --- STEP 2: SPAWN SUSTAINED ELECTRICAL SPARKS ---
     // Fires instantly on strike impact, lingering for ~1000ms
-    _fxSpawnParticles({
+    globalThis._fxSpawnParticles({
         count: 20,
         chars: ['⚡', '✨', '·', '▫️'],
         colors: ['#00ffff', '#ffffff', '#70e0ff', '#008b8b'],
@@ -88,7 +89,7 @@ function playResidualAnalysisEffect(row, col) {
 
 
 // standard deviation node
-function createBeamEffect(srcRow, srcCol, tgtRow, tgtCol) {
+export function createBeamEffect(srcRow, srcCol, tgtRow, tgtCol) {
     // FIX 1: Updated selectors to check 'g-r-c' first to match your actual grid DOM convention
     const srcEl = document.getElementById(`g-${srcRow}-${srcCol}`) || document.getElementById(`cell-${srcRow}-${srcCol}`) || document.querySelector(`[data-row="${srcRow}"][data-col="${srcCol}"]`);
     const tgtEl = document.getElementById(`g-${tgtRow}-${tgtCol}`) || document.getElementById(`cell-${tgtRow}-${tgtCol}`) || document.querySelector(`[data-row="${tgtRow}"][data-col="${tgtCol}"]`);
@@ -134,12 +135,12 @@ function createBeamEffect(srcRow, srcCol, tgtRow, tgtCol) {
 
 
 // 📈 Sample Efficiency: Dark scan wave + converging particles + reveal flash
-function playSampleEfficiencyEffect(targetRow, targetCol) {
+export function playSampleEfficiencyEffect(targetRow, targetCol) {
     const wrap = document.getElementById('puzzle-scaler');
     const targetCell = document.getElementById(`g-${targetRow}-${targetCol}`);
     if (!wrap || !targetCell) return;
 
-    const zoom = currentZoom || 1;
+    const zoom = globalThis.currentZoom || 1;
     const wRect = wrap.getBoundingClientRect();
     const tRect = targetCell.getBoundingClientRect();
 
@@ -198,14 +199,14 @@ function playSampleEfficiencyEffect(targetRow, targetCol) {
     overlay.appendChild(wave);
 
     // 5. Gather previously completed correct cells to serve as particle origins
-    const sol = cur.grid;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const pool = [];
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            if (sol[r][c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])) {
+            if (sol[r][c] === 1 && (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c])) {
                 if (r !== targetRow || c !== targetCol) {
                     const el = document.getElementById(`g-${r}-${c}`);
                     if (el) pool.push(el);
@@ -364,13 +365,13 @@ function playStochasticResonanceEffect(mistakeRow, mistakeCol, targetRow, target
 */
 
 // 〰️ Stochastic Resonance: Static expanding pulses
-function playStochasticResonanceEffect(mistakeRow, mistakeCol, targetRow, targetCol) {
+export function playStochasticResonanceEffect(mistakeRow, mistakeCol, targetRow, targetCol) {
     const wrap = document.getElementById('puzzle-scaler');
     const targetCell = document.getElementById(`g-${targetRow}-${targetCol}`);
     const mistakeCell = document.getElementById(`g-${mistakeRow}-${mistakeCol}`);
     if (!wrap || !targetCell) return;
 
-    const zoom = currentZoom || 1;
+    const zoom = globalThis.currentZoom || 1;
     const wRect = wrap.getBoundingClientRect();
     const tRect = targetCell.getBoundingClientRect();
 
@@ -463,7 +464,7 @@ function playStochasticResonanceEffect(mistakeRow, mistakeCol, targetRow, target
 
 // Injects the shared keyframes used by the reusable passive proc effects.
 // Guards with a sentinel style tag so it never runs twice.
-function _ensurePassiveFxStyles() {
+export function _ensurePassiveFxStyles() {
     if (document.getElementById('fx-passive-proc-styles')) return;
     const style = document.createElement('style');
     style.id = 'fx-passive-proc-styles';
@@ -497,7 +498,7 @@ function _ensurePassiveFxStyles() {
 // Floating time text ("+30s") that rises from the timer HUD and fades.
 //   label  - text to display (e.g. "+30s")
 //   color  - CSS color of the text/glow
-function playTimeGainEffect(label, color = '#ffd700') {
+export function playTimeGainEffect(label, color = '#ffd700') {
     const anchor = document.getElementById('timer-val') || document.querySelector('.timer-val');
     if (!anchor) return;
     _ensurePassiveFxStyles();
@@ -523,12 +524,12 @@ function playTimeGainEffect(label, color = '#ffd700') {
 }
 
 // Full-grid frost veil that fades in and back out (Timed Stasis).
-function playStasisOverlayEffect(durationMs = 1000) {
+export function playStasisOverlayEffect(durationMs = 1000) {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
     _ensurePassiveFxStyles();
 
-    const overlay = _fxOverlay(wrap, durationMs + 600);
+    const overlay = globalThis._fxOverlay(wrap, durationMs + 600);
     const veil = document.createElement('div');
     veil.style.cssText = `
         position: absolute; inset: 0; pointer-events: none; z-index: 998;
@@ -540,12 +541,12 @@ function playStasisOverlayEffect(durationMs = 1000) {
 }
 
 // Icy blue pulse across the grid when Frozen Resilience grants a shield charge.
-function playShieldChargePulseEffect() {
+export function playShieldChargePulseEffect() {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
     _ensurePassiveFxStyles();
 
-    const overlay = _fxOverlay(wrap, 950);
+    const overlay = globalThis._fxOverlay(wrap, 950);
     const pulse = document.createElement('div');
     pulse.style.cssText = 'position:absolute; inset:0; pointer-events:none; z-index:998;';
     pulse.style.animation = 'fx-charge-pulse 900ms ease-out forwards';
@@ -553,12 +554,12 @@ function playShieldChargePulseEffect() {
 }
 
 // Soft green edge glow while the Confidence Interval forgiveness window is open.
-function playConfidenceIntervalEffect(durationMs = 1000) {
+export function playConfidenceIntervalEffect(durationMs = 1000) {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
     _ensurePassiveFxStyles();
 
-    const overlay = _fxOverlay(wrap, durationMs + 100);
+    const overlay = globalThis._fxOverlay(wrap, durationMs + 100);
     const glow = document.createElement('div');
     glow.style.cssText = 'position:absolute; inset:0; pointer-events:none; z-index:998;';
     glow.style.animation = `fx-ci-window ${durationMs}ms ease-in-out forwards`;

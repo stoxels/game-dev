@@ -1,3 +1,16 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { t } from '../translation/translations.js';
+import { _egGetElementCentre } from './endgame-class-projectiles.js';
+import { _egConsumePlayerCharge, _egUpdatePlayerChargeBar } from './endgame-encounter-tick.js';
+import { _egApplyPlayerMeleeImpact } from './endgame-encounter.js';
+import { _egGetAllEquippedItems } from './endgame-player-stats.js';
+import { _egIsActive } from './endgame-state.js';
+
 //  endgame-weapon-swing.js
 //  MANUAL WEAPON ATTACK (E) + shared CSS swing visuals.
 //  Loads AFTER endgame-encounter.js, endgame-encounter-tick.js,
@@ -19,21 +32,21 @@
 //------------------------------------------------------------------------
 
 // Manual-attack input cooldown so E can't machine-gun the melee channel.
-const EG_WEAPON_SWING_COOLDOWN_MS = 400;
-let _egWeaponSwingLastAt = 0;
+export const EG_WEAPON_SWING_COOLDOWN_MS = 400;
+export let _egWeaponSwingLastAt = 0;
 
 // Melee reach: the avatar's screen centre must be within this many px of the
 // target card's centre for a strike to land. The avatar roams freely, so the
 // player must walk up to the monster first - no cross-screen hits.
-const EG_MELEE_RANGE_PX = 340;
+export const EG_MELEE_RANGE_PX = 340;
 // Throttle for the out-of-range toast (E can be held down).
-let _egMeleeRangeToastAt = 0;
+export let _egMeleeRangeToastAt = 0;
 // Throttle for the no-weapon toast (same hold-E protection).
-let _egMeleeNoWeaponToastAt = 0;
+export let _egMeleeNoWeaponToastAt = 0;
 
 // True when the avatar stands close enough to the target to strike it.
 // Missing DOM (tests, teardown) never blocks - fail open.
-function _egMeleeTargetInRange(targetId) {
+export function _egMeleeTargetInRange(targetId) {
     try {
         const card = document.getElementById(`eg-card-${targetId}`);
         const avatar = document.getElementById('player-avatar-wrapper')
@@ -55,7 +68,7 @@ function _egMeleeTargetInRange(targetId) {
 
 // Per-family visual lifetime (ms) - must cover the longest CSS keyframe
 // in weapon-swing.css so the node is removed after the effect finishes.
-const EG_WEAPON_SWING_DURATION_MS = {
+export const EG_WEAPON_SWING_DURATION_MS = {
     sword: 320, dagger: 260, axe: 400, mace: 420,
     wand: 360, staff: 480, bow: 340, unarmed: 280,
 };
@@ -64,7 +77,7 @@ const EG_WEAPON_SWING_DURATION_MS = {
 // deliberately fuzzy (baseId prefix + icon + name keywords) so every
 // current AND future base type - including the wpn_auto_* filler series -
 // lands on a sensible visual without a per-item table.
-function _egWeaponSwingFamily(item) {
+export function _egWeaponSwingFamily(item) {
     if (!item) return 'unarmed';
     if (item.slotType === 'ranged') return 'bow';
     const baseId = String(item.baseId || item.id || '');
@@ -85,7 +98,7 @@ function _egWeaponSwingFamily(item) {
 
 // Returns { item, family, hands, label } for the currently equipped melee
 // weapon (weapon slot). Falls back to the ranged bow, then unarmed.
-function _egGetEquippedWeaponInfo() {
+export function _egGetEquippedWeaponInfo() {
     let item = null;
     try {
         if (typeof _egGetAllEquippedItems === 'function') {
@@ -110,16 +123,16 @@ function _egGetEquippedWeaponInfo() {
 // walk loop (_lastFacingDir / _walkState.dirName in sprite_animations.js);
 // idle keeps the last travel direction, so a standing player still attacks
 // toward where they last walked. Falls back to 'down'.
-function _egGetAttackFacing() {
+export function _egGetAttackFacing() {
     const ok = (d) => d === 'up' || d === 'down' || d === 'left' || d === 'right';
-    try { if (typeof _lastFacingDir === 'string' && ok(_lastFacingDir)) return _lastFacingDir; } catch (e) {}
-    try { if (typeof _walkState !== 'undefined' && _walkState && ok(_walkState.dirName)) return _walkState.dirName; } catch (e) {}
+    try { if (typeof _lastFacingDir === 'string' && ok(globalThis._lastFacingDir)) return globalThis._lastFacingDir; } catch (e) {}
+    try { if (typeof _walkState !== 'undefined' && globalThis._walkState && ok(globalThis._walkState.dirName)) return globalThis._walkState.dirName; } catch (e) {}
     return 'down';
 }
 
 // Facing implied by a screen-space vector (used so AUTO-attacks aim the
 // swing at the targeted monster card instead of the movement facing).
-function _egFacingFromVector(dx, dy) {
+export function _egFacingFromVector(dx, dy) {
     if (Math.abs(dx) >= Math.abs(dy)) return dx >= 0 ? 'right' : 'left';
     return dy >= 0 ? 'down' : 'up';
 }
@@ -132,7 +145,7 @@ function _egFacingFromVector(dx, dy) {
 // Spawns the family-skinned CSS overlay on the avatar, rotated toward
 // `facing`. Character-agnostic: no sprite art is touched, so every
 // character/class combo shares the same effect. No-op without an avatar.
-function _egShowWeaponSwing(family, facing) {
+export function _egShowWeaponSwing(family, facing) {
     const avatar = document.getElementById('player-avatar-wrapper');
     if (!avatar) return;
     const fam = EG_WEAPON_SWING_DURATION_MS[family] != null ? family : 'sword';
@@ -151,7 +164,7 @@ function _egShowWeaponSwing(family, facing) {
 
 // Small hop toward `facing` so the swing has weight. Uses WAAPI on the
     // wrapper (the old auto-attack lunge is gone - manual strikes hop only).
-function _egWeaponSwingHop(facing) {
+export function _egWeaponSwingHop(facing) {
     const avatar = document.getElementById('player-avatar-wrapper');
     if (!avatar || typeof avatar.animate !== 'function') return;
     const d = 14;
@@ -167,7 +180,7 @@ function _egWeaponSwingHop(facing) {
 }
 
 // Best-effort swing sound from already-registered SFX (no new assets).
-function _egWeaponSwingSound(family) {
+export function _egWeaponSwingSound(family) {
     try {
         if (typeof Audio_Manager === 'undefined' || !Audio_Manager.playSFX) return;
         const sfx = family === 'wand' || family === 'staff' ? 'arcaneReveal'
@@ -189,10 +202,10 @@ function _egWeaponSwingSound(family) {
 // deals charge% of full damage - 100% charge = 100% damage - and spends
 // (resets) the charge bar, even on a miss. Without a target the swing
 // still plays as a whiff but costs nothing, so retargeting never punishes.
-function _egDoWeaponAttack() {
+export function _egDoWeaponAttack() {
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
-    if (typeof dead !== 'undefined' && dead) return;
-    if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+    if (typeof dead !== 'undefined' && globalThis.dead) return;
+    if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
     if (document.querySelector('.modal-bg.show')) return;
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA') return;
@@ -209,18 +222,18 @@ function _egDoWeaponAttack() {
     if (!_egGetEquippedWeaponInfo().item) {
         if (now - _egMeleeNoWeaponToastAt > 1500) {
             _egMeleeNoWeaponToastAt = now;
-            if (typeof showToast === 'function') showToast('⚔️ ' + t('eg_melee_no_weapon'));
+            if (typeof showToast === 'function') globalThis.showToast('⚔️ ' + t('eg_melee_no_weapon'));
         }
         return;
     }
 
     // Range gate: too far away → no swing, no charge spent. The toast is
     // throttled so holding E doesn't spam it.
-    const hasTargetEarly = !(typeof _egTargetId === 'undefined' || !_egTargetId);
-    if (hasTargetEarly && !_egMeleeTargetInRange(_egTargetId)) {
+    const hasTargetEarly = !(typeof _egTargetId === 'undefined' || !globalThis._egTargetId);
+    if (hasTargetEarly && !_egMeleeTargetInRange(globalThis._egTargetId)) {
         if (now - _egMeleeRangeToastAt > 1500) {
             _egMeleeRangeToastAt = now;
-            if (typeof showToast === 'function') showToast('⚔️ ' + t('eg_melee_too_far'));
+            if (typeof showToast === 'function') globalThis.showToast('⚔️ ' + t('eg_melee_too_far'));
         }
         return;
     }
@@ -234,11 +247,11 @@ function _egDoWeaponAttack() {
     // Spend the charge at key-press time so the strike matches the bar the
     // player saw (charging during the swing flight doesn't inflate it).
     // No target selected → whiff visual only, charge is kept.
-    const hasTarget = !(typeof _egTargetId === 'undefined' || !_egTargetId);
+    const hasTarget = !(typeof _egTargetId === 'undefined' || !globalThis._egTargetId);
     if (hasTarget && typeof _egConsumePlayerCharge === 'function') {
-        try { _egPendingMeleeChargePct = _egConsumePlayerCharge(); } catch (e) { _egPendingMeleeChargePct = 1; }
+        try { globalThis._egPendingMeleeChargePct = _egConsumePlayerCharge(); } catch (e) { globalThis._egPendingMeleeChargePct = 1; }
     } else {
-        _egPendingMeleeChargePct = null;
+        globalThis._egPendingMeleeChargePct = null;
     }
     if (typeof _egUpdatePlayerChargeBar === 'function') {
         try { _egUpdatePlayerChargeBar(); } catch (e) {}
@@ -248,16 +261,16 @@ function _egDoWeaponAttack() {
     setTimeout(() => {
         try {
             if (typeof _egIsActive === 'function' && !_egIsActive()) return;
-            if (typeof dead !== 'undefined' && dead) return;
-            if (typeof _egTargetId === 'undefined' || !_egTargetId) return;
-            if (typeof _egApplyPlayerMeleeImpact === 'function') _egApplyPlayerMeleeImpact(_egTargetId);
+            if (typeof dead !== 'undefined' && globalThis.dead) return;
+            if (typeof _egTargetId === 'undefined' || !globalThis._egTargetId) return;
+            if (typeof _egApplyPlayerMeleeImpact === 'function') _egApplyPlayerMeleeImpact(globalThis._egTargetId);
         } catch (e) {}
     }, Math.max(80, Math.round((EG_WEAPON_SWING_DURATION_MS[family] || 320) / 2)));
 }
 
-function _initEgWeaponAttackHotkey() {
+export function _initEgWeaponAttackHotkey() {
     if (typeof onKeybindAction === 'function') {
-        onKeybindAction('eg-attack', () => {
+        globalThis.onKeybindAction('eg-attack', () => {
             _egDoWeaponAttack();
             return false;
         });
@@ -270,4 +283,12 @@ function _initEgWeaponAttackHotkey() {
         });
     }
 }
-_initEgWeaponAttackHotkey();
+// Module-eval timing: the import phase runs before concatenated keybinds.js,
+// so registering at top level would take the raw-key fallback branch and the
+// rebindable registration would never happen. Defer to DOMContentLoaded - by
+// then the full global surface exists (same fix as the skill-hotbar P bug).
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _initEgWeaponAttackHotkey);
+} else {
+    _initEgWeaponAttackHotkey();
+}

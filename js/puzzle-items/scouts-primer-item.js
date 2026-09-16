@@ -1,10 +1,21 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { save } from '../state.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
+
+//------------------------------------------------------------------------
 //-------------------SCOUT'S PRIMER - USE HANDLER----------------------
 //------------------------------------------------------------------------
 
 // scoutPrimer - marks the next puzzle start so a reveal fires immediately.
-function _useScoutPrimer(id, def) {
-    STATE.primerPending = true;
+export function _useScoutPrimer(id, def) {
+    globalThis.STATE.primerPending = true;
     save();
     playItemEffect(id);
     return `📜 ${t('item_primer_activated')}`;
@@ -15,7 +26,7 @@ function _useScoutPrimer(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: spawns the 8 compass-direction arrows that shoot outward.
-function _fxMakePrimerArrows(container, cx, cy, r) {
+export function _fxMakePrimerArrows(container, cx, cy, r) {
     const arrows = ['▲', '▶', '▼', '◀', '◥', '◤', '◣', '◢'];
     arrows.forEach((ch, i) => {
         const angle = (i / arrows.length) * Math.PI * 2;
@@ -35,7 +46,7 @@ function _fxMakePrimerArrows(container, cx, cy, r) {
 }
 
 // 📜 Scout's Primer - golden compass-points radiate outward.
-function _fxScoutPrimer() {
+export function _fxScoutPrimer() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

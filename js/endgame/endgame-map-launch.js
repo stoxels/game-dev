@@ -1,4 +1,20 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { t } from '../translation/translations.js';
+import { egAtlasChainBlueprintForMap, egAtlasMakeRng } from './endgame-atlas.js';
+import { _egBuildChainPool, _egPickMapRunPuzzleGi } from './endgame-encounter-chain.js';
+import { _egEnsureLoseOverlayEndgameUI } from './endgame-encounter-overlays.js';
+import { _egPlayerTakeDamage } from './endgame-encounter.js';
+import { _egRenderMapSlot } from './endgame-gate.js';
+import { egSaveHubState } from './endgame-hub.js';
+import { _egGetMapRewardBonuses, _egRollMapSizeMix, egMapBaseDurationForTier, egMapBaseMistakesForTier, egMapBasePuzzlesForTier, egMapBaseQuestionsForTier } from './endgame-maps.js';
+import { _egIsActive } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME MAP DEVICE LAUNCH----------------------------
 //------------------------------------------------------------------------
 // Bridges the Probability Gate's map device and the puzzle encounter chain:
@@ -28,32 +44,32 @@
 //------------------------------------------------------------------------
 
 // The map item currently driving an active device run (null outside runs).
-let _egActiveMapItem = null;
+export let _egActiveMapItem = null;
 
 // Hard on-screen enemy cap for tier 1 maps - keeps early runs readable
 // for new players regardless of rolled +monster modifiers.
-const EG_TIER1_MAX_MONSTERS = 3;
+export const EG_TIER1_MAX_MONSTERS = 3;
 
 // Per-tier steps added to the on-screen enemy cap below tier 5:
 // tier 1 = 3, tier 2 = 3, tier 3 = 4, tier 4 = 5, tier 5+ = 6.
-const EG_LOW_TIER_MONSTER_STEPS = [0, 0, 1, 2];
+export const EG_LOW_TIER_MONSTER_STEPS = [0, 0, 1, 2];
 
 // Legacy: percent chance that a device map rolled a boss at all (maps
 // created before the "every map ends in a boss fight" rule). Bosses are
 // now guaranteed in every map (see _egRollMapBossStatus) - the constant is
 // only kept for the tooltip's legacy-map fallback line.
-const EG_MAP_BASE_BOSS_CHANCE = 50;
+export const EG_MAP_BASE_BOSS_CHANCE = 50;
 
 // Total non-boss kills required per tier - early tiers stay short so new
 // players can clear quickly. Caps: T1 ≤15, T2 ≤20.
-const EG_TIER1_MAX_TOTAL_MONSTERS = 15;
-const EG_TIER2_MAX_TOTAL_MONSTERS = 20;
+export const EG_TIER1_MAX_TOTAL_MONSTERS = 15;
+export const EG_TIER2_MAX_TOTAL_MONSTERS = 20;
 
 // Returns the first rolled value for a map mod family on the active map,
 // or 0 when the mod is not present / no run is active.
 // Tolerates legacy/persisted mod shapes: falls back to a numeric
 // rolledStats entry or a flat `mod.value` field.
-function _egGetActiveMapModValue(familyId) {
+export function _egGetActiveMapModValue(familyId) {
     if (!_egActiveMapItem || !Array.isArray(_egActiveMapItem.mods)) return 0;
     const mod = _egActiveMapItem.mods.find(m => m.familyId === familyId);
     if (!mod) return 0;
@@ -67,13 +83,13 @@ function _egGetActiveMapModValue(familyId) {
 }
 
 // True when the active map has the given mod family.
-function _egHasActiveMapMod(familyId) {
+export function _egHasActiveMapMod(familyId) {
     return _egGetActiveMapModValue(familyId) > 0;
 }
 
 // Blood Magic: class abilities pay their cost from the life pool instead of
 // mana while a map with this mod is active.
-function _egMapHasBloodMagic() {
+export function _egMapHasBloodMagic() {
     return _egHasActiveMapMod('map_blood_magic');
 }
 
@@ -85,140 +101,140 @@ function _egMapHasBloodMagic() {
 // so every consumer can apply them unconditionally.
 
 // "#% reduced maximum Life" → multiplier below 1.
-function _egMapPlayerLifeMult() {
+export function _egMapPlayerLifeMult() {
     const v = _egGetActiveMapModValue('map_player_life');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% reduced Damage" → multiplier below 1.
-function _egMapPlayerDamageMult() {
+export function _egMapPlayerDamageMult() {
     const v = _egGetActiveMapModValue('map_player_damage');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% reduced Armour, Evasion and Absorption" → multiplier below 1.
-function _egMapPlayerDefenceMult() {
+export function _egMapPlayerDefenceMult() {
     const v = _egGetActiveMapModValue('map_player_defences');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% reduced Mana gained" → multiplier below 1.
-function _egMapManaGainMult() {
+export function _egMapManaGainMult() {
     const v = _egGetActiveMapModValue('map_mana_penalty');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% reduced Melee Attack Damage" → multiplier below 1.
-function _egMapPlayerMeleeMult() {
+export function _egMapPlayerMeleeMult() {
     const v = _egGetActiveMapModValue('map_melee_damage');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% reduced Projectile Damage" → multiplier below 1.
-function _egMapPlayerProjectileMult() {
+export function _egMapPlayerProjectileMult() {
     const v = _egGetActiveMapModValue('map_projectile_damage');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "Reveals from Items deal #% less Damage" → multiplier below 1.
-function _egMapItemRevealMult() {
+export function _egMapItemRevealMult() {
     const v = _egGetActiveMapModValue('map_item_reveal_damage');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "Reveals from Abilities deal #% less Damage" → multiplier below 1.
-function _egMapAbilityRevealMult() {
+export function _egMapAbilityRevealMult() {
     const v = _egGetActiveMapModValue('map_ability_reveal_damage');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% reduced Spell Damage" → multiplier below 1.
-function _egMapSpellDamageMult() {
+export function _egMapSpellDamageMult() {
     const v = _egGetActiveMapModValue('map_spell_damage');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% less Time gained from Item and Ability effects" → multiplier below 1.
-function _egMapTimeGainMult() {
+export function _egMapTimeGainMult() {
     const v = _egGetActiveMapModValue('map_less_time_gained');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "Elemental Weakness - #% reduced all Resistances" → multiplier below 1.
-function _egMapResistMult() {
+export function _egMapResistMult() {
     const v = _egGetActiveMapModValue('map_elem_weakness');
     return v > 0 ? Math.max(0.25, 1 - v / 100) : 1;
 }
 
 // "Vulnerability - you take #% increased Damage" → amplifier above 1.
-function _egMapDamageTakenAmpMult() {
+export function _egMapDamageTakenAmpMult() {
     const v = _egGetActiveMapModValue('map_vulnerability');
     return v > 0 ? 1 + v / 100 : 1;
 }
 
 // "#% less Life gained from Kills" → multiplier below 1.
-function _egMapKillRecoveryMult() {
+export function _egMapKillRecoveryMult() {
     const v = _egGetActiveMapModValue('map_reduced_recovery');
     return v > 0 ? Math.max(0.05, 1 - v / 100) : 1;
 }
 
 // "#% reduced Evasion" → multiplier below 1.
-function _egMapEvasionMult() {
+export function _egMapEvasionMult() {
     const v = _egGetActiveMapModValue('map_reduced_evasion');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% reduced maximum Absorption" → multiplier below 1.
-function _egMapAbsorptionMult() {
+export function _egMapAbsorptionMult() {
     const v = _egGetActiveMapModValue('map_reduced_absorption');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% reduced Block Chance" → multiplier below 1.
-function _egMapBlockMult() {
+export function _egMapBlockMult() {
     const v = _egGetActiveMapModValue('map_reduced_block');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "Temporal Chains - you act #% slower" → attack-interval stretch above 1.
-function _egMapActionSlowMult() {
+export function _egMapActionSlowMult() {
     const v = _egGetActiveMapModValue('map_temporal_chains');
     return v > 0 ? 1 + v / 100 : 1;
 }
 
 // Monster crit mod: rolls per monster hit; returns a damage multiplier
 // (2 on a crit roll, otherwise 1).
-function _egRollMonsterCritMult(monster) {
+export function _egRollMonsterCritMult(monster) {
     if (!monster || !(monster.critChancePct > 0)) return 1;
     return (Math.random() * 100 < monster.critChancePct) ? 2 : 1;
 }
 
 // Quiz penalty: an incorrectly answered interstitial question burns a share
 // of maximum Life. Called from quiz.js (_resolveQuizAnswer) during map runs.
-function _egOnQuizWrongAnswer() {
+export function _egOnQuizWrongAnswer() {
     if (!_egIsActive()) return;
     const v = _egGetActiveMapModValue('map_quiz_damage');
     if (!(v > 0)) return;
-    const maxHP = (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
+    const maxHP = (typeof playerMaxHP !== 'undefined' && globalThis.playerMaxHP > 0) ? globalThis.playerMaxHP : 100;
     const dealt = _egPlayerTakeDamage(Math.max(1, Math.round(maxHP * v / 100)), true);
-    showToast(`❌ ${(typeof t === 'function' ? t('eg_mm_toast_quiz_wrong') : 'Incorrect Answer!')} (-${dealt})`);
+    globalThis.showToast(`❌ ${(typeof t === 'function' ? t('eg_mm_toast_quiz_wrong') : 'Incorrect Answer!')} (-${dealt})`);
 }
 
 // "#% reduced Accuracy" → multiplier below 1.
-function _egMapAccuracyMult() {
+export function _egMapAccuracyMult() {
     const v = _egGetActiveMapModValue('map_reduced_accuracy');
     return v > 0 ? Math.max(0.1, 1 - v / 100) : 1;
 }
 
 // "#% less Attack Speed" → multiplier below 1.
-function _egMapAttackSpeedMult() {
+export function _egMapAttackSpeedMult() {
     const v = _egGetActiveMapModValue('map_reduced_attack_speed');
     return v > 0 ? Math.max(0.2, 1 - v / 100) : 1;
 }
 
 // Called after a monster successfully hits the player. Applies the per-hit
 // escalation mods: snowball damage growth and Map-time leech.
-function _egApplyMonsterHitMods(monster) {
+export function _egApplyMonsterHitMods(monster) {
     if (!monster || !_egActiveMapItem) return;
 
     // Snowball: monsters gain #% damage each time they hit you (capped at
@@ -239,8 +255,8 @@ function _egApplyMonsterHitMods(monster) {
     // Time leech: drain seconds from the global level timer.
     const leechS = _egGetActiveMapModValue('map_time_leech');
     if (leechS > 0 && typeof timerSecs !== 'undefined') {
-        timerSecs = Math.max(0, timerSecs - leechS);
-        showToast(`⏳ -${leechS}s ${t('eg_mm_toast_time_leech') || ''}`.trim());
+        globalThis.timerSecs = Math.max(0, globalThis.timerSecs - leechS);
+        globalThis.showToast(`⏳ -${leechS}s ${t('eg_mm_toast_time_leech') || ''}`.trim());
     }
 }
 
@@ -252,7 +268,7 @@ function _egApplyMonsterHitMods(monster) {
 // Applies the active map's monster-strengthening mods to a freshly built
 // monster/boss object. Called at the end of _egBuildMonster/_egBuildBoss.
 // Mods: life %, damage %, attack speed %, +all resistances.
-function _egApplyMapModsToMonster(monster) {
+export function _egApplyMapModsToMonster(monster) {
     if (!monster || !_egActiveMapItem) return monster;
 
     const lifePct = _egGetActiveMapModValue('map_monster_life');
@@ -349,7 +365,7 @@ function _egApplyMapModsToMonster(monster) {
 
 // "+# additional Quiz Questions per Puzzle" → how many interstitial quiz
 // questions are shown between two puzzles of an active run (baseline 1).
-function _egMapQuestionsPerInterstitial() {
+export function _egMapQuestionsPerInterstitial() {
     const v = _egGetActiveMapModValue('map_extra_questions');
     return 1 + Math.max(0, v);
 }
@@ -363,23 +379,23 @@ function _egMapQuestionsPerInterstitial() {
 // when no device run is active.
 
 // { xp, quantity, rarity } percent bonuses of the active map (zeros outside runs).
-function _egActiveMapRewardBonuses() {
+export function _egActiveMapRewardBonuses() {
     if (typeof _egGetMapRewardBonuses !== 'function') return { xp: 0, quantity: 0, rarity: 0 };
     return _egGetMapRewardBonuses(_egActiveMapItem);
 }
 
 // Multiplier for XP gained from monster kills during the run.
-function _egMapXpMult() {
+export function _egMapXpMult() {
     return 1 + _egActiveMapRewardBonuses().xp / 100;
 }
 
 // Multiplier applied to loot/currency/item drop chances.
-function _egMapLootQuantityMult() {
+export function _egMapLootQuantityMult() {
     return 1 + _egActiveMapRewardBonuses().quantity / 100;
 }
 
 // Weight boost for non-common rarities when items roll their rarity.
-function _egMapLootRarityWeightMult() {
+export function _egMapLootRarityWeightMult() {
     return 1 + _egActiveMapRewardBonuses().rarity / 100;
 }
 
@@ -393,7 +409,7 @@ function _egMapLootRarityWeightMult() {
 // the run. If mods raised the required puzzle count above the mix total,
 // buckets top the queue up - via `rng` (seeded) when a chain blueprint is
 // present, so extended chains stay deterministic per region.
-function _egBuildSizeQueue(sizeMix, targetLen, rng) {
+export function _egBuildSizeQueue(sizeMix, targetLen, rng) {
     const R = rng || Math.random;
     const buckets = ['small', 'medium', 'large', 'massive'];
     const queue = [];
@@ -412,7 +428,7 @@ function _egBuildSizeQueue(sizeMix, targetLen, rng) {
 // Atlas regions additionally contribute their deterministic chain blueprint
 // (fixed story/generated mix, generator flavour, fixed boss) - the same
 // region always plays the same chain.
-function _egRollMapRunBaseline(map) {
+export function _egRollMapRunBaseline(map) {
     const tier = Math.max(1, map.mapTier || 1);
     const imp = (map && map.implicits) ? map.implicits : null;
 
@@ -498,7 +514,7 @@ function _egRollMapRunBaseline(map) {
 // Applies every rolled map modifier to the baseline run parameters.
 // Families already baked into the map's implicits (required_puzzles,
 // fewer_mistakes, less_time) are skipped for maps that carry implicits.
-function _egApplyModsToBaseline(base, map) {
+export function _egApplyModsToBaseline(base, map) {
     const mods = Array.isArray(map.mods) ? map.mods : [];
     const hasImplicits = !!(map && map.implicits);
     const imp = (map && map.implicits) ? map.implicits : null;
@@ -573,20 +589,20 @@ function _egApplyModsToBaseline(base, map) {
 // bucketed picker so the FIRST puzzle of the run already honours the map's
 // size mix and the story/generated source mix. Falls back to the test-hub
 // picker / plain story pool when the shared picker is unavailable or fails.
-function _egPickMapRunSeedGi(baseline) {
+export function _egPickMapRunSeedGi(baseline) {
     if (typeof _egPickMapRunPuzzleGi === 'function') {
         const gi = _egPickMapRunPuzzleGi(baseline.puzzlePool || {});
         if (gi !== null) return gi;
     }
 
     if (typeof _egtPickSeedGi === 'function') {
-        return _egtPickSeedGi(baseline);
+        return globalThis._egtPickSeedGi(baseline);
     }
     if (typeof _egBuildChainPool !== 'function') return null;
 
     let pool = _egBuildChainPool(baseline.puzzlePool || {});
     if (typeof isGatedLevel === 'function') {
-        pool = pool.filter(level => !isGatedLevel(level.gIdx));
+        pool = pool.filter(level => !globalThis.isGatedLevel(level.gIdx));
     }
     if (pool.length === 0) return null;
     return pool[Math.floor(Math.random() * pool.length)].gIdx;
@@ -594,7 +610,7 @@ function _egPickMapRunSeedGi(baseline) {
 
 // Strips all stamped run fields off the seed level. Called from
 // _egChainCleanup() so the story level returns to its pristine state.
-function _egCleanupMapRunSeedLevel() {
+export function _egCleanupMapRunSeedLevel() {
     // Launch guard: _egChainCleanup also fires from _egStopEncounter during
     // the launch's own startLevel() call (_cleanupPreviousLevel). Wiping the
     // runtime state there would kill ALL live map mods (hazards, monster
@@ -606,8 +622,8 @@ function _egCleanupMapRunSeedLevel() {
     _egActiveMapItem = null;
 
     if (seedGi == null) return;
-    const level = (typeof ALL !== 'undefined') ? ALL[seedGi] : null;
-    if (!level || level === cur) return;   // don't strip the level about to be retried
+    const level = (typeof ALL !== 'undefined') ? globalThis.ALL[seedGi] : null;
+    if (!level || level === globalThis.cur) return;   // don't strip the level about to be retried
 
     delete level.isMapRunSeed;
     delete level.isMonsterLevel;
@@ -625,7 +641,7 @@ function _egCleanupMapRunSeedLevel() {
 //   1. Builds baseline params from its tier and applies its mods
 //   2. Consumes the map from the slot
 //   3. Stamps everything onto a random seed puzzle and starts it
-function _egLaunchMapFromDevice(mapItem) {
+export function _egLaunchMapFromDevice(mapItem) {
     if (!mapItem || typeof startLevel !== 'function') return;
 
     // A device run is never a campaign trial: drop stale trial routing from
@@ -641,18 +657,18 @@ function _egLaunchMapFromDevice(mapItem) {
 
     const gi = _egPickMapRunSeedGi(baseline);
     if (gi === null) {
-        showToast((typeof t === 'function') ? t('egt_no_puzzles').replace('{name}', mapItem.name)
+        globalThis.showToast((typeof t === 'function') ? t('egt_no_puzzles').replace('{name}', mapItem.name)
                                             : `No puzzles available for ${mapItem.name}`);
         return;
     }
 
     // Consume the map BEFORE launching so a mid-run save can't duplicate it.
     _egActiveMapItem = mapItem;
-    _egMapSlotItem = null;
+    globalThis._egMapSlotItem = null;
     if (typeof egSaveHubState === 'function') egSaveHubState();
     if (typeof _egRenderMapSlot === 'function') _egRenderMapSlot();
 
-    const level = ALL[gi];
+    const level = globalThis.ALL[gi];
     level.isMonsterLevel = true;
     level.isMapRunSeed = true;
     window._egMapRunSeedGi = gi;
@@ -682,7 +698,7 @@ function _egLaunchMapFromDevice(mapItem) {
 
     // Gear: warding - its once-per-map killing-blow save refreshes at the
     // start of every device-map run.
-    _egWardingUsedThisMap = false;
+    globalThis._egWardingUsedThisMap = false;
 
     // Bind the endgame lose-overlay UI (no Retry - only "Return to the Nexus")
     // up front so every defeat path inside the map is covered.
@@ -693,11 +709,11 @@ function _egLaunchMapFromDevice(mapItem) {
     // mod state during this very launch (see _egCleanupMapRunSeedLevel).
     window._egMapDeviceLaunching = true;
     try {
-        showToast((typeof t === 'function') ? t('eg_map_activating').replace('{n}', mapItem.name)
+        globalThis.showToast((typeof t === 'function') ? t('eg_map_activating').replace('{n}', mapItem.name)
                                             : `Activating ${mapItem.name}...`);
 
         if (typeof trackAchStat === 'function') try { trackAchStat('egMapsLaunched', 1); } catch (e) {}
-        startLevel(gi);
+        globalThis.startLevel(gi);
     } finally {
         window._egMapDeviceLaunching = false;
     }

@@ -1,4 +1,25 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { t } from '../translation/translations.js';
+import { EG_MOD_CAPS, _egGetModTable, _egRollModCounts } from './endgame-equipment-generator.js';
+import { EG_ESSENCE_DEFS, _egBuildEssenceDetailHTML } from './endgame-essences.js';
+import { _egRenderMapSlot, _egRenderMapStashCell, _egSwitchMapStashTier, _egUpdateMapStashTabCounts } from './endgame-gate.js';
+import { _egSpawnCurrencyDrop } from './endgame-grid-pickups.js';
+import { _dndChipScreenEl, _egRenderCurrencyCell } from './endgame-hub-drag-and-drop.js';
+import { _egBuildTooltipBodyHTML, _egHideCompareTooltip, _egLastMouse, _egUpdateCompareTooltip } from './endgame-hub-tooltips.js';
+import { EG_INV_COLS, EG_MAP_STASH_COLS, _egAddItemToStash, _egCurrencyStash, _egEnsureInvRows, _egEquipped, _egFindFreeMapCellForTier, _egGetInvRows, _egGetMapTierGrid, _egHealCurrencyItem, _egInventory, _egMapStash, _egRebuildMapStashGrid, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
+import { _egRerollImplicits } from './endgame-implicits.js';
+import { _egMapLootQuantityMult } from './endgame-map-launch.js';
+import { EG_MAP_CURRENCY_RULES, _egBuildMapTooltipBodyHTML } from './endgame-maps.js';
+import { _egBuildItemName, _egBuildModPool, _egBuildRolledStats, _egPickModFromPool, _egPickTier, _egRollMods } from './endgame-mod-application.js';
+import { EG_SHARD_DEFS } from './endgame-shards.js';
+import { EG_UNIQUE_ITEMS, _egBuildUniqueItem } from './endgame-unique-items.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME CURRENCY (PoE-STYLE ORBS)--------------------
 //------------------------------------------------------------------------
 // Defines currency orbs that drop from monsters, stack in the currency
@@ -18,7 +39,7 @@
 //------------------------------------------------------------------------
 
 // Rerolls an item's mods entirely at the given rarity/counts.
-function _egRerollItemMods(item, rarity, prefixCount, suffixCount) {
+export function _egRerollItemMods(item, rarity, prefixCount, suffixCount) {
     const modTable = _egGetModTable(item);
     const mods = modTable ? _egRollMods(prefixCount, suffixCount, modTable, item.itemLevel || 1, item.defenses) : [];
     const name = _egBuildItemName(item.baseName || item.name, rarity, mods);
@@ -28,7 +49,7 @@ function _egRerollItemMods(item, rarity, prefixCount, suffixCount) {
 // Adds ONE new mod (prefix or suffix, whichever has room) to an item,
 // respecting the mod caps of the given rarity. Returns the item unchanged
 // if no eligible mod/slot was found.
-function _egAddOneModToItem(item, rarityForCaps) {
+export function _egAddOneModToItem(item, rarityForCaps) {
     const modTable = _egGetModTable(item);
     if (!modTable) return item;
 
@@ -61,7 +82,7 @@ function _egAddOneModToItem(item, rarityForCaps) {
 
 // Re-rolls the numeric VALUES of every modifier within its existing tier
 // (Divine Orb semantics). Families, tiers and rarity are kept untouched.
-function _egRerollItemModValues(item, modTable) {
+export function _egRerollItemModValues(item, modTable) {
     if (!modTable) return item;
     const mods = (item.mods || []).map(mod => {
         const section = mod.type === 'prefix' ? modTable.prefixes : modTable.suffixes;
@@ -76,7 +97,7 @@ function _egRerollItemModValues(item, modTable) {
 
 // Removes ONE random modifier from an item (Annulment semantics).
 // Rarity is kept untouched, even if fewer mods than the cap remain.
-function _egRemoveOneModFromItem(item) {
+export function _egRemoveOneModFromItem(item) {
     const existing = item.mods || [];
     if (existing.length === 0) return item;
     const index = Math.floor(Math.random() * existing.length);
@@ -85,7 +106,7 @@ function _egRemoveOneModFromItem(item) {
     return { ...item, mods, name };
 }
 
-const EG_CURRENCY_DEFS = {
+export const EG_CURRENCY_DEFS = {
 
     orb_transmutation: {
         id: 'orb_transmutation', name: t('eg_orb_transmutation'), icon: '🔷',
@@ -357,7 +378,7 @@ const EG_CURRENCY_DEFS = {
 };
 
 // Helper: eligible uniques for Ancient Orb - same slotType and required level <= source
-function _egGetAncientOrbEligibleUniques(item) {
+export function _egGetAncientOrbEligibleUniques(item) {
     if (!item || typeof EG_UNIQUE_ITEMS === 'undefined' || !Array.isArray(EG_UNIQUE_ITEMS)) return [];
     const slot = item.slotType;
     if (!slot) return [];
@@ -378,7 +399,7 @@ function _egGetAncientOrbEligibleUniques(item) {
 //-------------------CURRENCY DROPS FROM MONSTERS--------------------------
 //------------------------------------------------------------------------
 
-const EG_CURRENCY_DROP_TABLE = [
+export const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_transmutation', weight: 180 },
     { id: 'orb_augmentation', weight: 300 },
     { id: 'orb_alteration', weight: 380 },
@@ -404,10 +425,10 @@ const EG_CURRENCY_DROP_TABLE = [
     { id: 'orb_ancient', weight: 4 },
 ];
 
-const EG_CURRENCY_DROP_CHANCE_NORMAL = 0.25; // 25% per normal kill
-const EG_CURRENCY_DROP_CHANCE_BOSS = 0.90;   // bosses almost always drop one
+export const EG_CURRENCY_DROP_CHANCE_NORMAL = 0.25; // 25% per normal kill
+export const EG_CURRENCY_DROP_CHANCE_BOSS = 0.90;   // bosses almost always drop one
 
-function _egRollCurrencyDef() {
+export function _egRollCurrencyDef() {
     const total = EG_CURRENCY_DROP_TABLE.reduce((s, e) => s + e.weight, 0);
     let roll = Math.random() * total;
     for (const entry of EG_CURRENCY_DROP_TABLE) {
@@ -420,7 +441,7 @@ function _egRollCurrencyDef() {
 
 // Called on monster death (see endgame-encounter.js edit below).
 // Orbs now land on the grid and must be picked up, just like equipment loot.
-function _egTryDropCurrency(isBoss) {
+export function _egTryDropCurrency(isBoss) {
     const baseChance = isBoss ? EG_CURRENCY_DROP_CHANCE_BOSS : EG_CURRENCY_DROP_CHANCE_NORMAL;
     // Active map's loot quantity bonus scales the drop chance up.
     const qtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
@@ -440,30 +461,30 @@ function _egTryDropCurrency(isBoss) {
 //-------------------ORB "USE MODE" (right-click orb, left-click item)----
 //------------------------------------------------------------------------
 
-let _egPendingCurrencyUse = null; // { defId, sourceRow, sourceCol }
+export let _egPendingCurrencyUse = null; // { defId, sourceRow, sourceCol }
 
-function _egStartCurrencyUse(def, row, col, chipEl) {
+export function _egStartCurrencyUse(def, row, col, chipEl) {
     _egPendingCurrencyUse = { defId: def.id, sourceRow: row, sourceCol: col };
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     if (chipEl) chipEl.classList.add('eg-currency-selected');
     document.body.classList.add('eg-currency-use-active');
-    showToast(t('eg_currency_selected')
+    globalThis.showToast(t('eg_currency_selected')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name));
 }
 
-function _egCancelCurrencyUse(silent) {
+export function _egCancelCurrencyUse(silent) {
     if (!_egPendingCurrencyUse) return;
     _egPendingCurrencyUse = null;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     document.body.classList.remove('eg-currency-use-active');
-    if (!silent) showToast(t('eg_currency_cancelled'));
+    if (!silent) globalThis.showToast(t('eg_currency_cancelled'));
 }
 
 // Keeps use-mode active after an application (shift-click chaining, like
 // PoE). The currency cell may have been re-rendered by the application,
 // so the chip element is re-acquired from the DOM.
-function _egRefreshCurrencyUseHighlight() {
+export function _egRefreshCurrencyUseHighlight() {
     if (!_egPendingCurrencyUse) return;
     const { sourceRow, sourceCol } = _egPendingCurrencyUse;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
@@ -477,7 +498,7 @@ function _egRefreshCurrencyUseHighlight() {
     }
 }
 
-function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
+export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     if (!_egPendingCurrencyUse) return;
     const { sourceRow, sourceCol, defId } = _egPendingCurrencyUse;
     const def = EG_CURRENCY_DEFS[defId];
@@ -497,7 +518,7 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
 
     if (isMap && !mapRule) {
         const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
-        showToast(msg);
+        globalThis.showToast(msg);
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
@@ -510,7 +531,7 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     // Non-mirror map orbs must satisfy the map rule's own rarity gate.
     if (isMap && defId !== 'mirror_of_kalandra' && !mapRule.canApply(item)) {
         const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
-        showToast(msg);
+        globalThis.showToast(msg);
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
@@ -522,7 +543,7 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
 
     if (!isMap && (item.category !== 'equip' || !def.canApply(item))) {
         const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
-        showToast(msg);
+        globalThis.showToast(msg);
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
@@ -542,14 +563,14 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         if (copyToMapStash) {
             // Tiered infinite stash: place copy into its own tier
             try {
-                const tier = (item.mapTier != null ? item.mapTier : (_egMapStashActiveTier || 1));
+                const tier = (item.mapTier != null ? item.mapTier : (globalThis._egMapStashActiveTier || 1));
                 const pos = (typeof _egFindFreeMapCellForTier === 'function') ? _egFindFreeMapCellForTier(tier) : { r:0,c:0 };
                 const grid = (typeof _egGetMapTierGrid === 'function') ? _egGetMapTierGrid(tier) : _egMapStash;
                 const copy = JSON.parse(JSON.stringify(item));
                 copy.mirrored = true;
                 grid[pos.r][pos.c] = copy;
                 // render if visible tier
-                if (tier === (_egMapStashActiveTier || 1) && typeof _egRenderMapStashCell === 'function') {
+                if (tier === (globalThis._egMapStashActiveTier || 1) && typeof _egRenderMapStashCell === 'function') {
                     const domCells = document.querySelectorAll('.eg-map-stash-cell').length;
                     const needed = grid.length * EG_MAP_STASH_COLS;
                     if (domCells < needed && typeof _egRebuildMapStashGrid === 'function') _egRebuildMapStashGrid();
@@ -563,12 +584,12 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
                 _egRenderCurrencyCell(sourceRow, sourceCol);
                 if (keepActive && stack.count > 0) {
                     _egRefreshCurrencyUseHighlight();
-                    showToast(t('eg_mirror_created').replace('{name}', copy.name));
+                    globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
                     egSaveHubState();
                     return;
                 }
                 _egCancelCurrencyUse(true);
-                showToast(t('eg_mirror_created').replace('{name}', copy.name));
+                globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
                 egSaveHubState();
                 return;
             } catch(e) { /* fallback below */ }
@@ -597,12 +618,12 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
                 _egRenderCurrencyCell(sourceRow, sourceCol);
                 if (keepActive && stack.count > 0) {
                     _egRefreshCurrencyUseHighlight();
-                    showToast(t('eg_mirror_created').replace('{name}', copy.name));
+                    globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
                     egSaveHubState();
                     return;
                 }
                 _egCancelCurrencyUse(true);
-                showToast(t('eg_mirror_created').replace('{name}', copy.name));
+                globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
                 egSaveHubState();
                 return;
             }
@@ -626,13 +647,13 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         // Shift-click chaining: keep the mirror selected while stacks remain.
         if (keepActive && stack.count > 0) {
             _egRefreshCurrencyUseHighlight();
-            showToast(t('eg_mirror_created').replace('{name}', copy.name));
+            globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
             egSaveHubState();
             return;
         }
 
         _egCancelCurrencyUse(true);
-        showToast(t('eg_mirror_created').replace('{name}', copy.name));
+        globalThis.showToast(t('eg_mirror_created').replace('{name}', copy.name));
         egSaveHubState();
         return;
     }
@@ -657,7 +678,7 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         }
         if (!extraStack) {
             const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
-            showToast(msg);
+            globalThis.showToast(msg);
             _egCancelCurrencyUse(true);
             return;
         }
@@ -715,14 +736,14 @@ function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     // re-use it on the next target until the stack runs out.
     if (keepActive && stack.count > 0) {
         _egRefreshCurrencyUseHighlight();
-        showToast(t('eg_currency_applied').replace('{name}', def.name));
+        globalThis.showToast(t('eg_currency_applied').replace('{name}', def.name));
         if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
         egSaveHubState();
         return;
     }
 
     _egCancelCurrencyUse(true);
-    showToast(t('eg_currency_applied').replace('{name}', def.name));
+    globalThis.showToast(t('eg_currency_applied').replace('{name}', def.name));
     if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
     egSaveHubState();
 }
@@ -768,7 +789,7 @@ document.addEventListener('contextmenu', function (e) {
 
     const def = EG_CURRENCY_DEFS[item.id] || (typeof EG_SHARD_DEFS !== 'undefined' ? EG_SHARD_DEFS[item.id] : null);
     if (!def || (typeof def.apply !== 'function' && !def.isMirror)) {
-        showToast(t('eg_no_usable_effect'));
+        globalThis.showToast(t('eg_no_usable_effect'));
         return;
     }
 
@@ -813,7 +834,7 @@ document.addEventListener('mousedown', function (e) {
     let targetItem = null, applyFn = null;
     if (mapStashCell) {
         const r = +mapStashCell.dataset.row, c = +mapStashCell.dataset.col;
-        const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+        const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? globalThis._egMapStashActiveTier : 1);
         try {
             if (typeof _egGetMapTierGrid === 'function') targetItem = _egGetMapTierGrid(activeTier)[r][c];
             else targetItem = _egMapStash[r][c];
@@ -829,7 +850,7 @@ document.addEventListener('mousedown', function (e) {
                     const pos = (typeof _egFindFreeMapCellForTier === 'function') ? _egFindFreeMapCellForTier(newTier) : { r:0,c:0 };
                     _egGetMapTierGrid(newTier)[pos.r][pos.c] = newItem;
                     if (typeof _egUpdateMapStashTabCounts === 'function') _egUpdateMapStashTabCounts();
-                    if (newTier === (_egMapStashActiveTier || oldTier) && typeof _egRebuildMapStashGrid === 'function') {
+                    if (newTier === (globalThis._egMapStashActiveTier || oldTier) && typeof _egRebuildMapStashGrid === 'function') {
                         const domCells = document.querySelectorAll('.eg-map-stash-cell').length;
                         const needed = _egGetMapTierGrid(newTier).length * EG_MAP_STASH_COLS;
                         if (domCells < needed) _egRebuildMapStashGrid();
@@ -848,8 +869,8 @@ document.addEventListener('mousedown', function (e) {
             _egRenderMapStashCell(r, c);
         };
     } else if (mapSlotEl) {
-        targetItem = _egMapSlotItem;
-        applyFn = (newItem) => { _egMapSlotItem = newItem; _egRenderMapSlot(); };
+        targetItem = globalThis._egMapSlotItem;
+        applyFn = (newItem) => { globalThis._egMapSlotItem = newItem; _egRenderMapSlot(); };
     } else if (invCell) {
         const r = +invCell.dataset.row, c = +invCell.dataset.col;
         targetItem = _egInventory[r][c];
@@ -873,7 +894,7 @@ document.addEventListener('mousedown', function (e) {
 
     if (!targetItem) {
         const msg = t('eg_no_item_target');
-        showToast(msg);
+        globalThis.showToast(msg);
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         _egCancelCurrencyUse(true);
         return;
@@ -899,11 +920,11 @@ document.addEventListener('keydown', function (e) {
 // floating game tooltip (tooltips-hud.js) and drives the Alt-compare
 // tooltip.
 
-function _egShowTooltip(item, e) {
-    _egTooltipItem = item;
+export function _egShowTooltip(item, e) {
+    globalThis._egTooltipItem = item;
 
     if (!item) {
-        hideGameTooltip();
+        globalThis.hideGameTooltip();
         _egHideCompareTooltip();
         return;
     }
@@ -963,7 +984,7 @@ function _egShowTooltip(item, e) {
         html = _egBuildTooltipBodyHTML(item);
     }
 
-    showGameTooltip(html, e || {
+    globalThis.showGameTooltip(html, e || {
         clientX: _egLastMouse.x,
         clientY: _egLastMouse.y,
     });
@@ -976,7 +997,13 @@ function _egShowTooltip(item, e) {
 //------------------------------------------------------------------------
 
 // Heal any legacy currency/shard items already in memory (saved before description/category was persisted).
-(function _egHealExistingCurrencyStash() {
+// Module era: currency.js evaluates inside an import cycle, so running this
+// HERE would read an uninitialized _egCurrencyStash (typeof THROWS on TDZ
+// bindings) and silently skip. Classic order (hub before currency) always saw
+// the fresh empty stash - a no-op either way. Defer to DOMContentLoaded: the
+// stash is initialized (still empty - saves load on user action), same no-op,
+// and the audit stays honest (established step-5 passive-tree pattern).
+function _egBootHealExistingCurrencyStash() {
     try {
         if (typeof _egCurrencyStash !== 'undefined' && Array.isArray(_egCurrencyStash)) {
             for (let r = 0; r < _egCurrencyStash.length; r++) {
@@ -999,7 +1026,12 @@ function _egShowTooltip(item, e) {
             }
         }
     } catch (e) { /* ignore */ }
-})();
+}
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _egBootHealExistingCurrencyStash);
+} else {
+    _egBootHealExistingCurrencyStash();
+}
 
 (function _egInjectCurrencyStyles() {
     if (document.getElementById('eg-currency-styles')) return;

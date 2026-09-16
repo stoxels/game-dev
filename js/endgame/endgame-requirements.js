@@ -1,4 +1,17 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../translation/translations.js';
+import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
+import { _dndFindTargetSlot } from './endgame-hub-drag-and-drop.js';
+import { EG_INV_COLS, _egEnsureInvRows, _egEquipped, _egFindFreeInvCell, _egInventory, _egRenderEquipSlot, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
+import { _egSyncBaseAttributes } from './endgame-leveling.js';
+import { EG_STAT_KEY_MAP, _egGetAllEquippedItems } from './endgame-player-stats.js';
+import { _egInferWeaponHands } from './endgame-unique-items.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME EQUIPMENT REQUIREMENTS-----------------------
 //------------------------------------------------------------------------
 // Enforces gear stat requirements (Requires 10 Agi, etc.) on every
@@ -42,7 +55,7 @@
 // could ever be equipped. Tune freely - 20/20/20 covers early gear outright
 // and makes higher tiers a gear-investment / self-carry decision.
 // `level: null` means no level system yet - level requirements are skipped.
-const EG_PLAYER_BASE_ATTRIBUTES = {
+export const EG_PLAYER_BASE_ATTRIBUTES = {
     level: null,
     str: 20,
     agi: 20,
@@ -56,7 +69,7 @@ const EG_PLAYER_BASE_ATTRIBUTES = {
 
 // Sums the flat strength/agility/intelligence bonuses granted by mods AND implicits on
 // the given items. Only additive attribute mods count toward requirements.
-function _egSumAttributeBonuses(items) {
+export function _egSumAttributeBonuses(items) {
     const totals = { str: 0, agi: 0, int: 0 };
     function collect(list) {
         (Array.isArray(list) ? list : []).forEach(mod => {
@@ -79,7 +92,7 @@ function _egSumAttributeBonuses(items) {
 
 // Total attributes available to satisfy requirements for a given set of
 // items: base attributes plus every item's attribute bonus.
-function _egComputeLoadoutAttributes(items) {
+export function _egComputeLoadoutAttributes(items) {
     if (typeof _egSyncBaseAttributes === 'function') {
         try { _egSyncBaseAttributes(); } catch (e) {}
     }
@@ -100,7 +113,7 @@ function _egComputeLoadoutAttributes(items) {
 // violated by the given set of items. `stat` is 'level' | 'str' | 'agi' | 'int'.
 // Self-carrying falls out automatically because attribute totals include
 // all items in the set.
-function _egFindUnmetRequirements(items) {
+export function _egFindUnmetRequirements(items) {
     const attrs = _egComputeLoadoutAttributes(items);
     const unmet = [];
     (items || []).forEach(item => {
@@ -131,7 +144,7 @@ function _egFindUnmetRequirements(items) {
 // post-move reality - except for the displaced occupant, whose final resting
 // place (source equip slot vs stash cell) does not change the loadout's
 // total attribute pool.
-function _egSimulateAndCheck(mutateFn) {
+export function _egSimulateAndCheck(mutateFn) {
     if (typeof _egEquipped === 'undefined') return [];
     const sim = {};
     Object.keys(_egEquipped).forEach(k => { if (_egEquipped[k]) sim[k] = _egEquipped[k]; });
@@ -146,7 +159,7 @@ function _egSimulateAndCheck(mutateFn) {
 // up in an invalid state), the player can never be locked out - moves that
 // keep or reduce violations are always allowed, so any broken build can be
 // dismantled and fixed.
-function _egCheckMoveAllowed(mutateFn) {
+export function _egCheckMoveAllowed(mutateFn) {
     const before = _egSimulateAndCheck(() => {});
     const after = _egSimulateAndCheck(mutateFn);
     return { ok: after.length <= before.length, missing: after };
@@ -161,7 +174,7 @@ function _egCheckMoveAllowed(mutateFn) {
 //   - weapon2 accepts shields or 1H weapons only (dual-wield)
 //   - two shields are impossible (weapon1 never accepts shields)
 // Returns { ok: true } or { ok: false, missing: [...], handError }.
-function _egCanEquipInSlot(item, slotId) {
+export function _egCanEquipInSlot(item, slotId) {
     if (item && item.category === 'equip') {
         const handGate = _egCheckHandCompatibilityInSlot(item, slotId);
         if (!handGate.ok) return handGate;
@@ -179,7 +192,7 @@ function _egCanEquipInSlot(item, slotId) {
 // the loadout self-consistent. Also works mid-drag (item already lifted off
 // its slot) since deleting an absent key is a no-op.
 // Returns { ok: true } or { ok: false, missing: [...] }.
-function _egCheckUnequipSlot(slotId) {
+export function _egCheckUnequipSlot(slotId) {
     return _egCheckMoveAllowed(sim => {
         delete sim[slotId];
     });
@@ -191,14 +204,14 @@ function _egCheckUnequipSlot(slotId) {
 //------------------------------------------------------------------------
 
 // Formats one unmet entry as localized text, e.g. "10 Agi" or "Level 12".
-function _egFormatRequirementPart(stat, need) {
+export function _egFormatRequirementPart(stat, need) {
     if (stat === 'level') return t('eg_req_level').replace('{n}', need);
     const attrKeys = { str: 'eg_attr_str', agi: 'eg_attr_agi', int: 'eg_attr_int' };
     return `${need} ${t(attrKeys[stat])}`;
 }
 
 // Joins unmet entries into a single localized list, e.g. "5 Agi, 3 Int".
-function _egGetUnmetRequirementsText(missing) {
+export function _egGetUnmetRequirementsText(missing) {
     const seen = {};
     const parts = [];
     (missing || []).forEach(m => {
@@ -218,7 +231,7 @@ function _egGetUnmetRequirementsText(missing) {
 // explains that instead of the generic "missing" one.
 // Also mirrors the message into the stash center overlay (endgame-hub.js) so
 // the player sees WHY the action was blocked without having to catch a toast.
-function _egShowRequirementsToast(context, missingOrGate, item) {
+export function _egShowRequirementsToast(context, missingOrGate, item) {
     const itemName = (item && item.name) || item || '?';
     // Hand-rule rejections carry their own message (no attribute list).
     // Callers pass the full gate ({ ok, missing, handError }) or the missing array.
@@ -227,7 +240,7 @@ function _egShowRequirementsToast(context, missingOrGate, item) {
         : (item && item.handError ? item.handError : null);
     if (handError && typeof _egHandErrorMessage === 'function') {
         const msg = _egHandErrorMessage(handError, typeof item === 'object' ? item : { name: itemName });
-        if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+        if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         return;
     }
@@ -245,7 +258,7 @@ function _egShowRequirementsToast(context, missingOrGate, item) {
             ? t('eg_cannot_unequip').replace('{name}', itemName).replace('{list}', list)
             : t('eg_cannot_equip').replace('{name}', itemName).replace('{list}', list);
     }
-    if (typeof showToast === 'function') showToast(msg, '#e74c3c');
+    if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
     if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
 }
 
@@ -260,7 +273,7 @@ function _egShowRequirementsToast(context, missingOrGate, item) {
 //     item's own bonuses are included (self-carrying) - matching exactly what
 //     _egCanEquipInSlot will validate, so tooltips never show "requirements
 //     met" for an equip that the gate would reject (or vice versa).
-function _egPreviewEquipAttributes(item) {
+export function _egPreviewEquipAttributes(item) {
     const equipped = _egGetAllEquippedItems();
     if (equipped.includes(item)) return _egComputeLoadoutAttributes(equipped);
     const target = (typeof _dndFindTargetSlot === 'function') ? _dndFindTargetSlot(item) : null;
@@ -275,7 +288,7 @@ function _egPreviewEquipAttributes(item) {
 // OTHER equipped items rely on ("chain-break"). Returns null unless the item
 // is blocked purely for that reason:
 //   { occupant, broken: [{ item, stat, need, have }] }
-function _egGetSwapChainBreak(item) {
+export function _egGetSwapChainBreak(item) {
     if (!item || item.category !== 'equip' || !item.requirements) return null;
     if (typeof _egEquipped === 'undefined') return null;
 
@@ -305,7 +318,7 @@ function _egGetSwapChainBreak(item) {
 //     requirement gate (grandfather rule included - matches what the game
 //     would actually do on right-click / drop).
 // Non-equipment items and items with no requirements are never blocked.
-function _egIsItemBlocked(item) {
+export function _egIsItemBlocked(item) {
     if (!item || item.category !== 'equip' || !item.requirements) return false;
     if (typeof _egEquipped === 'undefined') return false;
 
@@ -357,7 +370,7 @@ function _egIsItemBlocked(item) {
 // Blocking always requires a shield in weapon2 (enforced in combat).
 // Two shields are impossible because weapon1 never accepts slotType 'shield'.
 
-function _egGetWeaponHands(item) {
+export function _egGetWeaponHands(item) {
     if (!item || item.slotType !== 'weapon') return null;
     if (item.hands === 1 || item.hands === 2) return item.hands;
     if (typeof _egInferWeaponHands === 'function') {
@@ -367,23 +380,23 @@ function _egGetWeaponHands(item) {
     return 1; // legacy fallback: old weapons were all effectively 1H
 }
 
-function _egIsTwoHandedWeapon(item) {
+export function _egIsTwoHandedWeapon(item) {
     return item && item.slotType === 'weapon' && _egGetWeaponHands(item) === 2;
 }
 
-function _egIsOneHandedWeapon(item) {
+export function _egIsOneHandedWeapon(item) {
     return item && item.slotType === 'weapon' && _egGetWeaponHands(item) === 1;
 }
 
 // True when both hand slots hold 1H weapons (dual-wield parry bonus active).
-function _egIsDualWielding(loadout) {
+export function _egIsDualWielding(loadout) {
     const eq = loadout || (typeof _egEquipped !== 'undefined' ? _egEquipped : {});
     if (!eq) return false;
     return _egIsOneHandedWeapon(eq.weapon1) && _egIsOneHandedWeapon(eq.weapon2);
 }
 
 // True when a shield sits in the off-hand (the ONLY setup that can block).
-function _egHasShieldEquipped(loadout) {
+export function _egHasShieldEquipped(loadout) {
     const eq = loadout || (typeof _egEquipped !== 'undefined' ? _egEquipped : {});
     if (!eq) return false;
     return !!(eq.weapon2 && eq.weapon2.slotType === 'shield');
@@ -393,7 +406,7 @@ function _egHasShieldEquipped(loadout) {
 // as it would look after the move). Returns { ok:true } or
 // { ok:false, handError:'two_handed_blocks_offhand' | 'offhand_blocked_by_two_hander'
 //   | 'offhand_single_handed_only', missing: [] }.
-function _egCheckHandCompatibilityInSlot(item, slotId) {
+export function _egCheckHandCompatibilityInSlot(item, slotId) {
     if (!item || item.category !== 'equip') return { ok: true };
     if (typeof _egEquipped === 'undefined') return { ok: true };
     const sim = {};
@@ -429,7 +442,7 @@ function _egCheckHandCompatibilityInSlot(item, slotId) {
 }
 
 // Localized hand-error message (falls back to EN when t() lacks the key).
-function _egHandErrorMessage(handError, item) {
+export function _egHandErrorMessage(handError, item) {
     const name = (item && item.name) || '?';
     try {
         if (handError === 'two_handed_blocks_offhand' && typeof t === 'function') {
@@ -453,7 +466,7 @@ function _egHandErrorMessage(handError, item) {
 
 // Heals a legacy weapon item saved before the 1H/2H split (no `hands`).
 // Mutates in place, returns true when changed.
-function _egHealWeaponHands(item) {
+export function _egHealWeaponHands(item) {
     if (!item || item.category !== 'equip' || item.slotType !== 'weapon') return false;
     if (item.hands === 1 || item.hands === 2) return false;
     let hands = null;
@@ -474,7 +487,7 @@ function _egHealWeaponHands(item) {
 // the move must stay blocked (e.g. freeing the off-hand would break other
 // gear's requirements, or no stash space). Callers re-run _egCanEquipInSlot
 // after a successful return.
-function _egTryAutoUnequipOffhandForTwoHander() {    if (typeof _egEquipped === 'undefined' || !_egEquipped.weapon2) return true;
+export function _egTryAutoUnequipOffhandForTwoHander() {    if (typeof _egEquipped === 'undefined' || !_egEquipped.weapon2) return true;
     // Chain safety: freeing the off-hand must not break remaining gear.
     try {
         const gate = _egCheckUnequipSlot('weapon2');
@@ -515,7 +528,7 @@ function _egTryAutoUnequipOffhandForTwoHander() {    if (typeof _egEquipped === 
 // legality is guaranteed and any newly-unmet requirements simply flag red,
 // exactly as if the player had unequipped the item themselves.
 // Returns an array of { slotId, item } moves ([] when nothing was illegal).
-function _egMigrateIllegalHandsToStash() {
+export function _egMigrateIllegalHandsToStash() {
     const moved = [];
     try {
         if (typeof _egEquipped === 'undefined' || !_egEquipped) return moved;

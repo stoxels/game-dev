@@ -1,4 +1,13 @@
-﻿//------------------------------------------------------------------------
+﻿import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
+import { _trackTimerDelta, updTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { _setAbilityMode } from './class-abilities.js';
+import { cooldownState } from './class-cooldown-state.js';
+import { buildClassHUD } from './class-hud.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+//------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
 //------------------------------MARKOVIAN CLASS--------------------------
 //------------------------------------------------------------------------
@@ -27,10 +36,10 @@
 //------------------------------------------------------------------------
 
 // How many seconds of snapshot history to keep in the circular buffer.
-const MARKOV_SNAPSHOT_BUFFER = 35;
+export const MARKOV_SNAPSHOT_BUFFER = 35;
 
 // Colour palette for the lightning bolts in the rollback VFX.
-const ROLLBACK_BOLT_HUES = [
+export const ROLLBACK_BOLT_HUES = [
     'rgba(140,80,255,',
     'rgba(80,140,255,',
     'rgba(80,220,200,',
@@ -38,18 +47,18 @@ const ROLLBACK_BOLT_HUES = [
 ];
 
 // Particle colour palette for the rollback hourglass VFX.
-const ROLLBACK_PARTICLE_COLORS = [
+export const ROLLBACK_PARTICLE_COLORS = [
     'rgba(200,140,255,',
     'rgba(140,100,255,',
     'rgba(100,160,255,',
 ];
 
 // Glyphs shown in the Transition Matrix rain overlay.
-const TM_GLYPH_CHARSET = '01アイウエオカキクケコ∑∫∂∇λμπ';
+export const TM_GLYPH_CHARSET = '01アイウエオカキクケコ∑∫∂∇λμπ';
 
 // CSS injected once for the Transition Matrix HUD badge and cell flash animations.
 // Kept here so the style string is easy to find and edit without digging into JS logic.
-const TM_BADGE_CSS = `
+export const TM_BADGE_CSS = `
     #transition-matrix-badge {
         display: inline-flex; align-items: center; gap: 3px;
         background: rgba(41,128,185,0.18); border: 1px solid #2980b9;
@@ -92,25 +101,25 @@ const TM_BADGE_CSS = `
 //------------------------------------------------------------------------
 
 // Initialises (or resets) the snapshot buffer for a new level.
-function _markovSnapshotInit() {
+export function _markovSnapshotInit() {
     window._markovSnapshots = [];
 }
 
 // Takes a deep-copy snapshot of all relevant grid state and appends it
 // to the circular buffer. Called once per second while a level is running.
-function _markovSnapshotTick() {
-    if (!cur || dead) return;
+export function _markovSnapshotTick() {
+    if (!globalThis.cur || globalThis.dead) return;
 
-    const ugCopy = userGrid.map(row => [...row]);
-    const wgCopy = wrongGrid.map(row => [...row]);
-    const rgCopy = revealedGrid.map(row => [...row]);
+    const ugCopy = globalThis.userGrid.map(row => [...row]);
+    const wgCopy = globalThis.wrongGrid.map(row => [...row]);
+    const rgCopy = globalThis.revealedGrid.map(row => [...row]);
 
     window._markovSnapshots.push({
         userGrid: ugCopy,
         wrongGrid: wgCopy,
         revealedGrid: rgCopy,
-        mistakeCount: mistakeCount,
-        timerSecs: timerSecs,
+        mistakeCount: globalThis.mistakeCount,
+        timerSecs: globalThis.timerSecs,
         ts: Date.now(),
     });
 
@@ -130,7 +139,7 @@ function _markovSnapshotTick() {
 
 // Returns the snapshot whose timestamp is closest to (now - windowSeconds).
 // Returns null when the buffer is empty.
-function _rollback_findBestSnapshot(windowSeconds) {
+export function _rollback_findBestSnapshot(windowSeconds) {
     const snapshots = window._markovSnapshots || [];
     if (snapshots.length === 0) return null;
 
@@ -151,9 +160,9 @@ function _rollback_findBestSnapshot(windowSeconds) {
 // Collects every cell that was already wrong inside the target snapshot.
 // Used by the Rank 3 "forgive old mistakes" bonus.
 // Returns an array of { r, c } objects.
-function _rollback_collectPreExistingMistakes(snapshot) {
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+export function _rollback_collectPreExistingMistakes(snapshot) {
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
     const result = [];
 
     for (let r = 0; r < rows; r++) {
@@ -165,43 +174,43 @@ function _rollback_collectPreExistingMistakes(snapshot) {
 }
 
 // Writes a snapshot's grid data into the live game grids.
-function _rollback_applySnapshot(snapshot) {
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+export function _rollback_applySnapshot(snapshot) {
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            userGrid[r][c] = snapshot.userGrid[r][c];
-            wrongGrid[r][c] = snapshot.wrongGrid[r][c];
-            revealedGrid[r][c] = snapshot.revealedGrid[r][c];
+            globalThis.userGrid[r][c] = snapshot.userGrid[r][c];
+            globalThis.wrongGrid[r][c] = snapshot.wrongGrid[r][c];
+            globalThis.revealedGrid[r][c] = snapshot.revealedGrid[r][c];
         }
     }
-    mistakeCount = snapshot.mistakeCount;
+    globalThis.mistakeCount = snapshot.mistakeCount;
 }
 
 // Clears the pre-existing mistake cells collected by
 // _rollback_collectPreExistingMistakes. Also credits the quest stat for
 // each cell removed.
-function _rollback_clearPreExistingMistakes(preExistingWrong) {
+export function _rollback_clearPreExistingMistakes(preExistingWrong) {
     if (preExistingWrong.length === 0) return;
 
     preExistingWrong.forEach(({ r, c }) => {
-        wrongGrid[r][c] = false;
+        globalThis.wrongGrid[r][c] = false;
         // Only blank the user fill if the cell isn't a correct reveal.
-        if (userGrid[r][c] !== 1 && !revealedGrid[r][c]) {
-            userGrid[r][c] = 0;
+        if (globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]) {
+            globalThis.userGrid[r][c] = 0;
         }
-        questStat_mistakesRemoved(1);
+        globalThis.questStat_mistakesRemoved(1);
     });
 
-    showToast(t('cls_rollback_old_cleared').replace('{n}', preExistingWrong.length));
+    globalThis.showToast(t('cls_rollback_old_cleared').replace('{n}', preExistingWrong.length));
 }
 
 // Re-renders every cell and refreshes all row/column clue indicators
 // after a rollback has been applied.
-function _rollback_refreshDisplay() {
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+export function _rollback_refreshDisplay() {
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -214,7 +223,7 @@ function _rollback_refreshDisplay() {
 
     // Update the on-screen mistake counter.
     const mc = document.getElementById('mistake-counter');
-    if (mc) mc.textContent = `${t('cls_mistakes_word')}: ${mistakeCount}`;
+    if (mc) mc.textContent = `${t('cls_mistakes_word')}: ${globalThis.mistakeCount}`;
 
     updTimer();
 
@@ -230,19 +239,19 @@ function _rollback_refreshDisplay() {
 //   windowSeconds    - how far back in time to seek (rank-dependent).
 //   rewindSeconds    - bonus seconds added on top of the restored timer.
 //   clearOldMistakes - Rank 3 flag: forgive pre-existing mistakes.
-function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
-    if (!cur) return;
+export function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
+    if (!globalThis.cur) return;
 
     // ── Find the target snapshot ──────────────────────────────────
     const best = _rollback_findBestSnapshot(windowSeconds);
     if (!best) {
-        showToast(t('cls_rollback_none'));
+        globalThis.showToast(t('cls_rollback_none'));
         _rollbackCancel(true);
         return;
     }
 
-    const mistakesBefore = mistakeCount;   // 
-    const timerBefore = timerSecs;         // 
+    const mistakesBefore = globalThis.mistakeCount;   // 
+    const timerBefore = globalThis.timerSecs;         // 
 
     // ── Rank 3: collect mistakes to forgive ──────────────────────
     const preExistingWrong = clearOldMistakes
@@ -258,18 +267,18 @@ function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
     }
 
     // ── "Cheat Death" achievement (triggered when nearly out of time) ──
-    if (timerSecs <= 10) {
+    if (globalThis.timerSecs <= 10) {
         trackAchStat('rollbackSaves');
-        showToast(t('cls_cheat_death'));
+        globalThis.showToast(t('cls_cheat_death'));
     }
 
     // Restore the timer to what it was at the snapshot moment, then add
     // the rank bonus on top. Cap at 1 hour.
-    timerSecs = Math.min(best.timerSecs + rewindSeconds, 3600);
-    _trackTimerDelta(timerBefore, timerSecs); 
+    globalThis.timerSecs = Math.min(best.timerSecs + rewindSeconds, 3600);
+    _trackTimerDelta(timerBefore, globalThis.timerSecs); 
 
-    const mistakesForgiven = Math.max(0, mistakesBefore - mistakeCount);
-    if (mistakesForgiven > 0) _levelMistakesErased += mistakesForgiven; 
+    const mistakesForgiven = Math.max(0, mistakesBefore - globalThis.mistakeCount);
+    if (mistakesForgiven > 0) globalThis._levelMistakesErased += mistakesForgiven; 
 
     // ── Refresh all UI that depends on grid state ────────────────
     _rollback_refreshDisplay();
@@ -283,34 +292,34 @@ function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
     window._markovSnapshots = [];
 
     // ── VFX + feedback ───────────────────────────────────────────
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
     const approxSecs = Math.round((Date.now() - best.ts) / 1000);
 
     _rollbackPlayVFX(rows, cols);
 
-    showToast(t('cls_rollback_done')
+    globalThis.showToast(t('cls_rollback_done')
         .replace('{a}', approxSecs)
         .replace('{b}', rewindSeconds));
 
     Audio_Manager.playSFX('stateReversal');
     trackAchStat('skillRollbackUsed');
 
-    checkWin();
+    globalThis.checkWin();
 }
 
 // Cancels an in-progress rollback activation (e.g. player pressed Escape).
 // Pass silent=true to suppress the cancellation toast.
-function _rollbackCancel(silent = false) {
+export function _rollbackCancel(silent = false) {
     _setAbilityMode(false);
-    STATE.classActiveChoice = 'active3';
+    globalThis.STATE.classActiveChoice = 'active3';
 
     const cd = cooldownState['active3'];
     if (cd && cd.interval) { clearInterval(cd.interval); cd.interval = null; }
     if (cd) cd.remaining = 0;
 
     buildClassHUD();
-    if (!silent) showToast(`⏳ ${t('cls_cancelled')}`);
+    if (!silent) globalThis.showToast(`⏳ ${t('cls_cancelled')}`);
 }
 
 
@@ -323,7 +332,7 @@ function _rollbackCancel(silent = false) {
 //------------------------------------------------------------------------
 
 // Creates and attaches the full-screen overlay canvas. Returns { cvs, ctx }.
-function _rollbackVFX_createCanvas() {
+export function _rollbackVFX_createCanvas() {
     const cvs = document.createElement('canvas');
     cvs.style.cssText = `
         position: fixed; inset: 0;
@@ -346,7 +355,7 @@ function _rollbackVFX_createCanvas() {
 // Builds a new lightning bolt starting from a random screen position and
 // pushes it into the bolts array. Each bolt is a chain of random segments
 // drifting downward to mimic a time-crack effect.
-function _rollbackVFX_spawnBolt(bolts, W, H) {
+export function _rollbackVFX_spawnBolt(bolts, W, H) {
     const x1 = W() * 0.05 + Math.random() * W() * 0.9;
     const y1 = Math.random() * H();
     const segs = [];
@@ -365,7 +374,7 @@ function _rollbackVFX_spawnBolt(bolts, W, H) {
 
 // Draws the dark screen tint and the animated grid-dot pulse layer.
 // OPTIMIZED: step 32px vs 18px (~68% fewer rects), skip near-invisible dots, thinner sweep.
-function _rollbackVFX_drawBackground(ctx, w, h, elapsed, fade) {
+export function _rollbackVFX_drawBackground(ctx, w, h, elapsed, fade) {
     ctx.fillStyle = `rgba(10,5,30,${0.82 * fade})`;
     ctx.fillRect(0, 0, w, h);
 
@@ -397,7 +406,7 @@ function _rollbackVFX_drawBackground(ctx, w, h, elapsed, fade) {
 }
 
 // Advances and draws all live lightning bolts. Dead bolts are removed.
-function _rollbackVFX_drawBolts(ctx, bolts, fade) {
+export function _rollbackVFX_drawBolts(ctx, bolts, fade) {
     for (let i = bolts.length - 1; i >= 0; i--) {
         const b = bolts[i];
         b.life -= 1 / b.maxLife;
@@ -430,7 +439,7 @@ function _rollbackVFX_drawBolts(ctx, bolts, fade) {
 
 // Draws the central rotating hourglass emoji with glow, plus drifting
 // sand/time particles orbiting it.
-function _rollbackVFX_drawHourglass(ctx, w, h, t, fade, particles) {
+export function _rollbackVFX_drawHourglass(ctx, w, h, t, fade, particles) {
     const cx = w / 2;
     const cy = h / 2;
 
@@ -490,7 +499,7 @@ function _rollbackVFX_drawHourglass(ctx, w, h, t, fade, particles) {
 
 // Applies a rippling colour flash to each grid cell with a staggered delay,
 // creating a wave effect that rolls diagonally across the puzzle.
-function _rollbackVFX_flashCells(rows, cols) {
+export function _rollbackVFX_flashCells(rows, cols) {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             const el = document.getElementById(`g-${r}-${c}`);
@@ -507,7 +516,7 @@ function _rollbackVFX_flashCells(rows, cols) {
 // Orchestrates the full rollback VFX: spawns the canvas overlay, runs the
 // animation loop for DURATION ms, then removes the canvas.
 // OPTIMIZED: throttled to ~30fps to halve CPU, capped bolt spawn.
-function _rollbackPlayVFX(rows, cols) {
+export function _rollbackPlayVFX(rows, cols) {
     const DURATION = 2200;
 
     const { cvs, ctx, resize } = _rollbackVFX_createCanvas();
@@ -545,7 +554,7 @@ function _rollbackPlayVFX(rows, cols) {
         if (t < 1) {
             animId = requestAnimationFrame(tick);
         } else {
-            cancelAnimationFrame(animId);
+            globalThis.cancelAnimationFrame(animId);
             window.removeEventListener('resize', resize);
             cvs.remove();
         }
@@ -564,7 +573,7 @@ function _rollbackPlayVFX(rows, cols) {
 //   durationMs    - how long the mode stays active.
 //   cascadeChance - probability (0–1) of each correct fill triggering a cascade.
 //   maxDepth      - maximum cascade chain length (1 = rank 1–2, 2 = rank 3).
-function _executeTransitionMatrix(durationMs, cascadeChance, maxDepth) {
+export function _executeTransitionMatrix(durationMs, cascadeChance, maxDepth) {
     _clearTransitionMatrix();
 
     window._transitionMatrixActive = {
@@ -576,7 +585,7 @@ function _executeTransitionMatrix(durationMs, cascadeChance, maxDepth) {
 
     const secs = Math.ceil(durationMs / 1000);
 
-    showToast(t('cls_tm_active')
+    globalThis.showToast(t('cls_tm_active')
         .replace('{s}', secs)
         .replace('{p}', Math.round(cascadeChance * 100)));
 
@@ -607,7 +616,7 @@ function _executeTransitionMatrix(durationMs, cascadeChance, maxDepth) {
 // Pass natural=true when the session ends by time-out (shows the expiry toast
 // and rebuilds the class HUD). Pass natural=false (default) when clearing
 // as part of starting a new session or resetting the level.
-function _clearTransitionMatrix(natural = false) {
+export function _clearTransitionMatrix(natural = false) {
     if (window._transitionMatrixActive?.timeout) {
         clearTimeout(window._transitionMatrixActive.timeout);
     }
@@ -621,7 +630,7 @@ function _clearTransitionMatrix(natural = false) {
     // Fade out and remove the canvas overlay if it is still running.
     const cvs = document.getElementById('tm-canvas-overlay');
     if (cvs) {
-        if (cvs._animId) cancelAnimationFrame(cvs._animId);
+        if (cvs._animId) globalThis.cancelAnimationFrame(cvs._animId);
         cvs.style.transition = 'opacity 0.4s ease-out';
         cvs.style.opacity = '0';
         setTimeout(() => {
@@ -631,7 +640,7 @@ function _clearTransitionMatrix(natural = false) {
     }
 
     if (natural) {
-        showToast(t('cls_tm_ended'));
+        globalThis.showToast(t('cls_tm_ended'));
         buildClassHUD();
     }
 }
@@ -650,10 +659,10 @@ function _clearTransitionMatrix(natural = false) {
 
 // Reads the current puzzle grid DOM and returns an array of node objects,
 // one per cell, each positioned at the cell's screen-centre.
-function _tmOverlay_buildNodes() {
-    if (!cur) return [];
+export function _tmOverlay_buildNodes() {
+    if (!globalThis.cur) return [];
 
-    const sol = cur.grid;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const nodes = [];
@@ -679,7 +688,7 @@ function _tmOverlay_buildNodes() {
 // Builds a sparse set of animated connection chains between nearby nodes.
 // maxDist controls which node pairs can be linked.
 // OPTIMIZED: cap total chains to 36, use dist² check to avoid sqrt.
-function _tmOverlay_buildChains(nodes) {
+export function _tmOverlay_buildChains(nodes) {
     const chains = [];
     const maxDist = 140;
     const maxDistSq = maxDist * maxDist;
@@ -706,7 +715,7 @@ function _tmOverlay_buildChains(nodes) {
 // Fills the glyphRain array with one column descriptor per screen column.
 // Called once on init; safe to call again if the window is resized.
 // OPTIMIZED: coarser columns (32px vs 22px), shorter trails, cached chars.
-function _tmOverlay_buildGlyphRain(glyphRain, canvasW, canvasH) {
+export function _tmOverlay_buildGlyphRain(glyphRain, canvasW, canvasH) {
     const colW = 32;
     const colCount = Math.floor(canvasW / colW);
     for (let i = glyphRain.length; i < colCount; i++) {
@@ -730,7 +739,7 @@ function _tmOverlay_buildGlyphRain(glyphRain, canvasW, canvasH) {
 
 // Advances and draws every glyph rain column.
 // OPTIMIZED: fewer fillText calls, cached glyphs, no per-glyph random, reduced alpha calc.
-function _tmOverlay_drawGlyphRain(ctx, glyphRain, h, fade) {
+export function _tmOverlay_drawGlyphRain(ctx, glyphRain, h, fade) {
     ctx.font = '12px monospace';
     ctx.textAlign = 'center';
     for (let idx = 0; idx < glyphRain.length; idx++) {
@@ -768,7 +777,7 @@ function _tmOverlay_drawGlyphRain(ctx, glyphRain, h, fade) {
 
 // Advances and draws every node chain, including the travelling energy pulse.
 // OPTIMIZED: single setLineDash, solid dot instead of radial gradient.
-function _tmOverlay_drawChains(ctx, chains, fade) {
+export function _tmOverlay_drawChains(ctx, chains, fade) {
     if (chains.length === 0) return;
     const lineAlpha = 0.18 * fade;
     ctx.strokeStyle = `rgba(30,180,100,${lineAlpha})`;
@@ -805,7 +814,7 @@ function _tmOverlay_drawChains(ctx, chains, fade) {
 
 // Draws each node as a pulsing circle; active (filled) nodes get an extra glow halo.
 // OPTIMIZED: no radial gradients, use globalAlpha + solid fills, cache pulse.
-function _tmOverlay_drawNodes(ctx, nodes, t2, fade) {
+export function _tmOverlay_drawNodes(ctx, nodes, t2, fade) {
     for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         const pulse = 0.5 + 0.5 * Math.sin(t2 * 2.2 + n.pulse);
@@ -838,7 +847,7 @@ function _tmOverlay_drawNodes(ctx, nodes, t2, fade) {
 
 // Spawns occasional cascade particles from random nodes and advances/draws them.
 // OPTIMIZED: lower spawn rate, cap particles to 10, smaller update.
-function _tmOverlay_drawParticles(ctx, particles, nodes, fade) {
+export function _tmOverlay_drawParticles(ctx, particles, nodes, fade) {
     if (particles.length < 10 && Math.random() < 0.08 && nodes.length > 0) {
         const src = nodes[Math.floor(Math.random() * nodes.length)];
         particles.push({
@@ -867,7 +876,7 @@ function _tmOverlay_drawParticles(ctx, particles, nodes, fade) {
 // Builds the canvas overlay and runs the animation loop for the full
 // durationMs of the Transition Matrix session.
 // OPTIMIZED: throttled to ~30fps, reduced overdraw, DPR-aware sizing.
-function _transitionMatrixStartOverlay(durationMs) {
+export function _transitionMatrixStartOverlay(durationMs) {
     // Respect reduced-motion preference - skip heavy canvas entirely
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     document.getElementById('tm-canvas-overlay')?.remove();
@@ -924,7 +933,7 @@ function _transitionMatrixStartOverlay(durationMs) {
 
         // Session ended naturally.
         if (t >= 1) {
-            cancelAnimationFrame(animId);
+            globalThis.cancelAnimationFrame(animId);
             cvs.style.transition = 'opacity 0.5s ease-out';
             cvs.style.opacity = '0';
             setTimeout(() => {
@@ -936,7 +945,7 @@ function _transitionMatrixStartOverlay(durationMs) {
 
         // Session was cancelled externally (e.g. level reset, skill deactivated).
         if (!window._transitionMatrixActive) {
-            cancelAnimationFrame(animId);
+            globalThis.cancelAnimationFrame(animId);
             cvs.style.transition = 'opacity 0.4s ease-out';
             cvs.style.opacity = '0';
             setTimeout(() => {
@@ -987,7 +996,7 @@ function _transitionMatrixStartOverlay(durationMs) {
 // Tries to cascade to a random unfilled correct cardinal neighbour.
 //   row / col  - the cell that was just filled correctly.
 //   depth      - remaining cascade depth (decremented on each recursive call).
-function _transitionMatrixCascade(row, col, depth) {
+export function _transitionMatrixCascade(row, col, depth) {
     const tm = window._transitionMatrixActive;
 
     // Abort if the session has expired.
@@ -995,9 +1004,9 @@ function _transitionMatrixCascade(row, col, depth) {
         _clearTransitionMatrix(true);
         return;
     }
-    if (depth <= 0 || Math.random() > tm.cascadeChance || !cur) return;
+    if (depth <= 0 || Math.random() > tm.cascadeChance || !globalThis.cur) return;
 
-    const sol = cur.grid;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -1008,7 +1017,7 @@ function _transitionMatrixCascade(row, col, depth) {
         const nr = row + dr;
         const nc = col + dc;
         if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
-        if (sol[nr][nc] === 1 && !revealedGrid[nr][nc] && userGrid[nr][nc] !== 1) {
+        if (sol[nr][nc] === 1 && !globalThis.revealedGrid[nr][nc] && globalThis.userGrid[nr][nc] !== 1) {
             neighbours.push([nr, nc]);
         }
     }
@@ -1018,18 +1027,18 @@ function _transitionMatrixCascade(row, col, depth) {
     // Pick a random eligible neighbour and reveal it.
     const [nr, nc] = neighbours[Math.floor(Math.random() * neighbours.length)];
 
-    revealedGrid[nr][nc] = true;
-    userGrid[nr][nc] = 1;
+    globalThis.revealedGrid[nr][nc] = true;
+    globalThis.userGrid[nr][nc] = 1;
     renderCell(nr, nc);
     updClues(nr, nc);
     trackAchStat('tilesRevealed', 1);
-    questStat_classRevealUsed(1);
-    updateQuestStats('classAbilityUsedThisLevel', {});
+    globalThis.questStat_classRevealUsed(1);
+    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
     if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
 
     _transitionMatrixCellVFX(nr, nc, row, col);
 
-    showToast(t('cls_tm_cascade'));
+    globalThis.showToast(t('cls_tm_cascade'));
 
     // Rank 3: the newly revealed cell can itself cascade after a short delay.
     if (depth > 1) {
@@ -1038,7 +1047,7 @@ function _transitionMatrixCascade(row, col, depth) {
     }
 
     Audio_Manager.playSFX('transitionCascade');
-    checkWin();
+    globalThis.checkWin();
 }
 
 
@@ -1051,7 +1060,7 @@ function _transitionMatrixCascade(row, col, depth) {
 //------------------------------------------------------------------------
 
 // Returns the screen-centre of a puzzle cell element, or null if missing.
-function _tmBeam_getCellCenter(row, col) {
+export function _tmBeam_getCellCenter(row, col) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return null;
     const rect = el.getBoundingClientRect();
@@ -1060,7 +1069,7 @@ function _tmBeam_getCellCenter(row, col) {
 
 // Draws the core beam line and its bright white centre stripe up to the
 // current head position (headX, headY).
-function _tmBeam_drawCore(ctx, x1, y1, hx, hy, alpha) {
+export function _tmBeam_drawCore(ctx, x1, y1, hx, hy, alpha) {
     const grad = ctx.createLinearGradient(x1, y1, hx, hy);
     grad.addColorStop(0, `rgba(46,204,113,0)`);
     grad.addColorStop(0.3, `rgba(46,204,113,${0.55 * alpha})`);
@@ -1088,7 +1097,7 @@ function _tmBeam_drawCore(ctx, x1, y1, hx, hy, alpha) {
 }
 
 // Draws the glowing spark travelling at the head of the beam.
-function _tmBeam_drawSpark(ctx, hx, hy, t, alpha) {
+export function _tmBeam_drawSpark(ctx, hx, hy, t, alpha) {
     const sparkR = 5 + 3 * Math.sin(t * Math.PI);
     const sparkGrad = ctx.createRadialGradient(hx, hy, 0, hx, hy, sparkR * 2.5);
     sparkGrad.addColorStop(0, `rgba(200,255,210,${alpha})`);
@@ -1102,7 +1111,7 @@ function _tmBeam_drawSpark(ctx, hx, hy, t, alpha) {
 
 // Draws the radial impact burst that plays once the beam reaches the target.
 // burstT is 0→1 starting from when the head arrives.
-function _tmBeam_drawBurst(ctx, x2, y2, t, alpha) {
+export function _tmBeam_drawBurst(ctx, x2, y2, t, alpha) {
     const burstT = (t - 0.55) / 0.45;
     const burstAlpha = alpha * (1 - burstT * 0.5);
     const burstR = 6 + burstT * 18;
@@ -1118,7 +1127,7 @@ function _tmBeam_drawBurst(ctx, x2, y2, t, alpha) {
 
 // Flashes the destination cell and animates a green energy beam from the
 // source cell (srcRow, srcCol) to the target cell (row, col).
-function _transitionMatrixCellVFX(row, col, srcRow, srcCol) {
+export function _transitionMatrixCellVFX(row, col, srcRow, srcCol) {
     // CSS flash on the destination cell.
     const el = document.getElementById(`g-${row}-${col}`);
     if (el) {
@@ -1173,7 +1182,7 @@ function _transitionMatrixCellVFX(row, col, srcRow, srcCol) {
         if (t < 1) {
             animId = requestAnimationFrame(tick);
         } else {
-            cancelAnimationFrame(animId);
+            globalThis.cancelAnimationFrame(animId);
             window.removeEventListener('resize', resize);
             cvs.remove();
         }
@@ -1191,7 +1200,7 @@ function _transitionMatrixCellVFX(row, col, srcRow, srcCol) {
 //------------------------------------------------------------------------
 
 // Injects the badge CSS once, then creates and appends the badge element.
-function _transitionMatrixSpawnBadge(remainingSecs) {
+export function _transitionMatrixSpawnBadge(remainingSecs) {
     _transitionMatrixRemoveBadge();
 
     if (!document.getElementById('tm-badge-styles')) {
@@ -1216,13 +1225,13 @@ function _transitionMatrixSpawnBadge(remainingSecs) {
 }
 
 // Updates the countdown text inside the badge.
-function _transitionMatrixUpdateBadge(remainingSecs) {
+export function _transitionMatrixUpdateBadge(remainingSecs) {
     const el = document.getElementById('tm-timer-val');
     if (el) el.textContent = `${Math.max(0, remainingSecs)}s`;
 }
 
 // Removes the badge from the DOM.
-function _transitionMatrixRemoveBadge() {
+export function _transitionMatrixRemoveBadge() {
     document.getElementById('transition-matrix-badge')?.remove();
 }
 
@@ -1232,7 +1241,7 @@ function _transitionMatrixRemoveBadge() {
 //------------------------------------------------------------------------
 
 // Called when a level ends or restarts to wipe all Markovian runtime state.
-function resetMarkovianState() {
+export function resetMarkovianState() {
     _markovSnapshotInit();
     _clearTransitionMatrix(false);
 }

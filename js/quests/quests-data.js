@@ -1,6 +1,13 @@
+//------------------------------------------------------------------------
+// PHASE 3 (quests step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _ptCurrentSpentCount } from './quests-stats.js';
+
 // Sort leder by categories
 
-const LEDGER_GROUPS = [
+export const LEDGER_GROUPS = [
     { id: 'progression', labelEn: 'Progression', labelDE: 'Fortschritt' },
     { id: 'gameplay', labelEn: 'Gameplay', labelDE: 'Spielweise' },
     { id: 'itemsclasses', labelEn: 'Items & Classes', labelDE: 'Gegenstände & Klassen' },
@@ -12,17 +19,17 @@ const LEDGER_GROUPS = [
 //  ATLAS TIER HELPER - used by the 16 Atlas Completion quests (Tiers 1-16)
 //  Returns { current, target } where current = completed atlas nodes of
 //  that tier and target = total atlas nodes of that tier. Reads live from
-//  STATE.egAtlasCompleted and EG_ATLAS_NODES so no extra questStats needed.
+//  globalThis.STATE.egAtlasCompleted and globalThis.EG_ATLAS_NODES so no extra questStats needed.
 // ─────────────────────────────────────────────────────────────
-function _atlasTierCheck(tier) {
-    if (typeof EG_ATLAS_NODES === 'undefined' || !Array.isArray(EG_ATLAS_NODES)) {
+export function _atlasTierCheck(tier) {
+    if (typeof globalThis.EG_ATLAS_NODES === 'undefined' || !Array.isArray(globalThis.EG_ATLAS_NODES)) {
         return { current: 0, target: 1 };
     }
-    const nodes = EG_ATLAS_NODES.filter(n => n.tier === tier);
+    const nodes = globalThis.EG_ATLAS_NODES.filter(n => n.tier === tier);
     const target = nodes.length;
     if (target === 0) return { current: 0, target: 1 };
     let current = 0;
-    const completed = (typeof STATE !== 'undefined' && STATE.egAtlasCompleted) ? STATE.egAtlasCompleted : {};
+    const completed = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.egAtlasCompleted) ? globalThis.STATE.egAtlasCompleted : {};
     for (const n of nodes) {
         if (completed[n.id]) current++;
     }
@@ -30,7 +37,7 @@ function _atlasTierCheck(tier) {
 }
 
 
-const LEDGER_CATEGORIES = [
+export const LEDGER_CATEGORIES = [
 
 
     //------------------------------------------------------------------------
@@ -50,22 +57,22 @@ const LEDGER_CATEGORIES = [
         milestones: [
             {
                 id: 'ev_1', labelEn: '5,000 total score', labelDE: '5.000 Gesamtpunkte',
-                check: () => ({ current: STATE.totalScore || 0, target: 5000 }),
+                check: () => ({ current: globalThis.STATE.totalScore || 0, target: 5000 }),
                 reward: { items: ['addTime300', 'reveal3'] }
             },
             {
                 id: 'ev_2', labelEn: '20,000 total score', labelDE: '20.000 Gesamtpunkte',
-                check: () => ({ current: STATE.totalScore || 0, target: 20000 }),
+                check: () => ({ current: globalThis.STATE.totalScore || 0, target: 20000 }),
                 reward: { items: ['addTime600', 'markWrong8'] }
             },
             {
                 id: 'ev_3', labelEn: '50,000 total score', labelDE: '50.000 Gesamtpunkte',
-                check: () => ({ current: STATE.totalScore || 0, target: 50000 }),
+                check: () => ({ current: globalThis.STATE.totalScore || 0, target: 50000 }),
                 reward: { items: ['addTime900', 'rowSolve'] }
             },
             {
                 id: 'ev_4', labelEn: '100,000 total score', labelDE: '100.000 Gesamtpunkte',
-                check: () => ({ current: STATE.totalScore || 0, target: 100000 }),
+                check: () => ({ current: globalThis.STATE.totalScore || 0, target: 100000 }),
                 reward: { ptPoints: 1, items: ['addTime900', 'colSolve'] }
             },
         ]
@@ -2025,7 +2032,7 @@ const LEDGER_CATEGORIES = [
 //  Populated once at load time.  { milestoneId → { milestone, category } }
 // ─────────────────────────────────────────────────────────────
 
-const _MILESTONE_MAP = {};
+export const _MILESTONE_MAP = {};
 
 (function _buildMilestoneMap() {
     LEDGER_CATEGORIES.forEach(cat => {

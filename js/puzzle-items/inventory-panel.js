@@ -1,4 +1,17 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { save } from '../state.js';
+import { t } from '../translation/translations.js';
+import { RESHUFFLE_GOAL, reshuffleCount, reshuffleRightClickItem, updateReshuffleCounter } from './inventory-reshuffle.js';
+import { ITEM_DEFS } from './item-definitions.js';
+import { itemDesc, itemName, rarityColors } from './item-pool.js';
+import { checkInventoryAchievements, showToast } from './toasts-and-popups.js';
+
+//------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -6,7 +19,7 @@
 // Defines the grouped slot layout for the inventory panel.
 // Each group has a visible label and an ordered list of item definition IDs.
 // Order within slots[] controls display order within the group.
-const INV_SLOT_GROUPS = [
+export const INV_SLOT_GROUPS = [
     { label: 'Reveal', slots: ['reveal1', 'reveal2', 'reveal3', 'reveal4'] },
     { label: 'Mark', slots: ['markWrong2', 'markWrong4', 'markWrong6', 'markWrong8'] },
     { label: 'Time', slots: ['addTime60', 'addTime300', 'addTime600', 'addTime900'] },
@@ -17,7 +30,7 @@ const INV_SLOT_GROUPS = [
 ];
 
 // Maps inventory group labels to their translation keys.
-const INV_GROUP_LABEL_KEYS = {
+export const INV_GROUP_LABEL_KEYS = {
     'Reveal': 'itm_group_reveal',
     'Mark': 'itm_group_mark',
     'Time': 'itm_group_time',
@@ -28,27 +41,27 @@ const INV_GROUP_LABEL_KEYS = {
 };
 
 // Maps rarities that have no dedicated rar_* key in the T table.
-const RARITY_EXTRA_LABEL_KEYS = {
+export const RARITY_EXTRA_LABEL_KEYS = {
     epic: 'itm_rar_epic',
     artifact: 'itm_rar_artifact',
 };
 
 // Returns the translated display label for a rarity string.
-function _rarityLabel(rarity) {
+export function _rarityLabel(rarity) {
     return RARITY_EXTRA_LABEL_KEYS[rarity]
         ? t(RARITY_EXTRA_LABEL_KEYS[rarity])
         : t('rar_' + rarity);
 }
 
 // Cached reference to the shared tooltip element - created once on first use.
-let _invTooltipEl = null;
+export let _invTooltipEl = null;
 
 // Currently open flyout group (label string) - null when none is open.
 // One flyout at a time; switching category buttons swaps the panel.
-let _invOpenFlyoutGroup = null;
+export let _invOpenFlyoutGroup = null;
 // Close-on-leave grace timer id: keeps the flyout open while the pointer
 // travels across the small gap between the category button and the panel.
-let _invFlyoutCloseTimer = null;
+export let _invFlyoutCloseTimer = null;
 
 
 
@@ -59,7 +72,7 @@ let _invFlyoutCloseTimer = null;
 //------------------------------------------------------------------------
 
 // Returns the shared tooltip element, creating it the first time it's needed.
-function _ensureTooltip() {
+export function _ensureTooltip() {
     if (_invTooltipEl) return _invTooltipEl;
     _invTooltipEl = document.createElement('div');
     _invTooltipEl.id = 'inv-slot-tooltip';
@@ -70,7 +83,7 @@ function _ensureTooltip() {
 // Positions the tooltip above the anchor element, centred horizontally.
 // Flips below the anchor if there isn't enough space above.
 // Clamps to the viewport so it never goes off-screen.
-function _positionTooltip(tip, anchor) {
+export function _positionTooltip(tip, anchor) {
     const ar = anchor.getBoundingClientRect();
     tip.style.left = '0px';
     tip.style.top = '0px';
@@ -90,7 +103,7 @@ function _positionTooltip(tip, anchor) {
 // Builds the tooltip's inner HTML for an item. When `count` is provided, includes
 // rarity, stack count, and the interaction hint (slot tooltips); when omitted,
 // returns just the name and description (simple reward-item tooltips).
-function _buildTooltipHtml(def, count) {
+export function _buildTooltipHtml(def, count) {
     const rc = rarityColors(def.rarity);
     const nameLine = `<div class="inv-tip-name" style="color:${rc.color}">${def.icon} ${itemName(def)}</div>`;
     const descLine = `<div class="inv-tip-desc">${itemDesc(def)}</div>`;
@@ -106,7 +119,7 @@ function _buildTooltipHtml(def, count) {
 // Shows the shared tooltip for an item, anchored to the given element.
 // Pass `count` for full slot tooltips (adds rarity/stack/hint); omit it for
 // simple item tooltips (name + description only).
-function _showTooltip(def, anchorEl, count) {
+export function _showTooltip(def, anchorEl, count) {
     const tip = _ensureTooltip();
     tip.innerHTML = _buildTooltipHtml(def, count);
     tip.classList.add('visible');
@@ -114,7 +127,7 @@ function _showTooltip(def, anchorEl, count) {
 }
 
 // Hides the tooltip by removing its visible class.
-function _hideSlotTooltip() {
+export function _hideSlotTooltip() {
     if (_invTooltipEl) _invTooltipEl.classList.remove('visible');
 }
 
@@ -127,30 +140,30 @@ function _hideSlotTooltip() {
 //------------------------------------------------------------------------
 
 // Finds the first inventory item matching the given defId, or undefined if none exists.
-function _findInventoryItemByDefId(defId) {
-    return STATE.inventory.find(i => i.defId === defId);
+export function _findInventoryItemByDefId(defId) {
+    return globalThis.STATE.inventory.find(i => i.defId === defId);
 }
 
 // Uses the first inventory item that matches the given defId.
-function _useOneByDefId(defId) {
+export function _useOneByDefId(defId) {
     const item = _findInventoryItemByDefId(defId);
     if (!item) return;
-    useItem(item.uid);
+    globalThis.useItem(item.uid);
 }
 
 // Sends the first matching item into the reshuffle pile (right-click action).
-function _reshuffleOneByDefId(defId) {
+export function _reshuffleOneByDefId(defId) {
     const item = _findInventoryItemByDefId(defId);
     if (!item) return;
     reshuffleRightClickItem(item.uid);
 }
 
 // Silently discards one item of this defId without adding to the reshuffle counter (alt+click action).
-function _discardOneByDefId(defId) {
-    const idx = STATE.inventory.findIndex(i => i.defId === defId);
+export function _discardOneByDefId(defId) {
+    const idx = globalThis.STATE.inventory.findIndex(i => i.defId === defId);
     if (idx < 0) return;
     const def = ITEM_DEFS[defId];
-    STATE.inventory.splice(idx, 1);
+    globalThis.STATE.inventory.splice(idx, 1);
     trackAchStat('itemsSold');
     save();
     buildInventoryPanel();
@@ -167,7 +180,7 @@ function _discardOneByDefId(defId) {
 
 // Attaches left-click (use), right-click (reshuffle), and alt+click (discard) handlers
 // to an inventory slot element. Only called when the slot is not ironman-locked.
-function _attachSlotInteractionHandlers(el, defId, isEmpty) {
+export function _attachSlotInteractionHandlers(el, defId, isEmpty) {
     el.addEventListener('click', (e) => {
         _hideSlotTooltip();
         if (isEmpty) return;
@@ -181,20 +194,20 @@ function _attachSlotInteractionHandlers(el, defId, isEmpty) {
     el.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         _hideSlotTooltip();
-        if (dead || isEmpty) return;
+        if (globalThis.dead || isEmpty) return;
         _reshuffleOneByDefId(defId);
     });
 }
 
 // Builds and returns a single inventory slot element for the given item defId.
 // Handles empty state, ironman lock, rarity border tint, icon, stack count, and tooltip.
-function _buildInvSlot(defId) {
+export function _buildInvSlot(defId) {
     const def = ITEM_DEFS[defId];
     if (!def) return null;
 
-    const count = STATE.inventory.filter(i => i.defId === defId).length;
+    const count = globalThis.STATE.inventory.filter(i => i.defId === defId).length;
     const isEmpty = count === 0;
-    const isLocked = curMods.ironman;
+    const isLocked = globalThis.curMods.ironman;
     const rc = rarityColors(def.rarity);
 
     const el = document.createElement('div');
@@ -224,7 +237,7 @@ function _buildInvSlot(defId) {
 //------------------------------------------------------------------------
 
 // Cancels a pending flyout close (pointer came back in time).
-function _invCancelFlyoutClose() {
+export function _invCancelFlyoutClose() {
     if (_invFlyoutCloseTimer) {
         clearTimeout(_invFlyoutCloseTimer);
         _invFlyoutCloseTimer = null;
@@ -235,7 +248,7 @@ function _invCancelFlyoutClose() {
 // the button and the panel. The delay bridges the physical gap between
 // them so diagonal mouse paths don't flicker the panel shut. Never fires
 // while a flyout is PINNED - pinning means "stay open until I click".
-function _invScheduleFlyoutClose() {
+export function _invScheduleFlyoutClose() {
     if (window._invPinnedFlyoutGroup) return;
     _invCancelFlyoutClose();
     _invFlyoutCloseTimer = setTimeout(() => {
@@ -249,7 +262,7 @@ function _invScheduleFlyoutClose() {
 // category button that was hovered. Empty groups (no items of any of the
 // group's defs in the inventory at all) still open - the slots show as
 // dimmed empties, matching the old always-visible bar behaviour.
-function openInventoryFlyout(groupLabel, anchorBtn) {
+export function openInventoryFlyout(groupLabel, anchorBtn) {
     const flyout = document.getElementById('inv-flyout');
     if (!flyout) return;
     _invCancelFlyoutClose();
@@ -299,7 +312,7 @@ function openInventoryFlyout(groupLabel, anchorBtn) {
 
 // Hides the flyout panel and clears button highlighting. Safe to call
 // when nothing is open.
-function closeInventoryFlyout() {
+export function closeInventoryFlyout() {
     const flyout = document.getElementById('inv-flyout');
     if (flyout) flyout.classList.remove('open');
     _invOpenFlyoutGroup = null;
@@ -309,7 +322,7 @@ function closeInventoryFlyout() {
 // True while the pointer is over the compact bar itself - the bar keeps
 // the flyout open so moving from the panel down to another button feels
 // like switching categories, not closing.
-function _invPointerInBar(x, y) {
+export function _invPointerInBar(x, y) {
     const bar = document.getElementById('inv-panel');
     if (!bar) return false;
     const r = bar.getBoundingClientRect();
@@ -325,7 +338,7 @@ function _invPointerInBar(x, y) {
 
 // Builds and returns a group container element (label + slots row) for the given group definition.
 // Returns null if none of the group's item definitions exist in ITEM_DEFS.
-function _buildInvGroup(group) {
+export function _buildInvGroup(group) {
     const defsExist = group.slots.some(id => ITEM_DEFS[id]);
     if (!defsExist) return null;
 
@@ -366,7 +379,7 @@ function _buildInvGroup(group) {
 // always-visible bar. A pinned (clicked) flyout stays open across rebuilds
 // so using an item - which triggers buildInventoryPanel() - doesn't slam
 // the panel shut on the player's hand.
-function buildInventoryPanel() {
+export function buildInventoryPanel() {
     _hideSlotTooltip();
 
     const panel = document.getElementById('inv-panel');
@@ -404,7 +417,7 @@ function buildInventoryPanel() {
 
         // Total owned items across the group's defs → badge on the button
         const owned = group.slots.reduce((n, id) =>
-            n + STATE.inventory.filter(i => i.defId === id).length, 0);
+            n + globalThis.STATE.inventory.filter(i => i.defId === id).length, 0);
 
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -476,7 +489,7 @@ function buildInventoryPanel() {
 
 // Creates the shared flyout container once (a body-level sibling of the
 // bar, so bar.innerHTML='' rebuilds never destroy its children mid-use).
-function _ensureInvFlyoutEl() {
+export function _ensureInvFlyoutEl() {
     let flyout = document.getElementById('inv-flyout');
     if (flyout) return flyout;
 
@@ -505,7 +518,7 @@ function _ensureInvFlyoutEl() {
 }
 
 // Small distinguishing icon per category (pure decoration next to the label).
-function invGroupIcon(label) {
+export function invGroupIcon(label) {
     switch (label) {
         case 'Reveal':  return '🔍';
         case 'Mark':    return '✏️';
@@ -529,7 +542,7 @@ function invGroupIcon(label) {
 // Repositions the inventory panel relative to the puzzle grid.
 // Places it to the right of the grid when there's enough screen width,
 // or below the grid on narrow screens.
-function _repositionInvPanel() {
+export function _repositionInvPanel() {
     const grid = document.getElementById('ptable');
     const panel = document.getElementById('inv-panel');
     if (!grid || !panel) return;
@@ -559,7 +572,7 @@ function _repositionInvPanel() {
 // Attaches an inventory-style tooltip to any DOM element representing a reward item
 // (e.g. win overlay rewards, gate rewards). Shows name and description only - no stack count.
 // Call this after the element has been inserted into the DOM.
-function attachItemTooltip(el, defId) {
+export function attachItemTooltip(el, defId) {
     const def = ITEM_DEFS[defId];
     if (!def || !el) return;
 

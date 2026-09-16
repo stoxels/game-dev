@@ -1,4 +1,7 @@
-﻿//------------------------------------------------------------------------
+﻿import { SAVE_SLOT_COUNT, getSlotName, getSlotSummary, loadStateFromSlot, setSlotName } from '../state.js';
+import { t } from '../translation/translations.js';
+import { hideModal, showModal, switchScreen } from './screens.js';
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -8,7 +11,7 @@
 // NOTE: adjust these paths/ids if your character-select code uses different
 // keys or a different image folder - this is a best-effort match based on
 // the naming convention seen elsewhere (images/Game_Setup/...).
-const CHAR_PORTRAIT_SRC = {
+export const CHAR_PORTRAIT_SRC = {
     stox: 'images/sprites/Stox_noclass.webp',
     trix: 'images/sprites/Trix_noclass.webp',
     syla: 'images/sprites/Syla_noclass.webp',
@@ -30,7 +33,7 @@ const CHAR_PORTRAIT_SRC = {
 
 
 // Looks up the portrait image for a saved character, factoring in class/ascendency.
-function getCharPortraitSrc(summary) {
+export function getCharPortraitSrc(summary) {
     if (!summary || !summary.playerCharacter) return '';
 
     const char = summary.playerCharacter;
@@ -45,14 +48,14 @@ function getCharPortraitSrc(summary) {
 }
 
 // Builds the inner markup for a save-slot card, empty or filled.
-function _buildSlotCardHtml(slotNum, summary) {
+export function _buildSlotCardHtml(slotNum, summary) {
     // Custom slot name - shown instead of the default "SLOT {n}" heading
     // whenever the player has named this slot (works for empty slots too,
     // e.g. "Hardcore Run" prepared before the first save).
     const customName = summary.name || '';
     const headingHtml = customName
         ? `<div class="ssc-num ssc-num-named">${t('scr_slot_label').replace('{n}', slotNum)}</div>
-           <div class="ssc-name" data-tip="${_tipAttr(customName)}">${customName.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`
+           <div class="ssc-name" data-tip="${globalThis._tipAttr(customName)}">${customName.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`
         : `<div class="ssc-num">${t('scr_slot_label').replace('{n}', slotNum)}</div>`;
 
     if (summary.empty) {
@@ -84,7 +87,7 @@ function _buildSlotCardHtml(slotNum, summary) {
 
 
 // Wires up click-to-select and delete-button behavior on a slot card.
-function _attachSlotCardListeners(card, slotNum) {
+export function _attachSlotCardListeners(card, slotNum) {
     card.addEventListener('click', (e) => {
         if (e.target.classList.contains('ssc-delete-btn')) return;
         if (e.target.classList.contains('ssc-name-btn')) return;
@@ -109,10 +112,10 @@ function _attachSlotCardListeners(card, slotNum) {
 
     // Hover tooltip: lifetime stats for this save slot (skip empty slots)
     const summary = getSlotSummary(slotNum);
-    if (!summary.empty && typeof showGameTooltip === 'function') {
-        card.addEventListener('mouseenter', (e) => showGameTooltip(_buildSaveSlotTooltipHTML(summary), e));
-        card.addEventListener('mousemove', moveGameTooltip);
-        card.addEventListener('mouseleave', hideGameTooltip);
+    if (!summary.empty && typeof globalThis.showGameTooltip === 'function') {
+        card.addEventListener('mouseenter', (e) => globalThis.showGameTooltip(globalThis._buildSaveSlotTooltipHTML(summary), e));
+        card.addEventListener('mousemove', globalThis.moveGameTooltip);
+        card.addEventListener('mouseleave', globalThis.hideGameTooltip);
     }
 }
 
@@ -123,7 +126,7 @@ function _attachSlotCardListeners(card, slotNum) {
 
 // Loads the chosen slot's save data and resumes whatever flow was waiting
 // on a slot pick (set up by showSaveSlotSelect).
-function onSaveSlotChosen(slotNum) {
+export function onSaveSlotChosen(slotNum) {
     loadStateFromSlot(slotNum);
     const cb = window._pendingSaveSlotCallback;
     window._pendingSaveSlotCallback = null;
@@ -136,7 +139,7 @@ function onSaveSlotChosen(slotNum) {
 //------------------------------------------------------------------------
 
 // Builds a single save-slot card element, populated from its saved summary.
-function buildSaveSlotCard(slotNum) {
+export function buildSaveSlotCard(slotNum) {
     const summary = getSlotSummary(slotNum);
     const card = document.createElement('div');
     card.className = 'save-slot-card' + (summary.empty ? ' empty' : '');
@@ -146,7 +149,7 @@ function buildSaveSlotCard(slotNum) {
 }
 
 // Rebuilds the save-slot grid from current save data.
-function renderSaveSlotScreen() {
+export function renderSaveSlotScreen() {
     const grid = document.getElementById('save-slots-grid');
     grid.innerHTML = '';
     for (let i = 1; i <= SAVE_SLOT_COUNT; i++) {
@@ -157,10 +160,10 @@ function renderSaveSlotScreen() {
 // Shows the save-slot select screen. `onSlotChosen` runs once the player
 // picks (or creates) a slot - this is where you resume the normal
 // intro/tutorial/character-select flow.
-function showSaveSlotSelect(onSlotChosen) {
+export function showSaveSlotSelect(onSlotChosen) {
     window._pendingSaveSlotCallback = onSlotChosen;
     renderSaveSlotScreen();
-    screenHistory.push('screen-title');
+    globalThis.screenHistory.push('screen-title');
     switchScreen('screen-save-slots');
 }
 
@@ -172,7 +175,7 @@ function showSaveSlotSelect(onSlotChosen) {
 // Opens the name-a-slot modal for the given slot. Pre-fills the input with
 // the current name (or empty), focuses it with the text selected so typing
 // replaces it immediately. Enter confirms, Escape cancels.
-function showSlotNameModal(slotNum) {
+export function showSlotNameModal(slotNum) {
     window._pendingSlotNameSlot = slotNum;
     const modal = document.getElementById('slot-name-modal');
     const input = document.getElementById('slot-name-input');
@@ -190,7 +193,7 @@ function showSlotNameModal(slotNum) {
 
 // Confirms the name edit: writes the (trimmed, ≤20 char) name and re-renders
 // the slot grid so the card heading updates immediately.
-function confirmSlotName() {
+export function confirmSlotName() {
     const slotNum = window._pendingSlotNameSlot;
     const input = document.getElementById('slot-name-input');
     hideModal('slot-name-modal');
@@ -201,7 +204,7 @@ function confirmSlotName() {
 }
 
 // Cancels the name edit without changing anything.
-function cancelSlotName() {
+export function cancelSlotName() {
     hideModal('slot-name-modal');
     window._pendingSlotNameSlot = null;
 }
@@ -242,7 +245,7 @@ function _setResetModalTextForSlot(slotNum) {
 // translation re-render doesn't overwrite this slot-specific text; the
 // original wording is restored by _restoreResetModalTextForFullReset()
 // whenever the modal is opened for the title-screen "reset everything" flow.
-function _setResetModalTextForSlot(slotNum) {
+export function _setResetModalTextForSlot(slotNum) {
     const modal = document.getElementById('reset-modal');
     if (!modal) return;
 
@@ -267,7 +270,7 @@ function _setResetModalTextForSlot(slotNum) {
 // "reset everything" flow. Text is swapped to reference this specific slot;
 // confirmReset() (ui-reset.js) checks window._pendingResetSlot to decide
 // whether to wipe just this slot or perform a full reset.
-function showDeleteSlotConfirm(slotNum) {
+export function showDeleteSlotConfirm(slotNum) {
     window._pendingResetSlot = slotNum;
     _setResetModalTextForSlot(slotNum);
     showModal('reset-modal');
@@ -276,7 +279,7 @@ function showDeleteSlotConfirm(slotNum) {
 // Restores the modal's original "reset everything" copy. Called whenever
 // the title-screen Reset button opens the modal, so slot-delete wording
 // never leaks into the full-reset flow.
-function _restoreResetModalTextForFullReset() {
+export function _restoreResetModalTextForFullReset() {
     const modal = document.getElementById('reset-modal');
     if (!modal) return;
 

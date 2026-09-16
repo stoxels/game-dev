@@ -1,4 +1,4 @@
-const TALENT_TREE_DATA = {
+﻿export const TALENT_TREE_DATA = {
     "nodes": [
         {
             "id": 1,

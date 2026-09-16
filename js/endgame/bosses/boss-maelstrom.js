@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE MAELSTROM (boss_maelstrom)-----------------------
 //------------------------------------------------------------------------
 // Gravity-well homage: a vortex drags your avatar toward its eye - fight
@@ -37,7 +45,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechMaelstromVortex(monster, phase) {
+export function _egMechMaelstromVortex(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const pullMs = 4500;

@@ -1,4 +1,16 @@
-﻿/*
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egBuildChainPool } from './endgame/endgame-encounter-chain.js';
+import { ALL } from './levels/levels.js';
+import { showToast } from './puzzle-items/toasts-and-popups.js';
+import { isGatedLevel } from './quiz-excercise/mathgate.js';
+import { switchScreen } from './screens/screens.js';
+import { t } from './translation/translations.js';
+
+/*
     ========================================================================
     ENDGAME-TEST-HUB.JS
     ========================================================================
@@ -39,7 +51,7 @@
 // test the actual map device / map system instead (see endgame-gate.js +
 // endgame-map-launch.js). The legacy map definitions are kept below inside a
 // block comment for easy re-enable - just remove the block wrappers.
-const EG_TEST_MAPS = [
+export const EG_TEST_MAPS = [
     /* DISABLED LEGACY TEST MAPS BEGIN - old system up to level 160 (training_grounds → terminus_theorem)
        Might revisit in future; for now we test the actual map device with proper map items.
        To re-enable, remove this block-comment opener and the closer at the end
@@ -673,7 +685,7 @@ const EG_TEST_MAPS = [
 // exclusion rules apply (no sandbox levels, no already-map-flagged levels).
 // Additionally excludes math-gated levels, since test runs bypass the
 // normal gate-check flow entirely.
-function _egtPickSeedGi(mapDef) {
+export function _egtPickSeedGi(mapDef) {
     if (typeof _egBuildChainPool !== 'function') return null;
 
     let pool = _egBuildChainPool(mapDef.puzzlePool || {});
@@ -692,7 +704,7 @@ function _egtPickSeedGi(mapDef) {
 
 // Stamps a map's parameters onto its chosen seed level and starts it.
 // Called from the map card's onclick.
-function _egLaunchTestMap(mapId) {
+export function _egLaunchTestMap(mapId) {
     const mapDef = EG_TEST_MAPS.find(m => m.id === mapId);
     if (!mapDef) return;
 
@@ -724,7 +736,7 @@ function _egLaunchTestMap(mapId) {
     // instead of the normal world/level-select screen when the run ends.
     window._egIsTestRun = true;
 
-    startLevel(gi);
+    globalThis.startLevel(gi);
 }
 
 
@@ -732,7 +744,7 @@ function _egLaunchTestMap(mapId) {
 //-------------------HTML BUILDERS------------------------------------------
 //------------------------------------------------------------------------
 
-function _egtBuildMapCardHTML(mapDef) {
+export function _egtBuildMapCardHTML(mapDef) {
     const bossLine = mapDef.hasBoss
         ? `<div class="egt-map-stat">💀 ${t('egt_boss')}${mapDef.maxBosses > 1 ? ` ×${mapDef.maxBosses}` : ''}</div>`
         : '';
@@ -756,7 +768,7 @@ function _egtBuildMapCardHTML(mapDef) {
 </div>`;
 }
 
-function _egtBuildFullScreenHTML() {
+export function _egtBuildFullScreenHTML() {
     return `
 <div class="egt-hub-layout">
     <div class="egt-topbar">
@@ -776,7 +788,7 @@ function _egtBuildFullScreenHTML() {
 // Injected via JS, same pattern as ensureLSTooltipStyles() in
 // screens-level-select.js - avoids needing to touch the (large) main CSS file.
 
-function _egtEnsureStyles() {
+export function _egtEnsureStyles() {
     if (document.getElementById('egt-test-hub-style')) return;
 
     const style = document.createElement('style');
@@ -844,7 +856,7 @@ function _egtEnsureStyles() {
 //-------------------SCREEN BOOTSTRAP----------------------------------------
 //------------------------------------------------------------------------
 
-function _egtCreateScreen() {
+export function _egtCreateScreen() {
     _egtEnsureStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-test-hub';
@@ -853,14 +865,14 @@ function _egtCreateScreen() {
     document.body.appendChild(screen);
 }
 
-function ensureEndgameTestHubScreen() {
+export function ensureEndgameTestHubScreen() {
     if (!document.getElementById('screen-endgame-test-hub')) _egtCreateScreen();
 }
 
 // Entry point - call this to show the map-select screen.
 // (History push happens in launchEndgameTestMode() in screens.js on first
 // entry; goToLevelSelect() calls this directly to return here after a run.)
-function showEndgameTestHub() {
+export function showEndgameTestHub() {
     ensureEndgameTestHubScreen();
     switchScreen('screen-endgame-test-hub');
 }

@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE MEDUSA (boss_medusa)-----------------------
 //------------------------------------------------------------------------
 // REWORK - gorgon homage, rebuilt as a full petrification gauntlet. The
@@ -49,8 +58,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_MD_DEBUG_SLOW = true;
-const _EG_MD_DEBUG_MULT = _EG_MD_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_MD_DEBUG_SLOW = true;
+export const _EG_MD_DEBUG_MULT = _EG_MD_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_medusa: {
@@ -80,12 +89,12 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_MD_GAZE_DMG    = [0, 0.15, 0.18, 0.21];   // gaze beam contact
-const EG_MD_SNAKE_DMG   = [0, 0.13, 0.16, 0.19];   // snake strike bite
-const EG_MD_WAVE_DMG    = [0, 0, 0.19, 0.22];      // petrify wave ring
-const EG_MD_COIL_DMG    = [0, 0, 0.14, 0.17];      // coil segment touch
-const EG_MD_STARE_DMG   = 0.32;                    // THE STARE full hit
-const EG_MD_HIT_CD_MS   = 700;                     // shared touch cooldown
+export const EG_MD_GAZE_DMG    = [0, 0.15, 0.18, 0.21];   // gaze beam contact
+export const EG_MD_SNAKE_DMG   = [0, 0.13, 0.16, 0.19];   // snake strike bite
+export const EG_MD_WAVE_DMG    = [0, 0, 0.19, 0.22];      // petrify wave ring
+export const EG_MD_COIL_DMG    = [0, 0, 0.14, 0.17];      // coil segment touch
+export const EG_MD_STARE_DMG   = 0.32;                    // THE STARE full hit
+export const EG_MD_HIT_CD_MS   = 700;                     // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -94,8 +103,8 @@ const EG_MD_HIT_CD_MS   = 700;                     // shared touch cooldown
 
 // Touch damage helper shared by all Medusa hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egMdHitCd = 0;
-function _egMdTouch(pct, level, label) {
+export let _egMdHitCd = 0;
+export function _egMdTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egMdHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -108,14 +117,14 @@ function _egMdTouch(pct, level, label) {
 
 // The gorgon's eyes: a pair of glowing serpent eyes, positioned via
 // transform, colour-coded by use (mechanic vs finale).
-function _egMdEyesEl(run, big) {
+export function _egMdEyesEl(run, big) {
     const el = _egNkEl(run, 'div', 'eg-md-eyes' + (big ? ' eg-md-eyes-big' : ''));
     return el;
 }
 
 // Stone-shard burst where petrification lands (visual only, body-level so
 // it survives the run ending in the same frame).
-function _egMdShards(x, y, big) {
+export function _egMdShards(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-md-shards' + (big ? ' eg-md-shards-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -142,10 +151,10 @@ function _egMdShards(x, y, big) {
 // The gorgon's eyes scan from above, dragging a vertical gaze beam across
 // the arena. Two passes per cast (it bounces at the far edge once), faster
 // and wider every phase. Step out of the beam!
-const EG_MD_GAZE_W     = [0, 60, 74, 90];
-const EG_MD_GAZE_SPEED = [0, 260, 320, 390];
+export const EG_MD_GAZE_W     = [0, 60, 74, 90];
+export const EG_MD_GAZE_SPEED = [0, 260, 320, 390];
 
-function _egMechMdStoneGaze(monster, phase) {
+export function _egMechMdStoneGaze(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -198,11 +207,11 @@ function _egMechMdStoneGaze(monster, phase) {
 // Marked floor spots erupt into snake heads that bite on a rhythm - three
 // bites each, slightly staggered across the brood - then sink away. Leave
 // the bite circles!
-const EG_MD_SNAKE_COUNT = [0, 3, 4, 5];
-const EG_MD_SNAKE_BITES = 3;
-const EG_MD_BITE_R      = 64;
+export const EG_MD_SNAKE_COUNT = [0, 3, 4, 5];
+export const EG_MD_SNAKE_BITES = 3;
+export const EG_MD_BITE_R      = 64;
 
-function _egMechMdSnakeStrikes(monster, phase) {
+export function _egMechMdSnakeStrikes(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -278,12 +287,12 @@ function _egMechMdSnakeStrikes(monster, phase) {
 // Stone-gray rings expand from points near the player with ONE rotating
 // safe gap arc. Slip the gap as the ring crosses you - caught by the ring
 // band anywhere else and the creeping stone bites.
-const EG_MD_WAVE_COUNT = [0, 0, 1, 2];
-const EG_MD_WAVE_SPEED = [0, 0, 300, 335];
-const EG_MD_WAVE_GAP   = 54;    // safe arc width, degrees
-const EG_MD_WAVE_ROT   = 42;    // gap rotation speed, deg/s
+export const EG_MD_WAVE_COUNT = [0, 0, 1, 2];
+export const EG_MD_WAVE_SPEED = [0, 0, 300, 335];
+export const EG_MD_WAVE_GAP   = 54;    // safe arc width, degrees
+export const EG_MD_WAVE_ROT   = 42;    // gap rotation speed, deg/s
 
-function _egMechMdPetrifyWaves(monster, phase) {
+export function _egMechMdPetrifyWaves(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -355,14 +364,14 @@ function _egMechMdPetrifyWaves(monster, phase) {
 // A snake coil forms around the player's position and SHRINKS while its
 // single gap slowly rotates. Escape through the gap - every segment bites.
 // The run is PASSIVE (field hazard - never blocks other mechanics).
-const EG_MD_COIL_SEGS  = 10;
-const EG_MD_COIL_R0    = 230;
-const EG_MD_COIL_R1    = 80;
-const EG_MD_COIL_LIFE  = 6500;
-const EG_MD_COIL_ROT   = 34;    // deg/s
-const EG_MD_COIL_GAP   = 72;    // gap arc, degrees (2 segments wide)
+export const EG_MD_COIL_SEGS  = 10;
+export const EG_MD_COIL_R0    = 230;
+export const EG_MD_COIL_R1    = 80;
+export const EG_MD_COIL_LIFE  = 6500;
+export const EG_MD_COIL_ROT   = 34;    // deg/s
+export const EG_MD_COIL_GAP   = 72;    // gap arc, degrees (2 segments wide)
 
-function _egMechMdCoilCage(monster, phase) {
+export function _egMechMdCoilCage(monster, phase) {
     if (_egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -447,26 +456,26 @@ function _egMechMdCoilCage(monster, phase) {
 // it touches petrifies… except the shadows behind the statues. Charge bar
 // frozen for the whole set-piece (gate in _egTickPlayer via
 // _egMdFinalActive).
-const EG_MD_FINAL_TICK_MS = 1200;
-const EG_MD_FINAL_TICKS = 3;
-const EG_MD_SHADOW_H = 150;
+export const EG_MD_FINAL_TICK_MS = 1200;
+export const EG_MD_FINAL_TICKS = 3;
+export const EG_MD_SHADOW_H = 150;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egMdFinal = null;
+export let _egMdFinal = null;
 
-function _egMdFinalActive() {
+export function _egMdFinalActive() {
     return !!_egMdFinal && !_egMdFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egMdOnPhaseEnter(monster, newPhase) {
+export function _egMdOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egMdStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egMdStartFinalWatcher(monster) {
+export function _egMdStartFinalWatcher(monster) {
     if (!monster || _egMdFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -483,7 +492,7 @@ function _egMdStartFinalWatcher(monster) {
 }
 
 // One statue + its shadow strip rise at a fresh spot.
-function _egMdRaiseStatue(g) {
+export function _egMdRaiseStatue(g) {
     const W = window.innerWidth, H = window.innerHeight;
     let x = W / 2, y = H / 2, guard = 0;
     do {
@@ -509,7 +518,7 @@ function _egMdRaiseStatue(g) {
     g.statues.push({ x, y, el, sh });
 }
 
-function _egMdFinalStart(monster) {
+export function _egMdFinalStart(monster) {
     if (_egMdFinal || !monster) return;
 
     // The garden goes quiet: kill every other run of this boss.
@@ -607,7 +616,7 @@ function _egMdFinalStart(monster) {
 // THE STARE: a screen-wide gaze wall sweeps from the top to the bottom of
 // the arena. Everything it touches petrifies - except the shadows behind
 // the statues.
-function _egMdStartGazeSweep(g, monster) {
+export function _egMdStartGazeSweep(g, monster) {
     const level = monster ? monster.level : 1;
 
     _egNkToast('eg_mech_md_final_bang', '🐍💀 THE STARE!', '#e2e8f0');
@@ -647,7 +656,7 @@ function _egMdStartGazeSweep(g, monster) {
     g.fxRun.timers.push(id2);
 }
 
-function _egMdFinalEnd(g) {
+export function _egMdFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -665,7 +674,7 @@ function _egMdFinalEnd(g) {
     document.querySelectorAll('.eg-md-charming').forEach(el => el.classList.remove('eg-md-charming'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -682,7 +691,7 @@ function _egMdFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egMdTeardown() {
+export function _egMdTeardown() {
     if (_egMdFinal) { try { _egMdFinalEnd(_egMdFinal); } catch (e) {} _egMdFinal = null; }
     document.querySelectorAll('.eg-md-eyes, .eg-md-gazebeam, .eg-md-snake, .eg-md-snake-warn, ' +
         '.eg-md-bite, .eg-md-wave, .eg-md-coil-seg, .eg-md-coil-warn, .eg-md-statue, ' +
@@ -709,7 +718,7 @@ if (typeof window !== 'undefined') {
     window._EG_MD_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_medusa') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_medusa') : null;
             if (!monster) return 'no medusa alive';
             const fn = name === 'gaze' ? _egMechMdStoneGaze
                 : name === 'snakes' ? _egMechMdSnakeStrikes
@@ -722,7 +731,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_medusa') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_medusa') : null;
             if (!monster) return 'no medusa alive';
             _egMdFinalStart(monster);
             return 'THE STARE started';

@@ -1,9 +1,20 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { cooldownState, startSlotCooldown } from '../classes/class-cooldown-state.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { PEARL_VARIANTS, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
+
+//------------------------------------------------------------------------
 //-------------------PEARLS - OF HASTE / OF SWIFTNESS / GRAND PEARL----------------------
 //------------------------------------------------------------------------
 
 // Helper: resets a single cooldown slot to 1 s remaining.
-function _resetCooldownSlot(slot) {
+export function _resetCooldownSlot(slot) {
     const cd = cooldownState[slot];
     if (cd.interval) {
         clearInterval(cd.interval);
@@ -14,24 +25,24 @@ function _resetCooldownSlot(slot) {
 }
 
 // pearlOfHaste - resets the cooldown of active skill slot 1.
-function _usePearlOfHaste(id, def) {
-    if (!STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
+export function _usePearlOfHaste(id, def) {
+    if (!globalThis.STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
     _resetCooldownSlot('active1');
     playItemEffect(id);
     return `${def.icon} ${t('itm_cooldown_s1')}`;
 }
 
 // pearlOfSwiftness - resets the cooldown of active skill slot 2.
-function _usePearlOfSwiftness(id, def) {
-    if (!STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
+export function _usePearlOfSwiftness(id, def) {
+    if (!globalThis.STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
     _resetCooldownSlot('active2');
     playItemEffect(id);
     return `${def.icon} ${t('itm_cooldown_s2')}`;
 }
 
 // grandPearl - resets the cooldowns of both active skill slots.
-function _useGrandPearl(id, def) {
-    if (!STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
+export function _useGrandPearl(id, def) {
+    if (!globalThis.STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
     _resetCooldownSlot('active1');
     _resetCooldownSlot('active2');
     playItemEffect(id);
@@ -44,7 +55,7 @@ function _useGrandPearl(id, def) {
 
 // Helper: spawns the stacked iridescent rings for pearl effects.
 // `color` is a CSS hex color; ring border + glow inherit it.
-function _fxMakePearlRings(container, cx, cy, color, maxSize) {
+export function _fxMakePearlRings(container, cx, cy, color, maxSize) {
     for (let i = 0; i < 5; i++) {
         const ring = document.createElement('div');
         ring.className = 'fx-shield-ring'; // reuse shield-ring CSS geometry
@@ -62,7 +73,7 @@ function _fxMakePearlRings(container, cx, cy, color, maxSize) {
 
 // 🔵🟣⚪ Pearl effects - iridescent ripple burst.
 // `color` drives ring tint and emoji selection via PEARL_VARIANTS.
-function _fxPearl(color) {
+export function _fxPearl(color) {
     const variant = PEARL_VARIANTS[color];
     if (!variant) return;
 

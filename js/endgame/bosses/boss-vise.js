@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egApplyPlayerAilment } from '../endgame-ailments.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkSlamShatter, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE VISE (boss_vise)----------------------------
 //------------------------------------------------------------------------
 // TIER 8 REWORK - "Cold Iron". The Mega-Man corridor soul, rebuilt on the
@@ -51,8 +60,8 @@
 
 // DEBUG: slow The Vise's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_VIS_DEBUG_SLOW = true;
-const _EG_VIS_DEBUG_MULT = _EG_VIS_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_VIS_DEBUG_SLOW = true;
+export const _EG_VIS_DEBUG_MULT = _EG_VIS_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_vise: {
@@ -89,7 +98,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_VIS_TOUCH_CD_MS = 700;      // shared touch cooldown
+export const EG_VIS_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -98,8 +107,8 @@ const EG_VIS_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 // Touch damage helper shared by all Vise hazards. Lightning-element boss -
 // hits go in with element 'lightning' so the toast palette stays yellow.
-let _egVisHitCd = 0;
-function _egVisTouch(pct, level, label) {
+export let _egVisHitCd = 0;
+export function _egVisTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egVisHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -111,15 +120,15 @@ function _egVisTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egVisPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egVisPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Proven reward pattern (Siren echo zones / Swarm royal jelly): heals go
 // through a guarded clamp + rerender.
-function _egVisHeal(amount) {
+export function _egVisHeal(amount) {
     if (typeof playerCurrentHP === 'undefined') return;
-    const before = playerCurrentHP;
-    playerCurrentHP = Math.min(playerMaxHP || before, before + amount);
-    if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    const before = globalThis.playerCurrentHP;
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + amount);
+    if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
 
@@ -131,17 +140,17 @@ function _egVisHeal(amount) {
 // sine, so the corridor is a living thing, not a straight pipe. Outside
 // the walls burns (DoT); touching a block is a chunk + brief slow.
 // Phase 3: the gap breathes faster while the walls hold.
-const EG_VIS_WALL_BLOCK  = 26;          // block size (px)
-const EG_VIS_WALL_STEP   = 15;          // spawn spacing (overlap → continuous)
-const EG_VIS_WALL_GAP    = [0, 300, 260, 220];   // base gap height per phase
-const EG_VIS_WALL_AMP    = [0, 46, 58, 72];      // breathing amplitude per phase
-const EG_VIS_WALL_RATE   = [0, 0.5, 0.65, 0.95]; // breathing rate (rad/s)
-const EG_VIS_WALL_SPD    = [0, 135, 165, 200];   // sweep speed px/s
-const EG_VIS_WALL_TOUCH  = [0, 0.20, 0.24, 0.28]; // %maxHP block touch
-const EG_VIS_WALL_DOT    = [0, 6.0, 7.5, 9.0];   // %/s outside the corridor
-const EG_VIS_WALL_LIFE   = [0, 11000, 11500, 12500]; // ms per pass
+export const EG_VIS_WALL_BLOCK  = 26;          // block size (px)
+export const EG_VIS_WALL_STEP   = 15;          // spawn spacing (overlap → continuous)
+export const EG_VIS_WALL_GAP    = [0, 300, 260, 220];   // base gap height per phase
+export const EG_VIS_WALL_AMP    = [0, 46, 58, 72];      // breathing amplitude per phase
+export const EG_VIS_WALL_RATE   = [0, 0.5, 0.65, 0.95]; // breathing rate (rad/s)
+export const EG_VIS_WALL_SPD    = [0, 135, 165, 200];   // sweep speed px/s
+export const EG_VIS_WALL_TOUCH  = [0, 0.20, 0.24, 0.28]; // %maxHP block touch
+export const EG_VIS_WALL_DOT    = [0, 6.0, 7.5, 9.0];   // %/s outside the corridor
+export const EG_VIS_WALL_LIFE   = [0, 11000, 11500, 12500]; // ms per pass
 
-function _egMechVisWalls(monster, phase) {
+export function _egMechVisWalls(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egVisEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -252,14 +261,14 @@ function _egMechVisWalls(monster, phase) {
 // standing strain zone: sparks chip anyone lingering in the squeezed band
 // for 4s after the bite. Escape the slice before the bite. Phase 3: two
 // slices (rows) at once.
-const EG_VIS_BENCH_WARN   = 1400;      // row telegraph before the jaws crawl
-const EG_VIS_BENCH_CRAWL  = 3400;      // jaws travel time
-const EG_VIS_BENCH_BAND   = 130;       // squeezed band height (px)
-const EG_VIS_BENCH_JAW    = [0, 0.22, 0.26, 0.30]; // %maxHP caught in the bite
-const EG_VIS_BENCH_STRAIN = [0, 0, 3.5, 4.5];     // %/s lingering in the strain
-const EG_VIS_BENCH_STRAIN_MS = 4000;   // strain zone lifetime after the bite
+export const EG_VIS_BENCH_WARN   = 1400;      // row telegraph before the jaws crawl
+export const EG_VIS_BENCH_CRAWL  = 3400;      // jaws travel time
+export const EG_VIS_BENCH_BAND   = 130;       // squeezed band height (px)
+export const EG_VIS_BENCH_JAW    = [0, 0.22, 0.26, 0.30]; // %maxHP caught in the bite
+export const EG_VIS_BENCH_STRAIN = [0, 0, 3.5, 4.5];     // %/s lingering in the strain
+export const EG_VIS_BENCH_STRAIN_MS = 4000;   // strain zone lifetime after the bite
 
-function _egMechVisBench(monster, phase) {
+export function _egMechVisBench(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egVisEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -359,17 +368,17 @@ function _egMechVisBench(monster, phase) {
 // piece SHATTERS - fail and the piece is QUENCHED: a giant wall-block
 // crosses the arena at your row (the corridor comes for you). Phase 3:
 // the quenched block returns the other way.
-const EG_VIS_QUEN_MS    = [0, 0, 7000, 5500]; // hammer time by phase
-const EG_VIS_QUEN_R     = 60;            // body-check radius
-const EG_VIS_QUEN_HP    = 2;             // body-checks to knock loose
-const EG_VIS_HAMMER_DMG = [0, 0, 0.15, 0.18]; // %maxHP caught by a hammer arc
-const EG_VIS_QUEN_SPARK_DPS = 2.8;      // %/s standing in the sparks pool
-const EG_VIS_BLOCK_DMG  = [0, 0, 0.26, 0.32]; // %maxHP caught by the quenched block
-const EG_VIS_BLOCK_SPD  = 430;          // px/s quenched block travel
-const EG_VIS_BLOCK_WARN = 1100;         // telegraph before the block crosses
-const EG_VIS_HEAL_CANCEL = 0.12;        // %maxHP heal for shattering
+export const EG_VIS_QUEN_MS    = [0, 0, 7000, 5500]; // hammer time by phase
+export const EG_VIS_QUEN_R     = 60;            // body-check radius
+export const EG_VIS_QUEN_HP    = 2;             // body-checks to knock loose
+export const EG_VIS_HAMMER_DMG = [0, 0, 0.15, 0.18]; // %maxHP caught by a hammer arc
+export const EG_VIS_QUEN_SPARK_DPS = 2.8;      // %/s standing in the sparks pool
+export const EG_VIS_BLOCK_DMG  = [0, 0, 0.26, 0.32]; // %maxHP caught by the quenched block
+export const EG_VIS_BLOCK_SPD  = 430;          // px/s quenched block travel
+export const EG_VIS_BLOCK_WARN = 1100;         // telegraph before the block crosses
+export const EG_VIS_HEAL_CANCEL = 0.12;        // %maxHP heal for shattering
 
-function _egMechVisQuench(monster, phase) {
+export function _egMechVisQuench(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egVisEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -538,31 +547,31 @@ function _egMechVisQuench(monster, phase) {
 // THE IRON VISE slams full-screen (35%) - only the stress-fracture SAFE
 // SLAB holds. Charge bar frozen (gate in _egTickPlayer via
 // _egVisFinalActive).
-const EG_VIS_FIN_SQUEEZES  = 3;      // compression waves
-const EG_VIS_FIN_COLS      = 8;      // slab grid columns
-const EG_VIS_FIN_ROWS      = 5;      // slab grid rows
-const EG_VIS_FIN_WARN      = 3600;   // time to reach the corridor
-const EG_VIS_FIN_SQUEEZE_MS = 8200;  // between squeezes
-const EG_VIS_FIN_DMG       = 0.20;   // %maxHP caught outside the corridor
-const EG_VIS_FIN_IRON_DMG  = 0.35;   // %maxHP outside the final slab
-const EG_VIS_FIN_FAILSAFE_MS = 34000;
+export const EG_VIS_FIN_SQUEEZES  = 3;      // compression waves
+export const EG_VIS_FIN_COLS      = 8;      // slab grid columns
+export const EG_VIS_FIN_ROWS      = 5;      // slab grid rows
+export const EG_VIS_FIN_WARN      = 3600;   // time to reach the corridor
+export const EG_VIS_FIN_SQUEEZE_MS = 8200;  // between squeezes
+export const EG_VIS_FIN_DMG       = 0.20;   // %maxHP caught outside the corridor
+export const EG_VIS_FIN_IRON_DMG  = 0.35;   // %maxHP outside the final slab
+export const EG_VIS_FIN_FAILSAFE_MS = 34000;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egVisFinal = null;
+export let _egVisFinal = null;
 
-function _egVisFinalActive() {
+export function _egVisFinalActive() {
     return !!_egVisFinal && !_egVisFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egVisOnPhaseEnter(monster, newPhase) {
+export function _egVisOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egVisEnsureFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egVisEnsureFinalWatcher(monster) {
+export function _egVisEnsureFinalWatcher(monster) {
     if (!monster || _egVisFinal || _egVisWatcherRun) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -578,10 +587,10 @@ function _egVisEnsureFinalWatcher(monster) {
         return true;
     });
 }
-let _egVisWatcherRun = null;
+export let _egVisWatcherRun = null;
 
 // Pause-safe timeout (mirrors the other finales).
-function _egVisAfter(g, ms, fn) {
+export function _egVisAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egVisFinal) return;
@@ -592,7 +601,7 @@ function _egVisAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egVisFinalStart(monster) {
+export function _egVisFinalStart(monster) {
     if (_egVisFinal || !monster) return;
 
     // The Vise clears the arena for the full clamp: kill every other run of
@@ -734,7 +743,7 @@ function _egVisFinalStart(monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egVisFinalEnd(g, monster) {
+export function _egVisFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -752,7 +761,7 @@ function _egVisFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -768,7 +777,7 @@ function _egVisFinalEnd(g, monster) {
 // was rebuilt on nk runs. The framework's old typeof-guarded call to
 // _egCrushTeardown is now a safe no-op; THIS teardown is wired separately
 // in _egBossCleanup (boss_vise branch).
-function _egVisTeardown() {
+export function _egVisTeardown() {
     if (_egVisFinal) { try { _egVisFinalEnd(_egVisFinal, null); } catch (e) {} _egVisFinal = null; }
     _egVisWatcherRun = null;
     document.querySelectorAll('.eg-vis-wblock, .eg-vis-bench-warn, .eg-vis-jaw, .eg-vis-piece, ' +
@@ -794,7 +803,7 @@ if (typeof window !== 'undefined') {
     window._EG_VIS_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_vise') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_vise') : null;
             if (!monster) return 'no vise alive';
             const fn = name === 'walls' ? _egMechVisWalls
                 : name === 'bench' ? _egMechVisBench
@@ -806,7 +815,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_vise') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_vise') : null;
             if (!monster) return 'no vise alive';
             _egVisFinalStart(monster);
             return 'THE FULL CLAMP started';

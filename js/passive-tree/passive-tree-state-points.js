@@ -1,4 +1,14 @@
-﻿//  passive-tree-state-points.js
+﻿import { setAchStat, trackAchStat } from '../achievements/achievements.js';
+import { save } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { TALENT_TREE_DATA } from './passive-tree-data.js';
+import { _ptRefreshAllStyles } from './passive-tree-ui.js';
+import { PT, PT_START_ID, _ptInitTreeData } from './passive-tree.js';
+//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+try { Object.defineProperty(globalThis, '_pt_skills', { get() { return _pt_skills; }, set(v) { _pt_skills = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_pt_conns', { get() { return _pt_conns; }, set(v) { _pt_conns = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_pt_skillMap', { get() { return _pt_skillMap; }, set(v) { _pt_skillMap = v; }, configurable: true }); } catch (e) {}
+//  passive-tree-state-points.js
 //  Handles all allocation / deallocation logic, point accounting, and the
 //  adjacency graph that the connectivity checks rely on.
 
@@ -10,16 +20,17 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Internal shared references - populated by PT.loadInline() so all sub-files
+// Internal shared references - populated by _ptInitTreeData() (deferred to
+// DOMContentLoaded) so all sub-files
 // operate on the same arrays without passing them as arguments on every call.
 let _pt_skills = [];   // layout skill objects
 let _pt_conns = [];   // connection objects
 let _pt_skillMap = {};   // id → layout skill object
-let _pt_adjacency = {};   // id → Set of adjacent node ids
+export let _pt_adjacency = {};   // id → Set of adjacent node ids
 
 // All statKeys that belong to each of the three main class branches.
 // Defined at module level so they are not recreated on every node click.
-const PT_BRANCH_STATISTICIAN = new Set([
+export const PT_BRANCH_STATISTICIAN = new Set([
     'gear_of_the_statistician', 'improved_gear_of_the_statistician',
     'chain_reaction', 'precise_momentum', 'exponential_growth',
     'learning_from_mistakes', 'mistakes_no_matter',
@@ -30,7 +41,7 @@ const PT_BRANCH_STATISTICIAN = new Set([
     'god_of_statistics',
 ]);
 
-const PT_BRANCH_MATHMAGICIAN = new Set([
+export const PT_BRANCH_MATHMAGICIAN = new Set([
     'gear_of_the_mathmagician', 'improved_gear_of_the_mathmagician',
     'arcane_echo', 'resonant_reveal', 'arcane_exposure',
     'rapid_revelation', 'accelerated_revelation',
@@ -41,7 +52,7 @@ const PT_BRANCH_MATHMAGICIAN = new Set([
     'god_of_math',
 ]);
 
-const PT_BRANCH_PROBABILIST = new Set([
+export const PT_BRANCH_PROBABILIST = new Set([
     'gear_of_the_probabilist', 'improved_gear_of_the_probabilist',
     'probabilistic_sweep', 'expanded_inference', 'momentum_of_certainty',
     'swift_marking', 'accelerated_marking',
@@ -53,7 +64,7 @@ const PT_BRANCH_PROBABILIST = new Set([
 ]);
 
 // StatKeys required to satisfy the "lucky tile build" achievement
-const PT_LUCKY_BUILD_KEYS = [
+export const PT_LUCKY_BUILD_KEYS = [
     'grid_awareness',
     'fortunes_tile_1', 'fortunes_tile_2', 'fortunes_tile_3',
     'generous_fortune_1', 'generous_fortune_2', 'generous_fortune_3',
@@ -63,7 +74,7 @@ const PT_LUCKY_BUILD_KEYS = [
 
 // StatKeys for nodes that lie on the outer rim of the tree (x > 3400).
 // Used to track how many outer rim nodes the player has allocated.
-const PT_OUTER_RIM_KEYS = new Set([
+export const PT_OUTER_RIM_KEYS = new Set([
     'timed_stasis_1', 'timed_stasis_2', 'timed_stasis_3',
     'interquartile_vision_1', 'interquartile_vision_2', 'interquartile_vision_3',
     'bayesian_update_2',
@@ -79,7 +90,7 @@ const PT_OUTER_RIM_KEYS = new Set([
 // Each entry is [keysArray, achievementStatName].
 // _ptTrackClusterCompletions() iterates this list so adding a new cluster
 // only requires a single line here rather than a new _clusterCheck call.
-const PT_CLUSTER_CHECKS = [
+export const PT_CLUSTER_CHECKS = [
     [
         ['tutor_enable', 'careful_study', 'stochastics_tutor', 'efficient_tutoring',
             'statistics_tutor', 'endless_instructions', 'maths_tutor', 'professor_tutor'],
@@ -132,7 +143,7 @@ const PT_CLUSTER_CHECKS = [
 //------------------------------------------------------------------------
 
 // Returns the active UI language: 'de' or 'en'
-function _ptLang() {
+export function _ptLang() {
     return (typeof LANG !== 'undefined' && LANG === 'de') ? 'de' : 'en';
 }
 
@@ -146,37 +157,37 @@ function _ptLang() {
 
 // Returns the live Set of allocated node IDs from STATE.
 // Auto-creates the Set if it is missing so callers never get undefined.
-function _ptAllocated() {
-    if (typeof STATE === 'undefined') return new Set();
-    if (!(STATE.passiveTreeAllocated instanceof Set)) {
-        STATE.passiveTreeAllocated = new Set();
+export function _ptAllocated() {
+    if (typeof globalThis.STATE === 'undefined') return new Set();
+    if (!(globalThis.STATE.passiveTreeAllocated instanceof Set)) {
+        globalThis.STATE.passiveTreeAllocated = new Set();
     }
-    return STATE.passiveTreeAllocated;
+    return globalThis.STATE.passiveTreeAllocated;
 }
 
 // Returns the current number of spendable convergence points
-function _ptPoints() {
-    return (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
+export function _ptPoints() {
+    return (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.passiveTreePoints) || 0;
 }
 
 // Decrements the point counter by 1 (floor 0) and refreshes the UI label
-function _ptSpendPoint() {
-    if (typeof STATE !== 'undefined') {
-        STATE.passiveTreePoints = Math.max(0, _ptPoints() - 1);
+export function _ptSpendPoint() {
+    if (typeof globalThis.STATE !== 'undefined') {
+        globalThis.STATE.passiveTreePoints = Math.max(0, _ptPoints() - 1);
     }
     _ptRefreshPointsDisplay();
 }
 
 // Increments the point counter by 1 and refreshes the UI label
-function _ptRefundPoint() {
-    if (typeof STATE !== 'undefined') {
-        STATE.passiveTreePoints = _ptPoints() + 1;
+export function _ptRefundPoint() {
+    if (typeof globalThis.STATE !== 'undefined') {
+        globalThis.STATE.passiveTreePoints = _ptPoints() + 1;
     }
     _ptRefreshPointsDisplay();
 }
 
 // Writes the current point count to the #pt-points element in the correct language
-function _ptRefreshPointsDisplay() {
+export function _ptRefreshPointsDisplay() {
     const el = document.getElementById('pt-points');
     if (!el) return;
     const p = _ptPoints();
@@ -192,8 +203,8 @@ function _ptRefreshPointsDisplay() {
 //------------------------------------------------------------------------
 
 // Rebuilds _pt_adjacency as a bidirectional map from _pt_conns.
-// Must be called after PT.loadInline() and before any unlock/dealloc checks.
-function _ptBuildAdjacency() {
+// Must be called after _ptInitTreeData() and before any unlock/dealloc checks.
+export function _ptBuildAdjacency() {
     _pt_adjacency = {};
     _pt_skills.forEach(s => { _pt_adjacency[s.id] = new Set(); });
     _pt_conns.forEach(c => {
@@ -213,7 +224,7 @@ function _ptBuildAdjacency() {
 // Traverses from `startId` through nodes present in `availableSet`, visiting
 // every reachable node exactly once. Returns a Set of all reached node IDs.
 // Used by the deallocation check to verify connectivity is not broken.
-function _ptBfsReachable(startId, availableSet) {
+export function _ptBfsReachable(startId, availableSet) {
     const visited = new Set();
     const queue = [startId];
     while (queue.length) {
@@ -232,7 +243,7 @@ function _ptBfsReachable(startId, availableSet) {
 
 // Returns the statKey string for the skill at the given node ID,
 // or an empty string if the node has no definition.
-function _ptGetSkillStatKey(nodeId) {
+export function _ptGetSkillStatKey(nodeId) {
     const skill = _pt_skillMap[nodeId];
     const def = skill ? skill._def : null;
     return def ? def.statKey : '';
@@ -240,7 +251,7 @@ function _ptGetSkillStatKey(nodeId) {
 
 // Builds and returns a Set of all statKeys that are currently allocated.
 // Filters out any nodes that have no associated definition.
-function _ptGetAllAllocatedStatKeys() {
+export function _ptGetAllAllocatedStatKeys() {
     const alloc = _ptAllocated();
     const keys = new Set();
     for (const nodeId of alloc) {
@@ -261,7 +272,7 @@ function _ptGetAllAllocatedStatKeys() {
 // A node is UNLOCKABLE when:
 //   – it is not already allocated
 //   – at least one adjacent node IS allocated, OR it is the Start node
-function _ptIsUnlockable(id) {
+export function _ptIsUnlockable(id) {
     const alloc = _ptAllocated();
     if (alloc.has(id)) return false;
     if (id === PT_START_ID) return true;
@@ -274,14 +285,14 @@ function _ptIsUnlockable(id) {
 }
 
 // Returns true if the given node exists in the allocated set
-function _ptIsAllocated(id) {
+export function _ptIsAllocated(id) {
     return _ptAllocated().has(id);
 }
 
 // A node can be DE-ALLOCATED when:
 //   – it IS currently allocated
 //   – removing it would NOT strand any other allocated node (traversal from Start)
-function _ptIsDeallocatable(id) {
+export function _ptIsDeallocatable(id) {
     const alloc = _ptAllocated();
     if (!alloc.has(id)) return false;
     if (id === PT_START_ID) return false;   // Start node is permanent
@@ -310,7 +321,7 @@ function _ptIsDeallocatable(id) {
 //------------------------------------------------------------------------
 
 // Tracks the basic per-allocation counters that fire on every node allocation
-function _ptTrackSimpleAchievements(statKey) {
+export function _ptTrackSimpleAchievements(statKey) {
     trackAchStat('treeNodesAllocated');
     trackAchStat('treePointsSpent');
 
@@ -320,7 +331,7 @@ function _ptTrackSimpleAchievements(statKey) {
 }
 
 // Tracks achievements related to the three God nodes individually and collectively
-function _ptTrackGodNodeAchievements(statKey) {
+export function _ptTrackGodNodeAchievements(statKey) {
     if (statKey === 'god_of_statistics') trackAchStat('treeGodStatisticsAllocated');
     if (statKey === 'god_of_math') trackAchStat('treeGodMathAllocated');
     if (statKey === 'god_of_probabilities') trackAchStat('treeGodProbabilitiesAllocated');
@@ -334,7 +345,7 @@ function _ptTrackGodNodeAchievements(statKey) {
 }
 
 // Tracks the keystone-duo achievement (2+ keystones active simultaneously)
-function _ptTrackKeystoneAchievements(alloc) {
+export function _ptTrackKeystoneAchievements(alloc) {
     if (typeof setAchStat !== 'function') return;
 
     const keystoneCount = [...alloc].filter(nodeId => {
@@ -349,7 +360,7 @@ function _ptTrackKeystoneAchievements(alloc) {
 
 // Tracks completion of the three main class branches (Statistician, Mathmagician, Probabilist)
 // and the cross-branch Lucky tile build achievement
-function _ptTrackBranchCompletions(allocatedKeys) {
+export function _ptTrackBranchCompletions(allocatedKeys) {
     if (typeof setAchStat === 'function') {
         if ([...PT_BRANCH_STATISTICIAN].every(k => allocatedKeys.has(k))) {
             setAchStat('treeStatisticianBranchComplete', 1);
@@ -369,21 +380,21 @@ function _ptTrackBranchCompletions(allocatedKeys) {
 }
 
 // Sets an achievement to 1 if all keys in the cluster are present in allocatedKeys
-function _ptCheckCluster(keys, statName, allocatedKeys) {
+export function _ptCheckCluster(keys, statName, allocatedKeys) {
     if (keys.every(k => allocatedKeys.has(k))) {
         if (typeof setAchStat === 'function') setAchStat(statName, 1);
     }
 }
 
 // Iterates PT_CLUSTER_CHECKS and fires any clusters that are now fully allocated
-function _ptTrackClusterCompletions(allocatedKeys) {
+export function _ptTrackClusterCompletions(allocatedKeys) {
     for (const [keys, statName] of PT_CLUSTER_CHECKS) {
         _ptCheckCluster(keys, statName, allocatedKeys);
     }
 }
 
 // Updates the outer-rim node count achievement (tracks how many outer-rim nodes are allocated)
-function _ptTrackOuterRimCount(allocatedKeys) {
+export function _ptTrackOuterRimCount(allocatedKeys) {
     if (typeof setAchStat !== 'function') return;
     const count = [...PT_OUTER_RIM_KEYS].filter(k => allocatedKeys.has(k)).length;
     setAchStat('treeOuterRimNodes', count);
@@ -391,7 +402,7 @@ function _ptTrackOuterRimCount(allocatedKeys) {
 
 // Master dispatcher - runs all achievement checks after a node is allocated.
 // Requires trackAchStat to be available; bails silently if it is not.
-function _ptTrackAllocationAchievements(nodeId, alloc) {
+export function _ptTrackAllocationAchievements(nodeId, alloc) {
     if (typeof trackAchStat !== 'function') return;
 
     const statKey = _ptGetSkillStatKey(nodeId);
@@ -415,7 +426,7 @@ function _ptTrackAllocationAchievements(nodeId, alloc) {
 
 // Handles the deallocation path when the player clicks an already-allocated node.
 // Returns true if deallocation succeeded so the caller can exit early.
-function _ptHandleDeallocation(id, alloc) {
+export function _ptHandleDeallocation(id, alloc) {
     if (!_ptIsDeallocatable(id)) return false;
 
     alloc.delete(id);
@@ -430,10 +441,10 @@ function _ptHandleDeallocation(id, alloc) {
 }
 
 // Handles the allocation path when the player clicks an unallocated node.
-function _ptHandleAllocation(id, alloc) {
+export function _ptHandleAllocation(id, alloc) {
     alloc.add(id);
     _ptSpendPoint();
-    STATE.passiveTreeLastNode = id;
+    globalThis.STATE.passiveTreeLastNode = id;
     save();
     _ptRefreshAllStyles();
     _ptTrackAllocationAchievements(id, alloc);
@@ -442,7 +453,7 @@ function _ptHandleAllocation(id, alloc) {
 // Full respec: de-allocates every node except the permanent Start node and
 // refunds one Convergence Point per removed node. Called by the "Refund All"
 // topbar button after the player confirms the action.
-function _ptRefundAllPoints() {
+export function _ptRefundAllPoints() {
     const alloc = _ptAllocated();
 
     // Collect refundable nodes (everything except Start), bail if tree is empty
@@ -451,8 +462,8 @@ function _ptRefundAllPoints() {
 
     refundable.forEach(id => alloc.delete(id));
 
-    if (typeof STATE !== 'undefined') {
-        STATE.passiveTreePoints = _ptPoints() + refundable.length;
+    if (typeof globalThis.STATE !== 'undefined') {
+        globalThis.STATE.passiveTreePoints = _ptPoints() + refundable.length;
     }
     save();
     _ptRefreshAllStyles();
@@ -467,7 +478,7 @@ function _ptRefundAllPoints() {
 
 // Entry point called when the player clicks any passive tree node.
 // Routes to deallocation or allocation depending on the node's current state.
-function _ptOnNodeClick(id) {
+export function _ptOnNodeClick(id) {
     const alloc = _ptAllocated();
 
     if (_ptIsAllocated(id)) {
@@ -491,7 +502,7 @@ function _ptOnNodeClick(id) {
 
 // Used by passive-tree-ui.js to determine which colour set to apply to a node.
 // Returns one of: 'allocated' | 'unlockable' | 'locked'
-function _ptGetNodeVisualState(id) {
+export function _ptGetNodeVisualState(id) {
     if (_ptIsAllocated(id)) return 'allocated';
     if (_ptIsUnlockable(id)) return 'unlockable';
     return 'locked';
@@ -509,13 +520,17 @@ function _ptGetNodeVisualState(id) {
 // This is the main public API used by the rest of the game to check passive bonuses.
 //
 // Example:  if (ptHasSkill('tutor_enable')) { ... }
-function ptHasSkill(statKey) {
+export function ptHasSkill(statKey) {
     // Treeless modifier: treat all nodes as unallocated
-    if (typeof isTreeless === 'function' && isTreeless()) return false;
+    if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return false;
 
-    // Ensure the skill map is populated before querying it
+    // Ensure the skill map is populated before querying it.
+    // Self-heal via the real init. (This branch used to call
+    // PT.loadInline - a function that never existed anywhere; the
+    // latent bug was unreachable while classic load order guaranteed
+    // _ptInitTreeData populated the map before any ptHasSkill call.)
     if (!_pt_skills.length && typeof TALENT_TREE_DATA !== 'undefined') {
-        PT.loadInline(TALENT_TREE_DATA);
+        _ptInitTreeData();
     }
 
     const alloc = _ptAllocated();

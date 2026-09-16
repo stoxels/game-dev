@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE NEEDLE (boss_needle)-----------------------
 //------------------------------------------------------------------------
 // REWORK - precision-sewing homage, rebuilt as a full stitchcraft gauntlet.
@@ -47,8 +56,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_ND_DEBUG_SLOW = true;
-const _EG_ND_DEBUG_MULT = _EG_ND_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_ND_DEBUG_SLOW = true;
+export const _EG_ND_DEBUG_MULT = _EG_ND_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_needle: {
@@ -78,13 +87,13 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_ND_GATE_DMG   = [0, 0.22, 0.26, 0.32];   // gate bar contact
-const EG_ND_PIN_DMG    = [0, 0.16, 0.19, 0.22];   // pin landing / planted pin
-const EG_ND_STITCH_DMG = [0, 0, 0.17, 0.20];      // stitch wave lane
-const EG_ND_PINB_DMG   = [0, 0, 0.18, 0.21];      // pincushion spoke
-const EG_ND_STAB_DMG   = 0.12;                    // finale stab clip
-const EG_ND_FINAL_DMG  = 0.32;                    // the last stitch
-const EG_ND_HIT_CD_MS  = 700;                     // shared touch cooldown
+export const EG_ND_GATE_DMG   = [0, 0.22, 0.26, 0.32];   // gate bar contact
+export const EG_ND_PIN_DMG    = [0, 0.16, 0.19, 0.22];   // pin landing / planted pin
+export const EG_ND_STITCH_DMG = [0, 0, 0.17, 0.20];      // stitch wave lane
+export const EG_ND_PINB_DMG   = [0, 0, 0.18, 0.21];      // pincushion spoke
+export const EG_ND_STAB_DMG   = 0.12;                    // finale stab clip
+export const EG_ND_FINAL_DMG  = 0.32;                    // the last stitch
+export const EG_ND_HIT_CD_MS  = 700;                     // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -93,8 +102,8 @@ const EG_ND_HIT_CD_MS  = 700;                     // shared touch cooldown
 
 // Touch damage helper shared by all Needle hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egNdHitCd = 0;
-function _egNdTouch(pct, level, label) {
+export let _egNdHitCd = 0;
+export function _egNdTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egNdHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -107,7 +116,7 @@ function _egNdTouch(pct, level, label) {
 
 // Thread-shred burst where a stitch lands (visual only, body-level so it
 // survives the run ending in the same frame).
-function _egNdThreadBurst(x, y, big) {
+export function _egNdThreadBurst(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-nd-threads' + (big ? ' eg-nd-threads-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -136,11 +145,11 @@ function _egNdThreadBurst(x, y, big) {
 // Full-height needle gates peek in at the right edge, then scroll across
 // with a single wobbling gap. Thread the gap! Two gates per pass; three at
 // the end. Faster every phase.
-const EG_ND_GATE_GAP   = [0, 220, 185, 155];
-const EG_ND_GATE_SPEED = [0, 150, 185, 225];
-const EG_ND_GATE_W     = 34;
+export const EG_ND_GATE_GAP   = [0, 220, 185, 155];
+export const EG_ND_GATE_SPEED = [0, 150, 185, 225];
+export const EG_ND_GATE_W     = 34;
 
-function _egMechNdNeedleGates(monster, phase) {
+export function _egMechNdNeedleGates(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -221,11 +230,11 @@ function _egMechNdNeedleGates(monster, phase) {
 //------------------------------------------------------------------------
 // Giant pins slam down point-first at marked spots (most aimed near you),
 // plant themselves as tilted hazards for a while, then dissolve.
-const EG_ND_PIN_COUNT = [0, 2, 3, 4];
-const EG_ND_PIN_LIFE  = 3500;
-const EG_ND_PIN_R     = 36;
+export const EG_ND_PIN_COUNT = [0, 2, 3, 4];
+export const EG_ND_PIN_LIFE  = 3500;
+export const EG_ND_PIN_R     = 36;
 
-function _egMechNdPinDrops(monster, phase) {
+export function _egMechNdPinDrops(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -309,11 +318,11 @@ function _egMechNdPinDrops(monster, phase) {
 // The floor flashes a stitch grid, then needles rise lane by lane in a
 // rolling wave - one pass at 60%, two passes (right→left) at 30%. Stand in
 // a rising lane and you get stitched.
-const EG_ND_WAVE_LANES = 7;
-const EG_ND_WAVE_LANE_MS = 950;
-const EG_ND_WAVE_GAP_MS = 420;
+export const EG_ND_WAVE_LANES = 7;
+export const EG_ND_WAVE_LANE_MS = 950;
+export const EG_ND_WAVE_GAP_MS = 420;
 
-function _egMechNdStitchWave(monster, phase) {
+export function _egMechNdStitchWave(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -390,9 +399,9 @@ function _egMechNdStitchWave(monster, phase) {
 //------------------------------------------------------------------------
 // A pincushion orb drops in, swells - then BURSTS: needles fly outward
 // along every spoke. Slip between them!
-const EG_ND_CUSHION_SPOKES = 8;
+export const EG_ND_CUSHION_SPOKES = 8;
 
-function _egMechNdPincushionBurst(monster, phase) {
+export function _egMechNdPincushionBurst(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -465,27 +474,27 @@ function _egMechNdPincushionBurst(monster, phase) {
 // eye hops to a fresh spot every stab; the last one is smaller and sews the
 // screen shut. Charge bar frozen for the whole set-piece (gate in
 // _egTickPlayer via _egNdFinalActive).
-const EG_ND_FINAL_TICK_MS = 1200;
-const EG_ND_FINAL_TICKS = 4;
-const EG_ND_EYE_R = 150;
-const EG_ND_EYE_R_FINAL = 115;
+export const EG_ND_FINAL_TICK_MS = 1200;
+export const EG_ND_FINAL_TICKS = 4;
+export const EG_ND_EYE_R = 150;
+export const EG_ND_EYE_R_FINAL = 115;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egNdFinal = null;
+export let _egNdFinal = null;
 
-function _egNdFinalActive() {
+export function _egNdFinalActive() {
     return !!_egNdFinal && !_egNdFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egNdOnPhaseEnter(monster, newPhase) {
+export function _egNdOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egNdStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egNdStartFinalWatcher(monster) {
+export function _egNdStartFinalWatcher(monster) {
     if (!monster || _egNdFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -504,7 +513,7 @@ function _egNdStartFinalWatcher(monster) {
 // Mark a fresh eye (safe circle) at a random spot - at least 340px from the
 // player so every stab demands a real dash - and poise the giant needle
 // above it.
-function _egNdMarkEye(g, r) {
+export function _egNdMarkEye(g, r) {
     if (g.eyeEl) { try { g.eyeEl.remove(); } catch (e) {} g.eyeEl = null; }
     if (g.needleEl) { try { g.needleEl.remove(); } catch (e) {} g.needleEl = null; }
     const W = window.innerWidth, H = window.innerHeight;
@@ -539,7 +548,7 @@ function _egNdMarkEye(g, r) {
 
 // One stab: the needle plunges onto the eye; everyone OUTSIDE the eye is
 // stitched.
-function _egNdStab(g, monster, big) {
+export function _egNdStab(g, monster, big) {
     const e = g.eye;
     if (!e || !g.fxRun) return;
     if (g.needleEl) g.needleEl.style.top = Math.round(e.y - 11) + 'px';
@@ -564,7 +573,7 @@ function _egNdStab(g, monster, big) {
     g.fxRun.timers.push(id);
 }
 
-function _egNdFinalStart(monster) {
+export function _egNdFinalStart(monster) {
     if (_egNdFinal || !monster) return;
 
     // The cloth goes taut: kill every other run of this boss.
@@ -663,7 +672,7 @@ function _egNdFinalStart(monster) {
     }, cdTick);
 }
 
-function _egNdFinalEnd(g) {
+export function _egNdFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -680,7 +689,7 @@ function _egNdFinalEnd(g) {
     document.querySelectorAll('.eg-nd-threading').forEach(el => el.classList.remove('eg-nd-threading'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -697,7 +706,7 @@ function _egNdFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egNdTeardown() {
+export function _egNdTeardown() {
     if (_egNdFinal) { try { _egNdFinalEnd(_egNdFinal); } catch (e) {} _egNdFinal = null; }
     document.querySelectorAll('.eg-nd-gateseg, .eg-nd-pinwarn, .eg-nd-pin, .eg-nd-stitchgrid, ' +
         '.eg-nd-stitchlane, .eg-nd-cushion, .eg-nd-spoke, .eg-nd-eye, .eg-nd-bigneedle, ' +
@@ -723,7 +732,7 @@ if (typeof window !== 'undefined') {
     window._EG_ND_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_needle') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_needle') : null;
             if (!monster) return 'no needle alive';
             const fn = name === 'gates' ? _egMechNdNeedleGates
                 : name === 'pins' ? _egMechNdPinDrops
@@ -736,7 +745,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_needle') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_needle') : null;
             if (!monster) return 'no needle alive';
             _egNdFinalStart(monster);
             return 'THE FINAL STITCH started';

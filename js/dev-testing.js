@@ -1,4 +1,19 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { WORLD_START_GI } from './levels/levels.js';
+import { showToast } from './puzzle-items/toasts-and-popups.js';
+import { showMapView } from './screens/screens-map-view.js';
+import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect } from './screens/screens-save-slots.js';
+import { showWorldDetail } from './screens/screens-world-levels.js';
+import { launchExistingGame, showSetup, showTitle, switchScreen } from './screens/screens.js';
+import { _doStartLevel } from './start-level.js';
+import { getActiveSlot, getSlotSummary, save, wipeSlot } from './state.js';
+import { markSeen } from './storyline/storyline-engine.js';
+
+//------------------------------------------------------------------------
 //-------------------DEV TESTING HARNESS (dev-testing.js)------------------
 //------------------------------------------------------------------------
 // Dev-time only. Inert for normal players.
@@ -49,7 +64,7 @@
 //------------------------------------------------------------------------
 
 // Reads the integer query param or returns fallback. Safe pre-STATE.
-function _devTestParam(name, fallback) {
+export function _devTestParam(name, fallback) {
     try {
         const v = new URLSearchParams(window.location.search).get(name);
         if (v === null || v === '') return fallback;
@@ -64,13 +79,13 @@ function _devTestParam(name, fallback) {
 window.STOX_EFFECT_TIME_SCALE = 1;
 
 // Normalizes the scale param/console value into a finite number ≥ 0.01.
-function _devTestNormalizeScale(v) {
+export function _devTestNormalizeScale(v) {
     const n = Number(v);
     if (!isFinite(n) || n <= 0) return 1;
     return Math.min(1000, Math.max(0.01, n));
 }
 
-const DevTest = {
+export const DevTest = {
     // Full boot chain. spec: { slot, character, skipIntro, skipTutorial,
     // screen: 'title'|'setup'|'mapview'|'world'|'game', world, level, force }
     goto(spec = {}) {
@@ -118,9 +133,9 @@ const DevTest = {
             // 2. Character + tutorial flags, then straight to setup.
             //    (Bypasses character-select UI and tutorial screens via the
             //    same STATE fields those screens write - no state is skipped.)
-            if (typeof STATE === 'undefined' || !STATE) return;
-            STATE.playerCharacter = s.character;
-            if (s.skipTutorial) STATE.tutorialDone = true;
+            if (typeof STATE === 'undefined' || !globalThis.STATE) return;
+            globalThis.STATE.playerCharacter = s.character;
+            if (s.skipTutorial) globalThis.STATE.tutorialDone = true;
             if (typeof save === 'function') save();
 
             if (s.screen === 'title') { log('done: title (slot ' + slotNum + ', char ' + s.character + ')'); return; }
@@ -145,7 +160,7 @@ const DevTest = {
                 ? WORLD_START_GI[s.world | 0] + (s.level | 0) : (s.level | 0);
             if (typeof startLevel !== 'function') return;
             if (s.force && typeof _doStartLevel === 'function') _doStartLevel(gi);
-            else startLevel(gi);
+            else globalThis.startLevel(gi);
             log('done: game gi=' + gi + ' (slot ' + slotNum + ', char ' + s.character + ')');
         });
         onSaveSlotChosen(slotNum);
@@ -159,7 +174,7 @@ const DevTest = {
         const gi = (typeof WORLD_START_GI !== 'undefined' && WORLD_START_GI[w] !== undefined)
             ? WORLD_START_GI[w] + l : l;
         if (force && typeof _doStartLevel === 'function') _doStartLevel(gi);
-        else if (typeof startLevel === 'function') startLevel(gi);
+        else if (typeof startLevel === 'function') globalThis.startLevel(gi);
     },
     setup() { if (typeof showSetup === 'function') showSetup(); },
     title() { if (typeof showTitle === 'function') showTitle(); },
@@ -167,13 +182,13 @@ const DevTest = {
 
     // --- Introspection ----------------------------------------------------
     state() {
-        if (typeof STATE === 'undefined' || !STATE) return 'no STATE';
+        if (typeof STATE === 'undefined' || !globalThis.STATE) return 'no STATE';
         return {
             slot: (typeof getActiveSlot === 'function') ? getActiveSlot() : null,
-            character: STATE.playerCharacter,
-            class: STATE.playerClass || STATE.playerAscendency || null,
-            levelsDone: STATE.done ? STATE.done.length : 0,
-            nexusUnlocked: !!STATE.nexusUnlocked,
+            character: globalThis.STATE.playerCharacter,
+            class: globalThis.STATE.playerClass || globalThis.STATE.playerAscendency || null,
+            levelsDone: globalThis.STATE.done ? globalThis.STATE.done.length : 0,
+            nexusUnlocked: !!globalThis.STATE.nexusUnlocked,
             activeScreen: document.querySelector('.screen.active')?.id || null,
             timeScale: window.STOX_EFFECT_TIME_SCALE,
         };

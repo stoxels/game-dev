@@ -1,4 +1,13 @@
-﻿//------------------------------------------------------------------------
+﻿import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
+import { _trackTimerDelta, updTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { _setAbilityMode } from './class-abilities.js';
+import { cooldownState } from './class-cooldown-state.js';
+import { buildClassHUD } from './class-hud.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+//------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
 //-------------------------------OUTLIER CLASS----------------------------
 //------------------------------------------------------------------------
@@ -8,19 +17,19 @@
 //------------------------------------------------------------------------
 
 // Hyperspeed canvas star colors (used by Black Swan visual effect)
-const BSW_STAR_COLORS = ['#ffffff', '#e8ccff', '#c4a8ff', '#ff6b6b', '#ffd93d', '#6bcfff'];
+export const BSW_STAR_COLORS = ['#ffffff', '#e8ccff', '#c4a8ff', '#ff6b6b', '#ffd93d', '#6bcfff'];
 
 // How long the hyperspeed ramp-up animation takes (ms) before reaching full speed
-const BSW_RAMP_DURATION_MS = 800;
+export const BSW_RAMP_DURATION_MS = 800;
 
 // Number of star streaks rendered during the hyperspeed effect
-const BSW_STAR_COUNT = 180;
+export const BSW_STAR_COUNT = 180;
 
 // How many ms before the end of Black Swan to begin the canvas fade-out
-const BSW_FADE_LEAD_MS = 500;
+export const BSW_FADE_LEAD_MS = 500;
 
 // HUD slot that Tail Risk maps to in the cooldown state
-const TAIL_RISK_COOLDOWN_SLOT = 'active3';
+export const TAIL_RISK_COOLDOWN_SLOT = 'active3';
 
 
 //------------------------------------------------------------------------
@@ -28,7 +37,7 @@ const TAIL_RISK_COOLDOWN_SLOT = 'active3';
 //------------------------------------------------------------------------
 
 // Formats time cost into MM:SS if over 60 seconds
-function _formatTimeCost(totalSeconds) {
+export function _formatTimeCost(totalSeconds) {
     if (totalSeconds <= 60) return `${totalSeconds}s`;
     const m = Math.floor(totalSeconds / 60);
     const s = totalSeconds % 60;
@@ -37,8 +46,8 @@ function _formatTimeCost(totalSeconds) {
 
 
 // Returns all unrevealed filled cells on the current grid as [row, col] pairs
-function _tailRiskGetCandidateCells() {
-    const sol = cur.grid;
+export function _tailRiskGetCandidateCells() {
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const candidates = [];
@@ -46,8 +55,8 @@ function _tailRiskGetCandidateCells() {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             const isFilled = sol[r][c] === 1;
-            const notRevealed = !revealedGrid[r][c];
-            const notUserFilled = userGrid[r][c] !== 1;
+            const notRevealed = !globalThis.revealedGrid[r][c];
+            const notUserFilled = globalThis.userGrid[r][c] !== 1;
             if (isFilled && notRevealed && notUserFilled) {
                 candidates.push([r, c]);
             }
@@ -58,7 +67,7 @@ function _tailRiskGetCandidateCells() {
 }
 
 // Builds the localised HTML string for the Tail Risk modal overlay
-function _tailRiskBuildOverlayHTML(secondsPerCell, maxCells) {
+export function _tailRiskBuildOverlayHTML(secondsPerCell, maxCells) {
     const title = t('cls_ih_title');
     const prompt = t('cls_ih_prompt').replace('{n}', secondsPerCell);
     const costLabel = t('cls_cost');
@@ -100,13 +109,13 @@ function _tailRiskBuildOverlayHTML(secondsPerCell, maxCells) {
 }
 
 // Removes the Tail Risk overlay from the DOM
-function _tailRiskRemoveOverlay() {
+export function _tailRiskRemoveOverlay() {
     const overlay = document.getElementById('tail-risk-overlay');
     if (overlay) overlay.remove();
 }
 
 // Attaches the live cost readout to the slider inside the overlay
-function _tailRiskBindSliderCost(secondsPerCell) {
+export function _tailRiskBindSliderCost(secondsPerCell) {
     const slider = document.getElementById('tr-slider');
     const costEl = document.getElementById('tr-cost');
     if (!slider || !costEl) return;
@@ -118,7 +127,7 @@ function _tailRiskBindSliderCost(secondsPerCell) {
 }
 
 // Refunds the cooldown for the Tail Risk HUD slot and resets it to zero
-function _tailRiskRefundCooldown() {
+export function _tailRiskRefundCooldown() {
     const cd = cooldownState[TAIL_RISK_COOLDOWN_SLOT];
     if (!cd) return;
 
@@ -130,23 +139,23 @@ function _tailRiskRefundCooldown() {
 }
 
 // Deducts totalCost seconds from the timer (floors at 0)
-function _tailRiskApplyTimeCost(totalCost) {
-    const before = timerSecs;
-    timerSecs = Math.max(0, timerSecs - totalCost);
-    _trackTimerDelta(before, timerSecs);
+export function _tailRiskApplyTimeCost(totalCost) {
+    const before = globalThis.timerSecs;
+    globalThis.timerSecs = Math.max(0, globalThis.timerSecs - totalCost);
+    _trackTimerDelta(before, globalThis.timerSecs);
     updTimer();
 }
 
 // Reveals count randomly selected cells from the shuffled candidate list.
 // Returns the number of cells actually revealed and their grid IDs.
-function _tailRiskRevealCells(shuffledCandidates, count) {
+export function _tailRiskRevealCells(shuffledCandidates, count) {
     const affectedIds = [];
     let revealedCount = 0;
 
     for (let i = 0; i < count; i++) {
         const [r, c] = shuffledCandidates[i];
-        revealedGrid[r][c] = true;
-        userGrid[r][c] = 1;
+        globalThis.revealedGrid[r][c] = true;
+        globalThis.userGrid[r][c] = 1;
         renderCell(r, c);
         updClues(r, c);
         affectedIds.push(`g-${r}-${c}`);
@@ -157,8 +166,8 @@ function _tailRiskRevealCells(shuffledCandidates, count) {
 }
 
 // Fires all post-reveal side-effects: visual flash, adjacency refresh, quest/achievement tracking, win check
-function _tailRiskPostReveal(revealedCount, affectedIds, totalCost) {
-    _applyCellEffect(affectedIds, 'reveal');
+export function _tailRiskPostReveal(revealedCount, affectedIds, totalCost) {
+    globalThis._applyCellEffect(affectedIds, 'reveal');
 
     // Refresh adjacency clues if the passive skill is active
     if (typeof _adjacencyMatrixRefreshAll === 'function' && ptHasSkill('adjacency_matrix')) {
@@ -166,19 +175,19 @@ function _tailRiskPostReveal(revealedCount, affectedIds, totalCost) {
     }
 
     trackAchStat('tilesRevealed', revealedCount);
-    showToast(t('cls_tail_risk_resolved')
+    globalThis.showToast(t('cls_tail_risk_resolved')
         .replace('{r}', revealedCount)
         .replace('{c}', totalCost));
 
     Audio_Manager.playSFX('tailRiskResolve');
 
-    questStat_classRevealUsed(revealedCount);
-    updateQuestStats('classAbilityUsedThisLevel', {});
+    globalThis.questStat_classRevealUsed(revealedCount);
+    globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
 
     // Achievement: reveal exactly 20 cells in one use
     if (revealedCount === 20) trackAchStat('outlierInfiniteHunger20Reveals');
 
-    checkWin();
+    globalThis.checkWin();
 }
 
 
@@ -187,7 +196,7 @@ function _tailRiskPostReveal(revealedCount, affectedIds, totalCost) {
 //------------------------------------------------------------------------
 
 // Spawns the Tail Risk modal overlay and stores the session data globally
-function _tailRiskShowOverlay(secondsPerCell, maxCells, candidates) {
+export function _tailRiskShowOverlay(secondsPerCell, maxCells, candidates) {
     window._tailRiskData = { secondsPerCell, candidates };
 
     const overlay = document.createElement('div');
@@ -202,22 +211,22 @@ function _tailRiskShowOverlay(secondsPerCell, maxCells, candidates) {
 
 // Called when the player clicks cancel on the Tail Risk overlay.
 // refund=true skips the cancel toast (used when no cells were available).
-function _tailRiskCancel(refund = false) {
+export function _tailRiskCancel(refund = false) {
     _tailRiskRemoveOverlay();
     window._tailRiskData = null;
 
     _setAbilityMode(false);
-    STATE.classActiveChoice = TAIL_RISK_COOLDOWN_SLOT;
+    globalThis.STATE.classActiveChoice = TAIL_RISK_COOLDOWN_SLOT;
 
     _tailRiskRefundCooldown();
     buildClassHUD();
 
-    if (!refund) showToast(`📈 ${t('cls_cancelled')}`);
+    if (!refund) globalThis.showToast(`📈 ${t('cls_cancelled')}`);
 }
 
 // Called when the player confirms the Tail Risk sacrifice.
 // Reads the slider value, deducts time, and reveals the chosen cells.
-function _tailRiskResolve() {
+export function _tailRiskResolve() {
     const slider = document.getElementById('tr-slider');
     if (!slider) return;
 
@@ -238,13 +247,13 @@ function _tailRiskResolve() {
 }
 
 // Entry point: validates the grid state, finds candidate cells, then opens the overlay
-function _executeTailRisk(secondsPerCell, maxCells) {
-    if (!cur) return;
+export function _executeTailRisk(secondsPerCell, maxCells) {
+    if (!globalThis.cur) return;
 
     const candidates = _tailRiskGetCandidateCells();
 
     if (candidates.length === 0) {
-        showToast(t('cls_tail_risk_none'));
+        globalThis.showToast(t('cls_tail_risk_none'));
         _tailRiskCancel(true); // refund cooldown - nothing to do
         return;
     }
@@ -263,7 +272,7 @@ function _executeTailRisk(secondsPerCell, maxCells) {
 //------------------------------------------------------------------------
 
 // Creates a single randomised star streak object for the hyperspeed canvas
-function _bswCreateStar() {
+export function _bswCreateStar() {
     return {
         angle: Math.random() * Math.PI * 2,
         dist: Math.random() * 60 + 5,
@@ -276,7 +285,7 @@ function _bswCreateStar() {
 }
 
 // Converts a CSS hex colour string and alpha value into an rgba() string
-function _bswHexToRgba(hex, alpha) {
+export function _bswHexToRgba(hex, alpha) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
@@ -284,7 +293,7 @@ function _bswHexToRgba(hex, alpha) {
 }
 
 // Returns the pixel centre of the puzzle grid element (used as the vanishing point for streaks)
-function _bswGetGridCenter(canvasWidth, canvasHeight) {
+export function _bswGetGridCenter(canvasWidth, canvasHeight) {
     const gridEl = document.getElementById('ptable') || document.getElementById('puzzle-scaler-wrap');
     if (gridEl) {
         const rect = gridEl.getBoundingClientRect();
@@ -295,13 +304,13 @@ function _bswGetGridCenter(canvasWidth, canvasHeight) {
 
 // Returns the bounding rect of the puzzle grid, or null if not found.
 // Used to clip the hyperspeed effect so it doesn't draw over the puzzle.
-function _bswGetGridRect() {
+export function _bswGetGridRect() {
     const gridEl = document.getElementById('ptable') || document.getElementById('puzzle-scaler-wrap');
     return gridEl ? gridEl.getBoundingClientRect() : null;
 }
 
 // Draws one frame of the radial vignette gradient behind the star streaks
-function _bswDrawVignette(ctx, cx, cy, cw, ch) {
+export function _bswDrawVignette(ctx, cx, cy, cw, ch) {
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(cw, ch) * 0.7);
     grad.addColorStop(0, 'rgba(0,0,0,0)');
     grad.addColorStop(1, 'rgba(0,0,0,0.45)');
@@ -310,7 +319,7 @@ function _bswDrawVignette(ctx, cx, cy, cw, ch) {
 }
 
 // Clips the canvas context so streaks only render outside the grid rectangle
-function _bswApplyGridClip(ctx, cw, ch, gridRect) {
+export function _bswApplyGridClip(ctx, cw, ch, gridRect) {
     ctx.beginPath();
     ctx.rect(0, 0, cw, ch);
     if (gridRect) {
@@ -321,7 +330,7 @@ function _bswApplyGridClip(ctx, cw, ch, gridRect) {
 }
 
 // Draws and advances a single star streak, then recycles it if it has left the canvas
-function _bswDrawAndAdvanceStar(ctx, stars, index, baseSpeed, speedFactor, cx, cy, cw, ch) {
+export function _bswDrawAndAdvanceStar(ctx, stars, index, baseSpeed, speedFactor, cx, cy, cw, ch) {
     const s = stars[index];
     s.dist += baseSpeed * s.speed;
 
@@ -346,7 +355,7 @@ function _bswDrawAndAdvanceStar(ctx, stars, index, baseSpeed, speedFactor, cx, c
 }
 
 // Fades the hyperspeed canvas out over 0.5 s, then removes it
-function _blackSwanFadeOutHyperspeed() {
+export function _blackSwanFadeOutHyperspeed() {
     const canvas = document.getElementById('black-swan-hyperspeed');
     if (!canvas) return;
     canvas.style.transition = 'opacity 0.5s ease-out';
@@ -355,10 +364,10 @@ function _blackSwanFadeOutHyperspeed() {
 }
 
 // Cancels the animation loop and removes the hyperspeed canvas immediately
-function _blackSwanStopHyperspeed() {
+export function _blackSwanStopHyperspeed() {
     const canvas = document.getElementById('black-swan-hyperspeed');
     if (!canvas) return;
-    if (canvas._animId) cancelAnimationFrame(canvas._animId);
+    if (canvas._animId) globalThis.cancelAnimationFrame(canvas._animId);
     if (canvas._stopTimeout) clearTimeout(canvas._stopTimeout);
     if (canvas._onResize) window.removeEventListener('resize', canvas._onResize);
     canvas.remove();
@@ -371,7 +380,7 @@ function _blackSwanStopHyperspeed() {
 
 // Creates the full-screen canvas, spawns stars, runs the animation loop,
 // and clips the effect so it never draws over the puzzle grid
-function _blackSwanStartHyperspeed(durationMs) {
+export function _blackSwanStartHyperspeed(durationMs) {
     _blackSwanStopHyperspeed(); // clean up any leftover canvas from a previous cast
 
     // --- Canvas setup ---
@@ -452,7 +461,7 @@ function _blackSwanStartHyperspeed(durationMs) {
 //------------------------------------------------------------------------
 
 // Injects the Black Swan badge CSS into <head> once (idempotent)
-function _blackSwanInjectBadgeStyles() {
+export function _blackSwanInjectBadgeStyles() {
     if (document.getElementById('black-swan-badge-styles')) return;
 
     const styleEl = document.createElement('style');
@@ -476,20 +485,20 @@ function _blackSwanInjectBadgeStyles() {
 }
 
 // Returns the best available parent element for the badge (handle > panel > null)
-function _blackSwanGetBadgeParent() {
+export function _blackSwanGetBadgeParent() {
     return document.getElementById('class-hud-drag-handle')
         || document.getElementById('class-hud-panel')
         || null;
 }
 
 // Updates the countdown number inside an existing badge
-function _blackSwanUpdateBadge(remainingSecs) {
+export function _blackSwanUpdateBadge(remainingSecs) {
     const el = document.getElementById('bsw-timer-val');
     if (el) el.textContent = `${Math.max(0, remainingSecs)}s`;
 }
 
 // Removes the Black Swan badge from the HUD
-function _blackSwanRemoveBadge() {
+export function _blackSwanRemoveBadge() {
     document.getElementById('black-swan-badge')?.remove();
 }
 
@@ -500,7 +509,7 @@ function _blackSwanRemoveBadge() {
 
 // Creates and appends the pulsing countdown badge to the class HUD.
 // Called after buildClassHUD() so the handle element exists in the DOM.
-function _blackSwanSpawnBadge(remainingSecs) {
+export function _blackSwanSpawnBadge(remainingSecs) {
     _blackSwanRemoveBadge();
     _blackSwanInjectBadgeStyles();
 
@@ -518,7 +527,7 @@ function _blackSwanSpawnBadge(remainingSecs) {
 //------------------------------------------------------------------------
 
 // Tears down the Black Swan effect: stops timers, fades the canvas, removes badge, resumes BGM
-function _endBlackSwan(natural = false) {
+export function _endBlackSwan(natural = false) {
     window._blackSwanActive = false;
 
     if (window._blackSwanTimeout) {
@@ -536,7 +545,7 @@ function _endBlackSwan(natural = false) {
     if (natural) {
         // Only track and announce when the effect ran its full duration
         trackAchStat('speedforceNaturalCompletions');
-        showToast(t('cls_speedforce_leave'));
+        globalThis.showToast(t('cls_speedforce_leave'));
         buildClassHUD();
     }
 
@@ -546,7 +555,7 @@ function _endBlackSwan(natural = false) {
 
 // Entry point: activates Black Swan (Speedforce mode) for durationMs milliseconds.
 // Starts the hyperspeed overlay, countdown badge, and schedules the auto-end timeout.
-function _executeBlackSwan(durationMs) {
+export function _executeBlackSwan(durationMs) {
     window._blackSwanActive = true;
     window._blackSwanDurationMs = durationMs;
     window._blackSwanStartTime = Date.now();
@@ -558,7 +567,7 @@ function _executeBlackSwan(durationMs) {
     Audio_Manager.stopBGM(300); // 300 ms fade-out before speedforce audio takes over
     Audio_Manager.playSFX('speedforceEnter');
     trackAchStat('skillSpeedforceUsed');
-    showToast(t('cls_speedforce_enter'));
+    globalThis.showToast(t('cls_speedforce_enter'));
 
     _blackSwanStartHyperspeed(durationMs);
 

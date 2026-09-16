@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _clueColCount, _clueColWidth, _rowCluesOnRight } from '../../grid.js';
+import { _fxGetPuzzleRect } from './fx-helpers.js';
+
+//------------------------------------------------------------------------
 //-------------------SHARED - CLUE BLACKOUT----------------------
 //------------------------------------------------------------------------
 
@@ -8,18 +16,18 @@
 
 // Tracks the active countdown badge per axis so overlapping cursed
 // effects (e.g. two row-blackouts back to back) don't leak old badges.
-let _blackoutCountdownState = { row: null, col: null };
+export let _blackoutCountdownState = { row: null, col: null };
 
 
 // Tracks the pending "remove blackout class" timeout per axis, so a
 // refreshed blackout (e.g. using Chaos Grid twice in a row) cancels the
 // old removal instead of letting it fire early.
-let _blackoutRemovalTimeout = { row: null, col: null };
+export let _blackoutRemovalTimeout = { row: null, col: null };
 
 
 // Clears any pending removal timeout for the given axis without touching
 // the DOM classes themselves (those get reapplied/extended by the new call).
-function _clearBlackoutRemoval(type) {
+export function _clearBlackoutRemoval(type) {
     if (_blackoutRemovalTimeout[type]) {
         clearTimeout(_blackoutRemovalTimeout[type]);
         _blackoutRemovalTimeout[type] = null;
@@ -28,7 +36,7 @@ function _clearBlackoutRemoval(type) {
 
 
 // Removes and clears the countdown badge for the given axis ('row'|'col').
-function _clearBlackoutCountdown(type) {
+export function _clearBlackoutCountdown(type) {
     const state = _blackoutCountdownState[type];
     if (!state) return;
     clearInterval(state.intervalId);
@@ -39,7 +47,7 @@ function _clearBlackoutCountdown(type) {
 
 // Repositions the badge centered over the row-clue strip or the
 // column-clue header block, based on the puzzle grid's current rect.
-function _positionBlackoutCountdown(type, el) {
+export function _positionBlackoutCountdown(type, el) {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -55,7 +63,7 @@ function _positionBlackoutCountdown(type, el) {
         if (firstHeader) {
             const wrapRect = r.wrap.getBoundingClientRect();
             const hRect = firstHeader.getBoundingClientRect();
-            const zoom = currentZoom || 1;
+            const zoom = globalThis.currentZoom || 1;
             headerTop = (hRect.top - wrapRect.top) / zoom;
         }
         el.style.left = `${r.left + r.width / 2}px`;
@@ -66,7 +74,7 @@ function _positionBlackoutCountdown(type, el) {
 
 // Creates (or restarts) a ticking countdown badge over the row-clue
 // strip or column-clue header for durationMs, then removes itself.
-function _startBlackoutCountdown(type, durationMs) {
+export function _startBlackoutCountdown(type, durationMs) {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
 
@@ -93,11 +101,11 @@ function _startBlackoutCountdown(type, durationMs) {
 
 // Selects roughly half the rows and half the cols at random and blacks
 // them out for a random duration between 30 and 60 seconds.
-function applyCursedBlackout() {
-    if (!cur) return;
+export function applyCursedBlackout() {
+    if (!globalThis.cur) return;
 
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
     const durationMs = (30 + Math.floor(Math.random() * 31)) * 1000;
 
     const affectedRows = [];
@@ -135,10 +143,10 @@ function applyCursedBlackout() {
 }
 
 
-function applyCursedRowBlackout(durationMs = 30000) {
-    if (!cur) return;
+export function applyCursedRowBlackout(durationMs = 30000) {
+    if (!globalThis.cur) return;
 
-    const rows = cur.grid.length;
+    const rows = globalThis.cur.grid.length;
     for (let r = 0; r < rows; r++) {
         document.querySelectorAll(`.rct-${r}`)
             .forEach(el => el.classList.add('clue-blackout'));
@@ -155,10 +163,10 @@ function applyCursedRowBlackout(durationMs = 30000) {
 }
 
 
-function applyCursedColBlackout(durationMs) {
-    if (!cur) return;
+export function applyCursedColBlackout(durationMs) {
+    if (!globalThis.cur) return;
 
-    const cols = cur.grid[0].length;
+    const cols = globalThis.cur.grid[0].length;
     for (let c = 0; c < cols; c++) {
         document.querySelectorAll(`.cch-${c}`)
             .forEach(el => el.classList.add('clue-blackout'));

@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE HUNTER (boss_hunter)-----------------------------
 //------------------------------------------------------------------------
 // Ambush-predator homage: three seekers sleep in the arena, harmless as
@@ -37,7 +45,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechDormantSeekers(monster, phase) {
+export function _egMechDormantSeekers(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const wakeRange = 260;

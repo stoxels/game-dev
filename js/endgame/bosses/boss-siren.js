@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE SIREN (boss_siren)--------------------------
 //------------------------------------------------------------------------
 // REWORK - PoE Merveil homage, rebuilt as a full stage concert. The Siren
@@ -56,8 +65,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const __EG_SIRE_DEBUG_SLOW = true;
-const _EG_SIRE_DEBUG_MULT = __EG_SIRE_DEBUG_SLOW ? 2.5 : 1;
+export const __EG_SIRE_DEBUG_SLOW = true;
+export const _EG_SIRE_DEBUG_MULT = __EG_SIRE_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_siren: {
@@ -87,13 +96,13 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_SIRE_BEAM_DMG   = [0, 0.14, 0.16, 0.19]; // %maxHP beam touch
-const EG_SIRE_ECHO_HEAL  = 0.04;                  // %maxHP echo-zone heal
-const EG_SIRE_PULL_DMG   = 0.09;                  // %maxHP flotsam contact
-const EG_SIRE_NOVA_DMG   = [0, 0, 0.14, 0.17];    // %maxHP whirlpool nova
-const EG_SIRE_BUBBLE_DMG = 0.12;                  // %maxHP popped bubble
-const EG_SIRE_CRESC_DMG  = 0.30;                  // %maxHP the killer note
-const EG_SIRE_HIT_CD_MS  = 700;                   // shared touch cooldown
+export const EG_SIRE_BEAM_DMG   = [0, 0.14, 0.16, 0.19]; // %maxHP beam touch
+export const EG_SIRE_ECHO_HEAL  = 0.04;                  // %maxHP echo-zone heal
+export const EG_SIRE_PULL_DMG   = 0.09;                  // %maxHP flotsam contact
+export const EG_SIRE_NOVA_DMG   = [0, 0, 0.14, 0.17];    // %maxHP whirlpool nova
+export const EG_SIRE_BUBBLE_DMG = 0.12;                  // %maxHP popped bubble
+export const EG_SIRE_CRESC_DMG  = 0.30;                  // %maxHP the killer note
+export const EG_SIRE_HIT_CD_MS  = 700;                   // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -102,8 +111,8 @@ const EG_SIRE_HIT_CD_MS  = 700;                   // shared touch cooldown
 
 // Touch damage helper shared by all Siren hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egSireHitCd = 0;
-function _egSireTouch(pct, level, label) {
+export let _egSireHitCd = 0;
+export function _egSireTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egSireHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -115,19 +124,19 @@ function _egSireTouch(pct, level, label) {
 }
 
 // Flat heal + HUD refresh (mirrors the Dancer/Jester - no shared helper).
-function _egSireHeal(amount) {
+export function _egSireHeal(amount) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
-        if (playerCurrentHP <= 0) return;
-        const before = playerCurrentHP;
-        playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + amount);
-        if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+        if (globalThis.playerCurrentHP <= 0) return;
+        const before = globalThis.playerCurrentHP;
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + amount);
+        if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }
 
 // Water-sparkle burst where a pop/eruption lands (visual only, body-level
 // so it survives the run ending in the same frame).
-function _egSireSplash(x, y, big) {
+export function _egSireSplash(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-sire-splash' + (big ? ' eg-sire-splash-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -147,12 +156,12 @@ function _egSireSplash(x, y, big) {
 }
 
 // The shared anchor: the Siren sings from the right side of the stage.
-function _egSireAnchor() {
+export function _egSireAnchor() {
     return { x: window.innerWidth * 0.84, y: window.innerHeight * 0.45 };
 }
 
 // Point-in-rotated-beam hit (kept local; mirrors the old _egNkBeamHit).
-function _egSireBeamHit(ax, ay, ang, len, halfW, pr, pad) {
+export function _egSireBeamHit(ax, ay, ang, len, halfW, pr, pad) {
     const pts = [
         [pr.left + pr.width / 2, pr.top + pr.height / 2],
         [pr.left, pr.top], [pr.right, pr.top],
@@ -176,9 +185,9 @@ function _egSireBeamHit(ax, ay, ang, len, halfW, pr, pad) {
 // swing / narrow flick / stutter reversals (phase 3 may reverse mid-song).
 // Glowing ECHO ZONES bloom along the swept arc - standing in one while the
 // beam passes heals you a little. The bait that teaches the sweep.
-const EG_SIRE_BEAM_PATTERNS = ['wide', 'flick', 'stutter'];
+export const EG_SIRE_BEAM_PATTERNS = ['wide', 'flick', 'stutter'];
 
-function _egMechSireWail(monster, phase) {
+export function _egMechSireWail(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -250,7 +259,7 @@ function _egMechSireWail(monster, phase) {
                         const maxHP = ((typeof _egNkMaxHP === 'function') ? _egNkMaxHP() : 0) || 100;
                         const heal = Math.max(1, Math.round(maxHP * EG_SIRE_ECHO_HEAL));
                         _egSireHeal(heal);
-                        showToast('🎵 +' + heal);
+                        globalThis.showToast('🎵 +' + heal);
                         _egSireSplash(ez.x, ez.y, false);
                         try { ez.el.remove(); } catch (e2) {}
                     }
@@ -269,11 +278,11 @@ function _egMechSireWail(monster, phase) {
 // in slow pulls you must fight; flotsam chunks spiral inward and bite.
 // Then the whirlpool NOVAS - be out of the ring before the pull becomes
 // the blast.
-const EG_SIRE_PULL_CYCLE = 700;
-const EG_SIRE_PULL_STEP = 26;      // px per pull
-const EG_SIRE_UNDERTOW_LIFE = 6000;
+export const EG_SIRE_PULL_CYCLE = 700;
+export const EG_SIRE_PULL_STEP = 26;      // px per pull
+export const EG_SIRE_UNDERTOW_LIFE = 6000;
 
-function _egMechSireUndertow(monster, phase) {
+export function _egMechSireUndertow(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -310,8 +319,8 @@ function _egMechSireUndertow(monster, phase) {
         // unless the player is moving (input overrides the sea).
         if (t >= nextPull && t < lifeMs * 0.75) {
             nextPull = t + cycleMs;
-            const moving = (typeof _avatarMoveState !== 'undefined' && _avatarMoveState
-                && _avatarMoveState.held && _avatarMoveState.held.size > 0);
+            const moving = (typeof _avatarMoveState !== 'undefined' && globalThis._avatarMoveState
+                && globalThis._avatarMoveState.held && globalThis._avatarMoveState.held.size > 0);
             if (!moving) {
                 const el = document.getElementById('player-avatar-wrapper')
                     || document.getElementById('player-avatar-simple');
@@ -375,9 +384,9 @@ function _egMechSireUndertow(monster, phase) {
 // The beam splits: a second, thinner beam mirrors the first from the same
 // anchor - one sweeps with the song, one against it. Phase 3 adds a third
 // slow arc. Read both (all three) before crossing.
-const EG_SIRE_REPLY_LIFE = 5200;
+export const EG_SIRE_REPLY_LIFE = 5200;
 
-function _egMechSireReply(monster, phase) {
+export function _egMechSireReply(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -427,7 +436,7 @@ function _egMechSireReply(monster, phase) {
             if (pr && now >= cdUntil) {
                 const hit = _egSireBeamHit(a.x, a.y, ang1, len, 10, pr, 6)
                     || _egSireBeamHit(a.x, a.y, ang2, len, 10, pr, 6)
-                    || (b3 && _egSireBeamHit(a.x, a.y, ang3, len, 13, pr, 6));
+                    || (b3 && _egSireBeamHit(a.x, a.y, globalThis.ang3, len, 13, pr, 6));
                 if (hit) {
                     cdUntil = now + 1000;
                     const dealt = _egNkHit(dmgPct, 'cold', level);
@@ -450,26 +459,26 @@ function _egMechSireReply(monster, phase) {
 // final note is the KILLER CRESSEND0: every bubble detonates EXCEPT the
 // far one - stand on it. Charge bar frozen for the whole set-piece (gate
 // in _egTickPlayer via _egSireFinalActive).
-const EG_SIRE_FINALE_LINES = 3;
-const EG_SIRE_LINE_CHARGE = 3600;   // ms to reach the far bubble (per line, shrinks)
-const EG_SIRE_LINE_CHARGE_MIN = 2400;
+export const EG_SIRE_FINALE_LINES = 3;
+export const EG_SIRE_LINE_CHARGE = 3600;   // ms to reach the far bubble (per line, shrinks)
+export const EG_SIRE_LINE_CHARGE_MIN = 2400;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egSireFinal = null;
+export let _egSireFinal = null;
 
-function _egSireFinalActive() {
+export function _egSireFinalActive() {
     return !!_egSireFinal && !_egSireFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egSireOnPhaseEnter(monster, newPhase) {
+export function _egSireOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egSireStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egSireStartFinalWatcher(monster) {
+export function _egSireStartFinalWatcher(monster) {
     if (!monster || _egSireFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -485,7 +494,7 @@ function _egSireStartFinalWatcher(monster) {
     });
 }
 
-function _egSireFinalStart(monster) {
+export function _egSireFinalStart(monster) {
     if (_egSireFinal || !monster) return;
 
     // The hall goes quiet: kill every other run of this boss (the finale
@@ -636,7 +645,7 @@ function _egSireFinalStart(monster) {
 
 // THE KILLER CRESCENDO: every remaining bubble detonates EXCEPT one far
 // bubble - the last note of the aria.
-function _egSireCrescendo(g, monster, level) {
+export function _egSireCrescendo(g, monster, level) {
     if (!g || g.finished) return;
     const alive = g.bubbles.filter(b => !b.popped);
     if (!alive.length) { _egSireFinalEnd(g); return; }
@@ -667,7 +676,7 @@ function _egSireCrescendo(g, monster, level) {
     }, warnMs);
 }
 
-function _egSireFinalEnd(g) {
+export function _egSireFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.lineTimer) { clearTimeout(g.lineTimer); g.lineTimer = null; }
@@ -681,7 +690,7 @@ function _egSireFinalEnd(g) {
     document.querySelectorAll('.eg-sire-singing').forEach(el => el.classList.remove('eg-sire-singing'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -698,7 +707,7 @@ function _egSireFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egSireTeardown() {
+export function _egSireTeardown() {
     if (_egSireFinal) { try { _egSireFinalEnd(_egSireFinal); } catch (e) {} _egSireFinal = null; }
     document.querySelectorAll('.eg-sire-echo, .eg-sire-pool, .eg-sire-flotsam, ' +
         '.eg-sire-beam-thin, .eg-sire-beam-fat, .eg-sire-stage, .eg-sire-bubble, ' +
@@ -723,7 +732,7 @@ if (typeof window !== 'undefined') {
     window._EG_SIRE_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_siren') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_siren') : null;
             if (!monster) return 'no siren alive';
             const fn = name === 'wail' ? _egMechSireWail
                 : name === 'undertow' ? _egMechSireUndertow
@@ -735,7 +744,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_siren') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_siren') : null;
             if (!monster) return 'no siren alive';
             _egSireFinalStart(monster);
             return 'THE DEADLY ARIA started';

@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { _egHzGridRect } from '../endgame-hazards.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDotTick, _egNkEl, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE PUDDLE (boss_puddle)-----------------------------
 //------------------------------------------------------------------------
 // Weather fight - the arena slowly drowns while the sky never stops:
@@ -51,39 +61,39 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Weather tuning ──────────────────────────────────────────────────────
-const EG_PUD_RAIN_INTERVAL_MS = [0, 1150, 950, 800]; // per boss phase - rain thickens (kept light)
-const EG_PUD_RAIN_SPEED = 640;        // px/s fall speed
-const EG_PUD_RAIN_R = 7;              // drop hit radius
-const EG_PUD_RAIN_DMG = 0.035;        // %maxHP per drop impact (cold)
-const EG_PUD_RAIN_HIT_CD_MS = 400;    // global rain-hit cooldown
-const EG_PUD_WATER_PCT = [0, 1 / 6, 2 / 6, 3 / 6]; // of viewport height per band
-const EG_PUD_WATER_RISE = 130;        // px/s the flood visibly rises
-const EG_PUD_WATER_DOT = [0, 7, 9, 12];  // %maxHP/s standing in the water
-const EG_PUD_FOUNTAIN_DMG = 8;        // %maxHP/s touching a fountain jet
-const EG_PUD_FOUNTAIN_MS = 2000;      // fountain lifetime - quick crown splash
-const EG_PUD_FOUNTAIN_H = 260;        // full jet height (px) - tall, since the flood stays low
-const EG_PUD_FOUNTAIN_CANOPY_W = 3.4; // canopy spread at full flare (× stem width)
-const EG_PUD_FOUNTAIN_W = 14;         // jet width (hitbox half = W/2 + pad)
-const EG_PUD_BUBBLE_N = 3;            // air bubbles airborne at once
-const EG_PUD_BUBBLE_R = 27;           // bubble radius (visual + hit)
-const EG_PUD_BUBBLE_SPEED = 130;      // px/s drift (used to stroll at 45-70)
-const EG_PUD_BUBBLE_RESPAWN_MS = 40000; // new bubble this long after a burst
-const EG_PUD_SHARD_SPEED = 300;       // px/s burst shrapnel
-const EG_PUD_SHARD_DMG = 0.05;        // %maxHP per shrapnel (cold)
-const EG_PUD_SHARD_CD_MS = 450;       // global shrapnel-hit cooldown
+export const EG_PUD_RAIN_INTERVAL_MS = [0, 1150, 950, 800]; // per boss phase - rain thickens (kept light)
+export const EG_PUD_RAIN_SPEED = 640;        // px/s fall speed
+export const EG_PUD_RAIN_R = 7;              // drop hit radius
+export const EG_PUD_RAIN_DMG = 0.035;        // %maxHP per drop impact (cold)
+export const EG_PUD_RAIN_HIT_CD_MS = 400;    // global rain-hit cooldown
+export const EG_PUD_WATER_PCT = [0, 1 / 6, 2 / 6, 3 / 6]; // of viewport height per band
+export const EG_PUD_WATER_RISE = 130;        // px/s the flood visibly rises
+export const EG_PUD_WATER_DOT = [0, 7, 9, 12];  // %maxHP/s standing in the water
+export const EG_PUD_FOUNTAIN_DMG = 8;        // %maxHP/s touching a fountain jet
+export const EG_PUD_FOUNTAIN_MS = 2000;      // fountain lifetime - quick crown splash
+export const EG_PUD_FOUNTAIN_H = 260;        // full jet height (px) - tall, since the flood stays low
+export const EG_PUD_FOUNTAIN_CANOPY_W = 3.4; // canopy spread at full flare (× stem width)
+export const EG_PUD_FOUNTAIN_W = 14;         // jet width (hitbox half = W/2 + pad)
+export const EG_PUD_BUBBLE_N = 3;            // air bubbles airborne at once
+export const EG_PUD_BUBBLE_R = 27;           // bubble radius (visual + hit)
+export const EG_PUD_BUBBLE_SPEED = 130;      // px/s drift (used to stroll at 45-70)
+export const EG_PUD_BUBBLE_RESPAWN_MS = 40000; // new bubble this long after a burst
+export const EG_PUD_SHARD_SPEED = 300;       // px/s burst shrapnel
+export const EG_PUD_SHARD_DMG = 0.05;        // %maxHP per shrapnel (cold)
+export const EG_PUD_SHARD_CD_MS = 450;       // global shrapnel-hit cooldown
 // Gate wave - sweeps the flood surface after each HP gate rise.
-const EG_PUD_WAVE_TELEGRAPH_MS = 1300; // crest looms at the edge before sweeping
-const EG_PUD_WAVE_SPEED = 430;         // px/s sweep across the screen
-const EG_PUD_WAVE_W = 96;              // crest width (visual + hitbox)
-const EG_PUD_WAVE_H = [0, 150, 190, 230]; // crest height above the surface per band
-const EG_PUD_WAVE_DMG = [0, 0.14, 0.18, 0.22]; // %maxHP single cold hit per band
+export const EG_PUD_WAVE_TELEGRAPH_MS = 1300; // crest looms at the edge before sweeping
+export const EG_PUD_WAVE_SPEED = 430;         // px/s sweep across the screen
+export const EG_PUD_WAVE_W = 96;              // crest width (visual + hitbox)
+export const EG_PUD_WAVE_H = [0, 150, 190, 230]; // crest height above the surface per band
+export const EG_PUD_WAVE_DMG = [0, 0.14, 0.18, 0.22]; // %maxHP single cold hit per band
 
 
-let _egPudWatcher = null; // per-fight weather state
+export let _egPudWatcher = null; // per-fight weather state
 
 
 // Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-function _egPuddleTeardown() {
+export function _egPuddleTeardown() {
     if (!_egPudWatcher) return;
     const st = _egPudWatcher;
     _egPudWatcher = null;
@@ -93,7 +103,7 @@ function _egPuddleTeardown() {
 
 // ── spawners ────────────────────────────────────────────────────────────
 
-function _egPudSpawnDrop(st, W) {
+export function _egPudSpawnDrop(st, W) {
     // 25% of drops drift toward the player (±90px) so the rain stays
     // honest pressure; the rest scatter across the full width.
     let x;
@@ -108,7 +118,7 @@ function _egPudSpawnDrop(st, W) {
 }
 
 
-function _egPudSpawnBubble(st, now) {
+export function _egPudSpawnBubble(st, now) {
     const r = EG_PUD_BUBBLE_R;
     const el = _egNkEl(st.run, 'div', 'eg-pud-bubble');
     const b = {
@@ -129,7 +139,7 @@ function _egPudSpawnBubble(st, now) {
 }
 
 
-function _egPudBurstBubble(st, b, now) {
+export function _egPudBurstBubble(st, b, now) {
     if (b.dead) return;
     b.dead = true;
     // Pop ring at the burst point.
@@ -157,7 +167,7 @@ function _egPudBurstBubble(st, b, now) {
 }
 
 
-function _egPudSpawnFountain(st, x, now) {
+export function _egPudSpawnFountain(st, x, now) {
     const anchor = _egNkEl(st.run, 'div', 'eg-pud-fountain');
     anchor.style.left = Math.round(x) + 'px';
     anchor.style.top = Math.round(st.waterY) + 'px';
@@ -185,7 +195,7 @@ function _egPudSpawnFountain(st, x, now) {
 }
 
 
-function _egPudSplash(st, x, y) {
+export function _egPudSplash(st, x, y) {
     // No water yet - drops still leave a small ground splash.
     const el = _egNkEl(st.run, 'div', 'eg-pud-splash');
     el.style.left = Math.round(x) + 'px';
@@ -195,7 +205,7 @@ function _egPudSplash(st, x, y) {
 
 
 // Removes a consumed drop and, if it reached the water, erupts a fountain.
-function _egPudConsumeDrop(st, idx, now) {
+export function _egPudConsumeDrop(st, idx, now) {
     const d = st.drops[idx];
     try { d.el.remove(); } catch (e) {}
     st.drops.splice(idx, 1);
@@ -207,7 +217,7 @@ function _egPudConsumeDrop(st, idx, now) {
 //   260–560ms the column's head flares into the wide draping canopy
 //   560–1250ms full crown boils gently
 //   1250ms+   the whole splash collapses (ease-in)
-function _egPudFountainHeight(tMs) {
+export function _egPudFountainHeight(tMs) {
     if (tMs >= EG_PUD_FOUNTAIN_MS) return 0;
     const colEnd = 260, flareEnd = 560, boilEnd = 1250;
     let h;
@@ -227,7 +237,7 @@ function _egPudFountainHeight(tMs) {
 }
 
 // Canopy width over the fountain's life: narrow stem → wide draping crown.
-function _egPudFountainWidth(tMs) {
+export function _egPudFountainWidth(tMs) {
     const flareStart = 200, flareEnd = 700;
     if (tMs <= flareStart) return 1;                  // stem
     if (tMs >= flareEnd) return EG_PUD_FOUNTAIN_CANOPY_W; // full crown
@@ -238,7 +248,7 @@ function _egPudFountainWidth(tMs) {
 
 // ── the persistent weather loop ─────────────────────────────────────────
 
-function _egPuddleArenaInit(monster) {
+export function _egPuddleArenaInit(monster) {
     if (_egPudWatcher) return;
     const monsterId = monster ? monster.id : null;
     const level = monster ? monster.level : 1;
@@ -268,8 +278,8 @@ function _egPuddleArenaInit(monster) {
     for (let i = 0; i < EG_PUD_BUBBLE_N; i++) _egPudSpawnBubble(st, performance.now());
 
     _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-            ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
         if (!live) return false; // boss gone → loop kills the run, onKill cleans state
 
         const W = window.innerWidth, H = window.innerHeight;

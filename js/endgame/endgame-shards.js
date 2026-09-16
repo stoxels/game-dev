@@ -1,4 +1,18 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { t } from '../translation/translations.js';
+import { _egPendingCurrencyUse } from './endgame-currency.js';
+import { _egRenderMapSlot, _egRenderMapStashCell } from './endgame-gate.js';
+import { _dndChipScreenEl, _egRenderCurrencyCell, egAddCurrency } from './endgame-hub-drag-and-drop.js';
+import { _egClearTooltip } from './endgame-hub-tooltips.js';
+import { EG_CURRENCY_COLS, _egCurrencySlotForId, _egCurrencyStash, _egGetMapTierGrid, _egInventory, _egMapStash, _egRenderInventoryCell, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME ORB SHARDS (SELL SYSTEM)---------------------
 //------------------------------------------------------------------------
 // Orb shards are fragments of currency orbs obtained by "selling" an item
@@ -27,10 +41,10 @@
 // Each shard maps 1:1 to its parent orb. name/description are resolved
 // through t() so translations stay in translations-strings.js.
 
-const EG_SHARD_STACK_MAX = 10;
-const EG_SHARD_HORIZON_STACK_MAX = 3;
+export const EG_SHARD_STACK_MAX = 10;
+export const EG_SHARD_HORIZON_STACK_MAX = 3;
 
-const EG_SHARD_DEFS = {
+export const EG_SHARD_DEFS = {
     shard_transmutation: {
         id: 'shard_transmutation', orbId: 'orb_transmutation',
         icon: '🔸', orbIcon: '🔷',
@@ -100,7 +114,7 @@ const EG_SHARD_DEFS = {
 // effectiveWeight = weight * (1 + statCount * statScale).
 // The epic-affecting shards (ascension / elevation / cataclysm) have the
 // highest scaling so stat-rich items yield better shards more often.
-const EG_SHARD_ROLL_TABLE = [
+export const EG_SHARD_ROLL_TABLE = [
     { id: 'shard_transmutation', weight: 220, statScale: 0.00 },
     { id: 'shard_alchemy',       weight: 200, statScale: 0.06 },
     { id: 'shard_chaos',         weight: 90,  statScale: 0.14 },
@@ -112,7 +126,7 @@ const EG_SHARD_ROLL_TABLE = [
 
 // Counts the total number of rolled stats on an item (each mod carries one
 // or more rolledStats entries; hybrid mods roll two stats at once).
-function _egCountItemStats(item) {
+export function _egCountItemStats(item) {
     if (!item || !Array.isArray(item.mods)) return 0;
     let count = 0;
     for (const mod of item.mods) {
@@ -123,7 +137,7 @@ function _egCountItemStats(item) {
 
 // Rolls a random shard def for the given item. Higher stat counts shift
 // probability toward the better (epic-grade) shards.
-function _egRollShardForItem(item) {
+export function _egRollShardForItem(item) {
     const statCount = _egCountItemStats(item);
 
     const weights = EG_SHARD_ROLL_TABLE.map(entry => ({
@@ -149,7 +163,7 @@ function _egRollShardForItem(item) {
 // EG_SHARD_STACK_MAX (3 for Horizon Fragments). Every full stack
 // automatically converts into the shard's parent orb via egAddCurrency()
 // (which merges into its own fixed orb slot). Returns true when granted.
-function egAddShard(id, amount = 1, def = null) {
+export function egAddShard(id, amount = 1, def = null) {
     const shardDef = def || EG_SHARD_DEFS[id];
     if (!shardDef) return false;
     const stackMax = shardDef.stackSize || EG_SHARD_STACK_MAX;
@@ -201,7 +215,7 @@ function egAddShard(id, amount = 1, def = null) {
 }
 
 // Resolves the translation key of a shard's parent orb name.
-function _egShardOrbNameKey(orbId) {
+export function _egShardOrbNameKey(orbId) {
     switch (orbId) {
         case 'orb_transmutation': return 'eg_orb_transmutation';
         case 'orb_alchemy':       return 'eg_orb_alchemy';
@@ -218,7 +232,7 @@ function _egShardOrbNameKey(orbId) {
 
 // Consumes one full shard stack and grants the parent orb. The orb is
 // added through egAddCurrency so an existing orb stack just increments.
-function _egConvertShardsToOrb(shardDef) {
+export function _egConvertShardsToOrb(shardDef) {
     const nameKey = _egShardOrbNameKey(shardDef.orbId);
     egAddCurrency(shardDef.orbId, 1, {
         id: shardDef.orbId,
@@ -229,7 +243,7 @@ function _egConvertShardsToOrb(shardDef) {
         description: nameKey ? t(nameKey + '_desc') : '',
     });
     const stackMax = shardDef.stackSize || EG_SHARD_STACK_MAX;
-    showToast(t('eg_shards_converted')
+    globalThis.showToast(t('eg_shards_converted')
         .replace('{count}', String(stackMax))
         .replace('{shard}', shardDef.name)
         .replace('{icon}', shardDef.orbIcon)
@@ -245,7 +259,7 @@ function _egConvertShardsToOrb(shardDef) {
 // Destroys the stash item in the given cell and grants one rolled shard.
 // Selling a UNIQUE item always grants an Ancient Shard (10 → Ancient Orb).
 // No confirmation popup - the sale is instant. Returns true on success.
-function _egSellStashItem(row, col) {
+export function _egSellStashItem(row, col) {
     const item = _egInventory[row][col];
     if (!item) return false;
 
@@ -261,7 +275,7 @@ function _egSellStashItem(row, col) {
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
             Audio_Manager.playSFX('player_equip_pickup');
         }
-        showToast(t('eg_sell_item_no_value').replace('{name}', item.name || '???'));
+        globalThis.showToast(t('eg_sell_item_no_value').replace('{name}', item.name || '???'));
         return true;
     }
 
@@ -286,7 +300,7 @@ function _egSellStashItem(row, col) {
     _egClearTooltip();
     egSaveHubState();
 
-    showToast(t('eg_sell_item_sold')
+    globalThis.showToast(t('eg_sell_item_sold')
         .replace('{name}', item.name || '???')
         .replace('{icon}', shardDef.icon)
         .replace('{shard}', shardDef.name));
@@ -297,7 +311,7 @@ function _egSellStashItem(row, col) {
 // Destroys a map item and grants exactly one Horizon Fragment (the
 // map-only sell currency). Shared by map-stash and map-device sells.
 // Returns true on success.
-function _egSellMapItem(map, sourceEl) {
+export function _egSellMapItem(map, sourceEl) {
     if (!map) return false;
 
     const shardDef = EG_SHARD_DEFS.shard_horizon;
@@ -311,7 +325,7 @@ function _egSellMapItem(map, sourceEl) {
     }
 
     _egClearTooltip();
-    showToast(t('eg_sell_item_sold')
+    globalThis.showToast(t('eg_sell_item_sold')
         .replace('{name}', map.name || '???')
         .replace('{icon}', shardDef.icon)
         .replace('{shard}', shardDef.name));
@@ -319,8 +333,8 @@ function _egSellMapItem(map, sourceEl) {
 }
 
 // Sells the map in the given map stash cell for one Horizon Fragment.
-function _egSellMapStashItem(row, col) {
-    const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? _egMapStashActiveTier : 1);
+export function _egSellMapStashItem(row, col) {
+    const activeTier = (typeof _egMapStashActiveTier !== 'undefined' ? globalThis._egMapStashActiveTier : 1);
     let map = null;
     try {
         if (typeof _egGetMapTierGrid === 'function') map = _egGetMapTierGrid(activeTier)[row][col];
@@ -343,14 +357,14 @@ function _egSellMapStashItem(row, col) {
 
 // Sells the map currently loaded into the Probability Gate device slot
 // for one Horizon Fragment.
-function _egSellDeviceMap() {
-    const map = _egMapSlotItem;
+export function _egSellDeviceMap() {
+    const map = globalThis._egMapSlotItem;
     if (!map) return false;
 
     const slotEl = document.getElementById('eg-map-slot');
     if (!_egSellMapItem(map, slotEl)) return false;
 
-    _egMapSlotItem = null;
+    globalThis._egMapSlotItem = null;
     _egRenderMapSlot();
     egSaveHubState();
     return true;

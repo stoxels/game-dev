@@ -1,15 +1,23 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { ITEM_DEFS } from './item-definitions.js';
+
+//------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE---------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-const RARITY_TIERS = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'cursed', 'artifact'];
-const HOARDER_THRESHOLD = 10;
+export const RARITY_TIERS = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'cursed', 'artifact'];
+export const HOARDER_THRESHOLD = 10;
 
-const TOAST_DISPLAY_DURATION_MS = 8000;
-const TOAST_MAX_VISIBLE = 6; // oldest gets force-removed beyond this
+export const TOAST_DISPLAY_DURATION_MS = 8000;
+export const TOAST_MAX_VISIBLE = 6; // oldest gets force-removed beyond this
 
-const activeToasts = []; // { msg, el, removing, timeoutId }
+export const activeToasts = []; // { msg, el, removing, timeoutId }
 
 
 //------------------------------------------------------------------------
@@ -18,9 +26,9 @@ const activeToasts = []; // { msg, el, removing, timeoutId }
 //------------------------------------------------------------------------
 
 // Returns true if the player is currently holding at least one item of every rarity tier
-function _hasAllRarityTiers() {
+export function _hasAllRarityTiers() {
     const raritiesPresent = new Set(
-        STATE.inventory
+        globalThis.STATE.inventory
             .map(item => ITEM_DEFS[item.defId]?.rarity)
             .filter(Boolean)
     );
@@ -29,9 +37,9 @@ function _hasAllRarityTiers() {
 
 // Checks and tracks the hoarder achievement (reaching max inventory size)
 // Only fires once per level, guarded by _maxInventoryTrackedThisLevel
-function _checkHoarderAchievement() {
+export function _checkHoarderAchievement() {
     if (window._maxInventoryTrackedThisLevel) return;
-    if (STATE.inventory.length < HOARDER_THRESHOLD) return;
+    if (globalThis.STATE.inventory.length < HOARDER_THRESHOLD) return;
 
     window._maxInventoryTrackedThisLevel = true;
     trackAchStat('maxInventoryReached');
@@ -39,7 +47,7 @@ function _checkHoarderAchievement() {
 
 // Checks and tracks the collector achievement (holding every rarity simultaneously)
 // Only fires once per level, guarded by _collectorTrackedThisLevel
-function _checkCollectorAchievement() {
+export function _checkCollectorAchievement() {
     if (window._collectorTrackedThisLevel) return;
     if (!_hasAllRarityTiers()) return;
 
@@ -55,7 +63,7 @@ function _checkCollectorAchievement() {
 
 // Called after every inventory change to check whether any
 // inventory-related achievements have been unlocked this level
-function checkInventoryAchievements() {
+export function checkInventoryAchievements() {
     _checkHoarderAchievement();
     _checkCollectorAchievement();
 }
@@ -68,7 +76,7 @@ function checkInventoryAchievements() {
 
 // Removes a single toast: plays its fade-out, then deletes the element
 // and its entry once the animation finishes.
-function _removeToast(entry) {
+export function _removeToast(entry) {
     if (entry.removing) return;
     entry.removing = true;
     clearTimeout(entry.timeoutId);
@@ -83,7 +91,7 @@ function _removeToast(entry) {
 
 // Instantly discards a toast entry (no fade-out animation). Used when a new
 // message replaces an identical one that is still visible.
-function _discardToastEntry(entry) {
+export function _discardToastEntry(entry) {
     clearTimeout(entry.timeoutId);
     entry.el.remove();
     const idx = activeToasts.indexOf(entry);
@@ -96,7 +104,7 @@ function _discardToastEntry(entry) {
 // an item always surface a fresh toast instead of being suppressed.
 // `accentColor` (optional) tints the message text - used e.g. for
 // rarity-colored loot / pickup notifications.
-function showToast(msg, accentColor) {
+export function showToast(msg, accentColor) {
     const container = document.getElementById('toast-stack');
     if (!container) return;
 
@@ -119,7 +127,7 @@ function showToast(msg, accentColor) {
 
     entry.timeoutId = setTimeout(
         () => _removeToast(entry),
-        (typeof SETTINGS !== 'undefined' ? SETTINGS.toastDuration : TOAST_DISPLAY_DURATION_MS / 1000) * 1000
+        (typeof SETTINGS !== 'undefined' ? globalThis.SETTINGS.toastDuration : TOAST_DISPLAY_DURATION_MS / 1000) * 1000
     );
 
     // Returns the toast element so callers can add extra styling (e.g. the
@@ -128,7 +136,7 @@ function showToast(msg, accentColor) {
 }
 
 // Clears every visible/pending toast immediately. Called on level reset or scene transitions.
-function resetToastQueue() {
+export function resetToastQueue() {
     activeToasts.forEach(t => {
         clearTimeout(t.timeoutId);
         t.el.remove();
@@ -147,19 +155,19 @@ function resetToastQueue() {
 //------------------------------------------------------------------------
 
 // How long (ms) a gain popup stays fully visible before it starts fading out.
-const ITEM_GAIN_POPUP_HOLD_MS = 1400;
+export const ITEM_GAIN_POPUP_HOLD_MS = 1400;
 // Duration (ms) of the rise/fade transition. Must match the injected CSS.
-const ITEM_GAIN_POPUP_FADE_MS = 400;
+export const ITEM_GAIN_POPUP_FADE_MS = 400;
 
 // Tracks in-flight popups keyed by defId, so multiple grants of the same
 // item in quick succession (e.g. two lucky drops of the same defId) stack
 // into a single incrementing "+N" instead of spawning overlapping popups.
-const _itemGainPopupState = {};
+export const _itemGainPopupState = {};
 
-let _itemGainPopupStyleInjected = false;
+export let _itemGainPopupStyleInjected = false;
 
 // Injects the popup's CSS once, lazily on first use.
-function _ensureItemGainPopupStyle() {
+export function _ensureItemGainPopupStyle() {
     if (_itemGainPopupStyleInjected) return;
     _itemGainPopupStyleInjected = true;
 
@@ -199,12 +207,12 @@ function _ensureItemGainPopupStyle() {
 // (#inv-flyout) and only exist in the DOM while that category is open -
 // so this can legitimately return null with the flyout closed (the gain
 // popup then silently no-ops, same as before the panel was ever built).
-function _findInvSlotEl(defId) {
+export function _findInvSlotEl(defId) {
     return document.querySelector(`.inv-slot[data-def-id="${defId}"]`);
 }
 
 // Positions the popup centered above the given slot element.
-function _positionItemGainPopup(el, slotEl) {
+export function _positionItemGainPopup(el, slotEl) {
     const r = slotEl.getBoundingClientRect();
     el.style.left = `${r.left + r.width / 2}px`;
     el.style.top = `${r.top}px`;
@@ -212,7 +220,7 @@ function _positionItemGainPopup(el, slotEl) {
 
 // Removes a popup's state entry and its DOM element once its animation
 // cycle is fully finished.
-function _clearItemGainPopup(defId) {
+export function _clearItemGainPopup(defId) {
     const state = _itemGainPopupState[defId];
     if (!state) return;
     clearTimeout(state.holdTimeoutId);
@@ -221,7 +229,7 @@ function _clearItemGainPopup(defId) {
 }
 
 // Starts (or restarts) the hold-then-fade timer for a popup.
-function _scheduleItemGainPopupDismiss(defId) {
+export function _scheduleItemGainPopupDismiss(defId) {
     const state = _itemGainPopupState[defId];
     if (!state) return;
 
@@ -240,7 +248,7 @@ function _scheduleItemGainPopupDismiss(defId) {
 //
 // Silently no-ops if the slot isn't currently in the DOM (e.g. the
 // inventory panel hasn't been built yet).
-function showItemGainPopup(defId, count = 1) {
+export function showItemGainPopup(defId, count = 1) {
     const slotEl = _findInvSlotEl(defId);
     if (!slotEl || count <= 0) return;
 

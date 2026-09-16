@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { _egDamageTargetById } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egFlingBurst, _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE STRIKER (boss_striker)----------------------
 //------------------------------------------------------------------------
 // Football-match fight: the pitch is his arena and the ball never rests.
@@ -64,50 +74,50 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Striker tuning ──────────────────────────────────────────────────────
 // The match ball
-const EG_STRK_BALL_SPEED = [0, 150, 185, 220]; // px/s seek speed per phase
-const EG_STRK_BALL_TURN = 1.7;               // rad/s steering cap (readability)
-const EG_STRK_BALL_R = 55;                   // ball radius (visual + hit)
-const EG_STRK_TACKLE_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP per tackle
-const EG_STRK_TACKLE_FLING = [0, 170, 200, 230];  // px fling per tackle
-const EG_STRK_TACKLE_CD_MS = 900;            // per-touch cooldown
+export const EG_STRK_BALL_SPEED = [0, 150, 185, 220]; // px/s seek speed per phase
+export const EG_STRK_BALL_TURN = 1.7;               // rad/s steering cap (readability)
+export const EG_STRK_BALL_R = 55;                   // ball radius (visual + hit)
+export const EG_STRK_TACKLE_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP per tackle
+export const EG_STRK_TACKLE_FLING = [0, 170, 200, 230];  // px fling per tackle
+export const EG_STRK_TACKLE_CD_MS = 900;            // per-touch cooldown
 // Parry kick (hold E): boot the ball away instead of being tackled
-const EG_STRK_PARRY_KICK_SPEED = 520;        // px/s kick burst speed
-const EG_STRK_PARRY_KICK_MS = 900;           // burst duration before homing resumes
+export const EG_STRK_PARRY_KICK_SPEED = 520;        // px/s kick burst speed
+export const EG_STRK_PARRY_KICK_MS = 900;           // burst duration before homing resumes
 // The goal: guide the ball into it → out of play for 30s
-const EG_STRK_GOAL_MOUTH_W = 130;            // goal-mouth depth from the edge (px)
-const EG_STRK_GOAL_OUT_MS = 30000;           // ball out of play after a goal
-const EG_STRK_GOAL_RESPAWN_GRACE_MS = 2500;  // fresh ball can't instantly re-score
-const EG_STRK_KEEPER_THROW_SPEED = 470;      // px/s keeper throw burst
-const EG_STRK_KEEPER_THROW_MS = 1100;        // lob duration before homing resumes
+export const EG_STRK_GOAL_MOUTH_W = 130;            // goal-mouth depth from the edge (px)
+export const EG_STRK_GOAL_OUT_MS = 30000;           // ball out of play after a goal
+export const EG_STRK_GOAL_RESPAWN_GRACE_MS = 2500;  // fresh ball can't instantly re-score
+export const EG_STRK_KEEPER_THROW_SPEED = 470;      // px/s keeper throw burst
+export const EG_STRK_KEEPER_THROW_MS = 1100;        // lob duration before homing resumes
 // Kick-Off Challenge (60% gate): score 1 goal
 // Hat-Trick (30% gate): score 3 goals in 60s
-const EG_STRK_KICK_BUDGET_G1 = 20000;        // ms budget for the 1-goal challenge
-const EG_STRK_KICK_BUDGET_G3 = 60000;        // ms budget for the hat-trick (needs time)
-const EG_STRK_KICK_RADIUS = 115;             // px from the ball to charge a kick
-const EG_STRK_KICK_CHARGE_MS = 1500;         // ms standing next to the ball → full power
-const EG_STRK_KICK_SPEED_MIN = 430;          // px/s kick speed at a tap
-const EG_STRK_KICK_SPEED_MAX = 960;          // px/s kick speed at full charge
-const EG_STRK_KICK_DECEL = 300;              // px/s² ball friction (roll-out)
-const EG_STRK_KICK_BOUNCE = 0.78;            // wall bounce restitution
-const EG_STRK_KICK_STOP = 26;                // snap to rest below this speed
+export const EG_STRK_KICK_BUDGET_G1 = 20000;        // ms budget for the 1-goal challenge
+export const EG_STRK_KICK_BUDGET_G3 = 60000;        // ms budget for the hat-trick (needs time)
+export const EG_STRK_KICK_RADIUS = 115;             // px from the ball to charge a kick
+export const EG_STRK_KICK_CHARGE_MS = 1500;         // ms standing next to the ball → full power
+export const EG_STRK_KICK_SPEED_MIN = 430;          // px/s kick speed at a tap
+export const EG_STRK_KICK_SPEED_MAX = 960;          // px/s kick speed at full charge
+export const EG_STRK_KICK_DECEL = 300;              // px/s² ball friction (roll-out)
+export const EG_STRK_KICK_BOUNCE = 0.78;            // wall bounce restitution
+export const EG_STRK_KICK_STOP = 26;                // snap to rest below this speed
 // Goal damage: a scored goal HURTS the boss - the challenge is a scoring
 // opportunity, not just relief. The kick's charge fraction scales the hit,
 // so full-power shots pay best.
-const EG_STRK_GOAL_DMG_MIN = 0.02;           // %maxHP at a tap kick
-const EG_STRK_GOAL_DMG_MAX = 0.06;           // %maxHP at a full-charge shot
+export const EG_STRK_GOAL_DMG_MIN = 0.02;           // %maxHP at a tap kick
+export const EG_STRK_GOAL_DMG_MAX = 0.06;           // %maxHP at a full-charge shot
 // Free kick (charge attack)
-const EG_STRK_FK_WARN_MS = 1150;             // dotted-arc telegraph
-const EG_STRK_FK_FLIGHT_MS = 650;            // ball bend time
-const EG_STRK_FK_DMG = [0, 0.12, 0.14, 0.16]; // %maxHP by phase
-const EG_STRK_FK_WALL_N = 3;                 // defender cones
+export const EG_STRK_FK_WARN_MS = 1150;             // dotted-arc telegraph
+export const EG_STRK_FK_FLIGHT_MS = 650;            // ball bend time
+export const EG_STRK_FK_DMG = [0, 0.12, 0.14, 0.16]; // %maxHP by phase
+export const EG_STRK_FK_WALL_N = 3;                 // defender cones
 
 
-let _egStrkWatcher = null;    // per-fight match state
-let _egStrkFkActive = false;  // a free kick set-piece is running
+export let _egStrkWatcher = null;    // per-fight match state
+export let _egStrkFkActive = false;  // a free kick set-piece is running
 
 
 // Sweep every striker overlay off the screen. Safe to call twice.
-function _egStrikerSweep() {
+export function _egStrikerSweep() {
     _egStrkFkActive = false;
     try {
         document.querySelectorAll('.eg-strk-ball, .eg-strk-corner, .eg-strk-cross, .eg-strk-goal, .eg-strk-spot, .eg-strk-shot, .eg-strk-shotring, .eg-strk-fk-wall, .eg-strk-fkball, .eg-strk-fkdot, .eg-strk-fkmark, .eg-strk-penhud, .eg-strk-penline, .eg-strk-pencore, .eg-strk-pensaved, .eg-strk-kickball, .eg-strk-kickring, .eg-strk-kickcharge, .eg-strk-scorehud, .eg-strk-goalpop, .eg-strk-kickstreak, .eg-strk-ballghost, .eg-strk-keeper, .eg-strk-kickdmg').forEach(el => el.remove());
@@ -116,7 +126,7 @@ function _egStrikerSweep() {
 
 
 // Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-function _egStrikerTeardown() {
+export function _egStrikerTeardown() {
     const st = _egStrkWatcher;
     _egStrkWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
@@ -128,7 +138,7 @@ function _egStrikerTeardown() {
 
 // Spawns the persistent match ball element on the run.
 // anchor (optional): spawn point for a kick-off after a goal; default centre-top.
-function _egStrkSpawnBall(st, anchor) {
+export function _egStrkSpawnBall(st, anchor) {
     const el = _egNkEl(st.run, 'div', 'eg-strk-ball kickoff', '⚽');
     const a0 = Math.random() * Math.PI * 2;
     st.ball = {
@@ -141,7 +151,7 @@ function _egStrkSpawnBall(st, anchor) {
 
 // Spawns the persistent goal frame at a screen edge (whole fight). The
 // mouth region (x0..x1, y0..y1) is the scoring zone for the match ball.
-function _egStrkSpawnGoal(st) {
+export function _egStrkSpawnGoal(st) {
     const W = window.innerWidth, H = window.innerHeight;
     const fromRight = Math.random() < 0.5;
     const el = _egNkEl(st.run, 'div', 'eg-strk-goal persistent' + (fromRight ? ' flip' : ''), '🥅');
@@ -160,7 +170,7 @@ function _egStrkSpawnGoal(st) {
 // GOAL! The match ball went into the goal: remove it from play for
 // EG_STRK_GOAL_OUT_MS, flash the net, arm the return timer on the goal,
 // then the keeper lobs it back onto the pitch.
-function _egStrkScoreGoal(st, now) {
+export function _egStrkScoreGoal(st, now) {
     const b = st.ball;
     try { if (b) b.el.remove(); } catch (e) {}
     st.ball = null;
@@ -187,7 +197,7 @@ function _egStrkScoreGoal(st, now) {
 // Advances the goal's return-timer ring while the ball is out of play.
 // The ring depletes counter-clockwise and the seconds count down; the
 // final 5s turn red and the ball icon pulses, then the whole HUD pops off.
-function _egStrkGoalTimerTick(st, now) {
+export function _egStrkGoalTimerTick(st, now) {
     const g = st.goal;
     if (!g || !g.timerEl) return;
     const leftMs = st.ballOutUntil - now;
@@ -208,7 +218,7 @@ function _egStrkGoalTimerTick(st, now) {
 // The lob rides the same kick-burst decay as the parry kick (so the gold
 // ghost trail follows it automatically), with a shrinking scale so the
 // ball reads as coming down from the air.
-function _egStrkKickoff(st) {
+export function _egStrkKickoff(st) {
     const W = window.innerWidth, H = window.innerHeight;
     // The return-timer HUD comes off with the kick-off.
     if (st.goal && st.goal.timerEl) {
@@ -251,7 +261,7 @@ function _egStrkKickoff(st) {
 
 // Directional kick streaks: a fan of gold dashes shot along the kick
 // vector at the boot moment. Self-removing; no run tracking needed.
-function _egStrkKickTrail(x, y, ang) {
+export function _egStrkKickTrail(x, y, ang) {
     try {
         for (let i = 0; i < 5; i++) {
             const s = document.createElement('div');
@@ -270,7 +280,7 @@ function _egStrkKickTrail(x, y, ang) {
 
 
 // One fading gold ghost of the ball along its kick flight. Self-removing.
-function _egStrkBallGhost(x, y) {
+export function _egStrkBallGhost(x, y) {
     try {
         const g = document.createElement('div');
         g.className = 'eg-strk-ballghost';
@@ -286,7 +296,7 @@ function _egStrkBallGhost(x, y) {
 // Advances the match ball: loose homing with a turn cap, wall bounces,
 // tackle on touch (hit + fling away from the impact) - or a parry kick
 // away from the player while the parry key is held.
-function _egStrkAdvanceBall(st, dtS, now, pr, p) {
+export function _egStrkAdvanceBall(st, dtS, now, pr, p) {
     const b = st.ball;
     const W = window.innerWidth, H = window.innerHeight;
     const c = _egNkPlayerCenter();
@@ -325,7 +335,7 @@ function _egStrkAdvanceBall(st, dtS, now, pr, p) {
     // tackle so it can't be spammed at point-blank range.
     if (pr && now >= b.cdUntil && _egNkCircleHit(b.x, b.y, EG_STRK_BALL_R * 0.85, pr, 0)) {
         b.cdUntil = now + EG_STRK_TACKLE_CD_MS;
-        const parrying = (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive);
+        const parrying = (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive);
         const c2 = _egNkPlayerCenter();
         if (parrying && c2) {
             const dx = b.x - c2.x, dy = b.y - c2.y; // directly away from the player
@@ -360,7 +370,7 @@ function _egStrkAdvanceBall(st, dtS, now, pr, p) {
 }
 
 
-function _egStrikerArenaInit(monster) {
+export function _egStrikerArenaInit(monster) {
     if (_egStrkWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -386,8 +396,8 @@ function _egStrikerArenaInit(monster) {
     _egStrkSpawnBall(st);
 
     _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-            ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -448,7 +458,7 @@ function _egStrikerArenaInit(monster) {
 // strip), step away to shoot. Charge time = power, your position relative
 // to the ball = kick angle. Score into the persistent goal for fanfare.
 
-function _egStrkScoringStart(st, now, need, budgetMs) {
+export function _egStrkScoringStart(st, now, need, budgetMs) {
     if (st.scoring) return; // one set-piece at a time
     // The homing ball is gone while the challenge runs - remove it and
     // cancel any pending kick-off so it stays off until the set-piece ends.
@@ -472,7 +482,7 @@ function _egStrkScoringStart(st, now, need, budgetMs) {
 
 
 // Places (or replaces) the stationary kick ball at a fresh mid-pitch spot.
-function _egStrkScoringBallSpawn(st, sc, W, H) {
+export function _egStrkScoringBallSpawn(st, sc, W, H) {
     try { if (sc.ball && sc.ball.el) sc.ball.el.remove(); } catch (e) {}
     try { if (sc.ringEl) sc.ringEl.remove(); } catch (e) {}
     try { if (sc.chargeEl) sc.chargeEl.remove(); } catch (e) {}
@@ -495,7 +505,7 @@ function _egStrkScoringBallSpawn(st, sc, W, H) {
 
 
 // Positions the kick ball + its ring/charge visuals at the ball's spot.
-function _egStrkScoringDrawBall(sc, W, H) {
+export function _egStrkScoringDrawBall(sc, W, H) {
     const b = sc.ball;
     b.el.style.transform = 'translate(' + Math.round(b.x - EG_STRK_BALL_R) + 'px,' + Math.round(b.y - EG_STRK_BALL_R) + 'px)';
     sc.ringEl.style.left = Math.round(b.x) + 'px';
@@ -512,9 +522,9 @@ function _egStrkScoringDrawBall(sc, W, H) {
 
 // Potential goal damage for a charge fraction - the same formula the real
 // hit uses at goal time, so the preview never lies.
-function _egStrkScoringPotentialDmg(st, charge) {
-    const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-        ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+export function _egStrkScoringPotentialDmg(st, charge) {
+    const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+        ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
     if (!live || !(live.maxHP > 0)) return 0;
     const pct = EG_STRK_GOAL_DMG_MIN + (EG_STRK_GOAL_DMG_MAX - EG_STRK_GOAL_DMG_MIN) * charge;
     return Math.max(1, Math.round(live.maxHP * pct));
@@ -523,7 +533,7 @@ function _egStrkScoringPotentialDmg(st, charge) {
 
 // Kicks the ball: direction = straight away from the player (so stand on
 // the side opposite the goal), power = charge fraction lerped to speed.
-function _egStrkScoringKick(st, sc, W, H) {
+export function _egStrkScoringKick(st, sc, W, H) {
     const b = sc.ball;
     const c = _egNkPlayerCenter() || { x: W / 2, y: H / 2 };
     let dx = b.x - c.x, dy = b.y - c.y;
@@ -551,7 +561,7 @@ function _egStrkScoringKick(st, sc, W, H) {
 
 
 // One frame of the scoring set-piece: ball physics, charge/kick, goal check.
-function _egStrkScoringTick(st, dtS, now, pr, W, H) {
+export function _egStrkScoringTick(st, dtS, now, pr, W, H) {
     const sc = st.scoring;
     sc.t += dtS * 1000;
     const b = sc.ball;
@@ -615,7 +625,7 @@ function _egStrkScoringTick(st, dtS, now, pr, W, H) {
 // A goal! Fanfare, BONUS DAMAGE to the boss (scaled by the kick's charge),
 // counter, and either respawn for the next attempt or complete the
 // set-piece when the required count is reached.
-function _egStrkScoringGoal(st, sc, W, H) {
+export function _egStrkScoringGoal(st, sc, W, H) {
     sc.goals++;
     if (st.goal) {
         st.goal.el.classList.add('scored');
@@ -629,8 +639,8 @@ function _egStrkScoringGoal(st, sc, W, H) {
     // flash and phase checks all apply.
     const charge = (sc.ball && sc.ball.kickCharge != null) ? sc.ball.kickCharge : 1;
     const dmgPct = EG_STRK_GOAL_DMG_MIN + (EG_STRK_GOAL_DMG_MAX - EG_STRK_GOAL_DMG_MIN) * charge;
-    const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-        ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+    const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+        ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
     let dealt = 0;
     if (live && typeof _egDamageTargetById === 'function' && live.maxHP > 0 && !live.bossImmune) {
         dealt = Math.max(1, Math.round(live.maxHP * dmgPct));
@@ -659,7 +669,7 @@ function _egStrkScoringGoal(st, sc, W, H) {
 // Tears the scoring set-piece down. A queued gate challenge (the boss was
 // damage-rushed across the next threshold mid-challenge) chains straight
 // in; otherwise the homing match ball kicks off again.
-function _egStrkScoringEnd(st, sc, success) {
+export function _egStrkScoringEnd(st, sc, success) {
     try { if (sc.ball && sc.ball.el) sc.ball.el.remove(); } catch (e) {}
     try { if (sc.ringEl) sc.ringEl.remove(); } catch (e) {}
     try { if (sc.chargeEl) sc.chargeEl.remove(); } catch (e) {}
@@ -683,13 +693,13 @@ function _egStrkScoringEnd(st, sc, success) {
 // chasing, charging and shooting the ball IS the attack, so the auto-attack
 // bar stays frozen (mirrors _egBomberFinalActive). Pending queued gates only
 // exist while st.scoring is live, so st.scoring covers those too.
-function _egStrkScoringActive() {
+export function _egStrkScoringActive() {
     return !!(_egStrkWatcher && _egStrkWatcher.scoring);
 }
 
 
 // Big gold "GOAL!" pop at a spot. Self-removing; no run tracking needed.
-function _egStrkGoalPop(x, y, label) {
+export function _egStrkGoalPop(x, y, label) {
     try {
         const el = document.createElement('div');
         el.className = 'eg-strk-goalpop';
@@ -709,7 +719,7 @@ function _egStrkGoalPop(x, y, label) {
 // the bend, then the ball curves around the wall onto the marked spot.
 // Wired from _egFireMonsterAttack (endgame-encounter.js).
 
-function _egStrkFreeKick(monster) {
+export function _egStrkFreeKick(monster) {
     if (_egStrkFkActive || _egNkDodgeBusy() || _egNkFrozen()) return;
     const st = _egStrkWatcher;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
@@ -794,4 +804,4 @@ function _egStrkFreeKick(monster) {
 //------------------------------------------------------------------------
 // The old scheduled Striker Ball is now the persistent match ball - keep the
 // handler name alive so any stale schedule entry no-ops instead of erroring.
-function _egMechStrikerBall() { void 0; }
+export function _egMechStrikerBall() { void 0; }

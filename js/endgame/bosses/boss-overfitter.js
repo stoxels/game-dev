@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../../translation/translations.js';
+import { _egRecentFills } from '../endgame-state.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egUnfillCell } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE OVERFITTER (boss_overfitter)---------------
 //------------------------------------------------------------------------
 // TIER 8 REWORK - "The Model That Learned Too Much". The ML soul, made
@@ -49,8 +59,8 @@
 
 // DEBUG: slow The Overfitter's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_OVR_DEBUG_SLOW = true;
-const _EG_OVR_DEBUG_MULT = _EG_OVR_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_OVR_DEBUG_SLOW = true;
+export const _EG_OVR_DEBUG_MULT = _EG_OVR_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_overfitter: {
@@ -87,7 +97,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_OVR_TOUCH_CD_MS = 700;      // shared touch cooldown
+export const EG_OVR_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -96,8 +106,8 @@ const EG_OVR_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 // Touch damage helper shared by all Overfitter hazards. Shadow-element boss
 // - hits go in with element 'shadow' so the toast palette stays violet.
-let _egOvrHitCd = 0;
-function _egOvrTouch(pct, level, label) {
+export let _egOvrHitCd = 0;
+export function _egOvrTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egOvrHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -109,15 +119,15 @@ function _egOvrTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egOvrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egOvrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Proven reward pattern (Siren echo zones / Swarm royal jelly): heals go
 // through a guarded clamp + rerender.
-function _egOvrHeal(amount) {
+export function _egOvrHeal(amount) {
     if (typeof playerCurrentHP === 'undefined') return;
-    const before = playerCurrentHP;
-    playerCurrentHP = Math.min(playerMaxHP || before, before + amount);
-    if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    const before = globalThis.playerCurrentHP;
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + amount);
+    if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
 
@@ -128,10 +138,10 @@ function _egOvrHeal(amount) {
 // player's position every 500ms from the first mechanic cast onward. The
 // ring buffer feeds the finale's heat-map (older samples fall off, so the
 // map always reflects your recent ~80s of movement).
-let _egOvrHistory = [];
-let _egOvrRecRun = null;
+export let _egOvrHistory = [];
+export let _egOvrRecRun = null;
 
-function _egOvrEnsureRecorder(monster) {
+export function _egOvrEnsureRecorder(monster) {
     if (_egOvrRecRun || !monster) return;
     const run = _egNkNewRun(monster.id, false);
     run.passive = true;
@@ -159,14 +169,14 @@ function _egOvrEnsureRecorder(monster) {
 // MINIMUM locks onto your position and detonates - the loss surface
 // collapses where you were standing. Phase 3: a second minimum chases your
 // CURRENT position after the first.
-const EG_OVR_STEPS      = 6;        // stamped bands per sweep
-const EG_OVR_BAND_W     = 130;      // band width (px)
-const EG_OVR_BAND_DPS   = [0, 5.0, 6.0, 7.0];   // %/s standing in a hot band
-const EG_OVR_MIN_R      = 112;      // local minimum burst radius
-const EG_OVR_MIN_DMG    = [0, 0.24, 0.28, 0.32]; // %maxHP caught in the minimum
-const EG_OVR_MIN_WARN_MS = 1200;    // telegraph before the minimum bursts
+export const EG_OVR_STEPS      = 6;        // stamped bands per sweep
+export const EG_OVR_BAND_W     = 130;      // band width (px)
+export const EG_OVR_BAND_DPS   = [0, 5.0, 6.0, 7.0];   // %/s standing in a hot band
+export const EG_OVR_MIN_R      = 112;      // local minimum burst radius
+export const EG_OVR_MIN_DMG    = [0, 0.24, 0.28, 0.32]; // %maxHP caught in the minimum
+export const EG_OVR_MIN_WARN_MS = 1200;    // telegraph before the minimum bursts
 
-function _egMechOvrGradient(monster, phase) {
+export function _egMechOvrGradient(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egOvrEnsureRecorder(monster);
     _egOvrEnsureFinalWatcher(monster);
@@ -282,13 +292,13 @@ function _egMechOvrGradient(monster, phase) {
 // Removes a small amount of recent correct progress. Unlike Prior Bomb,
 // this targets a repeated row/column pattern when possible, telegraphing the
 // boss's adaptive behaviour while remaining recoverable.
-function _egMechPatternBreak(monster, phase) {
-    if (!cur || !cur.grid || typeof userGrid === 'undefined') return;
+export function _egMechPatternBreak(monster, phase) {
+    if (!globalThis.cur || !globalThis.cur.grid || typeof userGrid === 'undefined') return;
     _egOvrEnsureRecorder(monster);
     _egOvrEnsureFinalWatcher(monster);
-    const sol = cur.grid;
+    const sol = globalThis.cur.grid;
     const recent = [..._egRecentFills].reverse().filter(([r, c]) =>
-        userGrid[r][c] === 1 && !revealedGrid[r][c] && sol[r][c] === 1
+        globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
     );
     if (recent.length === 0) return;
 
@@ -307,7 +317,7 @@ function _egMechPatternBreak(monster, phase) {
     const count = phase >= 3 ? 2 : 1;
     const targets = pool.slice(0, Math.min(count, pool.length));
 
-    showToast(t('eg_mech_pattern_break').replace('{n}', targets.length));
+    globalThis.showToast(t('eg_mech_pattern_break').replace('{n}', targets.length));
     targets.forEach(([r, c]) => _egUnfillCell(r, c));
 }
 
@@ -320,14 +330,14 @@ function _egMechPatternBreak(monster, phase) {
 // recorded sample and an OVERFIT STRIKE at your final position. Take no hit
 // during the replay and the model marks you UNLEARNED (+heal) - the reward
 // for moving unlike yourself.
-const EG_OVR_LOCK_REC_MS   = [0, 3500, 3800, 4200]; // recording length by phase
-const EG_OVR_LOCK_SAMPLE_MS = 250;  // sample cadence (ms)
-const EG_OVR_ECHO_R        = 66;    // echo burst radius
-const EG_OVR_ECHO_DMG      = 0.08;  // %maxHP per echo
-const EG_OVR_STRIKE_DMG    = 0.18;  // %maxHP overfit strike
-const EG_OVR_UNLEARN_HEAL  = 0.06;  // %maxHP for a clean replay
+export const EG_OVR_LOCK_REC_MS   = [0, 3500, 3800, 4200]; // recording length by phase
+export const EG_OVR_LOCK_SAMPLE_MS = 250;  // sample cadence (ms)
+export const EG_OVR_ECHO_R        = 66;    // echo burst radius
+export const EG_OVR_ECHO_DMG      = 0.08;  // %maxHP per echo
+export const EG_OVR_STRIKE_DMG    = 0.18;  // %maxHP overfit strike
+export const EG_OVR_UNLEARN_HEAL  = 0.06;  // %maxHP for a clean replay
 
-function _egMechOvrPatternLock(monster, phase) {
+export function _egMechOvrPatternLock(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egOvrEnsureRecorder(monster);
     _egOvrEnsureFinalWatcher(monster);
@@ -442,14 +452,14 @@ function _egMechOvrPatternLock(monster, phase) {
 // Two rings, one test. The model detonates the ring you are CLOSEST to -
 // it learned to aim. The other ring dissipates. Break equidistance (or get
 // near neither) and the model underfits: nothing detonates at all.
-const EG_OVR_VAL_R        = 115;    // ring radius (px, phase < 3)
-const EG_OVR_VAL_HOLD_MS  = 2400;   // telegraph hold
-const EG_OVR_VAL_DMG      = [0, 0.26, 0.30, 0.34]; // %maxHP caught in the true ring
-const EG_OVR_VAL_SPACING  = 320;    // min distance between the two rings
-const EG_OVR_VAL_CLEAR    = 280;    // farther than this from both = underfit
-const EG_OVR_VAL_TIE      = 44;     // |d1-d2| below this = can't decide
+export const EG_OVR_VAL_R        = 115;    // ring radius (px, phase < 3)
+export const EG_OVR_VAL_HOLD_MS  = 2400;   // telegraph hold
+export const EG_OVR_VAL_DMG      = [0, 0.26, 0.30, 0.34]; // %maxHP caught in the true ring
+export const EG_OVR_VAL_SPACING  = 320;    // min distance between the two rings
+export const EG_OVR_VAL_CLEAR    = 280;    // farther than this from both = underfit
+export const EG_OVR_VAL_TIE      = 44;     // |d1-d2| below this = can't decide
 
-function _egMechOvrValidation(monster, phase) {
+export function _egMechOvrValidation(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egOvrEnsureRecorder(monster);
     _egOvrEnsureFinalWatcher(monster);
@@ -534,29 +544,29 @@ function _egMechOvrValidation(monster, phase) {
 // and between waves the map RE-RECORDS - camp anywhere and your own heat
 // betrays you. Charge bar frozen (gate in _egTickPlayer via
 // _egOvrFinalActive).
-const EG_OVR_HEAT_COLS  = 6;
-const EG_OVR_HEAT_ROWS  = 4;
-const EG_OVR_WAVES      = 3;
-const EG_OVR_WAVE_DMG   = [0, 0.30, 0.32, 0.35]; // %maxHP caught by wave n
-const EG_OVR_FUSE_MS    = 1900;   // detonation fuse per wave
-const EG_OVR_REHEAT_MS  = 2400;   // re-record window between waves
+export const EG_OVR_HEAT_COLS  = 6;
+export const EG_OVR_HEAT_ROWS  = 4;
+export const EG_OVR_WAVES      = 3;
+export const EG_OVR_WAVE_DMG   = [0, 0.30, 0.32, 0.35]; // %maxHP caught by wave n
+export const EG_OVR_FUSE_MS    = 1900;   // detonation fuse per wave
+export const EG_OVR_REHEAT_MS  = 2400;   // re-record window between waves
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egOvrFinal = null;
+export let _egOvrFinal = null;
 
-function _egOvrFinalActive() {
+export function _egOvrFinalActive() {
     return !!_egOvrFinal && !_egOvrFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egOvrOnPhaseEnter(monster, newPhase) {
+export function _egOvrOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egOvrEnsureFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egOvrEnsureFinalWatcher(monster) {
+export function _egOvrEnsureFinalWatcher(monster) {
     if (!monster || _egOvrFinal || _egOvrWatcherRun) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -572,10 +582,10 @@ function _egOvrEnsureFinalWatcher(monster) {
         return true;
     });
 }
-let _egOvrWatcherRun = null;
+export let _egOvrWatcherRun = null;
 
 // Pause-safe timeout (mirrors the other finales).
-function _egOvrAfter(g, ms, fn) {
+export function _egOvrAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egOvrFinal) return;
@@ -587,7 +597,7 @@ function _egOvrAfter(g, ms, fn) {
 }
 
 // Heat bins from the live history. Returns counts + cell geometry.
-function _egOvrHeatCounts(W, H) {
+export function _egOvrHeatCounts(W, H) {
     const counts = new Array(EG_OVR_HEAT_COLS * EG_OVR_HEAT_ROWS).fill(0);
     const cw = W / EG_OVR_HEAT_COLS, ch = H / EG_OVR_HEAT_ROWS;
     for (const pt of _egOvrHistory) {
@@ -598,7 +608,7 @@ function _egOvrHeatCounts(W, H) {
     return counts;
 }
 
-function _egOvrFinalStart(monster) {
+export function _egOvrFinalStart(monster) {
     if (_egOvrFinal || !monster) return;
 
     // The model clears the arena for the final epoch: kill every other run
@@ -740,7 +750,7 @@ function _egOvrFinalStart(monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egOvrFinalEnd(g, monster) {
+export function _egOvrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -758,7 +768,7 @@ function _egOvrFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -770,7 +780,7 @@ function _egOvrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egOvrTeardown() {
+export function _egOvrTeardown() {
     if (_egOvrFinal) { try { _egOvrFinalEnd(_egOvrFinal, null); } catch (e) {} _egOvrFinal = null; }
     _egOvrHistory = [];
     _egOvrRecRun = null;
@@ -797,7 +807,7 @@ if (typeof window !== 'undefined') {
     window._EG_OVR_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_overfitter') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_overfitter') : null;
             if (!monster) return 'no overfitter alive';
             const fn = name === 'gradient' ? _egMechOvrGradient
                 : name === 'lock' ? _egMechOvrPatternLock
@@ -809,7 +819,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_overfitter') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_overfitter') : null;
             if (!monster) return 'no overfitter alive';
             _egOvrFinalStart(monster);
             return 'THE FINAL EPOCH started';

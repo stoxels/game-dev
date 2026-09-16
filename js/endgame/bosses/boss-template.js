@@ -8,8 +8,13 @@
 //   4. Define phases (threshold 1.00 → 0.00) + immunityDuration
 //   5. Schedule mechanics: shared ones by handler-name string, unique ones
 //      as new _egMech<Name> functions in this file
-//   6. Add a <script src="js/endgame/bosses/boss-<yourid>.js"></script> tag
-//      in index.html AFTER shared-boss-abilities.js
+//   6. Add the file to tools/module-manifest.json (exports + `bridge` for
+//      every `handler:` name string - dev/scratch/gen-bosses-bridges.mjs
+//      derives both), then run the full gate (lint + tests +
+//      phase2:verify + build). No index.html change needed.
+//   7. If the boss needs keybinds, register them in a DOMContentLoaded-
+//      deferred init (module top level runs before keybinds.js - see
+//      _initEgFireflyHotkeys in boss-firefly.js).
 //
 // Handler-name strings are resolved via window[handler] at fire time, so a
 // typo fails silently (mechanic never fires) - double-check the names.

@@ -1,3 +1,11 @@
+﻿import { t } from '../translation/translations.js';
+import { _abilityHotkeysBlocked, _formatCooldown, _isModalOpen } from '../classes/class-cooldown-state.js';
+import { hideHUDTooltip } from '../classes/class-hud.js';
+import { isSkillCharmUnlocked } from './skill-charms.js';
+import { SKILL_HOTBAR_COLS, SKILL_HOTBAR_SIZE, activateHotbarSlot, canAffordSkill, clearHotbarSlot, getHotbarSkill, getSkillCooldownRemaining, getSkillDef, getSkillImage, getSkillName, isSkillMovable, isSkillUsableNow } from './skill-registry.js';
+import { isSpellbookOpen, renderSpellbook, toggleSpellbook } from './skill-spellbook.js';
+import { cancelHoldCast, isSkillHoldCast, tryBeginHoldCast } from './spell-casttime.js';
+import { _uspUnlockHint, getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, isUniversalSpellId, isUniversalSpellUnlocked } from './universal-spells.js';
 // skill-hotbar.js
 //------------------------------------------------------------------------
 //---------------------------SKILL HOTBAR---------------------------------
@@ -22,17 +30,17 @@
 
 // Pointer-move distance (px) above which a slot press becomes a drag
 // instead of a cast click.
-const SKILL_DRAG_THRESHOLD_PX = 4;
+export const SKILL_DRAG_THRESHOLD_PX = 4;
 
 // Current drag operation: { skillId, fromSlot } or null.
-let _skillDragState = null;
+export let _skillDragState = null;
 
 // Floating ghost element shown while dragging a spell.
-let _skillDragGhost = null;
+export let _skillDragGhost = null;
 
 // Set after a drag ends so the click event that follows the pointerup is
 // swallowed instead of casting the spell again.
-let _suppressHotbarClick = false;
+export let _suppressHotbarClick = false;
 
 
 //------------------------------------------------------------------------
@@ -45,7 +53,7 @@ let _suppressHotbarClick = false;
 // (the grid) paints on top and receives the cell clicks. Keeping the bar out
 // of #screen-game entirely would lift it above the grid and steal those clicks
 // (the bug this replaces).
-function _hotbarHomeHost() {
+export function _hotbarHomeHost() {
     return document.querySelector('.puzzle-and-sidebar')
         || document.getElementById('screen-game')
         || document.body;
@@ -55,14 +63,14 @@ function _hotbarHomeHost() {
 // must escape the game screen's stacking context (otherwise the modal backdrop
 // traps it and spells cannot be dropped on it), so it hops onto <body> above
 // the backdrop. The book's open/close handlers call setHotbarAboveModal().
-function _hotbarMountHost() {
+export function _hotbarMountHost() {
     if (document.body.classList.contains('spellbook-open')) return document.body;
     return _hotbarHomeHost();
 }
 
 // Returns the hotbar container, creating it on first use and re-homing it
 // whenever the current mount host changed (spell book open/close).
-function _ensureHotbarContainer() {
+export function _ensureHotbarContainer() {
     let bar = document.getElementById('skill-hotbar');
     if (bar) {
         const host = _hotbarMountHost();
@@ -87,7 +95,7 @@ function _ensureHotbarContainer() {
 // Moves the bar above the spell book's modal backdrop (or back home).
 // Called from openSpellbook()/closeSpellbook() - the body class drives both
 // the host choice and the z-index lift in css/skills.css.
-function setHotbarAboveModal(above) {
+export function setHotbarAboveModal(above) {
     const bar = document.getElementById('skill-hotbar');
     if (!bar) return;
     const host = _hotbarMountHost();
@@ -97,7 +105,7 @@ function setHotbarAboveModal(above) {
 }
 
 // True while the game screen is the visible one.
-function _isGameScreenActive() {
+export function _isGameScreenActive() {
     return !!document.getElementById('screen-game')?.classList.contains('active');
 }
 
@@ -105,7 +113,7 @@ function _isGameScreenActive() {
 // the overworld screens (map view / world detail / level select), because
 // the whole point of opening the book there is rearranging the hotbar.
 // Without this the bar kept `display:none` and every drop silently failed.
-function _hotbarNeededForSpellbook() {
+export function _hotbarNeededForSpellbook() {
     return document.body.classList.contains('spellbook-open')
         || !!(document.getElementById('spellbook-overlay')?.classList.contains('show'));
 }
@@ -116,15 +124,15 @@ function _hotbarNeededForSpellbook() {
 //------------------------------------------------------------------------
 
 // Returns the display label for a hotbar slot's keybind (1…9,0).
-function _hotbarKeyLabel(slotIndex) {
+export function _hotbarKeyLabel(slotIndex) {
     const action = `hotbar-${slotIndex + 1}`;
-    const key = (typeof keybindKeyFor === 'function') ? keybindKeyFor(action) : null;
+    const key = (typeof globalThis.keybindKeyFor === 'function') ? globalThis.keybindKeyFor(action) : null;
     if (key === null || key === undefined) return String((slotIndex + 1) % 10);
-    return (typeof keybindDisplayLabel === 'function') ? keybindDisplayLabel(key) : key;
+    return (typeof globalThis.keybindDisplayLabel === 'function') ? globalThis.keybindDisplayLabel(key) : key;
 }
 
 // Builds the inner HTML of a single slot.
-function _buildHotbarSlotHTML(slotIndex, skillId) {
+export function _buildHotbarSlotHTML(slotIndex, skillId) {
     const keyLabel = `<span class="skill-hotbar-key">${_hotbarKeyLabel(slotIndex)}</span>`;
 
     if (!skillId) {
@@ -143,8 +151,8 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
     const isOnCD = cdRemaining > 0;
     const canAfford = (typeof canAffordSkill === 'function') ? canAffordSkill(skillId) : true;
     const noMana = !canAfford && !isOnCD;
-    const isArmed = (typeof activeAbilityMode !== 'undefined') && activeAbilityMode
-        && STATE.classActiveChoice === def.legacySlot;
+    const isArmed = (typeof globalThis.activeAbilityMode !== 'undefined') && globalThis.activeAbilityMode
+        && globalThis.STATE.classActiveChoice === def.legacySlot;
     const usableNow = (typeof isSkillUsableNow === 'function') ? isSkillUsableNow(skillId) : true;
     const locked = !usableNow;
     // Hold-to-cast spells (spell-casttime.js) get a marker so the longer
@@ -206,7 +214,7 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
 }
 
 // Formats a slot countdown (m:ss above a minute, else Xs).
-function _formatHotbarCooldown(secs) {
+export function _formatHotbarCooldown(secs) {
     if (typeof _formatCooldown === 'function') return _formatCooldown(Math.ceil(secs));
     const s = Math.ceil(secs);
     const m = Math.floor(s / 60);
@@ -217,19 +225,19 @@ function _formatHotbarCooldown(secs) {
 // hotbar, a charm in a spell slot, or a charm in the inventory. Used to show
 // the hotbar / mana bar before a class is chosen instead of hiding them
 // until then (universal charm spells need no class).
-function _hotbarClasslessHasSpells() {
+export function _hotbarClasslessHasSpells() {
     try {
-        if (typeof STATE === 'undefined' || !STATE) return false;
-        if (Array.isArray(STATE.skillHotbar) && STATE.skillHotbar.some(Boolean)) return true;
-        if (Array.isArray(STATE.charmSlots) && STATE.charmSlots.some(Boolean)) return true;
-        if (Array.isArray(STATE.charmInventory) && STATE.charmInventory.length > 0) return true;
+        if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return false;
+        if (Array.isArray(globalThis.STATE.skillHotbar) && globalThis.STATE.skillHotbar.some(Boolean)) return true;
+        if (Array.isArray(globalThis.STATE.charmSlots) && globalThis.STATE.charmSlots.some(Boolean)) return true;
+        if (Array.isArray(globalThis.STATE.charmInventory) && globalThis.STATE.charmInventory.length > 0) return true;
     } catch (e) { /* best-effort */ }
     return false;
 }
 
 // Rebuilds the entire hotbar. Cheap enough to call on every HUD rebuild -
 // 10 small slots, no listeners re-attached (delegated handlers only).
-function renderSkillHotbar() {
+export function renderSkillHotbar() {
     const bar = _ensureHotbarContainer();
 
     // Classless (or no save yet), or off the game screen / menu overlays →
@@ -239,10 +247,10 @@ function renderSkillHotbar() {
     // it. Pre-class campaign characters get the same treatment once they own
     // anything castable (a hotbar spell, a slotted charm, or an inventory
     // charm) - universal spells need no class.
-    const tqActive = (typeof _tqIsTutorialActive === 'function') && _tqIsTutorialActive();
-    const classlessHidden = (typeof STATE === 'undefined' || !STATE)
-        || (((!STATE.playerClass && !tqActive)
-            || ((typeof isClassless === 'function') && isClassless()))
+    const tqActive = (typeof globalThis._tqIsTutorialActive === 'function') && globalThis._tqIsTutorialActive();
+    const classlessHidden = (typeof globalThis.STATE === 'undefined' || !globalThis.STATE)
+        || (((!globalThis.STATE.playerClass && !tqActive)
+            || ((typeof globalThis.isClassless === 'function') && globalThis.isClassless()))
             && !_hotbarClasslessHasSpells()
             && !_hotbarNeededForSpellbook());
     if (classlessHidden
@@ -253,7 +261,7 @@ function renderSkillHotbar() {
         return;
     }
 
-    if (typeof ensureSkillHotbar === 'function') ensureSkillHotbar();
+    if (typeof globalThis.ensureSkillHotbar === 'function') globalThis.ensureSkillHotbar();
     bar.style.display = '';
 
     // Column count drives the CSS grid; kept configurable for future bars.
@@ -276,7 +284,7 @@ function renderSkillHotbar() {
 
 // In-place cooldown text patch for one skill (called every cooldown tick so
 // the whole hotbar isn't rebuilt each second).
-function patchHotbarSlotCooldown(skillId) {
+export function patchHotbarSlotCooldown(skillId) {
     const bar = document.getElementById('skill-hotbar');
     if (!bar || !skillId) return;
     const slot = bar.querySelector(`.skill-hotbar-slot[data-skill="${skillId}"]`);
@@ -321,9 +329,9 @@ function patchHotbarSlotCooldown(skillId) {
 
 // Patches the hotbar slot(s) bound to a legacy slot key (active1…active5).
 // Called from _patchCooldownButton() in class-cooldown-state.js.
-function patchHotbarCooldownForLegacySlot(legacySlot) {
-    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return;
-    for (const skillId of STATE.skillHotbar) {
+export function patchHotbarCooldownForLegacySlot(legacySlot) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.skillHotbar)) return;
+    for (const skillId of globalThis.STATE.skillHotbar) {
         if (!skillId) continue;
         const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
         if (def && def.legacySlot === legacySlot) patchHotbarSlotCooldown(skillId);
@@ -341,18 +349,18 @@ function patchHotbarCooldownForLegacySlot(legacySlot) {
 
 // Starts a drag for `skillId`. fromSlot is the hotbar index when the drag
 // began on a filled slot (so dropping outside clears it), else null.
-function startSkillDrag(skillId, e, fromSlot) {
+export function startSkillDrag(skillId, e, fromSlot) {
     // Sealed universal spells explain their future requirement instead of
     // the generic passive message (lock infra: universal-spells.js).
     if (typeof isUniversalSpellId === 'function' && isUniversalSpellId(skillId)
         && typeof isUniversalSpellUnlocked === 'function' && !isUniversalSpellUnlocked(skillId)) {
-        if (typeof showToast === 'function') {
+        if (typeof globalThis.showToast === 'function') {
             let hint = '🔒';
             try {
                 const usp = (typeof getUniversalSpellDef === 'function') ? getUniversalSpellDef(skillId) : null;
                 hint = '🔒 ' + _uspUnlockHint(usp);
             } catch (err) { /* generic lock marker */ }
-            showToast(hint, '#aaa');
+            globalThis.showToast(hint, '#aaa');
         }
         return;
     }
@@ -360,8 +368,8 @@ function startSkillDrag(skillId, e, fromSlot) {
         // Charm-locked spells get the actionable message instead of the
         // generic "passives can't be moved" one.
         const charmLocked = (typeof isSkillCharmUnlocked === 'function') && !isSkillCharmUnlocked(skillId);
-        if (typeof showToast === 'function') {
-            showToast(charmLocked ? t('charm_locked_toast') : t('skill_passive_not_movable'),
+        if (typeof globalThis.showToast === 'function') {
+            globalThis.showToast(charmLocked ? t('charm_locked_toast') : t('skill_passive_not_movable'),
                 charmLocked ? '#ff6b9d' : undefined);
         }
         return;
@@ -381,14 +389,14 @@ function startSkillDrag(skillId, e, fromSlot) {
 }
 
 // Repositions the floating ghost under the cursor.
-function _moveSkillDragGhost(x, y) {
+export function _moveSkillDragGhost(x, y) {
     if (!_skillDragGhost) return;
     _skillDragGhost.style.left = (x + 10) + 'px';
     _skillDragGhost.style.top = (y + 10) + 'px';
 }
 
 // Highlights the slot under the pointer while dragging.
-function _highlightDropTarget(x, y) {
+export function _highlightDropTarget(x, y) {
     const bar = document.getElementById('skill-hotbar');
     if (!bar) return;
     const target = document.elementFromPoint(x, y)?.closest?.('.skill-hotbar-slot');
@@ -397,7 +405,7 @@ function _highlightDropTarget(x, y) {
 }
 
 // Pointermove handler for an active drag.
-function _onSkillDragMove(e) {
+export function _onSkillDragMove(e) {
     if (!_skillDragState) return;
     if (!_skillDragState.moved) {
         const dx = e.clientX - _skillDragState.startX;
@@ -415,7 +423,7 @@ function _onSkillDragMove(e) {
 
 // Pointerup handler: drops onto the slot under the cursor, or clears the
 // source slot when a hotbar spell was dragged into empty space.
-function _onSkillDragEnd(e) {
+export function _onSkillDragEnd(e) {
     if (!_skillDragState) return;
     const { skillId, fromSlot, moved } = _skillDragState;
     _cleanupSkillDrag();
@@ -428,7 +436,7 @@ function _onSkillDragEnd(e) {
     const target = document.elementFromPoint(e.clientX, e.clientY)?.closest?.('.skill-hotbar-slot');
     if (target) {
         const slotIndex = Number(target.getAttribute('data-slot'));
-        if (!Number.isNaN(slotIndex)) setHotbarSlot(slotIndex, skillId);
+        if (!Number.isNaN(slotIndex)) globalThis.setHotbarSlot(slotIndex, skillId);
     } else if (fromSlot !== null && fromSlot !== undefined) {
         // Dragged out of the bar → remove.
         clearHotbarSlot(fromSlot);
@@ -439,7 +447,7 @@ function _onSkillDragEnd(e) {
 }
 
 // Removes the ghost, listeners and highlight classes.
-function _cleanupSkillDrag() {
+export function _cleanupSkillDrag() {
     _skillDragState = null;
     if (_skillDragGhost) { _skillDragGhost.remove(); _skillDragGhost = null; }
     document.body.classList.remove('skill-dragging');
@@ -460,7 +468,7 @@ function _cleanupSkillDrag() {
 //------------------------------------------------------------------------
 
 // Installs the delegated pointer handlers on the hotbar container.
-function _initHotbarInteractions() {
+export function _initHotbarInteractions() {
     const bar = _ensureHotbarContainer();
     if (bar.dataset.skillBound === '1') return;
     bar.dataset.skillBound = '1';
@@ -506,7 +514,7 @@ function _initHotbarInteractions() {
 
 // True when the hotbar should ignore key presses (has its own gate so the
 // spell book / modals / text fields never cast).
-function _hotbarKeysBlocked() {
+export function _hotbarKeysBlocked() {
     if (typeof _abilityHotkeysBlocked === 'function') {
         if (!_abilityHotkeysBlocked()) return false;
         // Blocked by the shared gate - but pre-class universal casting is
@@ -521,27 +529,27 @@ function _hotbarKeysBlocked() {
         try {
             if (typeof _isModalOpen === 'function' && _isModalOpen()) return true;
         } catch (e) { /* best-effort */ }
-        try { if (typeof dead !== 'undefined' && dead) return true; } catch (e) { /* best-effort */ }
+        try { if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return true; } catch (e) { /* best-effort */ }
         try {
-            if (typeof STATE !== 'undefined' && STATE && !STATE.playerClass) return false;
+            if (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && !globalThis.STATE.playerClass) return false;
         } catch (e) { /* best-effort */ }
         return true;
     }
     // Fallback when the shared gate is unavailable: same rules. Pre-class
     // characters cast universal charm spells (per-slot activation still
     // validates charm / cooldown / mana), so only death blocks here.
-    if (!STATE) return true;
-    if (typeof dead !== 'undefined' && dead) return true;
+    if (!globalThis.STATE) return true;
+    if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return true;
     return false;
 }
 
 // Registers hotbar-1…hotbar-10 and the spell book toggle with the central
 // keybind dispatcher.
-function _initSkillKeybinds() {
-    if (typeof onKeybindAction !== 'function') return;
+export function _initSkillKeybinds() {
+    if (typeof globalThis.onKeybindAction !== 'function') return;
 
     for (let i = 0; i < SKILL_HOTBAR_SIZE; i++) {
-        onKeybindAction(`hotbar-${i + 1}`, (e) => {
+        globalThis.onKeybindAction(`hotbar-${i + 1}`, (e) => {
             if (_hotbarKeysBlocked()) return false;
             if (_isModalOpenLoose()) return false;
             // Key auto-repeat while a hold is charging must not restart the
@@ -560,7 +568,7 @@ function _initSkillKeybinds() {
         });
     }
 
-    onKeybindAction('spellbook', () => {
+    globalThis.onKeybindAction('spellbook', () => {
         // Toggle-close must work even while the book is open: the book
         // itself is a .modal-bg, which makes _abilityHotkeysBlocked() true,
         // so check for the open book first and let P close it.
@@ -574,10 +582,10 @@ function _initSkillKeybinds() {
         // and death stay blocked.
         let classlessAllow = false;
         try {
-            classlessAllow = (typeof STATE !== 'undefined' && STATE && !STATE.playerClass)
+            classlessAllow = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && !globalThis.STATE.playerClass)
                 && !(document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA'))
                 && !(typeof _isModalOpen === 'function' && _isModalOpen())
-                && !(typeof dead !== 'undefined' && dead);
+                && !(typeof globalThis.dead !== 'undefined' && globalThis.dead);
         } catch (e) { classlessAllow = false; }
         if (!classlessAllow && typeof _abilityHotkeysBlocked === 'function' && _abilityHotkeysBlocked()) return false;
         if (typeof toggleSpellbook === 'function') toggleSpellbook();
@@ -586,7 +594,7 @@ function _initSkillKeybinds() {
 }
 
 // Local modal check that also covers the spell book overlay.
-function _isModalOpenLoose() {
+export function _isModalOpenLoose() {
     if (typeof _isModalOpen === 'function') return _isModalOpen();
     return !!document.querySelector('.modal-bg.show');
 }
@@ -597,7 +605,7 @@ function _isModalOpenLoose() {
 //------------------------------------------------------------------------
 
 // Full UI refresh: hotbar always, spell book only when open.
-function refreshSkillUI() {
+export function refreshSkillUI() {
     renderSkillHotbar();
     if (typeof isSpellbookOpen === 'function' && isSpellbookOpen() && typeof renderSpellbook === 'function') {
         renderSpellbook();
@@ -606,7 +614,7 @@ function refreshSkillUI() {
 
 // Initial build + keybind registration. Safe to call before class selection
 // (the bar simply hides until a class exists - buildClassHUD re-renders it).
-function initSkillHotbar() {
+export function initSkillHotbar() {
     renderSkillHotbar();
     _initHotbarInteractions();
     _initSkillKeybinds();
@@ -624,7 +632,15 @@ function initSkillHotbar() {
     }
 }
 
-if (document.readyState === 'loading') {
+// Module-eval timing: deferred module scripts execute at readyState
+// 'interactive', while concatenated keybinds.js has NOT run yet. Checking for
+// 'loading' only would init right inside the import phase, when
+// globalThis.onKeybindAction does not exist yet, so _initSkillKeybinds would
+// silently skip and P + the hotbar number keys stayed dead (no error). Both
+// 'loading' and 'interactive' mean DOMContentLoaded has not fired yet, so
+// wait for it - by then the full global surface exists. Only a post-load
+// evaluation ('complete') inits immediately.
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
     document.addEventListener('DOMContentLoaded', initSkillHotbar);
 } else {
     initSkillHotbar();

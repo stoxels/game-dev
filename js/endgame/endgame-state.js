@@ -1,4 +1,52 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Phase 3 step 7: live globalThis accessors for externally-mutated state.
+// (derived from write-site audit by dev/scratch/convert-endgame.mjs)
+//------------------------------------------------------------------------
+try { Object.defineProperty(globalThis, '_egActiveClueSwap', { get() { return _egActiveClueSwap; }, set(v) { _egActiveClueSwap = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egArcaneSurgeStreak', { get() { return _egArcaneSurgeStreak; }, set(v) { _egArcaneSurgeStreak = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egBlackoutActive', { get() { return _egBlackoutActive; }, set(v) { _egBlackoutActive = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egBlastSeq', { get() { return _egBlastSeq; }, set(v) { _egBlastSeq = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egChannelStacks', { get() { return _egChannelStacks; }, set(v) { _egChannelStacks = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egClueSwapRestoreTimer', { get() { return _egClueSwapRestoreTimer; }, set(v) { _egClueSwapRestoreTimer = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egDragChargeCol', { get() { return _egDragChargeCol; }, set(v) { _egDragChargeCol = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egDragChargeDamage', { get() { return _egDragChargeDamage; }, set(v) { _egDragChargeDamage = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egDragChargeRow', { get() { return _egDragChargeRow; }, set(v) { _egDragChargeRow = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egDragChargeStacks', { get() { return _egDragChargeStacks; }, set(v) { _egDragChargeStacks = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egDragChargeWasCrit', { get() { return _egDragChargeWasCrit; }, set(v) { _egDragChargeWasCrit = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egDropExpiryEntries', { get() { return _egDropExpiryEntries; }, set(v) { _egDropExpiryEntries = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egEncounterActive', { get() { return _egEncounterActive; }, set(v) { _egEncounterActive = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egExpireCountdownEntries', { get() { return _egExpireCountdownEntries; }, set(v) { _egExpireCountdownEntries = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egFirstStepToastShown', { get() { return _egFirstStepToastShown; }, set(v) { _egFirstStepToastShown = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egGridInvertTimer', { get() { return _egGridInvertTimer; }, set(v) { _egGridInvertTimer = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egHoldEPauseActive', { get() { return _egHoldEPauseActive; }, set(v) { _egHoldEPauseActive = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egMapDef', { get() { return _egMapDef; }, set(v) { _egMapDef = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egMonsters', { get() { return _egMonsters; }, set(v) { _egMonsters = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egPendingMeleeChargePct', { get() { return _egPendingMeleeChargePct; }, set(v) { _egPendingMeleeChargePct = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egPickupSpawnTimer', { get() { return _egPickupSpawnTimer; }, set(v) { _egPickupSpawnTimer = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egPickupTimers', { get() { return _egPickupTimers; }, set(v) { _egPickupTimers = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egPlayerAbsorptionCurrent', { get() { return _egPlayerAbsorptionCurrent; }, set(v) { _egPlayerAbsorptionCurrent = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egPlayerAbsorptionRegenDelayTimer', { get() { return _egPlayerAbsorptionRegenDelayTimer; }, set(v) { _egPlayerAbsorptionRegenDelayTimer = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egPlayerAbsorptionRegenInterval', { get() { return _egPlayerAbsorptionRegenInterval; }, set(v) { _egPlayerAbsorptionRegenInterval = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egPlayerCurrentCharge', { get() { return _egPlayerCurrentCharge; }, set(v) { _egPlayerCurrentCharge = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egRunCurrency', { get() { return _egRunCurrency; }, set(v) { _egRunCurrency = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egRunEssences', { get() { return _egRunEssences; }, set(v) { _egRunEssences = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egRunItems', { get() { return _egRunItems; }, set(v) { _egRunItems = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egRunLoot', { get() { return _egRunLoot; }, set(v) { _egRunLoot = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egRunMaps', { get() { return _egRunMaps; }, set(v) { _egRunMaps = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egSpawnTimers', { get() { return _egSpawnTimers; }, set(v) { _egSpawnTimers = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egTargetId', { get() { return _egTargetId; }, set(v) { _egTargetId = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egTickInterval', { get() { return _egTickInterval; }, set(v) { _egTickInterval = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egVeilActive', { get() { return _egVeilActive; }, set(v) { _egVeilActive = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egVoidSurgeActive', { get() { return _egVoidSurgeActive; }, set(v) { _egVoidSurgeActive = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egVoidSurgePollInterval', { get() { return _egVoidSurgePollInterval; }, set(v) { _egVoidSurgePollInterval = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egWardingUsedThisMap', { get() { return _egWardingUsedThisMap; }, set(v) { _egWardingUsedThisMap = v; }, configurable: true }); } catch (e) {}
+
+//------------------------------------------------------------------------
 //-------------------RUNTIME STATE----------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -17,23 +65,23 @@ let _egFirstStepToastShown = false;
 let _egSpawnTimers = [];
 
 // ── Pickup state ─────────────────────────────────────────────────────────────
-let _egPickups = new Map(); // key:"row-col" → pickupDef
+export let _egPickups = new Map(); // key:"row-col" → pickupDef
 let _egPickupTimers = [];        // expiry timers, cancelled on encounter stop
 let _egPickupSpawnTimer = null;      // recurring spawn-attempt timer
 
 // ── Pickup / drop expiry tracking (pause-aware) ───────────────────────────
 let _egDropExpiryEntries = []; // { map, key, value, lifetimeMs, expiresAt, timer, overlayId, removeOverlayFn, remaining }
-let _egPickupSpawnerInfo = { timer: null, expiresAt: 0, remaining: null }; // tracks next pickup spawn timeout for pause
+export let _egPickupSpawnerInfo = { timer: null, expiresAt: 0, remaining: null }; // tracks next pickup spawn timeout for pause
 let _egExpireCountdownEntries = []; // { overlayId, lifetimeMs, startedAt, expiresAt, timeout, interval, remaining, delayRemaining }
 
 // ── Boss state ───────────────────────────────────────────────────────────────
-let _egBossTimers = {};      // monsterId → array of mechanic timer handles
-let _egBossCorrupted = new Map(); // key:"row-col" → { timer } for Corrupt Cells
-let _egBossFrozen = new Map();    // key:"row-col" → { thawTimer, creepTimer, pending, cfg } for Frozen Cells
+export let _egBossTimers = {};      // monsterId → array of mechanic timer handles
+export let _egBossCorrupted = new Map(); // key:"row-col" → { timer } for Corrupt Cells
+export let _egBossFrozen = new Map();    // key:"row-col" → { thawTimer, creepTimer, pending, cfg } for Frozen Cells
 
 // ── Loot drop state ──────────────────────────────────────────────────────────
 // Active loot drops on the grid: key "row-col" → item object
-let _egLootDrops = new Map();
+export let _egLootDrops = new Map();
 
 // Per-run temporary loot bag - items the player has claimed this map run.
 // Flushed to the stash on successful map completion.
@@ -53,19 +101,19 @@ let _egVoidSurgePollInterval = null; // handle for the HUD-position poll during 
 // Shared by all dodge-style boss mechanics (Void Surge, Heat Death Bloom,
 // Rewrite Fate, Prior Collapse). Each active blast registers itself in the
 // map so boss death / encounter stop can tear every variant down at once.
-let _egBlastSeq = 0;             // monotonically increasing blast id counter
-const _egActiveBlasts = new Map(); // blast id → { timers:[], poll:null }
+export let _egBlastSeq = 0;             // monotonically increasing blast id counter
+export const _egActiveBlasts = new Map(); // blast id → { timers:[], poll:null }
 
 // ── Prior Bomb fill tracker ──────────────────────────────────────────────────
 // Circular buffer of [row, col] for recently correctly-filled cells.
-let _egRecentFills = [];
+export let _egRecentFills = [];
 
 // ── Drag-paint charged shot state ────────────────────────────────────────────
 // While the player drag-paints, every correct fill stacks its rolled damage
 // into a single charging projectile. It is released as one combined-damage
 // shot when the player stops painting (stopPainting).
 let _egDragChargeDamage = 0;   // accumulated damage of the current stroke
-let _egDragChargeElements = { fire: 0, cold: 0, lightning: 0, shadow: 0 }; // accumulated per-element share of _egDragChargeDamage
+export let _egDragChargeElements = { fire: 0, cold: 0, lightning: 0, shadow: 0 }; // accumulated per-element share of _egDragChargeDamage
 let _egDragChargeStacks = 0;   // number of painted cells in the current stroke
 let _egDragChargeRow = -1;     // stroke start cell - launch origin of the shot
 let _egDragChargeCol = -1;
@@ -85,16 +133,16 @@ let _egMapDef = null;
 // _egGetPlayerAttackInterval in endgame-player-stats.js); the weapon's
 // attack_speed mods then subtract seconds from it, and
 // EG_PLAYER_CHARGE_TIME_MULT shortens the result globally.
-const EG_PLAYER_DEFAULT_ATTACK_INTERVAL = 10;
-const EG_PLAYER_MIN_ATTACK_INTERVAL = 2; // Lower clamp so charges can't be spammed
-const EG_PLAYER_MELEE_DAMAGE = 20; // Default flat damage of a fully-charged unarmed strike
-const EG_PLAYER_MELEE_ANIM_DURATION_MS = 500; // Matches monster melee duration
+export const EG_PLAYER_DEFAULT_ATTACK_INTERVAL = 10;
+export const EG_PLAYER_MIN_ATTACK_INTERVAL = 2; // Lower clamp so charges can't be spammed
+export const EG_PLAYER_MELEE_DAMAGE = 20; // Default flat damage of a fully-charged unarmed strike
+export const EG_PLAYER_MELEE_ANIM_DURATION_MS = 500; // Matches monster melee duration
 // Global melee balance for the manual system: manual strikes land far less
 // often than the old auto-strikes did, so the melee channel hits harder.
-const EG_MELEE_DAMAGE_MULT = 2.0;
+export const EG_MELEE_DAMAGE_MULT = 2.0;
 // Global charge pacing for the manual system (0.65 = ~35% faster than the
 // old auto-strike intervals, which now serve as time-to-full-charge).
-const EG_PLAYER_CHARGE_TIME_MULT = 0.65;
+export const EG_PLAYER_CHARGE_TIME_MULT = 0.65;
 
 
 // ── Absorption shield state ───────────────────────────────────────────────
@@ -124,11 +172,11 @@ let _egPendingMeleeChargePct = null;
 let _egHoldEPauseActive = false;
 
 // Active currency drops on the grid: key "row-col" → currency def object
-let _egCurrencyDrops = new Map();
+export let _egCurrencyDrops = new Map();
 
 // Active regular-item drops on the grid: key "row-col" → { defId }
 // Claimed items go straight into the player's persistent STATE.inventory.
-let _egItemDrops = new Map();
+export let _egItemDrops = new Map();
 
 // Per-run currency tracker - currency picked up during the current map run,
 // aggregated by currency id, shown in the leave-map transition summary.
@@ -160,10 +208,10 @@ let _egRunEssences = [];
 
 // Central guard used before every combat operation.
 // Returns true only when an endgame encounter is actually running.
-function _egIsActive() {
+export function _egIsActive() {
     return _egEncounterActive
-        && typeof cur !== 'undefined' && cur
-        && (cur.isMonsterLevel === true);  // check if this level is assigned as a level that contains monsters
+        && typeof cur !== 'undefined' && globalThis.cur
+        && (globalThis.cur.isMonsterLevel === true);  // check if this level is assigned as a level that contains monsters
 }
 
 // True while the current level is a CAMPAIGN level running its light monster
@@ -171,15 +219,15 @@ function _egIsActive() {
 // Such levels set isMonsterLevel so the shared combat loop runs, but they
 // must NOT be treated as endgame map runs: no encounter chain, no map
 // objectives, no map-failed flow, no atlas completion.
-function _egIsCampaignRun() {
-    return typeof cur !== 'undefined' && !!cur
-        && cur.campaignMonsters === true
-        && cur.isMapRunSeed !== true
+export function _egIsCampaignRun() {
+    return typeof cur !== 'undefined' && !!globalThis.cur
+        && globalThis.cur.campaignMonsters === true
+        && globalThis.cur.isMapRunSeed !== true
         && !(typeof window !== 'undefined' && window._egIsMapDeviceRun);
 }
 
 // True while a real endgame map / encounter-chain run is active.
-function _egIsMapRun() {
+export function _egIsMapRun() {
     return typeof _egIsActive === 'function' && _egIsActive() && !_egIsCampaignRun();
 }
 
@@ -192,7 +240,7 @@ function _egIsMapRun() {
 // because dispatch is deferred through inline onclick strings). Screens
 // store a backFn NAME; the resolver validates that the name really is a
 // global function so a typo can never silently produce a dead back button.
-const EG_SCREEN_NAV = {
+export const EG_SCREEN_NAV = {
     hub: 'showEndgameHub',
     gate: 'showEndgameGate',
     atlas: 'showEndgameAtlas',
@@ -203,7 +251,7 @@ const EG_SCREEN_NAV = {
 
 // Returns `name` if it names a callable global (function declaration),
 // otherwise warns and returns the fallback.
-function _egResolveBackFn(name, fallback) {
+export function _egResolveBackFn(name, fallback) {
     if (typeof name === 'string' && typeof window[name] === 'function') return name;
     if (name && name !== fallback) {
         console.warn('[load-order] unknown endgame back-nav function:', name, '- falling back to', fallback);

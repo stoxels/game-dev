@@ -1,4 +1,16 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { ACHIEVEMENT_DEFS } from './achievements/achievements-data.js';
+import { ACH_STATE } from './achievements/achievements.js';
+import { Audio_Manager } from './audio/audio.js';
+import { showModal, showTitle, switchScreen } from './screens/screens.js';
+import { save } from './state.js';
+import { LANG, t } from './translation/translations.js';
+
+//------------------------------------------------------------------------
 //---------------------------MOODLE CODES---------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -10,12 +22,12 @@
 
 // Ensures the "locked codes" reminder only shows once per game session,
 // instead of after every level completion.
-let _lockedCodesModalShownThisSession = false;
+export let _lockedCodesModalShownThisSession = false;
 
 // Each entry defines a Moodle code the player can unlock by reaching
 // a score threshold AND a minimum percentage of all achievement tiers.
 // achPct: 0 means only the score requirement matters for that code.
-const WORLD_CODES = [
+export const WORLD_CODES = [
     { threshold: 10000, achPct: 0, code: 'TY_4_Playing_Stoxels', titleEn: 'Code 1', titleDE: 'Code 1' },
     { threshold: 25000, achPct: 0.15, code: 'IsThereADog?', titleEn: 'Code 2', titleDE: 'Code 2' },
     { threshold: 50000, achPct: 0.30, code: 'Stox0rTrix', titleEn: 'Code 3', titleDE: 'Code 3' },
@@ -31,20 +43,20 @@ const WORLD_CODES = [
 
 // Shared tier-count lookup used by every function that needs to compare
 // "achievement tiers unlocked" against "total achievement tiers".
-function _getAchievementTierCounts() {
+export function _getAchievementTierCounts() {
     const total = ACHIEVEMENT_DEFS.reduce((sum, def) => sum + def.tiers.length, 0);
     const have = ACH_STATE.unlocked.length;
     return { total, have };
 }
 
 // Returns the localised title for a code entry based on the active language
-function getCodeTitle(worldCode) {
+export function getCodeTitle(worldCode) {
     return LANG === 'de' ? worldCode.titleDE : worldCode.titleEn;
 }
 
 // Calculates what fraction of all achievement tiers the player has unlocked.
 // Returns a value between 0 and 1 (e.g. 0.5 = 50 % complete).
-function calcAchievementProgress() {
+export function calcAchievementProgress() {
     const { total, have } = _getAchievementTierCounts();
     return total > 0 ? have / total : 0;
 }
@@ -52,8 +64,8 @@ function calcAchievementProgress() {
 // Evaluates a single WORLD_CODES entry against the player's current
 // score and achievement progress.
 // Returns: 'unlocked' | 'locked_achievements' | 'not_reached'
-function evaluateCodeEligibility(worldCode, achPctDone) {
-    const scoreOk = STATE.totalScore >= worldCode.threshold;
+export function evaluateCodeEligibility(worldCode, achPctDone) {
+    const scoreOk = globalThis.STATE.totalScore >= worldCode.threshold;
     const achOk = achPctDone >= (worldCode.achPct || 0);
 
     if (scoreOk && achOk) return 'unlocked';
@@ -69,7 +81,7 @@ function evaluateCodeEligibility(worldCode, achPctDone) {
 
 // Builds the { wc, needed, have } shape used by both the locked-codes
 // collectors and the "locked" modal renderer.
-function _buildLockedCodeEntry(wc, tierCounts) {
+export function _buildLockedCodeEntry(wc, tierCounts) {
     return {
         wc,
         needed: Math.ceil(wc.achPct * tierCounts.total),
@@ -81,7 +93,7 @@ function _buildLockedCodeEntry(wc, tierCounts) {
 //   newCodes    - ready to unlock right now
 //   lockedCodes - score met, but not enough achievements yet
 // Returns both lists so the caller can act on them.
-function collectCodeUnlockResults() {
+export function collectCodeUnlockResults() {
     const newCodes = [];
     const lockedCodes = [];
 
@@ -90,12 +102,12 @@ function collectCodeUnlockResults() {
 
     WORLD_CODES.forEach(wc => {
         // Skip codes the player already owns
-        if (STATE.unlockedCodes.includes(wc.code)) return;
+        if (globalThis.STATE.unlockedCodes.includes(wc.code)) return;
 
         const result = evaluateCodeEligibility(wc, achPctDone);
 
         if (result === 'unlocked') {
-            STATE.unlockedCodes.push(wc.code);
+            globalThis.STATE.unlockedCodes.push(wc.code);
             newCodes.push(wc);
         } else if (result === 'locked_achievements') {
             lockedCodes.push(_buildLockedCodeEntry(wc, tierCounts));
@@ -107,13 +119,13 @@ function collectCodeUnlockResults() {
 
 // Same eligibility check as collectCodeUnlockResults(), but read-only -
 // does not mutate STATE.unlockedCodes. Used for the setup-screen reminder only.
-function collectLockedCodesOnly() {
+export function collectLockedCodesOnly() {
     const lockedCodes = [];
     const tierCounts = _getAchievementTierCounts();
     const achPctDone = calcAchievementProgress();
 
     WORLD_CODES.forEach(wc => {
-        if (STATE.unlockedCodes.includes(wc.code)) return;
+        if (globalThis.STATE.unlockedCodes.includes(wc.code)) return;
         const result = evaluateCodeEligibility(wc, achPctDone);
         if (result === 'locked_achievements') {
             lockedCodes.push(_buildLockedCodeEntry(wc, tierCounts));
@@ -133,7 +145,7 @@ function collectLockedCodesOnly() {
 // Each spark is a single absolutely-positioned star (css/modals.css 3j)
 // that fans out from the display's centre and fades; nodes self-remove
 // on animationend.
-function _pwFireSparkles(container) {
+export function _pwFireSparkles(container) {
     // Respect the reduced-motion off-switch in the CSS choreography.
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -157,7 +169,7 @@ function _pwFireSparkles(container) {
 // Builds the HTML for a single code block inside the unlock modal.
 // One parchment stone card (css/modals.css section 3) containing the
 // code's title, the glowing code display, and the Moodle hint.
-function buildCodeUnlockBlock(worldCode) {
+export function buildCodeUnlockBlock(worldCode) {
     const title = getCodeTitle(worldCode);
     return `
         <div class="pw-card">
@@ -169,7 +181,7 @@ function buildCodeUnlockBlock(worldCode) {
 }
 
 // Populates and opens the unlock modal for one or more newly earned codes.
-function showUnlockedCodesModal(codes) {
+export function showUnlockedCodesModal(codes) {
     const contentEl = document.getElementById('pw-content');
 
     document.getElementById('pw-modal')
@@ -203,7 +215,7 @@ function showUnlockedCodesModal(codes) {
 //
 // @param {object} lockedEntry - { wc, needed, have } as produced by
 //                                collectCodeUnlockResults()
-function buildCodeLockedBlock(lockedEntry) {
+export function buildCodeLockedBlock(lockedEntry) {
     const { wc, needed, have } = lockedEntry;
     const title = getCodeTitle(wc);
     const remaining = Math.max(0, needed - have);
@@ -227,7 +239,7 @@ function buildCodeLockedBlock(lockedEntry) {
 // Populates and opens the same pw-modal used for unlocks, but with
 // "locked" content: tells the player their score is high enough for one
 // or more codes, but they still need more achievement tiers to unlock them.
-function showLockedCodesModal(lockedCodes) {
+export function showLockedCodesModal(lockedCodes) {
     const contentEl = document.getElementById('pw-content');
 
     const lockedTitle = t('scr_code_still_locked');
@@ -268,7 +280,7 @@ function showLockedCodesModal(lockedCodes) {
  * @param {string}  barClass  - 'score' or 'ach' (controls bar colour via CSS)
  * @returns {string} HTML string
  */
-function _mcBuildReqBlock(label, current, required, met, barClass) {
+export function _mcBuildReqBlock(label, current, required, met, barClass) {
     const displayCurrent = met ? required : current;
     const pct = Math.min(100, Math.round((displayCurrent / required) * 100));
     const metCls = met ? ' met' : '';
@@ -298,8 +310,8 @@ function _mcBuildReqBlock(label, current, required, met, barClass) {
  * @param {number}  unlockedAchTiers - How many the player has earned
  * @returns {string} HTML string
  */
-function _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers) {
-    const unlocked = STATE.unlockedCodes.includes(wc.code);
+export function _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers) {
+    const unlocked = globalThis.STATE.unlockedCodes.includes(wc.code);
     const tierName = LANG === 'de' ? wc.titleDE : wc.titleEn;
     const scoreMet = total >= wc.threshold;
     const scoreLabel = (typeof t === 'function' ? t('codes_req_score') : null) || 'Required Score';
@@ -334,11 +346,11 @@ function _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers) {
  * The screen element itself carries the background image via CSS.
  * Everything rendered here is transparent overlay text + bars only.
  */
-function buildCodesScreen() {
+export function buildCodesScreen() {
     const screenEl = document.getElementById('screen-codes');
     if (!screenEl) return;
 
-    const total = STATE.totalScore;
+    const total = globalThis.STATE.totalScore;
     const achPct = calcAchievementProgress();
     const { total: totalAchTiers, have: unlockedAchTiers } = _getAchievementTierCounts();
 
@@ -378,7 +390,7 @@ function buildCodesScreen() {
 
 // Main entry point - call this after a level is beaten or a quiz is finished.
 // Checks for newly unlocked codes, persists state, and triggers UI feedback.
-function checkWorldCodes() {
+export function checkWorldCodes() {
     const { newCodes } = collectCodeUnlockResults();
     save();
     if (newCodes.length) showUnlockedCodesModal(newCodes);
@@ -386,7 +398,7 @@ function checkWorldCodes() {
 
 // Synchronous unlock check without UI - call this to persist unlocks immediately.
 // Returns the list of newly unlocked codes.
-function checkWorldCodesSync() {
+export function checkWorldCodesSync() {
     const { newCodes } = collectCodeUnlockResults();
     if (newCodes.length) save();
     return newCodes;
@@ -394,7 +406,7 @@ function checkWorldCodesSync() {
 
 // Call this once, when the player confirms Game Setup (before entering
 // level select). Shows the locked-codes reminder at most once per session.
-function checkLockedCodesOnSetup() {
+export function checkLockedCodesOnSetup() {
     if (_lockedCodesModalShownThisSession) return;
 
     const lockedCodes = collectLockedCodesOnly();
@@ -408,8 +420,8 @@ function checkLockedCodesOnSetup() {
  * Navigates to the codes screen.
  * Pushes the title screen onto the history stack so Escape returns there.
  */
-function showCodes() {
+export function showCodes() {
     buildCodesScreen();
-    screenHistory.push('screen-title');
+    globalThis.screenHistory.push('screen-title');
     switchScreen('screen-codes');
 }

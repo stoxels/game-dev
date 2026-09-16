@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE GRIDLOCK (boss_gridlock)--------------------
 //------------------------------------------------------------------------
 // REWORK - Quick-Man homage, rebuilt as a living circuit board. The
@@ -48,8 +57,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_GL_DEBUG_SLOW = true;
-const _EG_GL_DEBUG_MULT = _EG_GL_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_GL_DEBUG_SLOW = true;
+export const _EG_GL_DEBUG_MULT = _EG_GL_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_gridlock: {
@@ -79,19 +88,19 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_GL_LATTICE_WAVES = [0, 2, 3, 4];      // waves per cast, per phase
-const EG_GL_LATTICE_DMG   = [0, 0.12, 0.14, 0.17]; // %maxHP per live beam
-const EG_GL_LATTICE_STAGGER = 260;             // ms between a wave's lines firing
-const EG_GL_TOWER_COUNT   = [0, 4, 5, 6];      // signal towers per cast
-const EG_GL_TOWER_DMG     = [0, 0.10, 0.12, 0.14]; // %maxHP per cable
-const EG_GL_ORB_SPEED     = 150;               // px/s surge-orb seek speed
-const EG_GL_ORB_DMG       = [0, 0, 0.11, 0.13];// %maxHP orb contact
-const EG_GL_TRAIL_DMG     = 0.09;              // %maxHP live-trail contact
-const EG_GL_TRAIL_LIFE    = 1200;              // ms a trail segment stays hot
-const EG_GL_WIRE_DMG      = 0.10;              // %maxHP beat wire contact
-const EG_GL_JAM_DMG       = 0.14;              // %maxHP JAM wire contact
-const EG_GL_SURGE_DMG     = 0.30;              // %maxHP the surge dive
-const EG_GL_HIT_CD_MS     = 700;               // shared touch cooldown
+export const EG_GL_LATTICE_WAVES = [0, 2, 3, 4];      // waves per cast, per phase
+export const EG_GL_LATTICE_DMG   = [0, 0.12, 0.14, 0.17]; // %maxHP per live beam
+export const EG_GL_LATTICE_STAGGER = 260;             // ms between a wave's lines firing
+export const EG_GL_TOWER_COUNT   = [0, 4, 5, 6];      // signal towers per cast
+export const EG_GL_TOWER_DMG     = [0, 0.10, 0.12, 0.14]; // %maxHP per cable
+export const EG_GL_ORB_SPEED     = 150;               // px/s surge-orb seek speed
+export const EG_GL_ORB_DMG       = [0, 0, 0.11, 0.13];// %maxHP orb contact
+export const EG_GL_TRAIL_DMG     = 0.09;              // %maxHP live-trail contact
+export const EG_GL_TRAIL_LIFE    = 1200;              // ms a trail segment stays hot
+export const EG_GL_WIRE_DMG      = 0.10;              // %maxHP beat wire contact
+export const EG_GL_JAM_DMG       = 0.14;              // %maxHP JAM wire contact
+export const EG_GL_SURGE_DMG     = 0.30;              // %maxHP the surge dive
+export const EG_GL_HIT_CD_MS     = 700;               // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -100,8 +109,8 @@ const EG_GL_HIT_CD_MS     = 700;               // shared touch cooldown
 
 // Touch damage helper shared by all Gridlock hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egGlHitCd = 0;
-function _egGlTouch(pct, level, label) {
+export let _egGlHitCd = 0;
+export function _egGlTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egGlHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -114,7 +123,7 @@ function _egGlTouch(pct, level, label) {
 
 // Electric spark burst where a beam/cable/orb event lands (visual only,
 // body-level so it survives the run ending in the same frame).
-function _egGlSpark(x, y, big) {
+export function _egGlSpark(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-gl-sparks' + (big ? ' eg-gl-sparks-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -134,7 +143,7 @@ function _egGlSpark(x, y, big) {
 }
 
 // Point-to-segment distance (px) - hit-tests cables and trails.
-function _egGlDistToSeg(px, py, x0, y0, x1, y1) {
+export function _egGlDistToSeg(px, py, x0, y0, x1, y1) {
     const dx = x1 - x0, dy = y1 - y0;
     const len2 = dx * dx + dy * dy;
     const t = len2 ? Math.max(0, Math.min(1, ((px - x0) * dx + (py - y0) * dy) / len2)) : 0;
@@ -149,7 +158,7 @@ function _egGlDistToSeg(px, py, x0, y0, x1, y1) {
 // STAGGER-FIRE ~260ms apart, so each wave sweeps across the screen instead
 // of popping all at once - clear the lit lane whose turn is coming, and
 // mind the NEXT line while the first is still hot.
-function _egMechGlLattice(monster, phase) {
+export function _egMechGlLattice(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const waves = EG_GL_LATTICE_WAVES[p];
@@ -239,10 +248,10 @@ function _egMechGlLattice(monster, phase) {
 // The Gridlock plants signal towers around the field; every tower draws a
 // dashed cable to YOUR position at cast time - then all cables fire
 // together. The starburst aims at where you were: break the geometry.
-const EG_GL_SCRAMBLE_WARN = 1150;
-const EG_GL_SCRAMBLE_LIVE = 420;
+export const EG_GL_SCRAMBLE_WARN = 1150;
+export const EG_GL_SCRAMBLE_LIVE = 420;
 
-function _egMechGlScramble(monster, phase) {
+export function _egMechGlScramble(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -325,10 +334,10 @@ function _egMechGlScramble(monster, phase) {
 // A roaming ⚡ orb homes slowly and sheds a LIVE CABLE TRAIL behind it -
 // kiting it wires the arena against you. Trail segments fade after ~1.2s;
 // the orb despawns after its patrol. Phase 3 spawns a second chaser.
-const EG_GL_SURGE_LIFE = 7500;
-const EG_GL_SURGE_TURN = 2.2;   // rad/s steering cap (readability)
+export const EG_GL_SURGE_LIFE = 7500;
+export const EG_GL_SURGE_TURN = 2.2;   // rad/s steering cap (readability)
 
-function _egMechGlSurge(monster, phase) {
+export function _egMechGlSurge(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -443,30 +452,30 @@ function _egMechGlSurge(monster, phase) {
 // intersection is the only safe cell (marked with a pip). Then the SURGE
 // DIVE: a ⚡ orb dives the safe cell - step off it. Charge bar frozen for
 // the whole set-piece (gate in _egTickPlayer via _egGlFinalActive).
-const EG_GL_FINAL_BEATS = 3;
-const EG_GL_BEAT_CHARGE = 1000;   // ms telegraph per beat batch
-const EG_GL_BEAT_LIVE = 520;      // ms a beat batch stays hot
-const EG_GL_JAM_CHARGE = 1300;    // ms THE JAM telegraph
-const EG_GL_JAM_LIVE = 750;       // ms THE JAM stays hot
-const EG_GL_WIRE_COUNT_H = 5;     // horizontal wires
-const EG_GL_WIRE_COUNT_V = 7;     // vertical wires
+export const EG_GL_FINAL_BEATS = 3;
+export const EG_GL_BEAT_CHARGE = 1000;   // ms telegraph per beat batch
+export const EG_GL_BEAT_LIVE = 520;      // ms a beat batch stays hot
+export const EG_GL_JAM_CHARGE = 1300;    // ms THE JAM telegraph
+export const EG_GL_JAM_LIVE = 750;       // ms THE JAM stays hot
+export const EG_GL_WIRE_COUNT_H = 5;     // horizontal wires
+export const EG_GL_WIRE_COUNT_V = 7;     // vertical wires
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egGlFinal = null;
+export let _egGlFinal = null;
 
-function _egGlFinalActive() {
+export function _egGlFinalActive() {
     return !!_egGlFinal && !_egGlFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egGlOnPhaseEnter(monster, newPhase) {
+export function _egGlOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egGlStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egGlStartFinalWatcher(monster) {
+export function _egGlStartFinalWatcher(monster) {
     if (!monster || _egGlFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -482,7 +491,7 @@ function _egGlStartFinalWatcher(monster) {
     });
 }
 
-function _egGlFinalStart(monster) {
+export function _egGlFinalStart(monster) {
     if (_egGlFinal || !monster) return;
 
     // The gates close: kill every other run of this boss (the finale takes
@@ -707,7 +716,7 @@ function _egGlFinalStart(monster) {
     g.cdTimer = setInterval(step, beatTick);
 }
 
-function _egGlFinalEnd(g) {
+export function _egGlFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -725,7 +734,7 @@ function _egGlFinalEnd(g) {
     document.querySelectorAll('.eg-gl-locked').forEach(el => el.classList.remove('eg-gl-locked'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -742,7 +751,7 @@ function _egGlFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egGlTeardown() {
+export function _egGlTeardown() {
     if (_egGlFinal) { try { _egGlFinalEnd(_egGlFinal); } catch (e) {} _egGlFinal = null; }
     document.querySelectorAll('.eg-nk-lattice-warn, .eg-nk-lattice-hit, .eg-gl-tower, ' +
         '.eg-gl-tline, .eg-gl-orb, .eg-gl-trail, .eg-gl-arena, .eg-gl-grid, ' +
@@ -768,7 +777,7 @@ if (typeof window !== 'undefined') {
     window._EG_GL_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_gridlock') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_gridlock') : null;
             if (!monster) return 'no gridlock alive';
             const fn = name === 'lattice' ? _egMechGlLattice
                 : name === 'scramble' ? _egMechGlScramble
@@ -780,7 +789,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_gridlock') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_gridlock') : null;
             if (!monster) return 'no gridlock alive';
             _egGlFinalStart(monster);
             return 'SYSTEM LOCKDOWN started';

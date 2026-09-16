@@ -1,15 +1,29 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { _egMapTimeGainMult } from '../endgame/endgame-map-launch.js';
+import { _trackTimerDelta, updTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _resolveCursedBlackoutDownside } from './shared/cursed-downside.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
+import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+
+//------------------------------------------------------------------------
 //-------------------CURSED TIME - CURSED CLOCK----------------------
 //------------------------------------------------------------------------
 
 // cursedTime - adds 20 min to the timer; downside blacks out all clues.
-function _useCursedTime(id, def) {
+export function _useCursedTime(id, def) {
     _trackWitchImmuneCursedUse();
 
     const mapTimeMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
-    const before = timerSecs;
-    timerSecs += Math.round(1200 * mapTimeMult);
-    _trackTimerDelta(before, timerSecs);
+    const before = globalThis.timerSecs;
+    globalThis.timerSecs += Math.round(1200 * mapTimeMult);
+    _trackTimerDelta(before, globalThis.timerSecs);
     updTimer();
     playItemEffect(id);
 
@@ -22,7 +36,7 @@ function _useCursedTime(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: spawns dark fog tendrils blooming from each corner.
-function _fxMakeFogTendrils(container, r) {
+export function _fxMakeFogTendrils(container, r) {
     const corners = [
         { top: r.top, left: r.left },
         { top: r.top, left: r.right },
@@ -39,7 +53,7 @@ function _fxMakeFogTendrils(container, r) {
 }
 
 // 💀 Cursed Time - dark miasma + clock hands spin wildly.
-function _fxCursedTime() {
+export function _fxCursedTime() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

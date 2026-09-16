@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE GALE (boss_gale)---------------------------
 //------------------------------------------------------------------------
 // A rework of the old 8-second Cyclone Vault into a persistent storm
@@ -68,56 +77,56 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Storm tuning ─────────────────────────────────────────────────────────
 // The Eye (boss body)
-const EG_GAL_EYE_R = 48;                     // eye visual radius
-const EG_GAL_EYE_SPEED = [0, 30, 40, 52];    // px/s wander per phase
-const EG_GAL_EYE_REPICK_MS = 6200;           // max time on one wander target
-const EG_GAL_UPDRAFT_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the eye
-const EG_GAL_UPDRAFT_CD_MS = 1100;           // per-eye touch cooldown
-const EG_GAL_UPDRAFT_FLING = [0, 130, 155, 180]; // px fling (upward-biased)
+export const EG_GAL_EYE_R = 48;                     // eye visual radius
+export const EG_GAL_EYE_SPEED = [0, 30, 40, 52];    // px/s wander per phase
+export const EG_GAL_EYE_REPICK_MS = 6200;           // max time on one wander target
+export const EG_GAL_UPDRAFT_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the eye
+export const EG_GAL_UPDRAFT_CD_MS = 1100;           // per-eye touch cooldown
+export const EG_GAL_UPDRAFT_FLING = [0, 130, 155, 180]; // px fling (upward-biased)
 // Crosswind (global breeze)
-const EG_GAL_WIND_INTERVAL_MS = 7000;        // direction swap cadence
-const EG_GAL_WIND_PUSH = [0, 34, 46, 60];    // px/s breeze per phase
-const EG_GAL_WIND_STREAKS = 7;               // streak elements per side
+export const EG_GAL_WIND_INTERVAL_MS = 7000;        // direction swap cadence
+export const EG_GAL_WIND_PUSH = [0, 34, 46, 60];    // px/s breeze per phase
+export const EG_GAL_WIND_STREAKS = 7;               // streak elements per side
 // Cyclone funnels (perpetual Vault)
-const EG_GAL_FUNNEL_N = [0, 2, 3, 4];        // alive per phase
-const EG_GAL_FUNNEL_SPAWN_MS = [0, 5200, 4000, 3000]; // spawn cadence
-const EG_GAL_FUNNEL_SPEED = [0, 95, 125, 160]; // px/s hunt
-const EG_GAL_FUNNEL_DMG = [0, 7, 9, 12];     // %maxHP per second (DoT)
-const EG_GAL_FUNNEL_R = 52;                  // contact radius
+export const EG_GAL_FUNNEL_N = [0, 2, 3, 4];        // alive per phase
+export const EG_GAL_FUNNEL_SPAWN_MS = [0, 5200, 4000, 3000]; // spawn cadence
+export const EG_GAL_FUNNEL_SPEED = [0, 95, 125, 160]; // px/s hunt
+export const EG_GAL_FUNNEL_DMG = [0, 7, 9, 12];     // %maxHP per second (DoT)
+export const EG_GAL_FUNNEL_R = 52;                  // contact radius
 // Tornado Ladder (60% gate)
-const EG_GAL_LADDER_N = 3;                   // twisters in the column
-const EG_GAL_LADDER_WARN_MS = 1000;          // lane telegraph per twister
-const EG_GAL_LADDER_RISE_MS = 1250;          // climb time per twister
-const EG_GAL_LADDER_W = 190;                 // lane width
-const EG_GAL_LADDER_DMG = 0.13;              // %maxHP inside a twister
-const EG_GAL_LADDER_GAP_MS = 350;            // stagger between twisters
+export const EG_GAL_LADDER_N = 3;                   // twisters in the column
+export const EG_GAL_LADDER_WARN_MS = 1000;          // lane telegraph per twister
+export const EG_GAL_LADDER_RISE_MS = 1250;          // climb time per twister
+export const EG_GAL_LADDER_W = 190;                 // lane width
+export const EG_GAL_LADDER_DMG = 0.13;              // %maxHP inside a twister
+export const EG_GAL_LADDER_GAP_MS = 350;            // stagger between twisters
 // Eye of the Storm (30% gate)
-const EG_GAL_CONTRACT_RINGS = 4;             // contracting rings in sequence
-const EG_GAL_CONTRACT_START_R = 520;         // px starting radius
-const EG_GAL_CONTRACT_MIN_R = 56;            // fully contracted
-const EG_GAL_CONTRACT_TIME_MS = 2400;        // per-ring contraction
-const EG_GAL_CONTRACT_GAP_MS = 500;          // between rings
-const EG_GAL_CONTRACT_DMG = 0.13;            // %maxHP caught in a ring
+export const EG_GAL_CONTRACT_RINGS = 4;             // contracting rings in sequence
+export const EG_GAL_CONTRACT_START_R = 520;         // px starting radius
+export const EG_GAL_CONTRACT_MIN_R = 56;            // fully contracted
+export const EG_GAL_CONTRACT_TIME_MS = 2400;        // per-ring contraction
+export const EG_GAL_CONTRACT_GAP_MS = 500;          // between rings
+export const EG_GAL_CONTRACT_DMG = 0.13;            // %maxHP caught in a ring
 // Cyclone Lance (charge attack)
-const EG_GAL_LANCE_WARN_MS = 1000;           // lane telegraph
-const EG_GAL_LANCE_FLIGHT_MS = 520;          // bolt travel
-const EG_GAL_LANCE_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP by phase
-const EG_GAL_LANCE_FLING = [0, 170, 200, 230];  // px fling when hit
+export const EG_GAL_LANCE_WARN_MS = 1000;           // lane telegraph
+export const EG_GAL_LANCE_FLIGHT_MS = 520;          // bolt travel
+export const EG_GAL_LANCE_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP by phase
+export const EG_GAL_LANCE_FLING = [0, 170, 200, 230];  // px fling when hit
 
 
-let _egGaleWatcher = null; // per-fight storm state
+export let _egGaleWatcher = null; // per-fight storm state
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
-function _egGalPhase(st) {
+export function _egGalPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
-        const m = _egMonsters.find(x => x && x.id === st.monsterId);
+        const m = globalThis._egMonsters.find(x => x && x.id === st.monsterId);
         if (m) return Math.max(1, Math.min(3, Number(m.bossPhase) || 1));
     }
     return 1;
 }
 
 // Removes every storm overlay (registered in boss-framework teardown).
-function _egGaleTeardown() {
+export function _egGaleTeardown() {
     if (_egGaleWatcher) {
         const st = _egGaleWatcher;
         _egGaleWatcher = null;
@@ -134,7 +143,7 @@ function _egGaleTeardown() {
 
 
 // ── Persistent arena: the eye + crosswind + perpetual funnels ───────────
-function _egGaleArenaInit(monster) {
+export function _egGaleArenaInit(monster) {
     if (_egGaleWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -172,7 +181,7 @@ function _egGaleArenaInit(monster) {
 
     _egNkLoop(run, (dtS, now) => {
         if (_egGaleWatcher !== st) return false;
-        const live = _egMonsters ? _egMonsters.find(m => m.id === st.monsterId) : null;
+        const live = globalThis._egMonsters ? globalThis._egMonsters.find(m => m.id === st.monsterId) : null;
         if (!live) return false;
         const W = window.innerWidth, H = window.innerHeight;
         const c = _egNkPlayerCenter();
@@ -253,7 +262,7 @@ function _egGaleArenaInit(monster) {
 
 
 // ── Crosswind visuals: banner + drifting wind streaks from the upwind side
-function _egGaleShowWindBanner(st, dir) {
+export function _egGaleShowWindBanner(st, dir) {
     try { if (st.windBanner) st.windBanner.remove(); } catch (e) {}
     const el = _egNkEl(st.run, 'div', 'eg-gal-wind-banner');
     el.textContent = dir < 0 ? '◀◀ CROSSWIND' : 'CROSSWIND ▶▶';
@@ -279,7 +288,7 @@ function _egGaleShowWindBanner(st, dir) {
 
 // Advances streak drift; streaks recycle across the screen while the wind
 // is active, then fade with the banner cycle.
-function _egGaleTickStreaks(st, dtS) {
+export function _egGaleTickStreaks(st, dtS) {
     const W = window.innerWidth;
     st.streaks.forEach((s, i) => {
         s.x += st.windDir * s.spd * dtS;
@@ -292,7 +301,7 @@ function _egGaleTickStreaks(st, dtS) {
 
 
 // ── Cyclone funnels: spawn with a dust telegraph, hunt the player ────────
-function _egGaleSpawnFunnel(st) {
+export function _egGaleSpawnFunnel(st) {
     const W = window.innerWidth, H = window.innerHeight;
     const dust = _egNkEl(st.run, 'div', 'eg-gal-dust');
     const x = 80 + Math.random() * Math.max(60, W - 160);
@@ -313,7 +322,7 @@ function _egGaleSpawnFunnel(st) {
 
 
 // Ticks funnels: hunt + wrap + cold DoT inside the vortex.
-function _egGaleTickFunnels(st, dtS, now, c, pr, p) {
+export function _egGaleTickFunnels(st, dtS, now, c, pr, p) {
     const W = window.innerWidth, H = window.innerHeight;
     for (let i = st.funnels.length - 1; i >= 0; i--) {
         const f = st.funnels[i];
@@ -345,7 +354,7 @@ function _egGaleTickFunnels(st, dtS, now, c, pr, p) {
 // ── 60% gate: Tornado Ladder ─────────────────────────────────────────────
 // Three huge twisters climb the screen bottom→top through telegraphed
 // lanes, staggered; being inside a live twister lifts (hits + flings up).
-function _egGaleLadder(st, now) {
+export function _egGaleLadder(st, now) {
     if (st.ladder) return;
     const W = window.innerWidth;
     const lanes = [];
@@ -366,7 +375,7 @@ function _egGaleLadder(st, now) {
 
 
 // Ticks the ladder state machine: spawn lane warn → rising twister → top.
-function _egGaleTickLadder(st, dtS, pr) {
+export function _egGaleTickLadder(st, dtS, pr) {
     const ld = st.ladder;
     if (!ld) return;
     const H = window.innerHeight;
@@ -419,7 +428,7 @@ function _egGaleTickLadder(st, dtS, pr) {
 
 // ── 30% gate: Eye of the Storm ───────────────────────────────────────────
 // The eye plants at center; 4 vortex rings contract inward in sequence.
-function _egGaleContract(st, now) {
+export function _egGaleContract(st, now) {
     if (st.rings) return;
     const W = window.innerWidth, H = window.innerHeight;
     const eyeEl = st.eye.el;
@@ -436,7 +445,7 @@ function _egGaleContract(st, now) {
 
 
 // Ticks contracting rings: spawn → shrink toward the eye → snap closed.
-function _egGaleTickRings(st, dtS, c) {
+export function _egGaleTickRings(st, dtS, c) {
     const rg = st.rings;
     if (!rg) return;
     const W = window.innerWidth, H = window.innerHeight;
@@ -483,7 +492,7 @@ function _egGaleTickRings(st, dtS, c) {
 // Dispatched from _egFireMonsterAttack AND on an ambient cadence: a lane
 // telegraph through the player's row/column, then an air bolt blasts
 // across it, flinging anyone hit.
-function _egGaleCycloneLance(monster) {
+export function _egGaleCycloneLance(monster) {
     const st = _egGaleWatcher;
     if (!st || _egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
@@ -492,7 +501,7 @@ function _egGaleCycloneLance(monster) {
 
 
 // Spawns one lance: horizontal lane at the player's live row.
-function _egGaleLance(st, p) {
+export function _egGaleLance(st, p) {
     if (st.lances.length >= 3) return;
     const W = window.innerWidth, H = window.innerHeight;
     const c = _egNkPlayerCenter() || { x: W / 2, y: H / 2 };
@@ -515,7 +524,7 @@ function _egGaleLance(st, p) {
 
 
 // Ticks lances: warn lane → bolt crosses → despawn.
-function _egGaleTickLances(st, dtS, pr, p) {
+export function _egGaleTickLances(st, dtS, pr, p) {
     const W = window.innerWidth, H = window.innerHeight;
     for (let i = st.lances.length - 1; i >= 0; i--) {
         const l = st.lances[i];
@@ -562,4 +571,4 @@ function _egGaleTickLances(st, dtS, pr, p) {
 // The old scheduled mechanic is now the perpetual funnels - keep the
 // handler name alive so any stale schedule entry no-ops instead of
 // erroring.
-function _egMechGaleVault(monster, phase) { void monster; void phase; }
+export function _egMechGaleVault(monster, phase) { void monster; void phase; }

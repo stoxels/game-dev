@@ -1,4 +1,9 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //-------------------ENDGAME CRAFTING COSTS-------------------------------
 //------------------------------------------------------------------------
 // Single source of truth for crafting-bench costs. Tier 1 is strongest and
@@ -17,7 +22,7 @@
 // Returning an ARRAY per tier allows PoE-like mixed costs at the top end (e.g. 1x Exalted + 2x Chaos).
 //------------------------------------------------------------------------
 
-const EG_CRAFT_TIER_LADDER = {
+export const EG_CRAFT_TIER_LADDER = {
     orb_transmutation: {
         5: [{ id: 'orb_transmutation', count: 4 }],
         4: [{ id: 'orb_augmentation', count: 3 }],
@@ -111,7 +116,7 @@ const EG_CRAFT_TIER_LADDER = {
     },
 };
 
-const EG_CRAFT_FAMILY_CURRENCIES = {
+export const EG_CRAFT_FAMILY_CURRENCIES = {
     // Life, mana and recovery
     flat_health: 'orb_alchemy', inc_health: 'orb_alchemy', heart_heal: 'orb_alchemy',
     inc_heart_heal: 'orb_alchemy', flat_mana: 'orb_alteration', mana_heal: 'orb_alteration',
@@ -167,7 +172,7 @@ const EG_CRAFT_FAMILY_CURRENCIES = {
     deflect_damage: 'orb_exalted', shield_bash: 'orb_exalted',
 };
 
-function _egCraftingBenchCostFor(familyId, tier) {
+export function _egCraftingBenchCostFor(familyId, tier) {
     const baseId = EG_CRAFT_FAMILY_CURRENCIES[familyId] || 'orb_alchemy';
     const ladder = EG_CRAFT_TIER_LADDER[baseId] || EG_CRAFT_TIER_LADDER['orb_alchemy'];
     const entry = ladder[tier] || ladder[5] || [{ id: baseId, count: 2 }];
@@ -177,7 +182,7 @@ function _egCraftingBenchCostFor(familyId, tier) {
 
 // Backwards-compat: some tooling may still read tier counts. Derive a simple
 // count map from the ladder (max count per tier) so legacy code does not break.
-const EG_CRAFT_TIER_COSTS = (() => {
+export const EG_CRAFT_TIER_COSTS = (() => {
     const out = {};
     for (let tier = 1; tier <= 5; tier++) {
         let max = 0;

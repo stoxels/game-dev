@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkSlamShatter, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE SHRINE MAIDEN (boss_shrine)-----------------
 //------------------------------------------------------------------------
 // TIER 8 REWORK - "The Bound God". The danmaku homage, scaled to an arena:
@@ -50,8 +58,8 @@
 // DEBUG: slow The Shrine Maiden's timing 2.5x so manual playtests /
 // screenshot automation can catch mid-animation states. Flip to false for
 // ship.
-const _EG_SHR_DEBUG_SLOW = true;
-const _EG_SHR_DEBUG_MULT = _EG_SHR_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_SHR_DEBUG_SLOW = true;
+export const _EG_SHR_DEBUG_MULT = _EG_SHR_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_shrine: {
@@ -87,7 +95,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_SHR_TOUCH_CD_MS = 700;      // shared touch cooldown
+export const EG_SHR_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -96,8 +104,8 @@ const EG_SHR_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 // Touch damage helper shared by all Shrine hazards. Lightning-element boss -
 // hits go in with element 'lightning' so the toast palette stays yellow.
-let _egShrHitCd = 0;
-function _egShrTouch(pct, level, label) {
+export let _egShrHitCd = 0;
+export function _egShrTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egShrHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -109,15 +117,15 @@ function _egShrTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egShrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egShrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Proven reward pattern (Siren echo zones / Swarm royal jelly): heals go
 // through a guarded clamp + rerender.
-function _egShrHeal(amount) {
+export function _egShrHeal(amount) {
     if (typeof playerCurrentHP === 'undefined') return;
-    const before = playerCurrentHP;
-    playerCurrentHP = Math.min(playerMaxHP || before, before + amount);
-    if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    const before = globalThis.playerCurrentHP;
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + amount);
+    if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
 
@@ -131,16 +139,16 @@ function _egShrHeal(amount) {
 // closer to, that side's rope stays - the barrier persists around that
 // anchor as a vertical wall segment for 3s before it burns away. Phase 3:
 // a vertical pair crosses the horizontal one (quadrant pressure).
-const EG_SHR_BARS_N    = [0, 2, 3, 3]; // horizontal barriers by phase
-const EG_SHR_HUM_MS    = 1500;         // dashed hum telegraph
-const EG_SHR_LIT_MS    = 6000;         // lit lifetime
-const EG_SHR_BAR_DPS   = [0, 5.5, 6.5, 8.0]; // %/s touching a lit barrier
-const EG_SHR_KNOT_MS   = 3000;         // post-knot wall lifetime
-const EG_SHR_KNOT_DPS  = [0, 4.0, 5.0, 6.5]; // %/s touching a knot wall
-const EG_SHR_KNOT_R    = 26;           // wall half-width around the rope
-const EG_SHR_BURN_DMG  = [0, 0.10, 0.12, 0.14]; // %maxHP: wall burns away
+export const EG_SHR_BARS_N    = [0, 2, 3, 3]; // horizontal barriers by phase
+export const EG_SHR_HUM_MS    = 1500;         // dashed hum telegraph
+export const EG_SHR_LIT_MS    = 6000;         // lit lifetime
+export const EG_SHR_BAR_DPS   = [0, 5.5, 6.5, 8.0]; // %/s touching a lit barrier
+export const EG_SHR_KNOT_MS   = 3000;         // post-knot wall lifetime
+export const EG_SHR_KNOT_DPS  = [0, 4.0, 5.0, 6.5]; // %/s touching a knot wall
+export const EG_SHR_KNOT_R    = 26;           // wall half-width around the rope
+export const EG_SHR_BURN_DMG  = [0, 0.10, 0.12, 0.14]; // %maxHP: wall burns away
 
-function _egMechShrBarriers(monster, phase) {
+export function _egMechShrBarriers(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egShrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -261,15 +269,15 @@ function _egMechShrBarriers(monster, phase) {
 // 1.5s of steps and detonates your route in REVERSE. Stand still to feed
 // it nothing; keep your path crossing your old one and you eat both.
 // Phase 3: the shard plays your route FORWARD as it detonates.
-const EG_SHR_FAN_N      = [0, 0, 5, 7];  // orbs per fan, by phase
-const EG_SHR_FAN_SPD    = [0, 0, 140, 165];
-const EG_SHR_FAN_DMG    = [0, 0, 0.06, 0.08]; // %maxHP orb hit
-const EG_SHR_REC_MS     = 2500;          // record window (visible dashes)
-const EG_SHR_ROUTE_MS   = 1500;          // length of route played back
-const EG_SHR_SHARD_DMG  = [0, 0, 0.13, 0.16]; // %maxHP caught by a route echo
-const EG_SHR_STOP_DMG   = [0, 0, 0.16, 0.19]; // %maxHP SIGNATURE STRIKE
+export const EG_SHR_FAN_N      = [0, 0, 5, 7];  // orbs per fan, by phase
+export const EG_SHR_FAN_SPD    = [0, 0, 140, 165];
+export const EG_SHR_FAN_DMG    = [0, 0, 0.06, 0.08]; // %maxHP orb hit
+export const EG_SHR_REC_MS     = 2500;          // record window (visible dashes)
+export const EG_SHR_ROUTE_MS   = 1500;          // length of route played back
+export const EG_SHR_SHARD_DMG  = [0, 0, 0.13, 0.16]; // %maxHP caught by a route echo
+export const EG_SHR_STOP_DMG   = [0, 0, 0.16, 0.19]; // %maxHP SIGNATURE STRIKE
 
-function _egMechShrMirrors(monster, phase) {
+export function _egMechShrMirrors(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egShrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -422,16 +430,16 @@ function _egMechShrMirrors(monster, phase) {
 // tear it down (+12% heal) and cancel the chant; fail and a SHINTO SEAL
 // crosses the whole arena at your row (wide vertical gate sweep, lightning
 // punish). Phase 3: the seal sweeps back the other way after the first.
-const EG_SHR_WARD_MS    = [0, 0, 7000, 5500]; // chant time by phase
-const EG_SHR_WARD_R     = 58;            // body-check radius
-const EG_SHR_WARD_HP    = 3;             // body-checks to tear down
-const EG_SHR_CHAN_DPS   = 2.6;           // %/s chant channel (shadow)
-const EG_SHR_SEAL_DMG   = [0, 0, 0.24, 0.30]; // %maxHP caught by the seal
-const EG_SHR_SEAL_WARN  = 1100;          // telegraph before the sweep
-const EG_SHR_SEAL_SPD   = 1100;          // px/s seal travel
-const EG_SHR_HEAL_CANCEL = 0.12;         // %maxHP heal for tearing the ward
+export const EG_SHR_WARD_MS    = [0, 0, 7000, 5500]; // chant time by phase
+export const EG_SHR_WARD_R     = 58;            // body-check radius
+export const EG_SHR_WARD_HP    = 3;             // body-checks to tear down
+export const EG_SHR_CHAN_DPS   = 2.6;           // %/s chant channel (shadow)
+export const EG_SHR_SEAL_DMG   = [0, 0, 0.24, 0.30]; // %maxHP caught by the seal
+export const EG_SHR_SEAL_WARN  = 1100;          // telegraph before the sweep
+export const EG_SHR_SEAL_SPD   = 1100;          // px/s seal travel
+export const EG_SHR_HEAL_CANCEL = 0.12;         // %maxHP heal for tearing the ward
 
-function _egMechShrWard(monster, phase) {
+export function _egMechShrWard(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egShrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -555,36 +563,36 @@ function _egMechShrWard(monster, phase) {
 // one final beam sweep and everything outside a descending safety circle
 // is annulled. Charge bar frozen (gate in _egTickPlayer via
 // _egShrFinalActive).
-const EG_SHR_ARMS        = 8;       // torii beams on the lighthouse
-const EG_SHR_ARM_LEN_F   = 0.52;    // beam length × min(W,H)
-const EG_SHR_ARM_DPS     = 8.0;     // %/s touching a beam
-const EG_SHR_BEAM_SPD    = 26;      // deg/s lighthouse rotation
-const EG_SHR_KNOCKS      = 3;       // talisman grids before THE THOUSANDTH ARM
-const EG_SHR_KNOCK_MS    = 8500;    // between knocks
-const EG_SHR_GRID_COLS   = 5;
-const EG_SHR_GRID_ROWS   = 4;
-const EG_SHR_GRID_WARN   = 3500;    // time to reach the safe cell
-const EG_SHR_GRID_DMG    = 0.20;    // %maxHP caught by a grid detonation
-const EG_SHR_THOUS_DMG   = 0.35;    // %maxHP outside the safety circle
-const EG_SHR_SAFE_R      = 105;     // final safety-circle radius
-const EG_SHR_FAILSAFE_MS = 32000;   // hard cap on the set-piece
+export const EG_SHR_ARMS        = 8;       // torii beams on the lighthouse
+export const EG_SHR_ARM_LEN_F   = 0.52;    // beam length × min(W,H)
+export const EG_SHR_ARM_DPS     = 8.0;     // %/s touching a beam
+export const EG_SHR_BEAM_SPD    = 26;      // deg/s lighthouse rotation
+export const EG_SHR_KNOCKS      = 3;       // talisman grids before THE THOUSANDTH ARM
+export const EG_SHR_KNOCK_MS    = 8500;    // between knocks
+export const EG_SHR_GRID_COLS   = 5;
+export const EG_SHR_GRID_ROWS   = 4;
+export const EG_SHR_GRID_WARN   = 3500;    // time to reach the safe cell
+export const EG_SHR_GRID_DMG    = 0.20;    // %maxHP caught by a grid detonation
+export const EG_SHR_THOUS_DMG   = 0.35;    // %maxHP outside the safety circle
+export const EG_SHR_SAFE_R      = 105;     // final safety-circle radius
+export const EG_SHR_FAILSAFE_MS = 32000;   // hard cap on the set-piece
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egShrFinal = null;
+export let _egShrFinal = null;
 
-function _egShrFinalActive() {
+export function _egShrFinalActive() {
     return !!_egShrFinal && !_egShrFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egShrOnPhaseEnter(monster, newPhase) {
+export function _egShrOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egShrEnsureFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egShrEnsureFinalWatcher(monster) {
+export function _egShrEnsureFinalWatcher(monster) {
     if (!monster || _egShrFinal || _egShrWatcherRun) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -600,10 +608,10 @@ function _egShrEnsureFinalWatcher(monster) {
         return true;
     });
 }
-let _egShrWatcherRun = null;
+export let _egShrWatcherRun = null;
 
 // Pause-safe timeout (mirrors the other finales).
-function _egShrAfter(g, ms, fn) {
+export function _egShrAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egShrFinal) return;
@@ -614,7 +622,7 @@ function _egShrAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egShrFinalStart(monster) {
+export function _egShrFinalStart(monster) {
     if (_egShrFinal || !monster) return;
 
     // The Shrine clears the arena for the bound god: kill every other run
@@ -807,7 +815,7 @@ function _egShrFinalStart(monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egShrFinalEnd(g, monster) {
+export function _egShrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -825,7 +833,7 @@ function _egShrFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -837,7 +845,7 @@ function _egShrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egShrTeardown() {
+export function _egShrTeardown() {
     if (_egShrFinal) { try { _egShrFinalEnd(_egShrFinal, null); } catch (e) {} _egShrFinal = null; }
     _egShrWatcherRun = null;
     document.querySelectorAll('.eg-shr-bar, .eg-shr-knotwall, .eg-shr-anchor, .eg-shr-trail, .eg-shr-shard, ' +
@@ -863,7 +871,7 @@ if (typeof window !== 'undefined') {
     window._EG_SHR_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_shrine') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_shrine') : null;
             if (!monster) return 'no shrine maiden alive';
             const fn = name === 'bars' ? _egMechShrBarriers
                 : name === 'mirrors' ? _egMechShrMirrors
@@ -875,7 +883,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_shrine') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_shrine') : null;
             if (!monster) return 'no shrine maiden alive';
             _egShrFinalStart(monster);
             return 'THOUSAND ARMS started';

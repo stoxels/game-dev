@@ -1,3 +1,8 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
 //  endgame-mod-tables-arcane.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
@@ -29,7 +34,7 @@
 // exclusives (gloves), no heart_heal multiplier (belt), no charge
 // interaction mods (boots/pants/shoulders), no echo (rings).
 
-const EG_MOD_TABLE_ARCANE = {
+export const EG_MOD_TABLE_ARCANE = {
     prefixes: {
 
         // Individual class-ability cooldown reductions.

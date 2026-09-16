@@ -1,13 +1,25 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _resolveCursedBlackoutDownside } from './shared/cursed-downside.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxShieldBorderAdd } from './shared/fx-helpers.js';
+import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+
+//------------------------------------------------------------------------
 //-------------------CURSED SHIELD - DEMON EYE----------------------
 //------------------------------------------------------------------------
 
 // cursedShield - activates shield and reveals 2 cells; downside blacks out row clues.
-function _useCursedShield(id, def) {
+export function _useCursedShield(id, def) {
     _trackWitchImmuneCursedUse();
 
-    shieldActive = true;
-    revealTiles(2, 'item');
+    globalThis.shieldActive = true;
+    globalThis.revealTiles(2, 'item');
     playItemEffect(id);
 
     _resolveCursedBlackoutDownside(30000, true, false); // black out rows only
@@ -20,7 +32,7 @@ function _useCursedShield(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the dark-red scan lines that creep down the grid.
-function _fxMakeEyeScanLines(container, r) {
+export function _fxMakeEyeScanLines(container, r) {
     for (let i = 0; i < 5; i++) {
         _fxMakeElement(container, `
             position:absolute;
@@ -33,7 +45,7 @@ function _fxMakeEyeScanLines(container, r) {
 
 // 👁️ Cursed Shield - demonic eye opens, then rows black out.
 // 👁️ Cursed Shield - demonic eye opens, then rows black out.
-function _fxCursedShield() {
+export function _fxCursedShield() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

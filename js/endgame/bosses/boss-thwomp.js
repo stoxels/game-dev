@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE THWOMP (boss_thwomp)------------------------
 //------------------------------------------------------------------------
 // Mario-homage siege fight: the fortress guardian - a giant stone block
@@ -60,42 +69,42 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Thwomp tuning ───────────────────────────────────────────────────────
 // The hovering block
-const EG_THW_R = 62;                          // half-size of the block (visual + hit)
-const EG_THW_HOVER_SPEED = [0, 26, 34, 44];   // px/s drift while hovering
-const EG_THW_STOMP_INTERVAL_MS = [0, 8200, 6400, 4800]; // quake stomp cadence
-const EG_THW_STOMP_WARN_MS = 1000;            // dust-ring telegraph
-const EG_THW_STOMP_CRASH_MS = 320;            // the drop itself
-const EG_THW_STOMP_R = 120;                   // impact circle radius
-const EG_THW_STOMP_DMG = [0, 0.14, 0.16, 0.19]; // %maxHP per quake stomp
-const EG_THW_STOMP_FLING = [0, 190, 220, 250];  // px outward fling
+export const EG_THW_R = 62;                          // half-size of the block (visual + hit)
+export const EG_THW_HOVER_SPEED = [0, 26, 34, 44];   // px/s drift while hovering
+export const EG_THW_STOMP_INTERVAL_MS = [0, 8200, 6400, 4800]; // quake stomp cadence
+export const EG_THW_STOMP_WARN_MS = 1000;            // dust-ring telegraph
+export const EG_THW_STOMP_CRASH_MS = 320;            // the drop itself
+export const EG_THW_STOMP_R = 120;                   // impact circle radius
+export const EG_THW_STOMP_DMG = [0, 0.14, 0.16, 0.19]; // %maxHP per quake stomp
+export const EG_THW_STOMP_FLING = [0, 190, 220, 250];  // px outward fling
 // Ceiling collapse (60% gate)
-const EG_THW_COLLAPSE_MARKS = [0, 6, 8, 10];  // rubble marks per boss phase
-const EG_THW_COLLAPSE_MARK_MS = 1150;         // per-mark telegraph
-const EG_THW_COLLAPSE_STAGGER_MS = 380;       // between marks
-const EG_THW_COLLAPSE_DMG = 0.11;             // %maxHP per falling stone
-const EG_THW_AFTERSHOCK_MS = 2600;            // dust cloud lingers (visual)
+export const EG_THW_COLLAPSE_MARKS = [0, 6, 8, 10];  // rubble marks per boss phase
+export const EG_THW_COLLAPSE_MARK_MS = 1150;         // per-mark telegraph
+export const EG_THW_COLLAPSE_STAGGER_MS = 380;       // between marks
+export const EG_THW_COLLAPSE_DMG = 0.11;             // %maxHP per falling stone
+export const EG_THW_AFTERSHOCK_MS = 2600;            // dust cloud lingers (visual)
 // Mini-thwomp siege (30% gate)
-const EG_THW_MINI_N = [0, 3, 4, 5];           // minis per boss phase
-const EG_THW_MINI_HOP_MS = 700;               // per hop
-const EG_THW_MINI_SPEED = [0, 150, 165, 180]; // px/s hop-chase speed
-const EG_THW_MINI_R = 34;                     // impact radius per mini slam
-const EG_THW_MINI_DMG = 0.08;                 // %maxHP per mini slam
-const EG_THW_MINI_SIEGE_MS = 12000;           // siege duration
+export const EG_THW_MINI_N = [0, 3, 4, 5];           // minis per boss phase
+export const EG_THW_MINI_HOP_MS = 700;               // per hop
+export const EG_THW_MINI_SPEED = [0, 150, 165, 180]; // px/s hop-chase speed
+export const EG_THW_MINI_R = 34;                     // impact radius per mini slam
+export const EG_THW_MINI_DMG = 0.08;                 // %maxHP per mini slam
+export const EG_THW_MINI_SIEGE_MS = 12000;           // siege duration
 // Grand Slam (charge attack)
-const EG_THW_GS_FOLLOW_MS = 1000;             // shadow marker stalks you
-const EG_THW_GS_LOCK_MS = 550;                // the lock tell
-const EG_THW_GS_FALL_MS = 420;                // block drop time
-const EG_THW_GS_DMG = [0, 0.24, 0.28, 0.34];  // %maxHP (the signature hit)
-const EG_THW_GS_SHOCK_R = 200;                // shockwave ring radius
-const EG_THW_GS_SHOCK_DMG = [0, 0.08, 0.09, 0.11]; // %maxHP shockwave edge
+export const EG_THW_GS_FOLLOW_MS = 1000;             // shadow marker stalks you
+export const EG_THW_GS_LOCK_MS = 550;                // the lock tell
+export const EG_THW_GS_FALL_MS = 420;                // block drop time
+export const EG_THW_GS_DMG = [0, 0.24, 0.28, 0.34];  // %maxHP (the signature hit)
+export const EG_THW_GS_SHOCK_R = 200;                // shockwave ring radius
+export const EG_THW_GS_SHOCK_DMG = [0, 0.08, 0.09, 0.11]; // %maxHP shockwave edge
 
 
-let _egThwWatcher = null;      // per-fight guardian state
-let _egThwGrandSlamActive = false;
+export let _egThwWatcher = null;      // per-fight guardian state
+export let _egThwGrandSlamActive = false;
 
 
 // Sweep every thwomp overlay off the screen. Safe to call twice.
-function _egThwompSweep() {
+export function _egThwompSweep() {
     _egThwGrandSlamActive = false;
     try {
         document.querySelectorAll('.eg-thw-block, .eg-thw-ring, .eg-thw-mark, .eg-thw-stone, .eg-thw-cloud, .eg-thw-mini, .eg-thw-gs-mark, .eg-thw-shock, .eg-thw-crash').forEach(el => el.remove());
@@ -104,7 +113,7 @@ function _egThwompSweep() {
 
 
 // Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-function _egThwompTeardown() {
+export function _egThwompTeardown() {
     const st = _egThwWatcher;
     _egThwWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
@@ -114,7 +123,7 @@ function _egThwompTeardown() {
 }
 
 
-function _egThwompArenaInit(monster) {
+export function _egThwompArenaInit(monster) {
     if (_egThwWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -150,8 +159,8 @@ function _egThwompArenaInit(monster) {
     _egThwPickHoverSpot(block);
 
     _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-            ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -341,7 +350,7 @@ function _egThwompArenaInit(monster) {
 
 
 // Picks a fresh hover spot away from the current one, inside the arena.
-function _egThwPickHoverSpot(b) {
+export function _egThwPickHoverSpot(b) {
     const W = window.innerWidth, H = window.innerHeight;
     const pad = 130;
     let x = W / 2, y = H / 2;
@@ -355,7 +364,7 @@ function _egThwPickHoverSpot(b) {
 
 
 // Expanding shockwave ring (visual punctuation for any slam).
-function _egThwShockRing(st, x, y, r, power) {
+export function _egThwShockRing(st, x, y, r, power) {
     const ring = _egNkEl(st.run, 'div', 'eg-thw-shock');
     ring.style.left = Math.round(x) + 'px';
     ring.style.top = Math.round(y) + 'px';
@@ -366,7 +375,7 @@ function _egThwShockRing(st, x, y, r, power) {
 
 
 // ── 60% gate: Ceiling Collapse ──────────────────────────────────────────
-function _egThwCollapse(st, p) {
+export function _egThwCollapse(st, p) {
     const W = window.innerWidth, H = window.innerHeight;
     const n = EG_THW_COLLAPSE_MARKS[p];
     const marks = [];
@@ -384,7 +393,7 @@ function _egThwCollapse(st, p) {
 
 
 // ── 30% gate: Mini-thwomp Siege ─────────────────────────────────────────
-function _egThwSiege(st, p) {
+export function _egThwSiege(st, p) {
     const n = EG_THW_MINI_N[p];
     const minis = [];
     for (let i = 0; i < n; i++) {
@@ -410,7 +419,7 @@ function _egThwSiege(st, p) {
 // then the whole block teleports overhead and crashes onto the mark with a
 // huge shockwave ring. Wired from _egFireMonsterAttack (endgame-encounter.js).
 
-function _egThwompGrandSlam(monster) {
+export function _egThwompGrandSlam(monster) {
     if (_egThwGrandSlamActive || _egNkDodgeBusy() || _egNkFrozen()) return;
     const st = _egThwWatcher;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
@@ -487,4 +496,4 @@ function _egThwompGrandSlam(monster) {
 //------------------------------------------------------------------------
 // The old scheduled Crushing Slam is now the persistent arena - keep the
 // handler name alive so any stale schedule entry no-ops instead of erroring.
-function _egMechThwompSlam() { void 0; }
+export function _egMechThwompSlam() { void 0; }

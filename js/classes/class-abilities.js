@@ -1,4 +1,33 @@
-﻿// class-abilities.js
+﻿import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { renderCell, updClues } from '../grid.js';
+import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { _resetStoxFlags, save } from '../state.js';
+import { _trackTimerDelta, updTimer } from '../timer.js';
+import { LANG, t } from '../translation/translations.js';
+import { ASCENDENCY_DEFS } from './ascendency-defs.js';
+import { _executeRegressionToPrior, _executeSignificanceThreshold } from './class-actuary.js';
+import { _executeBayesTraps, _executeTypeIShield } from './class-bayesian.js';
+import { _patchCooldownButton, cooldownState, getEffectiveCooldown, startSlotCooldown } from './class-cooldown-state.js';
+import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
+import { CLASS_HUD_HINT_MAX_USES, buildClassHUD, updateMomentumBar } from './class-hud.js';
+import { _abilityCanAfford, _bloodMagicActive, _getAbilityManaCost, payAbilityCost } from './class-mana.js';
+import { _clearTransitionMatrix, _executeStateRollback, _executeTransitionMatrix, _transitionMatrixCascade, resetMarkovianState } from './class-markovian.js';
+import { _executeArcaneFreeze, _executeArcaneReveal, _varianceShield_playCometImpact, _varianceShield_removeBubble, _varianceShield_updateVisibility } from './class-mathmagician.js';
+import { _endBlackSwan, _executeBlackSwan, _executeTailRisk } from './class-outlier.js';
+import { _executeFieldScan, _executePrecisionMark, _playBayesianInsightAnimation, _playBayesianRevealEffect } from './class-probabilist.js';
+import { _executeBrownianMotion, _executeSummonDrifter } from './class-random-walker.js';
+import { _executeDegreesOfFreedom, _executeResidual, resetRecursionistState } from './class-recursionist.js';
+import { _executeDataStrike, _executeDiagonalStrike, _momentumClearParticlesImmediate, _momentumParticlesOnMistake, _momentumSpawnParticle, _statisticianTriggerMomentum } from './class-statistician.js';
+import { activateTargetingReticle } from './targeting-reticle.js';
+import { playShieldChargePulseEffect, playTimeGainEffect } from '../passive-tree/passive-effects.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { getCharmLockedSkillForLegacySlot, getSkillCastRankClampedForSlot, getSkillIdForLegacySlot, noteCharmCast } from '../skills/skill-charms.js';
+//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+try { Object.defineProperty(globalThis, 'correctFillStreak', { get() { return correctFillStreak; }, set(v) { correctFillStreak = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, 'nextPenaltyHalved', { get() { return nextPenaltyHalved; }, set(v) { nextPenaltyHalved = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, 'toggleActiveAbility', { get() { return toggleActiveAbility; }, set(v) { toggleActiveAbility = v; }, configurable: true }); } catch (e) {}
+// class-abilities.js
 // Handles all class passive and active ability logic:
 //   - Shared grid/cell helpers used across multiple abilities
 //   - Dispatch routing to per-class and per-ascendency ability functions
@@ -28,19 +57,19 @@ let nextPenaltyHalved = false;
 
 // _resolveCell - reveals a filled cell OR marks an empty cell.
 //   Returns the cell id string ("g-r-c") if the cell was actually changed, otherwise null.
-function _resolveCell(r, c, sol) {
+export function _resolveCell(r, c, sol) {
     if (sol[r][c] === 1) {
-        if (!revealedGrid[r][c] && userGrid[r][c] !== 1) {
-            revealedGrid[r][c] = true;
-            userGrid[r][c] = 1;
+        if (!globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1) {
+            globalThis.revealedGrid[r][c] = true;
+            globalThis.userGrid[r][c] = 1;
             renderCell(r, c);
             updClues(r, c);
             return `g-${r}-${c}`;
         }
     } else {
-        if (userGrid[r][c] === 0) {
-            userGrid[r][c] = 2;
-            systemMarkedGrid[r][c] = true;
+        if (globalThis.userGrid[r][c] === 0) {
+            globalThis.userGrid[r][c] = 2;
+            globalThis.systemMarkedGrid[r][c] = true;
             renderCell(r, c);
             return `g-${r}-${c}`;
         }
@@ -51,11 +80,11 @@ function _resolveCell(r, c, sol) {
 
 // _revealFilledCell - reveals a filled cell only. Never touches empty cells.
 //   Used by Diagonal Strike when the 'diagonally_wrong' passive node is NOT active.
-function _revealFilledCell(r, c, sol) {
+export function _revealFilledCell(r, c, sol) {
     if (sol[r][c] === 1) {
-        if (!revealedGrid[r][c] && userGrid[r][c] !== 1) {
-            revealedGrid[r][c] = true;
-            userGrid[r][c] = 1;
+        if (!globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1) {
+            globalThis.revealedGrid[r][c] = true;
+            globalThis.userGrid[r][c] = 1;
             renderCell(r, c);
             updClues(r, c);
             return `g-${r}-${c}`;
@@ -66,7 +95,7 @@ function _revealFilledCell(r, c, sol) {
 
 
 // _filterRevealedIds - from a list of cell ids, returns only those whose solution cell is filled (=1).
-function _filterRevealedIds(ids, sol) {
+export function _filterRevealedIds(ids, sol) {
     return ids.filter(id => {
         const [, r, c] = id.split('-').map(Number);
         return sol[r][c] === 1;
@@ -75,7 +104,7 @@ function _filterRevealedIds(ids, sol) {
 
 
 // _filterMarkedIds - from a list of cell ids, returns only those whose solution cell is empty (=0).
-function _filterMarkedIds(ids, sol) {
+export function _filterMarkedIds(ids, sol) {
     return ids.filter(id => {
         const [, r, c] = id.split('-').map(Number);
         return sol[r][c] === 0;
@@ -97,11 +126,11 @@ function _filterMarkedIds(ids, sol) {
 //   Reads classActive1Level / classActive2Level from STATE, overridden by
 //   the slotted charm's rank when the charm system has one placed (so
 //   slotting a lower-rank charm really does cast the weaker variant).
-function _getActiveAbilityData(def, activeKey) {
+export function _getActiveAbilityData(def, activeKey) {
     let level = activeKey === 'active1'
-        ? (STATE.classActive1Level || 1)
-        : (STATE.classActive2Level || 1);
-    if (STATE.playerClass && typeof getSkillCastRankClampedForSlot === 'function') {
+        ? (globalThis.STATE.classActive1Level || 1)
+        : (globalThis.STATE.classActive2Level || 1);
+    if (globalThis.STATE.playerClass && typeof getSkillCastRankClampedForSlot === 'function') {
         const charmRank = getSkillCastRankClampedForSlot(activeKey);
         if (charmRank) level = charmRank;
     }
@@ -111,24 +140,24 @@ function _getActiveAbilityData(def, activeKey) {
 
 // _getPassiveEffect - returns the current passive effect object for the active class.
 //   Reads classPassiveLevel from STATE.
-function _getPassiveEffect() {
-    const def = CLASS_DEFS[STATE.playerClass];
-    const passLv = STATE.classPassiveLevel || 1;
+export function _getPassiveEffect() {
+    const def = CLASS_DEFS[globalThis.STATE.playerClass];
+    const passLv = globalThis.STATE.classPassiveLevel || 1;
     return def.passive.levels[passLv - 1].effect;
 }
 
 
 // _getAscendencySlotData - resolves the ability data for an ascendency HUD slot.
 //   hudSlot 'active3' maps to ascendency active1; 'active4' maps to active2.
-function _getAscendencySlotData(hudSlot) {
-    const asc = STATE.playerAscendency ? ASCENDENCY_DEFS[STATE.playerAscendency] : null;
+export function _getAscendencySlotData(hudSlot) {
+    const asc = globalThis.STATE.playerAscendency ? ASCENDENCY_DEFS[globalThis.STATE.playerAscendency] : null;
     if (!asc) return null;
     const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
     let skillLv = ascSlot === 'active1'
-        ? (STATE.ascendencySkill1Level || 1)
-        : (STATE.ascendencySkill2Level || 1);
+        ? (globalThis.STATE.ascendencySkill1Level || 1)
+        : (globalThis.STATE.ascendencySkill2Level || 1);
     // Charm rank override (see _getActiveAbilityData above).
-    if (STATE.playerAscendency && typeof getSkillCastRankClampedForSlot === 'function') {
+    if (globalThis.STATE.playerAscendency && typeof getSkillCastRankClampedForSlot === 'function') {
         const charmRank = getSkillCastRankClampedForSlot(hudSlot);
         if (charmRank) skillLv = charmRank;
     }
@@ -151,23 +180,23 @@ function _getAscendencySlotData(hudSlot) {
 //   a grid cell. activateTargetingReticle() (targeting-reticle.js) replaces the native
 //   cursor everywhere with a custom animated reticle that tracks the mouse via JS, so it
 //   now stays consistent both inside and outside the grid.
-function _setAbilityMode(armed) {
-    activeAbilityMode = armed;
+export function _setAbilityMode(armed) {
+    globalThis.activeAbilityMode = armed;
     if (typeof activateTargetingReticle === 'function') activateTargetingReticle(armed);
 }
 
 
 // _showAbilityArmToast - shows the "click a cell" hint toast for the given HUD slot.
 //   Reads the localised cursor description from the ability definition.
-function _showAbilityArmToast(slot) {
+export function _showAbilityArmToast(slot) {
     let activeData = null;
 
     if (slot === 'active3' || slot === 'active4') {
-        const asc = STATE.playerAscendency ? ASCENDENCY_DEFS[STATE.playerAscendency] : null;
+        const asc = globalThis.STATE.playerAscendency ? ASCENDENCY_DEFS[globalThis.STATE.playerAscendency] : null;
         if (!asc) return;
         activeData = slot === 'active3' ? asc.active1 : asc.active2;
     } else {
-        const def = CLASS_DEFS[STATE.playerClass];
+        const def = CLASS_DEFS[globalThis.STATE.playerClass];
         if (!def) return;
         activeData = def[slot];
     }
@@ -176,7 +205,7 @@ function _showAbilityArmToast(slot) {
     const msg = LANG === 'de'
         ? (activeData.descCursorDE || activeData.descCursorEn)
         : activeData.descCursorEn;
-    showToast(`🎯 ${msg}`);
+    globalThis.showToast(`🎯 ${msg}`);
 }
 
 
@@ -193,7 +222,7 @@ function _showAbilityArmToast(slot) {
 
 
 // _dispatchBaseActive1 - dispatches the active1 ability for base classes.
-function _dispatchBaseActive1(playerClass, row, col, effect) {
+export function _dispatchBaseActive1(playerClass, row, col, effect) {
     switch (playerClass) {
         case 'mathmagician':
             _executeArcaneReveal(row, col, effect.radius, effect.maxReveals);
@@ -212,7 +241,7 @@ function _dispatchBaseActive1(playerClass, row, col, effect) {
 
 
 // _dispatchBaseActive2 - dispatches the active2 ability for base classes.
-function _dispatchBaseActive2(playerClass, row, col, effect) {
+export function _dispatchBaseActive2(playerClass, row, col, effect) {
     switch (playerClass) {
         case 'mathmagician':
             _executeArcaneFreeze(effect.freezeDuration);
@@ -236,7 +265,7 @@ function _dispatchBaseActive2(playerClass, row, col, effect) {
 //   (js/skills/skill-charms.js). Without this the HUD entry point - as opposed
 //   to the hotbar, which notes the cast in activateSkill() - would fall back
 //   to the un-charmed damage multiplier.
-function _noteCharmCastForSlot(slot) {
+export function _noteCharmCastForSlot(slot) {
     if (typeof noteCharmCast !== 'function' || typeof getSkillIdForLegacySlot !== 'function') return;
     const castingId = getSkillIdForLegacySlot(slot);
     if (castingId) noteCharmCast(castingId);
@@ -245,19 +274,19 @@ function _noteCharmCastForSlot(slot) {
 
 // _dispatchBaseAbility - top-level router for base class active abilities.
 //   Calls the correct active1 or active2 dispatcher, then logs the quest stat.
-function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
+export function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
     // The cast rank + orb bonus follow the skill's slotted charm.
     _noteCharmCastForSlot(activeKey);
 
     // Character banter for this exact class + skill combination.
-    if (typeof triggerSkillBanter === 'function') {
-        triggerSkillBanter(`${playerClass}_${activeKey}`);
+    if (typeof globalThis.triggerSkillBanter === 'function') {
+        globalThis.triggerSkillBanter(`${playerClass}_${activeKey}`);
     }
 
     // Combat animation for this exact class + skill combination (no-op
     // until art exists - the static portrait keeps showing).
-    if (typeof _playAvatarSkillAnimationForSlot === 'function') {
-        try { _playAvatarSkillAnimationForSlot(activeKey); } catch (e) {}
+    if (typeof globalThis._playAvatarSkillAnimationForSlot === 'function') {
+        try { globalThis._playAvatarSkillAnimationForSlot(activeKey); } catch (e) {}
     }
 
     if (activeKey === 'active1') {
@@ -265,7 +294,7 @@ function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
     } else {
         _dispatchBaseActive2(playerClass, row, col, effect);
     }
-    updateQuestStats('classAbilityUsed', {});
+    globalThis.updateQuestStats('classAbilityUsed', {});
 }
 
 
@@ -281,24 +310,24 @@ function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
 
 // _dispatchAscendencyAbility - routes to the correct ascendency skill implementation.
 //   hudSlot 'active3' → ascendency active1 (skill 1); 'active4' → ascendency active2 (skill 2).
-function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
+export function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
     const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
 
     // The cast rank + orb bonus follow the skill's slotted charm.
     _noteCharmCastForSlot(hudSlot);
 
     // Character banter for this exact ascendency + skill combination.
-    if (typeof triggerSkillBanter === 'function') {
-        triggerSkillBanter(`${ascendency}_${ascSlot}`);
+    if (typeof globalThis.triggerSkillBanter === 'function') {
+        globalThis.triggerSkillBanter(`${ascendency}_${ascSlot}`);
     }
 
     // Combat animation for this exact ascendency + skill combination
     // (no-op until art exists - the static portrait keeps showing).
-    if (typeof _playAvatarSkillAnimationForSlot === 'function') {
-        try { _playAvatarSkillAnimationForSlot(hudSlot); } catch (e) {}
+    if (typeof globalThis._playAvatarSkillAnimationForSlot === 'function') {
+        try { globalThis._playAvatarSkillAnimationForSlot(hudSlot); } catch (e) {}
     }
 
-    updateQuestStats('classAbilityUsed', {});
+    globalThis.updateQuestStats('classAbilityUsed', {});
 
     switch (ascendency) {
         case 'outlier':
@@ -366,30 +395,30 @@ function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
 
 // _isInstantAbility - returns true if the given slot fires immediately on button press.
 //   Instant abilities skip the arm → click flow entirely.
-function _isInstantAbility(slot) {
+export function _isInstantAbility(slot) {
     // Heartbloom (active5) is always instant - endgame-only
     if (slot === 'active5') return true;
 
     // Base class instants
     //if (STATE.playerClass === 'probabilist' && slot === 'active2') return true; // Field Scan
-    if (STATE.playerClass === 'statistician' && slot === 'active1') return true; // Data Strike
-    if (STATE.playerClass === 'mathmagician' && slot === 'active2') return true; // Absolute Zero
+    if (globalThis.STATE.playerClass === 'statistician' && slot === 'active1') return true; // Data Strike
+    if (globalThis.STATE.playerClass === 'mathmagician' && slot === 'active2') return true; // Absolute Zero
 
     // Ascendency instants
-    if (STATE.playerAscendency === 'actuary') {
+    if (globalThis.STATE.playerAscendency === 'actuary') {
         if (slot === 'active3') return true; // Regression to Prior
         if (slot === 'active4') return true; // Significance Threshold
     }
-    if (STATE.playerAscendency === 'markovian') {
+    if (globalThis.STATE.playerAscendency === 'markovian') {
         if (slot === 'active3') return true; // State Rollback
         if (slot === 'active4') return true; // Transition Matrix
     }
-    if (STATE.playerAscendency === 'bayesian') {
+    if (globalThis.STATE.playerAscendency === 'bayesian') {
         if (slot === 'active3') return true; // Bayes Traps
         if (slot === 'active4') return true; // Type I Error Shield
     }
-    if (STATE.playerAscendency === 'outlier' && slot === 'active3') return true; // Tail Risk
-    if (STATE.playerAscendency === 'random_walker') {
+    if (globalThis.STATE.playerAscendency === 'outlier' && slot === 'active3') return true; // Tail Risk
+    if (globalThis.STATE.playerAscendency === 'random_walker') {
         if (slot === 'active3') return true; // Brownian Motion
         if (slot === 'active4') return true; // Drifter
     }
@@ -397,7 +426,7 @@ function _isInstantAbility(slot) {
 
     // active4 instants for specific ascendencies
     if (slot !== 'active4') return false;
-    return STATE.playerAscendency === 'outlier' || STATE.playerAscendency === 'recursionist';
+    return globalThis.STATE.playerAscendency === 'outlier' || globalThis.STATE.playerAscendency === 'recursionist';
 }
 
 
@@ -405,35 +434,35 @@ function _isInstantAbility(slot) {
 // only make sense under certain conditions. Returns false (with a toast)
 // when the ability must not fire, e.g. Regression to Prior with an empty
 // mistake log. Prevents wasting the cooldown on a no-op.
-function _canFireInstantAbility(slot) {
+export function _canFireInstantAbility(slot) {
     if (slot === 'active5') {
         if (typeof isEndgameLevel === 'function' && !isEndgameLevel()) {
-            showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
+            globalThis.showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
             return false;
         }
         // Also ensure there is at least one eligible cell - otherwise toast and abort
         // so the cooldown isn't wasted on a no-op.
-        const pool = (typeof _egBuildPickupEligiblePool === 'function') ? _egBuildPickupEligiblePool() : null;
+        const pool = (typeof globalThis._egBuildPickupEligiblePool === 'function') ? globalThis._egBuildPickupEligiblePool() : null;
         if (pool && pool.length === 0) {
-            showToast('💚 No free cells to spawn hearts!', '#ff6b9d');
+            globalThis.showToast('💚 No free cells to spawn hearts!', '#ff6b9d');
             return false;
         }
         // Fallback manual check when _egBuildPickupEligiblePool not yet available
-        if (!pool && typeof cur !== 'undefined' && cur && cur.grid) {
+        if (!pool && typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
             let freeCount = 0;
-            for (let r = 0; r < cur.grid.length; r++)
-                for (let c = 0; c < cur.grid[0].length; c++)
-                    if (typeof _egIsCellPickupEligible === 'function' ? _egIsCellPickupEligible(r, c) : (userGrid[r][c] === 0 && !revealedGrid[r][c] && !wrongGrid[r][c])) freeCount++;
+            for (let r = 0; r < globalThis.cur.grid.length; r++)
+                for (let c = 0; c < globalThis.cur.grid[0].length; c++)
+                    if (typeof globalThis._egIsCellPickupEligible === 'function' ? globalThis._egIsCellPickupEligible(r, c) : (globalThis.userGrid[r][c] === 0 && !globalThis.revealedGrid[r][c] && !globalThis.wrongGrid[r][c])) freeCount++;
             if (freeCount === 0) {
-                showToast('💚 No free cells to spawn hearts!', '#ff6b9d');
+                globalThis.showToast('💚 No free cells to spawn hearts!', '#ff6b9d');
                 return false;
             }
         }
         return true;
     }
-    if (STATE.playerAscendency === 'actuary' && slot === 'active3') {
+    if (globalThis.STATE.playerAscendency === 'actuary' && slot === 'active3') {
         if (!(window._mistakeLog && window._mistakeLog.length > 0)) {
-            showToast(t('cls_regression_none'));
+            globalThis.showToast(t('cls_regression_none'));
             return false;
         }
     }
@@ -443,8 +472,8 @@ function _canFireInstantAbility(slot) {
 
 // _fireInstantBaseAbility - fires an instant ability from the base class slot (active1/active2)
 //   and immediately starts its cooldown.
-function _fireInstantBaseAbility(slot) {
-    const def = CLASS_DEFS[STATE.playerClass];
+export function _fireInstantBaseAbility(slot) {
+    const def = CLASS_DEFS[globalThis.STATE.playerClass];
     if (!def) return;
 
     const actData = _getActiveAbilityData(def, slot);
@@ -454,7 +483,7 @@ function _fireInstantBaseAbility(slot) {
     if (!payAbilityCost(_getAbilityManaCost(slot))) return;
 
     // Row/col are 0,0 - instant abilities ignore position.
-    _dispatchBaseAbility(slot, STATE.playerClass, 0, 0, effect);
+    _dispatchBaseAbility(slot, globalThis.STATE.playerClass, 0, 0, effect);
 
     const cdSeconds = getEffectiveCooldown(slot, def[slot].cooldownSeconds);
     startSlotCooldown(slot, cdSeconds);
@@ -463,7 +492,7 @@ function _fireInstantBaseAbility(slot) {
 
 // _fireInstantAscendencyAbility - fires an instant ability from an ascendency slot (active3/active4)
 //   and immediately starts its cooldown.
-function _fireInstantAscendencyAbility(slot) {
+export function _fireInstantAscendencyAbility(slot) {
     const slotData = _getAscendencySlotData(slot);
     if (!slotData) return;
 
@@ -474,7 +503,7 @@ function _fireInstantAscendencyAbility(slot) {
     if (!payAbilityCost(_getAbilityManaCost(slot))) return;
 
     // Row/col are 0,0 - instant abilities ignore position.
-    _dispatchAscendencyAbility(slot, STATE.playerAscendency, 0, 0, effect);
+    _dispatchAscendencyAbility(slot, globalThis.STATE.playerAscendency, 0, 0, effect);
 
     const cdSeconds = getEffectiveCooldown(slot, asc[ascSlot].cooldownSeconds);
     startSlotCooldown(slot, cdSeconds);
@@ -486,42 +515,42 @@ function _fireInstantAscendencyAbility(slot) {
 
 // Picks a random heart pickup def weighted like normal hearts:
 // 60% small, 30% medium, 10% large. Falls back to small if defs missing.
-function _pickRandomHeartDef() {
-    if (typeof EG_PICKUP_DEFS === 'undefined') return null;
+export function _pickRandomHeartDef() {
+    if (typeof globalThis.EG_PICKUP_DEFS === 'undefined') return null;
     const roll = Math.random() * 100;
-    if (roll < 60) return EG_PICKUP_DEFS.heart_small;
-    if (roll < 90) return EG_PICKUP_DEFS.heart_medium;
-    return EG_PICKUP_DEFS.heart_large;
+    if (roll < 60) return globalThis.EG_PICKUP_DEFS.heart_small;
+    if (roll < 90) return globalThis.EG_PICKUP_DEFS.heart_medium;
+    return globalThis.EG_PICKUP_DEFS.heart_large;
 }
 
 // Spawns `count` hearts onto eligible grid cells, bypassing the normal
 // EG_PICKUP_MAX_ON_BOARD cap so all 3 appear at once. Each heart gets
 // the standard lifetime/expiry handling.
-function _spawnHeartbloomHearts(count) {
+export function _spawnHeartbloomHearts(count) {
     let spawned = 0;
     for (let i = 0; i < count; i++) {
         let pool = [];
-        if (typeof _egBuildPickupEligiblePool === 'function') {
-            pool = _egBuildPickupEligiblePool().filter(([r, c]) => {
-                if (typeof _egCellHasAnyDrop === 'function') return !_egCellHasAnyDrop(r, c);
+        if (typeof globalThis._egBuildPickupEligiblePool === 'function') {
+            pool = globalThis._egBuildPickupEligiblePool().filter(([r, c]) => {
+                if (typeof globalThis._egCellHasAnyDrop === 'function') return !globalThis._egCellHasAnyDrop(r, c);
                 const key = `${r}-${c}`;
-                if (typeof _egPickups !== 'undefined' && _egPickups.has(key)) return false;
+                if (typeof globalThis._egPickups !== 'undefined' && globalThis._egPickups.has(key)) return false;
                 return true;
             });
-        } else if (typeof cur !== 'undefined' && cur && cur.grid) {
-            const rows = cur.grid.length;
-            const cols = cur.grid[0].length;
+        } else if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
+            const rows = globalThis.cur.grid.length;
+            const cols = globalThis.cur.grid[0].length;
             for (let r = 0; r < rows; r++)
                 for (let c = 0; c < cols; c++) {
                     const key = `${r}-${c}`;
-                    const hasPickup = (typeof _egPickups !== 'undefined' && _egPickups.has(key));
-                    const hasAnyDrop = (typeof _egCellHasAnyDrop === 'function') ? _egCellHasAnyDrop(r, c) : hasPickup;
+                    const hasPickup = (typeof globalThis._egPickups !== 'undefined' && globalThis._egPickups.has(key));
+                    const hasAnyDrop = (typeof globalThis._egCellHasAnyDrop === 'function') ? globalThis._egCellHasAnyDrop(r, c) : hasPickup;
                     if (hasAnyDrop) continue;
-                    if (typeof _egIsCellPickupEligible === 'function') {
-                        if (!_egIsCellPickupEligible(r, c)) continue;
+                    if (typeof globalThis._egIsCellPickupEligible === 'function') {
+                        if (!globalThis._egIsCellPickupEligible(r, c)) continue;
                     } else {
-                        if (userGrid[r][c] !== 0 || revealedGrid[r][c] || wrongGrid[r][c]) continue;
-                        if (typeof luckyTiles !== 'undefined' && luckyTiles && luckyTiles.has(key)) continue;
+                        if (globalThis.userGrid[r][c] !== 0 || globalThis.revealedGrid[r][c] || globalThis.wrongGrid[r][c]) continue;
+                        if (typeof globalThis.luckyTiles !== 'undefined' && globalThis.luckyTiles && globalThis.luckyTiles.has(key)) continue;
                     }
                     pool.push([r, c]);
                 }
@@ -529,20 +558,20 @@ function _spawnHeartbloomHearts(count) {
 
         if (pool.length === 0) break;
         const [r, c] = pool[Math.floor(Math.random() * pool.length)];
-        const def = _pickRandomHeartDef() || (typeof EG_PICKUP_DEFS !== 'undefined' ? EG_PICKUP_DEFS.heart_small : { id: 'heart_small', emoji: '💚', rarity: 'common' });
+        const def = _pickRandomHeartDef() || (typeof globalThis.EG_PICKUP_DEFS !== 'undefined' ? globalThis.EG_PICKUP_DEFS.heart_small : { id: 'heart_small', emoji: '💚', rarity: 'common' });
         if (!def) break;
         const key = `${r}-${c}`;
         try {
-            if (typeof _egPickups !== 'undefined') {
-                _egPickups.set(key, def);
-                if (typeof _egRenderPickupOverlay === 'function') _egRenderPickupOverlay(r, c, def);
-                const lifetime = (typeof EG_PICKUP_LIFETIME_MS !== 'undefined') ? EG_PICKUP_LIFETIME_MS : 20000;
-                if (typeof _egScheduleTrackedExpiry === 'function') {
-                    _egScheduleTrackedExpiry(_egPickups, key, def, lifetime, `eg-pickup-${r}-${c}`, (typeof _egRemovePickupOverlay === 'function') ? _egRemovePickupOverlay : () => {
+            if (typeof globalThis._egPickups !== 'undefined') {
+                globalThis._egPickups.set(key, def);
+                if (typeof globalThis._egRenderPickupOverlay === 'function') globalThis._egRenderPickupOverlay(r, c, def);
+                const lifetime = (typeof globalThis.EG_PICKUP_LIFETIME_MS !== 'undefined') ? globalThis.EG_PICKUP_LIFETIME_MS : 20000;
+                if (typeof globalThis._egScheduleTrackedExpiry === 'function') {
+                    globalThis._egScheduleTrackedExpiry(globalThis._egPickups, key, def, lifetime, `eg-pickup-${r}-${c}`, (typeof globalThis._egRemovePickupOverlay === 'function') ? globalThis._egRemovePickupOverlay : () => {
                         const span = document.getElementById(`eg-pickup-${r}-${c}`); if (span) span.remove();
                     });
-                } else if (typeof _egSchedulePickupExpiry === 'function') {
-                    _egSchedulePickupExpiry(key, def);
+                } else if (typeof globalThis._egSchedulePickupExpiry === 'function') {
+                    globalThis._egSchedulePickupExpiry(key, def);
                 }
             } else {
                 // Fallback when endgame pickup system not loaded (e.g. outside endgame map)
@@ -563,7 +592,7 @@ function _spawnHeartbloomHearts(count) {
 }
 
 // Fires the Heartbloom ability: pays cost, spawns 3 hearts, starts 5-min cooldown.
-function _fireInstantHeartbloomAbility() {
+export function _fireInstantHeartbloomAbility() {
     const def = (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined') ? ENDGAME_HEARTBLOOM_DEF : null;
     if (!def) return;
 
@@ -574,16 +603,16 @@ function _fireInstantHeartbloomAbility() {
     const spawned = _spawnHeartbloomHearts(count);
 
     if (spawned > 0) {
-        if (typeof showToast === 'function') showToast(`💚 Heartbloom: ${spawned} heart${spawned > 1 ? 's' : ''} spawned!`, '#ff6b9d');
+        if (typeof globalThis.showToast === 'function') globalThis.showToast(`💚 Heartbloom: ${spawned} heart${spawned > 1 ? 's' : ''} spawned!`, '#ff6b9d');
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('heart_heals');
-        if (typeof _playAvatarSkillAnimationForSlot === 'function') {
-            try { _playAvatarSkillAnimationForSlot('active5'); } catch (e) {}
+        if (typeof globalThis._playAvatarSkillAnimationForSlot === 'function') {
+            try { globalThis._playAvatarSkillAnimationForSlot('active5'); } catch (e) {}
         }
         if (typeof trackAchStat === 'function') trackAchStat('skillHeartbloomUsed');
-        if (typeof updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
-        if (typeof triggerSkillBanter === 'function') triggerSkillBanter('heartbloom');
+        if (typeof globalThis.updateQuestStats === 'function') globalThis.updateQuestStats('classAbilityUsed', {});
+        if (typeof globalThis.triggerSkillBanter === 'function') globalThis.triggerSkillBanter('heartbloom');
     } else {
-        if (typeof showToast === 'function') showToast('💚 Heartbloom: no free cells!', '#ff6b9d');
+        if (typeof globalThis.showToast === 'function') globalThis.showToast('💚 Heartbloom: no free cells!', '#ff6b9d');
         // Refund cost if nothing spawned? Keep cost spent as penalty for bad timing.
     }
 
@@ -593,7 +622,7 @@ function _fireInstantHeartbloomAbility() {
 
 
 // _fireInstantAbility - router that fires the correct instant handler based on slot.
-function _fireInstantAbility(slot) {
+export function _fireInstantAbility(slot) {
     if (slot === 'active5') {
         _fireInstantHeartbloomAbility();
     } else if (slot === 'active1' || slot === 'active2') {
@@ -609,11 +638,11 @@ function _fireInstantAbility(slot) {
 // Advances the "press 1/2" HUD hint counter. Only counts activations of the base
 // class slots (1/2), since that's what the arrows point at. Once it reaches
 // CLASS_HUD_HINT_MAX_USES the arrows stop rendering on the next HUD rebuild.
-function _trackActivationHintProgress(slot) {
+export function _trackActivationHintProgress(slot) {
     if (slot !== 'active1' && slot !== 'active2') return;
-    if ((STATE.classHudHintUses || 0) >= CLASS_HUD_HINT_MAX_USES) return;
+    if ((globalThis.STATE.classHudHintUses || 0) >= CLASS_HUD_HINT_MAX_USES) return;
 
-    STATE.classHudHintUses = (STATE.classHudHintUses || 0) + 1;
+    globalThis.STATE.classHudHintUses = (globalThis.STATE.classHudHintUses || 0) + 1;
     save();
 }
 
@@ -629,7 +658,7 @@ function _trackActivationHintProgress(slot) {
 //   Instant abilities fire immediately. All others arm the crosshair cursor
 //   so the next grid click calls executeActiveAbility().
 function toggleActiveAbility(slot) {
-    if (isClassless()) return;
+    if (globalThis.isClassless()) return;
     const newSlot = slot || 'active1';
 
     // Charm gate (js/skills/skill-charms.js): a spell whose charm is not in a
@@ -637,23 +666,23 @@ function toggleActiveAbility(slot) {
     if (typeof getCharmLockedSkillForLegacySlot === 'function') {
         const lockedId = getCharmLockedSkillForLegacySlot(newSlot);
         if (lockedId) {
-            if (typeof showToast === 'function') showToast(t('charm_locked_toast'), '#ff6b9d');
+            if (typeof globalThis.showToast === 'function') globalThis.showToast(t('charm_locked_toast'), '#ff6b9d');
             return;
         }
     }
 
     const cd = cooldownState[newSlot];
 
-    if (dead || !cd || cd.remaining > 0) return;
+    if (globalThis.dead || !cd || cd.remaining > 0) return;
 
     // Heartbloom is endgame-only - block entirely outside endgame (HUD also shows locked)
     if (newSlot === 'active5' && typeof isEndgameLevel === 'function' && !isEndgameLevel()) {
-        showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
+        globalThis.showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
         return;
     }
 
     // Clicking the already-armed slot cancels the arm
-    const isAlreadyArmed = activeAbilityMode && STATE.classActiveChoice === newSlot;
+    const isAlreadyArmed = globalThis.activeAbilityMode && globalThis.STATE.classActiveChoice === newSlot;
     if (isAlreadyArmed) {
         _setAbilityMode(false);
         buildClassHUD();
@@ -663,16 +692,16 @@ function toggleActiveAbility(slot) {
     // Affordability gate: the ability must be payable before it can be armed
     // or fired. Under Blood Magic the cost comes from life instead of mana.
     if (!_abilityCanAfford(newSlot)) {
-        showToast(t(_bloodMagicActive() ? 'cls_no_life' : 'cls_no_mana'));
+        globalThis.showToast(t(_bloodMagicActive() ? 'cls_no_life' : 'cls_no_mana'));
         return;
     }
 
     // Disallow activating or switching to another ability if one is already armed
-    if (activeAbilityMode && STATE.classActiveChoice !== newSlot) {
+    if (globalThis.activeAbilityMode && globalThis.STATE.classActiveChoice !== newSlot) {
         return;
     }
 
-    STATE.classActiveChoice = newSlot;
+    globalThis.STATE.classActiveChoice = newSlot;
     _trackActivationHintProgress(newSlot);
 
     if (_isInstantAbility(newSlot)) {
@@ -700,7 +729,7 @@ function toggleActiveAbility(slot) {
 
 // _executeAscendencySkillOnCell - fires a targeted ascendency ability on the clicked cell
 //   and handles post-fire cooldown logic.
-function _executeAscendencySkillOnCell(activeKey, row, col) {
+export function _executeAscendencySkillOnCell(activeKey, row, col) {
     const slotData = _getAscendencySlotData(activeKey);
     if (!slotData) return;
 
@@ -710,7 +739,7 @@ function _executeAscendencySkillOnCell(activeKey, row, col) {
     // Pay the cost (life under Blood Magic) - abort without firing if it can't be covered.
     if (!payAbilityCost(_getAbilityManaCost(activeKey))) return;
 
-    _dispatchAscendencyAbility(activeKey, STATE.playerAscendency, row, col, effect);
+    _dispatchAscendencyAbility(activeKey, globalThis.STATE.playerAscendency, row, col, effect);
 
     // End arm mode and start cooldown immediately
     _setAbilityMode(false);
@@ -721,19 +750,19 @@ function _executeAscendencySkillOnCell(activeKey, row, col) {
 
 // _executeBaseSkillOnCell - fires a targeted base class ability on the clicked cell
 //   and starts its cooldown immediately.
-function _executeBaseSkillOnCell(activeKey, row, col) {
+export function _executeBaseSkillOnCell(activeKey, row, col) {
     _setAbilityMode(false);
-    const def = CLASS_DEFS[STATE.playerClass];
+    const def = CLASS_DEFS[globalThis.STATE.playerClass];
     const actData = _getActiveAbilityData(def, activeKey);
     const effect = actData.effect;
 
     // Pay the cost (life under Blood Magic) - abort without firing if it can't be covered.
     if (!payAbilityCost(_getAbilityManaCost(activeKey))) {
-        showToast(t(_bloodMagicActive() ? 'cls_no_life' : 'cls_no_mana'));
+        globalThis.showToast(t(_bloodMagicActive() ? 'cls_no_life' : 'cls_no_mana'));
         return;
     }
 
-    _dispatchBaseAbility(activeKey, STATE.playerClass, row, col, effect);
+    _dispatchBaseAbility(activeKey, globalThis.STATE.playerClass, row, col, effect);
 
     const cdSeconds = getEffectiveCooldown(activeKey, def[activeKey].cooldownSeconds);
     startSlotCooldown(activeKey, cdSeconds);
@@ -742,13 +771,13 @@ function _executeBaseSkillOnCell(activeKey, row, col) {
 
 // executeActiveAbility - called when the player clicks a grid cell while an ability is armed.
 //   Routes to ascendency or base class execution based on the active HUD slot.
-function executeActiveAbility(row, col) {
-    if (!activeAbilityMode || !STATE.playerClass || dead) return;
-    if (isClassless()) { _setAbilityMode(false); return; }
+export function executeActiveAbility(row, col) {
+    if (!globalThis.activeAbilityMode || !globalThis.STATE.playerClass || globalThis.dead) return;
+    if (globalThis.isClassless()) { _setAbilityMode(false); return; }
 
     trackAchStat('classAbilitiesUsedTotal'); 
 
-    const activeKey = STATE.classActiveChoice || 'active1';
+    const activeKey = globalThis.STATE.classActiveChoice || 'active1';
 
     if (activeKey === 'active3' || activeKey === 'active4') {
         _executeAscendencySkillOnCell(activeKey, row, col);
@@ -772,7 +801,7 @@ function executeActiveAbility(row, col) {
 
 // _resetClassLevelState - zeroes all per-level tracking flags and window globals
 //   before any class-specific passive setup runs.
-function _resetClassLevelState() {
+export function _resetClassLevelState() {
     correctFillStreak = 0;
     nextPenaltyHalved = false;
     window._momentumThisLevel = 0;
@@ -802,7 +831,7 @@ function _resetClassLevelState() {
 //   Adds bonus charges from passive tree nodes reinforced_shield and fortified_shield.
 //   Recharges to max at the start of every puzzle, including chained puzzles
 //   inside an endgame encounter chain.
-function _applyMathmagicianPassive(effect) {
+export function _applyMathmagicianPassive(effect) {
     let freeMistakes = effect.freeMistakes || 0;
     if (ptHasSkill('reinforced_shield')) freeMistakes += 1;
     if (ptHasSkill('fortified_shield')) freeMistakes += 1;
@@ -813,7 +842,7 @@ function _applyMathmagicianPassive(effect) {
 
 // _collectProbabilistMarkCount - builds the auto-mark count for the Probabilist passive,
 //   adding bonus marks from passive tree nodes.
-function _collectProbabilistMarkCount(baseCount) {
+export function _collectProbabilistMarkCount(baseCount) {
     let markCount = baseCount;
     if (ptHasSkill('prior_knowledge')) markCount += 1;
     if (ptHasSkill('updated_beliefs')) markCount += 1;
@@ -824,32 +853,32 @@ function _collectProbabilistMarkCount(baseCount) {
 
 
 // _snapshotMarkedCells - returns a Set of all cell ids that are currently marked (userGrid === 2).
-function _snapshotMarkedCells() {
+export function _snapshotMarkedCells() {
     const marked = new Set();
-    if (!cur) return marked;
-    const sol = cur.grid;
+    if (!globalThis.cur) return marked;
+    const sol = globalThis.cur.grid;
     for (let r = 0; r < sol.length; r++)
         for (let c = 0; c < sol[0].length; c++)
-            if (userGrid[r][c] === 2) marked.add(`g-${r}-${c}`);
+            if (globalThis.userGrid[r][c] === 2) marked.add(`g-${r}-${c}`);
     return marked;
 }
 
 
 // _collectNewlyMarkedCells - returns the cell ids that are now marked but were not in the snapshot.
-function _collectNewlyMarkedCells(markedBefore) {
+export function _collectNewlyMarkedCells(markedBefore) {
     const newlyMarked = [];
-    if (!cur) return newlyMarked;
-    const sol = cur.grid;
+    if (!globalThis.cur) return newlyMarked;
+    const sol = globalThis.cur.grid;
     for (let r = 0; r < sol.length; r++)
         for (let c = 0; c < sol[0].length; c++)
-            if (userGrid[r][c] === 2 && !markedBefore.has(`g-${r}-${c}`))
+            if (globalThis.userGrid[r][c] === 2 && !markedBefore.has(`g-${r}-${c}`))
                 newlyMarked.push(`g-${r}-${c}`);
     return newlyMarked;
 }
 
 
 // _applyProbabilistBonusReveals - reveals bonus cells for confirmed_hypothesis / god_of_probabilities.
-function _applyProbabilistBonusReveals() {
+export function _applyProbabilistBonusReveals() {
     let bonusReveals = 0;
     if (ptHasSkill('confirmed_hypothesis')) bonusReveals += 1;
     if (ptHasSkill('god_of_probabilities')) bonusReveals += 1;
@@ -859,14 +888,14 @@ function _applyProbabilistBonusReveals() {
 
 // _applyProbabilistPassive - runs the delayed Bayesian Insight auto-mark sequence
 //   for the Probabilist at level start.
-function _applyProbabilistPassive(effect) {
+export function _applyProbabilistPassive(effect) {
     if (!effect.autoMarkCount) return;
 
     setTimeout(() => {
         const markCount = _collectProbabilistMarkCount(effect.autoMarkCount);
         const markedBefore = _snapshotMarkedCells();
 
-        markWrongTiles(markCount);
+        globalThis.markWrongTiles(markCount);
         Audio_Manager.playSFX('bayesianInsight');
         trackAchStat('bayesianInsightUsed');
 
@@ -882,27 +911,27 @@ function _applyProbabilistPassive(effect) {
 
 // _bayesianRevealOneCell - reveals 1 random unrevealed filled cell at level start.
 //   Used by confirmed_hypothesis and god_of_probabilities passive nodes.
-function _bayesianRevealOneCell() {
-    if (!cur) return;
-    const sol = cur.grid;
+export function _bayesianRevealOneCell() {
+    if (!globalThis.cur) return;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const candidates = [];
 
     for (let r = 0; r < rows; r++)
         for (let c = 0; c < cols; c++)
-            if (sol[r][c] === 1 && !revealedGrid[r][c] && userGrid[r][c] !== 1)
+            if (sol[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1)
                 candidates.push([r, c]);
 
     if (!candidates.length) return;
 
     const [r, c] = candidates[Math.floor(Math.random() * candidates.length)];
-    revealedGrid[r][c] = true;
-    userGrid[r][c] = 1;
+    globalThis.revealedGrid[r][c] = true;
+    globalThis.userGrid[r][c] = 1;
     renderCell(r, c);
     updClues(r, c);
     trackAchStat('tilesRevealed', 1);
-    _incDirect('lifetimeTilesRevealed', 1);
+    globalThis._incDirect('lifetimeTilesRevealed', 1);
 
     if (typeof _playBayesianRevealEffect === 'function') {
         const cellEl = document.getElementById(`g-${r}-${c}`);
@@ -915,21 +944,21 @@ function _bayesianRevealOneCell() {
 //   Resets all per-level state, then applies the class passive starting bonus.
 //   Must fire on EVERY puzzle, including chained puzzles inside a map
 //   (endgame encounter chain). See _egTransitionToChainPuzzle.
-function applyClassPassiveOnLevelStart() {
+export function applyClassPassiveOnLevelStart() {
     _resetClassLevelState();
 
-    if (!STATE.playerClass || isClassless()) {
+    if (!globalThis.STATE.playerClass || globalThis.isClassless()) {
         // Still mark that class passives were considered for this Gi so the
         // chain guarantee does not re-fire unnecessarily.
-        window._egClassPassiveAppliedForGi = cur ? cur.gIdx : null;
+        window._egClassPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : null;
         return;
     }
 
     const effect = _getPassiveEffect();
 
-    if (STATE.playerClass === 'mathmagician') _applyMathmagicianPassive(effect);
-    if (STATE.playerClass === 'probabilist') _applyProbabilistPassive(effect);
-    window._egClassPassiveAppliedForGi = cur ? cur.gIdx : null;
+    if (globalThis.STATE.playerClass === 'mathmagician') _applyMathmagicianPassive(effect);
+    if (globalThis.STATE.playerClass === 'probabilist') _applyProbabilistPassive(effect);
+    window._egClassPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : null;
 }
 
 
@@ -945,11 +974,11 @@ function applyClassPassiveOnLevelStart() {
 
 // _applyMathmagicianShieldAbsorb - consumes one free-mistake charge and optionally
 //   grants bonus time via passive tree nodes. Returns true if the penalty was absorbed.
-function _applyMathmagicianShieldAbsorb() {
+export function _applyMathmagicianShieldAbsorb() {
     if (window._classFreeMistakes <= 0) return false;
 
     window._classFreeMistakes--;
-    absorbedMistakes++;
+    globalThis.absorbedMistakes++;
     buildClassHUD();
     Audio_Manager.playSFX('varianceShield');
     trackAchStat('mistakesAbsorbed');
@@ -968,15 +997,15 @@ function _applyMathmagicianShieldAbsorb() {
 
     if (bonus > 0) {
         // Active map run: "% less Time gained from Item and Ability effects"
-        if (typeof _egMapTimeGainMult === 'function') bonus = Math.round(bonus * _egMapTimeGainMult());
-        const before = timerSecs;
-        timerSecs = Math.min(timerSecs + bonus, 3600);
-        _trackTimerDelta(before, timerSecs);
+        if (typeof globalThis._egMapTimeGainMult === 'function') bonus = Math.round(bonus * globalThis._egMapTimeGainMult());
+        const before = globalThis.timerSecs;
+        globalThis.timerSecs = Math.min(globalThis.timerSecs + bonus, 3600);
+        _trackTimerDelta(before, globalThis.timerSecs);
         updTimer();
 
         const msg = t('cls_shield_absorbed_time').replace('{n}', bonus);
 
-        showToast(msg);
+        globalThis.showToast(msg);
 
         // Floating "+Xs" feedback so the proc is visible beyond the toast
         if (typeof playTimeGainEffect === 'function') {
@@ -996,20 +1025,20 @@ function _applyMathmagicianShieldAbsorb() {
 //   Returns 0.0 if the penalty should be fully blocked (absorbed by a free mistake).
 //   Returns 5.0 if a Black Swan streak is broken (heavy punishment).
 //   Returns 1.0 for all other cases (standard penalty).
-function getClassPenaltyMultiplier() {
-    if (!STATE.playerClass || isClassless()) return 1.0;
+export function getClassPenaltyMultiplier() {
+    if (!globalThis.STATE.playerClass || globalThis.isClassless()) return 1.0;
 
     // Breaking an active Speedforce (Black Swan) streak ends it unnaturally and applies a heavy penalty
     if (window._blackSwanActive) {
         _endBlackSwan(false);
-        showToast(t('cls_speedforce_broken'));
+        globalThis.showToast(t('cls_speedforce_broken'));
         return 5.0;
     }
 
     // Mathmagician Variance Shield absorbs the mistake entirely.
     // Null Hypothesis / Asymptotic Mastery disable shields of all kinds,
     // so the class-passive absorption is skipped as well.
-    if (STATE.playerClass === 'mathmagician'
+    if (globalThis.STATE.playerClass === 'mathmagician'
         && !ptHasSkill('keystone_null_hypothesis')
         && !ptHasSkill('keystone_asymptotic_mastery')) {
         const absorbed = _applyMathmagicianShieldAbsorb();
@@ -1031,7 +1060,7 @@ function getClassPenaltyMultiplier() {
 
 // _handleTransitionMatrixCascade - if Transition Matrix is active, cascade from the
 //   newly filled cell. Clears the effect if its duration has expired.
-function _handleTransitionMatrixCascade(row, col) {
+export function _handleTransitionMatrixCascade(row, col) {
     if (!window._transitionMatrixActive) return;
     if (typeof _transitionMatrixCascade !== 'function') return;
 
@@ -1047,8 +1076,8 @@ function _handleTransitionMatrixCascade(row, col) {
 // _handleMathmagicianFreezeBonus - during Absolute Zero, awards passive bonuses
 //   for correct fills. frozen_resilience grants +1 shield every 5 fills;
 //   god_of_math reduces the Arcane Reveal cooldown by 1s per fill.
-function _handleMathmagicianFreezeBonus() {
-    if (STATE.playerClass !== 'mathmagician' || !window._freezeActive) return;
+export function _handleMathmagicianFreezeBonus() {
+    if (globalThis.STATE.playerClass !== 'mathmagician' || !window._freezeActive) return;
 
     if (ptHasSkill('frozen_resilience')) {
         window._freezeCorrFills = (window._freezeCorrFills || 0) + 1;
@@ -1057,7 +1086,7 @@ function _handleMathmagicianFreezeBonus() {
 
             _varianceShield_updateVisibility(); 
 
-            showToast(t('cls_frozen_resilience'));
+            globalThis.showToast(t('cls_frozen_resilience'));
 
             // Icy grid pulse so the charge gain is visible in play
             if (typeof playShieldChargePulseEffect === 'function') {
@@ -1079,7 +1108,7 @@ function _handleMathmagicianFreezeBonus() {
 // _handlePrecisionMarkMomentum - if momentum_of_certainty is active and the filled
 //   cell is inside the tracked Precision Mark window, grants +20s and clears the
 //   cell from the window (auto-closes when all tracked cells are filled).
-function _handlePrecisionMarkMomentum(row, col) {
+export function _handlePrecisionMarkMomentum(row, col) {
     if (!ptHasSkill('momentum_of_certainty')) return;
     if (!window._pmMomentumActive || !window._pmMomentumSet) return;
 
@@ -1087,10 +1116,10 @@ function _handlePrecisionMarkMomentum(row, col) {
     if (!window._pmMomentumSet.has(id)) return;
 
     window._pmMomentumSet.delete(id);
-    const before = timerSecs;
-    timerSecs = Math.min(timerSecs + 20, 3600);
-    _trackTimerDelta(before, timerSecs);
-    showToast(t('cls_momentum_certainty'));
+    const before = globalThis.timerSecs;
+    globalThis.timerSecs = Math.min(globalThis.timerSecs + 20, 3600);
+    _trackTimerDelta(before, globalThis.timerSecs);
+    globalThis.showToast(t('cls_momentum_certainty'));
     if (typeof playTimeGainEffect === 'function') playTimeGainEffect('+20s', '#ffb830');
     trackAchStat('timeAdded', 20);
 
@@ -1103,7 +1132,7 @@ function _handlePrecisionMarkMomentum(row, col) {
 
 // _handleStatisticianStreak - advances or triggers the Statistician fill streak.
 //   Black Swan mode bypasses the streak counter and fires momentum on every fill.
-function _handleStatisticianStreak(effect, row, col) {
+export function _handleStatisticianStreak(effect, row, col) {
     if (window._blackSwanActive) {
         // Black Swan: momentum on every correct fill, no streak required
         _momentumSpawnParticle(row, col);
@@ -1126,13 +1155,13 @@ function _handleStatisticianStreak(effect, row, col) {
 
 // onCorrectFill - called from ac() in mouse-button-handlers.js whenever the player
 //   correctly fills a cell. Runs all passive reactions in priority order.
-function onCorrectFill(row, col) {
+export function onCorrectFill(row, col) {
     _handleTransitionMatrixCascade(row, col);
     _handleMathmagicianFreezeBonus();
     _handlePrecisionMarkMomentum(row, col);
 
     // Statistician streak logic only applies to the Statistician class
-    if (STATE.playerClass !== 'statistician' || isClassless()) return;
+    if (globalThis.STATE.playerClass !== 'statistician' || globalThis.isClassless()) return;
     _handleStatisticianStreak(_getPassiveEffect(), row, col);
 }
 
@@ -1149,7 +1178,7 @@ function onCorrectFill(row, col) {
 // _getStatisticianStreakReduction - returns how many streak points a mistake costs
 //   based on which passive tree nodes are active.
 //   learning_from_mistakes + mistakes_no_matter together: -10. Either alone: -12. Neither: full reset.
-function _getStatisticianStreakReduction(hasLFM, hasMNM) {
+export function _getStatisticianStreakReduction(hasLFM, hasMNM) {
     if (hasLFM && hasMNM) return 10;
     if (hasLFM || hasMNM) return 12;
     return null; // null signals a full reset
@@ -1159,8 +1188,8 @@ function _getStatisticianStreakReduction(hasLFM, hasMNM) {
 
 // onMistake - called on any wrong fill (from input.js).
 //   Resets or reduces the Statistician fill streak depending on passive tree nodes.
-function onMistake() {
-    if (STATE.playerClass === 'statistician' && !isClassless()) {
+export function onMistake() {
+    if (globalThis.STATE.playerClass === 'statistician' && !globalThis.isClassless()) {
         _momentumParticlesOnMistake();
 
         const effect = _getPassiveEffect();

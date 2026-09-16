@@ -1,4 +1,15 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { t } from '../../translation/translations.js';
+import { _egHzGridRect } from '../endgame-hazards.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE SPROUT (boss_sprout)-----------------------
 //------------------------------------------------------------------------
 // Garden-siege fight: the Sprout overgrows the PUZZLE itself. You fight
@@ -61,50 +72,50 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Garden tuning ───────────────────────────────────────────────────────
 // Root Network (vines on cells)
-const EG_SPROUT_VINE_INTERVAL_MS = [0, 4500, 3600, 2800]; // per boss phase
-const EG_SPROUT_VINE_CAP = [0, 3, 5, 7];     // vines alive at once per phase
-const EG_SPROUT_VINE_LIFETIME_MS = 12000;    // withers on its own
+export const EG_SPROUT_VINE_INTERVAL_MS = [0, 4500, 3600, 2800]; // per boss phase
+export const EG_SPROUT_VINE_CAP = [0, 3, 5, 7];     // vines alive at once per phase
+export const EG_SPROUT_VINE_LIFETIME_MS = 12000;    // withers on its own
 // Spore Drift (screen hazard)
-const EG_SPROUT_SPORE_INTERVAL_MS = [0, 3200, 2400, 1800];
-const EG_SPROUT_SPORE_DMG = 0.025;   // %maxHP per spore (physical)
-const EG_SPROUT_SPORE_CD_MS = 500;   // global spore-hit cooldown
-const EG_SPROUT_SPORE_SPEED = [0, 70, 90, 110]; // px/s drift
+export const EG_SPROUT_SPORE_INTERVAL_MS = [0, 3200, 2400, 1800];
+export const EG_SPROUT_SPORE_DMG = 0.025;   // %maxHP per spore (physical)
+export const EG_SPROUT_SPORE_CD_MS = 500;   // global spore-hit cooldown
+export const EG_SPROUT_SPORE_SPEED = [0, 70, 90, 110]; // px/s drift
 // Bramble Wall (60% gate)
-const EG_SPROUT_BRAMBLE_MS = 10000;  // wall lifetime
-const EG_SPROUT_WHIP_DMG = 0.12;     // %maxHP per whip (physical)
-const EG_SPROUT_WHIP_LEN = 230;      // px a lash reaches beyond the grid edge
-const EG_SPROUT_WHIP_OUT_MS = 500;   // extend time
-const EG_SPROUT_WHIP_HOLD_MS = 800;  // fully extended
-const EG_SPROUT_WHIP_BACK_MS = 400;  // retract
-const EG_SPROUT_WHIP_TIMES = [1400, 4600, 7800]; // lash moments inside the wall
+export const EG_SPROUT_BRAMBLE_MS = 10000;  // wall lifetime
+export const EG_SPROUT_WHIP_DMG = 0.12;     // %maxHP per whip (physical)
+export const EG_SPROUT_WHIP_LEN = 230;      // px a lash reaches beyond the grid edge
+export const EG_SPROUT_WHIP_OUT_MS = 500;   // extend time
+export const EG_SPROUT_WHIP_HOLD_MS = 800;  // fully extended
+export const EG_SPROUT_WHIP_BACK_MS = 400;  // retract
+export const EG_SPROUT_WHIP_TIMES = [1400, 4600, 7800]; // lash moments inside the wall
 // Blooming Doom (30% gate)
-const EG_SPROUT_BUD_MS = 3200;       // bud growth (telegraph)
-const EG_SPROUT_BUD_R = 34;          // bud visual radius
-const EG_SPROUT_MOTE_N = 8;          // pollen motes per bloom
-const EG_SPROUT_MOTE_SPEED = 260;    // px/s
-const EG_SPROUT_MOTE_DMG = 0.025;    // %maxHP per mote (physical)
-const EG_SPROUT_MOTE_CD_MS = 450;    // global mote-hit cooldown
-const EG_SPROUT_MOTE_LIFE_MS = 2200;
-const EG_SPROUT_DUST_MS = 6500;      // pollen dust on cells
-const EG_SPROUT_DUST_BURST = 0.06;   // %maxHP when a dusted cell is disturbed
-const EG_SPROUT_DUST_BURST_CD_MS = 1200; // min gap between bursts (naive sweeps bleed, not die)
-const EG_SPROUT_DUST_WARN_MS = 1600; // dust visibly blinks this long before clearing
-const EG_SPROUT_REBLOOM_MS = 8000;   // next bud after a bloom (phase 3)
-const EG_SPROUT_BUDS_MAX = 3;        // buds per fight at most
+export const EG_SPROUT_BUD_MS = 3200;       // bud growth (telegraph)
+export const EG_SPROUT_BUD_R = 34;          // bud visual radius
+export const EG_SPROUT_MOTE_N = 8;          // pollen motes per bloom
+export const EG_SPROUT_MOTE_SPEED = 260;    // px/s
+export const EG_SPROUT_MOTE_DMG = 0.025;    // %maxHP per mote (physical)
+export const EG_SPROUT_MOTE_CD_MS = 450;    // global mote-hit cooldown
+export const EG_SPROUT_MOTE_LIFE_MS = 2200;
+export const EG_SPROUT_DUST_MS = 6500;      // pollen dust on cells
+export const EG_SPROUT_DUST_BURST = 0.06;   // %maxHP when a dusted cell is disturbed
+export const EG_SPROUT_DUST_BURST_CD_MS = 1200; // min gap between bursts (naive sweeps bleed, not die)
+export const EG_SPROUT_DUST_WARN_MS = 1600; // dust visibly blinks this long before clearing
+export const EG_SPROUT_REBLOOM_MS = 8000;   // next bud after a bloom (phase 3)
+export const EG_SPROUT_BUDS_MAX = 3;        // buds per fight at most
 // Vine Lunge (the boss's charge-bar attack)
-const EG_SPROUT_LUNGE_WARN_MS = 1050; // telegraph before the whip
-const EG_SPROUT_LUNGE_STRIKE_MS = 350; // the tendril is live (hot)
-const EG_SPROUT_LUNGE_FADE_MS = 700;  // tendril retracts
-const EG_SPROUT_LUNGE_H = 56;         // tendril band width (px)
-const EG_SPROUT_LUNGE_DMG = [0, 0.11, 0.14, 0.17]; // %maxHP by boss phase
+export const EG_SPROUT_LUNGE_WARN_MS = 1050; // telegraph before the whip
+export const EG_SPROUT_LUNGE_STRIKE_MS = 350; // the tendril is live (hot)
+export const EG_SPROUT_LUNGE_FADE_MS = 700;  // tendril retracts
+export const EG_SPROUT_LUNGE_H = 56;         // tendril band width (px)
+export const EG_SPROUT_LUNGE_DMG = [0, 0.11, 0.14, 0.17]; // %maxHP by boss phase
 
 
-let _egSproutWatcher = null; // per-fight garden state
-let _egSproutLungeActive = false; // a vine lunge set-piece is running
+export let _egSproutWatcher = null; // per-fight garden state
+export let _egSproutLungeActive = false; // a vine lunge set-piece is running
 
 
 // Sweep every garden overlay off the grid and screen. Safe to call twice.
-function _egSproutSweep() {
+export function _egSproutSweep() {
     _egSproutLungeActive = false;
     try {
         document.querySelectorAll('.eg-sprout-vine, .eg-sprout-dust, .eg-sprout-bramble, .eg-sprout-whip, .eg-sprout-bud, .eg-sprout-spore, .eg-sprout-mote, .eg-sprout-lunge, .eg-sprout-conn, .eg-sprout-ringlock').forEach(el => el.remove());
@@ -114,7 +125,7 @@ function _egSproutSweep() {
 
 
 // Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-function _egSproutTeardown() {
+export function _egSproutTeardown() {
     const st = _egSproutWatcher;
     _egSproutWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
@@ -125,9 +136,9 @@ function _egSproutTeardown() {
 
 
 // Unsolved cells (player value ≠ solution value) - the vine pool.
-function _egSproutVinePool() {
-    if (typeof cur === 'undefined' || !cur || !cur.grid) return [];
-    const sol = cur.grid, usr = (typeof userGrid !== 'undefined') ? userGrid : null;
+export function _egSproutVinePool() {
+    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid) return [];
+    const sol = globalThis.cur.grid, usr = (typeof userGrid !== 'undefined') ? globalThis.userGrid : null;
     if (!usr) return [];
     const pool = [];
     for (let r = 0; r < sol.length; r++)
@@ -138,7 +149,7 @@ function _egSproutVinePool() {
 }
 
 
-function _egSproutAddVine(r, c) {
+export function _egSproutAddVine(r, c) {
     const key = `eg-vine-${r}-${c}`;
     if (document.getElementById(key)) return;
     const cell = document.getElementById(`g-${r}-${c}`);
@@ -155,7 +166,7 @@ function _egSproutAddVine(r, c) {
 // Click intercept (mouse-button-handlers.js): prune vines, block brambled
 // ring cells, and burst pollen when a dusted cell is disturbed.
 // Returns true when the click is consumed (no fill/mark happens).
-function _egSproutCellIntercept(row, col) {
+export function _egSproutCellIntercept(row, col) {
     const st = _egSproutWatcher;
     if (!st) return false;
     // Vined cell: this click prunes the vine only.
@@ -164,14 +175,14 @@ function _egSproutCellIntercept(row, col) {
         el.classList.add('prune');
         setTimeout(() => { try { el.remove(); } catch (e) {} }, 240);
         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_prune'); } catch (e) {}
-        showToast(t('eg_sprout_pruned'));
+        globalThis.showToast(t('eg_sprout_pruned'));
         return true;
     }
     // Bramble Wall: outermost ring of the grid is sealed while it lives.
-    if (st.bramble && typeof cur !== 'undefined' && cur && cur.grid) {
-        const rows = cur.grid.length, cols = cur.grid[0] ? cur.grid[0].length : 0;
+    if (st.bramble && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
+        const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0] ? globalThis.cur.grid[0].length : 0;
         if (rows && cols && (row === 0 || col === 0 || row === rows - 1 || col === cols - 1)) {
-            showToast(t('eg_sprout_bramble_locked'));
+            globalThis.showToast(t('eg_sprout_bramble_locked'));
             return true;
         }
     }
@@ -182,7 +193,7 @@ function _egSproutCellIntercept(row, col) {
 }
 
 
-function _egSproutPollenBurst(st) {
+export function _egSproutPollenBurst(st) {
     const now = performance.now();
     if (now < st.dustCd) return;
     st.dustCd = now + EG_SPROUT_DUST_BURST_CD_MS;
@@ -209,7 +220,7 @@ function _egSproutPollenBurst(st) {
 // then whips - Brutus's Ground Slam pattern, but a line instead of a band.
 // Own dodge-type run: dodge-busy holds so no other mechanic overlaps, and
 // pause-safe (the telegraph freezes with the rest of the game).
-function _egSproutVineLunge(monster) {
+export function _egSproutVineLunge(monster) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
     const level = monster ? monster.level : 1;
@@ -271,7 +282,7 @@ function _egSproutVineLunge(monster) {
 
 // ── the persistent garden watcher ───────────────────────────────────────
 
-function _egSproutArenaInit(monster) {
+export function _egSproutArenaInit(monster) {
     if (_egSproutWatcher) return;
     const monsterId = monster ? monster.id : null;
     const level = monster ? monster.level : 1;
@@ -301,8 +312,8 @@ function _egSproutArenaInit(monster) {
     };
 
     _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-            ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -490,7 +501,7 @@ function _egSproutArenaInit(monster) {
 
 // ── 60% gate: Bramble Wall ──────────────────────────────────────────────
 
-function _egSproutBrambleWall(st) {
+export function _egSproutBrambleWall(st) {
     if (st.bramble) return;
     const gridR = (typeof _egHzGridRect === 'function') ? _egHzGridRect() : null;
     if (!gridR) return;
@@ -530,8 +541,8 @@ function _egSproutBrambleWall(st) {
     // ring of cells (connector from the strip into each ring cell) and every
     // ring cell gets a thorn badge + pulsing green seal - so "these cells are
     // the ones the wall is blocking" reads at a glance.
-    const rows = (typeof cur !== 'undefined' && cur && cur.grid) ? cur.grid.length : 0;
-    const cols = rows ? (cur.grid[0] ? cur.grid[0].length : 0) : 0;
+    const rows = (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) ? globalThis.cur.grid.length : 0;
+    const cols = rows ? (globalThis.cur.grid[0] ? globalThis.cur.grid[0].length : 0) : 0;
     const connEls = [], lockEls = [];
     if (rows && cols) {
         let i = 0;
@@ -579,12 +590,12 @@ function _egSproutBrambleWall(st) {
 
 // ── 30% gate: Blooming Doom ─────────────────────────────────────────────
 
-function _egSproutGrowBud(st) {
+export function _egSproutGrowBud(st) {
     const pool = _egSproutVinePool();
     const all = [];
-    if (typeof cur !== 'undefined' && cur && cur.grid) {
-        for (let r = 0; r < cur.grid.length; r++)
-            for (let c = 0; c < cur.grid[r].length; c++)
+    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
+        for (let r = 0; r < globalThis.cur.grid.length; r++)
+            for (let c = 0; c < globalThis.cur.grid[r].length; c++)
                 all.push([r, c]);
     }
     const spot = (pool.length ? pool : all)[Math.floor(Math.random() * Math.max(1, (pool.length ? pool : all).length))];
@@ -603,7 +614,7 @@ function _egSproutGrowBud(st) {
 }
 
 
-function _egSproutBloom(st, br, bc, tNow) {
+export function _egSproutBloom(st, br, bc, tNow) {
     // Dust deadlines are stored relative to the run's internal (tier-scaled)
     // clock, and the accumulator resets here so this bloom's dust counts its
     // full 6.5s from now (buds are 8s apart, so earlier dust has always
@@ -612,8 +623,8 @@ function _egSproutBloom(st, br, bc, tNow) {
     void tNow;
     // 1) Pollen-dust a 5x5 region around the bloom (unsolved cells only).
     let dusted = 0;
-    if (typeof cur !== 'undefined' && cur && cur.grid && (typeof userGrid !== 'undefined')) {
-        const sol = cur.grid, usr = userGrid;
+    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid && (typeof userGrid !== 'undefined')) {
+        const sol = globalThis.cur.grid, usr = globalThis.userGrid;
         for (let r = br - 2; r <= br + 2; r++) {
             for (let c = bc - 2; c <= bc + 2; c++) {
                 if (r < 0 || c < 0 || r >= sol.length || c >= sol[r].length) continue;
@@ -658,7 +669,7 @@ function _egSproutBloom(st, br, bc, tNow) {
 // The classic chase - a pack of sproutlings scuttles after the player for
 // a while. Kept from the original fight, now phase-scaled and with the
 // polished leaf-wiggle visual.
-function _egMechSproutlings(monster, phase) {
+export function _egMechSproutlings(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = [0, 6, 7, 8][p];

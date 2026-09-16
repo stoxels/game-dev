@@ -1,4 +1,8 @@
-﻿// class-hud-ls-tooltip.js
+﻿import { ASCENDENCY_DEFS } from './ascendency-defs.js';
+import { getEffectiveCooldown } from './class-cooldown-state.js';
+import { CLASS_DEFS } from './class-defs.js';
+import { HUD_COLOR_PASSIVE, _applyTooltipPosition, _formatCooldownLabel, _getAscendencySkillLevel, _getRankWord, getLocalDesc, getLocalName } from './class-hud.js';
+// class-hud-ls-tooltip.js
 // Level-select screen class summary tooltip: shows the chosen class's passive,
 // both active skills, and (if unlocked) ascendency skills, with current ranks.
 //
@@ -14,7 +18,7 @@
 // Resolves the effective cooldown for a level-select tooltip slot after all
 // reductions (passive tree nodes + endgame gear). Falls back to the base
 // value when the cooldown engine is not loaded yet.
-function _getLsEffectiveCooldown(slot, baseSeconds) {
+export function _getLsEffectiveCooldown(slot, baseSeconds) {
     if (typeof getEffectiveCooldown === 'function') {
         try {
             return getEffectiveCooldown(slot, baseSeconds);
@@ -27,7 +31,7 @@ function _getLsEffectiveCooldown(slot, baseSeconds) {
 // e.g. " ⏱ 2m"  (lower opacity, smaller font). When the effective cooldown
 // differs from the base (gear / passive reductions), the base is shown in
 // parens: " ⏱ 2m (base 5m)".
-function _buildLsCooldownAnnotation(cooldownSeconds, baseSeconds) {
+export function _buildLsCooldownAnnotation(cooldownSeconds, baseSeconds) {
     const effSec = Math.ceil(cooldownSeconds || 0);
     const effStr = _formatCooldownLabel(effSec);
     if (baseSeconds != null) {
@@ -40,7 +44,7 @@ function _buildLsCooldownAnnotation(cooldownSeconds, baseSeconds) {
 }
 
 // Builds the MAX rank badge shown next to a skill rank when it is maxed out.
-function _buildMaxRankBadge(level) {
+export function _buildMaxRankBadge(level) {
     return level >= 3
         ? ` <span style="color:#27ae60;font-size:.85em">✓ MAX</span>`
         : '';
@@ -58,7 +62,7 @@ function _buildMaxRankBadge(level) {
 // Used for both base class and ascendency skills. cooldownSeconds should
 // already be the EFFECTIVE value; pass the unreduced base via baseCooldownSeconds
 // so reductions remain visible. Older callers that pass only 6 args keep working.
-function _buildLsSkillBlock(nameHTML, rankWord, level, maxLevel, cooldownSeconds, descHTML, baseCooldownSeconds) {
+export function _buildLsSkillBlock(nameHTML, rankWord, level, maxLevel, cooldownSeconds, descHTML, baseCooldownSeconds) {
     return `
         <div style="color:#f1c40f;margin-bottom:2px;">
             🎯 ${nameHTML}
@@ -70,9 +74,9 @@ function _buildLsSkillBlock(nameHTML, rankWord, level, maxLevel, cooldownSeconds
 
 // Builds the ascendency section HTML block for the level-select tooltip.
 // Returns an empty string when no ascendency is active.
-function _buildLsAscendencySection(rankWord) {
-    if (!STATE.playerAscendency || !ASCENDENCY_DEFS[STATE.playerAscendency]) return '';
-    const asc = ASCENDENCY_DEFS[STATE.playerAscendency];
+export function _buildLsAscendencySection(rankWord) {
+    if (!globalThis.STATE.playerAscendency || !ASCENDENCY_DEFS[globalThis.STATE.playerAscendency]) return '';
+    const asc = ASCENDENCY_DEFS[globalThis.STATE.playerAscendency];
 
     const ascName = getLocalName(asc);
     const sk1Name = getLocalName(asc.active1);
@@ -125,14 +129,14 @@ function _buildLsAscendencySection(rankWord) {
 
 // Builds the full HTML for the class summary tooltip shown on the level-select screen.
 // Covers the class header, passive skill, both active skills, and the ascendency section.
-function buildLsClassTooltipHTML() {
-    if (!STATE.playerClass || !CLASS_DEFS[STATE.playerClass]) return '';
-    const def = CLASS_DEFS[STATE.playerClass];
+export function buildLsClassTooltipHTML() {
+    if (!globalThis.STATE.playerClass || !CLASS_DEFS[globalThis.STATE.playerClass]) return '';
+    const def = CLASS_DEFS[globalThis.STATE.playerClass];
     const rankWord = _getRankWord();
 
-    const passLv = STATE.classPassiveLevel || 1;
-    const act1Lv = STATE.classActive1Level || 1;
-    const act2Lv = STATE.classActive2Level || 1;
+    const passLv = globalThis.STATE.classPassiveLevel || 1;
+    const act1Lv = globalThis.STATE.classActive1Level || 1;
+    const act2Lv = globalThis.STATE.classActive2Level || 1;
 
     const passData = def.passive.levels[passLv - 1];
     const act1Data = def.active1.levels[act1Lv - 1];
@@ -177,7 +181,7 @@ function buildLsClassTooltipHTML() {
 
 // Returns (creating if needed) the singleton tooltip element used on the
 // level-select screen to show full class and ascendency skill details.
-function _getLsClassTooltipEl() {
+export function _getLsClassTooltipEl() {
     let tip = document.getElementById('ls-class-tooltip');
     if (!tip) {
         tip = document.createElement('div');
@@ -207,7 +211,7 @@ function _getLsClassTooltipEl() {
 }
 
 // Shows the level-select class tooltip with fresh content at the cursor position.
-function showLsClassTooltip(e) {
+export function showLsClassTooltip(e) {
     const tip = _getLsClassTooltipEl();
     tip.innerHTML = buildLsClassTooltipHTML();
     tip.style.opacity = '1';
@@ -215,12 +219,12 @@ function showLsClassTooltip(e) {
 }
 
 // Updates the level-select class tooltip position as the cursor moves.
-function moveLsClassTooltip(e) {
+export function moveLsClassTooltip(e) {
     _applyTooltipPosition(_getLsClassTooltipEl(), e);
 }
 
 // Hides the level-select class tooltip.
-function hideLsClassTooltip() {
+export function hideLsClassTooltip() {
     const tip = document.getElementById('ls-class-tooltip');
     if (tip) tip.style.opacity = '0';
 }

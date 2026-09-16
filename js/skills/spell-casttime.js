@@ -1,3 +1,6 @@
+﻿import { isSkillCharmUnlocked } from './skill-charms.js';
+import { activateHotbarSlot, activateSkill, canAffordSkill, getSkillCooldownRemaining, getSkillDef, getSkillName, isSkillUsableNow } from './skill-registry.js';
+import { isUniversalMovementSpell, isUniversalSupportSpell } from './universal-spells.js';
 // spell-casttime.js
 //------------------------------------------------------------------------
 //----------------------HOLD-TO-CAST (CAST BAR)---------------------------
@@ -29,7 +32,7 @@
 // Cast time of a skill in seconds (0 = instant). Reads the registry copy
 // first (universal spells mirror their def's castTimeSeconds there, the
 // Fireball carries its own), then falls back to parsing a '1.2s' string.
-function getSkillCastTimeSeconds(skillId) {
+export function getSkillCastTimeSeconds(skillId) {
     try {
         const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
         if (!def) return 0;
@@ -49,20 +52,20 @@ function getSkillCastTimeSeconds(skillId) {
 
 
 // True when the skill needs hold-to-cast instead of a plain click.
-function isSkillHoldCast(skillId) {
+export function isSkillHoldCast(skillId) {
     return getSkillCastTimeSeconds(skillId) > 0.05;
 }
 
 
 // Live hold state, or null while nothing is charging.
-let _holdCast = null;
+export let _holdCast = null;
 
 // Normalised keys currently driving a keyboard hold (blocks key-repeat
 // from restarting a cast while the key stays down).
-const _heldCastKeys = new Set();
+export const _heldCastKeys = new Set();
 
 // Theme → charge-orb / cast-bar tint. Falls back to arcane violet.
-const SPELL_CAST_THEME_COLORS = {
+export const SPELL_CAST_THEME_COLORS = {
     fire: '#ff7a2f', frost: '#7fd9ff', arcane: '#c792ff', shadow: '#a678ff',
     holy: '#ffd76b', nature: '#7fe0a0', lightning: '#ffe45e',
     blade: '#cfd6e4', arrow: '#b5e07f',
@@ -71,7 +74,7 @@ const SPELL_CAST_THEME_COLORS = {
 
 // Resolves the visual theme of a skill (fireball → fire, universal → its
 // theme, everything else → arcane).
-function _holdCastTheme(skillId) {
+export function _holdCastTheme(skillId) {
     try {
         if (skillId === 'fireball') return 'fire';
         const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
@@ -85,9 +88,9 @@ function _holdCastTheme(skillId) {
 // cast paths (cooldown, affordability, encounter/target) WITHOUT spending
 // anything or showing toasts - on failure the caller falls through to the
 // normal activation, which reports the reason itself.
-function _holdCastCanBegin(skillId) {
+export function _holdCastCanBegin(skillId) {
     try {
-        if (typeof dead !== 'undefined' && dead) return false;
+        if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return false;
         if (typeof isSkillUsableNow === 'function' && !isSkillUsableNow(skillId)) return false;
         if (typeof isSkillCharmUnlocked === 'function' && !isSkillCharmUnlocked(skillId)) return false;
         if (typeof getSkillCooldownRemaining === 'function' && getSkillCooldownRemaining(skillId) > 0) return false;
@@ -98,7 +101,7 @@ function _holdCastCanBegin(skillId) {
         const isFireball = skillId === 'fireball';
         if (isUniversal || isFireball) {
             let encounterOn = false;
-            try { encounterOn = (typeof _egIsActive === 'function') && _egIsActive(); } catch (e) {}
+            try { encounterOn = (typeof globalThis._egIsActive === 'function') && globalThis._egIsActive(); } catch (e) {}
             if (!encounterOn) return false;
             // Support / movement self-casts only need the live encounter;
             // everything offensive needs a target too.
@@ -109,7 +112,7 @@ function _holdCastCanBegin(skillId) {
             } catch (e) {}
             if (!selfCast) {
                 let target = null;
-                try { target = (typeof _egGetTarget === 'function') ? _egGetTarget() : null; } catch (e) {}
+                try { target = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null; } catch (e) {}
                 if (!target) return false;
             }
         }
@@ -126,7 +129,7 @@ function _holdCastCanBegin(skillId) {
 //   'casting'  - already charging this skill (key-repeat); swallow.
 //   'refused'  - hold spell, but a pre-gate failed; caller runs the normal
 //                activation so the player gets the usual toast.
-function tryBeginHoldCast(skillId, slotIndex, source) {
+export function tryBeginHoldCast(skillId, slotIndex, source) {
     if (!skillId || !isSkillHoldCast(skillId)) return 'instant';
     if (_holdCast && _holdCast.skillId === skillId) return 'casting';
     // One cast at a time: a new press replaces a stale hold (nothing was
@@ -164,7 +167,7 @@ function tryBeginHoldCast(skillId, slotIndex, source) {
 
 // Releases a hold: with source/key matching. Called on pointerup / keyup.
 // A full bar finishes the cast; anything less cancels it for free.
-function releaseHoldCast(source, slotIndex) {
+export function releaseHoldCast(source, slotIndex) {
     const h = _holdCast;
     if (!h || h.source !== source) return;
     if (typeof slotIndex === 'number' && h.slotIndex !== slotIndex) return;
@@ -175,7 +178,7 @@ function releaseHoldCast(source, slotIndex) {
 
 
 // Cancels the running hold (drag-away, death, manual cancel). Never spends.
-function cancelHoldCast() {
+export function cancelHoldCast() {
     const h = _holdCast;
     _holdCast = null;
     _holdCastHide(true);
@@ -185,14 +188,14 @@ function cancelHoldCast() {
 
 // Completes the cast: tears down the visuals, then fires through the normal
 // activation path (pays mana, starts cooldown, launches the projectile).
-function finishHoldCast() {
+export function finishHoldCast() {
     const h = _holdCast;
     _holdCast = null;
     _holdCastHide(false);
     if (h) _holdCastMarkSlot(h.skillId, false);
     if (!h) return;
     try {
-        if (typeof dead !== 'undefined' && dead) return;
+        if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return;
     } catch (e) { return; }
     try {
         if (typeof activateSkill === 'function') activateSkill(h.skillId);
@@ -206,14 +209,14 @@ function finishHoldCast() {
 // Frame driver: progress only accrues while the button is still held
 // (pause/death freeze or cancel; release-early is handled by the input
 // listeners, which flip held/cancel directly).
-function _holdCastTick() {
+export function _holdCastTick() {
     const h = _holdCast;
     if (!h) return;
     try {
-        if (typeof dead !== 'undefined' && dead) { cancelHoldCast(); return; }
+        if (typeof globalThis.dead !== 'undefined' && globalThis.dead) { cancelHoldCast(); return; }
     } catch (e) { cancelHoldCast(); return; }
     let paused = false;
-    try { paused = (typeof _gamePaused !== 'undefined' && _gamePaused); } catch (e) {}
+    try { paused = (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused); } catch (e) {}
     const now = performance.now();
     const dt = Math.min(0.1, Math.max(0, (now - h.lastTs) / 1000));
     h.lastTs = now;
@@ -230,7 +233,7 @@ function _holdCastTick() {
 //------------------------------------------------------------------------
 
 // Builds (once) the WoW-style cast bar pinned above the avatar's health bar.
-function _holdCastBarEls() {
+export function _holdCastBarEls() {
     let bar = document.getElementById('spell-castbar');
     if (bar) {
         return {
@@ -265,7 +268,7 @@ function _holdCastBarEls() {
 
 // Positions the cast bar directly above the avatar's bar stack (HP bar is
 // the stack's first row), so it reads as one more bar in that stack.
-function _holdCastPositionBar() {
+export function _holdCastPositionBar() {
     const bar = document.getElementById('spell-castbar');
     if (!bar) return;
     const avatar = document.getElementById('player-avatar-wrapper')
@@ -286,7 +289,7 @@ function _holdCastPositionBar() {
 // Builds the charging orb that swells over the avatar while held. The
 // fireball (and every other projectile spell) visibly grows here, then the
 // real projectile launches from the avatar on completion.
-function _holdCastOrbEl(theme) {
+export function _holdCastOrbEl(theme) {
     _holdCastRemoveOrb();
     const anchor = _holdCastAvatarCentre();
     const orb = document.createElement('div');
@@ -306,7 +309,7 @@ function _holdCastOrbEl(theme) {
 }
 
 
-function _holdCastRemoveOrb() {
+export function _holdCastRemoveOrb() {
     try {
         const old = document.getElementById('spell-charge-orb');
         if (old) old.remove();
@@ -315,19 +318,19 @@ function _holdCastRemoveOrb() {
 
 
 // Avatar centre in viewport coordinates (same anchors the projectiles use).
-function _holdCastAvatarCentre() {
+export function _holdCastAvatarCentre() {
     try {
-        if (typeof _egGetElementCentre !== 'function') return null;
+        if (typeof globalThis._egGetElementCentre !== 'function') return null;
         const avatar = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple')
             || document.getElementById('class-hud-drag-handle');
         if (!avatar) return null;
-        return _egGetElementCentre(avatar);
+        return globalThis._egGetElementCentre(avatar);
     } catch (e) { return null; }
 }
 
 
-function _holdCastShow(name, theme) {
+export function _holdCastShow(name, theme) {
     try {
         const els = _holdCastBarEls();
         const color = SPELL_CAST_THEME_COLORS[theme] || SPELL_CAST_THEME_COLORS.arcane;
@@ -348,7 +351,7 @@ function _holdCastShow(name, theme) {
 // Paints one frame: bar fill + spark position + orb growth. The orb scales
 // from a small ember to a full boulder as progress → 1. Fire spells add a
 // hotter outer flicker that intensifies with charge.
-function _holdCastPaint(p, theme) {
+export function _holdCastPaint(p, theme) {
     try {
         const els = _holdCastBarEls();
         if (els.fill) els.fill.style.width = `${Math.round(p * 100)}%`;
@@ -377,7 +380,7 @@ function _holdCastPaint(p, theme) {
 
 // Hides the bar; on cancel the orb fizzles, on completion it pops (the real
 // projectile takes over from the avatar at the same moment).
-function _holdCastHide(cancelled) {
+export function _holdCastHide(cancelled) {
     try {
         const bar = document.getElementById('spell-castbar');
         if (bar) bar.classList.remove('show');
@@ -396,7 +399,7 @@ function _holdCastHide(cancelled) {
 
 
 // Toggles the charging state on the hotbar slot(s) bound to the skill.
-function _holdCastMarkSlot(skillId, on) {
+export function _holdCastMarkSlot(skillId, on) {
     try {
         const bar = document.getElementById('skill-hotbar');
         if (!bar) return;
@@ -412,14 +415,14 @@ function _holdCastMarkSlot(skillId, on) {
 
 // Keyboard release: the keybind keydown path (skill-hotbar.js) starts the
 // hold; this ends it. Auto-repeat keydowns never reach here (keyup only).
-function _holdCastKeyup(e) {
+export function _holdCastKeyup(e) {
     const h = _holdCast;
     if (!h || h.source !== 'key' || typeof h.slotIndex !== 'number') return;
     try {
-        if (typeof keybindMatches === 'function' && !keybindMatches(e, `hotbar-${h.slotIndex + 1}`)) return;
+        if (typeof globalThis.keybindMatches === 'function' && !globalThis.keybindMatches(e, `hotbar-${h.slotIndex + 1}`)) return;
     } catch (err) { return; }
     try {
-        if (typeof _keybindNormalize === 'function') _heldCastKeys.delete(_keybindNormalize(e));
+        if (typeof globalThis._keybindNormalize === 'function') _heldCastKeys.delete(globalThis._keybindNormalize(e));
     } catch (err) {}
     releaseHoldCast('key', h.slotIndex);
 }
@@ -427,14 +430,14 @@ function _holdCastKeyup(e) {
 
 // Pointer release anywhere (the press may have slid off the slot) and
 // drag-away cancel (a press that moves becomes a hotbar drag, not a cast).
-function _holdCastPointerUp() {
+export function _holdCastPointerUp() {
     if (_holdCast && _holdCast.source === 'pointer') {
         releaseHoldCast('pointer', _holdCast.slotIndex);
     }
 }
 
 
-function _holdCastPointerMove(e) {
+export function _holdCastPointerMove(e) {
     const h = _holdCast;
     if (!h || h.source !== 'pointer') return;
     if (h.startX === null || h.startY === null) return;
@@ -448,10 +451,10 @@ function _holdCastPointerMove(e) {
 
 // Forget a keyboard hold when its key is released anywhere (safety net for
 // the repeat guard, kept in sync by _holdCastKeyup).
-function _holdCastKeydownForget(e) {
+export function _holdCastKeydownForget(e) {
     try {
-        if (_holdCast && _holdCast.source === 'key' && typeof _keybindNormalize === 'function') {
-            _heldCastKeys.add(_keybindNormalize(e));
+        if (_holdCast && _holdCast.source === 'key' && typeof globalThis._keybindNormalize === 'function') {
+            _heldCastKeys.add(globalThis._keybindNormalize(e));
         }
     } catch (err) { /* best-effort */ }
 }

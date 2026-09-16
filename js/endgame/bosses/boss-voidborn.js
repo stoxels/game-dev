@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE VOIDBORN (boss_voidborn)-------------------------
 //------------------------------------------------------------------------
 // Pinnacle hunger: a collapsing choice - two zones, only the marked one
@@ -38,7 +46,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechVoidChoice(monster, phase) {
+export function _egMechVoidChoice(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const radius = 95;
@@ -98,7 +106,7 @@ function _egMechVoidChoice(monster, phase) {
     });
 }
 
-function _egMechVoidTendrils(monster, phase) {
+export function _egMechVoidTendrils(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = [0, 3, 4, 4][p];

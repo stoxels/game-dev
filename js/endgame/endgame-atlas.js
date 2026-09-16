@@ -1,4 +1,15 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { setAchStat, trackAchStat } from '../achievements/achievements.js';
+import { updateQuestStats } from '../quests/quests-stats.js';
+import { save } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { egSaveHubState } from './endgame-hub.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME ATLAS (POE-STYLE MAP GRAPH)------------------
 //------------------------------------------------------------------------
 // PoE-style atlas of the endgame map system, laid out like a classic
@@ -43,28 +54,28 @@
 //-------------------CONFIGURATION----------------------------------------
 //------------------------------------------------------------------------
 
-const EG_ATLAS_MAX_TIER = 16;
+export const EG_ATLAS_MAX_TIER = 16;
 
 // Tier bands drive both the atlas colours (game rarity palette) and the
 // difficulty a run must be finished on to clear the region:
 //   tiers I–V   → uncommon (green)  → Easy
 //   tiers VI–X  → rare     (blue)   → Normal
 //   tiers XI–XVI→ epic     (purple) → Hard
-const EG_ATLAS_TIER_BANDS = [
+export const EG_ATLAS_TIER_BANDS = [
     { maxTier: 5,  rarity: 'uncommon', difficulty: 'easy' },
     { maxTier: 10, rarity: 'rare',     difficulty: 'normal' },
     { maxTier: 16, rarity: 'epic',     difficulty: 'hard' },
 ];
 
 // Returns the tier band a tier belongs to.
-function egAtlasTierBand(tier) {
+export function egAtlasTierBand(tier) {
     const t = Math.max(1, Math.min(EG_ATLAS_MAX_TIER, Math.round(tier || 1)));
     return EG_ATLAS_TIER_BANDS.find(b => t <= b.maxTier) || EG_ATLAS_TIER_BANDS[EG_ATLAS_TIER_BANDS.length - 1];
 }
 
 // Game difficulty ('easy' | 'normal' | 'hard') a region of this tier
 // requires for its atlas clear.
-function egAtlasTierDifficulty(tier) {
+export function egAtlasTierDifficulty(tier) {
     return egAtlasTierBand(tier).difficulty;
 }
 
@@ -72,7 +83,7 @@ function egAtlasTierDifficulty(tier) {
 // Counts follow the classic two-continent layout. NOTE: the first entries
 // of every tier are the original regions in their original slot order -
 // keep that order for save compatibility.
-const EG_ATLAS_TIER_NAMES = [
+export const EG_ATLAS_TIER_NAMES = [
     // ── Tier 1 - the four outer corners ──────────────────────────────
     [
         ['Gaussian Grasslands', 'Gaußsche Graslande'],
@@ -220,7 +231,7 @@ const EG_ATLAS_TIER_NAMES = [
 //     90px towards the centre so their wide labels clear the diagonal
 //     neighbours' node squares (Asymptote Anchorage / Epsilon Shore)
 //   - tier 16 pinnacles: untouched
-const EG_ATLAS_TIER_POSITIONS = [
+export const EG_ATLAS_TIER_POSITIONS = [
     /* T1 */ [[680, -300], [680, 300], [-680, -300], [-680, 300]],
     /* T2 */ [[580, 280], [665, 150], [665, -150], [580, -280], [-580, 280], [-665, 150], [-665, -150], [-580, -280]],
     /* T3 */ [[590, 190], [590, -190], [-590, 190], [-590, -190]],
@@ -241,7 +252,7 @@ const EG_ATLAS_TIER_POSITIONS = [
 
 // Slot offset between a continent and its mirror, per tier (array index
 // = tier - 1). Half the tier's region count by construction.
-const EG_ATLAS_TIER_MIRROR_OFFSET = [2, 4, 2, 4, 4, 3, 3, 4, 2, 2, 2, 2, 2, 2, 3, 2];
+export const EG_ATLAS_TIER_MIRROR_OFFSET = [2, 4, 2, 4, 4, 3, 3, 4, 2, 2, 2, 2, 2, 2, 3, 2];
 
 
 //------------------------------------------------------------------------
@@ -251,9 +262,9 @@ const EG_ATLAS_TIER_MIRROR_OFFSET = [2, 4, 2, 4, 4, 3, 3, 4, 2, 2, 2, 2, 2, 2, 3
 // Flattened list of all atlas nodes:
 //   { id, tier, slot, x, y, name, nameDe, links: [nodeId, ...] }
 // x/y are offsets from the atlas centre, used directly by the atlas screen.
-const EG_ATLAS_NODES = [];
+export const EG_ATLAS_NODES = [];
 
-function _egLinkAtlasNodes(a, b) {
+export function _egLinkAtlasNodes(a, b) {
     if (!a || !b || a === b) return;
     if (!a.links.includes(b.id)) a.links.push(b.id);
     if (!b.links.includes(a.id)) b.links.push(a.id);
@@ -263,7 +274,7 @@ function _egLinkAtlasNodes(a, b) {
 // [tierA, slotA, tierB, slotB]. Same-tier links chain neighbouring
 // regions; cross-tier links form the linear paths from the corners
 // towards the centre. The western continent mirrors every entry.
-const EG_ATLAS_EK_LINKS = [
+export const EG_ATLAS_EK_LINKS = [
     // ── same tier ────────────────────────────────────────────────────
     [4, 0, 4, 1], [4, 0, 4, 2], [4, 1, 4, 2], [4, 1, 4, 3], [4, 2, 4, 3],
     [5, 0, 5, 1], [5, 1, 5, 2], [5, 2, 5, 3],
@@ -291,7 +302,7 @@ const EG_ATLAS_EK_LINKS = [
 
 // Bridges between the two continents (same-tier pairs facing each other,
 // and the fully cross-linked pinnacle cluster).
-const EG_ATLAS_BRIDGE_LINKS = [
+export const EG_ATLAS_BRIDGE_LINKS = [
     [10, 2, 10, 0], [10, 3, 10, 1],
     [11, 2, 11, 0], [11, 3, 11, 1],
     [12, 2, 12, 0], [12, 3, 12, 1],
@@ -341,7 +352,7 @@ const EG_ATLAS_BRIDGE_LINKS = [
     EG_ATLAS_BRIDGE_LINKS.forEach(([ta, sa, tb, sb]) => addLink(ta, sa, tb, sb));
 })();
 
-const EG_ATLAS_NODE_BY_ID = (() => {
+export const EG_ATLAS_NODE_BY_ID = (() => {
     const m = new Map();
     EG_ATLAS_NODES.forEach(n => m.set(n.id, n));
     return m;
@@ -352,17 +363,17 @@ const EG_ATLAS_NODE_BY_ID = (() => {
 //-------------------LOOKUP + STATUS HELPERS------------------------------
 //------------------------------------------------------------------------
 
-function egAtlasNodeById(id) {
+export function egAtlasNodeById(id) {
     return EG_ATLAS_NODE_BY_ID.get(id) || null;
 }
 
-function egAtlasIsCompleted(id) {
-    return !!(typeof STATE !== 'undefined' && STATE.egAtlasCompleted && STATE.egAtlasCompleted[id]);
+export function egAtlasIsCompleted(id) {
+    return !!(typeof STATE !== 'undefined' && globalThis.STATE.egAtlasCompleted && globalThis.STATE.egAtlasCompleted[id]);
 }
 
 // A node is reachable when it sits in tier 1 or when ANY connected node has
 // been completed (links only exist between equal / adjacent tiers).
-function egAtlasIsUnlocked(id) {
+export function egAtlasIsUnlocked(id) {
     const node = egAtlasNodeById(id);
     if (!node) return false;
     if (node.tier <= 1) return true;
@@ -370,22 +381,22 @@ function egAtlasIsUnlocked(id) {
 }
 
 // Highest tier with at least one completed node (0 when nothing cleared yet).
-function egAtlasHighestCompletedTier() {
-    if (typeof STATE === 'undefined' || !STATE.egAtlasCompleted) return 0;
+export function egAtlasHighestCompletedTier() {
+    if (typeof STATE === 'undefined' || !globalThis.STATE.egAtlasCompleted) return 0;
     let highest = 0;
-    for (const id in STATE.egAtlasCompleted) {
+    for (const id in globalThis.STATE.egAtlasCompleted) {
         const node = egAtlasNodeById(id);
-        if (node && STATE.egAtlasCompleted[id] && node.tier > highest) {
+        if (node && globalThis.STATE.egAtlasCompleted[id] && node.tier > highest) {
             highest = node.tier;
         }
     }
     return highest;
 }
 
-function egAtlasProgress() {
+export function egAtlasProgress() {
     let completed = 0;
-    for (const id in (STATE.egAtlasCompleted || {})) {
-        if (STATE.egAtlasCompleted[id] && egAtlasNodeById(id)) completed++;
+    for (const id in (globalThis.STATE.egAtlasCompleted || {})) {
+        if (globalThis.STATE.egAtlasCompleted[id] && egAtlasNodeById(id)) completed++;
     }
     return {
         completed,
@@ -402,7 +413,7 @@ function egAtlasProgress() {
 // Picks a random atlas node id of the given tier. Prefers currently
 // unlocked regions so dropped maps stay runnable; falls back to any node
 // of that tier. Returns null for invalid tiers.
-function egAtlasPickNodeIdForTier(tier) {
+export function egAtlasPickNodeIdForTier(tier) {
     const clamped = Math.max(1, Math.min(EG_ATLAS_MAX_TIER, Math.round(tier || 1)));
     const all = EG_ATLAS_NODES.filter(n => n.tier === clamped);
     if (all.length === 0) return null;
@@ -412,7 +423,7 @@ function egAtlasPickNodeIdForTier(tier) {
 }
 
 // Localized display name of a node.
-function egAtlasNodeName(node) {
+export function egAtlasNodeName(node) {
     if (!node) return '';
     return (typeof LANG !== 'undefined' && LANG === 'de') ? node.nameDe : node.name;
 }
@@ -426,7 +437,7 @@ function egAtlasNodeName(node) {
 //                 HIGHER - bosses are the only source that climbs the
 //                 atlas (this is how higher tiers are first reached)
 // Returns an array of node ids, or null for unknown nodes.
-function egAtlasDropNodeIds(activeNodeId, isBoss) {
+export function egAtlasDropNodeIds(activeNodeId, isBoss) {
     const active = egAtlasNodeById(activeNodeId);
     if (!active) return null;
 
@@ -446,7 +457,7 @@ function egAtlasDropNodeIds(activeNodeId, isBoss) {
     // Completed regions of the same or a lower tier drop everywhere at or
     // above their own tier. Stale ids from older layouts resolve to null
     // and are skipped.
-    const completed = (typeof STATE !== 'undefined' && STATE.egAtlasCompleted) || {};
+    const completed = (typeof STATE !== 'undefined' && globalThis.STATE.egAtlasCompleted) || {};
     Object.keys(completed).forEach(id => {
         if (!completed[id]) return;
         const other = egAtlasNodeById(id);
@@ -463,14 +474,14 @@ function egAtlasDropNodeIds(activeNodeId, isBoss) {
 // (PoE-style atlas bonus): every completed region grants +1% chance that
 // finishing a map awards one extra adjacent-region map on top of all
 // regular drops. No cap needed (86 regions max = 86% max).
-const EG_ATLAS_ADJACENT_BONUS_PER_MAP = 0.01;
+export const EG_ATLAS_ADJACENT_BONUS_PER_MAP = 0.01;
 
 // Number of atlas regions currently marked as completed.
-function egAtlasCompletedCount() {
-    if (typeof STATE === 'undefined' || !STATE.egAtlasCompleted) return 0;
+export function egAtlasCompletedCount() {
+    if (typeof STATE === 'undefined' || !globalThis.STATE.egAtlasCompleted) return 0;
     let n = 0;
-    for (const id in STATE.egAtlasCompleted) {
-        if (STATE.egAtlasCompleted[id] && egAtlasNodeById(id)) n++;
+    for (const id in globalThis.STATE.egAtlasCompleted) {
+        if (globalThis.STATE.egAtlasCompleted[id] && egAtlasNodeById(id)) n++;
     }
     return n;
 }
@@ -478,12 +489,12 @@ function egAtlasCompletedCount() {
 // Independent extra-drop chance (0..1) for the adjacent-map atlas bonus.
 // Must be read AFTER _egAtlasOnMapCompleted() so a fresh first clear
 // already counts towards the bonus of the run that earned it.
-function egAtlasAdjacentBonusChance() {
+export function egAtlasAdjacentBonusChance() {
     return egAtlasCompletedCount() * EG_ATLAS_ADJACENT_BONUS_PER_MAP;
 }
 
 // Whole-percent display value of the adjacent-map atlas bonus.
-function egAtlasAdjacentBonusPercent() {
+export function egAtlasAdjacentBonusPercent() {
     return Math.round(egAtlasAdjacentBonusChance() * 100);
 }
 
@@ -496,7 +507,7 @@ function egAtlasAdjacentBonusPercent() {
 // already-completed +1). Falls back to the active region itself when it has
 // no links / is unknown, and to a same-tier unlocked region when there is
 // no active run at all.
-function egAtlasPickAdjacentBonusNodeId(activeNodeId) {
+export function egAtlasPickAdjacentBonusNodeId(activeNodeId) {
     const active = activeNodeId ? egAtlasNodeById(activeNodeId) : null;
     if (active && Array.isArray(active.links) && active.links.length > 0) {
         const linked = active.links.filter(id => egAtlasNodeById(id));
@@ -524,7 +535,7 @@ function egAtlasPickAdjacentBonusNodeId(activeNodeId) {
 // yet. The rest of the pool - the active region itself, linked same/lower
 // tier regions and completed regions - shares the remaining weight, so
 // boss kills still sustain the current tier most of the time.
-const EG_ATLAS_BOSS_CLIMB_DROP_SHARE = 0.55;
+export const EG_ATLAS_BOSS_CLIMB_DROP_SHARE = 0.55;
 
 // Picks a random atlas node id from the PoE-style drop pool. Boss kills
 // are biased toward the +1-tier climb regions so reaching the next tier
@@ -532,7 +543,7 @@ const EG_ATLAS_BOSS_CLIMB_DROP_SHARE = 0.55;
 // of all boss drops target the climb, the rest come from the remaining
 // pool (climb regions excluded so the split stays honest). Normal kills
 // pick uniformly.
-function egAtlasPickDropNodeId(activeNodeId, isBoss) {
+export function egAtlasPickDropNodeId(activeNodeId, isBoss) {
     const pool = egAtlasDropNodeIds(activeNodeId, isBoss);
     if (!pool || pool.length === 0) return null;
     if (!isBoss) return pool[Math.floor(Math.random() * pool.length)];
@@ -566,7 +577,7 @@ function egAtlasPickDropNodeId(activeNodeId, isBoss) {
 // (extra puzzles / questions) without reshuffling the base chain.
 
 // FNV-1a string hash → 32-bit seed.
-function egAtlasChainSeed(str) {
+export function egAtlasChainSeed(str) {
     let h = 0x811c9dc5;
     for (let i = 0; i < str.length; i++) {
         h ^= str.charCodeAt(i);
@@ -576,7 +587,7 @@ function egAtlasChainSeed(str) {
 }
 
 // mulberry32 seeded PRNG factory - small, fast, deterministic.
-function egAtlasMakeRng(seed) {
+export function egAtlasMakeRng(seed) {
     let a = (seed || 0) >>> 0;
     return function () {
         a |= 0; a = (a + 0x6D2B79F5) | 0;
@@ -589,7 +600,7 @@ function egAtlasMakeRng(seed) {
 // Chain flavours - each region deterministically rolls one, giving maps
 // distinct personalities: some are generated-grid heavy, some lean on the
 // classic story puzzles, some are pure sigil riddles.
-const EG_ATLAS_CHAIN_FLAVORS = [
+export const EG_ATLAS_CHAIN_FLAVORS = [
     { id: 'generated',  genShare: 0.85, genMode: 'mixed'   }, // mostly generated grids
     { id: 'sigils',     genShare: 0.70, genMode: 'symbol'  }, // symbol riddles
     { id: 'story',      genShare: 0.30, genMode: 'mixed'   }, // classic puzzle levels
@@ -603,7 +614,7 @@ const EG_ATLAS_CHAIN_FLAVORS = [
 // objectives (2–6 puzzles, see egMapBasePuzzlesForTier) plus fully modified
 // runs (≤20 puzzles); runs
 // consume the first N steps, so adding mods never reshuffles earlier steps.
-function egAtlasChainBlueprint(node) {
+export function egAtlasChainBlueprint(node) {
     if (!node) return null;
     const seed = egAtlasChainSeed(node.id + '|' + node.tier);
     const rng = egAtlasMakeRng(seed);
@@ -614,13 +625,13 @@ function egAtlasChainBlueprint(node) {
     // after the chain (like PoE's per-map bosses). The roster in
     // js/endgame/bosses/boss-rosters.js assigns each region its specific
     // boss (easy fights low, brutal fights at the pinnacle).
-    const bossIds = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.keys(EG_BOSS_DEFS) : [];
+    const bossIds = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.keys(globalThis.EG_BOSS_DEFS) : [];
     // Always consume the roll so the PRNG stream - and therefore every
     // region's chain flavour and step sources - stays exactly as before,
     // whether or not the roster overrides the result.
     const rolledBossId = bossIds.length > 0 ? bossIds[Math.floor(rng() * bossIds.length)] : null;
-    const bossId = (typeof EG_ATLAS_REGION_BOSSES !== 'undefined' && node && EG_ATLAS_REGION_BOSSES[node.id])
-        ? EG_ATLAS_REGION_BOSSES[node.id]
+    const bossId = (typeof EG_ATLAS_REGION_BOSSES !== 'undefined' && node && globalThis.EG_ATLAS_REGION_BOSSES[node.id])
+        ? globalThis.EG_ATLAS_REGION_BOSSES[node.id]
         : rolledBossId;
 
     const stepSources = [];
@@ -639,7 +650,7 @@ function egAtlasChainBlueprint(node) {
 }
 
 // Blueprint for a map item (resolves its atlas region; null outside the atlas).
-function egAtlasChainBlueprintForMap(mapItem) {
+export function egAtlasChainBlueprintForMap(mapItem) {
     if (!mapItem) return null;
     let node = null;
     if (mapItem.atlasNodeId) node = egAtlasNodeById(mapItem.atlasNodeId);
@@ -655,7 +666,7 @@ function egAtlasChainBlueprintForMap(mapItem) {
 //------------------------------------------------------------------------
 
 // Persists the atlas completion state through the shared save pipeline.
-function _egAtlasPersist() {
+export function _egAtlasPersist() {
     if (typeof egSaveHubState === 'function') egSaveHubState();
     else if (typeof save === 'function') save();
 }
@@ -665,7 +676,7 @@ function _egAtlasPersist() {
 // have none, so fall back to a name match against the region list and
 // finally to any region of the map's tier. Returns null only when the
 // map item itself is unusable.
-function _egAtlasResolveNodeForMap(mapItem) {
+export function _egAtlasResolveNodeForMap(mapItem) {
     if (!mapItem) return null;
     if (mapItem.atlasNodeId) {
         const stamped = egAtlasNodeById(mapItem.atlasNodeId);
@@ -698,7 +709,7 @@ function _egAtlasResolveNodeForMap(mapItem) {
 // all their loot but do NOT clear the atlas region.
 // Returns { node, firstClear, newlyUnlocked } or null when there was
 // nothing to record.
-function _egAtlasOnMapCompleted(mapItem) {
+export function _egAtlasOnMapCompleted(mapItem) {
     const node = _egAtlasResolveNodeForMap(mapItem);
     if (!node) return null;
 
@@ -706,21 +717,21 @@ function _egAtlasOnMapCompleted(mapItem) {
 
     // Difficulty gate - the player's selected game difficulty (applies to
     // every map run) must exactly match the region's required difficulty.
-    const runDiff = (typeof curDiff !== 'undefined' && curDiff) ? curDiff : 'normal';
+    const runDiff = (typeof curDiff !== 'undefined' && globalThis.curDiff) ? globalThis.curDiff : 'normal';
     if (runDiff !== node.difficulty) {
-        showToast(t('eg_atlas_diff_req_toast')
+        globalThis.showToast(t('eg_atlas_diff_req_toast')
             .replace('{n}', egAtlasNodeName(node))
             .replace('{d}', t('diff_' + node.difficulty)), '#e07b7b');
         return { node, firstClear: false, newlyUnlocked: [], diffDenied: true };
     }
 
-    if (!STATE.egAtlasCompleted) STATE.egAtlasCompleted = {};
+    if (!globalThis.STATE.egAtlasCompleted) globalThis.STATE.egAtlasCompleted = {};
 
-    const firstClear = !STATE.egAtlasCompleted[node.id];
+    const firstClear = !globalThis.STATE.egAtlasCompleted[node.id];
     const wasUnlocked = {};
     node.links.forEach(l => { wasUnlocked[l] = egAtlasIsUnlocked(l); });
 
-    STATE.egAtlasCompleted[node.id] = true;
+    globalThis.STATE.egAtlasCompleted[node.id] = true;
 
     // Freshly reached regions (cap the spam on dense rows).
     const newlyUnlocked = node.links
@@ -728,11 +739,11 @@ function _egAtlasOnMapCompleted(mapItem) {
         .slice(0, 3);
 
     if (firstClear) {
-        showToast(t('eg_atlas_completed_toast')
+        globalThis.showToast(t('eg_atlas_completed_toast')
             .replace('{n}', egAtlasNodeName(node)), '#f5d98a');
 
         newlyUnlocked.forEach(l => {
-            showToast(t('eg_atlas_unlocked_toast')
+            globalThis.showToast(t('eg_atlas_unlocked_toast')
                 .replace('{n}', `${egAtlasNodeName(egAtlasNodeById(l))} (${t('eg_map_tier_tt').replace('{n}', egAtlasNodeById(l).tier)})`), '#7fd67f');
         });
     }

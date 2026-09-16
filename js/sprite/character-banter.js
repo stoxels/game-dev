@@ -1,4 +1,11 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { LANG } from '../translation/translations.js';
+
+//------------------------------------------------------------------------
 //-------------------CHARACTER BANTER (SPEECH BUBBLE)----------------------
 //------------------------------------------------------------------------
 // Shows a speech bubble above-right of the player's sprite during puzzle
@@ -27,7 +34,7 @@
 // One is picked at random each time triggerBanter() fires for that event.
 //------------------------------------------------------------------------
 
-const _BANTER_LINES = {
+export const _BANTER_LINES = {
     stox: {
         tutorial_reply: [
             { en: "Understood. The clues are the axioms; the grid is the proof.", de: "Verstanden. Die Hinweise sind die Axiome; das Gitter der Beweis." },
@@ -555,7 +562,7 @@ const _BANTER_LINES = {
 // At least two unique lines exist per character per item.
 //------------------------------------------------------------------------
 
-const _BANTER_ITEM_LINES = {
+export const _BANTER_ITEM_LINES = {
     stox: {
         reveal1: [
             { en: "A candle. Illumination radius: exactly one cell.", de: "Eine Kerze. Beleuchtungsradius: exakt eine Zelle." },
@@ -1009,7 +1016,7 @@ const _BANTER_ITEM_LINES = {
 //   random_walker - active1 Brownian Motion,       active2 Drifter
 //------------------------------------------------------------------------
 
-const _BANTER_SKILL_LINES = {
+export const _BANTER_SKILL_LINES = {
     stox: {
         mathmagician_active1: [
             { en: "Arcane Reveal deployed. Sampling neighbours systematically.", de: "Arkane Enthüllung eingesetzt. Nachbarn werden systematisch beprobt." },
@@ -1250,17 +1257,17 @@ const _BANTER_SKILL_LINES = {
 // and the DEFAULT cooldown.
 //------------------------------------------------------------------------
 
-const _BANTER_DEFAULT_COOLDOWN_MS = 12000;
+export const _BANTER_DEFAULT_COOLDOWN_MS = 12000;
 
 // Item-specific banter: chance per use + cooldown per item id.
-const _BANTER_ITEM_CHANCE = 0.3;
-const _BANTER_ITEM_COOLDOWN_MS = 25000;
+export const _BANTER_ITEM_CHANCE = 0.3;
+export const _BANTER_ITEM_COOLDOWN_MS = 25000;
 
 // Skill-specific banter: chance per activation + cooldown per skill key.
-const _BANTER_SKILL_CHANCE = 0.5;
-const _BANTER_SKILL_COOLDOWN_MS = 45000;
+export const _BANTER_SKILL_CHANCE = 0.5;
+export const _BANTER_SKILL_COOLDOWN_MS = 45000;
 
-const _BANTER_EVENT_CFG = {
+export const _BANTER_EVENT_CFG = {
     level_start: { chance: 0.6, cooldownMs: 0 },
     mistake_single: { chance: 0.18, cooldownMs: 15000 },
     mistake_streak: { chance: 0.9, cooldownMs: 25000 },
@@ -1293,12 +1300,12 @@ const _BANTER_EVENT_CFG = {
 // Global gate: minimum gap between ANY two banter lines, regardless of
 // event key, so the bubble never feels spammy even if several different
 // triggers fire in quick succession.
-const _BANTER_GLOBAL_MIN_GAP_MS = 6000;
+export const _BANTER_GLOBAL_MIN_GAP_MS = 6000;
 
 // Runtime cooldown tracking. Reset per level in resetBanterState().
-let _banterLastShownByEvent = {};
-let _banterLastShownAt = 0;
-let _banterLowTimeFired = false;
+export let _banterLastShownByEvent = {};
+export let _banterLastShownAt = 0;
+export let _banterLowTimeFired = false;
 
 
 //------------------------------------------------------------------------
@@ -1308,14 +1315,14 @@ let _banterLowTimeFired = false;
 // Returns the avatar wrapper the bubble should attach to - the simple
 // (non-monster level) avatar or the full (monster level) avatar,
 // whichever currently exists.
-function _banterGetAvatarEl() {
+export function _banterGetAvatarEl() {
     return document.getElementById('player-avatar-simple')
         || document.getElementById('player-avatar-wrapper');
 }
 
 // Creates (if needed) and returns the bubble element, attached to body
 // so it can be positioned with fixed coordinates relative to the avatar.
-function _banterEnsureBubbleEl() {
+export function _banterEnsureBubbleEl() {
     let bubble = document.getElementById('char-speech-bubble');
     if (bubble) return bubble;
 
@@ -1328,7 +1335,7 @@ function _banterEnsureBubbleEl() {
 }
 
 // Positions the bubble to the top-right of the current avatar element.
-function _banterPositionBubble(bubble) {
+export function _banterPositionBubble(bubble) {
     const avatar = _banterGetAvatarEl();
     if (!avatar) return false;
 
@@ -1343,7 +1350,7 @@ function _banterPositionBubble(bubble) {
 }
 
 // Hides and clears the bubble immediately (no fade).
-function hideCharacterBanter() {
+export function hideCharacterBanter() {
     const bubble = document.getElementById('char-speech-bubble');
     if (!bubble) return;
     bubble.classList.remove('show');
@@ -1354,7 +1361,7 @@ function hideCharacterBanter() {
 }
 
 // Shows the bubble with the given text for a few seconds, then fades out.
-function _banterShowBubble(text) {
+export function _banterShowBubble(text) {
     const bubble = _banterEnsureBubbleEl();
     const textEl = document.getElementById('char-speech-bubble-text');
     if (!textEl) return;
@@ -1374,7 +1381,7 @@ function _banterShowBubble(text) {
 
 // Repositions the bubble (if it's currently visible) without changing its
 // text or restarting its hide timer. Called whenever the avatar moves.
-function _banterRepositionBubbleIfVisible() {
+export function _banterRepositionBubbleIfVisible() {
     const bubble = document.getElementById('char-speech-bubble');
     if (!bubble || !bubble.classList.contains('show')) return;
     _banterPositionBubble(bubble);
@@ -1395,8 +1402,8 @@ function _banterRepositionBubbleIfVisible() {
 // scratched record. Decks also keep no-repeat memory across level resets,
 // so a full tutorial run (3 puzzles) never repeats a reply line at all.
 // Optional `bank` lets the item/skill banks share the mechanism.
-const _banterLineDecks = {};
-function _banterPickLine(charId, eventKey, bank) {
+export const _banterLineDecks = {};
+export function _banterPickLine(charId, eventKey, bank) {
     const lines = (bank || _BANTER_LINES)[charId]?.[eventKey];
     if (!lines || lines.length === 0) return null;
 
@@ -1429,8 +1436,8 @@ function _banterPickLine(charId, eventKey, bank) {
 // `force` skips the global gap check (per-event cooldown + chance still
 // apply) - used by the tutorial replies, which must answer the Professor
 // even when level_start banter fired seconds earlier.
-function triggerBanter(eventKey, force) {
-    const charId = STATE?.playerCharacter;
+export function triggerBanter(eventKey, force) {
+    const charId = globalThis.STATE?.playerCharacter;
     if (!charId || !_BANTER_LINES[charId]) return; // no character chosen yet
 
     const cfg = _BANTER_EVENT_CFG[eventKey] || { chance: 1.0, cooldownMs: _BANTER_DEFAULT_COOLDOWN_MS };
@@ -1458,8 +1465,8 @@ function triggerBanter(eventKey, force) {
 // Shared gating + display logic for the item/skill-specific banks.
 // Returns true if a line was shown, false otherwise (so callers can fall
 // back to the generic banks when no specific line exists).
-function _banterFireFromBank(bank, id, eventKeyPrefix, chance, cooldownMs) {
-    const charId = STATE?.playerCharacter;
+export function _banterFireFromBank(bank, id, eventKeyPrefix, chance, cooldownMs) {
+    const charId = globalThis.STATE?.playerCharacter;
     const charBank = charId && bank[charId];
     if (!charBank || !charBank[id] || charBank[id].length === 0) return false;
 
@@ -1491,7 +1498,7 @@ function _banterFireFromBank(bank, id, eventKeyPrefix, chance, cooldownMs) {
 // for the current character, falls back to the generic/cursed item lines
 // so every item use can still produce banter. Safe to call unconditionally:
 // all gating (character check, global gap, cooldowns, chance) is internal.
-function triggerItemBanter(itemId, rarity) {
+export function triggerItemBanter(itemId, rarity) {
     if (typeof itemId !== 'string') return;
     if (_banterFireFromBank(_BANTER_ITEM_LINES, itemId, 'item', _BANTER_ITEM_CHANCE, _BANTER_ITEM_COOLDOWN_MS)) return;
     triggerBanter(rarity === 'cursed' ? 'item_used_cursed' : 'item_used_generic');
@@ -1500,7 +1507,7 @@ function triggerItemBanter(itemId, rarity) {
 // Call this when a specific class skill is used. skillKey must combine the
 // class/ascendency id with the active slot, e.g. 'mathmagician_active1'
 // or 'markovian_active2'. No-op if no lines exist for that key.
-function triggerSkillBanter(skillKey) {
+export function triggerSkillBanter(skillKey) {
     if (typeof skillKey !== 'string') return;
     _banterFireFromBank(_BANTER_SKILL_LINES, skillKey, 'skill', _BANTER_SKILL_CHANCE, _BANTER_SKILL_COOLDOWN_MS);
 }
@@ -1508,9 +1515,9 @@ function triggerSkillBanter(skillKey) {
 // Special-cased entry point for the "low time" warning so it only ever
 // fires once per level (separate from the normal per-event cooldown,
 // since levels can run long and we don't want repeats every cooldown window).
-function triggerLowTimeBanterIfNeeded() {
+export function triggerLowTimeBanterIfNeeded() {
     if (_banterLowTimeFired) return;
-    if (typeof timerSecs === 'undefined' || timerSecs > 60 || timerSecs <= 0) return;
+    if (typeof timerSecs === 'undefined' || globalThis.timerSecs > 60 || globalThis.timerSecs <= 0) return;
 
     _banterLowTimeFired = true;
     triggerBanter('low_time');
@@ -1518,7 +1525,7 @@ function triggerLowTimeBanterIfNeeded() {
 
 // Resets all banter cooldown/flag state. Call at the start of each level
 // (alongside the other _reset* helpers in start-level.js).
-function resetBanterState() {
+export function resetBanterState() {
     _banterLastShownByEvent = {};
     _banterLastShownAt = 0;
     _banterLowTimeFired = false;

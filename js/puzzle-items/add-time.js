@@ -1,9 +1,24 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { questStat_timerItemUsed } from '../quests/quests-stats.js';
+import { _trackTimerDelta, updTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { FREEZE_DURATION_MS } from './freeze.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _calcAddTimeSecs } from './shared/effect-modifiers.js';
+import { CHRONOBOLT_X_FRACTIONS, FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, playFreezeCountdownOverlay } from './shared/fx-helpers.js';
+
+//------------------------------------------------------------------------
 //-------------------ADD TIME - HOURGLASS / STOPWATCH / CHRONOBOLT----------------------
 //------------------------------------------------------------------------
 
 // addTime30 / addTime60 / addTime180 - adds seconds to the timer.
-function _useAddTime(id, def) {
+export function _useAddTime(id, def) {
     if (ptHasSkill('keystone_gamblers_ruin')) {
         return `${def.icon} ${t('itm_blocked_gamblers_ruin')}`;
     }
@@ -18,9 +33,9 @@ function _useAddTime(id, def) {
     // is active.
     if (ptHasSkill('keystone_countdown_crisis') && !window.STOX_FLAGS.goldenClockActive) {
         questStat_timerItemUsed();
-        const before = timerSecs;
-        timerSecs = Math.max(0, timerSecs - secs);
-        _trackTimerDelta(before, timerSecs);
+        const before = globalThis.timerSecs;
+        globalThis.timerSecs = Math.max(0, globalThis.timerSecs - secs);
+        _trackTimerDelta(before, globalThis.timerSecs);
     updTimer();
     playItemEffect(id);
     if (typeof playFreezeCountdownOverlay === 'function') playFreezeCountdownOverlay(FREEZE_DURATION_MS);
@@ -28,9 +43,9 @@ function _useAddTime(id, def) {
     }
 
     questStat_timerItemUsed();
-    const before = timerSecs;
-    timerSecs += secs;
-    _trackTimerDelta(before, timerSecs);
+    const before = globalThis.timerSecs;
+    globalThis.timerSecs += secs;
+    _trackTimerDelta(before, globalThis.timerSecs);
     updTimer();
     playItemEffect(id);
     return `${def.icon} ${t('item_time_added').replace('{n}', mins)}`;
@@ -41,7 +56,7 @@ function _useAddTime(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the large hourglass icon with spin animation.
-function _fxMakeHourglassIcon(wrap, cx, cy) {
+export function _fxMakeHourglassIcon(wrap, cx, cy) {
     const hg = document.createElement('div');
     hg.className = 'fx-hourglass-icon';
     hg.textContent = '⏳';
@@ -57,7 +72,7 @@ function _fxMakeHourglassIcon(wrap, cx, cy) {
 }
 
 // Helper: spawns sand grain particles falling from the hourglass center.
-function _fxMakeSandParticles(container, cx, cy, count) {
+export function _fxMakeSandParticles(container, cx, cy, count) {
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const grain = document.createElement('div');
@@ -74,7 +89,7 @@ function _fxMakeSandParticles(container, cx, cy, count) {
 }
 
 // ⏳ Hourglass - sand streams downward through the centre.
-function _fxHourglass() {
+export function _fxHourglass() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -90,7 +105,7 @@ function _fxHourglass() {
 }
 
 // Helper: spawns `count` time-ring divs rippling outward from (cx, cy).
-function _fxMakeTimeRings(container, cx, cy, count, maxSize) {
+export function _fxMakeTimeRings(container, cx, cy, count, maxSize) {
     for (let i = 0; i < count; i++) {
         const ring = document.createElement('div');
         ring.className = 'fx-time-ring';
@@ -106,7 +121,7 @@ function _fxMakeTimeRings(container, cx, cy, count, maxSize) {
 }
 
 // ⏱️ Stopwatch - timer rings ripple outward from centre.
-function _fxStopwatch() {
+export function _fxStopwatch() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -123,7 +138,7 @@ function _fxStopwatch() {
 
 // Generates a zigzag SVG lightning path of the given height.
 // Returns an HTML string containing the full <svg> element.
-function _fxGenerateLightningPath(height) {
+export function _fxGenerateLightningPath(height) {
     const segs = 8;
     const segH = height / segs;
     let d = 'M 0 0';
@@ -149,7 +164,7 @@ function _fxGenerateLightningPath(height) {
 }
 
 // Helper: creates one lightning bolt div at the given horizontal position.
-function _fxMakeLightningBolt(container, r, xFraction) {
+export function _fxMakeLightningBolt(container, r, xFraction) {
     const bolt = document.createElement('div');
     bolt.className = 'fx-lightning-bolt';
     bolt.style.cssText = `
@@ -164,7 +179,7 @@ function _fxMakeLightningBolt(container, r, xFraction) {
 }
 
 // ⚡ Chronobolt - lightning bolts crackle across the puzzle grid.
-function _fxChronobolt() {
+export function _fxChronobolt() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

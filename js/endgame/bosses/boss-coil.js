@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE COIL (boss_coil)----------------------------
 //------------------------------------------------------------------------
 // Serpent-pit fight: the arena is the Coil's nest and it is crawling.
@@ -58,46 +67,46 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Coil tuning ─────────────────────────────────────────────────────────
 // The coiled maw
-const EG_COIL_R = 56;                        // maw radius (visual + bite hit)
-const EG_COIL_SLITHER = [0, 40, 52, 66];     // px/s drift per phase
-const EG_COIL_BITE_DMG = [0, 0.05, 0.06, 0.08]; // %maxHP per bite
-const EG_COIL_BITE_CD_MS = 900;              // per-touch cooldown
-const EG_COIL_BITE_FLING = [0, 150, 175, 200]; // px fling per bite
+export const EG_COIL_R = 56;                        // maw radius (visual + bite hit)
+export const EG_COIL_SLITHER = [0, 40, 52, 66];     // px/s drift per phase
+export const EG_COIL_BITE_DMG = [0, 0.05, 0.06, 0.08]; // %maxHP per bite
+export const EG_COIL_BITE_CD_MS = 900;              // per-touch cooldown
+export const EG_COIL_BITE_FLING = [0, 150, 175, 200]; // px fling per bite
 // Seeker serpents + venom trails
-const EG_COIL_SNAKE_INTERVAL_MS = [0, 5200, 4100, 3100]; // spawn cadence
-const EG_COIL_SNAKE_ALIVE_MAX = [0, 2, 3, 4]; // concurrent serpent cap
-const EG_COIL_SNAKE_SPEED = [0, 85, 100, 118]; // px/s hunt speed
-const EG_COIL_SNAKE_TRIGGER_R = 95;          // start fusing when this close
-const EG_COIL_FUSE_MS = 800;                 // blinking fuse time
-const EG_COIL_BLAST_R = 105;                 // detonation radius
-const EG_COIL_BLAST_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP per blast (shadow)
-const EG_COIL_TRAIL_LIFE_MS = 3400;          // venom trail lingers
-const EG_COIL_TRAIL_DPS = 4;                 // %maxHP/s standing on a trail
+export const EG_COIL_SNAKE_INTERVAL_MS = [0, 5200, 4100, 3100]; // spawn cadence
+export const EG_COIL_SNAKE_ALIVE_MAX = [0, 2, 3, 4]; // concurrent serpent cap
+export const EG_COIL_SNAKE_SPEED = [0, 85, 100, 118]; // px/s hunt speed
+export const EG_COIL_SNAKE_TRIGGER_R = 95;          // start fusing when this close
+export const EG_COIL_FUSE_MS = 800;                 // blinking fuse time
+export const EG_COIL_BLAST_R = 105;                 // detonation radius
+export const EG_COIL_BLAST_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP per blast (shadow)
+export const EG_COIL_TRAIL_LIFE_MS = 3400;          // venom trail lingers
+export const EG_COIL_TRAIL_DPS = 4;                 // %maxHP/s standing on a trail
 // Constrictor (60% gate)
-const EG_COIL_CON_RING_N = [0, 3, 4, 5];     // contracting ring waves
-const EG_COIL_CON_WARN_MS = 1250;            // per-ring telegraph
-const EG_COIL_CON_CONTRACT_MS = 1100;        // ring contracts over this
-const EG_COIL_CON_DMG = 0.13;                // %maxHP per ring hit (shadow)
-const EG_COIL_CON_GAP_MS = 700;              // between rings
+export const EG_COIL_CON_RING_N = [0, 3, 4, 5];     // contracting ring waves
+export const EG_COIL_CON_WARN_MS = 1250;            // per-ring telegraph
+export const EG_COIL_CON_CONTRACT_MS = 1100;        // ring contracts over this
+export const EG_COIL_CON_DMG = 0.13;                // %maxHP per ring hit (shadow)
+export const EG_COIL_CON_GAP_MS = 700;              // between rings
 // Serpent tide (30% gate)
-const EG_COIL_TIDE_N = 3;                    // tides in the set-piece
-const EG_COIL_TIDE_WARN_MS = 1100;           // edge band telegraph
-const EG_COIL_TIDE_CHARGERS = [0, 5, 6, 8];  // chargers per tide
-const EG_COIL_TIDE_SPEED = 300;              // px/s charger speed
-const EG_COIL_TIDE_DMG = 0.09;               // %maxHP per charger hit
+export const EG_COIL_TIDE_N = 3;                    // tides in the set-piece
+export const EG_COIL_TIDE_WARN_MS = 1100;           // edge band telegraph
+export const EG_COIL_TIDE_CHARGERS = [0, 5, 6, 8];  // chargers per tide
+export const EG_COIL_TIDE_SPEED = 300;              // px/s charger speed
+export const EG_COIL_TIDE_DMG = 0.09;               // %maxHP per charger hit
 // Cobra strike (charge attack)
-const EG_COIL_COBRA_WARN_MS = 1050;          // hood-shadow lane telegraph
-const EG_COIL_COBRA_STRIKE_MS = 380;         // the lash is live
-const EG_COIL_COBRA_H = 92;                  // lane width
-const EG_COIL_COBRA_DMG = [0, 0.13, 0.15, 0.18]; // %maxHP by phase
+export const EG_COIL_COBRA_WARN_MS = 1050;          // hood-shadow lane telegraph
+export const EG_COIL_COBRA_STRIKE_MS = 380;         // the lash is live
+export const EG_COIL_COBRA_H = 92;                  // lane width
+export const EG_COIL_COBRA_DMG = [0, 0.13, 0.15, 0.18]; // %maxHP by phase
 
 
-let _egCoilWatcher = null;      // per-fight nest state
-let _egCoilCobraActive = false; // a cobra strike set-piece is running
+export let _egCoilWatcher = null;      // per-fight nest state
+export let _egCoilCobraActive = false; // a cobra strike set-piece is running
 
 
 // Sweep every coil overlay off the screen. Safe to call twice.
-function _egCoilSweep() {
+export function _egCoilSweep() {
     _egCoilCobraActive = false;
     try {
         document.querySelectorAll('.eg-coil-maw, .eg-coil-snake, .eg-coil-trail, .eg-coil-ring, .eg-coil-tideband, .eg-coil-charger, .eg-coil-cobra, .eg-coil-cobralash').forEach(el => el.remove());
@@ -106,7 +115,7 @@ function _egCoilSweep() {
 
 
 // Called from _egBossCleanup (boss-framework.js) on boss death / stop.
-function _egCoilTeardown() {
+export function _egCoilTeardown() {
     const st = _egCoilWatcher;
     _egCoilWatcher = null;
     if (st && st.run) { try { _egNkKillRun(st.run); } catch (e) {} }
@@ -116,7 +125,7 @@ function _egCoilTeardown() {
 }
 
 
-function _egCoilArenaInit(monster) {
+export function _egCoilArenaInit(monster) {
     if (_egCoilWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -165,8 +174,8 @@ function _egCoilArenaInit(monster) {
     _egCoilPickMawSpot(maw);
 
     _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-            ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
         // Boss not registered yet → wait for it (spawn races the arena init);
         // boss vanished AFTER being live → the fight is over, tear down.
         if (!live) {
@@ -367,7 +376,7 @@ function _egCoilArenaInit(monster) {
 
 
 // Picks a fresh maw drift spot a good distance from the current one.
-function _egCoilPickMawSpot(mw) {
+export function _egCoilPickMawSpot(mw) {
     const W = window.innerWidth, H = window.innerHeight;
     const pad = 120;
     let x = W / 2, y = H / 2;
@@ -380,7 +389,7 @@ function _egCoilPickMawSpot(mw) {
 }
 
 
-function _egCoilSpawnSnake(st) {
+export function _egCoilSpawnSnake(st) {
     const el = _egNkEl(st.run, 'div', 'eg-coil-snake', '🐍');
     // Emerge from the maw.
     const s = {
@@ -393,7 +402,7 @@ function _egCoilSpawnSnake(st) {
 
 // ── 60% gate: Constrictor ───────────────────────────────────────────────
 // Huge spiral rings contract toward the arena center - stand in the gaps.
-function _egCoilConstrictor(st, p) {
+export function _egCoilConstrictor(st, p) {
     if (st.con) return; // re-entry guard: never orphan a running set-piece
     const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const r0 = Math.hypot(window.innerWidth, window.innerHeight) * 0.42;
@@ -409,7 +418,7 @@ function _egCoilConstrictor(st, p) {
 
 
 // ── 30% gate: Serpent Tide ──────────────────────────────────────────────
-function _egCoilTide(st, p) {
+export function _egCoilTide(st, p) {
     if (st.tide) return; // re-entry guard: never orphan a running set-piece
     const dirX = Math.random() < 0.5 ? 1 : -1;
     const fx = dirX === 1 ? -30 : window.innerWidth + 30;
@@ -438,7 +447,7 @@ function _egCoilTide(st, p) {
 // maw rears up and strikes across it in one lightning lash.
 // Wired from _egFireMonsterAttack (endgame-encounter.js).
 
-function _egCoilCobraStrike(monster) {
+export function _egCoilCobraStrike(monster) {
     if (_egCoilCobraActive || _egNkDodgeBusy() || _egNkFrozen()) return;
     const st = _egCoilWatcher;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
@@ -480,4 +489,4 @@ function _egCoilCobraStrike(monster) {
 //------------------------------------------------------------------------
 // The old scheduled Seeker Snakes are now the persistent nest - keep the
 // handler name alive so any stale schedule entry no-ops instead of erroring.
-function _egMechSeekerSnakes() { void 0; }
+export function _egMechSeekerSnakes() { void 0; }

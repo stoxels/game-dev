@@ -1,4 +1,27 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { curMods } from '../difficulty-modifiers.js';
+import { _egOnQuestionAnswered } from '../endgame/endgame-encounter-chain.js';
+import { _egApplyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
+import { _egIsActive } from '../endgame/endgame-state.js';
+import { WORLDS } from '../levels/level-world-data.js';
+import { WORLD_START_GI } from '../levels/levels.js';
+import { PT } from '../passive-tree/passive-tree.js';
+import { buildInventoryPanel } from '../puzzle-items/inventory-panel.js';
+import { showToast } from '../puzzle-items/toasts-and-popups.js';
+import { questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../quests/quests-stats.js';
+import { _refreshQuestionModalFlag, goToLevelSelect, hideModal, showModal } from '../screens/screens.js';
+import { _charIs, _getPlayerCharacterImage } from '../sprite/player_sprite.js';
+import { save } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { MATH_GATE_POOLS } from './mathgate-questions.js';
+
+//------------------------------------------------------------------------
 //------------------------------CONSTANTS & STATE--------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -6,17 +29,17 @@
 // Tutor item IDs in ascending tier order (weakest → strongest).
 // Used both when searching for the best available tutor item and when
 // counting how many tutors the player owns.
-const TUTOR_ITEM_IDS_2 = ['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll'];
+export const TUTOR_ITEM_IDS_2 = ['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll'];
 
 // Number of wrong attempts before the hint becomes visible.
 // Can be reduced by passive tree nodes; never drops below 1.
-const MG_HINT_BASE_THRESHOLD = 5;
+export const MG_HINT_BASE_THRESHOLD = 5;
 
 // Number of wrong attempts before the "try a different question" button appears.
-const MG_NEW_QUESTION_THRESHOLD = 5;
+export const MG_NEW_QUESTION_THRESHOLD = 5;
 
 // How many recently-shown questions to avoid repeating, per world.
-const MG_RECENT_HISTORY_SIZE = 10;
+export const MG_RECENT_HISTORY_SIZE = 10;
 
 // All levels locked behind the Probability Gate, expressed as { world, level }
 // pairs using 1-based indices. buildMathGateSet() converts these to gi values
@@ -27,7 +50,7 @@ const MG_RECENT_HISTORY_SIZE = 10;
 
 
 
-const MATH_GATE_LEVELS = [
+export const MATH_GATE_LEVELS = [
     { world: 1, level: 6 },
     { world: 2, level: 1 },
     { world: 2, level: 6 },
@@ -106,24 +129,24 @@ const MATH_GATE_LEVELS = [
 
 
 // The gi that is waiting to be launched after a correct answer.
-let pendingGateGi = null;
+export let pendingGateGi = null;
 
 // The question object currently shown in the modal.
-let currentGateQuestion = null;
+export let currentGateQuestion = null;
 
 // Number of wrong attempts on the current question in this session.
-let gateAttempts = 0;
+export let gateAttempts = 0;
 
 // Guard flag that prevents submitMathGate() from firing twice in rapid succession
 // (e.g. from a double-click or a keyboard+button simultaneous trigger).
-let mgIsSubmitting = false;
+export let mgIsSubmitting = false;
 
 // The runtime Set of gated gi values, built once on load from MATH_GATE_LEVELS.
 // Re-run buildMathGateSet() if world data changes at runtime.
-let MATH_GATE_GI = buildMathGateSet();
+export let MATH_GATE_GI = buildMathGateSet();
 
 // Tracks the last N question objects shown per world: { [world]: [q, q, ...] }
-const _mgRecentQuestions = {};
+export const _mgRecentQuestions = {};
 
 
 //------------------------------------------------------------------------
@@ -136,7 +159,7 @@ const _mgRecentQuestions = {};
 // Entries whose world or level doesn't exist yet are silently skipped,
 // so it's safe to list future content in MATH_GATE_LEVELS.
 // NOTE: WORLDS and WORLD_START_GI are 0-based; MATH_GATE_LEVELS is 1-based.
-function buildMathGateSet() {
+export function buildMathGateSet() {
     const gatedGiSet = new Set();
     MATH_GATE_LEVELS.forEach(({ world, level }) => {
         const wi = world - 1;
@@ -150,28 +173,28 @@ function buildMathGateSet() {
 }
 
 // Returns true if this gi requires passing a math gate before entry.
-function isGatedLevel(gi) {
+export function isGatedLevel(gi) {
     return MATH_GATE_GI.has(gi);
 }
 
 // Returns true if the player has already passed the gate for this gi.
-function isMathGatePassed(gi) {
-    return (STATE.mathGatePassed ?? []).includes(gi);
+export function isMathGatePassed(gi) {
+    return (globalThis.STATE.mathGatePassed ?? []).includes(gi);
 }
 
 // Persists a gate pass to STATE and saves to disk.
 // Safe to call even if the gate was already marked as passed (no duplicate writes).
-function mgMarkGatePassed(gi) {
-    if (!STATE.mathGatePassed) STATE.mathGatePassed = [];
-    if (!STATE.mathGatePassed.includes(gi)) {
-        STATE.mathGatePassed.push(gi);
+export function mgMarkGatePassed(gi) {
+    if (!globalThis.STATE.mathGatePassed) globalThis.STATE.mathGatePassed = [];
+    if (!globalThis.STATE.mathGatePassed.includes(gi)) {
+        globalThis.STATE.mathGatePassed.push(gi);
         save();
     }
 }
 
 // Returns which world number (1-based) a gi belongs to.
 // Used to select the correct question pool for that world.
-function worldOfGi(gi) {
+export function worldOfGi(gi) {
     for (let wi = WORLDS.length - 1; wi >= 0; wi--) {
         if (WORLDS[wi].data.length > 0 && gi >= WORLD_START_GI[wi]) return wi + 1;
     }
@@ -187,13 +210,13 @@ function worldOfGi(gi) {
 
 // Returns the question pool for the world that the given gi belongs to.
 // Falls back to world 1's pool if no pool is defined for that world.
-function mgGetQuestionPool(gi) {
+export function mgGetQuestionPool(gi) {
     const world = worldOfGi(gi);
     return MATH_GATE_POOLS[world] || MATH_GATE_POOLS[1];
 }
 
 // Records a question as "recently shown" for its world, trimming to the window size.
-function _mgRecordShownQuestion(world, question) {
+export function _mgRecordShownQuestion(world, question) {
     if (!_mgRecentQuestions[world]) _mgRecentQuestions[world] = [];
     _mgRecentQuestions[world].push(question);
     if (_mgRecentQuestions[world].length > MG_RECENT_HISTORY_SIZE) {
@@ -204,7 +227,7 @@ function _mgRecordShownQuestion(world, question) {
 // Returns a random question from the pool, excluding whichever ones were
 // shown in this world's recent history (falls back to the full pool if
 // every question is currently "on cooldown", e.g. tiny pools).
-function mgPickRandomQuestion(pool, world) {
+export function mgPickRandomQuestion(pool, world) {
     const recent = _mgRecentQuestions[world] || [];
     const avoidSet = new Set(recent);
     let candidates = pool.filter(q => !avoidSet.has(q));
@@ -217,7 +240,7 @@ function mgPickRandomQuestion(pool, world) {
 
 // Returns a random question guaranteed to differ from the one currently shown
 // (unless the pool only has one question, in which case it can repeat).
-function mgPickDifferentQuestion(pool, world) {
+export function mgPickDifferentQuestion(pool, world) {
     let newQuestion;
     do {
         newQuestion = mgPickRandomQuestion(pool, world);
@@ -227,13 +250,13 @@ function mgPickDifferentQuestion(pool, world) {
 
 // Returns the localized question text, falling back to English if no
 // German translation exists.
-function mgGetLocalizedQuestion(question) {
+export function mgGetLocalizedQuestion(question) {
     return (LANG === 'de' && question.qDE) ? question.qDE : question.q;
 }
 
 // Returns the localized hint text, falling back to English if no
 // German translation exists.
-function mgGetLocalizedHint(question) {
+export function mgGetLocalizedHint(question) {
     return (LANG === 'de' && question.hintDE) ? question.hintDE : question.hintEn;
 }
 
@@ -247,13 +270,13 @@ function mgGetLocalizedHint(question) {
 // Parses the raw answer input string into a float.
 // Accepts both '.' and ',' as the decimal separator to support European locales.
 // Returns NaN if the input cannot be parsed as a number.
-function mgParseAnswer(rawInput) {
+export function mgParseAnswer(rawInput) {
     const normalized = rawInput.trim().replace(',', '.');
     return parseFloat(normalized);
 }
 
 // Returns true if the entered value is within the question's accepted tolerance.
-function mgIsAnswerCorrect(entered, question) {
+export function mgIsAnswerCorrect(entered, question) {
     return Math.abs(entered - question.answer) <= question.tolerance;
 }
 
@@ -262,7 +285,7 @@ function mgIsAnswerCorrect(entered, question) {
 // meaningful (tolerance 0.01 → 2 decimals, 0.0001 → 4). Returns '' for
 // non-finite answers so callers leave the field untouched.
 // Shared by all three tutor surfaces (mathgate / quiz / scouts-primer).
-function mgFormatTutorAnswer(question) {
+export function mgFormatTutorAnswer(question) {
     if (!question) return '';
     const a = Number(question.answer);
     if (!Number.isFinite(a)) return '';
@@ -280,18 +303,18 @@ function mgFormatTutorAnswer(question) {
 
 
 // Writes the world badge text into the modal header element.
-function mgPopulateWorldBadge(world) {
+export function mgPopulateWorldBadge(world) {
 
 }
 
 // Writes the current question's localized text into the modal question element.
-function mgPopulateQuestion(question) {
+export function mgPopulateQuestion(question) {
     document.getElementById('mg-question').textContent = mgGetLocalizedQuestion(question);
 }
 
 // Updates the unit label displayed next to the answer input.
 // Hides the label entirely if the question has no unit.
-function mgSetUnitLabel(question) {
+export function mgSetUnitLabel(question) {
     const unitEl = document.getElementById('mg-unit');
     const unitText = question.unit ? t(question.unit) : '';
     unitEl.textContent = unitText;
@@ -300,7 +323,7 @@ function mgSetUnitLabel(question) {
 
 // Resets all interactive input area elements back to their initial state.
 // Called both when opening the modal and when loading a replacement question.
-function mgResetModalInputState() {
+export function mgResetModalInputState() {
     const inputEl = document.getElementById('mg-answer-input');
     if (inputEl) {
         inputEl.value = '';
@@ -325,7 +348,7 @@ function mgResetModalInputState() {
 // Injects the character portrait medallion into the modal box, styled with
 // a character-specific accent color. Rebuilds the portrait element from
 // scratch each time so it can be safely called on every modal open.
-function _mgInjectPortrait() {
+export function _mgInjectPortrait() {
     const modalEl = document.getElementById('mg-modal');
     if (!modalEl) return;
 
@@ -358,7 +381,7 @@ function _mgInjectPortrait() {
         trix: { accent: '#ce93d8', glow: 'rgba(206,147,216,0.55)', crack: '#ce93d8', crackGlow: 'rgba(206,147,216,0.5)' },
         syla: { accent: '#66bb6a', glow: 'rgba(102,187,106,0.55)', crack: '#26c6a6', crackGlow: 'rgba(38,198,166,0.5)' },
     };
-    const c = charColors[STATE?.playerCharacter] || charColors.stox;
+    const c = charColors[globalThis.STATE?.playerCharacter] || charColors.stox;
     if (box) {
         box.style.setProperty('--qr-accent', c.accent);
         box.style.setProperty('--qr-accent-glow', c.glow);
@@ -369,7 +392,7 @@ function _mgInjectPortrait() {
 
 // Fills the small '#mg-portrait' element (distinct from _mgInjectPortrait's
 // medallion) with the player's character image, if available.
-function _mgPopulateModalPortrait() {
+export function _mgPopulateModalPortrait() {
     const mgPortrait = document.getElementById('mg-portrait');
     if (mgPortrait && typeof _getPlayerCharacterImage === 'function') {
         mgPortrait.innerHTML = `<img src="${_getPlayerCharacterImage()}" alt="">`;
@@ -377,14 +400,14 @@ function _mgPopulateModalPortrait() {
 }
 
 // Updates the feedback element with a success (green) or error (red) style.
-function showMgFeedback(msg, ok) {
+export function showMgFeedback(msg, ok) {
     const el = document.getElementById('mg-feedback');
     el.textContent = msg;
     el.className = 'mg-feedback ' + (ok ? 'mg-ok' : 'mg-bad');
 }
 
 // Toggles the explanation text box open/closed.
-function mgToggleExplain() {
+export function mgToggleExplain() {
     if (!currentGateQuestion) return;
     const box = document.getElementById('mg-explain');
     const text = (LANG === 'de' && currentGateQuestion.explainDE)
@@ -401,7 +424,7 @@ function mgToggleExplain() {
 
 // Shows/hides the "Tell me why" button depending on whether the current
 // gate question has an explanation available.
-function _mgRefreshWhyButton() {
+export function _mgRefreshWhyButton() {
     const btn = document.getElementById('mg-why-btn');
     const box = document.getElementById('mg-explain');
     if (!btn) return;
@@ -417,7 +440,7 @@ function _mgRefreshWhyButton() {
 
 
 // Closes the math gate modal and clears all module-level state.
-function hideMathGate() {
+export function hideMathGate() {
     hideModal('mg-modal');
     if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
     currentGateQuestion = null;
@@ -428,7 +451,7 @@ function hideMathGate() {
 // Closes the math gate modal and returns the player to level select.
 // Used by the modal's ✕ CLOSE button so declining the gate doesn't strand
 // the player on whatever screen was behind the modal.
-function mgCloseToLevelSelect() {
+export function mgCloseToLevelSelect() {
     hideMathGate();
     goToLevelSelect();
 }
@@ -441,7 +464,7 @@ function mgCloseToLevelSelect() {
 
 
 // Returns the base success chance for the tutor, increased by passive skill nodes.
-function mgCalcTutorChance() {
+export function mgCalcTutorChance() {
     let chance = 0.10;
     if (PT.hasSkill('stochastics_tutor')) chance += 0.10;
     if (PT.hasSkill('statistics_tutor')) chance += 0.10;
@@ -453,7 +476,7 @@ function mgCalcTutorChance() {
 
 // Returns the chance that the tutor item is NOT consumed after being used.
 // A roll >= this value means the item is preserved.
-function mgCalcNoConsumeChance() {
+export function mgCalcNoConsumeChance() {
     let chance = 0;
     if (PT.hasSkill('careful_study')) chance += 0.10;
     if (PT.hasSkill('efficient_tutoring')) chance += 0.15;
@@ -464,8 +487,8 @@ function mgCalcNoConsumeChance() {
 
 // Removes the given tutor item from the player's inventory, then saves
 // state and rebuilds the inventory panel.
-function mgConsumeTutorItem(tutorItem) {
-    STATE.inventory = STATE.inventory.filter(i => i.uid !== tutorItem.uid);
+export function mgConsumeTutorItem(tutorItem) {
+    globalThis.STATE.inventory = globalThis.STATE.inventory.filter(i => i.uid !== tutorItem.uid);
     save();
     buildInventoryPanel();
 }
@@ -474,14 +497,14 @@ function mgConsumeTutorItem(tutorItem) {
 // The button is only shown when the player has both the passive skill
 // unlocked AND at least one tutor item in their inventory.
 // Called whenever the modal opens or a new question is loaded.
-function mgRefreshTutorButton() {
+export function mgRefreshTutorButton() {
     const btn = document.getElementById('mg-tutor-btn');
     if (!btn) return;
 
     // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
     const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
     const canUseTutor = superTutorEnabled || PT.hasSkill('tutor_enable') || _charIs('trix');
-    const tutorCount = STATE.inventory.filter(i => TUTOR_ITEM_IDS_2.includes(i.defId)).length;
+    const tutorCount = globalThis.STATE.inventory.filter(i => TUTOR_ITEM_IDS_2.includes(i.defId)).length;
 
     if (canUseTutor && (superTutorEnabled || tutorCount > 0)) {
         btn.style.display = 'flex';
@@ -496,16 +519,16 @@ function mgRefreshTutorButton() {
 }
 
 // called by the mg-continue-btn click.
-function mgContinueToLevel() {
+export function mgContinueToLevel() {
     const gi = pendingGateGi;
     hideMathGate();
-    startLevel(gi);
+    globalThis.startLevel(gi);
 }
 
 // Handles the outcome where the tutor successfully solves the question.
 // Marks the gate as passed, disables the submit button, then launches
 // the level after a short celebration delay.
-function mgHandleTutorSuccess() {
+export function mgHandleTutorSuccess() {
     const gi = pendingGateGi;
     const msg = t('qz_tutor_solved');
 
@@ -532,7 +555,7 @@ function mgHandleTutorSuccess() {
 
 // Handles the outcome where the tutor fails to solve the question.
 // Shows failure feedback and hides the tutor button for this attempt.
-function mgHandleTutorFailure() {
+export function mgHandleTutorFailure() {
     const msg = t('qz_tutor_failed');
 
     Audio_Manager.playSFX('tutorFail');
@@ -543,14 +566,14 @@ function mgHandleTutorFailure() {
 // Entry point for the Tutor button click.
 // Finds the best available tutor item (lowest tier first), rolls for
 // consumption and success, then delegates to the success or failure handler.
-function mgUseTutor() {
+export function mgUseTutor() {
     if (!currentGateQuestion) return;
 
     // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
     const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
     // Find the lowest-tier tutor item the player currently owns.
     const tutorItem = superTutorEnabled ? null : TUTOR_ITEM_IDS_2
-        .flatMap(id => STATE.inventory.filter(i => i.defId === id))
+        .flatMap(id => globalThis.STATE.inventory.filter(i => i.defId === id))
         .find(Boolean);
     if (!superTutorEnabled && !tutorItem) return;
 
@@ -578,7 +601,7 @@ function mgUseTutor() {
 // Opens the math gate modal for the given gi.
 // Picks a random question from the appropriate world pool, populates all
 // modal elements, then opens the modal and focuses the answer input.
-function showMathGate(gi, launchFn) {
+export function showMathGate(gi, launchFn) {
     const pool = mgGetQuestionPool(gi);
     currentGateQuestion = mgPickRandomQuestion(pool, worldOfGi(gi));
     gateAttempts = 0;
@@ -605,7 +628,7 @@ function showMathGate(gi, launchFn) {
 // Called by startLevel() before launching any level.
 // If the level is not gated, or the gate is already passed, launches immediately.
 // Otherwise stores the pending gi and opens the math gate modal.
-function tryStartGatedLevel(gi, launchFn) {
+export function tryStartGatedLevel(gi, launchFn) {
     if (!isGatedLevel(gi) || isMathGatePassed(gi)) {
         launchFn();
         return;
@@ -625,7 +648,7 @@ function tryStartGatedLevel(gi, launchFn) {
 // helpers below were removed. Passing a gate just marks it passed and shows
 // the correct feedback; the passive-tree nodes that used to feed the removed
 // bonus rolls stay allocated but are simply inert for items.
-function mgGrantGateReward(gi) {
+export function mgGrantGateReward(gi) {
     showMgFeedback(t('mg_correct'), true);
     setTimeout(() => showToast(t('qz_gate_passed_toast')), 1000);
 }
@@ -642,7 +665,7 @@ function mgGrantGateReward(gi) {
 // On repeat passes: shows a simple correct feedback message.
 // Always: marks the gate as passed, tracks stats, rolls for bonus drops,
 // then closes the modal and launches the level after a short delay.
-function mgHandleCorrectAnswer() {
+export function mgHandleCorrectAnswer() {
     const gi = pendingGateGi;
 
     const isFirstPass = !isMathGatePassed(gi);
@@ -685,7 +708,7 @@ function mgHandleCorrectAnswer() {
 // trait grants the hint feature for free, one attempt sooner than base).
 // Reductions from tree nodes and the Syla trait stack additively; the
 // result can reach 0, meaning the hint is shown immediately.
-function mgCalcHintThreshold() {
+export function mgCalcHintThreshold() {
     const hasTreeUnlock = PT.hasSkill('wisdom_through_failure');
     const isSyla = _charIs('syla');
     if (!hasTreeUnlock && !isSyla) return null;
@@ -701,7 +724,7 @@ function mgCalcHintThreshold() {
 
 // Reveals the hint for the current question inside the modal.
 // Also tracks the hint-shown quest stat.
-function mgShowHint() {
+export function mgShowHint() {
     const hint = mgGetLocalizedHint(currentGateQuestion);
     document.getElementById('mg-hint-text').textContent = '💡 ' + hint;
     document.getElementById('mg-hint-box').style.display = 'block';
@@ -709,14 +732,14 @@ function mgShowHint() {
 }
 
 // Reveals the "try a different question" button in the modal.
-function mgShowNewQuestionButton() {
+export function mgShowNewQuestionButton() {
     document.getElementById('mg-new-q-btn').style.display = 'flex';
 }
 
 // Handles everything that happens when the player submits a wrong answer.
 // Increments the attempt counter, shows feedback, and conditionally reveals
 // the hint and/or the new-question button based on attempt thresholds.
-function mgHandleWrongAnswer() {
+export function mgHandleWrongAnswer() {
     gateAttempts++;
     trackAchStat('gateRejections');
     showMgFeedback(t('mg_wrong').replace('{n}', gateAttempts), false);
@@ -738,7 +761,7 @@ function mgHandleWrongAnswer() {
 // Called when the player submits an answer (via button click or Enter key).
 // Guards against double-firing, validates the input, then delegates to the
 // correct or wrong answer flow.
-function submitMathGate() {
+export function submitMathGate() {
     if (!currentGateQuestion) return;
     if (mgIsSubmitting) return;
 
@@ -763,7 +786,7 @@ function submitMathGate() {
 // Replaces the current question with a different one from the same pool.
 // Resets all attempt state and re-focuses the input.
 // Only becomes available to the player after MG_NEW_QUESTION_THRESHOLD failures.
-function mgNewQuestion() {
+export function mgNewQuestion() {
     const pool = mgGetQuestionPool(pendingGateGi);
     currentGateQuestion = mgPickDifferentQuestion(pool, worldOfGi(pendingGateGi));
     gateAttempts = 0;

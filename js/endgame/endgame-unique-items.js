@@ -1,4 +1,18 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { renderCell, updClues } from '../grid.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { save } from '../state.js';
+import { LANG } from '../translation/translations.js';
+import { EG_ALL_BASE_TYPES, EG_SLOT_ICONS } from './endgame-equipment-base-items.js';
+import { _egEquipped, _egInventory, egSaveHubState } from './endgame-hub.js';
+import { _egRollImplicitsForBase } from './endgame-implicits.js';
+import { _egMapLootRarityWeightMult } from './endgame-map-launch.js';
+
+//------------------------------------------------------------------------
 //-------------------UNIQUE ITEMS (PoE-STYLE)-----------------------------
 //------------------------------------------------------------------------
 // Fixed-modifier named items with a built-in downside - the golden tier
@@ -22,7 +36,7 @@
 
 // Chance that an equipment drop is replaced by a random unique
 // (~2% of equipment drops → roughly 1 in 150 normal monster kills).
-const EG_UNIQUE_DROP_CHANCE = 0.02;
+export const EG_UNIQUE_DROP_CHANCE = 0.02;
 
 // The active map's loot-rarity bonus also makes uniques more likely
 // (applied as a square-root so rarity farming helps, but softly).
@@ -30,8 +44,8 @@ const EG_UNIQUE_DROP_CHANCE = 0.02;
 // Unique-only QoL perk text for the zero-line auto-mark modifier.
 // Rendered as a special (blue) tooltip line, NOT a stat mod - it never
 // touches EG_STAT_KEY_MAP / _egComputePlayerStats.
-const EG_UNIQUE_ZERO_AUTOMARK_EN = 'Rows and Columns with zero filled cells are automatically marked incorrect on level start';
-const EG_UNIQUE_ZERO_AUTOMARK_DE = 'Reihen und Spalten ohne gefüllte Zellen werden bei Levelstart automatisch als falsch markiert';
+export const EG_UNIQUE_ZERO_AUTOMARK_EN = 'Rows and Columns with zero filled cells are automatically marked incorrect on level start';
+export const EG_UNIQUE_ZERO_AUTOMARK_DE = 'Reihen und Spalten ohne gefüllte Zellen werden bei Levelstart automatisch als falsch markiert';
 
 
 //------------------------------------------------------------------------
@@ -52,7 +66,7 @@ const EG_UNIQUE_ZERO_AUTOMARK_DE = 'Reihen und Spalten ohne gefüllte Zellen wer
 //     perk traded for raw power: the carrier uniques below are deliberately
 //     tuned slightly below curve for their level (see _egApplyUniqueZeroLineAutomark).
 
-const EG_UNIQUE_ITEMS = [
+export const EG_UNIQUE_ITEMS = [
 
     // ── Head ──────────────────────────────────────────────────────────
     {
@@ -6325,7 +6339,7 @@ const EG_UNIQUE_ITEMS = [
 
 // Returns the special (non-stat) modifier lines for a unique item or def.
 // Currently only the zero-line auto-mark perk. Each entry is { en, de }.
-function _egGetUniqueSpecialLines(itemOrDef) {
+export function _egGetUniqueSpecialLines(itemOrDef) {
     if (!itemOrDef) return [];
     // Item instances carry the copied boolean flag (see _egBuildUniqueItem).
     const hasZeroAutomark = !!itemOrDef.autoMarkZeroLines;
@@ -6341,7 +6355,7 @@ function _egGetUniqueSpecialLines(itemOrDef) {
 }
 
 // True when any currently equipped unique grants zero-line auto-mark.
-function _egHasZeroAutomarkEquipped() {
+export function _egHasZeroAutomarkEquipped() {
     try {
         if (typeof _egEquipped === 'undefined' || !_egEquipped) return false;
         return Object.values(_egEquipped).some(it => !!it && !!it.isUnique && !!it.autoMarkZeroLines);
@@ -6354,15 +6368,15 @@ function _egHasZeroAutomarkEquipped() {
 // marked. Respects ergodic_field / oracle (which disable all auto-marks).
 // Zero lines hold no solution cells, so this can never solve the puzzle
 // and intentionally skips checkWin().
-function _egApplyUniqueZeroLineAutomark() {
+export function _egApplyUniqueZeroLineAutomark() {
     if (!_egHasZeroAutomarkEquipped()) return 0;
-    if (typeof cur === 'undefined' || !cur || !cur.grid) return 0;
+    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid) return 0;
     try {
         if (typeof ptHasSkill === 'function' && ptHasSkill('keystone_ergodic_field')) return 0;
     } catch (e) {}
     if (window._oracleActive) return 0;
 
-    const sol = cur.grid;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     if (!rows) return 0;
     const cols = sol[0].length;
@@ -6371,12 +6385,12 @@ function _egApplyUniqueZeroLineAutomark() {
     const affected = [];
     const markCell = (r, c) => {
         if (sol[r][c] !== 0) return;
-        if (typeof wrongGrid !== 'undefined' && wrongGrid[r][c]) return;
-        if (typeof userGrid === 'undefined' || userGrid[r][c] === 2) return;
+        if (typeof wrongGrid !== 'undefined' && globalThis.wrongGrid[r][c]) return;
+        if (typeof userGrid === 'undefined' || globalThis.userGrid[r][c] === 2) return;
         // Only touch untouched/questioned cells - never overwrite fills.
-        if (userGrid[r][c] !== 0 && userGrid[r][c] !== 3) return;
-        userGrid[r][c] = 2;
-        try { systemMarkedGrid[r][c] = true; } catch (e) {}
+        if (globalThis.userGrid[r][c] !== 0 && globalThis.userGrid[r][c] !== 3) return;
+        globalThis.userGrid[r][c] = 2;
+        try { globalThis.systemMarkedGrid[r][c] = true; } catch (e) {}
         try { renderCell(r, c); } catch (e) {}
         affected.push(`g-${r}-${c}`);
         // Keep intersecting non-zero lines' clue flags consistent; isInitial
@@ -6402,14 +6416,14 @@ function _egApplyUniqueZeroLineAutomark() {
     }
 
     if (affected.length && typeof _applyCellEffect === 'function') {
-        try { _applyCellEffect(affected, 'mark'); } catch (e) {}
+        try { globalThis._applyCellEffect(affected, 'mark'); } catch (e) {}
     }
     return affected.length;
 }
 
 // Localized label for one unique stat line; '#' is replaced by the value
 // with an explicit '+' sign for positive numbers.
-function _egUniqueStatLabel(stat) {
+export function _egUniqueStatLabel(stat) {
     const template = (LANG === 'de') ? (stat.de || stat.en) : (stat.en || stat.de);
     const val = Number(stat.value) || 0;
     const str = String(template);
@@ -6427,7 +6441,7 @@ function _egUniqueStatLabel(stat) {
 // so uniques without explicit stats still have meaningful base armor / damage
 // and are not useless. This also fixes old uniques that were defined without
 // a defenses/damage field.
-function _egUniqueFallbackDefenses(def) {
+export function _egUniqueFallbackDefenses(def) {
     const jewelry = new Set(['ring', 'earring', 'amulet', 'talisman']);
     if (jewelry.has(def.slotType)) return { armour: 0, evasion: 0, absorption: 0 };
     if (typeof EG_ALL_BASE_TYPES === 'undefined' || !Array.isArray(EG_ALL_BASE_TYPES)) return null;
@@ -6441,7 +6455,7 @@ function _egUniqueFallbackDefenses(def) {
     if (best && best.defenses) return { armour: best.defenses.armour || 0, evasion: best.defenses.evasion || 0, absorption: best.defenses.absorption || 0 };
     return null;
 }
-function _egUniqueFallbackDamage(def) {
+export function _egUniqueFallbackDamage(def) {
     if (typeof EG_ALL_BASE_TYPES === 'undefined' || !Array.isArray(EG_ALL_BASE_TYPES)) return null;
     let candidates = EG_ALL_BASE_TYPES.filter(b => b.slotType === def.slotType && b.damage);
     if (!candidates.length) return null;
@@ -6456,7 +6470,7 @@ function _egUniqueFallbackDamage(def) {
     else if (def.slotType === 'ranged') out.attackIntervalSeconds = 3.0; // sensible default for ranged
     return out;
 }
-function _egUniqueFallbackBlockChance(def) {
+export function _egUniqueFallbackBlockChance(def) {
     if (def.slotType !== 'shield') return null;
     if (typeof EG_ALL_BASE_TYPES === 'undefined' || !Array.isArray(EG_ALL_BASE_TYPES)) return null;
     let candidates = EG_ALL_BASE_TYPES.filter(b => b.slotType === 'shield' && b.blockChance != null);
@@ -6471,7 +6485,7 @@ function _egUniqueFallbackBlockChance(def) {
 
 // Helper: strenghten downside values to balance new implicits (~30% stronger).
 // Keeps ±1 untouched (e.g. -1 mistake_count) to avoid double-harsh penalties.
-function _egStrengthenDownsideValue(v) {
+export function _egStrengthenDownsideValue(v) {
     if (v === 0 || Math.abs(v) === 1) return v;
     const factor = 1.30;
     if (Number.isInteger(v)) {
@@ -6483,7 +6497,7 @@ function _egStrengthenDownsideValue(v) {
     const scaled = v * factor;
     return Math.round(scaled * 10) / 10;
 }
-function _egBuildUniqueImplicits(def, defenses) {
+export function _egBuildUniqueImplicits(def, defenses) {
     try {
         if (typeof _egRollImplicitsForBase !== 'function') return [];
         const syntheticBase = {
@@ -6498,14 +6512,14 @@ function _egBuildUniqueImplicits(def, defenses) {
 }
 // Retroactively heals an already-stashed unique that was saved before
 // Two-handed unique weapons (everything else with slotType 'weapon' is 1H).
-const EG_UNIQUE_TWO_HANDED_IDS = new Set([
+export const EG_UNIQUE_TWO_HANDED_IDS = new Set([
     'worldsplitter', 'doomcallers_maul', 'hammer_of_reasonable_doubt',
     'protractor_polearm', 'slide_rule_scythe',
 ]);
 
 // Infers 1H/2H for a weapon item without a `hands` field (legacy saves).
 // Prefers the unique def, then the base-type table, then a slow-interval heuristic.
-function _egInferWeaponHands(item) {
+export function _egInferWeaponHands(item) {
     if (!item || item.slotType !== 'weapon') return null;
     if (typeof EG_UNIQUE_ITEMS !== 'undefined' && item.baseId) {
         const def = EG_UNIQUE_ITEMS.find(u => u.uniqueId === item.baseId);
@@ -6523,7 +6537,7 @@ function _egInferWeaponHands(item) {
 
 // base armor/damage was added or before implicits/downside rebalance.
 // Mutates `item` in place, returns true if anything was changed.
-function _egHealUniqueItem(item) {
+export function _egHealUniqueItem(item) {
     if (!item || !item.isUnique || !item.baseId) return false;
     let changed = false;
     let def = null;
@@ -6634,7 +6648,7 @@ function _egHealUniqueItem(item) {
 }
 
 // Builds the full item object for a unique definition.
-function _egBuildUniqueItem(def, monsterLevel) {
+export function _egBuildUniqueItem(def, monsterLevel) {
     const name = (LANG === 'de') ? (def.nameDe || def.nameEn) : def.nameEn;
     const icon = def.icon || EG_SLOT_ICONS[def.slotType] || '📦';
 
@@ -6728,7 +6742,7 @@ function _egBuildUniqueItem(def, monsterLevel) {
 
 // Returns a unique item object, or null when this drop is not a unique.
 // Called from _egSpawnLootDrop BEFORE the regular generator.
-function _egTryGenerateUniqueDrop(monsterLevel = 1) {
+export function _egTryGenerateUniqueDrop(monsterLevel = 1) {
     // Active map's loot rarity bonus softens the odds in the player's favor.
     let mult = 1;
     if (typeof _egMapLootRarityWeightMult === 'function') {
@@ -6750,7 +6764,15 @@ function _egTryGenerateUniqueDrop(monsterLevel = 1) {
 // file was parsed (hub.js calls _egLoadHubState at file bottom).
 // Also healed on every future _egLoadHubState via the hub's own block.
 // ----------------------------------------------------------------------
-(function _egHealExistingUniqueStashOnLoad() {
+// Module era: unique-items.js evaluates inside an import cycle, so running
+// this HERE would read uninitialized _egInventory/_egEquipped (typeof THROWS
+// on TDZ bindings) and silently skip the live-stash heal. Classic order
+// (unique-items BEFORE hub) always saw them ABSENT and skipped the live heal
+// too - but it DID heal the persisted STATE. Defer to DOMContentLoaded: all
+// bindings are initialized (live mirrors still empty - hub loads on user
+// action), the STATE heal runs as in classic, and the audit stays honest
+// (established step-5 passive-tree pattern).
+function _egBootHealExistingUniqueStash() {
     try {
         if (typeof _egHealUniqueItem !== 'function') return;
         let changed = false;
@@ -6765,23 +6787,28 @@ function _egTryGenerateUniqueDrop(monsterLevel = 1) {
             }
         };
         // Heal STATE (persisted) and live _egInventory/_egEquipped if already initialized
-        if (typeof STATE !== 'undefined' && STATE) {
-            if (Array.isArray(STATE.egInventory)) healGridState(STATE.egInventory);
-            if (STATE.egEquipped && typeof STATE.egEquipped === 'object') {
-                for (const it of Object.values(STATE.egEquipped)) if (it && it.isUnique && _egHealUniqueItem(it)) changed = true;
+        if (typeof STATE !== 'undefined' && globalThis.STATE) {
+            if (Array.isArray(globalThis.STATE.egInventory)) healGridState(globalThis.STATE.egInventory);
+            if (globalThis.STATE.egEquipped && typeof globalThis.STATE.egEquipped === 'object') {
+                for (const it of Object.values(globalThis.STATE.egEquipped)) if (it && it.isUnique && _egHealUniqueItem(it)) changed = true;
             }
-            if (STATE.egMapSlotItem && STATE.egMapSlotItem.isUnique && _egHealUniqueItem(STATE.egMapSlotItem)) changed = true;
-            if (STATE.egCraftingBenchItem && STATE.egCraftingBenchItem.isUnique && _egHealUniqueItem(STATE.egCraftingBenchItem)) changed = true;
+            if (globalThis.STATE.egMapSlotItem && globalThis.STATE.egMapSlotItem.isUnique && _egHealUniqueItem(globalThis.STATE.egMapSlotItem)) changed = true;
+            if (globalThis.STATE.egCraftingBenchItem && globalThis.STATE.egCraftingBenchItem.isUnique && _egHealUniqueItem(globalThis.STATE.egCraftingBenchItem)) changed = true;
         }
         if (typeof _egInventory !== 'undefined' && Array.isArray(_egInventory)) healGridState(_egInventory);
         if (typeof _egEquipped !== 'undefined' && _egEquipped && typeof _egEquipped === 'object') {
             for (const it of Object.values(_egEquipped)) if (it && it.isUnique && _egHealUniqueItem(it)) changed = true;
         }
-        if (typeof _egMapSlotItem !== 'undefined' && _egMapSlotItem && _egMapSlotItem.isUnique && _egHealUniqueItem(_egMapSlotItem)) changed = true;
-        if (typeof _egCraftingBenchItem !== 'undefined' && _egCraftingBenchItem && _egCraftingBenchItem.isUnique && _egHealUniqueItem(_egCraftingBenchItem)) changed = true;
+        if (typeof _egMapSlotItem !== 'undefined' && globalThis._egMapSlotItem && globalThis._egMapSlotItem.isUnique && _egHealUniqueItem(globalThis._egMapSlotItem)) changed = true;
+        if (typeof _egCraftingBenchItem !== 'undefined' && globalThis._egCraftingBenchItem && globalThis._egCraftingBenchItem.isUnique && _egHealUniqueItem(globalThis._egCraftingBenchItem)) changed = true;
         if (changed) {
             if (typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
             else if (typeof save === 'function') { try { save(); } catch (e) {} }
         }
     } catch (e) { /* ignore load-order */ }
-})();
+}
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _egBootHealExistingUniqueStash);
+} else {
+    _egBootHealExistingUniqueStash();
+}

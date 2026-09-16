@@ -1,17 +1,32 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { renderCell } from '../grid.js';
+import { questStat_shadowSealUsed } from '../quests/quests-stats.js';
+import { _trackTimerDelta } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { _applyCellEffect } from './cell-effects.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+import { shuffle } from './shared/puzzle-helpers.js';
+
+//------------------------------------------------------------------------
 //-------------------SHADOW SEAL----------------------
 //------------------------------------------------------------------------
 
 // shadowSeal - sets the timer to exactly 5 min, permanently hides all
 // clues for the rest of the level, and mass-marks 75 % of empty cells.
-function _useShadowSeal(id, def) {
+export function _useShadowSeal(id, def) {
     questStat_shadowSealUsed();
-    if (!cur) return '';
+    if (!globalThis.cur) return '';
 
     // 1. Hard-set the timer to exactly 5 minutes
-    const before = timerSecs;
-    timerSecs = 300;
-    _trackTimerDelta(before, timerSecs);
+    const before = globalThis.timerSecs;
+    globalThis.timerSecs = 300;
+    _trackTimerDelta(before, globalThis.timerSecs);
 
     // 2. Permanently hide all row and column clues for this level
     window._shadowSealActive = true;
@@ -19,14 +34,14 @@ function _useShadowSeal(id, def) {
         .forEach(el => el.classList.add('clue-blackout'));
 
     // 3. Mark 75% of all empty non-solution cells as wrong
-    const sol = cur.grid;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
     const cands = [];
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            if (sol[r][c] === 0 && (userGrid[r][c] === 0 || userGrid[r][c] === 3) && !wrongGrid?.[r]?.[c]) {
+            if (sol[r][c] === 0 && (globalThis.userGrid[r][c] === 0 || globalThis.userGrid[r][c] === 3) && !globalThis.wrongGrid?.[r]?.[c]) {
                 cands.push([r, c]);
             }
         }
@@ -36,8 +51,8 @@ function _useShadowSeal(id, def) {
     shuffle(cands);
     const affected = [];
     cands.slice(0, markCount).forEach(([r, c]) => {
-        userGrid[r][c] = 2;
-        systemMarkedGrid[r][c] = true;
+        globalThis.userGrid[r][c] = 2;
+        globalThis.systemMarkedGrid[r][c] = true;
         renderCell(r, c);
         affected.push(`g-${r}-${c}`);
     });
@@ -52,7 +67,7 @@ function _useShadowSeal(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the dark void veil that briefly obscures the grid.
-function _fxMakeShadowVeil(container, r) {
+export function _fxMakeShadowVeil(container, r) {
     const veil = document.createElement('div');
     veil.style.cssText = `
         position:absolute;
@@ -65,7 +80,7 @@ function _fxMakeShadowVeil(container, r) {
 }
 
 // 🌑 Shadow Seal - dark void engulfs the puzzle, then disperses.
-function _fxShadowSeal() {
+export function _fxShadowSeal() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

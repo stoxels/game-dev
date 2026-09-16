@@ -1,11 +1,24 @@
-﻿// ════════════════════════════════════════════════════════════════════════════
+//------------------------------------------------------------------------
+// PHASE 3 (quests step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { setAchStat, trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { save } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { LEDGER_CATEGORIES, _MILESTONE_MAP } from './quests-data.js';
+import { _incDirect } from './quests-stats.js';
+import { renderQuestLog } from './quests-ui.js';
+
+// ════════════════════════════════════════════════════════════════════════════
 //
 //  quests-logic.js  -  Milestone evaluation, claiming, banner, badge,
 //                      and achievement tracking for the quest ledger.
 //
 //  Depends on: quests-data.js   (LEDGER_CATEGORIES, _MILESTONE_MAP)
 //  Depends on: achievements.js  (trackAchStat, setAchStat)
-//  Depends on: (global)         STATE, LANG, ITEM_DEFS, save(), pickRandomItem()
+//  Depends on: (global)         globalThis.STATE, LANG, globalThis.ITEM_DEFS, save(), globalThis.pickRandomItem()
 //
 //  Public API:
 //    claimQuest(milestoneId)      - claim a completed milestone by id
@@ -22,22 +35,22 @@
 
 
 //------------------------------------------------------------------------
-//-------------------CONSTANTS & STATE-------------------------------------
+//-------------------CONSTANTS & globalThis.STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 /** How long (ms) the claim banner stays visible before starting to fade out. */
-const BANNER_DISMISS_MS = 4000;
+export const BANNER_DISMISS_MS = 4000;
 
 /** Duration (ms) of the claim banner CSS fade-out. Must match .qcb fade CSS. */
-const BANNER_FADEOUT_MS = 400;
+export const BANNER_FADEOUT_MS = 400;
 
 /**
  * Category ids that qualify as "keystone" quests for achievement tracking.
  * Defined here at the top level so the Set is only created once, not on
  * every claim event.
  */
-const KEYSTONE_CATEGORY_IDS = new Set([
+export const KEYSTONE_CATEGORY_IDS = new Set([
     'signal_noise_master',
     'oracle_vision',
     'degrees_of_freedom_master',
@@ -59,7 +72,7 @@ const KEYSTONE_CATEGORY_IDS = new Set([
  * Allows _ach_trackCategoryMilestone() to be a simple lookup rather than
  * a long chain of if-statements.
  */
-const CATEGORY_ACHIEVEMENT_MAP = {
+export const CATEGORY_ACHIEVEMENT_MAP = {
     expected_value: 'inferenceScoreMilestones',
     sample_size: 'inferenceSampleMilestones',
     parameter_space: 'inferenceWorldMilestones',
@@ -82,7 +95,7 @@ const CATEGORY_ACHIEVEMENT_MAP = {
 //------------------------------------------------------------------------
 //
 //  Read-only query layer. All UI and claiming code goes through these
-//  functions - nothing should read STATE.questStats or STATE.questsClaimed
+//  functions - nothing should read globalThis.STATE.questStats or globalThis.STATE.questsClaimed
 //  directly outside of this section.
 //
 
@@ -91,8 +104,8 @@ const CATEGORY_ACHIEVEMENT_MAP = {
  * @param {Object} ms - A milestone object from quests-data.js
  * @returns {boolean}
  */
-function _milestone_isComplete(ms) {
-    const { current, target } = ms.check(STATE.questStats || {});
+export function _milestone_isComplete(ms) {
+    const { current, target } = ms.check(globalThis.STATE.questStats || {});
     return current >= target;
 }
 
@@ -101,8 +114,8 @@ function _milestone_isComplete(ms) {
  * @param {Object} ms - A milestone object from quests-data.js
  * @returns {boolean}
  */
-function _milestone_isClaimed(ms) {
-    return (STATE.questsClaimed || []).includes(ms.id);
+export function _milestone_isClaimed(ms) {
+    return (globalThis.STATE.questsClaimed || []).includes(ms.id);
 }
 
 /**
@@ -111,8 +124,8 @@ function _milestone_isClaimed(ms) {
  * @param {Object} ms - A milestone object from quests-data.js
  * @returns {{ current: number, target: number, pct: number }}
  */
-function _milestone_getProgress(ms) {
-    const { current, target } = ms.check(STATE.questStats || {});
+export function _milestone_getProgress(ms) {
+    const { current, target } = ms.check(globalThis.STATE.questStats || {});
     const clamped = Math.min(current, target);
     const pct = Math.min(100, Math.round((clamped / target) * 100));
     return { current: clamped, target, pct };
@@ -123,7 +136,7 @@ function _milestone_getProgress(ms) {
  * Used to decide whether the red badge on the quest-log button should be shown.
  * @returns {boolean}
  */
-function _ledger_hasAnyClaimable() {
+export function _ledger_hasAnyClaimable() {
     return LEDGER_CATEGORIES.some(cat =>
         cat.milestones.some(ms => _milestone_isComplete(ms) && !_milestone_isClaimed(ms))
     );
@@ -135,9 +148,9 @@ function _ledger_hasAnyClaimable() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 //
-//  Helpers that write reward data into STATE.
+//  Helpers that write reward data into globalThis.STATE.
 //  All reward mutations are funnelled through _reward_grantAll() so
-//  it's easy to find every place STATE is modified during a claim.
+//  it's easy to find every place globalThis.STATE is modified during a claim.
 //
 
 /**
@@ -146,26 +159,26 @@ function _ledger_hasAnyClaimable() {
  * Placed first because _reward_grantOneItem() depends on it.
  * @returns {string}
  */
-function _reward_generateItemUid() {
+export function _reward_generateItemUid() {
     return `ledger_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 }
 
 /**
  * Resolves a single item defId (handling the special '__random__' token),
  * then pushes the resulting item into the player's inventory.
- * Silently no-ops if the resolved id is missing or not found in ITEM_DEFS.
+ * Silently no-ops if the resolved id is missing or not found in globalThis.ITEM_DEFS.
  * @param {string} defId - Raw defId from the reward definition; may be '__random__'
  */
-function _reward_grantOneItem(defId) {
-    // '__random__' is resolved at grant-time via pickRandomItem().
-    // pickRandomItem() may return null if the Apex Collector passive consumed the pool.
-    const resolvedId = defId === '__random__' ? pickRandomItem() : defId;
+export function _reward_grantOneItem(defId) {
+    // '__random__' is resolved at grant-time via globalThis.pickRandomItem().
+    // globalThis.pickRandomItem() may return null if the Apex Collector passive consumed the pool.
+    const resolvedId = defId === '__random__' ? globalThis.pickRandomItem() : defId;
     if (!resolvedId) return null;
 
-    const def = ITEM_DEFS[resolvedId];
+    const def = globalThis.ITEM_DEFS[resolvedId];
     if (!def) return null;
 
-    STATE.inventory.push({
+    globalThis.STATE.inventory.push({
         uid: _reward_generateItemUid(),
         defId: resolvedId,
     });
@@ -174,11 +187,11 @@ function _reward_grantOneItem(defId) {
 }
 
 /**
- * Adds passive-tree skill points to STATE.
+ * Adds passive-tree skill points to globalThis.STATE.
  * @param {number} amount - Number of points to add
  */
-function _reward_grantPassivePoints(amount) {
-    STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + amount;
+export function _reward_grantPassivePoints(amount) {
+    globalThis.STATE.passiveTreePoints = (globalThis.STATE.passiveTreePoints || 0) + amount;
     _incDirect('lifetimePassivePointsObtained', amount);
 }
 
@@ -188,7 +201,7 @@ function _reward_grantPassivePoints(amount) {
  * @param {Object} ms - The milestone whose rewards should be granted
  * @returns {string[]} defIds of every item actually granted (resolved, non-null)
  */
-function _reward_grantAll(ms) {
+export function _reward_grantAll(ms) {
     Audio_Manager.playSFX('questRewardClaimed');
 
     if (ms.reward.ptPoints) {
@@ -224,9 +237,9 @@ function _reward_grantAll(ms) {
  * @param {boolean} de   - True when the current language is German
  * @returns {string}
  */
-function _banner_resolveItemLabel(defId, de) {
-    const resolvedId = defId === '__random__' ? pickRandomItem() : defId;
-    const def = resolvedId ? ITEM_DEFS[resolvedId] : null;
+export function _banner_resolveItemLabel(defId, de) {
+    const resolvedId = defId === '__random__' ? globalThis.pickRandomItem() : defId;
+    const def = resolvedId ? globalThis.ITEM_DEFS[resolvedId] : null;
     return def
         ? `${def.icon} ${de ? def.nameDE : def.nameEn}`
         : t('qa_item_fallback');
@@ -240,9 +253,9 @@ function _banner_resolveItemLabel(defId, de) {
  * @param {string} defId - Resolved item defId (already resolved, not '__random__')
  * @returns {string}
  */
-function _questItemGrantToastMsg(defId) {
+export function _questItemGrantToastMsg(defId) {
     const de = LANG === 'de';
-    const def = ITEM_DEFS[defId];
+    const def = globalThis.ITEM_DEFS[defId];
     const label = def ? `${def.icon} ${de ? def.nameDE : def.nameEn}` : t('qa_item_fallback');
     return `🎒 ${t('qa_added_prefix')}: ${label}`;
 }
@@ -253,7 +266,7 @@ function _questItemGrantToastMsg(defId) {
  * @param {Object} ms - The milestone that was just claimed
  * @returns {string[]}
  */
-function _banner_buildRewardParts(ms) {
+export function _banner_buildRewardParts(ms) {
     const de = LANG === 'de';
     const parts = [];
 
@@ -277,7 +290,7 @@ function _banner_buildRewardParts(ms) {
  * @param {string[]} rewardParts - Output of _banner_buildRewardParts()
  * @returns {HTMLElement}
  */
-function _banner_buildElement(ms, cat, rewardParts) {
+export function _banner_buildElement(ms, cat, rewardParts) {
     const de = LANG === 'de';
 
     const banner = document.createElement('div');
@@ -306,7 +319,7 @@ function _banner_buildElement(ms, cat, rewardParts) {
  * Starts the auto-dismiss sequence for the claim banner:
  * waits BANNER_DISMISS_MS, then fades it out over BANNER_FADEOUT_MS, then removes it.
  */
-function _banner_startAutoDismiss() {
+export function _banner_startAutoDismiss() {
     setTimeout(() => {
         const el = document.getElementById('quest-claim-banner');
         if (!el) return;
@@ -321,7 +334,7 @@ function _banner_startAutoDismiss() {
  * @param {Object} ms  - The milestone that was just claimed
  * @param {Object} cat - The parent category of that milestone
  */
-function _showClaimBanner(ms, cat) {
+export function _showClaimBanner(ms, cat) {
     // Remove any previous banner that hasn't finished fading yet
     document.getElementById('quest-claim-banner')?.remove();
 
@@ -346,7 +359,7 @@ function _showClaimBanner(ms, cat) {
  * Shows or hides the red claimable-badge on the quest-log toolbar button.
  * Should be called any time milestone claimed/completed state may have changed.
  */
-function _refreshQuestBadge() {
+export function _refreshQuestBadge() {
     const badge = document.getElementById('quest-log-badge');
     if (!badge) return;
     badge.style.display = _ledger_hasAnyClaimable() ? 'inline-block' : 'none';
@@ -356,7 +369,7 @@ function _refreshQuestBadge() {
  * Public initialiser - call this from game init once the toolbar button
  * is in the DOM. Sets the correct initial badge visibility on load.
  */
-function buildQuestLogButton() {
+export function buildQuestLogButton() {
     _refreshQuestBadge();
 }
 
@@ -382,7 +395,7 @@ function buildQuestLogButton() {
  * Increments the global "total quests claimed" achievement counter.
  * Fired on every successful claim regardless of category or reward type.
  */
-function _ach_trackGlobalClaim() {
+export function _ach_trackGlobalClaim() {
     trackAchStat('inferenceQuestsClaimed');
 }
 
@@ -391,7 +404,7 @@ function _ach_trackGlobalClaim() {
  * Only called when the milestone reward actually includes pt points.
  * @param {Object} ms - The milestone that was just claimed
  */
-function _ach_trackPassivePointsEarned(ms) {
+export function _ach_trackPassivePointsEarned(ms) {
     if (ms.reward && ms.reward.ptPoints) {
         trackAchStat('inferencePtPointsEarned', ms.reward.ptPoints);
     }
@@ -402,7 +415,7 @@ function _ach_trackPassivePointsEarned(ms) {
  * is listed in KEYSTONE_CATEGORY_IDS.
  * @param {Object} cat - The parent category of the claimed milestone
  */
-function _ach_trackKeystoneQuest(cat) {
+export function _ach_trackKeystoneQuest(cat) {
     if (KEYSTONE_CATEGORY_IDS.has(cat.id)) {
         trackAchStat('inferenceKeystoneQuestsDone');
     }
@@ -414,7 +427,7 @@ function _ach_trackKeystoneQuest(cat) {
  * No-ops silently if the category has no mapped stat (e.g. future categories).
  * @param {Object} cat - The parent category of the claimed milestone
  */
-function _ach_trackCategoryMilestone(cat) {
+export function _ach_trackCategoryMilestone(cat) {
     const stat = CATEGORY_ACHIEVEMENT_MAP[cat.id];
     if (stat) {
         trackAchStat(stat);
@@ -427,10 +440,10 @@ function _ach_trackCategoryMilestone(cat) {
  * the 'inferenceFullCategoriesClaimed' achievement stat via setAchStat.
  * @param {Object} cat - The category to check for full completion
  */
-function _ach_trackFullCategoryCompletion(cat) {
+export function _ach_trackFullCategoryCompletion(cat) {
     if (typeof setAchStat !== 'function') return;
 
-    const claimedIds = STATE.questsClaimed || [];
+    const claimedIds = globalThis.STATE.questsClaimed || [];
 
     // Check if this specific category just became fully complete
     const thisCategoryComplete = cat.milestones.every(m => claimedIds.includes(m.id));
@@ -450,7 +463,7 @@ function _ach_trackFullCategoryCompletion(cat) {
  * @param {Object} ms  - The milestone that was just claimed
  * @param {Object} cat - The parent category of that milestone
  */
-function _trackInferenceAchievements(ms, cat) {
+export function _trackInferenceAchievements(ms, cat) {
     if (typeof trackAchStat !== 'function') return;
 
     _ach_trackGlobalClaim();
@@ -471,13 +484,13 @@ function _trackInferenceAchievements(ms, cat) {
 //
 
 /**
- * Marks a milestone as claimed by pushing its id into STATE.questsClaimed.
+ * Marks a milestone as claimed by pushing its id into globalThis.STATE.questsClaimed.
  * Initialises the array if it doesn't exist yet.
  * @param {Object} ms - The milestone to mark as claimed
  */
-function _claim_recordClaim(ms) {
-    if (!STATE.questsClaimed) STATE.questsClaimed = [];
-    STATE.questsClaimed.push(ms.id);
+export function _claim_recordClaim(ms) {
+    if (!globalThis.STATE.questsClaimed) globalThis.STATE.questsClaimed = [];
+    globalThis.STATE.questsClaimed.push(ms.id);
 }
 
 /**
@@ -487,7 +500,7 @@ function _claim_recordClaim(ms) {
  * Called from inline onclick handlers in quests-ui.js.
  * @param {string} milestoneId - The id of the milestone to claim
  */
-function claimQuest(milestoneId) {
+export function claimQuest(milestoneId) {
     const entry = _MILESTONE_MAP[milestoneId];
     if (!entry) return;
 
@@ -505,11 +518,11 @@ function claimQuest(milestoneId) {
     _refreshQuestBadge();
     renderQuestLog();
 
-    if (typeof buildInventoryPanel === 'function') buildInventoryPanel();
-    if (typeof showItemGainPopup === 'function') {
-        grantedIds.forEach(defId => showItemGainPopup(defId));
+    if (typeof globalThis.buildInventoryPanel === 'function') globalThis.buildInventoryPanel();
+    if (typeof globalThis.showItemGainPopup === 'function') {
+        grantedIds.forEach(defId => globalThis.showItemGainPopup(defId));
     }
-    if (typeof showToast === 'function') {
-        grantedIds.forEach(defId => showToast(_questItemGrantToastMsg(defId)));
+    if (typeof globalThis.showToast === 'function') {
+        grantedIds.forEach(defId => globalThis.showToast(_questItemGrantToastMsg(defId)));
     }
 }

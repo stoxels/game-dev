@@ -1,3 +1,12 @@
+﻿import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { LANG, t } from '../translation/translations.js';
+import { _formatCooldown } from '../classes/class-cooldown-state.js';
+import { hideHUDTooltip, moveHUDTooltip, showHUDTooltip } from '../classes/class-hud.js';
+import { _bloodMagicActive } from '../classes/class-mana.js';
+import { charmRankMeetsPlayerLevel, getCharmRankMinPlayerLevel, getCharmSkillOrbBonusPct, getCharmSlottedRank, isSkillCharmUnlocked } from './skill-charms.js';
+import { canAffordSkill, getPassiveSkillDef, getPlayerTraits, getSkillCooldown, getSkillDamage, getSkillDef, getSkillDesc, getSkillLevel, getSkillManaCost, getSkillName, isSkillPassive } from './skill-registry.js';
+import { getSkillCastTimeSeconds } from './spell-casttime.js';
+import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, getUniversalSpellMovementEstimate, getUniversalSpellSupportEstimate } from './universal-spells.js';
 // skill-tooltip.js
 //------------------------------------------------------------------------
 //-------------------SKILL TOOLTIP (PATH-OF-EXILE STYLE)------------------
@@ -25,7 +34,7 @@
 
 
 // Formats a cooldown in seconds for the tooltip (m:ss, or "12s").
-function _skillFormatCooldown(secs) {
+export function _skillFormatCooldown(secs) {
     const s = Math.max(0, Math.round(secs || 0));
     if (typeof _formatCooldown === 'function') return _formatCooldown(s);
     const m = Math.floor(s / 60);
@@ -38,14 +47,14 @@ function _skillFormatCooldown(secs) {
 //------------------------------------------------------------------------
 
 // The coloured type line: "Spell, Reveal, Area".
-function _skillTooltipTags(def) {
+export function _skillTooltipTags(def) {
     if (!def.tags || !def.tags.length) return '';
     return `<div class="skl-tip-tags">${def.tags.join(', ')}</div>`;
 }
 
 // Cost line - becomes red when the player cannot currently pay it, and
 // switches to Life under Blood Magic maps.
-function _skillTooltipCost(def) {
+export function _skillTooltipCost(def) {
     const cost = (typeof getSkillManaCost === 'function') ? getSkillManaCost(def.id) : 0;
     if (!cost) return '';
     const blood = (typeof _bloodMagicActive === 'function') && _bloodMagicActive();
@@ -59,7 +68,7 @@ function _skillTooltipCost(def) {
 // gear reduced it, the base value in parentheses. Charge spells (Blink,
 // Dash, …) show their pool instead: charges held, recharge time and - while
 // the pool is empty - the wait for the next charge.
-function _skillTooltipCooldown(def) {
+export function _skillTooltipCooldown(def) {
     const charges = (typeof getUniversalSpellCharges === 'function')
         ? getUniversalSpellCharges(def.id) : null;
     if (charges) {
@@ -84,7 +93,7 @@ function _skillTooltipCooldown(def) {
 
 // Cast-time line - instant skills fire on click; timed ones need the button
 // held until the cast bar fills (see js/skills/spell-casttime.js).
-function _skillTooltipCastTime(def) {
+export function _skillTooltipCastTime(def) {
     if (!def.castTime) return '';
     const isInstant = def.castTime === 'instant';
     let holdHint = '';
@@ -103,7 +112,7 @@ function _skillTooltipCastTime(def) {
 // Damage block - the puzzle-ability equivalent of PoE's "Deals X to Y
 // Physical Damage" lines: each revealed cell fires a reveal projectile.
 // Universal spells get their own direct-damage wording (see below).
-function _skillTooltipDamage(def) {
+export function _skillTooltipDamage(def) {
     if (typeof getSkillDamage !== 'function') return '';
     const dmg = getSkillDamage(def.id);
     if (!dmg) {
@@ -141,7 +150,7 @@ function _skillTooltipDamage(def) {
 // damage" plus a behaviour suffix (volley count, AoE, DoT ticks, chain,
 // delay) and a total line. Bilingual inline so no translation keys are
 // needed for the arsenal.
-function _uspTooltipDamage(def, dmg) {
+export function _uspTooltipDamage(def, dmg) {
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     const spell = (typeof getUniversalSpellDef === 'function') ? getUniversalSpellDef(def.id) : null;
     const elName = { fire: de ? 'Feuer' : 'Fire', cold: de ? 'Kälte' : 'Cold', lightning: de ? 'Blitz' : 'Lightning', shadow: de ? 'Schatten' : 'Shadow', physical: de ? 'physischen' : 'Physical' };
@@ -186,7 +195,7 @@ function _uspTooltipDamage(def, dmg) {
 // Support-spell wording: the concrete amount the cast will deliver. The line
 // is built inside getUniversalSpellSupportEstimate so the numbers shown here
 // are the same numbers the cast applies (rank + pools included).
-function _uspTooltipSupport(sup) {
+export function _uspTooltipSupport(sup) {
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     const line = de ? sup.lineDe : sup.lineEn;
     if (!line) return '';
@@ -198,7 +207,7 @@ function _uspTooltipSupport(sup) {
 // - while a Rift Anchor is armed - what the NEXT cast does instead of what the
 // spell does in general. Built inside getUniversalSpellMovementEstimate so the
 // numbers cannot drift from the ones the cast applies.
-function _uspTooltipMovement(mov) {
+export function _uspTooltipMovement(mov) {
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     const line = de ? mov.lineDe : mov.lineEn;
     if (!line) return '';
@@ -210,7 +219,7 @@ function _uspTooltipMovement(mov) {
 
 // Charm-orb bonus line, shown only when orbs have been applied to the
 // spell's charm (js/skills/skill-charms.js).
-function _skillTooltipCharmBonus(skillId) {
+export function _skillTooltipCharmBonus(skillId) {
     if (typeof getCharmSkillOrbBonusPct !== 'function') return '';
     const pct = getCharmSkillOrbBonusPct(skillId);
     if (!pct) return '';
@@ -218,13 +227,13 @@ function _skillTooltipCharmBonus(skillId) {
 }
 
 // Scaling line: "Scales with: Spell Damage, Cooldown Recovery".
-function _skillTooltipScaling(def) {
+export function _skillTooltipScaling(def) {
     if (!def.scaling || !def.scaling.length) return '';
     return `<div class="skl-tip-scaling">${t('skill_tip_scales_with')}: <b>${def.scaling.join(', ')}</b></div>`;
 }
 
 // Endgame-only warning for Heartbloom.
-function _skillTooltipGating(def) {
+export function _skillTooltipGating(def) {
     if (!def.endgameOnly) return '';
     const active = (typeof isEndgameLevel === 'function') && isEndgameLevel();
     return active
@@ -236,7 +245,7 @@ function _skillTooltipGating(def) {
 // spell cannot be cast, so the tooltip spells that out (the spell book's 🔒
 // badge is decorative and carries no native title tooltip). A slotted but
 // over-level charm names its player-level requirement instead.
-function _skillTooltipCharmLock(skillId) {
+export function _skillTooltipCharmLock(skillId) {
     if (typeof isSkillCharmUnlocked !== 'function') return '';
     if (isSkillCharmUnlocked(skillId)) return '';
     try {
@@ -256,7 +265,7 @@ function _skillTooltipCharmLock(skillId) {
 }
 
 // Small footer hint telling the player they can drag the skill.
-function _skillTooltipDragHint() {
+export function _skillTooltipDragHint() {
     return `<div class="skl-tip-foot">${t('skill_tip_drag_hint')}</div>`;
 }
 
@@ -266,7 +275,7 @@ function _skillTooltipDragHint() {
 //------------------------------------------------------------------------
 
 // Builds the full tooltip HTML for a castable skill.
-function buildSkillTooltipHTML(skillId) {
+export function buildSkillTooltipHTML(skillId) {
     const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
     if (!def) return '';
 
@@ -295,11 +304,11 @@ function buildSkillTooltipHTML(skillId) {
 }
 
 // Builds the tooltip HTML for a passive ability (never movable).
-function buildPassiveSkillTooltipHTML(passiveId) {
+export function buildPassiveSkillTooltipHTML(passiveId) {
     const def = (typeof getPassiveSkillDef === 'function') ? getPassiveSkillDef(passiveId) : null;
     if (!def) return '';
 
-    const rank = STATE.classPassiveLevel || 1;
+    const rank = globalThis.STATE.classPassiveLevel || 1;
     const data = def.levels && (def.levels[Math.min(rank, def.levels.length) - 1] || def.levels[0]);
     const name = LANG === 'de' ? (def.nameDE || def.nameEn) : def.nameEn;
     const desc = data ? (LANG === 'de' ? data.descDE : data.descEn) : '';
@@ -318,7 +327,7 @@ function buildPassiveSkillTooltipHTML(passiveId) {
 // Builds the tooltip HTML for one of the character's innate traits.
 // Traits are always-on (never placed on the hotbar), so they reuse the
 // passive tooltip look but are tagged as a character trait.
-function buildTraitTooltipHTML(traitIndex) {
+export function buildTraitTooltipHTML(traitIndex) {
     const traits = (typeof getPlayerTraits === 'function') ? getPlayerTraits() : [];
     const trait = traits[traitIndex];
     if (!trait) return '';
@@ -344,7 +353,7 @@ function buildTraitTooltipHTML(traitIndex) {
 //------------------------------------------------------------------------
 
 // Shows the tooltip for a character trait (by index into getPlayerTraits()).
-function handleTraitTip(e, traitIndex) {
+export function handleTraitTip(e, traitIndex) {
     if (typeof showHUDTooltip !== 'function') return;
     const html = buildTraitTooltipHTML(Number(traitIndex));
     if (html) showHUDTooltip(html, e);
@@ -352,7 +361,7 @@ function handleTraitTip(e, traitIndex) {
 
 
 // Shows the tooltip for a castable OR passive skill id.
-function handleSkillTip(e, skillId) {
+export function handleSkillTip(e, skillId) {
     if (typeof showHUDTooltip !== 'function') return;
     const html = (typeof isSkillPassive === 'function' && isSkillPassive(skillId))
         ? buildPassiveSkillTooltipHTML(skillId)
@@ -361,11 +370,11 @@ function handleSkillTip(e, skillId) {
 }
 
 // Repositions the floating tooltip as the cursor moves.
-function handleSkillTipMove(e) {
+export function handleSkillTipMove(e) {
     if (typeof moveHUDTooltip === 'function') moveHUDTooltip(e);
 }
 
 // Hides the floating tooltip.
-function handleSkillTipLeave() {
+export function handleSkillTipLeave() {
     if (typeof hideHUDTooltip === 'function') hideHUDTooltip();
 }

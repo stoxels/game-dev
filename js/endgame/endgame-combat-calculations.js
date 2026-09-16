@@ -1,15 +1,26 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_MELEE_OVERCHARGE_MULT } from './endgame-encounter.js';
+import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult, _egMapResistMult } from './endgame-map-launch.js';
+import { EG_PLAYER_STATS, _egComputePlayerStats, _egRollCrit } from './endgame-player-stats.js';
+import { _egQuizDamageBuffMult } from './endgame-quiz-buffs.js';
+import { EG_PLAYER_MELEE_DAMAGE } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------PLAYER DAMAGE CALCULATION----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Per-element breakdown of the most recent _egCalcPlayerDamage() roll.
 // Consumed by impact handlers to apply monster resistances per element.
-let _egLastHitElements = null;
-let _egLastHitWasCrit = false;
-let _egLastHitCritMult = 1;
+export let _egLastHitElements = null;
+export let _egLastHitWasCrit = false;
+export let _egLastHitCritMult = 1;
 
-function _egCalcPlayerDamage() {
+export function _egCalcPlayerDamage() {
     const stats = _egComputePlayerStats();
 
     let dmg = EG_PLAYER_STATS.baseDamage;
@@ -36,14 +47,14 @@ function _egCalcPlayerDamage() {
 
     dmg = Math.max(1, Math.round(dmg));
 
-    if (critMult > 1 && typeof showToast === 'function') showToast('💥 Critical Hit!');
+    if (critMult > 1 && typeof showToast === 'function') globalThis.showToast('💥 Critical Hit!');
 
     // Life leech - heal the player for a % of the damage about to be dealt.
     if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
         const heal = Math.round(dmg * (stats.lifeLeechPct / 100));
         if (heal > 0) {
-            playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
-            if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+            if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         }
     }
 
@@ -54,9 +65,9 @@ function _egCalcPlayerDamage() {
 // Per-element breakdown of the most recent _egCalcPlayerMeleeDamage() roll.
 // Passed to _egDamageTargetById so melee hits get the same resistance /
 // ailment / hit-burst treatment as projectiles.
-let _egLastMeleeElements = null;
-let _egLastMeleeWasCrit = false;
-let _egLastMeleeCritMult = 1;
+export let _egLastMeleeElements = null;
+export let _egLastMeleeWasCrit = false;
+export let _egLastMeleeCritMult = 1;
 
 // Manual melee channel (Secret-of-Mana-style) - fully independent from
 // projectiles: rolls the equipped weapon's base damage range plus its
@@ -67,7 +78,7 @@ let _egLastMeleeCritMult = 1;
 // _egCalcPlayerDamage() instead (see _egComputePlayerStats for routing).
 // `chargePct` (0..1) scales the whole roll - callers pass the spent manual
 // charge share (see _egApplyPlayerMeleeImpact in endgame-encounter.js).
-function _egCalcPlayerMeleeDamage(chargePct = 1) {
+export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     const stats = _egComputePlayerStats();
     // Manual charge share (Secret-of-Mana-style, linear): 1 = fully-charged
     // full damage. Applied up front so crit, map mods AND life leech below
@@ -116,14 +127,14 @@ function _egCalcPlayerMeleeDamage(chargePct = 1) {
 
     // Crit toast only on (near-)full charges - chip-hit crits would spam it
     // while machine-tapping E.
-    if (critMult > 1 && charge >= 0.99 && typeof showToast === 'function') showToast('💥 Critical Hit!');
+    if (critMult > 1 && charge >= 0.99 && typeof showToast === 'function') globalThis.showToast('💥 Critical Hit!');
 
     // Life leech - heal the player for a % of the damage about to be dealt.
     if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
         const heal = Math.round(dmg * (stats.lifeLeechPct / 100));
         if (heal > 0) {
-            playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
-            if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+            if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         }
     }
 
@@ -139,20 +150,20 @@ function _egCalcPlayerMeleeDamage(chargePct = 1) {
 // Resistances (player and monster side) never reduce more than this share.
 // The player cap can be raised ABOVE this base by "increased maximum
 // Resistance" bonuses from unique items (see _egGetPlayerResistCap).
-const EG_RESIST_CAP_PCT = 75;
+export const EG_RESIST_CAP_PCT = 75;
 
 // Effective resistance cap for one player element: base cap plus the
 // aggregated max-resist bonuses (per-element + the all-elements bucket).
 // Monsters have no max-resist sources - they are hard-capped at the base.
-function _egGetPlayerResistCap(stats, element) {
+export function _egGetPlayerResistCap(stats, element) {
     const extra = ((stats[element + 'ResistMax']) || 0) + ((stats.allResMax) || 0);
     return EG_RESIST_CAP_PCT + Math.max(0, extra);
 }
 
-const EG_ELEMENTS = ['fire', 'cold', 'lightning', 'shadow'];
+export const EG_ELEMENTS = ['fire', 'cold', 'lightning', 'shadow'];
 
 // Per-element flat damage roll for one hit. Returns { fire, cold, lightning, shadow }.
-function _egRollElementalBreakdown(stats) {
+export function _egRollElementalBreakdown(stats) {
     const roll = (min, max) => (min > 0 || max > 0) ? min + Math.random() * (max - min) : 0;
     return {
         fire: roll(stats.fireDmgMin, stats.fireDmgMax),
@@ -163,14 +174,14 @@ function _egRollElementalBreakdown(stats) {
 }
 
 // Total flat elemental damage bonus of one hit (sum of the breakdown).
-function _egGetElementalDamageBonus(stats) {
+export function _egGetElementalDamageBonus(stats) {
     const e = _egRollElementalBreakdown(stats);
     return e.fire + e.cold + e.lightning + e.shadow;
 }
 
 // Returns an element breakdown scaled by `factor` (used when only a % of the
 // original hit is dealt, e.g. reveal projectiles).
-function _egScaleElements(elements, factor) {
+export function _egScaleElements(elements, factor) {
     if (!elements) return null;
     const out = {};
     EG_ELEMENTS.forEach(el => { out[el] = (elements[el] || 0) * factor; });
@@ -185,7 +196,7 @@ function _egScaleElements(elements, factor) {
 // armor) reduces only the physical share and applies even when the hit
 // carries no elemental breakdown at all. Monsters without these keys keep
 // their previous behaviour exactly. Returns the post-resistance total.
-function _egApplyTargetResistances(amount, target, elements, opts) {
+export function _egApplyTargetResistances(amount, target, elements, opts) {
     if (!target) return amount;
     // Spellproof monsters: player SPELL/projectile hits (opts.isPlayerSpell)
     // are heavily reduced; player MELEE strikes (opts.isMelee) hit at full
@@ -227,7 +238,7 @@ function _egApplyTargetResistances(amount, target, elements, opts) {
 // Reduces an elemental monster hit by the player's matching resistance %
 // plus the flat Arcane Resistance (which applies to ALL elemental damage).
 // Non-elemental hits pass through untouched. Returns the reduced amount.
-function _egCalcPlayerResistanceReduction(amount, stats, element) {
+export function _egCalcPlayerResistanceReduction(amount, stats, element) {
     if (!element || amount <= 0) return amount;
     // Active map run: Elemental Weakness - #% reduced all Resistances.
     const resistMult = (typeof _egMapResistMult === 'function') ? _egMapResistMult() : 1;

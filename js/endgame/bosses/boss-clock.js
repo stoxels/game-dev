@@ -1,4 +1,15 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { updTimer } from '../../timer.js';
+import { t } from '../../translation/translations.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkEl, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE CLOCK (boss_clock)---------------------------
 //------------------------------------------------------------------------
 // Clockwork duel: The Clock summons three hands as the fight progresses -
@@ -52,7 +63,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Tunables ──────────────────────────────────────────────────────────────
-const EG_CLOCK_SUMMON_WARN_MS = 3000;            // center call → hand appears
+export const EG_CLOCK_SUMMON_WARN_MS = 3000;            // center call → hand appears
 // All three hands share ONE rotation speed so the staggered spawn positions
 // keep their relative gaps forever (a rigid three-hand clock). Every boss
 // phase (2 at 60% HP, 3 at 30%) speeds all beams up by 33% more (16s → 12s
@@ -60,26 +71,26 @@ const EG_CLOCK_SUMMON_WARN_MS = 3000;            // center call → hand appears
 // phase 3's sweep can be outrun at any radius inside the grid area only
 // with movement-speed boots - far from the pivot the beams outrun a
 // base-speed avatar, so the fight funnels you toward the clock's center.
-const EG_CLOCK_HAND_OMEGA = (2 * Math.PI) / 16;  // one full revolution per 16s in phase 1
-const EG_CLOCK_PHASE_SPEED_STEP = 0.33;          // +33% rotation speed per boss phase
-const EG_CLOCK_HIT_SLACK_PX = 2;                 // beam hit width ≈ its visual thickness
-const EG_CLOCK_HURTBOX_INSET_PX = 3;             // extra inset on the damage sample box
-const EG_CLOCK_SPAWN_GRACE_MS = 400;             // grace window after a hand spawns
-const EG_CLOCK_HIT_CD_MS = 1000;                 // per-hand cooldown while caught
-const EG_CLOCK_SPAWN_STAGGER_RAD = (2 * Math.PI) / 3; // new hands spawn ~120° apart → three equal safe wedges
-const EG_CLOCK_SPAWN_JITTER_RAD = (5 * Math.PI) / 180;  // ±5° randomness on top
+export const EG_CLOCK_HAND_OMEGA = (2 * Math.PI) / 16;  // one full revolution per 16s in phase 1
+export const EG_CLOCK_PHASE_SPEED_STEP = 0.33;          // +33% rotation speed per boss phase
+export const EG_CLOCK_HIT_SLACK_PX = 2;                 // beam hit width ≈ its visual thickness
+export const EG_CLOCK_HURTBOX_INSET_PX = 3;             // extra inset on the damage sample box
+export const EG_CLOCK_SPAWN_GRACE_MS = 400;             // grace window after a hand spawns
+export const EG_CLOCK_HIT_CD_MS = 1000;                 // per-hand cooldown while caught
+export const EG_CLOCK_SPAWN_STAGGER_RAD = (2 * Math.PI) / 3; // new hands spawn ~120° apart → three equal safe wedges
+export const EG_CLOCK_SPAWN_JITTER_RAD = (5 * Math.PI) / 180;  // ±5° randomness on top
 
 // ── Time Freeze tunables (the 15% HP last-stand) ─────────────────────────
-const EG_CLOCK_FREEZE_WARN_MS = 2500;    // telegraph before time actually stops
-const EG_CLOCK_FREEZE_TRIGGER_PCT = 0.15;   // boss HP% that stops time
-const EG_CLOCK_FREEZE_DURATION_MS = 30000;  // the frozen window (30s)
-const EG_CLOCK_FREEZE_STRIKE_MS = 800;      // beams lunge through the player
-const EG_CLOCK_FREEZE_BEAMS = 12;           // beams ringed all around the screen
-const EG_CLOCK_FREEZE_HOLD_PX = 68;         // hover radius from player center
-const EG_CLOCK_FREEZE_LUNGE_PX = 220;       // strike punches this far past the player
-const EG_CLOCK_FREEZE_DMG_PCT = 0.90;       // total damage on failure - every beam hits, ~7.5% each × 12
-const EG_CLOCK_FREEZE_COLOR = '#ffe536';    // lightning yellow
-const EG_CLOCK_FREEZE_RING_RADIUS = 92;     // countdown ring radius (px) around the player
+export const EG_CLOCK_FREEZE_WARN_MS = 2500;    // telegraph before time actually stops
+export const EG_CLOCK_FREEZE_TRIGGER_PCT = 0.15;   // boss HP% that stops time
+export const EG_CLOCK_FREEZE_DURATION_MS = 30000;  // the frozen window (30s)
+export const EG_CLOCK_FREEZE_STRIKE_MS = 800;      // beams lunge through the player
+export const EG_CLOCK_FREEZE_BEAMS = 12;           // beams ringed all around the screen
+export const EG_CLOCK_FREEZE_HOLD_PX = 68;         // hover radius from player center
+export const EG_CLOCK_FREEZE_LUNGE_PX = 220;       // strike punches this far past the player
+export const EG_CLOCK_FREEZE_DMG_PCT = 0.90;       // total damage on failure - every beam hits, ~7.5% each × 12
+export const EG_CLOCK_FREEZE_COLOR = '#ffe536';    // lightning yellow
+export const EG_CLOCK_FREEZE_RING_RADIUS = 92;     // countdown ring radius (px) around the player
 
 // Global freeze flags - true while The Clock is telegraphing then holding
 // time. _egClockTimeFreezeWarn is the 2.5s buildup (hands stop, face flares)
@@ -103,21 +114,21 @@ window._egClockTimeFreezeActive = false;
 // Every beam is SOLID from the pivot to the screen edge - no safe hole -
 // so the whole fight is reading the three beams' rhythm and staying off
 // their lines.
-const EG_CLOCK_HAND_SECONDS = {
+export const EG_CLOCK_HAND_SECONDS = {
     keyS: 'eg_clock_second', keyP: 'eg_clock_seconds', fbS: 'second', fbP: 'seconds',
     max: 59, scale: 60,
     summonPct: 0.90, dmgPct: 0.10,
     cls: 'eg-nk-clock-second', callCls: 'eg-nk-clock-call-second',
     height: 6, halfW: 4,
 };
-const EG_CLOCK_HAND_MINUTES = {
+export const EG_CLOCK_HAND_MINUTES = {
     keyS: 'eg_clock_minute', keyP: 'eg_clock_minutes', fbS: 'minute', fbP: 'minutes',
     max: 59, scale: 60,
     summonPct: 0.60, dmgPct: 0.13,
     cls: 'eg-nk-clock-minute', callCls: 'eg-nk-clock-call-minute',
     height: 12, halfW: 7,
 };
-const EG_CLOCK_HAND_HOURS = {
+export const EG_CLOCK_HAND_HOURS = {
     keyS: 'eg_clock_hour', keyP: 'eg_clock_hours', fbS: 'hour', fbP: 'hours',
     max: 12, scale: 12,
     summonPct: 0.30, dmgPct: 0.16,
@@ -127,7 +138,7 @@ const EG_CLOCK_HAND_HOURS = {
 
 
 // Localized "seconds / minutes / hours" label (singular form for value 1).
-function _egClockUnitLabel(h, value) {
+export function _egClockUnitLabel(h, value) {
     const key = value === 1 ? h.keyS : h.keyP;
     let unit = value === 1 ? h.fbS : h.fbP;
     try {
@@ -141,7 +152,7 @@ function _egClockUnitLabel(h, value) {
 // Nearest dial reading (1..max) for an angle - used to announce a spawn
 // position as a human-readable clock number. Angles follow the dial
 // convention (12 o'clock = 0 units, clockwise positive).
-function _egClockValueFromAngle(cfg, a) {
+export function _egClockValueFromAngle(cfg, a) {
     let v = Math.round(((a + Math.PI / 2) / (2 * Math.PI)) * cfg.scale);
     v = ((v - 1) % cfg.max + cfg.max) % cfg.max + 1;
     return v;
@@ -150,7 +161,7 @@ function _egClockValueFromAngle(cfg, a) {
 
 // Builds one hand: a solid beam from the pivot (left end) to the screen
 // edge that rotates about the pivot. Returns the element.
-function _egClockMakeHand(run, cfg, cx, cy, len) {
+export function _egClockMakeHand(run, cfg, cx, cy, len) {
     const el = _egNkEl(run, 'div', 'eg-nk-clock-hand');
     el.style.width = Math.round(len) + 'px';
     el.style.height = cfg.height + 'px';
@@ -170,7 +181,7 @@ function _egClockMakeHand(run, cfg, cx, cy, len) {
 // center - the avatar's visible artwork carries transparent padding, so a
 // grazing corner shouldn't register as a hit. Returns the inset box's four
 // corners + center for the beam line tests.
-function _egClockPlayerPts(pr) {
+export function _egClockPlayerPts(pr) {
     const ix = Math.min(EG_CLOCK_HURTBOX_INSET_PX, Math.max(0, pr.width / 2 - 8));
     const iy = Math.min(EG_CLOCK_HURTBOX_INSET_PX, Math.max(0, pr.height / 2 - 8));
     const l = pr.left + ix, r = pr.right - ix, t = pr.top + iy, b = pr.bottom - iy;
@@ -182,9 +193,9 @@ function _egClockPlayerPts(pr) {
 // ── Center-grid call banner (same slot as the low-time / mistakes /
 //    low-health warnings). One colored line per summoned hand, each line
 //    colored like its beam (red seconds, cyan minutes, amber hours).
-function _egClockShowCall(plan) {
+export function _egClockShowCall(plan) {
     if (typeof _egClearCenterGridBanners === 'function') {
-        _egClearCenterGridBanners('eg-clock-call-banner');
+        globalThis._egClearCenterGridBanners('eg-clock-call-banner');
     }
     const banner = document.createElement('div');
     banner.id = 'eg-clock-call-banner';
@@ -213,7 +224,7 @@ function _egClockShowCall(plan) {
 // clock_hands start trigger): watches boss HP and summons each hand at its
 // threshold - center call, 3s later the beam appears and rotates forever.
 // Hands only stop when the run dies with the boss (win or loss).
-function _egMechClockHands(monster, phase) {
+export function _egMechClockHands(monster, phase) {
     if (typeof _egNkNewRun !== 'function' || typeof _egNkEl !== 'function') return;
     // The face element doubles as the "hands already running" flag - it is
     // removed with the run's elements when the boss dies or the encounter
@@ -287,8 +298,8 @@ function _egMechClockHands(monster, phase) {
     _egNkLoop(run, (dtS, now) => {
         // HP polling - the run's aliveness check already kills it when the
         // boss dies; this lookup only feeds the summon thresholds.
-        const m = (typeof _egMonsters !== 'undefined' && _egMonsters)
-            ? _egMonsters.find(x => x && x.id === bossId) : null;
+        const m = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+            ? globalThis._egMonsters.find(x => x && x.id === bossId) : null;
         const pct = (m && m.maxHP > 0) ? (m.currentHP / m.maxHP) : 1;
 
         // Arm hands whose HP threshold was crossed (each exactly once).
@@ -390,7 +401,7 @@ function _egMechClockHands(monster, phase) {
 
 // Tears down the telegraph state (flag + face glow + center callout). Runs
 // as the warn run's onKill and defensively when the real freeze starts/ends.
-function _egClockClearFreezeWarn() {
+export function _egClockClearFreezeWarn() {
     window._egClockTimeFreezeWarn = false;
     const face = document.getElementById('eg-nk-clock-face');
     if (face) face.classList.remove('eg-clock-freeze-warn');
@@ -401,18 +412,18 @@ function _egClockClearFreezeWarn() {
 
 // Restores every system the Time Freeze pinned. Idempotent and safe to call
 // from onKill AND from the kill loop - the run is only ever killed once.
-function _egClockTimeFreezeEnd() {
+export function _egClockTimeFreezeEnd() {
     if (!window._egClockTimeFreezeActive && !window._egClockTimeFreezeWarn) return;
     _egClockClearFreezeWarn();                       // warn-only? just the telegraph
     if (!window._egClockTimeFreezeActive) return;    // nothing else was pinned
     window._egClockTimeFreezeActive = false;
-    if (typeof timerFrozen !== 'undefined') timerFrozen = false;
+    if (typeof timerFrozen !== 'undefined') globalThis.timerFrozen = false;
     if (typeof updTimer === 'function') updTimer();
 }
 
 
 // Localized helper with {n} placeholder support (English fallback).
-function _egClockL10n(key, fallback, n) {
+export function _egClockL10n(key, fallback, n) {
     let msg = fallback;
     try {
         const raw = t(key);
@@ -426,7 +437,7 @@ function _egClockL10n(key, fallback, n) {
 // Distance from a point to the viewport edge along a unit direction - the
 // beam's outer end sits on that edge, its tip hovers just short of the
 // player.
-function _egClockRayEdgeDist(px, py, ux, uy) {
+export function _egClockRayEdgeDist(px, py, ux, uy) {
     const w = window.innerWidth, h = window.innerHeight;
     let t = Infinity;
     if (ux > 0) t = Math.min(t, (w - px) / ux);
@@ -440,7 +451,7 @@ function _egClockRayEdgeDist(px, py, ux, uy) {
 // Applies the strike: every beam hits once (≈7.5% each, 90% total) and a
 // single summed toast reports the whole barrage. Per-beam hits let an
 // absorption shield soften only part of the blow.
-function _egClockFreezeApplyStrike(level, beams) {
+export function _egClockFreezeApplyStrike(level, beams) {
     const count = Math.max(1, (beams && beams.length) || 1);
     let dealt = 0;
     for (let i = 0; i < count; i++) {
@@ -452,7 +463,7 @@ function _egClockFreezeApplyStrike(level, beams) {
 
 // Center-grid telegraph callout - same pop style as the hand-summon calls,
 // so the incoming freeze reads instantly without a new visual language.
-function _egClockShowFreezeWarnBanner() {
+export function _egClockShowFreezeWarnBanner() {
     const banner = document.createElement('div');
     banner.id = 'eg-clock-freeze-warn-banner';
     banner.className = 'eg-clock-freeze-warn-banner';
@@ -478,7 +489,7 @@ function _egClockShowFreezeWarnBanner() {
 // player, and a clock sound builds. Then the real Time Freeze begins.
 // Own boss-owned nk run so it survives arena transitions and dies with the
 // fight.
-function _egClockStartTimeFreezeWarn(monster, level) {
+export function _egClockStartTimeFreezeWarn(monster, level) {
     if (typeof _egNkNewRun !== 'function' || typeof _egNkEl !== 'function') return;
     if (window._egClockTimeFreezeWarn || window._egClockTimeFreezeActive) return;
 
@@ -488,7 +499,7 @@ function _egClockStartTimeFreezeWarn(monster, level) {
     window._egClockTimeFreezeWarn = true;
 
     if (typeof _egClearCenterGridBanners === 'function') {
-        _egClearCenterGridBanners('eg-clock-freeze-warn-banner');
+        globalThis._egClearCenterGridBanners('eg-clock-freeze-warn-banner');
     }
     const face = document.getElementById('eg-nk-clock-face');
     if (face) face.classList.add('eg-clock-freeze-warn');
@@ -516,7 +527,7 @@ function _egClockStartTimeFreezeWarn(monster, level) {
 
 // Kicks off the Time Freeze. Single-flight: the global flag is raised before
 // any side effect, and the hands loop only ever starts it once per fight.
-function _egClockStartTimeFreeze(monster, level) {
+export function _egClockStartTimeFreeze(monster, level) {
     if (typeof _egNkNewRun !== 'function' || typeof _egNkEl !== 'function') return;
     if (window._egClockTimeFreezeActive) return;
 
@@ -528,12 +539,12 @@ function _egClockStartTimeFreeze(monster, level) {
     // between the flag and the freeze taking hold.
     window._egClockTimeFreezeActive = true;
     _egClockClearFreezeWarn();   // telegraph done - drop its flag, glow, callout
-    if (typeof timerFrozen !== 'undefined') timerFrozen = true;
+    if (typeof timerFrozen !== 'undefined') globalThis.timerFrozen = true;
     if (typeof updTimer === 'function') updTimer();
 
     // Clear center-grid banners so the frozen arena reads clean.
     if (typeof _egClearCenterGridBanners === 'function') {
-        _egClearCenterGridBanners('eg-clock-freeze-banner');
+        globalThis._egClearCenterGridBanners('eg-clock-freeze-banner');
     }
 
     // Own run owned by the boss id - boss death / encounter stop tears it

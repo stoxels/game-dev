@@ -1,11 +1,65 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from './achievements/achievements.js';
+import { Audio_Manager } from './audio/audio.js';
+import { _egMaybeLaunchAscensionTrial } from './campaign-trials.js';
+import { applyClassPassiveOnLevelStart } from './classes/class-abilities.js';
+import { buildClassHUD } from './classes/class-hud.js';
+import { _resetPlayerMana } from './classes/class-mana.js';
+import { _varianceShield_removeBubble } from './classes/class-mathmagician.js';
+import { DIFF_CFG, curDiff, curMods } from './difficulty-modifiers.js';
+import { _egOnPuzzleComplete, _egPuzzleCompleteFired, _egUpdateObjectivesHUD } from './endgame/endgame-encounter-chain.js';
+import { _egMaybeShowMistakesWarning } from './endgame/endgame-encounter-overlays.js';
+import { _egGetMaxAllowedMistakes } from './endgame/endgame-encounter-tick.js';
+import { _egPrepareCampaignEncounter, _egStartEncounter, _egStopEncounter } from './endgame/endgame-encounter.js';
+import { _egActiveMapItem, _egMapPlayerLifeMult, _egMapTimeGainMult } from './endgame/endgame-map-launch.js';
+import { EG_PLAYER_STATS, _egComputePlayerStats } from './endgame/endgame-player-stats.js';
+import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
+import { _egIsActive, _egIsCampaignRun } from './endgame/endgame-state.js';
+import { _egApplyUniqueZeroLineAutomark } from './endgame/endgame-unique-items.js';
+import { _adjacencyMatrixRefreshAll, buildGrid } from './grid.js';
+import { keybindDisplayLabel, keybindKeyFor } from './keybinds.js';
+import { ALL, lvText } from './levels/levels.js';
+import { _refreshTouchpadModeButtonLabel, updateTouchpadModeButtonVisibility } from './mouse-button-handlers.js';
+import { PassiveTracker } from './passive-tree/passive-tracker.js';
+import { _applyDegreesOfFreedom, _applyFrequentistsBurden, _applySignalToNoise, _applySparsePrior, _applyTheOracle, _entropyDrainInit, _resetNewNodeState, resetOverfittingTracker } from './passive-tree/passive-tree-special-nodes-logic.js';
+import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
+import { buildInventoryPanel } from './puzzle-items/inventory-panel.js';
+import { rarityColors } from './puzzle-items/item-pool.js';
+import { showPrimerModal } from './puzzle-items/scouts-primer.js';
+import { _fxShieldBorderRemove } from './puzzle-items/shared/fx-helpers.js';
+import { resetToastQueue, showToast } from './puzzle-items/toasts-and-popups.js';
+import { resetQuestLevelCounters, resetWitchImmunityLevelCounter } from './quests/quests-stats.js';
+import { isGatedLevel, isMathGatePassed, tryStartGatedLevel } from './quiz-excercise/mathgate.js';
+import { closeQuiz } from './quiz-excercise/quiz.js';
+import { _getLevelSpecialStatus, isPuzzleSolved } from './scoring.js';
+import { hideResultOverlays, switchScreen } from './screens/screens.js';
+import { _uspClearSupportBuffs } from './skills/universal-spells.js';
+import { resetBanterState, triggerBanter } from './sprite/character-banter.js';
+import { _renderPlayerAvatarSimple, _renderPlayerHealth, _showPlayerAvatar, _showPlayerAvatarSimple } from './sprite/player_sprite.js';
+import { _applyCompletionGlimpse, _applyPassiveStartEffects, _applySylaForestAffinity, _hideCompletionGlimpseBar, _initLuckyTiles } from './start-level-passives.js';
+import { save } from './state.js';
+import { _applyLowHealthVignette, _resetLowTimeWarningState, startTimer, stopTimer, updTimer } from './timer.js';
+import { t } from './translation/translations.js';
+
+//------------------------------------------------------------------------
+// Phase 3 step 10: live globalThis accessors for externally-mutated names.
+// (derived from the step-10 write-site audit by dev/scratch/convert-step10.mjs)
+//------------------------------------------------------------------------
+try { Object.defineProperty(globalThis, 'startLevel', { get() { return startLevel; }, set(v) { startLevel = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_initTimer', { get() { return _initTimer; }, set(v) { _initTimer = v; }, configurable: true }); } catch (e) {}
+
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE--------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Maps world number (1-based) to its background image path.
 // Place your background images in images/backgrounds/
-const WORLD_BACKGROUNDS = {
+export const WORLD_BACKGROUNDS = {
     1: 'images/backgrounds/Probability-Peaks-Background.webp',
     2: 'images/backgrounds/Distribution-Den-Background.webp',
     3: 'images/backgrounds/Sampling-Savanna-Background.webp',
@@ -30,24 +84,24 @@ const WORLD_BACKGROUNDS = {
 
 // Sets cur to the puzzle object for the given index.
 // Tracks the replay achievement stat if this level has already been completed.
-function _initLevelData(gi) {
-    cur = ALL[gi];
+export function _initLevelData(gi) {
+    globalThis.cur = ALL[gi];
 
-    if (STATE.done.includes(gi)) {
+    if (globalThis.STATE.done.includes(gi)) {
         trackAchStat('levelsReplayed');
     }
 }
 
 // Creates fresh userGrid, wrongGrid, and revealedGrid sized to the current puzzle dimensions.
 // All cells start empty/false - no carry-over from a previous level.
-function _initGrids() {
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+export function _initGrids() {
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
 
-    userGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
-    wrongGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
-    revealedGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
-    systemMarkedGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
+    globalThis.userGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
+    globalThis.wrongGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
+    globalThis.revealedGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
+    globalThis.systemMarkedGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
 }
 
 
@@ -57,32 +111,32 @@ function _initGrids() {
 //------------------------------------------------------------------------
 
 // Resets all simple gameplay flags and numeric counters to their default values.
-function _resetGameplayFlags() {
+export function _resetGameplayFlags() {
     const isChainTransition = !!window._egSuppressEncounterStop;
 
-    _gamePaused = false;
-    if (!isChainTransition) mistakeCount = 0;
-    if (!isChainTransition) absorbedMistakes = 0;
-    if (!isChainTransition) _levelTimeAdded = 0;
-    if (!isChainTransition) _levelTimeLost = 0;
-    if (!isChainTransition) _levelMistakesErased = 0;
-    levelStartTime = Date.now();
-    itemsUsedThisLevel = 0;
-    dead = false;
-    painting = false;
-    hoverRow = -1;
-    hoverCol = -1;
-    shieldActive = false;
+    globalThis._gamePaused = false;
+    if (!isChainTransition) globalThis.mistakeCount = 0;
+    if (!isChainTransition) globalThis.absorbedMistakes = 0;
+    if (!isChainTransition) globalThis._levelTimeAdded = 0;
+    if (!isChainTransition) globalThis._levelTimeLost = 0;
+    if (!isChainTransition) globalThis._levelMistakesErased = 0;
+    globalThis.levelStartTime = Date.now();
+    globalThis.itemsUsedThisLevel = 0;
+    globalThis.dead = false;
+    globalThis.painting = false;
+    globalThis.hoverRow = -1;
+    globalThis.hoverCol = -1;
+    globalThis.shieldActive = false;
     // The Clock's Time Freeze pins the map timer and must survive arena
     // puzzle transitions during the 30s window - only clear timerFrozen
     // when the freeze isn't running (or on a genuinely fresh level).
-    timerFrozen = isChainTransition
+    globalThis.timerFrozen = isChainTransition
         && (typeof window !== 'undefined' && !!window._egClockTimeFreezeActive);
-    quizAnsweredCorrectly = false;
-    consecutiveCorrectFills = 0;
-    _lawOfLargeNumbersNext = null;
-    _confidenceIntervalActive = false;
-    _streakBonusFills = 0;
+    globalThis.quizAnsweredCorrectly = false;
+    globalThis.consecutiveCorrectFills = 0;
+    globalThis._lawOfLargeNumbersNext = null;
+    globalThis._confidenceIntervalActive = false;
+    globalThis._streakBonusFills = 0;
 
     window.STOX_FLAGS.veiledCursedUsed = false;
     window._asymptoticLinesCompleted = 0;
@@ -95,7 +149,7 @@ function _resetGameplayFlags() {
 
 // Resets all per-level tracking Sets, logs, and boolean flags used by
 // passive nodes and achievement systems.
-function _resetLevelTrackers() {
+export function _resetLevelTrackers() {
     window._mistakeLog = [];
     window._sigThresholdProtected = new Set();
     window._dofRevertedCells = new Set();
@@ -110,20 +164,20 @@ function _resetLevelTrackers() {
 
 // Resets player HP to full, based on base HP plus any gear health bonus.
 // Reduced by the active map's "% reduced maximum Life" mod during device runs.
-function _resetPlayerHP() {
+export function _resetPlayerHP() {
     const baseHP = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseHP : 100;
     const gearHealthBonus = (typeof _egComputePlayerStats === 'function')
         ? _egComputePlayerStats().health : 0;
     let maxHP = baseHP + gearHealthBonus;
     if (typeof _egMapPlayerLifeMult === 'function') maxHP = Math.round(maxHP * _egMapPlayerLifeMult());
-    playerMaxHP = Math.max(1, maxHP);
-    playerCurrentHP = playerMaxHP;
+    globalThis.playerMaxHP = Math.max(1, maxHP);
+    globalThis.playerCurrentHP = globalThis.playerMaxHP;
 }
 
 // Cleans up any UI or system state left over from the previous level:
 // toast queue, node state, witch immunity, quest counters, overfitting tracker,
 // endgame encounter, completion glimpse bar, and player HP.
-function _cleanupPreviousLevel() {
+export function _cleanupPreviousLevel() {
     resetToastQueue();
     _resetNewNodeState();
     resetWitchImmunityLevelCounter();
@@ -170,7 +224,7 @@ function _cleanupPreviousLevel() {
 }
 
 // Full level state reset - runs all three reset helpers in order.
-function _resetLevelState() {
+export function _resetLevelState() {
     _resetGameplayFlags();
     _resetLevelTrackers();
     _cleanupPreviousLevel();
@@ -183,19 +237,19 @@ function _resetLevelState() {
 //------------------------------------------------------------------------
 
 // Returns the base timer value for the current level, halved in Time Trial mode.
-function _calcBaseTime() {
+export function _calcBaseTime() {
     const cfg = DIFF_CFG[curDiff];
     let baseTimer;
 
-    if (cur.isMonsterLevel && cur.egTimeLimit != null) {
+    if (globalThis.cur.isMonsterLevel && globalThis.cur.egTimeLimit != null) {
         let gearBonus = (typeof _egComputePlayerStats === 'function')
             ? (_egComputePlayerStats().timeAdded || 0) : 0;
         // Active map run: "% less Time gained from Item and Ability effects"
         // also scales the time_added bonus from equipped gear (an item effect).
         if (typeof _egMapTimeGainMult === 'function') gearBonus = Math.round(gearBonus * _egMapTimeGainMult());
-        baseTimer = cur.egTimeLimit + gearBonus;
+        baseTimer = globalThis.cur.egTimeLimit + gearBonus;
     } else {
-        baseTimer = cur.timer || cfg.timerStart;
+        baseTimer = globalThis.cur.timer || cfg.timerStart;
     }
 
     return curMods.timetrial ? Math.round(baseTimer * 0.5) : baseTimer;
@@ -204,7 +258,7 @@ function _calcBaseTime() {
 // extended_session (174-176): adds flat bonus seconds at level start.
 // Node 1: +60s | Node 2: +120s | Node 3: +180s (cumulative).
 // Blocked entirely by keystone_gamblers_ruin.
-function _applyExtendedSessionBonus() {
+export function _applyExtendedSessionBonus() {
     if (ptHasSkill('keystone_gamblers_ruin')) return 0;
     let bonus = 0;
     if (ptHasSkill('extended_session_1')) bonus += 60;
@@ -216,11 +270,11 @@ function _applyExtendedSessionBonus() {
 // expected_value (nodes vary): adds seconds proportional to total cell count.
 // Contributes 5/2/3 seconds per 10 cells for nodes 1/2/3 respectively.
 // Blocked entirely by keystone_gamblers_ruin.
-function _applyExpectedValueBonus() {
+export function _applyExpectedValueBonus() {
     if (ptHasSkill('keystone_gamblers_ruin')) return 0;
     if (!ptHasSkill('expected_value_1') && !ptHasSkill('expected_value_2') && !ptHasSkill('expected_value_3')) return 0;
 
-    const totalCells = cur.grid.length * cur.grid[0].length;
+    const totalCells = globalThis.cur.grid.length * globalThis.cur.grid[0].length;
     let secsPerTen = 0;
     if (ptHasSkill('expected_value_1')) secsPerTen += 5;
     if (ptHasSkill('expected_value_2')) secsPerTen += 2;
@@ -230,33 +284,33 @@ function _applyExpectedValueBonus() {
 
 // Calculates and sets timerSecs from the base time plus all passive bonuses.
 // keystone_dead_reckoning (264) grants +10 minutes (600s), also blocked by gamblers_ruin.
-function _initTimer() {
+export function _initTimer() {
     if (window._egSuppressEncounterStop) {
         // Chain puzzle - keep low-time banner state but sync the tracker to
         // the preserved timer so the next drain is detected correctly.
-        if (typeof _lowTimeLastSecs !== 'undefined') _lowTimeLastSecs = timerSecs;
+        if (typeof _lowTimeLastSecs !== 'undefined') globalThis._lowTimeLastSecs = globalThis.timerSecs;
         return;
     }
 
     const cfg = DIFF_CFG[curDiff];
-    const fullBaseTimer = cur.timer || cfg.timerStart;
+    const fullBaseTimer = globalThis.cur.timer || cfg.timerStart;
     const base = _calcBaseTime();
 
     // Remember exactly how many seconds Time Trial shaved off the base timer,
     // so scoring.js can add it back when computing the time bonus.
     window._timetrialTimeCut = curMods.timetrial ? (fullBaseTimer - base) : 0;
 
-    timerSecs = base;
+    globalThis.timerSecs = base;
 
     const extSessionBonus = _applyExtendedSessionBonus();
     const expValueBonus = _applyExpectedValueBonus();
-    timerSecs += extSessionBonus;
-    timerSecs += expValueBonus;
-    _levelTimeAdded += extSessionBonus + expValueBonus;
+    globalThis.timerSecs += extSessionBonus;
+    globalThis.timerSecs += expValueBonus;
+    globalThis._levelTimeAdded += extSessionBonus + expValueBonus;
 
     if (ptHasSkill('keystone_dead_reckoning') && !ptHasSkill('keystone_gamblers_ruin')) {
-        timerSecs += 600;
-        _levelTimeAdded += 600;
+        globalThis.timerSecs += 600;
+        globalThis._levelTimeAdded += 600;
     }
     // Fresh level - reset low-time center banners (keeps _lowTimeLastSecs
     // as null so the first updTimer can immediately surface the relevant
@@ -271,13 +325,13 @@ function _initTimer() {
 //------------------------------------------------------------------------
 
 // Updates the bonus sidebar hint text from the current level's data.
-function _updateBonusSidebar() {
+export function _updateBonusSidebar() {
     const el = document.getElementById('bonus-sidebar-hint');
-    el.textContent = (lvText(cur, 'bonusHint') || '');
+    el.textContent = (lvText(globalThis.cur, 'bonusHint') || '');
 }
 
 // Renders the active modifier and difficulty tags below the timer display.
-function _updateModTags() {
+export function _updateModTags() {
     const mt = document.getElementById('mod-tags');
     mt.innerHTML = '';
     if (curMods.timetrial) mt.innerHTML += `<span class="mod-tag tt">${t('mod_tt')}</span>`;
@@ -294,7 +348,7 @@ function _updateModTags() {
 // On endgame maps with a mistake limit the format is "x / y" (done / allowed);
 // regular campaign levels only ever show the raw count.
 // Hardcore: always shows "x / 0" so the player sees that no mistake is allowed.
-function _setMistakeCounterText(suffix = '') {
+export function _setMistakeCounterText(suffix = '') {
     const mc = document.getElementById('mistake-counter');
     if (!mc) return;
 
@@ -315,8 +369,8 @@ function _setMistakeCounterText(suffix = '') {
     }
 
     mc.textContent = (maxMistakes != null)
-        ? `${t('cg_mistakes_lbl')}: ${mistakeCount} / ${maxMistakes}${suffix}`
-        : `${t('cg_mistakes_lbl')}: ${mistakeCount}${suffix}`;
+        ? `${t('cg_mistakes_lbl')}: ${globalThis.mistakeCount} / ${maxMistakes}${suffix}`
+        : `${t('cg_mistakes_lbl')}: ${globalThis.mistakeCount}${suffix}`;
 
     // Hardcore visual cue - red tint when no mistake is allowed
     mc.classList.toggle('hc-zero', !!isHardcore && maxMistakes === 0);
@@ -328,10 +382,10 @@ function _setMistakeCounterText(suffix = '') {
 
 // Updates all HUD elements: level id, hint text, score display, penalty info,
 // mistake counter, bonus sidebar, and modifier tags.
-function _updateHUD() {
-    document.getElementById('top-id').textContent = `${t('lvl_prefix')} ${cur.world}-${cur.li}`;
-    document.getElementById('top-hint').textContent = lvText(cur, 'hint');
-    document.getElementById('sc-disp').textContent = STATE.totalScore;
+export function _updateHUD() {
+    document.getElementById('top-id').textContent = `${t('lvl_prefix')} ${globalThis.cur.world}-${globalThis.cur.li}`;
+    document.getElementById('top-hint').textContent = lvText(globalThis.cur, 'hint');
+    document.getElementById('sc-disp').textContent = globalThis.STATE.totalScore;
     document.getElementById('pen-info').textContent = '';
 
     _setMistakeCounterText();
@@ -353,8 +407,8 @@ function _updateHUD() {
             nameEl.style.color = (typeof rarityColors === 'function')
                 ? rarityColors(egMap.rarity).color : '';
         } else {
-            nameEl.textContent = `${lvText(cur, 'hint')}`;
-            const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
+            nameEl.textContent = `${lvText(globalThis.cur, 'hint')}`;
+            const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(globalThis.cur);
             nameEl.style.color = isNexusPoint ? '#7fd4ff' : isAscension ? '#c080ff' : isConvergence ? '#6dbf40' : '';
         }
     }
@@ -367,14 +421,14 @@ function _updateHUD() {
 //------------------------------------------------------------------------
 
 // Hides any win/lose overlays and closes the quiz modal left over from a previous level.
-function _closeLeftoverOverlays() {
+export function _closeLeftoverOverlays() {
     hideResultOverlays();
     closeQuiz();
 }
 
 // Starts the timer, renders the puzzle grid, and builds the inventory panel.
 // Also clears the bounceback flag if we have moved on to a different level.
-function _startSystems() {
+export function _startSystems() {
     updTimer();
     startTimer();
     buildGrid();
@@ -383,30 +437,30 @@ function _startSystems() {
     // sync the touchpad mode button to current settings each level start
     if (typeof updateTouchpadModeButtonVisibility === 'function') {
         updateTouchpadModeButtonVisibility();
-        touchpadMarkModeActive = false;       // always reset to default (Fill) on level start
+        globalThis.touchpadMarkModeActive = false;       // always reset to default (Fill) on level start
         if (typeof _refreshTouchpadModeButtonLabel === 'function') _refreshTouchpadModeButtonLabel();
     }
 
-    if (window._lastFailedGi !== undefined && cur && cur.gIdx !== window._lastFailedGi) {
+    if (window._lastFailedGi !== undefined && globalThis.cur && globalThis.cur.gIdx !== window._lastFailedGi) {
         window._lastFailedGi = null;
     }
 }
 
 // Resets class cooldown, applies passive class effects, and rebuilds the class HUD panel.
-function _initClassSystems() {
+export function _initClassSystems() {
     // Encounter chain (endgame): cooldowns for base + ascendency abilities
     // (active1-4) reset between individual puzzles so each puzzle starts
     // with abilities ready. Mana is the balancing factor and is intentionally
     // NOT reset - see _cleanupPreviousLevel / _resetPlayerMana which keep
     // playerCurrentMana / playerMaxMana across chain transitions.
-    resetActiveCooldown();
+    globalThis.resetActiveCooldown();
     applyClassPassiveOnLevelStart();
     buildClassHUD();
 }
 
 // Pushes the level-select screen onto navigation history and switches to the game screen.
-function _navigateToGameScreen() {
-    screenHistory.push('screen-levels');
+export function _navigateToGameScreen() {
+    globalThis.screenHistory.push('screen-levels');
     switchScreen('screen-game');
 }
 
@@ -415,9 +469,9 @@ function _navigateToGameScreen() {
 // During an endgame map chain this is evaluated on EVERY puzzle start
 // (via _doStartLevel called from _egTransitionToChainPuzzle), so a
 // mid-map Primer use correctly fires on the next chain puzzle.
-function _checkPrimerPending() {
-    if (!STATE.primerPending) return;
-    STATE.primerPending = false;
+export function _checkPrimerPending() {
+    if (!globalThis.STATE.primerPending) return;
+    globalThis.STATE.primerPending = false;
     save();
     // Defer primer modal until after class/PassiveTracker HUD is built so
     // the board dimensions are stable for flare animations (already the
@@ -434,7 +488,7 @@ function _checkPrimerPending() {
 // Backgrounds for the interactive tutorial puzzles (world 15). The tutorial
 // ships its own artwork: puzzle 1 (tqPuzzle 0) gets the Puzzle-1 backdrop,
 // puzzles 2 and 3 (tqPuzzle 1/2) share the Puzzle-2/3 backdrop.
-const TUTORIAL_QUEST_BACKGROUNDS = {
+export const TUTORIAL_QUEST_BACKGROUNDS = {
     0: 'images/Tutorial/Puzzle_1_Background.webp',
     1: 'images/Tutorial/Puzzle_2_3_Background.webp',
     2: 'images/Tutorial/Puzzle_2_3_Background.webp',
@@ -442,12 +496,12 @@ const TUTORIAL_QUEST_BACKGROUNDS = {
 
 // Applies the background image for the given world number to the game screen.
 // Tutorial quest levels override the world background with their dedicated art.
-function _applyWorldBackground(worldNum) {
+export function _applyWorldBackground(worldNum) {
     const screen = document.getElementById('screen-game');
     let bg = null;
-    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest
-        && TUTORIAL_QUEST_BACKGROUNDS[cur.tqPuzzle]) {
-        bg = TUTORIAL_QUEST_BACKGROUNDS[cur.tqPuzzle];
+    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest
+        && TUTORIAL_QUEST_BACKGROUNDS[globalThis.cur.tqPuzzle]) {
+        bg = TUTORIAL_QUEST_BACKGROUNDS[globalThis.cur.tqPuzzle];
     }
     if (!bg) bg = WORLD_BACKGROUNDS[worldNum];
     if (bg) {
@@ -468,7 +522,7 @@ function _applyWorldBackground(worldNum) {
 
 // Core level startup - runs every subsystem in the correct order.
 // Called directly for ungated levels, or as a callback after the gate check passes.
-function _doStartLevel(gi) {
+export function _doStartLevel(gi) {
     // 1. Data and grid setup
     _initLevelData(gi);
     _initGrids();
@@ -485,7 +539,7 @@ function _doStartLevel(gi) {
     _entropyDrainInit();
 
     // 4. Passive node effects - oracle flag must be set before passives run
-    if (ptHasSkill('keystone_the_oracle') && cur.grid.length * cur.grid[0].length >= 200) {
+    if (ptHasSkill('keystone_the_oracle') && globalThis.cur.grid.length * globalThis.cur.grid[0].length >= 200) {
         window._oracleActive = true;
     }
     _applyPassiveStartEffects();
@@ -501,8 +555,8 @@ function _doStartLevel(gi) {
     // _egTransitionToChainPuzzle checks this flag after _doStartLevel to guarantee
     // every chained puzzle in a map re-triggers passives even if a future refactor
     // gates _applyPassiveStartEffects behind _egSuppressEncounterStop.
-    window._egPassiveAppliedForGi = cur ? cur.gIdx : gi;
-    window._egClassPassiveAppliedForGi = cur ? cur.gIdx : gi;
+    window._egPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : gi;
+    window._egClassPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : gi;
 
     // 5. Deferred overlay effects (needs grid DOM to exist)
     // adjacency_matrix (302): populate neighbour-count overlays after passives are applied
@@ -514,13 +568,13 @@ function _doStartLevel(gi) {
     _initClassSystems();
     _navigateToGameScreen();
 
-    _applyWorldBackground(cur.world);
+    _applyWorldBackground(globalThis.cur.world);
 
     // Show the player's character sprite in the top-left. Both level kinds
     // share the same presentation now (Health / Mana / Shield / charge bar
     // stack - see _avatarBarsHTML in player_sprite.js); monster levels let
     // the encounter tick build the full avatar so the sprite size is stable.
-    if (!cur.isMonsterLevel) {
+    if (!globalThis.cur.isMonsterLevel) {
         _renderPlayerAvatarSimple();
         _showPlayerAvatarSimple();
         _showPlayerAvatar();
@@ -531,18 +585,18 @@ function _doStartLevel(gi) {
     // Character banter - fire the level-start line once the avatar exists.
     // Tutorial-quest levels are Professor lessons, not banter moments.
     if (typeof triggerBanter === 'function'
-        && !(typeof cur !== 'undefined' && cur && cur.isTutorialQuest)) {
+        && !(typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest)) {
         setTimeout(() => triggerBanter('level_start'), 600);
     }
 
     // Remind the player about unspent Convergence Points (delayed so it
     // appears after the toast queue reset and screen transition). {key} is
     // the player's CURRENT Probability Tree binding (K by default).
-    if ((STATE.passiveTreePoints || 0) > 0 && typeof showToast === 'function') {
+    if ((globalThis.STATE.passiveTreePoints || 0) > 0 && typeof showToast === 'function') {
         const treeKey = (typeof keybindDisplayLabel === 'function' && typeof keybindKeyFor === 'function')
             ? keybindDisplayLabel(keybindKeyFor('passive-tree')) : 'K';
         setTimeout(() => {
-            showToast(`🌿 ${t('toast_unspent_convergence').replace('{n}', STATE.passiveTreePoints).replace('{key}', treeKey)}`);
+            showToast(`🌿 ${t('toast_unspent_convergence').replace('{n}', globalThis.STATE.passiveTreePoints).replace('{key}', treeKey)}`);
         }, 900);
     }
 
@@ -560,11 +614,11 @@ function _doStartLevel(gi) {
     //     monster list, HP/damage budget) so the shared combat loop can run
     //     WITHOUT the endgame chain/objectives machinery.
     //   • Endgame map levels were already stamped by _egLaunchMapFromDevice.
-    if (cur && !dead && typeof _egPrepareCampaignEncounter === 'function'
+    if (globalThis.cur && !globalThis.dead && typeof _egPrepareCampaignEncounter === 'function'
         && !window._egSuppressEncounterStart) {
         _egPrepareCampaignEncounter();
     }
-    if (cur && cur.isMonsterLevel
+    if (globalThis.cur && globalThis.cur.isMonsterLevel
         && typeof _egStartEncounter === 'function'
         && !window._egSuppressEncounterStart) {
         _egStartEncounter();
@@ -582,13 +636,13 @@ function _doStartLevel(gi) {
     // _egIsActive was still false - now that the encounter is live, hand
     // the solved puzzle to the encounter chain (question modal → countdown
     // → next puzzle) instead of leaving a dead solved grid.
-    if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel
+    if (window._egIsMapDeviceRun && globalThis.cur && globalThis.cur.isMonsterLevel
         && typeof _egIsActive === 'function' && _egIsActive()
         && typeof isPuzzleSolved === 'function' && isPuzzleSolved()
         && typeof _egOnPuzzleComplete === 'function'
         && (typeof _egPuzzleCompleteFired === 'undefined' || !_egPuzzleCompleteFired)) {
-        if (!dead) {
-            dead = true;
+        if (!globalThis.dead) {
+            globalThis.dead = true;
             if (typeof stopTimer === 'function') stopTimer();
         }
         _egOnPuzzleComplete();
@@ -598,10 +652,10 @@ function _doStartLevel(gi) {
     // Tutorial quest levels keep the random tutorial track started on entry;
     // boss-arena chain puzzles keep the boss theme started by
     // _egSpawnNextArenaBoss - both skip the normal campaign track here.
-    if (cur && (cur.isTutorialQuest || cur.isBossArena)) {
+    if (globalThis.cur && (globalThis.cur.isTutorialQuest || globalThis.cur.isBossArena)) {
         // music already set by the entry point - do not override
     } else {
-        Audio_Manager.playBGM(Audio_Manager.trackForLevel(cur.world, cur.li));
+        Audio_Manager.playBGM(Audio_Manager.trackForLevel(globalThis.cur.world, globalThis.cur.li));
     }
 }
 

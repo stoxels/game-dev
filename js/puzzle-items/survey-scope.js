@@ -1,4 +1,19 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { _incDirect, questStat_revealItemUsed } from '../quests/quests-stats.js';
+import { t } from '../translation/translations.js';
+import { _applyCellEffect } from './cell-effects.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+
+//------------------------------------------------------------------------
 //-------------------SURVEY SCOPE----------------------
 //------------------------------------------------------------------------
 
@@ -6,7 +21,7 @@
 // Unlike the reveal family (random single tiles) this guarantees spatial
 // density: the whole window is surveyed at once. Blocked by the Ergodic
 // Field keystone and The Oracle, like every programmatic reveal.
-function _useSurveyScope(id, def) {
+export function _useSurveyScope(id, def) {
     // Ergodic Field (291) and The Oracle (300) disable all auto-reveals
     if (ptHasSkill('keystone_ergodic_field') || window._oracleActive) {
         return `${def.icon} ${t('itm_blocked_ergodic')}`;
@@ -14,8 +29,8 @@ function _useSurveyScope(id, def) {
 
     questStat_revealItemUsed();
 
-    if (!cur) return '';
-    const sol = cur.grid;
+    if (!globalThis.cur) return '';
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const win = 3;
@@ -41,8 +56,8 @@ function _useSurveyScope(id, def) {
     // Reveal every collected cell in the window
     const affected = [];
     area.cells.forEach(([r, c]) => {
-        revealedGrid[r][c] = true;
-        userGrid[r][c] = 1;
+        globalThis.revealedGrid[r][c] = true;
+        globalThis.userGrid[r][c] = 1;
         renderCell(r, c);
         updClues(r, c);
         affected.push(`g-${r}-${c}`);
@@ -57,20 +72,20 @@ function _useSurveyScope(id, def) {
     window._surveyScopeFxArea = { top: area.top, left: area.left, win };
 
     playItemEffect(id);
-    checkWin();
+    globalThis.checkWin();
     return `${def.icon} ${t('item_scope_done').replace('{n}', affected.length)}`;
 }
 
 // Collects the revealable cells ([row, col] pairs) inside the win×win
 // window whose top-left corner is (top, left), clamped to the grid.
 // Revealable = correct solution cell not yet filled or revealed by the player.
-function _collectScopeCells(sol, rows, cols, top, left, win) {
+export function _collectScopeCells(sol, rows, cols, top, left, win) {
     const bottom = Math.min(rows - 1, top + win - 1);
     const right = Math.min(cols - 1, left + win - 1);
     const cells = [];
     for (let r = top; r <= bottom; r++) {
         for (let c = left; c <= right; c++) {
-            if (sol[r][c] === 1 && userGrid[r][c] !== 1 && !revealedGrid[r][c]) {
+            if (sol[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]) {
                 cells.push([r, c]);
             }
         }
@@ -83,7 +98,7 @@ function _collectScopeCells(sol, rows, cols, top, left, win) {
 //------------------------------------------------------------------------
 
 // Injects the Survey Scope keyframes once (guarded by a sentinel style tag).
-function _ensureSurveyScopeStyles() {
+export function _ensureSurveyScopeStyles() {
     if (document.getElementById('fx-survey-scope-style')) return;
     const style = document.createElement('style');
     style.id = 'fx-survey-scope-style';
@@ -105,12 +120,12 @@ function _ensureSurveyScopeStyles() {
 
 // 🔬 Survey Scope - a cyan bracket frame locks onto the 3×3 window,
 // rings ripple out from its centre and sparkles shower the area.
-function _fxSurveyScope() {
+export function _fxSurveyScope() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
     _ensureSurveyScopeStyles();
 
-    const sol = cur?.grid;
+    const sol = globalThis.cur?.grid;
     if (!sol) return;
     const rows = sol.length;
     const cols = sol[0].length;

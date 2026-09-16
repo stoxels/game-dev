@@ -1,4 +1,13 @@
-﻿//------------------------------------------------------------------------
+﻿import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { renderCell, updClues } from '../grid.js';
+import { t } from '../translation/translations.js';
+import { CLASS_DEFS } from './class-defs.js';
+import { buildClassHUD } from './class-hud.js';
+import { _playDivineProcEffect } from './class-statistician.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { getSkillCastRankClamped } from '../skills/skill-charms.js';
+//------------------------------------------------------------------------
 //------------------------PROBABILIST-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -18,25 +27,25 @@
 
 // Charged arrow timing - deliberately much slower than the small marking
 // arrows fired by _firePrecisionArrow, so it reads as a "wind-up" shot.
-const PM_CHARGED_ARROW_SPEED_PX_S = 160;
-const PM_CHARGED_ARROW_MIN_DURATION_S = 0.7;
-const PM_CHARGED_ARROW_MAX_DURATION_S = 1.6;
-const PM_CHARGED_TRAIL_INTERVAL_MS = 45;
+export const PM_CHARGED_ARROW_SPEED_PX_S = 160;
+export const PM_CHARGED_ARROW_MIN_DURATION_S = 0.7;
+export const PM_CHARGED_ARROW_MAX_DURATION_S = 1.6;
+export const PM_CHARGED_TRAIL_INTERVAL_MS = 45;
 
 // Field Scan charge bolt: sprite → rain origin (above grid centre)
-const FIELD_SCAN_CHARGE_SPEED_PX_S = 260;
-const FIELD_SCAN_CHARGE_MIN_DURATION_S = 0.5;
-const FIELD_SCAN_CHARGE_MAX_DURATION_S = 1.1;
-const FIELD_SCAN_CHARGE_TRAIL_INTERVAL_MS = 40;
+export const FIELD_SCAN_CHARGE_SPEED_PX_S = 260;
+export const FIELD_SCAN_CHARGE_MIN_DURATION_S = 0.5;
+export const FIELD_SCAN_CHARGE_MAX_DURATION_S = 1.1;
+export const FIELD_SCAN_CHARGE_TRAIL_INTERVAL_MS = 40;
 
 // Field Scan drop-arrows: rain origin → each target cell
-const FIELD_SCAN_DROP_SPEED_PX_S = 700;
-const FIELD_SCAN_DROP_MIN_DURATION_S = 0.35;
-const FIELD_SCAN_DROP_MAX_DURATION_S = 0.65;
+export const FIELD_SCAN_DROP_SPEED_PX_S = 700;
+export const FIELD_SCAN_DROP_MIN_DURATION_S = 0.35;
+export const FIELD_SCAN_DROP_MAX_DURATION_S = 0.65;
 
 // Module state for the live Field Scan boundary preview shown while armed.
-let _fieldScanPreviewEl = null;
-let _fieldScanPreviewKey = null; // last-rendered region, to skip redundant rebuilds
+export let _fieldScanPreviewEl = null;
+export let _fieldScanPreviewKey = null; // last-rendered region, to skip redundant rebuilds
 
 // Note: window._pmMomentumActive / _pmMomentumSet / _pmMomentumTimeout are
 // dynamic globals used to communicate the momentum_of_certainty bonus
@@ -55,7 +64,7 @@ let _fieldScanPreviewKey = null; // last-rendered region, to skip redundant rebu
 // (randomly picking which cells in a line get marked when markCap is hit)
 // and by Field Scan's god_of_probabilities perk (randomly picking which
 // filled cells to permanently keep).
-function _shuffleArray(arr) {
+export function _shuffleArray(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -67,7 +76,7 @@ function _shuffleArray(arr) {
 // (puzzle-level) avatar first, then the full (monster-level) avatar. Falls
 // back to bottom-centre of the viewport if neither is currently rendered.
 // Shared between Precision Mark's charged arrow and Field Scan's charge bolt.
-function _pmGetSpriteOrigin() {
+export function _pmGetSpriteOrigin() {
     const el = document.getElementById('avatar-sprite-img-simple')
         || document.getElementById('avatar-sprite-img');
     if (el) {
@@ -85,9 +94,9 @@ function _pmGetSpriteOrigin() {
 
 // Computes the maximum number of cells Precision Mark is allowed to mark,
 // based on the player's class level and any relevant passive skills.
-function _precisionMarkComputeMarkCap() {
+export function _precisionMarkComputeMarkCap() {
     // Effect rank follows the slotted charm when one is placed.
-    let level = STATE.classActive1Level || 1;
+    let level = globalThis.STATE.classActive1Level || 1;
     if (typeof getSkillCastRankClamped === 'function') {
         const charmRank = getSkillCastRankClamped('probabilist_active1');
         if (charmRank) level = charmRank;
@@ -101,7 +110,7 @@ function _precisionMarkComputeMarkCap() {
 
 // Computes the set of rows and columns that Precision Mark should target,
 // starting from the clicked cell and expanding outward by extraLines.
-function _precisionMarkBuildTargets(row, col, extraLines, rows, cols) {
+export function _precisionMarkBuildTargets(row, col, extraLines, rows, cols) {
     const targetRows = new Set([row]);
     const targetCols = new Set([col]);
     for (let i = 1; i <= extraLines; i++) {
@@ -120,10 +129,10 @@ function _precisionMarkBuildTargets(row, col, extraLines, rows, cols) {
 // _precisionMarkCommitMark). `claimed` tracks cells already picked by other
 // lines in this same call, since userGrid itself isn't updated yet to do
 // that bookkeeping for us.
-function _precisionMarkSelectLine(cells, sol, maxCount, affected, claimed) {
+export function _precisionMarkSelectLine(cells, sol, maxCount, affected, claimed) {
     if (maxCount <= 0) return;
     const eligible = cells.filter(([r, c]) =>
-        sol[r][c] === 0 && userGrid[r][c] === 0 && !claimed.has(`${r}-${c}`)
+        sol[r][c] === 0 && globalThis.userGrid[r][c] === 0 && !claimed.has(`${r}-${c}`)
     );
     _shuffleArray(eligible);
     eligible.slice(0, maxCount).forEach(([r, c]) => {
@@ -136,13 +145,13 @@ function _precisionMarkSelectLine(cells, sol, maxCount, affected, claimed) {
 // for one Precision Mark cell, called exactly when that cell's marking
 // arrow lands. Re-checks the cell is still empty first, in case the player
 // manually filled or marked it during the arrow's brief flight time.
-function _precisionMarkCommitMark(id) {
+export function _precisionMarkCommitMark(id) {
     const [, r, c] = id.split('-').map(Number);
-    if (userGrid[r][c] !== 0) return; // no longer eligible - leave it alone
+    if (globalThis.userGrid[r][c] !== 0) return; // no longer eligible - leave it alone
 
-    userGrid[r][c] = 2;
+    globalThis.userGrid[r][c] = 2;
     renderCell(r, c);
-    _applyCellEffect([id], 'mark');
+    globalThis._applyCellEffect([id], 'mark');
 }
 
 // _precisionMarkApply - selects all cells Precision Mark will mark across
@@ -152,7 +161,7 @@ function _precisionMarkCommitMark(id) {
 // (rows AND columns, interleaved), so both orientations reliably receive
 // marks - a naive rows-first pass could let rows consume the entire cap
 // and leave the columns empty.
-function _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap) {
+export function _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap) {
     const affected = [];
     const claimed = new Set();
 
@@ -195,23 +204,23 @@ function _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap) {
         if (tookThisRound === 0) break; // nothing left to claim anywhere
     }
 
-    questStat_classMarkUsed(affected.length);
+    globalThis.questStat_classMarkUsed(affected.length);
     return affected;
 }
 
 // Collects all filled but not yet player-filled cells within the Precision Mark
 // target area, used by the momentum_of_certainty skill to start a bonus window.
-function _precisionMarkCollectMomentumCells(targetRows, targetCols, rows, cols, sol) {
+export function _precisionMarkCollectMomentumCells(targetRows, targetCols, rows, cols, sol) {
     const momentumCells = [];
     targetRows.forEach(r => {
         for (let c = 0; c < cols; c++) {
-            if (sol[r][c] === 1 && userGrid[r][c] !== 1) momentumCells.push(`g-${r}-${c}`);
+            if (sol[r][c] === 1 && globalThis.userGrid[r][c] !== 1) momentumCells.push(`g-${r}-${c}`);
         }
     });
     targetCols.forEach(c => {
         for (let r = 0; r < rows; r++) {
             // Skip rows already added via targetRows to avoid duplicates
-            if (sol[r][c] === 1 && userGrid[r][c] !== 1 && !targetRows.has(r)) {
+            if (sol[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !targetRows.has(r)) {
                 momentumCells.push(`g-${r}-${c}`);
             }
         }
@@ -221,7 +230,7 @@ function _precisionMarkCollectMomentumCells(targetRows, targetCols, rows, cols, 
 
 // Sets a 5-second window during which the next correct fill in any of the
 // affected cells grants +3 minutes (momentum_of_certainty skill perk).
-function _precisionMarkStartMomentumWindow(affected) {
+export function _precisionMarkStartMomentumWindow(affected) {
     const affectedSet = new Set(affected);
     window._pmMomentumActive = true;
     window._pmMomentumSet = affectedSet;
@@ -233,17 +242,17 @@ function _precisionMarkStartMomentumWindow(affected) {
 
 // Builds a pool of all rows and columns that still contain unmarked empty cells,
 // used by _precisionMarkBonusLine to pick a random unsolved line.
-function _precisionMarkBuildUnsolvedPool(rows, cols, sol) {
+export function _precisionMarkBuildUnsolvedPool(rows, cols, sol) {
     const unsolvedRows = [];
     const unsolvedCols = [];
 
     for (let r = 0; r < rows; r++) {
-        if ([...Array(cols).keys()].some(c => sol[r][c] === 0 && userGrid[r][c] === 0)) {
+        if ([...Array(cols).keys()].some(c => sol[r][c] === 0 && globalThis.userGrid[r][c] === 0)) {
             unsolvedRows.push(r);
         }
     }
     for (let c = 0; c < cols; c++) {
-        if ([...Array(rows).keys()].some(r => sol[r][c] === 0 && userGrid[r][c] === 0)) {
+        if ([...Array(rows).keys()].some(r => sol[r][c] === 0 && globalThis.userGrid[r][c] === 0)) {
             unsolvedCols.push(c);
         }
     }
@@ -256,7 +265,7 @@ function _precisionMarkBuildUnsolvedPool(rows, cols, sol) {
 
 // Marks all remaining empty cells in a single randomly chosen unsolved row or column.
 // Used as a bonus effect when a relevant skill proc fires.
-function _precisionMarkBonusLine(rows, cols, sol, affected) {
+export function _precisionMarkBonusLine(rows, cols, sol, affected) {
     const pool = _precisionMarkBuildUnsolvedPool(rows, cols, sol);
     if (!pool.length) return;
 
@@ -264,27 +273,27 @@ function _precisionMarkBonusLine(rows, cols, sol, affected) {
 
     if (pick.type === 'row') {
         for (let c = 0; c < cols; c++) {
-            if (sol[pick.idx][c] === 0 && userGrid[pick.idx][c] === 0) {
-                userGrid[pick.idx][c] = 2;
+            if (sol[pick.idx][c] === 0 && globalThis.userGrid[pick.idx][c] === 0) {
+                globalThis.userGrid[pick.idx][c] = 2;
                 renderCell(pick.idx, c);
-                questStat_classMarkUsed(1);
+                globalThis.questStat_classMarkUsed(1);
                 trackAchStat('tilesMarkedWrong', 1);
                 affected.push(`g-${pick.idx}-${c}`);
             }
         }
     } else {
         for (let r = 0; r < rows; r++) {
-            if (sol[r][pick.idx] === 0 && userGrid[r][pick.idx] === 0) {
-                userGrid[r][pick.idx] = 2;
+            if (sol[r][pick.idx] === 0 && globalThis.userGrid[r][pick.idx] === 0) {
+                globalThis.userGrid[r][pick.idx] = 2;
                 renderCell(r, pick.idx);
-                questStat_classMarkUsed(1);
+                globalThis.questStat_classMarkUsed(1);
                 trackAchStat('tilesMarkedWrong', 1);
                 affected.push(`g-${r}-${pick.idx}`);
             }
         }
     }
 
-    showToast(`🎯 ${t('cls_bonus_line_marked')}`);
+    globalThis.showToast(`🎯 ${t('cls_bonus_line_marked')}`);
 }
 
 
@@ -296,7 +305,7 @@ function _precisionMarkBonusLine(rows, cols, sol, affected) {
 // _pmChargedArrowTrailTick - spawns one fading comet-trail particle at the
 // charged arrow's current on-screen position. Called on an interval while
 // the arrow is in flight.
-function _pmChargedArrowTrailTick(arrowEl) {
+export function _pmChargedArrowTrailTick(arrowEl) {
     const rect = arrowEl.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -314,7 +323,7 @@ function _pmChargedArrowTrailTick(arrowEl) {
 // _playChargedArrowImpact - bigger impact burst played when the charged
 // arrow lands on the clicked cell (distinct from _playArrowImpact, which is
 // the smaller burst used for the marking arrows).
-function _playChargedArrowImpact(x, y) {
+export function _playChargedArrowImpact(x, y) {
     const ring = document.createElement('div');
     ring.className = 'pm-charged-impact-ring';
     ring.style.cssText = `left: ${x}px; top: ${y}px;`;
@@ -332,7 +341,7 @@ function _playChargedArrowImpact(x, y) {
 // (sx, sy) - the player sprite - to (tx, ty) - the clicked cell. Slower
 // and larger than the small marking arrows, with a glowing comet trail.
 // Calls onArrival() once it lands.
-function _pmFireChargedArrow(sx, sy, tx, ty, onArrival) {
+export function _pmFireChargedArrow(sx, sy, tx, ty, onArrival) {
     const dx = tx - sx, dy = ty - sy;
     const dist = Math.hypot(dx, dy);
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
@@ -372,7 +381,7 @@ function _pmFireChargedArrow(sx, sy, tx, ty, onArrival) {
 }
 
 // Plays a green ripple ring and radial flash at the arrow impact point.
-function _playArrowImpact(x, y) {
+export function _playArrowImpact(x, y) {
     // Expanding ring
     const ring = document.createElement('div');
     ring.className = 'pm-impact-ring';
@@ -413,7 +422,7 @@ function _playArrowImpact(x, y) {
 
 // Creates an arrow element and animates it flying from (sx, sy) to (tx, ty).
 // Speed is ~420px/s, clamped between 0.18s and 0.7s flight time.
-function _firePrecisionArrow(sx, sy, tx, ty, onImpact) {
+export function _firePrecisionArrow(sx, sy, tx, ty, onImpact) {
     const dx = tx - sx, dy = ty - sy;
     const dist = Math.hypot(dx, dy);
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
@@ -453,7 +462,7 @@ function _firePrecisionArrow(sx, sy, tx, ty, onImpact) {
 // every target cell, originating from (originX, originY) - the point where
 // the charged arrow just landed. Each cell's ✕ is committed exactly when
 // its own arrow lands, so the mark and the VFX stay in sync.
-function _precisionMarkFireArrowsAtTargets(ids, originX, originY) {
+export function _precisionMarkFireArrowsAtTargets(ids, originX, originY) {
     ids.forEach((id, i) => {
         const targetEl = document.getElementById(id);
         if (!targetEl) return;
@@ -471,7 +480,7 @@ function _precisionMarkFireArrowsAtTargets(ids, originX, originY) {
 // a slow charged arrow flies from the player's sprite to the clicked cell,
 // and once it lands, the green marking arrows fan out from that cell to
 // every cell the ability just marked.
-function _playPrecisionMarkEffect(clickRow, clickCol, affectedIds) {
+export function _playPrecisionMarkEffect(clickRow, clickCol, affectedIds) {
     const clickEl = document.getElementById(`g-${clickRow}-${clickCol}`);
     if (!clickEl) return;
 
@@ -494,7 +503,7 @@ function _playPrecisionMarkEffect(clickRow, clickCol, affectedIds) {
 // Applies passive skill modifiers to the base scan size and duration.
 // wider_lens and panoramic_view each add 1 to scan size.
 // photographic_memory adds 1 second to the duration.
-function _fieldScanComputeEffectiveParams(scanSize, durationMs) {
+export function _fieldScanComputeEffectiveParams(scanSize, durationMs) {
     let effectiveSize = scanSize;
     let effectiveDuration = durationMs;
     if (ptHasSkill('wider_lens')) effectiveSize += 1;
@@ -504,7 +513,7 @@ function _fieldScanComputeEffectiveParams(scanSize, durationMs) {
 }
 
 // Tracks the achievement for scanning 20 or more correct (filled) cells at once.
-function _fieldScanCheckBigScanAchievement(prevStates, sol) {
+export function _fieldScanCheckBigScanAchievement(prevStates, sol) {
     const correctInScan = prevStates.filter(({ r, c }) => sol[r][c] === 1).length;
     if (correctInScan >= 20) trackAchStat('probabilistBigScan');
 }
@@ -514,19 +523,19 @@ function _fieldScanCheckBigScanAchievement(prevStates, sol) {
 // When keepAllCrosses is set (rain-of-arrows cast of the actual class
 // ability only), every cell the scan showed as ✕ (solution-empty) is also
 // permanently committed as a system cross mark.
-function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses = false) {
+export function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses = false) {
     const filledInScan = prevStates.filter(({ r, c }) =>
-        cur.grid[r][c] === 1 && !revealedGrid[r][c] && userGrid[r][c] !== 1
+        globalThis.cur.grid[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1
     );
 
     _shuffleArray(filledInScan);
     filledInScan.slice(0, 3).forEach(({ r, c }) => {
-        revealedGrid[r][c] = true;
-        userGrid[r][c] = 1;
+        globalThis.revealedGrid[r][c] = true;
+        globalThis.userGrid[r][c] = 1;
         updClues(r, c);
         trackAchStat('tilesRevealed', 1);
-        questStat_classRevealUsed(1);
-        updateQuestStats('classAbilityUsedThisLevel', {});
+        globalThis.questStat_classRevealUsed(1);
+        globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
 
         // Correct reveals kept by God of Probabilities also feed the
         // Random Walker's Drifter with XP. (✕ marks grant no XP.)
@@ -535,13 +544,13 @@ function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses = false)
 
     if (keepAllCrosses) {
         prevStates.forEach(({ r, c }) => {
-            if (cur.grid[r][c] !== 0) return;                 // filled cells are handled above
-            if (userGrid[r][c] === 2 || wrongGrid[r][c]) return; // already marked / penalised
+            if (globalThis.cur.grid[r][c] !== 0) return;                 // filled cells are handled above
+            if (globalThis.userGrid[r][c] === 2 || globalThis.wrongGrid[r][c]) return; // already marked / penalised
 
-            userGrid[r][c] = 2;
-            systemMarkedGrid[r][c] = true;
+            globalThis.userGrid[r][c] = 2;
+            globalThis.systemMarkedGrid[r][c] = true;
             renderCell(r, c);
-            questStat_classMarkUsed(1);
+            globalThis.questStat_classMarkUsed(1);
             trackAchStat('tilesMarkedWrong', 1);
         });
     }
@@ -551,7 +560,7 @@ function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses = false)
 
 // Fades out the scan-reveal cells one by one with a randomized stagger,
 // then re-renders each cell to its actual state.
-function _fieldScanFadeOutCells(scanned) {
+export function _fieldScanFadeOutCells(scanned) {
     scanned.forEach(el => {
         setTimeout(() => {
             el.style.transition = 'opacity 0.25s ease-out, filter 0.25s ease-out';
@@ -570,7 +579,7 @@ function _fieldScanFadeOutCells(scanned) {
 // Restores all scanned cells to their real state after the scan timer expires.
 // If god_of_probabilities is active, permanently keeps up to 3 filled cells first
 // (plus, on rain-of-arrows casts of the actual class ability, every ✕ mark shown).
-function _fieldScanRestore(scanned, prevStates, isClassAbility = false) {
+export function _fieldScanRestore(scanned, prevStates, isClassAbility = false) {
     if (ptHasSkill('god_of_probabilities')) {
         _fieldScanRestoreGodOfProbabilities(prevStates, isClassAbility);
     }
@@ -579,19 +588,19 @@ function _fieldScanRestore(scanned, prevStates, isClassAbility = false) {
     prevStates.forEach(({ r, c }) => renderCell(r, c));
 
     _fieldScanFadeOutCells(scanned);
-    showToast(`🎯 ${t('cls_scan_faded')}`);
+    globalThis.showToast(`🎯 ${t('cls_scan_faded')}`);
     buildClassHUD();
     // The scan may have permanently revealed the last missing filled cells
     // via god_of_probabilities (or the player may have completed the puzzle
     // while the scan was still active). Check for win now that the board
     // state is final - otherwise the level would appear solved but never
     // trigger the win overlay until the next manual click.
-    if (typeof checkWin === 'function' && !dead) checkWin();
+    if (typeof globalThis.checkWin === 'function' && !globalThis.dead) globalThis.checkWin();
 }
 
 // _fieldScanComputeOrigin - centers a scanSize x scanSize region on the
 // clicked cell, clamped so the region never runs off the edge of the grid.
-function _fieldScanComputeOrigin(row, col, scanSize, rows, cols) {
+export function _fieldScanComputeOrigin(row, col, scanSize, rows, cols) {
     const half = Math.floor((scanSize - 1) / 2);
     const maxRow = Math.max(0, rows - scanSize);
     const maxCol = Math.max(0, cols - scanSize);
@@ -604,11 +613,11 @@ function _fieldScanComputeOrigin(row, col, scanSize, rows, cols) {
 // cell inside the scan region eligible for the scan-reveal treatment (i.e.
 // not already correctly filled or revealed). The length of this list is
 // exactly how many drop-arrows will rain down onto the grid.
-function _fieldScanComputeTargets(startRow, startCol, scanSize, rows, cols, sol) {
+export function _fieldScanComputeTargets(startRow, startCol, scanSize, rows, cols, sol) {
     const targets = [];
     for (let r = startRow; r < Math.min(startRow + scanSize, rows); r++) {
         for (let c = startCol; c < Math.min(startCol + scanSize, cols); c++) {
-            if (userGrid[r][c] === 1 || revealedGrid[r][c]) continue;
+            if (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c]) continue;
             targets.push({ r, c });
         }
     }
@@ -620,15 +629,15 @@ function _fieldScanComputeTargets(startRow, startCol, scanSize, rows, cols, sol)
 // old (synchronous) _fieldScanRevealRegion used to do per cell, just staged
 // in time with the VFX. Re-checks eligibility in case the player changed
 // that exact cell during the brief flight.
-function _fieldScanCommitCell(r, c, sol) {
-    if (userGrid[r][c] === 1 || revealedGrid[r][c]) return null;
+export function _fieldScanCommitCell(r, c, sol) {
+    if (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c]) return null;
 
     const el = document.getElementById(`g-${r}-${c}`);
     if (!el) return null;
 
     el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
     el.classList.add(sol[r][c] === 1 ? 'filled' : 'marked', 'scan-reveal');
-    questStat_fieldScanCellRevealed(1);
+    globalThis.questStat_fieldScanCellRevealed(1);
 
     return el;
 }
@@ -640,7 +649,7 @@ function _fieldScanCommitCell(r, c, sol) {
 //------------------------------------------------------------------------
 
 // Removes any leftover scan VFX elements from a previous ability cast.
-function _scanBeamCleanupPreviousCast() {
+export function _scanBeamCleanupPreviousCast() {
     ['ability-scan-beam', 'ability-scan-outline', 'ability-scan-bar', 'scan-beam-style'].forEach(id => {
         document.getElementById(id)?.remove();
     });
@@ -648,9 +657,9 @@ function _scanBeamCleanupPreviousCast() {
 
 // Computes the pixel bounds of the scan region within the puzzle scaler element,
 // accounting for the current zoom level.
-function _scanBeamBuildRegionBounds(startRow, startCol, scanSize, wrap) {
-    const rows = cur?.grid?.length || 99;
-    const cols = cur?.grid?.[0]?.length || 99;
+export function _scanBeamBuildRegionBounds(startRow, startCol, scanSize, wrap) {
+    const rows = globalThis.cur?.grid?.length || 99;
+    const cols = globalThis.cur?.grid?.[0]?.length || 99;
     const endRow = Math.min(startRow + scanSize - 1, rows - 1);
     const endCol = Math.min(startCol + scanSize - 1, cols - 1);
 
@@ -660,7 +669,7 @@ function _scanBeamBuildRegionBounds(startRow, startCol, scanSize, wrap) {
     if (!topCellEl || !botCellEl || !rightCellEl) return null;
 
     const wrapRect = wrap.getBoundingClientRect();
-    const zoom = currentZoom || 1;
+    const zoom = globalThis.currentZoom || 1;
     const topRect = topCellEl.getBoundingClientRect();
     const botRect = botCellEl.getBoundingClientRect();
     const rightRect = rightCellEl.getBoundingClientRect();
@@ -682,7 +691,7 @@ function _scanBeamBuildRegionBounds(startRow, startCol, scanSize, wrap) {
 
 // Injects the CSS keyframe animations needed for the scan beam effect.
 // Returns the inserted style tag so it can be removed during cleanup.
-function _scanBeamInjectKeyframes(durationMs, regionTop, regionHeight, beamH) {
+export function _scanBeamInjectKeyframes(durationMs, regionTop, regionHeight, beamH) {
     const travelDist = Math.max(0, regionHeight - beamH);
     const styleTag = document.createElement('style');
     styleTag.id = 'scan-beam-style';
@@ -716,7 +725,7 @@ function _scanBeamInjectKeyframes(durationMs, regionTop, regionHeight, beamH) {
 }
 
 // Creates and appends the animated green border outline for the scan region.
-function _scanBeamCreateOutline(wrap, regionLeft, regionTop, regionWidth, regionHeight) {
+export function _scanBeamCreateOutline(wrap, regionLeft, regionTop, regionWidth, regionHeight) {
     const outline = document.createElement('div');
     outline.id = 'ability-scan-outline';
     outline.style.cssText = `
@@ -736,7 +745,7 @@ function _scanBeamCreateOutline(wrap, regionLeft, regionTop, regionWidth, region
 }
 
 // Creates and appends the animated green beam that sweeps top-to-bottom.
-function _scanBeamCreateBeam(wrap, regionLeft, regionTop, regionWidth, beamH, durationMs) {
+export function _scanBeamCreateBeam(wrap, regionLeft, regionTop, regionWidth, beamH, durationMs) {
     const beam = document.createElement('div');
     beam.id = 'ability-scan-beam';
     beam.style.cssText = `
@@ -764,7 +773,7 @@ function _scanBeamCreateBeam(wrap, regionLeft, regionTop, regionWidth, beamH, du
 }
 
 // Creates and appends the countdown bar at the bottom of the scan region.
-function _scanBeamCreateCountdownBar(wrap, regionLeft, regionBottom, regionWidth, durationMs) {
+export function _scanBeamCreateCountdownBar(wrap, regionLeft, regionBottom, regionWidth, durationMs) {
     const bar = document.createElement('div');
     bar.id = 'ability-scan-bar';
     bar.style.cssText = `
@@ -786,7 +795,7 @@ function _scanBeamCreateCountdownBar(wrap, regionLeft, regionBottom, regionWidth
 }
 
 // Schedules a brief cell flash on each row of the scan region as the beam passes over it.
-function _scanBeamScheduleRowFlashes(startRow, endRow, startCol, endCol, durationMs) {
+export function _scanBeamScheduleRowFlashes(startRow, endRow, startCol, endCol, durationMs) {
     const rowCount = endRow - startRow + 1;
     for (let ri = 0; ri < rowCount; ri++) {
         const r = startRow + ri;
@@ -814,10 +823,10 @@ function _scanBeamScheduleRowFlashes(startRow, endRow, startCol, endCol, duratio
 // size (after passive bonuses) for whatever rank Field Scan is at. Kept
 // separate from _fieldScanComputeEffectiveParams since the preview doesn't
 // have a durationMs value yet (the ability hasn't fired).
-function _fieldScanGetEffectiveSizeForPreview() {
+export function _fieldScanGetEffectiveSizeForPreview() {
     const def = CLASS_DEFS?.probabilist;
     if (!def) return 3;
-    let level = STATE.classActive2Level || 1;
+    let level = globalThis.STATE.classActive2Level || 1;
     if (typeof getSkillCastRankClamped === 'function') {
         const charmRank = getSkillCastRankClamped('probabilist_active2');
         if (charmRank) level = charmRank;
@@ -829,7 +838,7 @@ function _fieldScanGetEffectiveSizeForPreview() {
 
 // _fieldScanGetHoveredCell - resolves which grid cell is under the given
 // viewport coordinates, or null if the cursor isn't over the grid at all.
-function _fieldScanGetHoveredCell(clientX, clientY) {
+export function _fieldScanGetHoveredCell(clientX, clientY) {
     const el = document.elementFromPoint(clientX, clientY);
     const cellEl = el?.closest('[id^="g-"]');
     if (!cellEl) return null;
@@ -841,7 +850,7 @@ function _fieldScanGetHoveredCell(clientX, clientY) {
 // _fieldScanBuildPreviewEl - creates the dashed preview outline once and
 // appends it to #puzzle-scaler. Reused across hover updates rather than
 // recreated every mousemove.
-function _fieldScanBuildPreviewEl(wrap) {
+export function _fieldScanBuildPreviewEl(wrap) {
     if (_fieldScanPreviewEl) return _fieldScanPreviewEl;
     const el = document.createElement('div');
     el.id = 'fs-scan-preview-outline';
@@ -854,7 +863,7 @@ function _fieldScanBuildPreviewEl(wrap) {
 // _fieldScanClearPreview - removes the live preview outline. Called when
 // Field Scan is disarmed (cancelled, executed, or the player switches to a
 // different ability/slot) and whenever the cursor leaves the grid while armed.
-function _fieldScanClearPreview() {
+export function _fieldScanClearPreview() {
     _fieldScanPreviewKey = null;
     if (_fieldScanPreviewEl) {
         _fieldScanPreviewEl.remove();
@@ -868,18 +877,18 @@ function _fieldScanClearPreview() {
 // NxN region is currently centred under the cursor, using the exact same
 // clamping logic _executeFieldScan itself uses (_fieldScanComputeOrigin),
 // so the preview always matches what will actually be scanned.
-function _fieldScanUpdatePreview(clientX, clientY) {
-    const isArmed = activeAbilityMode
-        && STATE.playerClass === 'probabilist'
-        && STATE.classActiveChoice === 'active2';
+export function _fieldScanUpdatePreview(clientX, clientY) {
+    const isArmed = globalThis.activeAbilityMode
+        && globalThis.STATE.playerClass === 'probabilist'
+        && globalThis.STATE.classActiveChoice === 'active2';
 
-    if (!isArmed || !cur) { _fieldScanClearPreview(); return; }
+    if (!isArmed || !globalThis.cur) { _fieldScanClearPreview(); return; }
 
     const hovered = _fieldScanGetHoveredCell(clientX, clientY);
     if (!hovered) { _fieldScanClearPreview(); return; }
 
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
     const scanSize = _fieldScanGetEffectiveSizeForPreview();
     const { startRow, startCol } = _fieldScanComputeOrigin(hovered.r, hovered.c, scanSize, rows, cols);
 
@@ -904,7 +913,7 @@ function _fieldScanUpdatePreview(clientX, clientY) {
 // Plays the full Field Scan visual effect:
 // a sweeping green beam across the scan region with a border outline, countdown bar,
 // per-row cell flashes, and a clean fade-out at the end.
-function _playScanBeamEffect(startRow, startCol, scanSize, durationMs) {
+export function _playScanBeamEffect(startRow, startCol, scanSize, durationMs) {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
 
@@ -916,9 +925,9 @@ function _playScanBeamEffect(startRow, startCol, scanSize, durationMs) {
     if (!bounds) return;
 
     const { regionTop, regionLeft, regionBottom, regionWidth, regionHeight } = bounds;
-    const rows = cur?.grid?.length || 99;
+    const rows = globalThis.cur?.grid?.length || 99;
     const endRow = Math.min(startRow + scanSize - 1, rows - 1);
-    const endCol = Math.min(startCol + scanSize - 1, (cur?.grid?.[0]?.length || 99) - 1);
+    const endCol = Math.min(startCol + scanSize - 1, (globalThis.cur?.grid?.[0]?.length || 99) - 1);
     const beamH = 28;
 
     const styleTag = _scanBeamInjectKeyframes(durationMs, regionTop, regionHeight, beamH);
@@ -943,10 +952,10 @@ function _playScanBeamEffect(startRow, startCol, scanSize, durationMs) {
 // area instead of flying in from wherever the timer UI happens to sit).
 // Computed from the corner cells' bounding rects, so it stays correct under
 // zoom/scroll. Falls back to top-centre of the viewport.
-function _fieldScanGetRainOrigin() {
+export function _fieldScanGetRainOrigin() {
     const topLeft = document.getElementById('g-0-0');
-    const rows = cur ? cur.grid.length : 0;
-    const cols = cur && cur.grid[0] ? cur.grid[0].length : 0;
+    const rows = globalThis.cur ? globalThis.cur.grid.length : 0;
+    const cols = globalThis.cur && globalThis.cur.grid[0] ? globalThis.cur.grid[0].length : 0;
     const bottomRight = rows > 0 && cols > 0
         ? document.getElementById(`g-${rows - 1}-${cols - 1}`)
         : null;
@@ -963,7 +972,7 @@ function _fieldScanGetRainOrigin() {
 
 // _fieldScanChargeTrailTick - spawns one fading square "data pixel" behind
 // the charge bolt while it's in flight.
-function _fieldScanChargeTrailTick(boltEl) {
+export function _fieldScanChargeTrailTick(boltEl) {
     const rect = boltEl.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -977,7 +986,7 @@ function _fieldScanChargeTrailTick(boltEl) {
 
 // _fieldScanPlaySplitBurst - brief radial burst at the rain origin when the
 // charge bolt arrives and splits into the rain-down arrows.
-function _fieldScanPlaySplitBurst(x, y) {
+export function _fieldScanPlaySplitBurst(x, y) {
     const burst = document.createElement('div');
     burst.className = 'fs-split-burst';
     burst.style.cssText = `left: ${x}px; top: ${y}px;`;
@@ -992,7 +1001,7 @@ function _fieldScanPlaySplitBurst(x, y) {
 // Precision Mark's
 // charged arrow: a dashed "data bolt" with a square-pixel trail instead of
 // a solid arrowhead with a round comet trail.
-function _fieldScanFireChargeArrow(sx, sy, tx, ty, onArrival) {
+export function _fieldScanFireChargeArrow(sx, sy, tx, ty, onArrival) {
     const dx = tx - sx, dy = ty - sy;
     const dist = Math.hypot(dx, dy);
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
@@ -1031,7 +1040,7 @@ function _fieldScanFireChargeArrow(sx, sy, tx, ty, onArrival) {
 }
 
 // _fieldScanPlayLandPing - tiny flash where a drop-arrow lands.
-function _fieldScanPlayLandPing(x, y) {
+export function _fieldScanPlayLandPing(x, y) {
     const ping = document.createElement('div');
     ping.className = 'fs-land-ping';
     ping.style.cssText = `left: ${x}px; top: ${y}px;`;
@@ -1043,7 +1052,7 @@ function _fieldScanPlayLandPing(x, y) {
 // rain origin (sx, sy) onto a target cell (tx, ty), using an accelerating
 // "gravity" ease so it reads as falling rather than flying flat. Calls
 // onLand() the instant it touches down.
-function _fieldScanFireDropArrow(sx, sy, tx, ty, onLand) {
+export function _fieldScanFireDropArrow(sx, sy, tx, ty, onLand) {
     const dx = tx - sx, dy = ty - sy;
     const dist = Math.hypot(dx, dy);
     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
@@ -1080,9 +1089,9 @@ function _fieldScanFireDropArrow(sx, sy, tx, ty, onLand) {
 // existing beam-sweep VFX, shows the toast/achievement, and schedules the
 // restore exactly as the old (instant) version did - just delayed until the
 // rain-down has actually finished.
-function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
+export function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
     _playScanBeamEffect(startRow, startCol, scanSize, durationMs);
-    showToast(`🎯 ${t('cls_field_scan')}`);
+    globalThis.showToast(`🎯 ${t('cls_field_scan')}`);
     _fieldScanCheckBigScanAchievement(prevStates, sol);
 
     setTimeout(() => _fieldScanRestore(scanned, prevStates, isClassAbility), durationMs);
@@ -1092,7 +1101,7 @@ function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, s
 // originating from the rain origin above the grid. Staggered (with a little
 // jitter) for a natural "rain" feel. Once every drop-arrow has landed, the
 // existing beam-sweep scan effect plays and the restore timer is scheduled.
-function _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
+export function _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
     const scanned = [];
     const prevStates = [];
     let landed = 0;
@@ -1123,7 +1132,7 @@ function _fieldScanSplitAndRain(targets, sol, rainPos, startRow, startCol, scanS
 // origin (a point centred above the grid), split into one drop-arrow per
 // target cell, rain down, then (once every arrow has landed) the existing
 // beam-sweep effect fires.
-function _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
+export function _fieldScanPlayTargetedVFX(targets, sol, startRow, startCol, scanSize, durationMs, isClassAbility = false) {
     const rainPos = _fieldScanGetRainOrigin();
     const origin = _pmGetSpriteOrigin(); // shared sprite-origin helper
 
@@ -1161,13 +1170,13 @@ function _fieldScanPickOrigin(scanSize, rows, cols) {
 // Superseded by _fieldScanComputeTargets + _fieldScanCommitCell for the targeted
 // ability, but still used by Interquartile Vision's whole-grid field scan
 // (via _executeFieldScanLegacy) where per-cell rain VFX would be far too slow.
-function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols, sol) {
+export function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols, sol) {
     const scanned = [];
     const prevStates = [];
 
     for (let r = startRow; r < Math.min(startRow + scanSize, rows); r++) {
         for (let c = startCol; c < Math.min(startCol + scanSize, cols); c++) {
-            if (userGrid[r][c] === 1 || revealedGrid[r][c]) continue;
+            if (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c]) continue;
 
             const el = document.getElementById(`g-${r}-${c}`);
             if (!el) continue;
@@ -1176,7 +1185,7 @@ function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols, sol) {
             el.classList.remove('filled', 'marked', 'wrong-mark', 'revealed', 'questioned');
             el.classList.add(sol[r][c] === 1 ? 'filled' : 'marked', 'scan-reveal');
             scanned.push(el);
-            questStat_fieldScanCellRevealed(1);
+            globalThis.questStat_fieldScanCellRevealed(1);
         }
     }
 
@@ -1186,14 +1195,14 @@ function _fieldScanRevealRegion(startRow, startCol, scanSize, rows, cols, sol) {
 // Old simpler scan beam - a single glowing band that sweeps top-to-bottom.
 // Kept here in case it is useful for other scan-like effects in the future,
 // currently used by _executeFieldScanLegacy (Interquartile Vision).
-function _playScanBeamEffect_legacy(startRow, startCol, scanSize, durationMs) {
+export function _playScanBeamEffect_legacy(startRow, startCol, scanSize, durationMs) {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
 
     const prevPosition = wrap.style.position;
     if (!prevPosition || prevPosition === 'static') wrap.style.position = 'relative';
 
-    const rows = cur?.grid?.length || 99;
+    const rows = globalThis.cur?.grid?.length || 99;
     const endRow = Math.min(startRow + scanSize - 1, rows - 1);
 
     const topCellEl = document.getElementById(`g-${startRow}-${startCol}`);
@@ -1203,7 +1212,7 @@ function _playScanBeamEffect_legacy(startRow, startCol, scanSize, durationMs) {
     const wrapRect = wrap.getBoundingClientRect();
     const topRect  = topCellEl.getBoundingClientRect();
     const botRect  = botCellEl.getBoundingClientRect();
-    const zoom     = currentZoom || 1;
+    const zoom     = globalThis.currentZoom || 1;
 
     const regionTop    = (topRect.top    - wrapRect.top) / zoom;
     const regionBottom = (botRect.bottom - wrapRect.top) / zoom;
@@ -1253,9 +1262,9 @@ function _playScanBeamEffect_legacy(startRow, startCol, scanSize, durationMs) {
 // Interquartile Vision passive node at level start. Reveals every eligible
 // cell in the region in one pass (no per-cell rain VFX), plays the legacy
 // beam sweep, then restores via the standard scan timer.
-function _executeFieldScanLegacy(row, col, scanSize, durationMs) {
-    if (!cur) return;
-    const sol = cur.grid;
+export function _executeFieldScanLegacy(row, col, scanSize, durationMs) {
+    if (!globalThis.cur) return;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -1266,7 +1275,7 @@ function _executeFieldScanLegacy(row, col, scanSize, durationMs) {
     if (scanned.length === 0) return;
 
     _playScanBeamEffect_legacy(startRow, startCol, effectiveSize, effectiveDuration);
-    showToast(`🎯 ${t('cls_field_scan')}`);
+    globalThis.showToast(`🎯 ${t('cls_field_scan')}`);
     _fieldScanCheckBigScanAchievement(prevStates, sol);
 
     setTimeout(() => _fieldScanRestore(scanned, prevStates), effectiveDuration);
@@ -1280,7 +1289,7 @@ function _executeFieldScanLegacy(row, col, scanSize, durationMs) {
 
 // Spawns the given number of large demon-eye emojis above the grid.
 // Returns an array of { el, x, y } objects.
-function _bayesianInsightSpawnEyes(count) {
+export function _bayesianInsightSpawnEyes(count) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const eyes = [];
@@ -1305,7 +1314,7 @@ function _bayesianInsightSpawnEyes(count) {
 }
 
 // Finds the nearest eye to a given (cellX, cellY) screen position.
-function _bayesianInsightFindNearestEye(eyes, cellX, cellY) {
+export function _bayesianInsightFindNearestEye(eyes, cellX, cellY) {
     let nearest = eyes[0], nearestDist = Infinity;
     eyes.forEach(eye => {
         const d = Math.hypot(eye.x - cellX, eye.y - cellY);
@@ -1315,7 +1324,7 @@ function _bayesianInsightFindNearestEye(eyes, cellX, cellY) {
 }
 
 // Draws a glowing eye-beam from an eye at (eyeX, eyeY) onto a cell at (cellX, cellY).
-function _bayesianInsightDrawBeam(eyeX, eyeY, cellX, cellY, duration) {
+export function _bayesianInsightDrawBeam(eyeX, eyeY, cellX, cellY, duration) {
     const dx = cellX - eyeX;
     const dy = cellY - eyeY;
     const dist = Math.hypot(dx, dy);
@@ -1335,7 +1344,7 @@ function _bayesianInsightDrawBeam(eyeX, eyeY, cellX, cellY, duration) {
 }
 
 // Plays a purple ripple ring where the eye-beam hits the cell.
-function _playBayesianImpact(x, y) {
+export function _playBayesianImpact(x, y) {
     const ring = document.createElement('div');
     ring.className = 'bi-impact';
     ring.style.cssText = `left: ${x}px; top: ${y}px;`;
@@ -1344,7 +1353,7 @@ function _playBayesianImpact(x, y) {
 }
 
 // Stamps a glowing X mark onto the cell where the eye-beam lands.
-function _bayesianInsightStampXMark(x, y) {
+export function _bayesianInsightStampXMark(x, y) {
     const xMark = document.createElement('div');
     xMark.className = 'bi-x-stamp';
     xMark.textContent = '✕';
@@ -1355,7 +1364,7 @@ function _bayesianInsightStampXMark(x, y) {
 
 // Fires the full eye-beam animation: draws the beam from the eye onto the cell,
 // then stamps the X mark on impact.
-function _fireBayesianEyeBeam(eyeX, eyeY, cellX, cellY) {
+export function _fireBayesianEyeBeam(eyeX, eyeY, cellX, cellY) {
     const dist = Math.hypot(cellX - eyeX, cellY - eyeY);
     const duration = Math.min(Math.max(dist / 900, 0.15), 0.45);
 
@@ -1367,7 +1376,7 @@ function _fireBayesianEyeBeam(eyeX, eyeY, cellX, cellY) {
 }
 
 // Schedules the eye elements to disappear after all beam animations finish.
-function _bayesianInsightScheduleEyeRemoval(eyes, cellCount) {
+export function _bayesianInsightScheduleEyeRemoval(eyes, cellCount) {
     const totalDur = 500 + 80 + cellCount * 55 + 900;
     setTimeout(() => {
         eyes.forEach(eye => {
@@ -1379,7 +1388,7 @@ function _bayesianInsightScheduleEyeRemoval(eyes, cellCount) {
 
 // Plays the Bayesian Insight VFX: spawns large demon eyes above the grid that
 // fire eye-beams onto each auto-marked cell to stamp it with an X.
-function _playBayesianInsightAnimation(markedCellIds) {
+export function _playBayesianInsightAnimation(markedCellIds) {
     if (!markedCellIds || !markedCellIds.length) return;
 
     const eyeCount = Math.min(2, markedCellIds.length);
@@ -1408,7 +1417,7 @@ function _playBayesianInsightAnimation(markedCellIds) {
 
 // Spawns a trail of small gold particles above the orb's starting position.
 // Particles fade out before the orb lands.
-function _bayesianRevealSpawnTrailParticles(sx, sy) {
+export function _bayesianRevealSpawnTrailParticles(sx, sy) {
     for (let i = 0; i < 5; i++) {
         const trail = document.createElement('div');
         const offsetX = (Math.random() - 0.5) * 10;
@@ -1433,7 +1442,7 @@ function _bayesianRevealSpawnTrailParticles(sx, sy) {
 }
 
 // Injects a per-spark keyframe animation if it hasn't been added yet.
-function _bayesianRevealInjectSparkKeyframe(index, rad, dist) {
+export function _bayesianRevealInjectSparkKeyframe(index, rad, dist) {
     const styleId = `bi-reveal-spark-style-${index}`;
     if (document.getElementById(styleId)) return;
 
@@ -1450,7 +1459,7 @@ function _bayesianRevealInjectSparkKeyframe(index, rad, dist) {
 }
 
 // Spawns the six star sparks that radiate outward from the golden impact point.
-function _bayesianRevealImpactSparks(x, y) {
+export function _bayesianRevealImpactSparks(x, y) {
     const angles = [0, 60, 120, 180, 240, 300];
     angles.forEach((angle, i) => {
         const rad = (angle * Math.PI) / 180;
@@ -1480,7 +1489,7 @@ function _bayesianRevealImpactSparks(x, y) {
 
 // Plays the warm golden burst impact when the reveal orb lands:
 // an expanding ring, a radial flash, and six radiating sparks.
-function _playBayesianRevealImpact(x, y) {
+export function _playBayesianRevealImpact(x, y) {
     // Expanding ring
     const ring = document.createElement('div');
     ring.className = 'bi-reveal-ring';
@@ -1522,7 +1531,7 @@ function _playBayesianRevealImpact(x, y) {
 
 // Creates and animates a golden orb descending from above the viewport
 // to the target cell position.
-function _bayesianRevealDropOrb(sx, sy, tx, ty, duration) {
+export function _bayesianRevealDropOrb(sx, sy, tx, ty, duration) {
     const orb = document.createElement('div');
     orb.className = 'bi-reveal-orb';
     orb.style.cssText = `
@@ -1556,7 +1565,7 @@ function _bayesianRevealDropOrb(sx, sy, tx, ty, duration) {
 
 // Plays the Bayesian Reveal VFX: a golden orb drops from above the viewport
 // and lands on the revealed cell, followed by a warm golden burst.
-function _playBayesianRevealEffect(cellEl) {
+export function _playBayesianRevealEffect(cellEl) {
     const rect = cellEl.getBoundingClientRect();
     const tx = rect.left + rect.width / 2;
     const ty = rect.top + rect.height / 2;
@@ -1576,9 +1585,9 @@ function _playBayesianRevealEffect(cellEl) {
 
 // Main entry point for the Precision Mark ability.
 // Marks empty cells in the target row/col and adjacent lines, then fires VFX.
-function _executePrecisionMark(row, col, extraLines) {
-    if (!cur) return;
-    const sol = cur.grid;
+export function _executePrecisionMark(row, col, extraLines) {
+    if (!globalThis.cur) return;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -1589,7 +1598,7 @@ function _executePrecisionMark(row, col, extraLines) {
     _playPrecisionMarkEffect(row, col, affected);
     // (the _applyCellEffect(affected, 'mark') call that used to be here is gone -
     // it now fires per-cell, at impact, inside _precisionMarkCommitMark)
-    showToast(t('cls_precision_marked').replace('{n}', affected.length));
+    globalThis.showToast(t('cls_precision_marked').replace('{n}', affected.length));
 
     Audio_Manager.playSFX('precisionMark');
     trackAchStat('tilesMarkedWrong', affected.length);
@@ -1607,9 +1616,9 @@ function _executePrecisionMark(row, col, extraLines) {
 // isClassAbility is true only for a real cast of the class ability (not the
 // emergency_scan or Interquartile Vision passive scans) - god_of_probabilities
 // uses it to also keep every ✕ mark shown by such a cast.
-function _executeFieldScan(row, col, scanSize, durationMs, isClassAbility = false) {
-    if (!cur) return;
-    const sol = cur.grid;
+export function _executeFieldScan(row, col, scanSize, durationMs, isClassAbility = false) {
+    if (!globalThis.cur) return;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -1618,7 +1627,7 @@ function _executeFieldScan(row, col, scanSize, durationMs, isClassAbility = fals
     const targets = _fieldScanComputeTargets(startRow, startCol, effectiveSize, rows, cols, sol);
 
     if (targets.length === 0) {
-        showToast(`🎯 ${t('cls_nothing_to_scan')}`);
+        globalThis.showToast(`🎯 ${t('cls_nothing_to_scan')}`);
         return;
     }
 

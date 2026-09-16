@@ -1,22 +1,33 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
+import { solveCols, solveRows } from './shared/grid-actions.js';
+
+//------------------------------------------------------------------------
 //-------------------ROW / COL SOLVE - SET SQUARE / RULER----------------------
 //------------------------------------------------------------------------
 
 // rowSolve - fully reveals one random unsolved row.
-function _useRowSolve(id, def) {
+export function _useRowSolve(id, def) {
     const n = solveRows(1, 'item');
     playItemEffect(id);
-    if (n > 0) checkWin();
+    if (n > 0) globalThis.checkWin();
     return n > 0
         ? `${def.icon} ${t('item_row_solved')}`
         : `${def.icon} ${t('item_row_solved_none')}`;
 }
 
 // colSolve - fully reveals one random unsolved column.
-function _useColSolve(id, def) {
+export function _useColSolve(id, def) {
     const n = solveCols(1, 'item');
     playItemEffect(id);
-    if (n > 0) checkWin();
+    if (n > 0) globalThis.checkWin();
     return n > 0
         ? `${def.icon} ${t('item_col_solved')}`
         : `${def.icon} ${t('item_col_solved_none')}`;
@@ -27,7 +38,7 @@ function _useColSolve(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the full-grid horizontal sweep bar for RowSolve.
-function _fxMakeRowSolveSweep(container, r) {
+export function _fxMakeRowSolveSweep(container, r) {
     const sweep = document.createElement('div');
     sweep.className = 'fx-rowsolve-bar';
     sweep.style.cssText = `
@@ -41,8 +52,8 @@ function _fxMakeRowSolveSweep(container, r) {
 }
 
 // Helper: creates the per-row shimmer lines for RowSolve.
-function _fxMakeRowSolveLines(container, r) {
-    const rows = cur?.grid?.length || 5;
+export function _fxMakeRowSolveLines(container, r) {
+    const rows = globalThis.cur?.grid?.length || 5;
     const rowH = r.height / rows;
     for (let i = 0; i < rows; i++) {
         const line = document.createElement('div');
@@ -59,7 +70,7 @@ function _fxMakeRowSolveLines(container, r) {
 }
 
 // 📐 Row Solve - a golden sweep flashes across the full grid height.
-function _fxRowSolve() {
+export function _fxRowSolve() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -75,7 +86,7 @@ function _fxRowSolve() {
 }
 
 // Helper: creates the full-grid vertical sweep bar for ColSolve.
-function _fxMakeColSolveSweep(container, r) {
+export function _fxMakeColSolveSweep(container, r) {
     const sweep = document.createElement('div');
     sweep.className = 'fx-colsolve-bar';
     sweep.style.cssText = `
@@ -89,8 +100,8 @@ function _fxMakeColSolveSweep(container, r) {
 }
 
 // Helper: creates the per-column shimmer lines for ColSolve.
-function _fxMakeColSolveLines(container, r) {
-    const cols = cur?.grid?.[0]?.length || 5;
+export function _fxMakeColSolveLines(container, r) {
+    const cols = globalThis.cur?.grid?.[0]?.length || 5;
     const colW = r.width / cols;
     for (let i = 0; i < cols; i++) {
         const line = document.createElement('div');
@@ -107,7 +118,7 @@ function _fxMakeColSolveLines(container, r) {
 }
 
 // 📏 Col Solve - a golden sweep flashes across the full grid width.
-function _fxColSolve() {
+export function _fxColSolve() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

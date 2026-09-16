@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE GAMBLER (boss_gambler)---------------------
 //------------------------------------------------------------------------
 // A rework of the old one-shot Loaded Dice into a persistent casino siege.
@@ -68,62 +78,62 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Casino tuning ────────────────────────────────────────────────────────
 // The House Chips (boss body)
-const EG_GMB_CHIP_R = 42;                    // chip-stack visual radius
-const EG_GMB_DRIFT_SPEED = [0, 28, 38, 50];  // px/s per phase
-const EG_GMB_DRIFT_REPICK_MS = 6000;
-const EG_GMB_SLAM_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the stack
-const EG_GMB_SLAM_CD_MS = 1000;
-const EG_GMB_SLAM_FLING = [0, 125, 150, 175];
+export const EG_GMB_CHIP_R = 42;                    // chip-stack visual radius
+export const EG_GMB_DRIFT_SPEED = [0, 28, 38, 50];  // px/s per phase
+export const EG_GMB_DRIFT_REPICK_MS = 6000;
+export const EG_GMB_SLAM_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the stack
+export const EG_GMB_SLAM_CD_MS = 1000;
+export const EG_GMB_SLAM_FLING = [0, 125, 150, 175];
 // Chip volley
-const EG_GMB_VOLLEY_N = [0, 3, 4, 6];        // chips per volley per phase
-const EG_GMB_VOLLEY_MS = [0, 6800, 5400, 4200]; // volley cadence
-const EG_GMB_CHIP_SPEED = 300;               // px/s
-const EG_GMB_CHIP_DMG = 0.05;                // %maxHP per chip (shadow)
+export const EG_GMB_VOLLEY_N = [0, 3, 4, 6];        // chips per volley per phase
+export const EG_GMB_VOLLEY_MS = [0, 6800, 5400, 4200]; // volley cadence
+export const EG_GMB_CHIP_SPEED = 300;               // px/s
+export const EG_GMB_CHIP_DMG = 0.05;                // %maxHP per chip (shadow)
 // Wheel of Fortune (60% gate)
-const EG_GMB_WHEEL_SPIN_MS = 4000;           // visible spin duration
-const EG_GMB_WHEEL_SNAKE_DMG = 0.16;         // snake eyes hit
-const EG_GMB_WHEEL_HEAL_BOSS = 0.12;         // jackpot: boss heals 12%
-const EG_GMB_WHEEL_HEAL_PLAYER = 0.10;       // you win: heal 10% maxHP
+export const EG_GMB_WHEEL_SPIN_MS = 4000;           // visible spin duration
+export const EG_GMB_WHEEL_SNAKE_DMG = 0.16;         // snake eyes hit
+export const EG_GMB_WHEEL_HEAL_BOSS = 0.12;         // jackpot: boss heals 12%
+export const EG_GMB_WHEEL_HEAL_PLAYER = 0.10;       // you win: heal 10% maxHP
 // Jackpot Rush (30% gate)
-const EG_GMB_RUSH_WAVES = 4;
-const EG_GMB_RUSH_PER_WAVE = [0, 6, 8, 10];
-const EG_GMB_RUSH_WAVE_GAP_MS = 1700;
-const EG_GMB_SYMBOL_SPEED = 240;
-const EG_GMB_SYMBOL_DMG = 0.06;              // %maxHP per symbol
-const EG_GMB_SEVEN_BURST_DMG = 0.11;         // %maxHP in a 7 blast
-const EG_GMB_SEVEN_BURST_R = 150;
-const EG_GMB_RUSH_MS = 8200;
+export const EG_GMB_RUSH_WAVES = 4;
+export const EG_GMB_RUSH_PER_WAVE = [0, 6, 8, 10];
+export const EG_GMB_RUSH_WAVE_GAP_MS = 1700;
+export const EG_GMB_SYMBOL_SPEED = 240;
+export const EG_GMB_SYMBOL_DMG = 0.06;              // %maxHP per symbol
+export const EG_GMB_SEVEN_BURST_DMG = 0.11;         // %maxHP in a 7 blast
+export const EG_GMB_SEVEN_BURST_R = 150;
+export const EG_GMB_RUSH_MS = 8200;
 // Russian Roulette (charge attack)
-const EG_GMB_RR_MARK_MS = 1800;              // cylinder telegraph
-const EG_GMB_RR_DMG = [0, 0.18, 0.21, 0.25]; // loaded chamber
-const EG_GMB_RR_R = 110;                     // mark radius
+export const EG_GMB_RR_MARK_MS = 1800;              // cylinder telegraph
+export const EG_GMB_RR_DMG = [0, 0.18, 0.21, 0.25]; // loaded chamber
+export const EG_GMB_RR_R = 110;                     // mark radius
 
 
-let _egGamblerWatcher = null; // per-fight casino state
+export let _egGamblerWatcher = null; // per-fight casino state
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
-function _egGmbPhase(st) {
+export function _egGmbPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
-        const m = _egMonsters.find(x => x && x.id === st.monsterId);
+        const m = globalThis._egMonsters.find(x => x && x.id === st.monsterId);
         if (m) return Math.max(1, Math.min(3, Number(m.bossPhase) || 1));
     }
     return 1;
 }
 
 // Flat player heal (% of maxHP) - same inline pattern as the hearts.
-function _egGmbHealPct(pct) {
+export function _egGmbHealPct(pct) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
-        if (playerCurrentHP <= 0) return;
+        if (globalThis.playerCurrentHP <= 0) return;
         const heal = Math.round(_egNkMaxHP() * pct);
-        const before = playerCurrentHP;
-        playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
-        if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+        const before = globalThis.playerCurrentHP;
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+        if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }
 
 // Boss heal (absolute % of its max).
-function _egGmbHealBoss(monster, pct) {
+export function _egGmbHealBoss(monster, pct) {
     try {
         if (!monster || !monster.maxHP) return;
         monster.currentHP = Math.min(monster.maxHP, monster.currentHP + Math.round(monster.maxHP * pct));
@@ -132,7 +142,7 @@ function _egGmbHealBoss(monster, pct) {
 }
 
 // Removes every casino overlay (registered in boss-framework teardown).
-function _egGamblerTeardown() {
+export function _egGamblerTeardown() {
     if (_egGamblerWatcher) {
         const st = _egGamblerWatcher;
         _egGamblerWatcher = null;
@@ -148,7 +158,7 @@ function _egGamblerTeardown() {
 
 
 // ── Persistent arena: the chip stack + chip volleys ─────────────────────
-function _egGamblerArenaInit(monster) {
+export function _egGamblerArenaInit(monster) {
     if (_egGamblerWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -184,7 +194,7 @@ function _egGamblerArenaInit(monster) {
 
     _egNkLoop(run, (dtS, now) => {
         if (_egGamblerWatcher !== st) return false;
-        const live = _egMonsters ? _egMonsters.find(m => m.id === st.monsterId) : null;
+        const live = globalThis._egMonsters ? globalThis._egMonsters.find(m => m.id === st.monsterId) : null;
         if (!live) return false;
         const W = window.innerWidth, H = window.innerHeight;
         const c = _egNkPlayerCenter();
@@ -298,7 +308,7 @@ function _egGamblerArenaInit(monster) {
 
 
 // ── Chip volley: one thrown card from the stack toward the player ────────
-function _egGamblerThrowCard(st, p) {
+export function _egGamblerThrowCard(st, p) {
     const ch = st.chips;
     const c = _egNkPlayerCenter();
     const tx = c ? c.x : window.innerWidth / 2;
@@ -318,7 +328,7 @@ function _egGamblerThrowCard(st, p) {
 
 
 // Advances cards: fly, hit, expire.
-function _egGamblerTickCards(st, dtS, pr) {
+export function _egGamblerTickCards(st, dtS, pr) {
     for (let i = st.cards.length - 1; i >= 0; i--) {
         const cd = st.cards[i];
         cd.t += dtS * 1000;
@@ -344,10 +354,10 @@ function _egGamblerTickCards(st, dtS, pr) {
 // ── 60% gate: Wheel of Fortune ───────────────────────────────────────────
 // A giant prize wheel spins center-screen, visibly ticking wedges, then
 // lands on one of four outcomes - including one that helps the player.
-const EG_GMB_WHEEL_FACES = ['🍒', '7️⃣', '💎', '🎲'];
-const EG_GMB_WHEEL_KEYS = ['snake', 'free', 'jackpot', 'win'];
+export const EG_GMB_WHEEL_FACES = ['🍒', '7️⃣', '💎', '🎲'];
+export const EG_GMB_WHEEL_KEYS = ['snake', 'free', 'jackpot', 'win'];
 
-function _egGamblerWheel(st, live) {
+export function _egGamblerWheel(st, live) {
     if (st.wheel) return;
     const W = window.innerWidth, H = window.innerHeight;
     const el = _egNkEl(st.run, 'div', 'eg-gmb-wheel', '🎲');
@@ -360,7 +370,7 @@ function _egGamblerWheel(st, live) {
 
 
 // Resolves the landed wedge. FREE SPIN immediately re-spins once.
-function _egGamblerWheelResolve(st, wl, live) {
+export function _egGamblerWheelResolve(st, wl, live) {
     let key = EG_GMB_WHEEL_KEYS[Math.floor(Math.random() * 4)];
     if (key === 'free' && wl.respun) key = 'snake'; // free spin only once
     const face = EG_GMB_WHEEL_FACES[EG_GMB_WHEEL_KEYS.indexOf(key)];
@@ -401,7 +411,7 @@ function _egGamblerWheelResolve(st, wl, live) {
 // ── 30% gate: Jackpot Rush ───────────────────────────────────────────────
 // Slot symbols rain across the table in waves; 7️⃣ symbols detonate in
 // expanding coin bursts when they expire.
-function _egGamblerRush(st, now) {
+export function _egGamblerRush(st, now) {
     if (st.rush) return;
     st.rush = { wave: 0, t: 0 };
     _egNkToast('eg_gmb_rush', '🎰 JACKPOT RUSH! Dodge the reels - mind the 7s!');
@@ -409,7 +419,7 @@ function _egGamblerRush(st, now) {
 }
 
 
-function _egGamblerTickRush(st, dtS, pr, p) {
+export function _egGamblerTickRush(st, dtS, pr, p) {
     const rush = st.rush;
     if (!rush) return;
     rush.t += dtS * 1000;
@@ -422,10 +432,10 @@ function _egGamblerTickRush(st, dtS, pr, p) {
 }
 
 
-const EG_GMB_SYMBOL_FACES = ['🍒', '🔔', '🍋', '7️⃣'];
+export const EG_GMB_SYMBOL_FACES = ['🍒', '🔔', '🍋', '7️⃣'];
 
 
-function _egGamblerSpawnSymbol(st) {
+export function _egGamblerSpawnSymbol(st) {
     const W = window.innerWidth;
     const el = _egNkEl(st.run, 'div', 'eg-gmb-symbol', EG_GMB_SYMBOL_FACES[Math.floor(Math.random() * 4)]);
     const fromLeft = Math.random() < 0.5;
@@ -442,7 +452,7 @@ function _egGamblerSpawnSymbol(st) {
 
 
 // Advances symbols; expiring 7s burst into coin rings.
-function _egGamblerTickSymbols(st, dtS, pr) {
+export function _egGamblerTickSymbols(st, dtS, pr) {
     for (let i = st.symbols.length - 1; i >= 0; i--) {
         const s = st.symbols[i];
         s.t += dtS * 1000;
@@ -468,7 +478,7 @@ function _egGamblerTickSymbols(st, dtS, pr) {
 
 
 // Expanding coin burst from an expiring 7.
-function _egGamblerBurst(st, x, y) {
+export function _egGamblerBurst(st, x, y) {
     const el = _egNkEl(st.run, 'div', 'eg-gmb-burst', '💰');
     el.style.left = x + 'px';
     el.style.top = y + 'px';
@@ -476,7 +486,7 @@ function _egGamblerBurst(st, x, y) {
 }
 
 
-function _egGamblerTickBursts(st, dtS) {
+export function _egGamblerTickBursts(st, dtS) {
     for (let i = st.bursts.length - 1; i >= 0; i--) {
         const b = st.bursts[i];
         b.t += dtS * 1000;
@@ -500,7 +510,7 @@ function _egGamblerTickBursts(st, dtS) {
 // ── Charge attack: Russian Roulette ──────────────────────────────────────
 // A 6-chamber cylinder telegraphs over the player for 1.8s, visibly
 // ticking down; then the hammer falls - 5/6 blank, 1/6 heavy hit.
-function _egGamblerRoulette(monster) {
+export function _egGamblerRoulette(monster) {
     const st = _egGamblerWatcher;
     if (!st || st.rr || _egNkDodgeBusy() || _egNkFrozen()) return;
     const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -515,7 +525,7 @@ function _egGamblerRoulette(monster) {
 
 
 // Blank outcome: a spent shell pops at the mark (flavor).
-function _egGamblerShellPop(st, x, y) {
+export function _egGamblerShellPop(st, x, y) {
     try {
         const el = document.createElement('div');
         el.className = 'eg-gmb-shell';
@@ -534,4 +544,4 @@ function _egGamblerShellPop(st, x, y) {
 // The old scheduled mechanic is now the persistent chip volley - keep the
 // handler name alive so any stale schedule entry no-ops instead of
 // erroring.
-function _egMechLoadedDice(monster, phase) { void monster; void phase; }
+export function _egMechLoadedDice(monster, phase) { void monster; void phase; }

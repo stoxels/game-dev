@@ -1,4 +1,11 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egChainPuzzleSizeAllowed } from './endgame-encounter-chain.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME PUZZLE GENERATOR-----------------------------
 //------------------------------------------------------------------------
 // Procedurally generates nonogram puzzle levels for endgame map runs so
@@ -30,7 +37,7 @@
 // Glyphs that can be drawn as puzzle shapes. en/de names are used for the
 // level hint + reveal text so both languages read naturally.
 
-const EG_GEN_SYMBOLS = [
+export const EG_GEN_SYMBOLS = [
     // Greek letters
     { ch: 'α', en: 'Alpha',        de: 'Alpha' },
     { ch: 'β', en: 'Beta',         de: 'Beta' },
@@ -601,7 +608,7 @@ const EG_GEN_SYMBOLS = [
 // Encounter-chain caps: 15×30 is the widest allowed, 20×20 is the max when
 // rows >15 (>15 rows && >20 cols is banned). Sizes beyond that are kept
 // out of the pool so chains stay fun.
-const EG_GEN_SIZES = [
+export const EG_GEN_SIZES = [
     { rows: 5,  cols: 5 },   //   25 cells → small
     { rows: 5,  cols: 10 },  //   50 cells → small
     { rows: 10, cols: 10 },  //  100 cells → medium
@@ -622,14 +629,14 @@ const EG_GEN_SIZES = [
 
 // Grid-size buckets (same thresholds as EG_GRID_SIZE_BUCKETS in
 // endgame-maps.js). A requested bucket constrains which sizes are drawn.
-const EG_GEN_BUCKETS = {
+export const EG_GEN_BUCKETS = {
     small:   [1, 99],
     medium:  [100, 199],
     large:   [200, 399],
     massive: [400, Infinity],
 };
 
-const EG_GEN_FONT_STACK =
+export const EG_GEN_FONT_STACK =
     '"Segoe UI Symbol","Segoe UI Emoji","Noto Sans Symbols2","Noto Sans Symbols",Arial,serif';
 
 
@@ -641,7 +648,7 @@ const EG_GEN_FONT_STACK =
 // resolution, then downsamples pixel coverage into a rows×cols binary grid.
 // Tries progressively lower coverage thresholds until the fill ratio lands
 // in a comfortable nonogram band; returns null when nothing was drawable.
-function _egRasterizeSymbolGrid(ch, rows, cols) {
+export function _egRasterizeSymbolGrid(ch, rows, cols) {
     if (typeof document === 'undefined') return null;
 
     const SS = 6;                       // supersample factor per grid cell
@@ -715,7 +722,7 @@ function _egRasterizeSymbolGrid(ch, rows, cols) {
 
 // One cellular-automata smoothing pass: cells with many filled neighbours
 // solidify, isolated cells vanish - turns noisy walks into organic blobs.
-function _egSmoothStructure(grid, rows, cols) {
+export function _egSmoothStructure(grid, rows, cols) {
     const out = Array.from({ length: rows }, () => new Array(cols).fill(0));
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -733,7 +740,7 @@ function _egSmoothStructure(grid, rows, cols) {
 }
 
 // Counts fill stats used to accept/reject a candidate structure.
-function _egStructureStats(grid, rows, cols) {
+export function _egStructureStats(grid, rows, cols) {
     let filled = 0;
     let liveRows = 0;
     let liveCols = 0;
@@ -757,7 +764,7 @@ function _egStructureStats(grid, rows, cols) {
 // Generates one random structure: drunkard-walk blobs with directional
 // momentum, CA smoothing, optional mirroring. Returns null if no valid
 // candidate is found within the retry budget.
-function _egGenerateRandomStructure(rows, cols, rng) {
+export function _egGenerateRandomStructure(rows, cols, rng) {
     const R = rng || Math.random;
     const cells = rows * cols;
 
@@ -834,7 +841,7 @@ function _egGenerateRandomStructure(rows, cols, rng) {
 // arenas to keep the fight on a small board.
 // Biases toward bigger grids as the map tier climbs. Falls back to the
 // closest eligible size when no size sits inside the window.
-function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng) {
+export function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng) {
     let lo = minCells || 0;
     let hi = Infinity;
     if (bucket && EG_GEN_BUCKETS[bucket]) {
@@ -881,12 +888,12 @@ function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng) {
     return list[list.length - 1];
 }
 
-function _egPickRandomSymbol(rng) {
+export function _egPickRandomSymbol(rng) {
     const R = rng || Math.random;
     return EG_GEN_SYMBOLS[Math.floor(R() * EG_GEN_SYMBOLS.length)];
 }
 
-const EG_GEN_RANDOM_REVEALS = [
+export const EG_GEN_RANDOM_REVEALS = [
     { en: 'A pattern woven by pure chance - order emerged anyway.', de: 'Ein vom reinen Zufall gewebtes Muster - und trotzdem entstand Ordnung.' },
     { en: 'The noise condensed into structure, exactly once.', de: 'Das Rauschen verdichtete sich zu einer Struktur - genau einmalig.' },
     { en: 'No sigil, no symbol: just randomness given form.', de: 'Kein Sigill, kein Symbol: nur Zufall, der Gestalt annimmt.' },
@@ -903,7 +910,7 @@ const EG_GEN_RANDOM_REVEALS = [
 // flavour text, world) derives from it, so the same seed always produces
 // the same grid - used by the atlas chain blueprints for per-map chains.
 // Returns null only if even the random fallback failed.
-function _egCreateGeneratedLevel(opts) {
+export function _egCreateGeneratedLevel(opts) {
     if (typeof ALL === 'undefined') return null;
     opts = opts || {};
     const tier = Math.max(1, opts.tier || 1);
@@ -935,9 +942,9 @@ function _egCreateGeneratedLevel(opts) {
     }
     if (!grid) return null;
 
-    const gi = ALL.length;
+    const gi = globalThis.ALL.length;
     const level = {
-        world: 1 + Math.floor(R() * (typeof WORLDS !== 'undefined' ? WORLDS.length : 1)),
+        world: 1 + Math.floor(R() * (typeof WORLDS !== 'undefined' ? globalThis.WORLDS.length : 1)),
         li: 0,
         gIdx: gi,
         size: size.cols,
@@ -966,6 +973,6 @@ function _egCreateGeneratedLevel(opts) {
         level.bonusHintDE = 'Beende das Level ohne Fehler';
     }
 
-    ALL.push(level);
+    globalThis.ALL.push(level);
     return gi;
 }

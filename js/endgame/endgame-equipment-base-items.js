@@ -1,4 +1,9 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //-------------------ENDGAME EQUIPMENT BASE ITEMS-------------------------
 //------------------------------------------------------------------------
 // Defines all equipment base types in the game, grouped by slot.
@@ -40,7 +45,7 @@
 // Maps each slotType to the default emoji used on the grid overlay and in
 // the stash. Individual base types can override this via an `icon` field
 // (e.g. axes get 🪓 instead of the generic sword).
-const EG_SLOT_ICONS = {
+export const EG_SLOT_ICONS = {
     head: '👑',
     earring: '💎',
     amulet: '📿',
@@ -64,7 +69,7 @@ const EG_SLOT_ICONS = {
 //------------------------------------------------------------------------
 //-------------------HELMET BASE TYPES------------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_HEAD = [
+export const EG_BASE_TYPES_HEAD = [
 
     // ── Strength (Armour) ─────────────────────────────────────────────
     {
@@ -393,7 +398,7 @@ const EG_BASE_TYPES_HEAD = [
 //-------------------EARRING BASE TYPES-----------------------------------
 //------------------------------------------------------------------------
 // Jewelry provides 0 base defenses, acting purely as affix carriers.
-const EG_BASE_TYPES_EARRING = [
+export const EG_BASE_TYPES_EARRING = [
     {
         id: 'earring_1', name: 'Bronze Stud', nameDe: 'Bronze-Ohrstecker',
         archetype: 'any', slotType: 'earring',
@@ -515,7 +520,7 @@ const EG_BASE_TYPES_EARRING = [
 //------------------------------------------------------------------------
 //-------------------CHEST BASE TYPES-------------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_CHEST = [
+export const EG_BASE_TYPES_CHEST = [
 
     // ── Strength ──────────────────────────────────────────────────────
     {
@@ -843,7 +848,7 @@ const EG_BASE_TYPES_CHEST = [
 //------------------------------------------------------------------------
 //-------------------GLOVES BASE TYPES------------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_GLOVES = [
+export const EG_BASE_TYPES_GLOVES = [
 
     // ── Strength ──────────────────────────────────────────────────────
     {
@@ -1128,7 +1133,7 @@ const EG_BASE_TYPES_GLOVES = [
 //------------------------------------------------------------------------
 //-------------------BOOTS BASE TYPES-------------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_BOOTS = [
+export const EG_BASE_TYPES_BOOTS = [
 
     // ── Strength ──────────────────────────────────────────────────────
     {
@@ -1413,7 +1418,7 @@ const EG_BASE_TYPES_BOOTS = [
 //------------------------------------------------------------------------
 //-------------------BELT BASE TYPES--------------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_BELT = [
+export const EG_BASE_TYPES_BELT = [
 
     // ── Strength ──────────────────────────────────────────────────────
     {
@@ -1702,7 +1707,7 @@ const EG_BASE_TYPES_BELT = [
 // The `damage` object gives the base physical damage range (min / max).
 // Sub-type determines icon and what slot it occupies.
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_WEAPON = [
+export const EG_BASE_TYPES_WEAPON = [
 
     // ── One-Handed Melee (slotType: weapon) ───────────────────────────
     {
@@ -2063,7 +2068,7 @@ const EG_BASE_TYPES_WEAPON = [
 //------------------------------------------------------------------------
 //-------------------SHIELD BASE TYPES------------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_SHIELD = [
+export const EG_BASE_TYPES_SHIELD = [
 
     // ── Strength ──────────────────────────────────────────────────────
     {
@@ -2287,7 +2292,7 @@ const EG_BASE_TYPES_SHIELD = [
 //------------------------------------------------------------------------
 //-------------------RANGED WEAPON BASE TYPES-----------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_RANGED = [
+export const EG_BASE_TYPES_RANGED = [
     {
         id: 'ranged_1', name: 'Shortbow', nameDe: 'Kurzbogen',
         archetype: 'agility', slotType: 'ranged',
@@ -2471,7 +2476,7 @@ const EG_BASE_TYPES_RANGED = [
 //------------------------------------------------------------------------
 //-------------------RING BASE TYPES--------------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_RING = [
+export const EG_BASE_TYPES_RING = [
     {
         id: 'ring_1', name: 'Iron Ring', nameDe: 'Eisenring',
         archetype: 'any', slotType: 'ring',
@@ -2619,7 +2624,7 @@ const EG_BASE_TYPES_RING = [
 //------------------------------------------------------------------------
 //-------------------AMULET BASE TYPES------------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_AMULET = [
+export const EG_BASE_TYPES_AMULET = [
     {
         id: 'amulet_1', name: 'Amber Amulet', nameDe: 'Bernstein-Amulett',
         archetype: 'any', slotType: 'amulet',
@@ -2754,7 +2759,7 @@ const EG_BASE_TYPES_AMULET = [
 //-------------------PANTS BASE TYPES-------------------------------------
 //------------------------------------------------------------------------
 // Pants have high defensive values, second only to Chest armor.
-const EG_BASE_TYPES_PANTS = [
+export const EG_BASE_TYPES_PANTS = [
     // ── Strength ──────────────────────────────────────────────────────
     {
         id: 'pants_str_1', name: 'Rusted Greaves', nameDe: 'Rostige Beinschienen',
@@ -2967,7 +2972,7 @@ const EG_BASE_TYPES_PANTS = [
 //------------------------------------------------------------------------
 //-------------------SHOULDERS BASE TYPES---------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_SHOULDERS = [
+export const EG_BASE_TYPES_SHOULDERS = [
     {
         id: 'shoulders_str_1', name: 'Spaulders', nameDe: 'Schulterplatten',
         archetype: 'strength', slotType: 'shoulders',
@@ -3090,7 +3095,7 @@ const EG_BASE_TYPES_SHOULDERS = [
 //------------------------------------------------------------------------
 //-------------------CLOAK BASE TYPES-------------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_CLOAK = [
+export const EG_BASE_TYPES_CLOAK = [
     {
         id: 'cloak_str_1', name: 'Heavy Cape', nameDe: 'Schwerer Umhang',
         archetype: 'strength', slotType: 'cloak',
@@ -3222,7 +3227,7 @@ const EG_BASE_TYPES_CLOAK = [
 //------------------------------------------------------------------------
 //-------------------BRACERS BASE TYPES-----------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_BRACERS = [
+export const EG_BASE_TYPES_BRACERS = [
     {
         id: 'bracers_str_1', name: 'Steel Vambraces', nameDe: 'Stählerne Unterarmschienen',
         archetype: 'strength', slotType: 'bracers',
@@ -3346,7 +3351,7 @@ const EG_BASE_TYPES_BRACERS = [
 //------------------------------------------------------------------------
 //-------------------TALISMAN BASE TYPES----------------------------------
 //------------------------------------------------------------------------
-const EG_BASE_TYPES_TALISMAN = [
+export const EG_BASE_TYPES_TALISMAN = [
     {
         id: 'talisman_1', name: 'Bone Charm', nameDe: 'Knochenamulett',
         archetype: 'any', slotType: 'talisman',
@@ -3467,7 +3472,7 @@ const EG_BASE_TYPES_TALISMAN = [
 //------------------------------------------------------------------------
 // Arcane items typically act as off-hand caster focuses (high Intellect).
 // Depending on your mechanics, they could provide flat absorption or just carry stats.
-const EG_BASE_TYPES_ARCANE = [
+export const EG_BASE_TYPES_ARCANE = [
     {
         id: 'arcane_1', name: 'Crystal Orb', nameDe: 'Kristallkugel',
         archetype: 'intellect', slotType: 'arcane',
@@ -3923,7 +3928,7 @@ const EG_BASE_TYPES_ARCANE = [
 // All base types in one flat array. The generator samples from this.
 // To bias certain slot types to drop more often, repeat their entries
 // or add per-slot weighting in _egGenerateEquipmentDrop below.
-const EG_ALL_BASE_TYPES = [
+export const EG_ALL_BASE_TYPES = [
     ...EG_BASE_TYPES_HEAD,
     ...EG_BASE_TYPES_CHEST,
     ...EG_BASE_TYPES_PANTS,

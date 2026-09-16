@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE MAZE (boss_maze)---------------------------
 //------------------------------------------------------------------------
 // REWORK - arcade-ghost homage, rebuilt as a full haunted-cabinet gauntlet.
@@ -48,8 +57,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_MZ_DEBUG_SLOW = true;
-const _EG_MZ_DEBUG_MULT = _EG_MZ_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_MZ_DEBUG_SLOW = true;
+export const _EG_MZ_DEBUG_MULT = _EG_MZ_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_maze: {
@@ -79,13 +88,13 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_MZ_GANG_DMG     = [0, 0.11, 0.13, 0.16];   // ghost touch
-const EG_MZ_WALL_DMG     = [0, 0.16, 0.19, 0.22];   // pellet wall contact
-const EG_MZ_MAZEWALL_DMG = [0, 0, 0.15, 0.18];      // labyrinth wall touch
-const EG_MZ_EYES_DMG     = [0, 0, 0.17, 0.20];      // eyes in the dark
-const EG_MZ_SLAM_DMG     = 0.14;                    // convergence slam
-const EG_MZ_FINAL_DMG    = 0.32;                    // the giant CHOMP
-const EG_MZ_HIT_CD_MS    = 700;                     // shared touch cooldown
+export const EG_MZ_GANG_DMG     = [0, 0.11, 0.13, 0.16];   // ghost touch
+export const EG_MZ_WALL_DMG     = [0, 0.16, 0.19, 0.22];   // pellet wall contact
+export const EG_MZ_MAZEWALL_DMG = [0, 0, 0.15, 0.18];      // labyrinth wall touch
+export const EG_MZ_EYES_DMG     = [0, 0, 0.17, 0.20];      // eyes in the dark
+export const EG_MZ_SLAM_DMG     = 0.14;                    // convergence slam
+export const EG_MZ_FINAL_DMG    = 0.32;                    // the giant CHOMP
+export const EG_MZ_HIT_CD_MS    = 700;                     // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -94,8 +103,8 @@ const EG_MZ_HIT_CD_MS    = 700;                     // shared touch cooldown
 
 // Touch damage helper shared by all Maze hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egMzHitCd = 0;
-function _egMzTouch(pct, level, label) {
+export let _egMzHitCd = 0;
+export function _egMzTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egMzHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -107,7 +116,7 @@ function _egMzTouch(pct, level, label) {
 }
 
 // One CSS arcade ghost (colour via currentColor, skirt via clip-path).
-function _egMzGhostEl(run, color) {
+export function _egMzGhostEl(run, color) {
     const g = _egNkEl(run, 'div', 'eg-mz-ghost');
     g.style.color = color;
     const body = document.createElement('div');
@@ -121,7 +130,7 @@ function _egMzGhostEl(run, color) {
 
 // Spook burst where the gang slams or a wall lands (visual only, body-level
 // so it survives the run ending in the same frame).
-function _egMzSpookBurst(x, y, big) {
+export function _egMzSpookBurst(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-mz-spooks' + (big ? ' eg-mz-spooks-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -150,11 +159,11 @@ function _egMzSpookBurst(x, y, big) {
 // scatter windows - every ~4s the whole gang flees to its corner for a
 // beat (a breather with a telegraph), then resumes the hunt. Speed scales
 // with phase.
-const EG_MZ_GANG_DUR_MS   = 11000;
-const EG_MZ_SCATTER_EVERY = 4000;
-const EG_MZ_SCATTER_DUR   = 1100;
+export const EG_MZ_GANG_DUR_MS   = 11000;
+export const EG_MZ_SCATTER_EVERY = 4000;
+export const EG_MZ_SCATTER_DUR   = 1100;
 
-function _egMechMzGhostGang(monster, phase) {
+export function _egMechMzGhostGang(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -246,10 +255,10 @@ function _egMechMzGhostGang(monster, phase) {
 //------------------------------------------------------------------------
 // Walls of glowing pellets march across the arena with a single gap. Warn
 // outline first, then the march. Phase 2 sends one wall from each axis.
-const EG_MZ_WALL_GAP   = 180;
-const EG_MZ_WALL_THICK = 30;
+export const EG_MZ_WALL_GAP   = 180;
+export const EG_MZ_WALL_THICK = 30;
 
-function _egMechMzDotWalls(monster, phase) {
+export function _egMechMzDotWalls(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -331,10 +340,10 @@ function _egMechMzDotWalls(monster, phase) {
 //------------------------------------------------------------------------
 // Shadow wall segments rise out of the floor and linger, building a
 // temporary maze while the gang keeps hunting. Touching a wall stings.
-const EG_MZ_MAZE_COUNT = [0, 0, 3, 4];
-const EG_MZ_MAZE_LIFE  = 6500;
+export const EG_MZ_MAZE_COUNT = [0, 0, 3, 4];
+export const EG_MZ_MAZE_LIFE  = 6500;
 
-function _egMechMzMazeWalls(monster, phase) {
+export function _egMechMzMazeWalls(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -416,10 +425,10 @@ function _egMechMzMazeWalls(monster, phase) {
 // The arena dims and pairs of glowing ghost eyes drift across the dark.
 // Touching eyes stings. The run is PASSIVE (field hazard - never blocks
 // other mechanics).
-const EG_MZ_DARK_COUNT = [0, 0, 3, 5];
-const EG_MZ_DARK_LIFE  = 5500;
+export const EG_MZ_DARK_COUNT = [0, 0, 3, 5];
+export const EG_MZ_DARK_LIFE  = 5500;
 
-function _egMechMzLightsOut(monster, phase) {
+export function _egMechMzLightsOut(monster, phase) {
     if (_egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -485,27 +494,27 @@ function _egMechMzLightsOut(monster, phase) {
 // player's position and the whole gang CONVERGES on it - three slams with a
 // growing final circle, then one giant CHOMP. Charge bar frozen for the
 // whole set-piece (gate in _egTickPlayer via _egMzFinalActive).
-const EG_MZ_FINAL_TICK_MS = 1200;
-const EG_MZ_FINAL_TICKS = 4;
-const EG_MZ_TARGET_R = 150;
-const EG_MZ_CHOMP_R = 200;
+export const EG_MZ_FINAL_TICK_MS = 1200;
+export const EG_MZ_FINAL_TICKS = 4;
+export const EG_MZ_TARGET_R = 150;
+export const EG_MZ_CHOMP_R = 200;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egMzFinal = null;
+export let _egMzFinal = null;
 
-function _egMzFinalActive() {
+export function _egMzFinalActive() {
     return !!_egMzFinal && !_egMzFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egMzOnPhaseEnter(monster, newPhase) {
+export function _egMzOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egMzStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egMzStartFinalWatcher(monster) {
+export function _egMzStartFinalWatcher(monster) {
     if (!monster || _egMzFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -522,7 +531,7 @@ function _egMzStartFinalWatcher(monster) {
 }
 
 // Mark a shadow convergence circle at the player's CURRENT position.
-function _egMzMarkTarget(g, r) {
+export function _egMzMarkTarget(g, r) {
     if (g.targetEl) { try { g.targetEl.remove(); } catch (e) {} g.targetEl = null; }
     const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const el = document.createElement('div');
@@ -539,7 +548,7 @@ function _egMzMarkTarget(g, r) {
 
 // The gang converges: four ghosts dash in from the edges toward the marked
 // circle; when they land, everyone still inside the circle is hit.
-function _egMzSlam(g, monster, big) {
+export function _egMzSlam(g, monster, big) {
     const t = g.target;
     if (!t || !g.fxRun) return;
     const W = window.innerWidth, H = window.innerHeight;
@@ -573,7 +582,7 @@ function _egMzSlam(g, monster, big) {
     }
 }
 
-function _egMzFinalStart(monster) {
+export function _egMzFinalStart(monster) {
     if (_egMzFinal || !monster) return;
 
     // The cabinet claims the screen: kill every other run of this boss.
@@ -668,7 +677,7 @@ function _egMzFinalStart(monster) {
     }, cdTick);
 }
 
-function _egMzFinalEnd(g) {
+export function _egMzFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -684,7 +693,7 @@ function _egMzFinalEnd(g) {
     document.querySelectorAll('.eg-mz-panicking').forEach(el => el.classList.remove('eg-mz-panicking'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -701,7 +710,7 @@ function _egMzFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egMzTeardown() {
+export function _egMzTeardown() {
     if (_egMzFinal) { try { _egMzFinalEnd(_egMzFinal); } catch (e) {} _egMzFinal = null; }
     document.querySelectorAll('.eg-mz-ghost, .eg-mz-dotwall, .eg-mz-mazewall, .eg-mz-eyes, ' +
         '.eg-mz-dark, .eg-mz-target, .eg-mz-scan, .eg-mz-cd, .eg-mz-spooks').forEach(el => {
@@ -726,7 +735,7 @@ if (typeof window !== 'undefined') {
     window._EG_MZ_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_maze') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_maze') : null;
             if (!monster) return 'no maze alive';
             const fn = name === 'gang' ? _egMechMzGhostGang
                 : name === 'walls' ? _egMechMzDotWalls
@@ -739,7 +748,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_maze') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_maze') : null;
             if (!monster) return 'no maze alive';
             _egMzFinalStart(monster);
             return 'GAME OVER started';

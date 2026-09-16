@@ -1,3 +1,8 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
 //  endgame-mod-tables-cloak.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
@@ -14,7 +19,7 @@
 // (that's weapons/amulets). Evasion values are the best of any armour
 // slot; armour and absorption values are slightly below helmet scale.
 
-const EG_MOD_TABLE_CLOAK = {
+export const EG_MOD_TABLE_CLOAK = {
     prefixes: {
 
         // --- LIFE & MANA ---

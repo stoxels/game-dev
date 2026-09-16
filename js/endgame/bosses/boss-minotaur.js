@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkSlamShatter, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE MINOTAUR (boss_minotaur)-------------------------
 //------------------------------------------------------------------------
 // TIER 8 REWORK - "The Labyrinth's Warden". The bull-rush soul, weaponised
@@ -44,8 +52,8 @@
 
 // DEBUG: slow The Minotaur's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_MNT_DEBUG_SLOW = true;
-const _EG_MNT_DEBUG_MULT = _EG_MNT_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_MNT_DEBUG_SLOW = true;
+export const _EG_MNT_DEBUG_MULT = _EG_MNT_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_minotaur: {
@@ -82,7 +90,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_MNT_TOUCH_CD_MS = 700;      // shared touch cooldown
+export const EG_MNT_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -92,8 +100,8 @@ const EG_MNT_TOUCH_CD_MS = 700;      // shared touch cooldown
 // Touch damage helper shared by all Minotaur hazards. Elementless boss -
 // hits go in with element null (pure physical) and keep the amber
 // signature color via EG_NK_BOSS_SIGNATURE_COLORS.
-let _egMntHitCd = 0;
-function _egMntTouch(pct, level, label) {
+export let _egMntHitCd = 0;
+export function _egMntTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egMntHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -105,15 +113,15 @@ function _egMntTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egMntPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egMntPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Proven reward pattern (Siren echo zones / Swarm royal jelly): heals go
 // through a guarded clamp + rerender.
-function _egMntHeal(amount) {
+export function _egMntHeal(amount) {
     if (typeof playerCurrentHP === 'undefined') return;
-    const before = playerCurrentHP;
-    playerCurrentHP = Math.min(playerMaxHP || before, before + amount);
-    if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    const before = globalThis.playerCurrentHP;
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + amount);
+    if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
 
@@ -129,16 +137,16 @@ function _egMntHeal(amount) {
 // The walls also hook into the charge path: a wall slab hit by the bull
 // CRUMBLES (it charges through its own maze, one wall per rush), so the
 // arena slowly opens up again.
-const EG_MNT_WALL_W      = 26;       // slab thickness (px)
-const EG_MNT_WALL_RISE_MS = 1000;    // telegraph before the slab turns solid
-const EG_MNT_WALL_HOLD_MS = 8000;    // how long walls stand
-const EG_MNT_CHARGE_WARN_MS = 1100;  // dust-line telegraph before each rush
-const EG_MNT_CHARGE_SPD  = 950;      // px/s
-const EG_MNT_LANE_H      = 90;       // charge lane height (px)
-const EG_MNT_RUSH_DMG    = [0, 0.24, 0.28, 0.34]; // %maxHP caught by the bull
-const EG_MNT_WALL_BREAK_DMG = 0.06;  // %maxHP clipped by a crumbling wall
+export const EG_MNT_WALL_W      = 26;       // slab thickness (px)
+export const EG_MNT_WALL_RISE_MS = 1000;    // telegraph before the slab turns solid
+export const EG_MNT_WALL_HOLD_MS = 8000;    // how long walls stand
+export const EG_MNT_CHARGE_WARN_MS = 1100;  // dust-line telegraph before each rush
+export const EG_MNT_CHARGE_SPD  = 950;      // px/s
+export const EG_MNT_LANE_H      = 90;       // charge lane height (px)
+export const EG_MNT_RUSH_DMG    = [0, 0.24, 0.28, 0.34]; // %maxHP caught by the bull
+export const EG_MNT_WALL_BREAK_DMG = 0.06;  // %maxHP clipped by a crumbling wall
 
-function _egMechMntLabyrinth(monster, phase) {
+export function _egMechMntLabyrinth(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -276,13 +284,13 @@ function _egMechMntLabyrinth(monster, phase) {
 // Every charge leaves hoof craters along its lane (impact rings that plant
 // lingering hoofprint hazards) plus a DUST STORM that trails the bull. The
 // maze accumulates burn terrain the longer the duel runs.
-const EG_MNT_CRATERS     = 5;
-const EG_MNT_CRATER_WARN_MS = 1200;
-const EG_MNT_CRATER_DMG  = [0, 0.12, 0.14, 0.16];  // %maxHP caught in a crater
-const EG_MNT_DUST_DPS    = [0, 4.5, 5.5, 6.5];     // %/s standing in the dust storm
-const EG_MNT_DUST_LIFE   = 4200;                   // ms the dust storm lingers
+export const EG_MNT_CRATERS     = 5;
+export const EG_MNT_CRATER_WARN_MS = 1200;
+export const EG_MNT_CRATER_DMG  = [0, 0.12, 0.14, 0.16];  // %maxHP caught in a crater
+export const EG_MNT_DUST_DPS    = [0, 4.5, 5.5, 6.5];     // %/s standing in the dust storm
+export const EG_MNT_DUST_LIFE   = 4200;                   // ms the dust storm lingers
 
-function _egMechMntHoofterrain(monster, phase) {
+export function _egMechMntHoofterrain(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -385,10 +393,10 @@ function _egMechMntHoofterrain(monster, phase) {
 //------------------------------------------------------------------------
 // A glowing thread marks the ONE SAFE LANE through the current walls -
 // honest, and bait: it snaps and re-forms elsewhere after each charge.
-const EG_MNT_THREAD_LIFE = 6000;   // ms the thread stays honest
-const EG_MNT_THREAD_HEAL = 0.06;   // %maxHP one-time hold reward
+export const EG_MNT_THREAD_LIFE = 6000;   // ms the thread stays honest
+export const EG_MNT_THREAD_HEAL = 0.06;   // %maxHP one-time hold reward
 
-function _egMechMntThread(monster, phase) {
+export function _egMechMntThread(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -439,28 +447,28 @@ function _egMechMntThread(monster, phase) {
 // the next generation). Shatter all three before the TRAMPLE - the last
 // charge runs EVERY lane at once and only shattered lanes are safe. Charge
 // bar frozen (gate in _egTickPlayer via _egMntFinalActive).
-const EG_MNT_GENWALLS   = 3;      // wall generations
-const EG_MNT_STONES     = 3;      // mazewall stones to shatter
-const EG_MNT_STONE_HP   = 3;      // body-checks per stone
-const EG_MNT_STONE_HIT_R = 62;    // body-check radius
-const EG_MNT_TRAMPLE_DMG = 0.35;  // %maxHP caught by the final trample
+export const EG_MNT_GENWALLS   = 3;      // wall generations
+export const EG_MNT_STONES     = 3;      // mazewall stones to shatter
+export const EG_MNT_STONE_HP   = 3;      // body-checks per stone
+export const EG_MNT_STONE_HIT_R = 62;    // body-check radius
+export const EG_MNT_TRAMPLE_DMG = 0.35;  // %maxHP caught by the final trample
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egMntFinal = null;
+export let _egMntFinal = null;
 
-function _egMntFinalActive() {
+export function _egMntFinalActive() {
     return !!_egMntFinal && !_egMntFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egMntOnPhaseEnter(monster, newPhase) {
+export function _egMntOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egMntStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egMntStartFinalWatcher(monster) {
+export function _egMntStartFinalWatcher(monster) {
     if (!monster || _egMntFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -477,7 +485,7 @@ function _egMntStartFinalWatcher(monster) {
 }
 
 // Pause-safe timeout (mirrors the other finales).
-function _egMntAfter(g, ms, fn) {
+export function _egMntAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egMntFinal) return;
@@ -488,7 +496,7 @@ function _egMntAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egMntFinalStart(monster) {
+export function _egMntFinalStart(monster) {
     if (_egMntFinal || !monster) return;
 
     // The warden clears the arena for the final maze: kill every other run
@@ -715,7 +723,7 @@ function _egMntFinalStart(monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egMntFinalEnd(g, monster) {
+export function _egMntFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -733,7 +741,7 @@ function _egMntFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -745,7 +753,7 @@ function _egMntFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egMntTeardown() {
+export function _egMntTeardown() {
     if (_egMntFinal) { try { _egMntFinalEnd(_egMntFinal, null); } catch (e) {} _egMntFinal = null; }
     document.querySelectorAll('.eg-mnt-wall-rise, .eg-mnt-wall, .eg-mnt-wall-crumble, .eg-mnt-lane, ' +
         '.eg-mnt-crater-warn, .eg-mnt-crater-boom, .eg-mnt-hoofprint, .eg-mnt-dust, ' +
@@ -770,7 +778,7 @@ if (typeof window !== 'undefined') {
     window._EG_MNT_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_minotaur') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_minotaur') : null;
             if (!monster) return 'no minotaur alive';
             const fn = name === 'labyrinth' ? _egMechMntLabyrinth
                 : name === 'hoof' ? _egMechMntHoofterrain
@@ -782,7 +790,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_minotaur') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_minotaur') : null;
             if (!monster) return 'no minotaur alive';
             _egMntFinalStart(monster);
             return 'THE WARDEN\u2019S LABYRINTH started';

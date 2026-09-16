@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel, _egSpawnMonster } from '../endgame-encounter.js';
+import { EG_MAX_CONCURRENT_MONSTERS } from '../endgame-monsters.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE AEGIS (boss_aegis)-------------------------
 //------------------------------------------------------------------------
 // REWORK - guardian-fortress homage, rebuilt as a full bulwark gauntlet.
@@ -51,8 +61,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_AG_DEBUG_SLOW = true;
-const _EG_AG_DEBUG_MULT = _EG_AG_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_AG_DEBUG_SLOW = true;
+export const _EG_AG_DEBUG_MULT = _EG_AG_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_aegis: {
@@ -82,13 +92,13 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_AG_CHARGE_DMG = [0, 0.18, 0.21, 0.24];   // shield charge lane
-const EG_AG_ORB_DMG    = [0, 0, 0.13, 0.16];      // sentry orb contact
-const EG_AG_ROTOR_DMG  = [0, 0, 0.12, 0.15];      // rotor arm contact
-const EG_AG_BEAM_DMG   = 0.10;                    // bastion beam contact
-const EG_AG_VANG_DMG   = 0.12;                    // vanguard charge clip
-const EG_AG_FINAL_DMG  = 0.32;                    // the final vanguard charge
-const EG_AG_HIT_CD_MS  = 700;                     // shared touch cooldown
+export const EG_AG_CHARGE_DMG = [0, 0.18, 0.21, 0.24];   // shield charge lane
+export const EG_AG_ORB_DMG    = [0, 0, 0.13, 0.16];      // sentry orb contact
+export const EG_AG_ROTOR_DMG  = [0, 0, 0.12, 0.15];      // rotor arm contact
+export const EG_AG_BEAM_DMG   = 0.10;                    // bastion beam contact
+export const EG_AG_VANG_DMG   = 0.12;                    // vanguard charge clip
+export const EG_AG_FINAL_DMG  = 0.32;                    // the final vanguard charge
+export const EG_AG_HIT_CD_MS  = 700;                     // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -97,8 +107,8 @@ const EG_AG_HIT_CD_MS  = 700;                     // shared touch cooldown
 
 // Touch damage helper shared by all Aegis hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egAgHitCd = 0;
-function _egAgTouch(pct, level, label) {
+export let _egAgHitCd = 0;
+export function _egAgTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egAgHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -111,8 +121,8 @@ function _egAgTouch(pct, level, label) {
 
 // Arena-wide glow so the shielded state reads at a glance (managed element,
 // not a body class - flashes own the body pseudo-elements).
-let _egAgGlowEl = null;
-function _egAgAegisGlow(on) {
+export let _egAgGlowEl = null;
+export function _egAgAegisGlow(on) {
     if (on) {
         if (_egAgGlowEl) return;
         _egAgGlowEl = document.createElement('div');
@@ -125,7 +135,7 @@ function _egAgAegisGlow(on) {
 
 // Stone-shard burst where a slam or charge lands (visual only, body-level
 // so it survives the run ending in the same frame).
-function _egAgDebris(x, y, big) {
+export function _egAgDebris(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-ag-debris' + (big ? ' eg-ag-debris-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -153,7 +163,7 @@ function _egAgDebris(x, y, big) {
 // the guards to break the shield (40s failsafe). Upgraded: guards wear a
 // pulsing guardian ring and the arena glows while the aegis is up, so the
 // state reads at a glance.
-function _egMechAgAegisProtocol(monster, phase) {
+export function _egMechAgAegisProtocol(monster, phase) {
     if (!monster || monster.aegisUp || _egNkFrozen()) return;
     if (typeof _egSpawnMonster !== 'function') return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -161,15 +171,15 @@ function _egMechAgAegisProtocol(monster, phase) {
     const level = Math.max(1, Math.round(monster.level || 1));
     const pool = ['slime', 'ghost', 'rat', 'bat', 'bee'];
     const cap = (typeof EG_MAX_CONCURRENT_MONSTERS !== 'undefined') ? EG_MAX_CONCURRENT_MONSTERS : 6;
-    const before = (typeof _egMonsters !== 'undefined') ? _egMonsters.length : 0;
+    const before = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.length : 0;
     let made = 0;
     for (let i = 0; i < count; i++) {
-        if (typeof _egMonsters !== 'undefined' && _egMonsters.length >= cap) break;
+        if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length >= cap) break;
         _egSpawnMonster(pool[Math.floor(Math.random() * pool.length)], level);
         made++;
     }
     const fresh = (typeof _egMonsters !== 'undefined')
-        ? _egMonsters.slice(before).filter(m => !m.isBoss) : [];
+        ? globalThis._egMonsters.slice(before).filter(m => !m.isBoss) : [];
     fresh.forEach(a => { a.aegisOf = monster.id; });
     if (fresh.length === 0) return;
 
@@ -187,13 +197,13 @@ function _egMechAgAegisProtocol(monster, phase) {
     _egNkLoop(run, (dtS) => {
         e += dtS * 1000;
         const boss = (typeof _egMonsters !== 'undefined')
-            ? _egMonsters.find(m => m.id === monster.id) : null;
+            ? globalThis._egMonsters.find(m => m.id === monster.id) : null;
         if (!boss) {
             _egAgAegisGlow(false);
             return false;
         }
         const alive = (typeof _egMonsters !== 'undefined')
-            && _egMonsters.some(m => m.aegisOf === monster.id && m.currentHP > 0);
+            && globalThis._egMonsters.some(m => m.aegisOf === monster.id && m.currentHP > 0);
         if (!alive || e > 40000) {
             boss.aegisUp = false;
             boss.bossImmune = false;
@@ -215,11 +225,11 @@ function _egMechAgAegisProtocol(monster, phase) {
 // The boss picks your row and BARRELS across it behind its shield. The
 // first charge aims at your current row; the rest aim nearby. Standing in
 // an active lane bites.
-const EG_AG_CHARGE_COUNT = [0, 2, 2, 3];
-const EG_AG_CHARGE_BAND  = [0, 120, 130, 140];
-const EG_AG_CHARGE_SPEED = [0, 620, 700, 780];
+export const EG_AG_CHARGE_COUNT = [0, 2, 2, 3];
+export const EG_AG_CHARGE_BAND  = [0, 120, 130, 140];
+export const EG_AG_CHARGE_SPEED = [0, 620, 700, 780];
 
-function _egMechAgShieldCharge(monster, phase) {
+export function _egMechAgShieldCharge(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -298,12 +308,12 @@ function _egMechAgShieldCharge(monster, phase) {
 //------------------------------------------------------------------------
 // Sentry shields plant at the edges and hurl slow tracking orbs at you for
 // a while. Strafe the orbs - they home, but they are slow.
-const EG_AG_SENTRY_COUNT = [0, 0, 2, 3];
-const EG_AG_SENTRY_LIFE  = 6500;
-const EG_AG_ORB_SPEED    = 130;
-const EG_AG_ORB_LIFE     = 6000;
+export const EG_AG_SENTRY_COUNT = [0, 0, 2, 3];
+export const EG_AG_SENTRY_LIFE  = 6500;
+export const EG_AG_ORB_SPEED    = 130;
+export const EG_AG_ORB_LIFE     = 6000;
 
-function _egMechAgSentries(monster, phase) {
+export function _egMechAgSentries(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -386,11 +396,11 @@ function _egMechAgSentries(monster, phase) {
 //------------------------------------------------------------------------
 // Two guardian orbs tether a beam that sweeps around a pivot like a radar
 // blade. Stay off the arms!
-const EG_AG_ROTOR_LIFE = [0, 0, 6500, 7500];
-const EG_AG_ROTOR_OMEGA = [0, 0, 75, 95];
-const EG_AG_ROTOR_INNER = 80;
+export const EG_AG_ROTOR_LIFE = [0, 0, 6500, 7500];
+export const EG_AG_ROTOR_OMEGA = [0, 0, 75, 95];
+export const EG_AG_ROTOR_INNER = 80;
 
-function _egMechAgGuardRotor(monster, phase) {
+export function _egMechAgGuardRotor(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -463,28 +473,28 @@ function _egMechAgGuardRotor(monster, phase) {
 // the beams retract and three shield charges barrel across your row, the
 // last one huge. Charge bar frozen for the whole set-piece (gate in
 // _egTickPlayer via _egAgFinalActive).
-const EG_AG_FINAL_TICK_MS = 1200;
-const EG_AG_FINAL_TICKS = 3;
-const EG_AG_BEAM_OMEGAS = [80, 115, 150];   // deg/s per stage
-const EG_AG_VANG_GAP = 900;
-const EG_AG_VANG_WARN = 450;
+export const EG_AG_FINAL_TICK_MS = 1200;
+export const EG_AG_FINAL_TICKS = 3;
+export const EG_AG_BEAM_OMEGAS = [80, 115, 150];   // deg/s per stage
+export const EG_AG_VANG_GAP = 900;
+export const EG_AG_VANG_WARN = 450;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egAgFinal = null;
+export let _egAgFinal = null;
 
-function _egAgFinalActive() {
+export function _egAgFinalActive() {
     return !!_egAgFinal && !_egAgFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egAgOnPhaseEnter(monster, newPhase) {
+export function _egAgOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egAgStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egAgStartFinalWatcher(monster) {
+export function _egAgStartFinalWatcher(monster) {
     if (!monster || _egAgFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -500,7 +510,7 @@ function _egAgStartFinalWatcher(monster) {
     });
 }
 
-function _egAgFinalStart(monster) {
+export function _egAgFinalStart(monster) {
     if (_egAgFinal || !monster) return;
 
     // The gates close: kill every other run of this boss and drop any
@@ -652,7 +662,7 @@ function _egAgFinalStart(monster) {
 
 // THE VANGUARD: three rapid shield charges barrel across the player's row,
 // the last one huge. Then the bastion stands down.
-function _egAgVanguard(g, monster) {
+export function _egAgVanguard(g, monster) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const bandH = 150;
@@ -738,7 +748,7 @@ function _egAgVanguard(g, monster) {
     });
 }
 
-function _egAgFinalEnd(g) {
+export function _egAgFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     g.beamOn = false;
@@ -758,7 +768,7 @@ function _egAgFinalEnd(g) {
     document.querySelectorAll('.eg-ag-fortified').forEach(el => el.classList.remove('eg-ag-fortified'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -775,7 +785,7 @@ function _egAgFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egAgTeardown() {
+export function _egAgTeardown() {
     if (_egAgFinal) { try { _egAgFinalEnd(_egAgFinal); } catch (e) {} _egAgFinal = null; }
     document.querySelectorAll('.eg-ag-chargewarn, .eg-ag-charger, .eg-ag-vangwarn, .eg-ag-sentry, ' +
         '.eg-ag-orb, .eg-ag-rotor-pivot, .eg-ag-rotor-arm, .eg-ag-bastion, .eg-ag-beam, ' +
@@ -802,7 +812,7 @@ if (typeof window !== 'undefined') {
     window._EG_AG_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_aegis') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_aegis') : null;
             if (!monster) return 'no aegis alive';
             const fn = name === 'protocol' ? _egMechAgAegisProtocol
                 : name === 'charge' ? _egMechAgShieldCharge
@@ -815,7 +825,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_aegis') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_aegis') : null;
             if (!monster) return 'no aegis alive';
             _egAgFinalStart(monster);
             return 'THE LAST BASTION started';

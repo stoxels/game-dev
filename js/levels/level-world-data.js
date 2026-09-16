@@ -1,8 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 // Helper function to convert shorthand rows [1,0,1] into objects {v:1, m:0}
 //------------------------------------------------------------------------
 
-function G(...rows) {
+export function G(...rows) {
     return rows.map(r => r.map(v => v));
 }
 
@@ -13,7 +18,7 @@ function G(...rows) {
 //------------------------------------------------------------------------
 
 
-const W1 = [
+export const W1 = [
 
     {   //5x5
         hint: "Probability",
@@ -257,7 +262,7 @@ const W1 = [
 //------------------------------------------------------------------------
 
 
-const W2 = [
+export const W2 = [
 
     {   //5x5
         hint: "Unequal",
@@ -472,7 +477,7 @@ const W2 = [
 //------------------------------------------------------------------------
 
 
-const W3 = [
+export const W3 = [
 
     {   //5x5
         hint: "Random Variable",
@@ -693,7 +698,7 @@ const W3 = [
 //------------------------------------------------------------------------
 
 
-const W4 = [
+export const W4 = [
 
     {   //5x5
         hint: "Expectation",
@@ -1054,7 +1059,7 @@ const W4 = [
 //------------------------------------------------------------------------
 
 
-const W5 = [
+export const W5 = [
 
     {   //5x5
         hint: "Lambda",
@@ -1307,7 +1312,7 @@ const W5 = [
 //------------------------------------------------------------------------
 
 
-const W6 = [
+export const W6 = [
 
 
 
@@ -1556,7 +1561,7 @@ const W6 = [
 
 
 
-const W7 = [
+export const W7 = [
 
     {   //5x10
         hint: "Almost Surely",
@@ -1804,7 +1809,7 @@ const W7 = [
 //------------------------------------------------------------------------
 
 
-const W8 = [
+export const W8 = [
 
     {   //5x5
         hint: "Bandwidth",
@@ -1984,7 +1989,7 @@ const W8 = [
 //------------------------------------------------------------------------
 
 
-const W9 = [
+export const W9 = [
 
     {   //5x10
         hint: "Variance of Chi-Squared",
@@ -2276,7 +2281,7 @@ const W9 = [
 //------------------------------------------------------------------------
 
 
-const W10 = [
+export const W10 = [
 
     {   //5x10
         hint: "p-Value Rejection",
@@ -2498,7 +2503,7 @@ const W10 = [
 //------------------------------------------------------------------------
 
 
-const W11 = [
+export const W11 = [
 
     {   //5x20
         hint: "Unpaired Samples",
@@ -2716,7 +2721,7 @@ const W11 = [
 //------------------------------------------------------------------------
 
 
-const W12 = [
+export const W12 = [
 
     {   //5x5
         hint: "True Correlation",
@@ -2971,7 +2976,7 @@ const W12 = [
 //------------------------------------------------------------------------
 
 
-const W13 = [
+export const W13 = [
 
     {   //5x5
         hint: "Wilcoxon Statistic",
@@ -3228,7 +3233,7 @@ const W13 = [
 
 
 
-const W14 = [
+export const W14 = [
     {   //5x5
         hint: "Population",
         hintDE: "Grundgesamtheit",
@@ -3480,7 +3485,7 @@ const W14 = [
 //------------------------------------------------------------------------
 
 
-const W15 = [
+export const W15 = [
 
     {   //5x5
         hint: "dev",
@@ -3509,7 +3514,7 @@ const W15 = [
 //------------------------------------------------------------------------
 
 
-const W16 = [
+export const W16 = [
 
     {   //5x5
         hint: "dev",
@@ -3538,7 +3543,7 @@ const W16 = [
 //------------------------------------------------------------------------
 
 
-const W17 = [
+export const W17 = [
 
     {   //5x5
         hint: "dev",
@@ -3567,7 +3572,7 @@ const W17 = [
 //------------------------------------------------------------------------
 
 
-const W18 = [
+export const W18 = [
 
     {   //5x5
         hint: "dev",
@@ -3594,7 +3599,7 @@ const W18 = [
 //------------------------------------------------------------------------
 
 
-const W19 = [
+export const W19 = [
 
     {   //5x5
         hint: "dev",
@@ -3622,36 +3627,7 @@ const W19 = [
 //------------------------------------------------------------------------
 
 
-const W20 = [
-
-    {   //5x5
-        hint: "dev",
-        hintDE: "your hint here (DE)",
-        reveal: "your reveal here",
-        revealDE: "your reveal here (DE)",
-        timer: 300,
-        bonusHint: "Complete level",
-        bonusHintDE: "Complete level (DE)",
-        bonusType: "nomiss",
-        bonusParam: 0,
-        grid: G(
-            [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0], [1, 0, 0, 0, 0]
-        )
-    },
-
-
-];
-
-
-
-//------------------------------------------------------------------------
-//-------------------DevWorld5: Level Data----------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-
-const W21 = [
+export const W20 = [
 
     {   //5x5
         hint: "dev",
@@ -3680,7 +3656,36 @@ const W21 = [
 //------------------------------------------------------------------------
 
 
-const W22 = [
+export const W21 = [
+
+    {   //5x5
+        hint: "dev",
+        hintDE: "your hint here (DE)",
+        reveal: "your reveal here",
+        revealDE: "your reveal here (DE)",
+        timer: 300,
+        bonusHint: "Complete level",
+        bonusHintDE: "Complete level (DE)",
+        bonusType: "nomiss",
+        bonusParam: 0,
+        grid: G(
+            [1, 0, 0, 0, 0], [1, 0, 0, 0, 0], [1, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0], [1, 0, 0, 0, 0]
+        )
+    },
+
+
+];
+
+
+
+//------------------------------------------------------------------------
+//-------------------DevWorld5: Level Data----------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+
+export const W22 = [
 
     {   //5x5
         hint: "dev",
@@ -3707,7 +3712,7 @@ const W22 = [
 //------------------------------------------------------------------------
 
 
-const W_ENDGAME = [
+export const W_ENDGAME = [
 
     {   // 
         hint: "endgame test",
@@ -3785,7 +3790,7 @@ const W_ENDGAME = [
 
 
 
-const WORLDS = [
+export const WORLDS = [
     { label: 'PROBABILITY PEAKS', labelDE: 'PROBABILITY PEAKS', data: W1 },
     { label: 'DISTRIBUTION DEN', labelDE: 'DISTRIBUTION DEN', data: W2 },
     { label: 'SAMPLING SAVANNA', labelDE: 'SAMPLING SAVANNA', data: W3 },

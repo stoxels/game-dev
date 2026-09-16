@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { LANG } from '../translation/translations.js';
+import { EG_MOD_NAME_WORDS } from './endgame-mod-name-words.js';
+
 //  endgame-mod-application.js
 //  Extracted from endgame-equipment-generator.js 2026-09-11 (Pass 6).
 //  Owns everything that TURNS ROLLED MODS INTO A FINISHED ITEM:
@@ -22,7 +30,7 @@
 // evasion-only base would be meaningless. Hybrid families count as local
 // for every defense stat they touch, so hybrid_armour_evasion requires the
 // base to have BOTH armour and evasion.
-const EG_LOCAL_DEFENSE_FAMILY_STATS = {
+export const EG_LOCAL_DEFENSE_FAMILY_STATS = {
     flat_armour: ['armour'],
     inc_armour: ['armour'],
     flat_evasion: ['evasion'],
@@ -43,7 +51,7 @@ const EG_LOCAL_DEFENSE_FAMILY_STATS = {
 
 // Returns true when `familyId` is allowed to roll on a base with `defenses`.
 // Families not listed here are always allowed.
-function _egFamilyAllowedOnBase(familyId, defenses) {
+export function _egFamilyAllowedOnBase(familyId, defenses) {
     const needed = EG_LOCAL_DEFENSE_FAMILY_STATS[familyId];
     if (!needed) return true;
     if (!defenses) return false;
@@ -57,7 +65,7 @@ function _egFamilyAllowedOnBase(familyId, defenses) {
 // For one mod family (e.g. flat_health), returns the subset of tiers whose
 // ilvl requirement is met by itemLevel, as weighted entries.
 
-function _egEligibleTiers(family, itemLevel) {
+export function _egEligibleTiers(family, itemLevel) {
     return family.tiers.filter(t => t.ilvl <= itemLevel);
 }
 
@@ -67,7 +75,7 @@ function _egEligibleTiers(family, itemLevel) {
 //------------------------------------------------------------------------
 // Picks one tier from an array of tier objects using their .weight field.
 
-function _egPickTier(tiers) {
+export function _egPickTier(tiers) {
     if (!tiers || tiers.length === 0) return null;
     const total = tiers.reduce((s, t) => s + t.weight, 0);
     let roll = Math.random() * total;
@@ -84,7 +92,7 @@ function _egPickTier(tiers) {
 //------------------------------------------------------------------------
 // Rolls an integer in [min, max] inclusive.
 
-function _egRollInt(min, max) {
+export function _egRollInt(min, max) {
     return min + Math.floor(Math.random() * (max - min + 1));
 }
 
@@ -94,7 +102,7 @@ function _egRollInt(min, max) {
 //------------------------------------------------------------------------
 // A mod family is hybrid when its tiers use min1/max1 + min2/max2.
 
-function _egIsHybrid(tier) {
+export function _egIsHybrid(tier) {
     // Dual-value mods are detected by the presence of a second range (min2).
     // Historical tables used `min`/`min2` (shield_bash, arcane_surge, channel)
     // while newer hybrids use `min1`/`min2`; treat either as hybrid so '#' and
@@ -113,7 +121,7 @@ function _egIsHybrid(tier) {
 //   hybrid       → '#' for first stat, '@' for second stat
 //                  lines are separated by '\n' in the label string
 
-function _egBuildRolledStats(family, tier) {
+export function _egBuildRolledStats(family, tier) {
     // Pick affix wording for the active language (falls back to EN).
     const label = (LANG === 'de' && family.labelDe) ? family.labelDe : family.label;
 
@@ -147,7 +155,7 @@ function _egBuildRolledStats(family, tier) {
 // Builds the pool of (familyId → { family, eligibleTiers }) entries
 // that are available for this roll, excluding families already chosen.
 
-function _egBuildModPool(modSection, itemLevel, chosenFamilyIds, defenses) {
+export function _egBuildModPool(modSection, itemLevel, chosenFamilyIds, defenses) {
     const pool = [];
     for (const [familyId, family] of Object.entries(modSection)) {
         if (chosenFamilyIds.has(familyId)) continue;           // no duplicate families
@@ -167,7 +175,7 @@ function _egBuildModPool(modSection, itemLevel, chosenFamilyIds, defenses) {
 // for that family (higher-ilvl items get access to rarer tiers, so the
 // effective weight of a family shifts upward - this is intentional).
 
-function _egPickModFromPool(pool) {
+export function _egPickModFromPool(pool) {
     if (pool.length === 0) return null;
     // Each pool entry contributes the weight of its BEST (lowest-tier-number)
     // eligible tier, so that higher-tier items feel meaningfully different.
@@ -194,7 +202,7 @@ function _egPickModFromPool(pool) {
 // Rolls prefixCount prefixes and suffixCount suffixes from the slot's mod table.
 // Returns an array of resolved mod objects ready to attach to the item.
 
-function _egRollMods(prefixCount, suffixCount, modTable, itemLevel, defenses) {
+export function _egRollMods(prefixCount, suffixCount, modTable, itemLevel, defenses) {
     const chosen = [];
     const chosenFamilyIds = new Set();
 
@@ -256,13 +264,13 @@ function _egRollMods(prefixCount, suffixCount, modTable, itemLevel, defenses) {
 // DE: genitive post-position instead of inflected adjectives
 //     e.g. "Lederkappe des Lebens und der Rüstung"
 
-function _egModNameEntry(familyId) {
+export function _egModNameEntry(familyId) {
     return (typeof EG_MOD_NAME_WORDS !== 'undefined') ? EG_MOD_NAME_WORDS[familyId] : null;
 }
 
 // Fallback when a family has no dictionary entry: title-case the familyId,
 // stripping generic segments ("flat_hybrid_map").
-function _egModFallbackWord(familyId) {
+export function _egModFallbackWord(familyId) {
     return familyId
         .split('_')
         .filter(w => !['flat', 'inc', 'hybrid', 'map'].includes(w))
@@ -271,24 +279,24 @@ function _egModFallbackWord(familyId) {
 }
 
 // EN adjective for the prefix position, e.g. "Healthy".
-function _egModAdjective(familyId) {
+export function _egModAdjective(familyId) {
     const entry = _egModNameEntry(familyId);
     return entry ? entry[0] : _egModFallbackWord(familyId);
 }
 
 // EN "of ..." phrase for the suffix position, e.g. "of Vitality".
-function _egModOfPhrase(familyId) {
+export function _egModOfPhrase(familyId) {
     const entry = _egModNameEntry(familyId);
     return entry ? entry[1] : 'of ' + _egModFallbackWord(familyId);
 }
 
 // DE genitive post-position phrase, e.g. "des Lebens" / "der Rüstung".
-function _egModDeGenitive(familyId) {
+export function _egModDeGenitive(familyId) {
     const entry = _egModNameEntry(familyId);
     return entry ? entry[2] : 'des ' + _egModFallbackWord(familyId);
 }
 
-function _egBuildItemName(baseName, rarity, mods) {
+export function _egBuildItemName(baseName, rarity, mods) {
     if (rarity === 'common' || mods.length === 0) return baseName;
 
     // rare/epic: PoE-style random two-word name ("Doom Bane").
@@ -323,7 +331,7 @@ function _egBuildItemName(baseName, rarity, mods) {
 // Each entry is [englishWord, germanWord]. The base type is still shown
 // separately via .baseName, exactly like PoE handles rare names.
 
-const EG_RARE_NAME_WORDS_FIRST = [
+export const EG_RARE_NAME_WORDS_FIRST = [
     ['Blood', 'Blut'],
     ['Storm', 'Sturm'],
     ['Ash', 'Asche'],
@@ -354,7 +362,7 @@ const EG_RARE_NAME_WORDS_FIRST = [
     ['Pale', 'Blass'],
     ['Silent', 'Still'],
 ];
-const EG_RARE_NAME_WORDS_SECOND = [
+export const EG_RARE_NAME_WORDS_SECOND = [
     ['Bane', 'Fluch'],
     ['Song', 'Lied'],
     ['Grip', 'Griff'],
@@ -387,7 +395,7 @@ const EG_RARE_NAME_WORDS_SECOND = [
     ['Maw', 'Rachen'],
 ];
 
-function _egPickRareItemName() {
+export function _egPickRareItemName() {
     const first = EG_RARE_NAME_WORDS_FIRST[Math.floor(Math.random() * EG_RARE_NAME_WORDS_FIRST.length)];
     const second = EG_RARE_NAME_WORDS_SECOND[Math.floor(Math.random() * EG_RARE_NAME_WORDS_SECOND.length)];
     return (LANG === 'de') ? `${first[1]} ${second[1]}` : `${first[0]} ${second[0]}`;

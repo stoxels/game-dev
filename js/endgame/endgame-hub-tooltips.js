@@ -1,3 +1,17 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { LANG, t } from '../translation/translations.js';
+import { EG_ART } from './endgame-art.js';
+import { _egShowTooltip } from './endgame-currency.js';
+import { EG_SLOT_ACCEPTS, _dndFindTargetSlot } from './endgame-hub-drag-and-drop.js';
+import { _egEquipped } from './endgame-hub.js';
+import { _egBuildMergedModLines, _egGetAllEquippedItems, _egGetItemEffectiveAttackInterval, _egGetItemEffectiveBlockChance, _egGetItemEffectiveDamage, _egGetItemEffectiveDefenses } from './endgame-player-stats.js';
+import { EG_PLAYER_BASE_ATTRIBUTES, _egCheckHandCompatibilityInSlot, _egGetSwapChainBreak, _egGetUnmetRequirementsText, _egGetWeaponHands, _egHandErrorMessage, _egPreviewEquipAttributes } from './endgame-requirements.js';
+import { _egGetUniqueSpecialLines, _egInferWeaponHands } from './endgame-unique-items.js';
+
 //  endgame-hub-tooltips.js
 //  HUB TOOLTIPS - extracted 2026-09-10 from endgame-hub.js
 //  (stat-block tooltip builder, mouse tracking, Alt-compare tooltip
@@ -12,7 +26,7 @@
 // Builds the HTML for the tooltip panel body from an item object.
 
 
-function _egBuildTooltipBodyHTML(item) {
+export function _egBuildTooltipBodyHTML(item) {
     const RARITY_COLOR_MAP = {
         common: { border: '#7a7a7a', color: '#b0b0b0' },
         uncommon: { border: '#2ecc71', color: '#2ecc71' },
@@ -326,15 +340,15 @@ function _egBuildTooltipBodyHTML(item) {
 
 
 
-function _egClearTooltip() {
+export function _egClearTooltip() {
     _egShowTooltip(null);
 }
 
 
 // Moves the main tooltip (and the compare tooltip with it) while the
 // cursor glides over the hovered item chip.
-function _egMoveTooltip(e) {
-    moveGameTooltip(e);
+export function _egMoveTooltip(e) {
+    globalThis.moveGameTooltip(e);
     _egPositionCompareTooltip();
 }
 
@@ -342,10 +356,10 @@ function _egMoveTooltip(e) {
 // ── Alt-hold compare tooltip ────────────────────────────────────────────
 
 // True while the Alt key is held down.
-let _egAltDown = false;
+export let _egAltDown = false;
 
 // Last known cursor position - fallback anchor when no event is available.
-let _egLastMouse = { x: 0, y: 0 };
+export let _egLastMouse = { x: 0, y: 0 };
 
 document.addEventListener('mousemove', e => {
     _egLastMouse.x = e.clientX;
@@ -354,7 +368,7 @@ document.addEventListener('mousemove', e => {
 
 // True while the endgame hub or gate screen is the active screen.
 // Used to scope the Alt-key browser-menu suppression to the item UIs.
-function _egIsItemScreenActive() {
+export function _egIsItemScreenActive() {
     const hub = document.getElementById('screen-endgame-hub');
     const gate = document.getElementById('screen-endgame-gate');
     return (hub && hub.classList.contains('active'))
@@ -393,7 +407,7 @@ window.addEventListener('blur', () => {
 // Only equipment items have a matching paperdoll slot; for multi-slot
 // types (rings, earrings, weapons) the first occupied slot wins.
 // Returns null when there is nothing meaningful to compare.
-function _egGetCompareItem(item) {
+export function _egGetCompareItem(item) {
     if (!item || item.category !== 'equip' || !item.slotType) return null;
     if (typeof EG_SLOT_ACCEPTS === 'undefined') return null;
     const ids = Object.keys(EG_SLOT_ACCEPTS)
@@ -408,13 +422,13 @@ function _egGetCompareItem(item) {
 // Shows or hides the compare tooltip based on the current hover target
 // and Alt key state. Only shown while Alt is held AND the hovered item
 // is not itself the equipped one being compared.
-function _egUpdateCompareTooltip() {
-    const compareItem = (_egAltDown && _egTooltipItem)
-        ? _egGetCompareItem(_egTooltipItem)
+export function _egUpdateCompareTooltip() {
+    const compareItem = (_egAltDown && globalThis._egTooltipItem)
+        ? _egGetCompareItem(globalThis._egTooltipItem)
         : null;
 
     // Don't "compare" an equipped item with itself.
-    if (compareItem === _egTooltipItem) {
+    if (compareItem === globalThis._egTooltipItem) {
         _egHideCompareTooltip();
         return;
     }
@@ -426,7 +440,7 @@ function _egUpdateCompareTooltip() {
 
 // Lazily creates the compare tooltip element (visual twin of the main
 // game tooltip, but with a yellow accent edge to tell them apart).
-function _egGetCompareTip() {
+export function _egGetCompareTip() {
     let tip = document.getElementById('eg-compare-tip');
     if (!tip) {
         tip = document.createElement('div');
@@ -454,7 +468,7 @@ function _egGetCompareTip() {
 }
 
 
-function _egShowCompareTooltip(item) {
+export function _egShowCompareTooltip(item) {
     const tip = _egGetCompareTip();
     tip.innerHTML = `
 <div class="eg-compare-label">${t('eg_tt_currently_equipped')}</div>
@@ -464,7 +478,7 @@ ${_egBuildTooltipBodyHTML(item)}`;
 }
 
 
-function _egHideCompareTooltip() {
+export function _egHideCompareTooltip() {
     const tip = document.getElementById('eg-compare-tip');
     if (tip) tip.style.opacity = '0';
 }
@@ -472,7 +486,7 @@ function _egHideCompareTooltip() {
 
 // Places the compare tooltip to the right of the main tooltip
 // (flips to the left side when there is not enough room).
-function _egPositionCompareTooltip() {
+export function _egPositionCompareTooltip() {
     const main = document.getElementById('ghud-floating-tip');
     const cmp = document.getElementById('eg-compare-tip');
     if (!main || !cmp || cmp.style.opacity !== '1') return;

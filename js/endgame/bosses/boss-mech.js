@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE MECH (boss_mech)---------------------------------
 //------------------------------------------------------------------------
 // Self-destruct homage: the Mech primes a nuke and shows you the blast
@@ -38,7 +46,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // True when segment (ax,ay)-(bx,by) intersects rect r (line-of-sight block).
-function _egMechSegHitsRect(ax, ay, bx, by, r) {
+export function _egMechSegHitsRect(ax, ay, bx, by, r) {
     const inside = (x, y) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
     if (inside(ax, ay) || inside(bx, by)) return true;
     // Segment-segment intersection against the four rect edges.
@@ -55,7 +63,7 @@ function _egMechSegHitsRect(ax, ay, bx, by, r) {
         || seg(ax, ay, bx, by, r.left, r.bottom, r.left, r.top);
 }
 
-function _egMechSelfDestruct(monster, phase) {
+export function _egMechSelfDestruct(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const countdownMs = [0, 3200, 2800, 2400][p];

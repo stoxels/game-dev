@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE MONSOON (boss_monsoon)---------------------
 //------------------------------------------------------------------------
 // REWORK - torrential-storm homage, rebuilt as a full flooding season. The
@@ -44,8 +53,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_MN_DEBUG_SLOW = true;
-const _EG_MN_DEBUG_MULT = _EG_MN_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_MN_DEBUG_SLOW = true;
+export const _EG_MN_DEBUG_MULT = _EG_MN_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_monsoon: {
@@ -75,13 +84,13 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_MN_BAND_DMG   = [0, 0.14, 0.17, 0.20];   // rain band contact
-const EG_MN_BOLT_DMG   = [0, 0.16, 0.19, 0.22];   // thunderbolt strike
-const EG_MN_SURGE_DMG  = [0, 0, 0.12, 0.15];      // submerged in surge water
-const EG_MN_HAIL_DMG   = [0, 0, 0.15, 0.18];      // hailstone impact
-const EG_MN_SURGE_CLIP = 0.12;                    // finale surge clip
-const EG_MN_FLOOD_DMG  = 0.32;                    // THE BREAK full hit
-const EG_MN_HIT_CD_MS  = 700;                     // shared touch cooldown
+export const EG_MN_BAND_DMG   = [0, 0.14, 0.17, 0.20];   // rain band contact
+export const EG_MN_BOLT_DMG   = [0, 0.16, 0.19, 0.22];   // thunderbolt strike
+export const EG_MN_SURGE_DMG  = [0, 0, 0.12, 0.15];      // submerged in surge water
+export const EG_MN_HAIL_DMG   = [0, 0, 0.15, 0.18];      // hailstone impact
+export const EG_MN_SURGE_CLIP = 0.12;                    // finale surge clip
+export const EG_MN_FLOOD_DMG  = 0.32;                    // THE BREAK full hit
+export const EG_MN_HIT_CD_MS  = 700;                     // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -90,8 +99,8 @@ const EG_MN_HIT_CD_MS  = 700;                     // shared touch cooldown
 
 // Touch damage helper shared by all Monsoon hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egMnHitCd = 0;
-function _egMnTouch(pct, level, label) {
+export let _egMnHitCd = 0;
+export function _egMnTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egMnHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -103,7 +112,7 @@ function _egMnTouch(pct, level, label) {
 }
 
 // One expanding ring (impact/splash) at (x, y) - body-level visual.
-function _egMnRing(x, y, cls, lifeMs, run, timers) {
+export function _egMnRing(x, y, cls, lifeMs, run, timers) {
     const el = document.createElement('div');
     el.className = 'eg-mn-icyring' + (cls ? ' ' + cls : '');
     el.style.left = Math.round(x) + 'px';
@@ -121,10 +130,10 @@ function _egMnRing(x, y, cls, lifeMs, run, timers) {
 // Diagonal rain curtains telegraph near the player, then pour for a few
 // seconds - standing inside a curtain stings repeatedly. Phase 1 sends
 // two, later phases three, all faster.
-const EG_MN_BAND_W    = 92;
-const EG_MN_BAND_LIFE = 3000;
+export const EG_MN_BAND_W    = 92;
+export const EG_MN_BAND_LIFE = 3000;
 
-function _egMechMnRainBands(monster, phase) {
+export function _egMechMnRainBands(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -193,10 +202,10 @@ function _egMechMnRainBands(monster, phase) {
 //------------------------------------------------------------------------
 // Golden marks flash across the arena and lightning strikes each one,
 // staggered across the sky. Clear the circles!
-const EG_MN_BOLT_COUNT = [0, 4, 5, 6];
-const EG_MN_BOLT_R     = 58;
+export const EG_MN_BOLT_COUNT = [0, 4, 5, 6];
+export const EG_MN_BOLT_R     = 58;
 
-function _egMechMnThunderbolts(monster, phase) {
+export function _egMechMnThunderbolts(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -254,12 +263,12 @@ function _egMechMnThunderbolts(monster, phase) {
 // The water rises from the bottom of the arena and holds - everything
 // submerged takes repeated hits - then recedes. The run is PASSIVE (field
 // hazard - never blocks other mechanics).
-const EG_MN_SURGE_PEAK = [0, 0, 0.34, 0.42];
-const EG_MN_SURGE_RISE = 3500;
-const EG_MN_SURGE_HOLD = 2600;
-const EG_MN_SURGE_FALL = 1600;
+export const EG_MN_SURGE_PEAK = [0, 0, 0.34, 0.42];
+export const EG_MN_SURGE_RISE = 3500;
+export const EG_MN_SURGE_HOLD = 2600;
+export const EG_MN_SURGE_FALL = 1600;
 
-function _egMechMnStormSurge(monster, phase) {
+export function _egMechMnStormSurge(monster, phase) {
     if (_egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -309,10 +318,10 @@ function _egMechMnStormSurge(monster, phase) {
 //------------------------------------------------------------------------
 // Hailstones drop onto marked spots - most aimed near where the player was
 // when the volley started. The stone falls during the warn, then impacts.
-const EG_MN_HAIL_COUNT = [0, 0, 7, 10];
-const EG_MN_HAIL_R     = 30;
+export const EG_MN_HAIL_COUNT = [0, 0, 7, 10];
+export const EG_MN_HAIL_R     = 30;
 
-function _egMechMnHailBarrage(monster, phase) {
+export function _egMechMnHailBarrage(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -382,28 +391,28 @@ function _egMechMnHailBarrage(monster, phase) {
 // ground - be on it when the surge lands! Then THE BREAK: the flood
 // swallows everything except the final island. Charge bar frozen for the
 // whole set-piece (gate in _egTickPlayer via _egMnFinalActive).
-const EG_MN_FINAL_TICK_MS = 1200;
-const EG_MN_FINAL_TICKS = 4;
-const EG_MN_ISLAND_R = 150;
-const EG_MN_ISLAND_R_FINAL = 200;
-const EG_MN_SURGE_STAGES = [0.30, 0.55, 0.78, 1.08];   // of screen height
+export const EG_MN_FINAL_TICK_MS = 1200;
+export const EG_MN_FINAL_TICKS = 4;
+export const EG_MN_ISLAND_R = 150;
+export const EG_MN_ISLAND_R_FINAL = 200;
+export const EG_MN_SURGE_STAGES = [0.30, 0.55, 0.78, 1.08];   // of screen height
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egMnFinal = null;
+export let _egMnFinal = null;
 
-function _egMnFinalActive() {
+export function _egMnFinalActive() {
     return !!_egMnFinal && !_egMnFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egMnOnPhaseEnter(monster, newPhase) {
+export function _egMnOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egMnStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egMnStartFinalWatcher(monster) {
+export function _egMnStartFinalWatcher(monster) {
     if (!monster || _egMnFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -420,7 +429,7 @@ function _egMnStartFinalWatcher(monster) {
 }
 
 // Hop the dry island to a fresh high-ground spot (top ~45% of the screen).
-function _egMnPlaceIsland(g, r, prev) {
+export function _egMnPlaceIsland(g, r, prev) {
     if (g.islandEl) { try { g.islandEl.remove(); } catch (e) {} g.islandEl = null; }
     const W = window.innerWidth, H = window.innerHeight;
     const m = 170;
@@ -442,7 +451,7 @@ function _egMnPlaceIsland(g, r, prev) {
     g.islandEl = el;
 }
 
-function _egMnFinalStart(monster) {
+export function _egMnFinalStart(monster) {
     if (_egMnFinal || !monster) return;
 
     // The sky closes: kill every other run of this boss.
@@ -564,7 +573,7 @@ function _egMnFinalStart(monster) {
     }, cdTick);
 }
 
-function _egMnFinalEnd(g) {
+export function _egMnFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -581,7 +590,7 @@ function _egMnFinalEnd(g) {
     document.querySelectorAll('.eg-mn-churning').forEach(el => el.classList.remove('eg-mn-churning'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -598,7 +607,7 @@ function _egMnFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egMnTeardown() {
+export function _egMnTeardown() {
     if (_egMnFinal) { try { _egMnFinalEnd(_egMnFinal); } catch (e) {} _egMnFinal = null; }
     document.querySelectorAll('.eg-mn-band, .eg-mn-bolt, .eg-mn-boltwarn, .eg-mn-flashring, ' +
         '.eg-mn-water, .eg-mn-hailwarn, .eg-mn-hail, .eg-mn-icyring, .eg-mn-island, ' +
@@ -624,7 +633,7 @@ if (typeof window !== 'undefined') {
     window._EG_MN_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_monsoon') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_monsoon') : null;
             if (!monster) return 'no monsoon alive';
             const fn = name === 'bands' ? _egMechMnRainBands
                 : name === 'bolts' ? _egMechMnThunderbolts
@@ -637,7 +646,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_monsoon') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_monsoon') : null;
             if (!monster) return 'no monsoon alive';
             _egMnFinalStart(monster);
             return 'THE GREAT FLOOD started';

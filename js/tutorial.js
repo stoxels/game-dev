@@ -1,4 +1,15 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from './audio/audio.js';
+import { showSetup, showTitle, switchScreen } from './screens/screens.js';
+import { save } from './state.js';
+import { t } from './translation/translations.js';
+import { startTutorialQuest } from './tutorial-quest.js';
+
+//------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -22,7 +33,7 @@
 //
 // NOTE: top/left percentages are relative to #tut-demo-area, which always
 // fills the available space at the image's aspect ratio (see tutorial.css).
-const TUTORIAL_STEPS = [
+export const TUTORIAL_STEPS = [
     { image: 'step1.webp', titleKey: 'tut2_s0_title', textKey: 'tut2_s0_text', box: { top: '80%', left: '50%' }, arrowTo: null }, // WELCOME TO STOXELS
     { image: 'step2.webp', titleKey: 'tut2_s1_title', textKey: 'tut2_s1_text', box: { top: '70%', left: '85%' }, arrowTo: null }, // THE GAME SCREEN
     { image: 'step2.webp', titleKey: 'tut2_s2_title', textKey: 'tut2_s2_text', box: { top: '70%', left: '85%' }, arrowTo: { top: '45%', left: '50%' } },  // THE PUZZLE GRID
@@ -39,17 +50,17 @@ const TUTORIAL_STEPS = [
 
 // Arrow color (golden) - kept as a JS constant too, in case you want to
 // theme it per-character later without touching the CSS.
-const TUTORIAL_ARROW_COLOR = '#d4af37';
+export const TUTORIAL_ARROW_COLOR = '#d4af37';
 
 // tutStep - index of the currently displayed tutorial step (0-based).
-let tutStep = 0;
+export let tutStep = 0;
 
 // tutCurrentImageKey - the image key currently shown, so we only swap the
 // <img> element when a step actually requests a different background.
-let tutCurrentImageKey = null;
+export let tutCurrentImageKey = null;
 
 // True while replaying the tutorial from the title screen's Replay panel.
-let _tutorialReplayFromTitle = false;
+export let _tutorialReplayFromTitle = false;
 
 
 
@@ -64,14 +75,14 @@ let _tutorialReplayFromTitle = false;
 //   character has been selected yet (e.g. tutorial shown before character pick).
 //   STATE.playerCharacter is stored lowercase ('stox'/'trix'/'syla'), so it's
 //   capitalized here to match the actual folder names on disk.
-function _tutCharacterFolder() {
-    const id = (STATE && STATE.playerCharacter) ? STATE.playerCharacter : 'stox';
+export function _tutCharacterFolder() {
+    const id = (globalThis.STATE && globalThis.STATE.playerCharacter) ? globalThis.STATE.playerCharacter : 'stox';
     return id.charAt(0).toUpperCase() + id.slice(1);
 }
 
 // _tutImagePath - builds the full path to a tutorial background image,
 //   using the current character's folder.
-function _tutImagePath(imageFile) {
+export function _tutImagePath(imageFile) {
     return `images/Tutorial/${_tutCharacterFolder()}/${imageFile}`;
 }
 
@@ -88,22 +99,22 @@ function _tutImagePath(imageFile) {
 
 // _getTutDemoArea - the container that holds the background image, arrow
 //   svg, and floating text box.
-function _getTutDemoArea() {
+export function _getTutDemoArea() {
     return document.getElementById('tut-demo-area');
 }
 
 // _getTutBgImg - the tutorial background <img>, or null if not yet created.
-function _getTutBgImg() {
+export function _getTutBgImg() {
     return document.getElementById('tut-bg-img');
 }
 
 // _getTutArrowSvg - the arrow <svg> overlay, or null if not yet created.
-function _getTutArrowSvg() {
+export function _getTutArrowSvg() {
     return document.getElementById('tut-arrow-svg');
 }
 
 // _getTutTextBox - the floating instruction box, or null if not yet created.
-function _getTutTextBox() {
+export function _getTutTextBox() {
     return document.getElementById('tut-text-box');
 }
 
@@ -116,7 +127,7 @@ function _getTutTextBox() {
 //------------------------------------------------------------------------
 
 // updateStepCounter - updates the "X / Y" step counter in the UI.
-function updateStepCounter() {
+export function updateStepCounter() {
     document.getElementById('tut-step-counter').textContent =
         `${tutStep + 1} / ${TUTORIAL_STEPS.length}`;
 }
@@ -125,7 +136,7 @@ function updateStepCounter() {
 //   whether this is the last step.
 //   NOTE: Does NOT reassign onclick - the button's handler in HTML calls
 //   advanceTutStep(), which decides whether to advance or finish.
-function updateNextButton() {
+export function updateNextButton() {
     const isLast = tutStep === TUTORIAL_STEPS.length - 1;
     document.getElementById('tut-next-btn').textContent = isLast
         ? t('st_tut_finish')
@@ -144,7 +155,7 @@ function updateNextButton() {
 //   <img> and the arrow <svg>, swapping the image src only when the step's
 //   image key actually changes (so repeated steps on the same screenshot
 //   don't flicker/reload the image).
-function ensureTutDemoSkeleton(step) {
+export function ensureTutDemoSkeleton(step) {
     const area = _getTutDemoArea();
     const wantedKey = step.image || tutCurrentImageKey || 'step1.jpeg';
 
@@ -167,7 +178,7 @@ function ensureTutDemoSkeleton(step) {
 // clampTutBoxPosition - nudges #tut-text-box (via an extra transform offset)
 //   so it never overflows outside #tut-demo-area, e.g. on narrow/short
 //   screens where the box is bigger relative to the canvas.
-function clampTutBoxPosition() {
+export function clampTutBoxPosition() {
     const area = _getTutDemoArea();
     const box = _getTutTextBox();
     if (!area || !box) return;
@@ -198,7 +209,7 @@ function clampTutBoxPosition() {
 
 // renderTutBox - creates (if needed) and positions the floating text box,
 //   filling it with the translated title and body text for this step.
-function renderTutBox(step) {
+export function renderTutBox(step) {
     const area = _getTutDemoArea();
     let box = _getTutTextBox();
 
@@ -225,7 +236,7 @@ function renderTutBox(step) {
 
 // renderTutArrow - draws (or clears) the golden dashed arrow from the
 //   text box's anchor point to the step's target coordinate.
-function renderTutArrow(step) {
+export function renderTutArrow(step) {
     const svg = _getTutArrowSvg();
     if (!svg) return;
     svg.innerHTML = '';
@@ -254,7 +265,7 @@ function renderTutArrow(step) {
 
 // renderTutStep - orchestrates rendering the current step: swaps the
 //   background image if needed, then (re)draws the text box and arrow.
-function renderTutStep() {
+export function renderTutStep() {
     const step = TUTORIAL_STEPS[tutStep];
     updateStepCounter();
     updateNextButton();
@@ -274,8 +285,8 @@ function renderTutStep() {
 
 // finishTutorial - marks the tutorial as completed, persists the save,
 //   and navigates to the level select screen.
-function finishTutorial() {
-    STATE.tutorialDone = true;
+export function finishTutorial() {
+    globalThis.STATE.tutorialDone = true;
     save();
     if (_tutorialReplayFromTitle) {
         _tutorialReplayFromTitle = false;
@@ -288,7 +299,7 @@ function finishTutorial() {
 // advanceTutStep - moves to the next step, or finishes the tutorial when
 //   on the last step. Called directly by the Next button's onclick in HTML,
 //   and by clicks on the demo area.
-function advanceTutStep() {
+export function advanceTutStep() {
     if (tutStep === TUTORIAL_STEPS.length - 1) {
         finishTutorial();
         return;
@@ -298,7 +309,7 @@ function advanceTutStep() {
 }
 
 // prevTutStep - moves to the previous step if one exists.
-function prevTutStep() {
+export function prevTutStep() {
     if (tutStep > 0) {
         tutStep--;
         renderTutStep();
@@ -308,7 +319,7 @@ function prevTutStep() {
 // initTutorialClickHandler - clicking anywhere on the demo area (but not
 //   on the text box itself, so its text remains selectable) advances to
 //   the next step, same as pressing NEXT.
-function initTutorialClickHandler() {
+export function initTutorialClickHandler() {
     const area = _getTutDemoArea();
     area.onclick = (e) => {
         if (e.target.closest('#tut-text-box')) return;
@@ -325,7 +336,7 @@ function initTutorialClickHandler() {
 //------------------------------------------------------------------------
 
 // showTutorialScreen - switches to the tutorial screen and shows the first step.
-function showTutorialScreen() {
+export function showTutorialScreen() {
     tutStep = 0;
     tutCurrentImageKey = null;
     // Static walkthrough replay: same random tutorial track as the quest entry.
@@ -339,8 +350,8 @@ function showTutorialScreen() {
 
 // showTutorial - called from the title screen.
 //   Skips the tutorial and goes straight to setup if already completed.
-function showTutorial() {
-    if (STATE.tutorialDone) {
+export function showTutorial() {
+    if (globalThis.STATE.tutorialDone) {
         showSetup();
         return;
     }
@@ -348,18 +359,18 @@ function showTutorial() {
     // three 5x5 puzzles (see js/tutorial-quest.js). The static image
     // walkthrough remains available via replayTutorialFromTitle().
     if (typeof startTutorialQuest === 'function') {
-        screenHistory.push('screen-title');
+        globalThis.screenHistory.push('screen-title');
         startTutorialQuest();
         return;
     }
-    screenHistory.push('screen-title');
+    globalThis.screenHistory.push('screen-title');
     showTutorialScreen();
 }
 
 // replayTutorialFromTitle - rewatch the tutorial even though
 // STATE.tutorialDone is already true (showTutorial() would otherwise skip it).
-function replayTutorialFromTitle() {
+export function replayTutorialFromTitle() {
     _tutorialReplayFromTitle = true;
-    screenHistory.push('screen-title');
+    globalThis.screenHistory.push('screen-title');
     showTutorialScreen();
 }

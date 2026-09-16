@@ -1,4 +1,16 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { switchScreen } from '../screens/screens.js';
+import { t } from '../translation/translations.js';
+import { EG_ART } from './endgame-art.js';
+import { EG_ATLAS_MAX_TIER, EG_ATLAS_NODES, egAtlasAdjacentBonusPercent, egAtlasChainBlueprint, egAtlasIsCompleted, egAtlasIsUnlocked, egAtlasNodeById, egAtlasNodeName, egAtlasProgress } from './endgame-atlas.js';
+import { EG_MAP_TIER_ROMANS, _egMapStash } from './endgame-hub.js';
+import { EG_SCREEN_NAV, _egResolveBackFn } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME ATLAS SCREEN---------------------------------
 //------------------------------------------------------------------------
 // PoE-style atlas overview, presented like a classic WoW atlas dialog
@@ -40,26 +52,26 @@
 // The atlas canvas is a fixed-size stage sized like the classic dialog
 // (~1500×850). Node positions come straight from the atlas data
 // (EG_ATLAS_TIER_POSITIONS offsets around the centre).
-const EG_ATLAS_CANVAS_W = 1440;
-const EG_ATLAS_CANVAS_H = 820;
-const EG_ATLAS_CX = EG_ATLAS_CANVAS_W / 2;
-const EG_ATLAS_CY = EG_ATLAS_CANVAS_H / 2;
-const EG_ATLAS_LABEL_H = 15;        // reserved space above a node for its name
+export const EG_ATLAS_CANVAS_W = 1440;
+export const EG_ATLAS_CANVAS_H = 820;
+export const EG_ATLAS_CX = EG_ATLAS_CANVAS_W / 2;
+export const EG_ATLAS_CY = EG_ATLAS_CANVAS_H / 2;
+export const EG_ATLAS_LABEL_H = 15;        // reserved space above a node for its name
 
 // Name of the global function the BACK button calls - set by
 // showEndgameAtlas(backFn). Defaults to the Probability Gate.
-let _egAtlasBackFn = EG_SCREEN_NAV.gate;
+export let _egAtlasBackFn = EG_SCREEN_NAV.gate;
 
-let _egAtlasSelectedNodeId = null;
-let _egAtlasSearchQuery = '';
-let _egAtlasStashCounts = {};
+export let _egAtlasSelectedNodeId = null;
+export let _egAtlasSearchQuery = '';
+export let _egAtlasStashCounts = {};
 
 // View state: the atlas scales to fit the window by default and can be
 // zoomed (mouse wheel / controls) and panned (mouse drag) freely.
-let _egAtlasZoom = 1;
-let _egAtlasZoomIsFit = true;
-const EG_ATLAS_ZOOM_MIN = 0.35;
-const EG_ATLAS_ZOOM_MAX = 3;
+export let _egAtlasZoom = 1;
+export let _egAtlasZoomIsFit = true;
+export const EG_ATLAS_ZOOM_MIN = 0.35;
+export const EG_ATLAS_ZOOM_MAX = 3;
 
 
 //------------------------------------------------------------------------
@@ -67,7 +79,7 @@ const EG_ATLAS_ZOOM_MAX = 3;
 //------------------------------------------------------------------------
 
 // Centre position of a node on the atlas canvas.
-function _egAtlasNodeCenter(node) {
+export function _egAtlasNodeCenter(node) {
     return {
         x: EG_ATLAS_CX + (node.x || 0),
         y: EG_ATLAS_CY + (node.y || 0),
@@ -75,7 +87,7 @@ function _egAtlasNodeCenter(node) {
 }
 
 // Node squares are small, like the classic atlas.
-function _egAtlasNodeSize(tier) {
+export function _egAtlasNodeSize(tier) {
     if (tier >= EG_ATLAS_MAX_TIER) return { w: 38, h: 38 }; // pinnacle
     return { w: 30, h: 30 };
 }
@@ -85,7 +97,7 @@ function _egAtlasNodeSize(tier) {
 //   tiers I–V   uncommon  #2ecc71 (green)
 //   tiers VI–X  rare      #3498db (blue)
 //   tiers XI–XVI epic     #c39bd3 (purple)
-function _egAtlasTierGroupColor(tier) {
+export function _egAtlasTierGroupColor(tier) {
     if (tier <= 5) return '#2ecc71';   // uncommon
     if (tier <= 10) return '#3498db';  // rare
     return '#c39bd3';                  // epic
@@ -94,20 +106,20 @@ function _egAtlasTierGroupColor(tier) {
 
 
 // Roman numerals for the tier inside the node square.
-function _egAtlasRoman(tier) {
+export function _egAtlasRoman(tier) {
     const romans = (typeof EG_MAP_TIER_ROMANS !== 'undefined' && EG_MAP_TIER_ROMANS.length === EG_ATLAS_MAX_TIER)
         ? EG_MAP_TIER_ROMANS
         : ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI'];
     return romans[tier - 1] || String(tier);
 }
 
-function _egAtlasNodeStatus(node) {
+export function _egAtlasNodeStatus(node) {
     if (egAtlasIsCompleted(node.id)) return 'completed';
     if (egAtlasIsUnlocked(node.id)) return 'available';
     return 'locked';
 }
 
-function _egAtlasStatusColor(status) {
+export function _egAtlasStatusColor(status) {
     switch (status) {
         case 'completed': return '#f5d98a';
         case 'available': return '#f5f5f5';
@@ -115,7 +127,7 @@ function _egAtlasStatusColor(status) {
     }
 }
 
-function _egAtlasStatusLabel(status) {
+export function _egAtlasStatusLabel(status) {
     switch (status) {
         case 'completed': return `✔ ${t('eg_atlas_status_completed')}`;
         case 'available': return `? ${t('eg_atlas_status_available')}`;
@@ -128,12 +140,12 @@ function _egAtlasStatusLabel(status) {
 // launch code use, so the card always names the boss actually fought in
 // that region's maps. Returns { id, name, emoji } or null when the boss
 // cannot be resolved (unknown region / missing defs).
-function _egAtlasNodeBoss(node) {
+export function _egAtlasNodeBoss(node) {
     if (!node || typeof egAtlasChainBlueprint !== 'function') return null;
     try {
         const bp = egAtlasChainBlueprint(node);
         if (!bp || !bp.bossId) return null;
-        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? EG_BOSS_DEFS[bp.bossId] : null;
+        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? globalThis.EG_BOSS_DEFS[bp.bossId] : null;
         if (!def) return null;
         return { id: bp.bossId, name: def.name || bp.bossId, emoji: def.emoji || '💀' };
     } catch (e) {
@@ -143,11 +155,11 @@ function _egAtlasNodeBoss(node) {
 
 // Counts the stashed map items per atlas region (like the classic atlas
 // showed the number of map items in the player's bags on every node).
-function egAtlasCountStashedMaps() {
+export function egAtlasCountStashedMaps() {
     const counts = {};
     let stash = null;
     if (typeof _egMapStash !== 'undefined' && Array.isArray(_egMapStash)) stash = _egMapStash;
-    else if (typeof STATE !== 'undefined' && STATE.egMapStash && Array.isArray(STATE.egMapStash)) stash = STATE.egMapStash;
+    else if (typeof STATE !== 'undefined' && globalThis.STATE.egMapStash && Array.isArray(globalThis.STATE.egMapStash)) stash = globalThis.STATE.egMapStash;
     if (!stash) return counts;
     stash.forEach(tierGrid => {
         if (!Array.isArray(tierGrid)) return;
@@ -166,7 +178,7 @@ function egAtlasCountStashedMaps() {
 // Builds one region node: a small square (tier numeral inside) with the
 // region name floating above it. Hovering the node opens a custom
 // tooltip naming the region's fixed boss (see _egAtlasNodeBoss).
-function _egAtlasBuildNodeHTML(node) {
+export function _egAtlasBuildNodeHTML(node) {
     const status = _egAtlasNodeStatus(node);
     const name = egAtlasNodeName(node);
     const size = _egAtlasNodeSize(node.tier);
@@ -200,7 +212,7 @@ width:${size.w}px; height:${size.h + EG_ATLAS_LABEL_H}px;"
 // Hover tooltip for one region node: names the region's fixed boss
 // (emoji + name, the same red boss line the map-item tooltips show).
 // Falls back to the generic boss label when the boss cannot be resolved.
-function _egAtlasBuildNodeTooltipHTML(nodeId) {
+export function _egAtlasBuildNodeTooltipHTML(nodeId) {
     const node = (typeof egAtlasNodeById === 'function') ? egAtlasNodeById(nodeId) : null;
     if (!node) return '';
     const boss = _egAtlasNodeBoss(node);
@@ -222,7 +234,7 @@ function _egAtlasBuildNodeTooltipHTML(nodeId) {
 
 // Builds the whole SVG underlay: thin dotted connection lines, exactly
 // like the classic atlas drew them between region coordinates.
-function _egAtlasBuildLinksSVG() {
+export function _egAtlasBuildLinksSVG() {
     let lines = '';
     const drawn = new Set();
 
@@ -260,7 +272,7 @@ viewBox="0 0 ${EG_ATLAS_CANVAS_W} ${EG_ATLAS_CANVAS_H}">${lines}</svg>`;
 }
 
 // Builds the header strip: progress, the adjacent-map bonus and the search box.
-function _egAtlasBuildHeaderHTML() {
+export function _egAtlasBuildHeaderHTML() {
     const prog = egAtlasProgress();
     const pct = prog.total > 0 ? Math.round(100 * prog.completed / prog.total) : 0;
     const bonusPct = (typeof egAtlasAdjacentBonusPercent === 'function') ? egAtlasAdjacentBonusPercent() : 0;
@@ -301,7 +313,7 @@ function _egAtlasBuildHeaderHTML() {
 // opens the shared tooltip with the tier's region list + statuses - so
 // the sweep pacing of the atlas (which region of a tier is still missing)
 // is visible at a glance.
-function _egAtlasBuildTierProgressHTML() {
+export function _egAtlasBuildTierProgressHTML() {
     const cells = [];
     for (let tier = 1; tier <= EG_ATLAS_MAX_TIER; tier++) {
         const nodes = EG_ATLAS_NODES.filter(n => n.tier === tier);
@@ -324,7 +336,7 @@ function _egAtlasBuildTierProgressHTML() {
 
 // Shared-tooltip content for one tier strip cell: every region of the tier
 // with its status glyph and colour (✔ cleared · ? available · 🔒 locked).
-function _egAtlasBuildTierTooltipHTML(tier) {
+export function _egAtlasBuildTierTooltipHTML(tier) {
     const nodes = EG_ATLAS_NODES.filter(n => n.tier === tier);
     const done = nodes.filter(n => egAtlasIsCompleted(n.id)).length;
     const rows = nodes.map(n => {
@@ -343,7 +355,7 @@ function _egAtlasBuildTierTooltipHTML(tier) {
 }
 
 // Assembles the full atlas screen body.
-function _egAtlasBuildFullScreenHTML() {
+export function _egAtlasBuildFullScreenHTML() {
     return `
 <div class="ega-layout">
     <div class="eg-topbar">
@@ -375,7 +387,7 @@ function _egAtlasBuildFullScreenHTML() {
 //------------------------------------------------------------------------
 
 // Rebuilds canvas nodes/links.
-function _egAtlasRender() {
+export function _egAtlasRender() {
     const canvas = document.getElementById('ega-canvas');
     if (!canvas) return;
 
@@ -393,7 +405,7 @@ function _egAtlasRender() {
 }
 
 // Centers the scrollable viewport on the atlas heart.
-function _egAtlasCenterViewport() {
+export function _egAtlasCenterViewport() {
     const vp = document.querySelector('#screen-endgame-atlas .ega-viewport');
     const wrap = document.getElementById('ega-zoom-wrap');
     if (!vp || !wrap) return;
@@ -403,12 +415,12 @@ function _egAtlasCenterViewport() {
 
 //-------------------ZOOM & PAN-----------------------------------------
 
-function _egAtlasViewportEl() {
+export function _egAtlasViewportEl() {
     return document.querySelector('#screen-endgame-atlas .ega-viewport');
 }
 
 // Zoom level that shows the whole atlas inside the viewport.
-function _egAtlasComputeFitZoom() {
+export function _egAtlasComputeFitZoom() {
     const vp = _egAtlasViewportEl();
     if (!vp || !vp.clientWidth) return 1;
     return Math.min(1,
@@ -417,7 +429,7 @@ function _egAtlasComputeFitZoom() {
 }
 
 // Reapplies the current zoom to the wrap/canvas elements.
-function _egAtlasApplyZoomStyles() {
+export function _egAtlasApplyZoomStyles() {
     const wrap = document.getElementById('ega-zoom-wrap');
     const canvas = document.getElementById('ega-canvas');
     if (wrap) {
@@ -431,7 +443,7 @@ function _egAtlasApplyZoomStyles() {
 
 // Sets a new zoom level. With an anchor (viewport-relative x/y) the map
 // point under the anchor stays fixed - zooming into the cursor position.
-function _egAtlasSetZoom(z, ax, ay, isFit) {
+export function _egAtlasSetZoom(z, ax, ay, isFit) {
     const vp = _egAtlasViewportEl();
     if (!vp) return;
     z = Math.max(EG_ATLAS_ZOOM_MIN, Math.min(EG_ATLAS_ZOOM_MAX, z));
@@ -450,7 +462,7 @@ function _egAtlasSetZoom(z, ax, ay, isFit) {
 }
 
 // Steps zoom in/out around the viewport centre (the − / + buttons).
-function _egAtlasZoomStep(dir) {
+export function _egAtlasZoomStep(dir) {
     const vp = _egAtlasViewportEl();
     const ax = vp ? vp.clientWidth / 2 : null;
     const ay = vp ? vp.clientHeight / 2 : null;
@@ -458,14 +470,14 @@ function _egAtlasZoomStep(dir) {
 }
 
 // Resets the view: zoom so the whole atlas fits, centered.
-function _egAtlasZoomFit() {
+export function _egAtlasZoomFit() {
     _egAtlasSetZoom(_egAtlasComputeFitZoom(), null, null, true);
     _egAtlasCenterViewport();
 }
 
 // Delegated wheel / drag-pan / resize handling. Attached once to the
 // screen element (and window), so they survive the innerHTML refreshes.
-function _egAtlasAttachViewHandlers(screen) {
+export function _egAtlasAttachViewHandlers(screen) {
     // Wheel = zoom around the cursor position.
     screen.addEventListener('wheel', (e) => {
         if (!e.target.closest('.ega-viewport')) return;
@@ -515,10 +527,10 @@ function _egAtlasAttachViewHandlers(screen) {
     });
 }
 
-let _egAtlasPanEndedAt = 0;
+export let _egAtlasPanEndedAt = 0;
 
 // Refreshes the selected-node outline without rebuilding the canvas.
-function _egAtlasRefreshSelection() {
+export function _egAtlasRefreshSelection() {
     document.querySelectorAll('.ega-node.selected').forEach(el => el.classList.remove('selected'));
     if (!_egAtlasSelectedNodeId) return;
     const el = document.getElementById(`ega-node-${_egAtlasSelectedNodeId}`);
@@ -527,7 +539,7 @@ function _egAtlasRefreshSelection() {
 
 // Click handler: pin a region (outline highlight). Clicks that end a
 // pan drag are swallowed so panning never selects a node.
-function _egAtlasSelectNode(nodeId) {
+export function _egAtlasSelectNode(nodeId) {
     if (performance.now() - _egAtlasPanEndedAt < 150) return;
     _egAtlasSelectedNodeId = (_egAtlasSelectedNodeId === nodeId) ? null : nodeId;
     _egAtlasRefreshSelection();
@@ -538,7 +550,7 @@ function _egAtlasSelectNode(nodeId) {
 // either the roman numeral shown inside the nodes (e.g. 'XV',
 // case-insensitive) or the plain tier number (e.g. '15', 'tier 15').
 // Empty query clears the highlight.
-function _egAtlasSearch(query) {
+export function _egAtlasSearch(query) {
     _egAtlasSearchQuery = (query || '').trim();
     _egAtlasApplySearch();
 }
@@ -547,7 +559,7 @@ function _egAtlasSearch(query) {
 // tier): accepts the roman numerals I..XVI (case-insensitive, same set
 // the nodes display) and plain numbers 1-16, optionally prefixed with
 // 'tier' or 't' (e.g. 'tier 15', 't15').
-function _egAtlasQueryTier(q) {
+export function _egAtlasQueryTier(q) {
     if (!q) return 0;
     const numMatch = q.match(/^(?:t(?:ier)?\s*)?(\d{1,2})$/);
     if (numMatch) {
@@ -561,7 +573,7 @@ function _egAtlasQueryTier(q) {
     return idx >= 0 ? idx + 1 : 0;
 }
 
-function _egAtlasApplySearch() {
+export function _egAtlasApplySearch() {
     const canvas = document.getElementById('ega-canvas');
     if (!canvas) return;
 
@@ -581,7 +593,7 @@ function _egAtlasApplySearch() {
 //-------------------STYLES (INJECTED ONCE)-------------------------------
 //------------------------------------------------------------------------
 
-function _egAtlasEnsureStyles() {
+export function _egAtlasEnsureStyles() {
     if (document.getElementById('ega-atlas-style')) return;
 
     const style = document.createElement('style');
@@ -762,7 +774,7 @@ function _egAtlasEnsureStyles() {
 //-------------------SCREEN BOOTSTRAP-------------------------------------
 //------------------------------------------------------------------------
 
-function _egAtlasCreateScreen() {
+export function _egAtlasCreateScreen() {
     _egAtlasEnsureStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-atlas';
@@ -772,7 +784,7 @@ function _egAtlasCreateScreen() {
     _egAtlasAttachViewHandlers(screen);
 }
 
-function ensureEndgameAtlasScreen() {
+export function ensureEndgameAtlasScreen() {
     if (!document.getElementById('screen-endgame-atlas')) _egAtlasCreateScreen();
 }
 
@@ -780,7 +792,7 @@ function ensureEndgameAtlasScreen() {
 // An optional backFn argument (name of a global function, e.g.
 // 'showEndgameHub') overrides where the BACK button returns to - used
 // when the atlas is opened from the endgame hub character sheet.
-function showEndgameAtlas(backFn) {
+export function showEndgameAtlas(backFn) {
     if (typeof backFn === 'string') _egAtlasBackFn = _egResolveBackFn(backFn, EG_SCREEN_NAV.gate);
     else _egAtlasBackFn = EG_SCREEN_NAV.gate;
     ensureEndgameAtlasScreen();

@@ -1,19 +1,28 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { LANG } from '../translation/translations.js';
+import { ITEM_DEFS } from './item-definitions.js';
+
+//------------------------------------------------------------------------
 //------------------------CONSTANTS---------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Item sets used for passive-tree weight boosting, defined here so they
 // are not recreated on every pickRandomItem() call.
-const REVEAL_ITEM_IDS = new Set(['reveal1', 'reveal2', 'reveal3', 'reveal4', 'surveyScope']);
-const MARK_ITEM_IDS = new Set(['markWrong2', 'markWrong4', 'markWrong6', 'markWrong8']);
-const TUTOR_ITEM_IDS = new Set(['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll']);
-const SHIELD_ITEM_IDS = new Set(['shield']);
-const UTILITY_ITEM_IDS = new Set(['freeze', 'shield', 'mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll', 'scoutPrimer']);
+export const REVEAL_ITEM_IDS = new Set(['reveal1', 'reveal2', 'reveal3', 'reveal4', 'surveyScope']);
+export const MARK_ITEM_IDS = new Set(['markWrong2', 'markWrong4', 'markWrong6', 'markWrong8']);
+export const TUTOR_ITEM_IDS = new Set(['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll']);
+export const SHIELD_ITEM_IDS = new Set(['shield']);
+export const UTILITY_ITEM_IDS = new Set(['freeze', 'shield', 'mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll', 'scoutPrimer']);
 
 // Items that are only added to the drop pool when a specific passive node is unlocked.
 // Weight 3 is intentionally higher than typical base weights to make them noticeable drops.
-const NODE_LOCKED_ITEMS = [
+export const NODE_LOCKED_ITEMS = [
     { id: 'pearlOfHaste', node: 'pearl_of_haste' },
     { id: 'pearlOfSwiftness', node: 'pearl_of_swiftness' },
     { id: 'grandPearl', node: 'grand_pearl' },
@@ -23,17 +32,17 @@ const NODE_LOCKED_ITEMS = [
 ];
 
 // Maps common item IDs to their uncommon upgrade target (used by Common Refinement).
-const COMMON_REFINEMENT_UPGRADES = {
+export const COMMON_REFINEMENT_UPGRADES = {
     'reveal1': 'reveal2',
     'markWrong2': 'markWrong4',
     'addTime60': 'addTime300',
 };
 
 // Rarities that are considered "high value" for Apex Collector keystone checks.
-const APEX_COLLECTOR_VALID_RARITIES = new Set(['epic', 'legendary', 'artifact', 'cursed']);
+export const APEX_COLLECTOR_VALID_RARITIES = new Set(['epic', 'legendary', 'artifact', 'cursed']);
 
 // Color definitions per rarity tier, used for item UI rendering.
-const RARITY_COLOR_MAP = {
+export const RARITY_COLOR_MAP = {
     common: { border: '#7a7a7a', color: '#b0b0b0' },
     uncommon: { border: '#2ecc71', color: '#2ecc71' },
     rare: { border: '#3498db', color: '#3498db' },
@@ -46,7 +55,7 @@ const RARITY_COLOR_MAP = {
 // Passive-tree node -> boost amount tables, keyed by the category they affect.
 // Consumed by _calcWeightBoosts() via _sumSkillBoosts(). Kept as data here so
 // adding/tuning a tier doesn't require touching function bodies.
-const WEIGHT_BOOST_NODES = {
+export const WEIGHT_BOOST_NODES = {
     quality: [['quality_loot_1', 0.10], ['quality_loot_2', 0.10], ['quality_loot_3', 0.10]],
     cursed: [['cursed_attraction_1', 0.05], ['cursed_attraction_2', 0.05], ['cursed_attraction_3', 0.10]],
     reveal: [['seeker_of_light_1', 0.15], ['seeker_of_light_2', 0.15], ['seeker_of_light_3', 0.20]],
@@ -58,7 +67,7 @@ const WEIGHT_BOOST_NODES = {
 
 // Common Refinement node -> upgrade-chance amount table. Same shape as
 // WEIGHT_BOOST_NODES so it can go through the same _sumSkillBoosts() helper.
-const COMMON_REFINEMENT_NODES = [
+export const COMMON_REFINEMENT_NODES = [
     ['common_refinement_1', 0.05],
     ['common_refinement_2', 0.05],
     ['common_refinement_3', 0.10],
@@ -71,12 +80,12 @@ const COMMON_REFINEMENT_NODES = [
 //------------------------------------------------------------------------
 
 // Returns the localised display name for an item definition.
-function itemName(def) {
+export function itemName(def) {
     return (LANG === 'de' && def.nameDE) ? def.nameDE : def.nameEn;
 }
 
 // Returns the localised description for an item definition.
-function itemDesc(def) {
+export function itemDesc(def) {
     return (LANG === 'de' && def.descDE) ? def.descDE : def.descEn;
 }
 
@@ -88,13 +97,13 @@ function itemDesc(def) {
 
 // Returns border and text color for a given rarity string.
 // Falls back to CSS variables if the rarity is unknown.
-function rarityColors(rarity) {
+export function rarityColors(rarity) {
     return RARITY_COLOR_MAP[rarity] || { border: 'var(--border2)', color: 'var(--accent2)' };
 }
 
 // Returns true if the given rarity qualifies under Apex Collector rules
 // (i.e. the item would not be suppressed).
-function isApexValidRarity(rarity) {
+export function isApexValidRarity(rarity) {
     return APEX_COLLECTOR_VALID_RARITIES.has(rarity);
 }
 
@@ -105,13 +114,13 @@ function isApexValidRarity(rarity) {
 //------------------------------------------------------------------------
 
 // Builds the base item pool from ITEM_DEFS, excluding items with weight <= 0.
-function _buildBaseItemPool() {
+export function _buildBaseItemPool() {
     return Object.values(ITEM_DEFS).filter(d => d.weight > 0);
 }
 
 // Appends node-locked items to the pool if their corresponding passive node is unlocked.
 // These items are injected with a fixed weight of 3.
-function _injectNodeLockedItems(pool) {
+export function _injectNodeLockedItems(pool) {
     NODE_LOCKED_ITEMS.forEach(({ id, node }) => {
         if (ptHasSkill(node) && ITEM_DEFS[id]) {
             pool.push({ ...ITEM_DEFS[id], weight: 3 });
@@ -121,13 +130,13 @@ function _injectNodeLockedItems(pool) {
 
 // Sums the boost amount for every [node, amount] pair whose node is unlocked.
 // Shared by weight-boost calculation and Common Refinement's upgrade chance.
-function _sumSkillBoosts(nodeAmountPairs) {
+export function _sumSkillBoosts(nodeAmountPairs) {
     return nodeAmountPairs.reduce((total, [node, amount]) => total + (ptHasSkill(node) ? amount : 0), 0);
 }
 
 // Calculates all passive-tree weight boost multipliers in one place.
 // Each returned value is an additive fraction (e.g. 0.20 = +20%).
-function _calcWeightBoosts() {
+export function _calcWeightBoosts() {
     const boosts = {};
     for (const category in WEIGHT_BOOST_NODES) {
         boosts[category] = _sumSkillBoosts(WEIGHT_BOOST_NODES[category]);
@@ -137,7 +146,7 @@ function _calcWeightBoosts() {
 
 // Applies all passive-tree weight boosts to a single item entry.
 // Returns a new object with the adjusted weight; does not mutate the original.
-function _applyWeightBoosts(itemDef, boosts) {
+export function _applyWeightBoosts(itemDef, boosts) {
     let w = itemDef.weight;
     const r = itemDef.rarity;
 
@@ -154,7 +163,7 @@ function _applyWeightBoosts(itemDef, boosts) {
 
 // Builds the fully adjusted drop pool: base items + node-locked items,
 // with all passive-tree weight boosts applied.
-function _buildAdjustedItemPool() {
+export function _buildAdjustedItemPool() {
     const pool = _buildBaseItemPool();
     _injectNodeLockedItems(pool);
     const boosts = _calcWeightBoosts();
@@ -169,7 +178,7 @@ function _buildAdjustedItemPool() {
 
 // Attempts to upgrade a common item to its uncommon variant (Common Refinement node).
 // Returns the upgraded item ID if the roll succeeds, or the original ID otherwise.
-function _tryApplyCommonRefinement(itemDef) {
+export function _tryApplyCommonRefinement(itemDef) {
     const upgradeChance = _sumSkillBoosts(COMMON_REFINEMENT_NODES);
 
     if (upgradeChance > 0 && Math.random() < upgradeChance) {
@@ -182,14 +191,14 @@ function _tryApplyCommonRefinement(itemDef) {
 // Checks whether an item passes the Apex Collector keystone filter.
 // Apex Collector suppresses drops below epic/legendary/artifact/cursed rarity.
 // Returns true if the item should be kept, false if it should be suppressed.
-function _passesApexCollectorFilter(itemDef) {
+export function _passesApexCollectorFilter(itemDef) {
     if (!ptHasSkill('keystone_apex_collector')) return true;
     return isApexValidRarity(itemDef.rarity);
 }
 
 // Performs a weighted random roll over the adjusted pool and returns the item ID.
 // Returns null if Apex Collector suppresses the result.
-function _rollWeightedItem(adjustedPool) {
+export function _rollWeightedItem(adjustedPool) {
     const total = adjustedPool.reduce((sum, d) => sum + d.weight, 0);
     let roll = Math.random() * total;
 
@@ -216,14 +225,14 @@ function _rollWeightedItem(adjustedPool) {
 
 // Standard item drop: builds the pool, applies all boosts, then rolls.
 // Returns an item ID string, or null if Apex Collector suppresses the result.
-function pickRandomItem() {
+export function pickRandomItem() {
     const adjustedPool = _buildAdjustedItemPool();
     return _rollWeightedItem(adjustedPool);
 }
 
 // Lucky item drop (e.g. from bonus chests): same as pickRandomItem but with
 // a small flat chance to force-drop an artifact when Apex Collector is active.
-function pickLuckyItem() {
+export function pickLuckyItem() {
     if (ptHasSkill('keystone_apex_collector') && Math.random() < 0.03) return 'artifactComplete';
     return pickRandomItem();
 }

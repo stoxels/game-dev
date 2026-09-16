@@ -1,4 +1,16 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_AIL_IGNITE_DMG_SHARE, EG_AIL_MIN_DOT_DAMAGE, _egApplyPlayerAilment } from './endgame-ailments.js';
+import { _egPlayerTakeDamage } from './endgame-encounter.js';
+import { _egActiveMapItem, _egGetActiveMapModValue } from './endgame-map-launch.js';
+import { EG_MAX_MAP_TIER } from './endgame-maps.js';
+import { _egComputePlayerStats } from './endgame-player-stats.js';
+import { _egIsActive } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME MAP ELEMENTAL HAZARDS------------------------
 //------------------------------------------------------------------------
 // Screen-space environmental hazards driven by map modifier families:
@@ -38,144 +50,144 @@
 //-------------------TUNING CONSTANTS------------------------------------
 //------------------------------------------------------------------------
 
-const EG_HZ_LAVA_BASE_DMG_PCT = 2;        // legacy tick (kept for reference; lava now uses explosion)
-const EG_HZ_LAVA_TICK_MS = 600;           // (unused after fuse redesign, kept for compat)
-const EG_HZ_LAVA_MIN_R = 55;              // pool radius range (px)
-const EG_HZ_LAVA_MAX_R = 85;
-const EG_HZ_LAVA_SPEED_MIN = 20;          // drift speed range (px/s)
-const EG_HZ_LAVA_SPEED_MAX = 48;
-const EG_HZ_LAVA_EXPLOSION_BASE_DMG_PCT = 20; // % of playerMaxHP dealt when a lava ball explodes (heavy fire)
-const EG_HZ_LAVA_FUSE_MS = 500;           // delay between collision and detonation
-const EG_HZ_LAVA_RESPAWN_MS = 180000;     // 3 minutes until the same ball respawns (gameplay time, paused while game is paused)
-const EG_HZ_LAVA_BLAST_R = 140;           // explosion radius (px) - must evade after the 0.5s fuse
-const EG_HZ_LAVA_IGNITE_CHANCE_PCT = 55;  // chance to ignite the player if the blast hits
+export const EG_HZ_LAVA_BASE_DMG_PCT = 2;        // legacy tick (kept for reference; lava now uses explosion)
+export const EG_HZ_LAVA_TICK_MS = 600;           // (unused after fuse redesign, kept for compat)
+export const EG_HZ_LAVA_MIN_R = 55;              // pool radius range (px)
+export const EG_HZ_LAVA_MAX_R = 85;
+export const EG_HZ_LAVA_SPEED_MIN = 20;          // drift speed range (px/s)
+export const EG_HZ_LAVA_SPEED_MAX = 48;
+export const EG_HZ_LAVA_EXPLOSION_BASE_DMG_PCT = 20; // % of playerMaxHP dealt when a lava ball explodes (heavy fire)
+export const EG_HZ_LAVA_FUSE_MS = 500;           // delay between collision and detonation
+export const EG_HZ_LAVA_RESPAWN_MS = 180000;     // 3 minutes until the same ball respawns (gameplay time, paused while game is paused)
+export const EG_HZ_LAVA_BLAST_R = 140;           // explosion radius (px) - must evade after the 0.5s fuse
+export const EG_HZ_LAVA_IGNITE_CHANCE_PCT = 55;  // chance to ignite the player if the blast hits
 
-const EG_HZ_LIGHTNING_BASE_DMG_PCT = 8;   // % of playerMaxHP per strike
-const EG_HZ_LIGHTNING_WARNING_MS = 5000;  // telegraph time before impact
-const EG_HZ_LIGHTNING_RADIUS = 80;        // impact radius (px)
-const EG_HZ_LIGHTNING_INTERVAL_MIN_MS = 9000;
-const EG_HZ_LIGHTNING_INTERVAL_MAX_MS = 14000;
+export const EG_HZ_LIGHTNING_BASE_DMG_PCT = 8;   // % of playerMaxHP per strike
+export const EG_HZ_LIGHTNING_WARNING_MS = 5000;  // telegraph time before impact
+export const EG_HZ_LIGHTNING_RADIUS = 80;        // impact radius (px)
+export const EG_HZ_LIGHTNING_INTERVAL_MIN_MS = 9000;
+export const EG_HZ_LIGHTNING_INTERVAL_MAX_MS = 14000;
 
-const EG_HZ_ICICLE_BASE_DMG_PCT = 5;      // % of playerMaxHP per icicle hit
-const EG_HZ_ICICLE_FALL_SPEED = 1400;     // px/s while dropping
-const EG_HZ_ICICLE_SHAKE_MS = 750;
-const EG_HZ_ICICLE_SPAWN_MIN_MS = 3000;
-const EG_HZ_ICICLE_SPAWN_MAX_MS = 6000;
+export const EG_HZ_ICICLE_BASE_DMG_PCT = 5;      // % of playerMaxHP per icicle hit
+export const EG_HZ_ICICLE_FALL_SPEED = 1400;     // px/s while dropping
+export const EG_HZ_ICICLE_SHAKE_MS = 750;
+export const EG_HZ_ICICLE_SPAWN_MIN_MS = 3000;
+export const EG_HZ_ICICLE_SPAWN_MAX_MS = 6000;
 
-const EG_HZ_ARCANE_BASE_DMG_PCT = 7;      // % of playerMaxHP per beam hit
-const EG_HZ_ARCANE_CHARGE_MIN_MS = 8000;
-const EG_HZ_ARCANE_CHARGE_MAX_MS = 10000;
-const EG_HZ_ARCANE_BEAM_TRAVEL_MS = 450;  // right → left sweep duration
-const EG_HZ_ARCANE_BEAM_HEIGHT = 64;
-const EG_HZ_ARCANE_POLYMORPH_CHANCE_PCT = 40;
-const EG_HZ_ARCANE_INTERVAL_MIN_MS = 13000;
-const EG_HZ_ARCANE_INTERVAL_MAX_MS = 18000;
+export const EG_HZ_ARCANE_BASE_DMG_PCT = 7;      // % of playerMaxHP per beam hit
+export const EG_HZ_ARCANE_CHARGE_MIN_MS = 8000;
+export const EG_HZ_ARCANE_CHARGE_MAX_MS = 10000;
+export const EG_HZ_ARCANE_BEAM_TRAVEL_MS = 450;  // right → left sweep duration
+export const EG_HZ_ARCANE_BEAM_HEIGHT = 64;
+export const EG_HZ_ARCANE_POLYMORPH_CHANCE_PCT = 40;
+export const EG_HZ_ARCANE_INTERVAL_MIN_MS = 13000;
+export const EG_HZ_ARCANE_INTERVAL_MAX_MS = 18000;
 
-const EG_HZ_METEOR_BASE_DMG_PCT = 6;       // % of playerMaxHP per meteor impact
-const EG_HZ_METEOR_WARNING_MS = 1400;      // telegraph time per meteor
-const EG_HZ_METEOR_FALL_MS = 420;          // descent duration once fired
-const EG_HZ_METEOR_RADIUS = 70;            // impact radius (px)
-const EG_HZ_METEOR_VOLLEY_MIN = 3;
-const EG_HZ_METEOR_VOLLEY_MAX = 6;
-const EG_HZ_METEOR_IGNITE_CHANCE_PCT = 40;
-const EG_HZ_METEOR_INTERVAL_MIN_MS = 7000;
-const EG_HZ_METEOR_INTERVAL_MAX_MS = 11000;
+export const EG_HZ_METEOR_BASE_DMG_PCT = 6;       // % of playerMaxHP per meteor impact
+export const EG_HZ_METEOR_WARNING_MS = 1400;      // telegraph time per meteor
+export const EG_HZ_METEOR_FALL_MS = 420;          // descent duration once fired
+export const EG_HZ_METEOR_RADIUS = 70;            // impact radius (px)
+export const EG_HZ_METEOR_VOLLEY_MIN = 3;
+export const EG_HZ_METEOR_VOLLEY_MAX = 6;
+export const EG_HZ_METEOR_IGNITE_CHANCE_PCT = 40;
+export const EG_HZ_METEOR_INTERVAL_MIN_MS = 7000;
+export const EG_HZ_METEOR_INTERVAL_MAX_MS = 11000;
 
-const EG_HZ_VOLATILE_BASE_DMG_PCT = 9;     // % of playerMaxHP per detonation
-const EG_HZ_VOLATILE_SPEED_MIN = 26;       // homing speed range (px/s)
-const EG_HZ_VOLATILE_SPEED_MAX = 60;
-const EG_HZ_VOLATILE_TRIGGER_R = 90;       // starts fusing when this close
-const EG_HZ_VOLATILE_FUSE_MS = 1100;       // flashing fuse before detonation
-const EG_HZ_VOLATILE_BLAST_R = 110;        // detonation radius (px)
-const EG_HZ_VOLATILE_LIFETIME_MS = 16000;  // fuses anyway so it can't stall
-const EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT = 60;
-const EG_HZ_VOLATILE_RESPAWN_MIN_MS = 4000;
-const EG_HZ_VOLATILE_RESPAWN_MAX_MS = 8000;
+export const EG_HZ_VOLATILE_BASE_DMG_PCT = 9;     // % of playerMaxHP per detonation
+export const EG_HZ_VOLATILE_SPEED_MIN = 26;       // homing speed range (px/s)
+export const EG_HZ_VOLATILE_SPEED_MAX = 60;
+export const EG_HZ_VOLATILE_TRIGGER_R = 90;       // starts fusing when this close
+export const EG_HZ_VOLATILE_FUSE_MS = 1100;       // flashing fuse before detonation
+export const EG_HZ_VOLATILE_BLAST_R = 110;        // detonation radius (px)
+export const EG_HZ_VOLATILE_LIFETIME_MS = 16000;  // fuses anyway so it can't stall
+export const EG_HZ_VOLATILE_SHADOWBURN_CHANCE_PCT = 60;
+export const EG_HZ_VOLATILE_RESPAWN_MIN_MS = 4000;
+export const EG_HZ_VOLATILE_RESPAWN_MAX_MS = 8000;
 
-const EG_HZ_FROSTNOVA_BASE_DMG_PCT = 7;    // % of playerMaxHP per nova hit
-const EG_HZ_FROSTNOVA_EXPAND_MS = 1600;    // ring expansion duration
-const EG_HZ_FROSTNOVA_MAX_R = 170;         // final ring radius (px)
-const EG_HZ_FROSTNOVA_BAND = 26;           // damaging band thickness (px)
-const EG_HZ_FROSTNOVA_FREEZE_CHANCE_PCT = 30;
-const EG_HZ_FROSTNOVA_INTERVAL_MIN_MS = 6000;
-const EG_HZ_FROSTNOVA_INTERVAL_MAX_MS = 10000;
+export const EG_HZ_FROSTNOVA_BASE_DMG_PCT = 7;    // % of playerMaxHP per nova hit
+export const EG_HZ_FROSTNOVA_EXPAND_MS = 1600;    // ring expansion duration
+export const EG_HZ_FROSTNOVA_MAX_R = 170;         // final ring radius (px)
+export const EG_HZ_FROSTNOVA_BAND = 26;           // damaging band thickness (px)
+export const EG_HZ_FROSTNOVA_FREEZE_CHANCE_PCT = 30;
+export const EG_HZ_FROSTNOVA_INTERVAL_MIN_MS = 6000;
+export const EG_HZ_FROSTNOVA_INTERVAL_MAX_MS = 10000;
 
-const EG_HZ_FIREWALL_BASE_DMG_PCT = 18;    // % of playerMaxHP per wall hit - significant fire wave (was 8, too low)
-const EG_HZ_FIREWALL_HEIGHT = 150;         // flame wave thickness (px)
-const EG_HZ_FIREWALL_WARNING_MS = 5000;    // telegraph before ignition
-const EG_HZ_FIREWALL_SWEEP_MS = 2600;      // sweep duration (direction depends on variant)
-const EG_HZ_FIREWALL_IGNITE_CHANCE_PCT = 50;
-const EG_HZ_FIREWALL_INTERVAL_MIN_MS = 8000;
-const EG_HZ_FIREWALL_INTERVAL_MAX_MS = 12000;
+export const EG_HZ_FIREWALL_BASE_DMG_PCT = 18;    // % of playerMaxHP per wall hit - significant fire wave (was 8, too low)
+export const EG_HZ_FIREWALL_HEIGHT = 150;         // flame wave thickness (px)
+export const EG_HZ_FIREWALL_WARNING_MS = 5000;    // telegraph before ignition
+export const EG_HZ_FIREWALL_SWEEP_MS = 2600;      // sweep duration (direction depends on variant)
+export const EG_HZ_FIREWALL_IGNITE_CHANCE_PCT = 50;
+export const EG_HZ_FIREWALL_INTERVAL_MIN_MS = 8000;
+export const EG_HZ_FIREWALL_INTERVAL_MAX_MS = 12000;
 // Outplay tuning - safe-zone insets and gap geometry for firewall variations
 // Top safe-zone must clear the avatar HUD (wrapper at top:4px + ~150px tall incl.
 // HP/charge bars).  Bottom safe-zone is less constrained so it stays smaller.
-const EG_HZ_FIREWALL_SAFE_MIN = 90;        // legacy generic (kept for compat)
-const EG_HZ_FIREWALL_SAFE_MAX = 160;
-const EG_HZ_FIREWALL_TOP_SAFE_MIN = 185;   // offsetTop: safe strip at very top (px)
-const EG_HZ_FIREWALL_TOP_SAFE_MAX = 260;
-const EG_HZ_FIREWALL_BOTTOM_SAFE_MIN = 90; // offsetBottom: safe strip at very bottom (px)
-const EG_HZ_FIREWALL_BOTTOM_SAFE_MAX = 165;
-const EG_HZ_FIREWALL_GAP_MIN_W = 180;      // minimum gap width for gap variants (px)
-const EG_HZ_FIREWALL_GAP_MAX_W = 280;      // maximum gap width (px)
-const EG_HZ_FIREWALL_GAP_MARGIN = 70;      // keep gap at least this far from screen edges (px)
+export const EG_HZ_FIREWALL_SAFE_MIN = 90;        // legacy generic (kept for compat)
+export const EG_HZ_FIREWALL_SAFE_MAX = 160;
+export const EG_HZ_FIREWALL_TOP_SAFE_MIN = 185;   // offsetTop: safe strip at very top (px)
+export const EG_HZ_FIREWALL_TOP_SAFE_MAX = 260;
+export const EG_HZ_FIREWALL_BOTTOM_SAFE_MIN = 90; // offsetBottom: safe strip at very bottom (px)
+export const EG_HZ_FIREWALL_BOTTOM_SAFE_MAX = 165;
+export const EG_HZ_FIREWALL_GAP_MIN_W = 180;      // minimum gap width for gap variants (px)
+export const EG_HZ_FIREWALL_GAP_MAX_W = 280;      // maximum gap width (px)
+export const EG_HZ_FIREWALL_GAP_MARGIN = 70;      // keep gap at least this far from screen edges (px)
 
-const EG_HZ_CYCLONE_BASE_DMG_PCT = 1.6;    // % of playerMaxHP per wind tick
-const EG_HZ_CYCLONE_TICK_MS = 500;         // damage tick rate inside a cyclone
-const EG_HZ_CYCLONE_R_MIN = 40;            // funnel radius range (px)
-const EG_HZ_CYCLONE_R_MAX = 62;
-const EG_HZ_CYCLONE_SPEED_MIN = 90;        // drift speed range (px/s)
-const EG_HZ_CYCLONE_SPEED_MAX = 170;
+export const EG_HZ_CYCLONE_BASE_DMG_PCT = 1.6;    // % of playerMaxHP per wind tick
+export const EG_HZ_CYCLONE_TICK_MS = 500;         // damage tick rate inside a cyclone
+export const EG_HZ_CYCLONE_R_MIN = 40;            // funnel radius range (px)
+export const EG_HZ_CYCLONE_R_MAX = 62;
+export const EG_HZ_CYCLONE_SPEED_MIN = 90;        // drift speed range (px/s)
+export const EG_HZ_CYCLONE_SPEED_MAX = 170;
 
-const EG_HZ_DELIRIUM_INTERVAL_MIN_MS = 18000;
-const EG_HZ_DELIRIUM_INTERVAL_MAX_MS = 26000;
-const EG_HZ_DELIRIUM_FADE_IN_MS = 2500;
-const EG_HZ_DELIRIUM_HOLD_MS = 4000;
-const EG_HZ_DELIRIUM_FADE_OUT_MS = 2000;
-const EG_HZ_DELIRIUM_POLYMORPH_CHANCE_PCT = 45;
+export const EG_HZ_DELIRIUM_INTERVAL_MIN_MS = 18000;
+export const EG_HZ_DELIRIUM_INTERVAL_MAX_MS = 26000;
+export const EG_HZ_DELIRIUM_FADE_IN_MS = 2500;
+export const EG_HZ_DELIRIUM_HOLD_MS = 4000;
+export const EG_HZ_DELIRIUM_FADE_OUT_MS = 2000;
+export const EG_HZ_DELIRIUM_POLYMORPH_CHANCE_PCT = 45;
 
-const EG_HZ_LAYER_Z = 850;                // below player avatar (z:1000)
+export const EG_HZ_LAYER_Z = 850;                // below player avatar (z:1000)
 
 
 //------------------------------------------------------------------------
 //-------------------RUNTIME STATE---------------------------------------
 //------------------------------------------------------------------------
 
-let _egHzActive = false;
-let _egHzLayer = null;
-let _egHzPausedForQuiz = false;
+export let _egHzActive = false;
+export let _egHzLayer = null;
+export let _egHzPausedForQuiz = false;
 
-let _egHzLava = null;       // { pools: [{x,y,r,vx,vy,el,dmgAcc}], dmgMult }
-let _egHzLightning = null;  // { pending: [{x,y,t,el}], nextIn }
-let _egHzBlizzard = null;   // { icicles: [], spawnIn, maxIcicles }
-let _egHzDarkness = null;   // { clouds: [] }
-let _egHzArcane = null;     // { charge: null | {...}, beam: null | {...}, nextIn }
-let _egHzMeteor = null;     // { pending: [{x,y,t,warnEl,state,el,y}], nextIn, intervalScale, dmgMult }
-let _egHzVolatile = null;   // { wisps: [], respawnIn, maxWisps, dmgMult }
-let _egHzFrostNova = null;  // { novas: [], nextIn, intervalScale, dmgMult }
-let _egHzFirewall = null;   // { pending: [{t,y,dir,totalDist,endY,variant,gapX,gapW,wallEls,warningEls,hitDone}], nextIn, intervalScale, dmgMult }
-let _egHzCyclone = null;    // { vortices: [{x,y,r,vx,vy,dmgAcc,el}], dmgMult }
-let _egHzDelirium = null;   // { phase, nextIn, t, el, rolled }
+export let _egHzLava = null;       // { pools: [{x,y,r,vx,vy,el,dmgAcc}], dmgMult }
+export let _egHzLightning = null;  // { pending: [{x,y,t,el}], nextIn }
+export let _egHzBlizzard = null;   // { icicles: [], spawnIn, maxIcicles }
+export let _egHzDarkness = null;   // { clouds: [] }
+export let _egHzArcane = null;     // { charge: null | {...}, beam: null | {...}, nextIn }
+export let _egHzMeteor = null;     // { pending: [{x,y,t,warnEl,state,el,y}], nextIn, intervalScale, dmgMult }
+export let _egHzVolatile = null;   // { wisps: [], respawnIn, maxWisps, dmgMult }
+export let _egHzFrostNova = null;  // { novas: [], nextIn, intervalScale, dmgMult }
+export let _egHzFirewall = null;   // { pending: [{t,y,dir,totalDist,endY,variant,gapX,gapW,wallEls,warningEls,hitDone}], nextIn, intervalScale, dmgMult }
+export let _egHzCyclone = null;    // { vortices: [{x,y,r,vx,vy,dmgAcc,el}], dmgMult }
+export let _egHzDelirium = null;   // { phase, nextIn, t, el, rolled }
 
 
 //------------------------------------------------------------------------
 //-------------------SMALL HELPERS---------------------------------------
 //------------------------------------------------------------------------
 
-function _egHzIntensity(familyId) {
+export function _egHzIntensity(familyId) {
     if (typeof _egGetActiveMapModValue !== 'function') return 0;
     return _egGetActiveMapModValue(familyId);
 }
 
 // Damage multiplier from the rolled intensity value (e.g. 60 → ×1.6).
-function _egHzMult(intensity) {
+export function _egHzMult(intensity) {
     return 1 + Math.max(0, intensity) / 100;
 }
 
 // Map-tier scaling for elemental hazards: higher tiers deal significantly
 // more hazard damage so hazards stay challenging in late endgame. Tier 1
 // is 1.0×, each additional tier adds ~7% (T16 ≈ 2.05×).
-function _egHzTierMult() {
+export function _egHzTierMult() {
     let tier = 1;
     try {
         if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem && _egActiveMapItem.mapTier != null) {
@@ -190,11 +202,11 @@ function _egHzTierMult() {
     return 1 + (tier - 1) * 0.07;
 }
 
-function _egHzRand(min, max) {
+export function _egHzRand(min, max) {
     return min + Math.random() * (max - min);
 }
 
-function _egHzPlayerEl() {
+export function _egHzPlayerEl() {
     return document.getElementById('player-avatar-wrapper') ||
            document.getElementById('player-avatar-simple');
 }
@@ -204,7 +216,7 @@ function _egHzPlayerEl() {
 // #player-avatar-simple 128px) is taller than the artwork, so using its
 // center/bounds misaligns collision by ~30–40px and makes lava/volatile
 // feel "off" while blizzard walls hit the bars.
-function _egHzPlayerSpriteRect() {
+export function _egHzPlayerSpriteRect() {
     let img = document.getElementById('avatar-sprite-img');
     if (!img || !img.getBoundingClientRect) img = null;
     let r = img ? img.getBoundingClientRect() : null;
@@ -216,7 +228,7 @@ function _egHzPlayerSpriteRect() {
     return null;
 }
 
-function _egHzPlayerRect() {
+export function _egHzPlayerRect() {
     // Primary: tight box around the sprite image with insets for
     // transparent padding (cape/shoulders/feet). Fallback: wrapper rect
     // with top cropped where HP/charge bars live.
@@ -251,13 +263,13 @@ function _egHzPlayerRect() {
 }
 
 // Alias used at call-sites for clarity - identical to _egHzPlayerRect().
-function _egHzPlayerHitbox() {
+export function _egHzPlayerHitbox() {
     return _egHzPlayerRect();
 }
 
 // Bounding box of the puzzle grid INCLUDING row/col clue number cells -
 // #ptable is one table containing both, so its rect already covers them.
-function _egHzGridRect(pad) {
+export function _egHzGridRect(pad) {
     const g = document.getElementById('ptable');
     if (!g) return null;
     const r = g.getBoundingClientRect();
@@ -270,13 +282,13 @@ function _egHzGridRect(pad) {
     };
 }
 
-function _egHzRectsOverlap(a, b) {
+export function _egHzRectsOverlap(a, b) {
     return !!a && !!b &&
         a.left < b.right && a.right > b.left &&
         a.top < b.bottom && a.bottom > b.top;
 }
 
-function _egHzCircleRectOverlap(x, y, r, rect) {
+export function _egHzCircleRectOverlap(x, y, r, rect) {
     if (!rect) return false;
     const cx = Math.max(rect.left, Math.min(x, rect.right));
     const cy = Math.max(rect.top, Math.min(y, rect.bottom));
@@ -286,7 +298,7 @@ function _egHzCircleRectOverlap(x, y, r, rect) {
 
 // Shared hazard hit resolution: use the same overlap rule for every circular
 // impact and apply the ailment only when the hit actually dealt damage.
-function _egHzApplyCircleHit(x, y, radius, pr, damagePct, element, color, ailment, ailmentDps) {
+export function _egHzApplyCircleHit(x, y, radius, pr, damagePct, element, color, ailment, ailmentDps) {
     if (!pr || !_egHzCircleRectOverlap(x, y, radius, pr)) return false;
     const dealt = _egHzDamage(damagePct, element, color);
     if (dealt > 0 && ailment && typeof _egApplyPlayerAilment === 'function') {
@@ -295,7 +307,7 @@ function _egHzApplyCircleHit(x, y, radius, pr, damagePct, element, color, ailmen
     return true;
 }
 
-function _egHzRectInsideCircle(rect, cx, cy, r) {
+export function _egHzRectInsideCircle(rect, cx, cy, r) {
     if (!rect) return false;
     const r2 = r * r;
     const corners = [
@@ -309,7 +321,7 @@ function _egHzRectInsideCircle(rect, cx, cy, r) {
     return true;
 }
 
-function _egHzRingRectOverlap(x, y, radius, band, rect) {
+export function _egHzRingRectOverlap(x, y, radius, band, rect) {
     if (!rect) return false;
     const outer = radius + band;
     if (!_egHzCircleRectOverlap(x, y, outer, rect)) return false;
@@ -323,7 +335,7 @@ function _egHzRingRectOverlap(x, y, radius, band, rect) {
     return true;
 }
 
-function _egHzSweptCircleRectOverlap(x0, y0, x1, y1, r, rect) {
+export function _egHzSweptCircleRectOverlap(x0, y0, x1, y1, r, rect) {
     if (!rect) return false;
     if (_egHzCircleRectOverlap(x0, y0, r, rect)) return true;
     if (_egHzCircleRectOverlap(x1, y1, r, rect)) return true;
@@ -351,7 +363,7 @@ function _egHzSweptCircleRectOverlap(x0, y0, x1, y1, r, rect) {
 
 // Samples a random viewport point that lies OUTSIDE the puzzle-grid rect
 // (inflated by `pad`). Falls back to any viewport point after 40 tries.
-function _egHzPointOutsideGrid(pad) {
+export function _egHzPointOutsideGrid(pad) {
     const vw = window.innerWidth, vh = window.innerHeight;
     const grid = _egHzGridRect(pad || 0);
     for (let i = 0; i < 40; i++) {
@@ -370,9 +382,9 @@ function _egHzPointOutsideGrid(pad) {
 // normal intake pipeline → resistances / dodge / block / shock amp apply.
 // Scales with both intensity (via caller) and map tier (here) so high-tier
 // maps remain challenging even when hazard intensity is moderate.
-function _egHzDamage(pctOfMaxHP, element, colorHex) {
+export function _egHzDamage(pctOfMaxHP, element, colorHex) {
     if (!_egIsActive()) return 0;
-    const maxHP = (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
+    const maxHP = (typeof playerMaxHP !== 'undefined' && globalThis.playerMaxHP > 0) ? globalThis.playerMaxHP : 100;
     const tierMult = _egHzTierMult();
     const amount = Math.max(1, Math.round(maxHP * pctOfMaxHP * tierMult / 100));
     const dealt = _egPlayerTakeDamage(amount, true, element);
@@ -381,7 +393,7 @@ function _egHzDamage(pctOfMaxHP, element, colorHex) {
 }
 
 // Small floating damage label on the player avatar.
-function _egHzShowHitText(amount, colorHex) {
+export function _egHzShowHitText(amount, colorHex) {
     if (!(amount > 0)) return;
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
@@ -400,7 +412,7 @@ function _egHzShowHitText(amount, colorHex) {
 
 // Starts all hazards present on the active map. Called from
 // _egResetEncounterState when an encounter begins.
-function _egHazardsReset() {
+export function _egHazardsReset() {
     _egHazardsCleanup();
     if (!_egIsActive()) return;
 
@@ -450,11 +462,11 @@ function _egHazardsReset() {
     _egHzActive = true;
     _egHzPausedForQuiz = false;
     if (_egHzLayer) _egHzLayer.style.display = '';
-    showToast(`☠️ Elemental Hazards active: ${active.join(' ')}`);
+    globalThis.showToast(`☠️ Elemental Hazards active: ${active.join(' ')}`);
 }
 
 // Tears down every hazard DOM node and state. Safe to call anytime.
-function _egHazardsCleanup() {
+export function _egHazardsCleanup() {
     _egHzActive = false;
     _egHzPausedForQuiz = false;
     _egHzLava = null;
@@ -481,7 +493,7 @@ function _egHazardsCleanup() {
 // Hides all hazard visuals and pauses hazard ticks while a quiz modal
 // is visible so the question remains readable and the player is not
 // damaged by invisible hazards.
-function _egHazardsHideForQuiz() {
+export function _egHazardsHideForQuiz() {
     if (!_egHzActive || _egHzPausedForQuiz) return;
     _egHzPausedForQuiz = true;
     if (_egHzLayer) _egHzLayer.style.display = 'none';
@@ -490,7 +502,7 @@ function _egHazardsHideForQuiz() {
 
 // Re-shows hazard visuals and resumes ticking when the next puzzle launches
 // (or after a standalone interstitial question is dismissed).
-function _egHazardsShowAfterQuiz() {
+export function _egHazardsShowAfterQuiz() {
     if (!_egHzPausedForQuiz) return;
     _egHzPausedForQuiz = false;
     if (_egHzLayer) _egHzLayer.style.display = '';
@@ -498,10 +510,10 @@ function _egHazardsShowAfterQuiz() {
 }
 
 // Per-tick driver - called at 10Hz from _egTickLoop.
-function _egHazardsTick() {
+export function _egHazardsTick() {
     if (!_egHzActive) return;
     if (_egHzPausedForQuiz) return;
-    if (typeof dead !== 'undefined' && dead) return;
+    if (typeof dead !== 'undefined' && globalThis.dead) return;
     const dtMs = 100;
 
     if (_egHzLava) _egHzTickLava(dtMs);
@@ -522,7 +534,7 @@ function _egHazardsTick() {
 //-------------------LAVA BALLS-------------------------------------------
 //------------------------------------------------------------------------
 
-function _egHzCreateLavaPool() {
+export function _egHzCreateLavaPool() {
     const r = _egHzRand(EG_HZ_LAVA_MIN_R, EG_HZ_LAVA_MAX_R);
     const pos = _egHzPointOutsideGrid(r + 24);
     const speed = _egHzRand(EG_HZ_LAVA_SPEED_MIN, EG_HZ_LAVA_SPEED_MAX);
@@ -546,14 +558,14 @@ function _egHzCreateLavaPool() {
     };
 }
 
-function _egHzTriggerLavaFuse(pool) {
+export function _egHzTriggerLavaFuse(pool) {
     if (!pool || pool.state !== 'active') return;
     pool.state = 'fusing';
     pool.fuseT = EG_HZ_LAVA_FUSE_MS;
     if (pool.el) pool.el.classList.add('eg-hz-lava-fuse');
 }
 
-function _egHzDetonateLava(pool) {
+export function _egHzDetonateLava(pool) {
     if (!pool) return;
     const bx = pool.x;
     const by = pool.y;
@@ -598,7 +610,7 @@ function _egHzDetonateLava(pool) {
         EG_HZ_LAVA_EXPLOSION_BASE_DMG_PCT * _egHzLava.dmgMult,
         'fire', '#ff6b4a',
         Math.random() * 100 < EG_HZ_LAVA_IGNITE_CHANCE_PCT ? 'ignite' : null,
-        Math.max(EG_AIL_MIN_DOT_DAMAGE, (playerMaxHP || 100) * EG_AIL_IGNITE_DMG_SHARE / 100))) {
+        Math.max(EG_AIL_MIN_DOT_DAMAGE, (globalThis.playerMaxHP || 100) * EG_AIL_IGNITE_DMG_SHARE / 100))) {
         // Damage and ailment application are handled consistently above.
     }
 
@@ -608,7 +620,7 @@ function _egHzDetonateLava(pool) {
     pool.fuseT = 0;
 }
 
-function _egHzRespawnLavaPool(pool) {
+export function _egHzRespawnLavaPool(pool) {
     const fresh = _egHzCreateLavaPool();
     // Reuse the same object identity so the pools array stays stable
     pool.x = fresh.x; pool.y = fresh.y; pool.r = fresh.r;
@@ -622,7 +634,7 @@ function _egHzRespawnLavaPool(pool) {
     // Ensure blast/fuse classes are clean (fresh element is clean by construction)
 }
 
-function _egHzInitLava(intensity) {
+export function _egHzInitLava(intensity) {
     // ~8 balls at low intensity (tier 3), scaling up to a cap of 14 at high
     // intensity (tier 1):  25 → 7 | 45 → 8 | 50 → 9 | 75 → 10 | 80 → 11 | 100 → 12
     const count = Math.min(14, 5 + Math.round(intensity / 16));
@@ -633,7 +645,7 @@ function _egHzInitLava(intensity) {
     _egHzLava = { pools, dmgMult: _egHzMult(intensity), intensity };
 }
 
-function _egHzTickLava(dtMs) {
+export function _egHzTickLava(dtMs) {
     const dtS = dtMs / 1000;
     const grid = _egHzGridRect(10);
     const pr = _egHzPlayerHitbox();
@@ -686,7 +698,7 @@ function _egHzTickLava(dtMs) {
 //-------------------LIGHTNING STORM--------------------------------------
 //------------------------------------------------------------------------
 
-function _egHzInitLightning(intensity) {
+export function _egHzInitLightning(intensity) {
     _egHzLightning = {
         pending: [],
         nextIn: _egHzRand(2500, 5000),
@@ -695,7 +707,7 @@ function _egHzInitLightning(intensity) {
     };
 }
 
-function _egHzTickLightning(dtMs) {
+export function _egHzTickLightning(dtMs) {
     const st = _egHzLightning;
 
     st.nextIn -= dtMs;
@@ -738,7 +750,7 @@ function _egHzTickLightning(dtMs) {
 //-------------------BLIZZARD---------------------------------------------
 //------------------------------------------------------------------------
 
-function _egHzInitBlizzard(intensity) {
+export function _egHzInitBlizzard(intensity) {
     // Full-screen snow layer (visual only - never blocks clicks).
     const overlay = document.createElement('div');
     overlay.className = 'eg-hz-blizzard';
@@ -767,7 +779,7 @@ function _egHzInitBlizzard(intensity) {
     };
 }
 
-function _egHzSpawnIcicle() {
+export function _egHzSpawnIcicle() {
     const w = _egHzRand(28, 44);
     const h = _egHzRand(60, 115);
     const x = _egHzRand(20, window.innerWidth - w - 20);
@@ -786,7 +798,7 @@ function _egHzSpawnIcicle() {
     };
 }
 
-function _egHzTickBlizzard(dtMs) {
+export function _egHzTickBlizzard(dtMs) {
     const st = _egHzBlizzard;
 
     st.spawnIn -= dtMs;
@@ -853,7 +865,7 @@ function _egHzTickBlizzard(dtMs) {
 //-------------------DARKNESS CLOUDS--------------------------------------
 //------------------------------------------------------------------------
 
-function _egHzInitDarkness(intensity) {
+export function _egHzInitDarkness(intensity) {
     // Shadow Resistance thins the clouds (min opacity floor keeps them fair).
     let shadowResist = 0;
     try {
@@ -892,7 +904,7 @@ function _egHzInitDarkness(intensity) {
     _egHzDarkness = { clouds, layer: darkLayer, blinded: false };
 }
 
-function _egHzTickDarkness(dtMs) {
+export function _egHzTickDarkness(dtMs) {
     const dtS = dtMs / 1000;
     const vw = window.innerWidth;
     const pr = _egHzPlayerHitbox();
@@ -924,7 +936,7 @@ function _egHzTickDarkness(dtMs) {
     }
 }
 
-function _egIsPlayerInDarknessCloud() {
+export function _egIsPlayerInDarknessCloud() {
     return !!(_egHzActive && _egHzDarkness && _egHzDarkness.blinded);
 }
 
@@ -933,7 +945,7 @@ function _egIsPlayerInDarknessCloud() {
 //-------------------ARCANE STORM-----------------------------------------
 //------------------------------------------------------------------------
 
-function _egHzInitArcane(intensity) {
+export function _egHzInitArcane(intensity) {
     _egHzArcane = {
         charge: null,
         beam: null,
@@ -943,7 +955,7 @@ function _egHzInitArcane(intensity) {
     };
 }
 
-function _egHzStartArcaneCharge() {
+export function _egHzStartArcaneCharge() {
     const y = _egHzRand(120, Math.max(140, window.innerHeight - 180));
     const chargeMs = _egHzRand(EG_HZ_ARCANE_CHARGE_MIN_MS, EG_HZ_ARCANE_CHARGE_MAX_MS);
     const size = 46;
@@ -962,7 +974,7 @@ function _egHzStartArcaneCharge() {
     _egHzArcane.charge = { y, t: chargeMs, total: chargeMs, orb, size };
 }
 
-function _egHzTickArcane(dtMs) {
+export function _egHzTickArcane(dtMs) {
     const st = _egHzArcane;
 
     // ── Charging phase ────────────────────────────────────────────────
@@ -1014,7 +1026,7 @@ function _egHzTickArcane(dtMs) {
     }
 }
 
-function _egHzFireArcaneBeam() {
+export function _egHzFireArcaneBeam() {
     const st = _egHzArcane;
     if (!st.charge) return;
     const y = st.charge.y;
@@ -1044,7 +1056,7 @@ function _egHzFireArcaneBeam() {
 // PoE-style meteor volleys: every interval a salvo of meteors telegraphs
 // impact circles, then slams down from above. Fire damage, may ignite.
 
-function _egHzInitMeteor(intensity) {
+export function _egHzInitMeteor(intensity) {
     _egHzMeteor = {
         pending: [],
         nextIn: _egHzRand(3000, 6000),
@@ -1053,7 +1065,7 @@ function _egHzInitMeteor(intensity) {
     };
 }
 
-function _egHzSpawnMeteor(delayMs) {
+export function _egHzSpawnMeteor(delayMs) {
     const pos = _egHzPointOutsideGrid(EG_HZ_METEOR_RADIUS * 0.6);
     const el = document.createElement('div');
     el.className = 'eg-hz-meteor-warning';
@@ -1071,7 +1083,7 @@ function _egHzSpawnMeteor(delayMs) {
     });
 }
 
-function _egHzTickMeteor(dtMs) {
+export function _egHzTickMeteor(dtMs) {
     const st = _egHzMeteor;
 
     st.nextIn -= dtMs;
@@ -1143,7 +1155,7 @@ function _egHzTickMeteor(dtMs) {
 // in on the player. When close (or after a lifetime) they flash briefly,
 // then detonate - shadow damage in a blast radius, may inflict Shadow Burn.
 
-function _egHzInitVolatile(intensity) {
+export function _egHzInitVolatile(intensity) {
     const maxWisps = Math.min(6, 1 + Math.round(intensity / 22));
     _egHzVolatile = {
         wisps: [],
@@ -1167,7 +1179,7 @@ function _egHzInitVolatile(intensity) {
     }
 }
 
-function _egHzActivateVolatileWisp(wisp) {
+export function _egHzActivateVolatileWisp(wisp) {
     const pos = _egHzPointOutsideGrid(40);
     wisp.x = pos.x;
     wisp.y = pos.y;
@@ -1179,7 +1191,7 @@ function _egHzActivateVolatileWisp(wisp) {
     wisp.el = el;
 }
 
-function _egHzDetonateVolatile(wisp) {
+export function _egHzDetonateVolatile(wisp) {
     const st = _egHzVolatile;
     wisp.state = 'dead';
     if (wisp.el) {
@@ -1201,7 +1213,7 @@ function _egHzDetonateVolatile(wisp) {
     }
 }
 
-function _egHzTickVolatile(dtMs) {
+export function _egHzTickVolatile(dtMs) {
     const st = _egHzVolatile;
     const dtS = dtMs / 1000;
     const pr = _egHzPlayerHitbox();
@@ -1265,7 +1277,7 @@ function _egHzTickVolatile(dtMs) {
 // expanding ring damages anything it passes through once (chill + freeze
 // chance). Cold Resistance mitigates; dodging out of the ring radius works.
 
-function _egHzInitFrostNova(intensity) {
+export function _egHzInitFrostNova(intensity) {
     _egHzFrostNova = {
         novas: [],
         nextIn: _egHzRand(2500, 5000),
@@ -1274,7 +1286,7 @@ function _egHzInitFrostNova(intensity) {
     };
 }
 
-function _egHzSpawnFrostNova() {
+export function _egHzSpawnFrostNova() {
     // Erupt close to the player so the expanding ring must be reacted to.
     let x = window.innerWidth * 0.5;
     let y = window.innerHeight * 0.5;
@@ -1295,7 +1307,7 @@ function _egHzSpawnFrostNova() {
     _egHzFrostNova.novas.push({ x, y, t: EG_HZ_FROSTNOVA_EXPAND_MS, r: 0, el, hitDone: false });
 }
 
-function _egHzTickFrostNova(dtMs) {
+export function _egHzTickFrostNova(dtMs) {
     const st = _egHzFrostNova;
     const dtS = dtMs / 1000;
 
@@ -1378,7 +1390,7 @@ function _egHzTickFrostNova(dtMs) {
 // the player's tight sprite hitbox; for gap variants the hit is
 // suppressed when the hitbox is fully inside the gap.
 
-function _egHzInitFirewall(intensity) {
+export function _egHzInitFirewall(intensity) {
     _egHzFirewall = {
         pending: [],
         nextIn: _egHzRand(3500, 6500),
@@ -1387,7 +1399,7 @@ function _egHzInitFirewall(intensity) {
     };
 }
 
-function _egHzCreateFirewallWallEls(variant, gapX, gapW, startY) {
+export function _egHzCreateFirewallWallEls(variant, gapX, gapW, startY) {
     const h = EG_HZ_FIREWALL_HEIGHT;
     const hasGap = variant === 'gapDown' || variant === 'gapUp';
     const els = [];
@@ -1436,7 +1448,7 @@ function _egHzCreateFirewallWallEls(variant, gapX, gapW, startY) {
     return els;
 }
 
-function _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
+export function _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
     const h = EG_HZ_FIREWALL_HEIGHT;
     const hasGap = variant === 'gapDown' || variant === 'gapUp';
     const els = [];
@@ -1480,7 +1492,7 @@ function _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY) {
     return els;
 }
 
-function _egHzTickFirewall(dtMs) {
+export function _egHzTickFirewall(dtMs) {
     const st = _egHzFirewall;
     const dtS = dtMs / 1000;
 
@@ -1683,7 +1695,7 @@ function _egHzTickFirewall(dtMs) {
 // Fast wind vortices that race across the whole screen (grid included),
 // damaging the player continuously while they stand inside one.
 
-function _egHzInitCyclone(intensity) {
+export function _egHzInitCyclone(intensity) {
     const count = Math.min(5, 2 + Math.round(intensity / 33));
     const vortices = [];
     for (let i = 0; i < count; i++) {
@@ -1711,7 +1723,7 @@ function _egHzInitCyclone(intensity) {
     _egHzCyclone = { vortices, dmgMult: _egHzMult(intensity) };
 }
 
-function _egHzTickCyclone(dtMs) {
+export function _egHzTickCyclone(dtMs) {
     const st = _egHzCyclone;
     const dtS = dtMs / 1000;
     const pr = _egHzPlayerHitbox();
@@ -1747,7 +1759,7 @@ function _egHzTickCyclone(dtMs) {
 // PoE Delirium: a purple mist periodically floods the screen. While it holds,
 // there is one chance roll to polymorph the player into chaos.
 
-function _egHzInitDelirium(intensity) {
+export function _egHzInitDelirium(intensity) {
     _egHzDelirium = {
         phase: 'idle',
         nextIn: _egHzRand(8000, 14000),
@@ -1758,7 +1770,7 @@ function _egHzInitDelirium(intensity) {
     };
 }
 
-function _egHzTickDelirium(dtMs) {
+export function _egHzTickDelirium(dtMs) {
     const st = _egHzDelirium;
 
     if (st.phase === 'idle') {

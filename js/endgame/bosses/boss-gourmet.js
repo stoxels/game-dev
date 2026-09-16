@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE GOURMET (boss_gourmet)---------------------
 //------------------------------------------------------------------------
 // A rework of the old one-shot Gourmet Gulp into a persistent tasting
@@ -70,65 +80,65 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Kitchen tuning ───────────────────────────────────────────────────────
 // The Gourmand (boss body)
-const EG_GMT_MOUTH_R = 44;                    // maw visual radius
-const EG_GMT_DRIFT_SPEED = [0, 24, 34, 46];   // px/s per phase
-const EG_GMT_DRIFT_REPICK_MS = 5200;
-const EG_GMT_CHOMP_DMG = [0, 0.05, 0.06, 0.08]; // %maxHP touching the maw
-const EG_GMT_CHOMP_CD_MS = 1000;
-const EG_GMT_CHOMP_FLING = [0, 120, 145, 170];
-const EG_GMT_CHOMP_HEAL = 0.01;               // boss heals 1% per bite
+export const EG_GMT_MOUTH_R = 44;                    // maw visual radius
+export const EG_GMT_DRIFT_SPEED = [0, 24, 34, 46];   // px/s per phase
+export const EG_GMT_DRIFT_REPICK_MS = 5200;
+export const EG_GMT_CHOMP_DMG = [0, 0.05, 0.06, 0.08]; // %maxHP touching the maw
+export const EG_GMT_CHOMP_CD_MS = 1000;
+export const EG_GMT_CHOMP_FLING = [0, 120, 145, 170];
+export const EG_GMT_CHOMP_HEAL = 0.01;               // boss heals 1% per bite
 // Aroma inhale + food spit (persistent cadence)
-const EG_GMT_INHALE_IDLE_MS = [0, 4200, 3400, 2600];
-const EG_GMT_INHALE_MS = 1600;                // suction duration
-const EG_GMT_PULL_SPEED = [0, 95, 115, 140];  // px/s suction
-const EG_GMT_SPIT_N = [0, 3, 4, 5];           // food per breath
-const EG_GMT_FOOD_SPEED = 280;
-const EG_GMT_FOOD_DMG = 0.05;                 // %maxHP per food hit
+export const EG_GMT_INHALE_IDLE_MS = [0, 4200, 3400, 2600];
+export const EG_GMT_INHALE_MS = 1600;                // suction duration
+export const EG_GMT_PULL_SPEED = [0, 95, 115, 140];  // px/s suction
+export const EG_GMT_SPIT_N = [0, 3, 4, 5];           // food per breath
+export const EG_GMT_FOOD_SPEED = 280;
+export const EG_GMT_FOOD_DMG = 0.05;                 // %maxHP per food hit
 // Sizzling plate + grease trails
-const EG_GMT_PLATE_SPEED = [0, 70, 90, 115];
-const EG_GMT_PLATE_DMG = 0.05;                // %maxHP touching the plate
-const EG_GMT_PLATE_CD_MS = 900;
-const EG_GMT_TRAIL_TTL_MS = 5200;             // grease pool lifetime
-const EG_GMT_TRAIL_GAP_MS = 420;              // pool spacing along the path
-const EG_GMT_TRAIL_DMG = 0.03;                // %maxHP per grease tick
-const EG_GMT_TRAIL_TICK_MS = 700;
-const EG_GMT_TRAIL_MAX = 14;                  // cap so the table stays readable
+export const EG_GMT_PLATE_SPEED = [0, 70, 90, 115];
+export const EG_GMT_PLATE_DMG = 0.05;                // %maxHP touching the plate
+export const EG_GMT_PLATE_CD_MS = 900;
+export const EG_GMT_TRAIL_TTL_MS = 5200;             // grease pool lifetime
+export const EG_GMT_TRAIL_GAP_MS = 420;              // pool spacing along the path
+export const EG_GMT_TRAIL_DMG = 0.03;                // %maxHP per grease tick
+export const EG_GMT_TRAIL_TICK_MS = 700;
+export const EG_GMT_TRAIL_MAX = 14;                  // cap so the table stays readable
 // Dinner Service (60% gate)
-const EG_GMT_CLOCHE_N = 3;                    // sequential slams
-const EG_GMT_CLOCHE_WARN_MS = 900;
-const EG_GMT_CLOCHE_R = 120;
-const EG_GMT_CLOCHE_DMG = [0, 0.13, 0.15, 0.18];
-const EG_GMT_CLOCHE_GAP_MS = 1350;
-const EG_GMT_CLOCHE_POOL_TTL = 6000;
+export const EG_GMT_CLOCHE_N = 3;                    // sequential slams
+export const EG_GMT_CLOCHE_WARN_MS = 900;
+export const EG_GMT_CLOCHE_R = 120;
+export const EG_GMT_CLOCHE_DMG = [0, 0.13, 0.15, 0.18];
+export const EG_GMT_CLOCHE_GAP_MS = 1350;
+export const EG_GMT_CLOCHE_POOL_TTL = 6000;
 // Banquet Toss (30% gate)
-const EG_GMT_BANQUET_WAVES = 4;
-const EG_GMT_BANQUET_PER_WAVE = [0, 5, 6, 8];
-const EG_GMT_BANQUET_GAP_MS = 1750;
-const EG_GMT_DISH_SPEED = 320;                // px/s fall
-const EG_GMT_DISH_DMG = 0.06;                 // %maxHP per dish
-const EG_GMT_BANQUET_MS = 9500;
+export const EG_GMT_BANQUET_WAVES = 4;
+export const EG_GMT_BANQUET_PER_WAVE = [0, 5, 6, 8];
+export const EG_GMT_BANQUET_GAP_MS = 1750;
+export const EG_GMT_DISH_SPEED = 320;                // px/s fall
+export const EG_GMT_DISH_DMG = 0.06;                 // %maxHP per dish
+export const EG_GMT_BANQUET_MS = 9500;
 // Devour (charge attack)
-const EG_GMT_DEVOUR_LOCK_MS = 700;            // ring follows the player
-const EG_GMT_DEVOUR_SUCK_MS = 1400;           // strong suction
-const EG_GMT_DEVOUR_SUCK_SPEED = [0, 150, 180, 215];
-const EG_GMT_DEVOUR_R = 150;                  // maw danger radius
-const EG_GMT_DEVOUR_DMG = [0, 0.18, 0.21, 0.25];
-const EG_GMT_DEVOUR_FLING = [0, 190, 215, 240];
+export const EG_GMT_DEVOUR_LOCK_MS = 700;            // ring follows the player
+export const EG_GMT_DEVOUR_SUCK_MS = 1400;           // strong suction
+export const EG_GMT_DEVOUR_SUCK_SPEED = [0, 150, 180, 215];
+export const EG_GMT_DEVOUR_R = 150;                  // maw danger radius
+export const EG_GMT_DEVOUR_DMG = [0, 0.18, 0.21, 0.25];
+export const EG_GMT_DEVOUR_FLING = [0, 190, 215, 240];
 
 
-let _egGourmetWatcher = null; // per-fight kitchen state
+export let _egGourmetWatcher = null; // per-fight kitchen state
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
-function _egGmtPhase(st) {
+export function _egGmtPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
-        const m = _egMonsters.find(x => x && x.id === st.monsterId);
+        const m = globalThis._egMonsters.find(x => x && x.id === st.monsterId);
         if (m) return Math.max(1, Math.min(3, Number(m.bossPhase) || 1));
     }
     return 1;
 }
 
 // Boss heal (absolute % of its max) - the Gourmet gets stronger by eating.
-function _egGmtHealBoss(monster, pct) {
+export function _egGmtHealBoss(monster, pct) {
     try {
         if (!monster || !monster.maxHP) return;
         const before = monster.currentHP;
@@ -138,7 +148,7 @@ function _egGmtHealBoss(monster, pct) {
 }
 
 // Removes every kitchen overlay (registered in boss-framework teardown).
-function _egGourmetTeardown() {
+export function _egGourmetTeardown() {
     if (_egGourmetWatcher) {
         const st = _egGourmetWatcher;
         _egGourmetWatcher = null;
@@ -157,7 +167,7 @@ function _egGourmetTeardown() {
 
 
 // ── Persistent arena: the maw, the breath, the plate ────────────────────
-function _egGourmetArenaInit(monster) {
+export function _egGourmetArenaInit(monster) {
     if (_egGourmetWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -204,7 +214,7 @@ function _egGourmetArenaInit(monster) {
 
     _egNkLoop(run, (dtS, now) => {
         if (_egGourmetWatcher !== st) return false;
-        const live = _egMonsters ? _egMonsters.find(m => m.id === st.monsterId) : null;
+        const live = globalThis._egMonsters ? globalThis._egMonsters.find(m => m.id === st.monsterId) : null;
         if (!live) return false;
         const W = window.innerWidth, H = window.innerHeight;
         const c = _egNkPlayerCenter();
@@ -458,7 +468,7 @@ function _egGourmetArenaInit(monster) {
 
 
 // A dashed warn ring (shared by cloches + devour lock styling).
-function _egGmtWarn(st, x, y, r) {
+export function _egGmtWarn(st, x, y, r) {
     const el = _egNkEl(st.run, 'div', 'eg-gmt-warn');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
@@ -469,7 +479,7 @@ function _egGmtWarn(st, x, y, r) {
 
 
 // One food projectile from the maw's spit.
-function _egGmtSpitFood(st, x, y, vx, vy) {
+export function _egGmtSpitFood(st, x, y, vx, vy) {
     const el = _egNkEl(st.run, 'div', 'eg-gmt-food', ['🍖', '🍗', '🧀'][Math.floor(Math.random() * 3)]);
     const food = { x, y, vx, vy, t: 0, hit: false, el };
     st.foods.push(food);
@@ -477,7 +487,7 @@ function _egGmtSpitFood(st, x, y, vx, vy) {
 
 
 // A grease-fire pool on the table.
-function _egGmtDropPool(st, x, y, ttl) {
+export function _egGmtDropPool(st, x, y, ttl) {
     const el = _egNkEl(st.run, 'div', 'eg-gmt-pool');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
@@ -488,7 +498,7 @@ function _egGmtDropPool(st, x, y, ttl) {
 // ── 60% gate: Dinner Service ─────────────────────────────────────────────
 // Three giant cloches slam onto telegraphed rings in sequence; each leaves
 // a grease pool where it lands.
-function _egGourmetDinnerService(st) {
+export function _egGourmetDinnerService(st) {
     if (st.cloche) return;
     const c = _egNkPlayerCenter();
     const x = c ? c.x : window.innerWidth / 2;
@@ -501,7 +511,7 @@ function _egGourmetDinnerService(st) {
 
 // ── 30% gate: Banquet Toss ───────────────────────────────────────────────
 // Dessert courses rain down on telegraphed columns in staggered waves.
-function _egGourmetBanquet(st, p) {
+export function _egGourmetBanquet(st, p) {
     if (st.banquet) return;
     st.banquet = { wave: 0, t: 0 };
     _egNkToast('eg_gmt_banquet', '🍰 BANQUET TOSS! The dessert course is landing on YOU!');
@@ -509,7 +519,7 @@ function _egGourmetBanquet(st, p) {
 }
 
 
-function _egGmtDropDish(st, W) {
+export function _egGmtDropDish(st, W) {
     const x = 60 + Math.random() * Math.max(80, W - 120);
     const warnEl = _egNkEl(st.run, 'div', 'eg-gmt-warncol');
     warnEl.style.left = Math.round(x) + 'px';
@@ -520,7 +530,7 @@ function _egGmtDropDish(st, W) {
 // ── Charge attack: Devour ────────────────────────────────────────────────
 // The maw locks on, then inhales hard - the ring shows the swallow radius.
 // Fight the suction and be outside the ring when the breath ends.
-function _egGourmetDevour(monster) {
+export function _egGourmetDevour(monster) {
     const st = _egGourmetWatcher;
     if (!st || st.devour || _egNkDodgeBusy() || _egNkFrozen()) return;
     const el = _egNkEl(st.run, 'div', 'eg-gmt-maw');
@@ -536,4 +546,4 @@ function _egGourmetDevour(monster) {
 // The old scheduled mechanic is now the persistent inhale/spit cadence -
 // keep the handler name alive so any stale schedule entry no-ops instead
 // of erroring.
-function _egMechGourmetGulp(monster, phase) { void monster; void phase; }
+export function _egMechGourmetGulp(monster, phase) { void monster; void phase; }

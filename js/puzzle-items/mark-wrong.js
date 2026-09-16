@@ -1,9 +1,21 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _calcMarkWrongCount } from './shared/effect-modifiers.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+
+//------------------------------------------------------------------------
 //-------------------MARK WRONG - ERASER / SWEEPER / ERROR MAGNET / ERROR GEM----------------------
 //------------------------------------------------------------------------
 
 // markWrong2 / markWrong4 / etc. - marks N random empty non-solution cells.
-function _useMarkWrong(id, def) {
+export function _useMarkWrong(id, def) {
     // Blinding Truth keystone blocks all mark-wrong items entirely
     if (ptHasSkill('keystone_blinding_truth')) {
         return `${def.icon} ${t('itm_blocked_blinding_truth')}`;
@@ -12,7 +24,7 @@ function _useMarkWrong(id, def) {
     const baseCount = parseInt(id.replace('markWrong', '')) || 2;
     const finalCount = _calcMarkWrongCount(baseCount);
 
-    markWrongTiles(finalCount);
+    globalThis.markWrongTiles(finalCount);
     playItemEffect(id);
     return `${def.icon} ${t('item_marked').replace('{n}', finalCount)}`;
 }
@@ -22,7 +34,7 @@ function _useMarkWrong(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates one horizontal eraser streak at a given vertical position.
-function _fxMakeEraserStreak(container, r, yFraction, delaySeconds) {
+export function _fxMakeEraserStreak(container, r, yFraction, delaySeconds) {
     const streak = document.createElement('div');
     streak.className = 'fx-eraser-streak';
     streak.style.cssText = `
@@ -35,7 +47,7 @@ function _fxMakeEraserStreak(container, r, yFraction, delaySeconds) {
 }
 
 // ✏️ Eraser - pink rubber streaks wipe across the grid.
-function _fxEraser() {
+export function _fxEraser() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -47,7 +59,7 @@ function _fxEraser() {
 }
 
 // Helper: spawns the broom icon that slides right-to-left across the grid.
-function _fxMakeBroom(wrap, r) {
+export function _fxMakeBroom(wrap, r) {
     const broom = document.createElement('div');
     broom.className = 'fx-sweeper-icon';
     broom.textContent = '🧹';
@@ -66,7 +78,7 @@ function _fxMakeBroom(wrap, r) {
 }
 
 // Helper: spawns dust particle divs staggered across the broom's path.
-function _fxMakeDustParticles(container, r, count) {
+export function _fxMakeDustParticles(container, r, count) {
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const dust = document.createElement('div');
@@ -82,7 +94,7 @@ function _fxMakeDustParticles(container, r, count) {
 }
 
 // 🧹 Sweeper - a sweeping broom icon trails dust particles.
-function _fxSweeper() {
+export function _fxSweeper() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -96,7 +108,7 @@ function _fxSweeper() {
 
 // Helper: creates and drops the magnet icon above the grid.
 // Returns { magnetX, magnetY } so the cross particles know where to fly.
-function _fxMakeMagnetIcon(wrap, r) {
+export function _fxMakeMagnetIcon(wrap, r) {
     const magnetX = r.left + r.width / 2;
     const magnetY = r.top - 10;
 
@@ -118,7 +130,7 @@ function _fxMakeMagnetIcon(wrap, r) {
 }
 
 // Helper: spawns ✕ cross particles that fly toward the magnet.
-function _fxMagnetCrossParticles(container, r, magnetX, magnetY, count) {
+export function _fxMagnetCrossParticles(container, r, magnetX, magnetY, count) {
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const cross = document.createElement('div');
@@ -141,7 +153,7 @@ function _fxMagnetCrossParticles(container, r, magnetX, magnetY, count) {
 }
 
 // 🧲 Error Magnet - a magnet swoops in, ✕ crosses fly toward it.
-function _fxErrorMagnet() {
+export function _fxErrorMagnet() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -154,7 +166,7 @@ function _fxErrorMagnet() {
 }
 
 // Helper: creates the large centered gem icon with burst animation.
-function _fxMakeGemIcon(wrap, cx, cy) {
+export function _fxMakeGemIcon(wrap, cx, cy) {
     const gem = document.createElement('div');
     gem.className = 'fx-gem-pulse';
     gem.textContent = '💎';
@@ -171,7 +183,7 @@ function _fxMakeGemIcon(wrap, cx, cy) {
 }
 
 // 💎 Error Gem - gem pulses, then showers coloured sparkles top-down.
-function _fxErrorGem() {
+export function _fxErrorGem() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

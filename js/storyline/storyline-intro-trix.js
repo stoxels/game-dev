@@ -1,4 +1,9 @@
-﻿// =============================================================================
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+// =============================================================================
 // storyline-intro-trix.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // Character intro data for Trix ("The Trickster").
@@ -10,7 +15,7 @@
 
 
 // Folder where Trix's intro images live (relative to your index.html)
-const TRIX_INTRO_IMAGE_PATH = "images/Intro/Trix_Intro/";
+export const TRIX_INTRO_IMAGE_PATH = "images/Intro/Trix_Intro/";
 
 
 // ---------------------------------------------------------------------------
@@ -31,7 +36,7 @@ const TRIX_INTRO_IMAGE_PATH = "images/Intro/Trix_Intro/";
 // spaced roughly every 10 seconds across the song's ~300s runtime. Replace
 // filenames and adjust times once the actual image set exists - the array
 // just needs to stay sorted by ascending `time`.
-const TRIX_INTRO_SONG = {
+export const TRIX_INTRO_SONG = {
     audio: "audio/Intro/Trix_Intro_Song.ogg",
     imagePath: TRIX_INTRO_IMAGE_PATH,
 

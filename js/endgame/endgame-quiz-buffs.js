@@ -1,3 +1,11 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _getPlayerMaxMana, gainMana } from '../classes/class-mana.js';
+import { _egMapHasBloodMagic } from './endgame-map-launch.js';
+
 // endgame-quiz-buffs.js
 //------------------------------------------------------------------------
 //-------------------ENDGAME QUIZ REWARD BUFFS-----------------------------
@@ -23,32 +31,32 @@
 
 // Damage per stack - each correct quiz answer adds +10% additively
 // (3 stacks = +30%, etc.). Each stack lasts EG_QUIZ_BUFF_DURATION_MS.
-const EG_QUIZ_BUFF_DAMAGE_PER_STACK = 0.10;
+export const EG_QUIZ_BUFF_DAMAGE_PER_STACK = 0.10;
 // Legacy constant - single-stack multiplier, kept for backward compatibility.
-const EG_QUIZ_BUFF_DAMAGE_MULT = 1 + EG_QUIZ_BUFF_DAMAGE_PER_STACK;
+export const EG_QUIZ_BUFF_DAMAGE_MULT = 1 + EG_QUIZ_BUFF_DAMAGE_PER_STACK;
 // Duration of each damage stack (30 minutes).
-const EG_QUIZ_BUFF_DURATION_MS = 30 * 60 * 1000;
+export const EG_QUIZ_BUFF_DURATION_MS = 30 * 60 * 1000;
 // Array of expiry timestamps (one entry per active +10% stack).
-let _egQuizDmgBuffStacks = [];
+export let _egQuizDmgBuffStacks = [];
 // Timestamp until which at least one stack is still active (0 = inactive).
 // Derived as max(_egQuizDmgBuffStacks); kept for debug / backward compat.
-let _egQuizDmgBuffUntil = 0;
+export let _egQuizDmgBuffUntil = 0;
 
 // Timeout handle for the barrier visual's expiry.
-let _egQuizShieldTimer = null;
+export let _egQuizShieldTimer = null;
 
 // Summary lines of every reward granted since the last chain countdown.
 // Each correctly answered interstitial question pushes one entry; all are
 // joined and consumed together by _egBuildChainBonusGainHTML. This fixes
 // the map_extra_questions mod (+# additional Quiz Questions per Puzzle)
 // which previously overwrote a single string and only the last reward was shown.
-let _egPendingQuizRewardLines = [];
+export let _egPendingQuizRewardLines = [];
 // Legacy alias - kept for backward compatibility / debug inspection.
-let _egPendingQuizRewardLine = '';
+export let _egPendingQuizRewardLine = '';
 
 // Removes expired stacks and refreshes the derived _egQuizDmgBuffUntil.
 // Returns the number of still-active stacks.
-function _egPruneQuizDamageStacks() {
+export function _egPruneQuizDamageStacks() {
     const now = Date.now();
     if (_egQuizDmgBuffStacks.length) {
         _egQuizDmgBuffStacks = _egQuizDmgBuffStacks.filter(t => t > now);
@@ -58,20 +66,20 @@ function _egPruneQuizDamageStacks() {
 }
 
 // Returns the number of active +10% stacks (pruning expired ones first).
-function _egQuizDamageBuffStacks() {
+export function _egQuizDamageBuffStacks() {
     return _egPruneQuizDamageStacks();
 }
 
 // Returns the active damage multiplier (1 when no buff is running).
 // Stacks additively: 1 stack = 1.10, 3 stacks = 1.30, etc.
-function _egQuizDamageBuffMult() {
+export function _egQuizDamageBuffMult() {
     const active = _egPruneQuizDamageStacks();
     if (active === 0) return 1;
     return 1 + active * EG_QUIZ_BUFF_DAMAGE_PER_STACK;
 }
 
 // Human-readable duration for toasts / labels (e.g. "30m").
-function _egFormatQuizBuffDuration(ms) {
+export function _egFormatQuizBuffDuration(ms) {
     const mins = Math.round(ms / 60000);
     if (mins >= 60) {
         const h = Math.floor(mins / 60);
@@ -84,7 +92,7 @@ function _egFormatQuizBuffDuration(ms) {
 // Schedules the shield visual to re-evaluate at the next stack expiry.
 // When the earliest stack expires we prune and either reschedule for the
 // next expiry or remove the wings if no stacks remain.
-function _egScheduleQuizShieldExpiry() {
+export function _egScheduleQuizShieldExpiry() {
     if (_egQuizShieldTimer) {
         clearTimeout(_egQuizShieldTimer);
         _egQuizShieldTimer = null;
@@ -109,7 +117,7 @@ function _egScheduleQuizShieldExpiry() {
 }
 
 // Clears any active quiz damage buff and its barrier visual.
-function _egResetQuizDamageBuff() {
+export function _egResetQuizDamageBuff() {
     _egQuizDmgBuffStacks = [];
     _egQuizDmgBuffUntil = 0;
     if (_egQuizShieldTimer) {
@@ -129,7 +137,7 @@ function _egResetQuizDamageBuff() {
 // Duplicate damage-buff lines from the same interstitial batch are coalesced
 // to the final total so two correct answers that both roll damage show only
 // a single "+20% damage (x2 stacks)" (or the final xN total later in a chain).
-function _egConsumePendingQuizRewardHTML() {
+export function _egConsumePendingQuizRewardHTML() {
     const _isDmgLine = l => l.includes('⚔️') && l.includes('damage');
     const _coalesce = lines => {
         const dmgLines = lines.filter(_isDmgLine);
@@ -161,19 +169,19 @@ function _egConsumePendingQuizRewardHTML() {
 //------------------------------------------------------------------------
 
 // Spark burst colours per reward type (heal / mana bursts).
-const EG_QUIZ_BUFF_COLORS = {
+export const EG_QUIZ_BUFF_COLORS = {
     damage: '#ff5533',
     heal: '#4caf50',
     mana: '#4fc3f7',
 };
 
-const EG_QUIZ_BUFF_SPARK_COUNT = 12;
-const EG_QUIZ_BUFF_FX_DURATION_MS = 900;
-const EG_QUIZ_SHIELD_FADE_MS = 400;
+export const EG_QUIZ_BUFF_SPARK_COUNT = 12;
+export const EG_QUIZ_BUFF_FX_DURATION_MS = 900;
+export const EG_QUIZ_SHIELD_FADE_MS = 400;
 
 // Adds the WeakAuras-style barrier: two glowing red wings flanking the
 // character sprite, pulsing while at least one damage stack is active.
-function _egAddQuizShieldFX(durationMs) {
+export function _egAddQuizShieldFX(durationMs) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
 
@@ -203,7 +211,7 @@ function _egAddQuizShieldFX(durationMs) {
 }
 
 // Removes the barrier wings - immediately, or after a short fade-out.
-function _egRemoveQuizShieldFX(immediate) {
+export function _egRemoveQuizShieldFX(immediate) {
     const wings = document.querySelectorAll('.eg-quiz-shield-wing');
     if (!wings.length) return;
 
@@ -217,7 +225,7 @@ function _egRemoveQuizShieldFX(immediate) {
 
 // Spark burst + floating label anchored to the player HUD. Used for the
 // heal / mana rewards; the damage buff uses the barrier wings instead.
-function _egShowQuizBuffBurst(type, labelText) {
+export function _egShowQuizBuffBurst(type, labelText) {
     const hud = document.getElementById('player-avatar-wrapper');
     const color = EG_QUIZ_BUFF_COLORS[type] || '#ffffff';
 
@@ -272,7 +280,7 @@ function _egShowQuizBuffBurst(type, labelText) {
 //------------------------------------------------------------------------
 
 // Helper: grant one stacking +10% damage stack and its visuals/toast.
-function _egGrantQuizDamageReward() {
+export function _egGrantQuizDamageReward() {
     // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev-testing.js):
     // ×1 = exact shipped behaviour (30 min stacks are unobservable in tests).
     const scale = (typeof window !== 'undefined' && window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)
@@ -287,7 +295,7 @@ function _egGrantQuizDamageReward() {
     const durLabel = _egFormatQuizBuffDuration(durationMs);
     if (typeof showToast === 'function') {
         const stackInfo = stacks > 1 ? ` (x${stacks} → +${totalPctLabel}% total)` : '';
-        showToast(`⚔️ Scholar's Wrath: +10% damage for ${durLabel}${stackInfo}!`);
+        globalThis.showToast(`⚔️ Scholar's Wrath: +10% damage for ${durLabel}${stackInfo}!`);
     }
     _egAddQuizShieldFX(durationMs);
 
@@ -322,18 +330,18 @@ function _egGrantQuizDamageReward() {
 // When the player is already at full life / full mana that reward is
 // excluded from the roll so no reward is wasted (e.g. full HP → no heal
 // offered, full mana → no mana offered, both full → always damage).
-function _egApplyQuizRewardBuff() {
+export function _egApplyQuizRewardBuff() {
     // ── Build eligible pool ──────────────────────────────────────────
     const needsHeal = typeof playerCurrentHP !== 'undefined'
         && typeof playerMaxHP !== 'undefined'
-        && playerMaxHP > 0
-        && playerCurrentHP < playerMaxHP;
+        && globalThis.playerMaxHP > 0
+        && globalThis.playerCurrentHP < globalThis.playerMaxHP;
     let needsMana = false;
     // Mana is irrelevant on Blood Magic maps (costs are paid from life)
     const bloodMagic = (typeof _egMapHasBloodMagic === 'function') && _egMapHasBloodMagic();
     if (!bloodMagic && typeof _getPlayerMaxMana === 'function') {
         const maxMana = _getPlayerMaxMana();
-        const curMana = (typeof playerCurrentMana !== 'undefined') ? Math.round(playerCurrentMana) : 0;
+        const curMana = (typeof playerCurrentMana !== 'undefined') ? Math.round(globalThis.playerCurrentMana) : 0;
         needsMana = maxMana > 0 && curMana < maxMana;
     }
 
@@ -347,10 +355,10 @@ function _egApplyQuizRewardBuff() {
         _egGrantQuizDamageReward();
     } else if (pick === 'heal') {
         // ── Life heal ────────────────────────────────────────────────────
-        const heal = Math.max(1, Math.round(playerMaxHP * 0.25));
-        playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
-        if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
-        if (typeof showToast === 'function') showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
+        const heal = Math.max(1, Math.round(globalThis.playerMaxHP * 0.25));
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+        if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+        if (typeof showToast === 'function') globalThis.showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
         _egShowQuizBuffBurst('heal', `+${heal} HP`);
         const healLine =
             `<span style="color:#7fd67f">💚 +${heal} life restored</span>`;
@@ -361,7 +369,7 @@ function _egApplyQuizRewardBuff() {
         const gain = Math.max(1, Math.round(_getPlayerMaxMana() * 0.25));
         const gained = (typeof gainMana === 'function') ? gainMana(gain) : 0;
         if (gained > 0) {
-            if (typeof showToast === 'function') showToast(`🔮 Scholar's Insight: restored ${gained} mana!`);
+            if (typeof showToast === 'function') globalThis.showToast(`🔮 Scholar's Insight: restored ${gained} mana!`);
             _egShowQuizBuffBurst('mana', `+${gained} Mana`);
             const manaLine =
                 `<span style="color:#7fb8ff">🔮 +${gained} mana restored</span>`;
@@ -371,10 +379,10 @@ function _egApplyQuizRewardBuff() {
             // No mana gained (e.g. Blood Magic or reduced gain) - fall back
             // Prefer heal if not at full life, otherwise fall back to damage.
             if (needsHeal) {
-                const heal = Math.max(1, Math.round(playerMaxHP * 0.25));
-                playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + heal);
-                if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
-                if (typeof showToast === 'function') showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
+                const heal = Math.max(1, Math.round(globalThis.playerMaxHP * 0.25));
+                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+                if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+                if (typeof showToast === 'function') globalThis.showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
                 _egShowQuizBuffBurst('heal', `+${heal} HP`);
                 const fbLine =
                     `<span style="color:#7fd67f">💚 +${heal} life restored</span>`;

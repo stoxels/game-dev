@@ -1,4 +1,21 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { showModal, switchScreen } from '../screens/screens.js';
+import { LANG, t } from '../translation/translations.js';
+import { _egAtlasBuildTierProgressHTML, _egAtlasEnsureStyles, _egAtlasRoman, _egAtlasTierGroupColor } from './endgame-atlas-ui.js';
+import { _egAtlasResolveNodeForMap, egAtlasDropNodeIds, egAtlasIsCompleted, egAtlasNodeById, egAtlasNodeName } from './endgame-atlas.js';
+import { _egChainTransitioning } from './endgame-encounter-chain.js';
+import { _egClearTooltip } from './endgame-hub-tooltips.js';
+import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, EG_MAP_TIER_ROMANS, _egBuildItemChipHTML, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencyStash, _egGetCellFill, _egGetMapStashRowsForTier, _egGetMapTierGrid, _egMapStash, _egRenderCurrencyStash, egSaveHubState, ensureEndgameHubScreen } from './endgame-hub.js';
+import { EG_LEVELING_CONFIG, _egGetPlayerLevel, _egGetPlayerXP, _egGetUnspentPoints, _egGetXpForNextLevel } from './endgame-leveling.js';
+import { _egLaunchMapFromDevice } from './endgame-map-launch.js';
+import { EG_MAP_MOD_TABLES, _egGetMapModRewards, _egMapModAffects } from './endgame-maps.js';
+import { EG_SCREEN_NAV, _egResolveBackFn } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME PROBABILITY GATE SCREEN----------------------
 //------------------------------------------------------------------------
 // Standalone screen hosting the Probability Gate:
@@ -24,7 +41,7 @@
 //------------------------------------------------------------------------
 
 // Builds the decorative orb-ring with cardinal rune markers (pure visual).
-function _egBuildMapOrbRingHTML() {
+export function _egBuildMapOrbRingHTML() {
     return `
 <div class="eg-map-orb-ring">
     <div class="eg-map-orb-rune eg-rune-top">✦</div>
@@ -35,7 +52,7 @@ function _egBuildMapOrbRingHTML() {
 }
 
 // Builds the four coloured sockets shown beneath the map device frame (pure visual).
-function _egBuildMapSocketRowHTML() {
+export function _egBuildMapSocketRowHTML() {
     return `
 <div class="eg-map-socket-row">
     <div class="eg-map-socket eg-socket-red"></div>
@@ -46,7 +63,7 @@ function _egBuildMapSocketRowHTML() {
 }
 
 // Builds the central orb drop slot where the player inserts a map.
-function _egBuildMapOrbSlotHTML() {
+export function _egBuildMapOrbSlotHTML() {
     return `
 <div class="eg-map-slot"
      id="eg-map-slot"
@@ -64,7 +81,7 @@ function _egBuildMapOrbSlotHTML() {
 // activate button. (The small "?" map-drop-rules button lives in the
 // potential-drops panel header, right of the device - see
 // _egBuildPotentialDropsPanelHTML.)
-function _egBuildMapDeviceHTML() {
+export function _egBuildMapDeviceHTML() {
     return `
 <div class="eg-map-device">
     <div class="eg-map-device-frame">
@@ -81,7 +98,7 @@ function _egBuildMapDeviceHTML() {
 // PoE-style map-drop rules (normal kills / cleared regions / bosses).
 // The one-line translation is split on its ' · ' separators so each rule
 // gets its own line inside the tooltip.
-function _egOnDropRulesEnter(e) {
+export function _egOnDropRulesEnter(e) {
     const lines = t('eg_drop_rules_line').split(' · ').join('<br>');
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#9d93c9;">
@@ -91,13 +108,13 @@ function _egOnDropRulesEnter(e) {
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc">${lines}</div></div>
 </div>`;
-    if (typeof showGameTooltip === 'function') showGameTooltip(html, e);
+    if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(html, e);
 }
-function _egOnDropRulesMove(e) {
-    if (typeof moveGameTooltip === 'function') moveGameTooltip(e);
+export function _egOnDropRulesMove(e) {
+    if (typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
 }
-function _egOnDropRulesLeave() {
-    if (typeof hideGameTooltip === 'function') hideGameTooltip();
+export function _egOnDropRulesLeave() {
+    if (typeof hideGameTooltip === 'function') globalThis.hideGameTooltip();
 }
 
 
@@ -117,8 +134,8 @@ function _egOnDropRulesLeave() {
 // Resolves the potential-drop entries for the map in the device slot.
 // Returns null when no map is inserted, otherwise an array of
 // { id, name, tier, bossOnly, isSelf, completed } sorted tier-desc, name-asc.
-function _egPotentialDropEntries() {
-    const map = (typeof _egMapSlotItem !== 'undefined') ? _egMapSlotItem : null;
+export function _egPotentialDropEntries() {
+    const map = (typeof _egMapSlotItem !== 'undefined') ? globalThis._egMapSlotItem : null;
     if (!map) return null;
     const node = (typeof _egGetMapAtlasNode === 'function') ? _egGetMapAtlasNode(map) : null;
     if (!node) return [];
@@ -149,7 +166,7 @@ function _egPotentialDropEntries() {
 }
 
 // Builds the scrollable list body for the potential-drops panel.
-function _egBuildPotentialDropsBodyHTML() {
+export function _egBuildPotentialDropsBodyHTML() {
     const entries = _egPotentialDropEntries();
     if (entries === null) return `<div class="eg-potential-drops-empty">${t('eg_potential_drops_empty')}</div>`;
     if (entries.length === 0) return `<div class="eg-potential-drops-empty">${t('eg_potential_drops_none')}</div>`;
@@ -166,7 +183,7 @@ function _egBuildPotentialDropsBodyHTML() {
 
 // Assembles the potential-drops panel: title with count, the "?" drop-rules
 // button on its right, a status legend and the scrollable region list.
-function _egBuildPotentialDropsPanelHTML() {
+export function _egBuildPotentialDropsPanelHTML() {
     return `
 <div class="eg-potential-drops" id="eg-potential-drops">
     <div class="eg-potential-drops-head">
@@ -184,7 +201,7 @@ function _egBuildPotentialDropsPanelHTML() {
 
 // Refreshes the potential-drops panel from the current device slot.
 // No-ops while the gate screen is not in the DOM.
-function _egRenderPotentialDrops() {
+export function _egRenderPotentialDrops() {
     const body = document.getElementById('eg-potential-drops-body');
     if (!body) return;
     body.innerHTML = _egBuildPotentialDropsBodyHTML();
@@ -197,7 +214,7 @@ function _egRenderPotentialDrops() {
 }
 
 // One-time CSS injection for the potential-drops panel.
-function _egInjectPotentialDropsStyles() {
+export function _egInjectPotentialDropsStyles() {
     if (document.getElementById('eg-potential-drops-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-potential-drops-styles';
@@ -271,7 +288,7 @@ _egInjectPotentialDropsStyles();
 //------------------------------------------------------------------------
 
 // Builds a single map stash cell div (drop target).
-function _egBuildMapStashCellHTML(row, col) {
+export function _egBuildMapStashCellHTML(row, col) {
     return `
 <div class="eg-inv-cell eg-map-stash-cell"
      id="eg-map-stash-cell-${row}-${col}"
@@ -284,8 +301,8 @@ function _egBuildMapStashCellHTML(row, col) {
 }
 
 // Builds the full map stash grid for a specific tier (infinite rows per tier).
-function _egBuildMapStashGridHTMLForTier(tier) {
-    const t = Math.max(1, Math.min(EG_MAP_TIER_COUNT || 16, Math.round(tier || _egMapStashActiveTier || 1)));
+export function _egBuildMapStashGridHTMLForTier(tier) {
+    const t = Math.max(1, Math.min(EG_MAP_TIER_COUNT || 16, Math.round(tier || globalThis._egMapStashActiveTier || 1)));
     const rows = (typeof _egGetMapStashRowsForTier === 'function') ? _egGetMapStashRowsForTier(t) : EG_MAP_STASH_INITIAL_ROWS;
     let html = '';
     for (let r = 0; r < rows; r++) {
@@ -296,14 +313,14 @@ function _egBuildMapStashGridHTMLForTier(tier) {
     return html;
 }
 // Legacy alias - returns grid for active tier
-function _egBuildMapStashGridHTML() {
-    return _egBuildMapStashGridHTMLForTier(_egMapStashActiveTier || 1);
+export function _egBuildMapStashGridHTML() {
+    return _egBuildMapStashGridHTMLForTier(globalThis._egMapStashActiveTier || 1);
 }
 
 // ── Tier tab bar (16 roman numeral tabs I..XVI) ──
-function _egBuildMapStashTabsHTML() {
+export function _egBuildMapStashTabsHTML() {
     const romans = (typeof EG_MAP_TIER_ROMANS !== 'undefined' && EG_MAP_TIER_ROMANS.length === 16) ? EG_MAP_TIER_ROMANS : ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI'];
-    const active = _egMapStashActiveTier || 1;
+    const active = globalThis._egMapStashActiveTier || 1;
     let html = '<div class="eg-map-stash-tabs" id="eg-map-stash-tabs">';
     for (let t = 1; t <= 16; t++) {
         const cnt = _egCountMapsInTier(t);
@@ -313,7 +330,7 @@ function _egBuildMapStashTabsHTML() {
     html += '</div>';
     return html;
 }
-function _egCountMapsInTier(tier) {
+export function _egCountMapsInTier(tier) {
     try {
         if (typeof _egGetMapTierGrid === 'function') {
             const grid = _egGetMapTierGrid(tier);
@@ -328,7 +345,7 @@ function _egCountMapsInTier(tier) {
     } catch(e){}
     return 0;
 }
-function _egUpdateMapStashTabCounts() {
+export function _egUpdateMapStashTabCounts() {
     const tabs = document.getElementById('eg-map-stash-tabs');
     if (!tabs) return;
     for (let t = 1; t <= 16; t++) {
@@ -336,9 +353,9 @@ function _egUpdateMapStashTabCounts() {
         if (btn) btn.textContent = _egCountMapsInTier(t);
     }
 }
-function _egSwitchMapStashTier(tier) {
+export function _egSwitchMapStashTier(tier) {
     const t = Math.max(1, Math.min(16, Math.round(tier || 1)));
-    _egMapStashActiveTier = t;
+    globalThis._egMapStashActiveTier = t;
     if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch(e){}
     // update tab active state
     const tabs = document.getElementById('eg-map-stash-tabs');
@@ -362,7 +379,7 @@ function _egSwitchMapStashTier(tier) {
 // centered, and the map stash grid below. The maps label carries a legend
 // hint for the gold atlas-incomplete highlight. Orbs & Shards stays in sync
 // with the hub's currency strip via the shared _egCurrencyStash.
-function _egBuildGatePanelHTML() {
+export function _egBuildGatePanelHTML() {
     const atlasHint = (typeof t === 'function' && t('eg_map_atlas_not_completed') !== 'eg_map_atlas_not_completed')
         ? t('eg_map_atlas_not_completed').replace(/^○\s*/, '★ ')
         : '★ Not yet completed on Atlas';
@@ -389,7 +406,7 @@ function _egBuildGatePanelHTML() {
         </div>
         ${_egBuildMapStashTabsHTML()}
         <div class="eg-map-stash-grid" id="eg-map-stash-grid" style="grid-template-columns: repeat(${EG_MAP_STASH_COLS}, 1fr);">
-            ${_egBuildMapStashGridHTMLForTier(_egMapStashActiveTier || 1)}
+            ${_egBuildMapStashGridHTMLForTier(globalThis._egMapStashActiveTier || 1)}
         </div>
     </div>
 </div>`;
@@ -405,7 +422,7 @@ function _egBuildGatePanelHTML() {
 // _egRenderCurrencyCell() in endgame-hub-drag-and-drop.js updates both.
 
 // Builds a single Orbs & Shards cell for the gate screen (PoE fixed slots).
-function _egBuildGateCurrencyCellHTML(row, col) {
+export function _egBuildGateCurrencyCellHTML(row, col) {
     return `
 <div class="eg-inv-cell eg-currency-cell"
      id="eg-gate-currency-cell-${row}-${col}"
@@ -421,7 +438,7 @@ function _egBuildGateCurrencyCellHTML(row, col) {
 }
 
 // Builds the full gate-side runes & orbs grid.
-function _egBuildGateCurrencyGridHTML() {
+export function _egBuildGateCurrencyGridHTML() {
     let html = '';
     for (let r = 0; r < EG_CURRENCY_ROWS; r++) {
         for (let c = 0; c < EG_CURRENCY_COLS; c++) {
@@ -432,7 +449,7 @@ function _egBuildGateCurrencyGridHTML() {
 }
 
 // Assembles the gate-side Orbs & Shards strip panel: label + currency cell grid (PoE fixed slots).
-function _egBuildGateCurrencyStripHTML() {
+export function _egBuildGateCurrencyStripHTML() {
     return `
 <div class="eg-currency-strip">
     <div class="eg-panel-label">${t('eg_runes_orbs')}</div>
@@ -443,7 +460,7 @@ function _egBuildGateCurrencyStripHTML() {
 </div>`;
 }
 
-function _egOnGateCurrencyCellEnter(row, col, e) {
+export function _egOnGateCurrencyCellEnter(row, col, e) {
     const item = _egCurrencyStash[row] && _egCurrencyStash[row][col];
     if (item) return;
     const assignedId = (typeof _egCurrencyIdForSlot === 'function') ? _egCurrencyIdForSlot(row, col) : null;
@@ -459,18 +476,18 @@ function _egOnGateCurrencyCellEnter(row, col, e) {
     </div>
     <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${def.description || ''}</div></div>
 </div>`;
-    if (typeof showGameTooltip === 'function') showGameTooltip(html, e);
+    if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(html, e);
 }
-function _egOnGateCurrencyCellMove(e) {
+export function _egOnGateCurrencyCellMove(e) {
     const cell = e.currentTarget || (e.target.closest && e.target.closest('.eg-currency-cell'));
     if (!cell) return;
     const r = +cell.dataset.row, c = +cell.dataset.col;
     const item = _egCurrencyStash[r] && _egCurrencyStash[r][c];
     if (item) return;
-    if ((typeof _egCurrencyIdForSlot === 'function') && _egCurrencyIdForSlot(r,c) && typeof moveGameTooltip === 'function') moveGameTooltip(e);
+    if ((typeof _egCurrencyIdForSlot === 'function') && _egCurrencyIdForSlot(r,c) && typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
 }
-function _egOnGateCurrencyCellLeave() {
-    if (typeof hideGameTooltip === 'function') hideGameTooltip();
+export function _egOnGateCurrencyCellLeave() {
+    if (typeof hideGameTooltip === 'function') globalThis.hideGameTooltip();
 }
 
 
@@ -479,7 +496,7 @@ function _egOnGateCurrencyCellLeave() {
 //------------------------------------------------------------------------
 
 // One-time CSS injection for the gate level chip (topbar).
-function _egInjectGateLevelChipStyles() {
+export function _egInjectGateLevelChipStyles() {
     if (document.getElementById('eg-gate-level-chip-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-gate-level-chip-styles';
@@ -522,12 +539,12 @@ _egInjectGateLevelChipStyles();
 
 // Refreshes the level chip in the gate topbar. Reuses the same XP/percentage
 // logic as _egRenderLevelHUD (endgame-leveling.js) so the gate stays in sync.
-function _egRenderGateLevelChip() {
+export function _egRenderGateLevelChip() {
     const el = document.getElementById('eg-gate-level-chip');
     if (!el) return;
-    const lvl = (typeof _egGetPlayerLevel === 'function') ? _egGetPlayerLevel() : ((typeof STATE !== 'undefined' && STATE && STATE.playerLevel) || 1);
-    const pts = (typeof _egGetUnspentPoints === 'function') ? _egGetUnspentPoints() : ((typeof STATE !== 'undefined' && STATE && STATE.egAttrPoints) || 0);
-    const xp = (typeof _egGetPlayerXP === 'function') ? _egGetPlayerXP() : ((typeof STATE !== 'undefined' && STATE && STATE.playerXP) || 0);
+    const lvl = (typeof _egGetPlayerLevel === 'function') ? _egGetPlayerLevel() : ((typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerLevel) || 1);
+    const pts = (typeof _egGetUnspentPoints === 'function') ? _egGetUnspentPoints() : ((typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.egAttrPoints) || 0);
+    const xp = (typeof _egGetPlayerXP === 'function') ? _egGetPlayerXP() : ((typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerXP) || 0);
     const maxLvl = (typeof EG_LEVELING_CONFIG !== 'undefined' && EG_LEVELING_CONFIG.maxLevel) || 100;
     const need = (typeof _egGetXpForNextLevel === 'function') ? _egGetXpForNextLevel(lvl) : 0;
     const pct = lvl >= maxLvl ? 100 : (need > 0 ? Math.min(100, (xp / need) * 100) : 0);
@@ -542,7 +559,7 @@ function _egRenderGateLevelChip() {
 
 // Builds the top navigation bar with back button, gate title, level chip and the
 // Atlas of Statistica button (opens the PoE-style map overview screen).
-function _egBuildGateTopbarHTML() {
+export function _egBuildGateTopbarHTML() {
     return `
 <div class="eg-topbar">
     <button class="eg-back-btn back-btn" onclick="${_egGateBackFn}()">${t('btn_back')}</button>
@@ -564,7 +581,7 @@ function _egBuildGateTopbarHTML() {
 // stash below. The progress band is rendered by _egRenderGateTierStrip() on
 // every open so completions from the last run are visible before the player
 // even opens the atlas.
-function _egBuildGateFullScreenHTML() {
+export function _egBuildGateFullScreenHTML() {
     return `
 <div class="eg-hub-layout">
     ${_egBuildGateTopbarHTML()}
@@ -578,7 +595,7 @@ function _egBuildGateFullScreenHTML() {
 // One-time CSS injection for the gate's per-tier atlas progress band. The
 // strip itself (ega-tier-* classes) is styled by the atlas module; this only
 // lays out the band that hosts it inside the gate layout.
-function _egInjectGateTierStripStyles() {
+export function _egInjectGateTierStripStyles() {
     if (document.getElementById('eg-gate-tier-strip-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-gate-tier-strip-styles';
@@ -598,7 +615,7 @@ function _egInjectGateTierStripStyles() {
 // ✔/?/🔒 status), so gate and atlas always agree. Refreshed on every
 // showEndgameGate() so completions from the last run show up immediately.
 // No-op when the atlas module is not loaded.
-function _egRenderGateTierStrip() {
+export function _egRenderGateTierStrip() {
     const el = document.getElementById('eg-gate-tier-strip');
     if (!el) return;
     if (typeof _egAtlasBuildTierProgressHTML !== 'function') {
@@ -616,7 +633,7 @@ function _egRenderGateTierStrip() {
 
 // Resolves the atlas node for a map item (prefers stamped atlasNodeId,
 // falls back to legacy name/tier matching via _egAtlasResolveNodeForMap).
-function _egGetMapAtlasNode(map) {
+export function _egGetMapAtlasNode(map) {
     if (!map) return null;
     if (map.atlasNodeId && typeof egAtlasNodeById === 'function') {
         const n = egAtlasNodeById(map.atlasNodeId);
@@ -630,7 +647,7 @@ function _egGetMapAtlasNode(map) {
 
 // Returns true when the map's atlas region has NOT yet been completed.
 // Returns false when completed or when the node cannot be resolved.
-function _egIsMapAtlasIncomplete(map) {
+export function _egIsMapAtlasIncomplete(map) {
     const node = _egGetMapAtlasNode(map);
     if (!node) return false;
     if (typeof egAtlasIsCompleted === 'function') {
@@ -640,7 +657,7 @@ function _egIsMapAtlasIncomplete(map) {
 }
 
 // One-time CSS injection for the uncompleted-atlas highlight (gold pulsing border).
-function _egInjectAtlasHighlightStyles() {
+export function _egInjectAtlasHighlightStyles() {
     if (document.getElementById('eg-atlas-highlight-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-atlas-highlight-styles';
@@ -701,7 +718,7 @@ function _egInjectAtlasHighlightStyles() {
     document.head.appendChild(style);
 }
 // Injects styles for the 16 roman-numeral tier tabs + scrollable infinite grid
-function _egInjectMapStashTabStyles() {
+export function _egInjectMapStashTabStyles() {
     if (document.getElementById('eg-map-stash-tab-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-map-stash-tab-styles';
@@ -792,21 +809,21 @@ _egInjectAtlasHighlightStyles();
 //------------------------------------------------------------------------
 
 // Updates the activate button enabled/disabled state based on whether a map is loaded.
-function _egRenderMapDeviceButton() {
+export function _egRenderMapDeviceButton() {
     const btn = document.getElementById('eg-activate-btn');
     if (!btn) return;
-    btn.disabled = !_egMapSlotItem;
+    btn.disabled = !globalThis._egMapSlotItem;
 }
 
 // Re-renders the map device orb slot: shows the loaded map chip, or the empty prompt.
 // Also refreshes the activate button state and the uncompleted-atlas border.
 // No-ops while the gate screen is not in the DOM.
-function _egRenderMapSlot() {
+export function _egRenderMapSlot() {
     const inner = document.getElementById('eg-map-slot-inner');
     if (!inner) return;
 
-    inner.innerHTML = _egMapSlotItem
-        ? _egBuildItemChipHTML(_egMapSlotItem, 'large')
+    inner.innerHTML = globalThis._egMapSlotItem
+        ? _egBuildItemChipHTML(globalThis._egMapSlotItem, 'large')
         : `<span class="eg-map-slot-empty-text">${t('eg_insert_map')}</span>`;
 
     _egRenderMapDeviceButton();
@@ -815,7 +832,7 @@ function _egRenderMapSlot() {
     const slot = document.getElementById('eg-map-slot');
     if (slot) {
         _egInjectAtlasHighlightStyles();
-        if (_egMapSlotItem && _egIsMapAtlasIncomplete(_egMapSlotItem)) {
+        if (globalThis._egMapSlotItem && _egIsMapAtlasIncomplete(globalThis._egMapSlotItem)) {
             slot.classList.add('eg-map-atlas-incomplete');
         } else {
             slot.classList.remove('eg-map-atlas-incomplete');
@@ -837,10 +854,10 @@ function _egRenderMapSlot() {
 // Maps whose atlas region has not yet been completed get a special
 // gold pulsing border (eg-map-atlas-incomplete).
 // No-ops while the gate screen is not in the DOM.
-function _egRenderMapStashCell(row, col) {
+export function _egRenderMapStashCell(row, col) {
     const cell = document.getElementById(`eg-map-stash-cell-${row}-${col}`);
     if (!cell) return;
-    const tier = _egMapStashActiveTier || 1;
+    const tier = globalThis._egMapStashActiveTier || 1;
     let item = null;
     try {
         if (typeof _egGetMapTierGrid === 'function') item = _egGetMapTierGrid(tier)[row][col];
@@ -875,8 +892,8 @@ function _egRenderMapStashCell(row, col) {
 }
 
 // Re-renders the entire map stash grid for a specific tier.
-function _egRenderMapStashForTier(tier) {
-    const t = tier != null ? tier : (_egMapStashActiveTier || 1);
+export function _egRenderMapStashForTier(tier) {
+    const t = tier != null ? tier : (globalThis._egMapStashActiveTier || 1);
     const rows = (typeof _egGetMapStashRowsForTier === 'function') ? _egGetMapStashRowsForTier(t) : EG_MAP_STASH_INITIAL_ROWS;
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < EG_MAP_STASH_COLS; c++) {
@@ -910,8 +927,8 @@ function _egRenderMapStashForTier(tier) {
 }
 
 // Re-renders the entire map stash grid (active tier).
-function _egRenderMapStash() {
-    _egRenderMapStashForTier(_egMapStashActiveTier || 1);
+export function _egRenderMapStash() {
+    _egRenderMapStashForTier(globalThis._egMapStashActiveTier || 1);
 }
 
 
@@ -922,20 +939,20 @@ function _egRenderMapStash() {
 // Triggers the map run sequence using whatever map is loaded in the device slot.
 // Delegates to _egLaunchMapFromDevice() (endgame-map-launch.js), which consumes
 // the map, applies its rolled modifiers and launches the encounter chain.
-function egActivateMap() {
-    if (!_egMapSlotItem) return;
+export function egActivateMap() {
+    if (!globalThis._egMapSlotItem) return;
     if (_egChainTransitioning) return;
 
     if (typeof _egLaunchMapFromDevice === 'function') {
-        _egLaunchMapFromDevice(_egMapSlotItem);
+        _egLaunchMapFromDevice(globalThis._egMapSlotItem);
         return;
     }
 
     // Fallback when the launch module isn't loaded: behave like before.
     if (typeof showModal === 'function') {
-        showModal(t('eg_map_warning_title'), t('eg_map_activating').replace('{n}', _egMapSlotItem.name));
+        showModal(t('eg_map_warning_title'), t('eg_map_activating').replace('{n}', globalThis._egMapSlotItem.name));
     } else {
-        alert(t('eg_map_alert_activated').replace('{n}', _egMapSlotItem.name));
+        alert(t('eg_map_alert_activated').replace('{n}', globalThis._egMapSlotItem.name));
     }
 }
 
@@ -951,17 +968,17 @@ function egActivateMap() {
 // in endgame-hub.js.
 
 // Category colors - same scheme as the map tooltips (tooltips-hud.js).
-const EG_MM_CATEGORY_COLORS = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
+export const EG_MM_CATEGORY_COLORS = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
 
 // Localized category name for a mod's `affects` tag.
-function _egMapModsCategoryLabel(affects) {
+export function _egMapModsCategoryLabel(affects) {
     const keys = { monster: 'eg_mm_cat_monster', player: 'eg_mm_cat_player', puzzle: 'eg_mm_cat_puzzle' };
     return t(keys[affects] || 'eg_mm_cat_monster');
 }
 
 // Fallback stat line for mods whose rolledStats carry no readable label
 // (e.g. maps persisted by older versions): rebuilds it from the family table.
-function _egMapModFallbackStatLabel(mod) {
+export function _egMapModFallbackStatLabel(mod) {
     if (!mod) return '';
     const section = mod.type === 'prefix'
         ? EG_MAP_MOD_TABLES.prefixes : EG_MAP_MOD_TABLES.suffixes;
@@ -975,7 +992,7 @@ function _egMapModFallbackStatLabel(mod) {
 }
 
 // Best-effort rolled-value lookup for an arbitrary mod object.
-function _egGetActiveMapModValueFor(mod) {
+export function _egGetActiveMapModValueFor(mod) {
     if (Array.isArray(mod.rolledStats)) {
         for (const stat of mod.rolledStats) {
             const v = Number(typeof stat === 'number' ? stat : stat && stat.value);
@@ -986,7 +1003,7 @@ function _egGetActiveMapModValueFor(mod) {
 }
 
 // Builds one modifier entry card.
-function _egBuildMapModEntryHTML(mod) {
+export function _egBuildMapModEntryHTML(mod) {
     const affects = (typeof _egMapModAffects === 'function') ? _egMapModAffects(mod.familyId) : 'monster';
     const color = EG_MM_CATEGORY_COLORS[affects] || EG_MM_CATEGORY_COLORS.monster;
     const rewards = _egGetMapModRewards(mod.familyId, mod.tier);
@@ -1015,8 +1032,8 @@ function _egBuildMapModEntryHTML(mod) {
 }
 
 // Builds the full overlay content from the map currently in the device slot.
-function _egBuildMapModsOverlayContentHTML() {
-    const map = _egMapSlotItem;
+export function _egBuildMapModsOverlayContentHTML() {
+    const map = globalThis._egMapSlotItem;
 
     if (!map) {
         return `<div class="eg-mm-empty">${t('eg_mm_no_map')}</div>`;
@@ -1039,7 +1056,7 @@ function _egBuildMapModsOverlayContentHTML() {
 }
 
 // Creates the overlay DOM element once (hidden by default).
-function _egEnsureMapModsOverlay() {
+export function _egEnsureMapModsOverlay() {
     if (document.getElementById('eg-map-mods-overlay')) return;
 
     const overlay = document.createElement('div');
@@ -1066,14 +1083,14 @@ function _egEnsureMapModsOverlay() {
 }
 
 // Opens the overlay, refreshing its content from the current device slot.
-function egOpenMapModsOverlay() {
+export function egOpenMapModsOverlay() {
     _egEnsureMapModsOverlay();
     document.getElementById('eg-mm-overlay-body').innerHTML = _egBuildMapModsOverlayContentHTML();
     document.getElementById('eg-map-mods-overlay').classList.add('show');
 }
 
 // Closes the overlay.
-function egCloseMapModsOverlay() {
+export function egCloseMapModsOverlay() {
     const overlay = document.getElementById('eg-map-mods-overlay');
     if (overlay) overlay.classList.remove('show');
 }
@@ -1091,7 +1108,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 // One-time CSS injection for the overlay (guard id prevents duplicates).
-function _egInjectMapModsOverlayStyles() {
+export function _egInjectMapModsOverlayStyles() {
     if (document.getElementById('eg-map-mods-overlay-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-map-mods-overlay-styles';
@@ -1142,7 +1159,7 @@ function _egInjectMapModsOverlayStyles() {
 // Creates and injects the gate screen DOM element on first call.
 // Also ensures the hub screen exists so its delegated DnD/currency
 // listeners (_egBindDragEvents) are active for the gate as well.
-function _egCreateGateScreen() {
+export function _egCreateGateScreen() {
     if (typeof ensureEndgameHubScreen === 'function') ensureEndgameHubScreen();
     _egInjectAtlasHighlightStyles();
     _egInjectGateLevelChipStyles();
@@ -1156,7 +1173,7 @@ function _egCreateGateScreen() {
 }
 
 // Ensures the gate screen element exists in the DOM; creates it on first call.
-function ensureEndgameGateScreen() {
+export function ensureEndgameGateScreen() {
     if (!document.getElementById('screen-endgame-gate')) {
         _egCreateGateScreen();
     }
@@ -1164,14 +1181,14 @@ function ensureEndgameGateScreen() {
 
 // Name of the global function the BACK button calls - set by
 // showEndgameGate(backFn). Defaults to the Nexus of Worlds.
-let _egGateBackFn = EG_SCREEN_NAV.nexus;
+export let _egGateBackFn = EG_SCREEN_NAV.nexus;
 
 // Transitions to the Probability Gate screen and refreshes all rendered zones.
 // This is the main entry point called from elsewhere in the codebase.
 // An optional backFn argument (name of a global function, e.g.
 // 'showEndgameHub') overrides where the BACK button returns to - used
 // when the gate is opened from the endgame hub character sheet.
-function showEndgameGate(backFn) {
+export function showEndgameGate(backFn) {
     if (typeof backFn === 'string') _egGateBackFn = _egResolveBackFn(backFn, EG_SCREEN_NAV.nexus);
     else _egGateBackFn = EG_SCREEN_NAV.nexus;
     ensureEndgameGateScreen();
@@ -1202,10 +1219,10 @@ function showEndgameGate(backFn) {
         document.getElementById('screen-endgame-gate').style.display = 'block';
     }
 
-    _egLoadHubState();
+    globalThis._egLoadHubState();
     // Re-sync tier tabs + grid to persisted active tier (may have changed via migration)
     try {
-        const activeTier = _egMapStashActiveTier || 1;
+        const activeTier = globalThis._egMapStashActiveTier || 1;
         const tabsEl = document.getElementById('eg-map-stash-tabs');
         const gridEl = document.getElementById('eg-map-stash-grid');
         if (gridEl) {

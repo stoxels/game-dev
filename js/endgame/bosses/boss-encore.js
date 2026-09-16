@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE ENCORE (boss_encore)-----------------------
 //------------------------------------------------------------------------
 // REWORK - showman phantom demanding applause, rebuilt as a full stage
@@ -47,8 +56,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_EN_DEBUG_SLOW = true;
-const _EG_EN_DEBUG_MULT = _EG_EN_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_EN_DEBUG_SLOW = true;
+export const _EG_EN_DEBUG_MULT = _EG_EN_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_encore: {
@@ -78,13 +87,13 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_EN_CIRCLE_DMG  = [0, 0.14, 0.17, 0.20];   // missed encore circle
-const EG_EN_EQ_DMG      = [0, 0.18, 0.22, 0.26];   // EQ bar contact
-const EG_EN_SPOT_DMG    = [0, 0, 0.22, 0.25];      // stage light blast
-const EG_EN_MINE_DMG    = [0, 0, 0.16, 0.19];      // beat mine pop
-const EG_EN_FINAL_DMG   = 0.32;                    // THE OVATION full hit
-const EG_EN_TICK_DMG    = 0.12;                    // per-beat applause clip
-const EG_EN_HIT_CD_MS   = 700;                     // shared touch cooldown
+export const EG_EN_CIRCLE_DMG  = [0, 0.14, 0.17, 0.20];   // missed encore circle
+export const EG_EN_EQ_DMG      = [0, 0.18, 0.22, 0.26];   // EQ bar contact
+export const EG_EN_SPOT_DMG    = [0, 0, 0.22, 0.25];      // stage light blast
+export const EG_EN_MINE_DMG    = [0, 0, 0.16, 0.19];      // beat mine pop
+export const EG_EN_FINAL_DMG   = 0.32;                    // THE OVATION full hit
+export const EG_EN_TICK_DMG    = 0.12;                    // per-beat applause clip
+export const EG_EN_HIT_CD_MS   = 700;                     // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -93,8 +102,8 @@ const EG_EN_HIT_CD_MS   = 700;                     // shared touch cooldown
 
 // Touch damage helper shared by all Encore numbers. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egEnHitCd = 0;
-function _egEnTouch(pct, level, label) {
+export let _egEnHitCd = 0;
+export function _egEnTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egEnHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -107,7 +116,7 @@ function _egEnTouch(pct, level, label) {
 
 // Confetti burst where the show lands a beat (visual only, body-level so it
 // survives the run ending in the same frame).
-function _egEnConfetti(x, y, big) {
+export function _egEnConfetti(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-en-confetti' + (big ? ' eg-en-confetti-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -131,7 +140,7 @@ function _egEnConfetti(x, y, big) {
 
 // One applause nova: an expanding gold ring from (x, y). Visual only -
 // damage is rolled by the caller at the beat the ring launches.
-function _egEnApplause(x, y, big) {
+export function _egEnApplause(x, y, big) {
     const ring = document.createElement('div');
     ring.className = 'eg-en-applause' + (big ? ' eg-en-applause-big' : '');
     ring.style.left = Math.round(x) + 'px';
@@ -147,9 +156,9 @@ function _egEnApplause(x, y, big) {
 // The signature inversion: gold rings close in on marked spots - be INSIDE
 // the circle the moment each ring lands. Rings land sequentially with a
 // stagger. Phase 2 throws a fourth, phase 3 a fifth, all faster.
-const EG_EN_CIRCLE_STAGGER_MS = 900;
+export const EG_EN_CIRCLE_STAGGER_MS = 900;
 
-function _egMechEnEncoreCircles(monster, phase) {
+export function _egMechEnEncoreCircles(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -220,9 +229,9 @@ function _egMechEnEncoreCircles(monster, phase) {
 // that hold a beat before retracting. Bars anchor to the floor under the
 // player's feet, so the dodge is lateral: OUT of the lane. Phase 2 throws
 // three, phase 3 four, all faster.
-const EG_EN_BAR_W = 88;
+export const EG_EN_BAR_W = 88;
 
-function _egMechEnSoundBars(monster, phase) {
+export function _egMechEnSoundBars(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -307,11 +316,11 @@ function _egMechEnSoundBars(monster, phase) {
 // Spotlights drift after the player like a chasing rig, then LOCK (ring
 // hardens) - a beat later they flash and burn everyone still inside.
 // Phase 2 runs one light; phase 3 staggers two so the locks desync.
-const EG_EN_LIGHT_TRACK_MS = 1500;
-const EG_EN_LIGHT_LOCK_MS  = 600;
-const EG_EN_LIGHT_BLAST_R  = 95;
+export const EG_EN_LIGHT_TRACK_MS = 1500;
+export const EG_EN_LIGHT_LOCK_MS  = 600;
+export const EG_EN_LIGHT_BLAST_R  = 95;
 
-function _egMechEnStageLights(monster, phase) {
+export function _egMechEnStageLights(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -376,13 +385,13 @@ function _egMechEnStageLights(monster, phase) {
 // Mines pulse on the beat like metronomes, then pop one after another in
 // sequence with small novas. The run is PASSIVE (field hazard - never
 // blocks other mechanics).
-const EG_EN_MINE_COUNT  = [0, 0, 4, 6];
-const EG_EN_MINE_BEAT_MS = 550;
-const EG_EN_MINE_STAGGER_MS = 260;
-const EG_EN_MINE_POP_BEATS = 4;
-const EG_EN_MINE_NOVA_R = 110;
+export const EG_EN_MINE_COUNT  = [0, 0, 4, 6];
+export const EG_EN_MINE_BEAT_MS = 550;
+export const EG_EN_MINE_STAGGER_MS = 260;
+export const EG_EN_MINE_POP_BEATS = 4;
+export const EG_EN_MINE_NOVA_R = 110;
 
-function _egMechEnBeatMines(monster, phase) {
+export function _egMechEnBeatMines(monster, phase) {
     if (_egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -445,26 +454,26 @@ function _egMechEnBeatMines(monster, phase) {
 // white-out flash and a triple applause nova; only the final spotlight
 // circle is safe. Charge bar frozen for the whole set-piece (gate in
 // _egTickPlayer via _egEnFinalActive).
-const EG_EN_FINAL_TICK_MS = 1200;
-const EG_EN_FINAL_TICKS = 3;
-const EG_EN_FINAL_SPOT_R = 150;   // safe spotlight radius, px
+export const EG_EN_FINAL_TICK_MS = 1200;
+export const EG_EN_FINAL_TICKS = 3;
+export const EG_EN_FINAL_SPOT_R = 150;   // safe spotlight radius, px
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egEnFinal = null;
+export let _egEnFinal = null;
 
-function _egEnFinalActive() {
+export function _egEnFinalActive() {
     return !!_egEnFinal && !_egEnFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egEnOnPhaseEnter(monster, newPhase) {
+export function _egEnOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egEnStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egEnStartFinalWatcher(monster) {
+export function _egEnStartFinalWatcher(monster) {
     if (!monster || _egEnFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -482,7 +491,7 @@ function _egEnStartFinalWatcher(monster) {
 
 // Random spotlight position (centre coords), at least 340px from the last
 // one so every jump is a real chase.
-function _egEnPlaceSpotlight(g, spot, prev) {
+export function _egEnPlaceSpotlight(g, spot, prev) {
     const W = window.innerWidth, H = window.innerHeight;
     const m = 190;
     let x = 0, y = 0, guard = 0;
@@ -496,7 +505,7 @@ function _egEnPlaceSpotlight(g, spot, prev) {
     spot.style.top = Math.round(y) + 'px';
 }
 
-function _egEnFinalStart(monster) {
+export function _egEnFinalStart(monster) {
     if (_egEnFinal || !monster) return;
 
     // The house goes quiet: kill every other run of this boss.
@@ -605,7 +614,7 @@ function _egEnFinalStart(monster) {
 
 // THE OVATION: white-out flash, triple applause nova from the final
 // spotlight. Everyone OUTSIDE that final circle takes the big hit.
-function _egEnFinalBang(g, monster) {
+export function _egEnFinalBang(g, monster) {
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(g.monsterId, true);
     g.run = run;
@@ -639,7 +648,7 @@ function _egEnFinalBang(g, monster) {
     run.timers.push(id2);
 }
 
-function _egEnFinalEnd(g) {
+export function _egEnFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -655,7 +664,7 @@ function _egEnFinalEnd(g) {
     document.querySelectorAll('.eg-en-bowing').forEach(el => el.classList.remove('eg-en-bowing'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -672,7 +681,7 @@ function _egEnFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egEnTeardown() {
+export function _egEnTeardown() {
     if (_egEnFinal) { try { _egEnFinalEnd(_egEnFinal); } catch (e) {} _egEnFinal = null; }
     document.querySelectorAll('.eg-en-spot, .eg-en-ring, .eg-en-eqwarn, .eg-en-eq, ' +
         '.eg-en-light, .eg-en-mine, .eg-en-mine-pop, .eg-en-applause, .eg-en-confetti, ' +
@@ -698,7 +707,7 @@ if (typeof window !== 'undefined') {
     window._EG_EN_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_encore') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_encore') : null;
             if (!monster) return 'no encore alive';
             const fn = name === 'circles' ? _egMechEnEncoreCircles
                 : name === 'bars' ? _egMechEnSoundBars
@@ -711,7 +720,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_encore') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_encore') : null;
             if (!monster) return 'no encore alive';
             _egEnFinalStart(monster);
             return 'CURTAIN CALL started';

@@ -1,4 +1,10 @@
-﻿/*
+﻿import { Audio_Manager } from '../audio/audio.js';
+import { save } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { _renderTopBarClassStatus, _renderTopBarNextCode, _renderTopBarQuestBadge, _renderTopBarScore, _renderTopBarTreePoints, _wireTopBarButtons, showMapView } from './screens-map-view.js';
+import { WD_WORLD_CONFIGS } from './screens-world-levels-config.js';
+import { switchScreen } from './screens.js';
+/*
     ========================================================================
     SCREENS-WORLD-LEVELS.JS
     ========================================================================
@@ -42,41 +48,41 @@
 //------------------------------------------------------------------------
 
 // Fallback aspect ratio used when a world config doesn't define imageAspect
-const WD_DEFAULT_IMAGE_ASPECT = 16 / 9;
+export const WD_DEFAULT_IMAGE_ASPECT = 16 / 9;
 
 // How fast the player sprite walks across the canvas, in pixels per second
-const WD_WALK_SPEED_PX_PER_SEC = 80;
+export const WD_WALK_SPEED_PX_PER_SEC = 80;
 
 // Fixed reference width used ONLY for speed calculations (per-world aspect
 // ratio applied), so walk speed stays constant regardless of window size.
-const WD_WALK_REF_WIDTH = 1000;
+export const WD_WALK_REF_WIDTH = 1000;
 
 // Maps modifier keys → short display labels / CSS classes for the tooltip (mirrors screens-level-select.js)
-const WD_MOD_LABELS = { timetrial: 'TT', hardcore: 'HC', ironman: 'IM', classless: 'CL', treeless: 'TR' };
-const WD_MOD_CLASSES = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
-const WD_BONUS_ICONS = {
+export const WD_MOD_LABELS = { timetrial: 'TT', hardcore: 'HC', ironman: 'IM', classless: 'CL', treeless: 'TR' };
+export const WD_MOD_CLASSES = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
+export const WD_BONUS_ICONS = {
     nomiss: '✨', fast: '⚡', noitem: '🎒', quiz: '🧠', combo: '🔥', lowmiss: '🎯',
     noitem_nomiss: '🎒✨', noitem_fast: '🎒⚡'
 };
-const WD_DIFF_TIERS = ['easy', 'normal', 'hard'];
-const WD_STAR_FILLED = '⭐';
-const WD_STAR_EMPTY = '☆';
-const WD_STAR_MOD = '★';
+export const WD_DIFF_TIERS = ['easy', 'normal', 'hard'];
+export const WD_STAR_FILLED = '⭐';
+export const WD_STAR_EMPTY = '☆';
+export const WD_STAR_MOD = '★';
 
 // Currently open world index (0-based), or null if screen not built yet
-let _wdCurrentWi = null;
+export let _wdCurrentWi = null;
 
 // Level index the sprite is currently standing on (null = at entrance)
-let _wdCurrentLevelIdx = null;
+export let _wdCurrentLevelIdx = null;
 
 // True while a walk animation is in progress - blocks new walk requests
-let _wdWalking = false;
+export let _wdWalking = false;
 
 // requestAnimationFrame handle for the current walk animation (used to cancel it)
-let _wdWalkAnim = null;
+export let _wdWalkAnim = null;
 
 // Queued { targetLevelIdx, onArrived } redirect requested while a walk was already in progress
-let _wdPendingRedirect = null;
+export let _wdPendingRedirect = null;
 
 
 //------------------------------------------------------------------------
@@ -88,14 +94,14 @@ let _wdPendingRedirect = null;
 /**
  * The world-detail background canvas element.
  */
-function _wdGetCanvas() {
+export function _wdGetCanvas() {
     return document.getElementById('wd-canvas');
 }
 
 /**
  * The player sprite element.
  */
-function _wdGetSprite() {
+export function _wdGetSprite() {
     return document.getElementById('wd-sprite');
 }
 
@@ -103,7 +109,7 @@ function _wdGetSprite() {
  * The tooltip element, without creating it. Use _wdEnsureTooltip() instead
  * if the tooltip needs to exist (e.g. before populating and showing it).
  */
-function _wdGetTooltipEl() {
+export function _wdGetTooltipEl() {
     return document.getElementById('wd-tooltip');
 }
 
@@ -124,7 +130,7 @@ function _wdGetTooltipEl() {
  * Returns the pixel rect (width, height, x offset, y offset) of the image
  * within the canvas, accounting for pillarbox / letterbox bars.
  */
-function _wdGetImageRectInCanvas(canvasWidth, canvasHeight, imageAspect) {
+export function _wdGetImageRectInCanvas(canvasWidth, canvasHeight, imageAspect) {
     const containerAspect = canvasWidth / canvasHeight;
     let imgW, imgH, imgX, imgY;
 
@@ -150,7 +156,7 @@ function _wdGetImageRectInCanvas(canvasWidth, canvasHeight, imageAspect) {
  * Use this for positioning any node, marker, or sprite whose position is
  * defined as image-relative coordinates in WD_WORLD_CONFIGS.
  */
-function _wdImgPctToCanvasPct(imgPctX, imgPctY, canvas, cfg) {
+export function _wdImgPctToCanvasPct(imgPctX, imgPctY, canvas, cfg) {
     const cw = canvas.offsetWidth;
     const ch = canvas.offsetHeight;
 
@@ -187,7 +193,7 @@ function _wdImgPctToCanvasPct(imgPctX, imgPctY, canvas, cfg) {
  * Returns the image-relative {x, y} position of a node reference.
  * nodeRef can be 'entrance', null (treated as entrance), or a 0-based index.
  */
-function _wdGetNodePos(cfg, nodeRef) {
+export function _wdGetNodePos(cfg, nodeRef) {
     if (nodeRef === null || nodeRef === 'entrance') return cfg.entrancePos;
     return cfg.nodes[nodeRef];
 }
@@ -196,7 +202,7 @@ function _wdGetNodePos(cfg, nodeRef) {
  * Builds one linear road segment (entrance → node[0], node[0] → node[1], etc.).
  * Returns null if the node has hideRoad set, skipping that segment.
  */
-function _wdBuildLinearSegment(cfg, i) {
+export function _wdBuildLinearSegment(cfg, i) {
     if (cfg.nodes[i].hideRoad) return null;
 
     const n1 = i === 0 ? 'entrance' : i - 1;
@@ -216,16 +222,16 @@ function _wdBuildLinearSegment(cfg, i) {
  * Checks whether an extra road segment's showAfter condition is currently met.
  * Returns true if there is no showAfter, or if that level is already done.
  */
-function _wdIsExtraRoadVisible(extra, wi) {
+export function _wdIsExtraRoadVisible(extra, wi) {
     if (extra.showAfter === undefined) return true;
-    const gi = WORLD_START_GI[wi] + extra.showAfter;
-    return !!(STATE && STATE.done && STATE.done.includes(gi));
+    const gi = globalThis.WORLD_START_GI[wi] + extra.showAfter;
+    return !!(globalThis.STATE && globalThis.STATE.done && globalThis.STATE.done.includes(gi));
 }
 
 /**
  * Builds a road segment object for one entry in cfg.extraRoads.
  */
-function _wdBuildExtraSegment(cfg, extra) {
+export function _wdBuildExtraSegment(cfg, extra) {
     const waypoints = extra.waypoints
         ? extra.waypoints
         : [_wdGetNodePos(cfg, extra.from), _wdGetNodePos(cfg, extra.to)];
@@ -240,7 +246,7 @@ function _wdBuildExtraSegment(cfg, extra) {
  * Trial node (so the off-road trial site is visibly connected to the map).
  * Returns an array of { n1, n2, waypoints } objects.
  */
-function _wdBuildRoads(cfg, wi) {
+export function _wdBuildRoads(cfg, wi) {
     const roads = [];
 
     // Linear chain
@@ -264,7 +270,7 @@ function _wdBuildRoads(cfg, wi) {
     // flow), but the endpoint key feeds _wdIsNodeReached so the spur can
     // render as 'travelled' once the trial is cleared.
     if (cfg.trialNode && _wdTrialNodeForWorld(wi)) {
-        const triggers = (typeof _egTrialTriggerLevels === 'function') ? _egTrialTriggerLevels(wi) : null;
+        const triggers = (typeof globalThis._egTrialTriggerLevels === 'function') ? globalThis._egTrialTriggerLevels(wi) : null;
         const fromLi = (triggers && triggers[1] != null && cfg.nodes[triggers[1]]) ? triggers[1] : (cfg.nodes.length - 1);
         const fromPos = cfg.nodes[fromLi] || cfg.entrancePos;
         roads.push({
@@ -288,7 +294,7 @@ function _wdBuildRoads(cfg, wi) {
  * Returns a stable string key for a node reference ('entrance' or index).
  * Used as Map keys in the BFS adjacency structure.
  */
-function _wdNodeKey(n) {
+export function _wdNodeKey(n) {
     return (n === 'entrance' || n === null) ? 'entrance' : String(n);
 }
 
@@ -296,7 +302,7 @@ function _wdNodeKey(n) {
  * Builds a bidirectional adjacency map from a list of road segments.
  * Each entry stores the segment and whether it was reversed (for waypoint ordering).
  */
-function _wdBuildRoadAdjacency(roads) {
+export function _wdBuildRoadAdjacency(roads) {
     const adj = new Map();
 
     const addEdge = (a, b, seg) => {
@@ -316,7 +322,7 @@ function _wdBuildRoadAdjacency(roads) {
  * Runs BFS from startKey to endKey over the adjacency map.
  * Returns an ordered list of { seg, reversed } entries, or null if no path exists.
  */
-function _wdBfsFindPath(adj, startKey, endKey) {
+export function _wdBfsFindPath(adj, startKey, endKey) {
     if (startKey === endKey) return [];
 
     const visited = new Set([startKey]);
@@ -342,7 +348,7 @@ function _wdBfsFindPath(adj, startKey, endKey) {
  * deduplicating the shared point where segments connect. The markers let
  * a walk animation detect when the sprite has passed through a specific node.
  */
-function _wdFlattenRouteToPointsWithMarkers(routeSegs) {
+export function _wdFlattenRouteToPointsWithMarkers(routeSegs) {
     const points = [];
     const markers = [];
 
@@ -374,7 +380,7 @@ function _wdFlattenRouteToPointsWithMarkers(routeSegs) {
  * or a 0-based index. Falls back to a direct straight line (with start/end
  * markers only) if no route exists in the current graph.
  */
-function _wdFindWalkPathWithMarkers(wi, fromNode, toNode) {
+export function _wdFindWalkPathWithMarkers(wi, fromNode, toNode) {
     const cfg = WD_WORLD_CONFIGS[wi];
     if (!cfg) return { points: [], markers: [] };
 
@@ -400,7 +406,7 @@ function _wdFindWalkPathWithMarkers(wi, fromNode, toNode) {
  * Marker-free variant of _wdFlattenRouteToPointsWithMarkers - same point
  * list, without the per-node marker bookkeeping.
  */
-function _wdFlattenRouteToPoints(routeSegs) {
+export function _wdFlattenRouteToPoints(routeSegs) {
     return _wdFlattenRouteToPointsWithMarkers(routeSegs).points;
 }
 
@@ -408,7 +414,7 @@ function _wdFlattenRouteToPoints(routeSegs) {
  * Marker-free variant of _wdFindWalkPathWithMarkers - same point list,
  * without the per-node marker bookkeeping.
  */
-function _wdFindWalkPath(wi, fromNode, toNode) {
+export function _wdFindWalkPath(wi, fromNode, toNode) {
     const cfg = WD_WORLD_CONFIGS[wi];
     if (!cfg) return [];
 
@@ -435,7 +441,7 @@ function _wdFindWalkPath(wi, fromNode, toNode) {
  * Converts a single image-relative waypoint into an absolute SVG coordinate
  * string for use in a polyline 'points' attribute.
  */
-function _wdWaypointToSvgPoint(point, canvas, cfg, svgWidth, svgHeight) {
+export function _wdWaypointToSvgPoint(point, canvas, cfg, svgWidth, svgHeight) {
     const { x, y } = _wdImgPctToCanvasPct(point.x, point.y, canvas, cfg);
     return `${x / 100 * svgWidth} ${y / 100 * svgHeight}`;
 }
@@ -445,13 +451,13 @@ function _wdWaypointToSvgPoint(point, canvas, cfg, svgWidth, svgHeight) {
  * reached; level nodes are reached once done or currently occupied by the sprite;
  * the 'trial' endpoint is reached once the world's Convergence Trial is done).
  */
-function _wdIsNodeReached(n, wi) {
+export function _wdIsNodeReached(n, wi) {
     if (n === 'entrance') return true;
     if (n === 'trial') {
-        return (typeof _egIsTrialDone === 'function') && _egIsTrialDone(wi);
+        return (typeof globalThis._egIsTrialDone === 'function') && globalThis._egIsTrialDone(wi);
     }
-    const gi = WORLD_START_GI[wi] + n;
-    if (STATE && STATE.done && STATE.done.includes(gi)) return true;
+    const gi = globalThis.WORLD_START_GI[wi] + n;
+    if (globalThis.STATE && globalThis.STATE.done && globalThis.STATE.done.includes(gi)) return true;
     return _wdCurrentLevelIdx === n;
 }
 
@@ -459,7 +465,7 @@ function _wdIsNodeReached(n, wi) {
  * Draws one road segment as an SVG polyline onto the given SVG element.
  * Adds the 'travelled' class if both endpoints have been reached.
  */
-function _wdDrawRoadSegment(svg, seg, canvas, cfg, w, h, wi) {
+export function _wdDrawRoadSegment(svg, seg, canvas, cfg, w, h, wi) {
     if (!seg.waypoints || seg.waypoints.length < 2) return;
 
     const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
@@ -480,7 +486,7 @@ function _wdDrawRoadSegment(svg, seg, canvas, cfg, w, h, wi) {
 /**
  * Clears and redraws all road segments for the current world onto the SVG.
  */
-function _wdDrawAllPaths(svg, wi, w, h) {
+export function _wdDrawAllPaths(svg, wi, w, h) {
     svg.innerHTML = '';
     const cfg = WD_WORLD_CONFIGS[wi];
     if (!cfg) return;
@@ -494,7 +500,7 @@ function _wdDrawAllPaths(svg, wi, w, h) {
  * Re-reads the canvas size, updates the SVG viewBox, and redraws all paths.
  * Call this after the sprite moves or the canvas is resized.
  */
-function _wdRefreshPaths(wi) {
+export function _wdRefreshPaths(wi) {
     const svg = document.getElementById('wd-paths-svg');
     const canvas = _wdGetCanvas();
     if (!svg || !canvas) return;
@@ -516,7 +522,7 @@ function _wdRefreshPaths(wi) {
  * milestones moved to Convergence Trial nodes (see js/campaign-trials.js).
  * Always false; kept because node building / tooltips still call it.
  */
-function _wdIsConvergenceNode(li, world) {
+export function _wdIsConvergenceNode(li, world) {
     return false;
 }
 
@@ -527,19 +533,19 @@ function _wdIsConvergenceNode(li, world) {
  * done; level 0 needs the tutorial). The Nexus World additionally requires
  * the whole campaign (worlds 1..13) to be finished first.
  */
-function _wdIsLevelUnlocked(li, gi, wi) {
-    if (typeof wi === 'number' && typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
-        if (typeof isNexusWorldUnlocked === 'function' && !isNexusWorldUnlocked()) return false;
+export function _wdIsLevelUnlocked(li, gi, wi) {
+    if (typeof wi === 'number' && typeof globalThis.isNexusWorld === 'function' && globalThis.isNexusWorld(wi)) {
+        if (typeof globalThis.isNexusWorldUnlocked === 'function' && !globalThis.isNexusWorldUnlocked()) return false;
     }
-    if (li === 0) return !!(STATE && STATE.tutorialDone);
-    return !!(STATE && STATE.done && STATE.done.includes(gi - 1));
+    if (li === 0) return !!(globalThis.STATE && globalThis.STATE.tutorialDone);
+    return !!(globalThis.STATE && globalThis.STATE.done && globalThis.STATE.done.includes(gi - 1));
 }
 
 /**
  * Returns true if the given level is blocked by an unsolved Probability Gate.
  */
-function _wdIsMathGated(gi) {
-    return typeof isGatedLevel === 'function' && isGatedLevel(gi) && !isMathGatePassed(gi);
+export function _wdIsMathGated(gi) {
+    return typeof globalThis.isGatedLevel === 'function' && globalThis.isGatedLevel(gi) && !globalThis.isMathGatePassed(gi);
 }
 
 /**
@@ -547,7 +553,7 @@ function _wdIsMathGated(gi) {
  * Convergence nodes show a leaf when not done; locked nodes show a lock.
  * All other states show the level number.
  */
-function _wdGetNodeIcon(li, isDone, isLocked, isLastInWorld, isConvergence) {
+export function _wdGetNodeIcon(li, isDone, isLocked, isLastInWorld, isConvergence) {
     if (isLastInWorld) return `${li + 1}`;
     if (isDone) return `${li + 1}`;
     if (isLocked) return '🔒';
@@ -582,7 +588,7 @@ function _wdGetNodeIcon(li, isDone, isLocked, isLastInWorld, isConvergence) {
  * structure visible in the reference images. Sparks are small animated circles
  * placed around the perimeter.
  */
-function _wdBuildStoxelAuraHtml(isDone) {
+export function _wdBuildStoxelAuraHtml(isDone) {
     const healedClass = isDone ? ' wd-stoxel-aura--healed' : '';
 
     return `
@@ -666,7 +672,7 @@ function _wdBuildStoxelAuraHtml(isDone) {
  * Builds the HTML for the glowing tree SVG that appears on a completed
  * convergence node. Returns an empty string if the node is not yet done.
  */
-function _wdBuildConvergenceTreeHtml(isDone) {
+export function _wdBuildConvergenceTreeHtml(isDone) {
     if (!isDone) return '';
     return `
         <div class="wd-3d-beam-tree">
@@ -702,7 +708,7 @@ function _wdBuildConvergenceTreeHtml(isDone) {
  * Builds the full convergence effect HTML: three spinning 3D rings plus the
  * optional glowing tree (shown only once the level is completed).
  */
-function _wdBuildConvergenceHtml(isDone) {
+export function _wdBuildConvergenceHtml(isDone) {
     const treeHtml = _wdBuildConvergenceTreeHtml(isDone);
     return `
         <div class="wd-convergence-3d-wrapper">
@@ -719,7 +725,7 @@ function _wdBuildConvergenceHtml(isDone) {
  * Builds the Math Gate effect HTML: a red "cyber lockdown cage" with rings
  * and a hex shield, shown when this level is blocked by a Probability Gate.
  */
-function _wdBuildMathGateHtml() {
+export function _wdBuildMathGateHtml() {
     return `
         <div class="wd-mathgate-3d-wrapper">
             <div class="wd-gate-ring wd-gate-ring-horiz"></div>
@@ -741,7 +747,7 @@ function _wdBuildMathGateHtml() {
  *   spike3 lower-left:  (44.1,  165.6)
  *   spike4 upper-left:  (28.2,  116.4)
  */
-function _wdBuildAscensionBeamsHtml(isDone) {
+export function _wdBuildAscensionBeamsHtml(isDone) {
     if (!isDone) return '';
     return `
         <g class="wd-asc-beams">
@@ -758,7 +764,7 @@ function _wdBuildAscensionBeamsHtml(isDone) {
  * Builds the SVG <defs> block for the ascension effect:
  * per-spike gradient definitions and glow filters.
  */
-function _wdBuildAscensionDefsHtml() {
+export function _wdBuildAscensionDefsHtml() {
     return `
         <defs>
             <linearGradient id="ascBeamGrad0" x1="70"    y1="86"    x2="70"    y2="16" gradientUnits="userSpaceOnUse">
@@ -804,7 +810,7 @@ function _wdBuildAscensionDefsHtml() {
  * Builds the full ascension effect HTML: a purple 5-pointed star SVG with
  * optional golden beams rising from each spike (shown once the level is done).
  */
-function _wdBuildAscensionHtml(isDone) {
+export function _wdBuildAscensionHtml(isDone) {
     const defsHtml = _wdBuildAscensionDefsHtml();
     const beamsHtml = _wdBuildAscensionBeamsHtml(isDone);
 
@@ -853,7 +859,7 @@ function _wdBuildAscensionHtml(isDone) {
  * Layer order (bottom → top):
  *   stoxelHtml → convergenceHtml → gateHtml → ascensionHtml → circle
  */
-function _wdBuildNodeEffectsHtml(icon, stoxelHtml, convergenceHtml, gateHtml, ascensionHtml) {
+export function _wdBuildNodeEffectsHtml(icon, stoxelHtml, convergenceHtml, gateHtml, ascensionHtml) {
     return `
         <div class="wd-node-effects-container">
             ${stoxelHtml}
@@ -869,7 +875,7 @@ function _wdBuildNodeEffectsHtml(icon, stoxelHtml, convergenceHtml, gateHtml, as
  * Builds the inner HTML for a standard level node.
  * Even plain nodes carry the stoxel aura - it is a universal world feature.
  */
-function _wdBuildPlainNodeHtml(icon, stoxelHtml) {
+export function _wdBuildPlainNodeHtml(icon, stoxelHtml) {
     return `
         <div class="wd-node-effects-container">
             ${stoxelHtml}
@@ -886,8 +892,8 @@ function _wdBuildPlainNodeHtml(icon, stoxelHtml) {
 /**
  * Returns true if the player has beaten this level on Hard with ALL modifiers active.
  */
-function _wdIsMaxCleared(gi) {
-    const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
+export function _wdIsMaxCleared(gi) {
+    const hs = globalThis.STATE && globalThis.STATE.levelHS && globalThis.STATE.levelHS[gi];
     if (!hs) return false;
     return hs.diff === 'hard' &&
         hs.mods &&
@@ -902,7 +908,7 @@ function _wdIsMaxCleared(gi) {
  * Applies the CSS state classes (done/locked/ascension/convergence/etc.) to
  * a level node element based on its computed state flags.
  */
-function _wdApplyNodeStateClasses(node, isDone, isLocked, isLastInWorld, isConvergence, isMathGated, isMaxCleared, isNexusPoint) {
+export function _wdApplyNodeStateClasses(node, isDone, isLocked, isLastInWorld, isConvergence, isMathGated, isMaxCleared, isNexusPoint) {
     if (isDone) node.classList.add('done');
     else if (isLocked) node.classList.add('locked');
     if (isLastInWorld) node.classList.add('ascension');
@@ -918,7 +924,7 @@ function _wdApplyNodeStateClasses(node, isDone, isLocked, isLastInWorld, isConve
  * Stores image-relative coordinates in the node's dataset and immediately
  * positions it on the canvas using canvas-relative CSS percentages.
  */
-function _wdPositionNodeOnCanvas(node, wi, pos) {
+export function _wdPositionNodeOnCanvas(node, wi, pos) {
     node.dataset.imgX = pos.x;
     node.dataset.imgY = pos.y;
 
@@ -932,7 +938,7 @@ function _wdPositionNodeOnCanvas(node, wi, pos) {
 /**
  * Wires up mouse tooltip events on a level node element.
  */
-function _wdWireNodeTooltip(node, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint) {
+export function _wdWireNodeTooltip(node, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint) {
     node.addEventListener('mouseenter', (e) => _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint));
     node.addEventListener('mousemove', (e) => _wdMoveTooltip(e));
     node.addEventListener('mouseleave', () => _wdHideTooltip());
@@ -943,16 +949,16 @@ function _wdWireNodeTooltip(node, wi, li, isDone, isLocked, isLastInWorld, isCon
  * sets inner HTML (with or without special effects), positions it on the
  * canvas, and wires up click and tooltip handlers.
  */
-function _wdBuildLevelNode(wi, li, pos) {
-    const gi = WORLD_START_GI[wi] + li;
-    const world = WORLDS && WORLDS[wi];
+export function _wdBuildLevelNode(wi, li, pos) {
+    const gi = globalThis.WORLD_START_GI[wi] + li;
+    const world = globalThis.WORLDS && globalThis.WORLDS[wi];
 
     // Determine state flags
-    const isDone = !!(STATE && STATE.done && STATE.done.includes(gi));
+    const isDone = !!(globalThis.STATE && globalThis.STATE.done && globalThis.STATE.done.includes(gi));
     const isUnlocked = _wdIsLevelUnlocked(li, gi, wi);
     const isLocked = !isUnlocked;
     const isLastInWorld = !!(world && li === world.data.length - 1);
-    const isNexusPoint = typeof isNexusPointLevel === 'function' && isNexusPointLevel(wi, li);
+    const isNexusPoint = typeof globalThis.isNexusPointLevel === 'function' && globalThis.isNexusPointLevel(wi, li);
     const isAscensionNode = isLastInWorld && !isNexusPoint;
     const isConvergence = !!(world && _wdIsConvergenceNode(li, world));
     const isMathGated = _wdIsMathGated(gi);
@@ -962,7 +968,7 @@ function _wdBuildLevelNode(wi, li, pos) {
 
     // Syla - Nature's Aid: forest levels get a nature badge so the player
     // knows her vegetation bonus will trigger in this level.
-    const isSylaForest = _charIs('syla') && !!(world && world.data[li] && world.data[li].isForestLevel);
+    const isSylaForest = globalThis._charIs('syla') && !!(world && world.data[li] && world.data[li].isForestLevel);
 
     // Create the element and apply positioning / state classes
     const node = document.createElement('div');
@@ -1002,7 +1008,7 @@ function _wdBuildLevelNode(wi, li, pos) {
  * Builds the clickable 🛖 entrance marker element, positioned on the canvas
  * at the world's entrancePos. Clicking it walks the sprite back to the start.
  */
-function _wdBuildEntranceMarker(wi, cfg, canvas) {
+export function _wdBuildEntranceMarker(wi, cfg, canvas) {
     const marker = document.createElement('div');
     marker.className = 'wd-entrance-marker';
 
@@ -1039,27 +1045,27 @@ function _wdBuildEntranceMarker(wi, cfg, canvas) {
  * quiz/exercise modals). Falls back to the no-class portrait only for
  * variants without directional art.
  */
-function _wdBuildSprite() {
+export function _wdBuildSprite() {
     const sprite = document.createElement('div');
     sprite.className = 'wd-sprite';
     sprite.id = 'wd-sprite';
 
     const img = document.createElement('img');
     img.id = 'wd-sprite-img';
-    img.src = (typeof _getPlayerPuzzleDefaultImage === 'function')
-        ? _getPlayerPuzzleDefaultImage()
-        : ((typeof _getPlayerCharacterImage === 'function')
-            ? _getPlayerCharacterImage()
+    img.src = (typeof globalThis._getPlayerPuzzleDefaultImage === 'function')
+        ? globalThis._getPlayerPuzzleDefaultImage()
+        : ((typeof globalThis._getPlayerCharacterImage === 'function')
+            ? globalThis._getPlayerCharacterImage()
             : 'images/sprites/Stox_noclass.webp');
     img.alt = 'Player';
     img.draggable = false;
 
     sprite.appendChild(img);
-    if (typeof _animSetDefaultDownImage === 'function') {
-        try { _animSetDefaultDownImage(img); } catch (e) {}
+    if (typeof globalThis._animSetDefaultDownImage === 'function') {
+        try { globalThis._animSetDefaultDownImage(img); } catch (e) {}
     }
-    if (typeof _startAvatarIdleAnimation === 'function') {
-        setTimeout(() => { try { _startAvatarIdleAnimation('wd-sprite-img'); } catch (e) {} }, 0);
+    if (typeof globalThis._startAvatarIdleAnimation === 'function') {
+        setTimeout(() => { try { globalThis._startAvatarIdleAnimation('wd-sprite-img'); } catch (e) {} }, 0);
     }
     return sprite;
 }
@@ -1068,7 +1074,7 @@ function _wdBuildSprite() {
  * Instantly moves the sprite element to the position of the given level index
  * (or to the entrance if levelIdx is null). No animation - used for initial placement.
  */
-function _wdPlaceSprite(sprite, wi, levelIdx) {
+export function _wdPlaceSprite(sprite, wi, levelIdx) {
     const cfg = WD_WORLD_CONFIGS[wi];
     if (!cfg || !sprite) return;
 
@@ -1091,7 +1097,7 @@ function _wdPlaceSprite(sprite, wi, levelIdx) {
  * on WD_WALK_SPEED_PX_PER_SEC and a fixed reference canvas width so speed
  * stays constant regardless of actual window size.
  */
-function _wdGetSegmentDurationMs(startPos, endPos, wi) {
+export function _wdGetSegmentDurationMs(startPos, endPos, wi) {
     const cfg = WD_WORLD_CONFIGS[wi];
     const aspect = (cfg && cfg.imageAspect) ? cfg.imageAspect : WD_DEFAULT_IMAGE_ASPECT;
     const refW = WD_WALK_REF_WIDTH;
@@ -1105,7 +1111,7 @@ function _wdGetSegmentDurationMs(startPos, endPos, wi) {
 /**
  * Smooth ease-in-out curve for sprite movement (t in [0, 1]).
  */
-function _wdEaseInOut(t) {
+export function _wdEaseInOut(t) {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
 
@@ -1114,7 +1120,7 @@ function _wdEaseInOut(t) {
  * Used to pick the directional walk set (up/down/left/right) instead of
  * the old menu-portrait/omni fallback.
  */
-function _wdDirectionForSegment(startPos, endPos) {
+export function _wdDirectionForSegment(startPos, endPos) {
     const dx = (endPos.x || 0) - (startPos.x || 0);
     const dy = (endPos.y || 0) - (startPos.y || 0);
     if (Math.abs(dx) >= Math.abs(dy)) return dx < 0 ? 'left' : 'right';
@@ -1128,7 +1134,7 @@ function _wdDirectionForSegment(startPos, endPos) {
  * NEVER be mirrored (same Trix left/right fix as the overworld map).
  * Only the omni right-facing fallback keeps the horizontal flip.
  */
-function _wdUpdateSpriteFrame(sprite, startPos, endPos, ease) {
+export function _wdUpdateSpriteFrame(sprite, startPos, endPos, ease) {
     const rawX = startPos.x + (endPos.x - startPos.x) * ease;
     const rawY = startPos.y + (endPos.y - startPos.y) * ease;
 
@@ -1139,14 +1145,14 @@ function _wdUpdateSpriteFrame(sprite, startPos, endPos, ease) {
     sprite.style.top = pct.y + '%';
 
     const dir = _wdDirectionForSegment(startPos, endPos);
-    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
+    const st = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE : null;
     const char = st ? st.playerCharacter : null;
     const variant = st ? (st.playerAscendency || st.playerClass || 'noclass') : 'noclass';
     let directional = false;
-    if (typeof _animHasDirectionalWalkSync === 'function' && char) {
-        directional = _animHasDirectionalWalkSync(char, variant, dir);
+    if (typeof globalThis._animHasDirectionalWalkSync === 'function' && char) {
+        directional = globalThis._animHasDirectionalWalkSync(char, variant, dir);
     }
-    if (!directional && typeof _animWalkIsDirectionalFor === 'function' && _animWalkIsDirectionalFor('wd-sprite-img')) {
+    if (!directional && typeof globalThis._animWalkIsDirectionalFor === 'function' && globalThis._animWalkIsDirectionalFor('wd-sprite-img')) {
         directional = true;
     }
     const img = sprite.querySelector('img');
@@ -1161,10 +1167,10 @@ function _wdUpdateSpriteFrame(sprite, startPos, endPos, ease) {
 /**
  * Saves the sprite's current level position to STATE and triggers a save.
  */
-function _wdPersistSpritePos(wi, levelIdx) {
-    if (!STATE) return;
-    if (!STATE.wdSpriteLevel) STATE.wdSpriteLevel = {};
-    STATE.wdSpriteLevel[wi] = levelIdx;
+export function _wdPersistSpritePos(wi, levelIdx) {
+    if (!globalThis.STATE) return;
+    if (!globalThis.STATE.wdSpriteLevel) globalThis.STATE.wdSpriteLevel = {};
+    globalThis.STATE.wdSpriteLevel[wi] = levelIdx;
     if (typeof save === 'function') save();
 }
 
@@ -1176,12 +1182,12 @@ function _wdPersistSpritePos(wi, levelIdx) {
  * Note: this function and _wdContinueWalkFromNode call each other by design
  * (each walk leg can trigger a redirect, and each redirect starts a new leg).
  */
-function _wdWalkAlongPoints(points, markers, segIdx, onComplete) {
+export function _wdWalkAlongPoints(points, markers, segIdx, onComplete) {
     const sprite = _wdGetSprite();
 
     if (segIdx >= points.length - 1) {
         sprite.classList.remove('walking');
-        if (typeof _stopAvatarWalkAnimation === 'function') _stopAvatarWalkAnimation();
+        if (typeof globalThis._stopAvatarWalkAnimation === 'function') globalThis._stopAvatarWalkAnimation();
         if (onComplete) onComplete();
         return;
     }
@@ -1190,7 +1196,7 @@ function _wdWalkAlongPoints(points, markers, segIdx, onComplete) {
     const endPos = points[segIdx + 1];
     const durationMs = _wdGetSegmentDurationMs(startPos, endPos, _wdCurrentWi);
     const dir = _wdDirectionForSegment(startPos, endPos);
-    const startTime = performance.now();
+    const startTime = globalThis.performance.now();
 
     const step = (now) => {
         const t = Math.min((now - startTime) / durationMs, 1);
@@ -1203,8 +1209,8 @@ function _wdWalkAlongPoints(points, markers, segIdx, onComplete) {
         // its short idle-debounce timer; calling it only once per segment
         // let that timer fire mid-glide, snapping the sprite back to idle
         // art for the rest of the walk ("sprite runs but never animates").
-        if (typeof _playAvatarWalkAnimation === 'function') {
-            try { _playAvatarWalkAnimation('wd-sprite-img', dir); }
+        if (typeof globalThis._playAvatarWalkAnimation === 'function') {
+            try { globalThis._playAvatarWalkAnimation('wd-sprite-img', dir); }
             catch (e) {}
         }
 
@@ -1233,7 +1239,7 @@ function _wdWalkAlongPoints(points, markers, segIdx, onComplete) {
  * continues) the walk animation along it. Finalizes STATE/position once the
  * destination is reached.
  */
-function _wdContinueWalkFromNode(fromNodeKey, targetLevelIdx, onArrived) {
+export function _wdContinueWalkFromNode(fromNodeKey, targetLevelIdx, onArrived) {
     const wi = _wdCurrentWi;
     const { points, markers } = _wdFindWalkPathWithMarkers(wi, fromNodeKey, targetLevelIdx);
 
@@ -1241,7 +1247,7 @@ function _wdContinueWalkFromNode(fromNodeKey, targetLevelIdx, onArrived) {
         _wdWalking = false;
         const sprite = _wdGetSprite();
         if (sprite) sprite.classList.remove('walking');
-        if (typeof _stopAvatarWalkAnimation === 'function') _stopAvatarWalkAnimation();
+        if (typeof globalThis._stopAvatarWalkAnimation === 'function') globalThis._stopAvatarWalkAnimation();
 
         _wdCurrentLevelIdx = targetLevelIdx;
         _wdPersistSpritePos(wi, targetLevelIdx);
@@ -1258,7 +1264,7 @@ function _wdContinueWalkFromNode(fromNodeKey, targetLevelIdx, onArrived) {
  * node. If a walk is already in progress, queues this as a redirect instead
  * of starting a second animation.
  */
-function _wdWalkSpriteTo(wi, targetLevelIdx, onArrived) {
+export function _wdWalkSpriteTo(wi, targetLevelIdx, onArrived) {
     if (_wdWalking) {
         _wdPendingRedirect = { targetLevelIdx, onArrived };
         return;
@@ -1269,7 +1275,7 @@ function _wdWalkSpriteTo(wi, targetLevelIdx, onArrived) {
 
     const sprite = _wdGetSprite();
     sprite.classList.add('walking');
-    if (typeof _startAvatarWalkAnimation === 'function') _startAvatarWalkAnimation('wd-sprite-img');
+    if (typeof globalThis._startAvatarWalkAnimation === 'function') globalThis._startAvatarWalkAnimation('wd-sprite-img');
 
     _wdContinueWalkFromNode(fromNode, targetLevelIdx, onArrived);
 }
@@ -1278,7 +1284,7 @@ function _wdWalkSpriteTo(wi, targetLevelIdx, onArrived) {
  * Starts walking the sprite back to the entrance. Same redirect-queueing
  * behavior as _wdWalkSpriteTo when a walk is already in progress.
  */
-function _wdWalkSpriteToEntrance() {
+export function _wdWalkSpriteToEntrance() {
     if (_wdWalking) {
         _wdPendingRedirect = { targetLevelIdx: null, onArrived: null };
         return;
@@ -1289,7 +1295,7 @@ function _wdWalkSpriteToEntrance() {
 
     const sprite = _wdGetSprite();
     sprite.classList.add('walking');
-    if (typeof _startAvatarWalkAnimation === 'function') _startAvatarWalkAnimation('wd-sprite-img');
+    if (typeof globalThis._startAvatarWalkAnimation === 'function') globalThis._startAvatarWalkAnimation('wd-sprite-img');
 
     _wdContinueWalkFromNode(fromNode, null, null);
 }
@@ -1302,8 +1308,8 @@ function _wdWalkSpriteToEntrance() {
 /**
  * Resolves the localised display name for a world.
  */
-function _wdGetWorldName(wi) {
-    const world = WORLDS && WORLDS[wi];
+export function _wdGetWorldName(wi) {
+    const world = globalThis.WORLDS && globalThis.WORLDS[wi];
     if (!world) return t('scr_world_n').replace('{n}', wi + 1);
     return (LANG === 'de' && world.labelDE) ? world.labelDE : world.label;
 }
@@ -1311,7 +1317,7 @@ function _wdGetWorldName(wi) {
 /**
  * Updates the world-detail top bar: sets the screen title and world name label.
  */
-function _wdBuildTopBar(wi) {
+export function _wdBuildTopBar(wi) {
     // The one difference vs the overworld topbar: the plaque carries the
     // CURRENT WORLD NAME instead of the SELECT LEVEL title.
     const plaque = document.getElementById('wd-title-plaque');
@@ -1332,9 +1338,9 @@ function _wdBuildTopBar(wi) {
     _renderTopBarTreePoints('wd');
     _wireTopBarButtons('wd');
     // Class-change token entry button - only visible while a token is held.
-    if (typeof updateClassChangeButtons === 'function') updateClassChangeButtons();
+    if (typeof globalThis.updateClassChangeButtons === 'function') globalThis.updateClassChangeButtons();
 
-    if (typeof renderMapViewCharacterPortrait === 'function') renderMapViewCharacterPortrait('wd');
+    if (typeof globalThis.renderMapViewCharacterPortrait === 'function') globalThis.renderMapViewCharacterPortrait('wd');
 }
 
 /**
@@ -1343,13 +1349,13 @@ function _wdBuildTopBar(wi) {
  * fits without overflow. Long localized names (e.g. "The Vortex of
  * Possibilities") can exceed the clamp's capacity at narrow widths.
  */
-function _wdFitPlaqueText(plaque) {
+export function _wdFitPlaqueText(plaque) {
     if (!plaque) return;
     // Re-derive from the CSS clamp each run so repeat calls (e.g. after the
     // screen becomes visible) start from the natural size, not the last fit.
     plaque.style.fontSize = '';
     plaque.style.letterSpacing = '';
-    const cs = getComputedStyle(plaque);
+    const cs = globalThis.getComputedStyle(plaque);
     let size = parseFloat(cs.fontSize);
     const min = 9;
     let guard = 0;
@@ -1365,9 +1371,9 @@ function _wdFitPlaqueText(plaque) {
  * Called from HTML via onclick="wdGoBackToMap()".
  * Cancels any in-progress walk animation and returns to the overworld map screen.
  */
-function wdGoBackToMap() {
+export function wdGoBackToMap() {
     if (_wdWalking) {
-        cancelAnimationFrame(_wdWalkAnim);
+        globalThis.cancelAnimationFrame(_wdWalkAnim);
         _wdWalkAnim = null;
         _wdWalking = false;
     }
@@ -1385,7 +1391,7 @@ function wdGoBackToMap() {
  * overlay element used for drawing road path polylines.
  * Returns { canvas, svg } so both can be populated immediately after.
  */
-function _wdCreateCanvasElement(cfg) {
+export function _wdCreateCanvasElement(cfg) {
     const canvas = document.createElement('div');
     canvas.className = 'wd-canvas';
     canvas.id = 'wd-canvas';
@@ -1414,7 +1420,7 @@ function _wdCreateCanvasElement(cfg) {
  * Respects both the config's node list length and the world's actual level count.
  * Afterwards appends the world's Convergence Trial node (if configured).
  */
-function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
+export function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
     const count = Math.min(cfg.nodes.length, levelCount);
     for (let li = 0; li < count; li++) {
         canvas.appendChild(_wdBuildLevelNode(wi, li, cfg.nodes[li]));
@@ -1427,10 +1433,10 @@ function _wdAppendLevelNodes(canvas, wi, cfg, levelCount) {
  * Returns the Convergence Trial node position for a world, or null when the
  * world has no trial (e.g. the Nexus World) or the trial system is absent.
  */
-function _wdTrialNodeForWorld(wi) {
+export function _wdTrialNodeForWorld(wi) {
     const cfg = (typeof WD_WORLD_CONFIGS !== 'undefined') ? WD_WORLD_CONFIGS[wi] : null;
     if (!cfg || !cfg.trialNode) return null;
-    if (typeof _egTrialWorlds === 'function' && _egTrialWorlds().indexOf(wi) === -1) return null;
+    if (typeof globalThis._egTrialWorlds === 'function' && globalThis._egTrialWorlds().indexOf(wi) === -1) return null;
     return cfg.trialNode;
 }
 
@@ -1439,14 +1445,14 @@ function _wdTrialNodeForWorld(wi) {
  * node (so resize/reposition picks it up automatically) plus the
  * convergence ring styling, a 🌿 icon and trial tooltip / enter flow.
  */
-function _wdBuildTrialNode(wi, pos) {
+export function _wdBuildTrialNode(wi, pos) {
     const node = document.createElement('div');
     node.className = 'wd-level-node wd-trial-node';
     node.dataset.trial = wi;
     _wdPositionNodeOnCanvas(node, wi, pos);
 
-    const isDone = (typeof _egIsTrialDone === 'function') && _egIsTrialDone(wi);
-    const isLocked = (typeof _egIsTrialUnlocked === 'function') ? !_egIsTrialUnlocked(wi) : false;
+    const isDone = (typeof globalThis._egIsTrialDone === 'function') && globalThis._egIsTrialDone(wi);
+    const isLocked = (typeof globalThis._egIsTrialUnlocked === 'function') ? !globalThis._egIsTrialUnlocked(wi) : false;
     if (isDone) node.classList.add('done');
     else if (isLocked) node.classList.add('locked');
     node.classList.add('convergence');
@@ -1472,7 +1478,7 @@ function _wdBuildTrialNode(wi, pos) {
  * and shows the trial enter button (no sprite walk - trial nodes sit
  * outside the road graph).
  */
-function _wdOnTrialNodeClick(wi) {
+export function _wdOnTrialNodeClick(wi) {
     const existing = document.getElementById('wd-enter-btn');
     if (existing) existing.remove();
     _wdShowTrialEnterButton(wi);
@@ -1481,7 +1487,7 @@ function _wdOnTrialNodeClick(wi) {
 /**
  * Shows the "Enter Convergence Trial N" button above the trial node.
  */
-function _wdShowTrialEnterButton(wi) {
+export function _wdShowTrialEnterButton(wi) {
     const existing = document.getElementById('wd-enter-btn');
     if (existing) existing.remove();
 
@@ -1489,7 +1495,7 @@ function _wdShowTrialEnterButton(wi) {
     const pos = cfg && cfg.trialNode;
     if (!pos) return;
 
-    const name = (typeof _egTrialName === 'function') ? _egTrialName(wi) : ('Convergence Trial ' + (wi + 1));
+    const name = (typeof globalThis._egTrialName === 'function') ? globalThis._egTrialName(wi) : ('Convergence Trial ' + (wi + 1));
     const rawEnter = (typeof t === 'function') ? t('scr_enter_trial') : null;
     const btnText = (rawEnter && rawEnter !== 'scr_enter_trial')
         ? rawEnter.replace('{n}', name) : ('Enter ' + name);
@@ -1519,7 +1525,7 @@ function _wdShowTrialEnterButton(wi) {
     `;
     btn.addEventListener('click', () => {
         btn.remove();
-        if (typeof _egLaunchCampaignTrial === 'function') _egLaunchCampaignTrial(wi);
+        if (typeof globalThis._egLaunchCampaignTrial === 'function') globalThis._egLaunchCampaignTrial(wi);
     });
     _wdWireEnterButtonDismiss(btn);
     if (canvas) canvas.appendChild(btn);
@@ -1529,9 +1535,9 @@ function _wdShowTrialEnterButton(wi) {
  * Trial-node tooltip: trial name, status, monster level / boss preview and
  * the first-clear reward note.
  */
-function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
+export function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
     const tip = _wdEnsureTooltip();
-    const name = (typeof _egTrialName === 'function') ? _egTrialName(wi) : ('Convergence Trial ' + (wi + 1));
+    const name = (typeof globalThis._egTrialName === 'function') ? globalThis._egTrialName(wi) : ('Convergence Trial ' + (wi + 1));
     let status = '';
     if (isLocked) status = t('scr_locked');
     else if (isDone) status = t('scr_trial_done');
@@ -1540,12 +1546,12 @@ function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
         status = isLocked ? 'Locked' : (isDone ? 'Completed' : 'Not completed');
     }
     let detail = '';
-    if (!isLocked && typeof _egTrialMonsterLevel === 'function') {
-        const ml = _egTrialMonsterLevel(wi, false);
+    if (!isLocked && typeof globalThis._egTrialMonsterLevel === 'function') {
+        const ml = globalThis._egTrialMonsterLevel(wi, false);
         let bossName = '';
         try {
-            if (typeof _egTrialBossId === 'function' && typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS) {
-                const def = EG_BOSS_DEFS[_egTrialBossId(wi, 0)];
+            if (typeof globalThis._egTrialBossId === 'function' && typeof globalThis.EG_BOSS_DEFS !== 'undefined' && globalThis.EG_BOSS_DEFS) {
+                const def = globalThis.EG_BOSS_DEFS[globalThis._egTrialBossId(wi, 0)];
                 if (def) bossName = ' · ' + (def.emoji ? def.emoji + ' ' : '') + (def.name || '');
             }
         } catch (err) {}
@@ -1571,7 +1577,7 @@ function _wdShowTrialTooltip(e, wi, isDone, isLocked) {
  * sprite, road paths) to match the current canvas size.
  * Called on resize and after the initial build.
  */
-function _wdRepositionAll(wi) {
+export function _wdRepositionAll(wi) {
     const canvas = _wdGetCanvas();
     if (!canvas) return;
     const cfg = WD_WORLD_CONFIGS[wi];
@@ -1608,9 +1614,9 @@ function _wdRepositionAll(wi) {
  * Attaches a ResizeObserver to the canvas so that _wdRepositionAll is called
  * automatically whenever the canvas element changes size.
  */
-function _wdObserveCanvasResize(canvas, wi) {
+export function _wdObserveCanvasResize(canvas, wi) {
     if (window._wdResizeObserver) window._wdResizeObserver.disconnect();
-    window._wdResizeObserver = new ResizeObserver(() => _wdRepositionAll(wi));
+    window._wdResizeObserver = new globalThis.ResizeObserver(() => _wdRepositionAll(wi));
     window._wdResizeObserver.observe(canvas);
 }
 
@@ -1619,7 +1625,7 @@ function _wdObserveCanvasResize(canvas, wi) {
  * sets the SVG viewBox, draws paths, and places the sprite.
  * Deferred to a rAF so the browser has computed element sizes first.
  */
-function _wdInitialLayout(canvas, svg, wi, sprite) {
+export function _wdInitialLayout(canvas, svg, wi, sprite) {
     requestAnimationFrame(() => {
         const w = canvas.offsetWidth;
         const h = canvas.offsetHeight;
@@ -1635,7 +1641,7 @@ function _wdInitialLayout(canvas, svg, wi, sprite) {
  * marker, level nodes, and player sprite. Also sets up the resize observer
  * and the dev-tool click logger. Clears any previous canvas content first.
  */
-function _wdBuildCanvas(wi) {
+export function _wdBuildCanvas(wi) {
     const wrap = document.getElementById('wd-canvas-wrap');
     if (!wrap) return;
     wrap.innerHTML = '';
@@ -1646,7 +1652,7 @@ function _wdBuildCanvas(wi) {
         return;
     }
 
-    const world = WORLDS && WORLDS[wi];
+    const world = globalThis.WORLDS && globalThis.WORLDS[wi];
     const levelCount = world ? world.data.length : cfg.nodes.length;
 
     const { canvas, svg } = _wdCreateCanvasElement(cfg);
@@ -1673,9 +1679,9 @@ function _wdBuildCanvas(wi) {
  * Builds the "Enter Level X-Y" button element and positions it above the
  * given level node on the canvas.
  */
-function _wdCreateEnterButton(wi, li, cfg) {
+export function _wdCreateEnterButton(wi, li, cfg) {
     const pos = cfg.nodes[li];
-    const isNexusPoint = typeof isNexusPointLevel === 'function' && isNexusPointLevel(wi, li);
+    const isNexusPoint = typeof globalThis.isNexusPointLevel === 'function' && globalThis.isNexusPointLevel(wi, li);
     const rawNexusLabel = t('scr_enter_nexus_point');
     const btnText = isNexusPoint && rawNexusLabel !== 'scr_enter_nexus_point'
         ? rawNexusLabel
@@ -1711,10 +1717,10 @@ function _wdCreateEnterButton(wi, li, cfg) {
 /**
  * Wires up the enter button's click handler: removes the button and starts the level.
  */
-function _wdWireEnterButtonClick(btn, gi) {
+export function _wdWireEnterButtonClick(btn, gi) {
     btn.addEventListener('click', () => {
         btn.remove();
-        if (typeof startLevel === 'function') startLevel(gi);
+        if (typeof globalThis.startLevel === 'function') globalThis.startLevel(gi);
     });
 }
 
@@ -1723,7 +1729,7 @@ function _wdWireEnterButtonClick(btn, gi) {
  * (but not on the button itself) removes the button.
  * Uses a short timeout to avoid the same click that opened the button dismissing it.
  */
-function _wdWireEnterButtonDismiss(btn) {
+export function _wdWireEnterButtonDismiss(btn) {
     const dismiss = (e) => {
         if (e.target !== btn) {
             btn.remove();
@@ -1739,14 +1745,14 @@ function _wdWireEnterButtonDismiss(btn) {
  * Shows the "Enter Level X-Y" button above the given level node, replacing
  * any previously open enter button.
  */
-function _wdShowEnterButton(wi, li) {
+export function _wdShowEnterButton(wi, li) {
     const existing = document.getElementById('wd-enter-btn');
     if (existing) existing.remove();
 
     const cfg = WD_WORLD_CONFIGS[wi];
     if (!cfg || !cfg.nodes[li]) return;
 
-    const gi = WORLD_START_GI[wi] + li;
+    const gi = globalThis.WORLD_START_GI[wi] + li;
     const btn = _wdCreateEnterButton(wi, li, cfg);
     _wdWireEnterButtonClick(btn, gi);
     _wdWireEnterButtonDismiss(btn);
@@ -1760,7 +1766,7 @@ function _wdShowEnterButton(wi, li) {
  * the sprite to the clicked node, then shows the enter button on arrival.
  * Ignored while a walk animation is already in progress.
  */
-function _wdOnLevelNodeClick(wi, li) {
+export function _wdOnLevelNodeClick(wi, li) {
 
     const existing = document.getElementById('wd-enter-btn');
     if (existing) existing.remove();
@@ -1777,7 +1783,7 @@ function _wdOnLevelNodeClick(wi, li) {
  * Ensures the tooltip element exists in the DOM, creating it if needed.
  * Reuses the overworld map tooltip CSS class (mv-tooltip).
  */
-function _wdEnsureTooltip() {
+export function _wdEnsureTooltip() {
     let tip = _wdGetTooltipEl();
     if (!tip) {
         tip = document.createElement('div');
@@ -1793,7 +1799,7 @@ function _wdEnsureTooltip() {
  * (e.g. "⚗️ ASCENSION · ", "🌌 NEXUS POINT · " or "🌿 CONVERGENCE · ").
  * Returns empty string for standard nodes.
  */
-function _wdGetTooltipTypeLabel(isLastInWorld, isConvergence, isNexusPoint) {
+export function _wdGetTooltipTypeLabel(isLastInWorld, isConvergence, isNexusPoint) {
     if (isNexusPoint) return `${t('scr_nexus_point_badge')} · `;
     if (isLastInWorld) return `${t('scr_ascension_badge')} · `;
     if (isConvergence) return `${t('scr_convergence_badge')} · `;
@@ -1803,8 +1809,8 @@ function _wdGetTooltipTypeLabel(isLastInWorld, isConvergence, isNexusPoint) {
 /**
  * Resolves the localised hint string for a level, if one is defined.
  */
-function _wdGetLevelHint(wi, li) {
-    const world = WORLDS && WORLDS[wi];
+export function _wdGetLevelHint(wi, li) {
+    const world = globalThis.WORLDS && globalThis.WORLDS[wi];
     const levelData = world && world.data[li];
     if (!levelData) return '';
     return (LANG === 'de' && levelData.hintDE) ? levelData.hintDE : (levelData.hint || '');
@@ -1813,8 +1819,8 @@ function _wdGetLevelHint(wi, li) {
 /**
  * Returns a star string for a level's best run (mirrors getStars in screens-level-select.js).
  */
-function _wdGetStars(gi) {
-    const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
+export function _wdGetStars(gi) {
+    const hs = globalThis.STATE && globalThis.STATE.levelHS && globalThis.STATE.levelHS[gi];
     if (!hs) return '';
     const diffIndex = WD_DIFF_TIERS.indexOf(hs.diff || 'easy');
     const starCount = Math.max(1, diffIndex + 1);
@@ -1826,7 +1832,7 @@ function _wdGetStars(gi) {
 /**
  * Builds HTML tag pills for the mods used in the player's best run.
  */
-function _wdBuildTooltipModTags(hs) {
+export function _wdBuildTooltipModTags(hs) {
     if (!hs || !hs.mods) return '';
     const active = Object.keys(hs.mods).filter(m => hs.mods[m]);
     if (!active.length) return '';
@@ -1840,11 +1846,11 @@ function _wdBuildTooltipModTags(hs) {
 /**
  * Builds the status line text for the tooltip based on the level's state.
  */
-function _wdGetTooltipStatusText(gi, isDone, isLocked) {
+export function _wdGetTooltipStatusText(gi, isDone, isLocked) {
     if (_wdIsMathGated(gi)) {
         return t('scr_gate_unsolved');
     }
-    const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
+    const hs = globalThis.STATE && globalThis.STATE.levelHS && globalThis.STATE.levelHS[gi];
     if (isDone && hs) {
         return t('scr_level_done_best').replace('{n}', hs.score);
     }
@@ -1859,14 +1865,14 @@ function _wdGetTooltipStatusText(gi, isDone, isLocked) {
  * "claimed" state). Returns empty string if the level has no bonus, or is
  * locked and the bonus hasn't already been claimed.
  */
-function _wdBuildTooltipBonusHtml(gi, levelData, isLocked) {
+export function _wdBuildTooltipBonusHtml(gi, levelData, isLocked) {
     if (!levelData || levelData.bonusType === undefined) return '';
 
     const bIcon = WD_BONUS_ICONS[levelData.bonusType || 'nomiss'] || '🎯';
     const bonusLabel = (LANG === 'de' && levelData.bonusHintDE) ? levelData.bonusHintDE
         : (levelData.bonusHint || t('ls_complete_level'));
 
-    if (STATE && STATE.bonusDone && STATE.bonusDone.includes(gi)) {
+    if (globalThis.STATE && globalThis.STATE.bonusDone && globalThis.STATE.bonusDone.includes(gi)) {
         return `<div class="wd-tip-bonus done">${bIcon} ${t('scr_bonus_claimed_tip')}</div>`;
     }
     if (!isLocked) {
@@ -1879,7 +1885,7 @@ function _wdBuildTooltipBonusHtml(gi, levelData, isLocked) {
  * Builds the grid-size pill shown in the tooltip header (e.g. "9×9").
  * Returns empty string if the level is locked or has no grid/world size data.
  */
-function _wdBuildTooltipGridHtml(levelData, world, isLocked) {
+export function _wdBuildTooltipGridHtml(levelData, world, isLocked) {
     if (!levelData || isLocked) return '';
     const gs = levelData.grid
         ? `${levelData.grid.length}×${levelData.grid[0].length}`
@@ -1890,14 +1896,14 @@ function _wdBuildTooltipGridHtml(levelData, world, isLocked) {
 /**
  * Populates and shows the enriched tooltip for a level node on mouseenter.
  */
-function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint) {
+export function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint) {
     const tip = _wdEnsureTooltip();
-    const gi = WORLD_START_GI[wi] + li;
-    const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
-    const world = WORLDS && WORLDS[wi];
+    const gi = globalThis.WORLD_START_GI[wi] + li;
+    const hs = globalThis.STATE && globalThis.STATE.levelHS && globalThis.STATE.levelHS[gi];
+    const world = globalThis.WORLDS && globalThis.WORLDS[wi];
     const levelData = world && world.data[li];
-    if (typeof isNexusPoint === 'undefined' && typeof isNexusPointLevel === 'function') {
-        isNexusPoint = isNexusPointLevel(wi, li);
+    if (typeof isNexusPoint === 'undefined' && typeof globalThis.isNexusPointLevel === 'function') {
+        isNexusPoint = globalThis.isNexusPointLevel(wi, li);
     }
 
     const typeLabel = _wdGetTooltipTypeLabel(isLastInWorld, isConvergence, isNexusPoint);
@@ -1915,7 +1921,7 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
         : '';
 
     // Syla - Nature's Aid note on forest levels
-    const sylaLine = (_charIs('syla') && levelData && levelData.isForestLevel)
+    const sylaLine = (globalThis._charIs('syla') && levelData && levelData.isForestLevel)
         ? `<div class="wd-tip-bonus syla">🌿 ${t('scr_syla_forest_tip')}</div>`
         : '';
 
@@ -1947,7 +1953,7 @@ function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergenc
 /**
  * Repositions the tooltip to follow the mouse cursor.
  */
-function _wdMoveTooltip(e) {
+export function _wdMoveTooltip(e) {
     const tip = _wdGetTooltipEl();
     if (!tip) return;
     const rect = tip.getBoundingClientRect();
@@ -1966,7 +1972,7 @@ function _wdMoveTooltip(e) {
 /**
  * Hides the tooltip.
  */
-function _wdHideTooltip() {
+export function _wdHideTooltip() {
     const tip = _wdGetTooltipEl();
     if (tip) tip.classList.remove('show');
 }
@@ -1989,14 +1995,14 @@ function _wdHideTooltip() {
  * Iterates through all worlds to find which one owns gi, then writes the
  * corresponding local level index into STATE.wdSpriteLevel[wi].
  */
-function _wdSyncSpriteToLevel(gi) {
-    for (let wi = 0; wi < WORLDS.length; wi++) {
-        const start = WORLD_START_GI[wi];
-        const world = WORLDS[wi];
+export function _wdSyncSpriteToLevel(gi) {
+    for (let wi = 0; wi < globalThis.WORLDS.length; wi++) {
+        const start = globalThis.WORLD_START_GI[wi];
+        const world = globalThis.WORLDS[wi];
         if (gi >= start && gi < start + world.data.length) {
             const li = gi - start;
-            if (!STATE.wdSpriteLevel) STATE.wdSpriteLevel = {};
-            STATE.wdSpriteLevel[wi] = li;
+            if (!globalThis.STATE.wdSpriteLevel) globalThis.STATE.wdSpriteLevel = {};
+            globalThis.STATE.wdSpriteLevel[wi] = li;
             if (typeof save === 'function') save();
             break;
         }
@@ -2013,18 +2019,18 @@ function _wdSyncSpriteToLevel(gi) {
  * Called from screens-map-view.js when the player clicks "Enter [World]".
  * wi - 0-based world index.
  */
-function showWorldDetail(wi) {
+export function showWorldDetail(wi) {
     // Per-world level selection: same overworld music as the map view.
     if (typeof Audio_Manager !== 'undefined') Audio_Manager.playBGM('overworld');
     _wdCurrentWi = wi;
 
-    _wdCurrentLevelIdx = (STATE && STATE.wdSpriteLevel && STATE.wdSpriteLevel[wi] !== undefined)
-        ? STATE.wdSpriteLevel[wi]
+    _wdCurrentLevelIdx = (globalThis.STATE && globalThis.STATE.wdSpriteLevel && globalThis.STATE.wdSpriteLevel[wi] !== undefined)
+        ? globalThis.STATE.wdSpriteLevel[wi]
         : null;
     _wdPendingRedirect = null;
 
-    _ptReturnScreen = 'screen-world-detail';
-    _ptReturnWorldIndex = wi;
+    globalThis._ptReturnScreen = 'screen-world-detail';
+    globalThis._ptReturnWorldIndex = wi;
 
     _wdBuildTopBar(wi);
     _wdBuildCanvas(wi);

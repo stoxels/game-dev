@@ -1,3 +1,8 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
 //  endgame-mod-tables-earring.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
@@ -13,7 +18,7 @@
 // equivalents to reflect the slot's secondary status.
 // Both earring slots (earring1, earring2) share this same table.
 
-const EG_MOD_TABLE_EARRING = {
+export const EG_MOD_TABLE_EARRING = {
     prefixes: {
 
         // --- LIFE & MANA ---

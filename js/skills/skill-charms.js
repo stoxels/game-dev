@@ -1,3 +1,10 @@
+﻿import { Audio_Manager } from '../audio/audio.js';
+import { save } from '../state.js';
+import { t } from '../translation/translations.js';
+import { showHUDTooltip } from '../classes/class-hud.js';
+import { renderSkillHotbar } from './skill-hotbar.js';
+import { getSkillDef, getSkillDesc, getSkillLevel, getSkillName } from './skill-registry.js';
+import { _sbSpellSchoolKey, buildSpellbookHeadHTML, isSpellbookOpen, renderSpellbook } from './skill-spellbook.js';
 // skill-charms.js
 //------------------------------------------------------------------------
 //---------------------------CHARM SYSTEM---------------------------------
@@ -32,34 +39,34 @@
 //------------------------------------------------------------------------
 
 // The two rows of five spell slots the player drags charms into.
-const CHARM_SLOT_COUNT = 10;
-const CHARM_SLOT_COLS = 5;
+export const CHARM_SLOT_COUNT = 10;
+export const CHARM_SLOT_COLS = 5;
 
 // Ten duplicate Lemmas prove one Theorem.
-const CHARM_SHARDS_PER_ORB = 10;
+export const CHARM_SHARDS_PER_ORB = 10;
 
 // Every applied Theorem adds this much damage to the charm's spell.
-const CHARM_ORB_DAMAGE_PCT = 1;
+export const CHARM_ORB_DAMAGE_PCT = 1;
 
 // Charm item glyph. The rank is drawn as a badge on top of it.
-const CHARM_BASE_ICON = '🧿';
+export const CHARM_BASE_ICON = '🧿';
 
 // Monster drop tuning (mirrors the loot-drop constants in
 // endgame-grid-pickups.js).
-const CHARM_DROP_CHANCE_NORMAL = 0.15;   // per normal monster kill
-const CHARM_DROP_CHANCE_BOSS = 1.00;     // bosses always drop
-const CHARM_DROP_LIFETIME_MS = 60000;    // uncollected charm lifetime
-const CHARM_DROP_MAX_ON_BOARD = 2;       // simultaneous charm drops
+export const CHARM_DROP_CHANCE_NORMAL = 0.15;   // per normal monster kill
+export const CHARM_DROP_CHANCE_BOSS = 1.00;     // bosses always drop
+export const CHARM_DROP_LIFETIME_MS = 60000;    // uncollected charm lifetime
+export const CHARM_DROP_MAX_ON_BOARD = 2;       // simultaneous charm drops
 
 // Rarity per rank - drives the overlay glow + toast colour.
-const CHARM_RANK_RARITY = ['common', 'rare', 'epic'];
+export const CHARM_RANK_RARITY = ['common', 'rare', 'epic'];
 
 // PoE-style rank gates: the minimum MONSTER level that can DROP each rank.
 // Index = rank - 1. Ranks 1-5 drop throughout the campaign (monster levels
 // 1..68), ranks 6-10 are map-only (T1 maps start at monster level 68, T16 at
 // 90 - see EG_MAP_TIER_MONSTER_LEVELS). Bosses share the same cap: a boss
 // only guarantees A drop, never a rank above its monster level.
-const CHARM_RANK_MIN_MONSTER_LEVEL = [1, 10, 22, 35, 50, 68, 74, 79, 84, 89];
+export const CHARM_RANK_MIN_MONSTER_LEVEL = [1, 10, 22, 35, 50, 68, 74, 79, 84, 89];
 
 // Minimum PLAYER level required to SLOT (use) each rank. Ranks 1-3 stay free
 // so the class/ascendency progression (which grants up to rank 3 via upgrades
@@ -67,7 +74,7 @@ const CHARM_RANK_MIN_MONSTER_LEVEL = [1, 10, 22, 35, 50, 68, 74, 79, 84, 89];
 // which are drop-only and mirror their drop thresholds. A player finding a
 // rank at monster level N is therefore roughly at the player level needed to
 // use it, while a twinked low-level character cannot slot a high rank early.
-const CHARM_RANK_MIN_PLAYER_LEVEL = [1, 1, 1, 35, 50, 68, 74, 79, 84, 89];
+export const CHARM_RANK_MIN_PLAYER_LEVEL = [1, 1, 1, 35, 50, 68, 74, 79, 84, 89];
 
 
 //------------------------------------------------------------------------
@@ -88,32 +95,32 @@ const CHARM_RANK_MIN_PLAYER_LEVEL = [1, 1, 1, 35, 50, 68, 74, 79, 84, 89];
 // Ranks 1-3 line up with the authored 3-rank curves the class defs already
 // shipped (rank 3 ≈ 1.65× the rank-1 reference damage), so existing content
 // keeps its feel and ranks 4-10 simply continue the curve.
-const SPELL_MAX_RANK = 10;
+export const SPELL_MAX_RANK = 10;
 
 // Index = rank - 1.
-const SPELL_RANK_DAMAGE_MULT = [1.00, 1.30, 1.65, 2.05, 2.50, 3.00, 3.60, 4.30, 5.10, 6.00];
-const SPELL_RANK_MANA_MULT = [1.00, 1.22, 1.52, 1.90, 2.40, 3.05, 3.90, 5.00, 6.40, 8.20];
+export const SPELL_RANK_DAMAGE_MULT = [1.00, 1.30, 1.65, 2.05, 2.50, 3.00, 3.60, 4.30, 5.10, 6.00];
+export const SPELL_RANK_MANA_MULT = [1.00, 1.22, 1.52, 1.90, 2.40, 3.05, 3.90, 5.00, 6.40, 8.20];
 
 // Relative chance a monster drops each rank's charm. Normal monsters skew hard
 // to low ranks; bosses roll a linear table so high ranks are a boss-farm
 // reward (a boss at monster level 89+ has ~18% chance of a rank-10 charm).
 // Both tables are rolled only among ranks the monster's level unlocks (see
 // CHARM_RANK_MIN_MONSTER_LEVEL), so low-level monsters can never drop high.
-const SPELL_RANK_DROP_WEIGHT_NORMAL = [16, 10, 7, 5, 4, 3, 2, 2, 1, 1];
-const SPELL_RANK_DROP_WEIGHT_BOSS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+export const SPELL_RANK_DROP_WEIGHT_NORMAL = [16, 10, 7, 5, 4, 3, 2, 2, 1, 1];
+export const SPELL_RANK_DROP_WEIGHT_BOSS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-function _spellRankClamp(rank) {
+export function _spellRankClamp(rank) {
     const r = Math.round(Number(rank) || 1);
     return Math.max(1, Math.min(SPELL_MAX_RANK, r));
 }
 
 // Damage multiplier for a rank (1.00 at rank 1).
-function getSpellRankDamageMult(rank) {
+export function getSpellRankDamageMult(rank) {
     return SPELL_RANK_DAMAGE_MULT[_spellRankClamp(rank) - 1];
 }
 
 // Mana/life cost multiplier for a rank (1.00 at rank 1).
-function getSpellRankManaMult(rank) {
+export function getSpellRankManaMult(rank) {
     return SPELL_RANK_MANA_MULT[_spellRankClamp(rank) - 1];
 }
 
@@ -121,7 +128,7 @@ function getSpellRankManaMult(rank) {
 //----------------------RANK LEVEL REQUIREMENTS---------------------------
 //------------------------------------------------------------------------
 // Minimum monster level that can drop a rank (1 when unknown).
-function getCharmRankMinMonsterLevel(rank) {
+export function getCharmRankMinMonsterLevel(rank) {
     const r = _spellRankClamp(rank);
     const v = CHARM_RANK_MIN_MONSTER_LEVEL[r - 1];
     return Number.isFinite(Number(v)) ? Math.max(1, Math.round(v)) : 1;
@@ -129,7 +136,7 @@ function getCharmRankMinMonsterLevel(rank) {
 
 // Highest rank a monster of `monsterLevel` may drop. Low-level creatures can
 // therefore never produce high-rank charms, no matter the weight table.
-function getCharmRankMaxForMonsterLevel(monsterLevel) {
+export function getCharmRankMaxForMonsterLevel(monsterLevel) {
     const mlvl = Math.max(1, Math.round(Number(monsterLevel) || 1));
     let max = 1;
     for (let r = 1; r <= SPELL_MAX_RANK; r++) {
@@ -139,29 +146,29 @@ function getCharmRankMaxForMonsterLevel(monsterLevel) {
 }
 
 // Minimum player level required to slot/use a rank (1 when unknown).
-function getCharmRankMinPlayerLevel(rank) {
+export function getCharmRankMinPlayerLevel(rank) {
     const r = _spellRankClamp(rank);
     const v = CHARM_RANK_MIN_PLAYER_LEVEL[r - 1];
     return Number.isFinite(Number(v)) ? Math.max(1, Math.round(v)) : 1;
 }
 
 // Live player level for requirement checks (endgame leveling when present).
-function _charmGetPlayerLevel() {
+export function _charmGetPlayerLevel() {
     try {
-        if (typeof _egGetPlayerLevel === 'function') {
-            const lv = Math.round(Number(_egGetPlayerLevel()) || 0);
+        if (typeof globalThis._egGetPlayerLevel === 'function') {
+            const lv = Math.round(Number(globalThis._egGetPlayerLevel()) || 0);
             if (lv >= 1) return lv;
         }
     } catch (e) { /* fall through to STATE */ }
-    if (typeof STATE !== 'undefined' && STATE) {
-        const lv = Math.round(Number(STATE.playerLevel) || 0);
+    if (typeof globalThis.STATE !== 'undefined' && globalThis.STATE) {
+        const lv = Math.round(Number(globalThis.STATE.playerLevel) || 0);
         if (lv >= 1) return lv;
     }
     return 1;
 }
 
 // True when the character meets the player-level requirement of a rank.
-function charmRankMeetsPlayerLevel(rank) {
+export function charmRankMeetsPlayerLevel(rank) {
     return _charmGetPlayerLevel() >= getCharmRankMinPlayerLevel(rank);
 }
 
@@ -172,18 +179,18 @@ function charmRankMeetsPlayerLevel(rank) {
 // Charm drops currently sitting on the grid: "row-col" → charm object.
 // Kept in its own map so the shared drop helpers (expiry, pause/resume,
 // cell-collision checks) can treat it like loot/currency/maps.
-let _egCharmDrops = new Map();
+export let _egCharmDrops = new Map();
 
 // Charm drag operation: { charmKey, fromSlot, moved, startX, startY } | null.
-let _charmDragState = null;
-let _charmDragGhost = null;
+export let _charmDragState = null;
+export let _charmDragGhost = null;
 
 // Transient "the player just cast this skill" marker. Reveal projectiles
 // fire asynchronously (staggered setTimeout), so the cast is remembered for
 // a short window and the orb bonus is snapshotted when the reveal starts.
-let _charmCastSkillId = null;
-let _charmCastAt = 0;
-const CHARM_CAST_MEMORY_MS = 1500;
+export let _charmCastSkillId = null;
+export let _charmCastAt = 0;
+export const CHARM_CAST_MEMORY_MS = 1500;
 
 
 //------------------------------------------------------------------------
@@ -191,12 +198,12 @@ const CHARM_CAST_MEMORY_MS = 1500;
 //------------------------------------------------------------------------
 
 // Stable charm key for a skill+rank pair.
-function charmKeyFor(skillId, rank) {
+export function charmKeyFor(skillId, rank) {
     return `${skillId}#${rank}`;
 }
 
 // Parses "mathmagician_active1#2" → { skillId, rank } (or null).
-function _charmParseKey(key) {
+export function _charmParseKey(key) {
     if (typeof key !== 'string') return null;
     const i = key.lastIndexOf('#');
     if (i <= 0) return null;
@@ -209,18 +216,18 @@ function _charmParseKey(key) {
 // Highest rank a spell has - every spell supports the full rank ladder, so
 // every rank gets its own charm (getSkillCastRankClamped keeps the authored
 // effect tables itself at ranks 1..levels.length).
-function getSkillMaxRank(skillId) {
+export function getSkillMaxRank(skillId) {
     if (typeof getSkillDef === 'function' && !getSkillDef(skillId)) return 1;
     return SPELL_MAX_RANK;
 }
 
 // Creates a fresh charm object (no orbs applied yet).
-function _charmMake(skillId, rank) {
+export function _charmMake(skillId, rank) {
     return { key: charmKeyFor(skillId, rank), skillId, rank, orbs: 0 };
 }
 
 // Localised display name of a charm, e.g. "Data Strike · Rank 2".
-function getCharmName(charm) {
+export function getCharmName(charm) {
     if (!charm) return '';
     const skillName = (typeof getSkillName === 'function') ? getSkillName(charm.skillId) : charm.skillId;
     return `${skillName} · ${t('skill_tip_rank')} ${charm.rank}`;
@@ -233,49 +240,49 @@ function getCharmName(charm) {
 
 // Ensures every charm container exists on STATE, prunes stale slot
 // references and grants the starter charms for a fresh class/ascendency.
-function ensureCharmState() {
-    if (typeof STATE === 'undefined' || !STATE) return null;
+export function ensureCharmState() {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return null;
 
-    if (!Array.isArray(STATE.charmInventory)) STATE.charmInventory = [];
-    if (!Array.isArray(STATE.charmSlots) || STATE.charmSlots.length !== CHARM_SLOT_COUNT) {
-        const slots = Array.isArray(STATE.charmSlots) ? STATE.charmSlots.slice(0, CHARM_SLOT_COUNT) : [];
+    if (!Array.isArray(globalThis.STATE.charmInventory)) globalThis.STATE.charmInventory = [];
+    if (!Array.isArray(globalThis.STATE.charmSlots) || globalThis.STATE.charmSlots.length !== CHARM_SLOT_COUNT) {
+        const slots = Array.isArray(globalThis.STATE.charmSlots) ? globalThis.STATE.charmSlots.slice(0, CHARM_SLOT_COUNT) : [];
         while (slots.length < CHARM_SLOT_COUNT) slots.push(null);
-        STATE.charmSlots = slots;
+        globalThis.STATE.charmSlots = slots;
     }
-    if (!Number.isFinite(Number(STATE.charmShards))) STATE.charmShards = 0;
-    if (!Number.isFinite(Number(STATE.charmOrbs))) STATE.charmOrbs = 0;
+    if (!Number.isFinite(Number(globalThis.STATE.charmShards))) globalThis.STATE.charmShards = 0;
+    if (!Number.isFinite(Number(globalThis.STATE.charmOrbs))) globalThis.STATE.charmOrbs = 0;
     // UI preference for the charm list (see _charmApplyRankFilter).
-    STATE.charmMaxRankOnly = STATE.charmMaxRankOnly === true;
+    globalThis.STATE.charmMaxRankOnly = globalThis.STATE.charmMaxRankOnly === true;
 
     // Drop slot references whose charm is no longer owned (save edits,
     // class resets) so a slot can never unlock a spell that isn't held.
     // A charm for a skill the player no longer owns (class change) also
     // frees its slot, so the new class's charms can take it.
-    for (let i = 0; i < STATE.charmSlots.length; i++) {
-        const key = STATE.charmSlots[i];
+    for (let i = 0; i < globalThis.STATE.charmSlots.length; i++) {
+        const key = globalThis.STATE.charmSlots[i];
         if (!key) continue;
         const charm = getCharmByKey(key);
-        if (!charm) { STATE.charmSlots[i] = null; continue; }
-        if (STATE.playerClass && typeof getSkillDef === 'function'
+        if (!charm) { globalThis.STATE.charmSlots[i] = null; continue; }
+        if (globalThis.STATE.playerClass && typeof getSkillDef === 'function'
             && getSkillDef(charm.skillId) && !_charmIsPlayerSkill(charm.skillId)) {
-            STATE.charmSlots[i] = null;
+            globalThis.STATE.charmSlots[i] = null;
         }
     }
 
     _charmSeedStarterCharms();
-    return STATE;
+    return globalThis.STATE;
 }
 
 // Returns the owned charm object for a key, or null.
-function getCharmByKey(key) {
-    if (!key || typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.charmInventory)) return null;
-    return STATE.charmInventory.find((c) => c && c.key === key) || null;
+export function getCharmByKey(key) {
+    if (!key || typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.charmInventory)) return null;
+    return globalThis.STATE.charmInventory.find((c) => c && c.key === key) || null;
 }
 
 // Every owned charm of a skill (any rank).
-function getCharmsForSkill(skillId) {
-    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.charmInventory)) return [];
-    return STATE.charmInventory.filter((c) => c && c.skillId === skillId);
+export function getCharmsForSkill(skillId) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.charmInventory)) return [];
+    return globalThis.STATE.charmInventory.filter((c) => c && c.skillId === skillId);
 }
 
 // Progression charms: the player owns a charm for every rank up to their
@@ -297,21 +304,21 @@ function getCharmsForSkill(skillId) {
 // old rank to the new one (promoteCharmSlotToRank), so the upgrade screen and
 // the charm ladder agree. A deliberate down-rank stays until the next
 // upgrade of that same spell.
-let _charmProgressionSig = null;
-function _charmSeedStarterCharms() {
-    const cls = STATE.playerClass;
+export let _charmProgressionSig = null;
+export function _charmSeedStarterCharms() {
+    const cls = globalThis.STATE.playerClass;
     if (!cls) return false;
-    if (typeof getPlayerSkillIds !== 'function' || typeof getSkillDef !== 'function') return false;
+    if (typeof globalThis.getPlayerSkillIds !== 'function' || typeof getSkillDef !== 'function') return false;
 
     let changed = false;
     let ids = [];
-    try { ids = getPlayerSkillIds(); } catch (e) { ids = []; }
+    try { ids = globalThis.getPlayerSkillIds(); } catch (e) { ids = []; }
 
     // 1) Rank ladder for every owned (non-universal) skill. Memoised on the
     //    progression inputs because ensureCharmState() runs on every render.
-    const sig = [cls, STATE.playerAscendency || '',
-        STATE.classActive1Level || 1, STATE.classActive2Level || 1,
-        STATE.ascendencySkill1Level || 1, STATE.ascendencySkill2Level || 1].join('|');
+    const sig = [cls, globalThis.STATE.playerAscendency || '',
+        globalThis.STATE.classActive1Level || 1, globalThis.STATE.classActive2Level || 1,
+        globalThis.STATE.ascendencySkill1Level || 1, globalThis.STATE.ascendencySkill2Level || 1].join('|');
     if (_charmProgressionSig !== sig) {
         _charmProgressionSig = sig;
         for (const id of ids) {
@@ -320,32 +327,32 @@ function _charmSeedStarterCharms() {
             const trained = (typeof getSkillLevel === 'function') ? (getSkillLevel(id) || 1) : 1;
             for (let rank = 1; rank <= trained; rank++) {
                 if (getCharmByKey(charmKeyFor(id, rank))) continue;
-                STATE.charmInventory.push(_charmMake(id, rank));
+                globalThis.STATE.charmInventory.push(_charmMake(id, rank));
                 changed = true;
             }
         }
     }
 
     // 2) One-time starter slots for the current class + ascendency.
-    const seedKey = `${cls}|${STATE.playerAscendency || ''}`;
-    if (STATE.charmSeedKey !== seedKey) {
+    const seedKey = `${cls}|${globalThis.STATE.playerAscendency || ''}`;
+    if (globalThis.STATE.charmSeedKey !== seedKey) {
         for (const id of ids) {
             const def = getSkillDef(id);
             if (!def || def.slotKind === 'universal') continue;
             const rank = (typeof getSkillLevel === 'function') ? (getSkillLevel(id) || 1) : 1;
             const key = charmKeyFor(id, rank);
             if (!getCharmByKey(key)) continue;       // only slot charms we actually own
-            if (STATE.charmSlots.includes(key)) continue;
+            if (globalThis.STATE.charmSlots.includes(key)) continue;
             // Never override a slot the player already dedicated to this spell.
-            const alreadySlotted = STATE.charmSlots.some((k) => {
+            const alreadySlotted = globalThis.STATE.charmSlots.some((k) => {
                 const c = getCharmByKey(k);
                 return !!c && c.skillId === id;
             });
             if (alreadySlotted) continue;
-            const free = STATE.charmSlots.indexOf(null);
-            if (free !== -1) { STATE.charmSlots[free] = key; changed = true; }
+            const free = globalThis.STATE.charmSlots.indexOf(null);
+            if (free !== -1) { globalThis.STATE.charmSlots[free] = key; changed = true; }
         }
-        STATE.charmSeedKey = seedKey;
+        globalThis.STATE.charmSeedKey = seedKey;
     }
 
     if (changed && typeof save === 'function') { try { save(); } catch (e) { /* best effort */ } }
@@ -360,7 +367,7 @@ function _charmSeedStarterCharms() {
 // Grants a charm to the inventory. Returns
 // { duplicate, orbsMade, shards } - a duplicate becomes a shard and every
 // ten shards forge an orb.
-function grantCharm(skillId, rank) {
+export function grantCharm(skillId, rank) {
     ensureCharmState();
     const key = charmKeyFor(skillId, rank);
     let duplicate = false;
@@ -368,41 +375,41 @@ function grantCharm(skillId, rank) {
 
     if (getCharmByKey(key)) {
         duplicate = true;
-        STATE.charmShards = (STATE.charmShards || 0) + 1;
-        while (STATE.charmShards >= CHARM_SHARDS_PER_ORB) {
-            STATE.charmShards -= CHARM_SHARDS_PER_ORB;
-            STATE.charmOrbs = (STATE.charmOrbs || 0) + 1;
+        globalThis.STATE.charmShards = (globalThis.STATE.charmShards || 0) + 1;
+        while (globalThis.STATE.charmShards >= CHARM_SHARDS_PER_ORB) {
+            globalThis.STATE.charmShards -= CHARM_SHARDS_PER_ORB;
+            globalThis.STATE.charmOrbs = (globalThis.STATE.charmOrbs || 0) + 1;
             orbsMade++;
         }
     } else {
-        STATE.charmInventory.push(_charmMake(skillId, rank));
+        globalThis.STATE.charmInventory.push(_charmMake(skillId, rank));
     }
 
     if (typeof save === 'function') { try { save(); } catch (e) { /* best effort */ } }
-    return { duplicate, orbsMade, shards: STATE.charmShards };
+    return { duplicate, orbsMade, shards: globalThis.STATE.charmShards };
 }
 
 // Spends one orb on a charm → +CHARM_ORB_DAMAGE_PCT% damage for its spell.
-function applyOrbToCharm(key) {
+export function applyOrbToCharm(key) {
     ensureCharmState();
     const charm = getCharmByKey(key);
     if (!charm) return false;
-    if ((STATE.charmOrbs || 0) <= 0) {
-        if (typeof showToast === 'function') showToast(`🔮 ${t('charm_no_orbs')}`, '#c39bd3');
+    if ((globalThis.STATE.charmOrbs || 0) <= 0) {
+        if (typeof globalThis.showToast === 'function') globalThis.showToast(`🔮 ${t('charm_no_orbs')}`, '#c39bd3');
         return false;
     }
-    STATE.charmOrbs -= 1;
+    globalThis.STATE.charmOrbs -= 1;
     charm.orbs = (charm.orbs || 0) + 1;
     if (typeof save === 'function') { try { save(); } catch (e) { /* best effort */ } }
-    if (typeof showToast === 'function') {
-        showToast(`🔮 ${getCharmName(charm)} - ${t('charm_orb_applied')} +${CHARM_ORB_DAMAGE_PCT}%`, '#f5d98b');
+    if (typeof globalThis.showToast === 'function') {
+        globalThis.showToast(`🔮 ${getCharmName(charm)} - ${t('charm_orb_applied')} +${CHARM_ORB_DAMAGE_PCT}%`, '#f5d98b');
     }
     _charmRefreshSpellbook();
     return true;
 }
 
 // Total orb bonus (in %) a skill's charms carry.
-function getCharmSkillOrbBonusPct(skillId) {
+export function getCharmSkillOrbBonusPct(skillId) {
     if (!skillId) return 0;
     let orbs = 0;
     for (const c of getCharmsForSkill(skillId)) orbs += (c.orbs || 0);
@@ -410,7 +417,7 @@ function getCharmSkillOrbBonusPct(skillId) {
 }
 
 // Damage multiplier for a skill (1.0 when it has no orbs applied).
-function getCharmSkillDamageMult(skillId) {
+export function getCharmSkillDamageMult(skillId) {
     return 1 + getCharmSkillOrbBonusPct(skillId) / 100;
 }
 
@@ -422,16 +429,16 @@ function getCharmSkillDamageMult(skillId) {
 // True when a charm with this skill sits in any spell slot AND meets its
 // player-level requirement. An over-level charm stays owned but does not
 // unlock its spell until the character grows into it (PoE gem-style).
-function isSkillCharmUnlocked(skillId) {
-    if (typeof STATE === 'undefined' || !STATE) return true;
+export function isSkillCharmUnlocked(skillId) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return true;
     // Tutorial: the Professor's Scroll of Fireball (Rank 1) lesson gates the
     // Fireball exactly like a normal charm - but ONLY Fireball, so the
     // earlier (classless) puzzle lessons keep working.
-    const tqActive = (typeof _tqIsTutorialActive === 'function')
-        && (function () { try { return _tqIsTutorialActive(); } catch (e) { return false; } })();
+    const tqActive = (typeof globalThis._tqIsTutorialActive === 'function')
+        && (function () { try { return globalThis._tqIsTutorialActive(); } catch (e) { return false; } })();
     if (tqActive) {
         if (skillId !== 'fireball') return true;
-    } else if (!STATE.playerClass) {
+    } else if (!globalThis.STATE.playerClass) {
         // Before a class is chosen nothing is charm-gated.
         return true;
     }
@@ -439,7 +446,7 @@ function isSkillCharmUnlocked(skillId) {
     if (!def) return true; // unknown ids are never gated
     if (!_charmIsPlayerSkill(skillId)) return true; // not part of the charm pool
     ensureCharmState();
-    return STATE.charmSlots.some((key) => {
+    return globalThis.STATE.charmSlots.some((key) => {
         const charm = getCharmByKey(key);
         return !!charm && charm.skillId === skillId && charmRankMeetsPlayerLevel(charm.rank);
     });
@@ -449,10 +456,10 @@ function isSkillCharmUnlocked(skillId) {
 // The spell book lists exactly these spells and nothing else - the slots ARE
 // the loadout, and the ~100-spell arsenal is far too large to browse. New
 // spells reach the book by slotting their charm from the charm inventory.
-function isSkillCharmSlotted(skillId) {
-    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.charmSlots)) return false;
+export function isSkillCharmSlotted(skillId) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.charmSlots)) return false;
     ensureCharmState();
-    return STATE.charmSlots.some((key) => {
+    return globalThis.STATE.charmSlots.some((key) => {
         const charm = getCharmByKey(key);
         return !!charm && charm.skillId === skillId;
     });
@@ -461,13 +468,13 @@ function isSkillCharmSlotted(skillId) {
 // True when the skill belongs to the player's own charm pool. The set is
 // memoised per class/ascendency because this is consulted for every spell on
 // every hotbar / spell book render.
-let _charmPlayerSkillSet = null;
-let _charmPlayerSkillKey = null;
-function _charmIsPlayerSkill(skillId) {
-    if (typeof getPlayerSkillIds !== 'function' || typeof STATE === 'undefined' || !STATE) return false;
-    const ownerKey = `${STATE.playerClass || ''}|${STATE.playerAscendency || ''}`;
+export let _charmPlayerSkillSet = null;
+export let _charmPlayerSkillKey = null;
+export function _charmIsPlayerSkill(skillId) {
+    if (typeof globalThis.getPlayerSkillIds !== 'function' || typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return false;
+    const ownerKey = `${globalThis.STATE.playerClass || ''}|${globalThis.STATE.playerAscendency || ''}`;
     if (!_charmPlayerSkillSet || _charmPlayerSkillKey !== ownerKey) {
-        try { _charmPlayerSkillSet = new Set(getPlayerSkillIds()); } catch (e) { _charmPlayerSkillSet = new Set(); }
+        try { _charmPlayerSkillSet = new Set(globalThis.getPlayerSkillIds()); } catch (e) { _charmPlayerSkillSet = new Set(); }
         _charmPlayerSkillKey = ownerKey;
     }
     return _charmPlayerSkillSet.has(skillId);
@@ -476,15 +483,15 @@ function _charmIsPlayerSkill(skillId) {
 // Resolves the player's skill id that owns a legacy ability slot
 // ('active1'…'active5'), or null when nothing maps to it. Memoised per
 // class/ascendency - this runs on every HUD render and tooltip.
-let _charmSlotSkillMap = null;
-let _charmSlotSkillMapKey = null;
-function getSkillIdForLegacySlot(slot) {
-    if (!slot || typeof getPlayerSkillIds !== 'function' || typeof STATE === 'undefined' || !STATE) return null;
-    const ownerKey = `${STATE.playerClass || ''}|${STATE.playerAscendency || ''}`;
+export let _charmSlotSkillMap = null;
+export let _charmSlotSkillMapKey = null;
+export function getSkillIdForLegacySlot(slot) {
+    if (!slot || typeof globalThis.getPlayerSkillIds !== 'function' || typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return null;
+    const ownerKey = `${globalThis.STATE.playerClass || ''}|${globalThis.STATE.playerAscendency || ''}`;
     if (!_charmSlotSkillMap || _charmSlotSkillMapKey !== ownerKey) {
         _charmSlotSkillMap = {};
         try {
-            for (const id of getPlayerSkillIds()) {
+            for (const id of globalThis.getPlayerSkillIds()) {
                 const def = getSkillDef(id);
                 if (def && def.legacySlot) _charmSlotSkillMap[def.legacySlot] = id;
             }
@@ -496,7 +503,7 @@ function getSkillIdForLegacySlot(slot) {
 
 // Returns the skill id using a legacy slot when its charm is NOT slotted
 // (so the legacy ability engine can refuse the cast), else null.
-function getCharmLockedSkillForLegacySlot(slot) {
+export function getCharmLockedSkillForLegacySlot(slot) {
     const id = getSkillIdForLegacySlot(slot);
     if (!id) return null;
     return isSkillCharmUnlocked(id) ? null : id;
@@ -507,10 +514,10 @@ function getCharmLockedSkillForLegacySlot(slot) {
 // requirement - use isSkillCharmUnlocked()/getSkillCastRankFull() for the
 // gated (effective) view. Raw display keeps the inventory/slot UI honest
 // about what is actually sitting in the slot while it is locked.
-function getCharmSlottedRank(skillId) {
+export function getCharmSlottedRank(skillId) {
     ensureCharmState();
-    if (typeof STATE === 'undefined' || !STATE) return null;
-    for (const key of STATE.charmSlots) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return null;
+    for (const key of globalThis.STATE.charmSlots) {
         const charm = getCharmByKey(key);
         if (charm && charm.skillId === skillId) return charm.rank;
     }
@@ -519,10 +526,10 @@ function getCharmSlottedRank(skillId) {
 
 // Rank of the slotted charm that the character may actually USE (meets the
 // player-level requirement), or null when nothing usable is slotted.
-function getCharmUsableSlottedRank(skillId) {
+export function getCharmUsableSlottedRank(skillId) {
     ensureCharmState();
-    if (typeof STATE === 'undefined' || !STATE) return null;
-    for (const key of STATE.charmSlots) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return null;
+    for (const key of globalThis.STATE.charmSlots) {
         const charm = getCharmByKey(key);
         if (charm && charm.skillId === skillId && charmRankMeetsPlayerLevel(charm.rank)) return charm.rank;
     }
@@ -540,7 +547,7 @@ function getCharmUsableSlottedRank(skillId) {
 // Full cast rank (may exceed the authored effect table - see below).
 // An over-level slotted charm does NOT raise the cast rank: the spell falls
 // back to the character's trained rank until the level requirement is met.
-function getSkillCastRankFull(skillId) {
+export function getSkillCastRankFull(skillId) {
     const slotted = getCharmUsableSlottedRank(skillId);
     if (slotted) return _spellRankClamp(slotted);
     const trained = (typeof getSkillLevel === 'function') ? getSkillLevel(skillId) : 1;
@@ -551,7 +558,7 @@ function getSkillCastRankFull(skillId) {
 // authored level tables only define ranks 1..levels.length, so higher-rank
 // charms keep the top authored effect and get their extra power from the
 // rank damage multiplier instead of indexing past the table.
-function getSkillCastRankClamped(skillId) {
+export function getSkillCastRankClamped(skillId) {
     const full = getSkillCastRankFull(skillId);
     const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
     const max = (def && Array.isArray(def.levels) && def.levels.length) ? def.levels.length : 1;
@@ -560,26 +567,26 @@ function getSkillCastRankClamped(skillId) {
 
 // Effect rank for a legacy ability slot ('active1'…'active5'), or null when
 // no player skill maps to the slot.
-function getSkillCastRankClampedForSlot(slot) {
+export function getSkillCastRankClampedForSlot(slot) {
     const id = getSkillIdForLegacySlot(slot);
     if (!id) return null;
     return getSkillCastRankClamped(id);
 }
 
 // Mana-cost multiplier for a legacy ability slot.
-function getSkillRankManaMultForSlot(slot) {
+export function getSkillRankManaMultForSlot(slot) {
     const id = getSkillIdForLegacySlot(slot);
     if (!id) return 1;
     return getSpellRankManaMult(getSkillCastRankFull(id));
 }
 
 // Damage multiplier for a skill id.
-function getSpellRankDamageMultForSkill(skillId) {
+export function getSpellRankDamageMultForSkill(skillId) {
     return getSpellRankDamageMult(getSkillCastRankFull(skillId));
 }
 
 // Mana-cost multiplier for a skill id.
-function getSpellRankManaMultForSkill(skillId) {
+export function getSpellRankManaMultForSkill(skillId) {
     return getSpellRankManaMult(getSkillCastRankFull(skillId));
 }
 
@@ -590,7 +597,7 @@ function getSpellRankManaMultForSkill(skillId) {
 // inventory, so no data is lost). Charms above the character's player level
 // are rejected with a toast - they stay owned until the level requirement is
 // met (see CHARM_RANK_MIN_PLAYER_LEVEL).
-function setCharmSlot(slotIndex, charmKey, opts) {
+export function setCharmSlot(slotIndex, charmKey, opts) {
     ensureCharmState();
     if (slotIndex < 0 || slotIndex >= CHARM_SLOT_COUNT) return false;
     if (charmKey !== null && !getCharmByKey(charmKey)) return false;
@@ -598,12 +605,12 @@ function setCharmSlot(slotIndex, charmKey, opts) {
     if (charmKey !== null && !bypassLevel) {
         const charm = getCharmByKey(charmKey);
         if (charm && !charmRankMeetsPlayerLevel(charm.rank)) {
-            if (typeof showToast === 'function') {
+            if (typeof globalThis.showToast === 'function') {
                 const need = getCharmRankMinPlayerLevel(charm.rank);
                 const msg = (typeof t === 'function')
                     ? t('charm_rank_locked_toast').replace('{r}', charm.rank).replace('{n}', need)
                     : `Rank ${charm.rank} charm needs player level ${need}`;
-                showToast(`🔒 ${msg}`, '#e06c55');
+                globalThis.showToast(`🔒 ${msg}`, '#e06c55');
             }
             return false;
         }
@@ -612,15 +619,15 @@ function setCharmSlot(slotIndex, charmKey, opts) {
     if (charmKey !== null) {
         // A charm lives in at most one slot, and only one charm per skill is
         // ever slotted (two ranks of the same spell must not both unlock it).
-        for (let i = 0; i < STATE.charmSlots.length; i++) {
+        for (let i = 0; i < globalThis.STATE.charmSlots.length; i++) {
             if (i === slotIndex) continue;
-            if (STATE.charmSlots[i] === charmKey) { STATE.charmSlots[i] = null; continue; }
-            const other = getCharmByKey(STATE.charmSlots[i]);
+            if (globalThis.STATE.charmSlots[i] === charmKey) { globalThis.STATE.charmSlots[i] = null; continue; }
+            const other = getCharmByKey(globalThis.STATE.charmSlots[i]);
             const placedCharm = getCharmByKey(charmKey);
-            if (other && placedCharm && other.skillId === placedCharm.skillId) STATE.charmSlots[i] = null;
+            if (other && placedCharm && other.skillId === placedCharm.skillId) globalThis.STATE.charmSlots[i] = null;
         }
     }
-    STATE.charmSlots[slotIndex] = charmKey;
+    globalThis.STATE.charmSlots[slotIndex] = charmKey;
     if (typeof save === 'function') { try { save(); } catch (e) { /* best effort */ } }
     // Slotting changes which spells are unlocked, so refresh the open book
     // (spell lock icons + charm panel) and the hotbar lock states.
@@ -629,7 +636,7 @@ function setCharmSlot(slotIndex, charmKey, opts) {
 }
 
 // Empties a spell slot (the charm stays in the inventory).
-function clearCharmSlot(slotIndex) {
+export function clearCharmSlot(slotIndex) {
     return setCharmSlot(slotIndex, null);
 }
 
@@ -637,13 +644,13 @@ function clearCharmSlot(slotIndex) {
 // empty spell slot. No-ops when the charm is unknown or already slotted,
 // and toasts when every slot is taken. setCharmSlot() owns dedupe, save
 // and re-render.
-function _charmQuickSlot(charmKey) {
+export function _charmQuickSlot(charmKey) {
     ensureCharmState();
     if (!charmKey || !getCharmByKey(charmKey)) return false;
-    if (STATE.charmSlots.includes(charmKey)) return false;
-    const idx = STATE.charmSlots.findIndex((s) => !s);
+    if (globalThis.STATE.charmSlots.includes(charmKey)) return false;
+    const idx = globalThis.STATE.charmSlots.findIndex((s) => !s);
     if (idx === -1) {
-        if (typeof showToast === 'function') showToast(t('charm_slots_full'));
+        if (typeof globalThis.showToast === 'function') globalThis.showToast(t('charm_slots_full'));
         return false;
     }
     return setCharmSlot(idx, charmKey);
@@ -661,19 +668,19 @@ function _charmQuickSlot(charmKey) {
 //     - a free slot is left free, and a higher-rank charm is never downgraded;
 //   • only promotes to a charm that is actually owned.
 // Returns true when a slot was rewritten.
-function promoteCharmSlotToRank(skillId, rank) {
+export function promoteCharmSlotToRank(skillId, rank) {
     ensureCharmState();
-    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.charmSlots)) return false;
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.charmSlots)) return false;
     if (!skillId || !rank) return false;
     const newKey = charmKeyFor(skillId, rank);
     if (!getCharmByKey(newKey)) return false;          // only promote charms we own
-    if (STATE.charmSlots.includes(newKey)) return false;
-    const idx = STATE.charmSlots.findIndex((key) => {
+    if (globalThis.STATE.charmSlots.includes(newKey)) return false;
+    const idx = globalThis.STATE.charmSlots.findIndex((key) => {
         const charm = getCharmByKey(key);
         return !!charm && charm.skillId === skillId && charm.rank < rank;
     });
     if (idx === -1) return false;
-    STATE.charmSlots[idx] = newKey;
+    globalThis.STATE.charmSlots[idx] = newKey;
     if (typeof save === 'function') { try { save(); } catch (e) { /* best effort */ } }
     // The book (equipped list + ranks) and the hotbar (cast rank, lock state)
     // both read the slotted charm.
@@ -690,24 +697,24 @@ function promoteCharmSlotToRank(skillId, rank) {
 // right spell. Class abilities reveal cells synchronously, so the reveal
 // handler snapshots this at entry; the armed-slot fallback covers casts
 // routed through the legacy class HUD.
-function noteCharmCast(skillId) {
+export function noteCharmCast(skillId) {
     if (!skillId) return;
     _charmCastSkillId = skillId;
     _charmCastAt = Date.now();
 }
 
 // Resolves the skill currently being cast (or null).
-function resolveCharmCastingSkillId() {
+export function resolveCharmCastingSkillId() {
     if (_charmCastSkillId && (Date.now() - _charmCastAt) < CHARM_CAST_MEMORY_MS) {
         return _charmCastSkillId;
     }
     try {
-        if (typeof activeAbilityMode !== 'undefined' && activeAbilityMode
-            && typeof STATE !== 'undefined' && STATE && STATE.classActiveChoice
-            && typeof getPlayerSkillIds === 'function') {
-            for (const id of getPlayerSkillIds()) {
+        if (typeof globalThis.activeAbilityMode !== 'undefined' && globalThis.activeAbilityMode
+            && typeof globalThis.STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.classActiveChoice
+            && typeof globalThis.getPlayerSkillIds === 'function') {
+            for (const id of globalThis.getPlayerSkillIds()) {
                 const def = getSkillDef(id);
-                if (def && def.legacySlot === STATE.classActiveChoice) return id;
+                if (def && def.legacySlot === globalThis.STATE.classActiveChoice) return id;
             }
         }
     } catch (e) { /* no legacy slot engine → no bonus */ }
@@ -717,14 +724,14 @@ function resolveCharmCastingSkillId() {
 // Damage multiplier for whichever spell is casting right now: its applied
 // charm orbs (+1% each) times its cast rank (rank 10 = 9.00×). Returns 1.0
 // when the reveal did not come from a charm-slotted skill.
-function getCastingSkillDamageMult() {
+export function getCastingSkillDamageMult() {
     const skillId = resolveCharmCastingSkillId();
     if (!skillId) return 1;
     return getCharmSkillDamageMult(skillId) * getSpellRankDamageMultForSkill(skillId);
 }
 
 // Back-compat alias (older call site in endgame-class-projectiles.js).
-function getCharmCastingDamageMult() {
+export function getCharmCastingDamageMult() {
     return getCastingSkillDamageMult();
 }
 
@@ -734,7 +741,7 @@ function getCharmCastingDamageMult() {
 //------------------------------------------------------------------------
 
 // Small inline icon: the charm glyph with its rank badge on top.
-function _charmIconMarkup(charm, extraClass) {
+export function _charmIconMarkup(charm, extraClass) {
     if (!charm) return '';
     const cls = extraClass ? ` ${extraClass}` : '';
     return `<span class="charm-icon${cls}">`
@@ -744,9 +751,9 @@ function _charmIconMarkup(charm, extraClass) {
 }
 
 // The 2 × 5 spell slot grid.
-function _charmBuildSlotsHTML() {
+export function _charmBuildSlotsHTML() {
     ensureCharmState();
-    const slots = (STATE && STATE.charmSlots) || [];
+    const slots = (globalThis.STATE && globalThis.STATE.charmSlots) || [];
     const cells = [];
     for (let i = 0; i < CHARM_SLOT_COUNT; i++) {
         const charm = getCharmByKey(slots[i]);
@@ -782,8 +789,8 @@ function _charmBuildSlotsHTML() {
 }
 
 // "Spell Slots 6 / 10" line under the slot grid.
-function _charmSlotsCountLabel() {
-    const slots = (STATE && Array.isArray(STATE.charmSlots)) ? STATE.charmSlots : [];
+export function _charmSlotsCountLabel() {
+    const slots = (globalThis.STATE && Array.isArray(globalThis.STATE.charmSlots)) ? globalThis.STATE.charmSlots : [];
     const used = slots.filter(Boolean).length;
     return `${t('charm_slots_title')} ${used} / ${CHARM_SLOT_COUNT}`;
 }
@@ -792,10 +799,10 @@ function _charmSlotsCountLabel() {
 // The Lemma meter always reads plural (it is a count of ten); the Theorem
 // count flips to its singular form at exactly one. Both widgets use the
 // custom spell-book hover tooltip instead of a native `title` popup.
-function _charmBuildCurrencyHTML() {
+export function _charmBuildCurrencyHTML() {
     ensureCharmState();
-    const shards = (STATE && STATE.charmShards) || 0;
-    const orbs = (STATE && STATE.charmOrbs) || 0;
+    const shards = (globalThis.STATE && globalThis.STATE.charmShards) || 0;
+    const orbs = (globalThis.STATE && globalThis.STATE.charmOrbs) || 0;
     const orbLabel = t(orbs === 1 ? 'charm_currency_orb_one' : 'charm_currency_orbs');
     const tipAttrs = (kind) => ` onmouseenter="handleCharmCurrencyTip(event,'${kind}')"`
         + ` onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
@@ -807,9 +814,9 @@ function _charmBuildCurrencyHTML() {
 
 // "Max rank only" filter row, above the charm list. Persisted on STATE so the
 // choice survives a reload like every other loadout preference.
-function _charmBuildFilterHTML() {
+export function _charmBuildFilterHTML() {
     ensureCharmState();
-    const on = !!(STATE && STATE.charmMaxRankOnly);
+    const on = !!(globalThis.STATE && globalThis.STATE.charmMaxRankOnly);
     return `<label class="sb3-maxrank">`
         + `<input type="checkbox" class="charm-filter-cb"${on ? ' checked' : ''}`
         + ` onchange="handleCharmMaxRankToggle(this.checked)">`
@@ -818,9 +825,9 @@ function _charmBuildFilterHTML() {
 }
 
 // Toggles the rank filter and re-renders the book.
-function handleCharmMaxRankToggle(checked) {
-    if (typeof STATE === 'undefined' || !STATE) return;
-    STATE.charmMaxRankOnly = !!checked;
+export function handleCharmMaxRankToggle(checked) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return;
+    globalThis.STATE.charmMaxRankOnly = !!checked;
     if (typeof save === 'function') { try { save(); } catch (e) { /* best effort */ } }
     _charmRefreshSpellbook();
 }
@@ -829,20 +836,20 @@ function handleCharmMaxRankToggle(checked) {
 // when the "max rank only" filter is on. Charms that are currently sitting in
 // a spell slot are kept regardless of rank: the filter is for tidying the
 // ladder, it must never hide the charm you would have to drag back out.
-function _charmApplyRankFilter(charms) {
-    if (!STATE || !STATE.charmMaxRankOnly) return charms;
+export function _charmApplyRankFilter(charms) {
+    if (!globalThis.STATE || !globalThis.STATE.charmMaxRankOnly) return charms;
     const topRank = {};
     for (const c of charms) {
         if (!topRank[c.skillId] || c.rank > topRank[c.skillId]) topRank[c.skillId] = c.rank;
     }
-    const slotted = Array.isArray(STATE.charmSlots) ? STATE.charmSlots : [];
+    const slotted = Array.isArray(globalThis.STATE.charmSlots) ? globalThis.STATE.charmSlots : [];
     return charms.filter((c) => c.rank === topRank[c.skillId] || slotted.includes(c.key));
 }
 
 // The inventory grid (drag source for the spell slots).
-function _charmBuildInventoryHTML() {
+export function _charmBuildInventoryHTML() {
     ensureCharmState();
-    const charms = (STATE && Array.isArray(STATE.charmInventory)) ? STATE.charmInventory : [];
+    const charms = (globalThis.STATE && Array.isArray(globalThis.STATE.charmInventory)) ? globalThis.STATE.charmInventory : [];
     if (!charms.length) {
         return `<div class="sb3-charm-list"><div class="charm-inv-empty">${t('charm_inventory_empty')}</div></div>`;
     }
@@ -852,7 +859,7 @@ function _charmBuildInventoryHTML() {
         return a.rank - b.rank;
     });
     const items = sorted.map((charm, index) => {
-        const slotted = STATE.charmSlots.includes(charm.key) ? ' is-slotted' : '';
+        const slotted = globalThis.STATE.charmSlots.includes(charm.key) ? ' is-slotted' : '';
         const bonus = charm.orbs > 0 ? `<span class="sb3-charm-orbs">+${charm.orbs * CHARM_ORB_DAMAGE_PCT}%</span>` : '';
         const school = (typeof _sbSpellSchoolKey === 'function') ? _sbSpellSchoolKey(charm.skillId) : '';
         const schoolAttr = school ? ` data-school="${school}"` : '';
@@ -870,7 +877,7 @@ function _charmBuildInventoryHTML() {
 
 // Renders the whole charm side of the spell book into the two hosts
 // created by skill-spellbook.js.
-function renderSpellbookCharmPanel() {
+export function renderSpellbookCharmPanel() {
     ensureCharmState();
     const slotsHost = document.getElementById('spellbook-slots');
     if (slotsHost) slotsHost.innerHTML = _charmBuildSlotsHTML();
@@ -889,7 +896,7 @@ function renderSpellbookCharmPanel() {
 }
 
 // Re-renders the spell book when it is open (hotbar lock states included).
-function _charmRefreshSpellbook() {
+export function _charmRefreshSpellbook() {
     if (typeof isSpellbookOpen === 'function' && isSpellbookOpen()
         && typeof renderSpellbook === 'function') {
         renderSpellbook();
@@ -904,7 +911,7 @@ function _charmRefreshSpellbook() {
 //-------------------------TOOLTIP----------------------------------------
 //------------------------------------------------------------------------
 
-function handleCharmTip(e, charmKey) {
+export function handleCharmTip(e, charmKey) {
     if (typeof showHUDTooltip !== 'function') return;
     const html = buildCharmTooltipHTML(charmKey);
     if (html) showHUDTooltip(html, e);
@@ -912,7 +919,7 @@ function handleCharmTip(e, charmKey) {
 
 // Hover tooltip for the Lemma / Theorem currency widgets. Called from inline
 // attributes, so it must stay a global.
-function handleCharmCurrencyTip(e, kind) {
+export function handleCharmCurrencyTip(e, kind) {
     // Never fight an in-flight drag: the ghost follows the cursor and the
     // tooltip would sit on top of it.
     if (_charmDragState) return;
@@ -922,10 +929,10 @@ function handleCharmCurrencyTip(e, kind) {
 
 // Builds the currency tooltip: what the currency is, how much you hold and
 // what the next one buys you.
-function buildCharmCurrencyTipHTML(kind) {
+export function buildCharmCurrencyTipHTML(kind) {
     ensureCharmState();
     const isOrb = (kind === 'orbs');
-    const count = isOrb ? ((STATE && STATE.charmOrbs) || 0) : ((STATE && STATE.charmShards) || 0);
+    const count = isOrb ? ((globalThis.STATE && globalThis.STATE.charmOrbs) || 0) : ((globalThis.STATE && globalThis.STATE.charmShards) || 0);
     // No emoji in the title either - the currency is named in words
     // everywhere else in the book now.
     const title = isOrb
@@ -957,13 +964,13 @@ function buildCharmCurrencyTipHTML(kind) {
 }
 
 // Hover tooltip for an empty spell slot (the drop target for a charm).
-function handleCharmEmptySlotTip(e, slotIndex) {
+export function handleCharmEmptySlotTip(e, slotIndex) {
     if (_charmDragState) return;
     if (typeof showHUDTooltip !== 'function') return;
     showHUDTooltip(buildCharmEmptySlotTipHTML(slotIndex), e);
 }
 
-function buildCharmEmptySlotTipHTML(slotIndex) {
+export function buildCharmEmptySlotTipHTML(slotIndex) {
     const pos = t('charm_slot_tip_of')
         .replace('{i}', slotIndex + 1)
         .replace('{n}', CHARM_SLOT_COUNT);
@@ -976,11 +983,11 @@ function buildCharmEmptySlotTipHTML(slotIndex) {
 }
 
 // Builds the hover tooltip for a charm (mirrors the skill tooltip look).
-function buildCharmTooltipHTML(charmKey) {
+export function buildCharmTooltipHTML(charmKey) {
     const charm = getCharmByKey(charmKey);
     if (!charm) return '';
-    const slotted = (typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.charmSlots)
-        && STATE.charmSlots.includes(charm.key));
+    const slotted = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && Array.isArray(globalThis.STATE.charmSlots)
+        && globalThis.STATE.charmSlots.includes(charm.key));
     const bonus = charm.orbs * CHARM_ORB_DAMAGE_PCT;
     const desc = (typeof getSkillDesc === 'function') ? getSkillDesc(charm.skillId) : '';
     const usable = charmRankMeetsPlayerLevel(charm.rank);
@@ -1011,7 +1018,7 @@ function buildCharmTooltipHTML(charmKey) {
         + `<div class="skl-tip-sep"></div>`
         + `<div class="skl-tip-desc">${desc}</div>`
         + `<div class="skl-tip-note">${t('charm_tip_unlock')}</div>`
-        + `<div class="skl-tip-foot">${t('charm_shift_hint')} · ${t('charm_orbs_owned')}: ${(STATE.charmOrbs || 0)}</div>`
+        + `<div class="skl-tip-foot">${t('charm_shift_hint')} · ${t('charm_orbs_owned')}: ${(globalThis.STATE.charmOrbs || 0)}</div>`
         + (!slotted ? `<div class="skl-tip-foot">${t('charm_rightclick_hint')}</div>` : '')
         + `</div>`;
 }
@@ -1025,7 +1032,7 @@ function buildCharmTooltipHTML(charmKey) {
 // the inventory panel to unslot it.
 //------------------------------------------------------------------------
 
-function startCharmDrag(charmKey, e, fromSlot) {
+export function startCharmDrag(charmKey, e, fromSlot) {
     if (!getCharmByKey(charmKey)) return;
     _charmDragState = {
         charmKey,
@@ -1047,20 +1054,20 @@ function startCharmDrag(charmKey, e, fromSlot) {
     document.addEventListener('pointercancel', _onCharmDragEnd, true);
 }
 
-function _charmMoveGhost(x, y) {
+export function _charmMoveGhost(x, y) {
     if (!_charmDragGhost) return;
     _charmDragGhost.style.left = (x + 10) + 'px';
     _charmDragGhost.style.top = (y + 10) + 'px';
 }
 
-function _charmHighlightDropTarget(x, y) {
+export function _charmHighlightDropTarget(x, y) {
     const el = document.elementFromPoint(x, y);
     document.querySelectorAll('.sb3-slot.drop-target').forEach((n) => n.classList.remove('drop-target'));
     const slot = el && el.closest ? el.closest('.sb3-slot') : null;
     if (slot) slot.classList.add('drop-target');
 }
 
-function _onCharmDragMove(e) {
+export function _onCharmDragMove(e) {
     if (!_charmDragState) return;
     if (!_charmDragState.moved) {
         const dx = e.clientX - _charmDragState.startX;
@@ -1073,7 +1080,7 @@ function _onCharmDragMove(e) {
     _charmHighlightDropTarget(e.clientX, e.clientY);
 }
 
-function _onCharmDragEnd(e) {
+export function _onCharmDragEnd(e) {
     if (!_charmDragState) return;
     const { charmKey, fromSlot, moved } = _charmDragState;
     _charmCleanupDrag();
@@ -1095,7 +1102,7 @@ function _onCharmDragEnd(e) {
     // setCharmSlot()/clearCharmSlot() already re-rendered the book.
 }
 
-function _charmCleanupDrag() {
+export function _charmCleanupDrag() {
     _charmDragState = null;
     if (_charmDragGhost) { _charmDragGhost.remove(); _charmDragGhost = null; }
     document.body.classList.remove('skill-dragging');
@@ -1108,7 +1115,7 @@ function _charmCleanupDrag() {
 // Installs the delegated charm interactions on the (persistent) spell book
 // overlay: shift-click applies an orb, right-click slots into the next free
 // spell slot, a normal press starts a drag.
-function initCharmPanelInteractions(host) {
+export function initCharmPanelInteractions(host) {
     if (!host || host.dataset.charmBound === '1') return;
     host.dataset.charmBound = '1';
 
@@ -1160,17 +1167,17 @@ function initCharmPanelInteractions(host) {
 
 // True when a charm drop occupies the cell (used by the shared
 // drop-collision and stop/cleanup helpers).
-function _charmCellHasDrop(row, col) {
+export function _charmCellHasDrop(row, col) {
     return _egCharmDrops.has(`${row}-${col}`);
 }
 
 // Weighted pool of player skills a monster can drop a charm for. The player's
 // own class / ascendency / Heartbloom skills are three times as likely as a
 // universal-spell charm so drops stay relevant to the character.
-function _charmBuildDropSkillPool() {
+export function _charmBuildDropSkillPool() {
     const pool = [];
     let ids = [];
-    try { ids = getPlayerSkillIds(); } catch (e) { ids = []; }
+    try { ids = globalThis.getPlayerSkillIds(); } catch (e) { ids = []; }
     for (const id of ids) {
         const def = (typeof getSkillDef === 'function') ? getSkillDef(id) : null;
         if (!def) continue;
@@ -1186,7 +1193,7 @@ function _charmBuildDropSkillPool() {
 // are rolled independently so the huge universal arsenal can never dilute
 // the chance of a high-rank own-class charm (which was the case when every
 // skill×rank pair went into one pool).
-function _charmRollDropRank(isBoss, monsterLevel) {
+export function _charmRollDropRank(isBoss, monsterLevel) {
     const table = isBoss ? SPELL_RANK_DROP_WEIGHT_BOSS : SPELL_RANK_DROP_WEIGHT_NORMAL;
     const maxRank = getCharmRankMaxForMonsterLevel(monsterLevel);
     const eligible = Math.max(1, Math.min(table.length, maxRank));
@@ -1202,7 +1209,7 @@ function _charmRollDropRank(isBoss, monsterLevel) {
 }
 
 // Rolls a random charm key for a drop (or null when there is no roster yet).
-function _charmRollDropKey(isBoss, monsterLevel) {
+export function _charmRollDropKey(isBoss, monsterLevel) {
     const skills = _charmBuildDropSkillPool();
     if (!skills.length) return null;
     const skillId = skills[Math.floor(Math.random() * skills.length)];
@@ -1213,8 +1220,8 @@ function _charmRollDropKey(isBoss, monsterLevel) {
 // Chance-driven charm drop after a monster death (bosses always drop).
 // `monsterLevel` gates the drop rank via getCharmRankMaxForMonsterLevel -
 // bosses share the same cap, they only guarantee a drop within it.
-function _charmTryMonsterDrop(isBoss, monsterLevel) {
-    if (typeof _egIsActive !== 'function' || !_egIsActive()) return false;
+export function _charmTryMonsterDrop(isBoss, monsterLevel) {
+    if (typeof globalThis._egIsActive !== 'function' || !globalThis._egIsActive()) return false;
     if (_egCharmDrops.size >= CHARM_DROP_MAX_ON_BOARD) return false;
 
     const chance = isBoss ? CHARM_DROP_CHANCE_BOSS : CHARM_DROP_CHANCE_NORMAL;
@@ -1225,9 +1232,9 @@ function _charmTryMonsterDrop(isBoss, monsterLevel) {
     const parsed = _charmParseKey(dropKey);
     if (!parsed) return false;
 
-    if (typeof _egBuildPickupEligiblePool !== 'function') return false;
-    const pool = _egBuildPickupEligiblePool();
-    const free = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
+    if (typeof globalThis._egBuildPickupEligiblePool !== 'function') return false;
+    const pool = globalThis._egBuildPickupEligiblePool();
+    const free = pool.filter(([r, c]) => !globalThis._egCellHasAnyDrop(r, c));
     if (!free.length) return false;
 
     const [r, c] = free[Math.floor(Math.random() * free.length)];
@@ -1236,12 +1243,12 @@ function _charmTryMonsterDrop(isBoss, monsterLevel) {
 
     _egCharmDrops.set(key, charm);
     _charmRenderOverlay(r, c, charm);
-    _egScheduleTrackedExpiry(_egCharmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
+    globalThis._egScheduleTrackedExpiry(_egCharmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
     return true;
 }
 
 // Writes the charm overlay into the cell's DOM.
-function _charmRenderOverlay(row, col, charm) {
+export function _charmRenderOverlay(row, col, charm) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
@@ -1251,17 +1258,17 @@ function _charmRenderOverlay(row, col, charm) {
     el.appendChild(span);
 }
 
-function _charmRemoveOverlay(key) {
+export function _charmRemoveOverlay(key) {
     const [r, c] = key.split('-').map(Number);
     const span = document.getElementById(`eg-charm-${r}-${c}`);
     if (span) span.remove();
 }
 
 // Small pop animation when a charm is claimed.
-function _charmAnimateClaim(row, col, charm) {
+export function _charmAnimateClaim(row, col, charm) {
     const el = document.getElementById(`g-${row}-${col}`);
-    if (!el || typeof _egGetElementCentre !== 'function') return;
-    const centre = _egGetElementCentre(el);
+    if (!el || typeof globalThis._egGetElementCentre !== 'function') return;
+    const centre = globalThis._egGetElementCentre(el);
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater charm-floater';
     floater.textContent = CHARM_BASE_ICON;
@@ -1272,26 +1279,26 @@ function _charmAnimateClaim(row, col, charm) {
 }
 
 // Player made a CORRECT action on a cell holding a charm → collect it.
-function _charmCheckClaim(row, col) {
-    if (typeof _egIsActive !== 'function' || !_egIsActive()) return false;
+export function _charmCheckClaim(row, col) {
+    if (typeof globalThis._egIsActive !== 'function' || !globalThis._egIsActive()) return false;
     const key = `${row}-${col}`;
     const charm = _egCharmDrops.get(key);
     if (!charm) return false;
 
-    _egCancelTrackedExpiry(_egCharmDrops, key, charm);
+    globalThis._egCancelTrackedExpiry(_egCharmDrops, key, charm);
     _egCharmDrops.delete(key);
     _charmRemoveOverlay(key);
     _charmAnimateClaim(row, col, charm);
 
     const res = grantCharm(charm.skillId, charm.rank);
     const name = getSkillName(charm.skillId);
-    if (typeof showToast === 'function') {
+    if (typeof globalThis.showToast === 'function') {
         if (res.duplicate) {
             let msg = `💠 ${t('charm_pickup_duplicate')}: ${name} (${t('skill_tip_rank')} ${charm.rank}) - +1 ${t('charm_currency_shard_one')} (${res.shards}/${CHARM_SHARDS_PER_ORB})`;
             if (res.orbsMade > 0) msg += ` - 🔮 ${t('charm_orb_forged')}`;
-            showToast(msg, '#c39bd3');
+            globalThis.showToast(msg, '#c39bd3');
         } else {
-            showToast(`🧿 ${t('charm_pickup_found')}: ${name} (${t('skill_tip_rank')} ${charm.rank})`, '#f5d98b');
+            globalThis.showToast(`🧿 ${t('charm_pickup_found')}: ${name} (${t('skill_tip_rank')} ${charm.rank})`, '#f5d98b');
         }
     }
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
@@ -1302,16 +1309,16 @@ function _charmCheckClaim(row, col) {
 }
 
 // Player made a WRONG action on a cell holding a charm → it is destroyed.
-function _charmDiscardDrop(row, col) {
-    if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
+export function _charmDiscardDrop(row, col) {
+    if (typeof globalThis._egIsActive !== 'function' || !globalThis._egIsActive()) return;
     const key = `${row}-${col}`;
     if (!_egCharmDrops.has(key)) return;
     const charm = _egCharmDrops.get(key);
-    _egCancelTrackedExpiry(_egCharmDrops, key, charm);
+    globalThis._egCancelTrackedExpiry(_egCharmDrops, key, charm);
     _egCharmDrops.delete(key);
     _charmRemoveOverlay(key);
-    if (typeof _egAnimatePickupDiscard === 'function') {
-        try { _egAnimatePickupDiscard(row, col, { emoji: CHARM_BASE_ICON }); } catch (e) { /* anim best-effort */ }
+    if (typeof globalThis._egAnimatePickupDiscard === 'function') {
+        try { globalThis._egAnimatePickupDiscard(row, col, { emoji: CHARM_BASE_ICON }); } catch (e) { /* anim best-effort */ }
     }
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
         try { Audio_Manager.playSFX('player_equip_not_pickup'); } catch (e) { /* audio best-effort */ }
@@ -1320,31 +1327,31 @@ function _charmDiscardDrop(row, col) {
 
 // Revealed cells can no longer be filled, so any charm sitting there would
 // be permanently unclaimable - auto-collect it instead.
-function _charmAutoClaimOnReveal(row, col) {
+export function _charmAutoClaimOnReveal(row, col) {
     if (_egCharmDrops.has(`${row}-${col}`)) _charmCheckClaim(row, col);
 }
 
 // Clears every charm drop from the board (encounter stop).
-function _charmStopDrops() {
+export function _charmStopDrops() {
     Array.from(_egCharmDrops.entries()).forEach(([key, charm]) => {
-        _egCancelTrackedExpiry(_egCharmDrops, key, charm);
+        globalThis._egCancelTrackedExpiry(_egCharmDrops, key, charm);
     });
     _egCharmDrops.forEach((charm, key) => _charmRemoveOverlay(key));
     _egCharmDrops.clear();
 }
 
 // Re-places carried charm drops after a chain transition.
-function _charmReplaceCarriedDrops(charms) {
+export function _charmReplaceCarriedDrops(charms) {
     if (!Array.isArray(charms) || !charms.length) return;
     for (const charm of charms) {
-        const pool = (typeof _egBuildPickupEligiblePool === 'function') ? _egBuildPickupEligiblePool() : [];
-        const free = pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c));
+        const pool = (typeof globalThis._egBuildPickupEligiblePool === 'function') ? globalThis._egBuildPickupEligiblePool() : [];
+        const free = pool.filter(([r, c]) => !globalThis._egCellHasAnyDrop(r, c));
         if (!free.length) break;
         const [r, c] = free[Math.floor(Math.random() * free.length)];
         const key = `${r}-${c}`;
         _egCharmDrops.set(key, charm);
         _charmRenderOverlay(r, c, charm);
-        _egScheduleTrackedExpiry(_egCharmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
+        globalThis._egScheduleTrackedExpiry(_egCharmDrops, key, charm, CHARM_DROP_LIFETIME_MS, `eg-charm-${r}-${c}`, _charmRemoveOverlay);
     }
 }
 
@@ -1357,7 +1364,7 @@ function _charmReplaceCarriedDrops(charms) {
 //------------------------------------------------------------------------
 
 // Grants a charm (or a shard when already owned) by skill id + rank.
-function charmGrantBySkill(skillId, rank) {
+export function charmGrantBySkill(skillId, rank) {
     const r = Math.max(1, Math.min(Number(rank) || 1, getSkillMaxRank(skillId)));
     return grantCharm(skillId, r);
 }
@@ -1366,12 +1373,12 @@ function charmGrantBySkill(skillId, rank) {
 // the player does not own it yet). Returns the slot index, or -1.
 // Dev/testing helper: bypasses the player-level gate so builds can be
 // exercised at any character level.
-function charmSlotSkill(skillId, rank) {
+export function charmSlotSkill(skillId, rank) {
     ensureCharmState();
     const r = Math.max(1, Math.min(Number(rank) || 1, getSkillMaxRank(skillId)));
     const key = charmKeyFor(skillId, r);
-    if (!getCharmByKey(key)) STATE.charmInventory.push(_charmMake(skillId, r));
-    const free = STATE.charmSlots.indexOf(null);
+    if (!getCharmByKey(key)) globalThis.STATE.charmInventory.push(_charmMake(skillId, r));
+    const free = globalThis.STATE.charmSlots.indexOf(null);
     const index = free !== -1 ? free : 0;
     setCharmSlot(index, key, { bypassLevel: true });
     return index;

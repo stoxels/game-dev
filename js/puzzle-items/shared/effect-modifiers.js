@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egMapTimeGainMult } from '../../endgame/endgame-map-launch.js';
+import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
+
+//------------------------------------------------------------------------
 //-------------------SHARED - EFFECT MODIFIERS----------------------
 //------------------------------------------------------------------------
 
@@ -8,7 +16,7 @@
 
 // Returns the final reveal count for a reveal item, including all passive
 // and keystone bonuses / penalties.
-function _calcRevealCount(baseCount) {
+export function _calcRevealCount(baseCount) {
     let count = baseCount;
 
     // Passive: Stronger Light - +1 per node
@@ -20,7 +28,7 @@ function _calcRevealCount(baseCount) {
     if (ptHasSkill('keystone_blinding_truth')) count = Math.ceil(count * 1.5);
 
     // Keystone: Countdown Crisis - ×5 when timer is under 3 minutes
-    if (ptHasSkill('keystone_countdown_crisis') && timerSecs < 180) count *= 5;
+    if (ptHasSkill('keystone_countdown_crisis') && globalThis.timerSecs < 180) count *= 5;
 
     // Keystone: Curse Embrace - non-cursed items are 50% weaker
     if (ptHasSkill('keystone_curse_embrace')) count = Math.max(1, Math.floor(count * 0.5));
@@ -33,7 +41,7 @@ function _calcRevealCount(baseCount) {
 
 
 // Returns the final mark-wrong count for a markWrong item.
-function _calcMarkWrongCount(baseCount) {
+export function _calcMarkWrongCount(baseCount) {
     let count = baseCount;
 
     // Passive: Stronger Marks - +1 per node
@@ -54,7 +62,7 @@ function _calcMarkWrongCount(baseCount) {
 // Returns the final time addition (seconds) for an addTime item.
 // Also handles the Countdown Crisis inversion (caller checks and acts on
 // the negative case).
-function _calcAddTimeSecs(baseSecs) {
+export function _calcAddTimeSecs(baseSecs) {
     let multiplier = 1.0;
 
     // Passive: Extended Hour - each node adds 10% / 15% / 10%
@@ -81,7 +89,7 @@ function _calcAddTimeSecs(baseSecs) {
 // Returns the final mistake-reduction count for a mistakeEraser item.
 // Pass isEraseAll=true for mistakeEraserAll (bypasses most modifiers since
 // it always clears the full current count).
-function _calcMistakeEraserCount(baseCount, isEraseAll) {
+export function _calcMistakeEraserCount(baseCount, isEraseAll) {
     if (isEraseAll) return baseCount; // eraseAll ignores all modifiers
 
     let count = baseCount;

@@ -1,3 +1,8 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
 //  endgame-mod-name-words.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Mod name words used by the item-name builder (_egBuildItemName).
@@ -19,7 +24,7 @@
 //   enOfPhrase  – reads naturally AFTER a noun ("Leather Cap of Vitality")
 //   deGenitive  – German genitive post-position ("Lederkappe des Lebens"),
 //                 which avoids German adjective-declension issues entirely.
-const EG_MOD_NAME_WORDS = {
+export const EG_MOD_NAME_WORDS = {
     // --- LIFE & MANA ---
     flat_health: ['Healthy', 'of Vitality', 'des Lebens'],
     inc_health: ['Vital', 'of Vitality', 'des Lebens'],

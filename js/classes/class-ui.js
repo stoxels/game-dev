@@ -1,17 +1,27 @@
-﻿//------------------------------------------------------------------------
+﻿import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { save } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { ASCENDENCY_DEFS, ASCENDENCY_SPELL_ICONS } from './ascendency-defs.js';
+import { ASCENDENCY_LIST, hasAscendency, isAscendencyMaxed, isBaseClassMaxed } from './class-cooldown-state.js';
+import { CLASS_DEFS, CLASS_LIST, CLASS_SPELL_ICONS } from './class-defs.js';
+import { buildClassHUD } from './class-hud.js';
+import { CHARM_BASE_ICON, charmKeyFor, ensureCharmState, getCharmByKey, promoteCharmSlotToRank } from '../skills/skill-charms.js';
+import { getSkillDef, getSkillName } from '../skills/skill-registry.js';
+//------------------------------------------------------------------------
 //----------------------------CONSTANTS-----------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Max level any class or ascendency skill can reach.
-const CLASS_SKILL_MAX_LEVEL = 3;
+export const CLASS_SKILL_MAX_LEVEL = 3;
 
 // Delay (ms) before firing the post-overlay callback, giving the close animation time to finish.
-const AFTER_CLASS_EVENT_DELAY_MS = 120;
+export const AFTER_CLASS_EVENT_DELAY_MS = 120;
 
 // Cursor offset (px) used when positioning the weapon-locker / spell-locker tooltip.
-const CLASS_TOOLTIP_OFFSET_X = 18;
-const CLASS_TOOLTIP_OFFSET_Y = 18;
+export const CLASS_TOOLTIP_OFFSET_X = 18;
+export const CLASS_TOOLTIP_OFFSET_Y = 18;
 
 
 
@@ -23,13 +33,13 @@ const CLASS_TOOLTIP_OFFSET_Y = 18;
 
 // Callback fired after the full class-event flow finishes (e.g. closes the world-completion modal).
 // Set via triggerClassEventIfPending and consumed by closeClassOverlay.
-let _afterClassEventCallback = null;
+export let _afterClassEventCallback = null;
 
 // Whether the shared #cs-tooltip element is currently open. Used by every screen that has
 // hover targets (class-selection weapon lockers, ascendency-selection lockers, class-upgrade /
 // ascendency-upgrade spell lockers) so mousemove just repositions instead of rebuilding
 // content on every event.
-let _classTooltipOpen = false;
+export let _classTooltipOpen = false;
 
 
 
@@ -45,7 +55,7 @@ let _classTooltipOpen = false;
 
 // Hides the shared tooltip element. Called on mouseleave of any locker element
 // and whenever the overlay closes.
-function hideClassTooltip() {
+export function hideClassTooltip() {
     _classTooltipOpen = false;
 
     const tooltip = document.getElementById('cs-tooltip');
@@ -56,7 +66,7 @@ function hideClassTooltip() {
 
 // Moves the tooltip to follow the cursor while a locker is hovered,
 // clamping to the viewport so it never renders off-screen.
-function positionClassTooltip(event) {
+export function positionClassTooltip(event) {
     if (!_classTooltipOpen) return;
 
     const tooltip = document.getElementById('cs-tooltip');
@@ -83,7 +93,7 @@ function positionClassTooltip(event) {
 // the calling card/class, and positions it near the cursor. Used by the class-selection
 // weapon lockers, the ascendency-selection lockers, and the class-upgrade / ascendency-upgrade
 // spell lockers.
-function showCsTooltip(html, color, event) {
+export function showCsTooltip(html, color, event) {
     const tooltip = document.getElementById('cs-tooltip');
     if (!tooltip) return;
 
@@ -106,7 +116,7 @@ function showCsTooltip(html, color, event) {
 //------------------------------------------------------------------------
 
 // Returns the two overlay DOM elements used by every class/ascendency screen.
-function getClassOverlayElements() {
+export function getClassOverlayElements() {
     return {
         overlay: document.getElementById('class-selection-overlay'),
         content: document.getElementById('class-selection-content'),
@@ -117,7 +127,7 @@ function getClassOverlayElements() {
 // classId (optional) is written to data-classid on the overlay element so CSS
 // can key a per-class background (or other per-class chrome) off it - see
 // showClassUpgrade(), showAscendencySelection() and their respective CSS files.
-function openClassOverlay(html, mode, classId) {
+export function openClassOverlay(html, mode, classId) {
     const { overlay, content } = getClassOverlayElements();
     content.innerHTML = html;
     overlay.dataset.mode = mode || '';
@@ -127,7 +137,7 @@ function openClassOverlay(html, mode, classId) {
 }
 
 // Hides the overlay and fires the pending after-event callback if one is set.
-function closeClassOverlay() {
+export function closeClassOverlay() {
     const { overlay } = getClassOverlayElements();
     overlay.classList.remove('show');
     overlay.removeAttribute('data-mode');
@@ -152,7 +162,7 @@ function closeClassOverlay() {
 
 // Builds a single ability row (passive or active) used inside class/ascendency cards
 // and inside the weapon-locker / ascendency-locker tooltip.
-function buildAbilityBlock(tagLabel, tagClass, abilityName, abilityDesc, slotClass) {
+export function buildAbilityBlock(tagLabel, tagClass, abilityName, abilityDesc, slotClass) {
     return `
         <div class="cs-ability ${tagClass} ${slotClass || ''}">
             <span class="cs-ability-tag ${tagClass}">${tagLabel}</span>
@@ -162,24 +172,24 @@ function buildAbilityBlock(tagLabel, tagClass, abilityName, abilityDesc, slotCla
 }
 
 // Builds the "✓ MAX LEVEL" badge used on upgrade cards when an ability is already capped.
-function buildMaxedBadge() {
+export function buildMaxedBadge() {
     return `<div class="cs-upgrade-maxed">${t('cls_max_level')}</div>`;
 }
 
 // Returns the localised display name from any definition object that has nameEn / nameDE fields.
-function _clsGetLocalizedName(obj) {
+export function _clsGetLocalizedName(obj) {
     return LANG === 'de' ? obj.nameDE : obj.nameEn;
 }
 
 // Returns the localised description string from any level-data object with descEn / descDE fields.
-function _clsGetLocalizedDesc(data) {
+export function _clsGetLocalizedDesc(data) {
     return LANG === 'de' ? data.descDE : data.descEn;
 }
 
 // Builds the current -> new comparison block shown inside a spell-locker tooltip.
 // Used by both base-class upgrades and ascendency upgrades.
 // If atMax is true, only the current description is shown alongside a "maxed" tag.
-function buildUpgradeTooltipContent(tagLabel, tagClass, abilityName, currentDesc, nextDesc, atMax) {
+export function buildUpgradeTooltipContent(tagLabel, tagClass, abilityName, currentDesc, nextDesc, atMax) {
     const curLabel = t('cls_current');
     const newLabel = t('cls_new');
     const maxLabel = t('cls_max_level');
@@ -204,7 +214,7 @@ function buildUpgradeTooltipContent(tagLabel, tagClass, abilityName, currentDesc
 }
 
 // Builds the standard section header used at the top of every overlay screen.
-function buildOverlayHeader(titleHtml, subtitleHtml) {
+export function buildOverlayHeader(titleHtml, subtitleHtml) {
     return `
         <div class="cs-header">
             <div class="cs-title">${titleHtml}</div>
@@ -213,7 +223,7 @@ function buildOverlayHeader(titleHtml, subtitleHtml) {
 }
 
 // Builds the "all maxed" footer with a close button; returns empty string if not all abilities are maxed.
-function buildAllMaxedFooter(color, emoji, messageKey) {
+export function buildAllMaxedFooter(color, emoji, messageKey) {
     const message = t(messageKey);
     const closeLabel = t('cls_close');
 
@@ -241,49 +251,49 @@ function buildAllMaxedFooter(color, emoji, messageKey) {
 // the "apply" logic further down is defined.
 
 // Returns the ability definition object for the given type key ('passive', 'active1', 'active2').
-function getAbilityDef(def, type) {
+export function getAbilityDef(def, type) {
     if (type === 'passive') return def.passive;
     if (type === 'active1') return def.active1;
     return def.active2;
 }
 
 // Increments the state level for the given ability type, capped at CLASS_SKILL_MAX_LEVEL.
-function incrementClassSkillLevel(type) {
+export function incrementClassSkillLevel(type) {
     if (type === 'passive') {
-        STATE.classPassiveLevel = Math.min((STATE.classPassiveLevel || 1) + 1, CLASS_SKILL_MAX_LEVEL);
+        globalThis.STATE.classPassiveLevel = Math.min((globalThis.STATE.classPassiveLevel || 1) + 1, CLASS_SKILL_MAX_LEVEL);
     } else if (type === 'active1') {
-        STATE.classActive1Level = Math.min((STATE.classActive1Level || 1) + 1, CLASS_SKILL_MAX_LEVEL);
+        globalThis.STATE.classActive1Level = Math.min((globalThis.STATE.classActive1Level || 1) + 1, CLASS_SKILL_MAX_LEVEL);
     } else if (type === 'active2') {
-        STATE.classActive2Level = Math.min((STATE.classActive2Level || 1) + 1, CLASS_SKILL_MAX_LEVEL);
+        globalThis.STATE.classActive2Level = Math.min((globalThis.STATE.classActive2Level || 1) + 1, CLASS_SKILL_MAX_LEVEL);
     }
 }
 
 // Returns the current saved level for the given ability type.
-function getClassSkillLevel(type) {
-    if (type === 'passive') return STATE.classPassiveLevel;
-    if (type === 'active1') return STATE.classActive1Level;
-    return STATE.classActive2Level;
+export function getClassSkillLevel(type) {
+    if (type === 'passive') return globalThis.STATE.classPassiveLevel;
+    if (type === 'active1') return globalThis.STATE.classActive1Level;
+    return globalThis.STATE.classActive2Level;
 }
 
 // Returns the localised ability name for the given type from a class definition.
-function getClassAbilityName(def, type) {
+export function getClassAbilityName(def, type) {
     if (type === 'passive') return _clsGetLocalizedName(def.passive);
     if (type === 'active1') return _clsGetLocalizedName(def.active1);
     return _clsGetLocalizedName(def.active2);
 }
 
 // Increments the state level for the given ascendency skill type, capped at CLASS_SKILL_MAX_LEVEL.
-function incrementAscendencySkillLevel(type) {
+export function incrementAscendencySkillLevel(type) {
     if (type === 'active1') {
-        STATE.ascendencySkill1Level = Math.min((STATE.ascendencySkill1Level || 1) + 1, CLASS_SKILL_MAX_LEVEL);
+        globalThis.STATE.ascendencySkill1Level = Math.min((globalThis.STATE.ascendencySkill1Level || 1) + 1, CLASS_SKILL_MAX_LEVEL);
     } else {
-        STATE.ascendencySkill2Level = Math.min((STATE.ascendencySkill2Level || 1) + 1, CLASS_SKILL_MAX_LEVEL);
+        globalThis.STATE.ascendencySkill2Level = Math.min((globalThis.STATE.ascendencySkill2Level || 1) + 1, CLASS_SKILL_MAX_LEVEL);
     }
 }
 
 // Returns the current saved level for the given ascendency skill type.
-function getAscendencySkillLevel(type) {
-    return type === 'active1' ? STATE.ascendencySkill1Level : STATE.ascendencySkill2Level;
+export function getAscendencySkillLevel(type) {
+    return type === 'active1' ? globalThis.STATE.ascendencySkill1Level : globalThis.STATE.ascendencySkill2Level;
 }
 
 
@@ -296,11 +306,11 @@ function getAscendencySkillLevel(type) {
 
 // Checks whether every level in the current world has been completed.
 // Iterates over all global indices that belong to this world.
-function areAllWorldLevelsDone(wi, world) {
-    const worldStart = WORLD_START_GI[wi];
+export function areAllWorldLevelsDone(wi, world) {
+    const worldStart = globalThis.WORLD_START_GI[wi];
     const worldEnd = worldStart + world.data.length - 1;
     for (let gi = worldStart; gi <= worldEnd; gi++) {
-        if (!STATE.done.includes(gi)) return false;
+        if (!globalThis.STATE.done.includes(gi)) return false;
     }
     return true;
 }
@@ -308,26 +318,26 @@ function areAllWorldLevelsDone(wi, world) {
 // Called after every level completion.
 // If the whole world is now done and hasn't triggered a class event yet,
 // sets a pending flag so the event fires when the result screen is dismissed.
-function checkWorldCompletion() {
-    if (!cur) return;
-    const wi = cur.world - 1;
-    const world = WORLDS[wi];
+export function checkWorldCompletion() {
+    if (!globalThis.cur) return;
+    const wi = globalThis.cur.world - 1;
+    const world = globalThis.WORLDS[wi];
     if (!world || !world.data.length) return;
     if (!areAllWorldLevelsDone(wi, world)) return;
 
-    if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
-    if (STATE.classWorldsCompleted.includes(wi)) return;
+    if (!globalThis.STATE.classWorldsCompleted) globalThis.STATE.classWorldsCompleted = [];
+    if (globalThis.STATE.classWorldsCompleted.includes(wi)) return;
 
     // Nexus World special case: its Ascension Level grants a one-time
     // CLASS CHANGE TOKEN instead of the normal upgrade/ascendency flow.
     // The token is spent from the class-change screen (topbar button).
-    if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
+    if (typeof globalThis.isNexusWorld === 'function' && globalThis.isNexusWorld(wi)) {
         grantClassChangeToken(wi);
         return;
     }
 
-    STATE._pendingClassEvent = true;
-    STATE._lastClassWorld = wi;
+    globalThis.STATE._pendingClassEvent = true;
+    globalThis.STATE._lastClassWorld = wi;
     save();
 }
 
@@ -343,16 +353,16 @@ function checkWorldCompletion() {
 // new class (the spent worlds' upgrade list is carried over 1:1).
 
 // Grants one class-change token (once per Nexus completion).
-function grantClassChangeToken(wi) {
-    if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
-    if (!STATE.classWorldsCompleted.includes(wi)) STATE.classWorldsCompleted.push(wi);
-    STATE._lastClassWorld = wi;
+export function grantClassChangeToken(wi) {
+    if (!globalThis.STATE.classWorldsCompleted) globalThis.STATE.classWorldsCompleted = [];
+    if (!globalThis.STATE.classWorldsCompleted.includes(wi)) globalThis.STATE.classWorldsCompleted.push(wi);
+    globalThis.STATE._lastClassWorld = wi;
 
-    if (STATE.classChangeTokens === undefined) STATE.classChangeTokens = 0;
-    STATE.classChangeTokens++;
+    if (globalThis.STATE.classChangeTokens === undefined) globalThis.STATE.classChangeTokens = 0;
+    globalThis.STATE.classChangeTokens++;
     save();
 
-    if (typeof showToast === 'function') showToast(t('cls_change_token_toast'));
+    if (typeof globalThis.showToast === 'function') globalThis.showToast(t('cls_change_token_toast'));
     Audio_Manager.playSFX('classSelected');
 
     // The topbars read token state on populate - refresh both entry buttons.
@@ -360,12 +370,12 @@ function grantClassChangeToken(wi) {
 }
 
 // Returns how many class-change tokens the player currently holds.
-function getClassChangeTokens() {
-    return STATE.classChangeTokens || 0;
+export function getClassChangeTokens() {
+    return globalThis.STATE.classChangeTokens || 0;
 }
 
 // Shows/hides the topbar class-change buttons (mv + wd) based on token count.
-function updateClassChangeButtons() {
+export function updateClassChangeButtons() {
     ['mv', 'wd'].forEach(p => {
         const btn = document.getElementById(p + '-btn-class-change');
         if (btn) btn.style.display = getClassChangeTokens() > 0 ? '' : 'none';
@@ -373,7 +383,7 @@ function updateClassChangeButtons() {
 }
 
 // Opens the class-change screen (token-gated entry point).
-function showClassChange() {
+export function showClassChange() {
     if (getClassChangeTokens() <= 0) return;
     showClassChangeSelection();
 }
@@ -381,11 +391,11 @@ function showClassChange() {
 // The class-change screen: same card grid as the initial class selection,
 // but the current class is marked, the CTA consumes a token, and the
 // subtitle explains what happens to progression.
-function showClassChangeSelection() {
+export function showClassChangeSelection() {
     const title = t('cls_change_title');
     const subtitle = t('cls_change_sub')
         .replace('{n}', getClassChangeTokens())
-        .replace('{old}', STATE.playerClass ? _clsGetLocalizedName(CLASS_DEFS[STATE.playerClass]) : '-');
+        .replace('{old}', globalThis.STATE.playerClass ? _clsGetLocalizedName(CLASS_DEFS[globalThis.STATE.playerClass]) : '-');
 
     const header = buildOverlayHeader(`🔄 ${title}`, subtitle);
     const cards = CLASS_LIST.map(cid => buildClassCard(cid, 'change')).join('');
@@ -403,24 +413,24 @@ function showClassChangeSelection() {
 // Ascendency + all skill levels are reset, but every world-upgrade the
 // player has already banked is replayed on the new class, in order:
 // base upgrades → ascendency selection → ascendency upgrades.
-function confirmClassChange(cid) {
+export function confirmClassChange(cid) {
     if (!CLASS_DEFS[cid]) return;
     if (getClassChangeTokens() <= 0) return;
-    if (cid === STATE.playerClass) { hideClassTooltip(); return; } // no-op pick
+    if (cid === globalThis.STATE.playerClass) { hideClassTooltip(); return; } // no-op pick
 
-    STATE.classChangeTokens--;
-    STATE.classChangeUsed = true;
+    globalThis.STATE.classChangeTokens--;
+    globalThis.STATE.classChangeUsed = true;
 
     // Full reset of the class + ascendency progression...
-    STATE.playerClass = cid;
-    STATE.playerAscendency = null;
-    STATE.classPassiveLevel = 1;
-    STATE.classActive1Level = 1;
-    STATE.classActive2Level = 1;
-    STATE.classActiveLevel = 1;
-    STATE.classActiveChoice = 'active1';
-    STATE.ascendencySkill1Level = 1;
-    STATE.ascendencySkill2Level = 1;
+    globalThis.STATE.playerClass = cid;
+    globalThis.STATE.playerAscendency = null;
+    globalThis.STATE.classPassiveLevel = 1;
+    globalThis.STATE.classActive1Level = 1;
+    globalThis.STATE.classActive2Level = 1;
+    globalThis.STATE.classActiveLevel = 1;
+    globalThis.STATE.classActiveChoice = 'active1';
+    globalThis.STATE.ascendencySkill1Level = 1;
+    globalThis.STATE.ascendencySkill2Level = 1;
 
     // ...then replay the earned upgrade flow on the new class: every
     // previously-completed world except the Nexus world itself queues one
@@ -428,13 +438,13 @@ function confirmClassChange(cid) {
     // not an upgrade, so it doesn't count). The router serves them in the
     // correct order: base upgrades → ascendency selection → ascendency
     // upgrades, exactly as if the worlds had been completed in sequence.
-    const nexusWi = (typeof NEXUS_WORLD_INDEX !== 'undefined') ? NEXUS_WORLD_INDEX : 13;
+    const nexusWi = (typeof globalThis.NEXUS_WORLD_INDEX !== 'undefined') ? globalThis.NEXUS_WORLD_INDEX : 13;
     const eventsToReplay = Math.max(0,
-        (STATE.classWorldsCompleted || []).filter(w => w !== nexusWi).length - 1);
-    STATE._classChangeReplayRemaining = eventsToReplay;
+        (globalThis.STATE.classWorldsCompleted || []).filter(w => w !== nexusWi).length - 1);
+    globalThis.STATE._classChangeReplayRemaining = eventsToReplay;
     // The replayed upgrades must not push worlds into classWorldsCompleted
     // again - clear the pointer so markLastWorldCompleted() no-ops.
-    STATE._lastClassWorld = null;
+    globalThis.STATE._lastClassWorld = null;
 
     // Switching class is a fresh class unlock: grant (and seed) the new
     // class's Rank 1 charms, and drop the old class's charms from the slots.
@@ -443,9 +453,9 @@ function confirmClassChange(cid) {
 
     const def = CLASS_DEFS[cid];
     Audio_Manager.playSFX('classSelected');
-    showToast(`🔄 ${_clsGetLocalizedName(def)} ${t('cls_selected_toast')}`);
-    if (typeof showToast === 'function') showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
-    updateQuestStats('classChosen', {});
+    globalThis.showToast(`🔄 ${_clsGetLocalizedName(def)} ${t('cls_selected_toast')}`);
+    if (typeof globalThis.showToast === 'function') globalThis.showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
+    globalThis.updateQuestStats('classChosen', {});
 
     closeClassOverlay();
     buildClassHUD();
@@ -457,11 +467,11 @@ function confirmClassChange(cid) {
 // the class-change confirmation and after every progression-advancing
 // applier (applyClassUpgrade, confirmAscendencySelection,
 // applyAscendencyUpgrade) so the replayed events chain back-to-back.
-function serveClassChangeReplay() {
-    const left = STATE._classChangeReplayRemaining || 0;
+export function serveClassChangeReplay() {
+    const left = globalThis.STATE._classChangeReplayRemaining || 0;
     if (left <= 0) return;
-    STATE._classChangeReplayRemaining = left - 1;
-    STATE._pendingClassEvent = true;
+    globalThis.STATE._classChangeReplayRemaining = left - 1;
+    globalThis.STATE._pendingClassEvent = true;
     save();
     setTimeout(() => { triggerClassEventIfPending(); }, AFTER_CLASS_EVENT_DELAY_MS);
 }
@@ -475,7 +485,7 @@ function serveClassChangeReplay() {
 //------------------------------------------------------------------------
 
 // Builds the tooltip content (passive + two actives) shown when hovering a class's weapon locker.
-function buildClassTooltipContent(def) {
+export function buildClassTooltipContent(def) {
     const passiveBlock = buildAbilityBlock(
         t('cls_tag_passive').replace('{i}', '⚡'),
         'passive',
@@ -513,7 +523,7 @@ function buildClassTooltipContent(def) {
 
 // True when a skill id is part of the charm ladder. The roster comes from the
 // skill registry, which registers the class passives elsewhere.
-function _clsSkillHasCharm(skillId) {
+export function _clsSkillHasCharm(skillId) {
     return (typeof getSkillDef === 'function') && !!getSkillDef(skillId);
 }
 
@@ -522,7 +532,7 @@ function _clsSkillHasCharm(skillId) {
 // `owned` marks a charm already in the inventory: on the class-change screen
 // that is a duplicate (it becomes a Lemma), on a maxed upgrade card it is
 // simply the charm the ability already has.
-function _clsCharmChipHTML(skillId, rank, owned) {
+export function _clsCharmChipHTML(skillId, rank, owned) {
     const name = (typeof getSkillName === 'function') ? getSkillName(skillId) : skillId;
     return `<span class="cs-charm${owned ? ' cs-charm--owned' : ''}">`
         + `<span class="cs-charm-glyph">${CHARM_BASE_ICON}`
@@ -533,7 +543,7 @@ function _clsCharmChipHTML(skillId, rank, owned) {
 }
 
 // Rank 1 charms a class / ascendency choice hands over.
-function buildCharmGrantPreviewHTML(prefix) {
+export function buildCharmGrantPreviewHTML(prefix) {
     const ids = [`${prefix}_active1`, `${prefix}_active2`].filter(_clsSkillHasCharm);
     if (!ids.length) return '';
     let ownedCount = 0;
@@ -553,7 +563,7 @@ function buildCharmGrantPreviewHTML(prefix) {
 }
 
 // The charm rank a single ability upgrade hands over.
-function buildCharmRewardPreviewHTML(prefix, type, currentLv, maxLv) {
+export function buildCharmRewardPreviewHTML(prefix, type, currentLv, maxLv) {
     if (!_clsSkillHasCharm(`${prefix}_${type}`)) {
         return `<div class="cs-charms cs-charms--none">`
             + `<div class="cs-charms-note">${t('cls_charm_none_note')}</div>`
@@ -574,7 +584,7 @@ function buildCharmRewardPreviewHTML(prefix, type, currentLv, maxLv) {
 // and in any display-only context (mode = 'view').
 // Layout: icon -> name -> desc -> weapon locker (hover = tooltip) -> charm
 // reward -> select button.
-function buildClassCard(cid, mode) {
+export function buildClassCard(cid, mode) {
     const def = CLASS_DEFS[cid];
 
     let cta = '';
@@ -583,7 +593,7 @@ function buildClassCard(cid, mode) {
     } else if (mode === 'change') {
         // Class-change screen: the current class gets a badge instead of a CTA;
         // every other class spends a token via confirmClassChange().
-        cta = (cid === STATE.playerClass)
+        cta = (cid === globalThis.STATE.playerClass)
             ? `<div class="cc-current-tag">${t('cls_change_current_tag')}</div>`
             : `<div class="cs-card-cta" onclick="confirmClassChange('${cid}')">${t('cls_change_btn').replace('{n}', getClassChangeTokens())}</div>`;
     }
@@ -595,7 +605,7 @@ function buildClassCard(cid, mode) {
     const charmPreview = (mode === 'view') ? '' : buildCharmGrantPreviewHTML(cid);
 
     return `
-        <div class="cs-card${mode === 'change' && cid === STATE.playerClass ? ' cc-current' : ''}"
+        <div class="cs-card${mode === 'change' && cid === globalThis.STATE.playerClass ? ' cc-current' : ''}"
              style="border-color:${def.color};--cls-color:${def.color};--cls-light:${def.colorLight};"
              data-classid="${cid}">
             <div class="cs-card-icon">${def.icon}</div>
@@ -613,7 +623,7 @@ function buildClassCard(cid, mode) {
 // Shows the custom tooltip for a class's weapon locker, fills it with that
 // class's ability info, colours it to match the class, and positions it
 // near the cursor. Called on mouseenter of .cs-weapon-locker.
-function showClassTooltip(cid, event) {
+export function showClassTooltip(cid, event) {
     const def = CLASS_DEFS[cid];
     if (!def) return;
 
@@ -622,7 +632,7 @@ function showClassTooltip(cid, event) {
 
 // Shows the initial class selection overlay, letting the player pick their base class.
 // Triggered on first world completion when no class has been chosen yet.
-function showClassSelection() {
+export function showClassSelection() {
     const title = t('cls_choose_class_title');
     const subtitle = t('cls_decision_permanent');
 
@@ -639,18 +649,18 @@ function showClassSelection() {
 }
 
 // Saves the chosen class, initialises all skill levels to 1, and closes the overlay.
-function confirmClassSelection(cid) {
+export function confirmClassSelection(cid) {
     if (!CLASS_DEFS[cid]) return;
 
-    STATE.playerClass = cid;
-    STATE.classPassiveLevel = 1;
-    STATE.classActive1Level = 1;
-    STATE.classActive2Level = 1;
-    STATE.classActiveLevel = 1;
-    STATE.classActiveChoice = 'active1';
+    globalThis.STATE.playerClass = cid;
+    globalThis.STATE.classPassiveLevel = 1;
+    globalThis.STATE.classActive1Level = 1;
+    globalThis.STATE.classActive2Level = 1;
+    globalThis.STATE.classActiveLevel = 1;
+    globalThis.STATE.classActiveChoice = 'active1';
 
-    if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
-    STATE.classWorldsCompleted.push(STATE._lastClassWorld);
+    if (!globalThis.STATE.classWorldsCompleted) globalThis.STATE.classWorldsCompleted = [];
+    globalThis.STATE.classWorldsCompleted.push(globalThis.STATE._lastClassWorld);
     // Unlocking the class also hands over its Rank 1 charms (the passive
     // class ability itself comes from STATE.playerClass). ensureCharmState()
     // grants them into the charm inventory and seeds the free spell slots.
@@ -662,12 +672,12 @@ function confirmClassSelection(cid) {
     const selectedLabel = t('cls_selected_toast');
 
     Audio_Manager.playSFX('classSelected');
-    showToast(`${def.icon} ${className} ${selectedLabel}`);
+    globalThis.showToast(`${def.icon} ${className} ${selectedLabel}`);
     // A fresh class starts with an empty/patchy hotbar, so point the player at
     // the spell book where they pick and drag their new skills onto the bar.
-    if (typeof showToast === 'function') showToast(t('spellbook_after_class_hint'), '#ffd27f');
-    if (typeof showToast === 'function') showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
-    updateQuestStats('classChosen', {});
+    if (typeof globalThis.showToast === 'function') globalThis.showToast(t('spellbook_after_class_hint'), '#ffd27f');
+    if (typeof globalThis.showToast === 'function') globalThis.showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
+    globalThis.updateQuestStats('classChosen', {});
 
     closeClassOverlay();
     buildClassHUD();
@@ -682,7 +692,7 @@ function confirmClassSelection(cid) {
 //------------------------------------------------------------------------
 
 // Returns the localised tag label shown on an upgrade card header row.
-function getUpgradeTagLabel(type, classId) {
+export function getUpgradeTagLabel(type, classId) {
     const icon = (CLASS_SPELL_ICONS[classId] && CLASS_SPELL_ICONS[classId][type]) || (type === 'passive' ? '⚡' : '🎯');
     if (type === 'passive') return t('cls_tag_passive').replace('{i}', icon);
     if (type === 'active1') return t('cls_tag_active1').replace('{i}', icon);
@@ -691,7 +701,7 @@ function getUpgradeTagLabel(type, classId) {
 
 // Returns the localised CTA button label for the given ability, using its actual
 // spell name (e.g. "▶ UPGRADE MOMENTUM") instead of a generic slot label.
-function getUpgradeCTALabel(type, abilityName) {
+export function getUpgradeCTALabel(type, abilityName) {
     return t('cls_upgrade_cta').replace('{n}', abilityName);
 }
 
@@ -699,28 +709,28 @@ function getUpgradeCTALabel(type, abilityName) {
 // the class-selection cards: icon -> name -> level badge -> spell locker (hover = tooltip) -> CTA.
 // The spell locker currently shows a generic glyph placeholder - see class_spell_upgrade.css
 // for how to swap in real per-class/per-ability artwork later.
-function buildClassUpgradeCard(def, type, currentLv, maxLv) {
+export function buildClassUpgradeCard(def, type, currentLv, maxLv) {
     const atMax = currentLv >= maxLv;
     const abilityDef = getAbilityDef(def, type);
-    const tagLabel = getUpgradeTagLabel(type, STATE.playerClass);
+    const tagLabel = getUpgradeTagLabel(type, globalThis.STATE.playerClass);
     const nextLv = Math.min(currentLv + 1, maxLv);
 
     const abilityName = _clsGetLocalizedName(abilityDef);
     const levelLabel = t('cls_level_label');
     const tagClass = type === 'passive' ? 'passive' : 'active';
-    const lockerIcon = (CLASS_SPELL_ICONS[STATE.playerClass] && CLASS_SPELL_ICONS[STATE.playerClass][type]) || (type === 'passive' ? '⚡' : '🎯');
+    const lockerIcon = (CLASS_SPELL_ICONS[globalThis.STATE.playerClass] && CLASS_SPELL_ICONS[globalThis.STATE.playerClass][type]) || (type === 'passive' ? '⚡' : '🎯');
 
     const cta = atMax
         ? buildMaxedBadge()
         : `<div class="cs-card-cta" onclick="applyClassUpgrade('${type}')">${getUpgradeCTALabel(type, abilityName)}</div>`;
     // The charm this upgrade hands over (Rank N+1), named before the button
     // that spends the upgrade. The passive has no charm and says so.
-    const charmPreview = buildCharmRewardPreviewHTML(STATE.playerClass, type, currentLv, maxLv);
+    const charmPreview = buildCharmRewardPreviewHTML(globalThis.STATE.playerClass, type, currentLv, maxLv);
 
     return `
         <div class="cs-card cs-spell-card ${atMax ? 'maxed' : ''}"
              style="border-color:${def.color};--cls-color:${def.color};--cls-light:${def.colorLight};"
-             data-classid="${STATE.playerClass}" data-type="${type}">
+             data-classid="${globalThis.STATE.playerClass}" data-type="${type}">
             <div class="cs-card-icon">${lockerIcon}</div>
             <div class="cs-card-name" style="color:${def.colorLight};">${abilityName}</div>
             <div class="cs-spell-level-badge ${tagClass}">${tagLabel} · ${levelLabel} ${currentLv} → ${nextLv}</div>
@@ -737,8 +747,8 @@ function buildClassUpgradeCard(def, type, currentLv, maxLv) {
 // Shows the tooltip for a base-class spell locker: current level's description compared
 // against the next level's description (or a "maxed" tag if already at cap).
 // Called on mouseenter of .cs-spell-locker inside the class-upgrade screen.
-function showUpgradeTooltip(type, event) {
-    const def = CLASS_DEFS[STATE.playerClass];
+export function showUpgradeTooltip(type, event) {
+    const def = CLASS_DEFS[globalThis.STATE.playerClass];
     if (!def) return;
 
     const abilityDef = getAbilityDef(def, type);
@@ -757,18 +767,18 @@ function showUpgradeTooltip(type, event) {
 
 // Shows the base-class upgrade overlay.
 // Increments the available-upgrade counter before rendering, since this call itself represents an earned upgrade.
-function showClassUpgrade() {
-    if (!STATE.playerClass) return;
+export function showClassUpgrade() {
+    if (!globalThis.STATE.playerClass) return;
 
-    if (STATE.classUpgradesAvailable === undefined) STATE.classUpgradesAvailable = 0;
-    STATE.classUpgradesAvailable++;
+    if (globalThis.STATE.classUpgradesAvailable === undefined) globalThis.STATE.classUpgradesAvailable = 0;
+    globalThis.STATE.classUpgradesAvailable++;
     save();
 
-    const def = CLASS_DEFS[STATE.playerClass];
+    const def = CLASS_DEFS[globalThis.STATE.playerClass];
     const levels = {
-        passive: STATE.classPassiveLevel || 1,
-        active1: STATE.classActive1Level || 1,
-        active2: STATE.classActive2Level || 1,
+        passive: globalThis.STATE.classPassiveLevel || 1,
+        active1: globalThis.STATE.classActive1Level || 1,
+        active2: globalThis.STATE.classActive2Level || 1,
     };
     const allMax = Object.values(levels).every(lv => lv >= CLASS_SKILL_MAX_LEVEL);
 
@@ -795,7 +805,7 @@ function showClassUpgrade() {
         </div>
         <div id="cs-tooltip" class="cs-tooltip"></div>
         ${footer}
-    `, 'upgrade', STATE.playerClass);
+    `, 'upgrade', globalThis.STATE.playerClass);
 }
 
 
@@ -807,35 +817,35 @@ function showClassUpgrade() {
 //------------------------------------------------------------------------
 
 // Decrements the available-upgrade counter, floored at 0.
-function decrementUpgradesAvailable() {
-    STATE.classUpgradesAvailable = Math.max(0, (STATE.classUpgradesAvailable || 1) - 1);
+export function decrementUpgradesAvailable() {
+    globalThis.STATE.classUpgradesAvailable = Math.max(0, (globalThis.STATE.classUpgradesAvailable || 1) - 1);
 }
 
 // Appends the last completed world index to the classWorldsCompleted list.
 // Guards against null and duplicates (class-change replay sets _lastClassWorld
 // to null so replayed upgrades don't pollute the completion list).
-function markLastWorldCompleted() {
-    if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
-    const wi = STATE._lastClassWorld;
+export function markLastWorldCompleted() {
+    if (!globalThis.STATE.classWorldsCompleted) globalThis.STATE.classWorldsCompleted = [];
+    const wi = globalThis.STATE._lastClassWorld;
     if (wi === null || wi === undefined) return;
-    if (STATE.classWorldsCompleted.includes(wi)) return;
-    STATE.classWorldsCompleted.push(wi);
+    if (globalThis.STATE.classWorldsCompleted.includes(wi)) return;
+    globalThis.STATE.classWorldsCompleted.push(wi);
 }
 
 // Shows a toast confirming which ability was upgraded and to what level.
-function showClassUpgradeToast(type) {
-    const def = CLASS_DEFS[STATE.playerClass];
+export function showClassUpgradeToast(type) {
+    const def = CLASS_DEFS[globalThis.STATE.playerClass];
     const abilityName = getClassAbilityName(def, type);
     const newLv = getClassSkillLevel(type);
-    showToast(`${def.icon} ${abilityName} → ${t('cls_level_word')} ${newLv}!`);
+    globalThis.showToast(`${def.icon} ${abilityName} → ${t('cls_level_word')} ${newLv}!`);
 }
 
 // Applies a base-class skill upgrade: increments the level, saves state, updates UI.
 // The next rank's charm is granted by the charm system's progression sync
 // (skill-charms.js) the moment the new level lands in STATE - ownership is
 // snapshotted first so we only announce a charm the upgrade actually added.
-function applyClassUpgrade(type) {
-    const charmSkillId = `${STATE.playerClass}_${type}`;
+export function applyClassUpgrade(type) {
+    const charmSkillId = `${globalThis.STATE.playerClass}_${type}`;
     const charmRank = Math.min((getClassSkillLevel(type) || 1) + 1, CLASS_SKILL_MAX_LEVEL);
     const hadCharm = typeof getCharmByKey === 'function'
         && !!getCharmByKey(charmKeyFor(charmSkillId, charmRank));
@@ -852,7 +862,7 @@ function applyClassUpgrade(type) {
 
     Audio_Manager.playSFX('classUpgraded');
     trackAchStat('classUpgradesApplied');
-    updateQuestStats('classUpgradeApplied', {});
+    globalThis.updateQuestStats('classUpgradeApplied', {});
     closeClassOverlay();
     showClassUpgradeToast(type);
     _showCharmGrantToast(charmSkillId, charmRank, hadCharm, promoted);
@@ -864,12 +874,12 @@ function applyClassUpgrade(type) {
 // that an upgrade promoted to the new rank. No-ops when the player already
 // owned the charm AND no slot changed (e.g. it dropped from a monster and was
 // already the rank sitting in the slot).
-function _showCharmGrantToast(skillId, rank, hadCharm, promoted) {
+export function _showCharmGrantToast(skillId, rank, hadCharm, promoted) {
     if (hadCharm && !promoted) return;
-    if (typeof showToast !== 'function') return;
+    if (typeof globalThis.showToast !== 'function') return;
     const name = (typeof getSkillName === 'function') ? getSkillName(skillId) : skillId;
     const key = promoted ? 'charm_rank_equipped_toast' : 'charm_rank_granted_toast';
-    showToast(`🧿 ${t(key).replace('{n}', name).replace('{r}', rank)}`, '#8fd3ff');
+    globalThis.showToast(`🧿 ${t(key).replace('{n}', name).replace('{r}', rank)}`, '#8fd3ff');
 }
 
 
@@ -885,7 +895,7 @@ function _showCharmGrantToast(skillId, rank, hadCharm, promoted) {
 // reachable from the player's current base class (see ASCENDENCY_LIST).
 
 // Builds the tooltip content (both skills) shown when hovering an ascendency's locker.
-function buildAscendencyTooltipContent(asc) {
+export function buildAscendencyTooltipContent(asc) {
     const skill1Block = buildAbilityBlock(
         t('cls_tag_skill1').replace('{i}', '🎯'),
         'active',
@@ -903,7 +913,7 @@ function buildAscendencyTooltipContent(asc) {
 
 // Builds a full ascendency card - used in selection (mode = 'select') or display (mode = 'view') contexts.
 // Layout matches buildClassCard(): icon -> name -> archetype tag -> desc -> locker (hover) -> CTA.
-function buildAscendencyCard(aid, mode) {
+export function buildAscendencyCard(aid, mode) {
     const asc = ASCENDENCY_DEFS[aid];
     if (!asc) return '';
 
@@ -937,7 +947,7 @@ function buildAscendencyCard(aid, mode) {
 // Shows the custom tooltip for an ascendency's locker, filled with both of its
 // skills, coloured to match, and positioned near the cursor.
 // Called on mouseenter of .cs-ascendency-locker.
-function showAscendencyTooltip(aid, event) {
+export function showAscendencyTooltip(aid, event) {
     const asc = ASCENDENCY_DEFS[aid];
     if (!asc) return;
 
@@ -947,9 +957,9 @@ function showAscendencyTooltip(aid, event) {
 // Shows the ascendency selection overlay.
 // Triggered when the base class is fully maxed and no ascendency has been chosen yet.
 // Only the ascendencies reachable from STATE.playerClass are rendered (2 out of the 6 total).
-function showAscendencySelection() {
-    const baseDef = CLASS_DEFS[STATE.playerClass];
-    const options = ASCENDENCY_LIST[STATE.playerClass] || [];
+export function showAscendencySelection() {
+    const baseDef = CLASS_DEFS[globalThis.STATE.playerClass];
+    const options = ASCENDENCY_LIST[globalThis.STATE.playerClass] || [];
 
     const baseName = _clsGetLocalizedName(baseDef);
     const title = t('cls_choose_ascendency_title');
@@ -962,21 +972,21 @@ function showAscendencySelection() {
         ${header}
         <div class="cs-cards cs-ascendency-cards">${cards}</div>
         <div id="cs-tooltip" class="cs-tooltip"></div>
-    `, 'ascend-select', STATE.playerClass);
+    `, 'ascend-select', globalThis.STATE.playerClass);
 
     Audio_Manager.playSFX('classSelection');
 }
 
 // Saves the chosen ascendency, initialises both skill levels to 1, and closes the overlay.
-function confirmAscendencySelection(aid) {
+export function confirmAscendencySelection(aid) {
     if (!ASCENDENCY_DEFS[aid]) return;
 
-    STATE.playerAscendency = aid;
-    STATE.ascendencySkill1Level = 1;
-    STATE.ascendencySkill2Level = 1;
+    globalThis.STATE.playerAscendency = aid;
+    globalThis.STATE.ascendencySkill1Level = 1;
+    globalThis.STATE.ascendencySkill2Level = 1;
 
-    if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
-    STATE.classWorldsCompleted.push(STATE._lastClassWorld);
+    if (!globalThis.STATE.classWorldsCompleted) globalThis.STATE.classWorldsCompleted = [];
+    globalThis.STATE.classWorldsCompleted.push(globalThis.STATE._lastClassWorld);
     // Choosing an ascendency is a second class unlock: its Rank 1 charms are
     // granted too, so both skills are castable straight away.
     if (typeof ensureCharmState === 'function') ensureCharmState();
@@ -987,9 +997,9 @@ function confirmAscendencySelection(aid) {
     const chosenLabel = t('cls_ascendency_chosen_toast');
 
     Audio_Manager.playSFX('classSelected');
-    showToast(`✨ ${ascName} ${chosenLabel}`);
-    if (typeof showToast === 'function') showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
-    updateQuestStats('ascendencyChosen', {});
+    globalThis.showToast(`✨ ${ascName} ${chosenLabel}`);
+    if (typeof globalThis.showToast === 'function') globalThis.showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
+    globalThis.updateQuestStats('ascendencyChosen', {});
     trackAchStat('ascendencyChosen');
     closeClassOverlay();
     buildClassHUD();
@@ -1005,7 +1015,7 @@ function confirmAscendencySelection(aid) {
 //------------------------------------------------------------------------
 
 // Returns the localised tag label for an ascendency skill slot.
-function getAscendencySkillTagLabel(type) {
+export function getAscendencySkillTagLabel(type) {
     return type === 'active1'
         ? t('cls_tag_skill1').replace('{i}', '🎯')
         : t('cls_tag_skill2').replace('{i}', '🎯');
@@ -1013,30 +1023,30 @@ function getAscendencySkillTagLabel(type) {
 
 // Returns the localised CTA label for an ascendency skill upgrade, using its actual
 // skill name instead of a generic slot label.
-function getAscendencyUpgradeCTALabel(type, skillName) {
+export function getAscendencyUpgradeCTALabel(type, skillName) {
     return t('cls_upgrade_cta').replace('{n}', skillName);
 }
 
 // Builds one spell card for an ascendency skill slot (active1 or active2), styled to match
 // the class-selection cards: icon -> name -> level badge -> spell locker (hover = tooltip) -> CTA.
-function buildAscendencyUpgradeCard(asc, type, currentLv, maxLv) {
+export function buildAscendencyUpgradeCard(asc, type, currentLv, maxLv) {
     const atMax = currentLv >= maxLv;
     const skillDef = asc[type];
     const nextLv = Math.min(currentLv + 1, maxLv);
     const tagLabel = getAscendencySkillTagLabel(type);
     const skillName = _clsGetLocalizedName(skillDef);
     const levelLabel = t('cls_level_label');
-    const lockerIcon = (ASCENDENCY_SPELL_ICONS[STATE.playerAscendency] && ASCENDENCY_SPELL_ICONS[STATE.playerAscendency][type]) || '🎯';
+    const lockerIcon = (ASCENDENCY_SPELL_ICONS[globalThis.STATE.playerAscendency] && ASCENDENCY_SPELL_ICONS[globalThis.STATE.playerAscendency][type]) || '🎯';
 
     const cta = atMax
         ? buildMaxedBadge()
         : `<div class="cs-card-cta" onclick="applyAscendencyUpgrade('${type}')">${getAscendencyUpgradeCTALabel(type, skillName)}</div>`;
-    const charmPreview = buildCharmRewardPreviewHTML(STATE.playerAscendency, type, currentLv, maxLv);
+    const charmPreview = buildCharmRewardPreviewHTML(globalThis.STATE.playerAscendency, type, currentLv, maxLv);
 
     return `
         <div class="cs-card cs-spell-card ${atMax ? 'maxed' : ''}"
              style="border-color:${asc.color};--cls-color:${asc.color};--cls-light:${asc.colorLight};"
-             data-classid="${STATE.playerAscendency}" data-type="${type}">
+             data-classid="${globalThis.STATE.playerAscendency}" data-type="${type}">
             <div class="cs-card-icon">${lockerIcon}</div>
             <div class="cs-card-name" style="color:${asc.colorLight};">${skillName}</div>
             <div class="cs-spell-level-badge active">${tagLabel} · ${levelLabel} ${currentLv} → ${nextLv}</div>
@@ -1053,8 +1063,8 @@ function buildAscendencyUpgradeCard(asc, type, currentLv, maxLv) {
 // Shows the tooltip for an ascendency spell locker: current level's description compared
 // against the next level's description (or a "maxed" tag if already at cap).
 // Called on mouseenter of .cs-spell-locker inside the ascendency-upgrade screen.
-function showAscendencyUpgradeTooltip(type, event) {
-    const asc = ASCENDENCY_DEFS[STATE.playerAscendency];
+export function showAscendencyUpgradeTooltip(type, event) {
+    const asc = ASCENDENCY_DEFS[globalThis.STATE.playerAscendency];
     if (!asc) return;
 
     const skillDef = asc[type];
@@ -1072,13 +1082,13 @@ function showAscendencyUpgradeTooltip(type, event) {
 
 // Shows the ascendency upgrade overlay.
 // Triggered when an ascendency is chosen but at least one skill is not yet at max level.
-function showAscendencyUpgrade() {
-    if (!STATE.playerAscendency) return;
+export function showAscendencyUpgrade() {
+    if (!globalThis.STATE.playerAscendency) return;
 
-    const asc = ASCENDENCY_DEFS[STATE.playerAscendency];
+    const asc = ASCENDENCY_DEFS[globalThis.STATE.playerAscendency];
     const levels = {
-        active1: STATE.ascendencySkill1Level || 1,
-        active2: STATE.ascendencySkill2Level || 1,
+        active1: globalThis.STATE.ascendencySkill1Level || 1,
+        active2: globalThis.STATE.ascendencySkill2Level || 1,
     };
     const allMax = Object.values(levels).every(lv => lv >= CLASS_SKILL_MAX_LEVEL);
 
@@ -1104,7 +1114,7 @@ function showAscendencyUpgrade() {
         </div>
         <div id="cs-tooltip" class="cs-tooltip"></div>
         ${footer}
-    `, 'ascend-upgrade', STATE.playerAscendency);
+    `, 'ascend-upgrade', globalThis.STATE.playerAscendency);
 }
 
 
@@ -1118,8 +1128,8 @@ function showAscendencyUpgrade() {
 // Applies an ascendency skill upgrade: increments the level, saves state, updates UI.
 // Like the base-class upgrade, the new rank's charm is granted by the charm
 // progression sync and announced only when it is genuinely new.
-function applyAscendencyUpgrade(type) {
-    const charmSkillId = `${STATE.playerAscendency}_${type}`;
+export function applyAscendencyUpgrade(type) {
+    const charmSkillId = `${globalThis.STATE.playerAscendency}_${type}`;
     const charmRank = Math.min((getAscendencySkillLevel(type) || 1) + 1, CLASS_SKILL_MAX_LEVEL);
     const hadCharm = typeof getCharmByKey === 'function'
         && !!getCharmByKey(charmKeyFor(charmSkillId, charmRank));
@@ -1132,14 +1142,14 @@ function applyAscendencyUpgrade(type) {
         && promoteCharmSlotToRank(charmSkillId, charmRank);
     save();
 
-    const asc = ASCENDENCY_DEFS[STATE.playerAscendency];
+    const asc = ASCENDENCY_DEFS[globalThis.STATE.playerAscendency];
     const skillDef = asc[type];
     const newLv = getAscendencySkillLevel(type);
 
     Audio_Manager.playSFX('classUpgraded');
-    showToast(`✨ ${_clsGetLocalizedName(skillDef)} → ${t('cls_level_word')} ${newLv}!`);
+    globalThis.showToast(`✨ ${_clsGetLocalizedName(skillDef)} → ${t('cls_level_word')} ${newLv}!`);
     _showCharmGrantToast(charmSkillId, charmRank, hadCharm, promoted);
-    updateQuestStats('ascendencyUpgradeApplied', {});
+    globalThis.updateQuestStats('ascendencyUpgradeApplied', {});
     trackAchStat('ascendencyUpgradesApplied');
     closeClassOverlay();
     buildClassHUD();
@@ -1159,8 +1169,8 @@ function applyAscendencyUpgrade(type) {
 
 // Determines which class-event screen to show based on the current progression state.
 // Priority order: initial selection → base class upgrades → ascendency selection → ascendency upgrades → nothing.
-function resolveNextClassEvent() {
-    if (!STATE.playerClass) return 'selectClass';
+export function resolveNextClassEvent() {
+    if (!globalThis.STATE.playerClass) return 'selectClass';
     if (!isBaseClassMaxed()) return 'upgradeClass';
     if (!hasAscendency()) return 'selectAscendency';
     if (!isAscendencyMaxed()) return 'upgradeAscendency';
@@ -1170,10 +1180,10 @@ function resolveNextClassEvent() {
 // Fires the appropriate class-event screen if a pending event exists.
 // afterCallback (optional) is invoked once the whole flow is complete and the overlay is closed.
 // Returns true if an event was triggered, false otherwise.
-function triggerClassEventIfPending(afterCallback) {
-    if (!STATE._pendingClassEvent) return false;
+export function triggerClassEventIfPending(afterCallback) {
+    if (!globalThis.STATE._pendingClassEvent) return false;
 
-    STATE._pendingClassEvent = false;
+    globalThis.STATE._pendingClassEvent = false;
     save();
 
     _afterClassEventCallback = afterCallback || null;

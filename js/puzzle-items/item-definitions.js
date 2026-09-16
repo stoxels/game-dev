@@ -1,10 +1,15 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //-------------------------ITEM DATA--------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 
-const ITEM_DEFS = {
+export const ITEM_DEFS = {
 
     // REVEAL items - show N correct (unfilled) tiles in green
     reveal1: {

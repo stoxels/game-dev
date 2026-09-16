@@ -1,4 +1,37 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { LANG, t } from '../translation/translations.js';
+import { EG_RESIST_CAP_PCT } from './endgame-combat-calculations.js';
+import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT, _egGetDeflectChancePct, _egGetDeflectDamagePct, _egGetDualWieldParryChancePct, _egGetParryChancePct } from './endgame-encounter.js';
+import { _egEquipped } from './endgame-hub.js';
+import { _egGetPlayerLevel } from './endgame-leveling.js';
+import { _egGetActiveMapModValue, _egMapAbsorptionMult, _egMapAccuracyMult, _egMapActionSlowMult, _egMapAttackSpeedMult, _egMapBlockMult, _egMapEvasionMult, _egMapPlayerDefenceMult, _egMapSpellDamageMult } from './endgame-map-launch.js';
+import { _egRollInt } from './endgame-mod-application.js';
+import { EG_MOD_TABLE_AMULET } from './endgame-mod-tables-amulet.js';
+import { EG_MOD_TABLE_ARCANE } from './endgame-mod-tables-arcane.js';
+import { EG_MOD_TABLE_BELT } from './endgame-mod-tables-belt.js';
+import { EG_MOD_TABLE_BOOTS } from './endgame-mod-tables-boots.js';
+import { EG_MOD_TABLE_BRACERS } from './endgame-mod-tables-bracers.js';
+import { EG_MOD_TABLE_CHEST } from './endgame-mod-tables-chest.js';
+import { EG_MOD_TABLE_CLOAK } from './endgame-mod-tables-cloak.js';
+import { EG_MOD_TABLE_EARRING } from './endgame-mod-tables-earring.js';
+import { EG_MOD_TABLE_GLOVES } from './endgame-mod-tables-gloves.js';
+import { EG_MOD_TABLE_HEAD } from './endgame-mod-tables-head.js';
+import { EG_MOD_TABLE_PANTS } from './endgame-mod-tables-pants.js';
+import { EG_MOD_TABLE_RING } from './endgame-mod-tables-ring.js';
+import { EG_MOD_TABLE_RANGED, EG_MOD_TABLE_SHIELD } from './endgame-mod-tables-shield.js';
+import { EG_MOD_TABLE_SHOULDERS } from './endgame-mod-tables-shoulders.js';
+import { EG_MOD_TABLE_TALISMAN } from './endgame-mod-tables-talisman.js';
+import { EG_MOD_TABLE_WEAPON_2H } from './endgame-mod-tables-weapon-2h.js';
+import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from './endgame-mod-tables-weapon1.js';
+import { EG_MOD_TABLE_WEAPON2 } from './endgame-mod-tables-weapon2.js';
+import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding } from './endgame-requirements.js';
+import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA DEFINITIONS-------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -11,7 +44,7 @@
 
 // Life Regen, + Life from Hearts
 
-const EG_PLAYER_STATS = {
+export const EG_PLAYER_STATS = {
     baseHP: 100, // Starting HP for all monster levels
     baseMana: 60, // Starting mana pool before gear and attribute bonuses
     baseDamage: 10, // Damage dealt per correct cell fill
@@ -23,8 +56,8 @@ const EG_PLAYER_STATS = {
 // EG_DUAL_WIELD_DAMAGE_MULT (~1.4x a single 1H, below a 2H's ~1.6-1.7x), and
 // grants EG_DUAL_WIELD_PARRY_PCT base parry chance WITHOUT holding the parry key
 // (gear parry adds on top; successful projectile parries can still deflect).
-const EG_DUAL_WIELD_DAMAGE_MULT = 0.7;
-const EG_DUAL_WIELD_PARRY_PCT = 15;
+export const EG_DUAL_WIELD_DAMAGE_MULT = 0.7;
+export const EG_DUAL_WIELD_PARRY_PCT = 15;
 
 
 
@@ -36,7 +69,7 @@ const EG_DUAL_WIELD_PARRY_PCT = 15;
 // Maps every mod "key" produced by _egBuildRolledStats() (endgame-equipment-generator.js)
 // to the stat bucket it feeds. Hybrid mods produce keys `${familyId}_1` / `${familyId}_2`;
 // single-stat mods just use `familyId` directly.
-const EG_STAT_KEY_MAP = {
+export const EG_STAT_KEY_MAP = {
     // NOTE: flat_armour / inc_armour / flat_evasion / inc_evasion /
     // flat_absorption / inc_absorption (and the defense halves of the hybrid
     // families) are LOCAL modifiers - they only affect the base value of the
@@ -170,7 +203,7 @@ const EG_STAT_KEY_MAP = {
 // these keys are routed per source slot: weapon items feed ONLY their melee
 // counterpart, ranged items feed only the shared (projectile) bucket, and
 // every other slot feeds both channels.
-const EG_MELEE_BUCKET_MAP = {
+export const EG_MELEE_BUCKET_MAP = {
     physFlatMin: 'meleePhysMin',
     physFlatMax: 'meleePhysMax',
     physIncPct: 'meleePhysIncPct',
@@ -197,7 +230,7 @@ const EG_MELEE_BUCKET_MAP = {
 // Returns [{ label: string, downside: bool, tierLabel: string }] for tooltip rendering.
 // tierLabel is PoE-style affix tier badge: "P4" for prefix tier 4, "S1" for suffix tier 1,
 // and "P2+S3" when multiple mods were merged into one combined line (including hybrids).
-function _egTryHealLegacyDualMod(mod) {
+export function _egTryHealLegacyDualMod(mod) {
     // Legacy items rolled before the min/min2 -> min1/min2 fix stored a single
     // rolledStat whose label still contains the '@' placeholder and no second
     // stat was created, so the damage value was never shown and never counted
@@ -270,7 +303,7 @@ function _egTryHealLegacyDualMod(mod) {
     }
 }
 
-function _egBuildMergedModLines(mods) {
+export function _egBuildMergedModLines(mods) {
     // Heal legacy dual-stat mods that were saved with a stray '@' placeholder
     // (shield_bash / arcane_surge / channel rolled with min/min2 before fix).
     if (Array.isArray(mods)) {
@@ -337,7 +370,7 @@ function _egBuildMergedModLines(mods) {
 }
 
 // Returns every non-empty equipped item as a flat array.
-function _egGetAllEquippedItems() {
+export function _egGetAllEquippedItems() {
     if (typeof _egEquipped === 'undefined') return [];
     return Object.values(_egEquipped).filter(Boolean);
 }
@@ -350,7 +383,7 @@ function _egGetAllEquippedItems() {
 // item they rolled on, not the character-wide totals.
 //
 // Effective item value = round((base + localFlat) * (1 + localIncPct / 100)).
-const EG_LOCAL_DEFENSE_FLAT_KEYS = {
+export const EG_LOCAL_DEFENSE_FLAT_KEYS = {
     flat_armour: 'armour',
     flat_evasion: 'evasion',
     flat_absorption: 'absorption',
@@ -364,7 +397,7 @@ const EG_LOCAL_DEFENSE_FLAT_KEYS = {
     hybrid_evasion_absorption_1: 'evasion', hybrid_evasion_absorption_2: 'absorption',
 };
 
-const EG_LOCAL_DEFENSE_INC_KEYS = {
+export const EG_LOCAL_DEFENSE_INC_KEYS = {
     inc_armour: 'armour',
     inc_evasion: 'evasion',
     inc_absorption: 'absorption',
@@ -374,7 +407,7 @@ const EG_LOCAL_DEFENSE_INC_KEYS = {
 // Returns { armour, evasion, absorption, modded: { armour, evasion, absorption } }
 // where modded.<stat> is true when local mods altered that value - used by
 // the tooltip to highlight already-increased values.
-function _egGetItemEffectiveDefenses(item) {
+export function _egGetItemEffectiveDefenses(item) {
     const base = item.defenses || {};
     const out = {
         armour: base.armour || 0,
@@ -429,7 +462,7 @@ function _egGetItemEffectiveDefenses(item) {
 // by % increased Physical), matching the combat order in
 // _egCalcPlayerDamage() where elemental damage is added AFTER the
 // % increased Physical multiplier.
-const EG_LOCAL_DAMAGE_FLAT_KEYS = {
+export const EG_LOCAL_DAMAGE_FLAT_KEYS = {
     flat_physical_damage_1: 'physMin',
     flat_physical_damage_2: 'physMax',
     fire_damage_1: 'fireMin',       fire_damage_2: 'fireMax',
@@ -438,7 +471,7 @@ const EG_LOCAL_DAMAGE_FLAT_KEYS = {
     shadow_damage_1: 'shadowMin',   shadow_damage_2: 'shadowMax',
 };
 
-const EG_LOCAL_DAMAGE_INC_KEYS = {
+export const EG_LOCAL_DAMAGE_INC_KEYS = {
     inc_physical_damage: 'physInc',
 };
 
@@ -448,7 +481,7 @@ const EG_LOCAL_DAMAGE_INC_KEYS = {
 // modded: { phys, fire, cold, lightning, shadow } } where modded.<elem>
 // is true when local mods altered that range - used by the tooltip to
 // highlight already-increased values.
-function _egGetItemEffectiveDamage(item) {
+export function _egGetItemEffectiveDamage(item) {
     const base = item.damage || {};
     const out = {
         physMin: base.min || 0,
@@ -505,7 +538,7 @@ function _egGetItemEffectiveDamage(item) {
 // sense as the damage ranges above - then shortened by
 // EG_PLAYER_CHARGE_TIME_MULT. Clamped to EG_PLAYER_MIN_ATTACK_INTERVAL so
 // it matches the combat interval in _egGetPlayerAttackIntervalBreakdown().
-function _egGetItemEffectiveAttackInterval(item) {
+export function _egGetItemEffectiveAttackInterval(item) {
     const base = Number(item.attackIntervalSeconds);
     if (!isFinite(base)) return { base: null, interval: null, modded: false };
 
@@ -545,7 +578,7 @@ function _egGetItemEffectiveAttackInterval(item) {
 // Effective = base + sum of block_chance mods on that item.
 // Returns { value, base, added, modded } where modded signals the display
 // should use .eg-tt-val-modified.
-function _egGetItemEffectiveBlockChance(item) {
+export function _egGetItemEffectiveBlockChance(item) {
     const base = Number(item.blockChance) || 0;
     if (!base) return { value: 0, base: 0, added: 0, modded: false };
     let added = 0;
@@ -568,7 +601,7 @@ function _egGetItemEffectiveBlockChance(item) {
 // Aggregates every equipped item's implicit defenses + rolled mods into one
 // stats object. Recomputed on demand (cheap - ~19 slots, ≤6 mods each) so it
 // never goes stale after an equip/unequip.
-function _egComputePlayerStats() {
+export function _egComputePlayerStats() {
     const s = {
         health: 0, mana: 0, healthIncPct: 0,
         armourFlat: 0, armourIncPct: 0,
@@ -795,7 +828,7 @@ function _egComputePlayerStats() {
 // shortened globally by EG_PLAYER_CHARGE_TIME_MULT for manual pacing.
 // Full breakdown for display: { base, reduction, interval } where interval
 // is the effective time-to-full-charge.
-function _egGetPlayerAttackIntervalBreakdown() {
+export function _egGetPlayerAttackIntervalBreakdown() {
     const defBase = EG_PLAYER_DEFAULT_ATTACK_INTERVAL;
     let base = defBase;
     // Only the melee weapon slot defines the manual-strike charge time -
@@ -827,7 +860,7 @@ function _egGetPlayerAttackIntervalBreakdown() {
     return { base, reduction, interval };
 }
 
-function _egGetPlayerAttackInterval() {
+export function _egGetPlayerAttackInterval() {
     return _egGetPlayerAttackIntervalBreakdown().interval;
 }
 
@@ -840,19 +873,19 @@ function _egGetPlayerAttackInterval() {
 // Armour mitigation is damage-relative (PoE-style): the same armour value
 // mitigates many small hits strongly but large hits weakly, so it never
 // trivially caps once gear values grow and stays relevant at every level.
-const EG_ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) - was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
-const EG_ARMOUR_MAX_REDUCTION = 0.75; // hard cap on mitigation
+export const EG_ARMOUR_DAMAGE_FACTOR = 12;   // reduction% = armour / (armour + factor * rawDamage) - was 10, raised so armour is less dominant at high tiers (more challenging when lacking)
+export const EG_ARMOUR_MAX_REDUCTION = 0.75; // hard cap on mitigation
 
 // Returns armour's % reduction (0..EG_ARMOUR_MAX_REDUCTION) against a hit of
 // the given raw size. Used by both the combat path and stat tooltips so the
 // displayed value always matches what combat actually rolls.
-function _egCalcArmourReductionPct(armour, rawDamage) {
+export function _egCalcArmourReductionPct(armour, rawDamage) {
     const armourVal = Math.max(0, Number(armour) || 0);
     const dmg = Math.max(1, Number(rawDamage) || 1);
     return Math.min(EG_ARMOUR_MAX_REDUCTION, armourVal / (armourVal + EG_ARMOUR_DAMAGE_FACTOR * dmg));
 }
 
-function _egCalcArmourMitigation(rawDamage, armour) {
+export function _egCalcArmourMitigation(rawDamage, armour) {
     const reductionPct = _egCalcArmourReductionPct(armour, rawDamage);
     return rawDamage * (1 - reductionPct);
 }
@@ -861,11 +894,11 @@ function _egCalcArmourMitigation(rawDamage, armour) {
 // 75%. The benchmark constant scales with the ATTACKER's level (PoE-style):
 // higher-level monsters are harder to dodge, so evasion keeps requiring
 // upgrades instead of permanently sitting at the cap once gear values grow.
-const EG_EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
-const EG_EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 - retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
-const EG_EVASION_DODGE_CAP_PCT = 75;
+export const EG_EVASION_DODGE_K = 200;        // dodge% = evasion / (evasion + K) at monster level 1
+export const EG_EVASION_LEVEL_GROWTH = 1.035; // per-level growth of the evasion benchmark (was 1.045 - retuned so 350 evasion = ~11% dodge at 90, ~50% at 30; was too punishing at 1.045, too generous at 1.03)
+export const EG_EVASION_DODGE_CAP_PCT = 75;
 
-function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
+export function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
     if (!evasion) return 0;
     const lvl = Math.max(1, Number(monsterLevel) || 1);
     const k = EG_EVASION_DODGE_K * Math.pow(EG_EVASION_LEVEL_GROWTH, lvl - 1);
@@ -885,13 +918,13 @@ function _egCalcEvasionDodgeChance(evasion, monsterLevel) {
 // gear lets you comfortably fight content ABOVE your level. Fighting
 // higher-level monsters without that investment now gets noticeably shaky
 // (retuned: higher scale so gear matters for T16; innate slightly lowered).
-const EG_ACCURACY_MISS_SCALE = 185;   // miss% = scale * monsterLevel / effectiveAccuracy (was 150)
-const EG_ACCURACY_MISS_MIN_PCT = 5;   // never perfectly reliable
-const EG_ACCURACY_MISS_MAX_PCT = 60;  // attacks always retain some threat
-const EG_ACCURACY_INNATE_BASE = 25;       // innate accuracy at player level 1 (was 30)
-const EG_ACCURACY_INNATE_PER_LEVEL = 13;  // extra innate accuracy per player level (was 15)
+export const EG_ACCURACY_MISS_SCALE = 185;   // miss% = scale * monsterLevel / effectiveAccuracy (was 150)
+export const EG_ACCURACY_MISS_MIN_PCT = 5;   // never perfectly reliable
+export const EG_ACCURACY_MISS_MAX_PCT = 60;  // attacks always retain some threat
+export const EG_ACCURACY_INNATE_BASE = 25;       // innate accuracy at player level 1 (was 30)
+export const EG_ACCURACY_INNATE_PER_LEVEL = 13;  // extra innate accuracy per player level (was 15)
 
-function _egGetInnateAccuracy() {
+export function _egGetInnateAccuracy() {
     const lvl = (typeof _egGetPlayerLevel === 'function')
         ? Math.max(1, Number(_egGetPlayerLevel()) || 1) : 1;
     return EG_ACCURACY_INNATE_BASE + EG_ACCURACY_INNATE_PER_LEVEL * (lvl - 1);
@@ -906,19 +939,19 @@ function _egGetInnateAccuracy() {
 //  miss reduction guarantees the bonus is felt even at high innate
 //  accuracy where extra accuracy alone would be marginal.
 // ──────────────────────────────────────────────────────────────────────────
-const EG_DRAG_ACCURACY_T1 = 6;   // >5 correct
-const EG_DRAG_ACCURACY_T2 = 11;  // >10 correct
-const EG_DRAG_ACCURACY_T3 = 16;  // >15 correct
+export const EG_DRAG_ACCURACY_T1 = 6;   // >5 correct
+export const EG_DRAG_ACCURACY_T2 = 11;  // >10 correct
+export const EG_DRAG_ACCURACY_T3 = 16;  // >15 correct
 
-const EG_DRAG_ACCURACY_BONUS_T1 = 40;
-const EG_DRAG_ACCURACY_BONUS_T2 = 85;
-const EG_DRAG_ACCURACY_BONUS_T3 = 145;
+export const EG_DRAG_ACCURACY_BONUS_T1 = 40;
+export const EG_DRAG_ACCURACY_BONUS_T2 = 85;
+export const EG_DRAG_ACCURACY_BONUS_T3 = 145;
 
-const EG_DRAG_MISS_REDUCTION_T1 = 6;   // percentage points
-const EG_DRAG_MISS_REDUCTION_T2 = 12;
-const EG_DRAG_MISS_REDUCTION_T3 = 19;
+export const EG_DRAG_MISS_REDUCTION_T1 = 6;   // percentage points
+export const EG_DRAG_MISS_REDUCTION_T2 = 12;
+export const EG_DRAG_MISS_REDUCTION_T3 = 19;
 
-function _egGetDragAccuracyBonus(stacks) {
+export function _egGetDragAccuracyBonus(stacks) {
     const n = Number(stacks) || 0;
     if (n >= EG_DRAG_ACCURACY_T3) return EG_DRAG_ACCURACY_BONUS_T3;
     if (n >= EG_DRAG_ACCURACY_T2) return EG_DRAG_ACCURACY_BONUS_T2;
@@ -926,7 +959,7 @@ function _egGetDragAccuracyBonus(stacks) {
     return 0;
 }
 
-function _egGetDragMissReduction(stacks) {
+export function _egGetDragMissReduction(stacks) {
     const n = Number(stacks) || 0;
     if (n >= EG_DRAG_ACCURACY_T3) return EG_DRAG_MISS_REDUCTION_T3;
     if (n >= EG_DRAG_ACCURACY_T2) return EG_DRAG_MISS_REDUCTION_T2;
@@ -934,7 +967,7 @@ function _egGetDragMissReduction(stacks) {
     return 0;
 }
 
-function _egGetDragTier(stacks) {
+export function _egGetDragTier(stacks) {
     const n = Number(stacks) || 0;
     if (n >= EG_DRAG_ACCURACY_T3) return 3;
     if (n >= EG_DRAG_ACCURACY_T2) return 2;
@@ -942,7 +975,7 @@ function _egGetDragTier(stacks) {
     return 0;
 }
 
-function _egGetDragTierLabelKey(stacks) {
+export function _egGetDragTierLabelKey(stacks) {
     const tier = _egGetDragTier(stacks);
     if (tier === 3) return 'eg_drag_t3';
     if (tier === 2) return 'eg_drag_t2';
@@ -950,7 +983,7 @@ function _egGetDragTierLabelKey(stacks) {
     return null;
 }
 
-function _egCalcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
+export function _egCalcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
     const lvl = Math.max(1, Number(monsterLevel) || 1);
     const bonus = _egGetDragAccuracyBonus(dragStacks);
     const acc = Math.max(0, Number(accuracy) || 0) + _egGetInnateAccuracy() + bonus;
@@ -963,7 +996,7 @@ function _egCalcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
 }
 
 // Rolls a crit for the current hit. Returns the damage multiplier (1 = no crit).
-function _egRollCrit(stats) {
+export function _egRollCrit(stats) {
     if (stats.critChance > 0 && Math.random() * 100 < stats.critChance) {
         return 1.5 + stats.critMultiplierPct / 100; // 150% base crit damage + bonus multiplier
     }
@@ -987,18 +1020,18 @@ function _egRollCrit(stats) {
 // gear: absorption_regen_rate increases the refill speed (%).
 
 // Base delay before regeneration starts (reduced by fasterAbsorptionRegenStart).
-const EG_ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 - 200 dmg hits at L41 every ~6s can no longer fully regen (needs 18s quiet)
+export const EG_ABSORPTION_REGEN_BASE_DELAY_MS = 18000; // was 12000 - 200 dmg hits at L41 every ~6s can no longer fully regen (needs 18s quiet)
 
 // Base share of max Absorption restored per regen tick (scaled by absorptionRegenRatePct).
-const EG_ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 - 5s to full (was 3.3s), so even after delay a full shield takes longer
+export const EG_ABSORPTION_REGEN_BASE_STEP_PCT = 0.04; // was 0.06 - 5s to full (was 3.3s), so even after delay a full shield takes longer
 
-function _egCancelAbsorptionRegen() {
-    if (_egPlayerAbsorptionRegenDelayTimer) { clearTimeout(_egPlayerAbsorptionRegenDelayTimer); _egPlayerAbsorptionRegenDelayTimer = null; }
-    if (_egPlayerAbsorptionRegenInterval) { clearInterval(_egPlayerAbsorptionRegenInterval); _egPlayerAbsorptionRegenInterval = null; }
+export function _egCancelAbsorptionRegen() {
+    if (globalThis._egPlayerAbsorptionRegenDelayTimer) { clearTimeout(globalThis._egPlayerAbsorptionRegenDelayTimer); globalThis._egPlayerAbsorptionRegenDelayTimer = null; }
+    if (globalThis._egPlayerAbsorptionRegenInterval) { clearInterval(globalThis._egPlayerAbsorptionRegenInterval); globalThis._egPlayerAbsorptionRegenInterval = null; }
 }
 
 // Called on every hit taken - interrupts any in-progress regen and restarts the delay.
-function _egScheduleAbsorptionRegen() {
+export function _egScheduleAbsorptionRegen() {
     _egCancelAbsorptionRegen();
 
     const stats = _egComputePlayerStats();
@@ -1010,13 +1043,13 @@ function _egScheduleAbsorptionRegen() {
     }
     const rateMult = 1 + Math.min(100, stats.absorptionRegenRatePct || 0) / 100;
 
-    _egPlayerAbsorptionRegenDelayTimer = setTimeout(() => {
-        _egPlayerAbsorptionRegenInterval = setInterval(() => {
+    globalThis._egPlayerAbsorptionRegenDelayTimer = setTimeout(() => {
+        globalThis._egPlayerAbsorptionRegenInterval = setInterval(() => {
             if (!_egIsActive()) { _egCancelAbsorptionRegen(); return; }
             const max = _egComputePlayerStats().absorption;
-            if (_egPlayerAbsorptionCurrent >= max) { _egCancelAbsorptionRegen(); return; }
+            if (globalThis._egPlayerAbsorptionCurrent >= max) { _egCancelAbsorptionRegen(); return; }
             const step = Math.max(1, Math.round(max * EG_ABSORPTION_REGEN_BASE_STEP_PCT * rateMult));
-            _egPlayerAbsorptionCurrent = Math.min(max, _egPlayerAbsorptionCurrent + step);
+            globalThis._egPlayerAbsorptionCurrent = Math.min(max, globalThis._egPlayerAbsorptionCurrent + step);
         }, 200);
     }, delayMs);
 }
@@ -1034,7 +1067,7 @@ function _egScheduleAbsorptionRegen() {
 // _egComputePlayerStats(). Buckets not listed here are either internal/derived
 // (armour/evasion/absorption totals, physFlatMin/Max, elemental dmg pairs)
 // and are handled explicitly by _egBuildStatLine() instead.
-const EG_STAT_DISPLAY_LABELS = {
+export const EG_STAT_DISPLAY_LABELS = {
     health: { label: t('eg_stat_health'), suffix: '' },
     healthIncPct: { label: t('eg_stat_inc_health'), suffix: '%' },
     mana: { label: t('eg_stat_mana'), suffix: '' },
@@ -1127,7 +1160,7 @@ const EG_STAT_DISPLAY_LABELS = {
 };
 
 // Rounds a value for display: whole numbers stay whole, decimals get 1 digit.
-function _egFormatStatValue(val) {
+export function _egFormatStatValue(val) {
     const rounded = Math.round(val * 10) / 10;
     return Number.isInteger(rounded) ? rounded : rounded.toFixed(1);
 }
@@ -1144,7 +1177,7 @@ function _egFormatStatValue(val) {
 //   puzzle  - center column between the paperdoll slots (mistakes/time,
 //             quiz helpers)
 // Buckets not listed in any category are silently omitted from display.
-const EG_STAT_LAYOUT = {
+export const EG_STAT_LAYOUT = {
     offense: [
         { catKey: 'eg_statcat_attributes', buckets: ['strength', 'agility', 'intelligence'] },
         { catKey: 'eg_statcat_crit', buckets: ['critChance', 'critMultiplierPct'] },
@@ -1199,7 +1232,7 @@ const EG_STAT_LAYOUT = {
 // combined pseudo-buckets (armour/evasion/absorption totals and the damage
 // ranges) explicitly; everything else falls through to EG_STAT_DISPLAY_LABELS.
 // Returns null when the stat's aggregated value is zero.
-function _egBuildStatLine(bucket, stats) {
+export function _egBuildStatLine(bucket, stats) {
     let line = null;
 
     switch (bucket) {
@@ -1350,7 +1383,7 @@ function _egBuildStatLine(bucket, stats) {
 // Aggregates all non-zero stats into the three screen regions defined by
 // EG_STAT_LAYOUT. Returns { offense: [...], defense: [...], puzzle: [...] }
 // where each side is an array of { title, lines: [{ label, value, descKey }] }.
-function _egBuildGroupedStats(stats) {
+export function _egBuildGroupedStats(stats) {
     const out = { offense: [], defense: [], puzzle: [] };
 
     Object.entries(EG_STAT_LAYOUT).forEach(([side, categories]) => {

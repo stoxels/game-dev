@@ -1,10 +1,19 @@
-﻿//------------------------------------------------------------------------
+﻿import { Audio_Manager } from '../audio/audio.js';
+import { save } from '../state.js';
+import { stopTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { isLevelConvergence, renderLevelSelect } from './screens-level-select.js';
+import { showMapView } from './screens-map-view.js';
+import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
+//--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
+try { Object.defineProperty(globalThis, 'replayLevel', { get() { return replayLevel; }, set(v) { replayLevel = v; }, configurable: true }); } catch (e) {}
+//------------------------------------------------------------------------
 //------------------------SCREEN SWITCH UTILITY---------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Deactivates all screens, then activates the one with the given id.
-function switchScreen(id) {
+export function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
@@ -17,12 +26,12 @@ function switchScreen(id) {
 //------------------------------------------------------------------------
 
 // Shows a modal overlay by its element ID
-function showModal(id) {
+export function showModal(id) {
     document.getElementById(id).classList.add('show');
 }
 
 // Hides a modal overlay by its element ID
-function hideModal(id) {
+export function hideModal(id) {
     document.getElementById(id).classList.remove('show');
 }
 
@@ -32,7 +41,7 @@ function hideModal(id) {
 // controllable player avatar sprite is hidden via CSS; the character
 // portrait baked into the background (boss card / top-centre sprite) is
 // untouched. Call after any open/close state change of those modals.
-function _refreshQuestionModalFlag() {
+export function _refreshQuestionModalFlag() {
     const qz = document.getElementById('quiz-overlay');
     const mg = document.getElementById('mg-modal');
     const open = !!(
@@ -51,7 +60,7 @@ function _refreshQuestionModalFlag() {
 //------------------------------------------------------------------------
 
 // Hides both the win and lose result overlays.
-function hideResultOverlays() {
+export function hideResultOverlays() {
     hideModal('ov-win');
     hideModal('ov-lose');
 }
@@ -63,12 +72,12 @@ function hideResultOverlays() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-let _convResizeBound = null;
-let _convCloseTimer = null;
-let _convSfxTimer = null;
+export let _convResizeBound = null;
+export let _convCloseTimer = null;
+export let _convSfxTimer = null;
 
 // Scales the book modal up to fill the viewport (capped) so it reads large.
-function _fitConvergenceModal(modal) {
+export function _fitConvergenceModal(modal) {
     modal = modal || document.getElementById('convergence-modal');
     const box = modal && modal.querySelector('.convm');
     if (!box) return;
@@ -77,7 +86,7 @@ function _fitConvergenceModal(modal) {
 }
 
 // Shows the convergence modal and plays its sound effect.
-function showConvergenceModal() {
+export function showConvergenceModal() {
     const modal = document.getElementById('convergence-modal');
     if (modal) {
         if (_convCloseTimer) { clearTimeout(_convCloseTimer); _convCloseTimer = null; }
@@ -90,8 +99,8 @@ function showConvergenceModal() {
     // Land the SFX right as the entrance animation completes, like a reveal.
     if (_convSfxTimer) { clearTimeout(_convSfxTimer); }
     _convSfxTimer = setTimeout(() => { Audio_Manager.playSFX('convergence'); _convSfxTimer = null; }, 680);
-    _hidePlayerAvatarSimple();
-    _hidePlayerAvatar();
+    globalThis._hidePlayerAvatarSimple();
+    globalThis._hidePlayerAvatar();
     _updateConvergenceModalPoints(modal);
     _fitConvergenceModal(modal);
     if (!_convResizeBound) {
@@ -106,7 +115,7 @@ function showConvergenceModal() {
 //------------------------------------------------------------------------
 (function _bindConvergenceModalButtons() {
     const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
-    on('convm-btn-open', () => { hideConvergenceModal(); hideResultOverlays(); showPassiveTree(); });
+    on('convm-btn-open', () => { hideConvergenceModal(); hideResultOverlays(); globalThis.showPassiveTree(); });
     on('convm-btn-next', () => { hideConvergenceModal(); goToNextLevel(); });
     on('convm-btn-select', () => { hideConvergenceModal(); goToLevelSelect(); });
 })();
@@ -114,16 +123,16 @@ function showConvergenceModal() {
 // Total number of Convergence Trials across all worlds - the "X" in the
 // "earned / total" readout. Leveling Rework: milestones moved from puzzle
 // levels (isLevelConvergence is always false now) to trials.
-let _convTotalCache = null;
-function _convergenceTotalMilestones() {
+export let _convTotalCache = null;
+export function _convergenceTotalMilestones() {
     if (_convTotalCache != null) return _convTotalCache;
-    if (typeof _egTrialCount === 'function') {
-        _convTotalCache = _egTrialCount();
+    if (typeof globalThis._egTrialCount === 'function') {
+        _convTotalCache = globalThis._egTrialCount();
         return _convTotalCache;
     }
-    if (typeof WORLDS === 'undefined' || typeof isLevelConvergence !== 'function') return 0;
+    if (typeof globalThis.WORLDS === 'undefined' || typeof isLevelConvergence !== 'function') return 0;
     let total = 0;
-    WORLDS.forEach((w) => {
+    globalThis.WORLDS.forEach((w) => {
         const data = (w && w.data) || [];
         data.forEach((_, li) => {
             if (isLevelConvergence(li, w, li === data.length - 1)) total++;
@@ -135,18 +144,18 @@ function _convergenceTotalMilestones() {
 
 // Fills the convergence modal's total-points chip with the current pool and
 // plays a short count-up from 0 so the reward reveal feels earned.
-function _updateConvergenceModalPoints(modal) {
+export function _updateConvergenceModalPoints(modal) {
     modal = modal || document.getElementById('convergence-modal');
     const plate = modal && modal.querySelector('.convm-total-plate span');
     if (!plate) return;
-    const total = ((typeof STATE !== 'undefined' && STATE.convergenceDone && STATE.convergenceDone.length) || 0)
-        + ((typeof STATE !== 'undefined' && STATE.trialsDone && STATE.trialsDone.length) || 0);
+    const total = ((typeof globalThis.STATE !== 'undefined' && globalThis.STATE.convergenceDone && globalThis.STATE.convergenceDone.length) || 0)
+        + ((typeof globalThis.STATE !== 'undefined' && globalThis.STATE.trialsDone && globalThis.STATE.trialsDone.length) || 0);
     const cap = _convergenceTotalMilestones();
     const label = t('convergence_total');
     const tmpl = (label && label !== 'convergence_total') ? label : 'TOTAL: {n} / {total}';
     const render = (val) => { plate.textContent = tmpl.replace('{n}', val).replace('{total}', cap); };
     render(0);
-    const start = performance.now();
+    const start = globalThis.performance.now();
     const dur = 650;
     const step = (now) => {
         const p = Math.min(1, (now - start) / dur);
@@ -158,7 +167,7 @@ function _updateConvergenceModalPoints(modal) {
 }
 
 // Hides the convergence modal.
-function hideConvergenceModal() {
+export function hideConvergenceModal() {
     if (_convResizeBound) {
         window.removeEventListener('resize', _convResizeBound);
         _convResizeBound = null;
@@ -182,7 +191,7 @@ function hideConvergenceModal() {
 // Builds a button handler that closes the convergence modal,
 // then optionally runs an extra action. If no extra action is given,
 // it falls through to the intended navigation callback (proceed).
-function _buildConvergenceButtonHandler(proceed, extraAction) {
+export function _buildConvergenceButtonHandler(proceed, extraAction) {
     return () => {
         hideConvergenceModal();
         if (extraAction) extraAction();
@@ -193,13 +202,13 @@ function _buildConvergenceButtonHandler(proceed, extraAction) {
 // Wires up all three buttons inside the convergence modal to close it
 // and route correctly: tree opens the passive tree, the other two
 // continue with the intended navigation.
-function _wireConvergenceModalButtons(modal, proceed) {
+export function _wireConvergenceModalButtons(modal, proceed) {
     const treeBtn = modal.querySelector('.convm-btn.open');
     const nextBtn = modal.querySelector('.convm-btn.next');
     const levelsBtn = modal.querySelector('.convm-btn.select');
 
     // Tree button opens the passive tree; navigation continues from there.
-    treeBtn.onclick = _buildConvergenceButtonHandler(proceed, () => { hideResultOverlays(); showPassiveTree(); });
+    treeBtn.onclick = _buildConvergenceButtonHandler(proceed, () => { hideResultOverlays(); globalThis.showPassiveTree(); });
     nextBtn.onclick = _buildConvergenceButtonHandler(proceed);
     levelsBtn.onclick = _buildConvergenceButtonHandler(proceed, () => { goToLevelSelect(); });
 }
@@ -208,7 +217,7 @@ function _wireConvergenceModalButtons(modal, proceed) {
 // convergence modal first. Once the player dismisses it, the intended
 // navigation callback (proceed) is executed.
 // If no convergence point is pending, proceed is called immediately.
-function _maybeShowConvergenceModal(proceed) {
+export function _maybeShowConvergenceModal(proceed) {
     if (!window._pendingConvergenceModal) {
         proceed();
         return;
@@ -224,9 +233,9 @@ function _maybeShowConvergenceModal(proceed) {
 // Builds a callback that first checks for a pending class event,
 // then runs the intended navigation. Used as the post-convergence
 // step in level transitions (next level, replay).
-function _buildPostConvergenceCallback(proceed) {
+export function _buildPostConvergenceCallback(proceed) {
     return () => {
-        if (triggerClassEventIfPending(proceed)) return;
+        if (globalThis.triggerClassEventIfPending(proceed)) return;
         proceed();
     };
 }
@@ -239,18 +248,18 @@ function _buildPostConvergenceCallback(proceed) {
 //------------------------------------------------------------------------
 
 // Navigates to the title screen and resets screen history and BGM.
-function showTitle() {
+export function showTitle() {
     Audio_Manager.playBGM('title');
     stopTimer();
-    screenHistory = [];
+    globalThis.screenHistory = [];
     switchScreen('screen-title');
 }
 
 // Scales the setup book (fixed 1376x768 design box) to fit the current
 // viewport so the screen looks right on any window size. Called on show and
 // on window resize (only while the setup screen is active).
-let _setupResizeBound = false;
-function _fitSetupBook() {
+export let _setupResizeBound = false;
+export function _fitSetupBook() {
     const book = document.querySelector('#screen-setup .setup-book');
     if (!book) return;
     const designW = 1376;
@@ -268,37 +277,37 @@ function _fitSetupBook() {
 // Refreshes the setup-screen Nexus button: visible only once the player
 // has completed the Nexus Point. Kept separate so win-overlay and load
 // flows can refresh it without re-entering the whole setup screen.
-function refreshSetupNexusButton() {
+export function refreshSetupNexusButton() {
     const btn = document.getElementById('btn-enter-nexus-setup');
     if (!btn) return;
-    const unlocked = typeof isNexusUnlocked === 'function' ? isNexusUnlocked() : false;
+    const unlocked = typeof globalThis.isNexusUnlocked === 'function' ? globalThis.isNexusUnlocked() : false;
     btn.style.display = unlocked ? '' : 'none';
 }
 
 // Enters the endgame Nexus directly from the setup screen.
 // Only reachable when the Nexus Point has been completed.
-function enterNexusFromSetup() {
-    if (typeof isNexusUnlocked === 'function' && !isNexusUnlocked()) return;
-    screenHistory.push('screen-setup');
-    if (typeof showEndgameNexus === 'function') showEndgameNexus();
+export function enterNexusFromSetup() {
+    if (typeof globalThis.isNexusUnlocked === 'function' && !globalThis.isNexusUnlocked()) return;
+    globalThis.screenHistory.push('screen-setup');
+    if (typeof globalThis.showEndgameNexus === 'function') globalThis.showEndgameNexus();
 }
 
 // Navigates to the setup screen and refreshes difficulty/mod descriptions.
-function showSetup() {
+export function showSetup() {
     stopTimer();
     // Clear any leftover WASD avatar from a finished level or tutorial: the
     // sprite is position:fixed at body level, so without an explicit hide it
     // floats over the setup screen and stays steerable. Every other screen
     // switch (level select, convergence modal, ...) hides it; this one simply
     // never did because the old setup flow never rendered an avatar.
-    if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
-    if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
+    if (typeof globalThis._hidePlayerAvatarSimple === 'function') globalThis._hidePlayerAvatarSimple();
+    if (typeof globalThis._hidePlayerAvatar === 'function') globalThis._hidePlayerAvatar();
     // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
-    if (typeof syncDiffModButtons === 'function') syncDiffModButtons();
-    screenHistory.push('screen-title');
-    updDiffDesc();
-    updModDesc();
-    _updateSetupScreenCharacter();
+    if (typeof globalThis.syncDiffModButtons === 'function') globalThis.syncDiffModButtons();
+    globalThis.screenHistory.push('screen-title');
+    globalThis.updDiffDesc();
+    globalThis.updModDesc();
+    globalThis._updateSetupScreenCharacter();
     switchScreen('screen-setup');
     refreshSetupNexusButton();
     _fitSetupBook();
@@ -317,20 +326,20 @@ function showSetup() {
 // TEMP: once Adventure Mode replaces the world map, this should go straight
 // back to calling launchExistingGame()'s body (or launchAdventureMode()'s),
 // and screen-mode-select / this function's redirect can be deleted.
-function confirmSetup() {
-    screenHistory.push('screen-setup');
+export function confirmSetup() {
+    globalThis.screenHistory.push('screen-setup');
     switchScreen('screen-mode-select');
 }
 
 // Launches the existing world-map implementation.
 // This is the exact logic that used to run at the end of confirmSetup() -
 // unchanged, just moved behind the dev mode-select screen.
-function launchExistingGame() {
-    screenHistory.push('screen-mode-select');
-    STATE.mapViewEnabled = true;
+export function launchExistingGame() {
+    globalThis.screenHistory.push('screen-mode-select');
+    globalThis.STATE.mapViewEnabled = true;
     if (typeof save === 'function') save();
 
-    if (typeof checkLockedCodesOnSetup === 'function') checkLockedCodesOnSetup();
+    if (typeof globalThis.checkLockedCodesOnSetup === 'function') globalThis.checkLockedCodesOnSetup();
 
     if (typeof showMapView === 'function') {
         showMapView();
@@ -343,35 +352,35 @@ function launchExistingGame() {
 }
 
 // Launches the new Adventure Mode sandbox (see js/adventure-mode.js).
-function launchAdventureMode() {
-    screenHistory.push('screen-mode-select');
-    if (typeof showAdventureMode === 'function') {
-        showAdventureMode();
+export function launchAdventureMode() {
+    globalThis.screenHistory.push('screen-mode-select');
+    if (typeof globalThis.showAdventureMode === 'function') {
+        globalThis.showAdventureMode();
     }
 }
 
 // Launches the endgame Nexus of Worlds screen (see endgame-nexus.js).
-function launchEndgameTestMode() {
-    screenHistory.push('screen-mode-select');
-    if (typeof showEndgameNexus === 'function') showEndgameNexus();
+export function launchEndgameTestMode() {
+    globalThis.screenHistory.push('screen-mode-select');
+    if (typeof globalThis.showEndgameNexus === 'function') globalThis.showEndgameNexus();
 }
 
 // Closes any overlays and active quiz, then navigates to the level select screen.
 // Respects convergence modal and pending class events before transitioning.
-function goToLevelSelect() {
+export function goToLevelSelect() {
     hideResultOverlays();
-    closeQuiz();
+    globalThis.closeQuiz();
 
     // Clear any leftover character sprite from a finished (ascension) level
-    if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple();
-    if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar();
+    if (typeof globalThis._hidePlayerAvatarSimple === 'function') globalThis._hidePlayerAvatarSimple();
+    if (typeof globalThis._hidePlayerAvatar === 'function') globalThis._hidePlayerAvatar();
 
     const _goToCorrectLevelView = () => {
         // Route back to the Probability Gate if this run was launched from the map device
         if (window._egIsMapDeviceRun) {
             window._egIsMapDeviceRun = false;
-            if (typeof showEndgameGate === 'function') {
-                showEndgameGate();
+            if (typeof globalThis.showEndgameGate === 'function') {
+                globalThis.showEndgameGate();
                 return;
             }
         }
@@ -380,8 +389,8 @@ function goToLevelSelect() {
         // single-boss test fight (forfeit via the pause menu).
         if (window._egIsBossTestRun) {
             window._egIsBossTestRun = false;
-            if (typeof showEndgameBossTest === 'function') {
-                showEndgameBossTest();
+            if (typeof globalThis.showEndgameBossTest === 'function') {
+                globalThis.showEndgameBossTest();
                 return;
             }
         }
@@ -389,13 +398,13 @@ function goToLevelSelect() {
         // Route back to the endgame test hub if this run was launched from there
         if (window._egIsTestRun) {
             window._egIsTestRun = false;
-            if (typeof showEndgameTestHub === 'function') {
-                showEndgameTestHub();
+            if (typeof globalThis.showEndgameTestHub === 'function') {
+                globalThis.showEndgameTestHub();
                 return;
             }
         }
 
-        if (STATE && STATE.mapViewEnabled) {
+        if (globalThis.STATE && globalThis.STATE.mapViewEnabled) {
             if (typeof _wdCurrentWi !== 'undefined' && _wdCurrentWi !== null
                 && typeof showWorldDetail === 'function') {
                 showWorldDetail(_wdCurrentWi);
@@ -411,8 +420,8 @@ function goToLevelSelect() {
     };
 
     const proceed = () => {
-        if (typeof triggerClassEventIfPending === 'function') {
-            if (triggerClassEventIfPending(_goToCorrectLevelView)) return;
+        if (typeof globalThis.triggerClassEventIfPending === 'function') {
+            if (globalThis.triggerClassEventIfPending(_goToCorrectLevelView)) return;
         }
         _goToCorrectLevelView();
     };
@@ -423,12 +432,12 @@ function goToLevelSelect() {
 // Navigates back to the previous screen in history.
 // If an open modal is detected, closes it instead of navigating.
 // If history is empty, falls back to the title screen.
-function goToPreviousScreen() {
+export function goToPreviousScreen() {
     const openModal = document.querySelector('.modal-bg.show');
     if (openModal) {
         // The Degrees of Freedom choice is mandatory - never dismiss it via back navigation.
         if (openModal.id === 'dof-modal') {
-            if (typeof _dofNudge === 'function') _dofNudge();
+            if (typeof globalThis._dofNudge === 'function') globalThis._dofNudge();
             return;
         }
         openModal.classList.remove('show');
@@ -436,8 +445,8 @@ function goToPreviousScreen() {
         return;
     }
 
-    if (screenHistory.length) {
-        const prev = screenHistory.pop();
+    if (globalThis.screenHistory.length) {
+        const prev = globalThis.screenHistory.pop();
 
         // The game screen is not directly re-enterable; go to level select instead.
         if (prev === 'screen-game') {
@@ -449,7 +458,7 @@ function goToPreviousScreen() {
 
         // Rebuild the level select so completion state is up to date.
         if (prev === 'screen-levels') {
-            if (STATE && STATE.mapViewEnabled && typeof showMapView === 'function') {
+            if (globalThis.STATE && globalThis.STATE.mapViewEnabled && typeof showMapView === 'function') {
                 showMapView();
                 return;
             }
@@ -470,31 +479,31 @@ function goToPreviousScreen() {
 // captured by reference; the subsequent startLevel's encounter teardown
 // cancels their old expiry timers, and the restore step below re-places them
 // with fresh lifetimes via the shared _egReplaceCarried* helpers.
-function _campaignSnapshotCarriedDrops() {
+export function _campaignSnapshotCarriedDrops() {
     const carried = { loot: [], currency: [], items: [], maps: [], charms: [] };
     try {
-        if (typeof _egLootDrops !== 'undefined' && _egLootDrops instanceof Map) {
-            carried.loot = Array.from(_egLootDrops.values());
+        if (typeof globalThis._egLootDrops !== 'undefined' && globalThis._egLootDrops instanceof Map) {
+            carried.loot = Array.from(globalThis._egLootDrops.values());
         }
     } catch (e) {}
     try {
-        if (typeof _egCurrencyDrops !== 'undefined' && _egCurrencyDrops instanceof Map) {
-            carried.currency = Array.from(_egCurrencyDrops.values());
+        if (typeof globalThis._egCurrencyDrops !== 'undefined' && globalThis._egCurrencyDrops instanceof Map) {
+            carried.currency = Array.from(globalThis._egCurrencyDrops.values());
         }
     } catch (e) {}
     try {
-        if (typeof _egItemDrops !== 'undefined' && _egItemDrops instanceof Map) {
-            carried.items = Array.from(_egItemDrops.values());
+        if (typeof globalThis._egItemDrops !== 'undefined' && globalThis._egItemDrops instanceof Map) {
+            carried.items = Array.from(globalThis._egItemDrops.values());
         }
     } catch (e) {}
     try {
-        if (typeof _egMapDrops !== 'undefined' && _egMapDrops instanceof Map) {
-            carried.maps = Array.from(_egMapDrops.values());
+        if (typeof globalThis._egMapDrops !== 'undefined' && globalThis._egMapDrops instanceof Map) {
+            carried.maps = Array.from(globalThis._egMapDrops.values());
         }
     } catch (e) {}
     try {
-        if (typeof _egCharmDrops !== 'undefined' && _egCharmDrops instanceof Map) {
-            carried.charms = Array.from(_egCharmDrops.values());
+        if (typeof globalThis._egCharmDrops !== 'undefined' && globalThis._egCharmDrops instanceof Map) {
+            carried.charms = Array.from(globalThis._egCharmDrops.values());
         }
     } catch (e) {}
     return carried;
@@ -504,7 +513,7 @@ function _campaignSnapshotCarriedDrops() {
 // grid. Polls briefly for the new puzzle's grid DOM so math-gated levels
 // (startLevel defers _doStartLevel until the gate passes) don't place drops
 // onto the stale grid just to have them wiped. Restores exactly once.
-function _campaignRestoreCarriedDrops(carried, nextIndex) {
+export function _campaignRestoreCarriedDrops(carried, nextIndex) {
     if (!carried) return;
     const total = (carried.loot?.length || 0) + (carried.currency?.length || 0)
         + (carried.items?.length || 0) + (carried.maps?.length || 0)
@@ -513,27 +522,27 @@ function _campaignRestoreCarriedDrops(carried, nextIndex) {
 
     let attempts = 0;
     const doRestore = () => {
-        if (carried.loot.length > 0 && typeof _egReplaceCarriedLootDrops === 'function') {
-            try { _egReplaceCarriedLootDrops(carried.loot); } catch (e) {}
+        if (carried.loot.length > 0 && typeof globalThis._egReplaceCarriedLootDrops === 'function') {
+            try { globalThis._egReplaceCarriedLootDrops(carried.loot); } catch (e) {}
         }
-        if (carried.currency.length > 0 && typeof _egReplaceCarriedCurrencyDrops === 'function') {
-            try { _egReplaceCarriedCurrencyDrops(carried.currency); } catch (e) {}
+        if (carried.currency.length > 0 && typeof globalThis._egReplaceCarriedCurrencyDrops === 'function') {
+            try { globalThis._egReplaceCarriedCurrencyDrops(carried.currency); } catch (e) {}
         }
-        if (carried.items.length > 0 && typeof _egReplaceCarriedItemDrops === 'function') {
-            try { _egReplaceCarriedItemDrops(carried.items); } catch (e) {}
+        if (carried.items.length > 0 && typeof globalThis._egReplaceCarriedItemDrops === 'function') {
+            try { globalThis._egReplaceCarriedItemDrops(carried.items); } catch (e) {}
         }
-        if (carried.maps.length > 0 && typeof _egReplaceCarriedMapDrops === 'function') {
-            try { _egReplaceCarriedMapDrops(carried.maps); } catch (e) {}
+        if (carried.maps.length > 0 && typeof globalThis._egReplaceCarriedMapDrops === 'function') {
+            try { globalThis._egReplaceCarriedMapDrops(carried.maps); } catch (e) {}
         }
-        if (carried.charms.length > 0 && typeof _charmReplaceCarriedDrops === 'function') {
-            try { _charmReplaceCarriedDrops(carried.charms); } catch (e) {}
+        if (carried.charms.length > 0 && typeof globalThis._charmReplaceCarriedDrops === 'function') {
+            try { globalThis._charmReplaceCarriedDrops(carried.charms); } catch (e) {}
         }
     };
     const poll = () => {
         attempts++;
-        const gridReady = !!(typeof cur !== 'undefined' && cur && cur.grid
+        const gridReady = !!(typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.grid
             && document.getElementById('g-0-0'));
-        const onTarget = (typeof cur !== 'undefined' && cur && cur.gIdx === nextIndex)
+        const onTarget = (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.gIdx === nextIndex)
             // Ascension-trial hijack launches a chain instead of the plain
             // puzzle - still a valid "next puzzle", so accept any fresh grid
             // after a few polls rather than dropping the items.
@@ -554,12 +563,12 @@ function _campaignRestoreCarriedDrops(carried, nextIndex) {
 // NEXT carries unclaimed grid drops forward (see helpers above); the LEVELS
 // path (onGoToLevelsFromOverlay → goToLevelSelect) intentionally carries
 // nothing, so those drops are lost on encounter teardown.
-function goToNextLevel() {
+export function goToNextLevel() {
     hideResultOverlays();
 
-    const nextIndex = cur.gIdx + 1;
+    const nextIndex = globalThis.cur.gIdx + 1;
     const proceed = () => {
-        if (nextIndex >= ALL.length) {
+        if (nextIndex >= globalThis.ALL.length) {
             goToLevelSelect();
             return;
         }
@@ -568,9 +577,9 @@ function goToNextLevel() {
         // carried - only what is still unclaimed on the grid counts.
         // Skipped for real endgame map runs: the encounter chain owns that
         // transition (_egTransitionToChainPuzzle) and would double-place.
-        const isMapRun = (typeof _egIsMapRun === 'function') && _egIsMapRun();
+        const isMapRun = (typeof globalThis._egIsMapRun === 'function') && globalThis._egIsMapRun();
         const carried = isMapRun ? null : _campaignSnapshotCarriedDrops();
-        startLevel(nextIndex);
+        globalThis.startLevel(nextIndex);
         if (carried) _campaignRestoreCarriedDrops(carried, nextIndex);
     };
 
@@ -585,10 +594,10 @@ function replayLevel() {
     // this covers the win/lose retry buttons. Chain transitions preserve
     // the buff via _egSuppressEncounterStop, but a manual retry is a map
     // exit and must wipe it.
-    if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
+    if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
 
-    const currentIndex = cur.gIdx;
-    const proceed = () => startLevel(currentIndex);
+    const currentIndex = globalThis.cur.gIdx;
+    const proceed = () => globalThis.startLevel(currentIndex);
 
     _maybeShowConvergenceModal(_buildPostConvergenceCallback(proceed));
 }

@@ -1,4 +1,19 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { save } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
+import { EG_SLOT_MOD_TABLE_MAP } from './endgame-equipment-generator.js';
+import { EG_INV_COLS, _egInventory, egSaveHubState } from './endgame-hub.js';
+import { EG_SHARD_DEFS, _egRollShardForItem, egAddShard } from './endgame-shards.js';
+import { _egIsActive } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME LOOT FILTER----------------------------------
 //------------------------------------------------------------------------
 // PoE/Last-Epoch style loot filter. The player defines VENDOR rules; any
@@ -44,9 +59,9 @@
 
 // Live filter state. Kept in STATE.egLootFilter:
 //   { enabled: bool, keepUnique: bool, rules: [rule, ...] }
-let _egLootFilter = null;
+export let _egLootFilter = null;
 
-function _eglfDefaultState() {
+export function _eglfDefaultState() {
     return {
         enabled: false,     // off by default - nothing is vendored until opted in
         keepUnique: true,   // golden items are never auto-vendored
@@ -54,7 +69,7 @@ function _eglfDefaultState() {
     };
 }
 
-function _eglfNormaliseRule(raw) {
+export function _eglfNormaliseRule(raw) {
     const r = (raw && typeof raw === 'object') ? raw : {};
     return {
         id: (typeof r.id === 'string' && r.id) ? r.id : `lf_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
@@ -69,7 +84,7 @@ function _eglfNormaliseRule(raw) {
     };
 }
 
-function _eglfNormaliseState(raw) {
+export function _eglfNormaliseState(raw) {
     const def = _eglfDefaultState();
     if (!raw || typeof raw !== 'object') return def;
     return {
@@ -79,18 +94,18 @@ function _eglfNormaliseState(raw) {
     };
 }
 
-function _egLoadLootFilter() {
-    if (typeof STATE !== 'undefined' && STATE.egLootFilter) {
-        _egLootFilter = _eglfNormaliseState(STATE.egLootFilter);
+export function _egLoadLootFilter() {
+    if (typeof STATE !== 'undefined' && globalThis.STATE.egLootFilter) {
+        _egLootFilter = _eglfNormaliseState(globalThis.STATE.egLootFilter);
     } else {
         _egLootFilter = _eglfDefaultState();
     }
     return _egLootFilter;
 }
 
-function _egSaveLootFilter() {
+export function _egSaveLootFilter() {
     if (typeof STATE !== 'undefined') {
-        STATE.egLootFilter = JSON.parse(JSON.stringify(_egLootFilter));
+        globalThis.STATE.egLootFilter = JSON.parse(JSON.stringify(_egLootFilter));
         if (typeof save === 'function') try { save(); } catch (e) {}
     }
     if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch (e) {}
@@ -105,7 +120,7 @@ _egLoadLootFilter();
 //------------------------------------------------------------------------
 
 // True when the item satisfies one rule's every set condition (AND).
-function _eglfRuleMatches(rule, item) {
+export function _eglfRuleMatches(rule, item) {
     // Slot condition.
     if (rule.slot !== 'any' && item.slotType !== rule.slot) return false;
 
@@ -144,7 +159,7 @@ function _eglfRuleMatches(rule, item) {
 
 // True when the item would be auto-vendored at pickup (matches a rule).
 // Hard exceptions live here so every call site agrees.
-function _egLootFilterShouldVendor(item) {
+export function _egLootFilterShouldVendor(item) {
     if (!item || item.category !== 'equip') return false;
     if (!_egLootFilter) _egLoadLootFilter();
     if (!_egLootFilter.enabled) return false;
@@ -156,7 +171,7 @@ function _egLootFilterShouldVendor(item) {
 }
 
 // True when the item is KEPT (no rule matches, or hard exception).
-function _egLootFilterKeeps(item) {
+export function _egLootFilterKeeps(item) {
     return !_egLootFilterShouldVendor(item);
 }
 
@@ -170,7 +185,7 @@ function _egLootFilterKeeps(item) {
 // Mirrors _egSellStashItem (Ctrl+click): unique → Ancient Shard, else a
 // rolled shard; shard stash full → item is kept.
 
-function _egLootFilterAutoVendor(item) {
+export function _egLootFilterAutoVendor(item) {
     if (!_egLootFilterShouldVendor(item)) return false;
 
     // Starter gear is excluded by _egLootFilterShouldVendor, so every item
@@ -189,7 +204,7 @@ function _egLootFilterAutoVendor(item) {
     if (!granted) {
         // Shard stash full - keep the item and tell the player why.
         if (typeof showToast === 'function') {
-            showToast(t('eg_loot_filter_shard_full')
+            globalThis.showToast(t('eg_loot_filter_shard_full')
                 .replace('{name}', item.name || '???'), '#f87171');
         }
         return false;
@@ -199,11 +214,11 @@ function _egLootFilterAutoVendor(item) {
     // in the runes & orbs row of the pause screen and the map win/loss
     // summary (same aggregation the Ctrl+click sell chips use). Only during
     // an active run - vendoring happens exclusively inside map runs.
-    if (typeof _egRunCurrency !== 'undefined' && Array.isArray(_egRunCurrency)
+    if (typeof _egRunCurrency !== 'undefined' && Array.isArray(globalThis._egRunCurrency)
         && (typeof _egIsActive !== 'function' || _egIsActive())) {
-        const existing = _egRunCurrency.find(e => e.id === shardDef.id);
+        const existing = globalThis._egRunCurrency.find(e => e.id === shardDef.id);
         if (existing) existing.count = (existing.count || 1) + 1;
-        else _egRunCurrency.push({
+        else globalThis._egRunCurrency.push({
             id: shardDef.id,
             name: shardDef.name,
             icon: shardDef.icon,
@@ -216,7 +231,7 @@ function _egLootFilterAutoVendor(item) {
         try { Audio_Manager.playSFX('player_equip_pickup'); } catch (e) {}
     }
     if (typeof showToast === 'function') {
-        showToast(t('eg_loot_filter_vendored')
+        globalThis.showToast(t('eg_loot_filter_vendored')
             .replace('{name}', item.name || '???')
             .replace('{icon}', shardDef.icon || '◆')
             .replace('{shard}', shardDef.name || '?'), '#f5d98a');
@@ -231,7 +246,7 @@ function _egLootFilterAutoVendor(item) {
 //------------------------------------------------------------------------
 
 // Distinct slot types across all base items, in stable first-seen order.
-function _eglfSlotTypes() {
+export function _eglfSlotTypes() {
     const out = [];
     if (typeof EG_ALL_BASE_TYPES !== 'undefined') {
         for (const b of EG_ALL_BASE_TYPES) {
@@ -242,14 +257,14 @@ function _eglfSlotTypes() {
 }
 
 // Base types for one slot ('any' → every base, only used for display).
-function _eglfBasesForSlot(slot) {
+export function _eglfBasesForSlot(slot) {
     if (typeof EG_ALL_BASE_TYPES === 'undefined') return [];
     return EG_ALL_BASE_TYPES.filter(b => slot === 'any' || b.slotType === slot);
 }
 
 // Mod families available for one slot, from its EG_SLOT_MOD_TABLE_* entry.
 // Returns [{ id, label }] with the localized label when the table has one.
-function _eglfModFamiliesForSlot(slot) {
+export function _eglfModFamiliesForSlot(slot) {
     const out = [];
     if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') return out;
     const getter = EG_SLOT_MOD_TABLE_MAP[slot];
@@ -273,7 +288,7 @@ function _eglfModFamiliesForSlot(slot) {
 }
 
 // Every mod family across all slots (used when rule slot = 'any').
-function _eglfAllModFamilies() {
+export function _eglfAllModFamilies() {
     const out = [];
     const seen = new Set();
     for (const slot of _eglfSlotTypes()) {
@@ -292,15 +307,15 @@ function _eglfAllModFamilies() {
 // in endgame-hub.js. Edits go into a working copy (_eglfWorking); SAVE
 // commits it to the live filter + STATE, Cancel discards.
 
-let _eglfWorking = null;
+export let _eglfWorking = null;
 
-function _eglfEscapeHTML(s) {
+export function _eglfEscapeHTML(s) {
     return String(s == null ? '' : s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-function _egInjectLootFilterStyles() {
+export function _egInjectLootFilterStyles() {
     if (document.getElementById('eg-loot-filter-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-loot-filter-styles';
@@ -561,7 +576,7 @@ function _egInjectLootFilterStyles() {
     document.head.appendChild(style);
 }
 
-function _egEnsureLootFilterModal() {
+export function _egEnsureLootFilterModal() {
     _egInjectLootFilterStyles();
     let modal = document.getElementById('eg-loot-filter-modal');
     if (modal) return modal;
@@ -617,7 +632,7 @@ function _egEnsureLootFilterModal() {
     return modal;
 }
 
-function _eglfRuleHTML(rule, idx) {
+export function _eglfRuleHTML(rule, idx) {
     const slotOpts = ['<option value="any"' + (rule.slot === 'any' ? ' selected' : '') + '>' + t('eg_loot_filter_any') + '</option>']
         .concat(_eglfSlotTypes().map(s =>
             `<option value="${s}"${rule.slot === s ? ' selected' : ''}>${s}</option>`))
@@ -689,7 +704,7 @@ function _eglfRuleHTML(rule, idx) {
 </div>`;
 }
 
-function _eglfRenderRules() {
+export function _eglfRenderRules() {
     const wrap = document.getElementById('eg-lf-rules');
     if (!wrap || !_eglfWorking) return;
     wrap.innerHTML = _eglfWorking.rules.length === 0
@@ -697,7 +712,7 @@ function _eglfRenderRules() {
         : _eglfWorking.rules.map((r, i) => _eglfRuleHTML(r, i)).join('');
 }
 
-function _eglfUpdatePreview() {
+export function _eglfUpdatePreview() {
     const preview = document.getElementById('eg-lf-preview');
     if (!preview || !_eglfWorking) return;
     let keep = 0, vendor = 0;
@@ -722,7 +737,7 @@ function _eglfUpdatePreview() {
         .replace('{keep}', `<span class="eg-lf-n-keep">${keep}</span>`);
 }
 
-function _eglfRenderModalContent() {
+export function _eglfRenderModalContent() {
     if (!_egLootFilter) _egLoadLootFilter();
     _eglfWorking = JSON.parse(JSON.stringify(_egLootFilter));
     const enabled = document.getElementById('eg-lf-enabled');
@@ -742,7 +757,7 @@ function _eglfRenderModalContent() {
 
 // Keeps the non-form chrome in sync with the working copy: the rule count
 // in the section header and the dimmed rules zone while the filter is off.
-function _eglfSyncChrome() {
+export function _eglfSyncChrome() {
     if (!_eglfWorking) return;
     const box = document.getElementById('eg-lf-box');
     if (box) box.classList.toggle('eg-lf-off', !_eglfWorking.enabled);
@@ -752,7 +767,7 @@ function _eglfSyncChrome() {
 
 // Re-applies the static shell strings on every open so a language switch
 // mid-session is picked up (the shell markup itself is built only once).
-function _eglfRenderStaticText(modal) {
+export function _eglfRenderStaticText(modal) {
     const title = modal.querySelector('.eg-lf-head-title');
     if (title) title.textContent = t('eg_loot_filter_title');
     const close = modal.querySelector('.eg-lf-close');
@@ -780,7 +795,7 @@ function _eglfRenderStaticText(modal) {
     if (cancelBtn) cancelBtn.textContent = t('reset_cancel');
 }
 
-function _egOpenLootFilterModal() {
+export function _egOpenLootFilterModal() {
     if (!_egLootFilter) _egLoadLootFilter();
     const modal = _egEnsureLootFilterModal();
     _eglfRenderStaticText(modal);
@@ -788,23 +803,23 @@ function _egOpenLootFilterModal() {
     modal.classList.add('show');
 }
 
-function _eglfCloseModal() {
+export function _eglfCloseModal() {
     const modal = document.getElementById('eg-loot-filter-modal');
     if (modal) modal.classList.remove('show');
     _eglfWorking = null;
 }
 
-function _eglfSaveModal() {
+export function _eglfSaveModal() {
     if (!_eglfWorking) return;
     _egLootFilter = _eglfNormaliseState(_eglfWorking);
     _eglfWorking = null;
     _egSaveLootFilter();
     _eglfCloseModal();
-    if (typeof showToast === 'function') showToast(t('eg_loot_filter_saved'));
+    if (typeof showToast === 'function') globalThis.showToast(t('eg_loot_filter_saved'));
 }
 
 // ── Rule editing handlers (called from inline onchange/onclick) ──────
-function _eglfSetRule(idx, field, value) {
+export function _eglfSetRule(idx, field, value) {
     if (!_eglfWorking || !_eglfWorking.rules[idx]) return;
     const rule = _eglfWorking.rules[idx];
     if (field === 'enabled') rule.enabled = !!value;
@@ -833,7 +848,7 @@ function _eglfSetRule(idx, field, value) {
     _eglfUpdatePreview();
 }
 
-function _eglfAddRule() {
+export function _eglfAddRule() {
     if (!_eglfWorking) return;
     _eglfWorking.rules.push(_eglfNormaliseRule({ enabled: true }));
     _eglfRenderRules();
@@ -841,7 +856,7 @@ function _eglfAddRule() {
     _eglfUpdatePreview();
 }
 
-function _eglfDelRule(idx) {
+export function _eglfDelRule(idx) {
     if (!_eglfWorking || !_eglfWorking.rules[idx]) return;
     _eglfWorking.rules.splice(idx, 1);
     _eglfRenderRules();
@@ -866,7 +881,7 @@ window.addEventListener('keydown', (e) => {
 //-------------------STASH BUTTON TOOLTIP---------------------------------
 //------------------------------------------------------------------------
 
-function _egShowLootFilterTooltip(e) {
+export function _egShowLootFilterTooltip(e) {
     if (!_egLootFilter) _egLoadLootFilter();
     const state = _egLootFilter.enabled
         ? t('eg_loot_filter_state_on').replace('{n}', String(_egLootFilter.rules.filter(r => r.enabled).length))
@@ -881,5 +896,5 @@ function _egShowLootFilterTooltip(e) {
         <div class="eg-tt-desc">${state}</div>
     </div>
 </div>`;
-    showGameTooltip(html, e);
+    globalThis.showGameTooltip(html, e);
 }

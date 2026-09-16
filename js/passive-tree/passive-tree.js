@@ -1,4 +1,18 @@
-﻿//------------------------------------------------------------------------
+﻿import { renderLevelSelect } from '../screens/screens-level-select.js';
+import { showMapView } from '../screens/screens-map-view.js';
+import { showWorldDetail } from '../screens/screens-world-levels.js';
+import { switchScreen } from '../screens/screens.js';
+import { save } from '../state.js';
+import { pauseTimer, resumeTimer } from '../timer.js';
+import { LANG, t } from '../translation/translations.js';
+import { PassiveTracker } from './passive-tracker.js';
+import { TALENT_TREE_DATA } from './passive-tree-data.js';
+import { ptHasSkill } from './passive-tree-state-points.js';
+import { _ptRender } from './passive-tree-ui.js';
+//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+try { Object.defineProperty(globalThis, '_ptReturnScreen', { get() { return _ptReturnScreen; }, set(v) { _ptReturnScreen = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_ptReturnWorldIndex', { get() { return _ptReturnWorldIndex; }, set(v) { _ptReturnWorldIndex = v; }, configurable: true }); } catch (e) {}
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -6,34 +20,34 @@
 // Special node IDs
 // The Start node is always considered reachable / pre-allocated.
 // Set PT_START_ID to match the "id" of your Start node in passive-tree-data.js
-const PT_START_ID = 1;
+export const PT_START_ID = 1;
 
 // Layout dimensions
-const PT_NODE_RADIUS = 22;
-const PT_PADDING = 80;
-const PT_CONN_WIDTH = 2;
+export const PT_NODE_RADIUS = 22;
+export const PT_PADDING = 80;
+export const PT_CONN_WIDTH = 2;
 
 // Zoom limits and step size
-const PT_ZOOM_MIN = 0.25;
-const PT_ZOOM_MAX = 3.0;
-const PT_ZOOM_STEP = 0.12;
+export const PT_ZOOM_MIN = 0.25;
+export const PT_ZOOM_MAX = 3.0;
+export const PT_ZOOM_STEP = 0.12;
 
 // Node colours - one set per state: locked / unlocked / allocated / start
-const PT_COL_LOCKED_BG = '#111120';
-const PT_COL_LOCKED_BORDER = '#3a3350';
-const PT_COL_LOCKED_DOT = '#3a3350';
-const PT_COL_UNLOCKED_BG = '#1a1a2e';
-const PT_COL_UNLOCKED_BORDER = '#b89a50';
-const PT_COL_UNLOCKED_DOT = '#b89a50';
-const PT_COL_ALLOCATED_BG = '#1e2a10';
-const PT_COL_ALLOCATED_BORDER = '#6dbf40';
-const PT_COL_ALLOCATED_DOT = '#6dbf40';
-const PT_COL_START = '#ffd700';
+export const PT_COL_LOCKED_BG = '#111120';
+export const PT_COL_LOCKED_BORDER = '#3a3350';
+export const PT_COL_LOCKED_DOT = '#3a3350';
+export const PT_COL_UNLOCKED_BG = '#1a1a2e';
+export const PT_COL_UNLOCKED_BORDER = '#b89a50';
+export const PT_COL_UNLOCKED_DOT = '#b89a50';
+export const PT_COL_ALLOCATED_BG = '#1e2a10';
+export const PT_COL_ALLOCATED_BORDER = '#6dbf40';
+export const PT_COL_ALLOCATED_DOT = '#6dbf40';
+export const PT_COL_START = '#ffd700';
 
 // Connection line colours - one per state
-const PT_CONN_LOCKED = 'rgba(80,70,110,0.3)';
-const PT_CONN_UNLOCKED = 'rgba(160,130,80,0.45)';
-const PT_CONN_ALLOCATED = 'rgba(109,191,64,0.7)';
+export const PT_CONN_LOCKED = 'rgba(80,70,110,0.3)';
+export const PT_CONN_UNLOCKED = 'rgba(160,130,80,0.45)';
+export const PT_CONN_ALLOCATED = 'rgba(109,191,64,0.7)';
 
 // Tracks which screen - and, if applicable, which world - to return to
 // after closing the Probability Tree. Kept up to date by showWorldDetail(),
@@ -54,8 +68,8 @@ let _ptReturnWorldIndex = null;
 
 // Maps TALENT_TREE_DATA.nodes into internal skill objects and builds
 // the _pt_skillMap lookup table for fast id-based access.
-function _ptInitSkills() {
-    _pt_skills = TALENT_TREE_DATA.nodes.map(n => ({
+export function _ptInitSkills() {
+    globalThis._pt_skills = TALENT_TREE_DATA.nodes.map(n => ({
         id: n.id,
         x: n.x,
         y: n.y,
@@ -64,13 +78,13 @@ function _ptInitSkills() {
         _def: n,           // full node definition kept for tooltip access
     }));
 
-    _pt_skillMap = {};
-    _pt_skills.forEach(s => { _pt_skillMap[s.id] = s; });
+    globalThis._pt_skillMap = {};
+    globalThis._pt_skills.forEach(s => { globalThis._pt_skillMap[s.id] = s; });
 }
 
 // Maps TALENT_TREE_DATA.connections into internal connection objects.
-function _ptInitConnections() {
-    _pt_conns = TALENT_TREE_DATA.connections.map(c => ({
+export function _ptInitConnections() {
+    globalThis._pt_conns = TALENT_TREE_DATA.connections.map(c => ({
         id: c.id,
         from: c.from,
         to: c.to,
@@ -80,13 +94,27 @@ function _ptInitConnections() {
 
 // _ptInitTreeData - called once when the script loads.
 // Populates all shared tree state from the TALENT_TREE_DATA constant.
-function _ptInitTreeData() {
+export function _ptInitTreeData() {
     _ptInitSkills();
     _ptInitConnections();
 }
 
-// Initialise immediately on script load.
-_ptInitTreeData();
+// Initialise once the document is ready (deferred). At module-eval time
+// this would run during passive-tree-state-points' import phase, i.e.
+// BEFORE its accessor prologue exists: globalThis._pt_skills = ... would
+// create a plain property that the prologue then REPLACES with a getter
+// to the still-empty module binding - silently discarding the data (the
+// classic script order populated after the shared declarations existed).
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    // 'loading' AND 'interactive' both mean DCL has not fired yet;
+    // deferred module scripts execute at 'interactive', so checking
+    // for 'loading' only would run this inside the import phase and
+    // the write would be clobbered by state-points' accessor prologue.
+
+    document.addEventListener('DOMContentLoaded', _ptInitTreeData);
+} else {
+    _ptInitTreeData();
+}
 
 
 //------------------------------------------------------------------------
@@ -98,7 +126,7 @@ _ptInitTreeData();
 // Tree data is loaded once at startup above - PT itself has no data
 // management responsibility, only rendering and skill lookup.
 
-const PT = (() => {
+export const PT = (() => {
     return {
         // Triggers a full re-render of the tree canvas.
         reload: _ptRender,
@@ -117,7 +145,7 @@ const PT = (() => {
 // Renders a loading placeholder into the canvas element.
 // Called at the start of buildPassiveTreeScreen so the user never sees
 // a blank panel while the tree is initialising.
-function _ptShowLoadingPlaceholder(lang) {
+export function _ptShowLoadingPlaceholder(lang) {
     const canvas = document.getElementById('pt-canvas');
     if (!canvas) return;
 
@@ -130,7 +158,7 @@ function _ptShowLoadingPlaceholder(lang) {
 }
 
 // Writes the current available-points count into the points display element.
-function _ptUpdatePointsDisplay(lang, points) {
+export function _ptUpdatePointsDisplay(lang, points) {
     const pointsEl = document.getElementById('pt-points');
     if (!pointsEl) return;
 
@@ -140,9 +168,9 @@ function _ptUpdatePointsDisplay(lang, points) {
 // buildPassiveTreeScreen - entry point called by the UI.
 // Updates the points counter, shows a brief loading state,
 // then triggers the full tree render.
-function buildPassiveTreeScreen() {
+export function buildPassiveTreeScreen() {
     const lang = (typeof LANG !== 'undefined') ? LANG : 'en';
-    const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
+    const points = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.passiveTreePoints) || 0;
 
     _ptUpdatePointsDisplay(lang, points);
     _ptShowLoadingPlaceholder(lang);
@@ -153,10 +181,10 @@ function buildPassiveTreeScreen() {
 // (via _ptReturnScreen / _ptReturnWorldIndex) so ptGoBack() can restore it.
 // An optional returnScreen argument (e.g. 'screen-endgame-hub') overrides
 // the return target - used when the tree is opened from the endgame hub.
-function showPassiveTree(returnScreen) {
+export function showPassiveTree(returnScreen) {
     if (typeof returnScreen === 'string') _ptReturnScreen = returnScreen;
     buildPassiveTreeScreen();
-    screenHistory.push(_ptReturnScreen);
+    globalThis.screenHistory.push(_ptReturnScreen);
     switchScreen('screen-passive-tree');
 }
 
@@ -164,18 +192,18 @@ function showPassiveTree(returnScreen) {
 // Unlike the generic goToPreviousScreen()/switchScreen() combo, this
 // re-runs the actual screen-build function for the destination so that
 // updated STATE.done / sprite position are reflected immediately.
-function ptGoBack() {
+export function ptGoBack() {
     // Game-overlay close (K keybind mid-puzzle) - never touches the menu
     // return path: the paused run continues exactly where it was.
     if (_ptGameOverlay) { closeTreeToGame(); return; }
-    screenHistory.pop(); // discard the entry showPassiveTree() pushed
+    globalThis.screenHistory.pop(); // discard the entry showPassiveTree() pushed
 
     if (_ptReturnScreen === 'screen-world-detail' && _ptReturnWorldIndex !== null) {
         showWorldDetail(_ptReturnWorldIndex);
     } else if (_ptReturnScreen === 'screen-map-view') {
         showMapView();
-    } else if (_ptReturnScreen === 'screen-endgame-hub' && typeof showEndgameHub === 'function') {
-        showEndgameHub();
+    } else if (_ptReturnScreen === 'screen-endgame-hub' && typeof globalThis.showEndgameHub === 'function') {
+        globalThis.showEndgameHub();
     } else if (_ptReturnScreen === 'screen-levels' && typeof renderLevelSelect === 'function') {
         switchScreen(_ptReturnScreen);
         renderLevelSelect();
@@ -197,56 +225,56 @@ function ptGoBack() {
 // effects that read ptHasSkill() live apply at once, level-start effects
 // (timer bonuses etc.) take effect on the next level.
 
-let _ptGameOverlay = false;
+export let _ptGameOverlay = false;
 // True only if THIS overlay open paused the game (a pause menu may already
 // have been up when K was pressed - then pause state is left untouched).
-let _ptOverlayPaused = false;
+export let _ptOverlayPaused = false;
 
 // True while the tree is open as an overlay over a running puzzle.
-function isTreeGameOverlay() {
+export function isTreeGameOverlay() {
     return _ptGameOverlay === true;
 }
 
 // Silently pauses the run WITHOUT the pause overlay. No-op unless a level
 // is actually running.
-function _ptOverlayPause() {
+export function _ptOverlayPause() {
     _ptOverlayPaused = false;
     try {
-        if (typeof dead !== 'undefined' && dead) return;
-        if (typeof cur === 'undefined' || !cur) return;
-        if (typeof _gamePaused !== 'undefined' && _gamePaused) return;  // pause menu already up
+        if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return;
+        if (typeof globalThis.cur === 'undefined' || !globalThis.cur) return;
+        if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return;  // pause menu already up
         if (typeof pauseTimer === 'function') pauseTimer();
-        _gamePaused = true;
-        if (typeof _egOnPause === 'function') { try { _egOnPause(); } catch (e) {} }
+        globalThis._gamePaused = true;
+        if (typeof globalThis._egOnPause === 'function') { try { globalThis._egOnPause(); } catch (e) {} }
         _ptOverlayPaused = true;
     } catch (e) {}
 }
 
 // Resumes a run paused by _ptOverlayPause. Never touches pause state owned
 // by someone else (pause menu, tutorial lessons, spell book).
-function _ptOverlayResume() {
+export function _ptOverlayResume() {
     if (!_ptOverlayPaused) return;
     _ptOverlayPaused = false;
     try {
-        _gamePaused = false;
-        if (typeof _egOnResume === 'function') { try { _egOnResume(); } catch (e) {} }
+        globalThis._gamePaused = false;
+        if (typeof globalThis._egOnResume === 'function') { try { globalThis._egOnResume(); } catch (e) {} }
         if (typeof resumeTimer === 'function') resumeTimer();
     } catch (e) {}
 }
 
-function _ptHideAvatars() {
-    try { if (typeof _hidePlayerAvatarSimple === 'function') _hidePlayerAvatarSimple(); } catch (e) {}
-    try { if (typeof _hidePlayerAvatar === 'function') _hidePlayerAvatar(); } catch (e) {}
+export function _ptHideAvatars() {
+    try { if (typeof globalThis._hidePlayerAvatarSimple === 'function') globalThis._hidePlayerAvatarSimple(); } catch (e) {}
+    try { if (typeof globalThis._hidePlayerAvatar === 'function') globalThis._hidePlayerAvatar(); } catch (e) {}
 }
 
-function _ptShowAvatars() {
-    try { if (typeof _showPlayerAvatarSimple === 'function') _showPlayerAvatarSimple(); } catch (e) {}
-    try { if (typeof _showPlayerAvatar === 'function') _showPlayerAvatar(); } catch (e) {}
+export function _ptShowAvatars() {
+    try { if (typeof globalThis._showPlayerAvatarSimple === 'function') globalThis._showPlayerAvatarSimple(); } catch (e) {}
+    try { if (typeof globalThis._showPlayerAvatar === 'function') globalThis._showPlayerAvatar(); } catch (e) {}
 }
 
 // Opens the tree over a running puzzle (K keybind path). Skips the menu
 // screen-history push - the overlay close path restores the game directly.
-function openTreeFromGame() {
+export function openTreeFromGame() {
     _ptGameOverlay = true;
     _ptReturnScreen = 'screen-game';
     _ptOverlayPause();
@@ -266,7 +294,7 @@ function openTreeFromGame() {
 }
 
 // Closes the overlay and returns to the running puzzle exactly where it was.
-function closeTreeToGame() {
+export function closeTreeToGame() {
     _ptGameOverlay = false;
     if (typeof switchScreen === 'function') switchScreen('screen-game');
     _ptShowAvatars();
@@ -288,8 +316,22 @@ function closeTreeToGame() {
 // tree needs no class (same reason B opens the sheet classless). Only real
 // blockers are checked: modals, question overlays, text input (already
 // filtered by the dispatcher) and death.
-if (typeof onKeybindAction === 'function') {
-    onKeybindAction('passive-tree', () => {
+// Phase 3 step 5: this file now evaluates as a module BEFORE keybinds.js
+    // (classic load order had it after), so the guard below was always true at
+    // eval time and would now silently be false. Defer to DOMContentLoaded -
+    // by then the full global surface exists and gameplay has not started
+    // (same pattern as tutorial-quest.js's _tqIntegrate). NOTE: deferred
+    // module scripts execute at readyState 'interactive', so 'loading' alone
+    // is not enough - both pre-complete states must wait (the skill-hotbar P
+    // bug was this exact miss).
+    if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+        document.addEventListener('DOMContentLoaded', _ptWireKeybinds);
+    } else {
+        _ptWireKeybinds();
+    }
+    export function _ptWireKeybinds() {
+    if (typeof globalThis.onKeybindAction === 'function') {
+    globalThis.onKeybindAction('passive-tree', () => {
         // Toggle-close: the tree screen is not a .modal-bg, so the shared
         // hotkey gate would not know about it - check first, like P does.
         try {
@@ -301,7 +343,7 @@ if (typeof onKeybindAction === 'function') {
         // The character-sheet overlay owns its own stack (its tree button is
         // hidden by design) - B closes it first, K stays out of the way.
         try {
-            if (typeof isHubGameOverlay === 'function' && isHubGameOverlay()) return false;
+            if (typeof globalThis.isHubGameOverlay === 'function' && globalThis.isHubGameOverlay()) return false;
         } catch (e) {}
         // A question modal (quiz / math gate / scouts primer) is a fixed
         // overlay that would float above the tree screen - answer it first.
@@ -314,14 +356,14 @@ if (typeof onKeybindAction === 'function') {
         try {
             if (document.querySelector('.modal-bg.show, .cs-overlay.show, #class-selection-overlay.show')) return false;
         } catch (e) {}
-        try { if (typeof dead !== 'undefined' && dead) return false; } catch (e) {}
+        try { if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return false; } catch (e) {}
         // Overlay open: only from a live game screen. Any other screen
         // (mode-select, Nexus, level select, hub, ...) keeps the menu path -
         // with the CURRENT screen as the return target, so a stale
         // _ptReturnScreen (e.g. 'screen-game' left over from an earlier
         // overlay open) can never strand the BACK button.
         const gameActive = document.getElementById('screen-game')?.classList.contains('active');
-        if (gameActive && typeof cur !== 'undefined' && cur) {
+        if (gameActive && typeof globalThis.cur !== 'undefined' && globalThis.cur) {
             try { openTreeFromGame(); } catch (e) {}
             return false;
         }
@@ -331,6 +373,7 @@ if (typeof onKeybindAction === 'function') {
         } catch (e) { try { showPassiveTree(); } catch (e2) {} }
         return false;
     });
+    }
 }
 
 
@@ -342,17 +385,17 @@ if (typeof onKeybindAction === 'function') {
 // Creates one item instance from a definition ID and adds it to the
 // player's inventory. Saves state and refreshes the inventory panel.
 // Does nothing if the defId does not exist in ITEM_DEFS.
-function _ptGrantItem(defId) {
-    const def = ITEM_DEFS[defId];
+export function _ptGrantItem(defId) {
+    const def = globalThis.ITEM_DEFS[defId];
     if (!def) return;
 
-    STATE.inventory.push({
+    globalThis.STATE.inventory.push({
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
         defId: defId,
     });
 
     save();
-    buildInventoryPanel();
+    globalThis.buildInventoryPanel();
 }
 
 
@@ -365,15 +408,15 @@ function _ptGrantItem(defId) {
 // given skill and the chance hits, grants the item and shows a toast.
 // Used by the per-class reward helpers below to avoid repeating the
 // hasSkill/random/grant/toast pattern for every gear node.
-function _ptRollGearReward(skillStatKey, chance, itemDefId, msgKey) {
+export function _ptRollGearReward(skillStatKey, chance, itemDefId, msgKey) {
     if (!ptHasSkill(skillStatKey) || Math.random() >= chance) return;
 
     _ptGrantItem(itemDefId);
-    showToast(t(msgKey));
+    globalThis.showToast(t(msgKey));
 }
 
 // Statistician gear drops - base gear: 33% magnifier, improved: 33% error gem
-function _ptApplyStatisticianRewards() {
+export function _ptApplyStatisticianRewards() {
     _ptRollGearReward('gear_of_the_statistician', 0.33, 'reveal2',
         'pt_gear_statistician_magnifier');
 
@@ -382,7 +425,7 @@ function _ptApplyStatisticianRewards() {
 }
 
 // Mathmagician gear drops - base gear: 25% professor, improved: 15% chronobolt
-function _ptApplyMathmagicianRewards() {
+export function _ptApplyMathmagicianRewards() {
     _ptRollGearReward('gear_of_the_mathmagician', 0.25, 'mistakeEraser4',
         'pt_gear_mathmagician_professor');
 
@@ -391,7 +434,7 @@ function _ptApplyMathmagicianRewards() {
 }
 
 // Probabilist gear drops - base gear: 25% sweeper, improved: 15% error magnet
-function _ptApplyProbabilistRewards() {
+export function _ptApplyProbabilistRewards() {
     _ptRollGearReward('gear_of_the_probabilist', 0.25, 'markWrong4',
         'pt_gear_probabilist_sweeper');
 
@@ -408,8 +451,8 @@ function _ptApplyProbabilistRewards() {
 // Called when the player completes a level.
 // Routes to the correct per-class reward helper based on STATE.playerClass.
 // Each class has its own gear nodes that provide randomised item drops.
-function _ptApplyLevelCompleteRewards() {
-    switch (STATE.playerClass) {
+export function _ptApplyLevelCompleteRewards() {
+    switch (globalThis.STATE.playerClass) {
         case 'statistician': _ptApplyStatisticianRewards(); break;
         case 'mathmagician': _ptApplyMathmagicianRewards(); break;
         case 'probabilist': _ptApplyProbabilistRewards(); break;

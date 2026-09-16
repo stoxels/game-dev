@@ -1,4 +1,17 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../../translation/translations.js';
+import { EG_ART } from '../endgame-art.js';
+import { _egHpBarClass, _egUpdateTargetAfterKill } from '../endgame-encounter.js';
+import { _egBuildMonster } from '../endgame-monsters.js';
+import { _egBossCorrupted, _egIsActive } from '../endgame-state.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egBossTierNorm, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkSlamShatter, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: BRUTUS (boss_brutus)---------------------------
 //------------------------------------------------------------------------
 // PoE Brutus homage: full-width ground-slam band, move vertically.
@@ -50,7 +63,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 // otherwise stack 10+ slams in a row (~25 s of forced dodging). The cap only
 // clamps the corruption bonus - the base slam always fires, and a chain is
 // still 1 + corrupted slams up to this many extras (5 corrupted → 4 slams).
-const EG_BRUTUS_SLAM_CHAIN_MAX_EXTRA = 3;
+export const EG_BRUTUS_SLAM_CHAIN_MAX_EXTRA = 3;
 
 
 // Sprite choreography for the slam wind-up: during the telegraph Brutus
@@ -59,20 +72,20 @@ const EG_BRUTUS_SLAM_CHAIN_MAX_EXTRA = 3;
 // pause-safe, tier-scaled clock, so the stomp always lands with the band
 // flash / shatter - on gentle tiers the wind-up just takes longer in real
 // time, on brutal tiers it snaps up quicker.
-const EG_BRUTUS_SPRITE_HOIST_PX = 88;   // how high the sprite rises above its card
-const EG_BRUTUS_SPRITE_SMASH_MS = 190;  // how long the downward stomp takes
+export const EG_BRUTUS_SPRITE_HOIST_PX = 88;   // how high the sprite rises above its card
+export const EG_BRUTUS_SPRITE_SMASH_MS = 190;  // how long the downward stomp takes
 
 
 // Slow rise curve for the wind-up (velocity zero at start AND apex, which
 // makes the sprite visibly hang for a beat right before the smash).
-function _egBrutusEaseInOut(k) {
+export function _egBrutusEaseInOut(k) {
     return k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
 }
 
 
 // Stomp trajectory (ms since impact): fast ease-out slam down to a small
 // overshoot below the resting point, then a quick settle back to rest.
-function _egBrutusSlamOffset(ms, hoist, smashMs) {
+export function _egBrutusSlamOffset(ms, hoist, smashMs) {
     const t = Math.min(1, ms / smashMs);
     if (t >= 1) return 0;
     if (t < 0.62) {
@@ -83,7 +96,7 @@ function _egBrutusSlamOffset(ms, hoist, smashMs) {
 }
 
 
-function _egMechGroundSlam(monster, phase) {
+export function _egMechGroundSlam(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const h = 130;
@@ -235,35 +248,35 @@ function _egMechGroundSlam(monster, phase) {
 // health, no loot, but a chance to drop a healing heart). Zombies are kept
 // OUT of EG_MONSTER_DEFS so the ambient respawn pool can never raise them.
 
-const _egBrutusSlamBand = { active: false, cy: 0, half: 0 };
+export const _egBrutusSlamBand = { active: false, cy: 0, half: 0 };
 
-let _egBrutusZombies = [];       // live zombie monster objects (also in _egMonsters)
-let _egBrutusZombieTimer = null; // roaming movement interval (50ms)
-let _egBrutusFeedExpiries = [];  // Date.now() expiry per devoured zombie, sorted ascending
-let _egBrutusWavePending = false; // spawn deferred while a ground-slam chain is busy
-let _egBrutusFeedHudTimer = null; // 100ms countdown driver for the haste chip on Brutus's card
-let _egBrutusFeedHudCount = -1;   // stack count the chip DOM was last (re)built for
+export let _egBrutusZombies = [];       // live zombie monster objects (also in _egMonsters)
+export let _egBrutusZombieTimer = null; // roaming movement interval (50ms)
+export let _egBrutusFeedExpiries = [];  // Date.now() expiry per devoured zombie, sorted ascending
+export let _egBrutusWavePending = false; // spawn deferred while a ground-slam chain is busy
+export let _egBrutusFeedHudTimer = null; // 100ms countdown driver for the haste chip on Brutus's card
+export let _egBrutusFeedHudCount = -1;   // stack count the chip DOM was last (re)built for
 // Boss monsters get a spawn-suffixed id (boss_brutus_7), so the chip and the
 // enrage frame must target the card through the REAL id captured at spawn /
 // devour time - never the bare def id.
-let _egBrutusBossCardId = null;   // 'eg-card-' + live Brutus monster id
+export let _egBrutusBossCardId = null;   // 'eg-card-' + live Brutus monster id
 
-const EG_BRUTUS_ZOMBIE_HEART_CHANCE = 0.2;      // per PLAYER kill - slam-devoured zombies drop nothing
-const EG_BRUTUS_ZOMBIE_LIFETIME_MS = 45000;     // shamble away in a poof if neither killed nor devoured
+export const EG_BRUTUS_ZOMBIE_HEART_CHANCE = 0.2;      // per PLAYER kill - slam-devoured zombies drop nothing
+export const EG_BRUTUS_ZOMBIE_LIFETIME_MS = 45000;     // shamble away in a poof if neither killed nor devoured
 // Fresh zombies claw out of the ground for the first 1.5s after spawning:
 // they neither shamble nor can be devoured during it, so a slam can never
 // eat a zombie within a second of it appearing (the earliest a slam can
 // land after a wave is one full telegraph later).
-const EG_BRUTUS_ZOMBIE_RISE_MS = 1500;
-const EG_BRUTUS_FEED_WINDOW_MS = 15000;         // each devoured zombie speeds Brutus up for this long
-const EG_BRUTUS_FEED_CHARGE_PCT = 30;           // +30% attack charge rate per active feed stack
-const EG_BRUTUS_FEED_MAX_STACKS = 6;            // concurrent stack cap (visual/balance sanity)
-const EG_BRUTUS_ZOMBIES_MAX_FIELD = 6;          // concurrent zombies on the field
+export const EG_BRUTUS_ZOMBIE_RISE_MS = 1500;
+export const EG_BRUTUS_FEED_WINDOW_MS = 15000;         // each devoured zombie speeds Brutus up for this long
+export const EG_BRUTUS_FEED_CHARGE_PCT = 30;           // +30% attack charge rate per active feed stack
+export const EG_BRUTUS_FEED_MAX_STACKS = 6;            // concurrent stack cap (visual/balance sanity)
+export const EG_BRUTUS_ZOMBIES_MAX_FIELD = 6;          // concurrent zombies on the field
 
 // Low-health add def - built inline (NOT in EG_MONSTER_DEFS, so the random
 // respawn pool never spawns one). baseHP 45 keeps them at a few hits at any
 // level; chargeMax 1 means their (hidden) charge bar never fills.
-const EG_BRUTUS_ZOMBIE_DEF = {
+export const EG_BRUTUS_ZOMBIE_DEF = {
     id: 'brutus_zombie',
     name: '', // filled at spawn via t('eg_mon_brutus_zombie')
     emoji: '🧟',
@@ -280,7 +293,7 @@ const EG_BRUTUS_ZOMBIE_DEF = {
 // _egGetMonsterChargeMultiplier (endgame-ailments.js) for every monster on
 // every tick, so this must stay cheap. Only prunes expired stacks - the HUD
 // chip itself is driven by its own 100ms timer (_egBrutusFeedHudTick).
-function _egBossFeedChargeMult(m) {
+export function _egBossFeedChargeMult(m) {
     // baseId is the unsuffixed def id - the real monster id carries a spawn
     // counter suffix (boss_brutus_7), which is why we never compare m.id.
     if (!m || (m.baseId || m.id) !== 'boss_brutus') return 1;
@@ -296,7 +309,7 @@ function _egBossFeedChargeMult(m) {
 
 // Starts the 100ms countdown driver that keeps the haste chip + enrage frame
 // fresh while at least one feed stack is live. Idempotent.
-function _egBrutusEnsureFeedHudTimer() {
+export function _egBrutusEnsureFeedHudTimer() {
     if (_egBrutusFeedHudTimer) return;
     _egBrutusFeedHudTimer = setInterval(_egBrutusFeedHudTick, 100);
 }
@@ -304,7 +317,7 @@ function _egBrutusEnsureFeedHudTimer() {
 
 // 100ms driver - renders the haste chip and stops itself once every stack
 // has expired (the chip hides and Brutus cools back down).
-function _egBrutusFeedHudTick() {
+export function _egBrutusFeedHudTick() {
     _egBrutusRenderFeedHud();
     if (_egBrutusFeedExpiries.length === 0 && _egBrutusFeedHudTimer) {
         clearInterval(_egBrutusFeedHudTimer);
@@ -321,7 +334,7 @@ function _egBrutusFeedHudTick() {
 // when that stack drops, and new devours extend the tail). Recreates itself
 // after any panel rebuild - the 100ms timer calls this, so a fresh chip is
 // back within a tick of a rebuild while stacks are active.
-function _egBrutusRenderFeedHud() {
+export function _egBrutusRenderFeedHud() {
     const card = _egBrutusBossCardId ? document.getElementById(_egBrutusBossCardId) : null;
     const now = Date.now();
     while (_egBrutusFeedExpiries.length && _egBrutusFeedExpiries[0] <= now) {
@@ -382,7 +395,7 @@ function _egBrutusRenderFeedHud() {
 
 // Boss mechanic handler - raises a wave of sacrificial zombies (2 at tier 1
 // up to 4 at tier 16, capped to the concurrent field limit).
-function _egMechSacrificialZombies(monster, phase) {
+export function _egMechSacrificialZombies(monster, phase) {
     if (!_egIsActive()) return;
     if (!monster || typeof _egBuildMonster !== 'function') return;
 
@@ -399,7 +412,7 @@ function _egMechSacrificialZombies(monster, phase) {
             setTimeout(() => {
                 _egBrutusWavePending = false;
                 if (!_egIsActive()) return;
-                if (!_egMonsters.some(m => m.id === (monster && monster.id))) return;
+                if (!globalThis._egMonsters.some(m => m.id === (monster && monster.id))) return;
                 _egMechSacrificialZombies(monster, phase);
             }, 2500);
         }
@@ -423,7 +436,7 @@ function _egMechSacrificialZombies(monster, phase) {
 // attack / bar updates / kill handling all work like any other add) and
 // renders its roaming card in the fixed #eg-zombie-layer. Zombies render
 // ONLY there - _egRenderMonstersIntoZones skips isSacrificialZombie.
-function _egBrutusSpawnZombie(monster) {
+export function _egBrutusSpawnZombie(monster) {
     EG_BRUTUS_ZOMBIE_DEF.name = t('eg_mon_brutus_zombie') || 'Sacrificial Zombie';
     const z = _egBuildMonster(EG_BRUTUS_ZOMBIE_DEF, monster.level || 1);
     if (!z) return;
@@ -446,8 +459,8 @@ function _egBrutusSpawnZombie(monster) {
     z.zoneId = 'eg-monster-panel';     // present but unused (panel render skips zombies)
 
     _egBrutusZombies.push(z);
-    _egMonsters.push(z);
-    if (!_egTargetId) _egTargetId = z.id;
+    globalThis._egMonsters.push(z);
+    if (!globalThis._egTargetId) globalThis._egTargetId = z.id;
 
     z.roamingCard = _egBrutusRenderZombieCard(z);
     _egBrutusSyncZombieCard(z);
@@ -461,7 +474,7 @@ function _egBrutusSpawnZombie(monster) {
 // _egFlashKillCard all work). Target feedback (gold highlight) is managed
 // separately by _egBrutusSyncZombieCard, since the roaming layer is not
 // touched by the panel rebuild that marks other monsters targeted.
-function _egBrutusRenderZombieCard(z) {
+export function _egBrutusRenderZombieCard(z) {
     let layer = document.getElementById('eg-zombie-layer');
     if (!layer) {
         layer = document.createElement('div');
@@ -502,10 +515,10 @@ function _egBrutusRenderZombieCard(z) {
 // only - the TARGET pill was removed). Called on spawn and every 50ms
 // roaming tick (cheap class toggles - the engine's panel rebuild never
 // touches roaming cards, so this is the only sync point).
-function _egBrutusSyncZombieCard(z) {
+export function _egBrutusSyncZombieCard(z) {
     const card = (z && z.roamingCard) || (z ? document.getElementById('eg-card-' + z.id) : null);
     if (!card) return;
-    const isTarget = (typeof _egTargetId !== 'undefined' && _egTargetId === z.id);
+    const isTarget = (typeof _egTargetId !== 'undefined' && globalThis._egTargetId === z.id);
     card.classList.toggle('eg-card-targeted', isTarget);
     const arrow = card.querySelector('.eg-target-arrow');
     if (arrow) arrow.remove();
@@ -513,7 +526,7 @@ function _egBrutusSyncZombieCard(z) {
 
 
 // Starts the roaming movement interval on first zombie spawn. Idempotent.
-function _egBrutusEnsureTick() {
+export function _egBrutusEnsureTick() {
     if (_egBrutusZombieTimer) return;
     _egBrutusZombieTimer = setInterval(_egBrutusZombieTick, 50);
 }
@@ -523,9 +536,9 @@ function _egBrutusEnsureTick() {
 // centre line (or drifts to mid-screen while no band is up), reconciles
 // against _egMonsters (player kills remove zombies there - the roaming card
 // is dropped here with a poof), and enforces the per-zombie lifetime.
-function _egBrutusZombieTick() {
+export function _egBrutusZombieTick() {
     if (_egBrutusZombies.length === 0) return;
-    if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+    if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
 
     const now = Date.now();
@@ -538,7 +551,7 @@ function _egBrutusZombieTick() {
         const z = _egBrutusZombies[i];
 
         // Player killed this zombie elsewhere (_egKillMonster): drop its card.
-        if (!_egMonsters.some(m => m.id === z.id)) {
+        if (!globalThis._egMonsters.some(m => m.id === z.id)) {
             _egBrutusPoof(z.x, z.y);
             const card = document.getElementById('eg-card-' + z.id);
             if (card) card.remove();
@@ -551,9 +564,9 @@ function _egBrutusZombieTick() {
             _egBrutusPoof(z.x, z.y);
             const card = document.getElementById('eg-card-' + z.id);
             if (card) card.remove();
-            const midx = _egMonsters.findIndex(m => m.id === z.id);
-            if (midx !== -1) _egMonsters.splice(midx, 1);
-            if (_egTargetId === z.id && typeof _egUpdateTargetAfterKill === 'function') {
+            const midx = globalThis._egMonsters.findIndex(m => m.id === z.id);
+            if (midx !== -1) globalThis._egMonsters.splice(midx, 1);
+            if (globalThis._egTargetId === z.id && typeof _egUpdateTargetAfterKill === 'function') {
                 _egUpdateTargetAfterKill();
             }
             _egBrutusZombies.splice(i, 1);
@@ -587,7 +600,7 @@ function _egBrutusZombieTick() {
 // so no heart roll either), and each victim stacks a 30s charge-rate buff.
 // Reads the band cy/half published at aim time (still valid - _egMechGroundSlam
 // clears only .active before calling us, so steering stops but the rect holds).
-function _egBrutusFeedZombies(monster) {
+export function _egBrutusFeedZombies(monster) {
     if (_egBrutusZombies.length === 0) return;
     if (monster) _egBrutusBossCardId = 'eg-card-' + monster.id;
     const band = _egBrutusSlamBand;
@@ -624,24 +637,24 @@ function _egBrutusFeedZombies(monster) {
 // Removes a zombie completely: roaming card + poof, and (unlike the player
 // kill path, which goes through _egKillMonster) direct removal from
 // _egMonsters with target reselect when needed. poof=false on teardown.
-function _egBrutusRemoveZombie(z, poof) {
+export function _egBrutusRemoveZombie(z, poof) {
     const card = document.getElementById('eg-card-' + z.id);
     if (card) card.remove();
     if (poof) _egBrutusPoof(z.x, z.y);
 
     const zi = _egBrutusZombies.indexOf(z);
     if (zi !== -1) _egBrutusZombies.splice(zi, 1);
-    const mi = _egMonsters.findIndex(m => m.id === z.id);
-    if (mi !== -1) _egMonsters.splice(mi, 1);
+    const mi = globalThis._egMonsters.findIndex(m => m.id === z.id);
+    if (mi !== -1) globalThis._egMonsters.splice(mi, 1);
 
-    if (_egTargetId === z.id && typeof _egUpdateTargetAfterKill === 'function') {
+    if (globalThis._egTargetId === z.id && typeof _egUpdateTargetAfterKill === 'function') {
         _egUpdateTargetAfterKill();
     }
 }
 
 
 // Small 💨 burst where a zombie vanished (devoured, expired or player-killed).
-function _egBrutusPoof(x, y) {
+export function _egBrutusPoof(x, y) {
     const p = document.createElement('span');
     p.className = 'eg-zombie-poof';
     p.textContent = '💨';
@@ -655,7 +668,7 @@ function _egBrutusPoof(x, y) {
 // Full teardown - stops the roaming driver, removes every zombie card/state
 // and clears the feed stacks. Fired from _egBossCleanup when Brutus dies or
 // the encounter stops; never on individual zombie kills.
-function _egBrutusZombieTeardown() {
+export function _egBrutusZombieTeardown() {
     if (_egBrutusZombieTimer) {
         clearInterval(_egBrutusZombieTimer);
         _egBrutusZombieTimer = null;

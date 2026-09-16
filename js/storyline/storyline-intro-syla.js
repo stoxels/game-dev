@@ -1,4 +1,9 @@
-﻿// =============================================================================
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+// =============================================================================
 // storyline-intro-syla.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // Character intro data for Syla ("The Field Statistician").
@@ -9,7 +14,7 @@
 
 
 // Folder where Syla's intro images live (relative to your index.html)
-const SYLA_INTRO_IMAGE_PATH = "images/Intro/Syla_Intro/";
+export const SYLA_INTRO_IMAGE_PATH = "images/Intro/Syla_Intro/";
 
 
 // ---------------------------------------------------------------------------
@@ -41,7 +46,7 @@ const SYLA_INTRO_IMAGE_PATH = "images/Intro/Syla_Intro/";
 // filenames and adjust times once the actual image set exists - the array
 // just needs to stay sorted by ascending `time`. (Not touched by the -1s
 // line-timing adjustment above - only the `lines` array was shifted.)
-const SYLA_INTRO_SONG = {
+export const SYLA_INTRO_SONG = {
     audio: "audio/Intro/Syla_Intro_Song.ogg",
     imagePath: SYLA_INTRO_IMAGE_PATH,
 

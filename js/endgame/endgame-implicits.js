@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { LANG } from '../translation/translations.js';
+import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
+import { _egBuildMergedModLines } from './endgame-player-stats.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME IMPLICITS (PoE-STYLE)------------------------
 //------------------------------------------------------------------------
 // Base types now carry ONE (sometimes two) built-in beneficial implicit
@@ -25,7 +34,7 @@
 // Values are intentionally strong - roughly 60-80% of a top-tier explicit
 // affix at endgame, and ~30% at level 1 so early implicits feel real.
 
-const EG_IMPLICIT_FAMILIES = {
+export const EG_IMPLICIT_FAMILIES = {
     flat_health: {
         id: 'flat_health',
         label: '+# to Maximum Health', labelDe: '+# zu maximalem Leben',
@@ -168,7 +177,7 @@ const EG_IMPLICIT_FAMILIES = {
 // the subset that is actually allowed on the base (local-defense implicits
 // need the base to have the stat). Jewelry never carries local implicits.
 
-const EG_IMPLICIT_POOL_BY_SLOT = {
+export const EG_IMPLICIT_POOL_BY_SLOT = {
     head:      ['flat_health','flat_mana','fire_resist','cold_resist','lightning_resist','shadow_resist','strength','agility','intelligence','inc_armour','inc_evasion','inc_absorption','life_regen'],
     chest:     ['flat_health','flat_mana','fire_resist','cold_resist','lightning_resist','shadow_resist','strength','agility','intelligence','inc_armour','inc_evasion','inc_absorption','life_regen','mana_regen'],
     gloves:    ['flat_health','accuracy','crit_chance','strength','agility','intelligence','inc_armour','inc_evasion','inc_absorption','attack_speed','spell_damage'],
@@ -194,23 +203,23 @@ const EG_IMPLICIT_POOL_BY_SLOT = {
 //-------------------SCALING HELPERS---------------------------------------
 //------------------------------------------------------------------------
 
-const EG_IMPLICIT_LEVEL_MIN = 1;
-const EG_IMPLICIT_LEVEL_MAX = 90;
+export const EG_IMPLICIT_LEVEL_MIN = 1;
+export const EG_IMPLICIT_LEVEL_MAX = 90;
 
-function _egImplicitClampLevel(lvl) {
+export function _egImplicitClampLevel(lvl) {
     const n = Number(lvl) || 1;
     return Math.max(EG_IMPLICIT_LEVEL_MIN, Math.min(EG_IMPLICIT_LEVEL_MAX, n));
 }
 
-function _egImplicitLerp(a, b, t) {
+export function _egImplicitLerp(a, b, t) {
     return a + (b - a) * t;
 }
 
-function _egImplicitIsLocalDefense(familyId) {
+export function _egImplicitIsLocalDefense(familyId) {
     return familyId === 'inc_armour' || familyId === 'inc_evasion' || familyId === 'inc_absorption';
 }
 
-function _egImplicitAllowedOnBase(familyId, defenses) {
+export function _egImplicitAllowedOnBase(familyId, defenses) {
     if (!_egImplicitIsLocalDefense(familyId)) return true;
     if (!defenses) return false;
     if (familyId === 'inc_armour') return (defenses.armour || 0) > 0;
@@ -220,7 +229,7 @@ function _egImplicitAllowedOnBase(familyId, defenses) {
 }
 
 // Returns { min, max } or { min1,max1,min2,max2 } interpolated for reqLevel
-function _egGetImplicitRange(family, reqLevel) {
+export function _egGetImplicitRange(family, reqLevel) {
     const lvl = _egImplicitClampLevel(reqLevel);
     const t = (lvl - EG_IMPLICIT_LEVEL_MIN) / (EG_IMPLICIT_LEVEL_MAX - EG_IMPLICIT_LEVEL_MIN);
     const lo = family.lo, hi = family.hi;
@@ -244,7 +253,7 @@ function _egGetImplicitRange(family, reqLevel) {
     };
 }
 
-function _egRollImplicitValue(range) {
+export function _egRollImplicitValue(range) {
     if (range.min1 !== undefined) {
         const v1 = range.min1 + Math.floor(Math.random() * (range.max1 - range.min1 + 1));
         const v2 = range.min2 + Math.floor(Math.random() * (range.max2 - range.min2 + 1));
@@ -263,7 +272,7 @@ function _egRollImplicitValue(range) {
     return { v };
 }
 
-function _egBuildImplicitRolledStats(family, reqLevel) {
+export function _egBuildImplicitRolledStats(family, reqLevel) {
     const range = _egGetImplicitRange(family, reqLevel);
     const label = (typeof LANG !== 'undefined' && LANG === 'de' && family.labelDe) ? family.labelDe : family.label;
     if (range.min1 !== undefined) {
@@ -287,7 +296,7 @@ function _egBuildImplicitRolledStats(family, reqLevel) {
 // Picks 1 implicit for the given base, scaled by base.requirements.level.
 // Returns array of implicit objects: [{ familyId, tier:'implicit', isImplicit:true, rolledStats }]
 
-function _egRollImplicitsForBase(base) {
+export function _egRollImplicitsForBase(base) {
     if (!base || !base.slotType) return [];
     const reqLevel = (base.requirements && base.requirements.level) || base.minLevel || 1;
     const pool = EG_IMPLICIT_POOL_BY_SLOT[base.slotType] || EG_IMPLICIT_POOL_BY_SLOT.head;
@@ -326,7 +335,7 @@ function _egRollImplicitsForBase(base) {
 // Rerolls numeric values of existing implicits, keeping the same families.
 // Used by the Blessing Orb. Values are freshly sampled from the SAME
 // reqLevel-scaled range (so the orb can high-roll or low-roll within tier).
-function _egRerollImplicits(item) {
+export function _egRerollImplicits(item) {
     if (!item || !Array.isArray(item.implicits) || item.implicits.length === 0) return item;
     const reqLevel = (item.requirements && item.requirements.level) || item.itemLevel || 1;
     const newImplicits = item.implicits.map(imp => {
@@ -339,7 +348,7 @@ function _egRerollImplicits(item) {
 }
 
 // Helper for tooltip merging - returns merged implicit lines (like _egBuildMergedModLines but for implicits)
-function _egBuildMergedImplicitLines(implicits) {
+export function _egBuildMergedImplicitLines(implicits) {
     // Reuse the same merging logic as explicit mods when available
     if (typeof _egBuildMergedModLines === 'function' && Array.isArray(implicits) && implicits.length) {
         // Map implicits to pseudo-mods so the merger can handle them; tag them as implicit for styling
@@ -357,7 +366,7 @@ function _egBuildMergedImplicitLines(implicits) {
 
 // Heals a legacy item that was saved before implicits existed: generates implicits
 // from its baseId/requirements when none are present. Returns the healed item.
-function _egHealItemImplicits(item) {
+export function _egHealItemImplicits(item) {
     if (!item || item.category !== 'equip' || item.isUnique) return item;
     if (Array.isArray(item.implicits) && item.implicits.length > 0) return item;
     try {

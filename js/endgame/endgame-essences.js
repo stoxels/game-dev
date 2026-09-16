@@ -1,4 +1,27 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { LANG, t } from '../translation/translations.js';
+import { _egCancelCurrencyUse, _egPendingCurrencyUse } from './endgame-currency.js';
+import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
+import { EG_MOD_CAPS, EG_SLOT_MOD_TABLE_MAP, _egGetModTable } from './endgame-equipment-generator.js';
+import { _egSpawnCurrencyDrop } from './endgame-grid-pickups.js';
+import { _dndBuildCurrencyChipHTML, _dndChipScreenEl } from './endgame-hub-drag-and-drop.js';
+import { _egClearTooltip } from './endgame-hub-tooltips.js';
+import { _egEquipped, _egInventory, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, egSaveHubState } from './endgame-hub.js';
+import { _egMapLootQuantityMult } from './endgame-map-launch.js';
+import { EG_LOCAL_DEFENSE_FAMILY_STATS, _egBuildItemName, _egBuildModPool, _egBuildRolledStats, _egEligibleTiers, _egFamilyAllowedOnBase, _egPickModFromPool, _egPickTier } from './endgame-mod-application.js';
+
+//------------------------------------------------------------------------
+// Phase 3 step 7: live globalThis accessors for externally-mutated state.
+// (derived from write-site audit by dev/scratch/convert-endgame.mjs)
+//------------------------------------------------------------------------
+try { Object.defineProperty(globalThis, '_egEssenceStash', { get() { return _egEssenceStash; }, set(v) { _egEssenceStash = v; }, configurable: true }); } catch (e) {}
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME ESSENCES (PoE-STYLE)-------------------------
 //------------------------------------------------------------------------
 // Defines essences that drop from monsters, stack in the essence tab
@@ -37,11 +60,11 @@
 // (mirrors the Orbs & Shards currency tab). Every essence id has a
 // dedicated cell; hovering an empty cell still shows its essence tooltip.
 // 12 rows × 8 cols = 96 cells → 93 modifier essences + 3 decorative empties.
-const EG_ESSENCE_ROWS = 12;
-const EG_ESSENCE_COLS = 8;
+export const EG_ESSENCE_ROWS = 12;
+export const EG_ESSENCE_COLS = 8;
 
 // Essence filter state
-let _egEssenceFilterSlotType = 'all'; // 'all' or a slotType like 'shield', 'weapon', etc.
+export let _egEssenceFilterSlotType = 'all'; // 'all' or a slotType like 'shield', 'weapon', etc.
 
 // Essence stash: 2D grid of stacked essence items (null = empty cell)
 let _egEssenceStash = Array.from({ length: EG_ESSENCE_ROWS }, () => Array(EG_ESSENCE_COLS).fill(null));
@@ -52,7 +75,7 @@ let _egEssenceStash = Array.from({ length: EG_ESSENCE_ROWS }, () => Array(EG_ESS
 //------------------------------------------------------------------------
 
 // Complete list of individual modifier families - one essence per family.
-const _EG_ESSENCE_FAMILIES = [
+export const _EG_ESSENCE_FAMILIES = [
     'absorption_on_kill', 'absorption_regen_rate', 'accuracy', 'agility', 'arcane_resistance', 'arcane_surge',
     'attack_speed', 'block_chance', 'block_recovery', 'chain', 'chance_for_new_question', 'chance_to_blind',
     'chance_to_convert', 'chance_to_freeze', 'chance_to_ignite', 'chance_to_shock', 'channel', 'cleave',
@@ -72,7 +95,7 @@ const _EG_ESSENCE_FAMILIES = [
 
 // Visual variety - cycle through a set of emojis so the essences don't all look identical.
 // Kept intentionally diverse (hearts, elements, combat, jewelry) but deterministic.
-const _EG_ESSENCE_ICON_CYCLE = [
+export const _EG_ESSENCE_ICON_CYCLE = [
     '💚', '💙', '❤️', '🧡', '💛', '💜', '🤍', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚪', '⚫', '🟤',
     '🔥', '❄️', '⚡', '🌑', '✨', '⭐', '💫', '🌟', '💠', '🔷', '🔶', '🌀', '🧩', '⚔️', '🛡️', '🏹',
     '🎯', '🔮', '🧪', '💎', '👑', '💍', '🧥', '🥋', '🦾', '🧤', '🔗', '👖', '👢', '📿', '🪬', '🧬',
@@ -82,7 +105,7 @@ const _EG_ESSENCE_ICON_CYCLE = [
 ];
 
 // Fixed assignment: essence id → {r,c}. Mirrors the Orbs & Shards tab.
-const EG_ESSENCE_SLOT_MAP = {};
+export const EG_ESSENCE_SLOT_MAP = {};
 (function _egBuildEssenceSlotMap() {
     let idx = 0;
     for (const fam of _EG_ESSENCE_FAMILIES) {
@@ -93,14 +116,14 @@ const EG_ESSENCE_SLOT_MAP = {};
         idx++;
     }
 })();
-const EG_ESSENCE_SLOT_REVERSE = (() => {
+export const EG_ESSENCE_SLOT_REVERSE = (() => {
     const m = {};
     for (const [id, pos] of Object.entries(EG_ESSENCE_SLOT_MAP)) m[`${pos.r}-${pos.c}`] = id;
     return m;
 })();
-function _egEssenceSlotForId(id) { return EG_ESSENCE_SLOT_MAP[id] || null; }
-function _egEssenceIdForSlot(r, c) { return EG_ESSENCE_SLOT_REVERSE[`${r}-${c}`] || null; }
-function _egEssenceDefForId(id) {
+export function _egEssenceSlotForId(id) { return EG_ESSENCE_SLOT_MAP[id] || null; }
+export function _egEssenceIdForSlot(r, c) { return EG_ESSENCE_SLOT_REVERSE[`${r}-${c}`] || null; }
+export function _egEssenceDefForId(id) {
     if (typeof EG_ESSENCE_DEFS !== 'undefined' && EG_ESSENCE_DEFS[id]) return EG_ESSENCE_DEFS[id];
     return null;
 }
@@ -113,7 +136,7 @@ function _egEssenceDefForId(id) {
 // EG_ESSENCE_DEFS entry for the same id has them. Falling back to the
 // canonical def by id prevents such items from silently bypassing the
 // slot-type filter.
-function _egEssenceResolveFamilyId(itemOrDef) {
+export function _egEssenceResolveFamilyId(itemOrDef) {
     if (!itemOrDef) return null;
     let familyId = itemOrDef.guaranteedFamily
         || (itemOrDef.guaranteedFamilies && itemOrDef.guaranteedFamilies[0]);
@@ -127,17 +150,17 @@ function _egEssenceResolveFamilyId(itemOrDef) {
 }
 
 // Helper: humanized fallback name when translation key missing
-function _egEssenceFallbackName(familyId) {
+export function _egEssenceFallbackName(familyId) {
     const disp = (typeof _egEssenceFamilyDisplayName === 'function')
         ? _egEssenceFamilyDisplayName(familyId) : familyId;
     return 'Essence of ' + disp;
 }
-function _egEssenceFallbackNameDe(familyId) {
+export function _egEssenceFallbackNameDe(familyId) {
     const disp = (typeof _egEssenceFamilyDisplayName === 'function')
         ? _egEssenceFamilyDisplayName(familyId) : familyId;
     return 'Essenz der ' + disp;
 }
-function _egEssenceCompatibleSlotTypes(familyId) {
+export function _egEssenceCompatibleSlotTypes(familyId) {
     if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') return [];
     const slots = [];
     for (const [slotType, getter] of Object.entries(EG_SLOT_MOD_TABLE_MAP)) {
@@ -150,7 +173,7 @@ function _egEssenceCompatibleSlotTypes(familyId) {
     }
     return slots;
 }
-function _egEssenceCanApplyToItem(familyId, item) {
+export function _egEssenceCanApplyToItem(familyId, item) {
     return _egEssenceIncompatibilityReason(familyId, item) === null;
 }
 
@@ -166,7 +189,7 @@ function _egEssenceCanApplyToItem(familyId, item) {
 //   'needs_evasion_absorption' - hybrid defence mods, base lacks one/both stats
 //   'no_eligible_tier'  - family exists on this slot, but every tier needs a
 //                         higher item level than the item has
-function _egEssenceIncompatibilityReason(familyId, item) {
+export function _egEssenceIncompatibilityReason(familyId, item) {
     if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') return 'no_mod_table';
     const modTable = _egGetModTable(item);
     if (!modTable) return 'no_mod_table';
@@ -197,7 +220,7 @@ function _egEssenceIncompatibilityReason(familyId, item) {
 }
 
 // Maps classifier reasons to translation keys for the reject messages.
-const EG_ESSENCE_REASON_KEYS = {
+export const EG_ESSENCE_REASON_KEYS = {
     no_mod_table: 'eg_essence_no_mod_table',
     family_missing: 'eg_essence_family_missing',
     needs_armour: 'eg_essence_needs_armour',
@@ -215,7 +238,7 @@ const EG_ESSENCE_REASON_KEYS = {
 //------------------------------------------------------------------------
 
 // Returns all slot types that have at least one essence compatible with them
-function _egGetEssenceFilterSlotTypes() {
+export function _egGetEssenceFilterSlotTypes() {
     const slotTypes = new Set();
     for (const familyId of _EG_ESSENCE_FAMILIES) {
         const slots = _egEssenceCompatibleSlotTypes(familyId);
@@ -229,7 +252,7 @@ function _egGetEssenceFilterSlotTypes() {
 }
 
 // Checks if an essence (by familyId) is compatible with the current filter
-function _egEssenceMatchesFilter(familyId) {
+export function _egEssenceMatchesFilter(familyId) {
     if (_egEssenceFilterSlotType === 'all') return true;
     const result = _egEssenceCanApplyToSlotType(familyId, _egEssenceFilterSlotType);
     return result;
@@ -237,7 +260,7 @@ function _egEssenceMatchesFilter(familyId) {
 
 // More thorough check: verifies the essence family can actually roll on at least one base of the filtered slot type
 // (considers defense gating and ilvl eligibility, not just mod table presence)
-function _egEssenceCanApplyToSlotType(familyId, slotType) {
+export function _egEssenceCanApplyToSlotType(familyId, slotType) {
     if (typeof EG_SLOT_MOD_TABLE_MAP === 'undefined') {
         return false;
     }
@@ -278,7 +301,7 @@ function _egEssenceCanApplyToSlotType(familyId, slotType) {
 }
 
 // Sets the essence filter and re-renders the essence tab
-function _egSetEssenceFilter(slotType) {
+export function _egSetEssenceFilter(slotType) {
     _egEssenceFilterSlotType = slotType;
     _egRenderEssenceStash();
     // Update the dropdown to reflect the current selection
@@ -294,7 +317,7 @@ function _egSetEssenceFilter(slotType) {
 // Rolls the GUARANTEED modifier for an essence application.
 // Now single-family: looks for the family in either prefix or suffix section,
 // checks defense gating and ilvl eligibility, and rolls a random eligible tier.
-function _egRollGuaranteedMod(modTable, preferredFamilies, itemLevel, defenses) {
+export function _egRollGuaranteedMod(modTable, preferredFamilies, itemLevel, defenses) {
     const families = Array.isArray(preferredFamilies) ? preferredFamilies : [preferredFamilies];
     const sections = [
         { type: 'prefix', pool: modTable.prefixes || {} },
@@ -322,7 +345,7 @@ function _egRollGuaranteedMod(modTable, preferredFamilies, itemLevel, defenses) 
 
 // Core essence re-forge. Returns the new EPIC item, or null when the item
 // has no usable mod table or the guaranteed family cannot roll on this base.
-function _egApplyEssenceCraft(item, def) {
+export function _egApplyEssenceCraft(item, def) {
     const modTable = _egGetModTable(item);
     if (!modTable) return null;
     // Epic caps per spec
@@ -387,7 +410,7 @@ function _egApplyEssenceCraft(item, def) {
 //-------------------ESSENCE DEFINITIONS----------------------------------
 //------------------------------------------------------------------------
 
-const EG_ESSENCE_DEFS = {};
+export const EG_ESSENCE_DEFS = {};
 
 // Generate per-modifier essences
 (function _egBuildPerModEssences() {
@@ -432,11 +455,21 @@ const EG_ESSENCE_DEFS = {};
 // Human-readable family display (EN/DE). Prefer the mod's own label stripped of
 // placeholders, fall back to a title-cased familyId.  Hybrid families are
 // joined with " + ".
-function _egEssenceFamilyDisplayName(familyId) {
+export function _egEssenceFamilyDisplayName(familyId) {
     let raw = null;
     let rawDe = null;
-    if (typeof EG_SLOT_MOD_TABLE_MAP !== 'undefined') {
-        for (const getter of Object.values(EG_SLOT_MOD_TABLE_MAP)) {
+    // Module era: this runs at module-eval time (the essence-def IIFE below)
+    // while endgame-equipment-generator.js is still initializing (import
+    // cycle), where typeof on the imported binding THROWS (TDZ) instead of
+    // reporting 'undefined'. Classic load order (essences well before the
+    // generator) always saw the map ABSENT here, so treat uninitialized
+    // exactly like absent and fall back to the curated names below. At
+    // runtime the map is initialized and the enriched lookup applies, same
+    // as the classic era.
+    let modTableMap = null;
+    try { modTableMap = EG_SLOT_MOD_TABLE_MAP; } catch (e) { modTableMap = null; }
+    if (modTableMap) {
+        for (const getter of Object.values(modTableMap)) {
             let tbl = null;
             try { tbl = getter(); } catch (e) { continue; }
             if (!tbl) continue;
@@ -635,7 +668,7 @@ function _egEssenceFamilyDisplayName(familyId) {
 
 // Builds the inner HTML for the essence tooltip's "Guaranteed" section.
 // NEW per-modifier version: single mod name + list of compatible base types.
-function _egBuildEssenceDetailHTML(def) {
+export function _egBuildEssenceDetailHTML(def) {
     if (!def) return '';
     const families = def.guaranteedFamilies || (def.guaranteedFamily ? [def.guaranteedFamily] : []);
     if (!families.length) return '';
@@ -674,12 +707,12 @@ function _egBuildEssenceDetailHTML(def) {
 
 // One entry per modifier family - equal weight so every targeted essence is
 // equally likely to drop (rarity differentiation via map tier/loot quantity).
-const EG_ESSENCE_DROP_TABLE = _EG_ESSENCE_FAMILIES.map(fid => ({ id: 'essence_' + fid, weight: 100 }));
+export const EG_ESSENCE_DROP_TABLE = _EG_ESSENCE_FAMILIES.map(fid => ({ id: 'essence_' + fid, weight: 100 }));
 
-const EG_ESSENCE_DROP_CHANCE_NORMAL = 0.06; // 6% per normal kill
-const EG_ESSENCE_DROP_CHANCE_BOSS = 0.45;   // bosses often reward one
+export const EG_ESSENCE_DROP_CHANCE_NORMAL = 0.06; // 6% per normal kill
+export const EG_ESSENCE_DROP_CHANCE_BOSS = 0.45;   // bosses often reward one
 
-function _egRollEssenceDef() {
+export function _egRollEssenceDef() {
     const total = EG_ESSENCE_DROP_TABLE.reduce((s, e) => s + e.weight, 0);
     let roll = Math.random() * total;
     for (const entry of EG_ESSENCE_DROP_TABLE) {
@@ -691,7 +724,7 @@ function _egRollEssenceDef() {
 
 // Called on monster death (see endgame-encounter.js). Essences land on the
 // grid as pickup drops and are claimed like currency orbs.
-function _egTryDropEssence(isBoss) {
+export function _egTryDropEssence(isBoss) {
     const baseChance = isBoss ? EG_ESSENCE_DROP_CHANCE_BOSS : EG_ESSENCE_DROP_CHANCE_NORMAL;
     const qtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
     const chance = Math.min(1, baseChance * qtyMult);
@@ -710,7 +743,7 @@ function _egTryDropEssence(isBoss) {
 
 // Adds `amount` of an essence type to the essence tab fixed slot.
 // Stacks merge on the pre-assigned cell; returns true on success.
-function egAddEssence(id, amount = 1, def = null) {
+export function egAddEssence(id, amount = 1, def = null) {
     const pos = _egEssenceSlotForId(id);
     if (!pos) {
         console.warn(`[ESSENCE] egAddEssence: no fixed slot for "${id}".`);
@@ -748,7 +781,7 @@ function egAddEssence(id, amount = 1, def = null) {
 //------------------------------------------------------------------------
 
 // Builds a single essence tab cell div (drop target) with empty-slot hover preview.
-function _egBuildEssenceCellHTML(row, col) {
+export function _egBuildEssenceCellHTML(row, col) {
     return `
 <div class="eg-inv-cell eg-essence-cell"
      id="eg-essence-cell-${row}-${col}"
@@ -764,7 +797,7 @@ function _egBuildEssenceCellHTML(row, col) {
 }
 
 // Assembles the essence tab panel: label + the essence cell grid.
-function _egBuildEssenceTabHTML() {
+export function _egBuildEssenceTabHTML() {
     let cellsHTML = '';
     for (let r = 0; r < EG_ESSENCE_ROWS; r++) {
         for (let c = 0; c < EG_ESSENCE_COLS; c++) {
@@ -800,7 +833,7 @@ function _egBuildEssenceTabHTML() {
 }
 
 // Empty-slot hover preview - mirrors Orbs & Shards behavior.
-function _egOnEssenceCellEnter(row, col, e) {
+export function _egOnEssenceCellEnter(row, col, e) {
     const stash = (typeof _egEssenceStash !== 'undefined') ? _egEssenceStash : null;
     const item = stash && stash[row] ? stash[row][col] : null;
     if (item) return; // occupied → chip's own onmouseenter handles tooltip
@@ -826,23 +859,23 @@ function _egOnEssenceCellEnter(row, col, e) {
     <div class="eg-tt-section"><div class="eg-tt-desc" style="opacity:0.85;">${ttDesc}</div></div>
     ${essenceDetailHTML}
 </div>`;
-    if (typeof showGameTooltip === 'function') showGameTooltip(html, e);
+    if (typeof showGameTooltip === 'function') globalThis.showGameTooltip(html, e);
 }
-function _egOnEssenceCellMove(e) {
+export function _egOnEssenceCellMove(e) {
     const cell = e.currentTarget || (e.target.closest && e.target.closest('.eg-essence-cell'));
     if (!cell) return;
     const r = +cell.dataset.row, c = +cell.dataset.col;
     const stash = (typeof _egEssenceStash !== 'undefined') ? _egEssenceStash : null;
     const item = stash && stash[r] ? stash[r][c] : null;
     if (item) return;
-    if (_egEssenceIdForSlot(r, c) && typeof moveGameTooltip === 'function') moveGameTooltip(e);
+    if (_egEssenceIdForSlot(r, c) && typeof moveGameTooltip === 'function') globalThis.moveGameTooltip(e);
 }
-function _egOnEssenceCellLeave() {
-    if (typeof hideGameTooltip === 'function') hideGameTooltip();
+export function _egOnEssenceCellLeave() {
+    if (typeof hideGameTooltip === 'function') globalThis.hideGameTooltip();
 }
 
 // Re-renders a single cell in the essence tab grid (fixed-slot with placeholder).
-function _egRenderEssenceCell(row, col) {
+export function _egRenderEssenceCell(row, col) {
     if (!_egEssenceStash[row]) return;
     const cell = document.getElementById(`eg-essence-cell-${row}-${col}`);
     if (!cell) return;
@@ -888,7 +921,7 @@ function _egRenderEssenceCell(row, col) {
         cell.innerHTML = '';
         cell.classList.add('eg-essence-assigned-empty');
         if (def.icon) cell.setAttribute('data-empty-icon', def.icon);
-        cell.setAttribute('data-tip', _tipAttr(def.name || assignedId));
+        cell.setAttribute('data-tip', globalThis._tipAttr(def.name || assignedId));
     } else {
         cell.innerHTML = '';
         cell.classList.remove('eg-essence-assigned-empty');
@@ -898,7 +931,7 @@ function _egRenderEssenceCell(row, col) {
 }
 
 // Re-renders the entire essence tab grid.
-function _egRenderEssenceStash() {
+export function _egRenderEssenceStash() {
     for (let r = 0; r < EG_ESSENCE_ROWS; r++) {
         for (let c = 0; c < EG_ESSENCE_COLS; c++) {
             _egRenderEssenceCell(r, c);
@@ -912,17 +945,17 @@ function _egRenderEssenceStash() {
 //-------------------(right-click essence, left-click item)----------------
 //------------------------------------------------------------------------
 
-let _egPendingEssenceUse = null; // { defId, sourceRow, sourceCol }
+export let _egPendingEssenceUse = null; // { defId, sourceRow, sourceCol }
 
 // Shared rejection path: shows a short reason toast + stash info, flashes the
 // target chip, and exits use mode. `reasonKey` is null for plain failures.
-function _egRejectEssenceUse(reasonKey, chipEl, opts = {}) {
+export function _egRejectEssenceUse(reasonKey, chipEl, opts = {}) {
     const isDe = (typeof LANG !== 'undefined' && LANG === 'de');
     const fallback = reasonKey ? (isDe ? 'Gegenstand nicht kompatibel.' : 'Item not compatible.') : (isDe ? 'Nicht anwendbar.' : 'Cannot be applied.');
     const msg = reasonKey
         ? (t(reasonKey) !== reasonKey ? t(reasonKey) : fallback)
         : fallback;
-    showToast(msg);
+    globalThis.showToast(msg);
     if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error', duration: opts.duration || 5000 });
     if (chipEl) {
         chipEl.classList.add('eg-slot-reject');
@@ -931,7 +964,7 @@ function _egRejectEssenceUse(reasonKey, chipEl, opts = {}) {
     _egCancelEssenceUse(true);
 }
 
-function _egStartEssenceUse(def, row, col, chipEl) {
+export function _egStartEssenceUse(def, row, col, chipEl) {
     if (typeof _egPendingCurrencyUse !== 'undefined' && _egPendingCurrencyUse) {
         _egCancelCurrencyUse(true);
     }
@@ -939,20 +972,20 @@ function _egStartEssenceUse(def, row, col, chipEl) {
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     if (chipEl) chipEl.classList.add('eg-currency-selected');
     document.body.classList.add('eg-currency-use-active');
-    showToast(t('eg_currency_selected')
+    globalThis.showToast(t('eg_currency_selected')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name));
 }
 
-function _egCancelEssenceUse(silent) {
+export function _egCancelEssenceUse(silent) {
     if (!_egPendingEssenceUse) return;
     _egPendingEssenceUse = null;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     document.body.classList.remove('eg-currency-use-active');
-    if (!silent) showToast(t('eg_currency_cancelled'));
+    if (!silent) globalThis.showToast(t('eg_currency_cancelled'));
 }
 
-function _egRefreshEssenceUseHighlight() {
+export function _egRefreshEssenceUseHighlight() {
     if (!_egPendingEssenceUse) return;
     const { sourceRow, sourceCol } = _egPendingEssenceUse;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
@@ -966,7 +999,7 @@ function _egRefreshEssenceUseHighlight() {
     }
 }
 
-function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
+export function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
     if (!_egPendingEssenceUse) return;
     const { sourceRow, sourceCol, defId } = _egPendingEssenceUse;
     const def = EG_ESSENCE_DEFS[defId];
@@ -1016,14 +1049,14 @@ function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
 
     if (keepActive && stack.count > 0) {
         _egRefreshEssenceUseHighlight();
-        showToast(t('eg_currency_applied').replace('{name}', def.name));
+        globalThis.showToast(t('eg_currency_applied').replace('{name}', def.name));
         if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
         egSaveHubState();
         return;
     }
 
     _egCancelEssenceUse(true);
-    showToast(t('eg_currency_applied').replace('{name}', def.name));
+    globalThis.showToast(t('eg_currency_applied').replace('{name}', def.name));
     if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
     egSaveHubState();
 }
@@ -1111,7 +1144,7 @@ document.addEventListener('mousedown', function (e) {
 
     if (!targetItem) {
         const msg = t('eg_no_item_target');
-        showToast(msg);
+        globalThis.showToast(msg);
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         _egCancelEssenceUse(true);
         return;

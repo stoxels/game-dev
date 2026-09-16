@@ -1,4 +1,13 @@
-﻿//------------------------------------------------------------------------
+﻿import { showAchievements } from './achievements/achievements-ui.js';
+import { showResetAchievementsModal } from './achievements/achievements.js';
+import { stopTimer } from './timer.js';
+import { setLang, t } from './translation/translations.js';
+import { toggleTouchpadMarkMode } from './mouse-button-handlers.js';
+import { clearHover } from './mouse-over.js';
+import { showHS } from './screens/screens-highscore.js';
+import { cancelSlotName, confirmSlotName, showSaveSlotSelect } from './screens/screens-save-slots.js';
+import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchAdventureMode, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
+//------------------------------------------------------------------------
 //-------------------REPLAY GALLERY (GLOBAL HELPER)-----------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -10,7 +19,7 @@
  * storyline beat, plus a Tutorial entry if the tutorial has been completed.
  * Called from the "REPLAY" button binding inside the title-screen section.
  */
-function _romanRegionNumber(beatId) {
+export function _romanRegionNumber(beatId) {
     const m = /^region_(\d+)$/.exec(beatId || '');
     if (!m) return '';
     const n = parseInt(m[1], 10);
@@ -18,7 +27,7 @@ function _romanRegionNumber(beatId) {
     return table[n] || String(n);
 }
 
-function _buildReplayRow(entry, unlocked, titleText) {
+export function _buildReplayRow(entry, unlocked, titleText) {
     const row = document.createElement('div');
     row.className = 'replay-track' + (unlocked ? '' : ' replay-track-locked');
 
@@ -59,11 +68,11 @@ function _buildReplayRow(entry, unlocked, titleText) {
     if (unlocked) {
         play.addEventListener('click', () => {
             hideModal('replay-modal');
-            hideGameTooltip(); // hide the custom tooltip immediately (replay modal is gone)
+            globalThis.hideGameTooltip(); // hide the custom tooltip immediately (replay modal is gone)
             if (entry.isTutorial) {
-                replayTutorialFromTitle();
+                globalThis.replayTutorialFromTitle();
             } else {
-                showBeat(entry.beatId, { ...(entry.options || {}), force: true });
+                globalThis.showBeat(entry.beatId, { ...(entry.options || {}), force: true });
             }
         });
     } else {
@@ -81,21 +90,21 @@ function _buildReplayRow(entry, unlocked, titleText) {
     return row;
 }
 
-function renderReplayModal() {
+export function renderReplayModal() {
     const container = document.getElementById('replay-content');
     container.innerHTML = '';
 
     let anyUnlocked = false;
 
-    const entries = (typeof REPLAY_GALLERY_ENTRIES !== 'undefined') ? REPLAY_GALLERY_ENTRIES : [];
+    const entries = (typeof globalThis.REPLAY_GALLERY_ENTRIES !== 'undefined') ? globalThis.REPLAY_GALLERY_ENTRIES : [];
     entries.forEach(entry => {
-        const unlocked = isReplayEntryUnlocked(entry);
+        const unlocked = globalThis.isReplayEntryUnlocked(entry);
         if (unlocked) anyUnlocked = true;
         container.appendChild(_buildReplayRow(entry, unlocked, entry.label));
     });
 
     // Tutorial replays only once it has been completed (per-save STATE flag).
-    if (STATE.tutorialDone) {
+    if (globalThis.STATE.tutorialDone) {
         anyUnlocked = true;
         container.appendChild(_buildReplayRow({
             id: 'tutorial',
@@ -127,7 +136,7 @@ function renderReplayModal() {
 // showGameTooltip/moveGameTooltip/hideGameTooltip live in tooltips-hud.js,
 // which loads after this file - they are referenced lazily inside the
 // handler (at interaction time), never at wiring time.
-let _replayTipBtn = null;
+export let _replayTipBtn = null;
 
 document.addEventListener('mousemove', (e) => {
     // Only active while the replay modal is open; also hides the tooltip
@@ -136,7 +145,7 @@ document.addEventListener('mousemove', (e) => {
     if (!modal || !modal.classList.contains('show')) {
         if (_replayTipBtn) {
             _replayTipBtn = null;
-            hideGameTooltip();
+            globalThis.hideGameTooltip();
         }
         return;
     }
@@ -148,13 +157,13 @@ document.addEventListener('mousemove', (e) => {
             _replayTipBtn = btn;
             const isLocked = btn.classList.contains('replay-track-play-locked');
             const text = isLocked ? t('scr_replay_locked') : (btn.getAttribute('aria-label') || '');
-            showGameTooltip(text, e);
+            globalThis.showGameTooltip(text, e);
         } else {
-            moveGameTooltip(e);
+            globalThis.moveGameTooltip(e);
         }
     } else if (_replayTipBtn) {
         _replayTipBtn = null;
-        hideGameTooltip();
+        globalThis.hideGameTooltip();
     }
 });
 
@@ -224,18 +233,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run once on load to register all close buttons present in the HTML.
     bindModalCloseButtons();
 
-    onClick('btn-pause-settings', () => { loadSettingsUI(); showModal('settings-modal'); });
+    onClick('btn-pause-settings', () => { globalThis.loadSettingsUI(); showModal('settings-modal'); });
 
     // Keybinds from the pause menu - the game stays paused behind the modal,
     // so bindings (including the new hotbar slots and the spellbook key) can
     // be reviewed and rebound mid-puzzle. The modal is raised above the pause
     // overlay in css/pause.css.
-    onClick('btn-pause-keybinds', () => { if (typeof openKeybindsModal === 'function') openKeybindsModal(); });
+    onClick('btn-pause-keybinds', () => { if (typeof globalThis.openKeybindsModal === 'function') globalThis.openKeybindsModal(); });
 
     // Spellbook from the pause menu - the game stays paused behind the book
     // so the player can review spells mid-puzzle. The book is raised above
     // the pause overlay in css/pause.css.
-    onClick('btn-pause-spellbook', () => { if (typeof openSpellbook === 'function') openSpellbook(); });
+    onClick('btn-pause-spellbook', () => { if (typeof globalThis.openSpellbook === 'function') globalThis.openSpellbook(); });
 
     //------------------------------------------------------------------------
     //-------------------TITLE SCREEN-----------------------------------------
@@ -251,8 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function onLanguageButtonClick(selectedBtn) {
         setLang(selectedBtn.dataset.lang);
         // Persist the choice so the language survives page reloads
-        SETTINGS.lang = selectedBtn.dataset.lang;
-        saveSettings(SETTINGS);
+        globalThis.SETTINGS.lang = selectedBtn.dataset.lang;
+        globalThis.saveSettings(globalThis.SETTINGS);
         document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
         selectedBtn.classList.add('active');
     }
@@ -260,14 +269,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Main menu navigation buttons.
     onClick('btn-play', () => {
         showSaveSlotSelect(() => {
-            const proceed = () => maybeShowCharacterSelect(() => showTutorial());
+            const proceed = () => globalThis.maybeShowCharacterSelect(() => globalThis.showTutorial());
             // A save WITHOUT a character is a brand-new character creation:
             // the opening cinematic always plays, even when the seen-flag
             // survived from an earlier character that was later wiped - the
             // flag can no longer mean "this player saw it" because there is
             // no player on this save yet.
-            const isNewCharacter = !STATE.playerCharacter;
-            if (!hasSeen('intro_cinematic') || isNewCharacter) {
+            const isNewCharacter = !globalThis.STATE.playerCharacter;
+            if (!globalThis.hasSeen('intro_cinematic') || isNewCharacter) {
                 // Arm the intro → character-select handoff: the cinematic's
                 // final image IS the select screen's backdrop. The song plays
                 // out to its natural end (final image up during the outro
@@ -281,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // why new characters skipped straight to the select screen
                 // when a stale flag survived on the slot). A save without a
                 // character must always PLAY the intro.
-                showBeat('intro_cinematic', { onComplete: proceed, force: isNewCharacter });
+                globalThis.showBeat('intro_cinematic', { onComplete: proceed, force: isNewCharacter });
             } else {
                 proceed();
             }
@@ -292,10 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     onClick('btn-how-to-play', () => showModal('tut-modal'));
     onClick('btn-highscores', () => showHS());
-    onClick('btn-codes', () => showCodes());
+    onClick('btn-codes', () => globalThis.showCodes());
     onClick('btn-achievements', () => showAchievements());
 
-    onClick('btn-settings', () => { loadSettingsUI(); showModal('settings-modal'); });
+    onClick('btn-settings', () => { globalThis.loadSettingsUI(); showModal('settings-modal'); });
 
     // Language switcher buttons (class-based, not id-based).
     document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -308,13 +317,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // resetKeybinds live in js/keybinds.js; the capture flow is driven from
     // the central dispatcher there.
     onClick('btn-keybinds', () => {
-        if (typeof openKeybindsModal === 'function') openKeybindsModal();
+        if (typeof globalThis.openKeybindsModal === 'function') globalThis.openKeybindsModal();
     });
     onClick('btn-keybinds-close', () => {
-        if (typeof closeKeybindsModal === 'function') closeKeybindsModal();
+        if (typeof globalThis.closeKeybindsModal === 'function') globalThis.closeKeybindsModal();
     });
     onClick('btn-keybinds-reset', () => {
-        if (typeof resetKeybinds === 'function') resetKeybinds();
+        if (typeof globalThis.resetKeybinds === 'function') globalThis.resetKeybinds();
     });
 
 
@@ -325,12 +334,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Difficulty selection buttons - each carries a [data-diff] attribute.
     document.querySelectorAll('[data-diff]').forEach(btn => {
-        btn.addEventListener('click', () => selDiff(btn));
+        btn.addEventListener('click', () => globalThis.selDiff(btn));
     });
 
     // Modifier toggle buttons - each carries a [data-mod] attribute.
     document.querySelectorAll('[data-mod]').forEach(btn => {
-        btn.addEventListener('click', () => togMod(btn));
+        btn.addEventListener('click', () => globalThis.togMod(btn));
     });
 
     onClick('btn-start-setup', () => confirmSetup());
@@ -351,8 +360,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Subsequent clicks see showDevPassiveTree already defined and go
     // straight to the screen.
     function _loadDevPassiveTreeAndOpen() {
-        if (typeof showDevPassiveTree === 'function') {
-            showDevPassiveTree();
+        if (typeof globalThis.showDevPassiveTree === 'function') {
+            globalThis.showDevPassiveTree();
             return;
         }
         const files = [
@@ -362,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let i = 0;
         const loadNext = () => {
             if (i >= files.length) {
-                if (typeof showDevPassiveTree === 'function') showDevPassiveTree();
+                if (typeof globalThis.showDevPassiveTree === 'function') globalThis.showDevPassiveTree();
                 else console.warn('[dev-tree] scripts loaded but showDevPassiveTree is still missing');
                 return;
             }
@@ -400,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
 
     // Confirmation button inside the reset modal.
-    onClick('btn-confirm-reset', () => confirmReset());
+    onClick('btn-confirm-reset', () => globalThis.confirmReset());
 
     // Save-slot name modal (✏️ button on the save-slot cards).
     onClick('btn-confirm-slot-name', () => confirmSlotName());
@@ -422,8 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
 
     onClick('btn-levels-back', () => showSetup());
-    onClick('btn-go-passive-tree', () => showPassiveTree());
-    onClick('btn-quest-log', () => showQuestLog());
+    onClick('btn-go-passive-tree', () => globalThis.showPassiveTree());
+    onClick('btn-quest-log', () => globalThis.showQuestLog());
 
 
     //------------------------------------------------------------------------
@@ -431,8 +440,8 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    onClick('btn-zoom-in', () => zoomInBtn());
-    onClick('btn-zoom-out', () => zoomOutBtn());
+    onClick('btn-zoom-in', () => globalThis.zoomInBtn());
+    onClick('btn-zoom-out', () => globalThis.zoomOutBtn());
 
 
     /**
@@ -449,8 +458,8 @@ document.addEventListener('DOMContentLoaded', () => {
         safeCall('_varianceShield_removeBubble');
         safeCall('_arcaneFreeze_clearAllFrostAndStalagmites');
 
-        _clearBlackoutCountdown('row');
-        _clearBlackoutCountdown('col');
+        globalThis._clearBlackoutCountdown('row');
+        globalThis._clearBlackoutCountdown('col');
     }
 
     /**
@@ -512,18 +521,18 @@ document.addEventListener('DOMContentLoaded', () => {
      * system cleanup before navigating.
      */
     function onGoToLevelsFromGame() {
-        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof _egIsActive === 'function' && _egIsActive()) {
+        if (globalThis.cur && globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
             showEgForfeitConfirm(() => {
-                unpauseGame();
+                globalThis.unpauseGame();
                 cleanupActiveGameSystems();
                 stopTimer();
                 // Keep the run's collected loot even on a forfeit - the
                 // consumed map is penalty enough (mirrors _egEndMapDefeated).
-                if (typeof _egFlushRunLootToStash === 'function') _egFlushRunLootToStash();
-                if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
-                if (typeof egSaveHubState === 'function') egSaveHubState();
-                if (typeof _egStopEncounter === 'function') _egStopEncounter();
-                if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
+                if (typeof globalThis._egFlushRunLootToStash === 'function') globalThis._egFlushRunLootToStash();
+                if (typeof globalThis._egBankUnclaimedMapDrops === 'function') globalThis._egBankUnclaimedMapDrops();
+                if (typeof globalThis.egSaveHubState === 'function') globalThis.egSaveHubState();
+                if (typeof globalThis._egStopEncounter === 'function') globalThis._egStopEncounter();
+                if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');
                 goToLevelSelect();
@@ -531,14 +540,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        unpauseGame();
+        globalThis.unpauseGame();
         cleanupActiveGameSystems();
         stopTimer();
         // ALWAYS tear down a running encounter (campaign monster levels too -
         // they don't take the forfeit branch above but must not keep ticking,
         // attacking, or re-rendering the player sprite after we leave).
-        if (typeof _egStopEncounter === 'function') _egStopEncounter();
-        if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
+        if (typeof globalThis._egStopEncounter === 'function') globalThis._egStopEncounter();
+        if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
         goToLevelSelect();
@@ -554,34 +563,34 @@ document.addEventListener('DOMContentLoaded', () => {
      * level select screen.
      */
     function onReturnToNexusFromGame() {
-        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof _egIsActive === 'function' && _egIsActive()) {
+        if (globalThis.cur && globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
             showEgForfeitConfirm(() => {
-                unpauseGame();
+                globalThis.unpauseGame();
                 cleanupActiveGameSystems();
                 stopTimer();
                 // Keep the run's collected loot even on a forfeit - the
                 // consumed map is penalty enough (mirrors _egEndMapDefeated).
-                if (typeof _egFlushRunLootToStash === 'function') _egFlushRunLootToStash();
-                if (typeof _egBankUnclaimedMapDrops === 'function') _egBankUnclaimedMapDrops();
-                if (typeof egSaveHubState === 'function') egSaveHubState();
-                if (typeof _egStopEncounter === 'function') _egStopEncounter();
-                if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
+                if (typeof globalThis._egFlushRunLootToStash === 'function') globalThis._egFlushRunLootToStash();
+                if (typeof globalThis._egBankUnclaimedMapDrops === 'function') globalThis._egBankUnclaimedMapDrops();
+                if (typeof globalThis.egSaveHubState === 'function') globalThis.egSaveHubState();
+                if (typeof globalThis._egStopEncounter === 'function') globalThis._egStopEncounter();
+                if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
                 safeCall('_hidePlayerAvatarSimple');
                 safeCall('_hidePlayerAvatar');
-                showEndgameNexus();
+                globalThis.showEndgameNexus();
             });
             return;
         }
 
-        unpauseGame();
+        globalThis.unpauseGame();
         cleanupActiveGameSystems();
         stopTimer();
         // ALWAYS tear down a running encounter (see onGoToLevelsFromGame).
-        if (typeof _egStopEncounter === 'function') _egStopEncounter();
-        if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff();
+        if (typeof globalThis._egStopEncounter === 'function') globalThis._egStopEncounter();
+        if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
-        showEndgameNexus();
+        globalThis.showEndgameNexus();
     }
 
     onClick('btn-go-nexus', onReturnToNexusFromGame);
@@ -593,8 +602,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         puzzleTable.addEventListener('mouseleave', () => {
             clearHover();
-            hoverRow = -1;
-            hoverCol = -1;
+            globalThis.hoverRow = -1;
+            globalThis.hoverCol = -1;
         });
     }
 
@@ -623,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cleanupActiveGameSystems();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
-        replayLevel();
+        globalThis.replayLevel();
     }
 
     onClick('btn-next-lvl', () => goToNextLevel());
@@ -633,7 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // "Retry with other difficulty/modifier" - opens the settings modal;
     // the actual replay only starts once the player hits START RETRY.
-    onClick('btn-win-retry-setup', openRetrySetupModal);
+    onClick('btn-win-retry-setup', globalThis.openRetrySetupModal);
 
     onClick('btn-lose-levels', onGoToLevelsFromOverlay);
     onClick('btn-lose-retry', onRetryLevelFromOverlay);
@@ -650,18 +659,18 @@ document.addEventListener('DOMContentLoaded', () => {
      * cleanup, then replays the current level via the standard path.
      */
     function onStartRetryWithSetup() {
-        beginRetrySetupRun();
+        globalThis.beginRetrySetupRun();
         hideModal('retry-setup-modal');
         cleanupActiveGameSystems();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
-        replayLevel();
+        globalThis.replayLevel();
     }
 
     onClick('btn-retry-setup-start', onStartRetryWithSetup);
-    onClick('btn-retry-setup-cancel', cancelRetrySetupModal);
-    onClick('btn-retry-keep', () => retrySetupResolve(true));
-    onClick('btn-retry-revert', () => retrySetupResolve(false));
+    onClick('btn-retry-setup-cancel', globalThis.cancelRetrySetupModal);
+    onClick('btn-retry-keep', () => globalThis.retrySetupResolve(true));
+    onClick('btn-retry-revert', () => globalThis.retrySetupResolve(false));
 
     /**
      * "Replay again, decide later": keeps the snapshot pending so the
@@ -669,11 +678,11 @@ document.addEventListener('DOMContentLoaded', () => {
      * restarts the current level with the new setup still applied.
      */
     function onRetryAgainDecideLater() {
-        retrySetupDefer();
+        globalThis.retrySetupDefer();
         cleanupActiveGameSystems();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');
-        replayLevel();
+        globalThis.replayLevel();
     }
 
     onClick('btn-retry-again', onRetryAgainDecideLater);
@@ -684,12 +693,12 @@ document.addEventListener('DOMContentLoaded', () => {
      * A single MutationObserver on both overlays covers every code path
      * that can end a level (scoring, timer expiry, hardcore fail, quiz flow).
      */
-    const _retryResultObserver = new MutationObserver(() => {
-        if (!retrySetupIsActive()) return;
+    const _retryResultObserver = new globalThis.MutationObserver(() => {
+        if (!globalThis.retrySetupIsActive()) return;
         const winShown = document.getElementById('ov-win').classList.contains('show');
         const loseShown = document.getElementById('ov-lose').classList.contains('show');
         if (winShown || loseShown) {
-            if (typeof updateRetryKeepModal === 'function') updateRetryKeepModal();
+            if (typeof globalThis.updateRetryKeepModal === 'function') globalThis.updateRetryKeepModal();
             showModal('retry-keep-modal');
         }
     });
@@ -704,10 +713,10 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    onClick('quiz-input-submit', () => answerQuizInput());
-    onClick('quiz-tutor-btn', () => quizUseTutor());
-    onClick('quiz-continue', () => finishQuiz());
-    onClick('quiz-close-x', () => skipQuiz());
+    onClick('quiz-input-submit', () => globalThis.answerQuizInput());
+    onClick('quiz-tutor-btn', () => globalThis.quizUseTutor());
+    onClick('quiz-continue', () => globalThis.finishQuiz());
+    onClick('quiz-close-x', () => globalThis.skipQuiz());
 
 
     //------------------------------------------------------------------------
@@ -715,9 +724,9 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    onClick('btn-skip-tutorial', () => finishTutorial());
-    onClick('tut-prev-btn', () => prevTutStep());
-    onClick('tut-next-btn', () => advanceTutStep());
+    onClick('btn-skip-tutorial', () => globalThis.finishTutorial());
+    onClick('tut-prev-btn', () => globalThis.prevTutStep());
+    onClick('tut-next-btn', () => globalThis.advanceTutStep());
 
 
     //------------------------------------------------------------------------
@@ -725,17 +734,17 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    onClick('mg-close-x', () => mgCloseToLevelSelect());
-    onClick('mg-submit-btn', () => submitMathGate());
-    onClick('mg-tutor-btn', () => mgUseTutor());
-    onClick('mg-new-q-btn', () => mgNewQuestion());
-    onClick('mg-continue-btn', () => mgContinueToLevel());
+    onClick('mg-close-x', () => globalThis.mgCloseToLevelSelect());
+    onClick('mg-submit-btn', () => globalThis.submitMathGate());
+    onClick('mg-tutor-btn', () => globalThis.mgUseTutor());
+    onClick('mg-new-q-btn', () => globalThis.mgNewQuestion());
+    onClick('mg-continue-btn', () => globalThis.mgContinueToLevel());
 
     // Allow the player to submit their math gate answer by pressing Enter,
     // in addition to clicking the submit button.
     if (mathGateInput) {
         mathGateInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter') submitMathGate();
+            if (e.key === 'Enter') globalThis.submitMathGate();
         });
     }
 
@@ -764,10 +773,10 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    onClick('btn-pt-back', () => ptGoBack());
+    onClick('btn-pt-back', () => globalThis.ptGoBack());
 
     // DEV SANDBOX passive tree - BACK returns to the select-mode screen.
-    onClick('btn-dpt-back', () => dptGoBack());
+    onClick('btn-dpt-back', () => globalThis.dptGoBack());
 
     /**
      * Shows an "are you sure?" confirmation modal for the passive tree's
@@ -815,7 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    onClick('btn-pt-refund-all', () => showPtRefundConfirm(() => _ptRefundAllPoints()));
+    onClick('btn-pt-refund-all', () => showPtRefundConfirm(() => globalThis._ptRefundAllPoints()));
 
 
     //------------------------------------------------------------------------
@@ -826,7 +835,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Changelog button may or may not be present depending on the build,
     // so we guard the binding rather than using onClick() which only warns.
     if (changelogBtn) {
-        changelogBtn.addEventListener('click', openChangelog);
+        changelogBtn.addEventListener('click', globalThis.openChangelog);
     }
 
 });

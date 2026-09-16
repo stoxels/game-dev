@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egbtRenderGrid } from './endgame-boss-test.js';
+import { _egRenderPanel } from './endgame-encounter.js';
+import { _egRenderEquipSlots, _egRenderInventory } from './endgame-hub.js';
+import { _egIsActive } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------PLACEHOLDER ART SYSTEM-------------------------------
 //------------------------------------------------------------------------
 // Resolves real images for endgame monsters and equipment base items.
@@ -27,7 +37,7 @@
 // emoji icon currently used, so nothing breaks while art is missing.
 
 
-const EG_ART = (function () {
+export const EG_ART = (function () {
 
     const ART_PATHS = {
         monster: 'images/endgame/monsters/',

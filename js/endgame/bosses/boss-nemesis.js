@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE NEMESIS (boss_nemesis)---------------------------
 //------------------------------------------------------------------------
 // Pinnacle hunter: a dense storm spiral to drown in, interleaved with
@@ -38,7 +46,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechSpiralStorm(monster, phase) {
+export function _egMechSpiralStorm(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const total = [0, 32, 38, 46][p];
@@ -92,7 +100,7 @@ function _egMechSpiralStorm(monster, phase) {
     });
 }
 
-function _egMechReaperFans(monster, phase) {
+export function _egMechReaperFans(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const volleys = [0, 3, 4, 4][p];

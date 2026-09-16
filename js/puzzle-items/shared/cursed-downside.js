@@ -1,4 +1,16 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
+import { questStat_curseBlocked } from '../../quests/quests-stats.js';
+import { t } from '../../translation/translations.js';
+import { showToast } from '../toasts-and-popups.js';
+import { applyCursedColBlackout, applyCursedRowBlackout } from './clue-blackout.js';
+import { unsolveColsExcluding, unsolveRowsExcluding } from './grid-actions.js';
+
+//------------------------------------------------------------------------
 //-------------------SHARED - CURSED DOWNSIDE----------------------
 //------------------------------------------------------------------------
 
@@ -9,7 +21,7 @@
 // Returns the effective blackout duration (ms) for a cursed downside,
 // after applying all passive reductions and immunity checks.
 // Returns 0 when the downside should be fully suppressed.
-function _cursedDownsideDuration(baseMs) {
+export function _cursedDownsideDuration(baseMs) {
     // Full immunity from The Witch or Cursed Ward
     if (window.STOX_FLAGS.cursedImmune) {
         questStat_curseBlocked();
@@ -46,7 +58,7 @@ function _cursedDownsideDuration(baseMs) {
 
 // Returns the effective erase count for a cursed downside (rows / cols
 // erased), applying the same immunity and reduction checks as duration.
-function _cursedDownsideCount(baseCount) {
+export function _cursedDownsideCount(baseCount) {
     // Full immunity from The Witch or Cursed Ward
     if (window.STOX_FLAGS.cursedImmune) {
         questStat_curseBlocked();
@@ -82,7 +94,7 @@ function _cursedDownsideCount(baseCount) {
 
 // Returns true if the Blackout Ward passive nodes block a blackout effect
 // this trigger.  Chance accumulates across all three invested nodes.
-function _blackoutWardBlocks() {
+export function _blackoutWardBlocks() {
     let chance = 0;
     if (ptHasSkill('blackout_ward_1')) chance += 0.30;
     if (ptHasSkill('blackout_ward_2')) chance += 0.10;
@@ -93,7 +105,7 @@ function _blackoutWardBlocks() {
 
 // Returns true if the Removal Ward passive nodes block a row / col
 // erasure effect this trigger.  Chance accumulates across all three nodes.
-function _removalWardBlocks() {
+export function _removalWardBlocks() {
     let chance = 0;
     if (ptHasSkill('removal_ward_1')) chance += 0.30;
     if (ptHasSkill('removal_ward_2')) chance += 0.10;
@@ -105,7 +117,7 @@ function _removalWardBlocks() {
 // Shared helper: applies a blackout downside (row and/or col) and shows a
 // ward-protection toast when the blackout is blocked.  Pass booleans to
 // select which axes to black out.
-function _applyBlackoutDownside(dur, blackoutRows, blackoutCols) {
+export function _applyBlackoutDownside(dur, blackoutRows, blackoutCols) {
     if (dur <= 0) return;
 
     if (_blackoutWardBlocks()) {
@@ -123,7 +135,7 @@ function _applyBlackoutDownside(dur, blackoutRows, blackoutCols) {
 // `preFilledSet` is the snapshot of filled rows taken before the item
 // benefit fired so only pre-existing rows are targeted.
 // Returns the number of rows actually erased.
-function _applyRowErasureDownside(eraseCount, preFilledSet) {
+export function _applyRowErasureDownside(eraseCount, preFilledSet) {
     if (eraseCount <= 0) return 0;
 
     if (_removalWardBlocks()) {
@@ -137,7 +149,7 @@ function _applyRowErasureDownside(eraseCount, preFilledSet) {
 
 // Shared helper: applies a column-erasure downside, with ward check.
 // Returns the number of columns actually erased.
-function _applyColErasureDownside(eraseCount, preFilledSet) {
+export function _applyColErasureDownside(eraseCount, preFilledSet) {
     if (eraseCount <= 0) return 0;
 
     if (_removalWardBlocks()) {
@@ -152,7 +164,7 @@ function _applyColErasureDownside(eraseCount, preFilledSet) {
 // Convenience wrapper combining duration scaling + blackout application.
 // Used by cursed items whose downside is a clue blackout (cursedTime,
 // cursedShield, cursedRowCol) so each handler doesn't repeat the pair.
-function _resolveCursedBlackoutDownside(baseMs, blackoutRows, blackoutCols) {
+export function _resolveCursedBlackoutDownside(baseMs, blackoutRows, blackoutCols) {
     const dur = _cursedDownsideDuration(baseMs);
     _applyBlackoutDownside(dur, blackoutRows, blackoutCols);
 }
@@ -160,7 +172,7 @@ function _resolveCursedBlackoutDownside(baseMs, blackoutRows, blackoutCols) {
 
 // Convenience wrapper combining count scaling + row-erasure application.
 // Used by cursedRowSolve. Returns the number of rows erased.
-function _resolveCursedRowErasureDownside(baseCount, preFilledSet) {
+export function _resolveCursedRowErasureDownside(baseCount, preFilledSet) {
     const eraseCount = _cursedDownsideCount(baseCount);
     return _applyRowErasureDownside(eraseCount, preFilledSet);
 }
@@ -168,7 +180,7 @@ function _resolveCursedRowErasureDownside(baseCount, preFilledSet) {
 
 // Convenience wrapper combining count scaling + col-erasure application.
 // Used by cursedColSolve. Returns the number of columns erased.
-function _resolveCursedColErasureDownside(baseCount, preFilledSet) {
+export function _resolveCursedColErasureDownside(baseCount, preFilledSet) {
     const eraseCount = _cursedDownsideCount(baseCount);
     return _applyColErasureDownside(eraseCount, preFilledSet);
 }

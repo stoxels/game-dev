@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE STACK (boss_stack)--------------------------
 //------------------------------------------------------------------------
 // A rework of the old one-shot Block Fall into a persistent construction
@@ -70,64 +79,64 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Construction tuning ──────────────────────────────────────────────────
-const EG_STK_CELL = 46;                       // tetromino cell px
+export const EG_STK_CELL = 46;                       // tetromino cell px
 // The Core Stack (boss body)
-const EG_STK_DRIFT_SPEED = [0, 22, 32, 44];   // px/s per phase
-const EG_STK_DRIFT_REPICK_MS = 5400;
-const EG_STK_SLAM_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the core
-const EG_STK_SLAM_CD_MS = 1000;
-const EG_STK_SLAM_FLING = [0, 135, 160, 185];
+export const EG_STK_DRIFT_SPEED = [0, 22, 32, 44];   // px/s per phase
+export const EG_STK_DRIFT_REPICK_MS = 5400;
+export const EG_STK_SLAM_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the core
+export const EG_STK_SLAM_CD_MS = 1000;
+export const EG_STK_SLAM_FLING = [0, 135, 160, 185];
 // Soft drop (persistent cadence)
-const EG_STK_SOFT_EVERY_MS = [0, 5200, 4300, 3400];
-const EG_STK_PIECE_FALL = 300;                // px/s soft-drop fall speed
-const EG_STK_LAND_R = 84;                     // landing burst radius
-const EG_STK_LAND_DMG = 0.06;                 // %maxHP landing burst
-const EG_STK_FLOOR_DMG = 0.045;               // %maxHP touching floor terrain
-const EG_STK_FLOOR_TTL = 3000;                // floor terrain lifetime
+export const EG_STK_SOFT_EVERY_MS = [0, 5200, 4300, 3400];
+export const EG_STK_PIECE_FALL = 300;                // px/s soft-drop fall speed
+export const EG_STK_LAND_R = 84;                     // landing burst radius
+export const EG_STK_LAND_DMG = 0.06;                 // %maxHP landing burst
+export const EG_STK_FLOOR_DMG = 0.045;               // %maxHP touching floor terrain
+export const EG_STK_FLOOR_TTL = 3000;                // floor terrain lifetime
 // Hard Drop (60% gate)
-const EG_STK_HD_N = 3;                        // sequential giant pieces
-const EG_STK_HD_WARN_MS = 900;
-const EG_STK_HD_FALL = 520;                   // px/s - much faster than soft
-const EG_STK_HD_SHOCK_R = 175;                // landing shockwave radius
-const EG_STK_HD_DMG = [0, 0.13, 0.15, 0.18];
-const EG_STK_HD_FLING = [0, 160, 185, 210];
-const EG_STK_HD_GAP_MS = 1500;
-const EG_STK_HD_FLOOR_TTL = 2400;
+export const EG_STK_HD_N = 3;                        // sequential giant pieces
+export const EG_STK_HD_WARN_MS = 900;
+export const EG_STK_HD_FALL = 520;                   // px/s - much faster than soft
+export const EG_STK_HD_SHOCK_R = 175;                // landing shockwave radius
+export const EG_STK_HD_DMG = [0, 0.13, 0.15, 0.18];
+export const EG_STK_HD_FLING = [0, 160, 185, 210];
+export const EG_STK_HD_GAP_MS = 1500;
+export const EG_STK_HD_FLOOR_TTL = 2400;
 // Line Clear (30% gate)
-const EG_STK_LC_ROWS = 4;
-const EG_STK_LC_ROW_H = 66;
-const EG_STK_LC_WARN_MS = 1000;
-const EG_STK_LC_DET_MS = 260;                 // detonation flash window
-const EG_STK_LC_DMG = [0, 0.14, 0.16, 0.19];
-const EG_STK_LC_GAP_MS = 1350;
+export const EG_STK_LC_ROWS = 4;
+export const EG_STK_LC_ROW_H = 66;
+export const EG_STK_LC_WARN_MS = 1000;
+export const EG_STK_LC_DET_MS = 260;                 // detonation flash window
+export const EG_STK_LC_DMG = [0, 0.14, 0.16, 0.19];
+export const EG_STK_LC_GAP_MS = 1350;
 // Garbage Rise (charge attack)
-const EG_STK_GR_RISE_MS = 2800;               // bottom → flood height
-const EG_STK_GR_HOLD_MS = 1700;
-const EG_STK_GR_SINK_MS = 1100;
-const EG_STK_GR_FLOOD = 0.55;                 // fraction of screen height
-const EG_STK_GR_TOP_CAP = 0.16;               // never rise above this fraction
-const EG_STK_GR_DMG = [0, 0.08, 0.10, 0.12];  // per grind tick
-const EG_STK_GR_TICK_MS = 700;
-const EG_STK_GR_FLING_UP = [0, 210, 235, 260];
+export const EG_STK_GR_RISE_MS = 2800;               // bottom → flood height
+export const EG_STK_GR_HOLD_MS = 1700;
+export const EG_STK_GR_SINK_MS = 1100;
+export const EG_STK_GR_FLOOD = 0.55;                 // fraction of screen height
+export const EG_STK_GR_TOP_CAP = 0.16;               // never rise above this fraction
+export const EG_STK_GR_DMG = [0, 0.08, 0.10, 0.12];  // per grind tick
+export const EG_STK_GR_TICK_MS = 700;
+export const EG_STK_GR_FLING_UP = [0, 210, 235, 260];
 
 
 // Tetromino palette (classic 7).
-const EG_STK_COLORS = ['#22d3ee', '#3b82f6', '#f97316', '#facc15', '#22c55e', '#a855f7', '#ef4444'];
+export const EG_STK_COLORS = ['#22d3ee', '#3b82f6', '#f97316', '#facc15', '#22c55e', '#a855f7', '#ef4444'];
 
 
-let _egStackWatcher = null; // per-fight build-site state
+export let _egStackWatcher = null; // per-fight build-site state
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
-function _egStkPhase(st) {
+export function _egStkPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
-        const m = _egMonsters.find(x => x && x.id === st.monsterId);
+        const m = globalThis._egMonsters.find(x => x && x.id === st.monsterId);
         if (m) return Math.max(1, Math.min(3, Number(m.bossPhase) || 1));
     }
     return 1;
 }
 
 // Removes every construction overlay (registered in boss-framework teardown).
-function _egStackTeardown() {
+export function _egStackTeardown() {
     if (_egStackWatcher) {
         const st = _egStackWatcher;
         _egStackWatcher = null;
@@ -143,13 +152,13 @@ function _egStackTeardown() {
 }
 
 // Removes a piece's cell elements.
-function _egStkRemoveCells(piece) {
+export function _egStkRemoveCells(piece) {
     (piece.cells || []).forEach(cl => { try { if (cl.el) cl.el.remove(); } catch (e) {} });
 }
 
 
 // ── Persistent arena: the core, the drops, the terrain ──────────────────
-function _egStackArenaInit(monster) {
+export function _egStackArenaInit(monster) {
     if (_egStackWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -194,7 +203,7 @@ function _egStackArenaInit(monster) {
 
     _egNkLoop(run, (dtS, now) => {
         if (_egStackWatcher !== st) return false;
-        const live = _egMonsters ? _egMonsters.find(m => m.id === st.monsterId) : null;
+        const live = globalThis._egMonsters ? globalThis._egMonsters.find(m => m.id === st.monsterId) : null;
         if (!live) return false;
         const W = window.innerWidth, H = window.innerHeight;
         const c = _egNkPlayerCenter();
@@ -423,7 +432,7 @@ function _egStackArenaInit(monster) {
 
 
 // Positions the core's cells under its container transform.
-function _egStkPlaceCore(st) {
+export function _egStkPlaceCore(st) {
     st.core.cells.forEach(cl => {
         cl.el.style.transform = 'translate(' + Math.round(st.core.x + cl.dx) + 'px,' + Math.round(st.core.y + cl.dy) + 'px)';
     });
@@ -431,13 +440,13 @@ function _egStkPlaceCore(st) {
 
 
 // Circle-vs-core-cells hit test (uses player rect).
-function _egStkCoreHit(st, pr) {
+export function _egStkCoreHit(st, pr) {
     return _egStkCellsHit(st.core.cells, st.core.x, st.core.y, pr);
 }
 
 
 // Generic cell-grid vs player-rect hit test.
-function _egStkCellsHit(cells, ox, oy, pr) {
+export function _egStkCellsHit(cells, ox, oy, pr) {
     if (!pr) return false;
     return cells.some(cl => {
         const x = ox + cl.dx, y = oy + cl.dy;
@@ -446,13 +455,13 @@ function _egStkCellsHit(cells, ox, oy, pr) {
 }
 
 
-function _egStkPieceHit(pc, pr) {
+export function _egStkPieceHit(pc, pr) {
     return _egStkCellsHit(pc.cells, pc.x, pc.y, pr);
 }
 
 
 // Queues a warn column; when it elapses, a piece spawns at the top.
-function _egStkQueuePiece(st, W, giantOverride, shock) {
+export function _egStkQueuePiece(st, W, giantOverride, shock) {
     const giant = !!giantOverride;
     const pw = giant ? EG_STK_CELL * 4 : EG_STK_CELL * 2;
     const x = 30 + Math.random() * Math.max(60, W - pw - 60);
@@ -464,7 +473,7 @@ function _egStkQueuePiece(st, W, giantOverride, shock) {
 
 
 // Builds a piece (soft = 2×2 O or 3-wide I; giant = 4-wide I or 2×2 O).
-function _egStkMakePiece(st, x, giant, shock) {
+export function _egStkMakePiece(st, x, giant, shock) {
     const color = EG_STK_COLORS[Math.floor(Math.random() * EG_STK_COLORS.length)];
     let shape;
     if (giant) shape = Math.random() < 0.5 ? [[0, 0], [1, 0], [2, 0], [3, 0]] : [[0, 0], [1, 0], [0, 1], [1, 1]];
@@ -487,7 +496,7 @@ function _egStkMakePiece(st, x, giant, shock) {
 
 
 // Landing: dust burst (+ optional shockwave) and floor terrain.
-function _egStkLand(st, pc, pr, p) {
+export function _egStkLand(st, pc, pr, p) {
     const x = pc.x + EG_STK_CELL * (pc.giant ? 2 : 1);
     const y = pc.floorY + EG_STK_CELL;
     if (pc.shock) {
@@ -522,7 +531,7 @@ function _egStkLand(st, pc, pr, p) {
 
 
 // Ghost preview for the hard-drop gate.
-function _egStkGhost(st, x, type) {
+export function _egStkGhost(st, x, type) {
     const el = _egNkEl(st.run, 'div', 'eg-stk-warn giant ghost');
     el.style.left = Math.round(x) + 'px';
     el.style.width = Math.round(EG_STK_CELL * 4) + 'px';
@@ -531,7 +540,7 @@ function _egStkGhost(st, x, type) {
 
 
 // ── 60% gate: Hard Drop ──────────────────────────────────────────────────
-function _egStkHardDrop(st, live) {
+export function _egStkHardDrop(st, live) {
     if (st.hard) return;
     const c = _egNkPlayerCenter();
     const W = window.innerWidth;
@@ -543,7 +552,7 @@ function _egStkHardDrop(st, live) {
 
 
 // ── 30% gate: Line Clear ─────────────────────────────────────────────────
-function _egStkLineClear(st, live) {
+export function _egStkLineClear(st, live) {
     if (st.lineClear) return;
     st.lineClear = { t: 0 };
     st.lcTimer = 0;
@@ -553,7 +562,7 @@ function _egStkLineClear(st, live) {
 }
 
 
-function _egStkQueueRow(st, W, H) {
+export function _egStkQueueRow(st, W, H) {
     const y = 90 + Math.random() * Math.max(80, H - 260);
     const el = _egNkEl(st.run, 'div', 'eg-stk-row');
     el.style.left = '0px';
@@ -566,7 +575,7 @@ function _egStkQueueRow(st, W, H) {
 
 
 // ── Charge attack: Garbage Rise ──────────────────────────────────────────
-function _egStackGarbage(monster) {
+export function _egStackGarbage(monster) {
     const st = _egStackWatcher;
     if (!st || st.garbage || _egNkDodgeBusy() || _egNkFrozen()) return;
     const H = window.innerHeight;
@@ -593,4 +602,4 @@ function _egStackGarbage(monster) {
 // The old scheduled mechanic is now the persistent soft-drop cadence -
 // keep the handler name alive so any stale schedule entry no-ops instead
 // of erroring.
-function _egMechBlockFall(monster, phase) { void monster; void phase; }
+export function _egMechBlockFall(monster, phase) { void monster; void phase; }

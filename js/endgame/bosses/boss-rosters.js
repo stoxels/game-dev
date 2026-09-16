@@ -1,4 +1,10 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egValidateAllBossHandlers } from './boss-framework.js';
+//------------------------------------------------------------------------
 //-------------------ATLAS BOSS ROSTER (86 regions → 86 bosses)------------
 //------------------------------------------------------------------------
 // One specific boss per atlas region - no random rolls. Region ids are
@@ -15,7 +21,7 @@
 // egAtlasChainBlueprint), so the atlas never breaks.
 //------------------------------------------------------------------------
 
-const EG_ATLAS_REGION_BOSSES = {
+export const EG_ATLAS_REGION_BOSSES = {
     // ── Tier 1 - first steps (simple, forgiving) ──
     'atlas_t1_0': 'boss_ember',
     'atlas_t1_1': 'boss_snail',
@@ -119,8 +125,16 @@ const EG_ATLAS_REGION_BOSSES = {
     'atlas_t16_2': 'boss_voidborn',
     'atlas_t16_3': 'boss_zenith',
 };
-
 // This is the last boss file to load - validate every mechanic handler
 // name once so a typo surfaces at boot (console warning) instead of
-// silently disabling a mechanic mid-fight.
-if (typeof _egValidateAllBossHandlers === 'function') _egValidateAllBossHandlers();
+// silently disabling a mechanic mid-fight. Deferred to DOMContentLoaded:
+// at module-eval time the entry's globalThis shims do not exist yet, so
+// window[handler] would spuriously miss every bridged handler.
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof _egValidateAllBossHandlers === 'function') _egValidateAllBossHandlers();
+    });
+} else if (typeof _egValidateAllBossHandlers === 'function') {
+    _egValidateAllBossHandlers();
+}
+

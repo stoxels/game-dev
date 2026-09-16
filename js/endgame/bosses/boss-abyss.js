@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE ABYSS (boss_abyss)-------------------------------
 //------------------------------------------------------------------------
 // Delve-darkness homage: the screen drowns in darkness and only a circle of
@@ -38,7 +46,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechAbyssDark(monster, phase) {
+export function _egMechAbyssDark(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const r0 = 280, r1 = 100;

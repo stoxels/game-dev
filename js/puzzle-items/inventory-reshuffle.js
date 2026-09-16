@@ -1,12 +1,25 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { save } from '../state.js';
+import { t } from '../translation/translations.js';
+import { buildInventoryPanel } from './inventory-panel.js';
+import { ITEM_DEFS } from './item-definitions.js';
+import { itemDesc, itemName, pickLuckyItem, rarityColors } from './item-pool.js';
+import { showToast } from './toasts-and-popups.js';
+
+//------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE---------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-let reshuffleCount = 0;             // tracks discarded items toward the reshuffle goal
-const RESHUFFLE_GOAL = 3;           // discards needed to trigger the reshuffle reward modal
-const RESHUFFLE_PICK_COUNT = 3;     // how many item choices are offered in the modal
-const RESHUFFLE_MAX_ATTEMPTS = 50;  // max loop iterations when picking distinct reward items
+export let reshuffleCount = 0;             // tracks discarded items toward the reshuffle goal
+export const RESHUFFLE_GOAL = 3;           // discards needed to trigger the reshuffle reward modal
+export const RESHUFFLE_PICK_COUNT = 3;     // how many item choices are offered in the modal
+export const RESHUFFLE_MAX_ATTEMPTS = 50;  // max loop iterations when picking distinct reward items
 
 
 
@@ -20,7 +33,7 @@ const RESHUFFLE_MAX_ATTEMPTS = 50;  // max loop iterations when picking distinct
 // Called by buildInventoryPanel() and whenever reshuffleCount changes.
 // Updates BOTH renderings: the label-block counter and the small-screen
 // mini chip inside the floating inventory dock.
-function updateReshuffleCounter() {
+export function updateReshuffleCounter() {
     const txt = `♻ ${reshuffleCount}/${RESHUFFLE_GOAL}`;
     const el = document.getElementById('reshuffle-counter');
     if (el) el.textContent = txt;
@@ -38,11 +51,11 @@ function updateReshuffleCounter() {
 
 // Removes the item with the given uid from inventory.
 // Returns the item definition, or null if the uid was not found.
-function removeItemFromInventory(uid) {
-    const idx = STATE.inventory.findIndex(i => i.uid === uid);
+export function removeItemFromInventory(uid) {
+    const idx = globalThis.STATE.inventory.findIndex(i => i.uid === uid);
     if (idx < 0) return null;
-    const def = ITEM_DEFS[STATE.inventory[idx].defId];
-    STATE.inventory.splice(idx, 1);
+    const def = ITEM_DEFS[globalThis.STATE.inventory[idx].defId];
+    globalThis.STATE.inventory.splice(idx, 1);
     return def;
 }
 
@@ -57,7 +70,7 @@ function removeItemFromInventory(uid) {
 // Picks RESHUFFLE_PICK_COUNT distinct random item definitions for the reward modal.
 // Uses the existing weighted pool (with artifact chance) via pickLuckyItem().
 // Returns an array of item definition objects.
-function pickReshuffleRewardItems() {
+export function pickReshuffleRewardItems() {
     const picks = [];
     const usedIds = new Set();
     let attempts = 0;
@@ -77,7 +90,7 @@ function pickReshuffleRewardItems() {
 // Builds the HTML string for a single reward card shown in the reshuffle modal.
 // The card is a parchment "stone card" mirroring .tut-section (How-To-Play modal);
 // its 2px border is tinted with the item's rarity color for a rarity glance-read.
-function buildReshuffleCardHtml(def) {
+export function buildReshuffleCardHtml(def) {
     const rarity = rarityColors(def.rarity);
     return `
         <button type="button" class="rshuffle-card" data-id="${def.id}" style="border-color:${rarity.border}">
@@ -92,7 +105,7 @@ function buildReshuffleCardHtml(def) {
 // css/replay.css): .modal-bg backdrop + a stone frame box built from the
 // Settings assets (settings_background.png shell, settings_title_plague.png
 // title plaque overhanging the top edge, settings_close_button.png stone X).
-function buildReshuffleModalElement(picks) {
+export function buildReshuffleModalElement(picks) {
     const cardsHtml = picks.map(buildReshuffleCardHtml).join('');
 
     const modal = document.createElement('div');
@@ -113,10 +126,10 @@ function buildReshuffleModalElement(picks) {
 }
 
 // Adds the chosen item to the player's inventory, saves, refreshes the UI, and closes the modal.
-function applyReshuffleChoice(chosenId, modal) {
+export function applyReshuffleChoice(chosenId, modal) {
     const chosenDef = ITEM_DEFS[chosenId];
 
-    STATE.inventory.push({
+    globalThis.STATE.inventory.push({
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
         defId: chosenId
     });
@@ -128,7 +141,7 @@ function applyReshuffleChoice(chosenId, modal) {
 }
 
 // Attaches a click handler to each reward card in the modal.
-function attachReshuffleCardHandlers(modal) {
+export function attachReshuffleCardHandlers(modal) {
     modal.querySelectorAll('.rshuffle-card').forEach(card => {
         card.addEventListener('click', () => applyReshuffleChoice(card.dataset.id, modal));
     });
@@ -144,7 +157,7 @@ function attachReshuffleCardHandlers(modal) {
 
 // Opens the reshuffle reward modal, offering the player a choice of random items.
 // Called automatically when the discard count reaches RESHUFFLE_GOAL.
-function openReshuffleModal() {
+export function openReshuffleModal() {
     const picks = pickReshuffleRewardItems();
     const modal = buildReshuffleModalElement(picks);
     document.body.appendChild(modal);
@@ -154,7 +167,7 @@ function openReshuffleModal() {
 // Checks if the reshuffle goal has been reached after an increment.
 // If so, resets the counter and opens the reward modal after a short delay
 // so the discard toast has time to render before the modal appears.
-function checkReshuffleGoalReached() {
+export function checkReshuffleGoalReached() {
     if (reshuffleCount < RESHUFFLE_GOAL) return;
     reshuffleCount = 0;
     updateReshuffleCounter();
@@ -174,7 +187,7 @@ function checkReshuffleGoalReached() {
 // then checks if the reshuffle goal has been reached.
 // NOTE: reshuffleCount is incremented BEFORE buildInventoryPanel() and
 // the toast so that both the badge and the toast display the same updated value.
-function reshuffleRightClickItem(uid) {
+export function reshuffleRightClickItem(uid) {
     const def = removeItemFromInventory(uid);
     if (!def) return;
 

@@ -1,25 +1,41 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { _updateMistakeCounterHUD } from '../penalty.js';
+import { questStat_mistakesRemoved } from '../quests/quests-stats.js';
+import { _trackTimerDelta, updTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _calcMistakeEraserCount } from './shared/effect-modifiers.js';
+import { MISTAKE_ERASER_SFX, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
+import { showToast } from './toasts-and-popups.js';
+
+//------------------------------------------------------------------------
 //-------------------MISTAKE ERASER - TUTOR / PROFESSOR / SCHOLAR / GRAND MENTOR----------------------
 //------------------------------------------------------------------------
 
 // mistakeEraser / mistakeEraser4 / mistakeEraser6 / mistakeEraserAll -
 // reduces the current mistake count, optionally granting bonus time via
 // the Time Well Spent passive.
-function _useMistakeEraser(id, def) {
-    if (mistakeCount === 0) {
+export function _useMistakeEraser(id, def) {
+    if (globalThis.mistakeCount === 0) {
         showToast(t('item_mistake_erased_none'));
         return null;
     }
 
     const isEraseAll = id === 'mistakeEraserAll';
-    const baseCount = isEraseAll ? mistakeCount : (parseInt(id.replace('mistakeEraser', '')) || 2);
+    const baseCount = isEraseAll ? globalThis.mistakeCount : (parseInt(id.replace('mistakeEraser', '')) || 2);
     const reduceBy = _calcMistakeEraserCount(baseCount, isEraseAll);
 
-    const before = mistakeCount;
-    mistakeCount = Math.max(0, mistakeCount - reduceBy);
+    const before = globalThis.mistakeCount;
+    globalThis.mistakeCount = Math.max(0, globalThis.mistakeCount - reduceBy);
     playItemEffect(id);
-    const removed = before - mistakeCount;
-    _levelMistakesErased += removed;
+    const removed = before - globalThis.mistakeCount;
+    globalThis._levelMistakesErased += removed;
 
     if (removed > 0) questStat_mistakesRemoved(removed);
 
@@ -29,9 +45,9 @@ function _useMistakeEraser(id, def) {
         if (ptHasSkill('time_well_spent_2')) bonusSecs = 60;
         if (ptHasSkill('time_well_spent_3')) bonusSecs = 90;
         if (bonusSecs > 0) {
-            const before2 = timerSecs;
-            timerSecs += bonusSecs * removed;
-            _trackTimerDelta(before2, timerSecs);
+            const before2 = globalThis.timerSecs;
+            globalThis.timerSecs += bonusSecs * removed;
+            _trackTimerDelta(before2, globalThis.timerSecs);
             updTimer();
         }
     }
@@ -42,7 +58,7 @@ function _useMistakeEraser(id, def) {
     if (typeof _updateMistakeCounterHUD === 'function') {
         _updateMistakeCounterHUD();
     } else {
-        _setMistakeCounterText();
+        globalThis._setMistakeCounterText();
     }
 
     return removed > 0
@@ -55,7 +71,7 @@ function _useMistakeEraser(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the three diagonal chalk smear divs.
-function _fxMakeChalkSmears(container, r) {
+export function _fxMakeChalkSmears(container, r) {
     for (let i = 0; i < 3; i++) {
         const smear = document.createElement('div');
         smear.className = 'fx-chalk-smear';
@@ -71,7 +87,7 @@ function _fxMakeChalkSmears(container, r) {
 
 // 🎓 Mistake Eraser - chalk dust smears clear mistakes from the board.
 // Variant-specific SFX is chosen via MISTAKE_ERASER_SFX lookup.
-function _fxMistakeEraser(defId) {
+export function _fxMistakeEraser(defId) {
     Audio_Manager.playSFX(MISTAKE_ERASER_SFX[defId] || 'tutor');
 
     const r = _fxGetPuzzleRect();

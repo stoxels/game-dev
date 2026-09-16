@@ -1,4 +1,25 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { LANG, t } from '../translation/translations.js';
+import { EG_ART } from './endgame-art.js';
+import { EG_ATLAS_MAX_TIER, _egAtlasResolveNodeForMap, egAtlasAdjacentBonusChance, egAtlasAdjacentBonusPercent, egAtlasChainBlueprintForMap, egAtlasDropNodeIds, egAtlasIsCompleted, egAtlasNodeById, egAtlasNodeName, egAtlasPickAdjacentBonusNodeId, egAtlasPickDropNodeId, egAtlasPickNodeIdForTier, egAtlasTierDifficulty } from './endgame-atlas.js';
+import { _egGetElementCentre } from './endgame-class-projectiles.js';
+import { EG_CURRENCY_DEFS, _egRerollItemModValues } from './endgame-currency.js';
+import { EG_MOD_CAPS, _egRollModCounts, _egRollRarity } from './endgame-equipment-generator.js';
+import { EG_ESSENCE_DEFS, _EG_ESSENCE_FAMILIES } from './endgame-essences.js';
+import { _egRenderMapStashCell, _egUpdateMapStashTabCounts } from './endgame-gate.js';
+import { EG_LOOT_DROP_LIFETIME_MS, _egAnimatePickupDiscard, _egBuildPickupEligiblePool, _egCancelTrackedExpiry, _egCellHasAnyDrop, _egRarityToastColor, _egScheduleTrackedExpiry, _egStartDropExpireCountdown } from './endgame-grid-pickups.js';
+import { EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_COUNT, _egFindFreeMapCellForTier, _egGetMapTierGrid, _egIsTieredMapStash, _egMapStash, _egRebuildMapStashGrid, egSaveHubState } from './endgame-hub.js';
+import { EG_MAP_BASE_BOSS_CHANCE, _egActiveMapItem, _egMapLootQuantityMult } from './endgame-map-launch.js';
+import { _egBuildItemName, _egBuildModPool, _egBuildRolledStats, _egPickModFromPool, _egPickTier, _egRollMods } from './endgame-mod-application.js';
+import { _egBuildMergedModLines } from './endgame-player-stats.js';
+import { _egIsActive } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------ENDGAME MAP ITEMS (PoE-STYLE)------------------------
 //------------------------------------------------------------------------
 // Rollable map items that drop from monsters and are played through the
@@ -25,11 +46,11 @@
 //-------------------CONFIGURATION----------------------------------------
 //------------------------------------------------------------------------
 
-const EG_MAP_DROP_CHANCE_NORMAL = 0.055;  // 5.5% per normal monster kill (scaled by Quantity bonus while on a map) - buffed +10%
-const EG_MAP_DROP_CHANCE_BOSS = 0.44;    // 44% per boss kill (also scaled by Quantity; boss always drops at least one map) - buffed +10%
+export const EG_MAP_DROP_CHANCE_NORMAL = 0.055;  // 5.5% per normal monster kill (scaled by Quantity bonus while on a map) - buffed +10%
+export const EG_MAP_DROP_CHANCE_BOSS = 0.44;    // 44% per boss kill (also scaled by Quantity; boss always drops at least one map) - buffed +10%
 
 // Highest possible map tier (cap for tier upgrades via the Orb of Horizons).
-const EG_MAX_MAP_TIER = 16;
+export const EG_MAX_MAP_TIER = 16;
 
 // Base run objectives per tier. T16 is the ceiling: at most 6 puzzles and
 // 4 questions. Lower tiers ramp down smoothly in four bands so early maps
@@ -40,11 +61,11 @@ const EG_MAX_MAP_TIER = 16;
 // on top of these bases and can push beyond the cap (clamp 20). Tiers above
 // EG_MAX_MAP_TIER only exist on the testing screen, which hardcodes its own
 // counts and ignores these helpers.
-function egMapBasePuzzlesForTier(tier) {
+export function egMapBasePuzzlesForTier(tier) {
     const t = Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.round(tier || 1))); 
     return Math.max(1, Math.min(6, 2 + Math.floor((t - 1) * 4 / 15))); 
 }
-function egMapBaseQuestionsForTier(tier) {
+export function egMapBaseQuestionsForTier(tier) {
     const t = Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.round(tier || 1))); 
     return Math.max(1, Math.min(4, 1 + Math.floor((t - 1) * 3 / 15))); 
 }
@@ -59,7 +80,7 @@ function egMapBaseQuestionsForTier(tier) {
 // ceiling unchanged, since T16 objectives did not change). The time cost of
 // one puzzle stays ~2.5 min at every tier, so difficulty grows only through
 // objective count and monster density.
-function egMapBaseDurationForTier(tier) {
+export function egMapBaseDurationForTier(tier) {
     const t = Math.max(1, Math.min(EG_MAX_MAP_TIER, Math.round(tier || 1))); 
     return 300 + t * 30 + egMapBasePuzzlesForTier(t) * 150 + egMapBaseQuestionsForTier(t) * 30; 
 }
@@ -68,7 +89,7 @@ function egMapBaseDurationForTier(tier) {
 // allowed mistake per objective, so the per-puzzle forgiveness stays constant
 // while the absolute budget grows with the ramp (T1: 6, T16: 10 - ceiling
 // unchanged). The map_fewer_mistakes modifier applies on top (min 3).
-function egMapBaseMistakesForTier(tier) {
+export function egMapBaseMistakesForTier(tier) {
     return 4 + egMapBasePuzzlesForTier(tier); 
 }
 
@@ -83,16 +104,16 @@ function egMapBaseMistakesForTier(tier) {
 // the late 90s (the XP safe band at pl 100 still reaches monster level ~91).
 // Tiers beyond EG_MAX_MAP_TIER only exist on the test screen; they extend
 // gently and clamp at EG_ENDGAME_MONSTER_LEVEL_CAP.
-const EG_MAP_TIER_MONSTER_LEVELS = [
+export const EG_MAP_TIER_MONSTER_LEVELS = [
     /* T1 */ 68, /* T2 */ 69, /* T3 */ 71, /* T4 */ 72,
     /* T5 */ 74, /* T6 */ 75, /* T7 */ 77, /* T8 */ 78,
     /* T9 */ 80, /* T10 */ 81, /* T11 */ 83, /* T12 */ 84,
     /* T13 */ 86, /* T14 */ 87, /* T15 */ 89, /* T16 */ 90,
 ];
-const EG_ENDGAME_MONSTER_LEVEL_CAP = 95;
+export const EG_ENDGAME_MONSTER_LEVEL_CAP = 95;
 
 // Monster level for a given map tier (curve lookup + gentle extension).
-function _egMapTierMonsterLevel(tier) {
+export function _egMapTierMonsterLevel(tier) {
     const t = Math.max(1, Math.round(tier || 1));
     if (t <= EG_MAP_TIER_MONSTER_LEVELS.length) {
         return EG_MAP_TIER_MONSTER_LEVELS[t - 1];
@@ -104,7 +125,7 @@ function _egMapTierMonsterLevel(tier) {
 
 // Map tier is derived from the monster level of the killing blow context:
 // the lowest tier whose curve value covers the monster level.
-function _egRollMapTier(monsterLevel) {
+export function _egRollMapTier(monsterLevel) {
     const mLvl = Math.max(1, Math.round(monsterLevel || 1));
     for (let t = 0; t < EG_MAP_TIER_MONSTER_LEVELS.length; t++) {
         if (mLvl <= EG_MAP_TIER_MONSTER_LEVELS[t]) return t + 1;
@@ -114,7 +135,7 @@ function _egRollMapTier(monsterLevel) {
 
 // Map base names grouped by tier band. The band containing the rolled tier
 // is chosen at random from all bands that cover it.
-const EG_MAP_BASE_NAMES = [
+export const EG_MAP_BASE_NAMES = [
     { minTier: 1, maxTier: 4, name: 'Gaussian Grasslands', nameDe: 'Gaußsche Graslande' },
     { minTier: 1, maxTier: 4, name: 'Variance Valley', nameDe: 'Varianztal' },
     { minTier: 1, maxTier: 4, name: 'Frequency Fields', nameDe: 'Frequenzfelder' },
@@ -132,7 +153,7 @@ const EG_MAP_BASE_NAMES = [
     { minTier: 14, maxTier: 16, name: 'Vortex of Possibilities: Overload', nameDe: 'Wirbel der Möglichkeiten: Überladung' },
 ];
 
-function _egPickMapBaseName(mapTier) {
+export function _egPickMapBaseName(mapTier) {
     const bands = EG_MAP_BASE_NAMES.filter(b => mapTier >= b.minTier && mapTier <= b.maxTier);
     const band = bands.length > 0
         ? bands[Math.floor(Math.random() * bands.length)]
@@ -148,7 +169,7 @@ function _egPickMapBaseName(mapTier) {
 // `affects` tag per family: 'player' | 'monster' | 'puzzle'.
 // T1 = best/highest roll. 'weight' higher = more common. 'ilvl' gates tiers.
 
-const EG_MAP_MOD_TABLES = {
+export const EG_MAP_MOD_TABLES = {
 
     prefixes: {
 
@@ -828,7 +849,7 @@ const EG_MAP_MOD_TABLES = {
 };
 
 // Resolves the `affects` category of a rolled map mod.
-function _egMapModAffects(familyId) {
+export function _egMapModAffects(familyId) {
     const fam = EG_MAP_MOD_TABLES.prefixes[familyId] || EG_MAP_MOD_TABLES.suffixes[familyId];
     return fam ? fam.affects : 'monster';
 }
@@ -844,7 +865,7 @@ function _egMapModAffects(familyId) {
 // Values are indexed by (tier - 1); T1 = strongest roll. More dangerous
 // maps are therefore always strictly more rewarding, PoE-style.
 
-const EG_MAP_MOD_REWARDS = {
+export const EG_MAP_MOD_REWARDS = {
     // ── Monster-strengthening ────────────────────────────────────
     map_monster_life:        { xp: [20, 14, 8, 4], quantity: [15, 11, 5, 3], rarity: [11, 7, 4, 1] },
     map_monster_damage:      { xp: [20, 14, 8, 4], quantity: [15, 11, 5, 3], rarity: [11, 7, 4, 1] },
@@ -927,7 +948,7 @@ const EG_MAP_MOD_REWARDS = {
 };
 
 // Resolves the reward triple of one mod at a given tier.
-function _egGetMapModRewards(familyId, tier) {
+export function _egGetMapModRewards(familyId, tier) {
     const r = EG_MAP_MOD_REWARDS[familyId];
     if (!r) return { xp: 0, quantity: 0, rarity: 0 };
     const idx = Math.max(0, Math.min(r.xp.length - 1, (tier || 1) - 1));
@@ -935,7 +956,7 @@ function _egGetMapModRewards(familyId, tier) {
 }
 
 // Sums the reward bonuses of all mods on a map → { xp, quantity, rarity }.
-function _egGetMapRewardBonuses(map) {
+export function _egGetMapRewardBonuses(map) {
     const total = { xp: 0, quantity: 0, rarity: 0 };
     if (!map || !Array.isArray(map.mods)) return total;
     map.mods.forEach(mod => {
@@ -949,7 +970,7 @@ function _egGetMapRewardBonuses(map) {
 
 // Computes the expected gold reward range for completing a map.
 // Returns { min, max, avg } based on map tier and modifier load.
-function _egGetMapGoldRewardRange(map) {
+export function _egGetMapGoldRewardRange(map) {
     const tier = Math.max(1, map.mapTier || 1);
     const mods = Array.isArray(map.mods) ? map.mods : [];
     const tierFrac = (tier - 1) / 15; // EG_MAX_MAP_TIER - 1
@@ -975,7 +996,7 @@ function _egGetMapGoldRewardRange(map) {
 // is fixed per map item and shown in its tooltip. Higher tiers unlock the
 // rarer entries via `minTier`.
 
-const EG_MAP_COMPLETION_REWARD_POOL = [
+export const EG_MAP_COMPLETION_REWARD_POOL = [
     // ── Orbs ─────────────────────────────────────────────────────
     { id: 'orb_alteration', weight: 280 },
     { id: 'orb_scouring',   weight: 170 },
@@ -995,33 +1016,37 @@ const EG_MAP_COMPLETION_REWARD_POOL = [
 // Map completion essences - one entry per per-modifier essence so every targeted
 // essence family can appear as a map completion reward. Weight 5 keeps total
 // essence weight comparable to original legacy pool (≈93×5 = 465 vs old 500).
-const EG_MAP_COMPLETION_ESSENCE_POOL = (typeof _EG_ESSENCE_FAMILIES !== 'undefined'
-    ? _EG_ESSENCE_FAMILIES.map(fid => ({ id: 'essence_' + fid, weight: 5 }))
-    : []);
+// NOTE (module era): maps.js sits in an import cycle with essences.js (via
+// currency/equipment-generator/implicits/.../gate) and can be evaluated while
+// essences is still initializing, so the pool is hydrated lazily on first use
+// instead of at module-eval time (classic linear order always had essences
+// ready first; ES-module cycle order does not - typeof guards THROW there).
+export const EG_MAP_COMPLETION_ESSENCE_POOL = [];
+export function _egHydrateMapCompletionEssencePool() {
+    if (EG_MAP_COMPLETION_ESSENCE_POOL.length) return EG_MAP_COMPLETION_ESSENCE_POOL;
+    for (const fid of _EG_ESSENCE_FAMILIES) {
+        EG_MAP_COMPLETION_ESSENCE_POOL.push({ id: 'essence_' + fid, weight: 5 });
+    }
+    return EG_MAP_COMPLETION_ESSENCE_POOL;
+}
 
 // Combined pool used at roll time - orbs plus dynamically built essence entries.
 // Keep a static reference for backwards compat, but the live roll builds fresh
 // so new essences (e.g. essence_inc_health) automatically appear.
-const EG_MAP_COMPLETION_REWARD_POOL_STATIC = EG_MAP_COMPLETION_REWARD_POOL.slice();
-function _egGetMapCompletionRewardPool() {
+export const EG_MAP_COMPLETION_REWARD_POOL_STATIC = EG_MAP_COMPLETION_REWARD_POOL.slice();
+export function _egGetMapCompletionRewardPool() {
     const base = EG_MAP_COMPLETION_REWARD_POOL_STATIC.slice();
     const existingIds = new Set(base.map(e => e.id));
-    // Prefer live _EG_ESSENCE_FAMILIES if available (maps.js loads before essences.js)
-    if (typeof _EG_ESSENCE_FAMILIES !== 'undefined' && Array.isArray(_EG_ESSENCE_FAMILIES)) {
-        for (const fid of _EG_ESSENCE_FAMILIES) {
-            const id = 'essence_' + fid;
-            if (!existingIds.has(id)) { base.push({ id, weight: 5 }); existingIds.add(id); }
-        }
-    } else {
-        for (const e of EG_MAP_COMPLETION_ESSENCE_POOL) {
-            if (!existingIds.has(e.id)) base.push(e);
-        }
+    // Live essence families (lazy hydration: cycle-safe in the module era).
+    _egHydrateMapCompletionEssencePool();
+    for (const e of EG_MAP_COMPLETION_ESSENCE_POOL) {
+        if (!existingIds.has(e.id)) { base.push(e); existingIds.add(e.id); }
     }
     return base;
 }
 
 // Resolves a completion-reward def from either currency table.
-function _egGetCompletionRewardDef(id) {
+export function _egGetCompletionRewardDef(id) {
     return EG_CURRENCY_DEFS[id] || EG_ESSENCE_DEFS[id] || null;
 }
 
@@ -1029,7 +1054,7 @@ function _egGetCompletionRewardDef(id) {
 // with map difficulty: higher tiers and more/higher-tier modifiers yield
 // bigger payouts (≈2–3 for an easy low-tier map with few mods, up to 8–10
 // for a fully modded max-tier map).
-function _egRollMapCompletionReward(map) {
+export function _egRollMapCompletionReward(map) {
     const tier = Math.max(1, Math.min(EG_ATLAS_MAX_TIER, map.mapTier || 1));
     const mods = Array.isArray(map.mods) ? map.mods : [];
     const livePool = (typeof _egGetMapCompletionRewardPool === 'function') ? _egGetMapCompletionRewardPool() : EG_MAP_COMPLETION_REWARD_POOL;
@@ -1069,7 +1094,7 @@ function _egRollMapCompletionReward(map) {
 // Grid-size buckets (same thresholds as _gridSizeBucket in quests-stats.js).
 // Used by the run launcher to filter story puzzles and to steer the
 // generated-puzzle sizes.
-const EG_GRID_SIZE_BUCKETS = {
+export const EG_GRID_SIZE_BUCKETS = {
     small:   [1, 99],
     medium:  [100, 199],
     large:   [200, 399],
@@ -1080,7 +1105,7 @@ const EG_GRID_SIZE_BUCKETS = {
 // Higher tiers shift weight toward large/massive grids; a "% larger Puzzle
 // Grids" mod (largerPct) pushes the mix further up. The counts always sum
 // to the tier's base puzzle count.
-function _egRollMapSizeMix(tier, largerPct) {
+export function _egRollMapSizeMix(tier, largerPct) {
     const t = Math.max(1, tier || 1);
     const total = egMapBasePuzzlesForTier(t);
 
@@ -1125,7 +1150,7 @@ function _egRollMapSizeMix(tier, largerPct) {
 // _egCanLeaveMap in endgame-encounter-chain.js). The status is baked as an
 // immutable implicit so tooltips can state it definitively - orbs/mods
 // MUST NOT be able to remove it.
-function _egRollMapBossStatus(map) {
+export function _egRollMapBossStatus(map) {
     return { hasBoss: true, maxBosses: 1 };
 }
 
@@ -1134,12 +1159,12 @@ function _egRollMapBossStatus(map) {
 // uses (egAtlasChainBlueprintForMap), so a tooltip always names the boss
 // actually fought in the arena. Returns { id, name, emoji } or null when the
 // map has no atlas region / the boss def is unknown.
-function _egResolveMapBoss(mapItem) {
+export function _egResolveMapBoss(mapItem) {
     if (!mapItem || typeof egAtlasChainBlueprintForMap !== 'function') return null;
     try {
         const bp = egAtlasChainBlueprintForMap(mapItem);
         if (!bp || !bp.bossId) return null;
-        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? EG_BOSS_DEFS[bp.bossId] : null;
+        const def = (typeof EG_BOSS_DEFS !== 'undefined') ? globalThis.EG_BOSS_DEFS[bp.bossId] : null;
         if (!def) return null;
         return { id: bp.bossId, name: def.name || bp.bossId, emoji: def.emoji || '💀' };
     } catch (e) {
@@ -1147,7 +1172,7 @@ function _egResolveMapBoss(mapItem) {
     }
 }
 
-function _egRollMapImplicits(map) {
+export function _egRollMapImplicits(map) {
     const tier = Math.max(1, map.mapTier || 1);
     let puzzles = egMapBasePuzzlesForTier(tier);
     let questions = egMapBaseQuestionsForTier(tier);
@@ -1194,7 +1219,7 @@ function _egRollMapImplicits(map) {
 // map already carries `implicits.hasBoss`, preserve it so orbs cannot reroll
 // whether the map has a boss (only brand-new maps without implicits roll a
 // fresh boss value).
-function _egWithImplicits(map) {
+export function _egWithImplicits(map) {
     const prevImp = map.implicits;
     const prevHasBoss = prevImp != null ? prevImp.hasBoss : null;
     const prevMaxBosses = prevImp != null ? prevImp.maxBosses : null;
@@ -1220,7 +1245,7 @@ function _egWithImplicits(map) {
 // `opts.forceNormal` skips the rarity/mod rolls entirely and produces a
 // plain Normal (white) map with no modifiers - used for the vendor's free
 // starter map so a fresh character always gets an unmodified baseline run.
-function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) {
+export function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) {
     monsterLevel = Math.max(1, Math.round(monsterLevel || 1));
 
     // Forced atlas region (PoE-style drop rules): the drop code resolves
@@ -1335,7 +1360,7 @@ function _egGenerateMapDrop(monsterLevel = 1, tierOverride = null, opts = null) 
 // Returns a node id, or null when no device run is active / the atlas
 // module isn't loaded (callers then fall back to legacy tier rolling).
 // Boss kills favour the +1-tier climb regions (see egAtlasPickDropNodeId).
-function _egResolveAtlasDropTarget(isBoss) {
+export function _egResolveAtlasDropTarget(isBoss) {
     if (typeof _egActiveMapItem === 'undefined' || !_egActiveMapItem || !_egActiveMapItem.atlasNodeId) return null;
 
     if (typeof egAtlasPickDropNodeId === 'function') {
@@ -1349,14 +1374,14 @@ function _egResolveAtlasDropTarget(isBoss) {
 }
 
 // Rerolls ALL mods of a map at the given rarity/counts (orb support).
-function _egRerollMapMods(map, rarity, prefixCount, suffixCount) {
+export function _egRerollMapMods(map, rarity, prefixCount, suffixCount) {
     const mods = _egRollMods(prefixCount, suffixCount, EG_MAP_MOD_TABLES, map.itemLevel || map.monsterLevel || 1, null);
     const name = _egBuildItemName(map.baseName || map.name, rarity, mods);
     return _egWithImplicits({ ...map, rarity, mods, name });
 }
 
 // Adds ONE new mod (prefix or suffix, whichever has room) to a map.
-function _egAddOneModToMap(map, rarityForCaps) {
+export function _egAddOneModToMap(map, rarityForCaps) {
     const existing = map.mods || [];
     const chosenFamilyIds = new Set(existing.map(m => m.familyId));
     const prefixCount = existing.filter(m => m.type === 'prefix').length;
@@ -1385,7 +1410,7 @@ function _egAddOneModToMap(map, rarityForCaps) {
 }
 
 // Removes ONE random modifier from a map (Annulment semantics).
-function _egRemoveOneModFromMap(map) {
+export function _egRemoveOneModFromMap(map) {
     const existing = map.mods || [];
     if (existing.length === 0) return map;
     const index = Math.floor(Math.random() * existing.length);
@@ -1401,7 +1426,7 @@ function _egRemoveOneModFromMap(map) {
 // Mirrors the orb semantics from endgame-currency.js, but rolls from the
 // MAP modifier tables. Looked up by orb id when an orb is used on a map.
 
-const EG_MAP_CURRENCY_RULES = {
+export const EG_MAP_CURRENCY_RULES = {
     orb_transmutation: {
         canApply(map) { return map.rarity === 'common'; },
         apply(map) {
@@ -1550,28 +1575,28 @@ const EG_MAP_CURRENCY_RULES = {
 // Maps land on the grid when monsters die. Claiming a map drop banks it
 // directly into the Probability Gate map stash (_egMapStash).
 
-const _egMapDrops = new Map();          // "row-col" → map item
-let _egMapStashFullToastAt = 0;         // throttle for the stash-full toast
+export const _egMapDrops = new Map();          // "row-col" → map item
+export let _egMapStashFullToastAt = 0;         // throttle for the stash-full toast
 
 // Returns true when the gate screen map stash has at least one free slot.
 // Per-tier stashes are infinite (auto-expand), so this is always true.
 // Kept for legacy vendor / claim callers that guard before adding.
-function _egMapStashHasFreeSlot(tier) {
+export function _egMapStashHasFreeSlot(tier) {
     return true;
 }
 // Writes a map into the first free cell of its tier's stash (infinite).
 // Returns true on success. If item has a mapTier, it routes to that tier;
 // otherwise falls back to tierOverride or the active tab.
-function _egAddMapToMapStash(item, tierOverride) {
+export function _egAddMapToMapStash(item, tierOverride) {
     if (!item) return false;
-    let tier = tierOverride != null ? tierOverride : (item.mapTier != null ? item.mapTier : (_egMapStashActiveTier || 1));
+    let tier = tierOverride != null ? tierOverride : (item.mapTier != null ? item.mapTier : (globalThis._egMapStashActiveTier || 1));
     tier = Math.max(1, Math.min(EG_MAP_TIER_COUNT || 16, Math.round(tier)));
     try {
         if (typeof _egFindFreeMapCellForTier === 'function' && typeof _egGetMapTierGrid === 'function') {
             const pos = _egFindFreeMapCellForTier(tier);
             _egGetMapTierGrid(tier)[pos.r][pos.c] = item;
             // if the target tier is currently visible, render that cell; otherwise just sync count
-            if (tier === (_egMapStashActiveTier || 1) && document.getElementById('eg-map-stash-grid')) {
+            if (tier === (globalThis._egMapStashActiveTier || 1) && document.getElementById('eg-map-stash-grid')) {
                 // ensure grid has enough DOM rows - rebuild if needed
                 const gridLen = _egGetMapTierGrid(tier).length;
                 const domCells = document.querySelectorAll('.eg-map-stash-cell').length;
@@ -1604,7 +1629,7 @@ function _egAddMapToMapStash(item, tierOverride) {
 // PoE-style sustain: while running a map the drop chance is multiplied by the
 // active map's Quantity bonus (EG_MAP_MOD_REWARDS.quantity). Harder maps
 // (more / higher-tier mods) therefore sustain maps much better.
-function _egTryDropMap(isBoss, monsterLevel) {
+export function _egTryDropMap(isBoss, monsterLevel) {
     // PoE-style: map items only drop from monsters level 55 or higher
     // (allows drops in late campaign: World 13 EXPECTATION PLATEAU and Nexus World)
     const MIN_MONSTER_LEVEL_FOR_MAP_DROPS = 55;
@@ -1657,7 +1682,7 @@ function _egTryDropMap(isBoss, monsterLevel) {
 // summary). Must be called from _egEndMap() AFTER _egAtlasOnMapCompleted()
 // so a fresh first clear already counts.
 // Returns the bonus map item when the roll succeeded, else null.
-function _egRollAtlasAdjacentBonusDrop(activeMapItem) {
+export function _egRollAtlasAdjacentBonusDrop(activeMapItem) {
     if (typeof egAtlasAdjacentBonusChance !== 'function') return null;
     let chance = 0;
     try { chance = egAtlasAdjacentBonusChance(); } catch (e) { chance = 0; }
@@ -1676,13 +1701,13 @@ function _egRollAtlasAdjacentBonusDrop(activeMapItem) {
     if (!bonusMap) return null;
 
     _egAddMapToMapStash(bonusMap);
-    if (typeof _egRunMaps !== 'undefined' && Array.isArray(_egRunMaps)) _egRunMaps.push(bonusMap);
+    if (typeof _egRunMaps !== 'undefined' && Array.isArray(globalThis._egRunMaps)) globalThis._egRunMaps.push(bonusMap);
 
     let pct = 0;
     try { pct = egAtlasAdjacentBonusPercent(); } catch (e) { pct = Math.round(chance * 100); }
     if (typeof showToast === 'function') {
         try {
-            showToast(t('eg_atlas_bonus_drop')
+            globalThis.showToast(t('eg_atlas_bonus_drop')
                 .replace('{p}', pct)
                 .replace('{name}', bonusMap.name || ''), '#7fd67f');
         } catch (e) {}
@@ -1691,7 +1716,7 @@ function _egRollAtlasAdjacentBonusDrop(activeMapItem) {
 }
 
 // Places a map drop on an eligible grid cell (mirrors _egSpawnLootDrop).
-function _egSpawnMapDrop(map) {
+export function _egSpawnMapDrop(map) {
     if (!_egIsActive() || !map) return;
     if (_egMapDrops.size >= 1) return; // one map drop on the board at a time
 
@@ -1730,20 +1755,20 @@ function _egSpawnMapDrop(map) {
                 _egRemoveMapDropOverlay(key);
             }
         }, lifetime);
-        if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
+        if (typeof _egPickupTimers !== 'undefined') globalThis._egPickupTimers.push(timer);
         if (typeof _egStartDropExpireCountdown === 'function') {
             _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
         }
     }
 }
 
-function _egRemoveMapDropOverlay(key) {
+export function _egRemoveMapDropOverlay(key) {
     const [r, c] = key.split('-').map(Number);
     const span = document.getElementById(`eg-mapdrop-${r}-${c}`);
     if (span) span.remove();
 }
 
-function _egAnimateMapDropClaim(row, col, item) {
+export function _egAnimateMapDropClaim(row, col, item) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const centre = typeof _egGetElementCentre === 'function' ? _egGetElementCentre(el) : { x: 0, y: 0 };
@@ -1759,7 +1784,7 @@ function _egAnimateMapDropClaim(row, col, item) {
 // Called from _egCheckAllClaims (mouse-button-handlers.js) and
 // _egAutoClaimDropsOnReveal (endgame-grid-pickups.js). Banks the claimed map
 // straight into the Probability Gate map stash.
-function _egCheckMapDropClaim(row, col) {
+export function _egCheckMapDropClaim(row, col) {
     if (!_egIsActive()) return false;
     const key = `${row}-${col}`;
     const map = _egMapDrops.get(key);
@@ -1775,9 +1800,9 @@ function _egCheckMapDropClaim(row, col) {
     _egAddMapToMapStash(map);
 
     // Track for the leave-map summary screen (mirrors _egTrackRunCurrency)
-    if (typeof _egRunMaps !== 'undefined') _egRunMaps.push(map);
+    if (typeof _egRunMaps !== 'undefined') globalThis._egRunMaps.push(map);
 
-    showToast(t('eg_map_claimed')
+    globalThis.showToast(t('eg_map_claimed')
         .replace('{icon}', map.icon || '')
         .replace('{name}', map.name)
         .replace('{tier}', map.mapTier != null ? map.mapTier : '?'), _egRarityToastColor(map.rarity));
@@ -1787,7 +1812,7 @@ function _egCheckMapDropClaim(row, col) {
 }
 
 // Called from _egDiscardAllDrops (mouse-button-handlers.js).
-function _egDiscardMapDrop(row, col) {
+export function _egDiscardMapDrop(row, col) {
     if (!_egIsActive()) return;
     const key = `${row}-${col}`;
     if (!_egMapDrops.has(key)) return;
@@ -1803,7 +1828,7 @@ function _egDiscardMapDrop(row, col) {
 
 // Banks any unclaimed map drops still sitting on the grid. Called on
 // map leave / forfeit / defeat so maps never silently vanish when the run ends.
-function _egBankUnclaimedMapDrops() {
+export function _egBankUnclaimedMapDrops() {
     if (_egMapDrops.size === 0) return;
     let banked = 0;
     for (const [, map] of Array.from(_egMapDrops.entries())) {
@@ -1815,7 +1840,7 @@ function _egBankUnclaimedMapDrops() {
 }
 
 // Clears all active map drops from the board (called by _egStopPickupSpawner).
-function _egStopMapDrops() {
+export function _egStopMapDrops() {
     if (typeof _egCancelTrackedExpiry === 'function') {
         Array.from(_egMapDrops.entries()).forEach(([key, map]) => _egCancelTrackedExpiry(_egMapDrops, key, map));
     }
@@ -1825,7 +1850,7 @@ function _egStopMapDrops() {
 
 // Carries unclaimed map drops into the next chained puzzle
 // (mirrors _egReplaceCarriedLootDrops / _egReplaceCarriedCurrencyDrops).
-function _egReplaceCarriedMapDrops(maps) {
+export function _egReplaceCarriedMapDrops(maps) {
     if (!maps || maps.length === 0) return;
 
     maps.forEach(map => {
@@ -1863,7 +1888,7 @@ function _egReplaceCarriedMapDrops(maps) {
                     _egRemoveMapDropOverlay(key);
                 }
             }, lifetime);
-            if (typeof _egPickupTimers !== 'undefined') _egPickupTimers.push(timer);
+            if (typeof _egPickupTimers !== 'undefined') globalThis._egPickupTimers.push(timer);
             if (typeof _egStartDropExpireCountdown === 'function') {
                 _egStartDropExpireCountdown(`eg-mapdrop-${r}-${c}`, lifetime);
             }
@@ -1879,7 +1904,7 @@ function _egReplaceCarriedMapDrops(maps) {
 // Builds the tooltip body for map items. Mods are grouped by their
 // `affects` category with distinct colors:
 //   monster → orange, player → red, puzzle → blue.
-function _egBuildMapTooltipBodyHTML(item) {
+export function _egBuildMapTooltipBodyHTML(item) {
     const RARITY_COLOR_MAP = {
         common: { border: '#7a7a7a', color: '#b0b0b0' },
         uncommon: { border: '#2ecc71', color: '#2ecc71' },
@@ -2029,7 +2054,7 @@ function _egBuildMapTooltipBodyHTML(item) {
             const diffLineHTML = `<div class="eg-tt-desc" style="color:${diffColors[reqDiff] || '#f5d98a'}; font-size:0.85em;">⚖️ ${t('eg_map_atlas_requires_diff').replace('{d}', t('diff_' + reqDiff))}</div>`;
             let mismatchHTML = '';
             if (!completed) {
-                const runDiff = (typeof curDiff !== 'undefined' && curDiff) ? curDiff : 'normal';
+                const runDiff = (typeof curDiff !== 'undefined' && globalThis.curDiff) ? globalThis.curDiff : 'normal';
                 if (runDiff !== reqDiff) {
                     mismatchHTML = `<div class="eg-tt-desc" style="color:#e74c3c; font-size:0.85em;">${t('eg_map_atlas_diff_mismatch').replace('{d}', t('diff_' + runDiff))}</div>`;
                 }
@@ -2100,7 +2125,7 @@ function _egBuildMapTooltipBodyHTML(item) {
 // false. Patch every persisted map so the boss fight is guaranteed: maps
 // without implicits roll fresh ones (boss always present), and a baked
 // hasBoss:false is upgraded to true (maxBosses 1).
-function _egHealMapBossImplicits(map) {
+export function _egHealMapBossImplicits(map) {
     if (!map || typeof map !== 'object') return map;
     if (!map.implicits || typeof map.implicits !== 'object') {
         map.implicits = _egRollMapImplicits(map);
@@ -2118,7 +2143,7 @@ function _egHealMapBossImplicits(map) {
     return map;
 }
 
-function _egMigrateMapBossImplicits() {
+export function _egMigrateMapBossImplicits() {
     try {
         if (typeof _egMapStash !== 'undefined' && Array.isArray(_egMapStash)) {
             // tiered check
@@ -2145,12 +2170,12 @@ function _egMigrateMapBossImplicits() {
                 }
             }
         }
-        if (typeof _egMapSlotItem !== 'undefined' && _egMapSlotItem && _egMapSlotItem.category === 'map') {
-            _egHealMapBossImplicits(_egMapSlotItem);
+        if (typeof _egMapSlotItem !== 'undefined' && globalThis._egMapSlotItem && globalThis._egMapSlotItem.category === 'map') {
+            _egHealMapBossImplicits(globalThis._egMapSlotItem);
         }
         // Also patch the hub state's saved copy so next save is clean.
-        if (typeof STATE !== 'undefined' && STATE) {
-            const stash = STATE.egMapStash;
+        if (typeof STATE !== 'undefined' && globalThis.STATE) {
+            const stash = globalThis.STATE.egMapStash;
             if (Array.isArray(stash)) {
                 const isTieredS = (typeof _egIsTieredMapStash === 'function' && _egIsTieredMapStash(stash));
                 if (isTieredS) {
@@ -2168,18 +2193,30 @@ function _egMigrateMapBossImplicits() {
                     });
                 }
             }
-            if (STATE.egMapSlotItem && STATE.egMapSlotItem.category === 'map') {
-                _egHealMapBossImplicits(STATE.egMapSlotItem);
+            if (globalThis.STATE.egMapSlotItem && globalThis.STATE.egMapSlotItem.category === 'map') {
+                _egHealMapBossImplicits(globalThis.STATE.egMapSlotItem);
             }
         }
     } catch (e) { /* ignore migration errors */ }
 }
-_egMigrateMapBossImplicits();
-// Wrap future loads so slot switches also heal.
-(function _egPatchHubLoadForBoss() {
+// Module era: maps.js evaluates inside an import cycle, so running the boss-
+// implicit migration HERE would read uninitialized bindings (_egMapStash via
+// the hub cycle - typeof THROWS on TDZ bindings) and silently skip, leaving
+// legacy saves unhealed. Classic order (maps dead last) always ran it fully.
+// Defer to DOMContentLoaded: everything is initialized, still before any user
+// interaction (established step-5 passive-tree pattern). Migration first,
+// then the hub-load patch setup - same order as the classic bottom.
+function _egBootHealMapBossImplicits() {
+    _egMigrateMapBossImplicits();
+    // Wrap future loads so slot switches also heal.
+    // NOTE (module era): _egLoadHubState is NOT imported here, so the bare
+    // typeof guard would always be false (module scope has no access to the
+    // concatenated/global scope). Read it as a globalThis member instead:
+    // hub.js exposes a live write-through accessor for exactly this, so the
+    // patch below propagates to import-based callers too.
     try {
-        if (typeof _egLoadHubState === 'function' && !_egLoadHubState._bossPatched) {
-            const orig = _egLoadHubState;
+        if (typeof globalThis._egLoadHubState === 'function' && !globalThis._egLoadHubState._bossPatched) {
+            const orig = globalThis._egLoadHubState;
             const patched = function() {
                 const ret = orig.apply(this, arguments);
                 try { _egMigrateMapBossImplicits(); } catch (e) {}
@@ -2188,7 +2225,12 @@ _egMigrateMapBossImplicits();
             patched._bossPatched = true;
             // Preserve the patched flag on the original for idempotency checks
             orig._bossPatched = true;
-            _egLoadHubState = patched;
+            globalThis._egLoadHubState = patched;
         }
     } catch (e) { /* ignore */ }
-})();
+}
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _egBootHealMapBossImplicits);
+} else {
+    _egBootHealMapBossImplicits();
+}

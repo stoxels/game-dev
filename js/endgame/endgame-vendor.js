@@ -1,3 +1,26 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { switchScreen } from '../screens/screens.js';
+import { save } from '../state.js';
+import { LANG, t } from '../translation/translations.js';
+import { EG_ATLAS_MAX_TIER } from './endgame-atlas.js';
+import { EG_CURRENCY_DEFS, _egShowTooltip } from './endgame-currency.js';
+import { EG_ALL_BASE_TYPES, EG_SLOT_ICONS } from './endgame-equipment-base-items.js';
+import { EG_ESSENCE_DEFS, egAddEssence } from './endgame-essences.js';
+import { _egAddGold, egGetGold, egSpendGold } from './endgame-gold.js';
+import { egAddCurrency } from './endgame-hub-drag-and-drop.js';
+import { _egClearTooltip } from './endgame-hub-tooltips.js';
+import { EG_INV_COLS, _egAddItemToStash, _egEnsureInvRows, _egEquipped, _egInventory, _egRenderInventoryCell, egSaveHubState } from './endgame-hub.js';
+import { _egGetPlayerLevel } from './endgame-leveling.js';
+import { EG_MAX_MAP_TIER, _egAddMapToMapStash, _egGenerateMapDrop, _egMapTierMonsterLevel } from './endgame-maps.js';
+import { _egnEnsureStyles } from './endgame-nexus.js';
+import { EG_PLAYER_BASE_ATTRIBUTES, _egComputeLoadoutAttributes, _egFormatRequirementPart } from './endgame-requirements.js';
+
 'use strict';
 
 //========================================================================
@@ -24,12 +47,12 @@
 //------------------------------------------------------------------------
 
 // Price of one vendor-bought Tier 1 map, in gold (0 = free).
-const EG_VENDOR_T1_MAP_PRICE = 0;
+export const EG_VENDOR_T1_MAP_PRICE = 0;
 
 // Base types given away for free in the Starter Gear tab - basic level 1
 // starter gear so new players can gear up without gold. No longer part
 // of the Base Items tab.
-const EG_VENDOR_FREE_BASE_IDS = new Set([
+export const EG_VENDOR_FREE_BASE_IDS = new Set([
     'wpn_1h_1',    // Rusted Sword (level 1 melee)
     'ranged_1',    // Shortbow (level 1 ranged)
     'chest_str_1', // Plate Vest (level 1 chest, pure armour)
@@ -43,7 +66,7 @@ const EG_VENDOR_FREE_BASE_IDS = new Set([
 // Prices per currency orb id (gold). Missing ids fall back to the default.
 // Rebalanced: common crafting orbs are affordable, rare/epic orbs are
 // deliberately expensive so they remain chase items and cannot be spammed.
-const EG_VENDOR_CURRENCY_PRICES = {
+export const EG_VENDOR_CURRENCY_PRICES = {
     orb_transmutation: 45,
     orb_augmentation: 55,
     orb_alteration: 65,
@@ -64,11 +87,11 @@ const EG_VENDOR_CURRENCY_PRICES = {
     orb_horizons: 500,
     mirror_of_kalandra: 8500,
 };
-const EG_VENDOR_CURRENCY_DEFAULT_PRICE = 320;
+export const EG_VENDOR_CURRENCY_DEFAULT_PRICE = 320;
 
 // Prices per essence id (gold). Every per-modifier essence has a distinct
 // price: baseline 320, powerful families cost significantly more.
-const EG_VENDOR_ESSENCE_PRICES = {
+export const EG_VENDOR_ESSENCE_PRICES = {
     // Recovery / absorption - 400-440
     essence_absorption_on_kill: 440,
     essence_absorption_regen_rate: 440,
@@ -180,11 +203,11 @@ const EG_VENDOR_ESSENCE_PRICES = {
     // Movement / utility
     essence_movement_speed: 540,
 };
-const EG_VENDOR_ESSENCE_DEFAULT_PRICE = 350;
+export const EG_VENDOR_ESSENCE_DEFAULT_PRICE = 350;
 
 // Puzzle item prices by rarity (gold) - rebalanced to be more expensive
 // across the board so puzzle items remain meaningful purchases.
-const EG_VENDOR_ITEM_RARITY_PRICES = {
+export const EG_VENDOR_ITEM_RARITY_PRICES = {
     common: 55,
     uncommon: 130,
     rare: 280,
@@ -196,7 +219,7 @@ const EG_VENDOR_ITEM_RARITY_PRICES = {
 
 // Base item price scales with the item level of the base type.
 // Rebalanced to be ~2.5x more expensive than before so progression feels slower.
-function _egvBaseItemPrice(base) {
+export function _egvBaseItemPrice(base) {
     return Math.round(90 + Math.pow(base.minLevel || 1, 1.78) * 2.3);
 }
 
@@ -205,10 +228,10 @@ function _egvBaseItemPrice(base) {
 //-------------------TAB STATE---------------------------------------------
 //------------------------------------------------------------------------
 
-let _egvActiveTab = 'maps';
-let _egvBaseFilterSlot = 'all';
+export let _egvActiveTab = 'maps';
+export let _egvBaseFilterSlot = 'all';
 
-const EG_VENDOR_TABS = [
+export const EG_VENDOR_TABS = [
     { id: 'maps', labelKey: 'eg_vendor_tab_maps' },
     { id: 'starter', labelKey: 'eg_vendor_tab_starter' },
     { id: 'currency', labelKey: 'eg_vendor_tab_currency' },
@@ -218,7 +241,7 @@ const EG_VENDOR_TABS = [
 ];
 
 // Hint text shown below each tab's content.
-const EG_VENDOR_TAB_HINTS = {
+export const EG_VENDOR_TAB_HINTS = {
     maps: 'eg_vendor_hint',
     starter: 'eg_vendor_hint_starter',
     currency: 'eg_vendor_hint_currency',
@@ -232,7 +255,7 @@ const EG_VENDOR_TAB_HINTS = {
 //-------------------HTML ASSEMBLY-----------------------------------------
 //------------------------------------------------------------------------
 
-function _egvBuildTopbarHTML() {
+export function _egvBuildTopbarHTML() {
     return `
 <div class="egn-topbar">
     <button class="back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
@@ -240,7 +263,7 @@ function _egvBuildTopbarHTML() {
 </div>`;
 }
 
-function _egvBuildTabBarHTML() {
+export function _egvBuildTabBarHTML() {
     const buttons = EG_VENDOR_TABS.map(tab => `
         <button class="egv-tab-btn${tab.id === _egvActiveTab ? ' egv-tab-active' : ''}"
                 id="egv-tab-btn-${tab.id}"
@@ -250,7 +273,7 @@ function _egvBuildTabBarHTML() {
 
 // Assembles the full vendor layout:
 // topbar → gold balance → tab bar → tab content → hint text.
-function _egvBuildFullScreenHTML() {
+export function _egvBuildFullScreenHTML() {
     return `
 <div class="egn-hub-layout egv-layout">
     ${_egvBuildTopbarHTML()}
@@ -268,7 +291,7 @@ function _egvBuildFullScreenHTML() {
 //-------------------RENDER HELPERS-----------------------------------------
 //------------------------------------------------------------------------
 
-function _egvRefreshGoldDisplay() {
+export function _egvRefreshGoldDisplay() {
     const balanceEl = document.getElementById('egv-gold-balance');
     if (balanceEl) {
         balanceEl.textContent = t('eg_vendor_gold_balance').replace('{n}', egGetGold().toLocaleString());
@@ -276,7 +299,7 @@ function _egvRefreshGoldDisplay() {
 }
 
 // Re-renders the active tab's content + hint.
-function _egvRenderTabContent() {
+export function _egvRenderTabContent() {
     const contentEl = document.getElementById('egv-tab-content');
     if (!contentEl) return;
 
@@ -295,7 +318,7 @@ function _egvRenderTabContent() {
     _egvRefreshGoldDisplay();
 }
 
-function _egvSwitchTab(tabId) {
+export function _egvSwitchTab(tabId) {
     _egvActiveTab = tabId;
     document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
     const btn = document.getElementById(`egv-tab-btn-${tabId}`);
@@ -308,9 +331,9 @@ function _egvSwitchTab(tabId) {
 //-------------------SHARED CARD HELPERS------------------------------------
 //------------------------------------------------------------------------
 
-function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraClass = '', blockedReason = '', extraAttrs = '' }) {
+export function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraClass = '', blockedReason = '', extraAttrs = '' }) {
     const blockedCls = blockedReason ? ' egv-card-blocked' : '';
-    const blockedTitle = blockedReason ? ` data-tip="${_tipAttr(blockedReason)}"` : '';
+    const blockedTitle = blockedReason ? ` data-tip="${globalThis._tipAttr(blockedReason)}"` : '';
     // Free offers (price 0) never show a gold deficit.
     const isFree = price <= 0;
     // Dim the card + show the deficit while the player cannot afford it.
@@ -341,16 +364,16 @@ function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraC
 
 // Generic gold purchase wrapper: spends first, runs grantFn, refunds on
 // failure so gold is never eaten by a full stash.
-function _egvPurchase(price, grantFn) {
+export function _egvPurchase(price, grantFn) {
     if (!egSpendGold(price)) {
-        showToast(t('eg_vendor_no_gold').replace('{n}', price - egGetGold()));
+        globalThis.showToast(t('eg_vendor_no_gold').replace('{n}', price - egGetGold()));
         Audio_Manager.playSFX('player_equip_not_pickup');
         return false;
     }
-    if (typeof _egLoadHubState === 'function') _egLoadHubState();
+    if (typeof _egLoadHubState === 'function') globalThis._egLoadHubState();
     if (!grantFn()) {
         _egAddGold(price); // refund
-        showToast(t('eg_vendor_no_space'));
+        globalThis.showToast(t('eg_vendor_no_space'));
         Audio_Manager.playSFX('player_equip_not_pickup');
         return false;
     }
@@ -367,7 +390,7 @@ function _egvPurchase(price, grantFn) {
 // Builds the Maps tab: only a single free Tier 1 Normal map is offered.
 // Maps are always Normal (white, no modifiers) so players must use currency
 // orbs to upgrade them. This keeps progression gated through map drops.
-function _egvBuildMapsTabHTML() {
+export function _egvBuildMapsTabHTML() {
     const tier = 1;
     const monsterLevel = (typeof _egMapTierMonsterLevel === 'function')
         ? _egMapTierMonsterLevel(tier) : tier;
@@ -391,7 +414,7 @@ function _egvBuildMapsTabHTML() {
 // Refreshes dynamic bits on the Maps tab. All tier maps are free (price 0)
 // so there is no cannot-afford state - we keep legacy single-card support
 // for save-compatibility and simply refresh the gold balance.
-function _egvRefreshMapsTabDynamic() {
+export function _egvRefreshMapsTabDynamic() {
     // Legacy single-card path (pre multi-tier): keep behaviour if that DOM still exists.
     const priceEl = document.getElementById('egv-offer-price');
     if (priceEl) {
@@ -419,14 +442,14 @@ function _egvRefreshMapsTabDynamic() {
 
 // Core purchase helper - always produces a Normal (white) map with no
 // modifiers. Players must use currency orbs to upgrade the map afterwards.
-function _egvBuyTierMap(tier) {
+export function _egvBuyTierMap(tier) {
     const maxTier = (typeof EG_MAX_MAP_TIER !== 'undefined') ? EG_MAX_MAP_TIER
         : ((typeof EG_ATLAS_MAX_TIER !== 'undefined') ? EG_ATLAS_MAX_TIER : 16);
     tier = Math.max(1, Math.min(maxTier, Math.round(tier || 1)));
     // Vendor only sells Tier 1 for now - clamp higher tiers down.
     tier = 1;
 
-    if (typeof _egLoadHubState === 'function') _egLoadHubState();
+    if (typeof _egLoadHubState === 'function') globalThis._egLoadHubState();
 
     // Always Normal - no rarity or mod rolls, but upgradeable with orbs.
     const map = _egGenerateMapDrop(4, 1, { forceNormal: true });
@@ -434,7 +457,7 @@ function _egvBuyTierMap(tier) {
     egSaveHubState();
 
     Audio_Manager.playSFX('player_equip_pickup');
-    showToast(t('eg_vendor_bought')
+    globalThis.showToast(t('eg_vendor_bought')
         .replace('{icon}', map.icon || '🗺️')
         .replace('{name}', map.name));
 
@@ -444,7 +467,7 @@ function _egvBuyTierMap(tier) {
 }
 
 // Backwards-compat shim: old Maps tab and external callers used this name.
-function _egvBuyTierOneMap() {
+export function _egvBuyTierOneMap() {
     return _egvBuyTierMap(1);
 }
 
@@ -453,7 +476,7 @@ function _egvBuyTierOneMap() {
 //-------------------TAB: STARTER GEAR (FREE)-------------------------------
 //------------------------------------------------------------------------
 
-function _egvBuildStarterTabHTML() {
+export function _egvBuildStarterTabHTML() {
     const slotOrder = _egvGetSlotOrder();
     const starterBases = EG_ALL_BASE_TYPES.filter(b => EG_VENDOR_FREE_BASE_IDS.has(b.id));
     // No filter - always show all 8 starter items, sorted by slot order
@@ -482,11 +505,11 @@ function _egvBuildStarterTabHTML() {
 //-------------------TAB: CURRENCY------------------------------------------
 //------------------------------------------------------------------------
 
-function _egvCurrencyPrice(id) {
+export function _egvCurrencyPrice(id) {
     return EG_VENDOR_CURRENCY_PRICES[id] != null ? EG_VENDOR_CURRENCY_PRICES[id] : EG_VENDOR_CURRENCY_DEFAULT_PRICE;
 }
 
-function _egvBuildCurrencyTabHTML() {
+export function _egvBuildCurrencyTabHTML() {
     const defs = Object.values(EG_CURRENCY_DEFS);
     const cards = defs.map(def => _egvBuildCardHTML({
         icon: def.icon,
@@ -498,7 +521,7 @@ function _egvBuildCurrencyTabHTML() {
     return `<div class="egv-cards">${cards}</div>`;
 }
 
-function _egvBuyCurrency(id) {
+export function _egvBuyCurrency(id) {
     const def = EG_CURRENCY_DEFS[id];
     if (!def) return;
     const price = _egvCurrencyPrice(id);
@@ -510,7 +533,7 @@ function _egvBuyCurrency(id) {
         description: def.description,
     }))) return;
 
-    showToast(t('eg_vendor_bought_generic')
+    globalThis.showToast(t('eg_vendor_bought_generic')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name));
     _egvRenderTabContent();
@@ -521,11 +544,11 @@ function _egvBuyCurrency(id) {
 //-------------------TAB: ESSENCES-------------------------------------------
 //------------------------------------------------------------------------
 
-function _egvEssencePrice(id) {
+export function _egvEssencePrice(id) {
     return EG_VENDOR_ESSENCE_PRICES[id] != null ? EG_VENDOR_ESSENCE_PRICES[id] : EG_VENDOR_ESSENCE_DEFAULT_PRICE;
 }
 
-function _egvBuildEssencesTabHTML() {
+export function _egvBuildEssencesTabHTML() {
     const defs = Object.values(EG_ESSENCE_DEFS);
     const cards = defs.map(def => _egvBuildCardHTML({
         icon: def.icon,
@@ -538,7 +561,7 @@ function _egvBuildEssencesTabHTML() {
     return `<div class="egv-cards">${cards}</div>`;
 }
 
-function _egvBuyEssence(id) {
+export function _egvBuyEssence(id) {
     const def = EG_ESSENCE_DEFS[id];
     if (!def) return;
     const price = _egvEssencePrice(id);
@@ -550,7 +573,7 @@ function _egvBuyEssence(id) {
         description: def.description,
     }))) return;
 
-    showToast(t('eg_vendor_bought_generic')
+    globalThis.showToast(t('eg_vendor_bought_generic')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name));
     _egvRenderTabContent();
@@ -561,16 +584,16 @@ function _egvBuyEssence(id) {
 //-------------------TAB: PUZZLE ITEMS (ITEM_DEFS)--------------------------
 //------------------------------------------------------------------------
 
-function _egvPuzzleItemPrice(rarity) {
+export function _egvPuzzleItemPrice(rarity) {
     return EG_VENDOR_ITEM_RARITY_PRICES[rarity] != null ? EG_VENDOR_ITEM_RARITY_PRICES[rarity] : 100;
 }
 
-function _egvBuildItemsTabHTML() {
-    const cards = Object.values(ITEM_DEFS).map(def => _egvBuildCardHTML({
+export function _egvBuildItemsTabHTML() {
+    const cards = Object.values(globalThis.ITEM_DEFS).map(def => _egvBuildCardHTML({
         icon: def.icon,
-        title: itemName(def),
+        title: globalThis.itemName(def),
         subtitle: def.rarity,
-        desc: itemDesc(def),
+        desc: globalThis.itemDesc(def),
         price: _egvPuzzleItemPrice(def.rarity),
         buyCall: `_egvBuyPuzzleItem('${def.id}')`,
     })).join('');
@@ -578,28 +601,28 @@ function _egvBuildItemsTabHTML() {
 }
 
 // Buys a regular puzzle item straight into the persistent main inventory.
-function _egvBuyPuzzleItem(defId) {
-    const def = ITEM_DEFS[defId];
+export function _egvBuyPuzzleItem(defId) {
+    const def = globalThis.ITEM_DEFS[defId];
     if (!def) return;
     const price = _egvPuzzleItemPrice(def.rarity);
 
     if (!egSpendGold(price)) {
-        showToast(t('eg_vendor_no_gold').replace('{n}', price - egGetGold()));
+        globalThis.showToast(t('eg_vendor_no_gold').replace('{n}', price - egGetGold()));
         Audio_Manager.playSFX('player_equip_not_pickup');
         return;
     }
 
-    STATE.inventory.push({
+    globalThis.STATE.inventory.push({
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
         defId,
     });
     save();
-    buildInventoryPanel();
+    globalThis.buildInventoryPanel();
 
     Audio_Manager.playSFX('player_equip_pickup');
-    showToast(t('eg_vendor_bought_generic')
+    globalThis.showToast(t('eg_vendor_bought_generic')
         .replace('{icon}', def.icon)
-        .replace('{name}', itemName(def)));
+        .replace('{name}', globalThis.itemName(def)));
     if (typeof trackAchStat === 'function') try { trackAchStat('egVendorPurchases', 1); } catch(e){}
     _egvRenderTabContent();
 }
@@ -610,7 +633,7 @@ function _egvBuyPuzzleItem(defId) {
 //------------------------------------------------------------------------
 
 // Canonical slot order - first appearance inside EG_ALL_BASE_TYPES.
-function _egvGetSlotOrder() {
+export function _egvGetSlotOrder() {
     const order = [];
     EG_ALL_BASE_TYPES.forEach(base => {
         if (!order.includes(base.slotType)) order.push(base.slotType);
@@ -620,7 +643,7 @@ function _egvGetSlotOrder() {
 
 // Requirement check against the player's live attributes/level.
 // Returns a list of localized deficit strings ("Level 12", "5 Agi").
-function _egvGetMissingRequirements(base) {
+export function _egvGetMissingRequirements(base) {
     const req = base.requirements || {};
     const missing = [];
 
@@ -649,7 +672,7 @@ function _egvGetMissingRequirements(base) {
 }
 
 // Short "Requires ..." summary line for a base type.
-function _egvBuildReqSummaryText(base) {
+export function _egvBuildReqSummaryText(base) {
     const req = base.requirements || {};
     const parts = [];
     if ((req.level || 0) > 0) parts.push(t('eg_req_level').replace('{n}', req.level));
@@ -659,13 +682,13 @@ function _egvBuildReqSummaryText(base) {
     return parts.length ? `${t('eg_vendor_requires')} ${parts.join(' · ')}` : '';
 }
 
-function _egvSetBaseFilter(value) {
+export function _egvSetBaseFilter(value) {
     _egvBaseFilterSlot = value;
     _egvRenderBaseListOnly();
 }
 
 // Re-renders only the base item list + filter controls (keeps focus/state).
-function _egvRenderBaseListOnly() {
+export function _egvRenderBaseListOnly() {
     _egvHideBaseTooltip(); // hovered card may be replaced by the re-render
     const listEl = document.getElementById('egv-base-list');
     if (listEl) listEl.innerHTML = _egvBuildBaseListHTML();
@@ -675,7 +698,7 @@ function _egvRenderBaseListOnly() {
     _egvRefreshGoldDisplay();
 }
 
-function _egvGetFilteredSortedBases() {
+export function _egvGetFilteredSortedBases() {
     // Exclude free starter gear - now in its own tab
     let bases = EG_ALL_BASE_TYPES.filter(b => !EG_VENDOR_FREE_BASE_IDS.has(b.id));
 
@@ -697,7 +720,7 @@ function _egvGetFilteredSortedBases() {
     return bases;
 }
 
-function _egvBuildBaseFilterOptionsHTML() {
+export function _egvBuildBaseFilterOptionsHTML() {
     const slotOrder = _egvGetSlotOrder();
     const options = [`<option value="all"${_egvBaseFilterSlot === 'all' ? ' selected' : ''}>${t('eg_vendor_filter_all')}</option>`];
     slotOrder.forEach(slot => {
@@ -707,7 +730,7 @@ function _egvBuildBaseFilterOptionsHTML() {
     return options.join('');
 }
 
-function _egvBuildBaseTabHTML() {
+export function _egvBuildBaseTabHTML() {
     return `
 <div class="egv-base-wrap">
     <div class="egv-base-controls">
@@ -720,7 +743,7 @@ function _egvBuildBaseTabHTML() {
 </div>`;
 }
 
-function _egvBuildBaseListHTML() {
+export function _egvBuildBaseListHTML() {
     const bases = _egvGetFilteredSortedBases();
     const cards = bases.map(base => {
         const name = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
@@ -744,7 +767,7 @@ function _egvBuildBaseListHTML() {
 
 // Builds a preview/purchase item object from an equipment base type -
 // used both for vendor purchases and for the mouseover stat tooltip.
-function _egvBuildBaseItemFromBase(base) {
+export function _egvBuildBaseItemFromBase(base) {
     const baseName = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
     return {
         id: `${base.id}_preview`,
@@ -766,20 +789,20 @@ function _egvBuildBaseItemFromBase(base) {
 
 // Shows the shared floating equipment tooltip (from endgame-hub.js) for a
 // base type card. Holding Alt also compares against the equipped item.
-function _egvShowBaseTooltip(baseId, e) {
+export function _egvShowBaseTooltip(baseId, e) {
     if (typeof _egShowTooltip !== 'function') return;
     const base = EG_ALL_BASE_TYPES.find(b => b.id === baseId);
     if (!base) return;
     _egShowTooltip(_egvBuildBaseItemFromBase(base), e);
 }
 
-function _egvHideBaseTooltip() {
+export function _egvHideBaseTooltip() {
     if (typeof _egClearTooltip === 'function') _egClearTooltip();
 }
 
 // Buys a specific equipment base type as a fresh common (white) item at its
 // minimum item level and places it in the first free hub inventory slot.
-function _egvBuyBaseItem(baseId) {
+export function _egvBuyBaseItem(baseId) {
     const base = EG_ALL_BASE_TYPES.find(b => b.id === baseId);
     if (!base) return;
     const price = EG_VENDOR_FREE_BASE_IDS.has(baseId) ? 0 : _egvBaseItemPrice(base);
@@ -813,7 +836,7 @@ function _egvBuyBaseItem(baseId) {
     })) return;
 
     const name = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
-    showToast(t('eg_vendor_bought_generic')
+    globalThis.showToast(t('eg_vendor_bought_generic')
         .replace('{icon}', base.icon || EG_SLOT_ICONS[base.slotType] || '📦')
         .replace('{name}', name));
     _egvRenderTabContent();
@@ -825,7 +848,7 @@ function _egvBuyBaseItem(baseId) {
 //-------------------STYLES (INJECTED ONCE)---------------------------------
 //------------------------------------------------------------------------
 
-function _egvEnsureStyles() {
+export function _egvEnsureStyles() {
     // The vendor topbar reuses the Nexus topbar styles.
     if (typeof _egnEnsureStyles === 'function') _egnEnsureStyles();
     if (document.getElementById('egv-vendor-style')) return;
@@ -1005,7 +1028,7 @@ function _egvEnsureStyles() {
 //-------------------SCREEN BOOTSTRAP----------------------------------------
 //------------------------------------------------------------------------
 
-function _egvCreateScreen() {
+export function _egvCreateScreen() {
     _egvEnsureStyles();
     const screen = document.createElement('div');
     screen.id = 'screen-endgame-vendor';
@@ -1015,7 +1038,7 @@ function _egvCreateScreen() {
 }
 
 // Entry point - opens the Vendor screen on the last active tab.
-function showEndgameVendor() {
+export function showEndgameVendor() {
     if (!document.getElementById('screen-endgame-vendor')) _egvCreateScreen();
 
     if (typeof switchScreen === 'function') {

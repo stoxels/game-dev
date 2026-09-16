@@ -1,9 +1,23 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _resolveCursedRowErasureDownside } from './shared/cursed-downside.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
+import { solveRows } from './shared/grid-actions.js';
+import { _getPreFilledRows } from './shared/puzzle-helpers.js';
+import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+
+//------------------------------------------------------------------------
 //-------------------CURSED ROW SOLVE - TIDAL WAVE----------------------
 //------------------------------------------------------------------------
 
 // cursedRowSolve - solves 3 rows; downside erases 1 pre-existing row.
-function _useCursedRowSolve(id, def) {
+export function _useCursedRowSolve(id, def) {
     _trackWitchImmuneCursedUse();
 
     const preFilledRows = _getPreFilledRows();
@@ -11,7 +25,7 @@ function _useCursedRowSolve(id, def) {
     const erased = _resolveCursedRowErasureDownside(1, preFilledRows);
 
     playItemEffect(id);
-    if (revealed > 0) checkWin();
+    if (revealed > 0) globalThis.checkWin();
     return `🌊 ${t('item_cursed_row_both').replace('{r}', revealed).replace('{e}', erased)}`;
 }
 
@@ -21,7 +35,7 @@ function _useCursedRowSolve(id, def) {
 
 // Helper: creates one tidal wave div at the given pass index.
 // Opacity decreases with each successive wave to fade them out.
-function _fxMakeWave(container, r, pass) {
+export function _fxMakeWave(container, r, pass) {
     _fxMakeElement(container, `
         position:absolute;
         top:${r.top}px; height:${r.height}px;
@@ -33,7 +47,7 @@ function _fxMakeWave(container, r, pass) {
 }
 
 // 🌊 Tidal Wave - waves of blue sweep across the grid multiple times.
-function _fxTidalWave() {
+export function _fxTidalWave() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

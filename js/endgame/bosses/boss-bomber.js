@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE BOMBER (boss_bomber)-----------------------
 //------------------------------------------------------------------------
 // REWORK - "ground war" aerial bomber. The boss shows a ⚠ target pip under
@@ -39,8 +48,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_BOMBER_DEBUG_SLOW = true;
-const _EG_BOMBER_DEBUG_MULT = _EG_BOMBER_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_BOMBER_DEBUG_SLOW = true;
+export const _EG_BOMBER_DEBUG_MULT = _EG_BOMBER_DEBUG_SLOW ? 2.5 : 1;
 
 // Debug-only: stretch the detonation animations so screenshots can catch
 // mid-blast states. Injected once at script load; disappears when the flag
@@ -84,28 +93,28 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_BMB_MINE_DMG = [0, 0.12, 0.15, 0.18];      // per mine blast, by phase
-const EG_BMB_CARPET_DMG = [0, 0, 0.15, 0.19];       // per carpet bomb, by phase
-const EG_BMB_CLUSTER_DMG = [0, 0, 0.12, 0.15];      // per cluster bomblet, by phase
-const EG_BMB_FINAL_WAVE_DMG = 0.22;                 // TOTAL CARPET main wave
-const EG_BMB_FINAL_AFTERTICK_DMG = 0.15;            // afterglow second wave
-const EG_BMB_MINE_LIFE_MS = 16000;                  // un-triggered mines fizzle out
-const EG_BMB_MAX_LIVE_MINES = 8;                    // field cap across mechanics
-const EG_BMB_HIT_CD_MS = 700;                       // shared mine-hit cooldown
+export const EG_BMB_MINE_DMG = [0, 0.12, 0.15, 0.18];      // per mine blast, by phase
+export const EG_BMB_CARPET_DMG = [0, 0, 0.15, 0.19];       // per carpet bomb, by phase
+export const EG_BMB_CLUSTER_DMG = [0, 0, 0.12, 0.15];      // per cluster bomblet, by phase
+export const EG_BMB_FINAL_WAVE_DMG = 0.22;                 // TOTAL CARPET main wave
+export const EG_BMB_FINAL_AFTERTICK_DMG = 0.15;            // afterglow second wave
+export const EG_BMB_MINE_LIFE_MS = 16000;                  // un-triggered mines fizzle out
+export const EG_BMB_MAX_LIVE_MINES = 8;                    // field cap across mechanics
+export const EG_BMB_HIT_CD_MS = 700;                       // shared mine-hit cooldown
 
 // Live mine field state, shared across mechanics: collar plants proximity
 // mines, carpet/bomblets plant fuse mines; TOTAL CARPET consumes all.
-let _egBmbMines = [];
-let _egBmbMineKeeper = null;
-let _egBmbKeeperRun = null;
+export let _egBmbMines = [];
+export let _egBmbMineKeeper = null;
+export let _egBmbKeeperRun = null;
 
 // Set while the TOTAL CARPET set-piece runs (read by _egTickPlayer's
 // charge-freeze gate, endgame-encounter.js).
-let _egBomberFinal = null;
+export let _egBomberFinal = null;
 
 // Charge-bar freeze gate for _egTickPlayer (endgame-encounter.js): true
 // from TOTAL CARPET start until it resolves. Mirrors _egCrashMazeActive.
-function _egBomberFinalActive() {
+export function _egBomberFinalActive() {
     return !!_egBomberFinal && !_egBomberFinal.finished;
 }
 
@@ -116,7 +125,7 @@ function _egBomberFinalActive() {
 
 // Applies the flying presentation: gentle idle bob on the card, a big soft
 // glow, and a ⚠ target pip under the card that tracks it every frame.
-function _egBomberApplyFlightStyle(monster) {
+export function _egBomberApplyFlightStyle(monster) {
     const card = document.getElementById('eg-card-' + monster.id);
     if (!card) return;
     card.classList.add('eg-bmb-flying');
@@ -136,7 +145,7 @@ function _egBomberApplyFlightStyle(monster) {
     sync();
 }
 
-function _egBomberOnInit(monster) {
+export function _egBomberOnInit(monster) {
     _egBomberApplyFlightStyle(monster);
     _egBmbEnsureKeeper(monster);
 }
@@ -149,7 +158,7 @@ function _egBomberOnInit(monster) {
 // Plants one mine at (x, y): bomb dot + dashed red danger ring (radius r).
 // Registered in the shared field for TOTAL CARPET and the keeper watcher.
 // Enforces the live-mine cap by fizzling the oldest mine first.
-function _egBmbPlantMine(run, x, y, r, level, label, dmgPct, phase) {
+export function _egBmbPlantMine(run, x, y, r, level, label, dmgPct, phase) {
     if (_egBmbMines.length >= EG_BMB_MAX_LIVE_MINES) _egBmbFizzleMine(_egBmbMines[0]);
     const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-bomb eg-bmb-mine', '💣');
     el.style.width = '46px';
@@ -168,7 +177,7 @@ function _egBmbPlantMine(run, x, y, r, level, label, dmgPct, phase) {
 
 // Detonates one mine: boom visuals sized to the danger ring + damage test.
 // Idempotent (safe to call from several watchers in the same frame).
-function _egBmbDetonateMine(run, mine, hitPlayer) {
+export function _egBmbDetonateMine(run, mine, hitPlayer) {
     if (!mine || mine.exploded) return;
     mine.exploded = true;
     if (mine.ring) { try { mine.ring.remove(); } catch (e) {} mine.ring = null; }
@@ -181,7 +190,7 @@ function _egBmbDetonateMine(run, mine, hitPlayer) {
 }
 
 // Despawns a mine without exploding (life expiry / cap eviction / lock-in).
-function _egBmbFizzleMine(mine) {
+export function _egBmbFizzleMine(mine) {
     if (!mine || mine.exploded) return;
     mine.exploded = true;
     if (mine.ring) { try { mine.ring.remove(); } catch (e) {} }
@@ -191,7 +200,7 @@ function _egBmbFizzleMine(mine) {
 }
 
 // Clears the whole field without explosions (boss death / teardown).
-function _egBmbClearMines() {
+export function _egBmbClearMines() {
     _egBmbMines.forEach(m => _egBmbFizzleMine(m));
     _egBmbMines = [];
 }
@@ -199,7 +208,7 @@ function _egBmbClearMines() {
 // Shared mine watcher: per-mine life expiry (fizzle), proximity detonation
 // for collar-style mines. Fuse mines (carpet: true) are handled by their
 // owning mechanic's loop instead. Returns true while any mine is live.
-function _egBmbMineWatch(run, hitCooldown) {
+export function _egBmbMineWatch(run, hitCooldown) {
     let pending = false;
     const now = performance.now();
     const pr = _egNkPlayerRect();
@@ -228,7 +237,7 @@ function _egBmbMineWatch(run, hitCooldown) {
 // commonly fire in the same frame their owning run is killed (mechanic end,
 // TOTAL CARPET lock-in), and a killed run sweeps its elements instantly -
 // the burst would never be seen. The layer self-removes after its window.
-function _egBmbBoom(run, x, y, radius, pct, level, label) {
+export function _egBmbBoom(run, x, y, radius, pct, level, label) {
     const R = Math.max(10, radius);
     const layer = document.createElement('div');
     layer.className = 'eg-bmb-burst';
@@ -268,7 +277,7 @@ function _egBmbBoom(run, x, y, radius, pct, level, label) {
 // Teardown - registered in boss-framework.js cleanup chain (startsWith
 // 'boss_bomber', runtime ids are suffixed). Fires on boss death, encounter
 // stop, and level teardown.
-function _egBmbTeardown() {
+export function _egBmbTeardown() {
     _egBmbClearMines();
     if (_egBmbMineKeeper) { try { _egBmbMineKeeper(); } catch (e) {} _egBmbMineKeeper = null; }
     if (_egBomberFinal) _egBomberFinalEnd(_egBomberFinal);
@@ -284,7 +293,7 @@ function _egBmbTeardown() {
 // A passive (non-set-piece) run keeps the shared mine field ticking between
 // mechanics: collar mines planted by one run still detonate/fizzle while
 // the boss schedules the next mechanic. Idle-but-alive so it costs nothing.
-function _egBmbEnsureKeeper(monster) {
+export function _egBmbEnsureKeeper(monster) {
     if (_egBmbMineKeeper) return _egBmbKeeperRun;
     const bossId = monster ? monster.id : 'boss_bomber';
     _egBmbKeeperRun = _egNkNewRun(bossId, true);
@@ -302,7 +311,7 @@ function _egBmbEnsureKeeper(monster) {
 // Run every live mine is planted into: the persistent keeper. Mechanic runs
 // own only their transient visuals - when they end, the FIELD must survive
 // (a killed run sweeps its elements instantly).
-function _egBmbFieldRun(monster) {
+export function _egBmbFieldRun(monster) {
     return _egBmbEnsureKeeper(monster);
 }
 
@@ -313,18 +322,18 @@ function _egBmbFieldRun(monster) {
 // A ring of 4–6 tethered mines orbits the boss card for a long, readable
 // wind-up, then each mine detaches and drifts to YOUR position at launch
 // time, planting a proximity mine. Standing still = surrounded.
-const EG_BMB_COLLAR_MINES = [0, 4, 5, 6];
-const EG_BMB_COLLAR_ORBIT_MS = [0, 3000, 2600, 2200];
-const EG_BMB_COLLAR_DRIFT_MS = [0, 3000, 2800, 2400];
-const EG_BMB_COLLAR_RING_R = 95;
+export const EG_BMB_COLLAR_MINES = [0, 4, 5, 6];
+export const EG_BMB_COLLAR_ORBIT_MS = [0, 3000, 2600, 2200];
+export const EG_BMB_COLLAR_DRIFT_MS = [0, 3000, 2800, 2400];
+export const EG_BMB_COLLAR_RING_R = 95;
 
 // Center of the playable grid (from corner cells), or viewport fallback -
 // the arena anchor for the collar orbit (the boss CARD moves between panel
 // zones, so it is a bad anchor for arena mechanics).
-function _egBmbGridCenter() {
-    if (typeof cur !== 'undefined' && cur && cur.grid && cur.grid.length && cur.grid[0]) {
+export function _egBmbGridCenter() {
+    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid && globalThis.cur.grid.length && globalThis.cur.grid[0]) {
         const a = document.getElementById('g-0-0');
-        const b = document.getElementById('g-' + (cur.grid.length - 1) + '-' + (cur.grid[0].length - 1));
+        const b = document.getElementById('g-' + (globalThis.cur.grid.length - 1) + '-' + (globalThis.cur.grid[0].length - 1));
         if (a && b && a.isConnected && b.isConnected) {
             const ra = a.getBoundingClientRect();
             const rb = b.getBoundingClientRect();
@@ -336,7 +345,7 @@ function _egBmbGridCenter() {
     return { x: window.innerWidth / 2, y: window.innerHeight * 0.38 };
 }
 
-function _egMechMineCollar(monster, phase) {
+export function _egMechMineCollar(monster, phase) {
     if (_egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -414,13 +423,13 @@ function _egMechMineCollar(monster, phase) {
 // carpets its path with bombs on a fixed cadence. Each bomb detonates on a
 // short fuse - the detonation front rolls along the path behind the plane,
 // so you must leave the highlighted lane entirely.
-const EG_BMB_CARPET_SPACING = [0, 0, 130, 110];
-const EG_BMB_CARPET_FUSE_MS = [0, 0, 1600, 1300];
-const EG_BMB_CARPET_SPEED = [0, 0, 420, 520];       // px/s plane travel
-const EG_BMB_CARPET_BLAST_R = 120;
-const EG_BMB_CARPET_TRAIL_W = 96;                   // lane highlight width
+export const EG_BMB_CARPET_SPACING = [0, 0, 130, 110];
+export const EG_BMB_CARPET_FUSE_MS = [0, 0, 1600, 1300];
+export const EG_BMB_CARPET_SPEED = [0, 0, 420, 520];       // px/s plane travel
+export const EG_BMB_CARPET_BLAST_R = 120;
+export const EG_BMB_CARPET_TRAIL_W = 96;                   // lane highlight width
 
-function _egMechCarpetRun(monster, phase) {
+export function _egMechCarpetRun(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -512,14 +521,14 @@ function _egMechCarpetRun(monster, phase) {
 // Mortar shells ☄️ burst at (near) the player's position into 7–10 bomblets
 // that scatter outward and land as short-fuse mines. Three shells, staggered
 // ~1s apart (debug-stretched). Get out of the scatter rings.
-const EG_BMB_CLUSTER_SHELLS = 3;
-const EG_BMB_CLUSTER_BOMBLETS = [0, 0, 0, 7];
-const EG_BMB_CLUSTER_SCATTER_R = [0, 0, 0, 240];
-const EG_BMB_CLUSTER_FUSE_MS = 1700;
-const EG_BMB_CLUSTER_SHELL_GAP_MS = 950;
-const EG_BMB_CLUSTER_BLAST_R = 86;
+export const EG_BMB_CLUSTER_SHELLS = 3;
+export const EG_BMB_CLUSTER_BOMBLETS = [0, 0, 0, 7];
+export const EG_BMB_CLUSTER_SCATTER_R = [0, 0, 0, 240];
+export const EG_BMB_CLUSTER_FUSE_MS = 1700;
+export const EG_BMB_CLUSTER_SHELL_GAP_MS = 950;
+export const EG_BMB_CLUSTER_BLAST_R = 86;
 
-function _egMechClusterShells(monster, phase) {
+export function _egMechClusterShells(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     if (Number(phase) < 3) return;   // phase-3-only mechanic (no phase3Only flag)
     const p = 3;
@@ -596,15 +605,15 @@ function _egMechClusterShells(monster, phase) {
 // afterglow sweep 1.1s later (if you still linger outside). The boss is
 // immune + shielded until the set-piece resolves, and the auto-attack
 // charge bar freezes (gate in _egTickPlayer, endgame-encounter.js).
-const EG_BMB_FINAL_CD_TICK_MS = 800;
-const EG_BMB_FINAL_CD_TICKS = 3;
-const EG_BMB_FINAL_WAVE_MS = 1500;                 // after countdown: bang wind-up
-const EG_BMB_FINAL_SAFE_R_PCT = 0.32;              // of min(vw, vh)
+export const EG_BMB_FINAL_CD_TICK_MS = 800;
+export const EG_BMB_FINAL_CD_TICKS = 3;
+export const EG_BMB_FINAL_WAVE_MS = 1500;                 // after countdown: bang wind-up
+export const EG_BMB_FINAL_SAFE_R_PCT = 0.32;              // of min(vw, vh)
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
 // Returning false keeps the normal transition flow untouched.
-function _egBomberOnPhaseEnter(monster, newPhase) {
+export function _egBomberOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egBmbStartFinalWatcher(monster); } catch (e) {}
     return false;
@@ -612,7 +621,7 @@ function _egBomberOnPhaseEnter(monster, newPhase) {
 
 // Passive watcher: fires TOTAL CARPET the first time the boss drops to
 // ≤10% HP. Dies automatically with the boss (nk run boss-alive check).
-function _egBmbStartFinalWatcher(monster) {
+export function _egBmbStartFinalWatcher(monster) {
     if (!monster || _egBomberFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -628,7 +637,7 @@ function _egBmbStartFinalWatcher(monster) {
     });
 }
 
-function _egBomberFinalStart(monster) {
+export function _egBomberFinalStart(monster) {
     if (_egBomberFinal || !monster) return;
 
     // The arena goes quiet: kill every other run of this boss (the watcher
@@ -720,7 +729,7 @@ function _egBomberFinalStart(monster) {
 
 // The bang: every live mine + a rolling detonation front around the safe
 // dome, then a global wave test (outside = hit) and an afterglow sweep.
-function _egBomberFinalBang(g, monster) {
+export function _egBomberFinalBang(g, monster) {
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(g.monsterId, true);
     g.run = run;
@@ -783,7 +792,7 @@ function _egBomberFinalBang(g, monster) {
 }
 
 // Ends the set-piece and hands control back to the boss (phase 3 schedule).
-function _egBomberFinalEnd(g) {
+export function _egBomberFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     g.faded = true;
@@ -798,7 +807,7 @@ function _egBomberFinalEnd(g) {
     document.body.classList.remove('eg-bmb-flash');
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -822,7 +831,7 @@ if (typeof window !== 'undefined') {
     window._EG_BMB_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_bomber') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_bomber') : null;
             if (!monster) return 'no bomber alive';
             const fn = name === 'collar' ? _egMechMineCollar
                 : name === 'carpet' ? _egMechCarpetRun
@@ -833,7 +842,7 @@ if (typeof window !== 'undefined') {
         },
         mine: (x, y) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_bomber') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_bomber') : null;
             if (!monster) return 'no bomber alive';
             // Persistent debug run: never swept by a timer - mines fizzle on
             // their own 16s life, and teardown clears the run.
@@ -847,7 +856,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_bomber') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_bomber') : null;
             if (!monster) return 'no bomber alive';
             _egBomberFinalStart(monster);
             return 'TOTAL CARPET started';

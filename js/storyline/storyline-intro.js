@@ -1,4 +1,9 @@
-﻿// =============================================================================
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+// =============================================================================
 // storyline-intro.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // Data for the main opening cinematic / intro song (Part 1).
@@ -21,7 +26,7 @@
 // below for a global default.
 // ---------------------------------------------------------------------------
 
-const INTRO_CINEMATIC_SLIDES = [
+export const INTRO_CINEMATIC_SLIDES = [
     { image: "1.webp", textKey: 'st_ic_1', duration: 8000 },
     { image: "2.webp", textKey: 'st_ic_2', duration: 8000 },
     { image: "3.webp", textKey: 'st_ic_3', duration: 12000 },
@@ -51,7 +56,7 @@ const INTRO_CINEMATIC_SLIDES = [
 
 
 // Folder where the intro images live (relative to your index.html)
-const INTRO_CINEMATIC_IMAGE_PATH = "images/Intro/Stoxels_Intro/";
+export const INTRO_CINEMATIC_IMAGE_PATH = "images/Intro/Stoxels_Intro/";
 
 
 
@@ -84,7 +89,7 @@ const INTRO_CINEMATIC_IMAGE_PATH = "images/Intro/Stoxels_Intro/";
 // Regenerate this block any time the SRT changes by re-running the same
 // parse script used to build it (parses the .srt, emits one
 // _wordsFromLine(...) call per cue with that cue's real start/end ms).
-const INTRO_SONG = {
+export const INTRO_SONG = {
     audio: "audio/Intro/Stoxels_Intro_Song.ogg",
     imagePath: INTRO_CINEMATIC_IMAGE_PATH,
 

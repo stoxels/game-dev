@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egApplyPlayerAilment } from '../endgame-ailments.js';
+import { _egDamageTargetById } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE NULL (boss_null)----------------------------
 //------------------------------------------------------------------------
 // TIER 7 REWORK - 🧿 "The Null Hypothesis". Erasure of certainty: the Null
@@ -40,8 +50,8 @@
 
 // DEBUG: slow The Null's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_NUL_DEBUG_SLOW = true;
-const _EG_NUL_DEBUG_MULT = _EG_NUL_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_NUL_DEBUG_SLOW = true;
+export const _EG_NUL_DEBUG_MULT = _EG_NUL_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_null: {
@@ -76,29 +86,29 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning ───────────────────────────────────────────────────────────
-const EG_NUL_LINE_DPS    = 9;      // %maxHP/s standing on a void line
-const EG_NUL_LATTICE_R   = 320;    // lattice line length (px)
-const EG_NUL_LINE_W      = 8;      // void line thickness
-const EG_NUL_RECONTRACT  = 12;     // s between lattice re-contractions
-const EG_NUL_ERASE_MS    = 8000;   // a hypothesis erasure lasts
-const EG_NUL_RAY_HIT     = 0.14;   // %maxHP crossing a null ray
-const EG_NUL_RAYS        = 2;      // orbiting eye-beams
-const EG_NUL_RAY_SPEED   = 0.7;    // rad/s orbit
-const EG_NUL_STRIKE_HIT  = 0.15;   // %maxHP caught on the strike side
-const EG_NUL_EXPOSE_R    = 150;    // exposure reach around the phantom
-const EG_NUL_WINDOW_MS   = 9000;   // per counter-example window
-const EG_NUL_NULLIFY     = 0.30;   // NULLIFICATION hit (outside the ring)
-const EG_NUL_RING_R      = 130;    // white safe ring radius
-const EG_NUL_HIT_CD_MS   = 700;    // shared touch cooldown
+export const EG_NUL_LINE_DPS    = 9;      // %maxHP/s standing on a void line
+export const EG_NUL_LATTICE_R   = 320;    // lattice line length (px)
+export const EG_NUL_LINE_W      = 8;      // void line thickness
+export const EG_NUL_RECONTRACT  = 12;     // s between lattice re-contractions
+export const EG_NUL_ERASE_MS    = 8000;   // a hypothesis erasure lasts
+export const EG_NUL_RAY_HIT     = 0.14;   // %maxHP crossing a null ray
+export const EG_NUL_RAYS        = 2;      // orbiting eye-beams
+export const EG_NUL_RAY_SPEED   = 0.7;    // rad/s orbit
+export const EG_NUL_STRIKE_HIT  = 0.15;   // %maxHP caught on the strike side
+export const EG_NUL_EXPOSE_R    = 150;    // exposure reach around the phantom
+export const EG_NUL_WINDOW_MS   = 9000;   // per counter-example window
+export const EG_NUL_NULLIFY     = 0.30;   // NULLIFICATION hit (outside the ring)
+export const EG_NUL_RING_R      = 130;    // white safe ring radius
+export const EG_NUL_HIT_CD_MS   = 700;    // shared touch cooldown
 
 
 //------------------------------------------------------------------------
 //-------------------SHARED HELPERS----------------------------------------
 //------------------------------------------------------------------------
-let _egNulHitCd = 0;
+export let _egNulHitCd = 0;
 
 // Touch damage helper shared by all Null hazards (per-touch cooldown).
-function _egNulTouch(pct, level, label) {
+export function _egNulTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egNulHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -110,20 +120,20 @@ function _egNulTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egNulPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egNulPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Prefixed delay for out-of-run callbacks: defers while the game is
 // frozen (visual-only use - the finale uses _egNulAfter instead).
-function _egNulDelay(ms, fn) {
+export function _egNulDelay(ms, fn) {
     setTimeout(() => { if (!_egNkFrozen()) fn(); else setTimeout(() => { if (!_egNkFrozen()) fn(); }, 120); }, ms);
 }
 
 // Movement recorder: the finale's phantoms replay YOUR recent path. One
 // passive run, created lazily, ~100ms samples, ~6s buffer.
-let _egNulRecBuf = [];   // { x, y, t }
-let _egNulRecRun = null;
+export let _egNulRecBuf = [];   // { x, y, t }
+export let _egNulRecRun = null;
 
-function _egNulEnsureRecRun(monster) {
+export function _egNulEnsureRecRun(monster) {
     if (_egNulRecRun && _egNkRuns.has(_egNulRecRun.id)) return;
     const run = _egNkNewRun(monster && monster.id, false);
     run.passive = true;
@@ -151,11 +161,11 @@ function _egNulEnsureRecRun(monster) {
 // lines dissolve, new ones grow (a ~1.2s grace window between states).
 // Geometry: 3 lines through the centre at 60° steps (6 spokes), plus a
 // hollow hexagon ring - the safe cells are the triangular gaps.
-let _egNulLatRun = null;
-let _egNulLines = [];   // { el, cx, cy, ang, len }
-let _egNulRing = [];    // { el, cx, cy, ang, d } (hexagon segments)
+export let _egNulLatRun = null;
+export let _egNulLines = [];   // { el, cx, cy, ang, len }
+export let _egNulRing = [];    // { el, cx, cy, ang, d } (hexagon segments)
 
-function _egMechNulLattice(monster, phase) {
+export function _egMechNulLattice(monster, phase) {
     // The lattice is permanent - one long-lived passive run owns it.
     // Later scheduled casts must NOT re-toast or rebuild it.
     if (_egNulLatRun && _egNkRuns.has(_egNulLatRun.id)) return;
@@ -275,7 +285,7 @@ function _egMechNulLattice(monster, phase) {
 // would be a fatal SyntaxError that kills this whole file.
 
 // Hides all clue spans and stores their original text so it can be restored.
-function _egApplyBlackout() {
+export function _egApplyBlackout() {
     document.querySelectorAll('[id^="rn-"], [id^="cn-"]').forEach(span => {
         span.dataset.origText = span.textContent;
         span.textContent = '?';
@@ -284,9 +294,9 @@ function _egApplyBlackout() {
 }
 
 // Restores all clue spans to their original text and removes the styling.
-function _egRemoveBlackout() {
-    if (!_egBlackoutActive && !document.querySelector('.eg-blackout-clue')) return;
-    _egBlackoutActive = false;
+export function _egRemoveBlackout() {
+    if (!globalThis._egBlackoutActive && !document.querySelector('.eg-blackout-clue')) return;
+    globalThis._egBlackoutActive = false;
     document.querySelectorAll('[id^="rn-"], [id^="cn-"]').forEach(span => {
         if (span.dataset.origText !== undefined) {
             span.textContent = span.dataset.origText;
@@ -297,9 +307,9 @@ function _egRemoveBlackout() {
 }
 
 // Removes all legacy Void Surge DOM elements and clears the poll interval.
-function _egVoidSurgeTeardown() {
-    _egVoidSurgeActive = false;
-    if (_egVoidSurgePollInterval) { clearInterval(_egVoidSurgePollInterval); _egVoidSurgePollInterval = null; }
+export function _egVoidSurgeTeardown() {
+    globalThis._egVoidSurgeActive = false;
+    if (globalThis._egVoidSurgePollInterval) { clearInterval(globalThis._egVoidSurgePollInterval); globalThis._egVoidSurgePollInterval = null; }
     ['eg-void-surge-overlay', 'eg-void-surge-circle', 'eg-void-surge-countdown']
         .forEach(id => { const el = document.getElementById(id); if (el) el.remove(); });
 }
@@ -311,9 +321,9 @@ function _egVoidSurgeTeardown() {
 // The Null targets ONE system each cast and greys it out for 8s with a
 // clear 🧿 marker over what it took. Readable sabotage: clue numbers
 // (blackout spans), the auto-attack charge bar, or the class HUD.
-const EG_NUL_ERASE_TARGETS = ['clues', 'charge', 'hud'];
+export const EG_NUL_ERASE_TARGETS = ['clues', 'charge', 'hud'];
 
-function _egMechNulErasure(monster, phase) {
+export function _egMechNulErasure(monster, phase) {
     if (_egNkFrozen()) return;
     void phase;
     const target = EG_NUL_ERASE_TARGETS[Math.floor(Math.random() * EG_NUL_ERASE_TARGETS.length)];
@@ -325,7 +335,7 @@ function _egMechNulErasure(monster, phase) {
     marker.textContent = '🧿';
     let host = null;
     if (target === 'clues') {
-        _egBlackoutActive = true;
+        globalThis._egBlackoutActive = true;
         _egApplyBlackout();
         host = document.getElementById('ptable');
     } else if (target === 'charge') {
@@ -375,7 +385,7 @@ function _egMechNulErasure(monster, phase) {
 //------------------------------------------------------------------------
 // Two eye-beams orbit the anchor. Crossing one: contact damage PLUS the
 // chill ailment (charge bar fills at 50% - a verified soft punish).
-function _egMechNulRays(monster, phase) {
+export function _egMechNulRays(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -432,27 +442,27 @@ function _egMechNulRays(monster, phase) {
 // contradiction and shatter a shell. Three exposures → the hypothesis
 // collapses (the Null pays its own HP). Three failures → NULLIFICATION:
 // darkness returns except one white ring (30% hit).
-const EG_NUL_EXPOSE_GOAL  = 3;     // shells to shatter (the kill)
-const EG_NUL_STRIKE_WALK  = 2500;  // ms the phantom replays (x mult)
-const EG_NUL_STRIKE_DELAY = 1400;  // ms telegraph after the walk
-const EG_NUL_STRIKE_LEN   = 90;    // px the strike lands from the phantom
+export const EG_NUL_EXPOSE_GOAL  = 3;     // shells to shatter (the kill)
+export const EG_NUL_STRIKE_WALK  = 2500;  // ms the phantom replays (x mult)
+export const EG_NUL_STRIKE_DELAY = 1400;  // ms telegraph after the walk
+export const EG_NUL_STRIKE_LEN   = 90;    // px the strike lands from the phantom
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egNulFinal = null;
+export let _egNulFinal = null;
 
-function _egNulFinalActive() {
+export function _egNulFinalActive() {
     return !!_egNulFinal && !_egNulFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egNulOnPhaseEnter(monster, newPhase) {
+export function _egNulOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egNulStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egNulStartFinalWatcher(monster) {
+export function _egNulStartFinalWatcher(monster) {
     if (!monster || _egNulFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -470,7 +480,7 @@ function _egNulStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-function _egNulAfter(g, ms, fn) {
+export function _egNulAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egNulFinal) return;
@@ -481,7 +491,7 @@ function _egNulAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egNulFinalStart(monster) {
+export function _egNulFinalStart(monster) {
     if (_egNulFinal || !monster) return;
 
     // The proof takes over: kill every ACTIVE mechanic run of this boss -
@@ -633,7 +643,7 @@ function _egNulFinalStart(monster) {
 
 // Three exposures: the hypothesis collapses - the Null implodes inward and
 // pays its own remaining HP (canonical path, immunity already released).
-function _egNulCollapse(g, monster) {
+export function _egNulCollapse(g, monster) {
     if (g.finished) return;
     _egNkToast('eg_mech_nul_collapse', '🧿💥 THE HYPOTHESIS COLLAPSES - the Null refutes itself!', '#a7f3d0');
     const flash = document.createElement('div');
@@ -642,7 +652,7 @@ function _egNulCollapse(g, monster) {
     setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1500);
     _egNulFinalEnd(g, monster);
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m && typeof _egDamageTargetById === 'function' && m.currentHP > 0) {
             _egDamageTargetById(g.monsterId, m.currentHP, ['shadow'], {});
         }
@@ -651,7 +661,7 @@ function _egNulCollapse(g, monster) {
 }
 
 // Three failures: NULLIFICATION - darkness returns except one white ring.
-function _egNulNullification(g, monster, level) {
+export function _egNulNullification(g, monster, level) {
     if (g.finished) return;
     _egNkToast('eg_mech_nul_nullify', '🧿💀 NULLIFICATION - everything is erased but the ring!', '#f87171');
     const W = window.innerWidth, H = window.innerHeight;
@@ -681,7 +691,7 @@ function _egNulNullification(g, monster, level) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egNulFinalEnd(g, monster) {
+export function _egNulFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -697,7 +707,7 @@ function _egNulFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -709,7 +719,7 @@ function _egNulFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body state this boss ever created.
-function _egNulTeardown() {
+export function _egNulTeardown() {
     if (_egNulFinal) { try { _egNulFinalEnd(_egNulFinal, null); } catch (e) {} _egNulFinal = null; }
     if (_egNulLatRun) { try { _egNkKillRun(_egNulLatRun); } catch (e) {} _egNulLatRun = null; }
     if (_egNulRecRun) { try { _egNkKillRun(_egNulRecRun); } catch (e) {} _egNulRecRun = null; }
@@ -717,8 +727,8 @@ function _egNulTeardown() {
     _egNulRing.forEach(r => { try { r.el.remove(); } catch (e) {} });
     _egNulLines = []; _egNulRing = [];
     _egNulRecBuf = [];
-    _egBlackoutActive = false;
-    _egVoidSurgeActive = false;
+    globalThis._egBlackoutActive = false;
+    globalThis._egVoidSurgeActive = false;
     _egRemoveBlackout();
     _egVoidSurgeTeardown();
     document.querySelectorAll('.eg-nul-line, .eg-nul-ring-seg, .eg-nul-anchor, .eg-nul-ray, ' +
@@ -748,7 +758,7 @@ if (typeof window !== 'undefined') {
     window._EG_NUL_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_null') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_null') : null;
             if (!monster) return 'no null alive';
             if (name === 'final') { _egNulFinalStart(monster); return 'PROOF BY CONTRADICTION started'; }
             const fn = name === 'lattice' ? _egMechNulLattice

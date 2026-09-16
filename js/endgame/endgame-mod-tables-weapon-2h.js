@@ -1,3 +1,10 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_MOD_TABLE_WEAPON1 } from './endgame-mod-tables-weapon1.js';
+
 //  endgame-mod-tables-weapon-2h.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
@@ -11,7 +18,7 @@
 // flat damage (physical + elemental) and ~25% harder on % increased physical.
 // Attack speed / crit / accuracy / status / cleave pools are unchanged, so a
 // 2H weapon feels like a bigger version of a 1H - not a different item class.
-const EG_MOD_TABLE_WEAPON_2H = (() => {
+export const EG_MOD_TABLE_WEAPON_2H = (() => {
     const clone = JSON.parse(JSON.stringify(EG_MOD_TABLE_WEAPON1));
     const scaleTierList = (tiers, factor) => {
         for (const tr of tiers) {

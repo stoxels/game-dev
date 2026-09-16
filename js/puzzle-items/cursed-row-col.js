@@ -1,9 +1,22 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _resolveCursedBlackoutDownside } from './shared/cursed-downside.js';
+import { CHAOS_BLAST_COLOURS, FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+import { solveCols, solveRows } from './shared/grid-actions.js';
+import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+
+//------------------------------------------------------------------------
 //-------------------CURSED ROW COL - CHAOS GRID----------------------
 //------------------------------------------------------------------------
 
 // cursedRowCol - solves 4 rows and 4 cols; downside blacks out column clues.
-function _useCursedRowCol(id, def) {
+export function _useCursedRowCol(id, def) {
     _trackWitchImmuneCursedUse();
 
     const rowsRevealed = solveRows(4, 'item');
@@ -12,7 +25,7 @@ function _useCursedRowCol(id, def) {
     _resolveCursedBlackoutDownside(45000, false, true); // black out cols only
 
     playItemEffect(id);
-    checkWin();
+    globalThis.checkWin();
     return `💥 ${t('item_cursed_rowcol_both').replace('{r}', rowsRevealed).replace('{c}', colsRevealed)}`;
 }
 
@@ -21,7 +34,7 @@ function _useCursedRowCol(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: detonates one explosion blast + shrapnel at a random grid position.
-function _fxDetonateBlast(container, r) {
+export function _fxDetonateBlast(container, r) {
     const blastColor = CHAOS_BLAST_COLOURS[Math.floor(Math.random() * CHAOS_BLAST_COLOURS.length)];
     const blast = _fxMakeElement(container, `
         position:absolute;
@@ -45,7 +58,7 @@ function _fxDetonateBlast(container, r) {
 }
 
 // 💥 Chaos Grid - multicolour explosions detonate across the entire grid.
-function _fxChaosGrid() {
+export function _fxChaosGrid() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

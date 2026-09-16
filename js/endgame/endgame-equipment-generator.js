@@ -1,3 +1,31 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { LANG } from '../translation/translations.js';
+import { EG_ALL_BASE_TYPES, EG_SLOT_ICONS } from './endgame-equipment-base-items.js';
+import { _egRollImplicitsForBase } from './endgame-implicits.js';
+import { _egMapLootRarityWeightMult } from './endgame-map-launch.js';
+import { _egBuildItemName, _egRollMods } from './endgame-mod-application.js';
+import { EG_MOD_TABLE_AMULET } from './endgame-mod-tables-amulet.js';
+import { EG_MOD_TABLE_ARCANE } from './endgame-mod-tables-arcane.js';
+import { EG_MOD_TABLE_BELT } from './endgame-mod-tables-belt.js';
+import { EG_MOD_TABLE_BOOTS } from './endgame-mod-tables-boots.js';
+import { EG_MOD_TABLE_BRACERS } from './endgame-mod-tables-bracers.js';
+import { EG_MOD_TABLE_CHEST } from './endgame-mod-tables-chest.js';
+import { EG_MOD_TABLE_CLOAK } from './endgame-mod-tables-cloak.js';
+import { EG_MOD_TABLE_EARRING } from './endgame-mod-tables-earring.js';
+import { EG_MOD_TABLE_GLOVES } from './endgame-mod-tables-gloves.js';
+import { EG_MOD_TABLE_HEAD } from './endgame-mod-tables-head.js';
+import { EG_MOD_TABLE_PANTS } from './endgame-mod-tables-pants.js';
+import { EG_MOD_TABLE_RING } from './endgame-mod-tables-ring.js';
+import { EG_MOD_TABLE_RANGED, EG_MOD_TABLE_SHIELD } from './endgame-mod-tables-shield.js';
+import { EG_MOD_TABLE_SHOULDERS } from './endgame-mod-tables-shoulders.js';
+import { EG_MOD_TABLE_TALISMAN } from './endgame-mod-tables-talisman.js';
+import { EG_MOD_TABLE_WEAPON_2H } from './endgame-mod-tables-weapon-2h.js';
+import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from './endgame-mod-tables-weapon1.js';
+
 //  endgame-equipment-generator.js
 //  Pass 6: mod application + item naming moved to endgame-mod-application.js.
 //  This file owns the ROLL PIPELINE only:
@@ -28,14 +56,14 @@
 //-------------------CONFIGURATION----------------------------------------
 //------------------------------------------------------------------------
 
-const EG_ITEM_RARITY_TABLE = [
+export const EG_ITEM_RARITY_TABLE = [
     { rarity: 'common', weight: 550 },
     { rarity: 'uncommon', weight: 290 },
     { rarity: 'rare', weight: 130 },
     { rarity: 'epic', weight: 60 },
 ];
 
-const EG_MOD_CAPS = {
+export const EG_MOD_CAPS = {
     common: { maxPre: 0, maxSuf: 0, maxTotal: 0, minTotal: 0 },
     uncommon: { maxPre: 1, maxSuf: 1, maxTotal: 2, minTotal: 1 },
     rare: { maxPre: 3, maxSuf: 3, maxTotal: 4, minTotal: 3 },
@@ -48,7 +76,7 @@ const EG_MOD_CAPS = {
 // NOTE: melee weapons use slotType 'weapon' - 1H rolls WEAPON_1H, 2H rolls
 // the harder-hitting WEAPON_2H table (PoE-style). Shields use slotType
 // 'shield' (→ SHIELD, a defensive-only derivative of WEAPON2).
-const EG_SLOT_MOD_TABLE_MAP = {
+export const EG_SLOT_MOD_TABLE_MAP = {
     head: () => EG_MOD_TABLE_HEAD,
     earring: () => EG_MOD_TABLE_EARRING,
     amulet: () => EG_MOD_TABLE_AMULET,
@@ -71,7 +99,7 @@ const EG_SLOT_MOD_TABLE_MAP = {
 // Returns the melee mod table for the base currently being rolled:
 // two-handed weapons roll the harder-hitting WEAPON_2H pool, everything
 // else (1H main-hand + 1H off-hand dual-wield) rolls WEAPON_1H.
-function _egGetWeaponModTable(base) {
+export function _egGetWeaponModTable(base) {
     const b = base || _egCurrentWeaponBase || null;
     const hands = b ? (b.hands === 2 ? 2 : 1) : 1;
     try {
@@ -85,7 +113,7 @@ function _egGetWeaponModTable(base) {
 
 // Set around the mod-roll so _egGetWeaponModTable can see the base even when
 // called via the slot map without arguments (essences / crafting paths).
-let _egCurrentWeaponBase = null;
+export let _egCurrentWeaponBase = null;
 
 
 //------------------------------------------------------------------------
@@ -93,7 +121,7 @@ let _egCurrentWeaponBase = null;
 //------------------------------------------------------------------------
 // Returns the correct mod table object for a given base item.
 
-function _egGetModTable(base) {
+export function _egGetModTable(base) {
     if (base && base.slotType === 'weapon') _egCurrentWeaponBase = base;
     const getter = EG_SLOT_MOD_TABLE_MAP[base.slotType];
     if (!getter) return null;
@@ -106,7 +134,7 @@ function _egGetModTable(base) {
 //-------------------RARITY ROLLER----------------------------------------
 //------------------------------------------------------------------------
 
-function _egRollRarity() {
+export function _egRollRarity() {
     // Active map's loot rarity bonus boosts non-common weights during runs.
     const rarMult = (typeof _egMapLootRarityWeightMult === 'function')
         ? _egMapLootRarityWeightMult() : 1;
@@ -129,7 +157,7 @@ function _egRollRarity() {
 //------------------------------------------------------------------------
 // Returns { prefixCount, suffixCount } for the given rarity.
 
-function _egRollModCounts(rarity) {
+export function _egRollModCounts(rarity) {
     const cap = EG_MOD_CAPS[rarity];
     if (!cap || cap.maxTotal === 0) return { prefixCount: 0, suffixCount: 0 };
 
@@ -167,7 +195,7 @@ function _egRollModCounts(rarity) {
 //------------------------------------------------------------------------
 // Signature matches the original in endgame-equipment-base-items.js.
 
-function _egGenerateEquipmentDrop(monsterLevel = 1) {
+export function _egGenerateEquipmentDrop(monsterLevel = 1) {
 
     // ── 1. Pick base type ────────────────────────────────────────────
     let eligible = EG_ALL_BASE_TYPES.filter(b => b.minLevel <= monsterLevel);

@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE STORMCALLER (boss_sirus)--------------------
 //------------------------------------------------------------------------
 // TIER 8 REWORK - "The Eye of the Storm". PoE Sirus homage, deepened: the
@@ -50,8 +58,8 @@
 // DEBUG: slow The Stormcaller's timing 2.5x so manual playtests /
 // screenshot automation can catch mid-animation states. Flip to false for
 // ship.
-const _EG_SIR_DEBUG_SLOW = true;
-const _EG_SIR_DEBUG_MULT = _EG_SIR_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_SIR_DEBUG_SLOW = true;
+export const _EG_SIR_DEBUG_MULT = _EG_SIR_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_sirus: {
@@ -87,7 +95,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_SIR_TOUCH_CD_MS = 700;      // shared touch cooldown
+export const EG_SIR_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -97,8 +105,8 @@ const EG_SIR_TOUCH_CD_MS = 700;      // shared touch cooldown
 // Touch damage helper shared by all Stormcaller hazards. Lightning-element
 // boss - hits go in with element 'lightning' so the toast palette stays
 // yellow.
-let _egSirHitCd = 0;
-function _egSirTouch(pct, level, label) {
+export let _egSirHitCd = 0;
+export function _egSirTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egSirHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -110,15 +118,15 @@ function _egSirTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egSirPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egSirPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Proven reward pattern (Siren echo zones / Swarm royal jelly): heals go
 // through a guarded clamp + rerender.
-function _egSirHeal(amount) {
+export function _egSirHeal(amount) {
     if (typeof playerCurrentHP === 'undefined') return;
-    const before = playerCurrentHP;
-    playerCurrentHP = Math.min(playerMaxHP || before, before + amount);
-    if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    const before = globalThis.playerCurrentHP;
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + amount);
+    if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
 
@@ -132,21 +140,21 @@ function _egSirHeal(amount) {
 // while charged you tick to EVERYTHING nearby (aura ticks stronger the
 // more stacks). Phase 3: the fronts close from both sides at once - a
 // pincer.
-const EG_SIR_ION_N      = [0, 2, 2, 2]; // lanes per cast (pincer = 2×2)
-const EG_SIR_ION_WARN   = 1500;         // dashed telegraph before the front moves
-const EG_SIR_ION_SPD    = [0, 190, 215, 245]; // px/s front travel
-const EG_SIR_ION_HOT    = [0, 6.5, 7.5, 9.0]; // %/s inside the hot band
-const EG_SIR_TANGENT_MS = 900;          // tangent safe window around crossing
-const EG_SIR_CHARGE_MAX = 5;            // charge stacks
-const EG_SIR_CHARGE_DECAY_MS = 4000;    // stacks fall off one per this
-const EG_SIR_AURA_DPS   = [0, 2.0, 2.5, 3.0]; // %/s self-aura per stack (at 1..5)
+export const EG_SIR_ION_N      = [0, 2, 2, 2]; // lanes per cast (pincer = 2×2)
+export const EG_SIR_ION_WARN   = 1500;         // dashed telegraph before the front moves
+export const EG_SIR_ION_SPD    = [0, 190, 215, 245]; // px/s front travel
+export const EG_SIR_ION_HOT    = [0, 6.5, 7.5, 9.0]; // %/s inside the hot band
+export const EG_SIR_TANGENT_MS = 900;          // tangent safe window around crossing
+export const EG_SIR_CHARGE_MAX = 5;            // charge stacks
+export const EG_SIR_CHARGE_DECAY_MS = 4000;    // stacks fall off one per this
+export const EG_SIR_AURA_DPS   = [0, 2.0, 2.5, 3.0]; // %/s self-aura per stack (at 1..5)
 
 // Fight-global charge (read by Chain Lightning + Perfect Storm).
-let _egSirCharge = 0, _egSirChargeUntil = 0;
-let _egSirChipRun = null;   // the HUD chip's run (teardown kills it)
+export let _egSirCharge = 0, _egSirChargeUntil = 0;
+export let _egSirChipRun = null;   // the HUD chip's run (teardown kills it)
 
 // The charge HUD chip: ⚡ stacks while charged (Bloom's WILT-chip pattern).
-function _egSirEnsureChip() {
+export function _egSirEnsureChip() {
     if (_egSirChipRun) return;
     const chip = document.createElement('div');
     chip.className = 'eg-sir-charge-chip';
@@ -166,14 +174,14 @@ function _egSirEnsureChip() {
 }
 
 // Shared: returns the player's current charge stacks (and applies decay).
-function _egSirChargeNow() {
+export function _egSirChargeNow() {
     const now = performance.now();
     if (now >= _egSirChargeUntil) { _egSirCharge = 0; }
     else while (_egSirCharge > 0 && now >= _egSirChargeUntil - (EG_SIR_CHARGE_MAX - _egSirCharge) * EG_SIR_CHARGE_DECAY_MS) _egSirCharge--;
     return _egSirCharge;
 }
 
-function _egMechSirIon(monster, phase) {
+export function _egMechSirIon(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egSirEnsureFinalWatcher(monster);
     _egSirEnsureChip();
@@ -291,15 +299,15 @@ function _egMechSirIon(monster, phase) {
 // that must cross water grounds itself at the shore. Cold pools (shared
 // frozen_cells) always ground the bolt - ice doesn't conduct. Phase 3:
 // TWO bolts.
-const EG_SIR_BOLT_SPD   = [0, 150, 165, 185]; // px/s hunting bolt
-const EG_SIR_BOLT_DMG   = [0, 0, 0.16, 0.20]; // %maxHP bolt hit
-const EG_SIR_BOLT_LIFE  = [0, 0, 9000, 11000]; // ms the bolt hunts
-const EG_SIR_RIVER_N    = [0, 0, 2, 2];       // water lanes per cast
-const EG_SIR_RIVER_SPD  = 90;                 // px/s river sweep
-const EG_SIR_RIVER_W    = 64;                 // standing water width
-const EG_SIR_GROUND_R   = 30;                 // distance at which the bolt grounds
+export const EG_SIR_BOLT_SPD   = [0, 150, 165, 185]; // px/s hunting bolt
+export const EG_SIR_BOLT_DMG   = [0, 0, 0.16, 0.20]; // %maxHP bolt hit
+export const EG_SIR_BOLT_LIFE  = [0, 0, 9000, 11000]; // ms the bolt hunts
+export const EG_SIR_RIVER_N    = [0, 0, 2, 2];       // water lanes per cast
+export const EG_SIR_RIVER_SPD  = 90;                 // px/s river sweep
+export const EG_SIR_RIVER_W    = 64;                 // standing water width
+export const EG_SIR_GROUND_R   = 30;                 // distance at which the bolt grounds
 
-function _egMechSirChain(monster, phase) {
+export function _egMechSirChain(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egSirEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -420,13 +428,13 @@ function _egMechSirChain(monster, phase) {
 // casts 7 hot cells; the SAFE tiles are the ones connected to the eye -
 // the dead zones are the ones he's already charged. Spends phase 3 for
 // phase 1: he NEVER MOVES AGAIN - the finale will have to come to him.
-const EG_SIR_EYE_N      = 4;     // 4×4 grid
-const EG_SIR_EYE_HOT    = 7;     // hot cells
-const EG_SIR_EYE_DPS    = [0, 0, 7.5, 9.0]; // %/s in a hot cell
-const EG_SIR_EYE_LIFE   = 9000;  // ms the cells live
-const EG_SIR_EYE_IMMUNE = true;  // he holds the eye: immune while it stands
+export const EG_SIR_EYE_N      = 4;     // 4×4 grid
+export const EG_SIR_EYE_HOT    = 7;     // hot cells
+export const EG_SIR_EYE_DPS    = [0, 0, 7.5, 9.0]; // %/s in a hot cell
+export const EG_SIR_EYE_LIFE   = 9000;  // ms the cells live
+export const EG_SIR_EYE_IMMUNE = true;  // he holds the eye: immune while it stands
 
-function _egMechSirEye(monster, phase) {
+export function _egMechSirEye(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egSirEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -498,29 +506,29 @@ function _egMechSirEye(monster, phase) {
 // bullets - every charged tick fires a hunting bullet at your last
 // position. Die by your own stored charge. Charge bar frozen (gate in
 // _egTickPlayer via _egSirFinalActive).
-const EG_SIR_FIN_BOXES    = 3;      // enclosing box waves
-const EG_SIR_FIN_BOX_DMG  = 0.18;   // %maxHP caught inside a closing box
-const EG_SIR_FIN_BULLET_DMG = 0.14; // %maxHP per bullet hit
-const EG_SIR_FIN_BULLET_SPD = 260;  // px/s hunting bullets
-const EG_SIR_FIN_BULLET_DPS = 3.5;  // %/s self-aura per stack inside
-const EG_SIR_FIN_FAILSAFE_MS = 34000;
+export const EG_SIR_FIN_BOXES    = 3;      // enclosing box waves
+export const EG_SIR_FIN_BOX_DMG  = 0.18;   // %maxHP caught inside a closing box
+export const EG_SIR_FIN_BULLET_DMG = 0.14; // %maxHP per bullet hit
+export const EG_SIR_FIN_BULLET_SPD = 260;  // px/s hunting bullets
+export const EG_SIR_FIN_BULLET_DPS = 3.5;  // %/s self-aura per stack inside
+export const EG_SIR_FIN_FAILSAFE_MS = 34000;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egSirFinal = null;
+export let _egSirFinal = null;
 
-function _egSirFinalActive() {
+export function _egSirFinalActive() {
     return !!_egSirFinal && !_egSirFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egSirOnPhaseEnter(monster, newPhase) {
+export function _egSirOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egSirEnsureFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egSirEnsureFinalWatcher(monster) {
+export function _egSirEnsureFinalWatcher(monster) {
     if (!monster || _egSirFinal || _egSirWatcherRun) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -536,10 +544,10 @@ function _egSirEnsureFinalWatcher(monster) {
         return true;
     });
 }
-let _egSirWatcherRun = null;
+export let _egSirWatcherRun = null;
 
 // Pause-safe timeout (mirrors the other finales).
-function _egSirAfter(g, ms, fn) {
+export function _egSirAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egSirFinal) return;
@@ -550,7 +558,7 @@ function _egSirAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egSirFinalStart(monster) {
+export function _egSirFinalStart(monster) {
     if (_egSirFinal || !monster) return;
 
     // The Stormcaller clears the arena for the perfect storm: kill every
@@ -719,7 +727,7 @@ function _egSirFinalStart(monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egSirFinalEnd(g, monster) {
+export function _egSirFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -738,7 +746,7 @@ function _egSirFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -750,7 +758,7 @@ function _egSirFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egSirTeardown() {
+export function _egSirTeardown() {
     if (_egSirFinal) { try { _egSirFinalEnd(_egSirFinal, null); } catch (e) {} _egSirFinal = null; }
     _egSirWatcherRun = null;
     try { if (_egSirChipRun) { _egSirChipRun.els.forEach(el => { try { el.remove(); } catch (e) {} }); _egNkKillRun(_egSirChipRun); } } catch (e) {}
@@ -761,7 +769,7 @@ function _egSirTeardown() {
     // fight ended mid-cast (teardown kills the run before its loop ends).
     try {
         if (typeof _egMonsters !== 'undefined') {
-            _egMonsters.forEach(m => { if (m && m.baseId === 'boss_sirus') m.bossImmune = false; });
+            globalThis._egMonsters.forEach(m => { if (m && m.baseId === 'boss_sirus') m.bossImmune = false; });
         }
     } catch (e) {}
     document.querySelectorAll('.eg-sir-ion-warn, .eg-sir-ion-front, .eg-sir-tangent, .eg-sir-bolt, .eg-sir-ground, ' +
@@ -786,7 +794,7 @@ if (typeof window !== 'undefined') {
     window._EG_SIR_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_sirus') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_sirus') : null;
             if (!monster) return 'no stormcaller alive';
             const fn = name === 'ion' ? _egMechSirIon
                 : name === 'chain' ? _egMechSirChain
@@ -798,7 +806,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_sirus') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_sirus') : null;
             if (!monster) return 'no stormcaller alive';
             _egSirFinalStart(monster);
             return 'PERFECT STORM started';

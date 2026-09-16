@@ -1,17 +1,26 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { showToast } from './puzzle-items/toasts-and-popups.js';
+import { renderSkillHotbar } from './skills/skill-hotbar.js';
+import { t } from './translation/translations.js';
+
+//------------------------------------------------------------------------
 //-------------------KEYBINDS: CONSTANTS & STATE---------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // localStorage key used to persist keybinds across sessions and reloads.
-const KEYBINDS_KEY = 'stoxels_keybinds';
+export const KEYBINDS_KEY = 'stoxels_keybinds';
 
 // Canonical action list. Each entry:
 //   id      - stable action identifier (persisted in localStorage)
 //   label   - display name in the keybind setup screen
 //   keys    - default key (KeyboardEvent.key, lowercased). Use 'escape',
 //             'space', 'arrowup'… for named keys; single chars otherwise.
-const KEYBIND_DEFAULTS = [
+export const KEYBIND_DEFAULTS = [
     // Sprite movement (WASD by default). The sprite systems read these
     // live via keybindKeyFor(), so rebinding takes effect immediately.
     // Listed in the on-screen WASD arrangement: up, then left/down/right.
@@ -68,15 +77,15 @@ const KEYBIND_DEFAULTS = [
 ];
 
 // Live keybind map: action id -> key string. Rebuilt by loadKeybinds().
-let KEYBINDS = {};
+export let KEYBINDS = {};
 
 // While non-null, the next keydown captures into this action id
 // (the "press a key" state of the setup screen).
-let _keybindCapturing = null;
+export let _keybindCapturing = null;
 
 // Key -> action ids that currently claim it (multiple actions may share a key;
 // the dispatcher calls every handler bound to the pressed key).
-const KEYBIND_KEY_INDEX = {};
+export const KEYBIND_KEY_INDEX = {};
 
 
 //------------------------------------------------------------------------
@@ -86,7 +95,7 @@ const KEYBIND_KEY_INDEX = {};
 
 // Reads saved keybinds from localStorage and merges with defaults.
 // Unknown saved actions are dropped; missing ones keep their default.
-function loadKeybinds() {
+export function loadKeybinds() {
     KEYBINDS = {};
     for (const def of KEYBIND_DEFAULTS) KEYBINDS[def.id] = def.keys;
     try {
@@ -116,12 +125,12 @@ function loadKeybinds() {
 }
 
 // Writes the current keybind map to localStorage.
-function saveKeybinds() {
+export function saveKeybinds() {
     localStorage.setItem(KEYBINDS_KEY, JSON.stringify(KEYBINDS));
 }
 
 // Resets every binding to its default, persists, and refreshes the UI.
-function resetKeybinds() {
+export function resetKeybinds() {
     for (const def of KEYBIND_DEFAULTS) KEYBINDS[def.id] = def.keys;
     saveKeybinds();
     _rebuildKeybindIndex();
@@ -129,7 +138,7 @@ function resetKeybinds() {
 }
 
 // Rebuilds the key -> actions index used by the central dispatcher.
-function _rebuildKeybindIndex() {
+export function _rebuildKeybindIndex() {
     for (const k in KEYBIND_KEY_INDEX) delete KEYBIND_KEY_INDEX[k];
     for (const def of KEYBIND_DEFAULTS) {
         const key = KEYBINDS[def.id];
@@ -144,31 +153,31 @@ function _rebuildKeybindIndex() {
 //------------------------------------------------------------------------
 
 // Normalizes a KeyboardEvent.key for comparison against stored bindings.
-function _keybindNormalize(e) {
+export function _keybindNormalize(e) {
     return (e.key || '').length === 1 ? e.key.toLowerCase() : (e.key || '').toLowerCase();
 }
 
 // Returns the action ids bound to the given keyboard event, or [].
-function keybindActionsFor(e) {
+export function keybindActionsFor(e) {
     return KEYBIND_KEY_INDEX[_keybindNormalize(e)] || [];
 }
 
 // Returns the currently bound key for an action id (falls back to the
 // default so callers stay safe even if loadKeybinds() has not run yet).
-function keybindKeyFor(actionId) {
+export function keybindKeyFor(actionId) {
     if (KEYBINDS[actionId]) return KEYBINDS[actionId];
     const def = KEYBIND_DEFAULTS.find((d) => d.id === actionId);
     return def ? def.keys : null;
 }
 
 // True if the given keyboard event matches the action's bound key.
-function keybindMatches(e, actionId) {
+export function keybindMatches(e, actionId) {
     const bound = keybindKeyFor(actionId);
     return bound !== null && _keybindNormalize(e) === bound;
 }
 
 // Human-readable label for a stored key (' ', 'escape', 'tab' → 'Space', 'Esc', 'Tab').
-function keybindDisplayLabel(key) {
+export function keybindDisplayLabel(key) {
     if (key === ' ') return 'Space';
     if (key === 'escape') return 'Esc';
     if (key === 'tab') return 'Tab';
@@ -190,12 +199,12 @@ function keybindDisplayLabel(key) {
 //
 // Placeholder → action mapping (index into KEYBIND_TUT_ACTIONS):
 //   {k1}…{k4} → hotbar-1…hotbar-4, {k5} → 'escape' (hard pause key).
-const KEYBIND_TUT_ACTIONS = [
+export const KEYBIND_TUT_ACTIONS = [
     'hotbar-1', 'hotbar-2', 'hotbar-3', 'hotbar-4',
     null, // {k5} - the pause key is fixed, shown as its key-cap label
 ];
 
-function tutUpdateKeybinds() {
+export function tutUpdateKeybinds() {
     document.querySelectorAll('[data-t]').forEach((el) => {
         const value = t(el.getAttribute('data-t'));
         if (!value || !value.includes('{k')) return;
@@ -218,7 +227,7 @@ function tutUpdateKeybinds() {
 
 // Builds the keybind rows inside the setup modal and wires click-to-capture.
 // Called every time the modal opens so rows always reflect live bindings.
-function renderKeybindsUI() {
+export function renderKeybindsUI() {
     const list = document.getElementById('keybind-list');
     if (!list) return;
     list.innerHTML = '';
@@ -250,7 +259,7 @@ function renderKeybindsUI() {
 
 // Puts the UI into capture mode for the given action: the next keydown
 // anywhere becomes that action's new binding.
-function _startKeybindCapture(actionId) {
+export function _startKeybindCapture(actionId) {
     _keybindCapturing = actionId;
     const btn = document.getElementById(`keybind-btn-${actionId}`);
     if (btn) {
@@ -261,7 +270,7 @@ function _startKeybindCapture(actionId) {
 
 // Applies a captured key to the capturing action. Refuses keys already
 // bound to a *different* action to avoid silent conflicts.
-function _applyKeybindCapture(key) {
+export function _applyKeybindCapture(key) {
     const actionId = _keybindCapturing;
     _keybindCapturing = null;
     if (!actionId) return;
@@ -286,7 +295,7 @@ function _applyKeybindCapture(key) {
 
 // Cancels an in-progress capture (Escape pressed while capturing, or the
 // modal closing mid-capture).
-function _cancelKeybindCapture() {
+export function _cancelKeybindCapture() {
     if (!_keybindCapturing) return;
     _keybindCapturing = null;
     renderKeybindsUI();
@@ -303,7 +312,7 @@ function _cancelKeybindCapture() {
 //   2. Text fields       → never intercept typing in inputs/textareas
 //   3. Bound actions     → dispatch to the registered handler, if any
 // Gameplay handlers register themselves via onKeybindAction() below.
-function _keybindDispatch(e) {
+export function _keybindDispatch(e) {
     if (_keybindCapturing) {
         e.preventDefault();
         e.stopPropagation();
@@ -338,12 +347,12 @@ function _keybindDispatch(e) {
 
 // Action id -> handler(e). Handlers return false to claim the keypress
 // (prevents default + stops propagation); anything else lets it pass.
-const KEYBIND_HANDLERS = {};
+export const KEYBIND_HANDLERS = {};
 
 // Registers (or replaces) the handler for a keybind action. Called by the
 // owning system at init time; the dispatcher reads the table live, so
 // handlers can be registered or swapped at any point.
-function onKeybindAction(actionId, handler) {
+export function onKeybindAction(actionId, handler) {
     KEYBIND_HANDLERS[actionId] = handler;
 }
 
@@ -355,7 +364,7 @@ function onKeybindAction(actionId, handler) {
 
 // Loads persisted bindings and installs the global listener. Called once
 // from the bootstrap sequence (before any screen can need a keypress).
-function initKeybinds() {
+export function initKeybinds() {
     loadKeybinds();
     document.addEventListener('keydown', _keybindDispatch, { capture: true });
     // Cross-tab sync: the storage event fires in every OTHER tab when
@@ -372,14 +381,14 @@ function initKeybinds() {
 }
 
 // Closes the keybinds modal (wired to the close button / Escape inside it).
-function closeKeybindsModal() {
+export function closeKeybindsModal() {
     const modal = document.getElementById('keybinds-modal');
     if (modal) modal.classList.remove('show');
     _cancelKeybindCapture();
 }
 
 // Opens the keybinds modal and renders the current bindings.
-function openKeybindsModal() {
+export function openKeybindsModal() {
     renderKeybindsUI();
     const modal = document.getElementById('keybinds-modal');
     if (modal) modal.classList.add('show');

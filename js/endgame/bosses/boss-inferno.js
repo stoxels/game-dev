@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egDamageTargetById } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE INFERNO (boss_inferno)----------------------
 //------------------------------------------------------------------------
 // TIER 7 REWORK - 🌋 "The Living Volcano". Escalating heat you must
@@ -37,8 +46,8 @@
 
 // DEBUG: slow Inferno's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_INFV_DEBUG_SLOW = true;
-const _EG_INFV_DEBUG_MULT = _EG_INFV_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_INFV_DEBUG_SLOW = true;
+export const _EG_INFV_DEBUG_MULT = _EG_INFV_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_inferno: {
@@ -74,34 +83,34 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning ───────────────────────────────────────────────────────────
-const EG_INFV_LAVA_DPS    = 12;    // %maxHP/s standing in lava
-const EG_INFV_HEAT_MAX    = 100;   // heat meter cap
-const EG_INFV_HEAT_STILL  = 10;    // heat/s while standing still
-const EG_INFV_HEAT_MOVE   = 4;     // heat/s while moving
-const EG_INFV_TILE_COOL   = 9;     // heat/s standing on an obsidian tile
-const EG_INFV_HAZE_MULT   = 2.5;   // heat gain multiplier inside a heat haze
-const EG_INFV_BURST       = 0.22;  // %maxHP heat-meter full detonation
-const EG_INFV_TILE_LIFE   = 16;    // s before a tile sinks (3 crack states)
-const EG_INFV_SURGE_HIT   = 0.24;  // %maxHP caught in the surge wall
-const EG_INFV_SURGE_GAPS  = 2;     // readable gaps in the wall
-const EG_INFV_VENTS       = 3;     // vents per eruption cast
-const EG_INFV_VENT_HIT    = 0.18;  // %maxHP caught in a jet
-const EG_INFV_VENT_HAZE   = 7;     // s a heat haze lingers
-const EG_INFV_BOMB_HIT    = 0.20;  // %maxHP magma bomb landing
-const EG_INFV_SURGE_GOAL  = 3;     // surges to lure into vents (the kill)
-const EG_INFV_WINTER_TIME = 40;    // s before the core's last stand detonation
-const EG_INFV_LASTSTAND   = 0.35;  // caught in the final detonation
-const EG_INFV_DRIFT_DECAY = 3.2;   // ice momentum: velocity decay /s
-const EG_INFV_HIT_CD_MS   = 700;   // shared touch cooldown
+export const EG_INFV_LAVA_DPS    = 12;    // %maxHP/s standing in lava
+export const EG_INFV_HEAT_MAX    = 100;   // heat meter cap
+export const EG_INFV_HEAT_STILL  = 10;    // heat/s while standing still
+export const EG_INFV_HEAT_MOVE   = 4;     // heat/s while moving
+export const EG_INFV_TILE_COOL   = 9;     // heat/s standing on an obsidian tile
+export const EG_INFV_HAZE_MULT   = 2.5;   // heat gain multiplier inside a heat haze
+export const EG_INFV_BURST       = 0.22;  // %maxHP heat-meter full detonation
+export const EG_INFV_TILE_LIFE   = 16;    // s before a tile sinks (3 crack states)
+export const EG_INFV_SURGE_HIT   = 0.24;  // %maxHP caught in the surge wall
+export const EG_INFV_SURGE_GAPS  = 2;     // readable gaps in the wall
+export const EG_INFV_VENTS       = 3;     // vents per eruption cast
+export const EG_INFV_VENT_HIT    = 0.18;  // %maxHP caught in a jet
+export const EG_INFV_VENT_HAZE   = 7;     // s a heat haze lingers
+export const EG_INFV_BOMB_HIT    = 0.20;  // %maxHP magma bomb landing
+export const EG_INFV_SURGE_GOAL  = 3;     // surges to lure into vents (the kill)
+export const EG_INFV_WINTER_TIME = 40;    // s before the core's last stand detonation
+export const EG_INFV_LASTSTAND   = 0.35;  // caught in the final detonation
+export const EG_INFV_DRIFT_DECAY = 3.2;   // ice momentum: velocity decay /s
+export const EG_INFV_HIT_CD_MS   = 700;   // shared touch cooldown
 
 
 //------------------------------------------------------------------------
 //-------------------SHARED HELPERS----------------------------------------
 //------------------------------------------------------------------------
-let _egInfVHitCd = 0;
+export let _egInfVHitCd = 0;
 
 // Touch damage helper shared by all Inferno hazards (per-touch cooldown).
-function _egInfVTouch(pct, level, label) {
+export function _egInfVTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egInfVHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -113,11 +122,11 @@ function _egInfVTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egInfVPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egInfVPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Prefixed delay for out-of-run callbacks: defers while the game is
 // frozen (visual-only use - the finale uses _egInfVAfter instead).
-function _egInfVDelay(ms, fn) {
+export function _egInfVDelay(ms, fn) {
     setTimeout(() => { if (!_egNkFrozen()) fn(); else setTimeout(() => { if (!_egNkFrozen()) fn(); }, 120); }, ms);
 }
 
@@ -129,16 +138,16 @@ function _egInfVDelay(ms, fn) {
 // obsidian tiles COOL you, heat haze heats you 2.5x. At full heat the
 // volcano detonates under you. Lives in module state so every mechanic
 // reads one truth; the passive watcher ticks it.
-let _egInfVHeat = 0;      // 0..100
-let _egInfVHeatRun = null;
-let _egInfVHeatHudEl = null;
-let _egInfVLavaZones = [];   // { x, y, w, h, el, until } (tide bodies)
-let _egInfVTiles = [];       // { x, y, el, born, until }
-let _egInfVHazes = [];       // { x, y, r, el, until }
-let _egInfVLastX = null, _egInfVLastY = null;
-let _egInfVHotAuraTimer = 0;
+export let _egInfVHeat = 0;      // 0..100
+export let _egInfVHeatRun = null;
+export let _egInfVHeatHudEl = null;
+export let _egInfVLavaZones = [];   // { x, y, w, h, el, until } (tide bodies)
+export let _egInfVTiles = [];       // { x, y, el, born, until }
+export let _egInfVHazes = [];       // { x, y, r, el, until }
+export let _egInfVLastX = null, _egInfVLastY = null;
+export let _egInfVHotAuraTimer = 0;
 
-function _egInfVHudApply() {
+export function _egInfVHudApply() {
     if (!_egInfVHeatHudEl) {
         _egInfVHeatHudEl = document.createElement('div');
         _egInfVHeatHudEl.className = 'eg-infv-heat';
@@ -153,7 +162,7 @@ function _egInfVHudApply() {
 
 // The heat watcher: created lazily by the first cast, re-created after the
 // finale's purge, dies with the boss.
-function _egInfVEnsureHeatRun(monster) {
+export function _egInfVEnsureHeatRun(monster) {
     if (_egInfVHeatRun && _egNkRuns.has(_egInfVHeatRun.id)) return;
     const run = _egNkNewRun(monster && monster.id, false);
     run.passive = true;
@@ -214,9 +223,9 @@ function _egInfVEnsureHeatRun(monster) {
 // Lava floods half the arena in slow alternating tides (left/right, then
 // quartered); each flood leaves cooling obsidian tiles at its edge. Stand
 // on tiles to cool down; avoid the flood; keep moving.
-const EG_INFV_TIDE_MS = [0, 6200, 5600, 5000];  // per-tide duration, by phase
+export const EG_INFV_TIDE_MS = [0, 6200, 5600, 5000];  // per-tide duration, by phase
 
-function _egMechInfVTides(monster, phase) {
+export function _egMechInfVTides(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const W = window.innerWidth, H = window.innerHeight;
@@ -274,9 +283,9 @@ function _egMechInfVTides(monster, phase) {
     });
 }
 
-const EG_INFV_TIDE_WARN = 1500;  // telegraph before each flood (ms)
+export const EG_INFV_TIDE_WARN = 1500;  // telegraph before each flood (ms)
 
-function _egInfVSpawnTile(x, y) {
+export function _egInfVSpawnTile(x, y) {
     const el = document.createElement('div');
     el.className = 'eg-infv-tile';
     el.dataset.crack = '0';
@@ -292,11 +301,11 @@ function _egInfVSpawnTile(x, y) {
 //------------------------------------------------------------------------
 // A wall of fire sweeps from one edge with two readable gaps; the ash
 // cloud lingering behind it is pressure (low visibility), not punish.
-const EG_INFV_SURGE_MS   = 4200;  // wall travel time (x debug mult)
-const EG_INFV_SURGE_GH   = 150;   // gap height
-const EG_INFV_WALL_H     = 90;    // wall thickness
+export const EG_INFV_SURGE_MS   = 4200;  // wall travel time (x debug mult)
+export const EG_INFV_SURGE_GH   = 150;   // gap height
+export const EG_INFV_WALL_H     = 90;    // wall thickness
 
-function _egMechInfVSurge(monster, phase) {
+export function _egMechInfVSurge(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     void phase;
     const level = monster ? monster.level : 1;
@@ -398,7 +407,7 @@ function _egMechInfVSurge(monster, phase) {
 //------------------------------------------------------------------------
 // Three vents telegraph, then jet upward; jets leave HEAT HAZE zones that
 // raise the heat meter faster while inside.
-function _egMechInfVVents(monster, phase) {
+export function _egMechInfVVents(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     void phase;
     const level = monster ? monster.level : 1;
@@ -449,29 +458,29 @@ function _egMechInfVVents(monster, phase) {
 // (fire→ice identity break). The ice sheet makes movement DRIFT; magma
 // bombs mark landing spots; lure the dying core's three magma surges into
 // the fissure vents to blow its cap - the third detonation is the kill.
-const EG_INFV_WINTER_SURGE_Y = [0.3, 0.5, 0.7];   // fixed surge bands (learnable)
-const EG_INFV_WINTER_VENT_X  = [0.18, 0.5, 0.82]; // matching vent columns
+export const EG_INFV_WINTER_SURGE_Y = [0.3, 0.5, 0.7];   // fixed surge bands (learnable)
+export const EG_INFV_WINTER_VENT_X  = [0.18, 0.5, 0.82]; // matching vent columns
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egInfVFinal = null;
+export let _egInfVFinal = null;
 
-function _egInfVFinalActive() {
+export function _egInfVFinalActive() {
     return !!_egInfVFinal && !_egInfVFinal.finished;
 }
 
 // Ice momentum: reads the player's velocity into a drift velocity. Called
 // from _avatarGetMoveSpeed-era hooks - actually applied in the drift
 // watcher below (a per-frame translation of the avatar while on ice).
-let _egInfVDrift = { vx: 0, vy: 0 };
-let _egInfVDriftRun = null;
+export let _egInfVDrift = { vx: 0, vy: 0 };
+export let _egInfVDriftRun = null;
 
-function _egInfVOnPhaseEnter(monster, newPhase) {
+export function _egInfVOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egInfVStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egInfVStartFinalWatcher(monster) {
+export function _egInfVStartFinalWatcher(monster) {
     if (!monster || _egInfVFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -489,7 +498,7 @@ function _egInfVStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-function _egInfVAfter(g, ms, fn) {
+export function _egInfVAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egInfVFinal) return;
@@ -500,7 +509,7 @@ function _egInfVAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egInfVFinalStart(monster) {
+export function _egInfVFinalStart(monster) {
     if (_egInfVFinal || !monster) return;
 
     // The winter takes over: kill every other run of this boss, then
@@ -583,7 +592,7 @@ function _egInfVFinalStart(monster) {
             // Smooth toward the observed velocity; apply when input stops.
             velX += (nvx - velX) * Math.min(1, dtS * 6);
             velY += (nvy - velY) * Math.min(1, dtS * 6);
-            const held = (typeof _avatarMoveState !== 'undefined' && _avatarMoveState && _avatarMoveState.held && _avatarMoveState.held.size > 0);
+            const held = (typeof _avatarMoveState !== 'undefined' && globalThis._avatarMoveState && globalThis._avatarMoveState.held && globalThis._avatarMoveState.held.size > 0);
             if (!held && (Math.abs(velX) > 6 || Math.abs(velY) > 6)) {
                 const dec = Math.exp(-EG_INFV_DRIFT_DECAY * dtS);
                 velX *= dec; velY *= dec;
@@ -673,7 +682,7 @@ function _egInfVFinalStart(monster) {
 
 // Magma bombs: telegraphed landing rings; standing in one when it lands
 // takes the hit.
-function _egInfVFallBombs(g, level, n) {
+export function _egInfVFallBombs(g, level, n) {
     const W = window.innerWidth, H = window.innerHeight;
     for (let i = 0; i < n; i++) {
         const bx = W * (0.12 + Math.random() * 0.76);
@@ -697,7 +706,7 @@ function _egInfVFallBombs(g, level, n) {
 }
 
 // The last stand: timer died - the core detonates everything but the vents.
-function _egInfVLastStand(g, monster, level) {
+export function _egInfVLastStand(g, monster, level) {
     if (g.finished) return;
     _egNkToast('eg_mech_infv_laststand', '🌋💀 THE CORE DETONATES - get between the vents!', '#f87171');
     const W = window.innerWidth, H = window.innerHeight;
@@ -718,7 +727,7 @@ function _egInfVLastStand(g, monster, level) {
 }
 
 // Three surges lured: the cap blows - the core pays its own HP.
-function _egInfVCapBlown(g, monster) {
+export function _egInfVCapBlown(g, monster) {
     if (g.finished) return;
     _egNkToast('eg_mech_infv_capblown', '🌋💥 THE CAP BLOWS - Supervolcanic Winter ends in fire AND ice!', '#fde68a');
     const flash = document.createElement('div');
@@ -727,7 +736,7 @@ function _egInfVCapBlown(g, monster) {
     setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1500);
     _egInfVFinalEnd(g, monster);
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m && typeof _egDamageTargetById === 'function' && m.currentHP > 0) {
             _egDamageTargetById(g.monsterId, m.currentHP, ['fire'], {});
         }
@@ -736,7 +745,7 @@ function _egInfVCapBlown(g, monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egInfVFinalEnd(g, monster) {
+export function _egInfVFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -753,7 +762,7 @@ function _egInfVFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -765,7 +774,7 @@ function _egInfVFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body state this boss ever created.
-function _egInfVTeardown() {
+export function _egInfVTeardown() {
     if (_egInfVFinal) { try { _egInfVFinalEnd(_egInfVFinal, null); } catch (e) {} _egInfVFinal = null; }
     if (_egInfVHeatRun) { try { _egNkKillRun(_egInfVHeatRun); } catch (e) {} _egInfVHeatRun = null; }
     _egInfVLavaZones.forEach(z => { try { z.el.remove(); } catch (e) {} });
@@ -800,7 +809,7 @@ if (typeof window !== 'undefined') {
     window._EG_INFV_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_inferno') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_inferno') : null;
             if (!monster) return 'no inferno alive';
             if (name === 'final') { _egInfVFinalStart(monster); return 'SUPERVOLCANIC WINTER started'; }
             const fn = name === 'tides' ? _egMechInfVTides

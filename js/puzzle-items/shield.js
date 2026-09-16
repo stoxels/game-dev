@@ -1,10 +1,22 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxShieldBorderAdd, _fxShieldBorderRemove, _fxSpawnParticles } from './shared/fx-helpers.js';
+import { showToast } from './toasts-and-popups.js';
+
+//------------------------------------------------------------------------
 //-------------------SHIELD----------------------
 //------------------------------------------------------------------------
 
 // shield - activates the damage shield, optionally adding extra charges
 // and a cursed-immunity window from passive nodes.
-function _useShield(id, def) {
+export function _useShield(id, def) {
     // Several keystones block shield items entirely
     if (ptHasSkill('keystone_iron_doctrine')) {
         return `${def.icon} ${t('itm_blocked_iron_doctrine')}`;
@@ -16,7 +28,7 @@ function _useShield(id, def) {
         return `${def.icon} ${t('itm_blocked_asymptotic_mastery')}`;
     }
 
-    shieldActive = true;
+    globalThis.shieldActive = true;
 
     // Passive: Reinforced Ward - each node adds 1 extra absorbed mistake
     const extraCharges = (ptHasSkill('reinforced_ward_1') ? 1 : 0)
@@ -47,7 +59,7 @@ function _useShield(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: spawns the shield overlay div covering the whole grid area.
-function _fxMakeShieldOverlay(wrap, r) {
+export function _fxMakeShieldOverlay(wrap, r) {
     const shield = document.createElement('div');
     shield.className = 'fx-shield-overlay';
     shield.style.cssText = `
@@ -63,7 +75,7 @@ function _fxMakeShieldOverlay(wrap, r) {
 }
 
 // 🛡️ Shield - a golden hexagonal shield briefly overlays the puzzle.
-function _fxShield() {
+export function _fxShield() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -85,12 +97,12 @@ function _fxShield() {
 }
 
 // 🛡️💥 Shield Break - Spawns shattering particles at the exact cell location
-function playShieldBreakEffect(row, col) {
+export function playShieldBreakEffect(row, col) {
     const wrap = document.getElementById('puzzle-scaler');
     const cell = document.getElementById(`g-${row}-${col}`);
     if (!wrap || !cell) return;
 
-    const zoom = currentZoom || 1;
+    const zoom = globalThis.currentZoom || 1;
     const wRect = wrap.getBoundingClientRect();
     const cRect = cell.getBoundingClientRect();
 

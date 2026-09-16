@@ -1,4 +1,31 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from './js/audio/audio.js';
+import { _bayesTrapsCleanup } from './js/classes/class-bayesian.js';
+import { _egRenderPauseLootSummary } from './js/endgame/endgame-encounter-chain.js';
+import { _egOnPause, _egOnResume } from './js/endgame/endgame-encounter-tick.js';
+import { closeHubToGame, isHubGameOverlay } from './js/endgame/endgame-hub.js';
+import { scalePuzzle } from './js/grid-scaling.js';
+import { stopPainting } from './js/mouse-button-handlers.js';
+import { _dofNudge } from './js/passive-tree/passive-tree-special-nodes-logic.js';
+import { closeTreeToGame, isTreeGameOverlay } from './js/passive-tree/passive-tree.js';
+import { skipQuiz } from './js/quiz-excercise/quiz.js';
+import { _refreshQuestionModalFlag, goToPreviousScreen, hideResultOverlays } from './js/screens/screens.js';
+import { SETTINGS, applySettings, initSettingsControls } from './js/settings.js';
+import { closeSpellbook } from './js/skills/skill-spellbook.js';
+import { pauseTimer, resumeTimer } from './js/timer.js';
+import { setLang } from './js/translation/translations.js';
+
+//------------------------------------------------------------------------
+// Phase 3 step 10: live globalThis accessors for externally-mutated names.
+// (derived from the step-10 write-site audit by dev/scratch/convert-step10.mjs)
+//------------------------------------------------------------------------
+try { Object.defineProperty(globalThis, '_gamePaused', { get() { return _gamePaused; }, set(v) { _gamePaused = v; }, configurable: true }); } catch (e) {}
+
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -8,13 +35,13 @@
 let _gamePaused = false;
 
 // Animation timing for the title decoration shimmer wave effect
-const DECO_PANEL_DELAY_STEP = 0.4;  // seconds between panels
-const DECO_ROW_DELAY_STEP = 0.08; // seconds between rows within a panel
-const DECO_COL_DELAY_STEP = 0.05; // seconds between columns within a row
+export const DECO_PANEL_DELAY_STEP = 0.4;  // seconds between panels
+export const DECO_ROW_DELAY_STEP = 0.08; // seconds between rows within a panel
+export const DECO_COL_DELAY_STEP = 0.05; // seconds between columns within a row
 
 // Pixel-art bitmaps (5×5) used on the title screen decoration.
 // 1 = filled cell, 0 = invisible cell.
-const DECO_PANELS = [
+export const DECO_PANELS = [
     // Panel 1 – classic puzzle cross
     [
         [0, 1, 0, 1, 0],
@@ -59,11 +86,11 @@ const DECO_PANELS = [
 
 // On endgame maps the pause menu offers "Return to Nexus" instead of "Levels".
 // Returns whether the current level is an endgame map.
-function _updatePauseMenuReturnButtons() {
+export function _updatePauseMenuReturnButtons() {
     // Campaign levels also carry isMonsterLevel (their light monster pack),
     // but they are NOT endgame maps - they keep the normal "Levels" button.
-    const onEndgameMap = typeof cur !== 'undefined' && cur &&
-        ((cur.isMonsterLevel && !cur.campaignMonsters) || cur.isEndgameSandbox);
+    const onEndgameMap = typeof cur !== 'undefined' && globalThis.cur &&
+        ((globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters) || globalThis.cur.isEndgameSandbox);
     const levelsBtn = document.getElementById('btn-go-levels');
     const nexusBtn = document.getElementById('btn-go-nexus');
     if (levelsBtn) levelsBtn.style.display = onEndgameMap ? 'none' : '';
@@ -73,8 +100,8 @@ function _updatePauseMenuReturnButtons() {
 
 // Shows the pause overlay and stops the timer.
 // Guards against pausing when the level is already finished (dead).
-function pauseGame() {
-    if (_gamePaused || dead) return;
+export function pauseGame() {
+    if (_gamePaused || globalThis.dead) return;
     _gamePaused = true;
     pauseTimer(); // defined in timer.js
     if (typeof _egOnPause === 'function') _egOnPause();
@@ -89,7 +116,7 @@ function pauseGame() {
 }
 
 // Hides the pause overlay and resumes the timer.
-function unpauseGame() {
+export function unpauseGame() {
     if (!_gamePaused) return;
     _gamePaused = false;
     document.getElementById('pause-overlay').classList.remove('show');
@@ -99,8 +126,8 @@ function unpauseGame() {
 
 // Toggles between paused and unpaused.
 // Does nothing if the level has already ended (dead flag).
-function togglePause() {
-    if (dead) return;
+export function togglePause() {
+    if (globalThis.dead) return;
     _gamePaused ? unpauseGame() : pauseGame();
 }
 
@@ -115,7 +142,7 @@ function togglePause() {
 // Runs cleanup for any active special-mechanic overlays before
 // the escape key resolves its main action. These are optional globals
 // defined in their respective mechanic files, so we guard before calling.
-function _runEscapeCleanup() {
+export function _runEscapeCleanup() {
     if (typeof _bayesTrapsCleanup === 'function') {
         _bayesTrapsCleanup(false);
     }
@@ -125,12 +152,12 @@ function _runEscapeCleanup() {
 }
 
 // Returns true if the quiz overlay is currently visible.
-function _isQuizOpen() {
+export function _isQuizOpen() {
     return document.getElementById('quiz-overlay').classList.contains('show');
 }
 
 // Returns true if any modal backdrop is currently visible.
-function _isAnyModalOpen() {
+export function _isAnyModalOpen() {
     return !!document.querySelector('.modal-bg.show');
 }
 
@@ -138,7 +165,7 @@ function _isAnyModalOpen() {
 // The Degrees of Freedom choice modal (#dof-modal) is mandatory - its
 // keystone downside must always apply - so it is never dismissed here.
 // It only closes via _dofChoose(); Escape just nudges it instead.
-function _closeAllModals() {
+export function _closeAllModals() {
     document.querySelectorAll('.modal-bg.show')
         .forEach(m => {
             if (m.id === 'dof-modal') {
@@ -161,13 +188,13 @@ function _closeAllModals() {
 }
 
 // Returns true if the win or lose end-of-level overlay is visible.
-function _isEndOverlayOpen() {
+export function _isEndOverlayOpen() {
     return document.getElementById('ov-win').classList.contains('show') ||
         document.getElementById('ov-lose').classList.contains('show');
 }
 
 // Returns true if the main game screen is the active screen.
-function _isOnGameScreen() {
+export function _isOnGameScreen() {
     return document.getElementById('screen-game').classList.contains('active');
 }
 
@@ -177,7 +204,7 @@ function _isOnGameScreen() {
 //   3. Win / lose overlay     → hide the overlay (stay on game screen)
 //   4. On the game screen     → toggle pause
 //   5. Anywhere else          → go back to the previous screen (via ui.js)
-function _handleEscapeKey() {
+export function _handleEscapeKey() {
     _runEscapeCleanup();
 
     if (_isQuizOpen()) {
@@ -224,7 +251,7 @@ function _handleEscapeKey() {
 // Creates a single decoration cell div.
 // Visible cells get a staggered animation delay to produce a wave shimmer.
 // panelIndex, row, col are used to calculate that delay.
-function buildDecoCell(isFilled, panelIndex, row, col) {
+export function buildDecoCell(isFilled, panelIndex, row, col) {
     const cell = document.createElement('div');
     cell.className = 'title-deco-cell';
     cell.style.opacity = isFilled ? '1' : '0';
@@ -244,7 +271,7 @@ function buildDecoCell(isFilled, panelIndex, row, col) {
 
 // Creates a single decoration panel div from a 5×5 bitmap grid.
 // Appends one cell div per bitmap entry.
-function buildDecoPanel(grid, panelIndex) {
+export function buildDecoPanel(grid, panelIndex) {
     const panel = document.createElement('div');
     panel.className = 'title-deco-panel';
     panel.dataset.panel = panelIndex;
@@ -260,7 +287,7 @@ function buildDecoPanel(grid, panelIndex) {
 
 // Builds all pixel-art decoration panels and injects them into
 // the #tdeco container on the title screen.
-function initTitleDecoration() {
+export function initTitleDecoration() {
     const container = document.getElementById('tdeco');
 
     DECO_PANELS.forEach((grid, panelIndex) => {
@@ -283,6 +310,15 @@ function initTitleDecoration() {
 // Allow forcing the interface language via URL (?lang=de or ?lang=en).
 // Handy for testing localized layouts and sharing language-specific links;
 // it only overrides the boot-time value, clicking EN/DE still persists normally.
+// Phase 3 (step 10): this file is now the LAST entry import - a real ES
+// module. These top-level statements used to run after every classic
+// script, but in module order they run BEFORE the entry body installs the
+// globalThis bridges (SETTINGS, hasSeen, ...) that applySettings() and the
+// game code below read (globalThis.SETTINGS in mouse-button-handlers.js
+// threw, aborting the whole module graph). Defer the bootstrap to
+// DOMContentLoaded: by then the entry body has finished and every bridge
+// exists (same idiom as MIGRATION.md step 7).
+function _bootstrap() {
 try {
     const _urlLang = new URLSearchParams(location.search).get('lang');
     if (_urlLang === 'en' || _urlLang === 'de') {
@@ -332,3 +368,10 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 
 // Run immediately on load so the decoration is ready when the title appears
 initTitleDecoration();
+}
+
+if (document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _bootstrap);
+} else {
+    _bootstrap();
+}

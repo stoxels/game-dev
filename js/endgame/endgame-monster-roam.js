@@ -1,3 +1,12 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../translation/translations.js';
+import { EG_MONSTER_ZONES, _egRenderPanel, _egRestartFlashClass, _egShowStatusLabel } from './endgame-encounter.js';
+import { _egIsActive } from './endgame-state.js';
+
 // endgame-monster-roam.js
 // MONSTER POSITIONING - normal monsters now HOLD GROUND in static side
 // panels instead of pacing permanently around the puzzle grid.
@@ -20,67 +29,67 @@
 // Loads AFTER endgame-encounter.js (calls its render helpers; encounter.js
 // calls back into _egRoamShouldRoam/_egRoamSync/_egRoamTeardown guarded).
 
-const EG_ROAM_LAYER_ID = 'eg-roam-layer';
+export const EG_ROAM_LAYER_ID = 'eg-roam-layer';
 
 // Minimum time between two sidesteps of the SAME monster (ms). Keeps the
 // behaviour occasional even when the player machine-guns E.
-const EG_SIDESTEP_COOLDOWN_MS = 5000;
+export const EG_SIDESTEP_COOLDOWN_MS = 5000;
 // Grace period after spawn during which a monster never sidesteps (ms) -
 // it should first be targetable where it appeared.
-const EG_SIDESTEP_SPAWN_GRACE_MS = 3500;
+export const EG_SIDESTEP_SPAWN_GRACE_MS = 3500;
 
 // Lore-weighted sidestep chance per successful melee hit. Small vermin dart
 // around, medium beasts shift sometimes, heavy brutes barely move.
-const EG_SIDESTEP_NIMBLE = new Set([
+export const EG_SIDESTEP_NIMBLE = new Set([
     'rat', 'bat', 'bee', 'mosquito', 'ant', 'moth', 'spider', 'ladybug',
     'frog', 'beetle', 'owl'
 ]);
-const EG_SIDESTEP_HEAVY = new Set([
+export const EG_SIDESTEP_HEAVY = new Set([
     'golem', 'golem_iron', 'ogre', 'troll', 'rhino', 'bison', 'zombie',
     'oni', 'volcano', 'meteor', 'moon', 'brain'
 ]);
 
 // Permanent patrol is disabled - monsters hold ground in static panels.
 // Always false so the zone renderer never skips normal monsters.
-function _egRoamShouldRoam(m) {
+export function _egRoamShouldRoam(m) {
     return false;
 }
 
 // Legacy layer cleanup. The patrol owned #eg-roam-layer; it may still exist
 // in a running session after this patch. Empty it so no ghost cards linger.
-function _egRoamClearLegacyLayer() {
+export function _egRoamClearLegacyLayer() {
     try {
         const layer = document.getElementById(EG_ROAM_LAYER_ID);
         if (layer) layer.innerHTML = '';
     } catch (e) { /* DOM not ready - nothing to clear */ }
     try {
         if (typeof _egMonsters !== 'undefined') {
-            _egMonsters.forEach(m => { if (m) m.isRoaming = false; });
+            globalThis._egMonsters.forEach(m => { if (m) m.isRoaming = false; });
         }
     } catch (e) {}
 }
 
 // Called from _egRenderPanel after the static zones render. No roaming cards
 // are built anymore - just make sure the legacy layer stays empty.
-function _egRoamSync() {
+export function _egRoamSync() {
     _egRoamClearLegacyLayer();
 }
 
 // Removes every legacy roaming card and stops any old driver. Called from
 // _egHideMonsterPanel (encounter over) and safe to call anytime.
-function _egRoamTeardown() {
+export function _egRoamTeardown() {
     _egRoamClearLegacyLayer();
 }
 
 // No-op kept so any stale rAF handle from a pre-patch session settles.
 // The patrol tick is gone; monsters no longer move on their own.
-function _egRoamEnsureTick() {}
-function _egRoamTick() {}
+export function _egRoamEnsureTick() {}
+export function _egRoamTick() {}
 
 // Returns the sidestep chance (0..1) for one successful melee hit on `m`.
 // Nimble vermin dart often, heavies plod, everyone else sits in between.
 // Ranged monsters strafe a touch more - they dislike blades up close.
-function _egMonsterSidestepChance(m) {
+export function _egMonsterSidestepChance(m) {
     const baseId = (m && (m.baseId || m.id || '')) + '';
     const key = baseId.split('_')[0];
     let chance = 0.20;
@@ -93,7 +102,7 @@ function _egMonsterSidestepChance(m) {
 
 // Picks a new zone panel for a sidestep: a different panel than `fromZone`,
 // preferring the least-populated ones so cards never pile up.
-function _egPickSidestepZone(monster, fromZone) {
+export function _egPickSidestepZone(monster, fromZone) {
     let zones = [];
     try {
         zones = (typeof EG_MONSTER_ZONES !== 'undefined' && EG_MONSTER_ZONES.length)
@@ -106,7 +115,7 @@ function _egPickSidestepZone(monster, fromZone) {
         const counts = {};
         others.forEach(z => { counts[z] = 0; });
         if (typeof _egMonsters !== 'undefined') {
-            _egMonsters.forEach(m => {
+            globalThis._egMonsters.forEach(m => {
                 if (!m || m.id === (monster && monster.id)) return;
                 const z = m.zoneId || 'eg-monster-panel';
                 if (counts[z] == null) counts[z] = 0;
@@ -125,15 +134,15 @@ function _egPickSidestepZone(monster, fromZone) {
 // different zone panel. Re-renders the panel, keeps the target locked, and
 // flashes a small status label so the hop reads as a dodge, not a glitch.
 // No-ops for bosses, tutorial runs, dead targets and single-zone layouts.
-function _egTryMonsterMeleeSidestep(targetId) {
+export function _egTryMonsterMeleeSidestep(targetId) {
     try {
         if (typeof _egMonsters === 'undefined') return;
         if (typeof _egIsActive === 'function' && !_egIsActive()) return;
-        const m = _egMonsters.find(x => x && x.id === targetId);
+        const m = globalThis._egMonsters.find(x => x && x.id === targetId);
         if (!m || m.currentHP <= 0) return;
         if (m.isBoss || m.isSacrificialZombie || m.isDynamoConductor) return;
         try {
-            if (typeof _tqIsTutorialActive === 'function' && _tqIsTutorialActive()) return;
+            if (typeof _tqIsTutorialActive === 'function' && globalThis._tqIsTutorialActive()) return;
         } catch (e) {}
         const now = (typeof Date !== 'undefined' && Date.now) ? Date.now() : 0;
         if (m._sidestepCdUntil && now < m._sidestepCdUntil) return;

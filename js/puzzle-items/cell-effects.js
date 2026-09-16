@@ -1,11 +1,18 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egOnProgrammaticReveal } from '../endgame/endgame-class-projectiles.js';
+
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // How long each cell-level effect class stays active (ms).
 // Must stay in sync with the matching CSS animation durations.
-const CELL_FX_DURATION = {
+export const CELL_FX_DURATION = {
     reveal: 1700,
     mark: 1700,
     erase: 2100,
@@ -33,7 +40,7 @@ const CELL_FX_DURATION = {
 
 // Injects all cell-effect keyframes + classes into <head> once.
 // Guards with a sentinel style tag so it never runs twice.
-function _ensureCellEffectCSS() {
+export function _ensureCellEffectCSS() {
     if (document.getElementById('cell-effect-style')) return;
 
     const style = document.createElement('style');
@@ -129,7 +136,7 @@ function _ensureCellEffectCSS() {
 // then strips the class once the animation finishes.
 // Forces a DOM reflow before re-adding the class so rapid
 // reuse on the same cell always restarts the animation cleanly.
-function _applyCellEffect(cellIds, type, source) {
+export function _applyCellEffect(cellIds, type, source) {
     if (!cellIds.length) return;
     _ensureCellEffectCSS();
 

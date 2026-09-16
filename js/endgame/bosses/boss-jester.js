@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE JESTER (boss_jester)------------------------
 //------------------------------------------------------------------------
 // REWORK - Boshy homage, rebuilt as a three-act stage performance. The
@@ -51,8 +60,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const __EG_JS_DEBUG_SLOW = true;
-const _EG_JS_DEBUG_MULT = __EG_JS_DEBUG_SLOW ? 2.5 : 1;
+export const __EG_JS_DEBUG_SLOW = true;
+export const _EG_JS_DEBUG_MULT = __EG_JS_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_jester: {
@@ -82,15 +91,15 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_JS_ORB_COUNT   = [0, 5, 6, 8];       // mayhem orbs per cast
-const EG_JS_ORB_SPEED   = [0, 200, 230, 260]; // px/s per phase
-const EG_JS_ORB_DMG     = [0, 0.05, 0.06, 0.08]; // %maxHP per orb touch
-const EG_JS_CARD_DMG    = [0, 0, 0.07, 0.09];    // %maxHP per card touch
-const EG_JS_JINX_DMG    = [0, 0, 0.09, 0.11];    // %maxHP jinx-ball touch
-const EG_JS_LUCK_HEAL   = 0.05;               // %maxHP per luck-ball touch
-const EG_JS_REVEAL_DMG  = 0.10;               // %maxHP wrong suit at a reveal
-const EG_JS_SWEEP_DMG   = 0.12;               // %maxHP curtain-call sweep
-const EG_JS_HIT_CD_MS   = 600;                // shared touch cooldown
+export const EG_JS_ORB_COUNT   = [0, 5, 6, 8];       // mayhem orbs per cast
+export const EG_JS_ORB_SPEED   = [0, 200, 230, 260]; // px/s per phase
+export const EG_JS_ORB_DMG     = [0, 0.05, 0.06, 0.08]; // %maxHP per orb touch
+export const EG_JS_CARD_DMG    = [0, 0, 0.07, 0.09];    // %maxHP per card touch
+export const EG_JS_JINX_DMG    = [0, 0, 0.09, 0.11];    // %maxHP jinx-ball touch
+export const EG_JS_LUCK_HEAL   = 0.05;               // %maxHP per luck-ball touch
+export const EG_JS_REVEAL_DMG  = 0.10;               // %maxHP wrong suit at a reveal
+export const EG_JS_SWEEP_DMG   = 0.12;               // %maxHP curtain-call sweep
+export const EG_JS_HIT_CD_MS   = 600;                // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -98,20 +107,20 @@ const EG_JS_HIT_CD_MS   = 600;                // shared touch cooldown
 //------------------------------------------------------------------------
 
 // Flat heal + HUD refresh (mirrors the Dancer - no shared helper exists).
-function _egJsHeal(amount) {
+export function _egJsHeal(amount) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
-        if (playerCurrentHP <= 0) return;
-        const before = playerCurrentHP;
-        playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + amount);
-        if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+        if (globalThis.playerCurrentHP <= 0) return;
+        const before = globalThis.playerCurrentHP;
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + amount);
+        if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }
 
 // Touch damage helper shared by all Jester hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egJsHitCd = 0;
-function _egJsTouch(pct, level, label) {
+export let _egJsHitCd = 0;
+export function _egJsTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egJsHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -124,7 +133,7 @@ function _egJsTouch(pct, level, label) {
 
 // Confetti puff where a show event lands (visual only, body-level so it
 // survives the run ending in the same frame).
-function _egJsConfetti(x, y, big) {
+export function _egJsConfetti(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-js-confetti' + (big ? ' eg-js-confetti-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -154,9 +163,9 @@ function _egJsConfetti(x, y, big) {
 // (easy to track); on each beat (every ~1.1s) they all HOP at once and
 // re-randomize their velocity - the swarm reshuffles its pattern on the
 // beat, so dodging is about reading the rhythm, not just the vectors.
-const EG_JS_MAYHEM_BEAT = 1100;
+export const EG_JS_MAYHEM_BEAT = 1100;
 
-function _egMechJsOrbs(monster, phase) {
+export function _egMechJsOrbs(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = EG_JS_ORB_COUNT[p];
@@ -224,11 +233,11 @@ function _egMechJsOrbs(monster, phase) {
 // they land, face-up, as hazards for a while - the arena becomes the
 // Jester's card table. Volley 1 litters the middle; volley 2 aims at your
 // position. Phase 3 throws a third volley.
-const EG_JS_CARD_LIFE = 6500;
-const EG_JS_CARD_W = 46;
-const EG_JS_CARD_H = 64;
+export const EG_JS_CARD_LIFE = 6500;
+export const EG_JS_CARD_W = 46;
+export const EG_JS_CARD_H = 64;
 
-function _egMechJsCards(monster, phase) {
+export function _egMechJsCards(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -330,10 +339,10 @@ function _egMechJsCards(monster, phase) {
 // them bites) and one LUCK ball (💛, touching it heals a little). The luck
 // ball drifts deliberately THROUGH the mayhem - greed bait. Phase 3 adds a
 // third jinx ball and tightens the loops.
-const EG_JS_JINX_LIFE = 8000;
-const EG_JS_ORBIT_TURN = 1.4;   // rad/s course change (readable loops)
+export const EG_JS_JINX_LIFE = 8000;
+export const EG_JS_ORBIT_TURN = 1.4;   // rad/s course change (readable loops)
 
-function _egMechJsJinx(monster, phase) {
+export function _egMechJsJinx(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -390,7 +399,7 @@ function _egMechJsJinx(monster, phase) {
                     const maxHP = ((typeof _egNkMaxHP === 'function') ? _egNkMaxHP() : 0) || 100;
                     const heal = Math.max(1, Math.round(maxHP * EG_JS_LUCK_HEAL));
                     _egJsHeal(heal);
-                    showToast('💛 +' + heal);
+                    globalThis.showToast('💛 +' + heal);
                     _egJsConfetti(b.x, b.y, false);
                     b.done = true;
                     try { b.el.remove(); } catch (e) {}
@@ -419,19 +428,19 @@ function _egMechJsJinx(monster, phase) {
 // then the BLACKOUT: all cards flip face-down except the safe suit, and
 // the CURTAIN CALL sweeps barrage lanes across the stage. Charge bar
 // frozen for the whole set-piece (gate in _egTickPlayer via _egJsFinalActive).
-const EG_JS_FINAL_SHOWS = 3;      // suit reveals
-const EG_JS_SHOW_CHARGE = 1400;   // ms telegraph per reveal (shrinks)
-const EG_JS_SHOW_CHARGE_MIN = 800;
-const EG_JS_CARD_COLS = 6;
-const EG_JS_CARD_ROWS = 4;
+export const EG_JS_FINAL_SHOWS = 3;      // suit reveals
+export const EG_JS_SHOW_CHARGE = 1400;   // ms telegraph per reveal (shrinks)
+export const EG_JS_SHOW_CHARGE_MIN = 800;
+export const EG_JS_CARD_COLS = 6;
+export const EG_JS_CARD_ROWS = 4;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egJsFinal = null;
+export let _egJsFinal = null;
 
 // Pause-safe timeout: while the game is frozen the callback retries every
 // 200ms instead of firing mid-pause (the freeze guard the other finales
 // run inside their loop ticks - this show runs on timeouts instead).
-function _egJsAfter(g, fn, ms) {
+export function _egJsAfter(g, fn, ms) {
     const id = setTimeout(() => {
         if (!g || g.finished || _egJsFinal !== g) return;
         if (_egNkFrozen()) { _egJsAfter(g, fn, 200); return; }
@@ -441,19 +450,19 @@ function _egJsAfter(g, fn, ms) {
     return id;
 }
 
-function _egJsFinalActive() {
+export function _egJsFinalActive() {
     return !!_egJsFinal && !_egJsFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egJsOnPhaseEnter(monster, newPhase) {
+export function _egJsOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egJsStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egJsStartFinalWatcher(monster) {
+export function _egJsStartFinalWatcher(monster) {
     if (!monster || _egJsFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -469,7 +478,7 @@ function _egJsStartFinalWatcher(monster) {
     });
 }
 
-function _egJsFinalStart(monster) {
+export function _egJsFinalStart(monster) {
     if (_egJsFinal || !monster) return;
 
     // The house lights dim: kill every other run of this boss (the finale
@@ -599,7 +608,7 @@ function _egJsFinalStart(monster) {
 
 // The BLACKOUT + CURTAIN CALL: all cards flip face-down except the safe
 // suit; sweeping barrage lanes cross the stage - the last show of shows.
-function _egJsBlackout(g, monster, level) {
+export function _egJsBlackout(g, monster, level) {
     if (!g || g.finished) return;
     g.phase = 'blackout';
     const W = window.innerWidth, H = window.innerHeight;
@@ -691,7 +700,7 @@ function _egJsBlackout(g, monster, level) {
     sweepNext();
 }
 
-function _egJsFinalEnd(g) {
+export function _egJsFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.showTimer) { clearTimeout(g.showTimer); g.showTimer = null; }
@@ -710,7 +719,7 @@ function _egJsFinalEnd(g) {
     document.querySelectorAll('.eg-js-bowing').forEach(el => el.classList.remove('eg-js-bowing'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -727,7 +736,7 @@ function _egJsFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egJsTeardown() {
+export function _egJsTeardown() {
     if (_egJsFinal) { try { _egJsFinalEnd(_egJsFinal); } catch (e) {} _egJsFinal = null; }
     document.querySelectorAll('.eg-nk-orb-jester, .eg-js-card, .eg-js-ball, ' +
         '.eg-js-curtain, .eg-js-table, .eg-js-cd, .eg-js-sweepwarn, .eg-js-sweep, ' +
@@ -752,7 +761,7 @@ if (typeof window !== 'undefined') {
     window._EG_JS_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_jester') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_jester') : null;
             if (!monster) return 'no jester alive';
             const fn = name === 'orbs' ? _egMechJsOrbs
                 : name === 'cards' ? _egMechJsCards
@@ -764,7 +773,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_jester') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_jester') : null;
             if (!monster) return 'no jester alive';
             _egJsFinalStart(monster);
             return 'THE GRAND FINALE started';

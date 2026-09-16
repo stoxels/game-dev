@@ -1,4 +1,47 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from './audio/audio.js';
+import { cooldownState, startSlotCooldown } from './classes/class-cooldown-state.js';
+import { _getAbilityManaCost, _getPlayerMaxMana, canAffordMana, spendMana, updateClassHUDManaBar } from './classes/class-mana.js';
+import { _egOnPause, _egOnResume } from './endgame/endgame-encounter-tick.js';
+import { _egAnimatePlayerProjectile, _egDamageTargetById, _egGetTarget, _egSpawnMonster, _egStopEncounter } from './endgame/endgame-encounter.js';
+import { EG_ALL_BASE_TYPES } from './endgame/endgame-equipment-base-items.js';
+import { _egCellHasAnyDrop, _egDropHeartPickup, _egFlushRunLootToStash, _egRenderLootOverlay } from './endgame/endgame-grid-pickups.js';
+import { _egAddItemToStash, _egInventory, closeHubToGame, egSaveHubState, isHubGameOverlay, openHubFromGame, showEndgameHub } from './endgame/endgame-hub.js';
+import { _egGetAllocatedAttributes, _egGetPlayerLevel } from './endgame/endgame-leveling.js';
+import { EG_PLAYER_STATS, _egComputePlayerStats, _egGetAllEquippedItems } from './endgame/endgame-player-stats.js';
+import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
+import { _egLootDrops, _egPickups } from './endgame/endgame-state.js';
+import { EG_VENDOR_FREE_BASE_IDS, _egvBuildBaseItemFromBase, _egvGetSlotOrder } from './endgame/endgame-vendor.js';
+import { renderCell, updClues } from './grid.js';
+import { keybindDisplayLabel, keybindKeyFor, onKeybindAction } from './keybinds.js';
+import { ALL } from './levels/levels.js';
+import { pval } from './mouse-button-handlers.js';
+import { isTreeGameOverlay } from './passive-tree/passive-tree.js';
+import { playItemEffect } from './puzzle-items/fx-dispatch.js';
+import { buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout } from './puzzle-items/inventory-panel.js';
+import { ITEM_DEFS } from './puzzle-items/item-definitions.js';
+import { FX_Z, _fxGetPuzzleRectForWrap } from './puzzle-items/shared/fx-helpers.js';
+import { showItemGainPopup, showToast } from './puzzle-items/toasts-and-popups.js';
+import { _consumeItem } from './puzzle-items/use-item.js';
+import { questStat_revealItemUsed } from './quests/quests-stats.js';
+import { isPuzzleSolved } from './scoring.js';
+import { hideResultOverlays, showSetup } from './screens/screens.js';
+import { _charmMake, _charmRenderOverlay, _egCharmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
+import { renderSkillHotbar } from './skills/skill-hotbar.js';
+import { SKILL_REGISTRY, isSkillOnHotbar } from './skills/skill-registry.js';
+import { closeSpellbook, isSpellbookOpen } from './skills/skill-spellbook.js';
+import { USP_THEME_PROJ } from './skills/universal-spell-fx.js';
+import { triggerBanter } from './sprite/character-banter.js';
+import { _hidePlayerAvatar, _hidePlayerAvatarSimple } from './sprite/player_sprite.js';
+import { save } from './state.js';
+import { pauseTimer, resumeTimer, stopTimer } from './timer.js';
+import { t } from './translation/translations.js';
+
+//------------------------------------------------------------------------
 //-------------------INTERACTIVE TUTORIAL QUEST---------------------------
 //------------------------------------------------------------------------
 // Replaces the static image tutorial for new players with a playable
@@ -34,7 +77,7 @@
 //   brute force to yield EXACTLY 2 solutions. Logic alone cannot decide the
 //   corner; only the Professor's Candle breaks the tie. Rows 3/4 are fully
 //   filled so the player banks early wins while learning.
-const TQ_P1 = [
+export const TQ_P1 = [
     [1, 0, 0, 0, 1],
     [0, 1, 0, 1, 0],
     [0, 0, 0, 1, 1],
@@ -47,8 +90,8 @@ const TQ_P1 = [
 // = the top-left corner); the second cell ([1,1]) then follows from the
 // clues - row 0 is complete, so (0,1) stays empty, and column 1 forces
 // (1,1) filled. Same as the real candle: one revealed cell per use.
-const TQ_AMBIGUOUS_CELLS = [[0, 0], [1, 1]];
-const TQ_CORNER_CELLS = [[0, 0], [0, 1], [1, 0], [1, 1]];
+export const TQ_AMBIGUOUS_CELLS = [[0, 0], [1, 1]];
+export const TQ_CORNER_CELLS = [[0, 0], [0, 1], [1, 0], [1, 1]];
 // Puzzle 2 is a FULL-PICTURE grid: every single cell belongs to the
 // solution (25 correct cells). A fresh, un-geared character deals exactly
 // EG_PLAYER_STATS.baseDamage (10) per correct fill, and the tutorial rat's
@@ -56,7 +99,7 @@ const TQ_CORNER_CELLS = [[0, 0], [0, 1], [1, 0], [1, 1]];
 // always dies a few fills in. The moment the rat dies the board locks and
 // the Professor's heart drops onto the grid (claimed with a left-click),
 // then the board frees up to finish the picture. See the p2 step list.
-const TQ_P2 = [
+export const TQ_P2 = [
     [1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1],
@@ -68,14 +111,14 @@ const TQ_P2 = [
 // intellect chest + pants variants too, but the tutorial keeps one clear
 // defensive identity: armour.) Four pieces, all wearable fresh (level 1,
 // 20/20/20 base attributes cover every requirement).
-const TQ_STARTER_BASE_IDS = ['wpn_1h_1', 'ranged_1', 'chest_str_1', 'pants_str_1'];
+export const TQ_STARTER_BASE_IDS = ['wpn_1h_1', 'ranged_1', 'chest_str_1', 'pants_str_1'];
 // Fills allowed during the combat lesson before the Professor pauses the
 // board - exactly half of the 25 solution cells. The rat always dies well
 // inside that cap (see the campaignMonsterHp comment in _tqStampLevel), so
 // in practice the kill - not the cap - ends the combat phase; the cap only
 // remains as a backstop.
-const TQ_P2_FILLS_LIMIT = 12;
-const TQ_P3 = [
+export const TQ_P2_FILLS_LIMIT = 12;
+export const TQ_P3 = [
     [0, 0, 1, 0, 0],
     [0, 0, 1, 0, 0],
     [1, 1, 1, 1, 1],
@@ -83,12 +126,12 @@ const TQ_P3 = [
     [1, 0, 1, 0, 1],
 ];
 
-const TQ_LEVEL_GRIDS = [TQ_P1, TQ_P2, TQ_P3];
-const TQ_LEVEL_HINTS = ['Deduction', 'The First Foe', 'Fire and Starlight'];
-const TQ_LEVEL_HINTS_DE = ['Deduktion', 'Der erste Gegner', 'Feuer und Sternenlicht'];
+export const TQ_LEVEL_GRIDS = [TQ_P1, TQ_P2, TQ_P3];
+export const TQ_LEVEL_HINTS = ['Deduction', 'The First Foe', 'Fire and Starlight'];
+export const TQ_LEVEL_HINTS_DE = ['Deduktion', 'Der erste Gegner', 'Feuer und Sternenlicht'];
 
 // Builds (once) and returns the global index of tutorial puzzle 0 in ALL.
-function _tqEnsureLevels() {
+export function _tqEnsureLevels() {
     if (window._tqLevelBaseG != null && ALL[window._tqLevelBaseG]
         && ALL[window._tqLevelBaseG].isTutorialQuest) {
         return window._tqLevelBaseG;
@@ -122,7 +165,7 @@ function _tqEnsureLevels() {
 // forfeit or completion alike. The level objects are reused for the whole
 // session, so the stamp must be refreshed before any restart. The
 // startLevel wrap calls this before every tutorial boot.
-function _tqRefreshMonsterStamps() {
+export function _tqRefreshMonsterStamps() {
     const base = _tqEnsureLevels();
     _tqStampLevel(ALL[base + 1]);
     _tqStampLevel(ALL[base + 2]);
@@ -134,38 +177,38 @@ function _tqRefreshMonsterStamps() {
 //------------------------------------------------------------------------
 
 // Active phase: null | 'p1' | 'p2' | 'intermission' | 'p3'.
-let _tqPhase = null;
+export let _tqPhase = null;
 // Index of the current step within the phase's step list.
-let _tqStepIdx = 0;
+export let _tqStepIdx = 0;
 // Poll handle driving task-completion checks.
-let _tqPollTimer = null;
+export let _tqPollTimer = null;
 // True once the player has used the tutorial candle in puzzle 1.
-let _tqCandleUsed = false;
+export let _tqCandleUsed = false;
 // True only while the candle-use lesson step is active (puzzle 1 s11): the
 // Professor hands the candle over one step earlier (s10), but using it
 // before he explains it would skip the lesson - early uses are refused with
 // a toast (see the useItem wrap).
-let _tqCandleUsable = false;
+export let _tqCandleUsable = false;
 // True once the player has cast Fireball at least once.
-let _tqFireballUsed = false;
+export let _tqFireballUsed = false;
 // True once the player dragged Fireball onto the hotbar.
-let _tqFireballEquipped = false;
+export let _tqFireballEquipped = false;
 // Puzzle 3: true only while the spellbook is open during the drag lesson -
 // pauses the encounter so the rat cannot chew on the player while they read
 // the book. Cleared when the book closes or the lesson ends.
-let _tqSpellbookPause = false;
+export let _tqSpellbookPause = false;
 // True once the current tutorial puzzle was solved (drives solve tasks).
-let _tqPuzzleSolvedFlag = false;
+export let _tqPuzzleSolvedFlag = false;
 // Puzzle-1 guided demos: while _tqGridLocked is true, EVERY grid click is
 // swallowed (checkSpecialIntercepts wrap) unless it matches the active demo
 // cell + button - the player can only interact when the Professor asks.
-let _tqGridLocked = false;
+export let _tqGridLocked = false;
 // Active demo: { kind: 'correct'|'mistake'|'cross', row, col, button } or null.
-let _tqActiveDemo = null;
+export let _tqActiveDemo = null;
 // Per-demo completion flags (poll predicates read these).
-let _tqDemoDone = { correct: false, mistake: false, cross: false };
+export let _tqDemoDone = { correct: false, mistake: false, cross: false };
 // Set when a monster was observed on the field (guards kill-task polling).
-let _tqSawMonster = false;
+export let _tqSawMonster = false;
 
 // Puzzle-2 lesson state. The half-fill gate arms with the rat fight: the
 // player may fill exactly TQ_P2_FILLS_LIMIT solution cells, and the rat's
@@ -180,54 +223,54 @@ let _tqSawMonster = false;
 // filled without picking the gear up (stash grant instead of a dead run).
 // _tqP2RatDead/_tqP2RatDeadAt freeze the fill count once the fight is over
 // so post-kill fills never consume the lesson cap.
-let _tqP2FillsGate = false;
-let _tqP2FillsCount = 0;
-let _tqP2GateOpen = false;
-let _tqP2GearDropped = false;
-let _tqP2GearClaimed = false;
-let _tqP2GearFillsGate = false;
-let _tqP2SolvedAfterGear = false;
-let _tqP2DropsBoardBackstop = false;
-let _tqP2RatDead = false;
-let _tqP2RatDeadAt = 0;
+export let _tqP2FillsGate = false;
+export let _tqP2FillsCount = 0;
+export let _tqP2GateOpen = false;
+export let _tqP2GearDropped = false;
+export let _tqP2GearClaimed = false;
+export let _tqP2GearFillsGate = false;
+export let _tqP2SolvedAfterGear = false;
+export let _tqP2DropsBoardBackstop = false;
+export let _tqP2RatDead = false;
+export let _tqP2RatDeadAt = 0;
 // Heart lesson gate: while open (the Professor's heart has spawned and is
 // still unclaimed), the otherwise-locked post-kill board accepts input ONLY
 // on the heart's own cell - every other grid click is swallowed. This keeps
 // the "no puzzle interaction until the Professor continues" promise without
 // soft-locking the healing lesson. Cleared the moment the heart is claimed
 // (or immediately when the spawn found no eligible cell).
-let _tqP2HeartOpen = false;
-let _tqP2HeartCell = null;
+export let _tqP2HeartOpen = false;
+export let _tqP2HeartCell = null;
 // Puzzle-3 drop gate: while open (the Professor's sword / charm has spawned
 // and is still unclaimed), the otherwise-locked board accepts input ONLY on
 // the drop's own cell, and ONLY via left-click (a right-click would destroy
 // the drop). One gate serves both drops - they never overlap.
-let _tqP3DropOpen = false;
-let _tqP3DropCell = null;
+export let _tqP3DropOpen = false;
+export let _tqP3DropCell = null;
 // Puzzle-3 sword lesson state.
-let _tqP3SwordKey = null;
-let _tqP3SwordClaimed = false;
+export let _tqP3SwordKey = null;
+export let _tqP3SwordClaimed = false;
 // Puzzle-3 charm lesson state.
-let _tqP3CharmKey = null;
-let _tqP3CharmClaimed = false;
+export let _tqP3CharmKey = null;
+export let _tqP3CharmClaimed = false;
 // Puzzle-3: set once the ghost (fireball lesson) has spawned - drives the
 // solve-time retry gate back to the right fight.
-let _tqP3GhostSpawned = false;
+export let _tqP3GhostSpawned = false;
 // Settling timestamp for the gear grant: claim-completion checks wait until
 // every staggered placement has had its attempt, so a momentary zero count
 // between two placements can never complete the task early.
-let _tqP2GearSettleAt = 0;
+export let _tqP2GearSettleAt = 0;
 // Puzzle 2: set once the starter-gear grant step has run.
-let _tqLootForced = false;
+export let _tqLootForced = false;
 // Throttle stamps for the grid-lock / ambiguity toasts (drag-paint safety).
-let _tqLockToastAt = 0;
-let _tqAmbiguityToastAt = 0;
+export let _tqLockToastAt = 0;
+export let _tqAmbiguityToastAt = 0;
 // mistakeCount snapshot taken when the mistake demo starts, so the demo
 // predicate can detect exactly the guided mistake.
-let _tqMistakesAtDemoStart = 0;// True while a "paused for explanation" step is showing its Continue button.
-let _tqWaitingForContinue = false;
+export let _tqMistakesAtDemoStart = 0;// True while a "paused for explanation" step is showing its Continue button.
+export let _tqWaitingForContinue = false;
 // Meet-the-Professor circle state (puzzle 1 opener): { el, rafId, done } or null.
-let _tqMeetCircle = null;
+export let _tqMeetCircle = null;
 
 
 
@@ -244,16 +287,16 @@ let _tqMeetCircle = null;
 // run would unpause behind the sheet, the tick would rebuild the sprite
 // through it, and monsters would attack while the player equips. The hub
 // owns the pause until closeHubToGame() hands it back.
-function _tqSetPaused(paused) {
+export function _tqSetPaused(paused) {
     try {
         if (paused) {
             if (typeof pauseTimer === 'function') pauseTimer();
-            _gamePaused = true;
+            globalThis._gamePaused = true;
             if (typeof _egOnPause === 'function') { try { _egOnPause(); } catch (e) {} }
         } else {
             if (typeof isHubGameOverlay === 'function' && isHubGameOverlay()) return;
             if (typeof isTreeGameOverlay === 'function' && isTreeGameOverlay()) return;
-            _gamePaused = false;
+            globalThis._gamePaused = false;
             if (typeof _egOnResume === 'function') { try { _egOnResume(); } catch (e) {} }
             if (typeof resumeTimer === 'function') resumeTimer();
         }
@@ -264,7 +307,7 @@ function _tqSetPaused(paused) {
 // open (the player is reading a modal, not fighting). The s2 step arms the
 // flag + initial pause; the rAF watcher keeps it applied until the lesson
 // step advances past s4, which disarms it.
-function _tqSetSpellbookPause(on) {
+export function _tqSetSpellbookPause(on) {
     _tqSpellbookPause = !!on;
     if (on) {
         try { if (typeof isSpellbookOpen === 'function' && isSpellbookOpen()) _tqSetPaused(true); } catch (e) {}
@@ -280,20 +323,20 @@ function _tqSetSpellbookPause(on) {
 
 // Keeps the spellbook-pause in sync with open/close while the drag lesson
 // is active. Runs on rAF (cheap boolean checks), cleaned up on lesson end.
-function _tqSpellbookPauseWatcher() {
+export function _tqSpellbookPauseWatcher() {
     if (!_tqSpellbookPause) return;
     const open = (typeof isSpellbookOpen === 'function') && isSpellbookOpen();
-    if (open && typeof _gamePaused !== 'undefined' && !_gamePaused) _tqSetPaused(true);
-    else if (!open && typeof _gamePaused !== 'undefined' && _gamePaused) _tqSetPaused(false);
+    if (open && typeof _gamePaused !== 'undefined' && !globalThis._gamePaused) _tqSetPaused(true);
+    else if (!open && typeof _gamePaused !== 'undefined' && globalThis._gamePaused) _tqSetPaused(false);
     window._tqSbWatcherRaf = requestAnimationFrame(_tqSpellbookPauseWatcher);
 }
 
-function _tqStartSpellbookWatcher() {
+export function _tqStartSpellbookWatcher() {
     if (window._tqSbWatcherRaf) return;
     window._tqSbWatcherRaf = requestAnimationFrame(_tqSpellbookPauseWatcher);
 }
 
-function _tqStopSpellbookWatcher() {
+export function _tqStopSpellbookWatcher() {
     if (window._tqSbWatcherRaf) { cancelAnimationFrame(window._tqSbWatcherRaf); window._tqSbWatcherRaf = null; }
 }
 
@@ -303,13 +346,13 @@ function _tqStopSpellbookWatcher() {
 //------------------------------------------------------------------------
 
 // Professor portrait (transparent, converted from images/Tutorial/Professor.png).
-const TQ_PROFESSOR_IMAGE = 'images/Tutorial/Professor.webp';
+export const TQ_PROFESSOR_IMAGE = 'images/Tutorial/Professor.webp';
 
 // Properly-capitalized display name for tutorial lines ('Stox'/'Trix'/'Syla').
 // Deliberately NOT _getAvatarCharacterName() - that returns the all-caps HUD
 // name ('STOX'), which reads wrong mid-sentence.
-function _tqCharacterDisplayName() {
-    const id = (STATE && STATE.playerCharacter) ? String(STATE.playerCharacter) : 'stox';
+export function _tqCharacterDisplayName() {
+    const id = (globalThis.STATE && globalThis.STATE.playerCharacter) ? String(globalThis.STATE.playerCharacter) : 'stox';
     const name = id.charAt(0).toUpperCase() + id.slice(1).toLowerCase();
     return ['Stox', 'Trix', 'Syla'].includes(name) ? name : 'Stox';
 }
@@ -318,7 +361,7 @@ function _tqCharacterDisplayName() {
 // Non-tutorial code paths use this to admit the classless tutorial player to
 // the spellbook / hotbar / hotkeys (see skill-spellbook.js, skill-hotbar.js,
 // class-cooldown-state.js, class-mana.js).
-function _tqIsTutorialActive() {
+export function _tqIsTutorialActive() {
     return typeof _tqPhase !== 'undefined' && !!_tqPhase;
 }
 
@@ -327,7 +370,7 @@ function _tqIsTutorialActive() {
 //   {key_move_up|left|down|right} - the player's actual movement keys from the
 //                           persisted keybind map (WASD by default), formatted
 //                           via the same keybindDisplayLabel() used elsewhere.
-function _tqFormatLine(textKey) {
+export function _tqFormatLine(textKey) {
     let line = t(textKey)
         .replace(/\{character_name\}/g, _tqCharacterDisplayName());
     if (typeof keybindKeyFor === 'function' && typeof keybindDisplayLabel === 'function') {
@@ -348,8 +391,8 @@ function _tqFormatLine(textKey) {
         if (sheetKey) line = line.replace(/\{key_charsheet\}/g, keybindDisplayLabel(sheetKey));
         // {key_fireball_slot}: the keybind of whichever hotbar slot the player
         // actually dragged Fireball into (falls back to slot 1).
-        const fbSlot = (typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.skillHotbar))
-            ? STATE.skillHotbar.indexOf('fireball') : -1;
+        const fbSlot = (typeof STATE !== 'undefined' && globalThis.STATE && Array.isArray(globalThis.STATE.skillHotbar))
+            ? globalThis.STATE.skillHotbar.indexOf('fireball') : -1;
         const fbIdx = fbSlot >= 0 ? fbSlot : 0;
         const fbKey = keybindKeyFor(`hotbar-${fbIdx + 1}`);
         if (fbKey) line = line.replace(/\{key_fireball_slot\}/g, keybindDisplayLabel(fbKey));
@@ -369,7 +412,7 @@ function _tqFormatLine(textKey) {
 // The bubble reuses the player's banter bubble markup/styles
 // (.char-speech-bubble in css/game.css) so both speakers share the same
 // comic look and show/hide transition; only the anchoring differs.
-function _tqEnsureBubbleDom() {
+export function _tqEnsureBubbleDom() {
     if (document.getElementById('tq-professor-wrap')) return;
     const wrap = document.createElement('div');
     wrap.id = 'tq-professor-wrap';
@@ -392,7 +435,7 @@ function _tqEnsureBubbleDom() {
 // the bubble shows a Continue button; otherwise it stays visible while the
 // player performs the current task.
 // Placeholders ({character_name}, {key_move_*}) are resolved by _tqFormatLine().
-function _tqSay(textKey, wait) {
+export function _tqSay(textKey, wait) {
     _tqEnsureBubbleDom();
     const wrap = document.getElementById('tq-professor-wrap');
     const bubble = document.getElementById('tq-bubble');
@@ -433,9 +476,9 @@ function _tqSay(textKey, wait) {
 // the killing fill doesn't stack solve + cheer + mistake bubbles.
 // NOTE: the Professor never answers these replies - his asides were
 // removed as confusing; the sprite simply acknowledges after ~5s.
-let _tqLastContextReplyAt = 0;
-let _tqLastReplyAttemptAt = 0;
-function _tqPlayerReply(delayMs, eventKey) {
+export let _tqLastContextReplyAt = 0;
+export let _tqLastReplyAttemptAt = 0;
+export function _tqPlayerReply(delayMs, eventKey) {
     const key = eventKey || 'tutorial_reply';
     const fire = () => {
         const now = Date.now();
@@ -464,7 +507,7 @@ function _tqPlayerReply(delayMs, eventKey) {
 
 // Continue button → next step (only meaningful on paused steps). The player
 // character chimes in right after the Professor's bubble closes.
-function _tqOnContinue() {
+export function _tqOnContinue() {
     if (!_tqWaitingForContinue) return;
     _tqWaitingForContinue = false;
     _tqSetPaused(false);
@@ -474,7 +517,7 @@ function _tqOnContinue() {
 }
 
 // Hides the Professor (end of tutorial).
-function _tqHideProfessor() {
+export function _tqHideProfessor() {
     const wrap = document.getElementById('tq-professor-wrap');
     if (wrap) wrap.style.display = 'none';
     _tqHideGridLockBorder();
@@ -492,7 +535,7 @@ function _tqHideProfessor() {
 
 // Spawns the meet-circle near the Professor's avatar (to his lower-left, on
 // the open game area). Radius scales with the viewport.
-function _tqShowMeetCircle() {
+export function _tqShowMeetCircle() {
     _tqHideMeetCircle();
     _tqEnsureBubbleDom();   // step fns run BEFORE _tqSay - create the wrap here
     const wrap = document.getElementById('tq-professor-wrap');
@@ -545,7 +588,7 @@ function _tqShowMeetCircle() {
 }
 
 // Removes the meet-circle (idempotent).
-function _tqHideMeetCircle() {
+export function _tqHideMeetCircle() {
     if (!_tqMeetCircle) return;
     const { el, rafId } = _tqMeetCircle;
     if (rafId) cancelAnimationFrame(rafId);
@@ -567,7 +610,7 @@ function _tqHideMeetCircle() {
 // Professor asks. Visual focus comes from pulsing outline highlights.
 
 // Shows the "patience" toast at most once every ~1.2s (drag-paint safety).
-function _tqGridLockToast() {
+export function _tqGridLockToast() {
     const now = Date.now();
     if (now - _tqLockToastAt < 1200) return;
     _tqLockToastAt = now;
@@ -575,7 +618,7 @@ function _tqGridLockToast() {
 }
 
 // Shown when the player tries to fill the undecidable pair pre-candle.
-function _tqAmbiguityToast() {
+export function _tqAmbiguityToast() {
     const now = Date.now();
     if (now - _tqAmbiguityToastAt < 1200) return;
     _tqAmbiguityToastAt = now;
@@ -584,7 +627,7 @@ function _tqAmbiguityToast() {
 
 // Generic focus highlight (HUD elements, clue cells, inventory slots).
 // Accepts a selector string OR an Element (e.g. from _tqPointAtDrop).
-function _tqHighlight(sel) {
+export function _tqHighlight(sel) {
     const els = (sel instanceof Element) ? [sel] : document.querySelectorAll(sel);
     els.forEach(el => {
         el.classList.add('tq-hl');
@@ -602,7 +645,7 @@ function _tqHighlight(sel) {
 // the fixed bottom-left corner when the grid rect is unavailable. Shows the
 // ACTION's current keybind so rebindings are honoured; cleared with the
 // normal highlight sweep.
-function _tqShowKeycapChip(actionId, textOverride) {
+export function _tqShowKeycapChip(actionId, textOverride) {
     _tqClearKeycapChip();
     const key = (typeof keybindKeyFor === 'function') ? keybindKeyFor(actionId) : null;
     const label = (key != null && typeof keybindDisplayLabel === 'function') ? keybindDisplayLabel(key) : String(key || '?');
@@ -651,7 +694,7 @@ function _tqShowKeycapChip(actionId, textOverride) {
     }
 }
 
-function _tqClearKeycapChip() {
+export function _tqClearKeycapChip() {
     const chip = document.getElementById('tq-keycap-chip');
     if (!chip) return;
     if (chip._tqReposition) {
@@ -663,14 +706,14 @@ function _tqClearKeycapChip() {
 }
 
 // Focus highlight for one puzzle cell (the .gc div inside its <td>).
-function _tqHighlightCell(row, col) {
+export function _tqHighlightCell(row, col) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (el) el.classList.add('tq-cell-hl');
     _tqUpdatePointerLine();   // aim the pointer line at the new target
 }
 
 // Removes every tutorial highlight.
-function _tqClearHighlights() {
+export function _tqClearHighlights() {
     document.querySelectorAll('.tq-hl').forEach(el => el.classList.remove('tq-hl'));
     document.querySelectorAll('.tq-cell-hl').forEach(el => el.classList.remove('tq-cell-hl'));
     _tqHidePointerLine();
@@ -685,21 +728,21 @@ function _tqClearHighlights() {
 // slot). Drawn as one fixed SVG overlay so the line can freely cross the
 // screen; re-anchored every frame cheaply (one rect read + two attribute
 // writes) so it tracks zoom, resize and layout shifts live.
-let _tqPointerSvg = null;
-let _tqPointerLine = null;
-let _tqPointerTipDot = null;
-let _tqPointerEndDot = null;
+export let _tqPointerSvg = null;
+export let _tqPointerLine = null;
+export let _tqPointerTipDot = null;
+export let _tqPointerEndDot = null;
 // Pointer-stick geometry measured from the actual Professor artwork
 // (silhouette scan of images/Tutorial/Professor.webp): the drawn stick tip
 // sits at ~2.7% across / ~33.6% down the avatar box, sloping up-left at
 // roughly -30° (hand at ~16.6% / ~50.7%). Anchoring there instead of the
 // avatar's right edge makes the line truly emanate from his pointer.
-const TQ_STICK_TIP = { x: 0.027, y: 0.336 };
-const TQ_STICK_ANGLE_DEG = 30;           // stick axis, up-left, from vertical
-const TQ_STICK_EXTEND_PX = 26;           // straight lead-out along the axis
-const TQ_STICK_HOVER_GAP = 10;           // standoff from the target edge
+export const TQ_STICK_TIP = { x: 0.027, y: 0.336 };
+export const TQ_STICK_ANGLE_DEG = 30;           // stick axis, up-left, from vertical
+export const TQ_STICK_EXTEND_PX = 26;           // straight lead-out along the axis
+export const TQ_STICK_HOVER_GAP = 10;           // standoff from the target edge
 
-function _tqEnsurePointerSvg() {
+export function _tqEnsurePointerSvg() {
     if (_tqPointerSvg && _tqPointerSvg.isConnected) return;
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.id = 'tq-pointer-svg';
@@ -719,7 +762,7 @@ function _tqEnsurePointerSvg() {
 }
 
 // Starts the live tracking loop while a pointer line is visible.
-function _tqStartPointerLoop() {
+export function _tqStartPointerLoop() {
     if (window._tqPointerRaf) return;
     const tick = () => {
         if (!_tqPointerLine) { window._tqPointerRaf = null; return; }
@@ -729,13 +772,13 @@ function _tqStartPointerLoop() {
     window._tqPointerRaf = requestAnimationFrame(tick);
 }
 
-function _tqStopPointerLoop() {
+export function _tqStopPointerLoop() {
     if (window._tqPointerRaf) { cancelAnimationFrame(window._tqPointerRaf); window._tqPointerRaf = null; }
 }
 
 // Anchors the line: starts at the Professor's pointer hand (upper body of
 // his portrait, where he holds it), ends at the first highlighted target.
-function _tqUpdatePointerLine() {
+export function _tqUpdatePointerLine() {
     if (!_tqPointerLine) return;
     const prof = document.getElementById('tq-professor-avatar');
     if (!prof || !prof.isConnected) { _tqHidePointerLine(); return; }
@@ -787,14 +830,14 @@ function _tqUpdatePointerLine() {
 }
 
 // Shows the pointer line (call after adding highlights).
-function _tqShowPointerLine() {
+export function _tqShowPointerLine() {
     _tqEnsurePointerSvg();
     _tqUpdatePointerLine();
     _tqStartPointerLoop();
 }
 
 // Hides the line and stops tracking (idempotent).
-function _tqHidePointerLine() {
+export function _tqHidePointerLine() {
     _tqStopPointerLoop();
     if (_tqPointerSvg && _tqPointerSvg.isConnected) _tqPointerSvg.remove();
     _tqPointerSvg = null;
@@ -804,14 +847,14 @@ function _tqHidePointerLine() {
 }
 
 // Highlights + aims the pointer line (convenience for step definitions).
-function _tqPointAt(sel) {
+export function _tqPointAt(sel) {
     _tqHighlight(sel);
     _tqShowPointerLine();
 }
 
 // Highlights the candle slot in the inventory panel + the Reveal category
 // button that owns it (so the player learns where the flyout lives).
-function _tqHighlightCandleSlot() {
+export function _tqHighlightCandleSlot() {
     _tqHighlight('.inv-slot[data-def-id="reveal1"]');
     _tqHighlight('.inv-cat-btn[data-group="Reveal"]');
 }
@@ -820,7 +863,7 @@ function _tqHighlightCandleSlot() {
 // exists in the DOM - the compact inventory bar only renders slots inside
 // a flyout, and the tutorial's highlight would otherwise point at nothing.
 // Closed again after the candle task (s12).
-function _tqOpenRevealFlyout() {
+export function _tqOpenRevealFlyout() {
     try {
         if (typeof openInventoryFlyout !== 'function') return;
         const btn = document.querySelector('.inv-cat-btn[data-group="Reveal"]');
@@ -831,7 +874,7 @@ function _tqOpenRevealFlyout() {
 }
 
 // Unpins + closes the inventory flyout opened for the candle lesson.
-function _tqCloseInventoryFlyout() {
+export function _tqCloseInventoryFlyout() {
     try {
         if (window._invPinnedFlyoutGroup === 'Reveal') window._invPinnedFlyoutGroup = null;
         if (typeof closeInventoryFlyout === 'function') closeInventoryFlyout();
@@ -840,7 +883,7 @@ function _tqCloseInventoryFlyout() {
 
 // Highlights the cell the candle will reveal (the undecidable top-left
 // corner - the second ambiguous cell is the player's own deduction).
-function _tqHighlightAmbiguousCells() {
+export function _tqHighlightAmbiguousCells() {
     const [r, c] = TQ_AMBIGUOUS_CELLS[0];
     _tqHighlightCell(r, c);
 }
@@ -859,8 +902,8 @@ function _tqHighlightAmbiguousCells() {
 // silently without the border.
 
 // True when grid input is currently restricted anywhere in the tutorial.
-function _tqIsGridInputLocked() {
-    if (typeof cur === 'undefined' || !cur || !cur.isTutorialQuest) return false;
+export function _tqIsGridInputLocked() {
+    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.isTutorialQuest) return false;
     if (_tqGridLocked) return true;
     if (_tqPhase === 'p2') {
         if (_tqP2HeartOpen) return true;
@@ -868,7 +911,7 @@ function _tqIsGridInputLocked() {
     return false;
 }
 
-function _tqRefreshGridLockBorder() {
+export function _tqRefreshGridLockBorder() {
     try {
         // Puzzle 2 never shows the red border - the input locks still apply,
         // they just aren't visualized.
@@ -879,7 +922,7 @@ function _tqRefreshGridLockBorder() {
 }
 
 // Shows the red lock border (idempotent).
-function _tqShowGridLockBorder() {
+export function _tqShowGridLockBorder() {
     if (document.getElementById('tq-grid-lock-border')) return;
     if (typeof _fxGetPuzzleRectForWrap !== 'function') return;
     const wrap = document.getElementById('puzzle-scaler-wrap');
@@ -919,7 +962,7 @@ function _tqShowGridLockBorder() {
 }
 
 // Hides the red lock border (idempotent).
-function _tqHideGridLockBorder() {
+export function _tqHideGridLockBorder() {
     const border = document.getElementById('tq-grid-lock-border');
     if (!border) return;
     if (border._tqReposition) {
@@ -940,7 +983,7 @@ function _tqHideGridLockBorder() {
 //   { fn: () => {} }                  - silent action step
 
 // Task predicates - return true when the current task is complete.
-const TQ_TASKS = {
+export const TQ_TASKS = {
     // Puzzle 1 opener: the avatar reached the Professor's meet-circle.
     meet_professor: () => !!(_tqMeetCircle && _tqMeetCircle.done),
     // Puzzle 1: the candle has been used (its single revealed cell does not
@@ -952,8 +995,8 @@ const TQ_TASKS = {
     // Solution-0 corners accept any non-fill state (empty, ✕ mark or ?) so
     // a player who marked the empties while learning is never soft-locked.
     corner_deduced: () => {
-        if (typeof userGrid === 'undefined' || !userGrid || typeof cur === 'undefined' || !cur) return false;
-        return TQ_CORNER_CELLS.every(([r, c]) => (cur.grid[r][c] === 1 ? userGrid[r][c] === 1 : userGrid[r][c] !== 1));
+        if (typeof userGrid === 'undefined' || !globalThis.userGrid || typeof cur === 'undefined' || !globalThis.cur) return false;
+        return TQ_CORNER_CELLS.every(([r, c]) => (globalThis.cur.grid[r][c] === 1 ? globalThis.userGrid[r][c] === 1 : globalThis.userGrid[r][c] !== 1));
     },
     // Puzzle 2: first correct grid reveal during the damage lesson. The
     // damage-explanation bubble stays up until the player has dealt damage
@@ -964,7 +1007,7 @@ const TQ_TASKS = {
     // rolls are suppressed for the tutorial - the Professor drops his own
     // heart on the kill).
     kill_monster: () => {
-        const dead = _tqSawMonster && typeof _egMonsters !== 'undefined' && _egMonsters.length === 0;
+        const dead = _tqSawMonster && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0;
         if (dead && !_tqP2RatDead) { _tqP2RatDead = true; _tqP2RatDeadAt = Date.now(); }
         return dead;
     },
@@ -1003,12 +1046,12 @@ const TQ_TASKS = {
         return false;
     },
     // Puzzle 3: the Rusted Sword sits in the weapon slot.
-    sword_equipped: () => !!(typeof STATE !== 'undefined' && STATE
-        && STATE.egEquipped && STATE.egEquipped.weapon1),
+    sword_equipped: () => !!(typeof STATE !== 'undefined' && globalThis.STATE
+        && globalThis.STATE.egEquipped && globalThis.STATE.egEquipped.weapon1),
     // Puzzle 3: the bat was defeated with melee strikes. Guarded by
     // _tqSawMonster so an empty field at boot can never complete it.
     melee_kill: () => _tqSawMonster
-        && typeof _egMonsters !== 'undefined' && _egMonsters.length === 0,
+        && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0,
     // Puzzle 3: the dropped Fireball charm has been picked up (grantCharm
     // lands it straight in the charm inventory - no flush needed).
     pick_charm: () => {
@@ -1027,7 +1070,7 @@ const TQ_TASKS = {
     },
     // Puzzle 3: the ghost was burned down with Fireball.
     fireball_kill: () => _tqSawMonster
-        && typeof _egMonsters !== 'undefined' && _egMonsters.length === 0,
+        && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0,
     // Puzzle 2: the fill-limit gate. The cap arms when the rat appears and
     // counts only fills spent on the rat (frozen at its death). The task
     // resolves once the limit is reached (then the board locks for the gear
@@ -1049,16 +1092,16 @@ const TQ_TASKS = {
     open_spellbook: () => typeof isSpellbookOpen === 'function' && isSpellbookOpen(),
     // Puzzle 3: the Scroll of Fireball was dragged into a spell slot, which
     // unlocks the Fireball in the spell book (js/skills/skill-charms.js).
-    slot_fireball: () => typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.charmSlots)
-        && STATE.charmSlots.indexOf('fireball#1') !== -1,
+    slot_fireball: () => typeof STATE !== 'undefined' && globalThis.STATE && Array.isArray(globalThis.STATE.charmSlots)
+        && globalThis.STATE.charmSlots.indexOf('fireball#1') !== -1,
     // Puzzle 3: Fireball sits on the hotbar.
     drag_fireball: () => typeof isSkillOnHotbar === 'function' && isSkillOnHotbar('fireball'),
     // Puzzle 3: Fireball was cast. If the ghost already died, the cast
     // lesson is moot: auto-skip instead of demanding a cast at nothing.
     cast_fireball: () => _tqFireballUsed
-        || (typeof _egMonsters !== 'undefined' && _tqSawMonster && _egMonsters.length === 0),
+        || (typeof _egMonsters !== 'undefined' && _tqSawMonster && globalThis._egMonsters.length === 0),
     // Puzzle 3: monster defeated.
-    kill_monster_2: () => _tqSawMonster && typeof _egMonsters !== 'undefined' && _egMonsters.length === 0,
+    kill_monster_2: () => _tqSawMonster && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0,
     // Puzzle 1: guided demos on the locked grid.
     demo_correct: () => _tqDemoDone.correct,
     demo_mistake: () => _tqDemoDone.mistake,
@@ -1067,11 +1110,11 @@ const TQ_TASKS = {
     // filled - the "shape" lesson. (The corner cannot be filled before the
     // candle; empty cells stay empty - marks are fine, fills are mistakes.)
     cross_filled: () => {
-        if (typeof userGrid === 'undefined' || !userGrid || !userGrid[0] || typeof cur === 'undefined' || !cur) return false;
+        if (typeof userGrid === 'undefined' || !globalThis.userGrid || !globalThis.userGrid[0] || typeof cur === 'undefined' || !globalThis.cur) return false;
         for (let r = 0; r < 5; r++) {
             for (let c = 0; c < 5; c++) {
                 if (TQ_CORNER_CELLS.some(([ar, ac]) => ar === r && ac === c)) continue;
-                if (cur.grid[r][c] === 1 && userGrid[r][c] !== 1) return false;
+                if (globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1) return false;
             }
         }
         return true;
@@ -1082,14 +1125,14 @@ const TQ_TASKS = {
 };
 
 // Steps per phase (see keys in translations-strings.js).
-function _tqPhaseSteps() {
+export function _tqPhaseSteps() {
     switch (_tqPhase) {
         case 'p1': return [
             { say: 'tq_p1_s0', task: 'meet_professor', fn: () => { _tqGridLocked = true; _tqDemoDone = { correct: false, mistake: false, cross: false }; _tqActiveDemo = null; _tqShowMeetCircle(); } },
             { say: 'tq_p1_s1', wait: true, fn: () => { _tqClearHighlights(); _tqPointAt('.ptable .rct'); _tqHighlight('.ptable .cch'); } },
             { say: 'tq_p1_s2', task: 'demo_correct', fn: () => { _tqClearHighlights(); _tqHighlightCell(3, 2); _tqShowPointerLine(); _tqActiveDemo = { kind: 'correct', row: 3, col: 2, button: 0 }; } },
             { say: 'tq_p1_s3', wait: true, fn: () => { _tqActiveDemo = null; _tqClearHighlights(); } },
-            { say: 'tq_p1_s4', task: 'demo_mistake', fn: () => { try { _tqMistakesAtDemoStart = mistakeCount; } catch (e) {} _tqHighlightCell(0, 3); _tqShowPointerLine(); _tqActiveDemo = { kind: 'mistake', row: 0, col: 3, button: 0 }; } },
+            { say: 'tq_p1_s4', task: 'demo_mistake', fn: () => { try { _tqMistakesAtDemoStart = globalThis.mistakeCount; } catch (e) {} _tqHighlightCell(0, 3); _tqShowPointerLine(); _tqActiveDemo = { kind: 'mistake', row: 0, col: 3, button: 0 }; } },
             { say: 'tq_p1_s5', wait: true, fn: () => { _tqActiveDemo = null; _tqClearHighlights(); _tqPointAt('#timer-val'); _tqHighlight('#mistake-counter'); } },
             { say: 'tq_p1_s6', task: 'demo_cross', fn: () => { _tqClearHighlights(); _tqHighlightCell(1, 4); _tqShowPointerLine(); _tqActiveDemo = { kind: 'cross', row: 1, col: 4, button: 2 }; } },
             { say: 'tq_p1_s7', wait: true, fn: () => { _tqActiveDemo = null; _tqClearHighlights(); } },
@@ -1147,7 +1190,7 @@ function _tqPhaseSteps() {
 }
 
 // Runs the step list from _tqStepIdx until it hits a wait, a task or the end.
-function _tqRunCurrentPhase() {
+export function _tqRunCurrentPhase() {
     // A jump (e.g. _tqOnPuzzleSolved retry/payoff) invalidates any poll that
     // is still running for a previous task step - kill it here so the old
     // predicate cannot fire a second advance while the new step is showing.
@@ -1167,7 +1210,7 @@ function _tqRunCurrentPhase() {
 }
 
 // Starts polling for a task's completion.
-function _tqStartTask(name) {
+export function _tqStartTask(name) {
     if (_tqPollTimer) clearInterval(_tqPollTimer);
     const pred = TQ_TASKS[name];
     if (!pred) { _tqRunCurrentPhase(); return; }
@@ -1203,26 +1246,26 @@ function _tqStartTask(name) {
 //             (mistakeCount is incremented by applyRealMistake AFTER
 //             handleWrongFill, so the poll always sees the increment)
 //   cross   → the demo cell now holds a player mark (2) or question mark (3)
-function _tqScanDemoOutcome() {
+export function _tqScanDemoOutcome() {
     const d = _tqActiveDemo;
     if (!d) return;
     if (d.done) return;
     try {
         if (d.kind === 'correct') {
-            if (userGrid[d.row][d.col] === 1) _tqDemoDone.correct = d.done = true;
+            if (globalThis.userGrid[d.row][d.col] === 1) _tqDemoDone.correct = d.done = true;
         } else if (d.kind === 'mistake') {
-            if (typeof mistakeCount === 'number' && mistakeCount > _tqMistakesAtDemoStart) {
+            if (typeof mistakeCount === 'number' && globalThis.mistakeCount > _tqMistakesAtDemoStart) {
                 _tqDemoDone.mistake = d.done = true;
             }
         } else if (d.kind === 'cross') {
-            const v = userGrid[d.row][d.col];
+            const v = globalThis.userGrid[d.row][d.col];
             if (v === 2 || v === 3) _tqDemoDone.cross = d.done = true;
         }
     } catch (e) {}
 }
 
 // All steps of the phase completed → advance the quest.
-function _tqPhaseFinished() {
+export function _tqPhaseFinished() {
     if (_tqPollTimer) { clearInterval(_tqPollTimer); _tqPollTimer = null; }
     // Safety: the grid lock belongs to puzzle 1's guided demos only. Clear
     // it on EVERY phase end (and boot) so a skipped/aborted lesson can never
@@ -1245,7 +1288,7 @@ function _tqPhaseFinished() {
         showToast('🎓 ' + t('tq_toast_p2_done'));
         setTimeout(() => _tqStartPuzzle(2), 1600);
     } else if (_tqPhase === 'p3') {
-        STATE.tutorialDone = true;
+        globalThis.STATE.tutorialDone = true;
         save();
         _tqHideProfessor();
         // Final farewell: as the Professor's graduation line closes, the
@@ -1267,7 +1310,7 @@ function _tqPhaseFinished() {
 
 // Starts tutorial puzzle i (0-based): stamps monster data and launches it
 // through the normal level pipeline.
-function _tqStartPuzzle(i) {
+export function _tqStartPuzzle(i) {
     const base = _tqEnsureLevels();
     _tqPhase = i === 0 ? 'p1' : i === 1 ? 'p2' : 'p3';
     _tqStepIdx = 0;
@@ -1308,7 +1351,7 @@ function _tqStartPuzzle(i) {
     _tqHideGridLockBorder();
     if (_tqPhase === 'p2' || _tqPhase === 'p3') _tqGridLocked = true;
     if (_tqPhase === 'p3') _tqEnsureFireball();
-    startLevel(base + i);
+    globalThis.startLevel(base + i);
     // Kick off the Professor's explanation once the level has booted (the
     // start pipeline is synchronous, so one tick is enough).
     setTimeout(() => _tqRunCurrentPhase(), 900);
@@ -1318,7 +1361,7 @@ function _tqStartPuzzle(i) {
 // runs. Puzzle 2 gets one very weak level-1 rat; puzzle 3 starts with NO
 // monster at all (maxMonsters 0 → empty spawn list) and its lessons spawn a
 // bat, then a ghost, on demand via _egSpawnMonster.
-function _tqStampLevel(lvl) {
+export function _tqStampLevel(lvl) {
     if (!lvl || !lvl.isTutorialQuest) return;
     if (lvl.tqPuzzle === 0) {
         // Puzzle 1: no monsters at all.
@@ -1361,7 +1404,7 @@ function _tqStampLevel(lvl) {
 }
 
 // checkWin hook - the entire tutorial bypass of the normal win flow.
-function _tqOnPuzzleSolved() {
+export function _tqOnPuzzleSolved() {
     _tqPuzzleSolvedFlag = true;
 
     // Retry gates: a lesson requirement was skipped - push the player back
@@ -1370,7 +1413,7 @@ function _tqOnPuzzleSolved() {
     // lives - at solve time it is always dead (see cast_fireball above), so
     // the bounce can never demand a cast at an empty field.
     if (_tqPhase === 'p1' && !_tqCandleUsed) {
-        dead = false;
+        globalThis.dead = false;
         _tqStepIdx = 11;  // re-run the candle explanation + task (see p1 list: 8=silent, 11=s10 grant, 12=s11 use, 13=s11b deduce)
         _tqRunCurrentPhase();
         return;
@@ -1380,8 +1423,8 @@ function _tqOnPuzzleSolved() {
     // the player back to the running fight - the encounter keeps running so
     // nothing is lost. New p3 list: 4=s3 melee+kill, 15=s8 fireball+kill.
     if (_tqPhase === 'p3'
-        && typeof _egMonsters !== 'undefined' && _egMonsters.length > 0) {
-        dead = false;
+        && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) {
+        globalThis.dead = false;
         _tqStepIdx = _tqP3GhostSpawned ? 15 : 4;   // re-run the live fight
         _tqRunCurrentPhase();
         return;
@@ -1391,15 +1434,15 @@ function _tqOnPuzzleSolved() {
     // keeps running so nothing is lost.
     // New p2 list: 0=s0 intro, 1=s1 damage, 2=first_fill, 3=s1b+kill.
     if (_tqPhase === 'p2' && !_tqP2RatDead
-        && typeof _egMonsters !== 'undefined' && _egMonsters.length > 0) {
-        dead = false;
+        && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) {
+        globalThis.dead = false;
         _tqStepIdx = 3;   // re-run the defeat-the-rat task
         _tqRunCurrentPhase();
         return;
     }
 
     // Phase genuinely finished: freeze everything and jump to the payoff.
-    dead = true;
+    globalThis.dead = true;
     if (typeof stopTimer === 'function') stopTimer();
     if (typeof _egStopEncounter === 'function') _egStopEncounter();
     // Congratulation reply - the character celebrates the solved puzzle
@@ -1431,8 +1474,8 @@ function _tqOnPuzzleSolved() {
 //------------------------------------------------------------------------
 
 // Adds an ITEM_DEFS item to the player's puzzle-item inventory.
-function _tqGrantPuzzleItem(defId, extraProps) {
-    STATE.inventory.push(Object.assign({
+export function _tqGrantPuzzleItem(defId, extraProps) {
+    globalThis.STATE.inventory.push(Object.assign({
         defId,
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
     }, extraProps || {}));
@@ -1444,8 +1487,8 @@ function _tqGrantPuzzleItem(defId, extraProps) {
 // variant that reveals exactly ONE undecidable cell when used (the second
 // one is the player's own deduction, like the real candle: 1 cell per use).
 // Idempotent: the retry path may re-run this step.
-function _tqGiveCandle() {
-    if (!STATE.inventory.some(i => i.defId === 'reveal1' && i.isTutorialCandle)) {
+export function _tqGiveCandle() {
+    if (!globalThis.STATE.inventory.some(i => i.defId === 'reveal1' && i.isTutorialCandle)) {
         _tqGrantPuzzleItem('reveal1', { isTutorialCandle: true });
     }
     showToast('🎓 ' + t('tq_toast_candle'));
@@ -1456,27 +1499,27 @@ function _tqGiveCandle() {
 // the item and returns the toast message (same contract as a normal item
 // handler). The revealed cell alone never completes the puzzle: the player
 // must deduce the second ambiguous cell from the clues themselves.
-function _tqUseTutorialCandle(def) {
+export function _tqUseTutorialCandle(def) {
     if (typeof questStat_revealItemUsed === 'function') questStat_revealItemUsed();
     const [ar, ac] = TQ_AMBIGUOUS_CELLS[0];
-    if (cur.grid[ar][ac] === 1 && userGrid[ar][ac] !== 1) {
-        revealedGrid[ar][ac] = true;
-        userGrid[ar][ac] = 1;
+    if (globalThis.cur.grid[ar][ac] === 1 && globalThis.userGrid[ar][ac] !== 1) {
+        globalThis.revealedGrid[ar][ac] = true;
+        globalThis.userGrid[ar][ac] = 1;
         renderCell(ar, ac);
         updClues(ar, ac);
     }
     playItemEffect('reveal1');
-    checkWin();
+    globalThis.checkWin();
     return `🕯️ ${t('item_revealed').replace('{n}', 1)}`;
 }
 
 // Routes candle uses: the tagged tutorial candle performs the targeted
 // reveal and consumes itself; a regular candle through the real pipeline
 // still sets the flag (its reveal just doesn't break the tie).
-function _tqOnCandleUse(uid) {
-    const idx = STATE.inventory.findIndex(i => i.uid === uid);
+export function _tqOnCandleUse(uid) {
+    const idx = globalThis.STATE.inventory.findIndex(i => i.uid === uid);
     if (idx < 0) return;
-    const item = STATE.inventory[idx];
+    const item = globalThis.STATE.inventory[idx];
     if (item.isTutorialCandle) {
         const def = ITEM_DEFS[item.defId];
         // Flag BEFORE the reveal: the reveal's checkWin must already see the
@@ -1498,7 +1541,7 @@ function _tqOnCandleUse(uid) {
 // calls this, so a second call while the gate is open is a no-op. When the
 // spawn finds no eligible cell the gate stays closed and the lesson
 // completes on its own.
-function _tqSpawnHeart() {
+export function _tqSpawnHeart() {
     if (_tqP2HeartOpen) return;
     try {
         if (typeof _egPickups !== 'undefined' && _egPickups.size > 0) {
@@ -1529,7 +1572,7 @@ function _tqSpawnHeart() {
 // gate (see the p3 intercept) admits only a left-click on that exact cell,
 // so the blade can never be destroyed or missed. Falls back to a direct
 // stash grant if the engine drop pipeline is unavailable.
-function _tqPlaceSwordDrop() {
+export function _tqPlaceSwordDrop() {
     _tqP3DropOpen = false;
     _tqP3DropCell = null;
     _tqP3SwordKey = null;
@@ -1537,8 +1580,8 @@ function _tqPlaceSwordDrop() {
         _tqEnsureFireball();
         if (typeof EG_ALL_BASE_TYPES === 'undefined'
             || typeof _egvBuildBaseItemFromBase !== 'function'
-            || typeof cur === 'undefined' || !cur || !cur.grid
-            || typeof userGrid === 'undefined' || !userGrid) {
+            || typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid
+            || typeof userGrid === 'undefined' || !globalThis.userGrid) {
             _tqGrantSwordToStash();
             return;
         }
@@ -1550,7 +1593,7 @@ function _tqPlaceSwordDrop() {
         item.noSellValue = true;   // loot-filter proof, like the starter gear
         item.isTutorialSword = true;
         const key = '2-2';
-        if (cur.grid[2][2] !== 1 || userGrid[2][2] !== 0) { _tqGrantSwordToStash(); return; }
+        if (globalThis.cur.grid[2][2] !== 1 || globalThis.userGrid[2][2] !== 0) { _tqGrantSwordToStash(); return; }
         _egLootDrops.set(key, item);
         if (typeof _egRenderLootOverlay === 'function') _egRenderLootOverlay(2, 2, item);
         // No expiry: unlike normal loot, the lesson drop waits until claimed.
@@ -1566,7 +1609,7 @@ function _tqPlaceSwordDrop() {
 // Fallback used only when the grid-drop pipeline is unavailable: the blade
 // goes straight into the persistent stash and the lesson continues at the
 // equip step (the claim task completes immediately).
-function _tqGrantSwordToStash() {
+export function _tqGrantSwordToStash() {
     try {
         if (typeof EG_ALL_BASE_TYPES === 'undefined' || typeof _egvBuildBaseItemFromBase !== 'function') return;
         const base = EG_ALL_BASE_TYPES.find((b) => b && b.id === 'wpn_1h_1');
@@ -1584,7 +1627,7 @@ function _tqGrantSwordToStash() {
 // Placed on the solution cell (2,0) with no expiry - claimed with a single
 // left-click through the same drop gate as the sword. grantCharm lands it
 // straight in the charm inventory, so no stash flush is needed.
-function _tqPlaceCharmDrop() {
+export function _tqPlaceCharmDrop() {
     _tqP3DropOpen = false;
     _tqP3DropCell = null;
     _tqP3CharmKey = null;
@@ -1592,9 +1635,9 @@ function _tqPlaceCharmDrop() {
         _tqEnsureFireball();
         if (typeof _charmMake !== 'function'
             || typeof _egCharmDrops === 'undefined'
-            || typeof cur === 'undefined' || !cur || !cur.grid
-            || typeof userGrid === 'undefined' || !userGrid
-            || cur.grid[2][0] !== 1 || userGrid[2][0] !== 0) {
+            || typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid
+            || typeof userGrid === 'undefined' || !globalThis.userGrid
+            || globalThis.cur.grid[2][0] !== 1 || globalThis.userGrid[2][0] !== 0) {
             if (typeof grantCharm === 'function') grantCharm('fireball', 1);
             _tqP3CharmClaimed = true;
             return;
@@ -1618,10 +1661,10 @@ function _tqPlaceCharmDrop() {
 // Clears stale fill damage (drag-charge + queued reveal projectiles) left
 // over from the sword / charm pickup fills, so the lesson fights start
 // clean and pickups never leak free damage into them.
-function _tqClearStaleFillDamage() {
-    try { if (typeof _egDragChargeDamage !== 'undefined') _egDragChargeDamage = 0; } catch (e) {}
-    try { if (typeof _egDragChargeStacks !== 'undefined') _egDragChargeStacks = 0; } catch (e) {}
-    try { if (typeof _egPendingRevealQueue !== 'undefined') _egPendingRevealQueue = []; } catch (e) {}
+export function _tqClearStaleFillDamage() {
+    try { if (typeof _egDragChargeDamage !== 'undefined') globalThis._egDragChargeDamage = 0; } catch (e) {}
+    try { if (typeof _egDragChargeStacks !== 'undefined') globalThis._egDragChargeStacks = 0; } catch (e) {}
+    try { if (typeof _egPendingRevealQueue !== 'undefined') globalThis._egPendingRevealQueue = []; } catch (e) {}
 }
 
 // Puzzle 3 melee lesson: a bat arrives once the sword is equipped. Its HP
@@ -1629,13 +1672,13 @@ function _tqClearStaleFillDamage() {
 // (4-10 base, doubled for manual pacing); it hits back gently (3).
 // Idempotent: the solve-time retry path re-runs this step while the bat
 // still lives, which must not double-spawn.
-function _tqSpawnP3Bat() {
+export function _tqSpawnP3Bat() {
     _tqClearStaleFillDamage();
     try {
-        if (typeof _egMonsters !== 'undefined' && _egMonsters.length > 0) { _tqSawMonster = true; return; }
-        if (typeof cur !== 'undefined' && cur) {
-            cur.campaignMonsterHp = 45;
-            cur.campaignMonsterDamage = 3;
+        if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) { _tqSawMonster = true; return; }
+        if (typeof cur !== 'undefined' && globalThis.cur) {
+            globalThis.cur.campaignMonsterHp = 45;
+            globalThis.cur.campaignMonsterDamage = 3;
         }
         if (typeof _egSpawnMonster === 'function') _egSpawnMonster('bat', 1);
         _tqSawMonster = true;
@@ -1645,19 +1688,19 @@ function _tqSpawnP3Bat() {
 // Puzzle 3 fireball lesson: a ghost arrives once Fireball sits on the
 // hotbar. It is immune to melee (meleeImmune flag - blades flash IMMUNE) so
 // only Fireball can bring it down. Three casts (18 each vs 50 ±15%) end it.
-function _tqSpawnP3Ghost() {
+export function _tqSpawnP3Ghost() {
     _tqClearStaleFillDamage();
     _tqP3GhostSpawned = true;
     try {
-        if (typeof _egMonsters !== 'undefined' && _egMonsters.length > 0) { _tqSawMonster = true; return; }
-        if (typeof cur !== 'undefined' && cur) {
-            cur.campaignMonsterHp = 50;
-            cur.campaignMonsterDamage = 3;
+        if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) { _tqSawMonster = true; return; }
+        if (typeof cur !== 'undefined' && globalThis.cur) {
+            globalThis.cur.campaignMonsterHp = 50;
+            globalThis.cur.campaignMonsterDamage = 3;
         }
         if (typeof _egSpawnMonster === 'function') _egSpawnMonster('ghost', 1);
         try {
-            const g = (typeof _egMonsters !== 'undefined' && _egMonsters.length)
-                ? _egMonsters[_egMonsters.length - 1] : null;
+            const g = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length)
+                ? globalThis._egMonsters[globalThis._egMonsters.length - 1] : null;
             if (g) g.meleeImmune = true;
         } catch (e) {}
         _tqSawMonster = true;
@@ -1668,7 +1711,7 @@ function _tqSpawnP3Ghost() {
 // The drop may spawn a beat after the step shows, so poll briefly - and the
 // rAF pointer loop re-resolves the target every frame, so the line follows
 // the drop and vanishes the moment it is claimed or expires.
-function _tqPointAtDrop(selector) {
+export function _tqPointAtDrop(selector) {
     let attempts = 0;
     const tryPoint = () => {
         const el = document.querySelector(selector);
@@ -1681,7 +1724,7 @@ function _tqPointAtDrop(selector) {
 // Aims the pointer at the first unclaimed starter-gear drop. The drops sit
 // on solution cells and outlive the lesson (60s lifetime, backstopped), so
 // there is always something to point at until the set is complete.
-function _tqPointAtGearDrop() {
+export function _tqPointAtGearDrop() {
     let attempts = 0;
     const tryPoint = () => {
         if (_tqP2GearClaimed) return;
@@ -1695,7 +1738,7 @@ function _tqPointAtGearDrop() {
 // Arms the puzzle-2 half-fill gate: the player may fill exactly
 // TQ_P2_FILLS_LIMIT solution cells, and the rat's HP budget guarantees the
 // fight is won inside that cap. The count freezes when the rat dies.
-function _tqArmFillsGate() {
+export function _tqArmFillsGate() {
     _tqP2FillsGate = true;
     _tqP2FillsCount = 0;
     _tqP2RatDead = false;
@@ -1707,7 +1750,7 @@ function _tqArmFillsGate() {
 // every grid click is swallowed and the "patience" toast reminds the player
 // who is teaching. Also freezes the fill count so post-kill fills never
 // consume the lesson cap, and stamps the death time for the kill handler.
-function _tqLockP2Grid() {
+export function _tqLockP2Grid() {
     if (!_tqP2RatDead) { _tqP2RatDead = true; _tqP2RatDeadAt = Date.now(); }
     _tqGridLocked = true;
     _tqRefreshGridLockBorder();
@@ -1716,7 +1759,7 @@ function _tqLockP2Grid() {
 // Opens the gear-claim gate: the lock narrows from "no input at all" to
 // "only correct fills on cells hosting a starter-gear drop". Every other
 // input is swallowed until the full set has been picked up.
-function _tqOpenGearGate() {
+export function _tqOpenGearGate() {
     _tqGridLocked = false;
     _tqP2GateOpen = true;
     _tqRefreshGridLockBorder();
@@ -1725,13 +1768,13 @@ function _tqOpenGearGate() {
 // Gear fills: once the set is claimed, only correct fills on remaining
 // solution cells count. Nothing extra is needed - the wrap lets them
 // through and the engine takes over; this gate just drives the task.
-function _tqArmGearFillsGate() {
+export function _tqArmGearFillsGate() {
     _tqP2GateOpen = false;
     _tqP2GearFillsGate = true;
     _tqRefreshGridLockBorder();
 }
 
-function _tqLiftGearFillsGate() {
+export function _tqLiftGearFillsGate() {
     _tqP2GearFillsGate = false;
     _tqRefreshGridLockBorder();
 }
@@ -1739,7 +1782,7 @@ function _tqLiftGearFillsGate() {
 // Counts a correct fill on puzzle 2 (called from the fill wrap). While the
 // half-fill gate is armed this drives the fill-limit task; the count is
 // frozen once the rat is dead so post-kill fills never consume the cap.
-function _tqCountCorrectFill() {
+export function _tqCountCorrectFill() {
     if (_tqP2FillsGate && !_tqP2RatDead) _tqP2FillsCount++;
     _tqRefreshGridLockBorder();
 }
@@ -1749,15 +1792,15 @@ function _tqCountCorrectFill() {
 // unclaimed (drops do not block fills, so this is possible). Marks the
 // claim task complete - the puzzle then solves normally and the solve-time
 // salvage in _tqOnPuzzleSolved grants the set to the stash.
-function _tqCheckGearFillsBackstop() {
+export function _tqCheckGearFillsBackstop() {
     if (_tqP2DropsBoardBackstop || _tqP2GearClaimed) return;
     if (_tqP2GearSettleAt && Date.now() < _tqP2GearSettleAt) return;   // placements still in flight
     if (_tqCountGearDrops() > 0) return;
-    if (typeof cur === 'undefined' || !cur || !cur.grid
-        || typeof userGrid === 'undefined' || !userGrid) return;
-    for (let r = 0; r < cur.grid.length; r++) {
-        for (let c = 0; c < cur.grid[r].length; c++) {
-            if (cur.grid[r][c] === 1 && userGrid[r][c] === 0) return;   // cells still open
+    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid
+        || typeof userGrid === 'undefined' || !globalThis.userGrid) return;
+    for (let r = 0; r < globalThis.cur.grid.length; r++) {
+        for (let c = 0; c < globalThis.cur.grid[r].length; c++) {
+            if (globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] === 0) return;   // cells still open
         }
     }
     _tqP2DropsBoardBackstop = true;
@@ -1771,7 +1814,7 @@ function _tqCheckGearFillsBackstop() {
 // clears the task; the solve-time backstop re-grants the full set to the
 // stash in that case, so nothing is permanently lost. Expiry is unlikely -
 // the player is actively guided.)
-function _tqCountGearDrops() {
+export function _tqCountGearDrops() {
     try {
         if (typeof _egLootDrops === 'undefined') return 0;
         let n = 0;
@@ -1797,7 +1840,7 @@ function _tqCountGearDrops() {
 // solve-time re-grant in _tqOnPuzzleSolved and the gear-fills backstop
 // below. Idempotent: the kill handler and the s5 grant step both call this;
 // the second call is a no-op.
-function _tqGrantStarterGear() {
+export function _tqGrantStarterGear() {
     if (_tqP2GearDropped) return;
     try {
         if (typeof EG_VENDOR_FREE_BASE_IDS === 'undefined'
@@ -1848,17 +1891,17 @@ function _tqGrantStarterGear() {
 // Cells are only eligible while untouched (userGrid 0, no reveal, no
 // mistake mark) and host no other drop - the exact engine eligibility rule,
 // so a claimed cell is never reused. Returns true on success.
-function _tqPlaceGearDrop(item) {
+export function _tqPlaceGearDrop(item) {
     try {
-        if (typeof cur === 'undefined' || !cur || !cur.grid
-            || typeof userGrid === 'undefined' || !userGrid) return false;
+        if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid
+            || typeof userGrid === 'undefined' || !globalThis.userGrid) return false;
         const open = [];
-        for (let r = 0; r < cur.grid.length; r++) {
-            for (let c = 0; c < cur.grid[r].length; c++) {
-                if (cur.grid[r][c] !== 1) continue;             // gear lives on solution cells
-                if (userGrid[r][c] !== 0) continue;             // untouched only
-                if (typeof revealedGrid !== 'undefined' && revealedGrid[r] && revealedGrid[r][c]) continue;
-                if (typeof wrongGrid !== 'undefined' && wrongGrid[r] && wrongGrid[r][c]) continue;
+        for (let r = 0; r < globalThis.cur.grid.length; r++) {
+            for (let c = 0; c < globalThis.cur.grid[r].length; c++) {
+                if (globalThis.cur.grid[r][c] !== 1) continue;             // gear lives on solution cells
+                if (globalThis.userGrid[r][c] !== 0) continue;             // untouched only
+                if (typeof revealedGrid !== 'undefined' && globalThis.revealedGrid[r] && globalThis.revealedGrid[r][c]) continue;
+                if (typeof wrongGrid !== 'undefined' && globalThis.wrongGrid[r] && globalThis.wrongGrid[r][c]) continue;
                 if (typeof _egCellHasAnyDrop === 'function' && _egCellHasAnyDrop(r, c)) continue;
                 open.push([r, c]);
             }
@@ -1882,7 +1925,7 @@ function _tqPlaceGearDrop(item) {
 // Fallback used only when the grid-drop pipeline is unavailable: the full
 // starter set goes straight into the persistent endgame stash, exactly like
 // the old grant. The lesson flow completes through the backstop gates.
-function _tqGrantStarterGearToStash() {
+export function _tqGrantStarterGearToStash() {
     try {
         if (typeof EG_VENDOR_FREE_BASE_IDS === 'undefined'
             || typeof EG_ALL_BASE_TYPES === 'undefined'
@@ -1910,7 +1953,7 @@ function _tqGrantStarterGearToStash() {
 // Shows the equip intermission and opens the REAL endgame hub (character
 // sheet + inventory, fully synchronized - drag gear onto the paperdoll).
 // Advances to puzzle 3 once weapon and chest are equipped.
-function _tqShowIntermission() {
+export function _tqShowIntermission() {
     // Self-healing: the lesson below is only completable with the 4 starter
     // pieces in stash (or already equipped). If any piece went missing on
     // the way here (refused save, discarded drop, stale mirror), rebuild it
@@ -1931,7 +1974,7 @@ function _tqShowIntermission() {
     if (_tqPollTimer) clearInterval(_tqPollTimer);
     let _tqInterLastSig = '';
     _tqPollTimer = setInterval(() => {
-        const eq = (typeof STATE !== 'undefined' && STATE && STATE.egEquipped) || {};
+        const eq = (typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.egEquipped) || {};
         const hasWeapon = !!(eq.weapon1);
         const hasArmor = !!(eq.chest || eq.pants);
         _tqUpdateIntermissionChecklist(hasWeapon, hasArmor);
@@ -1952,7 +1995,7 @@ function _tqShowIntermission() {
 }
 
 // Ticks the intermission checklist (weapon / armor ✓ or ✗).
-function _tqUpdateIntermissionChecklist(hasWeapon, hasArmor) {
+export function _tqUpdateIntermissionChecklist(hasWeapon, hasArmor) {
     try {
         const w = document.getElementById('tq-inter-check-weapon');
         const a = document.getElementById('tq-inter-check-armor');
@@ -1971,7 +2014,7 @@ function _tqUpdateIntermissionChecklist(hasWeapon, hasArmor) {
 // must be present in the stash or on the paperdoll when the equip lesson
 // starts. Missing pieces are rebuilt silently (white vendor bases, no sell
 // value) and persisted - the poll below can always complete.
-function _tqEnsureIntermissionGear() {
+export function _tqEnsureIntermissionGear() {
     try {
         const have = new Set();
         const scan = (item) => {
@@ -2005,7 +2048,7 @@ function _tqEnsureIntermissionGear() {
     } catch (e) {}
 }
 
-function _tqEnsureIntermissionDom() {
+export function _tqEnsureIntermissionDom() {
     if (document.getElementById('tq-intermission')) return;
     const el = document.createElement('div');
     el.id = 'tq-intermission';
@@ -2031,7 +2074,7 @@ function _tqEnsureIntermissionDom() {
 // drops a Fireball charm onto the grid and the claim grants it via the
 // engine's charm pipeline.
 // keybind routing all read the shared skill registry).
-function _tqEnsureFireball() {
+export function _tqEnsureFireball() {
     if (typeof SKILL_REGISTRY === 'undefined') return;
     if (SKILL_REGISTRY.fireball) return;
     SKILL_REGISTRY.fireball = {
@@ -2067,8 +2110,8 @@ function _tqEnsureFireball() {
 
 // Casts Fireball at the current target: pays mana, starts the cooldown and
 // animates a real fire projectile through the shared encounter pipeline.
-function _tqCastFireball() {
-    if (typeof dead !== 'undefined' && dead) return;
+export function _tqCastFireball() {
+    if (typeof dead !== 'undefined' && globalThis.dead) return;
     // The spell stays locked until its scroll sits in a spell slot.
     if (typeof isSkillCharmUnlocked === 'function' && !isSkillCharmUnlocked('fireball')) {
         showToast('🔒 ' + t('charm_locked_toast'), '#ff6b9d');
@@ -2130,8 +2173,8 @@ function _tqCastFireball() {
     //    registry may load after this file) - ensured on first roster query.
     if (typeof getPlayerSkillIds === 'function' && !window._tqWrappedSkillIds) {
         window._tqWrappedSkillIds = true;
-        const _orig = getPlayerSkillIds;
-        getPlayerSkillIds = function () {
+        const _orig = globalThis.getPlayerSkillIds;
+        globalThis.getPlayerSkillIds = function () {
             _tqEnsureFireball();
             const ids = _orig();
             if (!ids.includes('fireball')) ids.push('fireball');
@@ -2140,8 +2183,8 @@ function _tqCastFireball() {
     }
     if (typeof getPlayerSkillGroups === 'function' && !window._tqWrappedSkillGroups) {
         window._tqWrappedSkillGroups = true;
-        const _orig = getPlayerSkillGroups;
-        getPlayerSkillGroups = function () {
+        const _orig = globalThis.getPlayerSkillGroups;
+        globalThis.getPlayerSkillGroups = function () {
             const groups = _orig();
             // Put the tutorial Fireball section FIRST so the scroll lesson's
             // "unlocked" entry is visible without scrolling past the whole
@@ -2156,8 +2199,8 @@ function _tqCastFireball() {
     // 2. Route hotbar/keybind casts of Fireball to the tutorial handler.
     if (typeof toggleActiveAbility === 'function' && !window._tqWrappedToggle) {
         window._tqWrappedToggle = true;
-        const _orig = toggleActiveAbility;
-        toggleActiveAbility = function (slot) {
+        const _orig = globalThis.toggleActiveAbility;
+        globalThis.toggleActiveAbility = function (slot) {
             if (slot === 'active6') { _tqCastFireball(); return; }
             return _orig(slot);
         };
@@ -2168,18 +2211,18 @@ function _tqCastFireball() {
     // setHotbarSlot drag counts.
     if (typeof ensureSkillHotbar === 'function' && !window._tqWrappedEnsureHotbar) {
         window._tqWrappedEnsureHotbar = true;
-        const _orig = ensureSkillHotbar;
-        ensureSkillHotbar = function () {
+        const _orig = globalThis.ensureSkillHotbar;
+        globalThis.ensureSkillHotbar = function () {
             const r = _orig();
-            if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return r;
+            if (typeof STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.skillHotbar)) return r;
             // A classless tutorial player must not see Heartbloom (endgame-
             // only) auto-seeded onto the bar - it renders locked and clutters
             // exactly the slot the Fireball lesson invites the drop into. It
             // comes back legitimately once a class is chosen.
-            if (!STATE.playerClass) {
-                const hb = STATE.skillHotbar.indexOf('heartbloom');
+            if (!globalThis.STATE.playerClass) {
+                const hb = globalThis.STATE.skillHotbar.indexOf('heartbloom');
                 if (hb !== -1) {
-                    STATE.skillHotbar[hb] = null;
+                    globalThis.STATE.skillHotbar[hb] = null;
                     if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
                 }
             }
@@ -2191,9 +2234,9 @@ function _tqCastFireball() {
             try {
                 if ((typeof _tqIsTutorialActive === 'function') && !_tqIsTutorialActive()) return r;
             } catch (e) { return r; }
-            const idx = STATE.skillHotbar.indexOf('fireball');
+            const idx = globalThis.STATE.skillHotbar.indexOf('fireball');
             if (idx !== -1) {
-                STATE.skillHotbar[idx] = null;
+                globalThis.STATE.skillHotbar[idx] = null;
                 if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
             }
             return r;
@@ -2208,9 +2251,9 @@ function _tqCastFireball() {
     //     fallback, monster-defeat overlay - all call replayLevel()).
     if (typeof replayLevel === 'function' && !window._tqWrappedReplayLevel) {
         window._tqWrappedReplayLevel = true;
-        const _orig = replayLevel;
-        replayLevel = function () {
-            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest
+        const _orig = globalThis.replayLevel;
+        globalThis.replayLevel = function () {
+            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest
                 && typeof restartTutorialQuest === 'function') {
                 restartTutorialQuest();
                 return;
@@ -2229,8 +2272,8 @@ function _tqCastFireball() {
     //    at the END of ALL (world 15, gIdx ≈ 68) → level-68 monster pack.
     if (typeof startLevel === 'function' && !window._tqWrappedStartLevel) {
         window._tqWrappedStartLevel = true;
-        const _orig = startLevel;
-        startLevel = function (gi) {
+        const _orig = globalThis.startLevel;
+        globalThis.startLevel = function (gi) {
             const lvl = (typeof ALL !== 'undefined') ? ALL[gi] : null;
             if (lvl && lvl.isTutorialQuest) {
                 // The previous tutorial run's teardown wiped the monster
@@ -2246,15 +2289,15 @@ function _tqCastFireball() {
                 // natural way back is the normal pipeline: an empty stamp
                 // would fall into the generic campaign preparer and roll a
                 // level-index-derived monster pack (see the level-68 bug).
-                const _origClear = _egClearCampaignLevelFields;
-                _egClearCampaignLevelFields = function (level) {
+                const _origClear = globalThis._egClearCampaignLevelFields;
+                globalThis._egClearCampaignLevelFields = function (level) {
                     if (level && level.isTutorialQuest) return;   // protect the fresh stamp
                     return _origClear(level);
                 };
                 try {
                     return _orig(gi);
                 } finally {
-                    _egClearCampaignLevelFields = _origClear;
+                    globalThis._egClearCampaignLevelFields = _origClear;
                 }
             }
             return _orig(gi);
@@ -2262,9 +2305,9 @@ function _tqCastFireball() {
     }
     if (typeof checkWin === 'function' && !window._tqWrappedCheckWin) {
         window._tqWrappedCheckWin = true;
-        const _orig = checkWin;
-        checkWin = function () {
-            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
+        const _orig = globalThis.checkWin;
+        globalThis.checkWin = function () {
+            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
                 if (!isPuzzleSolved()) return;
                 _tqOnPuzzleSolved();
                 return;
@@ -2276,9 +2319,9 @@ function _tqCastFireball() {
     // 4. Campaign-monster suppression for puzzle 1 (no monsters there).
     if (typeof _egShouldPrepareCampaignEncounter === 'function' && !window._tqWrappedPrepEnc) {
         window._tqWrappedPrepEnc = true;
-        const _orig = _egShouldPrepareCampaignEncounter;
-        _egShouldPrepareCampaignEncounter = function () {
-            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest && cur.tqPuzzle === 0) return false;
+        const _orig = globalThis._egShouldPrepareCampaignEncounter;
+        globalThis._egShouldPrepareCampaignEncounter = function () {
+            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest && globalThis.cur.tqPuzzle === 0) return false;
             return _orig();
         };
     }
@@ -2292,9 +2335,9 @@ function _tqCastFireball() {
     //     resolved it - the 50/50 guess must go through the candle.
     if (typeof checkSpecialIntercepts === 'function' && !window._tqWrappedIntercepts) {
         window._tqWrappedIntercepts = true;
-        const _orig = checkSpecialIntercepts;
-        checkSpecialIntercepts = function (row, col) {
-            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
+        const _orig = globalThis.checkSpecialIntercepts;
+        globalThis.checkSpecialIntercepts = function (row, col) {
+            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
                 // Puzzle-2 heart gate: the post-kill board is fully locked
                 // and only a LEFT-click on the Professor's heart cell is
                 // accepted. Right-click is disallowed here - on this full-
@@ -2333,7 +2376,7 @@ function _tqCastFireball() {
                 // empty solution cell under the item claims it (the
                 // Professor literally locks the field to the loot). A ✕
                 // mark would be a wrong fill on a solution cell.
-                if (_tqP2GateOpen && typeof cur !== 'undefined' && cur) {
+                if (_tqP2GateOpen && typeof cur !== 'undefined' && globalThis.cur) {
                     const key = `${row}-${col}`;
                     const isDropCell = (typeof _egLootDrops !== 'undefined' && _egLootDrops.has(key))
                         || (typeof _egPickups !== 'undefined' && _egPickups.has(key));
@@ -2354,7 +2397,7 @@ function _tqCastFireball() {
                 // corner before the candle - filling the anti-diagonal would
                 // be a blind 50/50 mistake (its cells are empty in the
                 // canonical solution but unprovable either way).
-                if (!_tqCandleUsed && cur.tqPuzzle === 0
+                if (!_tqCandleUsed && globalThis.cur.tqPuzzle === 0
                     && TQ_CORNER_CELLS.some(([r, c]) => r === row && c === col)
                     && pval === 1) {
                     _tqAmbiguityToast();
@@ -2369,10 +2412,10 @@ function _tqCastFireball() {
     // first-fill task (damage lesson) and freezes once the rat is dead.
     if (typeof _egOnCorrectCell === 'function' && !window._tqWrappedCorrectCell) {
         window._tqWrappedCorrectCell = true;
-        const _orig = _egOnCorrectCell;
-        _egOnCorrectCell = function (row, col) {
+        const _orig = globalThis._egOnCorrectCell;
+        globalThis._egOnCorrectCell = function (row, col) {
             const r = _orig(row, col);
-            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest && cur.tqPuzzle === 1) {
+            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest && globalThis.cur.tqPuzzle === 1) {
                 _tqCountCorrectFill();
             }
             return r;
@@ -2390,8 +2433,8 @@ function _tqCastFireball() {
                 _tqP2GearClaimed = true;
             }
         };
-        const _orig = _egCheckLootClaim;
-        _egCheckLootClaim = function (row, col) {
+        const _orig = globalThis._egCheckLootClaim;
+        globalThis._egCheckLootClaim = function (row, col) {
             const r = _orig(row, col);
             window._tqGearClaimCheck();
             return r;
@@ -2408,11 +2451,11 @@ function _tqCastFireball() {
     // separately for the whole tutorial in 4h below.)
     if (typeof _egSpawnLootDrop === 'function' && !window._tqWrappedLootSpawn) {
         window._tqWrappedLootSpawn = true;
-        const _orig = _egSpawnLootDrop;
-        _egSpawnLootDrop = function (...args) {
-            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest
-                && ((cur.tqPuzzle === 1 && _tqPhase === 'p2')
-                    || (cur.tqPuzzle === 2 && _tqPhase === 'p3'))) return;
+        const _orig = globalThis._egSpawnLootDrop;
+        globalThis._egSpawnLootDrop = function (...args) {
+            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest
+                && ((globalThis.cur.tqPuzzle === 1 && _tqPhase === 'p2')
+                    || (globalThis.cur.tqPuzzle === 2 && _tqPhase === 'p3'))) return;
             return _orig(...args);
         };
     }
@@ -2428,8 +2471,8 @@ function _tqCastFireball() {
     // spawners, so the healing lesson is unaffected.
     if (typeof _egSpawnPickup === 'function' && !window._tqWrappedAmbientPickup) {
         window._tqWrappedAmbientPickup = true;
-        const _orig = _egSpawnPickup;
-        _egSpawnPickup = function (...args) {
+        const _orig = globalThis._egSpawnPickup;
+        globalThis._egSpawnPickup = function (...args) {
             if (typeof _tqPhase !== 'undefined' && _tqPhase) return;
             return _orig(...args);
         };
@@ -2445,7 +2488,7 @@ function _tqCastFireball() {
             const _orig = window[fnName];
             window[fnName] = function (...args) {
                 if (typeof _tqPhase !== 'undefined' && _tqPhase
-                    && typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
+                    && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
                 return _orig(...args);
             };
         }
@@ -2455,11 +2498,11 @@ function _tqCastFireball() {
     //    the flag (the pipeline already ran inside _orig).
     if (typeof useItem === 'function' && !window._tqWrappedUseItem) {
         window._tqWrappedUseItem = true;
-        const _orig = useItem;
-        useItem = function (uid) {
-            const item = STATE.inventory.find(i => i.uid === uid);
+        const _orig = globalThis.useItem;
+        globalThis.useItem = function (uid) {
+            const item = globalThis.STATE.inventory.find(i => i.uid === uid);
             if (item && item.defId === 'reveal1' && item.isTutorialCandle
-                && typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
+                && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
                 // The candle may only be lit once the Professor's use-candle
                 // step is showing (puzzle 1 s11) - lighting it straight after
                 // receiving it (s10) would skip the explanation.
@@ -2472,7 +2515,7 @@ function _tqCastFireball() {
             }
             const wasCandle = item && item.defId === 'reveal1';
             const r = _orig(uid);
-            if (wasCandle && typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
+            if (wasCandle && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
                 _tqCandleUsed = true;
             }
             return r;
@@ -2482,8 +2525,8 @@ function _tqCastFireball() {
     // 5b. Detect the Fireball drag onto the hotbar (lesson 3 task).
     if (typeof setHotbarSlot === 'function' && !window._tqWrappedSetHotbar) {
         window._tqWrappedSetHotbar = true;
-        const _orig = setHotbarSlot;
-        setHotbarSlot = function (slotIndex, skillId) {
+        const _orig = globalThis.setHotbarSlot;
+        globalThis.setHotbarSlot = function (slotIndex, skillId) {
             const r = _orig(slotIndex, skillId);
             if (skillId === 'fireball' && r) _tqFireballEquipped = true;
             return r;
@@ -2496,10 +2539,10 @@ function _tqCastFireball() {
     //      keep their existing mistake banter behaviour untouched.
     if (typeof applyRealMistake === 'function' && !window._tqWrappedRealMistake) {
         window._tqWrappedRealMistake = true;
-        const _orig = applyRealMistake;
-        applyRealMistake = function (row, col) {
+        const _orig = globalThis.applyRealMistake;
+        globalThis.applyRealMistake = function (row, col) {
             const r = _orig(row, col);
-            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
+            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
                 _tqPlayerReply(5000, 'tutorial_mistake');
             }
             return r;
@@ -2510,7 +2553,7 @@ function _tqCastFireball() {
     if (!window._tqMonsterWatch) {
         window._tqMonsterWatch = setInterval(() => {
             try {
-                if (_tqPhase && typeof _egMonsters !== 'undefined' && _egMonsters.length > 0) {
+                if (_tqPhase && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) {
                     _tqSawMonster = true;
                 }
             } catch (e) {}
@@ -2518,7 +2561,12 @@ function _tqCastFireball() {
     }
     }
 
-    if (document.readyState === 'loading') {
+    // Phase 3 (step 10): `!== 'complete'` idiom (see MIGRATION.md step 7).
+    // As a real module this file evaluates during the import phase, where
+    // readyState is 'interactive' - the old `=== 'loading'` branch would
+    // run _integrate() immediately instead of waiting for the full global
+    // surface. Both pre-complete states now defer to DOMContentLoaded.
+    if (document.readyState !== 'complete') {
         document.addEventListener('DOMContentLoaded', _integrate);
     } else {
         _integrate();
@@ -2532,7 +2580,7 @@ function _tqCastFireball() {
 
 // Called from showTutorial() when the player has not completed the tutorial
 // yet. Replaces the static image walkthrough with the playable chain.
-function startTutorialQuest() {
+export function startTutorialQuest() {
     _tqPhase = null;
     _tqStepIdx = 0;
     _tqCandleUsed = false;
@@ -2560,7 +2608,7 @@ function startTutorialQuest() {
             level: (typeof _egGetPlayerLevel === 'function') ? _egGetPlayerLevel() : 'n/a',
             equipped: (typeof _egGetAllEquippedItems === 'function') ? _egGetAllEquippedItems().length : 'n/a',
             allocatedAttrs: (typeof _egGetAllocatedAttributes === 'function') ? _egGetAllocatedAttributes() : 'n/a',
-            maxHP: (typeof playerMaxHP !== 'undefined') ? playerMaxHP : 'n/a',
+            maxHP: (typeof playerMaxHP !== 'undefined') ? globalThis.playerMaxHP : 'n/a',
             maxMana: (typeof _getPlayerMaxMana === 'function') ? _getPlayerMaxMana() : 'n/a',
             absorption: _tqStats ? _tqStats.absorption : 'n/a',
             baseDamage: (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseDamage : 'n/a',
@@ -2574,7 +2622,7 @@ function startTutorialQuest() {
 // tutorial level. A plain replayLevel() would only re-run the current puzzle
 // mid-phase; the tutorial must restart from puzzle 1 with all lesson flags
 // cleared. Called via the retryFromOverlay wrap in the integration section.
-function restartTutorialQuest() {
+export function restartTutorialQuest() {
     // Tear down the failed level like any manual retry does.
     try { hideResultOverlays(); } catch (e) {}
     try { if (typeof _egResetQuizDamageBuff === 'function') _egResetQuizDamageBuff(); } catch (e) {}
@@ -2595,7 +2643,11 @@ function restartTutorialQuest() {
 // sheet + inventory over a running puzzle - the same screen the hub uses, so
 // everything stays synchronized. Overlay mode (see endgame-hub.js): B opens
 // the sheet paused over the run, B again closes it back into the puzzle.
-if (typeof onKeybindAction === 'function') {
+// Phase 3 (step 10): as a real module this file evaluates before
+// keybinds.js in the import phase, so a top-level registration would be
+// dropped (the old `typeof` guard silently skipped it). Defer to
+// DOMContentLoaded - by then every module's bindings exist.
+function _tqRegisterCharSheetKeybind() {
     onKeybindAction('char-sheet', () => {
         // Overlay close: the sheet is open over a running puzzle - B closes
         // it and the puzzle continues exactly where it was.
@@ -2616,4 +2668,9 @@ if (typeof onKeybindAction === 'function') {
         try { if (typeof openHubFromGame === 'function') openHubFromGame(); } catch (e) {}
         return false;  // don't claim - harmless either way
     });
+}
+if (document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _tqRegisterCharSheetKeybind);
+} else {
+    _tqRegisterCharSheetKeybind();
 }

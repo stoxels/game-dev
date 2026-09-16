@@ -1,4 +1,11 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { AssetPreload } from './asset-preload.js';
+
+//------------------------------------------------------------------------
 //-------------------BOOT LOADER----------------------------------------
 //------------------------------------------------------------------------
 // Drives the #boot-loader overlay: progress over the boot asset set,
@@ -84,48 +91,21 @@
 
 
 // ---------------------------------------------------------------------
-// LOAD-ORDER SANITY CHECK (added 2026-09).
-// Warns loudly if a script failed to load or was ordered wrongly, so a
-// regression surfaces in the console instead of as silent breakage.
-// typeof never throws, so this is safe to run even when globals are
-// missing. Indirect eval resolves through the global lexical scope, which
-// also covers top-level const/let (STATE, PT, EG_BOSS_DEFS, ...).
+// LOAD-ORDER SANITY CHECK - RETIRED (Phase 3 step 10, 2026-09-16).
+//
+// This probed 21 names via direct eval('typeof X') and warned when a
+// classic script failed to load or was ordered wrongly - the only alarm
+// available in the concatenation era, where such a failure was silent.
+//
+// Every game file is now a real ES module (see MIGRATION.md):
+//   - a missing file or missing export is a LOUD link-time error,
+//   - static imports hoist, so file order no longer matters, and
+//   - the remaining globalThis surface (pass-through bridges, boss
+//     handler shims, owner accessors) is machine-generated and pinned
+//     by dev/tests/step10-modules.test.mjs.
+// As a module, the eval could only ever see this file's own scope plus
+// globalThis, so import-linked names (PT, STORY_BEATS, renderLevelSelect,
+// _shuffleArray, ...) false-warned as "missing" even though the game was
+// healthy. If you need a runtime health check again, assert on the module
+// graph or the generated bridge surface - not on globalThis probes.
 // ---------------------------------------------------------------------
-(function () {
-    var expected = [
-        ['STATE', 'core state (js/state.js)'],
-        ['ITEM_DEFS', 'item definitions (js/puzzle-items/item-definitions.js)'],
-        ['PT', 'passive tree (js/passive-tree/passive-tree.js)'],
-        ['STORY_BEATS', 'storyline beats (js/storyline/storyline-beats.js - loads last by design)'],
-        ['EG_BOSS_DEFS', 'boss registry (js/endgame/bosses/boss-framework.js)'],
-        ['EG_BOSS_MECHANICS', 'boss mechanics registry (boss-framework.js)'],
-        ['_egShowTooltip', 'single tooltip implementation (js/endgame/endgame-currency.js)'],
-        ['_egRenderCurrencyCell', 'currency cell renderer (js/endgame/endgame-hub-drag-and-drop.js)'],
-        ['_egGenerateEquipmentDrop', 'equipment generator (js/endgame/endgame-equipment-generator.js)'],
-        ['_egGetElementalDamageBonus', 'elemental damage helper (js/endgame/endgame-combat-calculations.js)'],
-        ['_egRemoveVeil', 'shared veil cleanup (js/endgame/bosses/shared-boss-abilities.js)'],
-        ['_egPtSegDist', 'shared geometry helper (shared-boss-abilities.js)'],
-        ['_shuffleArray', 'shared shuffle helper (js/classes/class-probabilist.js)'],
-        ['questStat_revealItemUsed', 'quest stats (js/quests/quests-logic.js)'],
-        ['renderLevelSelect', 'level select screen (js/screens/screens-level-select.js)'],
-        ['isMaxCleared', 'level select helpers (screens-level-select.js)'],
-        ['getStars', 'level select helpers (screens-level-select.js)'],
-        ['showEndgameGate', 'endgame gate screen (js/endgame/endgame-gate.js)'],
-        ['showEndgameNexus', 'endgame nexus screen (js/endgame/endgame-nexus.js)'],
-        ['showEndgameAtlas', 'endgame atlas screen (js/endgame/endgame-atlas.js)'],
-    ];
-    function safeTypeof(name) {
-        // typeof throws a ReferenceError for lexical bindings still in
-        // their temporal dead zone (e.g. STATE if state.js crashed mid-
-        // load), so probe defensively and treat a throw as "missing".
-        try { return (0, eval)('typeof ' + name); }
-        catch (err) { return 'undefined'; }
-    }
-    var missing = expected.filter(function (entry) {
-        return safeTypeof(entry[0]) === 'undefined';
-    });
-    if (missing.length) {
-        console.warn('[load-order] ' + missing.length + ' expected global(s) missing - a script failed to load or is ordered wrong: ' +
-            missing.map(function (entry) { return entry[0] + ' (' + entry[1] + ')'; }).join(', '));
-    }
-})();

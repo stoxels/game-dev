@@ -1,18 +1,29 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { renderCell, updClues } from '../grid.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+
+//------------------------------------------------------------------------
 //-------------------ARTIFACT COMPLETE - CODEX OF COMPLETION----------------------
 //------------------------------------------------------------------------
 
 // artifactComplete (Codex of Completion) - reveals every remaining cell.
-function _useArtifactComplete(id, def) {
-    const sol = cur.grid;
+export function _useArtifactComplete(id, def) {
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            if (sol[r][c] === 1 && userGrid[r][c] !== 1) {
-                revealedGrid[r][c] = true;
-                userGrid[r][c] = 1;
+            if (sol[r][c] === 1 && globalThis.userGrid[r][c] !== 1) {
+                globalThis.revealedGrid[r][c] = true;
+                globalThis.userGrid[r][c] = 1;
                 renderCell(r, c);
                 updClues(r, c);
             }
@@ -20,7 +31,7 @@ function _useArtifactComplete(id, def) {
     }
 
     playItemEffect(id);
-    checkWin();
+    globalThis.checkWin();
     return `🌟 ${t('item_artifact_complete')}`;
 }
 
@@ -29,7 +40,7 @@ function _useArtifactComplete(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: spawns the starburst rays radiating from the artifact centre.
-function _fxMakeArtifactRays(container, cx, cy, rayLength) {
+export function _fxMakeArtifactRays(container, cx, cy, rayLength) {
     for (let i = 0; i < 16; i++) {
         const ray = document.createElement('div');
         ray.className = 'fx-artifact-ray';
@@ -45,7 +56,7 @@ function _fxMakeArtifactRays(container, cx, cy, rayLength) {
 }
 
 // Helper: creates the gold grid-fill flash div for the artifact.
-function _fxMakeArtifactFill(container, r) {
+export function _fxMakeArtifactFill(container, r) {
     const fill = document.createElement('div');
     fill.className = 'fx-artifact-fill';
     fill.style.cssText = `
@@ -57,7 +68,7 @@ function _fxMakeArtifactFill(container, r) {
 }
 
 // 🌟 Artifact Complete - full golden supernova engulfs the grid.
-function _fxArtifact() {
+export function _fxArtifact() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

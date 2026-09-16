@@ -1,15 +1,27 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../audio/audio.js';
+import { questStat_revealItemUsed } from '../quests/quests-stats.js';
+import { t } from '../translation/translations.js';
+import { playItemEffect } from './fx-dispatch.js';
+import { _calcRevealCount } from './shared/effect-modifiers.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay } from './shared/fx-helpers.js';
+
+//------------------------------------------------------------------------
 //-------------------REVEAL - CANDLE / MAGNIFIER / SPYGLASS / SCANNER----------------------
 //------------------------------------------------------------------------
 
 // reveal1 / reveal2 / reveal3 / reveal4 - reveals N random solution cells.
-function _useReveal(id, def) {
+export function _useReveal(id, def) {
     questStat_revealItemUsed();
 
     const baseCount = parseInt(id.replace('reveal', '')) || 1;
     const finalCount = _calcRevealCount(baseCount);
 
-    revealTiles(finalCount, 'item');
+    globalThis.revealTiles(finalCount, 'item');
     playItemEffect(id);
 
     const msgKey = finalCount > 1 ? 'item_revealed_pl' : 'item_revealed';
@@ -21,7 +33,7 @@ function _useReveal(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: places a centered glow div inside the overlay.
-function _fxCandleGlow(overlay, cx, cy) {
+export function _fxCandleGlow(overlay, cx, cy) {
     overlay.innerHTML = `<div class="fx-candle-glow" style="
         position:absolute;
         left:${cx}px; top:${cy}px;
@@ -30,7 +42,7 @@ function _fxCandleGlow(overlay, cx, cy) {
 }
 
 // 🕯️ Candle - warm amber glow slowly blooms across the puzzle.
-function _fxCandle() {
+export function _fxCandle() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -48,7 +60,7 @@ function _fxCandle() {
 }
 
 // 🔍 Magnifier - a loupe slides across the grid left→right.
-function _fxMagnifier() {
+export function _fxMagnifier() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -73,14 +85,14 @@ function _fxMagnifier() {
 
 // Helper: spawns `count` concentric rings expanding from (cx, cy).
 // `baseSize` controls how large the outermost ring grows.
-function _fxSpawnExpandingRings(container, cx, cy, count, baseSize, className, animationName, delayStep = 0.18) {
+export function _fxSpawnExpandingRings(container, cx, cy, count, baseSize, className, animationName, delayStep = 0.18) {
     for (let i = 0; i < count; i++) {
         _fxMakeRing(container, cx, cy, className, baseSize * (0.5 + i * 0.35), i * delayStep, animationName);
     }
 }
 
 // 🔭 Spyglass - three concentric scan-rings expand from grid centre.
-function _fxSpyglass() {
+export function _fxSpyglass() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -95,7 +107,7 @@ function _fxSpyglass() {
 }
 
 // Helper: creates one horizontal scan-bar that sweeps downward.
-function _fxMakeScanBar(container, r, delaySeconds) {
+export function _fxMakeScanBar(container, r, delaySeconds) {
     const bar = document.createElement('div');
     bar.className = 'fx-scanner-bar';
     bar.style.cssText = `
@@ -109,7 +121,7 @@ function _fxMakeScanBar(container, r, delaySeconds) {
 }
 
 // 📡 Scanner - a horizontal green scan-bar sweeps top-to-bottom twice.
-function _fxScanner() {
+export function _fxScanner() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 

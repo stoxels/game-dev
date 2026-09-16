@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE BUZZSAW (boss_buzz)------------------------
 //------------------------------------------------------------------------
 // REWORK - IWBTG saw homage, rebuilt as a full sawmill gauntlet. The boss
@@ -44,8 +53,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_BZ_DEBUG_SLOW = true;
-const _EG_BZ_DEBUG_MULT = _EG_BZ_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_BZ_DEBUG_SLOW = true;
+export const _EG_BZ_DEBUG_MULT = _EG_BZ_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_buzz: {
@@ -75,14 +84,14 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_BZ_RICOCHET_DMG = [0, 0.18, 0.22, 0.26];   // flying saw touch, by phase
-const EG_BZ_FLOOR_DMG    = [0, 0.14, 0.17, 0.20];   // embedded floor blade touch
-const EG_BZ_CUT_DMG      = [0, 0.22, 0.25, 0.28];   // cut line sweep hit
-const EG_BZ_TRAP_DMG     = [0, 0, 0.16, 0.19];      // saw trap blade touch
-const EG_BZ_PEND_DMG     = [0, 0, 0, 0.25];         // pendulum saw hit
-const EG_BZ_FINAL_DMG    = 0.32;                    // CROSSCUT full-screen hit
-const EG_BZ_WALL_DMG     = 0.10;                    // per wall-saw touch (finale)
-const EG_BZ_HIT_CD_MS    = 700;                     // shared touch cooldown
+export const EG_BZ_RICOCHET_DMG = [0, 0.18, 0.22, 0.26];   // flying saw touch, by phase
+export const EG_BZ_FLOOR_DMG    = [0, 0.14, 0.17, 0.20];   // embedded floor blade touch
+export const EG_BZ_CUT_DMG      = [0, 0.22, 0.25, 0.28];   // cut line sweep hit
+export const EG_BZ_TRAP_DMG     = [0, 0, 0.16, 0.19];      // saw trap blade touch
+export const EG_BZ_PEND_DMG     = [0, 0, 0, 0.25];         // pendulum saw hit
+export const EG_BZ_FINAL_DMG    = 0.32;                    // CROSSCUT full-screen hit
+export const EG_BZ_WALL_DMG     = 0.10;                    // per wall-saw touch (finale)
+export const EG_BZ_HIT_CD_MS    = 700;                     // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -90,10 +99,10 @@ const EG_BZ_HIT_CD_MS    = 700;                     // shared touch cooldown
 //------------------------------------------------------------------------
 
 // Center of the playable grid (from corner cells), or viewport fallback.
-function _egBzGridCenter() {
-    if (typeof cur !== 'undefined' && cur && cur.grid && cur.grid.length && cur.grid[0]) {
+export function _egBzGridCenter() {
+    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid && globalThis.cur.grid.length && globalThis.cur.grid[0]) {
         const a = document.getElementById('g-0-0');
-        const b = document.getElementById('g-' + (cur.grid.length - 1) + '-' + (cur.grid[0].length - 1));
+        const b = document.getElementById('g-' + (globalThis.cur.grid.length - 1) + '-' + (globalThis.cur.grid[0].length - 1));
         if (a && b && a.isConnected && b.isConnected) {
             const ra = a.getBoundingClientRect();
             const rb = b.getBoundingClientRect();
@@ -108,7 +117,7 @@ function _egBzGridCenter() {
 // Builds one spinning saw blade: a fixed outer dot (translate-positioned)
 // with the metallic blade disc as a CHILD element (rotate animations run on
 // the child - never on the fixed wrapper). size in px.
-function _egBzSawEl(run, size, cls) {
+export function _egBzSawEl(run, size, cls) {
     const dot = _egNkEl(run, 'div', 'eg-nk-dot eg-bz-saw' + (cls ? ' ' + cls : ''));
     const blade = document.createElement('div');
     blade.className = 'eg-bz-blade';
@@ -120,7 +129,7 @@ function _egBzSawEl(run, size, cls) {
 
 // One steel-on-steel spark burst where a saw slams into something (visual
 // only, body-level so it survives the run ending in the same frame).
-function _egBzSparks(x, y, big) {
+export function _egBzSparks(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-bz-sparks' + (big ? ' eg-bz-sparks-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -141,8 +150,8 @@ function _egBzSparks(x, y, big) {
 
 // Touch damage helper shared by all buzzsaw blades. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egBzHitCd = 0;
-function _egBzTouch(pct, element, level, label) {
+export let _egBzHitCd = 0;
+export function _egBzTouch(pct, element, level, label) {
     const now = performance.now();
     if (now < _egBzHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -161,10 +170,10 @@ function _egBzTouch(pct, element, level, label) {
 // off the screen edges up to 3 times - each impact sparks steel - before
 // embedding themselves in the floor where they landed as short-lived
 // spinning hazards. Phase 2+ throws pairs, phase 3 throws a trio.
-const EG_BZ_RIC_BOUNCE_MS = 5200;   // max time spent flying before embedding
-const EG_BZ_FLOOR_LIFE_MS = 6500;   // embedded blade hazard lifetime
+export const EG_BZ_RIC_BOUNCE_MS = 5200;   // max time spent flying before embedding
+export const EG_BZ_FLOOR_LIFE_MS = 6500;   // embedded blade hazard lifetime
 
-function _egMechBzRicochetSaws(monster, phase) {
+export function _egMechBzRicochetSaws(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -263,10 +272,10 @@ function _egMechBzRicochetSaws(monster, phase) {
 // angle through (near) the player's current position. After the windup the
 // band ignites and a giant saw sweeps along it once, edge to edge. Step
 // OUT of the band before the sweep.
-const EG_BZ_CUT_WINDUP_MS = 2600;
-const EG_BZ_CUT_BAND_W    = 64;    // band thickness in px
+export const EG_BZ_CUT_WINDUP_MS = 2600;
+export const EG_BZ_CUT_BAND_W    = 64;    // band thickness in px
 
-function _egMechBzCutLine(monster, phase) {
+export function _egMechBzCutLine(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -339,11 +348,11 @@ function _egMechBzCutLine(monster, phase) {
 // Half a dozen floor positions flash a saw silhouette for a windup, then
 // erupt into embedded spinning blade hazards that linger a while. The run
 // is PASSIVE (field hazard - never blocks other mechanics).
-const EG_BZ_TRAP_COUNT = [0, 0, 5, 7];
-const EG_BZ_TRAP_WINDUP_MS = 2400;
-const EG_BZ_TRAP_LIFE_MS = 8000;
+export const EG_BZ_TRAP_COUNT = [0, 0, 5, 7];
+export const EG_BZ_TRAP_WINDUP_MS = 2400;
+export const EG_BZ_TRAP_LIFE_MS = 8000;
 
-function _egMechBzSawTraps(monster, phase) {
+export function _egMechBzSawTraps(monster, phase) {
     if (_egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -420,9 +429,9 @@ function _egMechBzSawTraps(monster, phase) {
 // Two giant saws on chains hang from the top of the arena and swing back
 // and forth like scythes, phase-offset so the arcs cross. Dodge under or
 // through the gap when the arcs open.
-const EG_BZ_PEND_SWINGS = 3;
+export const EG_BZ_PEND_SWINGS = 3;
 
-function _egMechBzPendulumBlades(monster, phase) {
+export function _egMechBzPendulumBlades(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(3, Math.min(3, Number(phase) || 3));
     const level = monster ? monster.level : 1;
@@ -491,26 +500,26 @@ function _egMechBzPendulumBlades(monster, phase) {
 // blade streaks slash across the full screen in a giant X. Only the centre
 // pocket survives. Charge bar frozen for the whole set-piece (gate in
 // _egTickPlayer via _egBzFinalActive).
-const EG_BZ_FINAL_CD_TICK_MS = 800;
-const EG_BZ_FINAL_CD_TICKS = 3;
-const EG_BZ_FINAL_POCKET_PCT = 0.16;   // safe pocket radius, of min(vw,vh)
+export const EG_BZ_FINAL_CD_TICK_MS = 800;
+export const EG_BZ_FINAL_CD_TICKS = 3;
+export const EG_BZ_FINAL_POCKET_PCT = 0.16;   // safe pocket radius, of min(vw,vh)
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egBzFinal = null;
+export let _egBzFinal = null;
 
-function _egBzFinalActive() {
+export function _egBzFinalActive() {
     return !!_egBzFinal && !_egBzFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egBzOnPhaseEnter(monster, newPhase) {
+export function _egBzOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egBzStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egBzStartFinalWatcher(monster) {
+export function _egBzStartFinalWatcher(monster) {
     if (!monster || _egBzFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -526,7 +535,7 @@ function _egBzStartFinalWatcher(monster) {
     });
 }
 
-function _egBzFinalStart(monster) {
+export function _egBzFinalStart(monster) {
     if (_egBzFinal || !monster) return;
 
     // The arena goes quiet: kill every other run of this boss.
@@ -655,7 +664,7 @@ function _egBzFinalStart(monster) {
 
 // The CROSSCUT: two colossal blade streaks slash across the screen in a
 // giant X from the arena centre. Everyone OUTSIDE the centre pocket is hit.
-function _egBzFinalBang(g, monster) {
+export function _egBzFinalBang(g, monster) {
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(g.monsterId, true);
     g.run = run;
@@ -702,7 +711,7 @@ function _egBzFinalBang(g, monster) {
     run.timers.push(id2);
 }
 
-function _egBzFinalEnd(g) {
+export function _egBzFinalEnd(g) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.cdTimer) { clearInterval(g.cdTimer); g.cdTimer = null; }
@@ -718,7 +727,7 @@ function _egBzFinalEnd(g) {
     document.querySelectorAll('.eg-bz-spinning').forEach(el => el.classList.remove('eg-bz-spinning'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -735,7 +744,7 @@ function _egBzFinalEnd(g) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egBzTeardown() {
+export function _egBzTeardown() {
     if (_egBzFinal) { try { _egBzFinalEnd(_egBzFinal); } catch (e) {} _egBzFinal = null; }
     document.querySelectorAll('.eg-bz-cutband, .eg-bz-floorblade, .eg-bz-trap-warn, ' +
         '.eg-bz-pendulum, .eg-bz-sparks, .eg-bz-wall, .eg-bz-cross, .eg-bz-cd').forEach(el => {
@@ -760,7 +769,7 @@ if (typeof window !== 'undefined') {
     window._EG_BZ_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_buzz') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_buzz') : null;
             if (!monster) return 'no buzzsaw alive';
             const fn = name === 'ricochet' ? _egMechBzRicochetSaws
                 : name === 'cut' ? _egMechBzCutLine
@@ -773,7 +782,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_buzz') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_buzz') : null;
             if (!monster) return 'no buzzsaw alive';
             _egBzFinalStart(monster);
             return 'FINAL CUT started';

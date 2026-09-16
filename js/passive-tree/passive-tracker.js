@@ -1,4 +1,8 @@
-﻿// passive-tracker.js
+﻿import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { t } from '../translation/translations.js';
+import { _getBayesianBonus, _overfittingGetPhase } from './passive-tree-special-nodes-logic.js';
+import { ptHasSkill } from './passive-tree-state-points.js';
+// passive-tracker.js
 // Passive Tree Effect Tracker Panel
 // Shows live countdowns, fill counters, stacked bonuses, and summaries
 // for all active passive-tree effects during gameplay.
@@ -6,7 +10,7 @@
 
 'use strict';
 
-const PassiveTracker = (() => {
+export const PassiveTracker = (() => {
 
     //------------------------------------------------------------------------
     //-------------------CONSTANTS & CONFIGURATION----------------------------
@@ -430,10 +434,10 @@ const PassiveTracker = (() => {
     // player is on an endgame map and the hide-passive setting is enabled.
     function _shouldHideForEndgame() {
         try {
-            if (typeof SETTINGS === 'undefined' || !SETTINGS.hidePassiveTrackerInEndgame) return false;
-            if (typeof _egIsActive === 'function' && _egIsActive()) return true;
+            if (typeof globalThis.SETTINGS === 'undefined' || !globalThis.SETTINGS.hidePassiveTrackerInEndgame) return false;
+            if (typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) return true;
             if (typeof isEndgameLevel === 'function' && isEndgameLevel()) return true;
-            if (typeof cur !== 'undefined' && cur && cur.isMonsterLevel) return true;
+            if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.isMonsterLevel) return true;
             return false;
         } catch (_) { return false; }
     }
@@ -664,7 +668,7 @@ const PassiveTracker = (() => {
         if (ptHasSkill('emergency_scan_3')) duration += 2;
         // Counts down with the level timer until the 5-minute threshold is reached.
         const fired = !!window._emergencyScanFired;
-        const secsLeft = fired ? 0 : Math.max(0, Math.min(300, (typeof timerSecs === 'number' ? timerSecs : 300)));
+        const secsLeft = fired ? 0 : Math.max(0, Math.min(300, (typeof globalThis.timerSecs === 'number' ? globalThis.timerSecs : 300)));
         return {
             id: 'emerg_scan',
             icon: '🚨',

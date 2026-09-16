@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE SHAPER (boss_shaper)------------------------
 //------------------------------------------------------------------------
 // REWORK - snow-globe homage, rebuilt as a sculptor of winter. The Shaper
@@ -54,8 +63,8 @@
 // screenshots can catch mid-animation states. Flip to false for ship.
 //------------------------------------------------------------------------
 
-const _EG_SHP_DEBUG_SLOW = true;
-const _EG_SHP_DEBUG_MULT = _EG_SHP_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_SHP_DEBUG_SLOW = true;
+export const _EG_SHP_DEBUG_MULT = _EG_SHP_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_shaper: {
@@ -85,14 +94,14 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_SHP_POOL_DMG      = [0, 9, 11, 13];   // %maxHP/s ice pool DoT
-const EG_SHP_FRONT_DMG     = [0, 0.11, 0.13, 0.16]; // %maxHP rift-front eruption
-const EG_SHP_WALL_DMG      = 0.10;             // %maxHP frost wall contact
-const EG_SHP_WALKER_DMG    = [0, 0, 0.10, 0.12]; // %maxHP walker contact
-const EG_SHP_SHARD_DMG     = 0.08;             // %maxHP shard shrapnel
-const EG_SHP_ARM_DMG       = 0.12;             // %maxHP finale arm sweep
-const EG_SHP_BREAK_DMG     = 0.35;             // %maxHP MONOLITH BREAK wave
-const EG_SHP_HIT_CD_MS     = 700;              // shared touch cooldown
+export const EG_SHP_POOL_DMG      = [0, 9, 11, 13];   // %maxHP/s ice pool DoT
+export const EG_SHP_FRONT_DMG     = [0, 0.11, 0.13, 0.16]; // %maxHP rift-front eruption
+export const EG_SHP_WALL_DMG      = 0.10;             // %maxHP frost wall contact
+export const EG_SHP_WALKER_DMG    = [0, 0, 0.10, 0.12]; // %maxHP walker contact
+export const EG_SHP_SHARD_DMG     = 0.08;             // %maxHP shard shrapnel
+export const EG_SHP_ARM_DMG       = 0.12;             // %maxHP finale arm sweep
+export const EG_SHP_BREAK_DMG     = 0.35;             // %maxHP MONOLITH BREAK wave
+export const EG_SHP_HIT_CD_MS     = 700;              // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -101,8 +110,8 @@ const EG_SHP_HIT_CD_MS     = 700;              // shared touch cooldown
 
 // Touch damage helper shared by all Shaper hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egShpHitCd = 0;
-function _egShpTouch(pct, level, label) {
+export let _egShpHitCd = 0;
+export function _egShpTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egShpHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -115,7 +124,7 @@ function _egShpTouch(pct, level, label) {
 
 // Ice-shard burst where a shatter/eruption lands (visual only, body-level
 // so it survives the run ending in the same frame).
-function _egShpShards(x, y, big) {
+export function _egShpShards(x, y, big) {
     const layer = document.createElement('div');
     layer.className = 'eg-shp-shards' + (big ? ' eg-shp-shards-big' : '');
     layer.style.left = Math.round(x) + 'px';
@@ -137,8 +146,8 @@ function _egShpShards(x, y, big) {
 
 // Lingering ice pools ACROSS casts (the rift's aftermath). Entries expire
 // by timestamp; capped so recasts cannot pave the whole screen.
-let _egShpPools = []; // { x, y, radius, until }
-function _egShpPrunePools(now) {
+export let _egShpPools = []; // { x, y, radius, until }
+export function _egShpPrunePools(now) {
     _egShpPools = _egShpPools.filter(z => z.until > now);
 }
 
@@ -152,10 +161,10 @@ function _egShpPrunePools(now) {
 // Where the front settles, LINGERING ICE POOLS remain (the old frozen
 // domains, now clearly the aftermath of the front) that drain while you
 // stand in them.
-const EG_SHP_RIFT_FRONT_MS = 2200;
-const EG_SHP_POOL_LIFE = 7000;
+export const EG_SHP_RIFT_FRONT_MS = 2200;
+export const EG_SHP_POOL_LIFE = 7000;
 
-function _egMechShpRift(monster, phase) {
+export function _egMechShpRift(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -277,12 +286,12 @@ function _egMechShpRift(monster, phase) {
 // growing wall of frost that slowly SHRINKS the arena toward the centre.
 // Break the monoliths (3 hits each) to stop their walls. Walls despawn
 // when their monolith dies; unbroken walls retract after the cast ends.
-const EG_SHP_MONO_COUNT  = [0, 0, 2, 3];
-const EG_SHP_MONO_HITS   = 3;
-const EG_SHP_WALL_GROW   = 130;    // px/s the wall extends
-const EG_SHP_MONO_LIFE   = 9000;
+export const EG_SHP_MONO_COUNT  = [0, 0, 2, 3];
+export const EG_SHP_MONO_HITS   = 3;
+export const EG_SHP_WALL_GROW   = 130;    // px/s the wall extends
+export const EG_SHP_MONO_LIFE   = 9000;
 
-function _egMechShpMonoliths(monster, phase) {
+export function _egMechShpMonoliths(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -399,12 +408,12 @@ function _egMechShpMonoliths(monster, phase) {
 // A sculpted ice sentinel (⛄) stalks you, trailing a freezing wake. It
 // shatters on contact - dealing its hit AND spawning shard shrapnel that
 // scatters outward. Phase 3 spawns two walkers.
-const EG_SHP_WALKER_SPEED = 165;
-const EG_SHP_WALKER_TURN = 1.9;
-const EG_SHP_WALKER_LIFE = 9000;
-const EG_SHP_SHARD_COUNT = 6;
+export const EG_SHP_WALKER_SPEED = 165;
+export const EG_SHP_WALKER_TURN = 1.9;
+export const EG_SHP_WALKER_LIFE = 9000;
+export const EG_SHP_SHARD_COUNT = 6;
 
-function _egMechShpWalker(monster, phase) {
+export function _egMechShpWalker(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -519,28 +528,28 @@ function _egMechShpWalker(monster, phase) {
 // sculpture - otherwise the MONOLITH BREAK: a full-screen ice shockwave
 // (only the eye at the centre is safe). Charge bar frozen for the whole
 // set-piece (gate in _egTickPlayer via _egShpFinalActive).
-const EG_SHP_FINAL_BEATS = 3;
-const EG_SHP_CORE_HITS = 3;          // player touches to shatter a core
-const EG_SHP_CORE_TOUCH_CD = 420;    // ms between crack touches
-const EG_SHP_ARM_OMEGAS = [70, 100, 135]; // deg/s per beat
-const EG_SHP_BEAT_MS = 5200;
+export const EG_SHP_FINAL_BEATS = 3;
+export const EG_SHP_CORE_HITS = 3;          // player touches to shatter a core
+export const EG_SHP_CORE_TOUCH_CD = 420;    // ms between crack touches
+export const EG_SHP_ARM_OMEGAS = [70, 100, 135]; // deg/s per beat
+export const EG_SHP_BEAT_MS = 5200;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egShpFinal = null;
+export let _egShpFinal = null;
 
-function _egShpFinalActive() {
+export function _egShpFinalActive() {
     return !!_egShpFinal && !_egShpFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egShpOnPhaseEnter(monster, newPhase) {
+export function _egShpOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egShpStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egShpStartFinalWatcher(monster) {
+export function _egShpStartFinalWatcher(monster) {
     if (!monster || _egShpFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -556,7 +565,7 @@ function _egShpStartFinalWatcher(monster) {
     });
 }
 
-function _egShpFinalStart(monster) {
+export function _egShpFinalStart(monster) {
     if (_egShpFinal || !monster) return;
 
     // The forge goes quiet: kill every other run of this boss (the finale
@@ -751,7 +760,7 @@ function _egShpFinalStart(monster) {
 
 // THE MONOLITH BREAK: the sculpture detonates - a full-screen ice
 // shockwave with a safe eye at the centre.
-function _egShpBreak(g, level) {
+export function _egShpBreak(g, level) {
     if (!g || g.finished) return;
     const W = window.innerWidth, H = window.innerHeight;
     _egNkToast('eg_mech_shp_break', '⛄💀 THE MONOLITH BREAK - reach the eye!', '#7dd3fc');
@@ -779,7 +788,7 @@ function _egShpBreak(g, level) {
     }, warnMs);
 }
 
-function _egShpFinalEnd(g, success) {
+export function _egShpFinalEnd(g, success) {
     if (!g || g.finished) return;
     g.finished = true;
     if (g.beatTimer) { clearTimeout(g.beatTimer); g.beatTimer = null; }
@@ -798,7 +807,7 @@ function _egShpFinalEnd(g, success) {
     document.querySelectorAll('.eg-shp-channelling').forEach(el => el.classList.remove('eg-shp-channelling'));
 
     const m = (g.monsterId && typeof _egMonsters !== 'undefined')
-        ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
     if (m && m.bossImmune) {
         m.bossImmune = false;
         if (typeof _egBossScheduleMechanics === 'function') {
@@ -815,7 +824,7 @@ function _egShpFinalEnd(g, success) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egShpTeardown() {
+export function _egShpTeardown() {
     if (_egShpFinal) { try { _egShpFinalEnd(_egShpFinal, false); } catch (e) {} _egShpFinal = null; }
     _egShpPools = [];
     document.querySelectorAll('.eg-shp-riftwarn, .eg-shp-fissure, .eg-shp-front, .eg-shp-pool, ' +
@@ -843,7 +852,7 @@ if (typeof window !== 'undefined') {
     window._EG_SHP_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_shaper') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_shaper') : null;
             if (!monster) return 'no shaper alive';
             const fn = name === 'rift' ? _egMechShpRift
                 : name === 'monos' ? _egMechShpMonoliths
@@ -855,7 +864,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_shaper') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_shaper') : null;
             if (!monster) return 'no shaper alive';
             _egShpFinalStart(monster);
             return 'THE SHAPED WINTER started';

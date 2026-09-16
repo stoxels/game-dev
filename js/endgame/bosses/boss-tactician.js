@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossRecalcDamage } from './boss-framework.js';
+import { _egMechSoulTithe, _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE TACTICIAN (boss_tactician)------------------
 //------------------------------------------------------------------------
 // A rework of the old one-shot Battle Intent into a persistent chess
@@ -73,62 +82,62 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Board tuning ─────────────────────────────────────────────────────────
 // The Queen's Guard (boss body)
-const EG_TCT_R = 38;                          // queen visual radius
-const EG_TCT_GLIDE_SPEED = [0, 42, 58, 76];   // px/s queen glide (queen-fast)
-const EG_TCT_GLIDE_REPICK_MS = 4200;
-const EG_TCT_ROOK_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the queen
-const EG_TCT_ROOK_CD_MS = 1000;
-const EG_TCT_ROOK_FLING = [0, 140, 165, 190];
+export const EG_TCT_R = 38;                          // queen visual radius
+export const EG_TCT_GLIDE_SPEED = [0, 42, 58, 76];   // px/s queen glide (queen-fast)
+export const EG_TCT_GLIDE_REPICK_MS = 4200;
+export const EG_TCT_ROOK_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the queen
+export const EG_TCT_ROOK_CD_MS = 1000;
+export const EG_TCT_ROOK_FLING = [0, 140, 165, 190];
 // Battle intent (persistent cadence)
-const EG_TCT_INTENT_EVERY_MS = [0, 8200, 7000, 5600];
-const EG_TCT_INTENT_DECLARE_MS = 2000;
-const EG_TCT_ORB_SPEED = 210;
-const EG_TCT_ORB_DMG = 0.05;                  // %maxHP per orb
+export const EG_TCT_INTENT_EVERY_MS = [0, 8200, 7000, 5600];
+export const EG_TCT_INTENT_DECLARE_MS = 2000;
+export const EG_TCT_ORB_SPEED = 210;
+export const EG_TCT_ORB_DMG = 0.05;                  // %maxHP per orb
 // Pawn marches
-const EG_TCT_PAWN_EVERY_MS = [0, 8600, 7300, 5900];
-const EG_TCT_PAWN_WARN_MS = 800;
-const EG_TCT_PAWN_SPEED = 130;                // px/s march
-const EG_TCT_PAWN_DMG = 0.07;                 // %maxHP per pawn touch
-const EG_TCT_PAWN_GAP_W = 130;                // the safe gap column
+export const EG_TCT_PAWN_EVERY_MS = [0, 8600, 7300, 5900];
+export const EG_TCT_PAWN_WARN_MS = 800;
+export const EG_TCT_PAWN_SPEED = 130;                // px/s march
+export const EG_TCT_PAWN_DMG = 0.07;                 // %maxHP per pawn touch
+export const EG_TCT_PAWN_GAP_W = 130;                // the safe gap column
 // Check (60% gate)
-const EG_TCT_CHECK_LANES = 4;                 // 2 horiz + 2 vert
-const EG_TCT_CHECK_WARN_MS = 1200;
-const EG_TCT_CHECK_DASH_SPEED = 560;
-const EG_TCT_CHECK_LANE_H = 76;
-const EG_TCT_CHECK_DMG = [0, 0.13, 0.15, 0.18];
-const EG_TCT_CHECK_FLING = [0, 170, 195, 220];
-const EG_TCT_CHECK_GAP_MS = 1500;
+export const EG_TCT_CHECK_LANES = 4;                 // 2 horiz + 2 vert
+export const EG_TCT_CHECK_WARN_MS = 1200;
+export const EG_TCT_CHECK_DASH_SPEED = 560;
+export const EG_TCT_CHECK_LANE_H = 76;
+export const EG_TCT_CHECK_DMG = [0, 0.13, 0.15, 0.18];
+export const EG_TCT_CHECK_FLING = [0, 170, 195, 220];
+export const EG_TCT_CHECK_GAP_MS = 1500;
 // Zugzwang (30% gate)
-const EG_TCT_ZUG_MS = 9000;
-const EG_TCT_BISHOP_EVERY_MS = 2100;
-const EG_TCT_BISHOP_WARN_MS = 950;
-const EG_TCT_BISHOP_DMG = 0.10;               // %maxHP per diagonal beam
-const EG_TCT_KNIGHT_LEAPS = 4;
-const EG_TCT_KNIGHT_WARN_MS = 800;
-const EG_TCT_KNIGHT_R = 130;
-const EG_TCT_KNIGHT_DMG = [0, 0.11, 0.13, 0.16];
-const EG_TCT_KNIGHT_FLING = [0, 150, 175, 200];
+export const EG_TCT_ZUG_MS = 9000;
+export const EG_TCT_BISHOP_EVERY_MS = 2100;
+export const EG_TCT_BISHOP_WARN_MS = 950;
+export const EG_TCT_BISHOP_DMG = 0.10;               // %maxHP per diagonal beam
+export const EG_TCT_KNIGHT_LEAPS = 4;
+export const EG_TCT_KNIGHT_WARN_MS = 800;
+export const EG_TCT_KNIGHT_R = 130;
+export const EG_TCT_KNIGHT_DMG = [0, 0.11, 0.13, 0.16];
+export const EG_TCT_KNIGHT_FLING = [0, 150, 175, 200];
 // Checkmate (charge attack)
-const EG_TCT_CM_WARN_MS = 1100;
-const EG_TCT_CM_CLOSE_MS = 2600;              // walls meet in 2.6s
-const EG_TCT_CM_THICK = 90;                   // wall thickness px
-const EG_TCT_CM_DMG = [0, 0.17, 0.20, 0.24];
-const EG_TCT_CM_FLING = [0, 200, 230, 260];   // inward crush fling
+export const EG_TCT_CM_WARN_MS = 1100;
+export const EG_TCT_CM_CLOSE_MS = 2600;              // walls meet in 2.6s
+export const EG_TCT_CM_THICK = 90;                   // wall thickness px
+export const EG_TCT_CM_DMG = [0, 0.17, 0.20, 0.24];
+export const EG_TCT_CM_FLING = [0, 200, 230, 260];   // inward crush fling
 
 
-let _egTacticianWatcher = null; // per-fight chess state
+export let _egTacticianWatcher = null; // per-fight chess state
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
-function _egTctPhase(st) {
+export function _egTctPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
-        const m = _egMonsters.find(x => x && x.id === st.monsterId);
+        const m = globalThis._egMonsters.find(x => x && x.id === st.monsterId);
         if (m) return Math.max(1, Math.min(3, Number(m.bossPhase) || 1));
     }
     return 1;
 }
 
 // Removes every chess overlay (registered in boss-framework teardown).
-function _egTacticianTeardown() {
+export function _egTacticianTeardown() {
     if (_egTacticianWatcher) {
         const st = _egTacticianWatcher;
         _egTacticianWatcher = null;
@@ -147,7 +156,7 @@ function _egTacticianTeardown() {
 
 
 // ── Persistent arena: the queen, the plans, the pawns ───────────────────
-function _egTacticianArenaInit(monster) {
+export function _egTacticianArenaInit(monster) {
     if (_egTacticianWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -185,7 +194,7 @@ function _egTacticianArenaInit(monster) {
 
     _egNkLoop(run, (dtS, now) => {
         if (_egTacticianWatcher !== st) return false;
-        const live = _egMonsters ? _egMonsters.find(m => m.id === st.monsterId) : null;
+        const live = globalThis._egMonsters ? globalThis._egMonsters.find(m => m.id === st.monsterId) : null;
         if (!live) return false;
         const W = window.innerWidth, H = window.innerHeight;
         const c = _egNkPlayerCenter();
@@ -482,7 +491,7 @@ function _egTacticianArenaInit(monster) {
 
 
 // Declares an intent with a floating banner at the queen.
-function _egTctDeclare(st, kind, live, p) {
+export function _egTctDeclare(st, kind, live, p) {
     const txt = kind === 'swords' ? '⚔️ VOLLEY' : kind === 'shield' ? '🛡️ TITHE' : '😡 ENRAGE';
     const banner = _egNkEl(st.run, 'div', 'eg-tct-intent', txt);
     banner.style.left = Math.round(st.queen.x) + 'px';
@@ -493,7 +502,7 @@ function _egTctDeclare(st, kind, live, p) {
 
 
 // Executes a declared intent.
-function _egTctExecute(st, it, live, p, W, H) {
+export function _egTctExecute(st, it, live, p, W, H) {
     if (it.kind === 'swords') {
         // Aimed volley of knight-orbs from the top corners.
         const c = _egNkPlayerCenter();
@@ -520,7 +529,7 @@ function _egTctExecute(st, it, live, p, W, H) {
 
 
 // Queues a pawn rank advancing from the bottom edge.
-function _egTctQueuePawn(st, W, H) {
+export function _egTctQueuePawn(st, W, H) {
     const gapX = 80 + Math.random() * Math.max(80, W - 160);
     const warnEl = _egNkEl(st.run, 'div', 'eg-tct-pawnwarn');
     warnEl.style.left = Math.round(gapX - EG_TCT_PAWN_GAP_W / 2) + 'px';
@@ -531,7 +540,7 @@ function _egTctQueuePawn(st, W, H) {
 
 
 // ── 60% gate: CHECK - four rook-slide lanes ──────────────────────────────
-function _egTctCheck(st, W, H) {
+export function _egTctCheck(st, W, H) {
     if (st.check) return;
     st.check = { t: 0, wave: 0 };
     _egNkToast('eg_tct_check', '♟️ CHECK! Read the rook lanes - do not stand in them!');
@@ -539,7 +548,7 @@ function _egTctCheck(st, W, H) {
 }
 
 
-function _egTctSpawnLane(st, W, H, waveIdx) {
+export function _egTctSpawnLane(st, W, H, waveIdx) {
     const horiz = waveIdx % 2 === 0; // first two waves horizontal, then vertical
     const c = _egNkPlayerCenter();
     const y = horiz ? (c ? c.y : H * 0.4) : 0;
@@ -561,7 +570,7 @@ function _egTctSpawnLane(st, W, H, waveIdx) {
 
 
 // ── 30% gate: ZUGZWANG ───────────────────────────────────────────────────
-function _egTctZugzwang(st, p) {
+export function _egTctZugzwang(st, p) {
     if (st.zug) return;
     st.zug = { t: 0 };
     st.zugAcc = 0;
@@ -572,7 +581,7 @@ function _egTctZugzwang(st, p) {
 
 
 // One bishop diagonal beam through the queen's current square.
-function _egTctQueueBeam(st, qn, W, H) {
+export function _egTctQueueBeam(st, qn, W, H) {
     const diag = Math.random() < 0.5 ? 1 : -1;
     const el = _egNkEl(st.run, 'div', 'eg-tct-beam');
     // The beam is a rotated long rectangle through the queen square.
@@ -586,7 +595,7 @@ function _egTctQueueBeam(st, qn, W, H) {
 
 // Rect vs rotated beam: approximate by projecting the player center onto
 // the beam axis and measuring the perpendicular distance.
-function _egTctBeamHits(b, pr) {
+export function _egTctBeamHits(b, pr) {
     const c = _egNkPlayerCenter();
     if (!c) return false;
     const rad = b.ang * Math.PI / 180;
@@ -598,7 +607,7 @@ function _egTctBeamHits(b, pr) {
 
 
 // One knight leap: the piece jumps an L to a landing square near the player.
-function _egTctQueueLeap(st, qn, W, H) {
+export function _egTctQueueLeap(st, qn, W, H) {
     const c = _egNkPlayerCenter();
     const tx = c ? c.x : W / 2, ty = c ? c.y : H / 2;
     // L offsets (knight moves).
@@ -618,7 +627,7 @@ function _egTctQueueLeap(st, qn, W, H) {
 
 
 // ── Charge attack: CHECKMATE ─────────────────────────────────────────────
-function _egTacticianCheckmate(monster) {
+export function _egTacticianCheckmate(monster) {
     const st = _egTacticianWatcher;
     if (!st || st.checkmate || _egNkDodgeBusy() || _egNkFrozen()) return;
     const W = window.innerWidth, H = window.innerHeight;
@@ -649,4 +658,4 @@ function _egTacticianCheckmate(monster) {
 // The old scheduled mechanic is now the persistent intent cadence -
 // keep the handler name alive so any stale schedule entry no-ops instead
 // of erroring.
-function _egMechBattleIntent(monster, phase) { void monster; void phase; }
+export function _egMechBattleIntent(monster, phase) { void monster; void phase; }

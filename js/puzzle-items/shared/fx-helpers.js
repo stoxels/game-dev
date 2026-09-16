@@ -1,4 +1,11 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+
+//------------------------------------------------------------------------
 //-------------------SHARED - FX HELPERS----------------------
 //------------------------------------------------------------------------
 
@@ -9,7 +16,7 @@
 // and the shield border (Shield / Cursed Shield).
 
 // Shared z-index tiers so overlapping effects stack predictably.
-const FX_Z = {
+export const FX_Z = {
     base: 320,   // standard overlay
     above: 325,   // icons / foreground overlays
     high: 326,   // large centered icons
@@ -20,15 +27,15 @@ const FX_Z = {
 
 
 // Horizontal positions (as grid-width fractions) for lightning bolts.
-const CHRONOBOLT_X_FRACTIONS = [0.2, 0.5, 0.8];
+export const CHRONOBOLT_X_FRACTIONS = [0.2, 0.5, 0.8];
 
 
 // Explosion colours used by ChaosGrid.
-const CHAOS_BLAST_COLOURS = ['#e74c3c', '#f39c12', '#9b59b6', '#3498db', '#2ecc71', '#e91e63'];
+export const CHAOS_BLAST_COLOURS = ['#e74c3c', '#f39c12', '#9b59b6', '#3498db', '#2ecc71', '#e91e63'];
 
 
 // Particle palettes shared across multiple effects.
-const PARTICLES = {
+export const PARTICLES = {
     gemSparkles: { chars: ['✦', '◆', '●', '▪'], colors: ['#88f', '#c8f', '#66f', '#aaf', '#fff'] },
     artifactStars: { chars: ['★', '✦', '✧', '⋆', '🌟'], colors: ['#ffd700', '#ffe066', '#fff9c4', '#fff', '#ffc300'] },
     witchSmoke: { chars: ['✦', '◆', '★', '·'], colors: ['#9b59b6', '#c39bd3', '#6c3483', '#d7bde2', '#fff'] },
@@ -40,7 +47,7 @@ const PARTICLES = {
 
 
 // SFX keys used by MistakeEraser variants, keyed by defId.
-const MISTAKE_ERASER_SFX = {
+export const MISTAKE_ERASER_SFX = {
     mistakeEraser: 'tutor',
     mistakeEraser4: 'professor',
     mistakeEraser6: 'scholar',
@@ -49,7 +56,7 @@ const MISTAKE_ERASER_SFX = {
 
 
 // Pearl variant definitions: color hex → emoji + sfx key.
-const PEARL_VARIANTS = {
+export const PEARL_VARIANTS = {
     '#88aaff': { emoji: '🔵', sfx: 'pearl_of_haste' },
     '#cc88ff': { emoji: '🟣', sfx: 'pearl_of_swiftness' },
     '#e0e0e0': { emoji: '⚪', sfx: 'grand_pearl' },
@@ -58,7 +65,7 @@ const PEARL_VARIANTS = {
 
 // Returns a new absolutely positioned div with the given cssText,
 // already appended to `parent`.  Does NOT auto-remove itself.
-function _fxMakeElement(parent, cssText, className) {
+export function _fxMakeElement(parent, cssText, className) {
     const el = document.createElement('div');
     if (className) el.className = className;
     el.style.cssText = cssText;
@@ -70,7 +77,7 @@ function _fxMakeElement(parent, cssText, className) {
 // Creates a centered emoji icon at (cx, cy) inside `parent`.
 // Auto-removes after `removeAfterMs`.
 // Returns the element in case the caller needs to remove it early.
-function _fxMakeIcon(parent, emoji, cx, cy, fontSize, animationCss, removeAfterMs) {
+export function _fxMakeIcon(parent, emoji, cx, cy, fontSize, animationCss, removeAfterMs) {
     const el = document.createElement('div');
     el.textContent = emoji;
     el.style.cssText = `
@@ -91,7 +98,7 @@ function _fxMakeIcon(parent, emoji, cx, cy, fontSize, animationCss, removeAfterM
 // Creates one expandable ring div centered at (cx, cy).
 // `ringSize` is the CSS custom property value for --ring-max / --ring-size.
 // `delayMs` staggers the animation when spawning multiple rings.
-function _fxMakeRing(container, cx, cy, className, ringSize, delayMs, animationName, duration = '0.9s') {
+export function _fxMakeRing(container, cx, cy, className, ringSize, delayMs, animationName, duration = '0.9s') {
     const ring = document.createElement('div');
     ring.className = className;
     ring.style.cssText = `
@@ -111,8 +118,8 @@ function _fxMakeRing(container, cx, cy, className, ringSize, delayMs, animationN
 // i.e. #g-0-0 and #g-{lastRow}-{lastCol}, or null if the grid/cells
 // aren't currently available. Shared by every helper that needs to know
 // where the grid sits on screen (rect calc, shield-border tracking, etc).
-function _fxGetGridCorners() {
-    const sol = cur?.grid;
+export function _fxGetGridCorners() {
+    const sol = globalThis.cur?.grid;
     if (!sol || !sol.length) return null;
 
     const rows = sol.length;
@@ -136,7 +143,7 @@ function _fxGetGridCorners() {
 // wrap, that division introduces zoom-dependent drift that blows up at
 // high zoom levels (this was the cause of the fx-shield-border /
 // variance-shield-bubble mispositioning bug).
-function _fxGetPuzzleRectForWrap() {
+export function _fxGetPuzzleRectForWrap() {
     const wrap = document.getElementById('puzzle-scaler-wrap');
     if (!wrap) return null;
     if (!wrap.style.position || wrap.style.position === 'static') {
@@ -166,7 +173,7 @@ function _fxGetPuzzleRectForWrap() {
 // Returns the bounding rect of the puzzle grid in the
 // coordinate space of the puzzle-scaler element (logical px).
 // Returns null when the grid elements can't be found.
-function _fxGetPuzzleRect() {
+export function _fxGetPuzzleRect() {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return null;
     if (!wrap.style.position || wrap.style.position === 'static') {
@@ -177,7 +184,7 @@ function _fxGetPuzzleRect() {
     if (!corners) return null;
     const { first, last } = corners;
 
-    const zoom = currentZoom || 1;
+    const zoom = globalThis.currentZoom || 1;
     const wRect = wrap.getBoundingClientRect();
     const fRect = first.getBoundingClientRect();
     const lRect = last.getBoundingClientRect();
@@ -197,7 +204,7 @@ function _fxGetPuzzleRect() {
 // Creates a full-scaler absolute overlay div and auto-removes
 // it after `durationMs`.  Returns the element for further setup.
 // `extraStyle` can override or extend any of the default styles.
-function _fxOverlay(wrap, durationMs, extraStyle = '') {
+export function _fxOverlay(wrap, durationMs, extraStyle = '') {
     const el = document.createElement('div');
     el.style.cssText = `
         position:absolute; inset:0;
@@ -213,7 +220,7 @@ function _fxOverlay(wrap, durationMs, extraStyle = '') {
 
 
 // Injects the keyframes used by the freeze countdown overlay (once).
-function _ensureFreezeCountdownStyles() {
+export function _ensureFreezeCountdownStyles() {
     if (document.getElementById('fx-freeze-countdown-style')) return;
     const style = document.createElement('style');
     style.id = 'fx-freeze-countdown-style';
@@ -236,7 +243,7 @@ function _ensureFreezeCountdownStyles() {
 // while a time-freeze effect is running (Absolute Zero, Time Freeze item,
 // Timed Stasis passive).  Shows "❄️ Ns" and pops once per second until the
 // freeze expires, then fades out.
-function playFreezeCountdownOverlay(durationMs) {
+export function playFreezeCountdownOverlay(durationMs) {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
     _ensureFreezeCountdownStyles();
@@ -309,7 +316,7 @@ function playFreezeCountdownOverlay(durationMs) {
 //   spreadX / spreadY - random offset radius in each axis (px)
 //   duration - base animation duration (ms); individual particles vary ±30%
 //   cssClass - class name applied to each particle (handles the animation)
-function _fxSpawnParticles(opts) {
+export function _fxSpawnParticles(opts) {
     const {
         count = 12,
         chars = ['·'],
@@ -346,7 +353,7 @@ function _fxSpawnParticles(opts) {
 
 
 // Helper: creates the central burst div for the clock effect.
-function _fxMakeClockBurst(container, cx, cy) {
+export function _fxMakeClockBurst(container, cx, cy) {
     const burst = document.createElement('div');
     burst.className = 'fx-clock-burst';
     burst.style.cssText = `
@@ -359,7 +366,7 @@ function _fxMakeClockBurst(container, cx, cy) {
 
 
 // Helper: spawns the 12 clock-ray divs radiating from (cx, cy).
-function _fxMakeClockRays(container, cx, cy, rayLength) {
+export function _fxMakeClockRays(container, cx, cy, rayLength) {
     for (let i = 0; i < 12; i++) {
         const ray = document.createElement('div');
         ray.className = 'fx-clock-ray';
@@ -377,7 +384,7 @@ function _fxMakeClockRays(container, cx, cy, rayLength) {
 
 
 // 🕰️ Clock - clock hands sweep + golden radial burst.
-function _fxClock() {
+export function _fxClock() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
@@ -398,7 +405,7 @@ function _fxClock() {
 // Uses position:fixed with screen-space coords so it is unaffected by the
 // CSS transform on puzzle-scaler.  A ResizeObserver repositions it whenever
 // the grid is zoomed or the window resizes.
-function _fxShieldBorderAdd() {
+export function _fxShieldBorderAdd() {
     if (document.getElementById('fx-shield-border')) return;
 
     const border = document.createElement('div');
@@ -451,7 +458,7 @@ function _fxShieldBorderAdd() {
 
 
 // Removes the shield border with a short fade-out.
-function _fxShieldBorderRemove() {
+export function _fxShieldBorderRemove() {
     const border = document.getElementById('fx-shield-border');
     if (!border) return;
 
@@ -467,7 +474,7 @@ function _fxShieldBorderRemove() {
 
 
 // Helper: creates the gold tint fill overlay used by Golden Clock.
-function _fxMakeGoldTintFill(container, r) {
+export function _fxMakeGoldTintFill(container, r) {
     const fill = document.createElement('div');
     fill.style.cssText = `
         position:absolute;

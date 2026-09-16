@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egDamageTargetById } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: ENTROPY (boss_entropy)--------------------------
 //------------------------------------------------------------------------
 // TIER 7 REWORK - "The Second Law". Everything winds down; ORDER is a
@@ -48,8 +57,8 @@
 
 // DEBUG: slow Entropy's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_ENTR_DEBUG_SLOW = true;
-const _EG_ENTR_DEBUG_MULT = _EG_ENTR_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_ENTR_DEBUG_SLOW = true;
+export const _EG_ENTR_DEBUG_MULT = _EG_ENTR_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_entropy: {
@@ -84,22 +93,22 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning ───────────────────────────────────────────────────────────
-const EG_ENTR_POOL_DPS    = 7;     // %maxHP/s standing in a cold pool
-const EG_ENTR_POOL_LIFE   = 12;    // s a pool lingers (phase 3: 10)
-const EG_ENTR_ZONE_LIFE   = 9;     // s an ordered zone stays lit
-const EG_ENTR_ORDER_FILL  = 14;    // order/s inside a zone
-const EG_ENTR_ORDER_DRAIN = 8;     // order/s outside zones (cold door: x2)
-const EG_ENTR_SPEED_MIN   = 0.55;  // movement floor at 0 order (never locks)
-const EG_ENTR_BURN_DPS    = 6;     // %maxHP/s while burning out a cursed cell
-const EG_ENTR_CELL_SPREAD = 4;     // s between cell spreads
-const EG_ENTR_CELL_LIFE   = 14;    // s a cursed cell survives
-const EG_ENTR_DOOR_STATE  = 8000;  // ms of elemental state from a door
-const EG_ENTR_SHARD_DMG   = 0.20;  // boss maxHP per delivered shard
-const EG_ENTR_SHARDS      = 5;     // shards to restart the universe
-const EG_ENTR_FINAL_TIME  = 32;    // s before HEAT DEATH
-const EG_ENTR_HEATDEATH   = 0.35;  // caught in the wave
-const EG_ENTR_SINGULAR_R  = 150;   // safe radius around the singularity
-const EG_ENTR_HIT_CD_MS   = 700;   // shared touch cooldown
+export const EG_ENTR_POOL_DPS    = 7;     // %maxHP/s standing in a cold pool
+export const EG_ENTR_POOL_LIFE   = 12;    // s a pool lingers (phase 3: 10)
+export const EG_ENTR_ZONE_LIFE   = 9;     // s an ordered zone stays lit
+export const EG_ENTR_ORDER_FILL  = 14;    // order/s inside a zone
+export const EG_ENTR_ORDER_DRAIN = 8;     // order/s outside zones (cold door: x2)
+export const EG_ENTR_SPEED_MIN   = 0.55;  // movement floor at 0 order (never locks)
+export const EG_ENTR_BURN_DPS    = 6;     // %maxHP/s while burning out a cursed cell
+export const EG_ENTR_CELL_SPREAD = 4;     // s between cell spreads
+export const EG_ENTR_CELL_LIFE   = 14;    // s a cursed cell survives
+export const EG_ENTR_DOOR_STATE  = 8000;  // ms of elemental state from a door
+export const EG_ENTR_SHARD_DMG   = 0.20;  // boss maxHP per delivered shard
+export const EG_ENTR_SHARDS      = 5;     // shards to restart the universe
+export const EG_ENTR_FINAL_TIME  = 32;    // s before HEAT DEATH
+export const EG_ENTR_HEATDEATH   = 0.35;  // caught in the wave
+export const EG_ENTR_SINGULAR_R  = 150;   // safe radius around the singularity
+export const EG_ENTR_HIT_CD_MS   = 700;   // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -107,40 +116,40 @@ const EG_ENTR_HIT_CD_MS   = 700;   // shared touch cooldown
 //------------------------------------------------------------------------
 // Zones and pools live in module state so the drift cast (spawner), the
 // order watcher (ticker) and the finale (cleaner) all share one truth.
-let _egEntrZones = [];    // { x, y, r, el, until }
-let _egEntrPools = [];    // { x, y, r, el, until, dps }
-let _egEntrCells = [];    // { x, y, el, born, dead }
-let _egEntrOrderRun = null;
-let _egEntrOrder = 100;   // 0..100 - the personal order meter
-let _egEntrHotUntil = 0;  // Maxwell hot-state deadline (perf.now ms)
-let _egEntrColdUntil = 0;
-let _egEntrHotAuraTimer = 0;
-let _egEntrColdAuraTimer = 0;
+export let _egEntrZones = [];    // { x, y, r, el, until }
+export let _egEntrPools = [];    // { x, y, r, el, until, dps }
+export let _egEntrCells = [];    // { x, y, el, born, dead }
+export let _egEntrOrderRun = null;
+export let _egEntrOrder = 100;   // 0..100 - the personal order meter
+export let _egEntrHotUntil = 0;  // Maxwell hot-state deadline (perf.now ms)
+export let _egEntrColdUntil = 0;
+export let _egEntrHotAuraTimer = 0;
+export let _egEntrColdAuraTimer = 0;
 
 // Movement hook (called from _avatarGetMoveSpeed in player_sprite.js,
 // typeof-guarded there - same pattern as _egSnailBroomHeld). Perfect
 // crystal during the finale: absolute zero is perfect order.
-function _egEntrMoveMult() {
+export function _egEntrMoveMult() {
     if (_egEntrFinalActive()) return 1;
     return EG_ENTR_SPEED_MIN + (1 - EG_ENTR_SPEED_MIN) * (_egEntrOrder / 100);
 }
 
-function _egEntrHeal(amount) {
+export function _egEntrHeal(amount) {
     try {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
-        if (playerCurrentHP <= 0) return;
-        const before = playerCurrentHP;
-        playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + amount);
-        if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+        if (globalThis.playerCurrentHP <= 0) return;
+        const before = globalThis.playerCurrentHP;
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + amount);
+        if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }
 
 // Player centre with a screen-centre fallback.
-function _egEntrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egEntrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Touch damage helper shared by all Entropy hazards (per-touch cooldown).
-let _egEntrHitCd = 0;
-function _egEntrTouch(pct, level, label) {
+export let _egEntrHitCd = 0;
+export function _egEntrTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egEntrHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -152,8 +161,8 @@ function _egEntrTouch(pct, level, label) {
 }
 
 // The order meter HUD (bottom-centre; the boss cards own the top).
-let _egEntrHudEl = null;
-function _egEntrHudApply() {
+export let _egEntrHudEl = null;
+export function _egEntrHudApply() {
     if (!_egEntrHudEl) {
         _egEntrHudEl = document.createElement('div');
         _egEntrHudEl.className = 'eg-entr-order';
@@ -169,7 +178,7 @@ function _egEntrHudApply() {
 // The passive watcher: expires zones/pools/cells, ticks pool DoT and the
 // order meter. Created lazily by the first cast and re-created after the
 // finale's kill-other-runs sweep, so it lives until the boss dies.
-function _egEntrEnsureOrderRun(monster) {
+export function _egEntrEnsureOrderRun(monster) {
     if (_egEntrOrderRun && _egNkRuns.has(_egEntrOrderRun.id)) return;
     const run = _egNkNewRun(monster && monster.id, false);
     run.passive = true;
@@ -240,11 +249,11 @@ function _egEntrEnsureOrderRun(monster) {
 // Cold pools bloom outward and MERGE when they touch; each cast also
 // plants a lit ordered zone (smaller as the pools grow). Standing in a
 // zone = protection + order refill; pools drain %HP/s.
-const EG_ENTR_DRIFT_BLOOMS = [0, 2, 2, 3];  // blooms per cast, by phase
-const EG_ENTR_POOL_R       = 95;            // base pool radius
-const EG_ENTR_BLOOM_MS     = 900;           // telegraph before eruption
+export const EG_ENTR_DRIFT_BLOOMS = [0, 2, 2, 3];  // blooms per cast, by phase
+export const EG_ENTR_POOL_R       = 95;            // base pool radius
+export const EG_ENTR_BLOOM_MS     = 900;           // telegraph before eruption
 
-function _egMechEntrDrift(monster, phase) {
+export function _egMechEntrDrift(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -292,7 +301,7 @@ function _egMechEntrDrift(monster, phase) {
 
 // Spawn a pool; if it overlaps an existing one, MERGE into a bigger pool
 // (real entropy - the cold consolidates instead of multiplying).
-function _egEntrSpawnPool(x, y, r, lifeMs) {
+export function _egEntrSpawnPool(x, y, r, lifeMs) {
     const near = _egEntrPools.find(q => Math.hypot(q.x - x, q.y - y) < q.r + r - 24);
     if (near) {
         const tot = near.r + r;
@@ -316,7 +325,7 @@ function _egEntrSpawnPool(x, y, r, lifeMs) {
     _egEntrPools.push({ x, y, r, el, until: performance.now() + lifeMs, dps: EG_ENTR_POOL_DPS });
 }
 
-function _egEntrSpawnZone(x, y, lifeMs) {
+export function _egEntrSpawnZone(x, y, lifeMs) {
     // Zones shrink as the cold consolidates: more pools → smaller refuge.
     const r = Math.max(55, 92 - _egEntrPools.length * 4);
     const el = document.createElement('div');
@@ -337,10 +346,10 @@ function _egEntrSpawnZone(x, y, lifeMs) {
 // Cursed cells AGE: every 4s each living cell spreads decay to an
 // orthogonal neighbour (cap 9). Stand on a cell to burn it out - the burn
 // costs a cold DoT while you stand there.
-const EG_ENTR_DECAY_SEEDS = [0, 3, 3, 5];   // cells seeded per cast, by phase
-const EG_ENTR_CELL_CAP    = 9;
+export const EG_ENTR_DECAY_SEEDS = [0, 3, 3, 5];   // cells seeded per cast, by phase
+export const EG_ENTR_CELL_CAP    = 9;
 
-function _egMechEntrDecay(monster, phase) {
+export function _egMechEntrDecay(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -372,7 +381,7 @@ function _egMechEntrDecay(monster, phase) {
     });
 }
 
-function _egEntrSpawnCell(x, y) {
+export function _egEntrSpawnCell(x, y) {
     if (_egEntrCells.filter(c => !c.dead).length >= EG_ENTR_CELL_CAP) return;
     const el = document.createElement('div');
     el.className = 'eg-entr-cell';
@@ -389,7 +398,7 @@ function _egEntrSpawnCell(x, y) {
 // A hot door and a cold door at opposite edges. Entering one applies the
 // element for 8s (one use each): HOT = pools heal you (zones stop
 // refilling), COLD = pool-proof (order drains twice as fast).
-function _egMechEntrDoor(monster, phase) {
+export function _egMechEntrDoor(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     void phase;
     const W = window.innerWidth, H = window.innerHeight;
@@ -423,19 +432,19 @@ function _egMechEntrDoor(monster, phase) {
     });
 }
 
-function _egEntrApplyHot() {
+export function _egEntrApplyHot() {
     _egEntrHotUntil = performance.now() + EG_ENTR_DOOR_STATE * _EG_ENTR_DEBUG_MULT;
     _egNkToast('eg_mech_entr_hot', '🔥 FIRE-STATE - cold pools heal you, but heat scatters order!', '#fdba74');
     _egEntrAura('eg-entr-hot-aura', 'hot');
 }
 
-function _egEntrApplyCold() {
+export function _egEntrApplyCold() {
     _egEntrColdUntil = performance.now() + EG_ENTR_DOOR_STATE * _EG_ENTR_DEBUG_MULT;
     _egNkToast('eg_mech_entr_cold', '❄️ COLD-STATE - pool-proof, but order drains twice as fast!', '#93c5fd');
     _egEntrAura('eg-entr-cold-aura', 'cold');
 }
 
-function _egEntrAura(cls, which) {
+export function _egEntrAura(cls, which) {
     const el = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (!el) return;
@@ -460,26 +469,26 @@ function _egEntrAura(cls, which) {
 // each touched shard's spark flies to the central singularity and pops the
 // boss for 20% of ITS maxHP through the canonical damage path. 5 shards =
 // the universe restarts (the kill). Timer fail = HEAT DEATH wave.
-const EG_ENTR_SHARD_LIFE = 7;      // s a landed shard waits
-const EG_ENTR_SHARD_WARN = 750;    // ms telegraph
+export const EG_ENTR_SHARD_LIFE = 7;      // s a landed shard waits
+export const EG_ENTR_SHARD_WARN = 750;    // ms telegraph
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate
 // and by _egEntrMoveMult).
-let _egEntrFinal = null;
+export let _egEntrFinal = null;
 
-function _egEntrFinalActive() {
+export function _egEntrFinalActive() {
     return !!_egEntrFinal && !_egEntrFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egEntrOnPhaseEnter(monster, newPhase) {
+export function _egEntrOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egEntrStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egEntrStartFinalWatcher(monster) {
+export function _egEntrStartFinalWatcher(monster) {
     if (!monster || _egEntrFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -497,7 +506,7 @@ function _egEntrStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-function _egEntrAfter(g, ms, fn) {
+export function _egEntrAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egEntrFinal) return;
@@ -508,7 +517,7 @@ function _egEntrAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egEntrFinalStart(monster) {
+export function _egEntrFinalStart(monster) {
     if (_egEntrFinal || !monster) return;
 
     // The lattice takes over: kill every other run of this boss, then
@@ -651,7 +660,7 @@ function _egEntrFinalStart(monster) {
 
 // A shard was touched: its spark flies to the singularity, then the boss
 // takes a 20% pop through the canonical damage path.
-function _egEntrDeliver(g, monster, sx, sy, level) {
+export function _egEntrDeliver(g, monster, sx, sy, level) {
     if (g.finished) return;
     void level;
     const W = window.innerWidth, H = window.innerHeight;
@@ -673,7 +682,7 @@ function _egEntrDeliver(g, monster, sx, sy, level) {
         // Staggered damage pop on the boss - canonical path so resistances,
         // phase checks and the death flow all apply.
         try {
-            const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+            const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
             if (m && typeof _egDamageTargetById === 'function' && m.currentHP > 0) {
                 _egDamageTargetById(g.monsterId, m.maxHP * EG_ENTR_SHARD_DMG, ['cold'], {});
             }
@@ -699,15 +708,15 @@ function _egEntrDeliver(g, monster, sx, sy, level) {
 // Follow-up shard after a delivery (the unified spawner lives in
 // _egEntrFinalStart as `spawnShard`; this thin re-entry keeps the delivery
 // path simple).
-let _egEntrSpawnShardFn = null;
-function _egEntrDropNext(g, monster) {
+export let _egEntrSpawnShardFn = null;
+export function _egEntrDropNext(g, monster) {
     if (g.finished || !_egEntrSpawnShardFn) return;
     _egEntrSpawnShardFn(g, monster);
 }
 
 // Timer failure: HEAT DEATH - a full-screen slow wave; only the singularity
 // centre is safe.
-function _egEntrHeatDeath(g, monster, level) {
+export function _egEntrHeatDeath(g, monster, level) {
     if (g.finished) return;
     _egNkToast('eg_mech_entr_heatdeath', '♾️💀 HEAT DEATH! The wave takes everything but the centre!', '#f87171');
     const wave = document.createElement('div');
@@ -732,7 +741,7 @@ function _egEntrHeatDeath(g, monster, level) {
 
 // Success: the fifth shard re-ignites the universe - the boss pays its own
 // remaining HP (through the canonical path, immunity already released).
-function _egEntrRestart(g, monster) {
+export function _egEntrRestart(g, monster) {
     if (g.finished) return;
     _egNkToast('eg_mech_entr_spark', '♾️💥 THE UNIVERSE RESTARTS - Entropy gave everything one last spark!', '#fde68a');
     const flash = document.createElement('div');
@@ -741,7 +750,7 @@ function _egEntrRestart(g, monster) {
     setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1400);
     _egEntrFinalEnd(g, monster);
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m && typeof _egDamageTargetById === 'function' && m.currentHP > 0) {
             _egDamageTargetById(g.monsterId, m.currentHP, ['cold'], {});
         }
@@ -750,7 +759,7 @@ function _egEntrRestart(g, monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egEntrFinalEnd(g, monster) {
+export function _egEntrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -766,7 +775,7 @@ function _egEntrFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -778,7 +787,7 @@ function _egEntrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body state this boss ever created.
-function _egEntrTeardown() {
+export function _egEntrTeardown() {
     if (_egEntrFinal) { try { _egEntrFinalEnd(_egEntrFinal, null); } catch (e) {} _egEntrFinal = null; }
     if (_egEntrOrderRun) { try { _egNkKillRun(_egEntrOrderRun); } catch (e) {} _egEntrOrderRun = null; }
     _egEntrZones.forEach(z => { try { z.el.remove(); } catch (e) {} });
@@ -816,7 +825,7 @@ if (typeof window !== 'undefined') {
     window._EG_ENTR_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_entropy') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_entropy') : null;
             if (!monster) return 'no entropy alive';
             const fn = name === 'drift' ? _egMechEntrDrift
                 : name === 'decay' ? _egMechEntrDecay

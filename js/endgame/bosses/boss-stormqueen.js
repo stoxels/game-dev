@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE STORMQUEEN (boss_stormqueen)---------------------
 //------------------------------------------------------------------------
 // Pinnacle tempest: three hunting storms that never tire, under a ceaseless
@@ -38,7 +46,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechQueenStorms(monster, phase) {
+export function _egMechQueenStorms(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const speed = [0, 62, 75, 92][p];
@@ -91,7 +99,7 @@ function _egMechQueenStorms(monster, phase) {
     });
 }
 
-function _egMechShrapnelDownpour(monster, phase) {
+export function _egMechShrapnelDownpour(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const total = [0, 14, 16, 20][p];

@@ -3,7 +3,7 @@
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-const CLASS_DEFS = {
+export const CLASS_DEFS = {
 
     // MATHMAGICIAN (Mage archetype)
     mathmagician: {
@@ -293,7 +293,7 @@ const CLASS_DEFS = {
     }
 };
 
-const CLASS_LIST = ['statistician', 'mathmagician', 'probabilist'];
+export const CLASS_LIST = ['statistician', 'mathmagician', 'probabilist'];
 
 
 //------------------------------------------------------------------------
@@ -303,7 +303,7 @@ const CLASS_LIST = ['statistician', 'mathmagician', 'probabilist'];
 
 // Per-spell locker icons for the class-upgrade screen (base classes only).
 // Keyed by classId -> ability type ('passive' | 'active1' | 'active2').
-const CLASS_SPELL_ICONS = {
+export const CLASS_SPELL_ICONS = {
     mathmagician: {
         passive: '💠',   // Variance Shield
         active1: '👁️',   // Arcane Reveal
@@ -328,7 +328,7 @@ const CLASS_SPELL_ICONS = {
 // instant cast, 5-minute cooldown, ~50 mana. Rendered in the HUD's
 // third row, first column (slot active5). Not tied to a class or
 // ascendency - available to every class but gated by isEndgameLevel().
-const ENDGAME_HEARTBLOOM_DEF = {
+export const ENDGAME_HEARTBLOOM_DEF = {
     id: 'heartbloom',
     icon: '💚',
     nameEn: 'Heartbloom',

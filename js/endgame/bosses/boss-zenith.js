@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE ZENITH (boss_zenith)-----------------------------
 //------------------------------------------------------------------------
 // The final throne: Royal Decrees - alternating freeze/move trials, three
@@ -38,7 +46,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechRoyalDecree(monster, phase) {
+export function _egMechRoyalDecree(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const waves = [0, 3, 3, 4][p];
@@ -98,7 +106,7 @@ function _egMechRoyalDecree(monster, phase) {
     });
 }
 
-function _egMechCrownRings(monster, phase) {
+export function _egMechCrownRings(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const expandMs = [0, 1700, 1500, 1300][p];

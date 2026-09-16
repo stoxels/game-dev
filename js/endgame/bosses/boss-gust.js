@@ -1,4 +1,15 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { t } from '../../translation/translations.js';
+import { _egBossCorrupted } from '../endgame-state.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDotTick, _egNkEl, _egNkHit, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkRuns, _egNkToast, _egRemoveCellCorruption } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE GUST (boss_gust)---------------------------
 //------------------------------------------------------------------------
 // Storm-front duel, reworked: the arena has NO lanes. Instead, a whole-
@@ -67,11 +78,11 @@ Object.assign(EG_BOSS_MECHANICS, {
 // ── Tuning ──────────────────────────────────────────────────────────────────
 // Wind cadence: a storm front rolls in roughly every 30 s (±15% jitter),
 // from a randomized side each time.
-const EG_GUST_WIND_EVERY_MS = 30000;
-const EG_GUST_WIND_WARN_MS = 350;    // brief gather preview (≈ the overlay's fade-in) before the shove - animation and push start together
-const EG_GUST_WIND_RAMP_MS = 500;    // push strength fades in - a slide, not a shove
-const EG_GUST_WIND_DUR = 5200;       // how long the gale blows
-const EG_GUST_STORM_WARN_LEAD_MS = 2000; // lightning pre-warning before a front rolls in
+export const EG_GUST_WIND_EVERY_MS = 30000;
+export const EG_GUST_WIND_WARN_MS = 350;    // brief gather preview (≈ the overlay's fade-in) before the shove - animation and push start together
+export const EG_GUST_WIND_RAMP_MS = 500;    // push strength fades in - a slide, not a shove
+export const EG_GUST_WIND_DUR = 5200;       // how long the gale blows
+export const EG_GUST_STORM_WARN_LEAD_MS = 2000; // lightning pre-warning before a front rolls in
 
 // Wind push in px/s - tuned against the avatar's REAL walk speed (320 px/s
 // base, up to ~432 with max movement-speed boots). Holding against the gale
@@ -79,67 +90,67 @@ const EG_GUST_STORM_WARN_LEAD_MS = 2000; // lightning pre-warning before a front
 // guaranteed downwind creep (EG_GUST_MIN_NET_DRIFT), so even a fully
 // movement-speed-geared player still drifts toward the spikes - just slower
 // than someone who stops fighting the current.
-const EG_GUST_PUSH = [0, 620, 680, 740, 800]; // by boss phase 1–4
+export const EG_GUST_PUSH = [0, 620, 680, 740, 800]; // by boss phase 1–4
 // Riding WITH the wind is a sprint; steering AGAINST it only slows the
 // shove - the current stays stronger than any full walk.
-const EG_GUST_RIDE_MULT = 1.15;
-const EG_GUST_RESIST_MULT = 0.75;   // fighting the wind trims it to 75%…
-const EG_GUST_MIN_NET_DRIFT = 55;   // …but never below walk speed + this creep
+export const EG_GUST_RIDE_MULT = 1.15;
+export const EG_GUST_RESIST_MULT = 0.75;   // fighting the wind trims it to 75%…
+export const EG_GUST_MIN_NET_DRIFT = 55;   // …but never below walk speed + this creep
 
 // Spike walls: contact hit + damage-over-time while inside (either side).
-const EG_GUST_SPIKE_W = 46;
-const EG_GUST_SPIKE_HIT = [0, 0.12, 0.13, 0.15, 0.17];  // %maxHP per contact hit
-const EG_GUST_SPIKE_DOT = [0, 0.045, 0.05, 0.055, 0.06]; // %maxHP/s while inside
-const EG_GUST_SPIKE_CD_MS = 900;
+export const EG_GUST_SPIKE_W = 46;
+export const EG_GUST_SPIKE_HIT = [0, 0.12, 0.13, 0.15, 0.17];  // %maxHP per contact hit
+export const EG_GUST_SPIKE_DOT = [0, 0.045, 0.05, 0.055, 0.06]; // %maxHP/s while inside
+export const EG_GUST_SPIKE_CD_MS = 900;
 
 // Windbreak wall: spawns on the downwind edge right next to the spikes.
-const EG_GUST_BREAK_W = 26;
-const EG_GUST_BREAK_H = 170;
-const EG_GUST_BREAK_CATCH = 12;    // px catch margin around the wall box
-const EG_GUST_BREAK_FADE_MS = 600; // linger after the wind dies, then vanish
+export const EG_GUST_BREAK_W = 26;
+export const EG_GUST_BREAK_H = 170;
+export const EG_GUST_BREAK_CATCH = 12;    // px catch margin around the wall box
+export const EG_GUST_BREAK_FADE_MS = 600; // linger after the wind dies, then vanish
 
 // Wind blades (the boss's direct attack between fronts).
-const EG_GUST_BLADE_INTERVAL = [0, 4200, 3400, 2800, 2300]; // ms by phase
-const EG_GUST_BLADE_SPEED = 520;     // px/s - crosses the arena in ~2.5 s
-const EG_GUST_BLADE_R = 30;          // hit radius
-const EG_GUST_BLADE_DMG = [0, 0.09, 0.10, 0.11, 0.13]; // %maxHP per hit
-const EG_GUST_BLADE_TELL_MS = 500;   // glint at the boss before launch
-const EG_GUST_BLADE_TWIN_P = [0, 0, 0.35, 0.5, 0.65]; // P2+: chance of a second blade on a nearby row
+export const EG_GUST_BLADE_INTERVAL = [0, 4200, 3400, 2800, 2300]; // ms by phase
+export const EG_GUST_BLADE_SPEED = 520;     // px/s - crosses the arena in ~2.5 s
+export const EG_GUST_BLADE_R = 30;          // hit radius
+export const EG_GUST_BLADE_DMG = [0, 0.09, 0.10, 0.11, 0.13]; // %maxHP per hit
+export const EG_GUST_BLADE_TELL_MS = 500;   // glint at the boss before launch
+export const EG_GUST_BLADE_TWIN_P = [0, 0, 0.35, 0.5, 0.65]; // P2+: chance of a second blade on a nearby row
 
 // Tornadoes (HP-gated volleys) - proper storm set-pieces: a tall funnel
 // column that owns its whole swept band, not a small spinning circle.
-const EG_GUST_TORNADO_SPEED = 340;   // px/s (crosses ~1400px in ~4s)
-const EG_GUST_TORNADO_W = 150;       // visual box width - storm-cloud head
-const EG_GUST_TORNADO_H = 320;       // visual funnel height - a wall of wind
-const EG_GUST_TORNADO_HIT_W = 110;   // hit column matches the funnel body
-const EG_GUST_TORNADO_HIT_H = 300;   // the whole funnel height is dangerous
-const EG_GUST_TORNADO_DMG = 0.20;    // heavy hit %maxHP
-const EG_GUST_TORNADO_CD_MS = 900;
-const EG_GUST_TORNADO_WARN_MS = 1600; // edge warning band before each entry
+export const EG_GUST_TORNADO_SPEED = 340;   // px/s (crosses ~1400px in ~4s)
+export const EG_GUST_TORNADO_W = 150;       // visual box width - storm-cloud head
+export const EG_GUST_TORNADO_H = 320;       // visual funnel height - a wall of wind
+export const EG_GUST_TORNADO_HIT_W = 110;   // hit column matches the funnel body
+export const EG_GUST_TORNADO_HIT_H = 300;   // the whole funnel height is dangerous
+export const EG_GUST_TORNADO_DMG = 0.20;    // heavy hit %maxHP
+export const EG_GUST_TORNADO_CD_MS = 900;
+export const EG_GUST_TORNADO_WARN_MS = 1600; // edge warning band before each entry
 // Suction: the funnel drags the player toward it while it is on screen -
 // the set-piece fights you for position. Pull is strongest at the funnel's
 // face and fades with distance; it halves while a storm front blows so
 // wind push + tornado drag can never stack into an unavoidable drift.
-const EG_GUST_TORNADO_PULL = 200;        // px/s at full strength
-const EG_GUST_TORNADO_PULL_INNER = 120;  // px from the column: full pull
-const EG_GUST_TORNADO_PULL_OUTER = 560;  // px from the column: no pull
+export const EG_GUST_TORNADO_PULL = 200;        // px/s at full strength
+export const EG_GUST_TORNADO_PULL_INNER = 120;  // px from the column: full pull
+export const EG_GUST_TORNADO_PULL_OUTER = 560;  // px from the column: no pull
 
 // Boss hover.
-const EG_GUST_BOSS_X_PAD = 110; // px from the right edge
+export const EG_GUST_BOSS_X_PAD = 110; // px from the right edge
 
 
-let _egGustArena = null; // persistent non-dodge run state
-let _egGustWindPause = false; // true while a storm front shoves the player
+export let _egGustArena = null; // persistent non-dodge run state
+export let _egGustWindPause = false; // true while a storm front shoves the player
 
 
 // Read by _egTickPlayer (endgame-encounter.js): freeze the auto-attack bar
 // while a storm front is blowing.
-function _egGustChargePaused() {
+export function _egGustChargePaused() {
     return !!_egGustWindPause;
 }
 
 
-function _egGustSetChargePause(active) {
+export function _egGustSetChargePause(active) {
     _egGustWindPause = !!active;
     const bar = document.getElementById('avatar-charge-fill');
     if (bar) bar.classList.toggle('eg-charge-paused', !!active);
@@ -169,15 +180,15 @@ function _egGustSetChargePause(active) {
 // Which horizontal direction is the player actively steering?
 // Reads the shared held-key set (rebind-aware) with a position-delta
 // fallback, so counter-wind play works with any keybinds.
-let _egGustLastPX = null;
-function _egGustPlayerSteer() {
+export let _egGustLastPX = null;
+export function _egGustPlayerSteer() {
     let left = false, right = false;
     try {
-        const held = (typeof _avatarMoveState !== 'undefined' && _avatarMoveState.held)
-            ? _avatarMoveState.held : null;
+        const held = (typeof _avatarMoveState !== 'undefined' && globalThis._avatarMoveState.held)
+            ? globalThis._avatarMoveState.held : null;
         if (held && held.size) {
-            const lk = (typeof keybindKeyFor === 'function') ? keybindKeyFor('move-left') : 'a';
-            const rk = (typeof keybindKeyFor === 'function') ? keybindKeyFor('move-right') : 'd';
+            const lk = (typeof keybindKeyFor === 'function') ? globalThis.keybindKeyFor('move-left') : 'a';
+            const rk = (typeof keybindKeyFor === 'function') ? globalThis.keybindKeyFor('move-right') : 'd';
             const has = (k) => k != null && held.has(String(k).toLowerCase());
             left = has(lk) || held.has('a') || held.has('arrowleft');
             right = has(rk) || held.has('d') || held.has('arrowright');
@@ -205,20 +216,20 @@ function _egGustPlayerSteer() {
 }
 
 
-function _egGustPhaseOf(monster) {
+export function _egGustPhaseOf(monster) {
     if (monster && monster.bossPhase) return Math.max(1, Math.min(4, monster.bossPhase));
     return 1;
 }
 
 
-function _egGustLiveMonster(monsterId) {
+export function _egGustLiveMonster(monsterId) {
     if (!monsterId || typeof _egMonsters === 'undefined') return null;
-    return _egMonsters.find((m) => m && m.id === monsterId) || null;
+    return globalThis._egMonsters.find((m) => m && m.id === monsterId) || null;
 }
 
 
 // Localized storm-front announcement ({side} → left/right).
-function _egGustWindToast(side) {
+export function _egGustWindToast(side) {
     const key = side === 1 ? 'eg_gust_windcoming_l' : 'eg_gust_windcoming_r';
     let msg = side === 1
         ? '🍃 A storm front gathers from the left!'
@@ -227,7 +238,7 @@ function _egGustWindToast(side) {
         const raw = t(key);
         if (raw && raw !== key) msg = raw;
     } catch (e) {}
-    if (typeof showToast === 'function') showToast(msg);
+    if (typeof showToast === 'function') globalThis.showToast(msg);
 }
 
 
@@ -235,7 +246,7 @@ function _egGustWindToast(side) {
 // walls + edge spikes + wind blades + boss hover + HP-gated tornado volleys.
 // Non-dodge run on purpose, so the scheduled corrupt_cells mechanic and
 // the tornado dodge runs can fire alongside it.
-function _egGustArenaInit(monster) {
+export function _egGustArenaInit(monster) {
     if (_egGustArena) return;
     if (typeof _egNkNewRun !== 'function') return;
     const monsterId = monster ? monster.id : null;
@@ -306,7 +317,7 @@ function _egGustArenaInit(monster) {
 
 // One arena tick. Split from the rAF wrapper so the wrapper can own error
 // visibility (see above).
-function _egGustArenaTick(st, dtS, now) {
+export function _egGustArenaTick(st, dtS, now) {
     const live = _egGustLiveMonster(st.monsterId);
     if (!live) {
         // Grace window: _egMonsters is rebuilt during encounter setup and
@@ -386,7 +397,7 @@ function _egGustArenaTick(st, dtS, now) {
                 // downwind creep, so movement-speed gear can never cancel
                 // the storm (the old flat 0.85× trim let geared players
                 // effectively stand still).
-                const walk = (typeof _avatarGetMoveSpeed === 'function') ? _avatarGetMoveSpeed() : 320;
+                const walk = (typeof _avatarGetMoveSpeed === 'function') ? globalThis._avatarGetMoveSpeed() : 320;
                 const resistFloor = (walk + EG_GUST_MIN_NET_DRIFT) * (wind.ramp || 0);
                 push = Math.max(push * EG_GUST_RESIST_MULT, resistFloor);
             } else if (steer === wind.side) {
@@ -511,7 +522,7 @@ function _egGustArenaTick(st, dtS, now) {
 // Lightning pre-warning: ~2 s before a storm front rolls in, a jagged bolt
 // strikes down the windward edge (CSS flicker animation) with a thunder
 // crack, so the player can pre-position before the shove even announces.
-function _egGustLightningWarn(st, side) {
+export function _egGustLightningWarn(st, side) {
     try {
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gust_thunder');
     } catch (e) {}
@@ -526,7 +537,7 @@ function _egGustLightningWarn(st, side) {
 // Announces a storm front: side streaks light up (CSS body class) and the
 // windbreak wall spawns immediately, so the catch spot is readable before
 // the gale starts shoving after only the short gather preview.
-function _egGustWindStart(st, side, now) {
+export function _egGustWindStart(st, side, now) {
     st.wind = { side, phase: 'warn', t: 0, ramp: 0, wallEl: null, wallDiesAt: Infinity };
     document.body.classList.add(side === 1 ? 'eg-gust-wind-from-left' : 'eg-gust-wind-from-right');
     _egGustWindToast(side);
@@ -547,7 +558,7 @@ function _egGustWindStart(st, side, now) {
 
 
 // Spawns a wind blade: 0.5 s glint at the boss's mouth, then flight.
-function _egGustBlade(st, y) {
+export function _egGustBlade(st, y) {
     const el = _egNkEl(st.run, 'div', 'eg-nk-gust-blade');
     el.classList.add('eg-gust-blade-tell');
     el.style.transform = 'translate(' + Math.round(st.bossX - EG_GUST_BLADE_R) + 'px,' + Math.round(y - EG_GUST_BLADE_R) + 'px)';
@@ -565,7 +576,7 @@ function _egGustBlade(st, y) {
 // Every entry is pre-warned by a pulsing edge line so the choreography is
 // readable before the tornado is even on screen. While a funnel is active
 // it drags the player toward it (see EG_GUST_TORNADO_PULL_*).
-function _egGustFireVolley(monsterId, stage, level, bossX, bossY) {
+export function _egGustFireVolley(monsterId, stage, level, bossX, bossY) {
     if (typeof _egNkNewRun !== 'function') return;
     const run = _egNkNewRun(monsterId, true);
     const lvl = Math.max(1, Math.round(level || 1));
@@ -692,16 +703,16 @@ function _egGustFireVolley(monsterId, stage, level, bossX, bossY) {
 // to the player it touches in flight. The consumed corruption is removed
 // through the shared dispel path so every corruption system stays
 // consistent (spread timers, caps, boss-specific interactions, ...).
-const EG_GUST_DAGGER_EVERY_MS = 900; // ms between conversion attempts during a gale
-const EG_GUST_DAGGER_CHANCE = 0.6;   // per attempt, per still-corrupted cell
-const EG_GUST_DAGGER_SPEED = 480;    // px/s downwind
-const EG_GUST_DAGGER_R = 14;         // approx half the glyph - keeps the visual centered on the hit point
-const EG_GUST_DAGGER_HIT = 0.07;     // %maxHP per dagger touch (shadow)
-const EG_GUST_DAGGER_CD_MS = 700;    // per-dagger hit cooldown
+export const EG_GUST_DAGGER_EVERY_MS = 900; // ms between conversion attempts during a gale
+export const EG_GUST_DAGGER_CHANCE = 0.6;   // per attempt, per still-corrupted cell
+export const EG_GUST_DAGGER_SPEED = 480;    // px/s downwind
+export const EG_GUST_DAGGER_R = 14;         // approx half the glyph - keeps the visual centered on the hit point
+export const EG_GUST_DAGGER_HIT = 0.07;     // %maxHP per dagger touch (shadow)
+export const EG_GUST_DAGGER_CD_MS = 700;    // per-dagger hit cooldown
 
 
 // Converts some currently corrupted cells into flying shadow daggers.
-function _egGustDaggerLaunch(st) {
+export function _egGustDaggerLaunch(st) {
     if (typeof _egBossCorrupted === 'undefined' || !_egBossCorrupted.size) return;
     const keys = Array.from(_egBossCorrupted.keys());
     const side = st.wind.side; // 1 = blows left→right, -1 = right→left
@@ -740,7 +751,7 @@ function _egGustDaggerLaunch(st) {
 
 // Per-frame flight + hit detection for the shadow daggers (runs off the
 // arena tick's dtS / now so pause and teardown behave like every mechanic).
-function _egGustDaggerFly(st, dtS, now, lvl) {
+export function _egGustDaggerFly(st, dtS, now, lvl) {
     const pr = _egNkPlayerRect();
     const W = window.innerWidth;
     for (let i = st.daggers.length - 1; i >= 0; i--) {
@@ -769,7 +780,7 @@ function _egGustDaggerFly(st, dtS, now, lvl) {
 // Defensive teardown for encounter stop / boss death ordering edge cases.
 // The arena run's onKill already clears the charge pause; this covers paths
 // where the run map was cleared first.
-function _egGustTeardown() {
+export function _egGustTeardown() {
     try { _egGustSetChargePause(false); } catch (e) { _egGustWindPause = false; }
     document.body.classList.remove('eg-gust-wind-from-left', 'eg-gust-wind-from-right',
         'eg-gust-spike-hot-l', 'eg-gust-spike-hot-r');

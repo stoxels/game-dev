@@ -1,3 +1,26 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../translation/translations.js';
+import { _egGetMonsterChargeMultiplier, _egGetPlayerChargeMultiplier, _egPlayerStatuses, _egPuzzleEffects, _egRefreshPlayerStatusIcons, _egTickAilments } from './endgame-ailments.js';
+import { _egEndMapDefeated } from './endgame-encounter-chain.js';
+import { _egMaybeShowLowHealthWarning, _egMaybeShowMistakesWarning } from './endgame-encounter-overlays.js';
+import { EG_LIFE_REGEN_INTERVAL_MS, EG_MELEE_OVERCHARGE_RATIO, _egFireMonsterAttack, _egUpdateBars } from './endgame-encounter.js';
+import { _egPauseGridDrops, _egResumeGridDrops } from './endgame-grid-pickups.js';
+import { _egHazardsTick } from './endgame-hazards.js';
+import { _egGetActiveMapModValue, _egHasActiveMapMod } from './endgame-map-launch.js';
+import { _egComputePlayerStats, _egGetPlayerAttackInterval } from './endgame-player-stats.js';
+import { _egIsActive } from './endgame-state.js';
+
+//------------------------------------------------------------------------
+// Phase 3 step 7: live globalThis accessors for externally-mutated state.
+// (derived from write-site audit by dev/scratch/convert-endgame.mjs)
+//------------------------------------------------------------------------
+try { Object.defineProperty(globalThis, '_egLastMistakesRemaining', { get() { return _egLastMistakesRemaining; }, set(v) { _egLastMistakesRemaining = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egLastMistakesWarningShown', { get() { return _egLastMistakesWarningShown; }, set(v) { _egLastMistakesWarningShown = v; }, configurable: true }); } catch (e) {}
+
 //  endgame-encounter-tick.js
 //  COMBAT TICK LOOP - extracted 2026-09-10 from endgame-encounter.js
 //  (tick loop, player/monster charge ticking, charge-pause gates,
@@ -12,7 +35,7 @@
 
 // Advances a single monster's charge bar by one tick (0.1s at 10Hz).
 // Fires the monster's attack when the charge bar fills completely.
-function _egTickMonster(m) {
+export function _egTickMonster(m) {
     // Brutus's sacrificial zombies never attack - they only shamble into the
     // ground-slam band; their movement is driven by the roaming tick in
     // boss-brutus.js, so skip charge/attack entirely.
@@ -40,7 +63,7 @@ function _egTickMonster(m) {
             if (m.bossBaseDamage != null) {
                 m.bossBaseDamage = Math.round(m.bossBaseDamage * (1 + enragePct / 100));
             }
-            showToast(`😡 ${t('eg_mm_toast_enrage') || 'The Boss is enraged!'}`);
+            globalThis.showToast(`😡 ${t('eg_mm_toast_enrage') || 'The Boss is enraged!'}`);
         }
     }
 
@@ -60,7 +83,7 @@ function _egTickMonster(m) {
     // The Marksman's Arrow Gauntlet: the boss's own attack charge freezes -
     // the bow volley IS his attack while the gauntlet holds the arena
     // (boss-marksman.js).
-    if (m.isBoss && typeof _egMarksGauntletChargePaused === 'function' && _egMarksGauntletChargePaused()) return;
+    if (m.isBoss && typeof _egMarksGauntletChargePaused === 'function' && globalThis._egMarksGauntletChargePaused()) return;
     // Ailments: frozen monsters don't charge, chilled ones charge at 50%
     const chargeMult = (typeof _egGetMonsterChargeMultiplier === 'function') ? _egGetMonsterChargeMultiplier(m) : 1;
     m.currentCharge += 0.1 * chargeMult;
@@ -74,27 +97,27 @@ function _egTickMonster(m) {
 // ready for a full-damage strike; above 1 the strike OVERCHARGES (deals
 // proportionally more damage, see EG_MELEE_OVERCHARGE_* in endgame-encounter.js).
 // Returns 0 outside encounters with no max.
-function _egGetPlayerChargePct() {
+export function _egGetPlayerChargePct() {
     if (typeof _egGetPlayerAttackInterval !== 'function') return 0;
     const max = _egGetPlayerAttackInterval();
     if (!max || max <= 0) return 0;
     const cap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
-    return Math.min(cap, Math.max(0, _egPlayerCurrentCharge / max));
+    return Math.min(cap, Math.max(0, globalThis._egPlayerCurrentCharge / max));
 }
 
 // Spends the current charge and returns the consumed % (0..1). Manual
 // melee strikes (E) call this at key-press time; the strike then deals
 // that share of full damage (linear, Secret-of-Mana-style).
-function _egConsumePlayerCharge() {
+export function _egConsumePlayerCharge() {
     const pct = _egGetPlayerChargePct();
-    _egPlayerCurrentCharge = 0;
+    globalThis._egPlayerCurrentCharge = 0;
     return pct;
 }
 
 // True while melee charging is paused: holding the parry key, or frozen
 // solid. Chilled only slows charging (see _egGetPlayerChargeMultiplier).
-function _egIsPlayerChargePaused() {
-    if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return true;
+export function _egIsPlayerChargePaused() {
+    if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) return true;
     if (typeof _egGetPlayerChargeMultiplier === 'function' && _egGetPlayerChargeMultiplier() === 0) return true;
     return false;
 }
@@ -110,10 +133,10 @@ function _egIsPlayerChargePaused() {
 // the bar is a charge-up, not free DPS, so finales no longer freeze it and
 // the sprite never lunges on its own. Only the parry hold and ailments
 // (frozen/chill) still gate charging.
-function _egTickPlayer() {
+export function _egTickPlayer() {
     // Hold-parry pause: while the parry key (R by default) is held during an
     // endgame encounter, freeze the player's own melee charge bar.
-    if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
+    if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) {
         if (typeof _egIsActive === 'function' && _egIsActive()) return;
         // If not in an active encounter, fall through (no effect outside endgame)
     }
@@ -126,11 +149,11 @@ function _egTickPlayer() {
     // Charge past full into OVERCHARGE (up to EG_MELEE_OVERCHARGE_RATIO) and
     // hold there until a manual strike spends it.
     const overchargeCap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
-    _egPlayerCurrentCharge = Math.min(max * overchargeCap, _egPlayerCurrentCharge + 0.1 * chargeMult); // Ticks at 10Hz
+    globalThis._egPlayerCurrentCharge = Math.min(max * overchargeCap, globalThis._egPlayerCurrentCharge + 0.1 * chargeMult); // Ticks at 10Hz
 }
 
 // ── Hold-parry charge pause - freeze own melee charge bar while held ───────
-function _egSetHoldEPauseVisual(isPaused) {
+export function _egSetHoldEPauseVisual(isPaused) {
     const bar = document.getElementById('avatar-charge-fill');
     if (bar) bar.classList.toggle('eg-charge-paused', !!isPaused);
     const alt = document.getElementById('eg-player-charge-bar');
@@ -159,11 +182,11 @@ function _egSetHoldEPauseVisual(isPaused) {
     }
 }
 
-function _initEgHoldEPauseHotkey() {
+export function _initEgHoldEPauseHotkey() {
     // Parry key is configurable (js/keybinds.js, action 'eg-parry', R by
     // default). keydown starts the parry window, keyup ends it.
     const isParryKey = (e) => {
-        if (typeof keybindMatches === 'function') return keybindMatches(e, 'eg-parry');
+        if (typeof keybindMatches === 'function') return globalThis.keybindMatches(e, 'eg-parry');
         return e.key && e.key.toLowerCase() === 'r';
     };
     document.addEventListener('keydown', (e) => {
@@ -171,35 +194,35 @@ function _initEgHoldEPauseHotkey() {
         if (e.repeat) return;
         // The Snail: pressing the parry key drops a held broom (it respawns outside the grid).
         if (typeof _egSnailDropBroom === 'function') {
-            try { _egSnailDropBroom(); } catch (err) {}
+            try { globalThis._egSnailDropBroom(); } catch (err) {}
         }
         const tag = document.activeElement?.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA') return;
         if (document.querySelector('.modal-bg.show')) return;
         if (typeof _egIsActive === 'function' && !_egIsActive()) return;
-        if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return;
-        _egHoldEPauseActive = true;
+        if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) return;
+        globalThis._egHoldEPauseActive = true;
         _egSetHoldEPauseVisual(true);
     });
     document.addEventListener('keyup', (e) => {
         if (!e || !isParryKey(e)) return;
-        if (typeof _egHoldEPauseActive !== 'undefined' && !_egHoldEPauseActive) {
+        if (typeof _egHoldEPauseActive !== 'undefined' && !globalThis._egHoldEPauseActive) {
             _egSetHoldEPauseVisual(false);
             return;
         }
-        _egHoldEPauseActive = false;
+        globalThis._egHoldEPauseActive = false;
         _egSetHoldEPauseVisual(false);
     });
     window.addEventListener('blur', () => {
-        if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
-            _egHoldEPauseActive = false;
+        if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) {
+            globalThis._egHoldEPauseActive = false;
             _egSetHoldEPauseVisual(false);
         }
     });
     // Also clear on encounter stop / visibility loss
     document.addEventListener('visibilitychange', () => {
-        if (document.hidden && typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) {
-            _egHoldEPauseActive = false;
+        if (document.hidden && typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) {
+            globalThis._egHoldEPauseActive = false;
             _egSetHoldEPauseVisual(false);
         }
     });
@@ -212,7 +235,7 @@ _initEgHoldEPauseHotkey();
 // or the lower part of the right-side stack can push that tooltip past the
 // bottom of the screen. On hover we measure the tooltip and, when it would
 // clip the viewport, flip it above the card via .eg-tip-flip.
-const EG_CARD_TOOLTIP_VIEW_MARGIN = 6;
+export const EG_CARD_TOOLTIP_VIEW_MARGIN = 6;
 document.addEventListener('mouseover', (e) => {
     const emoji = e.target && e.target.closest ? e.target.closest('.eg-emoji-wrapper') : null;
     if (!emoji) return;
@@ -237,7 +260,7 @@ document.addEventListener('mouseover', (e) => {
 // bar's paused/ready styling centrally so leftover per-boss 'eg-charge-paused'
 // toggles from the removed set-piece freeze era can't desync the visual:
 // paused reflects ONLY the live pause state (parry hold / frozen).
-function _egUpdatePlayerChargeBar() {
+export function _egUpdatePlayerChargeBar() {
     const pct = _egGetPlayerChargePct();
     const overcharged = pct > 1.001;
     const paused = _egIsPlayerChargePaused();
@@ -261,22 +284,22 @@ function _egUpdatePlayerChargeBar() {
 }
 
 
-function _egGetMaxAllowedMistakes() {
+export function _egGetMaxAllowedMistakes() {
     // Hardcore: no mistake is allowed - overrides map limit and gear bonuses
-    if (typeof curMods !== 'undefined' && curMods.hardcore) return 0;
-    const def = _egMapDef || cur;
+    if (typeof curMods !== 'undefined' && globalThis.curMods.hardcore) return 0;
+    const def = globalThis._egMapDef || globalThis.cur;
     if (!def || def.egMaxMistakes == null) return null;
     const gearBonus = (typeof _egComputePlayerStats === 'function')
         ? (_egComputePlayerStats().mistakeCount || 0) : 0;
     return def.egMaxMistakes + gearBonus;
 }
 
-function _egCheckMistakeLimit() {
+export function _egCheckMistakeLimit() {
     const max = _egGetMaxAllowedMistakes();
     if (max == null) return;
     // Low-mistakes overlay - fires when only 3/2/1/0 remain (deduped inside)
     if (typeof _egMaybeShowMistakesWarning === 'function') _egMaybeShowMistakesWarning();
-    if (typeof mistakeCount !== 'undefined' && mistakeCount > max) {
+    if (typeof mistakeCount !== 'undefined' && globalThis.mistakeCount > max) {
         // Central defeat handler - the player keeps the loot collected so far.
         _egEndMapDefeated(t('eg_map_failed'), t('eg_too_many_mistakes'));
     }
@@ -289,10 +312,10 @@ function _egCheckMistakeLimit() {
 let _egLastMistakesWarningShown = null;
 let _egLastMistakesRemaining = null;
 
-function _egGetMistakesRemaining() {
+export function _egGetMistakesRemaining() {
     const max = _egGetMaxAllowedMistakes();
     if (max == null) return null;
-    const curCount = (typeof mistakeCount !== 'undefined') ? mistakeCount : 0;
+    const curCount = (typeof mistakeCount !== 'undefined') ? globalThis.mistakeCount : 0;
     return max - curCount;
 }
 
@@ -320,36 +343,36 @@ if (typeof _egClearCenterGridBanners !== 'function') {
 
 // Gear: lifeRegen - heals the player for lifeRegen HP once per second
 // while an encounter is running. No-ops at full HP or when dead.
-let _egLastLifeRegenAt = 0;
-function _egTickLifeRegen() {
+export let _egLastLifeRegenAt = 0;
+export function _egTickLifeRegen() {
     const now = Date.now();
     if (now - _egLastLifeRegenAt < EG_LIFE_REGEN_INTERVAL_MS) return;
     _egLastLifeRegenAt = now;
 
     const regen = _egComputePlayerStats().lifeRegen || 0;
-    if (regen <= 0 || playerCurrentHP <= 0 || playerCurrentHP >= playerMaxHP) return;
+    if (regen <= 0 || globalThis.playerCurrentHP <= 0 || globalThis.playerCurrentHP >= globalThis.playerMaxHP) return;
 
     // Active map run: No Life Regeneration - gear regen is disabled.
     if (typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration')) return;
 
-    playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + regen);
-    if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + regen);
+    if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
 // Runs at 10Hz. Advances every monster's charge bar and fires their attack
 // when the bar fills. Also calls _egBossTick for per-tick boss logic.
-function _egTickLoop() {
+export function _egTickLoop() {
     if (!_egIsActive()) return;
-    if (typeof dead !== 'undefined' && dead) return;
-    if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+    if (typeof dead !== 'undefined' && globalThis.dead) return;
+    if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
 
     _egCheckMistakeLimit(); 
     _egMaybeShowLowHealthWarning();
 
-    _egBossTick();
+    globalThis._egBossTick();
     if (typeof _egTickAilments === 'function') _egTickAilments();
     if (typeof _egHazardsTick === 'function') _egHazardsTick();
-    _egMonsters.forEach(_egTickMonster);
+    globalThis._egMonsters.forEach(_egTickMonster);
 
     // Gear: lifeRegen - heals the player once per second
     _egTickLifeRegen();
@@ -361,9 +384,9 @@ function _egTickLoop() {
     if (typeof _egRefreshPlayerStatusIcons === 'function') _egRefreshPlayerStatusIcons();
     // Don't resurrect the sprite after defeat - the tick may have set
     // dead = true mid-iteration (DoT / hazard kill).
-    if (typeof dead !== 'undefined' && dead) return;
+    if (typeof dead !== 'undefined' && globalThis.dead) return;
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
-    _renderPlayerAvatar();
+    globalThis._renderPlayerAvatar();
     //_renderPlayerCharge();
 
     _egUpdateBars();
@@ -375,15 +398,15 @@ function _egTickLoop() {
 // Date.now()-based expiries (boss spawn time, ailments, lockouts, etc.)
 // would otherwise keep advancing wall-clock time while paused, so we shift
 // them forward by the paused duration on resume.
-let _egPauseStartedAt = 0;
-function _egOnPause() {
+export let _egPauseStartedAt = 0;
+export function _egOnPause() {
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     _egPauseStartedAt = Date.now();
     if (typeof _egPauseGridDrops === 'function') {
         try { _egPauseGridDrops(); } catch (e) {}
     }
 }
-function _egOnResume() {
+export function _egOnResume() {
     if (!_egPauseStartedAt) return;
     const delta = Date.now() - _egPauseStartedAt;
     _egPauseStartedAt = 0;
@@ -393,13 +416,13 @@ function _egOnResume() {
         }
         return;
     }
-    _egMonsters.forEach(m => {
+    globalThis._egMonsters.forEach(m => {
         if (m.bossSpawnTime) m.bossSpawnTime += delta;
         if (m.staggeredUntil) m.staggeredUntil += delta;
         if (m.statuses) Object.values(m.statuses).forEach(st => { if (st.until) st.until += delta; });
     });
     if (typeof window._egEncounterStartAt !== 'undefined' && window._egEncounterStartAt) window._egEncounterStartAt += delta;
-    if (typeof _egPlayerBlockLockoutUntil !== 'undefined' && _egPlayerBlockLockoutUntil) _egPlayerBlockLockoutUntil += delta;
+    if (typeof _egPlayerBlockLockoutUntil !== 'undefined' && globalThis._egPlayerBlockLockoutUntil) globalThis._egPlayerBlockLockoutUntil += delta;
     if (typeof _egLastLifeRegenAt !== 'undefined' && _egLastLifeRegenAt) _egLastLifeRegenAt += delta;
     if (typeof _egPlayerStatuses !== 'undefined' && _egPlayerStatuses) {
         Object.values(_egPlayerStatuses).forEach(st => { if (st.until) st.until += delta; });

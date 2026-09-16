@@ -1,4 +1,15 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../../translation/translations.js';
+import { _egRenderPanel } from '../endgame-encounter.js';
+import { _egIsActive } from '../endgame-state.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
+import { _egBlastHudInZone, _egNkAbilityHitToast, _egNkHit, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE FIREFLY (boss_firefly)---------------------
 //------------------------------------------------------------------------
 // The Firefly is an arena-light survival puzzle. The whole screen drowns in
@@ -64,58 +75,58 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 // ── Tuning ────────────────────────────────────────────────────────────────
-const EG_FIREFLY_COUNT = 5;        // the swarm - permanently flying around the keeper
-const EG_FIREFLY_MAX_HP = 3;       // restored on respawn (fairies die outright to trial fails)
-const EG_FIREFLY_RESPAWN_MS = 60000;  // lost lights return after one minute
+export const EG_FIREFLY_COUNT = 5;        // the swarm - permanently flying around the keeper
+export const EG_FIREFLY_MAX_HP = 3;       // restored on respawn (fairies die outright to trial fails)
+export const EG_FIREFLY_RESPAWN_MS = 60000;  // lost lights return after one minute
 // Fairy names so the keeper can tell the swarm apart - shown on the sprites
 // and used in every message that mentions a light.
-const EG_FIREFLY_NAMES = ['Lumina', 'Faye', 'Glimmer', 'Willow', 'Twila'];
-function _egFireflyName(i) {
+export const EG_FIREFLY_NAMES = ['Lumina', 'Faye', 'Glimmer', 'Willow', 'Twila'];
+export function _egFireflyName(i) {
     let list = null;
     try { const raw = t('eg_ff_names'); if (raw && raw !== 'eg_ff_names') list = raw.split(',').map(s => s.trim()); } catch (e) {}
     const names = (list && list.length >= EG_FIREFLY_COUNT) ? list : EG_FIREFLY_NAMES;
     return names[i % names.length];
 }
-const EG_FIREFLY_ORBIT_SPEED = 180;   // px/s while orbiting the keeper
-const EG_FIREFLY_FLY_SPEED = 430;    // px/s on a commanded flight
+export const EG_FIREFLY_ORBIT_SPEED = 180;   // px/s while orbiting the keeper
+export const EG_FIREFLY_FLY_SPEED = 430;    // px/s on a commanded flight
 // Darkness damage: the real threat - the keeper takes heavy ticking damage
 // while NO living fairy's light reaches them. Inside light you are simply
 // safe (fairies never hurt their keeper); straying into the dark to fill a
 // cell is the actual risk, and the veil pulses as a damage tell.
-const EG_FIREFLY_DARK_PCT = 0.03;    // % maxHP/s while fully outside the light
+export const EG_FIREFLY_DARK_PCT = 0.03;    // % maxHP/s while fully outside the light
 // Lumen Burst (the boss's direct attack between trials):
-const EG_FIREFLY_BURST_TELL_MS = 2000;   // tell bloom → detonation
-const EG_FIREFLY_BURST_R = 130;          // detonation radius (keeper + fairies)
-const EG_FIREFLY_BURST_PLAYER_PCT = 0.10; // % maxHP when caught inside
-const EG_FIREFLY_BURST_CHIP = 1;         // fairy HP per burst (3 = fallen)
+export const EG_FIREFLY_BURST_TELL_MS = 2000;   // tell bloom → detonation
+export const EG_FIREFLY_BURST_R = 130;          // detonation radius (keeper + fairies)
+export const EG_FIREFLY_BURST_PLAYER_PCT = 0.10; // % maxHP when caught inside
+export const EG_FIREFLY_BURST_CHIP = 1;         // fairy HP per burst (3 = fallen)
 // Burst cadence per boss phase (1–4), lerped between pairs [phase, ms].
-const EG_FIREFLY_BURST_CADENCE = [0, 5200, 4300, 3400]; // 0 = phase 1 is safe
-const EG_FIREFLY_BURST_TWINS = 2;        // simultaneous bursts in phase 4
-const EG_FIREFLY_HOLE_R = 150;       // fully lit radius in the darkness mask
-const EG_FIREFLY_FEATHER_R = 235;    // feathered falloff radius beyond that
+export const EG_FIREFLY_BURST_CADENCE = [0, 5200, 4300, 3400]; // 0 = phase 1 is safe
+export const EG_FIREFLY_BURST_TWINS = 2;        // simultaneous bursts in phase 4
+export const EG_FIREFLY_HOLE_R = 150;       // fully lit radius in the darkness mask
+export const EG_FIREFLY_FEATHER_R = 235;    // feathered falloff radius beyond that
 // Graduated cluster bonus: every EXTRA fairy inside another's radius widens
 // that fairy's mask hole by this much - 2 huddled fairies light visibly
 // more than one, 3 more than 2, up to the full 5-stack. Both the mask hole
 // and the visible halo div grow, so pool size always tells the truth.
-const EG_FIREFLY_CLUSTER_BONUS_R = 55;
+export const EG_FIREFLY_CLUSTER_BONUS_R = 55;
 // Fairy emblems - the fairy trio 🧚‍♀️🧚🧚‍♂️, cycled across the five fairies
 // (Lumina ♀, Faye neutral, Glimmer ♂, Willow ♀, Twila neutral) so the swarm
 // reads as individual sprites rather than five copies of one glyph.
-const EG_FIREFLY_EMOJIS = ['🧚‍♀️', '🧚', '🧚‍♂️'];
+export const EG_FIREFLY_EMOJIS = ['🧚‍♀️', '🧚', '🧚‍♂️'];
 // Trial placement tolerance (px) + per-fail burst penalties.
-const EG_FIREFLY_TRIAL_TOL = 80;
-const EG_FIREFLY_FAIL_PLAYER_PCT = 0.06;  // burst when the keeper misses their circle
-const EG_FIREFLY_FAIL_LIGHT_PCT = 0.015;  // burst per light that missed its mark
+export const EG_FIREFLY_TRIAL_TOL = 80;
+export const EG_FIREFLY_FAIL_PLAYER_PCT = 0.06;  // burst when the keeper misses their circle
+export const EG_FIREFLY_FAIL_LIGHT_PCT = 0.015;  // burst per light that missed its mark
 
-const _egFireflyRuns = new Map();
-let _egFireflyMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+export const _egFireflyRuns = new Map();
+export let _egFireflyMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 document.addEventListener('mousemove', e => { _egFireflyMouse = { x: e.clientX, y: e.clientY }; }, { passive: true });
 
 // Local template fills: {key} → Special Ability 1, {cycle} → Special
 // Ability 2, {recall} → Special Ability 3, {n}/{s} → numeric values.
 // (_egNkToast only knows {n} baked into the fallback; these need the
 // LIVE keybind label.)
-function _egFireflyText(key, fallback, vals) {
+export function _egFireflyText(key, fallback, vals) {
     let msg = fallback;
     try { const raw = t(key); if (raw && raw !== key) msg = raw; } catch (e) {}
     if (vals) {
@@ -129,14 +140,14 @@ function _egFireflyText(key, fallback, vals) {
     }
     return msg;
 }
-function _egFireflyToast(key, fallback, vals) {
+export function _egFireflyToast(key, fallback, vals) {
     if (typeof showToast !== 'function') return;
-    showToast(_egFireflyText(key, fallback, vals));
+    globalThis.showToast(_egFireflyText(key, fallback, vals));
 }
 
 // ── Fight setup ───────────────────────────────────────────────────────────
 
-function _egFireflyStart(monster) {
+export function _egFireflyStart(monster) {
     _egFireflyTeardown(monster.id);
     const darkness = document.createElement('div'); darkness.className = 'eg-firefly-darkness'; document.body.appendChild(darkness);
     // The mask punches genuine transparent holes through the darkness. A
@@ -191,11 +202,11 @@ function _egFireflyStart(monster) {
     if (center) run.flies.forEach(f => { f.x = center.x; f.y = center.y; });
 
     const keyLabel = (typeof keybindDisplayLabel === 'function')
-        ? keybindDisplayLabel(keybindKeyFor('eg-special')) : 'F';
+        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special')) : 'F';
     const cycleLabel = (typeof keybindDisplayLabel === 'function')
-        ? keybindDisplayLabel(keybindKeyFor('eg-special-2')) : 'G';
+        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special-2')) : 'G';
     const recallLabel = (typeof keybindDisplayLabel === 'function')
-        ? keybindDisplayLabel(keybindKeyFor('eg-special-3')) : 'H';
+        ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special-3')) : 'H';
     run.keyLabel = keyLabel;
     run.flies.forEach(f => { f.keytag.textContent = keyLabel; });
     _egFireflyToast('eg_ff_intro',
@@ -216,12 +227,12 @@ function _egFireflyStart(monster) {
 
 // ── Per-frame tick ────────────────────────────────────────────────────────
 
-function _egFireflyTick(now) {
+export function _egFireflyTick(now) {
     const run = Array.from(_egFireflyRuns.values())[0];
     if (!run) return;
     const dt = Math.min(.05, (now - run.last) / 1000);
     run.last = now;
-    const monster = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(m => m && m.id === run.monsterId) : null;
+    const monster = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(m => m && m.id === run.monsterId) : null;
     if (!monster) { _egFireflyTeardown(run.monsterId); return; }
     const center = _egNkPlayerCenter();
     const aliveFlies = run.flies.filter(f => f.hp > 0);
@@ -315,13 +326,13 @@ function _egFireflyTick(now) {
     // Refresh the command-key labels occasionally (rebinds mid-fight).
     if (run.frame % 60 === 0) {
         const kl = (typeof keybindDisplayLabel === 'function')
-            ? keybindDisplayLabel(keybindKeyFor('eg-special')) : 'F';
+            ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special')) : 'F';
         run.keyLabel = kl;
         if (run.controls) {
             const cl = (typeof keybindDisplayLabel === 'function')
-                ? keybindDisplayLabel(keybindKeyFor('eg-special-2')) : 'G';
+                ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special-2')) : 'G';
             const rl = (typeof keybindDisplayLabel === 'function')
-                ? keybindDisplayLabel(keybindKeyFor('eg-special-3')) : 'H';
+                ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor('eg-special-3')) : 'H';
             run.controls.textContent = _egFireflyText('eg_ff_controls',
                 '✨ [{key}] Send Fairy · [{cycle}] Cycle Fairy · [{recall}] Recall Fairies · [Drag] Move Fairy',
                 { key: kl, cycle: cl, recall: rl });
@@ -346,7 +357,7 @@ function _egFireflyTick(now) {
 
 // ── Darkness mask ─────────────────────────────────────────────────────────
 
-function _egFireflyPaintMask(run) {
+export function _egFireflyPaintMask(run) {
     const w = window.innerWidth, h = window.innerHeight;
     run.svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
     run.maskBase.setAttribute('width', w); run.maskBase.setAttribute('height', h);
@@ -370,7 +381,7 @@ function _egFireflyPaintMask(run) {
 
 // ── Commanding: F key + drag & drop ───────────────────────────────────────
 
-function _egFireflyCommand() {
+export function _egFireflyCommand() {
     // Formation trials are precisely when rapid commands matter most.
     const run = Array.from(_egFireflyRuns.values())[0];
     if (!run || !_egIsActive()) return;
@@ -389,12 +400,26 @@ function _egFireflyCommand() {
     fly.target = { ..._egFireflyMouse };
     return false;
 }
-if (typeof onKeybindAction === 'function') onKeybindAction('eg-special', _egFireflyCommand);
+// Module-eval timing: the import phase runs before concatenated keybinds.js,
+// so registering at top level would silently skip (typeof guard false) and
+// leave F dead. Deferred to DOMContentLoaded - by then the full global
+// surface exists (same fix as the skill-hotbar P bug).
+export function _initEgFireflyHotkeys() {
+    if (typeof globalThis.onKeybindAction !== 'function') return;
+    globalThis.onKeybindAction('eg-special', _egFireflyCommand);
+    globalThis.onKeybindAction('eg-special-2', _egFireflyCycle);
+    globalThis.onKeybindAction('eg-special-3', _egFireflyRecallAll);
+}
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _initEgFireflyHotkeys);
+} else {
+    _initEgFireflyHotkeys();
+}
 
 // G (rebindable - "Endgame Special Ability 2", reserved channel): cycles
 // WHICH fairy the F command controls. The hand-off gets a short flash so
 // the eye catches which fairy just became targeted even mid-trial.
-function _egFireflyCycle() {
+export function _egFireflyCycle() {
     const run = Array.from(_egFireflyRuns.values())[0];
     if (!run || !_egIsActive()) return;
     // Skip fairies that are down; wrap until a living fairy is found.
@@ -413,13 +438,14 @@ function _egFireflyCycle() {
     }
     return false;
 }
-if (typeof onKeybindAction === 'function') onKeybindAction('eg-special-2', _egFireflyCycle);
+// (F/G/H keybind registration lives in _initEgFireflyHotkeys above -
+// deferred to DOMContentLoaded for module-eval timing.)
 
 // H (rebindable - "Endgame Special Ability 3", reserved channel): recalls
 // the WHOLE swarm - every stationed fairy drops its target and resumes its
 // orbit around the keeper. The go-to panic button when the light gets thin
 // or a burst is about to land on a far-flung cluster.
-function _egFireflyRecallAll() {
+export function _egFireflyRecallAll() {
     const run = Array.from(_egFireflyRuns.values())[0];
     if (!run || !_egIsActive()) return;
     let recalled = 0, lastName = '';
@@ -446,9 +472,8 @@ function _egFireflyRecallAll() {
     }
     return false;
 }
-if (typeof onKeybindAction === 'function') onKeybindAction('eg-special-3', _egFireflyRecallAll);
 
-function _egFireflyDragStart(e, run, index) {
+export function _egFireflyDragStart(e, run, index) {
     if (e.button !== 0) return;
     const fly = run.flies[index];
     if (!fly || fly.hp <= 0) return;
@@ -511,7 +536,7 @@ document.addEventListener('pointercancel', () => {
 // ── Lumen Burst (the boss's direct attack between trials) ──────────────
 
 // Current attack phase from boss HP thresholds (mirrors the 75/50/25 rows).
-function _egFireflyBurstPhase(monster) {
+export function _egFireflyBurstPhase(monster) {
     const pct = monster.maxHP > 0 ? monster.currentHP / monster.maxHP : 1;
     if (pct <= .25) return 4;
     if (pct <= .50) return 3;
@@ -519,7 +544,7 @@ function _egFireflyBurstPhase(monster) {
     return 1;
 }
 
-function _egFireflyBurstRemove(run, burst) {
+export function _egFireflyBurstRemove(run, burst) {
     try { burst.tell.remove(); } catch (e) {}
     try { burst.boom.remove(); } catch (e) {}
     if (burst.timer) clearTimeout(burst.timer);
@@ -528,7 +553,7 @@ function _egFireflyBurstRemove(run, burst) {
 // Schedule the next burst wave. Phase 1 (above 75%) is calm; from phase 2
 // on the boss lobs light at the keeper and the biggest fairy cluster, and
 // phase 4 fires twin bursts. One timer only - rescheduling replaces it.
-function _egFireflyBurstSchedule(run, monster, delay) {
+export function _egFireflyBurstSchedule(run, monster, delay) {
     if (run.burstTimer) clearTimeout(run.burstTimer);
     run.burstTimer = null;
     const phase = _egFireflyBurstPhase(monster);
@@ -536,7 +561,7 @@ function _egFireflyBurstSchedule(run, monster, delay) {
     if (!ms) return; // phase 1: no bursts yet
     run.burstTimer = setTimeout(() => {
         run.burstTimer = null;
-        const mon = _egMonsters.find(m => m && m.id === run.monsterId);
+        const mon = globalThis._egMonsters.find(m => m && m.id === run.monsterId);
         if (!mon || run.trial) return; // fight over / set-piece owns the screen
         const count = phase >= 4 ? EG_FIREFLY_BURST_TWINS : 1;
         for (let i = 0; i < count; i++) _egFireflyBurstCast(run, mon, i);
@@ -546,7 +571,7 @@ function _egFireflyBurstSchedule(run, monster, delay) {
 
 // One burst: a growing tell at the target point, then a detonation that
 // sears the keeper and chips every fairy caught inside.
-function _egFireflyBurstCast(run, monster, index) {
+export function _egFireflyBurstCast(run, monster, index) {
     const w = window.innerWidth, h = window.innerHeight;
     const pc = _egNkPlayerCenter();
     let x, y;
@@ -579,7 +604,7 @@ function _egFireflyBurstCast(run, monster, index) {
     burst.timer = setTimeout(() => {
         burst.timer = null;
         boom.classList.add('eg-firefly-burst-fire');
-        const mon = _egMonsters.find(m => m && m.id === run.monsterId);
+        const mon = globalThis._egMonsters.find(m => m && m.id === run.monsterId);
         if (mon) {
             const keeper = _egNkPlayerCenter();
             if (keeper && Math.hypot(keeper.x - x, keeper.y - y) <= EG_FIREFLY_BURST_R) {
@@ -621,7 +646,7 @@ function _egFireflyBurstCast(run, monster, index) {
 // never leaves a circle nobody can fill. Losing a swarm unit still hurts
 // (less light, less flexibility) but a trial is always winnable with the
 // lights you have - no death spiral from a fixed quota you can't reach.
-function _egFireflyTrialLayout(phase, alive) {
+export function _egFireflyTrialLayout(phase, alive) {
     const w = window.innerWidth, h = window.innerHeight;
     const n = Math.max(0, Math.min(EG_FIREFLY_COUNT, Number(alive) || 0));
     if (n <= 0) return { circles: [], you: { x: w * .5, y: h * .7 } }; // all lights down
@@ -647,7 +672,7 @@ function _egFireflyTrialLayout(phase, alive) {
     };
 }
 
-const EG_FIREFLY_TRIALS = {
+export const EG_FIREFLY_TRIALS = {
     2: { seconds: 10, key: 'eg_ff_trial_gather', fallback: 'LIGHTFALL - every light and you into the circle!', severity: 1.0 },
     3: { seconds: 15, key: 'eg_ff_trial_split', fallback: 'SPLIT - lights in two circles, you take the third!', severity: 1.25 },
     4: { seconds: 20, key: 'eg_ff_trial_scatter', fallback: 'SCATTER - one light per mark, you to the last circle!', severity: 1.5 },
@@ -657,13 +682,13 @@ const EG_FIREFLY_TRIALS = {
 // (via the window flag) to freeze the player's charge-up attack bar during
 // the trial - a coordination set-piece, not free auto-attack time, same
 // pattern as the Clock's Time Freeze or the Snail's finisher.
-function _egFireflyTrialActive() {
+export function _egFireflyTrialActive() {
     const run = Array.from(_egFireflyRuns.values())[0];
     return !!(run && run.trial);
 }
 window._egFireflyTrialActive = _egFireflyTrialActive;
 
-function _egFireflyStartTrial(monster, phase) {
+export function _egFireflyStartTrial(monster, phase) {
     const run = _egFireflyRuns.get(monster.id);
     if (!run || run.trial) return;
     const spec = EG_FIREFLY_TRIALS[phase];
@@ -701,13 +726,13 @@ function _egFireflyStartTrial(monster, phase) {
     }, 100);
 }
 
-function _egFireflyInTarget(fly, target) {
+export function _egFireflyInTarget(fly, target) {
     return fly && fly.hp > 0 && Math.hypot(fly.x - target.x, fly.y - target.y) <= EG_FIREFLY_TRIAL_TOL;
 }
 
 // Greedy quota fill: each living light claims the nearest circle that still
 // has free capacity. Lights are interchangeable - only the counts matter.
-function _egFireflyAssignToCircles(run, trial) {
+export function _egFireflyAssignToCircles(run, trial) {
     const capacity = trial.circles.map(c => c.quota);
     const assignment = new Map(); // flyIndex → circleIndex (or -1)
     run.flies.forEach((fly, i) => {
@@ -726,7 +751,7 @@ function _egFireflyAssignToCircles(run, trial) {
     return assignment;
 }
 
-function _egFireflyResolveTrial(monster, run) {
+export function _egFireflyResolveTrial(monster, run) {
     const trial = run.trial; if (!trial) return;
     clearInterval(trial.timer);
     const assignment = _egFireflyAssignToCircles(run, trial);
@@ -777,7 +802,7 @@ function _egFireflyResolveTrial(monster, run) {
     run.bursts.length = 0;
     _egFireflyBurstSchedule(run, monster, 2800);
     setTimeout(() => {
-        if (!_egMonsters.find(m => m.id === monster.id)) return;
+        if (!globalThis._egMonsters.find(m => m.id === monster.id)) return;
         monster.bossImmune = false;
         _egBossScheduleMechanics(monster, monster.bossPhase);
         _egRenderPanel();
@@ -786,7 +811,7 @@ function _egFireflyResolveTrial(monster, run) {
 
 // ── Teardown ──────────────────────────────────────────────────────────────
 
-function _egFireflyTeardown(monsterId) {
+export function _egFireflyTeardown(monsterId) {
     const run = _egFireflyRuns.get(monsterId); if (!run) return;
     run.flies.forEach(f => { if (f._flashTimer) clearTimeout(f._flashTimer); });
     cancelAnimationFrame(run.raf);

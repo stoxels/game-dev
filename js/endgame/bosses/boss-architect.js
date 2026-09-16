@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNewRun, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE ARCHITECT (boss_architect)-----------------------
 //------------------------------------------------------------------------
 // Platforming homage without jumping: four safe platforms hover over a sea
@@ -38,12 +46,12 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egArchitectSpotTaken(spots, x, y, w, h) {
+export function _egArchitectSpotTaken(spots, x, y, w, h) {
     return spots.some(s =>
         x < s.x + s.w + 60 && x + w + 60 > s.x && y < s.y + s.h + 60 && y + h + 60 > s.y);
 }
 
-function _egArchitectNewSpot(spots, w, h) {
+export function _egArchitectNewSpot(spots, w, h) {
     for (let tries = 0; tries < 40; tries++) {
         const x = 40 + Math.random() * Math.max(40, window.innerWidth - w - 80);
         const y = 80 + Math.random() * Math.max(40, window.innerHeight - h - 160);
@@ -55,7 +63,7 @@ function _egArchitectNewSpot(spots, w, h) {
     };
 }
 
-function _egMechRisingPlats(monster, phase) {
+export function _egMechRisingPlats(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const dotPct = [0, 9, 11, 13][p];

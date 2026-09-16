@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkSlamShatter, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE RAZOR (boss_razor)-------------------------
 //------------------------------------------------------------------------
 // TIER 8 REWORK - "The Whetted Edge". The Metal-Man soul, scaled to an
@@ -48,8 +56,8 @@
 
 // DEBUG: slow The Razor's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_RZR_DEBUG_SLOW = true;
-const _EG_RZR_DEBUG_MULT = _EG_RZR_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_RZR_DEBUG_SLOW = true;
+export const _EG_RZR_DEBUG_MULT = _EG_RZR_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_razor: {
@@ -86,7 +94,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_RZR_TOUCH_CD_MS = 700;      // shared touch cooldown
+export const EG_RZR_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -95,8 +103,8 @@ const EG_RZR_TOUCH_CD_MS = 700;      // shared touch cooldown
 
 // Touch damage helper shared by all Razor hazards. Lightning-element boss -
 // hits go in with element 'lightning' so the toast palette stays yellow.
-let _egRzrHitCd = 0;
-function _egRzrTouch(pct, level, label) {
+export let _egRzrHitCd = 0;
+export function _egRzrTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egRzrHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -108,15 +116,15 @@ function _egRzrTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egRzrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egRzrPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Proven reward pattern (Siren echo zones / Swarm royal jelly): heals go
 // through a guarded clamp + rerender.
-function _egRzrHeal(amount) {
+export function _egRzrHeal(amount) {
     if (typeof playerCurrentHP === 'undefined') return;
-    const before = playerCurrentHP;
-    playerCurrentHP = Math.min(playerMaxHP || before, before + amount);
-    if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    const before = globalThis.playerCurrentHP;
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + amount);
+    if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
 
@@ -126,14 +134,14 @@ function _egRzrHeal(amount) {
 // A fan of boomerangs flies out to the far edge, wheels around, and returns
 // along curved arcs that cross each other on the way home. Phase 3: a
 // second fan launches while the first is still returning.
-const EG_RZR_FAN_N     = [0, 4, 5, 6];   // blades per fan, by phase
-const EG_RZR_OUT_SPD   = 340;             // px/s out leg
-const EG_RZR_BACK_SPD  = 400;             // px/s return arc speed
-const EG_RZR_STAGGER_MS = 180;            // throw stagger
-const EG_RZR_OUT_DMG   = [0, 0.12, 0.14, 0.16]; // %maxHP out-leg hit
-const EG_RZR_BACK_DMG  = [0, 0.14, 0.16, 0.18]; // %maxHP return-arc hit
+export const EG_RZR_FAN_N     = [0, 4, 5, 6];   // blades per fan, by phase
+export const EG_RZR_OUT_SPD   = 340;             // px/s out leg
+export const EG_RZR_BACK_SPD  = 400;             // px/s return arc speed
+export const EG_RZR_STAGGER_MS = 180;            // throw stagger
+export const EG_RZR_OUT_DMG   = [0, 0.12, 0.14, 0.16]; // %maxHP out-leg hit
+export const EG_RZR_BACK_DMG  = [0, 0.14, 0.16, 0.18]; // %maxHP return-arc hit
 
-function _egMechRzrCyclone(monster, phase) {
+export function _egMechRzrCyclone(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egRzrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -231,14 +239,14 @@ function _egMechRzrCyclone(monster, phase) {
 // Taut wires snap across the arena, hold, then SNAP - the cut ends whip
 // outward and sting anyone still near the line. Phase 3: five wires, one
 // arrives already taut.
-const EG_RZR_WIRE_N     = [0, 0, 3, 5];  // wires per cast, by phase
-const EG_RZR_WIRE_WARN  = 1400;          // dashed telegraph (ms)
-const EG_RZR_WIRE_HOLD  = 4500;          // taut hold (ms)
-const EG_RZR_WIRE_DPS   = [0, 0, 6.0, 7.5]; // %/s touching a taut wire
-const EG_RZR_WIRE_WHIP  = [0, 0, 0.14, 0.16]; // %maxHP caught by the snap-whip
-const EG_RZR_WHIP_R     = 42;            // whip punish radius (px)
+export const EG_RZR_WIRE_N     = [0, 0, 3, 5];  // wires per cast, by phase
+export const EG_RZR_WIRE_WARN  = 1400;          // dashed telegraph (ms)
+export const EG_RZR_WIRE_HOLD  = 4500;          // taut hold (ms)
+export const EG_RZR_WIRE_DPS   = [0, 0, 6.0, 7.5]; // %/s touching a taut wire
+export const EG_RZR_WIRE_WHIP  = [0, 0, 0.14, 0.16]; // %maxHP caught by the snap-whip
+export const EG_RZR_WHIP_R     = 42;            // whip punish radius (px)
 
-function _egMechRzrWires(monster, phase) {
+export function _egMechRzrWires(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egRzrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -333,17 +341,17 @@ function _egMechRzrWires(monster, phase) {
 // chips anything nearby. Body-check the stone 2× to shatter it (+12% heal)
 // and cancel the cast; fail and the giant scythe crosses the whole arena
 // at your row. Phase 3: the scythe comes back the other way.
-const EG_RZR_HONE_MS    = [0, 0, 7000, 5500]; // hone time by phase
-const EG_RZR_STONE_R    = 58;            // body-check radius
-const EG_RZR_STONE_HP   = 2;             // body-checks to shatter
-const EG_RZR_GRIND_R    = 96;            // grind aura radius
-const EG_RZR_GRIND_DPS  = 3.0;           // %/s standing in the grind aura
-const EG_RZR_SCYTHE_DMG = [0, 0, 0.24, 0.30]; // %maxHP caught by the scythe
-const EG_RZR_SCYTHE_WARN = 1100;         // telegraph before the sweep
-const EG_RZR_SCYTHE_SPD = 1100;          // px/s blade travel
-const EG_RZR_HEAL_CANCEL = 0.12;         // %maxHP heal for shattering the stone
+export const EG_RZR_HONE_MS    = [0, 0, 7000, 5500]; // hone time by phase
+export const EG_RZR_STONE_R    = 58;            // body-check radius
+export const EG_RZR_STONE_HP   = 2;             // body-checks to shatter
+export const EG_RZR_GRIND_R    = 96;            // grind aura radius
+export const EG_RZR_GRIND_DPS  = 3.0;           // %/s standing in the grind aura
+export const EG_RZR_SCYTHE_DMG = [0, 0, 0.24, 0.30]; // %maxHP caught by the scythe
+export const EG_RZR_SCYTHE_WARN = 1100;         // telegraph before the sweep
+export const EG_RZR_SCYTHE_SPD = 1100;          // px/s blade travel
+export const EG_RZR_HEAL_CANCEL = 0.12;         // %maxHP heal for shattering the stone
 
-function _egMechRzrHone(monster, phase) {
+export function _egMechRzrHone(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egRzrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -482,34 +490,34 @@ function _egMechRzrHone(monster, phase) {
 // condense into THE LAST EDGE - one full-screen scythe with a single safe
 // pocket: the whetstone's grind aura (which chips you while you stand in
 // it). Charge bar frozen (gate in _egTickPlayer via _egRzrFinalActive).
-const EG_RZR_SPOKES      = 9;       // spokes on the clock
-const EG_RZR_SPOKE_LEN_F = 0.46;    // spoke length × min(W,H)
-const EG_RZR_SPOKE_DPS   = 8.0;     // %/s touching a spoke
-const EG_RZR_CYCLES      = 3;       // rotation cycles before THE LAST EDGE
-const EG_RZR_CYCLE_MS    = 6000;    // cycle length (reverse at the midpoint)
-const EG_RZR_REV_SPD     = 22;      // deg/s spoke rotation
-const EG_RZR_FAN_BLADES  = 2;       // rim-fan blades per reversal
-const EG_RZR_LAST_DMG    = 0.35;    // %maxHP outside the safe pocket
-const EG_RZR_POCKET_R    = 110;     // safe pocket radius (the grind aura)
-const EG_RZR_POCKET_DPS  = 2.5;     // %/s chip inside the safe pocket
-const EG_RZR_FAILSAFE_MS = 30000;   // hard cap on the set-piece
+export const EG_RZR_SPOKES      = 9;       // spokes on the clock
+export const EG_RZR_SPOKE_LEN_F = 0.46;    // spoke length × min(W,H)
+export const EG_RZR_SPOKE_DPS   = 8.0;     // %/s touching a spoke
+export const EG_RZR_CYCLES      = 3;       // rotation cycles before THE LAST EDGE
+export const EG_RZR_CYCLE_MS    = 6000;    // cycle length (reverse at the midpoint)
+export const EG_RZR_REV_SPD     = 22;      // deg/s spoke rotation
+export const EG_RZR_FAN_BLADES  = 2;       // rim-fan blades per reversal
+export const EG_RZR_LAST_DMG    = 0.35;    // %maxHP outside the safe pocket
+export const EG_RZR_POCKET_R    = 110;     // safe pocket radius (the grind aura)
+export const EG_RZR_POCKET_DPS  = 2.5;     // %/s chip inside the safe pocket
+export const EG_RZR_FAILSAFE_MS = 30000;   // hard cap on the set-piece
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egRzrFinal = null;
+export let _egRzrFinal = null;
 
-function _egRzrFinalActive() {
+export function _egRzrFinalActive() {
     return !!_egRzrFinal && !_egRzrFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egRzrOnPhaseEnter(monster, newPhase) {
+export function _egRzrOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egRzrEnsureFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egRzrEnsureFinalWatcher(monster) {
+export function _egRzrEnsureFinalWatcher(monster) {
     if (!monster || _egRzrFinal || _egRzrWatcherRun) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -525,10 +533,10 @@ function _egRzrEnsureFinalWatcher(monster) {
         return true;
     });
 }
-let _egRzrWatcherRun = null;
+export let _egRzrWatcherRun = null;
 
 // Pause-safe timeout (mirrors the other finales).
-function _egRzrAfter(g, ms, fn) {
+export function _egRzrAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egRzrFinal) return;
@@ -539,7 +547,7 @@ function _egRzrAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egRzrFinalStart(monster) {
+export function _egRzrFinalStart(monster) {
     if (_egRzrFinal || !monster) return;
 
     // The Razor clears the arena for the bladestorm: kill every other run
@@ -737,7 +745,7 @@ function _egRzrFinalStart(monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egRzrFinalEnd(g, monster) {
+export function _egRzrFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -755,7 +763,7 @@ function _egRzrFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -767,7 +775,7 @@ function _egRzrFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egRzrTeardown() {
+export function _egRzrTeardown() {
     if (_egRzrFinal) { try { _egRzrFinalEnd(_egRzrFinal, null); } catch (e) {} _egRzrFinal = null; }
     _egRzrWatcherRun = null;
     document.querySelectorAll('.eg-rzr-blade, .eg-rzr-anchor, .eg-rzr-wire, .eg-rzr-whip-seg, ' +
@@ -792,7 +800,7 @@ if (typeof window !== 'undefined') {
     window._EG_RZR_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_razor') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_razor') : null;
             if (!monster) return 'no razor alive';
             const fn = name === 'cyclone' ? _egMechRzrCyclone
                 : name === 'wires' ? _egMechRzrWires
@@ -804,7 +812,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_razor') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_razor') : null;
             if (!monster) return 'no razor alive';
             _egRzrFinalStart(monster);
             return 'A THOUSAND EDGES started';

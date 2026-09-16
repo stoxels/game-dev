@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE COLOSSUS (boss_colossus)--------------------
 //------------------------------------------------------------------------
 // TIER 7 REWORK - "The Mountain That Walks". The boss is scenery that
@@ -39,8 +47,8 @@
 
 // DEBUG: slow the Colossus' timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_COLO_DEBUG_SLOW = true;
-const _EG_COLO_DEBUG_MULT = _EG_COLO_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_COLO_DEBUG_SLOW = true;
+export const _EG_COLO_DEBUG_MULT = _EG_COLO_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_colossus: {
@@ -73,16 +81,16 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_COLO_FOOT_DMG   = [0, 0.15, 0.17, 0.20]; // %maxHP footprint slam band
-const EG_COLO_WAVE_DMG   = [0, 0.18, 0.21, 0.25]; // %maxHP shockwave ring
-const EG_COLO_BOULDER_DMG = 0.16;                 // %maxHP boulder impact
-const EG_COLO_FRAG_DMG   = 0.12;                  // %maxHP rolling fragment
-const EG_COLO_GOLEM_DMG  = 0.14;                  // %maxHP golem push
-const EG_COLO_CHUTE_DMG  = [0, 0, 0.10, 0.12];    // %maxHP rock chute (finale)
-const EG_COLO_SEAL_HITS  = 3;                     // body-checks per joint seal
-const EG_COLO_CHARGE_DMG = 0.22;                  // %maxHP failing a seal wave
-const EG_COLO_CAVEIN_DMG = 0.35;                  // %maxHP the CAVE-IN
-const EG_COLO_HIT_CD_MS  = 700;                   // shared touch cooldown
+export const EG_COLO_FOOT_DMG   = [0, 0.15, 0.17, 0.20]; // %maxHP footprint slam band
+export const EG_COLO_WAVE_DMG   = [0, 0.18, 0.21, 0.25]; // %maxHP shockwave ring
+export const EG_COLO_BOULDER_DMG = 0.16;                 // %maxHP boulder impact
+export const EG_COLO_FRAG_DMG   = 0.12;                  // %maxHP rolling fragment
+export const EG_COLO_GOLEM_DMG  = 0.14;                  // %maxHP golem push
+export const EG_COLO_CHUTE_DMG  = [0, 0, 0.10, 0.12];    // %maxHP rock chute (finale)
+export const EG_COLO_SEAL_HITS  = 3;                     // body-checks per joint seal
+export const EG_COLO_CHARGE_DMG = 0.22;                  // %maxHP failing a seal wave
+export const EG_COLO_CAVEIN_DMG = 0.35;                  // %maxHP the CAVE-IN
+export const EG_COLO_HIT_CD_MS  = 700;                   // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -91,8 +99,8 @@ const EG_COLO_HIT_CD_MS  = 700;                   // shared touch cooldown
 
 // Touch damage helper shared by all Colossus hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egColoHitCd = 0;
-function _egColoTouch(pct, level, label) {
+export let _egColoHitCd = 0;
+export function _egColoTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egColoHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -104,10 +112,10 @@ function _egColoTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egColoPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egColoPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Rock chip burst at a spot (visual only).
-function _egColoRubble(run, x, y, big) {
+export function _egColoRubble(run, x, y, big) {
     for (let i = 0; i < (big ? 6 : 3); i++) {
         const el = _egNkEl(run, 'div', 'eg-colo-chip');
         el.style.left = Math.round(x + (Math.random() * 40 - 20)) + 'px';
@@ -118,7 +126,7 @@ function _egColoRubble(run, x, y, big) {
 }
 
 // Screen shake: quick translate jitter on the body (finale slump feedback).
-function _egColoShake(intensity) {
+export function _egColoShake(intensity) {
     const body = document.body;
     const frames = 12;
     let i = 0;
@@ -140,12 +148,12 @@ function _egColoShake(intensity) {
 // (each: a rounded band telegraph, then the slam), and each slam rolls a
 // full-screen shockwave ring with a jump-window gap between band and fade.
 // Phase 3: the stride path runs diagonally instead of horizontally.
-const EG_COLO_STRIDE_STEPS = 2;      // footprints per stride
-const EG_COLO_FOOT_WARN_MS = 1000;   // footprint telegraph
-const EG_COLO_WAVE_SPEED = 520;      // px/s shockwave expansion (divided by mult)
-const EG_COLO_WAVE_MAX_FRAC = 0.75;  // of the larger screen dimension
+export const EG_COLO_STRIDE_STEPS = 2;      // footprints per stride
+export const EG_COLO_FOOT_WARN_MS = 1000;   // footprint telegraph
+export const EG_COLO_WAVE_SPEED = 520;      // px/s shockwave expansion (divided by mult)
+export const EG_COLO_WAVE_MAX_FRAC = 0.75;  // of the larger screen dimension
 
-function _egMechSeismicSlam(monster, phase) {
+export function _egMechSeismicSlam(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -240,11 +248,11 @@ function _egMechSeismicSlam(monster, phase) {
 // The shoulder quarries hurl boulders that arc in and SHATTER into rolling
 // fragments that keep travelling outward. Dodge the impact ring AND the
 // fragment lanes. Phase 3 lobs an extra boulder.
-const EG_BOULDER_COUNT   = [0, 0, 3, 4];
-const EG_BOULDER_FALL_MS = 1500;   // telegraph before impact
-const EG_BOULDER_FRAGS   = 4;      // rolling fragments per boulder
+export const EG_BOULDER_COUNT   = [0, 0, 3, 4];
+export const EG_BOULDER_FALL_MS = 1500;   // telegraph before impact
+export const EG_BOULDER_FRAGS   = 4;      // rolling fragments per boulder
 
-function _egMechColoBoulders(monster, phase) {
+export function _egMechColoBoulders(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
@@ -333,12 +341,12 @@ function _egMechColoBoulders(monster, phase) {
 // moving walls that pin you into stride telegraphs. Body-check a golem 3×
 // (crack stages, like the Shaper's monoliths) to crumble it early; they
 // crumble on their own after ~9s.
-const EG_GOLEM_COUNT     = [0, 0, 2, 2];
-const EG_GOLEM_SPEED     = 62;      // px/s push (divided by mult)
-const EG_GOLEM_HITS      = 3;
-const EG_GOLEM_LIFE_MS   = 9000;
+export const EG_GOLEM_COUNT     = [0, 0, 2, 2];
+export const EG_GOLEM_SPEED     = 62;      // px/s push (divided by mult)
+export const EG_GOLEM_HITS      = 3;
+export const EG_GOLEM_LIFE_MS   = 9000;
 
-function _egMechColoGolems(monster, phase) {
+export function _egMechColoGolems(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
@@ -426,26 +434,26 @@ function _egMechColoGolems(monster, phase) {
 // timer → CAVE-IN: full-arena dust except one lit seal ring (35%).
 // Charge bar frozen for the whole set-piece (gate in _egTickPlayer via
 // _egColoFinalActive).
-const EG_COLO_FINALE_SEAL_MS   = 22000;  // ms budget per seal (incl. chutes)
-const EG_COLO_CHUTE_PERIOD_MS  = 2600;   // a chute lane every ~2.6s
-const EG_COLO_CHUTE_WARN_MS    = 900;    // lane telegraph before rocks
+export const EG_COLO_FINALE_SEAL_MS   = 22000;  // ms budget per seal (incl. chutes)
+export const EG_COLO_CHUTE_PERIOD_MS  = 2600;   // a chute lane every ~2.6s
+export const EG_COLO_CHUTE_WARN_MS    = 900;    // lane telegraph before rocks
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egColoFinal = null;
+export let _egColoFinal = null;
 
-function _egColoFinalActive() {
+export function _egColoFinalActive() {
     return !!_egColoFinal && !_egColoFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egColoOnPhaseEnter(monster, newPhase) {
+export function _egColoOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egColoStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egColoStartFinalWatcher(monster) {
+export function _egColoStartFinalWatcher(monster) {
     if (!monster || _egColoFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -463,7 +471,7 @@ function _egColoStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-function _egColoAfter(g, ms, fn) {
+export function _egColoAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egColoFinal) return;
@@ -474,7 +482,7 @@ function _egColoAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egColoFinalStart(monster) {
+export function _egColoFinalStart(monster) {
     if (_egColoFinal || !monster) return;
 
     // The mountain goes quiet: kill every other run of this boss (the
@@ -659,7 +667,7 @@ function _egColoFinalStart(monster) {
 
 // CAVE-IN: the failed finale's punish - dust wipes the arena except the
 // ring around the last seal (35% if you're outside it).
-function _egColoCaveIn(g, seal, level) {
+export function _egColoCaveIn(g, seal, level) {
     if (g.finished) return;
     const dust = document.createElement('div');
     dust.className = 'eg-colo-cavein';
@@ -677,7 +685,7 @@ function _egColoCaveIn(g, seal, level) {
 }
 
 // Ends the finale: collapse (seals broken) - releases immunity + charge bar.
-function _egColoFinalEnd(g, monster, collapsed) {
+export function _egColoFinalEnd(g, monster, collapsed) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -696,7 +704,7 @@ function _egColoFinalEnd(g, monster, collapsed) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     if (collapsed) {
@@ -714,7 +722,7 @@ function _egColoFinalEnd(g, monster, collapsed) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egColoTeardown() {
+export function _egColoTeardown() {
     if (_egColoFinal) { try { _egColoFinalEnd(_egColoFinal, null, false); } catch (e) {} _egColoFinal = null; }
     document.querySelectorAll('.eg-colo-foot-warn, .eg-colo-foot-slam, .eg-colo-wave, ' +
         '.eg-colo-boulder, .eg-colo-frag, .eg-colo-golem, .eg-colo-chip, ' +
@@ -739,7 +747,7 @@ if (typeof window !== 'undefined') {
     window._EG_COLO_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_colossus') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_colossus') : null;
             if (!monster) return 'no colossus alive';
             const fn = name === 'stride' ? _egMechSeismicSlam
                 : name === 'boulders' ? _egMechColoBoulders
@@ -751,7 +759,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_colossus') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_colossus') : null;
             if (!monster) return 'no colossus alive';
             _egColoFinalStart(monster);
             return 'TITAN\u2019S FALL started';

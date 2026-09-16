@@ -1,13 +1,21 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { hideModal, showModal } from './screens/screens.js';
+import { t } from './translation/translations.js';
+
+//------------------------------------------------------------------------
 //----------------------CONSTANTS & STATE----------------------------------
 //------------------------------------------------------------------------
 
 // Currently selected difficulty tier. Drives penalty timing and score mult.
-let curDiff = 'normal';
+export let curDiff = 'normal';
 
 // Per-difficulty config: scoreMult applied to final score, pens = mistake
 // penalty (seconds) at 1st/2nd/3rd/4th+ wrong fill.
-const DIFF_CFG = {
+export const DIFF_CFG = {
     easy: { scoreMult: 0.5, pens: [15, 30, 45, 60] },
     normal: { scoreMult: 1, pens: [40, 80, 120, 150] },
     hard: { scoreMult: 1.5, pens: [75, 150, 225, 300] },
@@ -17,10 +25,10 @@ const DIFF_CFG = {
 // checks below - order here also determines score-multiplier application
 // order, so don't reorder without checking scoreMultiplier().
 // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
-let curMods = { timetrial: false, hardcore: false, ironman: false, classless: false, treeless: false, superTutor: false };
+export let curMods = { timetrial: false, hardcore: false, ironman: false, classless: false, treeless: false, superTutor: false };
 
 // Score multiplier applied per active modifier (stacks multiplicatively).
-const MOD_MULT = {
+export const MOD_MULT = {
     timetrial: 1.2,
     hardcore: 1.3,
     ironman: 1.15,
@@ -33,7 +41,7 @@ const MOD_MULT = {
 // used everywhere else (timetrial, hardcore, ironman, classless, treeless).
 // Values are i18n keys resolved through t() at render time (see updModDesc),
 // so a language switch is always reflected.
-const MOD_SCROLL_TEXT_KEYS = {
+export const MOD_SCROLL_TEXT_KEYS = {
     timetrial: 'scr_mod_scroll_tt',
     hardcore: 'scr_mod_scroll_hc',
     ironman: 'scr_mod_scroll_im',
@@ -47,7 +55,7 @@ const MOD_SCROLL_TEXT_KEYS = {
 //------------------------------------------------------------------------
 
 // Refreshes the difficulty description ribbon to match curDiff.
-function updDiffDesc() {
+export function updDiffDesc() {
     const el = document.getElementById('diff-desc');
     if (el) el.textContent = t('diff_desc_' + curDiff);
 }
@@ -56,7 +64,7 @@ function updDiffDesc() {
 // the description ribbon. Highlighting is applied to ALL [data-diff]
 // buttons on the page (setup screen + retry modal) so duplicates stay
 // in sync.
-function selDiff(btn) {
+export function selDiff(btn) {
     curDiff = btn.dataset.diff;
     syncDiffModButtons();
     updDiffDesc();
@@ -71,7 +79,7 @@ function selDiff(btn) {
 // lines for every currently-active modifier.
 // Per-tombstone descriptions are handled separately by CSS
 // (.sel-yellow .mod-per-desc), so this only touches the scroll text.
-function updModDesc() {
+export function updModDesc() {
     const el = document.getElementById('active-mods-text');
     if (!el) return;
 
@@ -88,7 +96,7 @@ function updModDesc() {
 // Toggles a modifier on/off from its button, updates the yellow highlight
 // state of every matching [data-mod] button (setup screen + retry modal)
 // and refreshes the active-modifiers description.
-function togMod(btn) {
+export function togMod(btn) {
     const m = btn.dataset.mod;
     curMods[m] = !curMods[m];
     syncDiffModButtons();
@@ -97,7 +105,7 @@ function togMod(btn) {
 
 // Refreshes the .sel / .sel-yellow highlighting of every difficulty and
 // modifier button on the page from the current curDiff / curMods state.
-function syncDiffModButtons() {
+export function syncDiffModButtons() {
     document.querySelectorAll('[data-diff]').forEach(b =>
         b.classList.toggle('sel', b.dataset.diff === curDiff));
     document.querySelectorAll('[data-mod]').forEach(b =>
@@ -113,7 +121,7 @@ function syncDiffModButtons() {
 // modifier's multiplier. Iterates curMods in its declared key order
 // (timetrial, hardcore, ironman, classless, treeless) to keep the
 // multiplication order identical to the old explicit if-chain.
-function scoreMultiplier() {
+export function scoreMultiplier() {
     const diffCfg = DIFF_CFG[curDiff] || DIFF_CFG.normal;
     let mult = Number(diffCfg.scoreMult);
     Object.keys(curMods)
@@ -128,10 +136,10 @@ function scoreMultiplier() {
 //------------------------------------------------------------------------
 
 // Returns true when class abilities/passives should be fully suppressed.
-function isClassless() { return !!curMods.classless; }
+export function isClassless() { return !!curMods.classless; }
 
 // Returns true when passive tree nodes should be treated as unallocated.
-function isTreeless() { return !!curMods.treeless; }
+export function isTreeless() { return !!curMods.treeless; }
 
 
 //------------------------------------------------------------------------
@@ -141,18 +149,18 @@ function isTreeless() { return !!curMods.treeless; }
 // Snapshot of the player's original difficulty/modifiers while a
 // "retry with other settings" run (started from the win overlay) is in
 // flight. null = no such run is currently active.
-let _retrySetupOriginal = null;
+export let _retrySetupOriginal = null;
 
 // True while the player is replaying a level with settings that differ
 // from their standing setup and haven't yet decided whether to keep them.
-function retrySetupIsActive() {
+export function retrySetupIsActive() {
     return _retrySetupOriginal !== null;
 }
 
 // Opens the "retry with new settings" modal from the win overlay.
 // Snapshots the current setup once, so it can be restored later if the
 // player chooses to revert after finishing/failing the retried level.
-function openRetrySetupModal() {
+export function openRetrySetupModal() {
     if (!retrySetupIsActive()) {
         _retrySetupOriginal = { diff: curDiff, mods: { ...curMods } };
     }
@@ -163,7 +171,7 @@ function openRetrySetupModal() {
 // Dismisses the setup modal WITHOUT starting the retry. Drops the
 // snapshot and undoes any difficulty/modifier selections the player may
 // have previewed inside the modal, so their standing setup is untouched.
-function cancelRetrySetupModal() {
+export function cancelRetrySetupModal() {
     const orig = _retrySetupOriginal;
     _retrySetupOriginal = null;
     hideModal('retry-setup-modal');
@@ -179,7 +187,7 @@ function cancelRetrySetupModal() {
 
 // Marks a retry-with-new-settings run as started. Called right before
 // replayLevel() so the end-of-level prompt knows to appear afterwards.
-function beginRetrySetupRun() {
+export function beginRetrySetupRun() {
     if (!retrySetupIsActive()) {
         _retrySetupOriginal = { diff: curDiff, mods: { ...curMods } };
     }
@@ -189,7 +197,7 @@ function beginRetrySetupRun() {
 // retried level. keep = true leaves the newly selected difficulty/modifiers
 // in place; keep = false restores the snapshot taken when the run started
 // and refreshes every settings-dependent UI element.
-function retrySetupResolve(keep) {
+export function retrySetupResolve(keep) {
     hideModal('retry-keep-modal');
     const orig = _retrySetupOriginal;
     _retrySetupOriginal = null;
@@ -205,7 +213,7 @@ function retrySetupResolve(keep) {
 
 // Modifier key -> i18n key for the short button labels, used to render the
 // keep-modal setup comparison in the active language.
-const RETRY_SETUP_MOD_LABEL_KEYS = {
+export const RETRY_SETUP_MOD_LABEL_KEYS = {
     timetrial: 'mod_tt',
     hardcore: 'mod_hc',
     ironman: 'mod_im',
@@ -218,7 +226,7 @@ const RETRY_SETUP_MOD_LABEL_KEYS = {
 // "Hard + Hardcore, Ironman" or "Normal (no modifiers)". Used for the
 // keep-modal NEW vs PREVIOUS comparison so the player sees exactly what
 // each choice would keep or restore.
-function formatRetrySetup(diff, mods) {
+export function formatRetrySetup(diff, mods) {
     const diffLabel = t('diff_' + diff);
     const activeMods = Object.keys(mods || {})
         .filter(m => mods[m])
@@ -234,7 +242,7 @@ function formatRetrySetup(diff, mods) {
 // Refreshes the NEW vs PREVIOUS comparison lines inside #retry-keep-modal
 // from the live selection (new) and the snapshot (previous). Called right
 // before the modal is shown so a mid-run language switch is also reflected.
-function updateRetryKeepModal() {
+export function updateRetryKeepModal() {
     const orig = _retrySetupOriginal;
     if (!orig) return;
     const newEl = document.getElementById('retry-keep-new');
@@ -248,6 +256,6 @@ function updateRetryKeepModal() {
 // the prompt will reappear after the next win/fail until the player finally
 // picks KEEP or REVERT. This is the "try the new setup again, decide later"
 // escape hatch for e.g. repeated hardcore fails.
-function retrySetupDefer() {
+export function retrySetupDefer() {
     hideModal('retry-keep-modal');
 }

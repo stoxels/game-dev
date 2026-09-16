@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { t } from '../../translation/translations.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE MARKSMAN (boss_marksman)---------------------------
 //------------------------------------------------------------------------
 // Aimed strikes land where you stand - never stand still.
@@ -53,31 +63,31 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Marked Strikes tuning ───────────────────────────────────────────────
-const EG_MARKS_SHOTS = [0, 4, 4, 6];        // volleys per cast by phase
-const EG_MARKS_INTERVAL_MS = 1500;          // ms between volleys
-const EG_MARKS_AIM_MS = 900;                // crosshair lock → arrow release
-const EG_MARKS_FLIGHT_MS = 620;             // arrow arc duration (release → impact)
-const EG_MARKS_RADIUS = 70;                 // impact circle radius
-const EG_MARKS_DMG = [0, 0.10, 0.12, 0.15]; // %maxHP per impact (lightning)
+export const EG_MARKS_SHOTS = [0, 4, 4, 6];        // volleys per cast by phase
+export const EG_MARKS_INTERVAL_MS = 1500;          // ms between volleys
+export const EG_MARKS_AIM_MS = 900;                // crosshair lock → arrow release
+export const EG_MARKS_FLIGHT_MS = 620;             // arrow arc duration (release → impact)
+export const EG_MARKS_RADIUS = 70;                 // impact circle radius
+export const EG_MARKS_DMG = [0, 0.10, 0.12, 0.15]; // %maxHP per impact (lightning)
 
 // ── Arrow Gauntlet tuning ───────────────────────────────────────────────
-const EG_GAUNTLET_PCTS = [0.66, 0.33];      // HP gates: stage 2 at 66%, stage 3 at 33%
-const EG_GAUNTLET_CD_SEC = 5;               // 5-4-3-2-1 countdown
-const EG_GAUNTLET_SPEED = [0, 0, 360, 460]; // arrow px/s - 66% easy, 33% hard
-const EG_GAUNTLET_HIT = [0, 0, 0.16, 0.22]; // %maxHP per arrow - HEAVY physical
-const EG_GAUNTLET_HIT_CD_MS = 450;          // global player hit cooldown
-const EG_GAUNTLET_ARROW_GAP = 52;           // px between arrows in a wall
-const EG_GAUNTLET_WALL_T = 34;              // wall thickness (bows box)
-const EG_GAUNTLET_ARM_LEAD_MS = 550;        // bows glow this long before their volley releases
+export const EG_GAUNTLET_PCTS = [0.66, 0.33];      // HP gates: stage 2 at 66%, stage 3 at 33%
+export const EG_GAUNTLET_CD_SEC = 5;               // 5-4-3-2-1 countdown
+export const EG_GAUNTLET_SPEED = [0, 0, 360, 460]; // arrow px/s - 66% easy, 33% hard
+export const EG_GAUNTLET_HIT = [0, 0, 0.16, 0.22]; // %maxHP per arrow - HEAVY physical
+export const EG_GAUNTLET_HIT_CD_MS = 450;          // global player hit cooldown
+export const EG_GAUNTLET_ARROW_GAP = 52;           // px between arrows in a wall
+export const EG_GAUNTLET_WALL_T = 34;              // wall thickness (bows box)
+export const EG_GAUNTLET_ARM_LEAD_MS = 550;        // bows glow this long before their volley releases
 
 
-let _egMarksWatcher = null;  // per-fight HP-gate watcher state
-let _egMarksGauntlet = null; // non-null while a gauntlet (countdown + waves) runs
+export let _egMarksWatcher = null;  // per-fight HP-gate watcher state
+export let _egMarksGauntlet = null; // non-null while a gauntlet (countdown + waves) runs
 
 
 // Read by endgame-encounter.js: the whole gauntlet - countdown AND waves -
 // is a dodge set-piece, so the auto-attack charge bar stays paused.
-function _egMarksGauntletChargePaused() {
+export function _egMarksGauntletChargePaused() {
     return !!_egMarksGauntlet;
 }
 
@@ -85,9 +95,9 @@ function _egMarksGauntletChargePaused() {
 // The gauntlet makes the boss temporarily immune. Applied/restored via
 // explicit flags so it composes with (never clobbers) the framework's own
 // phase-transition immunity windows: we only ever clear what we set.
-function _egMarksGauntletApplyImmunity(monsterId) {
-    const m = (typeof _egMonsters !== 'undefined' && _egMonsters)
-        ? _egMonsters.find(x => x && x.id === monsterId) : null;
+export function _egMarksGauntletApplyImmunity(monsterId) {
+    const m = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+        ? globalThis._egMonsters.find(x => x && x.id === monsterId) : null;
     if (!m) return;
     if (!m._egMarksImmuneApplied) {
         m._egMarksImmuneApplied = true;
@@ -100,9 +110,9 @@ function _egMarksGauntletApplyImmunity(monsterId) {
 // Releases ONLY the immunity this system applied (framework windows,
 // e.g. a phase transition that ends after the gauntlet, stay untouched).
 // Safe on every path - missing monster (boss died) is a no-op.
-function _egMarksGauntletReleaseImmunity(monsterId) {
-    const m = (typeof _egMonsters !== 'undefined' && _egMonsters)
-        ? _egMonsters.find(x => x && x.id === monsterId) : null;
+export function _egMarksGauntletReleaseImmunity(monsterId) {
+    const m = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+        ? globalThis._egMonsters.find(x => x && x.id === monsterId) : null;
     if (!m || !m._egMarksImmuneApplied) return;
     m._egMarksImmuneApplied = false;
     if (!m._egMarksImmuneBefore) m.bossImmune = false;
@@ -112,7 +122,7 @@ function _egMarksGauntletReleaseImmunity(monsterId) {
 
 // True while a gauntlet (or its countdown) is running. Marked Strikes
 // stand down during it - the bows own the arena.
-function _egMarksGauntletActive() {
+export function _egMarksGauntletActive() {
     return !!_egMarksGauntlet;
 }
 
@@ -121,7 +131,7 @@ function _egMarksGauntletActive() {
 //-------------------MECHANIC: MARKED STRIKES------------------------------
 //------------------------------------------------------------------------
 
-function _egMechMarkedStrikes(monster, phase) {
+export function _egMechMarkedStrikes(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     if (_egMarksGauntletActive()) return; // the bows own the arena mid-gauntlet
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -212,7 +222,7 @@ function _egMechMarkedStrikes(monster, phase) {
 // Persistent per-fight watcher (onInit): fires the gauntlet once per HP
 // gate. Non-dodge run on purpose so the scheduled mechanics keep firing
 // alongside it between gauntlets.
-function _egMarksmanArenaInit(monster) {
+export function _egMarksmanArenaInit(monster) {
     if (_egMarksWatcher) return;
     const monsterId = monster ? monster.id : null;
     const level = monster ? monster.level : 1;
@@ -228,8 +238,8 @@ function _egMarksmanArenaInit(monster) {
         if (_egMarksWatcher && _egMarksWatcher.run === run) _egMarksWatcher = null;
     };
     _egNkLoop(run, (dtS, now) => {
-        const live = (typeof _egMonsters !== 'undefined' && _egMonsters)
-            ? (_egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
+        const live = (typeof _egMonsters !== 'undefined' && globalThis._egMonsters)
+            ? (globalThis._egMonsters.find(m => m && m.id === st.monsterId) || null) : null;
         if (!live) {
             // Grace window: _egMonsters is rebuilt during encounter setup.
             st.missingSince = st.missingSince || now;
@@ -254,7 +264,7 @@ function _egMarksmanArenaInit(monster) {
 // wave phase), side ('left'|'right'|'top'|'bottom' - where the bows FIRE
 // FROM), gapFrac (gap width as a fraction of the side span), gapCenter
 // (fractional position of the gap along that side) }.
-function _egMarksGauntletWaves(stage) {
+export function _egMarksGauntletWaves(stage) {
     const W = [];
     const push = (t, side, gapFrac, gapCenter) => W.push({ t, side, gapFrac, gapCenter, armed: false, fired: false });
     if (stage >= 3) {
@@ -298,7 +308,7 @@ function _egMarksGauntletWaves(stage) {
 // Live bounding rect of the interactive puzzle cells (clue rows/columns
 // excluded). Uses getBoundingClientRect so CSS scaling of the table is
 // already baked in. Returns null when no usable grid is on screen.
-function _egMarksGauntletGridRect() {
+export function _egMarksGauntletGridRect() {
     let L = Infinity, T = Infinity, R = -Infinity, B = -Infinity;
     document.querySelectorAll('#ptable .gc[id^="g-"]').forEach(cell => {
         const r = cell.getBoundingClientRect();
@@ -318,7 +328,7 @@ function _egMarksGauntletGridRect() {
 // returns its geometry (the wall elements come back too, so per-bow fire
 // telegraphs can address the right wall). Falls back to a viewport-centered
 // box if no grid is measurable (defensive only).
-function _egMarksGauntletBuildBox(run) {
+export function _egMarksGauntletBuildBox(run) {
     const gr = _egMarksGauntletGridRect();
     if (gr) {
         const box = { L: gr.L, T: gr.T, R: gr.R, B: gr.B, walls: {} };
@@ -338,7 +348,7 @@ function _egMarksGauntletBuildBox(run) {
 
 // Builds the four bow walls for a box, straddling its boundary lines so
 // the frame reads as sitting ON the grid edges.
-function _egMarksGauntletBuildWalls(run, box) {
+export function _egMarksGauntletBuildWalls(run, box) {
     const L = box.L, T = box.T, R = box.R, B = box.B;
     const bw = R - L, bh = B - T;
     const h = EG_GAUNTLET_WALL_T, half = h / 2;
@@ -367,7 +377,7 @@ function _egMarksGauntletBuildWalls(run, box) {
 // Arms (lights up) exactly the bows whose arrows are about to spawn for
 // this volley - a subtle per-bow tell of which lane turns deadly, not a
 // full row/column band. Bows in the gap never arm (they don't shoot).
-function _egMarksGauntletArmBows(g, ev) {
+export function _egMarksGauntletArmBows(g, ev) {
     if (!g.box || !g.box.walls) return;
     const wallEl = g.box.walls[ev.side];
     if (!wallEl) return;
@@ -389,7 +399,7 @@ function _egMarksGauntletArmBows(g, ev) {
 
 
 // Releases the armed glow right as the volley leaves the strings.
-function _egMarksGauntletDisarmBows(g, ev) {
+export function _egMarksGauntletDisarmBows(g, ev) {
     if (!ev.armedEls) return;
     ev.armedEls.forEach(el => { try { el.classList.remove('eg-gauntlet-bow-arm'); } catch (e) {} });
     ev.armedEls = null;
@@ -398,7 +408,7 @@ function _egMarksGauntletDisarmBows(g, ev) {
 
 // Volley release sting - the same drawn-bow twang the Probabilist's
 // Precision Mark plays, so every gauntlet volley reads as a bow loosing.
-function _egMarksGauntletVolleySfx() {
+export function _egMarksGauntletVolleySfx() {
     try {
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('precisionMark');
     } catch (e) {}
@@ -407,7 +417,7 @@ function _egMarksGauntletVolleySfx() {
 
 // Once-per-gauntlet hint for the frozen grid (see checkSpecialIntercepts
 // in mouse-button-handlers.js).
-function _egMarksGauntletGridLockToast() {
+export function _egMarksGauntletGridLockToast() {
     const g = _egMarksGauntlet;
     if (!g || g.gridToastShown) return;
     g.gridToastShown = true;
@@ -416,7 +426,7 @@ function _egMarksGauntletGridLockToast() {
 
 
 // Launches one gauntlet. Returns false if one is already running.
-function _egMarksGauntletStart(stage) {
+export function _egMarksGauntletStart(stage) {
     if (_egMarksGauntlet) return false;
     const w = _egMarksWatcher;
     if (!w) return false;
@@ -554,7 +564,7 @@ function _egMarksGauntletStart(stage) {
 
 // The bow wall is impassable: clamp the player just inside the grid
 // edges (the wall band straddles the boundary at ± half).
-function _egMarksGauntletClampPlayer(g) {
+export function _egMarksGauntletClampPlayer(g) {
     if (!g.box) return;
     const pr = _egNkPlayerRect();
     if (!pr) return;
@@ -568,7 +578,7 @@ function _egMarksGauntletClampPlayer(g) {
 
 // Fires one arrow wall from `ev.side`, leaving a readable gap at
 // ev.gapCenter (± ev.gapFrac/2 of the side's span).
-function _egMarksGauntletFireWall(g, ev) {
+export function _egMarksGauntletFireWall(g, ev) {
     const box = g.box;
     const speed = EG_GAUNTLET_SPEED[g.stage] || EG_GAUNTLET_SPEED[2];
     const s = ev.side;
@@ -598,7 +608,7 @@ function _egMarksGauntletFireWall(g, ev) {
 
 // Tears the gauntlet down: walls fade, arrows clear, charge pause lifts.
 // Safe to call from every end path (survived, boss died, encounter stop).
-function _egMarksGauntletEnd() {
+export function _egMarksGauntletEnd() {
     const g = _egMarksGauntlet;
     if (!g) return;
     _egMarksGauntlet = null;
@@ -616,7 +626,7 @@ function _egMarksGauntletEnd() {
 
 
 // Defensive teardown (mirrors the other bosses' pattern).
-function _egMarksmanTeardown() {
+export function _egMarksmanTeardown() {
     try { _egMarksGauntletEnd(); } catch (e) { _egMarksGauntlet = null; }
     _egMarksWatcher = null;
 }

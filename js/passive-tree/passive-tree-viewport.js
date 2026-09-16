@@ -1,19 +1,23 @@
-﻿//------------------------------------------------------------------------
+﻿import { _ptHideTooltip, _pt_container, _pt_world } from './passive-tree-ui.js';
+import { PT_NODE_RADIUS, PT_PADDING, PT_ZOOM_MAX, PT_ZOOM_MIN, PT_ZOOM_STEP } from './passive-tree.js';
+//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+try { Object.defineProperty(globalThis, '_pt_mouseDownTime', { get() { return _pt_mouseDownTime; }, set(v) { _pt_mouseDownTime = v; }, configurable: true }); } catch (e) {}
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Viewport transform state – applied to _pt_world every frame
-let _pt_scale = 1.0;
-let _pt_tx = 0;      // horizontal translation in px
-let _pt_ty = 0;      // vertical   translation in px
+export let _pt_scale = 1.0;
+export let _pt_tx = 0;      // horizontal translation in px
+export let _pt_ty = 0;      // vertical   translation in px
 
 // Mouse / touch drag state
-let _pt_dragging = false;
-let _pt_dragStartX = 0;
-let _pt_dragStartY = 0;
-let _pt_dragTxStart = 0;    // _pt_tx at the moment the drag began
-let _pt_dragTyStart = 0;    // _pt_ty at the moment the drag began
+export let _pt_dragging = false;
+export let _pt_dragStartX = 0;
+export let _pt_dragStartY = 0;
+export let _pt_dragTxStart = 0;    // _pt_tx at the moment the drag began
+export let _pt_dragTyStart = 0;    // _pt_ty at the moment the drag began
 
 // Shared with renderer: timestamp of the last mousedown,
 // used to distinguish a short click from a real drag.
@@ -21,20 +25,20 @@ let _pt_mouseDownTime = 0;
 
 // Active AbortController for _ptBindEvents – lets us cleanly remove all
 // listeners if the viewport is re-initialised without a page reload.
-let _pt_abortController = null;
+export let _pt_abortController = null;
 
 // Tracks the finger-separation distance from the previous touchmove frame,
 // used to calculate the pinch-zoom scale factor.
-let _pt_lastPinchDist = null;
+export let _pt_lastPinchDist = null;
 
 // Magic-number offsets that position the initial view on the tree.
 // Tweak these if the default camera position needs to change.
-const PT_FIT_OFFSET_X = 1200;
-const PT_FIT_OFFSET_Y = -1850;
+export const PT_FIT_OFFSET_X = 1200;
+export const PT_FIT_OFFSET_Y = -1850;
 
 // Fine-tune the horizontal centering when snapping to the last picked node.
 // Negative = shift camera left, positive = shift right.
-const PT_LAST_NODE_OFFSET_X = 500;
+export const PT_LAST_NODE_OFFSET_X = 500;
 
 
 
@@ -44,14 +48,14 @@ const PT_LAST_NODE_OFFSET_X = 500;
 //------------------------------------------------------------------------
 
 // Clamps a raw scale value to [PT_ZOOM_MIN, PT_ZOOM_MAX].
-function _ptClampScale(rawScale) {
+export function _ptClampScale(rawScale) {
     return Math.min(PT_ZOOM_MAX, Math.max(PT_ZOOM_MIN, rawScale));
 }
 
 // Zooms toward a specific point (pivotX, pivotY) in container-space.
 // This keeps whatever is under the pivot stationary while the rest
 // of the tree zooms around it.
-function _ptZoomToward(newScale, pivotX, pivotY) {
+export function _ptZoomToward(newScale, pivotX, pivotY) {
     const ratio = newScale / _pt_scale;
     _pt_tx = pivotX - ratio * (pivotX - _pt_tx);
     _pt_ty = pivotY - ratio * (pivotY - _pt_ty);
@@ -60,7 +64,7 @@ function _ptZoomToward(newScale, pivotX, pivotY) {
 
 // Reads the current _pt_scale and pushes the matching value to both the
 // range-slider and the human-readable percentage label.
-function _ptSyncZoomBar() {
+export function _ptSyncZoomBar() {
     const bar = document.getElementById('pt-zoom-bar');
     if (!bar) return;
 
@@ -73,7 +77,7 @@ function _ptSyncZoomBar() {
 
 // Writes the current (_pt_tx, _pt_ty, _pt_scale) state onto the world
 // element and keeps the zoom-bar UI in sync.
-function _ptApplyTransform() {
+export function _ptApplyTransform() {
     if (_pt_world) {
         _pt_world.style.transform =
             `translate(${_pt_tx}px, ${_pt_ty}px) scale(${_pt_scale})`;
@@ -90,7 +94,7 @@ function _ptApplyTransform() {
 
 // Computes the pixel position of a node inside the world div,
 // matching the offsetX/offsetY used by _ptDrawNodes and _ptDrawConnections.
-function _ptGetNodeWorldPos(skill, bounds) {
+export function _ptGetNodeWorldPos(skill, bounds) {
     const offsetX = PT_PADDING + PT_NODE_RADIUS - bounds.minX;
     const offsetY = PT_PADDING + PT_NODE_RADIUS - bounds.minY;
     return {
@@ -101,7 +105,7 @@ function _ptGetNodeWorldPos(skill, bounds) {
 
 // Centers the viewport on a specific skill node at the current scale.
 // Uses the same offset calculation as the draw functions so the position is accurate.
-function _ptCenterOnNode(skill, bounds) {
+export function _ptCenterOnNode(skill, bounds) {
     const cW = _pt_container.clientWidth || 800;
     const cH = _pt_container.clientHeight || 600;
     const { wx, wy } = _ptGetNodeWorldPos(skill, bounds);
@@ -112,7 +116,7 @@ function _ptCenterOnNode(skill, bounds) {
 
 // Fits the whole tree into the container on first load, then re-centers
 // on the last picked node (if any) so returning players land where they left off.
-function _ptFitToView(bounds) {
+export function _ptFitToView(bounds) {
     const treeW = bounds.maxX - bounds.minX + PT_PADDING * 2 + PT_NODE_RADIUS * 2;
     const treeH = bounds.maxY - bounds.minY + PT_PADDING * 2 + PT_NODE_RADIUS * 2;
     const cW = _pt_container.clientWidth || 800;
@@ -127,9 +131,9 @@ function _ptFitToView(bounds) {
     _pt_tx = (cW - scaledW) / 2 + PT_FIT_OFFSET_X;
     _pt_ty = (cH - scaledH) / 2 + offsetY * _pt_scale + PT_FIT_OFFSET_Y;
 
-    const lastId = (typeof STATE !== 'undefined') && STATE.passiveTreeLastNode;
-    if (lastId && _pt_skillMap[lastId]) {
-        _ptCenterOnNode(_pt_skillMap[lastId], bounds);
+    const lastId = (typeof globalThis.STATE !== 'undefined') && globalThis.STATE.passiveTreeLastNode;
+    if (lastId && globalThis._pt_skillMap[lastId]) {
+        _ptCenterOnNode(globalThis._pt_skillMap[lastId], bounds);
     } else {
         _ptApplyTransform();
     }
@@ -147,7 +151,7 @@ function _ptFitToView(bounds) {
 // ---- Wheel (zoom) -------------------------------------------------------
 
 // Zooms in or out around the mouse cursor position.
-function _ptOnWheel(e) {
+export function _ptOnWheel(e) {
     e.preventDefault();
 
     const dir = e.deltaY < 0 ? 1 : -1;
@@ -165,7 +169,7 @@ function _ptOnWheel(e) {
 // ---- Mouse drag (pan) ---------------------------------------------------
 
 // Records where the drag started so mousemove can compute the delta.
-function _ptOnMouseDown(e) {
+export function _ptOnMouseDown(e) {
     if (e.button !== 0) return;             // left button only
     if (e.target.closest('.pt-node')) return; // don't pan when clicking a node
 
@@ -178,7 +182,7 @@ function _ptOnMouseDown(e) {
 }
 
 // Pans the viewport by the distance moved since mousedown.
-function _ptOnMouseMove(e) {
+export function _ptOnMouseMove(e) {
     if (!_pt_dragging) return;
     _pt_tx = _pt_dragTxStart + (e.clientX - _pt_dragStartX);
     _pt_ty = _pt_dragTyStart + (e.clientY - _pt_dragStartY);
@@ -186,7 +190,7 @@ function _ptOnMouseMove(e) {
 }
 
 // Ends a drag and restores the grab cursor.
-function _ptOnMouseUp() {
+export function _ptOnMouseUp() {
     if (!_pt_dragging) return;
     _pt_dragging = false;
     _pt_container.style.cursor = 'grab';
@@ -195,14 +199,14 @@ function _ptOnMouseUp() {
 // ---- Touch drag + pinch-zoom --------------------------------------------
 
 // Returns the pixel distance between two Touch objects.
-function _ptTouchDistance(touches) {
+export function _ptTouchDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.hypot(dx, dy);
 }
 
 // Handles the start of a one-finger pan or a two-finger pinch.
-function _ptOnTouchStart(e) {
+export function _ptOnTouchStart(e) {
     if (e.touches.length === 1) {
         // Single finger -> start a pan
         _pt_dragging = true;
@@ -220,7 +224,7 @@ function _ptOnTouchStart(e) {
 }
 
 // Handles one-finger pan movement and two-finger pinch-zoom movement.
-function _ptOnTouchMove(e) {
+export function _ptOnTouchMove(e) {
     e.preventDefault();
 
     if (e.touches.length === 1 && _pt_dragging) {
@@ -239,7 +243,7 @@ function _ptOnTouchMove(e) {
 }
 
 // Resets drag and pinch state when all fingers lift.
-function _ptOnTouchEnd() {
+export function _ptOnTouchEnd() {
     _pt_dragging = false;
     _pt_lastPinchDist = null;
 }
@@ -247,12 +251,12 @@ function _ptOnTouchEnd() {
 // ---- Zoom-bar slider ----------------------------------------------------
 
 // Prevents the mousedown from bubbling up to the container's pan handler.
-function _ptOnZoomBarMouseDown(e) {
+export function _ptOnZoomBarMouseDown(e) {
     e.stopPropagation();
 }
 
 // Zooms toward the centre of the container when the slider is moved.
-function _ptOnZoomBarInput(zoomBar) {
+export function _ptOnZoomBarInput(zoomBar) {
     const pct = zoomBar.value / 100;
     const newScale = _ptClampScale(PT_ZOOM_MIN + pct * (PT_ZOOM_MAX - PT_ZOOM_MIN));
 
@@ -275,7 +279,7 @@ function _ptOnZoomBarInput(zoomBar) {
 // for mouse events that may leave the container while dragging).
 // Calling this a second time safely removes the previous set of listeners
 // via AbortController before adding new ones.
-function _ptBindEvents() {
+export function _ptBindEvents() {
 
     // Remove any listeners from a previous call
     if (_pt_abortController) _pt_abortController.abort();

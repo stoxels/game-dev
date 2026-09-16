@@ -1,3 +1,13 @@
+﻿import { trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { renderCell, updClues } from '../grid.js';
+import { _updateMistakeCounterHUD } from '../penalty.js';
+import { _trackTimerDelta, updTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { _setAbilityMode } from './class-abilities.js';
+import { cooldownState } from './class-cooldown-state.js';
+import { buildClassHUD } from './class-hud.js';
+import { _fadeOutElement } from './class-recursionist.js';
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
 //-------------------------------ACTUARY CLASS----------------------------
@@ -9,26 +19,26 @@
 //------------------------------------------------------------------------
 
 // Maximum number of mistakes stored in the rolling mistake log.
-const ACTUARY_MISTAKE_LOG_MAX = 10;
+export const ACTUARY_MISTAKE_LOG_MAX = 10;
 
 // Cooldown slot IDs for each Actuary active ability.
-const ACTUARY_CD_REGRESSION = 'active3';
-const ACTUARY_CD_SIG_THRESHOLD = 'active4';
+export const ACTUARY_CD_REGRESSION = 'active3';
+export const ACTUARY_CD_SIG_THRESHOLD = 'active4';
 
 // CSS class applied to cells inside a protected line.
-const SIG_THRESH_PROTECTED_CLASS = 'sig-thresh-protected';
+export const SIG_THRESH_PROTECTED_CLASS = 'sig-thresh-protected';
 
 // ID of the Significance Threshold line-picker modal overlay.
-const SIG_THRESH_PICKER_ID = 'sig-thresh-picker';
+export const SIG_THRESH_PICKER_ID = 'sig-thresh-picker';
 
 // Duration (ms) of the holy-explosion animation on a reverted cell.
-const REGRESSION_EXPLOSION_MS = 800;
+export const REGRESSION_EXPLOSION_MS = 800;
 
 // Delay (ms) before chained reveal targets are actually revealed.
-const REGRESSION_CHAIN_REVEAL_DELAY = 300;
+export const REGRESSION_CHAIN_REVEAL_DELAY = 300;
 
 // Total lifetime (ms) of the holy golden chain visual before it fades out.
-const REGRESSION_CHAIN_LIFETIME_MS = 1000;
+export const REGRESSION_CHAIN_LIFETIME_MS = 1000;
 
 // Global state for the Actuary's two active abilities.
 // These are intentionally on `window` so other files can
@@ -49,7 +59,7 @@ const REGRESSION_CHAIN_LIFETIME_MS = 1000;
 // actuaryLogMistake - called by applyPenalty() each time a real penalty
 // is deducted. Maintains a rolling window of the last ACTUARY_MISTAKE_LOG_MAX
 // mistakes so Regression To Prior can reference them.
-function actuaryLogMistake(r, c, penaltySecs) {
+export function actuaryLogMistake(r, c, penaltySecs) {
     if (!window._mistakeLog) window._mistakeLog = [];
     window._mistakeLog.push({ r, c, penaltySecs });
     if (window._mistakeLog.length > ACTUARY_MISTAKE_LOG_MAX) {
@@ -66,12 +76,12 @@ function actuaryLogMistake(r, c, penaltySecs) {
 
 // _regressionRevertCell - clears a single mistaken cell and triggers its
 // visual explosion effect. Returns the amount of time (seconds) to recover.
-function _regressionRevertCell(r, c, penaltySecs, recoverPct) {
+export function _regressionRevertCell(r, c, penaltySecs, recoverPct) {
     // Clear the mistake flag so the red ✕ disappears.
-    wrongGrid[r][c] = false;
+    globalThis.wrongGrid[r][c] = false;
 
     // Reset the cell to empty.
-    userGrid[r][c] = 0;
+    globalThis.userGrid[r][c] = 0;
 
     // Mark as DoF-reverted so grid.js can apply the 'dof-reverted' CSS class.
     if (!window._dofRevertedCells) window._dofRevertedCells = new Set();
@@ -85,7 +95,7 @@ function _regressionRevertCell(r, c, penaltySecs, recoverPct) {
     }
 
     renderCell(r, c);
-    questStat_mistakesRemoved(1);
+    globalThis.questStat_mistakesRemoved(1);
     Audio_Manager.playSFX('actuary_mistake_reversed');
 
     return Math.round(penaltySecs * recoverPct);
@@ -95,10 +105,10 @@ function _regressionRevertCell(r, c, penaltySecs, recoverPct) {
 // cells on the grid, draws a holy golden chain from the corrected mistake cell
 // to each of them and reveals them once the chain has "arrived".
 // Returns how many cells were actually revealed.
-function _regressionChainRevealCells(fromRow, fromCol, count) {
-    if (!cur || count <= 0) return 0;
+export function _regressionChainRevealCells(fromRow, fromCol, count) {
+    if (!globalThis.cur || count <= 0) return 0;
 
-    const sol = cur.grid;
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const pending = window._regressionPendingReveals || new Set();
@@ -108,7 +118,7 @@ function _regressionChainRevealCells(fromRow, fromCol, count) {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             const key = `${r}-${c}`;
-            if (sol[r][c] === 1 && !revealedGrid[r][c] && userGrid[r][c] !== 1 && !pending.has(key)) {
+            if (sol[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1 && !pending.has(key)) {
                 candidates.push({ r, c });
             }
         }
@@ -133,19 +143,19 @@ function _regressionChainRevealCells(fromRow, fromCol, count) {
     // Apply the reveals after a short travel delay.
     setTimeout(() => {
         targets.forEach(({ r, c }) => {
-            revealedGrid[r][c] = true;
-            userGrid[r][c] = 1;
+            globalThis.revealedGrid[r][c] = true;
+            globalThis.userGrid[r][c] = 1;
             renderCell(r, c);
             updClues(r, c);
             trackAchStat('tilesRevealed', 1);
-            _applyCellEffect([`g-${r}-${c}`], 'reveal');
+            globalThis._applyCellEffect([`g-${r}-${c}`], 'reveal');
         });
         if (targets.length > 0) { // Audio_Manager: Phase 3 module import, always present
             Audio_Manager.playSFX('arcaneReveal');
         }
-        questStat_classRevealUsed(targets.length);
-        updateQuestStats('classAbilityUsedThisLevel', {});
-        checkWin();
+        globalThis.questStat_classRevealUsed(targets.length);
+        globalThis.updateQuestStats('classAbilityUsedThisLevel', {});
+        globalThis.checkWin();
     }, REGRESSION_CHAIN_REVEAL_DELAY);
 
     return targets.length;
@@ -153,7 +163,7 @@ function _regressionChainRevealCells(fromRow, fromCol, count) {
 
 // _regressionDrawChain - builds a positioned SVG containing a golden chain
 // (marching link pattern with holy glow) between two cell elements.
-function _regressionDrawChain(fromEl, toEl) {
+export function _regressionDrawChain(fromEl, toEl) {
     const fr = fromEl.getBoundingClientRect();
     const tr = toEl.getBoundingClientRect();
 
@@ -203,12 +213,12 @@ function _regressionDrawChain(fromEl, toEl) {
 // _executeRegressionToPrior - main handler for the Regression To Prior ability.
 // Reverts up to `correctCount` recent mistakes, recovers a fraction of lost time
 // and reveals `revealCount` correct cells per corrected mistake (holy chain).
-function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
-    if (!cur) return;
+export function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
+    if (!globalThis.cur) return;
 
     const log = window._mistakeLog || [];
     if (log.length === 0) {
-        showToast(t('cls_regression_none'));
+        globalThis.showToast(t('cls_regression_none'));
         _regressionCancel(true);
         return;
     }
@@ -234,12 +244,12 @@ function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
     // Corrected mistakes no longer count against the player: decrement the
     // mistake counter and track them as erased (same as the Mistake Eraser item).
     if (toCorrect.length > 0) {
-        mistakeCount = Math.max(0, mistakeCount - toCorrect.length);
-        _levelMistakesErased += toCorrect.length;
+        globalThis.mistakeCount = Math.max(0, globalThis.mistakeCount - toCorrect.length);
+        globalThis._levelMistakesErased += toCorrect.length;
         if (typeof _updateMistakeCounterHUD === 'function') {
             _updateMistakeCounterHUD();
         } else {
-            _setMistakeCounterText();
+            globalThis._setMistakeCounterText();
         }
     }
 
@@ -247,13 +257,13 @@ function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
 
     // Apply the recovered time (cap at 1 hour).
     if (recoveredSecs > 0) {
-        const before = timerSecs;
-        timerSecs = Math.min(timerSecs + recoveredSecs, 3600);
-        _trackTimerDelta(before, timerSecs);
+        const before = globalThis.timerSecs;
+        globalThis.timerSecs = Math.min(globalThis.timerSecs + recoveredSecs, 3600);
+        _trackTimerDelta(before, globalThis.timerSecs);
         updTimer();
     }
 
-    showToast(t('cls_regression_done')
+    globalThis.showToast(t('cls_regression_done')
         .replace('{n}', toCorrect.length)
         .replace('{s}', recoveredSecs));
 
@@ -262,21 +272,21 @@ function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
 
     if (recoveredSecs >= 120) trackAchStat('correct120smistake');
 
-    checkWin();
+    globalThis.checkWin();
     buildClassHUD();
 }
 
 // _regressionCancel - cancels the Regression ability and refunds its cooldown.
 // Pass noOverlayToRemove = true when cancelling silently (e.g. nothing to correct).
-function _regressionCancel(noOverlayToRemove = false) {
+export function _regressionCancel(noOverlayToRemove = false) {
     _setAbilityMode(false);
-    STATE.classActiveChoice = ACTUARY_CD_REGRESSION;
+    globalThis.STATE.classActiveChoice = ACTUARY_CD_REGRESSION;
 
     _refundCooldown(ACTUARY_CD_REGRESSION);
 
     buildClassHUD();
     if (!noOverlayToRemove) {
-        showToast(`🛡️ ${t('cls_cancelled')}`);
+        globalThis.showToast(`🛡️ ${t('cls_cancelled')}`);
     }
 }
 
@@ -302,16 +312,16 @@ function _regressionCancel(noOverlayToRemove = false) {
 //------------------------------------------------------------------------
 
 // _sigThreshDiagKeys - returns both diagonal keys crossing cell (row, col).
-function _sigThreshDiagKeys(row, col) {
+export function _sigThreshDiagKeys(row, col) {
     return [`diagA:${row - col}`, `diagB:${row + col}`];
 }
 
 // _sigThreshIterateLine - calls cb(r, c) for every grid cell on the given
 // line key ('row:i', 'col:j', 'diagA:k' or 'diagB:k').
-function _sigThreshIterateLine(key, cb) {
-    if (!cur) return;
-    const rows = cur.grid.length;
-    const cols = cur.grid[0].length;
+export function _sigThreshIterateLine(key, cb) {
+    if (!globalThis.cur) return;
+    const rows = globalThis.cur.grid.length;
+    const cols = globalThis.cur.grid[0].length;
     const [type, idxStr] = key.split(':');
     const idx = parseInt(idxStr, 10);
 
@@ -338,7 +348,7 @@ function _sigThreshIterateLine(key, cb) {
 
 // _sigThreshApplyVisual - adds the golden-border shield class to every cell
 // on the given line key.
-function _sigThreshApplyVisual(key) {
+export function _sigThreshApplyVisual(key) {
     _sigThreshIterateLine(key, (r, c) => {
         document.getElementById(`g-${r}-${c}`)?.classList.add(SIG_THRESH_PROTECTED_CLASS);
     });
@@ -346,14 +356,14 @@ function _sigThreshApplyVisual(key) {
 
 // _sigThreshRemoveVisual - removes the golden-border shield class from every
 // cell on the given line key (called when the shield charge is consumed).
-function _sigThreshRemoveVisual(key) {
+export function _sigThreshRemoveVisual(key) {
     _sigThreshIterateLine(key, (r, c) => {
         document.getElementById(`g-${r}-${c}`)?.classList.remove(SIG_THRESH_PROTECTED_CLASS);
     });
 }
 
 // _sigThreshLineName - human-readable name for a line key (for toasts).
-function _sigThreshLineName(key) {
+export function _sigThreshLineName(key) {
     const [type, idxStr] = key.split(':');
     const n = parseInt(idxStr, 10) + 1;
     if (type === 'row') return `${t('cls_row_word')} ${n}`;
@@ -368,7 +378,7 @@ function _sigThreshLineName(key) {
 
 // _sigThreshApplyShieldsAt - registers every shield line (per rank config)
 // that passes through cell (row, col) and applies its visuals.
-function _sigThreshApplyShieldsAt(row, col, lines) {
+export function _sigThreshApplyShieldsAt(row, col, lines) {
     if (!window._sigThresholdProtected) window._sigThresholdProtected = new Set();
 
     const keys = [];
@@ -380,18 +390,18 @@ function _sigThreshApplyShieldsAt(row, col, lines) {
         if (window._sigThresholdProtected.has(key)) return;
         window._sigThresholdProtected.add(key);
         _sigThreshApplyVisual(key);
-        showToast(t('cls_line_protected').replace('{name}', _sigThreshLineName(key)));
+        globalThis.showToast(t('cls_line_protected').replace('{name}', _sigThreshLineName(key)));
     });
 }
 
 // _sigThreshConsumeShield - consumes a matching shield charge for the given
 // key and removes its visual.
-function _sigThreshConsumeShield(matchKey) {
+export function _sigThreshConsumeShield(matchKey) {
     window._sigThresholdProtected.delete(matchKey);
     _sigThreshRemoveVisual(matchKey);
     Audio_Manager.playSFX('actuary_shield_pop');
 
-    showToast(t('cls_thresh_triggered').replace('{line}', _sigThreshLineName(matchKey)));
+    globalThis.showToast(t('cls_thresh_triggered').replace('{line}', _sigThreshLineName(matchKey)));
 
     Audio_Manager.playSFX('varianceShield');
 }
@@ -408,7 +418,7 @@ function _sigThreshConsumeShield(matchKey) {
 // Usage in the input handler:
 //   if (_sigThresholdIntercept(row, col)) return;
 //
-function _sigThresholdIntercept(row, col) {
+export function _sigThresholdIntercept(row, col) {
     const protected_ = window._sigThresholdProtected;
 
     // --- Armed trigger: the first mistake after activation is always free,
@@ -417,9 +427,9 @@ function _sigThresholdIntercept(row, col) {
         window._sigThreshArmed = false;
 
         // Prevent the mistake - auto-mark the cell as ✕ (value 2).
-        if (userGrid[row][col] === 0) {
-            userGrid[row][col] = 2;
-            questStat_classMarkUsed(1);
+        if (globalThis.userGrid[row][col] === 0) {
+            globalThis.userGrid[row][col] = 2;
+            globalThis.questStat_classMarkUsed(1);
             renderCell(row, col);
             trackAchStat('tilesMarkedWrong', 1);
         }
@@ -449,9 +459,9 @@ function _sigThresholdIntercept(row, col) {
     if (!matchKey) return false;
 
     // Shield triggered - auto-mark the cell as ✕ (value 2) instead of a mistake.
-    if (userGrid[row][col] === 0) {
-        userGrid[row][col] = 2;
-        questStat_classMarkUsed(1);
+    if (globalThis.userGrid[row][col] === 0) {
+        globalThis.userGrid[row][col] = 2;
+        globalThis.questStat_classMarkUsed(1);
         renderCell(row, col);
         trackAchStat('tilesMarkedWrong', 1);
     }
@@ -469,15 +479,15 @@ function _sigThresholdIntercept(row, col) {
 // _executeSignificanceThreshold - main handler for the Significance Threshold
 // ability. Arms the shield: nothing happens until the player's next mistake,
 // which is then blocked and turns into protection for its surrounding lines.
-function _executeSignificanceThreshold(lines) {
-    if (!cur) return;
+export function _executeSignificanceThreshold(lines) {
+    if (!globalThis.cur) return;
 
     window._sigThreshArmed = true;
     window._sigThreshLines = Array.isArray(lines) && lines.length > 0 ? lines : ['row'];
 
     trackAchStat('skillSignificanceTreshold');
 
-    showToast(t('cls_sig_armed'));
+    globalThis.showToast(t('cls_sig_armed'));
 
     Audio_Manager.playSFX('holySpell');
     buildClassHUD();
@@ -489,7 +499,7 @@ function _executeSignificanceThreshold(lines) {
 
 // _refundCooldown - clears an active cooldown timer and resets its remaining
 // time to 0. Used by both Regression and Significance Threshold cancel paths.
-function _refundCooldown(slotId) {
+export function _refundCooldown(slotId) {
     const cd = cooldownState[slotId];
     if (cd?.interval) { clearInterval(cd.interval); cd.interval = null; }
     if (cd) cd.remaining = 0;

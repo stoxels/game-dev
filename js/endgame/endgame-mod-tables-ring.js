@@ -1,3 +1,8 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
 //  endgame-mod-tables-ring.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
@@ -35,7 +40,7 @@
 // resource sustain, attributes, resistances, and their two unique
 // passive-trigger exclusives.
 
-const EG_MOD_TABLE_RING = {
+export const EG_MOD_TABLE_RING = {
     prefixes: {
 
         // --- LIFE & MANA ---

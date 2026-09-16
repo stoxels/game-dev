@@ -1,4 +1,32 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _fxChronobolt, _fxHourglass, _fxStopwatch } from './add-time.js';
+import { _fxArtifact } from './artifact-complete.js';
+import { _fxChronoFracture } from './chrono-fracture.js';
+import { _fxVortex } from './cursed-col-solve.js';
+import { _fxCursedReveal } from './cursed-reveal.js';
+import { _fxChaosGrid } from './cursed-row-col.js';
+import { _fxTidalWave } from './cursed-row-solve.js';
+import { _fxCursedShield } from './cursed-shield.js';
+import { _fxCursedTime } from './cursed-time.js';
+import { _fxFreeze } from './freeze.js';
+import { _fxGoldenClock } from './golden-clock.js';
+import { _fxEraser, _fxErrorGem, _fxErrorMagnet, _fxSweeper } from './mark-wrong.js';
+import { _fxMistakeEraser } from './mistake-eraser.js';
+import { _fxPearl } from './pearls.js';
+import { _fxCandle, _fxMagnifier, _fxScanner, _fxSpyglass } from './reveal.js';
+import { _fxColSolve, _fxRowSolve } from './row-col-solve.js';
+import { _fxScoutPrimer } from './scouts-primer-item.js';
+import { _fxShadowSeal } from './shadow-seal.js';
+import { _fxClock } from './shared/fx-helpers.js';
+import { _fxShield } from './shield.js';
+import { _fxSurveyScope } from './survey-scope.js';
+import { _fxTheWitch } from './the-witch.js';
+
+//------------------------------------------------------------------------
 //-------------------FX DISPATCH----------------------
 //------------------------------------------------------------------------
 
@@ -6,7 +34,7 @@
 // function. The effect implementations live in the per-item files; this
 // dispatcher is the only place that references them by name.
 
-function playItemEffect(defId) {
+export function playItemEffect(defId) {
     if (!defId) return;
 
     // ── REVEAL ────────────────────────────────────────────────

@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_AIL_IGNITE_DMG_SHARE, EG_AIL_MIN_DOT_DAMAGE, _egApplyPlayerAilment } from '../endgame-ailments.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerRect, _egNkRectsOverlap, _egNkTierDamageFactor, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE EMBER (boss_ember)-------------------------------
 //------------------------------------------------------------------------
 // First-steps fight: slow embers drift straight down with generous
@@ -40,7 +49,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechEmberDrift(monster, phase) {
+export function _egMechEmberDrift(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = [0, 6, 8, 10][p];

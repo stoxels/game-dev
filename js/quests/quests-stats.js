@@ -1,11 +1,21 @@
-﻿//------------------------------------------------------------------------
-//-------------------CONSTANTS & STATE-------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (quests step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _ptAllocated, ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { save } from '../state.js';
+import { _MILESTONE_MAP } from './quests-data.js';
+import { _milestone_isClaimed, _milestone_isComplete, _refreshQuestBadge, claimQuest } from './quests-logic.js';
+
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & globalThis.STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Passive-tree nodes whose level-completion count is tracked individually.
 // Each active node increments levelsWithPTNode_<nodeId> on every level won.
-const _PT_TRACKED_NODES = [
+export const _PT_TRACKED_NODES = [
     'lucky_drops',
     'tutor_enable',
     'keystone_apex_collector',
@@ -16,11 +26,11 @@ const _PT_TRACKED_NODES = [
 
 // Nodes that qualify a level as a "replay" level for the Markov Chain category.
 // levelsWithReplayNode is incremented if any of these is active.
-const _PT_REPLAY_NODES = ['lucky_drops'];
+export const _PT_REPLAY_NODES = ['lucky_drops'];
 
 // Item defIds that count as "tutor" items (the mistake-eraser family).
 // Tracked for the Regression to the Mean category.
-const _TUTOR_ITEM_IDS = new Set([
+export const _TUTOR_ITEM_IDS = new Set([
     'mistakeEraser',
     'mistakeEraser4',
     'mistakeEraser6',
@@ -34,7 +44,7 @@ const _TUTOR_ITEM_IDS = new Set([
 //   medium  - 100-199 cells
 //   large   - 200-399 cells
 //   massive - 400+ cells
-const _GRID_SIZE_THRESHOLDS = {
+export const _GRID_SIZE_THRESHOLDS = {
     small: 0,
     medium: 100,
     large: 200,
@@ -42,12 +52,12 @@ const _GRID_SIZE_THRESHOLDS = {
 };
 
 // Ordered list of bucket names from smallest to largest. Used for comparisons.
-const _GRID_SIZE_ORDER = ['small', 'medium', 'large', 'massive'];
+export const _GRID_SIZE_ORDER = ['small', 'medium', 'large', 'massive'];
 
-// Shorthand reference to STATE.questStats. Set at the start of
+// Shorthand reference to globalThis.STATE.questStats. Set at the start of
 // updateQuestStats() and cleared when it returns. Every _inc() call relies
 // on this being set - never valid to read outside that call.
-let _qs = null;
+export let _qs = null;
 
 
 //------------------------------------------------------------------------
@@ -55,25 +65,25 @@ let _qs = null;
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Ensures STATE.questStats exists before a mid-level stat handler writes to
+// Ensures globalThis.STATE.questStats exists before a mid-level stat handler writes to
 // it. Used by every questStat_* function that can be called outside
 // updateQuestStats().
-function _ensureQuestStats() {
-    if (!STATE.questStats) STATE.questStats = {};
+export function _ensureQuestStats() {
+    if (!globalThis.STATE.questStats) globalThis.STATE.questStats = {};
 }
 
-// Increments a key on STATE.questStats by `by` (default 1), initialising it
+// Increments a key on globalThis.STATE.questStats by `by` (default 1), initialising it
 // to 0 first if needed. Safe to call mid-level, outside updateQuestStats.
-function _incDirect(key, by = 1) {
+export function _incDirect(key, by = 1) {
     // Tutorial-quest levels never touch quest/inference progress.
-    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
+    if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
     _ensureQuestStats();
-    STATE.questStats[key] = (STATE.questStats[key] || 0) + by;
+    globalThis.STATE.questStats[key] = (globalThis.STATE.questStats[key] || 0) + by;
 }
 
 // Increments a questStats counter key. Thin wrapper over _incDirect - only
 // valid while _qs is set, i.e. inside an updateQuestStats() call.
-function _inc(key, by = 1) {
+export function _inc(key, by = 1) {
     _incDirect(key, by);
 }
 
@@ -84,7 +94,7 @@ function _inc(key, by = 1) {
 //------------------------------------------------------------------------
 
 // Returns the grid-size bucket name for a given total cell count.
-function _gridSizeBucket(cells) {
+export function _gridSizeBucket(cells) {
     if (cells >= 400) return 'massive';
     if (cells >= 200) return 'large';
     if (cells >= 100) return 'medium';
@@ -93,16 +103,16 @@ function _gridSizeBucket(cells) {
 
 // Returns true if `bucket` is at least as large as `minBucket`, using the
 // canonical size ordering in _GRID_SIZE_ORDER.
-function _gridSizeAtLeast(bucket, minBucket) {
+export function _gridSizeAtLeast(bucket, minBucket) {
     return _GRID_SIZE_ORDER.indexOf(bucket) >= _GRID_SIZE_ORDER.indexOf(minBucket);
 }
 
-// Reads the current level grid (via the global `cur`) and returns its cell
+// Reads the current level grid (via the global `globalThis.cur`) and returns its cell
 // count and pre-computed bucket name. Returns { cells: 0, bucket: 'small' }
 // when no grid is loaded.
-function _getCurrentGridInfo() {
-    const rows = cur ? cur.grid.length : 0;
-    const cols = cur ? cur.grid[0]?.length ?? 0 : 0;
+export function _getCurrentGridInfo() {
+    const rows = globalThis.cur ? globalThis.cur.grid.length : 0;
+    const cols = globalThis.cur ? globalThis.cur.grid[0]?.length ?? 0 : 0;
     const cells = rows * cols;
     return { cells, bucket: _gridSizeBucket(cells) };
 }
@@ -117,19 +127,19 @@ function _getCurrentGridInfo() {
 
 // Returns true if the named passive-tree node is currently allocated.
 // Always false when the passive tree is not loaded.
-function _ptNodeActive(nodeId) {
+export function _ptNodeActive(nodeId) {
     return typeof ptHasSkill === 'function' && ptHasSkill(nodeId);
 }
 
 // Returns true if the passive tree API is available.
-function _ptAvailable() {
+export function _ptAvailable() {
     return typeof ptHasSkill === 'function';
 }
 
 // Returns how many passive-tree points the player has actually spent. The
 // origin/start node is always free, so we subtract 1 from the allocated set.
 // Returns 0 if the passive tree isn't initialised yet.
-function _ptCurrentSpentCount() {
+export function _ptCurrentSpentCount() {
     const allocated = (typeof _ptAllocated === 'function') ? _ptAllocated() : new Set();
     return Math.max(0, allocated.size - 1);
 }
@@ -164,7 +174,7 @@ function _ptCurrentSpentCount() {
 //   { type: 'mod',           mod:  string }    - modifier key is truthy
 
 // Evaluates a single condition descriptor against the payload and grid state.
-function _evalComboCondition(cond, payload, bucket, mods) {
+export function _evalComboCondition(cond, payload, bucket, mods) {
     switch (cond.type) {
 
         case 'ptNode':
@@ -213,7 +223,7 @@ function _evalComboCondition(cond, payload, bucket, mods) {
 
 // Evaluates every condition in the array against the payload. Returns true
 // only when ALL conditions pass.
-function _allComboConditionsMet(payload, conditions) {
+export function _allComboConditionsMet(payload, conditions) {
     const { bucket } = _getCurrentGridInfo();
     const mods = payload.mods || {};
 
@@ -223,15 +233,15 @@ function _allComboConditionsMet(payload, conditions) {
     return true;
 }
 
-// Increments STATE.questStats[statKey] by 1 if all conditions pass. Main
+// Increments globalThis.STATE.questStats[statKey] by 1 if all conditions pass. Main
 // entry point for registering a combo quest check.
-function _checkComboConditions(payload, statKey, conditions) {
+export function _checkComboConditions(payload, statKey, conditions) {
     if (_allComboConditionsMet(payload, conditions)) _inc(statKey);
 }
 
 
 //------------------------------------------------------------------------
-//-------------------STATE MIGRATION------------------------------------------
+//-------------------globalThis.STATE MIGRATION------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Called once when a save file is loaded to ensure the required sub-objects
@@ -239,7 +249,7 @@ function _checkComboConditions(payload, statKey, conditions) {
 
 // Ensures all required quest sub-objects exist on the save state. Must be
 // called by the save-load system before any quest code runs.
-function migrateQuestState(s) {
+export function migrateQuestState(s) {
     if (!s.questStats) s.questStats = {};
     if (!s.questsClaimed) s.questsClaimed = [];
     if (!s.questsNotified) s.questsNotified = [];
@@ -257,9 +267,9 @@ function migrateQuestState(s) {
 
 // Resets every per-level (_ql_) quest counter back to its initial value.
 // Called from start-level.js at the beginning of each level.
-function resetQuestLevelCounters() {
+export function resetQuestLevelCounters() {
     _ensureQuestStats();
-    const qs = STATE.questStats;
+    const qs = globalThis.STATE.questStats;
 
     // Item / ability usage counts
     qs._ql_mistakesRemovedThisLevel = 0;
@@ -298,9 +308,9 @@ function resetQuestLevelCounters() {
 // Resets the per-level Witch Immunity counter at the start of each level.
 // Kept separate because it's called from a different site than
 // resetQuestLevelCounters in some flows.
-function resetWitchImmunityLevelCounter() {
+export function resetWitchImmunityLevelCounter() {
     _ensureQuestStats();
-    STATE.questStats._cursedUnderImmunityThisLevel = 0;
+    globalThis.STATE.questStats._cursedUnderImmunityThisLevel = 0;
 }
 
 
@@ -310,67 +320,67 @@ function resetWitchImmunityLevelCounter() {
 //------------------------------------------------------------------------
 // Called from various game systems during a level (not at level-complete).
 // Each function increments one or more per-level or global counters. These
-// bypass _qs and write directly to STATE.questStats because they can be
+// bypass _qs and write directly to globalThis.STATE.questStats because they can be
 // called at any time, not just inside updateQuestStats().
 
 // Called from _useMistakeEraser when mistakes are actually removed.
-function questStat_mistakesRemoved(count) {
+export function questStat_mistakesRemoved(count) {
     _incDirect('_ql_mistakesRemovedThisLevel', count);
 }
 
 // Called when a curse downside is blocked (shield, witch immunity, ward, etc).
-function questStat_curseBlocked() {
+export function questStat_curseBlocked() {
     _incDirect('_ql_cursesBlockedThisLevel');
 }
 
 // Called from _useAddTime when a timer item is consumed (regardless of +/-).
-function questStat_timerItemUsed() {
+export function questStat_timerItemUsed() {
     _incDirect('_ql_timerItemsUsedThisLevel');
 }
 
 // Called when a reveal item (including cursedReveal) is used.
-function questStat_revealItemUsed() {
+export function questStat_revealItemUsed() {
     _incDirect('_ql_revealItemsThisLevel');
-    STATE.questStats._ql_hasUsedManualReveal = true;
+    globalThis.STATE.questStats._ql_hasUsedManualReveal = true;
 }
 
 // Called from handleCorrectFill: the player filled at least one cell by
 // hand this level (drives the "Fill a cell by hand" quest). Centralises
-// the _ql_hasManuallyFilledCell write (was a direct STATE.questStats write
+// the _ql_hasManuallyFilledCell write (was a direct globalThis.STATE.questStats write
 // in mouse-button-handlers.js).
-function questStat_hasManuallyFilledCell() {
+export function questStat_hasManuallyFilledCell() {
     _ensureQuestStats();
-    STATE.questStats._ql_hasManuallyFilledCell = true;
+    globalThis.STATE.questStats._ql_hasManuallyFilledCell = true;
 }
 
 // Called from rollLuckyDrops: one lucky-drop reward was claimed.
 // Centralises the luckyDropsClaimed increment (was a direct
-// STATE.questStats write in scoring.js).
-function questStat_luckyDropClaimed() {
+// globalThis.STATE.questStats write in scoring.js).
+export function questStat_luckyDropClaimed() {
     _incDirect('luckyDropsClaimed');
 }
 
 // Called from a class ability when it reveals cells.
-function questStat_classRevealUsed(count) {
+export function questStat_classRevealUsed(count) {
     _incDirect('_ql_abilityRevealsThisLevel', count || 1);
-    STATE.questStats._ql_hasUsedClassReveal = true;
+    globalThis.STATE.questStats._ql_hasUsedClassReveal = true;
 }
 
 // Called from a class ability when it marks wrong cells.
-function questStat_classMarkUsed(count) {
+export function questStat_classMarkUsed(count) {
     _incDirect('_ql_abilityMarksThisLevel', count || 1);
 }
 
 // Called when Shadow Seal is used. Records the current timestamp so the
 // 10-second early-use window can be checked at level-complete time.
-function questStat_shadowSealUsed() {
+export function questStat_shadowSealUsed() {
     _ensureQuestStats();
-    STATE.questStats._ql_shadowSealUsedAt = Date.now();
+    globalThis.STATE.questStats._ql_shadowSealUsedAt = Date.now();
 }
 
 // Called when a cursed row/col erasure happens (unsolveRows / unsolveCols).
 // Increments both the per-level counter and the persistent global total.
-function questStat_rowsErased(count) {
+export function questStat_rowsErased(count) {
     _incDirect('_ql_erasedRowsThisLevel', count);
     _incDirect('totalRowsErased', count);
 }
@@ -378,9 +388,9 @@ function questStat_rowsErased(count) {
 // Called when a tutor answers a question correctly (gate, quiz, or primer).
 // Also checks whether a chain of 5 correct answers has just completed,
 // which increments the primerTutorAllFive milestone counter.
-function questStat_tutorAnsweredCorrect() {
+export function questStat_tutorAnsweredCorrect() {
     _ensureQuestStats();
-    const qs = STATE.questStats;
+    const qs = globalThis.STATE.questStats;
 
     qs.tutorQuestCorrect = (qs.tutorQuestCorrect || 0) + 1;
     qs._ql_tutorQuestCorrectThisLevel = (qs._ql_tutorQuestCorrectThisLevel || 0) + 1;
@@ -394,51 +404,51 @@ function questStat_tutorAnsweredCorrect() {
 
 // Called when a MC question is displayed with a wrong answer already
 // eliminated. Increments both the global total and the per-level counter.
-function questStat_mcWrongAnswerEliminated() {
+export function questStat_mcWrongAnswerEliminated() {
     _incDirect('mcWrongAnswersEliminated');
     _incDirect('_ql_mcWrongRemovedThisLevel');
 }
 
 // Called when a primer hint appears (wrong attempt with wisdom_through_failure active).
-function questStat_primerHintShown() {
+export function questStat_primerHintShown() {
     _incDirect('primerHintsTotal');
 }
 
 // Called at the end of a primer with the total rows and columns revealed.
-function questStat_primerRowsColsRevealed(rows, cols) {
+export function questStat_primerRowsColsRevealed(rows, cols) {
     _incDirect('primerTotalRowsRevealed', rows);
     _incDirect('primerTotalColsRevealed', cols);
 }
 
 // Called from the Sample Efficiency node when a cell is auto-revealed by a
 // streak. Increments both the per-level counter and the global total.
-function questStat_sampleEfficiencyReveal() {
+export function questStat_sampleEfficiencyReveal() {
     _incDirect('_ql_sampleEffRevThisLevel');
     _incDirect('sampleEfficiencyRevealsTotal');
 }
 
 // Called when Gambler's Ruin adds time from a correct cell fill.
-function questStat_gamblersRuinTimeAdded(secs) {
+export function questStat_gamblersRuinTimeAdded(secs) {
     _incDirect('gamblersRuinTotalTimeAdded', secs);
     _incDirect('_ql_gamblersTimeAddedThisLevel', secs);
 }
 
 // Called when the Field Scan node reveals one or more correct cells.
-function questStat_fieldScanCellRevealed(count) {
+export function questStat_fieldScanCellRevealed(count) {
     _incDirect('fieldScanCorrectReveals', count || 1);
     _incDirect('_ql_fieldScanRevThisLevel', count || 1);
 }
 
 // Called when the Confidence Interval node absorbs (ignores) a mistake.
 // Increments both the per-level counter and the persistent global total.
-function questStat_confidenceIntervalIgnored() {
+export function questStat_confidenceIntervalIgnored() {
     _incDirect('confidenceIntervalIgnored');
     _incDirect('_ql_confIntIgnoredThisLevel');
 }
 
 // Called each time a class ability is used during the current level.
 // Increments only the per-level counter (global tracked by classAbilityUsed event).
-function _questStats_onClassAbilityThisLevel() {
+export function _questStats_onClassAbilityThisLevel() {
     _incDirect('_ql_classAbilitiesThisLevel');
 }
 
@@ -457,7 +467,7 @@ function _questStats_onClassAbilityThisLevel() {
 //     worldIndex, pts }
 
 // Tracks basic per-level outcome flags: no-mistake run, no-item run, hard difficulty.
-function _questStats_trackBasicFlags(payload) {
+export function _questStats_trackBasicFlags(payload) {
     if (payload.mistakeCount === 0) _inc('levelsNomiss');
     if (payload.itemsUsed === 0) _inc('levelsNoitem');
     if (payload.diff === 'hard') _inc('levelsHard');
@@ -465,7 +475,7 @@ function _questStats_trackBasicFlags(payload) {
 
 // Tracks which optional modifiers were active when the level was completed:
 // Hardcore, Time Trial, Ironman, Classless, Treeless.
-function _questStats_trackModifierFlags(mods) {
+export function _questStats_trackModifierFlags(mods) {
     if (mods.hardcore) _inc('levelsHardcore');
     if (mods.timetrial) _inc('levelsTimetrial');
     if (mods.ironman) _inc('levelsIronman');
@@ -475,7 +485,7 @@ function _questStats_trackModifierFlags(mods) {
 
 // Tracks the "Full Gauntlet" stat: Hard difficulty with all five modifiers
 // active simultaneously. Required for the Monte Carlo Method quest category.
-function _questStats_trackFullGauntlet(payload) {
+export function _questStats_trackFullGauntlet(payload) {
     const mods = payload.mods || {};
     const allModsActive = mods.hardcore && mods.timetrial && mods.ironman
         && mods.classless && mods.treeless;
@@ -487,7 +497,7 @@ function _questStats_trackFullGauntlet(payload) {
 
 // Increments the per-level-index replay counter. Used by the Markov Chain
 // quest to detect levels being replayed with Lucky Drops active.
-function _questStats_trackPerLevelReplay(gi) {
+export function _questStats_trackPerLevelReplay(gi) {
     if (gi !== undefined) _inc(`levelReplays_${gi}`);
 }
 
@@ -495,7 +505,7 @@ function _questStats_trackPerLevelReplay(gi) {
 // Increments a per-node counter for each tracked node, plus the generic
 // "replay node" counter used by the Markov Chain category. No-op when the
 // passive tree isn't loaded.
-function _questStats_trackActivePTNodes() {
+export function _questStats_trackActivePTNodes() {
     if (!_ptAvailable()) return;
 
     _PT_TRACKED_NODES.forEach(node => {
@@ -511,7 +521,7 @@ function _questStats_trackActivePTNodes() {
 // Tracks special level type completions: Convergence levels, world-clear
 // events (deduplicated by worldIndex), Lucky Drop triggers, Large Adjacency
 // Matrix levels.
-function _questStats_trackSpecialLevelTypes(payload) {
+export function _questStats_trackSpecialLevelTypes(payload) {
     if (payload.isConvergence) _inc('convergenceLevels');
     if (payload.isLargeAdjMatrix) _inc('levelsLargeAdjMatrix');
     if (payload.luckyDropTriggered) _inc('luckyDropsClaimed');
@@ -531,7 +541,7 @@ function _questStats_trackSpecialLevelTypes(payload) {
 // Commits the per-level Witch Immunity counter to the persistent total. Only
 // transferred on a successfully completed level, never on loss or quit.
 // Resets the per-level counter to zero afterwards.
-function _questStats_commitWitchImmunity() {
+export function _questStats_commitWitchImmunity() {
     const witchCount = _qs._cursedUnderImmunityThisLevel || 0;
     if (witchCount > 0) {
         _inc('cursedUnderImmunityWon', witchCount);
@@ -544,7 +554,7 @@ function _questStats_commitWitchImmunity() {
 // conditions via _checkComboConditions. Per-level (_ql_) counters are read
 // here and either committed to the permanent stats or discarded if
 // thresholds weren't met.
-function _questStats_trackComboQuests(payload) {
+export function _questStats_trackComboQuests(payload) {
     const qs = _qs;
     const { cells } = _getCurrentGridInfo();
     const isMassive = cells >= 400;
@@ -585,7 +595,7 @@ function _questStats_trackComboQuests(payload) {
 
     // Quest 6: Use Shadow Seal within the first 10 seconds on a massive grid
     if (isMassive && qs._ql_shadowSealUsedAt !== null) {
-        const secsIntoLevel = (qs._ql_shadowSealUsedAt - (levelStartTime || qs._ql_shadowSealUsedAt)) / 1000;
+        const secsIntoLevel = (qs._ql_shadowSealUsedAt - (globalThis.levelStartTime || qs._ql_shadowSealUsedAt)) / 1000;
         if (secsIntoLevel <= 10) {
             _inc('massiveGridShadowSealEarly');
         }
@@ -684,7 +694,7 @@ function _questStats_trackComboQuests(payload) {
 
 // Master handler for the 'levelComplete' event. Delegates each tracking
 // concern to a dedicated sub-handler above.
-function _questStats_onLevelComplete(payload) {
+export function _questStats_onLevelComplete(payload) {
     _inc('levelsCompleted');
 
     _questStats_trackBasicFlags(payload);
@@ -707,7 +717,7 @@ function _questStats_onLevelComplete(payload) {
 
 // Handles a correct-answer event. Increments the global counter and the
 // source-specific counter (payload.source: 'quiz' | 'gate' | 'primer').
-function _questStats_onQuestionCorrect(payload) {
+export function _questStats_onQuestionCorrect(payload) {
     _inc('questionsCorrect');
     if (payload.source === 'quiz') _inc('quizCorrect');
     if (payload.source === 'gate') _inc('gatesPassed');
@@ -716,7 +726,7 @@ function _questStats_onQuestionCorrect(payload) {
 
 // Handles an item-used event. Increments the total items counter plus
 // type-specific sub-counters (payload: { defId, rarity }).
-function _questStats_onItemUsed(payload) {
+export function _questStats_onItemUsed(payload) {
     _inc('itemsUsedTotal');
 
     if (payload.rarity === 'cursed') _inc('cursedItemsUsed');
@@ -736,13 +746,13 @@ function _questStats_onItemUsed(payload) {
 
 // Handles the 'classChosen' event. Only sets the flag once - subsequent
 // class changes do not re-trigger it.
-function _questStats_onClassChosen() {
+export function _questStats_onClassChosen() {
     if (!_qs.classChosen) _qs.classChosen = 1;
 }
 
 // Handles the 'ascendencyChosen' event. Only sets the flag once - subsequent
 // ascendency changes do not re-trigger it.
-function _questStats_onAscendencyChosen() {
+export function _questStats_onAscendencyChosen() {
     if (!_qs.ascendencyChosen) _qs.ascendencyChosen = 1;
 }
 
@@ -753,7 +763,7 @@ function _questStats_onAscendencyChosen() {
 //------------------------------------------------------------------------
 
 
-function _questStats_checkNewlyCompleted() {
+export function _questStats_checkNewlyCompleted() {
     for (const msId in _MILESTONE_MAP) {
         const { milestone } = _MILESTONE_MAP[msId];
 
@@ -774,13 +784,13 @@ function _questStats_checkNewlyCompleted() {
 
 // Records a game event and updates the relevant quest statistics. Single
 // public API for this module - all other code should call this rather than
-// modifying STATE.questStats directly.
-function updateQuestStats(event, payload = {}) {
+// modifying globalThis.STATE.questStats directly.
+export function updateQuestStats(event, payload = {}) {
     // Tutorial-quest levels never touch quest/inference progress (also keeps
     // onLevelCompleteAch, called from the levelComplete case, out of them).
-    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
+    if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
     _ensureQuestStats();
-    _qs = STATE.questStats; // set module-level shorthand for _inc()
+    _qs = globalThis.STATE.questStats; // set module-level shorthand for _inc()
 
     switch (event) {
         case 'levelComplete': _questStats_onLevelComplete(payload); break;
@@ -802,7 +812,7 @@ function updateQuestStats(event, payload = {}) {
         case 'cursedUnderImmunityUsed': _inc('_cursedUnderImmunityThisLevel'); break;
         case 'atlasTierCompleted':
         case 'atlasRetroCheck':
-            // Atlas tier quests read STATE.egAtlasCompleted live via _atlasTierCheck();
+            // Atlas tier quests read globalThis.STATE.egAtlasCompleted live via _atlasTierCheck();
             // no stat increment needed - just trigger the completion check below.
             break;
     }

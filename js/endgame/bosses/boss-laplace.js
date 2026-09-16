@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egDamageTargetById } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: LAPLACE'S DEMON (boss_laplace)------------------
 //------------------------------------------------------------------------
 // TIER 7 REWORK - 👁️ "It Has Already Seen This". The Demon predicts; you
@@ -41,8 +50,8 @@
 
 // DEBUG: slow Laplace's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_LAP_DEBUG_SLOW = true;
-const _EG_LAP_DEBUG_MULT = _EG_LAP_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_LAP_DEBUG_SLOW = true;
+export const _EG_LAP_DEBUG_MULT = _EG_LAP_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_laplace: {
@@ -77,30 +86,30 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning ───────────────────────────────────────────────────────────
-const EG_LAP_LANCE_W      = 110;    // lance corridor width
-const EG_LAP_LANCE_SPEED  = 640;    // px/s along its path
-const EG_LAP_LANCE_HIT    = 0.16;   // %maxHP caught in the corridor
-const EG_LAP_LANCE_END    = 0.14;   // %maxHP endpoint pin-blast (R120)
-const EG_LAP_GHOST_LEAD   = 3000;   // ms the ghost runs ahead of the real lance
-const EG_LAP_BRANCH_HIT   = 0.10;   // %maxHP true-future detonation (R90)
-const EG_LAP_GHOST_FORM   = 2000;   // ms of ghost-form from a fake future
-const EG_LAP_FRAY_RECALL  = 6;      // s of movement the clone replays
-const EG_LAP_FRAY_CD_MS   = 9000;   // between player-swaps
-const EG_LAP_TOUCH_MS     = 700;    // shared touch cooldown
-const EG_LAP_NODE_STAND   = 1.2;    // s cumulative standing to break a node
-const EG_LAP_LOOP_TIME    = 20;     // s per gauntlet loop
-const EG_LAP_FAIL_EXTEND  = 5000;   // ms a failed dodge extends the loop
-const EG_LAP_NODE_GOAL    = 3;      // nodes to close the timeline
+export const EG_LAP_LANCE_W      = 110;    // lance corridor width
+export const EG_LAP_LANCE_SPEED  = 640;    // px/s along its path
+export const EG_LAP_LANCE_HIT    = 0.16;   // %maxHP caught in the corridor
+export const EG_LAP_LANCE_END    = 0.14;   // %maxHP endpoint pin-blast (R120)
+export const EG_LAP_GHOST_LEAD   = 3000;   // ms the ghost runs ahead of the real lance
+export const EG_LAP_BRANCH_HIT   = 0.10;   // %maxHP true-future detonation (R90)
+export const EG_LAP_GHOST_FORM   = 2000;   // ms of ghost-form from a fake future
+export const EG_LAP_FRAY_RECALL  = 6;      // s of movement the clone replays
+export const EG_LAP_FRAY_CD_MS   = 9000;   // between player-swaps
+export const EG_LAP_TOUCH_MS     = 700;    // shared touch cooldown
+export const EG_LAP_NODE_STAND   = 1.2;    // s cumulative standing to break a node
+export const EG_LAP_LOOP_TIME    = 20;     // s per gauntlet loop
+export const EG_LAP_FAIL_EXTEND  = 5000;   // ms a failed dodge extends the loop
+export const EG_LAP_NODE_GOAL    = 3;      // nodes to close the timeline
 
 
 //------------------------------------------------------------------------
 //-------------------SHARED HELPERS----------------------------------------
 //------------------------------------------------------------------------
-let _egLapHitCd = 0;
+export let _egLapHitCd = 0;
 
 // Touch damage helper shared by all Laplace hazards (per-touch cooldown).
 // Ghost-form makes the player immune to these - that is the point of it.
-function _egLapTouch(pct, level, label) {
+export function _egLapTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egLapHitCd) return false;
     if (!_egLapDamageable()) return false;
@@ -114,8 +123,8 @@ function _egLapTouch(pct, level, label) {
 
 // Ghost-form: after correctly standing on a fake future, the player is
 // briefly untouchable by the Demon (greed window - stand IN the lance).
-let _egLapGhostUntil = 0;
-function _egLapGhostForm(ms) {
+export let _egLapGhostUntil = 0;
+export function _egLapGhostForm(ms) {
     _egLapGhostUntil = performance.now() + ms;
     const avatar = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
@@ -128,10 +137,10 @@ function _egLapGhostForm(ms) {
         }, ms + 60);
     }
 }
-function _egLapDamageable() { return performance.now() >= _egLapGhostUntil; }
+export function _egLapDamageable() { return performance.now() >= _egLapGhostUntil; }
 
 // Player centre with a screen-centre fallback.
-function _egLapPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egLapPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 
 //------------------------------------------------------------------------
@@ -140,9 +149,9 @@ function _egLapPC() { const c = _egNkPlayerCenter(); return c || { x: window.inn
 // A chase-lance whose full path is pre-run by a harmless ghost ~3s ahead.
 // The real lance follows the SAME path - its endpoint (the ghost's endpoint)
 // is exactly where a greedy or inattentive player will be standing.
-const EG_LAP_FATE_PHASE3 = 2;  // crossed lances in phase 3
+export const EG_LAP_FATE_PHASE3 = 2;  // crossed lances in phase 3
 
-function _egMechLapFate(monster, phase) {
+export function _egMechLapFate(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -172,7 +181,7 @@ function _egMechLapFate(monster, phase) {
 
 // One ghost + real lance pair on a fixed path - both fly on the run's
 // loop clock (pause-safe, tier-scaled).
-function _egLapLancePair(run, ax, ay, bx, by, delayMs, level) {
+export function _egLapLancePair(run, ax, ay, bx, by, delayMs, level) {
     const len = Math.hypot(bx - ax, by - ay);
     const travelMs = (len / EG_LAP_LANCE_SPEED) * 1000 * _EG_LAP_DEBUG_MULT;
     // The ghost pre-runs the SAME path but is guaranteed at least ~3s of
@@ -203,7 +212,7 @@ function _egLapLancePair(run, ax, ay, bx, by, delayMs, level) {
 
 // The real lance: solid fire corridor, damages within width, ends with a
 // pin-blast ring at the endpoint.
-function _egLapRealLance(run, ax, ay, bx, by, travelMs, level) {
+export function _egLapRealLance(run, ax, ay, bx, by, travelMs, level) {
     const corridor = _egNkEl(run, 'div', 'eg-lap-lance');
     _egLapPlaceCorridor(corridor, ax, ay, bx, by);
     const head = _egNkEl(run, 'div', 'eg-lap-lance-head', '🔥');
@@ -240,7 +249,7 @@ function _egLapRealLance(run, ax, ay, bx, by, travelMs, level) {
     });
 }
 
-function _egLapPlaceCorridor(el, ax, ay, bx, by) {
+export function _egLapPlaceCorridor(el, ax, ay, bx, by) {
     const len = Math.hypot(bx - ax, by - ay);
     el.style.left = Math.round(ax) + 'px';
     el.style.top = Math.round(ay - EG_LAP_LANCE_W / 2) + 'px';
@@ -257,10 +266,10 @@ function _egLapPlaceCorridor(el, ax, ay, bx, by) {
 // Three phantoms walk predictable dashed paths; each leaves a future cell.
 // At reveal ONE is the ✅ true future and detonates softly; standing on a
 // FAKE grants 2s ghost-form. 1-in-3 gamble with a greedy reward.
-const EG_LAP_BRANCH_WALK = 3.0;   // s a phantom walks
-const EG_LAP_BRANCH_R    = 90;    // detonation radius
+export const EG_LAP_BRANCH_WALK = 3.0;   // s a phantom walks
+export const EG_LAP_BRANCH_R    = 90;    // detonation radius
 
-function _egMechLapBranches(monster, phase) {
+export function _egMechLapBranches(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     void phase;
     const level = monster ? monster.level : 1;
@@ -348,7 +357,7 @@ function _egMechLapBranches(monster, phase) {
 
 // Plain prefixed delay for out-of-run callbacks: defers while the game is
 // frozen (visual-only use - mechanics never wait on this).
-function _egLapDelay(ms, fn) {
+export function _egLapDelay(ms, fn) {
     setTimeout(() => { if (!_egNkFrozen()) fn(); else setTimeout(() => { if (!_egNkFrozen()) fn(); }, 120); }, ms);
 }
 
@@ -359,11 +368,11 @@ function _egLapDelay(ms, fn) {
 // A clone of your avatar walks a recording of your own last 6 seconds
 // (path pre-drawn as fading dots). Touch it → swap positions with where
 // the clone was 2s ago. No damage - dizzying but fair.
-let _egLapRecBuf = [];      // { x, y, t } samples, ~100ms apart
-let _egLapRecRun = null;
-let _egLapFrayCd = 0;
+export let _egLapRecBuf = [];      // { x, y, t } samples, ~100ms apart
+export let _egLapRecRun = null;
+export let _egLapFrayCd = 0;
 
-function _egLapEnsureRecRun(monster) {
+export function _egLapEnsureRecRun(monster) {
     if (_egLapRecRun && _egNkRuns.has(_egLapRecRun.id)) return;
     const run = _egNkNewRun(monster && monster.id, false);
     run.passive = true;
@@ -382,7 +391,7 @@ function _egLapEnsureRecRun(monster) {
     });
 }
 
-function _egMechLapFray(monster, phase) {
+export function _egMechLapFray(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     void phase;
     if (_egLapRecBuf.length < 20) return;   // not enough recorded yet
@@ -449,26 +458,26 @@ function _egMechLapFray(monster, phase) {
 // node appears each loop at a new spot; stand on it 1.2s cumulative to
 // break it. Three breaks close the loop - the Demon pays its own HP.
 // Failed dodges extend the loop 5s and spawn an extra hunting phantom.
-const EG_LAP_LOOP_LANCE_Y  = [0.34, 0.62];   // fixed lance bands (learnable)
-const EG_LAP_LOOP_BRANCH_X = [0.25, 0.5, 0.75];
-const EG_LAP_LOOP_BRANCH_TRUE = 1;           // the middle cell is always true
+export const EG_LAP_LOOP_LANCE_Y  = [0.34, 0.62];   // fixed lance bands (learnable)
+export const EG_LAP_LOOP_BRANCH_X = [0.25, 0.5, 0.75];
+export const EG_LAP_LOOP_BRANCH_TRUE = 1;           // the middle cell is always true
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egLapFinal = null;
+export let _egLapFinal = null;
 
-function _egLapFinalActive() {
+export function _egLapFinalActive() {
     return !!_egLapFinal && !_egLapFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egLapOnPhaseEnter(monster, newPhase) {
+export function _egLapOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egLapStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egLapStartFinalWatcher(monster) {
+export function _egLapStartFinalWatcher(monster) {
     if (!monster || _egLapFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -486,7 +495,7 @@ function _egLapStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-function _egLapAfter(g, ms, fn) {
+export function _egLapAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egLapFinal) return;
@@ -497,7 +506,7 @@ function _egLapAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egLapFinalStart(monster) {
+export function _egLapFinalStart(monster) {
     if (_egLapFinal || !monster) return;
 
     // The loop takes over: kill every other run of this boss.
@@ -661,7 +670,7 @@ function _egLapFinalStart(monster) {
 }
 
 // A lance crossing the whole arena at a fixed band (final variant).
-function _egLapFinalLance(g, bandY, level) {
+export function _egLapFinalLance(g, bandY, level) {
     const W = window.innerWidth;
     const warn = _egNkEl(g.fxRun, 'div', 'eg-lap-loop-warn');
     warn.style.left = '0px';
@@ -686,7 +695,7 @@ function _egLapFinalLance(g, bandY, level) {
 }
 
 // A phantom walking a straight line (final gauntlet + failure hunters).
-function _egLapFinalPhantom(g, fixedY, isCross, level) {
+export function _egLapFinalPhantom(g, fixedY, isCross, level) {
     const W = window.innerWidth, H = window.innerHeight;
     const ltr = Math.random() < 0.5;
     const y = isCross ? fixedY : H * (0.2 + Math.random() * 0.6);
@@ -710,7 +719,7 @@ function _egLapFinalPhantom(g, fixedY, isCross, level) {
 }
 
 // A failed dodge inside the loop: extends the loop and spawns a hunter.
-function _egLapFailPunish(g, label) {
+export function _egLapFailPunish(g, label) {
     if (!g || g.finished) return;
     void label;
     const was = g.deadline;
@@ -720,7 +729,7 @@ function _egLapFailPunish(g, label) {
         // Extra hunter: a phantom that walks a random line right now.
         _egLapFinalPhantom(g, 0, false, (function () {
             try {
-                const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+                const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
                 return m ? m.level : 1;
             } catch (e) { return 1; }
         })());
@@ -728,7 +737,7 @@ function _egLapFailPunish(g, label) {
 }
 
 // Three nodes broken: the loop closes and the Demon pays its own HP.
-function _egLapCloseLoop(g, monster) {
+export function _egLapCloseLoop(g, monster) {
     if (g.finished) return;
     _egNkToast('eg_mech_lap_closed', '👁️💥 THE TIMELINE CLOSES - the Demon is trapped in its own loop!', '#a7f3d0');
     const flash = document.createElement('div');
@@ -737,7 +746,7 @@ function _egLapCloseLoop(g, monster) {
     setTimeout(() => { try { flash.remove(); } catch (e) {} }, 1500);
     _egLapFinalEnd(g, monster);
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m && typeof _egDamageTargetById === 'function' && m.currentHP > 0) {
             _egDamageTargetById(g.monsterId, m.currentHP, ['fire'], {});
         }
@@ -746,7 +755,7 @@ function _egLapCloseLoop(g, monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egLapFinalEnd(g, monster) {
+export function _egLapFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -762,7 +771,7 @@ function _egLapFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -774,7 +783,7 @@ function _egLapFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body state this boss ever created.
-function _egLapTeardown() {
+export function _egLapTeardown() {
     if (_egLapFinal) { try { _egLapFinalEnd(_egLapFinal, null); } catch (e) {} _egLapFinal = null; }
     if (_egLapRecRun) { try { _egNkKillRun(_egLapRecRun); } catch (e) {} _egLapRecRun = null; }
     _egLapRecBuf = [];
@@ -811,7 +820,7 @@ if (typeof window !== 'undefined') {
     window._EG_LAP_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_laplace') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_laplace') : null;
             if (!monster) return 'no laplace alive';
             if (name === 'final') { _egLapFinalStart(monster); return 'THE CLOSED TIMELINE started'; }
             const fn = name === 'fate' ? _egMechLapFate

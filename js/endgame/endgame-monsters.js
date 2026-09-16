@@ -1,4 +1,15 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../translation/translations.js';
+import { EG_ART } from './endgame-art.js';
+import { EG_CAMPAIGN_MONSTER_CONFIG } from './endgame-encounter.js';
+import { _egApplyMapModsToMonster } from './endgame-map-launch.js';
+import { _egIsCampaignRun } from './endgame-state.js';
+
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA DEFINITIONS-------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
@@ -6,12 +17,12 @@
 
 // Monster level scaling 
 // Applied per level above 1. 
-const EG_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1 - tuned for T1-easy / T16-spongy curve (see _egGetTierBalance)
-const EG_LEVEL_DAMAGE_SCALE = 0.26; // +26% damage per level above 1 - raised from 0.12 so high tiers stay threatening even with on-level gear; T1 eased via tier balance
+export const EG_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1 - tuned for T1-easy / T16-spongy curve (see _egGetTierBalance)
+export const EG_LEVEL_DAMAGE_SCALE = 0.26; // +26% damage per level above 1 - raised from 0.12 so high tiers stay threatening even with on-level gear; T1 eased via tier balance
 
 // Hard cap on how many monsters (including bosses) can be alive simultaneously.
 // New spawns are silently dropped until a slot opens.
-const EG_MAX_CONCURRENT_MONSTERS = 6;
+export const EG_MAX_CONCURRENT_MONSTERS = 6;
 
 // Tier-aware balance curve: T1 is easy (no gear), mid tiers ramp to normal,
 // high tiers become explicitly dangerous/spongy when undergeared.
@@ -20,7 +31,7 @@ const EG_MAX_CONCURRENT_MONSTERS = 6;
 // Anchors tuned so adequate gear (ilvl≈mlvl) feels: T1 easy (TTD~140s, TTK~6),
 // T4 forgiving, T7-8 normal (TTD~60s, TTK~4), T13 challenging, T16 hard but doable (~40s).
 // Lacking gear (-12 ilvl, -5 lvl) then feels 2-3x harder and 1.8-2x spongy.
-function _egGetTierBalance(lvl) {
+export function _egGetTierBalance(lvl) {
     const l = Math.max(1, Number(lvl) || 1);
     // dmg: peaks at mid (T7-8) then plateaus so T16 adequate stays ~40s not 28s
     const dmgAnchors = [[1,0.62],[3,0.70],[14,0.95],[30,1.30],[36,1.35],[50,1.30],[64,1.20],[78,1.22],[90,1.18]];
@@ -63,7 +74,7 @@ function _egGetTierBalance(lvl) {
 // resistances: % reduction of incoming player damage per element (capped at 75%).
 // Elemental monsters resist their own element.
 
-const EG_MONSTER_DEFS = {
+export const EG_MONSTER_DEFS = {
     // TIER 1 - Weak / fast
     slime: {
         id: 'slime', name: t('eg_mon_slime'), emoji: '🟢',
@@ -549,7 +560,7 @@ const EG_MONSTER_DEFS = {
 // Lore-accurate roam speeds (px/s) for the perimeter patrol in
 // endgame-monster-roam.js. Small vermin scurry, medium beasts lope, heavy
 // brutes lumber. Bosses never roam (they hold their ground as set-pieces).
-const EG_MONSTER_ROAM_SPEEDS = {
+export const EG_MONSTER_ROAM_SPEEDS = {
     // Scurrers - tiny, fast vermin
     rat: 90, bat: 88, bee: 92, mosquito: 95, ant: 85, moth: 86,
     spider: 82, ladybug: 75, frog: 78, beetle: 62, owl: 70,
@@ -568,7 +579,7 @@ const EG_MONSTER_ROAM_SPEEDS = {
 // Returns the lore-accurate roam speed (px/s) for a monster, with ±12%
 // per-spawn jitter so packs of the same species don't march in lockstep.
 // Unknown ids fall back to a bulk heuristic: tankier (high baseHP) = slower.
-function _egRoamSpeedFor(monster) {
+export function _egRoamSpeedFor(monster) {
     const base = monster && (monster.baseId || monster.id);
     // Direct lookup on the full base id (e.g. 'golem_iron', 'rat').
     let speed = (typeof base === 'string' && EG_MONSTER_ROAM_SPEEDS[base]) || null;
@@ -583,12 +594,12 @@ function _egRoamSpeedFor(monster) {
 // Accepts either a string id (looks up EG_MONSTER_DEFS) or a def object directly.
 // hpMult: optional multiplier for boss max HP only (e.g., 500k HP test mode);
 // damage is left at its normal scaled value.
-function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
+export function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
     const def = (typeof defOrId === 'string') ? EG_MONSTER_DEFS[defOrId] : defOrId;
 
     // FIX: If it's not a standard monster, check if it's a boss and route to the boss factory
-    if (!def && typeof defOrId === 'string' && typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS[defOrId]) {
-        const boss = _egBuildBoss(defOrId, level, hpMult);
+    if (!def && typeof defOrId === 'string' && typeof EG_BOSS_DEFS !== 'undefined' && globalThis.EG_BOSS_DEFS[defOrId]) {
+        const boss = globalThis._egBuildBoss(defOrId, level, hpMult);
         if (boss) boss.isBoss = true;
         return boss;
     }
@@ -607,8 +618,8 @@ function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
 
     let maxHP, damage, scaledCharge;
     if (isCampaign) {
-        const hpTarget = (cur && cur.campaignMonsterHp > 0) ? cur.campaignMonsterHp : def.baseHP;
-        const dmgTarget = (cur && cur.campaignMonsterDamage > 0) ? cur.campaignMonsterDamage : 6;
+        const hpTarget = (globalThis.cur && globalThis.cur.campaignMonsterHp > 0) ? globalThis.cur.campaignMonsterHp : def.baseHP;
+        const dmgTarget = (globalThis.cur && globalThis.cur.campaignMonsterDamage > 0) ? globalThis.cur.campaignMonsterDamage : 6;
         // ±15% spread so a pack doesn't feel flat; never below a few hits.
         maxHP = Math.max(10, Math.round(hpTarget * (0.85 + Math.random() * 0.30) * hpMult));
         damage = Math.max(1, Math.round(dmgTarget * (0.85 + Math.random() * 0.30)));
@@ -636,7 +647,7 @@ function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
     }
 
     const monster = {
-        id: `${def.id}_${++_egMonsterSpawnCounter}`,
+        id: `${def.id}_${++globalThis._egMonsterSpawnCounter}`,
         baseId: def.id, // unsuffixed def id - used for EG_ART image lookups
         // Fixed at spawn so re-renders keep the same image. Holds either the
         // base id or one of its "<base>_<n>" variants (see EG_ART.randomVariant).

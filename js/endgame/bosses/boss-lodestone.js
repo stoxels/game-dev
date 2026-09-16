@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { Audio_Manager } from '../../audio/audio.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE LODESTONE (boss_lodestone)------------------
 //------------------------------------------------------------------------
 // A rework of the old one-shot Polarity Field into a persistent magnetic
@@ -72,55 +81,55 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Magnetism tuning ─────────────────────────────────────────────────────
 // The Lodestone (boss body)
-const EG_LDS_R = 46;                          // stone visual radius
-const EG_LDS_DRIFT_SPEED = [0, 20, 30, 42];   // px/s per phase
-const EG_LDS_DRIFT_REPICK_MS = 5600;
-const EG_LDS_CLAMP_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the stone
-const EG_LDS_CLAMP_CD_MS = 1000;
-const EG_LDS_CLAMP_FLING = [0, 140, 165, 190]; // INTO the stone
+export const EG_LDS_R = 46;                          // stone visual radius
+export const EG_LDS_DRIFT_SPEED = [0, 20, 30, 42];   // px/s per phase
+export const EG_LDS_DRIFT_REPICK_MS = 5600;
+export const EG_LDS_CLAMP_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the stone
+export const EG_LDS_CLAMP_CD_MS = 1000;
+export const EG_LDS_CLAMP_FLING = [0, 140, 165, 190]; // INTO the stone
 // Polarity drag + flip pulse
-const EG_LDS_ATTRACT_SPEED = [0, 40, 55, 70]; // px/s radial pull
-const EG_LDS_FLIP_MS = [0, 7000, 6000, 5000]; // polarity cycle
-const EG_LDS_PULSE_SPEED = [0, 260, 300, 340]; // repulsion shove (one-shot)
+export const EG_LDS_ATTRACT_SPEED = [0, 40, 55, 70]; // px/s radial pull
+export const EG_LDS_FLIP_MS = [0, 7000, 6000, 5000]; // polarity cycle
+export const EG_LDS_PULSE_SPEED = [0, 260, 300, 340]; // repulsion shove (one-shot)
 // Shrapnel filings
-const EG_LDS_FILINGS_EVERY_MS = [0, 5200, 4300, 3400];
-const EG_LDS_FILING_SPEED = 250;
-const EG_LDS_FILING_DMG = 0.04;               // %maxHP per filing
+export const EG_LDS_FILINGS_EVERY_MS = [0, 5200, 4300, 3400];
+export const EG_LDS_FILING_SPEED = 250;
+export const EG_LDS_FILING_DMG = 0.04;               // %maxHP per filing
 // Magnetic Vortex (60% gate)
-const EG_LDS_VORTEX_MS = 4500;
-const EG_LDS_VORTEX_PULL = [0, 170, 200, 235]; // px/s hard drag
-const EG_LDS_VORTEX_GRIND_R = 140;            // grind zone around the stone
-const EG_LDS_VORTEX_GRIND_PCT = 4;            // %maxHP per second inside
+export const EG_LDS_VORTEX_MS = 4500;
+export const EG_LDS_VORTEX_PULL = [0, 170, 200, 235]; // px/s hard drag
+export const EG_LDS_VORTEX_GRIND_R = 140;            // grind zone around the stone
+export const EG_LDS_VORTEX_GRIND_PCT = 4;            // %maxHP per second inside
 // Railgun (30% gate)
-const EG_LDS_RAIL_N = 3;                      // lanes per gate
-const EG_LDS_RAIL_GAP_MS = 1400;
-const EG_LDS_RAIL_WARN_MS = 1100;
-const EG_LDS_RAIL_SLUG_SPEED = 700;           // px/s
-const EG_LDS_RAIL_DMG = [0, 0.14, 0.17, 0.20];
-const EG_LDS_RAIL_FLING = [0, 170, 195, 220];
+export const EG_LDS_RAIL_N = 3;                      // lanes per gate
+export const EG_LDS_RAIL_GAP_MS = 1400;
+export const EG_LDS_RAIL_WARN_MS = 1100;
+export const EG_LDS_RAIL_SLUG_SPEED = 700;           // px/s
+export const EG_LDS_RAIL_DMG = [0, 0.14, 0.17, 0.20];
+export const EG_LDS_RAIL_FLING = [0, 170, 195, 220];
 // Magnetic Leash (charge attack)
-const EG_LDS_LEASH_WARN_MS = 900;             // line telegraph (tracks 0.4s)
-const EG_LDS_LEASH_CORRIDOR = 44;             // px from the chain line
-const EG_LDS_LEASH_REEL_MS = 1600;
-const EG_LDS_LEASH_REEL_SPEED = [0, 230, 265, 300]; // px/s reel-in
-const EG_LDS_LEASH_CLAMP_R = 150;             // clamp radius at chain end
-const EG_LDS_LEASH_DMG = [0, 0.17, 0.20, 0.24];
-const EG_LDS_LEASH_FLING = [0, 180, 205, 230];
+export const EG_LDS_LEASH_WARN_MS = 900;             // line telegraph (tracks 0.4s)
+export const EG_LDS_LEASH_CORRIDOR = 44;             // px from the chain line
+export const EG_LDS_LEASH_REEL_MS = 1600;
+export const EG_LDS_LEASH_REEL_SPEED = [0, 230, 265, 300]; // px/s reel-in
+export const EG_LDS_LEASH_CLAMP_R = 150;             // clamp radius at chain end
+export const EG_LDS_LEASH_DMG = [0, 0.17, 0.20, 0.24];
+export const EG_LDS_LEASH_FLING = [0, 180, 205, 230];
 
 
-let _egLodestoneWatcher = null; // per-fight magnetic state
+export let _egLodestoneWatcher = null; // per-fight magnetic state
 
 // Phase lookup helper - resolves the boss's current phase (default 1).
-function _egLdsPhase(st) {
+export function _egLdsPhase(st) {
     if (typeof _egMonsters !== 'undefined') {
-        const m = _egMonsters.find(x => x && x.id === st.monsterId);
+        const m = globalThis._egMonsters.find(x => x && x.id === st.monsterId);
         if (m) return Math.max(1, Math.min(3, Number(m.bossPhase) || 1));
     }
     return 1;
 }
 
 // Removes every magnetic overlay (registered in boss-framework teardown).
-function _egLodestoneTeardown() {
+export function _egLodestoneTeardown() {
     if (_egLodestoneWatcher) {
         const st = _egLodestoneWatcher;
         _egLodestoneWatcher = null;
@@ -140,7 +149,7 @@ function _egLodestoneTeardown() {
 
 
 // ── Persistent arena: the stone, the field, the filings ─────────────────
-function _egLodestoneArenaInit(monster) {
+export function _egLodestoneArenaInit(monster) {
     if (_egLodestoneWatcher) return;
     const monsterId = monster ? monster.id : null;
     const st = {
@@ -179,7 +188,7 @@ function _egLodestoneArenaInit(monster) {
 
     _egNkLoop(run, (dtS, now) => {
         if (_egLodestoneWatcher !== st) return false;
-        const live = _egMonsters ? _egMonsters.find(m => m.id === st.monsterId) : null;
+        const live = globalThis._egMonsters ? globalThis._egMonsters.find(m => m.id === st.monsterId) : null;
         if (!live) return false;
         const W = window.innerWidth, H = window.innerHeight;
         const c = _egNkPlayerCenter();
@@ -432,7 +441,7 @@ function _egLodestoneArenaInit(monster) {
 
 
 // Polarity visuals: N = red face, S = blue face (classic magnet ends).
-function _egLdsApplyPolarity(st) {
+export function _egLdsApplyPolarity(st) {
     if (!st.stone || !st.stone.el) return;
     st.stone.el.classList.toggle('pol-n', st.polarity === 'N');
     st.stone.el.classList.toggle('pol-s', st.polarity === 'S');
@@ -440,7 +449,7 @@ function _egLdsApplyPolarity(st) {
 
 
 // Expanding repulsion-pulse ring on polarity flip.
-function _egLdsPulseRing(st, x, y) {
+export function _egLdsPulseRing(st, x, y) {
     const el = _egNkEl(st.run, 'div', 'eg-lds-pulse');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
@@ -449,7 +458,7 @@ function _egLdsPulseRing(st, x, y) {
 
 
 // Vortex grind DoT: chunked lightning ticks while pressed against the stone.
-function _egLdsGrindTick(st, vx, dtS, live) {
+export function _egLdsGrindTick(st, vx, dtS, live) {
     vx.grindAcc = (vx.grindAcc || 0) + dtS * 1000;
     if (vx.grindAcc >= 500) {
         vx.grindAcc = 0;
@@ -460,14 +469,14 @@ function _egLdsGrindTick(st, vx, dtS, live) {
 
 
 // One magnetized filing on a spiral path.
-function _egLdsSpawnFiling(st, x, y, ang) {
+export function _egLdsSpawnFiling(st, x, y, ang) {
     const el = _egNkEl(st.run, 'div', 'eg-lds-filing', '🔩');
     st.filings.push({ x, y, ang, rad: EG_LDS_R, spiral: 1200, vx: 0, vy: 0, t: 0, hit: false, el });
 }
 
 
 // ── 60% gate: Magnetic Vortex ────────────────────────────────────────────
-function _egLdsVortex(st) {
+export function _egLdsVortex(st) {
     if (st.vortex) return;
     const el = _egNkEl(st.run, 'div', 'eg-lds-vortex');
     st.vortex = { t: 0, el, grindAcc: 0 };
@@ -477,7 +486,7 @@ function _egLdsVortex(st) {
 
 
 // ── 30% gate: Railgun ────────────────────────────────────────────────────
-function _egLdsRailgun(st, live) {
+export function _egLdsRailgun(st, live) {
     if (st.railgun) return;
     st.railgun = { fired: 0 };
     st.railTimer = 0;
@@ -487,7 +496,7 @@ function _egLdsRailgun(st, live) {
 
 
 // One rail lane: full-screen telegraph through the stone aimed at the player.
-function _egLdsFireRail(st, sn, pr, W, H) {
+export function _egLdsFireRail(st, sn, pr, W, H) {
     const c = _egNkPlayerCenter();
     const horiz = c ? Math.abs(c.x - sn.x) >= Math.abs(c.y - sn.y) : Math.random() < 0.5;
     const pos = horiz ? (c ? c.y : H / 2) : (c ? c.x : W / 2);
@@ -504,7 +513,7 @@ function _egLdsFireRail(st, sn, pr, W, H) {
 
 
 // ── Charge attack: Magnetic Leash ────────────────────────────────────────
-function _egLodestoneLeash(monster) {
+export function _egLodestoneLeash(monster) {
     const st = _egLodestoneWatcher;
     if (!st || st.leash || st.vortex || _egNkDodgeBusy() || _egNkFrozen()) return;
     const c = _egNkPlayerCenter() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -517,7 +526,7 @@ function _egLodestoneLeash(monster) {
 
 
 // Positions a zero-size element as a line from (x1,y1) to (x2,y2).
-function _egLdsPlaceLine(el, x1, y1, x2, y2) {
+export function _egLdsPlaceLine(el, x1, y1, x2, y2) {
     const dx = x2 - x1, dy = y2 - y1;
     const len = Math.hypot(dx, dy);
     const ang = Math.atan2(dy, dx);
@@ -529,7 +538,7 @@ function _egLdsPlaceLine(el, x1, y1, x2, y2) {
 
 
 // Point-to-segment distance (for the leash corridor check).
-function _egLdsDistToSegment(px, py, x1, y1, x2, y2) {
+export function _egLdsDistToSegment(px, py, x1, y1, x2, y2) {
     const dx = x2 - x1, dy = y2 - y1;
     const lenSq = dx * dx + dy * dy;
     let t = lenSq > 0 ? ((px - x1) * dx + (py - y1) * dy) / lenSq : 0;
@@ -545,4 +554,4 @@ function _egLdsDistToSegment(px, py, x1, y1, x2, y2) {
 // The old scheduled mechanic is now the persistent drag/flip cadence -
 // keep the handler name alive so any stale schedule entry no-ops instead
 // of erroring.
-function _egMechPolarityField(monster, phase) { void monster; void phase; }
+export function _egMechPolarityField(monster, phase) { void monster; void phase; }

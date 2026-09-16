@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { t } from '../../translation/translations.js';
+import { _egDamageTargetById } from '../endgame-encounter.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: BAYES (boss_bayes)------------------------------
 //------------------------------------------------------------------------
 // TIER 7 REWORK - "The Grand Prior". Evidence updates beliefs - the fight
@@ -45,8 +55,8 @@
 
 // DEBUG: slow Bayes' timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_BAY_DEBUG_SLOW = true;
-const _EG_BAY_DEBUG_MULT = _EG_BAY_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_BAY_DEBUG_SLOW = true;
+export const _EG_BAY_DEBUG_MULT = _EG_BAY_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_bayes: {
@@ -83,14 +93,14 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_BAY_BOLT_DMG   = [0, 0.15, 0.17, 0.20]; // %maxHP bolt wave hit
-const EG_BAY_WISP_DMG   = 0.10;                  // %maxHP favoured-side wisp
-const EG_BAY_WISP_FLIP  = 15;                    // meter points per wisp flip
-const EG_BAY_WISP_LIFE  = 4.2;                   // s a wisp drifts
-const EG_BAY_DISTRICT_HIT = 0.18;                // %maxHP caught in a wave
-const EG_BAY_WAVES      = 3;                     // gambit cast waves
-const EG_BAY_WAVE_GAP   = 4200;                  // ms per gambit wave
-const EG_BAY_HIT_CD_MS  = 700;                   // shared touch cooldown
+export const EG_BAY_BOLT_DMG   = [0, 0.15, 0.17, 0.20]; // %maxHP bolt wave hit
+export const EG_BAY_WISP_DMG   = 0.10;                  // %maxHP favoured-side wisp
+export const EG_BAY_WISP_FLIP  = 15;                    // meter points per wisp flip
+export const EG_BAY_WISP_LIFE  = 4.2;                   // s a wisp drifts
+export const EG_BAY_DISTRICT_HIT = 0.18;                // %maxHP caught in a wave
+export const EG_BAY_WAVES      = 3;                     // gambit cast waves
+export const EG_BAY_WAVE_GAP   = 4200;                  // ms per gambit wave
+export const EG_BAY_HIT_CD_MS  = 700;                   // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -99,10 +109,10 @@ const EG_BAY_HIT_CD_MS  = 700;                   // shared touch cooldown
 // Lean: −100 = absolutely certain SAFE LEFT, +100 = absolutely certain
 // SAFE RIGHT, 0 = 50/50 (maximum clarity). Lives in a per-run global so the
 // veil chip, the wisps and the bolts all read one truth.
-let _egBayLean = 0;
-let _egBayMeterEl = null;
+export let _egBayLean = 0;
+export let _egBayMeterEl = null;
 
-function _egBayMeterApply() {
+export function _egBayMeterApply() {
     if (!_egBayMeterEl) {
         _egBayMeterEl = document.createElement('div');
         _egBayMeterEl.className = 'eg-bay-meter';
@@ -116,26 +126,26 @@ function _egBayMeterApply() {
     _egBayMeterEl.classList.toggle('eg-bay-meter-balanced', Math.abs(_egBayLean) < 10);
 }
 
-function _egBayMeterShift(delta) {
+export function _egBayMeterShift(delta) {
     _egBayLean = Math.max(-100, Math.min(100, _egBayLean + delta));
     _egBayMeterApply();
 }
 
-function _egBayMeterShow() { _egBayMeterApply(); }
+export function _egBayMeterShow() { _egBayMeterApply(); }
 
-function _egBayMeterHide() {
+export function _egBayMeterHide() {
     if (_egBayMeterEl) { try { _egBayMeterEl.remove(); } catch (e) {} _egBayMeterEl = null; }
 }
 
 // Which side does the meter currently favour? (0 → coin flip, that IS the
 // 50/50 state - Bayes must still believe something.)
-function _egBayFavouredSide() {
+export function _egBayFavouredSide() {
     if (_egBayLean < 0) return 'left';
     if (_egBayLean > 0) return 'right';
     return Math.random() < 0.5 ? 'left' : 'right';
 }
 
-function _egBaySideX(side) {
+export function _egBaySideX(side) {
     const W = window.innerWidth;
     return side === 'left' ? W * 0.28 : W * 0.72;
 }
@@ -147,8 +157,8 @@ function _egBaySideX(side) {
 
 // Touch damage helper shared by all Bayes hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egBayHitCd = 0;
-function _egBayTouch(pct, level, label) {
+export let _egBayHitCd = 0;
+export function _egBayTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egBayHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -160,7 +170,7 @@ function _egBayTouch(pct, level, label) {
 }
 
 // Player centre with a screen-centre fallback.
-function _egBayPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egBayPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 
 //------------------------------------------------------------------------
@@ -170,14 +180,14 @@ function _egBayPC() { const c = _egNkPlayerCenter(); return c || { x: window.inn
 // after the cast the meter shifts toward the other side (evidence updates).
 // The EVIDENCE RING on the punished side pays out meter shifts if you hold
 // it through a bolt landing.
-const EG_BAY_BOLTS = [0, 2, 3, 4];   // bolt columns per cast, by phase
-const EG_BAY_BOLT_W = 170;           // column width
-const EG_BAY_BOLT_WARN_MS = 900;     // per-column telegraph
-const EG_BAY_BOLT_GAP_MS = 560;      // stagger between columns
-const EG_BAY_EVIDENCE_SHIFT = 25;    // meter points per bolt held in the ring
-const EG_BAY_SELF_UPDATE = 20;       // meter points Bayes shifts after a cast
+export const EG_BAY_BOLTS = [0, 2, 3, 4];   // bolt columns per cast, by phase
+export const EG_BAY_BOLT_W = 170;           // column width
+export const EG_BAY_BOLT_WARN_MS = 900;     // per-column telegraph
+export const EG_BAY_BOLT_GAP_MS = 560;      // stagger between columns
+export const EG_BAY_EVIDENCE_SHIFT = 25;    // meter points per bolt held in the ring
+export const EG_BAY_SELF_UPDATE = 20;       // meter points Bayes shifts after a cast
 
-function _egMechBayBolts(monster, phase) {
+export function _egMechBayBolts(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -265,10 +275,10 @@ function _egMechBayBolts(monster, phase) {
 // non-favoured side glow (free evidence - pull the next cast away from
 // you); wisps on the favoured side sting on contact. Two spawn on the
 // non-favoured side, one on the favoured side.
-const EG_BAY_WISP_COUNT = 3;
-const EG_BAY_WISP_SPEED = 120;      // px/s drift (divided by mult)
+export const EG_BAY_WISP_COUNT = 3;
+export const EG_BAY_WISP_SPEED = 120;      // px/s drift (divided by mult)
 
-function _egMechBayWisps(monster, phase) {
+export function _egMechBayWisps(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
@@ -329,8 +339,8 @@ function _egMechBayWisps(monster, phase) {
 // The old Bayes owned the Grid Veil machinery; the rework keeps it here so
 // the framework's typeof-guarded teardown call still resolves. Creates and
 // shows the veil overlay element over the puzzle table.
-function _egActivateVeil() {
-    _egVeilActive = true;
+export function _egActivateVeil() {
+    globalThis._egVeilActive = true;
     const tbl = document.getElementById('ptable');
     if (!tbl) return;
     const parent = tbl.parentElement;
@@ -345,7 +355,7 @@ function _egActivateVeil() {
         parent.appendChild(veil);
     }
     veil.classList.remove('eg-hidden');
-    showToast(t('eg_mech_grid_veil'));
+    globalThis.showToast(t('eg_mech_grid_veil'));
 }
 
 
@@ -361,8 +371,8 @@ function _egActivateVeil() {
 // The classic Grid Veil, upgraded: the puzzle grid is hidden AS BAYES
 // BELIEVES IT - the veil tints toward the favoured side and a belief chip
 // shows the lean. Near 50/50 the tint fades (clarity = balance).
-function _egMechBayVeil(monster, phase) {
-    if (_egVeilActive) return;
+export function _egMechBayVeil(monster, phase) {
+    if (globalThis._egVeilActive) return;
     _egActivateVeil();
 
     // Bayes' tint layer over the shared veil + belief chip.
@@ -396,26 +406,26 @@ function _egMechBayVeil(monster, phase) {
 // Survive all three → Bayes concedes: full-board reveal, and the boss pays
 // its own remaining HP for the lost bet. Charge bar frozen (gate in
 // _egTickPlayer via _egBayFinalActive).
-const EG_BAY_DISTRICT_COLS = [0.16, 0.5, 0.84];
-const EG_BAY_DISTRICT_ROWS = [0.24, 0.5, 0.76];
-const EG_BAY_STRIKES_PER_WAVE = 3;
+export const EG_BAY_DISTRICT_COLS = [0.16, 0.5, 0.84];
+export const EG_BAY_DISTRICT_ROWS = [0.24, 0.5, 0.76];
+export const EG_BAY_STRIKES_PER_WAVE = 3;
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egBayFinal = null;
+export let _egBayFinal = null;
 
-function _egBayFinalActive() {
+export function _egBayFinalActive() {
     return !!_egBayFinal && !_egBayFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egBayOnPhaseEnter(monster, newPhase) {
+export function _egBayOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egBayStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egBayStartFinalWatcher(monster) {
+export function _egBayStartFinalWatcher(monster) {
     if (!monster || _egBayFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -433,7 +443,7 @@ function _egBayStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-function _egBayAfter(g, ms, fn) {
+export function _egBayAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egBayFinal) return;
@@ -444,7 +454,7 @@ function _egBayAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egBayFinalStart(monster) {
+export function _egBayFinalStart(monster) {
     if (_egBayFinal || !monster) return;
 
     // The oracle goes quiet: kill every other run of this boss (the finale
@@ -595,7 +605,7 @@ function _egBayFinalStart(monster) {
 
 // Concession: the lost bet - full reveal, release, and the boss pays its
 // own remaining HP through the canonical damage path (a real kill).
-function _egBayConcede(g, monster) {
+export function _egBayConcede(g, monster) {
     if (g.finished) return;
     _egNkToast('eg_mech_bay_concede', '🔮 THE PRIOR COLLAPSES - Bayes concedes the round!', '#4ade80');
     // Full-board reveal: every true probability laid bare.
@@ -608,7 +618,7 @@ function _egBayConcede(g, monster) {
     // resistances/phase checks/death flow all apply. Immunity is already
     // released by _egBayFinalEnd.
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m && typeof _egDamageTargetById === 'function' && m.currentHP > 0) {
             _egDamageTargetById(g.monsterId, m.currentHP, ['lightning'], {});
         }
@@ -616,7 +626,7 @@ function _egBayConcede(g, monster) {
 }
 
 // Ends the finale: releases immunity + charge bar and cleans the board.
-function _egBayFinalEnd(g, monster) {
+export function _egBayFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -634,7 +644,7 @@ function _egBayFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     void monster;
@@ -646,7 +656,7 @@ function _egBayFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egBayTeardown() {
+export function _egBayTeardown() {
     if (_egBayFinal) { try { _egBayFinalEnd(_egBayFinal, null); } catch (e) {} _egBayFinal = null; }
     _egBayMeterHide();
     document.querySelectorAll('.eg-bay-bolt-warn, .eg-bay-bolt, .eg-bay-evidence, ' +
@@ -675,7 +685,7 @@ if (typeof window !== 'undefined') {
     window._EG_BAY_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_bayes') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_bayes') : null;
             if (!monster) return 'no bayes alive';
             const fn = name === 'bolts' ? _egMechBayBolts
                 : name === 'wisps' ? _egMechBayWisps
@@ -688,7 +698,7 @@ if (typeof window !== 'undefined') {
         lean: (n) => { _egBayLean = Math.max(-100, Math.min(100, Number(n) || 0)); _egBayMeterApply(); return 'lean = ' + _egBayLean; },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_bayes') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_bayes') : null;
             if (!monster) return 'no bayes alive';
             _egBayFinalStart(monster);
             return 'THEOMERE\u2019S GAMBIT started';

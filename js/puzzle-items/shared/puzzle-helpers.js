@@ -1,4 +1,13 @@
 //------------------------------------------------------------------------
+// PHASE 3 (step 9): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
+import { t } from '../../translation/translations.js';
+import { showToast } from '../toasts-and-popups.js';
+
+//------------------------------------------------------------------------
 //-------------------SHARED - PUZZLE HELPERS----------------------
 //------------------------------------------------------------------------
 
@@ -6,7 +15,7 @@
 // Dense Marker passives) and grid snapshot helpers (pre-filled rows
 // and cols) - used by several puzzle item files.
 
-function shuffle(arr) {
+export function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -19,12 +28,12 @@ function shuffle(arr) {
 // criterion. Pass wantMax=false for the least-filled row (Targeted Reveal),
 // wantMax=true for the most-filled row (Dense Marker). Returns -1 when no
 // incomplete row exists.
-function _findUnsolvedRowByFill(sol, rows, wantMax) {
+export function _findUnsolvedRowByFill(sol, rows, wantMax) {
     let bestRow = -1;
     let bestFilled = wantMax ? -1 : Infinity;
 
     for (let r = 0; r < rows; r++) {
-        const filled = sol[r].filter((v, c) => v === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])).length;
+        const filled = sol[r].filter((v, c) => v === 1 && (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c])).length;
         const total = sol[r].filter(v => v === 1).length;
         if (filled >= total) continue;
         if (wantMax ? filled > bestFilled : filled < bestFilled) {
@@ -38,12 +47,12 @@ function _findUnsolvedRowByFill(sol, rows, wantMax) {
 
 // Column counterpart of _findUnsolvedRowByFill - see that function for the
 // wantMax semantics.
-function _findUnsolvedColByFill(sol, cols, wantMax) {
+export function _findUnsolvedColByFill(sol, cols, wantMax) {
     let bestCol = -1;
     let bestFilled = wantMax ? -1 : Infinity;
 
     for (let c = 0; c < cols; c++) {
-        const filled = sol.filter((row, r) => row[c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])).length;
+        const filled = sol.filter((row, r) => row[c] === 1 && (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c])).length;
         const total = sol.filter(row => row[c] === 1).length;
         if (filled >= total) continue;
         if (wantMax ? filled > bestFilled : filled < bestFilled) {
@@ -58,7 +67,7 @@ function _findUnsolvedColByFill(sol, cols, wantMax) {
 // Narrows `cands` to cells in the given best row/col and shows `toastMsg`
 // when that narrowing actually finds matches. Falls back to the original
 // (unbiased) candidate list otherwise.
-function _filterCandidatesByBias(cands, bestRow, bestCol, toastMsg) {
+export function _filterCandidatesByBias(cands, bestRow, bestCol, toastMsg) {
     const biased = cands.filter(([r, c]) => r === bestRow || c === bestCol);
     if (biased.length > 0) {
         showToast(toastMsg);
@@ -70,7 +79,7 @@ function _filterCandidatesByBias(cands, bestRow, bestCol, toastMsg) {
 
 // Attempts to narrow `cands` to cells in the least-filled unsolved row or
 // column based on the cumulative Targeted Reveal passive chance.
-function _applyTargetedRevealBias(cands, sol, rows, cols) {
+export function _applyTargetedRevealBias(cands, sol, rows, cols) {
     const chance = (ptHasSkill('targeted_reveal_1') ? 0.20 : 0)
         + (ptHasSkill('targeted_reveal_2') ? 0.20 : 0)
         + (ptHasSkill('targeted_reveal_3') ? 0.30 : 0);
@@ -85,7 +94,7 @@ function _applyTargetedRevealBias(cands, sol, rows, cols) {
 
 // Attempts to narrow `cands` to cells in the densest unsolved row or
 // column based on the Dense Marker passive chance.
-function _applyDenseMarkerBias(cands, sol, rows, cols) {
+export function _applyDenseMarkerBias(cands, sol, rows, cols) {
     const chance = (ptHasSkill('dense_marker_1') ? 0.20 : 0)
         + (ptHasSkill('dense_marker_2') ? 0.20 : 0)
         + (ptHasSkill('dense_marker_3') ? 0.30 : 0);
@@ -100,15 +109,15 @@ function _applyDenseMarkerBias(cands, sol, rows, cols) {
 
 // Returns a Set of row indices that contain at least one correctly-filled
 // cell (either placed by the player or revealed by a previous item).
-function _getPreFilledRows() {
-    const sol = cur.grid;
+export function _getPreFilledRows() {
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const filledRows = new Set();
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            if (sol[r][c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])) {
+            if (sol[r][c] === 1 && (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c])) {
                 filledRows.add(r);
                 break; // one filled cell is enough - move to the next row
             }
@@ -120,15 +129,15 @@ function _getPreFilledRows() {
 
 // Returns a Set of column indices that contain at least one correctly-
 // filled cell (either placed by the player or revealed by a previous item).
-function _getPreFilledCols() {
-    const sol = cur.grid;
+export function _getPreFilledCols() {
+    const sol = globalThis.cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const filledCols = new Set();
 
     for (let c = 0; c < cols; c++) {
         for (let r = 0; r < rows; r++) {
-            if (sol[r][c] === 1 && (userGrid[r][c] === 1 || revealedGrid[r][c])) {
+            if (sol[r][c] === 1 && (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c])) {
                 filledCols.add(c);
                 break; // one filled cell is enough - move to the next column
             }

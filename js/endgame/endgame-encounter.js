@@ -1,10 +1,52 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { ACH_STATE, saveAchState, setAchStat, trackAchStat } from '../achievements/achievements.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { _bloodMagicActive, _getPlayerMaxMana, gainMana, spendMana } from '../classes/class-mana.js';
+import { _charmTryMonsterDrop } from '../skills/skill-charms.js';
+import { _uspApplySupportMitigation, _uspClearSupportBuffs, _uspGetSupportMitigation, _uspReflectThorns, _uspTryWardNegate } from '../skills/universal-spells.js';
+import { stopTimer } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { _egAilmentsCleanup, _egAilmentsReset, _egApplyAilmentShockAmpOnMonster, _egApplyPlayerShockAmp, _egEnsurePlayerStatusBar, _egGetPolymorphVictim, _egIsPolymorphActive, _egMaybePuzzleAttack, _egRenderMonsterStatusStrip, _egRollMonsterHitAilment, _egRollPlayerHitAilments } from './endgame-ailments.js';
+import { EG_ART } from './endgame-art.js';
+import { _egFireProjectile, _egFlushPendingRevealProjectiles, _egGetElementCentre, _egGetProjectileDef } from './endgame-class-projectiles.js';
+import { EG_ELEMENTS, _egApplyTargetResistances, _egCalcPlayerDamage, _egCalcPlayerMeleeDamage, _egCalcPlayerResistanceReduction, _egLastHitElements, _egLastHitWasCrit, _egLastMeleeElements, _egLastMeleeWasCrit, _egScaleElements } from './endgame-combat-calculations.js';
+import { _egTryDropCurrency } from './endgame-currency.js';
+import { _egBossDefeated, _egChainCleanup, _egEndMapDefeated, _egOnAllBossesDead, _egScheduleArenaAdvance, _egUpdateObjectivesHUD } from './endgame-encounter-chain.js';
+import { _egMaybeShowAbsorptionBroken, _egMaybeShowMistakesWarning, _egResetAbsorptionBrokenState, _egResetLowHealthWarningState, _egResetMistakesWarningState } from './endgame-encounter-overlays.js';
+import { _egSetHoldEPauseVisual, _egTickLoop, _egUpdatePlayerChargeBar } from './endgame-encounter-tick.js';
+import { _egTryDropEssence } from './endgame-essences.js';
+import { _egDropHeartPickup, _egSpawnItemDrop, _egStartPickupSpawner, _egStopPickupSpawner } from './endgame-grid-pickups.js';
+import { _egHazardsCleanup, _egHazardsReset, _egIsPlayerInDarknessCloud } from './endgame-hazards.js';
+import { _egCampaignMonsterLevel, _egGetPlayerLevel, _egGrantMonsterXP } from './endgame-leveling.js';
+import { _egApplyMonsterHitMods, _egGetActiveMapModValue, _egMapDamageTakenAmpMult, _egMapKillRecoveryMult, _egMapPlayerProjectileMult, _egRollMonsterCritMult } from './endgame-map-launch.js';
+import { EG_ENDGAME_MONSTER_LEVEL_CAP, EG_MAP_TIER_MONSTER_LEVELS, _egRollMapTier, _egTryDropMap } from './endgame-maps.js';
+import { _egRoamShouldRoam, _egRoamSync, _egRoamTeardown, _egTryMonsterMeleeSidestep } from './endgame-monster-roam.js';
+import { EG_MAX_CONCURRENT_MONSTERS, EG_MONSTER_DEFS, _egBuildMonster } from './endgame-monsters.js';
+import { EG_DUAL_WIELD_PARRY_PCT, EG_PLAYER_STATS, _egCalcAccuracyMissChance, _egCalcArmourMitigation, _egCalcEvasionDodgeChance, _egCancelAbsorptionRegen, _egComputePlayerStats, _egFormatStatValue, _egGetAllEquippedItems, _egGetDragTier, _egGetDragTierLabelKey, _egScheduleAbsorptionRegen } from './endgame-player-stats.js';
+import { _egIsDualWielding } from './endgame-requirements.js';
+import { EG_PLAYER_MELEE_ANIM_DURATION_MS, EG_PLAYER_MELEE_DAMAGE, _egDragChargeElements, _egIsActive, _egIsCampaignRun, _egRecentFills } from './endgame-state.js';
+import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egShowWeaponSwing, _egWeaponSwingSound } from './endgame-weapon-swing.js';
+
+//------------------------------------------------------------------------
+// Phase 3 step 7: live globalThis accessors for externally-mutated state.
+// (derived from write-site audit by dev/scratch/convert-endgame.mjs)
+//------------------------------------------------------------------------
+try { Object.defineProperty(globalThis, '_egClearCampaignLevelFields', { get() { return _egClearCampaignLevelFields; }, set(v) { _egClearCampaignLevelFields = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egOnCorrectCell', { get() { return _egOnCorrectCell; }, set(v) { _egOnCorrectCell = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egPlayerBlockLockoutUntil', { get() { return _egPlayerBlockLockoutUntil; }, set(v) { _egPlayerBlockLockoutUntil = v; }, configurable: true }); } catch (e) {}
+try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { get() { return _egShouldPrepareCampaignEncounter; }, set(v) { _egShouldPrepareCampaignEncounter = v; }, configurable: true }); } catch (e) {}
+
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & CONFIGURATION----------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // All zone IDs where monster cards can be rendered.
-const EG_MONSTER_ZONES = [
+export const EG_MONSTER_ZONES = [
     'eg-monster-panel',
     'eg-panel-left',
     'eg-panel-right',
@@ -15,61 +57,61 @@ const EG_MONSTER_ZONES = [
 // Default monster count per wave if cur.maxMonsters is not set.
 // Scales with monster level so T16 feels dense: 3 at low tiers, 4 at mid, 5 at high.
 // T1 stays breezy, T3-7 ramp, T8+ feels crowded (PoE density).
-function _egGetDefaultMonsterCap(baseLevel) {
+export function _egGetDefaultMonsterCap(baseLevel) {
     const lvl = Number(baseLevel) || 1;
     if (lvl >= 60) return 5;
     if (lvl >= 30) return 4;
     if (lvl >= 14) return 3;
     return 2; // T1-T2 very light
 }
-const EG_DEFAULT_MONSTER_CAP = 3; // legacy fallback - use _egGetDefaultMonsterCap() instead
+export const EG_DEFAULT_MONSTER_CAP = 3; // legacy fallback - use _egGetDefaultMonsterCap() instead
 
 // Delay before a boss materialises after entering an arena / after the
 // previous arena boss died (ms).
-const EG_BOSS_SPAWN_DELAY_MS = 1500;
+export const EG_BOSS_SPAWN_DELAY_MS = 1500;
 
 // Delay range for respawn timer (ms). A random value in [min, min+variance] is used.
 // Shorter at high tiers so the screen never stays at 1 monster for long.
-function _egGetRespawnDelayMs(baseLevel) {
+export function _egGetRespawnDelayMs(baseLevel) {
     const lvl = Number(baseLevel) || 1;
     if (lvl >= 60) return { min: 2200, range: 2800 }; // 2.2-5.0s at T13+
     if (lvl >= 30) return { min: 2800, range: 3500 }; // 2.8-6.3s at T8+
     return { min: 4000, range: 6000 }; // 4-10s at low tiers
 }
-const EG_RESPAWN_DELAY_MIN_MS = 4000;
-const EG_RESPAWN_DELAY_RANGE_MS = 6000;
+export const EG_RESPAWN_DELAY_MIN_MS = 4000;
+export const EG_RESPAWN_DELAY_RANGE_MS = 6000;
 
 // Delay before re-rendering the panel after a monster death (ms).
-const EG_PANEL_RERENDER_DELAY_MS = 350;
+export const EG_PANEL_RERENDER_DELAY_MS = 350;
 
 // How long the player HUD hit flash lasts (ms).
-const EG_PLAYER_HIT_FLASH_MS = 150;
+export const EG_PLAYER_HIT_FLASH_MS = 150;
 
 // How long a floating damage number stays on screen (ms).
-const EG_DAMAGE_NUMBER_DURATION_MS = 1050;
+export const EG_DAMAGE_NUMBER_DURATION_MS = 1050;
 
 // How long a floating player damage number stays on screen (ms).
-const EG_PLAYER_DAMAGE_NUMBER_DURATION_MS = 1050;
+export const EG_PLAYER_DAMAGE_NUMBER_DURATION_MS = 1050;
 
 // How long the immune flash and label last on the card (ms).
-const EG_IMMUNE_FLASH_DURATION_MS = 400;
-const EG_IMMUNE_LABEL_DURATION_MS = 700;
+export const EG_IMMUNE_FLASH_DURATION_MS = 400;
+export const EG_IMMUNE_LABEL_DURATION_MS = 700;
 
 // Melee animation roundtrip duration (ms). Impact fires at the midpoint.
-const EG_MELEE_ANIM_DURATION_MS = 500;
+export const EG_MELEE_ANIM_DURATION_MS = 500;
 
 // Ranged monster projectile travel duration (ms).
-const EG_MONSTER_PROJ_DURATION_MS = 400;
+export const EG_MONSTER_PROJ_DURATION_MS = 400;
 
 // Base window after a successful block during which the player cannot
 // block again (ms). Player remains free to attack - recovery only disables
 // blocking. Reduced by the blockRecoveryPct stat.
-const EG_BLOCK_LOCKOUT_BASE_MS = 8000;
+export const EG_BLOCK_LOCKOUT_BASE_MS = 8000;
 
 // Hold-parry baseline values (gear adds on top via parry/deflect mods)
-const EG_PARRY_BASE_PCT = 50;          // 50% baseline while holding the parry key (R by default)
-const EG_DEFLECT_BASE_PCT = 5;         // 5% chance on a successful parry to deflect
-const EG_DEFLECT_BASE_DMG_PCT = 30;    // deflected projectile deals 30% of monster's damage
+export const EG_PARRY_BASE_PCT = 50;          // 50% baseline while holding the parry key (R by default)
+export const EG_DEFLECT_BASE_PCT = 5;         // 5% chance on a successful parry to deflect
+export const EG_DEFLECT_BASE_DMG_PCT = 30;    // deflected projectile deals 30% of monster's damage
 
 // Timestamp (Date.now()) until which the player cannot block again due to
 // a recent block. 0 when not locked out.
@@ -78,8 +120,8 @@ let _egPlayerBlockLockoutUntil = 0;
 // Tuning constants for the initial monster spawn stagger (also used by
 // endgame-encounter-tick.js). Declared with `let` so the rebalance pass
 // can overwrite them at load time.
-let EG_INITIAL_SPAWN_STAGGER_BASE_MS = 500;
-let EG_INITIAL_SPAWN_STAGGER_STEP_MS = 200;
+export let EG_INITIAL_SPAWN_STAGGER_BASE_MS = 500;
+export let EG_INITIAL_SPAWN_STAGGER_STEP_MS = 200;
 
 
 //------------------------------------------------------------------------
@@ -88,11 +130,11 @@ let EG_INITIAL_SPAWN_STAGGER_STEP_MS = 200;
 //------------------------------------------------------------------------
 
 // Returns true if every filled cell in the solution has been correctly placed.
-function _egIsPuzzleSolved() {
-    if (!cur || !userGrid) return false;
-    for (let r = 0; r < cur.grid.length; r++)
-        for (let c = 0; c < cur.grid[0].length; c++)
-            if (cur.grid[r][c] === 1 && userGrid[r][c] !== 1) return false;
+export function _egIsPuzzleSolved() {
+    if (!globalThis.cur || !globalThis.userGrid) return false;
+    for (let r = 0; r < globalThis.cur.grid.length; r++)
+        for (let c = 0; c < globalThis.cur.grid[0].length; c++)
+            if (globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1) return false;
     return true;
 }
 
@@ -109,12 +151,12 @@ function _egIsPuzzleSolved() {
 // so monsters sometimes roll close to the next tier's base level.
 // Below EG_EARLY_VARIANCE_FREE_LEVEL variance only rolls downward so fresh
 // characters never face monsters above their map's base level.
-const EG_EARLY_VARIANCE_FREE_LEVEL = 8;
-const EG_MONSTER_VARIANCE_DOWN = 2;
-const EG_MONSTER_VARIANCE_UP_MIN = 2;
-const EG_MONSTER_VARIANCE_UP_MAX = 6;
+export const EG_EARLY_VARIANCE_FREE_LEVEL = 8;
+export const EG_MONSTER_VARIANCE_DOWN = 2;
+export const EG_MONSTER_VARIANCE_UP_MIN = 2;
+export const EG_MONSTER_VARIANCE_UP_MAX = 6;
 
-function _egRollMonsterLevel(baseLevel) {
+export function _egRollMonsterLevel(baseLevel) {
     const base = Math.max(1, Math.round(Number(baseLevel) || 1));
     // Early tiers: only downward variance (protect new players).
     if (base < EG_EARLY_VARIANCE_FREE_LEVEL) {
@@ -157,19 +199,19 @@ function _egRollMonsterLevel(baseLevel) {
 // Chained-puzzle levels reuse regular puzzle defs that carry no monsterLevel
 // of their own - in that case respect the original map def's monster level
 // so monsters keep spawning at the map's intended level across the chain.
-function _egGetEncounterBaseLevel() {
-    if (cur && cur.monsterLevel != null && cur.monsterLevel > 0) return cur.monsterLevel;
-    if (typeof _egMapDef !== 'undefined' && _egMapDef
-        && _egMapDef.monsterLevel != null && _egMapDef.monsterLevel > 0) {
-        return _egMapDef.monsterLevel;
+export function _egGetEncounterBaseLevel() {
+    if (globalThis.cur && globalThis.cur.monsterLevel != null && globalThis.cur.monsterLevel > 0) return globalThis.cur.monsterLevel;
+    if (typeof _egMapDef !== 'undefined' && globalThis._egMapDef
+        && globalThis._egMapDef.monsterLevel != null && globalThis._egMapDef.monsterLevel > 0) {
+        return globalThis._egMapDef.monsterLevel;
     }
     return 1;
 }
 
 // Builds a fixed monster list from cur.monsters, levelling each entry.
 // Used when the map explicitly defines which monsters should appear.
-function _egBuildFixedNormalList(baseLevel, cap) {
-    return cur.monsters.slice(0, cap).map(entry => ({
+export function _egBuildFixedNormalList(baseLevel, cap) {
+    return globalThis.cur.monsters.slice(0, cap).map(entry => ({
         id: entry.id,
         level: entry.level != null ? entry.level : _egRollMonsterLevel(baseLevel),
     }));
@@ -178,14 +220,14 @@ function _egBuildFixedNormalList(baseLevel, cap) {
 // Builds a randomised monster list by shuffling all non-boss defs.
 // Count is random in [1, cap]. Used when the map has no explicit monster list.
 // Tier-weighted so high-level maps (T14-T16) prefer T3 hard-hitters over T1 fodder.
-function _egCategorizeMonsterTier(def) {
+export function _egCategorizeMonsterTier(def) {
     // T3: tanky / hard-hitting (high HP or high damage)
     if ((def.baseHP || 0) >= 110 || (def.baseDamage || 0) >= 15) return 3;
     // T2: medium
     if ((def.baseHP || 0) >= 55 || (def.baseDamage || 0) >= 7) return 2;
     return 1;
 }
-function _egPickWeightedMonster(allDefs, baseLevel) {
+export function _egPickWeightedMonster(allDefs, baseLevel) {
     const lvl = Number(baseLevel) || 1;
     // At L90: 65% T3, 25% T2, 10% T1; at L1: inverse.
     let w1 = 1.0, w2 = 1.0, w3 = 1.0;
@@ -206,7 +248,7 @@ function _egPickWeightedMonster(allDefs, baseLevel) {
     }
     return pool[pool.length - 1].def;
 }
-function _egBuildRandomNormalList(baseLevel, cap) {
+export function _egBuildRandomNormalList(baseLevel, cap) {
     const allNonBoss = Object.values(EG_MONSTER_DEFS);
     if (allNonBoss.length === 0) return [];
 
@@ -238,12 +280,12 @@ function _egBuildRandomNormalList(baseLevel, cap) {
 // Builds the normal (non-boss) part of the spawn list for the current encounter.
 // Delegates to fixed or random list builders depending on cur.monsters.
 // cur.maxMonsters caps the total count (0 = boss-only encounter).
-function _egBuildNormalSpawnList(baseLevel) {
+export function _egBuildNormalSpawnList(baseLevel) {
     const fallbackCap = (typeof _egGetDefaultMonsterCap === 'function') ? _egGetDefaultMonsterCap(baseLevel) : EG_DEFAULT_MONSTER_CAP;
-    const cap = (cur.maxMonsters != null && cur.maxMonsters >= 0) ? cur.maxMonsters : fallbackCap;
+    const cap = (globalThis.cur.maxMonsters != null && globalThis.cur.maxMonsters >= 0) ? globalThis.cur.maxMonsters : fallbackCap;
     if (cap === 0) return [];
 
-    if (cur.monsters && cur.monsters.length > 0) {
+    if (globalThis.cur.monsters && globalThis.cur.monsters.length > 0) {
         return _egBuildFixedNormalList(baseLevel, cap);
     }
     return _egBuildRandomNormalList(baseLevel, cap);
@@ -251,7 +293,7 @@ function _egBuildNormalSpawnList(baseLevel) {
 
 // Builds a boss list from an explicit list of boss entries on a map def object.
 // Shared by both _egBuildBossSpawnList (cur) and _egBuildBossSpawnListFromDef (mapDef).
-function _egBuildFixedBossList(bosses, bossCap, baseLevel) {
+export function _egBuildFixedBossList(bosses, bossCap, baseLevel) {
     return bosses.slice(0, bossCap).map(entry => ({
         id: entry.id,
         level: entry.level != null ? entry.level : _egRollMonsterLevel(baseLevel),
@@ -265,8 +307,8 @@ function _egBuildFixedBossList(bosses, bossCap, baseLevel) {
 
 // Picks one random boss from EG_BOSS_DEFS and returns it as a one-entry list.
 // Used when hasBoss is true but no explicit boss list is defined.
-function _egBuildRandomBossList(baseLevel) {
-    const allBossDefs = Object.values(EG_BOSS_DEFS);
+export function _egBuildRandomBossList(baseLevel) {
+    const allBossDefs = Object.values(globalThis.EG_BOSS_DEFS);
     if (allBossDefs.length === 0) return [];
     const picked = allBossDefs[Math.floor(Math.random() * allBossDefs.length)];
     return [{ id: picked.id, level: _egRollMonsterLevel(baseLevel), isBossSpawn: true }];
@@ -275,20 +317,20 @@ function _egBuildRandomBossList(baseLevel) {
 // Builds the boss part of the spawn list for the current encounter (reads from cur).
 // Uses cur.bosses if provided; otherwise picks one random boss when cur.hasBoss is true.
 // cur.maxBosses caps the count (defaults to 1).
-function _egBuildBossSpawnList(baseLevel) {
-    const hasBossFlag = cur.hasBoss;
-    const explicitBosses = cur.bosses && cur.bosses.length > 0;
+export function _egBuildBossSpawnList(baseLevel) {
+    const hasBossFlag = globalThis.cur.hasBoss;
+    const explicitBosses = globalThis.cur.bosses && globalThis.cur.bosses.length > 0;
     if (!hasBossFlag && !explicitBosses) return [];
 
-    const bossCap = (cur.maxBosses != null && cur.maxBosses > 0) ? cur.maxBosses : 1;
+    const bossCap = (globalThis.cur.maxBosses != null && globalThis.cur.maxBosses > 0) ? globalThis.cur.maxBosses : 1;
 
-    if (explicitBosses) return _egBuildFixedBossList(cur.bosses, bossCap, baseLevel);
+    if (explicitBosses) return _egBuildFixedBossList(globalThis.cur.bosses, bossCap, baseLevel);
     return _egBuildRandomBossList(baseLevel);
 }
 
 // Like _egBuildBossSpawnList but reads from an explicit mapDef object instead of cur.
 // Used by _egEnterBossArena so it always reads from the original map def.
-function _egBuildBossSpawnListFromDef(mapDef, baseLevel) {
+export function _egBuildBossSpawnListFromDef(mapDef, baseLevel) {
     if (!mapDef) return [];
     const hasBossFlag = mapDef.hasBoss;
     const explicitBosses = mapDef.bosses && mapDef.bosses.length > 0;
@@ -304,7 +346,7 @@ function _egBuildBossSpawnListFromDef(mapDef, baseLevel) {
 // NOTE: Bosses never spawn inside regular puzzles. On boss maps they are
 //       fought in dedicated boss-arena puzzles at the end of the run
 //       (see _egEnterBossArena in endgame-encounter-chain.js).
-function _egBuildSpawnList() {
+export function _egBuildSpawnList() {
     const baseLevel = _egGetEncounterBaseLevel();
     return _egBuildNormalSpawnList(baseLevel);
 }
@@ -322,7 +364,7 @@ function _egBuildSpawnList() {
 // before the puzzle completes.
 //
 // Campaign packs never respawn and never include bosses.
-const EG_CAMPAIGN_MONSTER_CONFIG = {
+export const EG_CAMPAIGN_MONSTER_CONFIG = {
     hpBudgetFraction: 0.85,   // share of the level's total player damage (~2x, so packs survive ~12 hits each with starter gear instead of ~6)
     minHp: 18,
     countBase: 2,
@@ -338,16 +380,16 @@ const EG_CAMPAIGN_MONSTER_CONFIG = {
 // _egClearCampaignLevelFields can restore the story level to its pristine
 // state once the encounter ends (the same level objects are reused as
 // endgame map seeds, so nothing may leak).
-const EG_CAMPAIGN_STAMPED_FIELDS = [
+export const EG_CAMPAIGN_STAMPED_FIELDS = [
     'campaignMonsters', 'campaignMonsterCount', 'campaignMonsterHp',
     'campaignMonsterDamage', 'monsters', 'monsterLevel', 'maxMonsters',
 ];
 
 // Counts the solution cells (value 1) of the current puzzle.
-function _egCountSolutionCells() {
-    if (!cur || !cur.grid) return 0;
+export function _egCountSolutionCells() {
+    if (!globalThis.cur || !globalThis.cur.grid) return 0;
     let n = 0;
-    for (const row of cur.grid) for (const v of row) if (v === 1) n++;
+    for (const row of globalThis.cur.grid) for (const v of row) if (v === 1) n++;
     return n;
 }
 
@@ -355,7 +397,7 @@ function _egCountSolutionCells() {
 // monster level so early worlds stay to fragile creatures while late worlds
 // can roll tankier ones (their HP is overridden by the campaign budget
 // anyway, but baseId drives the sprite and resistances).
-function _egBuildCampaignMonsterList(count, level) {
+export function _egBuildCampaignMonsterList(count, level) {
     const defs = (typeof EG_MONSTER_DEFS !== 'undefined') ? Object.values(EG_MONSTER_DEFS) : [];
     if (!defs.length) return [];
     const maxBaseHp = level <= 12 ? 40 : level <= 30 ? 80 : level <= 50 ? 130 : 200;
@@ -372,12 +414,12 @@ function _egBuildCampaignMonsterList(count, level) {
 // Returns true when the current level should run a campaign monster pack.
 // Excludes endgame sandbox levels and levels already stamped as map seeds.
 function _egShouldPrepareCampaignEncounter() {
-    if (!cur) return false;
-    if (cur.isEndgameSandbox) return false;
+    if (!globalThis.cur) return false;
+    if (globalThis.cur.isEndgameSandbox) return false;
     // Active map-device run / sandbox seed - already a monster level that is
     // NOT a campaign level.
-    if (cur.isMonsterLevel && !cur.campaignMonsters) return false;
-    if (cur.isMapRunSeed) return false;
+    if (globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters) return false;
+    if (globalThis.cur.isMapRunSeed) return false;
     if (typeof window !== 'undefined' && window._egIsMapDeviceRun) return false;
     return true;
 }
@@ -385,15 +427,15 @@ function _egShouldPrepareCampaignEncounter() {
 // Stamps the current campaign level with everything the shared encounter loop
 // needs (monster list, level, HP/damage budget) and returns true on success.
 // Called from start-level.js right before _egStartEncounter().
-function _egPrepareCampaignEncounter() {
+export function _egPrepareCampaignEncounter() {
     if (!_egShouldPrepareCampaignEncounter()) return false;
-    if (cur.campaignMonsters) return true;   // already prepared (retry / chain)
+    if (globalThis.cur.campaignMonsters) return true;   // already prepared (retry / chain)
 
     const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
     const cells = _egCountSolutionCells();
     const perCellDamage = (typeof EG_PLAYER_STATS !== 'undefined' && EG_PLAYER_STATS.baseDamage) || 10;
 
-    const world = cur.world || 1;
+    const world = globalThis.cur.world || 1;
     let count = cfg.countBase + Math.floor((world - 1) / cfg.countPerWorlds);
     count = Math.max(1, Math.min(cfg.countMax, count));
     count = Math.min(count, Math.max(1, Math.floor(cells / cfg.minCellsPerMonster)));
@@ -402,17 +444,17 @@ function _egPrepareCampaignEncounter() {
     const perHp = Math.max(cfg.minHp, Math.round(budget / Math.max(1, count)));
 
     const level = (typeof _egCampaignMonsterLevel === 'function')
-        ? _egCampaignMonsterLevel(cur.gIdx) : 1;
+        ? _egCampaignMonsterLevel(globalThis.cur.gIdx) : 1;
     const damage = Math.max(1, Math.round(cfg.damageBase + cfg.damagePerLevel * level));
 
-    cur.campaignMonsters = true;
-    cur.isMonsterLevel = true;
-    cur.monsterLevel = level;
-    cur.maxMonsters = count;
-    cur.campaignMonsterCount = count;
-    cur.campaignMonsterHp = perHp;
-    cur.campaignMonsterDamage = damage;
-    cur.monsters = _egBuildCampaignMonsterList(count, level);
+    globalThis.cur.campaignMonsters = true;
+    globalThis.cur.isMonsterLevel = true;
+    globalThis.cur.monsterLevel = level;
+    globalThis.cur.maxMonsters = count;
+    globalThis.cur.campaignMonsterCount = count;
+    globalThis.cur.campaignMonsterHp = perHp;
+    globalThis.cur.campaignMonsterDamage = damage;
+    globalThis.cur.monsters = _egBuildCampaignMonsterList(count, level);
     return true;
 }
 
@@ -437,7 +479,7 @@ function _egClearCampaignLevelFields(level) {
 // the leveling curve absorbs the higher per-map kill counts). Inside the
 // boss arena no natural spawns happen at all - adds only appear when a
 // boss ability purposefully summons them (_egMechSummonAdds).
-function _egShouldSuppressRespawn() {
+export function _egShouldSuppressRespawn() {
     if (!_egIsActive()) return true;
 
     // Campaign levels spawn one fixed pack and never respawn - the pack is
@@ -448,19 +490,19 @@ function _egShouldSuppressRespawn() {
     // Boss arena chain: no regular monsters interfere with the duel -
     // except when a boss ability summons them (direct _egSpawnMonster calls
     // from mechanic handlers bypass this gate by design).
-    if (typeof _egBossPhaseActive !== 'undefined' && _egBossPhaseActive) return true;
+    if (typeof _egBossPhaseActive !== 'undefined' && globalThis._egBossPhaseActive) return true;
 
     // Suppress if a boss is already on the field
-    if (_egMonsters.some(m => m.isBoss)) return true;
+    if (globalThis._egMonsters.some(m => m.isBoss)) return true;
 
     // Suppress if already at the concurrent cap
-    if (_egMonsters.length >= EG_MAX_CONCURRENT_MONSTERS) return true;
+    if (globalThis._egMonsters.length >= EG_MAX_CONCURRENT_MONSTERS) return true;
 
     return false;
 }
 
 // Picks a random non-boss def and spawns it at the current encounter's base level.
-function _egRespawnRandomMonster() {
+export function _egRespawnRandomMonster() {
     const baseLevel = _egGetEncounterBaseLevel();
     const allNonBoss = Object.values(EG_MONSTER_DEFS);
     if (allNonBoss.length === 0) return;
@@ -471,11 +513,11 @@ function _egRespawnRandomMonster() {
 
 // Schedules a single replacement monster to spawn after a short random delay.
 // Called whenever a normal monster dies and the kill gate is not yet reached.
-function _egScheduleRespawn() {
+export function _egScheduleRespawn() {
     const resp = (typeof _egGetRespawnDelayMs === 'function') ? _egGetRespawnDelayMs(_egGetEncounterBaseLevel()) : { min: EG_RESPAWN_DELAY_MIN_MS, range: EG_RESPAWN_DELAY_RANGE_MS };
     const delay = resp.min + Math.random() * resp.range;
     const t = setTimeout(() => {
-        if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+        if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) {
             // Paused - retry after pause without consuming the spawn slot
             _egScheduleRespawn();
             return;
@@ -483,7 +525,7 @@ function _egScheduleRespawn() {
         if (_egShouldSuppressRespawn()) return;
         _egRespawnRandomMonster();
     }, delay);
-    _egSpawnTimers.push(t); // tracked so it gets cancelled on encounter stop
+    globalThis._egSpawnTimers.push(t); // tracked so it gets cancelled on encounter stop
 }
 
 
@@ -494,7 +536,7 @@ function _egScheduleRespawn() {
 
 // Calculates a staggered delay for a single spawn entry in the initial wave.
 // The first 2-3 monsters appear almost immediately at high tiers; the rest are spaced 2-6s apart.
-function _egCalcSpawnDelay(index, immediateCount, cumulativeDelay) {
+export function _egCalcSpawnDelay(index, immediateCount, cumulativeDelay) {
     if (index < immediateCount) {
         // Tiny stagger so the first batch doesn't all land simultaneously
         return { delay: EG_INITIAL_SPAWN_STAGGER_BASE_MS + index * EG_INITIAL_SPAWN_STAGGER_STEP_MS, cumulative: cumulativeDelay };
@@ -507,7 +549,7 @@ function _egCalcSpawnDelay(index, immediateCount, cumulativeDelay) {
 
 // Queues all monsters in spawnList with staggered appearance delays.
 // The first 2-3 entries appear almost immediately at high tiers; the rest ramp up gradually.
-function _egScheduleMonsterSpawns(spawnList) {
+export function _egScheduleMonsterSpawns(spawnList) {
     if (spawnList.length === 0) return;
 
     const lvl = _egGetEncounterBaseLevel();
@@ -520,10 +562,10 @@ function _egScheduleMonsterSpawns(spawnList) {
         cumulativeDelay = result.cumulative;
 
         const t = setTimeout(() => {
-            if (typeof _gamePaused !== 'undefined' && _gamePaused) {
+            if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) {
                 // Paused - delay the spawn until the game resumes
                 const retry = setInterval(() => {
-                    if (typeof _gamePaused !== 'undefined' && _gamePaused) return;
+                    if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
                     clearInterval(retry);
                     if (_egIsActive()) _egSpawnMonster(entry.id, entry.level || 1);
                 }, 200);
@@ -531,7 +573,7 @@ function _egScheduleMonsterSpawns(spawnList) {
             }
             if (_egIsActive()) _egSpawnMonster(entry.id, entry.level || 1);
         }, result.delay);
-        _egSpawnTimers.push(t);
+        globalThis._egSpawnTimers.push(t);
     });
 }
 
@@ -542,50 +584,50 @@ function _egScheduleMonsterSpawns(spawnList) {
 //------------------------------------------------------------------------
 
 // Duration of the gear "stagger" charge-timer pause (pants mod).
-const EG_STAGGER_DURATION_MS = 2500;
+export const EG_STAGGER_DURATION_MS = 2500;
 
 // Tick interval for the gear lifeRegen heal (life_regen mod, HP per second).
-const EG_LIFE_REGEN_INTERVAL_MS = 1000;
+export const EG_LIFE_REGEN_INTERVAL_MS = 1000;
 
 // Resets all encounter state variables to their initial values.
-function _egResetEncounterState() {
+export function _egResetEncounterState() {
     // Reset the low-mistakes banner state for the new puzzle/encounter
     if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
     if (typeof _egResetLowHealthWarningState === 'function') _egResetLowHealthWarningState();
     if (typeof _egResetAbsorptionBrokenState === 'function') _egResetAbsorptionBrokenState();
-    _egEncounterActive = true;
-    _egTargetId = null;
-    _egMonsters = [];
+    globalThis._egEncounterActive = true;
+    globalThis._egTargetId = null;
+    globalThis._egMonsters = [];
     // Do NOT clear _egPendingRevealQueue here - start-of-puzzle passives
     // queued reveals before _egStartEncounter and would be lost. Queue is
     // cleared on _egStopEncounter or after flushing.
-    _egMapDef = cur;
-    _egMonsterSpawnCounter = 0;
-    _egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption;
+    globalThis._egMapDef = globalThis.cur;
+    globalThis._egMonsterSpawnCounter = 0;
+    globalThis._egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption;
     _egCancelAbsorptionRegen();
     if (typeof _egAilmentsReset === 'function') _egAilmentsReset();
     if (typeof _egHazardsReset === 'function') _egHazardsReset();
     if (typeof _egClearChargedProjectileVisual === 'function') _egClearChargedProjectileVisual();
 
     // Gear: channel / arcane surge streaks restart with each encounter
-    _egChannelStacks = 0;
-    _egArcaneSurgeStreak = 0;
+    globalThis._egChannelStacks = 0;
+    globalThis._egArcaneSurgeStreak = 0;
     // Gear: warding - "once per map". Standalone monster levels are their own
     // map, so refresh here; device-map runs refresh only at launch
     // (_egLaunchMapFromDevice) so the save persists across chained puzzles.
-    if (!window._egIsMapDeviceRun) _egWardingUsedThisMap = false;
+    if (!window._egIsMapDeviceRun) globalThis._egWardingUsedThisMap = false;
 
     // First step toast flag reset
-    _egFirstStepToastShown = false;
+    globalThis._egFirstStepToastShown = false;
 
     // Hold-parry pause starts released
-    if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
+    if (typeof _egHoldEPauseActive !== 'undefined') globalThis._egHoldEPauseActive = false;
     if (typeof _egSetHoldEPauseVisual === 'function') _egSetHoldEPauseVisual(false);
 
     // Manual melee charge starts empty each encounter (Secret-of-Mana-style:
     // every strike spends the bar, so every fight opens at 0%)
-    _egPlayerCurrentCharge = 0;
-    _egPendingMeleeChargePct = null;
+    globalThis._egPlayerCurrentCharge = 0;
+    globalThis._egPendingMeleeChargePct = null;
 
     // Initial low-mistakes check - shows the 3/2/1/0 overlay immediately
     // if the map already starts with a tight mistake budget.
@@ -593,9 +635,9 @@ function _egResetEncounterState() {
 }
 
 // Starts the combat tick loop at 10Hz.
-function _egStartTickLoop() {
-    if (_egTickInterval) clearInterval(_egTickInterval);
-    _egTickInterval = setInterval(_egTickLoop, 100);
+export function _egStartTickLoop() {
+    if (globalThis._egTickInterval) clearInterval(globalThis._egTickInterval);
+    globalThis._egTickInterval = setInterval(_egTickLoop, 100);
 }
 
 // Pass 5: bosses2.css is no longer a render-blocking <link> in index.html
@@ -603,7 +645,7 @@ function _egStartTickLoop() {
 // classes; base monster-card styles live in the eager monsters.css).
 // Warm it up once at idle after boot; _egStartEncounter force-loads it
 // synchronously if the warm-up has not landed yet.
-function _egAttachBossStylesheet() {
+export function _egAttachBossStylesheet() {
     if (document.querySelector('link[data-eg-boss-css]')) return;
     const l = document.createElement('link');
     l.rel = 'stylesheet';
@@ -612,13 +654,13 @@ function _egAttachBossStylesheet() {
     document.head.appendChild(l);
 }
 (function _egWarmBossStylesheet() {
-    if (typeof requestIdleCallback === 'function') requestIdleCallback(_egAttachBossStylesheet, { timeout: 8000 });
+    if (typeof requestIdleCallback === 'function') globalThis.requestIdleCallback(_egAttachBossStylesheet, { timeout: 8000 });
     else setTimeout(_egAttachBossStylesheet, 2500);
 })();
 
 // Initialises and begins a full monster encounter for the current level.
 // Called from start-level.js or equivalent when cur.isMonsterLevel is true.
-function _egStartEncounter() {
+export function _egStartEncounter() {
     _egAttachBossStylesheet(); // sync fallback in case the idle warm-up has not fired yet
     _egResetEncounterState();
     _egRenderPanel();
@@ -634,35 +676,35 @@ function _egStartEncounter() {
 }
 
 // Clears all pending spawn timers and resets the timer list.
-function _egCancelSpawnTimers() {
-    _egSpawnTimers.forEach(t => clearTimeout(t));
-    _egSpawnTimers = [];
+export function _egCancelSpawnTimers() {
+    globalThis._egSpawnTimers.forEach(t => clearTimeout(t));
+    globalThis._egSpawnTimers = [];
 }
 
 // Stops the combat tick loop if one is running.
-function _egStopTickLoop() {
-    if (_egTickInterval) {
-        clearInterval(_egTickInterval);
-        _egTickInterval = null;
+export function _egStopTickLoop() {
+    if (globalThis._egTickInterval) {
+        clearInterval(globalThis._egTickInterval);
+        globalThis._egTickInterval = null;
     }
 }
 
 // Tears down a running encounter and cleans up all state and DOM.
 // Safe to call even if no encounter is active.
-function _egStopEncounter() {
+export function _egStopEncounter() {
     if (window._egSuppressEncounterStop) return;
 
     // Campaign: restore the level object we stamped in
     // _egPrepareCampaignEncounter. _egMapDef still points at the level that
     // just ran (cur has already been reassigned by the next startLevel).
-    if (typeof _egMapDef !== 'undefined' && _egMapDef) {
-        _egClearCampaignLevelFields(_egMapDef);
+    if (typeof _egMapDef !== 'undefined' && globalThis._egMapDef) {
+        _egClearCampaignLevelFields(globalThis._egMapDef);
     }
 
-    _egEncounterActive = false;
-    _egMonsters = [];
-    _egTargetId = null;
-    if (typeof _egPendingRevealQueue !== 'undefined') _egPendingRevealQueue = [];
+    globalThis._egEncounterActive = false;
+    globalThis._egMonsters = [];
+    globalThis._egTargetId = null;
+    if (typeof _egPendingRevealQueue !== 'undefined') globalThis._egPendingRevealQueue = [];
 
     if (typeof window.clearActiveRandomWalkers === 'function') window.clearActiveRandomWalkers();
 
@@ -672,7 +714,7 @@ function _egStopEncounter() {
     _egStopPickupSpawner();
     if (typeof _egAilmentsCleanup === 'function') _egAilmentsCleanup();
     if (typeof _egHazardsCleanup === 'function') _egHazardsCleanup();
-    _egBossCleanupAll();
+    globalThis._egBossCleanupAll();
     _egCancelAbsorptionRegen();
     // Support-spell buffs never survive the encounter they were cast in.
     if (typeof _uspClearSupportBuffs === 'function') _uspClearSupportBuffs();
@@ -681,11 +723,11 @@ function _egStopEncounter() {
     if (typeof _egResetAbsorptionBrokenState === 'function') _egResetAbsorptionBrokenState();
     if (typeof _egChainCleanup === 'function') _egChainCleanup();
     _egHideMonsterPanel();
-    if (typeof _egHoldEPauseActive !== 'undefined') _egHoldEPauseActive = false;
+    if (typeof _egHoldEPauseActive !== 'undefined') globalThis._egHoldEPauseActive = false;
     if (typeof _egSetHoldEPauseVisual === 'function') _egSetHoldEPauseVisual(false);
     // Drop any in-flight manual swing snapshot with the encounter
-    _egPlayerCurrentCharge = 0;
-    _egPendingMeleeChargePct = null;
+    globalThis._egPlayerCurrentCharge = 0;
+    globalThis._egPendingMeleeChargePct = null;
 }
 
 
@@ -697,7 +739,7 @@ function _egStopEncounter() {
 //------------------------------------------------------------------------
 
 // Flashes the monster's card to signal it is attacking.
-function _egFlashMonsterAttackCard(monster) {
+export function _egFlashMonsterAttackCard(monster) {
     const card = document.getElementById(`eg-card-${monster.id}`);
     if (!card) return;
     card.classList.remove('eg-flash-attack');
@@ -707,7 +749,7 @@ function _egFlashMonsterAttackCard(monster) {
 
 // Resolves whether this attack should be melee or ranged.
 // 'both' type randomly picks one each time the monster swings.
-function _egResolveAttackType(monster) {
+export function _egResolveAttackType(monster) {
     const type = monster.attackType || 'ranged';
     if (type === 'both') return Math.random() < 0.5 ? 'melee' : 'ranged';
     return type;
@@ -716,7 +758,7 @@ function _egResolveAttackType(monster) {
 // Fires the monster's attack: flashes the card and dispatches the correct animation.
 // Small chance the attack instead flies to the CENTRE OF THE GRID and inflicts
 // a puzzle ailment based on the monster's element (see endgame-ailments.js).
-function _egFireMonsterAttack(monster) {
+export function _egFireMonsterAttack(monster) {
     _egFlashMonsterAttackCard(monster);
     if (typeof _egMaybePuzzleAttack === 'function' && _egMaybePuzzleAttack(monster)) return;
     // The Sprout: his charge-bar attack IS the set-piece - a thorned vine
@@ -724,91 +766,91 @@ function _egFireMonsterAttack(monster) {
     // (boss-sprout.js). No generic projectile/melee on top.
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_sprout')
         && typeof _egSproutVineLunge === 'function') {
-        _egSproutVineLunge(monster);
+        globalThis._egSproutVineLunge(monster);
         return;
     }
     // The Dancer: the mirror ball flashes, then unleashes 3 expanding
     // lightning rings - dodge the rings, dance the gaps (boss-dancer.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_dancer')
         && typeof _egDancerPirouette === 'function') {
-        _egDancerPirouette(monster);
+        globalThis._egDancerPirouette(monster);
         return;
     }
     // The Gale: a wind lance lane telegraphs, then a compressed air bolt
     // blasts across it, flinging anyone hit (boss-gale.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_gale')
         && typeof _egGaleCycloneLance === 'function') {
-        _egGaleCycloneLance(monster);
+        globalThis._egGaleCycloneLance(monster);
         return;
     }
     // The Gambler: a 6-chamber cylinder ticks down over the player, then
     // the hammer falls - 5/6 blank, 1/6 heavy shadow hit (boss-gambler.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_gambler')
         && typeof _egGamblerRoulette === 'function') {
-        _egGamblerRoulette(monster);
+        globalThis._egGamblerRoulette(monster);
         return;
     }
     // The Gourmet: the maw locks on, then inhales hard - fight the suction
     // or be swallowed for heavy damage (boss-gourmet.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_gourmet')
         && typeof _egGourmetDevour === 'function') {
-        _egGourmetDevour(monster);
+        globalThis._egGourmetDevour(monster);
         return;
     }
     // The Lodestone: a chain line telegraphs from the stone, then reels
     // anyone caught into the clamp radius (boss-lodestone.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_lodestone')
         && typeof _egLodestoneLeash === 'function') {
-        _egLodestoneLeash(monster);
+        globalThis._egLodestoneLeash(monster);
         return;
     }
     // The Stack: gray garbage rows flood up from the bottom - stay high or
     // be flung off the rising edge (boss-stack.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_stack')
         && typeof _egStackGarbage === 'function') {
-        _egStackGarbage(monster);
+        globalThis._egStackGarbage(monster);
         return;
     }
     // The Tactician: the four board edges slam inward as castle walls -
     // get inside the shrinking ring before they meet (boss-tactician.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_tactician')
         && typeof _egTacticianCheckmate === 'function') {
-        _egTacticianCheckmate(monster);
+        globalThis._egTacticianCheckmate(monster);
         return;
     }
     // The Bumper: a giant carnival bumper slams onto a telegraphed target
     // ring at the player, flinging anyone inside (boss-bumper.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_bumper')
         && typeof _egBumperSlam === 'function') {
-        _egBumperSlam(monster);
+        globalThis._egBumperSlam(monster);
         return;
     }
     // The Centipede: the whole colony stampedes across a telegraphed lane
     // through the player's row (boss-centipede.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_centipede')
         && typeof _egCentStampede === 'function') {
-        _egCentStampede(monster);
+        globalThis._egCentStampede(monster);
         return;
     }
     // The Striker: a curved free kick - dotted arc telegraph, cone wall,
     // the ball bends around it onto the marked spot (boss-striker.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_striker')
         && typeof _egStrkFreeKick === 'function') {
-        _egStrkFreeKick(monster);
+        globalThis._egStrkFreeKick(monster);
         return;
     }
     // The Thwomp: a shadow marker stalks and locks, then the whole block
     // crashes down on the mark with a huge shockwave (boss-thwomp.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_thwomp')
         && typeof _egThwompGrandSlam === 'function') {
-        _egThwompGrandSlam(monster);
+        globalThis._egThwompGrandSlam(monster);
         return;
     }
     // The Coil: a hood-shadow lane telegraphs, then the maw strikes across
     // it in one lightning lash (boss-coil.js).
     if (monster && monster.isBoss && typeof monster.id === 'string' && monster.id.startsWith('boss_coil')
         && typeof _egCoilCobraStrike === 'function') {
-        _egCoilCobraStrike(monster);
+        globalThis._egCoilCobraStrike(monster);
         return;
     }
     const attackType = _egResolveAttackType(monster);
@@ -820,7 +862,7 @@ function _egFireMonsterAttack(monster) {
 }
 
 
-function _egApplyPlayerMissFeedback() {
+export function _egApplyPlayerMissFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -831,7 +873,7 @@ function _egApplyPlayerMissFeedback() {
 }
 
 // Floating "Blocked!" label on the player HUD after a successful block.
-function _egApplyPlayerBlockFeedback() {
+export function _egApplyPlayerBlockFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -843,7 +885,7 @@ function _egApplyPlayerBlockFeedback() {
 
 // Floating "recovering" label for block-recovery feedback (retained for
 // external callers - attacks no longer fizzle while recovering).
-function _egApplyPlayerBlockLockoutFeedback() {
+export function _egApplyPlayerBlockLockoutFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -858,10 +900,10 @@ function _egApplyPlayerBlockLockoutFeedback() {
 // again because of a recent block. Purely visual: pointer-events none.
 
 // Interval handle driving the countdown text update.
-let _egBlockLockoutOverlayTimer = null;
+export let _egBlockLockoutOverlayTimer = null;
 
 // Shows (or refreshs) the lockout chip in the player status bar for `durationMs`.
-function _egShowBlockLockoutOverlay(durationMs) {
+export function _egShowBlockLockoutOverlay(durationMs) {
     const bar = (typeof _egEnsurePlayerStatusBar === 'function')
         ? _egEnsurePlayerStatusBar()
         : document.body;
@@ -895,7 +937,7 @@ function _egShowBlockLockoutOverlay(durationMs) {
 }
 
 // Removes the lockout chip and stops its countdown loop.
-function _egHideBlockLockoutOverlay() {
+export function _egHideBlockLockoutOverlay() {
     if (_egBlockLockoutOverlayTimer) {
         clearInterval(_egBlockLockoutOverlayTimer);
         _egBlockLockoutOverlayTimer = null;
@@ -905,7 +947,7 @@ function _egHideBlockLockoutOverlay() {
 }
 
 // Applies hit feedback to the player HUD: floating damage number + squish + red glow.
-function _egApplyPlayerHitFeedback(damageValue, isCrit, element) {
+export function _egApplyPlayerHitFeedback(damageValue, isCrit, element) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
 
@@ -951,7 +993,7 @@ function _egApplyPlayerHitFeedback(damageValue, isCrit, element) {
 // While the player is POLYMORPHED, the projectile is confused and flies at
 // another monster instead (friendly fire). With no other monster alive the
 // attack lands on the player as usual.
-function _egAnimateMonsterProjectile(monster) {
+export function _egAnimateMonsterProjectile(monster) {
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
     const targetHud = document.getElementById('player-avatar-wrapper');
     if (!sourceCard || !targetHud) return;
@@ -971,7 +1013,7 @@ function _egAnimateMonsterProjectile(monster) {
     _egFireProjectile(monster.emoji, 'eg-proj-monster', start, end, EG_MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
         if (polymorphVictim) {
             // Confused attack hits the other monster - no player mitigation
-            showToast(`🌀 ${monster.name || 'The monster'} hit ${polymorphVictim.name} instead!`);
+            globalThis.showToast(`🌀 ${monster.name || 'The monster'} hit ${polymorphVictim.name} instead!`);
             _egDamageTargetById(polymorphVictim.id, monster.damageValue);
             return;
         }
@@ -992,14 +1034,14 @@ function _egAnimateMonsterProjectile(monster) {
 // Triggers damage and hit feedback at the melee impact moment.
 // Only fires if the encounter is still active and the monster is still alive.
 // While POLYMORPHED the confused swing lands on another monster instead.
-function _egApplyMeleeImpact(monster) {
-    if (!_egIsActive() || !_egMonsters.some(m => m.id === monster.id)) return;
+export function _egApplyMeleeImpact(monster) {
+    if (!_egIsActive() || !globalThis._egMonsters.some(m => m.id === monster.id)) return;
 
     if (typeof _egIsPolymorphActive === 'function' && _egIsPolymorphActive()
         && typeof _egGetPolymorphVictim === 'function') {
         const victim = _egGetPolymorphVictim(monster.id);
         if (victim) {
-            showToast(`🌀 ${monster.name || 'The monster'} struck ${victim.name} instead!`);
+            globalThis.showToast(`🌀 ${monster.name || 'The monster'} struck ${victim.name} instead!`);
             _egDamageTargetById(victim.id, monster.damageValue);
             return;
         }
@@ -1026,7 +1068,7 @@ function _egApplyMeleeImpact(monster) {
 // Gear: preemptive_dodge (boots suffix) - the first attack each monster
 // directs at the player this encounter has a chance to be automatically
 // dodged. Resets per-monster, not per-map.
-function _egRollPreemptiveDodge(monster) {
+export function _egRollPreemptiveDodge(monster) {
     if (!monster) return false;
     const isFirstAttack = !monster.hasStruckPlayer;
     monster.hasStruckPlayer = true;
@@ -1036,7 +1078,7 @@ function _egRollPreemptiveDodge(monster) {
     const pct = stats.preemptiveDodgePct || 0;
     if (pct <= 0 || Math.random() * 100 >= pct) return false;
 
-    showToast(t('eg_dodged'));
+    globalThis.showToast(t('eg_dodged'));
     _egApplyPlayerMissFeedback();
     return true;
 }
@@ -1044,7 +1086,7 @@ function _egRollPreemptiveDodge(monster) {
 // Physically lunges the monster card toward the player HUD and snaps back.
 // Damage triggers at the animation midpoint (impact apex).
 // While POLYMORPHED the lunge visually chases the confused-attack victim.
-function _egAnimateMonsterMelee(monster) {
+export function _egAnimateMonsterMelee(monster) {
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
     const targetHud = document.getElementById('player-avatar-wrapper');
     if (!sourceCard || !targetHud) return;
@@ -1087,9 +1129,9 @@ function _egAnimateMonsterMelee(monster) {
 
 // Pushes a correctly filled cell into the recent-fills circular buffer.
 // Used by the Prior Bomb mechanic to undo recent player progress.
-function _egTrackRecentFill(row, col) {
+export function _egTrackRecentFill(row, col) {
     _egRecentFills.push([row, col]);
-    if (_egRecentFills.length > EG_RECENT_FILLS_CAPACITY) _egRecentFills.shift();
+    if (_egRecentFills.length > globalThis.EG_RECENT_FILLS_CAPACITY) _egRecentFills.shift();
 }
 
 // Entry point called from mouse-button-handlers.js on every correct cell fill.
@@ -1107,7 +1149,7 @@ function _egOnCorrectCell(row, col) {
     // Boss puzzle mechanics hook (Fated Cell, Soul Tithe): lets active boss
     // mechanics observe correct fills. No-op unless a mechanic is listening.
     if (row !== undefined && col !== undefined && typeof _egNotifyCorrectFill === 'function') {
-        try { _egNotifyCorrectFill(row, col); } catch (e) {}
+        try { globalThis._egNotifyCorrectFill(row, col); } catch (e) {}
     }
 
     // Projectile map mod: "% reduced Projectile Damage" scales correct-fill shots.
@@ -1116,15 +1158,15 @@ function _egOnCorrectCell(row, col) {
     EG_ELEMENTS.forEach(el => {
         _egDragChargeElements[el] += _egLastHitElements ? (_egLastHitElements[el] || 0) : 0;
     });
-    if (typeof _egLastHitWasCrit !== 'undefined' && _egLastHitWasCrit) _egDragChargeWasCrit = true;
+    if (typeof _egLastHitWasCrit !== 'undefined' && _egLastHitWasCrit) globalThis._egDragChargeWasCrit = true;
 
     // Anchor the charging projectile on the stroke's first painted cell
-    if (_egDragChargeStacks === 0 && row !== undefined && col !== undefined) {
-        _egDragChargeRow = row;
-        _egDragChargeCol = col;
+    if (globalThis._egDragChargeStacks === 0 && row !== undefined && col !== undefined) {
+        globalThis._egDragChargeRow = row;
+        globalThis._egDragChargeCol = col;
     }
-    _egDragChargeDamage += damage;
-    _egDragChargeStacks++;
+    globalThis._egDragChargeDamage += damage;
+    globalThis._egDragChargeStacks++;
     _egUpdateChargedProjectileVisual();
 
     // Gear: arcane surge streak + channel stacks grow per correct cell
@@ -1145,52 +1187,52 @@ function _egOnCorrectCell(row, col) {
 //                  automatically when the max-stack cap is reached.
 
 // Delay before an echo's second instance lands (see _egTryEchoHit).
-const EG_ECHO_DELAY_MS = 450;
+export const EG_ECHO_DELAY_MS = 450;
 
 // Called from breakFillStreaksOnMistake() (mouse-button-handlers.js) on any
 // real (unabsorbed) mistake - breaks both correct-cell streak mechanics.
-function _egOnMistake() {
-    _egArcaneSurgeStreak = 0;
-    _egChannelStacks = 0;
+export function _egOnMistake() {
+    globalThis._egArcaneSurgeStreak = 0;
+    globalThis._egChannelStacks = 0;
 
     // Active map run: mistakes burn a share of maximum Life.
     if (typeof _egIsActive === 'function' && _egIsActive()
         && typeof _egGetActiveMapModValue === 'function') {
         const pct = _egGetActiveMapModValue('map_mistake_damage');
         if (pct > 0) {
-            const maxHP = (typeof playerMaxHP !== 'undefined' && playerMaxHP > 0) ? playerMaxHP : 100;
+            const maxHP = (typeof playerMaxHP !== 'undefined' && globalThis.playerMaxHP > 0) ? globalThis.playerMaxHP : 100;
             const dealt = _egPlayerTakeDamage(Math.max(1, Math.round(maxHP * pct / 100)), true);
-            if (dealt > 0) showToast(`✖️ ${t('eg_mm_toast_mistake_pain') || 'Painful mistake!'} (-${dealt})`);
+            if (dealt > 0) globalThis.showToast(`✖️ ${t('eg_mm_toast_mistake_pain') || 'Painful mistake!'} (-${dealt})`);
         }
     }
 }
 
 // Advances the per-correct-cell gear streaks. Called from _egOnCorrectCell.
-function _egTickCorrectCellGearProcs() {
+export function _egTickCorrectCellGearProcs() {
     const stats = _egComputePlayerStats();
 
     // Arcane Surge: mana burst at the required streak length
     if (stats.arcaneSurgeStreak > 0 && stats.arcaneSurgeMana > 0) {
-        _egArcaneSurgeStreak++;
-        if (_egArcaneSurgeStreak >= stats.arcaneSurgeStreak) {
-            _egArcaneSurgeStreak = 0;
+        globalThis._egArcaneSurgeStreak++;
+        if (globalThis._egArcaneSurgeStreak >= stats.arcaneSurgeStreak) {
+            globalThis._egArcaneSurgeStreak = 0;
             const gained = gainMana(stats.arcaneSurgeMana);
-            if (gained > 0) showToast(t('eg_arcane_surge').replace('{n}', Math.round(gained)));
+            if (gained > 0) globalThis.showToast(t('eg_arcane_surge').replace('{n}', Math.round(gained)));
         }
     }
 
     // Channel: gain a stack, auto-releasing once the cap is reached
     if (stats.channelDamagePerStack > 0 && stats.channelMaxStacks > 0) {
-        _egChannelStacks++;
-        if (_egChannelStacks >= stats.channelMaxStacks) _egReleaseChannelAtMax();
+        globalThis._egChannelStacks++;
+        if (globalThis._egChannelStacks >= stats.channelMaxStacks) _egReleaseChannelAtMax();
     }
 }
 
 // Auto-release: dumps all accumulated channel stacks onto the current target.
-function _egReleaseChannelAtMax() {
+export function _egReleaseChannelAtMax() {
     const stats = _egComputePlayerStats();
-    const dmg = Math.round(_egChannelStacks * stats.channelDamagePerStack);
-    _egChannelStacks = 0;
+    const dmg = Math.round(globalThis._egChannelStacks * stats.channelDamagePerStack);
+    globalThis._egChannelStacks = 0;
     const target = typeof _egGetTarget === 'function' ? _egGetTarget() : null;
     if (target && dmg > 0) {
         _egShowStatusLabel(target.id, t('eg_channel'));
@@ -1202,21 +1244,21 @@ function _egReleaseChannelAtMax() {
 // returns their combined flat damage. Called once per player hit - from
 // _egResolveProjectileImpact (projectile channel) and
 // _egApplyPlayerMeleeImpact (melee channel).
-function _egConsumeOnHitGearBonus() {
+export function _egConsumeOnHitGearBonus() {
     const stats = _egComputePlayerStats();
     let bonus = 0;
 
     // Channel: spend accumulated stacks
-    if (_egChannelStacks > 0 && stats.channelDamagePerStack > 0) {
-        bonus += _egChannelStacks * stats.channelDamagePerStack;
-        _egChannelStacks = 0;
+    if (globalThis._egChannelStacks > 0 && stats.channelDamagePerStack > 0) {
+        bonus += globalThis._egChannelStacks * stats.channelDamagePerStack;
+        globalThis._egChannelStacks = 0;
     }
 
     // Mana to Damage: convert a % of CURRENT mana into flat bonus damage,
     // consuming that mana.
     const pct = Math.min(100, stats.manaToDamagePct || 0);
-    if (pct > 0 && playerCurrentMana > 0 && typeof spendMana === 'function') {
-        const converted = Math.floor(playerCurrentMana * pct / 100);
+    if (pct > 0 && globalThis.playerCurrentMana > 0 && typeof spendMana === 'function') {
+        const converted = Math.floor(globalThis.playerCurrentMana * pct / 100);
         if (converted > 0 && spendMana(converted)) bonus += converted;
     }
 
@@ -1231,10 +1273,10 @@ function _egConsumeOnHitGearBonus() {
 
 // Gear: fate (talisman suffix) - pure-luck chance to negate ANY incoming hit
 // entirely, including spells and charge attacks. Returns true when negated.
-function _egRollFateNegation(stats) {
+export function _egRollFateNegation(stats) {
     const pct = stats.fatePct || 0;
     if (pct <= 0 || Math.random() * 100 >= pct) return false;
-    showToast(t('eg_fate'));
+    globalThis.showToast(t('eg_fate'));
     _egApplyPlayerMissFeedback();
     _egScheduleAbsorptionRegen();
     return true;
@@ -1243,13 +1285,13 @@ function _egRollFateNegation(stats) {
 // Gear: grounded (boots prefix) - on a monster CHARGE hit, rolls against
 // groundedChancePct and reduces the hit by groundedReductionPct on proc.
 // Ranged (projectile) attacks are not charges and pass through untouched.
-function _egApplyGroundedReduction(rawDamage) {
+export function _egApplyGroundedReduction(rawDamage) {
     const stats = _egComputePlayerStats();
     const chance = stats.groundedChancePct || 0;
     const reduction = Math.min(100, stats.groundedReductionPct || 0);
     if (chance <= 0 || reduction <= 0) return rawDamage;
     if (Math.random() * 100 >= chance) return rawDamage;
-    showToast(t('eg_grounded'));
+    globalThis.showToast(t('eg_grounded'));
     return rawDamage * (1 - reduction / 100);
 }
 
@@ -1259,7 +1301,7 @@ function _egApplyGroundedReduction(rawDamage) {
 // spells (isSpell=true) are never parryable. Baseline 50% + gear parry.
 // On a successful projectile parry there is a 5% + gear deflect chance to
 // redirect the shot to another monster for 30% + gear deflect damage.
-function _egApplyPlayerParryFeedback() {
+export function _egApplyPlayerParryFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -1269,7 +1311,7 @@ function _egApplyPlayerParryFeedback() {
     hud.appendChild(label);
     setTimeout(() => label.remove(), 1050);
 }
-function _egApplyPlayerDeflectFeedback() {
+export function _egApplyPlayerDeflectFeedback() {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -1279,7 +1321,7 @@ function _egApplyPlayerDeflectFeedback() {
     hud.appendChild(label);
     setTimeout(() => label.remove(), 1050);
 }
-function _egGetParryChancePct() {
+export function _egGetParryChancePct() {
     const base = (typeof EG_PARRY_BASE_PCT !== 'undefined' ? EG_PARRY_BASE_PCT : 50);
     const gear = (_egComputePlayerStats().parryChancePct || 0);
     return base + gear;
@@ -1287,31 +1329,31 @@ function _egGetParryChancePct() {
 // Dual-wield parry (PoE-style): two 1H weapons grant a base chance to parry
 // WITHOUT holding the parry key (gear parry adds on top). Successful projectile parries
 // roll deflect exactly like held parries.
-function _egGetDualWieldParryChancePct() {
+export function _egGetDualWieldParryChancePct() {
     const base = (typeof EG_DUAL_WIELD_PARRY_PCT !== 'undefined' ? EG_DUAL_WIELD_PARRY_PCT : 15);
     let gear = 0;
     try { gear = (_egComputePlayerStats().parryChancePct || 0); } catch (e) {}
     return base + gear;
 }
-function _egIsDualWieldParryActive() {
+export function _egIsDualWieldParryActive() {
     try {
         if (typeof _egIsDualWielding === 'function') return _egIsDualWielding();
     } catch (e) {}
     return false;
 }
-function _egGetDeflectChancePct() {
+export function _egGetDeflectChancePct() {
     const base = (typeof EG_DEFLECT_BASE_PCT !== 'undefined' ? EG_DEFLECT_BASE_PCT : 5);
     const gear = (_egComputePlayerStats().deflectChancePct || 0);
     return base + gear;
 }
-function _egGetDeflectDamagePct() {
+export function _egGetDeflectDamagePct() {
     const base = (typeof EG_DEFLECT_BASE_DMG_PCT !== 'undefined' ? EG_DEFLECT_BASE_DMG_PCT : 30);
     const gear = (_egComputePlayerStats().deflectDamagePct || 0);
     return base + gear;
 }
-function _egRollParry(attacker, isProjectile) {
+export function _egRollParry(attacker, isProjectile) {
     // Hold-parry, or dual-wield auto-parry (two 1H weapons, no key needed)
-    const holding = (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive);
+    const holding = (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive);
     const dualWield = (typeof _egIsDualWieldParryActive === 'function' && _egIsDualWieldParryActive());
     if (!holding && !dualWield) return false;
     if (typeof _egIsActive === 'function' && !_egIsActive()) return false;
@@ -1322,15 +1364,15 @@ function _egRollParry(attacker, isProjectile) {
         : (typeof _egGetDualWieldParryChancePct === 'function' ? _egGetDualWieldParryChancePct() : 15);
     if (chance <= 0) return false;
     if (Math.random() * 100 >= chance) return false;
-    showToast((typeof t === 'function' ? t('eg_parried') : 'Parried!'));
+    globalThis.showToast((typeof t === 'function' ? t('eg_parried') : 'Parried!'));
     _egApplyPlayerParryFeedback();
     _egScheduleAbsorptionRegen();
     return true;
 }
-function _egTryDeflectProjectile(attacker, isProjectile) {
+export function _egTryDeflectProjectile(attacker, isProjectile) {
     if (!isProjectile) return false;
     if (!attacker) return false;
-    const others = _egMonsters.filter(m => m.id !== attacker.id && m.currentHP > 0);
+    const others = globalThis._egMonsters.filter(m => m.id !== attacker.id && m.currentHP > 0);
     if (others.length === 0) return false;
     const chance = _egGetDeflectChancePct();
     if (chance <= 0 || Math.random() * 100 >= chance) return false;
@@ -1346,12 +1388,12 @@ function _egTryDeflectProjectile(attacker, isProjectile) {
         const projDef = (typeof _egGetProjectileDef === 'function') ? _egGetProjectileDef() : { emoji: '↩️', cssClass: 'eg-proj-player', duration: 300, easing: 'linear' };
         _egFireProjectile(projDef, projDef.cssClass, start, end, 320, 'linear', () => {
             const toastKey = (typeof t === 'function' ? t('eg_deflected') : 'Deflected!');
-            showToast(toastKey !== 'eg_deflected' ? toastKey : `↩️ Deflected to ${victim.name || 'another monster'}!`);
+            globalThis.showToast(toastKey !== 'eg_deflected' ? toastKey : `↩️ Deflected to ${victim.name || 'another monster'}!`);
             _egDamageTargetById(victim.id, deflectDamage);
         });
     } else {
         _egDamageTargetById(victim.id, deflectDamage);
-        showToast((typeof t === 'function' ? t('eg_deflected') : 'Deflected!'));
+        globalThis.showToast((typeof t === 'function' ? t('eg_deflected') : 'Deflected!'));
     }
     _egApplyPlayerDeflectFeedback();
     return true;
@@ -1364,7 +1406,7 @@ function _egTryDeflectProjectile(attacker, isProjectile) {
 // `elements` optionally carries the per-element damage share of `amount` so
 // monster resistances can be applied at impact.
 // `opts.isCharged` marks a drag-paint charged shot so overkill can ricochet.
-function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride, startScale, elements, opts) {
+export function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride, startScale, elements, opts) {
     // Explicit source element first (reveal-triggered shots), then the cell
     // element, falling back to the HUD if missing
     let sourceEl = sourceElOverride
@@ -1409,8 +1451,8 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElOverride
 //   splash  - chance to hit every other monster in the target's zone
 //   chain   - chance to bounce to one monster in a DIFFERENT spawn location
 //   pierce  - chance to punch through and hit one additional monster anywhere
-function _egResolveProjectileImpact(damage, targetId, elements, opts) {
-    const target = _egMonsters.find(m => m.id === targetId);
+export function _egResolveProjectileImpact(damage, targetId, elements, opts) {
+    const target = globalThis._egMonsters.find(m => m.id === targetId);
 
     // Every projectile landing here is a player MAGIC/ranged source -
     // Spellproof monsters resist these (melee strikes are exempt).
@@ -1426,7 +1468,7 @@ function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     // Snipe: isolated target (no zone-mates) takes amplified projectile damage
     if (target) {
         const snipePct = _egComputePlayerStats().snipePct || 0;
-        const isIsolated = !_egMonsters.some(m => m.id !== targetId && m.zoneId === target.zoneId);
+        const isIsolated = !globalThis._egMonsters.some(m => m.id !== targetId && m.zoneId === target.zoneId);
         if (snipePct > 0 && isIsolated) {
             finalDamage = Math.round(finalDamage * (1 + snipePct / 100));
             _egShowStatusLabel(targetId, t('eg_snipe'));
@@ -1448,7 +1490,7 @@ function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     // Splash: hits all OTHER monsters sharing the target's spawn location
     const splashPct = _egComputePlayerStats().splashPct || 0;
     if (splashPct > 0 && Math.random() * 100 < splashPct) {
-        _egMonsters.filter(m => m.id !== targetId && m.zoneId === target.zoneId).forEach(m => {
+        globalThis._egMonsters.filter(m => m.id !== targetId && m.zoneId === target.zoneId).forEach(m => {
             const card = document.getElementById(`eg-card-${m.id}`);
             if (card) _egRestartFlashClass(card, 'eg-flash-damage');
             _egDamageTargetById(m.id, finalDamage, elements, { isCrit: !!(opts && opts.isCrit) });
@@ -1458,7 +1500,7 @@ function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     // Chain: bounces to one additional monster in a different spawn location
     const chainPct = _egComputePlayerStats().chainPct || 0;
     if (chainPct > 0 && Math.random() * 100 < chainPct) {
-        const others = _egMonsters.filter(m => m.id !== targetId && m.zoneId !== target.zoneId);
+        const others = globalThis._egMonsters.filter(m => m.id !== targetId && m.zoneId !== target.zoneId);
         if (others.length) {
             const victim = others[Math.floor(Math.random() * others.length)];
             _egDamageTargetById(victim.id, finalDamage, elements, { isCrit: !!(opts && opts.isCrit) });
@@ -1469,7 +1511,7 @@ function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     // (does not chain further - only one extra target per shot)
     const piercePct = _egComputePlayerStats().piercePct || 0;
     if (piercePct > 0 && Math.random() * 100 < piercePct) {
-        const others = _egMonsters.filter(m => m.id !== targetId);
+        const others = globalThis._egMonsters.filter(m => m.id !== targetId);
         if (others.length) {
             const victim = others[Math.floor(Math.random() * others.length)];
             _egDamageTargetById(victim.id, finalDamage, elements, { isCrit: !!(opts && opts.isCrit) });
@@ -1484,15 +1526,15 @@ function _egResolveProjectileImpact(damage, targetId, elements, opts) {
 //------------------------------------------------------------------------
 
 // Visual growth of the charging projectile per stacked cell.
-const EG_DRAG_CHARGE_BASE_SIZE_PX = 28;      // matches .eg-projectile font-size
-const EG_DRAG_CHARGE_SIZE_PER_STACK_PX = 7;
-const EG_DRAG_CHARGE_MAX_VISUAL_STACKS = 12; // size cap for the charging visual
-const EG_DRAG_CHARGE_SCALE_PER_STACK = 0.18; // extra launch scale on release
+export const EG_DRAG_CHARGE_BASE_SIZE_PX = 28;      // matches .eg-projectile font-size
+export const EG_DRAG_CHARGE_SIZE_PER_STACK_PX = 7;
+export const EG_DRAG_CHARGE_MAX_VISUAL_STACKS = 12; // size cap for the charging visual
+export const EG_DRAG_CHARGE_SCALE_PER_STACK = 0.18; // extra launch scale on release
 
 // Creates or refreshes the charging projectile div anchored over the stroke's
 // first painted cell. Grows with every stacked cell and pulses while charging.
-function _egUpdateChargedProjectileVisual() {
-    if (!_egIsActive() || _egDragChargeStacks <= 0) return;
+export function _egUpdateChargedProjectileVisual() {
+    if (!_egIsActive() || globalThis._egDragChargeStacks <= 0) return;
 
     let proj = document.getElementById('eg-charging-projectile');
     if (!proj) {
@@ -1510,7 +1552,7 @@ function _egUpdateChargedProjectileVisual() {
         proj.textContent = projDef.emoji;
     }
 
-    const stacksForVisual = Math.min(_egDragChargeStacks, EG_DRAG_CHARGE_MAX_VISUAL_STACKS);
+    const stacksForVisual = Math.min(globalThis._egDragChargeStacks, EG_DRAG_CHARGE_MAX_VISUAL_STACKS);
     const sizePx = EG_DRAG_CHARGE_BASE_SIZE_PX + stacksForVisual * EG_DRAG_CHARGE_SIZE_PER_STACK_PX;
     // Emoji visuals grow via font-size; code-built shapes via a scale var
     // (the .egp box has fixed pixel dimensions).
@@ -1518,8 +1560,8 @@ function _egUpdateChargedProjectileVisual() {
     proj.style.setProperty('--egp-charge-scale', (sizePx / EG_DRAG_CHARGE_BASE_SIZE_PX).toFixed(3));
 
     // Anchor on the stroke's start cell; fall back to the HUD handle
-    const anchor = ((_egDragChargeRow >= 0 && _egDragChargeCol >= 0)
-        && document.getElementById(`g-${_egDragChargeRow}-${_egDragChargeCol}`))
+    const anchor = ((globalThis._egDragChargeRow >= 0 && globalThis._egDragChargeCol >= 0)
+        && document.getElementById(`g-${globalThis._egDragChargeRow}-${globalThis._egDragChargeCol}`))
         || document.getElementById('class-hud-drag-handle');
     if (anchor) {
         const c = _egGetElementCentre(anchor);
@@ -1535,14 +1577,14 @@ function _egUpdateChargedProjectileVisual() {
 // Shows STEADY / FOCUSED / PRECISE on the avatar while charging, tiered at
 // >5 / >10 / >15 correct. Single word, color-coded per tier, with a pop
 // animation when the tier increases.
-function _egUpdateDragBonusLabel() {
+export function _egUpdateDragBonusLabel() {
     const avatar = document.getElementById('player-avatar-wrapper');
     if (!avatar) { _egClearDragBonusLabel(); return; }
 
-    const tier = (typeof _egGetDragTier === 'function') ? _egGetDragTier(_egDragChargeStacks) : 0;
+    const tier = (typeof _egGetDragTier === 'function') ? _egGetDragTier(globalThis._egDragChargeStacks) : 0;
     if (tier <= 0) { _egClearDragBonusLabel(); return; }
 
-    const key = (typeof _egGetDragTierLabelKey === 'function') ? _egGetDragTierLabelKey(_egDragChargeStacks) : null;
+    const key = (typeof _egGetDragTierLabelKey === 'function') ? _egGetDragTierLabelKey(globalThis._egDragChargeStacks) : null;
     const text = key && typeof t === 'function' ? t(key) : (tier === 3 ? 'PRECISE' : tier === 2 ? 'FOCUSED' : 'STEADY');
 
     let lbl = document.getElementById('eg-drag-bonus-label');
@@ -1567,7 +1609,7 @@ function _egUpdateDragBonusLabel() {
     lbl.style.display = '';
 }
 
-function _egClearDragBonusLabel() {
+export function _egClearDragBonusLabel() {
     const lbl = document.getElementById('eg-drag-bonus-label');
     if (lbl) lbl.remove();
     const linger = document.getElementById('eg-drag-bonus-linger');
@@ -1577,12 +1619,12 @@ function _egClearDragBonusLabel() {
 // Rotates the charging projectile so its tip points at the currently targeted
 // monster card (same atan2 flight vector the released shot will follow).
 // No-op when there is no live charge visual or no anchor.
-function _egAimChargingProjectile(anchor) {
+export function _egAimChargingProjectile(anchor) {
     const proj = document.getElementById('eg-charging-projectile');
     if (!proj || !anchor) return;
 
     let rot = '';
-    const targetCard = _egTargetId ? document.getElementById(`eg-card-${_egTargetId}`) : null;
+    const targetCard = globalThis._egTargetId ? document.getElementById(`eg-card-${globalThis._egTargetId}`) : null;
     if (targetCard) {
         const c = _egGetElementCentre(anchor);
         const t = _egGetElementCentre(targetCard);
@@ -1594,16 +1636,16 @@ function _egAimChargingProjectile(anchor) {
 }
 
 // Removes the charging projectile div and resets all stroke charge state.
-function _egClearChargedProjectileVisual() {
+export function _egClearChargedProjectileVisual() {
     const proj = document.getElementById('eg-charging-projectile');
     if (proj) proj.remove();
     if (typeof _egClearDragBonusLabel === 'function') _egClearDragBonusLabel();
-    _egDragChargeDamage = 0;
+    globalThis._egDragChargeDamage = 0;
     EG_ELEMENTS.forEach(el => { _egDragChargeElements[el] = 0; });
-    _egDragChargeStacks = 0;
-    _egDragChargeRow = -1;
-    _egDragChargeCol = -1;
-    _egDragChargeWasCrit = false;
+    globalThis._egDragChargeStacks = 0;
+    globalThis._egDragChargeRow = -1;
+    globalThis._egDragChargeCol = -1;
+    globalThis._egDragChargeWasCrit = false;
 }
 
 // Called from stopPainting(): releases the accumulated stroke as one combined-
@@ -1611,15 +1653,15 @@ function _egClearChargedProjectileVisual() {
 // snapshotted at release so mid-flight retargets don't redirect the shot.
 // The projectile launches from the stroke's first cell with a launch scale
 // that grows with the number of stacked cells.
-function _egReleaseChargedShot() {
-    const stacks = _egDragChargeStacks;
-    const damage = _egDragChargeDamage;
-    const row = _egDragChargeRow;
-    const col = _egDragChargeCol;
+export function _egReleaseChargedShot() {
+    const stacks = globalThis._egDragChargeStacks;
+    const damage = globalThis._egDragChargeDamage;
+    const row = globalThis._egDragChargeRow;
+    const col = globalThis._egDragChargeCol;
     // Snapshot the elemental share before clearing - needed so the target's
     // resistances can be applied per element at impact time.
     const elements = Object.assign({}, _egDragChargeElements);
-    const wasCrit = !!_egDragChargeWasCrit;
+    const wasCrit = !!globalThis._egDragChargeWasCrit;
     const releaseTier = (typeof _egGetDragTier === 'function') ? _egGetDragTier(stacks) : 0;
     const releaseLabelKey = (typeof _egGetDragTierLabelKey === 'function') ? _egGetDragTierLabelKey(stacks) : null;
     _egClearChargedProjectileVisual();
@@ -1643,7 +1685,7 @@ function _egReleaseChargedShot() {
     const sourceEl = (row >= 0 && col >= 0)
         ? document.getElementById(`g-${row}-${col}`)
         : null;
-    const targetIdAtFire = _egTargetId; // snapshot - do not use _egTargetId in the callback
+    const targetIdAtFire = globalThis._egTargetId; // snapshot - do not use _egTargetId in the callback
     const startScale = 1.5 + Math.min(stacks, EG_DRAG_CHARGE_MAX_VISUAL_STACKS) * EG_DRAG_CHARGE_SCALE_PER_STACK;
 
     // POLYMORPH: the charged reveal shot is confused and hits the PLAYER
@@ -1672,12 +1714,12 @@ function _egReleaseChargedShot() {
 // Gear: multishot (cloak/gloves) - rolls against multishotPct and, on
 // success, looses one extra projectile with the same damage at another
 // living monster (falls back to the primary target when it's the only one).
-function _egTryMultishot(damage, primaryTargetId, elements, sourceEl, wasCrit) {
+export function _egTryMultishot(damage, primaryTargetId, elements, sourceEl, wasCrit) {
     const stats = _egComputePlayerStats();
     const multishotPct = stats.multishotPct || 0;
     if (multishotPct <= 0 || Math.random() * 100 >= multishotPct) return;
 
-    const others = _egMonsters.filter(m => m.id !== primaryTargetId);
+    const others = globalThis._egMonsters.filter(m => m.id !== primaryTargetId);
     const targetId = others.length
         ? others[Math.floor(Math.random() * others.length)].id
         : primaryTargetId;
@@ -1726,7 +1768,7 @@ function _egAnimatePlayerProjectile(damage, targetId, row, col) {
 // a 30%-charged strike rolls 30% of the full hit, including its elemental
 // breakdown and life leech. The active map's "% reduced Melee Attack
 // Damage" mod is applied inside.
-function _egCurrentMeleeDamage(chargePct = 1) {
+export function _egCurrentMeleeDamage(chargePct = 1) {
     return (typeof _egCalcPlayerMeleeDamage === 'function')
         ? _egCalcPlayerMeleeDamage(chargePct)
         : Math.max(1, Math.round(EG_PLAYER_MELEE_DAMAGE * chargePct));
@@ -1740,8 +1782,8 @@ function _egCurrentMeleeDamage(chargePct = 1) {
 // `opts` may carry isChargedStacks for drag-painting charged shots so the
 // threshold-based accuracy bonus can be applied (flat accuracy + direct
 // miss reduction - see _egGetDragAccuracyBonus / _egGetDragMissReduction).
-function _egRollPlayerMiss(targetId, opts) {
-    const target = _egMonsters.find(m => m.id === targetId);
+export function _egRollPlayerMiss(targetId, opts) {
+    const target = globalThis._egMonsters.find(m => m.id === targetId);
     if (!target) return false;
 
     // Darkness clouds completely blind the player: every attack misses while
@@ -1766,43 +1808,43 @@ function _egRollPlayerMiss(targetId, opts) {
 // melee KILLS restore mana so the player weaves attacks to pay for spells
 // (spells cost, melee earns). Blood Magic builds skip it - their casts are
 // life-based, so mana income would be dead weight.
-const EG_MELEE_MANA_PER_HIT = 6;
-const EG_MELEE_MANA_PER_KILL = 20;
+export const EG_MELEE_MANA_PER_HIT = 6;
+export const EG_MELEE_MANA_PER_KILL = 20;
 
 // Execution tuning: a melee strike on a monster below this HP share is a
 // finisher - multiplied damage. Gives melee the "cleanup kill" niche while
 // spells handle wave-clear.
-const EG_MELEE_EXECUTE_HP_PCT = 0.25;
-const EG_MELEE_EXECUTE_MULT = 3;
+export const EG_MELEE_EXECUTE_HP_PCT = 0.25;
+export const EG_MELEE_EXECUTE_MULT = 3;
 
 // Overcharge tuning: the charge bar keeps filling past 100% while held...
 // see _egTickPlayer in endgame-encounter-tick.js. A strike released above
 // the full-charge cap deals proportionally MORE than full damage, up to
 // this multiplier (2 = up to double damage for a patient player).
-const EG_MELEE_OVERCHARGE_MULT = 2;
-const EG_MELEE_OVERCHARGE_RATIO = 2;
+export const EG_MELEE_OVERCHARGE_MULT = 2;
+export const EG_MELEE_OVERCHARGE_RATIO = 2;
 
 // Battle Trance - mana restored by the melee channel. Called once per
 // landed strike with the struck monster; grants the per-hit amount, plus
 // the per-kill amount when the strike just killed it (the monster is no
 // longer in the roster). No-ops outside encounters / without a mana pool
 // / under Blood Magic (casts cost life there - mana income is dead weight).
-function _egGrantMeleeMana(struck) {
+export function _egGrantMeleeMana(struck) {
     if (typeof _bloodMagicActive === 'function') {
         try { if (_bloodMagicActive()) return; } catch (e) { /* fall through */ }
     }
     if (typeof gainMana !== 'function' || typeof _getPlayerMaxMana !== 'function') return;
-    if (_getPlayerMaxMana() <= 0 || typeof playerCurrentMana === 'undefined' || playerCurrentMana <= 0) return;
-    if (typeof playerMaxMana === 'undefined' || playerCurrentMana >= playerMaxMana) return;
+    if (_getPlayerMaxMana() <= 0 || typeof playerCurrentMana === 'undefined' || globalThis.playerCurrentMana <= 0) return;
+    if (typeof playerMaxMana === 'undefined' || globalThis.playerCurrentMana >= globalThis.playerMaxMana) return;
 
-    const killed = !struck || !_egMonsters.some(m => m.id === struck.id);
+    const killed = !struck || !globalThis._egMonsters.some(m => m.id === struck.id);
     const amount = EG_MELEE_MANA_PER_HIT + (killed ? EG_MELEE_MANA_PER_KILL : 0);
     const gained = gainMana(amount);
     if (gained > 0) {
         if (typeof _egUpdatePlayerChargeBar === 'function') _egUpdatePlayerChargeBar();
         const pct = Math.round(gained);
         if (killed) {
-            showToast(`⚔️ +${pct} ${t('eg_battle_trance_kill')}`);
+            globalThis.showToast(`⚔️ +${pct} ${t('eg_battle_trance_kill')}`);
         } else {
             _egShowManaGain(struck.id, gained);
         }
@@ -1811,7 +1853,7 @@ function _egGrantMeleeMana(struck) {
 
 // Small floating +N readout over the struck monster (non-kill mana gains -
 // kills get a toast instead so the bigger reward reads as an event).
-function _egShowManaGain(targetId, amount) {
+export function _egShowManaGain(targetId, amount) {
     try {
         const card = document.getElementById(`eg-card-${targetId}`);
         if (!card) return;
@@ -1829,21 +1871,21 @@ function _egShowManaGain(targetId, amount) {
 // (reset to zero) at key-press time by _egDoWeaponAttack. The damage (and
 // its elemental breakdown) is rolled ONCE per swing so cleaved side targets
 // take the same hit as the primary target.
-function _egApplyPlayerMeleeImpact(targetId) {
-    if (!_egIsActive() || !_egMonsters.some(m => m.id === targetId)) return;
+export function _egApplyPlayerMeleeImpact(targetId) {
+    if (!_egIsActive() || !globalThis._egMonsters.some(m => m.id === targetId)) return;
 
     // Charge share snapshotted at key-press (null = legacy caller, full hit).
     // May exceed 1 when the player overcharged past 100% (see _egTickPlayer).
     const chargePct = (typeof _egPendingMeleeChargePct === 'number')
-        ? Math.min(EG_MELEE_OVERCHARGE_MULT, Math.max(0, _egPendingMeleeChargePct)) : 1;
-    _egPendingMeleeChargePct = null;
+        ? Math.min(EG_MELEE_OVERCHARGE_MULT, Math.max(0, globalThis._egPendingMeleeChargePct)) : 1;
+    globalThis._egPendingMeleeChargePct = null;
 
     // Accuracy: the swing can whiff entirely (no gear procs on a miss).
     // A whiffed swing does NOT refund the spent charge.
     if (_egRollPlayerMiss(targetId)) return;
 
     // Map mod: ethereal monsters evade melee strikes.
-    const meleeTarget = _egMonsters.find(m => m.id === targetId);
+    const meleeTarget = globalThis._egMonsters.find(m => m.id === targetId);
     if (meleeTarget && (meleeTarget.etherealPct || 0) > 0
         && Math.random() * 100 < meleeTarget.etherealPct) {
         _egShowStatusLabel(targetId, t('eg_dodged'));
@@ -1886,10 +1928,10 @@ function _egApplyPlayerMeleeImpact(targetId) {
     // Active map run: monsters reflect #% of melee damage back at you.
     if (typeof _egGetActiveMapModValue === 'function') {
         const reflectPct = _egGetActiveMapModValue('map_reflect_melee');
-        const reflectTarget = _egMonsters.find(m => m.id === targetId);
+        const reflectTarget = globalThis._egMonsters.find(m => m.id === targetId);
         if (reflectPct > 0 && reflectTarget) {
             const reflected = Math.max(1, Math.round(dmg * reflectPct / 100));
-            showToast(`🪞 ${t('eg_mm_toast_reflect') || 'Reflected!'} (-${reflected})`);
+            globalThis.showToast(`🪞 ${t('eg_mm_toast_reflect') || 'Reflected!'} (-${reflected})`);
             _egPlayerTakeDamage(reflected, false, null);
         }
     }
@@ -1909,16 +1951,16 @@ function _egApplyPlayerMeleeImpact(targetId) {
 // Cleave gear modifier (main weapon suffix): rolls against cleavePct and,
 // on success, hits every OTHER monster sharing the target's spawn location
 // for the same melee damage, with a dedicated flash animation and sound.
-function _egTryCleaveHit(targetId, dmg = _egCurrentMeleeDamage(), elements = _egLastMeleeElements) {
+export function _egTryCleaveHit(targetId, dmg = _egCurrentMeleeDamage(), elements = _egLastMeleeElements) {
     const stats = _egComputePlayerStats();
     const cleavePct = stats.cleavePct || 0;
     if (cleavePct <= 0 || Math.random() * 100 >= cleavePct) return;
 
-    const target = _egMonsters.find(m => m.id === targetId);
+    const target = globalThis._egMonsters.find(m => m.id === targetId);
     if (!target) return;
 
     // "Same spawn location" = monsters rendered into the same zone panel
-    const sideTargets = _egMonsters.filter(m => m.id !== targetId && m.zoneId === target.zoneId);
+    const sideTargets = globalThis._egMonsters.filter(m => m.id !== targetId && m.zoneId === target.zoneId);
     if (!sideTargets.length) return;
 
     if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('cleave');
@@ -1938,7 +1980,7 @@ function _egTryCleaveHit(targetId, dmg = _egCurrentMeleeDamage(), elements = _eg
 // callers don't crash. Manual strikes (E) use the weapon-swing overlay +
 // short hop in endgame-weapon-swing.js instead, so the sprite never
 // charges across the arena on its own.
-function _egAnimatePlayerMelee(targetId) {
+export function _egAnimatePlayerMelee(targetId) {
     const targetCard = document.getElementById(`eg-card-${targetId}`);
     const avatarWrapper = document.getElementById('player-avatar-wrapper');
     const sprite = document.getElementById('avatar-sprite-img');
@@ -2032,22 +2074,22 @@ function _egAnimatePlayerMelee(targetId) {
 //------------------------------------------------------------------------
 
 // Returns the currently targeted monster object, or null if none.
-function _egGetTarget() {
-    if (!_egTargetId) return null;
-    return _egMonsters.find(m => m.id === _egTargetId) || null;
+export function _egGetTarget() {
+    if (!globalThis._egTargetId) return null;
+    return globalThis._egMonsters.find(m => m.id === globalThis._egTargetId) || null;
 }
 
 // Sets the player's target to the given monster and refreshes the panel.
 // Called by the onclick handler on monster cards in the rendered panel HTML.
-function _egSelectTarget(monsterId) {
+export function _egSelectTarget(monsterId) {
     if (!_egIsActive()) return;
-    _egTargetId = monsterId;
+    globalThis._egTargetId = monsterId;
     _egRenderPanel();
 
     // Keep the charging projectile aimed at the new target mid-stroke
-    if (_egDragChargeStacks > 0) {
-        const anchor = ((_egDragChargeRow >= 0 && _egDragChargeCol >= 0)
-            && document.getElementById(`g-${_egDragChargeRow}-${_egDragChargeCol}`))
+    if (globalThis._egDragChargeStacks > 0) {
+        const anchor = ((globalThis._egDragChargeRow >= 0 && globalThis._egDragChargeCol >= 0)
+            && document.getElementById(`g-${globalThis._egDragChargeRow}-${globalThis._egDragChargeCol}`))
             || document.getElementById('class-hud-drag-handle');
         _egAimChargingProjectile(anchor);
     }
@@ -2055,38 +2097,46 @@ function _egSelectTarget(monsterId) {
 
 // Cycles the target through the live monster list (Shift = reverse).
 // Wraps around at both ends; no-op when no monsters are on the field.
-function _egCycleTarget(reverse) {
-    if (!_egIsActive() || _egMonsters.length === 0) return;
+export function _egCycleTarget(reverse) {
+    if (!_egIsActive() || globalThis._egMonsters.length === 0) return;
 
-    const idx = _egMonsters.findIndex(m => m.id === _egTargetId);
+    const idx = globalThis._egMonsters.findIndex(m => m.id === globalThis._egTargetId);
     const step = reverse ? -1 : 1;
     const nextIdx = idx === -1
         ? 0
-        : (idx + step + _egMonsters.length) % _egMonsters.length;
+        : (idx + step + globalThis._egMonsters.length) % globalThis._egMonsters.length;
 
-    _egSelectTarget(_egMonsters[nextIdx].id);
+    _egSelectTarget(globalThis._egMonsters[nextIdx].id);
 }
 
 // Tab targeting: registered via keybind system. Only active during an encounter.
 // Classless characters (tutorial, campaign levels before a class is picked)
 // may also cycle - the old class gate left Tab dead there.
-function _initEgTargetHotkeys() {
+export function _initEgTargetHotkeys() {
     if (typeof onKeybindAction === 'function') {
-        onKeybindAction('cycle-target', (e) => {
+        globalThis.onKeybindAction('cycle-target', (e) => {
             const encounterActive = (typeof _egIsActive === 'function') && _egIsActive();
-            if ((!STATE.playerClass || (typeof isClassless === 'function' && isClassless())) && !encounterActive) return false;
+            if ((!globalThis.STATE.playerClass || (typeof isClassless === 'function' && globalThis.isClassless())) && !encounterActive) return false;
             _egCycleTarget(e.shiftKey);
             return false;
         });
     }
 }
 
-_initEgTargetHotkeys();
+// Module-eval timing: the import phase runs before concatenated keybinds.js,
+// so registering at top level would silently skip (typeof guard false) and
+// leave Tab dead. Defer to DOMContentLoaded - by then the full global
+// surface exists (same fix as the skill-hotbar P bug).
+if (typeof document !== 'undefined' && document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', _initEgTargetHotkeys);
+} else {
+    _initEgTargetHotkeys();
+}
 
 // Convenience wrapper - damages the currently selected target.
 // Kept for any legacy callers that don't pass an explicit id.
-function _egDamageTarget(amount) {
-    _egDamageTargetById(_egTargetId, amount);
+export function _egDamageTarget(amount) {
+    _egDamageTargetById(globalThis._egTargetId, amount);
 }
 
 
@@ -2100,7 +2150,7 @@ function _egDamageTarget(amount) {
 // gear: stagger rolls a chance to pause the charge timer entirely for 1s.
 // Pushback is resisted by high-level monsters (50% at L41, 80% at L90) so
 // low-level players cannot permanently stall a T11+ monster by spamming.
-function _egApplyHitToMonster(target, amount) {
+export function _egApplyHitToMonster(target, amount) {
     const stats = _egComputePlayerStats();
     target.currentHP = Math.max(0, target.currentHP - amount);
     const basePushback = EG_PLAYER_STATS.chargePushback + (stats.pushbackFlat || 0);
@@ -2117,7 +2167,7 @@ function _egApplyHitToMonster(target, amount) {
 }
 
 // Appends a short floating status label (stagger/snipe/...) to a monster card.
-function _egShowStatusLabel(monsterId, text) {
+export function _egShowStatusLabel(monsterId, text) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
     const label = document.createElement('div');
@@ -2130,7 +2180,7 @@ function _egShowStatusLabel(monsterId, text) {
 }
 
 // Returns the dominant elemental key for visual choice, or 'physical' when none.
-function _egGetDominantElement(elements) {
+export function _egGetDominantElement(elements) {
     if (!elements) return 'physical';
     let best = 'physical';
     let bestVal = 0;
@@ -2150,10 +2200,10 @@ function _egGetDominantElement(elements) {
 // further echoes (they still trigger on-hit effects like leech/ailments).
 // `opts.isCharged` marks a drag-paint charged shot (or its ricochet chain)
 // so overkill always ricochets as a smaller projectile.
-function _egDamageTargetById(monsterId, amount, elements, opts) {
+export function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (!_egIsActive()) return;
 
-    const target = _egMonsters.find(m => m.id === monsterId);
+    const target = globalThis._egMonsters.find(m => m.id === monsterId);
     if (!target) return;
 
     // Boss immunity window - ignore damage and show the immune flash
@@ -2190,7 +2240,7 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (!(opts && opts.isEcho)) _egTryEchoHit(target.id, amount, elements, isCrit);
 
     // Check for boss phase transition before checking death
-    if (target.isBoss) _egBossCheckPhase(target);
+    if (target.isBoss) globalThis._egBossCheckPhase(target);
 
     if (target.currentHP <= 0) {
         // Charged overkill ricochet - always fires a smaller projectile
@@ -2212,7 +2262,7 @@ function _egDamageTargetById(monsterId, amount, elements, opts) {
 // Gear: overkill - on every killing blow with excess damage, transfers the
 // surplus to a random other living monster. overkillPct increases the amount
 // transferred; it is not a chance to transfer.
-function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCrit, elements) {
+export function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCrit, elements) {
     const stats = _egComputePlayerStats();
     const overkillPct = Math.max(0, stats.overkillPct || 0);
 
@@ -2221,7 +2271,7 @@ function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCrit, elem
         : Math.round(appliedDamage - dyingTarget.currentHP); // fallback: currentHP clamped at 0
     if (overkill <= 0) return;
 
-    const others = _egMonsters.filter(m => m.id !== dyingTarget.id && m.currentHP > 0);
+    const others = globalThis._egMonsters.filter(m => m.id !== dyingTarget.id && m.currentHP > 0);
     if (!others.length) return;
     const victim = others[Math.floor(Math.random() * others.length)];
     const transferredDamage = Math.round(overkill * (1 + overkillPct / 100));
@@ -2232,14 +2282,14 @@ function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCrit, elem
 // its target, a smaller projectile flies from the dying monster to the next
 // living monster dealing the exact overkill amount. Chains if that hit also
 // overkills (always triggers, no gear check required).
-const EG_CHARGED_RICOCHET_SCALE = 0.62;   // smaller than the main charged shot
-const EG_CHARGED_RICOCHET_DURATION_MS = 350;
+export const EG_CHARGED_RICOCHET_SCALE = 0.62;   // smaller than the main charged shot
+export const EG_CHARGED_RICOCHET_DURATION_MS = 350;
 
-function _egTryChargedOverkillRicochet(dyingTarget, appliedDamage, hpBefore, elements, opts) {
+export function _egTryChargedOverkillRicochet(dyingTarget, appliedDamage, hpBefore, elements, opts) {
     const overkill = Math.round(appliedDamage - (hpBefore != null ? hpBefore : 0));
     if (overkill <= 0) return;
 
-    const others = _egMonsters.filter(m => m.id !== dyingTarget.id && m.currentHP > 0);
+    const others = globalThis._egMonsters.filter(m => m.id !== dyingTarget.id && m.currentHP > 0);
     if (!others.length) return;
     const victim = others[Math.floor(Math.random() * others.length)];
 
@@ -2274,7 +2324,7 @@ function _egTryChargedOverkillRicochet(dyingTarget, appliedDamage, hpBefore, ele
 // Gear: echo (ring suffix) - rolls against echoChancePct and schedules a
 // delayed second hit worth echoDamagePct of the original applied damage.
 // Echo instances are flagged so they cannot chain into further echoes.
-function _egTryEchoHit(targetId, appliedAmount, elements, isCrit) {
+export function _egTryEchoHit(targetId, appliedAmount, elements, isCrit) {
     const stats = _egComputePlayerStats();
     const chance = stats.echoChancePct || 0;
     const dmgPct = stats.echoDamagePct || 0;
@@ -2284,7 +2334,7 @@ function _egTryEchoHit(targetId, appliedAmount, elements, isCrit) {
 
     setTimeout(() => {
         if (!_egIsActive()) return;
-        const target = _egMonsters.find(m => m.id === targetId);
+        const target = globalThis._egMonsters.find(m => m.id === targetId);
         if (!target) return;
         _egShowStatusLabel(targetId, t('eg_echo'));
         _egDamageTargetById(targetId, Math.max(1, Math.round(appliedAmount * dmgPct / 100)), elements, { isEcho: true, isCrit: !!isCrit });
@@ -2305,7 +2355,7 @@ function _egTryEchoHit(targetId, appliedAmount, elements, isCrit) {
 // `opts.isBossAbility` marks damage dealt by boss special abilities - those
 // hits can never be parried, dodged, blocked or fate-negated; they always
 // land unless the telegraphed mechanic itself was avoided by movement.
-function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLevel = null, opts = null) {
+export function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLevel = null, opts = null) {
     if (!_egIsActive()) return 0;
 
     // GODMODE - developer/test-only: blocks ALL incoming damage before any
@@ -2350,7 +2400,7 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     // On a successful projectile parry there is a 5% + gear deflect chance to
     // hit another monster for 30% + gear damage. Dual-wielding two 1H weapons
     // grants the same roll at a 15% + gear base WITHOUT holding the key.
-    const holdingE = (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive);
+    const holdingE = (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive);
     const dualWieldParry = !holdingE
         && (typeof _egIsDualWieldParryActive === 'function' && _egIsDualWieldParryActive());
     if (!isSpell && !isBossAbility && (holdingE || dualWieldParry)) {
@@ -2362,7 +2412,7 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
                 const isProjectile = !!(opts && opts.isProjectile);
                 const attacker = opts && opts.attacker ? opts.attacker : null;
                 const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
-                showToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
+                globalThis.showToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
                 _egApplyPlayerParryFeedback();
                 _egScheduleAbsorptionRegen();
                 if (isProjectile && attacker) _egTryDeflectProjectile(attacker, true);
@@ -2382,7 +2432,7 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
         const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, attackerLvl)
             + ((support && support.dodgePct) || 0));
         if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
-            showToast(t('eg_dodged'));
+            globalThis.showToast(t('eg_dodged'));
             _egApplyPlayerMissFeedback();
             _egScheduleAbsorptionRegen();
             return 0;
@@ -2403,7 +2453,7 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
         ? Math.min(75, isSpell ? stats.spellBlockChance : stats.blockChance)
         : 0;
     if (blockChance > 0 && Math.random() * 100 < blockChance) {
-        showToast(t('eg_blocked'));
+        globalThis.showToast(t('eg_blocked'));
         _egApplyPlayerBlockFeedback();
         _egScheduleAbsorptionRegen();
 
@@ -2468,13 +2518,13 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     // BEFORE the absorption shield so a Bulwark also stretches the shield.
     if (support) mitigated = _uspApplySupportMitigation(mitigated);
 
-    if (_egPlayerAbsorptionCurrent > 0) {
-        const prevAbs = _egPlayerAbsorptionCurrent;
-        const absorbed = Math.min(_egPlayerAbsorptionCurrent, mitigated);
-        _egPlayerAbsorptionCurrent -= absorbed;
+    if (globalThis._egPlayerAbsorptionCurrent > 0) {
+        const prevAbs = globalThis._egPlayerAbsorptionCurrent;
+        const absorbed = Math.min(globalThis._egPlayerAbsorptionCurrent, mitigated);
+        globalThis._egPlayerAbsorptionCurrent -= absorbed;
         mitigated -= absorbed;
         Audio_Manager.playSFX('player_shield_damage_taken');
-        if (typeof _egMaybeShowAbsorptionBroken === 'function') _egMaybeShowAbsorptionBroken(prevAbs, _egPlayerAbsorptionCurrent);
+        if (typeof _egMaybeShowAbsorptionBroken === 'function') _egMaybeShowAbsorptionBroken(prevAbs, globalThis._egPlayerAbsorptionCurrent);
     }
 
     _egScheduleAbsorptionRegen();
@@ -2482,22 +2532,22 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
     mitigated = Math.max(0, Math.round(mitigated));
     if (mitigated <= 0) return 0;
 
-    playerCurrentHP = Math.max(0, playerCurrentHP - mitigated);
+    globalThis.playerCurrentHP = Math.max(0, globalThis.playerCurrentHP - mitigated);
 
     // Gear: warding - once per map, a killing blow instead leaves the player
     // at wardingHP health and the ward shatters.
-    if (playerCurrentHP <= 0 && !_egWardingUsedThisMap) {
+    if (globalThis.playerCurrentHP <= 0 && !globalThis._egWardingUsedThisMap) {
         const wardHP = Math.round(stats.wardingHP || 0);
         if (wardHP > 0) {
-            _egWardingUsedThisMap = true;
-            playerCurrentHP = wardHP;
-            showToast(t('eg_warding'));
+            globalThis._egWardingUsedThisMap = true;
+            globalThis.playerCurrentHP = wardHP;
+            globalThis.showToast(t('eg_warding'));
             Audio_Manager.playSFX('player_shield_damage_taken');
         }
     }
 
-    _renderPlayerHealth();
-    if (playerCurrentHP <= 0) _egGameOver();
+    globalThis._renderPlayerHealth();
+    if (globalThis.playerCurrentHP <= 0) _egGameOver();
 
     // Ailments: elemental hits can ignite / chill / shock / shadow-burn the
     // player (rolled from the monster's attack element).
@@ -2513,18 +2563,18 @@ function _egPlayerTakeDamage(amount, isSpell = false, element = null, attackerLe
 //------------------------------------------------------------------------
 
 // Auto-selects the first remaining monster after a kill, or clears the target.
-function _egUpdateTargetAfterKill() {
-    if (_egMonsters.length > 0) {
-        _egTargetId = _egMonsters[0].id;
+export function _egUpdateTargetAfterKill() {
+    if (globalThis._egMonsters.length > 0) {
+        globalThis._egTargetId = globalThis._egMonsters[0].id;
     } else {
-        _egTargetId = null;
+        globalThis._egTargetId = null;
         _egOnAllMonstersDead();
     }
 }
 
 // Handles all post-kill logic for a normal (non-boss) monster death.
-function _egHandleNormalMonsterKill(dying) {
-    _egChainKillCount++;
+export function _egHandleNormalMonsterKill(dying) {
+    globalThis._egChainKillCount++;
 
     // Campaign kills never feed map objectives or respawns.
     const campaign = (typeof _egIsCampaignRun === 'function') && _egIsCampaignRun();
@@ -2546,7 +2596,7 @@ function _egHandleNormalMonsterKill(dying) {
             _egDropHeartPickup();
         }
     } else {
-        if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(false, dying.level);
+        if (typeof _egSpawnLootDrop === 'function') globalThis._egSpawnLootDrop(false, dying.level);
         if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false);
         if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
         if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false);
@@ -2560,9 +2610,9 @@ function _egHandleNormalMonsterKill(dying) {
 // Handles all post-kill logic for a boss monster death.
 // During the boss arena chain this advances the chain: more bosses left →
 // roll into the next arena; last boss dead → loot party + Complete Map.
-function _egHandleBossKill(dying) {
-    if (typeof _egBossPhaseActive !== 'undefined' && _egBossPhaseActive) {
-        _egBossKilledCount++;
+export function _egHandleBossKill(dying) {
+    if (typeof _egBossPhaseActive !== 'undefined' && globalThis._egBossPhaseActive) {
+        globalThis._egBossKilledCount++;
 
         const allDead = typeof _egBossDefeated === 'function' && _egBossDefeated();
         if (allDead) {
@@ -2573,7 +2623,7 @@ function _egHandleBossKill(dying) {
     }
 
     _egUpdateObjectivesHUD();
-    if (typeof _egSpawnLootDrop === 'function') _egSpawnLootDrop(true,dying.level);
+    if (typeof _egSpawnLootDrop === 'function') globalThis._egSpawnLootDrop(true,dying.level);
     if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
     if (typeof _egTryDropEssence === 'function') _egTryDropEssence(true);
     if (typeof _egTryDropMap === 'function') _egTryDropMap(true, dying.level);
@@ -2583,8 +2633,8 @@ function _egHandleBossKill(dying) {
 
 // Removes a monster from the encounter after its death animation fires.
 // Delegates to the appropriate normal or boss kill handler.
-function _egKillMonster(monsterId) {
-    const dying = _egMonsters.find(m => m.id === monsterId);
+export function _egKillMonster(monsterId) {
+    const dying = globalThis._egMonsters.find(m => m.id === monsterId);
 
     // Active map run: Second Wind - the monster rises back up once instead.
     if (dying && dying.secondWindPct > 0 && !dying.secondWindUsed
@@ -2593,7 +2643,7 @@ function _egKillMonster(monsterId) {
         if (Math.random() * 100 < dying.secondWindPct) {
             dying.currentHP = Math.max(1, Math.round((dying.maxHP || 1) * 0.25));
             dying.currentCharge = 0;
-            showToast(`✨ ${dying.name || ''} ${t('eg_mm_toast_second_wind') || 'rises again!'}`.trim());
+            globalThis.showToast(`✨ ${dying.name || ''} ${t('eg_mm_toast_second_wind') || 'rises again!'}`.trim());
             return;
         }
     }
@@ -2603,23 +2653,23 @@ function _egKillMonster(monsterId) {
     if (dying && dying.explodeOnDeathPct > 0 && typeof _egIsActive === 'function' && _egIsActive()) {
         const blast = Math.max(1, Math.round((dying.maxHP || 0) * dying.explodeOnDeathPct / 100));
         if (blast > 0) {
-            showToast(`💥 ${dying.name || ''} ${t('eg_mm_toast_explode') || 'explodes!'} (-${blast})`);
+            globalThis.showToast(`💥 ${dying.name || ''} ${t('eg_mm_toast_explode') || 'explodes!'} (-${blast})`);
             _egPlayerTakeDamage(blast, false, dying.element, dying.level);
-            if (typeof dead !== 'undefined' && dead) return;
+            if (typeof dead !== 'undefined' && globalThis.dead) return;
         }
     }
 
-    _egBossCleanup(monsterId);
+    globalThis._egBossCleanup(monsterId);
     _egFlashKillCard(monsterId);
 
     // Dynamo conductors: beam-network sockets whose power source is gone.
     // _egRemoveConductor fires the destruction burst and lets the roaming
     // card linger briefly so the kill-flash animation can play out.
     if (dying && dying.isDynamoConductor && typeof _egRemoveConductor === 'function') {
-        _egRemoveConductor(monsterId);
+        globalThis._egRemoveConductor(monsterId);
     }
 
-    _egMonsters = _egMonsters.filter(m => m.id !== monsterId);
+    globalThis._egMonsters = globalThis._egMonsters.filter(m => m.id !== monsterId);
 
     _egUpdateTargetAfterKill();
 
@@ -2652,25 +2702,25 @@ function _egKillMonster(monsterId) {
     if (typeof _egComputePlayerStats === 'function') {
         const killStats = _egComputePlayerStats();
 
-        if (typeof gainMana === 'function' && playerMaxMana > 0 && (killStats.manaOnKill || 0) > 0) {
+        if (typeof gainMana === 'function' && globalThis.playerMaxMana > 0 && (killStats.manaOnKill || 0) > 0) {
             gainMana(killStats.manaOnKill);
         }
 
-        if ((killStats.lifeOnKill || 0) > 0 && playerCurrentHP > 0 && playerCurrentHP < playerMaxHP) {
+        if ((killStats.lifeOnKill || 0) > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP) {
             // Active map run: "#% less Life gained from Kills".
             const recoveryMult = (typeof _egMapKillRecoveryMult === 'function')
                 ? _egMapKillRecoveryMult() : 1;
             const lifeGain = Math.round(killStats.lifeOnKill * recoveryMult);
             if (lifeGain > 0) {
-                playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + lifeGain);
-                if (typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + lifeGain);
+                if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
             }
         }
 
         if ((killStats.absorptionOnKill || 0) > 0 && typeof _egIsActive === 'function' && _egIsActive()) {
             const maxAbsorption = killStats.absorption;
-            if (_egPlayerAbsorptionCurrent < maxAbsorption) {
-                _egPlayerAbsorptionCurrent = Math.min(maxAbsorption, _egPlayerAbsorptionCurrent + killStats.absorptionOnKill);
+            if (globalThis._egPlayerAbsorptionCurrent < maxAbsorption) {
+                globalThis._egPlayerAbsorptionCurrent = Math.min(maxAbsorption, globalThis._egPlayerAbsorptionCurrent + killStats.absorptionOnKill);
             }
         }
     }
@@ -2685,16 +2735,16 @@ function _egKillMonster(monsterId) {
 
 // Called when the last monster in the encounter is killed.
 // Currently intentionally empty - kill toasts handle all feedback.
-function _egOnAllMonstersDead() { }
+export function _egOnAllMonstersDead() { }
 
 // Triggers the game-over sequence when the player's HP reaches zero.
-function _egGameOver() {
+export function _egGameOver() {
     // Campaign defeat: fall back to the normal lose overlay (retry/levels)
     // instead of the endgame map-failed screen, which routes to the Nexus.
     if (typeof _egIsCampaignRun === 'function' && _egIsCampaignRun()) {
-        dead = true;
+        globalThis.dead = true;
         if (typeof stopTimer === 'function') stopTimer();
-        if (cur) window._lastFailedGi = cur.gIdx;
+        if (globalThis.cur) window._lastFailedGi = globalThis.cur.gIdx;
         const lose = document.getElementById('ov-lose');
         if (lose) {
             const titleEl = document.getElementById('lose-title');
@@ -2722,10 +2772,10 @@ function _egGameOver() {
 // stacking in one. Tutorial runs always use the bottom dock, clear of the
 // Professor's portrait (top-right), so the tutorial monster can never spawn
 // on top of him.
-function _egAssignRandomSpawnZone(monster) {
+export function _egAssignRandomSpawnZone(monster) {
     if (typeof _tqIsTutorialActive === 'function') {
         try {
-            if (_tqIsTutorialActive()) {
+            if (globalThis._tqIsTutorialActive()) {
                 monster.zoneId = 'eg-monster-panel';
                 return;
             }
@@ -2735,8 +2785,8 @@ function _egAssignRandomSpawnZone(monster) {
     try {
         const counts = {};
         zones.forEach(z => { counts[z] = 0; });
-        if (typeof _egMonsters !== 'undefined' && _egMonsters.length) {
-            _egMonsters.forEach(m => {
+        if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length) {
+            globalThis._egMonsters.forEach(m => {
                 const z = m.zoneId || 'eg-monster-panel';
                 if (counts[z] == null) counts[z] = 0;
                 counts[z]++;
@@ -2753,14 +2803,14 @@ function _egAssignRandomSpawnZone(monster) {
 // Marks the monster as a boss if it was built from EG_BOSS_DEFS.
 // hpMult: optional multiplier for boss max HP only (e.g., 500k HP test mode);
 // damage is left at its normal scaled value.
-function _egBuildMonsterOrBoss(defId, level, hpMult = 1) {
+export function _egBuildMonsterOrBoss(defId, level, hpMult = 1) {
     let monster = _egBuildMonster(defId, level, hpMult);
     if (!monster) {
-        monster = _egBuildBoss(defId, level, hpMult);
+        monster = globalThis._egBuildBoss(defId, level, hpMult);
         if (monster) monster.isBoss = true;
-    } else if (typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS[defId]) {
+    } else if (typeof EG_BOSS_DEFS !== 'undefined' && globalThis.EG_BOSS_DEFS[defId]) {
         monster.isBoss = true;
-    } else if (monster.baseId && typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS[monster.baseId]) {
+    } else if (monster.baseId && typeof EG_BOSS_DEFS !== 'undefined' && globalThis.EG_BOSS_DEFS[monster.baseId]) {
         monster.isBoss = true;
     }
     return monster;
@@ -2768,9 +2818,9 @@ function _egBuildMonsterOrBoss(defId, level, hpMult = 1) {
 
 // Initialises boss logic on arrival. Spawn toasts were removed -
 // the monster cards themselves signal that something appeared.
-function _egNotifyMonsterArrival(monster) {
+export function _egNotifyMonsterArrival(monster) {
     if (monster.isBoss) {
-        _egBossInit(monster);
+        globalThis._egBossInit(monster);
     }
 }
 
@@ -2778,8 +2828,8 @@ function _egNotifyMonsterArrival(monster) {
 // Assigns a random spawn zone, auto-targets if no target exists, and notifies the player.
 // hpMult: optional multiplier for boss max HP only (e.g., 500k HP test mode);
 // damage is left at its normal scaled value.
-function _egSpawnMonster(defId, level, hpMult = 1) {
-    if (_egMonsters.length >= EG_MAX_CONCURRENT_MONSTERS) return;
+export function _egSpawnMonster(defId, level, hpMult = 1) {
+    if (globalThis._egMonsters.length >= EG_MAX_CONCURRENT_MONSTERS) return;
 
     const monster = _egBuildMonsterOrBoss(defId, level, hpMult);
     if (!monster) return;
@@ -2789,18 +2839,18 @@ function _egSpawnMonster(defId, level, hpMult = 1) {
     if (firstStepSec > 0) {
         monster.firstStepUntil = Date.now() + firstStepSec * 1000;
         // Show toast once per map when first_step is active
-        if (!_egFirstStepToastShown) {
-            _egFirstStepToastShown = true;
-            showToast(t('eg_first_step').replace('{n}', _egFormatStatValue(firstStepSec)));
+        if (!globalThis._egFirstStepToastShown) {
+            globalThis._egFirstStepToastShown = true;
+            globalThis.showToast(t('eg_first_step').replace('{n}', _egFormatStatValue(firstStepSec)));
         }
     }
 
     _egAssignRandomSpawnZone(monster);
     // Spawn stamp: melee sidesteps respect a short grace period after this.
     try { monster._spawnedAt = Date.now(); } catch (e) {}
-    _egMonsters.push(monster);
+    globalThis._egMonsters.push(monster);
 
-    if (!_egTargetId) _egTargetId = monster.id; // auto-target the first monster to arrive
+    if (!globalThis._egTargetId) globalThis._egTargetId = monster.id; // auto-target the first monster to arrive
 
     _egRenderPanel();
     _egNotifyMonsterArrival(monster);
@@ -2815,7 +2865,7 @@ function _egSpawnMonster(defId, level, hpMult = 1) {
 // Appends a floating "-N" damage number to the monster's card that fades out.
 // `isCrit` and `elements` drive the RPG pop: crits are bigger/gold, elemental
 // dominance tints the number and its glow (shadow/fire/cold/lightning).
-function _egShowDamageNumber(monsterId, amount, isCrit, elements) {
+export function _egShowDamageNumber(monsterId, amount, isCrit, elements) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
 
@@ -2838,27 +2888,27 @@ function _egShowDamageNumber(monsterId, amount, isCrit, elements) {
 
 // Removes and re-adds a CSS flash class to force the animation to restart.
 // Works for any flash class on any card element.
-function _egRestartFlashClass(card, cssClass) {
+export function _egRestartFlashClass(card, cssClass) {
     card.classList.remove(cssClass);
     void card.offsetWidth; // force reflow so the CSS animation restarts
     card.classList.add(cssClass);
 }
 
 // Triggers the damage flash CSS animation on the monster's card.
-function _egFlashDamageCard(monsterId) {
+export function _egFlashDamageCard(monsterId) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
     _egRestartFlashClass(card, 'eg-flash-damage');
 }
 
 // Adds the kill flash class to the monster's card (plays the death animation).
-function _egFlashKillCard(monsterId) {
+export function _egFlashKillCard(monsterId) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (card) card.classList.add('eg-flash-kill');
 }
 
 // Shows the IMMUNE label and flashes the immunity animation on the monster's card.
-function _egFlashImmune(monsterId) {
+export function _egFlashImmune(monsterId) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
 
@@ -2873,7 +2923,7 @@ function _egFlashImmune(monsterId) {
 }
 
 // Particle colour per damage element (falls back to white for physical).
-const EG_HIT_ELEMENT_COLORS = {
+export const EG_HIT_ELEMENT_COLORS = {
     physical: '#ffffff',
     fire: '#ff6b35',
     cold: '#4fc3f7',
@@ -2881,15 +2931,15 @@ const EG_HIT_ELEMENT_COLORS = {
     shadow: '#b06bff'
 };
 
-const EG_HIT_BURST_SPARK_COUNT = 14;
-const EG_HIT_BURST_DURATION_MS = 750;
+export const EG_HIT_BURST_SPARK_COUNT = 14;
+export const EG_HIT_BURST_DURATION_MS = 750;
 
 // Spawns a short spark burst + expanding shockwave ring at the monster's
 // card centre when damage lands. Both melee strikes and projectiles funnel
 // through _egDamageTargetById, so this fires for every player hit.
 // `elements` optionally maps each element to its share of the hit; the
 // dominant element picks the burst colour. `isCrit` enlarges the burst.
-function _egSpawnHitBurst(monsterId, elements, isCrit) {
+export function _egSpawnHitBurst(monsterId, elements, isCrit) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
 
@@ -2949,7 +2999,7 @@ function _egSpawnHitBurst(monsterId, elements, isCrit) {
 //------------------------------------------------------------------------
 
 // Returns the CSS class for an HP bar based on the percentage remaining.
-function _egHpBarClass(hpPct) {
+export function _egHpBarClass(hpPct) {
     if (hpPct > 60) return 'eg-hp-high';
     if (hpPct > 30) return 'eg-hp-mid';
     return 'eg-hp-low';
@@ -2957,7 +3007,7 @@ function _egHpBarClass(hpPct) {
 
 // Builds the badge HTML for a monster's name row (level, boss phase, immune, target).
 // NOTE: _egBuildMonsterBadgesHTML is kept for any external callers.
-function _egBuildMonsterBadgesHTML(m, isTarget) {
+export function _egBuildMonsterBadgesHTML(m, isTarget) {
     let html = `<span class="eg-level-badge">${t('eg_lv_badge').replace('{n}', m.level)}</span>`;
     if (m.isBoss && m.bossPhase)
         html += `<span class="eg-boss-phase-badge eg-boss-phase-${m.bossPhase}">${t('eg_phase_badge').replace('{n}', m.bossPhase)}</span>`;
@@ -2969,7 +3019,7 @@ function _egBuildMonsterBadgesHTML(m, isTarget) {
 }
 
 // Calculates HP and charge percentages clamped to [0, 100] for a given monster.
-function _egCalcBarPercentages(m) {
+export function _egCalcBarPercentages(m) {
     return {
         hpPct: Math.max(0, Math.round((m.currentHP / m.maxHP) * 100)),
         chargePct: Math.min(100, Math.max(0, (m.currentCharge / m.chargeMax) * 100)),
@@ -2977,9 +3027,9 @@ function _egCalcBarPercentages(m) {
 }
 
 // Builds the compact emoji card HTML for a single monster.
-function _egBuildMonsterCardHTML(m) {
+export function _egBuildMonsterCardHTML(m) {
     const { hpPct, chargePct } = _egCalcBarPercentages(m);
-    const isTarget = (m.id === _egTargetId);
+    const isTarget = (m.id === globalThis._egTargetId);
     const bossCls = m.isBoss ? ' eg-boss-card' : '';
     const targetedCls = isTarget ? ' eg-card-targeted' : '';
 
@@ -3019,7 +3069,7 @@ function _egBuildMonsterCardHTML(m) {
 
 // Updates the HP bar, charge bar, and HP label for a single monster.
 // Cheap DOM update used by the 10Hz tick loop - no full rebuild.
-function _egUpdateMonsterBars(m) {
+export function _egUpdateMonsterBars(m) {
     const { hpPct, chargePct } = _egCalcBarPercentages(m);
 
     const hpBar = document.getElementById(`eg-hp-bar-${m.id}`);
@@ -3044,13 +3094,13 @@ function _egUpdateMonsterBars(m) {
 
 // High-frequency bar update (10Hz). Only touches bar widths and HP text -
 // no DOM rebuilds. Keeps the tick loop cheap.
-function _egUpdateBars() {
+export function _egUpdateBars() {
     if (!_egIsActive()) return;
-    _egMonsters.forEach(_egUpdateMonsterBars);
+    globalThis._egMonsters.forEach(_egUpdateMonsterBars);
 }
 
 // Clears all monster zone elements and hides the wrapper.
-function _egHideMonsterPanel() {
+export function _egHideMonsterPanel() {
     EG_MONSTER_ZONES.forEach(zone => {
         const el = document.getElementById(zone);
         if (el) el.innerHTML = '';
@@ -3064,7 +3114,7 @@ function _egHideMonsterPanel() {
 }
 
 // Clears the HTML content of every monster zone panel.
-function _egClearAllZones() {
+export function _egClearAllZones() {
     EG_MONSTER_ZONES.forEach(zone => {
         const el = document.getElementById(zone);
         if (el) el.innerHTML = '';
@@ -3076,8 +3126,8 @@ function _egClearAllZones() {
 // Monsters hold ground here - the old perimeter patrol is disabled, so every
 // normal monster renders in its static panel. Only Brutus zombies / Dynamo
 // conductors (own layers) and the legacy roam hook skip panels.
-function _egRenderMonstersIntoZones() {
-    _egMonsters.forEach(m => {
+export function _egRenderMonstersIntoZones() {
+    globalThis._egMonsters.forEach(m => {
         // Brutus's sacrificial zombies render as roaming cards in the fixed
         // #eg-zombie-layer, not in the static monster panel.
         if (m.isSacrificialZombie) return;
@@ -3096,7 +3146,7 @@ function _egRenderMonstersIntoZones() {
 
 // Full panel rebuild. Only called on spawn, death, or target change -
 // never from the tick loop.
-function _egRenderPanel() {
+export function _egRenderPanel() {
     const wrapper = document.getElementById('eg-monster-wrapper');
 
     if (!_egIsActive()) {

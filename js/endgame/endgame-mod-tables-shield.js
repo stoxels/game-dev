@@ -1,3 +1,10 @@
+//------------------------------------------------------------------------
+// PHASE 3 (endgame step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_MOD_TABLE_WEAPON2 } from './endgame-mod-tables-weapon2.js';
+
 //  endgame-mod-tables-shield.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
 //  Slot modifier table(s) - data only, no logic.
@@ -13,7 +20,7 @@
 // everything else - local defences, block & dodge suffixes, shield_bash,
 // attributes, regen and utility - carries over unchanged.
 
-const EG_MOD_TABLE_SHIELD = (() => {
+export const EG_MOD_TABLE_SHIELD = (() => {
     const offensivePrefixIds = ['spell_damage', 'inc_spell_damage', 'channel'];
     return {
         prefixes: Object.fromEntries(
@@ -56,7 +63,7 @@ const EG_MOD_TABLE_SHIELD = (() => {
 // In: endgame-mod-tables.js
 // Replace the empty EG_MOD_TABLE_RANGED at the bottom of the file
 
-const EG_MOD_TABLE_RANGED = {
+export const EG_MOD_TABLE_RANGED = {
     prefixes: {
 
         // --- FLAT PHYSICAL DAMAGE ---

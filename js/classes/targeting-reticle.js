@@ -1,4 +1,7 @@
-﻿// targeting-reticle.js
+﻿import { _arcaneReveal_clearPreview, _arcaneReveal_updatePreview } from './class-mathmagician.js';
+import { _fieldScanClearPreview, _fieldScanUpdatePreview } from './class-probabilist.js';
+import { _diagStrikeClearPreview, _diagStrikeUpdatePreview } from './class-statistician.js';
+// targeting-reticle.js
 // Owns the custom mouse-follower reticle shown while a targeted class
 // ability is armed (waiting for the player to click a cell).
 //
@@ -17,17 +20,17 @@
 //------------------------------------------------------------------------
 
 // Cached references, created lazily on first arm.
-let _arReticleEl = null;
-let _arStageEl = null;
+export let _arReticleEl = null;
+export let _arStageEl = null;
 
 // Bound mousemove handler reference, so we can add/remove the exact same
 // function and avoid leaking listeners across repeated arm/disarm cycles.
-let _arMoveHandler = null;
+export let _arMoveHandler = null;
 
 // Last known pointer position, kept so the reticle can be (re)placed
 // immediately on arm without waiting for the next mousemove.
-let _arLastX = -9999;
-let _arLastY = -9999;
+export let _arLastX = -9999;
+export let _arLastY = -9999;
 
 
 //------------------------------------------------------------------------
@@ -38,18 +41,18 @@ let _arLastY = -9999;
 // new classes get their own bespoke reticle palette.
 //------------------------------------------------------------------------
 
-function _arResolveTheme() {
-    const slot = STATE.classActiveChoice;
+export function _arResolveTheme() {
+    const slot = globalThis.STATE.classActiveChoice;
 
     // Ascendency-specific themes take priority over the base class theme,
     // since an ascendency slot (active3/active4) can be armed independently
     // of which base class the player picked.
-    if (STATE.playerAscendency === 'recursionist' && slot === 'active3') return 'recursionist'; // Residual Totem
+    if (globalThis.STATE.playerAscendency === 'recursionist' && slot === 'active3') return 'recursionist'; // Residual Totem
 
     // Base class themes
-    if (STATE.playerClass === 'mathmagician') return 'mathmagician'; // Arcane Reveal
-    if (STATE.playerClass === 'statistician') return 'statistician'; // Diagonal Strike
-    if (STATE.playerClass === 'probabilist') return 'probabilist';   // Precision Mark
+    if (globalThis.STATE.playerClass === 'mathmagician') return 'mathmagician'; // Arcane Reveal
+    if (globalThis.STATE.playerClass === 'statistician') return 'statistician'; // Diagonal Strike
+    if (globalThis.STATE.playerClass === 'probabilist') return 'probabilist';   // Precision Mark
 
     return 'default';
 }
@@ -62,7 +65,7 @@ function _arResolveTheme() {
 
 // _arBuildReticleDOM - builds the reticle markup once and appends it to
 //   <body>. Safe to call multiple times; it is a no-op after the first.
-function _arBuildReticleDOM() {
+export function _arBuildReticleDOM() {
     if (_arReticleEl) return;
 
     const root = document.createElement('div');
@@ -101,7 +104,7 @@ function _arBuildReticleDOM() {
 // _arMoveTo - positions the reticle at the given viewport coordinates.
 //   Uses a transform on the root element so we only ever touch one
 //   property per move, keeping this cheap even on fast mouse movement.
-function _arMoveTo(x, y) {
+export function _arMoveTo(x, y) {
     _arLastX = x;
     _arLastY = y;
     if (_arReticleEl) {
@@ -112,7 +115,7 @@ function _arMoveTo(x, y) {
 // _arOnMouseMove - listener bound to the whole document while armed, so
 //   the reticle keeps following the cursor regardless of whether it is
 //   currently over the grid, the HUD, or empty page space.
-function _arOnMouseMove(e) {
+export function _arOnMouseMove(e) {
     _arMoveTo(e.clientX, e.clientY);
     if (typeof _fieldScanUpdatePreview === 'function') _fieldScanUpdatePreview(e.clientX, e.clientY);
     if (typeof _arcaneReveal_updatePreview === 'function') _arcaneReveal_updatePreview(e.clientX, e.clientY);
@@ -129,7 +132,7 @@ function _arOnMouseMove(e) {
 //   re-triggering the CSS animation class (removing then re-adding it on
 //   the next frame, since browsers won't restart an animation just by
 //   re-adding the same class without a reflow in between).
-function _arShowArmPop() {
+export function _arShowArmPop() {
     if (!_arStageEl) return;
     _arStageEl.classList.remove('ar-just-armed');
     void _arStageEl.offsetWidth; // force reflow
@@ -139,7 +142,7 @@ function _arShowArmPop() {
 // activateTargetingReticle - arms or disarms the custom targeting reticle.
 //   Called from _setAbilityMode() in class-abilities.js so the reticle
 //   lifecycle always matches activeAbilityMode exactly.
-function activateTargetingReticle(armed) {
+export function activateTargetingReticle(armed) {
     _arBuildReticleDOM();
 
     if (armed) {

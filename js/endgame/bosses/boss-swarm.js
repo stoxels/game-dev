@@ -1,4 +1,12 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE SWARM (boss_swarm)--------------------------
 //------------------------------------------------------------------------
 // Galaga homage turned living hive: the drones never sit still - the whole
@@ -38,8 +46,8 @@
 
 // DEBUG: slow the Swarm's timing 2.5x so manual playtests / screenshot
 // automation can catch mid-animation states. Flip to false for ship.
-const _EG_SW_DEBUG_SLOW = true;
-const _EG_SW_DEBUG_MULT = _EG_SW_DEBUG_SLOW ? 2.5 : 1;
+export const _EG_SW_DEBUG_SLOW = true;
+export const _EG_SW_DEBUG_MULT = _EG_SW_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
     boss_swarm: {
@@ -69,16 +77,16 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-const EG_SW_ARC_DMG     = [0, 0.13, 0.15, 0.18]; // %maxHP drone body hit
-const EG_SW_ARC_DPS     = 14;                   // %maxHP/s inside the glow trail
-const EG_SW_LARVA_HEAL  = 0.15;                  // %maxHP royal jelly heal
-const EG_SW_MIMIC_DMG   = 0.12;                  // %maxHP mimic stink burst
-const EG_SW_CLOUD_DPS   = 3.5;                   // %maxHP/s standing in stink
-const EG_SW_EDGE_DPS    = 5;                     // %maxPS/s grazing bloom edge
-const EG_SW_BLOOM_DMG   = 0.14;                  // %maxHP drone contact in bloom
-const EG_SW_CHARGE_DMG  = [0, 0, 0.16, 0.19];    // %maxHP finale charge hit
-const EG_SW_FUNNEL_DMG  = 0.30;                  // %maxHP failing the drone funnel
-const EG_SW_HIT_CD_MS   = 700;                   // shared touch cooldown
+export const EG_SW_ARC_DMG     = [0, 0.13, 0.15, 0.18]; // %maxHP drone body hit
+export const EG_SW_ARC_DPS     = 14;                   // %maxHP/s inside the glow trail
+export const EG_SW_LARVA_HEAL  = 0.15;                  // %maxHP royal jelly heal
+export const EG_SW_MIMIC_DMG   = 0.12;                  // %maxHP mimic stink burst
+export const EG_SW_CLOUD_DPS   = 3.5;                   // %maxHP/s standing in stink
+export const EG_SW_EDGE_DPS    = 5;                     // %maxPS/s grazing bloom edge
+export const EG_SW_BLOOM_DMG   = 0.14;                  // %maxHP drone contact in bloom
+export const EG_SW_CHARGE_DMG  = [0, 0, 0.16, 0.19];    // %maxHP finale charge hit
+export const EG_SW_FUNNEL_DMG  = 0.30;                  // %maxHP failing the drone funnel
+export const EG_SW_HIT_CD_MS   = 700;                   // shared touch cooldown
 
 
 //------------------------------------------------------------------------
@@ -87,8 +95,8 @@ const EG_SW_HIT_CD_MS   = 700;                   // shared touch cooldown
 
 // Touch damage helper shared by all Swarm hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
-let _egSwHitCd = 0;
-function _egSwTouch(pct, level, label) {
+export let _egSwHitCd = 0;
+export function _egSwTouch(pct, level, label) {
     const now = performance.now();
     if (now < _egSwHitCd) return false;
     const pr = _egNkPlayerRect();
@@ -100,18 +108,18 @@ function _egSwTouch(pct, level, label) {
 }
 
 // Circular distance between player centre and a point.
-function _egSwPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
+export function _egSwPC() { const c = _egNkPlayerCenter(); return c || { x: window.innerWidth / 2, y: window.innerHeight / 2 }; }
 
 // Royal jelly heal helper (mirrors the Siren's echo-zone heal).
-function _egSwHeal(amount) {
+export function _egSwHeal(amount) {
     if (typeof playerCurrentHP !== 'number') return;
-    const before = playerCurrentHP;
-    playerCurrentHP = Math.min(playerMaxHP, playerCurrentHP + Math.max(1, Math.round(amount)));
-    if (playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') _renderPlayerHealth();
+    const before = globalThis.playerCurrentHP;
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + Math.max(1, Math.round(amount)));
+    if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 
 // Spawn a hatching-ping: a small expanding ring where a drone peels off.
-function _egSwHatchPing(run, x, y) {
+export function _egSwHatchPing(run, x, y) {
     const el = _egNkEl(run, 'div', 'eg-sw-ping');
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
@@ -127,12 +135,12 @@ function _egSwHatchPing(run, x, y) {
 // drone trails laval glow; standing in the trail burns. Mid-arc a
 // HATCHLING splits off and keeps cutting a tighter arc. Dodge the EDGE,
 // not the whole screen.
-const EG_SW_WEDGE = 5;                    // drones per wedge
-const EG_SW_ARC_SPEED = 175;              // px/s along the arc (divided by debug mult)
-const EG_SW_ARC_RADIUS = 520;             // swing radius of the arc pivot
-const EG_SW_TRAIL_LIFE = 2.6;             // s a glow trail cell lives
+export const EG_SW_WEDGE = 5;                    // drones per wedge
+export const EG_SW_ARC_SPEED = 175;              // px/s along the arc (divided by debug mult)
+export const EG_SW_ARC_RADIUS = 520;             // swing radius of the arc pivot
+export const EG_SW_TRAIL_LIFE = 2.6;             // s a glow trail cell lives
 
-function _egMechSwSwarmArc(monster, phase) {
+export function _egMechSwSwarmArc(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -232,10 +240,10 @@ function _egMechSwSwarmArc(monster, phase) {
 // One is REAL, three are MIMICS. Step on the real larva to crush it: royal
 // jelly heals you 15% maxHP. Step on a mimic and it bursts a rancid stink
 // cloud that bites while you stand in it. Larvae sink after ~4s of opening.
-const EG_MIMIC_OPEN_MS = 3400;      // how long larvae sit before sinking
-const EG_MIMIC_CLOUD_LIFE = 4.5;    // s the stink cloud bites
+export const EG_MIMIC_OPEN_MS = 3400;      // how long larvae sit before sinking
+export const EG_MIMIC_CLOUD_LIFE = 4.5;    // s the stink cloud bites
 
-function _egMechSwMimicQueen(monster, phase) {
+export function _egMechSwMimicQueen(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
@@ -337,7 +345,7 @@ function _egMechSwMimicQueen(monster, phase) {
 }
 
 // Small sparkle flare helper.
-function _egSwFlareEl(run, x, y, cls, glyph) {
+export function _egSwFlareEl(run, x, y, cls, glyph) {
     const el = _egNkEl(run, 'div', cls, glyph);
     el.style.left = Math.round(x) + 'px';
     el.style.top = Math.round(y) + 'px';
@@ -352,10 +360,10 @@ function _egSwFlareEl(run, x, y, cls, glyph) {
 // position, then BLOOMS into a smoke ring: everything outside the 150px
 // clear hole goes dark for ~6s. Two overlapping blooms in phase 3. Plan
 // your position BEFORE the bloom - inside the hole you see everything.
-const EG_BLOOM_LIFE = 6;        // s the smoke covers the screen
-const EG_BLOOM_HOLE = 150;      // px radius of the clear centre
+export const EG_BLOOM_LIFE = 6;        // s the smoke covers the screen
+export const EG_BLOOM_HOLE = 150;      // px radius of the clear centre
 
-function _egMechSwHiveEye(monster, phase) {
+export function _egMechSwHiveEye(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
@@ -469,28 +477,28 @@ function _egMechSwHiveEye(monster, phase) {
 // streams. Survive the funnel: the swarm scatters, the fight resumes.
 // Charge bar frozen for the whole set-piece (gate in _egTickPlayer via
 // _egSwFinalActive).
-const EG_SW_FINALE_CHARGES = 3;
-const EG_SW_FINALE_CHARGE_MS = 1600;     // ms telegraph per charge (shrinks)
-const EG_SW_FINALE_CHARGE_MIN = 1000;
-const EG_SW_FUNNEL_ROWS = 4;
-const EG_SW_FUNNEL_ROW_MS = 1150;        // ms between funnel rows
+export const EG_SW_FINALE_CHARGES = 3;
+export const EG_SW_FINALE_CHARGE_MS = 1600;     // ms telegraph per charge (shrinks)
+export const EG_SW_FINALE_CHARGE_MIN = 1000;
+export const EG_SW_FUNNEL_ROWS = 4;
+export const EG_SW_FUNNEL_ROW_MS = 1150;        // ms between funnel rows
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
-let _egSwFinal = null;
+export let _egSwFinal = null;
 
-function _egSwFinalActive() {
+export function _egSwFinalActive() {
     return !!_egSwFinal && !_egSwFinal.finished;
 }
 
 // Phase-enter hook: starts the ≤10% HP watcher (the framework only calls
 // onPhaseEnter on transitions, so a dive from 30% → 10% needs its own gate).
-function _egSwOnPhaseEnter(monster, newPhase) {
+export function _egSwOnPhaseEnter(monster, newPhase) {
     if (newPhase !== 3) return false;
     try { _egSwStartFinalWatcher(monster); } catch (e) {}
     return false;
 }
 
-function _egSwStartFinalWatcher(monster) {
+export function _egSwStartFinalWatcher(monster) {
     if (!monster || _egSwFinal) return;
     const run = _egNkNewRun(monster.id, true);
     run.passive = true;
@@ -508,7 +516,7 @@ function _egSwStartFinalWatcher(monster) {
 
 // Pause-safe timeout: if the game freezes mid-wait, retry until thawed
 // instead of firing during the pause (mirrors the other finales).
-function _egSwAfter(g, ms, fn) {
+export function _egSwAfter(g, ms, fn) {
     const t0 = performance.now();
     const step = () => {
         if (g.finished || !_egSwFinal) return;
@@ -519,7 +527,7 @@ function _egSwAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
-function _egSwFinalStart(monster) {
+export function _egSwFinalStart(monster) {
     if (_egSwFinal || !monster) return;
 
     // The hive goes quiet: kill every other run of this boss (the finale
@@ -741,7 +749,7 @@ function _egSwFinalStart(monster) {
 }
 
 // Ends the finale: scatter burst, release immunity and the charge bar.
-function _egSwFinalEnd(g, monster) {
+export function _egSwFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
@@ -761,7 +769,7 @@ function _egSwFinalEnd(g, monster) {
         if (el) el.classList.remove('eg-charge-paused');
     });
     try {
-        const m = (typeof _egMonsters !== 'undefined') ? _egMonsters.find(x => x && x.id === g.monsterId) : null;
+        const m = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.find(x => x && x.id === g.monsterId) : null;
         if (m) m.bossImmune = false;
     } catch (e) {}
     if (typeof _egNkToast === 'function') {
@@ -776,7 +784,7 @@ function _egSwFinalEnd(g, monster) {
 //------------------------------------------------------------------------
 // Called from _egBossCleanup on boss death AND from the encounter stop -
 // removes every run element, overlay and body class this boss ever created.
-function _egSwTeardown() {
+export function _egSwTeardown() {
     if (_egSwFinal) { try { _egSwFinalEnd(_egSwFinal, null); } catch (e) {} _egSwFinal = null; }
     document.querySelectorAll('.eg-sw-drone, .eg-sw-host, .eg-sw-larva, .eg-sw-cloud, ' +
         '.eg-sw-trail, .eg-sw-ping, .eg-sw-probe, .eg-sw-bloom, .eg-sw-guard, ' +
@@ -802,7 +810,7 @@ if (typeof window !== 'undefined') {
     window._EG_SW_DEBUG = {
         fire: (name, phase) => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_swarm') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_swarm') : null;
             if (!monster) return 'no swarm alive';
             const fn = name === 'arc' ? _egMechSwSwarmArc
                 : name === 'mimic' ? _egMechSwMimicQueen
@@ -814,7 +822,7 @@ if (typeof window !== 'undefined') {
         },
         final: () => {
             const monster = (typeof _egMonsters !== 'undefined')
-                ? _egMonsters.find(m => m && m.baseId === 'boss_swarm') : null;
+                ? globalThis._egMonsters.find(m => m && m.baseId === 'boss_swarm') : null;
             if (!monster) return 'no swarm alive';
             _egSwFinalStart(monster);
             return 'THE SWARM SINGULARITY started';

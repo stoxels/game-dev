@@ -1,4 +1,14 @@
 //------------------------------------------------------------------------
+// PHASE 3 (boss step): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { _egRenderPanel, _egSpawnMonster } from '../endgame-encounter.js';
+import { EG_MAX_CONCURRENT_MONSTERS } from '../endgame-monsters.js';
+import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
+
+//------------------------------------------------------------------------
 //-------------------BOSS: THE WARLORD (boss_warlord)---------------------------
 //------------------------------------------------------------------------
 // Pinnacle commander: calls its guard to raise a shield you must break by
@@ -38,7 +48,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-function _egMechGuardCall(monster, phase) {
+export function _egMechGuardCall(monster, phase) {
     if (!monster || monster.warlordGuard || _egNkFrozen()) return;
     if (typeof _egSpawnMonster !== 'function') return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -46,13 +56,13 @@ function _egMechGuardCall(monster, phase) {
     const level = Math.max(1, Math.round(monster.level || 1));
     const pool = ['slime', 'ghost', 'rat', 'bat', 'bee'];
     const cap = (typeof EG_MAX_CONCURRENT_MONSTERS !== 'undefined') ? EG_MAX_CONCURRENT_MONSTERS : 6;
-    const before = (typeof _egMonsters !== 'undefined') ? _egMonsters.length : 0;
+    const before = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.length : 0;
     for (let i = 0; i < count; i++) {
-        if (typeof _egMonsters !== 'undefined' && _egMonsters.length >= cap) break;
+        if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length >= cap) break;
         _egSpawnMonster(pool[Math.floor(Math.random() * pool.length)], level);
     }
     const fresh = (typeof _egMonsters !== 'undefined')
-        ? _egMonsters.slice(before).filter(m => !m.isBoss) : [];
+        ? globalThis._egMonsters.slice(before).filter(m => !m.isBoss) : [];
     if (fresh.length === 0) return;
 
     monster.warlordGuard = true;
@@ -68,10 +78,10 @@ function _egMechGuardCall(monster, phase) {
     _egNkLoop(run, (dtS) => {
         e += dtS * 1000;
         const boss = (typeof _egMonsters !== 'undefined')
-            ? _egMonsters.find(m => m.id === monster.id) : null;
+            ? globalThis._egMonsters.find(m => m.id === monster.id) : null;
         if (!boss) return false;
         const alive = (typeof _egMonsters !== 'undefined')
-            && _egMonsters.some(m => m.warlordOf === monster.id && m.currentHP > 0);
+            && globalThis._egMonsters.some(m => m.warlordOf === monster.id && m.currentHP > 0);
         if (!alive || e > 30000) {
             boss.warlordGuard = false;
             boss.bossImmune = false;
@@ -85,7 +95,7 @@ function _egMechGuardCall(monster, phase) {
     });
 }
 
-function _egMechTripleRings(monster, phase) {
+export function _egMechTripleRings(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const expandMs = [0, 2000, 1800, 1600][p];

@@ -1,16 +1,36 @@
-﻿//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// PHASE 3 (step 10): converted to a real ES module. Do not add new
+// bare cross-file references - import explicitly or use globalThis.X for
+// names still living in the concatenated body. See MIGRATION.md.
+//------------------------------------------------------------------------
+import { updateClassHUDManaBar } from '../classes/class-mana.js';
+import { _egEntrMoveMult } from '../endgame/bosses/boss-entropy.js';
+import { _egSnailBroomHeld } from '../endgame/bosses/boss-snail.js';
+import { _egPlayerHasAilment } from '../endgame/endgame-ailments.js';
+import { _egSetHoldEPauseVisual } from '../endgame/endgame-encounter-tick.js';
+import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
+import { EG_PLAYER_DEFAULT_ATTACK_INTERVAL, _egIsActive } from '../endgame/endgame-state.js';
+import { keybindKeyFor, keybindMatches } from '../keybinds.js';
+import { _refreshQuestionModalFlag } from '../screens/screens.js';
+import { _uspMovementSpeedMult } from '../skills/universal-spells.js';
+import { _applyLowHealthVignette } from '../timer.js';
+import { t } from '../translation/translations.js';
+import { _banterRepositionBubbleIfVisible, hideCharacterBanter } from './character-banter.js';
+import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _animSetDefaultDownImage, _animShouldMirrorFor, _animWalkIsDirectionalFor, _playAvatarWalkAnimation, _startAvatarIdleAnimation, _stopAvatarWalkAnimation } from './sprite_animations.js';
+
+//------------------------------------------------------------------------
 //-------------------IMAGE LOOKUP-----------------------------------------
 //------------------------------------------------------------------------
 
 // Maps character id + class/ascendency id → image path.
 // Falls back to the no-class portrait if no class is selected.
-function _getPlayerCharacterImage() {
-    const char = (STATE && STATE.playerCharacter) ? STATE.playerCharacter : 'stox';
+export function _getPlayerCharacterImage() {
+    const char = (globalThis.STATE && globalThis.STATE.playerCharacter) ? globalThis.STATE.playerCharacter : 'stox';
 
     // Ascendency takes priority over base class
-    const classKey = (STATE && STATE.playerAscendency)
-        ? STATE.playerAscendency
-        : (STATE && STATE.playerClass ? STATE.playerClass : 'noclass');
+    const classKey = (globalThis.STATE && globalThis.STATE.playerAscendency)
+        ? globalThis.STATE.playerAscendency
+        : (globalThis.STATE && globalThis.STATE.playerClass ? globalThis.STATE.playerClass : 'noclass');
 
     // Expected filenames: e.g. images/sprites/Stox_statistician.webp
     // No-class fallback: images/sprites/Stox_noclass.webp
@@ -20,24 +40,24 @@ function _getPlayerCharacterImage() {
 
 
 // Returns the display name of the currently selected character.
-function _getAvatarCharacterName() {
+export function _getAvatarCharacterName() {
     const names = { stox: 'STOX', trix: 'TRIX', syla: 'SYLA' };
-    return names[STATE?.playerCharacter] || 'STOX';
+    return names[globalThis.STATE?.playerCharacter] || 'STOX';
 }
 
-function _getAvatarCharacterColor() {
+export function _getAvatarCharacterColor() {
     const colors = {
         stox: '#4fc3f7',
         trix: '#ce93d8',
         syla: '#66bb6a',
     };
-    return colors[STATE?.playerCharacter] || '#ffffff';
+    return colors[globalThis.STATE?.playerCharacter] || '#ffffff';
 }
 
 // Returns true if the given character id is currently selected.
 // Shared helper for all character-trait checks across the codebase.
-function _charIs(id) {
-    return STATE?.playerCharacter === id;
+export function _charIs(id) {
+    return globalThis.STATE?.playerCharacter === id;
 }
 
 
@@ -54,7 +74,7 @@ function _charIs(id) {
 // uses the default 100% of its 100px wrapper. The ids are shared, so
 // exactly one avatar may exist at a time (each render removes the other -
 // see _renderPlayerAvatar* below).
-function _avatarBarsHTML(barWidth = '100%') {
+export function _avatarBarsHTML(barWidth = '100%') {
     return `
             <div style="width: ${barWidth};">
                 <div style="width: 100%; margin-bottom: 4px;">
@@ -95,20 +115,20 @@ function _avatarBarsHTML(barWidth = '100%') {
 // shield visibility, charge bar. Mana fill/text are owned by
 // updateClassHUDManaBar() (class-mana.js). Idempotent - call after any
 // avatar (re)build or health change.
-function _updateAvatarBarStack() {
+export function _updateAvatarBarStack() {
     // Health - the text shows only the current value (the bar's shape
     // already communicates the maximum), fill is the percentage.
     const hpText = document.getElementById('avatar-hp-text');
     const hpFill = document.getElementById('avatar-hp-fill');
-    if (hpText) hpText.innerText = `${Math.max(0, Math.round(playerCurrentHP))}`;
+    if (hpText) hpText.innerText = `${Math.max(0, Math.round(globalThis.playerCurrentHP))}`;
     if (hpFill) {
-        const hpPct = (typeof playerMaxHP === 'number' && playerMaxHP > 0)
-            ? Math.max(0, Math.min(100, (playerCurrentHP / playerMaxHP) * 100))
+        const hpPct = (typeof playerMaxHP === 'number' && globalThis.playerMaxHP > 0)
+            ? Math.max(0, Math.min(100, (globalThis.playerCurrentHP / globalThis.playerMaxHP) * 100))
             : 100;
         hpFill.style.width = hpPct + '%';
     }    // Absorption shield - hidden entirely unless the player actually has
     // some (gear absorption > 0 AND current charge above zero).
-    const absCur = (typeof _egPlayerAbsorptionCurrent === 'number') ? _egPlayerAbsorptionCurrent : 0;
+    const absCur = (typeof _egPlayerAbsorptionCurrent === 'number') ? globalThis._egPlayerAbsorptionCurrent : 0;
     const maxAbsorption = (typeof _egComputePlayerStats === 'function') ? (_egComputePlayerStats().absorption || 0) : 0;
     const shieldWrap = document.getElementById('avatar-shield-wrap');
     const shieldFill = document.getElementById('avatar-shield-fill');
@@ -124,10 +144,11 @@ function _updateAvatarBarStack() {
         }
     }
 
-    // Manual melee charge - fills toward 100% during combat and holds until    // an E strike spends it. On puzzle levels the charge stays parked at 0.
+    // Manual melee charge - fills toward 100% during combat and holds until
+    // an E strike spends it. On puzzle levels the charge stays parked at 0.
     const chargeFill = document.getElementById('avatar-charge-fill');
     if (chargeFill) {
-        const chargeCur = (typeof _egPlayerCurrentCharge === 'number') ? _egPlayerCurrentCharge : 0;
+        const chargeCur = (typeof _egPlayerCurrentCharge === 'number') ? globalThis._egPlayerCurrentCharge : 0;
         const chargeMax = (typeof _egGetPlayerAttackInterval === 'function')
             ? _egGetPlayerAttackInterval()
             : (typeof EG_PLAYER_DEFAULT_ATTACK_INTERVAL === 'number' ? EG_PLAYER_DEFAULT_ATTACK_INTERVAL : 5000);
@@ -156,7 +177,7 @@ function _updateAvatarBarStack() {
 // overlap the right-hand HUD/zoom bar, so the whole wrapper is shrunk.
 // Uses CSS zoom (same mechanism as the puzzle scaler) so offsetWidth
 // stays in sync and _setAvatarPos() keeps clamping correctly.
-function _avatarResponsiveScale() {
+export function _avatarResponsiveScale() {
     const vw = window.innerWidth || 1280;
     if (vw >= 700) return 1;   // desktop anchor - unchanged behaviour
     if (vw >= 480) return 0.8; // large phones / small tablets
@@ -172,7 +193,7 @@ function _avatarResponsiveScale() {
 // zoom-scaled phone layout its visual box spills past the wrapper's left
 // edge by (128 - wrapperWidth) * scale / 2 px. The anchor compensates for
 // that spill so the ARTWORK - not the wrapper box - keeps an 8px margin.
-function _avatarAnchorLeft() {
+export function _avatarAnchorLeft() {
     const vw = window.innerWidth || 1280;
     if (vw >= 700) return '250px';
     const withCompanions = _hasCompanions();
@@ -182,7 +203,7 @@ function _avatarAnchorLeft() {
     return Math.round(8 + spill) + 'px';
 }
 
-function _avatarAnchorTop() {
+export function _avatarAnchorTop() {
     if ((window.innerWidth || 1280) >= 700) return '15px';
     const hud = document.querySelector('.game-hud-corner');
     const hudBottom = hud ? hud.getBoundingClientRect().bottom : 0;
@@ -191,7 +212,7 @@ function _avatarAnchorTop() {
 
 // Applies the responsive anchor + zoom scale to a simple-avatar wrapper.
 // Desktop (>700px) is a no-op - behaviour there is byte-for-byte unchanged.
-function _applyAvatarResponsiveLayout(wrapper) {
+export function _applyAvatarResponsiveLayout(wrapper) {
     if (!wrapper) return;
     wrapper.style.left = _avatarAnchorLeft();
     wrapper.style.top = _avatarAnchorTop();
@@ -209,8 +230,8 @@ function _applyAvatarResponsiveLayout(wrapper) {
 // Renders the WASD-controlled sprite in the top-left with the full
 // Health / Mana / Shield / charge bar stack above it (same presentation as
 // the monster-level avatar - see _avatarBarsHTML).
-function _renderPlayerAvatarSimple() {
-    if (typeof dead !== 'undefined' && dead) {
+export function _renderPlayerAvatarSimple() {
+    if (typeof dead !== 'undefined' && globalThis.dead) {
         const _hideSimple = document.getElementById('player-avatar-simple');
         if (_hideSimple) _hideSimple.style.display = 'none';
         return;
@@ -428,7 +449,7 @@ function _renderPlayerAvatarSimple() {
 })();
 
 // Removes the simple avatar (called when entering a monster level).
-function _removePlayerAvatarSimple() {
+export function _removePlayerAvatarSimple() {
     const simple = document.getElementById('player-avatar-simple');
     if (simple) simple.remove();
     // Clean up WASD listeners
@@ -437,7 +458,7 @@ function _removePlayerAvatarSimple() {
 }
 
 // Refreshes the sprite image on the simple avatar (e.g. after class selection).
-function _updateAvatarSimpleImage() {
+export function _updateAvatarSimpleImage() {
     const img = document.getElementById('avatar-sprite-img-simple');
     if (img) {
         if (typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(img);
@@ -450,8 +471,8 @@ function _updateAvatarSimpleImage() {
     }
     // New class/variant: drop stale frame cache, warm the new one, and
     // (re)start the idle loop so fresh idle art appears.
-    if (typeof _animRefreshCacheFor === 'function' && typeof STATE !== 'undefined' && STATE) {
-        _animRefreshCacheFor(STATE.playerCharacter, STATE.playerAscendency || STATE.playerClass || 'noclass');
+    if (typeof _animRefreshCacheFor === 'function' && typeof STATE !== 'undefined' && globalThis.STATE) {
+        _animRefreshCacheFor(globalThis.STATE.playerCharacter, globalThis.STATE.playerAscendency || globalThis.STATE.playerClass || 'noclass');
     }
     if (typeof _startAvatarIdleAnimation === 'function') {
         _startAvatarIdleAnimation('avatar-sprite-img-simple');
@@ -473,13 +494,13 @@ function _updateAvatarSimpleImage() {
 // Held-key movement. Keys come from the persisted keybind map
 // (js/keybinds.js, actions move-up/down/left/right, WASD by default) so
 // player rebindings take effect here too.
-const AVATAR_MOVE_SPEED_PX_PER_SEC = 320;
+export const AVATAR_MOVE_SPEED_PX_PER_SEC = 320;
 
 // Boots movement-speed modifier (PoE-style). Reads live gear via
 // _egComputePlayerStats().movementSpeedPct which is only rolled on
 // boots (10–35%). Outside endgame or with no boots equipped this
 // stays at 1.0×.
-function _avatarGetMoveSpeed() {
+export function _avatarGetMoveSpeed() {
     let base = AVATAR_MOVE_SPEED_PX_PER_SEC;
     try {
         if (typeof _egComputePlayerStats === 'function') {
@@ -521,20 +542,20 @@ function _avatarGetMoveSpeed() {
 // player holding a key against a UI block is not walking, and the movement
 // spells must aim where the sprite last went, not where a held key points.
 // Read through getAvatarLastMoveDir() (js/skills/universal-spells.js).
-let _avatarLastMoveDir = null;
+export let _avatarLastMoveDir = null;
 
-function getAvatarLastMoveDir() {
+export function getAvatarLastMoveDir() {
     return _avatarLastMoveDir;
 }
 
-const _avatarMoveState = {
+export const _avatarMoveState = {
     held: new Set(),
     elId: null,
     rafId: null,
     lastTs: 0,
 };
 
-function _avatarMoveUiBlocked() {
+export function _avatarMoveUiBlocked() {
     const tag = document.activeElement ? document.activeElement.tagName : null;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show')) return true;
     // A question modal (quiz overlay / math gate / scouts primer) hides the
@@ -562,12 +583,12 @@ function _avatarMoveUiBlocked() {
     // for scripted movement tests; never set in normal play.
     if (typeof window !== 'undefined' && window.STOX_FLAGS && window.STOX_FLAGS.devTestActive
         && window.STOX_FLAGS.devTestFreezeAvatar) return true;
-    if (typeof _egHoldEPauseActive !== 'undefined' && _egHoldEPauseActive) return true;
+    if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) return true;
     if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('frozen')) return true;
     return false;
 }
 
-function _avatarMoveTick(ts) {
+export function _avatarMoveTick(ts) {
     _avatarMoveState.rafId = null;
     if (!_avatarMoveState.held.size || !_avatarMoveState.elId) return;
 
@@ -648,7 +669,7 @@ function _avatarMoveTick(ts) {
     _avatarMoveState.rafId = requestAnimationFrame(_avatarMoveTick);
 }
 
-function _makeAvatarWasdHandlers(elId) {
+export function _makeAvatarWasdHandlers(elId) {
     const onKeyDown = (e) => {
         if (_avatarMoveUiBlocked()) return;
         const k = (e.key || '').toLowerCase();
@@ -685,7 +706,7 @@ function _makeAvatarWasdHandlers(elId) {
     return { onKeyDown, onKeyUp, onBlur };
 }
 
-function _removeSimpleAvatarWasdListeners() {
+export function _removeSimpleAvatarWasdListeners() {
     if (window._avatarWASDHandler) {
         document.removeEventListener('keydown', window._avatarWASDHandler);
         window._avatarWASDHandler = null;
@@ -700,7 +721,7 @@ function _removeSimpleAvatarWasdListeners() {
     }
 }
 
-function _initSimpleAvatarWASD(wrapper) {
+export function _initSimpleAvatarWASD(wrapper) {
     // Remove any previous listeners
     _removeSimpleAvatarWasdListeners();
 
@@ -719,9 +740,9 @@ function _initSimpleAvatarWASD(wrapper) {
 // hiccup here used to abort the whole render - including the WASD listener
 // wiring below it - leaving the sprite permanently unmovable for the
 // session (the "movement only works after visiting the nexus" report).
-function _hasCompanions() {
+export function _hasCompanions() {
     try {
-        return !!(typeof STATE !== 'undefined' && STATE && STATE.playerAscendency === 'random_walker');
+        return !!(typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerAscendency === 'random_walker');
     } catch (e) {
         return false;
     }
@@ -730,7 +751,7 @@ function _hasCompanions() {
 // Charges a companion sprite from its current position to a grid cell,
 // calls onArrival() when it lands, then flies it back home.
 // companionId: 'avatar-companion-drifter' | 'avatar-companion-brownian'
-function _chargeCompanionToCell(companionId, targetR, targetC, onArrival, onReturn) {
+export function _chargeCompanionToCell(companionId, targetR, targetC, onArrival, onReturn) {
     const el = document.getElementById(companionId);
     if (!el) {
         // No companion visible (e.g. wrong ascendency) - just fire callbacks immediately
@@ -796,8 +817,8 @@ function _chargeCompanionToCell(companionId, targetR, targetC, onArrival, onRetu
 // the menu-style portrait presentation is unchanged.
 // With companions, also reorders Drifter/Brownian so they stay on the
 // correct side (Drifter left, Brownian right) relative to the character.
-function _updateAvatarFacing(el, direction) {
-    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
+export function _updateAvatarFacing(el, direction) {
+    const st = (typeof STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE : null;
     const char = st ? st.playerCharacter : null;
     const variant = st ? (st.playerAscendency || st.playerClass || 'noclass') : 'noclass';
     const dir = (direction && typeof ANIM_DIRECTIONS !== 'undefined' && ANIM_DIRECTIONS.indexOf(direction) !== -1)
@@ -916,7 +937,7 @@ function _updateAvatarFacing(el, direction) {
 // animation state and facing untouched.
 // direction is optional ('up' | 'down' | 'left' | 'right') - picks the
 // directional walk set when it exists, omni otherwise.
-function _setAvatarPos(el, x, y, direction) {
+export function _setAvatarPos(el, x, y, direction) {
     const w = el.offsetWidth || 72;
     const h = el.offsetHeight || 90;
     const maxX = window.innerWidth - w - 4;
@@ -953,7 +974,7 @@ function _setAvatarPos(el, x, y, direction) {
 
 // Call this inside renderLSCharacterAvatar() (character-select.js) to also
 // update the avatar image when the level select screen opens.
-function _updateLSAvatarImage() {
+export function _updateLSAvatarImage() {
     const img = document.querySelector('.ls-char-avatar-img');
     if (img) img.src = _getPlayerCharacterImage();
 }
@@ -968,8 +989,8 @@ function _updateLSAvatarImage() {
 // Maps character id → the per-character name-image asset shown on the
 // left page of the setup screen's book. Expected filenames:
 // images/Game_Setup/Stox.webp, Trix.png, Syla.png
-function _getSetupCharNameImage() {
-    const char = (STATE && STATE.playerCharacter) ? STATE.playerCharacter : 'stox';
+export function _getSetupCharNameImage() {
+    const char = (globalThis.STATE && globalThis.STATE.playerCharacter) ? globalThis.STATE.playerCharacter : 'stox';
     const charCap = char.charAt(0).toUpperCase() + char.slice(1);
     return `images/Game_Setup/${charCap}.webp`;
 }
@@ -979,7 +1000,7 @@ function _getSetupCharNameImage() {
 
 // Call this inside showSetup() (screens.js) to sync the setup screen's
 // character name image + portrait to whichever character the player chose.
-function _updateSetupScreenCharacter() {
+export function _updateSetupScreenCharacter() {
     const nameImg = document.getElementById('setup-char-name-img');
     if (nameImg) nameImg.src = _getSetupCharNameImage();
 
@@ -998,8 +1019,8 @@ function _updateSetupScreenCharacter() {
 // charge bar stack. Shares its markup and element ids with the simple
 // avatar (see _avatarBarsHTML), so puzzle levels and monster levels render
 // the exact same sprite presentation - the old endgame-only split is gone.
-function _renderPlayerAvatar() {
-    if (typeof dead !== 'undefined' && dead) {
+export function _renderPlayerAvatar() {
+    if (typeof dead !== 'undefined' && globalThis.dead) {
         const _hideEl = document.getElementById('player-avatar-wrapper');
         if (_hideEl) _hideEl.style.display = 'none';
         return;
@@ -1065,7 +1086,7 @@ function _renderPlayerAvatar() {
     if (typeof _egHoldEPauseActive !== 'undefined' && typeof _egSetHoldEPauseVisual === 'function') {
         // Avoid redundant DOM churn: _egSetHoldEPauseVisual is idempotent and cheap
         const lbl = document.getElementById('eg-hold-pause-label');
-        const shouldShow = !!_egHoldEPauseActive;
+        const shouldShow = !!globalThis._egHoldEPauseActive;
         const isShowing = !!lbl && lbl.parentElement === avatar;
         if (shouldShow !== isShowing) _egSetHoldEPauseVisual(shouldShow);
         else if (shouldShow && lbl) {
@@ -1077,7 +1098,7 @@ function _renderPlayerAvatar() {
     }
 }
 
-function _removeFullAvatarWasdListeners() {
+export function _removeFullAvatarWasdListeners() {
     if (window._avatarFullWASDHandler) {
         document.removeEventListener('keydown', window._avatarFullWASDHandler);
         window._avatarFullWASDHandler = null;
@@ -1092,7 +1113,7 @@ function _removeFullAvatarWasdListeners() {
     }
 }
 
-function _initFullAvatarWASD(wrapper) {
+export function _initFullAvatarWASD(wrapper) {
     _removeFullAvatarWasdListeners();
 
     const h = _makeAvatarWasdHandlers('player-avatar-wrapper');
@@ -1109,7 +1130,7 @@ function _initFullAvatarWASD(wrapper) {
 
 
 
-function _hidePlayerAvatarSimple() {
+export function _hidePlayerAvatarSimple() {
     const el = document.getElementById('player-avatar-simple');
     if (el) el.style.display = 'none';
     if (typeof _stopAvatarWalkAnimation === 'function') _stopAvatarWalkAnimation();
@@ -1117,8 +1138,8 @@ function _hidePlayerAvatarSimple() {
     if (typeof _avatarMoveState !== 'undefined' && _avatarMoveState.held) _avatarMoveState.held.clear();
 }
 
-function _showPlayerAvatarSimple() {
-    if (typeof dead !== 'undefined' && dead) return;
+export function _showPlayerAvatarSimple() {
+    if (typeof dead !== 'undefined' && globalThis.dead) return;
     const el = document.getElementById('player-avatar-simple');
     if (el) el.style.display = 'flex';
 }
@@ -1126,22 +1147,22 @@ function _showPlayerAvatarSimple() {
 // In js/sprite/player_sprite.js - add to wherever _egStopEncounter cleans up,
 // or add a dedicated hide function mirroring the simple one:
 
-function _hidePlayerAvatar() {
+export function _hidePlayerAvatar() {
     const el = document.getElementById('player-avatar-wrapper');
     if (el) el.style.display = 'none';
     if (typeof _stopAvatarWalkAnimation === 'function') _stopAvatarWalkAnimation();
     if (typeof _avatarMoveState !== 'undefined' && _avatarMoveState.held) _avatarMoveState.held.clear();
 }
 
-function _showPlayerAvatar() {
-    if (typeof dead !== 'undefined' && dead) return;
+export function _showPlayerAvatar() {
+    if (typeof dead !== 'undefined' && globalThis.dead) return;
     const el = document.getElementById('player-avatar-wrapper');
     if (el) el.style.display = 'flex';
 }
 
 
 
-function _renderPlayerHealth() {
+export function _renderPlayerHealth() {
     _updateAvatarBarStack();
     if (typeof _applyLowHealthVignette === 'function') _applyLowHealthVignette();
 }
