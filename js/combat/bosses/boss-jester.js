@@ -5,54 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egN
 //------------------------------------------------------------------------
 //-------------------BOSS: THE JESTER (boss_jester)------------------------
 //------------------------------------------------------------------------
-// REWORK - Boshy homage, rebuilt as a three-act stage performance. The
-// Jester never stops showboating: every mechanic is a NUMBERED ACT, and the
-// fight literally plays on a stage - a spotlight follows the show, cards
-// deal a hand you must survive, and the finale is the show of shows.
-//
-//   Phase 1 (100–60%) - BOUNCING MAYHEM (signature, upgraded). The juggling
-//                       orbs now BOUNCE IN RHYTHM: they stay calm between
-//                       beats, then all HOP on the beat, teleporting their
-//                       velocity to a fresh random angle - the dodge rhythm
-//                       is the skill. Dense but fair; every orb is slow
-//                       enough to track.
-//                       Plus CLUE SWAP (shared).
-//   Phase 2 ( ≤60%)   - ACT II: CARD TOSS. A fan of oversized playing cards
-//                       arcs across the stage and STICKS where they land,
-//                       face-up, as hazards - the arena becomes the Jester's
-//                       card table. Two volleys; the second aims at you.
-//                       Plus JUGGLER'S Jinx. Three cursed balls (🟣 jinx,
-//                       💛 luck) orbit the stage; touching the JINX ball
-//                       costs a hit, touching the LUCK ball pops a small
-//                       heal - greed bait in the middle of the chaos.
-//   Phase 3 ( ≤30%)   - ACT III: THE ENCORE. Mayhem orbs multiply (8), the
-//                       card volleys triple, and the jinx orbit tightens.
-//                       The audience is on its feet.
-//   Finale ( ≤10%)    - 🎪 THE GRAND FINALE (one-shot set-piece): the stage
-//                       curtain drops, the boss bows (immune), and the
-//                       FULL HOUSE builds: cards deal onto the grid in a
-//                       closing spiral - every card face is a hazard, and
-//                       the pattern spells one safe suit. STAND ON THE SAFE
-//                       SUIT when the reveal lands - wrong suit = hit, and
-//                       each reveal comes faster. The last reveal is the
-//                       BLACKOUT: all cards flip down except the safe suit,
-//                       then the CURTAIN CALL barrage sweeps the safe lanes.
-//                       Charge bar frozen for the whole set-piece (gate in
-//                       _egTickPlayer via _egJsFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (clue_swap) live in shared-boss-abilities.js and are
-// referenced by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Rework stage performance: bouncing mayhem orbs in rhythm, card tosses
+// that stick as hazards, jinx/luck orbit balls, and HP-gated encore acts.
+// THE GRAND FINALE at ≤10%: cards spiral in spelling one safe suit -
+// stand on it at each reveal, faster every time.
 //------------------------------------------------------------------------
 
 export const __EG_JS_DEBUG_SLOW = false;
