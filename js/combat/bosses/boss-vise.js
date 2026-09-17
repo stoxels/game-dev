@@ -5,52 +5,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFroze
 //------------------------------------------------------------------------
 //-------------------BOSS: THE VISE (boss_vise)----------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK - "Cold Iron". The Mega-Man corridor soul, rebuilt on the
-// shared nk-run standard: the walls still sweep, the gap still breathes,
-// and the corridor still demands you stay between the walls. But now the
-// Vise is a forge that works you: every pass QUENCHES a workpiece, the
-// bench can BREAK before the cast, and the finale turns the whole arena
-// into a finished blade that snaps. Element: lightning.
-//
-//   • CRUSHING WALLS (signature, all fight) - the corridor, on nk runs:
-//     two block walls sweep right → left around a BREATHING gap (the gap
-//     widens and narrows in a sine; the safe band is a living thing, not a
-//     straight pipe). Outside the walls burns. Touch a block: chunk +
-//     slow. Phase 3: the gap breathes FASTER while the walls hold.
-//   • BENCH VISE (60%, ~21s) - a great bench vise clamps down on a wide
-//     slice of the arena: two jaws crawl from opposite edges toward a
-//     centre line at your row (row telegraph), and the squeeze leaves a
-//     standing strain zone: sparks chip you if you linger in the squeezed
-//     band after the jaws bite. Escape the slice before the bite.
-//   • QUENCH OR SHATTER (60%, ~23s) - the Vise plants a glowing workpiece
-//     and HAMMERS it: telegraphed hammer arcs slam along the piece; a
-//     sparks pool splashes off each strike. Body-check the workpiece 2×
-//     to knock it loose (+12% maxHP heal) and the piece SHATTERS - fail
-//     and the piece is QUENCHED: a giant wall-block crosses the arena at
-//     your row (the corridor comes for you). Phase 3: the quenched block
-//     returns the other way.
-//   • 🧱 THE FULL CLAMP (≤10%, one-shot finale) - three compression waves
-//     squeeze the arena into a corridor of shrinking SAFE SLABS (lit blue
-//     tiles connected like a corridor; everything else detonates per
-//     wave). Survive three squeezes and the VISE OVERCLENCHES: THE IRON
-//     VISE slams full-screen (35%) - only the stress-fracture SAFE SLAB
-//     holds. Charge bar frozen (gate in _egTickPlayer via
-//     _egVisFinalActive).
-//
-// Shared soul kept: probability_shift still turns the puzzle's clues -
-// fitting for a boss about pressure and release. clue_scramble and
-// corrupt_cells retired (their pressure lives in the squeeze).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (probability_shift) live in shared-boss-abilities.js
-// and are referenced by handler-name string.
+// Tier-8 rework "Cold Iron": crushing walls sweep a breathing gap all
+// fight; bench vise + quench-or-shatter join at 60%. THE FULL CLAMP at
+// ≤10% squeezes the arena onto shrinking safe slabs - survive three
+// squeezes, then only the stress-fracture slab holds.
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Vise's timing 2.5x so manual playtests / screenshot
