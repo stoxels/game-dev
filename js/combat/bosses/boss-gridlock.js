@@ -5,51 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE GRIDLOCK (boss_gridlock)--------------------
 //------------------------------------------------------------------------
-// REWORK - Quick-Man homage, rebuilt as a living circuit board. The
-// Gridlock never chases: it turns the arena itself into a machine that
-// computes where you are and denies the space you want to stand in.
-// Nothing stays live long, but everything cycles - reading the patterns
-// while staying mobile is the fight.
-//
-//   Phase 1 (100–60%) - LASER LATTICE (signature, upgraded). Alternating
-//                       full-screen H/V beam waves - now each wave's lines
-//                       STAGGER-FIRE across the screen (~260ms apart), so
-//                       a wave sweeps rather than pops. Clear the lit
-//                       lanes before their line's turn comes!
-//                       Plus PROBABILITY SHIFT (shared).
-//   Phase 2 ( ≤60%)   - SIGNAL SCRAMBLE. The boss plants signal towers and
-//                       every one draws a dashed cable to YOUR position -
-//                       then all fire together. Break the geometry: the
-//                       starburst aims at where you were.
-//                       Plus SURGE CHASER. A roaming ⚡ orb homes slowly
-//                       and sheds a LIVE CABLE TRAIL behind it - the arena
-//                       accumulates hot wires while you kite.
-//   Phase 3 ( ≤30%)   - Everything faster: 4 lattice waves, 6 towers, TWO
-//                       surge orbs. The gates will not hold much longer.
-//   Finale ( ≤10%)    - SYSTEM LOCKDOWN (one-shot set-piece): a circuit-
-//                       board overlay floods the screen and the arena
-//                       becomes a live wire grid. Three beats of charging
-//                       wire batches - then THE JAM: every wire fires at
-//                       once EXCEPT one horizontal + one vertical, whose
-//                       intersection is the only safe cell. Then the
-//                       SURGE DIVE: a ⚡ orb dives the safe cell - step off
-//                       it, then the lockdown breaks. Charge bar frozen
-//                       for the whole set-piece (gate in _egTickPlayer
-//                       via _egGlFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (probability_shift) live in shared-boss-abilities.js
-// and are referenced by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Rework "living circuit board": stagger-fired laser lattice waves, signal
+// towers that fire at your old position, and a cable-trailing surge chaser.
+// SYSTEM LOCKDOWN at ≤10%: every wire fires except one crossing - stand
+// on the intersection, then step off for the surge dive.
 //------------------------------------------------------------------------
 
 export const _EG_GL_DEBUG_SLOW = false;
