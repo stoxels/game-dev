@@ -5,59 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SIREN (boss_siren)--------------------------
 //------------------------------------------------------------------------
-// REWORK - PoE Merveil homage, rebuilt as a full stage concert. The Siren
-// fights like her myth: her voice IS the weapon. Every mechanic is sung -
-// sweeping wail beams that pin the arena, an undertow whirlpool that drags
-// the whole stage toward her, and the finale is her DEADLY ARIA: the
-// audience of bubbles sings along, and the last note kills anyone who
-// sings it wrong.
-//
-//   Phase 1 (100–60%) - WAIL BEAM (signature, upgraded). The beam still
-//                       sweeps from its anchor - now in a variable pattern
-//                       (wide swing / narrow flick / stutter reversals),
-//                       and glowing ECHO ZONES spawn along its path:
-//                       standing in one while the beam passes = a small
-//                       heal (the sea sings with you). Bait = learn.
-//                       Plus FROZEN CELLS (shared).
-//   Phase 2 ( ≤60%)   - UNDERTOW. A whirlpool spins up at the anchor and
-//                       DRAGS the whole arena toward it (the avatar glides
-//                       in slow pulls you must fight); flotsam chunks orbit
-//                       in and bite. The whirlpool then NOVAS - get out of
-//                       the ring before the pull becomes a blast.
-//                       Plus SIREN'S REPLY. The beam splits: a second,
-//                       thinner beam mirrors the first from the opposite
-//                       side - one sweeps with it, one against it. Read
-//                       both.
-//   Phase 3 ( ≤30%)   - Everything faster: the undertow pulls harder and
-//                       novas sooner, the reply beam adds a third arc, and
-//                       the wail sweeps reverse mid-song. The concert
-//                       crescendos.
-//   Finale ( ≤10%)    - 🌀 THE DEADLY ARIA (one-shot set-piece): the arena
-//                       floods with her audience of bubbles, three rings
-//                       deep. The Siren sings SONG LINES - each line
-//                       lights up a chain of bubbles through the rings, and
-//                       you must follow the far end: reach the last lit
-//                       bubble of the line before the note lands and the
-//                       rest of the song pops around you. Lines get longer
-//                       and faster. The final note is the KILLER CRESSENDO:
-//                       every bubble in the arena detonates EXCEPT the one
-//                       far bubble - stand on it or be hit hard. Charge
-//                       bar frozen for the whole set-piece (gate in
-//                       _egTickPlayer via _egSireFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (frozen_cells) live in shared-boss-abilities.js and are
-// referenced by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Rework stage concert: sweeping wail beams with healing echo zones, a
+// dragging undertow whirlpool, and a mirrored reply beam. THE DEADLY ARIA
+// at ≤10% chains bubbles through three rings - follow each line to its
+// far bubble before the note lands.
 //------------------------------------------------------------------------
 
 export const __EG_SIRE_DEBUG_SLOW = false;
