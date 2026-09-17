@@ -1,52 +1,26 @@
-// =============================================================================
-// storyline-intro-syla.js - The Cartographers of Chance
-// ---------------------------------------------------------------------------
-// Character intro data for Syla ("The Field Statistician").
-// Depends on: storyline-engine.js (_wordsFromLine, MAX_SONG_SECTION_LINES,
-// DEFAULT_SLIDE_DURATION_MS etc.) - must load AFTER that file.
-// =============================================================================
+//----------------------------------------------------------------------------
+//-------------------SYLA INTRO DATA------------------------------------------
+//----------------------------------------------------------------------------
+// Syla's intro cinematic: image timeline + SRT-timed bilingual lyrics.
+// Consumed by storyline-beats.js (beat gallery) and storyline-engine.js.
 
-
-
-// Folder where Syla's intro images live (relative to your index.html)
+// Intro images folder, relative to index.html.
 export const SYLA_INTRO_IMAGE_PATH = "images/Intro/Syla_Intro/";
 
 
-// ---------------------------------------------------------------------------
-// SONG BEAT - karaoke-style Syla intro
-// ---------------------------------------------------------------------------
-//
-// SYLA_INTRO_SONG - timed from Syla_Intro_Song.srt. Each line's start time
-// is rounded DOWN to the nearest 0.5s (e.g. 12495ms -> 12000ms) so
-// line-changes land on a clean half-second beat; end times are kept as the
-// real SRT values, same approach as STOX_INTRO_SONG / TRIX_INTRO_SONG.
-//
-// NOTE on cue 55 ("The Guild man looks at her boots"): the source .srt has
-// a broken end timestamp for this cue (00:02:57,617 --> 00:02:57,858, a
-// ~240ms span for a full line - almost certainly an export glitch, since
-// the next cue doesn't start until 00:03:02,545). The end time below
-// is corrected to fill the natural gap before the next line instead of
-// using the bad SRT value. Re-check this line if the SRT is ever
-// re-exported/fixed upstream.
-//
-// TIMING ADJUSTMENT (applied to all `lines` entries below): every start/end
-// timestamp has been shifted 1000ms earlier, then rounded to the nearest
-// 500ms. This was a deliberate manual adjustment layered on top of the
-// original SRT-derived values described above - re-derive from the SRT
-// first, then re-apply this same -1000ms + round-to-nearest-0.5s step, if
-// the source SRT ever changes.
-//
-// The `images` timeline below uses placeholder filenames (1.jpeg ... 27.jpeg)
-// spaced roughly every 9 seconds across the song's ~239s runtime. Replace
-// filenames and adjust times once the actual image set exists - the array
-// just needs to stay sorted by ascending `time`. (Not touched by the -1s
-// line-timing adjustment above - only the `lines` array was shifted.)
+//----------------------------------------------------------------------------
+//-------------------SONG BEAT - KARAOKE-STYLE SYLA INTRO---------------------
+//----------------------------------------------------------------------------
+// Two manual adjustments layered on Syla_Intro_Song.srt (re-apply both when
+// re-parsing): every `lines` timestamp shifted -1000ms then rounded to the
+// nearest 0.5s, and cue 55's end replaced with a gap-fill (source SRT end
+// is a broken ~240ms span; next cue starts 00:03:02,545). Keep the images
+// array sorted by ascending time (currently 29 images; not -1s-shifted).
 export const SYLA_INTRO_SONG = {
     audio: "audio/Intro/Syla_Intro_Song.ogg",
     imagePath: SYLA_INTRO_IMAGE_PATH,
 
-    // Image timeline - placeholders, adjust filenames and times once images exist.
-    // Each entry fires when playback crosses its `time` (ms from song start).
+    // Image timeline: each entry fires when playback crosses its `time` (ms).
     images: [
         { image: "1.webp", time: 0 },          // establishing shot before vocals
         { image: "2.webp", time: 12000 },      // "Born beneath the Normal Grove"
@@ -79,12 +53,8 @@ export const SYLA_INTRO_SONG = {
         { image: "29.webp", time: 232000 },
     ],
 
-    // Lyric timeline - all 70 lines from the SRT, in order, as bilingual
-    // entries { section, en, de, s, e }. Timestamps here have been shifted
-    // 1000ms earlier and rounded to the nearest 500ms (see TIMING ADJUSTMENT
-    // note above); cue 55's end is the manually corrected gap-fill value.
-    // The engine resolves the active language's text into timed words via
-    // _wordsFromLine() at playback time (see startSong in storyline-engine.js).
+    // All 70 SRT lines in order, bilingual: { section, en, de, s, e } in ms
+    // (with the -1s shift and cue-55 corrections noted above).
     lines: [
         { section: 'Verse 1', en: 'Born beneath the Normal Grove', de: 'Geboren unter dem Normalenhain', s: 11000, e: 14000 },
         { section: 'Verse 1', en: 'Where the bell curve shapes the stone', de: 'wo die Glockenkurve den Stein formt', s: 14000, e: 16500 },
