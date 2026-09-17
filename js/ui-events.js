@@ -6,7 +6,7 @@ import { toggleTouchpadMarkMode } from './mouse-button-handlers.js';
 import { clearHover } from './mouse-over.js';
 import { showHS } from './screens/screens-highscore.js';
 import { cancelSlotName, confirmSlotName, showSaveSlotSelect } from './screens/screens-save-slots.js';
-import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchAdventureMode, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
+import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
 import { ptGoBack, showPassiveTree } from './passive-tree/passive-tree.js';
 import { showQuestLog } from './quests/quests-ui.js';
 import { _ptRefundAllPoints } from './passive-tree/passive-tree-state-points.js';
@@ -392,19 +392,10 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-existing', () => launchExistingGame());
-    onClick('btn-mode-adventure', () => launchAdventureMode());
     onClick('btn-mode-endgame-test', () => launchEndgameTestMode());
 
     // DEV SANDBOX: new passive tree layout playground (not connected to gameplay)
     onClick('btn-mode-passive-tree-dev', () => _loadDevPassiveTreeAndOpen());
-
-
-    //------------------------------------------------------------------------
-    //-------------------ADVENTURE MODE SANDBOX (TEMP STUB)--------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-
-    onClick('btn-adventure-back', () => goToPreviousScreen());
 
 
     //------------------------------------------------------------------------

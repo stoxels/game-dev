@@ -1,5 +1,5 @@
 /* ============================================================
-   TEMP: dev mode-select screen + adventure sandbox stub styles.
+   TEMP: dev mode-select screen styles.
    Remove this whole file once Adventure Mode replaces the map.
    ============================================================ */
 
@@ -69,40 +69,6 @@
     opacity: 0.75;
     line-height: 1.5;
 }
-
-/* Adventure sandbox */
-
-.adv-topbar {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.3);
-}
-
-.adv-title {
-    font-family: var(--PX, monospace);
-    color: #f5e9c8;
-    letter-spacing: 1px;
-    font-size: 12px;
-}
-
-.adv-canvas-wrap {
-    position: relative;
-    width: 100%;
-    height: calc(100vh - 60px);
-    background: #1a1200;
-    overflow: hidden;
-}
-
-.adv-player-sprite {
-    position: absolute;
-    width: 96px;
-    height: 96px;
-    object-fit: contain;
-    pointer-events: none;
-}
-
 
 /* ---------------------------------------------------------
    CHEAT: CHARACTER LAB - 30-combo sprite tester

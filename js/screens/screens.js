@@ -327,8 +327,8 @@ export function showSetup() {
 
 // Confirms setup and navigates to the temporary dev mode-select screen.
 // TEMP: once Adventure Mode replaces the world map, this should go straight
-// back to calling launchExistingGame()'s body (or launchAdventureMode()'s),
-// and screen-mode-select / this function's redirect can be deleted.
+// back to calling launchExistingGame()'s body, and screen-mode-select /
+// this function's redirect can be deleted.
 export function confirmSetup() {
     globalThis.screenHistory.push('screen-setup');
     switchScreen('screen-mode-select');
@@ -351,14 +351,6 @@ export function launchExistingGame() {
         if (typeof Audio_Manager !== 'undefined') Audio_Manager.playBGM('overworld');
         renderLevelSelect();
         switchScreen('screen-levels');
-    }
-}
-
-// Launches the new Adventure Mode sandbox (see js/adventure-mode.js).
-export function launchAdventureMode() {
-    globalThis.screenHistory.push('screen-mode-select');
-    if (typeof globalThis.showAdventureMode === 'function') {
-        globalThis.showAdventureMode();
     }
 }
 
