@@ -5,54 +5,18 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFroze
 //------------------------------------------------------------------------
 //-------------------BOSS: ENTROPY (boss_entropy)--------------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK - "The Second Law". Everything winds down; ORDER is a
-// resource you spend. Entropy attacks the arena itself: cold pools spread
-// and merge (real entropy, not just more circles) while the lit ORDERED
-// ZONES - the only places that keep you crisp - keep shrinking. Element:
-// cold (unchanged).
-//   • HEAT DEATH DRIFT (signature, all fight) - cold pools bloom outward
-//     and MERGE into bigger ones when they touch; each cast also plants a
-//     lit ordered zone that shrinks as the pools grow. Pools drain %HP/s;
-//     standing in an ordered zone protects you and refills your ORDER -
-//     outside the zones your movement turns progressively sluggish (never
-//     fully locked; floors at 55%). Order is the resource: zone time in,
-//     crisp movement out.
-//   • RECURSIVE DECAY (60%) - cursed cells now AGE: every 4s a corrupted
-//     cell spreads decay to an orthogonal neighbour (cap 9 cells). Stand
-//     ON a cell to burn it out - but burning costs a cold DoT while you
-//     stand there. Triage: burn the pack before it spreads across the map.
-//   • MAXWELL'S DOOR (60%) - a 🔥 hot door and a ❄ cold door spawn at
-//     opposite edges; entering one applies that element to you for 8s
-//     (one use each). HOT: cold pools HEAL you instead of harming (but
-//     heat scatters order - zones stop refilling). COLD: pool-proof (but
-//     cold stiffens - order drains twice as fast). Voluntary swap, real
-//     trade - entropy as choice, not sentence.
-//   • ♾️ THE LAST DEGREE (≤10%, one-shot finale) - absolute zero approaches:
-//     all decay pauses, the arena becomes one frozen lattice (perfect
-//     order - full movement speed) with only the central SINGULARITY lit.
-//     Shattered ORDER SHARDS rain in telegraphed volleys - touch a shard
-//     and its spark flies to the singularity: each delivered shard is a
-//     staggered 20% damage pop on the boss THROUGH the canonical damage
-//     path. Collect 5 before the timer dies and the universe restarts -
-//     the finale IS the kill. Fail the timer → HEAT DEATH: a full-screen
-//     slow wave with only the singularity centre safe (35%). Charge bar
-//     frozen (gate in _egTickPlayer via _egEntrFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Prefix discipline: everything here is _egEntr / eg-entr- (the _egEnt stem
-// collides with _egEnterBossArena elsewhere - do not shorten).
+// Tier-7 rework "The Second Law": cold pools spread and merge while lit
+// ORDERED ZONES shrink - zone time refills ORDER, outside it movement
+// slows (never below 55%). Recursive Decay + Maxwell's Door from 60%,
+// THE LAST DEGREE finale at ≤10%: deliver 5 shards or face HEAT DEATH.
 //------------------------------------------------------------------------
 
+// Prefix discipline: everything here is _egEntr / eg-entr- (the _egEnt stem
+// collides with _egEnterBossArena elsewhere - do not shorten).
+
 // DEBUG: slow Entropy's timing 2.5x so manual playtests / screenshot
-// automation can catch mid-animation states. Flip to false for ship.
-export const _EG_ENTR_DEBUG_SLOW = true;
+// automation can catch mid-animation states. Off for ship.
+export const _EG_ENTR_DEBUG_SLOW = false;
 export const _EG_ENTR_DEBUG_MULT = _EG_ENTR_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
