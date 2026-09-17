@@ -2,18 +2,10 @@ import { _egValidateAllBossHandlers } from './boss-framework.js';
 //------------------------------------------------------------------------
 //-------------------ATLAS BOSS ROSTER (86 regions → 86 bosses)------------
 //------------------------------------------------------------------------
-// One specific boss per atlas region - no random rolls. Region ids are
-// `atlas_t{tier}_{slot}` (slot = order in EG_ATLAS_TIER_NAMES).
-//
-// Difficulty rises with tier: outer tiers (T1–T5) hold simple, readable
-// fights; mid tiers (T6–T8) hold layered mechanics; high tiers (T9–T14)
-// hold punishing fights; the pinnacle (T15–T16) holds brutal multi-threat
-// bosses with two signature mechanics each.
-//
-// To move a boss: change the id on its region line. To add a tier/region,
-// add the node in endgame-atlas.js and a line here. Regions missing from
-// this table fall back to the old seeded-random roll (see
-// egAtlasChainBlueprint), so the atlas never breaks.
+// One fixed boss per atlas region (`atlas_t{tier}_{slot}`); difficulty
+// rises with tier (T1 readable -> T16 brutal). To move a boss change the id
+// on its region line; missing regions fall back to the seeded-random roll
+// in egAtlasChainBlueprint, so the atlas never breaks.
 //------------------------------------------------------------------------
 
 export const EG_ATLAS_REGION_BOSSES = {
@@ -120,11 +112,10 @@ export const EG_ATLAS_REGION_BOSSES = {
     'atlas_t16_2': 'boss_voidborn',
     'atlas_t16_3': 'boss_zenith',
 };
-// This is the last boss file to load - validate every mechanic handler
-// name once so a typo surfaces at boot (console warning) instead of
-// silently disabling a mechanic mid-fight. Deferred to DOMContentLoaded:
-// at module-eval time the entry's globalThis shims do not exist yet, so
-// window[handler] would spuriously miss every bridged handler.
+// Last boss file to load: validate every handler name once so a typo
+// warns at boot instead of silently disabling a mechanic mid-fight.
+// Deferred to DOMContentLoaded: at module-eval time the entry's shims
+// do not exist yet, so window[handler] would spuriously miss them all.
 if (typeof document !== 'undefined' && document.readyState !== 'complete') {
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof _egValidateAllBossHandlers === 'function') _egValidateAllBossHandlers();
