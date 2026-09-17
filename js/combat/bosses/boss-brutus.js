@@ -9,17 +9,9 @@ import { _egBossTierNorm, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkL
 //------------------------------------------------------------------------
 //-------------------BOSS: BRUTUS (boss_brutus)---------------------------
 //------------------------------------------------------------------------
-// PoE Brutus homage: full-width ground-slam band, move vertically.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb,
-// frozen_cells, clue_swap, grid_invert, summons) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
-// The ground-shatter burst visual (_egNkSlamShatter) is also shared there
-// - band mechanics of other bosses reuse it.
+// PoE Brutus homage: full-width ground-slam bands (dodge vertically),
+// sacrificial zombies, corrupt cells. Plate armor soaks physical hits
+// but conducts elements (+25% elemental taken).
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
