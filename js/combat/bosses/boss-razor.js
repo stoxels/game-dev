@@ -4,49 +4,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkE
 //------------------------------------------------------------------------
 //-------------------BOSS: THE RAZOR (boss_razor)-------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK - "The Whetted Edge". The Metal-Man soul, scaled to an
-// arena: every blade comes back, every line is an edge, and the boss
-// hones its edges on a whetstone you must break before the cast finishes.
-// Element: lightning.
-//
-//   • BLADE CYCLONE (signature, all fight) - a fan of boomerangs flies OUT
-//     to the far edge, wheels around, and returns along CURVED arcs that
-//     cross each other on the way home. Dodge the throw, then read the
-//     crossfire of every return path. Phase 3: a second fan launches while
-//     the first is still returning.
-//   • RAZOR WIRE LATTICE (60%) - taut wires snap across the arena (line
-//     hazard, lightning DoT on contact), hold, then SNAP: the cut ends
-//     whip outward and sting anyone still near the line. Path between the
-//     wires, then leave the line before it dies. Phase 3: five wires and
-//     one arrives already taut.
-//   • HONE AND CAST (60%) - the Razor plants a WHETSTONE and hones a GIANT
-//     BLADE while a grind aura chips anything nearby. Body-check the stone
-//     2× to shatter it (+12% maxHP heal) and cancel the cast; fail and the
-//     giant scythe crosses the whole arena at your row. Phase 3: the scythe
-//     comes back the other way.
-//   • 🪃 A THOUSAND EDGES (≤10%, one-shot finale) - a clock of nine razor
-//     spokes rotates around the arena centre; the gaps between spokes are
-//     safe, but the clock REVERSES every few seconds and rim fans shave
-//     across the middle each time. Survive three cycles and the blades
-//     condense into THE LAST EDGE - one full-screen scythe with a single
-//     safe pocket: the whetstone's grind aura. The safe zone chips you for
-//     standing in it. Knife-edge, literally. Charge bar frozen (gate in
-//     _egTickPlayer via _egRzrFinalActive).
-//
-// Shared soul kept: probability_shift still turns the puzzle's clues -
-// fitting for a boss about angles and deflection. clue_scramble retired
-// (its pressure lives in the wires you must path around).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (probability_shift) live in shared-boss-abilities.js
-// and are referenced by handler-name string.
+// Tier-8 rework "The Whetted Edge": boomerang blade cyclones whose return
+// arcs cross, wire lattices to path between, and a whetstone to shatter
+// before the giant blade casts. A THOUSAND EDGES at ≤10%: survive the
+// reversing spoke clock, then the last edge with one safe pocket.
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Razor's timing 2.5x so manual playtests / screenshot
