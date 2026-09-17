@@ -1,42 +1,24 @@
-// =============================================================================
-// storyline-intro-trix.js - The Cartographers of Chance
-// ---------------------------------------------------------------------------
-// Character intro data for Trix ("The Trickster").
-// Depends on: storyline-engine.js (_wordsFromLine, MAX_SONG_SECTION_LINES,
-// DEFAULT_SLIDE_DURATION_MS etc.) - must load AFTER that file.
-//
-// =============================================================================
+//----------------------------------------------------------------------------
+//-------------------TRIX INTRO DATA------------------------------------------
+//----------------------------------------------------------------------------
+// Trix's intro cinematic: image timeline + SRT-timed bilingual lyrics.
+// Consumed by storyline-beats.js (beat gallery) and storyline-engine.js.
 
-
-
-// Folder where Trix's intro images live (relative to your index.html)
+// Intro images folder, relative to index.html.
 export const TRIX_INTRO_IMAGE_PATH = "images/Intro/Trix_Intro/";
 
 
-// ---------------------------------------------------------------------------
-// SONG BEAT - karaoke-style Trix intro
-// ---------------------------------------------------------------------------
-//
-// TRIX_INTRO_SONG - timed from Trix_Intro_Song.srt. Each line's start AND
-// end time is rounded DOWN to the nearest 0.5s (e.g. 12223ms -> 12000ms)
-// so line-changes land on clean half-second beats. Word-level reveal within
-// each line is interpolated evenly across that line's window via
-// _wordsFromLine, same approach as STOX_INTRO_SONG in storyline-intro-stox.js.
-//
-// Regenerate this block any time the SRT changes by re-parsing it the same
-// way: round each cue's start AND end down to the nearest 500ms, and emit
-// one _wordsFromLine(...) call per cue.
-//
-// The `images` timeline below uses placeholder filenames (1.jpeg ... 30.jpeg)
-// spaced roughly every 10 seconds across the song's ~300s runtime. Replace
-// filenames and adjust times once the actual image set exists - the array
-// just needs to stay sorted by ascending `time`.
+//----------------------------------------------------------------------------
+//-------------------SONG BEAT - KARAOKE-STYLE TRIX INTRO---------------------
+//----------------------------------------------------------------------------
+// Timed from Trix_Intro_Song.srt: starts AND ends rounded down to the
+// nearest 0.5s. To regenerate, re-parse the SRT the same way.
+// Keep the images array sorted by ascending time (currently 30 images).
 export const TRIX_INTRO_SONG = {
     audio: "audio/Intro/Trix_Intro_Song.ogg",
     imagePath: TRIX_INTRO_IMAGE_PATH,
 
-    // Image timeline - placeholders, adjust filenames and times once images exist.
-    // Each entry fires when playback crosses its `time` (ms from song start).
+    // Image timeline: each entry fires when playback crosses its `time` (ms).
     images: [
         { image: "1.webp", time: 0 },          // establishing shot before vocals
         { image: "2.webp", time: 12000 },      // "Three hundred years since the world came apart"
@@ -70,11 +52,7 @@ export const TRIX_INTRO_SONG = {
         { image: "30.webp", time: 298000 },     // TRIX nameplate
     ],
 
-    // Lyric timeline - all 46 lines from the SRT, in order, as bilingual
-    // entries { section, en, de, s, e }: both start and end times rounded down
-    // to the nearest 0.5s from the real SRT values. The engine resolves the
-    // active language's text into timed words via _wordsFromLine() at
-    // playback time (see startSong in storyline-engine.js).
+    // All 46 SRT lines in order, bilingual: { section, en, de, s, e } in ms.
     lines: [
         { section: 'Verse 1', en: 'Three hundred years since the world came apart', de: 'Dreihundert Jahre, seit die Welt zerbrach', s: 10500, e: 15000 },
         { section: 'Verse 1', en: 'Since the Apex cracked open and the sky lost its math', de: 'seit der Apex aufriss und der Himmel seine Mathematik verlor', s: 15500, e: 21000 },
