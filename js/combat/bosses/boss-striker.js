@@ -6,41 +6,10 @@ import { _egFlingBurst, _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _e
 //------------------------------------------------------------------------
 //-------------------BOSS: THE STRIKER (boss_striker)----------------------
 //------------------------------------------------------------------------
-// Football-match fight: the pitch is his arena and the ball never rests.
-//
-//   PERSISTENT (whole fight, watcher):
-//   • THE MATCH BALL - the giant football never leaves the pitch. It bounces
-//     around the arena and steers toward you (loose homing with a turn cap,
-//     so it is always readable). Touching it is a TACKLE: a heavy physical
-//     hit plus a fling away from the impact. Faster every phase.
-//     PARRY KICK: holding the parry key (R by default) when the ball reaches you boots the
-//     ball away instead - no damage, no fling; the kick burst decays back
-//     to the phase seek speed and homing resumes.
-//   • THE GOAL - a goal frame stands at a screen edge for the whole fight.
-//     Guide the ball into it (home it by baiting, or parry-kick it in) and
-//     it goes OUT OF PLAY for 30s - no ball on the pitch at all - then the
-//     keeper (🧤) lobs it back onto the pitch from the net.
-//
-//   HP GATES (watcher) - the homing match ball LEAVES the pitch and a
-//   stationary ball rests on the grid for a scoring challenge:
-//   • 60% - KICK-OFF CHALLENGE: score 1 goal. Run to the stationary ball,
-//     stand NEXT to it to charge (bomb-defuse-style strip), step away to
-//     shoot. Charge time = power; your angle around the ball = aim.
-//   • 30% - HAT-TRICK: score 3 goals in 60s. Same kick rules, more
-//     targets - plan each shot, the ball rolls out and can be re-kicked.
-//
-//   CHARGE ATTACK - FREE KICK: when the boss's attack bar fills, a cone wall
-//   materializes between ball and you, a dotted arc telegraphs the curve
-//   around the wall, then the ball bends around it straight at the marked
-//   spot. Damage lands as the ball arrives.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics (prior_bomb) live in shared-boss-abilities.js and are
-// referenced by handler-name string.
+// Football fight on a persistent pitch: a homing match ball tackles on
+// touch (hold parry to kick it away), goals rest the pitch for 30s, HP
+// gates run scoring challenges (kick-off, hat-trick), and a filled
+// attack bar fires a bending free kick around a cone wall.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -75,7 +44,7 @@ export const EG_STRK_BALL_R = 55;                   // ball radius (visual + hit
 export const EG_STRK_TACKLE_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP per tackle
 export const EG_STRK_TACKLE_FLING = [0, 170, 200, 230];  // px fling per tackle
 export const EG_STRK_TACKLE_CD_MS = 900;            // per-touch cooldown
-// Parry kick (hold E): boot the ball away instead of being tackled
+// Parry kick (hold R): boot the ball away instead of being tackled
 export const EG_STRK_PARRY_KICK_SPEED = 520;        // px/s kick burst speed
 export const EG_STRK_PARRY_KICK_MS = 900;           // burst duration before homing resumes
 // The goal: guide the ball into it → out of play for 30s
