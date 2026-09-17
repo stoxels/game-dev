@@ -6,37 +6,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFroze
 //------------------------------------------------------------------------
 //-------------------BOSS: THE NULL (boss_null)----------------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK - 🧿 "The Null Hypothesis". Erasure of certainty: the Null
-// deletes your information and your tools, and the fight is a proof - prove
-// you can win with less. Element: shadow (unchanged).
-//   • VOID LATTICE (signature, all fight) - a permanent star-lattice of
-//     void lines on the floor; standing ON a line is a shadow DoT. The
-//     lattice re-contracts every ~12s to a new random centre (old lines
-//     dissolve, new ones grow - a 1.2s grace window between).
-//   • HYPOTHESIS ERASURE (60%) - the Null targets ONE system each cast
-//     (clue numbers / auto-attack charge bar / class HUD) and greys it out
-//     for 8s with a clear 🧿 marker over what it took. Readable sabotage
-//     instead of blackout chaos. (Clue numbers reuse the blackout spans.)
-//   • NULL RAYS (60%) - two eye-beams orbit the anchor; crossing a ray
-//     CHILLS your charge bar (50% fill for the ailment duration - the soft
-//     punish) plus contact damage.
-//   • 💀 PROOF BY CONTRADICTION (≤10%, one-shot) - the arena empties to
-//     pure white; the Null asserts "you cannot hit me" (immune). Three
-//     COUNTER-EXAMPLE WINDOWS open in sequence: a phantom replays your own
-//     recent movement and telegraphs a strike toward its heading - stand
-//     OPPOSITE the strike (within reach) to expose the contradiction and
-//     shatter a shell. Three exposures → the hypothesis collapses (the
-//     Null implodes and pays its own HP). Three failed windows →
-//     NULLIFICATION: darkness returns except one white ring (30% hit).
-//     Charge bar frozen (gate in _egTickPlayer via _egNulFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Tier-7 rework "The Null Hypothesis": a void lattice to stand between,
+// hypothesis erasures that grey out one UI system, and orbiting null rays.
+// PROOF BY CONTRADICTION at ≤10%: expose 3 counter-examples or face
+// NULLIFICATION.
 //
 // Prefix discipline: everything here is _egNul / eg-nul-.
 // Compatibility: the framework's shared cleanup typeof-guards
