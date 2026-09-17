@@ -1,9 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (endgame step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.
 // (derived from write-site audit by dev/scratch/convert-endgame.mjs)
 //------------------------------------------------------------------------

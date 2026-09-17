@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (step 10): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { STOX_INTRO_SONG } from './storyline-intro-stox.js';
 import { SYLA_INTRO_SONG } from './storyline-intro-syla.js';
 import { TRIX_INTRO_SONG } from './storyline-intro-trix.js';

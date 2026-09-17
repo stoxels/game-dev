@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (quests step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { _ptAllocated, ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { save } from '../state.js';
 import { _MILESTONE_MAP } from './quests-data.js';

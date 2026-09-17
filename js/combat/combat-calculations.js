@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (endgame step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { EG_MELEE_OVERCHARGE_MULT } from './encounter.js';
 import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult, _egMapResistMult } from '../endgame/endgame-map-launch.js';
 import { EG_PLAYER_STATS, _egComputePlayerStats, _egRollCrit } from '../endgame/endgame-player-stats.js';

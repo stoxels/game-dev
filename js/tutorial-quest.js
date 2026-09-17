@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (step 10): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { Audio_Manager } from './audio/audio.js';
 import { cooldownState, startSlotCooldown } from './classes/class-cooldown-state.js';
 import { _getAbilityManaCost, _getPlayerMaxMana, canAffordMana, spendMana, updateClassHUDManaBar } from './classes/class-mana.js';

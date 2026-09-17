@@ -10,11 +10,6 @@
 // EG_UNIQUE_ITEMS entries at module-eval time, so importers deterministically
 // see the rebalanced curves.
 
-//------------------------------------------------------------------------
-// PHASE 3 (endgame step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { renderCell, updClues } from '../grid.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { save } from '../state.js';

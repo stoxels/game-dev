@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (boss step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { _egRenderPanel } from '../encounter.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';

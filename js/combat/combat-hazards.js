@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (endgame step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { EG_AIL_IGNITE_DMG_SHARE, EG_AIL_MIN_DOT_DAMAGE, _egApplyPlayerAilment } from './combat-ailments.js';
 import { _egPlayerTakeDamage } from './encounter.js';
 import { _egActiveMapItem, _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';

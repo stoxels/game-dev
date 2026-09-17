@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (step 10): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { trackAchStat } from './achievements/achievements.js';
 import { areAllWorldLevelsDone, grantClassChangeToken, triggerClassEventIfPending } from './classes/class-ui.js';
 import { curMods } from './difficulty-modifiers.js';

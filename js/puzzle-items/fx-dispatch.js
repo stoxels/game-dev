@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (step 9): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { _fxChronobolt, _fxHourglass, _fxStopwatch } from './add-time.js';
 import { _fxArtifact } from './artifact-complete.js';
 import { _fxChronoFracture } from './chrono-fracture.js';

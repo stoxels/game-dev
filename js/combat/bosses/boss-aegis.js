@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (boss step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { _egRenderPanel, _egSpawnMonster } from '../encounter.js';
 import { EG_MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';

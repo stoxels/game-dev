@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (endgame step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { _egbtRenderGrid } from '../combat/combat-boss-test.js';
 import { _egRenderPanel } from '../combat/encounter.js';
 import { _egRenderEquipSlots, _egRenderInventory } from './endgame-hub.js';

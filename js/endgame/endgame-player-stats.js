@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (endgame step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { LANG, t } from '../translation/translations.js';
 import { EG_RESIST_CAP_PCT } from '../combat/combat-calculations.js';
 import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT, _egGetDeflectChancePct, _egGetDeflectDamagePct, _egGetDualWieldParryChancePct, _egGetParryChancePct } from '../combat/encounter.js';

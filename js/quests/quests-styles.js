@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (quests step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 // quests-styles.js  -  Injects all Ledger / Quest CSS once on load
 //
 // No dependencies. Safe to load before the DOM is ready (uses

@@ -1,8 +1,3 @@
-//------------------------------------------------------------------------
-// PHASE 3 (boss step): converted to a real ES module. Do not add new
-// bare cross-file references - import explicitly or use globalThis.X for
-// names still living in the concatenated body. See MIGRATION.md.
-//------------------------------------------------------------------------
 import { _egValidateAllBossHandlers } from './boss-framework.js';
 //------------------------------------------------------------------------
 //-------------------ATLAS BOSS ROSTER (86 regions → 86 bosses)------------
