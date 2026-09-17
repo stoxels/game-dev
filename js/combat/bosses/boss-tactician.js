@@ -1,6 +1,7 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossRecalcDamage } from './boss-framework.js';
-import { _egMechSoulTithe, _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { _egMechSoulTithe } from './shared-puzzle-mechanics.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE TACTICIAN (boss_tactician)------------------

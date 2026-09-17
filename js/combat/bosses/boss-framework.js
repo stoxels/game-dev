@@ -8,7 +8,8 @@ import { _egBossTimers, _egIsActive } from '../combat-state.js';
 // boss -> framework, running the boss's top-level Object.assign(EG_BOSS_*)
 // while these consts are still in their temporal dead zone and aborting
 // the whole entry (the step-5 SKILL_REGISTRY lesson).
-import { _egBlastTeardownAll, _egClearAllCorruptedCells, _egClearAllFrozenCells, _egClearFateMarks, _egClearPriorBombFuses, _egClearShiftGlows, _egNkTeardownBoss, _egRemoveClueScramble, _egRemoveClueSwap, _egRemoveFogBank, _egRemoveGridInvert, _egRemoveVeil, _egTitheTeardown } from './shared-boss-abilities.js';
+import { _egBlastTeardownAll, _egClearAllCorruptedCells, _egClearAllFrozenCells, _egClearPriorBombFuses, _egClearShiftGlows, _egNkTeardownBoss, _egRemoveClueSwap, _egRemoveGridInvert } from './shared-boss-abilities.js';
+import { _egClearFateMarks, _egRemoveClueScramble, _egRemoveFogBank, _egRemoveVeil, _egTitheTeardown } from './shared-puzzle-mechanics.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME BOSS FRAMEWORK-------------------------------

@@ -355,7 +355,7 @@ export function _egActivateVeil() {
 
 
 // Removes the veil overlay element entirely (framework calls on any cleanup).
-// _egRemoveVeil is defined ONCE, in shared-boss-abilities.js (consolidated
+// _egRemoveVeil is defined ONCE, in shared-puzzle-mechanics.js (consolidated
 // 2026-09 from this file and boss-bloom.js - the copies used to shadow
 // each other via load order, and bloom's superset already won).
 
