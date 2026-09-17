@@ -38,8 +38,8 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkE
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Barrage's timing 2.5x so manual playtests / screenshot
-// automation can catch mid-animation states. Flip to false for ship.
-export const _EG_BAR_DEBUG_SLOW = true;
+// automation can catch mid-animation states. Off for ship.
+export const _EG_BAR_DEBUG_SLOW = false;
 export const _EG_BAR_DEBUG_MULT = _EG_BAR_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {

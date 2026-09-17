@@ -46,8 +46,8 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _eg
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Minotaur's timing 2.5x so manual playtests / screenshot
-// automation can catch mid-animation states. Flip to false for ship.
-export const _EG_MNT_DEBUG_SLOW = true;
+// automation can catch mid-animation states. Off for ship.
+export const _EG_MNT_DEBUG_SLOW = false;
 export const _EG_MNT_DEBUG_MULT = _EG_MNT_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {

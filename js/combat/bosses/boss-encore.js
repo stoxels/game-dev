@@ -48,10 +48,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 // by handler-name string.
 //
 // DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Flip to false for ship.
+// screenshots can catch mid-animation states. Off for ship.
 //------------------------------------------------------------------------
 
-export const _EG_EN_DEBUG_SLOW = true;
+export const _EG_EN_DEBUG_SLOW = false;
 export const _EG_EN_DEBUG_MULT = _EG_EN_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {

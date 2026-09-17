@@ -40,8 +40,8 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFroze
 //------------------------------------------------------------------------
 
 // DEBUG: slow the Swarm's timing 2.5x so manual playtests / screenshot
-// automation can catch mid-animation states. Flip to false for ship.
-export const _EG_SW_DEBUG_SLOW = true;
+// automation can catch mid-animation states. Off for ship.
+export const _EG_SW_DEBUG_SLOW = false;
 export const _EG_SW_DEBUG_MULT = _EG_SW_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
