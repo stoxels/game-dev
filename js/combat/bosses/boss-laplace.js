@@ -5,47 +5,17 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: LAPLACE'S DEMON (boss_laplace)------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK - 👁️ "It Has Already Seen This". The Demon predicts; you
-// falsify. Every telegraph is CORRECT - but shown twice: once as a ghost
-// pre-run ~3s early (the prediction, harmless), then the real one. The
-// skill is reading ghosts fast and using the pre-knowledge to greed DPS
-// windows. Element: fire (unchanged).
-//   • DEMONSTRATED FATE (signature, all fight) - every cast plays the
-//     ghost-run then the real-run of a chase-lance that ENDS exactly where
-//     the ghost ended: standing at the ghost's endpoint is precisely the
-//     trap. Move after the ghost dissolves. Phase 3 crosses two lances.
-//   • CONDITIONAL BRANCHES (60%) - three phantom Laplaces walk predictable
-//     dashed paths and each places a "future cell". At resolution ONE
-//     detonates softly (the ✅ true future, small hit) - the other two are
-//     fakes: correctly standing on a fake grants 2s GHOST-FORM (immune to
-//     the next signature). 1-in-3 gamble, greedy reward.
-//   • TIMELINE FRAY (60%) - a clone of your avatar walks a recording of
-//     your own last 6 seconds (path pre-drawn as fading dots). Touch it
-//     and you swap positions with where the clone was 2s ago - no damage,
-//     just dizzying repositioning. Your own past is the hazard.
-//   • 💀 THE CLOSED TIMELINE (≤10%, one-shot finale) - the arena loops: the
-//     same three-mechanic gauntlet repeats on a strict 20s loop with
-//     IDENTICAL telegraphs each loop (learnable!). A timeline node appears
-//     each loop at a new spot - stand on it 1.2s cumulative to break it.
-//     Three breaks close the loop and the Demon pays its own remaining HP.
-//     Dying to a loop failure isn't possible: each failed dodge extends
-//     the loop by 5s and spawns an extra hunting phantom. Charge bar
-//     frozen (gate in _egTickPlayer via _egLapFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Prefix discipline: everything here is _egLap / eg-lap-.
+// Tier-7 rework "It Has Already Seen This": every telegraph plays twice -
+// a harmless ghost prediction ~3s early, then the real thing. Branches +
+// fray join at 60%; THE CLOSED TIMELINE finale at ≤10% repeats a learnable
+// 20s gauntlet loop until 3 timeline nodes break.
 //------------------------------------------------------------------------
 
+// Prefix discipline: everything here is _egLap / eg-lap-.
+
 // DEBUG: slow Laplace's timing 2.5x so manual playtests / screenshot
-// automation can catch mid-animation states. Flip to false for ship.
-export const _EG_LAP_DEBUG_SLOW = true;
+// automation can catch mid-animation states. Off for ship.
+export const _EG_LAP_DEBUG_SLOW = false;
 export const _EG_LAP_DEBUG_MULT = _EG_LAP_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
