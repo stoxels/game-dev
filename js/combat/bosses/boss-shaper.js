@@ -11,7 +11,8 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _eg
 // Shared soul_tithe pressure comes along (shared-puzzle-mechanics.js).
 //------------------------------------------------------------------------
 
-export const _EG_SHP_DEBUG_SLOW = true;
+// DEBUG: stretch telegraphs/windups 2.5x for screenshots. Off for ship.
+export const _EG_SHP_DEBUG_SLOW = false;
 export const _EG_SHP_DEBUG_MULT = _EG_SHP_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
