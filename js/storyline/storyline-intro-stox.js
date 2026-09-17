@@ -1,40 +1,19 @@
-//-------------------STOX INTRO DATA - "THE CARTOGRAPHERS OF CHANCE"------
 //------------------------------------------------------------------------
+//-------------------STOX INTRO DATA--------------------------------------
 //------------------------------------------------------------------------
-// Character intro data for Stox ("The Analyst"): the audio/image/lyric
-// timeline of his intro cinematic. Pure data module - no imports, no
-// logic. storyline-beats.js wires STOX_INTRO_SONG into the beat gallery;
-// storyline-engine.js consumes it at playback and resolves each line's
-// timed words via _wordsFromLine (same machinery as INTRO_SONG).
+// Stox's intro cinematic: image timeline + SRT-timed bilingual lyrics.
+// Consumed by storyline-beats.js (beat gallery) and storyline-engine.js.
 
-//------------------------------------------------------------------------
-//-------------------CONSTANTS & STATE------------------------------------
-//------------------------------------------------------------------------
-
-// Folder where Stox's intro images live (relative to your index.html)
+// Intro images folder, relative to index.html.
 export const STOX_INTRO_IMAGE_PATH = "images/Intro/Stox_Intro/";
 
 
 //------------------------------------------------------------------------
 //-------------------SONG BEAT - KARAOKE-STYLE STOX INTRO-----------------
 //------------------------------------------------------------------------
-//------------------------------------------------------------------------
-//
-// STOX_INTRO_SONG - timed from Stox_Intro_Song.srt. Each line's start/end
-// comes directly from the SRT (real vocal timing), with start times rounded
-// DOWN to the nearest 0.5s (e.g. 9367 -> 9000) so line-changes land on a
-// clean half-second beat. End times are left as-is from the SRT. Word-level
-// reveal within each line is interpolated evenly across that line's window
-// via _wordsFromLine, same approach as INTRO_SONG in storyline-intro.js.
-//
-// Regenerate this block any time the SRT changes by re-parsing it the same
-// way: round each cue's start down to the nearest 500ms, keep its real end,
-// and emit one _wordsFromLine(...) call per cue.
-//
-// The `images` timeline below is the final 31-image set. Filenames are
-// matched to their original shot-list slot numbers, and the array is
-// ordered chronologically by `time`. If you regenerate or reorder any
-// images, keep this array sorted by ascending `time`.
+// Timed from Stox_Intro_Song.srt: line starts rounded down to the nearest
+// 0.5s, real SRT ends kept. To regenerate, re-parse the SRT the same way.
+// Keep the images array sorted by ascending time (currently 31 images).
 export const STOX_INTRO_SONG = {
     audio: "audio/Intro/Stox_Intro_Song.ogg",
     imagePath: STOX_INTRO_IMAGE_PATH,
@@ -73,11 +52,7 @@ export const STOX_INTRO_SONG = {
         { image: "31.webp", time: 325000 },
     ],
 
-    // Lyric timeline - all 57 lines from the SRT, in order, as bilingual
-    // entries { section, en, de, s, e }: start times rounded down to the
-    // nearest 0.5s; end times are the real SRT ends. The engine resolves the
-    // active language's text into timed words via _wordsFromLine() at
-    // playback time (see startSong in storyline-engine.js).
+    // All 57 SRT lines in order, bilingual: { section, en, de, s, e } in ms.
     lines: [
         { section: 'Verse 1', en: 'Stox has spent his whole life', de: 'Stox verbrachte sein ganzes Leben', s: 4000, e: 6999 },
         { section: 'Verse 1', en: 'Inside this archive', de: 'in diesem Archiv', s: 7000, e: 14999 },
