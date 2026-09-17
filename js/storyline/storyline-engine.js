@@ -1,8 +1,8 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { SETTINGS, loadSettingsUI, saveSettings } from '../settings.js';
-import { getActiveSlot } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
-import { REPLAY_GALLERY_ENTRIES, STORY_BEATS } from './storyline-beats.js';
+import { hasSeen, markSeen } from './storyline-progress.js';
+import { STORY_BEATS } from './storyline-beats.js';
 import { INTRO_CINEMATIC_IMAGE_PATH } from './storyline-intro.js';
 
 // =============================================================================
@@ -12,24 +12,23 @@ import { INTRO_CINEMATIC_IMAGE_PATH } from './storyline-intro.js';
 // karaoke-style songs. Contains no story CONTENT - only the machinery that
 // plays it back.
 //
-// Load order: this file (or its shared constants, see below) must be loaded
-// AFTER all storyline-intro-*.js / storyline-beats.js data files, since
-// showBeat()/StorylineRenderer read STORY_BEATS, INTRO_SONG, etc. lazily
-// inside function bodies - so technically order vs. those doesn't matter at
-// parse time. The one thing that DOES matter: this file defines
-// _wordsFromLine(), DEFAULT_SLIDE_DURATION_MS, and
-// SLIDE_FADE_MS, which the data files (e.g. storyline-intro.js) call/reference
-// directly inside their own top-level const declarations - so THIS file must
-// load BEFORE storyline-intro.js and any other file that calls
-// _wordsFromLine(...) or references these constants at parse time.
+// Load order: the data files (storyline-intro*.js) call _wordsFromLine()
+// and reference DEFAULT_SLIDE_DURATION_MS / SLIDE_FADE_MS inside their own
+// top-level const declarations - so THIS file must load BEFORE them.
+// Order vs. storyline-beats.js doesn't matter at parse time (showBeat() /
+// StorylineRenderer read STORY_BEATS lazily inside function bodies), but
+// beats loads last in practice. storyline-progress.js (seen-state / replay
+// unlocks / resets, split out 2026-09-17) is a leaf - parse order vs. this
+// file doesn't matter (all its consumers call it at runtime).
 //
 // Suggested <script> order in index.html:
-//   1. storyline-engine.js          (this file)
-//   2. storyline-intro.js           (main game intro song)
-//   3. storyline-intro-stox.js      (Stox character intro)
-//   4. storyline-intro-trix.js      (Trix character intro)
-//   5. storyline-intro-syla.js      (Syla character intro)
-//   6. storyline-beats.js           (STORY_BEATS - references all of the above)
+//   1. storyline-progress.js        (seen-state / replay unlocks / resets)
+//   2. storyline-engine.js          (this file)
+//   3. storyline-intro.js           (main game intro song)
+//   4. storyline-intro-stox.js      (Stox character intro)
+//   5. storyline-intro-trix.js      (Trix character intro)
+//   6. storyline-intro-syla.js      (Syla character intro)
+//   7. storyline-beats.js           (STORY_BEATS - references all of the above)
 //
 // ---------------------------------------------------------------------------
 // VIDEO BEATS - data shape
@@ -1771,118 +1770,6 @@ export const StorylineRenderer = (() => {
     return { show };
 
 })();
-
-
-// ---------------------------------------------------------------------------
-// SEEN-STATE - uses localStorage so beats only show once per save
-// ---------------------------------------------------------------------------
-
-export function _seenKey(beatId, options = {}) {
-    const suffix = options.character ? `_${options.character}`
-        : options.className ? `_${options.className}`
-            : options.ascendencyClass ? `_${options.ascendencyClass}` : '';
-    const slot = (typeof getActiveSlot === 'function' ? getActiveSlot() : null) || 1;
-    return `storyline_seen_slot${slot}_${beatId}${suffix}`;
-}
-
-export function hasSeen(beatId, options = {}) {
-    try {
-        return localStorage.getItem(_seenKey(beatId, options)) === '1';
-    } catch (e) {
-        return false;
-    }
-}
-
-export function markSeen(beatId, options = {}) {
-    try {
-        localStorage.setItem(_seenKey(beatId, options), '1');
-    } catch (e) { /* storage unavailable */ }
-}
-
-// ---------------------------------------------------------------------------
-// GLOBAL REPLAY UNLOCKS - persist independently of the 20 save slots.
-//
-// Intro cutscenes (opening cinematic + all three character intros) are
-// unlocked FOREVER as soon as the player starts a game with any character.
-// Keys use their own `replay_unlocked_` prefix (NOT `storyline_seen_`), so
-// wipeSlot()/resetAllBeats() never touch them - the unlocks survive resets
-// and apply to every save slot. Everything else (region beats) stays tied to
-// the per-save "already seen" state.
-// ---------------------------------------------------------------------------
-
-export function _replayGlobalKey(entryId) {
-    return `replay_unlocked_${entryId}`;
-}
-
-export function _isReplayGloballyUnlocked(entryId) {
-    try {
-        return localStorage.getItem(_replayGlobalKey(entryId)) === '1';
-    } catch (e) {
-        return false;
-    }
-}
-
-export function _setReplayGloballyUnlocked(entryId) {
-    try {
-        localStorage.setItem(_replayGlobalKey(entryId), '1');
-    } catch (e) { /* storage unavailable */ }
-}
-
-// isReplayEntryUnlocked - an entry is replayable if it is flagged as
-// permanently unlocked (globalUnlock → always available, all save slots),
-// OR carries a persisted global unlock flag, OR has been seen in the
-// current save. Intro cutscenes are meant to be available forever, so they
-// short-circuit to true.
-export function isReplayEntryUnlocked(entry) {
-    if (!entry) return false;
-    if (entry.globalUnlock) return true;
-    if (entry.id && _isReplayGloballyUnlocked(entry.id)) return true;
-    return hasSeen(entry.beatId, entry.options || {});
-}
-
-// unlockReplayIntroBundle - called when the player confirms any character on
-// the start-of-game character select. Unlocks every gallery entry flagged
-// `globalUnlock` (the opening cinematic + the three character intros) for
-// good, across all save slots.
-export function unlockReplayIntroBundle() {
-    if (typeof REPLAY_GALLERY_ENTRIES === 'undefined') return;
-    REPLAY_GALLERY_ENTRIES
-        .filter(entry => entry.globalUnlock && entry.id)
-        .forEach(entry => _setReplayGloballyUnlocked(entry.id));
-}
-
-// getUnlockedReplayEntries - subset of REPLAY_GALLERY_ENTRIES (storyline-beats.js)
-// the player can replay. Used by the title screen's Replay panel.
-export function getUnlockedReplayEntries() {
-    if (typeof REPLAY_GALLERY_ENTRIES === 'undefined') return [];
-    return REPLAY_GALLERY_ENTRIES.filter(entry => isReplayEntryUnlocked(entry));
-}
-
-
-
-// Allow resetting a specific beat (useful for testing)
-export function resetBeat(beatId, options = {}) {
-    try {
-        localStorage.removeItem(_seenKey(beatId, options));
-    } catch (e) { /* noop */ }
-}
-
-// Reset all story beats at once (e.g. new game)
-export function resetAllBeats() {
-    try {
-        Object.keys(localStorage)
-            .filter(k => k.startsWith('storyline_seen_'))
-            .forEach(k => localStorage.removeItem(k));
-    } catch (e) { /* noop */ }
-}
-
-export function resetAllBeatsForSlot(slotNum) {
-    try {
-        Object.keys(localStorage)
-            .filter(k => k.startsWith(`storyline_seen_slot${slotNum}_`))
-            .forEach(k => localStorage.removeItem(k));
-    } catch (e) { }
-}
 
 
 // ---------------------------------------------------------------------------

@@ -3,7 +3,7 @@ import { showToast } from './puzzle-items/toasts-and-popups.js';
 import { renderSaveSlotScreen } from './screens/screens-save-slots.js';
 import { hideModal, showTitle } from './screens/screens.js';
 import { buildFreshState, getActiveSlot, save, wipeSlot } from './state.js';
-import { resetAllBeats } from './storyline/storyline-engine.js';
+import { resetAllBeats } from './storyline/storyline-progress.js';
 import { t } from './translation/translations.js';
 
 //------------------------------------------------------------------------

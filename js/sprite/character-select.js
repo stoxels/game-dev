@@ -1,7 +1,8 @@
 import { _ensureTooltipElement, _hideWorldTooltip, _trackTooltipToMouse } from '../screens/screens-map-view.js';
 import { switchScreen } from '../screens/screens.js';
 import { save } from '../state.js';
-import { showBeat, unlockReplayIntroBundle } from '../storyline/storyline-engine.js';
+import { showBeat } from '../storyline/storyline-engine.js';
+import { unlockReplayIntroBundle } from '../storyline/storyline-progress.js';
 import { _tipAttr } from '../tooltips-hud.js';
 import { LANG } from '../translation/translations.js';
 import { _getPlayerCharacterImage, _updateLSAvatarImage } from './player_sprite.js';

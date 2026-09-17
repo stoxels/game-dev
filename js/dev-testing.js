@@ -6,7 +6,7 @@ import { showWorldDetail } from './screens/screens-world-levels.js';
 import { launchExistingGame, showSetup, showTitle, switchScreen } from './screens/screens.js';
 import { _doStartLevel } from './start-level.js';
 import { getActiveSlot, getSlotSummary, save, wipeSlot } from './state.js';
-import { markSeen } from './storyline/storyline-engine.js';
+import { markSeen } from './storyline/storyline-progress.js';
 
 //------------------------------------------------------------------------
 //-------------------DEV TESTING HARNESS (dev-testing.js)------------------
