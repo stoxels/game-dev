@@ -5,50 +5,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ENCORE (boss_encore)-----------------------
 //------------------------------------------------------------------------
-// REWORK - showman phantom demanding applause, rebuilt as a full stage
-// production. Every mechanic is a musical number, and the house lights do
-// NOT come back up until you earn your seat back.
-//
-//   Phase 1 (100–60%) - ENCORE CIRCLES. The signature inversion of every
-//                       "stay out" instinct: gold rings close in on marked
-//                       spots - be INSIDE the circle the moment each ring
-//                       lands. Miss the moment, eat the chord.
-//                       Plus SOUND BARS: equalizer lanes telegraph on the
-//                       floor, then slam UP as solid sound bars. Out of
-//                       the lane!
-//   Phase 2 ( ≤60%)   - STAGE LIGHTS. Spotlights drift after you, then
-//                       LOCK - a beat later they flash and burn everyone
-//                       still inside. Break away before they set!
-//                       Plus BEAT MINES: mines pulse on the beat, then pop
-//                       one after another in sequence. Stand between the
-//                       pops. Everything else gets faster and meaner.
-//   Phase 3 ( ≤30%)   - DOUBLE LIGHTS, fuller mine fields, tighter
-//                       circles. The tempo never comes back down.
-//   Finale ( ≤10%)    - CURTAIN CALL (one-shot set-piece): the boss goes
-//                       immune and shielded and TAKES A BOW while the
-//                       house goes dark and a single spotlight plays
-//                       MUSICAL CHAIRS. On every metronome beat the old
-//                       light erupts in an applause nova (everyone outside
-//                       is clipped), then the light JUMPS somewhere new.
-//                       3…2…1 - THE OVATION: a white-out flash and a
-//                       triple applause nova; only the final spotlight
-//                       circle is safe. FOLLOW THE LIGHT! Charge bar
-//                       frozen for the whole set-piece (gate in
-//                       _egTickPlayer via _egEnFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Rework stage production: be INSIDE closing encore circles, dodge rising
+// sound bars, break from locking spotlights, and stand between sequential
+// beat mines. CURTAIN CALL at ≤10% plays musical chairs with a spotlight
+// - follow the light to the final safe circle.
 //------------------------------------------------------------------------
 
 export const _EG_EN_DEBUG_SLOW = false;
