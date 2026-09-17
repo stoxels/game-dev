@@ -5,52 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MEDUSA (boss_medusa)-----------------------
 //------------------------------------------------------------------------
-// REWORK - gorgon homage, rebuilt as a full petrification gauntlet. The
-// Medusa turns the whole arena into her statue garden: a raking stone gaze
-// from above, snake heads erupting from the floor on a rhythm, rings of
-// creeping petrification with a single rotating gap, and a living coil that
-// closes around you - then, at the very end, she casts THE STARE and only
-// the shadows of her own statues can shelter you.
-//
-//   Phase 1 (100–60%) - STONE GAZE. The gorgon's eyes scan from above and
-//                       drag a vertical gaze beam across the arena. Caught
-//                       in the beam = stung. Two passes per cast, faster
-//                       and wider every phase.
-//                       Plus SNAKE STRIKES. Marked floor spots erupt into
-//                       snake heads that bite on a rhythm - leave the bite
-//                       circles!
-//   Phase 2 ( ≤60%)   - PETRIFY WAVES. Stone-gray rings expand from near
-//                       your position with one rotating safe gap. Slip the
-//                       gap or be caught by the creeping stone.
-//                       Plus COIL CAGE. A snake coil forms around you and
-//                       SHRINKS while its gap slowly rotates - escape
-//                       through the gap before it closes on you.
-//   Phase 3 ( ≤30%)   - Everything faster: wider gaze, more snakes, twin
-//                       waves, tighter coils. The garden fills.
-//   Finale ( ≤10%)    - THE STARE (one-shot set-piece): the boss goes
-//                       immune and shielded and SWAYS while the arena tints
-//                       serpent-green and giant eyes open at the top. On
-//                       every metronome beat a stone statue rises - and
-//                       every statue casts a SHADOW strip. 3…2…1 - THE
-//                       STARE: a screen-wide gaze wall sweeps from top to
-//                       bottom and everything it touches turns to stone…
-//                       EXCEPT the shadows behind the statues. SHELTER!
-//                       Charge bar frozen for the whole set-piece (gate in
-//                       _egTickPlayer via _egMdFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Rework petrification gauntlet: a raking stone gaze, rhythmic snake
+// strikes, expanding petrify rings with one rotating gap, and a shrinking
+// coil cage. THE STARE at ≤10%: statues rise - shelter in their shadows
+// when the gaze wall sweeps.
 //------------------------------------------------------------------------
 
 export const _EG_MD_DEBUG_SLOW = false;
