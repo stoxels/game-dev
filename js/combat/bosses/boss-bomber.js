@@ -5,45 +5,14 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BOMBER (boss_bomber)-----------------------
 //------------------------------------------------------------------------
-// REWORK - "ground war" aerial bomber. The boss shows a ⚠ target pip under
-// its card for the whole fight and drops a different ordnance package per
-// phase:
-//
-//   Phase 1 (100–60%) - MINE COLLAR. Tethered mines orbit the boss card,
-//                       then detach and drift to your position at launch
-//                       time, planting glowing proximity mines. Step inside
-//                       a mine's red danger ring and it detonates.
-//   Phase 2 ( ≤60%)   - CARPET RUNS. A bomber plane sprite banks across the
-//                       arena through your position and carpets its flight
-//                       path with bombs that detonate on a fuse - leave the
-//                       highlighted lane.
-//   Phase 3 ( ≤30%)   - CLUSTER SHELLS. Mortar shells ☄️ burst at your
-//                       position into 7–10 bomblets that scatter outward
-//                       and fuse on their own. Plus everything earlier,
-//                       faster.
-//   Finale ( ≤10%)    - TOTAL CARPET. One-shot set-piece (Bomb-Maze
-//                       style): 3…2…1 countdown, a green SAFE dome plants
-//                       at your position, then every live mine plus a
-//                       rolling detonation front goes off. OUTSIDE the dome
-//                       = hit, twice (main wave + afterglow). The boss is
-//                       immune and shielded until the set-piece resolves.
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/act windows are stretched 2.5× so
-// screenshots can catch mid-animation states. Flip to false for ship.
+// Rework "ground war" aerial bomber: a target pip tracks under its card
+// while each phase drops new ordnance - mine collar, carpet runs, cluster
+// shells - ending in the TOTAL CARPET finale at ≤10%: reach the SAFE dome
+// before the detonation front goes off.
 //------------------------------------------------------------------------
 
-export const _EG_BOMBER_DEBUG_SLOW = true;
+// DEBUG: stretch telegraphs/act windows 2.5x for screenshots. Off for ship.
+export const _EG_BOMBER_DEBUG_SLOW = false;
 export const _EG_BOMBER_DEBUG_MULT = _EG_BOMBER_DEBUG_SLOW ? 2.5 : 1;
 
 // Debug-only: stretch the detonation animations so screenshots can catch
