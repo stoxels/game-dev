@@ -7,37 +7,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egN
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SPROUT (boss_sprout)-----------------------
 //------------------------------------------------------------------------
-// Garden-siege fight: the Sprout overgrows the PUZZLE itself. You fight
-// by filling cells - it fights by claiming them back.
-//
-//   PERSISTENT (whole fight):
-//   • ROOT NETWORK - living vines periodically claim unsolved cells. A
-//     vined cell can't be filled; clicking it PRUNES the vine (one extra
-//     click) before you can fill. Vines wither on their own after a while.
-//   • SPORE DRIFT - puffball spores drift across the screen in wavy lines;
-//     touching one is a light physical hit.
-//
-//   HP GATES (watcher, like Puddle/Marksman):
-//   • 60% - BRAMBLE WALL: thorned brambles grow along all four grid edges.
-//     The grid's outermost ring of cells is locked for ~10s, and thorned
-//     whips lash outward from the brambles - heavy physical hit on contact.
-//   • 30% - BLOOMING DOOM: a giant flower bud grows over the grid, then
-//     BURSTS: pollen motes shower outward (contact damage) and nearby cells
-//     get pollen-dusted - disturbing (clicking) a dusted cell bursts pollen
-//     around YOU. The bud re-grows while phase 3 lasts.
-//
-//   CHARGE ATTACK - VINE LUNGE: when The Sprout's own attack bar fills, it
-//   doesn't fire a generic projectile - it LUNGES: a thorned tendril
-//   telegraphs across the whole screen along a line through your current
-//   position (~1s), then whips. Heavy physical hit if it catches you.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics (prior_bomb) live in shared-boss-abilities.js and are
-// referenced by handler-name string.
+// Garden siege on the puzzle itself: root vines claim unsolved cells
+// (click to prune), spores drift, bramble walls lock the outer ring at
+// 60%, a blooming bud dusts cells at 30%, and the boss's own attack bar
+// fires a telegraphed vine lunge.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
