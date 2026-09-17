@@ -4,50 +4,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkE
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SHRINE MAIDEN (boss_shrine)-----------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK - "The Bound God". The danmaku homage, scaled to an arena:
-// the Maiden no longer sends fans - she sends HERSELF, or rather every
-// mirror-spirit she is bound to. Every ward, every knot, every talisman
-// repeats: that is the whole trick of a bound god. Element: lightning.
-//
-//   • KNOT BARRIERS (signature, all fight) - sacred ropes (shimenawa) drop
-//     anchors and draw TAUt paper barriers between them: crossing bars of
-//     lightning-scribed paper that hum before they light. Safe lanes close
-//     as more barriers cross. Phase 3: a vertical pair crosses the
-//     horizontal one - read the quadrant that stays open.
-//   • MIRROR SPIRITS (60%) - the Maiden fans out five MIRROR SPIRITS
-//     (five-way spirit fans, thrown from an anchored ⛩️) while a SPIRIT
-//     SIGNATURE marks your movement: after 2.5s it SHATTERS - a mirror
-//     spirit copies your last 1.5s of steps and detonates your route in
-//     reverse. Stop repeating yourself. Phase 3: the shard follows your
-//     route FORWARD as it detonates.
-//   • OFUDA WARD (60%) - the Maiden plants a golden ofuda talisman and
-//     chants; the ward channel ticks shadow damage while up. Body-check
-//     the ofuda 3× to tear it down (+12% maxHP heal) and cancel the chant;
-//     fail and a SHINTO SEAL crosses the whole arena at your row. Phase 3:
-//     the seal returns the other way.
-//   • ⛩️ THOUSAND ARMS (≤10%, one-shot finale) - the bound god unleashes
-//     every arm at once: eight radial TORII BEAMS sweep like a lighthouse,
-//     and every few seconds a knock comes - 20 TALISMANS land in a grid
-//     with one revealed safe cell; you have 3.5s to reach it before the
-//     grid detonates. Survive three knocks and the Maiden descends: THE
-//     THOUSANDTH ARM - the eight beams sweep one final time and everything
-//     outside a descending safety circle is annulled. Charge bar frozen
-//     (gate in _egTickPlayer via _egShrFinalActive).
-//
-// Shared soul kept: fated_cell still marks fated cells - the Shrine's
-// whole schtick is fate you cannot dodge. corrupt_cells retired (its
-// pressure lives in the barriers and talisman grid).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (fated_cell) live in shared-boss-abilities.js and are
-// referenced by handler-name string.
+// Tier-8 rework "The Bound God": knot barriers all fight, mirror spirits
+// + ofuda ward from 60%, and the THOUSAND ARMS finale at ≤10%. Shared
+// fated_cell pressure comes along (see shared-puzzle-mechanics.js); the
+// finale freezes the charge bar via _egShrFinalActive.
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Shrine Maiden's timing 2.5x so manual playtests /
