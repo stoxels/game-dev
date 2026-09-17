@@ -7,30 +7,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DEMOLITIONIST (boss_demolitionist)-------------------
 //------------------------------------------------------------------------
-// The Demolitionist - a three-act demolition show:
-//   Phase 1 (100–75%) - corrupt cells + Sticky Bomb volleys (keep moving).
-//   Phase 2 ( 75–50%) - a MEGA BOMB is lobbed onto the grid: a big
-//                       telegraphed ring, then a huge detonation. Any
-//                       corrupted cell caught inside its radius re-fuses
-//                       and blows up a beat later (fire damage).
-//   Phase 3 ( 50–25%) - TWO mega bombs land on separated spots you must
-//                       slip between, plus a 5-bomb sticky volley lobbed
-//                       at YOU roughly every 2 s - never stand still.
-//   Phase 4 (≤ 25% )  - THE BOMB MAZE, a one-shot pinnacle set-piece:
-//                       a serpentine corridor walled by solid bombs that
-//                       detonate from the start and chase the player to
-//                       the exit - with a giant SUPER BOMB hurled onto
-//                       your start ~1s in that rolls the corridor behind
-//                       the explosions and one-shots you if it catches
-//                       you (auto-attack charge bar frozen).
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + phase hook)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb,
-// frozen_cells, clue_swap, grid_invert, summons) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Three-act demolition show: sticky-bomb volleys (keep moving), lobbed
+// MEGA BOMBs with telegraphed rings (phase 2+), and the BOMB MAZE finisher
+// at ≤25% HP - outrun the detonations to the exit. Defs, mechanics and
+// unique handlers live here; shared moves use handler-name strings.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -180,9 +160,8 @@ export function _egCrashArmDot(run, x, y, cls, sizePx, ringR, text) {
 //------------------------------------------------------------------------
 // Small bombs lobbed at the player's position - they "stick" where you
 // were standing, so the only answer is to keep moving.
-//   P1–P2 - three quick sticks around you (3 short volleys).
-//   P3+   - five sticks, one lobbed every ~2 s at wherever you are right
-//           then; every bomb shows its blast ring while it fuses.
+//   P1–P2 - three quick sticks around you. P3+ - five sticks, one lobbed
+//   every ~2 s; every bomb shows its blast ring while it fuses.
 export function _egMechStickyBombs(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = _egCrashP(phase);
@@ -417,20 +396,10 @@ export function _egCrashChainCells(run, x, y, r, level, phase, chainDelays) {
 //------------------------------------------------------------------------
 //-------------------THE BOMB MAZE (phase 4 finisher)---------------------
 //------------------------------------------------------------------------
-// One-shot pinnacle (like The Snail's Snailgeddon). On crossing ≤25% HP:
-//   1. Boss goes immune; the auto-attack charge bar freezes.
-//   2. A 5…1 countdown covers the arena.
-//   3. The player is dropped at the top-left of a serpentine corridor
-//      walled by SOLID bombs (you cannot walk through them, and touching
-//      one hurts). A faint arrow underfoot shows the single path.
-//   4. Bombs detonate from the start and chase you down the corridor -
-//      run! ~1s in, the boss hurls a SUPER BOMB onto your start that rolls
-//      the corridor behind the explosions: it never stops, and if it
-//      catches you it's instant defeat. Reaching the exit triggers a
-//      full-maze fireworks finale - the super bomb rolls on and detonates
-//      there as the closing bang - and the set-piece ends.
-// The boss owns its immunity for the whole set-piece and only releases it
-// (and resumes its phase-4 schedule) when the maze resolves.
+// One-shot pinnacle finisher at ≤25% HP (Snailgeddon-style): countdown,
+// then a serpentine corridor of solid bombs detonating from the start
+// chases you to the exit while a SUPER BOMB rolls behind them. The boss
+// holds immunity until the maze resolves.
 //------------------------------------------------------------------------
 
 export const EG_CRASH_MAZE_CD_MS = 800;              // per countdown tick
@@ -457,12 +426,9 @@ export const EG_CRASH_MAZE_FINALE_WALL_MS = 42;      // cascade spacing during t
 export const EG_CRASH_MAZE_FINALE_TAIL_MS = 900;     // hold after the last cascade pop
 
 // ── The SUPER BOMB ────────────────────────────────────────────────────────
-// ~1s after the maze starts, the boss hurls a giant bomb onto the START
-// tile (where the player just was). It then rolls the corridor along the
-// path at the SAME tier-scaled speed as the wall detonations (which pop
-// right behind it as it passes) and never slows down: if its leading edge
-// reaches the player, that's instant defeat. Outrun it to the goal; once
-// the maze resolves it keeps rolling and detonates at the end as the
+// ~1s after GO the boss hurls a giant bomb onto the start tile. It rolls
+// the corridor at wall-detonation speed and never slows: if its leading
+// edge reaches you that's instant defeat. It detonates at the end as the
 // finale's closing bang.
 export const EG_CRASH_SUPER_DROP_MS = 1000;     // internal-clock ms after GO: slams onto the start tile
 export const EG_CRASH_SUPER_FALL_PX = 420;      // spawn height above the start (falling telegraph)
@@ -1181,6 +1147,7 @@ export function _egCrashTeardown() {
 
 // ── Countdown / banner overlays ───────────────────────────────────────────
 
+// Builds the 5…1 countdown overlay at the arena centre.
 export function _egCrashMazeShowOverlay(g) {
     const ov = document.createElement('div');
     ov.className = 'eg-crash-cd';
@@ -1196,6 +1163,7 @@ export function _egCrashMazeShowOverlay(g) {
     ov.style.top = Math.round(r.cy) + 'px';
 }
 
+// Builds the GO banner + arena tint.
 export function _egCrashMazeShowBanner(g) {
     const r = g.region;
     const banner = document.createElement('div');
