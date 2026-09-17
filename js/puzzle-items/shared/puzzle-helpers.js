@@ -23,7 +23,7 @@ export function shuffle(arr) {
 // criterion. Pass wantMax=false for the least-filled row (Targeted Reveal),
 // wantMax=true for the most-filled row (Dense Marker). Returns -1 when no
 // incomplete row exists.
-export function _findUnsolvedRowByFill(sol, rows, wantMax) {
+function _findUnsolvedRowByFill(sol, rows, wantMax) {
     let bestRow = -1;
     let bestFilled = wantMax ? -1 : Infinity;
 
@@ -42,7 +42,7 @@ export function _findUnsolvedRowByFill(sol, rows, wantMax) {
 
 // Column counterpart of _findUnsolvedRowByFill - see that function for the
 // wantMax semantics.
-export function _findUnsolvedColByFill(sol, cols, wantMax) {
+function _findUnsolvedColByFill(sol, cols, wantMax) {
     let bestCol = -1;
     let bestFilled = wantMax ? -1 : Infinity;
 
@@ -62,7 +62,7 @@ export function _findUnsolvedColByFill(sol, cols, wantMax) {
 // Narrows `cands` to cells in the given best row/col and shows `toastMsg`
 // when that narrowing actually finds matches. Falls back to the original
 // (unbiased) candidate list otherwise.
-export function _filterCandidatesByBias(cands, bestRow, bestCol, toastMsg) {
+function _filterCandidatesByBias(cands, bestRow, bestCol, toastMsg) {
     const biased = cands.filter(([r, c]) => r === bestRow || c === bestCol);
     if (biased.length > 0) {
         showToast(toastMsg);
