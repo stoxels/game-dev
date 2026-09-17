@@ -4,40 +4,13 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE COLOSSUS (boss_colossus)--------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK - "The Mountain That Walks". The boss is scenery that
-// attacks; the fight is about reading huge telegraphs and raiding the
-// titan's joints. Elementless: the Colossus deals PURE PHYSICAL - resists
-// don't help. That is its identity.
-//   • SEISMIC STRIDE (signature, all fight) - the Colossus WALKS: two giant
-//     footprints slam down sequentially (rounded band telegraphs), then a
-//     full-screen shockwave ring rolls out of each print with jump-window
-//     gaps. Phase 3 strides cross the arena diagonally.
-//   • BOULDER RAIN (60%) - the shoulder quarries hurl 🪨 boulders that arc
-//     in and SHATTER into rolling fragments that keep travelling. Dive
-//     through the fragment lanes, not just the impact ring.
-//   • GRANITE GOLEMS (60%) - two golem statues climb out of cracks and
-//     slow-push toward you: moving walls that pin you into stride
-//     telegraphs. Body-check a golem 3× to crumble it early.
-//   • 💀 TITAN'S FALL (≤10%, one-shot finale) - the Colossus kneels and the
-//     arena becomes a climb: three glowing JOINT SEALS (shoulder, knee,
-//     chest) light up one at a time; reach and body-check the lit seal
-//     while falling-rock chutes (telegraphed lanes) sweep the arena. Break
-//     a seal → the titan slumps (screen shake). All three → the Colossus
-//     collapses for good. Fail timer → CAVE-IN: dust wipes the arena except
-//     one lit seal ring (35% hit). Charge bar frozen (gate in _egTickPlayer
-//     via _egColoFinalActive).
+// Tier-7 rework "The Mountain That Walks": telegraphed seismic strides,
+// boulder rain that shatters into fragments, and body-checkable granite
+// golems. TITAN'S FALL at ≤10%: break three joint seals while rock chutes
+// sweep, or face the CAVE-IN.
 //
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and are
-// referenced by handler-name string. The point-to-segment helper is the
-// shared _egPtSegDist (moved here from boss-inferno.js).
+// Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 // DEBUG: slow the Colossus' timing 2.5x so manual playtests / screenshot
