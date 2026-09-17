@@ -5,47 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BUZZSAW (boss_buzz)------------------------
 //------------------------------------------------------------------------
-// REWORK - IWBTG saw homage, rebuilt as a full sawmill gauntlet. The boss
-// floods the arena with spinning steel: ricocheting blades, sweeping cut
-// lines, embedded saw traps and swinging pendulum saws - then, at the very
-// end, it spins up and CUTS THE ROOM IN HALF.
-//
-//   Phase 1 (100–60%) - RICOCHET SAWS. Blades are flung in from the screen
-//                       edges straight at you and bounce off the walls up
-//                       to 3 times before embedding themselves in the floor
-//                       as short-lived spinning hazards.
-//                       Plus CUT LINE: a dashed telegraph band stretches
-//                       across the arena, then a giant saw sweeps along it.
-//                       Step out of the band!
-//   Phase 2 ( ≤60%)   - SAW TRAPS. Half a dozen floor positions flash a saw
-//                       silhouette, then erupt into spinning blade hazards
-//                       that linger. Ricochets come in pairs.
-//   Phase 3 ( ≤30%)   - PENDULUM BLADES. Two giant saws on chains swing
-//                       from the top of the arena, scything across it.
-//                       Everything else gets faster and meaner.
-//   Finale ( ≤10%)    - THE FINAL CUT (one-shot set-piece): the boss goes
-//                       immune and shields and SPINS UP while four toothed
-//                       wall-saws close in from the four screen edges,
-//                       shrinking the safe pocket around the arena centre.
-//                       3…2…1 - CROSSCUT: two colossal blade streaks slash
-//                       across the full screen in a giant X. Only the tiny
-//                       centre pocket survives. STAY CENTRED! Charge bar
-//                       frozen for the whole set-piece (gate in
-//                       _egTickPlayer via _egBzFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Rework sawmill gauntlet: ricocheting blades, sweeping cut lines, floor
+// saw traps and swinging pendulums. THE FINAL CUT at ≤10%: wall-saws
+// close in from four edges, then a screen-wide X CROSSCUT - only the
+// tiny centre pocket survives.
 //------------------------------------------------------------------------
 
 export const _EG_BZ_DEBUG_SLOW = false;
