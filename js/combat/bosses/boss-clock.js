@@ -7,27 +7,10 @@ import { _egNkAbilityHitToast, _egNkEl, _egNkHit, _egNkLoop, _egNkNewRun, _egNkP
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CLOCK (boss_clock)---------------------------
 //------------------------------------------------------------------------
-// Clockwork duel: The Clock summons three hands as the fight progresses -
-// the seconds hand at 90% HP, the minutes hand at 60%, the hours hand at
-// 30%. Every hand is a single SOLID THIN BEAM (a line from the pivot
-// outward to the screen edge) that sweeps the arena - anywhere on the
-// beam hurts, so you must stay off every hand's line. Each hand is
-// announced by calling the time in the center of the grid ("35 seconds",
-// "27 minutes", "5 hours") 3 seconds before it appears, and once summoned
-// the hands NEVER stop - they rotate at the SAME speed until the boss is
-// won or lost, and they spawn staggered ~120° apart so the three beams
-// keep permanent gaps between them instead of bunching into a single
-// blade.
-// Phase 1 runs a single hand (seconds), phase 2 adds the minute hand,
-// phase 3 adds the hour hand. Getting caught by a beam is punishing:
-// hits deal a large % of max HP, scaled per hand.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Clockwork duel: three beam hands summon at 90/60/30% HP and sweep at one
+// shared speed, staggered 120° apart. At 15% HP time freezes for 30s while
+// twelve beams ring the arena and lunge - survive the strikes to restart
+// the clock.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
