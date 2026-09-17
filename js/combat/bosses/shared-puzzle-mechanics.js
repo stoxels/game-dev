@@ -15,19 +15,10 @@ import { _egCellInBounds, _egRecentFills } from '../combat-state.js';
 //------------------------------------------------------------------------
 //-------------------SHARED PUZZLE MECHANICS (PACK 4)----------------------
 //------------------------------------------------------------------------
-// Grid/puzzle disruption usable by any boss (referenced by handler-name
-// string like the older shared mechanics above):
-//   fated_cell    - fill the marked cell(s) in time or lose recent progress
-//   fog_bank      - a wandering fog bank hides a chunk of the grid
-//   clue_swap     - row clues exchange numbers (per-phase: pair / triple
-//                   cycle / double pair)
-//   clue_scramble - shuffles the numbers inside clue lines (reverts)
-//   soul_tithe    - boss shields until the player fills N correct cells
-//
-// fated_cell and soul_tithe observe correct fills through
-// _egNotifyCorrectFill(), which endgame-encounter.js calls from the central
-// _egOnCorrectCell() fill path. Each ability's per-phase variants are
-// summarised in the file-top PHASE VARIANTS comment.
+// Grid/puzzle disruption usable by any boss (handler-name string like the older
+// shared mechanics): fated_cell (fill marked cells in time or lose progress),
+// fog_bank (wandering fog hides the grid), clue_swap / clue_scramble (clue lines
+// exchange/reorder numbers; scramble reverts), soul_tithe (shields until N fills).
 //------------------------------------------------------------------------
 
 // ── Fill observer ─────────────────────────────────────────────────────────────
@@ -248,10 +239,11 @@ export const EG_FOG_DRIFT_F = [1.2, 0.8];      // drift-interval factor [tier1, 
 
 // Positions one fog element over a cell region (r0,c0)-(r0+h-1,c0+w-1).
 // Recomputes fresh rects so a drifted bank lands exactly on the new cells.
-// Persistent hidden sentinel at the grid container's layout origin - lets
-// us map viewport rects into the container's local coordinate space without
-// mutating the fog element (a style write + forced flush here would arm the
-// fog's CSS transition and make it glide in from (0,0)).
+
+// Persistent hidden sentinel at the grid container's layout origin - maps
+// viewport rects into container coordinates without touching the fog element
+// (a style write here would arm the fog's CSS transition and make it glide
+// in from (0,0)).
 export let _egFogProbe = null;
 export function _egFogPlace(el, r0, c0, h, w) {
     const tbl = document.getElementById('ptable');
@@ -413,10 +405,9 @@ export function _egMechFogBank(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------SHARED MECHANIC: CLUE SCRAMBLE------------------------
 //------------------------------------------------------------------------
-// Shuffles the order of the numbers inside 2 random clue lines (rows and/or
-// columns). No information is destroyed - the same numbers, just reordered -
-// and everything reverts after a phase-scaled duration. Clue number spans
-// are per-number elements (rn-{row}-{i} / cn-{col}-{i}); the scramble swaps
+// Shuffles the numbers inside 2 random clue lines. Nothing is destroyed -
+// the same numbers, reordered - and it reverts after a phase-scaled duration.
+// Operates on the per-number spans (rn-{row}-{i} / cn-{col}-{i}), swapping
 // their text among themselves, so solved-state styling is untouched.
 
 let _egClueScrambleRestoreTimer = null;
@@ -569,17 +560,14 @@ export function _egRemoveClueScramble() {
 //------------------------------------------------------------------------
 //-------------------SHARED MECHANIC: SOUL TITHE---------------------------
 //------------------------------------------------------------------------
-// The boss raises a damage shield that only yields to puzzle progress: fill
-// N correct cells (3/4/5 by phase) to break it. Failsafe: the shield decays
-// after 25s so it can never soft-lock the fight. Progress is observed via
-// _egNotifyCorrectFill. Mirrors the Aegis Protocol pattern (bossImmune +
-// shielded card badge) but counts fills instead of add kills.
+// The boss raises a damage shield only puzzle progress can break: fill N
+// correct cells (3/4/5 by phase), or wait out the 25s failsafe (no soft-lock).
+// Progress observed via _egNotifyCorrectFill; mirrors the Aegis Protocol
+// pattern (bossImmune + shielded badge) but counts fills instead of kills.
 
-// TIER-SCALED Soul Tithe knobs - same endpoint pattern as Corrupt Cells.
-// Quotas lerp between [tier1, tier16] pairs (tier 8 lands on 3 / 4 / 5);
-// the lapse window is a duration factor anchored exactly at tier 8 (8s / 6s
-// unchanged there) - brutal tiers stall faster, gentle tiers stall longer.
-// The 25s shield failsafe is intentionally fixed so a boss can never soft-lock.
+// TIER-SCALED Soul Tithe knobs - [tier1, tier16] endpoint pairs like Corrupt
+// Cells (tier 8 lands on 3/4/5). The lapse window is a duration factor
+// anchored at tier 8 (8s/6s unchanged there). The 25s failsafe stays fixed.
 export const EG_TITHE_NEED_P1 = [3, 4];
 export const EG_TITHE_NEED_P2 = [4, 5];
 export const EG_TITHE_NEED_P3 = [5, 6];
@@ -618,9 +606,8 @@ export function _egTitheDrop(monster) {
 // Boss mechanic handler - phase variants:
 //   P1 - Soul Tithe: fill 3 cells, shield fades after 25s (original).
 //   P2 - Lapsing Tithe: fill 4 cells; stall 8s and 1 progress decays.
-//   P3 - Demanding Tithe: fill 5 cells; stall 6s and 1 progress decays, and if
-//        the shield times out the boss COLLECTS its due - your 2 most recent
-//        correct fills are unfilled.
+//   P3 - Demanding Tithe: fill 5; stall 6s decays 1, and a timed-out shield
+//        COLLECTS its due - your 2 most recent correct fills are unfilled.
 export function _egMechSoulTithe(monster, phase) {
     if (!monster || monster.soulTithe || monster.aegisUp || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -684,12 +671,9 @@ export function _egTitheTeardown(monsterId) {
 }
 
 
-// Removes the Grid Veil overlay. THE single implementation (consolidated
-// 2026-09 from boss-bayes.js / boss-bloom.js, whose copies used to shadow
-// each other via load order - bloom's superset won): clears every
-// tint/state class either boss applies, so cleanup works regardless of
-// which boss's veil was active. Called by the framework's _egBossCleanup
-// typeof-guard.
+// Removes the Grid Veil overlay - the single implementation, clearing every
+// tint/state class either boss applies so cleanup works regardless of whose
+// veil was active. Called by the framework's _egBossCleanup typeof-guard.
 export function _egRemoveVeil() {
     if (typeof _egVeilActive !== 'undefined') globalThis._egVeilActive = false;
     const veil = document.getElementById('eg-grid-veil');

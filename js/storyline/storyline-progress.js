@@ -38,14 +38,10 @@ export function markSeen(beatId, options = {}) {
 }
 
 // ---------------------------------------------------------------------------
-// GLOBAL REPLAY UNLOCKS - persist independently of the 20 save slots.
-//
-// Intro cutscenes (opening cinematic + all three character intros) are
-// unlocked FOREVER as soon as the player starts a game with any character.
-// Keys use their own `replay_unlocked_` prefix (NOT `storyline_seen_`), so
-// wipeSlot()/resetAllBeats() never touch them - the unlocks survive resets
-// and apply to every save slot. Everything else (region beats) stays tied to
-// the per-save "already seen" state.
+// GLOBAL REPLAY UNLOCKS - persist independently of the save slots. Intro
+// cutscenes unlock forever once the player starts a game with any character;
+// keys use the `replay_unlocked_` prefix (not `storyline_seen_`) so resets
+// never touch them. Region beats stay tied to per-save seen-state.
 // ---------------------------------------------------------------------------
 
 export function _replayGlobalKey(entryId) {
@@ -66,11 +62,9 @@ export function _setReplayGloballyUnlocked(entryId) {
     } catch (e) { /* storage unavailable */ }
 }
 
-// isReplayEntryUnlocked - an entry is replayable if it is flagged as
-// permanently unlocked (globalUnlock → always available, all save slots),
-// OR carries a persisted global unlock flag, OR has been seen in the
-// current save. Intro cutscenes are meant to be available forever, so they
-// short-circuit to true.
+// isReplayEntryUnlocked - replayable when flagged globalUnlock (always
+// available), OR carrying a persisted global unlock flag, OR seen in the
+// current save. Intro cutscenes short-circuit to true (meant to be forever).
 export function isReplayEntryUnlocked(entry) {
     if (!entry) return false;
     if (entry.globalUnlock) return true;

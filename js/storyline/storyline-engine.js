@@ -8,83 +8,38 @@ import { INTRO_CINEMATIC_IMAGE_PATH } from './storyline-intro.js';
 // =============================================================================
 // storyline-engine.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
-// The rendering engine for story beats: text pages, image slideshows, and
-// karaoke-style songs. Contains no story CONTENT - only the machinery that
-// plays it back.
+// The rendering engine for story beats: text pages, image slideshows, songs,
+// and video. No story CONTENT - only playback machinery.
 //
-// Load order: the data files (storyline-intro*.js) call _wordsFromLine()
-// and reference DEFAULT_SLIDE_DURATION_MS / SLIDE_FADE_MS inside their own
-// top-level const declarations - so THIS file must load BEFORE them.
-// Order vs. storyline-beats.js doesn't matter at parse time (showBeat() /
-// StorylineRenderer read STORY_BEATS lazily inside function bodies), but
-// beats loads last in practice. storyline-progress.js (seen-state / replay
-// unlocks / resets, split out 2026-09-17) is a leaf - parse order vs. this
-// file doesn't matter (all its consumers call it at runtime).
-//
-// Suggested <script> order in index.html:
-//   1. storyline-progress.js        (seen-state / replay unlocks / resets)
-//   2. storyline-engine.js          (this file)
-//   3. storyline-intro.js           (main game intro song)
-//   4. storyline-intro-stox.js      (Stox character intro)
-//   5. storyline-intro-trix.js      (Trix character intro)
-//   6. storyline-intro-syla.js      (Syla character intro)
-//   7. storyline-beats.js           (STORY_BEATS - references all of the above)
+// Load order: the data files (storyline-intro*.js) call _wordsFromLine() and
+// read DEFAULT_SLIDE_DURATION_MS / SLIDE_FADE_MS in top-level const initializers,
+// so THIS file must load before them. Parse order vs. beats/progress doesn't
+// matter (they are read lazily at runtime); beats still loads last in practice.
+// Actual <script> order lives in index.html - keep this file first of the family.
 //
 // ---------------------------------------------------------------------------
 // VIDEO BEATS - data shape
 // ---------------------------------------------------------------------------
-// A video beat's `video` object supports two shapes:
+// `video` supports two shapes, both fully supported:
+//   1) single clip (legacy): { videoFile, audio, captions }
+//   2) multi-clip sequence: { clips: [{ videoFile, audio, gapAfterMs }, ...],
+//      captions } - gapAfterMs holds that clip's end frame before the next;
+//      the last clip's gap is ignored.
 //
-//   1) Single clip (legacy, still fully supported):
-//        video: { videoFile: "video/foo.mp4", audio: "...", captions: [...] }
+// Playback: clips play in order; videos never loop - after the final clip the
+// frame freezes (no restart, no auto-close). EACH CLIP OWNS ITS AUDIO: a clip's
+// `audio` file starts in lockstep with that clip and is stopped when the next
+// clip starts (_playClip/_stopClipAudio); no shared narration track exists.
+// A clip without `audio` plays silently (or with its own embedded track).
+// The bottom-right button reads "skip" until the final clip finishes, then
+// relabels to "continue" (same handler either way - it closes the beat).
 //
-//   2) Multi-clip sequence (new):
-//        video: {
-//            clips: [
-//                { videoFile: "video/foo_part1.mp4", audio: "audio/foo_part1.ogg", gapAfterMs: 0 },
-//                { videoFile: "video/foo_part2.mp4", audio: "audio/foo_part2.ogg", gapAfterMs: 2000 },
-//                { videoFile: "video/foo_part3.mp4", audio: "audio/foo_part3.ogg" } // last clip - gapAfterMs ignored
-//            ],
-//            captions: [...]     // unchanged - see below
-//        }
-//
-// Playback behavior for video beats:
-//   - Clips play in order. `gapAfterMs` on a clip is how long (ms) playback
-//     holds on that clip's OWN end frame before the next clip starts. 0 means
-//     jump to the next clip immediately. The gap on the LAST clip is ignored.
-//   - Videos never loop. Once the final clip finishes, playback simply
-//     freezes on that last frame - it does not restart and does not auto-close.
-//   - EACH CLIP OWNS ITS OWN AUDIO. If a clip has an `audio` field, that file
-//     starts playing the moment the clip starts playing (in lockstep - same
-//     call, same frame), and the clip's own video track is muted so the two
-//     don't overlap. When the sequence advances to the next clip, the
-//     previous clip's audio is stopped and the next clip's audio (if any)
-//     starts. There is no longer a single shared narration track spanning
-//     the whole sequence, and no independent per-line narration queue -
-//     audio is scoped 1:1 to whichever clip is currently on screen. A clip
-//     with no `audio` field just plays silently (or with its own embedded
-//     track, if `audio` is omitted and you want the raw video sound).
-//   - The bottom-right button reads "skip" until the final clip has finished
-//     playing, at which point it relabels itself to "continue" (same click
-//     handler either way - it closes the beat). This avoids a "skip" button
-//     that doesn't make sense once there's nothing left to skip.
-//   - Captions are unrelated to the per-clip audio and still support TWO
-//     shapes, auto-detected per beat:
-//       a) Per-line narration: { text, audio, durationMs }[]. No `start`
-//          field. Each line gets its OWN short audio clip, played in strict
-//          sequence via _playNarrationLine() - independent of which video
-//          clip happens to be on screen at the time.
-//       b) Legacy start-based (still fully supported): each caption's
-//          `start` (ms) is measured from the START of the whole clip
-//          sequence (not any single clip's currentTime) - so `start: 4000`
-//          always means "4 seconds after this beat began," regardless of
-//          how many clips/gaps came before it. This is driven off a
-//          wall-clock timer started when the beat began (videoSeqStartTime),
-//          since with multiple clips no single video element's currentTime
-//          spans the whole sequence, and clip audio is no longer a single
-//          track either.
-//     Caption lines still only ever fade IN once and are never hidden or
-//     dimmed again - the panel just keeps growing.
+// Captions are unrelated to per-clip audio; two shapes, auto-detected per beat:
+//   a) per-line narration: { text, audio, durationMs }[] - each line gets its
+//      own short audio clip, played in sequence via _playNarrationLine().
+//   b) legacy start-based: `start` (ms) measured from the START of the whole
+//      sequence (wall-clock videoSeqStartTime), not any clip's currentTime.
+// Caption lines fade IN once and are never hidden afterwards - the panel grows.
 // =============================================================================
 
 // ---------------------------------------------------------------------------
@@ -98,13 +53,10 @@ export const DEFAULT_SLIDE_DURATION_MS = 10000;
 // How long the text/image fade transition takes (ms) for slideshow beats.
 export const SLIDE_FADE_MS = 500;
 
-// _wordsFromLine - PLACEHOLDER-STYLE timestamp generator for karaoke song
-// beats. Splits a line into words and spaces their "fully revealed" times
-// evenly between lineStartMs and lineEndMs. When fed real per-LINE timing
-// (e.g. parsed from an .srt file), this still gives accurate line-level
-// sync - only the word-by-word pace within a line is estimated/even, since
-// SRT files don't carry per-word timestamps. Swap in literal per-word
-// timestamps for any line where you have them.
+// _wordsFromLine - timestamp generator for karaoke song beats: spaces each
+// word's "fully revealed" time evenly between lineStartMs and lineEndMs.
+// Line-level sync stays accurate when fed per-LINE timing (e.g. .srt); only
+// the per-word pace is estimated. Swap in literal timestamps where available.
 export function _wordsFromLine(text, lineStartMs, lineEndMs) {
     const words = text.split(' ').filter(Boolean);
     const span = lineEndMs - lineStartMs;

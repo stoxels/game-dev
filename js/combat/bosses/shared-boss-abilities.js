@@ -12,42 +12,42 @@ import { _egActiveBlasts, _egBossCorrupted, _egBossFrozen, _egCellInBounds, _egI
 //------------------------------------------------------------------------
 //-------------------SHARED BOSS ABILITIES--------------------------------
 //------------------------------------------------------------------------
-// Mechanics used by TWO OR MORE bosses live here so they are defined once.
-// Rule of thumb:
+// Mechanics used by TWO OR MORE bosses live here so they are defined once;
+// per-boss-only abilities live in the boss's own file. Boss files reference
+// these by handler-name string, e.g. { name: 'corrupt_cells',
+// handler: '_egMechCorruptCells', ... }. Family layout:
 //   shared (here) - corrupt_cells, probability_shift, prior_bomb (+ summon
-//     helpers), clue_swap, frozen_cells, grid_invert, plus the shared engines
-//     (generic screen-blast engine, _egNk dodge kit).
-//   shared-puzzle-mechanics.js - fated_cell, fog_bank, clue_scramble,
-//     soul_tithe (split out 2026-09-17; referenced by handler-name string
-//     like the above).
-//   per-boss file - everything only ONE boss uses.
+//     helpers), clue_swap, frozen_cells, grid_invert + the shared engines
+//     (screen-blast, _egNk dodge kit).
+//   shared-puzzle-mechanics.js - fated_cell, fog_bank, clue_scramble, soul_tithe.
 //
-// Boss files reference these by handler-name string, e.g.
-//   { name: 'corrupt_cells', handler: '_egMechCorruptCells', ... }
-//
-// PHASE VARIANTS - every shared ability evolves per boss phase instead of
-// only scaling counts:
-//   corrupt_cells     P1 static · P2 spreads to neighbours · P3 never expires
-//                     (every spread is telegraphed ~1s before it lands; the
-//                     initial cast count, spread caps and rates all scale
-//                     with the boss's tier 1–16)
+// PHASE VARIANTS - every shared ability evolves per boss phase (P1/P2/P3)
+// instead of only scaling counts; initial counts, caps and rates additionally
+// scale with the boss's atlas tier (1-16). Variants per ability:
+//   corrupt_cells     P1 static · P2 spreads to neighbours (telegraphed) ·
+//                     P3 never expires
 //   probability_shift P1 erases · P2 relocates marks · P3 relocates + erases
-//                     (target counts scale with the boss's tier 1–16)
 //   prior_bomb        P1 instant · P2 fused telegraph · P3 cascade wave
-//                     (counts AND fuse timing scale with tier 1–16)
-//   frozen_cells      P1 static locks · P2 creeping frost (telegraphed,
-//                     single-generation children) · P3 glacial drift (faster,
-//                     longer)
+//   frozen_cells      P1 static locks · P2 creeping frost (one child
+//                     generation, telegraphed) · P3 glacial drift (faster, longer)
 //   fated_cell        P1 single mark · P2 doom relay (marks chain) ·
-//                     P3 twin dooms (two marks, each fill respawns one)
+//                     P3 twin dooms (each fill respawns one)
 //   fog_bank          P1 static · P2 drifting fog · P3 twin wandering banks
-//   soul_tithe        P1 fixed quota · P2 lapsing (progress decays when you
-//                     stall) · P3 demanding (decay + timeout collects fills)
+//   soul_tithe        P1 fixed quota · P2 lapsing (decays on stall) ·
+//                     P3 demanding (decay + timeout collects fills)
 //   clue_swap         P1 pair swap · P2 triple shift · P3 double cross
 //   clue_scramble     P1 2 lines · P2 3 lines · P3 3 lines, re-shuffled midway
+// Corrupt Cells spread cadence: P1 static + expire · P2 a corrupted cell
+// infects one adjacent correct cell per tick (cell still expires) · P3 never
+// expires and spreads faster - keep dispelling or the grid drowns.
+//
+// Caps and spread intervals are TIER-SCALED: [0] = tier-1 endpoint (gentle),
+// [1] = tier-16 endpoint (brutal), lerped linearly; tier ~8 lands on the
+// pre-scaling values (spread interval P2 ~5.1s / P3 ~4.2s, cap P2 = 6 / P3 = 8).
+
 //------------------------------------------------------------------------
 
-// ── Corrupt cell expiry time ─────────────────────────────────────────────────
+// ── Corrupt cell expiry time ───────────────────────────────────────────────
 export const EG_CORRUPT_CELL_LIFETIME_MS = 15000; // ms before corruption auto-expires (P1/P2 only)
 // Brutus's arena keeps corruption on the grid LONGER (30s) so his corrupted
 // cells linger as an ongoing hazard - they also chain his ground slams, so a
@@ -58,19 +58,6 @@ export const EG_BRUTUS_CORRUPT_LIFETIME_MS = 30000;
 // evaporates long before the slow snail can ever reach it.
 export const EG_SNAIL_CORRUPT_LIFETIME_MS = 60000;
 
-// Spread cadence for the Corrupt Cells phase variants:
-//   P1 - static: corruptions just sit and expire (original behaviour)
-//   P2 - spreading: a corrupted cell infects one adjacent correct cell on a
-//        timer (the cell still expires after its 15s lifetime)
-//   P3 - relentless: corruptions never expire on their own and spread faster
-//        - the player MUST keep dispelling or the grid drowns
-//
-// Caps and spread intervals are TIER-SCALED. Each pair is the endpoint value
-// at tier 1 (gentle) vs tier 16 (brutal), lerped linearly by boss tier - the
-// pre-scaling behaviour sits around mid-tier (tier ~8):
-//   [0] = tier 1   [1] = tier 16
-//     spread interval  P2 ≈ 5.1s · P3 ≈ 4.2s at tier 8
-//     spread cap       P2 = 6    · P3 = 8       at tier 8
 export const EG_CORRUPT_SPREAD_INTERVAL_P2 = [6500, 3500]; // ms between spread attempts
 export const EG_CORRUPT_SPREAD_INTERVAL_P3 = [5500, 2800];
 export const EG_CORRUPT_SPREAD_CAP_P2 = [4, 8];           // max simultaneous corruptions
@@ -127,11 +114,9 @@ export function _egBossTierLerp(range, norm) {
 }
 
 
-// Duration multiplier for tier-scaled TIMING, anchored exactly at tier 8
-// (norm = 7/15 → factor 1.0, so the pre-scaling duration is unchanged there).
-// range = [tier1 factor, tier16 factor]; use >1 for "more time at low tier"
-// knobs and <1 for knobs where a short value means gentle (callers pick the
-// direction that makes tier 1 easy and tier 16 brutal).
+// Duration multiplier for tier-scaled TIMING, anchored at tier 8 (factor 1.0,
+// pre-scaling duration unchanged there). range = [tier1, tier16 factor];
+// callers pick the direction so tier 1 is easy and tier 16 is brutal.
 export function _egBossTierFactor(norm, range) {
     if (norm == null || !isFinite(norm)) return 1;
     const anchor = 7 / 15; // tier 8 - where the pre-scaling timing was tuned
@@ -179,10 +164,9 @@ export function _egCorruptSpreadCap(cfg) {
 
 
 // Builds the per-cast rule set carried by every corruption of one cast:
-//   p    - boss phase (1–3): drives expiry + base behaviour
-//   norm - tier difficulty weight (0 tier 1 … 1 tier 16): drives caps + rates
-// Newly spread cells inherit the same cfg, so a whole field follows one rule
-// set even as the fight's phase advances between casts.
+//   p    - boss phase (1-3): drives expiry + base behaviour
+//   norm - tier difficulty weight (0 tier 1 ... 1 tier 16): caps + rates
+// Newly spread cells inherit the same cfg, so one field follows one rule set.
 export function _egCorruptConfig(monster, phase) {
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const isBrutus = !!(monster && (monster.id === 'boss_brutus' || monster.baseId === 'boss_brutus'));
@@ -324,9 +308,8 @@ export function _egCorruptSpreadTick(key) {
 
 // Places the ☣️ corruption overlay on a cell and registers its expiry timer.
 // cfg drives the variants (see _egCorruptConfig): p = phase (P1 static+expire,
-// P2 expire+spread, P3 never expires) and norm = tier weight for how fast the
-// field spreads and how large it may grow. Newly spread cells inherit the same
-// cfg so the whole field follows one rule set.
+// P2 expire+spread, P3 never expires), norm = tier weight. Spread children
+// inherit the cfg, so a whole field follows one rule set.
 export function _egApplyCellCorruption(r, c, cfg) {
     const key = `${r}-${c}`;
     const el = document.getElementById(`g-${r}-${c}`);
@@ -403,13 +386,10 @@ export function _egDispelCorruption(row, col) {
 }
 
 
-// Boss mechanic handler - called by the boss mechanic scheduler.
-// Phase variants (counts), with tier-scaled cast counts, caps + spread rates:
-//   P1 - Corrupts static cells (auto-expire, must be dispelled to fill);
-//        1–3 by tier.
-//   P2 - Corrupts cells that SPREAD to neighbours (count, cap + rate by tier).
-//   P3 - Corrupts cells that never expire and spread faster (count, cap + rate
-//        by tier) - tier 1 stays manageable, tier 16 drowns the grid.
+// Boss mechanic handler - called by the boss mechanic scheduler. Tier-scaled
+// counts, caps + spread rates; P1 static cells (auto-expire, dispel to fill,
+// 1-3 by tier), P2 cells that SPREAD to neighbours, P3 cells that never expire
+// and spread faster (tier 1 manageable, tier 16 drowns the grid).
 export function _egMechCorruptCells(monster, phase) {
     const pool = _egBuildCorruptibleCellPool();
     if (pool.length === 0) return;
@@ -479,11 +459,10 @@ export function _egShiftFlyEase(t) {
 }
 
 
-// Spawns one flying ✕ from the center of (sr, sc) to the center of (dr, dc)
-// over EG_SHIFT_FLY_MS. The destination rect is re-read every frame so a
-// scroll / zoom mid-flight still lands on the right cell. onLanded fires
-// exactly once (also when either cell is missing - no visual, just the
-// state commit).
+// Spawns one flying ✕ from cell (sr,sc) to (dr,dc) over EG_SHIFT_FLY_MS; the
+// destination rect is re-read per frame so scroll/zoom mid-flight still lands
+// right. onLanded fires exactly once (also when a cell is missing - state
+// commits without the visual).
 export function _egShiftSpawnFlyer(sr, sc, dr, dc, onLanded) {
     let done = false;
     const finish = () => {
@@ -571,14 +550,10 @@ export function _egShiftSpawnFlyer(sr, sc, dr, dc, onLanded) {
 
 
 // Moves each target mark to a different empty cell. The ✕ stays on the board
-// (the emptiness just "shifts" elsewhere) so no information is destroyed -
-// the player has to hunt the marks down again.
-//
-// Visual: the old ✕ vanishes immediately and a floating ✕ flies from the old
-// cell to the new one over EG_SHIFT_FLY_MS, then the new mark lands with a
-// brief golden glow. Game state (userGrid) commits instantly so a click
-// mid-flight can never double-mark the destination; only the reveal is
-// delayed until the flyer lands.
+// (the emptiness just "shifts" elsewhere) so no information is destroyed.
+// Visual: old ✕ vanishes, a floating ✕ flies over EG_SHIFT_FLY_MS, the new
+// mark lands with a golden glow. userGrid commits instantly (a mid-flight
+// click can never double-mark the destination) - only the reveal waits.
 export function _egRelocateMarks(targets) {
     const excludeKeys = new Set(targets.map(([r, c]) => `${r}-${c}`));
     const dests = _egBuildMarkDestinations(excludeKeys).sort(() => Math.random() - 0.5);
@@ -683,13 +658,10 @@ export function _egFlashPriorBombCell(row, col) {
 }
 
 
-// One Prior Bomb detonation, at the bomb's cell centre: the Demolitionist's
-// boom (fireball core + expanding shockwave ring + ember sparks, sized to the
-// blast disc), plus a purple-purple tint left on the detonated cell and a
-// subtle whole-screen shake so the countdown payoff is FELT. Purely visual -
-// the mechanic's own effect (unfilling the cell) stays in the caller.
-// Orphan layer: the effect outlives any nk run and self-removes (same
-// pattern as _egCrashBoom's orphan branch).
+// One Prior Bomb detonation at the bomb's cell centre: Demolitionist boom +
+// purple tint + whole-screen shake so the payoff is FELT. Purely visual (the
+// unfill stays in the caller); runs on an orphan layer that outlives the nk
+// run and self-removes (same pattern as _egCrashBoom's orphan branch).
 export function _egPriorBombBoom(x, y, radius) {
     const R = Math.max(12, radius);
 
@@ -763,13 +735,10 @@ export function _egUnfillCell(row, col) {
 }
 
 
-// Boss mechanic handler - deliberately SUMMONS monster reinforcements into
-// the arena. This is the one spawn path that stays open inside the boss
-// arena (natural respawns are suppressed there - see _egShouldSuppressRespawn
-// in endgame-encounter.js): the spawn here is a purposeful boss ability, not
-// ambient repopulation. Summons 2 minions in phase 3, 1 otherwise, at the
-// boss's own level, capped by the global concurrent-monster cap. Slain
-// minions pay out normal XP/loot on top of the boss reward.
+// Boss mechanic handler - deliberately SUMMONS reinforcements: the one spawn
+// path left open inside the boss arena (natural respawns are suppressed - see
+// _egShouldSuppressRespawn). 2 minions in P3 (else 1) at the boss's level,
+// capped by the global monster cap; slain minions pay normal XP/loot.
 export const EG_SUMMON_POOL = ['slime', 'ghost', 'rat', 'bat', 'bee'];
 
 
@@ -805,12 +774,9 @@ export function _egPriorBombPool() {
 
 
 // ── Prior Bomb: countdown bombs with a defuse counterplay ────────────────────
-// Armed bombs show a LIVE countdown above the 💣 and remove a correct fill if
-// they detonate. Every bomb is now outplayable: park the player sprite on the
-// bomb to PAUSE its fuse and start defusing - hold the position for
-// EG_PRIOR_BOMB_DEFUSE_MS and the bomb is disarmed with no effect on the grid.
-// State lives in _egPriorBombs, driven by one shared 100 ms interval that is
-// pause-aware (fuses freeze while the game is paused).
+// A LIVE countdown above the 💣; standing on the bomb pauses the fuse - hold
+// for EG_PRIOR_BOMB_DEFUSE_MS to disarm it with no grid effect. State in
+// _egPriorBombs, driven by one shared 100 ms pause-aware interval.
 
 export let _egPriorBombs = [];           // { r, c, cellEl, fuseEl, remainMs, defuseAcc, monsterId, resolved }
 export let _egPriorBombTimer = null;
@@ -818,11 +784,9 @@ export let _egPriorBombDefusingActive = false;   // player standing on an armed 
 export let _egPriorBombChargePauseShown = false; // dedupes the charge-bar pause style toggles
 
 
-// True while the player is actively defusing a Prior Bomb (standing on it with
-// its fuse paused). LEGACY: the manual melee charge bar no longer freezes
-// while defusing (charge pauses were removed with the manual system) - kept
-// for save/macro compat. Defusing still costs time the player could spend
-// positioning for a charged strike.
+// True while the player is actively defusing a Prior Bomb (standing on it,
+// fuse paused). Defusing still costs time the player could spend positioning
+// for a charged strike.
 export function _egPriorBombDefusing() {
     return _egPriorBombDefusingActive;
 }
@@ -911,11 +875,10 @@ export function _egPriorBombArmCell(r, c, monsterId, fuseMs) {
 }
 
 
-// Detonation: the fuse pays off - explosion FX (boom + screen shake + SFX)
-// fire at the cell, THEN the fill is removed. Re-validated so an arena
-// transition or a refill mid-fuse can never corrupt the new grid (original
-// behaviour). A ghosted cell (grid rebuilt but cell still present) still
-// pops visually - the FX read from the DOM cell when possible.
+// Detonation: explosion FX fire at the cell, THEN the fill is removed.
+// Re-validated so an arena transition or mid-fuse refill can never corrupt
+// the new grid; a ghosted cell (grid rebuilt, cell still present) still pops
+// visually - the FX read from the DOM cell when possible.
 export function _egPriorBombExplode(b) {
     _egPriorBombDetonationFX(b);
     if (b.fuseEl) b.fuseEl.remove();
@@ -940,8 +903,7 @@ export function _egPriorBombDefuse(b) {
 // Shared 100 ms driver for every armed bomb:
 //   • player standing on the bomb → fuse paused, defuse accumulates;
 //   • otherwise → fuse ticks down to detonation.
-// Freezes under pause/death and vanishes silently when the boss dies or the
-// grid is torn down.
+// Freezes under pause/death; vanishes silently on boss death / teardown.
 export function _egPriorBombTick() {
     if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
     if (typeof dead !== 'undefined' && globalThis.dead) return;
@@ -1032,14 +994,14 @@ export function _egClearPriorBombFuses() {
 }
 
 
-// Boss mechanic handler - EVERY phase now arms visible, defusable bombs
-// (counts AND fuse timing stay TIER-SCALED like Corrupt Cells):
+// Boss mechanic handler - every phase arms visible, defusable bombs (counts
+// and fuse timing TIER-SCALED like Corrupt Cells):
 //   P1 - Prior Bomb: {n} bombs on the most recent correct fills.
 //   P2 - Fused Bomb: {n} bombs (snappier window at high tier).
 //   P3 - Cascade Bomb: {n} bombs, then a delayed second bomb arms on the
 //        freshest fill ~EG_PRIOR_BOMB_CASCADE_DELAY_MS later.
-// Each bomb shows its countdown above the icon; standing on it for
-// EG_PRIOR_BOMB_DEFUSE_MS defuses it (fuse paused while defusing).
+//
+// Standing on any bomb for EG_PRIOR_BOMB_DEFUSE_MS defuses it.
 export function _egMechPriorBomb(monster, phase) {
     const pool = _egPriorBombPool();
     if (pool.length === 0) return;
@@ -1083,10 +1045,10 @@ export function _egCollectClueSpans(kind, idx) {
 
 
 // ── Clue Swap state ──────────────────────────────────────────────────────────
-// Active swap = { groups: [ { rows, spans:[[...]], orig:[[...]] } ] }. Each
+// Active swap = { groups: [ { rows, spans:[[...]], orig:[[...]] } ] }; each
 // group cycles its rows' clue numbers one step (pair A↔B, triple A←B←C←A).
-// Clue numbers live as per-number spans (rn-{row}-{i} / cn-{col}-{i}), so the
-// swap operates on those spans - a row's whole clue is spread across them.
+// Clue numbers live as per-number spans (rn-{row}-{i} / cn-{col}-{i}), which
+// the swap operates on directly.
 
 // Picks `n` distinct rows with clue spans, preferring rows of equal clue
 // length so positional exchanges read as clean full swaps. Returns null when
@@ -1225,11 +1187,10 @@ export const EG_FROZEN_CREEP_DELAY_MS = 4500;     // P2 - when each initial free
 export const EG_FROZEN_CREEP_DELAY_P3_MS = 4000;  // P3 - the ice creeps faster
 export const EG_FROZEN_TELEGRAPH_MS = 1000;       // warning between the ghost ❄️ and the creep landing
 
-// TIER-SCALED knobs - same [tier1, tier16] endpoint pattern as Corrupt Cells.
-// Cast counts and field caps lerp between endpoint pairs (tier 8 lands on the
-// pre-scaling values: 2 / 3 / 4 casts, 6 / 8 caps); thaw time and creep delay
-// are duration factors anchored exactly at tier 8. Low tiers thaw faster and
-// creep slower, high tiers hold the deep freeze longer and creep sooner.
+// TIER-SCALED knobs - [tier1, tier16] endpoint pairs like Corrupt Cells
+// (tier 8 lands on the pre-scaling values: 2/3/4 casts, 6/8 caps). Thaw time
+// and creep delay are duration factors anchored at tier 8: low tiers thaw
+// faster and creep slower; high tiers hold the freeze longer and creep sooner.
 export const EG_FROZEN_CAST_P1 = [1, 3]; // P1 static locks
 export const EG_FROZEN_CAST_P2 = [2, 4]; // P2 initial locks
 export const EG_FROZEN_CAST_P3 = [3, 5]; // P3 initial locks
@@ -1296,11 +1257,11 @@ export function _egBuildFreezableCellPool() {
 
 // Places the ❄ freeze overlay on a cell and registers its thaw timer.
 // cfg = { p: boss phase (1-3), child: true for a creeping child (never
-// re-creeps), norm: tier weight 0..1 } - children inherit the source's cfg so
-// one whole field follows the same rule set.
+// re-creeps), norm: tier weight 0..1 } - children inherit the source's cfg.
+//
 // P1 - plain static freeze. P2+ - initial freezes each spawn one telegraphed
-// "creeping frost" child mid-life (see _egFrozenCreepTick), so the lock count
-// can double while it lasts but always fully thaws afterwards.
+// "creeping frost" child mid-life (see _egFrozenCreepTick): the lock count can
+// double while it lasts, but always fully thaws afterwards.
 export function _egApplyCellFreeze(r, c, cfg) {
     const key = `${r}-${c}`;
     const el = document.getElementById(`g-${r}-${c}`);
@@ -1461,8 +1422,8 @@ export function _egIsCellFrozen(row, col) {
 }
 
 
-// Boss mechanic handler - phase variants (counts/caps/thaw/creep all scaled
-// by the boss's atlas tier, anchored at tier 8 on the pre-scaling values):
+// Boss mechanic handler - phase variants (counts/caps/thaw/creep TIER-SCALED,
+// anchored at tier 8):
 //   P1 - Frozen Cells: static locks that thaw on their own (original).
 //   P2 - Creeping Frost: each initial freeze spawns ONE telegraphed child on
 //        a neighbour mid-life (field caps out, all auto-thaw).
@@ -2162,12 +2123,9 @@ export function _egNkRectsOverlap(a, b) {
 
 
 // Rendered-box hit test for small translated projectile dots (embers, orbs,
-// saws, wisps, ...). Collision uses the dot's ACTUAL painted box (+2px
-// forgiveness) instead of an idealized circle around its logical x/y, so a
-// projectile that visibly touches the player always registers and any CSS
-// motion (wiggle/spin animations, transitions) can't skew the hitbox.
-// The Ember Drift / Firefly / Barrage bosses were converted first; every
-// translate-positioned dot boss shares this helper now.
+// saws, wisps, ...): collision uses the dot's ACTUAL painted box (+2px
+// forgiveness) rather than an idealized circle, so visible contact always
+// registers and CSS motion can't skew the hitbox.
 export function _egNkDotHit(el, pr, pad) {
     if (!el || !pr) return false;
     const r = el.getBoundingClientRect();
@@ -2246,20 +2204,14 @@ export function _egNkDotTick(run, pctPerSec, dtS, level, element) {
 }
 
 
-// Failed-dodge feedback toast for a NAMED boss ability, decided by how much
-// damage actually landed:
-//   dealt > 0            → "💥 The Minotaur’s Bull Rush hits you for 24 damage!"
-//   dealt == 0 and the absorption shield ate the whole hit (flag set by
-//     _egNkHit / the screen-blast engine) → "🛡️ The Minotaur’s Bull Rush
-//     absorbed by your shield!" - shielded hits stay acknowledged instead of
-//     vanishing, and a misleading "hit for 0" is never shown.
+// Failed-dodge feedback toast for a NAMED boss ability, decided by damage:
+//   dealt > 0 → "💥 <boss> <ability> hits you for N damage!"
+//   dealt == 0 + absorption flag (from _egNkHit / the blast engine) →
+//     "🛡️ absorbed by your shield!" - never a misleading "hit for 0".
 //   dealt == 0 without absorption (godmode, inactive encounter) → silent.
-// bossName may be null; abilityName reads after it. Localized through the
-// Boss damage-toast COLORS - stacked arenas must read at a glance. Bosses
-// with an element use the game's canonical damage-number element palette
-// (fire/cold/lightning/shadow), so e.g. the cold-element Siren toasts cyan.
-// Elementless bosses (element: null - Brutus, The Minotaur, …) have nothing
-// to key on, so each gets a fixed signature color instead (Brutus = red).
+// bossName may be null; abilityName reads after it. Element bosses use the
+// canonical damage-number palette; elementless ones (Brutus, The Minotaur, ...)
+// get a fixed signature color from EG_NK_BOSS_SIGNATURE_COLORS.
 export const EG_NK_ELEMENT_TOAST_COLORS = {
     fire: '#ff3b1f', cold: '#6ecbff', lightning: '#ffe536', shadow: '#c084ff',
 };
@@ -2368,13 +2320,11 @@ export function _egNkToast(key, fallback, color) {
 //------------------------------------------------------------------------
 //-------------------SHARED GROUND-SHATTER BURST (BAND MECHANICS)----------
 //------------------------------------------------------------------------
-// When a band-style dodge mechanic's telegraph resolves (Brutus ground
-// slam, Juggernaut/Minotaur bull rushes), the struck band erupts: jagged
-// fissures crack across the whole band width while rock shards and dust
-// burst out of the ground. The burst is a body-level overlay (pointer-
-// events: none and tracked on the run's element list) so the pieces keep
-// animating after the band's red flash fades, and encounter cleanup removes
-// them with the run. CSS lives in bosses2.css (.eg-slam-* rules).
+// Band-slam eruption (Brutus ground slam, Juggernaut/Minotaur bull rushes):
+// jagged fissures + rock shards + dust burst from the struck band. The burst
+// is a body-level overlay (pointer-events: none, tracked on the run's element
+// list) so pieces keep animating after the band flash fades; encounter cleanup
+// removes them with the run. CSS in bosses2.css (.eg-slam-* rules).
 
 
 // Random-walk fissures across the band: 2–3 main cracks running left → right
@@ -2533,15 +2483,11 @@ export function _egNkNudgeAvatar(dx, dy) {
 }
 
 
-// Animated knockback: same contract as _egNkNudgeAvatar but the avatar's
-// PIXELS glide to the new spot instead of teleporting - a decaying ease-out
-// slide done with a CSS transition on left/top (compositor-driven, so it
-// animates smoothly and never fights the game's rAF loops) plus a tumble
-// wobble keyframe on the wrapper. Also pops an impact burst at the contact
-// point so the bump itself reads on screen.
-//   dx, dy          - fling impulse in px (same as the nudge)
-//   srcX, srcY      - optional contact point for the burst (default:
-//                     between the avatar and its landing spot)
+// Animated knockback: like _egNkNudgeAvatar but the avatar's PIXELS glide
+// (compositor-driven CSS ease-out slide on left/top + tumble wobble) instead
+// of teleporting, with an impact burst at the contact point.
+//   dx, dy     - fling impulse in px (same as the nudge)
+//   srcX, srcY - optional contact point for the burst
 export let _egFlingSeq = 0;
 export function _egNkFlingAvatar(dx, dy, srcX, srcY) {
     const el = document.getElementById('player-avatar-wrapper')

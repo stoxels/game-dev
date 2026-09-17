@@ -6,11 +6,10 @@ import { INTRO_SONG } from './storyline-intro.js';
 // =============================================================================
 // storyline-beats.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
-// STORY_BEATS - the registry of every story beat in the game, keyed by
-// beatId, passed to showBeat(beatId, options). Live callers: ui-events.js
-// (opening cinematic + Replay gallery) and character-select.js (character
-// intros). The region-beat trigger inside scoring.js's checkWin() is
-// commented out for now - parked until the region media assets land.
+// STORY_BEATS - registry of every story beat, keyed by beatId, passed to
+// showBeat(beatId, options). Live callers: ui-events.js (opening cinematic
+// + Replay gallery) and character-select.js (character intros). The region
+// trigger in scoring.js's checkWin() is parked until region media lands.
 // =============================================================================
 
 // ---------------------------------------------------------------------------
@@ -51,13 +50,10 @@ export const STORY_BEATS = {
 // ---------------------------------------------------------------------------
 // REGION BEAT TRIGGER LEVELS
 // ---------------------------------------------------------------------------
-// Maps world number -> the level index (li, 1-based) within that world whose
-// FIRST clear fires that world's region_N story beat (see the commented-out
-// trigger block in scoring.js's checkWin() - parked until the region media
-// is complete). Placeholder values live in the commented sample below -
-// adjust per world once each world's level design/pacing is finalized.
-// Must not exceed the number of levels actually defined for that world in
-// level-world-data.js.
+// Maps world number -> 1-based level index (li) whose FIRST clear fires that
+// world's region_N beat (trigger in scoring.js's checkWin() is parked). Fill
+// values per world once level design/pacing is final; must not exceed the
+// world's level count in level-world-data.js.
 // ---------------------------------------------------------------------------
 export const REGION_BEAT_TRIGGER_LEVEL = {
 
@@ -82,94 +78,41 @@ export const REGION_BEAT_TRIGGER_LEVEL = {
 
 
 // ---------------------------------------------------------------------------
-// REGION ENTRY BEATS - each fires once, on first clear of its designated
-// trigger level (see REGION_BEAT_TRIGGER_LEVEL above). Rendered as a
-// 5-CLIP video sequence (see storyline-engine.js's video-beat `clips` path)
-// with captions that accumulate on screen - each line fades in and stays,
-// so by the end of the sequence the player has seen the full story text
-// written out together.
+// REGION ENTRY BEATS - each fires once on the first clear of its trigger
+// level, rendered as a 5-clip video sequence with accumulating captions
+// (clip shape + playback rules: see the video-beat docs in storyline-engine.js).
 //
-// AUDIO IS PER-CLIP, NOT A SINGLE SHARED TRACK. Each of the 5 clips has its
-// own dedicated audio file (`audio` field on the clip), which starts the
-// instant that clip starts playing and is stopped the instant the sequence
-// moves on to the next clip (see storyline-engine.js's _playClip /
-// _stopClipAudio). So instead of one long narration.ogg spanning all ~40s,
-// split your narration to match your 5 video parts: part1's narration goes
-// with part1's video, etc. Video and audio for a given clip always start
-// together - there's no separate timing to configure for "when" a clip's
-// audio plays; it's implicitly "whenever that clip is on screen."
+// AUDIO IS PER-CLIP: each clip's `audio` file starts with that clip and stops
+// when the next one starts (_playClip/_stopClipAudio) - never one narration.ogg
+// for the whole sequence. Clips are ~8s each; gapAfterMs on clips 1-4 holds the
+// end frame a beat, the last clip's gap is ignored. Caption lines are sized
+// ~18-22 words (~7-7.5s spoken) to fit inside a clip. Playback need not finish
+// inside the ~40s: after the last clip the frame freezes while captions continue
+// (_onClipEnded). CAPTION TIMING IS MANUAL: [translationKey, startMs] pairs,
+// startMs measured from the start of the whole sequence (see _captions below);
+// the numbers here are word-count starting points (~165 wpm) - adjust by hand
+// once narration exists. region_1's audio exists; videos still pending.
 //
-// Each region is split into 5 clips (~8s each, matching your generator's
-// clip-length limit) instead of one single clip. `gapAfterMs` on clips 1
-// through 4 holds on that clip's end frame for a beat before cutting to the
-// next one; the last clip's gapAfterMs is ignored (see storyline-engine.js).
-// Each clip's caption/narration is sized to ~18-22 words (~7-7.5s spoken)
-// so it fits comfortably inside that clip's ~8s runtime without leaving an
-// awkward silent gap before the next clip starts.
-// Playback does NOT need to finish inside the ~40s the 5 clips cover - once
-// the last clip ends it freezes on that frame (with its own audio, if any,
-// left playing) while captions keep going for as long as they need (see
-// storyline-engine.js's _onClipEnded). So a text-heavy region is fine having
-// more caption lines than the video "covers."
-//
-// CAPTION TIMING IS MANUAL - each line is a [translationKey, startMs] pair
-// (see _captions() below), where startMs is exactly when that line should
-// appear on screen, measured from the start of the whole clip sequence
-// (wall-clock time, independent of which clip/audio happens to be
-// playing). You control this per line, per region. Example:
-//     _captions([
-//         ['st_r1_c1', 0],     // shown instantly
-//         ['st_r1_c2', 8000],  // shown at 8s
-//         ['st_r1_c3', 16000], // shown at 16s
-//     ])
-// The numbers below are auto-generated STARTING POINTS (word-count based,
-// ~165 words/min) - listen to your actual narration once you have it and
-// adjust every number by hand to match. `videoFile` / `audio` paths are
-// placeholders matching _regionClips() below - region_1's narration audio
-// already exists under these names (audio/Regions/region_1_part1..3_audio.ogg);
-// the videos are still pending (video/Regions/ not created yet).
-//
-// World order is locked: 1 Probability Peaks, 2 Distribution Den,
-// 3 Sampling Savanna, 4 Vortex of Possibilities, 5 Regression Rift,
-// 6 Frequency Forest, 7 Stochapolis, 8 Hypothesis Hinterlands,
-// 9 Data Delta, 10 Parameter Plains, 11 Null Hypothesis Void,
-// 12 Bayesian Bay, 13 Expectation Plateau, 14 the Nexus (interlude world,
-// 0-based NEXUS_WORLD_INDEX 13 in levels.js).
+// World order is locked: 1 Probability Peaks ... 13 Expectation Plateau,
+// 14 the Nexus (interlude world, 0-based NEXUS_WORLD_INDEX 13 in levels.js).
 // ---------------------------------------------------------------------------
 
-// Converts an array of [translationKey, startMs] pairs into the
-// { textKey, start } caption objects the engine expects. The key is resolved
-// to the active language's text via t() at DISPLAY time (see renderVideo in
-// storyline-engine.js) - so a mid-session language switch is picked up on the
-// next playback. This is the ONLY place caption timing is decided - startMs is
-// exactly when that line appears on screen, in milliseconds from the start of
-// the whole clip sequence. Set every number by hand per line, per region.
-// Caption timing is independent of per-clip audio - a caption line does not
-// need to "belong" to any particular clip.
+// Converts [translationKey, startMs] pairs into the { textKey, start }
+// objects the engine expects; keys resolve via t() at display time (so a
+// mid-session language switch applies on the next playback). This is the
+// only place caption timing is decided: startMs is when the line appears,
+// in ms from the start of the whole sequence, independent of clip audio.
 export function _captions(entries) {
     return entries.map(([key, start]) => ({ textKey: key, start }));
 }
 
-// Builds a standard 5-clip sequence for a region, using the region's number
-// to generate the placeholder file paths:
-//   video/Regions/region_N_part1.mp4  +  audio/Regions/region_N_part1_audio.ogg
-//   video/Regions/region_N_part2.mp4  +  audio/Regions/region_N_part2_audio.ogg
-//   video/Regions/region_N_part3.mp4  +  audio/Regions/region_N_part3_audio.ogg
-//   video/Regions/region_N_part4.mp4  +  audio/Regions/region_N_part4_audio.ogg
-//   video/Regions/region_N_part5.mp4  +  audio/Regions/region_N_part5_audio.ogg
-// Each clip's audio starts together with that clip and is swapped out the
-// moment the next clip starts (see storyline-engine.js's _playClip). Swap
-// in real filenames once they exist - or just replace the whole `clips`
-// array per-region if the part count/naming ever differs from this pattern,
-// or if a particular clip should have no audio at all (omit `audio` on
-// that clip's object).
-//
-// Each clip is ~8s of video. Its matching caption line (see each region's
-// `_captions([...])` call below) is written to take roughly 7-7.5s to
-// narrate at a natural reading pace (~18-22 words) - short enough that the
-// voiceover for that clip finishes with a little headroom before the next
-// clip's own audio starts, instead of running out of words early and
-// leaving several seconds of silence over still-playing video.
+// Builds a standard 5-clip sequence for a region, generating placeholder
+// paths of the form video/Regions/region_N_partX.mp4 with matching
+// audio/Regions/region_N_partX_audio.ogg (per-clip audio swap: _playClip).
+// Swap in real filenames once they exist - or replace a region's whole
+// `clips` array if its part count/naming differs (omit `audio` for a silent
+// clip). Each clip is ~8s; its caption line is sized ~18-22 words so the
+// voiceover finishes with headroom instead of leaving silence over video.
 export function _regionClips(n) {
     return [
         { videoFile: `video/Regions/region_${n}_part1.mp4`, audio: `audio/Regions/region_${n}_part1_audio.ogg`, gapAfterMs: 0 },
@@ -372,11 +315,9 @@ STORY_BEATS.region_14 = {
 
 
 // ---------------------------------------------------------------------------
-// REPLAY GALLERY - flat registry of beats replayable from the title screen's
-// Replay panel. An entry is shown when it is unlocked: `globalUnlock: true`
-// entries are permanently available (independent of save slots), everything
-// else unlocks once seen in the current save (see storyline-engine.js). Add
-// a new entry here any time a new story beat should show up in that panel.
+// REPLAY GALLERY - registry of beats replayable from the title screen's
+// Replay panel. `globalUnlock: true` entries are permanently available;
+// everything else unlocks once seen in the current save (storyline-engine.js).
 // `options` must match whatever showBeat(beatId, options) expects.
 // ---------------------------------------------------------------------------
 export const REPLAY_GALLERY_ENTRIES = [
