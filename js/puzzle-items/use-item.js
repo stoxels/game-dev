@@ -29,8 +29,9 @@ import { _useTheWitch } from './the-witch.js';
 import { showToast } from './toasts-and-popups.js';
 
 //------------------------------------------------------------------------
-// Phase 3 step 9: live globalThis accessors for externally-mutated names.
-// (derived from write-site audit by dev/scratch/convert-step9.mjs)
+// globalThis accessor for externally-mutated names (see the write-site audit):
+// the tutorial quest monkey-patches useItem, so imports must read the live
+// binding through here rather than a frozen import reference.
 //------------------------------------------------------------------------
 try { Object.defineProperty(globalThis, 'useItem', { get() { return useItem; }, set(v) { useItem = v; }, configurable: true }); } catch (e) {}
 
@@ -47,7 +48,7 @@ try { Object.defineProperty(globalThis, 'useItem', { get() { return useItem; }, 
 //   prefix  - id must start with this string
 //   handler - the function to call
 //   exclude - exact ids that share the prefix but must NOT use this handler
-export const ITEM_PREFIX_HANDLERS = [
+const ITEM_PREFIX_HANDLERS = [
     { prefix: 'reveal', handler: _useReveal, exclude: ['cursedReveal'] },
     { prefix: 'markWrong', handler: _useMarkWrong, exclude: [] },
     { prefix: 'addTime', handler: _useAddTime, exclude: [] },
@@ -55,7 +56,7 @@ export const ITEM_PREFIX_HANDLERS = [
 
 
 // Exact-id handler table.
-export const ITEM_EFFECT_HANDLERS = {
+const ITEM_EFFECT_HANDLERS = {
     freeze: _useFreeze,
     shield: _useShield,
     rowSolve: _useRowSolve,
@@ -85,7 +86,7 @@ export const ITEM_EFFECT_HANDLERS = {
 
 // Routes an item id to the correct handler, trying prefix matches first.
 // Returns the localised result string (used as the toast message).
-export function _dispatchItemEffect(id, def) {
+function _dispatchItemEffect(id, def) {
     for (const { prefix, handler, exclude } of ITEM_PREFIX_HANDLERS) {
         if (id.startsWith(prefix) && !exclude.includes(id)) {
             return handler(id, def);
@@ -100,7 +101,7 @@ export function _dispatchItemEffect(id, def) {
 
 
 // Checks whether `id` is any variant of the mistakeEraser item.
-export function _isMistakeEraserItem(id) {
+function _isMistakeEraserItem(id) {
     return id === 'mistakeEraser'
         || id === 'mistakeEraser4'
         || id === 'mistakeEraser6'
@@ -109,7 +110,7 @@ export function _isMistakeEraserItem(id) {
 
 
 // Fires all relevant achievement and quest-stat calls for the used item.
-export function _trackItemAchievements(id, def) {
+function _trackItemAchievements(id, def) {
     // Universal - every item use
     trackAchStat('itemsUsed');
     if (def.rarity === 'cursed') trackAchStat('cursedItemsUsed');
@@ -153,7 +154,7 @@ export function _trackItemAchievements(id, def) {
 
 
 // Returns the cumulative Frugal Use proc chance (0.0 – 0.17).
-export function _getFrugalUseChance() {
+function _getFrugalUseChance() {
     return (ptHasSkill('frugal_use_1') ? 0.05 : 0)
         + (ptHasSkill('frugal_use_2') ? 0.05 : 0)
         + (ptHasSkill('frugal_use_3') ? 0.07 : 0);
@@ -198,6 +199,9 @@ export function _consumeItem(idx, def, msg) {
 }
 
 
+// useItem - public entry point (accessor-global, see the prologue above):
+// find the inventory item by uid, dispatch its effect, then consume it.
+// Disabled while dead or in Ironman mode.
 function useItem(uid) {
     // Items are disabled in dead state and Ironman mode
     if (globalThis.dead || globalThis.curMods.ironman) return;
