@@ -6,46 +6,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: BAYES (boss_bayes)------------------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK - "The Grand Prior". Evidence updates beliefs - the fight
-// literally re-weights. Bayes holds a visible BELIEF METER between two
-// hypotheses (SAFE LEFT / SAFE RIGHT); its casts strike the side the meter
-// currently favours. Your job is feeding evidence to flip the meter before
-// each big cast. Element: lightning.
-//   • POSTERIOR BOLTS (signature, all fight) - every cast, lightning waves
-//     land across the currently-BELIEVED-SAFE side in wide columns; the
-//     meter then shifts toward the OTHER side (getting hit by your own
-//     belief's evidence). A glowing EVIDENCE RING spawns on the opposite
-//     side: stand in it when a bolt lands to shift the meter strongly your
-//     way - risk = reward, because that side is being punished next.
-//   • EVIDENCE WISPS (60%) - 🔮 wisps drift along wide readable loops;
-//     touching one flips the meter 15 points toward the wisp's own side
-//     (pull the next cast away from you). Wisps on the non-favoured side
-//     glow - those are the free flips; wisps on the favoured side sting.
-//   • BELIEF VEIL (60%, once) - the classic Grid Veil returns, upgraded:
-//     the puzzle grid is hidden AS BAYES BELIEVES IT - the veil is tinted
-//     toward the favoured side, and a belief chip shows the current lean.
-//     The closer the meter sits to 50/50, the clearer the veil reads
-//     (a balanced belief sees clearly - the hidden lesson of the boss).
-//   • 🔮 THEOMERE'S GAMBIT (≤10%, one-shot finale) - Bayes bets everything
-//     on one final hypothesis: the arena splits into a 3×3 of districts,
-//     each showing a truthful danger-probability chip. Stand on a chip to
-//     flip it to its complement (one flip per district - a gamble). Three
-//     cast waves strike the true danger districts; survive all three and
-//     Bayes updates its prior to "the player wins" and CONCEDES - every
-//     chip reveals, and the boss takes its own remaining HP as the price
-//     of a lost bet. Charge bar frozen (gate in _egTickPlayer via
-//     _egBayFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (prior_bomb) live in shared-boss-abilities.js and are
-// referenced by handler-name string.
+// Tier-7 rework "The Grand Prior": a belief meter leans SAFE LEFT/RIGHT
+// and casts strike the favoured side - feed evidence (rings, wisps) to
+// flip it. Belief veil + wisps join at 60%; THEOMERE'S GAMBIT at ≤10%:
+// flip district chips, survive three waves, and Bayes concedes.
 //------------------------------------------------------------------------
 
 // DEBUG: slow Bayes' timing 2.5x so manual playtests / screenshot
