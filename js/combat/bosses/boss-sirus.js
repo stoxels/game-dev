@@ -4,55 +4,14 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkE
 //------------------------------------------------------------------------
 //-------------------BOSS: THE STORMCALLER (boss_sirus)--------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK - "The Eye of the Storm". PoE Sirus homage, deepened: the
-// sky no longer sends storms - the sky IS the weapon. Every mechanic
-// electrifies the arena and every mechanic answers to the other: currents
-// charge you, being charged draws the chains, standing in water while
-// charged is suicide, and in the finale the storm turns YOUR stored charge
-// into the kill. Element: lightning.
-//
-//   • ION CURRENT (signature, all fight) - two glowing ion fronts slide
-//     across the arena on telegraphed lanes, split by a solid line: the
-//     TANGENT is the only instant a lane is safe (2 hot bands + 1 cool).
-//     Crossing a tangent puts CHARGE on you; while charged you tick to
-//     EVERYTHING nearby. Phase 3: the fronts close from both sides at
-//     once - the whole arena goes hot in a pincer.
-//   • CHAIN LIGHTNING (60%) - a ⚡ hunting bolt tracks you; you cannot
-//     outwalk it, only outposition it. Broken by the WATER LINE - blue
-//     currents sweep and leave standing water; a bolt that reaches you
-//     over water grounds itself at the shore. Cold pools (shared
-//     frozen_cells) always ground the bolt - ice doesn't conduct.
-//   • STORM EYE (60%, once) - the Stormcaller descends to the centre in a
-//     16-cell grid: he casts 7 hot cells, then the SAFE tiles are the ones
-//     connected to the eye - the dead zones are the ones he's already
-//     charged. Spends phase 3 for phase 1 - never moves again. Safe cells
-//     protect from EVERYTHING (a true succ zone).
-//   • ⛈️ PERFECT STORM (≤10%, one-shot finale) - four ion currents enclose
-//     a shrinking box; the eye tracks you while the eye of the box closes;
-//     then the STORM GROWS TEETH: your CHARGE becomes bullets - every
-//     charged tick fires a hunting bullet at your last position. Die by
-//     your own stored charge. Charge bar frozen (gate in _egTickPlayer
-//     via _egSirFinalActive).
-//
-// Shared soul kept: probability_shift still turns the puzzle's clues -
-// fitting for a boss about charge vs. potential. frozen_cells (cold
-// pools) retained as a bolt-grounding interaction. corrupt_cells retired.
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (probability_shift, frozen_cells) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Tier-8 rework "The Eye of the Storm": ion currents charge you, chains
+// hunt the charged, water grounds bolts, and the storm eye's safe cells
+// shelter from everything. PERFECT STORM at ≤10% turns your own stored
+// charge into hunting bullets.
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Stormcaller's timing 2.5x so manual playtests /
-// screenshot automation can catch mid-animation states. Flip to false for
-// ship.
+// screenshot automation can catch mid-animation states. Off for ship.
 export const _EG_SIR_DEBUG_SLOW = false;
 export const _EG_SIR_DEBUG_MULT = _EG_SIR_DEBUG_SLOW ? 2.5 : 1;
 
