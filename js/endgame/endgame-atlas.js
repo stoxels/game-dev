@@ -623,7 +623,7 @@ export function egAtlasChainBlueprint(node) {
 
     // One fixed boss per region - the map's own boss, fought in the arena
     // after the chain (like PoE's per-map bosses). The roster in
-    // js/endgame/bosses/boss-rosters.js assigns each region its specific
+    // js/combat/bosses/boss-rosters.js assigns each region its specific
     // boss (easy fights low, brutal fights at the pinnacle).
     const bossIds = (typeof EG_BOSS_DEFS !== 'undefined') ? Object.keys(globalThis.EG_BOSS_DEFS) : [];
     // Always consume the roll so the PRNG stream - and therefore every

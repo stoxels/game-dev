@@ -31,7 +31,7 @@ import { EG_SCREEN_NAV, _egResolveBackFn } from './endgame-state.js';
 //   - Hovering a node opens a custom tooltip naming the region's fixed
 //     boss (emoji + name - the same guardian the region's map tooltips
 //     name, see EG_ATLAS_REGION_BOSSES in
-//     js/endgame/bosses/boss-rosters.js)
+//     js/combat/bosses/boss-rosters.js)
 //   - Search box (top right): matching regions glow blue (pulsing node
 //     frame + brightened name), including locked ones; matches by region
 //     name and by tier numeral / number (e.g. 'XV' or '15')

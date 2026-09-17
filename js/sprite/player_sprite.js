@@ -4,8 +4,8 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { updateClassHUDManaBar } from '../classes/class-mana.js';
-import { _egEntrMoveMult } from '../endgame/bosses/boss-entropy.js';
-import { _egSnailBroomHeld } from '../endgame/bosses/boss-snail.js';
+import { _egEntrMoveMult } from '../combat/bosses/boss-entropy.js';
+import { _egSnailBroomHeld } from '../combat/bosses/boss-snail.js';
 import { _egPlayerHasAilment } from '../endgame/endgame-ailments.js';
 import { _egSetHoldEPauseVisual } from '../endgame/endgame-encounter-tick.js';
 import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';

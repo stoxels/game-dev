@@ -6,7 +6,7 @@
 import { trackAchStat } from './achievements/achievements.js';
 import { areAllWorldLevelsDone, grantClassChangeToken, triggerClassEventIfPending } from './classes/class-ui.js';
 import { curMods } from './difficulty-modifiers.js';
-import { EG_BOSS_DEFS } from './endgame/bosses/boss-framework.js';
+import { EG_BOSS_DEFS } from './combat/bosses/boss-framework.js';
 import { _egBuildChainPool, _egCanLeaveMap, _egCancelChainCountdown, _egRollBonusMapLoot, _egShowLeaveMapTransition } from './endgame/endgame-encounter-chain.js';
 import { _egEnsureLoseOverlayEndgameUI } from './endgame/endgame-encounter-overlays.js';
 import { _egStopEncounter } from './endgame/endgame-encounter.js';
