@@ -5,51 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MAZE (boss_maze)---------------------------
 //------------------------------------------------------------------------
-// REWORK - arcade-ghost homage, rebuilt as a full haunted-cabinet gauntlet.
-// A gang of four ghosts with their own brains hunts you through marching
-// pellet walls, a rising shadow labyrinth and lights-out darkness - then,
-// at the very end, the arcade finally catches up: GAME OVER.
-//
-//   Phase 1 (100–60%) - GHOST GANG. Four ghosts, four brains: one chases,
-//                       one ambushes where you are heading, one flanks
-//                       sideways, one wanders hungrily. Every few seconds
-//                       the whole gang SCATTERS to its corners (arcade
-//                       rules) - breathe, then move. Learn all four or be
-//                       surrounded.
-//                       Plus DOT WALLS. Walls of glowing pellets march
-//                       across the arena with a single gap. Slip the gap -
-//                       pellets sting!
-//   Phase 2 ( ≤60%)   - THE LABYRINTH. Shadow wall segments rise out of
-//                       the floor and linger, building a temporary maze
-//                       while the gang keeps hunting. Route around them!
-//                       Plus LIGHTS OUT. The arena goes dark and only
-//                       drifting ghost eyes glow. Do NOT touch the eyes.
-//                       Everything else gets faster and meaner.
-//   Phase 3 ( ≤30%)   - Fuller labyrinths, more eyes, faster walls, a
-//                       hungrier gang. The cabinet wants its quarter.
-//   Finale ( ≤10%)    - GAME OVER (one-shot set-piece): the boss goes
-//                       immune and shielded and TREMBLES while a CRT
-//                       scanline overlay swallows the arena. On every
-//                       metronome beat a shadow circle marks YOUR position
-//                       and the whole gang CONVERGES on it - 3 slams with
-//                       a growing final circle, then one giant CHOMP.
-//                       NEVER stand still! Charge bar frozen for the whole
-//                       set-piece (gate in _egTickPlayer via
-//                       _egMzFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Rework haunted-cabinet gauntlet: a four-brain ghost gang, marching pellet
+// walls with one gap, a rising shadow labyrinth, and lights-out darkness.
+// GAME OVER at ≤10%: the gang converges on your position 3 times, then
+// one giant CHOMP - never stand still.
 //------------------------------------------------------------------------
 
 export const _EG_MZ_DEBUG_SLOW = false;
