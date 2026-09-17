@@ -5,41 +5,13 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egN
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BLOOM (boss_bloom)-------------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK - "The Garden's Verdict". Malenia homage, deepened: the
-// arena is a GARDEN that grows whether you fight or not. Scars you carve
-// by dodging blooms are the only ground you truly own. Element: fire (keep
-// - scarlet rot).
+// Tier-8 rework "The Garden's Verdict": blooms track you until the petal
+// freeze, then plant rot gardens that multiply untended. Seed volleys and
+// the withering veil join at 60%; FULMINATION at ≤10% carves scars until
+// three open the one true gap.
 //
-//   • SCARLET BLOOMS (signature, all fight) - flowers open where you STAND
-//     (not where you were: the marker tracks you until the petal-freeze
-//     instant, then it's yours). The burst is only half of it: each bloom
-//     plants a ROT GARDEN whose stamen sweeps a slow rotor beam and, once
-//     per garden, reaches CRITICAL MASS - it bursts into seed pods, and the
-//     first two pods that settle plant NEW rot gardens. Untended, the
-//     garden takes over.
-//   • SEED VOLLEY (60%) - three seed pods arc across the arena and plant
-//     three fresh rot gardens in a line toward you.
-//   • WITHERING BLOOM (60%, once) - the Scarlet Veil, upgraded: the puzzle
-//     grid is hidden behind a blooming veil. Every cell you fill wilts the
-//     veil a little (visible progress: the veil thins); every mistake
-//     regrows it (petals rain back in). The puzzle is the pruning.
-//   • 🌸 FULMINATION (≤10%, one-shot finale) - the boss curls shut and
-//     blooms from EVERY direction: petal-chains crawl along radial lanes
-//     while a judgment-bloom stamps your position each beat. Each dodge
-//     carves one SCAR - three scars open the ONE TRUE GAP, the only safe
-//     wedge, and THE LAST BLOOM detonates everything outside it. Charge
-//     bar frozen (gate in _egTickPlayer via _egBlmFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (corrupt_cells, fated_cell) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Bloom's timing 2.5x so manual playtests / screenshot
