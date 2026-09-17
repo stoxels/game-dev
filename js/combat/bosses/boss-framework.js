@@ -2,33 +2,27 @@ import { t } from '../../translation/translations.js';
 import { _egRenderPanel } from '../encounter.js';
 import { _egApplyMapModsToMonster, _egGetActiveMapModValue } from '../../endgame/endgame-map-launch.js';
 import { _egBossTimers, _egIsActive } from '../combat-state.js';
-// NOTE: no imports from boss-*.js files here on purpose. The per-boss
-// teardown fns below resolve lazily via globalThis (same dynamic dispatch
+// NOTE: no imports from per-boss boss files here on purpose (the data
+// table ./boss-teardown-hooks.js is exempt - it imports nothing, so it
+// cannot cycle). The per-boss teardown fns resolve lazily via globalThis
+// (same dynamic dispatch
 // as window[mech.handler]): a static import would cycle framework ->
 // boss -> framework, running the boss's top-level Object.assign(EG_BOSS_*)
 // while these consts are still in their temporal dead zone and aborting
 // the whole entry (the step-5 SKILL_REGISTRY lesson).
 import { _egBlastTeardownAll, _egClearAllCorruptedCells, _egClearAllFrozenCells, _egClearPriorBombFuses, _egClearShiftGlows, _egNkTeardownBoss, _egRemoveClueSwap, _egRemoveGridInvert } from './shared-boss-abilities.js';
 import { _egClearFateMarks, _egRemoveClueScramble, _egRemoveFogBank, _egRemoveVeil, _egTitheTeardown } from './shared-puzzle-mechanics.js';
+import { EG_BOSS_TEARDOWN_HOOKS } from './boss-teardown-hooks.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME BOSS FRAMEWORK-------------------------------
 //------------------------------------------------------------------------
-// Load order (see index.html):
-//   1. boss-framework.js      (this file - registries, scaling, engine, scheduling)
-//   2. shared-boss-abilities.js (mechanics shared by 2+ bosses + shared engines)
-//   3. boss-<id>.js           (one file per boss: data + mechanics + unique moves)
-//
-// To add a new boss:
-//   1. Copy js/combat/bosses/boss-template.js (or any boss-*.js) to boss-<id>.js
-//   2. Change the EG_BOSS_DEFS / EG_BOSS_MECHANICS entries to your new id
-//   3. Put boss-unique handlers in that file; shared moves stay in
-//      shared-boss-abilities.js and are referenced by handler name string
-//   4. Add the file to tools/module-manifest.json (exports + `bridge` for
-//      every `handler:` name string, so window[handler] dispatch keeps
-//      working - dev/scratch/gen-bosses-bridges.mjs derives both), then run
-//      the full gate (lint + tests + phase2:verify + build). No index.html
-//      change: the entry imports manifest modules directly.
+//------------------------------------------------------------------------
+// Registries, scaling, lifecycle, phases and scheduling for all bosses.
+// Per-boss files register via Object.assign(EG_BOSS_DEFS/MECHANICS); the
+// teardown table lives in ./boss-teardown-hooks.js. To add a boss, copy
+// boss-template.js, list exports + handler bridges in module-manifest.json,
+// then run the full gate (lint + tests + phase2:verify + build).
 //------------------------------------------------------------------------
 
 
@@ -40,7 +34,7 @@ export const EG_BOSS_MECHANICS = {};
 
 // Boss level scaling 
 // Applied per level above 1. 
-export const EG_BOSS_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1 - retuned after the
+export const EG_BOSS_LEVEL_HP_SCALE = 0.28; // +28% HP per level above 1
 
 
 export const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
@@ -88,8 +82,6 @@ export const EG_BOSS_SOFT_ENRAGE_DMG_STEP = 0.08;     // +8% damage per stack
 export const EG_BOSS_SOFT_ENRAGE_MAX_STACKS = 10;     // hard cap: +80% damage
 
 
-// ── Phase display names (indexed by phase number) ────────────────────────────
-// Index 0 is unused. Add entries here as you add more phases to any boss.
 // ── Phase display names (translation keys, indexed by phase number) ──────────
 // Index 0 is unused. Add entries here as you add more phases to any boss.
 export const EG_BOSS_PHASE_NAMES = ['', 'eg_phase_1', 'eg_phase_2_enrage', 'eg_phase_3_fury', 'eg_phase_4_finale'];
@@ -228,158 +220,8 @@ export function _egBossInit(monster) {
 }
 
 
-// Per-boss teardown hooks: [monsterIdPrefix, globalTeardownFn, exactMatch?].
-// A hook fires when the monster id matches (prefix match unless
-// exactMatch) and the named teardown is a global function. Boss files
-// load AFTER this file, so the functions resolve at cleanup time - that
-// is also why every entry keeps the typeof guard (a boss file that fails
-// to load must not break cleanup). Keeps _egBossCleanup free of per-boss
-// if-blocks: a new boss only adds one array entry.
-export const EG_BOSS_TEARDOWN_HOOKS = [
-    // Brutus: sacrificial zombies roam in their own layer until he dies or
-    // the encounter stops - tear them down exactly when that happens (this
-    // hook never fires for individual zombie kills: their ids differ).
-    // PREFIX match is required: live boss ids carry a spawn counter suffix
-    // (boss_brutus_7), so an exact match would never fire and the roaming
-    // zombie cards would survive into the hub / boss overview.
-    ['boss_brutus', '_egBrutusZombieTeardown'],
-    // The Dynamo: lightning conductors and beam network.
-    ['boss_dynamo', '_egDynamoTeardown'],
-    // The Gust: persistent storm-siege arena (lanes, water, clouds) plus
-    // the wind-lane charge-pause latch.
-    ['boss_gust', '_egGustTeardown'],
-    // The Marksman: HP-gate watcher + any running Arrow Gauntlet (bow
-    // walls, flying arrows, countdown overlay, charge-bar pause).
-    ['boss_marksman', '_egMarksmanTeardown'],
-    // The Puddle: persistent weather arena (rain, rising water, fountains,
-    // air bubbles + burst shrapnel).
-    ['boss_puddle', '_egPuddleTeardown'],
-    // The Sprout: persistent garden arena (root vines, spore drift,
-    // bramble wall whips, doom bud blooms + pollen dust).
-    ['boss_sprout', '_egSproutTeardown'],
-    // The Bumper: persistent carnival arena (roaming bumpers, pinball
-    // shower, flipper frenzy bands, multiball rush + slam rings).
-    ['boss_bumper', '_egBumperTeardown'],
-    // The Centipede: persistent colony arena (winding body, molt mini,
-    // tunnel mounds, exoskeleton plates, venom blobs + pools).
-    ['boss_centipede', '_egCentipedeTeardown'],
-    // The Striker: persistent pitch arena (homing match ball, corner-kick
-    // barrage, penalty shootout, free-kick charge attack).
-    ['boss_striker', '_egStrikerTeardown'],
-    // The Thwomp: persistent fortress arena (hovering block, quake stomps,
-    // ceiling collapse, mini-thwomp siege, grand slam charge attack).
-    ['boss_thwomp', '_egThwompTeardown'],
-    // The Coil: persistent serpent nest (coiled maw, seeker serpents,
-    // venom trails, constrictor rings, serpent tide, cobra strike).
-    ['boss_coil', '_egCoilTeardown'],
-    // The Dancer: persistent ballroom (mirror ball, spotlight steps,
-    // rhythm ribbons, curtain call patches, petal storm, pirouette rings).
-    ['boss_dancer', '_egDancerTeardown'],
-    // The Gale: persistent storm (wandering eye, crosswind, cyclone
-    // funnels, tornado ladder, contracting rings, cyclone lance).
-    ['boss_gale', '_egGaleTeardown'],
-    // The Gambler: persistent casino (house chips, card volleys, wheel of
-    // fortune, jackpot rush, russian roulette mark).
-    ['boss_gambler', '_egGamblerTeardown'],
-    // The Gourmet: persistent tasting menu (drifting maw, aroma inhale,
-    // sizzling plate + grease pools, dinner service, banquet, devour).
-    ['boss_gourmet', '_egGourmetTeardown'],
-    // The Lodestone: persistent magnetic field (drifting stone, polarity
-    // drag + flip pulses, filings, vortex, railgun, leash).
-    ['boss_lodestone', '_egLodestoneTeardown'],
-    // The Stack: persistent construction site (tetromino core, soft/hard
-    // drops, floor terrain, line clears, garbage rise).
-    ['boss_stack', '_egStackTeardown'],
-    // The Tactician: persistent chess siege (gliding queen, battle
-    // intents, pawn marches, check lanes, zugzwang, checkmate walls).
-    ['boss_tactician', '_egTacticianTeardown'],
-    // The Bomber (rework): mine field, keeper run, TOTAL CARPET set-piece
-    // and the flying presentation (target pip).
-    ['boss_bomber', '_egBmbTeardown'],
-    // The Creeper (rework): creeper packs, TNT chains, SSSS…BOOM set-piece
-    // and the primed-boss presentation.
-    ['boss_creeper', '_egCrpTeardown'],
-    // The Buzzsaw (rework): ricochet saws, cut lines, saw traps, pendulum
-    // blades and the FINAL CUT set-piece.
-    ['boss_buzz', '_egBzTeardown'],
-    // The Encore (rework): encore circles, EQ slams, stage lights, beat
-    // mines and the CURTAIN CALL set-piece.
-    ['boss_encore', '_egEnTeardown'],
-    // The Medusa (rework): stone gaze, snake strikes, petrify waves, coil
-    // cage and THE STARE set-piece.
-    ['boss_medusa', '_egMdTeardown'],
-    // The Maze (rework): ghost gang, dot walls, the labyrinth, lights-out
-    // eyes and the GAME OVER set-piece.
-    ['boss_maze', '_egMzTeardown'],
-    // The Monsoon (rework): rain bands, thunderbolts, storm surge, hail
-    // barrage and the GREAT FLOOD set-piece.
-    ['boss_monsoon', '_egMnTeardown'],
-    // The Needle (rework): spike gates, pin drops, stitch wave, pincushion
-    // burst and the FINAL STITCH set-piece.
-    ['boss_needle', '_egNdTeardown'],
-    // The Aegis (rework): aegis protocol, shield charge, sentry shields,
-    // guard rotor and the LAST BASTION set-piece.
-    ['boss_aegis', '_egAgTeardown'],
-    // The Gridlock (rework): laser lattice, signal scramble, surge chaser
-    // and the SYSTEM LOCKDOWN set-piece.
-    ['boss_gridlock', '_egGlTeardown'],
-    // The Jester (rework): bouncing mayhem, card toss, juggler's jinx and
-    // the GRAND FINALE set-piece.
-    ['boss_jester', '_egJsTeardown'],
-    // The Shaper (rework): glacier rift, frost monoliths, ice walkers and
-    // the SHAPED WINTER set-piece.
-    ['boss_shaper', '_egShpTeardown'],
-    // The Siren (rework): wail beam patterns, undertow, siren's reply and
-    // the DEADLY ARIA set-piece.
-    ['boss_siren', '_egSireTeardown'],
-    // The Swarm (rework): swarm arcs, mimic queen, hive eye blooms and the
-    // SWARM SINGULARITY set-piece.
-    ['boss_swarm', '_egSwTeardown'],
-    // The Colossus (rework): stride footfalls, boulders, golems and the
-    // TITAN'S FALL set-piece.
-    ['boss_colossus', '_egColoTeardown'],
-    // Bayes (rework): belief meter, gambit board, veil chip and the veil
-    // itself (the shared _egRemoveVeil lives in shared-boss-abilities.js).
-    ['boss_bayes', '_egBayTeardown'],
-    // Entropy (rework): order meter, pools/zones/cells, door auras and the
-    // LAST DEGREE set-piece.
-    ['boss_entropy', '_egEntrTeardown'],
-    // Laplace (rework): ghost corridors, branches, the movement clone and
-    // the CLOSED TIMELINE set-piece.
-    ['boss_laplace', '_egLapTeardown'],
-    // The Inferno (rework): heat meter, tides/tiles/hazes and the
-    // SUPERVOLCANIC WINTER set-piece.
-    ['boss_inferno', '_egInfVTeardown'],
-    // The Null (rework): lattice lines, erasure markers, rays and the
-    // PROOF BY CONTRADICTION set-piece. Also owns the legacy blackout and
-    // void-surge teardowns the framework typeof-guards.
-    ['boss_null', '_egNulTeardown'],
-    // The Barrage (rework): shelling curtain, supply jammers, shot shells
-    // and the FINAL BOMBARDMENT set-piece.
-    ['boss_barrage', '_egBarTeardown'],
-    // The Bloom (rework): rot gardens, stamen rotors, seed pods and the
-    // FULMINATION set-piece.
-    ['boss_bloom', '_egBlmTeardown'],
-    // The Minotaur (rework): labyrinth walls, hoof craters, dust storms,
-    // Ariadne threads and the WARDEN'S LABYRINTH set-piece.
-    ['boss_minotaur', '_egMntTeardown'],
-    // The Overfitter (rework): gradient sweeps, pattern replays,
-    // validation rings and the FINAL EPOCH heat-map set-piece.
-    ['boss_overfitter', '_egOvrTeardown'],
-    // The Razor (rework): cyclone blades, razor wires, whetstones and the
-    // A THOUSAND EDGES spoke-clock set-piece.
-    ['boss_razor', '_egRzrTeardown'],
-    // The Shrine Maiden (rework): knot barriers, mirror spirits, ofuda
-    // wards and the THOUSAND ARMS talisman-grid set-piece.
-    ['boss_shrine', '_egShrTeardown'],
-    // The Stormcaller (rework): ion currents, chain lightning, the storm
-    // eye grid and the PERFECT STORM charge-bullet set-piece.
-    ['boss_sirus', '_egSirTeardown'],
-    // The Vise (rework): breathing crushing walls, the bench vise jaws,
-    // quench casts and the FULL CLAMP safe-slab set-piece (replaces the
-    // legacy _egCrushTeardown corridor hook).
-    ['boss_vise', '_egVisTeardown'],
-];
+// Teardown registry lives in ./boss-teardown-hooks.js (imported above).
+// _egBossCleanup + _egValidateAllBossHandlers read it from there.
 
 
 // Cancels all mechanic timers for a specific boss and cleans up any
@@ -413,8 +255,8 @@ export function _egBossCleanup(monsterId) {
     // overlay, banner, charge-bar freeze) while it runs - drop it with the
     // boss. Runs on boss death and on encounter stop via _egBossCleanupAll.
     if (typeof globalThis._egCrashTeardown === 'function') globalThis._egCrashTeardown();
-    // Per-boss field-effect teardowns - registry-driven
-    // (EG_BOSS_TEARDOWN_HOOKS above; entries keep their own typeof guard).
+    // Per-boss field-effect teardowns - registry-driven (table in
+    // ./boss-teardown-hooks.js; entries keep their own typeof guard).
     for (let i = 0; i < EG_BOSS_TEARDOWN_HOOKS.length; i++) {
         const hook = EG_BOSS_TEARDOWN_HOOKS[i];
         const matches = hook[2] ? monsterId === hook[0] : monsterId.startsWith(hook[0]);
