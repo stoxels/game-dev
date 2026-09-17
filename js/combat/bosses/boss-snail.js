@@ -9,31 +9,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SNAIL (boss_snail)-------------------------------
 //------------------------------------------------------------------------
-// First-steps fight: a single, VERY slow homing snail. It cannot be
-// outrun forever - but it can barely catch you either. Teaches kiting:
-// keep moving in wide arcs and never corner yourself.
-//
-// The Doom Snail now stays until it is dealt with:
-//   • It has NO duration - it follows you until it crashes into a
-//     CORRUPTED grid cell, which banishes it (and cleans that corruption
-//     in the process).
-//   • While it crawls over the grid it randomly SLIMES cells. Slimed
-//     cells block ALL interaction until swept clean.
-//   • The BROOM sits outside the grid. Walk over it to pick it up and
-//     stand on a slimed cell for EG_SNAIL_SWEEP_MS to clean it. Holding
-//     the broom slows you to a crawl and freezes your auto-attack charge
-//     so the snail can catch up - press the parry key (R by default) to drop it.
-//   • At ≤20% HP: SNAILGEDDON - a 5-second warning, then the player is
-//     yanked to the grid centre while a closing frame of snails traps them.
-//     A wedge of snails lags far behind, tearing a wide, player-sized
-//     escape gap in the ring.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// First-steps boss: one VERY slow homing snail. Lure it into a corrupted
+// cell to banish it; sweep slimed cells with the broom. At ≤20% HP the
+// SNAILGEDDON ring closes in - escape through the slow wedge. Shared
+// moves are referenced by handler-name string (shared-boss-abilities.js).
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -567,8 +546,6 @@ export function _egSnailBroomTick() {
 
     // Held: sweeping a slimed cell accumulates standing time.
     const b = held;
-
-    // Held: sweeping a slimed cell accumulates standing time.
     const slimed = _egSnailSweepTarget(pr, b.sweepKey);
     const key = slimed ? (slimed.r + '-' + slimed.c) : null;
 
