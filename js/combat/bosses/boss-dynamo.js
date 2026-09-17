@@ -9,23 +9,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DYNAMO (boss_dynamo)---------------------------
 //------------------------------------------------------------------------
-// Spark-Mandrill homage: jagged lightning pillars crackle through the
-// arena - vertical in P1, horizontal from 50% HP, diagonal from 25% HP.
-// Every pillar is independently randomized (stratified lanes + per-bolt
-// timing offsets) so casts never line up into a grid.
-//
-// Lightning Conductors: attackable socket monsters the boss charges with a
-// live beam network. Beams arc boss→conductor and conductor↔conductor; the
-// field inside the network shocks heavily. Kill conductors to reclaim
-// ground, or risk the field and burn the boss down.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb, …)
-// live in shared-boss-abilities.js and are referenced by handler name.
+// Spark-mandrill homage: randomized lightning pillars (vertical, then
+// horizontal from 50%, diagonal from 25%) plus attackable Lightning
+// Conductors wired by a beam network - kill them to reclaim ground or
+// burn the boss down inside the field.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -858,7 +845,3 @@ export function _egPointInPolygon(point, polygon) {
     }
     return inside;
 }
-
-// _egPtSegDist (point-to-segment distance) is defined ONCE, in
-// shared-boss-abilities.js - the identical local copy was removed 2026-09
-// (it shadowed the shared one via load order).
