@@ -3,20 +3,28 @@
 // bare cross-file references - import explicitly or use globalThis.X for
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
-// =============================================================================
-// storyline-intro-stox.js - The Cartographers of Chance
-// ---------------------------------------------------------------------------
-// Character intro data for Stox ("The Analyst").
-// Depends on: storyline-engine.js (_wordsFromLine, MAX_SONG_SECTION_LINES,
-// DEFAULT_SLIDE_DURATION_MS etc.) - must load AFTER that file.
+//------------------------------------------------------------------------
+//-------------------STOX INTRO DATA - "THE CARTOGRAPHERS OF CHANCE"------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Character intro data for Stox ("The Analyst"): the audio/image/lyric
+// timeline of his intro cinematic. Pure data module - no imports, no
+// logic. storyline-beats.js wires STOX_INTRO_SONG into the beat gallery;
+// storyline-engine.js consumes it at playback and resolves each line's
+// timed words via _wordsFromLine (same machinery as INTRO_SONG).
+
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE------------------------------------
+//------------------------------------------------------------------------
 
 // Folder where Stox's intro images live (relative to your index.html)
 export const STOX_INTRO_IMAGE_PATH = "images/Intro/Stox_Intro/";
 
 
-// ---------------------------------------------------------------------------
-// SONG BEAT - karaoke-style Stox intro
-// ---------------------------------------------------------------------------
+//------------------------------------------------------------------------
+//-------------------SONG BEAT - KARAOKE-STYLE STOX INTRO-----------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
 //
 // STOX_INTRO_SONG - timed from Stox_Intro_Song.srt. Each line's start/end
 // comes directly from the SRT (real vocal timing), with start times rounded
@@ -29,12 +37,9 @@ export const STOX_INTRO_IMAGE_PATH = "images/Intro/Stox_Intro/";
 // way: round each cue's start down to the nearest 500ms, keep its real end,
 // and emit one _wordsFromLine(...) call per cue.
 //
-// The `images` timeline below is the final 30-image set (see
-// stox-intro-image-prompts.md for what each one depicts and why it's timed
-// where it is). Filenames are matched to their original shot-list slot
-// numbers, but the array is ordered chronologically by `time` (slot 27 fires
-// before slot 26, since "He is finished waiting" lands earlier in the song
-// than "The archive kept its secrets..."). If you regenerate or reorder any
+// The `images` timeline below is the final 31-image set. Filenames are
+// matched to their original shot-list slot numbers, and the array is
+// ordered chronologically by `time`. If you regenerate or reorder any
 // images, keep this array sorted by ascending `time`.
 export const STOX_INTRO_SONG = {
     audio: "audio/Intro/Stox_Intro_Song.ogg",
