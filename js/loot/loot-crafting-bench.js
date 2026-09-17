@@ -1,10 +1,10 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { LANG, t } from '../translation/translations.js';
-import { _egCraftingBenchCostFor } from './endgame-crafting-costs.js';
-import { EG_MOD_CAPS, _egGetModTable } from './endgame-equipment-generator.js';
-import { _egRenderCurrencyCell } from './endgame-hub-drag-and-drop.js';
-import { _egBuildItemChipHTML, _egCurrencyDefForId, _egCurrencySlotForId, _egCurrencyStash, _egRenderAll, _egShowStashInfo, _egUpdateCraftingBenchLauncherSlot, egSaveHubState } from './endgame-hub.js';
-import { _egBuildItemName, _egBuildRolledStats, _egFamilyAllowedOnBase } from './endgame-mod-application.js';
+import { _egCraftingBenchCostFor } from './loot-crafting-costs.js';
+import { EG_MOD_CAPS, _egGetModTable } from './loot-equipment-generator.js';
+import { _egRenderCurrencyCell } from '../endgame/endgame-hub-drag-and-drop.js';
+import { _egBuildItemChipHTML, _egCurrencyDefForId, _egCurrencySlotForId, _egCurrencyStash, _egRenderAll, _egShowStashInfo, _egUpdateCraftingBenchLauncherSlot, egSaveHubState } from '../endgame/endgame-hub.js';
+import { _egBuildItemName, _egBuildRolledStats, _egFamilyAllowedOnBase } from './loot-mod-application.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.

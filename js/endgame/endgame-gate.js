@@ -7,7 +7,7 @@ import { _egClearTooltip } from './endgame-hub-tooltips.js';
 import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, EG_MAP_TIER_ROMANS, _egBuildItemChipHTML, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencyStash, _egGetCellFill, _egGetMapStashRowsForTier, _egGetMapTierGrid, _egMapStash, _egRenderCurrencyStash, egSaveHubState, ensureEndgameHubScreen } from './endgame-hub.js';
 import { EG_LEVELING_CONFIG, _egGetPlayerLevel, _egGetPlayerXP, _egGetUnspentPoints, _egGetXpForNextLevel } from './endgame-leveling.js';
 import { _egLaunchMapFromDevice } from './endgame-map-launch.js';
-import { EG_MAP_MOD_TABLES, _egGetMapModRewards, _egMapModAffects } from './endgame-maps.js';
+import { EG_MAP_MOD_TABLES, _egGetMapModRewards, _egMapModAffects } from '../loot/loot-maps.js';
 import { EG_SCREEN_NAV, _egResolveBackFn } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------

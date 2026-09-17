@@ -10,20 +10,20 @@ import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { EG_ART } from '../endgame/endgame-art.js';
 import { _egGetElementCentre } from './combat-class-projectiles.js';
-import { _egTryDropCurrency } from '../endgame/endgame-currency.js';
+import { _egTryDropCurrency } from '../loot/loot-currency.js';
 import { _egGetMapRequirements, _egUpdateObjectivesHUD } from './encounter-chain.js';
-import { _egGenerateEquipmentDrop } from '../endgame/endgame-equipment-generator.js';
-import { _egTryDropEssence, egAddEssence } from '../endgame/endgame-essences.js';
-import { _egStopGoldDrops } from '../endgame/endgame-gold.js';
+import { _egGenerateEquipmentDrop } from '../loot/loot-equipment-generator.js';
+import { _egTryDropEssence, egAddEssence } from '../loot/loot-essences.js';
+import { _egStopGoldDrops } from '../loot/loot-gold.js';
 import { egAddCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
 import { _egAddUniqueToCollection } from '../endgame/endgame-hub-uniques.js';
 import { EG_INV_COLS, _egAddItemToStash, _egInventory, _egRebuildInventoryGrid, _egRenderInventory, _egRenderUniqueStash, egSaveHubState } from '../endgame/endgame-hub.js';
-import { _egLootFilterAutoVendor } from '../endgame/endgame-loot-filter.js';
+import { _egLootFilterAutoVendor } from '../loot/loot-filter.js';
 import { _egActiveMapItem, _egGetActiveMapModValue, _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
-import { EG_MAX_MAP_TIER, _egCheckMapDropClaim, _egMapDrops, _egStopMapDrops, _egTryDropMap } from '../endgame/endgame-maps.js';
+import { EG_MAX_MAP_TIER, _egCheckMapDropClaim, _egMapDrops, _egStopMapDrops, _egTryDropMap } from '../loot/loot-maps.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egCurrencyDrops, _egIsActive, _egItemDrops, _egLootDrops, _egPickupSpawnerInfo, _egPickups } from './combat-state.js';
-import { _egTryGenerateUniqueDrop } from '../endgame/endgame-unique-items.js';
+import { _egTryGenerateUniqueDrop } from '../loot/unique-items.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.

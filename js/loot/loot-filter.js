@@ -2,10 +2,10 @@ import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
-import { EG_SLOT_MOD_TABLE_MAP } from './endgame-equipment-generator.js';
-import { EG_INV_COLS, _egInventory, egSaveHubState } from './endgame-hub.js';
-import { EG_SHARD_DEFS, _egRollShardForItem, egAddShard } from './endgame-shards.js';
+import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
+import { EG_SLOT_MOD_TABLE_MAP } from './loot-equipment-generator.js';
+import { EG_INV_COLS, _egInventory, egSaveHubState } from '../endgame/endgame-hub.js';
+import { EG_SHARD_DEFS, _egRollShardForItem, egAddShard } from './loot-shards.js';
 import { _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------

@@ -9,7 +9,7 @@ import { _egFlushRunLootToStash } from './combat/combat-grid-pickups.js';
 import { egSaveHubState } from './endgame/endgame-hub.js';
 import { EG_LEVELING_CONFIG, _egAwardXP, _egCalcXpMultiplier, _egCampaignExpectedLevel, _egGetPlayerLevel, _egGetXpForNextLevel, _egGrantCampaignLevelXP } from './endgame/endgame-leveling.js';
 import { _egPickMapRunSeedGi } from './endgame/endgame-map-launch.js';
-import { _egBankUnclaimedMapDrops } from './endgame/endgame-maps.js';
+import { _egBankUnclaimedMapDrops } from './loot/loot-maps.js';
 import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
 import { WORLDS } from './levels/level-world-data.js';
 import { ALL, WORLD_START_GI, isNexusPointLevel, isNexusWorld } from './levels/levels.js';

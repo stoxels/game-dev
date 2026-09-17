@@ -1,11 +1,11 @@
 import { LANG, t } from '../translation/translations.js';
 import { EG_ART } from './endgame-art.js';
-import { _egShowTooltip } from './endgame-currency.js';
+import { _egShowTooltip } from '../loot/loot-currency.js';
 import { EG_SLOT_ACCEPTS, _dndFindTargetSlot } from './endgame-hub-drag-and-drop.js';
 import { _egEquipped } from './endgame-hub.js';
 import { _egBuildMergedModLines, _egGetAllEquippedItems, _egGetItemEffectiveAttackInterval, _egGetItemEffectiveBlockChance, _egGetItemEffectiveDamage, _egGetItemEffectiveDefenses } from './endgame-player-stats.js';
-import { EG_PLAYER_BASE_ATTRIBUTES, _egCheckHandCompatibilityInSlot, _egGetSwapChainBreak, _egGetUnmetRequirementsText, _egGetWeaponHands, _egHandErrorMessage, _egPreviewEquipAttributes } from './endgame-requirements.js';
-import { _egGetUniqueSpecialLines, _egInferWeaponHands } from './endgame-unique-items.js';
+import { EG_PLAYER_BASE_ATTRIBUTES, _egCheckHandCompatibilityInSlot, _egGetSwapChainBreak, _egGetUnmetRequirementsText, _egGetWeaponHands, _egHandErrorMessage, _egPreviewEquipAttributes } from '../loot/loot-requirements.js';
+import { _egGetUniqueSpecialLines, _egInferWeaponHands } from '../loot/unique-items.js';
 
 //  endgame-hub-tooltips.js
 //  HUB TOOLTIPS - extracted 2026-09-10 from endgame-hub.js

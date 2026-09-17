@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _egFindFreeInvCell, _egInventory, _egRenderInventoryCell, _egRenderUniqueStash, _egStashTab, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
-import { EG_UNIQUE_ITEMS } from './endgame-unique-items.js';
+import { EG_UNIQUE_ITEMS } from '../loot/unique-items.js';
 
 //  endgame-hub-uniques.js
 //  UNIQUE COLLECTION - extracted 2026-09-10 from endgame-hub.js

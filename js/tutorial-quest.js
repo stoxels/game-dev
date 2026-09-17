@@ -3,14 +3,14 @@ import { cooldownState, startSlotCooldown } from './classes/class-cooldown-state
 import { _getAbilityManaCost, _getPlayerMaxMana, canAffordMana, spendMana, updateClassHUDManaBar } from './classes/class-mana.js';
 import { _egOnPause, _egOnResume } from './combat/encounter-tick.js';
 import { _egAnimatePlayerProjectile, _egDamageTargetById, _egGetTarget, _egSpawnMonster, _egStopEncounter } from './combat/encounter.js';
-import { EG_ALL_BASE_TYPES } from './endgame/endgame-equipment-base-items.js';
+import { EG_ALL_BASE_TYPES } from './loot/equipment-base-items.js';
 import { _egCellHasAnyDrop, _egDropHeartPickup, _egFlushRunLootToStash, _egRenderLootOverlay } from './combat/combat-grid-pickups.js';
 import { _egAddItemToStash, _egInventory, closeHubToGame, egSaveHubState, isHubGameOverlay, openHubFromGame, showEndgameHub } from './endgame/endgame-hub.js';
 import { _egGetAllocatedAttributes, _egGetPlayerLevel } from './endgame/endgame-leveling.js';
 import { EG_PLAYER_STATS, _egComputePlayerStats, _egGetAllEquippedItems } from './endgame/endgame-player-stats.js';
 import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
 import { _egLootDrops, _egPickups } from './combat/combat-state.js';
-import { EG_VENDOR_FREE_BASE_IDS, _egvBuildBaseItemFromBase, _egvGetSlotOrder } from './endgame/endgame-vendor.js';
+import { EG_VENDOR_FREE_BASE_IDS, _egvBuildBaseItemFromBase, _egvGetSlotOrder } from './loot/loot-vendor.js';
 import { renderCell, updClues } from './grid.js';
 import { keybindDisplayLabel, keybindKeyFor, onKeybindAction } from './keybinds.js';
 import { ALL } from './levels/levels.js';

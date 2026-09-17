@@ -2,7 +2,7 @@ import { trackAchStat } from '../achievements/achievements.js';
 import { save } from '../state.js';
 import { _egGetElementCentre } from '../combat/combat-class-projectiles.js';
 import { EG_LOOT_DROP_LIFETIME_MS, _egBuildPickupEligiblePool, _egCancelTrackedExpiry, _egCellHasAnyDrop, _egScheduleTrackedExpiry, _egStartDropExpireCountdown } from '../combat/combat-grid-pickups.js';
-import { _egMapLootQuantityMult } from './endgame-map-launch.js';
+import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import { _egIsActive } from '../combat/combat-state.js';
 
 'use strict';

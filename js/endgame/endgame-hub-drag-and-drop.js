@@ -1,12 +1,12 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { EG_ART } from './endgame-art.js';
-import { _egCloseCraftingBench, _egRefreshCraftingBench, _egSetCraftingBenchItem } from './endgame-crafting-bench.js';
-import { _egEssenceIdForSlot, _egRenderEssenceCell } from './endgame-essences.js';
+import { _egCloseCraftingBench, _egRefreshCraftingBench, _egSetCraftingBenchItem } from '../loot/loot-crafting-bench.js';
+import { _egEssenceIdForSlot, _egRenderEssenceCell } from '../loot/loot-essences.js';
 import { _egRenderMapSlot, _egRenderMapStash, _egRenderMapStashCell, _egSwitchMapStashTier } from './endgame-gate.js';
 import { _egClearTooltip } from './endgame-hub-tooltips.js';
 import { _egAddUniqueToCollection, _egUpdateUniqueTabBadge } from './endgame-hub-uniques.js';
 import { EG_CURRENCY_COLS, EG_INV_COLS, EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_ROMANS, _egAddItemToStash, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencySlotForId, _egCurrencyStash, _egEnsureInvRows, _egEnsureMapTierRows, _egEquipped, _egFindFreeInvCell, _egFindFreeMapCellForTier, _egGetInvRows, _egGetMapTierGrid, _egInventory, _egMapStash, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egRenderUniqueStash, _egShowStashInfo, _egStashTab, _egSwitchStashTab, _egUpdateCraftingBenchLauncherSlot, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
-import { _egCanEquipInSlot, _egCheckUnequipSlot, _egGetWeaponHands, _egIsTwoHandedWeapon, _egShowRequirementsToast, _egSimulateAndCheck, _egTryAutoUnequipOffhandForTwoHander } from './endgame-requirements.js';
+import { _egCanEquipInSlot, _egCheckUnequipSlot, _egGetWeaponHands, _egIsTwoHandedWeapon, _egShowRequirementsToast, _egSimulateAndCheck, _egTryAutoUnequipOffhandForTwoHander } from '../loot/loot-requirements.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME HUB DRAG AND DROP---------------------------

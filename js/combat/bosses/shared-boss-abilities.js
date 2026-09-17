@@ -5,7 +5,7 @@ import { t } from '../../translation/translations.js';
 import { _egUpdateObjectivesHUD } from '../encounter-chain.js';
 import { _egApplyPlayerHitFeedback, _egPlayerTakeDamage, _egRenderPanel, _egSpawnMonster } from '../encounter.js';
 import { _egHzPlayerHitbox, _egHzPlayerRect, _egHzPlayerSpriteRect } from '../combat-hazards.js';
-import { EG_MAP_TIER_MONSTER_LEVELS, EG_MAX_MAP_TIER, _egRollMapTier } from '../../endgame/endgame-maps.js';
+import { EG_MAP_TIER_MONSTER_LEVELS, EG_MAX_MAP_TIER, _egRollMapTier } from '../../loot/loot-maps.js';
 import { EG_MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
 import { _egActiveBlasts, _egBossCorrupted, _egBossFrozen, _egCellInBounds, _egIsActive, _egRecentFills } from '../combat-state.js';
 

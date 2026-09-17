@@ -29,10 +29,10 @@ import { renderSkillHotbar } from '../skills/skill-hotbar.js';
 import { pauseTimer, resumeTimer } from '../timer.js';
 import { LANG, t } from '../translation/translations.js';
 import { EG_ART } from './endgame-art.js';
-import { _egShowTooltip } from './endgame-currency.js';
+import { _egShowTooltip } from '../loot/loot-currency.js';
 import { _egOnPause, _egOnResume } from '../combat/encounter-tick.js';
 import { _egGetEncounterBaseLevel, _egGetTarget, _egRenderPanel } from '../combat/encounter.js';
-import { _egBuildEssenceTabHTML, _egRenderEssenceStash } from './endgame-essences.js';
+import { _egBuildEssenceTabHTML, _egRenderEssenceStash } from '../loot/loot-essences.js';
 import { _egRenderMapSlot, _egRenderMapStash } from './endgame-gate.js';
 import { _egFlushRunLootToStash } from '../combat/combat-grid-pickups.js';
 import { _egBindDragEvents, _egRenderCurrencyCell } from './endgame-hub-drag-and-drop.js';
@@ -42,14 +42,14 @@ import { EG_LEVELING_CONFIG, _egGetPlayerLevel, _egRenderLevelHUD } from './endg
 import { _egMapPlayerLifeMult } from './endgame-map-launch.js';
 import { showEndgameNexus } from './endgame-nexus.js';
 import { EG_PLAYER_STATS, _egBuildGroupedStats, _egCalcAccuracyMissChance, _egCalcArmourReductionPct, _egCalcEvasionDodgeChance, _egComputePlayerStats } from './endgame-player-stats.js';
-import { _egIsItemBlocked } from './endgame-requirements.js';
-import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, _egBuildCraftingBenchSlotHTML, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencyStash } from './hub-currency.js';
+import { _egIsItemBlocked } from '../loot/loot-requirements.js';
+import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, _egBuildCraftingBenchSlotHTML, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencyStash } from '../loot/hub-currency.js';
 import { _egPendingHandMigrationToast, _egShowHandMigrationToast } from './hub-load.js';
 import { _egCancelMassSellConfirm, _egCloseMassSellModal, _egInjectMassSellStyles } from './hub-mass-sell-modal.js';
 import { _egBuildItemChipHTML, _egShowItemLevel } from './hub-mass-sell.js';
 import { EG_INV_COLS, _egEnsureInvRows, _egEquipped, _egGetInvCapacity, _egGetInvRows, _egInventory, _egStashTab } from './hub-stash.js';
 import { _egBuildTopbarHTML, _egUpdateItemLevelToggleButton, _egUpdatePassiveTreeButton } from './hub-topbar.js';
-import { EG_UNIQUE_ITEMS } from './unique-item-data.js';
+import { EG_UNIQUE_ITEMS } from '../loot/unique-item-data.js';
 
 
 //------------------------------------------------------------------------
@@ -1238,7 +1238,7 @@ export {
     _egCurrencyIdForSlot,
     _egCurrencySlotForId,
     _egCurrencyStash,
-} from './hub-currency.js';
+} from '../loot/hub-currency.js';
 
 export {
     EG_MAP_STASH_COLS,

@@ -21,21 +21,21 @@ import { ACH_STATE, setAchStat } from '../achievements/achievements.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { egAtlasNodeById, egAtlasProgress } from './endgame-atlas.js';
-import { EG_CURRENCY_DEFS } from './endgame-currency.js';
-import { EG_ESSENCE_COLS, EG_ESSENCE_DEFS, EG_ESSENCE_ROWS, _egEssenceDefForId, _egEssenceIdForSlot, _egEssenceSlotForId } from './endgame-essences.js';
-import { egGetGold } from './endgame-gold.js';
+import { EG_CURRENCY_DEFS } from '../loot/loot-currency.js';
+import { EG_ESSENCE_COLS, EG_ESSENCE_DEFS, EG_ESSENCE_ROWS, _egEssenceDefForId, _egEssenceIdForSlot, _egEssenceSlotForId } from '../loot/loot-essences.js';
+import { egGetGold } from '../loot/loot-gold.js';
 import { _egEnsureUniqueStash } from './endgame-hub-uniques.js';
 import { _egShowStashInfo } from './endgame-hub.js';
-import { _egHealItemImplicits } from './endgame-implicits.js';
+import { _egHealItemImplicits } from '../loot/loot-implicits.js';
 import { _egGetPlayerLevel } from './endgame-leveling.js';
-import { _egLoadLootFilter } from './endgame-loot-filter.js';
-import { _egHealWeaponHands, _egIsTwoHandedWeapon, _egMigrateIllegalHandsToStash } from './endgame-requirements.js';
-import { EG_SHARD_DEFS } from './endgame-shards.js';
-import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, _egCurrencyDefForId, _egCurrencySlotForId, _egCurrencyStash } from './hub-currency.js';
+import { _egLoadLootFilter } from '../loot/loot-filter.js';
+import { _egHealWeaponHands, _egIsTwoHandedWeapon, _egMigrateIllegalHandsToStash } from '../loot/loot-requirements.js';
+import { EG_SHARD_DEFS } from '../loot/loot-shards.js';
+import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, _egCurrencyDefForId, _egCurrencySlotForId, _egCurrencyStash } from '../loot/hub-currency.js';
 import { EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, _egIsTieredMapStash, _egMakeAllMapStashes, _egMakeMapTierGrid, _egMapStash, _egMapTierToIndex } from './hub-map-stash.js';
 import { _egLoadMassSellSettings, _egMassSellKeep, _egMassSellKeepUnique, _egMassSellMinItemLevel, _egMassSellMinReqLevel } from './hub-mass-sell.js';
 import { EG_INV_COLS, EG_INV_INITIAL_ROWS, _egEnsureInvRows, _egEquipped, _egInventory } from './hub-stash.js';
-import { _egHealUniqueItem } from './unique-item-logic.js';
+import { _egHealUniqueItem } from '../loot/unique-item-logic.js';
 
 
 

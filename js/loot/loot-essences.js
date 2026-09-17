@@ -1,14 +1,14 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { LANG, t } from '../translation/translations.js';
-import { _egCancelCurrencyUse, _egPendingCurrencyUse } from './endgame-currency.js';
-import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
-import { EG_MOD_CAPS, EG_SLOT_MOD_TABLE_MAP, _egGetModTable } from './endgame-equipment-generator.js';
+import { _egCancelCurrencyUse, _egPendingCurrencyUse } from './loot-currency.js';
+import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
+import { EG_MOD_CAPS, EG_SLOT_MOD_TABLE_MAP, _egGetModTable } from './loot-equipment-generator.js';
 import { _egSpawnCurrencyDrop } from '../combat/combat-grid-pickups.js';
-import { _dndBuildCurrencyChipHTML, _dndChipScreenEl } from './endgame-hub-drag-and-drop.js';
-import { _egClearTooltip } from './endgame-hub-tooltips.js';
-import { _egEquipped, _egInventory, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, egSaveHubState } from './endgame-hub.js';
-import { _egMapLootQuantityMult } from './endgame-map-launch.js';
-import { EG_LOCAL_DEFENSE_FAMILY_STATS, _egBuildItemName, _egBuildModPool, _egBuildRolledStats, _egEligibleTiers, _egFamilyAllowedOnBase, _egPickModFromPool, _egPickTier } from './endgame-mod-application.js';
+import { _dndBuildCurrencyChipHTML, _dndChipScreenEl } from '../endgame/endgame-hub-drag-and-drop.js';
+import { _egClearTooltip } from '../endgame/endgame-hub-tooltips.js';
+import { _egEquipped, _egInventory, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, egSaveHubState } from '../endgame/endgame-hub.js';
+import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
+import { EG_LOCAL_DEFENSE_FAMILY_STATS, _egBuildItemName, _egBuildModPool, _egBuildRolledStats, _egEligibleTiers, _egFamilyAllowedOnBase, _egPickModFromPool, _egPickTier } from './loot-mod-application.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.

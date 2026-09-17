@@ -14,10 +14,10 @@ import { renderCell, updClues } from '../grid.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { save } from '../state.js';
 import { LANG } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES, EG_SLOT_ICONS } from './endgame-equipment-base-items.js';
-import { _egEquipped, _egInventory, egSaveHubState } from './endgame-hub.js';
-import { _egRollImplicitsForBase } from './endgame-implicits.js';
-import { _egMapLootRarityWeightMult } from './endgame-map-launch.js';
+import { EG_ALL_BASE_TYPES, EG_SLOT_ICONS } from './equipment-base-items.js';
+import { _egEquipped, _egInventory, egSaveHubState } from '../endgame/endgame-hub.js';
+import { _egRollImplicitsForBase } from './loot-implicits.js';
+import { _egMapLootRarityWeightMult } from '../endgame/endgame-map-launch.js';
 
 //------------------------------------------------------------------------
 //-------------------UNIQUE ITEMS (PoE-STYLE)-----------------------------

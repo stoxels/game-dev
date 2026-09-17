@@ -13,13 +13,13 @@ import { renderCell, updClues } from '../grid.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { save } from '../state.js';
 import { LANG } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
-import { _egRollImplicitsForBase } from './endgame-implicits.js';
-import { _egMapLootRarityWeightMult } from './endgame-map-launch.js';
+import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
+import { _egRollImplicitsForBase } from './loot-implicits.js';
+import { _egMapLootRarityWeightMult } from '../endgame/endgame-map-launch.js';
 import { EG_SLOT_ICONS } from './equipment-slot-icons.js';
-import { egSaveHubState } from './hub-load.js';
+import { egSaveHubState } from '../endgame/hub-load.js';
 import { EG_UNIQUE_DROP_CHANCE, EG_UNIQUE_ITEMS, EG_UNIQUE_ZERO_AUTOMARK_DE, EG_UNIQUE_ZERO_AUTOMARK_EN } from './unique-item-data.js';
-import { _egEquipped, _egInventory } from './hub-stash.js';
+import { _egEquipped, _egInventory } from '../endgame/hub-stash.js';
 
 
 

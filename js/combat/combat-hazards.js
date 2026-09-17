@@ -1,7 +1,7 @@
 import { EG_AIL_IGNITE_DMG_SHARE, EG_AIL_MIN_DOT_DAMAGE, _egApplyPlayerAilment } from './combat-ailments.js';
 import { _egPlayerTakeDamage } from './encounter.js';
 import { _egActiveMapItem, _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
-import { EG_MAX_MAP_TIER } from '../endgame/endgame-maps.js';
+import { EG_MAX_MAP_TIER } from '../loot/loot-maps.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
 

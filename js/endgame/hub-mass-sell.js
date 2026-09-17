@@ -21,10 +21,10 @@ try { Object.defineProperty(globalThis, '_egShowItemLevel', { get() { return _eg
 
 import { save } from '../state.js';
 import { EG_ART } from './endgame-art.js';
-import { _egShowTooltip } from './endgame-currency.js';
+import { _egShowTooltip } from '../loot/loot-currency.js';
 import { _dndPickUp } from './endgame-hub-drag-and-drop.js';
 import { _egClearTooltip } from './endgame-hub-tooltips.js';
-import { _egIsItemBlocked } from './endgame-requirements.js';
+import { _egIsItemBlocked } from '../loot/loot-requirements.js';
 import { egSaveHubState } from './hub-load.js';
 import { EG_INV_COLS, _egInventory } from './hub-stash.js';
 

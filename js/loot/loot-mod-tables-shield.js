@@ -1,4 +1,4 @@
-import { EG_MOD_TABLE_WEAPON2 } from './endgame-mod-tables-weapon2.js';
+import { EG_MOD_TABLE_WEAPON2 } from './loot-mod-tables-weapon2.js';
 
 //  endgame-mod-tables-shield.js
 //  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).

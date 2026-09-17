@@ -3,7 +3,7 @@ import { t } from '../translation/translations.js';
 import { EG_ART } from '../endgame/endgame-art.js';
 import { _egBuildChainPool, _egSpawnNextArenaBoss, _egUpdateObjectivesHUD } from './encounter-chain.js';
 import { _egEnsureLoseOverlayEndgameUI } from './encounter-overlays.js';
-import { _egMapTierMonsterLevel, _egRollMapTier } from '../endgame/endgame-maps.js';
+import { _egMapTierMonsterLevel, _egRollMapTier } from '../loot/loot-maps.js';
 import { _egCreateGeneratedLevel } from './combat-puzzle-generator.js';
 
 'use strict';

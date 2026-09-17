@@ -1,10 +1,10 @@
 import { t } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
-import { _dndFindTargetSlot } from './endgame-hub-drag-and-drop.js';
-import { EG_INV_COLS, _egEnsureInvRows, _egEquipped, _egFindFreeInvCell, _egInventory, _egRenderEquipSlot, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
-import { _egSyncBaseAttributes } from './endgame-leveling.js';
-import { EG_STAT_KEY_MAP, _egGetAllEquippedItems } from './endgame-player-stats.js';
-import { _egInferWeaponHands } from './endgame-unique-items.js';
+import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
+import { _dndFindTargetSlot } from '../endgame/endgame-hub-drag-and-drop.js';
+import { EG_INV_COLS, _egEnsureInvRows, _egEquipped, _egFindFreeInvCell, _egInventory, _egRenderEquipSlot, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, _egUpdateInvCount, egSaveHubState } from '../endgame/endgame-hub.js';
+import { _egSyncBaseAttributes } from '../endgame/endgame-leveling.js';
+import { EG_STAT_KEY_MAP, _egGetAllEquippedItems } from '../endgame/endgame-player-stats.js';
+import { _egInferWeaponHands } from './unique-items.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME EQUIPMENT REQUIREMENTS-----------------------

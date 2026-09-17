@@ -1,18 +1,18 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { t } from '../translation/translations.js';
-import { EG_MOD_CAPS, _egGetModTable, _egRollModCounts } from './endgame-equipment-generator.js';
-import { EG_ESSENCE_DEFS, _egBuildEssenceDetailHTML } from './endgame-essences.js';
-import { _egRenderMapSlot, _egRenderMapStashCell, _egSwitchMapStashTier, _egUpdateMapStashTabCounts } from './endgame-gate.js';
+import { EG_MOD_CAPS, _egGetModTable, _egRollModCounts } from './loot-equipment-generator.js';
+import { EG_ESSENCE_DEFS, _egBuildEssenceDetailHTML } from './loot-essences.js';
+import { _egRenderMapSlot, _egRenderMapStashCell, _egSwitchMapStashTier, _egUpdateMapStashTabCounts } from '../endgame/endgame-gate.js';
 import { _egSpawnCurrencyDrop } from '../combat/combat-grid-pickups.js';
-import { _dndChipScreenEl, _egRenderCurrencyCell } from './endgame-hub-drag-and-drop.js';
-import { _egBuildTooltipBodyHTML, _egHideCompareTooltip, _egLastMouse, _egUpdateCompareTooltip } from './endgame-hub-tooltips.js';
-import { EG_INV_COLS, EG_MAP_STASH_COLS, _egAddItemToStash, _egCurrencyStash, _egEnsureInvRows, _egEquipped, _egFindFreeMapCellForTier, _egGetInvRows, _egGetMapTierGrid, _egHealCurrencyItem, _egInventory, _egMapStash, _egRebuildMapStashGrid, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
-import { _egRerollImplicits } from './endgame-implicits.js';
-import { _egMapLootQuantityMult } from './endgame-map-launch.js';
-import { EG_MAP_CURRENCY_RULES, _egBuildMapTooltipBodyHTML } from './endgame-maps.js';
-import { _egBuildItemName, _egBuildModPool, _egBuildRolledStats, _egPickModFromPool, _egPickTier, _egRollMods } from './endgame-mod-application.js';
-import { EG_SHARD_DEFS } from './endgame-shards.js';
-import { EG_UNIQUE_ITEMS, _egBuildUniqueItem } from './endgame-unique-items.js';
+import { _dndChipScreenEl, _egRenderCurrencyCell } from '../endgame/endgame-hub-drag-and-drop.js';
+import { _egBuildTooltipBodyHTML, _egHideCompareTooltip, _egLastMouse, _egUpdateCompareTooltip } from '../endgame/endgame-hub-tooltips.js';
+import { EG_INV_COLS, EG_MAP_STASH_COLS, _egAddItemToStash, _egCurrencyStash, _egEnsureInvRows, _egEquipped, _egFindFreeMapCellForTier, _egGetInvRows, _egGetMapTierGrid, _egHealCurrencyItem, _egInventory, _egMapStash, _egRebuildMapStashGrid, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, _egUpdateInvCount, egSaveHubState } from '../endgame/endgame-hub.js';
+import { _egRerollImplicits } from './loot-implicits.js';
+import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
+import { EG_MAP_CURRENCY_RULES, _egBuildMapTooltipBodyHTML } from './loot-maps.js';
+import { _egBuildItemName, _egBuildModPool, _egBuildRolledStats, _egPickModFromPool, _egPickTier, _egRollMods } from './loot-mod-application.js';
+import { EG_SHARD_DEFS } from './loot-shards.js';
+import { EG_UNIQUE_ITEMS, _egBuildUniqueItem } from './unique-items.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME CURRENCY (PoE-STYLE ORBS)--------------------

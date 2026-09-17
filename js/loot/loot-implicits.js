@@ -1,6 +1,6 @@
 import { LANG } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
-import { _egBuildMergedModLines } from './endgame-player-stats.js';
+import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
+import { _egBuildMergedModLines } from '../endgame/endgame-player-stats.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME IMPLICITS (PoE-STYLE)------------------------

@@ -20,7 +20,7 @@ try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { g
 import { EG_DEFAULT_MONSTER_CAP, EG_INITIAL_SPAWN_STAGGER_BASE_MS, EG_RESPAWN_DELAY_MIN_MS, EG_RESPAWN_DELAY_RANGE_MS, _egGetDefaultMonsterCap, _egGetRespawnDelayMs } from './encounter-constants.js';
 import { _egSpawnMonster } from './encounter-monster-spawning.js';
 import { _egCampaignMonsterLevel } from '../endgame/endgame-leveling.js';
-import { EG_ENDGAME_MONSTER_LEVEL_CAP, EG_MAP_TIER_MONSTER_LEVELS, _egRollMapTier } from '../endgame/endgame-maps.js';
+import { EG_ENDGAME_MONSTER_LEVEL_CAP, EG_MAP_TIER_MONSTER_LEVELS, _egRollMapTier } from '../loot/loot-maps.js';
 import { EG_MAX_CONCURRENT_MONSTERS, EG_MONSTER_DEFS } from './combat-monsters.js';
 import { EG_PLAYER_STATS } from '../endgame/endgame-player-stats.js';
 import { _egIsActive, _egIsCampaignRun } from './combat-state.js';

@@ -12,9 +12,9 @@
 // step-9/step-10 pattern.
 try { Object.defineProperty(globalThis, '_egCurrencyStash', { get() { return _egCurrencyStash; }, set(v) { _egCurrencyStash = v; }, configurable: true }); } catch (e) {}
 
-import { EG_CURRENCY_DEFS } from './endgame-currency.js';
-import { EG_SHARD_DEFS } from './endgame-shards.js';
-import { _egBuildItemChipHTML } from './hub-mass-sell.js';
+import { EG_CURRENCY_DEFS } from './loot-currency.js';
+import { EG_SHARD_DEFS } from './loot-shards.js';
+import { _egBuildItemChipHTML } from '../endgame/hub-mass-sell.js';
 
 
 

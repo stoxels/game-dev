@@ -26,7 +26,7 @@ import { EG_ELEMENTS, _egCalcPlayerDamage, _egLastHitElements, _egLastHitWasCrit
 import { _egRestartFlashClass } from './encounter.js';
 import { _egGetActiveMapModValue, _egMapPlayerProjectileMult } from '../endgame/endgame-map-launch.js';
 import { EG_DUAL_WIELD_PARRY_PCT, _egComputePlayerStats, _egScheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
-import { _egIsDualWielding } from '../endgame/endgame-requirements.js';
+import { _egIsDualWielding } from '../loot/loot-requirements.js';
 import { _egDragChargeElements, _egIsActive, _egRecentFills } from './combat-state.js';
 
 

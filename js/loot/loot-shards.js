@@ -1,11 +1,11 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _egPendingCurrencyUse } from './endgame-currency.js';
-import { _egRenderMapSlot, _egRenderMapStashCell } from './endgame-gate.js';
-import { _dndChipScreenEl, _egRenderCurrencyCell, egAddCurrency } from './endgame-hub-drag-and-drop.js';
-import { _egClearTooltip } from './endgame-hub-tooltips.js';
-import { EG_CURRENCY_COLS, _egCurrencySlotForId, _egCurrencyStash, _egGetMapTierGrid, _egInventory, _egMapStash, _egRenderInventoryCell, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
+import { _egPendingCurrencyUse } from './loot-currency.js';
+import { _egRenderMapSlot, _egRenderMapStashCell } from '../endgame/endgame-gate.js';
+import { _dndChipScreenEl, _egRenderCurrencyCell, egAddCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
+import { _egClearTooltip } from '../endgame/endgame-hub-tooltips.js';
+import { EG_CURRENCY_COLS, _egCurrencySlotForId, _egCurrencyStash, _egGetMapTierGrid, _egInventory, _egMapStash, _egRenderInventoryCell, _egUpdateInvCount, egSaveHubState } from '../endgame/endgame-hub.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME ORB SHARDS (SELL SYSTEM)---------------------

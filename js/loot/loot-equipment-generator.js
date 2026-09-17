@@ -1,25 +1,25 @@
 import { LANG } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES, EG_SLOT_ICONS } from './endgame-equipment-base-items.js';
-import { _egRollImplicitsForBase } from './endgame-implicits.js';
-import { _egMapLootRarityWeightMult } from './endgame-map-launch.js';
-import { _egBuildItemName, _egRollMods } from './endgame-mod-application.js';
-import { EG_MOD_TABLE_AMULET } from './endgame-mod-tables-amulet.js';
-import { EG_MOD_TABLE_ARCANE } from './endgame-mod-tables-arcane.js';
-import { EG_MOD_TABLE_BELT } from './endgame-mod-tables-belt.js';
-import { EG_MOD_TABLE_BOOTS } from './endgame-mod-tables-boots.js';
-import { EG_MOD_TABLE_BRACERS } from './endgame-mod-tables-bracers.js';
-import { EG_MOD_TABLE_CHEST } from './endgame-mod-tables-chest.js';
-import { EG_MOD_TABLE_CLOAK } from './endgame-mod-tables-cloak.js';
-import { EG_MOD_TABLE_EARRING } from './endgame-mod-tables-earring.js';
-import { EG_MOD_TABLE_GLOVES } from './endgame-mod-tables-gloves.js';
-import { EG_MOD_TABLE_HEAD } from './endgame-mod-tables-head.js';
-import { EG_MOD_TABLE_PANTS } from './endgame-mod-tables-pants.js';
-import { EG_MOD_TABLE_RING } from './endgame-mod-tables-ring.js';
-import { EG_MOD_TABLE_RANGED, EG_MOD_TABLE_SHIELD } from './endgame-mod-tables-shield.js';
-import { EG_MOD_TABLE_SHOULDERS } from './endgame-mod-tables-shoulders.js';
-import { EG_MOD_TABLE_TALISMAN } from './endgame-mod-tables-talisman.js';
-import { EG_MOD_TABLE_WEAPON_2H } from './endgame-mod-tables-weapon-2h.js';
-import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from './endgame-mod-tables-weapon1.js';
+import { EG_ALL_BASE_TYPES, EG_SLOT_ICONS } from './equipment-base-items.js';
+import { _egRollImplicitsForBase } from './loot-implicits.js';
+import { _egMapLootRarityWeightMult } from '../endgame/endgame-map-launch.js';
+import { _egBuildItemName, _egRollMods } from './loot-mod-application.js';
+import { EG_MOD_TABLE_AMULET } from './loot-mod-tables-amulet.js';
+import { EG_MOD_TABLE_ARCANE } from './loot-mod-tables-arcane.js';
+import { EG_MOD_TABLE_BELT } from './loot-mod-tables-belt.js';
+import { EG_MOD_TABLE_BOOTS } from './loot-mod-tables-boots.js';
+import { EG_MOD_TABLE_BRACERS } from './loot-mod-tables-bracers.js';
+import { EG_MOD_TABLE_CHEST } from './loot-mod-tables-chest.js';
+import { EG_MOD_TABLE_CLOAK } from './loot-mod-tables-cloak.js';
+import { EG_MOD_TABLE_EARRING } from './loot-mod-tables-earring.js';
+import { EG_MOD_TABLE_GLOVES } from './loot-mod-tables-gloves.js';
+import { EG_MOD_TABLE_HEAD } from './loot-mod-tables-head.js';
+import { EG_MOD_TABLE_PANTS } from './loot-mod-tables-pants.js';
+import { EG_MOD_TABLE_RING } from './loot-mod-tables-ring.js';
+import { EG_MOD_TABLE_RANGED, EG_MOD_TABLE_SHIELD } from './loot-mod-tables-shield.js';
+import { EG_MOD_TABLE_SHOULDERS } from './loot-mod-tables-shoulders.js';
+import { EG_MOD_TABLE_TALISMAN } from './loot-mod-tables-talisman.js';
+import { EG_MOD_TABLE_WEAPON_2H } from './loot-mod-tables-weapon-2h.js';
+import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from './loot-mod-tables-weapon1.js';
 
 //  endgame-equipment-generator.js
 //  Pass 6: mod application + item naming moved to endgame-mod-application.js.

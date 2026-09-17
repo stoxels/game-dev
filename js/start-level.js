@@ -14,7 +14,7 @@ import { _egActiveMapItem, _egMapPlayerLifeMult, _egMapTimeGainMult } from './en
 import { EG_PLAYER_STATS, _egComputePlayerStats } from './endgame/endgame-player-stats.js';
 import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
 import { _egIsActive, _egIsCampaignRun } from './combat/combat-state.js';
-import { _egApplyUniqueZeroLineAutomark } from './endgame/endgame-unique-items.js';
+import { _egApplyUniqueZeroLineAutomark } from './loot/unique-items.js';
 import { _adjacencyMatrixRefreshAll, buildGrid } from './grid.js';
 import { keybindDisplayLabel, keybindKeyFor } from './keybinds.js';
 import { ALL, lvText } from './levels/levels.js';

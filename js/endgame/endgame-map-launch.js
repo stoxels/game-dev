@@ -6,7 +6,7 @@ import { _egEnsureLoseOverlayEndgameUI } from '../combat/encounter-overlays.js';
 import { _egPlayerTakeDamage } from '../combat/encounter.js';
 import { _egRenderMapSlot } from './endgame-gate.js';
 import { egSaveHubState } from './endgame-hub.js';
-import { _egGetMapRewardBonuses, _egRollMapSizeMix, egMapBaseDurationForTier, egMapBaseMistakesForTier, egMapBasePuzzlesForTier, egMapBaseQuestionsForTier } from './endgame-maps.js';
+import { _egGetMapRewardBonuses, _egRollMapSizeMix, egMapBaseDurationForTier, egMapBaseMistakesForTier, egMapBasePuzzlesForTier, egMapBaseQuestionsForTier } from '../loot/loot-maps.js';
 import { _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------

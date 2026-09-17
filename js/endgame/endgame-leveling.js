@@ -10,7 +10,7 @@ import { _egRenderGateLevelChip } from './endgame-gate.js';
 import { _egRenderEquipSlots, _egRenderInventory, _egRenderStatsList } from './endgame-hub.js';
 import { _egMapPlayerLifeMult, _egMapXpMult } from './endgame-map-launch.js';
 import { _egCancelAbsorptionRegen, _egComputePlayerStats, _egGetAllEquippedItems } from './endgame-player-stats.js';
-import { EG_PLAYER_BASE_ATTRIBUTES, _egFindUnmetRequirements, _egGetUnmetRequirementsText, _egSumAttributeBonuses } from './endgame-requirements.js';
+import { EG_PLAYER_BASE_ATTRIBUTES, _egFindUnmetRequirements, _egGetUnmetRequirementsText, _egSumAttributeBonuses } from '../loot/loot-requirements.js';
 import { _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------

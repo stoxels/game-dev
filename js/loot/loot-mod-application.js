@@ -1,5 +1,5 @@
 import { LANG } from '../translation/translations.js';
-import { EG_MOD_NAME_WORDS } from './endgame-mod-name-words.js';
+import { EG_MOD_NAME_WORDS } from './loot-mod-name-words.js';
 
 //  endgame-mod-application.js
 //  Extracted from endgame-equipment-generator.js 2026-09-11 (Pass 6).

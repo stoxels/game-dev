@@ -1,7 +1,7 @@
 import { curMods } from './difficulty-modifiers.js';
 import { _egGetMaxAllowedMistakes } from './combat/encounter-tick.js';
 import { _egActiveMapItem } from './endgame/endgame-map-launch.js';
-import { _egGetMapRewardBonuses, _egMapModAffects, _egResolveMapBoss } from './endgame/endgame-maps.js';
+import { _egGetMapRewardBonuses, _egMapModAffects, _egResolveMapBoss } from './loot/loot-maps.js';
 import { _egBuildMergedModLines } from './endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat/combat-state.js';
 import { ALL, lvText } from './levels/levels.js';
