@@ -7,7 +7,10 @@ import { INTRO_SONG } from './storyline-intro.js';
 // storyline-beats.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // STORY_BEATS - the registry of every story beat in the game, keyed by
-// beatId, passed to showBeat(beatId, options) from game.js.
+// beatId, passed to showBeat(beatId, options). Live callers: ui-events.js
+// (opening cinematic + Replay gallery) and character-select.js (character
+// intros). The region-beat trigger inside scoring.js's checkWin() is
+// commented out for now - parked until the region media assets land.
 // =============================================================================
 
 // ---------------------------------------------------------------------------
@@ -49,10 +52,12 @@ export const STORY_BEATS = {
 // REGION BEAT TRIGGER LEVELS
 // ---------------------------------------------------------------------------
 // Maps world number -> the level index (li, 1-based) within that world whose
-// FIRST clear fires that world's region_N story beat (see checkWin() in
-// scoring.js). Placeholder values below are all `2` - adjust per world once
-// each world's level design/pacing is finalized. Must not exceed the number
-// of levels actually defined for that world in level-world-data.js.
+// FIRST clear fires that world's region_N story beat (see the commented-out
+// trigger block in scoring.js's checkWin() - parked until the region media
+// is complete). Placeholder values live in the commented sample below -
+// adjust per world once each world's level design/pacing is finalized.
+// Must not exceed the number of levels actually defined for that world in
+// level-world-data.js.
 // ---------------------------------------------------------------------------
 export const REGION_BEAT_TRIGGER_LEVEL = {
 
@@ -79,17 +84,17 @@ export const REGION_BEAT_TRIGGER_LEVEL = {
 // ---------------------------------------------------------------------------
 // REGION ENTRY BEATS - each fires once, on first clear of its designated
 // trigger level (see REGION_BEAT_TRIGGER_LEVEL above). Rendered as a
-// 3-CLIP video sequence (see storyline-engine.js's video-beat `clips` path)
+// 5-CLIP video sequence (see storyline-engine.js's video-beat `clips` path)
 // with captions that accumulate on screen - each line fades in and stays,
 // so by the end of the sequence the player has seen the full story text
 // written out together.
 //
-// AUDIO IS PER-CLIP, NOT A SINGLE SHARED TRACK. Each of the 3 clips has its
+// AUDIO IS PER-CLIP, NOT A SINGLE SHARED TRACK. Each of the 5 clips has its
 // own dedicated audio file (`audio` field on the clip), which starts the
 // instant that clip starts playing and is stopped the instant the sequence
 // moves on to the next clip (see storyline-engine.js's _playClip /
-// _stopClipAudio). So instead of one long narration.ogg spanning all ~24s,
-// split your narration to match your 3 video parts: part1's narration goes
+// _stopClipAudio). So instead of one long narration.ogg spanning all ~40s,
+// split your narration to match your 5 video parts: part1's narration goes
 // with part1's video, etc. Video and audio for a given clip always start
 // together - there's no separate timing to configure for "when" a clip's
 // audio plays; it's implicitly "whenever that clip is on screen."
@@ -101,33 +106,35 @@ export const REGION_BEAT_TRIGGER_LEVEL = {
 // Each clip's caption/narration is sized to ~18-22 words (~7-7.5s spoken)
 // so it fits comfortably inside that clip's ~8s runtime without leaving an
 // awkward silent gap before the next clip starts.
-// Playback does NOT need to finish inside the ~24s the 3 clips cover - once
+// Playback does NOT need to finish inside the ~40s the 5 clips cover - once
 // the last clip ends it freezes on that frame (with its own audio, if any,
 // left playing) while captions keep going for as long as they need (see
 // storyline-engine.js's _onClipEnded). So a text-heavy region is fine having
 // more caption lines than the video "covers."
 //
-// CAPTION TIMING IS MANUAL - each line is a [text, startMs] pair (see
-// _captions() below), where startMs is exactly when that line should
+// CAPTION TIMING IS MANUAL - each line is a [translationKey, startMs] pair
+// (see _captions() below), where startMs is exactly when that line should
 // appear on screen, measured from the start of the whole clip sequence
 // (wall-clock time, independent of which clip/audio happens to be
 // playing). You control this per line, per region. Example:
 //     _captions([
-//         ["Probability Peaks.", 0],           // shown instantly
-//         ["The mountains here shift...", 8000], // shown at 8s
-//         ["The First Cartographers...", 16000], // shown at 16s
+//         ['st_r1_c1', 0],     // shown instantly
+//         ['st_r1_c2', 8000],  // shown at 8s
+//         ['st_r1_c3', 16000], // shown at 16s
 //     ])
 // The numbers below are auto-generated STARTING POINTS (word-count based,
 // ~165 words/min) - listen to your actual narration once you have it and
 // adjust every number by hand to match. `videoFile` / `audio` paths are
-// placeholders - replace "video/Regions/region_N_partX.mp4" and
-// "audio/Regions/region_N_partX_narration.ogg" with your real files.
+// placeholders matching _regionClips() below - region_1's narration audio
+// already exists under these names (audio/Regions/region_1_part1..3_audio.ogg);
+// the videos are still pending (video/Regions/ not created yet).
 //
 // World order is locked: 1 Probability Peaks, 2 Distribution Den,
 // 3 Sampling Savanna, 4 Vortex of Possibilities, 5 Regression Rift,
 // 6 Frequency Forest, 7 Stochapolis, 8 Hypothesis Hinterlands,
 // 9 Data Delta, 10 Parameter Plains, 11 Null Hypothesis Void,
-// 12 Bayesian Bay, 13 Expectation Plateau.
+// 12 Bayesian Bay, 13 Expectation Plateau, 14 the Nexus (interlude world,
+// 0-based NEXUS_WORLD_INDEX 13 in levels.js).
 // ---------------------------------------------------------------------------
 
 // Converts an array of [translationKey, startMs] pairs into the
@@ -145,11 +152,11 @@ export function _captions(entries) {
 
 // Builds a standard 5-clip sequence for a region, using the region's number
 // to generate the placeholder file paths:
-//   video/Regions/region_N_part1.mp4  +  audio/Regions/region_N_part1_narration.ogg
-//   video/Regions/region_N_part2.mp4  +  audio/Regions/region_N_part2_narration.ogg
-//   video/Regions/region_N_part3.mp4  +  audio/Regions/region_N_part3_narration.ogg
-//   video/Regions/region_N_part4.mp4  +  audio/Regions/region_N_part4_narration.ogg
-//   video/Regions/region_N_part5.mp4  +  audio/Regions/region_N_part5_narration.ogg
+//   video/Regions/region_N_part1.mp4  +  audio/Regions/region_N_part1_audio.ogg
+//   video/Regions/region_N_part2.mp4  +  audio/Regions/region_N_part2_audio.ogg
+//   video/Regions/region_N_part3.mp4  +  audio/Regions/region_N_part3_audio.ogg
+//   video/Regions/region_N_part4.mp4  +  audio/Regions/region_N_part4_audio.ogg
+//   video/Regions/region_N_part5.mp4  +  audio/Regions/region_N_part5_audio.ogg
 // Each clip's audio starts together with that clip and is swapped out the
 // moment the next clip starts (see storyline-engine.js's _playClip). Swap
 // in real filenames once they exist - or just replace the whole `clips`
@@ -383,9 +390,10 @@ export const REPLAY_GALLERY_ENTRIES = [
     { id: 'intro_trix', beatId: 'character_intro', label: 'Trix - Character Intro', options: { character: 'trix' }, thumb: 'images/sprites/Trix_noclass.webp', descKey: 'scr_replay_desc_intro_trix', globalUnlock: true },
     { id: 'intro_syla', beatId: 'character_intro', label: 'Syla - Character Intro', options: { character: 'syla' }, thumb: 'images/sprites/Syla_noclass.webp', descKey: 'scr_replay_desc_intro_syla', globalUnlock: true },
 
-    // Region interludes (region_1 … region_13) are intentionally NOT listed
-    // yet - their cutscenes don't exist. Re-add each here (with a `thumb` and
-    // `descKey`) once the corresponding world intro is built.
+    // Region interludes (region_1 … region_14, Nexus world included) are
+    // intentionally NOT listed yet - their cutscenes don't exist. Re-add each
+    // here (with a `thumb` and `descKey`) once the corresponding world intro
+    // is built.
 ];
 
 
