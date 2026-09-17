@@ -5,57 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _eg
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SHAPER (boss_shaper)------------------------
 //------------------------------------------------------------------------
-// REWORK - snow-globe homage, rebuilt as a sculptor of winter. The Shaper
-// does not merely chill the floor: it SHAPES the arena. It plants ice
-// monoliths that erect walls of frost, snaps a glacier finger at you,
-// and sculpts living ice that walks. The finale is the sculpture itself:
-// the SHAPED WINTER - the boss assembles a colossal ice monolith that
-// grinds the whole arena with rotating frost arms while you shatter its
-// three exposed cores.
-//
-//   Phase 1 (100–60%) - GLACIER RIFT (signature, upgraded). Frost fissures
-//                       spider out from the boss side and erupt in a
-//                       rolling wave - no longer instant zones, but a
-//                       CREeping front you outpace. Where the front
-//                       settles, lingering ice pools remain (the old
-//                       domains, kept as the aftermath).
-//                       Plus SOUL TITHE (shared).
-//   Phase 2 ( ≤60%)   - FROST MONOLITHS. The Shaper plants rune-carved
-//                       monoliths at the edges; each erects a growing wall
-//                       of frost that slowly SHRINKS the arena. Break the
-//                       monoliths (3 hits each) to stop the walls.
-//                       Plus ICE WALKER. A sculpted ice sentinel stalks
-//                       you, trailing a freezing wake - it shatters on
-//                       contact, spawning shard shrapnel.
-//   Phase 3 ( ≤30%)   - Three monoliths, two walkers, the rift front
-//                       closes faster. Winter is winning.
-//   Finale ( ≤10%)    - ⛄ THE SHAPED WINTER (one-shot set-piece): the boss
-//                       assembles a colossal ice monolith at the centre
-//                       and goes immune. Three frost arms (like a radar
-//                       blade) sweep the arena, spinning faster each
-//                       beat - and three CORES on the monolith's faces
-//                       light up one at a time. Reach the lit core's safe
-//                       arc and land 3 hits to SHATTER it; a shattered
-//                       core stalls the sweep. Shatter all three before
-//                       the final beat to break the sculpture - otherwise
-//                       the MONOLITH BREAK: a full-screen ice shockwave
-//                       (huge damage, only the eye at the centre is safe).
-//                       Charge bar frozen for the whole set-piece (gate
-//                       in _egTickPlayer via _egShpFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (soul_tithe) live in shared-boss-abilities.js and are
-// referenced by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Flip to false for ship.
+// Rework "sculptor of winter": glacier rifts (rolling frost fronts +
+// lingering ice pools), frost monoliths and ice walkers from 60%, and the
+// SHAPED WINTER finale at ≤10% - shatter three cores before the last beat.
+// Shared soul_tithe pressure comes along (shared-puzzle-mechanics.js).
 //------------------------------------------------------------------------
 
 export const _EG_SHP_DEBUG_SLOW = true;
