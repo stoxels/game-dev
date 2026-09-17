@@ -7,17 +7,17 @@ import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
 import { EG_ART } from './endgame-art.js';
 import { EG_ATLAS_MAX_TIER, _egAtlasResolveNodeForMap, egAtlasAdjacentBonusChance, egAtlasAdjacentBonusPercent, egAtlasChainBlueprintForMap, egAtlasDropNodeIds, egAtlasIsCompleted, egAtlasNodeById, egAtlasNodeName, egAtlasPickAdjacentBonusNodeId, egAtlasPickDropNodeId, egAtlasPickNodeIdForTier, egAtlasTierDifficulty } from './endgame-atlas.js';
-import { _egGetElementCentre } from './endgame-class-projectiles.js';
+import { _egGetElementCentre } from '../combat/combat-class-projectiles.js';
 import { EG_CURRENCY_DEFS, _egRerollItemModValues } from './endgame-currency.js';
 import { EG_MOD_CAPS, _egRollModCounts, _egRollRarity } from './endgame-equipment-generator.js';
 import { EG_ESSENCE_DEFS, _EG_ESSENCE_FAMILIES } from './endgame-essences.js';
 import { _egRenderMapStashCell, _egUpdateMapStashTabCounts } from './endgame-gate.js';
-import { EG_LOOT_DROP_LIFETIME_MS, _egAnimatePickupDiscard, _egBuildPickupEligiblePool, _egCancelTrackedExpiry, _egCellHasAnyDrop, _egRarityToastColor, _egScheduleTrackedExpiry, _egStartDropExpireCountdown } from './endgame-grid-pickups.js';
+import { EG_LOOT_DROP_LIFETIME_MS, _egAnimatePickupDiscard, _egBuildPickupEligiblePool, _egCancelTrackedExpiry, _egCellHasAnyDrop, _egRarityToastColor, _egScheduleTrackedExpiry, _egStartDropExpireCountdown } from '../combat/combat-grid-pickups.js';
 import { EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_COUNT, _egFindFreeMapCellForTier, _egGetMapTierGrid, _egIsTieredMapStash, _egMapStash, _egRebuildMapStashGrid, egSaveHubState } from './endgame-hub.js';
 import { EG_MAP_BASE_BOSS_CHANCE, _egActiveMapItem, _egMapLootQuantityMult } from './endgame-map-launch.js';
 import { _egBuildItemName, _egBuildModPool, _egBuildRolledStats, _egPickModFromPool, _egPickTier, _egRollMods } from './endgame-mod-application.js';
 import { _egBuildMergedModLines } from './endgame-player-stats.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME MAP ITEMS (PoE-STYLE)------------------------

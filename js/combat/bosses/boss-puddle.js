@@ -4,7 +4,7 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { Audio_Manager } from '../../audio/audio.js';
-import { _egHzGridRect } from '../../endgame/endgame-hazards.js';
+import { _egHzGridRect } from '../combat-hazards.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDotTick, _egNkEl, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast } from './shared-boss-abilities.js';
 

@@ -3,10 +3,10 @@
 // bare cross-file references - import explicitly or use globalThis.X for
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
-import { _egbtRenderGrid } from './endgame-boss-test.js';
-import { _egRenderPanel } from './endgame-encounter.js';
+import { _egbtRenderGrid } from '../combat/combat-boss-test.js';
+import { _egRenderPanel } from '../combat/encounter.js';
 import { _egRenderEquipSlots, _egRenderInventory } from './endgame-hub.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------PLACEHOLDER ART SYSTEM-------------------------------

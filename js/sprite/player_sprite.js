@@ -6,10 +6,10 @@
 import { updateClassHUDManaBar } from '../classes/class-mana.js';
 import { _egEntrMoveMult } from '../combat/bosses/boss-entropy.js';
 import { _egSnailBroomHeld } from '../combat/bosses/boss-snail.js';
-import { _egPlayerHasAilment } from '../endgame/endgame-ailments.js';
-import { _egSetHoldEPauseVisual } from '../endgame/endgame-encounter-tick.js';
+import { _egPlayerHasAilment } from '../combat/combat-ailments.js';
+import { _egSetHoldEPauseVisual } from '../combat/encounter-tick.js';
 import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
-import { EG_PLAYER_DEFAULT_ATTACK_INTERVAL, _egIsActive } from '../endgame/endgame-state.js';
+import { EG_PLAYER_DEFAULT_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 import { keybindKeyFor, keybindMatches } from '../keybinds.js';
 import { _refreshQuestionModalFlag } from '../screens/screens.js';
 import { _uspMovementSpeedMult } from '../skills/universal-spells.js';

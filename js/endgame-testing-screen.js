@@ -3,7 +3,7 @@
 // bare cross-file references - import explicitly or use globalThis.X for
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
-import { _egBuildChainPool } from './endgame/endgame-encounter-chain.js';
+import { _egBuildChainPool } from './combat/encounter-chain.js';
 import { ALL } from './levels/levels.js';
 import { showToast } from './puzzle-items/toasts-and-popups.js';
 import { isGatedLevel } from './quiz-excercise/mathgate.js';

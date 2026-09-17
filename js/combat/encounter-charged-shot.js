@@ -1,17 +1,17 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { _bloodMagicActive, _getPlayerMaxMana, gainMana } from '../classes/class-mana.js';
 import { t } from '../translation/translations.js';
-import { _egIsPolymorphActive } from './endgame-ailments.js';
-import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './endgame-class-projectiles.js';
-import { EG_ELEMENTS, _egCalcPlayerMeleeDamage, _egLastMeleeElements, _egLastMeleeWasCrit } from './endgame-combat-calculations.js';
-import { _egUpdatePlayerChargeBar } from './endgame-encounter-tick.js';
-import { EG_MONSTER_PROJ_DURATION_MS, _egAnimatePlayerProjectile, _egApplyPlayerHitFeedback, _egConsumeOnHitGearBonus, _egDamageTargetById, _egFlashImmune, _egPlayerTakeDamage, _egRestartFlashClass, _egShowStatusLabel } from './endgame-encounter.js';
-import { _egIsPlayerInDarknessCloud } from './endgame-hazards.js';
-import { _egGetActiveMapModValue } from './endgame-map-launch.js';
-import { _egTryMonsterMeleeSidestep } from './endgame-monster-roam.js';
-import { _egCalcAccuracyMissChance, _egComputePlayerStats, _egGetDragTier, _egGetDragTierLabelKey } from './endgame-player-stats.js';
-import { EG_PLAYER_MELEE_ANIM_DURATION_MS, EG_PLAYER_MELEE_DAMAGE, _egDragChargeElements, _egIsActive } from './endgame-state.js';
-import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egShowWeaponSwing, _egWeaponSwingSound } from './endgame-weapon-swing.js';
+import { _egIsPolymorphActive } from './combat-ailments.js';
+import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
+import { EG_ELEMENTS, _egCalcPlayerMeleeDamage, _egLastMeleeElements, _egLastMeleeWasCrit } from './combat-calculations.js';
+import { _egUpdatePlayerChargeBar } from './encounter-tick.js';
+import { EG_MONSTER_PROJ_DURATION_MS, _egAnimatePlayerProjectile, _egApplyPlayerHitFeedback, _egConsumeOnHitGearBonus, _egDamageTargetById, _egFlashImmune, _egPlayerTakeDamage, _egRestartFlashClass, _egShowStatusLabel } from './encounter.js';
+import { _egIsPlayerInDarknessCloud } from './combat-hazards.js';
+import { _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
+import { _egTryMonsterMeleeSidestep } from './combat-monster-roam.js';
+import { _egCalcAccuracyMissChance, _egComputePlayerStats, _egGetDragTier, _egGetDragTierLabelKey } from '../endgame/endgame-player-stats.js';
+import { EG_PLAYER_MELEE_ANIM_DURATION_MS, EG_PLAYER_MELEE_DAMAGE, _egDragChargeElements, _egIsActive } from './combat-state.js';
+import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egShowWeaponSwing, _egWeaponSwingSound } from './combat-weapon-swing.js';
 
 //------------------------------------------------------------------------
 // PHASE 4 split (2026-09-16): extracted into a focused module. The original

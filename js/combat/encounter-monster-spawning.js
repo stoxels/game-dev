@@ -9,9 +9,9 @@
 
 import { t } from '../translation/translations.js';
 import { EG_MONSTER_ZONES } from './encounter-constants.js';
-import { _egRenderPanel } from './endgame-encounter.js';
-import { EG_MAX_CONCURRENT_MONSTERS, _egBuildMonster } from './endgame-monsters.js';
-import { _egComputePlayerStats, _egFormatStatValue } from './endgame-player-stats.js';
+import { _egRenderPanel } from './encounter.js';
+import { EG_MAX_CONCURRENT_MONSTERS, _egBuildMonster } from './combat-monsters.js';
+import { _egComputePlayerStats, _egFormatStatValue } from '../endgame/endgame-player-stats.js';
 
 
 

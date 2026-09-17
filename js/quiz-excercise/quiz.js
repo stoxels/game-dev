@@ -8,7 +8,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { checkWorldCompletion } from '../classes/class-ui.js';
 import { checkWorldCodes, checkWorldCodesSync } from '../codes.js';
 import { curMods } from '../difficulty-modifiers.js';
-import { _egOnQuestionAnswered } from '../endgame/endgame-encounter-chain.js';
+import { _egOnQuestionAnswered } from '../combat/encounter-chain.js';
 import { _egOnQuizWrongAnswer } from '../endgame/endgame-map-launch.js';
 import { _egApplyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
 import { buildReveal } from '../grid.js';

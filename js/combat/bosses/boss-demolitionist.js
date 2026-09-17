@@ -3,8 +3,8 @@
 // bare cross-file references - import explicitly or use globalThis.X for
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
-import { _egGameOver, _egRenderPanel } from '../../endgame/endgame-encounter.js';
-import { _egBossCorrupted } from '../../endgame/endgame-state.js';
+import { _egGameOver, _egRenderPanel } from '../encounter.js';
+import { _egBossCorrupted } from '../combat-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egTeleportAvatarTo } from './boss-wormhole.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egRemoveCellCorruption } from './shared-boss-abilities.js';

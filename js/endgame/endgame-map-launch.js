@@ -6,13 +6,13 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { t } from '../translation/translations.js';
 import { egAtlasChainBlueprintForMap, egAtlasMakeRng } from './endgame-atlas.js';
-import { _egBuildChainPool, _egPickMapRunPuzzleGi } from './endgame-encounter-chain.js';
-import { _egEnsureLoseOverlayEndgameUI } from './endgame-encounter-overlays.js';
-import { _egPlayerTakeDamage } from './endgame-encounter.js';
+import { _egBuildChainPool, _egPickMapRunPuzzleGi } from '../combat/encounter-chain.js';
+import { _egEnsureLoseOverlayEndgameUI } from '../combat/encounter-overlays.js';
+import { _egPlayerTakeDamage } from '../combat/encounter.js';
 import { _egRenderMapSlot } from './endgame-gate.js';
 import { egSaveHubState } from './endgame-hub.js';
 import { _egGetMapRewardBonuses, _egRollMapSizeMix, egMapBaseDurationForTier, egMapBaseMistakesForTier, egMapBasePuzzlesForTier, egMapBaseQuestionsForTier } from './endgame-maps.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME MAP DEVICE LAUNCH----------------------------

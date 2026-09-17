@@ -3,7 +3,7 @@
 // bare cross-file references - import explicitly or use globalThis.X for
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
-import { _egOnProgrammaticReveal } from '../endgame/endgame-class-projectiles.js';
+import { _egOnProgrammaticReveal } from '../combat/combat-class-projectiles.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE------------------------------------

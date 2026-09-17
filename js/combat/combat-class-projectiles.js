@@ -4,11 +4,11 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { getCharmCastingDamageMult } from '../skills/skill-charms.js';
-import { _egCalcPlayerDamage, _egLastHitElements, _egScaleElements } from './endgame-combat-calculations.js';
-import { _egAnimatePlayerProjectile } from './endgame-encounter.js';
-import { _egMapAbilityRevealMult, _egMapItemRevealMult } from './endgame-map-launch.js';
-import { _egComputePlayerStats } from './endgame-player-stats.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egCalcPlayerDamage, _egLastHitElements, _egScaleElements } from './combat-calculations.js';
+import { _egAnimatePlayerProjectile } from './encounter.js';
+import { _egMapAbilityRevealMult, _egMapItemRevealMult } from '../endgame/endgame-map-launch.js';
+import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _egIsActive } from './combat-state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.

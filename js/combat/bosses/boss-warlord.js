@@ -3,8 +3,8 @@
 // bare cross-file references - import explicitly or use globalThis.X for
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
-import { _egRenderPanel, _egSpawnMonster } from '../../endgame/endgame-encounter.js';
-import { EG_MAX_CONCURRENT_MONSTERS } from '../../endgame/endgame-monsters.js';
+import { _egRenderPanel, _egSpawnMonster } from '../encounter.js';
+import { EG_MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
 

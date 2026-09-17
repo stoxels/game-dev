@@ -4,9 +4,9 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { t } from '../../translation/translations.js';
-import { _egRenderPanel } from '../../endgame/endgame-encounter.js';
-import { _egHzGridRect } from '../../endgame/endgame-hazards.js';
-import { _egBossCorrupted, _egIsActive } from '../../endgame/endgame-state.js';
+import { _egRenderPanel } from '../encounter.js';
+import { _egHzGridRect } from '../combat-hazards.js';
+import { _egBossCorrupted, _egIsActive } from '../combat-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egTeleportAvatarTo } from './boss-wormhole.js';
 import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast, _egRemoveCellCorruption } from './shared-boss-abilities.js';

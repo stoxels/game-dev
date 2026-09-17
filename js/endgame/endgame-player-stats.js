@@ -4,8 +4,8 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { LANG, t } from '../translation/translations.js';
-import { EG_RESIST_CAP_PCT } from './endgame-combat-calculations.js';
-import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT, _egGetDeflectChancePct, _egGetDeflectDamagePct, _egGetDualWieldParryChancePct, _egGetParryChancePct } from './endgame-encounter.js';
+import { EG_RESIST_CAP_PCT } from '../combat/combat-calculations.js';
+import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT, _egGetDeflectChancePct, _egGetDeflectDamagePct, _egGetDualWieldParryChancePct, _egGetParryChancePct } from '../combat/encounter.js';
 import { _egEquipped } from './endgame-hub.js';
 import { _egGetPlayerLevel } from './endgame-leveling.js';
 import { _egGetActiveMapModValue, _egMapAbsorptionMult, _egMapAccuracyMult, _egMapActionSlowMult, _egMapAttackSpeedMult, _egMapBlockMult, _egMapEvasionMult, _egMapPlayerDefenceMult, _egMapSpellDamageMult } from './endgame-map-launch.js';
@@ -29,7 +29,7 @@ import { EG_MOD_TABLE_WEAPON_2H } from './endgame-mod-tables-weapon-2h.js';
 import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from './endgame-mod-tables-weapon1.js';
 import { EG_MOD_TABLE_WEAPON2 } from './endgame-mod-tables-weapon2.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding } from './endgame-requirements.js';
-import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from './endgame-state.js';
+import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA DEFINITIONS-------------------------

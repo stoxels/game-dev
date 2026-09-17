@@ -4,8 +4,8 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { t } from '../translation/translations.js';
-import { EG_MONSTER_ZONES, _egRenderPanel, _egRestartFlashClass, _egShowStatusLabel } from './endgame-encounter.js';
-import { _egIsActive } from './endgame-state.js';
+import { EG_MONSTER_ZONES, _egRenderPanel, _egRestartFlashClass, _egShowStatusLabel } from './encounter.js';
+import { _egIsActive } from './combat-state.js';
 
 // endgame-monster-roam.js
 // MONSTER POSITIONING - normal monsters now HOLD GROUND in static side

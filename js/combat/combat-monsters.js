@@ -4,10 +4,10 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { t } from '../translation/translations.js';
-import { EG_ART } from './endgame-art.js';
-import { EG_CAMPAIGN_MONSTER_CONFIG } from './endgame-encounter.js';
-import { _egApplyMapModsToMonster } from './endgame-map-launch.js';
-import { _egIsCampaignRun } from './endgame-state.js';
+import { EG_ART } from '../endgame/endgame-art.js';
+import { EG_CAMPAIGN_MONSTER_CONFIG } from './encounter.js';
+import { _egApplyMapModsToMonster } from '../endgame/endgame-map-launch.js';
+import { _egIsCampaignRun } from './combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA DEFINITIONS-------------------------

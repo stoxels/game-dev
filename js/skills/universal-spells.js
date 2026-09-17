@@ -709,7 +709,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // ── MOVEMENT (repositioning self-casts) ──────────────────────────────
     // No monster target and no damage: these move YOU. They exist because
     // damage against the player is resolved against the SPRITE'S HITBOX
-    // (js/endgame/endgame-hazards.js → _egHzPlayerRect) and bosses telegraph
+    // (js/combat/combat-hazards.js → _egHzPlayerRect) and bosses telegraph
     // where they are about to land, so "be somewhere else in time" is real
     // defence. Everything here aims with the direction the sprite last
     // WALKED (js/sprite/player_sprite.js → getAvatarLastMoveDir).
@@ -1219,7 +1219,7 @@ export function isUspSupportBuffActive(kind) {
 }
 
 // ---------------------------------------------------------------------
-// Player status-strip icons (js/endgame/endgame-ailments.js appends this)
+// Player status-strip icons (js/combat/combat-ailments.js appends this)
 // ---------------------------------------------------------------------
 
 export function _uspSupportStatusSignature() {
@@ -1386,7 +1386,7 @@ export function getUniversalSpellSupportEstimate(spellId) {
 // The repositioning family: blink / dash / disengage / windstep / rift anchor.
 //
 // WHY THIS EXISTS - damage against the player is resolved against the
-// SPRITE'S HITBOX (js/endgame/endgame-hazards.js → _egHzPlayerRect), and the
+// SPRITE'S HITBOX (js/combat/combat-hazards.js → _egHzPlayerRect), and the
 // game's own design note says a boss special is only avoidable by MOVEMENT
 // AND POSITION. Walking is 320px/s, so a telegraph that resolves faster than
 // that is unavoidable without a movement ability. That is the niche these

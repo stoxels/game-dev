@@ -8,7 +8,7 @@ import { t } from '../translation/translations.js';
 import { EG_ART } from './endgame-art.js';
 import { EG_ATLAS_MAX_TIER, EG_ATLAS_NODES, egAtlasAdjacentBonusPercent, egAtlasChainBlueprint, egAtlasIsCompleted, egAtlasIsUnlocked, egAtlasNodeById, egAtlasNodeName, egAtlasProgress } from './endgame-atlas.js';
 import { EG_MAP_TIER_ROMANS, _egMapStash } from './endgame-hub.js';
-import { EG_SCREEN_NAV, _egResolveBackFn } from './endgame-state.js';
+import { EG_SCREEN_NAV, _egResolveBackFn } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME ATLAS SCREEN---------------------------------

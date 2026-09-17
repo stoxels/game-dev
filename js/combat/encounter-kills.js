@@ -16,16 +16,16 @@ import { t } from '../translation/translations.js';
 import { EG_PANEL_RERENDER_DELAY_MS } from './encounter-constants.js';
 import { _egPlayerTakeDamage } from './encounter-damage.js';
 import { _egScheduleRespawn } from './encounter-spawn-rules.js';
-import { _egTryDropCurrency } from './endgame-currency.js';
-import { _egBossDefeated, _egEndMapDefeated, _egOnAllBossesDead, _egScheduleArenaAdvance, _egUpdateObjectivesHUD } from './endgame-encounter-chain.js';
-import { _egFlashKillCard, _egRenderPanel } from './endgame-encounter.js';
-import { _egTryDropEssence } from './endgame-essences.js';
-import { _egDropHeartPickup, _egSpawnItemDrop } from './endgame-grid-pickups.js';
-import { _egGrantMonsterXP } from './endgame-leveling.js';
-import { _egMapKillRecoveryMult } from './endgame-map-launch.js';
-import { _egTryDropMap } from './endgame-maps.js';
-import { _egComputePlayerStats } from './endgame-player-stats.js';
-import { _egIsActive, _egIsCampaignRun } from './endgame-state.js';
+import { _egTryDropCurrency } from '../endgame/endgame-currency.js';
+import { _egBossDefeated, _egEndMapDefeated, _egOnAllBossesDead, _egScheduleArenaAdvance, _egUpdateObjectivesHUD } from './encounter-chain.js';
+import { _egFlashKillCard, _egRenderPanel } from './encounter.js';
+import { _egTryDropEssence } from '../endgame/endgame-essences.js';
+import { _egDropHeartPickup, _egSpawnItemDrop } from './combat-grid-pickups.js';
+import { _egGrantMonsterXP } from '../endgame/endgame-leveling.js';
+import { _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';
+import { _egTryDropMap } from '../endgame/endgame-maps.js';
+import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _egIsActive, _egIsCampaignRun } from './combat-state.js';
 
 
 

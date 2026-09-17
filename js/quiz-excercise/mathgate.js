@@ -6,9 +6,9 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { curMods } from '../difficulty-modifiers.js';
-import { _egOnQuestionAnswered } from '../endgame/endgame-encounter-chain.js';
+import { _egOnQuestionAnswered } from '../combat/encounter-chain.js';
 import { _egApplyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
-import { _egIsActive } from '../endgame/endgame-state.js';
+import { _egIsActive } from '../combat/combat-state.js';
 import { WORLDS } from '../levels/level-world-data.js';
 import { WORLD_START_GI } from '../levels/levels.js';
 import { PT } from '../passive-tree/passive-tree.js';

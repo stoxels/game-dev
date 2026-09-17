@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
-import { _egOnProgrammaticReveal } from '../endgame/endgame-class-projectiles.js';
+import { _egOnProgrammaticReveal } from '../combat/combat-class-projectiles.js';
 import { renderCell, updClues } from '../grid.js';
 import { PT } from '../passive-tree/passive-tree.js';
 import { questStat_mcWrongAnswerEliminated, questStat_primerRowsColsRevealed, questStat_tutorAnsweredCorrect, updateQuestStats } from '../quests/quests-stats.js';

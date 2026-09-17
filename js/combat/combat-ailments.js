@@ -8,12 +8,12 @@ import { Audio_Manager } from '../audio/audio.js';
 import { renderCell } from '../grid.js';
 import { applyCell } from '../mouse-button-handlers.js';
 import { _uspBuildSupportStatusIconsHTML, _uspSupportStatusSignature } from '../skills/universal-spells.js';
-import { _egFireProjectile, _egGetElementCentre } from './endgame-class-projectiles.js';
-import { _egMaybeShowAbsorptionBroken } from './endgame-encounter-overlays.js';
-import { EG_MONSTER_PROJ_DURATION_MS, _egGameOver, _egHideBlockLockoutOverlay, _egKillMonster, _egPlayerTakeDamage, _egShowDamageNumber } from './endgame-encounter.js';
-import { _egGetActiveMapModValue, _egHasActiveMapMod } from './endgame-map-launch.js';
-import { _egComputePlayerStats } from './endgame-player-stats.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egFireProjectile, _egGetElementCentre } from './combat-class-projectiles.js';
+import { _egMaybeShowAbsorptionBroken } from './encounter-overlays.js';
+import { EG_MONSTER_PROJ_DURATION_MS, _egGameOver, _egHideBlockLockoutOverlay, _egKillMonster, _egPlayerTakeDamage, _egShowDamageNumber } from './encounter.js';
+import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
+import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _egIsActive } from './combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------ELEMENTAL AILMENTS SYSTEM----------------------------

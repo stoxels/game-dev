@@ -4,9 +4,9 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { t } from '../translation/translations.js';
-import { _egEndMapDefeated } from './endgame-encounter-chain.js';
-import { _egGetMistakesRemaining } from './endgame-encounter-tick.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egEndMapDefeated } from './encounter-chain.js';
+import { _egGetMistakesRemaining } from './encounter-tick.js';
+import { _egIsActive } from './combat-state.js';
 import { _egClearCenterGridBanners } from '../timer.js';
 
 

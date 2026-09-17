@@ -13,10 +13,10 @@
 import { t } from '../translation/translations.js';
 import { EG_DAMAGE_NUMBER_DURATION_MS, EG_IMMUNE_FLASH_DURATION_MS, EG_IMMUNE_LABEL_DURATION_MS, EG_MONSTER_ZONES } from './encounter-constants.js';
 import { _egGetDominantElement } from './encounter-damage.js';
-import { _egRenderMonsterStatusStrip } from './endgame-ailments.js';
-import { EG_ART } from './endgame-art.js';
-import { _egRoamShouldRoam, _egRoamSync, _egRoamTeardown } from './endgame-monster-roam.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egRenderMonsterStatusStrip } from './combat-ailments.js';
+import { EG_ART } from '../endgame/endgame-art.js';
+import { _egRoamShouldRoam, _egRoamSync, _egRoamTeardown } from './combat-monster-roam.js';
+import { _egIsActive } from './combat-state.js';
 
 
 

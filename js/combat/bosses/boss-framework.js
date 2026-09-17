@@ -4,9 +4,9 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { t } from '../../translation/translations.js';
-import { _egRenderPanel } from '../../endgame/endgame-encounter.js';
+import { _egRenderPanel } from '../encounter.js';
 import { _egApplyMapModsToMonster, _egGetActiveMapModValue } from '../../endgame/endgame-map-launch.js';
-import { _egBossTimers, _egIsActive } from '../../endgame/endgame-state.js';
+import { _egBossTimers, _egIsActive } from '../combat-state.js';
 // NOTE: no imports from boss-*.js files here on purpose. The per-boss
 // teardown fns below resolve lazily via globalThis (same dynamic dispatch
 // as window[mech.handler]): a static import would cycle framework ->

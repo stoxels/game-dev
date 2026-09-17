@@ -3,11 +3,11 @@
 // bare cross-file references - import explicitly or use globalThis.X for
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
-import { EG_MELEE_OVERCHARGE_MULT } from './endgame-encounter.js';
-import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult, _egMapResistMult } from './endgame-map-launch.js';
-import { EG_PLAYER_STATS, _egComputePlayerStats, _egRollCrit } from './endgame-player-stats.js';
-import { _egQuizDamageBuffMult } from './endgame-quiz-buffs.js';
-import { EG_PLAYER_MELEE_DAMAGE } from './endgame-state.js';
+import { EG_MELEE_OVERCHARGE_MULT } from './encounter.js';
+import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult, _egMapResistMult } from '../endgame/endgame-map-launch.js';
+import { EG_PLAYER_STATS, _egComputePlayerStats, _egRollCrit } from '../endgame/endgame-player-stats.js';
+import { _egQuizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
+import { EG_PLAYER_MELEE_DAMAGE } from './combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------PLAYER DAMAGE CALCULATION----------------------------

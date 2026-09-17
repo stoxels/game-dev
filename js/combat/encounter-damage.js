@@ -19,15 +19,15 @@ import { EG_STAGGER_DURATION_MS } from './encounter-lifecycle.js';
 import { _egApplyPlayerBlockFeedback, _egApplyPlayerMissFeedback, _egShowBlockLockoutOverlay } from './encounter-monster-attacks.js';
 import { EG_ECHO_DELAY_MS, _egApplyPlayerParryFeedback, _egGetDualWieldParryChancePct, _egGetParryChancePct, _egIsDualWieldParryActive, _egRollFateNegation, _egTryDeflectProjectile } from './encounter-player-attacks.js';
 import { _egGetEncounterBaseLevel } from './encounter-spawn-rules.js';
-import { _egApplyAilmentShockAmpOnMonster, _egApplyPlayerShockAmp, _egRollMonsterHitAilment, _egRollPlayerHitAilments } from './endgame-ailments.js';
-import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './endgame-class-projectiles.js';
-import { EG_ELEMENTS, _egApplyTargetResistances, _egCalcPlayerResistanceReduction, _egScaleElements } from './endgame-combat-calculations.js';
-import { _egMaybeShowAbsorptionBroken } from './endgame-encounter-overlays.js';
-import { _egFlashDamageCard, _egFlashImmune, _egRenderPanel, _egShowDamageNumber, _egSpawnHitBurst, _egUpdateBars } from './endgame-encounter.js';
-import { _egGetPlayerLevel } from './endgame-leveling.js';
-import { _egGetActiveMapModValue, _egMapDamageTakenAmpMult } from './endgame-map-launch.js';
-import { EG_PLAYER_STATS, _egCalcArmourMitigation, _egCalcEvasionDodgeChance, _egComputePlayerStats, _egGetAllEquippedItems, _egScheduleAbsorptionRegen } from './endgame-player-stats.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egApplyAilmentShockAmpOnMonster, _egApplyPlayerShockAmp, _egRollMonsterHitAilment, _egRollPlayerHitAilments } from './combat-ailments.js';
+import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
+import { EG_ELEMENTS, _egApplyTargetResistances, _egCalcPlayerResistanceReduction, _egScaleElements } from './combat-calculations.js';
+import { _egMaybeShowAbsorptionBroken } from './encounter-overlays.js';
+import { _egFlashDamageCard, _egFlashImmune, _egRenderPanel, _egShowDamageNumber, _egSpawnHitBurst, _egUpdateBars } from './encounter.js';
+import { _egGetPlayerLevel } from '../endgame/endgame-leveling.js';
+import { _egGetActiveMapModValue, _egMapDamageTakenAmpMult } from '../endgame/endgame-map-launch.js';
+import { EG_PLAYER_STATS, _egCalcArmourMitigation, _egCalcEvasionDodgeChance, _egComputePlayerStats, _egGetAllEquippedItems, _egScheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
+import { _egIsActive } from './combat-state.js';
 
 
 // Sets the player's target to the given monster and refreshes the panel.

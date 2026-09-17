@@ -3,7 +3,7 @@
 // bare cross-file references - import explicitly or use globalThis.X for
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
-import { _egChainPuzzleSizeAllowed } from './endgame-encounter-chain.js';
+import { _egChainPuzzleSizeAllowed } from './encounter-chain.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME PUZZLE GENERATOR-----------------------------

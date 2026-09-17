@@ -4,8 +4,8 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { t } from '../../translation/translations.js';
-import { _egRenderPanel } from '../../endgame/endgame-encounter.js';
-import { _egIsActive } from '../../endgame/endgame-state.js';
+import { _egRenderPanel } from '../encounter.js';
+import { _egIsActive } from '../combat-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egBlastHudInZone, _egNkAbilityHitToast, _egNkHit, _egNkPlayerCenter, _egNkToast } from './shared-boss-abilities.js';
 

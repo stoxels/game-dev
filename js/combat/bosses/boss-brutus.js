@@ -5,9 +5,9 @@
 //------------------------------------------------------------------------
 import { t } from '../../translation/translations.js';
 import { EG_ART } from '../../endgame/endgame-art.js';
-import { _egHpBarClass, _egUpdateTargetAfterKill } from '../../endgame/endgame-encounter.js';
-import { _egBuildMonster } from '../../endgame/endgame-monsters.js';
-import { _egBossCorrupted, _egIsActive } from '../../endgame/endgame-state.js';
+import { _egHpBarClass, _egUpdateTargetAfterKill } from '../encounter.js';
+import { _egBuildMonster } from '../combat-monsters.js';
+import { _egBossCorrupted, _egIsActive } from '../combat-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egBossTierNorm, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkSlamShatter, _egNkToast } from './shared-boss-abilities.js';
 

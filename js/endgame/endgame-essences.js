@@ -8,7 +8,7 @@ import { LANG, t } from '../translation/translations.js';
 import { _egCancelCurrencyUse, _egPendingCurrencyUse } from './endgame-currency.js';
 import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
 import { EG_MOD_CAPS, EG_SLOT_MOD_TABLE_MAP, _egGetModTable } from './endgame-equipment-generator.js';
-import { _egSpawnCurrencyDrop } from './endgame-grid-pickups.js';
+import { _egSpawnCurrencyDrop } from '../combat/combat-grid-pickups.js';
 import { _dndBuildCurrencyChipHTML, _dndChipScreenEl } from './endgame-hub-drag-and-drop.js';
 import { _egClearTooltip } from './endgame-hub-tooltips.js';
 import { _egEquipped, _egInventory, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egShowStashInfo, egSaveHubState } from './endgame-hub.js';

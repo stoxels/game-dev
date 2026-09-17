@@ -14,11 +14,11 @@ import { EG_MELEE_ANIM_DURATION_MS, EG_MONSTER_PROJ_DURATION_MS, EG_PLAYER_DAMAG
 import { _egDamageTargetById, _egPlayerTakeDamage } from './encounter-damage.js';
 import { _egFlashMonsterAttackCard } from './encounter-lifecycle.js';
 import { _egApplyGroundedReduction } from './encounter-player-attacks.js';
-import { _egEnsurePlayerStatusBar, _egGetPolymorphVictim, _egIsPolymorphActive, _egMaybePuzzleAttack } from './endgame-ailments.js';
-import { _egFireProjectile, _egGetElementCentre } from './endgame-class-projectiles.js';
-import { _egApplyMonsterHitMods, _egRollMonsterCritMult } from './endgame-map-launch.js';
-import { _egComputePlayerStats } from './endgame-player-stats.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egEnsurePlayerStatusBar, _egGetPolymorphVictim, _egIsPolymorphActive, _egMaybePuzzleAttack } from './combat-ailments.js';
+import { _egFireProjectile, _egGetElementCentre } from './combat-class-projectiles.js';
+import { _egApplyMonsterHitMods, _egRollMonsterCritMult } from '../endgame/endgame-map-launch.js';
+import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _egIsActive } from './combat-state.js';
 
 
 // Resolves whether this attack should be melee or ranged.

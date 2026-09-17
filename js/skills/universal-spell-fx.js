@@ -6,7 +6,7 @@
 // every projectile is built from nested divs pointing RIGHT (+x) inside a
 // 44x28 px box - the shared _egFireProjectile() flight code rotates the
 // whole box onto the flight vector, exactly like the class projectiles
-// (see js/endgame/endgame-class-projectiles.js).
+// (see js/combat/combat-class-projectiles.js).
 //
 // Entry points used by universal-spells.js:
 //   _uspFireThemedProjectile(spell, monsterId, hit, opts)

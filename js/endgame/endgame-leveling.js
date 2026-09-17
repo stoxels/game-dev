@@ -8,15 +8,15 @@ import { _resetPlayerMana, gainMana } from '../classes/class-mana.js';
 import { _incDirect } from '../quests/quests-stats.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
-import { _egGetRevealProjectileDamagePct } from './endgame-class-projectiles.js';
-import { _egCalcPlayerDamage, _egLastHitElements, _egScaleElements } from './endgame-combat-calculations.js';
-import { _egAnimatePlayerProjectile } from './endgame-encounter.js';
+import { _egGetRevealProjectileDamagePct } from '../combat/combat-class-projectiles.js';
+import { _egCalcPlayerDamage, _egLastHitElements, _egScaleElements } from '../combat/combat-calculations.js';
+import { _egAnimatePlayerProjectile } from '../combat/encounter.js';
 import { _egRenderGateLevelChip } from './endgame-gate.js';
 import { _egRenderEquipSlots, _egRenderInventory, _egRenderStatsList } from './endgame-hub.js';
 import { _egMapPlayerLifeMult, _egMapXpMult } from './endgame-map-launch.js';
 import { _egCancelAbsorptionRegen, _egComputePlayerStats, _egGetAllEquippedItems } from './endgame-player-stats.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egFindUnmetRequirements, _egGetUnmetRequirementsText, _egSumAttributeBonuses } from './endgame-requirements.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME CHARACTER LEVELING---------------------------

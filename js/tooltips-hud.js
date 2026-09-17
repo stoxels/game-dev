@@ -4,11 +4,11 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { curMods } from './difficulty-modifiers.js';
-import { _egGetMaxAllowedMistakes } from './endgame/endgame-encounter-tick.js';
+import { _egGetMaxAllowedMistakes } from './combat/encounter-tick.js';
 import { _egActiveMapItem } from './endgame/endgame-map-launch.js';
 import { _egGetMapRewardBonuses, _egMapModAffects, _egResolveMapBoss } from './endgame/endgame-maps.js';
 import { _egBuildMergedModLines } from './endgame/endgame-player-stats.js';
-import { _egIsActive } from './endgame/endgame-state.js';
+import { _egIsActive } from './combat/combat-state.js';
 import { ALL, lvText } from './levels/levels.js';
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
 import { _getAsymptoticMasteryReduction, _getPenaltySecondsAtCount } from './penalty.js';

@@ -5,11 +5,11 @@
 //------------------------------------------------------------------------
 import { switchScreen } from '../screens/screens.js';
 import { t } from '../translation/translations.js';
-import { EG_ART } from './endgame-art.js';
-import { _egBuildChainPool, _egSpawnNextArenaBoss, _egUpdateObjectivesHUD } from './endgame-encounter-chain.js';
-import { _egEnsureLoseOverlayEndgameUI } from './endgame-encounter-overlays.js';
-import { _egMapTierMonsterLevel, _egRollMapTier } from './endgame-maps.js';
-import { _egCreateGeneratedLevel } from './endgame-puzzle-generator.js';
+import { EG_ART } from '../endgame/endgame-art.js';
+import { _egBuildChainPool, _egSpawnNextArenaBoss, _egUpdateObjectivesHUD } from './encounter-chain.js';
+import { _egEnsureLoseOverlayEndgameUI } from './encounter-overlays.js';
+import { _egMapTierMonsterLevel, _egRollMapTier } from '../endgame/endgame-maps.js';
+import { _egCreateGeneratedLevel } from './combat-puzzle-generator.js';
 
 'use strict';
 

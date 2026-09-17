@@ -5,11 +5,11 @@
 //------------------------------------------------------------------------
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _egGetElementCentre } from './endgame-class-projectiles.js';
-import { _egConsumePlayerCharge, _egUpdatePlayerChargeBar } from './endgame-encounter-tick.js';
-import { _egApplyPlayerMeleeImpact } from './endgame-encounter.js';
-import { _egGetAllEquippedItems } from './endgame-player-stats.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egGetElementCentre } from './combat-class-projectiles.js';
+import { _egConsumePlayerCharge, _egUpdatePlayerChargeBar } from './encounter-tick.js';
+import { _egApplyPlayerMeleeImpact } from './encounter.js';
+import { _egGetAllEquippedItems } from '../endgame/endgame-player-stats.js';
+import { _egIsActive } from './combat-state.js';
 
 //  endgame-weapon-swing.js
 //  MANUAL WEAPON ATTACK (E) + shared CSS swing visuals.

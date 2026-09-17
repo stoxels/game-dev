@@ -21,13 +21,13 @@ import { _egGetTarget, _egRollPlayerMiss, _egUpdateChargedProjectileVisual } fro
 import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT } from './encounter-constants.js';
 import { _egDamageTargetById, _egPlayerTakeDamage, _egShowStatusLabel } from './encounter-damage.js';
 import { _egApplyPlayerMissFeedback } from './encounter-monster-attacks.js';
-import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './endgame-class-projectiles.js';
-import { EG_ELEMENTS, _egCalcPlayerDamage, _egLastHitElements, _egLastHitWasCrit } from './endgame-combat-calculations.js';
-import { _egRestartFlashClass } from './endgame-encounter.js';
-import { _egGetActiveMapModValue, _egMapPlayerProjectileMult } from './endgame-map-launch.js';
-import { EG_DUAL_WIELD_PARRY_PCT, _egComputePlayerStats, _egScheduleAbsorptionRegen } from './endgame-player-stats.js';
-import { _egIsDualWielding } from './endgame-requirements.js';
-import { _egDragChargeElements, _egIsActive, _egRecentFills } from './endgame-state.js';
+import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
+import { EG_ELEMENTS, _egCalcPlayerDamage, _egLastHitElements, _egLastHitWasCrit } from './combat-calculations.js';
+import { _egRestartFlashClass } from './encounter.js';
+import { _egGetActiveMapModValue, _egMapPlayerProjectileMult } from '../endgame/endgame-map-launch.js';
+import { EG_DUAL_WIELD_PARRY_PCT, _egComputePlayerStats, _egScheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
+import { _egIsDualWielding } from '../endgame/endgame-requirements.js';
+import { _egDragChargeElements, _egIsActive, _egRecentFills } from './combat-state.js';
 
 
 

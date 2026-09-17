@@ -31,7 +31,7 @@ export const KEYBIND_DEFAULTS = [
 
     // Endgame parry (hold R by default) and manual weapon attack (E).
     // The attack swings the equipped weapon toward the facing direction
-    // with a pure-CSS effect (see js/endgame/endgame-weapon-swing.js) -
+    // with a pure-CSS effect (see js/combat/combat-weapon-swing.js) -
     // no per-character/per-class weapon art needed.
     { id: 'eg-parry',    label: 'Parry (hold)',  keys: 'r' },
     { id: 'eg-attack',   label: 'Melee Attack (spends charge %)', keys: 'e' },

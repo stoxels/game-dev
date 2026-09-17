@@ -850,7 +850,7 @@ export function _sraClassProjDef(spellId) {
 // Fires ONE real projectile and OWNS its lifetime.
 //
 // _egFireProjectile removes its own element from `anim.onfinish` (see
-// js/endgame/endgame-class-projectiles.js). That is reliable in-game, but this
+// js/combat/combat-class-projectiles.js). That is reliable in-game, but this
 // screen is not the game: a 5-projectile volley (Rain of Fire) came back with
 // the projectiles parked at the origin - animations gone, arrival never fired
 // - which reads as a spell that does nothing. So the flight timeline is driven

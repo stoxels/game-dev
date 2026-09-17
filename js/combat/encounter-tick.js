@@ -4,15 +4,15 @@
 // names still living in the concatenated body. See MIGRATION.md.
 //------------------------------------------------------------------------
 import { t } from '../translation/translations.js';
-import { _egGetMonsterChargeMultiplier, _egGetPlayerChargeMultiplier, _egPlayerStatuses, _egPuzzleEffects, _egRefreshPlayerStatusIcons, _egTickAilments } from './endgame-ailments.js';
-import { _egEndMapDefeated } from './endgame-encounter-chain.js';
-import { _egMaybeShowLowHealthWarning, _egMaybeShowMistakesWarning } from './endgame-encounter-overlays.js';
-import { EG_LIFE_REGEN_INTERVAL_MS, EG_MELEE_OVERCHARGE_RATIO, _egFireMonsterAttack, _egUpdateBars } from './endgame-encounter.js';
-import { _egPauseGridDrops, _egResumeGridDrops } from './endgame-grid-pickups.js';
-import { _egHazardsTick } from './endgame-hazards.js';
-import { _egGetActiveMapModValue, _egHasActiveMapMod } from './endgame-map-launch.js';
-import { _egComputePlayerStats, _egGetPlayerAttackInterval } from './endgame-player-stats.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egGetMonsterChargeMultiplier, _egGetPlayerChargeMultiplier, _egPlayerStatuses, _egPuzzleEffects, _egRefreshPlayerStatusIcons, _egTickAilments } from './combat-ailments.js';
+import { _egEndMapDefeated } from './encounter-chain.js';
+import { _egMaybeShowLowHealthWarning, _egMaybeShowMistakesWarning } from './encounter-overlays.js';
+import { EG_LIFE_REGEN_INTERVAL_MS, EG_MELEE_OVERCHARGE_RATIO, _egFireMonsterAttack, _egUpdateBars } from './encounter.js';
+import { _egPauseGridDrops, _egResumeGridDrops } from './combat-grid-pickups.js';
+import { _egHazardsTick } from './combat-hazards.js';
+import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
+import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
+import { _egIsActive } from './combat-state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.

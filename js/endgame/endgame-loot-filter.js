@@ -11,7 +11,7 @@ import { EG_ALL_BASE_TYPES } from './endgame-equipment-base-items.js';
 import { EG_SLOT_MOD_TABLE_MAP } from './endgame-equipment-generator.js';
 import { EG_INV_COLS, _egInventory, egSaveHubState } from './endgame-hub.js';
 import { EG_SHARD_DEFS, _egRollShardForItem, egAddShard } from './endgame-shards.js';
-import { _egIsActive } from './endgame-state.js';
+import { _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME LOOT FILTER----------------------------------

@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------
 import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
-import { _egBossCorrupted } from '../../endgame/endgame-state.js';
+import { _egBossCorrupted } from '../combat-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDotTick, _egNkEl, _egNkHit, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkRuns, _egNkToast, _egRemoveCellCorruption } from './shared-boss-abilities.js';
 

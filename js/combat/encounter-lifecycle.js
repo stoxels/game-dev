@@ -11,16 +11,16 @@
 import { _uspClearSupportBuffs } from '../skills/universal-spells.js';
 import { _egClearChargedProjectileVisual } from './encounter-charged-shot.js';
 import { _egBuildSpawnList, _egClearCampaignLevelFields, _egScheduleMonsterSpawns } from './encounter-spawn-rules.js';
-import { _egAilmentsCleanup, _egAilmentsReset } from './endgame-ailments.js';
-import { _egFlushPendingRevealProjectiles } from './endgame-class-projectiles.js';
-import { _egChainCleanup } from './endgame-encounter-chain.js';
-import { _egMaybeShowMistakesWarning, _egResetAbsorptionBrokenState, _egResetLowHealthWarningState, _egResetMistakesWarningState } from './endgame-encounter-overlays.js';
-import { _egSetHoldEPauseVisual, _egTickLoop } from './endgame-encounter-tick.js';
-import { _egHideMonsterPanel, _egRenderPanel } from './endgame-encounter.js';
-import { _egStartPickupSpawner, _egStopPickupSpawner } from './endgame-grid-pickups.js';
-import { _egHazardsCleanup, _egHazardsReset } from './endgame-hazards.js';
-import { _egCancelAbsorptionRegen, _egComputePlayerStats } from './endgame-player-stats.js';
-import { _egRecentFills } from './endgame-state.js';
+import { _egAilmentsCleanup, _egAilmentsReset } from './combat-ailments.js';
+import { _egFlushPendingRevealProjectiles } from './combat-class-projectiles.js';
+import { _egChainCleanup } from './encounter-chain.js';
+import { _egMaybeShowMistakesWarning, _egResetAbsorptionBrokenState, _egResetLowHealthWarningState, _egResetMistakesWarningState } from './encounter-overlays.js';
+import { _egSetHoldEPauseVisual, _egTickLoop } from './encounter-tick.js';
+import { _egHideMonsterPanel, _egRenderPanel } from './encounter.js';
+import { _egStartPickupSpawner, _egStopPickupSpawner } from './combat-grid-pickups.js';
+import { _egHazardsCleanup, _egHazardsReset } from './combat-hazards.js';
+import { _egCancelAbsorptionRegen, _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _egRecentFills } from './combat-state.js';
 
 
 
