@@ -5,43 +5,18 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFroze
 //------------------------------------------------------------------------
 //-------------------BOSS: THE INFERNO (boss_inferno)----------------------
 //------------------------------------------------------------------------
-// TIER 7 REWORK - 🌋 "The Living Volcano". Escalating heat you must
-// actively cool: the arena heats the longer you stand still - movement is
-// survival. Element: fire (unchanged).
-//   • MAGMA TIDES (signature, all fight) - lava floods half the arena in
-//     slow alternating tides (left/right, quartered in phase 3). Standing
-//     in lava is a heavy DoT; the tide edge leaves COOLING OBSIDIAN TILES
-//     that are safe to stand on and slowly crack (3 states) before
-//     sinking. Every tile stood on COOLS you: heat is the meter.
-//   • PYROCLASTIC SURGE (60%) - a wall of fire sweeps from one edge with
-//     two readable gaps; ash cloud lingers behind it (low visibility, no
-//     damage - pressure, not punish).
-//   • ERUPTION VENTS (60%) - three vents telegraph, then jet upward; the
-//     jets leave HEAT HAZE zones that raise your heat meter faster while
-//     inside.
-//   • 💀 SUPERVOLCANIC WINTER (≤10%, one-shot) - inversion twist: the
-//     Inferno detonates and the arena FREEZES over (fire→ice identity
-//     break). The ice sheet makes your movement DRIFT (momentum), magma
-//     bombs mark landing spots, and you must lure the dying core's three
-//     magma surges into the fissure vents to blow its cap. The detonation
-//     of the third surge is the kill (canonical damage path). Charge bar
-//     frozen (gate in _egTickPlayer via _egInfVFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Prefix discipline: everything here is _egInfV / eg-infv- (the _egInf stem
-// is shared - do not shorten).
+// Tier-7 rework "The Living Volcano": standing still builds heat, moving
+// and obsidian tiles cool you. Surge + vents join at 60%; SUPERVOLCANIC
+// WINTER at ≤10% inverts the arena to ice - lure 3 magma surges into
+// fissure vents for the kill.
 //------------------------------------------------------------------------
 
+// Prefix discipline: everything here is _egInfV / eg-infv- (the _egInf stem
+// is shared - do not shorten).
+
 // DEBUG: slow Inferno's timing 2.5x so manual playtests / screenshot
-// automation can catch mid-animation states. Flip to false for ship.
-export const _EG_INFV_DEBUG_SLOW = true;
+// automation can catch mid-animation states. Off for ship.
+export const _EG_INFV_DEBUG_SLOW = false;
 export const _EG_INFV_DEBUG_MULT = _EG_INFV_DEBUG_SLOW ? 2.5 : 1;
 
 Object.assign(EG_BOSS_DEFS, {
