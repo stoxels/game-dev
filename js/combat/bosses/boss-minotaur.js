@@ -4,45 +4,13 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _eg
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MINOTAUR (boss_minotaur)-------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK - "The Labyrinth's Warden". The bull-rush soul, weaponised
-// into a full labyrinth duel: walls rise to MAKE the maze, the bull runs
-// the lanes it creates, and the thread you follow is the fight. Element:
-// null - pure physical, resists do nothing (the Colossus precedent).
+// Tier-8 rework "The Labyrinth's Warden": walls rise to make the maze and
+// the bull rushes the lane matching your row/column. Hooftread terrain +
+// thread of Ariadne join at 60%; THE WARDEN'S LABYRINTH at ≤10% runs every
+// lane at once - only shattered lanes are safe.
 //
-//   • LABYRINTH WALLS + CHARGES (signature, all fight) - 5–6 labyrinth
-//     walls rise from the floor (telegraphed slabs) and hold for ~8s. Each
-//     charge, the Minotaur locks onto the open lane that matches your
-//     current row/column and BULL-RUSHES down it - the maze channels the
-//     charge, so the walls are both cover and deathtrap. Phase 3: double
-//     rushes per cast, and the walls grow an extra row.
-//   • HOOFTREAD TERRAIN (60%) - every charge leaves HOOF CRATERS along its
-//     lane (small impact rings that plant lingering hoofprint hazards) and
-//     a DUST STORM trails the bull for a few seconds (burn lane). The maze
-//     accumulates terrain the longer the duel runs.
-//   • THREAD OF ARIADNE (60%) - a glowing thread marks the ONE SAFE LANE
-//     through the current walls. It is honest - and it is bait: standing
-//     in the thread when the charge comes keeps you safe, but the thread
-//     then snaps and re-forms elsewhere for the next charge (the maze is
-//     never solved twice). Read it fast, move through it, do not live in it.
-//   • 🐂 THE WARDEN'S LABYRINTH (≤10%, one-shot finale) - the final maze:
-//     three wall generations rise one after another while the Warden
-//     charges each generation TWICE. Break the maze: three MAZEWALL
-//     STONES glow in the walls - body-check a lit stone 3× to shatter it
-//     (each shatter shortens the next generation's wall set). Shatter all
-//     three before the TRAMPLE - the last charge runs EVERY lane at once
-//     and only shattered lanes are safe. Charge bar frozen (gate in
-//     _egTickPlayer via _egMntFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (fog_bank, prior_bomb) live in shared-boss-abilities.js
-// and are referenced by handler-name string.
+// Shared mechanics (prior_bomb) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Minotaur's timing 2.5x so manual playtests / screenshot
