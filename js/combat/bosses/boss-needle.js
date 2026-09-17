@@ -5,50 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE NEEDLE (boss_needle)-----------------------
 //------------------------------------------------------------------------
-// REWORK - precision-sewing homage, rebuilt as a full stitchcraft gauntlet.
-// The Needle treats the arena as cloth: spike gates to thread, pins that
-// rain down and plant themselves, a rolling stitch wave of rising needles,
-// and a pincushion that bursts - then, at the very end, it sews the whole
-// screen shut and only the eye of the needle lets you through.
-//
-//   Phase 1 (100–60%) - SPIKE GATES. Full-height needle gates peek in at
-//                       the edge, then scroll across with a single wobbling
-//                       gap. Thread the gap! Two gates per pass; three at
-//                       the end.
-//                       Plus PIN DROPS. Giant pins slam down point-first at
-//                       marked spots and plant themselves as tilted
-//                       hazards. Mind the planted pins!
-//   Phase 2 ( ≤60%)   - STITCH WAVE. The floor flashes a stitch grid, then
-//                       needles rise lane by lane in a rolling wave. Stay
-//                       ahead of the wave!
-//                       Plus PINCUSHION BURST. A pincushion swells and
-//                       BURSTS - needles fly outward along every spoke.
-//                       Slip between them!
-//   Phase 3 ( ≤30%)   - Three gates, four pins, a double stitch wave,
-//                       faster spokes. The cloth is half-sewn already.
-//   Finale ( ≤10%)    - THE FINAL STITCH (one-shot set-piece): the boss
-//                       goes immune and shielded and SEWS while a fabric
-//                       weave swallows the arena. On every metronome beat a
-//                       colossal needle stabs the ENTIRE screen - only the
-//                       glowing EYE of the needle is safe. The eye hops to
-//                       a fresh spot every stab; the last one is smaller
-//                       and sews the screen shut. THREAD THE EYE! Charge
-//                       bar frozen for the whole set-piece (gate in
-//                       _egTickPlayer via _egNdFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Rework stitchcraft gauntlet: spike gates with one wobbling gap, planted
+// pin drops, a rolling stitch wave, and bursting pincushions. THE FINAL
+// STITCH at ≤10%: a colossal needle stabs the whole screen on every beat
+// - only the hopping eye is safe.
 //------------------------------------------------------------------------
 
 export const _EG_ND_DEBUG_SLOW = false;
