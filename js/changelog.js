@@ -5,13 +5,10 @@ import { LANG } from './translation/translations.js';
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Version history shown in the Changelog modal, newest first.
-// All texts are stored INLINE as ["english", "german"] pairs - no
-// translation keys. Every change item and every category label is an
-// array whose [0] is the English text and [1] the German text (picked
-// via LANG at render time, see _changelogLangIndex below). Version
-// numbers and dates are language-neutral literals. To add an entry,
-// just append a pair.
+// Version history shown in the Changelog modal, newest first. Every change
+// item and category label is an inline ["english", "german"] pair (picked
+// via LANG at render time); version numbers and dates are neutral literals.
+// To add an entry, just append a pair.
 export const CHANGELOG_DATA = [
 
 
@@ -317,7 +314,8 @@ export function renderChangelog() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Opens the changelog modal, rendering its content first if needed.
+// Opens the changelog modal, rendering its content first so a
+// mid-session language switch is reflected on the next open.
 export function openChangelog() {
     renderChangelog();
     document.getElementById("changelog-modal").classList.add("show");
