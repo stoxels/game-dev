@@ -7,42 +7,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDotTick, _egNkEl, _egNkHit, 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE GUST (boss_gust)---------------------------
 //------------------------------------------------------------------------
-// Storm-front duel, reworked: the arena has NO lanes. Instead, a whole-
-// screen WIND howls across the fight on a fixed cadence - every ~30 s a
-// storm front gathers on one (randomized) side and starts shoving the
-// player toward the opposite wall almost immediately (brief gather
-// preview only, no long wind-up).
-//
-// The counterplay is the WINDBREAK: the moment the wind announces itself,
-// a wooden wall spawns on the DOWNWIND side at a RANDOM height. Riding the
-// gale into the wall's shadow catches the player harmlessly (the wall stops
-// the push); miss the catch window and the wind throws you into the edge
-// SPIKES, which hit hard on contact and keep grinding damage every second
-// while you stay inside them.
-//
-//   • Wind pushes toward one side; steering against it (holding the
-//     opposite direction) weakens the push enough to make progress.
-//   • While the wind blows, the auto-attack charge bar is PAUSED -
-//     storm time is never free DPS time.
-//   • Spikes line both screen edges permanently: contact hit + DoT while
-//     inside, on either side.
-//   • The boss hovers on the right edge, bobbing vertically, and throws
-//     telegraphed wind blades at the player's current row.
-//   • HP-gated tornado volleys remain the phase set-pieces (75/50/25%),
-//     each entry pre-warned by a pulsing edge line, and the funnel on
-//     screen SUCTIONS the player toward it - you must fight to keep
-//     your distance:
-//       75% - one tornado from the boss, sweeping left.
-//       50% - boss tornado; as it fades, a return tornado from the left.
-//       25% - boss tornado, left return, then a tornado diving from the top.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Storm-front duel with no lanes: a whole-screen wind shoves you toward
+// edge spikes every ~30s - ride it into the downwind windbreak wall for
+// a harmless catch. Wind blades, HP-gated suction tornadoes, and a paused
+// charge bar while the wind blows.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
