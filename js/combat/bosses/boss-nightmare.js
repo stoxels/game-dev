@@ -5,15 +5,11 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkE
 //-------------------BOSS: THE NIGHTMARE (boss_nightmare)-----------------------
 //------------------------------------------------------------------------
 // Lights-out hunt: the arena drowns in darkness and something fast starts
-// circling. You can barely see it - but you can hear the toast warnings,
-// and the dark itself only tickles. The teeth are the thing in the black.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// circling. The dark only tickles - the teeth are the thing in the black.
+// Listen for the warnings and keep it at arm's length.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (soul_tithe) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// A circling beast hunts in full darkness; closeness warnings are the tell.
+// Keep it at range - the dark itself barely scratches.
 export function _egMechDarkHunt(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
