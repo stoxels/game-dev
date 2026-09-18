@@ -7,42 +7,11 @@ import { _egBlastHudInZone, _egNkAbilityHitToast, _egNkHit, _egNkPlayerCenter, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE FIREFLY (boss_firefly)---------------------
 //------------------------------------------------------------------------
-// The Firefly is an arena-light survival puzzle. The whole screen drowns in
-// darkness; the player's five fairies are the only light sources - and the
-// darkness itself is the enemy: stand outside every fairy's light and the
-// dark gnaws you HEAVILY. The swarm is commanded like RTS units: press the
-// Special Ability key (F by default) to send the selected fairy to the
-// mouse cursor, or simply drag a fairy with the mouse. Fairies that cluster
-// overlap their glow - the more that stack, the bigger the safe pool -
-// while formation trials force the swarm to spread out.
+// Arena-light survival puzzle: five fairies are the only light in drowning
+// darkness - command them RTS-style (F sends one to the cursor, G cycles,
+// H recalls all, or drag them). LUMEN BURSTS punish clustering between the
+// 75/50/25% formation trials; fail a placement and that fairy is lost for 60s.
 //
-// Between trials the boss fights back directly: LUMEN BURSTS. A bright
-// tell blooms somewhere on the grid (~2s), then detonates - searing the
-// keeper if she stands inside and chipping every fairy caught in the blast
-// (three hits fell a fairy). Bursts aim at the keeper herself and at the
-// biggest fairy cluster, so the answer is to keep moving AND keep the swarm
-// spread. Trials cancel pending bursts (a set-piece owns the screen).
-//
-// Formation trials (per intended design):
-//   75% HP → LIGHTFALL - all 5 fairies + the keeper in one shared position
-//            (10s to gather)
-//   50% HP → SPLIT - 2 groups of fairies, keeper in a third position (15s)
-//   25% HP → SCATTER - every fairy in its own position, keeper in the 5th
-//            (20s)
-// Circles are QUOTA-based ("3× fairies"), never per-number - any fairy can
-// fill any slot, and greedy nearest-assignment decides the verdict.
-//
-// Commanding: F sends the SELECTED fairy to the cursor; G cycles which
-// fairy is selected (with a flash so the eye catches the hand-off); H
-// recalls ALL fairies to the keeper's orbit; dragging does F and recall
-// at once. Aiming F at the keeper recalls just that one fairy.
-// Fail any placement and that fairy is LOST from the swarm (60s respawn),
-// plus the burst damages the keeper.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + onInit + trial phase hook)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
