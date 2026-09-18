@@ -1,11 +1,11 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
-import { _resolveCursedRowErasureDownside } from '../shared/cursed-downside.js';
+import { _resolveCursedRowErasureDownside } from '../../puzzle-mechanics/cursed-downside.js';
 import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { solveRows } from '../../puzzle-mechanics/grid-actions.js';
 import { _getPreFilledRows } from '../../puzzle-mechanics/puzzle-helpers.js';
-import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
+import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
 
 //------------------------------------------------------------------------
 //-------------------CURSED ROW SOLVE - TIDAL WAVE-------------------------

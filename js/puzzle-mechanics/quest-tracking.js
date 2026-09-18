@@ -1,4 +1,4 @@
-import { updateQuestStats } from '../../quests/quests-stats.js';
+import { updateQuestStats } from '../quests/quests-stats.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - QUEST TRACKING----------------------

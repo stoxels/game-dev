@@ -2,7 +2,7 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { FX_Z, _fxClock, _fxGetPuzzleRect, _fxMakeGoldTintFill, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
-import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
+import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
 
 //------------------------------------------------------------------------
 //-------------------CHRONO FRACTURE--------------------------------------

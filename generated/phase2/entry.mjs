@@ -37,10 +37,10 @@ import { APEX_COLLECTOR_VALID_RARITIES, COMMON_REFINEMENT_NODES, COMMON_REFINEME
 import { CELL_FX_DURATION, _applyCellEffect, _ensureCellEffectCSS } from '../../js/puzzle-mechanics/cell-fx.js';
 import { CHAOS_BLAST_COLOURS, CHRONOBOLT_X_FRACTIONS, FX_Z, TUTOR_ITEM_SFX, PARTICLES, PEARL_VARIANTS, _ensureFreezeCountdownStyles, _fxClock, _fxGetGridCorners, _fxGetPuzzleRect, _fxGetPuzzleRectForWrap, _fxMakeClockBurst, _fxMakeClockRays, _fxMakeElement, _fxMakeGoldTintFill, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxShieldBorderAdd, _fxShieldBorderRemove, _fxSpawnParticles, playFreezeCountdownOverlay } from '../../js/puzzle-mechanics/fx-helpers.js';
 import { _applyDenseMarkerBias, _applyTargetedRevealBias, _getPreFilledCols, _getPreFilledRows, shuffle } from '../../js/puzzle-mechanics/puzzle-helpers.js';
-import { _trackWitchImmuneCursedUse } from '../../js/puzzle-items/shared/quest-tracking.js';
-import { _clearBlackoutCountdown, applyCursedRowBlackout, applyCursedColBlackout } from '../../js/puzzle-items/shared/clue-blackout.js';
+import { _trackWitchImmuneCursedUse } from '../../js/puzzle-mechanics/quest-tracking.js';
+import { _clearBlackoutCountdown, applyCursedRowBlackout, applyCursedColBlackout } from '../../js/puzzle-mechanics/clue-blackout.js';
 import { _eraseFilledCellsInCol, _eraseFilledCellsInRow, solveCols, solveRows, unsolveCols, unsolveColsExcluding, unsolveRows, unsolveRowsExcluding } from '../../js/puzzle-mechanics/grid-actions.js';
-import { _applyBlackoutDownside, _applyColErasureDownside, _applyRowErasureDownside, _blackoutWardBlocks, _cursedDownsideCount, _cursedDownsideDuration, _removalWardBlocks, _resolveCursedBlackoutDownside, _resolveCursedColErasureDownside, _resolveCursedRowErasureDownside } from '../../js/puzzle-items/shared/cursed-downside.js';
+import { _applyBlackoutDownside, _applyColErasureDownside, _applyRowErasureDownside, _blackoutWardBlocks, _cursedDownsideCount, _cursedDownsideDuration, _removalWardBlocks, _resolveCursedBlackoutDownside, _resolveCursedColErasureDownside, _resolveCursedRowErasureDownside } from '../../js/puzzle-mechanics/cursed-downside.js';
 import { _calcAddTimeSecs, _calcMarkWrongCount, _calcTutorItemCount, _calcRevealCount } from '../../js/puzzle-mechanics/effect-modifiers.js';
 import { attachItemTooltip, buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout } from '../../js/puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { _fxCandle, _fxCandleGlow, _fxMagnifier, _fxMakeScanBar, _fxScanner, _fxSpawnExpandingRings, _fxSpyglass, _useReveal } from '../../js/puzzle-items/reveal/reveal.js';

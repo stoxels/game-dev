@@ -1,9 +1,9 @@
-import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
-import { questStat_curseBlocked } from '../../quests/quests-stats.js';
-import { t } from '../../translation/translations.js';
-import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { questStat_curseBlocked } from '../quests/quests-stats.js';
+import { t } from '../translation/translations.js';
+import { showToast } from './toasts-and-popups.js';
 import { applyCursedColBlackout, applyCursedRowBlackout } from './clue-blackout.js';
-import { unsolveColsExcluding, unsolveRowsExcluding } from '../../puzzle-mechanics/grid-actions.js';
+import { unsolveColsExcluding, unsolveRowsExcluding } from './grid-actions.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - CURSED DOWNSIDE----------------------

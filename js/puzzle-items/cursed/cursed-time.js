@@ -2,9 +2,9 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { addTimeSecs } from '../../timer/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
-import { _resolveCursedBlackoutDownside } from '../shared/cursed-downside.js';
+import { _resolveCursedBlackoutDownside } from '../../puzzle-mechanics/cursed-downside.js';
 import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
-import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
+import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
 
 //------------------------------------------------------------------------
 //-------------------CURSED TIME - CURSED CLOCK---------------------------
