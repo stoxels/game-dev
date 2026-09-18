@@ -41,20 +41,34 @@ export const BEAR_PATH_EMERGENCY_STOP = 1500;
 export let _nextBearRevealSoundTime = 0;
 
 // Active bear movement intervals - stored so they can be killed on level end
-window._bearIntervals = window._bearIntervals || [];
+let _bearIntervals = [];
 
 // Live agent-state objects for every currently walking bear
 // (path, progress, interval, HUD card). Used by the mistake penalty to
 // shorten walks instead of removing the bears outright.
-window._activeBearAgents = window._activeBearAgents || [];
+let _activeBearAgents = [];
 
 // Remaining-time holders for walker HUD cards, keyed by card unique ID
 // (drifter / fuse countdown cards). Bear timers now live directly on their
 // agent state and are shown above the bear on the grid instead.
-window._walkerHudState = window._walkerHudState || {};
+let _walkerHudState = {};
 
 // Active HUD timer intervals - each entry is { id, loopId }
-window._walkerHudTimers = window._walkerHudTimers || [];
+let _walkerHudTimers = [];
+
+// Drifter (companion) state. Was loose window._drifter* globals with no
+// top-level declarations; no-init lets preserve the old unset-undefined
+// semantics - the cast path assigns every field before first read.
+let _drifterActive;
+let _drifterCurrPos;
+let _drifterBaseInterval;
+let _drifterCurrentInterval;
+let _drifterTimeRemainingSeconds;
+let _drifterCharges;
+let _drifterCurrentFeed;
+let _drifterInterval;      // setTimeout handle for the next step
+let _drifterTimer;         // setInterval handle for the countdown tick
+let _drifterFuseInterval;  // setInterval handle for the fuse countdown
 
 
 //------------------------------------------------------------------------
@@ -209,7 +223,7 @@ export function _removeBearElement(bearEl) {
 }
 
 // Starts the step-by-step interval loop that moves a bear along its pre-built path.
-// Registers the walk in window._activeBearAgents so mistakes can shorten it.
+// Registers the walk in _activeBearAgents so mistakes can shorten it.
 // Draws the dashed path preview overlay and cleans up everything when the
 // path ends. pathColor tints the dashed line (yellow Browney / grey Wiener).
 // rank is stored on the agent so the mistake penalty can apply rank-scaled loss.
@@ -258,7 +272,7 @@ export function _startBearAnimation(path, icon, stepDurationMs, bearName, pathCo
         _updateBearTimerLabel(state);
     }, 1000);
 
-    window._activeBearAgents.push(state);
+    _activeBearAgents.push(state);
     _redrawBearPathOverlays();
 }
 
@@ -270,7 +284,7 @@ export function _finishBearAgent(state) {
 
     if (state.interval) clearInterval(state.interval);
     if (state.timerInterval) clearInterval(state.timerInterval);
-    window._activeBearAgents = window._activeBearAgents.filter(s => s !== state);
+    _activeBearAgents = _activeBearAgents.filter(s => s !== state);
 
     _removeBearElement(state.bearEl);
     _redrawBearPathOverlays();
@@ -390,7 +404,7 @@ export function _createDrifterElement(intervalMs) {
             <div id="drifter-healthbar" style="width:0%;height:100%;background:#1abc9c;transition:width 0.3s;"></div>
         </div>
         <div id="drifter-icon">🐶</div>
-        <div id="drifter-timer-text" style="font-size:12px;color:#f1c40f;font-family:monospace;font-weight:bold;margin-top:2px;">${window._drifterTimeRemainingSeconds}s</div>
+        <div id="drifter-timer-text" style="font-size:12px;color:#f1c40f;font-family:monospace;font-weight:bold;margin-top:2px;">${_drifterTimeRemainingSeconds}s</div>
     `;
     document.body.appendChild(el);
     return el;
@@ -399,11 +413,11 @@ export function _createDrifterElement(intervalMs) {
 // Kills all active drifter timers and removes its DOM element.
 // Safe to call even if no drifter is currently active.
 export function _drifterClear() {
-    window._drifterActive = false;
-    window._drifterCurrPos = null;
-    if (window._drifterInterval) { clearTimeout(window._drifterInterval); window._drifterInterval = null; }
-    if (window._drifterTimer) { clearInterval(window._drifterTimer); window._drifterTimer = null; }
-    if (window._drifterFuseInterval) { clearInterval(window._drifterFuseInterval); window._drifterFuseInterval = null; }
+    _drifterActive = false;
+    _drifterCurrPos = null;
+    if (_drifterInterval) { clearTimeout(_drifterInterval); _drifterInterval = null; }
+    if (_drifterTimer) { clearInterval(_drifterTimer); _drifterTimer = null; }
+    if (_drifterFuseInterval) { clearInterval(_drifterFuseInterval); _drifterFuseInterval = null; }
     document.getElementById('drifter-agent')?.remove();
 }
 
@@ -423,7 +437,7 @@ export function _drifterPlayLevelUpEffects(newLevel) {
     const drifterEl = document.getElementById('drifter-agent');
     if (drifterEl) {
         // Update CSS transition to reflect the new faster movement speed
-        drifterEl.style.transition = `left ${window._drifterCurrentInterval}ms linear, top ${window._drifterCurrentInterval}ms linear`;
+        drifterEl.style.transition = `left ${_drifterCurrentInterval}ms linear, top ${_drifterCurrentInterval}ms linear`;
 
         // Quick pop scale animation
         drifterEl.style.transform = 'translate(-50%, -50%) scale(1.4)';
@@ -442,39 +456,39 @@ export function _drifterPlayLevelUpEffects(newLevel) {
 
 // Updates the XP bar fill percentage based on current feed progress vs target.
 export function _drifterUpdateXpBar() {
-    const required = _drifterXpRequiredForNextLevel(window._drifterCharges);
+    const required = _drifterXpRequiredForNextLevel(_drifterCharges);
     const bar = document.getElementById('drifter-healthbar');
     if (bar) {
-        bar.style.width = `${(window._drifterCurrentFeed / required) * 100}%`;
+        bar.style.width = `${(_drifterCurrentFeed / required) * 100}%`;
     }
 }
 
 // Public - called externally when the player feeds the drifter a tile reveal.
 // Grants bonus lifetime, advances XP, and levels up the drifter if threshold is met.
 window.feedDrifter = function () {
-    if (!window._drifterActive) return;
+    if (!_drifterActive) return;
 
     // Each feed point adds a small bonus to the drifter's remaining lifetime
-    window._drifterTimeRemainingSeconds += 0.5;
+    _drifterTimeRemainingSeconds += 0.5;
 
-    window._drifterCurrentFeed++;
+    _drifterCurrentFeed++;
 
     // Update the Drifter Timer on the grid when the player feeds Drifter
     const timerTextEl = document.getElementById('drifter-timer-text');
     if (timerTextEl) {
-        timerTextEl.innerText = `${Math.max(0, Math.floor(window._drifterTimeRemainingSeconds))}s`;
+        timerTextEl.innerText = `${Math.max(0, Math.floor(_drifterTimeRemainingSeconds))}s`;
     }
 
-    const required = _drifterXpRequiredForNextLevel(window._drifterCharges);
-    if (window._drifterCurrentFeed >= required) {
-        window._drifterCurrentFeed = 0;
-        window._drifterCharges++;
+    const required = _drifterXpRequiredForNextLevel(_drifterCharges);
+    if (_drifterCurrentFeed >= required) {
+        _drifterCurrentFeed = 0;
+        _drifterCharges++;
 
         // Each level reduces step interval by 15%, capped at 75% total speedup
-        const speedMultiplier = Math.max(0.25, 1 - (window._drifterCharges * 0.15));
-        window._drifterCurrentInterval = window._drifterBaseInterval * speedMultiplier;
+        const speedMultiplier = Math.max(0.25, 1 - (_drifterCharges * 0.15));
+        _drifterCurrentInterval = _drifterBaseInterval * speedMultiplier;
 
-        _drifterPlayLevelUpEffects(window._drifterCharges);
+        _drifterPlayLevelUpEffects(_drifterCharges);
     }
 
     _drifterUpdateXpBar();
@@ -546,7 +560,7 @@ export function _drifterPlayExplosionAnimation(el) {
 // Runs the 3-second fuse countdown, then detonates a radius explosion
 // centered on the drifter's last position. Radius = drifter's final level.
 export function _drifterPoopExplosion(el, r, c, rows, cols) {
-    window._drifterActive = false;
+    _drifterActive = false;
 
     if (!el || !document.body.contains(el)) return;
 
@@ -557,7 +571,7 @@ export function _drifterPoopExplosion(el, r, c, rows, cols) {
     Audio_Manager.playSFX('drifterPoop');
 
     let countdown = 3;
-    window._drifterFuseInterval = setInterval(() => {
+    _drifterFuseInterval = setInterval(() => {
         countdown--;
 
         if (countdown > 0) {
@@ -566,11 +580,11 @@ export function _drifterPoopExplosion(el, r, c, rows, cols) {
         }
 
         // Countdown hit 0 - detonate!
-        clearInterval(window._drifterFuseInterval);
-        window._drifterFuseInterval = null;
+        clearInterval(_drifterFuseInterval);
+        _drifterFuseInterval = null;
         _removeWalkerHudIndicator(hudUid);
 
-        const radius = window._drifterCharges;
+        const radius = _drifterCharges;
         const cellsRevealed = _drifterExplodeCells(r, c, radius, rows, cols);
 
         globalThis.showToast(t('cls_kaboom'));
@@ -592,10 +606,10 @@ export function _drifterPoopExplosion(el, r, c, rows, cols) {
 // Schedules the next drifter movement step using the current interval speed.
 // Recursively reschedules itself until _drifterActive is false.
 export function _drifterScheduleNextStep(drifterEl, currPos, rows, cols, smartTarget, sol) {
-    if (!window._drifterActive) return;
+    if (!_drifterActive) return;
 
-    window._drifterInterval = setTimeout(() => {
-        if (!window._drifterActive) return;
+    _drifterInterval = setTimeout(() => {
+        if (!_drifterActive) return;
         const next = _drifterPickNextStep(currPos.r, currPos.c, rows, cols, smartTarget, sol);
         currPos.r = next.r;
         currPos.c = next.c;
@@ -605,26 +619,26 @@ export function _drifterScheduleNextStep(drifterEl, currPos, rows, cols, smartTa
         Audio_Manager.playSFX('drifterBark');
 
         _drifterScheduleNextStep(drifterEl, currPos, rows, cols, smartTarget, sol);
-    }, window._drifterCurrentInterval);
+    }, _drifterCurrentInterval);
 }
 
 // Starts the 1-second countdown timer that ends the drifter's active roaming phase
 // and kicks off the poop explosion once time runs out.
 export function _drifterStartCountdownTimer(drifterEl, currPos, rows, cols, hudUid) {
-    window._drifterTimer = setInterval(() => {
-        window._drifterTimeRemainingSeconds--;
+    _drifterTimer = setInterval(() => {
+        _drifterTimeRemainingSeconds--;
 
         // Update the Drifter Countdown Timer underneath the Icon 
         const timerTextEl = document.getElementById('drifter-timer-text');
         if (timerTextEl) {
-            timerTextEl.innerText = `${Math.max(0, Math.floor(window._drifterTimeRemainingSeconds))}s`;
+            timerTextEl.innerText = `${Math.max(0, Math.floor(_drifterTimeRemainingSeconds))}s`;
         }
 
-        if (window._drifterTimeRemainingSeconds <= 0) {
+        if (_drifterTimeRemainingSeconds <= 0) {
             // Stop roaming - but keep the DOM element alive for the explosion phase
-            window._drifterActive = false;
-            if (window._drifterInterval) { clearTimeout(window._drifterInterval); window._drifterInterval = null; }
-            if (window._drifterTimer) { clearInterval(window._drifterTimer); window._drifterTimer = null; }
+            _drifterActive = false;
+            if (_drifterInterval) { clearTimeout(_drifterInterval); _drifterInterval = null; }
+            if (_drifterTimer) { clearInterval(_drifterTimer); _drifterTimer = null; }
 
             _removeWalkerHudIndicator(hudUid);
             _drifterPoopExplosion(drifterEl, currPos.r, currPos.c, rows, cols);
@@ -649,19 +663,19 @@ export function _executeSummonDrifter(duration, interval, smartTarget) {
     const cols = sol[0].length;
 
     // Initialise global drifter state
-    window._drifterActive = true;
-    window._drifterCharges = 0;
-    window._drifterCurrentFeed = 0;
-    window._drifterBaseInterval = interval;
-    window._drifterCurrentInterval = interval;
-    window._drifterTimeRemainingSeconds = Math.ceil(duration / 1000);
+    _drifterActive = true;
+    _drifterCharges = 0;
+    _drifterCurrentFeed = 0;
+    _drifterBaseInterval = interval;
+    _drifterCurrentInterval = interval;
+    _drifterTimeRemainingSeconds = Math.ceil(duration / 1000);
 
     // Spawn at a random starting cell
     const currPos = {
         r: Math.floor(Math.random() * rows),
         c: Math.floor(Math.random() * cols),
     };
-    window._drifterCurrPos = currPos; // kept for resize/zoom re-snapping
+    _drifterCurrPos = currPos; // kept for resize/zoom re-snapping
 
     globalThis.showToast(t('cls_drifter_roaming'));
     Audio_Manager.playSFX('drifterSummon');
@@ -670,7 +684,7 @@ export function _executeSummonDrifter(duration, interval, smartTarget) {
     // Avatar combat animation is handled centrally in
     // _dispatchAscendencyAbility (slot active4 → drifter).
 
-    const hudUid = _spawnWalkerHudIndicator("🐶", "Drifter", window._drifterTimeRemainingSeconds, true);
+    const hudUid = _spawnWalkerHudIndicator("🐶", "Drifter", _drifterTimeRemainingSeconds, true);
 
     // Charge the dog companion sprite to the starting cell, then begin roaming
     const _beginDrifterRoam = () => {
@@ -750,17 +764,17 @@ export function _createHudCard(uniqueId, icon, label, initialSeconds) {
 }
 
 // Starts the 1-second tick interval that updates a HUD card's displayed timer.
-// The remaining time lives in a holder object inside window._walkerHudState
+// The remaining time lives in a holder object inside _walkerHudState
 // (keyed by card ID) so the mistake penalty can shave seconds off it.
 // For the drifter card (isDrifter=true) it reads the global remaining time
 // instead of counting down independently, so it stays in sync with feed bonuses.
 export function _startHudCardTicker(uniqueId, initialSeconds, isDrifter) {
     const holder = { timeRemaining: initialSeconds };
-    window._walkerHudState[uniqueId] = holder;
+    _walkerHudState[uniqueId] = holder;
 
     const tickerInterval = setInterval(() => {
         if (isDrifter) {
-            holder.timeRemaining = Math.max(0, Math.floor(window._drifterTimeRemainingSeconds));
+            holder.timeRemaining = Math.max(0, Math.floor(_drifterTimeRemainingSeconds));
         } else {
             holder.timeRemaining--;
         }
@@ -798,7 +812,7 @@ export function _spawnWalkerHudIndicator(icon, label, initialSeconds, isDrifter 
     container.appendChild(el);
 
     const tickerInterval = _startHudCardTicker(uniqueId, initialSeconds, isDrifter);
-    window._walkerHudTimers.push({ id: uniqueId, loopId: tickerInterval });
+    _walkerHudTimers.push({ id: uniqueId, loopId: tickerInterval });
 
     return uniqueId;
 }
@@ -813,13 +827,13 @@ export function _removeWalkerHudIndicator(id) {
         setTimeout(() => el.remove(), 200);
     }
 
-    const match = window._walkerHudTimers.find(t => t.id === id);
+    const match = _walkerHudTimers.find(t => t.id === id);
     if (match) {
         clearInterval(match.loopId);
-        window._walkerHudTimers = window._walkerHudTimers.filter(t => t.id !== id);
+        _walkerHudTimers = _walkerHudTimers.filter(t => t.id !== id);
     }
 
-    delete window._walkerHudState[id];
+    delete _walkerHudState[id];
 }
 
 
@@ -915,7 +929,7 @@ export function _redrawBearPathOverlays() {
     const svg = _positionBearPathOverlaySvg();
     if (!svg) return;
 
-    const active = (window._activeBearAgents || []).filter(s => !s.finished);
+    const active = (_activeBearAgents || []).filter(s => !s.finished);
     if (active.length === 0) {
         svg.style.display = 'none';
         return;
@@ -975,7 +989,7 @@ export function _playPathCutAnimation(lostSteps, baseColor) {
 // grid cell (no glide across a resized layout) and redraws the path overlays.
 // Wired to window resize, puzzle zoom and clue-side toggles.
 window._repositionRandomWalkerAgents = function () {
-    (window._activeBearAgents || []).forEach(state => {
+    (_activeBearAgents || []).forEach(state => {
         if (state.finished || !state.bearEl) return;
         const pos = state.path[Math.min(state.step, state.path.length - 1)];
         state.bearEl.style.transition = 'none';
@@ -987,15 +1001,15 @@ window._repositionRandomWalkerAgents = function () {
         });
     });
 
-    if (window._drifterActive && window._drifterCurrPos) {
+    if (_drifterActive && _drifterCurrPos) {
         const drifterEl = document.getElementById('drifter-agent');
         if (drifterEl) {
             drifterEl.style.transition = 'none';
-            _drifterSnapToCell(drifterEl, window._drifterCurrPos.r, window._drifterCurrPos.c);
+            _drifterSnapToCell(drifterEl, _drifterCurrPos.r, _drifterCurrPos.c);
             void drifterEl.offsetWidth;
             requestAnimationFrame(() => {
                 drifterEl.style.transition =
-                    `left ${window._drifterCurrentInterval}ms linear, top ${window._drifterCurrentInterval}ms linear`;
+                    `left ${_drifterCurrentInterval}ms linear, top ${_drifterCurrentInterval}ms linear`;
             });
         }
     }
@@ -1006,7 +1020,7 @@ window._repositionRandomWalkerAgents = function () {
 window.addEventListener('resize', () => {
     // Only react while walkers are actually on the grid - avoids spawning
     // the overlay SVG on menu screens.
-    if ((window._activeBearAgents || []).length > 0 || window._drifterActive) {
+    if ((_activeBearAgents || []).length > 0 || _drifterActive) {
         window._repositionRandomWalkerAgents();
     }
 }, { passive: true });
@@ -1027,7 +1041,7 @@ window.penalizeRandomWalkersOnMistake = function () {
     // the bear simply stops earlier instead of skipping cells mid-path.
     // The removed tail flashes red on the path preview, then fades out.
     // Loss is rank-scaled: 15s / 10s / 5s for rank 1 / 2 / 3.
-    (window._activeBearAgents || []).slice().forEach(state => {
+    (_activeBearAgents || []).slice().forEach(state => {
         const bearLoss = BEAR_TIME_LOSS_S_BY_RANK[state.rank] ?? BEAR_TIME_LOSS_S_BY_RANK[1];
         const remainingSteps = state.path.length - state.step - 1; // steps after the current one
         const stepsToCut = Math.ceil((bearLoss * 1000) / state.stepDurationMs);
@@ -1053,12 +1067,12 @@ window.penalizeRandomWalkersOnMistake = function () {
 
     // Drifter - shave 5 s off its remaining roaming time. If that drains
     // the timer completely, its own countdown triggers the explosion.
-    if (window._drifterActive) {
-        window._drifterTimeRemainingSeconds = Math.max(0, window._drifterTimeRemainingSeconds - DRIFTER_TIME_LOSS_S);
+    if (_drifterActive) {
+        _drifterTimeRemainingSeconds = Math.max(0, _drifterTimeRemainingSeconds - DRIFTER_TIME_LOSS_S);
 
         const timerTextEl = document.getElementById('drifter-timer-text');
         if (timerTextEl) {
-            timerTextEl.innerText = `${Math.max(0, Math.floor(window._drifterTimeRemainingSeconds))}s`;
+            timerTextEl.innerText = `${Math.max(0, Math.floor(_drifterTimeRemainingSeconds))}s`;
         }
     }
 };
@@ -1072,19 +1086,19 @@ window.penalizeRandomWalkersOnMistake = function () {
 // kill their timers, and wipe their DOM elements from the screen.
 window.clearActiveRandomWalkers = function () {
     // Tear down all walking bears (interval + HUD card + visual)
-    (window._activeBearAgents || []).slice().forEach(_finishBearAgent);
-    window._activeBearAgents = [];
+    (_activeBearAgents || []).slice().forEach(_finishBearAgent);
+    _activeBearAgents = [];
 
     // Legacy interval list kept for safety - should already be empty
-    if (window._bearIntervals?.length > 0) {
-        window._bearIntervals.forEach(id => clearInterval(id));
-        window._bearIntervals = [];
+    if (_bearIntervals?.length > 0) {
+        _bearIntervals.forEach(id => clearInterval(id));
+        _bearIntervals = [];
     }
 
     // Kill all HUD ticker intervals
-    if (window._walkerHudTimers?.length > 0) {
-        window._walkerHudTimers.forEach(hud => clearInterval(hud.loopId));
-        window._walkerHudTimers = [];
+    if (_walkerHudTimers?.length > 0) {
+        _walkerHudTimers.forEach(hud => clearInterval(hud.loopId));
+        _walkerHudTimers = [];
     }
 
     // Shut down drifter (including any active fuse countdown)
