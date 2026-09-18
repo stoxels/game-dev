@@ -1,7 +1,7 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell } from '../grid.js';
-import { endTimerFreeze, startTimerFreeze } from '../timer/timer-freeze.js';
+import { endTimerFreeze, resetFreezeCorrFills, startTimerFreeze } from '../timer/timer-freeze.js';
 import { t } from '../translation/translations.js';
 import { _filterMarkedIds, _filterRevealedIds, _resolveCell } from './class-abilities.js';
 import { CLASS_DEFS } from './class-defs.js';
@@ -1234,7 +1234,9 @@ export function _executeArcaneFreeze(durationMs) {
     // fill intercepts, so the cast must carry it. Overlay stays on (matches
     // the item cast); the blizzard + frozen floor below are the extras.
     startTimerFreeze(effectiveDuration, { freezeActive: true });
-    window._freezeCorrFills = 0; // Tracks correct fills during freeze (for frozen_resilience passive)
+    // Tracks correct fills during freeze (for frozen_resilience passive);
+    // the counter itself is owned by the timer-freeze mechanic.
+    resetFreezeCorrFills();
 
     _arcaneFreeze_resetTileTrackers(); 
 

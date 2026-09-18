@@ -30,6 +30,26 @@ let _freezeReleaseTimer = null;
 // the release clear it, so caller-owned flags are never stomped).
 let _ownsFreezeActive = false;
 
+// Correct fills made during the current freeze window. Owned here because
+// it is meaningless outside a freeze: the Mathmagician resets it when
+// casting Absolute Zero and the frozen_resilience passive increments it
+// per correct fill (+1 shield every 5). No per-level reset entry is
+// needed - the next freeze cast always resets it before use.
+let _freezeCorrFills = 0;
+
+// Resets the freeze-window fill counter. Called when a freeze cast starts
+// (Absolute Zero) so the counter always counts the current freeze only.
+export function resetFreezeCorrFills() {
+    _freezeCorrFills = 0;
+}
+
+// Counts one correct fill inside the freeze window and returns the new
+// total (callers check it against their milestone thresholds).
+export function bumpFreezeCorrFills() {
+    _freezeCorrFills += 1;
+    return _freezeCorrFills;
+}
+
 // Starts a freeze: sets timerFrozen (and optionally freezeActive), shows
 // the icy countdown overlay on the puzzle grid, and schedules the
 // Clock-guarded release after durationMs. opts:

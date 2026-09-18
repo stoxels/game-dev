@@ -5,6 +5,7 @@ import { renderCell, updClues } from '../grid.js';
 import { isEndgameLevel } from '../mouse-button-handlers.js';
 import { _resetLevelFlags, save } from '../state.js';
 import { addTimeSecs, previewGainSecs } from '../timer/timer-adjust.js';
+import { bumpFreezeCorrFills } from '../timer/timer-freeze.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _executeRegressionToPrior, _executeSignificanceThreshold } from './class-actuary.js';
@@ -1085,8 +1086,7 @@ export function _handleMathmagicianFreezeBonus() {
     if (STATE.playerClass !== 'mathmagician' || !window._freezeActive) return;
 
     if (ptHasSkill('frozen_resilience')) {
-        window._freezeCorrFills = (window._freezeCorrFills || 0) + 1;
-        if (window._freezeCorrFills % 5 === 0) {
+        if (bumpFreezeCorrFills() % 5 === 0) {
             window._classFreeMistakes = (window._classFreeMistakes || 0) + 1;
 
             _varianceShield_updateVisibility(); 
