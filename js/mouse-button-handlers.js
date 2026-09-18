@@ -5,7 +5,7 @@ import { _adjacencyMatrixRefreshAll, renderCell, updClues } from './grid.js';
 import { applyPenalty } from './penalty.js';
 import { save } from './state.js';
 import { stopTimer } from './timer.js';
-import { addTimeSecs, subtractTimeSecs } from './puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs, previewGainSecs, subtractTimeSecs } from './puzzle-mechanics/timer-adjust.js';
 import { t } from './translation/translations.js';
 import { _countAdjacentPrefillRun, dragCounterApply, dragCounterClear } from './mouse-over.js';
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
@@ -697,9 +697,11 @@ export function checkStreakBonus() {
         if (ptHasSkill('streak_bonus_2')) bonus += 5;
         if (ptHasSkill('streak_bonus_3')) bonus += 10;
 
+        // Preview so the FX/toast show the actual (map-scaled) gain.
+        const shown = previewGainSecs(bonus);
         addTimeSecs(bonus);
-        if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${bonus}s`, '#ffb830');
-        globalThis.showToast(`🔥 ${t('cg_streak_bonus').replace('{n}', bonus)}`);
+        if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${shown}s`, '#ffb830');
+        globalThis.showToast(`🔥 ${t('cg_streak_bonus').replace('{n}', shown)}`);
         PassiveTracker.onStreakBonusTrigger();
     }
 }

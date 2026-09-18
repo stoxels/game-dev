@@ -1,7 +1,7 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
-import { addTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs, previewGainSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { LANG, t } from '../translation/translations.js';
 import { _filterMarkedIds, _filterRevealedIds, _resolveCell, _revealFilledCell, _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
@@ -1270,16 +1270,16 @@ export function _statisticianTriggerMomentum(bonusSeconds) {
     // god_of_statistics doubles the total bonus (applied last)
     if (ptHasSkill('god_of_statistics')) bonus *= 2;
 
-    // Active map run: "% less Time gained from Item and Ability effects"
-    if (typeof globalThis._egMapTimeGainMult === 'function') bonus = Math.round(bonus * globalThis._egMapTimeGainMult());
-
+    // Map-run "% less Time gained" applies centrally in timer-adjust.js;
+    // preview so the toast and the achievement stat reflect the real gain.
+    const shown = previewGainSecs(bonus);
     addTimeSecs(bonus, { capSecs: 3600 });
 
-    const msg = t('cls_momentum_gain').replace('{n}', bonus);
+    const msg = t('cls_momentum_gain').replace('{n}', shown);
 
     globalThis.showToast(msg);
 
-    trackAchStat('timeAdded', bonus);
+    trackAchStat('timeAdded', shown);
     trackAchStat('momentumTriggered');
     updateQuestStats('momentumTriggered', {});
 

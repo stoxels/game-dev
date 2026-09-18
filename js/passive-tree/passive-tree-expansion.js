@@ -3,7 +3,7 @@ import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js
 import { save } from '../state.js';
 import { _calcEmergencyScanDuration, updTimer } from '../timer.js';
 import { startTimerFreeze } from '../puzzle-mechanics/timer-freeze.js';
-import { addTimeSecs, subtractTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
@@ -101,8 +101,12 @@ export function _ptxRunExpansion() {
     //--------------------------------------------------------------------------
 
     function addSecs(n) {
-        if (!globalThis.cur || globalThis.dead || n <= 0) return;
+        if (!globalThis.cur || globalThis.dead || n <= 0) return 0;
+        // Map-run "% less Time gained" applies centrally in timer-adjust.js;
+        // return the previewed amount so toast/FX text shows what lands.
+        const shown = previewGainSecs(n);
         addTimeSecs(n, { capSecs: 7200 });
+        return shown;
     }
 
     function loseSecs(n) {
@@ -458,8 +462,8 @@ export function _ptxRunExpansion() {
     ON_FILL.push((r, c) => {   // Dialectic (310)
         if (has('dialectic') && S.dialecticArmed) {
             S.dialecticArmed = false;
-            addSecs(5);
-            toast('🧠 Dialectic +5s');
+            const s = addSecs(5);
+            if (s > 0) toast(`🧠 Dialectic +${s}s`);
         }
     });
 
@@ -534,7 +538,7 @@ export function _ptxRunExpansion() {
     ON_MISTAKE.push(() => {   // Chaos Buffer (335)
         if (!has('chaos_buffer')) return;
         S.chaosMistakes++;
-        if (S.chaosMistakes % 2 === 0) { addSecs(10); toast('🌪️ Chaos Buffer +10s'); }
+        if (S.chaosMistakes % 2 === 0) { const s = addSecs(10); if (s > 0) toast(`🌪️ Chaos Buffer +${s}s`); }
     });
 
     ON_MISTAKE.push(() => {   // Dialectic arm (310)
@@ -560,8 +564,8 @@ export function _ptxRunExpansion() {
         const last = window._ptxLastPen || 0;
         if (last > 0) {
             const refund = Math.ceil(last / 2);
-            addSecs(refund);
-            toast(`🧾 Risk Auditor refunded ${refund}s`);
+            const got = addSecs(refund);
+            if (got > 0) toast(`🧾 Risk Auditor refunded ${got}s`);
         }
     });
 
@@ -588,8 +592,8 @@ export function _ptxRunExpansion() {
     ON_LINE_DONE.push(() => {   // Martingale payout (322)
         if (!has('keystone_martingale')) return;
         if (S.martingaleStake > 15) {
-            addSecs(S.martingaleStake);
-            toast(`🎰 Martingale pays out ${S.martingaleStake}s`);
+            const paid = addSecs(S.martingaleStake);
+            if (paid > 0) toast(`🎰 Martingale pays out ${paid}s`);
         }
         S.martingaleStake = 15;
     });
@@ -626,7 +630,7 @@ export function _ptxRunExpansion() {
     //--------------------------------------------------------------------------
 
     TICKS.push(() => {   // Tailwind keystone (350)
-        if (has('keystone_tailwind') && S.tick % 60 === 0) { addSecs(10); toast('🪁 Tailwind +10s'); }
+        if (has('keystone_tailwind') && S.tick % 60 === 0) { const s = addSecs(10); if (s > 0) toast(`🪁 Tailwind +${s}s`); }
     });
 
     TICKS.push(() => {   // Scholar's Debt keystone (364)
@@ -913,7 +917,10 @@ export function _ptxRunExpansion() {
             globalThis.STATE.ptxSavingsSecs = 0;
         }
 
-        if (add > 0) addTimeSecs(add);
+        // ptxSavingsSecs is banked level-start time (purchased with passive
+        // points) - setup, not an in-level gain, so it must not scale with
+        // the map modifier.
+        if (add > 0) addTimeSecs(add, { raw: true });
 
         // Scholar's Debt keystone: double total starting time. Raw write on
         // purpose - this is level-start setup, not a player-facing time gain,

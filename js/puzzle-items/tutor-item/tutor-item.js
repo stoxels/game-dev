@@ -2,7 +2,7 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
 import { _updateMistakeCounterHUD } from '../../penalty.js';
 import { questStat_mistakesRemoved } from '../../quests/quests-stats.js';
-import { addTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs } from '../../puzzle-mechanics/timer-adjust.js'; // (map-run "% less Time gained" applies centrally inside addTimeSecs)
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _calcTutorItemCount } from '../../puzzle-mechanics/effect-modifiers.js';

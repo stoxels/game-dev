@@ -2,7 +2,7 @@
 import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { stopTimer, updTimer } from '../timer.js';
-import { addTimeSecs, subtractTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { PassiveTracker } from './passive-tracker.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
@@ -584,8 +584,10 @@ export function _applyMaximumLikelihood() {
 // Adds 3 seconds for a correct fill. Called from mouse-button-handlers.js.
 export function _gamblersRuinOnCorrectFill() {
     if (!ptHasSkill('keystone_gamblers_ruin')) return;
+    // Preview so the quest stat records the actual (map-scaled) gain.
+    const gained = previewGainSecs(3);
     addTimeSecs(3);
-    questStat_gamblersRuinTimeAdded(3);
+    questStat_gamblersRuinTimeAdded(gained);
 }
 
 // Deducts 60 seconds for a mistake. Called from penalty.js.

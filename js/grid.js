@@ -1,4 +1,4 @@
-﻿import { addTimeSecs } from './puzzle-mechanics/timer-adjust.js';
+﻿import { addTimeSecs, previewGainSecs } from './puzzle-mechanics/timer-adjust.js';
 import { markWrongTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
@@ -902,16 +902,19 @@ export function _handleRegressionReward(row, col, rowDone, colDone, sol) {
 
     if (rowDone && !window._regressionRewardedLines.has(`r${row}`)) {
         window._regressionRewardedLines.add(`r${row}`);
+        // Preview so the FX/toast show the actual (map-scaled) gain.
+        const shown = previewGainSecs(bonus);
         addTimeSecs(bonus);
-        if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${bonus}s`, '#6dbf40');
-        globalThis.showToast(`📉 ${t('cg_regression_reward').replace('{n}', bonus)}`);
+        if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${shown}s`, '#6dbf40');
+        globalThis.showToast(`📉 ${t('cg_regression_reward').replace('{n}', shown)}`);
     }
 
     if (colDone && !window._regressionRewardedLines.has(`c${col}`)) {
         window._regressionRewardedLines.add(`c${col}`);
+        const shown = previewGainSecs(bonus);
         addTimeSecs(bonus);
-        if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${bonus}s`, '#6dbf40');
-        globalThis.showToast(`📉 ${t('cg_regression_reward').replace('{n}', bonus)}`);
+        if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${shown}s`, '#6dbf40');
+        globalThis.showToast(`📉 ${t('cg_regression_reward').replace('{n}', shown)}`);
     }
 }
 

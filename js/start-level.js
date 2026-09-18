@@ -238,12 +238,13 @@ export function _calcBaseTime() {
     let baseTimer;
 
     if (globalThis.cur.isMonsterLevel && globalThis.cur.egTimeLimit != null) {
-        let gearBonus = (typeof _egComputePlayerStats === 'function')
+        const gearBonus = (typeof _egComputePlayerStats === 'function')
             ? (_egComputePlayerStats().timeAdded || 0) : 0;
-        // Active map run: "% less Time gained from Item and Ability effects"
-        // also scales the time_added bonus from equipped gear (an item effect).
-        if (typeof _egMapTimeGainMult === 'function') gearBonus = Math.round(gearBonus * _egMapTimeGainMult());
-        baseTimer = globalThis.cur.egTimeLimit + gearBonus;
+        // The map-run "% less Time gained" modifier also scales the gear
+        // time_added bonus (an item effect) - preserved from the old
+        // per-site handling; see _applyBaseTimer() below for the raw add.
+        const gearMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
+        baseTimer = globalThis.cur.egTimeLimit + Math.round(gearBonus * gearMult);
     } else {
         baseTimer = globalThis.cur.timer || cfg.timerStart;
     }
@@ -300,11 +301,14 @@ export function _initTimer() {
 
     const extSessionBonus = _applyExtendedSessionBonus();
     const expValueBonus = _applyExpectedValueBonus();
-    addTimeSecs(extSessionBonus);
-    addTimeSecs(expValueBonus);
+    // Level-start bonuses are setup, not in-level gains - they were never
+    // scaled by the map modifier before, so add them raw to keep that
+    // contract (the central hook only scales in-level gains).
+    addTimeSecs(extSessionBonus, { raw: true });
+    addTimeSecs(expValueBonus, { raw: true });
 
     if (ptHasSkill('keystone_dead_reckoning') && !ptHasSkill('keystone_gamblers_ruin')) {
-        addTimeSecs(600);
+        addTimeSecs(600, { raw: true });
     }
     // Fresh level - reset low-time center banners (keeps _lowTimeLastSecs
     // as null so the first updTimer can immediately surface the relevant

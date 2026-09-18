@@ -1,4 +1,3 @@
-import { _egMapTimeGainMult } from '../endgame/endgame-map-launch.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 
 //------------------------------------------------------------------------
@@ -74,10 +73,9 @@ export function _calcAddTimeSecs(baseSecs) {
     // Keystone: Curse Embrace - 50% weaker
     if (ptHasSkill('keystone_curse_embrace')) multiplier *= 0.5;
 
-    // Active map run: "% less Time gained from Item and Ability effects"
-    const mapTimeMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
-
-    return Math.round(baseSecs * multiplier * mapTimeMult);
+    // Map-run "% less Time gained" no longer applies here - it is applied
+    // centrally in timer-adjust.js when the gain lands on the timer.
+    return Math.round(baseSecs * multiplier);
 }
 
 

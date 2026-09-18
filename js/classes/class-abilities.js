@@ -4,7 +4,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
 import { isEndgameLevel } from '../mouse-button-handlers.js';
 import { _resetLevelFlags, save } from '../state.js';
-import { addTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs, previewGainSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _executeRegressionToPrior, _executeSignificanceThreshold } from './class-actuary.js';
@@ -999,9 +999,12 @@ export function _applyMathmagicianShieldAbsorb() {
     if (ptHasSkill('god_of_math') && bonus > 0) bonus *= 2;
 
     if (bonus > 0) {
-        // Active map run: "% less Time gained from Item and Ability effects"
-        if (typeof globalThis._egMapTimeGainMult === 'function') bonus = Math.round(bonus * globalThis._egMapTimeGainMult());
-        addTimeSecs(bonus, { capSecs: 3600 });
+        // Map-run "% less Time gained" applies centrally in timer-adjust.js;
+        // preview the scaled amount so the toast/FX/achievement stat match
+        // what actually lands, then pass the PREVIEWED value through
+        // addTimeSecs (a previewed gain stays a gain - no double scaling).
+        bonus = previewGainSecs(bonus);
+        addTimeSecs(bonus, { capSecs: 3600, raw: true });
 
         const msg = t('cls_shield_absorbed_time').replace('{n}', bonus);
 

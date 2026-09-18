@@ -2,7 +2,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
 import { _updateMistakeCounterHUD } from '../penalty.js';
-import { addTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs, previewGainSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
@@ -257,9 +257,11 @@ export function _executeRegressionToPrior(correctCount, recoverPct, revealCount)
 
     window._regressionPendingReveals = null;
 
-    // Apply the recovered time (cap at 1 hour).
+    // Apply the recovered time (cap at 1 hour). Preview so the toast and
+    // the 120s achievement threshold reflect the actual (map-scaled) gain.
     if (recoveredSecs > 0) {
-        addTimeSecs(recoveredSecs, { capSecs: 3600 });
+        recoveredSecs = previewGainSecs(recoveredSecs);
+        addTimeSecs(recoveredSecs, { capSecs: 3600, raw: true });
     }
 
     globalThis.showToast(t('cls_regression_done')

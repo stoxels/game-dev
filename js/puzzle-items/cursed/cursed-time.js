@@ -1,5 +1,4 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { _egMapTimeGainMult } from '../../endgame/endgame-map-launch.js';
 import { addTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
@@ -19,8 +18,9 @@ import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 export function _useCursedTime(id, def) {
     _trackWitchImmuneCursedUse();
 
-    const mapTimeMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
-    addTimeSecs(Math.round(1200 * mapTimeMult));
+    // The map-run "% less Time gained" modifier applies centrally in
+    // timer-adjust.js now - this gain just passes the base amount.
+    addTimeSecs(1200);
     playItemEffect(id);
 
     // Black out every clue axis - the harshest cursed downside of the family.
