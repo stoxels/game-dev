@@ -4,7 +4,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
 import { isEndgameLevel } from '../mouse-button-handlers.js';
 import { _resetStoxFlags, save } from '../state.js';
-import { _trackTimerDelta, updTimer } from '../timer.js';
+import { addTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _executeRegressionToPrior, _executeSignificanceThreshold } from './class-actuary.js';
@@ -1001,10 +1001,7 @@ export function _applyMathmagicianShieldAbsorb() {
     if (bonus > 0) {
         // Active map run: "% less Time gained from Item and Ability effects"
         if (typeof globalThis._egMapTimeGainMult === 'function') bonus = Math.round(bonus * globalThis._egMapTimeGainMult());
-        const before = globalThis.timerSecs;
-        globalThis.timerSecs = Math.min(globalThis.timerSecs + bonus, 3600);
-        _trackTimerDelta(before, globalThis.timerSecs);
-        updTimer();
+        addTimeSecs(bonus, { capSecs: 3600 });
 
         const msg = t('cls_shield_absorbed_time').replace('{n}', bonus);
 
@@ -1119,9 +1116,7 @@ export function _handlePrecisionMarkMomentum(row, col) {
     if (!window._pmMomentumSet.has(id)) return;
 
     window._pmMomentumSet.delete(id);
-    const before = globalThis.timerSecs;
-    globalThis.timerSecs = Math.min(globalThis.timerSecs + 20, 3600);
-    _trackTimerDelta(before, globalThis.timerSecs);
+    addTimeSecs(20, { capSecs: 3600 });
     globalThis.showToast(t('cls_momentum_certainty'));
     if (typeof playTimeGainEffect === 'function') playTimeGainEffect('+20s', '#ffb830');
     trackAchStat('timeAdded', 20);

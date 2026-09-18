@@ -1,7 +1,8 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
-import { _trackTimerDelta, updTimer } from '../timer.js';
+import { updTimer } from '../timer.js';
+import { addTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
@@ -253,7 +254,6 @@ export function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMist
     }
 
     const mistakesBefore = globalThis.mistakeCount;   // 
-    const timerBefore = globalThis.timerSecs;         // 
 
     // ── Rank 3: collect mistakes to forgive ──────────────────────
     const preExistingWrong = clearOldMistakes
@@ -275,9 +275,10 @@ export function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMist
     }
 
     // Restore the timer to what it was at the snapshot moment, then add
-    // the rank bonus on top. Cap at 1 hour.
-    globalThis.timerSecs = Math.min(best.timerSecs + rewindSeconds, 3600);
-    _trackTimerDelta(timerBefore, globalThis.timerSecs); 
+    // the rank bonus on top. Cap at 1 hour. The snapshot write itself is
+    // bookkeeping-neutral, so only the bonus is recorded as time gained.
+    globalThis.timerSecs = best.timerSecs;
+    addTimeSecs(rewindSeconds, { capSecs: 3600 });
 
     const mistakesForgiven = Math.max(0, mistakesBefore - globalThis.mistakeCount);
     if (mistakesForgiven > 0) globalThis._levelMistakesErased += mistakesForgiven; 

@@ -1,7 +1,7 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
-import { _trackTimerDelta, updTimer } from '../timer.js';
+import { subtractTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
@@ -142,10 +142,7 @@ export function _tailRiskRefundCooldown() {
 
 // Deducts totalCost seconds from the timer (floors at 0)
 export function _tailRiskApplyTimeCost(totalCost) {
-    const before = globalThis.timerSecs;
-    globalThis.timerSecs = Math.max(0, globalThis.timerSecs - totalCost);
-    _trackTimerDelta(before, globalThis.timerSecs);
-    updTimer();
+    subtractTimeSecs(totalCost);
 }
 
 // Reveals count randomly selected cells from the shuffled candidate list.

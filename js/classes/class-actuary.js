@@ -2,7 +2,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
 import { _updateMistakeCounterHUD } from '../penalty.js';
-import { _trackTimerDelta, updTimer } from '../timer.js';
+import { addTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
@@ -259,10 +259,7 @@ export function _executeRegressionToPrior(correctCount, recoverPct, revealCount)
 
     // Apply the recovered time (cap at 1 hour).
     if (recoveredSecs > 0) {
-        const before = globalThis.timerSecs;
-        globalThis.timerSecs = Math.min(globalThis.timerSecs + recoveredSecs, 3600);
-        _trackTimerDelta(before, globalThis.timerSecs);
-        updTimer();
+        addTimeSecs(recoveredSecs, { capSecs: 3600 });
     }
 
     globalThis.showToast(t('cls_regression_done')

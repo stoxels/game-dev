@@ -1,7 +1,7 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
-import { _trackTimerDelta, updTimer } from '../timer.js';
+import { addTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { LANG, t } from '../translation/translations.js';
 import { _filterMarkedIds, _filterRevealedIds, _resolveCell, _revealFilledCell, _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
@@ -1273,10 +1273,7 @@ export function _statisticianTriggerMomentum(bonusSeconds) {
     // Active map run: "% less Time gained from Item and Ability effects"
     if (typeof globalThis._egMapTimeGainMult === 'function') bonus = Math.round(bonus * globalThis._egMapTimeGainMult());
 
-    const before = globalThis.timerSecs;
-    globalThis.timerSecs = Math.min(globalThis.timerSecs + bonus, 3600);
-    _trackTimerDelta(before, globalThis.timerSecs);
-    updTimer();
+    addTimeSecs(bonus, { capSecs: 3600 });
 
     const msg = t('cls_momentum_gain').replace('{n}', bonus);
 
