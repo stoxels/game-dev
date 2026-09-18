@@ -26,7 +26,7 @@ import { _useShadowSeal } from './shadow-seal/shadow-seal.js';
 import { _useShield } from './shield/shield.js';
 import { _useSurveyScope } from './survey-scope/survey-scope.js';
 import { _useTheWitch } from './the-witch/the-witch.js';
-import { showToast } from './toasts-and-popups.js';
+import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 // globalThis accessor for externally-mutated names (see the write-site audit):

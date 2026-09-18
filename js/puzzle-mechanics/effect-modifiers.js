@@ -1,5 +1,5 @@
-import { _egMapTimeGainMult } from '../../endgame/endgame-map-launch.js';
-import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
+import { _egMapTimeGainMult } from '../endgame/endgame-map-launch.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - EFFECT MODIFIERS----------------------

@@ -1,4 +1,5 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
+import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
 import { isEndgameLevel } from '../mouse-button-handlers.js';
@@ -897,7 +898,7 @@ export function _applyProbabilistPassive(effect) {
         const markCount = _collectProbabilistMarkCount(effect.autoMarkCount);
         const markedBefore = _snapshotMarkedCells();
 
-        globalThis.markWrongTiles(markCount);
+        markWrongTiles(markCount);
         Audio_Manager.playSFX('bayesianInsight');
         trackAchStat('bayesianInsightUsed');
 

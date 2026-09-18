@@ -1,5 +1,5 @@
 import { trackAchStat } from '../achievements/achievements.js';
-import { ITEM_DEFS } from './item-definitions.js';
+import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE---------------------------

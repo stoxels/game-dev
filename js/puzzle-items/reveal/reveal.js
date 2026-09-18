@@ -1,9 +1,10 @@
 import { Audio_Manager } from '../../audio/audio.js';
+import { revealTiles } from '../../puzzle-mechanics/grid-actions.js';
 import { questStat_revealItemUsed } from '../../quests/quests-stats.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../fx-dispatch.js';
-import { _calcRevealCount } from '../shared/effect-modifiers.js';
-import { FX_Z, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay } from '../shared/fx-helpers.js';
+import { _calcRevealCount } from '../../puzzle-mechanics/effect-modifiers.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------REVEAL - CANDLE / MAGNIFIER / SPYGLASS / SCANNER----------------------
@@ -16,7 +17,7 @@ export function _useReveal(id, def) {
     const baseCount = parseInt(id.replace('reveal', '')) || 1;
     const finalCount = _calcRevealCount(baseCount);
 
-    globalThis.revealTiles(finalCount, 'item');
+    revealTiles(finalCount, 'item');
     playItemEffect(id);
 
     const msgKey = finalCount > 1 ? 'item_revealed_pl' : 'item_revealed';

@@ -1,8 +1,8 @@
-import { trackAchStat } from '../../achievements/achievements.js';
-import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../../grid.js';
-import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
-import { _incDirect, questStat_rowsErased } from '../../quests/quests-stats.js';
-import { _applyCellEffect } from '../cell-effects.js';
+import { trackAchStat } from '../achievements/achievements.js';
+import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
+import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { _incDirect, questStat_rowsErased } from '../quests/quests-stats.js';
+import { _applyCellEffect } from './cell-effects.js';
 import { _applyDenseMarkerBias, _applyTargetedRevealBias, shuffle } from './puzzle-helpers.js';
 
 //------------------------------------------------------------------------
@@ -19,7 +19,7 @@ try { Object.defineProperty(globalThis, 'revealTiles', { get() { return revealTi
 // Core grid manipulation primitives shared by item handlers, class
 // abilities, passives and the penalty system.
 
-function revealTiles(count, source) {
+export function revealTiles(count, source) {
     // Ergodic Field (291) and The Oracle (300) disable all auto-reveals
     if (ptHasSkill('keystone_ergodic_field') || window._oracleActive) return;
 
@@ -65,7 +65,7 @@ function revealTiles(count, source) {
 }
 
 
-function markWrongTiles(count) {
+export function markWrongTiles(count) {
     // Ergodic Field (291) and The Oracle (300) disable all auto-marks
     if (ptHasSkill('keystone_ergodic_field') || window._oracleActive) return;
 

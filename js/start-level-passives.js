@@ -1,12 +1,13 @@
 import { Audio_Manager } from './audio/audio.js';
+import { revealTiles, markWrongTiles } from './puzzle-mechanics/grid-actions.js';
 import { _executeFieldScanLegacy } from './classes/class-probabilist.js';
 import { _adjacencyMatrixRefreshAll, clues, renderCell, updClues } from './grid.js';
 import { lvText } from './levels/levels.js';
 import { _applyMaximumLikelihood, _interquartileVisionDuration } from './passive-tree/passive-tree-special-nodes-logic.js';
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
-import { _applyCellEffect } from './puzzle-items/cell-effects.js';
-import { shuffle } from './puzzle-items/shared/puzzle-helpers.js';
-import { showToast } from './puzzle-items/toasts-and-popups.js';
+import { _applyCellEffect } from './puzzle-mechanics/cell-effects.js';
+import { shuffle } from './puzzle-mechanics/puzzle-helpers.js';
+import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { _charIs } from './sprite/player_sprite.js';
 import { t } from './translation/translations.js';
 
@@ -244,13 +245,13 @@ export function _applyProbabilisticStartRolls() {
     if (ptHasSkill('probabilistic_start_1') && Math.random() < 0.10) reveals++;
     if (ptHasSkill('probabilistic_start_2') && Math.random() < 0.15) reveals++;
     if (ptHasSkill('probabilistic_start_3') && Math.random() < 0.20) reveals++;
-    if (reveals > 0) globalThis.revealTiles(reveals);
+    if (reveals > 0) revealTiles(reveals);
 
     let marks = 0;
     if (ptHasSkill('error_elimination_1') && Math.random() < 0.10) marks++;
     if (ptHasSkill('error_elimination_2') && Math.random() < 0.15) marks++;
     if (ptHasSkill('error_elimination_3') && Math.random() < 0.20) marks++;
-    if (marks > 0) globalThis.markWrongTiles(marks);
+    if (marks > 0) markWrongTiles(marks);
 }
 
 // keystone_null_hypothesis (220): finds the sparsest row and sparsest column,
@@ -666,7 +667,7 @@ export function triggerSylaFlowerEffect(coords) {
 export function _applySylaForestAffinity() {
     if (!_charIs('syla')) return;
     if (!globalThis.cur || !globalThis.cur.isForestLevel) return;
-    const revealedCoords = globalThis.revealTiles(1);
+    const revealedCoords = revealTiles(1);
     Audio_Manager.playSFX('syla_nature');
     showToast(t('cg_syla_bonus'));
 

@@ -1,8 +1,9 @@
 import { Audio_Manager } from '../../audio/audio.js';
+import { revealTiles } from '../../puzzle-mechanics/grid-actions.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../fx-dispatch.js';
 import { _resolveCursedBlackoutDownside } from '../shared/cursed-downside.js';
-import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxShieldBorderAdd } from '../shared/fx-helpers.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxShieldBorderAdd } from '../../puzzle-mechanics/fx-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
@@ -14,7 +15,7 @@ export function _useCursedShield(id, def) {
     _trackWitchImmuneCursedUse();
 
     globalThis.shieldActive = true;
-    globalThis.revealTiles(2, 'item');
+    revealTiles(2, 'item');
     playItemEffect(id);
 
     _resolveCursedBlackoutDownside(30000, true, false); // black out rows only

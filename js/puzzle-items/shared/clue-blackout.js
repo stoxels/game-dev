@@ -1,5 +1,5 @@
 import { _clueColCount, _clueColWidth, _rowCluesOnRight } from '../../grid.js';
-import { _fxGetPuzzleRect } from './fx-helpers.js';
+import { _fxGetPuzzleRect } from '../../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - CLUE BLACKOUT----------------------

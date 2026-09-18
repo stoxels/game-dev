@@ -3,10 +3,10 @@ import { renderCell } from '../../grid.js';
 import { questStat_shadowSealUsed } from '../../quests/quests-stats.js';
 import { _trackTimerDelta } from '../../timer.js';
 import { t } from '../../translation/translations.js';
-import { _applyCellEffect } from '../cell-effects.js';
+import { _applyCellEffect } from '../../puzzle-mechanics/cell-effects.js';
 import { playItemEffect } from '../fx-dispatch.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../shared/fx-helpers.js';
-import { shuffle } from '../shared/puzzle-helpers.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
+import { shuffle } from '../../puzzle-mechanics/puzzle-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------SHADOW SEAL----------------------

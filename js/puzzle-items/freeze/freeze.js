@@ -5,7 +5,7 @@ import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
 import { updTimer } from '../../timer.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../fx-dispatch.js';
-import { showToast } from '../toasts-and-popups.js';
+import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 //-------------------FREEZE - TIME FREEZE----------------------

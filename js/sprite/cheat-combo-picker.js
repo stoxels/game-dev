@@ -1,7 +1,7 @@
 import { ASCENDENCY_LIST } from '../classes/class-cooldown-state.js';
 import { CLASS_LIST } from '../classes/class-defs.js';
 import { buildClassHUD } from '../classes/class-hud.js';
-import { showToast } from '../puzzle-items/toasts-and-popups.js';
+import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { hideModal, showModal } from '../screens/screens.js';
 import { save } from '../state.js';
 import { _tipAttr } from '../tooltips-hud.js';

@@ -4,7 +4,7 @@ import { t } from '../translation/translations.js';
 import { RESHUFFLE_GOAL, reshuffleCount, reshuffleRightClickItem, updateReshuffleCounter } from './inventory-reshuffle.js';
 import { ITEM_DEFS } from './item-definitions.js';
 import { itemDesc, itemName, rarityColors } from './item-pool.js';
-import { checkInventoryAchievements, showToast } from './toasts-and-popups.js';
+import { checkInventoryAchievements, showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE----------------------------

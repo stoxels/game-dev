@@ -8,7 +8,7 @@ import { WORLDS } from '../levels/level-world-data.js';
 import { WORLD_START_GI } from '../levels/levels.js';
 import { PT } from '../passive-tree/passive-tree.js';
 import { buildInventoryPanel } from '../puzzle-items/inventory-panel.js';
-import { showToast } from '../puzzle-items/toasts-and-popups.js';
+import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../quests/quests-stats.js';
 import { _refreshQuestionModalFlag, goToLevelSelect, hideModal, showModal } from '../screens/screens.js';
 import { _charIs, _getPlayerCharacterImage } from '../sprite/player_sprite.js';

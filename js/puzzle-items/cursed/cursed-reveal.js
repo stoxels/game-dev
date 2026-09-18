@@ -1,11 +1,12 @@
 import { Audio_Manager } from '../../audio/audio.js';
+import { revealTiles } from '../../puzzle-mechanics/grid-actions.js';
 import { renderCell } from '../../grid.js';
 import { questStat_revealItemUsed } from '../../quests/quests-stats.js';
 import { t } from '../../translation/translations.js';
-import { _applyCellEffect } from '../cell-effects.js';
+import { _applyCellEffect } from '../../puzzle-mechanics/cell-effects.js';
 import { playItemEffect } from '../fx-dispatch.js';
 import { _cursedDownsideDuration } from '../shared/cursed-downside.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../shared/fx-helpers.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
@@ -17,7 +18,7 @@ export function _useCursedReveal(id, def) {
     _trackWitchImmuneCursedUse();
     questStat_revealItemUsed();
 
-    globalThis.revealTiles(6, 'item');
+    revealTiles(6, 'item');
 
     // Route the downside through the shared curse helpers so Witch immunity,
     // Curse Embrace and the first-use protection of Veil of Purity all apply

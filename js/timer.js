@@ -1,4 +1,5 @@
 ﻿import { renderCell, updClues } from './grid.js';
+import { revealTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
 
@@ -574,7 +575,7 @@ export function _triggerLawOfLargeNumbers() {
     // Bayesian Boost: chance for a bonus free tile after a LLN reveal.
     if (globalThis._getBayesianBonus() > 0 && Math.random() < globalThis._getBayesianBonus()) {
         globalThis._resetBayesianBonus();
-        globalThis.revealTiles(1);
+        revealTiles(1);
         globalThis.showToast(`🔃 ${t('cg_bayesian_boost')}`);
     }
 

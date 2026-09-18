@@ -1,5 +1,5 @@
 import { _egLoadLevelingState } from './endgame/endgame-leveling.js';
-import { showToast } from './puzzle-items/toasts-and-popups.js';
+import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { renderSaveSlotScreen } from './screens/screens-save-slots.js';
 import { hideModal, showTitle } from './screens/screens.js';
 import { buildFreshState, getActiveSlot, save, wipeSlot } from './state.js';

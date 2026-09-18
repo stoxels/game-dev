@@ -1,4 +1,5 @@
 ﻿import { updTimer } from './timer.js';
+import { markWrongTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
 //--- Phase 3 step 5: write-through accessors for runtime patch() targets ---
@@ -950,7 +951,7 @@ export function _tryAutoMarkAdjacentLine(adjacentIndices, getCandidates) {
         // Bayesian bonus: chance to chain-mark one additional wrong tile
         if (globalThis._getBayesianBonus() > 0 && Math.random() < globalThis._getBayesianBonus()) {
             globalThis._resetBayesianBonus();
-            globalThis.markWrongTiles(1);
+            markWrongTiles(1);
         }
 
         break; // only mark in one adjacent line per completion

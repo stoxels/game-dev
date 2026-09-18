@@ -1,5 +1,5 @@
 import { WORLD_START_GI } from './levels/levels.js';
-import { showToast } from './puzzle-items/toasts-and-popups.js';
+import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { showMapView } from './screens/screens-map-view.js';
 import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect } from './screens/screens-save-slots.js';
 import { showWorldDetail } from './screens/screens-world-levels.js';

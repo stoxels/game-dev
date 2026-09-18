@@ -4,7 +4,7 @@ import { t } from '../translation/translations.js';
 import { buildInventoryPanel } from './inventory-panel.js';
 import { ITEM_DEFS } from './item-definitions.js';
 import { itemDesc, itemName, pickLuckyItem, rarityColors } from './item-pool.js';
-import { showToast } from './toasts-and-popups.js';
+import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE---------------------------

@@ -1,6 +1,6 @@
 import { _egBuildChainPool } from './combat/encounter-chain.js';
 import { ALL } from './levels/levels.js';
-import { showToast } from './puzzle-items/toasts-and-popups.js';
+import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { isGatedLevel } from './quiz-excercise/mathgate.js';
 import { switchScreen } from './screens/screens.js';
 import { t } from './translation/translations.js';

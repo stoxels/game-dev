@@ -1,4 +1,4 @@
-import { Audio_Manager } from '../../audio/audio.js';
+import { Audio_Manager } from '../audio/audio.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - FX HELPERS----------------------

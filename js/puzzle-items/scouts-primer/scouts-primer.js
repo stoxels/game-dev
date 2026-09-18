@@ -16,7 +16,7 @@ import { save } from '../../state.js';
 import { pauseTimer, resumeTimer } from '../../timer.js';
 import { buildInventoryPanel } from '../inventory-panel.js';
 import { PRIMER_MAX, applyPrimerHeadstart, applyPerfectPrimerReveal } from './scouts-primer-reveal.js';
-import { shuffle } from '../shared/puzzle-helpers.js';
+import { shuffle } from '../../puzzle-mechanics/puzzle-helpers.js';
 
 //-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------

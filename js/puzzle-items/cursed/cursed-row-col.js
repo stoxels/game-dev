@@ -2,8 +2,8 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../fx-dispatch.js';
 import { _resolveCursedBlackoutDownside } from '../shared/cursed-downside.js';
-import { CHAOS_BLAST_COLOURS, FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../shared/fx-helpers.js';
-import { solveCols, solveRows } from '../shared/grid-actions.js';
+import { CHAOS_BLAST_COLOURS, FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
+import { solveCols, solveRows } from '../../puzzle-mechanics/grid-actions.js';
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------

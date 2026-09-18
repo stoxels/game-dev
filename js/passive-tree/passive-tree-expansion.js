@@ -1,4 +1,5 @@
 ﻿import { _isColSolved, _isRowSolved, clues, renderCell, updClues } from '../grid.js';
+import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { save } from '../state.js';
 import { _calcEmergencyScanDuration, _trackTimerDelta, updTimer } from '../timer.js';
 import { t } from '../translation/translations.js';
@@ -319,13 +320,13 @@ export function _ptxRunExpansion() {
     // Simple rolls ----------------------------------------------------------------
 
     ON_START.push(() => {   // Socratic Method (308)
-        if (has('socratic_method') && roll(0.25, false)) globalThis.revealTiles(1);
+        if (has('socratic_method') && roll(0.25, false)) revealTiles(1);
     });
 
     ON_START.push(() => {   // Fair Coin (382)
         if (!has('fair_coin')) return;
-        if (roll(0.10, false)) globalThis.revealTiles(1);
-        if (roll(0.10, true)) globalThis.markWrongTiles(1);
+        if (roll(0.10, false)) revealTiles(1);
+        if (roll(0.10, true)) markWrongTiles(1);
     });
 
     // Information-theory cluster -----------------------------------------------
@@ -368,7 +369,7 @@ export function _ptxRunExpansion() {
             globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c] &&
             (rowHasRevealed(r) || colHasRevealed(c)));
         if (target) { revealAt(target[0], target[1]); toast('🔗 Mutual Information'); }
-        else globalThis.revealTiles(1);
+        else revealTiles(1);
     });
 
     function rowHasRevealed(r) {
@@ -402,17 +403,17 @@ export function _ptxRunExpansion() {
 
     // Generic +reveal / +mark start nodes ---------------------------------------
 
-    ON_START.push(() => { if (has('interdisciplinary')) globalThis.revealTiles(1); });          // 360
-    ON_START.push(() => { if (has('cross_faculty')) globalThis.markWrongTiles(1); });           // 361
-    ON_START.push(() => { if (has('margin_notes')) globalThis.revealTiles(1); });               // 377
-    ON_START.push(() => { if (has('study_group')) globalThis.markWrongTiles(1); });             // 378
-    ON_START.push(() => { if (has('dark_adaptation')) globalThis.markWrongTiles(1); });         // 390
-    ON_START.push(() => { if (has('corollary')) globalThis.revealTiles(1); });                  // 401
+    ON_START.push(() => { if (has('interdisciplinary')) revealTiles(1); });          // 360
+    ON_START.push(() => { if (has('cross_faculty')) markWrongTiles(1); });           // 361
+    ON_START.push(() => { if (has('margin_notes')) revealTiles(1); });               // 377
+    ON_START.push(() => { if (has('study_group')) markWrongTiles(1); });             // 378
+    ON_START.push(() => { if (has('dark_adaptation')) markWrongTiles(1); });         // 390
+    ON_START.push(() => { if (has('corollary')) revealTiles(1); });                  // 401
     ON_START.push(() => {                                                            // 393 Thesis Defense
         if (!has('thesis_defense')) return;
-        globalThis.revealTiles(1); globalThis.markWrongTiles(1);
+        revealTiles(1); markWrongTiles(1);
     });
-    ON_START.push(() => { if (has('night_vision')) globalThis.markWrongTiles(2); });            // 338
+    ON_START.push(() => { if (has('night_vision')) markWrongTiles(2); });            // 338
 
     // Persistent pending bonuses (Hour Vault / Cold Reading) ----------------------
 
@@ -422,7 +423,7 @@ export function _ptxRunExpansion() {
             if (globalThis.STATE.ptxSavingsReveals > 0) { pending += globalThis.STATE.ptxSavingsReveals; globalThis.STATE.ptxSavingsReveals = 0; }
             if (globalThis.STATE.ptxColdReading) { pending += 1; globalThis.STATE.ptxColdReading = false; }
         }
-        if (pending > 0) { globalThis.revealTiles(pending); toast(`🏦 Banked insight: ${pending} reveal${pending > 1 ? 's' : ''}`); }
+        if (pending > 0) { revealTiles(pending); toast(`🏦 Banked insight: ${pending} reveal${pending > 1 ? 's' : ''}`); }
     });
 
     // Census (385) ------------------------------------------------------------------
@@ -490,15 +491,15 @@ export function _ptxRunExpansion() {
     ON_FILL.push(() => {   // Coding Theory (316) & Gnostic Echo (311) & Serendipity Seed (384)
         S.fillCount++;
         if (has('coding_theory') && S.fillCount % 20 === 0) {
-            globalThis.revealTiles(1);
+            revealTiles(1);
             toast('🧮 Coding Theory');
         }
         if (has('gnostic_echo') && S.fillCount % 10 === 0 && Math.random() < 0.15) {
-            globalThis.revealTiles(1);
+            revealTiles(1);
             toast('🔁 Gnostic Echo');
         }
         if (has('serendipity_seed') && S.fillCount === 1 && roll(0.25, false)) {
-            globalThis.revealTiles(1);
+            revealTiles(1);
             toast('🌰 Serendipity Seed');
         }
     });
@@ -640,7 +641,7 @@ export function _ptxRunExpansion() {
     });
 
     TICKS.push(() => {   // Eclipse Focus (339)
-        if (has('eclipse_focus') && S.tick % 240 === 0 && S.tick > 0) globalThis.revealTiles(1);
+        if (has('eclipse_focus') && S.tick % 240 === 0 && S.tick > 0) revealTiles(1);
     });
 
     TICKS.push(() => {   // Wiener Process (318)
@@ -675,8 +676,8 @@ export function _ptxRunExpansion() {
         const frac = globalThis.timerSecs / baseTime();
 
         if (has('hypothesis_testing')) {
-            if (!S.hypo75 && frac <= 0.75) { S.hypo75 = true; globalThis.revealTiles(1); toast('📐 Hypothesis Test: reveal'); }
-            if (!S.hypo50 && frac <= 0.50) { S.hypo50 = true; globalThis.markWrongTiles(1); toast('📐 Hypothesis Test: mark'); }
+            if (!S.hypo75 && frac <= 0.75) { S.hypo75 = true; revealTiles(1); toast('📐 Hypothesis Test: reveal'); }
+            if (!S.hypo50 && frac <= 0.50) { S.hypo50 = true; markWrongTiles(1); toast('📐 Hypothesis Test: mark'); }
         }
 
         if (has('expected_shortfall') && !S.shortfallUsed && frac <= 0.5) {
@@ -698,7 +699,7 @@ export function _ptxRunExpansion() {
                 for (let c = 0; c < globalThis.cur.grid[0].length; c++)
                     if (globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]) remaining++;
             const n = Math.ceil(remaining * 0.05);
-            if (n > 0) { globalThis.revealTiles(n); toast(`🎲 Axiom of Choice: ${n} cells revealed`); }
+            if (n > 0) { revealTiles(n); toast(`🎲 Axiom of Choice: ${n} cells revealed`); }
         }
     });
 
@@ -717,7 +718,7 @@ export function _ptxRunExpansion() {
     //--------------------------------------------------------------------------
 
     ON_LUCKY_CLAIM.push(() => {   // Fortune Well (324)
-        if (has('fortune_well')) { globalThis.revealTiles(1); toast('🕳️ Fortune Well'); }
+        if (has('fortune_well')) { revealTiles(1); toast('🕳️ Fortune Well'); }
     });
 
     ON_LUCKY_CLAIM.push(() => {   // Gilded Cage (326)
@@ -727,7 +728,7 @@ export function _ptxRunExpansion() {
     ON_LUCKY_CLAIM.push(() => {   // Philosopher's Grid keystone (327)
         if (has('keystone_philosophers_grid')) {
             addSecs(60);
-            globalThis.revealTiles(2);
+            revealTiles(2);
             toast("🧪 Philosopher's Grid +60s");
         }
     });
@@ -746,7 +747,7 @@ export function _ptxRunExpansion() {
 
     ON_ITEM_USE.push(() => {   // Open Bazaar keystone (353)
         if (has('keystone_open_bazaar')) {
-            globalThis.revealTiles(2);
+            revealTiles(2);
             addSecs(5);
             toast('🏪 Open Bazaar: 2 reveals, +5s');
         }
@@ -828,7 +829,7 @@ export function _ptxRunExpansion() {
             for (const r of Object.keys(S.clueOriginals.rows)) writeLineSpans('row', Number(r), S.clueOriginals.rows[r]);
             for (const c of Object.keys(S.clueOriginals.cols)) writeLineSpans('col', Number(c), S.clueOriginals.cols[c]);
             S.clueOriginals = null;
-            globalThis.revealTiles(3);
+            revealTiles(3);
             toast('🌅 Night lifts - clues restored, 3 reveals granted');
         }, 120000);
     }
@@ -1070,7 +1071,7 @@ export function _ptxRunExpansion() {
         const result = orig(...args);
         if (result === true && globalThis.cur && !globalThis.dead) {
             if (has('glyph_ward')) { addSecs(15); toast('🔱 Glyph Ward +15s'); }
-            if (has('symmetric_shield')) { globalThis.markWrongTiles(2); toast('🪞 Symmetric Shield'); }
+            if (has('symmetric_shield')) { markWrongTiles(2); toast('🪞 Symmetric Shield'); }
         }
         return result;
     });

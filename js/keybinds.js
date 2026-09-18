@@ -1,4 +1,4 @@
-import { showToast } from './puzzle-items/toasts-and-popups.js';
+import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { renderSkillHotbar } from './skills/skill-hotbar.js';
 import { t } from './translation/translations.js';
 

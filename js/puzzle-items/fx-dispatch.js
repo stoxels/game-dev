@@ -16,7 +16,7 @@ import { _fxCandle, _fxMagnifier, _fxScanner, _fxSpyglass } from './reveal/revea
 import { _fxColSolve, _fxRowSolve } from './row-col-solve/row-col-solve.js';
 import { _fxScoutPrimer } from './scouts-primer/scouts-primer-item.js';
 import { _fxShadowSeal } from './shadow-seal/shadow-seal.js';
-import { _fxClock } from './shared/fx-helpers.js';
+import { _fxClock } from '../puzzle-mechanics/fx-helpers.js';
 import { _fxShield } from './shield/shield.js';
 import { _fxSurveyScope } from './survey-scope/survey-scope.js';
 import { _fxTheWitch } from './the-witch/the-witch.js';

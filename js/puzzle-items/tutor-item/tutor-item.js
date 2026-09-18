@@ -5,9 +5,9 @@ import { questStat_mistakesRemoved } from '../../quests/quests-stats.js';
 import { _trackTimerDelta, updTimer } from '../../timer.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../fx-dispatch.js';
-import { _calcTutorItemCount } from '../shared/effect-modifiers.js';
-import { TUTOR_ITEM_SFX, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../shared/fx-helpers.js';
-import { showToast } from '../toasts-and-popups.js';
+import { _calcTutorItemCount } from '../../puzzle-mechanics/effect-modifiers.js';
+import { TUTOR_ITEM_SFX, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 //-------------------TUTOR - TUTOR / PROFESSOR / SCHOLAR / GRAND MENTOR----------------------

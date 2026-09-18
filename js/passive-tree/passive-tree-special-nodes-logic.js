@@ -1,4 +1,5 @@
 ﻿import { Audio_Manager } from '../audio/audio.js';
+import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { stopTimer, updTimer } from '../timer.js';
 import { t } from '../translation/translations.js';
@@ -307,7 +308,7 @@ export function _poissonProcessTick() {
 
     let count = 1 + _poissonCheckBayesianExtra();
 
-    globalThis.markWrongTiles(count);
+    markWrongTiles(count);
     globalThis.showToast(t('pt_toast_poisson_marked').replace('{n}', count));
     Audio_Manager.playSFX('poisson_process');
 }
@@ -463,7 +464,7 @@ export function _binomialBurstOnCorrectFill(row, col) {
     const chance = _binomialBurstGetChance();
     if (!_bayesianRoll(chance)) return;
 
-    const markedCells = globalThis.markWrongTiles(1);
+    const markedCells = markWrongTiles(1);
     globalThis.showToast(`💢 ${t('pt_toast_binomial')}`);
     Audio_Manager.playSFX('binomial_burst');
     PassiveTracker.onBinomialTrigger();
@@ -869,7 +870,7 @@ export function _randomWalkRevealCell(r, c) {
     // Consume any pending Bayesian bonus as an extra mark on the side
     if (_getBayesianBonus() > 0 && Math.random() < _getBayesianBonus()) {
         _resetBayesianBonus();
-        globalThis.markWrongTiles(1);
+        markWrongTiles(1);
     }
 
     updClues(r, c);

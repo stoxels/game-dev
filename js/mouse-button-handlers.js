@@ -1,4 +1,5 @@
 ﻿import { trackAchStat } from './achievements/achievements.js';
+import { revealTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from './grid.js';
 import { applyPenalty } from './penalty.js';
@@ -657,7 +658,7 @@ export function checkSampleEfficiency(row, col) {
     if (globalThis.consecutiveCorrectFills >= threshold) {
         globalThis.consecutiveCorrectFills = 0;
         // Capture the output of revealTiles
-        const revealed = globalThis.revealTiles(1);
+        const revealed = revealTiles(1);
         if (revealed && revealed.length > 0) {
             globalThis.playSampleEfficiencyEffect(revealed[0].row, revealed[0].col);
             Audio_Manager.playSFX('sample_efficiency');
@@ -666,7 +667,7 @@ export function checkSampleEfficiency(row, col) {
         // Bayesian bonus: chance to reveal a second tile
         if (_getBayesianBonus() > 0 && Math.random() < _getBayesianBonus()) {
             _resetBayesianBonus();
-            const bonusRevealed = globalThis.revealTiles(1);
+            const bonusRevealed = revealTiles(1);
 
             if (bonusRevealed && bonusRevealed.length > 0) {
                 // Delay the second effect slightly so they don't overlap perfectly

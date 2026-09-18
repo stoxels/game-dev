@@ -1,4 +1,5 @@
 ﻿import { stopTimer, timesUp, updTimer } from './timer.js';
+import { revealTiles, markWrongTiles } from './puzzle-mechanics/grid-actions.js';
 import { trackAchStat } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
@@ -55,7 +56,7 @@ export function _tryProcStochasticResonance(row, col) {
     const canProc = globalThis.ptHasSkill('keystone_stochastic_resonance') && !window._stochasticLastFired;
     if (canProc && Math.random() < 0.25) {
         window._stochasticLastFired = true;
-        const revealed = globalThis.revealTiles(1);
+        const revealed = revealTiles(1);
         if (revealed && revealed.length > 0) {
             // Pass four arguments: mistake coordinates, followed by target coordinates
             globalThis.playStochasticResonanceEffect(row, col, revealed[0].row, revealed[0].col);
@@ -85,12 +86,12 @@ export function _tryProcStandardDeviation(mistakeRow, mistakeCol) {
     if (globalThis.mistakeCount % threshold !== 0) return;
 
     const revealCount = hasNode3 ? 2 : 1;
-    const revealedTiles = globalThis.revealTiles(revealCount) || [];
+    const revealedTiles = revealTiles(revealCount) || [];
 
     // Bayesian bonus: extra reveal based on accumulated bonus probability
     if (globalThis._getBayesianBonus() > 0 && Math.random() < globalThis._getBayesianBonus()) {
         globalThis._resetBayesianBonus();
-        const extraTiles = globalThis.revealTiles(1) || [];
+        const extraTiles = revealTiles(1) || [];
         revealedTiles.push(...extraTiles);
     }
 

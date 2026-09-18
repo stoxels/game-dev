@@ -1,9 +1,10 @@
 import { Audio_Manager } from '../audio/audio.js';
+import { markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { t } from '../translation/translations.js';
 import { playItemEffect } from './fx-dispatch.js';
-import { _calcMarkWrongCount } from './shared/effect-modifiers.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+import { _calcMarkWrongCount } from '../puzzle-mechanics/effect-modifiers.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxOverlay, _fxSpawnParticles } from '../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------MARK WRONG - ERASER / SWEEPER / ERROR MAGNET / ERROR GEM----------------------
@@ -19,7 +20,7 @@ export function _useMarkWrong(id, def) {
     const baseCount = parseInt(id.replace('markWrong', '')) || 2;
     const finalCount = _calcMarkWrongCount(baseCount);
 
-    globalThis.markWrongTiles(finalCount);
+    markWrongTiles(finalCount);
     playItemEffect(id);
     return `${def.icon} ${t('item_marked').replace('{n}', finalCount)}`;
 }
