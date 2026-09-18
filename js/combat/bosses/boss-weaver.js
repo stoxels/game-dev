@@ -4,16 +4,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE WEAVER (boss_weaver)-----------------------------
 //------------------------------------------------------------------------
-// Thread-trap homage: the Weaver strings a live grid of tripwires - three
-// horizontal, three vertical - and electrifies half of them at a time. Even
-// threads one moment, odd the next; the warning flicker is your only friend.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Thread-trap homage: a live grid of tripwires, half electrified at a
+// time. Even threads one moment, odd the next; the warning flicker is
+// your only friend.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (prior_bomb) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// A wire grid that warns which threads go live, then electrifies them.
+// Stand clear of the flickering threads before each cycle turns live.
 export function _egMechThreadGrid(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
