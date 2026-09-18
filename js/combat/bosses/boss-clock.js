@@ -1,6 +1,7 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { _egClearCenterGridBanners, updTimer } from '../../timer.js';
+import { _egClearCenterGridBanners } from '../../timer.js';
 import { t } from '../../translation/translations.js';
+import { endTimerFreeze, startTimerFreeze } from '../../puzzle-mechanics/timer-freeze.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkEl, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
 
@@ -74,7 +75,12 @@ export const EG_CLOCK_FREEZE_RING_RADIUS = 92;     // countdown ring radius (px)
 // time. _egClockTimeFreezeWarn is the 2.5s buildup (hands stop, face flares)
 // so the player isn't blindsided; _egClockTimeFreezeActive is the real 30s
 // freeze. Both are written BEFORE any side effect so a single frame can
-// never slip between the flag and the effect taking hold. Read in:
+// never slip between the flag and the effect taking hold. timerFrozen
+// itself is owned by the shared timer-freeze mechanic: the freeze is
+// started via startTimerFreeze(hold:true) and released via
+// endTimerFreeze(), so shorter freezes can never cut this one short and
+// the Clock no longer writes the flag directly. The meta-flags are read
+// in:
 //   start-level.js      keeps timerFrozen alive across arena transitions
 //   penalty.js          mistake counter frozen
 //   player_sprite.js    avatar can't move
@@ -394,9 +400,9 @@ export function _egClockTimeFreezeEnd() {
     if (!window._egClockTimeFreezeActive && !window._egClockTimeFreezeWarn) return;
     _egClockClearFreezeWarn();                       // warn-only? just the telegraph
     if (!window._egClockTimeFreezeActive) return;    // nothing else was pinned
-    window._egClockTimeFreezeActive = false;
-    if (typeof timerFrozen !== 'undefined') globalThis.timerFrozen = false;
-    if (typeof updTimer === 'function') updTimer();
+    window._egClockTimeFreezeActive = false;         // drop the guard BEFORE the
+    // release, so endTimerFreeze's Clock-guard sees the hold as ended.
+    endTimerFreeze();
 }
 
 
@@ -514,11 +520,14 @@ export function _egClockStartTimeFreeze(monster, level) {
 
     // Freeze the global systems BEFORE any visual lands - one synchronous
     // block, so nothing else (timer tick, mistake penalty, WASD) can fire
-    // between the flag and the freeze taking hold.
+    // between the flag and the freeze taking hold. The timer pin goes
+    // through the shared timer-freeze mechanic in hold mode: this loop's
+    // countdown is pause-aware, so the release must not be a real-time
+    // setTimeout (it would tick through Escape-pause and arena
+    // transitions); _egClockTimeFreezeEnd releases via endTimerFreeze().
     window._egClockTimeFreezeActive = true;
     _egClockClearFreezeWarn();   // telegraph done - drop its flag, glow, callout
-    if (typeof timerFrozen !== 'undefined') globalThis.timerFrozen = true;
-    if (typeof updTimer === 'function') updTimer();
+    startTimerFreeze(EG_CLOCK_FREEZE_DURATION_MS, { hold: true, overlay: false });
 
     // Clear center-grid banners so the frozen arena reads clean.
     if (typeof _egClearCenterGridBanners === 'function') {
