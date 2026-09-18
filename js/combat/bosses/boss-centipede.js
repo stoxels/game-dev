@@ -5,45 +5,12 @@ import { _egFlingBurst, _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _e
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CENTIPEDE (boss_centipede)------------------
 //------------------------------------------------------------------------
-// Arcade-siege fight: the colony INFESTS the arena and keeps coming no
-// matter how many pieces you cut off.
+// Arcade colony siege: a winding segmented body you must constantly dodge,
+// baitable burrow holes, EXOSKELETON spiral at 60%, MOLT split at 30%, venom
+// pools throughout, and the full-screen CENTIPEDE STAMPEDE charge attack.
 //
-//   PERSISTENT (whole fight, watcher):
-//   • THE WINDING COLONY - the centipede itself never leaves: a segmented
-//     body (5/7/9 segments per phase) sinuously winds around the arena,
-//     homing loosely toward the player. Touching any segment is a physical
-//     hit. Cutting through the fight means dodging it constantly.
-//   • BURROW HOLES - after Molt, dirt holes surface at random spots and
-//     stay open for a while. Stand on one to bait the molt mini-centipede
-//     (it homes onto you): if it reaches the hole you're in, it buries
-//     itself and is gone for 15s. Standing in a hole while it BURIES is
-//     harmless - but the hole then collapses and closes for a while.
-//
-//   HP GATES (watcher):
-//   • 60% - EXOSKELETON: the boss sheds chitin plates that orbit it in a
-//     wide ring (visible telegraph) - the plates spin outward in a
-//     rotating spiral wave you have to weave through, twice.
-//   • 30% - MOLT: the centipede STOPS, swells visibly, then splits: the
-//     back half detaches and becomes a second, faster mini-centipede for
-//     the rest of the fight, while the main body enrages (faster winding,
-//     more segments).
-//
-//   FINALE - every phase, the boss periodically spits a VENOM BURST: a
-//   target ring on the player, then a splash of venom blobs that leave
-//   short-lived toxic pools. At 30%+, venom rain joins in (falling drops
-//   with target rings).
-//
-//   CHARGE ATTACK - CENTIPEDE STAMPEDE: the boss's charged attack is a
-//   full-screen horizontal dash: a 1s telegraph band at the player's row,
-//   then the whole colony stampedes across it (heavy physical hit).
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics (clue_scramble) live in shared-boss-abilities.js and are
-// referenced by handler-name string.
+// Shared mechanics (clue_scramble) live in shared-puzzle-mechanics.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
