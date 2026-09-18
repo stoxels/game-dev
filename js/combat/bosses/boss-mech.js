@@ -4,16 +4,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MECH (boss_mech)---------------------------------
 //------------------------------------------------------------------------
-// Self-destruct homage: the Mech primes a nuke and shows you the blast
-// radius - plus the concrete pillars that can save you. When the countdown
-// ends, be behind cover: anything with open sky to the blast is ash.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Self-destruct homage: the Mech primes a nuke and shows the blast radius
+// plus the concrete pillars that can save you. When the countdown ends,
+// be behind cover: open sky to the blast is ash.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (soul_tithe) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,7 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
-// True when segment (ax,ay)-(bx,by) intersects rect r (line-of-sight block).
+// True when a blast ray from the bomb crosses a cover rectangle.
+// Used to judge whether a pillar blocks the line of sight.
 export function _egMechSegHitsRect(ax, ay, bx, by, r) {
     const inside = (x, y) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
     if (inside(ax, ay) || inside(bx, by)) return true;
@@ -58,6 +55,8 @@ export function _egMechSegHitsRect(ax, ay, bx, by, r) {
         || seg(ax, ay, bx, by, r.left, r.bottom, r.left, r.top);
 }
 
+// A countdown nuke with pillar cover; anyone without a pillar between
+// them and the blast burns when the timer ends. Watch the counter.
 export function _egMechSelfDestruct(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
