@@ -4,34 +4,10 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkE
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BARRAGE (boss_barrage)---------------------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK - "The War-Machine Brute". artillery barrage theming. The
-// fight is a creeping shelling curtain you fight THROUGH, not away from.
-// Element: fire (keep - artillery, not apples).
-//
-//   • SHELLING CURTAIN (signature, all fight) - a creeping wall of shell
-//     splashes advances across the arena each cast; the telegraph stays
-//     visible while it rolls, so you fight inside the barrage and clear
-//     puzzle cells between the shell lines. Phase 3: the curtain comes from
-//     the top as well - fight on a diagonal front.
-//   • SUPPLY DROP (60%) - cargo crates crash down (slam telegraphs); each
-//     one flips open into a small artillery JAMMER that lobs slow mortar
-//     shells at your last position. Destructible: step into one to smash it.
-//   • SHOT SHELLS (60%) - heavy shells fall on telegraphed rings, each burst
-//     scatters hot shrapnel that keeps travelling. Impact ring + fragment
-//     lanes - read both.
-//   • 💀 FINAL BOMBARDMENT (≤10%, one-shot finale) - the whole arena becomes
-//     the target zone: THREE massive strikes light up one at a time (each a
-//     widening volley), then the ALL-OUT SALVO detonates everything except
-//     the single untouched safe tile. Charge bar frozen (gate in
-//     _egTickPlayer via _egBarFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Fire artillery siege: a creeping shelling curtain rolls across the arena
+// all fight while you clear cells between the shell lines. Supply-drop
+// jammers and shot-shell shrapnel join at 60%; at ≤10% the FINAL BOMBARDMENT
+// detonates everything except one untouched safe tile.
 //
 // Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and are
 // referenced by handler-name string.
