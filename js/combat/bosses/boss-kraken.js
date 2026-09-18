@@ -4,16 +4,11 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE KRAKEN (boss_kraken)-----------------------------
 //------------------------------------------------------------------------
-// Deep-sea homage: two great tentacle arms sweep around a central maw -
-// slow, thick, and impossible to outrun forever. Slip between the arms'
-// rhythm like a tide-pool dancer.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Deep-sea homage: great tentacle arms sweep around a central maw - slow,
+// thick, impossible to outrun forever. Slip between the arms' rhythm.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (fog_bank) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +35,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Rotating tentacle arms around a central maw; touching an arm burns.
+// Count the rotation speed and step through as each arm passes.
 export function _egMechTentacleSweep(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
