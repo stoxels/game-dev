@@ -4,17 +4,12 @@ import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNew
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ARCHITECT (boss_architect)-----------------------
 //------------------------------------------------------------------------
-// Platforming homage without jumping: four safe platforms hover over a sea
-// of burning ground. Every few seconds one platform sinks and a new one
-// rises elsewhere - telegraphed, so keep an exit route in mind.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Platforming homage without jumping: four safe platforms over burning
+// ground. Every few seconds one sinks and a new one rises elsewhere -
+// telegraphed, so keep an exit route in mind.
 //
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb,
-// frozen_cells, clue_swap, grid_invert, summons) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Shared mechanics (probability_shift) live in shared-boss-abilities.js
+// and are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -41,11 +36,15 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// True when a new platform rectangle would crowd an existing one.
+// Keeps platforms spread out so there is always room to stand.
 export function _egArchitectSpotTaken(spots, x, y, w, h) {
     return spots.some(s =>
         x < s.x + s.w + 60 && x + w + 60 > s.x && y < s.y + s.h + 60 && y + h + 60 > s.y);
 }
 
+// Picks a clear spot for a fresh platform, retrying crowded picks.
+// Falls back to any random spot if the arena is too full.
 export function _egArchitectNewSpot(spots, w, h) {
     for (let tries = 0; tries < 40; tries++) {
         const x = 40 + Math.random() * Math.max(40, window.innerWidth - w - 80);
@@ -58,6 +57,8 @@ export function _egArchitectNewSpot(spots, w, h) {
     };
 }
 
+// Four safe platforms sink one at a time and respawn elsewhere.
+// Standing off every platform burns; move before your ground sinks.
 export function _egMechRisingPlats(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
