@@ -5,36 +5,12 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFli
 //------------------------------------------------------------------------
 //-------------------BOSS: THE THWOMP (boss_thwomp)------------------------
 //------------------------------------------------------------------------
-// Mario-homage siege fight: the fortress guardian - a giant stone block
-// that hovers over the arena and never stops trying to flatten you.
+// Hovering-fortress flattening siege: orchestrating block, telegraphed QUAKE
+// STOMPS, CEILING COLLAPSE rubble at 60%, MINI-THWOMP SIEGE at 30%, and the
+// teleporting GRAND SLAM marker-lock charge attack.
 //
-//   PERSISTENT (whole fight, watcher):
-//   • THE HOVERING BLOCK - the Thwomp itself hangs mid-arena, bobbing and
-//     glaring (angry face). It never attacks directly; it ORCHESTRATES.
-//   • QUAKE STOMPS - the block periodically SLAMS DOWN where it hovers:
-//     a growing dust ring telegraphs, then the whole block crashes down
-//     with a shockwave. Anyone in the impact circle takes heavy damage and
-//     gets flung outward. It then floats back up, drifting to a new spot.
-//
-//   HP GATES (watcher):
-//   • 60% - CEILING COLLAPSE: rubble warning marks bloom across the arena,
-//     then stones rain down in sequence. Aftershock dust clouds linger.
-//   • 30% - MINI-THWOMP SIEGE: the guardian summons 3–5 mini blocks that
-//     hop after you Mario-style, each slamming where it lands. While the
-//     siege runs, the big block quake-stomps on a faster cadence.
-//
-//   CHARGE ATTACK - GRAND SLAM: when the boss's attack bar fills, a shadow
-//   marker stalks your avatar and LOCKS (the classic Thwomp tell), then
-//   the whole block teleports overhead and crashes down on the mark with
-//   a huge shockwave ring. The block's signature kill move.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics (soul_tithe, corrupt_cells) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Shared mechanics (soul_tithe in shared-puzzle-mechanics.js, corrupt_cells
+// in shared-boss-abilities.js) are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
