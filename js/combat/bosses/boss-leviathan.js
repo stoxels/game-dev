@@ -4,16 +4,11 @@ import { _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkH
 //------------------------------------------------------------------------
 //-------------------BOSS: THE LEVIATHAN (boss_leviathan)-----------------------
 //------------------------------------------------------------------------
-// Rising-tide homage: the sea itself comes for you - a burning tide sweeps
-// up the screen while wreckage rains from above. Outrun the water, dodge
-// the debris, and do not stop.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Rising-tide homage: a burning tide sweeps up the screen while wreckage
+// rains from above. Outrun the water, dodge the debris, do not stop.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +35,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// A burning tide rises from below while debris falls from above.
+// Climb past the waterline and sidestep the falling wreckage.
 export function _egMechRisingTide(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
