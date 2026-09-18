@@ -5,43 +5,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkF
 //------------------------------------------------------------------------
 //-------------------BOSS: THE STACK (boss_stack)--------------------------
 //------------------------------------------------------------------------
-// A rework of the old one-shot Block Fall into a persistent construction
-// siege. The Stack is a living tetromino cluster and the arena is its
-// build site: it drops pieces, slams its mass, and clears its lines with
-// you still inside them. Fight identity: GRAVITY - everything falls, and
-// everything that lands becomes terrain.
+// Living-tetromino construction siege - GRAVITY is the fight: drifting core
+// stack, SOFT DROP terrain, HARD DROP at 60%, LINE CLEAR bands at 30%, and
+// the GARBAGE RISE charge attack. One _egNkLoop drives every state machine.
 //
-//   PERSISTENT (whole fight, watcher):
-//   • THE CORE STACK - the boss's arena body: a 4-block T-tetromino that
-//     drifts around the table. Touching it is a STACK SLAM: animated
-//     fling + physical damage.
-//   • SOFT DROP - every few seconds pieces telegraph a landing column,
-//     fall, and thud down: the landing burst hurts, and each landed piece
-//     LINGERS as floor terrain for a moment before the Stack absorbs it.
-//
-//   60% GATE - HARD DROP: three giant pieces (an O and two I-beams) ghost
-//   above your column, then slam down at full speed - each landing fires
-//   a shockwave ring and leaves a heavy floor block behind.
-//
-//   30% GATE - LINE CLEAR: full-width rows flash (telegraph), then
-//   detonate across their entire width, one after another. Dodge
-//   vertically between the flashing bands.
-//
-//   CHARGE ATTACK - GARBAGE RISE: gray garbage rows rise from the BOTTOM
-//   of the screen and flood the lower half - touch the rising edge and
-//   you're flung upward; stand inside and it grinds you. Stay high until
-//   the garbage sinks.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string. Damage flows through the shared tier curve.
-// NOTE: exactly ONE _egNkLoop runs on the watcher's run - every state
-// machine (soft drop, hard drop, line clear, garbage rise) lives in that
-// single tick.
+// Shared mechanics (fog_bank in shared-puzzle-mechanics.js, probability_shift
+// in shared-boss-abilities.js) are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
