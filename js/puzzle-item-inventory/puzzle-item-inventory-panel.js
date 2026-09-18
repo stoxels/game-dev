@@ -371,6 +371,36 @@ function _wireGlobalFlyoutGuard() {
             closeInventoryFlyout();
         }).observe(el, { attributes: true, attributeFilter: ['class'] });
     });
+    // Mid-level question modals: the quiz overlay and the math gate take
+    // over the screen inside a level - the flyout (and pin) must go there
+    // too. Both are static elements with a 'show' class toggle, so the same
+    // observer pattern as the result overlays covers every open path
+    // (quiz.js opens via classList directly, mathgate via showModal()).
+    ['quiz-overlay', 'mg-modal'].forEach((overlayId) => {
+        const el = document.getElementById(overlayId);
+        if (!el) return;
+        new MutationObserver(() => {
+            if (!el.classList.contains('show')) return;
+            window._invPinnedFlyoutGroup = null;
+            _invCancelFlyoutClose();
+            closeInventoryFlyout();
+        }).observe(el, { attributes: true, attributeFilter: ['class'] });
+    });
+    // The scouts-primer overlay is created dynamically and appended with
+    // 'modal-bg show' already set (no static element to observe), so watch
+    // body childList for its insertion instead.
+    new MutationObserver((muts) => {
+        for (const m of muts) {
+            for (const n of m.addedNodes) {
+                if (n.nodeType === 1 && n.id === 'primer-overlay') {
+                    window._invPinnedFlyoutGroup = null;
+                    _invCancelFlyoutClose();
+                    closeInventoryFlyout();
+                    return;
+                }
+            }
+        }
+    }).observe(document.body, { childList: true });
 }
 
 
