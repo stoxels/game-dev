@@ -388,7 +388,7 @@ export function getPlayerTraits() {
 }
 
 // True if a skill may be placed into the hotbar. Sealed universal spells
-// are refused (setHotbarSlot + startSkillDrag both funnel through here).
+// are refused (setHotbarSlot funnels through here).
 export function isSkillMovable(skillId) {
     const def = getSkillDef(skillId);
     if (!def || def.movable === false) return false;
@@ -724,6 +724,9 @@ export function getPlayerPassiveSkillIds() {
 //------------------------------------------------------------------------
 // The hotbar is a fixed-size array of skill ids (or null) persisted on
 // STATE.skillHotbar. Slot index 0..9 maps to the keys 1..9,0 by default.
+// The array is a 1:1 mirror of STATE.charmSlots (skill-charms.js) - charm
+// slot N always casts from hotbar slot N. Writes go through the charm slots;
+// ensureSkillHotbar()/rebuildHotbarFromCharmSlots() recompute the mirror.
 //------------------------------------------------------------------------
 
 // Builds the default hotbar for a save: the player's owned skills fill the
@@ -746,14 +749,18 @@ export function _defaultSkillHotbar(state) {
     return slots;
 }
 
-// Ensures STATE.skillHotbar exists and is the right length, prunes skills the
-// player no longer owns (e.g. after a class change), and - only on the very
-// first init or when the class/ascendency changes - fills the free slots from
-// the new roster.
+// Ensures STATE.skillHotbar exists and is the right length, then mirrors the
+// spell-book charm slots 1:1 (charm slot N casts from hotbar key N - see
+// js/skills/skill-charms.js). The hotbar is fully driven by the charm slots:
+// slotting a charm places its spell on the matching hotbar slot, unslotting
+// clears it. Deliberately save-free: the charm slots own persistence, so a
+// mirror write must never clobber a save on its own.
 //
-// The auto-fill MUST NOT run on every call: clearing a slot would otherwise
-// be silently undone (the spell would immediately be re-placed in the first
-// free slot), which broke drag-out-to-remove.
+// When the charm slots do not exist yet (charm system not initialised) the
+// bar is left alone - the next call after the first ensureCharmState() picks
+// the mirror up. Unknown ids are kept as-is: the slot renderer degrades to
+// an empty slot and the next render (after the def registers, e.g. the
+// tutorial Fireball) shows them.
 function ensureSkillHotbar() {
     if (typeof STATE === 'undefined' || !STATE) return [];
     if (!Array.isArray(STATE.skillHotbar) || STATE.skillHotbar.length !== SKILL_HOTBAR_SIZE) {
@@ -762,36 +769,29 @@ function ensureSkillHotbar() {
         while (STATE.skillHotbar.length < SKILL_HOTBAR_SIZE) STATE.skillHotbar.push(null);
     }
 
-    const owned = new Set(getPlayerSkillIds());
-
-    // Drop skills the player can no longer use (class / ascendency change).
-    for (let i = 0; i < SKILL_HOTBAR_SIZE; i++) {
-        const id = STATE.skillHotbar[i];
-        if (id && !owned.has(id)) STATE.skillHotbar[i] = null;
-    }
-
-    // First-ever init, or the player's class/ascendency changed → seed the
-    // bar with the (new) roster so there's always something to press.
-    // Universal spells are NEVER auto-seeded: the player drags them onto
-    // the bar themselves (mirrors the tutorial Fireball rule).
-    const ownerKey = `${STATE.playerClass || ''}|${STATE.playerAscendency || ''}`;
-    const shouldSeed = !STATE.skillHotbarInit || STATE.skillHotbarOwner !== ownerKey;
-    if (shouldSeed) {
-        const placed = new Set(STATE.skillHotbar.filter(Boolean));
-        for (const id of getPlayerSkillIds()) {
-            const seedDef = getSkillDef(id);
-            if (seedDef && seedDef.slotKind === 'universal') continue;
-            if (placed.has(id)) continue;
-            const free = STATE.skillHotbar.indexOf(null);
-            if (free === -1) break;
-            STATE.skillHotbar[free] = id;
-            placed.add(id);
+    if (Array.isArray(STATE.charmSlots)) {
+        for (let i = 0; i < SKILL_HOTBAR_SIZE; i++) {
+            STATE.skillHotbar[i] = _charmKeyToSkillId(STATE.charmSlots[i]);
         }
-        STATE.skillHotbarInit = true;
-        STATE.skillHotbarOwner = ownerKey;
     }
 
     return STATE.skillHotbar;
+}
+
+// Skill id carried by a charm slot key ("<skillId>#<rank>"), or null when the
+// slot is empty or the key is malformed.
+export function _charmKeyToSkillId(key) {
+    if (typeof key !== 'string') return null;
+    const h = key.lastIndexOf('#');
+    if (h <= 0) return null;
+    return key.slice(0, h) || null;
+}
+
+// Rebuilds the whole hotbar from the charm slots (used after charm-slot
+// mutations that bypass setCharmSlot, e.g. starter seeding and stale pruning).
+export function rebuildHotbarFromCharmSlots() {
+    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.charmSlots)) return;
+    ensureSkillHotbar();
 }
 
 // Returns the skill id in a hotbar slot (or null).
@@ -803,6 +803,11 @@ export function getHotbarSkill(slotIndex) {
 // Assigns a skill to a hotbar slot. Refuses passives and unknown skills.
 // If the skill already sits in another slot it is swapped, so the same
 // spell never occupies two slots.
+//
+// DEPRECATED as a player-facing path: the hotbar mirrors the charm slots
+// 1:1 (charm slot N = hotbar slot N), so the next ensureSkillHotbar() call
+// overwrites any direct write. Kept working for the dev console and old
+// call sites; game code assigns through setCharmSlot() instead.
 function setHotbarSlot(slotIndex, skillId) {
     if (slotIndex < 0 || slotIndex >= SKILL_HOTBAR_SIZE) return false;
     if (skillId !== null && !isSkillMovable(skillId)) return false;

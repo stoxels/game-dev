@@ -1,5 +1,6 @@
 import { _clueColCount, _clueColWidth, _rowCluesOnRight } from '../grid.js';
 import { _fxGetPuzzleRect } from './fx-helpers.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - CLUE BLACKOUT----------------------
@@ -110,9 +111,9 @@ function _scheduleBlackoutRemoval(type, durationMs) {
 // Blacks out every row-clue cell for durationMs (default 30s), with a
 // ticking countdown badge over the row-clue strip.
 export function applyCursedRowBlackout(durationMs = 30000) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const rows = globalThis.cur.grid.length;
+    const rows = cur.grid.length;
     for (let r = 0; r < rows; r++) {
         document.querySelectorAll(`.rct-${r}`)
             .forEach(el => el.classList.add('clue-blackout'));
@@ -127,9 +128,9 @@ export function applyCursedRowBlackout(durationMs = 30000) {
 // Blacks out every column-clue header cell for durationMs, with a
 // ticking countdown badge over the column-clue header block.
 export function applyCursedColBlackout(durationMs) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const cols = globalThis.cur.grid[0].length;
+    const cols = cur.grid[0].length;
     for (let c = 0; c < cols; c++) {
         document.querySelectorAll(`.cch-${c}`)
             .forEach(el => el.classList.add('clue-blackout'));

@@ -19,6 +19,7 @@ import { MATH_GATE_POOLS } from './mathgate-questions.js';
 import { mgFormatTutorAnswer } from './mathgate.js';
 import { BONUS_QUIZ_POOLS } from './quiz-questions.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 10: live globalThis accessors for externally-mutated names.
@@ -333,7 +334,7 @@ export function _quizHandleFirstCorrectReward(resEl) {
     document.getElementById('sc-disp').textContent = STATE.totalScore;
 
     // Mark bonus as claimed regardless of Ironman mode or item availability
-    STATE.bonusDone.push(globalThis.cur.gIdx);
+    STATE.bonusDone.push(cur.gIdx);
     // Re-check world aggregates - claiming this bonus may have completed
     // the "all bonuses in a world" achievement set.
     if (typeof checkWorldCompleteAch === 'function') checkWorldCompleteAch();
@@ -357,7 +358,7 @@ export function _resolveQuizAnswer(correct) {
     document.getElementById('quiz-tutor-btn').style.display = 'none';
     const resEl = document.getElementById('quiz-result');
     const isInterstitial = typeof window._egInterstitialDone === 'function';
-    const quizAlreadyClaimed = STATE.bonusDone.includes(globalThis.cur.gIdx);
+    const quizAlreadyClaimed = STATE.bonusDone.includes(cur.gIdx);
     if (correct) {
         Audio_Manager.playSFX('quizCorrect');
         trackAchStat('questionsCorrect');

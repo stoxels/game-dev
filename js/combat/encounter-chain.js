@@ -30,6 +30,7 @@ import { _egCreateGeneratedLevel } from './combat-puzzle-generator.js';
 import { _egConsumePendingQuizRewardHTML, _egResetQuizDamageBuff } from '../endgame/endgame-quiz-buffs.js';
 import { _egCurrencyDrops, _egIsActive, _egIsCampaignRun, _egItemDrops, _egLootDrops, _egPickups } from './combat-state.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.
@@ -92,7 +93,7 @@ export let _egBonusLootChance = 0;
 // requiredPuzzles: how many puzzles must be solved
 // requiredQuestions: how many bonus questions must be answered correctly
 export function _egGetMapRequirements() {
-    const def = globalThis._egMapDef || globalThis.cur;
+    const def = globalThis._egMapDef || cur;
     return {
         totalMonsters: (def && def.totalMonsters != null) ? def.totalMonsters : 0,
         requiredPuzzles: (def && def.requiredPuzzles != null) ? def.requiredPuzzles : 0,
@@ -225,7 +226,7 @@ export function _egOnPuzzleComplete() {
 }
 
 export function _egHasBoss() {
-    const def = globalThis._egMapDef || globalThis.cur;
+    const def = globalThis._egMapDef || cur;
     return !!(def.hasBoss || (def.bosses && def.bosses.length > 0));
 }
 
@@ -635,7 +636,7 @@ export function _egEnterBossArena() {
 export const EG_BOSS_ARENA_MIN_CELLS = 36;
 
 export function _egFindBossArenaPuzzleGi() {
-    const activeDef = globalThis._egMapDef || globalThis.cur;
+    const activeDef = globalThis._egMapDef || cur;
     const pool = (activeDef.puzzlePool && typeof activeDef.puzzlePool === 'object')
         ? activeDef.puzzlePool : {};
 
@@ -982,7 +983,7 @@ export function _egPickMapRunPuzzleGi(criteria) {
 }
 
 export function _egFindNextChainPuzzleGi() {
-    const activeDef = globalThis._egMapDef || globalThis.cur;
+    const activeDef = globalThis._egMapDef || cur;
     const criteria = (activeDef.puzzlePool && typeof activeDef.puzzlePool === 'object')
         ? activeDef.puzzlePool : {};
 
@@ -1011,8 +1012,8 @@ export const EG_BONUS_LOOT_CHANCE_MAX = 5.0;
 // Returns the bonus-loot gain (0–1) for solving a puzzle, based on how many
 // cells the puzzle's grid has (same buckets as _gridSizeBucket in inference-stats.js).
 export function _egGetPuzzleBonusLootGain() {
-    const rows = globalThis.cur ? globalThis.cur.grid.length : 0;
-    const cols = globalThis.cur && globalThis.cur.grid[0] ? globalThis.cur.grid[0].length : 0;
+    const rows = cur ? cur.grid.length : 0;
+    const cols = cur && cur.grid[0] ? cur.grid[0].length : 0;
     const cells = rows * cols;
     if (cells >= 400) return EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE.massive;
     if (cells >= 200) return EG_BONUS_LOOT_CHANCE_BY_GRID_SIZE.large;
@@ -1300,7 +1301,7 @@ export function _egTryLeaveMap() {
 // Helper: total bosses required for this map (for HUD display).
 export function _egGetBossTotalForHUD() {
     if (_egBossTotalCount > 0) return _egBossTotalCount;
-    const def = globalThis._egMapDef || globalThis.cur;
+    const def = globalThis._egMapDef || cur;
     if (!def) return 0;
     if (def.bosses && def.bosses.length > 0) {
         const cap = (def.maxBosses != null && def.maxBosses > 0) ? def.maxBosses : def.bosses.length;
@@ -1546,7 +1547,7 @@ export function _egHideChainCountdownOverlay() {
 export function _egChainCleanup() {
     _egCancelChainCountdown();
     globalThis.ALL.forEach(level => {
-        if (level.isChainedPuzzle && level !== globalThis.cur) {   // <-- don't strip the level about to be retried
+        if (level.isChainedPuzzle && level !== cur) {   // <-- don't strip the level about to be retried
             delete level.isMonsterLevel;
             delete level.isChainedPuzzle;
         }

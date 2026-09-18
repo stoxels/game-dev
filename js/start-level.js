@@ -41,6 +41,7 @@ import { _applyLowHealthVignette, _resetLowTimeWarningState, startTimer, stopTim
 import { addTimeSecs } from './timer/timer-adjust.js';
 import { t } from './translation/translations.js';
 import { STATE } from './state.js';
+import { cur } from './state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 10: live globalThis accessors for externally-mutated names.
@@ -92,8 +93,8 @@ export function _initLevelData(gi) {
 // Creates fresh userGrid, wrongGrid, and revealedGrid sized to the current puzzle dimensions.
 // All cells start empty/false - no carry-over from a previous level.
 export function _initGrids() {
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
 
     globalThis.userGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
     globalThis.wrongGrid = Array.from({ length: rows }, () => Array(cols).fill(false));
@@ -238,16 +239,16 @@ export function _calcBaseTime() {
     const cfg = DIFF_CFG[curDiff];
     let baseTimer;
 
-    if (globalThis.cur.isMonsterLevel && globalThis.cur.egTimeLimit != null) {
+    if (cur.isMonsterLevel && cur.egTimeLimit != null) {
         const gearBonus = (typeof _egComputePlayerStats === 'function')
             ? (_egComputePlayerStats().timeAdded || 0) : 0;
         // The map-run "% less Time gained" modifier also scales the gear
         // time_added bonus (an item effect) - preserved from the old
         // per-site handling; see _applyBaseTimer() below for the raw add.
         const gearMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
-        baseTimer = globalThis.cur.egTimeLimit + Math.round(gearBonus * gearMult);
+        baseTimer = cur.egTimeLimit + Math.round(gearBonus * gearMult);
     } else {
-        baseTimer = globalThis.cur.timer || cfg.timerStart;
+        baseTimer = cur.timer || cfg.timerStart;
     }
 
     return curMods.timetrial ? Math.round(baseTimer * 0.5) : baseTimer;
@@ -272,7 +273,7 @@ export function _applyExpectedValueBonus() {
     if (ptHasSkill('keystone_gamblers_ruin')) return 0;
     if (!ptHasSkill('expected_value_1') && !ptHasSkill('expected_value_2') && !ptHasSkill('expected_value_3')) return 0;
 
-    const totalCells = globalThis.cur.grid.length * globalThis.cur.grid[0].length;
+    const totalCells = cur.grid.length * cur.grid[0].length;
     let secsPerTen = 0;
     if (ptHasSkill('expected_value_1')) secsPerTen += 5;
     if (ptHasSkill('expected_value_2')) secsPerTen += 2;
@@ -291,7 +292,7 @@ export function _initTimer() {
     }
 
     const cfg = DIFF_CFG[curDiff];
-    const fullBaseTimer = globalThis.cur.timer || cfg.timerStart;
+    const fullBaseTimer = cur.timer || cfg.timerStart;
     const base = _calcBaseTime();
 
     // Remember exactly how many seconds Time Trial shaved off the base timer,
@@ -326,7 +327,7 @@ export function _initTimer() {
 // Updates the bonus sidebar hint text from the current level's data.
 export function _updateBonusSidebar() {
     const el = document.getElementById('bonus-sidebar-hint');
-    el.textContent = (lvText(globalThis.cur, 'bonusHint') || '');
+    el.textContent = (lvText(cur, 'bonusHint') || '');
 }
 
 // Renders the active modifier and difficulty tags below the timer display.
@@ -382,8 +383,8 @@ export function _setMistakeCounterText(suffix = '') {
 // Updates all HUD elements: level id, hint text, score display, penalty info,
 // mistake counter, bonus sidebar, and modifier tags.
 export function _updateHUD() {
-    document.getElementById('top-id').textContent = `${t('lvl_prefix')} ${globalThis.cur.world}-${globalThis.cur.li}`;
-    document.getElementById('top-hint').textContent = lvText(globalThis.cur, 'hint');
+    document.getElementById('top-id').textContent = `${t('lvl_prefix')} ${cur.world}-${cur.li}`;
+    document.getElementById('top-hint').textContent = lvText(cur, 'hint');
     document.getElementById('sc-disp').textContent = STATE.totalScore;
     document.getElementById('pen-info').textContent = '';
 
@@ -406,8 +407,8 @@ export function _updateHUD() {
             nameEl.style.color = (typeof rarityColors === 'function')
                 ? rarityColors(egMap.rarity).color : '';
         } else {
-            nameEl.textContent = `${lvText(globalThis.cur, 'hint')}`;
-            const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(globalThis.cur);
+            nameEl.textContent = `${lvText(cur, 'hint')}`;
+            const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
             nameEl.style.color = isNexusPoint ? '#7fd4ff' : isAscension ? '#c080ff' : isConvergence ? '#6dbf40' : '';
         }
     }
@@ -440,7 +441,7 @@ export function _startSystems() {
         if (typeof _refreshTouchpadModeButtonLabel === 'function') _refreshTouchpadModeButtonLabel();
     }
 
-    if (window._lastFailedGi !== undefined && globalThis.cur && globalThis.cur.gIdx !== window._lastFailedGi) {
+    if (window._lastFailedGi !== undefined && cur && cur.gIdx !== window._lastFailedGi) {
         window._lastFailedGi = null;
     }
 }
@@ -462,7 +463,7 @@ export function _initClassSystems() {
 // to mid-lesson (it stays locked until graduation), so history keeps the
 // entry pushed by showTutorial() instead of a stale screen-levels.
 export function _navigateToGameScreen() {
-    if (!(globalThis.cur && globalThis.cur.isTutorialQuest)) {
+    if (!(cur && cur.isTutorialQuest)) {
         globalThis.screenHistory.push('screen-levels');
     }
     switchScreen('screen-game');
@@ -503,9 +504,9 @@ export const TUTORIAL_QUEST_BACKGROUNDS = {
 export function _applyWorldBackground(worldNum) {
     const screen = document.getElementById('screen-game');
     let bg = null;
-    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest
-        && TUTORIAL_QUEST_BACKGROUNDS[globalThis.cur.tqPuzzle]) {
-        bg = TUTORIAL_QUEST_BACKGROUNDS[globalThis.cur.tqPuzzle];
+    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest
+        && TUTORIAL_QUEST_BACKGROUNDS[cur.tqPuzzle]) {
+        bg = TUTORIAL_QUEST_BACKGROUNDS[cur.tqPuzzle];
     }
     if (!bg) bg = WORLD_BACKGROUNDS[worldNum];
     if (bg) {
@@ -543,7 +544,7 @@ export function _doStartLevel(gi) {
     _entropyDrainInit();
 
     // 4. Passive node effects - oracle flag must be set before passives run
-    if (ptHasSkill('keystone_the_oracle') && globalThis.cur.grid.length * globalThis.cur.grid[0].length >= 200) {
+    if (ptHasSkill('keystone_the_oracle') && cur.grid.length * cur.grid[0].length >= 200) {
         window._oracleActive = true;
     }
     _applyPassiveStartEffects();
@@ -559,8 +560,8 @@ export function _doStartLevel(gi) {
     // _egTransitionToChainPuzzle checks this flag after _doStartLevel to guarantee
     // every chained puzzle in a map re-triggers passives even if a future refactor
     // gates _applyPassiveStartEffects behind _egSuppressEncounterStop.
-    window._egPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : gi;
-    window._egClassPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : gi;
+    window._egPassiveAppliedForGi = cur ? cur.gIdx : gi;
+    window._egClassPassiveAppliedForGi = cur ? cur.gIdx : gi;
 
     // 5. Deferred overlay effects (needs grid DOM to exist)
     // adjacency_matrix (302): populate neighbour-count overlays after passives are applied
@@ -572,13 +573,13 @@ export function _doStartLevel(gi) {
     _initClassSystems();
     _navigateToGameScreen();
 
-    _applyWorldBackground(globalThis.cur.world);
+    _applyWorldBackground(cur.world);
 
     // Show the player's character sprite in the top-left. Both level kinds
     // share the same presentation now (Health / Mana / Shield / charge bar
     // stack - see _avatarBarsHTML in player_sprite.js); monster levels let
     // the encounter tick build the full avatar so the sprite size is stable.
-    if (!globalThis.cur.isMonsterLevel) {
+    if (!cur.isMonsterLevel) {
         _renderPlayerAvatarSimple();
         _showPlayerAvatarSimple();
         _showPlayerAvatar();
@@ -589,7 +590,7 @@ export function _doStartLevel(gi) {
     // Character banter - fire the level-start line once the avatar exists.
     // Tutorial-quest levels are Professor lessons, not banter moments.
     if (typeof triggerBanter === 'function'
-        && !(typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest)) {
+        && !(typeof cur !== 'undefined' && cur && cur.isTutorialQuest)) {
         setTimeout(() => triggerBanter('level_start'), 600);
     }
 
@@ -618,11 +619,11 @@ export function _doStartLevel(gi) {
     //     monster list, HP/damage budget) so the shared combat loop can run
     //     WITHOUT the endgame chain/objectives machinery.
     //   • Endgame map levels were already stamped by _egLaunchMapFromDevice.
-    if (globalThis.cur && !globalThis.dead && typeof _egPrepareCampaignEncounter === 'function'
+    if (cur && !globalThis.dead && typeof _egPrepareCampaignEncounter === 'function'
         && !window._egSuppressEncounterStart) {
         _egPrepareCampaignEncounter();
     }
-    if (globalThis.cur && globalThis.cur.isMonsterLevel
+    if (cur && cur.isMonsterLevel
         && typeof _egStartEncounter === 'function'
         && !window._egSuppressEncounterStart) {
         _egStartEncounter();
@@ -640,7 +641,7 @@ export function _doStartLevel(gi) {
     // _egIsActive was still false - now that the encounter is live, hand
     // the solved puzzle to the encounter chain (question modal → countdown
     // → next puzzle) instead of leaving a dead solved grid.
-    if (window._egIsMapDeviceRun && globalThis.cur && globalThis.cur.isMonsterLevel
+    if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel
         && typeof _egIsActive === 'function' && _egIsActive()
         && typeof isPuzzleSolved === 'function' && isPuzzleSolved()
         && typeof _egOnPuzzleComplete === 'function'
@@ -656,10 +657,10 @@ export function _doStartLevel(gi) {
     // Tutorial quest levels keep the random tutorial track started on entry;
     // boss-arena chain puzzles keep the boss theme started by
     // _egSpawnNextArenaBoss - both skip the normal campaign track here.
-    if (globalThis.cur && (globalThis.cur.isTutorialQuest || globalThis.cur.isBossArena)) {
+    if (cur && (cur.isTutorialQuest || cur.isBossArena)) {
         // music already set by the entry point - do not override
     } else {
-        Audio_Manager.playBGM(Audio_Manager.trackForLevel(globalThis.cur.world, globalThis.cur.li));
+        Audio_Manager.playBGM(Audio_Manager.trackForLevel(cur.world, cur.li));
     }
 }
 

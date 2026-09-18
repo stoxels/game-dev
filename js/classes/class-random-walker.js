@@ -4,6 +4,7 @@ import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { t } from '../translation/translations.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
@@ -73,7 +74,7 @@ export function _agentSnapToCellCenter(el, r, c) {
 // Throttles the reveal sound so it doesn't spam on every step.
 // Also fires quest tracking and win-check after each reveal attempt.
 export function _revealCellForAgent(r, c) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     const now = Date.now();
     if (now >= _nextBearRevealSoundTime) {
@@ -82,7 +83,7 @@ export function _revealCellForAgent(r, c) {
         _nextBearRevealSoundTime = now + randomDelay;
     }
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
 
     if (sol[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1) {
         globalThis.revealedGrid[r][c] = true;
@@ -118,8 +119,8 @@ export function _revealCellForAgent(r, c) {
 // revealed/filled (or that contain no filled cells at all) count as done.
 // Falls back to 0 when everything is finished or no level is active.
 export function _findFirstUnfinishedColumn() {
-    if (typeof globalThis.cur === 'undefined' || !globalThis.cur) return 0;
-    const sol = globalThis.cur.grid;
+    if (typeof cur === 'undefined' || !cur) return 0;
+    const sol = cur.grid;
     if (!sol || !sol.length) return 0;
     const rows = sol.length;
     const cols = sol[0].length;
@@ -283,9 +284,9 @@ export function _finishBearAgent(state) {
 // Spawns one bear (rank 1–2) or two bears (rank 3) that walk across the grid.
 // Each bear follows a right-biased random path and reveals cells as it walks.
 export function _executeBrownianMotion(row, col, paths, rank) {
-    if (!globalThis.cur) return false;
+    if (!cur) return false;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -517,14 +518,14 @@ export function _drifterExplodeCells(r, c, radius, rows, cols) {
         for (let j = c - radius; j <= c + radius; j++) {
             if (i < 0 || i >= rows || j < 0 || j >= cols) continue;
 
-            if (globalThis.cur.grid[i][j] === 1 && !globalThis.revealedGrid[i][j] && globalThis.userGrid[i][j] !== 1) {
+            if (cur.grid[i][j] === 1 && !globalThis.revealedGrid[i][j] && globalThis.userGrid[i][j] !== 1) {
                 globalThis.revealedGrid[i][j] = true;
                 globalThis.userGrid[i][j] = 1;
                 renderCell(i, j);
                 updClues(i, j);
                 globalThis._applyCellEffect([`g-${i}-${j}`], 'reveal');
                 cellsRevealed++;
-            } else if (globalThis.cur.grid[i][j] === 0 && globalThis.userGrid[i][j] === 0) {
+            } else if (cur.grid[i][j] === 0 && globalThis.userGrid[i][j] === 0) {
                 globalThis.userGrid[i][j] = 2;
                 renderCell(i, j);
                 globalThis._applyCellEffect([`g-${i}-${j}`], 'mark');
@@ -640,10 +641,10 @@ export function _drifterStartCountdownTimer(drifterEl, currPos, rows, cols, hudU
 // revealing cells as it goes. On expiry it explodes in a radius burst.
 // `smartTarget` makes it prefer unrevealed filled cells over random movement.
 export function _executeSummonDrifter(duration, interval, smartTarget) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
     _drifterClear(); // Kill any pre-existing drifter cleanly
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -832,9 +833,9 @@ export function _removeWalkerHudIndicator(id) {
 
 // Returns the viewport-space bounding box of the puzzle grid cells.
 export function _getGridCellBounds() {
-    if (!globalThis.cur) return null;
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    if (!cur) return null;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const first = document.getElementById('g-0-0');
     const last = document.getElementById(`g-${rows - 1}-${cols - 1}`);
     if (!first || !last) return null;

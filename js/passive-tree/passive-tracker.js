@@ -2,6 +2,7 @@
 import { t } from '../translation/translations.js';
 import { _getBayesianBonus, _overfittingGetPhase } from './passive-tree-special-nodes-logic.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
+import { cur } from '../state.js';
 // passive-tracker.js
 // Passive Tree Effect Tracker Panel
 // Shows live countdowns, fill counters, stacked bonuses, and summaries
@@ -437,7 +438,7 @@ export const PassiveTracker = (() => {
             if (typeof globalThis.SETTINGS === 'undefined' || !globalThis.SETTINGS.hidePassiveTrackerInEndgame) return false;
             if (typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) return true;
             if (typeof isEndgameLevel === 'function' && isEndgameLevel()) return true;
-            if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.isMonsterLevel) return true;
+            if (typeof cur !== 'undefined' && cur && cur.isMonsterLevel) return true;
             return false;
         } catch (_) { return false; }
     }

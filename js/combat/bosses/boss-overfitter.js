@@ -2,6 +2,7 @@ import { t } from '../../translation/translations.js';
 import { _egCellInBounds, _egRecentFills } from '../combat-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egUnfillCell } from './shared-boss-abilities.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE OVERFITTER (boss_overfitter)---------------
@@ -249,10 +250,10 @@ export function _egMechOvrGradient(monster, phase) {
 // this targets a repeated row/column pattern when possible, telegraphing the
 // boss's adaptive behaviour while remaining recoverable.
 export function _egMechPatternBreak(monster, phase) {
-    if (!globalThis.cur || !globalThis.cur.grid || typeof userGrid === 'undefined') return;
+    if (!cur || !cur.grid || typeof userGrid === 'undefined') return;
     _egOvrEnsureRecorder(monster);
     _egOvrEnsureFinalWatcher(monster);
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const recent = [..._egRecentFills].reverse().filter(([r, c]) =>
         _egCellInBounds(r, c)
         && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1

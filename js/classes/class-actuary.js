@@ -10,6 +10,7 @@ import { buildClassHUD } from './class-hud.js';
 import { _fadeOutElement } from './class-recursionist.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
@@ -109,9 +110,9 @@ export function _regressionRevertCell(r, c, penaltySecs, recoverPct) {
 // to each of them and reveals them once the chain has "arrived".
 // Returns how many cells were actually revealed.
 export function _regressionChainRevealCells(fromRow, fromCol, count) {
-    if (!globalThis.cur || count <= 0) return 0;
+    if (!cur || count <= 0) return 0;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const pending = window._regressionPendingReveals || new Set();
@@ -217,7 +218,7 @@ export function _regressionDrawChain(fromEl, toEl) {
 // Reverts up to `correctCount` recent mistakes, recovers a fraction of lost time
 // and reveals `revealCount` correct cells per corrected mistake (holy chain).
 export function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     const log = window._mistakeLog || [];
     if (log.length === 0) {
@@ -321,9 +322,9 @@ export function _sigThreshDiagKeys(row, col) {
 // _sigThreshIterateLine - calls cb(r, c) for every grid cell on the given
 // line key ('row:i', 'col:j', 'diagA:k' or 'diagB:k').
 export function _sigThreshIterateLine(key, cb) {
-    if (!globalThis.cur) return;
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    if (!cur) return;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const [type, idxStr] = key.split(':');
     const idx = parseInt(idxStr, 10);
 
@@ -482,7 +483,7 @@ export function _sigThresholdIntercept(row, col) {
 // ability. Arms the shield: nothing happens until the player's next mistake,
 // which is then blocked and turns into protection for its surrounding lines.
 export function _executeSignificanceThreshold(lines) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     window._sigThreshArmed = true;
     window._sigThreshLines = Array.isArray(lines) && lines.length > 0 ? lines : ['row'];

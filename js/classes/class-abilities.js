@@ -26,6 +26,7 @@ import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getCharmLockedSkillForLegacySlot, getSkillCastRankClampedForSlot, getSkillIdForLegacySlot, noteCharmCast } from '../skills/skill-charms.js';
 import { _incDirect, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'correctFillStreak', { get() { return correctFillStreak; }, set(v) { correctFillStreak = v; }, configurable: true }); } catch (e) {}
@@ -452,10 +453,10 @@ export function _canFireInstantAbility(slot) {
             return false;
         }
         // Fallback manual check when _egBuildPickupEligiblePool not yet available
-        if (!pool && typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
+        if (!pool && typeof cur !== 'undefined' && cur && cur.grid) {
             let freeCount = 0;
-            for (let r = 0; r < globalThis.cur.grid.length; r++)
-                for (let c = 0; c < globalThis.cur.grid[0].length; c++)
+            for (let r = 0; r < cur.grid.length; r++)
+                for (let c = 0; c < cur.grid[0].length; c++)
                     if (typeof globalThis._egIsCellPickupEligible === 'function' ? globalThis._egIsCellPickupEligible(r, c) : (globalThis.userGrid[r][c] === 0 && !globalThis.revealedGrid[r][c] && !globalThis.wrongGrid[r][c])) freeCount++;
             if (freeCount === 0) {
                 globalThis.showToast('💚 No free cells to spawn hearts!', '#ff6b9d');
@@ -541,9 +542,9 @@ export function _spawnHeartbloomHearts(count) {
                 if (typeof globalThis._egPickups !== 'undefined' && globalThis._egPickups.has(key)) return false;
                 return true;
             });
-        } else if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
-            const rows = globalThis.cur.grid.length;
-            const cols = globalThis.cur.grid[0].length;
+        } else if (typeof cur !== 'undefined' && cur && cur.grid) {
+            const rows = cur.grid.length;
+            const cols = cur.grid[0].length;
             for (let r = 0; r < rows; r++)
                 for (let c = 0; c < cols; c++) {
                     const key = `${r}-${c}`;
@@ -859,8 +860,8 @@ export function _collectProbabilistMarkCount(baseCount) {
 // _snapshotMarkedCells - returns a Set of all cell ids that are currently marked (userGrid === 2).
 export function _snapshotMarkedCells() {
     const marked = new Set();
-    if (!globalThis.cur) return marked;
-    const sol = globalThis.cur.grid;
+    if (!cur) return marked;
+    const sol = cur.grid;
     for (let r = 0; r < sol.length; r++)
         for (let c = 0; c < sol[0].length; c++)
             if (globalThis.userGrid[r][c] === 2) marked.add(`g-${r}-${c}`);
@@ -871,8 +872,8 @@ export function _snapshotMarkedCells() {
 // _collectNewlyMarkedCells - returns the cell ids that are now marked but were not in the snapshot.
 export function _collectNewlyMarkedCells(markedBefore) {
     const newlyMarked = [];
-    if (!globalThis.cur) return newlyMarked;
-    const sol = globalThis.cur.grid;
+    if (!cur) return newlyMarked;
+    const sol = cur.grid;
     for (let r = 0; r < sol.length; r++)
         for (let c = 0; c < sol[0].length; c++)
             if (globalThis.userGrid[r][c] === 2 && !markedBefore.has(`g-${r}-${c}`))
@@ -916,8 +917,8 @@ export function _applyProbabilistPassive(effect) {
 // _bayesianRevealOneCell - reveals 1 random unrevealed filled cell at level start.
 //   Used by confirmed_hypothesis and god_of_probabilities passive nodes.
 export function _bayesianRevealOneCell() {
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const candidates = [];
@@ -954,7 +955,7 @@ export function applyClassPassiveOnLevelStart() {
     if (!STATE.playerClass || globalThis.isClassless()) {
         // Still mark that class passives were considered for this Gi so the
         // chain guarantee does not re-fire unnecessarily.
-        window._egClassPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : null;
+        window._egClassPassiveAppliedForGi = cur ? cur.gIdx : null;
         return;
     }
 
@@ -962,7 +963,7 @@ export function applyClassPassiveOnLevelStart() {
 
     if (STATE.playerClass === 'mathmagician') _applyMathmagicianPassive(effect);
     if (STATE.playerClass === 'probabilist') _applyProbabilistPassive(effect);
-    window._egClassPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : null;
+    window._egClassPassiveAppliedForGi = cur ? cur.gIdx : null;
 }
 
 

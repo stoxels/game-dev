@@ -1,6 +1,7 @@
 import { _egRenderPanel } from '../encounter.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE JELLY (boss_jelly)-------------------------------
@@ -215,8 +216,8 @@ export function _egJellyStepBlob(b, dtMs, slipOk) {
 // has a patch to lure a blob onto.
 
 export function _egJellyIcePickTargets(gate, count) {
-    if (!globalThis.cur || !globalThis.cur.grid || typeof userGrid === 'undefined') return [];
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid || typeof userGrid === 'undefined') return [];
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const clean = [];   // untouched cells - ideal ice spots

@@ -11,6 +11,7 @@ import { t } from '../../translation/translations.js';
 import { _egBossTierLerp, _egBossTierFactor, _egBossTierNorm, _egUnfillCell, _egNkFrozen, _egNkToast, _egCollectClueSpans } from './shared-boss-abilities.js';
 import { _egRenderPanel } from '../encounter.js';
 import { _egCellInBounds, _egRecentFills } from '../combat-state.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED PUZZLE MECHANICS (PACK 4)----------------------
@@ -61,8 +62,8 @@ export let _egFateChain = null;      // { p, monsterId, budget, resolved, window
 
 // Returns all correct unfilled cells that can host a fate mark.
 export function _egBuildFatePool() {
-    if (!globalThis.cur || !globalThis.cur.grid) return [];
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return [];
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const pool = [];
     for (let r = 0; r < rows; r++) {
@@ -144,8 +145,8 @@ export function _egResolveFateMark(key, filled) {
     }
 
     globalThis.showToast(t('eg_fate_fail'), '#f87171');
-    if (!globalThis.cur || !globalThis.cur.grid || typeof _egUnfillCell !== 'function') return;
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid || typeof _egUnfillCell !== 'function') return;
+    const sol = cur.grid;
     const pool = [..._egRecentFills].reverse().filter(([r, c]) =>
         _egCellInBounds(r, c)
         && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
@@ -287,8 +288,8 @@ export function _egFogPlace(el, r0, c0, h, w) {
 // Picks a random fog region that does not overlap any of the other active
 // banks (so twin banks never stack into one black blob).
 export function _egFogPickRegion(exceptBank) {
-    if (!globalThis.cur || !globalThis.cur.grid) return null;
-    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+    if (!cur || !cur.grid) return null;
+    const rows = cur.grid.length, cols = cur.grid[0].length;
     const w = Math.min(4, cols), h = Math.min(4, rows);
     const others = _egFogBanks.filter(b => b !== exceptBank);
     for (let attempt = 0; attempt < 14; attempt++) {
@@ -501,8 +502,8 @@ export const EG_SCRAMBLE_DURATION_F = [0.85, 1.15]; // [tier1, tier16]
 //   P3 - Double Scramble: 3 lines, and the numbers re-shuffle mid-effect.
 export function _egMechClueScramble(monster, phase) {
     if (globalThis._egBlackoutActive || globalThis._egActiveClueScramble || globalThis._egActiveClueSwap) return; // don't stack
-    const rows = (globalThis.cur && globalThis.cur.grid) ? globalThis.cur.grid.length : 0;
-    const cols = (globalThis.cur && globalThis.cur.grid && globalThis.cur.grid[0]) ? globalThis.cur.grid[0].length : 0;
+    const rows = (cur && cur.grid) ? cur.grid.length : 0;
+    const cols = (cur && cur.grid && cur.grid[0]) ? cur.grid[0].length : 0;
     if (!rows || !cols) return;
 
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -635,8 +636,8 @@ export function _egMechSoulTithe(monster, phase) {
         if (!st) return;
         if (st.collect) {
             // Debt-collect reprisal (P3): unfill the 2 most recent fills.
-            if (globalThis.cur && globalThis.cur.grid && typeof _egUnfillCell === 'function') {
-                const sol = globalThis.cur.grid;
+            if (cur && cur.grid && typeof _egUnfillCell === 'function') {
+                const sol = cur.grid;
                 const pool = [..._egRecentFills].reverse().filter(([r, c]) =>
                     _egCellInBounds(r, c)
                     && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1

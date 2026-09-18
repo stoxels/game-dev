@@ -4,6 +4,7 @@ import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { _incDirect, questStat_rowsErased } from '../inference/inference-stats.js';
 import { _applyCellEffect } from './cell-fx.js';
 import { _applyDenseMarkerBias, _applyTargetedRevealBias, shuffle } from './puzzle-helpers.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 9: live globalThis accessors for externally-mutated names.
@@ -23,7 +24,7 @@ export function revealTiles(count, source) {
     // Ergodic Field (291) and The Oracle (300) disable all auto-reveals
     if (ptHasSkill('keystone_ergodic_field') || window._oracleActive) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -69,7 +70,7 @@ export function markWrongTiles(count) {
     // Ergodic Field (291) and The Oracle (300) disable all auto-marks
     if (ptHasSkill('keystone_ergodic_field') || window._oracleActive) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -145,7 +146,7 @@ export function _eraseFilledCellsInCol(c, sol, rows) {
 // Returns the number of rows actually revealed (may be less than count if
 // fewer unsolved rows exist).
 export function solveRows(count, source) {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -180,7 +181,7 @@ export function solveRows(count, source) {
 // Fully reveals `count` random unsolved columns.
 // Returns the number of columns actually revealed.
 export function solveCols(count, source) {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -216,7 +217,7 @@ export function solveCols(count, source) {
 // Wrong marks are left untouched.
 // Returns the number of rows actually erased.
 export function unsolveRows(count) {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -241,7 +242,7 @@ export function unsolveRows(count) {
 // Wrong marks are left untouched.
 // Returns the number of columns actually erased.
 export function unsolveCols(count) {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -267,7 +268,7 @@ export function unsolveCols(count) {
 // are in the set (i.e. the board was essentially blank before use).
 // Returns the number of rows erased.
 export function unsolveRowsExcluding(count, allowedSet) {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -308,7 +309,7 @@ export function unsolveRowsExcluding(count, allowedSet) {
 // present in `allowedSet`.  Same fallback behaviour as unsolveRowsExcluding.
 // Returns the number of columns erased.
 export function unsolveColsExcluding(count, allowedSet) {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 

@@ -10,6 +10,7 @@ import { buildClassHUD } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
@@ -112,7 +113,7 @@ export function _markovSnapshotInit() {
 // Takes a deep-copy snapshot of all relevant grid state and appends it
 // to the circular buffer. Called once per second while a level is running.
 export function _markovSnapshotTick() {
-    if (!globalThis.cur || globalThis.dead) return;
+    if (!cur || globalThis.dead) return;
 
     const ugCopy = globalThis.userGrid.map(row => [...row]);
     const wgCopy = globalThis.wrongGrid.map(row => [...row]);
@@ -165,8 +166,8 @@ export function _rollback_findBestSnapshot(windowSeconds) {
 // Used by the Rank 3 "forgive old mistakes" bonus.
 // Returns an array of { r, c } objects.
 export function _rollback_collectPreExistingMistakes(snapshot) {
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const result = [];
 
     for (let r = 0; r < rows; r++) {
@@ -179,8 +180,8 @@ export function _rollback_collectPreExistingMistakes(snapshot) {
 
 // Writes a snapshot's grid data into the live game grids.
 export function _rollback_applySnapshot(snapshot) {
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -213,8 +214,8 @@ export function _rollback_clearPreExistingMistakes(preExistingWrong) {
 // Re-renders every cell and refreshes all row/column clue indicators
 // after a rollback has been applied.
 export function _rollback_refreshDisplay() {
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -244,7 +245,7 @@ export function _rollback_refreshDisplay() {
 //   rewindSeconds    - bonus seconds added on top of the restored timer.
 //   clearOldMistakes - Rank 3 flag: forgive pre-existing mistakes.
 export function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMistakes) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     // ── Find the target snapshot ──────────────────────────────────
     const best = _rollback_findBestSnapshot(windowSeconds);
@@ -299,8 +300,8 @@ export function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMist
     window._markovSnapshots = [];
 
     // ── VFX + feedback ───────────────────────────────────────────
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const approxSecs = Math.round((Date.now() - best.ts) / 1000);
 
     _rollbackPlayVFX(rows, cols);
@@ -667,9 +668,9 @@ export function _clearTransitionMatrix(natural = false) {
 // Reads the current puzzle grid DOM and returns an array of node objects,
 // one per cell, each positioned at the cell's screen-centre.
 export function _tmOverlay_buildNodes() {
-    if (!globalThis.cur) return [];
+    if (!cur) return [];
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const nodes = [];
@@ -1011,9 +1012,9 @@ export function _transitionMatrixCascade(row, col, depth) {
         _clearTransitionMatrix(true);
         return;
     }
-    if (depth <= 0 || Math.random() > tm.cascadeChance || !globalThis.cur) return;
+    if (depth <= 0 || Math.random() > tm.cascadeChance || !cur) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 

@@ -21,6 +21,7 @@ import { egSaveHubState } from '../endgame/hub-save.js';
 import { EG_UNIQUE_DROP_CHANCE, EG_UNIQUE_ITEMS, EG_UNIQUE_ZERO_AUTOMARK_DE, EG_UNIQUE_ZERO_AUTOMARK_EN } from './unique-item-data.js';
 import { _egEquipped, _egInventory } from '../endgame/hub-stash.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 
 
@@ -62,13 +63,13 @@ export function _egHasZeroAutomarkEquipped() {
 // and intentionally skips checkWin().
 export function _egApplyUniqueZeroLineAutomark() {
     if (!_egHasZeroAutomarkEquipped()) return 0;
-    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid) return 0;
+    if (typeof cur === 'undefined' || !cur || !cur.grid) return 0;
     try {
         if (typeof ptHasSkill === 'function' && ptHasSkill('keystone_ergodic_field')) return 0;
     } catch (e) {}
     if (window._oracleActive) return 0;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     if (!rows) return 0;
     const cols = sol[0].length;

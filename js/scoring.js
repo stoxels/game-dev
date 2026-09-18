@@ -10,6 +10,7 @@ import { goToLevelSelect, hideResultOverlays } from './screens/screens.js';
 import { _wdSyncSpriteToLevel } from './screens/screens-world-levels.js';
 import { _ptApplyLevelCompleteRewards } from './passive-tree/passive-tree.js';
 import { STATE } from './state.js';
+import { cur } from './state.js';
 
 
 //------------------------------------------------------------------------
@@ -45,7 +46,7 @@ export let currentRunScore = 0;
 // A cell counts as "filled" if the player marked it (userGrid === 1)
 // or if it was revealed by a helper item (revealedGrid === true).
 export function isPuzzleSolved() {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -114,7 +115,7 @@ export function maybeUpdateHighScore(gi, pts) {
 // updates the level high score if beaten, and returns all relevant values
 // for display and quest-stat tracking.
 export function calculateScore(rows, cols) {
-    const gi = globalThis.cur.gIdx;
+    const gi = cur.gIdx;
     const rawScore = computeRawScore(rows, cols);
     const calculatedMult = globalThis.scoreMultiplier();
     const mult = Number.isFinite(Number(calculatedMult)) ? Number(calculatedMult) : 1;
@@ -139,8 +140,8 @@ export function calculateScore(rows, cols) {
 // Returns true if the current level's bonus condition has been satisfied.
 // Each bonusType has its own pass/fail rule; unknown types default to false.
 export function evaluateBonusObjective(elapsed) {
-    const bt = globalThis.cur.bonusType || 'nomiss';
-    const bp = globalThis.cur.bonusParam !== undefined ? globalThis.cur.bonusParam : 0;
+    const bt = cur.bonusType || 'nomiss';
+    const bp = cur.bonusParam !== undefined ? cur.bonusParam : 0;
 
     switch (bt) {
         case 'fast': return elapsed <= bp;
@@ -183,7 +184,7 @@ export function countMarkedCells(rows, cols) {
 // Fires the achievement system's level-complete hook with all relevant stats,
 // then clears the per-run window flags used by penalty-clutch and bounceback logic.
 export function fireAchievements({ gi, rows, cols, elapsed, pts, ptsAwarded, prevBest, mult, isFirstClear }) {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const totalCells = rows * cols;
     const cellsFilled = countFilledCells(sol, rows, cols);
     const tilesMarked = countMarkedCells(rows, cols);
@@ -203,7 +204,7 @@ export function fireAchievements({ gi, rows, cols, elapsed, pts, ptsAwarded, pre
         rows,
         cols,
         scoreEarned: pts,
-        world: globalThis.cur.world,
+        world: cur.world,
         gi,
         elapsed,
         timerSecs: globalThis.timerSecs,
@@ -316,7 +317,7 @@ export function applyNexusPointReward(irz) {
 // when a special reward applies. The Nexus Point never grants the ascension
 // codex - it unlocks the Nexus instead.
 export function handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz, isNexusPoint }) {
-    const worldData = globalThis.WORLDS[globalThis.cur.world - 1];
+    const worldData = globalThis.WORLDS[cur.world - 1];
 
     if (isConvergenceLevel(worldData, isAscensionLevel) && isFirstClear) {
         applyConvergenceReward(gi);
@@ -469,7 +470,7 @@ export function buildTimeColumn(elapsed) {
 export function renderBonusBadge(bonusMet) {
     document.getElementById('bonus-list').innerHTML = `
         <span class="bonus-badge ${bonusMet ? 'earned' : 'missed'}">
-            ${bonusMet ? t('ov_bonus_met') : '🎯 ' + globalThis.lvText(globalThis.cur, 'bonusHint')}
+            ${bonusMet ? t('ov_bonus_met') : '🎯 ' + globalThis.lvText(cur, 'bonusHint')}
         </span>`;
 }
 
@@ -509,7 +510,7 @@ export function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLeve
     const irz = document.getElementById('item-reward-zone');
     irz.innerHTML = '';
     const bonusAlreadyDone = STATE.bonusDone.includes(gi);
-    const isQuizBonus = globalThis.cur.bonusType === 'quiz';
+    const isQuizBonus = cur.bonusType === 'quiz';
 
     // Special one-time rewards (convergence points, ascension codex, Nexus unlock) go first
     handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz, isNexusPoint });
@@ -545,7 +546,7 @@ export function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLeve
 
 // Orchestrates the full win overlay render: stats, bonus badge, and item rewards.
 export function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet, isAscensionLevel, isFirstClear, isNexusPoint }) {
-    document.getElementById('ov-reveal-quote').innerHTML = `"${globalThis.lvText(globalThis.cur, 'reveal')}"`;
+    document.getElementById('ov-reveal-quote').innerHTML = `"${globalThis.lvText(cur, 'reveal')}"`;
     buildScoreColumn(pts, ptsAwarded, prevBest, mult);
     buildTimeColumn(elapsed);
     renderBonusBadge(bonusMet);
@@ -588,7 +589,7 @@ export function _updateConvergenceTrialWinButton(gi) {
     let show = false;
     let wi = null;
     try {
-        wi = globalThis.cur.world - 1;
+        wi = cur.world - 1;
         const level = globalThis.ALL[gi];
         const triggers = (typeof globalThis._egTrialTriggerLevels === 'function') ? globalThis._egTrialTriggerLevels(wi) : null;
         const isTrigger = !!(level && triggers && triggers.includes(level.li - 1));
@@ -670,7 +671,7 @@ export function checkIsConvergenceLevel(worldData, isAscensionLevel) {
 export function checkWorldJustCompleted(worldData, isFirstClear) {
     if (!isFirstClear) return false;
 
-    const wi = globalThis.cur.world - 1;
+    const wi = cur.world - 1;
     const start = globalThis.WORLD_START_GI[wi];
     const allDone = worldData.data.every((_, li) => STATE.done.includes(start + li));
     if (!allDone) return false;
@@ -683,8 +684,8 @@ export function checkWorldJustCompleted(worldData, isFirstClear) {
 // Returns true if this is a "large" level (200+ cells) and the player
 // has the adjacency_matrix passive skill allocated.
 export function checkIsLargeAdjMatrix() {
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     return (rows * cols >= 200) && ptHasSkill('adjacency_matrix');
 }
 
@@ -728,7 +729,7 @@ function checkWin() {
     // win flow. Campaign levels also run monsters (cur.campaignMonsters) but
     // must still complete as normal puzzle levels, so they are excluded.
     if (typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()
-        && !(globalThis.cur && globalThis.cur.campaignMonsters)) {
+        && !(cur && cur.campaignMonsters)) {
         if (typeof globalThis._egOnPuzzleComplete === 'function') {
             globalThis.dead = true;
             stopTimer();
@@ -743,7 +744,7 @@ function checkWin() {
     // chain (question modal → countdown → next puzzle). Suppress the normal
     // overlay here; _doStartLevel() will hand off to _egOnPuzzleComplete
     // immediately after it starts the encounter.
-    if (window._egIsMapDeviceRun && globalThis.cur && globalThis.cur.isMonsterLevel
+    if (window._egIsMapDeviceRun && cur && cur.isMonsterLevel
         && typeof globalThis._egOnPuzzleComplete === 'function'
         && typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) {
         return;
@@ -761,13 +762,13 @@ function checkWin() {
     }
 
     // Gather level context
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
-    const gi = globalThis.cur.gIdx;
-    const worldData = globalThis.WORLDS[globalThis.cur.world - 1];
+    const gi = cur.gIdx;
+    const worldData = globalThis.WORLDS[cur.world - 1];
     if (!worldData) return;   // tutorial-quest levels bypass the normal win flow
-    const _special = _getLevelSpecialStatus(globalThis.cur);
+    const _special = _getLevelSpecialStatus(cur);
     const isAscensionLevel = _special.isAscension;
     const isNexusPoint = !!_special.isNexusPoint;
     const isFirstClear = !STATE.done.includes(gi);
@@ -826,11 +827,11 @@ function checkWin() {
     globalThis.checkWorldCompletion();
 
     // Show the win overlay (or quiz flow if the bonus type is 'quiz')
-    if (bonusMet && globalThis.cur.bonusType === 'quiz') {
+    if (bonusMet && cur.bonusType === 'quiz') {
         // ov-win itself isn't shown yet here - showQuiz() opens the separate
         // quiz-overlay first. buildReveal() runs later, in finishQuiz()/skipQuiz()
         // in quiz.js, right when ov-win actually becomes visible.
-        setTimeout(() => globalThis.showQuiz(globalThis.cur.world), 1500);
+        setTimeout(() => globalThis.showQuiz(cur.world), 1500);
     } else {
         setTimeout(() => {
             document.getElementById('ov-win').classList.add('show');
@@ -846,7 +847,7 @@ function checkWin() {
     // Quest stats update
     updateQuestStats('levelComplete', {
         gi,
-        world: globalThis.cur.world,
+        world: cur.world,
         diff: globalThis.curDiff,
         mods: { ...globalThis.curMods },
         mistakeCount: globalThis.mistakeCount,
@@ -856,7 +857,7 @@ function checkWin() {
         bonusMet,
         isConvergence: checkIsConvergenceLevel(worldData, isAscensionLevel) && isFirstClear,
         worldJustCompleted: checkWorldJustCompleted(worldData, isFirstClear),
-        worldIndex: globalThis.cur.world - 1,
+        worldIndex: cur.world - 1,
         luckyDropTriggered: false,
         timerSecsAtWin: globalThis.timerSecs,
         isLargeAdjMatrix: checkIsLargeAdjMatrix(),

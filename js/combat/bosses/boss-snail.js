@@ -5,6 +5,7 @@ import { _egBossCorrupted, _egIsActive } from '../combat-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egTeleportAvatarTo } from './boss-wormhole.js';
 import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast, _egRemoveCellCorruption } from './shared-boss-abilities.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SNAIL (boss_snail)-------------------------------
@@ -102,9 +103,9 @@ export function _egSnailIsCellSlimed(row, col) {
 // Grid cell under a screen point, via the corner play-cells' rects (the
 // play area is uniform, so row/col falls out of the geometry).
 export function _egSnailCellFromPoint(x, y) {
-    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid) return null;
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    if (typeof cur === 'undefined' || !cur || !cur.grid) return null;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     if (!rows || !cols) return null;
     const a = document.getElementById('g-0-0');
     const b = document.getElementById('g-' + (rows - 1) + '-' + (cols - 1));
@@ -857,9 +858,9 @@ export function _egSnailgeddonDropShield(g) {
 // rows × cols of cur.grid - so the ring can be shaped by the puzzle's
 // actual dimensions instead of a pixel shortcut.
 export function _egSnailGridCentre() {
-    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid || !globalThis.cur.grid.length || !globalThis.cur.grid[0]) return null;
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    if (typeof cur === 'undefined' || !cur || !cur.grid || !cur.grid.length || !cur.grid[0]) return null;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const a = document.getElementById('g-0-0');
     const b = document.getElementById('g-' + (rows - 1) + '-' + (cols - 1));
     if (!a || !b || !a.isConnected || !b.isConnected) return null;

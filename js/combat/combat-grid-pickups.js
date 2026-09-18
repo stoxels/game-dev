@@ -25,6 +25,7 @@ import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egCurrencyDrops, _egIsActive, _egItemDrops, _egLootDrops, _egPickupSpawnerInfo, _egPickups } from './combat-state.js';
 import { _egTryGenerateUniqueDrop } from '../loot/unique-items.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.
@@ -390,8 +391,8 @@ export function _egIsCellPickupEligible(row, col) {
 
 // Builds the full list of pickup-eligible cells and returns it as [[row, col], ...].
 export function _egBuildPickupEligiblePool() {
-    if (!globalThis.cur || !globalThis.cur.grid) return [];
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return [];
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const pool = [];

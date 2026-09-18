@@ -13,6 +13,7 @@ import { _getLevelSpecialStatus } from './scoring.js';
 import { _getGridSizeTier } from './start-level-passives.js';
 import { t } from './translation/translations.js';
 import { STATE } from './state.js';
+import { cur } from './state.js';
 
 // tooltips-hud.js
 // Generic floating tooltip engine (visual twin of class-hud.js's tooltip)
@@ -361,13 +362,13 @@ export function _buildLevelNameTooltipHTML() {
         return _buildMapRunTooltipHTML();
     }
 
-    if (!globalThis.cur) return '';
-    const gi = globalThis.cur.gIdx;
+    if (!cur) return '';
+    const gi = cur.gIdx;
     const hs = STATE.levelHS[gi];
     const bonusDone = STATE.bonusDone.includes(gi);
-    const bonusHintText = lvText(globalThis.cur, 'bonusHint') || '';
+    const bonusHintText = lvText(cur, 'bonusHint') || '';
 
-    let html = `<strong>${t('lvl_prefix')} ${globalThis.cur.world}-${globalThis.cur.li}</strong>`;
+    let html = `<strong>${t('lvl_prefix')} ${cur.world}-${cur.li}</strong>`;
     html += `<br>${t('cg_tt_bonus').replace('{x}', bonusHintText)}`;
     html += `<br>${t('cg_tt_bonus_claimed')} <b style="color:${bonusDone ? '#2ecc71' : '#e74c3c'}">${bonusDone ? t('cg_yes') : t('cg_no')}</b>`;
 
@@ -388,11 +389,11 @@ export function _buildLevelNameTooltipHTML() {
 
     if (ptHasSkill('grid_awareness')) {
         const tierLabels = { small: 'cg_grid_small', medium: 'cg_grid_medium', large: 'cg_grid_large', massive: 'cg_grid_massive' };
-        const tier = _getGridSizeTier(globalThis.cur.grid.length, globalThis.cur.grid[0].length);
+        const tier = _getGridSizeTier(cur.grid.length, cur.grid[0].length);
         html += `<br>${t('cg_tt_grid_class')} <b>${t(tierLabels[tier])}</b>`;
     }
 
-    const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(globalThis.cur);
+    const { isAscension, isConvergence, isNexusPoint } = _getLevelSpecialStatus(cur);
     if (isNexusPoint) html += `<br><span style="color:#7fd4ff">${t('scr_nexus_point_badge')}</span>`;
     else if (isAscension) html += `<br><span style="color:#c080ff">${t('cg_ascension_lvl')}</span>`;
     if (isConvergence) html += `<br><span style="color:#6dbf40">${t('cg_convergence_lvl')}</span>`;

@@ -3,6 +3,7 @@ import { renderCell, updClues } from '../../grid.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ARTIFACT COMPLETE - CODEX OF COMPLETION--------------
@@ -19,7 +20,7 @@ function _revealArtifactCell(r, c) {
 
 // artifactComplete (Codex of Completion) - reveals every remaining cell.
 export function _useArtifactComplete(id, def) {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 

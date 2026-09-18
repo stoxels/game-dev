@@ -8,6 +8,7 @@ import { _egHzPlayerHitbox, _egHzPlayerRect, _egHzPlayerSpriteRect } from '../co
 import { EG_MAP_TIER_MONSTER_LEVELS, EG_MAX_MAP_TIER, _egRollMapTier } from '../../loot/loot-maps.js';
 import { EG_MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
 import { _egActiveBlasts, _egBossCorrupted, _egBossFrozen, _egCellInBounds, _egIsActive, _egRecentFills } from '../combat-state.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED BOSS ABILITIES--------------------------------
@@ -184,8 +185,8 @@ export function _egCorruptConfig(monster, phase) {
 // Targets BOTH correct cells (sol=1, blockable until filled) and incorrect
 // cells (sol=0, blockable until ✕-marked) that the player hasn't finished yet.
 export function _egBuildCorruptibleCellPool() {
-    if (!globalThis.cur || !globalThis.cur.grid) return [];
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return [];
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const pool = [];
@@ -214,8 +215,8 @@ export function _egBuildCorruptibleCellPool() {
 // already marked as a pending spread target). Returns null when no neighbour
 // qualifies.
 export function _egCorruptPickNeighbor(r, c) {
-    if (!globalThis.cur || !globalThis.cur.grid) return null;
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return null;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const cands = [];
     const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
@@ -271,9 +272,9 @@ export function _egCorruptSpreadLand(key) {
     if (tel) tel.remove();
 
     if (!_egBossCorrupted.has(key)) return;          // source dispelled mid-telegraph
-    if (!globalThis.cur || !globalThis.cur.grid) return;
-    if (tr >= globalThis.cur.grid.length || tc >= globalThis.cur.grid[0].length) return; // grid swapped
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return;
+    if (tr >= cur.grid.length || tc >= cur.grid[0].length) return; // grid swapped
+    const sol = cur.grid;
     if (sol[tr][tc] === 1) {
         if (globalThis.userGrid[tr][tc] === 1 || globalThis.revealedGrid[tr][tc]) return;    // correct target filled meanwhile
     } else if (sol[tr][tc] === 0) {
@@ -411,8 +412,8 @@ export function _egMechCorruptCells(monster, phase) {
 
 // Returns all cells the player has correctly marked as ✕ (userGrid=2, sol=0).
 export function _egBuildProbabilityShiftPool() {
-    if (!globalThis.cur || !globalThis.cur.grid) return [];
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return [];
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const pool = [];
@@ -427,8 +428,8 @@ export function _egBuildProbabilityShiftPool() {
 // Returns empty (sol=0) cells that a shifted mark can land on: unmarked,
 // not already wrong-marked, and never the source cells being relocated.
 export function _egBuildMarkDestinations(excludeKeys) {
-    if (!globalThis.cur || !globalThis.cur.grid) return [];
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return [];
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const dests = [];
     for (let r = 0; r < rows; r++) {
@@ -764,8 +765,8 @@ export function _egMechSummonAdds(monster, phase) {
 
 // Returns the most-recently-filled correct cells eligible for Prior Bomb.
 export function _egPriorBombPool() {
-    if (!globalThis.cur || !globalThis.cur.grid) return [];
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return [];
+    const sol = cur.grid;
     return [..._egRecentFills].reverse().filter(([r, c]) =>
         _egCellInBounds(r, c)
         && globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c] && sol[r][c] === 1
@@ -882,9 +883,9 @@ export function _egPriorBombArmCell(r, c, monsterId, fuseMs) {
 export function _egPriorBombExplode(b) {
     _egPriorBombDetonationFX(b);
     if (b.fuseEl) b.fuseEl.remove();
-    if (!globalThis.cur || !globalThis.cur.grid) return;
-    if (b.r >= globalThis.cur.grid.length || b.c >= globalThis.cur.grid[0].length) return;
-    if (globalThis.userGrid[b.r][b.c] !== 1 || globalThis.revealedGrid[b.r][b.c] || globalThis.cur.grid[b.r][b.c] !== 1) return;
+    if (!cur || !cur.grid) return;
+    if (b.r >= cur.grid.length || b.c >= cur.grid[0].length) return;
+    if (globalThis.userGrid[b.r][b.c] !== 1 || globalThis.revealedGrid[b.r][b.c] || cur.grid[b.r][b.c] !== 1) return;
     _egUnfillCell(b.r, b.c);
 }
 
@@ -1136,7 +1137,7 @@ export const EG_SWAP_DURATION_F = [0.85, 1.15]; // [tier1, tier16]
 //   P3 - Double Cross: two independent row pairs swap at once.
 export function _egMechClueSwap(monster, phase) {
     if (globalThis._egBlackoutActive || globalThis._egActiveClueScramble) return; // don't fight over clue text
-    const rows = (globalThis.cur && globalThis.cur.grid) ? globalThis.cur.grid.length : 0;
+    const rows = (cur && cur.grid) ? cur.grid.length : 0;
     if (rows < 2) return;
 
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -1229,8 +1230,8 @@ export function _egFrozenCreepDelayMs(p, norm) {
 // ✕-marked) that the player hasn't finished yet. Cells already frozen or
 // corrupted are skipped.
 export function _egBuildFreezableCellPool() {
-    if (!globalThis.cur || !globalThis.cur.grid) return [];
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return [];
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const pool = [];
@@ -1293,8 +1294,8 @@ export function _egApplyCellFreeze(r, c, cfg) {
 // marked as a pending creep target). Returns null when no neighbour
 // qualifies.
 export function _egFrozenPickNeighbor(r, c) {
-    if (!globalThis.cur || !globalThis.cur.grid) return null;
-    const sol = globalThis.cur.grid;
+    if (!cur || !cur.grid) return null;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const cands = [];
     const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
@@ -1356,10 +1357,10 @@ export function _egFrozenCreepLand(key) {
     if (tel) tel.remove();
 
     if (!_egBossFrozen.has(key)) return;          // source thawed mid-telegraph
-    if (!globalThis.cur || !globalThis.cur.grid) return;
-    if (tr >= globalThis.cur.grid.length || tc >= globalThis.cur.grid[0].length) return; // grid swapped
+    if (!cur || !cur.grid) return;
+    if (tr >= cur.grid.length || tc >= cur.grid[0].length) return; // grid swapped
     if (_egBossFrozen.size >= _egFrozenCap(data)) return;          // cap reached meanwhile
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     if (sol[tr][tc] === 1) {
         if (globalThis.userGrid[tr][tc] === 1 || globalThis.revealedGrid[tr][tc]) return;    // correct target filled meanwhile
     } else if (sol[tr][tc] === 0) {

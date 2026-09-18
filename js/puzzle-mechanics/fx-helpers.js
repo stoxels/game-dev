@@ -1,4 +1,5 @@
 import { Audio_Manager } from '../audio/audio.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - FX HELPERS----------------------
@@ -115,7 +116,7 @@ export function _fxMakeRing(container, cx, cy, className, ringSize, delayMs, ani
 // aren't currently available. Shared by every helper that needs to know
 // where the grid sits on screen (rect calc, shield-border tracking, etc).
 export function _fxGetGridCorners() {
-    const sol = globalThis.cur?.grid;
+    const sol = cur?.grid;
     if (!sol || !sol.length) return null;
 
     const rows = sol.length;

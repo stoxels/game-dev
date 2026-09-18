@@ -3,6 +3,7 @@ import { save } from '../state.js';
 import { _MILESTONE_MAP } from './inference-data.js';
 import { _milestone_isClaimed, _milestone_isComplete, _refreshQuestBadge, claimQuest } from './inference-logic.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
@@ -73,7 +74,7 @@ export function _ensureQuestStats() {
 // to 0 first if needed. Safe to call mid-level, outside updateQuestStats.
 export function _incDirect(key, by = 1) {
     // Tutorial-quest levels never touch quest/inference progress.
-    if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
+    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
     _ensureQuestStats();
     STATE.questStats[key] = (STATE.questStats[key] || 0) + by;
 }
@@ -104,12 +105,12 @@ export function _gridSizeAtLeast(bucket, minBucket) {
     return _GRID_SIZE_ORDER.indexOf(bucket) >= _GRID_SIZE_ORDER.indexOf(minBucket);
 }
 
-// Reads the current level grid (via the global `globalThis.cur`) and returns its cell
+// Reads the current level grid (via the global `cur`) and returns its cell
 // count and pre-computed bucket name. Returns { cells: 0, bucket: 'small' }
 // when no grid is loaded.
 export function _getCurrentGridInfo() {
-    const rows = globalThis.cur ? globalThis.cur.grid.length : 0;
-    const cols = globalThis.cur ? globalThis.cur.grid[0]?.length ?? 0 : 0;
+    const rows = cur ? cur.grid.length : 0;
+    const cols = cur ? cur.grid[0]?.length ?? 0 : 0;
     const cells = rows * cols;
     return { cells, bucket: _gridSizeBucket(cells) };
 }
@@ -785,7 +786,7 @@ export function _questStats_checkNewlyCompleted() {
 export function updateQuestStats(event, payload = {}) {
     // Tutorial-quest levels never touch quest/inference progress (also keeps
     // onLevelCompleteAch, called from the levelComplete case, out of them).
-    if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
+    if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
     _ensureQuestStats();
     _qs = STATE.questStats; // set module-level shorthand for _inc()
 

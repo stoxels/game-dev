@@ -44,6 +44,22 @@ export function _egUpdateTargetAfterKill() {
     }
 }
 
+// Tutorial quest: creatures must never drop random loot when defeated -
+// every lesson grant is placed explicitly (the rat's starter set, the
+// Professor's sword, the bat's Fireball charm, the Professor's own heart).
+// A random gear drop could land on a non-solution cell, where the
+// tutorial's claim gates turn it into a forced mistake or unclaimable
+// clutter. Guarded here at the kill-reward choke point (rather than only
+// in the tutorial's spawner wraps) so no drop path can slip through; the
+// explicit lesson placements write the drop maps directly and are
+// unaffected.
+function _egTutorialSuppressesDrops() {
+    try {
+        const c = globalThis.cur;
+        return !!(c && c.isTutorialQuest);
+    } catch (e) { return false; }
+}
+
 // Handles all post-kill logic for a normal (non-boss) monster death.
 export function _egHandleNormalMonsterKill(dying) {
     globalThis._egChainKillCount++;
@@ -64,10 +80,11 @@ export function _egHandleNormalMonsterKill(dying) {
     if (dying && dying.noLoot) {
         const heartChance = dying.zombieHeartDropChance || 0;
         if (heartChance > 0 && Math.random() * 100 < heartChance * 100
+            && !_egTutorialSuppressesDrops()
             && typeof _egDropHeartPickup === 'function') {
             _egDropHeartPickup();
         }
-    } else {
+    } else if (!_egTutorialSuppressesDrops()) {
         if (typeof _egSpawnLootDrop === 'function') globalThis._egSpawnLootDrop(false, dying.level);
         if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false);
         if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
@@ -95,12 +112,16 @@ export function _egHandleBossKill(dying) {
     }
 
     _egUpdateObjectivesHUD();
-    if (typeof _egSpawnLootDrop === 'function') globalThis._egSpawnLootDrop(true,dying.level);
-    if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
-    if (typeof _egTryDropEssence === 'function') _egTryDropEssence(true);
-    if (typeof _egTryDropMap === 'function') _egTryDropMap(true, dying.level);
-    // Bosses always drop a charm (see skill-charms.js).
-    if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(true, dying.level);
+    // Tutorial quest: no random kill drops (see _egTutorialSuppressesDrops
+    // above) - the lessons place their own rewards explicitly.
+    if (!_egTutorialSuppressesDrops()) {
+        if (typeof _egSpawnLootDrop === 'function') globalThis._egSpawnLootDrop(true,dying.level);
+        if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
+        if (typeof _egTryDropEssence === 'function') _egTryDropEssence(true);
+        if (typeof _egTryDropMap === 'function') _egTryDropMap(true, dying.level);
+        // Bosses always drop a charm (see skill-charms.js).
+        if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(true, dying.level);
+    }
 }
 
 // Removes a monster from the encounter after its death animation fires.
@@ -216,7 +237,7 @@ export function _egGameOver() {
     if (typeof _egIsCampaignRun === 'function' && _egIsCampaignRun()) {
         globalThis.dead = true;
         if (typeof stopTimer === 'function') stopTimer();
-        if (globalThis.cur) window._lastFailedGi = globalThis.cur.gIdx;
+        if (cur) window._lastFailedGi = cur.gIdx;
         const lose = document.getElementById('ov-lose');
         if (lose) {
             const titleEl = document.getElementById('lose-title');

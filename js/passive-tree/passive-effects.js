@@ -1,4 +1,5 @@
 ﻿import { Audio_Manager } from '../audio/audio.js';
+import { cur } from '../state.js';
 // Residual Analysis
 
 
@@ -199,7 +200,7 @@ export function playSampleEfficiencyEffect(targetRow, targetCol) {
     overlay.appendChild(wave);
 
     // 5. Gather previously completed correct cells to serve as particle origins
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const pool = [];

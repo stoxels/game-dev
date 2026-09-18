@@ -1,11 +1,9 @@
-﻿import { t } from '../translation/translations.js';
-import { _abilityHotkeysBlocked, _formatCooldown, _isModalOpen } from '../classes/class-cooldown-state.js';
+﻿import { _abilityHotkeysBlocked, _formatCooldown, _isModalOpen } from '../classes/class-cooldown-state.js';
 import { hideHUDTooltip } from '../classes/class-hud.js';
-import { isSkillCharmUnlocked } from './skill-charms.js';
-import { SKILL_HOTBAR_COLS, SKILL_HOTBAR_SIZE, activateHotbarSlot, canAffordSkill, clearHotbarSlot, getHotbarSkill, getSkillCooldownRemaining, getSkillDef, getSkillImage, getSkillName, isSkillMovable, isSkillUsableNow } from './skill-registry.js';
+import { SKILL_HOTBAR_COLS, SKILL_HOTBAR_SIZE, activateHotbarSlot, canAffordSkill, getHotbarSkill, getSkillCooldownRemaining, getSkillDef, getSkillImage, getSkillName, isSkillUsableNow } from './skill-registry.js';
 import { isSpellbookOpen, renderSpellbook, toggleSpellbook } from './skill-spellbook.js';
-import { cancelHoldCast, isSkillHoldCast, tryBeginHoldCast } from './spell-casttime.js';
-import { _uspUnlockHint, getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, isUniversalSpellId, isUniversalSpellUnlocked } from './universal-spells.js';
+import { isSkillHoldCast, tryBeginHoldCast } from './spell-casttime.js';
+import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges } from './universal-spells.js';
 import { STATE } from '../state.js';
 // skill-hotbar.js
 //------------------------------------------------------------------------
@@ -20,27 +18,18 @@ import { STATE } from '../state.js';
 // used (countdown text / dimmed "no mana" state). Hover shows the
 // Path-of-Exile style tooltip from skill-tooltip.js.
 //
-// Slots are filled by dragging spells out of the spell book
-// (skill-spellbook.js). Passives are never movable - setHotbarSlot() in the
-// registry rejects them.
+// Slots mirror the spell-book charm slots 1:1 (charm slot N casts from
+// hotbar key N - see skill-charms.js). The bar itself is click-to-cast
+// only; there is no drag to rearrange or remove spells. Passives are never
+// on the bar - setHotbarSlot() in the registry rejects them.
 //
 // Keybinds: the central dispatcher in keybinds.js routes hotbar-1…hotbar-10
 // to activateHotbarSlot(). Default keys are 1,2,3,4,5,6,7,8,9,0.
 //------------------------------------------------------------------------
 
 
-// Pointer-move distance (px) above which a slot press becomes a drag
-// instead of a cast click.
-export const SKILL_DRAG_THRESHOLD_PX = 4;
-
-// Current drag operation: { skillId, fromSlot } or null.
-export let _skillDragState = null;
-
-// Floating ghost element shown while dragging a spell.
-export let _skillDragGhost = null;
-
-// Set after a drag ends so the click event that follows the pointerup is
-// swallowed instead of casting the spell again.
+// Set while a hold-to-cast charge is arming so the click event that follows
+// the pointerup is swallowed instead of casting the spell twice.
 export let _suppressHotbarClick = false;
 
 
@@ -110,10 +99,11 @@ export function _isGameScreenActive() {
     return !!document.getElementById('screen-game')?.classList.contains('active');
 }
 
-// True while the spell book is up. The bar has to stay usable then even on
+// True while the spell book is up. The bar has to stay visible then even on
 // the overworld screens (map view / world detail / level select), because
-// the whole point of opening the book there is rearranging the hotbar.
-// Without this the bar kept `display:none` and every drop silently failed.
+// the whole point of opening the book there is slotting charms - and each
+// spell slot casts from its matching hotbar key. Without this the bar kept
+// `display:none` while the book was open.
 export function _hotbarNeededForSpellbook() {
     return document.body.classList.contains('spellbook-open')
         || !!(document.getElementById('spellbook-overlay')?.classList.contains('show'));
@@ -341,124 +331,13 @@ export function patchHotbarCooldownForLegacySlot(legacySlot) {
 
 
 //------------------------------------------------------------------------
-//-------------------------DRAG & DROP------------------------------------
+//-------------------------SLOT INTERACTION-------------------------------
 //------------------------------------------------------------------------
-// Pointer-based (not HTML5 drag events) to match the rest of the codebase
-// and to work uniformly on touch. The spell book starts the drag via
-// startSkillDrag(); the hotbar only needs to act as a drop target.
+// The bar is click-to-cast only: a press casts the spell, a press-and-hold
+// charges hold-to-cast spells (spell-casttime.js). There is no drag - the
+// slots mirror the spell-book charm slots 1:1 (charm slot N = hotbar key N),
+// so rearranging or removing spells happens by moving charms in the book.
 //------------------------------------------------------------------------
-
-// Starts a drag for `skillId`. fromSlot is the hotbar index when the drag
-// began on a filled slot (so dropping outside clears it), else null.
-export function startSkillDrag(skillId, e, fromSlot) {
-    // Sealed universal spells explain their future requirement instead of
-    // the generic passive message (lock infra: universal-spells.js).
-    if (typeof isUniversalSpellId === 'function' && isUniversalSpellId(skillId)
-        && typeof isUniversalSpellUnlocked === 'function' && !isUniversalSpellUnlocked(skillId)) {
-        if (typeof globalThis.showToast === 'function') {
-            let hint = '🔒';
-            try {
-                const usp = (typeof getUniversalSpellDef === 'function') ? getUniversalSpellDef(skillId) : null;
-                hint = '🔒 ' + _uspUnlockHint(usp);
-            } catch (err) { /* generic lock marker */ }
-            globalThis.showToast(hint, '#aaa');
-        }
-        return;
-    }
-    if (typeof isSkillMovable === 'function' && !isSkillMovable(skillId)) {
-        // Charm-locked spells get the actionable message instead of the
-        // generic "passives can't be moved" one.
-        const charmLocked = (typeof isSkillCharmUnlocked === 'function') && !isSkillCharmUnlocked(skillId);
-        if (typeof globalThis.showToast === 'function') {
-            globalThis.showToast(charmLocked ? t('charm_locked_toast') : t('skill_passive_not_movable'),
-                charmLocked ? '#ff6b9d' : undefined);
-        }
-        return;
-    }
-    _skillDragState = { skillId, fromSlot: (fromSlot === undefined ? null : fromSlot), moved: false, startX: e.clientX, startY: e.clientY };
-
-    const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
-    _skillDragGhost = document.createElement('div');
-    _skillDragGhost.className = 'skill-drag-ghost';
-    _skillDragGhost.textContent = (def && def.icon) || '✦';
-    document.body.appendChild(_skillDragGhost);
-    _moveSkillDragGhost(e.clientX, e.clientY);
-
-    document.addEventListener('pointermove', _onSkillDragMove, true);
-    document.addEventListener('pointerup', _onSkillDragEnd, true);
-    document.addEventListener('pointercancel', _onSkillDragEnd, true);
-}
-
-// Repositions the floating ghost under the cursor.
-export function _moveSkillDragGhost(x, y) {
-    if (!_skillDragGhost) return;
-    _skillDragGhost.style.left = (x + 10) + 'px';
-    _skillDragGhost.style.top = (y + 10) + 'px';
-}
-
-// Highlights the slot under the pointer while dragging.
-export function _highlightDropTarget(x, y) {
-    const bar = document.getElementById('skill-hotbar');
-    if (!bar) return;
-    const target = document.elementFromPoint(x, y)?.closest?.('.skill-hotbar-slot');
-    bar.querySelectorAll('.skill-hotbar-slot.drop-target').forEach(el => el.classList.remove('drop-target'));
-    if (target) target.classList.add('drop-target');
-}
-
-// Pointermove handler for an active drag.
-export function _onSkillDragMove(e) {
-    if (!_skillDragState) return;
-    if (!_skillDragState.moved) {
-        const dx = e.clientX - _skillDragState.startX;
-        const dy = e.clientY - _skillDragState.startY;
-        if (Math.hypot(dx, dy) < SKILL_DRAG_THRESHOLD_PX) return;
-        _skillDragState.moved = true;
-        document.body.classList.add('skill-dragging');
-        // A press that moves is a drag, not a cast: drop any hold-to-cast
-        // charge so the release cannot fire it (spell-casttime.js).
-        if (typeof cancelHoldCast === 'function') cancelHoldCast();
-    }
-    _moveSkillDragGhost(e.clientX, e.clientY);
-    _highlightDropTarget(e.clientX, e.clientY);
-}
-
-// Pointerup handler: drops onto the slot under the cursor, or clears the
-// source slot when a hotbar spell was dragged into empty space.
-export function _onSkillDragEnd(e) {
-    if (!_skillDragState) return;
-    const { skillId, fromSlot, moved } = _skillDragState;
-    _cleanupSkillDrag();
-
-    // A press without movement is a click, not a drag - let the element's
-    // own click handler handle casting.
-    if (!moved) return;
-    _suppressHotbarClick = true;
-
-    const target = document.elementFromPoint(e.clientX, e.clientY)?.closest?.('.skill-hotbar-slot');
-    if (target) {
-        const slotIndex = Number(target.getAttribute('data-slot'));
-        if (!Number.isNaN(slotIndex)) globalThis.setHotbarSlot(slotIndex, skillId);
-    } else if (fromSlot !== null && fromSlot !== undefined) {
-        // Dragged out of the bar → remove.
-        clearHotbarSlot(fromSlot);
-    }
-
-    renderSkillHotbar();
-    if (typeof renderSpellbook === 'function' && isSpellbookOpen()) renderSpellbook();
-}
-
-// Removes the ghost, listeners and highlight classes.
-export function _cleanupSkillDrag() {
-    _skillDragState = null;
-    if (_skillDragGhost) { _skillDragGhost.remove(); _skillDragGhost = null; }
-    document.body.classList.remove('skill-dragging');
-    document.getElementById('skill-hotbar')
-        ?.querySelectorAll('.skill-hotbar-slot.drop-target')
-        .forEach(el => el.classList.remove('drop-target'));
-    document.removeEventListener('pointermove', _onSkillDragMove, true);
-    document.removeEventListener('pointerup', _onSkillDragEnd, true);
-    document.removeEventListener('pointercancel', _onSkillDragEnd, true);
-}
 
 
 //------------------------------------------------------------------------
@@ -469,6 +348,7 @@ export function _cleanupSkillDrag() {
 //------------------------------------------------------------------------
 
 // Installs the delegated pointer handlers on the hotbar container.
+// Click casts the spell; hold charges hold-to-cast spells. No drag.
 export function _initHotbarInteractions() {
     const bar = _ensureHotbarContainer();
     if (bar.dataset.skillBound === '1') return;
@@ -482,24 +362,20 @@ export function _initHotbarInteractions() {
         if (!skillId) return;
         e.preventDefault();
         // Hold-to-cast (spell-casttime.js): heavy spells charge while the
-        // button is held and fire once the cast bar fills. A press that
-        // turns into a drag cancels the hold (see _onSkillDragMove) and the
-        // swallowed click below stops the release from double-casting.
+        // button is held and fire once the cast bar fills.
         // Primary button only - right-clicks are reserved for the context menu
         // (touch/pen presses have no button to check, so they always pass).
         if ((e.button === 0 || e.pointerType !== 'mouse') && typeof tryBeginHoldCast === 'function') {
             const hold = tryBeginHoldCast(skillId, slotIndex, 'pointer');
             if (hold === 'started' || hold === 'casting') _suppressHotbarClick = true;
         }
-        startSkillDrag(skillId, e, slotIndex);
     });
 
     bar.addEventListener('click', (e) => {
         const slot = e.target.closest('.skill-hotbar-slot');
         if (!slot) return;
-        // Ignore clicks that were part of a drag - the pointerup already
-        // resolved the drop, casting again would fire the spell unintentionally.
-        if (_skillDragState || _suppressHotbarClick) {
+        // Ignore clicks that were part of a hold-to-cast charge.
+        if (_suppressHotbarClick) {
             _suppressHotbarClick = false;
             return;
         }

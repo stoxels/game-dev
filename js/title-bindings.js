@@ -11,6 +11,7 @@ import { ptGoBack, showPassiveTree } from './passive-tree/passive-tree.js';
 import { showQuestLog } from './inference/inference-ui.js';
 import { _ptRefundAllPoints } from './passive-tree/passive-tree-state-points.js';
 import { STATE } from './state.js';
+import { cur } from './state.js';
 
 //------------------------------------------------------------------------
 //-------------------REPLAY GALLERY (GLOBAL HELPER)-----------------------
@@ -519,8 +520,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function onGoToLevelsFromGame() {
         // Tutorial quest is mandatory: the LEVELS exits are hidden mid-lesson,
         // and this guard covers any programmatic path (keyboard, stale overlay).
-        if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
-        if (globalThis.cur && globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
+        if (cur && cur.isTutorialQuest) return;
+        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
             showEgForfeitConfirm(() => {
                 globalThis.unpauseGame();
                 cleanupActiveGameSystems();
@@ -562,8 +563,8 @@ document.addEventListener('DOMContentLoaded', () => {
      * level select screen.
      */
     function onReturnToNexusFromGame() {
-        if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
-        if (globalThis.cur && globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
+        if (cur && cur.isTutorialQuest) return;
+        if (cur && cur.isMonsterLevel && !cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
             showEgForfeitConfirm(() => {
                 globalThis.unpauseGame();
                 cleanupActiveGameSystems();
@@ -620,7 +621,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function onGoToLevelsFromOverlay() {
         // Tutorial retry path owns the overlays (replayLevel restarts the
         // quest) - never let win/lose LEVELS buttons escape to level select.
-        if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
+        if (cur && cur.isTutorialQuest) return;
         cleanupActiveGameSystems();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');

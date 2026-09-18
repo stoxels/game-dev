@@ -2,6 +2,7 @@
 import { markWrongTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
+import { cur } from './state.js';
 //--- Phase 3 step 5: write-through accessors for runtime patch() targets ---
 try { Object.defineProperty(globalThis, 'buildGrid', { get() { return buildGrid; }, set(v) { buildGrid = v; }, configurable: true }); } catch (e) {} // PHASE3-SHIM write-through: passive-tree-expansion patch()
 try { Object.defineProperty(globalThis, 'updClues', { get() { return updClues; }, set(v) { updClues = v; }, configurable: true }); } catch (e) {} // PHASE3-SHIM write-through: passive-tree-expansion patch()
@@ -496,9 +497,9 @@ export function _toggleColCluesSide() {
 //
 //   row, col - the cell whose neighbours to count
 export function _adjacencyMatrixCount(row, col) {
-    if (!globalThis.cur) return 0;
+    if (!cur) return 0;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     let count = 0;
@@ -548,10 +549,10 @@ export function _adjacencyMatrixUpdateOverlay(row, col) {
 //   on the board.  Called at level start (after the grid DOM is ready) and
 //   after any bulk reveal that changes many cells at once.
 export function _adjacencyMatrixRefreshAll() {
-    if (!globalThis.ptHasSkill('adjacency_matrix') || !globalThis.cur) return;
+    if (!globalThis.ptHasSkill('adjacency_matrix') || !cur) return;
 
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -579,7 +580,7 @@ export function _adjacencyMatrixRefreshAll() {
 export function buildGrid() {
     globalThis.resetZoom();
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const maxDim = Math.max(rows, cols);
@@ -1043,9 +1044,9 @@ export function _handleResidualAnalysis(row, col, rowDone, colDone, sol) {
 //   toggles the CSS class 'clue-done' (strikethrough) on clue number
 //   spans accordingly.  Also fires various skill reward checks.
 export function updClues(row, col, isInitial = false) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -1133,9 +1134,9 @@ export function _clearCellClasses(el, row, col) {
 export function _refreshAdjacencyNeighbours(row, col) {
     _adjacencyMatrixUpdateOverlay(row, col);
 
-    if (!globalThis.cur) return;
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    if (!cur) return;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
 
     for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
@@ -1207,7 +1208,7 @@ export function renderCell(row, col) {
         // Endgame: correct mark on a wrong-solution cell auto-claims any drop
         // sitting there. Covers ability / item / passive / proc marks so the
         // player no longer has to erase and re-mark the same cell to pick up.
-        if (globalThis.cur && globalThis.cur.grid && globalThis.cur.grid[row][col] === 0) {
+        if (cur && cur.grid && cur.grid[row][col] === 0) {
             if (typeof globalThis.isEndgameLevel === 'function' && globalThis.isEndgameLevel() && typeof globalThis._egCheckAllClaims === 'function') {
                 globalThis._egCheckAllClaims(row, col);
             }
@@ -1252,7 +1253,7 @@ export function renderCell(row, col) {
 //   win overlay.  Sizes cells to fill most of the viewport while keeping
 //   them square, then stamps a div per cell coloured by the solution value.
 export function buildReveal() {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const ct = document.getElementById('ov-reveal');

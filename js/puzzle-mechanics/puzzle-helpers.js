@@ -1,6 +1,7 @@
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { t } from '../translation/translations.js';
 import { showToast } from './toasts-and-popups.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - PUZZLE HELPERS----------------------
@@ -105,7 +106,7 @@ export function _applyDenseMarkerBias(cands, sol, rows, cols) {
 // Returns a Set of row indices that contain at least one correctly-filled
 // cell (either placed by the player or revealed by a previous item).
 export function _getPreFilledRows() {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const filledRows = new Set();
@@ -125,7 +126,7 @@ export function _getPreFilledRows() {
 // Returns a Set of column indices that contain at least one correctly-
 // filled cell (either placed by the player or revealed by a previous item).
 export function _getPreFilledCols() {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const filledCols = new Set();

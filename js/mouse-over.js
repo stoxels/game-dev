@@ -1,4 +1,5 @@
 ﻿import { applyCell, dragStartCol, dragStartRow } from './mouse-button-handlers.js';
+import { cur } from './state.js';
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'painting', { get() { return painting; }, set(v) { painting = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'hoverRow', { get() { return hoverRow; }, set(v) { hoverRow = v; }, configurable: true }); } catch (e) {}
@@ -45,7 +46,7 @@ export function _setColClueHighlight(col, on) {
 
 // Turns the row-tint on/off for every grid cell in the given row.
 export function _setRowCellsHighlight(row, on) {
-    const cols = globalThis.cur.grid[0].length;
+    const cols = cur.grid[0].length;
     for (let c = 0; c < cols; c++) {
         const cell = document.getElementById(`g-${row}-${c}`);
         if (cell) cell.classList.toggle('hov-r', on);
@@ -54,7 +55,7 @@ export function _setRowCellsHighlight(row, on) {
 
 // Turns the column-tint on/off for every grid cell in the given column.
 export function _setColCellsHighlight(col, on) {
-    const rows = globalThis.cur.grid.length;
+    const rows = cur.grid.length;
     for (let r = 0; r < rows; r++) {
         const cell = document.getElementById(`g-${r}-${col}`);
         if (cell) cell.classList.toggle('hov-c', on);
@@ -71,7 +72,7 @@ export function _setColCellsHighlight(col, on) {
 //   that pass through (row, col): tints the clue cells and all grid cells
 //   along both axes.
 export function applyHover(row, col) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
     _setRowClueHighlight(row, true);
     _setColClueHighlight(col, true);
     _setRowCellsHighlight(row, true);
@@ -82,7 +83,7 @@ export function applyHover(row, col) {
 //   that were previously highlighted.
 //   Early-exits if nothing is currently hovered or there is no active puzzle.
 export function clearHover() {
-    if (hoverRow < 0 || !globalThis.cur) return;
+    if (hoverRow < 0 || !cur) return;
     _setRowClueHighlight(hoverRow, false);
     _setColClueHighlight(hoverCol, false);
     _setRowCellsHighlight(hoverRow, false);
@@ -119,7 +120,7 @@ export function _isDragCellAllowed(row, col) {
 // True if (row, col) is a cell the player has correctly resolved
 // (either filled themselves or via a reveal).
 export function _isCellCorrectlyFilled(row, col) {
-    return (globalThis.userGrid[row][col] === 1 || globalThis.revealedGrid[row][col]) && globalThis.cur.grid[row][col] === 1;
+    return (globalThis.userGrid[row][col] === 1 || globalThis.revealedGrid[row][col]) && cur.grid[row][col] === 1;
 }
 
 // Counts the contiguous run of already-correct cells touching (row, col)
@@ -128,11 +129,11 @@ export function _isCellCorrectlyFilled(row, col) {
 export function _countAdjacentPrefillRun(row, col, axis) {
     let count = 0;
     if (axis === 'row') {
-        const cols = globalThis.cur.grid[0].length;
+        const cols = cur.grid[0].length;
         for (let c = col - 1; c >= 0 && _isCellCorrectlyFilled(row, c); c--) count++;
         for (let c = col + 1; c < cols && _isCellCorrectlyFilled(row, c); c++) count++;
     } else {
-        const rows = globalThis.cur.grid.length;
+        const rows = cur.grid.length;
         for (let r = row - 1; r >= 0 && _isCellCorrectlyFilled(r, col); r--) count++;
         for (let r = row + 1; r < rows && _isCellCorrectlyFilled(r, col); r++) count++;
     }

@@ -107,11 +107,11 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
     grid-template-rows: 16.8% 83.2% 89.5%;
 }
 
-/* ---------- the three pages -------------------------------------------- */
+/* ---------- the two pages (charms + slots) ---------------------------------------- */
 .spellbook-body {
     position: absolute;
     display: grid;
-    grid-template-columns: 1fr 1.02fr 1.55fr;
+    grid-template-columns: 1fr 1.2fr;
     left: 17.4%;
     right: 16.6%;
     top: 17.4%;
@@ -660,7 +660,7 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
 
 /* ---------- compact frames ------------------------------------------------ */
 @container (max-width: 860px) {
-    .spellbook-body { grid-template-columns: 1fr; grid-template-rows: minmax(120px, 1fr) minmax(140px, auto) minmax(160px, 1fr); }
+    .spellbook-body { grid-template-columns: 1fr; grid-template-rows: minmax(120px, 1fr) minmax(140px, auto); }
     .spellbook-page { overflow-y: auto; }
 }
 

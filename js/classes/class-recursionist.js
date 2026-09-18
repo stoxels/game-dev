@@ -6,6 +6,7 @@ import { t } from '../translation/translations.js';
 import { _refundCooldown } from './class-actuary.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
@@ -205,8 +206,8 @@ export function _scheduleNextSkeletonMove(sk) {
 
 // Moves the skeleton one row up or down within its column, then checks for jumps
 export function _skeletonStep(sk) {
-    if (!globalThis.cur) return;
-    const rows = globalThis.cur.grid.length;
+    if (!cur) return;
+    const rows = cur.grid.length;
     if (rows <= 1) { _trySkeletonJump(sk); return; }
 
     let dr = Math.random() < 0.5 ? -1 : 1;
@@ -233,12 +234,12 @@ export function _skeletonStep(sk) {
     mistakes appear in a valid column.
 */
 export function _trySkeletonJump(sk) {
-    if (!globalThis.cur || !globalThis.wrongGrid[sk.row] || !globalThis.wrongGrid[sk.row][sk.col]) return;
+    if (!cur || !globalThis.wrongGrid[sk.row] || !globalThis.wrongGrid[sk.row][sk.col]) return;
 
     const originKey = `${sk.row}-${sk.col}`;
     if (sk.visited.has(originKey)) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -316,7 +317,7 @@ export function _skeletonFireCycle(id) {
     skeleton. Each beam is slightly staggered for a nicer visual rhythm.
 */
 export function _skeletonFireVolley(sk) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     const targets = _findAdjacentRevealableCells(sk.row, sk.col);
     targets.forEach((target, i) => {
@@ -331,7 +332,7 @@ export function _skeletonFireVolley(sk) {
 
 // Scans the 8 neighbours of (row, col) and returns all unrevealed correct cells
 export function _findAdjacentRevealableCells(row, col) {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const cells = [];
@@ -625,9 +626,9 @@ export function _executeDegreesOfFreedom(row, col, effect) {
 
 // Returns a random cell that is unfilled, unmarked and not a mistake
 export function _findZombieSpawnCell() {
-    if (!globalThis.cur) return null;
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    if (!cur) return null;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const candidates = [];
 
     for (let r = 0; r < rows; r++) {
@@ -732,9 +733,9 @@ export function _scheduleNextZombieMove(zombie) {
 // Arriving on a free cell starts a dwell - countdown challenge there,
 // but only after the current challenge grace period has elapsed.
 export function _zombieStep(zombie) {
-    if (!globalThis.cur) return;
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    if (!cur) return;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
 
     const dirs = [
         { dr: -1, dc: 0 }, { dr: 1, dc: 0 },
@@ -840,7 +841,7 @@ export function _updateZombieCountdownLabel(zombie) {
 */
 export function _evaluateZombieChallenge(zombie) {
     const { row, col } = zombie.challenge;
-    const sol = globalThis.cur.grid[row][col];
+    const sol = cur.grid[row][col];
 
     if (!_isZombieChallengeResolvedState(row, col, sol)) {
         if (!_isFreeCellForZombie(row, col)) {
@@ -870,7 +871,7 @@ export function _isZombieChallengeResolvedState(row, col, sol) {
 */
 export function _zombieFillCell(zombie) {
     const { row, col } = zombie.challenge;
-    const sol = globalThis.cur.grid[row][col];
+    const sol = cur.grid[row][col];
 
     _endZombieChallenge(zombie);
 
@@ -900,15 +901,15 @@ export function _zombieFillCell(zombie) {
     fabricates an additional jump node for the Residual skeletons.
 */
 export function _zombieCurseNearbyCell(zombie, row, col) {
-    if (!globalThis.cur) return;
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    if (!cur) return;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const candidates = [];
 
     for (let r = Math.max(0, row - ZOMBIE_CURSE_RADIUS); r <= Math.min(rows - 1, row + ZOMBIE_CURSE_RADIUS); r++) {
         for (let c = Math.max(0, col - ZOMBIE_CURSE_RADIUS); c <= Math.min(cols - 1, col + ZOMBIE_CURSE_RADIUS); c++) {
             if (r === row && c === col) continue;
-            if (globalThis.cur.grid[r][c] !== 0) continue;           // must be an incorrect cell
+            if (cur.grid[r][c] !== 0) continue;           // must be an incorrect cell
             if (globalThis.wrongGrid[r][c]) continue;                // already a mistake
             if (globalThis.userGrid[r][c] === 1) continue;           // filled (would be a real mistake)
             candidates.push({ r, c });

@@ -13,6 +13,7 @@ import { _egCancelAbsorptionRegen, _egComputePlayerStats, _egGetAllEquippedItems
 import { EG_PLAYER_BASE_ATTRIBUTES, _egFindUnmetRequirements, _egGetUnmetRequirementsText, _egSumAttributeBonuses } from '../loot/loot-requirements.js';
 import { _egIsActive } from '../combat/combat-state.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME CHARACTER LEVELING---------------------------
@@ -485,9 +486,9 @@ export function _egCampaignMonsterLevel(gi) {
 // endgame map/chain runs.
 export function _egGrantCampaignLevelXP(gi, isFirstClear) {
     if (typeof STATE === 'undefined' || !STATE) return 0;
-    if (typeof cur === 'undefined' || !globalThis.cur) return 0;
+    if (typeof cur === 'undefined' || !cur) return 0;
     // Never award campaign XP during an endgame map/chain run.
-    if (globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters) return 0;
+    if (cur.isMonsterLevel && !cur.campaignMonsters) return 0;
     if (_egGetPlayerLevel() >= EG_LEVELING_CONFIG.maxLevel) return 0;
 
     const c = EG_LEVELING_CONFIG;

@@ -9,6 +9,7 @@ import { hideLsClassTooltip } from './class-hud-levelselect-tooltip.js';
 import { buildClassHUD, hideHUDTooltip } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
@@ -405,7 +406,7 @@ export function _bayesTrapsCleanup(buildHUD = true) {
 // Starts the Bayes Traps ability flow.
 // Resets any lingering previous activation, initialises state, then opens the selection overlay.
 export function _executeBayesTraps(trapCount, availableTraps) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
     if (typeof hideHUDTooltip === 'function') hideHUDTooltip();
     if (typeof hideLsClassTooltip === 'function') hideLsClassTooltip();
 
@@ -450,8 +451,8 @@ export function _bayesTrapActivate(type, row, col) {
 
 // Reveal Trap: fills in correct unfilled cells within a 1-step radius (8 neighbours + self).
 export function _bayesTrapReveal(row, col) {
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const affected = [];
@@ -487,8 +488,8 @@ export function _bayesTrapReveal(row, col) {
 // Elimination Trap: marks wrong empty cells (sol===0) in the four cardinal directions,
 // up to BAYES_ELIMINATION_REACH steps away from the detonation cell.
 export function _bayesTrapElimination(row, col) {
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
@@ -555,8 +556,8 @@ export function _bayesTrapAddShieldIconToCell(el) {
 
 // Adds shield icons to every cell in the given row or column.
 export function _bayesTrapApplyProtectionVisual(type, idx) {
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -577,8 +578,8 @@ export function _bayesTrapApplyProtectionVisual(type, idx) {
 // Respects overlapping protections: a cell that is still covered by the other axis
 // keeps its shield icon.
 export function _bayesTrapRemoveProtectionVisual(type, idx) {
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const lines = window._bayesTrapProtectedLines || new Set();
@@ -860,8 +861,8 @@ export function _bayesTrapAnimateExplosion(row, col, type) {
 
 // Returns a shuffled list of every empty (sol===0), unrevealed, unshielded cell on the grid.
 export function _typeIGetEligibleCells() {
-    if (!globalThis.cur) return [];
-    const sol = globalThis.cur.grid;
+    if (!cur) return [];
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const shielded = window._typeIShieldedCells || new Set();
@@ -958,7 +959,7 @@ export function _typeICreateShardElement(row, col, shardIndex) {
 
 // Activates the shield: picks eligible empty cells, seeds them, and plays the animation.
 export function _executeTypeIShield(seedCount, bonusReveal) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     if (!window._typeIShieldedCells) window._typeIShieldedCells = new Set();
     window._typeIBonusReveal = bonusReveal;
@@ -1059,8 +1060,8 @@ export function _typeIShowShieldBreakEffect(row, col) {
 // Reveals one random correct cell on the same row or column as the triggered shield.
 // Runs only when the shield was set up with bonusReveal=true.
 export function _typeIBonusRevealCell(row, col) {
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const candidates = [];

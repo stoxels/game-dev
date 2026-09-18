@@ -3,6 +3,7 @@ import { EG_ART } from '../endgame/endgame-art.js';
 import { EG_CAMPAIGN_MONSTER_CONFIG } from './encounter.js';
 import { _egApplyMapModsToMonster } from '../endgame/endgame-map-launch.js';
 import { _egIsCampaignRun } from './combat-state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA DEFINITIONS-------------------------
@@ -613,8 +614,8 @@ export function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
 
     let maxHP, damage, scaledCharge;
     if (isCampaign) {
-        const hpTarget = (globalThis.cur && globalThis.cur.campaignMonsterHp > 0) ? globalThis.cur.campaignMonsterHp : def.baseHP;
-        const dmgTarget = (globalThis.cur && globalThis.cur.campaignMonsterDamage > 0) ? globalThis.cur.campaignMonsterDamage : 6;
+        const hpTarget = (cur && cur.campaignMonsterHp > 0) ? cur.campaignMonsterHp : def.baseHP;
+        const dmgTarget = (cur && cur.campaignMonsterDamage > 0) ? cur.campaignMonsterDamage : 6;
         // ±15% spread so a pack doesn't feel flat; never below a few hits.
         maxHP = Math.max(10, Math.round(hpTarget * (0.85 + Math.random() * 0.30) * hpMult));
         damage = Math.max(1, Math.round(dmgTarget * (0.85 + Math.random() * 0.30)));

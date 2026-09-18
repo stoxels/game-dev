@@ -10,6 +10,7 @@ import { shuffle } from './puzzle-mechanics/puzzle-helpers.js';
 import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { _charIs } from './sprite/player_sprite.js';
 import { t } from './translation/translations.js';
+import { cur } from './state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 10: live globalThis accessors for externally-patched names.
@@ -113,8 +114,8 @@ export function _initLuckyTiles() {
     globalThis.luckyRewardClaimed = 0;
     window._outlierHighlighted = new Set();
 
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const tier = _getGridSizeTier(rows, cols);
     const isLarge = tier === 'large';
     const isMassive = tier === 'massive';
@@ -133,7 +134,7 @@ export function _initLuckyTiles() {
     const pool = [];
     for (let r = 0; r < rows; r++)
         for (let c = 0; c < cols; c++)
-            if (globalThis.cur.grid[r][c] !== 1) pool.push(`${r}-${c}`);
+            if (cur.grid[r][c] !== 1) pool.push(`${r}-${c}`);
 
     shuffle(pool);
     for (let i = 0; i < Math.min(tileCount, pool.length); i++) {
@@ -153,9 +154,9 @@ export function _initLuckyTiles() {
 // Individual run-length numbers are hidden (only the first span is used).
 // Called with a short delay so the grid DOM exists before we modify spans.
 export function _deadReckoningApplyClues() {
-    if (!globalThis.cur || !window._deadReckoningActive || window._deadReckoningUnlocked) return;
+    if (!cur || !window._deadReckoningActive || window._deadReckoningUnlocked) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
 
     // Row clues: show total filled count on the first span, blank the rest
@@ -180,9 +181,9 @@ export function _deadReckoningApplyClues() {
 // Called from updClues so it re-evaluates after every cell change.
 export function _deadReckoningCheckUnlock() {
     if (!window._deadReckoningActive || window._deadReckoningUnlocked) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const totalFilled = sol.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
 
@@ -262,7 +263,7 @@ export function _applyNullHypothesis() {
     if (window._oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
 
     // Identify the row with the fewest filled solution cells
@@ -328,7 +329,7 @@ export function _applyCentralTendency() {
     if (window._oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const cx = (rows - 1) / 2; // fractional centre row
     const cy = (cols - 1) / 2; // fractional centre col
@@ -373,7 +374,7 @@ export function _applyDensityMapping() {
     if (window._oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const lineCount = ptHasSkill('density_mapping_3') ? 2 : 1; // node 3 targets 2 lines
     const markedIds = [];
@@ -466,7 +467,7 @@ export function _applySparseRegion() {
     if (window._oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const markedIds = [];
 
@@ -534,7 +535,7 @@ export function _applyMarginalDistribution() {
     if (window._oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
 
     // Collect all unrevealed/unmarked edge cells without duplicates
@@ -588,9 +589,9 @@ export function _applyMarginalDistribution() {
 export function _applyInterquartileVision() {
     if (!ptHasSkill('interquartile_vision_1')) return;
     if (window._oracleActive) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length, cols = cur.grid[0].length;
     if (rows * cols < 200) return; // only fires on large grids
 
     const scanSize = Math.max(rows, cols); // cover the full centre region
@@ -666,7 +667,7 @@ export function triggerSylaFlowerEffect(coords) {
 // Syla - Nature's Aid: on forest levels, the grove reveals one correct tile for her.
 export function _applySylaForestAffinity() {
     if (!_charIs('syla')) return;
-    if (!globalThis.cur || !globalThis.cur.isForestLevel) return;
+    if (!cur || !cur.isForestLevel) return;
     const revealedCoords = revealTiles(1);
     Audio_Manager.playSFX('syla_nature');
     showToast(t('cg_syla_bonus'));
@@ -719,7 +720,7 @@ export function _applyCompletionGlimpse() {
     if (ptHasSkill('completion_glimpse_2')) duration += 30000;
     if (ptHasSkill('completion_glimpse_3')) duration += 30000;
 
-    const text = lvText(globalThis.cur, 'reveal');
+    const text = lvText(cur, 'reveal');
     if (!text) return;
 
     const bar = document.getElementById('completion-glimpse-bar');

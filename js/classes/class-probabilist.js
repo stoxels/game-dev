@@ -9,6 +9,7 @@ import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_fieldScanCellRevealed, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //------------------------PROBABILIST-------------------------------------
@@ -528,7 +529,7 @@ export function _fieldScanCheckBigScanAchievement(prevStates, sol) {
 // permanently committed as a system cross mark.
 export function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses = false) {
     const filledInScan = prevStates.filter(({ r, c }) =>
-        globalThis.cur.grid[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1
+        cur.grid[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1
     );
 
     _shuffleArray(filledInScan);
@@ -547,7 +548,7 @@ export function _fieldScanRestoreGodOfProbabilities(prevStates, keepAllCrosses =
 
     if (keepAllCrosses) {
         prevStates.forEach(({ r, c }) => {
-            if (globalThis.cur.grid[r][c] !== 0) return;                 // filled cells are handled above
+            if (cur.grid[r][c] !== 0) return;                 // filled cells are handled above
             if (globalThis.userGrid[r][c] === 2 || globalThis.wrongGrid[r][c]) return; // already marked / penalised
 
             globalThis.userGrid[r][c] = 2;
@@ -661,8 +662,8 @@ export function _scanBeamCleanupPreviousCast() {
 // Computes the pixel bounds of the scan region within the puzzle scaler element,
 // accounting for the current zoom level.
 export function _scanBeamBuildRegionBounds(startRow, startCol, scanSize, wrap) {
-    const rows = globalThis.cur?.grid?.length || 99;
-    const cols = globalThis.cur?.grid?.[0]?.length || 99;
+    const rows = cur?.grid?.length || 99;
+    const cols = cur?.grid?.[0]?.length || 99;
     const endRow = Math.min(startRow + scanSize - 1, rows - 1);
     const endCol = Math.min(startCol + scanSize - 1, cols - 1);
 
@@ -885,13 +886,13 @@ export function _fieldScanUpdatePreview(clientX, clientY) {
         && STATE.playerClass === 'probabilist'
         && STATE.classActiveChoice === 'active2';
 
-    if (!isArmed || !globalThis.cur) { _fieldScanClearPreview(); return; }
+    if (!isArmed || !cur) { _fieldScanClearPreview(); return; }
 
     const hovered = _fieldScanGetHoveredCell(clientX, clientY);
     if (!hovered) { _fieldScanClearPreview(); return; }
 
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const scanSize = _fieldScanGetEffectiveSizeForPreview();
     const { startRow, startCol } = _fieldScanComputeOrigin(hovered.r, hovered.c, scanSize, rows, cols);
 
@@ -928,9 +929,9 @@ export function _playScanBeamEffect(startRow, startCol, scanSize, durationMs) {
     if (!bounds) return;
 
     const { regionTop, regionLeft, regionBottom, regionWidth, regionHeight } = bounds;
-    const rows = globalThis.cur?.grid?.length || 99;
+    const rows = cur?.grid?.length || 99;
     const endRow = Math.min(startRow + scanSize - 1, rows - 1);
-    const endCol = Math.min(startCol + scanSize - 1, (globalThis.cur?.grid?.[0]?.length || 99) - 1);
+    const endCol = Math.min(startCol + scanSize - 1, (cur?.grid?.[0]?.length || 99) - 1);
     const beamH = 28;
 
     const styleTag = _scanBeamInjectKeyframes(durationMs, regionTop, regionHeight, beamH);
@@ -957,8 +958,8 @@ export function _playScanBeamEffect(startRow, startCol, scanSize, durationMs) {
 // zoom/scroll. Falls back to top-centre of the viewport.
 export function _fieldScanGetRainOrigin() {
     const topLeft = document.getElementById('g-0-0');
-    const rows = globalThis.cur ? globalThis.cur.grid.length : 0;
-    const cols = globalThis.cur && globalThis.cur.grid[0] ? globalThis.cur.grid[0].length : 0;
+    const rows = cur ? cur.grid.length : 0;
+    const cols = cur && cur.grid[0] ? cur.grid[0].length : 0;
     const bottomRight = rows > 0 && cols > 0
         ? document.getElementById(`g-${rows - 1}-${cols - 1}`)
         : null;
@@ -1205,7 +1206,7 @@ export function _playScanBeamEffect_legacy(startRow, startCol, scanSize, duratio
     const prevPosition = wrap.style.position;
     if (!prevPosition || prevPosition === 'static') wrap.style.position = 'relative';
 
-    const rows = globalThis.cur?.grid?.length || 99;
+    const rows = cur?.grid?.length || 99;
     const endRow = Math.min(startRow + scanSize - 1, rows - 1);
 
     const topCellEl = document.getElementById(`g-${startRow}-${startCol}`);
@@ -1266,8 +1267,8 @@ export function _playScanBeamEffect_legacy(startRow, startCol, scanSize, duratio
 // cell in the region in one pass (no per-cell rain VFX), plays the legacy
 // beam sweep, then restores via the standard scan timer.
 export function _executeFieldScanLegacy(row, col, scanSize, durationMs) {
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -1589,8 +1590,8 @@ export function _playBayesianRevealEffect(cellEl) {
 // Main entry point for the Precision Mark ability.
 // Marks empty cells in the target row/col and adjacent lines, then fires VFX.
 export function _executePrecisionMark(row, col, extraLines) {
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -1620,8 +1621,8 @@ export function _executePrecisionMark(row, col, extraLines) {
 // emergency_scan or Interquartile Vision passive scans) - god_of_probabilities
 // uses it to also keep every ✕ mark shown by such a cast.
 export function _executeFieldScan(row, col, scanSize, durationMs, isClassAbility = false) {
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 

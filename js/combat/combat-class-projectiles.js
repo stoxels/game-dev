@@ -5,6 +5,7 @@ import { _egMapAbilityRevealMult, _egMapItemRevealMult } from '../endgame/endgam
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.
@@ -288,7 +289,7 @@ export function _egOnProgrammaticReveal(cellIds, source) {
     if (!Array.isArray(cellIds) || !cellIds.length) return;
     if (typeof _egIsActive !== 'function' || !_egIsActive()) {
         // Queue start-of-puzzle auto-reveals so they still shoot once monsters spawn.
-        if (globalThis.cur && (globalThis.cur.isMonsterLevel || globalThis.cur.isChainedPuzzle)) {
+        if (cur && (cur.isMonsterLevel || cur.isChainedPuzzle)) {
             _egPendingRevealQueue.push({ ids: cellIds.slice(0, EG_REVEAL_PROJECTILE_MAX), source });
         }
         return;
@@ -297,7 +298,7 @@ export function _egOnProgrammaticReveal(cellIds, source) {
     // If active but no monster is alive yet (spawn stagger / respawn gap),
     // queue and retry so damage is not lost to a null target.
     if (!globalThis._egMonsters || globalThis._egMonsters.length === 0) {
-        if (globalThis.cur && (globalThis.cur.isMonsterLevel || globalThis.cur.isChainedPuzzle)) {
+        if (cur && (cur.isMonsterLevel || cur.isChainedPuzzle)) {
             _egPendingRevealQueue.push({ ids: cellIds.slice(0, EG_REVEAL_PROJECTILE_MAX), source });
             setTimeout(() => _egFlushPendingRevealProjectiles(), 300);
         }

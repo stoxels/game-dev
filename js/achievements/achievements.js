@@ -8,6 +8,7 @@ import { ACHIEVEMENT_DEFS } from './achievements-data.js';
 import { _achToastQueue, _drainAchToastQueue, showAchResetModal, buildAchievementsScreen, backToAchCategories } from './achievements-ui.js';
 import { t } from '../translation/translations.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
@@ -76,7 +77,7 @@ ACH_STATE = initAchState();
 //   This is the primary entry point other modules should call.
 export function trackAchStat(stat, amount = 1) {
     // Tutorial-quest levels never touch achievement progress.
-    const _cur = globalThis.cur; // LIVE accessor in entry (reassigned at runtime)
+    const _cur = cur; // LIVE accessor in entry (reassigned at runtime)
     if (typeof _cur !== 'undefined' && _cur && _cur.isTutorialQuest) return;
     if (!ACH_STATE.stats[stat]) ACH_STATE.stats[stat] = 0;
     ACH_STATE.stats[stat] += amount;

@@ -7,6 +7,7 @@ import { _applyCellEffect } from '../../puzzle-mechanics/cell-fx.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
 import { shuffle } from '../../puzzle-mechanics/puzzle-helpers.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------SHADOW SEAL----------------------
@@ -16,7 +17,7 @@ import { shuffle } from '../../puzzle-mechanics/puzzle-helpers.js';
 // clues for the rest of the level, and mass-marks 75 % of empty cells.
 export function _useShadowSeal(id, def) {
     questStat_shadowSealUsed();
-    if (!globalThis.cur) return '';
+    if (!cur) return '';
 
     // 1. Hard-set the timer to exactly 5 minutes
     setTimeSecs(300);
@@ -27,7 +28,7 @@ export function _useShadowSeal(id, def) {
         .forEach(el => el.classList.add('clue-blackout'));
 
     // 3. Mark 75% of all empty non-solution cells as wrong
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 

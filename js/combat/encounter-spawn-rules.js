@@ -14,6 +14,8 @@
 // split modules rebind these through globalThis.<name> assignment
 // (imported module bindings are read-only views) - the established
 // step-9/step-10 pattern.
+import { cur } from '../state.js';
+
 try { Object.defineProperty(globalThis, '_egClearCampaignLevelFields', { get() { return _egClearCampaignLevelFields; }, set(v) { _egClearCampaignLevelFields = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { get() { return _egShouldPrepareCampaignEncounter; }, set(v) { _egShouldPrepareCampaignEncounter = v; }, configurable: true }); } catch (e) {}
 
@@ -35,10 +37,10 @@ export let EG_INITIAL_SPAWN_STAGGER_STEP_MS = 200;
 
 // Returns true if every filled cell in the solution has been correctly placed.
 export function _egIsPuzzleSolved() {
-    if (!globalThis.cur || !globalThis.userGrid) return false;
-    for (let r = 0; r < globalThis.cur.grid.length; r++)
-        for (let c = 0; c < globalThis.cur.grid[0].length; c++)
-            if (globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1) return false;
+    if (!cur || !globalThis.userGrid) return false;
+    for (let r = 0; r < cur.grid.length; r++)
+        for (let c = 0; c < cur.grid[0].length; c++)
+            if (cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1) return false;
     return true;
 }
 
@@ -104,7 +106,7 @@ export function _egRollMonsterLevel(baseLevel) {
 // of their own - in that case respect the original map def's monster level
 // so monsters keep spawning at the map's intended level across the chain.
 export function _egGetEncounterBaseLevel() {
-    if (globalThis.cur && globalThis.cur.monsterLevel != null && globalThis.cur.monsterLevel > 0) return globalThis.cur.monsterLevel;
+    if (cur && cur.monsterLevel != null && cur.monsterLevel > 0) return cur.monsterLevel;
     if (typeof _egMapDef !== 'undefined' && globalThis._egMapDef
         && globalThis._egMapDef.monsterLevel != null && globalThis._egMapDef.monsterLevel > 0) {
         return globalThis._egMapDef.monsterLevel;
@@ -115,7 +117,7 @@ export function _egGetEncounterBaseLevel() {
 // Builds a fixed monster list from cur.monsters, levelling each entry.
 // Used when the map explicitly defines which monsters should appear.
 export function _egBuildFixedNormalList(baseLevel, cap) {
-    return globalThis.cur.monsters.slice(0, cap).map(entry => ({
+    return cur.monsters.slice(0, cap).map(entry => ({
         id: entry.id,
         level: entry.level != null ? entry.level : _egRollMonsterLevel(baseLevel),
     }));
@@ -186,10 +188,10 @@ export function _egBuildRandomNormalList(baseLevel, cap) {
 // cur.maxMonsters caps the total count (0 = boss-only encounter).
 export function _egBuildNormalSpawnList(baseLevel) {
     const fallbackCap = (typeof _egGetDefaultMonsterCap === 'function') ? _egGetDefaultMonsterCap(baseLevel) : EG_DEFAULT_MONSTER_CAP;
-    const cap = (globalThis.cur.maxMonsters != null && globalThis.cur.maxMonsters >= 0) ? globalThis.cur.maxMonsters : fallbackCap;
+    const cap = (cur.maxMonsters != null && cur.maxMonsters >= 0) ? cur.maxMonsters : fallbackCap;
     if (cap === 0) return [];
 
-    if (globalThis.cur.monsters && globalThis.cur.monsters.length > 0) {
+    if (cur.monsters && cur.monsters.length > 0) {
         return _egBuildFixedNormalList(baseLevel, cap);
     }
     return _egBuildRandomNormalList(baseLevel, cap);
@@ -222,13 +224,13 @@ export function _egBuildRandomBossList(baseLevel) {
 // Uses cur.bosses if provided; otherwise picks one random boss when cur.hasBoss is true.
 // cur.maxBosses caps the count (defaults to 1).
 export function _egBuildBossSpawnList(baseLevel) {
-    const hasBossFlag = globalThis.cur.hasBoss;
-    const explicitBosses = globalThis.cur.bosses && globalThis.cur.bosses.length > 0;
+    const hasBossFlag = cur.hasBoss;
+    const explicitBosses = cur.bosses && cur.bosses.length > 0;
     if (!hasBossFlag && !explicitBosses) return [];
 
-    const bossCap = (globalThis.cur.maxBosses != null && globalThis.cur.maxBosses > 0) ? globalThis.cur.maxBosses : 1;
+    const bossCap = (cur.maxBosses != null && cur.maxBosses > 0) ? cur.maxBosses : 1;
 
-    if (explicitBosses) return _egBuildFixedBossList(globalThis.cur.bosses, bossCap, baseLevel);
+    if (explicitBosses) return _egBuildFixedBossList(cur.bosses, bossCap, baseLevel);
     return _egBuildRandomBossList(baseLevel);
 }
 
@@ -291,9 +293,9 @@ export const EG_CAMPAIGN_STAMPED_FIELDS = [
 
 // Counts the solution cells (value 1) of the current puzzle.
 export function _egCountSolutionCells() {
-    if (!globalThis.cur || !globalThis.cur.grid) return 0;
+    if (!cur || !cur.grid) return 0;
     let n = 0;
-    for (const row of globalThis.cur.grid) for (const v of row) if (v === 1) n++;
+    for (const row of cur.grid) for (const v of row) if (v === 1) n++;
     return n;
 }
 
@@ -318,12 +320,12 @@ export function _egBuildCampaignMonsterList(count, level) {
 // Returns true when the current level should run a campaign monster pack.
 // Excludes endgame sandbox levels and levels already stamped as map seeds.
 function _egShouldPrepareCampaignEncounter() {
-    if (!globalThis.cur) return false;
-    if (globalThis.cur.isEndgameSandbox) return false;
+    if (!cur) return false;
+    if (cur.isEndgameSandbox) return false;
     // Active map-device run / sandbox seed - already a monster level that is
     // NOT a campaign level.
-    if (globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters) return false;
-    if (globalThis.cur.isMapRunSeed) return false;
+    if (cur.isMonsterLevel && !cur.campaignMonsters) return false;
+    if (cur.isMapRunSeed) return false;
     if (typeof window !== 'undefined' && window._egIsMapDeviceRun) return false;
     return true;
 }
@@ -333,13 +335,13 @@ function _egShouldPrepareCampaignEncounter() {
 // Called from start-level.js right before _egStartEncounter().
 export function _egPrepareCampaignEncounter() {
     if (!_egShouldPrepareCampaignEncounter()) return false;
-    if (globalThis.cur.campaignMonsters) return true;   // already prepared (retry / chain)
+    if (cur.campaignMonsters) return true;   // already prepared (retry / chain)
 
     const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
     const cells = _egCountSolutionCells();
     const perCellDamage = (typeof EG_PLAYER_STATS !== 'undefined' && EG_PLAYER_STATS.baseDamage) || 10;
 
-    const world = globalThis.cur.world || 1;
+    const world = cur.world || 1;
     let count = cfg.countBase + Math.floor((world - 1) / cfg.countPerWorlds);
     count = Math.max(1, Math.min(cfg.countMax, count));
     count = Math.min(count, Math.max(1, Math.floor(cells / cfg.minCellsPerMonster)));
@@ -348,17 +350,17 @@ export function _egPrepareCampaignEncounter() {
     const perHp = Math.max(cfg.minHp, Math.round(budget / Math.max(1, count)));
 
     const level = (typeof _egCampaignMonsterLevel === 'function')
-        ? _egCampaignMonsterLevel(globalThis.cur.gIdx) : 1;
+        ? _egCampaignMonsterLevel(cur.gIdx) : 1;
     const damage = Math.max(1, Math.round(cfg.damageBase + cfg.damagePerLevel * level));
 
-    globalThis.cur.campaignMonsters = true;
-    globalThis.cur.isMonsterLevel = true;
-    globalThis.cur.monsterLevel = level;
-    globalThis.cur.maxMonsters = count;
-    globalThis.cur.campaignMonsterCount = count;
-    globalThis.cur.campaignMonsterHp = perHp;
-    globalThis.cur.campaignMonsterDamage = damage;
-    globalThis.cur.monsters = _egBuildCampaignMonsterList(count, level);
+    cur.campaignMonsters = true;
+    cur.isMonsterLevel = true;
+    cur.monsterLevel = level;
+    cur.maxMonsters = count;
+    cur.campaignMonsterCount = count;
+    cur.campaignMonsterHp = perHp;
+    cur.campaignMonsterDamage = damage;
+    cur.monsters = _egBuildCampaignMonsterList(count, level);
     return true;
 }
 

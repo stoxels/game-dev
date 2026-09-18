@@ -17,6 +17,7 @@ import { questStat_primerRowsColsRevealed, updateQuestStats } from '../../infere
 import { t } from '../../translation/translations.js';
 import { shuffle } from '../../puzzle-mechanics/puzzle-helpers.js';
 import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
+import { cur } from '../../state.js';
 
 // Maximum number of questions in a single primer chain.
 export const PRIMER_MAX = 5;
@@ -232,9 +233,9 @@ function _primerApplyBoardGlow(boardEl, colour, count) {
 // staggered per-cell flare animation sweep and a board-level glow.
 // count: the number of correct answers that were given before the chain ended.
 export function applyPrimerHeadstart(count) {
-    if (!globalThis.cur || count <= 0) return;
+    if (!cur || count <= 0) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -318,9 +319,9 @@ function _primerSchedulePerfectFlares(rowIdxs, colIdxs, rows, cols) {
 // renderCell() never overwrites a flare placed the same frame), then glow
 // + toast, staggered gold flares, and the win check after all animations.
 export function applyPerfectPrimerReveal() {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 

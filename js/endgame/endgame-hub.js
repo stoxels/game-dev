@@ -20,6 +20,8 @@
 // split modules rebind these lets through globalThis.<name> assignment
 // (imported module bindings are read-only views) - the established
 // step-9/step-10 pattern.
+import { cur } from '../state.js';
+
 try { Object.defineProperty(globalThis, '_egTooltipItem', { get() { return _egTooltipItem; }, set(v) { _egTooltipItem = v; }, configurable: true }); } catch (e) {}
 
 import { buildClassHUD } from '../classes/class-hud.js';
@@ -1053,7 +1055,7 @@ export function _egHubOverlayPause() {
     _egHubOverlayPaused = false;
     try {
         if (typeof dead !== 'undefined' && globalThis.dead) return;
-        if (typeof cur === 'undefined' || !globalThis.cur) return;
+        if (typeof cur === 'undefined' || !cur) return;
         if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;  // pause menu already up
         if (typeof pauseTimer === 'function') pauseTimer();
         globalThis._gamePaused = true;
@@ -1107,7 +1109,7 @@ export function openHubFromGame() {
 export function _egSyncOverlayGearPools() {
     try {
         if (typeof _egComputePlayerStats !== 'function') return;
-        if (typeof cur === 'undefined' || !globalThis.cur) return;
+        if (typeof cur === 'undefined' || !cur) return;
         const stats = _egComputePlayerStats() || {};
         // ── HP ──
         if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {

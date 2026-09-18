@@ -9,6 +9,7 @@ import { buildClassHUD } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
@@ -50,7 +51,7 @@ export function _formatTimeCost(totalSeconds) {
 
 // Returns all unrevealed filled cells on the current grid as [row, col] pairs
 export function _tailRiskGetCandidateCells() {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const candidates = [];
@@ -248,7 +249,7 @@ export function _tailRiskResolve() {
 
 // Entry point: validates the grid state, finds candidate cells, then opens the overlay
 export function _executeTailRisk(secondsPerCell, maxCells) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     const candidates = _tailRiskGetCandidateCells();
 

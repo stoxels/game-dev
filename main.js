@@ -13,6 +13,7 @@ import { SETTINGS, applySettings, initSettingsControls } from './js/settings.js'
 import { closeSpellbook } from './js/skills/skill-spellbook.js';
 import { pauseTimer, resumeTimer } from './js/timer/timer.js';
 import { setLang } from './js/translation/translations.js';
+import { cur } from './js/state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 10: live globalThis accessors for externally-mutated names.
@@ -84,12 +85,12 @@ export const DECO_PANELS = [
 export function _updatePauseMenuReturnButtons() {
     // Campaign levels also carry isMonsterLevel (their light monster pack),
     // but they are NOT endgame maps - they keep the normal "Levels" button.
-    const onEndgameMap = typeof cur !== 'undefined' && globalThis.cur &&
-        ((globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters) || globalThis.cur.isEndgameSandbox);
+    const onEndgameMap = typeof cur !== 'undefined' && cur &&
+        ((cur.isMonsterLevel && !cur.campaignMonsters) || cur.isEndgameSandbox);
     // Tutorial quest is mandatory - no LEVELS exit mid-lesson (the HUD and
     // overlay buttons are hidden by _tqUpdateLevelExitButtons; the pause
     // menu button is hidden here where its visibility is owned).
-    const onTutorial = !!(typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest);
+    const onTutorial = !!(typeof cur !== 'undefined' && cur && cur.isTutorialQuest);
     const levelsBtn = document.getElementById('btn-go-levels');
     const nexusBtn = document.getElementById('btn-go-nexus');
     if (levelsBtn) levelsBtn.style.display = (onEndgameMap || onTutorial) ? 'none' : '';

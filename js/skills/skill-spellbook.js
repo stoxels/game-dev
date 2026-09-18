@@ -1,24 +1,20 @@
-﻿import { LANG, t } from '../translation/translations.js';
+﻿import { t } from '../translation/translations.js';
 import { hideHUDTooltip } from '../classes/class-hud.js';
-import { CHARM_SLOT_COUNT, getCharmSlottedRank, initCharmPanelInteractions, isSkillCharmSlotted, isSkillCharmUnlocked, renderSpellbookCharmPanel } from './skill-charms.js';
-import { _isGameScreenActive, renderSkillHotbar, setHotbarAboveModal, startSkillDrag } from './skill-hotbar.js';
-import { SKILL_HOTBAR_SIZE, getPassiveSkillDef, getPassiveSkillImage, getPlayerPassiveSkillIds, getPlayerTraits, getSkillDef, getSkillImage, getSkillLevel, getSkillName, isSkillMovable, isSkillOnHotbar, isSkillUsableNow } from './skill-registry.js';
+import { CHARM_SLOT_COUNT, initCharmPanelInteractions, renderSpellbookCharmPanel } from './skill-charms.js';
+import { _isGameScreenActive, renderSkillHotbar, setHotbarAboveModal } from './skill-hotbar.js';
+import { getSkillDef } from './skill-registry.js';
 import { UNIVERSAL_SPELL_MAP, isUniversalMovementSpell, isUniversalSupportSpell } from './universal-spells.js';
 import { STATE } from '../state.js';
 // skill-spellbook.js
 //------------------------------------------------------------------------
 //-----------------------------SPELL BOOK---------------------------------
 //------------------------------------------------------------------------
-// Overlay listing every spell the player can actually use, grouped into
-// class actives, ascendency actives and the universal Heartbloom endgame
-// skill. The contents are driven entirely by getPlayerSkillGroups()
-// (skill-registry.js), so a future spell appears here automatically once it
-// is registered against the player's class/ascendency.
-//
-// Spells are drag sources: holding the pointer on an entry and dropping it
-// on a hotbar slot assigns it (see skill-hotbar.js). Passives (Variance
-// Shield, Momentum, …) are listed in their own locked section and can never
-// be dragged - the registry's setHotbarSlot() rejects them as well.
+// Overlay for the two-step spell loadout: the charm inventory (found in the
+// world) on the left, the 10 spell slots on the right. Slotting a charm
+// unlocks its spell directly on the matching hotbar slot (spell slot N =
+// hotbar key N) - there is no separate spell list and no drag-to-hotbar
+// step. Passives (Variance Shield, Momentum, …) and traits are always-on
+// and live outside the book (class HUD / level-select tooltips).
 //
 // Open/close: the 'spellbook' keybind (default P), the pause-menu button,
 // or the close button. Escape closes it through the shared modal machinery
@@ -49,7 +45,6 @@ export function _ensureSpellbookOverlay() {
                 <div class="spellbook-body">
                     <aside class="spellbook-page sb-page-charms" id="spellbook-charms"></aside>
                     <div class="spellbook-page sb-page-slots" id="spellbook-slots"></div>
-                    <div class="spellbook-page sb-page-spells" id="spellbook-content"></div>
                 </div>
                 <div class="spellbook-footer" id="spellbook-footer"></div>
             </div>
@@ -133,8 +128,9 @@ export function openSpellbook() {
     const pauseEl = document.getElementById('pause-overlay');
     if (pauseEl && pauseEl.classList.contains('show')) pauseEl.classList.remove('show');
     // Lift the hotbar above the modal backdrop (and out of the game screen's
-    // stacking context) so spells can be dragged straight onto it while the
-    // book is open (see setHotbarAboveModal + css/skills.css).
+    // stacking context) so the player can see which hotbar key each spell
+    // slot casts from while slotting charms (see setHotbarAboveModal +
+    // css/skills.css).
     document.body.classList.add('spellbook-open');
     // Tutorial: also lift the Professor + his pointer line above the book so
     // the assignment stays visible while dragging (css/tutorial.css).
@@ -208,116 +204,18 @@ export function buildSpellbookHeadHTML(title, sub) {
         + (sub ? `<div class="sb3-head-sub">${sub}</div>` : '');
 }
 
-// Builds the HTML for one spell entry: a spell stone (drag source + hover
-// tooltip). Art: images/Spellbook/spell_stone.webp, element glow via the
-// group's data-school (css/spellbook-redesign.css).
-export function _buildSpellbookEntryHTML(skillId) {
-    const def = getSkillDef(skillId);
-    if (!def) return '';
-    // A spell is only unlocked while its charm sits in one of the spell
-    // slots (see js/skills/skill-charms.js). While locked it shows the rank
-    // of the stored skill, once unlocked the rank of the slotted charm.
-    const charmRank = (typeof getCharmSlottedRank === 'function') ? getCharmSlottedRank(skillId) : null;
-    const rank = charmRank || getSkillLevel(skillId);
-    const onBar = (typeof isSkillOnHotbar === 'function') && isSkillOnHotbar(skillId);
-    const charmLocked = (typeof isSkillCharmUnlocked === 'function') && !isSkillCharmUnlocked(skillId);
-    const usable = charmLocked ? false
-        : ((typeof isSkillUsableNow === 'function') ? isSkillUsableNow(skillId) : true);
-    const image = getSkillImage(skillId);
-    const icon = image
-        ? `<img class="sb3-stone-img" src="${image}" alt="${getSkillName(skillId)}" draggable="false">`
-        : `<span class="sb3-stone-icon">${def.icon || '✦'}</span>`;
-    // The ✓ / 🔒 badges are decorative: they use aria-label (never a native
-    // `title`, which would pop the browser's own tooltip on top of ours).
-    // The lock reason is spelled out in the entry's custom tooltip.
-    const lockLabel = charmLocked ? t('charm_locked_hint') : '';
-
-    return `<div class="sb3-stone ${usable ? '' : 'is-locked'}"
-                 data-skill="${skillId}"
-                 onmouseenter="handleSkillTip(event,'${skillId}')"
-                 onmousemove="handleSkillTipMove(event)"
-                 onmouseleave="handleSkillTipLeave()">
-        ${icon}
-        <span class="sb3-stone-name">${getSkillName(skillId)}</span>
-        <span class="sb3-stone-rank">${t('skill_tip_rank')} ${rank}</span>
-        <span class="sb3-stone-check${onBar ? ' is-on' : ''}"${onBar ? ` aria-label="${t('spellbook_on_bar')}"` : ''}>${onBar ? '✓' : ''}</span>
-        ${usable ? '' : `<span class="spellbook-entry-lock"${lockLabel ? ` aria-label="${lockLabel}"` : ''}>🔒</span>`}
-    </div>`;
-}
-
-// Builds the locked (non-draggable) passive section: the class passive plus
-// the character's innate traits, which are always-on abilities and therefore
-// also live on this side of the book.
-export function _buildSpellbookPassivesHTML() {
-    const entries = [];
-
-    for (const id of getPlayerPassiveSkillIds()) {
-        const def = getPassiveSkillDef(id);
-        if (!def) continue;
-        const name = LANG === 'de' ? (def.nameDE || def.nameEn) : def.nameEn;
-        const image = (typeof getPassiveSkillImage === 'function') ? getPassiveSkillImage(id) : null;
-        const icon = image
-            ? `<img class="spellbook-entry-img" src="${image}" alt="${name}" draggable="false">`
-            : `<span class="spellbook-entry-icon">${def.icon}</span>`;
-        entries.push(`<div class="sb3-stone is-passive"
-                     data-passive="${id}"
-                     onmouseenter="handleSkillTip(event,'${id}')"
-                     onmousemove="handleSkillTipMove(event)"
-                     onmouseleave="handleSkillTipLeave()">
-            ${icon}
-            <span class="sb3-stone-name">${name}</span>
-            <span class="sb3-stone-rank">${t('skill_tip_passive_tag')}</span>
-            <span class="spellbook-entry-lock">🔒</span>
-        </div>`);
-    }
-
-    // Character traits - indexed tooltip, never draggable.
-    const traits = (typeof getPlayerTraits === 'function') ? getPlayerTraits() : [];
-    traits.forEach((trait, index) => {
-        const name = LANG === 'de' ? (trait.nameDE || trait.nameEn) : trait.nameEn;
-        entries.push(`<div class="sb3-stone is-passive is-trait"
-                     data-trait="${index}"
-                     onmouseenter="handleTraitTip(event,${index})"
-                     onmousemove="handleSkillTipMove(event)"
-                     onmouseleave="handleSkillTipLeave()">
-            <span class="sb3-stone-icon">${trait.icon || '★'}</span>
-            <span class="sb3-stone-name">${name}</span>
-            <span class="sb3-stone-rank">${t('skill_tip_trait_tag')}</span>
-            <span class="spellbook-entry-lock">🔒</span>
-        </div>`);
-    });
-
-    if (!entries.length) return '';
-    // Same carved header bar as the spell groups - a legacy text-only title
-    // here made the passives block look like it belonged to a different menu.
-    const title = t('spellbook_group_passives');
-    return `<div class="spellbook-group" data-school="arcane">
-        ${(typeof buildSpellbookHeadHTML === 'function') ? buildSpellbookHeadHTML(title) : `<div class="spellbook-group-title">${title}</div>`}
-        <div class="sb3-stone-grid">${entries.join('')}</div>
-    </div>`;
-}
-
-// SCHOOL CURATION - the equipped list is organised so a full loadout reads
-// as a curated set rather than a flat list. Ownership stays first (class →
-// ascendency → heartbloom, tinted with the class colour), then the utility
-// families (support, movement), then the offensive spells regrouped by their
-// magic school (FIRE, FROST, …) with every spell section sorted by rank,
-// descending. Each entry's stone carries the school as data-school, so the
-// CSS element glow keys off it.
+// SCHOOL GLOW - charm inventory rows and spell slots carry their element as
+// data-school so the CSS element glow keys off it (see
+// css/spellbook-redesign.css). (The old right-side spell list with its stone
+// builders is gone: slotting a charm now places its spell on the matching
+// hotbar slot directly, so there is nothing left to curate or sort here.
+// Passives and traits are always-on and live outside the book - class HUD /
+// level-select tooltips.)
 //
-// SPELLBOOK_SCHOOL_ORDER doubles as the display order of the school sections
-// (elemental first, physical last). Themes are read defensively:
-// universal-spells.js loads after the registry in some load orders.
+// SPELLBOOK_SCHOOL_ORDER is the canonical school set (elemental first,
+// physical last). Themes are read defensively: universal-spells.js loads
+// after the registry in some load orders.
 export const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'nature', 'holy', 'shadow', 'arcane', 'physical'];
-
-// Bilingual section titles for the school bars. Like the universal-spells
-// group titles (_uspGroupTitle & co.) these are resolved directly so no
-// translation keys are required.
-export function _sbSchoolTitle(school) {
-    const EN = { fire: 'Fire', frost: 'Frost', lightning: 'Lightning', nature: 'Nature', holy: 'Holy', shadow: 'Shadow', arcane: 'Arcane', physical: 'Physical' };
-    const DE = { fire: 'Feuer', frost: 'Frost', lightning: 'Blitz', nature: 'Natur', holy: 'Heilig', shadow: 'Schatten', arcane: 'Arkan', physical: 'Physisch' };
-    return (typeof LANG !== 'undefined' && LANG === 'de') ? (DE[school] || school) : (EN[school] || school);
-}
 
 // The offensive school of a universal spell id, or null when the spell is
 // not an offensive universal (support / movement live in their own sections;
@@ -330,13 +228,6 @@ export function _sbSpellSchool(skillId) {
     if (SPELLBOOK_SCHOOL_ORDER.indexOf(spell.theme) !== -1) return spell.theme;
     // Blade / arrow arts are physical weapon schools, not arcane.
     return (spell.theme === 'blade' || spell.theme === 'arrow') ? 'physical' : 'arcane';
-}
-
-// Display rank of an entry for sorting: the slotted charm's rank (what the
-// player actually casts) or, before a charm is slotted, the trained rank.
-export function _sbSortRank(skillId) {
-    const charmRank = (typeof getCharmSlottedRank === 'function') ? getCharmSlottedRank(skillId) : null;
-    return charmRank || getSkillLevel(skillId) || 1;
 }
 
 // Element/school of a skill for the stone glow. Universal spells read their
@@ -356,153 +247,28 @@ export function _sbSpellSchoolKey(skillId) {
     return '';
 }
 
-// One curated section: gold banner + stone grid. data-school on the section
-// carries the element into the CSS glow (see css/spellbook-redesign.css).
-export function _spellbookGroupHTML(title, ids, school) {
-    const entries = ids.map(_buildSpellbookEntryHTML).join('');
-    const attr = school ? ` data-school="${school}"` : '';
-    return `<div class="spellbook-group"${attr}>`
-        + ((typeof buildSpellbookHeadHTML === 'function')
-            ? buildSpellbookHeadHTML(title)
-            : `<div class="spellbook-group-title">${title}</div>`)
-        + `<div class="sb3-stone-grid">${entries}</div>`
-        + `</div>`;
-}
-
-// Rebuilds the spell book contents from the player's current class
-// (or, pre-class, from their slotted universal charms).
+// Rebuilds the spell book: the charm inventory / currency panel plus the
+// spell slot grid (both in skill-charms.js), and the footer meter showing
+// how full the spell slots are. Slotting a charm places its spell on the
+// matching hotbar slot, so there is no spell list to render here.
 export function renderSpellbook() {
-    const content = document.getElementById('spellbook-content');
-    if (!content) return;
-    if (typeof STATE === 'undefined' || !STATE) { content.innerHTML = ''; return; }
-
-    // Only EQUIPPED spells are listed: a spell appears here exactly while its
-    // charm sits in one of the 10 spell slots (js/skills/skill-charms.js).
-    // The full arsenal (100+ universal spells) is never dumped into the book -
-    // it lives in the charm inventory until the player slots it.
-    const equipped = (typeof isSkillCharmSlotted === 'function') ? isSkillCharmSlotted : () => true;
-    const groups = globalThis.getPlayerSkillGroups()
-        .map((group) => ({ ...group, ids: (group.ids || []).filter(equipped) }))
-        .filter((group) => group.ids.length);
-
-    // Split the equipped loadout: ownership sections keep their identity,
-    // universal spells are re-bucketed into support / movement / offensive
-    // schools. Every spell bucket is sorted by rank, descending.
-    const byRankDesc = (a, b) => _sbSortRank(b) - _sbSortRank(a);
-    const offense = {};
-    const supportIds = [];
-    const movementIds = [];
-    const ownership = [];
-    for (const group of groups) {
-        if (group.labelKey === 'spellbook_group_support') supportIds.push(...group.ids);
-        else if (group.labelKey === 'spellbook_group_movement') movementIds.push(...group.ids);
-        else if (group.labelKey === 'spellbook_group_universal') {
-            for (const id of group.ids) {
-                const school = _sbSpellSchool(id) || 'arcane';
-                (offense[school] = offense[school] || []).push(id);
-            }
-        } else ownership.push(group);
-    }
-    supportIds.sort(byRankDesc);
-    movementIds.sort(byRankDesc);
-    for (const school of Object.keys(offense)) offense[school].sort(byRankDesc);
-
-    let html = '';
-    for (const group of ownership) {
-        group.ids.sort(byRankDesc); // rank-descending inside every section
-        // The section's data-school: the class/ascendency key when every id
-        // in the group shares it (the glow then follows the class colour),
-        // empty otherwise (neutral stones).
-        let school = '';
-        if (group.labelKey === 'spellbook_group_class'
-            || group.labelKey === 'tq_spellbook_group') school = STATE.playerClass || '';
-        else if (group.labelKey === 'spellbook_group_ascendency') school = STATE.playerAscendency || '';
-        else if (group.labelKey === 'spellbook_group_endgame') school = 'holy';
-        else if (group.labelKey === 'spellbook_group_support') school = 'nature';
-        else if (group.labelKey === 'spellbook_group_movement') school = 'arcane';
-        html += _spellbookGroupHTML(group.labelFallback || t(group.labelKey), group.ids, school);
-    }
-    for (const school of SPELLBOOK_SCHOOL_ORDER) {
-        if (!offense[school] || !offense[school].length) continue;
-        html += _spellbookGroupHTML(_sbSchoolTitle(school), offense[school], school);
-    }
-
-    if (!html) {
-        html = `<div class="spellbook-empty">${t('spellbook_empty_unslotted')}</div>`;
-    }
-
-    html += _buildSpellbookPassivesHTML();
-    content.innerHTML = html;
-
-    _initSpellbookDrag(content);
+    if (typeof STATE === 'undefined' || !STATE) return;
 
     // Spell slot grid + charm inventory / currency (skill-charms.js).
     if (typeof renderSpellbookCharmPanel === 'function') renderSpellbookCharmPanel();
 
-    // Footer: how full the hotbar and the spell slots currently are, so the
-    // player can see at a glance whether there is room left.
+    // Footer: how full the spell slots currently are, so the player can see
+    // at a glance whether there is room left. (The hotbar mirrors the slots
+    // 1:1, so a second hotbar meter would always read the same.)
     const footer = document.getElementById('spellbook-footer');
     if (footer) {
-        const slots = Array.isArray(STATE.skillHotbar) ? STATE.skillHotbar : [];
-        const used = slots.filter(Boolean).length;
-        const total = (typeof SKILL_HOTBAR_SIZE === 'number') ? SKILL_HOTBAR_SIZE : 10;
         const charmSlots = Array.isArray(STATE.charmSlots) ? STATE.charmSlots : [];
         const charmUsed = charmSlots.filter(Boolean).length;
         const charmTotal = (typeof CHARM_SLOT_COUNT === 'number') ? CHARM_SLOT_COUNT : 10;
-        // Left: the spell slots the charms go into. Right: how full the
-        // hotbar is. Each label travels with its own meter as one group.
         const slotPct = charmTotal ? Math.round(100 * charmUsed / charmTotal) : 0;
-        const barPct = total ? Math.round(100 * used / total) : 0;
         footer.innerHTML = `<div class="sb3-meter">`
             + `<span class="sb3-meter-label">${t('charm_slots_title')} ${charmUsed} / ${charmTotal}</span>`
             + `<div class="sb3-meter-track"><div class="sb3-meter-fill is-cyan" style="width:${slotPct}%"></div></div>`
-            + `</div>`
-            + `<div class="sb3-meter">`
-            + `<span class="sb3-meter-label">${t('spellbook_hotbar_used')} ${used} / ${total}</span>`
-            + `<div class="sb3-meter-track"><div class="sb3-meter-fill is-purple" style="width:${barPct}%"></div></div>`
             + `</div>`;
     }
-}
-
-// Wires pointerdown drag + double-click quick-assign on the entries.
-export function _initSpellbookDrag(content) {
-    content.querySelectorAll('.sb3-stone[data-skill]').forEach((el) => {
-        const skillId = el.getAttribute('data-skill');
-        el.addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            if (typeof isSkillCharmUnlocked === 'function' && !isSkillCharmUnlocked(skillId)) {
-                if (typeof globalThis.showToast === 'function') globalThis.showToast(t('charm_locked_toast'), '#ff6b9d');
-                return;
-            }
-            if (typeof startSkillDrag === 'function') startSkillDrag(skillId, e, null);
-        });
-        el.addEventListener('dblclick', () => _quickAssignSkill(skillId));
-    });
-
-    // Passives / traits: pressing them explains why they can't be moved.
-    content.querySelectorAll('.sb3-stone[data-passive], .sb3-stone[data-trait]').forEach((el) => {
-        el.addEventListener('pointerdown', (e) => {
-            e.preventDefault();
-            if (typeof globalThis.showToast === 'function') globalThis.showToast(t('skill_passive_not_movable'));
-        });
-    });
-}
-
-// Double-click convenience: drop the spell into the first free hotbar slot,
-// or the first slot when the bar is full.
-export function _quickAssignSkill(skillId) {
-    if (typeof isSkillCharmUnlocked === 'function' && !isSkillCharmUnlocked(skillId)) {
-        if (typeof globalThis.showToast === 'function') globalThis.showToast(t('charm_locked_toast'), '#ff6b9d');
-        return;
-    }
-    if (typeof isSkillMovable === 'function' && !isSkillMovable(skillId)) {
-        if (typeof globalThis.showToast === 'function') globalThis.showToast(t('skill_passive_not_movable'));
-        return;
-    }
-    globalThis.ensureSkillHotbar();
-    let index = STATE.skillHotbar.indexOf(null);
-    if (index === -1) index = 0;
-    globalThis.setHotbarSlot(index, skillId);
-    renderSpellbook();
-    renderSkillHotbar();
 }

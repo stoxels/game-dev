@@ -10,6 +10,7 @@ import { CHARM_BASE_ICON, charmKeyFor, ensureCharmState, getCharmByKey, promoteC
 import { getSkillDef, getSkillName } from '../skills/skill-registry.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS-----------------------------------
@@ -322,8 +323,8 @@ export function areAllWorldLevelsDone(wi, world) {
 // If the whole world is now done and hasn't triggered a class event yet,
 // sets a pending flag so the event fires when the result screen is dismissed.
 export function checkWorldCompletion() {
-    if (!globalThis.cur) return;
-    const wi = globalThis.cur.world - 1;
+    if (!cur) return;
+    const wi = cur.world - 1;
     const world = globalThis.WORLDS[wi];
     if (!world || !world.data.length) return;
     if (!areAllWorldLevelsDone(wi, world)) return;

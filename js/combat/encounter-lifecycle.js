@@ -21,6 +21,7 @@ import { _egStartPickupSpawner, _egStopPickupSpawner } from './combat-grid-picku
 import { _egHazardsCleanup, _egHazardsReset } from './combat-hazards.js';
 import { _egCancelAbsorptionRegen, _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egRecentFills } from './combat-state.js';
+import { cur } from '../state.js';
 
 
 
@@ -54,7 +55,7 @@ export function _egResetEncounterState() {
     // Do NOT clear _egPendingRevealQueue here - start-of-puzzle passives
     // queued reveals before _egStartEncounter and would be lost. Queue is
     // cleared on _egStopEncounter or after flushing.
-    globalThis._egMapDef = globalThis.cur;
+    globalThis._egMapDef = cur;
     globalThis._egMonsterSpawnCounter = 0;
     globalThis._egPlayerAbsorptionCurrent = _egComputePlayerStats().absorption;
     _egCancelAbsorptionRegen();

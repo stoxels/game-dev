@@ -8,6 +8,7 @@ import { _egRenderMapSlot } from './endgame-gate.js';
 import { egSaveHubState } from './endgame-hub.js';
 import { _egGetMapRewardBonuses, _egRollMapSizeMix, egMapBaseDurationForTier, egMapBaseMistakesForTier, egMapBasePuzzlesForTier, egMapBaseQuestionsForTier } from '../loot/loot-maps.js';
 import { _egIsActive } from '../combat/combat-state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME MAP DEVICE LAUNCH----------------------------
@@ -618,7 +619,7 @@ export function _egCleanupMapRunSeedLevel() {
 
     if (seedGi == null) return;
     const level = (typeof ALL !== 'undefined') ? globalThis.ALL[seedGi] : null;
-    if (!level || level === globalThis.cur) return;   // don't strip the level about to be retried
+    if (!level || level === cur) return;   // don't strip the level about to be retried
 
     delete level.isMapRunSeed;
     delete level.isMonsterLevel;

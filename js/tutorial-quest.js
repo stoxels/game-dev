@@ -27,7 +27,7 @@ import { isPuzzleSolved } from './scoring.js';
 import { hideResultOverlays, showSetup } from './screens/screens.js';
 import { _charmMake, _charmRenderOverlay, _egCharmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
 import { renderSkillHotbar } from './skills/skill-hotbar.js';
-import { SKILL_REGISTRY, isSkillOnHotbar } from './skills/skill-registry.js';
+import { SKILL_REGISTRY } from './skills/skill-registry.js';
 import { closeSpellbook, isSpellbookOpen } from './skills/skill-spellbook.js';
 import { USP_THEME_PROJ } from './skills/universal-spell-fx.js';
 import { triggerBanter } from './sprite/character-banter.js';
@@ -36,6 +36,7 @@ import { save } from './state.js';
 import { pauseTimer, resumeTimer, stopTimer } from './timer/timer.js';
 import { t } from './translation/translations.js';
 import { STATE } from './state.js';
+import { cur } from './state.js';
 
 //------------------------------------------------------------------------
 //-------------------INTERACTIVE TUTORIAL QUEST---------------------------
@@ -187,8 +188,6 @@ export let _tqCandleUsed = false;
 export let _tqCandleUsable = false;
 // True once the player has cast Fireball at least once.
 export let _tqFireballUsed = false;
-// True once the player dragged Fireball onto the hotbar.
-export let _tqFireballEquipped = false;
 // Puzzle 3: true only while the spellbook is open during the drag lesson -
 // pauses the encounter so the rat cannot chew on the player while they read
 // the book. Cleared when the book closes or the lesson ends.
@@ -536,7 +535,7 @@ const _TQ_EXIT_BUTTON_IDS = ['btn-hud-levels', 'btn-go-levels', 'btn-win-levels'
 // True while the player is on a tutorial-quest level (the exit lock applies).
 export function _tqIsTutorialLevelActive() {
     try {
-        return !!(globalThis.cur && globalThis.cur.isTutorialQuest
+        return !!(cur && cur.isTutorialQuest
             && typeof _tqPhase !== 'undefined' && _tqPhase);
     } catch (e) { return false; }
 }
@@ -958,7 +957,7 @@ export function _tqHighlightAmbiguousCells() {
 
 // True when grid input is currently restricted anywhere in the tutorial.
 export function _tqIsGridInputLocked() {
-    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.isTutorialQuest) return false;
+    if (typeof cur === 'undefined' || !cur || !cur.isTutorialQuest) return false;
     if (_tqGridLocked) return true;
     if (_tqPhase === 'p2') {
         if (_tqP2HeartOpen) return true;
@@ -1050,8 +1049,8 @@ export const TQ_TASKS = {
     // Solution-0 corners accept any non-fill state (empty, ✕ mark or ?) so
     // a player who marked the empties while learning is never soft-locked.
     corner_deduced: () => {
-        if (typeof userGrid === 'undefined' || !globalThis.userGrid || typeof cur === 'undefined' || !globalThis.cur) return false;
-        return TQ_CORNER_CELLS.every(([r, c]) => (globalThis.cur.grid[r][c] === 1 ? globalThis.userGrid[r][c] === 1 : globalThis.userGrid[r][c] !== 1));
+        if (typeof userGrid === 'undefined' || !globalThis.userGrid || typeof cur === 'undefined' || !cur) return false;
+        return TQ_CORNER_CELLS.every(([r, c]) => (cur.grid[r][c] === 1 ? globalThis.userGrid[r][c] === 1 : globalThis.userGrid[r][c] !== 1));
     },
     // Puzzle 2: first correct grid reveal during the damage lesson. The
     // damage-explanation bubble stays up until the player has dealt damage
@@ -1146,11 +1145,9 @@ export const TQ_TASKS = {
     // Puzzle 3: the spellbook was opened.
     open_spellbook: () => typeof isSpellbookOpen === 'function' && isSpellbookOpen(),
     // Puzzle 3: the Scroll of Fireball was dragged into a spell slot, which
-    // unlocks the Fireball in the spell book (js/skills/skill-charms.js).
+    // unlocks the Fireball on the matching hotbar key (slot N = hotbar key N).
     slot_fireball: () => typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.charmSlots)
         && STATE.charmSlots.indexOf('fireball#1') !== -1,
-    // Puzzle 3: Fireball sits on the hotbar.
-    drag_fireball: () => typeof isSkillOnHotbar === 'function' && isSkillOnHotbar('fireball'),
     // Puzzle 3: Fireball was cast. If the ghost already died, the cast
     // lesson is moot: auto-skip instead of demanding a cast at nothing.
     cast_fireball: () => _tqFireballUsed
@@ -1165,11 +1162,11 @@ export const TQ_TASKS = {
     // filled - the "shape" lesson. (The corner cannot be filled before the
     // candle; empty cells stay empty - marks are fine, fills are mistakes.)
     cross_filled: () => {
-        if (typeof userGrid === 'undefined' || !globalThis.userGrid || !globalThis.userGrid[0] || typeof cur === 'undefined' || !globalThis.cur) return false;
+        if (typeof userGrid === 'undefined' || !globalThis.userGrid || !globalThis.userGrid[0] || typeof cur === 'undefined' || !cur) return false;
         for (let r = 0; r < 5; r++) {
             for (let c = 0; c < 5; c++) {
                 if (TQ_CORNER_CELLS.some(([ar, ac]) => ar === r && ac === c)) continue;
-                if (globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1) return false;
+                if (cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1) return false;
             }
         }
         return true;
@@ -1224,21 +1221,19 @@ export function _tqPhaseSteps() {
             // Charm lesson: the bat drops a Fireball charm onto the grid.
             { say: 'tq_p3_s4', fn: () => { _tqPlaceCharmDrop(); _tqPointAtDrop('.eg-charm-overlay, [id^="eg-charm-"]'); } },
             { task: 'pick_charm' },
-            // Spellbook lessons: slot the charm, then hotbar the spell. No
-            // monster is alive, so no spellbook pause is needed.
+            // Spellbook lesson: slot the charm and Fireball appears on the
+            // matching hotbar key (slot N = hotbar key N). No drag step.
             { say: 'tq_p3_s5' },
             { fn: () => { _tqShowKeycapChip('spellbook', t('tq_chip_spellbook')); } },
             { task: 'open_spellbook' },
             { say: 'tq_p3_s6', wait: true, fn: () => { _tqClearHighlights(); _tqPointAtDrop('.charm-item[data-charm-key="fireball#1"]'); } },
             { task: 'slot_fireball' },
-            { say: 'tq_p3_s7', wait: true, fn: () => { _tqClearHighlights(); _tqPointAtDrop('.spellbook-entry[data-skill="fireball"]'); } },
-            { task: 'drag_fireball' },
             { fn: () => { try { if (typeof isSpellbookOpen === 'function' && isSpellbookOpen() && typeof closeSpellbook === 'function') closeSpellbook(); } catch (e) {} _tqClearHighlights(); try { if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar(); } catch (e) {} } },
             // Fireball lesson: the ghost is immune to blades - burn it down.
-            { say: 'tq_p3_s8', task: 'fireball_kill', fn: () => { _tqSpawnP3Ghost(); _tqPointAt('.skill-hotbar-slot[data-skill="fireball"]'); } },
+            { say: 'tq_p3_s7', task: 'fireball_kill', fn: () => { _tqSpawnP3Ghost(); _tqPointAt('.skill-hotbar-slot[data-skill="fireball"]'); } },
             { fn: () => { _tqGridLocked = false; _tqClearHighlights(); _tqRefreshGridLockBorder(); } },
-            { say: 'tq_p3_s9', task: 'solve_puzzle' },
-            { say: 'tq_p3_s10', wait: true },
+            { say: 'tq_p3_s8', task: 'solve_puzzle' },
+            { say: 'tq_p3_s9', wait: true },
         ];
         default: return [];
     }
@@ -1559,7 +1554,7 @@ export function _tqGiveCandle() {
 export function _tqUseTutorialCandle(def) {
     if (typeof questStat_revealItemUsed === 'function') questStat_revealItemUsed();
     const [ar, ac] = TQ_AMBIGUOUS_CELLS[0];
-    if (globalThis.cur.grid[ar][ac] === 1 && globalThis.userGrid[ar][ac] !== 1) {
+    if (cur.grid[ar][ac] === 1 && globalThis.userGrid[ar][ac] !== 1) {
         globalThis.revealedGrid[ar][ac] = true;
         globalThis.userGrid[ar][ac] = 1;
         renderCell(ar, ac);
@@ -1637,7 +1632,7 @@ export function _tqPlaceSwordDrop() {
         _tqEnsureFireball();
         if (typeof EG_ALL_BASE_TYPES === 'undefined'
             || typeof _egvBuildBaseItemFromBase !== 'function'
-            || typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid
+            || typeof cur === 'undefined' || !cur || !cur.grid
             || typeof userGrid === 'undefined' || !globalThis.userGrid) {
             _tqGrantSwordToStash();
             return;
@@ -1650,7 +1645,7 @@ export function _tqPlaceSwordDrop() {
         item.noSellValue = true;   // loot-filter proof, like the starter gear
         item.isTutorialSword = true;
         const key = '2-2';
-        if (globalThis.cur.grid[2][2] !== 1 || globalThis.userGrid[2][2] !== 0) { _tqGrantSwordToStash(); return; }
+        if (cur.grid[2][2] !== 1 || globalThis.userGrid[2][2] !== 0) { _tqGrantSwordToStash(); return; }
         _egLootDrops.set(key, item);
         if (typeof _egRenderLootOverlay === 'function') _egRenderLootOverlay(2, 2, item);
         // No expiry: unlike normal loot, the lesson drop waits until claimed.
@@ -1692,9 +1687,9 @@ export function _tqPlaceCharmDrop() {
         _tqEnsureFireball();
         if (typeof _charmMake !== 'function'
             || typeof _egCharmDrops === 'undefined'
-            || typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid
+            || typeof cur === 'undefined' || !cur || !cur.grid
             || typeof userGrid === 'undefined' || !globalThis.userGrid
-            || globalThis.cur.grid[2][0] !== 1 || globalThis.userGrid[2][0] !== 0) {
+            || cur.grid[2][0] !== 1 || globalThis.userGrid[2][0] !== 0) {
             if (typeof grantCharm === 'function') grantCharm('fireball', 1);
             _tqP3CharmClaimed = true;
             return;
@@ -1733,9 +1728,9 @@ export function _tqSpawnP3Bat() {
     _tqClearStaleFillDamage();
     try {
         if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) { _tqSawMonster = true; return; }
-        if (typeof cur !== 'undefined' && globalThis.cur) {
-            globalThis.cur.campaignMonsterHp = 45;
-            globalThis.cur.campaignMonsterDamage = 3;
+        if (typeof cur !== 'undefined' && cur) {
+            cur.campaignMonsterHp = 45;
+            cur.campaignMonsterDamage = 3;
         }
         if (typeof _egSpawnMonster === 'function') _egSpawnMonster('bat', 1);
         _tqSawMonster = true;
@@ -1750,9 +1745,9 @@ export function _tqSpawnP3Ghost() {
     _tqP3GhostSpawned = true;
     try {
         if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) { _tqSawMonster = true; return; }
-        if (typeof cur !== 'undefined' && globalThis.cur) {
-            globalThis.cur.campaignMonsterHp = 50;
-            globalThis.cur.campaignMonsterDamage = 3;
+        if (typeof cur !== 'undefined' && cur) {
+            cur.campaignMonsterHp = 50;
+            cur.campaignMonsterDamage = 3;
         }
         if (typeof _egSpawnMonster === 'function') _egSpawnMonster('ghost', 1);
         try {
@@ -1853,11 +1848,11 @@ export function _tqCheckGearFillsBackstop() {
     if (_tqP2DropsBoardBackstop || _tqP2GearClaimed) return;
     if (_tqP2GearSettleAt && Date.now() < _tqP2GearSettleAt) return;   // placements still in flight
     if (_tqCountGearDrops() > 0) return;
-    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid
+    if (typeof cur === 'undefined' || !cur || !cur.grid
         || typeof userGrid === 'undefined' || !globalThis.userGrid) return;
-    for (let r = 0; r < globalThis.cur.grid.length; r++) {
-        for (let c = 0; c < globalThis.cur.grid[r].length; c++) {
-            if (globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] === 0) return;   // cells still open
+    for (let r = 0; r < cur.grid.length; r++) {
+        for (let c = 0; c < cur.grid[r].length; c++) {
+            if (cur.grid[r][c] === 1 && globalThis.userGrid[r][c] === 0) return;   // cells still open
         }
     }
     _tqP2DropsBoardBackstop = true;
@@ -1950,12 +1945,12 @@ export function _tqGrantStarterGear() {
 // so a claimed cell is never reused. Returns true on success.
 export function _tqPlaceGearDrop(item) {
     try {
-        if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid
+        if (typeof cur === 'undefined' || !cur || !cur.grid
             || typeof userGrid === 'undefined' || !globalThis.userGrid) return false;
         const open = [];
-        for (let r = 0; r < globalThis.cur.grid.length; r++) {
-            for (let c = 0; c < globalThis.cur.grid[r].length; c++) {
-                if (globalThis.cur.grid[r][c] !== 1) continue;             // gear lives on solution cells
+        for (let r = 0; r < cur.grid.length; r++) {
+            for (let c = 0; c < cur.grid[r].length; c++) {
+                if (cur.grid[r][c] !== 1) continue;             // gear lives on solution cells
                 if (globalThis.userGrid[r][c] !== 0) continue;             // untouched only
                 if (typeof revealedGrid !== 'undefined' && globalThis.revealedGrid[r] && globalThis.revealedGrid[r][c]) continue;
                 if (typeof wrongGrid !== 'undefined' && globalThis.wrongGrid[r] && globalThis.wrongGrid[r][c]) continue;
@@ -2264,8 +2259,8 @@ export function _tqCastFireball() {
     }
 
     // 2b. Prevent the hotbar auto-seeder from placing Fireball on the bar -
-    // the player must drag it there themselves (lesson 3). Only the explicit
-    // setHotbarSlot drag counts.
+    // the player must slot its charm first (lesson 3). The hotbar mirrors
+    // the spell slots 1:1, so the auto-seeder must not pre-place it.
     if (typeof ensureSkillHotbar === 'function' && !window._tqWrappedEnsureHotbar) {
         window._tqWrappedEnsureHotbar = true;
         const _orig = globalThis.ensureSkillHotbar;
@@ -2283,14 +2278,16 @@ export function _tqCastFireball() {
                     if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
                 }
             }
-            if (_tqFireballEquipped) return r;
-            // The Fireball self-drag lesson only runs inside the tutorial:
+            // The Fireball self-slot lesson only runs inside the tutorial:
             // outside it a classless campaign character may legitimately keep
             // Fireball on the bar (universal charm play), so never strip it
             // there - a reload would otherwise eat the saved loadout.
             try {
                 if ((typeof _tqIsTutorialActive === 'function') && !_tqIsTutorialActive()) return r;
             } catch (e) { return r; }
+            // Since the hotbar mirrors charm slots 1:1, Fireball will only
+            // appear once its charm is slotted. The auto-seeder should not
+            // pre-place it. If it somehow did, clear it.
             const idx = STATE.skillHotbar.indexOf('fireball');
             if (idx !== -1) {
                 STATE.skillHotbar[idx] = null;
@@ -2310,7 +2307,7 @@ export function _tqCastFireball() {
         window._tqWrappedReplayLevel = true;
         const _orig = globalThis.replayLevel;
         globalThis.replayLevel = function () {
-            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest
+            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest
                 && typeof restartTutorialQuest === 'function') {
                 restartTutorialQuest();
                 return;
@@ -2370,7 +2367,7 @@ export function _tqCastFireball() {
         window._tqWrappedCheckWin = true;
         const _orig = globalThis.checkWin;
         globalThis.checkWin = function () {
-            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
+            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
                 if (!isPuzzleSolved()) return;
                 _tqOnPuzzleSolved();
                 return;
@@ -2384,7 +2381,7 @@ export function _tqCastFireball() {
         window._tqWrappedPrepEnc = true;
         const _orig = globalThis._egShouldPrepareCampaignEncounter;
         globalThis._egShouldPrepareCampaignEncounter = function () {
-            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest && globalThis.cur.tqPuzzle === 0) return false;
+            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest && cur.tqPuzzle === 0) return false;
             return _orig();
         };
     }
@@ -2400,7 +2397,7 @@ export function _tqCastFireball() {
         window._tqWrappedIntercepts = true;
         const _orig = globalThis.checkSpecialIntercepts;
         globalThis.checkSpecialIntercepts = function (row, col) {
-            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
+            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
                 // Puzzle-2 heart gate: the post-kill board is fully locked
                 // and only a LEFT-click on the Professor's heart cell is
                 // accepted. Right-click is disallowed here - on this full-
@@ -2439,7 +2436,7 @@ export function _tqCastFireball() {
                 // empty solution cell under the item claims it (the
                 // Professor literally locks the field to the loot). A ✕
                 // mark would be a wrong fill on a solution cell.
-                if (_tqP2GateOpen && typeof cur !== 'undefined' && globalThis.cur) {
+                if (_tqP2GateOpen && typeof cur !== 'undefined' && cur) {
                     const key = `${row}-${col}`;
                     const isDropCell = (typeof _egLootDrops !== 'undefined' && _egLootDrops.has(key))
                         || (typeof _egPickups !== 'undefined' && _egPickups.has(key));
@@ -2460,7 +2457,7 @@ export function _tqCastFireball() {
                 // corner before the candle - filling the anti-diagonal would
                 // be a blind 50/50 mistake (its cells are empty in the
                 // canonical solution but unprovable either way).
-                if (!_tqCandleUsed && globalThis.cur.tqPuzzle === 0
+                if (!_tqCandleUsed && cur.tqPuzzle === 0
                     && TQ_CORNER_CELLS.some(([r, c]) => r === row && c === col)
                     && pval === 1) {
                     _tqAmbiguityToast();
@@ -2478,7 +2475,7 @@ export function _tqCastFireball() {
         const _orig = globalThis._egOnCorrectCell;
         globalThis._egOnCorrectCell = function (row, col) {
             const r = _orig(row, col);
-            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest && globalThis.cur.tqPuzzle === 1) {
+            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest && cur.tqPuzzle === 1) {
                 _tqCountCorrectFill();
             }
             return r;
@@ -2516,9 +2513,9 @@ export function _tqCastFireball() {
         window._tqWrappedLootSpawn = true;
         const _orig = globalThis._egSpawnLootDrop;
         globalThis._egSpawnLootDrop = function (...args) {
-            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest
-                && ((globalThis.cur.tqPuzzle === 1 && _tqPhase === 'p2')
-                    || (globalThis.cur.tqPuzzle === 2 && _tqPhase === 'p3'))) return;
+            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest
+                && ((cur.tqPuzzle === 1 && _tqPhase === 'p2')
+                    || (cur.tqPuzzle === 2 && _tqPhase === 'p3'))) return;
             return _orig(...args);
         };
     }
@@ -2537,7 +2534,7 @@ export function _tqCastFireball() {
         const _orig = globalThis._egSpawnPickup;
         globalThis._egSpawnPickup = function (...args) {
             if (typeof _tqPhase !== 'undefined' && _tqPhase
-                && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
+                && typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
             return _orig(...args);
         };
     }
@@ -2552,7 +2549,7 @@ export function _tqCastFireball() {
             const _orig = window[fnName];
             window[fnName] = function (...args) {
                 if (typeof _tqPhase !== 'undefined' && _tqPhase
-                    && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
+                    && typeof cur !== 'undefined' && cur && cur.isTutorialQuest) return;
                 return _orig(...args);
             };
         }
@@ -2566,7 +2563,7 @@ export function _tqCastFireball() {
         globalThis.useItem = function (uid) {
             const item = STATE.inventory.find(i => i.uid === uid);
             if (item && item.defId === 'reveal1' && item.isTutorialCandle
-                && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
+                && typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
                 // The candle may only be lit once the Professor's use-candle
                 // step is showing (puzzle 1 s11) - lighting it straight after
                 // receiving it (s10) would skip the explanation.
@@ -2579,25 +2576,14 @@ export function _tqCastFireball() {
             }
             const wasCandle = item && item.defId === 'reveal1';
             const r = _orig(uid);
-            if (wasCandle && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
+            if (wasCandle && typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
                 _tqCandleUsed = true;
             }
             return r;
         };
     }
 
-    // 5b. Detect the Fireball drag onto the hotbar (lesson 3 task).
-    if (typeof setHotbarSlot === 'function' && !window._tqWrappedSetHotbar) {
-        window._tqWrappedSetHotbar = true;
-        const _orig = globalThis.setHotbarSlot;
-        globalThis.setHotbarSlot = function (slotIndex, skillId) {
-            const r = _orig(slotIndex, skillId);
-            if (skillId === 'fireball' && r) _tqFireballEquipped = true;
-            return r;
-        };
-    }
-
-    // 5c. Groan reply: when a REAL mistake lands during a tutorial lesson
+    // 5b. Groan reply: when a REAL mistake lands during a tutorial lesson
     //      (guided mistake demo included), the character reacts to it.
     //      Wrapped here (not in applyRealMistake) so normal campaign levels
     //      keep their existing mistake banter behaviour untouched.
@@ -2606,7 +2592,7 @@ export function _tqCastFireball() {
         const _orig = globalThis.applyRealMistake;
         globalThis.applyRealMistake = function (row, col) {
             const r = _orig(row, col);
-            if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
+            if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
                 _tqPlayerReply(5000, 'tutorial_mistake');
             }
             return r;
@@ -2650,7 +2636,6 @@ export function startTutorialQuest() {
     _tqCandleUsed = false;
     _tqCandleUsable = false;
     _tqFireballUsed = false;
-    _tqFireballEquipped = false;
     _tqPuzzleSolvedFlag = false;
     _tqSawMonster = false;
     // Tutorial entry: play one random tutorial track (kept across all three

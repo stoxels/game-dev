@@ -9,6 +9,7 @@ import { EG_MONSTER_PROJ_DURATION_MS, _egGameOver, _egHideBlockLockoutOverlay, _
 import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ELEMENTAL AILMENTS SYSTEM----------------------------
@@ -626,7 +627,7 @@ export function _egMaybePuzzleAttack(monster) {
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
     const grid = document.getElementById('ptable');
     if (!sourceCard || !grid || typeof _egFireProjectile !== 'function') return false;
-    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid || !globalThis.cur.grid.length) return false;
+    if (typeof cur === 'undefined' || !cur || !cur.grid || !cur.grid.length) return false;
 
     const start = (typeof _egGetElementCentre === 'function') ? _egGetElementCentre(sourceCard) : null;
     const end = (typeof _egGetElementCentre === 'function') ? _egGetElementCentre(grid) : null;
@@ -653,8 +654,8 @@ export function _egApplyPuzzleAilment(element) {
 
 // Picks a random valid cell for hazard placement (unfilled, unrevealed).
 export function _egPickHazardCell(existingKeys, radiusCenter) {
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     for (let tries = 0; tries < 40; tries++) {
         let r, c;
         if (radiusCenter && tries < 20) {
@@ -715,7 +716,7 @@ export function _egClearAllPuzzleEffects() {
 
 export function _egPuzzleLava() {
     if (_egPuzzleEffects.some(e => e.type === 'lava')) return;
-    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length, cols = cur.grid[0].length;
     const center = { r: Math.floor(rows / 2), c: Math.floor(cols / 2) };
     const cells = new Map(); // key → overlay span id
 
@@ -751,7 +752,7 @@ export function _egIsLavaCell(row, col) {
 
 export function _egPuzzleIce() {
     if (_egPuzzleEffects.some(e => e.type === 'ice')) return;
-    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length, cols = cur.grid[0].length;
     const center = { r: Math.floor(rows / 2), c: Math.floor(cols / 2) };
     const cells = new Map();
 
@@ -787,7 +788,7 @@ export function _egPuzzleIceRedirect(row, col) {
     const neighbours = [
         [row - 1, col], [row + 1, col], [row, col - 1], [row, col + 1],
     ].filter(([r, c]) =>
-        r >= 0 && c >= 0 && r < globalThis.cur.grid.length && c < globalThis.cur.grid[0].length
+        r >= 0 && c >= 0 && r < cur.grid.length && c < cur.grid[0].length
         && !globalThis.revealedGrid[r][c]
     );
     if (neighbours.length === 0) return false;
@@ -899,8 +900,8 @@ export function _egOnCorrectCellPuzzleFX(row, col) {
 
     // Collect all currently ✕-marked cells, regardless of distance from reveal
     const marked = [];
-    for (let r = 0; r < globalThis.cur.grid.length; r++) {
-        for (let c = 0; c < globalThis.cur.grid[0].length; c++) {
+    for (let r = 0; r < cur.grid.length; r++) {
+        for (let c = 0; c < cur.grid[0].length; c++) {
             if (globalThis.userGrid[r][c] === 2) marked.push([r, c]);
         }
     }
@@ -995,7 +996,7 @@ export function _egApplyPuzzleArcaneBomb() {
     const bomb = { type: 'arcanebomb', row: pick.r, col: pick.c, until: Date.now() + EG_PUZZLE_EFFECT_DURATION_MS, el: icon };
     bomb.timer = setTimeout(() => {
         const adjacent = [[pick.r-1,pick.c-1],[pick.r-1,pick.c],[pick.r-1,pick.c+1],[pick.r,pick.c-1],[pick.r,pick.c+1],[pick.r+1,pick.c-1],[pick.r+1,pick.c],[pick.r+1,pick.c+1]];
-        const marks = adjacent.filter(([r,c]) => r >= 0 && c >= 0 && r < globalThis.cur.grid.length && c < globalThis.cur.grid[0].length && globalThis.userGrid[r][c] === 2).length;
+        const marks = adjacent.filter(([r,c]) => r >= 0 && c >= 0 && r < cur.grid.length && c < cur.grid[0].length && globalThis.userGrid[r][c] === 2).length;
         const amount = Math.max(1, marks * 8);
         _egPlayerTakeDamage(amount, true, 'arcane');
         _egRemovePuzzleEffect(bomb);
@@ -1006,7 +1007,7 @@ export function _egApplyPuzzleArcaneBomb() {
 
 export function _egPuzzleShadowBlackout() {
     if (_egPuzzleEffects.some(e => e.type === 'shadowline')) return;
-    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length, cols = cur.grid[0].length;
     const isRow = Math.random() < 0.5;
     const idx = isRow ? Math.floor(Math.random() * rows) : Math.floor(Math.random() * cols);
     const prefix = isRow ? `rn-${idx}-` : `cn-${idx}-`;

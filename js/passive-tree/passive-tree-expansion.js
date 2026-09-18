@@ -8,6 +8,7 @@ import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 //----------------------------------------------------------------------------------------
 //-------------------PASSIVE TREE EXPANSION (nodes 303-402)-------------------------------
 //----------------------------------------------------------------------------------------
@@ -102,7 +103,7 @@ export function _ptxRunExpansion() {
     //--------------------------------------------------------------------------
 
     function addSecs(n) {
-        if (!globalThis.cur || globalThis.dead || n <= 0) return 0;
+        if (!cur || globalThis.dead || n <= 0) return 0;
         // Map-run "% less Time gained" applies centrally in timer-adjust.js;
         // return the previewed amount so toast/FX text shows what lands.
         const shown = previewGainSecs(n);
@@ -111,12 +112,12 @@ export function _ptxRunExpansion() {
     }
 
     function loseSecs(n) {
-        if (!globalThis.cur || globalThis.dead || n <= 0) return;
+        if (!cur || globalThis.dead || n <= 0) return;
         subtractTimeSecs(n);
     }
 
     function freeze(ms) {
-        if (!globalThis.cur || globalThis.dead) return;
+        if (!cur || globalThis.dead) return;
         // Shared timer-freeze mechanic - its Clock-guarded release fixes the
         // old raw-write version, which could cut the Clock boss's 30 s Time
         // Freeze short when a tree freeze ended.
@@ -140,8 +141,8 @@ export function _ptxRunExpansion() {
 
     // Reveals one specific solution cell (guards included).
     function revealAt(r, c) {
-        if (!globalThis.cur) return false;
-        const sol = globalThis.cur.grid;
+        if (!cur) return false;
+        const sol = cur.grid;
         if (sol[r][c] !== 1) return false;
         if (globalThis.userGrid[r][c] === 1 || globalThis.revealedGrid[r][c]) return false;
         globalThis.revealedGrid[r][c] = true;
@@ -157,8 +158,8 @@ export function _ptxRunExpansion() {
 
     // Marks one specific truly-empty cell.
     function markAt(r, c) {
-        if (!globalThis.cur) return false;
-        const sol = globalThis.cur.grid;
+        if (!cur) return false;
+        const sol = cur.grid;
         if (sol[r][c] !== 0) return false;
         if (globalThis.userGrid[r][c] !== 0 && globalThis.userGrid[r][c] !== 3) return false;
         if (globalThis.wrongGrid[r][c]) return false;
@@ -170,8 +171,8 @@ export function _ptxRunExpansion() {
 
     // Returns [r,c] of a random candidate satisfying pick(), or null.
     function randomCell(pick) {
-        if (!globalThis.cur) return null;
-        const sol = globalThis.cur.grid;
+        if (!cur) return null;
+        const sol = cur.grid;
         const pool = [];
         for (let r = 0; r < sol.length; r++)
             for (let c = 0; c < sol[0].length; c++)
@@ -182,12 +183,12 @@ export function _ptxRunExpansion() {
 
     const ORTHO = [[-1, 0], [1, 0], [0, -1], [0, 1]];
     function inGrid(r, c) {
-        return globalThis.cur && r >= 0 && c >= 0 && r < globalThis.cur.grid.length && c < globalThis.cur.grid[0].length;
+        return cur && r >= 0 && c >= 0 && r < cur.grid.length && c < cur.grid[0].length;
     }
 
     // Line fill stats copied from timer.js semantics.
     function lineFillStats(index, isRow) {
-        const sol = globalThis.cur.grid;
+        const sol = cur.grid;
         const other = isRow ? sol[0].length : sol.length;
         let filled = 0, total = 0;
         for (let i = 0; i < other; i++) {
@@ -287,7 +288,7 @@ export function _ptxRunExpansion() {
 
     ON_START.push(() => {   // Stratosphere Read (304)
         if (!has('stratosphere_read')) return;
-        const lastRow = globalThis.cur.grid.length - 1;
+        const lastRow = cur.grid.length - 1;
         const cell = randomCell((r, c) => r === lastRow);
         if (cell && revealAt(cell[0], cell[1])) toast('🎈 Stratosphere Read');
     });
@@ -300,14 +301,14 @@ export function _ptxRunExpansion() {
 
     ON_START.push(() => {   // Zenith Glimpse (306)
         if (!has('zenith_glimpse')) return;
-        const lastCol = globalThis.cur.grid[0].length - 1;
+        const lastCol = cur.grid[0].length - 1;
         const cell = randomCell((r, c) => c === lastCol);
         if (cell && markAt(cell[0], cell[1])) toast('☀️ Zenith Glimpse');
     });
 
     ON_START.push(() => {   // Cartographer's Oath keystone (307)
         if (!has('keystone_cartographers_oath')) return;
-        const sol = globalThis.cur.grid;
+        const sol = cur.grid;
         const rows = sol.length, cols = sol[0].length;
         let touched = 0;
         const walk = (r, c) => {
@@ -335,7 +336,7 @@ export function _ptxRunExpansion() {
 
     ON_START.push(() => {   // Entropy Observer (312)
         if (!has('entropy_observer')) return;
-        const sol = globalThis.cur.grid;
+        const sol = cur.grid;
         let sparsest = 0, min = Infinity;
         for (let r = 0; r < sol.length; r++) {
             const f = sol[r].filter(v => v === 1).length;
@@ -347,7 +348,7 @@ export function _ptxRunExpansion() {
 
     ON_START.push(() => {   // Prior Art (366)
         if (!has('prior_art')) return;
-        const sol = globalThis.cur.grid;
+        const sol = cur.grid;
         let densest = 0, max = -1;
         for (let r = 0; r < sol.length; r++) {
             const f = sol[r].filter(v => v === 1).length;
@@ -360,7 +361,7 @@ export function _ptxRunExpansion() {
     ON_START.push(() => {   // Shannon Bound (313)
         if (!has('shannon_bound')) return;
         const target = randomCell((r, c) =>
-            globalThis.cur.grid[r][c] === 0 && globalThis.userGrid[r][c] === 0 &&
+            cur.grid[r][c] === 0 && globalThis.userGrid[r][c] === 0 &&
             ORTHO.some(([dr, dc]) => inGrid(r + dr, c + dc) && globalThis.revealedGrid[r + dr][c + dc]));
         if (target && markAt(target[0], target[1])) toast('📶 Shannon Bound');
     });
@@ -368,18 +369,18 @@ export function _ptxRunExpansion() {
     ON_START.push(() => {   // Mutual Information (314)
         if (!has('mutual_information')) return;
         const target = randomCell((r, c) =>
-            globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c] &&
+            cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c] &&
             (rowHasRevealed(r) || colHasRevealed(c)));
         if (target) { revealAt(target[0], target[1]); toast('🔗 Mutual Information'); }
         else revealTiles(1);
     });
 
     function rowHasRevealed(r) {
-        for (let c = 0; c < globalThis.cur.grid[0].length; c++) if (globalThis.revealedGrid[r][c]) return true;
+        for (let c = 0; c < cur.grid[0].length; c++) if (globalThis.revealedGrid[r][c]) return true;
         return false;
     }
     function colHasRevealed(c) {
-        for (let r = 0; r < globalThis.cur.grid.length; r++) if (globalThis.revealedGrid[r][c]) return true;
+        for (let r = 0; r < cur.grid.length; r++) if (globalThis.revealedGrid[r][c]) return true;
         return false;
     }
 
@@ -387,7 +388,7 @@ export function _ptxRunExpansion() {
 
     ON_START.push(() => {   // Umbral Survey (337)
         if (!has('umbral_survey')) return;
-        const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+        const rows = cur.grid.length, cols = cur.grid[0].length;
         const midR = Math.floor(rows / 2), midC = Math.floor(cols / 2);
         const quads = [
             [0, midR, 0, midC], [0, midR, midC, cols],
@@ -397,7 +398,7 @@ export function _ptxRunExpansion() {
         quads.forEach(([r0, r1, c0, c1]) => {
             const cell = randomCell((r, c) =>
                 r >= r0 && r < r1 && c >= c0 && c < c1 &&
-                globalThis.cur.grid[r][c] === 0 && globalThis.userGrid[r][c] === 0);
+                cur.grid[r][c] === 0 && globalThis.userGrid[r][c] === 0);
             if (cell && markAt(cell[0], cell[1])) marked++;
         });
         if (marked) toast('🌑 Umbral Survey');
@@ -431,16 +432,16 @@ export function _ptxRunExpansion() {
     // Census (385) ------------------------------------------------------------------
 
     ON_START.push(() => {
-        if (!has('census') || !globalThis.cur) return;
-        const total = globalThis.cur.grid.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
+        if (!has('census') || !cur) return;
+        const total = cur.grid.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
         toast(`🗂️ Census: ${total} filled cells in total`);
     });
 
     // Measure Zero (343) --------------------------------------------------------------
 
     ON_START.push(() => {
-        if (!has('measure_zero') || !globalThis.cur) return;
-        const sol = globalThis.cur.grid;
+        if (!has('measure_zero') || !cur) return;
+        const sol = cur.grid;
         const rows = sol.length, cols = sol[0].length;
         let done = 0;
         for (let r = 0; r < rows; r++) {
@@ -614,7 +615,7 @@ export function _ptxRunExpansion() {
         if (type !== 'col' || !has('collapse_point')) return;
         [-1, 1].forEach(dc => {
             const nc = idx + dc;
-            if (nc < 0 || nc >= globalThis.cur.grid[0].length) return;
+            if (nc < 0 || nc >= cur.grid[0].length) return;
             const cell = randomCell((r, c) => c === nc);
             if (cell) revealAt(cell[0], cell[1]);
         });
@@ -648,14 +649,14 @@ export function _ptxRunExpansion() {
 
     TICKS.push(() => {   // Wiener Process (318)
         if (!has('wiener_process') || S.tick % 90 !== 0 || S.tick === 0) return;
-        const cell = randomCell((r, c) => globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]);
+        const cell = randomCell((r, c) => cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]);
         if (!cell) return;
         const [r, c] = cell;
         const prev = globalThis.userGrid[r][c];
         globalThis.userGrid[r][c] = 1;
         renderCell(r, c);
         setTimeout(() => {
-            if (!globalThis.cur) return;
+            if (!cur) return;
             if (globalThis.userGrid[r][c] === 1 && !globalThis.revealedGrid[r][c]) {
                 globalThis.userGrid[r][c] = prev;
                 renderCell(r, c);
@@ -673,7 +674,7 @@ export function _ptxRunExpansion() {
     });
 
     TICKS.push(() => {   // Hypothesis Testing (368) / Expected Shortfall (402) / Stationary State (356) / Axiom of Choice (344)
-        if (!globalThis.cur || !baseTime()) return;
+        if (!cur || !baseTime()) return;
 
         const frac = globalThis.timerSecs / baseTime();
 
@@ -697,9 +698,9 @@ export function _ptxRunExpansion() {
         if (has('keystone_axiom_of_choice') && !S.axiomUsed && frac <= 0.25) {
             S.axiomUsed = true;
             let remaining = 0;
-            for (let r = 0; r < globalThis.cur.grid.length; r++)
-                for (let c = 0; c < globalThis.cur.grid[0].length; c++)
-                    if (globalThis.cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]) remaining++;
+            for (let r = 0; r < cur.grid.length; r++)
+                for (let c = 0; c < cur.grid[0].length; c++)
+                    if (cur.grid[r][c] === 1 && globalThis.userGrid[r][c] !== 1 && !globalThis.revealedGrid[r][c]) remaining++;
             const n = Math.ceil(remaining * 0.05);
             if (n > 0) { revealTiles(n); toast(`🎲 Axiom of Choice: ${n} cells revealed`); }
         }
@@ -710,8 +711,8 @@ export function _ptxRunExpansion() {
         if (!window._emergencyScanFired || S.powerScan2Fired) return;
         if (globalThis.timerSecs > 120 || globalThis.timerSecs <= 0) return;
         S.powerScan2Fired = true;
-        const fullSize = Math.max(globalThis.cur.grid.length, globalThis.cur.grid[0].length);
-        _executeFieldScan(Math.floor(globalThis.cur.grid.length / 2), Math.floor(globalThis.cur.grid[0].length / 2), fullSize, _calcEmergencyScanDuration());
+        const fullSize = Math.max(cur.grid.length, cur.grid[0].length);
+        _executeFieldScan(Math.floor(cur.grid.length / 2), Math.floor(cur.grid[0].length / 2), fullSize, _calcEmergencyScanDuration());
         toast('💪 Power Analysis: scan re-fired');
     });
 
@@ -762,8 +763,8 @@ export function _ptxRunExpansion() {
     // Priority: Kolmogorov > Uniform Prior > Nightfall (only one applies).
 
     function applyKolmogorov() {
-        if (!globalThis.cur) return;
-        const sol = globalThis.cur.grid;
+        if (!cur) return;
+        const sol = cur.grid;
         for (let r = 0; r < sol.length; r++) {
             const runs = clues(sol[r]);
             const txt = compressRuns(runs);
@@ -784,8 +785,8 @@ export function _ptxRunExpansion() {
     }
 
     function applyUniformPrior() {
-        if (!globalThis.cur) return;
-        const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+        if (!cur) return;
+        const rows = cur.grid.length, cols = cur.grid[0].length;
         S.clueOriginals = { rows: {}, cols: {} };
 
         // Backup originals
@@ -813,8 +814,8 @@ export function _ptxRunExpansion() {
     }
 
     function applyNightfall() {
-        if (!globalThis.cur) return;
-        const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+        if (!cur) return;
+        const rows = cur.grid.length, cols = cur.grid[0].length;
         S.clueOriginals = { rows: {}, cols: {} };
         for (let r = 0; r < rows; r++) {
             S.clueOriginals.rows[r] = readLineSpans('row', r);
@@ -827,7 +828,7 @@ export function _ptxRunExpansion() {
         toast('🌃 Nightfall Protocol: clues hidden for 2 minutes');
 
         setTimeout(() => {
-            if (!globalThis.cur || !S.clueOriginals) return;
+            if (!cur || !S.clueOriginals) return;
             for (const r of Object.keys(S.clueOriginals.rows)) writeLineSpans('row', Number(r), S.clueOriginals.rows[r]);
             for (const c of Object.keys(S.clueOriginals.cols)) writeLineSpans('col', Number(c), S.clueOriginals.cols[c]);
             S.clueOriginals = null;
@@ -841,13 +842,13 @@ export function _ptxRunExpansion() {
     //--------------------------------------------------------------------------
 
     function snapshotLines() {
-        if (!globalThis.cur) { S.rowsPrimed = new Set(); S.colsPrimed = new Set(); return; }
+        if (!cur) { S.rowsPrimed = new Set(); S.colsPrimed = new Set(); return; }
         S.rowsPrimed = new Set();
         S.colsPrimed = new Set();
-        for (let r = 0; r < globalThis.cur.grid.length; r++)
-            if (_isRowSolved(globalThis.cur.grid, r)) S.rowsPrimed.add(r);
-        for (let c = 0; c < globalThis.cur.grid[0].length; c++)
-            if (_isColSolved(globalThis.cur.grid, c)) S.colsPrimed.add(c);
+        for (let r = 0; r < cur.grid.length; r++)
+            if (_isRowSolved(cur.grid, r)) S.rowsPrimed.add(r);
+        for (let c = 0; c < cur.grid[0].length; c++)
+            if (_isColSolved(cur.grid, c)) S.colsPrimed.add(c);
     }
 
     function fireIfNewlyDone(type, idx, primed) {
@@ -878,7 +879,7 @@ export function _ptxRunExpansion() {
     });
 
     function runClueFX() {
-        if (!globalThis.cur || globalThis.dead) return;
+        if (!cur || globalThis.dead) return;
         if (has('keystone_kolmogorov')) { applyKolmogorov(); return; }
         if (has('keystone_uniform_prior')) { applyUniformPrior(); return; }
         if (has('keystone_nightfall_protocol')) { applyNightfall(); return; }
@@ -903,7 +904,7 @@ export function _ptxRunExpansion() {
 
     patch('_initTimer', function (orig, args) {
         const result = orig(...args);
-        if (window._egSuppressEncounterStop || !globalThis.cur) return result;
+        if (window._egSuppressEncounterStop || !cur) return result;
 
         const FLATS = [
             ['wind_tunnel', 10], ['jet_stream', 15], ['cum_laude', 25],
@@ -946,7 +947,7 @@ export function _ptxRunExpansion() {
         const before = globalThis.mistakeCount;
         const result = orig(...args);
         const counted = globalThis.mistakeCount > before;
-        if (counted && globalThis.cur && !globalThis.dead) {
+        if (counted && cur && !globalThis.dead) {
             if (has('drift_correction')) S.driftMistakes++;
             ON_MISTAKE.forEach(fn => { try { fn(args[0], args[1]); } catch (e) { /* ignore */ } });
         }
@@ -957,7 +958,7 @@ export function _ptxRunExpansion() {
 
     patch('fireCorrectFillHooks', function (orig, args) {
         const result = orig(...args);
-        if (globalThis.cur && !globalThis.dead) {
+        if (cur && !globalThis.dead) {
             ON_FILL.forEach(fn => { try { fn(args[0], args[1]); } catch (e) { /* ignore */ } });
         }
         return result;
@@ -967,15 +968,15 @@ export function _ptxRunExpansion() {
 
     patch('updClues', function (orig, args) {
         const [row, col, isInitial] = args;
-        if (isInitial || !globalThis.cur) return orig(...args);
+        if (isInitial || !cur) return orig(...args);
 
         const rowWasDone = S.rowsPrimed ? S.rowsPrimed.has(row) : true;
         const colWasDone = S.colsPrimed ? S.colsPrimed.has(col) : true;
 
         const result = orig(...args);
 
-        const rowDone = _isRowSolved(globalThis.cur.grid, row);
-        const colDone = _isColSolved(globalThis.cur.grid, col);
+        const rowDone = _isRowSolved(cur.grid, row);
+        const colDone = _isColSolved(cur.grid, col);
         if (rowDone && !rowWasDone) fireIfNewlyDone('row', row, false);
         else if (rowDone && S.rowsPrimed) S.rowsPrimed.add(row);
         if (colDone && !colWasDone) fireIfNewlyDone('col', col, false);
@@ -991,7 +992,7 @@ export function _ptxRunExpansion() {
     function startTickLoop() {
         stopTickLoop();
         tickInterval = setInterval(() => {
-            if (!globalThis.cur || globalThis.dead) return;
+            if (!cur || globalThis.dead) return;
             if (globalThis.timerFrozen) return;
             S.tick++;
             TICKS.forEach(fn => { try { fn(); } catch (e) { /* ignore */ } });
@@ -1014,7 +1015,7 @@ export function _ptxRunExpansion() {
 
     patch('handleLuckyTileClaim', function (orig, args) {
         const result = orig(...args);
-        if (globalThis.cur && !globalThis.dead) {
+        if (cur && !globalThis.dead) {
             ON_LUCKY_CLAIM.forEach(fn => { try { fn(args[0], args[1]); } catch (e) { /* ignore */ } });
         }
         return result;
@@ -1024,8 +1025,8 @@ export function _ptxRunExpansion() {
         const [isLarge, isMassive, isLargeOrMassive] = args;
         let count = orig(...args);
         if (has('karmic_residue') && count > 0 && Math.random() < 0.10) count += 1;
-        if (has('probability_well') && count === 0 && !isLargeOrMassive && globalThis.cur) {
-            const cells = globalThis.cur.grid.length * globalThis.cur.grid[0].length;
+        if (has('probability_well') && count === 0 && !isLargeOrMassive && cur) {
+            const cells = cur.grid.length * cur.grid[0].length;
             if (cells >= 100) count = 1;   // medium grids get exactly one lucky tile
         }
         return count;
@@ -1034,7 +1035,7 @@ export function _ptxRunExpansion() {
     // Philosopher's Grid: strip the shimmer so tiles stay invisible.
     patch('renderCell', function (orig, args) {
         const result = orig(...args);
-        if (has('keystone_philosophers_grid') && globalThis.cur) {
+        if (has('keystone_philosophers_grid') && cur) {
             const el = document.getElementById(`g-${args[0]}-${args[1]}`);
             if (el) el.classList.remove('cell-lucky', 'cell-lucky-focus');
         }
@@ -1050,11 +1051,11 @@ export function _ptxRunExpansion() {
 
     patch('resolveRightClickValue', function (orig, args) {
         const value = orig(...args);
-        if (value === 2 && !S.typeIUsed && has('keystone_type_i_error') && globalThis.cur && !globalThis.dead) {
+        if (value === 2 && !S.typeIUsed && has('keystone_type_i_error') && cur && !globalThis.dead) {
             S.typeIUsed = true;
             const [row, col] = args;
             let n = 0;
-            const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+            const rows = cur.grid.length, cols = cur.grid[0].length;
             for (let c = 0; c < cols; c++) if (c !== col && markAt(row, c)) n++;
             for (let r = 0; r < rows; r++) if (r !== row && markAt(r, col)) n++;
             if (n > 0) toast(`🚨 Type I Error: ${n} cells mass-marked`);
@@ -1066,7 +1067,7 @@ export function _ptxRunExpansion() {
 
     patch('useItem', function (orig, args) {
         const result = orig(...args);
-        if (globalThis.cur && !globalThis.dead) {
+        if (cur && !globalThis.dead) {
             ON_ITEM_USE.forEach(fn => { try { fn(); } catch (e) { /* ignore */ } });
         }
         return result;
@@ -1076,7 +1077,7 @@ export function _ptxRunExpansion() {
 
     patch('tryAbsorbWithShield', function (orig, args) {
         const result = orig(...args);
-        if (result === true && globalThis.cur && !globalThis.dead) {
+        if (result === true && cur && !globalThis.dead) {
             if (has('glyph_ward')) { addSecs(15); toast('🔱 Glyph Ward +15s'); }
             if (has('symmetric_shield')) { markWrongTiles(2); toast('🪞 Symmetric Shield'); }
         }
@@ -1085,7 +1086,7 @@ export function _ptxRunExpansion() {
 
     patch('tryAbsorbWithConfidenceInterval', function (orig, args) {
         const result = orig(...args);
-        if (result === true && globalThis.cur && !globalThis.dead && has('asymptotic_freedom')) {
+        if (result === true && cur && !globalThis.dead && has('asymptotic_freedom')) {
             addSecs(15);
             toast('🕊️ Asymptotic Freedom +15s');
         }
@@ -1096,7 +1097,7 @@ export function _ptxRunExpansion() {
 
     patch('_triggerLawOfLargeNumbers', function (orig, args) {
         const result = orig(...args);
-        if (globalThis.cur && !globalThis.dead && has('limit_theorem') && has('keystone_law_of_large_numbers')) {
+        if (cur && !globalThis.dead && has('limit_theorem') && has('keystone_law_of_large_numbers')) {
             addSecs(5);
             toast('📈 Limit Theorem +5s');
         }
@@ -1115,10 +1116,10 @@ export function _ptxRunExpansion() {
     // ---- Dead Reckoning threshold reduction (386) -----------------------------------------------------------
 
     patch('_deadReckoningCheckUnlock', function (orig, args) {
-        if (!has('sampling_frame') || !window._deadReckoningActive || window._deadReckoningUnlocked || !globalThis.cur) {
+        if (!has('sampling_frame') || !window._deadReckoningActive || window._deadReckoningUnlocked || !cur) {
             return orig(...args);
         }
-        const sol = globalThis.cur.grid;
+        const sol = cur.grid;
         const rows = sol.length, cols = sol[0].length;
         const totalFilled = sol.reduce((sum, row) => sum + row.filter(v => v === 1).length, 0);
         let playerFilled = 0;
@@ -1190,7 +1191,7 @@ export function _ptxRunExpansion() {
 
         // Wavefunction Spread (346) + Law of Total Probability (394) post-reveal procs
         // revealTiles returns [{row, col}, ...]
-        if (Array.isArray(result) && result.length > 0 && globalThis.cur && !globalThis.dead) {
+        if (Array.isArray(result) && result.length > 0 && cur && !globalThis.dead) {
             result.forEach(({ row: r, col: c }) => {
                 if (has('wavefunction_spread') && Math.random() < 0.20) {
                     const dirs = shuffleArr([...ORTHO]);
@@ -1201,7 +1202,7 @@ export function _ptxRunExpansion() {
                 if (has('total_probability') && Math.random() < 0.25) {
                     const dirs = shuffleArr([...ORTHO]);
                     for (const [dr, dc] of dirs) {
-                        if (inGrid(r + dr, c + dc) && globalThis.cur.grid[r + dr][c + dc] === 1 && revealAt(r + dr, c + dc)) { toast('➗ Total Probability cascade'); break; }
+                        if (inGrid(r + dr, c + dc) && cur.grid[r + dr][c + dc] === 1 && revealAt(r + dr, c + dc)) { toast('➗ Total Probability cascade'); break; }
                     }
                 }
             });
@@ -1213,7 +1214,7 @@ export function _ptxRunExpansion() {
 
     patch('markWrongTiles', function (orig, args) {
         const result = orig(...args);
-        if (Array.isArray(result) && result.length > 0 && globalThis.cur && !globalThis.dead && has('peripheral_vision')) {
+        if (Array.isArray(result) && result.length > 0 && cur && !globalThis.dead && has('peripheral_vision')) {
             result.forEach(([r, c]) => {
                 if (Math.random() >= 0.25) return;
                 [[0, -1], [0, 1]].forEach(([dr, dc]) => {
@@ -1231,7 +1232,7 @@ export function _ptxRunExpansion() {
     window.revealTiles = function (...args) {
         if (window._ptxInSwap) return revealAfterProcs(...args);
         const result = revealAfterProcs(...args);
-        if (Array.isArray(result) && result.length > 0 && globalThis.cur && !globalThis.dead && ptHasSkill('variance_swap') && Math.random() < 0.10) {
+        if (Array.isArray(result) && result.length > 0 && cur && !globalThis.dead && ptHasSkill('variance_swap') && Math.random() < 0.10) {
             window._ptxInSwap = true;
             try { revealAfterProcs(result.length); toast('🎚️ Variance Swap: reveal doubled'); } finally { window._ptxInSwap = false; }
         }

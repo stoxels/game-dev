@@ -11,6 +11,7 @@ import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //----------------------MATHMAGICIAN SKILLS-------------------------------
@@ -601,13 +602,13 @@ export function _arcaneReveal_updatePreview(clientX, clientY) {
         && STATE.playerClass === 'mathmagician'
         && STATE.classActiveChoice === 'active1';
 
-    if (!isArmed || !globalThis.cur) { _arcaneReveal_clearPreview(); return; }
+    if (!isArmed || !cur) { _arcaneReveal_clearPreview(); return; }
 
     const hovered = _arcaneReveal_getHoveredCell(clientX, clientY);
     if (!hovered) { _arcaneReveal_clearPreview(); return; }
 
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const radius = _arcaneReveal_getEffectiveRadiusForPreview();
 
     const startRow = Math.max(0, hovered.r - radius);
@@ -643,9 +644,9 @@ export function _arcaneReveal_updatePreview(clientX, clientY) {
 // Reveals up to maxReveals correct cells within radius steps of (row, col),
 // including diagonals. Passive nodes can extend radius and reveal cap.
 export function _executeArcaneReveal(row, col, radius, maxReveals = 4) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 

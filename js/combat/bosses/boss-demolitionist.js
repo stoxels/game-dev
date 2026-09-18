@@ -3,6 +3,7 @@ import { _egBossCorrupted } from '../combat-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egTeleportAvatarTo } from './boss-wormhole.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egRemoveCellCorruption } from './shared-boss-abilities.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DEMOLITIONIST (boss_demolitionist)-------------------
@@ -76,9 +77,9 @@ export function _egCrashCellCenter(r, c) {
 
 // Center of the whole playable grid (from the corner cells), or null.
 export function _egCrashGridRect() {
-    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid || !globalThis.cur.grid.length || !globalThis.cur.grid[0]) return null;
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    if (typeof cur === 'undefined' || !cur || !cur.grid || !cur.grid.length || !cur.grid[0]) return null;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const a = document.getElementById('g-0-0');
     const b = document.getElementById('g-' + (rows - 1) + '-' + (cols - 1));
     if (!a || !b || !a.isConnected || !b.isConnected) return null;
@@ -291,9 +292,9 @@ export function _egCrashPickMegaSpots(count, blastR) {
 
     // Candidate cell centers (or viewport points when the grid is gone).
     const cands = [];
-    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
-        const rows = globalThis.cur.grid.length;
-        const cols = globalThis.cur.grid[0].length;
+    if (typeof cur !== 'undefined' && cur && cur.grid) {
+        const rows = cur.grid.length;
+        const cols = cur.grid[0].length;
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 const cc = _egCrashCellCenter(r, c);
@@ -346,10 +347,10 @@ export function _egCrashPickMegaSpots(count, blastR) {
 // alive until every detonation has fired.
 export function _egCrashChainCells(run, x, y, r, level, phase, chainDelays) {
     if (!_egBossCorrupted || _egBossCorrupted.size === 0) return;
-    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid) return;
+    if (typeof cur === 'undefined' || !cur || !cur.grid) return;
     const p = Math.max(2, _egCrashP(phase));
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const inside = [];
     for (const key of Array.from(_egBossCorrupted.keys())) {
         const [cr, cc] = key.split('-').map(Number);

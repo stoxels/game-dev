@@ -3,7 +3,7 @@ import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { showHUDTooltip } from '../classes/class-hud.js';
 import { renderSkillHotbar } from './skill-hotbar.js';
-import { getSkillDef, getSkillDesc, getSkillLevel, getSkillName } from './skill-registry.js';
+import { getSkillDef, getSkillDesc, getSkillLevel, getSkillName, rebuildHotbarFromCharmSlots } from './skill-registry.js';
 import { _sbSpellSchoolKey, buildSpellbookHeadHTML, isSpellbookOpen, renderSpellbook } from './skill-spellbook.js';
 import { STATE } from '../state.js';
 // skill-charms.js
@@ -20,8 +20,9 @@ import { STATE } from '../state.js';
 //   • picking up a charm you already own yields a Lemma instead
 //   • 10 Lemmas automatically prove 1 Theorem
 //   • shift-left-clicking a charm spends 1 Theorem → +1% damage for its spell
-//   • placing a charm into one of the 10 SPELL SLOTS unlocks that spell in
-//     the spell book, from where it can be dragged onto the hotbar
+//   • placing a charm into one of the 10 SPELL SLOTS unlocks that spell
+//     directly on the matching hotbar slot (spell slot N = hotbar key N -
+//     there is no separate drag-to-hotbar step)
 //
 // Persistence: charmInventory / charmSlots / charmShards / charmOrbs /
 // charmSeedKey live on STATE (js/state.js), so they travel with the save.
@@ -259,18 +260,25 @@ export function ensureCharmState() {
     // class resets) so a slot can never unlock a spell that isn't held.
     // A charm for a skill the player no longer owns (class change) also
     // frees its slot, so the new class's charms can take it.
+    let pruned = false;
     for (let i = 0; i < STATE.charmSlots.length; i++) {
         const key = STATE.charmSlots[i];
         if (!key) continue;
         const charm = getCharmByKey(key);
-        if (!charm) { STATE.charmSlots[i] = null; continue; }
+        if (!charm) { STATE.charmSlots[i] = null; pruned = true; continue; }
         if (STATE.playerClass && typeof getSkillDef === 'function'
             && getSkillDef(charm.skillId) && !_charmIsPlayerSkill(charm.skillId)) {
             STATE.charmSlots[i] = null;
+            pruned = true;
         }
     }
 
-    _charmSeedStarterCharms();
+    const seeded = _charmSeedStarterCharms();
+    // Pruning or starter seeding rewrote slots behind setCharmSlot()'s back,
+    // so re-mirror the hotbar (slot N = hotbar key N).
+    if ((pruned || seeded) && typeof rebuildHotbarFromCharmSlots === 'function') {
+        try { rebuildHotbarFromCharmSlots(); } catch (e) { /* bar is best-effort */ }
+    }
     return STATE;
 }
 
@@ -454,9 +462,8 @@ export function isSkillCharmUnlocked(skillId) {
 }
 
 // True when the spell's charm currently sits in one of the 10 spell slots.
-// The spell book lists exactly these spells and nothing else - the slots ARE
-// the loadout, and the ~100-spell arsenal is far too large to browse. New
-// spells reach the book by slotting their charm from the charm inventory.
+// The slots ARE the loadout: a slotted charm casts its spell from the
+// matching hotbar slot (slot N = hotbar key N).
 export function isSkillCharmSlotted(skillId) {
     if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.charmSlots)) return false;
     ensureCharmState();
@@ -629,9 +636,16 @@ export function setCharmSlot(slotIndex, charmKey, opts) {
         }
     }
     STATE.charmSlots[slotIndex] = charmKey;
+    // The hotbar mirrors the spell slots 1:1 (slot N = hotbar key N), so the
+    // slotted spell lands on the matching hotbar slot immediately (or leaves
+    // it when unslotted). The dedupe above may also have freed other slots -
+    // a full rebuild covers those too.
+    if (typeof rebuildHotbarFromCharmSlots === 'function') {
+        try { rebuildHotbarFromCharmSlots(); } catch (e) { /* bar is best-effort */ }
+    }
     if (typeof save === 'function') { try { save(); } catch (e) { /* best effort */ } }
     // Slotting changes which spells are unlocked, so refresh the open book
-    // (spell lock icons + charm panel) and the hotbar lock states.
+    // (charm panel) and the hotbar.
     _charmRefreshSpellbook();
     return true;
 }
@@ -682,9 +696,12 @@ export function promoteCharmSlotToRank(skillId, rank) {
     });
     if (idx === -1) return false;
     STATE.charmSlots[idx] = newKey;
+    if (typeof rebuildHotbarFromCharmSlots === 'function') {
+        try { rebuildHotbarFromCharmSlots(); } catch (e) { /* bar is best-effort */ }
+    }
     if (typeof save === 'function') { try { save(); } catch (e) { /* best effort */ } }
-    // The book (equipped list + ranks) and the hotbar (cast rank, lock state)
-    // both read the slotted charm.
+    // The book (ranks) and the hotbar (cast rank, lock state) both read the
+    // slotted charm.
     _charmRefreshSpellbook();
     return true;
 }

@@ -11,6 +11,7 @@ import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-----------------STATISTICIAN-------------------------------------------
@@ -136,9 +137,9 @@ export function _revealCappedCells(lineEntry, type, cap) {
 //   Returns the total number of cells that were actually revealed (may be <
 //   count * cap if fewer unsolved lines/cells exist).
 export function _solveLinesCapped(type, count, cap) {
-    if (!globalThis.cur) return 0;
+    if (!cur) return 0;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -313,7 +314,7 @@ export function _playSlashEffect(vertical = false) {
     if (!wrap) return;
     if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
 
-    const sol = globalThis.cur?.grid;
+    const sol = cur?.grid;
     if (!sol) return;
 
     requestAnimationFrame(() => {
@@ -431,7 +432,7 @@ export function _playDiagonalSlashEffect(row, col, diagonalCount) {
     if (!wrap) return;
     if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
 
-    const sol = globalThis.cur?.grid;
+    const sol = cur?.grid;
     if (!sol) return;
 
     requestAnimationFrame(() => {
@@ -1035,8 +1036,8 @@ export function _diagStrikeBonusRepeat(diagonalCount, revealCap, markCap, rows, 
 export function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
     Audio_Manager.playSFX('diagonalStrike');
 
-    if (!globalThis.cur) return;
-    const sol = globalThis.cur.grid;
+    if (!cur) return;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -1171,7 +1172,7 @@ export function _diagStrikePreviewMakeBar(container, cx, cy, diagLen, deg) {
 //   diagonalCount >= 2 : + anti-diagonal (45°)
 //   diagonalCount >= 4 : + horizontal (0°) and vertical (90°)
 export function _diagStrikeBuildPreviewBars(wrap, row, col, diagonalCount) {
-    const sol = globalThis.cur?.grid;
+    const sol = cur?.grid;
     if (!sol) return;
 
     const zoom = globalThis.currentZoom || 1;
@@ -1213,7 +1214,7 @@ export function _diagStrikeUpdatePreview(clientX, clientY) {
         && STATE.playerClass === 'statistician'
         && STATE.classActiveChoice === 'active2';
 
-    if (!isArmed || !globalThis.cur) { _diagStrikeClearPreview(); return; }
+    if (!isArmed || !cur) { _diagStrikeClearPreview(); return; }
 
     const hovered = _diagStrikeGetHoveredCell(clientX, clientY);
     if (!hovered) { _diagStrikeClearPreview(); return; }
@@ -1407,7 +1408,7 @@ export function _momentumSpawnParticle(row, col) {
 
     const wrap = document.getElementById('puzzle-scaler-wrap'); // was 'puzzle-scaler'
     const container = _momentumGetContainer();
-    const sol = globalThis.cur?.grid;
+    const sol = cur?.grid;
     const rect = _momentumGetBorderRect();
     if (!wrap || !container || !sol || !rect) return;
 

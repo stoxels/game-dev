@@ -13,6 +13,7 @@ import { _incDirect, questStat_confidenceIntervalIgnored, questStat_hasManuallyF
 import { PassiveTracker } from './passive-tree/passive-tracker.js';
 import { _binomialBurstOnCorrectFill, _frequentistsBurdenOnCorrectFill, _gamblersRuinOnCorrectFill, _getBayesianBonus, _resetBayesianBonus } from './passive-tree/passive-tree-special-nodes-logic.js';
 import { STATE } from './state.js';
+import { cur } from './state.js';
 
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'dragAxis', { get() { return dragAxis; }, set(v) { dragAxis = v; }, configurable: true }); } catch (e) {}
@@ -84,8 +85,8 @@ let touchpadMarkModeActive = false;
 // Returns true if the current level is an endgame sandbox or monster level.
 // Used to guard all _eg* hook calls throughout this file.
 export function isEndgameLevel() {
-    if (!globalThis.cur) return false;
-    return globalThis.cur.isEndgameSandbox || globalThis.cur.isMonsterLevel;
+    if (!cur) return false;
+    return cur.isEndgameSandbox || cur.isMonsterLevel;
 }
 
 // Endgame: discards any pickup, loot drop, or currency drop sitting on a
@@ -211,7 +212,7 @@ export function isCellAlreadyDesiredValue(row, col) {
 // so this also works correctly in Touchpad Mode, where a "mark" stroke
 // can be driven by the left mouse button.
 export function isRightClickOnCorrectCell(row, col) {
-    return pval !== 1 && globalThis.userGrid[row][col] === 1 && globalThis.cur.grid[row][col] === 1;
+    return pval !== 1 && globalThis.userGrid[row][col] === 1 && cur.grid[row][col] === 1;
 }
 
 // No-op: cannot erase a cell that was revealed by an item.
@@ -413,7 +414,7 @@ export function checkGoldenClockAfterMistake() {
         window.LEVEL_FLAGS.goldenClockActive = false;
         globalThis.dead = true;
         stopTimer();
-        window._lastFailedGi = globalThis.cur.gIdx;
+        window._lastFailedGi = cur.gIdx;
         if (typeof globalThis._arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
             globalThis._arcaneFreeze_clearAllFrostAndStalagmites();   
         }
@@ -441,7 +442,7 @@ export function checkHardcoreAfterMistake() {
 
     globalThis.dead = true;
     stopTimer();
-    window._lastFailedGi = globalThis.cur.gIdx;    // bounceback achievement needs this
+    window._lastFailedGi = cur.gIdx;    // bounceback achievement needs this
     if (typeof globalThis._arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
         globalThis._arcaneFreeze_clearAllFrostAndStalagmites();    
     }
@@ -539,7 +540,7 @@ export function applyCovarianceShiftReveal(row, col) {
     if (!ptHasSkill('covariance_shift_1')) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const cols = sol[0].length;
     const rows = sol.length;
 
@@ -768,7 +769,7 @@ export function applyCell(row, col) {
     if (checkCellGuards(row, col)) return;
 
     // --- Wrong fill path (left-click on an incorrect cell) ---
-    if (pval === 1 && globalThis.cur.grid[row][col] !== 1) {
+    if (pval === 1 && cur.grid[row][col] !== 1) {
         // First try sig-threshold intercept (must be before penalty logic)
         if (globalThis._sigThresholdIntercept(row, col)) {
             trackAchStat('sigThresholdIntercepts');
@@ -797,7 +798,7 @@ export function applyCell(row, col) {
     Audio_Manager.playSFX('cellMark');
 
     // Endgame: right-click mark on a correct cell discards any drop sitting there
-    if (isEndgameLevel() && pval === 2 && globalThis.cur.grid[row][col] === 1) {
+    if (isEndgameLevel() && pval === 2 && cur.grid[row][col] === 1) {
         _egDiscardAllDrops(row, col);
     }
 
@@ -811,12 +812,12 @@ export function applyCell(row, col) {
     globalThis.systemMarkedGrid[row][col] = false;
 
     // Extra logic that only applies to a correct left-click fill
-    if (pval === 1 && globalThis.cur.grid[row][col] === 1) {
+    if (pval === 1 && cur.grid[row][col] === 1) {
         handleCorrectFill(row, col);
     }
 
     // Endgame: correct right-click mark on an empty-solution cell claims any drop there
-    if (pval === 2 && globalThis.cur.grid[row][col] === 0) {
+    if (pval === 2 && cur.grid[row][col] === 0) {
         _egCheckAllClaims(row, col);
     }
 
@@ -888,7 +889,7 @@ export function cellDown(e, row, col) {
     if (effectiveBtn === 0) {
         pval = 1;
     } else {
-        if (globalThis.userGrid[row][col] === 1 && globalThis.cur.grid[row][col] === 1) {
+        if (globalThis.userGrid[row][col] === 1 && cur.grid[row][col] === 1) {
             globalThis.painting = false;
             return;
         }

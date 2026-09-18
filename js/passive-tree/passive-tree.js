@@ -10,6 +10,7 @@ import { TALENT_TREE_DATA } from './passive-tree-data.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
 import { _ptRender } from './passive-tree-ui.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, '_ptReturnScreen', { get() { return _ptReturnScreen; }, set(v) { _ptReturnScreen = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_ptReturnWorldIndex', { get() { return _ptReturnWorldIndex; }, set(v) { _ptReturnWorldIndex = v; }, configurable: true }); } catch (e) {}
@@ -242,7 +243,7 @@ export function _ptOverlayPause() {
     _ptOverlayPaused = false;
     try {
         if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return;
-        if (typeof globalThis.cur === 'undefined' || !globalThis.cur) return;
+        if (typeof cur === 'undefined' || !cur) return;
         if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return;  // pause menu already up
         if (typeof pauseTimer === 'function') pauseTimer();
         globalThis._gamePaused = true;
@@ -364,7 +365,7 @@ export function closeTreeToGame() {
         // _ptReturnScreen (e.g. 'screen-game' left over from an earlier
         // overlay open) can never strand the BACK button.
         const gameActive = document.getElementById('screen-game')?.classList.contains('active');
-        if (gameActive && typeof globalThis.cur !== 'undefined' && globalThis.cur) {
+        if (gameActive && typeof cur !== 'undefined' && cur) {
             try { openTreeFromGame(); } catch (e) {}
             return false;
         }

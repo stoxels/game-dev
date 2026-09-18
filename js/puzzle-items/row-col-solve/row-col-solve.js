@@ -3,6 +3,7 @@ import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { solveCols, solveRows } from '../../puzzle-mechanics/grid-actions.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ROW / COL SOLVE - SET SQUARE / RULER----------------------
@@ -48,7 +49,7 @@ export function _fxMakeRowSolveSweep(container, r) {
 
 // Helper: creates the per-row shimmer lines for RowSolve.
 export function _fxMakeRowSolveLines(container, r) {
-    const rows = globalThis.cur?.grid?.length || 5;
+    const rows = cur?.grid?.length || 5;
     const rowH = r.height / rows;
     for (let i = 0; i < rows; i++) {
         const line = document.createElement('div');
@@ -96,7 +97,7 @@ export function _fxMakeColSolveSweep(container, r) {
 
 // Helper: creates the per-column shimmer lines for ColSolve.
 export function _fxMakeColSolveLines(container, r) {
-    const cols = globalThis.cur?.grid?.[0]?.length || 5;
+    const cols = cur?.grid?.[0]?.length || 5;
     const colW = r.width / cols;
     for (let i = 0; i < cols; i++) {
         const line = document.createElement('div');

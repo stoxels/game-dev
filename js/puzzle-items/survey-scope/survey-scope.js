@@ -7,6 +7,7 @@ import { t } from '../../translation/translations.js';
 import { _applyCellEffect } from '../../puzzle-mechanics/cell-fx.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------SURVEY SCOPE----------------------
@@ -24,8 +25,8 @@ export function _useSurveyScope(id, def) {
 
     questStat_revealItemUsed();
 
-    if (!globalThis.cur) return '';
-    const sol = globalThis.cur.grid;
+    if (!cur) return '';
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
     const win = 3;
@@ -120,7 +121,7 @@ export function _fxSurveyScope() {
     if (!r) return;
     _ensureSurveyScopeStyles();
 
-    const sol = globalThis.cur?.grid;
+    const sol = cur?.grid;
     if (!sol) return;
     const rows = sol.length;
     const cols = sol[0].length;

@@ -7,6 +7,7 @@ import { t } from '../translation/translations.js';
 import { PassiveTracker } from './passive-tracker.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
 import { questStat_gamblersRuinTimeAdded } from '../inference/inference-stats.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //----------------- passive-tree-special-nodes-logic.js ------------------
@@ -128,8 +129,8 @@ export function _countFilledSolutionCells(sol) {
 
 // Returns completion ratio 0.0–1.0 for the current puzzle.
 export function _getBoardCompletionRatio() {
-    if (!globalThis.cur) return 0;
-    const sol = globalThis.cur.grid;
+    if (!cur) return 0;
+    const sol = cur.grid;
     const total = _countTotalSolutionCells(sol);
     if (total === 0) return 1;
     return _countFilledSolutionCells(sol) / total;
@@ -299,7 +300,7 @@ export function _poissonCheckBayesianExtra() {
 export function _poissonProcessTick() {
     if (!window._poissonNext) return;
     if (Date.now() < window._poissonNext) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     const interval = _poissonGetInterval();
     window._poissonNext = Date.now() + interval * 1000;
@@ -544,9 +545,9 @@ export function _revealCol(sol, colIndex) {
 export function _applyMaximumLikelihood() {
     if (!ptHasSkill('keystone_maximum_likelihood')) return;
     if (_autoActionsBlocked()) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
 
     // Apply the time penalty first (-15 minutes)
     subtractTimeSecs(900);
@@ -621,20 +622,20 @@ export function _getAdjacentLineIndices(lineIndex, maxIndex) {
 
 // Reveals clues for a completed row and its immediate row-neighbours.
 export function _sparsePriorRevealRow(lineIndex) {
-    const rows = globalThis.cur.grid.length;
+    const rows = cur.grid.length;
     _getAdjacentLineIndices(lineIndex, rows).forEach(_revealRowClues);
 }
 
 // Reveals clues for a completed column and its immediate column-neighbours.
 export function _sparsePriorRevealCol(lineIndex) {
-    const cols = globalThis.cur.grid[0].length;
+    const cols = cur.grid[0].length;
     _getAdjacentLineIndices(lineIndex, cols).forEach(_revealColClues);
 }
 
 // Called from grid.js when a line is completed. Reveals adjacent clues once.
 export function _sparsePriorOnLineComplete(lineIndex, isRow) {
     if (!ptHasSkill('keystone_sparse_prior')) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     if (!window._sparsePriorRevealedLines) window._sparsePriorRevealedLines = new Set();
 
@@ -698,11 +699,11 @@ export function _ergodicFieldInit() {
 export function _ergodicFieldTick() {
     if (!ptHasSkill('keystone_ergodic_field')) return;
     if (!window._ergodicFieldNext || Date.now() < window._ergodicFieldNext) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     window._ergodicFieldNext = Date.now() + ERGODIC_FIELD_INTERVAL_MS;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const flashedCells = _ergodicFieldGetFlashCells(sol);
 
     globalThis.showToast(`🌊 ${t('pt_toast_ergodic')}`);
@@ -775,9 +776,9 @@ export function _entropyDrainRevertCol(colIndex, rows) {
 export function _entropyDrainInit() {
     window._entropyDrainTimestamps = {};
     if (!ptHasSkill('keystone_entropy_drain')) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length, cols = cur.grid[0].length;
     const now = Date.now();
     for (let r = 0; r < rows; r++) window._entropyDrainTimestamps[`r-${r}`] = now;
     for (let c = 0; c < cols; c++) window._entropyDrainTimestamps[`c-${c}`] = now;
@@ -812,9 +813,9 @@ export function _entropyDrainProcessLine(key, isStalled, revert, now) {
 // Called from: timer.js setInterval
 export function _entropyDrainTick() {
     if (!ptHasSkill('keystone_entropy_drain')) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const now = Date.now();
 
@@ -843,7 +844,7 @@ export function _entropyDrainTick() {
 export function _randomWalkFail() {
     globalThis.dead = true;
     stopTimer();
-    window._lastFailedGi = globalThis.cur.gIdx;
+    window._lastFailedGi = cur.gIdx;
     document.getElementById('lose-title').textContent = t('ov_lose');
     document.getElementById('lose-sub').textContent = t('pt_rw_fail_sub');
     document.getElementById('ov-lose').classList.add('show');
@@ -851,7 +852,7 @@ export function _randomWalkFail() {
 
 // Builds a list of all cells that have not yet been touched by the player.
 export function _randomWalkGetUnfilledCells() {
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length, cols = sol[0].length;
     const unfilled = [];
     for (let r = 0; r < rows; r++)
@@ -903,7 +904,7 @@ export function _randomWalkInit() {
 // Called from: timer.js setInterval
 export function _randomWalkTick() {
     if (!ptHasSkill('keystone_random_walk')) return;
-    if (!globalThis.cur || globalThis.dead) return;
+    if (!cur || globalThis.dead) return;
     if (_autoActionsBlocked()) return; // Ergodic Field / The Oracle block all auto-actions
 
     // Enforce the loss condition BEFORE doing anything else
@@ -926,7 +927,7 @@ export function _randomWalkTick() {
 
     const [r, c] = unfilled[Math.floor(Math.random() * unfilled.length)];
 
-    if (globalThis.cur.grid[r][c] === 1) {
+    if (cur.grid[r][c] === 1) {
         _randomWalkRevealCell(r, c);
     } else {
         _randomWalkMarkEmpty(r, c);
@@ -946,8 +947,8 @@ export function _randomWalkTick() {
 
 // Collects all row/col indices that still have at least one blacked-out clue element.
 export function _frequentistGetHiddenLines() {
-    if (!globalThis.cur) return [];
-    const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0].length;
+    if (!cur) return [];
+    const rows = cur.grid.length, cols = cur.grid[0].length;
     const hidden = [];
 
     for (let r = 0; r < rows; r++) {
@@ -1053,12 +1054,12 @@ export function _signalToNoiseRestoreSpan({ spanId, originalVal }) {
 // Called from: start-level.js
 export function _applySignalToNoise() {
     if (!ptHasSkill('keystone_signal_to_noise')) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     window._signalToNoiseActive = true;
     window._signalToNoiseFakeClues = [];
 
-    const allSpans = _signalToNoiseCollectAllSpans(globalThis.cur.grid);
+    const allSpans = _signalToNoiseCollectAllSpans(cur.grid);
     const corruptCount = Math.max(1, Math.floor(allSpans.length * SIGNAL_NOISE_CORRUPT_RATIO));
 
     // Shuffle in-place then slice to pick the target spans
@@ -1072,7 +1073,7 @@ export function _applySignalToNoise() {
 export function _signalToNoiseCheckRestore() {
     if (!ptHasSkill('keystone_signal_to_noise')) return;
     if (!window._signalToNoiseActive) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     if (_getBoardCompletionRatio() < SIGNAL_NOISE_RESTORE_RATIO) return;
 
@@ -1154,7 +1155,7 @@ export function _dofNudge() {
 
 // Hides the clues for the chosen axis across the whole board.
 export function _dofHideChosenAxis(type) {
-    if (!globalThis.cur) return;
+    if (!cur) return;
     _setClueBlackout(_dofSelectorFor(type), true);
 }
 
@@ -1196,7 +1197,7 @@ export function _dofFlashElements(token, choice) {
         if (token !== window._dofFlashToken) return;
         if (choice !== window._degreesOfFreedomChoice) return;
         if (!ptHasSkill('keystone_degrees_of_freedom')) return;
-        if (!globalThis.cur) return;
+        if (!cur) return;
         document.querySelectorAll(_dofSelectorFor(choice))
             .forEach(el => el.classList.add('clue-blackout'));
     }, DOF_FLASH_DURATION_MS);
@@ -1219,7 +1220,7 @@ export function _degreesOfFreedomTick() {
     if (!ptHasSkill('keystone_degrees_of_freedom')) return;
     if (!window._degreesOfFreedomChoice || !window._degreesOfFreedomNext) return;
     if (Date.now() < window._degreesOfFreedomNext) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
     window._degreesOfFreedomNext = Date.now() + DOF_FLASH_INTERVAL_MS;
 
@@ -1242,7 +1243,7 @@ export function _degreesOfFreedomTick() {
 
 // Calculates the current phase without side effects.
 export function _overfittingCalculatePhase() {
-    if (!globalThis.cur) return 'off';
+    if (!cur) return 'off';
     const ratio = _getBoardCompletionRatio();
     if (ratio < OVERFITTING_PHASE_THRESHOLD) return 'free';
     if (ratio < OVERFITTING_HARD_THRESHOLD) return 'normal';
@@ -1316,14 +1317,14 @@ export function _oracleHideSolution(sol) {
 // Called from: start-level.js
 export function _applyTheOracle() {
     if (!ptHasSkill('keystone_the_oracle')) return;
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const cellCount = globalThis.cur.grid.length * globalThis.cur.grid[0].length;
+    const cellCount = cur.grid.length * cur.grid[0].length;
     if (cellCount < ORACLE_MIN_CELL_COUNT) return;
 
     window._oracleActive = true;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
 
     _oracleFlashSolution(sol);
     _hideAllClues(); // Clues are permanently hidden for the rest of the level

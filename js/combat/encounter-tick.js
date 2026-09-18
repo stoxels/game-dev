@@ -8,6 +8,7 @@ import { _egHazardsTick } from './combat-hazards.js';
 import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
 import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.
@@ -282,7 +283,7 @@ export function _egUpdatePlayerChargeBar() {
 export function _egGetMaxAllowedMistakes() {
     // Hardcore: no mistake is allowed - overrides map limit and gear bonuses
     if (typeof curMods !== 'undefined' && globalThis.curMods.hardcore) return 0;
-    const def = globalThis._egMapDef || globalThis.cur;
+    const def = globalThis._egMapDef || cur;
     if (!def || def.egMaxMistakes == null) return null;
     const gearBonus = (typeof _egComputePlayerStats === 'function')
         ? (_egComputePlayerStats().mistakeCount || 0) : 0;

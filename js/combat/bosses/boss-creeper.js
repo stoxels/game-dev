@@ -1,6 +1,7 @@
 import { _egRenderPanel } from '../encounter.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CREEPER (boss_creeper)---------------------
@@ -55,9 +56,9 @@ export const EG_CRP_HIT_CD_MS = 700;                       // shared blast-hit c
 
 // Center of the playable grid (from corner cells), or viewport fallback.
 export function _egCrpGridCenter() {
-    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid && globalThis.cur.grid.length && globalThis.cur.grid[0]) {
+    if (typeof cur !== 'undefined' && cur && cur.grid && cur.grid.length && cur.grid[0]) {
         const a = document.getElementById('g-0-0');
-        const b = document.getElementById('g-' + (globalThis.cur.grid.length - 1) + '-' + (globalThis.cur.grid[0].length - 1));
+        const b = document.getElementById('g-' + (cur.grid.length - 1) + '-' + (cur.grid[0].length - 1));
         if (a && b && a.isConnected && b.isConnected) {
             const ra = a.getBoundingClientRect();
             const rb = b.getBoundingClientRect();

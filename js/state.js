@@ -854,6 +854,7 @@ export function initState() {
 // initial value depends on initState(), which in turn depends on
 // buildFreshState()/migrateOldSave() - all defined earlier in this file.
 let STATE = initState();
+export { cur };
 export { STATE };
 
 

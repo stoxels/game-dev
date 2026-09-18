@@ -9,6 +9,7 @@ import { showPassiveTree } from '../passive-tree/passive-tree.js';
 import { _dofNudge } from '../passive-tree/passive-tree-special-nodes-logic.js';
 import { closeInventoryFlyout } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'replayLevel', { get() { return replayLevel; }, set(v) { replayLevel = v; }, configurable: true }); } catch (e) {}
@@ -373,7 +374,7 @@ export function launchEndgameTestMode() {
 // the level select screen (its exits are hidden and the title-bindings
 // handlers refuse); this guard is the last line of defense.
 export function goToLevelSelect() {
-    if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
+    if (cur && cur.isTutorialQuest) return;
     hideResultOverlays();
     globalThis.closeQuiz();
 
@@ -454,7 +455,7 @@ export function goToPreviousScreen() {
     if (globalThis.screenHistory.length) {
         // Mid-tutorial there is no valid previous level-select screen -
         // stay put instead of popping history toward the locked screens.
-        if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
+        if (cur && cur.isTutorialQuest) return;
         const prev = globalThis.screenHistory.pop();
 
         // The game screen is not directly re-enterable; go to level select instead.
@@ -549,9 +550,9 @@ export function _campaignRestoreCarriedDrops(carried, nextIndex) {
     };
     const poll = () => {
         attempts++;
-        const gridReady = !!(typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.grid
+        const gridReady = !!(typeof cur !== 'undefined' && cur && cur.grid
             && document.getElementById('g-0-0'));
-        const onTarget = (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.gIdx === nextIndex)
+        const onTarget = (typeof cur !== 'undefined' && cur && cur.gIdx === nextIndex)
             // Ascension-trial hijack launches a chain instead of the plain
             // puzzle - still a valid "next puzzle", so accept any fresh grid
             // after a few polls rather than dropping the items.
@@ -575,7 +576,7 @@ export function _campaignRestoreCarriedDrops(carried, nextIndex) {
 export function goToNextLevel() {
     hideResultOverlays();
 
-    const nextIndex = globalThis.cur.gIdx + 1;
+    const nextIndex = cur.gIdx + 1;
     const proceed = () => {
         if (nextIndex >= globalThis.ALL.length) {
             goToLevelSelect();
@@ -605,7 +606,7 @@ function replayLevel() {
     // exit and must wipe it.
     if (typeof globalThis._egResetQuizDamageBuff === 'function') globalThis._egResetQuizDamageBuff();
 
-    const currentIndex = globalThis.cur.gIdx;
+    const currentIndex = cur.gIdx;
     const proceed = () => globalThis.startLevel(currentIndex);
 
     _maybeShowConvergenceModal(_buildPostConvergenceCallback(proceed));

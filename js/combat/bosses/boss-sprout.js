@@ -3,6 +3,7 @@ import { t } from '../../translation/translations.js';
 import { _egHzGridRect } from '../combat-hazards.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast } from './shared-boss-abilities.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SPROUT (boss_sprout)-----------------------
@@ -105,8 +106,8 @@ export function _egSproutTeardown() {
 
 // Unsolved cells (player value ≠ solution value) - the vine pool.
 export function _egSproutVinePool() {
-    if (typeof cur === 'undefined' || !globalThis.cur || !globalThis.cur.grid) return [];
-    const sol = globalThis.cur.grid, usr = (typeof userGrid !== 'undefined') ? globalThis.userGrid : null;
+    if (typeof cur === 'undefined' || !cur || !cur.grid) return [];
+    const sol = cur.grid, usr = (typeof userGrid !== 'undefined') ? globalThis.userGrid : null;
     if (!usr) return [];
     const pool = [];
     for (let r = 0; r < sol.length; r++)
@@ -147,8 +148,8 @@ export function _egSproutCellIntercept(row, col) {
         return true;
     }
     // Bramble Wall: outermost ring of the grid is sealed while it lives.
-    if (st.bramble && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
-        const rows = globalThis.cur.grid.length, cols = globalThis.cur.grid[0] ? globalThis.cur.grid[0].length : 0;
+    if (st.bramble && typeof cur !== 'undefined' && cur && cur.grid) {
+        const rows = cur.grid.length, cols = cur.grid[0] ? cur.grid[0].length : 0;
         if (rows && cols && (row === 0 || col === 0 || row === rows - 1 || col === cols - 1)) {
             globalThis.showToast(t('eg_sprout_bramble_locked'));
             return true;
@@ -509,8 +510,8 @@ export function _egSproutBrambleWall(st) {
     // ring of cells (connector from the strip into each ring cell) and every
     // ring cell gets a thorn badge + pulsing green seal - so "these cells are
     // the ones the wall is blocking" reads at a glance.
-    const rows = (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) ? globalThis.cur.grid.length : 0;
-    const cols = rows ? (globalThis.cur.grid[0] ? globalThis.cur.grid[0].length : 0) : 0;
+    const rows = (typeof cur !== 'undefined' && cur && cur.grid) ? cur.grid.length : 0;
+    const cols = rows ? (cur.grid[0] ? cur.grid[0].length : 0) : 0;
     const connEls = [], lockEls = [];
     if (rows && cols) {
         let i = 0;
@@ -561,9 +562,9 @@ export function _egSproutBrambleWall(st) {
 export function _egSproutGrowBud(st) {
     const pool = _egSproutVinePool();
     const all = [];
-    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid) {
-        for (let r = 0; r < globalThis.cur.grid.length; r++)
-            for (let c = 0; c < globalThis.cur.grid[r].length; c++)
+    if (typeof cur !== 'undefined' && cur && cur.grid) {
+        for (let r = 0; r < cur.grid.length; r++)
+            for (let c = 0; c < cur.grid[r].length; c++)
                 all.push([r, c]);
     }
     const spot = (pool.length ? pool : all)[Math.floor(Math.random() * Math.max(1, (pool.length ? pool : all).length))];
@@ -591,8 +592,8 @@ export function _egSproutBloom(st, br, bc, tNow) {
     void tNow;
     // 1) Pollen-dust a 5x5 region around the bloom (unsolved cells only).
     let dusted = 0;
-    if (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.grid && (typeof userGrid !== 'undefined')) {
-        const sol = globalThis.cur.grid, usr = globalThis.userGrid;
+    if (typeof cur !== 'undefined' && cur && cur.grid && (typeof userGrid !== 'undefined')) {
+        const sol = cur.grid, usr = globalThis.userGrid;
         for (let r = br - 2; r <= br + 2; r++) {
             for (let c = bc - 2; c <= bc + 2; c++) {
                 if (r < 0 || c < 0 || r >= sol.length || c >= sol[r].length) continue;

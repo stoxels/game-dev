@@ -8,6 +8,7 @@ import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _cursedDownsideDuration } from '../../puzzle-mechanics/cursed-downside.js';
 import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------CURSED REVEAL - CURSED LENS---------------------------
@@ -33,8 +34,8 @@ export function _useCursedReveal(id, def) {
 
     // Downside: clear every wrong mark the player has placed, with the
     // yellow 'unmark' cell effect on each cleared cell.
-    const rows = globalThis.cur.grid.length;
-    const cols = globalThis.cur.grid[0].length;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
     const unmarked = [];
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {

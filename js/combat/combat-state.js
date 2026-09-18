@@ -1,6 +1,8 @@
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.
 // (derived from write-site audit by dev/scratch/convert-endgame.mjs)
 //------------------------------------------------------------------------
+
+
 try { Object.defineProperty(globalThis, '_egActiveClueSwap', { get() { return _egActiveClueSwap; }, set(v) { _egActiveClueSwap = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_egArcaneSurgeStreak', { get() { return _egArcaneSurgeStreak; }, set(v) { _egArcaneSurgeStreak = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_egBlackoutActive', { get() { return _egBlackoutActive; }, set(v) { _egBlackoutActive = v; }, configurable: true }); } catch (e) {}
@@ -223,7 +225,7 @@ let _egRunEssences = [];
 // Returns true only when an endgame encounter is actually running.
 export function _egIsActive() {
     return _egEncounterActive
-        && typeof cur !== 'undefined' && globalThis.cur
+        && typeof globalThis.cur !== 'undefined' && globalThis.cur
         && (globalThis.cur.isMonsterLevel === true);  // check if this level is assigned as a level that contains monsters
 }
 
@@ -233,7 +235,7 @@ export function _egIsActive() {
 // must NOT be treated as endgame map runs: no encounter chain, no map
 // objectives, no map-failed flow, no atlas completion.
 export function _egIsCampaignRun() {
-    return typeof cur !== 'undefined' && !!globalThis.cur
+    return typeof globalThis.cur !== 'undefined' && !!globalThis.cur
         && globalThis.cur.campaignMonsters === true
         && globalThis.cur.isMapRunSeed !== true
         && !(typeof window !== 'undefined' && window._egIsMapDeviceRun);

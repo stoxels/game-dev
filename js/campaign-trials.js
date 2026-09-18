@@ -25,6 +25,7 @@ import { save } from './state.js';
 import { stopTimer } from './timer/timer.js';
 import { t } from './translation/translations.js';
 import { STATE } from './state.js';
+import { cur } from './state.js';
 
 //------------------------------------------------------------------------
 //-------------------CAMPAIGN TRIALS--------------------------------------
@@ -168,7 +169,7 @@ export function _egTrialChainParams(wi) {
 // ascension). Reads the stamp on the level (survives chain transitions
 // via _egMapDef) with a window-runtime fallback.
 export function _egIsTrialRun() {
-    const stamped = (typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.campaignTrial)
+    const stamped = (typeof cur !== 'undefined' && cur && cur.campaignTrial)
         || (typeof _egMapDef !== 'undefined' && globalThis._egMapDef && globalThis._egMapDef.campaignTrial)
         || (typeof window !== 'undefined' && window._egCampaignTrial);
     return stamped || null;
@@ -440,7 +441,7 @@ export function _egGrantAscensionTrialReward(wi) {
     // Campaign XP for the ascension level itself (first clear / replay).
     if (ascGi >= 0 && typeof _egGrantCampaignLevelXP === 'function') {
         try {
-            const keepCur = (typeof cur !== 'undefined') ? globalThis.cur : null;
+            const keepCur = (typeof cur !== 'undefined') ? cur : null;
             if (typeof ALL !== 'undefined' && ALL[ascGi]) {
                 // _egGrantCampaignLevelXP guards on `cur`: point it at the
                 // ascension level briefly (trial seeds are map seeds, which
@@ -555,7 +556,7 @@ export function _egCleanupCampaignTrialSeed() {
     if (seedGi == null) return;
     if (typeof ALL === 'undefined' || !ALL[seedGi]) return;
     const level = ALL[seedGi];
-    if (!level || level === (typeof cur !== 'undefined' ? globalThis.cur : null)) return;
+    if (!level || level === (typeof cur !== 'undefined' ? cur : null)) return;
     // Only touch levels that actually carried a trial (map-device seeds are
     // restored by _egCleanupMapRunSeedLevel; chained leftovers by the loop).
     if (!level.campaignTrial && !hadTrial) return;

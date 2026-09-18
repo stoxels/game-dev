@@ -4,6 +4,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { startTimerFreeze } from './timer-freeze.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 3: live globalThis accessors for externally-mutated state.
@@ -230,7 +231,7 @@ export function _maybeShowLowTimeWarning() {
     if (typeof timerSecs === 'undefined') return;
     if (timerSecs <= 0) return;
     // No active puzzle/level - don't spam in menus/lobby
-    if (typeof globalThis.cur !== 'undefined' && !globalThis.cur) {
+    if (typeof cur !== 'undefined' && !cur) {
         _lowTimeLastSecs = timerSecs;
         return;
     }
@@ -352,7 +353,7 @@ export function timesUp() {
     // excludes the campaign's own monster levels).
     if (typeof globalThis._egIsMapRun === 'function' && globalThis._egIsMapRun()) {
         if (typeof globalThis._egEndMapDefeated === 'function') {
-            if (globalThis.cur) window._lastFailedGi = globalThis.cur.gIdx;
+            if (cur) window._lastFailedGi = cur.gIdx;
             const title = (typeof t === 'function') ? t('eg_map_failed') : 'Map Failed';
             const sub = (typeof t === 'function') ? t('ov_lose') : "TIME'S UP!";
             const handled = globalThis._egEndMapDefeated(title, sub);
@@ -362,7 +363,7 @@ export function timesUp() {
 
     // Record the failed level for the bounceback achievement so scoring.js
     // can detect an immediate retry win on the same level.
-    if (globalThis.cur) window._lastFailedGi = globalThis.cur.gIdx;
+    if (cur) window._lastFailedGi = cur.gIdx;
 
     document.getElementById('lose-title').textContent = t('ov_lose');
     document.getElementById('lose-sub').textContent =
@@ -546,9 +547,9 @@ export function _revealSparseLine(sol, index, otherCount, isRow) {
 // and column, reveals them, applies the optional Bayesian Boost bonus,
 // shows a toast, and checks for a win.
 export function _triggerLawOfLargeNumbers() {
-    if (!globalThis.cur) return;
+    if (!cur) return;
 
-    const sol = globalThis.cur.grid;
+    const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
@@ -641,9 +642,9 @@ export function _tickEmergencyScan() {
 
     // Cover the entire puzzle: centre the scan on the middle of the grid and
     // pass the larger grid dimension as scan size.
-    const fullSize = Math.max(globalThis.cur.grid.length, globalThis.cur.grid[0].length);
-    const centerRow = Math.floor(globalThis.cur.grid.length / 2);
-    const centerCol = Math.floor(globalThis.cur.grid[0].length / 2);
+    const fullSize = Math.max(cur.grid.length, cur.grid[0].length);
+    const centerRow = Math.floor(cur.grid.length / 2);
+    const centerCol = Math.floor(cur.grid[0].length / 2);
     globalThis._executeFieldScan(centerRow, centerCol, fullSize, _calcEmergencyScanDuration());
 }
 

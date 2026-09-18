@@ -6,6 +6,7 @@ import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOver
 import { solveCols } from '../../puzzle-mechanics/grid-actions.js';
 import { _getPreFilledCols } from '../../puzzle-mechanics/puzzle-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
+import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------CURSED COL SOLVE - VORTEX-----------------------------
@@ -35,7 +36,7 @@ export function _useCursedColSolve(id, def) {
 // Widths are derived from the live grid's column count (falls back to 5
 // when the grid is not built, e.g. headless tests).
 export function _fxMakeVortexStrips(container, r) {
-    const cols = globalThis.cur?.grid?.[0]?.length || 5;
+    const cols = cur?.grid?.[0]?.length || 5;
     const colW = r.width / cols;
 
     for (let i = 0; i < Math.min(cols, 8); i++) {

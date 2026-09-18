@@ -28,6 +28,7 @@ import { _useSurveyScope } from './survey-scope/survey-scope.js';
 import { _useTheWitch } from './the-witch/the-witch.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { STATE } from '../state.js';
+import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 // globalThis accessor for externally-mutated names (see the write-site audit):
@@ -148,7 +149,7 @@ function _trackItemAchievements(id, def) {
     }
 
     // Cursed items used on a first-attempt level
-    if (def.rarity === 'cursed' && !STATE.done.includes(globalThis.cur.gIdx)) {
+    if (def.rarity === 'cursed' && !STATE.done.includes(cur.gIdx)) {
         trackAchStat('cursedFirstAttempts');
     }
 }
