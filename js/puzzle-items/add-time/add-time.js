@@ -1,10 +1,10 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
 import { questStat_timerItemUsed } from '../../quests/quests-stats.js';
-import { _trackTimerDelta, updTimer } from '../../timer.js';
 import { t } from '../../translation/translations.js';
 import { FREEZE_DURATION_MS } from '../freeze/freeze.js';
 import { playItemEffect } from '../fx-dispatch.js';
+import { addTimeSecs, subtractTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
 import { _calcAddTimeSecs } from '../../puzzle-mechanics/effect-modifiers.js';
 import { CHRONOBOLT_X_FRACTIONS, FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, playFreezeCountdownOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 
@@ -46,8 +46,7 @@ function parseAddTimeId(id) {
 // instead of seconds (e.g. 90s -> 1.5min).
 function applyAddTime(id, def, secs) {
     questStat_timerItemUsed();
-    globalThis.timerSecs = addTimerSecs(globalThis.timerSecs, secs);
-    updTimer();
+    addTimeSecs(secs);
     playItemEffect(id);
     return `${def.icon} ${t('item_time_added').replace('{n}', secsToMinutes(secs))}`;
 }
@@ -58,20 +57,13 @@ function applyAddTime(id, def, secs) {
 // suppressed while it is active. Otherwise identical to applyAddTime.
 function applyCountdownCrisis(id, def, secs) {
     questStat_timerItemUsed();
-    globalThis.timerSecs = addTimerSecs(globalThis.timerSecs, -secs);
-    updTimer();
+    subtractTimeSecs(secs);
     playItemEffect(id);
     playFreezeCountdownOverlay(FREEZE_DURATION_MS);
     return `${def.icon} ${t('itm_countdown_crisis').replace('{n}', secsToMinutes(secs))}`;
 }
 
-// addTimerSecs - applies a signed delta to the timer and records it, clamped
-// so the timer can never go below zero.
-function addTimerSecs(currentSecs, deltaSecs) {
-    const next = Math.max(0, currentSecs + deltaSecs);
-    _trackTimerDelta(currentSecs, next);
-    return next;
-}
+// (the timer write itself now lives in timer-adjust.js)
 
 // secsToMinutes - formats seconds as rounded minutes for the toast text
 // (e.g. 90 -> 1.5).

@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { _egMapTimeGainMult } from '../../endgame/endgame-map-launch.js';
-import { _trackTimerDelta, updTimer } from '../../timer.js';
+import { addTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../fx-dispatch.js';
 import { _resolveCursedBlackoutDownside } from '../shared/cursed-downside.js';
@@ -20,10 +20,7 @@ export function _useCursedTime(id, def) {
     _trackWitchImmuneCursedUse();
 
     const mapTimeMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
-    const before = globalThis.timerSecs;
-    globalThis.timerSecs += Math.round(1200 * mapTimeMult);
-    _trackTimerDelta(before, globalThis.timerSecs);
-    updTimer();
+    addTimeSecs(Math.round(1200 * mapTimeMult));
     playItemEffect(id);
 
     // Black out every clue axis - the harshest cursed downside of the family.

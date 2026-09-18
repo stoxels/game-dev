@@ -1,5 +1,5 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { _trackTimerDelta, updTimer } from '../../timer.js';
+import { subtractTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../fx-dispatch.js';
 import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
@@ -12,10 +12,7 @@ import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 // theWitch - pays −10 min upfront in exchange for 60 s of full cursed
 // immunity (makes subsequent cursed items downside-free for that window).
 export function _useTheWitch(id, def) {
-    const before = globalThis.timerSecs;
-    globalThis.timerSecs = Math.max(0, globalThis.timerSecs - 600);
-    _trackTimerDelta(before, globalThis.timerSecs);
-    updTimer();
+    subtractTimeSecs(600);
 
     window.STOX_FLAGS.cursedImmune = true;
     playItemEffect(id);

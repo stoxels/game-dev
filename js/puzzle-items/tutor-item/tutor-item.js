@@ -2,7 +2,7 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
 import { _updateMistakeCounterHUD } from '../../penalty.js';
 import { questStat_mistakesRemoved } from '../../quests/quests-stats.js';
-import { _trackTimerDelta, updTimer } from '../../timer.js';
+import { addTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../fx-dispatch.js';
 import { _calcTutorItemCount } from '../../puzzle-mechanics/effect-modifiers.js';
@@ -39,10 +39,7 @@ export function _useTutorItem(id, def) {
         if (ptHasSkill('time_well_spent_2')) bonusSecs = 60;
         if (ptHasSkill('time_well_spent_3')) bonusSecs = 90;
         if (bonusSecs > 0) {
-            const before2 = globalThis.timerSecs;
-            globalThis.timerSecs += bonusSecs * removed;
-            _trackTimerDelta(before2, globalThis.timerSecs);
-            updTimer();
+            addTimeSecs(bonusSecs * removed);
         }
     }
 

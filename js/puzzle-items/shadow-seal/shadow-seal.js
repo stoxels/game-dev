@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { renderCell } from '../../grid.js';
 import { questStat_shadowSealUsed } from '../../quests/quests-stats.js';
-import { _trackTimerDelta } from '../../timer.js';
+import { setTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { _applyCellEffect } from '../../puzzle-mechanics/cell-effects.js';
 import { playItemEffect } from '../fx-dispatch.js';
@@ -19,9 +19,7 @@ export function _useShadowSeal(id, def) {
     if (!globalThis.cur) return '';
 
     // 1. Hard-set the timer to exactly 5 minutes
-    const before = globalThis.timerSecs;
-    globalThis.timerSecs = 300;
-    _trackTimerDelta(before, globalThis.timerSecs);
+    setTimeSecs(300);
 
     // 2. Permanently hide all row and column clues for this level
     window._shadowSealActive = true;
