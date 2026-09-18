@@ -7,6 +7,7 @@ import { showMapView } from './screens-map-view.js';
 import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
 import { showPassiveTree } from '../passive-tree/passive-tree.js';
 import { _dofNudge } from '../passive-tree/passive-tree-special-nodes-logic.js';
+import { closeInventoryFlyout } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'replayLevel', { get() { return replayLevel; }, set(v) { replayLevel = v; }, configurable: true }); } catch (e) {}
@@ -16,11 +17,13 @@ try { Object.defineProperty(globalThis, 'replayLevel', { get() { return replayLe
 //------------------------------------------------------------------------
 
 // Deactivates all screens, then activates the one with the given id.
+// Also closes the puzzle-item inventory flyout: it is a hover/pin surface
+// anchored to the in-level bar and must never survive a screen change.
 export function switchScreen(id) {
+    closeInventoryFlyout();
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
-
 
 
 //------------------------------------------------------------------------
@@ -28,8 +31,11 @@ export function switchScreen(id) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Shows a modal overlay by its element ID
+// Shows a modal overlay by its element ID. The win/lose overlays are also
+// covered by the flyout module's own overlay class-observer (several sites
+// add 'show' directly), this hook stays for the showModal-based paths.
 export function showModal(id) {
+    if (id === 'ov-win' || id === 'ov-lose') closeInventoryFlyout();
     document.getElementById(id).classList.add('show');
 }
 

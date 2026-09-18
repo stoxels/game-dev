@@ -355,6 +355,22 @@ function _wireGlobalFlyoutGuard() {
     window.addEventListener('blur', () => {
         if (_invOpenFlyoutGroup && !window._invPinnedFlyoutGroup) closeInventoryFlyout();
     });
+    // Level end / screen transitions: the win/lose overlays appearing over
+    // the still-active game screen mean the level is over, so the flyout
+    // (and any pin) must go. Several sites open those overlays directly via
+    // classList (scoring, quiz, timer, mouse-button-handlers, passive-tree
+    // special nodes) rather than through a shared helper, so a class
+    // MutationObserver on the overlay elements covers every one of them.
+    ['ov-win', 'ov-lose'].forEach((overlayId) => {
+        const el = document.getElementById(overlayId);
+        if (!el) return;
+        new MutationObserver(() => {
+            if (!el.classList.contains('show')) return;
+            window._invPinnedFlyoutGroup = null;
+            _invCancelFlyoutClose();
+            closeInventoryFlyout();
+        }).observe(el, { attributes: true, attributeFilter: ['class'] });
+    });
 }
 
 
