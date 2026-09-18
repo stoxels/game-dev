@@ -8,8 +8,10 @@ import { playItemEffect } from '../fx-dispatch.js';
 import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
-//-------------------FREEZE - TIME FREEZE----------------------
+//-------------------FREEZE - TIME FREEZE---------------------------------
 //------------------------------------------------------------------------
+
+// CONSTANTS & STATE
 
 // Freeze duration shared with add-time.js (Countdown Crisis branch shows the
 // freeze countdown overlay with this duration). Top-level so the module
@@ -17,7 +19,14 @@ import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 // across files, which threw ReferenceError whenever that branch ran.
 export const FREEZE_DURATION_MS = 2000;
 
+// MAIN ENTRY POINTS
+
 // freeze - freezes the timer for 2 s and activates a temporary shield.
+// Both freeze flags are multi-writer game state (this item, the Mathmagician
+// class, the Clock boss's 30 s freeze, the Stasis passive node), so they stay
+// on the shared state objects rather than module-locals. shieldActive likewise
+// mirrors the plain shield item and is consumed by the shield-absorb
+// intercepts; Null Hypothesis keystone skips the shield grant.
 export function _useFreeze(id, def) {
     globalThis.timerFrozen = true;
     window._freezeActive = true;
@@ -26,7 +35,7 @@ export function _useFreeze(id, def) {
     updTimer();
     playItemEffect(id);
 
-    // Track clutch freezes (used with ≤ 10 s remaining)
+    // Tracked: clutch freezes (used with ≤ 10 s remaining) feed an achievement.
     if (globalThis.timerSecs <= 10) trackAchStat('freezeClutches');
 
     // Countdown ticker shown in the timer element
@@ -38,9 +47,9 @@ export function _useFreeze(id, def) {
         if (remaining <= 0) clearInterval(freezeTick);
     }, 1000);
 
+    // Freeze release: the Clock boss's Time Freeze holds the timer for its whole
+    // window - this item's 2 s freeze must never cut that freeze short.
     setTimeout(() => {
-        // The Clock's Time Freeze holds the timer for its whole window -
-        // this item's 2s freeze must never cut that freeze short.
         if (typeof window === 'undefined' || !window._egClockTimeFreezeActive) {
             globalThis.timerFrozen = false;
         }
