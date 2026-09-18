@@ -2,7 +2,7 @@ import { trackAchStat } from '../achievements/achievements.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { _incDirect, questStat_rowsErased } from '../quests/quests-stats.js';
-import { _applyCellEffect } from './cell-effects.js';
+import { _applyCellEffect } from './cell-fx.js';
 import { _applyDenseMarkerBias, _applyTargetedRevealBias, shuffle } from './puzzle-helpers.js';
 
 //------------------------------------------------------------------------

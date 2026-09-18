@@ -5,7 +5,7 @@ import { _adjacencyMatrixRefreshAll, clues, renderCell, updClues } from './grid.
 import { lvText } from './levels/levels.js';
 import { _applyMaximumLikelihood, _interquartileVisionDuration } from './passive-tree/passive-tree-special-nodes-logic.js';
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
-import { _applyCellEffect } from './puzzle-mechanics/cell-effects.js';
+import { _applyCellEffect } from './puzzle-mechanics/cell-fx.js';
 import { shuffle } from './puzzle-mechanics/puzzle-helpers.js';
 import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { _charIs } from './sprite/player_sprite.js';
