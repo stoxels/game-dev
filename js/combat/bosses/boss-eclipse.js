@@ -5,15 +5,11 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 //-------------------BOSS: THE ECLIPSE (boss_eclipse)---------------------------
 //------------------------------------------------------------------------
 // Umbral-dash homage: the Eclipse dissolves at the screen's edge and
-// reappears mid-dash - straight at you, from any angle, four times over.
-// There is no lane to memorize. There is only the tell, and moving.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// reappears mid-dash - straight at you, from any angle. There is no lane
+// to memorize; there is only the tell, and moving.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (fated_cell) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// A shade telegraphs from a random screen edge, then dashes at the player.
+// Each dash locks its line at fire time, so keep moving after the tell.
 export function _egMechUmbralDashes(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
