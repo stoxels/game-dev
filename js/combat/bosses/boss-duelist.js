@@ -4,16 +4,12 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DUELIST (boss_duelist)---------------------------
 //------------------------------------------------------------------------
-// Flurry homage: three blinding slashes chase you down in under two
-// seconds - then a breath, then another flurry. Block with distance, and
-// never be where you were a heartbeat ago.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Flurry homage: blinding slashes chase you down - then a breath, then
+// another flurry. Block with distance, and never be where you were a
+// heartbeat ago.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (fated_cell) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Fast slash flurries, each re-aimed at the player's live position.
+// Keep moving between slashes; the telegraph marks where NOT to stand.
 export function _egMechFlurry(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
