@@ -426,7 +426,7 @@ export function _ptApplyStatisticianRewards() {
 
 // Mathmagician gear drops - base gear: 25% professor, improved: 15% chronobolt
 export function _ptApplyMathmagicianRewards() {
-    _ptRollGearReward('gear_of_the_mathmagician', 0.25, 'mistakeEraser4',
+    _ptRollGearReward('gear_of_the_mathmagician', 0.25, 'tutor4',
         'pt_gear_mathmagician_professor');
 
     _ptRollGearReward('improved_gear_of_the_mathmagician', 0.15, 'addTime900',

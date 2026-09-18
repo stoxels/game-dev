@@ -23,13 +23,14 @@ export const _PT_TRACKED_NODES = [
 // levelsWithReplayNode is incremented if any of these is active.
 export const _PT_REPLAY_NODES = ['lucky_drops'];
 
-// Item defIds that count as "tutor" items (the mistake-eraser family).
+// Item defIds that count as "tutor" items (the Tutor / Professor /
+// Scholar / Grand Mentor family).
 // Tracked for the Regression to the Mean category.
 export const _TUTOR_ITEM_IDS = new Set([
-    'mistakeEraser',
-    'mistakeEraser4',
-    'mistakeEraser6',
-    'mistakeEraserAll',
+    'tutor',
+    'tutor4',
+    'tutor6',
+    'tutorAll',
 ]);
 
 // Grid size bucket thresholds (cell count -> bucket name). Used by
@@ -318,7 +319,7 @@ export function resetWitchImmunityLevelCounter() {
 // bypass _qs and write directly to globalThis.STATE.questStats because they can be
 // called at any time, not just inside updateQuestStats().
 
-// Called from _useMistakeEraser when mistakes are actually removed.
+// Called from _useTutorItem when mistakes are actually removed.
 export function questStat_mistakesRemoved(count) {
     _incDirect('_ql_mistakesRemovedThisLevel', count);
 }

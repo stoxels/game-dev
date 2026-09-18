@@ -10,7 +10,7 @@ import { _fxCursedTime } from './cursed-time.js';
 import { _fxFreeze } from './freeze.js';
 import { _fxGoldenClock } from './golden-clock.js';
 import { _fxEraser, _fxErrorGem, _fxErrorMagnet, _fxSweeper } from './mark-wrong.js';
-import { _fxMistakeEraser } from './mistake-eraser.js';
+import { _fxTutorItem } from './tutor-item.js';
 import { _fxPearl } from './pearls.js';
 import { _fxCandle, _fxMagnifier, _fxScanner, _fxSpyglass } from './reveal.js';
 import { _fxColSolve, _fxRowSolve } from './row-col-solve.js';
@@ -58,10 +58,10 @@ export function playItemEffect(defId) {
     if (defId === 'surveyScope') return _fxSurveyScope();
     if (defId === 'scoutPrimer') return _fxScoutPrimer();
     if (defId === 'artifactComplete') return _fxArtifact();
-    if (defId === 'mistakeEraser' ||
-        defId === 'mistakeEraser4' ||
-        defId === 'mistakeEraser6' ||
-        defId === 'mistakeEraserAll') return _fxMistakeEraser(defId);
+    if (defId === 'tutor' ||
+        defId === 'tutor4' ||
+        defId === 'tutor6' ||
+        defId === 'tutorAll') return _fxTutorItem(defId);
 
     // ── CURSED ────────────────────────────────────────────────
     if (defId === 'cursedReveal') return _fxCursedReveal();

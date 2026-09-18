@@ -17,7 +17,7 @@ import { _useGoldenClock } from './golden-clock.js';
 import { buildInventoryPanel } from './inventory-panel.js';
 import { ITEM_DEFS } from './item-definitions.js';
 import { _useMarkWrong } from './mark-wrong.js';
-import { _useMistakeEraser } from './mistake-eraser.js';
+import { _useTutorItem } from './tutor-item.js';
 import { _useGrandPearl, _usePearlOfHaste, _usePearlOfSwiftness } from './pearls.js';
 import { _useReveal } from './reveal.js';
 import { _useColSolve, _useRowSolve } from './row-col-solve.js';
@@ -62,10 +62,10 @@ const ITEM_EFFECT_HANDLERS = {
     rowSolve: _useRowSolve,
     colSolve: _useColSolve,
     surveyScope: _useSurveyScope,
-    mistakeEraser: _useMistakeEraser,
-    mistakeEraser4: _useMistakeEraser,
-    mistakeEraser6: _useMistakeEraser,
-    mistakeEraserAll: _useMistakeEraser,
+    tutor: _useTutorItem,
+    tutor4: _useTutorItem,
+    tutor6: _useTutorItem,
+    tutorAll: _useTutorItem,
     artifactComplete: _useArtifactComplete,
     scoutPrimer: _useScoutPrimer,
     cursedReveal: _useCursedReveal,
@@ -100,12 +100,12 @@ function _dispatchItemEffect(id, def) {
 }
 
 
-// Checks whether `id` is any variant of the mistakeEraser item.
-function _isMistakeEraserItem(id) {
-    return id === 'mistakeEraser'
-        || id === 'mistakeEraser4'
-        || id === 'mistakeEraser6'
-        || id === 'mistakeEraserAll';
+// Checks whether `id` is any variant of the Tutor item.
+function _isTutorItem(id) {
+    return id === 'tutor'
+        || id === 'tutor4'
+        || id === 'tutor6'
+        || id === 'tutorAll';
 }
 
 
@@ -119,7 +119,7 @@ function _trackItemAchievements(id, def) {
     if (id === 'shield') trackAchStat('shieldsUsed');
     if (id === 'artifactComplete') trackAchStat('artifactUsed');
     if (id === 'freeze') trackAchStat('freezeUsed');
-    if (_isMistakeEraserItem(id)) trackAchStat('eraserUsed');
+    if (_isTutorItem(id)) trackAchStat('eraserUsed');
     if (id === 'cursedReveal') trackAchStat('cursedLensUsed');
     if (id === 'cursedTime') trackAchStat('cursedClockUsed');
     if (id === 'cursedShield') trackAchStat('demonEyeUsed');

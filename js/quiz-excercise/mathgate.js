@@ -24,7 +24,7 @@ import { MATH_GATE_POOLS } from './mathgate-questions.js';
 // Tutor item IDs in ascending tier order (weakest → strongest).
 // Used both when searching for the best available tutor item and when
 // counting how many tutors the player owns.
-export const TUTOR_ITEM_IDS_2 = ['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll'];
+export const TUTOR_ITEM_IDS_2 = ['tutor', 'tutor4', 'tutor6', 'tutorAll'];
 
 // Number of wrong attempts before the hint becomes visible.
 // Can be reduced by passive tree nodes; never drops below 1.

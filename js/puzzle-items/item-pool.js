@@ -11,9 +11,9 @@ import { ITEM_DEFS } from './item-definitions.js';
 // are not recreated on every pickRandomItem() call.
 export const REVEAL_ITEM_IDS = new Set(['reveal1', 'reveal2', 'reveal3', 'reveal4', 'surveyScope']);
 export const MARK_ITEM_IDS = new Set(['markWrong2', 'markWrong4', 'markWrong6', 'markWrong8']);
-export const TUTOR_ITEM_IDS = new Set(['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll']);
+export const TUTOR_ITEM_IDS = new Set(['tutor', 'tutor4', 'tutor6', 'tutorAll']);
 export const SHIELD_ITEM_IDS = new Set(['shield']);
-export const UTILITY_ITEM_IDS = new Set(['freeze', 'shield', 'mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll', 'scoutPrimer']);
+export const UTILITY_ITEM_IDS = new Set(['freeze', 'shield', 'tutor', 'tutor4', 'tutor6', 'tutorAll', 'scoutPrimer']);
 
 // Items that are only added to the drop pool when a specific passive node is unlocked.
 // Weight 3 is intentionally higher than typical base weights to make them noticeable drops.

@@ -627,19 +627,19 @@ export const _BANTER_ITEM_LINES = {
             { en: "Defensive buffer armed. One mistake pre-forgiven.", de: "Defensivpuffer aktiviert. Ein Fehler im Voraus verziehen." },
             { en: "Insurance against exactly one anomaly. A rational purchase.", de: "Versicherung gegen genau eine Anomalie. Ein vernünftiger Kauf." },
         ],
-        mistakeEraser: [
+        tutor: [
             { en: "Two errors expunged from the record.", de: "Zwei Fehler aus der Akte getilgt." },
             { en: "Error count reduced. The dataset smooths out.", de: "Fehleranzahl reduziert. Der Datensatz glättet sich." },
         ],
-        mistakeEraser4: [
+        tutor4: [
             { en: "Four mistakes struck from the log. Academic rigor applied.", de: "Vier Fehler aus dem Protokoll gestrichen. Akademische Sorgfalt angewandt." },
             { en: "Correcting the record. Four revisions accepted.", de: "Die Akte korrigiert. Vier Revisionen akzeptiert." },
         ],
-        mistakeEraser6: [
+        tutor6: [
             { en: "Six errors erased. That is deep scholarship at work.", de: "Sechs Fehler ausgelöscht. Das ist tiefgründige Gelehrsamkeit." },
             { en: "Six failed hypotheses quietly retired.", de: "Sechs gescheiterte Hypothesen still zur Rente geschickt." },
         ],
-        mistakeEraserAll: [
+        tutorAll: [
             { en: "Complete error reset. As if they never occurred.", de: "Kompletter Fehler-Reset. Als wären sie nie passiert." },
             { en: "The record is wiped clean. Statistically reborn.", de: "Das Protokoll ist komplett gewischt. Statistisch wiedergeboren." },
         ],
@@ -770,19 +770,19 @@ export const _BANTER_ITEM_LINES = {
             { en: "A shield? I AM the shield. But fine, I'll wear it.", de: "Ein Schild? ICH bin der Schild. Aber na gut, ich trag ihn." },
             { en: "Next mistake bounces right off. Like everything else.", de: "Der nächste Fehler prallt einfach ab. Wie alles andere." },
         ],
-        mistakeEraser: [
+        tutor: [
             { en: "Two mistakes deleted. History gets rewritten by winners.", de: "Zwei Fehler gelöscht. Geschichte wird von Gewinnerinnen neu geschrieben." },
             { en: "Poof. Never happened.", de: "Puff. Nie passiert." },
         ],
-        mistakeEraser4: [
+        tutor4: [
             { en: "Four erased. My record stays spotless. Officially.", de: "Vier ausgelöscht. Meine Bilanz bleibt makellos. Offiziell." },
             { en: "The Professor owes me one now.", de: "Der Professor schuldet mir jetzt einen Gefallen." },
         ],
-        mistakeEraser6: [
+        tutor6: [
             { en: "Six gone. Even scholars agree: flawless.", de: "Sechs weg. Sogar Gelehrte sind sich einig: makellos." },
             { en: "Six mistakes retired, with honors.", de: "Sechs Fehler in den Ruhestand geschickt, mit Ehren." },
         ],
-        mistakeEraserAll: [
+        tutorAll: [
             { en: "Zero mistakes. Exactly the number I remember making.", de: "Null Fehler. Genau die Zahl, an die ich mich erinnere." },
             { en: "A perfectly clean slate. Just how legends are written.", de: "Ein perfekt weißes Blatt. So schreibt man Legenden." },
         ],
@@ -913,19 +913,19 @@ export const _BANTER_ITEM_LINES = {
             { en: "Little shield, guard us well! You can do it!", de: "Kleines Schild, pass gut auf uns auf! Du schaffst das!" },
             { en: "Now mistakes bounce off, like rain off a leaf!", de: "Jetzt prallen Fehler einfach ab, wie Regen von einem Blatt!" },
         ],
-        mistakeEraser: [
+        tutor: [
             { en: "The tutor washed two mistakes away! Clean as a stream!", de: "Der Tutor hat zwei Fehler fortgewaschen! Sauber wie ein Bach!" },
             { en: "Two oopsies less! Thank you, wise helper!", de: "Zwei Hoppla-Momente weniger! Danke, weiser Helfer!" },
         ],
-        mistakeEraser4: [
+        tutor4: [
             { en: "Four mistakes healed! Like little scrapes on knees!", de: "Vier Fehler verheilt! Wie kleine Schürfwunden auf Knien!" },
             { en: "The professor knows so much! And shares it kindly!", de: "Der Professor weiß so viel! Und teilt es freundlich!" },
         ],
-        mistakeEraser6: [
+        tutor6: [
             { en: "All better now! The scholar is like a gentle doctor!", de: "Allen wieder gut! Der Gelehrte ist wie ein sanfter Doktor!" },
             { en: "So many oopsies gone! The grid feels lighter, I think!", de: "So viele Hoppla-Weg! Das Raster fühlt sich leichter an, glaube ich!" },
         ],
-        mistakeEraserAll: [
+        tutorAll: [
             { en: "ALL mistakes gone! Fresh as morning dew!", de: "ALLE Fehler weg! Frisch wie Morgentau!" },
             { en: "Zero mistakes! The grid forgave everything! I knew it!", de: "Null Fehler! Das Raster hat alles vergeben! Ich wusste es!" },
         ],

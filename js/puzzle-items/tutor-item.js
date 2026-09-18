@@ -5,26 +5,25 @@ import { questStat_mistakesRemoved } from '../quests/quests-stats.js';
 import { _trackTimerDelta, updTimer } from '../timer.js';
 import { t } from '../translation/translations.js';
 import { playItemEffect } from './fx-dispatch.js';
-import { _calcMistakeEraserCount } from './shared/effect-modifiers.js';
-import { MISTAKE_ERASER_SFX, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
+import { _calcTutorItemCount } from './shared/effect-modifiers.js';
+import { TUTOR_ITEM_SFX, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
 import { showToast } from './toasts-and-popups.js';
 
 //------------------------------------------------------------------------
-//-------------------MISTAKE ERASER - TUTOR / PROFESSOR / SCHOLAR / GRAND MENTOR----------------------
+//-------------------TUTOR - TUTOR / PROFESSOR / SCHOLAR / GRAND MENTOR----------------------
 //------------------------------------------------------------------------
 
-// mistakeEraser / mistakeEraser4 / mistakeEraser6 / mistakeEraserAll -
-// reduces the current mistake count, optionally granting bonus time via
-// the Time Well Spent passive.
-export function _useMistakeEraser(id, def) {
+// tutor / tutor4 / tutor6 / tutorAll - reduces the current mistake count,
+// optionally granting bonus time via the Time Well Spent passive.
+export function _useTutorItem(id, def) {
     if (globalThis.mistakeCount === 0) {
         showToast(t('item_mistake_erased_none'));
         return null;
     }
 
-    const isEraseAll = id === 'mistakeEraserAll';
-    const baseCount = isEraseAll ? globalThis.mistakeCount : (parseInt(id.replace('mistakeEraser', '')) || 2);
-    const reduceBy = _calcMistakeEraserCount(baseCount, isEraseAll);
+    const isEraseAll = id === 'tutorAll';
+    const baseCount = isEraseAll ? globalThis.mistakeCount : (parseInt(id.replace('tutor', '')) || 2);
+    const reduceBy = _calcTutorItemCount(baseCount, isEraseAll);
 
     const before = globalThis.mistakeCount;
     globalThis.mistakeCount = Math.max(0, globalThis.mistakeCount - reduceBy);
@@ -80,10 +79,10 @@ export function _fxMakeChalkSmears(container, r) {
     }
 }
 
-// 🎓 Mistake Eraser - chalk dust smears clear mistakes from the board.
-// Variant-specific SFX is chosen via MISTAKE_ERASER_SFX lookup.
-export function _fxMistakeEraser(defId) {
-    Audio_Manager.playSFX(MISTAKE_ERASER_SFX[defId] || 'tutor');
+// 🎓 Tutor item - chalk dust smears clear mistakes from the board.
+// Variant-specific SFX is chosen via TUTOR_ITEM_SFX lookup.
+export function _fxTutorItem(defId) {
+    Audio_Manager.playSFX(TUTOR_ITEM_SFX[defId] || 'tutor');
 
     const r = _fxGetPuzzleRect();
     if (!r) return;

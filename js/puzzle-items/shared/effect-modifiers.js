@@ -81,10 +81,10 @@ export function _calcAddTimeSecs(baseSecs) {
 }
 
 
-// Returns the final mistake-reduction count for a mistakeEraser item.
-// Pass isEraseAll=true for mistakeEraserAll (bypasses most modifiers since
+// Returns the final mistake-reduction count for a Tutor item.
+// Pass isEraseAll=true for tutorAll (bypasses most modifiers since
 // it always clears the full current count).
-export function _calcMistakeEraserCount(baseCount, isEraseAll) {
+export function _calcTutorItemCount(baseCount, isEraseAll) {
     if (isEraseAll) return baseCount; // eraseAll ignores all modifiers
 
     let count = baseCount;

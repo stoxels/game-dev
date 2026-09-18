@@ -57,7 +57,7 @@ import { t } from './translation/translations.js';
 //
 // The Professor's lines are styled after the game's stochastic storyline
 // (probability, inference, deduction - the themes of the worlds and the
-// mistake-eraser "Professor/Tutor" items).
+// the Tutor item family (Tutor / Professor / Scholar / Grand Mentor).
 //------------------------------------------------------------------------
 
 

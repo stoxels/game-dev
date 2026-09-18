@@ -1191,8 +1191,8 @@ export const ACHIEVEMENT_DEFS = [
         icon: '🎓',
         nameEn: 'The Tutor\'s Way',
         nameDE: 'Des Tutors Weg',
-        descEn: 'Use Mistake Eraser items to reduce your mistake count.',
-        descDE: 'Nutze Fehlerradierer-Items, um deine Fehleranzahl zu reduzieren.',
+        descEn: 'Use Tutor items to reduce your mistake count.',
+        descDE: 'Nutze Tutor-Items, um deine Fehleranzahl zu reduzieren.',
         stat: 'eraserUsed',
         tiers: [
             { threshold: 1, labelEn: 'Second Chance', labelDE: 'Zweite Chance' },

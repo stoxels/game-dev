@@ -392,6 +392,17 @@ export function _migrateCoreFields(s) {
     if (!s.ascensionTrialsDone) s.ascensionTrialsDone = [];
     if (s.nexusUnlocked === undefined) s.nexusUnlocked = false;
 
+    // DefId rename: the "Tutor" item family was previously coded as
+    // mistakeEraser / mistakeEraser4 / mistakeEraser6 / mistakeEraserAll.
+    // Rewrites the stored defIds so old inventories keep working - runs
+    // before any consumer reads the inventory.
+    if (Array.isArray(s.inventory)) {
+        const LEGACY_TUTOR_IDS = { mistakeEraser: 'tutor', mistakeEraser4: 'tutor4', mistakeEraser6: 'tutor6', mistakeEraserAll: 'tutorAll' };
+        s.inventory.forEach(item => {
+            if (item && LEGACY_TUTOR_IDS[item.defId]) item.defId = LEGACY_TUTOR_IDS[item.defId];
+        });
+    }
+
     if (s.totalTimePlayedSecs === undefined) s.totalTimePlayedSecs = 0;
 }
 

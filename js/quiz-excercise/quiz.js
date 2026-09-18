@@ -53,7 +53,7 @@ export const QUIZ_RECENT_HISTORY_SIZE = 10;
 export const _quizRecentQuestions = {};
 
 // Inventory item ids for every Tutor tier, in priority order (lowest tier first).
-export const TUTOR_ITEM_IDS2 = ['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll'];
+export const TUTOR_ITEM_IDS2 = ['tutor', 'tutor4', 'tutor6', 'tutorAll'];
 
 
 //------------------------------------------------------------------------

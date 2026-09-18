@@ -41,12 +41,13 @@ export const PARTICLES = {
 };
 
 
-// SFX keys used by MistakeEraser variants, keyed by defId.
-export const MISTAKE_ERASER_SFX = {
-    mistakeEraser: 'tutor',
-    mistakeEraser4: 'professor',
-    mistakeEraser6: 'scholar',
-    mistakeEraserAll: 'grand_mentor',
+// SFX keys used by Tutor item variants (Tutor / Professor / Scholar /
+// Grand Mentor), keyed by defId.
+export const TUTOR_ITEM_SFX = {
+    tutor: 'tutor',
+    tutor4: 'professor',
+    tutor6: 'scholar',
+    tutorAll: 'grand_mentor',
 };
 
 

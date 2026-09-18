@@ -30,7 +30,7 @@ let primerStreak = 0;
 
 
 // Tutor item IDs, in ascending tier order (lowest tier consumed first).
-const PRIMER_TUTOR_ITEM_ORDER = ['mistakeEraser', 'mistakeEraser4', 'mistakeEraser6', 'mistakeEraserAll'];
+const PRIMER_TUTOR_ITEM_ORDER = ['tutor', 'tutor4', 'tutor6', 'tutorAll'];
 
 // Set of question strings already shown in the current primer chain.
 // Cleared at the start of each new chain (streak === 0).
@@ -389,14 +389,14 @@ export function skipPrimer() {
 //-------------------TUTOR FEATURE (PASSIVE TREE)------------------------
 //------------------------------------------------------------------------
 
-// Counts how many tutor items (any tier of mistakeEraser) the player currently
-// holds in their inventory.
+// Counts how many tutor items (any tier of the Tutor family) the player
+// currently holds in their inventory.
 function _primerCountTutorItems() {
     return globalThis.STATE.inventory.filter(i =>
-        i.defId === 'mistakeEraser' ||
-        i.defId === 'mistakeEraser4' ||
-        i.defId === 'mistakeEraser6' ||
-        i.defId === 'mistakeEraserAll'
+        i.defId === 'tutor' ||
+        i.defId === 'tutor4' ||
+        i.defId === 'tutor6' ||
+        i.defId === 'tutorAll'
     ).length;
 }
 

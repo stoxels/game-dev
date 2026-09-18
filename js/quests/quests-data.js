@@ -88,7 +88,7 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'sample_size_1', labelEn: 'n = 10', labelDE: 'n = 10',
                 check: qs => ({ current: qs.levelsCompleted || 0, target: 10 }),
-                reward: { items: ['reveal3', 'mistakeEraser4'] }
+                reward: { items: ['reveal3', 'tutor4'] }
             },
             {
                 id: 'sample_size_2', labelEn: 'n = 50', labelDE: 'n = 50',
@@ -103,7 +103,7 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'sample_size_4', labelEn: 'n = 200', labelDE: 'n = 200',
                 check: qs => ({ current: qs.levelsCompleted || 0, target: 200 }),
-                reward: { items: ['colSolve', 'mistakeEraser4'] }
+                reward: { items: ['colSolve', 'tutor4'] }
             },
             {
                 id: 'sample_size_5', labelEn: 'n = 500', labelDE: 'n = 500',
@@ -136,12 +136,12 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'world_3', labelEn: '8 worlds completed', labelDE: '8 Welten abgeschlossen',
                 check: qs => ({ current: qs.worldsCompleted || 0, target: 8 }),
-                reward: { items: ['rowSolve', 'colSolve', 'mistakeEraserAll'] }
+                reward: { items: ['rowSolve', 'colSolve', 'tutorAll'] }
             },
             {
                 id: 'world_4', labelEn: 'All worlds completed', labelDE: 'Alle Welten abgeschlossen',
                 check: qs => ({ current: qs.worldsCompleted || 0, target: 14 }),
-                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'mistakeEraserAll', 'addTime900'] }
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'tutorAll', 'addTime900'] }
             },
         ]
     },
@@ -193,7 +193,7 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'conv_2', labelEn: '13 convergence levels', labelDE: '13 Konvergenz-Level',
                 check: qs => ({ current: qs.convergenceLevels || 0, target: 13 }),
-                reward: { items: ['colSolve', 'mistakeEraser4'] }
+                reward: { items: ['colSolve', 'tutor4'] }
             },
             {
                 id: 'conv_3', labelEn: '26 convergence levels', labelDE: '26 Konvergenz-Level',
@@ -292,7 +292,7 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'mle_3', labelEn: 'All 6 upgrades applied', labelDE: 'Alle 6 Upgrades angewendet',
                 check: qs => ({ current: qs.classUpgradesApplied || 0, target: 6 }),
-                reward: { items: ['grandPearl', 'mistakeEraserAll'] }
+                reward: { items: ['grandPearl', 'tutorAll'] }
             },
         ]
     },
@@ -346,19 +346,19 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'ach_2', labelEn: '25 achievements unlocked', labelDE: '25 Erfolge freigeschaltet',
                 check: qs => ({ current: qs.achievementsUnlocked || 0, target: 25 }),
-                reward: { items: ['rowSolve', 'mistakeEraser6'] }
+                reward: { items: ['rowSolve', 'tutor6'] }
             },
             {
                 id: 'ach_3', labelEn: '50 achievements unlocked', labelDE: '50 Erfolge freigeschaltet',
                 check: qs => ({ current: qs.achievementsUnlocked || 0, target: 50 }),
-                reward: { items: ['rowSolve', 'mistakeEraserAll'] }
+                reward: { items: ['rowSolve', 'tutorAll'] }
             },
 
 
             {
                 id: 'ach_4', labelEn: '100 achievements unlocked', labelDE: '100 Erfolge freigeschaltet',
                 check: qs => ({ current: qs.achievementsUnlocked || 0, target: 100 }),
-                reward: { ptPoints: 1, items: ['colSolve', 'mistakeEraserAll'] }
+                reward: { ptPoints: 1, items: ['colSolve', 'tutorAll'] }
             },
         ]
     },
@@ -423,17 +423,17 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'tutor_ans_1', labelEn: '5 tutor correct answers', labelDE: '5 richtige Tutor-Antworten',
                 check: qs => ({ current: qs.tutorQuestCorrect || 0, target: 5 }),
-                reward: { items: ['mistakeEraser6', 'scoutPrimer'] }
+                reward: { items: ['tutor6', 'scoutPrimer'] }
             },
             {
                 id: 'tutor_ans_2', labelEn: '20 tutor correct answers', labelDE: '20 richtige Tutor-Antworten',
                 check: qs => ({ current: qs.tutorQuestCorrect || 0, target: 20 }),
-                reward: { items: ['mistakeEraserAll', 'scoutPrimer'] }
+                reward: { items: ['tutorAll', 'scoutPrimer'] }
             },
             {
                 id: 'tutor_ans_3', labelEn: '50 tutor correct answers', labelDE: '50 richtige Tutor-Antworten',
                 check: qs => ({ current: qs.tutorQuestCorrect || 0, target: 50 }),
-                reward: { ptPoints: 1, items: ['mistakeEraserAll', 'rowSolve'] }
+                reward: { ptPoints: 1, items: ['tutorAll', 'rowSolve'] }
             },
         ]
     },
@@ -450,7 +450,7 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'full_primer_1', labelEn: 'Tutor answers all 5 primer questions once', labelDE: 'Tutor beantwortet einmal alle 5 Primer-Fragen',
                 check: qs => ({ current: qs.primerTutorAllFive || 0, target: 1 }),
-                reward: { items: ['scoutPrimer', 'scoutPrimer', 'mistakeEraser6'] }
+                reward: { items: ['scoutPrimer', 'scoutPrimer', 'tutor6'] }
             },
             {
                 id: 'full_primer_2', labelEn: '5 full-tutor primer chains', labelDE: '5 vollständige Tutor-Primer-Ketten',
@@ -561,12 +561,12 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'err_corr_1', labelEn: 'Remove 50 mistakes in one level', labelDE: '50 Fehler in einem Level entfernen',
                 check: qs => ({ current: qs.levelsRemovedFiftyMistakes || 0, target: 1 }),
-                reward: { items: ['mistakeEraserAll', 'mistakeEraser6'] }
+                reward: { items: ['tutorAll', 'tutor6'] }
             },
             {
                 id: 'err_corr_2', labelEn: '5 levels with 50+ mistakes removed', labelDE: '5 Level mit 50+ entfernten Fehlern',
                 check: qs => ({ current: qs.levelsRemovedFiftyMistakes || 0, target: 5 }),
-                reward: { ptPoints: 1, items: ['mistakeEraserAll', 'addTime900'] }
+                reward: { ptPoints: 1, items: ['tutorAll', 'addTime900'] }
             },
         ]
     },
@@ -653,12 +653,12 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'overfit_1', labelEn: '1 large grid cleared with Overfitting and 25+ mistakes', labelDE: '1 großes Raster mit Überanpassung und 25+ Fehlern',
                 check: qs => ({ current: qs.levelsOverfitHighMistakes || 0, target: 1 }),
-                reward: { items: ['mistakeEraserAll', 'addTime900'] }
+                reward: { items: ['tutorAll', 'addTime900'] }
             },
             {
                 id: 'overfit_2', labelEn: '5 such levels', labelDE: '5 solche Level',
                 check: qs => ({ current: qs.levelsOverfitHighMistakes || 0, target: 5 }),
-                reward: { ptPoints: 1, items: ['mistakeEraserAll', 'addTime900', 'addTime900'] }
+                reward: { ptPoints: 1, items: ['tutorAll', 'addTime900', 'addTime900'] }
             },
         ]
     },
@@ -812,17 +812,17 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'rw_1', labelEn: '3 large grids with Random Walk', labelDE: '3 große Raster mit Zufälligem Wandel',
                 check: qs => ({ current: qs.largeGridsRandomWalk || 0, target: 3 }),
-                reward: { items: ['shield', 'mistakeEraser6'] }
+                reward: { items: ['shield', 'tutor6'] }
             },
             {
                 id: 'rw_2', labelEn: '10 large grids with Random Walk', labelDE: '10 große Raster mit Zufälligem Wandel',
                 check: qs => ({ current: qs.largeGridsRandomWalk || 0, target: 10 }),
-                reward: { items: ['mistakeEraserAll', 'rowSolve'] }
+                reward: { items: ['tutorAll', 'rowSolve'] }
             },
             {
                 id: 'rw_3', labelEn: '25 large grids with Random Walk', labelDE: '25 große Raster mit Zufälligem Wandel',
                 check: qs => ({ current: qs.largeGridsRandomWalk || 0, target: 25 }),
-                reward: { ptPoints: 1, items: ['mistakeEraserAll', 'rowSolve', 'colSolve'] }
+                reward: { ptPoints: 1, items: ['tutorAll', 'rowSolve', 'colSolve'] }
             },
         ]
     },
@@ -1034,17 +1034,17 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'ci_ign_1', labelEn: '10 mistakes ignored by Confidence Interval', labelDE: '10 Fehler durch Konfidenzintervall ignoriert',
                 check: qs => ({ current: qs.confidenceIntervalIgnored || 0, target: 10 }),
-                reward: { items: ['shield', 'mistakeEraser4'] }
+                reward: { items: ['shield', 'tutor4'] }
             },
             {
                 id: 'ci_ign_2', labelEn: '50 mistakes ignored by Confidence Interval', labelDE: '50 Fehler durch Konfidenzintervall ignoriert',
                 check: qs => ({ current: qs.confidenceIntervalIgnored || 0, target: 50 }),
-                reward: { items: ['mistakeEraser6', 'shield'] }
+                reward: { items: ['tutor6', 'shield'] }
             },
             {
                 id: 'ci_ign_3', labelEn: '150 mistakes ignored by Confidence Interval', labelDE: '150 Fehler durch Konfidenzintervall ignoriert',
                 check: qs => ({ current: qs.confidenceIntervalIgnored || 0, target: 150 }),
-                reward: { ptPoints: 1, items: ['mistakeEraserAll', 'shield'] }
+                reward: { ptPoints: 1, items: ['tutorAll', 'shield'] }
             },
         ]
     },
@@ -1266,7 +1266,7 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'witch_imm_2', labelEn: '10 cursed items under immunity (in a won level)', labelDE: '10 verfluchte Items unter Immunität (in einem gewonnenen Level)',
                 check: qs => ({ current: qs.cursedUnderImmunityWon || 0, target: 10 }),
-                reward: { items: ['theWitch', 'mistakeEraser6'] }
+                reward: { items: ['theWitch', 'tutor6'] }
             },
             {
                 id: 'witch_imm_3', labelEn: '15 cursed items under immunity (in a won level)', labelDE: '15 verfluchte Items unter Immunität (in einem gewonnenen Level)',
@@ -1364,17 +1364,17 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'tutor_1', labelEn: '5 Tutor items used', labelDE: '5 Tutor-Items verwendet',
                 check: qs => ({ current: qs.tutorItemsUsed || 0, target: 5 }),
-                reward: { items: ['mistakeEraser4', 'mistakeEraser'] }
+                reward: { items: ['tutor4', 'tutor'] }
             },
             {
                 id: 'tutor_2', labelEn: '20 Tutor items used', labelDE: '20 Tutor-Items verwendet',
                 check: qs => ({ current: qs.tutorItemsUsed || 0, target: 20 }),
-                reward: { items: ['mistakeEraser6', 'mistakeEraser4'] }
+                reward: { items: ['tutor6', 'tutor4'] }
             },
             {
                 id: 'tutor_3', labelEn: '50 Tutor items used', labelDE: '50 Tutor-Items verwendet',
                 check: qs => ({ current: qs.tutorItemsUsed || 0, target: 50 }),
-                reward: { items: ['mistakeEraserAll', 'mistakeEraser6'] }
+                reward: { items: ['tutorAll', 'tutor6'] }
             },
         ]
     },
@@ -1520,12 +1520,12 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'hard_2', labelEn: '30 Hard levels', labelDE: '30 Level auf Schwer',
                 check: qs => ({ current: qs.levelsHard || 0, target: 30 }),
-                reward: { items: ['mistakeEraser6', 'markWrong8'] }
+                reward: { items: ['tutor6', 'markWrong8'] }
             },
             {
                 id: 'hard_3', labelEn: '60 Hard levels', labelDE: '60 Level auf Schwer',
                 check: qs => ({ current: qs.levelsHard || 0, target: 60 }),
-                reward: { items: ['mistakeEraserAll', 'reveal4'] }
+                reward: { items: ['tutorAll', 'reveal4'] }
             },
         ]
     },
@@ -1574,17 +1574,17 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'hc_1', labelEn: '5 Hardcore levels', labelDE: '5 Hardcore-Level',
                 check: qs => ({ current: qs.levelsHardcore || 0, target: 5 }),
-                reward: { items: ['mistakeEraser4', 'shield'] }
+                reward: { items: ['tutor4', 'shield'] }
             },
             {
                 id: 'hc_2', labelEn: '20 Hardcore levels', labelDE: '20 Hardcore-Level',
                 check: qs => ({ current: qs.levelsHardcore || 0, target: 20 }),
-                reward: { items: ['mistakeEraser6', 'mistakeEraser4'] }
+                reward: { items: ['tutor6', 'tutor4'] }
             },
             {
                 id: 'hc_3', labelEn: '50 Hardcore levels', labelDE: '50 Hardcore-Level',
                 check: qs => ({ current: qs.levelsHardcore || 0, target: 50 }),
-                reward: { items: ['mistakeEraserAll', 'mistakeEraser6'] }
+                reward: { items: ['tutorAll', 'tutor6'] }
             },
         ]
     },
@@ -1603,17 +1603,17 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'iron_1', labelEn: '5 Ironman levels', labelDE: '5 Ironman-Level',
                 check: qs => ({ current: qs.levelsIronman || 0, target: 5 }),
-                reward: { items: ['mistakeEraser4', 'reveal4'] }
+                reward: { items: ['tutor4', 'reveal4'] }
             },
             {
                 id: 'iron_2', labelEn: '20 Ironman levels', labelDE: '20 Ironman-Level',
                 check: qs => ({ current: qs.levelsIronman || 0, target: 20 }),
-                reward: { items: ['mistakeEraser6', 'rowSolve'] }
+                reward: { items: ['tutor6', 'rowSolve'] }
             },
             {
                 id: 'iron_3', labelEn: '50 Ironman levels', labelDE: '50 Ironman-Level',
                 check: qs => ({ current: qs.levelsIronman || 0, target: 50 }),
-                reward: { items: ['mistakeEraserAll', 'rowSolve'] }
+                reward: { items: ['tutorAll', 'rowSolve'] }
             },
         ]
     },
@@ -1637,12 +1637,12 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'classless_2', labelEn: '20 levels in Classless mode', labelDE: '20 Level im Klassenlosen Modus',
                 check: qs => ({ current: qs.levelsClassless || 0, target: 20 }),
-                reward: { items: ['rowSolve', 'mistakeEraser6'] }
+                reward: { items: ['rowSolve', 'tutor6'] }
             },
             {
                 id: 'classless_3', labelEn: '50 levels in Classless mode', labelDE: '50 Level im Klassenlosen Modus',
                 check: qs => ({ current: qs.levelsClassless || 0, target: 50 }),
-                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'mistakeEraserAll'] }
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'tutorAll'] }
             },
         ]
     },
@@ -1665,12 +1665,12 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'treeless_2', labelEn: '20 levels in Treeless mode', labelDE: '20 Level im Baumlosen Modus',
                 check: qs => ({ current: qs.levelsTreeless || 0, target: 20 }),
-                reward: { items: ['rowSolve', 'mistakeEraser6'] }
+                reward: { items: ['rowSolve', 'tutor6'] }
             },
             {
                 id: 'treeless_3', labelEn: '50 levels in Treeless mode', labelDE: '50 Level im Baumlosen Modus',
                 check: qs => ({ current: qs.levelsTreeless || 0, target: 50 }),
-                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'mistakeEraserAll'] }
+                reward: { ptPoints: 1, items: ['rowSolve', 'colSolve', 'tutorAll'] }
             },
         ]
     },
@@ -1689,17 +1689,17 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'mc_1', labelEn: '1 Quintuple-Modifier level', labelDE: '1 Fünffach-Modifikator-Level',
                 check: qs => ({ current: qs.levelsTripleModifier || 0, target: 1 }),
-                reward: { items: ['mistakeEraser6', 'addTime600'] }
+                reward: { items: ['tutor6', 'addTime600'] }
             },
             {
                 id: 'mc_2', labelEn: '10 Quintuple-Modifier levels', labelDE: '10 Fünffach-Modifikator-Level',
                 check: qs => ({ current: qs.levelsTripleModifier || 0, target: 10 }),
-                reward: { items: ['mistakeEraserAll', 'addTime900'] }
+                reward: { items: ['tutorAll', 'addTime900'] }
             },
             {
                 id: 'mc_3', labelEn: '30 Quintuple-Modifier levels', labelDE: '30 Fünffach-Modifikator-Level',
                 check: qs => ({ current: qs.levelsTripleModifier || 0, target: 30 }),
-                reward: { ptPoints: 1, items: ['mistakeEraserAll', 'rowSolve', 'colSolve'] }
+                reward: { ptPoints: 1, items: ['tutorAll', 'rowSolve', 'colSolve'] }
             },
         ]
     },
@@ -1719,22 +1719,22 @@ export const LEDGER_CATEGORIES = [
             {
                 id: 'zero_var_1', labelEn: '10 flawless levels', labelDE: '10 fehlerfreie Level',
                 check: qs => ({ current: qs.levelsNomiss || 0, target: 10 }),
-                reward: { items: ['shield', 'mistakeEraser'] }
+                reward: { items: ['shield', 'tutor'] }
             },
             {
                 id: 'zero_var_2', labelEn: '30 flawless levels', labelDE: '30 fehlerfreie Level',
                 check: qs => ({ current: qs.levelsNomiss || 0, target: 30 }),
-                reward: { items: ['mistakeEraser6', 'shield'] }
+                reward: { items: ['tutor6', 'shield'] }
             },
             {
                 id: 'zero_var_3', labelEn: '60 flawless levels', labelDE: '60 fehlerfreie Level',
                 check: qs => ({ current: qs.levelsNomiss || 0, target: 60 }),
-                reward: { items: ['mistakeEraserAll', 'reveal4'] }
+                reward: { items: ['tutorAll', 'reveal4'] }
             },
             {
                 id: 'zero_var_4', labelEn: '100 flawless levels', labelDE: '100 fehlerfreie Level',
                 check: qs => ({ current: qs.levelsNomiss || 0, target: 100 }),
-                reward: { items: ['mistakeEraserAll'] }
+                reward: { items: ['tutorAll'] }
             },
         ]
     },

@@ -145,26 +145,26 @@ export const ITEM_DEFS = {
         rarity: 'epic', weight: 4
     },
 
-    mistakeEraser: {
-        id: 'mistakeEraser', icon: '🎓',
+    tutor: {
+        id: 'tutor', icon: '🎓',
         nameEn: 'Tutor', nameDE: 'Tutor',
         descEn: 'Reduces your mistake count by 2', descDE: 'Reduziert deine Fehleranzahl um 2',
         rarity: 'rare', weight: 5
     },
-    mistakeEraser4: {
-        id: 'mistakeEraser4', icon: '📚',
+    tutor4: {
+        id: 'tutor4', icon: '📚',
         nameEn: 'Professor', nameDE: 'Professor',
         descEn: 'Reduces your mistake count by 4', descDE: 'Reduziert deine Fehleranzahl um 4',
         rarity: 'epic', weight: 3
     },
-    mistakeEraser6: {
-        id: 'mistakeEraser6', icon: '🏛️',
+    tutor6: {
+        id: 'tutor6', icon: '🏛️',
         nameEn: 'Scholar', nameDE: 'Gelehrter',
         descEn: 'Reduces your mistake count by 6', descDE: 'Reduziert deine Fehleranzahl um 6',
         rarity: 'legendary', weight: 2
     },
-    mistakeEraserAll: {
-        id: 'mistakeEraserAll', icon: '🧿',
+    tutorAll: {
+        id: 'tutorAll', icon: '🧿',
         nameEn: 'Grand Mentor', nameDE: 'Großer Mentor',
         descEn: 'Resets your mistake count to 0', descDE: 'Setzt deine Fehleranzahl auf 0 zurück',
         rarity: 'legendary', weight: 1
