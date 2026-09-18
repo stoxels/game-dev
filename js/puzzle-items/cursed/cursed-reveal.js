@@ -10,7 +10,7 @@ import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOver
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
-//-------------------CURSED REVEAL - CURSED LENS----------------------
+//-------------------CURSED REVEAL - CURSED LENS---------------------------
 //------------------------------------------------------------------------
 
 // cursedReveal - reveals 6 cells; downside clears all wrong marks.
@@ -21,17 +21,18 @@ export function _useCursedReveal(id, def) {
     revealTiles(6, 'item');
 
     // Route the downside through the shared curse helpers so Witch immunity,
-    // Curse Embrace and the first-use protection of Veil of Purity all apply
-    // here as well. A result of 0 means the downside is fully suppressed;
-    // when Veil of Purity is broken the helper also shows the amplification
-    // toast (the mark-clear itself is already maximal, so it cannot grow).
+    // Curse Embrace and Veil of Purity apply here too. A duration multiplier
+    // of 0 means the downside is fully suppressed (the helper also handles
+    // the Veil-of-Purity toast); the mark-clear itself is already maximal,
+    // so amplification cannot grow it - only trigger the break toast.
     const downsideMult = _cursedDownsideDuration(1000) / 1000;
     if (downsideMult <= 0) {
         playItemEffect(id);
         return `☠️ ${t('itm_cursed_reveal_protected')}`;
     }
 
-    // Downside: clear every wrong mark the player has placed
+    // Downside: clear every wrong mark the player has placed, with the
+    // yellow 'unmark' cell effect on each cleared cell.
     const rows = globalThis.cur.grid.length;
     const cols = globalThis.cur.grid[0].length;
     const unmarked = [];
@@ -55,6 +56,7 @@ export function _useCursedReveal(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the sickly green tint rect over the grid.
+// Must be created after _fxOverlay() - it anchors to the overlay.
 export function _fxMakeCursedTint(container, r) {
     _fxMakeElement(container, `
         position:absolute;
