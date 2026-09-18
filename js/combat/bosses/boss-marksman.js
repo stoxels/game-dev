@@ -6,30 +6,12 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MARKSMAN (boss_marksman)---------------------------
 //------------------------------------------------------------------------
-// Aimed strikes land where you stand - never stand still.
+// Aimed-strike duel - never stand still: crosshair MARKED STRIKES land when
+// the arrow impacts, and HP-gated ARROW GAUNTLETS at 66%/33% wall you in
+// with bow formations firing arrow walls with gaps. Physical damage only.
 //
-// MARKED STRIKES: a crosshair reticle locks onto the player's position and
-// an arrow flies in on a concave (gravity) arc - damage lands WHEN THE
-// ARROW IMPACTS the mark, not at lock-on. The ring is just the aim; the
-// arrow is the hit.
-//
-// ARROW GAUNTLET (HP-gated set-piece at 66% / 33%, Viper Napuatzi-style):
-// a 5-4-3-2-1 countdown announces the gauntlet, then a rectangle of
-// conjured bows walls the player in - impassable until the formation is
-// survived. The bows fire arrow walls with gaps to dodge through; the 33%
-// gauntlet is faster and meaner than the 66% one. Arrows deal heavy
-// PHYSICAL damage (no element = armour-only mitigation). The auto-attack
-// charge bar is paused for the whole gauntlet (countdown included) - see
-// _egMarksGauntletChargePaused in endgame-encounter.js.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb,
-// frozen_cells, clue_swap, grid_invert, summons) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Shared mechanics (probability_shift) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
