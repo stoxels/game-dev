@@ -5,15 +5,11 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //-------------------BOSS: THE PHANTOM (boss_phantom)---------------------------
 //------------------------------------------------------------------------
 // Vent-assassin homage: three vents breathe on the arena floor. The Phantom
-// telegraphs at the vent nearest you - then steps out and slashes. Never
+// telegraphs at the vent nearest you, then steps out and slashes. Never
 // linger beside a breathing vent.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (fog_bank) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Slash strikes from the vent nearest the player, telegraphed first.
+// Keep moving so no vent stays the nearest one for long.
 export function _egMechVentAmbush(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
