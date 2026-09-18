@@ -6,54 +6,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE AEGIS (boss_aegis)-------------------------
 //------------------------------------------------------------------------
-// REWORK - guardian-fortress homage, rebuilt as a full bulwark gauntlet.
-// The Aegis fights like a castle that learned to walk: it hides behind
-// summoned guards, charges you behind its shield, plants sentries that
-// hurl tracking orbs, and sweeps the field with a rotating guard rotor -
-// then, at the very end, it plants THE LAST BASTION and sweeps the whole
-// arena with escalating beams before one final vanguard charge.
-//
-//   Phase 1 (100–60%) - AEGIS PROTOCOL (signature, upgraded). The boss
-//                       summons a guard squad and goes IMMUNE while they
-//                       live - kill the guards to break the shield (40s
-//                       failsafe). Guards now wear a pulsing guardian ring
-//                       and the whole arena gets an "aegis active" glow so
-//                       the state reads at a glance.
-//                       Plus SHIELD CHARGE. The boss picks your row and
-//                       BARRELS across it behind its shield. Out of the
-//                       lane! Two charges per cast; three at the end.
-//   Phase 2 ( ≤60%)   - SENTRY SHIELDS. Sentry shields plant at the edges
-//                       and hurl slow tracking orbs at you for a while.
-//                       Strafe the orbs!
-//                       Plus GUARD ROTOR. Two guardian orbs tether a beam
-//                       that sweeps around a pivot like a radar blade.
-//                       Stay off the arms! Everything gets faster.
-//   Phase 3 ( ≤30%)   - Three charges, three sentries, a faster rotor. The
-//                       gates will not hold much longer.
-//   Finale ( ≤10%)    - THE LAST BASTION (one-shot set-piece): the boss
-//                       goes immune and shielded and FORTIFIES while a
-//                       stone citadel swallow the arena. A bastion plants
-//                       at the centre and sweeps the field with two
-//                       opposite beams - each beat they spin FASTER (80° →
-//                       115° → 150° per second). Then the VANGUARD: the
-//                       beams retract and three shield charges barrel
-//                       across your row, the last one huge. STAY OFF THE
-//                       BEAMS! Charge bar frozen for the whole set-piece
-//                       (gate in _egTickPlayer via _egAgFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Walking-castle bulwark gauntlet: a guard squad shields the boss until
+// killed, shield charges barrel down your row, sentry orbs and a sweeping
+// guard rotor join at 60%; at ≤10% THE LAST BASTION spins faster and faster
+// beams before a final triple vanguard charge.
 //------------------------------------------------------------------------
 
 export const _EG_AG_DEBUG_SLOW = false;
