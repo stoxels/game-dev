@@ -4,15 +4,11 @@ import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNew
 //------------------------------------------------------------------------
 //-------------------BOSS: THE EXARCH (boss_exarch)---------------------------
 //------------------------------------------------------------------------
-// PoE Exarch homage: constricting ring, outside = heavy DoT.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Constricting-ring homage: a safe circle shrinks around you while the
+// outside burns. Stay inside and keep ahead of the closing wall.
 //
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb,
-// frozen_cells, clue_swap, grid_invert, summons) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Shared mechanics (prior_bomb) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -39,6 +35,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// A safe ring shrinks over time; standing outside it burns.
+// Drift inward early so the closing wall never catches you.
 export function _egMechConstriction(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
