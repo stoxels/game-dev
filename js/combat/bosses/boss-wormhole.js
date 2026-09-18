@@ -4,16 +4,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 //------------------------------------------------------------------------
 //-------------------BOSS: THE WORMHOLE (boss_wormhole)-------------------------
 //------------------------------------------------------------------------
-// Portal homage: two wormholes tear open - step into one and you fall out
-// of the other. A hungry wisp rides you down the whole time, and it does
-// not do doors. Lose it through the holes.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Portal homage: two wormholes tear open - step into one and fall out of
+// the other. A hungry wisp rides you the whole time, and it does not do
+// doors. Lose it through the holes.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (clue_scramble) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Moves the avatar sprite to a point, through the game's own mover when
+// present. Plain fallback keeps portals working without that system.
 export function _egTeleportAvatarTo(x, y) {
     const el = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
@@ -52,6 +50,8 @@ export function _egTeleportAvatarTo(x, y) {
     }
 }
 
+// Linked portal pair plus a chasing wisp. Hop through to shake the wisp;
+// the hop cooldown stops flickering back and forth.
 export function _egMechPortalWisp(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
