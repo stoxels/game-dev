@@ -4,39 +4,13 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFroze
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SWARM (boss_swarm)--------------------------
 //------------------------------------------------------------------------
-// Galaga homage turned living hive: the drones never sit still - the whole
-// arena breathes with them.
-//   • SWARM ARC (signature, all fight) - a wedge of 🛸 drones carves a huge
-//     arc across the stage; drones trail LAVAL GLOW so the arc edge is the
-//     dodge line, and a hatchling 🐝 splinters off mid-arc to keep cutting.
-//   • MIMIC QUEEN (60%) - four 🛸 drones halt mid-flight and open like
-//     flowers to reveal 👑 larvae. One is real, three are mimics: step on
-//     the REAL larva to crush it - royal jelly heals you 15% maxHP (golden
-//     flare + toast). Step on a mimic and it bursts a rancid stink cloud
-//     (mist-green, 12% hit while you stand in it). Larvae sink after 4s.
-//   • HIVE EYE (60%) - the hive blinds you: a probe sweeps from the hive
-//     to your position, then BLOOMS a smoke ring that covers everything
-//     outside its 150px clear hole for ~6s. Two overlapping blooms in
-//     phase 3. Read the ring edge and plan BEFORE the bloom.
-//   • 🐝 THE SWARM SINGULARITY (≤10%, one-shot finale) - every drone
-//     recalls into a whirling ball of wings; 3 rapid CHARGES from the ball
-//     (stand in the marked gap), then the ball implodes into a funnel of
-//     24 drones you must SLIP BETWEEN. Survive the funnel: the swarm
-//     scatters, the fight resumes.
+// Living-hive siege: a drone wedge carves arcs across the arena all fight,
+// the MIMIC QUEEN guessing game and the blinding HIVE EYE join at 60%, and
+// at ≤10% THE SWARM SINGULARITY recalls every drone into charges plus a
+// 24-drone funnel to slip between.
 //
-// Charge bar is frozen for the whole finale (gate in _egTickPlayer via
-// _egSwFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (prior_bomb, clue_scramble) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Shared mechanics (prior_bomb) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 // DEBUG: slow the Swarm's timing 2.5x so manual playtests / screenshot
