@@ -38,6 +38,7 @@ import { _renderPlayerAvatarSimple, _renderPlayerHealth, _showPlayerAvatar, _sho
 import { _applyCompletionGlimpse, _applyPassiveStartEffects, _applySylaForestAffinity, _hideCompletionGlimpseBar, _initLuckyTiles } from './start-level-passives.js';
 import { save } from './state.js';
 import { _applyLowHealthVignette, _resetLowTimeWarningState, startTimer, stopTimer, updTimer } from './timer.js';
+import { addTimeSecs } from './puzzle-mechanics/timer-adjust.js';
 import { t } from './translation/translations.js';
 
 //------------------------------------------------------------------------
@@ -299,13 +300,11 @@ export function _initTimer() {
 
     const extSessionBonus = _applyExtendedSessionBonus();
     const expValueBonus = _applyExpectedValueBonus();
-    globalThis.timerSecs += extSessionBonus;
-    globalThis.timerSecs += expValueBonus;
-    globalThis._levelTimeAdded += extSessionBonus + expValueBonus;
+    addTimeSecs(extSessionBonus);
+    addTimeSecs(expValueBonus);
 
     if (ptHasSkill('keystone_dead_reckoning') && !ptHasSkill('keystone_gamblers_ruin')) {
-        globalThis.timerSecs += 600;
-        globalThis._levelTimeAdded += 600;
+        addTimeSecs(600);
     }
     // Fresh level - reset low-time center banners (keeps _lowTimeLastSecs
     // as null so the first updTimer can immediately surface the relevant

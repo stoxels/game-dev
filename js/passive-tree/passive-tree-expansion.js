@@ -1,7 +1,8 @@
 ﻿import { _isColSolved, _isRowSolved, clues, renderCell, updClues } from '../grid.js';
 import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { save } from '../state.js';
-import { _calcEmergencyScanDuration, _trackTimerDelta, updTimer } from '../timer.js';
+import { _calcEmergencyScanDuration, updTimer } from '../timer.js';
+import { addTimeSecs, subtractTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
@@ -100,18 +101,12 @@ export function _ptxRunExpansion() {
 
     function addSecs(n) {
         if (!globalThis.cur || globalThis.dead || n <= 0) return;
-        const before = globalThis.timerSecs;
-        globalThis.timerSecs = Math.min(7200, globalThis.timerSecs + n);
-        if (typeof _trackTimerDelta === 'function') _trackTimerDelta(before, globalThis.timerSecs);
-        updTimer();
+        addTimeSecs(n, { capSecs: 7200 });
     }
 
     function loseSecs(n) {
         if (!globalThis.cur || globalThis.dead || n <= 0) return;
-        const before = globalThis.timerSecs;
-        globalThis.timerSecs = Math.max(0, globalThis.timerSecs - n);
-        if (typeof _trackTimerDelta === 'function') _trackTimerDelta(before, globalThis.timerSecs);
-        updTimer();
+        subtractTimeSecs(n);
     }
 
     function freeze(ms) {
@@ -916,9 +911,11 @@ export function _ptxRunExpansion() {
             globalThis.STATE.ptxSavingsSecs = 0;
         }
 
-        if (add > 0) globalThis.timerSecs += add;
+        if (add > 0) addTimeSecs(add);
 
-        // Scholar's Debt keystone: double total starting time.
+        // Scholar's Debt keystone: double total starting time. Raw write on
+        // purpose - this is level-start setup, not a player-facing time gain,
+        // so it must not feed the time-added bookkeeping.
         if (has('keystone_scholars_debt')) globalThis.timerSecs += globalThis.timerSecs;
 
         window._ptxBaseTime = globalThis.timerSecs;

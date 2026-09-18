@@ -1,4 +1,5 @@
 ﻿import { stopTimer, timesUp, updTimer } from './timer.js';
+import { subtractTimeSecs } from './puzzle-mechanics/timer-adjust.js';
 import { revealTiles, markWrongTiles } from './puzzle-mechanics/grid-actions.js';
 import { trackAchStat } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';
@@ -181,11 +182,9 @@ export function _applyTimeDeduction(row, col, effectivePen) {
         updTimer();
         return;
     }
-    globalThis.timerSecs = Math.max(0, globalThis.timerSecs - effectivePen);
-    updTimer();
+    subtractTimeSecs(effectivePen);
     if (effectivePen > 0) {
         globalThis.actuaryLogMistake(row, col, effectivePen);
-        globalThis._levelTimeLost += effectivePen;
     }
 }
 

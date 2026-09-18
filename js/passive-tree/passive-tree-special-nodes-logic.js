@@ -2,6 +2,7 @@
 import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { stopTimer, updTimer } from '../timer.js';
+import { addTimeSecs, subtractTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { PassiveTracker } from './passive-tracker.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
@@ -548,7 +549,7 @@ export function _applyMaximumLikelihood() {
     const sol = globalThis.cur.grid;
 
     // Apply the time penalty first (-15 minutes)
-    globalThis.timerSecs = Math.max(0, globalThis.timerSecs - 900);
+    subtractTimeSecs(900);
 
     const densestRow = _findDensestRow(sol);
     const densestCol = _findDensestCol(sol);
@@ -583,16 +584,14 @@ export function _applyMaximumLikelihood() {
 // Adds 3 seconds for a correct fill. Called from mouse-button-handlers.js.
 export function _gamblersRuinOnCorrectFill() {
     if (!ptHasSkill('keystone_gamblers_ruin')) return;
-    globalThis.timerSecs += 3;
+    addTimeSecs(3);
     questStat_gamblersRuinTimeAdded(3);
-    updTimer();
 }
 
 // Deducts 60 seconds for a mistake. Called from penalty.js.
 export function _gamblersRuinOnMistake() {
     if (!ptHasSkill('keystone_gamblers_ruin')) return;
-    globalThis.timerSecs = Math.max(0, globalThis.timerSecs - 60);
-    updTimer();
+    subtractTimeSecs(60);
 }
 
 
