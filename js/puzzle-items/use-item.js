@@ -14,7 +14,7 @@ import { _useCursedShield } from './cursed/cursed-shield.js';
 import { _useCursedTime } from './cursed/cursed-time.js';
 import { _useFreeze } from './freeze/freeze.js';
 import { _useGoldenClock } from './golden-clock/golden-clock.js';
-import { buildInventoryPanel } from './inventory-panel.js';
+import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { ITEM_DEFS } from './item-definitions.js';
 import { _useMarkWrong } from './mark-wrong.js';
 import { _useTutorItem } from './tutor-item/tutor-item.js';

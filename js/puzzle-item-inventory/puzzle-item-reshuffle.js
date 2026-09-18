@@ -1,9 +1,9 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
-import { buildInventoryPanel } from './inventory-panel.js';
-import { ITEM_DEFS } from './item-definitions.js';
-import { itemDesc, itemName, pickLuckyItem, rarityColors } from './item-pool.js';
+import { buildInventoryPanel } from './puzzle-item-inventory-panel.js';
+import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
+import { itemDesc, itemName, pickLuckyItem, rarityColors } from '../puzzle-items/item-pool.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------

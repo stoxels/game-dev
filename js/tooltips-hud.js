@@ -7,7 +7,7 @@ import { _egIsActive } from './combat/combat-state.js';
 import { ALL, lvText } from './levels/levels.js';
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
 import { _getAsymptoticMasteryReduction, _getPenaltySecondsAtCount } from './penalty.js';
-import { RESHUFFLE_GOAL } from './puzzle-items/inventory-reshuffle.js';
+import { RESHUFFLE_GOAL } from './puzzle-item-inventory/puzzle-item-reshuffle.js';
 import { rarityColors } from './puzzle-items/item-pool.js';
 import { _getLevelSpecialStatus } from './scoring.js';
 import { _getGridSizeTier } from './start-level-passives.js';

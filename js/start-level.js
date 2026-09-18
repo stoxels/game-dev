@@ -22,7 +22,7 @@ import { _refreshTouchpadModeButtonLabel, updateTouchpadModeButtonVisibility } f
 import { PassiveTracker } from './passive-tree/passive-tracker.js';
 import { _applyDegreesOfFreedom, _applyFrequentistsBurden, _applySignalToNoise, _applySparsePrior, _applyTheOracle, _entropyDrainInit, _resetNewNodeState, resetOverfittingTracker } from './passive-tree/passive-tree-special-nodes-logic.js';
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
-import { buildInventoryPanel } from './puzzle-items/inventory-panel.js';
+import { buildInventoryPanel } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { rarityColors } from './puzzle-items/item-pool.js';
 import { showPrimerModal } from './puzzle-items/scouts-primer/scouts-primer.js';
 import { _fxShieldBorderRemove } from './puzzle-mechanics/fx-helpers.js';

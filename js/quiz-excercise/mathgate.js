@@ -7,7 +7,7 @@ import { _egIsActive } from '../combat/combat-state.js';
 import { WORLDS } from '../levels/level-world-data.js';
 import { WORLD_START_GI } from '../levels/levels.js';
 import { PT } from '../passive-tree/passive-tree.js';
-import { buildInventoryPanel } from '../puzzle-items/inventory-panel.js';
+import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../quests/quests-stats.js';
 import { _refreshQuestionModalFlag, goToLevelSelect, hideModal, showModal } from '../screens/screens.js';

@@ -14,7 +14,7 @@ import { questStat_mcWrongAnswerEliminated, questStat_tutorAnsweredCorrect, upda
 import { _refreshQuestionModalFlag } from '../../screens/screens.js';
 import { save } from '../../state.js';
 import { pauseTimer, resumeTimer } from '../../timer.js';
-import { buildInventoryPanel } from '../inventory-panel.js';
+import { buildInventoryPanel } from '../../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { PRIMER_MAX, applyPrimerHeadstart, applyPerfectPrimerReveal } from './scouts-primer-reveal.js';
 import { shuffle } from '../../puzzle-mechanics/puzzle-helpers.js';
 

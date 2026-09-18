@@ -8,7 +8,7 @@ import { _egOnQuizWrongAnswer } from '../endgame/endgame-map-launch.js';
 import { _egApplyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
 import { buildReveal } from '../grid.js';
 import { PT } from '../passive-tree/passive-tree.js';
-import { buildInventoryPanel } from '../puzzle-items/inventory-panel.js';
+import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { shuffle } from '../puzzle-mechanics/puzzle-helpers.js';
 import { questStat_mcWrongAnswerEliminated, questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../quests/quests-stats.js';
 import { _refreshQuestionModalFlag } from '../screens/screens.js';

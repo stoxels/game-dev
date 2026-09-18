@@ -13,7 +13,7 @@ import { _egBankUnclaimedMapDrops } from './loot/loot-maps.js';
 import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
 import { WORLDS } from './levels/level-world-data.js';
 import { ALL, WORLD_START_GI, isNexusPointLevel, isNexusWorld } from './levels/levels.js';
-import { buildInventoryPanel } from './puzzle-items/inventory-panel.js';
+import { buildInventoryPanel } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { ITEM_DEFS } from './puzzle-items/item-definitions.js';
 import { showItemGainPopup, showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { _incDirect, updateQuestStats } from './quests/quests-stats.js';
