@@ -5,45 +5,13 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFli
 //------------------------------------------------------------------------
 //-------------------BOSS: THE LODESTONE (boss_lodestone)------------------
 //------------------------------------------------------------------------
-// A rework of the old one-shot Polarity Field into a persistent magnetic
-// siege. The Lodestone is a living magnet and the whole arena is its
-// field. Fight identity: POLARITY - you are metal; it moves you.
+// Living-magnet siege - POLARITY moves you: drifting stone with radial pull,
+// flipping N/S REPULSION PULSES, shrapnel filings, MAGNETIC VORTEX at 60%,
+// RAILGUN lanes at 30%, and the MAGNETIC LEASH reel-in charge attack. One
+// _egNkLoop drives every state machine.
 //
-//   PERSISTENT (whole fight, watcher):
-//   • THE LODESTONE - the boss's arena body: a floating 🧲 that drifts
-//     around the table. Touching it is a MAGNETIC CLAMP: you are flung
-//     INTO the stone (magnetism pulls, it doesn't push) + lightning hit.
-//   • POLARITY DRAG - the stone constantly ATTRACTS you (gentle radial
-//     pull, phase-scaled). Every ~6-7s its polarity FLIPS (visible N/S
-//     recolor + banner): the flip emits a REPULSION PULSE that shoves you
-//     hard away from the stone. Ride the pull, respect the flips.
-//   • SHRAPNEL FILINGS - the stone sheds magnetized iron filings (🔩)
-//     that spiral outward and launch radially. Lightning hits.
-//
-//   60% GATE - MAGNETIC VORTEX: the stone plants itself at center and
-//   spins up (spiral field visuals): a strong drag pulls everything toward
-//   it for ~4.5s; standing too close grinds you against it (lightning
-//   DoT). Fight the pull and keep your distance.
-//
-//   30% GATE - RAILGUN: the stone aligns magnetic rails through itself
-//   (full-screen lane telegraphs aimed at you), gathers filings into the
-//   lane, then fires a ⚡ slug down each one. Anyone hit is flung.
-//
-//   CHARGE ATTACK - MAGNETIC LEASH: the stone fires a chain 🔗 along a
-//   telegraphed line. If it connects, you are REELED IN fast - end up
-//   inside the clamp radius when the chain runs out and you take heavy
-//   lightning damage + a clamp fling. If it misses, the chain sticks
-//   harmlessly.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string. Damage flows through the shared tier curve.
-// NOTE: exactly ONE _egNkLoop runs on the watcher's run - every state
-// machine (flip pulse, vortex, railgun, leash) lives in that single tick.
+// Shared mechanics (probability_shift) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
