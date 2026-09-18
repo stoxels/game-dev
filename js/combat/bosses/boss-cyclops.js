@@ -4,16 +4,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CYCLOPS (boss_cyclops)---------------------------
 //------------------------------------------------------------------------
-// Bullet-eye homage: the great eye opens and fires radial bursts - eight
-// slow orbs at a time, four volleys deep. The gaps are wide; the punishment
-// for dozing inside one is not.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Bullet-eye homage: the great eye fires radial bursts - eight slow orbs
+// at a time, volleys deep. The gaps are wide; dozing inside one is not
+// forgiven.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (prior_bomb) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Rotating radial orb volleys from a fixed eye. Each volley turns the gaps,
+// so park where the last gap was, not where the next one will be.
 export function _egMechEyeBursts(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
