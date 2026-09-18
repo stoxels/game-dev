@@ -4,6 +4,7 @@ import { LANG, t } from '../translation/translations.js';
 import { _renderTopBarClassStatus, _renderTopBarNextCode, _renderTopBarQuestBadge, _renderTopBarScore, _renderTopBarTreePoints, _wireTopBarButtons, showMapView } from './screens-map-view.js';
 import { WD_WORLD_CONFIGS } from './screens-world-levels-config.js';
 import { switchScreen } from './screens.js';
+import { STATE } from '../state.js';
 /*
     ========================================================================
     SCREENS-WORLD-LEVELS.JS
@@ -225,7 +226,7 @@ export function _wdBuildLinearSegment(cfg, i) {
 export function _wdIsExtraRoadVisible(extra, wi) {
     if (extra.showAfter === undefined) return true;
     const gi = globalThis.WORLD_START_GI[wi] + extra.showAfter;
-    return !!(globalThis.STATE && globalThis.STATE.done && globalThis.STATE.done.includes(gi));
+    return !!(STATE && STATE.done && STATE.done.includes(gi));
 }
 
 /**
@@ -457,7 +458,7 @@ export function _wdIsNodeReached(n, wi) {
         return (typeof globalThis._egIsTrialDone === 'function') && globalThis._egIsTrialDone(wi);
     }
     const gi = globalThis.WORLD_START_GI[wi] + n;
-    if (globalThis.STATE && globalThis.STATE.done && globalThis.STATE.done.includes(gi)) return true;
+    if (STATE && STATE.done && STATE.done.includes(gi)) return true;
     return _wdCurrentLevelIdx === n;
 }
 
@@ -537,8 +538,8 @@ export function _wdIsLevelUnlocked(li, gi, wi) {
     if (typeof wi === 'number' && typeof globalThis.isNexusWorld === 'function' && globalThis.isNexusWorld(wi)) {
         if (typeof globalThis.isNexusWorldUnlocked === 'function' && !globalThis.isNexusWorldUnlocked()) return false;
     }
-    if (li === 0) return !!(globalThis.STATE && globalThis.STATE.tutorialDone);
-    return !!(globalThis.STATE && globalThis.STATE.done && globalThis.STATE.done.includes(gi - 1));
+    if (li === 0) return !!(STATE && STATE.tutorialDone);
+    return !!(STATE && STATE.done && STATE.done.includes(gi - 1));
 }
 
 /**
@@ -893,7 +894,7 @@ export function _wdBuildPlainNodeHtml(icon, stoxelHtml) {
  * Returns true if the player has beaten this level on Hard with ALL modifiers active.
  */
 export function _wdIsMaxCleared(gi) {
-    const hs = globalThis.STATE && globalThis.STATE.levelHS && globalThis.STATE.levelHS[gi];
+    const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
     if (!hs) return false;
     return hs.diff === 'hard' &&
         hs.mods &&
@@ -954,7 +955,7 @@ export function _wdBuildLevelNode(wi, li, pos) {
     const world = globalThis.WORLDS && globalThis.WORLDS[wi];
 
     // Determine state flags
-    const isDone = !!(globalThis.STATE && globalThis.STATE.done && globalThis.STATE.done.includes(gi));
+    const isDone = !!(STATE && STATE.done && STATE.done.includes(gi));
     const isUnlocked = _wdIsLevelUnlocked(li, gi, wi);
     const isLocked = !isUnlocked;
     const isLastInWorld = !!(world && li === world.data.length - 1);
@@ -1145,7 +1146,7 @@ export function _wdUpdateSpriteFrame(sprite, startPos, endPos, ease) {
     sprite.style.top = pct.y + '%';
 
     const dir = _wdDirectionForSegment(startPos, endPos);
-    const st = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE : null;
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
     const char = st ? st.playerCharacter : null;
     const variant = st ? (st.playerAscendency || st.playerClass || 'noclass') : 'noclass';
     let directional = false;
@@ -1168,9 +1169,9 @@ export function _wdUpdateSpriteFrame(sprite, startPos, endPos, ease) {
  * Saves the sprite's current level position to STATE and triggers a save.
  */
 export function _wdPersistSpritePos(wi, levelIdx) {
-    if (!globalThis.STATE) return;
-    if (!globalThis.STATE.wdSpriteLevel) globalThis.STATE.wdSpriteLevel = {};
-    globalThis.STATE.wdSpriteLevel[wi] = levelIdx;
+    if (!STATE) return;
+    if (!STATE.wdSpriteLevel) STATE.wdSpriteLevel = {};
+    STATE.wdSpriteLevel[wi] = levelIdx;
     if (typeof save === 'function') save();
 }
 
@@ -1820,7 +1821,7 @@ export function _wdGetLevelHint(wi, li) {
  * Returns a star string for a level's best run (mirrors getStars in screens-level-select.js).
  */
 export function _wdGetStars(gi) {
-    const hs = globalThis.STATE && globalThis.STATE.levelHS && globalThis.STATE.levelHS[gi];
+    const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
     if (!hs) return '';
     const diffIndex = WD_DIFF_TIERS.indexOf(hs.diff || 'easy');
     const starCount = Math.max(1, diffIndex + 1);
@@ -1850,7 +1851,7 @@ export function _wdGetTooltipStatusText(gi, isDone, isLocked) {
     if (_wdIsMathGated(gi)) {
         return t('scr_gate_unsolved');
     }
-    const hs = globalThis.STATE && globalThis.STATE.levelHS && globalThis.STATE.levelHS[gi];
+    const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
     if (isDone && hs) {
         return t('scr_level_done_best').replace('{n}', hs.score);
     }
@@ -1872,7 +1873,7 @@ export function _wdBuildTooltipBonusHtml(gi, levelData, isLocked) {
     const bonusLabel = (LANG === 'de' && levelData.bonusHintDE) ? levelData.bonusHintDE
         : (levelData.bonusHint || t('ls_complete_level'));
 
-    if (globalThis.STATE && globalThis.STATE.bonusDone && globalThis.STATE.bonusDone.includes(gi)) {
+    if (STATE && STATE.bonusDone && STATE.bonusDone.includes(gi)) {
         return `<div class="wd-tip-bonus done">${bIcon} ${t('scr_bonus_claimed_tip')}</div>`;
     }
     if (!isLocked) {
@@ -1899,7 +1900,7 @@ export function _wdBuildTooltipGridHtml(levelData, world, isLocked) {
 export function _wdShowTooltip(e, wi, li, isDone, isLocked, isLastInWorld, isConvergence, isMaxCleared, isNexusPoint) {
     const tip = _wdEnsureTooltip();
     const gi = globalThis.WORLD_START_GI[wi] + li;
-    const hs = globalThis.STATE && globalThis.STATE.levelHS && globalThis.STATE.levelHS[gi];
+    const hs = STATE && STATE.levelHS && STATE.levelHS[gi];
     const world = globalThis.WORLDS && globalThis.WORLDS[wi];
     const levelData = world && world.data[li];
     if (typeof isNexusPoint === 'undefined' && typeof globalThis.isNexusPointLevel === 'function') {
@@ -2001,8 +2002,8 @@ export function _wdSyncSpriteToLevel(gi) {
         const world = globalThis.WORLDS[wi];
         if (gi >= start && gi < start + world.data.length) {
             const li = gi - start;
-            if (!globalThis.STATE.wdSpriteLevel) globalThis.STATE.wdSpriteLevel = {};
-            globalThis.STATE.wdSpriteLevel[wi] = li;
+            if (!STATE.wdSpriteLevel) STATE.wdSpriteLevel = {};
+            STATE.wdSpriteLevel[wi] = li;
             if (typeof save === 'function') save();
             break;
         }
@@ -2024,8 +2025,8 @@ export function showWorldDetail(wi) {
     if (typeof Audio_Manager !== 'undefined') Audio_Manager.playBGM('overworld');
     _wdCurrentWi = wi;
 
-    _wdCurrentLevelIdx = (globalThis.STATE && globalThis.STATE.wdSpriteLevel && globalThis.STATE.wdSpriteLevel[wi] !== undefined)
-        ? globalThis.STATE.wdSpriteLevel[wi]
+    _wdCurrentLevelIdx = (STATE && STATE.wdSpriteLevel && STATE.wdSpriteLevel[wi] !== undefined)
+        ? STATE.wdSpriteLevel[wi]
         : null;
     _wdPendingRedirect = null;
 

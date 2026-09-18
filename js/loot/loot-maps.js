@@ -13,6 +13,7 @@ import { EG_MAP_BASE_BOSS_CHANCE, _egActiveMapItem, _egMapLootQuantityMult } fro
 import { _egBuildItemName, _egBuildModPool, _egBuildRolledStats, _egPickModFromPool, _egPickTier, _egRollMods } from './loot-mod-application.js';
 import { _egBuildMergedModLines } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from '../combat/combat-state.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME MAP ITEMS (PoE-STYLE)------------------------
@@ -2169,8 +2170,8 @@ export function _egMigrateMapBossImplicits() {
             _egHealMapBossImplicits(globalThis._egMapSlotItem);
         }
         // Also patch the hub state's saved copy so next save is clean.
-        if (typeof STATE !== 'undefined' && globalThis.STATE) {
-            const stash = globalThis.STATE.egMapStash;
+        if (typeof STATE !== 'undefined' && STATE) {
+            const stash = STATE.egMapStash;
             if (Array.isArray(stash)) {
                 const isTieredS = (typeof _egIsTieredMapStash === 'function' && _egIsTieredMapStash(stash));
                 if (isTieredS) {
@@ -2188,8 +2189,8 @@ export function _egMigrateMapBossImplicits() {
                     });
                 }
             }
-            if (globalThis.STATE.egMapSlotItem && globalThis.STATE.egMapSlotItem.category === 'map') {
-                _egHealMapBossImplicits(globalThis.STATE.egMapSlotItem);
+            if (STATE.egMapSlotItem && STATE.egMapSlotItem.category === 'map') {
+                _egHealMapBossImplicits(STATE.egMapSlotItem);
             }
         }
     } catch (e) { /* ignore migration errors */ }

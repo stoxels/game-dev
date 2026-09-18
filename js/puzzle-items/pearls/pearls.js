@@ -3,6 +3,7 @@ import { cooldownState, startSlotCooldown } from '../../classes/class-cooldown-s
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { PEARL_VARIANTS, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { STATE } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------PEARLS - OF HASTE / OF SWIFTNESS / GRAND PEARL----------------------
@@ -21,7 +22,7 @@ export function _resetCooldownSlot(slot) {
 
 // pearlOfHaste - resets the cooldown of active skill slot 1.
 export function _usePearlOfHaste(id, def) {
-    if (!globalThis.STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
+    if (!STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
     _resetCooldownSlot('active1');
     playItemEffect(id);
     return `${def.icon} ${t('itm_cooldown_s1')}`;
@@ -29,7 +30,7 @@ export function _usePearlOfHaste(id, def) {
 
 // pearlOfSwiftness - resets the cooldown of active skill slot 2.
 export function _usePearlOfSwiftness(id, def) {
-    if (!globalThis.STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
+    if (!STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
     _resetCooldownSlot('active2');
     playItemEffect(id);
     return `${def.icon} ${t('itm_cooldown_s2')}`;
@@ -37,7 +38,7 @@ export function _usePearlOfSwiftness(id, def) {
 
 // grandPearl - resets the cooldowns of both active skill slots.
 export function _useGrandPearl(id, def) {
-    if (!globalThis.STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
+    if (!STATE.playerClass) return `${def.icon} ${t('itm_no_class')}`;
     _resetCooldownSlot('active1');
     _resetCooldownSlot('active2');
     playItemEffect(id);

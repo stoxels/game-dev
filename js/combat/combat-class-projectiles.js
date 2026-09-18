@@ -4,6 +4,7 @@ import { _egAnimatePlayerProjectile } from './encounter.js';
 import { _egMapAbilityRevealMult, _egMapItemRevealMult } from '../endgame/endgame-map-launch.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.
@@ -210,8 +211,8 @@ export function _egGetRevealProjectileDamagePct() {
 // Returns the projectile definition for the player's current class.
 // Falls back to _default when class is null or unrecognised.
 export function _egGetProjectileDef() {
-    const cls = (typeof STATE !== 'undefined' && globalThis.STATE.playerClass)
-        ? globalThis.STATE.playerClass.toLowerCase()
+    const cls = (typeof STATE !== 'undefined' && STATE.playerClass)
+        ? STATE.playerClass.toLowerCase()
         : '_default';
     return EG_CLASS_PROJECTILES[cls] || EG_CLASS_PROJECTILES._default;
 }

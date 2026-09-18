@@ -8,6 +8,7 @@ import { _playDivineProcEffect } from './class-statistician.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_fieldScanCellRevealed, updateQuestStats } from '../inference/inference-stats.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //------------------------PROBABILIST-------------------------------------
@@ -98,7 +99,7 @@ export function _pmGetSpriteOrigin() {
 // based on the player's class level and any relevant passive skills.
 export function _precisionMarkComputeMarkCap() {
     // Effect rank follows the slotted charm when one is placed.
-    let level = globalThis.STATE.classActive1Level || 1;
+    let level = STATE.classActive1Level || 1;
     if (typeof getSkillCastRankClamped === 'function') {
         const charmRank = getSkillCastRankClamped('probabilist_active1');
         if (charmRank) level = charmRank;
@@ -828,7 +829,7 @@ export function _scanBeamScheduleRowFlashes(startRow, endRow, startCol, endCol, 
 export function _fieldScanGetEffectiveSizeForPreview() {
     const def = CLASS_DEFS?.probabilist;
     if (!def) return 3;
-    let level = globalThis.STATE.classActive2Level || 1;
+    let level = STATE.classActive2Level || 1;
     if (typeof getSkillCastRankClamped === 'function') {
         const charmRank = getSkillCastRankClamped('probabilist_active2');
         if (charmRank) level = charmRank;
@@ -881,8 +882,8 @@ export function _fieldScanClearPreview() {
 // so the preview always matches what will actually be scanned.
 export function _fieldScanUpdatePreview(clientX, clientY) {
     const isArmed = globalThis.activeAbilityMode
-        && globalThis.STATE.playerClass === 'probabilist'
-        && globalThis.STATE.classActiveChoice === 'active2';
+        && STATE.playerClass === 'probabilist'
+        && STATE.classActiveChoice === 'active2';
 
     if (!isArmed || !globalThis.cur) { _fieldScanClearPreview(); return; }
 

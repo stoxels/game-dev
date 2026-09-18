@@ -1,4 +1,5 @@
 import { _getPlayerCharacterImage } from './player_sprite.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------SPRITE ANIMATIONS-------------------------------------
@@ -273,8 +274,8 @@ export function _advanceWalkFrameIndex(frameCount) {
 // otherwise the omnidirectional set plays. Draw walk frames facing
 // right - the avatar flip in player_sprite.js mirrors them when needed.
 export function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simple', direction = null) {
-    const char = globalThis.STATE?.playerCharacter;
-    const asc = globalThis.STATE?.playerAscendency || globalThis.STATE?.playerClass || 'noclass';
+    const char = STATE?.playerCharacter;
+    const asc = STATE?.playerAscendency || STATE?.playerClass || 'noclass';
     if (!char) return;
 
     // Remember facing so the sprite keeps looking its travel direction
@@ -435,13 +436,13 @@ export const _SKILL_TIMINGS = {
 // static portrait keeps showing) if no frames are defined yet.
 export function _playAvatarSkillAnimation(skillKey, imgElementId) {
     if (typeof _playAvatarSkillAnimationGeneric === 'function') {
-        const char = globalThis.STATE?.playerCharacter;
-        const asc = globalThis.STATE?.playerAscendency || globalThis.STATE?.playerClass || 'noclass';
+        const char = STATE?.playerCharacter;
+        const asc = STATE?.playerAscendency || STATE?.playerClass || 'noclass';
         _playAvatarSkillAnimationGeneric(char, asc, skillKey, imgElementId);
         return;
     }
-    const char = globalThis.STATE?.playerCharacter;
-    const asc = globalThis.STATE?.playerAscendency;
+    const char = STATE?.playerCharacter;
+    const asc = STATE?.playerAscendency;
     if (!char || !asc) return;
 
     const frames = _SKILL_FRAMES[char]?.[asc]?.[skillKey];
@@ -540,8 +541,8 @@ export function _animCharCap(char) {
 
 // Ascendency wins over base class, mirroring _getPlayerCharacterImage().
 export function _animVariant() {
-    if (typeof STATE === 'undefined' || !globalThis.STATE) return 'noclass';
-    return globalThis.STATE.playerAscendency || globalThis.STATE.playerClass || 'noclass';
+    if (typeof STATE === 'undefined' || !STATE) return 'noclass';
+    return STATE.playerAscendency || STATE.playerClass || 'noclass';
 }
 
 // Which avatar <img> should animate right now? Only one of the two
@@ -722,7 +723,7 @@ export function _animExpectedWalkDownSrc(char, variant) {
 // optimistic idle-down path (with onerror chain handled by the caller via
 // _animSetDefaultDownImage), otherwise the menu portrait.
 export function _getPlayerPuzzleDefaultImage() {
-    const st = (typeof STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE : null;
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
     const char = st ? st.playerCharacter : null;
     const variant = (typeof _animVariant === 'function') ? _animVariant() : 'noclass';
     if (!char) {
@@ -741,7 +742,7 @@ export function _getPlayerPuzzleDefaultImage() {
 // paint where discovery hasn't confirmed the art yet.
 export function _animSetDefaultDownImage(imgEl) {
     if (!imgEl) return;
-    const st = (typeof STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE : null;
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
     const char = st ? st.playerCharacter : null;
     const variant = (typeof _animVariant === 'function') ? _animVariant() : 'noclass';
     const menuSrc = (typeof _getPlayerCharacterImage === 'function') ? _getPlayerCharacterImage() : '';
@@ -874,7 +875,7 @@ export function _scheduleIdleFaceReset(imgElementId, face) {
 export function _startAvatarIdleAnimation(imgElementId, direction) {
     const id = (typeof _animTargetImgId === 'function') ? _animTargetImgId(imgElementId) : imgElementId;
     if (!id || typeof document === 'undefined') return;
-    const char = (typeof STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE.playerCharacter : null;
+    const char = (typeof STATE !== 'undefined' && STATE) ? STATE.playerCharacter : null;
     const variant = (typeof _animVariant === 'function') ? _animVariant() : 'noclass';
     if (!char) return;
     const face = (direction && ANIM_DIRECTIONS.indexOf(direction) !== -1)
@@ -980,7 +981,7 @@ export function _startAvatarIdleAnimation(imgElementId, direction) {
 // on the base class, active3/4 on the ascendency, active5 is Heartbloom.
 export function _animSpellKeyForSlot(slot) {
     if (slot === 'active5') return 'heartbloom';
-    const st = (typeof STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE : null;
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
     const cls = st ? st.playerClass : null;
     const asc = st ? st.playerAscendency : null;
     const base = {
@@ -1006,10 +1007,10 @@ export function _animSpellKeyForSlot(slot) {
 // ability dispatchers in class-abilities.js so every base/ascendency
 // spell (instant or targeted) animates through this one path.
 export function _playAvatarSkillAnimationForSlot(slot, imgElementId) {
-    const char = (typeof STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE.playerCharacter : null;
+    const char = (typeof STATE !== 'undefined' && STATE) ? STATE.playerCharacter : null;
     const spell = (typeof _animSpellKeyForSlot === 'function') ? _animSpellKeyForSlot(slot) : null;
     if (!char || !spell) return;
-    const st = globalThis.STATE;
+    const st = STATE;
     const variant = (slot === 'active1' || slot === 'active2')
         ? (st.playerClass || 'noclass')
         : (slot === 'active5' ? _animVariant() : (st.playerAscendency || 'noclass'));

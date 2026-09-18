@@ -10,6 +10,7 @@ import { _shuffleArray } from './class-probabilist.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //----------------------MATHMAGICIAN SKILLS-------------------------------
@@ -511,7 +512,7 @@ export function _arcaneReveal_getEffectiveRadiusForPreview() {
     if (!def) return 1;
     // Effect rank follows the slotted charm when one is placed
     // (js/skills/skill-charms.js).
-    let level = globalThis.STATE.classActive1Level || 1;
+    let level = STATE.classActive1Level || 1;
     if (typeof getSkillCastRankClamped === 'function') {
         const charmRank = getSkillCastRankClamped('mathmagician_active1');
         if (charmRank) level = charmRank;
@@ -597,8 +598,8 @@ export function _arcaneReveal_clearPreview() {
 // what will actually be revealed.
 export function _arcaneReveal_updatePreview(clientX, clientY) {
     const isArmed = globalThis.activeAbilityMode
-        && globalThis.STATE.playerClass === 'mathmagician'
-        && globalThis.STATE.classActiveChoice === 'active1';
+        && STATE.playerClass === 'mathmagician'
+        && STATE.classActiveChoice === 'active1';
 
     if (!isArmed || !globalThis.cur) { _arcaneReveal_clearPreview(); return; }
 
@@ -805,7 +806,7 @@ export function _varianceShield_updateVisibility() {
     if (window._vsSuppressAutoHide) return; // a meteor is currently resolving this exact mistake - don't interfere
 
     const stacks = window._classFreeMistakes || 0;
-    if (globalThis.STATE.playerClass === 'mathmagician' && stacks > 0) {
+    if (STATE.playerClass === 'mathmagician' && stacks > 0) {
         _varianceShield_spawnBubble();
     } else {
         _varianceShield_removeBubble();

@@ -15,6 +15,7 @@ import { _egGetPlayerLevel } from '../endgame/endgame-leveling.js';
 import { EG_MAX_MAP_TIER, _egAddMapToMapStash, _egGenerateMapDrop, _egMapTierMonsterLevel } from './loot-maps.js';
 import { _egnEnsureStyles } from '../endgame/endgame-nexus.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egComputeLoadoutAttributes, _egFormatRequirementPart } from './loot-requirements.js';
+import { STATE } from '../state.js';
 
 'use strict';
 
@@ -607,7 +608,7 @@ export function _egvBuyPuzzleItem(defId) {
         return;
     }
 
-    globalThis.STATE.inventory.push({
+    STATE.inventory.push({
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
         defId,
     });

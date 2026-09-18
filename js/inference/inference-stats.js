@@ -2,9 +2,10 @@ import { _ptAllocated, ptHasSkill } from '../passive-tree/passive-tree-state-poi
 import { save } from '../state.js';
 import { _MILESTONE_MAP } from './inference-data.js';
 import { _milestone_isClaimed, _milestone_isComplete, _refreshQuestBadge, claimQuest } from './inference-logic.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
-//-------------------CONSTANTS & globalThis.STATE-------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -50,7 +51,7 @@ export const _GRID_SIZE_THRESHOLDS = {
 // Ordered list of bucket names from smallest to largest. Used for comparisons.
 export const _GRID_SIZE_ORDER = ['small', 'medium', 'large', 'massive'];
 
-// Shorthand reference to globalThis.STATE.questStats. Set at the start of
+// Shorthand reference to STATE.questStats. Set at the start of
 // updateQuestStats() and cleared when it returns. Every _inc() call relies
 // on this being set - never valid to read outside that call.
 export let _qs = null;
@@ -61,20 +62,20 @@ export let _qs = null;
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Ensures globalThis.STATE.questStats exists before a mid-level stat handler writes to
+// Ensures STATE.questStats exists before a mid-level stat handler writes to
 // it. Used by every questStat_* function that can be called outside
 // updateQuestStats().
 export function _ensureQuestStats() {
-    if (!globalThis.STATE.questStats) globalThis.STATE.questStats = {};
+    if (!STATE.questStats) STATE.questStats = {};
 }
 
-// Increments a key on globalThis.STATE.questStats by `by` (default 1), initialising it
+// Increments a key on STATE.questStats by `by` (default 1), initialising it
 // to 0 first if needed. Safe to call mid-level, outside updateQuestStats.
 export function _incDirect(key, by = 1) {
     // Tutorial-quest levels never touch quest/inference progress.
     if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
     _ensureQuestStats();
-    globalThis.STATE.questStats[key] = (globalThis.STATE.questStats[key] || 0) + by;
+    STATE.questStats[key] = (STATE.questStats[key] || 0) + by;
 }
 
 // Increments a questStats counter key. Thin wrapper over _incDirect - only
@@ -229,7 +230,7 @@ export function _allComboConditionsMet(payload, conditions) {
     return true;
 }
 
-// Increments globalThis.STATE.questStats[statKey] by 1 if all conditions pass. Main
+// Increments STATE.questStats[statKey] by 1 if all conditions pass. Main
 // entry point for registering a combo quest check.
 export function _checkComboConditions(payload, statKey, conditions) {
     if (_allComboConditionsMet(payload, conditions)) _inc(statKey);
@@ -237,7 +238,7 @@ export function _checkComboConditions(payload, statKey, conditions) {
 
 
 //------------------------------------------------------------------------
-//-------------------globalThis.STATE MIGRATION------------------------------------------
+//-------------------STATE MIGRATION------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 // Called once when a save file is loaded to ensure the required sub-objects
@@ -265,7 +266,7 @@ export function migrateQuestState(s) {
 // Called from start-level.js at the beginning of each level.
 export function resetQuestLevelCounters() {
     _ensureQuestStats();
-    const qs = globalThis.STATE.questStats;
+    const qs = STATE.questStats;
 
     // Item / ability usage counts
     qs._ql_mistakesRemovedThisLevel = 0;
@@ -306,7 +307,7 @@ export function resetQuestLevelCounters() {
 // resetQuestLevelCounters in some flows.
 export function resetWitchImmunityLevelCounter() {
     _ensureQuestStats();
-    globalThis.STATE.questStats._cursedUnderImmunityThisLevel = 0;
+    STATE.questStats._cursedUnderImmunityThisLevel = 0;
 }
 
 
@@ -316,7 +317,7 @@ export function resetWitchImmunityLevelCounter() {
 //------------------------------------------------------------------------
 // Called from various game systems during a level (not at level-complete).
 // Each function increments one or more per-level or global counters. These
-// bypass _qs and write directly to globalThis.STATE.questStats because they can be
+// bypass _qs and write directly to STATE.questStats because they can be
 // called at any time, not just inside updateQuestStats().
 
 // Called from _useTutorItem when mistakes are actually removed.
@@ -337,21 +338,21 @@ export function questStat_timerItemUsed() {
 // Called when a reveal item (including cursedReveal) is used.
 export function questStat_revealItemUsed() {
     _incDirect('_ql_revealItemsThisLevel');
-    globalThis.STATE.questStats._ql_hasUsedManualReveal = true;
+    STATE.questStats._ql_hasUsedManualReveal = true;
 }
 
 // Called from handleCorrectFill: the player filled at least one cell by
 // hand this level (drives the "Fill a cell by hand" quest). Centralises
-// the _ql_hasManuallyFilledCell write (was a direct globalThis.STATE.questStats write
+// the _ql_hasManuallyFilledCell write (was a direct STATE.questStats write
 // in mouse-button-handlers.js).
 export function questStat_hasManuallyFilledCell() {
     _ensureQuestStats();
-    globalThis.STATE.questStats._ql_hasManuallyFilledCell = true;
+    STATE.questStats._ql_hasManuallyFilledCell = true;
 }
 
 // Called from rollLuckyDrops: one lucky-drop reward was claimed.
 // Centralises the luckyDropsClaimed increment (was a direct
-// globalThis.STATE.questStats write in scoring.js).
+// STATE.questStats write in scoring.js).
 export function questStat_luckyDropClaimed() {
     _incDirect('luckyDropsClaimed');
 }
@@ -359,7 +360,7 @@ export function questStat_luckyDropClaimed() {
 // Called from a class ability when it reveals cells.
 export function questStat_classRevealUsed(count) {
     _incDirect('_ql_abilityRevealsThisLevel', count || 1);
-    globalThis.STATE.questStats._ql_hasUsedClassReveal = true;
+    STATE.questStats._ql_hasUsedClassReveal = true;
 }
 
 // Called from a class ability when it marks wrong cells.
@@ -371,7 +372,7 @@ export function questStat_classMarkUsed(count) {
 // 10-second early-use window can be checked at level-complete time.
 export function questStat_shadowSealUsed() {
     _ensureQuestStats();
-    globalThis.STATE.questStats._ql_shadowSealUsedAt = Date.now();
+    STATE.questStats._ql_shadowSealUsedAt = Date.now();
 }
 
 // Called when a cursed row/col erasure happens (unsolveRows / unsolveCols).
@@ -386,7 +387,7 @@ export function questStat_rowsErased(count) {
 // which increments the primerTutorAllFive milestone counter.
 export function questStat_tutorAnsweredCorrect() {
     _ensureQuestStats();
-    const qs = globalThis.STATE.questStats;
+    const qs = STATE.questStats;
 
     qs.tutorQuestCorrect = (qs.tutorQuestCorrect || 0) + 1;
     qs._ql_tutorQuestCorrectThisLevel = (qs._ql_tutorQuestCorrectThisLevel || 0) + 1;
@@ -780,13 +781,13 @@ export function _questStats_checkNewlyCompleted() {
 
 // Records a game event and updates the relevant quest statistics. Single
 // public API for this module - all other code should call this rather than
-// modifying globalThis.STATE.questStats directly.
+// modifying STATE.questStats directly.
 export function updateQuestStats(event, payload = {}) {
     // Tutorial-quest levels never touch quest/inference progress (also keeps
     // onLevelCompleteAch, called from the levelComplete case, out of them).
     if (typeof globalThis.cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
     _ensureQuestStats();
-    _qs = globalThis.STATE.questStats; // set module-level shorthand for _inc()
+    _qs = STATE.questStats; // set module-level shorthand for _inc()
 
     switch (event) {
         case 'levelComplete': _questStats_onLevelComplete(payload); break;
@@ -808,7 +809,7 @@ export function updateQuestStats(event, payload = {}) {
         case 'cursedUnderImmunityUsed': _inc('_cursedUnderImmunityThisLevel'); break;
         case 'atlasTierCompleted':
         case 'atlasRetroCheck':
-            // Atlas tier quests read globalThis.STATE.egAtlasCompleted live via _atlasTierCheck();
+            // Atlas tier quests read STATE.egAtlasCompleted live via _atlasTierCheck();
             // no stat increment needed - just trigger the completion check below.
             break;
     }

@@ -24,6 +24,7 @@ import { EG_MAX_MAP_TIER, _egCheckMapDropClaim, _egMapDrops, _egStopMapDrops, _e
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egCurrencyDrops, _egIsActive, _egItemDrops, _egLootDrops, _egPickupSpawnerInfo, _egPickups } from './combat-state.js';
 import { _egTryGenerateUniqueDrop } from '../loot/unique-items.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.
@@ -1507,7 +1508,7 @@ export function _egCheckItemDropClaim(row, col) {
     _egAnimateItemDropClaim(row, col, drop);
 
     const def = globalThis.ITEM_DEFS[drop.defId];
-    globalThis.STATE.inventory.push({
+    STATE.inventory.push({
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
         defId: drop.defId,
     });

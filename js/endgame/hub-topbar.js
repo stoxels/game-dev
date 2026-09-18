@@ -12,6 +12,7 @@ import { t } from '../translation/translations.js';
 import { _egRenderEquipSlots } from './endgame-hub.js';
 import { _egSaveMassSellSettings, _egShowItemLevel } from './hub-mass-sell.js';
 import { _egRebuildInventoryGrid } from './hub-stash.js';
+import { STATE } from '../state.js';
 
 
 
@@ -50,7 +51,7 @@ export function _egBuildTopbarHTML() {
 export function _egUpdatePassiveTreeButton() {
     const btn = document.getElementById('eg-btn-passive-tree');
     if (!btn) return;
-    const points = (typeof STATE !== 'undefined' && globalThis.STATE.passiveTreePoints) || 0;
+    const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
     const hasPoints = points > 0;
     btn.classList.toggle('unspent-points', hasPoints);
     let countEl = document.getElementById('eg-pt-point-count');

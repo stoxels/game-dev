@@ -12,6 +12,7 @@ import { _applyLowHealthVignette } from '../timer/timer.js';
 import { t } from '../translation/translations.js';
 import { _banterRepositionBubbleIfVisible, hideCharacterBanter } from './character-banter.js';
 import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _animSetDefaultDownImage, _animShouldMirrorFor, _animWalkIsDirectionalFor, _playAvatarWalkAnimation, _startAvatarIdleAnimation, _stopAvatarWalkAnimation } from './sprite_animations.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------IMAGE LOOKUP-----------------------------------------
@@ -20,12 +21,12 @@ import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _an
 // Maps character id + class/ascendency id → image path.
 // Falls back to the no-class portrait if no class is selected.
 export function _getPlayerCharacterImage() {
-    const char = (globalThis.STATE && globalThis.STATE.playerCharacter) ? globalThis.STATE.playerCharacter : 'stox';
+    const char = (STATE && STATE.playerCharacter) ? STATE.playerCharacter : 'stox';
 
     // Ascendency takes priority over base class
-    const classKey = (globalThis.STATE && globalThis.STATE.playerAscendency)
-        ? globalThis.STATE.playerAscendency
-        : (globalThis.STATE && globalThis.STATE.playerClass ? globalThis.STATE.playerClass : 'noclass');
+    const classKey = (STATE && STATE.playerAscendency)
+        ? STATE.playerAscendency
+        : (STATE && STATE.playerClass ? STATE.playerClass : 'noclass');
 
     // Expected filenames: e.g. images/sprites/Stox_statistician.webp
     // No-class fallback: images/sprites/Stox_noclass.webp
@@ -37,7 +38,7 @@ export function _getPlayerCharacterImage() {
 // Returns the display name of the currently selected character.
 export function _getAvatarCharacterName() {
     const names = { stox: 'STOX', trix: 'TRIX', syla: 'SYLA' };
-    return names[globalThis.STATE?.playerCharacter] || 'STOX';
+    return names[STATE?.playerCharacter] || 'STOX';
 }
 
 export function _getAvatarCharacterColor() {
@@ -46,13 +47,13 @@ export function _getAvatarCharacterColor() {
         trix: '#ce93d8',
         syla: '#66bb6a',
     };
-    return colors[globalThis.STATE?.playerCharacter] || '#ffffff';
+    return colors[STATE?.playerCharacter] || '#ffffff';
 }
 
 // Returns true if the given character id is currently selected.
 // Shared helper for all character-trait checks across the codebase.
 export function _charIs(id) {
-    return globalThis.STATE?.playerCharacter === id;
+    return STATE?.playerCharacter === id;
 }
 
 
@@ -466,8 +467,8 @@ export function _updateAvatarSimpleImage() {
     }
     // New class/variant: drop stale frame cache, warm the new one, and
     // (re)start the idle loop so fresh idle art appears.
-    if (typeof _animRefreshCacheFor === 'function' && typeof STATE !== 'undefined' && globalThis.STATE) {
-        _animRefreshCacheFor(globalThis.STATE.playerCharacter, globalThis.STATE.playerAscendency || globalThis.STATE.playerClass || 'noclass');
+    if (typeof _animRefreshCacheFor === 'function' && typeof STATE !== 'undefined' && STATE) {
+        _animRefreshCacheFor(STATE.playerCharacter, STATE.playerAscendency || STATE.playerClass || 'noclass');
     }
     if (typeof _startAvatarIdleAnimation === 'function') {
         _startAvatarIdleAnimation('avatar-sprite-img-simple');
@@ -737,7 +738,7 @@ export function _initSimpleAvatarWASD(wrapper) {
 // session (the "movement only works after visiting the nexus" report).
 export function _hasCompanions() {
     try {
-        return !!(typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerAscendency === 'random_walker');
+        return !!(typeof STATE !== 'undefined' && STATE && STATE.playerAscendency === 'random_walker');
     } catch (e) {
         return false;
     }
@@ -813,7 +814,7 @@ export function _chargeCompanionToCell(companionId, targetR, targetC, onArrival,
 // With companions, also reorders Drifter/Brownian so they stay on the
 // correct side (Drifter left, Brownian right) relative to the character.
 export function _updateAvatarFacing(el, direction) {
-    const st = (typeof STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE : null;
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
     const char = st ? st.playerCharacter : null;
     const variant = st ? (st.playerAscendency || st.playerClass || 'noclass') : 'noclass';
     const dir = (direction && typeof ANIM_DIRECTIONS !== 'undefined' && ANIM_DIRECTIONS.indexOf(direction) !== -1)
@@ -985,7 +986,7 @@ export function _updateLSAvatarImage() {
 // left page of the setup screen's book. Expected filenames:
 // images/Game_Setup/Stox.webp, Trix.png, Syla.png
 export function _getSetupCharNameImage() {
-    const char = (globalThis.STATE && globalThis.STATE.playerCharacter) ? globalThis.STATE.playerCharacter : 'stox';
+    const char = (STATE && STATE.playerCharacter) ? STATE.playerCharacter : 'stox';
     const charCap = char.charAt(0).toUpperCase() + char.slice(1);
     return `images/Game_Setup/${charCap}.webp`;
 }

@@ -9,6 +9,7 @@ import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { _fadeOutElement } from './class-recursionist.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../inference/inference-stats.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
@@ -281,7 +282,7 @@ export function _executeRegressionToPrior(correctCount, recoverPct, revealCount)
 // Pass noOverlayToRemove = true when cancelling silently (e.g. nothing to correct).
 export function _regressionCancel(noOverlayToRemove = false) {
     _setAbilityMode(false);
-    globalThis.STATE.classActiveChoice = ACTUARY_CD_REGRESSION;
+    STATE.classActiveChoice = ACTUARY_CD_REGRESSION;
 
     _refundCooldown(ACTUARY_CD_REGRESSION);
 

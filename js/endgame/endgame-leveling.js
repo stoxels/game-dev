@@ -12,6 +12,7 @@ import { _egMapPlayerLifeMult, _egMapXpMult } from './endgame-map-launch.js';
 import { _egCancelAbsorptionRegen, _egComputePlayerStats, _egGetAllEquippedItems } from './endgame-player-stats.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egFindUnmetRequirements, _egGetUnmetRequirementsText, _egSumAttributeBonuses } from '../loot/loot-requirements.js';
 import { _egIsActive } from '../combat/combat-state.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME CHARACTER LEVELING---------------------------
@@ -183,19 +184,19 @@ export const EG_LEVELING_ATTRS = [
 //------------------------------------------------------------------------
 
 export function _egGetPlayerLevel() {
-    return (typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerLevel) || EG_LEVELING_CONFIG.startLevel;
+    return (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerLevel) || EG_LEVELING_CONFIG.startLevel;
 }
 
 export function _egGetPlayerXP() {
-    return (typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerXP) || 0;
+    return (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerXP) || 0;
 }
 
 export function _egGetUnspentPoints() {
-    return (typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.egAttrPoints) || 0;
+    return (typeof STATE !== 'undefined' && STATE && STATE.egAttrPoints) || 0;
 }
 
 export function _egGetAllocatedAttributes() {
-    if (typeof STATE === 'undefined' || !globalThis.STATE || !globalThis.STATE.egAttrAllocated) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !globalThis.STATE.egAttrAllocated) {
         return { str: 0, agi: 0, int: 0 };
     }
     return globalThis.STATE.egAttrAllocated;
@@ -327,35 +328,35 @@ export function _egBuildXpTiersHTML() {
 // number of levels gained. All XP sources (monster kills and campaign level
 // completions) funnel through here so progression stays consistent.
 export function _egAwardXP(xpGain) {
-    if (typeof STATE === 'undefined' || !globalThis.STATE) return 0;
+    if (typeof STATE === 'undefined' || !STATE) return 0;
     const c = EG_LEVELING_CONFIG;
 
     if (_egGetPlayerLevel() >= c.maxLevel) {
         // Level cap reached - no more XP accumulates.
-        if (globalThis.STATE.playerXP !== 0) { globalThis.STATE.playerXP = 0; egSaveLevelingState(); }
+        if (STATE.playerXP !== 0) { STATE.playerXP = 0; egSaveLevelingState(); }
         return 0;
     }
 
     const gain = Math.max(0, Math.round(Number(xpGain) || 0));
     if (gain <= 0) return 0;
-    globalThis.STATE.playerXP = _egGetPlayerXP() + gain;
+    STATE.playerXP = _egGetPlayerXP() + gain;
 
     let levelsGained = 0;
     let passiveGained = 0;
     while (_egGetPlayerLevel() < c.maxLevel
-        && globalThis.STATE.playerXP >= _egGetXpForNextLevel(_egGetPlayerLevel())) {
-        globalThis.STATE.playerXP -= _egGetXpForNextLevel(_egGetPlayerLevel());
-        globalThis.STATE.playerLevel++;
+        && STATE.playerXP >= _egGetXpForNextLevel(_egGetPlayerLevel())) {
+        STATE.playerXP -= _egGetXpForNextLevel(_egGetPlayerLevel());
+        STATE.playerLevel++;
         levelsGained++;
         // Legacy: attribute points per level are disabled (0) now, but the
         // field is still honoured if a future pass re-enables it.
-        if (c.attrPointsPerLevel) globalThis.STATE.egAttrPoints = (globalThis.STATE.egAttrPoints || 0) + c.attrPointsPerLevel;
+        if (c.attrPointsPerLevel) STATE.egAttrPoints = (STATE.egAttrPoints || 0) + c.attrPointsPerLevel;
         passiveGained += (c.passivePointsPerLevel || 0);
     }
-    if (_egGetPlayerLevel() >= c.maxLevel) globalThis.STATE.playerXP = 0;
+    if (_egGetPlayerLevel() >= c.maxLevel) STATE.playerXP = 0;
 
     if (passiveGained > 0) {
-        globalThis.STATE.passiveTreePoints = (globalThis.STATE.passiveTreePoints || 0) + passiveGained;
+        STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + passiveGained;
         if (typeof _incDirect === 'function') try { _incDirect('lifetimePassivePointsObtained', passiveGained); } catch (e) {}
     }
 
@@ -416,9 +417,9 @@ export function _egAwardXP(xpGain) {
 // by the active map's "% more Experience" bonus (neutral outside runs),
 // then handed to _egAwardXP.
 export function _egGrantMonsterXP(monsterLevel, isBoss) {
-    if (typeof STATE === 'undefined' || !globalThis.STATE) return;
+    if (typeof STATE === 'undefined' || !STATE) return;
     if (_egGetPlayerLevel() >= EG_LEVELING_CONFIG.maxLevel) {
-        if (globalThis.STATE.playerXP !== 0) { globalThis.STATE.playerXP = 0; egSaveLevelingState(); }
+        if (STATE.playerXP !== 0) { STATE.playerXP = 0; egSaveLevelingState(); }
         return;
     }
 
@@ -483,7 +484,7 @@ export function _egCampaignMonsterLevel(gi) {
 // on every campaign clear (first clear and replay alike). No-ops during
 // endgame map/chain runs.
 export function _egGrantCampaignLevelXP(gi, isFirstClear) {
-    if (typeof STATE === 'undefined' || !globalThis.STATE) return 0;
+    if (typeof STATE === 'undefined' || !STATE) return 0;
     if (typeof cur === 'undefined' || !globalThis.cur) return 0;
     // Never award campaign XP during an endgame map/chain run.
     if (globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters) return 0;
@@ -581,8 +582,8 @@ export function _egAllocateAttribute(attr) {
         return false;
     }
 
-    globalThis.STATE.egAttrPoints--;
-    globalThis.STATE.egAttrAllocated[attr] = (globalThis.STATE.egAttrAllocated[attr] || 0) + 1;
+    STATE.egAttrPoints--;
+    STATE.egAttrAllocated[attr] = (STATE.egAttrAllocated[attr] || 0) + 1;
     _egSyncBaseAttributes();
     egSaveLevelingState();
 
@@ -644,8 +645,8 @@ export function _egRefundAttribute(attr) {
         return false;
     }
 
-    globalThis.STATE.egAttrAllocated[attr] = (globalThis.STATE.egAttrAllocated[attr] || 0) - 1;
-    globalThis.STATE.egAttrPoints = (globalThis.STATE.egAttrPoints || 0) + 1;
+    STATE.egAttrAllocated[attr] = (STATE.egAttrAllocated[attr] || 0) - 1;
+    STATE.egAttrPoints = (STATE.egAttrPoints || 0) + 1;
     _egSyncBaseAttributes();
     egSaveLevelingState();
 
@@ -673,7 +674,7 @@ export function egSaveLevelingState() {
 // Reads leveling fields from STATE (with defaults for legacy saves) and
 // applies them to the shared base attributes object.
 export function _egLoadLevelingState() {
-    if (typeof STATE === 'undefined' || !globalThis.STATE) return;
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return;
     if (!globalThis.STATE.playerLevel) globalThis.STATE.playerLevel = EG_LEVELING_CONFIG.startLevel;
     if (!globalThis.STATE.playerXP) globalThis.STATE.playerXP = 0;
     if (!globalThis.STATE.egAttrPoints) globalThis.STATE.egAttrPoints = 0;

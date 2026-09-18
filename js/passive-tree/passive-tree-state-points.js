@@ -4,6 +4,7 @@ import { LANG, t } from '../translation/translations.js';
 import { TALENT_TREE_DATA } from './passive-tree-data.js';
 import { _ptRefreshAllStyles } from './passive-tree-ui.js';
 import { PT, PT_START_ID, _ptInitTreeData } from './passive-tree.js';
+import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, '_pt_skills', { get() { return _pt_skills; }, set(v) { _pt_skills = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_pt_conns', { get() { return _pt_conns; }, set(v) { _pt_conns = v; }, configurable: true }); } catch (e) {}
@@ -158,30 +159,30 @@ export function _ptLang() {
 // Returns the live Set of allocated node IDs from STATE.
 // Auto-creates the Set if it is missing so callers never get undefined.
 export function _ptAllocated() {
-    if (typeof globalThis.STATE === 'undefined') return new Set();
-    if (!(globalThis.STATE.passiveTreeAllocated instanceof Set)) {
-        globalThis.STATE.passiveTreeAllocated = new Set();
+    if (typeof STATE === 'undefined') return new Set();
+    if (!(STATE.passiveTreeAllocated instanceof Set)) {
+        STATE.passiveTreeAllocated = new Set();
     }
-    return globalThis.STATE.passiveTreeAllocated;
+    return STATE.passiveTreeAllocated;
 }
 
 // Returns the current number of spendable convergence points
 export function _ptPoints() {
-    return (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.passiveTreePoints) || 0;
+    return (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
 }
 
 // Decrements the point counter by 1 (floor 0) and refreshes the UI label
 export function _ptSpendPoint() {
-    if (typeof globalThis.STATE !== 'undefined') {
-        globalThis.STATE.passiveTreePoints = Math.max(0, _ptPoints() - 1);
+    if (typeof STATE !== 'undefined') {
+        STATE.passiveTreePoints = Math.max(0, _ptPoints() - 1);
     }
     _ptRefreshPointsDisplay();
 }
 
 // Increments the point counter by 1 and refreshes the UI label
 export function _ptRefundPoint() {
-    if (typeof globalThis.STATE !== 'undefined') {
-        globalThis.STATE.passiveTreePoints = _ptPoints() + 1;
+    if (typeof STATE !== 'undefined') {
+        STATE.passiveTreePoints = _ptPoints() + 1;
     }
     _ptRefreshPointsDisplay();
 }
@@ -444,7 +445,7 @@ export function _ptHandleDeallocation(id, alloc) {
 export function _ptHandleAllocation(id, alloc) {
     alloc.add(id);
     _ptSpendPoint();
-    globalThis.STATE.passiveTreeLastNode = id;
+    STATE.passiveTreeLastNode = id;
     save();
     _ptRefreshAllStyles();
     _ptTrackAllocationAchievements(id, alloc);
@@ -462,8 +463,8 @@ export function _ptRefundAllPoints() {
 
     refundable.forEach(id => alloc.delete(id));
 
-    if (typeof globalThis.STATE !== 'undefined') {
-        globalThis.STATE.passiveTreePoints = _ptPoints() + refundable.length;
+    if (typeof STATE !== 'undefined') {
+        STATE.passiveTreePoints = _ptPoints() + refundable.length;
     }
     save();
     _ptRefreshAllStyles();

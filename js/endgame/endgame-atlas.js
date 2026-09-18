@@ -3,6 +3,7 @@ import { updateQuestStats } from '../inference/inference-stats.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { egSaveHubState } from './endgame-hub.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME ATLAS (POE-STYLE MAP GRAPH)------------------
@@ -363,7 +364,7 @@ export function egAtlasNodeById(id) {
 }
 
 export function egAtlasIsCompleted(id) {
-    return !!(typeof STATE !== 'undefined' && globalThis.STATE.egAtlasCompleted && globalThis.STATE.egAtlasCompleted[id]);
+    return !!(typeof STATE !== 'undefined' && STATE.egAtlasCompleted && STATE.egAtlasCompleted[id]);
 }
 
 // A node is reachable when it sits in tier 1 or when ANY connected node has
@@ -377,11 +378,11 @@ export function egAtlasIsUnlocked(id) {
 
 // Highest tier with at least one completed node (0 when nothing cleared yet).
 export function egAtlasHighestCompletedTier() {
-    if (typeof STATE === 'undefined' || !globalThis.STATE.egAtlasCompleted) return 0;
+    if (typeof STATE === 'undefined' || !STATE.egAtlasCompleted) return 0;
     let highest = 0;
-    for (const id in globalThis.STATE.egAtlasCompleted) {
+    for (const id in STATE.egAtlasCompleted) {
         const node = egAtlasNodeById(id);
-        if (node && globalThis.STATE.egAtlasCompleted[id] && node.tier > highest) {
+        if (node && STATE.egAtlasCompleted[id] && node.tier > highest) {
             highest = node.tier;
         }
     }
@@ -390,8 +391,8 @@ export function egAtlasHighestCompletedTier() {
 
 export function egAtlasProgress() {
     let completed = 0;
-    for (const id in (globalThis.STATE.egAtlasCompleted || {})) {
-        if (globalThis.STATE.egAtlasCompleted[id] && egAtlasNodeById(id)) completed++;
+    for (const id in (STATE.egAtlasCompleted || {})) {
+        if (STATE.egAtlasCompleted[id] && egAtlasNodeById(id)) completed++;
     }
     return {
         completed,
@@ -452,7 +453,7 @@ export function egAtlasDropNodeIds(activeNodeId, isBoss) {
     // Completed regions of the same or a lower tier drop everywhere at or
     // above their own tier. Stale ids from older layouts resolve to null
     // and are skipped.
-    const completed = (typeof STATE !== 'undefined' && globalThis.STATE.egAtlasCompleted) || {};
+    const completed = (typeof STATE !== 'undefined' && STATE.egAtlasCompleted) || {};
     Object.keys(completed).forEach(id => {
         if (!completed[id]) return;
         const other = egAtlasNodeById(id);
@@ -473,10 +474,10 @@ export const EG_ATLAS_ADJACENT_BONUS_PER_MAP = 0.01;
 
 // Number of atlas regions currently marked as completed.
 export function egAtlasCompletedCount() {
-    if (typeof STATE === 'undefined' || !globalThis.STATE.egAtlasCompleted) return 0;
+    if (typeof STATE === 'undefined' || !STATE.egAtlasCompleted) return 0;
     let n = 0;
-    for (const id in globalThis.STATE.egAtlasCompleted) {
-        if (globalThis.STATE.egAtlasCompleted[id] && egAtlasNodeById(id)) n++;
+    for (const id in STATE.egAtlasCompleted) {
+        if (STATE.egAtlasCompleted[id] && egAtlasNodeById(id)) n++;
     }
     return n;
 }
@@ -720,13 +721,13 @@ export function _egAtlasOnMapCompleted(mapItem) {
         return { node, firstClear: false, newlyUnlocked: [], diffDenied: true };
     }
 
-    if (!globalThis.STATE.egAtlasCompleted) globalThis.STATE.egAtlasCompleted = {};
+    if (!STATE.egAtlasCompleted) STATE.egAtlasCompleted = {};
 
-    const firstClear = !globalThis.STATE.egAtlasCompleted[node.id];
+    const firstClear = !STATE.egAtlasCompleted[node.id];
     const wasUnlocked = {};
     node.links.forEach(l => { wasUnlocked[l] = egAtlasIsUnlocked(l); });
 
-    globalThis.STATE.egAtlasCompleted[node.id] = true;
+    STATE.egAtlasCompleted[node.id] = true;
 
     // Freshly reached regions (cap the spam on dense rows).
     const newlyUnlocked = node.links

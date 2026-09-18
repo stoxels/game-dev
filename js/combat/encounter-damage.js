@@ -28,6 +28,7 @@ import { _egGetPlayerLevel } from '../endgame/endgame-leveling.js';
 import { _egGetActiveMapModValue, _egMapDamageTakenAmpMult } from '../endgame/endgame-map-launch.js';
 import { EG_PLAYER_STATS, _egCalcArmourMitigation, _egCalcEvasionDodgeChance, _egComputePlayerStats, _egGetAllEquippedItems, _egScheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
+import { STATE } from '../state.js';
 
 
 // Sets the player's target to the given monster and refreshes the panel.
@@ -67,7 +68,7 @@ export function _initEgTargetHotkeys() {
     if (typeof onKeybindAction === 'function') {
         globalThis.onKeybindAction('cycle-target', (e) => {
             const encounterActive = (typeof _egIsActive === 'function') && _egIsActive();
-            if ((!globalThis.STATE.playerClass || (typeof isClassless === 'function' && globalThis.isClassless())) && !encounterActive) return false;
+            if ((!STATE.playerClass || (typeof isClassless === 'function' && globalThis.isClassless())) && !encounterActive) return false;
             _egCycleTarget(e.shiftKey);
             return false;
         });

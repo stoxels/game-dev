@@ -13,6 +13,7 @@
 // split modules rebind these lets through globalThis.<name> assignment
 // (imported module bindings are read-only views) - the established
 // step-9/step-10 pattern.
+import { STATE } from '../state.js';
 try { Object.defineProperty(globalThis, '_egMassSellKeepUnique', { get() { return _egMassSellKeepUnique; }, set(v) { _egMassSellKeepUnique = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_egMassSellKeep', { get() { return _egMassSellKeep; }, set(v) { _egMassSellKeep = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_egMassSellMinItemLevel', { get() { return _egMassSellMinItemLevel; }, set(v) { _egMassSellMinItemLevel = v; }, configurable: true }); } catch (e) {}
@@ -71,20 +72,20 @@ export function _egNormaliseMassSellKeep(raw) {
 }
 export function _egLoadMassSellSettings() {
     _egMassSellKeep = _egNormaliseMassSellKeep(globalThis.STATE && globalThis.STATE.egMassSellKeep);
-    if (typeof STATE !== 'undefined' && typeof globalThis.STATE.egMassSellKeepUnique === 'boolean') {
+    if (typeof globalThis.STATE !== 'undefined' && typeof globalThis.STATE.egMassSellKeepUnique === 'boolean') {
         _egMassSellKeepUnique = globalThis.STATE.egMassSellKeepUnique;
     } else {
         _egMassSellKeepUnique = true;
     }
-    if (typeof STATE !== 'undefined' && typeof globalThis.STATE.egShowItemLevel === 'boolean') {
+    if (typeof globalThis.STATE !== 'undefined' && typeof globalThis.STATE.egShowItemLevel === 'boolean') {
         _egShowItemLevel = globalThis.STATE.egShowItemLevel;
     }
-    if (typeof STATE !== 'undefined' && typeof globalThis.STATE.egMassSellMinItemLevel === 'number') {
+    if (typeof globalThis.STATE !== 'undefined' && typeof globalThis.STATE.egMassSellMinItemLevel === 'number') {
         _egMassSellMinItemLevel = Math.max(0, Math.floor(globalThis.STATE.egMassSellMinItemLevel));
     } else {
         _egMassSellMinItemLevel = 0;
     }
-    if (typeof STATE !== 'undefined' && typeof globalThis.STATE.egMassSellMinReqLevel === 'number') {
+    if (typeof globalThis.STATE !== 'undefined' && typeof globalThis.STATE.egMassSellMinReqLevel === 'number') {
         _egMassSellMinReqLevel = Math.max(0, Math.floor(globalThis.STATE.egMassSellMinReqLevel));
     } else {
         _egMassSellMinReqLevel = 0;
@@ -92,11 +93,11 @@ export function _egLoadMassSellSettings() {
 }
 export function _egSaveMassSellSettings() {
     if (typeof STATE !== 'undefined') {
-        globalThis.STATE.egMassSellKeep = { ..._egMassSellKeep };
-        globalThis.STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
-        globalThis.STATE.egShowItemLevel = _egShowItemLevel;
-        globalThis.STATE.egMassSellMinItemLevel = _egMassSellMinItemLevel;
-        globalThis.STATE.egMassSellMinReqLevel = _egMassSellMinReqLevel;
+        STATE.egMassSellKeep = { ..._egMassSellKeep };
+        STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
+        STATE.egShowItemLevel = _egShowItemLevel;
+        STATE.egMassSellMinItemLevel = _egMassSellMinItemLevel;
+        STATE.egMassSellMinReqLevel = _egMassSellMinReqLevel;
         if (typeof save === 'function') try { save(); } catch (e) {}
     }
     // also persist via the main hub save path

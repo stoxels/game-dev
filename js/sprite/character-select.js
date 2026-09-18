@@ -6,6 +6,7 @@ import { unlockReplayIntroBundle } from '../storyline/storyline-progress.js';
 import { _tipAttr } from '../tooltips-hud.js';
 import { LANG } from '../translation/translations.js';
 import { _getPlayerCharacterImage, _updateLSAvatarImage } from './player_sprite.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------CHARACTER SELECTION----------------------------------
@@ -308,7 +309,7 @@ export function _csiConfirmSelection(selectedId, onSelect) {
     // The character-intro beat takes over the screen next; without this the
     // hover tooltip would ride along on top of the cinematic.
     _csiHideTip();
-    globalThis.STATE.playerCharacter = selectedId;
+    STATE.playerCharacter = selectedId;
     // Picking any character permanently unlocks the opening cinematic and
     // all three character-intro replays in the Replay Gallery, regardless
     // of which save slot is active (see storyline-engine.js).
@@ -506,7 +507,7 @@ export function _buildCharacterSelectCardsUI(onSelect) {
 // maybeShowCharacterSelect - entry point called from the play button flow.
 // Shows character select if no character chosen yet, otherwise calls onDone directly.
 export function maybeShowCharacterSelect(onDone) {
-    if (globalThis.STATE.playerCharacter) {
+    if (STATE.playerCharacter) {
         onDone();
         return;
     }
@@ -525,9 +526,9 @@ export function renderLSCharacterAvatar() {
     const old = document.getElementById('ls-char-avatar');
     if (old) old.remove();
 
-    if (!globalThis.STATE.playerCharacter) return;
+    if (!STATE.playerCharacter) return;
 
-    const char = CHARACTERS[globalThis.STATE.playerCharacter];
+    const char = CHARACTERS[STATE.playerCharacter];
     if (!char) return;
 
     const topbarRight = document.querySelector('#screen-levels .ls-topbar-right') ||
@@ -609,12 +610,12 @@ export function renderMapViewCharacterPortrait(p = 'mv') {
     const wrap = document.getElementById(p + '-char-portrait-wrap');
     if (!wrap) return;
 
-    if (!globalThis.STATE.playerCharacter || !CHARACTERS[globalThis.STATE.playerCharacter]) {
+    if (!STATE.playerCharacter || !CHARACTERS[STATE.playerCharacter]) {
         wrap.innerHTML = '';
         return;
     }
 
-    const char = CHARACTERS[globalThis.STATE.playerCharacter];
+    const char = CHARACTERS[STATE.playerCharacter];
     wrap.innerHTML = `<img src="${_getPlayerCharacterImage()}" alt="${char.name}" class="mv-char-portrait-img" draggable="false">`;
 
     wrap.onmouseenter = (e) => _showCharacterTooltip(e, char);

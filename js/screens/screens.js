@@ -8,6 +8,7 @@ import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
 import { showPassiveTree } from '../passive-tree/passive-tree.js';
 import { _dofNudge } from '../passive-tree/passive-tree-special-nodes-logic.js';
 import { closeInventoryFlyout } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
+import { STATE } from '../state.js';
 
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'replayLevel', { get() { return replayLevel; }, set(v) { replayLevel = v; }, configurable: true }); } catch (e) {}
@@ -157,8 +158,8 @@ export function _updateConvergenceModalPoints(modal) {
     modal = modal || document.getElementById('convergence-modal');
     const plate = modal && modal.querySelector('.convm-total-plate span');
     if (!plate) return;
-    const total = ((typeof globalThis.STATE !== 'undefined' && globalThis.STATE.convergenceDone && globalThis.STATE.convergenceDone.length) || 0)
-        + ((typeof globalThis.STATE !== 'undefined' && globalThis.STATE.trialsDone && globalThis.STATE.trialsDone.length) || 0);
+    const total = ((typeof STATE !== 'undefined' && STATE.convergenceDone && STATE.convergenceDone.length) || 0)
+        + ((typeof STATE !== 'undefined' && STATE.trialsDone && STATE.trialsDone.length) || 0);
     const cap = _convergenceTotalMilestones();
     const label = t('convergence_total');
     const tmpl = (label && label !== 'convergence_total') ? label : 'TOTAL: {n} / {total}';
@@ -345,7 +346,7 @@ export function confirmSetup() {
 // unchanged, just moved behind the dev mode-select screen.
 export function launchExistingGame() {
     globalThis.screenHistory.push('screen-mode-select');
-    globalThis.STATE.mapViewEnabled = true;
+    STATE.mapViewEnabled = true;
     if (typeof save === 'function') save();
 
     if (typeof globalThis.checkLockedCodesOnSetup === 'function') globalThis.checkLockedCodesOnSetup();
@@ -409,7 +410,7 @@ export function goToLevelSelect() {
             }
         }
 
-        if (globalThis.STATE && globalThis.STATE.mapViewEnabled) {
+        if (STATE && STATE.mapViewEnabled) {
             if (typeof _wdCurrentWi !== 'undefined' && _wdCurrentWi !== null
                 && typeof showWorldDetail === 'function') {
                 showWorldDetail(_wdCurrentWi);
@@ -466,7 +467,7 @@ export function goToPreviousScreen() {
 
         // Rebuild the level select so completion state is up to date.
         if (prev === 'screen-levels') {
-            if (globalThis.STATE && globalThis.STATE.mapViewEnabled && typeof showMapView === 'function') {
+            if (STATE && STATE.mapViewEnabled && typeof showMapView === 'function') {
                 showMapView();
                 return;
             }

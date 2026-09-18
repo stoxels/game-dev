@@ -6,6 +6,7 @@ import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { patchHotbarCooldownForLegacySlot } from '../skills/skill-hotbar.js';
+import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'activeAbilityMode', { get() { return activeAbilityMode; }, set(v) { activeAbilityMode = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'resetActiveCooldown', { get() { return resetActiveCooldown; }, set(v) { resetActiveCooldown = v; }, configurable: true }); } catch (e) {}
@@ -102,22 +103,22 @@ export const CLASS_COOLDOWN_REDUCTIONS = {
 
 // Returns true if all 3 base class skills are at max level (Rank 3)
 export function isBaseClassMaxed() {
-    if (!globalThis.STATE.playerClass) return false;
-    return (globalThis.STATE.classPassiveLevel || 1) >= 3 &&
-        (globalThis.STATE.classActive1Level || 1) >= 3 &&
-        (globalThis.STATE.classActive2Level || 1) >= 3;
+    if (!STATE.playerClass) return false;
+    return (STATE.classPassiveLevel || 1) >= 3 &&
+        (STATE.classActive1Level || 1) >= 3 &&
+        (STATE.classActive2Level || 1) >= 3;
 }
 
 // Returns true if the player has chosen an ascendency
 export function hasAscendency() {
-    return !!globalThis.STATE.playerAscendency;
+    return !!STATE.playerAscendency;
 }
 
 // Returns true if both ascendency skills are at max level (Rank 3)
 export function isAscendencyMaxed() {
-    if (!globalThis.STATE.playerAscendency) return false;
-    return (globalThis.STATE.ascendencySkill1Level || 1) >= 3 &&
-        (globalThis.STATE.ascendencySkill2Level || 1) >= 3;
+    if (!STATE.playerAscendency) return false;
+    return (STATE.ascendencySkill1Level || 1) >= 3 &&
+        (STATE.ascendencySkill2Level || 1) >= 3;
 }
 
 
@@ -152,7 +153,7 @@ export function _getReadyLabel() {
 // Returns the ability definition object for a base class slot (active1 / active2).
 // Returns null if the class definition can't be found.
 export function _getBaseClassAbilityData(slot) {
-    const def = CLASS_DEFS[globalThis.STATE.playerClass];
+    const def = CLASS_DEFS[STATE.playerClass];
     if (!def) return null;
     return def[slot] ?? null;
 }
@@ -161,7 +162,7 @@ export function _getBaseClassAbilityData(slot) {
 // active3 maps to the ascendency's first active, active4 to the second.
 // Returns null if no ascendency is set or the definition is missing.
 export function _getAscendencyAbilityData(slot) {
-    const asc = globalThis.STATE.playerAscendency ? ASCENDENCY_DEFS[globalThis.STATE.playerAscendency] : null;
+    const asc = STATE.playerAscendency ? ASCENDENCY_DEFS[STATE.playerAscendency] : null;
     if (!asc) return null;
     return slot === 'active3' ? asc.active1 : asc.active2;
 }
@@ -209,7 +210,7 @@ export function _getGlobalCooldownReduction() {
 // class and slot, looked up from CLASS_COOLDOWN_REDUCTIONS above.
 // Returns 0 for unknown classes/slots or slots with no listed passives.
 export function _getClassCooldownReduction(slot) {
-    const slotEntries = CLASS_COOLDOWN_REDUCTIONS[globalThis.STATE.playerClass]?.[slot];
+    const slotEntries = CLASS_COOLDOWN_REDUCTIONS[STATE.playerClass]?.[slot];
     if (!slotEntries) return 0;
     return slotEntries.reduce(
         (total, [skillId, seconds]) => total + (ptHasSkill(skillId) ? seconds : 0),
@@ -244,12 +245,12 @@ export function _getEquipmentCooldownReduction(slot) {
 
     let familyId = null;
     if (slot === 'active1' || slot === 'active2') {
-        const map = BASE_SKILL_COOLDOWN_FAMILY[globalThis.STATE.playerClass];
+        const map = BASE_SKILL_COOLDOWN_FAMILY[STATE.playerClass];
         if (map) familyId = map[slot];
     } else if (slot === 'active3' || slot === 'active4') {
-        if (!globalThis.STATE.playerAscendency) return 0;
+        if (!STATE.playerAscendency) return 0;
         const ascSlot = slot === 'active3' ? 'active1' : 'active2';
-        const map = ASCENDENCY_SKILL_COOLDOWN_FAMILY[globalThis.STATE.playerAscendency];
+        const map = ASCENDENCY_SKILL_COOLDOWN_FAMILY[STATE.playerAscendency];
         if (map) familyId = map[ascSlot];
     }
     if (!familyId) return 0;
@@ -330,7 +331,7 @@ export function _buildMiniBarSlotHTML(slot, displayIndex) {
 export function patchMinimizedBar() {
     const bar = document.getElementById('chud-mini-bar');
     if (!bar) return;
-    if (!CLASS_DEFS[globalThis.STATE.playerClass]) return;
+    if (!CLASS_DEFS[STATE.playerClass]) return;
 
     const baseSlots = ['active1', 'active2'];
     const parts = baseSlots.map((slot, i) => _buildMiniBarSlotHTML(slot, i + 1));
@@ -466,7 +467,7 @@ export function _abilityHotkeysBlocked() {
     // Tutorial exception: puzzle 3 casts Fireball via hotbar keys before any
     // class is chosen (mirrors the hotbar gate in skill-hotbar.js).
     const tqActive = (typeof globalThis._tqIsTutorialActive === 'function') && globalThis._tqIsTutorialActive();
-    if ((!globalThis.STATE.playerClass && !tqActive) || globalThis.isClassless() || globalThis.dead) return true;
+    if ((!STATE.playerClass && !tqActive) || globalThis.isClassless() || globalThis.dead) return true;
     return false;
 }
 

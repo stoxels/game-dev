@@ -7,6 +7,7 @@ import { CLASS_DEFS, CLASS_SPELL_ICONS, ENDGAME_HEARTBLOOM_DEF } from '../classe
 import { _abilityCanAfford, _getAbilityManaCost } from '../classes/class-mana.js';
 import { getSkillCastRankClamped, getSkillCastRankFull, getSpellRankDamageMult, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { UNIVERSAL_SPELL_DEFS, _registerUniversalSpells, _uspGroupTitle, _uspMovementGroupTitle, _uspSupportGroupTitle, canAffordUniversalSpell, castUniversalSpell, getUniversalSpellCooldownRemaining, getUniversalSpellDamageEstimate, getUniversalSpellEffectiveCooldown, getUniversalSpellManaCost, isUniversalMovementSpell, isUniversalSpellUnlocked, isUniversalSupportSpell } from './universal-spells.js';
+import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'getPlayerSkillIds', { get() { return getPlayerSkillIds; }, set(v) { getPlayerSkillIds = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'getPlayerSkillGroups', { get() { return getPlayerSkillGroups; }, set(v) { getPlayerSkillGroups = v; }, configurable: true }); } catch (e) {}
@@ -381,8 +382,8 @@ export function getPassiveSkillImage(passiveId) {
 // always-on abilities that are not class skills, so they are surfaced in the
 // spell book's passive section rather than the hotbar.
 export function getPlayerTraits() {
-    if (typeof globalThis.CHARACTERS === 'undefined' || !globalThis.STATE || !globalThis.STATE.playerCharacter) return [];
-    const char = globalThis.CHARACTERS[globalThis.STATE.playerCharacter];
+    if (typeof globalThis.CHARACTERS === 'undefined' || !STATE || !STATE.playerCharacter) return [];
+    const char = globalThis.CHARACTERS[STATE.playerCharacter];
     return (char && Array.isArray(char.traits)) ? char.traits : [];
 }
 
@@ -407,10 +408,10 @@ export function getSkillLevel(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return 1;
     switch (def.slotKind) {
-        case 'base1': return globalThis.STATE.classActive1Level || 1;
-        case 'base2': return globalThis.STATE.classActive2Level || 1;
-        case 'asc1': return globalThis.STATE.ascendencySkill1Level || 1;
-        case 'asc2': return globalThis.STATE.ascendencySkill2Level || 1;
+        case 'base1': return STATE.classActive1Level || 1;
+        case 'base2': return STATE.classActive2Level || 1;
+        case 'asc1': return STATE.ascendencySkill1Level || 1;
+        case 'asc2': return STATE.ascendencySkill2Level || 1;
         default: return 1;
     }
 }
@@ -634,14 +635,14 @@ export function getSkillDamage(skillId) {
 
 // Returns the base-class skill ids for the active class.
 export function _playerBaseSkillIds() {
-    const cls = globalThis.STATE.playerClass;
+    const cls = STATE.playerClass;
     if (!cls || typeof CLASS_DEFS === 'undefined' || !CLASS_DEFS[cls]) return [];
     return [`${cls}_active1`, `${cls}_active2`];
 }
 
 // Returns the ascendency skill ids for the chosen ascendency.
 export function _playerAscendencySkillIds() {
-    const asc = globalThis.STATE.playerAscendency;
+    const asc = STATE.playerAscendency;
     if (!asc || typeof ASCENDENCY_DEFS === 'undefined' || !ASCENDENCY_DEFS[asc]) return [];
     return [`${asc}_active1`, `${asc}_active2`];
 }
@@ -670,7 +671,7 @@ function getPlayerSkillGroups() {
     if (base.length) groups.push({ labelKey: 'spellbook_group_class', ids: base });
     const asc = _playerAscendencySkillIds().filter((id) => !!getSkillDef(id));
     if (asc.length) {
-        const ascDef = ASCENDENCY_DEFS[globalThis.STATE.playerAscendency];
+        const ascDef = ASCENDENCY_DEFS[STATE.playerAscendency];
         groups.push({
             labelKey: 'spellbook_group_ascendency',
             labelFallback: ascDef ? (LANG === 'de' ? (ascDef.nameDE || ascDef.nameEn) : ascDef.nameEn) : '',
@@ -712,7 +713,7 @@ function getPlayerSkillGroups() {
 
 // The passives the player owns (never movable, shown for reference).
 export function getPlayerPassiveSkillIds() {
-    const cls = globalThis.STATE.playerClass;
+    const cls = STATE.playerClass;
     if (!cls) return [];
     return [`${cls}_passive`].filter((id) => !!getPassiveSkillDef(id));
 }
@@ -729,7 +730,7 @@ export function getPlayerPassiveSkillIds() {
 // first slots in roster order (active1, active2, ascendency, heartbloom).
 export function _defaultSkillHotbar(state) {
     const slots = new Array(SKILL_HOTBAR_SIZE).fill(null);
-    const s = state || (typeof globalThis.STATE !== 'undefined' ? globalThis.STATE : null);
+    const s = state || (typeof STATE !== 'undefined' ? STATE : null);
     if (!s || !s.playerClass) return slots;
 
     const ids = [];
@@ -754,49 +755,49 @@ export function _defaultSkillHotbar(state) {
 // be silently undone (the spell would immediately be re-placed in the first
 // free slot), which broke drag-out-to-remove.
 function ensureSkillHotbar() {
-    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return [];
-    if (!Array.isArray(globalThis.STATE.skillHotbar) || globalThis.STATE.skillHotbar.length !== SKILL_HOTBAR_SIZE) {
-        const existing = Array.isArray(globalThis.STATE.skillHotbar) ? globalThis.STATE.skillHotbar.slice(0, SKILL_HOTBAR_SIZE) : [];
-        globalThis.STATE.skillHotbar = existing;
-        while (globalThis.STATE.skillHotbar.length < SKILL_HOTBAR_SIZE) globalThis.STATE.skillHotbar.push(null);
+    if (typeof STATE === 'undefined' || !STATE) return [];
+    if (!Array.isArray(STATE.skillHotbar) || STATE.skillHotbar.length !== SKILL_HOTBAR_SIZE) {
+        const existing = Array.isArray(STATE.skillHotbar) ? STATE.skillHotbar.slice(0, SKILL_HOTBAR_SIZE) : [];
+        STATE.skillHotbar = existing;
+        while (STATE.skillHotbar.length < SKILL_HOTBAR_SIZE) STATE.skillHotbar.push(null);
     }
 
     const owned = new Set(getPlayerSkillIds());
 
     // Drop skills the player can no longer use (class / ascendency change).
     for (let i = 0; i < SKILL_HOTBAR_SIZE; i++) {
-        const id = globalThis.STATE.skillHotbar[i];
-        if (id && !owned.has(id)) globalThis.STATE.skillHotbar[i] = null;
+        const id = STATE.skillHotbar[i];
+        if (id && !owned.has(id)) STATE.skillHotbar[i] = null;
     }
 
     // First-ever init, or the player's class/ascendency changed → seed the
     // bar with the (new) roster so there's always something to press.
     // Universal spells are NEVER auto-seeded: the player drags them onto
     // the bar themselves (mirrors the tutorial Fireball rule).
-    const ownerKey = `${globalThis.STATE.playerClass || ''}|${globalThis.STATE.playerAscendency || ''}`;
-    const shouldSeed = !globalThis.STATE.skillHotbarInit || globalThis.STATE.skillHotbarOwner !== ownerKey;
+    const ownerKey = `${STATE.playerClass || ''}|${STATE.playerAscendency || ''}`;
+    const shouldSeed = !STATE.skillHotbarInit || STATE.skillHotbarOwner !== ownerKey;
     if (shouldSeed) {
-        const placed = new Set(globalThis.STATE.skillHotbar.filter(Boolean));
+        const placed = new Set(STATE.skillHotbar.filter(Boolean));
         for (const id of getPlayerSkillIds()) {
             const seedDef = getSkillDef(id);
             if (seedDef && seedDef.slotKind === 'universal') continue;
             if (placed.has(id)) continue;
-            const free = globalThis.STATE.skillHotbar.indexOf(null);
+            const free = STATE.skillHotbar.indexOf(null);
             if (free === -1) break;
-            globalThis.STATE.skillHotbar[free] = id;
+            STATE.skillHotbar[free] = id;
             placed.add(id);
         }
-        globalThis.STATE.skillHotbarInit = true;
-        globalThis.STATE.skillHotbarOwner = ownerKey;
+        STATE.skillHotbarInit = true;
+        STATE.skillHotbarOwner = ownerKey;
     }
 
-    return globalThis.STATE.skillHotbar;
+    return STATE.skillHotbar;
 }
 
 // Returns the skill id in a hotbar slot (or null).
 export function getHotbarSkill(slotIndex) {
-    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.skillHotbar)) return null;
-    return globalThis.STATE.skillHotbar[slotIndex] || null;
+    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return null;
+    return STATE.skillHotbar[slotIndex] || null;
 }
 
 // Assigns a skill to a hotbar slot. Refuses passives and unknown skills.
@@ -808,13 +809,13 @@ function setHotbarSlot(slotIndex, skillId) {
     ensureSkillHotbar();
 
     if (skillId !== null) {
-        const prevIndex = globalThis.STATE.skillHotbar.indexOf(skillId);
+        const prevIndex = STATE.skillHotbar.indexOf(skillId);
         if (prevIndex !== -1 && prevIndex !== slotIndex) {
-            globalThis.STATE.skillHotbar[prevIndex] = globalThis.STATE.skillHotbar[slotIndex] || null;
+            STATE.skillHotbar[prevIndex] = STATE.skillHotbar[slotIndex] || null;
         }
     }
 
-    globalThis.STATE.skillHotbar[slotIndex] = skillId;
+    STATE.skillHotbar[slotIndex] = skillId;
     if (typeof save === 'function') save();
     return true;
 }
@@ -826,8 +827,8 @@ export function clearHotbarSlot(slotIndex) {
 
 // True if the skill currently sits in any hotbar slot.
 export function isSkillOnHotbar(skillId) {
-    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.skillHotbar)) return false;
-    return globalThis.STATE.skillHotbar.indexOf(skillId) !== -1;
+    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return false;
+    return STATE.skillHotbar.indexOf(skillId) !== -1;
 }
 
 

@@ -8,6 +8,7 @@ import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------
@@ -215,7 +216,7 @@ export function _tailRiskCancel(refund = false) {
     window._tailRiskData = null;
 
     _setAbilityMode(false);
-    globalThis.STATE.classActiveChoice = TAIL_RISK_COOLDOWN_SLOT;
+    STATE.classActiveChoice = TAIL_RISK_COOLDOWN_SLOT;
 
     _tailRiskRefundCooldown();
     buildClassHUD();

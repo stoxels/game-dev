@@ -9,6 +9,7 @@ import { EG_LEVELING_CONFIG, _egGetPlayerLevel, _egGetPlayerXP, _egGetUnspentPoi
 import { _egLaunchMapFromDevice } from './endgame-map-launch.js';
 import { EG_MAP_MOD_TABLES, _egGetMapModRewards, _egMapModAffects } from '../loot/loot-maps.js';
 import { EG_SCREEN_NAV, _egResolveBackFn } from '../combat/combat-state.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME PROBABILITY GATE SCREEN----------------------
@@ -537,9 +538,9 @@ _egInjectGateLevelChipStyles();
 export function _egRenderGateLevelChip() {
     const el = document.getElementById('eg-gate-level-chip');
     if (!el) return;
-    const lvl = (typeof _egGetPlayerLevel === 'function') ? _egGetPlayerLevel() : ((typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerLevel) || 1);
-    const pts = (typeof _egGetUnspentPoints === 'function') ? _egGetUnspentPoints() : ((typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.egAttrPoints) || 0);
-    const xp = (typeof _egGetPlayerXP === 'function') ? _egGetPlayerXP() : ((typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.playerXP) || 0);
+    const lvl = (typeof _egGetPlayerLevel === 'function') ? _egGetPlayerLevel() : ((typeof STATE !== 'undefined' && STATE && STATE.playerLevel) || 1);
+    const pts = (typeof _egGetUnspentPoints === 'function') ? _egGetUnspentPoints() : ((typeof STATE !== 'undefined' && STATE && STATE.egAttrPoints) || 0);
+    const xp = (typeof _egGetPlayerXP === 'function') ? _egGetPlayerXP() : ((typeof STATE !== 'undefined' && STATE && STATE.playerXP) || 0);
     const maxLvl = (typeof EG_LEVELING_CONFIG !== 'undefined' && EG_LEVELING_CONFIG.maxLevel) || 100;
     const need = (typeof _egGetXpForNextLevel === 'function') ? _egGetXpForNextLevel(lvl) : 0;
     const pct = lvl >= maxLvl ? 100 : (need > 0 ? Math.min(100, (xp / need) * 100) : 0);

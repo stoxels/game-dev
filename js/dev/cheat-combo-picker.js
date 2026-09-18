@@ -6,6 +6,7 @@ import { hideModal, showModal } from '../screens/screens.js';
 import { save } from '../state.js';
 import { _tipAttr } from '../tooltips-hud.js';
 import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _animSetDefaultDownImage, _animWarmCacheFor, _playAvatarWalkAnimation, _stopAvatarWalkAnimation } from '../sprite/sprite_animations.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------CHEAT: CHARACTER LAB----------------------------------
@@ -167,30 +168,30 @@ export function _charLabRenderGrid() {
 // set), refreshes the animation cache, and updates the live preview.
 // Never persists - "SAVE INTO CURRENT SLOT" does that explicitly.
 export function _charLabApply(charId, variant) {
-    if (!globalThis.STATE) return;
-    globalThis.STATE.playerCharacter = charId;
+    if (!STATE) return;
+    STATE.playerCharacter = charId;
 
     const parent = _charLabParentOf(variant);
     if (variant === 'noclass') {
-        globalThis.STATE.playerClass = null;
-        globalThis.STATE.playerAscendency = null;
+        STATE.playerClass = null;
+        STATE.playerAscendency = null;
     } else if (parent) {
         // Ascendency: keep the parent base class selected too.
-        globalThis.STATE.playerClass = parent;
-        globalThis.STATE.playerAscendency = variant;
+        STATE.playerClass = parent;
+        STATE.playerAscendency = variant;
     } else {
-        globalThis.STATE.playerClass = variant;
-        globalThis.STATE.playerAscendency = null;
+        STATE.playerClass = variant;
+        STATE.playerAscendency = null;
     }
 
     // The same rank-1 fields the real selection flows initialise.
-    globalThis.STATE.classPassiveLevel = 1;
-    globalThis.STATE.classActive1Level = 1;
-    globalThis.STATE.classActive2Level = 1;
-    globalThis.STATE.classActiveLevel = 1;
-    globalThis.STATE.classActiveChoice = 'active1';
-    globalThis.STATE.ascendencySkill1Level = 1;
-    globalThis.STATE.ascendencySkill2Level = 1;
+    STATE.classPassiveLevel = 1;
+    STATE.classActive1Level = 1;
+    STATE.classActive2Level = 1;
+    STATE.classActiveLevel = 1;
+    STATE.classActiveChoice = 'active1';
+    STATE.ascendencySkill1Level = 1;
+    STATE.ascendencySkill2Level = 1;
 
     // Re-discover animation art for the new combo (drops stale cache).
     if (typeof _animRefreshCacheFor === 'function') _animRefreshCacheFor(charId, variant);
@@ -205,7 +206,7 @@ export function _charLabApply(charId, variant) {
 
 // Opt-in persistence: writes the currently previewed combo into the save.
 export function _charLabSaveCurrent() {
-    if (!globalThis.STATE || !globalThis.STATE.playerCharacter) return;
+    if (!STATE || !STATE.playerCharacter) return;
     if (typeof save === 'function') save();
     if (typeof showToast === 'function') showToast('💾 Saved current slot');
 }
@@ -223,10 +224,10 @@ export function _charLabRenderPreview() {
     const img = document.getElementById('charlab-preview-img');
     const portrait = document.getElementById('charlab-preview-portrait');
     const label = document.getElementById('charlab-preview-label');
-    if (!img || !globalThis.STATE || !globalThis.STATE.playerCharacter) return;
+    if (!img || !STATE || !STATE.playerCharacter) return;
 
-    const charId = globalThis.STATE.playerCharacter;
-    const variant = globalThis.STATE.playerAscendency || globalThis.STATE.playerClass || 'noclass';
+    const charId = STATE.playerCharacter;
+    const variant = STATE.playerAscendency || STATE.playerClass || 'noclass';
     _charLabPreview.char = charId;
     _charLabPreview.variant = variant;
 

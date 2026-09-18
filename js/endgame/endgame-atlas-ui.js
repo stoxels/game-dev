@@ -4,6 +4,7 @@ import { EG_ART } from './endgame-art.js';
 import { EG_ATLAS_MAX_TIER, EG_ATLAS_NODES, egAtlasAdjacentBonusPercent, egAtlasChainBlueprint, egAtlasIsCompleted, egAtlasIsUnlocked, egAtlasNodeById, egAtlasNodeName, egAtlasProgress } from './endgame-atlas.js';
 import { EG_MAP_TIER_ROMANS, _egMapStash } from './endgame-hub.js';
 import { EG_SCREEN_NAV, _egResolveBackFn } from '../combat/combat-state.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME ATLAS SCREEN---------------------------------
@@ -154,7 +155,7 @@ export function egAtlasCountStashedMaps() {
     const counts = {};
     let stash = null;
     if (typeof _egMapStash !== 'undefined' && Array.isArray(_egMapStash)) stash = _egMapStash;
-    else if (typeof STATE !== 'undefined' && globalThis.STATE.egMapStash && Array.isArray(globalThis.STATE.egMapStash)) stash = globalThis.STATE.egMapStash;
+    else if (typeof STATE !== 'undefined' && STATE.egMapStash && Array.isArray(STATE.egMapStash)) stash = STATE.egMapStash;
     if (!stash) return counts;
     stash.forEach(tierGrid => {
         if (!Array.isArray(tierGrid)) return;

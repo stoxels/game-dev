@@ -3,6 +3,7 @@ import { showSetup, showTitle, switchScreen } from './screens/screens.js';
 import { save } from './state.js';
 import { t } from './translation/translations.js';
 import { startTutorialQuest } from './tutorial-quest.js';
+import { STATE } from './state.js';
 
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE----------------------------
@@ -71,7 +72,7 @@ export let _tutorialReplayFromTitle = false;
 //   STATE.playerCharacter is stored lowercase ('stox'/'trix'/'syla'), so it's
 //   capitalized here to match the actual folder names on disk.
 export function _tutCharacterFolder() {
-    const id = (globalThis.STATE && globalThis.STATE.playerCharacter) ? globalThis.STATE.playerCharacter : 'stox';
+    const id = (STATE && STATE.playerCharacter) ? STATE.playerCharacter : 'stox';
     return id.charAt(0).toUpperCase() + id.slice(1);
 }
 
@@ -281,7 +282,7 @@ export function renderTutStep() {
 // finishTutorial - marks the tutorial as completed, persists the save,
 //   and navigates to the level select screen.
 export function finishTutorial() {
-    globalThis.STATE.tutorialDone = true;
+    STATE.tutorialDone = true;
     save();
     if (_tutorialReplayFromTitle) {
         _tutorialReplayFromTitle = false;
@@ -346,7 +347,7 @@ export function showTutorialScreen() {
 // showTutorial - called from the title screen.
 //   Skips the tutorial and goes straight to setup if already completed.
 export function showTutorial() {
-    if (globalThis.STATE.tutorialDone) {
+    if (STATE.tutorialDone) {
         showSetup();
         return;
     }

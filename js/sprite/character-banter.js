@@ -1,4 +1,5 @@
 import { LANG } from '../translation/translations.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------CHARACTER BANTER (SPEECH BUBBLE)----------------------
@@ -1432,7 +1433,7 @@ export function _banterPickLine(charId, eventKey, bank) {
 // apply) - used by the tutorial replies, which must answer the Professor
 // even when level_start banter fired seconds earlier.
 export function triggerBanter(eventKey, force) {
-    const charId = globalThis.STATE?.playerCharacter;
+    const charId = STATE?.playerCharacter;
     if (!charId || !_BANTER_LINES[charId]) return; // no character chosen yet
 
     const cfg = _BANTER_EVENT_CFG[eventKey] || { chance: 1.0, cooldownMs: _BANTER_DEFAULT_COOLDOWN_MS };
@@ -1461,7 +1462,7 @@ export function triggerBanter(eventKey, force) {
 // Returns true if a line was shown, false otherwise (so callers can fall
 // back to the generic banks when no specific line exists).
 export function _banterFireFromBank(bank, id, eventKeyPrefix, chance, cooldownMs) {
-    const charId = globalThis.STATE?.playerCharacter;
+    const charId = STATE?.playerCharacter;
     const charBank = charId && bank[charId];
     if (!charBank || !charBank[id] || charBank[id].length === 0) return false;
 

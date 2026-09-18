@@ -3,6 +3,7 @@ import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
 import { getSkillRankManaMultForSlot } from '../skills/skill-charms.js';
 import { _hotbarClasslessHasSpells } from '../skills/skill-hotbar.js';
+import { STATE } from '../state.js';
 // class-mana.js
 //------------------------------------------------------------------------
 //------------------------PLAYER MANA SYSTEM------------------------------
@@ -99,7 +100,7 @@ export function _getAbilityManaCost(hudSlot) {
 // Gear-scaled cost before the rank multiplier.
 export function _getAbilityScaledBaseCost(hudSlot) {
     if (hudSlot === 'active5') {
-        if (!globalThis.STATE.playerClass || !_manaEnabled()) return 0;
+        if (!STATE.playerClass || !_manaEnabled()) return 0;
         const def = (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined') ? ENDGAME_HEARTBLOOM_DEF : null;
         return _scaleAbilityManaCost((def && def.manaCost) || 0);
     }
@@ -112,10 +113,10 @@ export function _getAbilityScaledBaseCost(hudSlot) {
         return _scaleAbilityManaCost(16);
     }
 
-    if (!globalThis.STATE.playerClass || !_manaEnabled()) return 0;
+    if (!STATE.playerClass || !_manaEnabled()) return 0;
 
     if (hudSlot === 'active1' || hudSlot === 'active2') {
-        const def = (typeof CLASS_DEFS !== 'undefined') ? CLASS_DEFS[globalThis.STATE.playerClass] : null;
+        const def = (typeof CLASS_DEFS !== 'undefined') ? CLASS_DEFS[STATE.playerClass] : null;
         return _scaleAbilityManaCost((def && def[hudSlot] && def[hudSlot].manaCost) || 0);
     }
 
@@ -161,7 +162,7 @@ export function _abilityCanAfford(hudSlot) {
 // True when every HUD skill slot can currently be paid for. Slots without
 // an ability/cost resolve to affordable, so this reflects the worst case.
 export function _allSlotsAffordable() {
-    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE.playerClass) return true;
+    if (typeof STATE === 'undefined' || !STATE.playerClass) return true;
     return ['active1', 'active2', 'active3', 'active4', 'active5'].every(
         (s) => (typeof _abilityCanAfford === 'function') ? _abilityCanAfford(s) : true
     );
@@ -248,7 +249,7 @@ export function updateClassHUDManaBar() {
         try {
             if (typeof _hotbarClasslessHasSpells === 'function') classlessSpells = _hotbarClasslessHasSpells();
         } catch (e) { /* best-effort */ }
-        if (!globalThis.STATE.playerClass && !tqActive && !classlessSpells) {
+        if (!STATE.playerClass && !tqActive && !classlessSpells) {
             avatarWrap.style.display = 'none';
         } else {
             avatarWrap.style.display = '';

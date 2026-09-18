@@ -25,6 +25,7 @@ import { playShieldChargePulseEffect, playTimeGainEffect } from '../passive-tree
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getCharmLockedSkillForLegacySlot, getSkillCastRankClampedForSlot, getSkillIdForLegacySlot, noteCharmCast } from '../skills/skill-charms.js';
 import { _incDirect, updateQuestStats } from '../inference/inference-stats.js';
+import { STATE } from '../state.js';
 
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'correctFillStreak', { get() { return correctFillStreak; }, set(v) { correctFillStreak = v; }, configurable: true }); } catch (e) {}
@@ -131,9 +132,9 @@ export function _filterMarkedIds(ids, sol) {
 //   slotting a lower-rank charm really does cast the weaker variant).
 export function _getActiveAbilityData(def, activeKey) {
     let level = activeKey === 'active1'
-        ? (globalThis.STATE.classActive1Level || 1)
-        : (globalThis.STATE.classActive2Level || 1);
-    if (globalThis.STATE.playerClass && typeof getSkillCastRankClampedForSlot === 'function') {
+        ? (STATE.classActive1Level || 1)
+        : (STATE.classActive2Level || 1);
+    if (STATE.playerClass && typeof getSkillCastRankClampedForSlot === 'function') {
         const charmRank = getSkillCastRankClampedForSlot(activeKey);
         if (charmRank) level = charmRank;
     }
@@ -144,8 +145,8 @@ export function _getActiveAbilityData(def, activeKey) {
 // _getPassiveEffect - returns the current passive effect object for the active class.
 //   Reads classPassiveLevel from STATE.
 export function _getPassiveEffect() {
-    const def = CLASS_DEFS[globalThis.STATE.playerClass];
-    const passLv = globalThis.STATE.classPassiveLevel || 1;
+    const def = CLASS_DEFS[STATE.playerClass];
+    const passLv = STATE.classPassiveLevel || 1;
     return def.passive.levels[passLv - 1].effect;
 }
 
@@ -153,14 +154,14 @@ export function _getPassiveEffect() {
 // _getAscendencySlotData - resolves the ability data for an ascendency HUD slot.
 //   hudSlot 'active3' maps to ascendency active1; 'active4' maps to active2.
 export function _getAscendencySlotData(hudSlot) {
-    const asc = globalThis.STATE.playerAscendency ? ASCENDENCY_DEFS[globalThis.STATE.playerAscendency] : null;
+    const asc = STATE.playerAscendency ? ASCENDENCY_DEFS[STATE.playerAscendency] : null;
     if (!asc) return null;
     const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
     let skillLv = ascSlot === 'active1'
-        ? (globalThis.STATE.ascendencySkill1Level || 1)
-        : (globalThis.STATE.ascendencySkill2Level || 1);
+        ? (STATE.ascendencySkill1Level || 1)
+        : (STATE.ascendencySkill2Level || 1);
     // Charm rank override (see _getActiveAbilityData above).
-    if (globalThis.STATE.playerAscendency && typeof getSkillCastRankClampedForSlot === 'function') {
+    if (STATE.playerAscendency && typeof getSkillCastRankClampedForSlot === 'function') {
         const charmRank = getSkillCastRankClampedForSlot(hudSlot);
         if (charmRank) skillLv = charmRank;
     }
@@ -195,11 +196,11 @@ export function _showAbilityArmToast(slot) {
     let activeData = null;
 
     if (slot === 'active3' || slot === 'active4') {
-        const asc = globalThis.STATE.playerAscendency ? ASCENDENCY_DEFS[globalThis.STATE.playerAscendency] : null;
+        const asc = STATE.playerAscendency ? ASCENDENCY_DEFS[STATE.playerAscendency] : null;
         if (!asc) return;
         activeData = slot === 'active3' ? asc.active1 : asc.active2;
     } else {
-        const def = CLASS_DEFS[globalThis.STATE.playerClass];
+        const def = CLASS_DEFS[STATE.playerClass];
         if (!def) return;
         activeData = def[slot];
     }
@@ -404,24 +405,24 @@ export function _isInstantAbility(slot) {
 
     // Base class instants
     //if (STATE.playerClass === 'probabilist' && slot === 'active2') return true; // Field Scan
-    if (globalThis.STATE.playerClass === 'statistician' && slot === 'active1') return true; // Data Strike
-    if (globalThis.STATE.playerClass === 'mathmagician' && slot === 'active2') return true; // Absolute Zero
+    if (STATE.playerClass === 'statistician' && slot === 'active1') return true; // Data Strike
+    if (STATE.playerClass === 'mathmagician' && slot === 'active2') return true; // Absolute Zero
 
     // Ascendency instants
-    if (globalThis.STATE.playerAscendency === 'actuary') {
+    if (STATE.playerAscendency === 'actuary') {
         if (slot === 'active3') return true; // Regression to Prior
         if (slot === 'active4') return true; // Significance Threshold
     }
-    if (globalThis.STATE.playerAscendency === 'markovian') {
+    if (STATE.playerAscendency === 'markovian') {
         if (slot === 'active3') return true; // State Rollback
         if (slot === 'active4') return true; // Transition Matrix
     }
-    if (globalThis.STATE.playerAscendency === 'bayesian') {
+    if (STATE.playerAscendency === 'bayesian') {
         if (slot === 'active3') return true; // Bayes Traps
         if (slot === 'active4') return true; // Type I Error Shield
     }
-    if (globalThis.STATE.playerAscendency === 'outlier' && slot === 'active3') return true; // Tail Risk
-    if (globalThis.STATE.playerAscendency === 'random_walker') {
+    if (STATE.playerAscendency === 'outlier' && slot === 'active3') return true; // Tail Risk
+    if (STATE.playerAscendency === 'random_walker') {
         if (slot === 'active3') return true; // Brownian Motion
         if (slot === 'active4') return true; // Drifter
     }
@@ -429,7 +430,7 @@ export function _isInstantAbility(slot) {
 
     // active4 instants for specific ascendencies
     if (slot !== 'active4') return false;
-    return globalThis.STATE.playerAscendency === 'outlier' || globalThis.STATE.playerAscendency === 'recursionist';
+    return STATE.playerAscendency === 'outlier' || STATE.playerAscendency === 'recursionist';
 }
 
 
@@ -463,7 +464,7 @@ export function _canFireInstantAbility(slot) {
         }
         return true;
     }
-    if (globalThis.STATE.playerAscendency === 'actuary' && slot === 'active3') {
+    if (STATE.playerAscendency === 'actuary' && slot === 'active3') {
         if (!(window._mistakeLog && window._mistakeLog.length > 0)) {
             globalThis.showToast(t('cls_regression_none'));
             return false;
@@ -476,7 +477,7 @@ export function _canFireInstantAbility(slot) {
 // _fireInstantBaseAbility - fires an instant ability from the base class slot (active1/active2)
 //   and immediately starts its cooldown.
 export function _fireInstantBaseAbility(slot) {
-    const def = CLASS_DEFS[globalThis.STATE.playerClass];
+    const def = CLASS_DEFS[STATE.playerClass];
     if (!def) return;
 
     const actData = _getActiveAbilityData(def, slot);
@@ -486,7 +487,7 @@ export function _fireInstantBaseAbility(slot) {
     if (!payAbilityCost(_getAbilityManaCost(slot))) return;
 
     // Row/col are 0,0 - instant abilities ignore position.
-    _dispatchBaseAbility(slot, globalThis.STATE.playerClass, 0, 0, effect);
+    _dispatchBaseAbility(slot, STATE.playerClass, 0, 0, effect);
 
     const cdSeconds = getEffectiveCooldown(slot, def[slot].cooldownSeconds);
     startSlotCooldown(slot, cdSeconds);
@@ -506,7 +507,7 @@ export function _fireInstantAscendencyAbility(slot) {
     if (!payAbilityCost(_getAbilityManaCost(slot))) return;
 
     // Row/col are 0,0 - instant abilities ignore position.
-    _dispatchAscendencyAbility(slot, globalThis.STATE.playerAscendency, 0, 0, effect);
+    _dispatchAscendencyAbility(slot, STATE.playerAscendency, 0, 0, effect);
 
     const cdSeconds = getEffectiveCooldown(slot, asc[ascSlot].cooldownSeconds);
     startSlotCooldown(slot, cdSeconds);
@@ -643,9 +644,9 @@ export function _fireInstantAbility(slot) {
 // CLASS_HUD_HINT_MAX_USES the arrows stop rendering on the next HUD rebuild.
 export function _trackActivationHintProgress(slot) {
     if (slot !== 'active1' && slot !== 'active2') return;
-    if ((globalThis.STATE.classHudHintUses || 0) >= CLASS_HUD_HINT_MAX_USES) return;
+    if ((STATE.classHudHintUses || 0) >= CLASS_HUD_HINT_MAX_USES) return;
 
-    globalThis.STATE.classHudHintUses = (globalThis.STATE.classHudHintUses || 0) + 1;
+    STATE.classHudHintUses = (STATE.classHudHintUses || 0) + 1;
     save();
 }
 
@@ -685,7 +686,7 @@ function toggleActiveAbility(slot) {
     }
 
     // Clicking the already-armed slot cancels the arm
-    const isAlreadyArmed = globalThis.activeAbilityMode && globalThis.STATE.classActiveChoice === newSlot;
+    const isAlreadyArmed = globalThis.activeAbilityMode && STATE.classActiveChoice === newSlot;
     if (isAlreadyArmed) {
         _setAbilityMode(false);
         buildClassHUD();
@@ -700,11 +701,11 @@ function toggleActiveAbility(slot) {
     }
 
     // Disallow activating or switching to another ability if one is already armed
-    if (globalThis.activeAbilityMode && globalThis.STATE.classActiveChoice !== newSlot) {
+    if (globalThis.activeAbilityMode && STATE.classActiveChoice !== newSlot) {
         return;
     }
 
-    globalThis.STATE.classActiveChoice = newSlot;
+    STATE.classActiveChoice = newSlot;
     _trackActivationHintProgress(newSlot);
 
     if (_isInstantAbility(newSlot)) {
@@ -742,7 +743,7 @@ export function _executeAscendencySkillOnCell(activeKey, row, col) {
     // Pay the cost (life under Blood Magic) - abort without firing if it can't be covered.
     if (!payAbilityCost(_getAbilityManaCost(activeKey))) return;
 
-    _dispatchAscendencyAbility(activeKey, globalThis.STATE.playerAscendency, row, col, effect);
+    _dispatchAscendencyAbility(activeKey, STATE.playerAscendency, row, col, effect);
 
     // End arm mode and start cooldown immediately
     _setAbilityMode(false);
@@ -755,7 +756,7 @@ export function _executeAscendencySkillOnCell(activeKey, row, col) {
 //   and starts its cooldown immediately.
 export function _executeBaseSkillOnCell(activeKey, row, col) {
     _setAbilityMode(false);
-    const def = CLASS_DEFS[globalThis.STATE.playerClass];
+    const def = CLASS_DEFS[STATE.playerClass];
     const actData = _getActiveAbilityData(def, activeKey);
     const effect = actData.effect;
 
@@ -765,7 +766,7 @@ export function _executeBaseSkillOnCell(activeKey, row, col) {
         return;
     }
 
-    _dispatchBaseAbility(activeKey, globalThis.STATE.playerClass, row, col, effect);
+    _dispatchBaseAbility(activeKey, STATE.playerClass, row, col, effect);
 
     const cdSeconds = getEffectiveCooldown(activeKey, def[activeKey].cooldownSeconds);
     startSlotCooldown(activeKey, cdSeconds);
@@ -775,12 +776,12 @@ export function _executeBaseSkillOnCell(activeKey, row, col) {
 // executeActiveAbility - called when the player clicks a grid cell while an ability is armed.
 //   Routes to ascendency or base class execution based on the active HUD slot.
 export function executeActiveAbility(row, col) {
-    if (!globalThis.activeAbilityMode || !globalThis.STATE.playerClass || globalThis.dead) return;
+    if (!globalThis.activeAbilityMode || !STATE.playerClass || globalThis.dead) return;
     if (globalThis.isClassless()) { _setAbilityMode(false); return; }
 
     trackAchStat('classAbilitiesUsedTotal'); 
 
-    const activeKey = globalThis.STATE.classActiveChoice || 'active1';
+    const activeKey = STATE.classActiveChoice || 'active1';
 
     if (activeKey === 'active3' || activeKey === 'active4') {
         _executeAscendencySkillOnCell(activeKey, row, col);
@@ -950,7 +951,7 @@ export function _bayesianRevealOneCell() {
 export function applyClassPassiveOnLevelStart() {
     _resetClassLevelState();
 
-    if (!globalThis.STATE.playerClass || globalThis.isClassless()) {
+    if (!STATE.playerClass || globalThis.isClassless()) {
         // Still mark that class passives were considered for this Gi so the
         // chain guarantee does not re-fire unnecessarily.
         window._egClassPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : null;
@@ -959,8 +960,8 @@ export function applyClassPassiveOnLevelStart() {
 
     const effect = _getPassiveEffect();
 
-    if (globalThis.STATE.playerClass === 'mathmagician') _applyMathmagicianPassive(effect);
-    if (globalThis.STATE.playerClass === 'probabilist') _applyProbabilistPassive(effect);
+    if (STATE.playerClass === 'mathmagician') _applyMathmagicianPassive(effect);
+    if (STATE.playerClass === 'probabilist') _applyProbabilistPassive(effect);
     window._egClassPassiveAppliedForGi = globalThis.cur ? globalThis.cur.gIdx : null;
 }
 
@@ -1029,7 +1030,7 @@ export function _applyMathmagicianShieldAbsorb() {
 //   Returns 5.0 if a Black Swan streak is broken (heavy punishment).
 //   Returns 1.0 for all other cases (standard penalty).
 export function getClassPenaltyMultiplier() {
-    if (!globalThis.STATE.playerClass || globalThis.isClassless()) return 1.0;
+    if (!STATE.playerClass || globalThis.isClassless()) return 1.0;
 
     // Breaking an active Speedforce (Black Swan) streak ends it unnaturally and applies a heavy penalty
     if (window._blackSwanActive) {
@@ -1041,7 +1042,7 @@ export function getClassPenaltyMultiplier() {
     // Mathmagician Variance Shield absorbs the mistake entirely.
     // Null Hypothesis / Asymptotic Mastery disable shields of all kinds,
     // so the class-passive absorption is skipped as well.
-    if (globalThis.STATE.playerClass === 'mathmagician'
+    if (STATE.playerClass === 'mathmagician'
         && !ptHasSkill('keystone_null_hypothesis')
         && !ptHasSkill('keystone_asymptotic_mastery')) {
         const absorbed = _applyMathmagicianShieldAbsorb();
@@ -1080,7 +1081,7 @@ export function _handleTransitionMatrixCascade(row, col) {
 //   for correct fills. frozen_resilience grants +1 shield every 5 fills;
 //   god_of_math reduces the Arcane Reveal cooldown by 1s per fill.
 export function _handleMathmagicianFreezeBonus() {
-    if (globalThis.STATE.playerClass !== 'mathmagician' || !window._freezeActive) return;
+    if (STATE.playerClass !== 'mathmagician' || !window._freezeActive) return;
 
     if (ptHasSkill('frozen_resilience')) {
         window._freezeCorrFills = (window._freezeCorrFills || 0) + 1;
@@ -1162,7 +1163,7 @@ export function onCorrectFill(row, col) {
     _handlePrecisionMarkMomentum(row, col);
 
     // Statistician streak logic only applies to the Statistician class
-    if (globalThis.STATE.playerClass !== 'statistician' || globalThis.isClassless()) return;
+    if (STATE.playerClass !== 'statistician' || globalThis.isClassless()) return;
     _handleStatisticianStreak(_getPassiveEffect(), row, col);
 }
 
@@ -1190,7 +1191,7 @@ export function _getStatisticianStreakReduction(hasLFM, hasMNM) {
 // onMistake - called on any wrong fill (from input.js).
 //   Resets or reduces the Statistician fill streak depending on passive tree nodes.
 export function onMistake() {
-    if (globalThis.STATE.playerClass === 'statistician' && !globalThis.isClassless()) {
+    if (STATE.playerClass === 'statistician' && !globalThis.isClassless()) {
         _momentumParticlesOnMistake();
 
         const effect = _getPassiveEffect();

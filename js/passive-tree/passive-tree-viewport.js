@@ -1,5 +1,6 @@
 ﻿import { _ptHideTooltip, _pt_container, _pt_world } from './passive-tree-ui.js';
 import { PT_NODE_RADIUS, PT_PADDING, PT_ZOOM_MAX, PT_ZOOM_MIN, PT_ZOOM_STEP } from './passive-tree.js';
+import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, '_pt_mouseDownTime', { get() { return _pt_mouseDownTime; }, set(v) { _pt_mouseDownTime = v; }, configurable: true }); } catch (e) {}
 //------------------------------------------------------------------------
@@ -131,7 +132,7 @@ export function _ptFitToView(bounds) {
     _pt_tx = (cW - scaledW) / 2 + PT_FIT_OFFSET_X;
     _pt_ty = (cH - scaledH) / 2 + offsetY * _pt_scale + PT_FIT_OFFSET_Y;
 
-    const lastId = (typeof globalThis.STATE !== 'undefined') && globalThis.STATE.passiveTreeLastNode;
+    const lastId = (typeof STATE !== 'undefined') && STATE.passiveTreeLastNode;
     if (lastId && globalThis._pt_skillMap[lastId]) {
         _ptCenterOnNode(globalThis._pt_skillMap[lastId], bounds);
     } else {

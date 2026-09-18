@@ -6,6 +6,7 @@ import { SKILL_HOTBAR_COLS, SKILL_HOTBAR_SIZE, activateHotbarSlot, canAffordSkil
 import { isSpellbookOpen, renderSpellbook, toggleSpellbook } from './skill-spellbook.js';
 import { cancelHoldCast, isSkillHoldCast, tryBeginHoldCast } from './spell-casttime.js';
 import { _uspUnlockHint, getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, isUniversalSpellId, isUniversalSpellUnlocked } from './universal-spells.js';
+import { STATE } from '../state.js';
 // skill-hotbar.js
 //------------------------------------------------------------------------
 //---------------------------SKILL HOTBAR---------------------------------
@@ -152,7 +153,7 @@ export function _buildHotbarSlotHTML(slotIndex, skillId) {
     const canAfford = (typeof canAffordSkill === 'function') ? canAffordSkill(skillId) : true;
     const noMana = !canAfford && !isOnCD;
     const isArmed = (typeof globalThis.activeAbilityMode !== 'undefined') && globalThis.activeAbilityMode
-        && globalThis.STATE.classActiveChoice === def.legacySlot;
+        && STATE.classActiveChoice === def.legacySlot;
     const usableNow = (typeof isSkillUsableNow === 'function') ? isSkillUsableNow(skillId) : true;
     const locked = !usableNow;
     // Hold-to-cast spells (spell-casttime.js) get a marker so the longer
@@ -227,10 +228,10 @@ export function _formatHotbarCooldown(secs) {
 // until then (universal charm spells need no class).
 export function _hotbarClasslessHasSpells() {
     try {
-        if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return false;
-        if (Array.isArray(globalThis.STATE.skillHotbar) && globalThis.STATE.skillHotbar.some(Boolean)) return true;
-        if (Array.isArray(globalThis.STATE.charmSlots) && globalThis.STATE.charmSlots.some(Boolean)) return true;
-        if (Array.isArray(globalThis.STATE.charmInventory) && globalThis.STATE.charmInventory.length > 0) return true;
+        if (typeof STATE === 'undefined' || !STATE) return false;
+        if (Array.isArray(STATE.skillHotbar) && STATE.skillHotbar.some(Boolean)) return true;
+        if (Array.isArray(STATE.charmSlots) && STATE.charmSlots.some(Boolean)) return true;
+        if (Array.isArray(STATE.charmInventory) && STATE.charmInventory.length > 0) return true;
     } catch (e) { /* best-effort */ }
     return false;
 }
@@ -248,8 +249,8 @@ export function renderSkillHotbar() {
     // anything castable (a hotbar spell, a slotted charm, or an inventory
     // charm) - universal spells need no class.
     const tqActive = (typeof globalThis._tqIsTutorialActive === 'function') && globalThis._tqIsTutorialActive();
-    const classlessHidden = (typeof globalThis.STATE === 'undefined' || !globalThis.STATE)
-        || (((!globalThis.STATE.playerClass && !tqActive)
+    const classlessHidden = (typeof STATE === 'undefined' || !STATE)
+        || (((!STATE.playerClass && !tqActive)
             || ((typeof globalThis.isClassless === 'function') && globalThis.isClassless()))
             && !_hotbarClasslessHasSpells()
             && !_hotbarNeededForSpellbook());
@@ -330,8 +331,8 @@ export function patchHotbarSlotCooldown(skillId) {
 // Patches the hotbar slot(s) bound to a legacy slot key (active1…active5).
 // Called from _patchCooldownButton() in class-cooldown-state.js.
 export function patchHotbarCooldownForLegacySlot(legacySlot) {
-    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.skillHotbar)) return;
-    for (const skillId of globalThis.STATE.skillHotbar) {
+    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return;
+    for (const skillId of STATE.skillHotbar) {
         if (!skillId) continue;
         const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
         if (def && def.legacySlot === legacySlot) patchHotbarSlotCooldown(skillId);
@@ -531,14 +532,14 @@ export function _hotbarKeysBlocked() {
         } catch (e) { /* best-effort */ }
         try { if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return true; } catch (e) { /* best-effort */ }
         try {
-            if (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && !globalThis.STATE.playerClass) return false;
+            if (typeof STATE !== 'undefined' && STATE && !STATE.playerClass) return false;
         } catch (e) { /* best-effort */ }
         return true;
     }
     // Fallback when the shared gate is unavailable: same rules. Pre-class
     // characters cast universal charm spells (per-slot activation still
     // validates charm / cooldown / mana), so only death blocks here.
-    if (!globalThis.STATE) return true;
+    if (!STATE) return true;
     if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return true;
     return false;
 }
@@ -582,7 +583,7 @@ export function _initSkillKeybinds() {
         // and death stay blocked.
         let classlessAllow = false;
         try {
-            classlessAllow = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE && !globalThis.STATE.playerClass)
+            classlessAllow = (typeof STATE !== 'undefined' && STATE && !STATE.playerClass)
                 && !(document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA'))
                 && !(typeof _isModalOpen === 'function' && _isModalOpen())
                 && !(typeof globalThis.dead !== 'undefined' && globalThis.dead);

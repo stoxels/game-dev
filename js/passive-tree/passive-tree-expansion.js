@@ -7,6 +7,7 @@ import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../timer/timer-a
 import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
+import { STATE } from '../state.js';
 //----------------------------------------------------------------------------------------
 //-------------------PASSIVE TREE EXPANSION (nodes 303-402)-------------------------------
 //----------------------------------------------------------------------------------------
@@ -420,9 +421,9 @@ export function _ptxRunExpansion() {
 
     ON_START.push(() => {
         let pending = 0;
-        if (typeof globalThis.STATE !== 'undefined') {
-            if (globalThis.STATE.ptxSavingsReveals > 0) { pending += globalThis.STATE.ptxSavingsReveals; globalThis.STATE.ptxSavingsReveals = 0; }
-            if (globalThis.STATE.ptxColdReading) { pending += 1; globalThis.STATE.ptxColdReading = false; }
+        if (typeof STATE !== 'undefined') {
+            if (STATE.ptxSavingsReveals > 0) { pending += STATE.ptxSavingsReveals; STATE.ptxSavingsReveals = 0; }
+            if (STATE.ptxColdReading) { pending += 1; STATE.ptxColdReading = false; }
         }
         if (pending > 0) { revealTiles(pending); toast(`🏦 Banked insight: ${pending} reveal${pending > 1 ? 's' : ''}`); }
     });
@@ -912,9 +913,9 @@ export function _ptxRunExpansion() {
         let add = 0;
         FLATS.forEach(([key, val]) => { if (has(key)) add += val; });
 
-        if (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.ptxSavingsSecs > 0) {
-            add += globalThis.STATE.ptxSavingsSecs;
-            globalThis.STATE.ptxSavingsSecs = 0;
+        if (typeof STATE !== 'undefined' && STATE.ptxSavingsSecs > 0) {
+            add += STATE.ptxSavingsSecs;
+            STATE.ptxSavingsSecs = 0;
         }
 
         // ptxSavingsSecs is banked level-start time (purchased with passive
@@ -1154,7 +1155,7 @@ export function _ptxRunExpansion() {
 
     patch('checkWin', function (orig, args) {
         const result = orig(...args);
-        if (S.bankedThisLevel || typeof globalThis.STATE === 'undefined') return result;
+        if (S.bankedThisLevel || typeof STATE === 'undefined') return result;
         const ov = document.getElementById('ov-win');
         if (!ov || !ov.classList.contains('show')) return result;
         S.bankedThisLevel = true;
@@ -1162,12 +1163,12 @@ export function _ptxRunExpansion() {
         if (has('hour_vault') && globalThis.timerSecs > 300) {
             const cap = has('safety_deposit') ? 240 : 120;
             const amount = Math.min(cap, Math.round(globalThis.timerSecs * 0.10));
-            globalThis.STATE.ptxSavingsSecs = Math.min(cap, (globalThis.STATE.ptxSavingsSecs || 0) + amount);
+            STATE.ptxSavingsSecs = Math.min(cap, (STATE.ptxSavingsSecs || 0) + amount);
             if (amount > 0) toast(`🏦 Hour Vault: banked ${amount}s for next level`);
         }
-        if (has('compound_interest')) globalThis.STATE.ptxSavingsReveals = Math.max(1, globalThis.STATE.ptxSavingsReveals || 0);
-        if (has('safety_deposit')) globalThis.STATE.ptxSavingsReveals = Math.max(2, globalThis.STATE.ptxSavingsReveals || 0);
-        if (has('cold_reading') && globalThis.mistakeCount >= 3) globalThis.STATE.ptxColdReading = true;
+        if (has('compound_interest')) STATE.ptxSavingsReveals = Math.max(1, STATE.ptxSavingsReveals || 0);
+        if (has('safety_deposit')) STATE.ptxSavingsReveals = Math.max(2, STATE.ptxSavingsReveals || 0);
+        if (has('cold_reading') && globalThis.mistakeCount >= 3) STATE.ptxColdReading = true;
 
         save();
         return result;

@@ -3,6 +3,7 @@ import { revealTiles } from '../puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { startTimerFreeze } from './timer-freeze.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 3: live globalThis accessors for externally-mutated state.
@@ -441,7 +442,7 @@ export function _initProceduralSystems() {
 // a level is actually running (guarded by the same dead/timerFrozen check
 // as the rest of the tick loop).
 export function _tickPlaytimeTracker() {
-    globalThis.STATE.totalTimePlayedSecs = (globalThis.STATE.totalTimePlayedSecs || 0) + 1;
+    STATE.totalTimePlayedSecs = (STATE.totalTimePlayedSecs || 0) + 1;
 }
 
 

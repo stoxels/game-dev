@@ -6,6 +6,7 @@ import { showWorldDetail, wdGoBackToMap } from './screens-world-levels.js';
 import { showSetup, switchScreen } from './screens.js';
 import { showQuestLog } from '../inference/inference-ui.js';
 import { showPassiveTree } from '../passive-tree/passive-tree.js';
+import { STATE } from '../state.js';
 
 /*
     ========================================================================
@@ -468,9 +469,9 @@ export function _getWorldLabel(wi) {
  * @returns {boolean}
  */
 export function _isWorldComplete(wi) {
-    if (!globalThis.STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
+    if (!STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
     const finalGi = globalThis.WORLD_START_GI[wi] + (globalThis.WORLDS[wi].data.length - 1);
-    return globalThis.STATE.done && globalThis.STATE.done.includes(finalGi);
+    return STATE.done && STATE.done.includes(finalGi);
 }
 
 /**
@@ -492,25 +493,25 @@ export function _isWorldAccessible(wi) {
     }
 
     // All campaign worlds require tutorial completion only
-    return !!(globalThis.STATE && globalThis.STATE.tutorialDone);
+    return !!(STATE && STATE.tutorialDone);
 }
 
 /**
  * Returns true if every level in the given world has been completed at least once.
  */
 export function _isWorldFullyDone(wi) {
-    if (!globalThis.STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
+    if (!STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
     const start = globalThis.WORLD_START_GI[wi];
-    return globalThis.WORLDS[wi].data.every((_, li) => globalThis.STATE.done && globalThis.STATE.done.includes(start + li));
+    return globalThis.WORLDS[wi].data.every((_, li) => STATE.done && STATE.done.includes(start + li));
 }
 
 /**
  * Returns true if every level in the given world has had its bonus objective claimed.
  */
 export function _isWorldBonusComplete(wi) {
-    if (!globalThis.STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
+    if (!STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
     const start = globalThis.WORLD_START_GI[wi];
-    return globalThis.WORLDS[wi].data.every((_, li) => globalThis.STATE.bonusDone && globalThis.STATE.bonusDone.includes(start + li));
+    return globalThis.WORLDS[wi].data.every((_, li) => STATE.bonusDone && STATE.bonusDone.includes(start + li));
 }
 
 /**
@@ -518,7 +519,7 @@ export function _isWorldBonusComplete(wi) {
  * all five modifiers active (reuses isMaxCleared from screens-level-select.js).
  */
 export function _isWorldMaxCleared(wi) {
-    if (!globalThis.STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi] || typeof isMaxCleared !== 'function') return false;
+    if (!STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi] || typeof isMaxCleared !== 'function') return false;
     const start = globalThis.WORLD_START_GI[wi];
     return globalThis.WORLDS[wi].data.every((_, li) => isMaxCleared(start + li));
 }
@@ -800,7 +801,7 @@ export function _updateSpriteDirection(sprite, startPos, endPos) {
     const img = sprite.querySelector('img');
     if (!img) return;
     const dir = _mvDirectionForSegment(startPos, endPos);
-    const st = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE) ? globalThis.STATE : null;
+    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
     const char = st ? st.playerCharacter : null;
     const variant = st ? (st.playerAscendency || st.playerClass || 'noclass') : 'noclass';
     let directional = false;
@@ -861,8 +862,8 @@ export function _animateWalkStep(sprite, startPos, endPos, durationMs, onStepCom
  * @param {number|null} worldIdx
  */
 export function _saveSpritePosition(worldIdx) {
-    if (globalThis.STATE) {
-        globalThis.STATE.mapSpriteWorldIndex = worldIdx;
+    if (STATE) {
+        STATE.mapSpriteWorldIndex = worldIdx;
         if (typeof save === 'function') save();
     }
 }
@@ -968,8 +969,8 @@ export function _walkSpriteTo(targetWorldIdx, onArrived) {
 
     _mvWalking = true;
     sprite.classList.add('walking');
-    if (typeof globalThis._animWarmCacheFor === 'function' && typeof globalThis.STATE !== 'undefined' && globalThis.STATE) {
-        try { globalThis._animWarmCacheFor(globalThis.STATE.playerCharacter, globalThis.STATE.playerAscendency || globalThis.STATE.playerClass || 'noclass'); } catch (e) {}
+    if (typeof globalThis._animWarmCacheFor === 'function' && typeof STATE !== 'undefined' && STATE) {
+        try { globalThis._animWarmCacheFor(STATE.playerCharacter, STATE.playerAscendency || STATE.playerClass || 'noclass'); } catch (e) {}
     }
     if (typeof globalThis._startAvatarWalkAnimation === 'function') globalThis._startAvatarWalkAnimation('mv-sprite-img');
 
@@ -991,8 +992,8 @@ export function _walkSpriteToHome() {
 
     _mvWalking = true;
     sprite.classList.add('walking');
-    if (typeof globalThis._animWarmCacheFor === 'function' && typeof globalThis.STATE !== 'undefined' && globalThis.STATE) {
-        try { globalThis._animWarmCacheFor(globalThis.STATE.playerCharacter, globalThis.STATE.playerAscendency || globalThis.STATE.playerClass || 'noclass'); } catch (e) {}
+    if (typeof globalThis._animWarmCacheFor === 'function' && typeof STATE !== 'undefined' && STATE) {
+        try { globalThis._animWarmCacheFor(STATE.playerCharacter, STATE.playerAscendency || STATE.playerClass || 'noclass'); } catch (e) {}
     }
     if (typeof globalThis._startAvatarWalkAnimation === 'function') globalThis._startAvatarWalkAnimation('mv-sprite-img');
 
@@ -1094,7 +1095,7 @@ export function _getWorldStoxelProgressText(wi) {
     const total = worldData.data.length;
     let solved = 0;
     for (let li = 0; li < total; li++) {
-        if (globalThis.STATE.done.includes(start + li)) solved++;
+        if (STATE.done.includes(start + li)) solved++;
     }
     return t('scr_world_stoxels')
         .replace('{solved}', solved)
@@ -1112,9 +1113,9 @@ export function _getWorldStoxelProgressText(wi) {
  */
 export function _getWorldConvergenceText(wi) {
     // Trial system present: "claimed 1/1" style readout.
-    if (typeof globalThis._egTrialIdForWorld === 'function' && typeof globalThis.STATE !== 'undefined' && globalThis.STATE) {
+    if (typeof globalThis._egTrialIdForWorld === 'function' && typeof STATE !== 'undefined' && STATE) {
         const id = globalThis._egTrialIdForWorld(wi);
-        const done = globalThis.STATE.trialsDone && globalThis.STATE.trialsDone.includes(id);
+        const done = STATE.trialsDone && STATE.trialsDone.includes(id);
         const key = done ? 'scr_world_trial_done' : 'scr_world_trial_todo';
         let label = (typeof t === 'function') ? t(key) : null;
         if (label && label !== key) return label;
@@ -1130,7 +1131,7 @@ export function _getWorldConvergenceText(wi) {
         const gi = start + li;
         const isLastInWorld = li === worldData.data.length - 1;
         if (isLevelConvergence(li, worldData, isLastInWorld)
-            && globalThis.STATE.convergenceDone && globalThis.STATE.convergenceDone.includes(gi)) {
+            && STATE.convergenceDone && STATE.convergenceDone.includes(gi)) {
             claimed++;
         }
     });
@@ -1150,7 +1151,7 @@ export function _getWorldClassUpgradeText(wi) {
     if (typeof globalThis.isNexusWorld === 'function' && globalThis.isNexusWorld(wi)) {
         return t('scr_nexus_ascension_hint');
     }
-    const obtained = globalThis.STATE.classWorldsCompleted && globalThis.STATE.classWorldsCompleted.includes(wi);
+    const obtained = STATE.classWorldsCompleted && STATE.classWorldsCompleted.includes(wi);
     return obtained ? t('scr_world_class_upgrade_done') : t('scr_world_class_upgrade_missing');
 }
 
@@ -1762,7 +1763,7 @@ export function _renderTopBarMods() {
 export function _renderTopBarScore(p = 'mv') {
     const scoreEl = document.getElementById(p + '-ls-score');
     if (scoreEl) {
-        scoreEl.textContent = (globalThis.STATE ? globalThis.STATE.totalScore : 0);
+        scoreEl.textContent = (STATE ? STATE.totalScore : 0);
     }
 }
 
@@ -1783,9 +1784,9 @@ export function _renderTopBarClassStatus(p = 'mv') {
     const classEl = document.getElementById(p + '-class-status');
     if (!classEl) return;
 
-    if (globalThis.STATE && globalThis.STATE.playerClass) {
-        const def = globalThis.CLASS_DEFS[globalThis.STATE.playerClass];
-        const asc = globalThis.STATE.playerAscendency ? globalThis.ASCENDENCY_DEFS[globalThis.STATE.playerAscendency] : null;
+    if (STATE && STATE.playerClass) {
+        const def = globalThis.CLASS_DEFS[STATE.playerClass];
+        const asc = STATE.playerAscendency ? globalThis.ASCENDENCY_DEFS[STATE.playerAscendency] : null;
         applyClassStatusActiveStyle(classEl, def, asc);
     } else {
         applyClassStatusEmptyStyle(classEl);
@@ -1803,7 +1804,7 @@ export function _renderTopBarTreePoints(p = 'mv') {
     const treeBtn = document.getElementById(p + '-btn-passive-tree');
     if (!treeBtn) return;
 
-    const points = (globalThis.STATE && globalThis.STATE.passiveTreePoints) || 0;
+    const points = (STATE && STATE.passiveTreePoints) || 0;
     const hasPoints = points > 0;
 
     // Class-based styling (the stone-block image sets border: none !important,
@@ -1879,7 +1880,7 @@ export function _buildMapViewTopBar() {
  * based on the current view mode stored in STATE.
  */
 export function _updateToggleButtonLabels() {
-    const isMap = globalThis.STATE && globalThis.STATE.mapViewEnabled;
+    const isMap = STATE && STATE.mapViewEnabled;
     const label = isMap ? t('scr_btn_list') : t('scr_btn_map');
 
     const btn = document.getElementById('btn-toggle-map-view');
@@ -1896,12 +1897,12 @@ export function _updateToggleButtonLabels() {
  * section - see refactor summary for why this forward-reference is kept.
  */
 export function toggleMapView() {
-    if (!globalThis.STATE) return;
+    if (!STATE) return;
 
-    globalThis.STATE.mapViewEnabled = !globalThis.STATE.mapViewEnabled;
+    STATE.mapViewEnabled = !STATE.mapViewEnabled;
     if (typeof save === 'function') save();
 
-    if (globalThis.STATE.mapViewEnabled) {
+    if (STATE.mapViewEnabled) {
         showMapView();
     } else {
         globalThis._ptReturnScreen = 'screen-levels';
@@ -1936,8 +1937,8 @@ export function initMapViewToggle() {
 export function showMapView() {
     // Level-selection overworld: play the old title theme (bgm_title1).
     if (typeof Audio_Manager !== 'undefined') Audio_Manager.playBGM('overworld');
-    _mvCurrentWorldIdx = (globalThis.STATE && globalThis.STATE.mapSpriteWorldIndex !== undefined)
-        ? globalThis.STATE.mapSpriteWorldIndex
+    _mvCurrentWorldIdx = (STATE && STATE.mapSpriteWorldIndex !== undefined)
+        ? STATE.mapSpriteWorldIndex
         : null;
     _mvPendingRedirect = null;
 

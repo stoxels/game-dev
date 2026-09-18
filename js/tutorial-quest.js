@@ -35,6 +35,7 @@ import { _hidePlayerAvatar, _hidePlayerAvatarSimple } from './sprite/player_spri
 import { save } from './state.js';
 import { pauseTimer, resumeTimer, stopTimer } from './timer/timer.js';
 import { t } from './translation/translations.js';
+import { STATE } from './state.js';
 
 //------------------------------------------------------------------------
 //-------------------INTERACTIVE TUTORIAL QUEST---------------------------
@@ -347,7 +348,7 @@ export const TQ_PROFESSOR_IMAGE = 'images/Tutorial/Professor.webp';
 // Deliberately NOT _getAvatarCharacterName() - that returns the all-caps HUD
 // name ('STOX'), which reads wrong mid-sentence.
 export function _tqCharacterDisplayName() {
-    const id = (globalThis.STATE && globalThis.STATE.playerCharacter) ? String(globalThis.STATE.playerCharacter) : 'stox';
+    const id = (STATE && STATE.playerCharacter) ? String(STATE.playerCharacter) : 'stox';
     const name = id.charAt(0).toUpperCase() + id.slice(1).toLowerCase();
     return ['Stox', 'Trix', 'Syla'].includes(name) ? name : 'Stox';
 }
@@ -386,8 +387,8 @@ export function _tqFormatLine(textKey) {
         if (sheetKey) line = line.replace(/\{key_charsheet\}/g, keybindDisplayLabel(sheetKey));
         // {key_fireball_slot}: the keybind of whichever hotbar slot the player
         // actually dragged Fireball into (falls back to slot 1).
-        const fbSlot = (typeof STATE !== 'undefined' && globalThis.STATE && Array.isArray(globalThis.STATE.skillHotbar))
-            ? globalThis.STATE.skillHotbar.indexOf('fireball') : -1;
+        const fbSlot = (typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.skillHotbar))
+            ? STATE.skillHotbar.indexOf('fireball') : -1;
         const fbIdx = fbSlot >= 0 ? fbSlot : 0;
         const fbKey = keybindKeyFor(`hotbar-${fbIdx + 1}`);
         if (fbKey) line = line.replace(/\{key_fireball_slot\}/g, keybindDisplayLabel(fbKey));
@@ -1100,8 +1101,8 @@ export const TQ_TASKS = {
         return false;
     },
     // Puzzle 3: the Rusted Sword sits in the weapon slot.
-    sword_equipped: () => !!(typeof STATE !== 'undefined' && globalThis.STATE
-        && globalThis.STATE.egEquipped && globalThis.STATE.egEquipped.weapon1),
+    sword_equipped: () => !!(typeof STATE !== 'undefined' && STATE
+        && STATE.egEquipped && STATE.egEquipped.weapon1),
     // Puzzle 3: the bat was defeated with melee strikes. Guarded by
     // _tqSawMonster so an empty field at boot can never complete it.
     melee_kill: () => _tqSawMonster
@@ -1146,8 +1147,8 @@ export const TQ_TASKS = {
     open_spellbook: () => typeof isSpellbookOpen === 'function' && isSpellbookOpen(),
     // Puzzle 3: the Scroll of Fireball was dragged into a spell slot, which
     // unlocks the Fireball in the spell book (js/skills/skill-charms.js).
-    slot_fireball: () => typeof STATE !== 'undefined' && globalThis.STATE && Array.isArray(globalThis.STATE.charmSlots)
-        && globalThis.STATE.charmSlots.indexOf('fireball#1') !== -1,
+    slot_fireball: () => typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.charmSlots)
+        && STATE.charmSlots.indexOf('fireball#1') !== -1,
     // Puzzle 3: Fireball sits on the hotbar.
     drag_fireball: () => typeof isSkillOnHotbar === 'function' && isSkillOnHotbar('fireball'),
     // Puzzle 3: Fireball was cast. If the ghost already died, the cast
@@ -1342,7 +1343,7 @@ export function _tqPhaseFinished() {
         showToast('🎓 ' + t('tq_toast_p2_done'));
         setTimeout(() => _tqStartPuzzle(2), 1600);
     } else if (_tqPhase === 'p3') {
-        globalThis.STATE.tutorialDone = true;
+        STATE.tutorialDone = true;
         save();
         _tqHideProfessor();
         // Final farewell: as the Professor's graduation line closes, the
@@ -1531,7 +1532,7 @@ export function _tqOnPuzzleSolved() {
 
 // Adds an ITEM_DEFS item to the player's puzzle-item inventory.
 export function _tqGrantPuzzleItem(defId, extraProps) {
-    globalThis.STATE.inventory.push(Object.assign({
+    STATE.inventory.push(Object.assign({
         defId,
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
     }, extraProps || {}));
@@ -1544,7 +1545,7 @@ export function _tqGrantPuzzleItem(defId, extraProps) {
 // one is the player's own deduction, like the real candle: 1 cell per use).
 // Idempotent: the retry path may re-run this step.
 export function _tqGiveCandle() {
-    if (!globalThis.STATE.inventory.some(i => i.defId === 'reveal1' && i.isTutorialCandle)) {
+    if (!STATE.inventory.some(i => i.defId === 'reveal1' && i.isTutorialCandle)) {
         _tqGrantPuzzleItem('reveal1', { isTutorialCandle: true });
     }
     showToast('🎓 ' + t('tq_toast_candle'));
@@ -1573,9 +1574,9 @@ export function _tqUseTutorialCandle(def) {
 // reveal and consumes itself; a regular candle through the real pipeline
 // still sets the flag (its reveal just doesn't break the tie).
 export function _tqOnCandleUse(uid) {
-    const idx = globalThis.STATE.inventory.findIndex(i => i.uid === uid);
+    const idx = STATE.inventory.findIndex(i => i.uid === uid);
     if (idx < 0) return;
-    const item = globalThis.STATE.inventory[idx];
+    const item = STATE.inventory[idx];
     if (item.isTutorialCandle) {
         const def = ITEM_DEFS[item.defId];
         // Flag BEFORE the reveal: the reveal's checkWin must already see the
@@ -2030,7 +2031,7 @@ export function _tqShowIntermission() {
     if (_tqPollTimer) clearInterval(_tqPollTimer);
     let _tqInterLastSig = '';
     _tqPollTimer = setInterval(() => {
-        const eq = (typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.egEquipped) || {};
+        const eq = (typeof STATE !== 'undefined' && STATE && STATE.egEquipped) || {};
         const hasWeapon = !!(eq.weapon1);
         const hasArmor = !!(eq.chest || eq.pants);
         _tqUpdateIntermissionChecklist(hasWeapon, hasArmor);
@@ -2270,15 +2271,15 @@ export function _tqCastFireball() {
         const _orig = globalThis.ensureSkillHotbar;
         globalThis.ensureSkillHotbar = function () {
             const r = _orig();
-            if (typeof STATE === 'undefined' || !globalThis.STATE || !Array.isArray(globalThis.STATE.skillHotbar)) return r;
+            if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return r;
             // A classless tutorial player must not see Heartbloom (endgame-
             // only) auto-seeded onto the bar - it renders locked and clutters
             // exactly the slot the Fireball lesson invites the drop into. It
             // comes back legitimately once a class is chosen.
-            if (!globalThis.STATE.playerClass) {
-                const hb = globalThis.STATE.skillHotbar.indexOf('heartbloom');
+            if (!STATE.playerClass) {
+                const hb = STATE.skillHotbar.indexOf('heartbloom');
                 if (hb !== -1) {
-                    globalThis.STATE.skillHotbar[hb] = null;
+                    STATE.skillHotbar[hb] = null;
                     if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
                 }
             }
@@ -2290,9 +2291,9 @@ export function _tqCastFireball() {
             try {
                 if ((typeof _tqIsTutorialActive === 'function') && !_tqIsTutorialActive()) return r;
             } catch (e) { return r; }
-            const idx = globalThis.STATE.skillHotbar.indexOf('fireball');
+            const idx = STATE.skillHotbar.indexOf('fireball');
             if (idx !== -1) {
-                globalThis.STATE.skillHotbar[idx] = null;
+                STATE.skillHotbar[idx] = null;
                 if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
             }
             return r;
@@ -2563,7 +2564,7 @@ export function _tqCastFireball() {
         window._tqWrappedUseItem = true;
         const _orig = globalThis.useItem;
         globalThis.useItem = function (uid) {
-            const item = globalThis.STATE.inventory.find(i => i.uid === uid);
+            const item = STATE.inventory.find(i => i.uid === uid);
             if (item && item.defId === 'reveal1' && item.isTutorialCandle
                 && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) {
                 // The candle may only be lit once the Professor's use-candle

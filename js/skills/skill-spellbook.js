@@ -4,6 +4,7 @@ import { CHARM_SLOT_COUNT, getCharmSlottedRank, initCharmPanelInteractions, isSk
 import { _isGameScreenActive, renderSkillHotbar, setHotbarAboveModal, startSkillDrag } from './skill-hotbar.js';
 import { SKILL_HOTBAR_SIZE, getPassiveSkillDef, getPassiveSkillImage, getPlayerPassiveSkillIds, getPlayerTraits, getSkillDef, getSkillImage, getSkillLevel, getSkillName, isSkillMovable, isSkillOnHotbar, isSkillUsableNow } from './skill-registry.js';
 import { UNIVERSAL_SPELL_MAP, isUniversalMovementSpell, isUniversalSupportSpell } from './universal-spells.js';
+import { STATE } from '../state.js';
 // skill-spellbook.js
 //------------------------------------------------------------------------
 //-----------------------------SPELL BOOK---------------------------------
@@ -93,7 +94,7 @@ export function openSpellbook() {
     // plus the charm inventory/slots panel. Class/ascendency sections are
     // simply empty until a class is chosen. (The tutorial's puzzle 3 used to
     // be the only classless exception - Fireball before any class.)
-    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return;
+    if (typeof STATE === 'undefined' || !STATE) return;
     const tqActive = (typeof globalThis._tqIsTutorialActive === 'function') && globalThis._tqIsTutorialActive();
     const overlay = _ensureSpellbookOverlay();
     renderSpellbook();
@@ -350,8 +351,8 @@ export function _sbSpellSchoolKey(skillId) {
         const school = _sbSpellSchool(skillId);
         if (school) return school;
     }
-    if (def.slotKind === 'base1' || def.slotKind === 'base2') return globalThis.STATE.playerClass || '';
-    if (def.slotKind === 'asc1' || def.slotKind === 'asc2') return globalThis.STATE.playerAscendency || '';
+    if (def.slotKind === 'base1' || def.slotKind === 'base2') return STATE.playerClass || '';
+    if (def.slotKind === 'asc1' || def.slotKind === 'asc2') return STATE.playerAscendency || '';
     return '';
 }
 
@@ -373,7 +374,7 @@ export function _spellbookGroupHTML(title, ids, school) {
 export function renderSpellbook() {
     const content = document.getElementById('spellbook-content');
     if (!content) return;
-    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) { content.innerHTML = ''; return; }
+    if (typeof STATE === 'undefined' || !STATE) { content.innerHTML = ''; return; }
 
     // Only EQUIPPED spells are listed: a spell appears here exactly while its
     // charm sits in one of the 10 spell slots (js/skills/skill-charms.js).
@@ -414,8 +415,8 @@ export function renderSpellbook() {
         // empty otherwise (neutral stones).
         let school = '';
         if (group.labelKey === 'spellbook_group_class'
-            || group.labelKey === 'tq_spellbook_group') school = globalThis.STATE.playerClass || '';
-        else if (group.labelKey === 'spellbook_group_ascendency') school = globalThis.STATE.playerAscendency || '';
+            || group.labelKey === 'tq_spellbook_group') school = STATE.playerClass || '';
+        else if (group.labelKey === 'spellbook_group_ascendency') school = STATE.playerAscendency || '';
         else if (group.labelKey === 'spellbook_group_endgame') school = 'holy';
         else if (group.labelKey === 'spellbook_group_support') school = 'nature';
         else if (group.labelKey === 'spellbook_group_movement') school = 'arcane';
@@ -442,10 +443,10 @@ export function renderSpellbook() {
     // player can see at a glance whether there is room left.
     const footer = document.getElementById('spellbook-footer');
     if (footer) {
-        const slots = Array.isArray(globalThis.STATE.skillHotbar) ? globalThis.STATE.skillHotbar : [];
+        const slots = Array.isArray(STATE.skillHotbar) ? STATE.skillHotbar : [];
         const used = slots.filter(Boolean).length;
         const total = (typeof SKILL_HOTBAR_SIZE === 'number') ? SKILL_HOTBAR_SIZE : 10;
-        const charmSlots = Array.isArray(globalThis.STATE.charmSlots) ? globalThis.STATE.charmSlots : [];
+        const charmSlots = Array.isArray(STATE.charmSlots) ? STATE.charmSlots : [];
         const charmUsed = charmSlots.filter(Boolean).length;
         const charmTotal = (typeof CHARM_SLOT_COUNT === 'number') ? CHARM_SLOT_COUNT : 10;
         // Left: the spell slots the charms go into. Right: how full the
@@ -499,7 +500,7 @@ export function _quickAssignSkill(skillId) {
         return;
     }
     globalThis.ensureSkillHotbar();
-    let index = globalThis.STATE.skillHotbar.indexOf(null);
+    let index = STATE.skillHotbar.indexOf(null);
     if (index === -1) index = 0;
     globalThis.setHotbarSlot(index, skillId);
     renderSpellbook();

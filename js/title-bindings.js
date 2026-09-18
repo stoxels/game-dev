@@ -10,6 +10,7 @@ import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goTo
 import { ptGoBack, showPassiveTree } from './passive-tree/passive-tree.js';
 import { showQuestLog } from './inference/inference-ui.js';
 import { _ptRefundAllPoints } from './passive-tree/passive-tree-state-points.js';
+import { STATE } from './state.js';
 
 //------------------------------------------------------------------------
 //-------------------REPLAY GALLERY (GLOBAL HELPER)-----------------------
@@ -108,7 +109,7 @@ export function renderReplayModal() {
     });
 
     // Tutorial replays only once it has been completed (per-save STATE flag).
-    if (globalThis.STATE.tutorialDone) {
+    if (STATE.tutorialDone) {
         anyUnlocked = true;
         container.appendChild(_buildReplayRow({
             id: 'tutorial',
@@ -279,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // survived from an earlier character that was later wiped - the
             // flag can no longer mean "this player saw it" because there is
             // no player on this save yet.
-            const isNewCharacter = !globalThis.STATE.playerCharacter;
+            const isNewCharacter = !STATE.playerCharacter;
             if (!globalThis.hasSeen('intro_cinematic') || isNewCharacter) {
                 // Arm the intro → character-select handoff: the cinematic's
                 // final image IS the select screen's backdrop. The song plays

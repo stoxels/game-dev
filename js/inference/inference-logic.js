@@ -5,6 +5,7 @@ import { LANG, t } from '../translation/translations.js';
 import { LEDGER_CATEGORIES, _MILESTONE_MAP } from './inference-data.js';
 import { _incDirect } from './inference-stats.js';
 import { renderQuestLog } from './inference-ui.js';
+import { STATE } from '../state.js';
 
 // ════════════════════════════════════════════════════════════════════════════
 //
@@ -13,7 +14,7 @@ import { renderQuestLog } from './inference-ui.js';
 //
 //  Depends on: inference-data.js   (LEDGER_CATEGORIES, _MILESTONE_MAP)
 //  Depends on: achievements.js  (trackAchStat, setAchStat)
-//  Depends on: (global)         globalThis.STATE, LANG, globalThis.ITEM_DEFS, save(), globalThis.pickRandomItem()
+//  Depends on: (global)         STATE, LANG, globalThis.ITEM_DEFS, save(), globalThis.pickRandomItem()
 //
 //  Public API:
 //    claimQuest(milestoneId)      - claim a completed milestone by id
@@ -30,7 +31,7 @@ import { renderQuestLog } from './inference-ui.js';
 
 
 //------------------------------------------------------------------------
-//-------------------CONSTANTS & globalThis.STATE-------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
@@ -90,7 +91,7 @@ export const CATEGORY_ACHIEVEMENT_MAP = {
 //------------------------------------------------------------------------
 //
 //  Read-only query layer. All UI and claiming code goes through these
-//  functions - nothing should read globalThis.STATE.questStats or globalThis.STATE.questsClaimed
+//  functions - nothing should read STATE.questStats or STATE.questsClaimed
 //  directly outside of this section.
 //
 
@@ -100,7 +101,7 @@ export const CATEGORY_ACHIEVEMENT_MAP = {
  * @returns {boolean}
  */
 export function _milestone_isComplete(ms) {
-    const { current, target } = ms.check(globalThis.STATE.questStats || {});
+    const { current, target } = ms.check(STATE.questStats || {});
     return current >= target;
 }
 
@@ -110,7 +111,7 @@ export function _milestone_isComplete(ms) {
  * @returns {boolean}
  */
 export function _milestone_isClaimed(ms) {
-    return (globalThis.STATE.questsClaimed || []).includes(ms.id);
+    return (STATE.questsClaimed || []).includes(ms.id);
 }
 
 /**
@@ -120,7 +121,7 @@ export function _milestone_isClaimed(ms) {
  * @returns {{ current: number, target: number, pct: number }}
  */
 export function _milestone_getProgress(ms) {
-    const { current, target } = ms.check(globalThis.STATE.questStats || {});
+    const { current, target } = ms.check(STATE.questStats || {});
     const clamped = Math.min(current, target);
     const pct = Math.min(100, Math.round((clamped / target) * 100));
     return { current: clamped, target, pct };
@@ -143,9 +144,9 @@ export function _ledger_hasAnyClaimable() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 //
-//  Helpers that write reward data into globalThis.STATE.
+//  Helpers that write reward data into STATE.
 //  All reward mutations are funnelled through _reward_grantAll() so
-//  it's easy to find every place globalThis.STATE is modified during a claim.
+//  it's easy to find every place STATE is modified during a claim.
 //
 
 /**
@@ -173,7 +174,7 @@ export function _reward_grantOneItem(defId) {
     const def = globalThis.ITEM_DEFS[resolvedId];
     if (!def) return null;
 
-    globalThis.STATE.inventory.push({
+    STATE.inventory.push({
         uid: _reward_generateItemUid(),
         defId: resolvedId,
     });
@@ -182,11 +183,11 @@ export function _reward_grantOneItem(defId) {
 }
 
 /**
- * Adds passive-tree skill points to globalThis.STATE.
+ * Adds passive-tree skill points to STATE.
  * @param {number} amount - Number of points to add
  */
 export function _reward_grantPassivePoints(amount) {
-    globalThis.STATE.passiveTreePoints = (globalThis.STATE.passiveTreePoints || 0) + amount;
+    STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + amount;
     _incDirect('lifetimePassivePointsObtained', amount);
 }
 
@@ -438,7 +439,7 @@ export function _ach_trackCategoryMilestone(cat) {
 export function _ach_trackFullCategoryCompletion(cat) {
     if (typeof setAchStat !== 'function') return;
 
-    const claimedIds = globalThis.STATE.questsClaimed || [];
+    const claimedIds = STATE.questsClaimed || [];
 
     // Check if this specific category just became fully complete
     const thisCategoryComplete = cat.milestones.every(m => claimedIds.includes(m.id));
@@ -479,13 +480,13 @@ export function _trackInferenceAchievements(ms, cat) {
 //
 
 /**
- * Marks a milestone as claimed by pushing its id into globalThis.STATE.questsClaimed.
+ * Marks a milestone as claimed by pushing its id into STATE.questsClaimed.
  * Initialises the array if it doesn't exist yet.
  * @param {Object} ms - The milestone to mark as claimed
  */
 export function _claim_recordClaim(ms) {
-    if (!globalThis.STATE.questsClaimed) globalThis.STATE.questsClaimed = [];
-    globalThis.STATE.questsClaimed.push(ms.id);
+    if (!STATE.questsClaimed) STATE.questsClaimed = [];
+    STATE.questsClaimed.push(ms.id);
 }
 
 /**

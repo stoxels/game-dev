@@ -12,6 +12,7 @@ import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
 import { _incDirect, questStat_confidenceIntervalIgnored, questStat_hasManuallyFilledCell, questStat_sampleEfficiencyReveal } from './inference/inference-stats.js';
 import { PassiveTracker } from './passive-tree/passive-tracker.js';
 import { _binomialBurstOnCorrectFill, _frequentistsBurdenOnCorrectFill, _gamblersRuinOnCorrectFill, _getBayesianBonus, _resetBayesianBonus } from './passive-tree/passive-tree-special-nodes-logic.js';
+import { STATE } from './state.js';
 
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'dragAxis', { get() { return dragAxis; }, set(v) { dragAxis = v; }, configurable: true }); } catch (e) {}
@@ -492,7 +493,7 @@ export function claimLuckyTileItems() {
             uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
             defId: wonItemId
         };
-        globalThis.STATE.inventory.push(newItem);
+        STATE.inventory.push(newItem);
 
         const def = globalThis.ITEM_DEFS[wonItemId];
         toastMsg = t('cg_lucky_tile_found').replace('{x}', `${def.icon} ${globalThis.itemName(def)}`);
@@ -513,7 +514,7 @@ export function claimLuckyTileItems() {
                 uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
                 defId: bonusItemId
             };
-            globalThis.STATE.inventory.push(bonusItem);
+            STATE.inventory.push(bonusItem);
             const bonusDef = globalThis.ITEM_DEFS[bonusItemId];
             toastMsg += ` + ${bonusDef.icon} ${globalThis.itemName(bonusDef)}`;
             grantedIds.push(bonusItemId);

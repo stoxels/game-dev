@@ -7,6 +7,7 @@ import { launchExistingGame, showSetup, showTitle, switchScreen } from '../scree
 import { _doStartLevel } from '../start-level.js';
 import { getActiveSlot, getSlotSummary, save, wipeSlot } from '../state.js';
 import { markSeen } from '../storyline/storyline-progress.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------DEV TESTING HARNESS (dev-testing.js)------------------
@@ -128,9 +129,9 @@ export const DevTest = {
             // 2. Character + tutorial flags, then straight to setup.
             //    (Bypasses character-select UI and tutorial screens via the
             //    same STATE fields those screens write - no state is skipped.)
-            if (typeof STATE === 'undefined' || !globalThis.STATE) return;
-            globalThis.STATE.playerCharacter = s.character;
-            if (s.skipTutorial) globalThis.STATE.tutorialDone = true;
+            if (typeof STATE === 'undefined' || !STATE) return;
+            STATE.playerCharacter = s.character;
+            if (s.skipTutorial) STATE.tutorialDone = true;
             if (typeof save === 'function') save();
 
             if (s.screen === 'title') { log('done: title (slot ' + slotNum + ', char ' + s.character + ')'); return; }
@@ -177,13 +178,13 @@ export const DevTest = {
 
     // --- Introspection ----------------------------------------------------
     state() {
-        if (typeof STATE === 'undefined' || !globalThis.STATE) return 'no STATE';
+        if (typeof STATE === 'undefined' || !STATE) return 'no STATE';
         return {
             slot: (typeof getActiveSlot === 'function') ? getActiveSlot() : null,
-            character: globalThis.STATE.playerCharacter,
-            class: globalThis.STATE.playerClass || globalThis.STATE.playerAscendency || null,
-            levelsDone: globalThis.STATE.done ? globalThis.STATE.done.length : 0,
-            nexusUnlocked: !!globalThis.STATE.nexusUnlocked,
+            character: STATE.playerCharacter,
+            class: STATE.playerClass || STATE.playerAscendency || null,
+            levelsDone: STATE.done ? STATE.done.length : 0,
+            nexusUnlocked: !!STATE.nexusUnlocked,
             activeScreen: document.querySelector('.screen.active')?.id || null,
             timeScale: window.STOX_EFFECT_TIME_SCALE,
         };

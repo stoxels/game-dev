@@ -9,6 +9,7 @@ import { PassiveTracker } from './passive-tracker.js';
 import { TALENT_TREE_DATA } from './passive-tree-data.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
 import { _ptRender } from './passive-tree-ui.js';
+import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, '_ptReturnScreen', { get() { return _ptReturnScreen; }, set(v) { _ptReturnScreen = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_ptReturnWorldIndex', { get() { return _ptReturnWorldIndex; }, set(v) { _ptReturnWorldIndex = v; }, configurable: true }); } catch (e) {}
@@ -170,7 +171,7 @@ export function _ptUpdatePointsDisplay(lang, points) {
 // then triggers the full tree render.
 export function buildPassiveTreeScreen() {
     const lang = (typeof LANG !== 'undefined') ? LANG : 'en';
-    const points = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.passiveTreePoints) || 0;
+    const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
 
     _ptUpdatePointsDisplay(lang, points);
     _ptShowLoadingPlaceholder(lang);
@@ -389,7 +390,7 @@ export function _ptGrantItem(defId) {
     const def = globalThis.ITEM_DEFS[defId];
     if (!def) return;
 
-    globalThis.STATE.inventory.push({
+    STATE.inventory.push({
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
         defId: defId,
     });
@@ -452,7 +453,7 @@ export function _ptApplyProbabilistRewards() {
 // Routes to the correct per-class reward helper based on STATE.playerClass.
 // Each class has its own gear nodes that provide randomised item drops.
 export function _ptApplyLevelCompleteRewards() {
-    switch (globalThis.STATE.playerClass) {
+    switch (STATE.playerClass) {
         case 'statistician': _ptApplyStatisticianRewards(); break;
         case 'mathmagician': _ptApplyMathmagicianRewards(); break;
         case 'probabilist': _ptApplyProbabilistRewards(); break;

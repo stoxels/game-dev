@@ -1,6 +1,7 @@
 ﻿import { _arcaneReveal_clearPreview, _arcaneReveal_updatePreview } from './class-mathmagician.js';
 import { _fieldScanClearPreview, _fieldScanUpdatePreview } from './class-probabilist.js';
 import { _diagStrikeClearPreview, _diagStrikeUpdatePreview } from './class-statistician.js';
+import { STATE } from '../state.js';
 // targeting-reticle.js
 // Owns the custom mouse-follower reticle shown while a targeted class
 // ability is armed (waiting for the player to click a cell).
@@ -42,17 +43,17 @@ export let _arLastY = -9999;
 //------------------------------------------------------------------------
 
 export function _arResolveTheme() {
-    const slot = globalThis.STATE.classActiveChoice;
+    const slot = STATE.classActiveChoice;
 
     // Ascendency-specific themes take priority over the base class theme,
     // since an ascendency slot (active3/active4) can be armed independently
     // of which base class the player picked.
-    if (globalThis.STATE.playerAscendency === 'recursionist' && slot === 'active3') return 'recursionist'; // Residual Totem
+    if (STATE.playerAscendency === 'recursionist' && slot === 'active3') return 'recursionist'; // Residual Totem
 
     // Base class themes
-    if (globalThis.STATE.playerClass === 'mathmagician') return 'mathmagician'; // Arcane Reveal
-    if (globalThis.STATE.playerClass === 'statistician') return 'statistician'; // Diagonal Strike
-    if (globalThis.STATE.playerClass === 'probabilist') return 'probabilist';   // Precision Mark
+    if (STATE.playerClass === 'mathmagician') return 'mathmagician'; // Arcane Reveal
+    if (STATE.playerClass === 'statistician') return 'statistician'; // Diagonal Strike
+    if (STATE.playerClass === 'probabilist') return 'probabilist';   // Precision Mark
 
     return 'default';
 }

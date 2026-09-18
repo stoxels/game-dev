@@ -17,6 +17,7 @@ import { pauseTimer, resumeTimer } from '../../timer/timer.js';
 import { buildInventoryPanel } from '../../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { PRIMER_MAX, applyPrimerHeadstart, applyPerfectPrimerReveal } from './scouts-primer-reveal.js';
 import { shuffle } from '../../puzzle-mechanics/puzzle-helpers.js';
+import { STATE } from '../../state.js';
 
 //-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
@@ -392,7 +393,7 @@ export function skipPrimer() {
 // Counts how many tutor items (any tier of the Tutor family) the player
 // currently holds in their inventory.
 function _primerCountTutorItems() {
-    return globalThis.STATE.inventory.filter(i =>
+    return STATE.inventory.filter(i =>
         i.defId === 'tutor' ||
         i.defId === 'tutor4' ||
         i.defId === 'tutor6' ||
@@ -405,7 +406,7 @@ function _primerCountTutorItems() {
 // Returns the item object, or undefined if none is available.
 function _primerFindLowestTierTutorItem() {
     return PRIMER_TUTOR_ITEM_ORDER
-        .flatMap(id => globalThis.STATE.inventory.filter(i => i.defId === id))
+        .flatMap(id => STATE.inventory.filter(i => i.defId === id))
         .find(Boolean);
 }
 
@@ -433,7 +434,7 @@ function _primerCalcTutorNoConsumeChance() {
 
 // Consumes one tutor item from the inventory (removes it, saves, rebuilds UI).
 function _primerConsumeTutorItem(item) {
-    globalThis.STATE.inventory = globalThis.STATE.inventory.filter(i => i.uid !== item.uid);
+    STATE.inventory = STATE.inventory.filter(i => i.uid !== item.uid);
     save();
     buildInventoryPanel();
 }

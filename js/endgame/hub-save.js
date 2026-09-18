@@ -14,6 +14,7 @@
 // split modules rebind these lets through globalThis.<name> assignment
 // (imported module bindings are read-only views) - the established
 // step-9/step-10 pattern.
+import { STATE } from '../state.js';
 try { Object.defineProperty(globalThis, '_egPendingHandMigrationToast', { get() { return _egPendingHandMigrationToast; }, set(v) { _egPendingHandMigrationToast = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_egLoadHubState', { get() { return _egLoadHubState; }, set(v) { _egLoadHubState = v; }, configurable: true }); } catch (e) {}
 
@@ -65,23 +66,23 @@ export function egSaveHubState() {
         console.error('[hub] egSaveHubState REFUSED - hub state has not finished loading');
         return;
     }
-    globalThis.STATE.egEquipped = _egEquipped;
-    globalThis.STATE.egInventory = _egInventory;
-    globalThis.STATE.egMapStash = _egMapStash;
-    globalThis.STATE.egCurrencyStash = _egCurrencyStash;
-    globalThis.STATE.egEssenceStash = globalThis._egEssenceStash;
-    globalThis.STATE.egMapSlotItem = globalThis._egMapSlotItem;
-    globalThis.STATE.egMapStashActiveTier = globalThis._egMapStashActiveTier;
-    globalThis.STATE.egCraftingBenchItem = globalThis._egCraftingBenchItem;
+    STATE.egEquipped = _egEquipped;
+    STATE.egInventory = _egInventory;
+    STATE.egMapStash = _egMapStash;
+    STATE.egCurrencyStash = _egCurrencyStash;
+    STATE.egEssenceStash = globalThis._egEssenceStash;
+    STATE.egMapSlotItem = globalThis._egMapSlotItem;
+    STATE.egMapStashActiveTier = globalThis._egMapStashActiveTier;
+    STATE.egCraftingBenchItem = globalThis._egCraftingBenchItem;
     // Unique collection
-    globalThis.STATE.egUniqueStash = globalThis._egUniqueStash || {};
-    globalThis.STATE.egUniqueCollected = globalThis._egUniqueCollected ? Array.from(globalThis._egUniqueCollected) : [];
+    STATE.egUniqueStash = globalThis._egUniqueStash || {};
+    STATE.egUniqueCollected = globalThis._egUniqueCollected ? Array.from(globalThis._egUniqueCollected) : [];
     // Mass-sell filter (persisted alongside the stash so reconstructing the
     // hub after a reload restores the player's protection choices).
-    if (_egMassSellKeep) globalThis.STATE.egMassSellKeep = { ..._egMassSellKeep };
-    if (typeof _egMassSellKeepUnique !== 'undefined') globalThis.STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
-    globalThis.STATE.egMassSellMinItemLevel = _egMassSellMinItemLevel;
-    globalThis.STATE.egMassSellMinReqLevel = _egMassSellMinReqLevel;
+    if (_egMassSellKeep) STATE.egMassSellKeep = { ..._egMassSellKeep };
+    if (typeof _egMassSellKeepUnique !== 'undefined') STATE.egMassSellKeepUnique = _egMassSellKeepUnique;
+    STATE.egMassSellMinItemLevel = _egMassSellMinItemLevel;
+    STATE.egMassSellMinReqLevel = _egMassSellMinReqLevel;
     save();
 }
 
@@ -173,10 +174,10 @@ function _egLoadHubState() {
     // internal persistence calls below (heal/migration results), because at
     // this point the mirrors hold exactly what was just read from STATE.
     window._stoxHubLoadInProgress = true;
-    globalThis._egEquipped = globalThis.STATE.egEquipped || {};
+    globalThis._egEquipped = STATE.egEquipped || {};
     // Unlimited stash: keep whatever rows were saved; ensure at least the initial minimum
-    if (Array.isArray(globalThis.STATE.egInventory) && globalThis.STATE.egInventory.length > 0) {
-        globalThis._egInventory = globalThis.STATE.egInventory;
+    if (Array.isArray(STATE.egInventory) && STATE.egInventory.length > 0) {
+        globalThis._egInventory = STATE.egInventory;
         // Normalise column count and guarantee minimum rows
         if (_egInventory.length < EG_INV_INITIAL_ROWS) _egEnsureInvRows(EG_INV_INITIAL_ROWS);
         // Ensure every row has the correct column width
@@ -211,7 +212,7 @@ function _egLoadHubState() {
     }
     // ── Map stash: tiered 16× infinite stashes ──
     (function _migrateMapStash() {
-        const saved = globalThis.STATE.egMapStash;
+        const saved = STATE.egMapStash;
         if (_egIsTieredMapStash(saved)) {
             globalThis._egMapStash = saved;
             // normalise each tier: ensure correct cols and at least initial rows
@@ -251,24 +252,24 @@ function _egLoadHubState() {
                     }
                 }
             }
-            globalThis.STATE.egMapStash = _egMapStash;
+            STATE.egMapStash = _egMapStash;
             try { if (typeof save === 'function') save(); } catch(e) {}
         } else {
             globalThis._egMapStash = _egMakeAllMapStashes();
         }
         // restore active tier if persisted
-        if (globalThis.STATE.egMapStashActiveTier != null) {
-            const at = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(globalThis.STATE.egMapStashActiveTier)));
+        if (STATE.egMapStashActiveTier != null) {
+            const at = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(STATE.egMapStashActiveTier)));
             globalThis._egMapStashActiveTier = at;
         }
     })();
-    if (globalThis.STATE.egMapStashActiveTier != null) globalThis._egMapStashActiveTier = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(globalThis.STATE.egMapStashActiveTier)));
+    if (STATE.egMapStashActiveTier != null) globalThis._egMapStashActiveTier = Math.max(1, Math.min(EG_MAP_TIER_COUNT, Math.round(STATE.egMapStashActiveTier)));
 
     // ── Currency stash migration to fixed PoE-style slots ──
     // Old saves were 1×30; new is 6×5 with fixed positions. Migrate by collecting items
     // and re-inserting them into their assigned slots (stacking counts).
     (function _migrateCurrency() {
-        const saved = globalThis.STATE.egCurrencyStash;
+        const saved = STATE.egCurrencyStash;
         let needMigration = !Array.isArray(saved)
             || saved.length !== EG_CURRENCY_ROWS
             || (saved[0] && saved[0].length !== EG_CURRENCY_COLS);
@@ -331,7 +332,7 @@ function _egLoadHubState() {
             };
         }
         // Persist migrated shape immediately
-        globalThis.STATE.egCurrencyStash = _egCurrencyStash;
+        STATE.egCurrencyStash = _egCurrencyStash;
         try { if (typeof save === 'function') save(); } catch(e) {}
     })();
     // Heal after migration as well
@@ -362,7 +363,7 @@ function _egLoadHubState() {
         const essR = typeof EG_ESSENCE_ROWS !== 'undefined' ? EG_ESSENCE_ROWS : 12;
         const essC = typeof EG_ESSENCE_COLS !== 'undefined' ? EG_ESSENCE_COLS : 8;
         const freshEssGrid = Array.from({ length: essR }, () => Array(essC).fill(null));
-        const savedEssGrid = globalThis.STATE.egEssenceStash;
+        const savedEssGrid = STATE.egEssenceStash;
         let needsFixedMigration = false;
         if (Array.isArray(savedEssGrid)) {
             // Detect old fixed-slot vs free-form: if any item is not in its assigned slot, migrate
@@ -436,7 +437,7 @@ function _egLoadHubState() {
                     if (!placed) console.warn('[ESSENCE] leftover essence could not be placed', it.id);
                 }
                 // Persist migrated shape
-                globalThis.STATE.egEssenceStash = freshEssGrid;
+                STATE.egEssenceStash = freshEssGrid;
                 try { if (typeof save === 'function') save(); } catch(e) {}
             } else {
                 for (let r = 0; r < Math.min(essR, savedEssGrid.length); r++) {
@@ -449,8 +450,8 @@ function _egLoadHubState() {
         }
         globalThis._egEssenceStash = freshEssGrid;
     }
-    globalThis._egMapSlotItem = globalThis.STATE.egMapSlotItem || null;
-    globalThis._egCraftingBenchItem = globalThis.STATE.egCraftingBenchItem || null;
+    globalThis._egMapSlotItem = STATE.egMapSlotItem || null;
+    globalThis._egCraftingBenchItem = STATE.egCraftingBenchItem || null;
     // Heal legacy essence cells too (description/category missing from old saves).
     if (Array.isArray(globalThis._egEssenceStash)) {
         for (let r = 0; r < globalThis._egEssenceStash.length; r++) {
@@ -554,15 +555,15 @@ function _egLoadHubState() {
     try {
         _egEnsureUniqueStash();
         // Load from STATE
-        if (globalThis.STATE.egUniqueStash && typeof globalThis.STATE.egUniqueStash === 'object' && !Array.isArray(globalThis.STATE.egUniqueStash)) {
-            globalThis._egUniqueStash = globalThis.STATE.egUniqueStash;
+        if (STATE.egUniqueStash && typeof STATE.egUniqueStash === 'object' && !Array.isArray(STATE.egUniqueStash)) {
+            globalThis._egUniqueStash = STATE.egUniqueStash;
             // ensure arrays
             for (const k of Object.keys(globalThis._egUniqueStash)) if (!Array.isArray(globalThis._egUniqueStash[k])) globalThis._egUniqueStash[k] = globalThis._egUniqueStash[k] ? [globalThis._egUniqueStash[k]] : [];
         } else {
             globalThis._egUniqueStash = {};
         }
-        if (Array.isArray(globalThis.STATE.egUniqueCollected)) {
-            globalThis._egUniqueCollected = new Set(globalThis.STATE.egUniqueCollected);
+        if (Array.isArray(STATE.egUniqueCollected)) {
+            globalThis._egUniqueCollected = new Set(STATE.egUniqueCollected);
         } else {
             globalThis._egUniqueCollected = new Set();
         }
@@ -592,8 +593,8 @@ function _egLoadHubState() {
             }
         }
         if (migrated) {
-            globalThis.STATE.egUniqueStash = globalThis._egUniqueStash;
-            globalThis.STATE.egUniqueCollected = Array.from(globalThis._egUniqueCollected);
+            STATE.egUniqueStash = globalThis._egUniqueStash;
+            STATE.egUniqueCollected = Array.from(globalThis._egUniqueCollected);
             try { if (typeof save === 'function') save(); } catch(e){}
             // persist via egSaveHubState shape (ensures other fields consistent)
             try { egSaveHubState(); } catch(e){}
@@ -618,24 +619,24 @@ function _egLoadHubState() {
             }
             if (typeof _egHealUniqueItem === 'function') _egHealUniqueItem(globalThis._egCraftingBenchItem);
             globalThis._egCraftingBenchItem = null;
-            globalThis.STATE.egCraftingBenchItem = null;
-            globalThis.STATE.egUniqueStash = globalThis._egUniqueStash;
-            globalThis.STATE.egUniqueCollected = Array.from(globalThis._egUniqueCollected || []);
+            STATE.egCraftingBenchItem = null;
+            STATE.egUniqueStash = globalThis._egUniqueStash;
+            STATE.egUniqueCollected = Array.from(globalThis._egUniqueCollected || []);
             try { if (typeof save === 'function') save(); } catch(e){}
         }
     } catch(e) { /* never break hub load for a bench cleanup */ }
 
     // Endgame achievements - retroactive sync for existing saves
     try {
-        if (typeof setAchStat === 'function' && typeof egAtlasProgress === 'function' && globalThis.STATE.egAtlasCompleted) {
+        if (typeof setAchStat === 'function' && typeof egAtlasProgress === 'function' && STATE.egAtlasCompleted) {
             const _ap = egAtlasProgress();
             setAchStat('egAtlasRegions', _ap.completed);
             setAchStat('egAtlasHighestTier', _ap.highestTier);
             // count T16 regions separately
             let _pinn = 0;
-            for (const _id in globalThis.STATE.egAtlasCompleted) {
+            for (const _id in STATE.egAtlasCompleted) {
                 const _node = (typeof egAtlasNodeById === 'function') ? egAtlasNodeById(_id) : null;
-                if (_node && _node.tier === 16 && globalThis.STATE.egAtlasCompleted[_id]) _pinn++;
+                if (_node && _node.tier === 16 && STATE.egAtlasCompleted[_id]) _pinn++;
             }
             setAchStat('egAtlasPinnacle', _pinn);
         }

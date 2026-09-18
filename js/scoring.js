@@ -9,6 +9,7 @@ import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
 import { goToLevelSelect, hideResultOverlays } from './screens/screens.js';
 import { _wdSyncSpriteToLevel } from './screens/screens-world-levels.js';
 import { _ptApplyLevelCompleteRewards } from './passive-tree/passive-tree.js';
+import { STATE } from './state.js';
 
 
 //------------------------------------------------------------------------
@@ -90,16 +91,16 @@ export function computeRawScore(rows, cols) {
 // If the current run score beats the level high score, the difference is awarded.
 // Otherwise nothing is awarded (the player already has a better record).
 export function computePointsAwarded(pts, gi) {
-    const hs = globalThis.STATE.levelHS[gi];
+    const hs = STATE.levelHS[gi];
     const prevBest = hs ? hs.score : 0;
     return { ptsAwarded: Math.max(0, pts - prevBest), prevBest };
 }
 
 // Saves a new high-score entry for this level if the current run beats the record.
 export function maybeUpdateHighScore(gi, pts) {
-    const hs = globalThis.STATE.levelHS[gi];
+    const hs = STATE.levelHS[gi];
     if (!hs || pts > hs.score) {
-        globalThis.STATE.levelHS[gi] = {
+        STATE.levelHS[gi] = {
             score: pts,
             diff: globalThis.curDiff,
             time: globalThis.timerSecs,
@@ -122,8 +123,8 @@ export function calculateScore(rows, cols) {
 
     const { ptsAwarded, prevBest } = computePointsAwarded(pts, gi);
 
-    const currentTotal = Number.isFinite(Number(globalThis.STATE.totalScore)) ? Number(globalThis.STATE.totalScore) : 0;
-    globalThis.STATE.totalScore = currentTotal + ptsAwarded;
+    const currentTotal = Number.isFinite(Number(STATE.totalScore)) ? Number(STATE.totalScore) : 0;
+    STATE.totalScore = currentTotal + ptsAwarded;
     maybeUpdateHighScore(gi, pts);
 
     return { pts, ptsAwarded, prevBest, mult };
@@ -192,8 +193,8 @@ export function fireAchievements({ gi, rows, cols, elapsed, pts, ptsAwarded, pre
         itemsUsed: globalThis.itemsUsedThisLevel,
         diff: globalThis.curDiff,
         mods: globalThis.curMods,
-        playerClass: globalThis.STATE.playerClass || null,
-        playerAscendency: globalThis.STATE.playerAscendency || null,
+        playerClass: STATE.playerClass || null,
+        playerAscendency: STATE.playerAscendency || null,
         absorbedMistakes: globalThis.absorbedMistakes,
         absorbedThisLevel: globalThis.absorbedMistakes,
         cellsFilled,
@@ -257,10 +258,10 @@ export function isConvergenceLevel(worldData, isAscensionLevel) {
 // and queues the convergence modal for display after the win overlay closes.
 
 export function applyConvergenceReward(gi) {
-    if (!globalThis.STATE.convergenceDone) globalThis.STATE.convergenceDone = [];
-    const isFirstEver = globalThis.STATE.convergenceDone.length === 0;
-    globalThis.STATE.convergenceDone.push(gi);
-    globalThis.STATE.passiveTreePoints = (globalThis.STATE.passiveTreePoints || 0) + 1;
+    if (!STATE.convergenceDone) STATE.convergenceDone = [];
+    const isFirstEver = STATE.convergenceDone.length === 0;
+    STATE.convergenceDone.push(gi);
+    STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + 1;
     _incDirect('lifetimePassivePointsObtained', 1);
     save();
     window._pendingConvergenceModal = true;
@@ -283,7 +284,7 @@ export function applyAscensionReward(irz) {
     const defId = 'artifactComplete';
     const codexDef = globalThis.ITEM_DEFS[defId];
 
-    globalThis.STATE.inventory.push({
+    STATE.inventory.push({
         defId,
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
     });
@@ -300,8 +301,8 @@ export function applyAscensionReward(irz) {
 // Builds the Nexus Point unlock card shown in the win overlay's reward zone.
 export function applyNexusPointReward(irz) {
     if (typeof globalThis.setNexusUnlocked === 'function') globalThis.setNexusUnlocked();
-    else if (typeof globalThis.STATE !== 'undefined' && globalThis.STATE) {
-        globalThis.STATE.nexusUnlocked = true;
+    else if (typeof STATE !== 'undefined' && STATE) {
+        STATE.nexusUnlocked = true;
         if (typeof save === 'function') save();
     }
     if (!irz) return;
@@ -369,7 +370,7 @@ export function grantLuckyDropItem() {
     const def = globalThis.ITEM_DEFS[defId];
     if (!def) return '';
 
-    globalThis.STATE.inventory.push({ defId, uid: Date.now() + Math.random().toString(36).slice(2) });
+    STATE.inventory.push({ defId, uid: Date.now() + Math.random().toString(36).slice(2) });
 
     globalThis.buildInventoryPanel();
     globalThis.showItemGainPopup(defId);
@@ -481,7 +482,7 @@ export function grantBonusItem() {
     const def = globalThis.ITEM_DEFS[defId];
     if (!def) return '';
 
-    globalThis.STATE.inventory.push({ defId, uid: Date.now() + Math.random().toString(36).slice(2) });
+    STATE.inventory.push({ defId, uid: Date.now() + Math.random().toString(36).slice(2) });
     save();
 
     globalThis.buildInventoryPanel();
@@ -507,7 +508,7 @@ export function buildBonusClaimedNote() {
 export function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNexusPoint) {
     const irz = document.getElementById('item-reward-zone');
     irz.innerHTML = '';
-    const bonusAlreadyDone = globalThis.STATE.bonusDone.includes(gi);
+    const bonusAlreadyDone = STATE.bonusDone.includes(gi);
     const isQuizBonus = globalThis.cur.bonusType === 'quiz';
 
     // Special one-time rewards (convergence points, ascension codex, Nexus unlock) go first
@@ -515,7 +516,7 @@ export function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLeve
 
     // Mark the bonus as done on first clear (before item logic so save() is called once)
     if (bonusMet && !bonusAlreadyDone && !isQuizBonus) {
-        globalThis.STATE.bonusDone.push(gi);
+        STATE.bonusDone.push(gi);
         save();
         // Re-check world aggregates - claiming this bonus may have completed
         // the "all bonuses in a world" achievement set.
@@ -671,11 +672,11 @@ export function checkWorldJustCompleted(worldData, isFirstClear) {
 
     const wi = globalThis.cur.world - 1;
     const start = globalThis.WORLD_START_GI[wi];
-    const allDone = worldData.data.every((_, li) => globalThis.STATE.done.includes(start + li));
+    const allDone = worldData.data.every((_, li) => STATE.done.includes(start + li));
     if (!allDone) return false;
 
-    globalThis.STATE.questStats = globalThis.STATE.questStats || {};
-    const counted = globalThis.STATE.questStats._worldsCountedList || [];
+    STATE.questStats = STATE.questStats || {};
+    const counted = STATE.questStats._worldsCountedList || [];
     return !counted.includes(wi);
 }
 
@@ -769,9 +770,9 @@ function checkWin() {
     const _special = _getLevelSpecialStatus(globalThis.cur);
     const isAscensionLevel = _special.isAscension;
     const isNexusPoint = !!_special.isNexusPoint;
-    const isFirstClear = !globalThis.STATE.done.includes(gi);
+    const isFirstClear = !STATE.done.includes(gi);
 
-    if (isFirstClear) globalThis.STATE.done.push(gi);
+    if (isFirstClear) STATE.done.push(gi);
 
     // Campaign XP: a first clear grants the full amount, a replay a fraction
     // of it (see _egGrantCampaignLevelXP / EG_LEVELING_CONFIG). Endgame map
@@ -790,10 +791,10 @@ function checkWin() {
 
     // Track per-level mistake record for the "flawless world" achievement.
     // Always keep the best (lowest) mistake count across replays.
-    if (!globalThis.STATE.levelMistakes) globalThis.STATE.levelMistakes = {};
-    const prevMistakeRecord = globalThis.STATE.levelMistakes[gi];
+    if (!STATE.levelMistakes) STATE.levelMistakes = {};
+    const prevMistakeRecord = STATE.levelMistakes[gi];
     if (prevMistakeRecord === undefined || globalThis.mistakeCount < prevMistakeRecord) {
-        globalThis.STATE.levelMistakes[gi] = globalThis.mistakeCount;
+        STATE.levelMistakes[gi] = globalThis.mistakeCount;
     }
 
     const elapsed = Math.round((Date.now() - globalThis.levelStartTime) / 1000);
@@ -801,7 +802,7 @@ function checkWin() {
     // Score
     const { pts, ptsAwarded, prevBest, mult } = calculateScore(rows, cols);
     save();
-    document.getElementById('sc-disp').textContent = globalThis.STATE.totalScore;
+    document.getElementById('sc-disp').textContent = STATE.totalScore;
 
     // Achievements
     fireAchievements({ gi, rows, cols, elapsed, pts, ptsAwarded, prevBest, mult, isFirstClear });
@@ -850,7 +851,7 @@ function checkWin() {
         mods: { ...globalThis.curMods },
         mistakeCount: globalThis.mistakeCount,
         itemsUsed: globalThis.itemsUsedThisLevel,
-        playerClass: globalThis.STATE.playerClass,
+        playerClass: STATE.playerClass,
         elapsed,
         bonusMet,
         isConvergence: checkIsConvergenceLevel(worldData, isAscensionLevel) && isFirstClear,

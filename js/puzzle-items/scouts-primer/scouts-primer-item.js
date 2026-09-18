@@ -3,6 +3,7 @@ import { save } from '../../state.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { STATE } from '../../state.js';
 
 //------------------------------------------------------------------------
 //-------------------SCOUT'S PRIMER - USE HANDLER----------------------
@@ -10,7 +11,7 @@ import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanic
 
 // scoutPrimer - marks the next puzzle start so a reveal fires immediately.
 export function _useScoutPrimer(id, def) {
-    globalThis.STATE.primerPending = true;
+    STATE.primerPending = true;
     save();
     playItemEffect(id);
     return `📜 ${t('item_primer_activated')}`;

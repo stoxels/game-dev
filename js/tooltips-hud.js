@@ -12,6 +12,7 @@ import { rarityColors } from './puzzle-items/item-pool.js';
 import { _getLevelSpecialStatus } from './scoring.js';
 import { _getGridSizeTier } from './start-level-passives.js';
 import { t } from './translation/translations.js';
+import { STATE } from './state.js';
 
 // tooltips-hud.js
 // Generic floating tooltip engine (visual twin of class-hud.js's tooltip)
@@ -362,8 +363,8 @@ export function _buildLevelNameTooltipHTML() {
 
     if (!globalThis.cur) return '';
     const gi = globalThis.cur.gIdx;
-    const hs = globalThis.STATE.levelHS[gi];
-    const bonusDone = globalThis.STATE.bonusDone.includes(gi);
+    const hs = STATE.levelHS[gi];
+    const bonusDone = STATE.bonusDone.includes(gi);
     const bonusHintText = lvText(globalThis.cur, 'bonusHint') || '';
 
     let html = `<strong>${t('lvl_prefix')} ${globalThis.cur.world}-${globalThis.cur.li}</strong>`;
@@ -381,8 +382,8 @@ export function _buildLevelNameTooltipHTML() {
         html += `<br><span style="opacity:.6">${t('cg_tt_not_cleared')}</span>`;
     }
 
-    if (globalThis.STATE.levelMistakes && globalThis.STATE.levelMistakes[gi] !== undefined) {
-        html += `<br>${t('cg_tt_best_mistakes')} <b>${globalThis.STATE.levelMistakes[gi]}</b>`;
+    if (STATE.levelMistakes && STATE.levelMistakes[gi] !== undefined) {
+        html += `<br>${t('cg_tt_best_mistakes')} <b>${STATE.levelMistakes[gi]}</b>`;
     }
 
     if (ptHasSkill('grid_awareness')) {

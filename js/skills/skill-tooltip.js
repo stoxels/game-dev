@@ -7,6 +7,7 @@ import { charmRankMeetsPlayerLevel, getCharmRankMinPlayerLevel, getCharmSkillOrb
 import { canAffordSkill, getPassiveSkillDef, getPlayerTraits, getSkillCooldown, getSkillDamage, getSkillDef, getSkillDesc, getSkillLevel, getSkillManaCost, getSkillName, isSkillPassive } from './skill-registry.js';
 import { getSkillCastTimeSeconds } from './spell-casttime.js';
 import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, getUniversalSpellMovementEstimate, getUniversalSpellSupportEstimate } from './universal-spells.js';
+import { STATE } from '../state.js';
 // skill-tooltip.js
 //------------------------------------------------------------------------
 //-------------------SKILL TOOLTIP (PATH-OF-EXILE STYLE)------------------
@@ -308,7 +309,7 @@ export function buildPassiveSkillTooltipHTML(passiveId) {
     const def = (typeof getPassiveSkillDef === 'function') ? getPassiveSkillDef(passiveId) : null;
     if (!def) return '';
 
-    const rank = globalThis.STATE.classPassiveLevel || 1;
+    const rank = STATE.classPassiveLevel || 1;
     const data = def.levels && (def.levels[Math.min(rank, def.levels.length) - 1] || def.levels[0]);
     const name = LANG === 'de' ? (def.nameDE || def.nameEn) : def.nameEn;
     const desc = data ? (LANG === 'de' ? data.descDE : data.descEn) : '';

@@ -4,6 +4,7 @@ import { Audio_Manager } from './audio/audio.js';
 import { showModal, showTitle, switchScreen } from './screens/screens.js';
 import { save } from './state.js';
 import { LANG, t } from './translation/translations.js';
+import { STATE } from './state.js';
 
 //------------------------------------------------------------------------
 //---------------------------MOODLE CODES---------------------------------
@@ -60,7 +61,7 @@ export function calcAchievementProgress() {
 // score and achievement progress.
 // Returns: 'unlocked' | 'locked_achievements' | 'not_reached'
 export function evaluateCodeEligibility(worldCode, achPctDone) {
-    const scoreOk = globalThis.STATE.totalScore >= worldCode.threshold;
+    const scoreOk = STATE.totalScore >= worldCode.threshold;
     const achOk = achPctDone >= (worldCode.achPct || 0);
 
     if (scoreOk && achOk) return 'unlocked';
@@ -97,12 +98,12 @@ export function collectCodeUnlockResults() {
 
     WORLD_CODES.forEach(wc => {
         // Skip codes the player already owns
-        if (globalThis.STATE.unlockedCodes.includes(wc.code)) return;
+        if (STATE.unlockedCodes.includes(wc.code)) return;
 
         const result = evaluateCodeEligibility(wc, achPctDone);
 
         if (result === 'unlocked') {
-            globalThis.STATE.unlockedCodes.push(wc.code);
+            STATE.unlockedCodes.push(wc.code);
             newCodes.push(wc);
         } else if (result === 'locked_achievements') {
             lockedCodes.push(_buildLockedCodeEntry(wc, tierCounts));
@@ -120,7 +121,7 @@ export function collectLockedCodesOnly() {
     const achPctDone = calcAchievementProgress();
 
     WORLD_CODES.forEach(wc => {
-        if (globalThis.STATE.unlockedCodes.includes(wc.code)) return;
+        if (STATE.unlockedCodes.includes(wc.code)) return;
         const result = evaluateCodeEligibility(wc, achPctDone);
         if (result === 'locked_achievements') {
             lockedCodes.push(_buildLockedCodeEntry(wc, tierCounts));
@@ -306,7 +307,7 @@ export function _mcBuildReqBlock(label, current, required, met, barClass) {
  * @returns {string} HTML string
  */
 export function _mcBuildRow(wc, total, achPct, totalAchTiers, unlockedAchTiers) {
-    const unlocked = globalThis.STATE.unlockedCodes.includes(wc.code);
+    const unlocked = STATE.unlockedCodes.includes(wc.code);
     const tierName = LANG === 'de' ? wc.titleDE : wc.titleEn;
     const scoreMet = total >= wc.threshold;
     const scoreLabel = (typeof t === 'function' ? t('codes_req_score') : null) || 'Required Score';
@@ -345,7 +346,7 @@ export function buildCodesScreen() {
     const screenEl = document.getElementById('screen-codes');
     if (!screenEl) return;
 
-    const total = globalThis.STATE.totalScore;
+    const total = STATE.totalScore;
     const achPct = calcAchievementProgress();
     const { total: totalAchTiers, have: unlockedAchTiers } = _getAchievementTierCounts();
 

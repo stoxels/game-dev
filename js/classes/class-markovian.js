@@ -9,6 +9,7 @@ import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../inference/inference-stats.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
@@ -318,7 +319,7 @@ export function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMist
 // Pass silent=true to suppress the cancellation toast.
 export function _rollbackCancel(silent = false) {
     _setAbilityMode(false);
-    globalThis.STATE.classActiveChoice = 'active3';
+    STATE.classActiveChoice = 'active3';
 
     const cd = cooldownState['active3'];
     if (cd && cd.interval) { clearInterval(cd.interval); cd.interval = null; }

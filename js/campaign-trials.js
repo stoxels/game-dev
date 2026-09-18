@@ -24,6 +24,7 @@ import { _hidePlayerAvatar, _hidePlayerAvatarSimple } from './sprite/player_spri
 import { save } from './state.js';
 import { stopTimer } from './timer/timer.js';
 import { t } from './translation/translations.js';
+import { STATE } from './state.js';
 
 //------------------------------------------------------------------------
 //-------------------CAMPAIGN TRIALS--------------------------------------
@@ -185,32 +186,32 @@ export function _egIsAscensionTrialRun() {
 
 // Trial state guards for new saves / old saves without the arrays.
 export function _egEnsureTrialState() {
-    if (typeof STATE === 'undefined' || !globalThis.STATE) return;
-    if (!Array.isArray(globalThis.STATE.trialsDone)) globalThis.STATE.trialsDone = [];
-    if (!Array.isArray(globalThis.STATE.ascensionTrialsDone)) globalThis.STATE.ascensionTrialsDone = [];
+    if (typeof STATE === 'undefined' || !STATE) return;
+    if (!Array.isArray(STATE.trialsDone)) STATE.trialsDone = [];
+    if (!Array.isArray(STATE.ascensionTrialsDone)) STATE.ascensionTrialsDone = [];
 }
 
 export function _egIsTrialDone(wi) {
     _egEnsureTrialState();
-    return globalThis.STATE.trialsDone.includes(_egTrialIdForWorld(wi));
+    return STATE.trialsDone.includes(_egTrialIdForWorld(wi));
 }
 
 export function _egIsAscensionTrialDone(wi) {
     _egEnsureTrialState();
-    return globalThis.STATE.ascensionTrialsDone.includes('asc_' + (wi + 1));
+    return STATE.ascensionTrialsDone.includes('asc_' + (wi + 1));
 }
 
 // Trials unlock by clearing the world's two convergence milestone levels
 // (the old 33% / 66% rule, see _egTrialTriggerLevels). World 1 Trial 1
 // additionally needs the tutorial finished (matches level 1-1).
 export function _egIsTrialUnlocked(wi) {
-    if (typeof STATE === 'undefined' || !globalThis.STATE) return false;
-    if (wi === 0 && !globalThis.STATE.tutorialDone) return false;
+    if (typeof STATE === 'undefined' || !STATE) return false;
+    if (wi === 0 && !STATE.tutorialDone) return false;
     const start = _egTrialWorldStartGi(wi);
     if (start < 0 || typeof ALL === 'undefined') return false;
     const triggers = _egTrialTriggerLevels(wi);
     if (!triggers) return false;
-    return triggers.every((li) => globalThis.STATE.done && globalThis.STATE.done.includes(start + li));
+    return triggers.every((li) => STATE.done && STATE.done.includes(start + li));
 }
 
 // The two convergence milestone level indices (0-based li inside the world)
@@ -368,17 +369,17 @@ export function _egMaybeLaunchAscensionTrial(gi) {
 export function _egGrantConvergenceTrialReward(wi) {
     _egEnsureTrialState();
     const id = _egTrialIdForWorld(wi);
-    const isFirstClear = !globalThis.STATE.trialsDone.includes(id);
+    const isFirstClear = !STATE.trialsDone.includes(id);
     if (isFirstClear) {
-        globalThis.STATE.trialsDone.push(id);
-        globalThis.STATE.passiveTreePoints = (globalThis.STATE.passiveTreePoints || 0) + 1;
+        STATE.trialsDone.push(id);
+        STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + 1;
         if (typeof _incDirect === 'function') try { _incDirect('lifetimePassivePointsObtained', 1); } catch (e) {}
         // Trials are the new convergence milestones - keep the Inference
         // ledger's convergence counter moving (legacy levels no longer feed it).
         if (typeof _incDirect === 'function') try { _incDirect('convergenceLevels', 1); } catch (e) {}
         if (typeof trackAchStat === 'function') try { trackAchStat('egMapsCompleted', 1); } catch (e) {}
         // Reuse the legacy trail so old saves/modals/achievements keep working.
-        if (!Array.isArray(globalThis.STATE.convergenceDone)) globalThis.STATE.convergenceDone = [];
+        if (!Array.isArray(STATE.convergenceDone)) STATE.convergenceDone = [];
         window._pendingConvergenceModal = true;
     }
     // Flat completion XP on top of kill XP: one first-clear share of the
@@ -408,25 +409,25 @@ export function _egGrantAscensionTrialReward(wi) {
     _egEnsureTrialState();
     const world = (typeof WORLDS !== 'undefined' && WORLDS) ? WORLDS[wi] : null;
     const key = 'asc_' + (wi + 1);
-    const isFirstClear = !globalThis.STATE.ascensionTrialsDone.includes(key);
+    const isFirstClear = !STATE.ascensionTrialsDone.includes(key);
     let ascGi = -1;
     if (world) {
         const start = _egTrialWorldStartGi(wi);
         if (start >= 0) ascGi = start + world.data.length - 1;
     }
-    const wasDone = ascGi >= 0 && globalThis.STATE.done && globalThis.STATE.done.includes(ascGi);
+    const wasDone = ascGi >= 0 && STATE.done && STATE.done.includes(ascGi);
     if (ascGi >= 0 && !wasDone) {
-        globalThis.STATE.done.push(ascGi);
+        STATE.done.push(ascGi);
         if (typeof _wdSyncSpriteToLevel === 'function') try { _wdSyncSpriteToLevel(ascGi); } catch (e) {}
     }
     if (isFirstClear) {
-        globalThis.STATE.ascensionTrialsDone.push(key);
+        STATE.ascensionTrialsDone.push(key);
         // Codex of Completion (same artifact as the old ascension clear).
         try {
             if (typeof ITEM_DEFS !== 'undefined' && ITEM_DEFS['artifactComplete']
-                && globalThis.STATE && Array.isArray(globalThis.STATE.inventory)
+                && STATE && Array.isArray(STATE.inventory)
                 && !(typeof curMods !== 'undefined' && curMods && curMods.ironman)) {
-                globalThis.STATE.inventory.push({
+                STATE.inventory.push({
                     defId: 'artifactComplete',
                     uid: 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2),
                 });
@@ -454,14 +455,14 @@ export function _egGrantAscensionTrialReward(wi) {
     // class-ui.js but for the explicit world - `cur` is a trial seed here).
     try {
         if (world && typeof areAllWorldLevelsDone === 'function' && areAllWorldLevelsDone(wi, world)) {
-            if (!globalThis.STATE.classWorldsCompleted) globalThis.STATE.classWorldsCompleted = [];
-            if (!globalThis.STATE.classWorldsCompleted.includes(wi)) {
+            if (!STATE.classWorldsCompleted) STATE.classWorldsCompleted = [];
+            if (!STATE.classWorldsCompleted.includes(wi)) {
                 if (typeof isNexusWorld === 'function' && isNexusWorld(wi)) {
                     if (typeof grantClassChangeToken === 'function') grantClassChangeToken(wi);
-                    else { globalThis.STATE.classWorldsCompleted.push(wi); if (typeof save === 'function') save(); }
+                    else { STATE.classWorldsCompleted.push(wi); if (typeof save === 'function') save(); }
                 } else {
-                    globalThis.STATE._pendingClassEvent = true;
-                    globalThis.STATE._lastClassWorld = wi;
+                    STATE._pendingClassEvent = true;
+                    STATE._lastClassWorld = wi;
                     if (typeof save === 'function') save();
                 }
             }

@@ -1,4 +1,5 @@
 import { _ptCurrentSpentCount } from './inference-stats.js';
+import { STATE } from '../state.js';
 
 // Sort leder by categories
 
@@ -14,7 +15,7 @@ export const LEDGER_GROUPS = [
 //  ATLAS TIER HELPER - used by the 16 Atlas Completion quests (Tiers 1-16)
 //  Returns { current, target } where current = completed atlas nodes of
 //  that tier and target = total atlas nodes of that tier. Reads live from
-//  globalThis.STATE.egAtlasCompleted and globalThis.EG_ATLAS_NODES so no extra questStats needed.
+//  STATE.egAtlasCompleted and globalThis.EG_ATLAS_NODES so no extra questStats needed.
 // ─────────────────────────────────────────────────────────────
 export function _atlasTierCheck(tier) {
     if (typeof globalThis.EG_ATLAS_NODES === 'undefined' || !Array.isArray(globalThis.EG_ATLAS_NODES)) {
@@ -24,7 +25,7 @@ export function _atlasTierCheck(tier) {
     const target = nodes.length;
     if (target === 0) return { current: 0, target: 1 };
     let current = 0;
-    const completed = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.egAtlasCompleted) ? globalThis.STATE.egAtlasCompleted : {};
+    const completed = (typeof STATE !== 'undefined' && STATE.egAtlasCompleted) ? STATE.egAtlasCompleted : {};
     for (const n of nodes) {
         if (completed[n.id]) current++;
     }
@@ -52,22 +53,22 @@ export const LEDGER_CATEGORIES = [
         milestones: [
             {
                 id: 'ev_1', labelEn: '5,000 total score', labelDE: '5.000 Gesamtpunkte',
-                check: () => ({ current: globalThis.STATE.totalScore || 0, target: 5000 }),
+                check: () => ({ current: STATE.totalScore || 0, target: 5000 }),
                 reward: { items: ['addTime300', 'reveal3'] }
             },
             {
                 id: 'ev_2', labelEn: '20,000 total score', labelDE: '20.000 Gesamtpunkte',
-                check: () => ({ current: globalThis.STATE.totalScore || 0, target: 20000 }),
+                check: () => ({ current: STATE.totalScore || 0, target: 20000 }),
                 reward: { items: ['addTime600', 'markWrong8'] }
             },
             {
                 id: 'ev_3', labelEn: '50,000 total score', labelDE: '50.000 Gesamtpunkte',
-                check: () => ({ current: globalThis.STATE.totalScore || 0, target: 50000 }),
+                check: () => ({ current: STATE.totalScore || 0, target: 50000 }),
                 reward: { items: ['addTime900', 'rowSolve'] }
             },
             {
                 id: 'ev_4', labelEn: '100,000 total score', labelDE: '100.000 Gesamtpunkte',
-                check: () => ({ current: globalThis.STATE.totalScore || 0, target: 100000 }),
+                check: () => ({ current: STATE.totalScore || 0, target: 100000 }),
                 reward: { ptPoints: 1, items: ['addTime900', 'colSolve'] }
             },
         ]

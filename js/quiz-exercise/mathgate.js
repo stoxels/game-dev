@@ -15,6 +15,7 @@ import { _charIs, _getPlayerCharacterImage } from '../sprite/player_sprite.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { MATH_GATE_POOLS } from './mathgate-questions.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //------------------------------CONSTANTS & STATE--------------------------
@@ -174,15 +175,15 @@ export function isGatedLevel(gi) {
 
 // Returns true if the player has already passed the gate for this gi.
 export function isMathGatePassed(gi) {
-    return (globalThis.STATE.mathGatePassed ?? []).includes(gi);
+    return (STATE.mathGatePassed ?? []).includes(gi);
 }
 
 // Persists a gate pass to STATE and saves to disk.
 // Safe to call even if the gate was already marked as passed (no duplicate writes).
 export function mgMarkGatePassed(gi) {
-    if (!globalThis.STATE.mathGatePassed) globalThis.STATE.mathGatePassed = [];
-    if (!globalThis.STATE.mathGatePassed.includes(gi)) {
-        globalThis.STATE.mathGatePassed.push(gi);
+    if (!STATE.mathGatePassed) STATE.mathGatePassed = [];
+    if (!STATE.mathGatePassed.includes(gi)) {
+        STATE.mathGatePassed.push(gi);
         save();
     }
 }
@@ -376,7 +377,7 @@ export function _mgInjectPortrait() {
         trix: { accent: '#ce93d8', glow: 'rgba(206,147,216,0.55)', crack: '#ce93d8', crackGlow: 'rgba(206,147,216,0.5)' },
         syla: { accent: '#66bb6a', glow: 'rgba(102,187,106,0.55)', crack: '#26c6a6', crackGlow: 'rgba(38,198,166,0.5)' },
     };
-    const c = charColors[globalThis.STATE?.playerCharacter] || charColors.stox;
+    const c = charColors[STATE?.playerCharacter] || charColors.stox;
     if (box) {
         box.style.setProperty('--qr-accent', c.accent);
         box.style.setProperty('--qr-accent-glow', c.glow);
@@ -483,7 +484,7 @@ export function mgCalcNoConsumeChance() {
 // Removes the given tutor item from the player's inventory, then saves
 // state and rebuilds the inventory panel.
 export function mgConsumeTutorItem(tutorItem) {
-    globalThis.STATE.inventory = globalThis.STATE.inventory.filter(i => i.uid !== tutorItem.uid);
+    STATE.inventory = STATE.inventory.filter(i => i.uid !== tutorItem.uid);
     save();
     buildInventoryPanel();
 }
@@ -499,7 +500,7 @@ export function mgRefreshTutorButton() {
     // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
     const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
     const canUseTutor = superTutorEnabled || PT.hasSkill('tutor_enable') || _charIs('trix');
-    const tutorCount = globalThis.STATE.inventory.filter(i => TUTOR_ITEM_IDS_2.includes(i.defId)).length;
+    const tutorCount = STATE.inventory.filter(i => TUTOR_ITEM_IDS_2.includes(i.defId)).length;
 
     if (canUseTutor && (superTutorEnabled || tutorCount > 0)) {
         btn.style.display = 'flex';
@@ -568,7 +569,7 @@ export function mgUseTutor() {
     const superTutorEnabled = !!(typeof curMods !== 'undefined' && curMods.superTutor);
     // Find the lowest-tier tutor item the player currently owns.
     const tutorItem = superTutorEnabled ? null : TUTOR_ITEM_IDS_2
-        .flatMap(id => globalThis.STATE.inventory.filter(i => i.defId === id))
+        .flatMap(id => STATE.inventory.filter(i => i.defId === id))
         .find(Boolean);
     if (!superTutorEnabled && !tutorItem) return;
 

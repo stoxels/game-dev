@@ -2,6 +2,7 @@
 import { initMapViewToggle, showMapView } from './screens-map-view.js';
 import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
 import { buildQuestLogButton } from '../inference/inference-logic.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //--------------------CONSTANTS-------------------------------------------
@@ -95,16 +96,16 @@ export function renderLSTopBar() {
 // Builds the "points to next unlock code" hint string.
 // Returns a trophy message if all codes are already unlocked.
 export function buildNextCodeStr() {
-    const nextCode = globalThis.WORLD_CODES.find(wc => globalThis.STATE.totalScore < wc.threshold);
+    const nextCode = globalThis.WORLD_CODES.find(wc => STATE.totalScore < wc.threshold);
     if (!nextCode) return `🏆 ${t('ls_all_codes')}`;
 
     const title = LANG === 'de' ? nextCode.titleDE : nextCode.titleEn;
-    return `${nextCode.threshold - globalThis.STATE.totalScore} ${t('ls_to_next')}`;
+    return `${nextCode.threshold - STATE.totalScore} ${t('ls_to_next')}`;
 }
 
 // Renders the total score and the "points to next unlock code" hint into the top bar.
 export function renderLSScoreRow() {
-    document.getElementById('ls-score').textContent = globalThis.STATE.totalScore;
+    document.getElementById('ls-score').textContent = STATE.totalScore;
 
     const ptsNextEl = document.getElementById('ls-pts-next');
     if (ptsNextEl) ptsNextEl.textContent = buildNextCodeStr();
@@ -151,9 +152,9 @@ export function renderLSClassStatus() {
     const classEl = document.getElementById('ls-class-status');
     if (!classEl) return;
 
-    if (globalThis.STATE.playerClass) {
-        const def = globalThis.CLASS_DEFS[globalThis.STATE.playerClass];
-        const asc = globalThis.STATE.playerAscendency ? globalThis.ASCENDENCY_DEFS[globalThis.STATE.playerAscendency] : null;
+    if (STATE.playerClass) {
+        const def = globalThis.CLASS_DEFS[STATE.playerClass];
+        const asc = STATE.playerAscendency ? globalThis.ASCENDENCY_DEFS[STATE.playerAscendency] : null;
         applyClassStatusActiveStyle(classEl, def, asc);
     } else {
         applyClassStatusEmptyStyle(classEl);
@@ -165,7 +166,7 @@ export function renderLSClassStatus() {
 // Shows a golden border and a yellow point count to the right of the label
 // when the player has unspent points to spend.
 export function renderLSPassiveTreeButton() {
-    const treePoints = globalThis.STATE.passiveTreePoints || 0;
+    const treePoints = STATE.passiveTreePoints || 0;
     const ptBtn = document.getElementById('btn-go-passive-tree');
     if (!ptBtn) return;
 
@@ -250,7 +251,7 @@ export function renderLSWorlds() {
 export function renderLevelSelect() {
 
     // --- MAP VIEW REDIRECT GATEWAY HOOK ---
-    if (globalThis.STATE && globalThis.STATE.mapViewEnabled) {
+    if (STATE && STATE.mapViewEnabled) {
         // If a world detail screen was active, go back to that world directly
         // rather than dropping the player at the overworld map every time.
         if (typeof _wdCurrentWi !== 'undefined' && _wdCurrentWi !== null
@@ -300,7 +301,7 @@ export function isLevelConvergence(li, w, isLastInWorld) {
 // Returns true if the player has beaten this level on Hard with all modifiers active.
 // This represents the theoretical maximum completion state for a level.
 export function isMaxCleared(gi) {
-    const hs = globalThis.STATE.levelHS[gi];
+    const hs = STATE.levelHS[gi];
     if (!hs) return false;
     return hs.diff === 'hard' &&
         hs.mods &&
@@ -314,7 +315,7 @@ export function isMaxCleared(gi) {
 // Returns a star string based on the difficulty and modifiers of the best run.
 // Stars 1–3 reflect difficulty tier; each active modifier appends a bonus star (★).
 export function getStars(gi) {
-    const hs = globalThis.STATE.levelHS[gi];
+    const hs = STATE.levelHS[gi];
     if (!hs) return '';
 
     const diffIndex = DIFF_TIERS.indexOf(hs.diff || 'easy');
@@ -357,7 +358,7 @@ export function buildBonusHtml(p, gi, isUnlocked) {
 
     const bIcon = BONUS_ICONS[p.bonusType || 'nomiss'] || '🎯';
 
-    if (globalThis.STATE.bonusDone.includes(gi)) {
+    if (STATE.bonusDone.includes(gi)) {
         return `<div class="lc-bonus" style="color:var(--green);opacity:0.7;">✓ ${bIcon} ${t('ls_bonus_claimed')}</div>`;
     }
 
@@ -401,7 +402,7 @@ export function buildAscensionBadge(isLastInWorld, w, isNexusPoint) {
 export function buildConvergenceBadge(isConvergenceLevel, gi) {
     if (!isConvergenceLevel) return '';
 
-    const claimed = globalThis.STATE.convergenceDone && globalThis.STATE.convergenceDone.includes(gi);
+    const claimed = STATE.convergenceDone && STATE.convergenceDone.includes(gi);
     const label = t(claimed ? 'scr_convergence_claimed' : 'scr_convergence_badge');
 
     return `<div class="lc-convergence-badge">${label}</div>`;
@@ -456,13 +457,13 @@ export function attachLevelCardEvents(card, gi, isDone, isMathGated, tip) {
 export function buildLevelCard(p, li, wi, w, tip) {
     const gi = globalThis.WORLD_START_GI[wi] + li;
     const isNexusPoint = typeof globalThis.isNexusPointLevel === 'function' && globalThis.isNexusPointLevel(wi, li);
-    let isUnlocked = li === 0 ? !!globalThis.STATE.tutorialDone : globalThis.STATE.done.includes(gi - 1);
+    let isUnlocked = li === 0 ? !!STATE.tutorialDone : STATE.done.includes(gi - 1);
     if (typeof globalThis.isNexusWorld === 'function' && globalThis.isNexusWorld(wi)
         && typeof globalThis.isNexusWorldUnlocked === 'function' && !globalThis.isNexusWorldUnlocked()) {
         isUnlocked = false;
     }
-    const isDone = globalThis.STATE.done.includes(gi);
-    const hs = globalThis.STATE.levelHS[gi];
+    const isDone = STATE.done.includes(gi);
+    const hs = STATE.levelHS[gi];
     const isMathGated = globalThis.isGatedLevel(gi) && !globalThis.isMathGatePassed(gi);
     const isLastInWorld = li === w.data.length - 1;
     const isConvergenceLevel = isLevelConvergence(li, w, isLastInWorld);
@@ -597,7 +598,7 @@ export function getModSuggestion(hs) {
 // Looks at the player's best run and suggests higher difficulty, unused modifiers, 
 // or performance optimizations (time/mistakes).
 export function getTooltipHint(gi) {
-    const hs = globalThis.STATE.levelHS[gi];
+    const hs = STATE.levelHS[gi];
     if (!hs) return t('ls_no_score');
 
     const suggestions = [

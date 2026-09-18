@@ -18,6 +18,7 @@ import { LANG, t } from '../translation/translations.js';
 import { MATH_GATE_POOLS } from './mathgate-questions.js';
 import { mgFormatTutorAnswer } from './mathgate.js';
 import { BONUS_QUIZ_POOLS } from './quiz-questions.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 10: live globalThis accessors for externally-mutated names.
@@ -328,11 +329,11 @@ export function _quizHandleAlreadyClaimedReward(resEl) {
 // awards +50 score and marks the bonus as claimed (no item rewards -
 // quiz answers no longer drop items).
 export function _quizHandleFirstCorrectReward(resEl) {
-    globalThis.STATE.totalScore += 50;
-    document.getElementById('sc-disp').textContent = globalThis.STATE.totalScore;
+    STATE.totalScore += 50;
+    document.getElementById('sc-disp').textContent = STATE.totalScore;
 
     // Mark bonus as claimed regardless of Ironman mode or item availability
-    globalThis.STATE.bonusDone.push(globalThis.cur.gIdx);
+    STATE.bonusDone.push(globalThis.cur.gIdx);
     // Re-check world aggregates - claiming this bonus may have completed
     // the "all bonuses in a world" achievement set.
     if (typeof checkWorldCompleteAch === 'function') checkWorldCompleteAch();
@@ -356,7 +357,7 @@ export function _resolveQuizAnswer(correct) {
     document.getElementById('quiz-tutor-btn').style.display = 'none';
     const resEl = document.getElementById('quiz-result');
     const isInterstitial = typeof window._egInterstitialDone === 'function';
-    const quizAlreadyClaimed = globalThis.STATE.bonusDone.includes(globalThis.cur.gIdx);
+    const quizAlreadyClaimed = STATE.bonusDone.includes(globalThis.cur.gIdx);
     if (correct) {
         Audio_Manager.playSFX('quizCorrect');
         trackAchStat('questionsCorrect');
@@ -526,18 +527,18 @@ export function _quizShowInputRow(q) {
 // tiers in priority order (lowest tier first).
 export function _quizGetTutorItem() {
     return TUTOR_ITEM_IDS2
-        .flatMap(id => globalThis.STATE.inventory.filter(i => i.defId === id))
+        .flatMap(id => STATE.inventory.filter(i => i.defId === id))
         .find(Boolean) ?? null;
 }
 
 // Counts all Tutor items across every tier in the player's inventory.
 export function _quizCountTutorItems() {
-    return globalThis.STATE.inventory.filter(i => TUTOR_ITEM_IDS2.includes(i.defId)).length;
+    return STATE.inventory.filter(i => TUTOR_ITEM_IDS2.includes(i.defId)).length;
 }
 
 // Removes the given Tutor item from inventory and persists the change.
 export function _quizConsumeTutorItem(tutorItem) {
-    globalThis.STATE.inventory = globalThis.STATE.inventory.filter(i => i.uid !== tutorItem.uid);
+    STATE.inventory = STATE.inventory.filter(i => i.uid !== tutorItem.uid);
     save();
     buildInventoryPanel();
 }
@@ -686,7 +687,7 @@ export function _quizInjectPortrait(overlayEl) {
         trix: { accent: '#ce93d8', glow: 'rgba(206,147,216,0.55)', crack: '#ce93d8', crackGlow: 'rgba(206,147,216,0.5)' },
         syla: { accent: '#66bb6a', glow: 'rgba(102,187,106,0.55)', crack: '#26c6a6', crackGlow: 'rgba(38,198,166,0.5)' },
     };
-    const c = charColors[globalThis.STATE?.playerCharacter] || charColors.stox;
+    const c = charColors[STATE?.playerCharacter] || charColors.stox;
     overlayEl.style.setProperty('--qr-accent', c.accent);
     overlayEl.style.setProperty('--qr-accent-glow', c.glow);
     const frame = overlayEl.querySelector('.qr-frame');

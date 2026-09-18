@@ -7,6 +7,7 @@
 import { ACHIEVEMENT_DEFS } from './achievements-data.js';
 import { _achToastQueue, _drainAchToastQueue, showAchResetModal, buildAchievementsScreen, backToAchCategories } from './achievements-ui.js';
 import { t } from '../translation/translations.js';
+import { STATE } from '../state.js';
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE----------------------------
 //------------------------------------------------------------------------
@@ -275,7 +276,7 @@ function trackGridStats(ctx) {
 function countUniqueWorldsPlayed() {
     const worldsSeen = new Set();
     if (typeof globalThis.ALL !== 'undefined') {
-        const _STATE = globalThis.STATE; // LIVE accessor
+        const _STATE = STATE; // LIVE accessor
         const doneLevels = _STATE ? _STATE.done : [];
         doneLevels.forEach(gi => {
             if (globalThis.ALL[gi]) worldsSeen.add(globalThis.ALL[gi].world);
@@ -328,14 +329,14 @@ function getLevelIndicesForWorld(worldIndex) {
 // areAllLevelsCompleted - returns true if every gi in levelIndices appears
 //   in STATE.done.
 function areAllLevelsCompleted(levelIndices) {
-    const _s = globalThis.STATE; // LIVE accessor
+    const _s = STATE; // LIVE accessor
     return !!_s && levelIndices.every(gi => _s.done.includes(gi));
 }
 
 // areAllLevelsFlawless - returns true if the sum of recorded mistakes across
 //   every level in levelIndices is zero. Returns false if mistake data is absent.
 function areAllLevelsFlawless(levelIndices) {
-    const _s = globalThis.STATE; // LIVE accessor
+    const _s = STATE; // LIVE accessor
     if (!_s || typeof _s.levelMistakes === 'undefined') return false;
     const totalMistakes = levelIndices.reduce(
         (sum, gi) => sum + (_s.levelMistakes[gi] ?? 999), 0
@@ -346,7 +347,7 @@ function areAllLevelsFlawless(levelIndices) {
 // areAllBonusesClaimed - returns true if every gi in levelIndices appears
 //   in STATE.bonusDone.
 function areAllBonusesClaimed(levelIndices) {
-    const _s = globalThis.STATE; // LIVE accessor
+    const _s = STATE; // LIVE accessor
     return !!_s && levelIndices.every(gi => _s.bonusDone.includes(gi));
 }
 

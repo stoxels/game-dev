@@ -5,6 +5,7 @@ import { RESHUFFLE_GOAL, reshuffleCount, reshuffleRightClickItem, updateReshuffl
 import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { itemDesc, itemName, rarityColors } from '../puzzle-items/item-pool.js';
 import { checkInventoryAchievements, showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE----------------------------
@@ -136,7 +137,7 @@ function _hideSlotTooltip() {
 
 // Finds the first inventory item matching the given defId, or undefined if none exists.
 function _findInventoryItemByDefId(defId) {
-    return globalThis.STATE.inventory.find(i => i.defId === defId);
+    return STATE.inventory.find(i => i.defId === defId);
 }
 
 // Uses the first inventory item that matches the given defId.
@@ -155,10 +156,10 @@ function _reshuffleOneByDefId(defId) {
 
 // Silently discards one item of this defId without adding to the reshuffle counter (alt+click action).
 function _discardOneByDefId(defId) {
-    const idx = globalThis.STATE.inventory.findIndex(i => i.defId === defId);
+    const idx = STATE.inventory.findIndex(i => i.defId === defId);
     if (idx < 0) return;
     const def = ITEM_DEFS[defId];
-    globalThis.STATE.inventory.splice(idx, 1);
+    STATE.inventory.splice(idx, 1);
     trackAchStat('itemsSold');
     save();
     buildInventoryPanel();
@@ -200,7 +201,7 @@ function _buildInvSlot(defId) {
     const def = ITEM_DEFS[defId];
     if (!def) return null;
 
-    const count = globalThis.STATE.inventory.filter(i => i.defId === defId).length;
+    const count = STATE.inventory.filter(i => i.defId === defId).length;
     const isEmpty = count === 0;
     const isLocked = globalThis.curMods.ironman;
     const rc = rarityColors(def.rarity);
@@ -456,7 +457,7 @@ export function buildInventoryPanel() {
 
         // Total owned items across the group's defs → badge on the button
         const owned = group.slots.reduce((n, id) =>
-            n + globalThis.STATE.inventory.filter(i => i.defId === id).length, 0);
+            n + STATE.inventory.filter(i => i.defId === id).length, 0);
 
         const btn = document.createElement('button');
         btn.type = 'button';

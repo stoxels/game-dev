@@ -10,6 +10,7 @@ import { buildClassHUD, updateMomentumBar } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-----------------STATISTICIAN-------------------------------------------
@@ -702,7 +703,7 @@ export function _dataStrikeCancel() {
     window._dataStrikePendingCount = null;
 
     _setAbilityMode(false);
-    globalThis.STATE.classActiveChoice = 'active1';
+    STATE.classActiveChoice = 'active1';
 
     _dataStrikeRefundCooldown();
     buildClassHUD();
@@ -1107,7 +1108,7 @@ export function _diagStrikeGetEffectiveDiagonalsForPreview() {
     const def = CLASS_DEFS?.statistician;
     if (!def) return 1;
     // Effect rank follows the slotted charm when one is placed.
-    let level = globalThis.STATE.classActive2Level || 1;
+    let level = STATE.classActive2Level || 1;
     if (typeof getSkillCastRankClamped === 'function') {
         const charmRank = getSkillCastRankClamped('statistician_active2');
         if (charmRank) level = charmRank;
@@ -1209,8 +1210,8 @@ export function _diagStrikeBuildPreviewBars(wrap, row, col, diagonalCount) {
 // count, skipping the rebuild if neither has changed since the last move.
 export function _diagStrikeUpdatePreview(clientX, clientY) {
     const isArmed = globalThis.activeAbilityMode
-        && globalThis.STATE.playerClass === 'statistician'
-        && globalThis.STATE.classActiveChoice === 'active2';
+        && STATE.playerClass === 'statistician'
+        && STATE.classActiveChoice === 'active2';
 
     if (!isArmed || !globalThis.cur) { _diagStrikeClearPreview(); return; }
 
@@ -1402,7 +1403,7 @@ export function _momentumUpdateParticles() {
 //
 //   row / col : the cell that was just correctly filled (optional)
 export function _momentumSpawnParticle(row, col) {
-    if (globalThis.STATE.playerClass !== 'statistician' || globalThis.isClassless()) return;
+    if (STATE.playerClass !== 'statistician' || globalThis.isClassless()) return;
 
     const wrap = document.getElementById('puzzle-scaler-wrap'); // was 'puzzle-scaler'
     const container = _momentumGetContainer();

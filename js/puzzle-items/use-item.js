@@ -27,6 +27,7 @@ import { _useShield } from './shield/shield.js';
 import { _useSurveyScope } from './survey-scope/survey-scope.js';
 import { _useTheWitch } from './the-witch/the-witch.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 // globalThis accessor for externally-mutated names (see the write-site audit):
@@ -147,7 +148,7 @@ function _trackItemAchievements(id, def) {
     }
 
     // Cursed items used on a first-attempt level
-    if (def.rarity === 'cursed' && !globalThis.STATE.done.includes(globalThis.cur.gIdx)) {
+    if (def.rarity === 'cursed' && !STATE.done.includes(globalThis.cur.gIdx)) {
         trackAchStat('cursedFirstAttempts');
     }
 }
@@ -189,7 +190,7 @@ export function _consumeItem(idx, def, msg) {
     }
 
     // Normal path - remove item, track, save, toast
-    globalThis.STATE.inventory.splice(idx, 1);
+    STATE.inventory.splice(idx, 1);
     globalThis.itemsUsedThisLevel++;
     _trackItemAchievements(def.id, def);
     updateQuestStats('itemUsed', { defId: def.id, rarity: def.rarity });
@@ -206,10 +207,10 @@ function useItem(uid) {
     // Items are disabled in dead state and Ironman mode
     if (globalThis.dead || globalThis.curMods.ironman) return;
 
-    const idx = globalThis.STATE.inventory.findIndex(i => i.uid === uid);
+    const idx = STATE.inventory.findIndex(i => i.uid === uid);
     if (idx < 0) return;
 
-    const item = globalThis.STATE.inventory[idx];
+    const item = STATE.inventory[idx];
     const def = ITEM_DEFS[item.defId];
     if (!def) return;
 

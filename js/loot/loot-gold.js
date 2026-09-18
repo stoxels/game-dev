@@ -5,6 +5,7 @@ import { EG_LOOT_DROP_LIFETIME_MS, _egBuildPickupEligiblePool, _egCancelTrackedE
 import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import { _egIsActive } from '../combat/combat-state.js';
 
+
 'use strict';
 
 //------------------------------------------------------------------------
@@ -13,7 +14,7 @@ import { _egIsActive } from '../combat/combat-state.js';
 // Gold is the endgame's soft trade currency. Monsters (and especially
 // bosses) drop gold coins onto the grid like any other drop type; claiming
 // a coin banks it into the player's persistent gold balance
-// (STATE.egGold). The Atlas Vendor on the Nexus of Worlds screen sells
+// (globalThis.STATE.egGold). The Atlas Vendor on the Nexus of Worlds screen sells
 // free Tier 1 Normal maps and other goods for gold.
 //
 // Load AFTER endgame-maps.js (vendor needs _egGenerateMapDrop) and AFTER
@@ -51,14 +52,14 @@ export const EG_GOLD_BOSS_AMOUNT_MULT = 4;
 //-------------------PERSISTENT BALANCE------------------------------------
 //------------------------------------------------------------------------
 
-export let _egGoldAmount = (typeof STATE !== 'undefined' && globalThis.STATE.egGold) || 0;
+export let _egGoldAmount = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.egGold) || 0;
 
 export function egGetGold() {
     return _egGoldAmount;
 }
 
 export function _egSyncGoldToState() {
-    if (typeof STATE === 'undefined') return;
+    if (typeof globalThis.STATE === 'undefined') return;
     globalThis.STATE.egGold = _egGoldAmount;
     if (typeof save === 'function') save();
 }

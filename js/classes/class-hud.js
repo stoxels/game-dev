@@ -7,6 +7,7 @@ import { _abilityCanAfford, _bloodMagicActive, _getAbilityManaCost, updateClassH
 import { _clsGetLocalizedName } from './class-ui.js';
 import { getSkillCastRankClampedForSlot } from '../skills/skill-charms.js';
 import { renderSkillHotbar } from '../skills/skill-hotbar.js';
+import { STATE } from '../state.js';
 // class-hud.js
 // In-game compact "class HUD" panel: passive/active skill buttons, cooldowns,
 // tooltips, momentum bar, shield pips, and drag positioning.
@@ -72,15 +73,15 @@ export function _getRankWord() {
 // Returns the current level for a base class active skill slot (active1 or active2).
 export function getActiveSkillLevel(key) {
     return key === 'active1'
-        ? (globalThis.STATE.classActive1Level || 1)
-        : (globalThis.STATE.classActive2Level || 1);
+        ? (STATE.classActive1Level || 1)
+        : (STATE.classActive2Level || 1);
 }
 
 // Returns the current level for an ascendency skill slot (active1 or active2 within the ascendency).
 export function _getAscendencySkillLevel(ascSlot) {
     return ascSlot === 'active1'
-        ? (globalThis.STATE.ascendencySkill1Level || 1)
-        : (globalThis.STATE.ascendencySkill2Level || 1);
+        ? (STATE.ascendencySkill1Level || 1)
+        : (STATE.ascendencySkill2Level || 1);
 }
 
 
@@ -230,7 +231,7 @@ export function hideHUDTooltip() {
 // Global event handlers called from inline HTML attributes on HUD buttons.
 // These need to be globals because buildClassHUD rebuilds innerHTML each time.
 export function handleHUDTip(e, key) {
-    const def = CLASS_DEFS[globalThis.STATE.playerClass];
+    const def = CLASS_DEFS[STATE.playerClass];
     if (!def) return;
     // Heartbloom (active5) uses its own tooltip builder
     if (key === 'active5') {
@@ -259,7 +260,7 @@ export function handleHUDTipMove(e) {
 
 // Builds the tooltip HTML for the passive skill icon on the compact HUD.
 export function _buildPassiveTooltipHTML(def) {
-    const passLv = globalThis.STATE.classPassiveLevel || 1;
+    const passLv = STATE.classPassiveLevel || 1;
     const passData = def.passive.levels[passLv - 1];
     return `<strong style="color:${HUD_COLOR_PASSIVE}">${getLocalName(def.passive)}</strong>`
         + ` <span style="opacity:.6;font-size:.85em">- ${_getRankWord()} ${passLv}</span>`
@@ -305,8 +306,8 @@ export function buildSkillTooltip(def, key) {
 
 // Builds the tooltip HTML for ascendency skill buttons (active3 / active4 HUD slots).
 export function buildAscendencySkillTooltip(hudSlot) {
-    if (!globalThis.STATE.playerAscendency) return '';
-    const asc = ASCENDENCY_DEFS[globalThis.STATE.playerAscendency];
+    if (!STATE.playerAscendency) return '';
+    const asc = ASCENDENCY_DEFS[STATE.playerAscendency];
     if (!asc) return '';
 
     const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
@@ -352,7 +353,7 @@ export function buildHeartbloomTooltip() {
 export function _getSkillBtnState(hudSlot, accentColor) {
     const cdRemaining = (cooldownState[hudSlot] && cooldownState[hudSlot].remaining) || 0;
     const isOnCD = cdRemaining > 0;
-    const isArmed = globalThis.activeAbilityMode && globalThis.STATE.classActiveChoice === hudSlot;
+    const isArmed = globalThis.activeAbilityMode && STATE.classActiveChoice === hudSlot;
 
     // Unaffordable abilities are disabled until the pool refills.
     const canAfford = (typeof _abilityCanAfford === 'function') ? _abilityCanAfford(hudSlot) : true;
@@ -408,7 +409,7 @@ export function _buildSkillBtnHTML(hudSlot, displayIdx, accentColor, extraClasse
 
 // Returns true if the "press 1/2" hint arrows should still render.
 export function _shouldShowActivationHint() {
-    return (globalThis.STATE.classHudHintUses || 0) < CLASS_HUD_HINT_MAX_USES;
+    return (STATE.classHudHintUses || 0) < CLASS_HUD_HINT_MAX_USES;
 }
 
 // Builds the bouncing yellow arrow + key label shown near HUD slot 1/2.
@@ -464,8 +465,8 @@ export function renderHeartbloomBtn() {
 // Renders the separator icon + two ascendency skill buttons.
 // Returns an empty string when no ascendency is active.
 export function renderAscendencyButtons() {
-    if (!globalThis.STATE.playerAscendency) return '';
-    const asc = ASCENDENCY_DEFS[globalThis.STATE.playerAscendency];
+    if (!STATE.playerAscendency) return '';
+    const asc = ASCENDENCY_DEFS[STATE.playerAscendency];
     if (!asc) return '';
 
     return `
@@ -580,13 +581,13 @@ export function updateMomentumBar(streak, threshold) {
 // Builds the drag-handle row: grip icon, class icon (passive tooltip),
 // active skill buttons, optional ascendency buttons, and optional shield pips.
 export function renderCompactHUD(def) {
-    const isMage = globalThis.STATE.playerClass === 'mathmagician';
+    const isMage = STATE.playerClass === 'mathmagician';
     const stacks = isMage ? (window._classFreeMistakes || 0) : 0;
     const shieldAttr = isMage ? `data-shield-stacks="${stacks}"` : '';
     const shieldPips = isMage && stacks > 0 ? _renderShieldPips(stacks) : '';
 
     // The momentum bar row is injected only for the Statistician
-    const momentumBar = globalThis.STATE.playerClass === 'statistician'
+    const momentumBar = STATE.playerClass === 'statistician'
         ? '<div id="chud-momentum-bar-wrap"><div id="chud-momentum-bar"></div><span id="chud-momentum-count"></span></div>'
         : '';
 
@@ -623,7 +624,7 @@ export function renderCompactHUD(def) {
 // Updates the shield stack attribute on the HUD panel element so CSS can
 // layer the correct visual treatment.
 export function _updatePanelShieldAttribute(panel) {
-    if (globalThis.STATE.playerClass === 'mathmagician') {
+    if (STATE.playerClass === 'mathmagician') {
         panel.setAttribute('data-shield-stacks', window._classFreeMistakes || 0);
     } else {
         panel.removeAttribute('data-shield-stacks');
@@ -649,7 +650,7 @@ export function buildClassHUD() {
         return;
     }
 
-    if (!globalThis.STATE.playerClass || globalThis.isClassless()) {
+    if (!STATE.playerClass || globalThis.isClassless()) {
         panel.innerHTML = '';
         panel.style.display = 'none';
         // No class panel, but the skill hotbar / mana bar live on their own:
@@ -661,12 +662,12 @@ export function buildClassHUD() {
         return;
     }
 
-    const def = CLASS_DEFS[globalThis.STATE.playerClass];
+    const def = CLASS_DEFS[STATE.playerClass];
     if (!def) return;
 
     // Ensure classActiveChoice is a valid slot key, not a legacy number
-    if (!globalThis.STATE.classActiveChoice || typeof globalThis.STATE.classActiveChoice === 'number') {
-        globalThis.STATE.classActiveChoice = 'active1';
+    if (!STATE.classActiveChoice || typeof STATE.classActiveChoice === 'number') {
+        STATE.classActiveChoice = 'active1';
     }
 
     panel.style.display = 'flex';

@@ -7,6 +7,7 @@ import { EG_SLOT_MOD_TABLE_MAP } from './loot-equipment-generator.js';
 import { EG_INV_COLS, _egInventory, egSaveHubState } from '../endgame/endgame-hub.js';
 import { EG_SHARD_DEFS, _egRollShardForItem, egAddShard } from './loot-shards.js';
 import { _egIsActive } from '../combat/combat-state.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME LOOT FILTER----------------------------------
@@ -90,7 +91,7 @@ export function _eglfNormaliseState(raw) {
 }
 
 export function _egLoadLootFilter() {
-    if (typeof STATE !== 'undefined' && globalThis.STATE.egLootFilter) {
+    if (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.egLootFilter) {
         _egLootFilter = _eglfNormaliseState(globalThis.STATE.egLootFilter);
     } else {
         _egLootFilter = _eglfDefaultState();
@@ -100,7 +101,7 @@ export function _egLoadLootFilter() {
 
 export function _egSaveLootFilter() {
     if (typeof STATE !== 'undefined') {
-        globalThis.STATE.egLootFilter = JSON.parse(JSON.stringify(_egLootFilter));
+        STATE.egLootFilter = JSON.parse(JSON.stringify(_egLootFilter));
         if (typeof save === 'function') try { save(); } catch (e) {}
     }
     if (typeof egSaveHubState === 'function') try { egSaveHubState(); } catch (e) {}

@@ -40,6 +40,7 @@ import { save } from './state.js';
 import { _applyLowHealthVignette, _resetLowTimeWarningState, startTimer, stopTimer, updTimer } from './timer/timer.js';
 import { addTimeSecs } from './timer/timer-adjust.js';
 import { t } from './translation/translations.js';
+import { STATE } from './state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 10: live globalThis accessors for externally-mutated names.
@@ -83,7 +84,7 @@ export const WORLD_BACKGROUNDS = {
 export function _initLevelData(gi) {
     globalThis.cur = ALL[gi];
 
-    if (globalThis.STATE.done.includes(gi)) {
+    if (STATE.done.includes(gi)) {
         trackAchStat('levelsReplayed');
     }
 }
@@ -383,7 +384,7 @@ export function _setMistakeCounterText(suffix = '') {
 export function _updateHUD() {
     document.getElementById('top-id').textContent = `${t('lvl_prefix')} ${globalThis.cur.world}-${globalThis.cur.li}`;
     document.getElementById('top-hint').textContent = lvText(globalThis.cur, 'hint');
-    document.getElementById('sc-disp').textContent = globalThis.STATE.totalScore;
+    document.getElementById('sc-disp').textContent = STATE.totalScore;
     document.getElementById('pen-info').textContent = '';
 
     _setMistakeCounterText();
@@ -473,8 +474,8 @@ export function _navigateToGameScreen() {
 // (via _doStartLevel called from _egTransitionToChainPuzzle), so a
 // mid-map Primer use correctly fires on the next chain puzzle.
 export function _checkPrimerPending() {
-    if (!globalThis.STATE.primerPending) return;
-    globalThis.STATE.primerPending = false;
+    if (!STATE.primerPending) return;
+    STATE.primerPending = false;
     save();
     // Defer primer modal until after class/PassiveTracker HUD is built so
     // the board dimensions are stable for flare animations (already the
@@ -595,11 +596,11 @@ export function _doStartLevel(gi) {
     // Remind the player about unspent Convergence Points (delayed so it
     // appears after the toast queue reset and screen transition). {key} is
     // the player's CURRENT Probability Tree binding (K by default).
-    if ((globalThis.STATE.passiveTreePoints || 0) > 0 && typeof showToast === 'function') {
+    if ((STATE.passiveTreePoints || 0) > 0 && typeof showToast === 'function') {
         const treeKey = (typeof keybindDisplayLabel === 'function' && typeof keybindKeyFor === 'function')
             ? keybindDisplayLabel(keybindKeyFor('passive-tree')) : 'K';
         setTimeout(() => {
-            showToast(`🌿 ${t('toast_unspent_convergence').replace('{n}', globalThis.STATE.passiveTreePoints).replace('{key}', treeKey)}`);
+            showToast(`🌿 ${t('toast_unspent_convergence').replace('{n}', STATE.passiveTreePoints).replace('{key}', treeKey)}`);
         }, 900);
     }
 

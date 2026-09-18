@@ -20,6 +20,7 @@ import { EG_SLOT_ICONS } from './equipment-slot-icons.js';
 import { egSaveHubState } from '../endgame/hub-save.js';
 import { EG_UNIQUE_DROP_CHANCE, EG_UNIQUE_ITEMS, EG_UNIQUE_ZERO_AUTOMARK_DE, EG_UNIQUE_ZERO_AUTOMARK_EN } from './unique-item-data.js';
 import { _egEquipped, _egInventory } from '../endgame/hub-stash.js';
+import { STATE } from '../state.js';
 
 
 
@@ -478,13 +479,13 @@ function _egBootHealExistingUniqueStash() {
             }
         };
         // Heal STATE (persisted) and live _egInventory/_egEquipped if already initialized
-        if (typeof STATE !== 'undefined' && globalThis.STATE) {
-            if (Array.isArray(globalThis.STATE.egInventory)) healGridState(globalThis.STATE.egInventory);
-            if (globalThis.STATE.egEquipped && typeof globalThis.STATE.egEquipped === 'object') {
-                for (const it of Object.values(globalThis.STATE.egEquipped)) if (it && it.isUnique && _egHealUniqueItem(it)) changed = true;
+        if (typeof STATE !== 'undefined' && STATE) {
+            if (Array.isArray(STATE.egInventory)) healGridState(STATE.egInventory);
+            if (STATE.egEquipped && typeof STATE.egEquipped === 'object') {
+                for (const it of Object.values(STATE.egEquipped)) if (it && it.isUnique && _egHealUniqueItem(it)) changed = true;
             }
-            if (globalThis.STATE.egMapSlotItem && globalThis.STATE.egMapSlotItem.isUnique && _egHealUniqueItem(globalThis.STATE.egMapSlotItem)) changed = true;
-            if (globalThis.STATE.egCraftingBenchItem && globalThis.STATE.egCraftingBenchItem.isUnique && _egHealUniqueItem(globalThis.STATE.egCraftingBenchItem)) changed = true;
+            if (STATE.egMapSlotItem && STATE.egMapSlotItem.isUnique && _egHealUniqueItem(STATE.egMapSlotItem)) changed = true;
+            if (STATE.egCraftingBenchItem && STATE.egCraftingBenchItem.isUnique && _egHealUniqueItem(STATE.egCraftingBenchItem)) changed = true;
         }
         if (typeof _egInventory !== 'undefined' && Array.isArray(_egInventory)) healGridState(_egInventory);
         if (typeof _egEquipped !== 'undefined' && _egEquipped && typeof _egEquipped === 'object') {

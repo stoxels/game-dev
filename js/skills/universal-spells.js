@@ -8,6 +8,7 @@ import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './sk
 import { SKILL_REGISTRY } from './skill-registry.js';
 import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspBlinkFX, _uspFireThemedProjectile, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph } from './universal-spell-fx.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
+import { STATE } from '../state.js';
 
 // universal-spells.js
 //------------------------------------------------------------------------
@@ -1752,8 +1753,8 @@ export function _uspMovementGroupTitle() {
 
 export function getUniversalSpellUnlockList() {
     try {
-        if (typeof globalThis.STATE !== 'undefined' && Array.isArray(globalThis.STATE.universalSpellsUnlocked)) {
-            return globalThis.STATE.universalSpellsUnlocked;
+        if (typeof STATE !== 'undefined' && Array.isArray(STATE.universalSpellsUnlocked)) {
+            return STATE.universalSpellsUnlocked;
         }
     } catch (e) { /* no gating configured */ }
     return null; // null = all unlocked
@@ -1767,11 +1768,11 @@ export function isUniversalSpellUnlocked(spellId) {
 
 // Unlock one spell (persists via save()).
 export function unlockUniversalSpell(spellId) {
-    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return false;
+    if (typeof STATE === 'undefined' || !STATE) return false;
     if (!UNIVERSAL_SPELL_MAP[spellId]) return false;
-    if (!Array.isArray(globalThis.STATE.universalSpellsUnlocked)) globalThis.STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
-    if (globalThis.STATE.universalSpellsUnlocked.indexOf(spellId) === -1) {
-        globalThis.STATE.universalSpellsUnlocked.push(spellId);
+    if (!Array.isArray(STATE.universalSpellsUnlocked)) STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
+    if (STATE.universalSpellsUnlocked.indexOf(spellId) === -1) {
+        STATE.universalSpellsUnlocked.push(spellId);
         if (typeof save === 'function') save();
         if (typeof refreshSkillUI === 'function') refreshSkillUI();
     }
@@ -1780,11 +1781,11 @@ export function unlockUniversalSpell(spellId) {
 
 // (Re-)lock one spell - used by the future gating system / testing.
 export function lockUniversalSpell(spellId) {
-    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return false;
-    if (!Array.isArray(globalThis.STATE.universalSpellsUnlocked)) globalThis.STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
-    const i = globalThis.STATE.universalSpellsUnlocked.indexOf(spellId);
+    if (typeof STATE === 'undefined' || !STATE) return false;
+    if (!Array.isArray(STATE.universalSpellsUnlocked)) STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
+    const i = STATE.universalSpellsUnlocked.indexOf(spellId);
     if (i !== -1) {
-        globalThis.STATE.universalSpellsUnlocked.splice(i, 1);
+        STATE.universalSpellsUnlocked.splice(i, 1);
         if (typeof save === 'function') save();
         if (typeof refreshSkillUI === 'function') refreshSkillUI();
     }

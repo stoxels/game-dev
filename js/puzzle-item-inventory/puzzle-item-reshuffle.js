@@ -5,6 +5,7 @@ import { buildInventoryPanel } from './puzzle-item-inventory-panel.js';
 import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { itemDesc, itemName, pickLuckyItem, rarityColors } from '../puzzle-items/item-pool.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE---------------------------
@@ -47,10 +48,10 @@ export function updateReshuffleCounter() {
 // Removes the item with the given uid from inventory.
 // Returns the item definition, or null if the uid was not found.
 export function removeItemFromInventory(uid) {
-    const idx = globalThis.STATE.inventory.findIndex(i => i.uid === uid);
+    const idx = STATE.inventory.findIndex(i => i.uid === uid);
     if (idx < 0) return null;
-    const def = ITEM_DEFS[globalThis.STATE.inventory[idx].defId];
-    globalThis.STATE.inventory.splice(idx, 1);
+    const def = ITEM_DEFS[STATE.inventory[idx].defId];
+    STATE.inventory.splice(idx, 1);
     return def;
 }
 
@@ -124,7 +125,7 @@ export function buildReshuffleModalElement(picks) {
 export function applyReshuffleChoice(chosenId, modal) {
     const chosenDef = ITEM_DEFS[chosenId];
 
-    globalThis.STATE.inventory.push({
+    STATE.inventory.push({
         uid: `item_${Date.now()}_${Math.random().toString(36).slice(2)}`,
         defId: chosenId
     });

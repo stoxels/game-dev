@@ -1,6 +1,7 @@
 import { save } from '../state.js';
 import { LANG } from '../translation/translations.js';
 import { WORLDS } from './level-world-data.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------TRANSLATION HELPER----------------------------------
@@ -115,14 +116,14 @@ export function getNexusPointGi() {
 // Returns true if the player has finished ALL campaign worlds before the
 // Nexus World (every level in worlds 1..13). This gates access to World 14.
 export function isNexusWorldUnlocked() {
-    if (typeof STATE === 'undefined' || !globalThis.STATE || !globalThis.STATE.done) return false;
+    if (typeof STATE === 'undefined' || !STATE || !STATE.done) return false;
     if (typeof WORLDS === 'undefined' || typeof WORLD_START_GI === 'undefined') return false;
     for (let wi = 0; wi < NEXUS_WORLD_INDEX; wi++) {
         const w = WORLDS[wi];
         if (!w) continue;
         const start = WORLD_START_GI[wi];
         for (let li = 0; li < w.data.length; li++) {
-            if (!globalThis.STATE.done.includes(start + li)) return false;
+            if (!STATE.done.includes(start + li)) return false;
         }
     }
     return true;
@@ -131,17 +132,17 @@ export function isNexusWorldUnlocked() {
 // Returns true if the player has unlocked the Nexus (completed the Nexus
 // Point at least once, or carries the persistent flag).
 export function isNexusUnlocked() {
-    if (typeof STATE !== 'undefined' && globalThis.STATE && globalThis.STATE.nexusUnlocked) return true;
-    if (typeof STATE === 'undefined' || !globalThis.STATE || !globalThis.STATE.done) return false;
+    if (typeof STATE !== 'undefined' && STATE && STATE.nexusUnlocked) return true;
+    if (typeof STATE === 'undefined' || !STATE || !STATE.done) return false;
     const gi = getNexusPointGi();
-    return gi >= 0 && globalThis.STATE.done.includes(gi);
+    return gi >= 0 && STATE.done.includes(gi);
 }
 
 // Persists the Nexus unlock flag. Called on first clear of the Nexus Point.
 export function setNexusUnlocked() {
-    if (typeof STATE === 'undefined' || !globalThis.STATE) return;
-    if (!globalThis.STATE.nexusUnlocked) {
-        globalThis.STATE.nexusUnlocked = true;
+    if (typeof STATE === 'undefined' || !STATE) return;
+    if (!STATE.nexusUnlocked) {
+        STATE.nexusUnlocked = true;
         if (typeof save === 'function') save();
     }
 }

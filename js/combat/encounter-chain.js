@@ -29,6 +29,7 @@ import { showEndgameNexus } from '../endgame/endgame-nexus.js';
 import { _egCreateGeneratedLevel } from './combat-puzzle-generator.js';
 import { _egConsumePendingQuizRewardHTML, _egResetQuizDamageBuff } from '../endgame/endgame-quiz-buffs.js';
 import { _egCurrencyDrops, _egIsActive, _egIsCampaignRun, _egItemDrops, _egLootDrops, _egPickups } from './combat-state.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 7: live globalThis accessors for externally-mutated state.
@@ -521,7 +522,7 @@ export function _egTransitionToChainPuzzle(nextGi, isBossArena) {
             // Note: applyClassPassiveOnLevelStart resets class level state;
             // calling it a second time would wipe the just-applied shield.
             // Only re-apply the probabilist branch which is safe to repeat.
-            if (globalThis.STATE.playerClass === 'probabilist' && typeof _applyProbabilistPassive === 'function') {
+            if (STATE.playerClass === 'probabilist' && typeof _applyProbabilistPassive === 'function') {
                 const eff = (typeof _getPassiveEffect === 'function') ? _getPassiveEffect() : { autoMarkCount: 0 };
                 if (eff && eff.autoMarkCount) _applyProbabilistPassive(eff);
             }

@@ -1,5 +1,6 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
+import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS & STATE---------------------------
@@ -23,7 +24,7 @@ export const activeToasts = []; // { msg, el, removing, timeoutId }
 // Returns true if the player is currently holding at least one item of every rarity tier
 export function _hasAllRarityTiers() {
     const raritiesPresent = new Set(
-        globalThis.STATE.inventory
+        STATE.inventory
             .map(item => ITEM_DEFS[item.defId]?.rarity)
             .filter(Boolean)
     );
@@ -34,7 +35,7 @@ export function _hasAllRarityTiers() {
 // Only fires once per level, guarded by _maxInventoryTrackedThisLevel
 export function _checkHoarderAchievement() {
     if (window._maxInventoryTrackedThisLevel) return;
-    if (globalThis.STATE.inventory.length < HOARDER_THRESHOLD) return;
+    if (STATE.inventory.length < HOARDER_THRESHOLD) return;
 
     window._maxInventoryTrackedThisLevel = true;
     trackAchStat('maxInventoryReached');
