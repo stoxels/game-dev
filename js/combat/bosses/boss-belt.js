@@ -4,16 +4,12 @@ import { _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop,
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BELT (boss_belt)---------------------------------
 //------------------------------------------------------------------------
-// Asteroid-belt homage: three great rocks tumble through the arena - and
-// every few seconds each one splits into two fast shards. Kill the clock,
-// not the rocks: everything fades, but not before it multiplies.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Asteroid-belt homage: three great rocks tumble through the arena, each
+// splitting into two fast shards. Kill the clock, not the rocks:
+// everything fades, but not before it multiplies.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (fated_cell) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Slow bouncing rocks that each split into two fast shards mid-flight.
+// Dodge the big ones early; the shards fade on their own soon after.
 export function _egMechSplitterRocks(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
