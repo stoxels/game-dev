@@ -61,8 +61,24 @@ export function _useShadowSeal(id, def) {
 //-------------------ITEM VISUAL EFFECT-----------------------------------
 //------------------------------------------------------------------------
 
+// Injects the veil keyframes used by _fxMakeShadowVeil (once).
+function _ensureShadowVeilStyles() {
+    if (document.getElementById('fx-shadow-seal-style')) return;
+    const style = document.createElement('style');
+    style.id = 'fx-shadow-seal-style';
+    style.textContent = `
+        @keyframes fx-shadow-seal-veil {
+            0%   { background: rgba(0,0,0,0);    }
+            60%  { background: rgba(0,0,0,0.55); }
+            100% { background: rgba(0,0,0,0);    }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 // Helper: creates the dark void veil that briefly obscures the grid.
 export function _fxMakeShadowVeil(container, r) {
+    _ensureShadowVeilStyles();
     const veil = document.createElement('div');
     veil.style.cssText = `
         position:absolute;

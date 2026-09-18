@@ -23,15 +23,11 @@ export const CELL_FX_DURATION = {
 // A unified lingering animation applied directly to grid cells
 // touched by an item effect - independent of the overlay system.
 //
-// Types:
-//   'reveal'   - green pulse  (tile revealed / row-col solved)
-//   'mark'     - orange pulse (empty tile marked ✕ by item)
-//   'erase'    - red pulse    (filled tile wiped by cursed item)
-//   'artifact' - gold burst   (artifact / primer headstart)
-//   'unmark'   - yellow fade  (✕ marks cleared by cursedReveal)
+// Types: 'reveal' (green pulse), 'mark' (orange pulse for placed ✕),
+// 'erase' (red pulse for wiped filled tile), 'artifact' (gold burst),
+// 'unmark' (yellow fade for cleared ✕ marks).
 //
-// Usage:
-//   _applyCellEffect(['g-3-2', 'g-3-5'], 'reveal');
+// Usage: _applyCellEffect(['g-3-2', 'g-3-5'], 'reveal');
 
 // Injects all cell-effect keyframes + classes into <head> once.
 // Guards with a sentinel style tag so it never runs twice.
@@ -111,12 +107,6 @@ export function _ensureCellEffectCSS() {
     }
     .cell-fx-unmark::before {
         animation: cellUnmarkPulse 1.4s ease-out forwards;
-    }
-
-    @keyframes fx-shadow-seal-veil {
-        0%   { background: rgba(0,0,0,0);    }
-        60%  { background: rgba(0,0,0,0.55); }
-        100% { background: rgba(0,0,0,0);    }
     }
 `;
     document.head.appendChild(style);
