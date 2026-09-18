@@ -5,44 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE CREEPER (boss_creeper)---------------------
 //------------------------------------------------------------------------
-// REWORK - green-thing homage. The boss is a nest mother: it sics packs of
-// stalking creepers on you, chains primed TNT under your feet and, at the
-// very end, swells up and mega-detonates itself.
-//
-//   Phase 1 (100–60%) - CREEPER PACK. 2–3 creepers scuttle in from the
-//                       edges and stalk you: their fuse HEATS while you are
-//                       close (white flash + swelling body) and COOLS while
-//                       you keep your distance. Fuse ≥ 1 = detonation.
-//                       Plus FUSE POUNCE: a creeper drops onto your current
-//                       position, hisses briefly, and blows.
-//   Phase 2 ( ≤60%)   - TNT CHAIN. A cluster of primed TNT blocks rains
-//                       down around you, flashes faster and faster, then
-//                       detonates in a rolling chain reaction outward from
-//                       the centre block. Leave the cluster entirely!
-//   Phase 3 ( ≤30%)   - bigger packs (one CHARGED creeper with a blue aura,
-//                       faster heat, bigger boom), double pounces, double
-//                       TNT clusters.
-//   Finale ( ≤10%)    - SSSS… BOOM (one-shot set-piece, Bomb-Maze style):
-//                       the boss goes immune and shields, a 3…2…1 fuse
-//                       counts down while a huge red blast ring telegraph
-//                       grows around it, then it mega-detonates (huge
-//                       radius + screen flash + lingering crater). Be
-//                       outside the ring! Charge bar frozen for the whole
-//                       set-piece (gate in _egTickPlayer).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/fuses are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Green nest-mother siege: stalking creeper packs whose fuses heat while you
+// are close and cool while you keep distance, TNT chains raining at 60%, and
+// at ≤10% the SSSS…BOOM finale - the boss goes immune, counts 3…2…1, then
+// mega-detonates. Be outside the ring.
 //------------------------------------------------------------------------
 
 export const _EG_CRP_DEBUG_SLOW = false;
