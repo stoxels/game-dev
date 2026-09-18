@@ -11,7 +11,7 @@ import { updateQuestStats } from '../../quests/quests-stats.js';
 // Must be called once at the very top of every cursed item handler,
 // before any downside logic runs.
 export function _trackWitchImmuneCursedUse() {
-    if (window.STOX_FLAGS.cursedImmune) {
+    if (window.LEVEL_FLAGS.cursedImmune) {
         updateQuestStats('cursedUnderImmunityUsed', {});
     }
 }

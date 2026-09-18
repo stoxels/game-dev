@@ -66,7 +66,7 @@ export function _calcAddTimeSecs(baseSecs) {
     if (ptHasSkill('extended_hour_3')) multiplier += 0.10;
 
     // Keystone: Golden Clock - timer items are 100% more effective while active
-    if (window.STOX_FLAGS.goldenClockActive) multiplier += 1.0;
+    if (window.LEVEL_FLAGS.goldenClockActive) multiplier += 1.0;
 
     // Keystone: Iron Doctrine - 300% effectiveness
     if (ptHasSkill('keystone_iron_doctrine')) multiplier += 3.0;

@@ -576,8 +576,8 @@ export function _avatarMoveUiBlocked() {
     if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) return true;
     // Dev-testing harness (js/dev-testing.js) explicitly freezes the avatar
     // for scripted movement tests; never set in normal play.
-    if (typeof window !== 'undefined' && window.STOX_FLAGS && window.STOX_FLAGS.devTestActive
-        && window.STOX_FLAGS.devTestFreezeAvatar) return true;
+    if (typeof window !== 'undefined' && window.LEVEL_FLAGS && window.LEVEL_FLAGS.devTestActive
+        && window.LEVEL_FLAGS.devTestFreezeAvatar) return true;
     if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) return true;
     if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('frozen')) return true;
     return false;

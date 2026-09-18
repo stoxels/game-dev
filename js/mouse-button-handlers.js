@@ -396,7 +396,7 @@ export function openConfidenceIntervalGraceWindow() {
 // Golden Clock: decrement its mistake budget and trigger game-over if exhausted.
 // Returns true if the clock fired a game-over (caller should return).
 export function checkGoldenClockAfterMistake() {
-    if (!window.STOX_FLAGS.goldenClockActive) return false;
+    if (!window.LEVEL_FLAGS.goldenClockActive) return false;
 
     window._goldenClockMistakesLeft = (window._goldenClockMistakesLeft || 0) - 1;
 
@@ -409,7 +409,7 @@ export function checkGoldenClockAfterMistake() {
     }
 
     if (window._goldenClockMistakesLeft <= 0) {
-        window.STOX_FLAGS.goldenClockActive = false;
+        window.LEVEL_FLAGS.goldenClockActive = false;
         globalThis.dead = true;
         stopTimer();
         window._lastFailedGi = globalThis.cur.gIdx;

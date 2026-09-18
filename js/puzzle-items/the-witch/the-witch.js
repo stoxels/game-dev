@@ -14,12 +14,12 @@ import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 export function _useTheWitch(id, def) {
     subtractTimeSecs(600);
 
-    window.STOX_FLAGS.cursedImmune = true;
+    window.LEVEL_FLAGS.cursedImmune = true;
     playItemEffect(id);
     showToast(`🧙 ${t('itm_witch_immunity')}`);
 
     setTimeout(() => {
-        window.STOX_FLAGS.cursedImmune = false;
+        window.LEVEL_FLAGS.cursedImmune = false;
         showToast(`🧙 ${t('itm_witch_faded')}`);
     }, 60000);
 

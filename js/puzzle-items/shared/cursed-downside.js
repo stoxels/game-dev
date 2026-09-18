@@ -18,7 +18,7 @@ import { unsolveColsExcluding, unsolveRowsExcluding } from '../../puzzle-mechani
 // Returns 0 when the downside should be fully suppressed.
 export function _cursedDownsideDuration(baseMs) {
     // Full immunity from The Witch or Cursed Ward
-    if (window.STOX_FLAGS.cursedImmune) {
+    if (window.LEVEL_FLAGS.cursedImmune) {
         questStat_curseBlocked();
         return 0;
     }
@@ -31,8 +31,8 @@ export function _cursedDownsideDuration(baseMs) {
 
     // Veil of Purity keystone: first use is immune; subsequent uses amplify
     if (ptHasSkill('keystone_veil_of_purity')) {
-        if (!window.STOX_FLAGS.veiledCursedUsed) {
-            window.STOX_FLAGS.veiledCursedUsed = true;
+        if (!window.LEVEL_FLAGS.veiledCursedUsed) {
+            window.LEVEL_FLAGS.veiledCursedUsed = true;
             showToast(t('itm_veil_prevented'));
             questStat_curseBlocked();
             return 0;
@@ -55,7 +55,7 @@ export function _cursedDownsideDuration(baseMs) {
 // erased), applying the same immunity and reduction checks as duration.
 export function _cursedDownsideCount(baseCount) {
     // Full immunity from The Witch or Cursed Ward
-    if (window.STOX_FLAGS.cursedImmune) {
+    if (window.LEVEL_FLAGS.cursedImmune) {
         questStat_curseBlocked();
         return 0;
     }
@@ -70,7 +70,7 @@ export function _cursedDownsideCount(baseCount) {
     // Note: the flag is set inside _cursedDownsideDuration, so we only need
     // to read it here without toggling it a second time.
     if (ptHasSkill('keystone_veil_of_purity')) {
-        if (!window.STOX_FLAGS.veiledCursedUsed) {
+        if (!window.LEVEL_FLAGS.veiledCursedUsed) {
             // First use immunity - toast / flag handled by the duration call
             questStat_curseBlocked();
             return 0;

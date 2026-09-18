@@ -134,7 +134,7 @@ export function _resetGameplayFlags() {
     globalThis._confidenceIntervalActive = false;
     globalThis._streakBonusFills = 0;
 
-    window.STOX_FLAGS.veiledCursedUsed = false;
+    window.LEVEL_FLAGS.veiledCursedUsed = false;
     window._asymptoticLinesCompleted = 0;
     window._stochasticLastFired = false;
     window._deadReckoningActive = false;

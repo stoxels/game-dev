@@ -203,12 +203,12 @@ export const DevTest = {
     // blocked, automation like knockback glides still render); the frozen
     // position is sampled through _avatarMoveTick's own accumulator. Pass
     // false (or nothing) to release. Only meaningful while the harness is
-    // active (STOX_FLAGS.devTestActive).
+    // active (LEVEL_FLAGS.devTestActive).
     freezeAvatar(freeze = true) {
         if (typeof window === 'undefined') return;
-        window.STOX_FLAGS = window.STOX_FLAGS || {};
-        window.STOX_FLAGS.devTestFreezeAvatar = !!freeze;
-        return window.STOX_FLAGS.devTestFreezeAvatar;
+        window.LEVEL_FLAGS = window.LEVEL_FLAGS || {};
+        window.LEVEL_FLAGS.devTestFreezeAvatar = !!freeze;
+        return window.LEVEL_FLAGS.devTestFreezeAvatar;
     },
 
     // Dispatch a real WASD key event (keyboard-event-equivalent) against the
@@ -262,9 +262,9 @@ window.DevTest = DevTest;
     const mode = _devTestParam('devtest', null);
     if (!mode) return; // normal player boot - harness stays inert
     // Register the session in the game's owned flag namespace (see state.js).
-    // _resetStoxFlags() deliberately preserves this entry across levels.
-    window.STOX_FLAGS = window.STOX_FLAGS || {};
-    window.STOX_FLAGS.devTestActive = true;
+    // _resetLevelFlags() deliberately preserves this entry across levels.
+    window.LEVEL_FLAGS = window.LEVEL_FLAGS || {};
+    window.LEVEL_FLAGS.devTestActive = true;
 
     const SCREENS = { title: 'title', setup: 'setup', mapview: 'mapview', map: 'mapview', world: 'world', game: 'game', level: 'game' };
     const spec = {

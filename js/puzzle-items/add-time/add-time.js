@@ -30,7 +30,7 @@ export function _useAddTime(id, def) {
     }
 
     const secs = _calcAddTimeSecs(parseAddTimeId(id));
-    return ptHasSkill('keystone_countdown_crisis') && !window.STOX_FLAGS.goldenClockActive
+    return ptHasSkill('keystone_countdown_crisis') && !window.LEVEL_FLAGS.goldenClockActive
         ? applyCountdownCrisis(id, def, secs)
         : applyAddTime(id, def, secs);
 }

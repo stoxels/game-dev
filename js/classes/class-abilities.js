@@ -3,7 +3,7 @@ import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js
 import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
 import { isEndgameLevel } from '../mouse-button-handlers.js';
-import { _resetStoxFlags, save } from '../state.js';
+import { _resetLevelFlags, save } from '../state.js';
 import { addTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from './ascendency-defs.js';
@@ -814,8 +814,8 @@ export function _resetClassLevelState() {
     window._chronoFractureActive = false;
     window._shieldExtraCharges = 0;
     // cursedImmune / goldenClockActive / veiledCursedUsed now live in
-    // window.STOX_FLAGS (state.js) - reset them all in one call.
-    _resetStoxFlags();
+    // window.LEVEL_FLAGS (state.js) - reset them all in one call.
+    _resetLevelFlags();
     window._bayesTrapsState = null;
     window._typeIShieldedCells = new Set();
     window._typeIBonusReveal = false;

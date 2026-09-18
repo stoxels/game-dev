@@ -44,22 +44,22 @@ try { Object.defineProperty(globalThis, 'wrongGrid', { get() { return wrongGrid;
 
 // --- Ad-hoc gameplay flags (namespaced 2026-09-10, Pass 4) ---
 // These used to be loose window._* globals written from 12 files with no
-// single owner. Now they live in one namespace; _resetStoxFlags() zeroes
+// single owner. Now they live in one namespace; _resetLevelFlags() zeroes
 // them all at level start (called from _resetClassLevelState in
 // class-abilities.js).
-window.STOX_FLAGS = {
+window.LEVEL_FLAGS = {
     cursedImmune: false,      // Cursed Shield / The Witch: item curses do nothing this level
     goldenClockActive: false, // Golden Clock: the timer is frozen
     veiledCursedUsed: false,  // Veil of the Cursed: one-time curse redirection per level
     devTestActive: false,     // js/dev-testing.js harness engaged (never set in normal play)
 };
 
-// Resets every STOX_FLAGS entry - call at level start/end so a flag that
+// Resets every LEVEL_FLAGS entry - call at level start/end so a flag that
 // was left set (e.g. immunity that outlived the level) can never leak.
-export function _resetStoxFlags() {
-    window.STOX_FLAGS.cursedImmune = false;
-    window.STOX_FLAGS.goldenClockActive = false;
-    window.STOX_FLAGS.veiledCursedUsed = false;
+export function _resetLevelFlags() {
+    window.LEVEL_FLAGS.cursedImmune = false;
+    window.LEVEL_FLAGS.goldenClockActive = false;
+    window.LEVEL_FLAGS.veiledCursedUsed = false;
     // devTestActive survives: it describes the session, not the level.
 }
 

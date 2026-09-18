@@ -178,7 +178,7 @@ export function _calcEffectivePenalty(penMult) {
 // keystone_golden_clock: while the Golden Clock is active the timer can no
 // longer decrease, so mistake deductions are skipped entirely.
 export function _applyTimeDeduction(row, col, effectivePen) {
-    if (window.STOX_FLAGS.goldenClockActive) {
+    if (window.LEVEL_FLAGS.goldenClockActive) {
         updTimer();
         return;
     }
