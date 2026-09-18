@@ -6,50 +6,11 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _eg
 //------------------------------------------------------------------------
 //-------------------BOSS: THE OVERFITTER (boss_overfitter)---------------
 //------------------------------------------------------------------------
-// TIER 8 REWORK - "The Model That Learned Too Much". The ML soul, made
-// lethal: the Overfitter does not attack you - it LEARNS you. Every
-// mechanic is your own data turned back against you, and the only way to
-// win is to refuse to be predictable. Element: shadow.
+// The model that learned too much: gradient-descent sweeps with a detonating
+// local minimum all fight, movement-recording PATTERN LOCK and ring-aiming
+// VALIDATION SET at 60% plus fill-stripping PATTERN BREAK; at ≤10% THE FINAL
+// EPOCH re-trains your own position heat-map in three waves.
 //
-//   • GRADIENT DESCENT (signature, all fight) - the training run: bands of
-//     hot gradient STAMP down in sequence, marching across the arena like
-//     steps of a descending loss curve (shadow DoT inside a hot band). At
-//     the end of the sweep the LOCAL MINIMUM locks onto your position and
-//     detonates - the loss surface collapses where you were standing.
-//     Phase 3: a second minimum chases your CURRENT position.
-//   • PATTERN LOCK (60%) - the model RECORDS your movement for ~4s (the
-//     dashed trail is live - you watch yourself being learned), then
-//     REPLAYS it: a spike walks the exact path you walked, detonating an
-//     echo at every recorded sample, and an OVERFIT STRIKE where you
-//     stopped. Beat your own record - take no hit during the replay - and
-//     the model marks you unlearned (+heal). Move unlike yourself.
-//   • VALIDATION SET (60%) - two rings, one test. The model detonates the
-//     ring you are CLOSEST to (it learned to aim); the other dissipates.
-//     Break equidistance and it underfits - nothing detonates at all.
-//   • 📈 THE FINAL EPOCH (≤10%, one-shot finale) - the whole fight was
-//     training data. Your ACTUAL position history (recorded since spawn)
-//     is rendered as a live HEAT-MAP over the arena, then re-trained in
-//     three waves: hot cells detonate, cool cells are safe, and between
-//     waves the map RE-RECORDS - camp anywhere and your own heat betrays
-//     you. New ground is safe ground. Charge bar frozen (gate in
-//     _egTickPlayer via _egOvrFinalActive).
-//
-// Legacy soul kept: PATTERN BREAK still strips your recent fills every
-// ~16s - the puzzle pressure that made the Overfitter hateful lives on.
-// Shared frozen_cells dropped (the kit is full); model_drift and the old
-// overfit_bloom blast are retired - their souls live in PATTERN LOCK and
-// the LOCAL MINIMUM.
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock, so
-// gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics (prior_bomb lives in shared-boss-abilities.js and is
-// referenced by handler-name string where needed).
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Overfitter's timing 2.5x so manual playtests / screenshot
