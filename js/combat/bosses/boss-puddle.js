@@ -6,28 +6,11 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDotTick, _egNkEl, _egNkHit, 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE PUDDLE (boss_puddle)-----------------------------
 //------------------------------------------------------------------------
-// Weather fight - the arena slowly drowns while the sky never stops:
-//   • RAIN: drops fall from the top of the screen for the whole fight and
-//     deal cold damage on impact. A quarter of them drift toward you.
-//   • RISING WATER: at 75% / 50% / 25% boss HP the lower 1/6 / 2/6 / 3/6
-//     of the screen floods. Standing in water ticks cold damage.
-//   • FOUNTAINS: every drop that lands in the water erupts a crown splash
-//     (thin column + wide draping canopy) - 2s of cold spray on contact.
-//   The flood never climbs above the puzzle grid's lower border.
-//   • GATE WAVE (signature): each HP gate, after the flood rises, a curling
-//     wave crest charges at a screen edge (~1.3s telegraph) then sweeps the
-//     whole water surface. Its crest reaches above the waterline into the
-//     grid's lowest rows - one heavy cold hit if it catches you.
-//   • AIR BUBBLES: three glossy bubbles drift around the arena (faster
-//     than they used to wander). A raindrop or fountain jet that touches
-//     one pops it - bubble shrapnel flies off toward the screen sides and
-//     damages the player. A fresh bubble respawns after 40s.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Drowning-weather siege: endless cold rain, water rising in thirds at HP
+// gates with sweeping GATE WAVES, crown-splash fountains, and popping air
+// bubbles - the flood never climbs above the puzzle grid's lower border.
 //
-// Shared mechanics (fated_cell) live in shared-boss-abilities.js and are
+// Shared mechanics (fated_cell) live in shared-puzzle-mechanics.js and are
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
