@@ -1924,8 +1924,8 @@ export function _uspChargeState(spellId, cfg) {
 // like Celerity would zero out short pools) - it uses the authored time.
 export function _uspScheduleRecharge(spellId, cfg) {
     const st = _uspChargeState(spellId, cfg);
-    const scale = (typeof window !== 'undefined' && window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)
-        ? window.STOX_EFFECT_TIME_SCALE : 1;
+    const scale = (typeof window !== 'undefined' && window.DEV_EFFECT_TIME_SCALE > 0 && window.DEV_EFFECT_TIME_SCALE !== 1)
+        ? window.DEV_EFFECT_TIME_SCALE : 1;
     st.pending.push(Math.max(1, Math.round(cfg.recharge * scale)));
     if (st.interval) return;
     st.interval = setInterval(() => {
@@ -2026,8 +2026,8 @@ export function startUniversalSpellCooldown(spellId, secondsOverride) {
         : getUniversalSpellEffectiveCooldown(spellId);
     const prev = _uspCooldowns[spellId];
     if (prev && prev.interval) clearInterval(prev.interval);
-    const scale = (typeof window !== 'undefined' && window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)
-        ? window.STOX_EFFECT_TIME_SCALE : 1;
+    const scale = (typeof window !== 'undefined' && window.DEV_EFFECT_TIME_SCALE > 0 && window.DEV_EFFECT_TIME_SCALE !== 1)
+        ? window.DEV_EFFECT_TIME_SCALE : 1;
     const state = _uspCooldowns[spellId] = {
         remaining: Math.max(1, Math.round(secs * scale)),
         interval: null,

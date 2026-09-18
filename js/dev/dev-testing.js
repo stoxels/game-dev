@@ -44,7 +44,7 @@ import { STATE } from '../state.js';
 //
 // 3) EFFECT TIME SCALE - short effects (ailments, cooldowns, buffs) are
 //    impossible to observe at real speed in a test. Every central duration
-//    site multiplies by window.STOX_EFFECT_TIME_SCALE (default 1 = exact
+//    site multiplies by window.DEV_EFFECT_TIME_SCALE (default 1 = exact
 //    game behaviour):
 //
 //       DevTest.timeScale(10)   or   index.html?...&devscale=10
@@ -72,7 +72,7 @@ export function _devTestParam(name, fallback) {
 // wiring sites (see file header). Kept ≥ 0.01 so a typo can't freeze time
 // silently; 0 means "0.01×" which is still observable. Default 1 = exact
 // shipped behaviour.
-window.STOX_EFFECT_TIME_SCALE = 1;
+window.DEV_EFFECT_TIME_SCALE = 1;
 
 // Normalizes the scale param/console value into a finite number ≥ 0.01.
 export function _devTestNormalizeScale(v) {
@@ -186,17 +186,17 @@ export const DevTest = {
             levelsDone: STATE.done ? STATE.done.length : 0,
             nexusUnlocked: !!STATE.nexusUnlocked,
             activeScreen: document.querySelector('.screen.active')?.id || null,
-            timeScale: window.STOX_EFFECT_TIME_SCALE,
+            timeScale: window.DEV_EFFECT_TIME_SCALE,
         };
     },
 
     // --- Effect time scale -------------------------------------------------
     // >1 = longer effects (default testing), <1 = shorter. 1 = shipped game.
     timeScale(x) {
-        window.STOX_EFFECT_TIME_SCALE = _devTestNormalizeScale(x);
-        const msg = '⏱ Effect time scale = ×' + window.STOX_EFFECT_TIME_SCALE;
+        window.DEV_EFFECT_TIME_SCALE = _devTestNormalizeScale(x);
+        const msg = '⏱ Effect time scale = ×' + window.DEV_EFFECT_TIME_SCALE;
         if (typeof showToast === 'function') showToast(msg); else console.info(msg);
-        return window.STOX_EFFECT_TIME_SCALE;
+        return window.DEV_EFFECT_TIME_SCALE;
     },
 
     // --- Movement control (scripted WASD tests) ------------------------------
@@ -279,7 +279,7 @@ window.DevTest = DevTest;
         skipTutorial: _devTestParam('keeptutorial', '0') !== '1',
     };
     const devscale = _devTestParam('devscale', null);
-    if (devscale !== null) window.STOX_EFFECT_TIME_SCALE = _devTestNormalizeScale(devscale);
+    if (devscale !== null) window.DEV_EFFECT_TIME_SCALE = _devTestNormalizeScale(devscale);
     // Wait for window load: every game script (including ones tagged after
     // this file) has run by then, so all flow functions exist.
     const boot = () => {

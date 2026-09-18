@@ -652,34 +652,34 @@ export function getSlotSummary(slotNum) {
     };
 }
 
-// _stoxAnyItem - true when v (a stash grid / object-of-arrays / item) holds
+// _saveAnyItem - true when v (a stash grid / object-of-arrays / item) holds
 // at least one real item. Used by the save() degraded-state guard so it can
 // tell "player owns nothing endgame" apart from "hub mirrors failed to load".
-export function _stoxAnyItem(v) {
+export function _saveAnyItem(v) {
     if (!v) return false;
     if (Array.isArray(v)) {
         for (const x of v) {
             if (x && typeof x === 'object' && (x.id || x.baseId)) return true;
-            if (Array.isArray(x) && _stoxAnyItem(x)) return true;
+            if (Array.isArray(x) && _saveAnyItem(x)) return true;
         }
         return false;
     }
     if (typeof v === 'object') {
         for (const k in v) {
-            if (Array.isArray(v[k]) && _stoxAnyItem(v[k])) return true;
+            if (Array.isArray(v[k]) && _saveAnyItem(v[k])) return true;
             if (v[k] && typeof v[k] === 'object' && !Array.isArray(v[k]) && (v[k].id || v[k].baseId)) return true;
         }
     }
     return false;
 }
 
-// _stoxHasEndgameProgress - true when the save shows any sign the player
+// _saveHasEndgameProgress - true when the save shows any sign the player
 // ever ENGAGED with the endgame (atlas unlocks, gold, hub metadata, an
 // equipped/inventoried item). Campaign-only characters (the normal path
 // since the leveling rework hands out XP from story level 1) legitimately
 // own zero endgame items - the presence of these fields distinguishes
 // "never entered the endgame" from "hub mirrors failed to load".
-export function _stoxHasEndgameProgress(v) {
+export function _saveHasEndgameProgress(v) {
     return !!v && (
         (v.egGold !== undefined && v.egGold !== null && Number(v.egGold) !== 0) ||
         (v.egAtlasCompleted && typeof v.egAtlasCompleted === 'object' && Object.keys(v.egAtlasCompleted).length > 0) ||
@@ -687,9 +687,9 @@ export function _stoxHasEndgameProgress(v) {
         (v.egHighestMapTier !== undefined && v.egHighestMapTier !== null && Number(v.egHighestMapTier) > 0) ||
         (v.egAttrAllocated && typeof v.egAttrAllocated === 'object' &&
             Object.values(v.egAttrAllocated).some(n => Number(n) > 0)) ||
-        _stoxAnyItem(v.egEquipped) || _stoxAnyItem(v.egInventory) ||
-        _stoxAnyItem(v.egMapStash) || _stoxAnyItem(v.egCurrencyStash) ||
-        _stoxAnyItem(v.egEssenceStash) || _stoxAnyItem(v.egUniqueStash) ||
+        _saveAnyItem(v.egEquipped) || _saveAnyItem(v.egInventory) ||
+        _saveAnyItem(v.egMapStash) || _saveAnyItem(v.egCurrencyStash) ||
+        _saveAnyItem(v.egEssenceStash) || _saveAnyItem(v.egUniqueStash) ||
         !!(v.egMapSlotItem && (v.egMapSlotItem.id || v.egMapSlotItem.baseId))
     );
 }
@@ -704,7 +704,7 @@ export function _stoxHasEndgameProgress(v) {
 //      backup_1 into _backup_2). The last two pre-session states therefore
 //      stay recoverable at all times (see tools/save-doctor.html).
 //   2. DEGRADED-WRITE GUARD - refuses to overwrite a save with endgame
-//      PROGRESS (see _stoxHasEndgameProgress) whose ENTIRE endgame
+//      PROGRESS (see _saveHasEndgameProgress) whose ENTIRE endgame
 //      inventory is empty (all of egEquipped/egInventory/egMapStash/
 //      egCurrencyStash/egEssenceStash/egUniqueStash), because that pattern
 //      in practice only occurs when the hub's mirrors failed to load
@@ -733,29 +733,29 @@ export function save() {
     try { prev = raw ? JSON.parse(raw) : null; } catch (e) { prev = null; }
     const endgameEmpty =
         (!toSave.egEquipped || Object.keys(toSave.egEquipped).length === 0) &&
-        !_stoxAnyItem(toSave.egInventory) &&
-        !_stoxAnyItem(toSave.egMapStash) &&
-        !_stoxAnyItem(toSave.egCurrencyStash) &&
-        !_stoxAnyItem(toSave.egEssenceStash) &&
-        !_stoxAnyItem(toSave.egUniqueStash) &&
+        !_saveAnyItem(toSave.egInventory) &&
+        !_saveAnyItem(toSave.egMapStash) &&
+        !_saveAnyItem(toSave.egCurrencyStash) &&
+        !_saveAnyItem(toSave.egEssenceStash) &&
+        !_saveAnyItem(toSave.egUniqueStash) &&
         !(toSave.egMapSlotItem && (toSave.egMapSlotItem.id || toSave.egMapSlotItem.baseId));
-    if (prev && (prev.playerLevel || 0) > 1 && _stoxHasEndgameProgress(prev) && endgameEmpty && !window._stoxAllowDegradedSave) {
+    if (prev && (prev.playerLevel || 0) > 1 && _saveHasEndgameProgress(prev) && endgameEmpty && !window._saveAllowDegradedWrite) {
         // Log once per session - a save-deadlock with a spamming console helps
         // nobody. The override lets a genuinely intentional full reset (or a
         // recovered save) proceed; everything is documented in save-doctor.
-        if (!window._stoxSaveRefusalLogged) {
+        if (!window._saveRefusalLogged) {
             console.error('[save] REFUSED to overwrite: previous save has playerLevel', prev.playerLevel,
                 'but this save has NO endgame items at all - that pattern means the hub state failed to load,',
                 'not that the player sold everything. Previous save left untouched.',
                 'Inspect/recover via tools/save-doctor.html. If this refusal is wrong (you really do own nothing),',
-                'run  window._stoxAllowDegradedSave = true  in this console to override for this session.');
-            window._stoxSaveRefusalLogged = true;
+                'run  window._saveAllowDegradedWrite = true  in this console to override for this session.');
+            window._saveRefusalLogged = true;
         }
-        window._stoxLastSaveRefusal = { at: Date.now(), prevLevel: prev.playerLevel, slot };
+        window._saveLastRefusal = { at: Date.now(), prevLevel: prev.playerLevel, slot };
         return;
     }
     // Rolling backups - first write per session snapshots the pre-session state.
-    if (window._stoxLastSavedKey !== key) {
+    if (window._saveLastSavedKey !== key) {
         try {
             const b1 = localStorage.getItem(key + '_backup_1');
             if (b1) localStorage.setItem(key + '_backup_2', b1);
@@ -766,7 +766,7 @@ export function save() {
         localStorage.setItem(key, json);
         // Only mark the backup as rotated after the real write succeeded, so a
         // failed write (quota) retries the rotation on the next save.
-        window._stoxLastSavedKey = key;
+        window._saveLastSavedKey = key;
     } catch (e) {
         console.error('[save] write failed (storage full?) - previous save left untouched', e);
         return;
@@ -788,8 +788,8 @@ export function loadStateFromSlot(slotNum) {
     // New slot = new data: clear this session's hub load/save latches so the
     // hub re-syncs its mirrors from the freshly loaded STATE (and so a load
     // failure bound to the previous slot does not poison this one).
-    window._stoxHubStateLoaded = false;
-    window._stoxHubLoadFailed = false;
+    window._hubStateLoaded = false;
+    window._hubLoadFailed = false;
     // Slot switch resync: the live hub mirrors (_egEquipped, _egInventory,
     // currency/essence/map stashes, ...) still hold the PREVIOUS slot's data
     // until something re-runs the load. showEndgameHub does - but the
@@ -799,15 +799,15 @@ export function loadStateFromSlot(slotNum) {
     // the wrong mirror). Re-sync immediately, mirroring the parse-time
     // completion pattern in endgame-hub.js.
     if (typeof globalThis._egLoadHubState === 'function') {
-        window._stoxHubLoadInProgress = true;
+        window._hubLoadInProgress = true;
         try {
             globalThis._egLoadHubState();
-            window._stoxHubStateLoaded = true;
+            window._hubStateLoaded = true;
         } catch (e) {
-            window._stoxHubLoadFailed = true;
+            window._hubLoadFailed = true;
             console.error('[hub] slot-switch re-sync failed - save-writes BLOCKED until reload', e);
         } finally {
-            window._stoxHubLoadInProgress = false;
+            window._hubLoadInProgress = false;
         }
     }
     // Re-sync endgame leveling (player level / attribute points) to the newly loaded save.

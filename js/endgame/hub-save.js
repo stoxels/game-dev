@@ -55,14 +55,14 @@ export function egSaveHubState() {
     // and writing them back would wipe the player's real stash. Writes made
     // FROM INSIDE the load itself are the exception: they persist heal /
     // migration results computed from mirrors that were just read from STATE
-    // (flagged via _stoxHubLoadInProgress). This is the path that destroyed a
+    // (flagged via _hubLoadInProgress). This is the path that destroyed a
     // level-97 stash once; it stays closed until the hub load succeeds (the
     // state.js save() degraded guard is the second net).
-    if (window._stoxHubLoadFailed) {
+    if (window._hubLoadFailed) {
         console.error('[hub] egSaveHubState REFUSED - hub state failed to load this session; reload the page');
         return;
     }
-    if (!window._stoxHubStateLoaded && !window._stoxHubLoadInProgress) {
+    if (!window._hubStateLoaded && !window._hubLoadInProgress) {
         console.error('[hub] egSaveHubState REFUSED - hub state has not finished loading');
         return;
     }
@@ -165,15 +165,15 @@ function _egLoadHubState() {
     // previous attempt FAILED midway, also skip: the mirrors may be half-
     // loaded, and egSaveHubState is interlocked to refuse writes until the
     // page is reloaded and the load succeeds.
-    if (window._stoxHubStateLoaded) return;
-    if (window._stoxHubLoadFailed) {
+    if (window._hubStateLoaded) return;
+    if (window._hubLoadFailed) {
         console.error('[hub] skipping _egLoadHubState - previous attempt failed midway; save-writes stay blocked until reload');
         return;
     }
     // Mark the load as in progress: egSaveHubState's interlock must ALLOW the
     // internal persistence calls below (heal/migration results), because at
     // this point the mirrors hold exactly what was just read from STATE.
-    window._stoxHubLoadInProgress = true;
+    window._hubLoadInProgress = true;
     globalThis._egEquipped = STATE.egEquipped || {};
     // Unlimited stash: keep whatever rows were saved; ensure at least the initial minimum
     if (Array.isArray(STATE.egInventory) && STATE.egInventory.length > 0) {
@@ -663,7 +663,7 @@ function _egLoadHubState() {
 // STATE via egSaveHubState. If it throws, the session is marked degraded:
 // the mirrors may hold half-loaded/empty data, and writing them back would
 // wipe the player's real stash. state.js save() refuses that case as well.
-// _stoxHubLoadInProgress is cleared in finally so the interlock can never be
+// _hubLoadInProgress is cleared in finally so the interlock can never be
 // left in "load running" state by a throw midway.
 // Module era: hub.js evaluates inside an import cycle, so running the load
 // HERE would read uninitialized bindings (EG_ART via the render chain) and
@@ -672,15 +672,15 @@ function _egLoadHubState() {
 // module plus the concatenated body is initialized by then, still before any
 // user interaction (established step-5 passive-tree pattern).
 function _egBootLoadHubState() {
-    window._stoxHubLoadInProgress = false;
+    window._hubLoadInProgress = false;
     try {
         _egLoadHubState();
-        window._stoxHubStateLoaded = true;
+        window._hubStateLoaded = true;
     } catch (e) {
-        window._stoxHubLoadFailed = true;
+        window._hubLoadFailed = true;
         console.error('[hub] load failed - save-writes BLOCKED for this session to protect your stash (reload the page)', e);
     } finally {
-        window._stoxHubLoadInProgress = false;
+        window._hubLoadInProgress = false;
     }
 }
 if (typeof document !== 'undefined' && document.readyState !== 'complete') {
