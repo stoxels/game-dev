@@ -22,7 +22,7 @@ import { _wdSyncSpriteToLevel, showWorldDetail } from './screens/screens-world-l
 import { _maybeShowConvergenceModal, goToLevelSelect } from './screens/screens.js';
 import { _hidePlayerAvatar, _hidePlayerAvatarSimple } from './sprite/player_sprite.js';
 import { save } from './state.js';
-import { stopTimer } from './timer.js';
+import { stopTimer } from './timer/timer.js';
 import { t } from './translation/translations.js';
 
 //------------------------------------------------------------------------

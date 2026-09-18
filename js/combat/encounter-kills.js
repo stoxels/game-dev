@@ -11,7 +11,7 @@ import { ACH_STATE, saveAchState, setAchStat, trackAchStat } from '../achievemen
 import { Audio_Manager } from '../audio/audio.js';
 import { gainMana } from '../classes/class-mana.js';
 import { _charmTryMonsterDrop } from '../skills/skill-charms.js';
-import { stopTimer } from '../timer.js';
+import { stopTimer } from '../timer/timer.js';
 import { t } from '../translation/translations.js';
 import { EG_PANEL_RERENDER_DELAY_MS } from './encounter-constants.js';
 import { _egPlayerTakeDamage } from './encounter-damage.js';

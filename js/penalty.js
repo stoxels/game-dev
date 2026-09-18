@@ -1,5 +1,5 @@
-﻿import { stopTimer, timesUp, updTimer } from './timer.js';
-import { subtractTimeSecs } from './puzzle-mechanics/timer-adjust.js';
+﻿import { stopTimer, timesUp, updTimer } from './timer/timer.js';
+import { subtractTimeSecs } from './timer/timer-adjust.js';
 import { revealTiles, markWrongTiles } from './puzzle-mechanics/grid-actions.js';
 import { trackAchStat } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';

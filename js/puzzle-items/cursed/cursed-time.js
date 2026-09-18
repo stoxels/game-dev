@@ -1,5 +1,5 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { addTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs } from '../../timer/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _resolveCursedBlackoutDownside } from '../shared/cursed-downside.js';

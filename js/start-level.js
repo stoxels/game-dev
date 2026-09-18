@@ -37,8 +37,8 @@ import { resetBanterState, triggerBanter } from './sprite/character-banter.js';
 import { _renderPlayerAvatarSimple, _renderPlayerHealth, _showPlayerAvatar, _showPlayerAvatarSimple } from './sprite/player_sprite.js';
 import { _applyCompletionGlimpse, _applyPassiveStartEffects, _applySylaForestAffinity, _hideCompletionGlimpseBar, _initLuckyTiles } from './start-level-passives.js';
 import { save } from './state.js';
-import { _applyLowHealthVignette, _resetLowTimeWarningState, startTimer, stopTimer, updTimer } from './timer.js';
-import { addTimeSecs } from './puzzle-mechanics/timer-adjust.js';
+import { _applyLowHealthVignette, _resetLowTimeWarningState, startTimer, stopTimer, updTimer } from './timer/timer.js';
+import { addTimeSecs } from './timer/timer-adjust.js';
 import { t } from './translation/translations.js';
 
 //------------------------------------------------------------------------

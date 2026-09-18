@@ -2,7 +2,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
 import { _updateMistakeCounterHUD } from '../penalty.js';
-import { addTimeSecs, previewGainSecs } from '../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs, previewGainSecs } from '../timer/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';

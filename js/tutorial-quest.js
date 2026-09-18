@@ -33,7 +33,7 @@ import { USP_THEME_PROJ } from './skills/universal-spell-fx.js';
 import { triggerBanter } from './sprite/character-banter.js';
 import { _hidePlayerAvatar, _hidePlayerAvatarSimple } from './sprite/player_sprite.js';
 import { save } from './state.js';
-import { pauseTimer, resumeTimer, stopTimer } from './timer.js';
+import { pauseTimer, resumeTimer, stopTimer } from './timer/timer.js';
 import { t } from './translation/translations.js';
 
 //------------------------------------------------------------------------

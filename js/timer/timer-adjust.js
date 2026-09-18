@@ -1,4 +1,4 @@
-import { _trackTimerDelta, updTimer } from '../timer.js';
+import { _trackTimerDelta, updTimer } from './timer.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - TIMER ADJUST---------------------------------

@@ -2,7 +2,7 @@ import { t } from '../translation/translations.js';
 import { _egEndMapDefeated } from './encounter-chain.js';
 import { _egGetMistakesRemaining } from './encounter-tick.js';
 import { _egIsActive } from './combat-state.js';
-import { _egClearCenterGridBanners } from '../timer.js';
+import { _egClearCenterGridBanners } from '../timer/timer.js';
 
 
 //  endgame-encounter-overlays.js

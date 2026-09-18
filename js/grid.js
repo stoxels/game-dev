@@ -1,4 +1,4 @@
-﻿import { addTimeSecs, previewGainSecs } from './puzzle-mechanics/timer-adjust.js';
+﻿import { addTimeSecs, previewGainSecs } from './timer/timer-adjust.js';
 import { markWrongTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';

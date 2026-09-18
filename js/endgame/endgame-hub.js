@@ -26,7 +26,7 @@ import { buildClassHUD } from '../classes/class-hud.js';
 import { _getPlayerMaxMana, updateClassHUDManaBar } from '../classes/class-mana.js';
 import { switchScreen } from '../screens/screens.js';
 import { renderSkillHotbar } from '../skills/skill-hotbar.js';
-import { pauseTimer, resumeTimer } from '../timer.js';
+import { pauseTimer, resumeTimer } from '../timer/timer.js';
 import { LANG, t } from '../translation/translations.js';
 import { EG_ART } from './endgame-art.js';
 import { _egShowTooltip } from '../loot/loot-currency.js';

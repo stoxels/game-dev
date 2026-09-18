@@ -1,8 +1,8 @@
-﻿import { renderCell, updClues } from './grid.js';
-import { revealTiles } from './puzzle-mechanics/grid-actions.js';
-import { Audio_Manager } from './audio/audio.js';
-import { t } from './translation/translations.js';
-import { startTimerFreeze } from './puzzle-mechanics/timer-freeze.js';
+﻿import { renderCell, updClues } from '../grid.js';
+import { revealTiles } from '../puzzle-mechanics/grid-actions.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { t } from '../translation/translations.js';
+import { startTimerFreeze } from './timer-freeze.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 3: live globalThis accessors for externally-mutated state.

@@ -3,7 +3,7 @@ import { showMapView } from '../screens/screens-map-view.js';
 import { showWorldDetail } from '../screens/screens-world-levels.js';
 import { switchScreen } from '../screens/screens.js';
 import { save } from '../state.js';
-import { pauseTimer, resumeTimer } from '../timer.js';
+import { pauseTimer, resumeTimer } from '../timer/timer.js';
 import { LANG, t } from '../translation/translations.js';
 import { PassiveTracker } from './passive-tracker.js';
 import { TALENT_TREE_DATA } from './passive-tree-data.js';

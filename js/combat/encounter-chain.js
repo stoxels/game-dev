@@ -4,7 +4,7 @@ import { _applyProbabilistPassive, _getPassiveEffect } from '../classes/class-ab
 import { PassiveTracker } from '../passive-tree/passive-tracker.js';
 import { _refreshQuestionModalFlag } from '../screens/screens.js';
 import { _charmReplaceCarriedDrops, _egCharmDrops } from '../skills/skill-charms.js';
-import { _egClearCenterGridBanners, pauseTimer, resumeTimer, stopTimer } from '../timer.js';
+import { _egClearCenterGridBanners, pauseTimer, resumeTimer, stopTimer } from '../timer/timer.js';
 import { t } from '../translation/translations.js';
 import { EG_ART } from '../endgame/endgame-art.js';
 import { _egAtlasOnMapCompleted, egAtlasMakeRng, egAtlasNodeName } from '../endgame/endgame-atlas.js';

@@ -1,7 +1,7 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
-import { addTimeSecs, previewGainSecs } from '../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs, previewGainSecs } from '../timer/timer-adjust.js';
 import { LANG, t } from '../translation/translations.js';
 import { _filterMarkedIds, _filterRevealedIds, _resolveCell, _revealFilledCell, _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';

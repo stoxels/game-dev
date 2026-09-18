@@ -8,7 +8,7 @@ import { EG_PLAYER_DEFAULT_ATTACK_INTERVAL, _egIsActive } from '../combat/combat
 import { keybindKeyFor, keybindMatches } from '../keybinds.js';
 import { _refreshQuestionModalFlag } from '../screens/screens.js';
 import { _uspMovementSpeedMult } from '../skills/universal-spells.js';
-import { _applyLowHealthVignette } from '../timer.js';
+import { _applyLowHealthVignette } from '../timer/timer.js';
 import { t } from '../translation/translations.js';
 import { _banterRepositionBubbleIfVisible, hideCharacterBanter } from './character-banter.js';
 import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _animSetDefaultDownImage, _animShouldMirrorFor, _animWalkIsDirectionalFor, _playAvatarWalkAnimation, _startAvatarIdleAnimation, _stopAvatarWalkAnimation } from './sprite_animations.js';

@@ -1,4 +1,4 @@
-import { playFreezeCountdownOverlay } from './fx-helpers.js';
+import { playFreezeCountdownOverlay } from '../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - TIMER FREEZE---------------------------------

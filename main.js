@@ -11,7 +11,7 @@ import { skipQuiz } from './js/quiz-excercise/quiz.js';
 import { _refreshQuestionModalFlag, goToPreviousScreen, hideResultOverlays } from './js/screens/screens.js';
 import { SETTINGS, applySettings, initSettingsControls } from './js/settings.js';
 import { closeSpellbook } from './js/skills/skill-spellbook.js';
-import { pauseTimer, resumeTimer } from './js/timer.js';
+import { pauseTimer, resumeTimer } from './js/timer/timer.js';
 import { setLang } from './js/translation/translations.js';
 
 //------------------------------------------------------------------------

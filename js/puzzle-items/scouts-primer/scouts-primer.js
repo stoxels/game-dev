@@ -13,7 +13,7 @@ import { PT } from '../../passive-tree/passive-tree.js';
 import { questStat_mcWrongAnswerEliminated, questStat_tutorAnsweredCorrect, updateQuestStats } from '../../quests/quests-stats.js';
 import { _refreshQuestionModalFlag } from '../../screens/screens.js';
 import { save } from '../../state.js';
-import { pauseTimer, resumeTimer } from '../../timer.js';
+import { pauseTimer, resumeTimer } from '../../timer/timer.js';
 import { buildInventoryPanel } from '../../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { PRIMER_MAX, applyPrimerHeadstart, applyPerfectPrimerReveal } from './scouts-primer-reveal.js';
 import { shuffle } from '../../puzzle-mechanics/puzzle-helpers.js';

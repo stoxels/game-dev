@@ -1,9 +1,9 @@
 ﻿import { _isColSolved, _isRowSolved, clues, renderCell, updClues } from '../grid.js';
 import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { save } from '../state.js';
-import { _calcEmergencyScanDuration, updTimer } from '../timer.js';
-import { startTimerFreeze } from '../puzzle-mechanics/timer-freeze.js';
-import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
+import { _calcEmergencyScanDuration, updTimer } from '../timer/timer.js';
+import { startTimerFreeze } from '../timer/timer-freeze.js';
+import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../timer/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
 import { ptHasSkill } from './passive-tree-state-points.js';

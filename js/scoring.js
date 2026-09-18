@@ -1,6 +1,6 @@
 ﻿import { buildReveal } from './grid.js';
 import { save } from './state.js';
-import { stopTimer } from './timer.js';
+import { stopTimer } from './timer/timer.js';
 import { checkWorldCompleteAch, onLevelCompleteAch } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';

@@ -4,7 +4,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
 import { isEndgameLevel } from '../mouse-button-handlers.js';
 import { _resetLevelFlags, save } from '../state.js';
-import { addTimeSecs, previewGainSecs } from '../puzzle-mechanics/timer-adjust.js';
+import { addTimeSecs, previewGainSecs } from '../timer/timer-adjust.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _executeRegressionToPrior, _executeSignificanceThreshold } from './class-actuary.js';

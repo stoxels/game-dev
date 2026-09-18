@@ -1,6 +1,6 @@
 ﻿import { showAchievements } from './achievements/achievements-ui.js';
 import { showResetAchievementsModal } from './achievements/achievements.js';
-import { stopTimer } from './timer.js';
+import { stopTimer } from './timer/timer.js';
 import { setLang, t } from './translation/translations.js';
 import { toggleTouchpadMarkMode } from './mouse-button-handlers.js';
 import { clearHover } from './mouse-over.js';

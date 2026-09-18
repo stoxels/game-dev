@@ -1,6 +1,6 @@
 ﻿import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
-import { stopTimer } from '../timer.js';
+import { stopTimer } from '../timer/timer.js';
 import { t } from '../translation/translations.js';
 import { isLevelConvergence, renderLevelSelect } from './screens-level-select.js';
 import { showMapView } from './screens-map-view.js';

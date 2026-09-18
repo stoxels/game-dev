@@ -1,7 +1,7 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell } from '../grid.js';
-import { endTimerFreeze, startTimerFreeze } from '../puzzle-mechanics/timer-freeze.js';
+import { endTimerFreeze, startTimerFreeze } from '../timer/timer-freeze.js';
 import { t } from '../translation/translations.js';
 import { _filterMarkedIds, _filterRevealedIds, _resolveCell } from './class-abilities.js';
 import { CLASS_DEFS } from './class-defs.js';

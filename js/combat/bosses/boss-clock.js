@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { _egClearCenterGridBanners } from '../../timer.js';
+import { _egClearCenterGridBanners } from '../../timer/timer.js';
 import { t } from '../../translation/translations.js';
-import { endTimerFreeze, startTimerFreeze } from '../../puzzle-mechanics/timer-freeze.js';
+import { endTimerFreeze, startTimerFreeze } from '../../timer/timer-freeze.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkEl, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
 
