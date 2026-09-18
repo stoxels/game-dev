@@ -368,7 +368,11 @@ export function launchEndgameTestMode() {
 
 // Closes any overlays and active quiz, then navigates to the level select screen.
 // Respects convergence modal and pending class events before transitioning.
+// The tutorial quest is mandatory - a tutorial level must never escape to
+// the level select screen (its exits are hidden and the title-bindings
+// handlers refuse); this guard is the last line of defense.
 export function goToLevelSelect() {
+    if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
     hideResultOverlays();
     globalThis.closeQuiz();
 
@@ -447,6 +451,9 @@ export function goToPreviousScreen() {
     }
 
     if (globalThis.screenHistory.length) {
+        // Mid-tutorial there is no valid previous level-select screen -
+        // stay put instead of popping history toward the locked screens.
+        if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
         const prev = globalThis.screenHistory.pop();
 
         // The game screen is not directly re-enterable; go to level select instead.

@@ -521,6 +521,65 @@ export function _tqHideProfessor() {
 }
 
 //------------------------------------------------------------------------
+//----------------------LEVEL-EXIT LOCK------------------------------------
+//------------------------------------------------------------------------
+// The tutorial is mandatory (level 1 stays locked until STATE.tutorialDone),
+// so the LEVELS exits must not be usable mid-lesson: leaving for the old
+// level-select screen strands tutorial state (poll timer, silent pause,
+// grid locks, encounter) and corrupts the next run. While a tutorial level
+// is active the top-right HUD button, the pause-menu button and the
+// win/lose overlay buttons are hidden, and every programmatic LEVELS path
+// (title-bindings, screens.goToLevelSelect) refuses to navigate.
+const _TQ_EXIT_BUTTON_IDS = ['btn-hud-levels', 'btn-go-levels', 'btn-win-levels', 'btn-lose-levels'];
+
+// True while the player is on a tutorial-quest level (the exit lock applies).
+export function _tqIsTutorialLevelActive() {
+    try {
+        return !!(globalThis.cur && globalThis.cur.isTutorialQuest
+            && typeof _tqPhase !== 'undefined' && _tqPhase);
+    } catch (e) { return false; }
+}
+
+// Shows/hides the LEVELS exit buttons for the current level.
+export function _tqUpdateLevelExitButtons() {
+    const hide = _tqIsTutorialLevelActive();
+    _TQ_EXIT_BUTTON_IDS.forEach((id) => {
+        try {
+            const el = document.getElementById(id);
+            if (el) el.style.display = hide ? 'none' : '';
+        } catch (e) {}
+    });
+}
+
+// Full teardown of transient tutorial lesson state. Called on graduation
+// (before showSetup) and as a safety net when a non-tutorial level boots
+// while lesson state is still armed, so a stray exit can never leave the
+// poll loop, pointer/spellbook watchers, professor DOM or grid locks behind.
+export function _tqTeardownTutorialState() {
+    try { if (_tqPollTimer) { clearInterval(_tqPollTimer); } } catch (e) {}
+    _tqPollTimer = null;
+    try { _tqStopSpellbookWatcher(); } catch (e) {}
+    try { _tqStopPointerLoop(); } catch (e) {}
+    try { _tqHideProfessor(); } catch (e) {}
+    try { _tqClearHighlights(); } catch (e) {}
+    try { _tqHideGridLockBorder(); } catch (e) {}
+    try { _tqClearKeycapChip(); } catch (e) {}
+    try { _tqCloseInventoryFlyout(); } catch (e) {}
+    _tqPhase = null;
+    _tqStepIdx = 0;
+    _tqGridLocked = false;
+    _tqActiveDemo = null;
+    _tqWaitingForContinue = false;
+    _tqP2HeartOpen = false;
+    _tqP2HeartCell = null;
+    _tqP3DropOpen = false;
+    _tqP3DropCell = null;
+    _tqCandleUsable = false;
+    _tqSpellbookPause = false;
+    _tqUpdateLevelExitButtons();
+}
+
+//------------------------------------------------------------------------
 //----------------------MEET-THE-PROFESSOR CIRCLE--------------------------
 //------------------------------------------------------------------------
 // Opening task of puzzle 1: a golden circle appears next to the Professor
@@ -1293,6 +1352,7 @@ export function _tqPhaseFinished() {
         _tqPlayerReply(600, 'tutorial_farewell');
         setTimeout(() => {
             showToast('🎓 ' + t('tq_toast_graduated'));
+            _tqTeardownTutorialState();
             showSetup();
         }, 4200);
     }
@@ -1347,6 +1407,7 @@ export function _tqStartPuzzle(i) {
     if (_tqPhase === 'p2' || _tqPhase === 'p3') _tqGridLocked = true;
     if (_tqPhase === 'p3') _tqEnsureFireball();
     globalThis.startLevel(base + i);
+    _tqUpdateLevelExitButtons();
     // Kick off the Professor's explanation once the level has booted (the
     // start pipeline is synchronous, so one tick is enough).
     setTimeout(() => _tqRunCurrentPhase(), 900);
@@ -2270,6 +2331,12 @@ export function _tqCastFireball() {
         const _orig = globalThis.startLevel;
         globalThis.startLevel = function (gi) {
             const lvl = (typeof ALL !== 'undefined') ? ALL[gi] : null;
+            if (lvl && !lvl.isTutorialQuest && typeof _tqPhase !== 'undefined' && _tqPhase) {
+                // Safety net: a non-tutorial boot while lesson state is armed
+                // (e.g. a stray exit path) must not inherit the tutorial's
+                // poll loop, locks or button hiding - tear it down first.
+                try { _tqTeardownTutorialState(); } catch (e) {}
+            }
             if (lvl && lvl.isTutorialQuest) {
                 // The previous tutorial run's teardown wiped the monster
                 // stamps off the level objects - refresh them all first.
@@ -2468,7 +2535,8 @@ export function _tqCastFireball() {
         window._tqWrappedAmbientPickup = true;
         const _orig = globalThis._egSpawnPickup;
         globalThis._egSpawnPickup = function (...args) {
-            if (typeof _tqPhase !== 'undefined' && _tqPhase) return;
+            if (typeof _tqPhase !== 'undefined' && _tqPhase
+                && typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest) return;
             return _orig(...args);
         };
     }

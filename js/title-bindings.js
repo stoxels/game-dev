@@ -516,6 +516,9 @@ document.addEventListener('DOMContentLoaded', () => {
      * system cleanup before navigating.
      */
     function onGoToLevelsFromGame() {
+        // Tutorial quest is mandatory: the LEVELS exits are hidden mid-lesson,
+        // and this guard covers any programmatic path (keyboard, stale overlay).
+        if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
         if (globalThis.cur && globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
             showEgForfeitConfirm(() => {
                 globalThis.unpauseGame();
@@ -558,6 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * level select screen.
      */
     function onReturnToNexusFromGame() {
+        if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
         if (globalThis.cur && globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters && typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) {
             showEgForfeitConfirm(() => {
                 globalThis.unpauseGame();
@@ -613,6 +617,9 @@ document.addEventListener('DOMContentLoaded', () => {
      * win or lose overlays. Cleans up game systems before navigating.
      */
     function onGoToLevelsFromOverlay() {
+        // Tutorial retry path owns the overlays (replayLevel restarts the
+        // quest) - never let win/lose LEVELS buttons escape to level select.
+        if (globalThis.cur && globalThis.cur.isTutorialQuest) return;
         cleanupActiveGameSystems();
         safeCall('_hidePlayerAvatarSimple');
         safeCall('_hidePlayerAvatar');

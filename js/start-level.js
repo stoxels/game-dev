@@ -457,8 +457,13 @@ export function _initClassSystems() {
 }
 
 // Pushes the level-select screen onto navigation history and switches to the game screen.
+// Tutorial-quest levels push nothing: there is no level select to go back
+// to mid-lesson (it stays locked until graduation), so history keeps the
+// entry pushed by showTutorial() instead of a stale screen-levels.
 export function _navigateToGameScreen() {
-    globalThis.screenHistory.push('screen-levels');
+    if (!(globalThis.cur && globalThis.cur.isTutorialQuest)) {
+        globalThis.screenHistory.push('screen-levels');
+    }
     switchScreen('screen-game');
 }
 

@@ -86,9 +86,13 @@ export function _updatePauseMenuReturnButtons() {
     // but they are NOT endgame maps - they keep the normal "Levels" button.
     const onEndgameMap = typeof cur !== 'undefined' && globalThis.cur &&
         ((globalThis.cur.isMonsterLevel && !globalThis.cur.campaignMonsters) || globalThis.cur.isEndgameSandbox);
+    // Tutorial quest is mandatory - no LEVELS exit mid-lesson (the HUD and
+    // overlay buttons are hidden by _tqUpdateLevelExitButtons; the pause
+    // menu button is hidden here where its visibility is owned).
+    const onTutorial = !!(typeof cur !== 'undefined' && globalThis.cur && globalThis.cur.isTutorialQuest);
     const levelsBtn = document.getElementById('btn-go-levels');
     const nexusBtn = document.getElementById('btn-go-nexus');
-    if (levelsBtn) levelsBtn.style.display = onEndgameMap ? 'none' : '';
+    if (levelsBtn) levelsBtn.style.display = (onEndgameMap || onTutorial) ? 'none' : '';
     if (nexusBtn) nexusBtn.style.display = onEndgameMap ? '' : 'none';
     return onEndgameMap;
 }
