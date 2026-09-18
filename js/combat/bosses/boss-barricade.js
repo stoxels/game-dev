@@ -4,16 +4,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BARRICADE (boss_barricade)-----------------------
 //------------------------------------------------------------------------
-// Bullet-wall homage: walls of shot sweep down the screen, each with one
-// gap - and the gap drifts sideways as it falls. Start moving early and
-// track it all the way down.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Bullet-wall homage: walls of shot sweep down, each with one gap that
+// drifts sideways as it falls. Start moving early and track the gap all
+// the way down.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (soul_tithe) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Falling shot walls with one drifting gap each; anything outside the gap
+// burns. Read the gap early since it slides sideways while falling.
 export function _egMechBulletWalls(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
