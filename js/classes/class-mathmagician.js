@@ -1,7 +1,7 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell } from '../grid.js';
-import { updTimer } from '../timer.js';
+import { endTimerFreeze, startTimerFreeze } from '../puzzle-mechanics/timer-freeze.js';
 import { t } from '../translation/translations.js';
 import { _filterMarkedIds, _filterRevealedIds, _resolveCell } from './class-abilities.js';
 import { CLASS_DEFS } from './class-defs.js';
@@ -1010,12 +1010,10 @@ export function _arcaneFreeze_startCountdown(totalSecs) {
 }
 
 // Restores normal game timer state and cleans up all freeze visuals.
+// Flag release goes through the shared mechanic (Clock-guarded).
 export function _arcaneFreeze_end(tick) {
-    globalThis.timerFrozen = false;
-    window._freezeActive = false;
-
+    endTimerFreeze();
     clearInterval(tick);
-    updTimer();
     buildClassHUD();
 
     _arcaneFreeze_removeFrozenFloor();
@@ -1229,17 +1227,17 @@ export function _arcaneFreeze_clearAllFrostAndStalagmites() {
 export function _executeArcaneFreeze(durationMs) {
     const effectiveDuration = _arcaneFreeze_calcDuration(durationMs);
 
-    // Set freeze state flags
-    globalThis.timerFrozen = true;
-    window._freezeActive = true;
+    // Set freeze state flags via the shared timer-freeze mechanic. The
+    // freezeActive flag drives this class's frozen-floor / frozen-resilience
+    // fill intercepts, so the cast must carry it. Overlay stays on (matches
+    // the item cast); the blizzard + frozen floor below are the extras.
+    startTimerFreeze(effectiveDuration, { freezeActive: true });
     window._freezeCorrFills = 0; // Tracks correct fills during freeze (for frozen_resilience passive)
 
     _arcaneFreeze_resetTileTrackers(); 
 
     _arcaneFreeze_spawnFrozenFloor();
     _startBlizzardEffect(effectiveDuration);
-    if (typeof globalThis.playFreezeCountdownOverlay === 'function') globalThis.playFreezeCountdownOverlay(effectiveDuration);
-    updTimer();
 
     const secs = Math.ceil(effectiveDuration / 1000);
     globalThis.showToast(t('cls_absolute_zero').replace('{n}', secs));

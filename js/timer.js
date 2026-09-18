@@ -2,6 +2,7 @@
 import { revealTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
+import { startTimerFreeze } from './puzzle-mechanics/timer-freeze.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 3: live globalThis accessors for externally-mutated state.
@@ -479,20 +480,12 @@ export function _tickTimedStasis() {
     window._timedStasisNext = Date.now() + 10 * 60 * 1000;
 
     const freezeDur = _calcTimedStasisDuration();
-    globalThis.timerFrozen = true;
-    updTimer();
+    // Shared mechanic: sets the flag, refreshes the HUD and shows the icy
+    // countdown overlay; the Clock-guarded release replaces the old
+    // hand-rolled setTimeout. The stasis toast + overlay effect stay here.
+    startTimerFreeze(freezeDur);
     globalThis.showToast(`⏸️ ${t('cg_timed_stasis')}`);
     if (typeof globalThis.playStasisOverlayEffect === 'function') globalThis.playStasisOverlayEffect(freezeDur);
-    if (typeof globalThis.playFreezeCountdownOverlay === 'function') globalThis.playFreezeCountdownOverlay(freezeDur);
-
-    setTimeout(() => {
-        // The Clock's Time Freeze holds the timer for its whole window -
-        // a short passive-freeze must never cut that freeze short.
-        if (typeof window === 'undefined' || !window._egClockTimeFreezeActive) {
-            globalThis.timerFrozen = false;
-        }
-        updTimer();
-    }, freezeDur);
 }
 
 

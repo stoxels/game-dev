@@ -2,6 +2,7 @@
 import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { save } from '../state.js';
 import { _calcEmergencyScanDuration, updTimer } from '../timer.js';
+import { startTimerFreeze } from '../puzzle-mechanics/timer-freeze.js';
 import { addTimeSecs, subtractTimeSecs } from '../puzzle-mechanics/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
@@ -111,9 +112,10 @@ export function _ptxRunExpansion() {
 
     function freeze(ms) {
         if (!globalThis.cur || globalThis.dead) return;
-        globalThis.timerFrozen = true;
-        updTimer();
-        setTimeout(() => { globalThis.timerFrozen = false; updTimer(); }, ms);
+        // Shared timer-freeze mechanic - its Clock-guarded release fixes the
+        // old raw-write version, which could cut the Clock boss's 30 s Time
+        // Freeze short when a tree freeze ended.
+        startTimerFreeze(ms);
     }
 
     // Start-of-level luck roll with all +% chance nodes applied.

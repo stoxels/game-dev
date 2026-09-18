@@ -765,7 +765,6 @@ try { Object.defineProperty(globalThis, "pauseGame", { get() { return pauseGame;
 try { Object.defineProperty(globalThis, "pickLuckyItem", { get() { return pickLuckyItem; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "pickRandomItem", { get() { return pickRandomItem; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "playConfidenceIntervalEffect", { get() { return playConfidenceIntervalEffect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "playFreezeCountdownOverlay", { get() { return playFreezeCountdownOverlay; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "playResidualAnalysisEffect", { get() { return playResidualAnalysisEffect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "playSampleEfficiencyEffect", { get() { return playSampleEfficiencyEffect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "playShieldBreakEffect", { get() { return playShieldBreakEffect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
