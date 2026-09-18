@@ -353,7 +353,7 @@ export function timesUp() {
     // excludes the campaign's own monster levels).
     if (typeof globalThis._egIsMapRun === 'function' && globalThis._egIsMapRun()) {
         if (typeof globalThis._egEndMapDefeated === 'function') {
-            if (cur) window._lastFailedGi = cur.gIdx;
+            if (cur) window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
             const title = (typeof t === 'function') ? t('eg_map_failed') : 'Map Failed';
             const sub = (typeof t === 'function') ? t('ov_lose') : "TIME'S UP!";
             const handled = globalThis._egEndMapDefeated(title, sub);
@@ -363,7 +363,7 @@ export function timesUp() {
 
     // Record the failed level for the bounceback achievement so scoring.js
     // can detect an immediate retry win on the same level.
-    if (cur) window._lastFailedGi = cur.gIdx;
+    if (cur) window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
 
     document.getElementById('lose-title').textContent = t('ov_lose');
     document.getElementById('lose-sub').textContent =

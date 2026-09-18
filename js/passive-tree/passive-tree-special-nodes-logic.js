@@ -102,8 +102,9 @@ export let _lastOverfittingPhase = 'free'; // Tracks phase transitions to preven
 // --- The Oracle (node 300) ---
 export const ORACLE_MIN_CELL_COUNT = 200; // Minimum grid size to activate
 export const ORACLE_FLASH_DURATION_MS = 5000;
-window._oracleActive = false; // True for the entire level after Oracle fires; blocks all auto-actions
-
+// oracleActive now lives in window.LEVEL_FLAGS (state.js) - true for the
+// entire level after Oracle fires; blocks all auto-actions. Per-level reset
+// happens in _resetNewNodeState() below.
 
 //------------------------------------------------------------------------
 //----------------- SHARED: GRID COMPLETION HELPERS ----------------------
@@ -202,7 +203,7 @@ export function _applyScanRevealClasses(el, isSolutionCell) {
 
 // Returns true if auto-reveals and auto-marks are currently blocked.
 export function _autoActionsBlocked() {
-    return ptHasSkill('keystone_ergodic_field') || window._oracleActive;
+    return ptHasSkill('keystone_ergodic_field') || window.LEVEL_FLAGS.oracleActive;
 }
 
 
@@ -844,7 +845,7 @@ export function _entropyDrainTick() {
 export function _randomWalkFail() {
     globalThis.dead = true;
     stopTimer();
-    window._lastFailedGi = cur.gIdx;
+    window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
     document.getElementById('lose-title').textContent = t('ov_lose');
     document.getElementById('lose-sub').textContent = t('pt_rw_fail_sub');
     document.getElementById('ov-lose').classList.add('show');
@@ -1322,7 +1323,7 @@ export function _applyTheOracle() {
     const cellCount = cur.grid.length * cur.grid[0].length;
     if (cellCount < ORACLE_MIN_CELL_COUNT) return;
 
-    window._oracleActive = true;
+    window.LEVEL_FLAGS.oracleActive = true;
 
     const sol = cur.grid;
 
@@ -1355,7 +1356,7 @@ export function _resetNewNodeState() {
     window._degreesOfFreedomNext = null;
     if (typeof _dofClearFlashTimeout === 'function') _dofClearFlashTimeout();
     window._dofFlashToken = (window._dofFlashToken || 0) + 1;
-    window._oracleActive = false;
+    window.LEVEL_FLAGS.oracleActive = false;
     window._sparsePriorRevealedLines = new Set();
     window._residualAnalysisRewardedLines = new Set();
 }

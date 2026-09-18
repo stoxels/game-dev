@@ -11,7 +11,6 @@ try { Object.defineProperty(globalThis, '_lawOfLargeNumbersNext', { get() { retu
 try { Object.defineProperty(globalThis, '_levelMistakesErased', { get() { return _levelMistakesErased; }, set(v) { _levelMistakesErased = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_levelTimeAdded', { get() { return _levelTimeAdded; }, set(v) { _levelTimeAdded = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_levelTimeLost', { get() { return _levelTimeLost; }, set(v) { _levelTimeLost = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, '_streakBonusFills', { get() { return _streakBonusFills; }, set(v) { _streakBonusFills = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'absorbedMistakes', { get() { return absorbedMistakes; }, set(v) { absorbedMistakes = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'axisLockEnabled', { get() { return axisLockEnabled; }, set(v) { axisLockEnabled = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'consecutiveCorrectFills', { get() { return consecutiveCorrectFills; }, set(v) { consecutiveCorrectFills = v; }, configurable: true }); } catch (e) {}
@@ -52,6 +51,12 @@ window.LEVEL_FLAGS = {
     goldenClockActive: false, // Golden Clock: the timer is frozen
     veiledCursedUsed: false,  // Veil of the Cursed: one-time curse redirection per level
     devTestActive: false,     // js/dev/dev-testing.js harness engaged (never set in normal play)
+    oracleActive: false,      // The Oracle keystone: fired this level; blocks all auto-actions
+    streakBonusFills: 0,      // streak_bonus skill: consecutive correct fills since last mistake
+    goldenClockMistakesLeft: null, // Golden Clock: mistakes remaining before the timer resumes
+    momentumThisLevel: 0,     // Statistician Momentum: triggers this level (exponential_growth scaling)
+    mistakeLog: [],           // Actuary/Markovian: rolling log of {r,c,penaltySecs} mistakes
+    lastFailedGi: null,       // gIdx of the level the player last failed (bounceback achievement)
 };
 
 // Resets every LEVEL_FLAGS entry - call at level start/end so a flag that
@@ -60,7 +65,18 @@ export function _resetLevelFlags() {
     window.LEVEL_FLAGS.cursedImmune = false;
     window.LEVEL_FLAGS.goldenClockActive = false;
     window.LEVEL_FLAGS.veiledCursedUsed = false;
+    window.LEVEL_FLAGS.streakBonusFills = 0;
+    window.LEVEL_FLAGS.goldenClockMistakesLeft = null;
+    window.LEVEL_FLAGS.momentumThisLevel = 0;
+    window.LEVEL_FLAGS.mistakeLog = [];
     // devTestActive survives: it describes the session, not the level.
+    // oracleActive survives this reset: _doStartLevel sets it (step 4) before
+    // _initClassSystems fires this reset (step 6), so zeroing it here would
+    // undo the level-start set. Its per-level reset lives in
+    // _resetNewNodeState (passive-tree-special-nodes-logic.js).
+    // lastFailedGi survives this reset: it must outlive the failed level for
+    // the bounceback achievement; it is cleared conditionally in _startSystems
+    // (level changed) and after a bounceback win (scoring.js).
 }
 
 
@@ -167,9 +183,6 @@ let _confidenceIntervalActive = false;
 // [confidence_interval] True if the grace window was just consumed,
 // preventing back-to-back activations.
 let _confidenceIntervalUsed = false;
-
-// [streak_bonus] Consecutive correct fills since the last mistake.
-let _streakBonusFills = 0;
 
 
 // --- Player HP ---

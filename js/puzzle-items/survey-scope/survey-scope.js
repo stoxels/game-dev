@@ -19,7 +19,7 @@ import { cur } from '../../state.js';
 // Field keystone and The Oracle, like every programmatic reveal.
 export function _useSurveyScope(id, def) {
     // Ergodic Field (291) and The Oracle (300) disable all auto-reveals
-    if (ptHasSkill('keystone_ergodic_field') || window._oracleActive) {
+    if (ptHasSkill('keystone_ergodic_field') || window.LEVEL_FLAGS.oracleActive) {
         return `${def.icon} ${t('itm_blocked_ergodic')}`;
     }
 

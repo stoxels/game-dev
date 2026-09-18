@@ -30,7 +30,7 @@ import { cur } from '../state.js';
 //   window._dataStrikePendingCount    - solve count stored while the Data Strike modal is open
 //   window._dataStrikeRevealCap       - reveal cap stored while the Data Strike modal is open
 //   window._dataStrikeUsesThisLevel   - how many times Data Strike has fired this level (god_of_statistics scaling)
-//   window._momentumThisLevel         - how many times Momentum has triggered this level (exponential_growth scaling)
+//   window.LEVEL_FLAGS.momentumThisLevel         - how many times Momentum has triggered this level (exponential_growth scaling)
 
 // Diagonal strike: maximum steps walked per direction before stopping.
 export const DIAG_STRIKE_MAX_STEPS = 3;
@@ -1266,7 +1266,7 @@ export function _statisticianTriggerMomentum(bonusSeconds) {
 
     // exponential_growth: each prior Momentum trigger this level adds +1s
     if (ptHasSkill('exponential_growth')) {
-        bonus += (window._momentumThisLevel || 0);
+        bonus += (window.LEVEL_FLAGS.momentumThisLevel || 0);
     }
 
     // god_of_statistics doubles the total bonus (applied last)
@@ -1285,8 +1285,8 @@ export function _statisticianTriggerMomentum(bonusSeconds) {
     trackAchStat('momentumTriggered');
     updateQuestStats('momentumTriggered', {});
 
-    window._momentumThisLevel = (window._momentumThisLevel || 0) + 1;
-    if (window._momentumThisLevel === 10) trackAchStat('statistician3MomentumOneLevel');
+    window.LEVEL_FLAGS.momentumThisLevel = (window.LEVEL_FLAGS.momentumThisLevel || 0) + 1;
+    if (window.LEVEL_FLAGS.momentumThisLevel === 10) trackAchStat('statistician3MomentumOneLevel');
 
     Audio_Manager.playSFX('momentum');
     updateMomentumBar(0, 15); // reset momentum bar after it fires

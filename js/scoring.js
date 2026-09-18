@@ -213,12 +213,12 @@ export function fireAchievements({ gi, rows, cols, elapsed, pts, ptsAwarded, pre
         mult,
         isFirstClear,
         hadPenaltyClutch: !!window._hadPenaltyClutch,
-        isBouncebackWin: window._lastFailedGi === gi,
+        isBouncebackWin: window.LEVEL_FLAGS.lastFailedGi === gi,
     });
 
     // Reset transient run flags consumed by the achievement system
     window._hadPenaltyClutch = false;
-    window._lastFailedGi = null;
+    window.LEVEL_FLAGS.lastFailedGi = null;
 
     checkWorldCompleteAch();
 }

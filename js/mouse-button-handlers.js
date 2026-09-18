@@ -318,7 +318,7 @@ export function tryAbsorbWithConfidenceInterval(row, col) {
     globalThis.wrongGrid[row][col] = true;
     renderCell(row, col);
     globalThis.consecutiveCorrectFills = 0;        // CI absorption also breaks the correct-fill streak
-    globalThis._streakBonusFills = 0;
+    window.LEVEL_FLAGS.streakBonusFills = 0;
     if (typeof globalThis.PassiveTracker !== 'undefined') PassiveTracker.onStreakReset();
     globalThis.showToast(`📐 ${t('cg_ci_absorb')}`);
     return true;
@@ -360,7 +360,7 @@ export function markCellWrongAndPenalize(row, col) {
 // Reset consecutive-fill streaks and notify passive systems.
 export function breakFillStreaksOnMistake() {
     globalThis.consecutiveCorrectFills = 0;    // sample_efficiency skill: streak reset
-    globalThis._streakBonusFills = 0;          // streak_bonus skill: streak reset
+    window.LEVEL_FLAGS.streakBonusFills = 0;          // streak_bonus skill: streak reset
 
     // Endgame gear: arcane surge streak + channel stacks break on a mistake
     if (typeof globalThis._egOnMistake === 'function') globalThis._egOnMistake();
@@ -400,21 +400,21 @@ export function openConfidenceIntervalGraceWindow() {
 export function checkGoldenClockAfterMistake() {
     if (!window.LEVEL_FLAGS.goldenClockActive) return false;
 
-    window._goldenClockMistakesLeft = (window._goldenClockMistakesLeft || 0) - 1;
+    window.LEVEL_FLAGS.goldenClockMistakesLeft = (window.LEVEL_FLAGS.goldenClockMistakesLeft || 0) - 1;
 
     // Canonical counter format (keeps the "x / y" endgame layout) + clock suffix
     if (typeof globalThis._setMistakeCounterText === 'function') {
-        globalThis._setMistakeCounterText(` 🕰️${window._goldenClockMistakesLeft}`);
+        globalThis._setMistakeCounterText(` 🕰️${window.LEVEL_FLAGS.goldenClockMistakesLeft}`);
     } else {
         const mcEl = document.getElementById('mistake-counter');
-        if (mcEl) mcEl.textContent = `✗ ${globalThis.mistakeCount} 🕰️${window._goldenClockMistakesLeft}`;
+        if (mcEl) mcEl.textContent = `✗ ${globalThis.mistakeCount} 🕰️${window.LEVEL_FLAGS.goldenClockMistakesLeft}`;
     }
 
-    if (window._goldenClockMistakesLeft <= 0) {
+    if (window.LEVEL_FLAGS.goldenClockMistakesLeft <= 0) {
         window.LEVEL_FLAGS.goldenClockActive = false;
         globalThis.dead = true;
         stopTimer();
-        window._lastFailedGi = cur.gIdx;
+        window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
         if (typeof globalThis._arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
             globalThis._arcaneFreeze_clearAllFrostAndStalagmites();   
         }
@@ -442,7 +442,7 @@ export function checkHardcoreAfterMistake() {
 
     globalThis.dead = true;
     stopTimer();
-    window._lastFailedGi = cur.gIdx;    // bounceback achievement needs this
+    window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;    // bounceback achievement needs this
     if (typeof globalThis._arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
         globalThis._arcaneFreeze_clearAllFrostAndStalagmites();    
     }
@@ -536,7 +536,7 @@ export function applyVarianceCollapsePenalty(toastMsg) {
 // covariance_shift (261-263): after a lucky tile is claimed, reveal 1–3
 // unrevealed correct cells from the same row or column.
 export function applyCovarianceShiftReveal(row, col) {
-    if (window._oracleActive) return;
+    if (window.LEVEL_FLAGS.oracleActive) return;
     if (!ptHasSkill('covariance_shift_1')) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
@@ -691,9 +691,9 @@ export function checkStreakBonus() {
     if (!ptHasSkill('streak_bonus_1')) return;
     if (ptHasSkill('keystone_gamblers_ruin')) return;
 
-    globalThis._streakBonusFills++;
-    if (globalThis._streakBonusFills >= 15) {
-        globalThis._streakBonusFills = 0;
+    window.LEVEL_FLAGS.streakBonusFills++;
+    if (window.LEVEL_FLAGS.streakBonusFills >= 15) {
+        window.LEVEL_FLAGS.streakBonusFills = 0;
 
         let bonus = 15;                                     // streak_bonus_1 base
         if (ptHasSkill('streak_bonus_2')) bonus += 5;

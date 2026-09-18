@@ -134,7 +134,7 @@ export function _resetGameplayFlags() {
     globalThis.consecutiveCorrectFills = 0;
     globalThis._lawOfLargeNumbersNext = null;
     globalThis._confidenceIntervalActive = false;
-    globalThis._streakBonusFills = 0;
+    window.LEVEL_FLAGS.streakBonusFills = 0;
 
     window.LEVEL_FLAGS.veiledCursedUsed = false;
     window._asymptoticLinesCompleted = 0;
@@ -148,7 +148,7 @@ export function _resetGameplayFlags() {
 // Resets all per-level tracking Sets, logs, and boolean flags used by
 // passive nodes and achievement systems.
 export function _resetLevelTrackers() {
-    window._mistakeLog = [];
+    window.LEVEL_FLAGS.mistakeLog = [];
     window._sigThresholdProtected = new Set();
     window._dofRevertedCells = new Set();
     window._regressionRewardedLines = new Set();
@@ -441,8 +441,8 @@ export function _startSystems() {
         if (typeof _refreshTouchpadModeButtonLabel === 'function') _refreshTouchpadModeButtonLabel();
     }
 
-    if (window._lastFailedGi !== undefined && cur && cur.gIdx !== window._lastFailedGi) {
-        window._lastFailedGi = null;
+    if (window.LEVEL_FLAGS.lastFailedGi !== undefined && cur && cur.gIdx !== window.LEVEL_FLAGS.lastFailedGi) {
+        window.LEVEL_FLAGS.lastFailedGi = null;
     }
 }
 
@@ -545,7 +545,7 @@ export function _doStartLevel(gi) {
 
     // 4. Passive node effects - oracle flag must be set before passives run
     if (ptHasSkill('keystone_the_oracle') && cur.grid.length * cur.grid[0].length >= 200) {
-        window._oracleActive = true;
+        window.LEVEL_FLAGS.oracleActive = true;
     }
     _applyPassiveStartEffects();
     _applySylaForestAffinity();

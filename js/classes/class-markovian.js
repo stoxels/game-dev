@@ -293,7 +293,7 @@ export function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMist
 
     // Clear stale DoF tracking - the entire grid state just changed.
     window._dofRevertedCells = new Set();
-    window._mistakeLog = [];
+    window.LEVEL_FLAGS.mistakeLog = [];
 
     // Flush snapshots: everything recorded after the applied snapshot is
     // now invalid since we branched into a new timeline.

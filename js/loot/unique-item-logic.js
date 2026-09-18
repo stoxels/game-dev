@@ -67,7 +67,7 @@ export function _egApplyUniqueZeroLineAutomark() {
     try {
         if (typeof ptHasSkill === 'function' && ptHasSkill('keystone_ergodic_field')) return 0;
     } catch (e) {}
-    if (window._oracleActive) return 0;
+    if (window.LEVEL_FLAGS.oracleActive) return 0;
 
     const sol = cur.grid;
     const rows = sol.length;

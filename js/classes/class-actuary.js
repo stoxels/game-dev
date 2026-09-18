@@ -48,7 +48,7 @@ export const REGRESSION_CHAIN_LIFETIME_MS = 1000;
 // These are intentionally on `window` so other files can
 // read them without importing this module.
 //
-//   window._mistakeLog            - Array<{r,c,penaltySecs}>  rolling mistake history
+//   window.LEVEL_FLAGS.mistakeLog            - Array<{r,c,penaltySecs}>  rolling mistake history
 //   window._dofRevertedCells      - Set<string>               cells cleared by Regression
 //   window._regressionPendingReveals - Set<string> | null     reveal targets reserved during a Regression cast
 //   window._sigThreshArmed        - boolean  Significance Threshold armed (next mistake triggers it)
@@ -64,10 +64,10 @@ export const REGRESSION_CHAIN_LIFETIME_MS = 1000;
 // is deducted. Maintains a rolling window of the last ACTUARY_MISTAKE_LOG_MAX
 // mistakes so Regression To Prior can reference them.
 export function actuaryLogMistake(r, c, penaltySecs) {
-    if (!window._mistakeLog) window._mistakeLog = [];
-    window._mistakeLog.push({ r, c, penaltySecs });
-    if (window._mistakeLog.length > ACTUARY_MISTAKE_LOG_MAX) {
-        window._mistakeLog.shift();
+    if (!window.LEVEL_FLAGS.mistakeLog) window.LEVEL_FLAGS.mistakeLog = [];
+    window.LEVEL_FLAGS.mistakeLog.push({ r, c, penaltySecs });
+    if (window.LEVEL_FLAGS.mistakeLog.length > ACTUARY_MISTAKE_LOG_MAX) {
+        window.LEVEL_FLAGS.mistakeLog.shift();
     }
 }
 
@@ -220,7 +220,7 @@ export function _regressionDrawChain(fromEl, toEl) {
 export function _executeRegressionToPrior(correctCount, recoverPct, revealCount) {
     if (!cur) return;
 
-    const log = window._mistakeLog || [];
+    const log = window.LEVEL_FLAGS.mistakeLog || [];
     if (log.length === 0) {
         globalThis.showToast(t('cls_regression_none'));
         _regressionCancel(true);

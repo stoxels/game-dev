@@ -10,7 +10,7 @@ import { FX_Z, _fxClock, _fxGetPuzzleRect, _fxMakeGoldTintFill, _fxOverlay } fro
 // goldenClock - halts the timer until 3 more mistakes are made.
 export function _useGoldenClock(id, def) {
     window.LEVEL_FLAGS.goldenClockActive = true;
-    window._goldenClockMistakesLeft = 3;
+    window.LEVEL_FLAGS.goldenClockMistakesLeft = 3;
     playItemEffect(id);
 
     // Update the mistake display so the player immediately sees the limit

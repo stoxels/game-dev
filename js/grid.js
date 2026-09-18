@@ -969,7 +969,7 @@ export function _tryAutoMarkAdjacentLine(adjacentIndices, getCandidates) {
 //   colDone    - whether the affected column is now complete
 //   sol        - 2D solution array
 export function _handleResidualAnalysis(row, col, rowDone, colDone, sol) {
-    if (window._oracleActive) return;
+    if (window.LEVEL_FLAGS.oracleActive) return;
     if (globalThis.ptHasSkill('keystone_ergodic_field')) return;
     if (!globalThis.ptHasSkill('residual_analysis_1') &&
         !globalThis.ptHasSkill('residual_analysis_2') &&

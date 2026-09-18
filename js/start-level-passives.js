@@ -260,7 +260,7 @@ export function _applyProbabilisticStartRolls() {
 // Skipped if the oracle is active or keystone_ergodic_field is allocated.
 export function _applyNullHypothesis() {
     if (!ptHasSkill('keystone_null_hypothesis')) return;
-    if (window._oracleActive) return;
+    if (window.LEVEL_FLAGS.oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
     const sol = cur.grid;
@@ -326,7 +326,7 @@ export function _applyCentralTendency() {
         + (ptHasSkill('central_tendency_2') ? 1 : 0)
         + (ptHasSkill('central_tendency_3') ? 1 : 0);
     if (nodes === 0) return;
-    if (window._oracleActive) return;
+    if (window.LEVEL_FLAGS.oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
     const sol = cur.grid;
@@ -371,7 +371,7 @@ export function _applyDensityMapping() {
         + (ptHasSkill('density_mapping_2') ? 1 : 0)
         + (ptHasSkill('density_mapping_3') ? 1 : 0);
     if (nodes === 0) return;
-    if (window._oracleActive) return;
+    if (window.LEVEL_FLAGS.oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
     const sol = cur.grid;
@@ -464,7 +464,7 @@ export function _applySparseRegion() {
         + (ptHasSkill('sparse_region_2') ? 1 : 0)
         + (ptHasSkill('sparse_region_3') ? 1 : 0);
     if (nodes === 0) return;
-    if (window._oracleActive) return;
+    if (window.LEVEL_FLAGS.oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
     const sol = cur.grid;
@@ -532,7 +532,7 @@ export function _applyMarginalDistribution() {
         + (ptHasSkill('marginal_distribution_2') ? 1 : 0)
         + (ptHasSkill('marginal_distribution_3') ? 1 : 0);
     if (nodes === 0) return;
-    if (window._oracleActive) return;
+    if (window.LEVEL_FLAGS.oracleActive) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
     const sol = cur.grid;
@@ -588,7 +588,7 @@ export function _applyMarginalDistribution() {
 // Delayed to ensure the grid DOM is fully rendered before the scan runs.
 export function _applyInterquartileVision() {
     if (!ptHasSkill('interquartile_vision_1')) return;
-    if (window._oracleActive) return;
+    if (window.LEVEL_FLAGS.oracleActive) return;
     if (!cur) return;
 
     const rows = cur.grid.length, cols = cur.grid[0].length;

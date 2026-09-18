@@ -237,7 +237,7 @@ export function _egGameOver() {
     if (typeof _egIsCampaignRun === 'function' && _egIsCampaignRun()) {
         globalThis.dead = true;
         if (typeof stopTimer === 'function') stopTimer();
-        if (cur) window._lastFailedGi = cur.gIdx;
+        if (cur) window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
         const lose = document.getElementById('ov-lose');
         if (lose) {
             const titleEl = document.getElementById('lose-title');

@@ -22,7 +22,7 @@ try { Object.defineProperty(globalThis, 'revealTiles', { get() { return revealTi
 
 export function revealTiles(count, source) {
     // Ergodic Field (291) and The Oracle (300) disable all auto-reveals
-    if (ptHasSkill('keystone_ergodic_field') || window._oracleActive) return;
+    if (ptHasSkill('keystone_ergodic_field') || window.LEVEL_FLAGS.oracleActive) return;
 
     const sol = cur.grid;
     const rows = sol.length;
@@ -68,7 +68,7 @@ export function revealTiles(count, source) {
 
 export function markWrongTiles(count) {
     // Ergodic Field (291) and The Oracle (300) disable all auto-marks
-    if (ptHasSkill('keystone_ergodic_field') || window._oracleActive) return;
+    if (ptHasSkill('keystone_ergodic_field') || window.LEVEL_FLAGS.oracleActive) return;
 
     const sol = cur.grid;
     const rows = sol.length;

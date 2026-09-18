@@ -466,7 +466,7 @@ export function _canFireInstantAbility(slot) {
         return true;
     }
     if (STATE.playerAscendency === 'actuary' && slot === 'active3') {
-        if (!(window._mistakeLog && window._mistakeLog.length > 0)) {
+        if (!(window.LEVEL_FLAGS.mistakeLog && window.LEVEL_FLAGS.mistakeLog.length > 0)) {
             globalThis.showToast(t('cls_regression_none'));
             return false;
         }
@@ -809,10 +809,10 @@ export function executeActiveAbility(row, col) {
 export function _resetClassLevelState() {
     correctFillStreak = 0;
     nextPenaltyHalved = false;
-    window._momentumThisLevel = 0;
+    window.LEVEL_FLAGS.momentumThisLevel = 0;
     window._dataStrikeUsesThisLevel = 0;
     window._shadowSealActive = false;
-    window._goldenClockMistakesLeft = null;
+    window.LEVEL_FLAGS.goldenClockMistakesLeft = null;
     window._chronoFractureActive = false;
     window._shieldExtraCharges = 0;
     // cursedImmune / goldenClockActive / veiledCursedUsed now live in

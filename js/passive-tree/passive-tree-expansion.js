@@ -1107,8 +1107,8 @@ export function _ptxRunExpansion() {
     // ---- Streak threshold reduction (334) ----------------------------------------------------------------
 
     patch('checkStreakBonus', function (orig, args) {
-        if (has('truly_large_numbers') && typeof globalThis._streakBonusFills !== 'undefined' && globalThis._streakBonusFills === 9) {
-            globalThis._streakBonusFills = 14;   // the upcoming fill becomes #10 and hits the hardcoded >=15 trigger
+        if (has('truly_large_numbers') && typeof window.LEVEL_FLAGS.streakBonusFills !== 'undefined' && window.LEVEL_FLAGS.streakBonusFills === 9) {
+            window.LEVEL_FLAGS.streakBonusFills = 14;   // the upcoming fill becomes #10 and hits the hardcoded >=15 trigger
         }
         return orig(...args);
     });
