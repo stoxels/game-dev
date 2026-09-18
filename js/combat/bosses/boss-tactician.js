@@ -6,46 +6,13 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFli
 //------------------------------------------------------------------------
 //-------------------BOSS: THE TACTICIAN (boss_tactician)------------------
 //------------------------------------------------------------------------
-// A rework of the old one-shot Battle Intent into a persistent chess
-// siege. The Tactician plays the board and the board is the arena.
-// Fight identity: READ THE BOARD - every attack is a chess move, declared
-// in advance, and every declared move is dodgeable if you read it.
+// Persistent chess siege - every attack is a declared, dodgeable chess move:
+// the gliding queen body, telegraphed battle intents, pawn marches, CHECK
+// rook lanes at 60%, zugzwang hazards at 30%, and the CHECKMATE wall-crush
+// charge attack. One _egNkLoop drives every state machine.
 //
-//   PERSISTENT (whole fight, watcher):
-//   • THE QUEEN'S GUARD - the boss's arena body: a black ♛ queen that
-//     glides around the board like a queen move (axis + diagonal lines).
-//     Touching it is a ROOK'S CHARGE: animated fling + physical damage.
-//   • BATTLE INTENT - the Tactician still telegraphs its plans (the old
-//     identity, now constant): a banner declares ⚔️ VOLLEY, 🛡️ TITHE or
-//     😡 ENRAGE, then executes 2s later. Volleys are aimed knight-orbs.
-//   • PAWN MARCHES - ♟️ pawns periodically advance up the board in rank
-//     columns (telegraphed lane, then a marching wall with one gap).
-//     Physical hits; the gap is the answer.
-//
-//   60% GATE - CHECK: the queen calls CHECK - four rook-slide lanes pin
-//   the board (two horizontal, two vertical, telegraphed), then charge
-//   along them. Each lane is a full-screen rook dash.
-//
-//   30% GATE - ZUGZWANG: every position is losing. Chess-piece hazards
-//   occupy cells: bishop diagonals scorch the board (telegraphed diagonal
-//   beams), and a knight ♞ appears and leaps in L-shapes at your position,
-//   each landing a burst. Forced movement, forced reads.
-//
-//   CHARGE ATTACK - CHECKMATE: the board flashes, the four board edges
-//   slam inward as castle walls (like a rook castle from all sides),
-//   crushing anyone caught in the shrinking ring. Escape through the
-//   narrowing gaps before the walls meet.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string. Damage flows through the shared tier curve.
-// NOTE: exactly ONE _egNkLoop runs on the watcher's run - every state
-// machine (intent, pawns, check lanes, zugzwang, checkmate) lives in
-// that single tick.
+// Shared mechanics (fog_bank by handler-name string, soul_tithe by import)
+// live in shared-puzzle-mechanics.js.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
