@@ -1,5 +1,5 @@
 import { setAchStat, trackAchStat } from '../achievements/achievements.js';
-import { updateQuestStats } from '../quests/quests-stats.js';
+import { updateQuestStats } from '../inference/inference-stats.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { egSaveHubState } from './endgame-hub.js';

@@ -6,7 +6,7 @@ import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../timer/timer-a
 import { t } from '../translation/translations.js';
 import { PassiveTracker } from './passive-tracker.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
-import { questStat_gamblersRuinTimeAdded } from '../quests/quests-stats.js';
+import { questStat_gamblersRuinTimeAdded } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //----------------- passive-tree-special-nodes-logic.js ------------------

@@ -9,7 +9,7 @@ import { CLASS_DEFS } from './class-defs.js';
 import { buildClassHUD, updateMomentumBar } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
-import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //-----------------STATISTICIAN-------------------------------------------

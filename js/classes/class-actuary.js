@@ -8,7 +8,7 @@ import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { _fadeOutElement } from './class-recursionist.js';
-import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------

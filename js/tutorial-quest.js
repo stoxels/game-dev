@@ -22,7 +22,7 @@ import { ITEM_DEFS } from './puzzle-items/item-definitions.js';
 import { FX_Z, _fxGetPuzzleRectForWrap } from './puzzle-mechanics/fx-helpers.js';
 import { showItemGainPopup, showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { _consumeItem } from './puzzle-items/use-item.js';
-import { questStat_revealItemUsed } from './quests/quests-stats.js';
+import { questStat_revealItemUsed } from './inference/inference-stats.js';
 import { isPuzzleSolved } from './scoring.js';
 import { hideResultOverlays, showSetup } from './screens/screens.js';
 import { _charmMake, _charmRenderOverlay, _egCharmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';

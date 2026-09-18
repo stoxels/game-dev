@@ -1,7 +1,7 @@
 ﻿import { LANG, t } from '../translation/translations.js';
 import { initMapViewToggle, showMapView } from './screens-map-view.js';
 import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
-import { buildQuestLogButton } from '../quests/quests-logic.js';
+import { buildQuestLogButton } from '../inference/inference-logic.js';
 
 //------------------------------------------------------------------------
 //--------------------CONSTANTS-------------------------------------------

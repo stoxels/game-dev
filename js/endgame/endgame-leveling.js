@@ -1,6 +1,6 @@
 import { setAchStat } from '../achievements/achievements.js';
 import { _resetPlayerMana, gainMana } from '../classes/class-mana.js';
-import { _incDirect } from '../quests/quests-stats.js';
+import { _incDirect } from '../inference/inference-stats.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { _egGetRevealProjectileDamagePct } from '../combat/combat-class-projectiles.js';

@@ -3,7 +3,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { t } from '../translation/translations.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
-import { questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------

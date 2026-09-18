@@ -1086,7 +1086,7 @@ export function _egRollMapCompletionReward(map) {
 //   sizeMix          - puzzle count per grid-size bucket
 //                      (small / medium / large / massive)
 
-// Grid-size buckets (same thresholds as _gridSizeBucket in quests-stats.js).
+// Grid-size buckets (same thresholds as _gridSizeBucket in inference-stats.js).
 // Used by the run launcher to filter story puzzles and to steer the
 // generated-puzzle sizes.
 export const EG_GRID_SIZE_BUCKETS = {

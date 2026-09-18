@@ -8,7 +8,7 @@ import { showHS } from './screens/screens-highscore.js';
 import { cancelSlotName, confirmSlotName, showSaveSlotSelect } from './screens/screens-save-slots.js';
 import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
 import { ptGoBack, showPassiveTree } from './passive-tree/passive-tree.js';
-import { showQuestLog } from './quests/quests-ui.js';
+import { showQuestLog } from './inference/inference-ui.js';
 import { _ptRefundAllPoints } from './passive-tree/passive-tree-state-points.js';
 
 //------------------------------------------------------------------------

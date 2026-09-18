@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { revealTiles } from '../../puzzle-mechanics/grid-actions.js';
-import { questStat_revealItemUsed } from '../../quests/quests-stats.js';
+import { questStat_revealItemUsed } from '../../inference/inference-stats.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _calcRevealCount } from '../../puzzle-mechanics/effect-modifiers.js';

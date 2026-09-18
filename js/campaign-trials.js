@@ -16,7 +16,7 @@ import { ALL, WORLD_START_GI, isNexusPointLevel, isNexusWorld } from './levels/l
 import { buildInventoryPanel } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { ITEM_DEFS } from './puzzle-items/item-definitions.js';
 import { showItemGainPopup, showToast } from './puzzle-mechanics/toasts-and-popups.js';
-import { _incDirect, updateQuestStats } from './quests/quests-stats.js';
+import { _incDirect, updateQuestStats } from './inference/inference-stats.js';
 import { isGatedLevel } from './quiz-exercise/mathgate.js';
 import { _wdSyncSpriteToLevel, showWorldDetail } from './screens/screens-world-levels.js';
 import { _maybeShowConvergenceModal, goToLevelSelect } from './screens/screens.js';

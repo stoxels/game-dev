@@ -7,10 +7,18 @@ import { _calcMarkWrongCount } from '../puzzle-mechanics/effect-modifiers.js';
 import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxOverlay, _fxSpawnParticles } from '../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------
-//-------------------MARK WRONG - ERASER / SWEEPER / ERROR MAGNET / ERROR GEM----------------------
+//-------------------MARK WRONG ITEMS---------------------------------------
 //------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// Eraser, Sweeper, Error Magnet and Error Gem: each marks a few wrong
+// cells so the true cells stand out. Stronger tiers mark more cells
+// with fancier effects. Blinding Truth blocks them entirely.
 
-// markWrong2 / markWrong4 / etc. - marks N random empty non-solution cells.
+// MAIN ENTRY POINTS
+
+// Uses a mark-wrong item: marks N wrong cells, plays its effect.
+// The count comes from the item id (markWrong2 = 2) plus bonuses.
+// Blocked entirely while Blinding Truth is active.
 export function _useMarkWrong(id, def) {
     // Blinding Truth keystone blocks all mark-wrong items entirely
     if (ptHasSkill('keystone_blinding_truth')) {
@@ -27,6 +35,7 @@ export function _useMarkWrong(id, def) {
 
 //------------------------------------------------------------------------
 //-------------------ITEM VISUAL EFFECT-----------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Helper: creates one horizontal eraser streak at a given vertical position.

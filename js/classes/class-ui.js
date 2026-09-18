@@ -8,7 +8,7 @@ import { CLASS_DEFS, CLASS_LIST, CLASS_SPELL_ICONS } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
 import { CHARM_BASE_ICON, charmKeyFor, ensureCharmState, getCharmByKey, promoteCharmSlotToRank } from '../skills/skill-charms.js';
 import { getSkillDef, getSkillName } from '../skills/skill-registry.js';
-import { updateQuestStats } from '../quests/quests-stats.js';
+import { updateQuestStats } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //----------------------------CONSTANTS-----------------------------------

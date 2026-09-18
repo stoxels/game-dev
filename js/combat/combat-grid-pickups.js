@@ -4,7 +4,7 @@ import { ALL_SLOTS, SLOT_DISPLAY_INDEX, _getAbilityData, _getAbilityName, _patch
 import { buildClassHUD } from '../classes/class-hud.js';
 import { _getPlayerMaxMana, gainMana } from '../classes/class-mana.js';
 import { _updateMistakeCounterHUD } from '../penalty.js';
-import { questStat_mistakesRemoved } from '../quests/quests-stats.js';
+import { questStat_mistakesRemoved } from '../inference/inference-stats.js';
 import { _charmAutoClaimOnReveal, _charmCellHasDrop, _charmStopDrops } from '../skills/skill-charms.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';

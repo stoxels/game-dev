@@ -7,7 +7,7 @@ import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
-import { questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS--------------------

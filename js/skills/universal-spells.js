@@ -7,7 +7,7 @@ import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, 
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
 import { SKILL_REGISTRY } from './skill-registry.js';
 import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspBlinkFX, _uspFireThemedProjectile, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph } from './universal-spell-fx.js';
-import { updateQuestStats } from '../quests/quests-stats.js';
+import { updateQuestStats } from '../inference/inference-stats.js';
 
 // universal-spells.js
 //------------------------------------------------------------------------

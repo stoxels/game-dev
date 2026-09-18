@@ -4,7 +4,7 @@ import { LANG, t } from '../translation/translations.js';
 import { MOD_CLASSES, MOD_LABELS, applyClassStatusActiveStyle, applyClassStatusEmptyStyle, buildNextCodeStr, isLevelConvergence, isMaxCleared, renderLevelSelect } from './screens-level-select.js';
 import { showWorldDetail, wdGoBackToMap } from './screens-world-levels.js';
 import { showSetup, switchScreen } from './screens.js';
-import { showQuestLog } from '../quests/quests-ui.js';
+import { showQuestLog } from '../inference/inference-ui.js';
 import { showPassiveTree } from '../passive-tree/passive-tree.js';
 
 /*

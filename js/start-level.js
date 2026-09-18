@@ -27,7 +27,7 @@ import { rarityColors } from './puzzle-items/item-pool.js';
 import { showPrimerModal } from './puzzle-items/scouts-primer/scouts-primer.js';
 import { _fxShieldBorderRemove } from './puzzle-mechanics/fx-helpers.js';
 import { resetToastQueue, showToast } from './puzzle-mechanics/toasts-and-popups.js';
-import { resetQuestLevelCounters, resetWitchImmunityLevelCounter } from './quests/quests-stats.js';
+import { resetQuestLevelCounters, resetWitchImmunityLevelCounter } from './inference/inference-stats.js';
 import { isGatedLevel, isMathGatePassed, tryStartGatedLevel } from './quiz-exercise/mathgate.js';
 import { closeQuiz } from './quiz-exercise/quiz.js';
 import { _getLevelSpecialStatus, isPuzzleSolved } from './scoring.js';

@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
-import { LEDGER_CATEGORIES, LEDGER_GROUPS } from './quests-data.js';
-import { _milestone_getProgress, _milestone_isClaimed, _milestone_isComplete } from './quests-logic.js';
+import { LEDGER_CATEGORIES, LEDGER_GROUPS } from './inference-data.js';
+import { _milestone_getProgress, _milestone_isClaimed, _milestone_isComplete } from './inference-logic.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
@@ -27,7 +27,7 @@ export let _ledger_activeCategoryId = null;
  * Category icons layered on top of the shared stone-and-parchment card
  * frame (that frame is one shared image set in CSS, .ledger-card-art -
  * only this small icon changes per category). Every category id from
- * quests-data.js needs exactly one entry here.
+ * inference-data.js needs exactly one entry here.
  */
 export const LEDGER_CATEGORY_ICON = {
     // Progression
@@ -500,7 +500,7 @@ export function _ledger_buildClaimButton(ms, claimable, claimed) {
 
 /**
  * Builds the HTML for a single milestone row in the detail view.
- * @param {Object} ms - A milestone object from quests-data.js
+ * @param {Object} ms - A milestone object from inference-data.js
  * @returns {string} HTML string
  */
 export function _ledger_buildMilestoneRow(ms) {
@@ -608,7 +608,7 @@ export function _ledger_backToGrid() {
 /**
  * Opens the detail view for a category.
  * Called from inline onclick on category cards.
- * @param {string} id - Category id from quests-data.js
+ * @param {string} id - Category id from inference-data.js
  */
 export function _ledger_openCategory(id) {
     _ledger_activeCategoryId = id;
@@ -747,7 +747,7 @@ export function _drainQuestToastQueue() {
 
 /**
  * Public entry point - queues a "milestone reached" toast notification.
- * Called from quests-stats.js when a milestone becomes complete.
+ * Called from inference-stats.js when a milestone becomes complete.
  * @param {Object} milestone
  * @param {Object} category
  */

@@ -4,7 +4,7 @@ import { stopTimer } from './timer/timer.js';
 import { checkWorldCompleteAch, onLevelCompleteAch } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
-import { _incDirect, questStat_luckyDropClaimed, updateQuestStats } from './quests/quests-stats.js';
+import { _incDirect, questStat_luckyDropClaimed, updateQuestStats } from './inference/inference-stats.js';
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
 import { goToLevelSelect, hideResultOverlays } from './screens/screens.js';
 import { _wdSyncSpriteToLevel } from './screens/screens-world-levels.js';

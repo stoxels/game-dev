@@ -1008,7 +1008,7 @@ export const EG_BONUS_LOOT_CHANCE_PER_QUESTION = [0.33, 0.33, 0.34];
 export const EG_BONUS_LOOT_CHANCE_MAX = 5.0;
 
 // Returns the bonus-loot gain (0–1) for solving a puzzle, based on how many
-// cells the puzzle's grid has (same buckets as _gridSizeBucket in quests-stats.js).
+// cells the puzzle's grid has (same buckets as _gridSizeBucket in inference-stats.js).
 export function _egGetPuzzleBonusLootGain() {
     const rows = globalThis.cur ? globalThis.cur.grid.length : 0;
     const cols = globalThis.cur && globalThis.cur.grid[0] ? globalThis.cur.grid[0].length : 0;

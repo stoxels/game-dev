@@ -2,16 +2,16 @@ import { setAchStat, trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
-import { LEDGER_CATEGORIES, _MILESTONE_MAP } from './quests-data.js';
-import { _incDirect } from './quests-stats.js';
-import { renderQuestLog } from './quests-ui.js';
+import { LEDGER_CATEGORIES, _MILESTONE_MAP } from './inference-data.js';
+import { _incDirect } from './inference-stats.js';
+import { renderQuestLog } from './inference-ui.js';
 
 // ════════════════════════════════════════════════════════════════════════════
 //
-//  quests-logic.js  -  Milestone evaluation, claiming, banner, badge,
+//  inference-logic.js  -  Milestone evaluation, claiming, banner, badge,
 //                      and achievement tracking for the quest ledger.
 //
-//  Depends on: quests-data.js   (LEDGER_CATEGORIES, _MILESTONE_MAP)
+//  Depends on: inference-data.js   (LEDGER_CATEGORIES, _MILESTONE_MAP)
 //  Depends on: achievements.js  (trackAchStat, setAchStat)
 //  Depends on: (global)         globalThis.STATE, LANG, globalThis.ITEM_DEFS, save(), globalThis.pickRandomItem()
 //
@@ -20,7 +20,7 @@ import { renderQuestLog } from './quests-ui.js';
 //    buildQuestLogButton()        - initialise badge visibility on game start
 //    _refreshQuestBadge()         - update red badge on the quest-log button
 //
-//  Used internally by quests-ui.js:
+//  Used internally by inference-ui.js:
 //    _milestone_isComplete(ms)                    - has the player hit the target?
 //    _milestone_isClaimed(ms)                     - has the reward been collected?
 //    _milestone_getProgress(ms)  → { current, target, pct }
@@ -96,7 +96,7 @@ export const CATEGORY_ACHIEVEMENT_MAP = {
 
 /**
  * Returns true if the player has met the milestone's required target.
- * @param {Object} ms - A milestone object from quests-data.js
+ * @param {Object} ms - A milestone object from inference-data.js
  * @returns {boolean}
  */
 export function _milestone_isComplete(ms) {
@@ -106,7 +106,7 @@ export function _milestone_isComplete(ms) {
 
 /**
  * Returns true if the player has already claimed this milestone's reward.
- * @param {Object} ms - A milestone object from quests-data.js
+ * @param {Object} ms - A milestone object from inference-data.js
  * @returns {boolean}
  */
 export function _milestone_isClaimed(ms) {
@@ -116,7 +116,7 @@ export function _milestone_isClaimed(ms) {
 /**
  * Returns current progress for a milestone.
  * `current` is clamped to `target` so progress bars never overflow 100%.
- * @param {Object} ms - A milestone object from quests-data.js
+ * @param {Object} ms - A milestone object from inference-data.js
  * @returns {{ current: number, target: number, pct: number }}
  */
 export function _milestone_getProgress(ms) {
@@ -291,7 +291,7 @@ export function _banner_buildElement(ms, cat, rewardParts) {
     const banner = document.createElement('div');
     banner.id = 'quest-claim-banner';
 
-    // quests-logic.js - inside _banner_buildElement()
+    // inference-logic.js - inside _banner_buildElement()
 
     banner.innerHTML = `
     <div class="qcb-inner">
@@ -492,7 +492,7 @@ export function _claim_recordClaim(ms) {
  * Claims a milestone by id if it is complete and not yet claimed.
  * On success: records the claim, grants rewards, saves, shows the banner,
  * refreshes the badge, tracks achievements, and re-renders the quest log.
- * Called from inline onclick handlers in quests-ui.js.
+ * Called from inline onclick handlers in inference-ui.js.
  * @param {string} milestoneId - The id of the milestone to claim
  */
 export function claimQuest(milestoneId) {

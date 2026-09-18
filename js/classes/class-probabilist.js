@@ -7,7 +7,7 @@ import { buildClassHUD } from './class-hud.js';
 import { _playDivineProcEffect } from './class-statistician.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
-import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_fieldScanCellRevealed, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_fieldScanCellRevealed, updateQuestStats } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //------------------------PROBABILIST-------------------------------------

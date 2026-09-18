@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { renderCell } from '../../grid.js';
-import { questStat_shadowSealUsed } from '../../quests/quests-stats.js';
+import { questStat_shadowSealUsed } from '../../inference/inference-stats.js';
 import { setTimeSecs } from '../../timer/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { _applyCellEffect } from '../../puzzle-mechanics/cell-fx.js';

@@ -3,7 +3,7 @@
 // ============================================================
 //  Pure data, no logic. Loaded before audio.js, which reads
 //  these as globals (same pattern as item-definitions.js / item-pool.js,
-//  quests-data.js / quests-logic.js, etc.)
+//  inference-data.js / inference-logic.js, etc.)
 //
 //  Structure:
 //    1. BGM Track Registry

@@ -1,4 +1,4 @@
-import { _ptCurrentSpentCount } from './quests-stats.js';
+import { _ptCurrentSpentCount } from './inference-stats.js';
 
 // Sort leder by categories
 

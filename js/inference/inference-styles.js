@@ -1,4 +1,4 @@
-// quests-styles.js  -  Injects all Ledger / Quest CSS once on load
+// inference-styles.js  -  Injects all Ledger / Quest CSS once on load
 //
 // No dependencies. Safe to load before the DOM is ready (uses
 // document.head.appendChild which works as soon as <head> exists).

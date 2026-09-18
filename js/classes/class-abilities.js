@@ -24,7 +24,7 @@ import { activateTargetingReticle } from './targeting-reticle.js';
 import { playShieldChargePulseEffect, playTimeGainEffect } from '../passive-tree/passive-effects.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getCharmLockedSkillForLegacySlot, getSkillCastRankClampedForSlot, getSkillIdForLegacySlot, noteCharmCast } from '../skills/skill-charms.js';
-import { _incDirect, updateQuestStats } from '../quests/quests-stats.js';
+import { _incDirect, updateQuestStats } from '../inference/inference-stats.js';
 
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'correctFillStreak', { get() { return correctFillStreak; }, set(v) { correctFillStreak = v; }, configurable: true }); } catch (e) {}

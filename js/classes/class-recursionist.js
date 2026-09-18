@@ -5,7 +5,7 @@ import { handleWrongFill } from '../mouse-button-handlers.js';
 import { t } from '../translation/translations.js';
 import { _refundCooldown } from './class-actuary.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
-import { questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------

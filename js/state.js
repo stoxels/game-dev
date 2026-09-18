@@ -1,4 +1,4 @@
-import { migrateQuestState } from './quests/quests-stats.js';
+import { migrateQuestState } from './inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 3: live globalThis accessors for externally-mutated state.
@@ -559,8 +559,8 @@ export function migrateOldSave(s) {
     _migrateEndgameFields(s);
     _migrateCharmFields(s);
     // Quest containers. migrateQuestState is a REAL import now (from
-    // js/quests/quests-stats.js). The state.js <-> quests-stats cycle is
-    // safe: quests-stats has no top-level statements and migrateQuestState
+    // js/inference/inference-stats.js). The state.js <-> inference-stats cycle is
+    // safe: inference-stats has no top-level statements and migrateQuestState
     // is a hoisted declaration, so it exists before this body runs. The
     // guarded fallback from the 3.4.1 hotfix is retired.
     migrateQuestState(s);

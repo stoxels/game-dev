@@ -1,6 +1,6 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
-import { updateQuestStats } from '../quests/quests-stats.js';
+import { updateQuestStats } from '../inference/inference-stats.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { _useAddTime } from './add-time/add-time.js';

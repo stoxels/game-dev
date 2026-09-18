@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
-import { questStat_timerItemUsed } from '../../quests/quests-stats.js';
+import { questStat_timerItemUsed } from '../../inference/inference-stats.js';
 import { t } from '../../translation/translations.js';
 import { FREEZE_DURATION_MS } from '../freeze/freeze.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';

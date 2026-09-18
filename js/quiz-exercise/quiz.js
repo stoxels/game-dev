@@ -10,7 +10,7 @@ import { buildReveal } from '../grid.js';
 import { PT } from '../passive-tree/passive-tree.js';
 import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { shuffle } from '../puzzle-mechanics/puzzle-helpers.js';
-import { questStat_mcWrongAnswerEliminated, questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_mcWrongAnswerEliminated, questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../inference/inference-stats.js';
 import { _refreshQuestionModalFlag } from '../screens/screens.js';
 import { _charIs, _getPlayerCharacterImage } from '../sprite/player_sprite.js';
 import { save } from '../state.js';

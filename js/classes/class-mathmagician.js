@@ -9,7 +9,7 @@ import { buildClassHUD } from './class-hud.js';
 import { _shuffleArray } from './class-probabilist.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
-import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //----------------------MATHMAGICIAN SKILLS-------------------------------

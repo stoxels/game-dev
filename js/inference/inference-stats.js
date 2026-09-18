@@ -1,7 +1,7 @@
 import { _ptAllocated, ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { save } from '../state.js';
-import { _MILESTONE_MAP } from './quests-data.js';
-import { _milestone_isClaimed, _milestone_isComplete, _refreshQuestBadge, claimQuest } from './quests-logic.js';
+import { _MILESTONE_MAP } from './inference-data.js';
+import { _milestone_isClaimed, _milestone_isComplete, _refreshQuestBadge, claimQuest } from './inference-logic.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & globalThis.STATE-------------------------------------

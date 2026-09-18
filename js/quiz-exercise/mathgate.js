@@ -9,7 +9,7 @@ import { WORLD_START_GI } from '../levels/levels.js';
 import { PT } from '../passive-tree/passive-tree.js';
 import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
-import { questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../inference/inference-stats.js';
 import { _refreshQuestionModalFlag, goToLevelSelect, hideModal, showModal } from '../screens/screens.js';
 import { _charIs, _getPlayerCharacterImage } from '../sprite/player_sprite.js';
 import { save } from '../state.js';

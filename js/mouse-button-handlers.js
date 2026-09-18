@@ -9,7 +9,7 @@ import { addTimeSecs, previewGainSecs, subtractTimeSecs } from './timer/timer-ad
 import { t } from './translation/translations.js';
 import { _countAdjacentPrefillRun, dragCounterApply, dragCounterClear } from './mouse-over.js';
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
-import { _incDirect, questStat_confidenceIntervalIgnored, questStat_hasManuallyFilledCell, questStat_sampleEfficiencyReveal } from './quests/quests-stats.js';
+import { _incDirect, questStat_confidenceIntervalIgnored, questStat_hasManuallyFilledCell, questStat_sampleEfficiencyReveal } from './inference/inference-stats.js';
 import { PassiveTracker } from './passive-tree/passive-tracker.js';
 import { _binomialBurstOnCorrectFill, _frequentistsBurdenOnCorrectFill, _gamblersRuinOnCorrectFill, _getBayesianBonus, _resetBayesianBonus } from './passive-tree/passive-tree-special-nodes-logic.js';
 

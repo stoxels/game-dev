@@ -8,7 +8,7 @@ import { cooldownState } from './class-cooldown-state.js';
 import { hideLsClassTooltip } from './class-hud-levelselect-tooltip.js';
 import { buildClassHUD, hideHUDTooltip } from './class-hud.js';
 import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
-import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../quests/quests-stats.js';
+import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
