@@ -5,16 +5,11 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //-------------------BOSS: THE WARDEN (boss_warden)-----------------------------
 //------------------------------------------------------------------------
 // Totem homage: three storm totems pulse in sequence, each blast telegraphed
-// by the totem itself. The order cycles, so you can dance ahead of the
-// pulses once you learn the rhythm.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// by the totem itself. The order cycles, so dance ahead of the pulses
+// once you learn the rhythm.
 //
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb,
-// frozen_cells, clue_swap, grid_invert, summons) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Shared mechanics (frozen_cells) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -41,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Three totems take turns flashing a warning, then blasting their radius.
+// Learn the cycle order and stand clear of the totem that lights up.
 export function _egMechTotemPulse(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
