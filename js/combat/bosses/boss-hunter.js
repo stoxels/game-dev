@@ -4,16 +4,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen
 //------------------------------------------------------------------------
 //-------------------BOSS: THE HUNTER (boss_hunter)-----------------------------
 //------------------------------------------------------------------------
-// Ambush-predator homage: three seekers sleep in the arena, harmless as
-// stones - until you come close. Then they ignite, scream inward, and burn
-// out. Feed them distance and they starve.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Ambush-predator homage: three seekers sleep harmless as stones until
+// you come close. Then they ignite, chase, and burn out. Feed them
+// distance and they starve.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (fog_bank) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Sleeping seekers wake when approached, chase briefly, then burn out.
+// Keep your distance and each one spends itself on empty ground.
 export function _egMechDormantSeekers(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
