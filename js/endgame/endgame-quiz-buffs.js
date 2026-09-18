@@ -276,7 +276,7 @@ export function _egShowQuizBuffBurst(type, labelText) {
 
 // Helper: grant one stacking +10% damage stack and its visuals/toast.
 export function _egGrantQuizDamageReward() {
-    // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev-testing.js):
+    // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev/dev-testing.js):
     // ×1 = exact shipped behaviour (30 min stacks are unobservable in tests).
     const scale = (typeof window !== 'undefined' && window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)
         ? window.STOX_EFFECT_TIME_SCALE : 1;

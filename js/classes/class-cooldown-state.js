@@ -406,7 +406,7 @@ export function startSlotCooldown(slot, seconds) {
     const state = cooldownState[slot];
 
     if (state.interval) clearInterval(state.interval);
-    // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev-testing.js):
+    // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev/dev-testing.js):
     // ×1 = exact shipped behaviour; scales every ability cooldown centrally.
     const scale = (typeof window !== 'undefined' && window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)
         ? window.STOX_EFFECT_TIME_SCALE : 1;

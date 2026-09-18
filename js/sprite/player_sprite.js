@@ -574,7 +574,7 @@ export function _avatarMoveUiBlocked() {
     }
     // The Clock's Time Freeze locks the avatar in place for the whole window.
     if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) return true;
-    // Dev-testing harness (js/dev-testing.js) explicitly freezes the avatar
+    // Dev-testing harness (js/dev/dev-testing.js) explicitly freezes the avatar
     // for scripted movement tests; never set in normal play.
     if (typeof window !== 'undefined' && window.LEVEL_FLAGS && window.LEVEL_FLAGS.devTestActive
         && window.LEVEL_FLAGS.devTestFreezeAvatar) return true;

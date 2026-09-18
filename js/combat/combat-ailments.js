@@ -124,7 +124,7 @@ export function _egHasStatus(statusMap, key) {
 }
 
 export function _egApplyStatusToMap(statusMap, key, durationS, dps) {
-    // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev-testing.js):
+    // STOX_EFFECT_TIME_SCALE (dev testing harness, see js/dev/dev-testing.js):
     // ×1 = exact shipped behaviour. Scaled centrally so every ailment
     // (player + monster) becomes observable in tests at once.
     const scale = (typeof window !== 'undefined' && window.STOX_EFFECT_TIME_SCALE > 0 && window.STOX_EFFECT_TIME_SCALE !== 1)

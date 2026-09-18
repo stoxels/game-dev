@@ -887,7 +887,7 @@ export function _uspSupportRankMult(spellId) {
 // one rank. Every magnitude calculator below therefore takes an optional
 // `rank` argument: omitted (the cast path) it resolves the live cast rank,
 // supplied it answers "what would rank N be?" - which is what the spell rank
-// audit screen (js/skills/spell-rank-audit.js) asks. Keeping ONE calculator
+// audit screen (js/dev/spell-rank-audit.js) asks. Keeping ONE calculator
 // for both means the audit tool cannot drift from the real cast.
 export function _uspRankFor(spellId, rank) {
     if (rank != null) return Math.max(1, Math.round(Number(rank) || 1));

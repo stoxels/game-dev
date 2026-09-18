@@ -51,7 +51,7 @@ window.LEVEL_FLAGS = {
     cursedImmune: false,      // Cursed Shield / The Witch: item curses do nothing this level
     goldenClockActive: false, // Golden Clock: the timer is frozen
     veiledCursedUsed: false,  // Veil of the Cursed: one-time curse redirection per level
-    devTestActive: false,     // js/dev-testing.js harness engaged (never set in normal play)
+    devTestActive: false,     // js/dev/dev-testing.js harness engaged (never set in normal play)
 };
 
 // Resets every LEVEL_FLAGS entry - call at level start/end so a flag that

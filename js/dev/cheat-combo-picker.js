@@ -5,7 +5,7 @@ import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { hideModal, showModal } from '../screens/screens.js';
 import { save } from '../state.js';
 import { _tipAttr } from '../tooltips-hud.js';
-import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _animSetDefaultDownImage, _animWarmCacheFor, _playAvatarWalkAnimation, _stopAvatarWalkAnimation } from './sprite_animations.js';
+import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _animSetDefaultDownImage, _animWarmCacheFor, _playAvatarWalkAnimation, _stopAvatarWalkAnimation } from '../sprite/sprite_animations.js';
 
 //------------------------------------------------------------------------
 //-------------------CHEAT: CHARACTER LAB----------------------------------

@@ -1,9 +1,9 @@
-import { _egBuildChainPool } from './combat/encounter-chain.js';
-import { ALL } from './levels/levels.js';
-import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
-import { isGatedLevel } from './quiz-exercise/mathgate.js';
-import { switchScreen } from './screens/screens.js';
-import { t } from './translation/translations.js';
+import { _egBuildChainPool } from '../combat/encounter-chain.js';
+import { ALL } from '../levels/levels.js';
+import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { isGatedLevel } from '../quiz-exercise/mathgate.js';
+import { switchScreen } from '../screens/screens.js';
+import { t } from '../translation/translations.js';
 
 /*
     ========================================================================

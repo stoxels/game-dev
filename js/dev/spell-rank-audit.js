@@ -5,10 +5,10 @@ import { ASCENDENCY_LIST } from '../classes/class-cooldown-state.js';
 import { CLASS_DEFS, CLASS_LIST } from '../classes/class-defs.js';
 import { _scaleAbilityManaCost } from '../classes/class-mana.js';
 import { _clsGetLocalizedName } from '../classes/class-ui.js';
-import { SPELL_MAX_RANK, getCharmSlottedRank, getSkillCastRankFull, getSkillMaxRank, getSpellRankDamageMult, getSpellRankManaMult } from './skill-charms.js';
-import { HEARTBLOOM_SKILL_ID, getSkillDamage, getSkillDef, getSkillEffect, getSkillImage, getSkillManaCost, getSkillName } from './skill-registry.js';
-import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspProjDefFor } from './universal-spell-fx.js';
-import { UNIVERSAL_SPELL_DEFS, USP_WARD_MIN_HIT_PCT, _uspCalcAbsorb, _uspCalcArmourPct, _uspCalcDodgePct, _uspCalcDrPct, _uspCalcHeal, _uspCalcHotTick, _uspCalcThornsPct, _uspCalcWardCharges, _uspHealingPower, _uspMaxAbsorption, _uspMaxLife, _uspRankAdditive, getUniversalSpellDef, isUniversalMovementSpell, isUniversalSupportSpell, isUspAnchorArmed } from './universal-spells.js';
+import { SPELL_MAX_RANK, getCharmSlottedRank, getSkillCastRankFull, getSkillMaxRank, getSpellRankDamageMult, getSpellRankManaMult } from '../skills/skill-charms.js';
+import { HEARTBLOOM_SKILL_ID, getSkillDamage, getSkillDef, getSkillEffect, getSkillImage, getSkillManaCost, getSkillName } from '../skills/skill-registry.js';
+import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspProjDefFor } from '../skills/universal-spell-fx.js';
+import { UNIVERSAL_SPELL_DEFS, USP_WARD_MIN_HIT_PCT, _uspCalcAbsorb, _uspCalcArmourPct, _uspCalcDodgePct, _uspCalcDrPct, _uspCalcHeal, _uspCalcHotTick, _uspCalcThornsPct, _uspCalcWardCharges, _uspHealingPower, _uspMaxAbsorption, _uspMaxLife, _uspRankAdditive, getUniversalSpellDef, isUniversalMovementSpell, isUniversalSupportSpell, isUspAnchorArmed } from '../skills/universal-spells.js';
 // spell-rank-audit.js
 //------------------------------------------------------------------------
 //-------------------SPELL RANK AUDIT (dev screen)------------------------

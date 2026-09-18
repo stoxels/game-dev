@@ -6300,7 +6300,7 @@ Object.assign(T.de, {
 });
 
 //------------------------------------------------------------------------
-//--------SPELL RANK AUDIT (dev screen: js/skills/spell-rank-audit.js)----
+//--------SPELL RANK AUDIT (dev screen: js/dev/spell-rank-audit.js)----
 //------------------------------------------------------------------------
 // Dev-only tooling, but the screen is deliberately translated so the same
 // build reads correctly in either language while tuning.

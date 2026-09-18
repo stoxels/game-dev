@@ -1,12 +1,12 @@
-import { WORLD_START_GI } from './levels/levels.js';
-import { showToast } from './puzzle-mechanics/toasts-and-popups.js';
-import { showMapView } from './screens/screens-map-view.js';
-import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect } from './screens/screens-save-slots.js';
-import { showWorldDetail } from './screens/screens-world-levels.js';
-import { launchExistingGame, showSetup, showTitle, switchScreen } from './screens/screens.js';
-import { _doStartLevel } from './start-level.js';
-import { getActiveSlot, getSlotSummary, save, wipeSlot } from './state.js';
-import { markSeen } from './storyline/storyline-progress.js';
+import { WORLD_START_GI } from '../levels/levels.js';
+import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { showMapView } from '../screens/screens-map-view.js';
+import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect } from '../screens/screens-save-slots.js';
+import { showWorldDetail } from '../screens/screens-world-levels.js';
+import { launchExistingGame, showSetup, showTitle, switchScreen } from '../screens/screens.js';
+import { _doStartLevel } from '../start-level.js';
+import { getActiveSlot, getSlotSummary, save, wipeSlot } from '../state.js';
+import { markSeen } from '../storyline/storyline-progress.js';
 
 //------------------------------------------------------------------------
 //-------------------DEV TESTING HARNESS (dev-testing.js)------------------
