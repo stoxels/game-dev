@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { revealTiles } from '../../puzzle-mechanics/grid-actions.js';
 import { t } from '../../translation/translations.js';
-import { playItemEffect } from '../fx-dispatch.js';
+import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _resolveCursedBlackoutDownside } from '../shared/cursed-downside.js';
 import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxShieldBorderAdd } from '../../puzzle-mechanics/fx-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';

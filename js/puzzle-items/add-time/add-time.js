@@ -3,7 +3,7 @@ import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
 import { questStat_timerItemUsed } from '../../quests/quests-stats.js';
 import { t } from '../../translation/translations.js';
 import { FREEZE_DURATION_MS } from '../freeze/freeze.js';
-import { playItemEffect } from '../fx-dispatch.js';
+import { playItemEffect } from '../item-fx-dispatcher.js';
 import { addTimeSecs, subtractTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
 import { _calcAddTimeSecs } from '../../puzzle-mechanics/effect-modifiers.js';
 import { CHRONOBOLT_X_FRACTIONS, FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, playFreezeCountdownOverlay } from '../../puzzle-mechanics/fx-helpers.js';

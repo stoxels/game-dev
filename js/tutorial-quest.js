@@ -16,7 +16,7 @@ import { keybindDisplayLabel, keybindKeyFor, onKeybindAction } from './keybinds.
 import { ALL } from './levels/levels.js';
 import { pval } from './mouse-button-handlers.js';
 import { isTreeGameOverlay } from './passive-tree/passive-tree.js';
-import { playItemEffect } from './puzzle-items/fx-dispatch.js';
+import { playItemEffect } from './puzzle-items/item-fx-dispatcher.js';
 import { buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout } from './puzzle-items/inventory-panel.js';
 import { ITEM_DEFS } from './puzzle-items/item-definitions.js';
 import { FX_Z, _fxGetPuzzleRectForWrap } from './puzzle-mechanics/fx-helpers.js';

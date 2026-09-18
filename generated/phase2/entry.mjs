@@ -64,7 +64,7 @@ import { _fxTheWitch, _useTheWitch } from '../../js/puzzle-items/the-witch/the-w
 import { _fxGoldenClock, _useGoldenClock } from '../../js/puzzle-items/golden-clock/golden-clock.js';
 import { _fxMakeShadowVeil, _fxShadowSeal, _useShadowSeal } from '../../js/puzzle-items/shadow-seal/shadow-seal.js';
 import { _fxChronoFracture, _useChronoFracture } from '../../js/puzzle-items/chrono-fracture/chrono-fracture.js';
-import { playItemEffect } from '../../js/puzzle-items/fx-dispatch.js';
+import { playItemEffect } from '../../js/puzzle-items/item-fx-dispatcher.js';
 import { _consumeItem } from '../../js/puzzle-items/use-item.js';
 import { RESHUFFLE_GOAL, RESHUFFLE_MAX_ATTEMPTS, RESHUFFLE_PICK_COUNT, applyReshuffleChoice, attachReshuffleCardHandlers, buildReshuffleCardHtml, buildReshuffleModalElement, checkReshuffleGoalReached, openReshuffleModal, pickReshuffleRewardItems, removeItemFromInventory, reshuffleCount, reshuffleRightClickItem, updateReshuffleCounter } from '../../js/puzzle-items/inventory-reshuffle.js';
 import { HOARDER_THRESHOLD, ITEM_GAIN_POPUP_FADE_MS, ITEM_GAIN_POPUP_HOLD_MS, RARITY_TIERS, TOAST_DISPLAY_DURATION_MS, TOAST_MAX_VISIBLE, _checkCollectorAchievement, _checkHoarderAchievement, _clearItemGainPopup, _discardToastEntry, _ensureItemGainPopupStyle, _findInvSlotEl, _hasAllRarityTiers, _itemGainPopupState, _itemGainPopupStyleInjected, _positionItemGainPopup, _removeToast, _scheduleItemGainPopupDismiss, activeToasts, checkInventoryAchievements, resetToastQueue, showItemGainPopup, showToast } from '../../js/puzzle-mechanics/toasts-and-popups.js';

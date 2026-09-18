@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { cooldownState, startSlotCooldown } from '../../classes/class-cooldown-state.js';
 import { t } from '../../translation/translations.js';
-import { playItemEffect } from '../fx-dispatch.js';
+import { playItemEffect } from '../item-fx-dispatcher.js';
 import { PEARL_VARIANTS, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------

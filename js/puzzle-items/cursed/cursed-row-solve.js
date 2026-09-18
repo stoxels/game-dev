@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
-import { playItemEffect } from '../fx-dispatch.js';
+import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _resolveCursedRowErasureDownside } from '../shared/cursed-downside.js';
 import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { solveRows } from '../../puzzle-mechanics/grid-actions.js';

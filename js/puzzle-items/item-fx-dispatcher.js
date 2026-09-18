@@ -22,7 +22,7 @@ import { _fxSurveyScope } from './survey-scope/survey-scope.js';
 import { _fxTheWitch } from './the-witch/the-witch.js';
 
 //------------------------------------------------------------------------
-//-------------------FX DISPATCH----------------------
+//-------------------ITEM FX DISPATCHER-------------
 //------------------------------------------------------------------------
 
 // playItemEffect(defId) - routes an item id to its visual effect

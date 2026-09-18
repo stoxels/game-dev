@@ -4,7 +4,7 @@ import { _updateMistakeCounterHUD } from '../../penalty.js';
 import { questStat_mistakesRemoved } from '../../quests/quests-stats.js';
 import { addTimeSecs } from '../../puzzle-mechanics/timer-adjust.js';
 import { t } from '../../translation/translations.js';
-import { playItemEffect } from '../fx-dispatch.js';
+import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _calcTutorItemCount } from '../../puzzle-mechanics/effect-modifiers.js';
 import { TUTOR_ITEM_SFX, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';

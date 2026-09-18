@@ -3,7 +3,7 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { _startBlizzardEffect } from '../../classes/class-mathmagician.js';
 import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
 import { t } from '../../translation/translations.js';
-import { playItemEffect } from '../fx-dispatch.js';
+import { playItemEffect } from '../item-fx-dispatcher.js';
 import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 import { startTimerFreeze } from '../../puzzle-mechanics/timer-freeze.js';
 

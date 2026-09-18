@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
-import { playItemEffect } from '../fx-dispatch.js';
+import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { solveCols, solveRows } from '../../puzzle-mechanics/grid-actions.js';
 
