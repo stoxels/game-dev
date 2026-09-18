@@ -4,16 +4,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE TRON (boss_tron)---------------------------------
 //------------------------------------------------------------------------
-// Light-cycle homage: a rider burns across the arena at full speed,
-// turning on a dime and walling its trail behind it. The trail is death -
-// herd the rider into loops that leave you room.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Light-cycle homage: a rider burns across the arena, walling its trail
+// behind it. The trail is death - herd the rider into loops that leave
+// you room.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// A rider steers around the arena laying a deadly trail behind it.
+// Touching the bike or any trail segment burns; give it looping room.
 export function _egMechLightCycle(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
