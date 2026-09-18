@@ -970,7 +970,7 @@ export function _refreshTouchpadModeButtonLabel() {
     }
 }
 
-// Flips the mode. Wired to the button's click handler in ui-events.js (or here).
+// Flips the mode. Wired to the button's click handler in title-bindings.js (or here).
 export function toggleTouchpadMarkMode() {
     touchpadMarkModeActive = !touchpadMarkModeActive;
     _refreshTouchpadModeButtonLabel();

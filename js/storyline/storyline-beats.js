@@ -7,7 +7,7 @@ import { INTRO_SONG } from './storyline-intro.js';
 // storyline-beats.js - The Cartographers of Chance
 // ---------------------------------------------------------------------------
 // STORY_BEATS - registry of every story beat, keyed by beatId, passed to
-// showBeat(beatId, options). Live callers: ui-events.js (opening cinematic
+// showBeat(beatId, options). Live callers: title-bindings.js (opening cinematic
 // + Replay gallery) and character-select.js (character intros). The region
 // trigger in scoring.js's checkWin() is parked until region media lands.
 // =============================================================================

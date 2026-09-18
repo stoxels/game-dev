@@ -1077,7 +1077,7 @@ export const StorylineRenderer = (() => {
         // holds the bare artwork for a beat, then dissolves the frozen
         // overlay. Only the song's NATURAL end takes this path - skipping
         // fades to black and the select screen just appears. The handoff
-        // is armed per-run by the play button flow (ui-events.js) and
+        // is armed per-run by the play button flow (title-bindings.js) and
         // consumed here, so replays of the intro from the gallery tear down
         // normally.
         const handoffArmed = (typeof window !== 'undefined' && window.__csiHandoffArmed === true);

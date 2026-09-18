@@ -554,7 +554,7 @@ export function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed,
     // and promote the Levels button to the primary action.
     // The Nexus Point behaves the same, but gains a dedicated gateway
     // button into the Nexus screen (separate element, so the static
-    // Next/Levels handlers wired in ui-events.js keep working untouched).
+    // Next/Levels handlers wired in title-bindings.js keep working untouched).
     const nextBtn = document.getElementById('btn-next-lvl');
     const retryBtn = document.getElementById('btn-win-retry');
     const levelsBtn = document.getElementById('btn-win-levels');

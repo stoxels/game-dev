@@ -188,7 +188,7 @@ export function showPassiveTree(returnScreen) {
     switchScreen('screen-passive-tree');
 }
 
-// Called by the Probability Tree's BACK button (see ui-events.js).
+// Called by the Probability Tree's BACK button (see title-bindings.js).
 // Unlike the generic goToPreviousScreen()/switchScreen() combo, this
 // re-runs the actual screen-build function for the destination so that
 // updated STATE.done / sprite position are reflected immediately.

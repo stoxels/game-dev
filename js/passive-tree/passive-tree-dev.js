@@ -1266,7 +1266,7 @@ function _dptInjectSearchBar() {
 //------------------------------------------------------------------------
 
 // Binds the sandbox-only topbar buttons once. Navigation (back) and the
-// mode-select entry button are bound in ui-events.js instead.
+// mode-select entry button are bound in title-bindings.js instead.
 function _dptBindTopbarButtons() {
     if (_dpt_topbarBound) return;
     _dpt_topbarBound = true;
