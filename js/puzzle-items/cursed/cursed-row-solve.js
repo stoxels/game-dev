@@ -8,10 +8,13 @@ import { _getPreFilledRows } from '../../puzzle-mechanics/puzzle-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
-//-------------------CURSED ROW SOLVE - TIDAL WAVE----------------------
+//-------------------CURSED ROW SOLVE - TIDAL WAVE-------------------------
 //------------------------------------------------------------------------
 
 // cursedRowSolve - solves 3 rows; downside erases 1 pre-existing row.
+// The pre-filled-row snapshot MUST be taken before solveRows() runs:
+// the downside erases a row that was already pre-filled, not one the
+// item itself just revealed. (Mirror of cursed-col-solve.)
 export function _useCursedRowSolve(id, def) {
     _trackWitchImmuneCursedUse();
 
@@ -29,7 +32,8 @@ export function _useCursedRowSolve(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates one tidal wave div at the given pass index.
-// Opacity decreases with each successive wave to fade them out.
+// Opacity decreases with each successive wave so later passes read as
+// fading foam rather than three identical walls of water.
 export function _fxMakeWave(container, r, pass) {
     _fxMakeElement(container, `
         position:absolute;
