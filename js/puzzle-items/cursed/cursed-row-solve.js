@@ -1,11 +1,11 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { t } from '../translation/translations.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { _resolveCursedRowErasureDownside } from './shared/cursed-downside.js';
-import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
-import { solveRows } from './shared/grid-actions.js';
-import { _getPreFilledRows } from './shared/puzzle-helpers.js';
-import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { t } from '../../translation/translations.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { _resolveCursedRowErasureDownside } from '../shared/cursed-downside.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from '../shared/fx-helpers.js';
+import { solveRows } from '../shared/grid-actions.js';
+import { _getPreFilledRows } from '../shared/puzzle-helpers.js';
+import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
 //-------------------CURSED ROW SOLVE - TIDAL WAVE----------------------

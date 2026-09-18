@@ -1,8 +1,8 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { t } from '../translation/translations.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { FX_Z, _fxClock, _fxGetPuzzleRect, _fxMakeGoldTintFill, _fxOverlay } from './shared/fx-helpers.js';
-import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { t } from '../../translation/translations.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { FX_Z, _fxClock, _fxGetPuzzleRect, _fxMakeGoldTintFill, _fxOverlay } from '../shared/fx-helpers.js';
+import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
 //-------------------CHRONOFRACTURE----------------------

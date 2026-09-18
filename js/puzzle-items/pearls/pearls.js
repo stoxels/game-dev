@@ -1,8 +1,8 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { cooldownState, startSlotCooldown } from '../classes/class-cooldown-state.js';
-import { t } from '../translation/translations.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { PEARL_VARIANTS, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { cooldownState, startSlotCooldown } from '../../classes/class-cooldown-state.js';
+import { t } from '../../translation/translations.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { PEARL_VARIANTS, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../shared/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------PEARLS - OF HASTE / OF SWIFTNESS / GRAND PEARL----------------------

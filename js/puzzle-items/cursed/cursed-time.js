@@ -1,11 +1,11 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { _egMapTimeGainMult } from '../endgame/endgame-map-launch.js';
-import { _trackTimerDelta, updTimer } from '../timer.js';
-import { t } from '../translation/translations.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { _resolveCursedBlackoutDownside } from './shared/cursed-downside.js';
-import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
-import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { _egMapTimeGainMult } from '../../endgame/endgame-map-launch.js';
+import { _trackTimerDelta, updTimer } from '../../timer.js';
+import { t } from '../../translation/translations.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { _resolveCursedBlackoutDownside } from '../shared/cursed-downside.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from '../shared/fx-helpers.js';
+import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
 //-------------------CURSED TIME - CURSED CLOCK----------------------

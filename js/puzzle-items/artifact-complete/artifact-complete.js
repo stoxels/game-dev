@@ -1,8 +1,8 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { renderCell, updClues } from '../grid.js';
-import { t } from '../translation/translations.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { renderCell, updClues } from '../../grid.js';
+import { t } from '../../translation/translations.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../shared/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------ARTIFACT COMPLETE - CODEX OF COMPLETION----------------------

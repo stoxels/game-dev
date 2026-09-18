@@ -1,9 +1,9 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { questStat_revealItemUsed } from '../quests/quests-stats.js';
-import { t } from '../translation/translations.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { _calcRevealCount } from './shared/effect-modifiers.js';
-import { FX_Z, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay } from './shared/fx-helpers.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { questStat_revealItemUsed } from '../../quests/quests-stats.js';
+import { t } from '../../translation/translations.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { _calcRevealCount } from '../shared/effect-modifiers.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay } from '../shared/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------REVEAL - CANDLE / MAGNIFIER / SPYGLASS / SCANNER----------------------

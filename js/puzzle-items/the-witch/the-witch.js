@@ -1,9 +1,9 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { _trackTimerDelta, updTimer } from '../timer.js';
-import { t } from '../translation/translations.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
-import { showToast } from './toasts-and-popups.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { _trackTimerDelta, updTimer } from '../../timer.js';
+import { t } from '../../translation/translations.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../shared/fx-helpers.js';
+import { showToast } from '../toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 //-------------------THE WITCH----------------------

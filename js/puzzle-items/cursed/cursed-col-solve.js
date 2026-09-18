@@ -1,11 +1,11 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { t } from '../translation/translations.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { _resolveCursedColErasureDownside } from './shared/cursed-downside.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
-import { solveCols } from './shared/grid-actions.js';
-import { _getPreFilledCols } from './shared/puzzle-helpers.js';
-import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { t } from '../../translation/translations.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { _resolveCursedColErasureDownside } from '../shared/cursed-downside.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../shared/fx-helpers.js';
+import { solveCols } from '../shared/grid-actions.js';
+import { _getPreFilledCols } from '../shared/puzzle-helpers.js';
+import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
 //-------------------CURSED COL SOLVE - VORTEX----------------------

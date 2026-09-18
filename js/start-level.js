@@ -24,7 +24,7 @@ import { _applyDegreesOfFreedom, _applyFrequentistsBurden, _applySignalToNoise, 
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
 import { buildInventoryPanel } from './puzzle-items/inventory-panel.js';
 import { rarityColors } from './puzzle-items/item-pool.js';
-import { showPrimerModal } from './puzzle-items/scouts-primer.js';
+import { showPrimerModal } from './puzzle-items/scouts-primer/scouts-primer.js';
 import { _fxShieldBorderRemove } from './puzzle-items/shared/fx-helpers.js';
 import { resetToastQueue, showToast } from './puzzle-items/toasts-and-popups.js';
 import { resetQuestLevelCounters, resetWitchImmunityLevelCounter } from './quests/quests-stats.js';

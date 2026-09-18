@@ -1,12 +1,12 @@
-import { trackAchStat } from '../achievements/achievements.js';
-import { Audio_Manager } from '../audio/audio.js';
-import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
-import { _incDirect, questStat_revealItemUsed } from '../quests/quests-stats.js';
-import { t } from '../translation/translations.js';
-import { _applyCellEffect } from './cell-effects.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
+import { trackAchStat } from '../../achievements/achievements.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../../grid.js';
+import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
+import { _incDirect, questStat_revealItemUsed } from '../../quests/quests-stats.js';
+import { t } from '../../translation/translations.js';
+import { _applyCellEffect } from '../cell-effects.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxSpawnParticles } from '../shared/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------SURVEY SCOPE----------------------

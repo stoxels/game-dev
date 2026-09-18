@@ -6,17 +6,17 @@
 //  scouts-primer-reveal.js and is called when a chain ends.
 //------------------------------------------------------------------------
 
-import { trackAchStat } from '../achievements/achievements.js';
-import { Audio_Manager } from '../audio/audio.js';
-import { LANG, t } from '../translation/translations.js';
-import { PT } from '../passive-tree/passive-tree.js';
-import { questStat_mcWrongAnswerEliminated, questStat_tutorAnsweredCorrect, updateQuestStats } from '../quests/quests-stats.js';
-import { _refreshQuestionModalFlag } from '../screens/screens.js';
-import { save } from '../state.js';
-import { pauseTimer, resumeTimer } from '../timer.js';
-import { buildInventoryPanel } from './inventory-panel.js';
+import { trackAchStat } from '../../achievements/achievements.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { LANG, t } from '../../translation/translations.js';
+import { PT } from '../../passive-tree/passive-tree.js';
+import { questStat_mcWrongAnswerEliminated, questStat_tutorAnsweredCorrect, updateQuestStats } from '../../quests/quests-stats.js';
+import { _refreshQuestionModalFlag } from '../../screens/screens.js';
+import { save } from '../../state.js';
+import { pauseTimer, resumeTimer } from '../../timer.js';
+import { buildInventoryPanel } from '../inventory-panel.js';
 import { PRIMER_MAX, applyPrimerHeadstart, applyPerfectPrimerReveal } from './scouts-primer-reveal.js';
-import { shuffle } from './shared/puzzle-helpers.js';
+import { shuffle } from '../shared/puzzle-helpers.js';
 
 //-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------

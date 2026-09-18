@@ -1,12 +1,12 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { renderCell } from '../grid.js';
-import { questStat_revealItemUsed } from '../quests/quests-stats.js';
-import { t } from '../translation/translations.js';
-import { _applyCellEffect } from './cell-effects.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { _cursedDownsideDuration } from './shared/cursed-downside.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from './shared/fx-helpers.js';
-import { _trackWitchImmuneCursedUse } from './shared/quest-tracking.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { renderCell } from '../../grid.js';
+import { questStat_revealItemUsed } from '../../quests/quests-stats.js';
+import { t } from '../../translation/translations.js';
+import { _applyCellEffect } from '../cell-effects.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { _cursedDownsideDuration } from '../shared/cursed-downside.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../shared/fx-helpers.js';
+import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
 //-------------------CURSED REVEAL - CURSED LENS----------------------

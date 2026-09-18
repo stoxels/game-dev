@@ -1,8 +1,8 @@
-import { Audio_Manager } from '../audio/audio.js';
-import { t } from '../translation/translations.js';
-import { playItemEffect } from './fx-dispatch.js';
-import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from './shared/fx-helpers.js';
-import { solveCols, solveRows } from './shared/grid-actions.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { t } from '../../translation/translations.js';
+import { playItemEffect } from '../fx-dispatch.js';
+import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../shared/fx-helpers.js';
+import { solveCols, solveRows } from '../shared/grid-actions.js';
 
 //------------------------------------------------------------------------
 //-------------------ROW / COL SOLVE - SET SQUARE / RULER----------------------

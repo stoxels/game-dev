@@ -8,15 +8,15 @@
 //  (applyPrimerHeadstart / applyPerfectPrimerReveal) when a chain ends.
 //------------------------------------------------------------------------
 
-import { trackAchStat } from '../achievements/achievements.js';
-import { Audio_Manager } from '../audio/audio.js';
-import { _egOnProgrammaticReveal } from '../combat/combat-class-projectiles.js';
-import { renderCell, updClues } from '../grid.js';
-import { PT } from '../passive-tree/passive-tree.js';
-import { questStat_primerRowsColsRevealed, updateQuestStats } from '../quests/quests-stats.js';
-import { t } from '../translation/translations.js';
-import { shuffle } from './shared/puzzle-helpers.js';
-import { showToast } from './toasts-and-popups.js';
+import { trackAchStat } from '../../achievements/achievements.js';
+import { Audio_Manager } from '../../audio/audio.js';
+import { _egOnProgrammaticReveal } from '../../combat/combat-class-projectiles.js';
+import { renderCell, updClues } from '../../grid.js';
+import { PT } from '../../passive-tree/passive-tree.js';
+import { questStat_primerRowsColsRevealed, updateQuestStats } from '../../quests/quests-stats.js';
+import { t } from '../../translation/translations.js';
+import { shuffle } from '../shared/puzzle-helpers.js';
+import { showToast } from '../toasts-and-popups.js';
 
 // Maximum number of questions in a single primer chain.
 export const PRIMER_MAX = 5;
