@@ -4,16 +4,11 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MAELSTROM (boss_maelstrom)-----------------------
 //------------------------------------------------------------------------
-// Gravity-well homage: a vortex drags your avatar toward its eye - fight
-// the pull - then detonates in a nova. Be far from the center when it blows.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Gravity-well homage: a vortex drags you toward its eye - fight the pull -
+// then detonates in a nova. Be far from the center when it blows.
 //
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb,
-// frozen_cells, clue_swap, grid_invert, summons) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +35,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// A vortex pulls the player in, then detonates a nova at its eye.
+// Fight the pull early so the blast radius cannot reach you.
 export function _egMechMaelstromVortex(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
