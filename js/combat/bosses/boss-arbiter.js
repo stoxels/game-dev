@@ -4,18 +4,11 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ARBITER (boss_arbiter)---------------------------
 //------------------------------------------------------------------------
-// Undertale homage: the Stillness Trial. Each cast is a BLUE wave (hold
-// perfectly still - moving is punished) or an ORANGE wave (keep moving -
-// standing still is punished). Read the color, obey the rule.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Stillness Trial: each cast is a BLUE wave (hold perfectly still) or an
+// ORANGE wave (keep moving). Read the color, obey the rule.
 //
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb,
-// frozen_cells, clue_swap, grid_invert, summons, fated_cell, fog_bank,
-// clue_scramble, soul_tithe) live in shared-boss-abilities.js and are
-// referenced by handler-name string.
+// Shared mechanics (fated_cell, probability_shift) live in
+// shared-boss-abilities.js and are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -43,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Colored judgment waves: BLUE punishes any movement, ORANGE punishes
+// standing still. The rule is telegraphed before each wave goes live.
 export function _egMechStillnessTrial(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
