@@ -4,17 +4,12 @@ import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNew
 //------------------------------------------------------------------------
 //-------------------BOSS: THE ABYSS (boss_abyss)-------------------------------
 //------------------------------------------------------------------------
-// Delve-darkness homage: the screen drowns in darkness and only a circle of
-// light keeps you safe. The light follows you - but it lags behind sharp
-// movement and keeps shrinking. Move smoothly and deliberately.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Delve-darkness homage: the screen drowns in darkness and only a circle
+// of light keeps you safe. The light follows but lags and shrinks - move
+// smoothly and deliberately.
 //
-// Shared mechanics (corrupt_cells, probability_shift, prior_bomb,
-// frozen_cells, clue_swap, grid_invert, summons) live in
-// shared-boss-abilities.js and are referenced by handler-name string.
+// Shared mechanics (frozen_cells) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -41,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Darkness covers the screen except a shrinking circle that trails behind.
+// Stay inside the glow; smooth lines keep the lagging light with you.
 export function _egMechAbyssDark(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
