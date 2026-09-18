@@ -52,7 +52,7 @@ import { _fxColSolve, _fxMakeColSolveLines, _fxMakeColSolveSweep, _fxMakeRowSolv
 import { _collectScopeCells, _ensureSurveyScopeStyles, _fxSurveyScope, _useSurveyScope } from '../../js/puzzle-items/survey-scope/survey-scope.js';
 import { _fxArtifact, _fxMakeArtifactFill, _fxMakeArtifactRays, _useArtifactComplete } from '../../js/puzzle-items/artifact-complete/artifact-complete.js';
 import { _fxCursedReveal, _fxMakeCursedTint, _useCursedReveal } from '../../js/puzzle-items/cursed/cursed-reveal.js';
-import { _fxCursedTime, _fxMakeFogTendrils, _useCursedTime } from '../../js/puzzle-items/cursed/cursed-time.js';
+import { _fxCursedTime, _useCursedTime } from '../../js/puzzle-items/cursed/cursed-time.js';
 import { _fxCursedShield, _fxMakeEyeScanLines, _useCursedShield } from '../../js/puzzle-items/cursed/cursed-shield.js';
 import { _fxMakeWave, _fxTidalWave, _useCursedRowSolve } from '../../js/puzzle-items/cursed/cursed-row-solve.js';
 import { _fxMakeVortexStrips, _fxVortex, _useCursedColSolve } from '../../js/puzzle-items/cursed/cursed-col-solve.js';

@@ -8,10 +8,14 @@ import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from 
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
-//-------------------CURSED TIME - CURSED CLOCK----------------------
+//-------------------CURSED TIME - CURSED CLOCK---------------------------
 //------------------------------------------------------------------------
 
-// cursedTime - adds 20 min to the timer; downside blacks out all clues.
+// cursedTime - adds 20 min to the timer; downside blacks out all clues for
+// 30 s (before reductions/immunity). Arguments of _resolveCursedBlackoutDownside
+// are (durationMs, blackoutRows, blackoutCols) - here both axes at once.
+// The timer is multi-writer game state (pause, tick, other time items), so the
+// update goes through globalThis.timerSecs with _trackTimerDelta bookkeeping.
 export function _useCursedTime(id, def) {
     _trackWitchImmuneCursedUse();
 
@@ -22,6 +26,7 @@ export function _useCursedTime(id, def) {
     updTimer();
     playItemEffect(id);
 
+    // Black out every clue axis - the harshest cursed downside of the family.
     _resolveCursedBlackoutDownside(30000, true, true);
     return `💀 ${t('item_cursed_time_both')}`;
 }
@@ -31,7 +36,8 @@ export function _useCursedTime(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: spawns dark fog tendrils blooming from each corner.
-export function _fxMakeFogTendrils(container, r) {
+// One tendril per corner (4 total), each delayed by 0.15 s so they cascade.
+function _fxMakeFogTendrils(container, r) {
     const corners = [
         { top: r.top, left: r.left },
         { top: r.top, left: r.right },
