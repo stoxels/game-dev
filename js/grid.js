@@ -1,4 +1,4 @@
-﻿import { updTimer } from './timer.js';
+﻿import { addTimeSecs } from './puzzle-mechanics/timer-adjust.js';
 import { markWrongTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
@@ -902,18 +902,14 @@ export function _handleRegressionReward(row, col, rowDone, colDone, sol) {
 
     if (rowDone && !window._regressionRewardedLines.has(`r${row}`)) {
         window._regressionRewardedLines.add(`r${row}`);
-        globalThis.timerSecs += bonus;
-        globalThis._levelTimeAdded += bonus;
-        updTimer();
+        addTimeSecs(bonus);
         if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${bonus}s`, '#6dbf40');
         globalThis.showToast(`📉 ${t('cg_regression_reward').replace('{n}', bonus)}`);
     }
 
     if (colDone && !window._regressionRewardedLines.has(`c${col}`)) {
         window._regressionRewardedLines.add(`c${col}`);
-        globalThis.timerSecs += bonus;
-        globalThis._levelTimeAdded += bonus;
-        updTimer();
+        addTimeSecs(bonus);
         if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${bonus}s`, '#6dbf40');
         globalThis.showToast(`📉 ${t('cg_regression_reward').replace('{n}', bonus)}`);
     }

@@ -4,7 +4,8 @@ import { Audio_Manager } from './audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from './grid.js';
 import { applyPenalty } from './penalty.js';
 import { save } from './state.js';
-import { stopTimer, updTimer } from './timer.js';
+import { stopTimer } from './timer.js';
+import { addTimeSecs, subtractTimeSecs } from './puzzle-mechanics/timer-adjust.js';
 import { t } from './translation/translations.js';
 import { _countAdjacentPrefillRun, dragCounterApply, dragCounterClear } from './mouse-over.js';
 import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
@@ -526,9 +527,7 @@ export function claimLuckyTileItems() {
 // costs the player 10 minutes. Appends a warning to the toast message.
 export function applyVarianceCollapsePenalty(toastMsg) {
     if (!ptHasSkill('keystone_variance_collapse')) return toastMsg;
-    globalThis.timerSecs = Math.max(0, globalThis.timerSecs - 600);
-    globalThis._levelTimeLost += 600;
-    updTimer();
+    subtractTimeSecs(600);
     return toastMsg + ` ${t('cg_variance_collapse_note')}`;
 }
 
@@ -698,9 +697,7 @@ export function checkStreakBonus() {
         if (ptHasSkill('streak_bonus_2')) bonus += 5;
         if (ptHasSkill('streak_bonus_3')) bonus += 10;
 
-        globalThis.timerSecs += bonus;
-        globalThis._levelTimeAdded += bonus;
-        updTimer();
+        addTimeSecs(bonus);
         if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${bonus}s`, '#ffb830');
         globalThis.showToast(`🔥 ${t('cg_streak_bonus').replace('{n}', bonus)}`);
         PassiveTracker.onStreakBonusTrigger();
