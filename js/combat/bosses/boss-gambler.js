@@ -6,41 +6,12 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFli
 //------------------------------------------------------------------------
 //-------------------BOSS: THE GAMBLER (boss_gambler)---------------------
 //------------------------------------------------------------------------
-// A rework of the old one-shot Loaded Dice into a persistent casino siege.
-// The Gambler runs the table and the table is the arena. Fight identity:
-// RISK - every mechanic offers a visible payout or a visible price.
+// Persistent casino siege - RISK is the fight: croupier chip stack, chip
+// volleys, WHEEL OF FORTUNE at 60%, JACKPOT RUSH symbols at 30%, and the
+// RUSSIAN ROULETTE chamber-tick charge attack.
 //
-//   PERSISTENT (whole fight, watcher):
-//   • THE HOUSE CHIPS - the boss's arena body: a stack of 4 glowing casino
-//     chips that drifts around the table. Touching it is a Croupier Slam:
-//     animated fling + shadow damage.
-//   • CHIP VOLLEY - the chips periodically fan out and whip at you like
-//     thrown playing cards (fast small shadow hits, phase-scaled count).
-//
-//   60% GATE - WHEEL OF FORTUNE: a giant prize wheel spins center-screen
-//   for ~4s (visibly ticking through wedges). Where it stops, everyone
-//   pays - one of: SNAKE EYES (heavy hit + double volley), FREE SPIN
-//   (the wheel fires again immediately), JACKPOT (the Gambler heals 12%),
-//   or YOU WIN (you heal 10% - the one good wedge). The wheel result is
-//   broadcast with a big toast; the gamble is real.
-//
-//   30% GATE - JACKPOT RUSH: slot symbols rain across the table in waves
-//   (🍒🔔🍋7️⃣); matching 7️⃣s detonate in expanding coin bursts. Pure
-//   dodge pressure, phase-scaled.
-//
-//   CHARGE ATTACK - RUSSIAN ROULETTE: a 6-chamber cylinder overlays your
-//   position; chambers tick down visibly (1.8s total). When the hammer
-//   falls, 5 of 6 chambers are blanks - a visible shell lands harmless -
-//   but the loaded chamber deal a heavy shadow hit. Pure odds, fully
-//   telegraphed; move out of the mark before the click.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string. Damage flows through the shared tier curve.
+// Shared mechanics (soul_tithe) live in shared-puzzle-mechanics.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
