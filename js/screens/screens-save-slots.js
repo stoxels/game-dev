@@ -22,7 +22,7 @@ export const CHAR_PORTRAIT_SRC = {
 // showSaveSlotSelect(), consumed and cleared in onSaveSlotChosen().
 //
 // window._pendingResetSlot - slot number awaiting delete confirmation. Set
-// in showDeleteSlotConfirm(), read by confirmReset() in ui-reset.js to
+// in showDeleteSlotConfirm(), read by confirmReset() in save-reset.js to
 // decide whether to wipe just this slot or perform a full reset.
 
 //------------------------------------------------------------------------
@@ -268,7 +268,7 @@ export function _setResetModalTextForSlot(slotNum) {
 // Reuses the shared #reset-modal (styled via reset-game.css) instead of a
 // one-off modal, so per-slot deletion looks identical to the title-screen
 // "reset everything" flow. Text is swapped to reference this specific slot;
-// confirmReset() (ui-reset.js) checks window._pendingResetSlot to decide
+// confirmReset() (save-reset.js) checks window._pendingResetSlot to decide
 // whether to wipe just this slot or perform a full reset.
 export function showDeleteSlotConfirm(slotNum) {
     window._pendingResetSlot = slotNum;

@@ -4,7 +4,7 @@
 //
 // Split out of storyline-engine.js (2026-09-17): persistence/progress is a
 // separate responsibility from playback machinery. showBeat() (in the
-// engine) consults hasSeen()/markSeen() here; ui-reset.js, dev-testing.js
+// engine) consults hasSeen()/markSeen() here; save-reset.js, dev-testing.js
 // and character-select.js call the reset/unlock helpers directly.
 //-----------------------------------------------------------------------------
 
