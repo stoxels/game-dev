@@ -5,35 +5,11 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egN
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BUMPER (boss_bumper)------------------------
 //------------------------------------------------------------------------
-// Carnival-ring fight: the arena becomes a pinball table that fights you.
+// Pinball-table brawl: drifting bumper flings, ricocheting pinball showers,
+// TILT FLIPPER FRENZY at 60%, MULTIBALL RUSH at 30%, and the telegraphed
+// BUMPER SLAM charge attack.
 //
-//   PERSISTENT (whole fight, watcher):
-//   • ROAMING BUMPERS - 2–3 carnival bumpers drift around the arena.
-//     Touching one THWACKS you: a heavy fling across the screen plus a
-//     physical hit. They drift faster and fling harder every phase.
-//   • PINBALL SHOWER - steel pinballs roll in from a screen edge on a
-//     phase-scaled cadence, bouncing off the arena walls. Contact hurts.
-//
-//   HP GATES (watcher):
-//   • 60% - TILT! FLIPPER FRENZY: giant flippers materialize in the bottom
-//     corners and slap telegraphed arc bands across the lower arena
-//     (warn → strike → retract, alternating). Contact is a heavy physical
-//     hit. While the flippers rage, the bumpers go TILT: red-hot, drifting
-//     faster, flinging farther.
-//   • 30% - MULTIBALL RUSH: the machine coughs up 6–9 live pinballs that
-//     ricochet off every wall at high speed for 12s. Survive the rush.
-//
-//   CHARGE ATTACK - BUMPER SLAM: when the boss's attack bar fills, a target
-//   ring telegraphs on your position (~1s), then a giant bumper slams down:
-//   anyone inside the ring takes a heavy hit AND gets flung away from the
-//   impact. No generic projectile on top.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics (fog_bank) live in shared-boss-abilities.js and are
+// Shared mechanics (fog_bank) live in shared-puzzle-mechanics.js and are
 // referenced by handler-name string.
 //------------------------------------------------------------------------
 
