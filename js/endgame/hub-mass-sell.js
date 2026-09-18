@@ -25,7 +25,7 @@ import { _egShowTooltip } from '../loot/loot-currency.js';
 import { _dndPickUp } from './endgame-hub-drag-and-drop.js';
 import { _egClearTooltip } from './endgame-hub-tooltips.js';
 import { _egIsItemBlocked } from '../loot/loot-requirements.js';
-import { egSaveHubState } from './hub-load.js';
+import { egSaveHubState } from './hub-save.js';
 import { EG_INV_COLS, _egInventory } from './hub-stash.js';
 
 export const _egChipRegistry = new Map();

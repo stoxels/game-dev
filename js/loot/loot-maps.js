@@ -2200,7 +2200,7 @@ export function _egMigrateMapBossImplicits() {
 // legacy saves unhealed. Classic order (maps dead last) always ran it fully.
 // Defer to DOMContentLoaded: everything is initialized, still before any user
 // interaction (established step-5 passive-tree pattern). Migration first,
-// then the hub-load patch setup - same order as the classic bottom.
+// then the hub-save patch setup - same order as the classic bottom.
 function _egBootHealMapBossImplicits() {
     _egMigrateMapBossImplicits();
     // Wrap future loads so slot switches also heal.
