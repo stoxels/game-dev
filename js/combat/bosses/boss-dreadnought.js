@@ -4,17 +4,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkE
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DREADNOUGHT (boss_dreadnought)------------------
 //------------------------------------------------------------------------
-// Pinnacle broadside: the Dreadnought walks its guns along both flanks -
-// alternating port and starboard spreads - while a searchlight tracks you
-// and burns whatever it catches. Watch the muzzle sides, kill the light
-// by leaving it.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Pinnacle broadside: alternating port and starboard spreads walk both
+// flanks while a searchlight tracks and burns what it catches. Watch
+// the muzzle sides, kill the light by leaving it.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -42,6 +37,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Broadside volleys from alternating flanks, aimed where the player stands.
+// Shells fly straight for a few seconds; each shell can hit once.
 export function _egMechBroadsides(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -98,6 +95,8 @@ export function _egMechBroadsides(monster, phase) {
     });
 }
 
+// A slow lamp chases the player and burns anyone caught inside its light.
+// Keep moving so the lamp never settles on you.
 export function _egMechSearchlight(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
