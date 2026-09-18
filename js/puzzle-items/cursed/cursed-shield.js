@@ -7,10 +7,15 @@ import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxShi
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
-//-------------------CURSED SHIELD - DEMON EYE----------------------
+//-------------------CURSED SHIELD - DEMON EYE-----------------------------
 //------------------------------------------------------------------------
 
-// cursedShield - activates shield and reveals 2 cells; downside blacks out row clues.
+// cursedShield - activates shield and reveals 2 cells; downside blacks
+// out row clues for 30 s (before reductions/immunity). Arguments of
+// _resolveCursedBlackoutDownside are (durationMs, blackoutRows, blackoutCols).
+// The shield flag is multi-writer game state (freeze item, plain shield,
+// level reset) and is consumed via the shield-absorb intercepts, so it
+// stays on the shared state object rather than a module-local.
 export function _useCursedShield(id, def) {
     _trackWitchImmuneCursedUse();
 
@@ -18,7 +23,8 @@ export function _useCursedShield(id, def) {
     revealTiles(2, 'item');
     playItemEffect(id);
 
-    _resolveCursedBlackoutDownside(30000, true, false); // black out rows only
+    // Black out rows only - mirrors the col-only blackout of cursedRowCol.
+    _resolveCursedBlackoutDownside(30000, true, false);
 
     return `👁️ ${t('item_cursed_shield_both')}`;
 }
@@ -28,6 +34,7 @@ export function _useCursedShield(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the dark-red scan lines that creep down the grid.
+// Five bands, staggered top-to-bottom, timed to land after the eye opens.
 export function _fxMakeEyeScanLines(container, r) {
     for (let i = 0; i < 5; i++) {
         _fxMakeElement(container, `
@@ -39,7 +46,6 @@ export function _fxMakeEyeScanLines(container, r) {
     }
 }
 
-// 👁️ Cursed Shield - demonic eye opens, then rows black out.
 // 👁️ Cursed Shield - demonic eye opens, then rows black out.
 export function _fxCursedShield() {
     const r = _fxGetPuzzleRect();
