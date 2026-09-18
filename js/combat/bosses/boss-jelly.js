@@ -5,26 +5,12 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE JELLY (boss_jelly)-------------------------------
 //------------------------------------------------------------------------
-// Dragon-Quest homage and first-steps fight - a cold-element blob boss
-// that teaches dodging hop shadows. The fight has three acts:
-//   Phase 1 (100–50%): Jelly Hops - the classic chained hop attack. The
-//     Jelly telegraphs slow hops toward where you stand. Watch the shadow,
-//     leave before it lands.
-//   Phase 2 (50–20%): ICE SHELL. At 50% the Jelly hardens behind a green
-//     immunity shield - projectiles and auto attacks deal nothing. The
-//     floor ices over while the Jelly lobs single hop blobs at you. Lure a
-//     hop blob onto an icy cell: it slips on the frost and jumps straight
-//     into the Jelly, shattering the shell so the fight can continue.
-//   Phase 3 (≤20%): JELLY ARMY. The Jelly erupts: ten hop blobs pour out in
-//     a row (short delay between spawns) and each leaps at the player with
-//     the usual hop-blob mechanic. Dodge as many shadows as you can.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onPhaseEnter)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Cold blob first-steps fight that teaches dodge-hop shadows: chained hops
+// at 100-50%, an ICE SHELL immunity at 50% broken by luring a hop blob onto
+// ice, then a ten-blob JELLY ARMY at ≤20%. Dodge the shadows, not the blobs.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (probability_shift) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
