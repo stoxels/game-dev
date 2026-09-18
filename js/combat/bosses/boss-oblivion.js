@@ -5,15 +5,11 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFroze
 //-------------------BOSS: THE OBLIVION (boss_oblivion)-------------------------
 //------------------------------------------------------------------------
 // Pinnacle gravity: a singularity drags you toward a burning core while
-// three flame beams sweep the disc. Feed the beams distance, feed the
-// core sideways motion - feed both at once, or be unmade.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// flame beams sweep the disc. Feed the beams distance, feed the core
+// sideways motion - or be unmade.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (fog_bank) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -41,6 +37,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// A gravity core pulls the player inward and burns anyone who falls in.
+// Strafe sideways around it instead of fighting the pull head-on.
 export function _egMechSingularity(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
@@ -82,6 +80,8 @@ export function _egMechSingularity(monster, phase) {
     });
 }
 
+// Rotating flame beams around the arena center; touching one burns.
+// Count the rotation and slip between beams as they pass.
 export function _egMechEventBeams(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
