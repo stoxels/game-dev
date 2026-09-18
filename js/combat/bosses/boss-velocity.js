@@ -4,16 +4,12 @@ import { _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkLoop, _egNkNew
 //------------------------------------------------------------------------
 //-------------------BOSS: THE VELOCITY (boss_velocity)-------------------------
 //------------------------------------------------------------------------
-// Speedway homage: four full-width lanes blow in alternating directions -
-// hard - while the rails top and bottom burn. There is no standing still
-// here, only choosing which way to slide.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Speedway homage: full-width lanes blow in alternating directions while
+// the rails top and bottom burn. No standing still here, only choosing
+// which way to slide.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and
+// are referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -40,6 +36,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Wind lanes shove the player sideways, alternating direction per lane.
+// Ride the push and stay off the burning top and bottom rails.
 export function _egMechSpeedLanes(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
