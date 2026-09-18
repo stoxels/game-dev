@@ -6,43 +6,13 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFli
 //------------------------------------------------------------------------
 //-------------------BOSS: THE GOURMET (boss_gourmet)---------------------
 //------------------------------------------------------------------------
-// A rework of the old one-shot Gourmet Gulp into a persistent tasting
-// menu. The Gourmet is a great gourmand that hovers around the table and
-// treats YOU as the main course. Fight identity: APPETITE - it pulls,
-// plates, and devours; everything it eats makes it stronger.
+// Tasting-menu siege - YOU are the main course: chomping gourmand, aroma
+// inhale into spit fans, roaming sizzling plates, DINNER SERVICE cloches at
+// 60%, BANQUET TOSS at 30%, and the DEVOUR suction charge attack. One
+// _egNkLoop drives every state machine.
 //
-//   PERSISTENT (whole fight, watcher):
-//   • THE GOURMAND - the boss's arena body: a giant 👄 mouth drifting
-//     around the table. Touching it is a CHOMP: animated fling + physical
-//     damage - and it heals 1% from the bite (it's eating you).
-//   • AROMA INHALE - every few seconds the mouth inhales: a dashed aroma
-//     telegraph blooms, then a suction current drags you toward the maw.
-//     When the breath ends it SPITS a fan of food (🍖🍗🧀) back at you.
-//   • SIZZLING PLATE - a roaming 🍳 hot plate slides across the table,
-//     leaving grease-fire trails that burn anyone standing in them.
-//
-//   60% GATE - DINNER SERVICE: three giant cloches 🍽️ slam down on
-//   telegraphed rings in sequence, flinging anyone under them and leaving
-//   bubbling grease pools behind.
-//
-//   30% GATE - BANQUET TOSS: the Gourmet gorges - columns telegraph, then
-//   dessert courses (🍰🧁🎂) rain down in staggered waves. Pure dodge
-//   pressure, phase-scaled.
-//
-//   CHARGE ATTACK - DEVOUR: the maw locks onto you, then inhales hard
-//   (strong suction, visible maw ring = the danger zone). When the breath
-//   ends, everything still inside the ring is eaten: heavy damage + fling.
-//   The counterplay is fighting the suction - get out before the swallow.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string. Damage flows through the shared tier curve.
-// NOTE: exactly ONE _egNkLoop runs on the watcher's run - every state
-// machine (inhale, cloches, banquet, devour) lives in that single tick.
+// Shared mechanics (corrupt_cells) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
