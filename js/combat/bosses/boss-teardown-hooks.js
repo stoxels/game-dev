@@ -1,15 +1,10 @@
 //------------------------------------------------------------------------
 //-------------------BOSS TEARDOWN HOOKS----------------------------------
 //------------------------------------------------------------------------
+// Per-boss teardown registry for _egBossCleanup: [monsterIdPrefix,
+// globalTeardownFn, exactMatch?]. Prefix match (live ids carry a spawn
+// counter suffix); a new boss only adds one array entry.
 //------------------------------------------------------------------------
-// Per-boss teardown registry for _egBossCleanup (see boss-framework.js).
-// Pure data: [monsterIdPrefix, globalTeardownFn, exactMatch?]. A hook fires
-// on prefix match (live ids carry a spawn counter suffix) while the named
-// teardown stays a global function. A new boss only adds one array entry.
-
-// Per-boss teardown hooks: [monsterIdPrefix, globalTeardownFn, exactMatch?].
-// A hook fires when the monster id matches (prefix match unless
-// exactMatch) and the named teardown is a global function.
 export const EG_BOSS_TEARDOWN_HOOKS = [
     // Brutus: sacrificial zombies roam in their own layer until he dies or
     // the encounter stops - tear them down exactly when that happens (this
