@@ -5,43 +5,12 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFli
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DANCER (boss_dancer)-----------------------
 //------------------------------------------------------------------------
-// The ballroom never closes: a rework of the old one-shot Dance Steps
-// mechanic into a persistent rhythm siege. The Dancer herself is a
-// mirror-ball figure drifting above the floor, conducting the fight on a
-// beat. Fight identity: EVERYTHING lands on a beat - telegraphs pulse to
-// the tempo, damage hits on the downbeat, and dodging well IS dancing.
+// Mirror-ball rhythm siege - everything lands on a beat: waltzing ball,
+// spotlight steps, sweeping rhythm ribbons, CURTAIN CALL drops at 60%,
+// PETAL STORM at 30%, and the PIROUETTE ring-dodge charge attack.
 //
-//   PERSISTENT (whole fight, watcher):
-//   • THE MIRROR BALL - the boss hangs mid-arena as a spinning 🪩 figure,
-//     slowly waltzing to a new spot after every bar. Touching it is a
-//     Twirl: animated fling + lightning on a per-touch cooldown.
-//   • SPOTLIGHT STEPS - the old Dance Steps, now perpetual: footprints
-//     light up in sequence somewhere on the floor; standing on the lit
-//     step "dances" it away (small heal reward), missing the beat zaps
-//     you. Cadence and step count scale per phase.
-//   • RHYTHM RIBBONS - rotating light beams (like a dance-floor laser
-//     show) sweep from the ball, telegraphed by a dashed arc before each
-//     sweep. Standing in a live ribbon is a heavy hit.
-//
-//   60% GATE - CURTAIN CALL: the stage lights cut and red curtain drops
-//   fall at staggered telegraphed marks across the floor, each leaving a
-//   lingering dim "backstage" patch that drags you toward its center.
-//
-//   30% GATE - PETAL STORM: the finale - v-waves of 🌸 petals cross the
-//   screen over ~8s; petals are small but numerous shadow hits, and a
-//   thin ambient drizzle keeps falling afterwards in phase 3.
-//
-//   CHARGE ATTACK - PIROUETTE: the ball flashes, then spins in place
-//   unleashing 3 expanding lightning rings (like a dancer's turns) with
-//   gaps you can stand in - a rhythm dodge.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string. Damage flows through the shared tier curve.
+// Shared mechanics (fated_cell) live in shared-puzzle-mechanics.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
