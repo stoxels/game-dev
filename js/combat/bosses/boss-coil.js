@@ -5,32 +5,9 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _eg
 //------------------------------------------------------------------------
 //-------------------BOSS: THE COIL (boss_coil)----------------------------
 //------------------------------------------------------------------------
-// Serpent-pit fight: the arena is the Coil's nest and it is crawling.
-//
-//   PERSISTENT (whole fight, watcher):
-//   • THE COILED MAW - the boss itself is a spiral of serpent coils (a
-//     rotating 😵-style spiral of 🐍) that slowly slithers around the
-//     arena. Touching it is a BITE: shadow damage + a fling.
-//   • SEEKER SERPENTS - snakes spawn from the maw on a phase cadence and
-//     hunt the player. When one gets close it starts FUSING (blinking),
-//     then detonates in a shadow blast. Its path sears a short VENOM
-//     TRAIL that lingers and ticks shadow damage if you walk it.
-//
-//   HP GATES (watcher):
-//   • 60% - CONSTRICTOR: the maw coils into a huge spiral pattern that
-//     contracts toward the arena center in ring waves - stand in the gaps
-//     between rings or be squeezed (heavy shadow damage per ring).
-//   • 30% - SERPENT TIDE: the pit boils - a wave of fast chargers crosses
-//     the arena from one edge, aimed at your live row/column. Three tides.
-//
-//   CHARGE ATTACK - COBRA STRIKE: when the boss's attack bar fills, a
-//     wide hood-shadow telegraphs a lane through your position, then the
-//     maw rears up and strikes across it in one lightning lash.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + onInit arena)
-//   3. UNIQUE mechanic handlers + the persistent watcher
+// Serpent-pit siege: a slithering coiled maw, fusing seeker serpents with
+// venom trails, CONSTRICTOR ring waves at 60%, SERPENT TIDE chargers at 30%,
+// and the COBRA STRIKE lane-lash charge attack.
 //
 // Shared mechanics (frozen_cells) live in shared-boss-abilities.js and are
 // referenced by handler-name string.
