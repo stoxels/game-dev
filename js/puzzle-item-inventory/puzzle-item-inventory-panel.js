@@ -55,6 +55,12 @@ let _invTooltipEl = null;
 // Currently open flyout group (label string) - null when none is open.
 // One flyout at a time; switching category buttons swaps the panel.
 let _invOpenFlyoutGroup = null;
+
+// Pinned flyout group (label string) or null. A pinned flyout stays open
+// until an explicit unpin/outside click - the tutorial uses this so its
+// highlight points at the open Reveal flyout for the whole candle task.
+// Mutate via pinInventoryFlyout()/unpinInventoryFlyout() from other modules.
+let _invPinnedFlyoutGroup = null;
 // Close-on-leave grace timer id: keeps the flyout open while the pointer
 // travels across the small gap between the category button and the panel.
 let _invFlyoutCloseTimer = null;
@@ -245,11 +251,11 @@ function _invCancelFlyoutClose() {
 // them so diagonal mouse paths don't flicker the panel shut. Never fires
 // while a flyout is PINNED - pinning means "stay open until I click".
 function _invScheduleFlyoutClose() {
-    if (window._invPinnedFlyoutGroup) return;
+    if (_invPinnedFlyoutGroup) return;
     _invCancelFlyoutClose();
     _invFlyoutCloseTimer = setTimeout(() => {
         _invFlyoutCloseTimer = null;
-        if (!window._invPinnedFlyoutGroup) closeInventoryFlyout();
+        if (!_invPinnedFlyoutGroup) closeInventoryFlyout();
     }, 220);
 }
 
@@ -304,6 +310,21 @@ export function openInventoryFlyout(groupLabel, anchorBtn) {
     flyout.style.display = '';
 }
 
+// Pins the currently open (or given) flyout group so hover-close and the
+// global mousemove guard leave it open. Used by the tutorial quest, which
+// opens the Reveal flyout and needs it to stay open for the whole lesson.
+export function pinInventoryFlyout(groupLabel) {
+    _invPinnedFlyoutGroup = groupLabel;
+}
+
+// Drops the pin (only if it matches, when a label is given) so the flyout
+// returns to normal hover-close behaviour.
+export function unpinInventoryFlyout(groupLabel) {
+    if (groupLabel === undefined || _invPinnedFlyoutGroup === groupLabel) {
+        _invPinnedFlyoutGroup = null;
+    }
+}
+
 // Hides the flyout panel and clears button highlighting. Safe to call
 // when nothing is open.
 export function closeInventoryFlyout() {
@@ -345,7 +366,7 @@ function _wireGlobalFlyoutGuard() {
     if (_invGlobalGuardWired) return;
     _invGlobalGuardWired = true;
     document.addEventListener('mousemove', (e) => {
-        if (!_invOpenFlyoutGroup || window._invPinnedFlyoutGroup) return;
+        if (!_invOpenFlyoutGroup || _invPinnedFlyoutGroup) return;
         if (!_invPointerInBar(e.clientX, e.clientY) && !_invPointerInFlyout(e.clientX, e.clientY)) {
             _invScheduleFlyoutClose();
         }
@@ -354,7 +375,7 @@ function _wireGlobalFlyoutGuard() {
     // hover-opened flyout is closed. Pinned flyouts survive (the user chose
     // to keep them) and still close on the next outside click.
     window.addEventListener('blur', () => {
-        if (_invOpenFlyoutGroup && !window._invPinnedFlyoutGroup) closeInventoryFlyout();
+        if (_invOpenFlyoutGroup && !_invPinnedFlyoutGroup) closeInventoryFlyout();
     });
     // Level end / screen transitions: the win/lose overlays appearing over
     // the still-active game screen mean the level is over, so the flyout
@@ -367,7 +388,7 @@ function _wireGlobalFlyoutGuard() {
         if (!el) return;
         new MutationObserver(() => {
             if (!el.classList.contains('show')) return;
-            window._invPinnedFlyoutGroup = null;
+            _invPinnedFlyoutGroup = null;
             _invCancelFlyoutClose();
             closeInventoryFlyout();
         }).observe(el, { attributes: true, attributeFilter: ['class'] });
@@ -382,7 +403,7 @@ function _wireGlobalFlyoutGuard() {
         if (!el) return;
         new MutationObserver(() => {
             if (!el.classList.contains('show')) return;
-            window._invPinnedFlyoutGroup = null;
+            _invPinnedFlyoutGroup = null;
             _invCancelFlyoutClose();
             closeInventoryFlyout();
         }).observe(el, { attributes: true, attributeFilter: ['class'] });
@@ -394,7 +415,7 @@ function _wireGlobalFlyoutGuard() {
         for (const m of muts) {
             for (const n of m.addedNodes) {
                 if (n.nodeType === 1 && n.id === 'primer-overlay') {
-                    window._invPinnedFlyoutGroup = null;
+                    _invPinnedFlyoutGroup = null;
                     _invCancelFlyoutClose();
                     closeInventoryFlyout();
                     return;
@@ -429,7 +450,7 @@ export function buildInventoryPanel() {
     // after the rebuild so slot counts/badges never go stale after an item
     // use - the rebuild itself IS the inventory change.
     const openGroup = _invOpenFlyoutGroup;
-    const pinnedGroup = window._invPinnedFlyoutGroup || null;
+    const pinnedGroup = _invPinnedFlyoutGroup || null;
 
     panel.innerHTML = '';
 
@@ -480,11 +501,11 @@ export function buildInventoryPanel() {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             _invCancelFlyoutClose();
-            if (window._invPinnedFlyoutGroup === group.label) {
-                window._invPinnedFlyoutGroup = null;
+            if (_invPinnedFlyoutGroup === group.label) {
+                _invPinnedFlyoutGroup = null;
                 closeInventoryFlyout();
             } else {
-                window._invPinnedFlyoutGroup = group.label;
+                _invPinnedFlyoutGroup = group.label;
                 openInventoryFlyout(group.label, btn);
             }
         });
@@ -508,12 +529,12 @@ export function buildInventoryPanel() {
             openInventoryFlyout(openGroup, anchor);
         } else {
             // Group vanished (no defs) - close and drop any pin.
-            window._invPinnedFlyoutGroup = null;
+            _invPinnedFlyoutGroup = null;
             closeInventoryFlyout();
         }
     } else if (pinnedGroup) {
         // Pinned but not currently rendered open (edge case) - drop the pin.
-        window._invPinnedFlyoutGroup = null;
+        _invPinnedFlyoutGroup = null;
     }
 
     checkInventoryAchievements();
@@ -549,9 +570,9 @@ function _ensureInvFlyoutEl() {
     // A click anywhere outside the bar/flyout un-pins and closes (only
     // matters while pinned - hover users just move the pointer away).
     document.addEventListener('click', (e) => {
-        if (!window._invPinnedFlyoutGroup) return;
+        if (!_invPinnedFlyoutGroup) return;
         if (e.target.closest('#inv-panel') || e.target.closest('#inv-flyout')) return;
-        window._invPinnedFlyoutGroup = null;
+        _invPinnedFlyoutGroup = null;
         closeInventoryFlyout();
     });
 

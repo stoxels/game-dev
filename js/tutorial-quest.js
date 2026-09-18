@@ -17,7 +17,7 @@ import { ALL } from './levels/levels.js';
 import { pval } from './mouse-button-handlers.js';
 import { isTreeGameOverlay } from './passive-tree/passive-tree.js';
 import { playItemEffect } from './puzzle-items/item-fx-dispatcher.js';
-import { buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
+import { buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout, pinInventoryFlyout, unpinInventoryFlyout } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { ITEM_DEFS } from './puzzle-items/item-definitions.js';
 import { FX_Z, _fxGetPuzzleRectForWrap } from './puzzle-mechanics/fx-helpers.js';
 import { showItemGainPopup, showToast } from './puzzle-mechanics/toasts-and-popups.js';
@@ -922,7 +922,7 @@ export function _tqOpenRevealFlyout() {
         if (typeof openInventoryFlyout !== 'function') return;
         const btn = document.querySelector('.inv-cat-btn[data-group="Reveal"]');
         if (!btn) return;
-        window._invPinnedFlyoutGroup = 'Reveal';
+        pinInventoryFlyout('Reveal');
         openInventoryFlyout('Reveal', btn);
     } catch (e) {}
 }
@@ -930,7 +930,7 @@ export function _tqOpenRevealFlyout() {
 // Unpins + closes the inventory flyout opened for the candle lesson.
 export function _tqCloseInventoryFlyout() {
     try {
-        if (window._invPinnedFlyoutGroup === 'Reveal') window._invPinnedFlyoutGroup = null;
+        unpinInventoryFlyout('Reveal');
         if (typeof closeInventoryFlyout === 'function') closeInventoryFlyout();
     } catch (e) {}
 }
