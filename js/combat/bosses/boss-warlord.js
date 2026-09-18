@@ -6,16 +6,12 @@ import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _
 //------------------------------------------------------------------------
 //-------------------BOSS: THE WARLORD (boss_warlord)---------------------------
 //------------------------------------------------------------------------
-// Pinnacle commander: calls its guard to raise a shield you must break by
-// killing them - while triple shockwave rings roll the arena on a tight
-// fuse. Two wars at once: the guards, and the ground.
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
+// Pinnacle commander: calls a guard that shields it until the guards die,
+// while triple shockwave rings roll the arena on a tight fuse. Fight two
+// wars at once: the guards, and the ground.
 //
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
+// Shared mechanics (soul_tithe) live in shared-boss-abilities.js and are
+// referenced by handler-name string.
 //------------------------------------------------------------------------
 
 Object.assign(EG_BOSS_DEFS, {
@@ -43,6 +39,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 });
 
 
+// Spawns guard monsters and turns the boss immune until they all die.
+// The shield drops early if the guards survive past the time limit.
 export function _egMechGuardCall(monster, phase) {
     if (!monster || monster.warlordGuard || _egNkFrozen()) return;
     if (typeof _egSpawnMonster !== 'function') return;
@@ -90,6 +88,8 @@ export function _egMechGuardCall(monster, phase) {
     });
 }
 
+// Three expanding rings in a staggered row; standing on a ring band hurts.
+// Watch the first ring to time the gaps in the next two.
 export function _egMechTripleRings(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
