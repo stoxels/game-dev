@@ -8,10 +8,13 @@ import { _getPreFilledCols } from '../../puzzle-mechanics/puzzle-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
-//-------------------CURSED COL SOLVE - VORTEX----------------------
+//-------------------CURSED COL SOLVE - VORTEX-----------------------------
 //------------------------------------------------------------------------
 
 // cursedColSolve - solves 3 columns; downside erases 1 pre-existing column.
+// The pre-filled-column snapshot MUST be taken before solveCols() runs:
+// the downside erases a column that was already pre-filled, not one the
+// item itself just revealed.
 export function _useCursedColSolve(id, def) {
     _trackWitchImmuneCursedUse();
 
@@ -29,6 +32,8 @@ export function _useCursedColSolve(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates the dark "sucked in" column strips for Vortex.
+// Widths are derived from the live grid's column count (falls back to 5
+// when the grid is not built, e.g. headless tests).
 export function _fxMakeVortexStrips(container, r) {
     const cols = globalThis.cur?.grid?.[0]?.length || 5;
     const colW = r.width / cols;
