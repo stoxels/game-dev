@@ -7,7 +7,7 @@ import { scalePuzzle } from './js/grid-scaling.js';
 import { stopPainting } from './js/mouse-button-handlers.js';
 import { _dofNudge } from './js/passive-tree/passive-tree-special-nodes-logic.js';
 import { closeTreeToGame, isTreeGameOverlay } from './js/passive-tree/passive-tree.js';
-import { skipQuiz } from './js/quiz-excercise/quiz.js';
+import { skipQuiz } from './js/quiz-exercise/quiz.js';
 import { _refreshQuestionModalFlag, goToPreviousScreen, hideResultOverlays } from './js/screens/screens.js';
 import { SETTINGS, applySettings, initSettingsControls } from './js/settings.js';
 import { closeSpellbook } from './js/skills/skill-spellbook.js';
