@@ -5,47 +5,10 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFro
 //------------------------------------------------------------------------
 //-------------------BOSS: THE MONSOON (boss_monsoon)---------------------
 //------------------------------------------------------------------------
-// REWORK - torrential-storm homage, rebuilt as a full flooding season. The
-// sky opens: diagonal rain curtains pour, thunderbolts hammer the marks,
-// hail pelts wherever you were - and the water itself rises. At the very
-// end, the levee fails: THE GREAT FLOOD.
-//
-//   Phase 1 (100–60%) - RAIN BANDS. Diagonal rain curtains telegraph near
-//                       your position, then pour for a few seconds. Stay
-//                       out of the curtains!
-//                       Plus THUNDERBOLTS. Golden marks flash and lightning
-//                       strikes each one, staggered across the sky. Clear
-//                       the circles!
-//   Phase 2 ( ≤60%)   - STORM SURGE. The water rises from the bottom and
-//                       holds - everything submerged takes repeated hits -
-//                       then recedes. Climb!
-//                       Plus HAIL BARRAGE. Hailstones drop onto marked
-//                       spots, most aimed near where you were. Keep moving!
-//   Phase 3 ( ≤30%)   - Higher surges, more bolts, denser hail, a third
-//                       curtain. The sky is not finished with you.
-//   Finale ( ≤10%)    - THE GREAT FLOOD (one-shot set-piece): the boss goes
-//                       immune and shielded and CHURNS while a storm
-//                       swallows the arena and the water rises in three
-//                       surges (30% → 55% → 78%). On every beat a dry
-//                       ISLAND hops to a fresh spot in the high ground -
-//                       reach it before the next surge! Then THE BREAK: the
-//                       flood swallows everything except the final island.
-//                       CLIMB! Charge bar frozen for the whole set-piece
-//                       (gate in _egTickPlayer via _egMnFinalActive).
-//
-// Tier scaling: every dodge run uses the shared EG_NK_TIER_FACTOR clock,
-// so gentle tiers get longer telegraphs and brutal tiers tighter ones.
-//
-// This file holds EVERYTHING this boss needs in one place:
-//   1. EG_BOSS_DEFS entry (stats, element, resistances)
-//   2. EG_BOSS_MECHANICS entry (phases + mechanic schedule + hooks)
-//   3. UNIQUE mechanic handlers (only this boss uses them)
-//
-// Shared mechanics live in shared-boss-abilities.js and are referenced
-// by handler-name string.
-//
-// DEBUG_SLOW: while true, telegraphs/windups are stretched 2.5× so
-// screenshots can catch mid-animation states. Off for ship.
+// Torrential-storm flood season: diagonal rain curtains, thunderbolt marks
+// and hail join a rising storm surge at 60%; at ≤10% THE GREAT FLOOD
+// swallows the arena in three surges - hop between dry islands before THE
+// BREAK takes everything except the final one.
 //------------------------------------------------------------------------
 
 export const _EG_MN_DEBUG_SLOW = false;
