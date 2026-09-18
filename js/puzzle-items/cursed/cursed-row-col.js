@@ -7,17 +7,22 @@ import { solveCols, solveRows } from '../../puzzle-mechanics/grid-actions.js';
 import { _trackWitchImmuneCursedUse } from '../shared/quest-tracking.js';
 
 //------------------------------------------------------------------------
-//-------------------CURSED ROW COL - CHAOS GRID----------------------
+//-------------------CURSED ROW COL - CHAOS GRID---------------------------
 //------------------------------------------------------------------------
 
-// cursedRowCol - solves 4 rows and 4 cols; downside blacks out column clues.
+// cursedRowCol - solves 4 rows and 4 cols; downside blacks out column
+// clues for 45 s (before reductions/immunity). Unlike the erase/downside
+// items, no pre-solve snapshot is needed: the blackout targets clue
+// headers, not tiles, and _applyBlackoutDownside no-ops itself when the
+// duration resolves to 0 (immunity / Curse Embrace / Veil of Purity).
 export function _useCursedRowCol(id, def) {
     _trackWitchImmuneCursedUse();
 
     const rowsRevealed = solveRows(4, 'item');
     const colsRevealed = solveCols(4, 'item');
 
-    _resolveCursedBlackoutDownside(45000, false, true); // black out cols only
+    // Arguments are (durationMs, blackoutRows, blackoutCols) - cols only.
+    _resolveCursedBlackoutDownside(45000, false, true);
 
     playItemEffect(id);
     globalThis.checkWin();
@@ -29,6 +34,7 @@ export function _useCursedRowCol(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: detonates one explosion blast + shrapnel at a random grid position.
+// Blast colour is drawn from CHAOS_BLAST_COLOURS so each detonation differs.
 export function _fxDetonateBlast(container, r) {
     const blastColor = CHAOS_BLAST_COLOURS[Math.floor(Math.random() * CHAOS_BLAST_COLOURS.length)];
     const blast = _fxMakeElement(container, `
@@ -65,7 +71,7 @@ export function _fxChaosGrid() {
     for (let i = 0; i < 8; i++) {
         setTimeout(() => _fxDetonateBlast(overlay, r), i * 180);
     }
-
+    // Icon reuses the artifact-icon keyframe (same pop-and-fade shape).
     _fxMakeIcon(r.wrap, '💥', cx, cy, 80,
         `z-index:${FX_Z.supreme}; animation:fx-artifact-icon 1.2s ease-out forwards;`, 1600);
 
