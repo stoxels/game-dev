@@ -9,6 +9,18 @@ import { _executeFieldScan } from '../classes/class-probabilist.js';
 import { ptHasSkill } from './passive-tree-state-points.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
+
+// --- Expansion-node per-level state (module-owned; was loose window._ptx*
+// globals lazily created on first write). Inits mirror the old unset-window
+// semantics: _ptxRecallLeft stays undefined until armed (=== undefined
+// checks), the rest default falsy to match the old || 0 fallbacks. ---
+let _ptxRecallLeft;               // ergodic_recall: reveals left (undefined = not armed)
+let _ptxSupplyStacks = 0;         // supply_chain: stacked discount charges (max 3)
+let _ptxDoubleNextReveal = false; // doubled reveal armed for the next revealTiles call
+let _ptxBaseTime = 0;             // timer snapshot taken when the tree was opened
+let _ptxLastPen = 0;              // last effective penalty seen (doubled-reveal trigger)
+let _ptxInSwap = false;           // re-entrancy guard: Variance Swap cascade
+let _ptxInPtxReveal = false;      // re-entrancy guard: doubled-reveal cascade
 //----------------------------------------------------------------------------------------
 //-------------------PASSIVE TREE EXPANSION (nodes 303-402)-------------------------------
 //----------------------------------------------------------------------------------------
@@ -91,7 +103,7 @@ export function _ptxRunExpansion() {
     }
 
     function baseTime() {
-        return window._ptxBaseTime || 0;
+        return _ptxBaseTime || 0;
     }
 
     function elapsedSecs() {
@@ -243,8 +255,8 @@ export function _ptxRunExpansion() {
         pen => ((has('rune_insurance') || has('outlier_immunity')) && globalThis.mistakeCount === 1) ? 0 : pen,
         // Ergodic Recall: 3 charges per level absorb penalties entirely.
         pen => {
-            if (has('ergodic_recall') && pen > 0 && (window._ptxRecallLeft === undefined || window._ptxRecallLeft > 0)) {
-                window._ptxRecallLeft = (window._ptxRecallLeft === undefined ? 3 : window._ptxRecallLeft) - 1;
+            if (has('ergodic_recall') && pen > 0 && (_ptxRecallLeft === undefined || _ptxRecallLeft > 0)) {
+                _ptxRecallLeft = (_ptxRecallLeft === undefined ? 3 : _ptxRecallLeft) - 1;
                 toast('🧿 Ergodic Recall absorbed the penalty');
                 return 0;
             }
@@ -255,7 +267,7 @@ export function _ptxRunExpansion() {
         // Actuary: flat −5s.
         pen => has('actuary') ? Math.max(0, pen - 5) : pen,
         // Supply Chain: −10s per item used (max 3 stacks).
-        pen => has('supply_chain') ? Math.max(0, pen - 10 * Math.min(3, window._ptxSupplyStacks || 0)) : pen,
+        pen => has('supply_chain') ? Math.max(0, pen - 10 * Math.min(3, _ptxSupplyStacks || 0)) : pen,
         // Graceful Degradation: cap at 30s.
         pen => has('graceful_degradation') ? Math.min(30, pen) : pen,
         // Zero Variance: everything becomes exactly 45s (overrides all above).
@@ -563,7 +575,7 @@ export function _ptxRunExpansion() {
 
     ON_MISTAKE.push(() => {   // Risk Auditor refund (329)
         if (!has('risk_auditor') || Math.random() >= 0.20) return;
-        const last = window._ptxLastPen || 0;
+        const last = _ptxLastPen || 0;
         if (last > 0) {
             const refund = Math.ceil(last / 2);
             const got = addSecs(refund);
@@ -606,7 +618,7 @@ export function _ptxRunExpansion() {
 
     ON_LINE_DONE.push(() => {   // Midas Path (325)
         if (has('midas_path') && Math.random() < 0.10) {
-            window._ptxDoubleNextReveal = true;
+            _ptxDoubleNextReveal = true;
             toast('👑 Midas Path: next reveal doubled');
         }
     });
@@ -745,7 +757,7 @@ export function _ptxRunExpansion() {
     });
 
     ON_ITEM_USE.push(() => {   // Supply Chain stack (352)
-        if (has('supply_chain')) window._ptxSupplyStacks = Math.min(3, (window._ptxSupplyStacks || 0) + 1);
+        if (has('supply_chain')) _ptxSupplyStacks = Math.min(3, (_ptxSupplyStacks || 0) + 1);
     });
 
     ON_ITEM_USE.push(() => {   // Open Bazaar keystone (353)
@@ -867,9 +879,9 @@ export function _ptxRunExpansion() {
 
     patch('buildGrid', function (orig, args) {
         resetLevel();
-        window._ptxRecallLeft = has('ergodic_recall') ? 3 : 0;
-        window._ptxSupplyStacks = 0;
-        window._ptxDoubleNextReveal = false;
+        _ptxRecallLeft = has('ergodic_recall') ? 3 : 0;
+        _ptxSupplyStacks = 0;
+        _ptxDoubleNextReveal = false;
         const result = orig(...args);
         setTimeout(() => {
             snapshotLines();
@@ -929,7 +941,7 @@ export function _ptxRunExpansion() {
         // so it must not feed the time-added bookkeeping.
         if (has('keystone_scholars_debt')) globalThis.timerSecs += globalThis.timerSecs;
 
-        window._ptxBaseTime = globalThis.timerSecs;
+        _ptxBaseTime = globalThis.timerSecs;
         updTimer();
         return result;
     });
@@ -939,7 +951,7 @@ export function _ptxRunExpansion() {
     patch('_calcEffectivePenalty', function (orig, args) {
         let pen = orig(...args);
         for (const mod of PENALTY_MODS) pen = mod(pen);
-        window._ptxLastPen = pen;
+        _ptxLastPen = pen;
         return pen;
     });
 
@@ -1178,13 +1190,13 @@ export function _ptxRunExpansion() {
     // ---- Midas double-reveal plumbing (325) ------------------------------------------------------------------
 
     patch('revealTiles', function (orig, args) {
-        if (window._ptxInPtxReveal) return orig(...args);   // no recursion through our own cascades
+        if (_ptxInPtxReveal) return orig(...args);   // no recursion through our own cascades
         let count = args[0];
-        if (count > 0 && window._ptxDoubleNextReveal) {
-            window._ptxDoubleNextReveal = false;
+        if (count > 0 && _ptxDoubleNextReveal) {
+            _ptxDoubleNextReveal = false;
             count *= 2;
-            window._ptxInPtxReveal = true;
-            try { orig(count); } finally { window._ptxInPtxReveal = false; }
+            _ptxInPtxReveal = true;
+            try { orig(count); } finally { _ptxInPtxReveal = false; }
             return;
         }
         const result = orig(...args);
@@ -1230,11 +1242,11 @@ export function _ptxRunExpansion() {
 
     const revealAfterProcs = window.revealTiles;
     window.revealTiles = function (...args) {
-        if (window._ptxInSwap) return revealAfterProcs(...args);
+        if (_ptxInSwap) return revealAfterProcs(...args);
         const result = revealAfterProcs(...args);
         if (Array.isArray(result) && result.length > 0 && cur && !globalThis.dead && ptHasSkill('variance_swap') && Math.random() < 0.10) {
-            window._ptxInSwap = true;
-            try { revealAfterProcs(result.length); toast('🎚️ Variance Swap: reveal doubled'); } finally { window._ptxInSwap = false; }
+            _ptxInSwap = true;
+            try { revealAfterProcs(result.length); toast('🎚️ Variance Swap: reveal doubled'); } finally { _ptxInSwap = false; }
         }
         return result;
     };

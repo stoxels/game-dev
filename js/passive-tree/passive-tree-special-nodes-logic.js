@@ -52,47 +52,53 @@ import { cur } from '../state.js';
 //-------------------------- CONSTANTS & STATE ----------------------------
 //------------------------------------------------------------------------
 
+// Module-owned state below: each per-node global was converted to a file
+// local (Tier 2, 2026-09-18). _resetNewNodeState() below still resets all of
+// them at level start - it now assigns the locals directly. Reset order is
+// unchanged: _resetNewNodeState runs at _resetLevelState (step 1 of
+// _doStartLevel), long before any passive node arms its state.
+
 // --- Bayesian Update (nodes 282–284 shared bonus pool) ---
-window._bayesianBonus = window._bayesianBonus || 0; // Accumulated extra trigger % from mistakes
+let _bayesianBonus = 0; // Accumulated extra trigger % from mistakes
 
 // --- Binomial Burst (nodes 282–284) ---
-window._binomialBurstFills = 0; // Correct-fill counter; triggers at every 10th fill
+let _binomialBurstFills = 0; // Correct-fill counter; triggers at every 10th fill
 
 // --- Sparse Prior (node 290) - per-level Set, initialized in reset ---
-window._sparsePriorRevealedLines = new Set(); // Keys like "r3" or "c7" to avoid double-reveals
+let _sparsePriorRevealedLines = new Set(); // Keys like "r3" or "c7" to avoid double-reveals
 
 // --- Ergodic Field (node 291) ---
 export const ERGODIC_FIELD_INTERVAL_MS = 3 * 60 * 1000; // Time between solution flashes
 export const ERGODIC_FIELD_FLASH_MS = 1000;             // How long the flash stays on screen
-window._ergodicFieldNext = null; // Timestamp for next solution flash
+let _ergodicFieldNext = null; // Timestamp for next solution flash
 
 // --- Entropy Drain (node 293) ---
 export const ENTROPY_DRAIN_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes before a stalled line reverts
-window._entropyDrainTimestamps = {}; // "r-{row}" / "c-{col}" → timestamp of last progress
+let _entropyDrainTimestamps = {}; // "r-{row}" / "c-{col}" → timestamp of last progress
 
 // --- Random Walk (node 294) ---
 export const RANDOM_WALK_INTERVAL_MS = 30 * 1000; // Time between auto-actions
 export const RANDOM_WALK_MAX_MISTAKES = 2;         // Level is lost at this many mistakes
-window._randomWalkNext = null; // Timestamp for next random cell action
+let _randomWalkNext = null; // Timestamp for next random cell action
 
 // --- Frequentist's Burden (node 295) ---
 export const FREQUENTIST_FILLS_PER_REVEAL = 5; // One clue revealed per this many correct fills
-window._frequentistsFills = 0;    // Correct-fill counter; reveals a clue every 5 fills
-window._frequentistsBurdenActive = false;
+let _frequentistsFills = 0;    // Correct-fill counter; reveals a clue every 5 fills
+let _frequentistsBurdenActive = false;
 
 // --- Signal to Noise (node 296) ---
 export const SIGNAL_NOISE_CORRUPT_RATIO = 0.15; // Fraction of clue spans to falsify
 export const SIGNAL_NOISE_RESTORE_RATIO = 0.75; // Board completion % to trigger restore
-window._signalToNoiseActive = false;
-window._signalToNoiseFakeClues = []; // Array of { spanId, originalVal, fakeVal }
+let _signalToNoiseActive = false;
+let _signalToNoiseFakeClues = []; // Array of { spanId, originalVal, fakeVal }
 
 // --- Degrees of Freedom (node 298) ---
 export const DOF_FLASH_INTERVAL_MS = 30 * 1000; // Time between brief reveals
 export const DOF_FLASH_DURATION_MS = 5 * 1000;  // How long clues stay visible during flash
-window._degreesOfFreedomChoice = null; // 'row' | 'col' - player's chosen hidden clue axis
-window._degreesOfFreedomNext = null; // Timestamp for next brief clue reveal
-window._degreesOfFreedomFlashTimeout = null; // Pending re-hide timeout of an active flash
-window._dofFlashToken = 0; // Bumps on every choice/reset; stale flash timeouts no-op on mismatch
+let _degreesOfFreedomChoice = null; // 'row' | 'col' - player's chosen hidden clue axis
+let _degreesOfFreedomNext = null; // Timestamp for next brief clue reveal
+let _degreesOfFreedomFlashTimeout = null; // Pending re-hide timeout of an active flash
+let _dofFlashToken = 0; // Bumps on every choice/reset; stale flash timeouts no-op on mismatch
 
 // --- Overfitting (node 299) - local var, not on window ---
 export const OVERFITTING_PHASE_THRESHOLD = 0.15; // Board fill % at which mistakes stop being free
@@ -233,12 +239,12 @@ export function _interquartileVisionDuration() {
 
 // Returns total accumulated bonus from mistakes (0.0–1.0+)
 export function _getBayesianBonus() {
-    return window._bayesianBonus || 0;
+    return _bayesianBonus || 0;
 }
 
 // Resets the bonus pool after it has been consumed by a trigger
 export function _resetBayesianBonus() {
-    window._bayesianBonus = 0;
+    _bayesianBonus = 0;
 }
 
 // Accumulates +5% per active Bayesian Update tier on each mistake.
@@ -254,7 +260,7 @@ export function _onMistakeBayesianUpdate() {
     if (hasTier2) increment += 0.05;
     if (hasTier3) increment += 0.05;
 
-    window._bayesianBonus = (window._bayesianBonus || 0) + increment;
+    _bayesianBonus = (_bayesianBonus || 0) + increment;
 }
 
 // Rolls against (baseChance + bayesianBonus). Resets the bonus pool on success.
@@ -460,9 +466,9 @@ export function _binomialBurstOnCorrectFill(row, col) {
     if (!ptHasSkill('binomial_burst_1')) return;
     if (_autoActionsBlocked()) return;
 
-    window._binomialBurstFills = (window._binomialBurstFills || 0) + 1;
-    if (window._binomialBurstFills < 10) return;
-    window._binomialBurstFills = 0;
+    _binomialBurstFills = (_binomialBurstFills || 0) + 1;
+    if (_binomialBurstFills < 10) return;
+    _binomialBurstFills = 0;
 
     const chance = _binomialBurstGetChance();
     if (!_bayesianRoll(chance)) return;
@@ -638,12 +644,12 @@ export function _sparsePriorOnLineComplete(lineIndex, isRow) {
     if (!ptHasSkill('keystone_sparse_prior')) return;
     if (!cur) return;
 
-    if (!window._sparsePriorRevealedLines) window._sparsePriorRevealedLines = new Set();
+    if (!_sparsePriorRevealedLines) _sparsePriorRevealedLines = new Set();
 
     // Guard against duplicate reveals for the same line
     const key = (isRow ? 'r' : 'c') + lineIndex;
-    if (window._sparsePriorRevealedLines.has(key)) return;
-    window._sparsePriorRevealedLines.add(key);
+    if (_sparsePriorRevealedLines.has(key)) return;
+    _sparsePriorRevealedLines.add(key);
 
     if (isRow) {
         _sparsePriorRevealRow(lineIndex);
@@ -692,17 +698,17 @@ export function _ergodicFieldRestoreBoard(flashedCells, sol) {
 // Called from: start-level.js
 export function _ergodicFieldInit() {
     if (!ptHasSkill('keystone_ergodic_field')) return;
-    window._ergodicFieldNext = Date.now() + ERGODIC_FIELD_INTERVAL_MS;
+    _ergodicFieldNext = Date.now() + ERGODIC_FIELD_INTERVAL_MS;
 }
 
 // Main tick - fires the solution flash if enough time has elapsed.
 // Called from: timer.js setInterval
 export function _ergodicFieldTick() {
     if (!ptHasSkill('keystone_ergodic_field')) return;
-    if (!window._ergodicFieldNext || Date.now() < window._ergodicFieldNext) return;
+    if (!_ergodicFieldNext || Date.now() < _ergodicFieldNext) return;
     if (!cur) return;
 
-    window._ergodicFieldNext = Date.now() + ERGODIC_FIELD_INTERVAL_MS;
+    _ergodicFieldNext = Date.now() + ERGODIC_FIELD_INTERVAL_MS;
 
     const sol = cur.grid;
     const flashedCells = _ergodicFieldGetFlashCells(sol);
@@ -775,14 +781,14 @@ export function _entropyDrainRevertCol(colIndex, rows) {
 // Stamps all row and column timestamps to "now" at level start.
 // Called from: start-level.js
 export function _entropyDrainInit() {
-    window._entropyDrainTimestamps = {};
+    _entropyDrainTimestamps = {};
     if (!ptHasSkill('keystone_entropy_drain')) return;
     if (!cur) return;
 
     const rows = cur.grid.length, cols = cur.grid[0].length;
     const now = Date.now();
-    for (let r = 0; r < rows; r++) window._entropyDrainTimestamps[`r-${r}`] = now;
-    for (let c = 0; c < cols; c++) window._entropyDrainTimestamps[`c-${c}`] = now;
+    for (let r = 0; r < rows; r++) _entropyDrainTimestamps[`r-${r}`] = now;
+    for (let c = 0; c < cols; c++) _entropyDrainTimestamps[`c-${c}`] = now;
 }
 
 // Refreshes the timestamp for a row and column when the player makes progress.
@@ -790,22 +796,22 @@ export function _entropyDrainInit() {
 export function _entropyDrainUpdateProgress(row, col) {
     if (!ptHasSkill('keystone_entropy_drain')) return;
     const now = Date.now();
-    window._entropyDrainTimestamps[`r-${row}`] = now;
-    window._entropyDrainTimestamps[`c-${col}`] = now;
+    _entropyDrainTimestamps[`r-${row}`] = now;
+    _entropyDrainTimestamps[`c-${col}`] = now;
 }
 
 // Checks a single row/col timer entry: refreshes its timestamp if no longer
 // stalled, or reverts the line once the stall exceeds the timeout.
 export function _entropyDrainProcessLine(key, isStalled, revert, now) {
-    const ts = window._entropyDrainTimestamps[key];
+    const ts = _entropyDrainTimestamps[key];
     if (!ts) return;
 
     if (!isStalled()) {
-        window._entropyDrainTimestamps[key] = now;
+        _entropyDrainTimestamps[key] = now;
         return;
     }
     if (now - ts >= ENTROPY_DRAIN_TIMEOUT_MS) {
-        window._entropyDrainTimestamps[key] = now;
+        _entropyDrainTimestamps[key] = now;
         revert();
     }
 }
@@ -896,9 +902,9 @@ export function _randomWalkMarkEmpty(r, c) {
 // Initialises the first trigger timestamp at level start.
 // Called from: start-level.js
 export function _randomWalkInit() {
-    window._randomWalkNext = null;
+    _randomWalkNext = null;
     if (!ptHasSkill('keystone_random_walk')) return;
-    window._randomWalkNext = Date.now() + RANDOM_WALK_INTERVAL_MS;
+    _randomWalkNext = Date.now() + RANDOM_WALK_INTERVAL_MS;
 }
 
 // Main tick - checks for failures, then fires the next random cell action.
@@ -915,13 +921,13 @@ export function _randomWalkTick() {
     }
 
     // Self-initialisation failsafe (in case init was called before the skill was active)
-    if (!window._randomWalkNext) {
-        window._randomWalkNext = Date.now() + RANDOM_WALK_INTERVAL_MS;
+    if (!_randomWalkNext) {
+        _randomWalkNext = Date.now() + RANDOM_WALK_INTERVAL_MS;
         return;
     }
-    if (Date.now() < window._randomWalkNext) return;
+    if (Date.now() < _randomWalkNext) return;
 
-    window._randomWalkNext = Date.now() + RANDOM_WALK_INTERVAL_MS;
+    _randomWalkNext = Date.now() + RANDOM_WALK_INTERVAL_MS;
 
     const unfilled = _randomWalkGetUnfilledCells();
     if (unfilled.length === 0) return;
@@ -978,8 +984,8 @@ export function _frequentistRevealLine(line) {
 // Called from: start-level.js
 export function _applyFrequentistsBurden() {
     if (!ptHasSkill('keystone_frequentists_burden')) return;
-    window._frequentistsFills = 0;
-    window._frequentistsBurdenActive = true;
+    _frequentistsFills = 0;
+    _frequentistsBurdenActive = true;
     setTimeout(_hideAllClues, 100);
 }
 
@@ -987,10 +993,10 @@ export function _applyFrequentistsBurden() {
 // Called from: mouse-button-handlers.js
 export function _frequentistsBurdenOnCorrectFill() {
     if (!ptHasSkill('keystone_frequentists_burden')) return;
-    if (!window._frequentistsBurdenActive) return;
+    if (!_frequentistsBurdenActive) return;
 
-    window._frequentistsFills = (window._frequentistsFills || 0) + 1;
-    if (window._frequentistsFills % FREQUENTIST_FILLS_PER_REVEAL !== 0) return;
+    _frequentistsFills = (_frequentistsFills || 0) + 1;
+    if (_frequentistsFills % FREQUENTIST_FILLS_PER_REVEAL !== 0) return;
 
     const hiddenLines = _frequentistGetHiddenLines();
     if (hiddenLines.length === 0) return;
@@ -1040,7 +1046,7 @@ export function _signalToNoiseCorruptSpan(spanEntry) {
     const original = parseInt(span.textContent) || 0;
     const fake = _signalToNoiseGenerateFakeValue(original);
 
-    window._signalToNoiseFakeClues.push({ spanId: span.id, originalVal: original, fakeVal: fake });
+    _signalToNoiseFakeClues.push({ spanId: span.id, originalVal: original, fakeVal: fake });
     span.textContent = fake;
     span.style.color = 'var(--danger, #f55)';
 }
@@ -1057,8 +1063,8 @@ export function _applySignalToNoise() {
     if (!ptHasSkill('keystone_signal_to_noise')) return;
     if (!cur) return;
 
-    window._signalToNoiseActive = true;
-    window._signalToNoiseFakeClues = [];
+    _signalToNoiseActive = true;
+    _signalToNoiseFakeClues = [];
 
     const allSpans = _signalToNoiseCollectAllSpans(cur.grid);
     const corruptCount = Math.max(1, Math.floor(allSpans.length * SIGNAL_NOISE_CORRUPT_RATIO));
@@ -1073,14 +1079,14 @@ export function _applySignalToNoise() {
 // Called from: grid.js / checkWin
 export function _signalToNoiseCheckRestore() {
     if (!ptHasSkill('keystone_signal_to_noise')) return;
-    if (!window._signalToNoiseActive) return;
+    if (!_signalToNoiseActive) return;
     if (!cur) return;
 
     if (_getBoardCompletionRatio() < SIGNAL_NOISE_RESTORE_RATIO) return;
 
-    window._signalToNoiseActive = false;
-    window._signalToNoiseFakeClues.forEach(_signalToNoiseRestoreSpan);
-    window._signalToNoiseFakeClues = [];
+    _signalToNoiseActive = false;
+    _signalToNoiseFakeClues.forEach(_signalToNoiseRestoreSpan);
+    _signalToNoiseFakeClues = [];
 
     globalThis.showToast(`📡 ${t('pt_stn_restored')}`);
 }
@@ -1162,9 +1168,9 @@ export function _dofHideChosenAxis(type) {
 
 // Cancels a pending flash re-hide timeout, if any.
 export function _dofClearFlashTimeout() {
-    if (window._degreesOfFreedomFlashTimeout) {
-        clearTimeout(window._degreesOfFreedomFlashTimeout);
-        window._degreesOfFreedomFlashTimeout = null;
+    if (_degreesOfFreedomFlashTimeout) {
+        clearTimeout(_degreesOfFreedomFlashTimeout);
+        _degreesOfFreedomFlashTimeout = null;
     }
 }
 
@@ -1174,9 +1180,9 @@ export function _dofChoose(type) {
     if (type !== 'row' && type !== 'col') return;
     _dofRemoveModal();
     _dofClearFlashTimeout();
-    window._degreesOfFreedomChoice = type;
-    window._degreesOfFreedomNext = Date.now() + DOF_FLASH_INTERVAL_MS;
-    window._dofFlashToken = (window._dofFlashToken || 0) + 1;
+    _degreesOfFreedomChoice = type;
+    _degreesOfFreedomNext = Date.now() + DOF_FLASH_INTERVAL_MS;
+    _dofFlashToken = (_dofFlashToken || 0) + 1;
 
     _dofHideChosenAxis(type);
 
@@ -1193,10 +1199,10 @@ export function _dofFlashElements(token, choice) {
         .forEach(el => el.classList.remove('clue-blackout'));
 
     _dofClearFlashTimeout();
-    window._degreesOfFreedomFlashTimeout = setTimeout(() => {
-        window._degreesOfFreedomFlashTimeout = null;
-        if (token !== window._dofFlashToken) return;
-        if (choice !== window._degreesOfFreedomChoice) return;
+    _degreesOfFreedomFlashTimeout = setTimeout(() => {
+        _degreesOfFreedomFlashTimeout = null;
+        if (token !== _dofFlashToken) return;
+        if (choice !== _degreesOfFreedomChoice) return;
         if (!ptHasSkill('keystone_degrees_of_freedom')) return;
         if (!cur) return;
         document.querySelectorAll(_dofSelectorFor(choice))
@@ -1209,9 +1215,9 @@ export function _dofFlashElements(token, choice) {
 export function _applyDegreesOfFreedom() {
     if (!ptHasSkill('keystone_degrees_of_freedom')) return;
     _dofClearFlashTimeout();
-    window._degreesOfFreedomNext = null;
-    window._degreesOfFreedomChoice = null;
-    window._dofFlashToken = (window._dofFlashToken || 0) + 1;
+    _degreesOfFreedomNext = null;
+    _degreesOfFreedomChoice = null;
+    _dofFlashToken = (_dofFlashToken || 0) + 1;
     _dofShowModal();
 }
 
@@ -1219,13 +1225,13 @@ export function _applyDegreesOfFreedom() {
 // Called from: timer.js setInterval
 export function _degreesOfFreedomTick() {
     if (!ptHasSkill('keystone_degrees_of_freedom')) return;
-    if (!window._degreesOfFreedomChoice || !window._degreesOfFreedomNext) return;
-    if (Date.now() < window._degreesOfFreedomNext) return;
+    if (!_degreesOfFreedomChoice || !_degreesOfFreedomNext) return;
+    if (Date.now() < _degreesOfFreedomNext) return;
     if (!cur) return;
 
-    window._degreesOfFreedomNext = Date.now() + DOF_FLASH_INTERVAL_MS;
+    _degreesOfFreedomNext = Date.now() + DOF_FLASH_INTERVAL_MS;
 
-    _dofFlashElements(window._dofFlashToken, window._degreesOfFreedomChoice);
+    _dofFlashElements(_dofFlashToken, _degreesOfFreedomChoice);
     globalThis.showToast(`🎛️ ${t('pt_dof_flash')}`);
 }
 
@@ -1343,20 +1349,20 @@ export function _applyTheOracle() {
 // new level. Call this from _resetLevelState() in start-level.js.
 //------------------------------------------------------------------------
 export function _resetNewNodeState() {
-    window._bayesianBonus = 0;
-    window._binomialBurstFills = 0;
-    window._ergodicFieldNext = null;
-    window._entropyDrainTimestamps = {};
-    window._randomWalkNext = null;
-    window._frequentistsFills = 0;
-    window._frequentistsBurdenActive = false;
-    window._signalToNoiseActive = false;
-    window._signalToNoiseFakeClues = [];
-    window._degreesOfFreedomChoice = null;
-    window._degreesOfFreedomNext = null;
+    _bayesianBonus = 0;
+    _binomialBurstFills = 0;
+    _ergodicFieldNext = null;
+    _entropyDrainTimestamps = {};
+    _randomWalkNext = null;
+    _frequentistsFills = 0;
+    _frequentistsBurdenActive = false;
+    _signalToNoiseActive = false;
+    _signalToNoiseFakeClues = [];
+    _degreesOfFreedomChoice = null;
+    _degreesOfFreedomNext = null;
     if (typeof _dofClearFlashTimeout === 'function') _dofClearFlashTimeout();
-    window._dofFlashToken = (window._dofFlashToken || 0) + 1;
+    _dofFlashToken = (_dofFlashToken || 0) + 1;
     window.LEVEL_FLAGS.oracleActive = false;
-    window._sparsePriorRevealedLines = new Set();
+    _sparsePriorRevealedLines = new Set();
     window._residualAnalysisRewardedLines = new Set();
 }
