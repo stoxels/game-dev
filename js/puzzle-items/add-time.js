@@ -9,49 +9,99 @@ import { _calcAddTimeSecs } from './shared/effect-modifiers.js';
 import { CHRONOBOLT_X_FRACTIONS, FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, playFreezeCountdownOverlay } from './shared/fx-helpers.js';
 
 //------------------------------------------------------------------------
-//-------------------ADD TIME - HOURGLASS / STOPWATCH / CHRONOBOLT----------------------
+//-------------------CONSTANTS & STATE------------------------------------
 //------------------------------------------------------------------------
 
-// addTime30 / addTime60 / addTime180 - adds seconds to the timer.
+// How long the hourglass/stopwatch overlays stay on screen (ms). The
+// chronobolt uses its own slightly longer duration for its flash + bolts.
+const FX_DURATION_MS = 1400;
+
+//------------------------------------------------------------------------
+//-------------------ITEM LOGIC-------------------------------------------
+//------------------------------------------------------------------------
+
+// _useAddTime - the Hourglass / Stopwatch / Chronobolt handler. Adds seconds
+// to the timer (amount parsed from the item id, then modified by passives).
+// The Gambler's Ruin keystone blocks all timer items outright, so it must be
+// checked before anything else. Returns the toast text.
 export function _useAddTime(id, def) {
     if (ptHasSkill('keystone_gamblers_ruin')) {
         return `${def.icon} ${t('itm_blocked_gamblers_ruin')}`;
     }
 
-    const baseSecs = parseInt(id.replace('addTime', '')) || 30;
-    const secs = _calcAddTimeSecs(baseSecs);
-    // Toast shows minutes instead of seconds (e.g. 90s -> 1.5min)
-    const mins = Math.round((secs / 60) * 10) / 10;
+    const secs = _calcAddTimeSecs(parseAddTimeId(id));
+    return ptHasSkill('keystone_countdown_crisis') && !window.STOX_FLAGS.goldenClockActive
+        ? applyCountdownCrisis(id, def, secs)
+        : applyAddTime(id, def, secs);
+}
 
-    // Countdown Crisis inverts timer items - but the Golden Clock guarantees
-    // the timer can only increase, so the inversion is suppressed while it
-    // is active.
-    if (ptHasSkill('keystone_countdown_crisis') && !window.STOX_FLAGS.goldenClockActive) {
-        questStat_timerItemUsed();
-        const before = globalThis.timerSecs;
-        globalThis.timerSecs = Math.max(0, globalThis.timerSecs - secs);
-        _trackTimerDelta(before, globalThis.timerSecs);
-    updTimer();
-    playItemEffect(id);
-    if (typeof playFreezeCountdownOverlay === 'function') playFreezeCountdownOverlay(FREEZE_DURATION_MS);
-        return `${def.icon} ${t('itm_countdown_crisis').replace('{n}', mins)}`;
-    }
+// parseAddTimeId - reads the number out of an item id like "addTime300".
+// Falls back to 30s for unknown/legacy ids without a numeric suffix.
+function parseAddTimeId(id) {
+    return parseInt(id.replace('addTime', '')) || 30;
+}
 
+// applyAddTime - the normal branch: adds the seconds, updates the HUD, fires
+// the item's visual effect and returns the toast text. Toast shows minutes
+// instead of seconds (e.g. 90s -> 1.5min).
+function applyAddTime(id, def, secs) {
     questStat_timerItemUsed();
-    const before = globalThis.timerSecs;
-    globalThis.timerSecs += secs;
-    _trackTimerDelta(before, globalThis.timerSecs);
+    globalThis.timerSecs = addTimerSecs(globalThis.timerSecs, secs);
     updTimer();
     playItemEffect(id);
-    return `${def.icon} ${t('item_time_added').replace('{n}', mins)}`;
+    return `${def.icon} ${t('item_time_added').replace('{n}', secsToMinutes(secs))}`;
+}
+
+// applyCountdownCrisis - the inverted branch: the Countdown Crisis keystone
+// turns timer items harmful (removes seconds instead of adding them). The
+// Golden Clock guarantees the timer can only increase, so the inversion is
+// suppressed while it is active. Otherwise identical to applyAddTime.
+function applyCountdownCrisis(id, def, secs) {
+    questStat_timerItemUsed();
+    globalThis.timerSecs = addTimerSecs(globalThis.timerSecs, -secs);
+    updTimer();
+    playItemEffect(id);
+    playFreezeCountdownOverlay(FREEZE_DURATION_MS);
+    return `${def.icon} ${t('itm_countdown_crisis').replace('{n}', secsToMinutes(secs))}`;
+}
+
+// addTimerSecs - applies a signed delta to the timer and records it, clamped
+// so the timer can never go below zero.
+function addTimerSecs(currentSecs, deltaSecs) {
+    const next = Math.max(0, currentSecs + deltaSecs);
+    _trackTimerDelta(currentSecs, next);
+    return next;
+}
+
+// secsToMinutes - formats seconds as rounded minutes for the toast text
+// (e.g. 90 -> 1.5).
+function secsToMinutes(secs) {
+    return Math.round((secs / 60) * 10) / 10;
 }
 
 //------------------------------------------------------------------------
 //-------------------ITEM VISUAL EFFECT-----------------------------------
 //------------------------------------------------------------------------
 
-// Helper: creates the large hourglass icon with spin animation.
-export function _fxMakeHourglassIcon(wrap, cx, cy) {
+// _fxHourglass - ⏳ effect: sand streams downward through the centre.
+export function _fxHourglass() {
+    const r = _fxGetPuzzleRect();
+    if (!r) return;
+
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+
+    _fxMakeHourglassIcon(r.wrap, cx, cy);
+
+    const overlay = _fxOverlay(r.wrap, FX_DURATION_MS);
+    _fxMakeSandParticles(overlay, cx, cy, 20);
+
+    Audio_Manager.playSFX('hourglass');
+}
+
+// _fxMakeHourglassIcon - helper: creates the large hourglass icon with spin
+// animation.
+function _fxMakeHourglassIcon(wrap, cx, cy) {
     const hg = document.createElement('div');
     hg.className = 'fx-hourglass-icon';
     hg.textContent = '⏳';
@@ -66,8 +116,9 @@ export function _fxMakeHourglassIcon(wrap, cx, cy) {
     setTimeout(() => hg.remove(), 1600);
 }
 
-// Helper: spawns sand grain particles falling from the hourglass center.
-export function _fxMakeSandParticles(container, cx, cy, count) {
+// _fxMakeSandParticles - helper: spawns sand grain particles falling from the
+// hourglass centre.
+function _fxMakeSandParticles(container, cx, cy, count) {
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const grain = document.createElement('div');
@@ -83,24 +134,25 @@ export function _fxMakeSandParticles(container, cx, cy, count) {
     }
 }
 
-// ⏳ Hourglass - sand streams downward through the centre.
-export function _fxHourglass() {
+// _fxStopwatch - ⏱️ effect: timer rings ripple outward from centre.
+export function _fxStopwatch() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
+    const overlay = _fxOverlay(r.wrap, FX_DURATION_MS);
     const cx = r.left + r.width / 2;
     const cy = r.top + r.height / 2;
+    const maxSize = Math.max(r.width, r.height) * 0.7;
 
-    _fxMakeHourglassIcon(r.wrap, cx, cy);
+    _fxMakeTimeRings(overlay, cx, cy, 4, maxSize);
+    _fxMakeIcon(r.wrap, '⏱️', cx, cy, 42, 'animation:fx-icon-pop 0.6s ease-out forwards;', 900);
 
-    const overlay = _fxOverlay(r.wrap, 1400);
-    _fxMakeSandParticles(overlay, cx, cy, 20);
-
-    Audio_Manager.playSFX('hourglass');
+    Audio_Manager.playSFX('stopwatch');
 }
 
-// Helper: spawns `count` time-ring divs rippling outward from (cx, cy).
-export function _fxMakeTimeRings(container, cx, cy, count, maxSize) {
+// _fxMakeTimeRings - helper: spawns `count` time-ring divs rippling outward
+// from (cx, cy).
+function _fxMakeTimeRings(container, cx, cy, count, maxSize) {
     for (let i = 0; i < count; i++) {
         const ring = document.createElement('div');
         ring.className = 'fx-time-ring';
@@ -115,25 +167,48 @@ export function _fxMakeTimeRings(container, cx, cy, count, maxSize) {
     }
 }
 
-// ⏱️ Stopwatch - timer rings ripple outward from centre.
-export function _fxStopwatch() {
+// _fxChronobolt - ⚡ effect: lightning bolts crackle across the puzzle grid.
+export function _fxChronobolt() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
-    const overlay = _fxOverlay(r.wrap, 1400);
+    const overlay = _fxOverlay(r.wrap, 1600, `z-index:${FX_Z.top};`);
+
+    // Full-grid white flash that fades out
+    _fxMakeElement(overlay, 'position:absolute;inset:0;', 'fx-chronobolt-flash');
+
+    // Three staggered lightning bolts striking from the top edge
+    CHRONOBOLT_X_FRACTIONS.forEach((xFrac, i) => {
+        setTimeout(() => _fxMakeLightningBolt(overlay, r, xFrac), i * 180);
+    });
+
+    // Large ⚡ icon that flashes at the centre
     const cx = r.left + r.width / 2;
     const cy = r.top + r.height / 2;
-    const maxSize = Math.max(r.width, r.height) * 0.7;
+    _fxMakeIcon(r.wrap, '⚡', cx, cy, 72, `z-index:${FX_Z.supreme}; animation:fx-bolt-icon 0.5s ease-out forwards;`, 800);
 
-    _fxMakeTimeRings(overlay, cx, cy, 4, maxSize);
-    _fxMakeIcon(r.wrap, '⏱️', cx, cy, 42, 'animation:fx-icon-pop 0.6s ease-out forwards;', 900);
-
-    Audio_Manager.playSFX('stopwatch');
+    Audio_Manager.playSFX('chronobolt');
 }
 
-// Generates a zigzag SVG lightning path of the given height.
-// Returns an HTML string containing the full <svg> element.
-export function _fxGenerateLightningPath(height) {
+// _fxMakeLightningBolt - helper: creates one lightning bolt div at the given
+// horizontal position.
+function _fxMakeLightningBolt(container, r, xFraction) {
+    const bolt = document.createElement('div');
+    bolt.className = 'fx-lightning-bolt';
+    bolt.style.cssText = `
+        position:absolute;
+        left:${r.left + r.width * xFraction}px;
+        top:${r.top}px;
+        --bolt-height:${r.height}px;
+        animation:fx-bolt-strike 0.35s steps(3) forwards;
+    `;
+    bolt.innerHTML = _fxGenerateLightningPath(r.height);
+    container.appendChild(bolt);
+}
+
+// _fxGenerateLightningPath - generates a zigzag SVG lightning path of the
+// given height. Returns an HTML string containing the full <svg> element.
+function _fxGenerateLightningPath(height) {
     const segs = 8;
     const segH = height / segs;
     let d = 'M 0 0';
@@ -156,42 +231,4 @@ export function _fxGenerateLightningPath(height) {
                 </filter>
             </defs>
         </svg>`;
-}
-
-// Helper: creates one lightning bolt div at the given horizontal position.
-export function _fxMakeLightningBolt(container, r, xFraction) {
-    const bolt = document.createElement('div');
-    bolt.className = 'fx-lightning-bolt';
-    bolt.style.cssText = `
-        position:absolute;
-        left:${r.left + r.width * xFraction}px;
-        top:${r.top}px;
-        --bolt-height:${r.height}px;
-        animation:fx-bolt-strike 0.35s steps(3) forwards;
-    `;
-    bolt.innerHTML = _fxGenerateLightningPath(r.height);
-    container.appendChild(bolt);
-}
-
-// ⚡ Chronobolt - lightning bolts crackle across the puzzle grid.
-export function _fxChronobolt() {
-    const r = _fxGetPuzzleRect();
-    if (!r) return;
-
-    const overlay = _fxOverlay(r.wrap, 1600, `z-index:${FX_Z.top};`);
-
-    // Full-grid white flash that fades out
-    _fxMakeElement(overlay, 'position:absolute;inset:0;', 'fx-chronobolt-flash');
-
-    // Three staggered lightning bolts striking from the top edge
-    CHRONOBOLT_X_FRACTIONS.forEach((xFrac, i) => {
-        setTimeout(() => _fxMakeLightningBolt(overlay, r, xFrac), i * 180);
-    });
-
-    // Large ⚡ icon that flashes at the centre
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
-    _fxMakeIcon(r.wrap, '⚡', cx, cy, 72, `z-index:${FX_Z.supreme}; animation:fx-bolt-icon 0.5s ease-out forwards;`, 800);
-
-    Audio_Manager.playSFX('chronobolt');
 }

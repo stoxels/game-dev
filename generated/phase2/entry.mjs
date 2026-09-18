@@ -43,7 +43,7 @@ import { _calcAddTimeSecs, _calcMarkWrongCount, _calcMistakeEraserCount, _calcRe
 import { attachItemTooltip, buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout } from '../../js/puzzle-items/inventory-panel.js';
 import { _fxCandle, _fxCandleGlow, _fxMagnifier, _fxMakeScanBar, _fxScanner, _fxSpawnExpandingRings, _fxSpyglass, _useReveal } from '../../js/puzzle-items/reveal.js';
 import { _fxEraser, _fxErrorGem, _fxErrorMagnet, _fxMagnetCrossParticles, _fxMakeBroom, _fxMakeDustParticles, _fxMakeEraserStreak, _fxMakeGemIcon, _fxMakeMagnetIcon, _fxSweeper, _useMarkWrong } from '../../js/puzzle-items/mark-wrong.js';
-import { _fxChronobolt, _fxGenerateLightningPath, _fxHourglass, _fxMakeHourglassIcon, _fxMakeLightningBolt, _fxMakeSandParticles, _fxMakeTimeRings, _fxStopwatch, _useAddTime } from '../../js/puzzle-items/add-time.js';
+import { _fxChronobolt, _fxHourglass, _fxStopwatch, _useAddTime } from '../../js/puzzle-items/add-time.js';
 import { _fxMakeShieldOverlay, _fxShield, _useShield, playShieldBreakEffect } from '../../js/puzzle-items/shield.js';
 import { FREEZE_DURATION_MS, _fxFreeze, _useFreeze } from '../../js/puzzle-items/freeze.js';
 import { _fxMakeChalkSmears, _fxMistakeEraser, _useMistakeEraser } from '../../js/puzzle-items/mistake-eraser.js';
@@ -306,7 +306,7 @@ import { INTRO_CINEMATIC_IMAGE_PATH, INTRO_CINEMATIC_SLIDES, INTRO_SONG } from '
 import { STOX_INTRO_IMAGE_PATH, STOX_INTRO_SONG } from '../../js/storyline/storyline-intro-stox.js';
 import { TRIX_INTRO_IMAGE_PATH, TRIX_INTRO_SONG } from '../../js/storyline/storyline-intro-trix.js';
 import { SYLA_INTRO_IMAGE_PATH, SYLA_INTRO_SONG } from '../../js/storyline/storyline-intro-syla.js';
-import { REGION_BEAT_TRIGGER_LEVEL, REPLAY_GALLERY_ENTRIES, STORY_BEATS, _captions, _regionClips } from '../../js/storyline/storyline-beats.js';
+import { REGION_BEAT_TRIGGER_LEVEL, REPLAY_GALLERY_ENTRIES, STORY_BEATS } from '../../js/storyline/storyline-beats.js';
 import { EG_TEST_MAPS, _egLaunchTestMap, _egtBuildFullScreenHTML, _egtBuildMapCardHTML, _egtCreateScreen, _egtEnsureStyles, _egtPickSeedGi, ensureEndgameTestHubScreen, showEndgameTestHub } from '../../js/endgame-testing-screen.js';
 import { _egAscensionTrialName, _egCleanupCampaignTrialSeed, _egEndCampaignTrial, _egEnsureTrialState, _egGrantAscensionTrialReward, _egGrantConvergenceTrialReward, _egIsAscensionTrialDone, _egIsAscensionTrialRun, _egIsConvergenceTrialRun, _egIsTrialDone, _egIsTrialRun, _egIsTrialUnlocked, _egLaunchAscensionTrial, _egLaunchCampaignTrial, _egLaunchTrialRun, _egMaybeLaunchAscensionTrial, _egRetitleLeaveMapTransition, _egRouteTrialReturn, _egServePostTrialFlows, _egTrialBossId, _egTrialChainParams, _egTrialCount, _egTrialIdForWorld, _egTrialMonsterLevel, _egTrialName, _egTrialTriggerLevels, _egTrialWorldStartGi, _egTrialWorlds } from '../../js/campaign-trials.js';
 import { AssetPreload } from '../../js/asset-preload.js';
