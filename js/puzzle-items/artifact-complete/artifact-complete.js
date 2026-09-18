@@ -5,8 +5,17 @@ import { playItemEffect } from '../fx-dispatch.js';
 import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------
-//-------------------ARTIFACT COMPLETE - CODEX OF COMPLETION----------------------
+//-------------------ARTIFACT COMPLETE - CODEX OF COMPLETION--------------
 //------------------------------------------------------------------------
+
+// Helper: reveals one solution cell in the player's grid and refreshes
+// its row/column clues. Shared by the loop below.
+function _revealArtifactCell(r, c) {
+    globalThis.revealedGrid[r][c] = true;
+    globalThis.userGrid[r][c] = 1;
+    renderCell(r, c);
+    updClues(r, c);
+}
 
 // artifactComplete (Codex of Completion) - reveals every remaining cell.
 export function _useArtifactComplete(id, def) {
@@ -17,10 +26,7 @@ export function _useArtifactComplete(id, def) {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             if (sol[r][c] === 1 && globalThis.userGrid[r][c] !== 1) {
-                globalThis.revealedGrid[r][c] = true;
-                globalThis.userGrid[r][c] = 1;
-                renderCell(r, c);
-                updClues(r, c);
+                _revealArtifactCell(r, c);
             }
         }
     }
