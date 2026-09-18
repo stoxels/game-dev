@@ -322,6 +322,41 @@ function _invPointerInBar(x, y) {
     return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
 }
 
+// True while the pointer is over the open flyout panel.
+function _invPointerInFlyout(x, y) {
+    const flyout = document.getElementById('inv-flyout');
+    if (!flyout || !flyout.classList.contains('open')) return false;
+    const r = flyout.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+}
+
+// Wired once: global safety net against stuck flyouts. The open/close path
+// relies on mouseleave from the button and the flyout, but that never fires
+// when a rebuild detaches the hovered button, on some fast pointer exits,
+// or when the element is removed under the pointer (degenerate coords).
+// So on every mousemove, a hover-opened flyout whose pointer sits outside
+// BOTH the bar and the panel starts the regular close-grace timer - the
+// same path a mouseleave uses, so the button→flyout gap grace still works
+// and re-entering the flyout cancels the close as before. Pinned flyouts
+// are untouched (they close on outside click, by design).
+let _invGlobalGuardWired = false;
+function _wireGlobalFlyoutGuard() {
+    if (_invGlobalGuardWired) return;
+    _invGlobalGuardWired = true;
+    document.addEventListener('mousemove', (e) => {
+        if (!_invOpenFlyoutGroup || window._invPinnedFlyoutGroup) return;
+        if (!_invPointerInBar(e.clientX, e.clientY) && !_invPointerInFlyout(e.clientX, e.clientY)) {
+            _invScheduleFlyoutClose();
+        }
+    });
+    // Tab/window focus loss: pointer-based leaves can't be trusted, so a
+    // hover-opened flyout is closed. Pinned flyouts survive (the user chose
+    // to keep them) and still close on the next outside click.
+    window.addEventListener('blur', () => {
+        if (_invOpenFlyoutGroup && !window._invPinnedFlyoutGroup) closeInventoryFlyout();
+    });
+}
+
 
 
 //------------------------------------------------------------------------
@@ -448,6 +483,7 @@ export function buildInventoryPanel() {
 // Creates the shared flyout container once (a body-level sibling of the
 // bar, so bar.innerHTML='' rebuilds never destroy its children mid-use).
 function _ensureInvFlyoutEl() {
+    _wireGlobalFlyoutGuard();
     let flyout = document.getElementById('inv-flyout');
     if (flyout) return flyout;
 
