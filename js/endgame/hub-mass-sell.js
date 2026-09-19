@@ -153,6 +153,9 @@ export function _egBuildItemChipHTML(item, size = 'normal') {
         : '';
     const chipId = `egchip-${++_egChipCounter}`;
     _egChipRegistry.set(chipId, item);
+    // Map items share one baseId ('atlas_map') - the art system resolves
+    // the tier-specific art (map_tNN) for them.
+    const artId = EG_ART.artIdForItem(item);
 
     return `
 <div class="eg-item-chip ${rarityClass} ${sizeClass} ${blockedClass}"
@@ -163,7 +166,7 @@ export function _egBuildItemChipHTML(item, size = 'normal') {
      onmouseleave="_egClearTooltip()">
     ${ilvlBadge}
     ${mapTierBadge}
-    <span class="eg-item-chip-icon">${EG_ART.html('item', item.baseId, item.icon || '📦')}</span>
+    <span class="eg-item-chip-icon">${EG_ART.html('item', artId, item.icon || '📦')}</span>
     <span class="eg-item-chip-name">${item.name || '???'}</span>
 </div>`;
 }

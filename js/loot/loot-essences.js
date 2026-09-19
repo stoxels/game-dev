@@ -1,4 +1,5 @@
 import { trackAchStat } from '../achievements/achievements.js';
+import { EG_ART } from '../endgame/endgame-art.js';
 import { LANG, t } from '../translation/translations.js';
 import { _egCancelCurrencyUse, _egPendingCurrencyUse } from './loot-currency.js';
 import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
@@ -846,7 +847,7 @@ export function _egOnEssenceCellEnter(row, col, e) {
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon" style="opacity:0.55;">${ttIcon}</div>
+        <div class="eg-tt-icon" style="opacity:0.55;">${EG_ART.html('item', assignedId, ttIcon)}</div>
         <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
         <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
@@ -914,7 +915,22 @@ export function _egRenderEssenceCell(row, col) {
     } else if (assignedId && def) {
         cell.innerHTML = '';
         cell.classList.add('eg-essence-assigned-empty');
-        if (def.icon) cell.setAttribute('data-empty-icon', def.icon);
+        // Empty slots preview their essence art (dimmed via CSS) once
+        // loaded, else the classic emoji ::after placeholder.
+        const emptyArt = EG_ART ? EG_ART.url('item', assignedId) : null;
+        if (emptyArt) {
+            cell.removeAttribute('data-empty-icon');
+            const img = document.createElement('img');
+            img.src = emptyArt;
+            img.alt = '';
+            img.draggable = false;
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.className = 'eg-art-img eg-empty-slot-art';
+            cell.appendChild(img);
+        } else if (def.icon) {
+            cell.setAttribute('data-empty-icon', def.icon);
+        }
         cell.setAttribute('data-tip', globalThis._tipAttr(def.name || assignedId));
     } else {
         cell.innerHTML = '';
@@ -931,6 +947,19 @@ export function _egRenderEssenceStash() {
             _egRenderEssenceCell(r, c);
         }
     }
+}
+
+// Item art arrives asynchronously (images/items/manifest.json is fetched
+// lazily on first use). Cells rendered with emoji fallbacks before that
+// refresh here so they swap to art without needing a reload.
+if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('eg-art-loaded', function () {
+        try {
+            if (document.getElementById('eg-essence-cell-0-0')) {
+                _egRenderEssenceStash();
+            }
+        } catch (e) { /* essence tab not open - safe to ignore */ }
+    });
 }
 
 

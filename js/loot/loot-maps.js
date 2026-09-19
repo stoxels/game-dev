@@ -1730,13 +1730,14 @@ export function _egSpawnMapDrop(map) {
     _egMapDrops.set(key, map);
 
     // Overlay visual - reuses the loot overlay styling with a map tint class.
-    // Glow class follows the map's own rarity color.
+    // Glow class follows the map's own rarity color. Shows the tier-specific
+    // map art (map_tNN via EG_ART.artIdForItem) when available, else emoji.
     const el = document.getElementById(`g-${r}-${c}`);
     if (el) {
         const span = document.createElement('span');
         span.className = `eg-pickup-overlay eg-pickup-rarity-${map.rarity || 'common'} eg-loot-overlay eg-mapdrop-overlay`;
         span.id = `eg-mapdrop-${r}-${c}`;
-        span.textContent = map.icon || '🗺️';
+        EG_ART.fillElement(span, 'item', EG_ART.artIdForItem(map), map.icon || '🗺️');
         el.appendChild(span);
     }
 
@@ -1770,7 +1771,7 @@ export function _egAnimateMapDropClaim(row, col, item) {
     const centre = typeof _egGetElementCentre === 'function' ? _egGetElementCentre(el) : { x: 0, y: 0 };
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    floater.textContent = item.icon || '🗺️';
+    EG_ART.fillElement(floater, 'item', EG_ART.artIdForItem(item), item.icon || '🗺️');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);
@@ -1870,7 +1871,7 @@ export function _egReplaceCarriedMapDrops(maps) {
             const span = document.createElement('span');
             span.className = `eg-pickup-overlay eg-pickup-rarity-${map.rarity || 'common'} eg-loot-overlay eg-mapdrop-overlay`;
             span.id = `eg-mapdrop-${r}-${c}`;
-            span.textContent = map.icon || '🗺️';
+            EG_ART.fillElement(span, 'item', EG_ART.artIdForItem(map), map.icon || '🗺️');
             el.appendChild(span);
         }
 
@@ -2068,7 +2069,7 @@ export function _egBuildMapTooltipBodyHTML(item) {
     return `
 <div class="eg-tt-frame eg-map-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon">${item.icon || '🗺️'}</div>
+        <div class="eg-tt-icon">${EG_ART.html('item', EG_ART.artIdForItem(item), item.icon || '🗺️')}</div>
         <div class="eg-tt-name" style="color:${rc.color};">${item.name || '???'}</div>
         ${(item.baseName && item.baseName !== item.name)
             ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}

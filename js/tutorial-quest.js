@@ -2,10 +2,16 @@ import { Audio_Manager } from './audio/audio.js';
 import { cooldownState, startSlotCooldown } from './classes/class-cooldown-state.js';
 import { _getAbilityManaCost, _getPlayerMaxMana, canAffordMana, spendMana, updateClassHUDManaBar } from './classes/class-mana.js';
 import { _egOnPause, _egOnResume } from './combat/encounter-tick.js';
-import { _egAnimatePlayerProjectile, _egDamageTargetById, _egGetTarget, _egSpawnMonster, _egStopEncounter } from './combat/encounter.js';
+import { _egStopEncounter } from './combat/encounter-lifecycle.js';
+import { _egAnimatePlayerProjectile } from './combat/encounter-player-attacks.js';
+import { _egGetTarget } from './combat/encounter-charged-shot.js';
+import { _egDamageTargetById } from './combat/encounter-damage.js';
+import { _egSpawnMonster } from './combat/encounter-monster-spawning.js';
 import { EG_ALL_BASE_TYPES } from './loot/equipment-base-items.js';
 import { _egCellHasAnyDrop, _egDropHeartPickup, _egFlushRunLootToStash, _egRenderLootOverlay } from './combat/combat-grid-pickups.js';
-import { _egAddItemToStash, _egInventory, closeHubToGame, egSaveHubState, isHubGameOverlay, openHubFromGame, showEndgameHub } from './endgame/endgame-hub.js';
+import { closeHubToGame, isHubGameOverlay, openHubFromGame, showEndgameHub } from './endgame/endgame-hub.js';
+import { _egAddItemToStash, _egInventory } from './endgame/hub-stash.js';
+import { egSaveHubState } from './endgame/hub-save.js';
 import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
 import { _egGetAllEquippedItems } from './endgame/endgame-player-stats.js';
 import { _egLootDrops, _egPickups } from './combat/combat-state.js';
@@ -1175,8 +1181,13 @@ export const TQ_TASKS = {
 };
 
 // Steps per phase (see keys in translations-strings.js).
-export function _tqPhaseSteps() {
-    switch (_tqPhase) {
+//
+// _tqStepsFor(phase) returns the step list for ANY phase without touching
+// live tutorial state - this is what makes the step lists addressable to
+// the retry gates (TQ_STEP_INDEX below) and to tests. _tqPhaseSteps() stays
+// the live-state reader the step engine calls.
+export function _tqStepsFor(phase) {
+    switch (phase) {
         case 'p1': return [
             { say: 'tq_p1_s0', task: 'meet_professor', fn: () => { _tqGridLocked = true; _tqDemoDone = { correct: false, mistake: false, cross: false }; _tqActiveDemo = null; _tqShowMeetCircle(); } },
             { say: 'tq_p1_s1', wait: true, fn: () => { _tqClearHighlights(); _tqPointAt('.ptable .rct'); _tqHighlight('.ptable .cch'); } },
@@ -1239,6 +1250,42 @@ export function _tqPhaseSteps() {
         default: return [];
     }
 }
+
+export function _tqPhaseSteps() {
+    return _tqStepsFor(_tqPhase);
+}
+
+//------------------------------------------------------------------------
+//---------------------STEP INDEX CONSTANTS-------------------------------
+//------------------------------------------------------------------------
+// Retry-gate bounce targets, derived from the step lists themselves by
+// SAY KEY - the same strings the translations dictionaries use - so a
+// step reorder automatically re-derives the correct index and code and
+// comments can never drift apart again (the old hardcoded 13/15/4
+// literals silently landed on the wrong steps twice).
+//
+// TQ_STEP_INDEX maps say key -> index per phase, computed ONCE at module
+// init. The pin test (tutorial-tasks-fresh-state.test.mjs) walks every
+// phase list against this map and asserts each target still points at
+// the step with the right task and, where it matters, the right setup
+// action - so removing or retitling a say key fails loudly at test time.
+const TQ_STEP_INDEX = {};
+for (const phase of ['p1', 'p2', 'p3']) {
+    const map = {};
+    _tqStepsFor(phase).forEach((st, i) => { if (st.say) map[st.say] = i; });
+    TQ_STEP_INDEX[phase] = map;
+}
+
+// p1: the candle grant + explanation step (s10) - re-running it re-grants
+// the candle and re-arms _tqCandleUsable before the use_candle task at s11.
+const TQ_P1_STEP_CANDLE_GRANT = TQ_STEP_INDEX.p1['tq_p1_s10'];
+// p2: the defeat-the-rat task step (s1b, task kill_monster).
+const TQ_P2_STEP_KILL_RAT = TQ_STEP_INDEX.p2['tq_p2_s1b'];
+// p3: the melee-the-bat task step (s3, task melee_kill) and the
+// fireball-the-ghost task step (s7, task fireball_kill) - s7 also re-spawns
+// the ghost, which is what guarantees a retrying player a real corpse.
+const TQ_P3_STEP_MELEE_BAT = TQ_STEP_INDEX.p3['tq_p3_s3'];
+const TQ_P3_STEP_FIREBALL_GHOST = TQ_STEP_INDEX.p3['tq_p3_s7'];
 
 // Runs the step list from _tqStepIdx until it hits a wait, a task or the end.
 export function _tqRunCurrentPhase() {
@@ -1467,32 +1514,33 @@ export function _tqOnPuzzleSolved() {
     // the bounce can never demand a cast at an empty field.
     if (_tqPhase === 'p1' && !_tqCandleUsed) {
         globalThis.dead = false;
-        _tqStepIdx = 11;  // re-run the candle explanation + task (see p1 list: 8=silent, 11=s10 grant, 12=s11 use, 13=s11b deduce)
+        _tqStepIdx = TQ_P1_STEP_CANDLE_GRANT;   // re-run the candle explanation + task (s10 grant → s11 use → s11b deduce)
         _tqRunCurrentPhase();
         return;
     }
     // Puzzle 3: the board filled while a lesson monster still lives (the
     // grid is locked for both fights, so this is only a safety net). Push
     // the player back to the running fight - the encounter keeps running so
-    // nothing is lost. p3 list: 4=s3 melee_kill (bat), 13=s7 fireball_kill
-    // (ghost, points at the Fireball hotbar slot again on the way).
-    // Index note: step 13 (not 15) re-runs the fight task - step 14 is the
-    // silent grid-unlock that must NOT precede a still-living ghost.
+    // nothing is lost. Bounces to the melee_kill task (s3, bat) or the
+    // fireball_kill task (s7, ghost) - the s7 step also re-spawns the ghost,
+    // so a retried fireball lesson always has a real corpse to celebrate.
+    // It must bounce to the TASK step, never the silent grid-unlock step
+    // after it: unlocking the board before a still-living ghost is told
+    // about would strand the lesson.
     if (_tqPhase === 'p3'
         && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) {
         globalThis.dead = false;
-        _tqStepIdx = _tqP3GhostSpawned ? 13 : 4;   // re-run the live fight
+        _tqStepIdx = _tqP3GhostSpawned ? TQ_P3_STEP_FIREBALL_GHOST : TQ_P3_STEP_MELEE_BAT;
         _tqRunCurrentPhase();
         return;
     }
     // Puzzle 2: the board filled while the rat still lives. Push the player
     // back to the fight instead of finishing the lesson - the encounter
     // keeps running so nothing is lost.
-    // New p2 list: 0=s0 intro, 1=s1 damage, 2=first_fill, 3=s1b+kill.
     if (_tqPhase === 'p2' && !_tqP2RatDead
         && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) {
         globalThis.dead = false;
-        _tqStepIdx = 3;   // re-run the defeat-the-rat task
+        _tqStepIdx = TQ_P2_STEP_KILL_RAT;   // re-run the defeat-the-rat task (s1b)
         _tqRunCurrentPhase();
         return;
     }

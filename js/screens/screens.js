@@ -13,6 +13,11 @@ import { cur } from '../state.js';
 
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'replayLevel', { get() { return replayLevel; }, set(v) { replayLevel = v; }, configurable: true }); } catch (e) {}
+// Bridge for classic scripts OUTSIDE the concatenated core (e.g.
+// passive-tree-dev.js, lazy-injected at runtime): bare switchScreen() calls
+// there resolve to globalThis.switchScreen - without this accessor they
+// would throw ReferenceError.
+try { Object.defineProperty(globalThis, 'switchScreen', { get() { return switchScreen; }, set(v) { switchScreen = v; }, configurable: true }); } catch (e) {}
 //------------------------------------------------------------------------
 //------------------------SCREEN SWITCH UTILITY---------------------------
 //------------------------------------------------------------------------

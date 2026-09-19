@@ -16,6 +16,7 @@ import { EG_MAX_MAP_TIER, _egAddMapToMapStash, _egGenerateMapDrop, _egMapTierMon
 import { _egnEnsureStyles } from '../endgame/endgame-nexus.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egComputeLoadoutAttributes, _egFormatRequirementPart } from './loot-requirements.js';
 import { STATE } from '../state.js';
+import { EG_ART } from '../endgame/endgame-art.js';
 
 'use strict';
 
@@ -327,6 +328,19 @@ export function _egvSwitchTab(tabId) {
 //-------------------SHARED CARD HELPERS------------------------------------
 //------------------------------------------------------------------------
 
+// Resolves a vendor card icon through the shared item-art system
+// (images/items/manifest.json). Returns an <img> when art exists for the
+// id, else the emoji fallback - same pattern as hub/gate/mass-sell.
+// Kicks off the lazy manifest fetch on first use.
+function _egvIconHTML(artId, fallbackEmoji) {
+    try {
+        if (typeof EG_ART !== 'undefined' && EG_ART && typeof EG_ART.html === 'function') {
+            return EG_ART.html('item', artId, fallbackEmoji);
+        }
+    } catch (e) { /* art system not ready - fall through to emoji */ }
+    return fallbackEmoji || '';
+}
+
 export function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall, extraClass = '', blockedReason = '', extraAttrs = '' }) {
     const blockedCls = blockedReason ? ' egv-card-blocked' : '';
     const blockedTitle = blockedReason ? ` data-tip="${globalThis._tipAttr(blockedReason)}"` : '';
@@ -396,7 +410,7 @@ export function _egvBuildMapsTabHTML() {
     let desc;
     try { desc = t('eg_vendor_offer_desc'); } catch (e) { desc = 'A freshly charted Tier 1 map - always Normal (white). Use currency orbs to add modifiers.'; }
     const card = _egvBuildCardHTML({
-        icon: '🗺️',
+        icon: _egvIconHTML('map_t01', '🗺️'),
         title,
         subtitle: sub,
         desc,
@@ -482,7 +496,7 @@ export function _egvBuildStarterTabHTML() {
         const name = (typeof LANG !== 'undefined' && LANG === 'de' && base.nameDe) ? base.nameDe : base.name;
         const missing = _egvGetMissingRequirements(base);
         return _egvBuildCardHTML({
-            icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
+            icon: _egvIconHTML(base.id, base.icon || EG_SLOT_ICONS[base.slotType] || '📦'),
             title: name,
             subtitle: `${t(`eg_slot_${base.slotType}`)} · ${t('eg_item_level').replace('{n}', base.minLevel)}`,
             desc: _egvBuildReqSummaryText(base),
@@ -508,7 +522,7 @@ export function _egvCurrencyPrice(id) {
 export function _egvBuildCurrencyTabHTML() {
     const defs = Object.values(EG_CURRENCY_DEFS);
     const cards = defs.map(def => _egvBuildCardHTML({
-        icon: def.icon,
+        icon: _egvIconHTML(def.id, def.icon),
         title: def.name,
         desc: def.description,
         price: _egvCurrencyPrice(def.id),
@@ -547,7 +561,7 @@ export function _egvEssencePrice(id) {
 export function _egvBuildEssencesTabHTML() {
     const defs = Object.values(EG_ESSENCE_DEFS);
     const cards = defs.map(def => _egvBuildCardHTML({
-        icon: def.icon,
+        icon: _egvIconHTML(def.id, def.icon),
         title: def.name,
         desc: def.description,
         price: _egvEssencePrice(def.id),
@@ -586,7 +600,7 @@ export function _egvPuzzleItemPrice(rarity) {
 
 export function _egvBuildItemsTabHTML() {
     const cards = Object.values(globalThis.ITEM_DEFS).map(def => _egvBuildCardHTML({
-        icon: def.icon,
+        icon: _egvIconHTML(def.id, def.icon),
         title: globalThis.itemName(def),
         subtitle: def.rarity,
         desc: globalThis.itemDesc(def),
@@ -746,7 +760,7 @@ export function _egvBuildBaseListHTML() {
         const missing = _egvGetMissingRequirements(base);
         const price = EG_VENDOR_FREE_BASE_IDS.has(base.id) ? 0 : _egvBaseItemPrice(base);
         return _egvBuildCardHTML({
-            icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
+            icon: _egvIconHTML(base.id, base.icon || EG_SLOT_ICONS[base.slotType] || '📦'),
             title: name,
             subtitle: `${t(`eg_slot_${base.slotType}`)} · ${t('eg_item_level').replace('{n}', base.minLevel)}`,
             desc: _egvBuildReqSummaryText(base),
@@ -912,6 +926,10 @@ export function _egvEnsureStyles() {
         }
         .egv-card-top { display: flex; gap: 10px; align-items: flex-start; }
         .egv-card-icon { font-size: 34px; line-height: 1; }
+        .egv-card-icon img.eg-art-img {
+            width: 44px; height: 44px; object-fit: contain;
+            display: inline-block; vertical-align: middle; pointer-events: none;
+        }
         .egv-card-info { flex-grow: 1; min-width: 0; }
         .egv-card-name {
             font-size: 13px; letter-spacing: 1px; color: var(--accent, #c8a84b);
@@ -1031,6 +1049,19 @@ export function _egvCreateScreen() {
     screen.className = 'screen';
     screen.innerHTML = _egvBuildFullScreenHTML();
     document.body.appendChild(screen);
+}
+
+// Item art arrives asynchronously (images/items/manifest.json is fetched
+// lazily on first use). Cards rendered with emoji fallbacks before that
+// refresh here so they swap to art without needing a reload.
+if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('eg-art-loaded', function () {
+        try {
+            if (document.getElementById('egv-tab-content')) {
+                _egvRenderTabContent();
+            }
+        } catch (e) { /* vendor screen not open - safe to ignore */ }
+    });
 }
 
 // Entry point - opens the Vendor screen on the last active tab.

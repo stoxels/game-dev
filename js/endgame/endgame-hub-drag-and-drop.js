@@ -1035,7 +1035,7 @@ export function _dndBuildCurrencyChipHTML(item) {
      onmouseenter="_egShowTooltip(${itemJson}, event)"
      onmousemove="_egMoveTooltip(event)"
      onmouseleave="_egClearTooltip()">
-    <span class="eg-item-chip-icon">${item.icon || '📦'}</span>${badge}
+    <span class="eg-item-chip-icon">${EG_ART.html('item', item.id, item.icon || '📦')}</span>${badge}
 </div>`;
 }
 
@@ -1062,7 +1062,22 @@ export function _egRenderCurrencyCell(row, col) {
         } else if (assignedId) {
             cell.innerHTML = '';
             cell.classList.add('eg-currency-assigned-empty');
-            if (def && def.icon) cell.setAttribute('data-empty-icon', def.icon);
+            // Empty slots preview their currency art (dimmed via CSS) once
+            // loaded, else the classic emoji ::after placeholder.
+            const emptyArt = (def && EG_ART) ? EG_ART.url('item', assignedId) : null;
+            if (emptyArt) {
+                cell.removeAttribute('data-empty-icon');
+                const img = document.createElement('img');
+                img.src = emptyArt;
+                img.alt = '';
+                img.draggable = false;
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                img.className = 'eg-art-img eg-empty-slot-art';
+                cell.appendChild(img);
+            } else if (def && def.icon) {
+                cell.setAttribute('data-empty-icon', def.icon);
+            }
         } else {
             cell.innerHTML = '';
             cell.classList.remove('eg-currency-assigned-empty');

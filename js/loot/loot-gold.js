@@ -4,6 +4,7 @@ import { _egGetElementCentre } from '../combat/combat-class-projectiles.js';
 import { EG_LOOT_DROP_LIFETIME_MS, _egBuildPickupEligiblePool, _egCancelTrackedExpiry, _egCellHasAnyDrop, _egScheduleTrackedExpiry, _egStartDropExpireCountdown } from '../combat/combat-grid-pickups.js';
 import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import { _egIsActive } from '../combat/combat-state.js';
+import { EG_ART } from '../endgame/endgame-art.js';
 
 
 'use strict';
@@ -119,7 +120,8 @@ export function _egRenderGoldDropOverlay(row, col, drop) {
     const span = document.createElement('span');
     span.className = `eg-pickup-overlay eg-pickup-rarity-legendary eg-gold-drop-overlay`;
     span.id = `eg-gold-drop-${row}-${col}`;
-    span.textContent = '🪙';
+    // Gold coin art (images/items/, id 'gold') when available, else emoji.
+    EG_ART.fillElement(span, 'item', 'gold', '🪙');
     el.appendChild(span);
 }
 
@@ -135,7 +137,7 @@ export function _egAnimateGoldDropClaim(row, col, drop) {
     const centre = typeof _egGetElementCentre === 'function' ? _egGetElementCentre(el) : { x: 0, y: 0 };
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    floater.textContent = '🪙';
+    EG_ART.fillElement(floater, 'item', 'gold', '🪙');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);

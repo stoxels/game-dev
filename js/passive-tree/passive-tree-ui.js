@@ -1,4 +1,5 @@
 ﻿import { t } from '../translation/translations.js';
+import { EG_ART } from '../endgame/endgame-art.js';
 import { _ptAllocated, _ptBuildAdjacency, _ptGetNodeVisualState, _ptIsDeallocatable, _ptLang, _ptOnNodeClick, _ptPoints, _ptRefreshPointsDisplay } from './passive-tree-state-points.js';
 import { _ptBindEvents, _ptFitToView } from './passive-tree-viewport.js';
 import { PT_COL_ALLOCATED_BG, PT_COL_ALLOCATED_BORDER, PT_COL_ALLOCATED_DOT, PT_COL_LOCKED_BG, PT_COL_LOCKED_BORDER, PT_COL_LOCKED_DOT, PT_COL_START, PT_COL_UNLOCKED_BG, PT_COL_UNLOCKED_BORDER, PT_COL_UNLOCKED_DOT, PT_CONN_ALLOCATED, PT_CONN_UNLOCKED, PT_CONN_WIDTH, PT_NODE_RADIUS, PT_PADDING, PT_START_ID } from './passive-tree.js';
@@ -537,13 +538,19 @@ export function _ptCounterRotateKeystoneChild(node) {
 }
 
 // Creates and appends an <img> icon element inside the node.
-export function _ptAppendImageIcon(node, iconSrc, isKeystone) {
+// `smooth` disables the pixelated upscaling used for pixel-art portraits -
+// detailed item art (images/passives/, images/keystones/) renders smooth.
+export function _ptAppendImageIcon(node, iconSrc, isKeystone, smooth) {
     const img = document.createElement('img');
     img.src = iconSrc;
+    img.alt = '';
+    img.draggable = false;
+    img.loading = 'lazy';
+    img.decoding = 'async';
     img.style.cssText = `
         width: 60%; height: 60%;
         object-fit: contain;
-        image-rendering: pixelated;
+        image-rendering: ${smooth ? 'auto' : 'pixelated'};
         opacity: 0.85;
         pointer-events: none;
     `;
@@ -583,9 +590,20 @@ export function _ptAppendDotFallback(node, isKeystone) {
 
 // Resolves which icon string to use for a skill, preferring the definition
 // data over the layout data, then delegates to the right append helper.
+// Item art (images/items/, keyed by node statKey) wins over emoji when
+// present; everything else behaves exactly as before.
 // The placeholder image 'axe-hammer-grey' is treated the same as no icon.
 // `scale` scales emoji icons with the node's tier size.
 export function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
+    const artKey = (def && def.statKey) || (skill && skill.statKey) || null;
+    const artUrl = artKey ? EG_ART.url('item', artKey) : null;
+    if (artUrl) {
+        _ptAppendImageIcon(node, artUrl, isKeystone, true);
+        return;
+    }
+    // Art not available (yet) - remember the key so the late-arrival refresh
+    // below can swap the fallback without redrawing the whole tree.
+    if (artKey) node.dataset.ptArtPending = artKey;
     const icon = (def && def.icon) ? def.icon : skill.image;
     const isImageUrl = icon && (icon.startsWith('/') || icon.startsWith('http'));
     const isRealImg = isImageUrl && !icon.includes('axe-hammer-grey');
@@ -598,6 +616,30 @@ export function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
     } else {
         _ptAppendDotFallback(node, isKeystone);
     }
+}
+
+// Swaps emoji fallbacks for item art that arrived after the tree was drawn
+// (images/items/manifest.json is fetched lazily on first use). Node elements
+// contain exactly one child (the icon), so replacing it is safe - shape,
+// styles and events live on the node element itself.
+export function _ptRefreshPendingArt() {
+    if (typeof document === 'undefined' || !_pt_nodesLayer || !_pt_nodesLayer.isConnected) return;
+    const pending = _pt_nodesLayer.querySelectorAll('[data-pt-art-pending]');
+    pending.forEach(function (el) {
+        if (!el.isConnected) return;
+        const key = el.getAttribute('data-pt-art-pending');
+        const u = key ? EG_ART.url('item', key) : null;
+        if (!u) return;
+        el.removeAttribute('data-pt-art-pending');
+        while (el.firstChild) el.removeChild(el.firstChild);
+        _ptAppendImageIcon(el, u, el.classList.contains('pt-node-keystone'), true);
+    });
+}
+
+if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('eg-art-loaded', function () {
+        try { _ptRefreshPendingArt(); } catch (e) { /* tree not open - safe to ignore */ }
+    });
 }
 
 

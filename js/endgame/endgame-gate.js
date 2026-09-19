@@ -1,4 +1,5 @@
 import { showModal, switchScreen } from '../screens/screens.js';
+import { EG_ART } from './endgame-art.js';
 import { LANG, t } from '../translation/translations.js';
 import { _egAtlasBuildTierProgressHTML, _egAtlasEnsureStyles, _egAtlasRoman, _egAtlasTierGroupColor } from './endgame-atlas-ui.js';
 import { _egAtlasResolveNodeForMap, egAtlasDropNodeIds, egAtlasIsCompleted, egAtlasNodeById, egAtlasNodeName } from './endgame-atlas.js';
@@ -466,7 +467,7 @@ export function _egOnGateCurrencyCellEnter(row, col, e) {
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon" style="opacity:0.55;">${def.icon || '◻'}</div>
+        <div class="eg-tt-icon" style="opacity:0.55;">${EG_ART.html('item', assignedId, def.icon || '◻')}</div>
         <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${def.name || assignedId}</div>
         <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
@@ -925,6 +926,19 @@ export function _egRenderMapStashForTier(tier) {
 // Re-renders the entire map stash grid (active tier).
 export function _egRenderMapStash() {
     _egRenderMapStashForTier(globalThis._egMapStashActiveTier || 1);
+}
+
+// Item art arrives asynchronously (images/items/manifest.json is fetched
+// lazily on first use). Cells rendered with emoji fallbacks before that
+// refresh here so they swap to art without needing a reload.
+if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('eg-art-loaded', function () {
+        try {
+            if (document.getElementById('eg-map-stash-cell-0-0')) {
+                _egRenderMapStash();
+            }
+        } catch (e) { /* gate screen not open - safe to ignore */ }
+    });
 }
 
 

@@ -1704,7 +1704,7 @@ export function _egBuildCurrencyTooltipHTML(entry) {
     const countLine = entry.count > 1 ? ` <span class="eg-tooltip-count">×${entry.count}</span>` : '';
     return `<div class="eg-tt-frame" style="--tt-border:#b59248;">
         <div class="eg-tt-header">
-            <div class="eg-tt-icon">${entry.icon || '💰'}</div>
+            <div class="eg-tt-icon">${EG_ART.html('item', entry.id, entry.icon || '💰')}</div>
             <div class="eg-tt-name" style="color:#f5d98a;">${entry.name || '???'}${countLine}</div>
             <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')}</div>
         </div>
@@ -1719,7 +1719,7 @@ export function _egBuildEssenceTooltipHTML(entry) {
     const countLine = entry.count > 1 ? ` <span class="eg-tooltip-count">×${entry.count}</span>` : '';
     return `<div class="eg-tt-frame" style="--tt-border:#b59248;">
         <div class="eg-tt-header">
-            <div class="eg-tt-icon">${entry.icon || '🧬'}</div>
+            <div class="eg-tt-icon">${EG_ART.html('item', entry.id, entry.icon || '🧬')}</div>
             <div class="eg-tt-name" style="color:#f5d98a;">${entry.name || '???'}${countLine}</div>
             <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_essence')}</div>
         </div>

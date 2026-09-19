@@ -1,4 +1,5 @@
 import { trackAchStat } from '../achievements/achievements.js';
+import { EG_ART } from '../endgame/endgame-art.js';
 import { t } from '../translation/translations.js';
 import { EG_MOD_CAPS, _egGetModTable, _egRollModCounts } from './loot-equipment-generator.js';
 import { EG_ESSENCE_DEFS, _egBuildEssenceDetailHTML } from './loot-essences.js';
@@ -964,7 +965,7 @@ export function _egShowTooltip(item, e) {
         html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon">${ttIcon}</div>
+        <div class="eg-tt-icon">${EG_ART.html('item', item.id, ttIcon)}</div>
         <div class="eg-tt-name" style="color:#f5d98a;">${ttName}${countLine}</div>
         <div class="eg-tt-rarity-line" style="color:#b59248;">${isEssenceTT ? t('eg_rarity_essence') : t('eg_rarity_currency')}</div>
     </div>

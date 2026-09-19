@@ -42,7 +42,7 @@ import { _clearBlackoutCountdown, applyCursedRowBlackout, applyCursedColBlackout
 import { _eraseFilledCellsInCol, _eraseFilledCellsInRow, solveCols, solveRows, unsolveCols, unsolveColsExcluding, unsolveRows, unsolveRowsExcluding } from '../../js/puzzle-mechanics/grid-actions.js';
 import { _cursedDownsideSuppressed, _resolveCursedBlackoutDownside, _resolveCursedColErasureDownside, _resolveCursedRowErasureDownside } from '../../js/puzzle-mechanics/cursed-downside.js';
 import { _calcAddTimeSecs, _calcMarkWrongCount, _calcTutorItemCount, _calcRevealCount } from '../../js/puzzle-mechanics/effect-modifiers.js';
-import { attachItemTooltip, buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout } from '../../js/puzzle-item-inventory/puzzle-item-inventory-panel.js';
+import { attachItemTooltip, buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout, pinInventoryFlyout, unpinInventoryFlyout } from '../../js/puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { _fxCandle, _fxCandleGlow, _fxMagnifier, _fxMakeScanBar, _fxScanner, _fxSpawnExpandingRings, _fxSpyglass, _useReveal } from '../../js/puzzle-items/reveal/reveal.js';
 import { _fxEraser, _fxErrorGem, _fxErrorMagnet, _fxSweeper, _useMarkWrong } from '../../js/puzzle-items/mark-wrong.js';
 import { _fxChronobolt, _fxHourglass, _fxStopwatch, _useAddTime } from '../../js/puzzle-items/add-time/add-time.js';

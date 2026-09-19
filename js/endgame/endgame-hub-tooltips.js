@@ -300,7 +300,7 @@ export function _egBuildTooltipBodyHTML(item) {
     return `
 <div class="eg-tt-frame" style="--tt-border:${rc.border};">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon">${EG_ART.html('item', item.baseId, item.icon || '📦')}</div>
+        <div class="eg-tt-icon">${EG_ART.html('item', EG_ART.artIdForItem(item), item.icon || '📦')}</div>
         <div class="eg-tt-name" style="color:${rc.color};">${item.name || item.baseName || '???'}</div>
         ${(item.baseName && item.baseName !== item.name)
             ? `<div class="eg-tt-basename" style="opacity:.7;">${item.baseName}</div>` : ''}

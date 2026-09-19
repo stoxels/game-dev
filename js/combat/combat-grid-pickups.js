@@ -416,14 +416,27 @@ export function _egCellHasAnyDrop(row, col) {
         || (typeof _charmCellHasDrop === 'function' && _charmCellHasDrop(row, col));
 }
 
-// Injects the pickup emoji overlay span into the cell's DOM element.
+// Injects the pickup overlay span into the cell's DOM element.
+// Shows the pickup art (images/items/) once loaded, else the emoji.
 export function _egRenderPickupOverlay(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const span = document.createElement('span');
     span.className = `eg-pickup-overlay eg-pickup-rarity-${def.rarity}`;
     span.id = `eg-pickup-${row}-${col}`;
-    span.textContent = def.emoji;
+    const artUrl = (def && def.id) ? EG_ART.url('item', def.id) : null;
+    if (artUrl) {
+        const img = document.createElement('img');
+        img.src = artUrl;
+        img.alt = '';
+        img.draggable = false;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.style.cssText = 'width:100%;height:100%;object-fit:contain;pointer-events:none;';
+        span.appendChild(img);
+    } else {
+        span.textContent = def.emoji;
+    }
     el.appendChild(span);
 }
 
@@ -894,6 +907,19 @@ export function _egStashHasFreeSlot() {
     return true;
 }
 
+// Resolves grid art for an equipment drop: base-type art first, then the
+// slot silhouette (covers uniques, whose baseId is the unique id with no
+// art of its own), else null so callers show the emoji fallback.
+function _egLootArtId(item) {
+    if (!item) return null;
+    try {
+        if (EG_ART.url('item', item.baseId)) return item.baseId;
+        const slotKey = item.slotType ? 'slot_' + item.slotType : null;
+        if (slotKey && EG_ART.url('item', slotKey)) return slotKey;
+    } catch (e) { /* art system not ready - emoji fallback */ }
+    return null;
+}
+
 // Injects the loot overlay span into the cell's DOM element.
 // Re-uses the pickup overlay class but adds a dedicated loot modifier class.
 // The glow class is chosen from the item's own rarity so the drop shines
@@ -906,7 +932,7 @@ export function _egRenderLootOverlay(row, col, item) {
     const uniqueCls = item.isUnique ? ' eg-unique-drop' : '';
     span.className = `eg-pickup-overlay eg-pickup-rarity-${item.rarity || 'common'} eg-loot-overlay${uniqueCls}`;
     span.id = `eg-loot-${row}-${col}`;
-    EG_ART.fillElement(span, 'item', item.baseId, item.icon || '📦');
+    EG_ART.fillElement(span, 'item', _egLootArtId(item), item.icon || '📦');
     el.appendChild(span);
 }
 
@@ -924,7 +950,7 @@ export function _egAnimateLootClaim(row, col, item) {
     const centre = _egGetElementCentre(el);
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    EG_ART.fillElement(floater, 'item', item.baseId, item.icon || '📦');
+    EG_ART.fillElement(floater, 'item', _egLootArtId(item), item.icon || '📦');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);
@@ -1256,7 +1282,9 @@ export function _egRenderCurrencyDropOverlay(row, col, def) {
     const span = document.createElement('span');
     span.className = `eg-pickup-overlay eg-pickup-rarity-currency eg-currency-drop-overlay`;
     span.id = `eg-currency-drop-${row}-${col}`;
-    span.textContent = def.icon || '💰';
+    // Orb/essence art (images/items/, keyed by def id) when available,
+    // else the emoji fallback - same pattern as the loot overlay above.
+    EG_ART.fillElement(span, 'item', def && def.id, (def && def.icon) || '💰');
     el.appendChild(span);
 }
 
@@ -1272,7 +1300,7 @@ export function _egAnimateCurrencyDropClaim(row, col, def) {
     const centre = _egGetElementCentre(el);
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    floater.textContent = def.icon || '💰';
+    EG_ART.fillElement(floater, 'item', def && def.id, (def && def.icon) || '💰');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);
@@ -1436,7 +1464,9 @@ export function _egRenderItemDropOverlay(row, col, drop) {
     const span = document.createElement('span');
     span.className = `eg-pickup-overlay eg-pickup-rarity-${rarityCls} eg-item-drop-overlay`;
     span.id = `eg-item-drop-${row}-${col}`;
-    span.textContent = (def && def.icon) || '📦';
+    // Puzzle items have no art in the manifest yet - wires the def id so
+    // future art shows automatically, emoji fallback until then.
+    EG_ART.fillElement(span, 'item', drop && drop.defId, (def && def.icon) || '📦');
     el.appendChild(span);
 }
 
@@ -1453,7 +1483,7 @@ export function _egAnimateItemDropClaim(row, col, drop) {
     const centre = _egGetElementCentre(el);
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    floater.textContent = (def && def.icon) || '📦';
+    EG_ART.fillElement(floater, 'item', drop && drop.defId, (def && def.icon) || '📦');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);

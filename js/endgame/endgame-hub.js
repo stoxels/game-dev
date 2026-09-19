@@ -246,7 +246,7 @@ export function _egOnCurrencyCellEnter(row, col, e) {
     const html = `
 <div class="eg-tt-frame" style="--tt-border:#b59248;">
     <div class="eg-tt-header">
-        <div class="eg-tt-icon" style="opacity:0.55;">${ttIcon}</div>
+        <div class="eg-tt-icon" style="opacity:0.55;">${EG_ART.html('item', assignedId, ttIcon)}</div>
         <div class="eg-tt-name" style="color:#f5d98a; opacity:0.9;">${ttName}</div>
         <div class="eg-tt-rarity-line" style="color:#b59248;">${t('eg_rarity_currency')} - ${t('eg_empty_slot_hint') || 'Empty slot'}</div>
     </div>
@@ -634,9 +634,18 @@ export function _egRenderEquipSlot(slotId) {
     const slot = EG_EQUIP_SLOTS.find(s => s.id === slotId);
     const item = _egEquipped[slotId] || null;
 
+    // Empty slots show their slot art (slot_<type> from images/items/) once
+    // loaded, else the classic emoji placeholder. weapon2 is the offhand.
+    let placeholderIcon = slot ? slot.icon : '◻';
+    if (slot) {
+        const artKey = slot.id === 'weapon2' ? 'slot_shield' : 'slot_' + String(slot.id).replace(/[0-9]+$/, '');
+        const artHtml = EG_ART.html('item', artKey, '');
+        if (artHtml) placeholderIcon = artHtml;
+    }
+
     el.innerHTML = item
         ? _egBuildItemChipHTML(item)
-        : `<span class="eg-equip-slot-placeholder">${slot ? slot.icon : '◻'}</span>`;
+        : `<span class="eg-equip-slot-placeholder">${placeholderIcon}</span>`;
 
     if (slotEl) {
         if (item) {
@@ -743,6 +752,19 @@ export function _egRenderCurrencyStash() {
             _egRenderCurrencyCell(r, c);
         }
     }
+}
+
+// Item art arrives asynchronously (images/items/manifest.json is fetched
+// lazily on first use). Cells rendered with emoji fallbacks before that
+// refresh here so they swap to art without needing a reload.
+if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('eg-art-loaded', function () {
+        try {
+            if (document.getElementById('eg-currency-cell-0-0') || document.getElementById('eg-gate-currency-cell-0-0')) {
+                _egRenderCurrencyStash();
+            }
+        } catch (e) { /* hub not open - safe to ignore */ }
+    });
 }
 
 

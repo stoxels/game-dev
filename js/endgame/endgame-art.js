@@ -23,9 +23,18 @@ import { _egIsActive } from '../combat/combat-state.js';
 // Regenerate it after adding/removing art with:
 //   powershell -File tools/build-art-manifest.ps1
 //
-// Only ids present in the manifest are ever requested, so a page load costs
-// exactly ONE extra request regardless of how much art exists.
-// If the manifest is missing (e.g. local dev), we fall back to probing -
+// Item icons (equipment, currency, essences, maps, slots, pickups) live in
+// images/items/ under their ORIGINAL filenames; passive-tree icons live in
+// images/passives/ and images/keystones/. All are mapped by game id in:
+//   images/items/manifest.json       { "map": { "<id>": "<path from images/>" } }
+// Regenerate it with:  node tools/build-items-manifest.mjs
+// It is fetched LAZILY (first item lookup, not at boot) so the title screen
+// and boot preload cost zero bytes for it - a page load that never shows an
+// item icon never requests it. One request total, then pure Map lookups.
+//
+// Only ids present in a manifest are ever requested, so a page load costs
+// at most TWO extra requests regardless of how much art exists.
+// If a manifest is missing (e.g. local dev), we fall back to probing -
 // but lazily (only when a screen actually asks for an id) and through a
 // small concurrency-limited queue.
 // If no image exists for an id, every render call falls back to the
@@ -41,6 +50,49 @@ export const EG_ART = (function () {
 
     const MANIFEST_URL = 'images/endgame/manifest.json';
     const EXTENSIONS = ['png', 'webp', 'jpg', 'jpeg', 'gif'];
+
+    // Item-icon manifest (images/items/): id -> art path relative to images/.
+    // Fetched LAZILY on the first 'item' lookup so boot and the title screen
+    // never pay for it. Regenerate with: node tools/build-items-manifest.mjs
+    const ITEMS_MANIFEST_URL = 'images/items/manifest.json';
+    let _itemsManifestStarted = false;
+    let _itemsManifestSettled = false;
+
+    function _applyItemsManifest(entries) {
+        Object.keys(entries).forEach(function (id) {
+            const key = _key('item', id);
+            if (!_cache.has(key) || !_cache.get(key)) {
+                _cache.set(key, 'images/' + entries[id]);
+            }
+        });
+    }
+
+    function _ensureItemsManifest() {
+        if (_itemsManifestStarted) return;
+        _itemsManifestStarted = true;
+        if (location.protocol === 'file:') {
+            // fetch() is blocked by CORS on file:// (local double-click
+            // build) - stay on emoji fallbacks there; the game plays on.
+            _itemsManifestSettled = true;
+            return;
+        }
+        fetch(ITEMS_MANIFEST_URL)
+            .then(function (res) {
+                if (!res.ok) throw new Error('items manifest http ' + res.status);
+                return res.json();
+            })
+            .then(function (m) {
+                _itemsManifestSettled = true;
+                _applyItemsManifest((m && m.map) || {});
+                _notify();
+            })
+            .catch(function () {
+                _itemsManifestSettled = true;
+                // Screens rendered while the fetch was in flight used emoji;
+                // re-render once so deferred ids get their legacy probing.
+                _notify();
+            });
+    }
 
     // Fallback probing: never run more than this many image requests at once.
     const MAX_CONCURRENT_PROBES = 2;
@@ -131,13 +183,33 @@ export const EG_ART = (function () {
     }
 
 
+    // Resolves the art id for an item object: tier-specific map art for map
+    // items (which share one baseId), the base id otherwise. Null when the
+    // item carries neither - callers fall back to emoji.
+    function artIdForItem(item) {
+        if (!item) return null;
+        if (item.category === 'map' && item.mapTier != null) {
+            return 'map_t' + String(item.mapTier).padStart(2, '0');
+        }
+        return item.baseId || null;
+    }
+
     // Returns the image url for an id, or null if none exists (yet).
-    // With the manifest present this is a pure Map lookup after load.
+    // With a manifest present this is a pure Map lookup after load.
     function url(kind, id) {
         if (!id) return null;
         const key = _key(kind, id);
         if (!_cache.has(key)) {
             _cache.set(key, null);
+            if (kind === 'item') {
+                // The items manifest owns 'item' ids: start its lazy fetch
+                // and hold off legacy path-probing only while it is still
+                // in flight (its arrival notifies and re-renders). Once
+                // settled, ids it does not cover still fall through to the
+                // legacy probing below, preserving the drop-in workflow.
+                _ensureItemsManifest();
+                if (!_itemsManifestSettled) return _cache.get(key);
+            }
             if (_manifestFailed && !_probing.has(key)) {
                 _probing.add(key);
                 _probeQueue.push({ kind: kind, id: id });
@@ -148,10 +220,12 @@ export const EG_ART = (function () {
     }
 
     // HTML helper for template strings: <img> when art exists, else the emoji.
+    // Images decode async and load lazily so big grids (inventory, stash,
+    // essence tab) never stall the frame or fetch off-screen icons eagerly.
     function html(kind, id, fallbackEmoji) {
         const u = url(kind, id);
         if (u) {
-            return '<img src="' + u + '" alt="" class="eg-art-img" draggable="false">';
+            return '<img src="' + u + '" alt="" class="eg-art-img" draggable="false" loading="lazy" decoding="async">';
         }
         return fallbackEmoji || '';
     }
@@ -167,6 +241,8 @@ export const EG_ART = (function () {
             img.alt = '';
             img.className = 'eg-art-img';
             img.draggable = false;
+            img.loading = 'lazy';
+            img.decoding = 'async';
             el.appendChild(img);
         } else {
             el.textContent = fallbackEmoji || '';
@@ -200,7 +276,7 @@ export const EG_ART = (function () {
     // already cached by the single fetch above; nothing to do here.
     function preload() { /* handled by the manifest fetch */ }
 
-    return { url, html, fillElement, variants, randomVariant, preload };
+    return { url, html, fillElement, variants, randomVariant, preload, artIdForItem };
 })();
 
 
