@@ -1228,6 +1228,9 @@ export function _tqPhaseSteps() {
             { task: 'slot_fireball' },
             { fn: () => { try { if (typeof isSpellbookOpen === 'function' && isSpellbookOpen() && typeof closeSpellbook === 'function') closeSpellbook(); } catch (e) {} _tqClearHighlights(); try { if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar(); } catch (e) {} } },
             // Fireball lesson: the ghost is immune to blades - burn it down.
+            // The ghost spawns HERE, before the player is told to cast, so a
+            // player who dies to the ghost and retries (cast_fireball's
+            // dead-skip) gets a real corpse to celebrate, not an empty field.
             { say: 'tq_p3_s7', task: 'fireball_kill', fn: () => { _tqSpawnP3Ghost(); _tqPointAt('.skill-hotbar-slot[data-skill="fireball"]'); } },
             { fn: () => { _tqGridLocked = false; _tqClearHighlights(); _tqRefreshGridLockBorder(); } },
             { say: 'tq_p3_s8', task: 'solve_puzzle' },
@@ -1471,11 +1474,14 @@ export function _tqOnPuzzleSolved() {
     // Puzzle 3: the board filled while a lesson monster still lives (the
     // grid is locked for both fights, so this is only a safety net). Push
     // the player back to the running fight - the encounter keeps running so
-    // nothing is lost. New p3 list: 4=s3 melee+kill, 15=s8 fireball+kill.
+    // nothing is lost. p3 list: 4=s3 melee_kill (bat), 13=s7 fireball_kill
+    // (ghost, points at the Fireball hotbar slot again on the way).
+    // Index note: step 13 (not 15) re-runs the fight task - step 14 is the
+    // silent grid-unlock that must NOT precede a still-living ghost.
     if (_tqPhase === 'p3'
         && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) {
         globalThis.dead = false;
-        _tqStepIdx = _tqP3GhostSpawned ? 15 : 4;   // re-run the live fight
+        _tqStepIdx = _tqP3GhostSpawned ? 13 : 4;   // re-run the live fight
         _tqRunCurrentPhase();
         return;
     }
@@ -2022,17 +2028,11 @@ export function _tqShowIntermission() {
     // along live so a stall is always actionable; a state change is logged
     // for diagnosis.
     if (_tqPollTimer) clearInterval(_tqPollTimer);
-    let _tqInterLastSig = '';
     _tqPollTimer = setInterval(() => {
         const eq = (typeof STATE !== 'undefined' && STATE && STATE.egEquipped) || {};
         const hasWeapon = !!(eq.weapon1);
         const hasArmor = !!(eq.chest || eq.pants);
         _tqUpdateIntermissionChecklist(hasWeapon, hasArmor);
-        const sig = `${hasWeapon ? 1 : 0}${hasArmor ? 1 : 0}|${Object.keys(eq).length}`;
-        if (sig !== _tqInterLastSig) {
-            _tqInterLastSig = sig;
-            try { console.info('[tutorial] intermission poll', { hasWeapon, hasArmor, slots: Object.keys(eq) }); } catch (e) {}
-        }
         if (hasWeapon && hasArmor) {
             clearInterval(_tqPollTimer);
             _tqPollTimer = null;
