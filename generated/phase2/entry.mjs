@@ -40,7 +40,7 @@ import { _applyDenseMarkerBias, _applyTargetedRevealBias, _getPreFilledCols, _ge
 import { _trackWitchImmuneCursedUse } from '../../js/puzzle-mechanics/quest-tracking.js';
 import { _clearBlackoutCountdown, applyCursedRowBlackout, applyCursedColBlackout } from '../../js/puzzle-mechanics/clue-blackout.js';
 import { _eraseFilledCellsInCol, _eraseFilledCellsInRow, solveCols, solveRows, unsolveCols, unsolveColsExcluding, unsolveRows, unsolveRowsExcluding } from '../../js/puzzle-mechanics/grid-actions.js';
-import { _applyBlackoutDownside, _applyColErasureDownside, _applyRowErasureDownside, _blackoutWardBlocks, _cursedDownsideCount, _cursedDownsideDuration, _removalWardBlocks, _resolveCursedBlackoutDownside, _resolveCursedColErasureDownside, _resolveCursedRowErasureDownside } from '../../js/puzzle-mechanics/cursed-downside.js';
+import { _cursedDownsideSuppressed, _resolveCursedBlackoutDownside, _resolveCursedColErasureDownside, _resolveCursedRowErasureDownside } from '../../js/puzzle-mechanics/cursed-downside.js';
 import { _calcAddTimeSecs, _calcMarkWrongCount, _calcTutorItemCount, _calcRevealCount } from '../../js/puzzle-mechanics/effect-modifiers.js';
 import { attachItemTooltip, buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout } from '../../js/puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { _fxCandle, _fxCandleGlow, _fxMagnifier, _fxMakeScanBar, _fxScanner, _fxSpawnExpandingRings, _fxSpyglass, _useReveal } from '../../js/puzzle-items/reveal/reveal.js';

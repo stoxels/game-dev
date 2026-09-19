@@ -5,7 +5,7 @@ import { questStat_revealItemUsed } from '../../inference/inference-stats.js';
 import { t } from '../../translation/translations.js';
 import { _applyCellEffect } from '../../puzzle-mechanics/cell-fx.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
-import { _cursedDownsideDuration } from '../../puzzle-mechanics/cursed-downside.js';
+import { _cursedDownsideSuppressed } from '../../puzzle-mechanics/cursed-downside.js';
 import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
 import { cur } from '../../state.js';
@@ -22,12 +22,12 @@ export function _useCursedReveal(id, def) {
     revealTiles(6, 'item');
 
     // Route the downside through the shared curse helpers so Witch immunity,
-    // Curse Embrace and Veil of Purity apply here too. A duration multiplier
-    // of 0 means the downside is fully suppressed (the helper also handles
-    // the Veil-of-Purity toast); the mark-clear itself is already maximal,
-    // so amplification cannot grow it - only trigger the break toast.
-    const downsideMult = _cursedDownsideDuration(1000) / 1000;
-    if (downsideMult <= 0) {
+    // Curse Embrace and Veil of Purity apply here too. Full suppression means
+    // the downside is skipped (the helper also handles the Veil-of-Purity
+    // toast); the mark-clear itself is already maximal, so amplification
+    // cannot grow it - only trigger the break toast.
+    const protectedFromDownside = _cursedDownsideSuppressed();
+    if (protectedFromDownside) {
         playItemEffect(id);
         return `☠️ ${t('itm_cursed_reveal_protected')}`;
     }
