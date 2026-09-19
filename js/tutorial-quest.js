@@ -6,9 +6,8 @@ import { _egAnimatePlayerProjectile, _egDamageTargetById, _egGetTarget, _egSpawn
 import { EG_ALL_BASE_TYPES } from './loot/equipment-base-items.js';
 import { _egCellHasAnyDrop, _egDropHeartPickup, _egFlushRunLootToStash, _egRenderLootOverlay } from './combat/combat-grid-pickups.js';
 import { _egAddItemToStash, _egInventory, closeHubToGame, egSaveHubState, isHubGameOverlay, openHubFromGame, showEndgameHub } from './endgame/endgame-hub.js';
-import { _egGetAllocatedAttributes, _egGetPlayerLevel } from './endgame/endgame-leveling.js';
-import { EG_PLAYER_STATS, _egComputePlayerStats, _egGetAllEquippedItems } from './endgame/endgame-player-stats.js';
 import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
+import { _egGetAllEquippedItems } from './endgame/endgame-player-stats.js';
 import { _egLootDrops, _egPickups } from './combat/combat-state.js';
 import { EG_VENDOR_FREE_BASE_IDS, _egvBuildBaseItemFromBase, _egvGetSlotOrder } from './loot/loot-vendor.js';
 import { renderCell, updClues } from './grid.js';
@@ -26,7 +25,6 @@ import { questStat_revealItemUsed } from './inference/inference-stats.js';
 import { isPuzzleSolved } from './scoring.js';
 import { hideResultOverlays, showSetup } from './screens/screens.js';
 import { _charmMake, _charmRenderOverlay, _egCharmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
-import { renderSkillHotbar } from './skills/skill-hotbar.js';
 import { SKILL_REGISTRY } from './skills/skill-registry.js';
 import { closeSpellbook, isSpellbookOpen } from './skills/skill-spellbook.js';
 import { USP_THEME_PROJ } from './skills/universal-spell-fx.js';
@@ -2273,10 +2271,7 @@ export function _tqCastFireball() {
             // comes back legitimately once a class is chosen.
             if (!STATE.playerClass) {
                 const hb = STATE.skillHotbar.indexOf('heartbloom');
-                if (hb !== -1) {
-                    STATE.skillHotbar[hb] = null;
-                    if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
-                }
+                if (hb !== -1) STATE.skillHotbar[hb] = null;
             }
             // The Fireball self-slot lesson only runs inside the tutorial:
             // outside it a classless campaign character may legitimately keep
@@ -2285,14 +2280,21 @@ export function _tqCastFireball() {
             try {
                 if ((typeof _tqIsTutorialActive === 'function') && !_tqIsTutorialActive()) return r;
             } catch (e) { return r; }
-            // Since the hotbar mirrors charm slots 1:1, Fireball will only
-            // appear once its charm is slotted. The auto-seeder should not
-            // pre-place it. If it somehow did, clear it.
+            // Since the hotbar mirrors charm slots 1:1, Fireball appears only
+            // once its charm is slotted. The auto-seeder must not pre-place
+            // it - but the player's OWN slotting (right-click quick-slot or
+            // drag into a spell slot, lesson 3) MUST survive this wrap: the
+            // strip below used to fire unconditionally, so every setCharmSlot()
+            // call was instantly undone and the slotted spell never showed
+            // up on the bar. Only clear it while the charm is still unslotted.
             const idx = STATE.skillHotbar.indexOf('fireball');
-            if (idx !== -1) {
+            if (idx !== -1 && (typeof isSkillCharmUnlocked !== 'function' || !isSkillCharmUnlocked('fireball'))) {
                 STATE.skillHotbar[idx] = null;
-                if (typeof renderSkillHotbar === 'function') renderSkillHotbar();
             }
+            // No renderSkillHotbar() call here! The two strip paths only ever
+            // run inside _orig()/renderSkillHotbar() - both callers re-render
+            // after the wrapped call, and a render from here would recurse
+            // render -> ensure(wrap) -> render -> ... (stack overflow).
             return r;
         };
     }
@@ -2646,23 +2648,8 @@ export function startTutorialQuest() {
         try { if (typeof Audio_Manager.unlockBGM === 'function') Audio_Manager.unlockBGM(); } catch (e) {}
         Audio_Manager.playTutorialBGM();
     }
-    // Freshness diagnostic: a truly fresh character is level 1 with nothing
-    // equipped and no allocated attribute points (→ 140 HP / 100 mana /
-    // 0 absorption / 10 damage per fill). Anything else means the test slot
-    // carries state over from earlier runs (gear, levels, attributes) -
-    // the tutorial balances around the fresh values (see _tqStampLevel).
-    try {
-        const _tqStats = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : null;
-        console.info('[tutorial] entry check', {
-            level: (typeof _egGetPlayerLevel === 'function') ? _egGetPlayerLevel() : 'n/a',
-            equipped: (typeof _egGetAllEquippedItems === 'function') ? _egGetAllEquippedItems().length : 'n/a',
-            allocatedAttrs: (typeof _egGetAllocatedAttributes === 'function') ? _egGetAllocatedAttributes() : 'n/a',
-            maxHP: (typeof playerMaxHP !== 'undefined') ? globalThis.playerMaxHP : 'n/a',
-            maxMana: (typeof _getPlayerMaxMana === 'function') ? _getPlayerMaxMana() : 'n/a',
-            absorption: _tqStats ? _tqStats.absorption : 'n/a',
-            baseDamage: (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseDamage : 'n/a',
-        });
-    } catch (e) {}
+    // (Freshness diagnostic removed - it printed a noisy [tutorial] entry
+    // check line into the console on every tutorial boot.)
     _tqEnsureLevels();
     _tqStartPuzzle(0);
 }
