@@ -44,7 +44,7 @@ import { _cursedDownsideSuppressed, _resolveCursedBlackoutDownside, _resolveCurs
 import { _calcAddTimeSecs, _calcMarkWrongCount, _calcTutorItemCount, _calcRevealCount } from '../../js/puzzle-mechanics/effect-modifiers.js';
 import { attachItemTooltip, buildInventoryPanel, closeInventoryFlyout, openInventoryFlyout } from '../../js/puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { _fxCandle, _fxCandleGlow, _fxMagnifier, _fxMakeScanBar, _fxScanner, _fxSpawnExpandingRings, _fxSpyglass, _useReveal } from '../../js/puzzle-items/reveal/reveal.js';
-import { _fxEraser, _fxErrorGem, _fxErrorMagnet, _fxMagnetCrossParticles, _fxMakeBroom, _fxMakeDustParticles, _fxMakeEraserStreak, _fxMakeGemIcon, _fxMakeMagnetIcon, _fxSweeper, _useMarkWrong } from '../../js/puzzle-items/mark-wrong.js';
+import { _fxEraser, _fxErrorGem, _fxErrorMagnet, _fxSweeper, _useMarkWrong } from '../../js/puzzle-items/mark-wrong.js';
 import { _fxChronobolt, _fxHourglass, _fxStopwatch, _useAddTime } from '../../js/puzzle-items/add-time/add-time.js';
 import { _fxMakeShieldOverlay, _fxShield, _useShield, playShieldBreakEffect } from '../../js/puzzle-items/shield/shield.js';
 import { FREEZE_DURATION_MS, _fxFreeze, _useFreeze } from '../../js/puzzle-items/freeze/freeze.js';

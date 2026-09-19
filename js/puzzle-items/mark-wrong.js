@@ -39,7 +39,7 @@ export function _useMarkWrong(id, def) {
 //------------------------------------------------------------------------
 
 // Helper: creates one horizontal eraser streak at a given vertical position.
-export function _fxMakeEraserStreak(container, r, yFraction, delaySeconds) {
+function _fxMakeEraserStreak(container, r, yFraction, delaySeconds) {
     const streak = document.createElement('div');
     streak.className = 'fx-eraser-streak';
     streak.style.cssText = `
@@ -64,7 +64,7 @@ export function _fxEraser() {
 }
 
 // Helper: spawns the broom icon that slides right-to-left across the grid.
-export function _fxMakeBroom(wrap, r) {
+function _fxMakeBroom(wrap, r) {
     const broom = document.createElement('div');
     broom.className = 'fx-sweeper-icon';
     broom.textContent = '🧹';
@@ -83,7 +83,7 @@ export function _fxMakeBroom(wrap, r) {
 }
 
 // Helper: spawns dust particle divs staggered across the broom's path.
-export function _fxMakeDustParticles(container, r, count) {
+function _fxMakeDustParticles(container, r, count) {
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const dust = document.createElement('div');
@@ -113,7 +113,7 @@ export function _fxSweeper() {
 
 // Helper: creates and drops the magnet icon above the grid.
 // Returns { magnetX, magnetY } so the cross particles know where to fly.
-export function _fxMakeMagnetIcon(wrap, r) {
+function _fxMakeMagnetIcon(wrap, r) {
     const magnetX = r.left + r.width / 2;
     const magnetY = r.top - 10;
 
@@ -135,7 +135,7 @@ export function _fxMakeMagnetIcon(wrap, r) {
 }
 
 // Helper: spawns ✕ cross particles that fly toward the magnet.
-export function _fxMagnetCrossParticles(container, r, magnetX, magnetY, count) {
+function _fxMagnetCrossParticles(container, r, magnetX, magnetY, count) {
     for (let i = 0; i < count; i++) {
         setTimeout(() => {
             const cross = document.createElement('div');
@@ -171,7 +171,7 @@ export function _fxErrorMagnet() {
 }
 
 // Helper: creates the large centered gem icon with burst animation.
-export function _fxMakeGemIcon(wrap, cx, cy) {
+function _fxMakeGemIcon(wrap, cx, cy) {
     const gem = document.createElement('div');
     gem.className = 'fx-gem-pulse';
     gem.textContent = '💎';
