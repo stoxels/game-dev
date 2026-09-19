@@ -840,6 +840,7 @@ try { Object.defineProperty(globalThis, "zoomOutBtn", { get() { return zoomOutBt
 
 //=======[ PHASE 3 module-import shims ]=========================================
 try { globalThis["t"] = t; } catch (e) {} // PHASE3-SHIM (js/translation/translations.js)
+try { globalThis["showEndgameVendor"] = showEndgameVendor; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor.js)
 try { globalThis["_egMechClueSwap"] = _egMechClueSwap; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/shared-boss-abilities.js)
 try { globalThis["_egMechCorruptCells"] = _egMechCorruptCells; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/shared-boss-abilities.js)
 try { globalThis["_egMechFrozenCells"] = _egMechFrozenCells; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/shared-boss-abilities.js)

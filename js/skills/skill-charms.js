@@ -648,6 +648,9 @@ export function setCharmSlot(slotIndex, charmKey, opts) {
             if (other && placedCharm && other.skillId === placedCharm.skillId) STATE.charmSlots[i] = null;
         }
     }
+    const wasUnlocked = (charmKey !== null)
+        ? isSkillCharmUnlocked(getCharmByKey(charmKey)?.skillId)
+        : false;
     STATE.charmSlots[slotIndex] = charmKey;
     // The hotbar mirrors the spell slots 1:1 (slot N = hotbar key N), so the
     // slotted spell lands on the matching hotbar slot immediately (or leaves
@@ -657,6 +660,22 @@ export function setCharmSlot(slotIndex, charmKey, opts) {
         try { rebuildHotbarFromCharmSlots(); } catch (e) { /* bar is best-effort */ }
     }
     if (typeof save === 'function') { try { save(); } catch (e) { /* best effort */ } }
+    // Reward the unlock moment: when a charm slot makes a NEW spell castable
+    // (it was locked before this write), announce the spell and the hotbar
+    // key it landed on. Re-slots, moves and unslots stay silent.
+    const placedCharm = (charmKey !== null) ? getCharmByKey(charmKey) : null;
+    if (placedCharm && !wasUnlocked && isSkillCharmUnlocked(placedCharm.skillId)
+        && typeof globalThis.showToast === 'function') {
+        const key = (typeof globalThis.keybindDisplayLabel === 'function')
+            ? globalThis.keybindDisplayLabel(globalThis.keybindKeyFor(`hotbar-${slotIndex + 1}`))
+            : String((slotIndex + 1) % 10);
+        globalThis.showToast(
+            t('charm_slotted_unlocked')
+                .replace('{skill}', getSkillName(placedCharm.skillId))
+                .replace('{key}', key),
+            '#f5d98b'
+        );
+    }
     // Slotting changes which spells are unlocked, so refresh the open book
     // (charm panel) and the hotbar.
     _charmRefreshSpellbook();
