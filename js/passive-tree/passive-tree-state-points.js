@@ -3,7 +3,7 @@ import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { TALENT_TREE_DATA } from './passive-tree-data.js';
 import { _ptRefreshAllStyles } from './passive-tree-ui.js';
-import { PT, PT_START_ID, _ptInitTreeData } from './passive-tree.js';
+import { PT_START_ID, _ptInitTreeData } from './passive-tree.js';
 import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, '_pt_skills', { get() { return _pt_skills; }, set(v) { _pt_skills = v; }, configurable: true }); } catch (e) {}

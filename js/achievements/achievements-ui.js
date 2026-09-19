@@ -202,16 +202,8 @@ function _countTotalTiers() {
 }
 
 // _countTotalAchievements - total number of achievement definitions (tiers ignored).
-function _countTotalAchievements() {
-    return ACHIEVEMENT_DEFS.length;
-}
 
 // _countFullyUnlockedAchievements - number of defs where every tier has been earned.
-function _countFullyUnlockedAchievements() {
-    return ACHIEVEMENT_DEFS.filter(def =>
-        def.tiers.every((_, ti) => _isTierUnlocked(def, ti))
-    ).length;
-}
 
 // _countCategoryUnlocked - total unlocked tier count across all defs in one category.
 function _countCategoryUnlocked(defs) {
@@ -301,34 +293,9 @@ function _buildCardProgressHtml(def, highestUnlocked, currentVal, lang) {
 
 // _buildProgressBlockHtml - returns the HTML for a single labelled progress bar block.
 //   Used twice inside the overall header (once for achievements, once for milestones).
-function _buildProgressBlockHtml(label, current, total, pct, extraBarClass = '') {
-    return `
-        <div class="ach-progress-block">
-            <span class="ach-progress-label">${label}</span>
-            <span class="ach-progress-text">${current} / ${total} &nbsp;(${pct}%)</span>
-            <div class="ach-progress-bar-outer">
-                <div class="ach-progress-bar-inner ${extraBarClass}" style="width:${pct}%"></div>
-            </div>
-        </div>`;
-}
 
 // _buildHeaderHtml - renders the overall progress header with two side-by-side bars:
 //   left = fully completed achievements, right = total milestone tiers unlocked.
-function _buildHeaderHtml(fullAchs, totalAchs, fullPct, unlockedTiers, totalTiers, milestonePct, lang) {
-    const achLabel = t('qa_ach_completed');
-    const mileLabel = t('qa_ach_milestones');
-
-    const achBlock = _buildProgressBlockHtml(achLabel, fullAchs, totalAchs, fullPct);
-    const mileBlock = _buildProgressBlockHtml(mileLabel, unlockedTiers, totalTiers, milestonePct, 'ach-progress-bar-milestones');
-
-    return `
-        <div class="ach-header">
-            <div class="ach-progress-dual">
-                ${achBlock}
-                ${mileBlock}
-            </div>
-        </div>`;
-}
 
 // _buildCardHtml - returns the full HTML for a single achievement card,
 //   including icon, name, description, tier dots, earned label, and progress bar.
@@ -360,26 +327,6 @@ function _buildCardHtml(def, lang) {
 
 // _buildCategoryHtml - returns the HTML for one full category section
 //   (header strip + card grid). Returns an empty string if the category is empty.
-function _buildCategoryHtml(cat, defs, lang) {
-    if (!defs.length) return '';
-
-    const catLabel = _pickLang(cat, 'label', lang);
-    const catTotal = _countCategoryTiers(defs);
-    const catUnlocked = _countCategoryUnlocked(defs);
-    const cardsHtml = defs.map(def => _buildCardHtml(def, lang)).join('');
-
-    return `
-        <div class="ach-category">
-            <div class="ach-category-header">
-                <span class="ach-category-icon">${cat.icon}</span>
-                <span class="ach-category-name">${catLabel}</span>
-                <span class="ach-category-count">${catUnlocked} / ${catTotal}</span>
-            </div>
-            <div class="ach-grid">
-                ${cardsHtml}
-            </div>
-        </div>`;
-}
 
 
 
@@ -583,7 +530,7 @@ function _buildCategoryDetailHtml(catKey, lang) {
     if (!cat) return '';
 
     const defs = _groupDefsByCategory()[catKey] || [];
-    const catLabel = _pickLang(cat, 'label', lang);
+    _pickLang(cat, 'label', lang);
     const totalTiers = _countCategoryTiers(defs);
     const unlockedTiers = _countCategoryUnlocked(defs);
     const pct = _calcProgressPct(unlockedTiers, totalTiers);

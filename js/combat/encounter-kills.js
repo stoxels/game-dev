@@ -20,6 +20,12 @@ import { _egTryDropCurrency } from '../loot/loot-currency.js';
 import { _egBossDefeated, _egEndMapDefeated, _egOnAllBossesDead, _egScheduleArenaAdvance, _egUpdateObjectivesHUD } from './encounter-chain.js';
 import { _egFlashKillCard, _egRenderPanel } from './encounter.js';
 import { _egTryDropEssence } from '../loot/loot-essences.js';
+// Live binding of the current level's puzzle object (state.js exports the
+// binding itself, so this always reads the CURRENT level, not a snapshot).
+// Phase-4 split leftover: this file used to read `cur` bare through the
+// classic-script shared scope; the import is the module-era equivalent
+// (same pattern as combat-ailments.js / combat-class-projectiles.js).
+import { cur } from '../state.js';
 import { _egDropHeartPickup, _egSpawnItemDrop } from './combat-grid-pickups.js';
 import { _egGrantMonsterXP } from '../endgame/endgame-leveling.js';
 import { _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';

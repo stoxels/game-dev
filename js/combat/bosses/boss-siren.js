@@ -233,7 +233,6 @@ export function _egMechSireUndertow(monster, phase) {
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(monster && monster.id, true);
-    const W = window.innerWidth, H = window.innerHeight;
     const a = _egSireAnchor();
     const lifeMs = EG_SIRE_UNDERTOW_LIFE * _EG_SIRE_DEBUG_MULT;
     const cycleMs = EG_SIRE_PULL_CYCLE * _EG_SIRE_DEBUG_MULT;
@@ -340,7 +339,6 @@ export function _egMechSireReply(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const a = _egSireAnchor();
     const len = Math.hypot(W, H);
-    const lifeMs = EG_SIRE_REPLY_LIFE * _EG_SIRE_DEBUG_MULT;
     const warnMs = 1100 * _EG_SIRE_DEBUG_MULT;
     const sweepMs = 3000 * _EG_SIRE_DEBUG_MULT;
     const dmgPct = EG_SIRE_BEAM_DMG[p] * 0.75;

@@ -140,7 +140,6 @@ export function _egMechMntLabyrinth(monster, phase) {
     let t = 0;
     let dir = 1, laneY = 0;
     let lineEl = null, bullEl = null, bx = 0, hitDone = false;
-    let wallsBrokenThisRush = 0;
 
     const clearRushEls = () => {
         if (lineEl) { try { lineEl.remove(); } catch (e) {} lineEl = null; }
@@ -182,7 +181,6 @@ export function _egMechMntLabyrinth(monster, phase) {
                 bx = dir > 0 ? -90 : W + 90;
                 bullEl = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-charger', '🐂');
                 hitDone = false;
-                wallsBrokenThisRush = 0;
             }
         } else if (stage === 'dash') {
             bx += dir * EG_MNT_CHARGE_SPD * dtS;
@@ -204,7 +202,6 @@ export function _egMechMntLabyrinth(monster, phase) {
                 if (laneY > wlTop - EG_MNT_LANE_H / 2 && laneY < wlBot + EG_MNT_LANE_H / 2
                     && Math.abs(bx - wl.x) < 40) {
                     wl.broken = true;
-                    wallsBrokenThisRush++;
                     wl.el.classList.remove('eg-mnt-wall');
                     wl.el.classList.add('eg-mnt-wall-crumble');
                     // Shrapnel clip: standing beside a crumbling wall stings.
@@ -289,14 +286,12 @@ export function _egMechMntHoofterrain(monster, phase) {
     _egNkLoop(run, (dtS, now) => {
         const pr = _egNkPlayerRect();
         const pc = _egMntPC();
-        let pending = false;
 
         // Craters: warn → stamp → hoofprint lingers.
         for (const c of craters) {
             if (c.struck) {
                 // Hoofprint hazard ticks while you stand in it, then fades.
                 if (c.print && now < c.printUntil) {
-                    pending = true;
                     if (pr && _egNkCircleHit(c.x, c.y, 44, pr, 0)) {
                         _egNkDotTick(run, 3.5, dtS, level, null);
                     } else {
@@ -305,8 +300,7 @@ export function _egMechMntHoofterrain(monster, phase) {
                 }
                 continue;
             }
-            if (now < c.born) { pending = true; continue; }
-            pending = true;
+            if (now < c.born) {  continue; }
             if (now >= c.born + EG_MNT_CRATER_WARN_MS * _EG_MNT_DEBUG_MULT) {
                 c.struck = true;
                 try { c.warn.remove(); } catch (e) {}
@@ -332,7 +326,6 @@ export function _egMechMntHoofterrain(monster, phase) {
         dust.style.left = Math.round(dustX) + 'px';
         dust.style.width = '260px';
         if (dustT < EG_MNT_DUST_LIFE * _EG_MNT_DEBUG_MULT) {
-            pending = true;
             if (pr && pc.x > dustX && pc.x < dustX + 260 && Math.abs(pc.y - laneY) < 70) {
                 _egNkDotTick(run, EG_MNT_DUST_DPS[p], dtS, level, null);
             } else {
@@ -361,9 +354,8 @@ export const EG_MNT_THREAD_HEAL = 0.06;   // %maxHP one-time hold reward
 
 export function _egMechMntThread(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
-    const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const level = monster ? monster.level : 1;
-    const W = window.innerWidth, H = window.innerHeight;
+    Math.max(1, Math.min(3, Number(phase) || 1));
+    const H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
     _egNkToast('eg_mech_mnt_thread', '🧵 THREAD OF ARIADNE - the safe lane is marked. Trust it, but never live in it!', '#ffd166');

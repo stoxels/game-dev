@@ -196,7 +196,6 @@ export function _egMechJsCards(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const volleys = p >= 3 ? 3 : 2;
     const volleyGap = 2400 * _EG_JS_DEBUG_MULT;
-    const warnMs = 1000 * _EG_JS_DEBUG_MULT;
     const lifeMs = EG_JS_CARD_LIFE * _EG_JS_DEBUG_MULT;
     const dmgPct = EG_JS_CARD_DMG[p];
 
@@ -225,7 +224,6 @@ export function _egMechJsCards(monster, phase) {
     let touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
         vt += dtS * 1000;
-        let active = false;
         if (volley < volleys && vt >= nextVolleyAt) {
             volley++;
             nextVolleyAt = vt + volleyGap;
@@ -241,7 +239,6 @@ export function _egMechJsCards(monster, phase) {
             if (!c.born) c.born = vt;
             const age = vt - c.born;
             if (!c.stuck) {
-                active = true;
                 const k = Math.min(1, age / flightMs);
                 const ex = k * k; // ease-in (a tossed card accelerates)
                 c.el.style.left = Math.round(c.x0 + (c.tx - c.x0) * ex) + 'px';
@@ -260,7 +257,6 @@ export function _egMechJsCards(monster, phase) {
                     _egJsConfetti(c.tx, c.ty, false);
                 }
             } else {
-                active = true;
                 if (pr && now >= touchCd) {
                     const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
                     if (Math.abs(pc.x - c.tx) < EG_JS_CARD_W / 2 + 10 && Math.abs(pc.y - c.ty) < EG_JS_CARD_H / 2 + 10) {

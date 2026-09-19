@@ -1,5 +1,5 @@
 ﻿import { trackAchStat } from '../achievements/achievements.js';
-import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
+import { markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
 import { isEndgameLevel } from '../mouse-button-handlers.js';

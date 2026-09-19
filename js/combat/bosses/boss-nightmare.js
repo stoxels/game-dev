@@ -42,13 +42,12 @@ export function _egMechDarkHunt(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const chaseSpeed = [0, 105, 120, 140][p];
-    const radius = 26;
     const dmgPct = [0, 0.15, 0.18, 0.22][p];
     const darkDot = [0, 3, 4, 5][p];
     const durMs = 10000;
     const run = _egNkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
-    const dark = _egNkEl(run, 'div', 'eg-nk-darkling');
+    _egNkEl(run, 'div', 'eg-nk-darkling');
     const beast = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-nightbeast', '👹');
     const b = { x: window.innerWidth * 0.5, y: 80 };
     _egNkToast('eg_mech_nightmare', '🌃 The Nightmare: Dark Hunt! Something circles in the black!');

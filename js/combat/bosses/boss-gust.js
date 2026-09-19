@@ -217,8 +217,8 @@ export function _egGustArenaInit(monster) {
     const run = _egNkNewRun(monsterId, false);
 
     // ── Spike walls (CSS sawtooths draw themselves - no children needed) ──
-    const spikeL = _egNkEl(run, 'div', 'eg-nk-gust-spike eg-nk-gust-spike-left');
-    const spikeR = _egNkEl(run, 'div', 'eg-nk-gust-spike eg-nk-gust-spike-right');
+    _egNkEl(run, 'div', 'eg-nk-gust-spike eg-nk-gust-spike-left');
+    _egNkEl(run, 'div', 'eg-nk-gust-spike eg-nk-gust-spike-right');
 
     // ── Wind overlay: full-screen streak field + drifting debris. The
     //    body classes drive the CSS; the node itself is ALWAYS visible so

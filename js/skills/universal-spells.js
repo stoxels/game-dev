@@ -1340,7 +1340,6 @@ export function _uspApplySupportSpell(spell) {
 export function getUniversalSpellSupportEstimate(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell || !isUniversalSupportSpell(spell)) return null;
-    const de = (typeof LANG !== 'undefined' && LANG === 'de');
     const rank = _uspCastRank(spellId);
     const secs = Math.round(spell.buffSeconds || 0);
 
@@ -1680,7 +1679,6 @@ export function _uspApplyMovementSpell(spell) {
 export function getUniversalSpellMovementEstimate(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell || !isUniversalMovementSpell(spell)) return null;
-    const de = (typeof LANG !== 'undefined' && LANG === 'de');
     const rank = _uspCastRank(spellId);
     const base = {
         kind: spell.behavior,

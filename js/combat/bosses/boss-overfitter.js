@@ -301,7 +301,6 @@ export function _egMechOvrPatternLock(monster, phase) {
     _egOvrEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
-    const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
     _egNkToast('eg_mech_ovr_lock', '🧠 PATTERN LOCK - recording your movement… the model is learning you!', '#c084ff');
@@ -320,7 +319,7 @@ export function _egMechOvrPatternLock(monster, phase) {
     let hitFlag = false;
 
     _egNkLoop(run, (dtS, now) => {
-        const pc = _egOvrPC();
+        _egOvrPC();
         let pending = true;
 
         if (stage === 'record') {

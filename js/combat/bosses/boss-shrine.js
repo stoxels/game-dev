@@ -140,11 +140,9 @@ export function _egMechShrBarriers(monster, phase) {
 
     _egNkLoop(run, (dtS, now) => {
         const pc = _egShrPC();
-        let pending = false;
 
         for (const b of bars) {
             if (b.dead) continue;
-            pending = true;
 
             if (!b.dieAt) {
                 // Still humming (or just turning lit).
@@ -198,7 +196,6 @@ export function _egMechShrBarriers(monster, phase) {
             if (now >= b.knotDieAt) {
                 b.burned = true;
                 b.knotEl.classList.add('eg-shr-knotwall-burn');
-                const fromTop = b.knotSide < 0;
                 if (sideOK && d < EG_SHR_KNOT_R + 8) {
                     _egShrTouch(EG_SHR_BURN_DMG[p], level, 'Knot Burn');
                 }
@@ -246,7 +243,6 @@ export function _egMechShrMirrors(monster, phase) {
     const anchor = _egNkEl(run, 'div', 'eg-nk-dot eg-shr-anchor', '⛩️');
     anchor.style.transform = 'translate(' + Math.round(ax - 26) + 'px,' + Math.round(ay - 26) + 'px)';
     const orbs = [];
-    let fired = false;
     if (p >= 2) {
         const fanN = EG_SHR_FAN_N[p];
         const base = Math.atan2(_egShrPC().y - ay, _egShrPC().x - ax);
@@ -256,7 +252,6 @@ export function _egMechShrMirrors(monster, phase) {
             const el = _egNkEl(run, 'div', 'eg-nk-dot eg-nk-orb-spirit');
             orbs.push({ x: ax, y: ay, vx: Math.cos(a) * EG_SHR_FAN_SPD[p], vy: Math.sin(a) * EG_SHR_FAN_SPD[p], hitDone: false, el });
         }
-        fired = true;
     }
 
     // ── Spirit signature: record → shatter → playback. ───────────────────
@@ -669,7 +664,7 @@ export function _egShrFinalStart(monster) {
                 g.gridCells.push({ x: gx + c * cell + cell / 2, y: gy + r * cell + cell / 2, safe: r === safeRow && c === safeCol, el });
             }
         }
-        const detonateAt = performance.now() + EG_SHR_GRID_WARN * _EG_SHR_DEBUG_MULT;
+        performance.now() + EG_SHR_GRID_WARN * _EG_SHR_DEBUG_MULT;
 
         _egShrAfter(g, EG_SHR_GRID_WARN * _EG_SHR_DEBUG_MULT, () => {
             if (g.finished) return;

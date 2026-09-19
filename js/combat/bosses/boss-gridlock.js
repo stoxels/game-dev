@@ -151,10 +151,9 @@ export function _egMechGlLattice(monster, phase) {
         }
         return { lines, t: 0 };
     };
-    let left = waves, wave = null, e = 0;
+    let left = waves, wave = null;
     _egNkToast('eg_mech_lattice', '📡 The Gridlock: Laser Lattice! Clear the lit lanes!');
     _egNkLoop(run, (dtS, now) => {
-        e += dtS * 1000;
         if (!wave && left > 0) {
             left--;
             wave = mkWave();
@@ -162,9 +161,8 @@ export function _egMechGlLattice(monster, phase) {
         if (!wave) return false;
         wave.t += dtS * 1000;
         const pr = _egNkPlayerRect();
-        let anyHot = false;
         wave.lines.forEach(l => {
-            if (l.fired) { anyHot = true; return; }
+            if (l.fired) {  return; }
             if (wave.t >= l.fireAt) {
                 l.fired = true;
                 l.el.classList.remove('eg-nk-lattice-warn');
@@ -180,9 +178,8 @@ export function _egMechGlLattice(monster, phase) {
                         _egNkAbilityHitToast(dealt, 'The Gridlock', 'Laser Lattice');
                     }
                 }
-                anyHot = true;
             } else {
-                anyHot = true; // still telegraphing or waiting its turn
+ // still telegraphing or waiting its turn
             }
         });
         // A wave ends when its LAST line has fired and cooled.
@@ -532,21 +529,6 @@ export function _egGlFinalStart(monster) {
     }
 
     const level = monster.level || 1;
-    let touchCd = 0;
-    const liveHit = (pct, label) => {
-        const now = performance.now();
-        if (now < touchCd) return;
-        const pr = _egNkPlayerRect();
-        if (!pr) return;
-        const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
-        // Any HOT wire under the player bites (pad 6 for the wire thickness).
-        const hitH = g.wiresH.some(w => w.hot && Math.abs(pc.y - w.y) < 12);
-        const hitV = g.wiresV.some(w => w.hot && Math.abs(pc.x - w.x) < 12);
-        if (hitH || hitV) {
-            touchCd = now + EG_GL_HIT_CD_MS;
-            _egGlTouch(pct, level, label);
-        }
-    };
     const setBatch = (ws, cls, on) => ws.forEach(w => {
         w.hot = on;
         w.el.classList.toggle(cls, on);

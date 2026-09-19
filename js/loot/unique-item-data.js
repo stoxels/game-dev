@@ -10,14 +10,14 @@
 // EG_UNIQUE_ITEMS entries at module-eval time, so importers deterministically
 // see the rebalanced curves.
 
-import { renderCell, updClues } from '../grid.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
-import { save } from '../state.js';
-import { LANG } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES, EG_SLOT_ICONS } from './equipment-base-items.js';
-import { _egEquipped, _egInventory, egSaveHubState } from '../endgame/endgame-hub.js';
-import { _egRollImplicitsForBase } from './loot-implicits.js';
-import { _egMapLootRarityWeightMult } from '../endgame/endgame-map-launch.js';
+import '../grid.js';
+import '../passive-tree/passive-tree-state-points.js';
+import '../state.js';
+import '../translation/translations.js';
+import './equipment-base-items.js';
+import '../endgame/endgame-hub.js';
+import './loot-implicits.js';
+import '../endgame/endgame-map-launch.js';
 
 //------------------------------------------------------------------------
 //-------------------UNIQUE ITEMS (PoE-STYLE)-----------------------------
@@ -6258,7 +6258,7 @@ export const EG_UNIQUE_ITEMS = [
     const hybridForArmor = (lvl) => { if(lvl<40) return null; return Math.round(20+(lvl-1)*2.75); };
     const hybridForJewelry = (lvl) => { if(lvl<40) return null; return Math.round(16+(lvl-1)*2.20); };
     const JEWELRY = new Set(['ring','earring','amulet','talisman']);
-    const ARMOR_SLOTS = new Set(['head','chest','pants','shoulders','cloak','bracers','gloves','boots','belt','weapon','shield','ranged','arcane']);
+    new Set(['head','chest','pants','shoulders','cloak','bracers','gloves','boots','belt','weapon','shield','ranged','arcane']);
     for (const u of EG_UNIQUE_ITEMS) {
         const lvl = u.minLevel || 1;
         if (lvl <= 10) continue;
@@ -6291,7 +6291,6 @@ export const EG_UNIQUE_ITEMS = [
         }
         // Zero-stat -> assign based on power and slot
         // Jewelry any keeps lighter pure, armor/weapons get full pure, high-impact chase gets hybrid/triple
-        const isHighPower = lvl >= 55 && (u.slotType === 'amulet' || u.slotType === 'talisman' || u.slotType === 'ring' || u.slotType === 'chest' || u.slotType === 'weapon');
         // Prefer archetype if not any
         let arch = u.archetype;
         if (arch === 'any' || !arch) {

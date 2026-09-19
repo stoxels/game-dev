@@ -350,7 +350,7 @@ export function buildCodesScreen() {
     const achPct = calcAchievementProgress();
     const { total: totalAchTiers, have: unlockedAchTiers } = _getAchievementTierCounts();
 
-    const footerMsg = (typeof t === 'function' ? t('scr_codes_footer') : null)
+    (typeof t === 'function' ? t('scr_codes_footer') : null)
         || 'Earn points to unlock these powerful achievement codes!';
 
     const rowsHTML = WORLD_CODES.map(wc =>

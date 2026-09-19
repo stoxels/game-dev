@@ -435,11 +435,9 @@ export function _buildCharacterSelectCardsUI(onSelect) {
         const tagline = lang === 'de' ? char.taglineDE : char.tagline;
         const background = lang === 'de' ? char.backgroundDE : char.background;
         const personality = lang === 'de' ? char.personalityDE : char.personality;
-        const strength = lang === 'de' ? char.strengthDE : char.strength;
 
         const labelBackground = lang === 'de' ? 'Hintergrund' : 'Background';
         const labelPersonality = lang === 'de' ? 'Persönlichkeit' : 'Personality';
-        const labelStrength = lang === 'de' ? 'Stärke' : 'Strength';
         const labelTraits = lang === 'de' ? 'Fähigkeiten' : 'Traits';
 
         const traitsHtml = (char.traits || []).map(tr => {

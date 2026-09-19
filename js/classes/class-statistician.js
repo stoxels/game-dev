@@ -1412,7 +1412,6 @@ export function _momentumSpawnParticle(row, col) {
     const rect = _momentumGetBorderRect();
     if (!wrap || !container || !sol || !rect) return;
 
-    const zoom = globalThis.currentZoom || 1;
     let startX = rect.x0 + rect.w / 2;
     let startY = rect.y0 + rect.h / 2;
 

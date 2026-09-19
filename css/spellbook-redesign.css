@@ -1,8 +1,11 @@
 /* =========================================================================
-   SPELLBOOK REDESIGN  (css/spellbook-redesign.css)
-   Stone tome + 3 parchment pages, built from the dedicated art in
+   SPELLBOOK REDESIGN  (css/spellbook-redesign.css)  —  v3
+   Stone tome + 2 parchment pages, built from the dedicated art in
    images/Spellbook/. Loaded AFTER css/skills.css; overrides the legacy
-   section-4 spellbook rules by source order (same specificity).
+   section-4 spellbook rules by source order (same specificity) - EXCEPT the
+   box width/height, where the legacy vh-clamped width is re-clamped to the
+   viewport right here (the "book suddenly shrank when the hotbar showed"
+   bug came from that override chain).
    ========================================================================= */
 
 /* ---------- overlay + frame -------------------------------------------- */
@@ -10,15 +13,24 @@
 
 .spellbook-box {
     position: relative;
-    width: min(1400px, 96vw, calc((100vh - 170px) * 1.792));
+    /* v3 size contract: the frame is sized from the VIEWPORT only, with the
+       hotbar strip deducted in the same declaration (the legacy skills.css
+       rule "body.spellbook-open.skill-hotbar-visible" no longer overrides
+       width because this one comes later AND is the only width source).
+       1376/768 = the background art's aspect ratio; at 96vh tall on a 16:9
+       window the frame fills the screen, on taller windows the 1400px cap
+       binds and the art simply stays crisp. */
+    width: min(1400px, 96vw, calc((100vh - 150px) * 1.792));
+    max-width: none;               /* override .modal-box's 660px cap */
+    max-height: calc(100vh - 150px);
     aspect-ratio: 1376 / 768;
-    min-height: 420px;
-    max-height: calc(100vh - 170px);
+    min-height: 340px;
     background-image: url('../images/Spellbook/Spellbook_Background.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-color: transparent;
     border: none;
+    border-left: none;
     box-shadow: none;
     padding: 0;
     overflow: visible;
@@ -34,53 +46,77 @@
     to   { opacity: 1; transform: scale(1) rotate(0deg); }
 }
 
-body.spellbook-open.skill-hotbar-visible .spellbook-box {
-    max-height: calc(100vh - 160px);
+/* v3: legacy skills.css tried to shrink/reposition the box when the hotbar
+   was visible (--sb-reserve dance). The redesign keeps ONE behaviour: the
+   clamp above already deducts the hotbar strip (150px), so all these no-op. */
+.spellbook-box { --sb-reserve: 0px !important; }
+
+/* v3.5: the game's UI scale transform (scalePuzzle / normalize-scale) makes
+   the 150px height reserve shrink on screen while the hotbar keeps its pixel
+   size, so on SMALL viewports the book's footer band slid UNDER the bar
+   (measured ~970px^2 overlap at 1280x620, 407px^2 at 1024x600, a 200px^2
+   graze at 1024x768). A bottom margin lifts the book into the space above
+   the bar AND scales with the same UI transform. Scoped to the sizes where
+   the overlap actually occurs (measured: clean at 1280x720, 1366x768 and
+   every bigger window), so the big-desktop centred look is unchanged. */
+@media (max-height: 700px), (max-width: 1100px) {
+    body.spellbook-open.skill-hotbar-visible .spellbook-box {
+        /* 15vh keeps the meter's right tip clear even at ~600px-tall windows,
+           where the UI scale transform shrinks the effective margin the most;
+           the 150px cap matches the height reserve in the width formula. */
+        margin-bottom: clamp(96px, 15vh, 150px);
+    }
 }
 
-/* Title - plain gold Cinzel lettering sitting on the frame art's carved top
-   band (the reference carries no plaque image, just the gold word). */
+/* ---------- title: gold lettering on the art's carved top plaque ---------- */
+/* Measured on the art (668x373): the plaque's dark INNER face spans
+   y 2.7-11%; the title box covers exactly that band and flex-centres the
+   glyphs in it. padding-left compensates the trailing letter-spacing so the
+   text optically centres, not the text+trailing-space box. */
 .spellbook-plaque {
     position: absolute;
-    top: 4.2%;
+    top: 2.7%;
+    height: 8.3%;
     left: 50%;
     transform: translateX(-50%);
     width: auto;
-    height: auto;
     background: none;
+    padding: 0 0 0 clamp(4px, .58cqw, 11px);
+    margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
     font-family: var(--C);
     font-weight: 700;
-    font-size: clamp(14px, 2cqw, 30px);
-    letter-spacing: clamp(3px, .5cqw, 9px);
+    font-size: clamp(15px, 2.05cqw, 32px);
+    line-height: 1;
+    letter-spacing: clamp(4px, .58cqw, 11px);
     white-space: nowrap;
-    color: #f2d283;
-    text-shadow: 0 1px 0 #6b4a12, 0 2px 4px rgba(0, 0, 0, .8), 0 0 18px rgba(245, 205, 120, .35);
+    color: #f5e0a0;
+    text-shadow: 0 1px 0 #5a3d08, 0 2px 5px rgba(0, 0, 0, .9), 0 0 22px rgba(255, 220, 130, .45);
     z-index: 5;
 }
 
 .spellbook-plaque-text { text-transform: uppercase; }
 
-/* Close - dark rounded square with a gold rim + gold X, top-right on the
-   frame art (drawn in CSS; no dedicated art asset exists). */
+/* ---------- close: gold X square on the frame's top-right corner ---------- */
+/* (v3 fix: sits on the OUTER frame, not on the right parchment page - the
+   old right offset parked it on the page paper.) */
 .spellbook-box .modal-close {
     position: absolute;
-    top: 4%;
-    right: 5.2%;
-    width: clamp(24px, 3.4cqw, 44px);
-    height: clamp(24px, 3.4cqw, 44px);
-    background: linear-gradient(180deg, #322c40, #191622);
-    border: 1px solid #a8853c;
-    border-radius: 18%;
-    box-shadow: inset 0 1px 0 rgba(255, 220, 150, .25), 0 2px 6px rgba(0, 0, 0, .7);
+    top: 4.2%;
+    right: 1.6%;
+    width: clamp(30px, 3.6cqw, 50px);
+    height: clamp(30px, 3.6cqw, 50px);
+    background: linear-gradient(180deg, #2a2538, #12101a);
+    border: 2px solid #b89044;
+    border-radius: 20%;
+    box-shadow: inset 0 1px 0 rgba(255, 220, 150, .3), 0 3px 8px rgba(0, 0, 0, .8);
     font-size: 0;
     padding: 0;
     cursor: pointer;
     z-index: 5;
-    transition: transform .12s, filter .12s;
+    transition: transform .12s, filter .12s, box-shadow .12s;
 }
 .spellbook-box .modal-close::after {
     content: '✕';
@@ -89,56 +125,83 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(13px, 1.8cqw, 24px);
-    font-weight: bold;
-    color: #f2d283;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
+    font-size: clamp(15px, 1.9cqw, 26px);
+    font-weight: 800;
+    color: #f5e0a0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .95);
 }
-.spellbook-box .modal-close:hover { filter: brightness(1.35); transform: scale(1.08); }
+.spellbook-box .modal-close:hover { filter: brightness(1.4); transform: scale(1.1); box-shadow: inset 0 1px 0 rgba(255, 220, 150, .4), 0 4px 12px rgba(0, 0, 0, .9), 0 0 20px rgba(245, 200, 100, .5); }
 
-/* Frame body: content sits on the three parchment pages of the art.
-   Page art regions (measured): left x 18.0-41.3%, mid 42.4-57.9%,
-   right 59.2-82.3%, y 17.2-83.5%. The grid uses those proportions. */
+/* ---------- page geometry (measured off the art) --------------------------
+   Parchment: x 7.2-93.1%, left page 7.2-47.5, right 53-93.1,
+   y 13.4-86.9 (outer corners dip to 15-18.8 / 74.8-79.6). Content is inset
+   from the paper edges; the spine gap ~47.5-53% stays empty.
+   Grid columns: [frame L][left page][spine][right page][frame R]
+   Grid rows:    [plaque band][page][footer band]                             */
 .spellbook-frame-body {
     position: absolute;
     inset: 0;
     display: grid;
-    grid-template-columns: 17.6% 41.9% 58.6% 82.7% 100%;
-    grid-template-rows: 16.8% 83.2% 89.5%;
+    grid-template-columns: 7.6% 39.4% 6% 39.4% 7.6%;
+    grid-template-rows: 15.5% 66.5% 18%;
 }
 
-/* ---------- the two pages (charms + slots) ---------------------------------------- */
+/* The two pages: headers at the TOP, content rail below, tool cluster
+   (currency + max-rank) pinned to the BOTTOM of the left page. */
 .spellbook-body {
     position: absolute;
     display: grid;
     grid-template-columns: 1fr 1.2fr;
-    left: 17.4%;
-    right: 16.6%;
-    top: 17.4%;
-    bottom: 12.4%;
-    gap: .8%;
+    left: 7.8%;
+    right: 7.8%;
+    top: 16.2%;
+    bottom: 14.6%;
+    gap: 1.2%;
 }
 
 .spellbook-page {
     position: relative;
     min-width: 0;
     min-height: 0;
-    display: flex;
-    flex-direction: column;
-    padding: clamp(3px, .7cqw, 9px) clamp(4px, .8cqw, 10px);
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    padding: clamp(3px, .6cqw, 9px) clamp(4px, .7cqw, 10px);
     overflow: hidden;
 }
 
+/* Right page has no filter row: header, drag label, slot grid. */
+.sb-page-slots { grid-template-rows: auto auto 1fr; }
+
 /* Pages scroll without a visible scrollbar (the reference shows none). */
-.sb-page-charms, .sb-page-spells { overflow-y: auto; scrollbar-width: none; }
-.sb-page-charms::-webkit-scrollbar, .sb-page-spells::-webkit-scrollbar { width: 0; height: 0; }
+.sb-page-charms, .sb-page-slots { overflow: hidden; }
+.sb-charm-rail { overflow-y: auto; scrollbar-width: none; min-height: 0; padding-bottom: clamp(4px, .6cqw, 9px); }
+.sb-charm-rail::-webkit-scrollbar { width: 0; height: 0; }
+
+/* "Max rank only" filter - TOP-LEFT of the left page (v3.2: it used to
+   share the bottom cluster with the counters; spec puts it top-left). */
+/* v3.6: "Max rank only" is a left-aligned GRID ROW directly under the
+   plaque - the top-left corner of the left page. */
+.sb3-page-filter {
+    display: flex;
+    justify-content: flex-start;
+    margin: 0 0 clamp(1px, .25cqw, 4px);
+}
+
+/* Bottom cluster of the left page (last row of the page grid). */
+.sb3-page-tools {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 /* ---------- section header plaques (gold banner art) -------------------- */
+/* Rows 1 of each page: pinned at the top of the parchment (v3 fix - they
+   used to sit far lower because the currency strip shared the top). */
 .sb3-head {
     flex: 0 0 auto;
-    height: clamp(24px, 4.2cqw, 52px);
-    margin: 0 auto clamp(4px, .8cqw, 10px);
-    width: clamp(120px, 66%, 260px);
+    height: clamp(30px, 4.6cqw, 56px);
+    margin: 0 auto;
+    width: clamp(160px, 72%, 320px);
     background-image: url('../images/Spellbook/spellbook_category_header.webp');
     background-size: 100% 100%;
     background-repeat: no-repeat;
@@ -146,158 +209,215 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
     align-items: center;
     justify-content: center;
     font-family: var(--C);
-    font-weight: 700;
-    font-size: clamp(8px, 1.15cqw, 14px);
-    letter-spacing: clamp(1px, .15cqw, 2px);
+    font-weight: 800;
+    font-size: clamp(11px, 1.4cqw, 18px);
+    letter-spacing: clamp(2px, .2cqw, 3px);
     text-transform: uppercase;
-    color: #f0d896;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .9), 0 0 10px rgba(240, 205, 120, .3);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .5));
+    color: #f5e0a0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .95), 0 0 14px rgba(245, 220, 130, .45);
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, .6));
 }
 
-/* ---------- charms page -------------------------------------------------- */
-/* Currency pills: dark rounded plaques with gold diamonds + gold text. */
+/* ---------- charms page: bottom tool cluster ----------------------------- */
+/* Row 3 of the left page: Lemmas / Theorems on one line, Max rank under it,
+   both centred at the BOTTOM of the page (v3 fix - used to sit under the
+   header, eating the top of the page). */
 .sb3-charm-tools {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(4px, .6cqw, 9px);
-    margin-bottom: clamp(3px, .45cqw, 7px);
-    font-family: var(--F, monospace);
-    font-weight: bold;
-    font-size: clamp(8px, .9cqw, 12px);
-    color: #f0d896;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .8);
+    gap: clamp(8px, 1cqw, 16px);
+    /* v4: match the gold plaque art - carved dark body, gold bevel frame,
+       plaque-style serif lettering (same idiom as .spellbook-plaque). */
+    padding: clamp(2px, .3cqw, 5px) clamp(6px, .9cqw, 12px);
+    background: linear-gradient(180deg, #2e2839 0%, #191523 55%, #0f0d16 100%);
+    border: 2px solid #b89044;
+    border-radius: 999px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 220, 150, .35),
+        inset 0 -2px 4px rgba(0, 0, 0, .7),
+        0 3px 10px rgba(0, 0, 0, .7),
+        0 0 14px rgba(184, 144, 68, .18);
+    font-family: var(--C, var(--F, monospace));
+    font-weight: 700;
+    font-size: clamp(10px, 1.1cqw, 15px);
+    letter-spacing: clamp(.5px, .06cqw, 1.2px);
+    text-transform: uppercase;
+    color: #f5e0a0;
+    text-shadow: 0 1px 0 #5a3d08, 0 2px 4px rgba(0, 0, 0, .95), 0 0 12px rgba(255, 220, 130, .35);
 }
 .sb3-lemma, .sb3-theorem {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: clamp(2px, .3cqw, 5px) clamp(6px, .8cqw, 11px);
-    background: linear-gradient(180deg, #3a3448, #1f1b2b);
-    border: 1px solid #8a6d2f;
+    gap: 6px;
+    padding: clamp(2px, .35cqw, 6px) clamp(10px, 1.2cqw, 16px);
+    background: linear-gradient(180deg, #352e45 0%, #211c2e 60%, #141020 100%);
+    border: 2px solid #a8853c;
     border-radius: 999px;
-    box-shadow: inset 0 1px 0 rgba(255, 220, 150, .18), 0 1px 3px rgba(0, 0, 0, .5);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 220, 150, .3),
+        inset 0 -2px 4px rgba(0, 0, 0, .65),
+        0 2px 6px rgba(0, 0, 0, .6);
 }
-.sb3-lemma::before, .sb3-theorem::before { content: '◆'; font-size: .8em; }
-.sb3-lemma::before { color: #f2c94c; text-shadow: 0 0 6px rgba(245, 197, 24, .9); }
-.sb3-theorem::before { color: #c89bef; text-shadow: 0 0 6px rgba(176, 127, 232, .9); }
-.sb3-lemma b, .sb3-theorem b { color: #ffe9a8; }
+.sb3-lemma::before, .sb3-theorem::before { content: '◆'; font-size: .9em; }
+.sb3-lemma::before { color: #ffd75e; text-shadow: 0 0 8px rgba(245, 197, 24, 1), 0 0 14px rgba(245, 197, 24, .5); }
+.sb3-theorem::before { color: #d5a8f5; text-shadow: 0 0 8px rgba(176, 127, 232, 1), 0 0 14px rgba(176, 127, 232, .5); }
+.sb3-lemma b, .sb3-theorem b {
+    color: #ffe9a8;
+    font-size: 1.12em;
+    text-shadow: 0 0 10px rgba(255, 224, 138, .55);
+}
 
-/* "Max rank only" - dark checkbox + parchment label, like the reference. */
+/* Glow flash on the <b> number when its value increases.
+   The JS re-adds the class per change; animation runs once per add. */
+@keyframes sb3-count-pop {
+    0% { text-shadow: 0 0 10px rgba(255, 224, 138, .55); transform: scale(1); }
+    30% { text-shadow: 0 0 6px #fff, 0 0 18px #ffd75e, 0 0 34px rgba(255, 200, 80, .9); transform: scale(1.35); }
+    100% { text-shadow: 0 0 10px rgba(255, 224, 138, .55); transform: scale(1); }
+}
+.sb3-lemma b.sb3-count-glow, .sb3-theorem b.sb3-count-glow {
+    animation: sb3-count-pop .7s ease-out;
+    display: inline-block;
+    transform-origin: center;
+}
+
+/* "Max rank only" - centred under the currency pills. */
 .sb3-maxrank {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin: 0 auto clamp(4px, .6cqw, 9px);
+    justify-content: center;
+    gap: clamp(4px, .5cqw, 8px);
+    margin: 0;
+    padding: clamp(2px, .3cqw, 5px) clamp(6px, .8cqw, 12px);
+    background: linear-gradient(180deg, rgba(26, 22, 36, .9), rgba(14, 12, 18, .95));
+    border: 2px solid #8a6d2f;
+    border-radius: 999px;
     font-family: var(--F, monospace);
     font-weight: bold;
-    font-size: clamp(8.5px, .95cqw, 12px);
-    color: #2e1d0c;
-    text-shadow: 0 1px 0 rgba(255, 248, 220, .65);
+    font-size: clamp(10px, 1.05cqw, 14px);
+    color: #f0d896;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
     cursor: pointer;
     user-select: none;
 }
 .sb3-maxrank input {
     appearance: none;
     -webkit-appearance: none;
-    width: clamp(10px, 1.15cqw, 15px);
-    height: clamp(10px, 1.15cqw, 15px);
+    width: clamp(14px, 1.5cqw, 20px);
+    height: clamp(14px, 1.5cqw, 20px);
     margin: 0;
-    border: 1px solid #17141f;
-    border-radius: 3px;
+    flex-shrink: 0;
+    border: 2px solid #5a5074;
+    border-radius: 4px;
     background: linear-gradient(180deg, #3a3448, #1f1b2b);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .7);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, .8);
     cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+}
+.sb3-maxrank input:checked {
+    border-color: #c89bef;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, .8), 0 0 10px rgba(176, 127, 232, .6);
 }
 .sb3-maxrank input:checked::after {
     content: '✓';
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #f2d283;
-    font-size: .9em;
-    font-weight: bold;
-    text-shadow: 0 0 4px rgba(245, 205, 120, .8);
+    width: 100%;
+    height: 100%;
+    color: #c89bef;
+    font-size: 1.1em;
+    font-weight: 900;
+    text-shadow: 0 0 6px rgba(176, 127, 232, 1);
 }
 
-.sb3-charm-list {
+.sb-charm-rail {
     display: flex;
     flex-direction: column;
     gap: clamp(3px, .5cqw, 6px);
     padding-right: 2px;
 }
 
-/* One charm row: dark slate bar, number disc hanging on the parchment to its
-   left, glyph, large cream serif name, gold rank at the right. */
+/* One charm row: dark slate bar, number disc on the parchment to its left,
+   glyph, cream serif name, gold rank at the right. */
 .sb3-charm-row {
     position: relative;
-    margin-left: clamp(13px, 1.6cqw, 22px);
+    margin-left: clamp(16px, 2cqw, 28px);
     display: flex;
     align-items: center;
-    gap: clamp(5px, .7cqw, 10px);
-    padding: clamp(3px, .45cqw, 6px) clamp(6px, .8cqw, 11px);
-    min-height: clamp(16px, 2.3cqw, 30px);
-    background-image: linear-gradient(rgba(48, 53, 70, .92), rgba(30, 33, 45, .95)),
+    gap: clamp(8px, 1cqw, 14px);
+    padding: clamp(4px, .5cqw, 8px) clamp(10px, 1.2cqw, 16px);
+    /* v3.4: taller rows (reference look) - the list distributes them over
+       the full rail height via .sb3-charm-list below. */
+    min-height: clamp(30px, 4cqw, 52px);
+    background-image: linear-gradient(rgba(48, 53, 70, .95), rgba(30, 33, 45, .98)),
         url('../images/Spellbook/charm-stone-texture.webp');
     background-size: cover;
     background-position: center;
-    border: 1px solid #5a5474;
-    border-radius: clamp(4px, .5cqw, 8px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 2px 5px rgba(0, 0, 0, .55);
+    border: 2px solid #6a6484;
+    border-radius: clamp(6px, .7cqw, 10px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 3px 8px rgba(0, 0, 0, .6);
     cursor: grab;
     touch-action: none;
     transition: border-color .12s, box-shadow .12s, transform .08s;
 }
+/* v3.4: the list fills the rail and stretches its rows evenly, so the
+   inventory uses the whole page height like the reference art. */
+.sb3-charm-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: clamp(2px, .35cqw, 6px);
+    min-height: 100%;
+}
+
 .sb3-charm-row:hover {
-    border-color: rgba(245, 197, 24, .7);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 3px 10px rgba(0, 0, 0, .55),
-        0 0 14px -4px rgba(245, 197, 24, .6);
-    transform: translateY(-1px);
+    border-color: rgba(255, 200, 100, .85);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 4px 14px rgba(0, 0, 0, .6),
+        0 0 20px -4px rgba(255, 200, 100, .55);
+    transform: translateY(-2px);
 }
 .sb3-charm-row:active { cursor: grabbing; }
 
-/* Plain regular number badge (no art assets for these). */
 .sb3-charm-num {
     position: absolute;
-    left: calc(-1 * clamp(13px, 1.6cqw, 22px));
+    left: calc(-1 * clamp(16px, 2cqw, 28px));
     top: 50%;
     transform: translateY(-50%);
-    flex: 0 0 auto;
-    min-width: clamp(12px, 1.35cqw, 18px);
-    height: clamp(12px, 1.35cqw, 18px);
+    min-width: clamp(16px, 1.8cqw, 24px);
+    height: clamp(16px, 1.8cqw, 24px);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--F, monospace);
-    font-weight: bold;
-    font-size: clamp(6.5px, .72cqw, 10px);
-    color: #ece2c8;
-    background: linear-gradient(180deg, #3a3448, #1f1b2b);
-    border: 1px solid #55506a;
+    font-weight: 900;
+    font-size: clamp(8px, .9cqw, 12px);
+    color: #ffe9a8;
+    background: linear-gradient(180deg, #2a2538, #14121a);
+    border: 2px solid #6a6484;
     border-radius: 50%;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .8);
-    text-shadow: 0 1px 1px rgba(0, 0, 0, .8);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .9), 0 0 8px rgba(255, 220, 150, .4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
 }
 
 .sb3-charm-glyph {
     flex: 0 0 auto;
-    font-size: clamp(12px, 1.4cqw, 18px);
+    font-size: clamp(16px, 1.8cqw, 24px);
     line-height: 1;
-    filter: drop-shadow(0 0 5px rgba(176, 127, 232, .5));
+    filter: drop-shadow(0 0 8px rgba(176, 127, 232, .6));
 }
 
 .sb3-charm-name {
     flex: 1 1 auto;
     min-width: 0;
     font-family: var(--C);
-    font-weight: 600;
-    font-size: clamp(8px, 1.05cqw, 14px);
+    font-weight: 700;
+    font-size: clamp(10px, 1.2cqw, 16px);
     letter-spacing: .02em;
-    color: #ece2c8;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
+    color: #f5e8d0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .95);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -307,106 +427,163 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
     flex: 0 0 auto;
     font-family: var(--F, monospace);
     font-weight: bold;
-    font-size: clamp(7.5px, .8cqw, 11px);
-    color: #f0c869;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+    font-size: clamp(9px, 1cqw, 13px);
+    color: #f5d07a;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
 }
 
 .sb3-charm-orbs {
     flex: 0 0 auto;
     font-family: var(--F, monospace);
     font-weight: bold;
-    font-size: clamp(7px, .75cqw, 10px);
+    font-size: clamp(8px, .85cqw, 12px);
     color: #7fd9ff;
-    text-shadow: 0 0 6px rgba(127, 217, 255, .7);
+    text-shadow: 0 0 8px rgba(127, 217, 255, .8);
 }
 
 /* ---------- spell slots page -------------------------------------------- */
+/* "DRAG A CHARM HERE" pill under the header, grid fills the rest. */
 .sb3-drag-label {
     flex: 0 0 auto;
     text-align: center;
     font-family: var(--C);
-    font-size: clamp(9px, 1.05cqw, 14px);
-    font-weight: 700;
-    letter-spacing: clamp(1px, .15cqw, 2px);
+    font-size: clamp(11px, 1.25cqw, 16px);
+    font-weight: 800;
+    letter-spacing: clamp(1.5px, .2cqw, 3px);
     text-transform: uppercase;
     color: #fdf7e3;
-    text-shadow: 0 1px 2px rgba(60, 38, 12, .85), 0 0 6px rgba(60, 38, 12, .4);
-    margin-bottom: clamp(3px, .6cqw, 9px);
+    text-shadow: 0 1px 3px rgba(60, 38, 12, .9), 0 0 10px rgba(60, 38, 12, .5);
+    margin: 0;
+    padding: clamp(3px, .4cqw, 6px) clamp(8px, 1cqw, 14px);
+    background: linear-gradient(180deg, rgba(60, 38, 12, .8), rgba(30, 20, 8, .9));
+    border: 1px solid rgba(200, 150, 80, .4);
+    border-radius: 999px;
 }
 
+/* The 2 × 5 spell slot grid - matching the hotbar layout (5 cols × 2 rows).
+   Each grid cell is a column: number row on top, socket below. */
 .sb3-slot-grid {
     flex: 1 1 auto;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: minmax(0, 1fr);
-    gap: clamp(4px, .8cqw, 12px) clamp(4px, .6cqw, 9px);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-rows: 1fr 1fr;
+    gap: clamp(8px, 1cqw, 16px) clamp(4px, .7cqw, 10px);
     align-content: center;
     min-height: 0;
 }
 
-/* One socket: the spell_slot art, element glow when filled. */
+/* One socket: the spell_slot art with its number floating ABOVE it.
+   v3.1: the head+socket group is centred in the cell so uneven row heights
+   don't park the art at the top. */
 .sb3-slot {
     position: relative;
-    background-image: url('../images/Spellbook/spell_slot.webp');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1px;
+    min-height: 0;
     touch-action: none;
-    transition: transform .12s, filter .12s;
+}
+
+/* Number disc ABOVE the socket (v3 fix - was clipped under the art).
+   v4: Cinzel to match the charm/spell name lettering (was pixel font). */
+.sb3-slot-head {
+    flex: 0 0 auto;
+    min-width: clamp(15px, 1.7cqw, 24px);
+    height: clamp(15px, 1.7cqw, 24px);
+    padding: 0 3px;
+    margin-bottom: clamp(2px, .3cqw, 5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--C, serif);
+    font-size: clamp(10px, 1.15cqw, 16px);
+    font-weight: 700;
+    letter-spacing: 0;
+    color: #ffe9a8;
+    background: linear-gradient(180deg, #2a2538, #14121a);
+    border: 2px solid #6a6484;
+    border-radius: 999px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .9), 0 0 8px rgba(255, 220, 150, .35);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .95);
+    line-height: 1;
+}
+
+/* The octagonal socket art: a square box (the art renders contained, so it
+   never distorts) that shrinks to fit the cell. Icon-only content now -
+   centred inside the octagon's inner circle. */
+.sb3-slot-socket {
+    position: relative;
+    flex: 0 1 auto;
+    width: 100%;
+    aspect-ratio: 1;
+    max-height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-image: url('../images/Spellbook/spell_slot.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .5));
+    transition: transform .12s, filter .12s;
 }
 .sb3-slot.is-filled { cursor: grab; }
 .sb3-slot.is-filled:active { cursor: grabbing; }
-.sb3-slot.is-filled:hover { transform: scale(1.06); z-index: 2; }
-
-.sb3-slot-num {
-    position: absolute;
-    top: 4%;
-    left: 12%;
-    font-family: var(--PX, monospace);
-    font-size: clamp(6px, .65cqw, 9px);
-    color: rgba(220, 210, 235, .55);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
-}
+.sb3-slot.is-filled .sb3-slot-socket:hover { transform: scale(1.06); }
 
 .sb3-slot-icon {
-    font-size: clamp(14px, 1.8cqw, 26px);
+    flex: 0 0 auto;
+    font-size: clamp(15px, 1.9cqw, 27px);
     line-height: 1;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8));
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .85));
 }
 
-.sb3-slot-name {
-    max-width: 92%;
-    font-family: var(--PX, monospace);
-    font-size: clamp(5.5px, .62cqw, 8px);
-    line-height: 1.25;
+/* Name (+orb bonus) on the parchment UNDER the socket, mirroring the
+   number disc above it - v3.1: used to live inside the octagon and
+   overflowed onto the neighbouring sockets. */
+.sb3-slot-foot {
+    flex: 0 0 auto;
+    max-width: 100%;
+    margin-top: clamp(1px, .2cqw, 4px);
+    font-family: var(--C, 'Cinzel', serif);
+    font-size: clamp(7.5px, .8cqw, 11.5px);
+    font-weight: 700;
+    line-height: 1.15;
     text-align: center;
-    color: #f3ead2;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, .95);
-    white-space: normal;
-    overflow-wrap: anywhere;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    color: #4a2c12;
+    text-shadow: 0 1px 0 rgba(255, 240, 200, .55);
+    /* v3.6: single line like the reference (name + orb bonus share it);
+       long names ellipsize instead of wrapping into the fold crease. */
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sb3-slot-orbs {
+    flex: 0 0 auto;
+    font-style: normal;
     font-family: var(--PX, monospace);
-    font-size: clamp(5.5px, .6cqw, 8px);
+    font-size: clamp(6px, .68cqw, 9px);
     color: #7fd9ff;
-    text-shadow: 0 0 5px rgba(127, 217, 255, .7);
+    text-shadow: 0 0 6px rgba(127, 217, 255, .8);
 }
 
-/* The in-page slot count is redundant with the footer meter and clipped on
-   short pages - hidden; the footer carries the number. */
-.sb3-slots-count { display: none; }
+/* Legacy in-socket name/orbs styles - kept harmless (slots now render the
+   label in .sb3-slot-foot on the parchment below the socket). */
+.sb3-slot-name { display: none; }
+
+.sb3-slot-orbs {
+    flex: 0 0 auto;
+    font-family: var(--C, 'Cinzel', serif);
+    font-size: clamp(7px, .7cqw, 10px);
+    font-weight: 700;
+    color: #7fd9ff;
+    text-shadow: 0 0 6px rgba(127, 217, 255, .8);
+}
 
 /* ---------- spells page (stones) ---------------------------------------- */
 .sb3-school-title {
@@ -419,8 +596,6 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
     text-transform: uppercase;
     margin: clamp(2px, .5cqw, 8px) 0 clamp(4px, .7cqw, 10px);
     text-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 0 14px var(--sb-glow, transparent);
-    /* The reference tints each school title with its element but keeps it
-       warm - hence the mix with parchment gold. */
     color: color-mix(in srgb, var(--sb-title, #8a6a2a) 55%, #e8c987);
 }
 
@@ -457,8 +632,6 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
 .sb3-stone:active { cursor: grabbing; }
 .sb3-stone:hover { transform: translateY(-2px) scale(1.04); z-index: 2; }
 
-/* Class-upgrade artwork used as a spell icon: sized to the stone's inner
-   window (the carved recess), never the image's natural size. */
 .sb3-stone-img {
     flex: 0 0 auto;
     width: 52%;
@@ -522,9 +695,7 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
     box-shadow: 0 0 9px -1px rgba(245, 197, 24, .9);
 }
 
-/* ---------- ELEMENT GLOWS ------------------------------------------------
-   Every element-carrying node (stone, socket, glyph, section title) passes
-   the element as data-school; the glow colours are defined once here. */
+/* ---------- ELEMENT GLOWS ------------------------------------------------ */
 
 [data-school="fire"]     { --sb-glow: rgba(255, 110, 40, .95); }
 [data-school="frost"]    { --sb-glow: rgba(90, 190, 255, .95); }
@@ -555,11 +726,83 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
 .mathmagician  { --sb-glow: rgba(255, 170, 90, .9); }
 .probabilist   { --sb-glow: rgba(150, 255, 170, .9); }
 
+/* Class keys on the parchment feet (--sb-title, dark enough for paper). */
+[data-school="mathmagician"]  { --sb-title: #8a4a10; }
+[data-school="statistician"]  { --sb-title: #1a5a8a; }
+[data-school="probabilist"]   { --sb-title: #1f6a30; }
+[data-school="outlier"]       { --sb-title: #8a2a20; }
+[data-school="actuary"]       { --sb-title: #8a5a00; }
+[data-school="recursionist"]  { --sb-title: #5a2a7a; }
+[data-school="markovian"]     { --sb-title: #1a5a7a; }
+[data-school="bayesian"]      { --sb-title: #1f6a30; }
+[data-school="random_walker"] { --sb-title: #0f6a5a; }
+
+/* ---------- ELEMENT-COLORED SKILL NAMES (v3.3) --------------------------- */
+/* Light palette (--sb-el): on the dark inventory rows + tooltip titles.
+   Parchment palette (--sb-title above): on the slot feet under the sockets. */
+[data-school="fire"]      { --sb-el: #ff9a5c; }
+[data-school="frost"],
+[data-school="cold"]      { --sb-el: #7cc4ff; }
+[data-school="lightning"] { --sb-el: #c9a2ff; }
+[data-school="shadow"]    { --sb-el: #b58ae0; }
+[data-school="nature"]    { --sb-el: #6fe07f; }
+[data-school="holy"]      { --sb-el: #ffe08a; }
+[data-school="arcane"]    { --sb-el: #cf9df2; }
+[data-school="physical"]  { --sb-el: #e8dcc0; }
+[data-school="blood"]     { --sb-el: #ff6a7a; }
+[data-school="air"]       { --sb-el: #a5e9ff; }
+/* Class / ascendency skills carry their class key as data-school. */
+[data-school="mathmagician"]  { --sb-el: #ffaa5a; }
+[data-school="statistician"]  { --sb-el: #78beff; }
+[data-school="probabilist"]   { --sb-el: #96ffaa; }
+[data-school="outlier"]       { --sb-el: #f1948a; }
+[data-school="actuary"]       { --sb-el: #f0a500; }
+[data-school="recursionist"]  { --sb-el: #bb8fce; }
+[data-school="markovian"]     { --sb-el: #7fb3d3; }
+[data-school="bayesian"]      { --sb-el: #58d68d; }
+[data-school="random_walker"] { --sb-el: #48c9b0; }
+
+/* Inventory rows: the skill name takes the element colour. */
+.sb3-charm-row[data-school] .sb3-charm-name {
+    color: var(--sb-el, #f5e8d0);
+}
+
+/* Filled socket feet: parchment-safe element colour (the dark --sb-title
+   set) so the label stays readable on the paper. */
+.sb3-slot.is-filled[data-school] .sb3-slot-foot {
+    color: var(--sb-title, #4a2c12);
+    font-weight: 900;
+}
+
+/* Charm tooltip title picks up the element colour too. */
+.charm-tip[data-school] .skl-tip-title { color: var(--sb-el, #f0d090); }
+
+/* ---------- SLOTTED INDICATOR (v3.3) ------------------------------------- */
+/* A charm sitting in a spell slot: cyan edge + the slot number chip. */
+.sb3-charm-row.is-slotted {
+    border-color: rgba(102, 252, 241, .55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12),
+        0 0 14px -4px rgba(102, 252, 241, .55);
+}
+.sb3-charm-slotref {
+    flex: 0 0 auto;
+    font-family: var(--PX, monospace);
+    font-size: clamp(8px, .85cqw, 12px);
+    font-weight: 900;
+    color: #66fcf1;
+    text-shadow: 0 0 7px rgba(102, 252, 241, .65);
+    padding: 1px clamp(4px, .5cqw, 7px);
+    border: 1px solid rgba(102, 252, 241, .45);
+    border-radius: 999px;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
 /* Filled socket: glowing rim + aura in the element colour. */
-.sb3-slot.is-filled[data-school] {
+.sb3-slot.is-filled[data-school] .sb3-slot-socket {
     filter: drop-shadow(0 0 9px var(--sb-glow)) drop-shadow(0 2px 4px rgba(0, 0, 0, .5));
 }
-.sb3-slot.is-filled[data-school]::after {
+.sb3-slot.is-filled[data-school] .sb3-slot-socket::after {
     content: '';
     position: absolute;
     inset: 14% 16%;
@@ -569,7 +812,7 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
     pointer-events: none;
     z-index: 0;
 }
-.sb3-slot.is-filled[data-school] > * { position: relative; z-index: 1; }
+.sb3-slot.is-filled[data-school] .sb3-slot-socket > * { position: relative; z-index: 1; }
 
 /* Spell stone: glowing frame in the element colour. */
 .sb3-stone[data-school] {
@@ -586,38 +829,27 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
 }
 .sb3-stone[data-school]:hover::before { opacity: 1; }
 
-
-/* ---------- footer meters ------------------------------------------------
-   Reference: wide dark meters across the frame's bottom band, cream labels
-   sitting above each bar, the art's center gem between them. */
-.spellbook-footer {
-    position: absolute;
-    left: 19.5%;
-    right: 19%;
-    bottom: 3.4%;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: clamp(30px, 8cqw, 130px);
-    z-index: 3;
-}
+/* ---------- footer meter ------------------------------------------------
+   v3.6: the meter element is generic; it is POSITIONED by the frame-strip
+   host (.spellbook-strips / .sb3-strip-right above) so it lands exactly on
+   the art's carved right band. */
 
 .sb3-meter {
-    flex: 1 1 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: clamp(2px, .35cqw, 5px);
-    min-width: 0;
 }
 
 .sb3-meter-label {
     flex: 0 0 auto;
     font-family: var(--F, monospace);
     font-weight: bold;
-    font-size: clamp(8px, .95cqw, 13px);
+    font-size: clamp(9px, 1cqw, 14px);
     color: #ece2c8;
     text-shadow: 0 1px 3px rgba(0, 0, 0, .95);
     white-space: nowrap;
+    text-align: right;
 }
 
 .sb3-meter-track {
@@ -647,6 +879,8 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
 
 /* ---------- legacy hooks kept quiet -------------------------------------- */
 .spellbook-hint { display: none; }
+/* The in-page slot count is redundant with the footer meter. */
+.sb3-slots-count { display: none; }
 
 /* Empty spells page. */
 .spellbook-empty {
@@ -658,14 +892,68 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box {
     padding: 24px 12px;
 }
 
-/* ---------- compact frames ------------------------------------------------ */
-@container (max-width: 860px) {
-    .spellbook-body { grid-template-columns: 1fr; grid-template-rows: minmax(120px, 1fr) minmax(140px, auto); }
-    .spellbook-page { overflow-y: auto; }
+/* Empty inventory note sits centred in the scroll rail. */
+.charm-inv-empty {
+    text-align: center;
+    font-family: var(--PX, monospace);
+    font-size: clamp(9px, 1cqw, 13px);
+    line-height: 1.8;
+    color: #6a4a20;
+    padding: 24px 12px;
 }
 
+/* ---------- compact frames ------------------------------------------------ */
+/* v3.4: NO stacked breakpoint. Every inner dimension is container-relative
+   (cqw clamps), so the two-page layout scales down proportionally like the
+   art itself. The old <=860px stack collapsed the charm rail to a sliver and
+   detached the content from the parchment; side-by-side at every size keeps
+   the book identical at 800x600 and 2560x1440. */
+
+/* ---------- frame strips (v3.6) ------------------------------------------- */
+/* The art's carved bottom bands (y 88-97.5%): counters live on the LEFT
+   strip, the spell-slot meter on the RIGHT strip. Measured x-zones avoid
+   the corner garnish (left x 5.5-39%, right x 52-89%, clasp at 50%). */
+.spellbook-strips {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 88%;
+    height: 9.5%;
+    display: flex;
+    align-items: stretch;
+    pointer-events: none;
+    z-index: 4;
+}
+.sb3-strip { position: relative; pointer-events: auto; }
+.sb3-strip-left  { position: absolute; left: 5.5%; width: 33.5%; top: 0; height: 100%;
+    display: flex; align-items: center; justify-content: flex-start; }
+.sb3-strip-right { position: absolute; left: 52%; width: 37%; top: 0; height: 100%;
+    display: flex; align-items: center; justify-content: center; }
+
+/* Counters: keep the pill look, sized to the strip band. */
+.sb3-strip-left .sb3-charm-tools {
+    margin: 0;
+    transform: scale(.92);
+    transform-origin: left center;
+}
+
+/* Meter: label above a slim track, both centred on the strip band, matching
+   the reference ("Spell Slots 8 / 10" art). */
+.sb3-strip-right .sb3-meter {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1px, .2cqw, 3px);
+}
+.sb3-strip-right .sb3-meter-label {
+    text-align: center;
+    font-size: clamp(9px, 1.05cqw, 15px);
+}
+.sb3-strip-right .sb3-meter-track { width: 100%; }
+
 /* Charm drop-target highlight (drag & drop from skill-charms.js). */
-.sb3-slot.drop-target {
+.sb3-slot.drop-target .sb3-slot-socket {
     filter: drop-shadow(0 0 10px rgba(79, 195, 247, .95)) drop-shadow(0 2px 4px rgba(0, 0, 0, .5)) brightness(1.35);
     transform: scale(1.08);
 }

@@ -43,7 +43,7 @@ export function _egMechRisingTide(monster, phase) {
     const tideSpeed = [0, 90, 110, 135][p];
     const tideDot = [0, 12, 14, 17][p];
     const debrisN = [0, 5, 7, 9][p];
-    const debrisSpeed = 260, debrisR = 16;
+    const debrisSpeed = 260;
     const debrisDmg = [0, 0.07, 0.08, 0.10][p];
     const durMs = 9000;
     const run = _egNkNewRun(monster && monster.id, true);

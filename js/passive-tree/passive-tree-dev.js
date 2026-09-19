@@ -88,7 +88,6 @@ let _dpt_svg = null;
 let _dpt_nodesLayer = null;
 let _dpt_tooltip = null;
 let _dpt_nodeEls = {};
-let _dpt_connEls = {};
 
 // Viewport transform state.
 let _dpt_scale = 1.0;
@@ -150,7 +149,11 @@ function _dptGetNodeTier(def) {
 
 // Populates _dpt_skills / _dpt_skillMap from TALENT_TREE_DEV_DATA.
 function _dptInitSkills() {
-    _dpt_skills = TALENT_TREE_DEV_DATA.nodes.map(n => ({
+    // Explicit bridge: the data lives in the shared classic-script scope
+    // (passive-tree-dev-data.js); referencing it through globalThis makes the
+    // cross-file dependency visible to static analysis.
+    const DEV_DATA = globalThis.TALENT_TREE_DEV_DATA;
+    _dpt_skills = DEV_DATA.nodes.map(n => ({
         id: n.id,
         x: n.x,
         y: n.y,
@@ -168,8 +171,8 @@ function _dptBuildAdjacency() {
     _dpt_adjacency = {};
     _dpt_skills.forEach(s => { _dpt_adjacency[s.id] = new Set(); });
     _dpt_links = [];
-    const conns = (typeof TALENT_TREE_DEV_DATA !== 'undefined'
-        && TALENT_TREE_DEV_DATA.connections) || [];
+    const DEV_DATA = globalThis.TALENT_TREE_DEV_DATA;
+    const conns = (DEV_DATA && DEV_DATA.connections) || [];
     const seen = new Set();
     conns.forEach(c => {
         const a = c.from, b = c.to;
@@ -1346,7 +1349,6 @@ function _dptResetRenderState() {
     old.parentNode.replaceChild(_dpt_container, old);
 
     _dpt_nodeEls = {};
-    _dpt_connEls = {};
 
     if (_dpt_tooltip) { _dpt_tooltip.remove(); _dpt_tooltip = null; }
 
@@ -1398,27 +1400,6 @@ function _dptCreateNodesLayer(worldW, worldH) {
         height: ${worldH}px;
     `;
     return layer;
-}
-
-// Draws one big translucent category label above a cluster origin.
-function _dptDrawClusterLabel(text, x, y, color) {
-    const el = document.createElement('div');
-    el.textContent = text;
-    el.style.cssText = `
-        position: absolute;
-        left: ${x}px;
-        top: ${y}px;
-        font-family: var(--PX, monospace);
-        font-size: 88px;
-        letter-spacing: 14px;
-        color: ${color};
-        opacity: 0.18;
-        pointer-events: none;
-        user-select: none;
-        white-space: nowrap;
-        z-index: 1;
-    `;
-    _dpt_nodesLayer.appendChild(el);
 }
 
 // Draws the connection lines (inherited PoE1 wheel-and-spoke skeleton) into
@@ -1506,3 +1487,8 @@ function dptGoBack() {
     screenHistory.pop(); // discard the entry showDevPassiveTree() pushed
     switchScreen('screen-mode-select');
 }
+
+// Explicit bridges: title-bindings.js invokes these via globalThis.*
+// (classic-script cross-file calls are invisible to static analysis).
+globalThis.showDevPassiveTree = showDevPassiveTree;
+globalThis.dptGoBack = dptGoBack;

@@ -257,7 +257,6 @@ export function _egCoilArenaInit(monster) {
             // Spawn the next ring when its slot comes up.
             const due = cn.spawned * (EG_COIL_CON_WARN_MS + EG_COIL_CON_GAP_MS);
             if (cn.spawned < cn.total && cn.t >= due) {
-                const idx = cn.spawned;
                 const ring = _egNkEl(st.run, 'div', 'eg-coil-ring');
                 ring.style.width = ring.style.height = (cn.r0 * 2) + 'px';
                 ring.style.left = (cn.cx - cn.r0) + 'px';
@@ -421,7 +420,6 @@ export function _egCoilTide(st, p) {
 
 export function _egCoilCobraStrike(monster) {
     if (_egCoilCobraActive || _egNkDodgeBusy() || _egNkFrozen()) return;
-    const st = _egCoilWatcher;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(monster ? monster.id : null, true);

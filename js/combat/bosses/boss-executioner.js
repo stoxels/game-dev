@@ -43,7 +43,6 @@ export function _egMechAxePendulum(monster, phase) {
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const periodMs = [0, 2600, 2200, 1800][p];
     const swing = 1.1; // radians either side of straight down
-    const bladeR = 34;
     const dmgPct = [0, 0.24, 0.28, 0.34][p];
     const durMs = 10000;
     const run = _egNkNewRun(monster && monster.id, true);

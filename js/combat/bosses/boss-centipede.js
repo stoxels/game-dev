@@ -133,7 +133,7 @@ export function _egCentAdvance(st, body, dtS, now, pr, speed, hitPct) {
         // Committed bait charge: straight at the spot the player stood when
         // the mini popped out.
         const lx = body.lock.x - head.x, ly = body.lock.y - head.y;
-        const ld = Math.hypot(lx, ly) || 1;
+        Math.hypot(lx, ly) || 1;
         head.a = Math.atan2(ly, lx);
         ang = head.a;
     } else {
@@ -141,7 +141,7 @@ export function _egCentAdvance(st, body, dtS, now, pr, speed, hitPct) {
         // Head steers loosely toward the player, wobbling as it goes.
         if (c) {
             const dx = c.x - head.x, dy = c.y - head.y;
-            const d = Math.hypot(dx, dy) || 1;
+            Math.hypot(dx, dy) || 1;
             head.a = head.a == null ? Math.atan2(dy, dx) : head.a;
             let want = Math.atan2(dy, dx);
             let diff = want - head.a;

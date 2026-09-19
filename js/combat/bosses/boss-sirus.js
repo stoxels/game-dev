@@ -305,7 +305,7 @@ export function _egMechSirChain(monster, phase) {
         bolts.push({ x: (i === 0 ? 60 : W - 60), y: 60 + Math.random() * Math.max(60, H - 120), el, life: EG_SIR_BOLT_LIFE[p] * _EG_SIR_DEBUG_MULT, grounded: false });
     }
 
-    const t0 = performance.now();
+    performance.now();
     _egNkLoop(run, (dtS, now) => {
         const pc = _egSirPC();
         const pr = _egNkPlayerRect();

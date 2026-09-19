@@ -200,7 +200,6 @@ export function _buildColClueHeaderRows(colClues, maxColDepth, maxRowWidth, cols
 //   fontSize - px font size
 //   colWidth - px width of each row-clue column (see _calcClueColWidth)
 export function _buildRowClueCell(row, clueIdx, padLeft, value, fontSize, colWidth) {
-    const leftPx = (padLeft + clueIdx) * colWidth;
     return `<td class="rct rct-${row}${window._shadowSealActive ? ' clue-blackout' : ''}" id="rct-${row}-${clueIdx}"` +
         ` style="font-size:${fontSize}px">` +
         `<div class="rcinner"><span id="rn-${row}-${clueIdx}" style="font-size:${fontSize}px">${value}</span></div>` +
@@ -1047,8 +1046,6 @@ export function updClues(row, col, isInitial = false) {
     if (!cur) return;
 
     const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
 
     // --- Row clue state - always updated so passive reveals at puzzle start
     // (central_tendency, marginal_distribution, maximum_likelihood) correctly

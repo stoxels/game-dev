@@ -3415,7 +3415,7 @@ export const ACHIEVEMENT_DEFS = [
     {
         id: 'eg_boss_variety',
         category: 'endgame',
-        icon: '🧿',
+        icon: '💫',
         nameEn: 'Pantheon',
         nameDE: 'Pantheon',
         descEn: 'Defeat each of the 5 unique endgame bosses at least once.',

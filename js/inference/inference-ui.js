@@ -577,7 +577,7 @@ export function _ledger_renderDetailView(modal) {
  */
 export function renderQuestLog() {
     const modal = document.getElementById('quest-log-modal');
-    const hasShow = modal?.classList.contains('show');
+    modal?.classList.contains('show');
     if (!modal || !modal.classList.contains('show')) return;
 
     if (_ledger_activeCategoryId) {

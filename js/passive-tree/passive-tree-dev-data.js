@@ -39413,3 +39413,7 @@ const TALENT_TREE_DEV_DATA = {
   }
  ]
 };
+
+// Explicit globalThis bridge: passive-tree-dev.js (classic script) reads
+// this constant across files via the shared global scope.
+globalThis.TALENT_TREE_DEV_DATA = TALENT_TREE_DEV_DATA;

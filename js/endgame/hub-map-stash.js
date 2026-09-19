@@ -57,7 +57,7 @@ export function _egGetMapStashRowsForTier(tier) {
     return _egGetMapTierGrid(tier).length;
 }
 export function _egEnsureMapTierRows(tier, minRows) {
-    const idx = _egMapTierToIndex(tier);
+    _egMapTierToIndex(tier);
     let grid = _egGetMapTierGrid(tier);
     if (grid.length >= minRows) return;
     for (let i = grid.length; i < minRows; i++) grid.push(Array(EG_MAP_STASH_COLS).fill(null));

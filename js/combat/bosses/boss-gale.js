@@ -375,7 +375,7 @@ export function _egGaleTickLadder(st, dtS, pr) {
                 // Lift: hit + strong upward fling (once per twister).
                 if (!tw.hit) {
                     tw.hit = true;
-                    const p = _egGalPhase(st);
+                    _egGalPhase(st);
                     const dealt = _egNkHit(EG_GAL_LADDER_DMG, 'cold', st.level);
                     _egNkAbilityHitToast(dealt, 'The Gale', 'Tornado');
                     _egNkFlingAvatar(0, -EG_GAL_LADDER_DMG * 900, tw.x, tw.y);
@@ -414,7 +414,6 @@ export function _egGaleContract(st, now) {
 export function _egGaleTickRings(st, dtS, c) {
     const rg = st.rings;
     if (!rg) return;
-    const W = window.innerWidth, H = window.innerHeight;
     rg.t += dtS * 1000;
     const ex = st.eye.x, ey = st.eye.y;
     // Spawn the next ring on schedule.

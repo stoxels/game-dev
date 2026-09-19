@@ -556,7 +556,6 @@ export function _questStats_trackComboQuests(payload) {
     const qs = _qs;
     const { cells } = _getCurrentGridInfo();
     const isMassive = cells >= 400;
-    const mods = payload.mods || {};
 
     // -- Manual threshold checks (can't easily be expressed as declarative conditions) --
 

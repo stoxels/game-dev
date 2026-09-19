@@ -68,9 +68,8 @@ export function _egMechBulletWalls(monster, phase) {
         q.fired = true;
     };
     _egNkToast('eg_mech_barricade', '🚧 The Barricade: Bullet Walls! Track the gap!');
-    let e = 0, cdUntil = 0;
+    let cdUntil = 0;
     _egNkLoop(run, (dtS, now) => {
-        e += dtS * 1000;
         let pending = false;
         const pr = _egNkPlayerRect();
         queue.forEach(q => {

@@ -458,7 +458,7 @@ export function confirmClassChange(cid) {
     const def = CLASS_DEFS[cid];
     Audio_Manager.playSFX('classSelected');
     globalThis.showToast(`🔄 ${_clsGetLocalizedName(def)} ${t('cls_selected_toast')}`);
-    if (typeof globalThis.showToast === 'function') globalThis.showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
+    if (typeof globalThis.showToast === 'function') globalThis.showToast(`💫 ${t('charm_class_granted_toast')}`, '#8fd3ff');
     updateQuestStats('classChosen', {});
 
     closeClassOverlay();
@@ -680,7 +680,7 @@ export function confirmClassSelection(cid) {
     // A fresh class starts with an empty/patchy hotbar, so point the player at
     // the spell book where they pick and drag their new skills onto the bar.
     if (typeof globalThis.showToast === 'function') globalThis.showToast(t('spellbook_after_class_hint'), '#ffd27f');
-    if (typeof globalThis.showToast === 'function') globalThis.showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
+    if (typeof globalThis.showToast === 'function') globalThis.showToast(`💫 ${t('charm_class_granted_toast')}`, '#8fd3ff');
     updateQuestStats('classChosen', {});
 
     closeClassOverlay();
@@ -883,7 +883,7 @@ export function _showCharmGrantToast(skillId, rank, hadCharm, promoted) {
     if (typeof globalThis.showToast !== 'function') return;
     const name = (typeof getSkillName === 'function') ? getSkillName(skillId) : skillId;
     const key = promoted ? 'charm_rank_equipped_toast' : 'charm_rank_granted_toast';
-    globalThis.showToast(`🧿 ${t(key).replace('{n}', name).replace('{r}', rank)}`, '#8fd3ff');
+    globalThis.showToast(`💫 ${t(key).replace('{n}', name).replace('{r}', rank)}`, '#8fd3ff');
 }
 
 
@@ -1002,7 +1002,7 @@ export function confirmAscendencySelection(aid) {
 
     Audio_Manager.playSFX('classSelected');
     globalThis.showToast(`✨ ${ascName} ${chosenLabel}`);
-    if (typeof globalThis.showToast === 'function') globalThis.showToast(`🧿 ${t('charm_class_granted_toast')}`, '#8fd3ff');
+    if (typeof globalThis.showToast === 'function') globalThis.showToast(`💫 ${t('charm_class_granted_toast')}`, '#8fd3ff');
     updateQuestStats('ascendencyChosen', {});
     trackAchStat('ascendencyChosen');
     closeClassOverlay();

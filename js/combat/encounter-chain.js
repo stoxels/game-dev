@@ -813,7 +813,6 @@ export function _egPuzzlePassesCriteria(level, criteria) {
 
 export function _egBuildChainPool(criteria) {
     const avoidRecent = criteria.avoidRecent !== false;
-    const window = criteria.recentWindow || 8;
 
     let pool = globalThis.ALL.filter(level =>
         !level.isEndgameSandbox &&

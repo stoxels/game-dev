@@ -1304,7 +1304,6 @@ export function _egHzSpawnFrostNova() {
 
 export function _egHzTickFrostNova(dtMs) {
     const st = _egHzFrostNova;
-    const dtS = dtMs / 1000;
 
     st.nextIn -= dtMs;
     if (st.nextIn <= 0) {

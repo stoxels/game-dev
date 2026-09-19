@@ -113,7 +113,7 @@ export function _egMechSwSwarmArc(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
-    const W = window.innerWidth, H = window.innerHeight;
+    const W = window.innerWidth;
     const run = _egNkNewRun(monster && monster.id, true);
     const side = Math.random() < 0.5 ? -1 : 1;
     const pivotX = side < 0 ? W * 0.5 : W * 0.5;
@@ -134,7 +134,7 @@ export function _egMechSwSwarmArc(monster, phase) {
     _egNkLoop(run, (dtS) => {
         arcT += dtS;
         ang -= angSpd * dtS * side;
-        const ca = Math.cos(ang), sa = Math.sin(ang);
+        Math.cos(ang), Math.sin(ang);
         // Wedge advance: each drone rides the arc with a lateral offset.
         drones.forEach((d, i) => {
             const swing = (i - (EG_SW_WEDGE - 1) / 2) * 0.055;   // slight fan

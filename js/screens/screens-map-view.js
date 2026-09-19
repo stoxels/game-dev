@@ -1649,8 +1649,8 @@ export function _attachWaypointDebugLogger(canvas) {
         const clickX = e.clientX - rect.left;
         const clickY = e.clientY - rect.top;
 
-        const imgPctX = ((clickX - imgX) / imgW * 100).toFixed(1);
-        const imgPctY = ((clickY - imgY) / imgH * 100).toFixed(1);
+        ((clickX - imgX) / imgW * 100).toFixed(1);
+        ((clickY - imgY) / imgH * 100).toFixed(1);
 
         //console.log(`{ x: ${imgPctX}, y: ${imgPctY} },`);
     });

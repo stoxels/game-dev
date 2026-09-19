@@ -311,7 +311,6 @@ export const EG_ENTR_CELL_CAP    = 9;
 export function _egMechEntrDecay(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
     _egNkToast('eg_mech_entr_decay', '♾️🦠 RECURSIVE DECAY - the cells spread! Stand on them to burn them out!', '#86efac');
@@ -377,7 +376,7 @@ export function _egMechEntrDoor(monster, phase) {
     _egNkLoop(run, (dtS) => {
         t += dtS * 1000;
         const pc = _egEntrPC();
-        const now = performance.now();
+        performance.now();
         if (Math.hypot(pc.x - W * 0.08, pc.y - y) < 50) {
             _egEntrApplyHot();
             return false;

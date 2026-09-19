@@ -513,7 +513,6 @@ export function _egRollMapRunBaseline(map) {
 export function _egApplyModsToBaseline(base, map) {
     const mods = Array.isArray(map.mods) ? map.mods : [];
     const hasImplicits = !!(map && map.implicits);
-    const imp = (map && map.implicits) ? map.implicits : null;
     const tier = Math.max(1, (map && map.mapTier) || 1);
 
     mods.forEach(mod => {

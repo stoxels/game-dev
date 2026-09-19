@@ -123,7 +123,6 @@ export function _egMechVisWalls(monster, phase) {
 
     const t0 = performance.now();
     let distAcc = 0;
-    const last = { ts: t0 };
 
     _egNkLoop(run, (dtS, now) => {
         const t = (now - t0) / 1000;
@@ -255,7 +254,7 @@ export function _egMechVisBench(monster, phase) {
         slices.push({ y, warn, jawL, jawR, warnUntil: performance.now() + EG_VIS_BENCH_WARN * _EG_VIS_DEBUG_MULT, bitten: false, strainUntil: 0 });
     }
 
-    const t0 = performance.now();
+    performance.now();
     _egNkLoop(run, (dtS, now) => {
         const pc = _egVisPC();
         let pending = false;

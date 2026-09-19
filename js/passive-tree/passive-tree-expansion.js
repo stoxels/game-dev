@@ -1034,7 +1034,7 @@ export function _ptxRunExpansion() {
     });
 
     patch('_calcLuckyTileCount', function (orig, args) {
-        const [isLarge, isMassive, isLargeOrMassive] = args;
+        const [, , isLargeOrMassive] = args;
         let count = orig(...args);
         if (has('karmic_residue') && count > 0 && Math.random() < 0.10) count += 1;
         if (has('probability_well') && count === 0 && !isLargeOrMassive && cur) {

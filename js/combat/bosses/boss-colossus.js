@@ -329,9 +329,7 @@ export function _egMechColoGolems(monster, phase) {
         el.style.top = Math.round(gy - 28) + 'px';
         golems.push({ x: gx, y: gy, el, hp: EG_GOLEM_HITS, dead: false, born: 0 });
     }
-    let t = 0;
     _egNkLoop(run, (dtS, now) => {
-        t += dtS * 1000;
         const pr = _egNkPlayerRect();
         const pc = _egColoPC();
         let active = false;

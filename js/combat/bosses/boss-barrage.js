@@ -116,7 +116,6 @@ export function _egMechBarCurtain(monster, phase) {
     let lastSplash = 0;
     _egNkLoop(run, (dtS, now) => {
         x += speed * dtS;
-        const isX = !fromTop;
         // Splash dots inside the wall for readability.
         if (now - lastSplash > 90) {
             lastSplash = now;

@@ -56,7 +56,7 @@ export function _egMechPortalWisp(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const wispSpeed = [0, 85, 100, 118][p];
-    const portalR = 46, wispR = 22;
+    const portalR = 46;
     const dmgPct = [0, 0.16, 0.19, 0.24][p];
     const durMs = 12000;
     const run = _egNkNewRun(monster && monster.id, true);

@@ -354,12 +354,6 @@ function areAllBonusesClaimed(levelIndices) {
 
 // countFullyCompletedWorlds - returns how many non-empty worlds have had
 //   every level completed.
-function countFullyCompletedWorlds() {
-    return globalThis.WORLDS.filter((w, wi) => {
-        if (!w.data.length) return false;
-        return areAllLevelsCompleted(getLevelIndicesForWorld(wi));
-    }).length;
-}
 
 // countFlawlessWorlds - returns how many non-empty worlds have been fully
 //   completed without a single mistake across any level.

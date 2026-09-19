@@ -231,7 +231,7 @@ export function _egBuildCurrencyStripHTML() {
 
 // Hover helpers for empty assigned slots - show placeholder name without needing an item.
 export function _egOnCurrencyCellEnter(row, col, e) {
-    const cell = document.getElementById(`eg-currency-cell-${row}-${col}`);
+    document.getElementById(`eg-currency-cell-${row}-${col}`);
     const item = _egCurrencyStash[row] && _egCurrencyStash[row][col];
     if (item) return; // occupied → chip's own onmouseenter handles tooltip
     const assignedId = _egCurrencyIdForSlot(row, col);

@@ -605,7 +605,7 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
             if (typeof _egAddItemToStash === 'function') {
                 const copy = JSON.parse(JSON.stringify(item));
                 copy.mirrored = true;
-                const pos = _egAddItemToStash(copy);
+                _egAddItemToStash(copy);
                 // consume mirror below - handled after early return path
                 // consume and update source
                 stack.count = (stack.count || 1) - 1;

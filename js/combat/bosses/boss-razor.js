@@ -241,11 +241,9 @@ export function _egMechRzrWires(monster, phase) {
     let holdStarted = 0;   // (set below when the first wire turns taut)
     _egNkLoop(run, (dtS, now) => {
         const pc = _egRzrPC();
-        let pending = false;
 
         for (const w of wires) {
             if (w.snapped) continue;
-            pending = true;
             if (now < w.tautAt) continue;
             if (!w.dieAt) {
                 // Turn taut.

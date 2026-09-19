@@ -841,7 +841,6 @@ export function _egOnEssenceCellEnter(row, col, e) {
     const ttIcon = def.icon || '🧬';
     const ttDesc = def.description || '';
     // heal missing category for display
-    const fakeItem = { ...def, count: 0, category: 'essence', rarity: 'essence' };
     let essenceDetailHTML = '';
     try { essenceDetailHTML = _egBuildEssenceDetailHTML(def); } catch (err) { essenceDetailHTML = ''; }
     const html = `

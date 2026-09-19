@@ -102,7 +102,6 @@ export function _egMechVoidTendrils(monster, phase) {
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const count = [0, 3, 4, 4][p];
     const speed = [0, 68, 80, 95][p];
-    const radius = 20;
     const dmgPct = [0, 0.10, 0.12, 0.15][p];
     const durMs = 11000;
     const run = _egNkNewRun(monster && monster.id, true);

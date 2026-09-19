@@ -180,10 +180,8 @@ export function _egMechBayBolts(monster, phase) {
         t += dtS * 1000;
         const pr = _egNkPlayerRect();
         const pc = _egBayPC();
-        let pending = false;
         columns.forEach(col => {
             if (col.struck) return;
-            pending = true;
             if (t >= col.warnAt && !col.warnEl) {
                 col.warnEl = _egNkEl(run, 'div', 'eg-bay-bolt-warn');
                 col.warnEl.style.left = Math.round(col.x - EG_BAY_BOLT_W / 2) + 'px';

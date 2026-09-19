@@ -200,7 +200,7 @@ export function _egMechStickyBombs(monster, phase) {
             bombs[i].exploded = false;
         }
 
-        const pr = _egNkPlayerRect();
+        _egNkPlayerRect();
         bombs.forEach(b => {
             if (!b) return;
             if (b.exploded) return;

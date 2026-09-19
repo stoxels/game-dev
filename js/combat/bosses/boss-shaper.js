@@ -623,7 +623,7 @@ export function _egShpFinalStart(monster) {
         g.arm += g.omega * dtS;
         g.arms.forEach((el, i) => { el.style.rotate = (g.arm + i * 120) + 'deg'; });
         const c = _egNkPlayerCenter();
-        const pr = _egNkPlayerRect();
+        _egNkPlayerRect();
 
         // Arm sweep damage (outside the monolith hub).
         if (c && now >= touchCd) {
@@ -711,7 +711,6 @@ export function _egShpFinalStart(monster) {
 // shockwave with a safe eye at the centre.
 export function _egShpBreak(g, level) {
     if (!g || g.finished) return;
-    const W = window.innerWidth, H = window.innerHeight;
     _egNkToast('eg_mech_shp_break', '⛄💀 THE MONOLITH BREAK - reach the eye!', '#7dd3fc');
     // Ring telegraph, then detonate. Safe: within 130px of the centre.
     const ring = document.createElement('div');

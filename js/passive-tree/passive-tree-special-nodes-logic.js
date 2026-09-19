@@ -1,5 +1,5 @@
 ﻿import { Audio_Manager } from '../audio/audio.js';
-import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
+import { markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { stopTimer, updTimer } from '../timer/timer.js';
 import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../timer/timer-adjust.js';

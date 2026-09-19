@@ -303,7 +303,7 @@ export function _egStrkAdvanceBall(st, dtS, now, pr, p) {
         const c2 = _egNkPlayerCenter();
         if (parrying && c2) {
             const dx = b.x - c2.x, dy = b.y - c2.y; // directly away from the player
-            const d = Math.hypot(dx, dy) || 1;
+            Math.hypot(dx, dy) || 1;
             const ang = Math.atan2(dy, dx);
             b.a = ang;
             b.kickUntil = now + EG_STRK_PARRY_KICK_MS;

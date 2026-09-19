@@ -237,12 +237,10 @@ export function _executeRegressionToPrior(correctCount, recoverPct, revealCount)
 
     // Revert each cell and accumulate recovered time.
     let recoveredSecs = 0;
-    let revealedTotal = 0;
     toCorrect.forEach(({ r, c, penaltySecs }) => {
         recoveredSecs += _regressionRevertCell(r, c, penaltySecs, recoverPct);
         if (revealCount > 0) {
-            revealedTotal += _regressionChainRevealCells(r, c, revealCount);
-        }
+            _regressionChainRevealCells(r, c, revealCount)        }
     });
 
     // Corrected mistakes no longer count against the player: decrement the

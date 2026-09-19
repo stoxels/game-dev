@@ -44,7 +44,6 @@ export function _egMechDormantSeekers(monster, phase) {
     const wakeRange = 260;
     const igniteMs = 500, chaseMs = [0, 2800, 3200, 3600][p];
     const chaseSpeed = [0, 190, 220, 255][p];
-    const radius = 22;
     const dmgPct = [0, 0.15, 0.18, 0.22][p];
     const durMs = 12000;
     const run = _egNkNewRun(monster && monster.id, true);

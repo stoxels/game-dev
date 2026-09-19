@@ -222,7 +222,7 @@ export function _egSproutVineLunge(monster) {
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_thorn'); } catch (e) {}
 
     // warn → strike → fade (Brutus slam state machine).
-    let t = 0, state = 'warn', hit = false;
+    let t = 0, state = 'warn';
     _egNkLoop(run, (dtS, now) => {
         t += dtS * 1000;
         if (state === 'warn' && t >= EG_SPROUT_LUNGE_WARN_MS) {
@@ -232,7 +232,6 @@ export function _egSproutVineLunge(monster) {
             const b = band.getBoundingClientRect();
             if (pr && _egNkRectsOverlap(
                 { left: b.left, right: b.right, top: b.top, bottom: b.bottom }, pr)) {
-                hit = true;
                 const dealt = _egNkHit(dmgPct, null, level);
                 _egNkAbilityHitToast(dealt, 'The Sprout', 'Vine Lunge');
             }

@@ -46,7 +46,14 @@ export function _ensureSpellbookOverlay() {
                     <aside class="spellbook-page sb-page-charms" id="spellbook-charms"></aside>
                     <div class="spellbook-page sb-page-slots" id="spellbook-slots"></div>
                 </div>
-                <div class="spellbook-footer" id="spellbook-footer"></div>
+            </div>
+            <!-- v3.6: the bottom frame STRIPS (the art's carved bands under the
+                 pages) host the counters (left) and the spell-slot meter
+                 (right). Positions are measured on the art: strips span
+                 y 88-97.5%, left zone x 5.5-39%, right zone x 52-89%. -->
+            <div class="spellbook-strips">
+                <div class="sb3-strip sb3-strip-left" id="spellbook-strip-left"></div>
+                <div class="sb3-strip sb3-strip-right" id="spellbook-strip-right"></div>
             </div>
         </div>`;
     document.body.appendChild(overlay);
@@ -90,6 +97,18 @@ export function openSpellbook() {
     // simply empty until a class is chosen. (The tutorial's puzzle 3 used to
     // be the only classless exception - Fireball before any class.)
     if (typeof STATE === 'undefined' || !STATE) return;
+    // On the title screen / before a character is picked, there's no spellbook
+    // to show - no class, no charms, no spells. Only open if a character exists.
+    // v3 fix: a returning player's last save slot is auto-loaded into STATE at
+    // boot, so a bare playerCharacter check let the book open ON the title
+    // screen (nothing loaded, no level, charms irrelevant). The book now also
+    // requires an actual game/overworld screen to be active - the title,
+    // save-slot, setup and mode-select screens never offer the spellbook.
+    if (!STATE.playerCharacter) return;
+    const activeScreen = document.querySelector('.screen.active')?.id || null;
+    const overAllowedScreens = ['screen-game', 'screen-levels', 'screen-map-view',
+        'screen-world-detail', 'screen-tutorial', 'screen-passive-tree'];
+    if (!activeScreen || overAllowedScreens.indexOf(activeScreen) === -1) return;
     const tqActive = (typeof globalThis._tqIsTutorialActive === 'function') && globalThis._tqIsTutorialActive();
     const overlay = _ensureSpellbookOverlay();
     renderSpellbook();
@@ -242,9 +261,18 @@ export function _sbSpellSchoolKey(skillId) {
         const school = _sbSpellSchool(skillId);
         if (school) return school;
     }
-    if (def.slotKind === 'base1' || def.slotKind === 'base2') return STATE.playerClass || '';
-    if (def.slotKind === 'asc1' || def.slotKind === 'asc2') return STATE.playerAscendency || '';
+    if (def.slotKind === 'base1' || def.slotKind === 'base2') return STATE.playerClass || _classFromSkillId(skillId);
+    if (def.slotKind === 'asc1' || def.slotKind === 'asc2') return STATE.playerAscendency || _classFromSkillId(skillId);
     return '';
+}
+
+// v3.3 fallback: derive the class/ascendency id from the skill id itself
+// ("mathmagician_active2" -> "mathmagician"). Covers saves where the skills
+// were granted before STATE.playerClass was set (devtest boots) without
+// changing real-game behaviour, where the STATE fields win.
+function _classFromSkillId(skillId) {
+    const m = /^(usp_|[a-z_]+?)_(?:active[12]|passive)$/.exec(String(skillId || ''));
+    return (m && m[1] !== 'usp') ? m[1] : '';
 }
 
 // Rebuilds the spell book: the charm inventory / currency panel plus the
@@ -257,16 +285,16 @@ export function renderSpellbook() {
     // Spell slot grid + charm inventory / currency (skill-charms.js).
     if (typeof renderSpellbookCharmPanel === 'function') renderSpellbookCharmPanel();
 
-    // Footer: how full the spell slots currently are, so the player can see
-    // at a glance whether there is room left. (The hotbar mirrors the slots
+    // v3.6: the meter lives on the RIGHT frame strip (art band y 88-97.5%),
+    // how full the spell slots are at a glance. (The hotbar mirrors the slots
     // 1:1, so a second hotbar meter would always read the same.)
-    const footer = document.getElementById('spellbook-footer');
-    if (footer) {
+    const stripRight = document.getElementById('spellbook-strip-right');
+    if (stripRight) {
         const charmSlots = Array.isArray(STATE.charmSlots) ? STATE.charmSlots : [];
         const charmUsed = charmSlots.filter(Boolean).length;
         const charmTotal = (typeof CHARM_SLOT_COUNT === 'number') ? CHARM_SLOT_COUNT : 10;
         const slotPct = charmTotal ? Math.round(100 * charmUsed / charmTotal) : 0;
-        footer.innerHTML = `<div class="sb3-meter">`
+        stripRight.innerHTML = `<div class="sb3-meter">`
             + `<span class="sb3-meter-label">${t('charm_slots_title')} ${charmUsed} / ${charmTotal}</span>`
             + `<div class="sb3-meter-track"><div class="sb3-meter-fill is-cyan" style="width:${slotPct}%"></div></div>`
             + `</div>`;

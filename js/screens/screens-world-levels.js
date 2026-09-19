@@ -960,7 +960,6 @@ export function _wdBuildLevelNode(wi, li, pos) {
     const isLocked = !isUnlocked;
     const isLastInWorld = !!(world && li === world.data.length - 1);
     const isNexusPoint = typeof globalThis.isNexusPointLevel === 'function' && globalThis.isNexusPointLevel(wi, li);
-    const isAscensionNode = isLastInWorld && !isNexusPoint;
     const isConvergence = !!(world && _wdIsConvergenceNode(li, world));
     const isMathGated = _wdIsMathGated(gi);
 

@@ -138,7 +138,7 @@ export function _egPotentialDropEntries() {
     if (typeof egAtlasDropNodeIds !== 'function') return [];
     const normalPool = egAtlasDropNodeIds(node.id, false) || [];
     const bossPool = egAtlasDropNodeIds(node.id, true) || [];
-    const normalSet = new Set(normalPool);
+    new Set(normalPool);
     const pushEntry = (out, seen, id, bossOnly) => {
         if (seen.has(id)) return;
         seen.add(id);

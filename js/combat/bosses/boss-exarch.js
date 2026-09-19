@@ -49,7 +49,7 @@ export function _egMechConstriction(monster, phase) {
     const cx = c0 ? Math.max(r1 + 20, Math.min(window.innerWidth - r1 - 20, c0.x)) : window.innerWidth / 2;
     const cy = c0 ? Math.max(r1 + 60, Math.min(window.innerHeight - r1 - 20, c0.y)) : window.innerHeight / 2;
     const ring = _egNkEl(run, 'div', 'eg-nk-ring');
-    const tint = _egNkEl(run, 'div', 'eg-nk-tint');
+    _egNkEl(run, 'div', 'eg-nk-tint');
     _egNkToast('eg_mech_constrict', '🔥 The Exarch: Constriction! Stay inside the ring!');
     let e = 0, dotWarnAt = 0;
     _egNkLoop(run, (dtS, now) => {

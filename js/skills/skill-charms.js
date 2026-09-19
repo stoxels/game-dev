@@ -51,7 +51,7 @@ export const CHARM_SHARDS_PER_ORB = 10;
 export const CHARM_ORB_DAMAGE_PCT = 1;
 
 // Charm item glyph. The rank is drawn as a badge on top of it.
-export const CHARM_BASE_ICON = '🧿';
+export const CHARM_BASE_ICON = '💫';
 
 // Monster drop tuning (mirrors the loot-drop constants in
 // endgame-grid-pickups.js).
@@ -266,11 +266,24 @@ export function ensureCharmState() {
         if (!key) continue;
         const charm = getCharmByKey(key);
         if (!charm) { STATE.charmSlots[i] = null; pruned = true; continue; }
-        if (STATE.playerClass && typeof getSkillDef === 'function'
-            && getSkillDef(charm.skillId) && !_charmIsPlayerSkill(charm.skillId)) {
-            STATE.charmSlots[i] = null;
-            pruned = true;
+        if (STATE.playerClass && typeof getSkillDef === 'function') {
+            // Unknown skill id (stale save data from a renamed/removed spell)
+            // must ALSO free the slot - otherwise the charm keeps squatting a
+            // spell slot + its hotbar key while rendering as a dead empty slot.
+            if (!getSkillDef(charm.skillId) || !_charmIsPlayerSkill(charm.skillId)) {
+                STATE.charmSlots[i] = null;
+                pruned = true;
+            }
         }
+    }
+
+    // The inventory itself also sheds charms whose skill id no longer
+    // resolves (save edits / renamed spells) - they can never be slotted or
+    // cast, so keeping them only ghosts up the book's charm list.
+    if (STATE.playerClass && typeof getSkillDef === 'function'
+        && STATE.charmInventory.some((c) => c && !getSkillDef(c.skillId))) {
+        STATE.charmInventory = STATE.charmInventory.filter((c) => c && !!getSkillDef(c.skillId));
+        pruned = true;
     }
 
     const seeded = _charmSeedStarterCharms();
@@ -781,19 +794,27 @@ export function _charmBuildSlotsHTML() {
             cells.push(`<div class="sb3-slot is-empty" data-charm-slot="${i}"`
                 + ` onmouseenter="handleCharmEmptySlotTip(event,${i})"`
                 + ` onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
-                + `<span class="sb3-slot-num">${i + 1}</span>`
+                + `<span class="sb3-slot-head">${i + 1}</span>`
+                + `<span class="sb3-slot-socket"></span>`
                 + `</div>`);
             continue;
         }
-        const bonus = charm.orbs > 0 ? `<span class="sb3-slot-orbs">+${charm.orbs * CHARM_ORB_DAMAGE_PCT}%</span>` : '';
         const school = (typeof _sbSpellSchoolKey === 'function') ? _sbSpellSchoolKey(charm.skillId) : '';
         const schoolAttr = school ? ` data-school="${school}"` : '';
+        // v3.1: only the icon lives INSIDE the socket; the name (+orb bonus)
+        // sits on the parchment UNDER the socket, mirroring the number above,
+        // so the octagon stays clean and the label never overflows it.
+        const nameTxt = getSkillName(charm.skillId) || charm.skillId;
+        const bonusTxt = charm.orbs > 0 ? ` <i class="sb3-slot-orbs">+${charm.orbs * CHARM_ORB_DAMAGE_PCT}%</i>` : '';
+        // v3.3: a filled slot shows the SPELL tooltip (same as hovering the
+        // spell on the hotbar) - the charm tooltip lives on the inventory
+        // rows. charmSlotSkill-style handling means handleSkillTip already
+        // reads the slotted charm's rank for cast stats.
         cells.push(`<div class="sb3-slot is-filled"${schoolAttr} data-charm-slot="${i}" data-charm-key="${charm.key}"`
-            + ` onmouseenter="handleCharmTip(event,'${charm.key}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
-            + `<span class="sb3-slot-num">${i + 1}</span>`
-            + `<span class="sb3-slot-icon">${CHARM_BASE_ICON}</span>`
-            + `<span class="sb3-slot-name">${getSkillName(charm.skillId)}</span>`
-            + bonus
+            + ` onmouseenter="handleSkillTip(event,'${charm.skillId}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
+            + `<span class="sb3-slot-head">${i + 1}</span>`
+            + `<span class="sb3-slot-socket"><span class="sb3-slot-icon">${CHARM_BASE_ICON}</span></span>`
+            + `<span class="sb3-slot-foot">${nameTxt}${bonusTxt}</span>`
             + `</div>`);
     }
 
@@ -881,12 +902,21 @@ export function _charmBuildInventoryHTML() {
         const bonus = charm.orbs > 0 ? `<span class="sb3-charm-orbs">+${charm.orbs * CHARM_ORB_DAMAGE_PCT}%</span>` : '';
         const school = (typeof _sbSpellSchoolKey === 'function') ? _sbSpellSchoolKey(charm.skillId) : '';
         const schoolAttr = school ? ` data-school="${school}"` : '';
+        // v3.3: when this exact charm sits in a spell slot, show WHICH one(s)
+        // as a cyan chip after the rank (handles the multi-slot edge case).
+        const slotNums = STATE.charmSlots
+            .map((k, si) => (k === charm.key ? si + 1 : null))
+            .filter(Boolean);
+        const slotRef = slotNums.length
+            ? `<span class="sb3-charm-slotref" data-tip-slot="${slotNums.join(',')}">▸ ${slotNums.join(',')}</span>`
+            : '';
         return `<div class="sb3-charm-row${slotted}"${schoolAttr} data-charm-key="${charm.key}"`
             + ` onmouseenter="handleCharmTip(event,'${charm.key}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
             + `<span class="sb3-charm-num">${index + 1}</span>`
             + `<span class="sb3-charm-glyph">${CHARM_BASE_ICON}</span>`
-            + `<span class="sb3-charm-name">${getSkillName(charm.skillId)}</span>`
+            + `<span class="sb3-charm-name">${getSkillName(charm.skillId) || charm.skillId}</span>`
             + `<span class="sb3-charm-rank">${charm.rank}</span>`
+            + slotRef
             + bonus
             + `</div>`;
     }).join('');
@@ -895,6 +925,14 @@ export function _charmBuildInventoryHTML() {
 
 // Renders the whole charm side of the spell book into the two hosts
 // created by skill-spellbook.js.
+//
+// v3 layout (css/spellbook-redesign.css): each page is a 3-row grid -
+//   row 1  section header plaque (top of the parchment)
+//   row 2  the working rail (charm list / drag label + slot grid)
+//   row 3  the working rail (charm list)
+//   row 4  bottom cluster (currency counters, LEFT page only)
+// The tool cluster sits at the BOTTOM of the left page; the right page keeps
+// its header + label at the top so the 10 sockets get the full height.
 export function renderSpellbookCharmPanel() {
     ensureCharmState();
     const slotsHost = document.getElementById('spellbook-slots');
@@ -904,12 +942,37 @@ export function renderSpellbookCharmPanel() {
         const head = (typeof buildSpellbookHeadHTML === 'function')
             ? buildSpellbookHeadHTML(t('charm_inventory_title'))
             : `<div class="charm-panel-title">${t('charm_inventory_title')}</div>`;
-        // Currency strip (Lemmas / Theorems) + "max rank only" filter sit
-        // between the header and the list.
+        // v3.6: "Max rank only" is a left-aligned row directly under the
+        // plaque (grid row 2); the Lemmas/Theorems counters moved OUT of the
+        // page onto the LEFT frame strip (renderSpellbook fills it).
         invHost.innerHTML = head
-            + _charmBuildCurrencyHTML()
-            + _charmBuildFilterHTML()
-            + _charmBuildInventoryHTML();
+            + `<div class="sb3-page-filter">${_charmBuildFilterHTML()}</div>`
+            + `<div class="sb-charm-rail">${_charmBuildInventoryHTML()}</div>`;
+    }
+    // Counters on the left frame strip (the carved band under the page).
+    // v4: detect value increases vs the previous render and flash a glow
+    // animation on the changed number (see .sb3-count-glow in CSS).
+    const stripLeft = document.getElementById('spellbook-strip-left');
+    if (stripLeft) {
+        const prev = {};
+        stripLeft.querySelectorAll('.sb3-lemma b, .sb3-theorem b').forEach((el, i) => {
+            prev[i < 2 ? 'shards' : 'orbs'] = parseInt(el.textContent, 10) || 0;
+        });
+        const shardsNow = (STATE && STATE.charmShards) || 0;
+        const orbsNow = (STATE && STATE.charmOrbs) || 0;
+        stripLeft.innerHTML = _charmBuildCurrencyHTML();
+        const flash = (idx, was, now) => {
+            if (now > was) {
+                const el = stripLeft.querySelectorAll('.sb3-lemma b, .sb3-theorem b')[idx];
+                if (el) {
+                    el.classList.remove('sb3-count-glow');
+                    void el.offsetWidth; // restart the animation
+                    el.classList.add('sb3-count-glow');
+                }
+            }
+        };
+        flash(0, prev.shards ?? shardsNow, shardsNow);
+        flash(1, prev.orbs ?? orbsNow, orbsNow);
     }
 }
 
@@ -1009,21 +1072,22 @@ export function buildCharmTooltipHTML(charmKey) {
     const bonus = charm.orbs * CHARM_ORB_DAMAGE_PCT;
     const desc = (typeof getSkillDesc === 'function') ? getSkillDesc(charm.skillId) : '';
     const usable = charmRankMeetsPlayerLevel(charm.rank);
-    const needMlvl = getCharmRankMinMonsterLevel(charm.rank);
+    // v3.3: the "drops at monster Lv X" hint is gone - the drop table is an
+    // in-world discovery, the tooltip only gates on the PLAYER level.
     const needPlvl = getCharmRankMinPlayerLevel(charm.rank);
     // Level line: green when usable, red when the character is too low.
     // t() keys fall back to English when a translation is missing.
     const reqColor = usable ? '#2ecc71' : '#e06c55';
     const reqLine = (typeof t === 'function')
-        ? `<div class="skl-tip-stat">${t('charm_tip_req_player')}: <b style="color:${reqColor}">${needPlvl}</b>`
-            + ` <span style="opacity:.65">· ${t('charm_tip_req_drop')}: ${needMlvl}</span></div>`
-        : `<div class="skl-tip-stat">Requires player Lv <b style="color:${reqColor}">${needPlvl}</b>`
-            + ` <span style="opacity:.65">· drops at monster Lv ${needMlvl}+</span></div>`;
+        ? `<div class="skl-tip-stat">${t('charm_tip_req_player')}: <b style="color:${reqColor}">${needPlvl}</b></div>`
+        : `<div class="skl-tip-stat">Requires player Lv <b style="color:${reqColor}">${needPlvl}</b></div>`;
     const lockedLine = usable ? '' : `<div class="skl-tip-note" style="color:#e06c55">${
         (typeof t === 'function' ? t('charm_tip_locked_level') : 'Too high rank for your level - slot it once you reach the required level.')
     }</div>`;
 
-    return `<div class="skl-tip charm-tip">`
+    return `<div class="skl-tip charm-tip"${(typeof _sbSpellSchoolKey === 'function')
+        ? (() => { const s = _sbSpellSchoolKey(charm.skillId); return s ? ` data-school="${s}"` : ''; })()
+        : ''}>`
         + `<div class="skl-tip-title">${CHARM_BASE_ICON} ${getSkillName(charm.skillId)}</div>`
         + `<div class="skl-tip-tags">${t('charm_tip_type')}</div>`
         + `<div class="skl-tip-stat">${t('skill_tip_rank')}: <b style="color:#f1c40f">${charm.rank}</b></div>`
@@ -1316,7 +1380,7 @@ export function _charmCheckClaim(row, col) {
             if (res.orbsMade > 0) msg += ` - 🔮 ${t('charm_orb_forged')}`;
             globalThis.showToast(msg, '#c39bd3');
         } else {
-            globalThis.showToast(`🧿 ${t('charm_pickup_found')}: ${name} (${t('skill_tip_rank')} ${charm.rank})`, '#f5d98b');
+            globalThis.showToast(`💫 ${t('charm_pickup_found')}: ${name} (${t('skill_tip_rank')} ${charm.rank})`, '#f5d98b');
         }
     }
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {

@@ -209,7 +209,6 @@ export function _egMechCreeperPack(monster, phase) {
     }
 
     let t = 0;
-    let lastBlastAt = 0;
     _egNkLoop(run, (dtS) => {
         t += dtS * 1000;
         let pending = false;
@@ -367,11 +366,9 @@ export function _egMechTntChain(monster, phase) {
     let boomIdx = 0;
     _egNkLoop(run, (dtS) => {
         t += dtS * 1000;
-        let pending = false;
 
         // Wind-up: flash accelerates; CSS handles the blink rate ramp.
         if (t < windupMs) {
-            pending = true;
             const frac = t / windupMs;
             blocks.forEach(b => {
                 if (b.el) b.el.style.animationDuration = (0.9 - frac * 0.62).toFixed(2) + 's';

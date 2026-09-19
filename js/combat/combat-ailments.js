@@ -851,8 +851,8 @@ export function _egSpawnCursorSpark(x = _egSparkLastX, y = _egSparkLastY) {
     // Start at a small random offset so sparks ring the target point
     const ang = Math.random() * Math.PI * 2;
     const startR = 4 + Math.random() * 10;
-    const dx = Math.cos(ang) * (14 + Math.random() * 26);
-    const dy = Math.sin(ang) * (14 + Math.random() * 26) - 6; // slight upward bias
+    Math.cos(ang) * (14 + Math.random() * 26);
+    Math.sin(ang) * (14 + Math.random() * 26) - 6; // slight upward bias
     spark.style.left = `${x + Math.cos(ang) * startR}px`;
     spark.style.top = `${y + Math.sin(ang) * startR}px`;
     spark.style.fontSize = `${(9 + Math.random() * 8).toFixed(1)}px`;

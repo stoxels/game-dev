@@ -161,14 +161,12 @@ export function _egMechBzRicochetSaws(monster, phase) {
         saws.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, sp, sprite, bounces: 0, embedded: false, floorEl: null, born: 0 });
     }
 
-    let e = 0, floorPhase = false, touchCd = 0;
+    let e = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
         e += dtS * 1000;
         const pr = _egNkPlayerRect();
-        let alive = 0;
         saws.forEach(s => {
             if (s.embedded) return;
-            alive++;
             s.x += s.vx * dtS;
             s.y += s.vy * dtS;
             const r = 26;
@@ -338,7 +336,7 @@ export function _egMechBzSawTraps(monster, phase) {
     // Windup: all warnings flash together, then every trap erupts (slightly
     // staggered so the field reads as a ripple, not a flashbang).
     const windupMs = EG_BZ_TRAP_WINDUP_MS * _EG_BZ_DEBUG_MULT;
-    let eruptIdx = 0, t = 0, touchCd = 0, pr0 = null;
+    let eruptIdx = 0, t = 0, touchCd = 0;
     _egNkLoop(run, (dtS, now) => {
         t += dtS * 1000;
         const pr = _egNkPlayerRect();
@@ -423,7 +421,6 @@ export function _egMechBzPendulumBlades(monster, phase) {
         t += dtS * 1000;
         const totalMs = swingS * 1000 * EG_BZ_PEND_SWINGS;
         const pr = _egNkPlayerRect();
-        let done = true;
         pends.forEach(pd => {
             const local = ((t / 1000 + pd.phaseOff / (Math.PI * 2) * swingS) % swingS) / swingS; // 0..1
             // Ease-in-out pendulum: cos swing between -55° and +55°.
@@ -435,7 +432,6 @@ export function _egMechBzPendulumBlades(monster, phase) {
             const sx = pd.xCtr + Math.sin(rad) * arm;
             const sy = 40 + Math.cos(rad) * arm;
             pd.sprite.dot.style.transform = 'translate(' + Math.round(sx - pd.xCtr - 44 + 44) + 'px,' + Math.round(sy - 40 - 44) + 'px)';
-            if (t < totalMs) done = false;
             if (pr && now >= touchCd && _egNkCircleHit(sx, sy, 40, pr, 0)) {
                 touchCd = now + EG_BZ_HIT_CD_MS;
                 _egBzTouch(EG_BZ_PEND_DMG[p], null, level, 'Pendulum Blade');
@@ -525,7 +521,6 @@ export function _egBzFinalStart(monster) {
     // Four toothed wall-saws close in from the edges (CSS transition drives
     // the approach; debug-stretched so it screenshots mid-growth).
     const inset = g.pocketR;   // final distance each wall stops from centre
-    const closeS = _EG_BZ_DEBUG_SLOW ? 8 : 2.6;
     const mkWall = (which) => {
         const w = document.createElement('div');
         w.className = 'eg-bz-wall';
@@ -582,7 +577,6 @@ export function _egBzFinalStart(monster) {
         if (_egNkFrozen()) return;
         const pr = _egNkPlayerRect();
         if (!pr) return;
-        const W = window.innerWidth, H = window.innerHeight;
         const cx = pr.left + pr.width / 2, cy = pr.top + pr.height / 2;
         const nearTop = cy <= g.center.y - g.pocketR + 10;
         const nearBottom = cy >= g.center.y + g.pocketR - 10;
@@ -660,7 +654,6 @@ export function _egBzFinalBang(g, monster) {
 
     // Walls retract, then hand control back to the boss (debug: linger long
     // enough for the crosscut visuals to be captured).
-    const W = window.innerWidth, H = window.innerHeight;
     const setAll = (el, style) => { Object.keys(style).forEach(k => el.style[k] = style[k]); };
     setAll(g.walls.top, { height: '0px' });
     setAll(g.walls.bottom, { height: '0px' });

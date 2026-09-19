@@ -1287,8 +1287,8 @@ export function _dndBindListeners() {
                 }
             }
             // Unique stash dragover highlight (only for uniques) – includes tab button when grid is hidden
-            const uniqGrid = document.getElementById('eg-unique-grid');
-            const uniqTabBtnEl = document.getElementById('eg-tab-uniques');
+            document.getElementById('eg-unique-grid');
+            document.getElementById('eg-tab-uniques');
             // clear previous
             document.querySelectorAll('.eg-unique-cell.eg-dragover, .eg-unique-grid.eg-dragover, #eg-tab-uniques.eg-dragover').forEach(el => el.classList.remove('eg-dragover'));
             if (_dnd.item && _dnd.item.isUnique) {

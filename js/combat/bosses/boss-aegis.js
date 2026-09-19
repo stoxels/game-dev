@@ -123,11 +123,9 @@ export function _egMechAgAegisProtocol(monster, phase) {
     const pool = ['slime', 'ghost', 'rat', 'bat', 'bee'];
     const cap = (typeof EG_MAX_CONCURRENT_MONSTERS !== 'undefined') ? EG_MAX_CONCURRENT_MONSTERS : 6;
     const before = (typeof _egMonsters !== 'undefined') ? globalThis._egMonsters.length : 0;
-    let made = 0;
     for (let i = 0; i < count; i++) {
         if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length >= cap) break;
         _egSpawnMonster(pool[Math.floor(Math.random() * pool.length)], level);
-        made++;
     }
     const fresh = (typeof _egMonsters !== 'undefined')
         ? globalThis._egMonsters.slice(before).filter(m => !m.isBoss) : [];

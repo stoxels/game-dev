@@ -99,7 +99,6 @@ export function buildNextCodeStr() {
     const nextCode = globalThis.WORLD_CODES.find(wc => STATE.totalScore < wc.threshold);
     if (!nextCode) return `🏆 ${t('ls_all_codes')}`;
 
-    const title = LANG === 'de' ? nextCode.titleDE : nextCode.titleEn;
     return `${nextCode.threshold - STATE.totalScore} ${t('ls_to_next')}`;
 }
 
