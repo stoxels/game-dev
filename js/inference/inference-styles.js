@@ -2,10 +2,8 @@
 //
 // No dependencies. Safe to load before the DOM is ready (uses
 // document.head.appendChild which works as soon as <head> exists).
-//
-// If you prefer to keep styles in your main .css file, move the rules
-// there and delete this file. Just ensure the selectors listed here are
-// present before showQuestLog() is called.
+// Pure side-effect module: 0 exports - the entry imports it bare and the
+// step6 pin test guards that contract.
 //
 // CSS sections inside the injected stylesheet (in order):
 //   1. ANIMATIONS
@@ -17,7 +15,6 @@
 //   7. QUEST / MILESTONE LIST
 //   8. QUEST OBJECTIVES
 //   9. QUEST REWARDS & CLAIM BUTTON
-//  10. TOAST NOTIFICATION
 
 //------------------------------------------------------------------------
 //-------------------STYLE INJECTION (MAIN ENTRY POINT)-------------------
@@ -366,7 +363,7 @@
 
 
     /*-----------------------------------------------------------------------*/
-    /*-------------------- QUEST REWARDS & CLAIM BUTTON --------------------*/
+    /*----------------------- QUEST REWARDS & CLAIM BUTTON ------------------*/
     /*-----------------------------------------------------------------------*/
 
     /* Flex row holding the reward chips on the left, claim button on the right */
@@ -432,13 +429,6 @@
     .quest-claimed-btn:hover {
         background: rgba(46, 204, 113, 0.07);
     }
-
-
-    /*-----------------------------------------------------------------------*/
-    /*------------------------- TOAST NOTIFICATION --------------------------*/
-    /*-----------------------------------------------------------------------*/
-
-
 
     `;
 
