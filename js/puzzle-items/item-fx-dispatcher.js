@@ -22,64 +22,79 @@ import { _fxSurveyScope } from './survey-scope/survey-scope.js';
 import { _fxTheWitch } from './the-witch/the-witch.js';
 
 //------------------------------------------------------------------------
-//-------------------ITEM FX DISPATCHER-------------
+//-------------------ITEM FX DISPATCH TABLE-------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// playItemEffect(defId) - routes an item id to its visual effect
-// function. The effect implementations live in the per-item files; this
-// dispatcher is the only place that references them by name.
+// Maps an item id to the visual effect that runs when the item is used.
+// One row per item: giving an item its look means adding a row here, not
+// touching playItemEffect(). Each row receives the item id (the Tutor
+// entries use it, pearls ignore it and pass their glow color, everything
+// else ignores it too).
+const ITEM_FX = {
+    // REVEAL
+    reveal1: _fxCandle,
+    reveal2: _fxMagnifier,
+    reveal3: _fxSpyglass,
+    reveal4: _fxScanner,
 
+    // MARK-WRONG
+    markWrong2: _fxEraser,
+    markWrong4: _fxSweeper,
+    markWrong6: _fxErrorMagnet,
+    markWrong8: _fxErrorGem,
+
+    // ADD TIME
+    addTime60: _fxHourglass,
+    addTime300: _fxStopwatch,
+    addTime600: _fxClock,
+    addTime900: _fxChronobolt,
+
+    // UTILITY
+    freeze: _fxFreeze,
+    shield: _fxShield,
+    rowSolve: _fxRowSolve,
+    colSolve: _fxColSolve,
+    surveyScope: _fxSurveyScope,
+    scoutPrimer: _fxScoutPrimer,
+    artifactComplete: _fxArtifact,
+    tutor: _fxTutorItem,
+    tutor4: _fxTutorItem,
+    tutor6: _fxTutorItem,
+    tutorAll: _fxTutorItem,
+
+    // CURSED
+    cursedReveal: _fxCursedReveal,
+    cursedTime: _fxCursedTime,
+    cursedShield: _fxCursedShield,
+    cursedRowSolve: _fxTidalWave,
+    cursedColSolve: _fxVortex,
+    cursedRowCol: _fxChaosGrid,
+
+    // PEARLS
+    pearlOfHaste: () => _fxPearl('#88aaff'),
+    pearlOfSwiftness: () => _fxPearl('#cc88ff'),
+    grandPearl: () => _fxPearl('#e0e0e0'),
+
+    // KEYSTONES + special
+    theWitch: _fxTheWitch,
+    goldenClock: _fxGoldenClock,
+    shadowSeal: _fxShadowSeal,
+    chronoFracture: _fxChronoFracture,
+};
+
+
+//------------------------------------------------------------------------
+//-------------------ITEM FX DISPATCH-------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// playItemEffect(defId) - routes an item id to its visual effect function.
+// The effect implementations live in the per-item files; this dispatcher
+// is the only place that references them by name. Unknown or empty ids
+// do nothing.
 export function playItemEffect(defId) {
     if (!defId) return;
-
-    // ── REVEAL ────────────────────────────────────────────────
-    if (defId === 'reveal1') return _fxCandle();
-    if (defId === 'reveal2') return _fxMagnifier();
-    if (defId === 'reveal3') return _fxSpyglass();
-    if (defId === 'reveal4') return _fxScanner();
-
-    // ── MARK-WRONG ────────────────────────────────────────────
-    if (defId === 'markWrong2') return _fxEraser();
-    if (defId === 'markWrong4') return _fxSweeper();
-    if (defId === 'markWrong6') return _fxErrorMagnet();
-    if (defId === 'markWrong8') return _fxErrorGem();
-
-    // ── ADD TIME ──────────────────────────────────────────────
-    if (defId === 'addTime60') return _fxHourglass();
-    if (defId === 'addTime300') return _fxStopwatch();
-    if (defId === 'addTime600') return _fxClock();
-    if (defId === 'addTime900') return _fxChronobolt();
-
-    // ── UTILITY ───────────────────────────────────────────────
-    if (defId === 'freeze') return _fxFreeze();
-    if (defId === 'shield') return _fxShield();
-    if (defId === 'rowSolve') return _fxRowSolve();
-    if (defId === 'colSolve') return _fxColSolve();
-    if (defId === 'surveyScope') return _fxSurveyScope();
-    if (defId === 'scoutPrimer') return _fxScoutPrimer();
-    if (defId === 'artifactComplete') return _fxArtifact();
-    if (defId === 'tutor' ||
-        defId === 'tutor4' ||
-        defId === 'tutor6' ||
-        defId === 'tutorAll') return _fxTutorItem(defId);
-
-    // ── CURSED ────────────────────────────────────────────────
-    if (defId === 'cursedReveal') return _fxCursedReveal();
-    if (defId === 'cursedTime') return _fxCursedTime();
-    if (defId === 'cursedShield') return _fxCursedShield();
-    if (defId === 'cursedRowSolve') return _fxTidalWave();
-    if (defId === 'cursedColSolve') return _fxVortex();
-    if (defId === 'cursedRowCol') return _fxChaosGrid();
-
-    // ── PEARLS ────────────────────────────────────────────────
-    if (defId === 'pearlOfHaste') return _fxPearl('#88aaff');
-    if (defId === 'pearlOfSwiftness') return _fxPearl('#cc88ff');
-    if (defId === 'grandPearl') return _fxPearl('#e0e0e0');
-
-    // ── KEYSTONES ─────────────────────────────────────────────
-    if (defId === 'theWitch') return _fxTheWitch();
-    if (defId === 'goldenClock') return _fxGoldenClock();
-    if (defId === 'shadowSeal') return _fxShadowSeal();
-
-    if (defId === 'chronoFracture') return _fxChronoFracture();
+    const fx = ITEM_FX[defId];
+    if (fx) return fx(defId);
 }
