@@ -21,6 +21,11 @@ import { T } from './translations-strings.js';
 
 // Default language on startup. Updated when the player clicks EN/DE on the title screen.
 export let LANG = 'en';
+// Live accessor for code OUTSIDE the module bundle (the lazy-loaded dev
+// passive tree reads LANG bare). A get-only accessor always returns the
+// current value, so a language switch is seen immediately; no global writer
+// exists (setLang() is the only reassignment path).
+try { Object.defineProperty(globalThis, 'LANG', { get() { return LANG; }, configurable: true }); } catch (e) {}
 
 
 //------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 import { BGM_TRACKS, BOSS_BGM, TUTORIAL_BGM, LEVEL_BGM, WORLD_BGM, SFX } from '../../js/audio/audio-data.js';
 import { Audio_Manager } from '../../js/audio/audio.js';
 import { T } from '../../js/translation/translations-strings.js';
-import { LANG, getActiveDictionary, t, updateLangButtons, stripTitleButtonIcon, applyTranslationsToDOM, updateTitleExpansionLogos, setLang } from '../../js/translation/translations.js';
+import { getActiveDictionary, t, updateLangButtons, stripTitleButtonIcon, applyTranslationsToDOM, updateTitleExpansionLogos, setLang } from '../../js/translation/translations.js';
 import { ACHIEVEMENT_DEFS } from '../../js/achievements/achievements-data.js';
 import { ACH_SAVE_KEY, ACH_STATE, loadAchState, saveAchState, migrateAchState, initAchState, trackAchStat, setAchStat, checkAchievements, onLevelCompleteAch, checkWorldCompleteAch, showResetAchievementsModal, _doResetAchievements } from '../../js/achievements/achievements.js';
 import { ACTIVE_SLOT_KEY, SAVE_SLOT_COUNT, SLOT_NAMES_KEY, _makeEgGrid, _migrateAscendencyFields, _migrateCharmFields, _migrateClassFields, _migrateCoreFields, _migrateEndgameFields, _migratePassiveTreeFields, _migrateSlotNameFromBlob, _resetLevelFlags, _slotKey, _saveAnyItem, _saveHasEndgameProgress, buildFreshState, getActiveSlot, getSlotName, getSlotSummary, initState, loadRawSaveFromSlot, loadStateFromSlot, migrateOldSave, save, setActiveSlot, setSlotName, wipeSlot } from '../../js/state.js';
@@ -839,6 +839,7 @@ try { Object.defineProperty(globalThis, "zoomOutBtn", { get() { return zoomOutBt
 
 
 //=======[ PHASE 3 module-import shims ]=========================================
+try { globalThis["t"] = t; } catch (e) {} // PHASE3-SHIM (js/translation/translations.js)
 try { globalThis["_egMechClueSwap"] = _egMechClueSwap; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/shared-boss-abilities.js)
 try { globalThis["_egMechCorruptCells"] = _egMechCorruptCells; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/shared-boss-abilities.js)
 try { globalThis["_egMechFrozenCells"] = _egMechFrozenCells; } catch (e) {} // PHASE3-SHIM (js/combat/bosses/shared-boss-abilities.js)
