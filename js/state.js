@@ -108,7 +108,7 @@ let systemMarkedGrid = [];
 // Date.now() timestamp recorded when the level begins.
 // Used for accurate elapsed-time display on the win overlay,
 // independent of any item-based time changes during the level.
-let levelStartTime = 0;
+export let levelStartTime = 0;
 
 // How many wrong fills the player has made this level.
 // Used for score penalties and Hardcore mode failure tracking.

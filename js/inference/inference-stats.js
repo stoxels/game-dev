@@ -1,9 +1,7 @@
 import { _ptAllocated, ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
-import { save } from '../state.js';
+import { levelStartTime, save, STATE, cur } from '../state.js';
 import { _MILESTONE_MAP } from './inference-data.js';
 import { _milestone_isClaimed, _milestone_isComplete, _refreshQuestBadge, claimQuest } from './inference-logic.js';
-import { STATE } from '../state.js';
-import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
@@ -547,17 +545,15 @@ export function _questStats_commitWitchImmunity() {
     }
 }
 
-// Evaluates all per-level manual combo quest conditions and increments
-// counters for those that pass, then dispatches the declarative combo
-// conditions via _checkComboConditions. Per-level (_ql_) counters are read
-// here and either committed to the permanent stats or discarded if
-// thresholds weren't met.
-export function _questStats_trackComboQuests(payload) {
+// Evaluates all per-level manual threshold checks and increments counters
+// for those that pass. These read per-level (_ql_) counters committed by the
+// mid-level handlers and can't be expressed as declarative conditions.
+// Per-level counters are either committed to the permanent stats or discarded
+// if thresholds weren't met.
+function _questStats_trackManualThresholdQuests(payload) {
     const qs = _qs;
     const { cells } = _getCurrentGridInfo();
     const isMassive = cells >= 400;
-
-    // -- Manual threshold checks (can't easily be expressed as declarative conditions) --
 
     // Quest 1: Remove 50 mistakes in a single level (Mistake Eraser family)
     if ((qs._ql_mistakesRemovedThisLevel || 0) >= 50) {
@@ -592,7 +588,7 @@ export function _questStats_trackComboQuests(payload) {
 
     // Quest 6: Use Shadow Seal within the first 10 seconds on a massive grid
     if (isMassive && qs._ql_shadowSealUsedAt !== null) {
-        const secsIntoLevel = (qs._ql_shadowSealUsedAt - (globalThis.levelStartTime || qs._ql_shadowSealUsedAt)) / 1000;
+        const secsIntoLevel = (qs._ql_shadowSealUsedAt - (levelStartTime || qs._ql_shadowSealUsedAt)) / 1000;
         if (secsIntoLevel <= 10) {
             _inc('massiveGridShadowSealEarly');
         }
@@ -611,13 +607,17 @@ export function _questStats_trackComboQuests(payload) {
     // Quest 7: Erase 10+ filled rows/cols via cursed items
     // Global counter tracked in questStat_rowsErased; milestones read totalRowsErased.
 
-    // Quest 20: Emergency scan triggered on a massive grid
+    // Quest 20: Emergency scan triggered on a massive grid. The fired flag is
+    // a multi-writer timer.js-owned patch point, read through the global
+    // object on purpose (bridge escape hatch - see REFACTOR-RULES.md).
     if (isMassive && window._emergencyScanFired) {
         _inc('massiveGridsEmergencyScan');
     }
+}
 
-    // -- Declarative combo conditions --
-
+// Dispatches the declarative combo quest conditions: each quest is a small
+// condition list evaluated by _checkComboConditions.
+function _questStats_trackDeclarativeComboQuests(payload) {
     // Quest 13: Overfitting keystone - large+ grid with ≥ 25 mistakes
     _checkComboConditions(payload, 'levelsOverfitHighMistakes', [
         { type: 'ptNode', node: 'keystone_overfitting' },
@@ -687,6 +687,13 @@ export function _questStats_trackComboQuests(payload) {
         { type: 'minGridSize', size: 'large' },
         { type: 'noMistakes' },
     ]);
+}
+
+// Runs every combo quest check for the finished level: the manual threshold
+// checks first, then the declarative condition lists.
+export function _questStats_trackComboQuests(payload) {
+    _questStats_trackManualThresholdQuests(payload);
+    _questStats_trackDeclarativeComboQuests(payload);
 }
 
 // Master handler for the 'levelComplete' event. Delegates each tracking
