@@ -300,7 +300,10 @@ export function applyAscensionReward(irz) {
 }
 
 // Builds the Nexus Point unlock card shown in the win overlay's reward zone.
+// MONSTERLESS runs end after World 14: no Nexus unlock, no card.
 export function applyNexusPointReward(irz) {
+    if (typeof globalThis.curMods !== 'undefined' && globalThis.curMods && globalThis.curMods.monsterless) return;
+    if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return;
     if (typeof globalThis.setNexusUnlocked === 'function') globalThis.setNexusUnlocked();
     else if (typeof STATE !== 'undefined' && STATE) {
         STATE.nexusUnlocked = true;
@@ -621,7 +624,10 @@ export function _updateConvergenceTrialWinButton(gi) {
 // Ensures the win overlay has a dedicated "Enter the Nexus" button.
 // Created once, then shown only after the Nexus Point. Uses its own id so
 // it never collides with the static Next/Levels handlers.
+// MONSTERLESS runs end after World 14: the button never shows.
 export function _updateNexusWinButton(show) {
+    if (typeof globalThis.curMods !== 'undefined' && globalThis.curMods && globalThis.curMods.monsterless) show = false;
+    else if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) show = false;
     const container = document.querySelector('#ov-win .ov-btns');
     if (!container) return;
     // Prefer the NEXT column wrapper (the Nexus button occupies Next's slot

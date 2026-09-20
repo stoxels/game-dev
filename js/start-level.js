@@ -339,6 +339,7 @@ export function _updateModTags() {
     if (curMods.ironman) mt.innerHTML += `<span class="mod-tag im">${t('mod_im')}</span>`;
     if (curMods.classless) mt.innerHTML += `<span class="mod-tag cl">${t('mod_cl')}</span>`;
     if (curMods.treeless) mt.innerHTML += `<span class="mod-tag tl">${t('mod_tl')}</span>`;
+    if (curMods.monsterless) mt.innerHTML += `<span class="mod-tag ml">${t('mod_ml')}</span>`;
     mt.innerHTML += `<span class="mod-tag diff">${t('diff_' + curDiff)}</span>`;
 }
 
@@ -579,7 +580,9 @@ export function _doStartLevel(gi) {
     // share the same presentation now (Health / Mana / Shield / charge bar
     // stack - see _avatarBarsHTML in player_sprite.js); monster levels let
     // the encounter tick build the full avatar so the sprite size is stable.
-    if (!cur.isMonsterLevel) {
+    // MONSTERLESS never shows combat bars - not even on trial chains that
+    // are technically stamped as monster levels.
+    if (!cur.isMonsterLevel || curMods.monsterless) {
         _renderPlayerAvatarSimple();
         _showPlayerAvatarSimple();
         _showPlayerAvatar();
@@ -619,11 +622,15 @@ export function _doStartLevel(gi) {
     //     monster list, HP/damage budget) so the shared combat loop can run
     //     WITHOUT the endgame chain/objectives machinery.
     //   • Endgame map levels were already stamped by _egLaunchMapFromDevice.
+    //   • MONSTERLESS: campaign levels skip the encounter entirely (the
+    //     preparer refuses); trial chains still start it so the puzzle
+    //     chain + question intermissions run, just with nothing to fight.
     if (cur && !globalThis.dead && typeof _egPrepareCampaignEncounter === 'function'
         && !window._egSuppressEncounterStart) {
         _egPrepareCampaignEncounter();
     }
     if (cur && cur.isMonsterLevel
+        && (cur.campaignTrial || !curMods.monsterless)
         && typeof _egStartEncounter === 'function'
         && !window._egSuppressEncounterStart) {
         _egStartEncounter();

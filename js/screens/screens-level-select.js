@@ -16,6 +16,7 @@ export const MOD_LABELS = {
     ironman: 'IM',
     classless: 'CL',
     treeless: 'TR',
+    monsterless: 'ML',
 };
 
 // Maps internal modifier keys to their CSS class names (used for tag coloring)
@@ -25,6 +26,7 @@ export const MOD_CLASSES = {
     ironman: 'im',
     classless: 'cl',
     treeless: 'tl',
+    monsterless: 'ml',
 };
 
 // Maps internal modifier keys to their i18n translation keys (used in tooltips)
@@ -34,6 +36,7 @@ export const MOD_I18N_KEYS = {
     ironman: 'mod_im',
     classless: 'mod_cl',
     treeless: 'mod_tl',
+    monsterless: 'mod_ml',
 };
 
 // Maps bonus types to their display icons (used on level cards)
@@ -83,9 +86,12 @@ export function buildModTagSpan(modKey, labelMap, classMap) {
 
 // Renders the active modifier tags (TT / HC / IM / etc.) and the current difficulty
 // tag into the #ls-mods element in the top bar.
+// MONSTERLESS is a content toggle (no score, no stars) so it is not in
+// SCORE_MODS - it is appended explicitly so the active mod stays visible.
 export function renderLSTopBar() {
     const modEl = document.getElementById('ls-mods');
     const active = Object.keys(globalThis.curMods).filter(m => SCORE_MODS.has(m) && globalThis.curMods[m]);
+    if (globalThis.curMods && globalThis.curMods.monsterless) active.push('monsterless');
 
     modEl.innerHTML =
         active.map(m => buildModTagSpan(m, MOD_LABELS, MOD_CLASSES)).join(' ') +

@@ -1,4 +1,5 @@
 import { trackAchStat } from '../achievements/achievements.js';
+import { EG_ART } from '../endgame/endgame-art.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { RESHUFFLE_GOAL, reshuffleCount, reshuffleRightClickItem, updateReshuffleCounter } from './puzzle-item-reshuffle.js';
@@ -102,12 +103,21 @@ function _positionTooltip(tip, anchor) {
     tip.style.top = top + 'px';
 }
 
+// Puzzle-item art: real image from images/items/manifest.json when present,
+// otherwise the emoji fallback from the def (EG_ART.html handles both).
+function _puzArtHtml(def) {
+    if (typeof EG_ART !== 'undefined' && EG_ART && typeof EG_ART.html === 'function') {
+        return EG_ART.html('item', def.id, def.icon);
+    }
+    return def.icon;
+}
+
 // Builds the tooltip's inner HTML for an item. When `count` is provided, includes
 // rarity, stack count, and the interaction hint (slot tooltips); when omitted,
 // returns just the name and description (simple reward-item tooltips).
 function _buildTooltipHtml(def, count) {
     const rc = rarityColors(def.rarity);
-    const nameLine = `<div class="inv-tip-name" style="color:${rc.color}">${def.icon} ${itemName(def)}</div>`;
+    const nameLine = `<div class="inv-tip-name" style="color:${rc.color}">${_puzArtHtml(def)} ${itemName(def)}</div>`;
     const descLine = `<div class="inv-tip-desc">${itemDesc(def)}</div>`;
 
     if (count === undefined) return nameLine + descLine;
@@ -219,7 +229,7 @@ function _buildInvSlot(defId) {
     if (!isEmpty) el.style.borderColor = rc.border;
 
     el.innerHTML = `
-        <span class="inv-slot-icon">${def.icon}</span>
+        <span class="inv-slot-icon">${_puzArtHtml(def)}</span>
         ${count > 0 ? `<span class="inv-slot-count">${count}</span>` : ''}`;
 
     if (!isLocked) _attachSlotInteractionHandlers(el, defId, isEmpty);
@@ -365,6 +375,16 @@ let _invGlobalGuardWired = false;
 function _wireGlobalFlyoutGuard() {
     if (_invGlobalGuardWired) return;
     _invGlobalGuardWired = true;
+    // Late-loading item art: the items manifest is fetched lazily on first
+    // lookup, so slots rendered before it arrives show emoji. Rebuild the
+    // panel when art resolves so fresh images replace the fallbacks.
+    // (Subscribed here, not at top level: step9-items.test.mjs forbids
+    // top-level executable statements in this family.)
+    document.addEventListener('eg-art-loaded', function () {
+        try {
+            if (document.getElementById('inv-panel')) buildInventoryPanel();
+        } catch (e) { /* panel not initialised yet - safe to ignore */ }
+    });
     document.addEventListener('mousemove', (e) => {
         if (!_invOpenFlyoutGroup || _invPinnedFlyoutGroup) return;
         if (!_invPointerInBar(e.clientX, e.clientY) && !_invPointerInFlyout(e.clientX, e.clientY)) {

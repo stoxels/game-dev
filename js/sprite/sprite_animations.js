@@ -785,15 +785,12 @@ export const _idleState = {
     direction: 1, // ping-pong direction through frames
     imgElementId: null,
     key: null,    // char|variant|facing the loop was started for
-    faceResetTimeoutId: null, // pending turn-to-player (look-down) timer
 };
 
 // After this long without moving, an idle sprite turns to face the player
 // (default look-down / standing image) instead of holding its last travel
 // direction. Rearmed every time the idle loop (re)starts; cancelled as soon
 // as walking resumes.
-export const _IDLE_FACE_RESET_MS = 3000;
-
 // Last movement facing, so the gameplay sprite keeps looking its travel
 // direction when it stops (directional idle art) instead of snapping back
 // to the static portrait. Menus are unaffected: they render
@@ -824,42 +821,10 @@ export function _stopAvatarIdleAnimation() {
         clearInterval(_idleState.intervalId);
         _idleState.intervalId = null;
     }
-    if (_idleState.faceResetTimeoutId) {
-        clearTimeout(_idleState.faceResetTimeoutId);
-        _idleState.faceResetTimeoutId = null;
-    }
     _idleState.frameIndex = 0;
     _idleState.direction = 1;
     _idleState.imgElementId = null;
     _idleState.key = null;
-}
-
-// Clears any pending turn-to-player timer without touching the loop itself.
-export function _clearIdleFaceReset() {
-    if (_idleState.faceResetTimeoutId) {
-        clearTimeout(_idleState.faceResetTimeoutId);
-        _idleState.faceResetTimeoutId = null;
-    }
-}
-
-// Schedules the turn-to-player: after _IDLE_FACE_RESET_MS of uninterrupted
-// idling the sprite switches to its default look-down image. No-op when
-// already facing down. The timer self-cancels if walking resumes or the
-// facing changed meanwhile (movement rearms idle with a new facing).
-export function _scheduleIdleFaceReset(imgElementId, face) {
-    _clearIdleFaceReset();
-    if (!face || face === 'down') return;
-    const capturedFace = face;
-    const capturedId = imgElementId;
-    _idleState.faceResetTimeoutId = setTimeout(() => {
-        _idleState.faceResetTimeoutId = null;
-        if (_walkState.intervalId) return; // moving again - walk owns the sprite
-        try {
-            if (typeof _lastFacingDir === 'string' && _lastFacingDir !== capturedFace) return;
-        } catch (e) { /* pre-init: fall through and reset */ }
-        try { _lastFacingDir = 'down'; } catch (e) { /* pre-init: ignore */ }
-        _startAvatarIdleAnimation(capturedId, 'down');
-    }, _IDLE_FACE_RESET_MS);
 }
 
 // Starts the looping idle animation. Safe to call liberally (avatar
@@ -895,7 +860,6 @@ export function _startAvatarIdleAnimation(imgElementId, direction) {
         // Turn toward the player after a while idle, even when there is no
         // directional idle art to hold (keeps _lastFacingDir consistent so a
         // late-discovered directional set still resolves back to down).
-        _scheduleIdleFaceReset(id, face);
         // Gameplay fallback: move-down art, NOT the menu portrait. The menu
         // portrait stays reserved for save slots, level-select topbar and
         // quiz/exercise modals (they render _getPlayerCharacterImage()
@@ -952,9 +916,6 @@ export function _startAvatarIdleAnimation(imgElementId, direction) {
     _idleState.frameIndex = 0;
     _idleState.direction = 1;
     el.src = frames[0];
-    // Idle facing is temporary: turn toward the player (look-down) after
-    // _IDLE_FACE_RESET_MS without moving.
-    _scheduleIdleFaceReset(id, face);
     if (frames.length < 2) return;
 
     _idleState.intervalId = setInterval(() => {

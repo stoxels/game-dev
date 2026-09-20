@@ -19,10 +19,16 @@ export const DIFF_CFG = {
 // Currently toggled optional modifiers. Keys drive UI, scoring and gameplay
 // checks below - order here also determines score-multiplier application
 // order, so don't reorder without checking scoreMultiplier().
+// MONSTERLESS disables all Rise of the Beasts features (monsters, combat
+// bars, grid pickups, trial bosses, endgame) at x1.0 - it is intentionally
+// absent from MOD_MULT below so scoreMultiplier() ignores it.
 // BETA TEST ONLY: Super Tutor is temporary and will be removed after the beta period.
-export let curMods = { timetrial: false, hardcore: false, ironman: false, classless: false, treeless: false, superTutor: false };
+export let curMods = { timetrial: false, hardcore: false, ironman: false, classless: false, treeless: false, monsterless: false, superTutor: false };
 
 // Score multiplier applied per active modifier (stacks multiplicatively).
+// MONSTERLESS is deliberately missing here: disabling the Beasts expansion
+// costs nothing and grants nothing (x1.0) - scoreMultiplier() only applies
+// keys present in this table.
 export const MOD_MULT = {
     timetrial: 1.2,
     hardcore: 1.3,
@@ -42,6 +48,7 @@ export const MOD_SCROLL_TEXT_KEYS = {
     ironman: 'scr_mod_scroll_im',
     classless: 'scr_mod_scroll_cl',
     treeless: 'scr_mod_scroll_tl',
+    monsterless: 'scr_mod_scroll_ml',
 };
 
 
@@ -116,6 +123,7 @@ export function syncDiffModButtons() {
 // modifier's multiplier. Iterates curMods in its declared key order
 // (timetrial, hardcore, ironman, classless, treeless) to keep the
 // multiplication order identical to the old explicit if-chain.
+// MONSTERLESS and Super Tutor have no MOD_MULT entry and pass through at x1.0.
 export function scoreMultiplier() {
     const diffCfg = DIFF_CFG[curDiff] || DIFF_CFG.normal;
     let mult = Number(diffCfg.scoreMult);
@@ -135,6 +143,11 @@ export function isClassless() { return !!curMods.classless; }
 
 // Returns true when passive tree nodes should be treated as unallocated.
 export function isTreeless() { return !!curMods.treeless; }
+
+// Returns true when all Rise of the Beasts features should be disabled:
+// no monster packs, no combat bars, no grid pickups, no trial bosses,
+// no endgame. Score multiplier is unaffected (x1.0).
+export function isMonsterless() { return !!curMods.monsterless; }
 
 
 //------------------------------------------------------------------------
@@ -214,6 +227,7 @@ export const RETRY_SETUP_MOD_LABEL_KEYS = {
     ironman: 'mod_im',
     classless: 'mod_cl',
     treeless: 'mod_tl',
+    monsterless: 'mod_ml',
     superTutor: 'mod_super_tutor',
 };
 

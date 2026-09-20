@@ -639,6 +639,12 @@ div.gc.hov-r.hov-c:not(.filled):not(.wrong-mark) {
     color: var(--green);
 }
 
+/* MONSTERLESS mod tag colour - bone grey for the fallen Beasts */
+.mod-tag.ml {
+    border-color: #c9ccd1;
+    color: #c9ccd1;
+}
+
 
 
 

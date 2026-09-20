@@ -720,7 +720,9 @@ export function _egAnimatePickupDiscard(row, col, def) {
 
 // Schedules the next pickup spawn attempt with a random delay in the configured range.
 // Recursively reschedules itself so pickups continue to appear throughout the encounter.
+// MONSTERLESS runs never start the loop: no hearts, mana, cooldown or eraser drops.
 export function _egScheduleNextPickupSpawn() {
+    if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return;
     const delay = EG_PICKUP_SPAWN_INTERVAL_MIN
         + Math.random() * (EG_PICKUP_SPAWN_INTERVAL_MAX - EG_PICKUP_SPAWN_INTERVAL_MIN);
 
@@ -741,6 +743,8 @@ export function _egScheduleNextPickupSpawn() {
 // Attempts to place one pickup on a random eligible grid tile.
 // Does nothing if the board is already at max pickups or no eligible cells exist.
 function _egSpawnPickup() {
+    // MONSTERLESS: no health/mana/cooldown/mistake pickups on the grid.
+    if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return;
     // Stop spawning hearts once all monsters have been defeated
     const req = _egGetMapRequirements();
     if (req.totalMonsters > 0 && globalThis._egChainKillCount >= req.totalMonsters) return;
@@ -783,6 +787,7 @@ function _egSpawnPickup() {
 // to the ambient pickup (total capped at one extra). Returns true when a
 // heart was placed.
 export function _egDropHeartPickup() {
+    if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return false;
     if (!_egIsActive()) return false;
     if (typeof _egPickups === 'undefined' || typeof EG_PICKUP_DEFS === 'undefined') return false;
     if (_egPickups.size >= EG_PICKUP_MAX_ON_BOARD + 1) return false;
@@ -806,6 +811,7 @@ export function _egDropHeartPickup() {
 
 // Starts the recurring pickup spawn loop.
 export function _egStartPickupSpawner() {
+    if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return;
     _egScheduleNextPickupSpawn();
 }
 

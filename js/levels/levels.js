@@ -131,7 +131,9 @@ export function isNexusWorldUnlocked() {
 
 // Returns true if the player has unlocked the Nexus (completed the Nexus
 // Point at least once, or carries the persistent flag).
+// MONSTERLESS runs end after World 14: the Nexus never unlocks.
 export function isNexusUnlocked() {
+    if (typeof globalThis.curMods !== 'undefined' && globalThis.curMods && globalThis.curMods.monsterless) return false;
     if (typeof STATE !== 'undefined' && STATE && STATE.nexusUnlocked) return true;
     if (typeof STATE === 'undefined' || !STATE || !STATE.done) return false;
     const gi = getNexusPointGi();
@@ -139,7 +141,9 @@ export function isNexusUnlocked() {
 }
 
 // Persists the Nexus unlock flag. Called on first clear of the Nexus Point.
+// No-op on MONSTERLESS runs (the game ends after World 14).
 export function setNexusUnlocked() {
+    if (typeof globalThis.curMods !== 'undefined' && globalThis.curMods && globalThis.curMods.monsterless) return;
     if (typeof STATE === 'undefined' || !STATE) return;
     if (!STATE.nexusUnlocked) {
         STATE.nexusUnlocked = true;

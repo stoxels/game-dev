@@ -465,6 +465,11 @@
         color: var(--green);
     }
 
+    .lc-mod-tag.ml {
+        border-color: #c9ccd1;
+        color: #c9ccd1;
+    }
+
 
 
 

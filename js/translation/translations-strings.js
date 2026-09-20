@@ -100,8 +100,10 @@ export const T = {
         mod_desc_im: 'No Items',
         mod_cl: 'CLASSLESS',
         mod_tl: 'TREELESS',
+        mod_ml: 'MONSTERLESS',
         mod_desc_cl: 'No Class Abilities',
         mod_desc_tl: 'No Tree Effects',
+        mod_desc_ml: 'No Beasts: no monsters, no bosses, no endgame',
 
         // In-game HUD
         score_lbl: 'SCORE',
@@ -549,8 +551,10 @@ export const T = {
         mod_desc_im: 'Keine Gegenstände',
         mod_cl: 'KLASSENLOS',
         mod_tl: 'BAUMLOS',
+        mod_ml: 'MONSTERLOS',
         mod_desc_cl: 'Keine Klassenfähigkeiten',
         mod_desc_tl: 'Keine Baum-Effekte',
+        mod_desc_ml: 'Keine Bestien: keine Monster, keine Bosse, kein Endgame',
 
         // In-game HUD
         score_lbl: 'PUNKTE',
@@ -3165,6 +3169,7 @@ Object.assign(T.en, {
     scr_mod_scroll_cl: 'All class abilities are disabled.',
     scr_mod_scroll_hc: 'One mistake and game over.',
     scr_mod_scroll_im: 'No retries. No mercy.',
+    scr_mod_scroll_ml: 'The Beasts never rise: pure puzzles, no monsters, no endgame.',
     scr_mod_scroll_tl: 'The passive tree is sealed shut.',
     scr_mod_scroll_tt: 'A clock is ticking against you.',
     scr_mode_endgame_test: '🧪 Endgame',
@@ -5826,6 +5831,7 @@ Object.assign(T.de, {
     scr_mod_scroll_cl: 'Alle Klassenfähigkeiten sind deaktiviert.',
     scr_mod_scroll_hc: 'Ein Fehler und das Spiel ist vorbei.',
     scr_mod_scroll_im: 'Keine Wiederholungen. Keine Gnade.',
+    scr_mod_scroll_ml: 'Die Bestien erheben sich nie: reine Rätsel, keine Monster, kein Endgame.',
     scr_mod_scroll_tl: 'Der Wahrscheinlichkeitsbaum ist versiegelt.',
     scr_mod_scroll_tt: 'Eine Uhr läuft gegen dich.',
     scr_mode_endgame_test: '🧪 Endgame',

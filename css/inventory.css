@@ -386,6 +386,22 @@
     user-select: none;
 }
 
+/* 5f2 - Puzzle-item art (images/items manifest via EG_ART): scale exactly
+   like the emoji fallback it replaces, so slots never change size. */
+.inv-slot-icon img.eg-art-img {
+    width: 1.5em;
+    height: 1.5em;
+    object-fit: contain;
+    vertical-align: middle;
+    pointer-events: none;
+}
+.inv-tip-name img.eg-art-img {
+    width: 1.2em;
+    height: 1.2em;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
 /* 5g - Small stack-count badge in the bottom-right corner of the slot */
 .inv-slot-count {
     position: absolute;
@@ -671,6 +687,14 @@
 .rshuffle-card-icon {
     font-size: clamp(34px, 4.4vw, 48px);
     line-height: 1;
+}
+
+/* Puzzle-item art on reshuffle cards: fill the icon box like the emoji. */
+.rshuffle-card-icon img.eg-art-img {
+    width: 1em;
+    height: 1em;
+    object-fit: contain;
+    vertical-align: middle;
 }
 
 /* Short item name below the icon - dark ink so it reads on the parchment

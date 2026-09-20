@@ -1,4 +1,5 @@
 import { trackAchStat } from '../achievements/achievements.js';
+import { EG_ART } from '../endgame/endgame-art.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
 import { buildInventoryPanel } from './puzzle-item-inventory-panel.js';
@@ -88,9 +89,12 @@ export function pickReshuffleRewardItems() {
 // its 2px border is tinted with the item's rarity color for a rarity glance-read.
 export function buildReshuffleCardHtml(def) {
     const rarity = rarityColors(def.rarity);
+    const art = (typeof EG_ART !== 'undefined' && EG_ART && typeof EG_ART.html === 'function')
+        ? EG_ART.html('item', def.id, def.icon)
+        : def.icon;
     return `
         <button type="button" class="rshuffle-card" data-id="${def.id}" style="border-color:${rarity.border}">
-            <div class="rshuffle-card-icon">${def.icon}</div>
+            <div class="rshuffle-card-icon">${art}</div>
             <div class="rshuffle-card-name">${itemName(def)}</div>
             <div class="rshuffle-card-desc">${itemDesc(def)}</div>
         </button>`;

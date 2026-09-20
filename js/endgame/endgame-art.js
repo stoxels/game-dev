@@ -54,7 +54,10 @@ export const EG_ART = (function () {
     // Item-icon manifest (images/items/): id -> art path relative to images/.
     // Fetched LAZILY on the first 'item' lookup so boot and the title screen
     // never pay for it. Regenerate with: node tools/build-items-manifest.mjs
-    const ITEMS_MANIFEST_URL = 'images/items/manifest.json';
+    // ?v= cache-buster: bump whenever art moves or ids are renamed, so
+    // returning visitors never use a cached manifest pointing at old paths
+    // (relaid out 2026-09-21: per-slot folders + puzzle_items + new ids).
+    const ITEMS_MANIFEST_URL = 'images/items/manifest.json?v=2';
     let _itemsManifestStarted = false;
     let _itemsManifestSettled = false;
 

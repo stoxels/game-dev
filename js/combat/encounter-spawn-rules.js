@@ -319,8 +319,10 @@ export function _egBuildCampaignMonsterList(count, level) {
 
 // Returns true when the current level should run a campaign monster pack.
 // Excludes endgame sandbox levels and levels already stamped as map seeds.
+// MONSTERLESS runs never prepare an encounter - pure puzzles, no Beasts.
 function _egShouldPrepareCampaignEncounter() {
     if (!cur) return false;
+    if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return false;
     if (cur.isEndgameSandbox) return false;
     // Active map-device run / sandbox seed - already a monster level that is
     // NOT a campaign level.
@@ -335,6 +337,7 @@ function _egShouldPrepareCampaignEncounter() {
 // Called from start-level.js right before _egStartEncounter().
 export function _egPrepareCampaignEncounter() {
     if (!_egShouldPrepareCampaignEncounter()) return false;
+    if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return false;
     if (cur.campaignMonsters) return true;   // already prepared (retry / chain)
 
     const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
@@ -387,6 +390,9 @@ export function _egClearCampaignLevelFields(level) {
 // boss ability purposefully summons them (_egMechSummonAdds).
 export function _egShouldSuppressRespawn() {
     if (!_egIsActive()) return true;
+
+    // MONSTERLESS: nothing may ever repopulate the field.
+    if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return true;
 
     // Campaign levels spawn one fixed pack and never respawn - the pack is
     // budgeted against the puzzle's damage economy (see

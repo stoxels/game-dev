@@ -245,6 +245,10 @@ export function _egLaunchTrialRun(wi, kind) {
     const monsterLevel = _egTrialMonsterLevel(wi, kind === 'ascension');
     const bossId = _egTrialBossId(wi, kind === 'ascension' ? 1 : 0);
     const trialId = kind === 'convergence' ? _egTrialIdForWorld(wi) : ('asc_' + (wi + 1));
+    // MONSTERLESS: trials stay puzzle chains with question intermissions but
+    // run with no monsters and no boss finale.
+    const monsterless = !!(typeof curMods !== 'undefined' && curMods && curMods.monsterless);
+    const trialBossId = monsterless ? null : bossId;
     const stamp = {
         kind, wi, trialId,
         name: kind === 'convergence' ? _egTrialName(wi) : _egAscensionTrialName(wi),
@@ -255,10 +259,10 @@ export function _egLaunchTrialRun(wi, kind) {
 
     const baseline = {
         monsterLevel,
-        maxMonsters: chain.maxMonsters,
-        totalMonsters: chain.totalMonsters,
-        hasBoss: true,
-        maxBosses: 1,
+        maxMonsters: monsterless ? 0 : chain.maxMonsters,
+        totalMonsters: monsterless ? 0 : chain.totalMonsters,
+        hasBoss: monsterless ? false : true,
+        maxBosses: monsterless ? 0 : 1,
         requiredPuzzles: chain.requiredPuzzles,
         requiredQuestions: chain.requiredQuestions,
         egTimeLimit: 1200,
@@ -301,7 +305,7 @@ export function _egLaunchTrialRun(wi, kind) {
     level.totalMonsters = baseline.totalMonsters;
     level.hasBoss = baseline.hasBoss;
     level.maxBosses = baseline.maxBosses;
-    if (bossId) level.bosses = [{ id: bossId }];
+    if (trialBossId) level.bosses = [{ id: trialBossId }];
     else delete level.bosses;
     level.requiredPuzzles = baseline.requiredPuzzles;
     level.requiredQuestions = baseline.requiredQuestions;

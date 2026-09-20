@@ -71,6 +71,9 @@ export function _charIs(id) {
 // exactly one avatar may exist at a time (each render removes the other -
 // see _renderPlayerAvatar* below).
 export function _avatarBarsHTML(barWidth = '100%') {
+    // MONSTERLESS: pure puzzling needs no combat readout - the sprite stands
+    // alone with no Health / Mana / Shield / charge bars.
+    if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return '';
     return `
             <div style="width: ${barWidth};">
                 <div style="width: 100%; margin-bottom: 4px;">
