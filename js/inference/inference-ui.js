@@ -2,6 +2,8 @@ import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
 import { LEDGER_CATEGORIES, LEDGER_GROUPS } from './inference-data.js';
 import { _milestone_getProgress, _milestone_isClaimed, _milestone_isComplete } from './inference-logic.js';
+import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
+import { rarityColors } from '../puzzle-items/item-pool.js';
 import { puzzleItemIconHtml } from '../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
@@ -10,19 +12,19 @@ import { puzzleItemIconHtml } from '../puzzle-mechanics/toasts-and-popups.js';
 //------------------------------------------------------------------------
 
 /** How long a quest toast stays fully visible before fading out (ms). */
-export const QUEST_TOAST_DISPLAY_MS = 10000; //3500;
+const QUEST_TOAST_DISPLAY_MS = 10000; //3500;
 
 /** Duration of the toast CSS fade-out transition (ms). Must match the CSS. */
-export const QUEST_TOAST_FADEOUT_MS = 500;
+const QUEST_TOAST_FADEOUT_MS = 500;
 
 /** Gap between consecutive toasts to prevent them overlapping (ms). */
-export const QUEST_TOAST_GAP_MS = 300;
+const QUEST_TOAST_GAP_MS = 300;
 
 /** Currently active ledger tab (category group). */
-export let _ledger_activeGroupId = 'progression'; // Default tab
+let _ledger_activeGroupId = 'progression'; // Default tab
 
 /** Currently open category id, or null when showing the grid overview. */
-export let _ledger_activeCategoryId = null;
+let _ledger_activeCategoryId = null;
 
 /**
  * Category icons layered on top of the shared stone-and-parchment card
@@ -30,7 +32,7 @@ export let _ledger_activeCategoryId = null;
  * only this small icon changes per category). Every category id from
  * inference-data.js needs exactly one entry here.
  */
-export const LEDGER_CATEGORY_ICON = {
+const LEDGER_CATEGORY_ICON = {
     // Progression
     expected_value: 'images/Inference/icons/expected_value.webp',
     sample_size: 'images/Inference/icons/sample_size.webp',
@@ -118,13 +120,13 @@ export const LEDGER_CATEGORY_ICON = {
 };
 
 /** Cached reference to the floating reward-tooltip element. */
-export let _questRewardTipEl = null;
+let _questRewardTipEl = null;
 
 /** Queue of pending { milestone, category } objects waiting to be displayed as toasts. */
-export let _questToastQueue = [];
+let _questToastQueue = [];
 
 /** True while a toast is currently being shown (prevents overlap). */
-export let _questToastBusy = false;
+let _questToastBusy = false;
 
 
 //------------------------------------------------------------------------
@@ -139,7 +141,7 @@ export let _questToastBusy = false;
  * @param {string} catId
  * @returns {string} a CSS url() value
  */
-export function _ledger_getCategoryIcon(catId) {
+function _ledger_getCategoryIcon(catId) {
     const path = LEDGER_CATEGORY_ICON[catId] || 'images/Inference/icons/placeholder.webp';
     return `url('${path}')`;
 }
@@ -150,7 +152,7 @@ export function _ledger_getCategoryIcon(catId) {
  * @param {HTMLElement} tip
  * @param {HTMLElement} anchorEl
  */
-export function _positionTooltipNearAnchor(tip, anchorEl) {
+function _positionTooltipNearAnchor(tip, anchorEl) {
     // Reset so we can measure the natural size
     tip.style.left = '0px';
     tip.style.top = '0px';
@@ -182,7 +184,7 @@ export function _positionTooltipNearAnchor(tip, anchorEl) {
  * Returns (or lazily creates) the floating tooltip element used on reward chips.
  * @returns {HTMLElement}
  */
-export function _ensureQuestRewardTooltip() {
+function _ensureQuestRewardTooltip() {
     if (_questRewardTipEl) return _questRewardTipEl;
     _questRewardTipEl = document.createElement('div');
     _questRewardTipEl.id = 'quest-reward-tooltip';
@@ -192,12 +194,12 @@ export function _ensureQuestRewardTooltip() {
 
 /**
  * Fills in and shows the reward tooltip, positioned near the hovered chip.
- * @param {Object} def       - globalThis.ITEM_DEFS entry for the item
+ * @param {Object} def       - ITEM_DEFS entry for the item
  * @param {HTMLElement} anchorEl - The chip element that was hovered
  */
-export function _showQuestRewardTooltip(def, anchorEl) {
+function _showQuestRewardTooltip(def, anchorEl) {
     const tip = _ensureQuestRewardTooltip();
-    const rc = globalThis.rarityColors(def.rarity);
+    const rc = rarityColors(def.rarity);
     const de = LANG === 'de';
 
     tip.innerHTML = `
@@ -221,7 +223,7 @@ export function _hideQuestRewardTooltip() {
  * @param {string} defId
  */
 export function _questChipHover(el, defId) {
-    const def = globalThis.ITEM_DEFS[defId];
+    const def = ITEM_DEFS[defId];
     if (def) _showQuestRewardTooltip(def, el);
 }
 
@@ -236,7 +238,7 @@ export function _questChipHover(el, defId) {
  * Separated from the HTML builder so the data is easy to test or reuse.
  * @returns {{ totalMs: number, claimedMs: number, claimableMs: number, ptFromLedger: number, ptTotal: number }}
  */
-export function _ledger_computeSummaryData() {
+function _ledger_computeSummaryData() {
     let totalMs = 0, claimedMs = 0, claimableMs = 0, ptFromLedger = 0, ptTotal = 0;
 
     LEDGER_CATEGORIES.forEach(cat => {
@@ -260,7 +262,7 @@ export function _ledger_computeSummaryData() {
  * Displays total PT points earned, milestones claimed, and a claimable badge if relevant.
  * @returns {string} HTML string
  */
-export function _ledger_buildSummaryStrip() {
+function _ledger_buildSummaryStrip() {
     const { totalMs, claimedMs, claimableMs, ptFromLedger, ptTotal } = _ledger_computeSummaryData();
 
     const claimableStat = claimableMs > 0
@@ -299,7 +301,7 @@ export function _ledger_buildSummaryStrip() {
  * @param {Object} cat - A category object from LEDGER_CATEGORIES
  * @returns {string} HTML string
  */
-export function _ledger_buildCategoryCard(cat) {
+function _ledger_buildCategoryCard(cat) {
     const de = LANG === 'de';
 
     const totalMs = cat.milestones.length;
@@ -346,7 +348,7 @@ export function _ledger_buildCategoryCard(cat) {
  * @param {Array} cats
  * @returns {string} HTML string
  */
-export function _ledger_buildGrid(cats) {
+function _ledger_buildGrid(cats) {
     return `<div class="ledger-grid">
         ${cats.map(_ledger_buildCategoryCard).join('')}
     </div>`;
@@ -357,7 +359,7 @@ export function _ledger_buildGrid(cats) {
  * into the modal element, for the currently active group tab.
  * @param {HTMLElement} modal
  */
-export function _ledger_renderGridView(modal) {
+function _ledger_renderGridView(modal) {
     const de = LANG === 'de';
 
     // Build the Tab Navigation
@@ -416,7 +418,7 @@ export function _ledger_renderGridView(modal) {
  * @param {Object} ms
  * @returns {{ rowClass: string, statusText: string, claimable: boolean, claimed: boolean }}
  */
-export function _ledger_getMilestoneDisplayState(ms) {
+function _ledger_getMilestoneDisplayState(ms) {
     const claimed = _milestone_isClaimed(ms);
     const complete = _milestone_isComplete(ms);
     const claimable = complete && !claimed;
@@ -438,8 +440,8 @@ export function _ledger_getMilestoneDisplayState(ms) {
  * @param {boolean} de - True if German locale
  * @returns {string} HTML string
  */
-export function _ledger_buildItemChip(defId, de) {
-    const def = globalThis.ITEM_DEFS[defId];
+function _ledger_buildItemChip(defId, de) {
+    const def = ITEM_DEFS[defId];
     if (!def) return '';
     return `
         <span class="quest-reward-item quest-reward-item-tip"
@@ -455,7 +457,7 @@ export function _ledger_buildItemChip(defId, de) {
  * @param {Object} reward - The ms.reward object
  * @returns {string} HTML string
  */
-export function _ledger_buildRewardChips(reward) {
+function _ledger_buildRewardChips(reward) {
     const de = LANG === 'de';
     const chips = [];
 
@@ -485,7 +487,7 @@ export function _ledger_buildRewardChips(reward) {
  * @param {boolean} claimed
  * @returns {string} HTML string
  */
-export function _ledger_buildClaimButton(ms, claimable, claimed) {
+function _ledger_buildClaimButton(ms, claimable, claimed) {
     if (claimable) {
         return `<button class="quest-claim-btn" onclick="claimQuest('${ms.id}')">
                     🎁 ${t('qa_btn_claim')}
@@ -504,7 +506,7 @@ export function _ledger_buildClaimButton(ms, claimable, claimed) {
  * @param {Object} ms - A milestone object from inference-data.js
  * @returns {string} HTML string
  */
-export function _ledger_buildMilestoneRow(ms) {
+function _ledger_buildMilestoneRow(ms) {
     const de = LANG === 'de';
     const { rowClass, claimable, claimed } = _ledger_getMilestoneDisplayState(ms);
     const { current, target, pct } = _milestone_getProgress(ms);
@@ -537,7 +539,7 @@ export function _ledger_buildMilestoneRow(ms) {
  * Falls back to the grid view if the category id is invalid.
  * @param {HTMLElement} modal
  */
-export function _ledger_renderDetailView(modal) {
+function _ledger_renderDetailView(modal) {
     const de = LANG === 'de';
     const cat = LEDGER_CATEGORIES.find(c => c.id === _ledger_activeCategoryId);
     if (!cat) { _ledger_backToGrid(); return; }
@@ -591,7 +593,7 @@ export function renderQuestLog() {
 /**
  * Closes the quest-log modal and resets navigation back to the grid overview.
  */
-export function hideQuestLog() {
+function hideQuestLog() {
     _ledger_activeCategoryId = null;
     const modal = document.getElementById('quest-log-modal');
     if (modal) modal.classList.remove('show');
@@ -601,7 +603,7 @@ export function hideQuestLog() {
  * Returns to the category grid from a detail view.
  * Called from the "Back to Overview" button.
  */
-export function _ledger_backToGrid() {
+function _ledger_backToGrid() {
     _ledger_activeCategoryId = null;
     renderQuestLog();
 }
@@ -668,7 +670,7 @@ export function showQuestLog() {
  * @param {Object} category
  * @returns {HTMLElement}
  */
-export function _buildQuestToastElement(milestone, category) {
+function _buildQuestToastElement(milestone, category) {
     const de = LANG === 'de';
 
     const catTitle = de ? category.titleDE : category.titleEn;
@@ -696,7 +698,7 @@ export function _buildQuestToastElement(milestone, category) {
  * and schedules the next drain after the gap delay.
  * @param {HTMLElement} el
  */
-export function _dismissQuestToast(el) {
+function _dismissQuestToast(el) {
     el.classList.remove('show');
     setTimeout(() => {
         el.remove();
@@ -713,7 +715,7 @@ export function _dismissQuestToast(el) {
  * @param {Object} milestone
  * @param {Object} category
  */
-export function _showQuestToast(milestone, category) {
+function _showQuestToast(milestone, category) {
     _questToastBusy = true;
 
     // Safety-clear any element that somehow wasn't removed
@@ -740,7 +742,7 @@ export function _showQuestToast(milestone, category) {
 /**
  * Dequeues and displays the next toast if none is currently showing.
  */
-export function _drainQuestToastQueue() {
+function _drainQuestToastQueue() {
     if (_questToastBusy || !_questToastQueue.length) return;
     const { milestone, category } = _questToastQueue.shift();
     _showQuestToast(milestone, category);
@@ -748,7 +750,7 @@ export function _drainQuestToastQueue() {
 
 /**
  * Public entry point - queues a "milestone reached" toast notification.
- * Called from inference-stats.js when a milestone becomes complete.
+ * Currently unused: the claim flow shows the banner in inference-logic.js
  * @param {Object} milestone
  * @param {Object} category
  */
