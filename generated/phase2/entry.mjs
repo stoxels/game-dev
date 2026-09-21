@@ -376,6 +376,7 @@ try { Object.defineProperty(globalThis, "EG_PICKUP_LIFETIME_MS", { get() { retur
 try { Object.defineProperty(globalThis, "EG_PLAYER_STATS", { get() { return EG_PLAYER_STATS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "EG_RECENT_FILLS_CAPACITY", { get() { return EG_RECENT_FILLS_CAPACITY; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "EG_REVEAL_PROJECTILE_STAGGER_MS", { get() { return EG_REVEAL_PROJECTILE_STAGGER_MS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "G", { get() { return G; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "ITEM_DEFS", { get() { return ITEM_DEFS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "MATH_GATE_POOLS", { get() { return MATH_GATE_POOLS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "NEXUS_WORLD_INDEX", { get() { return NEXUS_WORLD_INDEX; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -419,6 +420,8 @@ try { Object.defineProperty(globalThis, "_dofChoose", { get() { return _dofChoos
 try { Object.defineProperty(globalThis, "_dofNudge", { get() { return _dofNudge; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egAllocateAttribute", { get() { return _egAllocateAttribute; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egAnimatePickupDiscard", { get() { return _egAnimatePickupDiscard; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egAtlasBuildNodeTooltipHTML", { get() { return _egAtlasBuildNodeTooltipHTML; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egAtlasBuildTierTooltipHTML", { get() { return _egAtlasBuildTierTooltipHTML; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egAtlasSearch", { get() { return _egAtlasSearch; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egAtlasSelectNode", { get() { return _egAtlasSelectNode; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egAtlasZoomFit", { get() { return _egAtlasZoomFit; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -434,6 +437,8 @@ try { Object.defineProperty(globalThis, "_egBossTick", { get() { return _egBossT
 try { Object.defineProperty(globalThis, "_egBossTierNorm", { get() { return _egBossTierNorm; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egBuildBoss", { get() { return _egBuildBoss; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egBuildPickupEligiblePool", { get() { return _egBuildPickupEligiblePool; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egBuildStatDescTooltipHTML", { get() { return _egBuildStatDescTooltipHTML; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egBuildXpTiersHTML", { get() { return _egBuildXpTiersHTML; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egBumperSlam", { get() { return _egBumperSlam; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egCalcPlayerDamage", { get() { return _egCalcPlayerDamage; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egCancelMassSellConfirm", { get() { return _egCancelMassSellConfirm; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -485,6 +490,7 @@ try { Object.defineProperty(globalThis, "_egGetElementCentre", { get() { return 
 try { Object.defineProperty(globalThis, "_egGetPlayerLevel", { get() { return _egGetPlayerLevel; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGetRevealProjectileDamagePct", { get() { return _egGetRevealProjectileDamagePct; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGetTarget", { get() { return _egGetTarget; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egGetUnmetRequirementsText", { get() { return _egGetUnmetRequirementsText; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGourmetDevour", { get() { return _egGourmetDevour; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGrantCampaignLevelXP", { get() { return _egGrantCampaignLevelXP; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egHandleChipMouseDown", { get() { return _egHandleChipMouseDown; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -611,6 +617,11 @@ try { Object.defineProperty(globalThis, "_eglfDelRule", { get() { return _eglfDe
 try { Object.defineProperty(globalThis, "_eglfSaveModal", { get() { return _eglfSaveModal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_eglfSetRule", { get() { return _eglfSetRule; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egtPickSeedGi", { get() { return _egtPickSeedGi; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egvBuyBaseItem", { get() { return _egvBuyBaseItem; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egvBuyCurrency", { get() { return _egvBuyCurrency; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egvBuyEssence", { get() { return _egvBuyEssence; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egvBuyPuzzleItem", { get() { return _egvBuyPuzzleItem; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egvBuyTierMap", { get() { return _egvBuyTierMap; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvHideBaseTooltip", { get() { return _egvHideBaseTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvSetBaseFilter", { get() { return _egvSetBaseFilter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvShowBaseTooltip", { get() { return _egvShowBaseTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -656,7 +667,10 @@ try { Object.defineProperty(globalThis, "_showPlayerAvatar", { get() { return _s
 try { Object.defineProperty(globalThis, "_showPlayerAvatarSimple", { get() { return _showPlayerAvatarSimple; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_sigThresholdIntercept", { get() { return _sigThresholdIntercept; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_signalToNoiseCheckRestore", { get() { return _signalToNoiseCheckRestore; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_skillFormatCooldown", { get() { return _skillFormatCooldown; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_sparsePriorOnLineComplete", { get() { return _sparsePriorOnLineComplete; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_sraDmgMult", { get() { return _sraDmgMult; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_sraManaMult", { get() { return _sraManaMult; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_sraOnPick", { get() { return _sraOnPick; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_sraPlayVisual", { get() { return _sraPlayVisual; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_sraStep", { get() { return _sraStep; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -698,9 +712,12 @@ try { Object.defineProperty(globalThis, "curDiff", { get() { return curDiff; }, 
 try { Object.defineProperty(globalThis, "curMods", { get() { return curMods; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "currentZoom", { get() { return currentZoom; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "egActivateMap", { get() { return egActivateMap; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "egAtlasNodeById", { get() { return egAtlasNodeById; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "egAtlasNodeName", { get() { return egAtlasNodeName; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "egCloseMapModsOverlay", { get() { return egCloseMapModsOverlay; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "egDragOver", { get() { return egDragOver; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "egDropOnCraftingBench", { get() { return egDropOnCraftingBench; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "egGetGold", { get() { return egGetGold; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "egOpenMapModsOverlay", { get() { return egOpenMapModsOverlay; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "egSaveHubState", { get() { return egSaveHubState; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "executeActiveAbility", { get() { return executeActiveAbility; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -708,6 +725,7 @@ try { Object.defineProperty(globalThis, "finishQuiz", { get() { return finishQui
 try { Object.defineProperty(globalThis, "finishTutorial", { get() { return finishTutorial; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "gainMana", { get() { return gainMana; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getAvatarLastMoveDir", { get() { return getAvatarLastMoveDir; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "getClassChangeTokens", { get() { return getClassChangeTokens; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getClassPenaltyMultiplier", { get() { return getClassPenaltyMultiplier; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getGameTooltip", { get() { return getGameTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "goToPreviousScreen", { get() { return goToPreviousScreen; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -824,6 +842,7 @@ try { Object.defineProperty(globalThis, "stopPainting", { get() { return stopPai
 try { Object.defineProperty(globalThis, "submitMathGate", { get() { return submitMathGate; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "submitPrimerAnswer", { get() { return submitPrimerAnswer; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "syncDiffModButtons", { get() { return syncDiffModButtons; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "t", { get() { return t; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "togMod", { get() { return togMod; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "triggerBanter", { get() { return triggerBanter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "triggerClassEventIfPending", { get() { return triggerClassEventIfPending; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

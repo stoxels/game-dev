@@ -255,7 +255,7 @@ export const EG_VENDOR_TAB_HINTS = {
 export function _egvBuildTopbarHTML() {
     return `
 <div class="egn-topbar">
-    <button class="back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
+    <button class="back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
     <span class="egn-topbar-title">${t('eg_vendor_title')}</span>
 </div>`;
 }
@@ -1067,6 +1067,12 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 // Entry point - opens the Vendor screen on the last active tab.
 export function showEndgameVendor() {
     if (!document.getElementById('screen-endgame-vendor')) _egvCreateScreen();
+
+    // The vendor screen DOM is built once - keep the back button pointed
+    // at the Nexus of Worlds (also heals screens built before the
+    // goToPreviousScreen() -> showEndgameNexus() fix).
+    const backBtn = document.querySelector('#screen-endgame-vendor .back-btn');
+    if (backBtn) backBtn.setAttribute('onclick', 'showEndgameNexus()');
 
     if (typeof switchScreen === 'function') {
         switchScreen('screen-endgame-vendor');
