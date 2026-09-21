@@ -108,15 +108,36 @@ export function resolveItemMeta(data, id) {
     const handle = Array.isArray(ov.handle) ? ov.handle.slice()
         : Array.isArray(ov.autoHandle) ? ov.autoHandle.slice()
         : cat.handle.slice();
+    // Mass-record fields (per-ITEM, recorded once per item in the grip
+    // lab's record mode and applied to EVERY frame/character afterwards):
+    //   offsetByDir — SCREEN-SPACE grip offset from the frame's hand anchor,
+    //                 per direction {up,down,left,right}, in body-box
+    //                 fractions (x across, y down). Borrowed from the
+    //                 opposite direction (x negated) when missing.
+    //   rotByDir    — per-direction rotation in degrees, same borrowing
+    //                 (negated) for the opposite horizontal direction.
+    //   offset      — legacy direction-independent offset (fallback).
+    //   recMirrored — record-mode override: skip the x-negation when the
+    //                 opposite direction borrows this record (gear that
+    //                  should NOT swap sides, e.g. back-slung shields).
+    const isMap = (m) => m && typeof m === 'object' && !Array.isArray(m);
     return {
         id,
         role: ov.role || cat.role,
         category: cat.id,
         handle,
         autoHandle: Array.isArray(ov.autoHandle) ? ov.autoHandle.slice() : null,
+        offsetByDir: isMap(ov.offsetByDir) ? { ...ov.offsetByDir } : null,
+        rotByDir: isMap(ov.rotByDir) ? { ...ov.rotByDir } : null,
+        offset: Array.isArray(ov.offset) && ov.offset.length === 2
+            ? [typeof ov.offset[0] === 'number' ? ov.offset[0] : 0,
+               typeof ov.offset[1] === 'number' ? ov.offset[1] : 0]
+            : null,
+        recMirrored: !!ov.recMirrored,
         scale: fullScale,
         visibleScale: typeof ov.scale === 'number' ? ov.scale : cat.scale,
         rot: typeof ov.rot === 'number' ? ov.rot : (cat.rot || 0),
+        hasRot: typeof ov.rot === 'number',
         axis: Array.isArray(ov.axis) ? ov.axis.slice() : (cat.axis || [0.5, 0.5]).slice(),
         flipX: !!ov.flipX,
         bbox,
@@ -325,7 +346,26 @@ export function resolvePlacement(req) {
     const role = slot === 'off' ? (req.offRole || 'shield') : 'weapon';
 
     // ---- resolution chain: pose (per-item edit) → frame cfg → defaults
-    const rotSrc = typeof pose.rot === 'number' ? pose.rot
+    const OPP = { up: 'down', down: 'up', left: 'right', right: 'left' };
+    const opp = OPP[dir];
+    // Mass-recorded per-item rotation (rotByDir) wins over everything: it
+    // is a deliberate, item-specific direction choice made in record mode.
+    // Missing direction: borrow the opposite record, negated (screen-space
+    // mirror), unless recMirrored says the record must not swap sides.
+    let dirRot = null;
+    const rbd = item.rotByDir;
+    if (rbd && typeof rbd[dir] === 'number') dirRot = rbd[dir];
+    else if (rbd && typeof rbd[opp] === 'number') {
+        // Borrow the opposite record. Against real frame data the screen
+        // mirror means the recorded rot must negate here; against a
+        // mirrored set the mirror block below negates it instead (the
+        // borrowed record is then the record of the displayed set itself).
+        const horizontal = dir === 'left' || dir === 'right';
+        const negate = horizontal && !item.recMirrored && !res.mirrored;
+        dirRot = negate ? -wrapDeg(rbd[opp]) : rbd[opp];
+    }
+    const rotSrc = dirRot !== null ? dirRot
+        : typeof pose.rot === 'number' ? pose.rot
         : (typeof cfg.rot === 'number' ? cfg.rot : defaultRot(dir, role, handed));
     const scaleSrc = typeof pose.scale === 'number' ? pose.scale
         : (typeof cfg.scale === 'number' ? cfg.scale : item.visibleScale);
@@ -357,9 +397,36 @@ export function resolvePlacement(req) {
     const patchR = typeof patchCfg.r === 'number' ? patchCfg.r : 0.045;
 
     // the weapon ALWAYS grips at its own hand anchor; the second fist of a
-    // two-hander is a patch at shieldHand handled by the renderer (F5)
-    const hand = frame[handKey];
-    if (!hand) return null;
+    // two-hander is a patch at shieldHand handled by the renderer (F5).
+    // Mass-recorded per-item offset shifts the grip from the body's generic
+    // hand anchor. Offsets are recorded in body-box fractions (x across,
+    // y down at the body's aspect), so y is scaled to the box here.
+    const hand0 = frame[handKey];
+    if (!hand0) return null;
+
+    // Mass-recorded per-item grip offset. Resolution: this direction's
+    // record → the opposite direction's record (x negated — the offset was
+    // made facing the other way; records are always made in source sets,
+    // so this only fires against real, unmirrored frame data) → the legacy
+    // direction-independent offset → none.
+    //
+    // When res.mirrored (the lab playing opposite-side art flipped), the
+    // borrowed record IS the record of the set being displayed: keep it in
+    // body space and let the renderer's body flip mirror it on screen —
+    // the same reason the rot mirror block below negates after the fact.
+    let off = null;
+    const obd = item.offsetByDir;
+    if (obd && Array.isArray(obd[dir])) off = obd[dir].slice();
+    else if (obd && Array.isArray(obd[opp])) {
+        off = obd[opp].slice();
+        const horizontal = dir === 'left' || dir === 'right';
+        if (horizontal && !item.recMirrored && !res.mirrored) off[0] = -off[0];
+    } else if (item.offset) off = item.offset.slice();
+
+    const hand = [
+        hand0[0] + (off ? off[0] : 0),
+        hand0[1] + (off ? off[1] : 0),
+    ];
 
     return {
         hand: hand.slice(),

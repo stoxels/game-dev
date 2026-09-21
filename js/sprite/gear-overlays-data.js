@@ -42,14 +42,17 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.674,
-    0.723
+    0.624,
+    0.624
    ],
    "autoHandle": [
     0.674,
     0.723
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -64,20 +67,23 @@ export const GEAR_GRIP_DATA = {
     0.824,
     0.824
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_1h_2": {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.271,
-    0.742
+    0.377,
+    0.621
    ],
    "autoHandle": [
     0.271,
     0.742
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -92,20 +98,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_1h_3": {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.339,
-    0.727
+    0.383,
+    0.627
    ],
    "autoHandle": [
     0.339,
     0.727
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -120,20 +129,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_1h_4": {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.287,
-    0.735
+    0.404,
+    0.61
    ],
    "autoHandle": [
     0.287,
     0.735
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -148,20 +160,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_1h_5": {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.701,
-    0.729
+    0.375,
+    0.36
    ],
    "autoHandle": [
     0.701,
     0.729
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -176,20 +191,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_agi_1": {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.306,
-    0.743
+    0.393,
+    0.624
    ],
    "autoHandle": [
     0.306,
     0.743
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -204,20 +222,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_agi_2": {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.341,
-    0.734
+    0.42,
+    0.609
    ],
    "autoHandle": [
     0.341,
     0.734
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -232,20 +253,23 @@ export const GEAR_GRIP_DATA = {
     0.809,
     0.84
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_agi_3": {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.353,
-    0.747
+    0.384,
+    0.636
    ],
    "autoHandle": [
     0.353,
     0.747
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -260,20 +284,23 @@ export const GEAR_GRIP_DATA = {
     0.809,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_agi_4": {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.279,
-    0.733
+    0.358,
+    0.652
    ],
    "autoHandle": [
     0.279,
     0.733
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -288,20 +315,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_int_1": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.306,
-    0.733
+    0.363,
+    0.658
    ],
    "autoHandle": [
     0.306,
     0.733
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -316,20 +346,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_int_2": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.297,
-    0.737
+    0.365,
+    0.666
    ],
    "autoHandle": [
     0.297,
     0.737
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -344,20 +377,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_int_3": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.297,
-    0.743
+    0.409,
+    0.621
    ],
    "autoHandle": [
     0.297,
     0.743
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -372,20 +408,23 @@ export const GEAR_GRIP_DATA = {
     0.809,
     0.84
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_int_4": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.275,
-    0.744
+    0.375,
+    0.648
    ],
    "autoHandle": [
     0.275,
     0.744
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -400,20 +439,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_2h_1": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.674,
-    0.723
+    0.616,
+    0.618
    ],
    "autoHandle": [
     0.674,
     0.723
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -428,20 +470,23 @@ export const GEAR_GRIP_DATA = {
     0.824,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_2h_2": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.283,
-    0.739
+    0.377,
+    0.644
    ],
    "autoHandle": [
     0.283,
     0.739
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -456,20 +501,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_2h_3": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.651,
-    0.724
+    0.608,
+    0.626
    ],
    "autoHandle": [
     0.651,
     0.724
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -484,20 +532,23 @@ export const GEAR_GRIP_DATA = {
     0.824,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_1h_6": {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.386,
-    0.64
+    0.372,
+    0.624
    ],
    "autoHandle": [
     0.323,
     0.722
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -518,14 +569,17 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.341,
-    0.724
+    0.391,
+    0.619
    ],
    "autoHandle": [
     0.341,
     0.724
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -540,20 +594,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_1h_8": {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.696,
-    0.731
+    0.363,
+    0.355
    ],
    "autoHandle": [
     0.696,
     0.731
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -568,20 +625,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_agi_5": {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.273,
-    0.738
+    0.409,
+    0.605
    ],
    "autoHandle": [
     0.273,
     0.738
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -596,20 +656,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_agi_6": {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.287,
-    0.716
+    0.37,
+    0.613
    ],
    "autoHandle": [
     0.287,
     0.716
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -624,20 +687,23 @@ export const GEAR_GRIP_DATA = {
     0.836,
     0.813
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_agi_7": {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.292,
-    0.744
+    0.4,
+    0.636
    ],
    "autoHandle": [
     0.292,
     0.744
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -652,20 +718,23 @@ export const GEAR_GRIP_DATA = {
     0.805,
     0.84
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_int_5": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.29,
-    0.748
+    0.38,
+    0.664
    ],
    "autoHandle": [
     0.29,
     0.748
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -680,20 +749,23 @@ export const GEAR_GRIP_DATA = {
     0.801,
     0.844
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_int_6": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.278,
-    0.749
+    0.377,
+    0.656
    ],
    "autoHandle": [
     0.278,
     0.749
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -708,20 +780,23 @@ export const GEAR_GRIP_DATA = {
     0.809,
     0.84
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_int_7": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.307,
-    0.761
+    0.406,
+    0.68
    ],
    "autoHandle": [
     0.307,
     0.761
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -736,20 +811,23 @@ export const GEAR_GRIP_DATA = {
     0.781,
     0.855
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_2h_4": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.86,
-    0.78
+    0.384,
+    0.64
    ],
    "autoHandle": [
     0.338,
     0.733
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -770,14 +848,17 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.378,
-    0.713
+    0.366,
+    0.628
    ],
    "autoHandle": [
     0.378,
     0.713
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -792,20 +873,23 @@ export const GEAR_GRIP_DATA = {
     0.828,
     0.82
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_1h_9": {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.358,
-    0.731
+    0.397,
+    0.627
    ],
    "autoHandle": [
     0.358,
     0.731
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -820,20 +904,23 @@ export const GEAR_GRIP_DATA = {
     0.809,
     0.84
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_agi_8": {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.281,
-    0.744
+    0.378,
+    0.62
    ],
    "autoHandle": [
     0.281,
     0.744
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -848,20 +935,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_int_8": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.31,
-    0.744
+    0.392,
+    0.662
    ],
    "autoHandle": [
     0.31,
     0.744
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -876,20 +966,23 @@ export const GEAR_GRIP_DATA = {
     0.801,
     0.844
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_2h_6": {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.289,
-    0.731
+    0.383,
+    0.628
    ],
    "autoHandle": [
     0.289,
     0.731
    ],
    "scale": 0.62,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -904,20 +997,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_rusted_arcane_rod_2": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.306,
-    0.729
+    0.393,
+    0.614
    ],
    "autoHandle": [
     0.306,
     0.729
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -932,20 +1028,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_rusted_battle_blade_3": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.668,
-    0.729
+    0.606,
+    0.614
    ],
    "autoHandle": [
     0.668,
     0.729
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -960,20 +1059,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_worn_battle_blade_7": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.703,
-    0.728
+    0.372,
+    0.361
    ],
    "autoHandle": [
     0.703,
     0.728
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -988,20 +1090,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_worn_battle_blade_8": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.336,
-    0.731
+    0.39,
+    0.618
    ],
    "autoHandle": [
     0.336,
     0.731
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1016,20 +1121,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_worn_swift_fang_9": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.754,
-    0.728
+    0.407,
+    0.379
    ],
    "autoHandle": [
     0.754,
     0.728
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1044,20 +1152,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_worn_battle_blade_11": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.66,
-    0.734
+    0.607,
+    0.636
    ],
    "autoHandle": [
     0.66,
     0.734
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1072,20 +1183,23 @@ export const GEAR_GRIP_DATA = {
     0.809,
     0.84
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_iron_swift_fang_13": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.304,
-    0.718
+    0.41,
+    0.591
    ],
    "autoHandle": [
     0.304,
     0.718
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1100,20 +1214,23 @@ export const GEAR_GRIP_DATA = {
     0.832,
     0.816
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_iron_arcane_rod_14": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.687,
-    0.728
+    0.631,
+    0.621
    ],
    "autoHandle": [
     0.687,
     0.728
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -1128,20 +1245,23 @@ export const GEAR_GRIP_DATA = {
     0.824,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_iron_battle_blade_16": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.677,
-    0.707
+    0.603,
+    0.629
    ],
    "autoHandle": [
     0.677,
     0.738
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1162,14 +1282,17 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.292,
-    0.718
+    0.399,
+    0.586
    ],
    "autoHandle": [
     0.292,
     0.718
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1184,20 +1307,23 @@ export const GEAR_GRIP_DATA = {
     0.832,
     0.816
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_steel_arcane_rod_18": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.304,
-    0.726
+    0.392,
+    0.621
    ],
    "autoHandle": [
     0.304,
     0.726
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -1212,20 +1338,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_steel_battle_blade_20": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.705,
-    0.73
+    0.372,
+    0.357
    ],
    "autoHandle": [
     0.705,
     0.73
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1240,20 +1369,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_steel_swift_fang_21": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.283,
-    0.727
+    0.377,
+    0.63
    ],
    "autoHandle": [
     0.283,
     0.727
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1268,20 +1400,23 @@ export const GEAR_GRIP_DATA = {
     0.824,
     0.824
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_soldier_battle_blade_23": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.333,
-    0.728
+    0.391,
+    0.628
    ],
    "autoHandle": [
     0.333,
     0.728
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1296,20 +1431,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_soldier_battle_blade_24": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.7,
-    0.734
+    0.386,
+    0.368
    ],
    "autoHandle": [
     0.7,
     0.734
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1324,20 +1462,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_soldier_swift_fang_25": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.302,
-    0.732
+    0.384,
+    0.644
    ],
    "autoHandle": [
     0.302,
     0.732
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1352,20 +1493,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_soldier_battle_blade_27": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.337,
-    0.726
+    0.378,
+    0.635
    ],
    "autoHandle": [
     0.337,
     0.726
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1380,20 +1524,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_soldier_battle_blade_28": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.351,
-    0.727
+    0.38,
+    0.635
    ],
    "autoHandle": [
     0.351,
     0.727
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1408,20 +1555,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_silvered_arcane_rod_30": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.305,
-    0.724
+    0.367,
+    0.641
    ],
    "autoHandle": [
     0.305,
     0.724
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -1436,20 +1586,23 @@ export const GEAR_GRIP_DATA = {
     0.824,
     0.824
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_silvered_battle_blade_31": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.376,
-    0.73
+    0.387,
+    0.627
    ],
    "autoHandle": [
     0.376,
     0.73
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1464,20 +1617,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_silvered_battle_blade_32": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.321,
-    0.732
+    0.394,
+    0.63
    ],
    "autoHandle": [
     0.321,
     0.732
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1492,20 +1648,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_silvered_swift_fang_33": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.267,
-    0.723
+    0.369,
+    0.619
    ],
    "autoHandle": [
     0.267,
     0.723
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1520,20 +1679,23 @@ export const GEAR_GRIP_DATA = {
     0.832,
     0.816
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_golden_arcane_rod_34": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.697,
-    0.725
+    0.38,
+    0.368
    ],
    "autoHandle": [
     0.697,
     0.725
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -1548,20 +1710,23 @@ export const GEAR_GRIP_DATA = {
     0.828,
     0.824
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_golden_battle_blade_35": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.32,
-    0.726
+    0.389,
+    0.63
    ],
    "autoHandle": [
     0.32,
     0.726
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1576,20 +1741,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_golden_battle_blade_36": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.666,
-    0.721
+    0.627,
+    0.625
    ],
    "autoHandle": [
     0.666,
     0.721
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1604,20 +1772,23 @@ export const GEAR_GRIP_DATA = {
     0.824,
     0.824
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_golden_swift_fang_37": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.724,
-    0.726
+    0.622,
+    0.598
    ],
    "autoHandle": [
     0.724,
     0.726
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1632,20 +1803,23 @@ export const GEAR_GRIP_DATA = {
     0.828,
     0.816
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_golden_arcane_rod_38": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.283,
-    0.731
+    0.357,
+    0.649
    ],
    "autoHandle": [
     0.283,
     0.731
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -1660,20 +1834,23 @@ export const GEAR_GRIP_DATA = {
     0.824,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_golden_battle_blade_39": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.693,
-    0.73
+    0.378,
+    0.369
    ],
    "autoHandle": [
     0.693,
     0.73
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1688,20 +1865,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_runed_swift_fang_41": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.3,
-    0.725
+    0.391,
+    0.615
    ],
    "autoHandle": [
     0.3,
     0.725
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1716,20 +1896,23 @@ export const GEAR_GRIP_DATA = {
     0.832,
     0.816
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_runed_arcane_rod_42": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.294,
-    0.731
+    0.365,
+    0.654
    ],
    "autoHandle": [
     0.294,
     0.731
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -1744,20 +1927,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_runed_battle_blade_43": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.702,
-    0.725
+    0.375,
+    0.357
    ],
    "autoHandle": [
     0.702,
     0.725
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1772,20 +1958,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_runed_battle_blade_44": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.332,
-    0.729
+    0.384,
+    0.628
    ],
    "autoHandle": [
     0.332,
     0.729
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1800,20 +1989,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_frost_swift_fang_45": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.73,
-    0.729
+    0.644,
+    0.58
    ],
    "autoHandle": [
     0.73,
     0.729
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1828,20 +2020,23 @@ export const GEAR_GRIP_DATA = {
     0.832,
     0.816
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_frost_arcane_rod_46": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.29,
-    0.733
+    0.385,
+    0.633
    ],
    "autoHandle": [
     0.29,
     0.733
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -1856,20 +2051,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_frost_battle_blade_47": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.669,
-    0.725
+    0.622,
+    0.624
    ],
    "autoHandle": [
     0.669,
     0.725
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1884,20 +2082,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_frost_battle_blade_48": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.334,
-    0.727
+    0.372,
+    0.644
    ],
    "autoHandle": [
     0.334,
     0.727
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1912,20 +2113,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_frost_swift_fang_49": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.656,
-    0.734
+    0.383,
+    0.363
    ],
    "autoHandle": [
     0.656,
     0.734
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1940,20 +2144,23 @@ export const GEAR_GRIP_DATA = {
     0.828,
     0.824
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_ember_battle_blade_51": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.673,
-    0.726
+    0.625,
+    0.625
    ],
    "autoHandle": [
     0.673,
     0.726
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -1968,20 +2175,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_ember_swift_fang_53": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.745,
-    0.725
+    0.633,
+    0.604
    ],
    "autoHandle": [
     0.745,
     0.725
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -1996,20 +2206,23 @@ export const GEAR_GRIP_DATA = {
     0.824,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_ember_arcane_rod_54": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.275,
-    0.737
+    0.391,
+    0.622
    ],
    "autoHandle": [
     0.275,
     0.737
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -2024,20 +2237,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_ember_battle_blade_55": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.3,
-    0.73
+    0.395,
+    0.613
    ],
    "autoHandle": [
     0.3,
     0.73
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2052,20 +2268,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dusk_battle_blade_56": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.329,
-    0.746
+    0.411,
+    0.626
    ],
    "autoHandle": [
     0.329,
     0.746
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2080,20 +2299,23 @@ export const GEAR_GRIP_DATA = {
     0.793,
     0.848
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dusk_swift_fang_57": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.669,
-    0.709
+    0.646,
+    0.599
    ],
    "autoHandle": [
     0.669,
     0.709
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2108,20 +2330,23 @@ export const GEAR_GRIP_DATA = {
     0.844,
     0.805
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dusk_arcane_rod_58": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.296,
-    0.752
+    0.395,
+    0.65
    ],
    "autoHandle": [
     0.296,
     0.752
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -2136,20 +2361,23 @@ export const GEAR_GRIP_DATA = {
     0.797,
     0.848
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dusk_battle_blade_59": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.332,
-    0.741
+    0.398,
+    0.643
    ],
    "autoHandle": [
     0.332,
     0.741
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2164,20 +2392,23 @@ export const GEAR_GRIP_DATA = {
     0.801,
     0.844
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dusk_battle_blade_60": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.317,
-    0.731
+    0.393,
+    0.621
    ],
    "autoHandle": [
     0.317,
     0.731
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2192,20 +2423,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dusk_swift_fang_61": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.705,
-    0.716
+    0.641,
+    0.605
    ],
    "autoHandle": [
     0.705,
     0.716
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2220,20 +2454,23 @@ export const GEAR_GRIP_DATA = {
     0.836,
     0.813
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dawn_battle_blade_63": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.327,
-    0.731
+    0.397,
+    0.621
    ],
    "autoHandle": [
     0.327,
     0.731
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2248,20 +2485,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dawn_battle_blade_64": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.309,
-    0.735
+    0.402,
+    0.616
    ],
    "autoHandle": [
     0.309,
     0.735
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2276,20 +2516,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dawn_swift_fang_65": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.694,
-    0.722
+    0.613,
+    0.607
    ],
    "autoHandle": [
     0.694,
     0.722
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2304,20 +2547,23 @@ export const GEAR_GRIP_DATA = {
     0.828,
     0.82
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dragonbone_battle_blade_67": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.326,
-    0.729
+    0.399,
+    0.613
    ],
    "autoHandle": [
     0.326,
     0.729
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2332,20 +2578,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dragonbone_battle_blade_68": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.338,
-    0.726
+    0.396,
+    0.616
    ],
    "autoHandle": [
     0.338,
     0.726
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2360,20 +2609,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dragonbone_swift_fang_69": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.307,
-    0.716
+    0.375,
+    0.616
    ],
    "autoHandle": [
     0.307,
     0.716
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2388,20 +2640,23 @@ export const GEAR_GRIP_DATA = {
     0.836,
     0.813
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dragonbone_arcane_rod_70": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.297,
-    0.737
+    0.38,
+    0.659
    ],
    "autoHandle": [
     0.297,
     0.737
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -2416,20 +2671,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dragonbone_battle_blade_71": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.689,
-    0.729
+    0.599,
+    0.603
    ],
    "autoHandle": [
     0.689,
     0.729
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2444,20 +2702,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_dragonbone_battle_blade_72": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.685,
-    0.729
+    0.607,
+    0.614
    ],
    "autoHandle": [
     0.685,
     0.729
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2472,20 +2733,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_storm_swift_fang_73": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.299,
-    0.717
+    0.369,
+    0.611
    ],
    "autoHandle": [
     0.299,
     0.717
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2500,20 +2764,23 @@ export const GEAR_GRIP_DATA = {
     0.832,
     0.816
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_storm_arcane_rod_74": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.292,
-    0.734
+    0.385,
+    0.638
    ],
    "autoHandle": [
     0.292,
     0.734
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -2528,20 +2795,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_storm_battle_blade_75": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.337,
-    0.734
+    0.395,
+    0.628
    ],
    "autoHandle": [
     0.337,
     0.734
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2556,20 +2826,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_storm_battle_blade_76": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.34,
-    0.735
+    0.387,
+    0.643
    ],
    "autoHandle": [
     0.34,
     0.735
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2584,20 +2857,23 @@ export const GEAR_GRIP_DATA = {
     0.809,
     0.84
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_storm_swift_fang_77": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.702,
-    0.73
+    0.393,
+    0.35
    ],
    "autoHandle": [
     0.702,
     0.73
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2612,20 +2888,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_void_arcane_rod_78": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.304,
-    0.734
+    0.396,
+    0.633
    ],
    "autoHandle": [
     0.304,
     0.734
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -2640,20 +2919,23 @@ export const GEAR_GRIP_DATA = {
     0.809,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_void_battle_blade_79": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.347,
-    0.725
+    0.367,
+    0.635
    ],
    "autoHandle": [
     0.347,
     0.725
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2668,20 +2950,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_void_battle_blade_80": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.684,
-    0.729
+    0.372,
+    0.36
    ],
    "autoHandle": [
     0.684,
     0.729
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2696,20 +2981,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_void_swift_fang_81": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.316,
-    0.715
+    0.386,
+    0.606
    ],
    "autoHandle": [
     0.316,
     0.715
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2724,20 +3012,23 @@ export const GEAR_GRIP_DATA = {
     0.832,
     0.816
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_void_arcane_rod_82": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.279,
-    0.742
+    0.38,
+    0.641
    ],
    "autoHandle": [
     0.279,
     0.742
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -2752,20 +3043,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_void_battle_blade_83": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.63,
-    0.723
+    0.627,
+    0.627
    ],
    "autoHandle": [
     0.63,
     0.723
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2780,20 +3074,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_godforged_battle_blade_84": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.338,
-    0.729
+    0.377,
+    0.632
    ],
    "autoHandle": [
     0.338,
     0.729
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2808,20 +3105,23 @@ export const GEAR_GRIP_DATA = {
     0.816,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_godforged_arcane_rod_86": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.281,
-    0.74
+    0.385,
+    0.64
    ],
    "autoHandle": [
     0.281,
     0.74
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -2836,20 +3136,23 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.832
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_godforged_battle_blade_87": {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.34,
-    0.727
+    0.377,
+    0.633
    ],
    "autoHandle": [
     0.34,
     0.727
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.12
@@ -2864,20 +3167,23 @@ export const GEAR_GRIP_DATA = {
     0.82,
     0.828
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_godforged_swift_fang_89": {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.321,
-    0.716
+    0.375,
+    0.622
    ],
    "autoHandle": [
     0.321,
     0.716
    ],
    "scale": 0.42,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2892,20 +3198,23 @@ export const GEAR_GRIP_DATA = {
     0.832,
     0.816
    ],
-   "tuned": false
+   "tuned": true
   },
   "wpn_godforged_arcane_rod_90": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.317,
-    0.735
+    0.369,
+    0.657
    ],
    "autoHandle": [
     0.317,
     0.735
    ],
    "scale": 0.5,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.1
@@ -2920,7 +3229,7 @@ export const GEAR_GRIP_DATA = {
     0.813,
     0.836
    ],
-   "tuned": false
+   "tuned": true
   },
   "ranged_1": {
    "role": "weapon",
@@ -2934,6 +3243,9 @@ export const GEAR_GRIP_DATA = {
     0.748
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2962,6 +3274,9 @@ export const GEAR_GRIP_DATA = {
     0.791
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -2990,6 +3305,9 @@ export const GEAR_GRIP_DATA = {
     0.747
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3018,6 +3336,9 @@ export const GEAR_GRIP_DATA = {
     0.73
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3046,6 +3367,9 @@ export const GEAR_GRIP_DATA = {
     0.753
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3074,6 +3398,9 @@ export const GEAR_GRIP_DATA = {
     0.735
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3102,6 +3429,9 @@ export const GEAR_GRIP_DATA = {
     0.737
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3130,6 +3460,9 @@ export const GEAR_GRIP_DATA = {
     0.761
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3158,6 +3491,9 @@ export const GEAR_GRIP_DATA = {
     0.721
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3186,6 +3522,9 @@ export const GEAR_GRIP_DATA = {
     0.734
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3214,6 +3553,9 @@ export const GEAR_GRIP_DATA = {
     0.73
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3242,6 +3584,9 @@ export const GEAR_GRIP_DATA = {
     0.715
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3270,6 +3615,9 @@ export const GEAR_GRIP_DATA = {
     0.759
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3298,6 +3646,9 @@ export const GEAR_GRIP_DATA = {
     0.716
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3326,6 +3677,9 @@ export const GEAR_GRIP_DATA = {
     0.723
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3354,6 +3708,9 @@ export const GEAR_GRIP_DATA = {
     0.74
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3382,6 +3739,9 @@ export const GEAR_GRIP_DATA = {
     0.744
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3410,6 +3770,9 @@ export const GEAR_GRIP_DATA = {
     0.734
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3438,6 +3801,9 @@ export const GEAR_GRIP_DATA = {
     0.751
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3466,6 +3832,9 @@ export const GEAR_GRIP_DATA = {
     0.744
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3494,6 +3863,9 @@ export const GEAR_GRIP_DATA = {
     0.734
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3522,6 +3894,9 @@ export const GEAR_GRIP_DATA = {
     0.729
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.15
@@ -3550,6 +3925,9 @@ export const GEAR_GRIP_DATA = {
     0.726
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3578,6 +3956,9 @@ export const GEAR_GRIP_DATA = {
     0.726
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3606,6 +3987,9 @@ export const GEAR_GRIP_DATA = {
     0.739
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3634,6 +4018,9 @@ export const GEAR_GRIP_DATA = {
     0.745
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3662,6 +4049,9 @@ export const GEAR_GRIP_DATA = {
     0.728
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3690,6 +4080,9 @@ export const GEAR_GRIP_DATA = {
     0.734
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3718,6 +4111,9 @@ export const GEAR_GRIP_DATA = {
     0.736
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3746,6 +4142,9 @@ export const GEAR_GRIP_DATA = {
     0.723
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3774,6 +4173,9 @@ export const GEAR_GRIP_DATA = {
     0.735
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3802,6 +4204,9 @@ export const GEAR_GRIP_DATA = {
     0.741
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3830,6 +4235,9 @@ export const GEAR_GRIP_DATA = {
     0.731
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3858,6 +4266,9 @@ export const GEAR_GRIP_DATA = {
     0.743
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3886,6 +4297,9 @@ export const GEAR_GRIP_DATA = {
     0.735
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3914,6 +4328,9 @@ export const GEAR_GRIP_DATA = {
     0.718
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3942,6 +4359,9 @@ export const GEAR_GRIP_DATA = {
     0.737
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3970,6 +4390,9 @@ export const GEAR_GRIP_DATA = {
     0.732
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -3998,6 +4421,9 @@ export const GEAR_GRIP_DATA = {
     0.737
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4026,6 +4452,9 @@ export const GEAR_GRIP_DATA = {
     0.73
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4054,6 +4483,9 @@ export const GEAR_GRIP_DATA = {
     0.736
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4082,6 +4514,9 @@ export const GEAR_GRIP_DATA = {
     0.731
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4110,6 +4545,9 @@ export const GEAR_GRIP_DATA = {
     0.735
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4138,6 +4576,9 @@ export const GEAR_GRIP_DATA = {
     0.735
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4166,6 +4607,9 @@ export const GEAR_GRIP_DATA = {
     0.733
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4194,6 +4638,9 @@ export const GEAR_GRIP_DATA = {
     0.734
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4222,6 +4669,9 @@ export const GEAR_GRIP_DATA = {
     0.729
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4250,6 +4700,9 @@ export const GEAR_GRIP_DATA = {
     0.736
    ],
    "scale": 0.55,
+   "offsetByDir": null,
+   "rotByDir": null,
+   "recMirrored": false,
    "axis": [
     0.5,
     0.5
@@ -4269,45 +4722,6 @@ export const GEAR_GRIP_DATA = {
  },
  "sprites": {
   "stox|actuary": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/actuary/up/Stox_actuary_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -4348,6 +4762,45 @@ export const GEAR_GRIP_DATA = {
        "wpn_iron_battle_blade_16": {
         "rot": 7,
         "scale": 0.77
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/actuary/up/Stox_actuary_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
        }
       }
      }
@@ -4419,115 +4872,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/actuary/up/Stox_actuary_walk_up_1.webp",
-      "weaponHand": [
-       0.871,
-       0.567
-      ],
-      "shieldHand": [
-       0.514,
-       0.507
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/actuary/up/Stox_actuary_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/actuary/up/Stox_actuary_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": 0.55,
        "flipX": false,
        "sx": 1,
@@ -4671,6 +5015,115 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/actuary/up/Stox_actuary_walk_up_1.webp",
+      "weaponHand": [
+       0.871,
+       0.567
+      ],
+      "shieldHand": [
+       0.514,
+       0.507
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/actuary/up/Stox_actuary_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/actuary/up/Stox_actuary_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": 0.55,
        "flipX": false,
@@ -4983,122 +5436,9 @@ export const GEAR_GRIP_DATA = {
       }
      }
     ]
-   },
-   "walk": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/Stox_actuary_walk_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/Stox_actuary_walk_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
    }
   },
   "stox|bayesian": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/bayesian/up/Stox_bayesian_idle_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -5133,6 +5473,45 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.05
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/bayesian/up/Stox_bayesian_idle_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
        }
       }
      }
@@ -5207,150 +5586,6 @@ export const GEAR_GRIP_DATA = {
        "scale": 0.55,
        "flipX": false,
        "sx": 0.55,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_2.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 17,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_3.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_4.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 3,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
        "tint": 0.65,
        "patch": {
         "on": false,
@@ -5496,6 +5731,150 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 1,
        "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_2.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 17,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_3.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_4.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 3,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
        "patch": {
         "on": false,
         "r": 0.045
@@ -5724,45 +6103,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "stox|markovian": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/markovian/up/Stox_markovian_idle_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -5797,6 +6137,45 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.05
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/markovian/up/Stox_markovian_idle_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
        }
       }
      }
@@ -5871,115 +6250,6 @@ export const GEAR_GRIP_DATA = {
        "scale": 0.55,
        "flipX": false,
        "sx": 0.55,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/markovian/up/Stox_markovian_walk_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/markovian/up/Stox_markovian_walk_up_2.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 17,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/markovian/up/Stox_markovian_walk_up_3.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
        "tint": 0.65,
        "patch": {
         "on": false,
@@ -6125,6 +6395,115 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 1,
        "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/markovian/up/Stox_markovian_walk_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/markovian/up/Stox_markovian_walk_up_2.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 17,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/markovian/up/Stox_markovian_walk_up_3.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
        "patch": {
         "on": false,
         "r": 0.045
@@ -6353,45 +6732,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "stox|mathmagician": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/mathmagician/up/Stox_mathmagician_idle_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -6426,6 +6766,45 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.05
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/mathmagician/up/Stox_mathmagician_idle_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
        }
       }
      }
@@ -6501,6 +6880,115 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 0.55,
        "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/mathmagician/down/Stox_mathmagician_walk_down_1.webp",
+      "weaponHand": [
+       0.16,
+       0.53
+      ],
+      "shieldHand": [
+       0.87,
+       0.58
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/mathmagician/down/Stox_mathmagician_walk_down_2.webp",
+      "weaponHand": [
+       0.16,
+       0.53
+      ],
+      "shieldHand": [
+       0.87,
+       0.58
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/mathmagician/down/Stox_mathmagician_walk_down_3.webp",
+      "weaponHand": [
+       0.16,
+       0.53
+      ],
+      "shieldHand": [
+       0.87,
+       0.58
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
        "patch": {
         "on": false,
         "r": 0.045
@@ -6645,115 +7133,6 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 1,
        "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/mathmagician/down/Stox_mathmagician_walk_down_1.webp",
-      "weaponHand": [
-       0.16,
-       0.53
-      ],
-      "shieldHand": [
-       0.87,
-       0.58
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -15,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/mathmagician/down/Stox_mathmagician_walk_down_2.webp",
-      "weaponHand": [
-       0.16,
-       0.53
-      ],
-      "shieldHand": [
-       0.87,
-       0.58
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -8,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/mathmagician/down/Stox_mathmagician_walk_down_3.webp",
-      "weaponHand": [
-       0.16,
-       0.53
-      ],
-      "shieldHand": [
-       0.87,
-       0.58
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -15,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
        "patch": {
         "on": false,
         "r": 0.045
@@ -7052,45 +7431,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "stox|noclass": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/noclass/up/Stox_noclass_idle_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -7125,6 +7465,45 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.05
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/noclass/up/Stox_noclass_idle_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
        }
       }
      }
@@ -7199,150 +7578,6 @@ export const GEAR_GRIP_DATA = {
        "scale": 0.55,
        "flipX": false,
        "sx": 0.55,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_2.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 17,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_3.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_4.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 3,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
        "tint": 0.65,
        "patch": {
         "on": false,
@@ -7488,6 +7723,150 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 1,
        "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_2.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 17,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_3.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_4.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 3,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
        "patch": {
         "on": false,
         "r": 0.045
@@ -7751,45 +8130,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "stox|outlier": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/outlier/up/Stox_outlier_idle_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -7824,6 +8164,45 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.05
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/outlier/up/Stox_outlier_idle_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
        }
       }
      }
@@ -7898,115 +8277,6 @@ export const GEAR_GRIP_DATA = {
        "scale": 0.55,
        "flipX": false,
        "sx": 0.55,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/outlier/up/Stox_outlier_walk_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/outlier/up/Stox_outlier_walk_up_2.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 17,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/outlier/up/Stox_outlier_walk_up_3.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
        "tint": 0.65,
        "patch": {
         "on": false,
@@ -8152,6 +8422,115 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 1,
        "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/outlier/up/Stox_outlier_walk_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/outlier/up/Stox_outlier_walk_up_2.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 17,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/outlier/up/Stox_outlier_walk_up_3.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
        "patch": {
         "on": false,
         "r": 0.045
@@ -8380,45 +8759,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "stox|probabilist": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/probabilist/up/Stox_probabilist_idle_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -8453,6 +8793,45 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.05
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/probabilist/up/Stox_probabilist_idle_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
        }
       }
      }
@@ -8527,115 +8906,6 @@ export const GEAR_GRIP_DATA = {
        "scale": 0.55,
        "flipX": false,
        "sx": 0.55,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/probabilist/up/Stox_probabilist_walk_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/probabilist/up/Stox_probabilist_walk_up_2.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 17,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/probabilist/up/Stox_probabilist_walk_up_3.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
        "tint": 0.65,
        "patch": {
         "on": false,
@@ -8746,6 +9016,115 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 1,
        "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/probabilist/up/Stox_probabilist_walk_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/probabilist/up/Stox_probabilist_walk_up_2.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 17,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/probabilist/up/Stox_probabilist_walk_up_3.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
        "patch": {
         "on": false,
         "r": 0.045
@@ -8974,45 +9353,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "stox|random_walker": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/random_walker/up/Stox_random_walker_idle_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -9047,6 +9387,45 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.05
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/random_walker/up/Stox_random_walker_idle_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
        }
       }
      }
@@ -9121,115 +9500,6 @@ export const GEAR_GRIP_DATA = {
        "scale": 0.55,
        "flipX": false,
        "sx": 0.55,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/random_walker/up/Stox_random_walker_walk_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/random_walker/up/Stox_random_walker_walk_up_2.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 17,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/random_walker/up/Stox_random_walker_walk_up_3.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
        "tint": 0.65,
        "patch": {
         "on": false,
@@ -9375,6 +9645,115 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 1,
        "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/random_walker/up/Stox_random_walker_walk_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/random_walker/up/Stox_random_walker_walk_up_2.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 17,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/random_walker/up/Stox_random_walker_walk_up_3.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
        "patch": {
         "on": false,
         "r": 0.045
@@ -9603,45 +9982,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "stox|recursionist": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/recursionist/up/Stox_recursionist_idle_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -9676,6 +10016,45 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.05
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/recursionist/up/Stox_recursionist_idle_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
        }
       }
      }
@@ -9751,6 +10130,115 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 0.55,
        "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/recursionist/down/Stox_recursionist_walk_down_1.webp",
+      "weaponHand": [
+       0.16,
+       0.53
+      ],
+      "shieldHand": [
+       0.87,
+       0.58
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/recursionist/down/Stox_recursionist_walk_down_2.webp",
+      "weaponHand": [
+       0.16,
+       0.53
+      ],
+      "shieldHand": [
+       0.87,
+       0.58
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/recursionist/down/Stox_recursionist_walk_down_3.webp",
+      "weaponHand": [
+       0.16,
+       0.53
+      ],
+      "shieldHand": [
+       0.87,
+       0.58
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
        "patch": {
         "on": false,
         "r": 0.045
@@ -9895,115 +10383,6 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 1,
        "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/recursionist/down/Stox_recursionist_walk_down_1.webp",
-      "weaponHand": [
-       0.16,
-       0.53
-      ],
-      "shieldHand": [
-       0.87,
-       0.58
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -15,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/recursionist/down/Stox_recursionist_walk_down_2.webp",
-      "weaponHand": [
-       0.16,
-       0.53
-      ],
-      "shieldHand": [
-       0.87,
-       0.58
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -8,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/recursionist/down/Stox_recursionist_walk_down_3.webp",
-      "weaponHand": [
-       0.16,
-       0.53
-      ],
-      "shieldHand": [
-       0.87,
-       0.58
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -15,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
        "patch": {
         "on": false,
         "r": 0.045
@@ -10232,45 +10611,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "stox|statistician": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/idle/statistician/up/Stox_statistician_idle_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -10305,6 +10645,45 @@ export const GEAR_GRIP_DATA = {
        "patch": {
         "on": false,
         "r": 0.05
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/idle/statistician/up/Stox_statistician_idle_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
        }
       }
      }
@@ -10379,150 +10758,6 @@ export const GEAR_GRIP_DATA = {
        "scale": 0.55,
        "flipX": false,
        "sx": 0.55,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_1.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_2.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 17,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_3.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.65,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_4.webp",
-      "weaponHand": [
-       0.66,
-       0.58
-      ],
-      "shieldHand": [
-       0.36,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 3,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": false,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
        "tint": 0.65,
        "patch": {
         "on": false,
@@ -10668,6 +10903,150 @@ export const GEAR_GRIP_DATA = {
        "flipX": false,
        "sx": 1,
        "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_1.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_2.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 17,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_3.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_4.webp",
+      "weaponHand": [
+       0.66,
+       0.58
+      ],
+      "shieldHand": [
+       0.36,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 3,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": false,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.65,
        "patch": {
         "on": false,
         "r": 0.045
@@ -10965,11 +11344,381 @@ export const GEAR_GRIP_DATA = {
     ]
    }
   },
-  "trix|actuary": {
+  "syla|actuary": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/actuary/down/Syla_actuary_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
    "idle:up": {
     "frames": [
      {
-      "img": "animations/Trix/idle/actuary/up/Trix_actuary_idle_up_1.webp",
+      "img": "animations/Syla/idle/actuary/up/Syla_actuary_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/actuary/left/Syla_actuary_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/actuary/right/Syla_actuary_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/actuary/down/Syla_actuary_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/down/Syla_actuary_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/down/Syla_actuary_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/down/Syla_actuary_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/actuary/up/Syla_actuary_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/up/Syla_actuary_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/up/Syla_actuary_walk_up_3.webp",
       "weaponHand": [
        0.68,
        0.5
@@ -11005,6 +11754,6870 @@ export const GEAR_GRIP_DATA = {
      }
     ]
    },
+   "walk:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/actuary/left/Syla_actuary_walk_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/left/Syla_actuary_walk_left_2.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/left/Syla_actuary_walk_left_3.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/left/Syla_actuary_walk_left_4.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": 0.5,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/actuary/right/Syla_actuary_walk_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/right/Syla_actuary_walk_right_2.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/actuary/right/Syla_actuary_walk_right_3.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": 0.5,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "syla|bayesian": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/bayesian/down/Syla_bayesian_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/bayesian/up/Syla_bayesian_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/bayesian/left/Syla_bayesian_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/bayesian/right/Syla_bayesian_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/bayesian/down/Syla_bayesian_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/down/Syla_bayesian_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/down/Syla_bayesian_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/down/Syla_bayesian_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/bayesian/up/Syla_bayesian_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/up/Syla_bayesian_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/up/Syla_bayesian_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/up/Syla_bayesian_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/bayesian/left/Syla_bayesian_walk_left_1.webp",
+      "weaponHand": [
+       0.518,
+       0.65
+      ],
+      "shieldHand": [
+       0.539,
+       0.655
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/left/Syla_bayesian_walk_left_2.webp",
+      "weaponHand": [
+       0.596,
+       0.661
+      ],
+      "shieldHand": [
+       0.601,
+       0.661
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/left/Syla_bayesian_walk_left_3.webp",
+      "weaponHand": [
+       0.448,
+       0.65
+      ],
+      "shieldHand": [
+       0.448,
+       0.676
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/bayesian/right/Syla_bayesian_walk_right_1.webp",
+      "weaponHand": [
+       0.482,
+       0.65
+      ],
+      "shieldHand": [
+       0.461,
+       0.655
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/right/Syla_bayesian_walk_right_2.webp",
+      "weaponHand": [
+       0.404,
+       0.661
+      ],
+      "shieldHand": [
+       0.399,
+       0.661
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/bayesian/right/Syla_bayesian_walk_right_3.webp",
+      "weaponHand": [
+       0.552,
+       0.65
+      ],
+      "shieldHand": [
+       0.552,
+       0.676
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "syla|markovian": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/markovian/down/Syla_markovian_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/markovian/up/Syla_markovian_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/markovian/left/Syla_markovian_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/markovian/right/Syla_markovian_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/markovian/down/Syla_markovian_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/down/Syla_markovian_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/down/Syla_markovian_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/down/Syla_markovian_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/markovian/up/Syla_markovian_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/up/Syla_markovian_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/up/Syla_markovian_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/up/Syla_markovian_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_1.webp",
+      "weaponHand": [
+       0.518,
+       0.65
+      ],
+      "shieldHand": [
+       0.539,
+       0.655
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_2.webp",
+      "weaponHand": [
+       0.596,
+       0.661
+      ],
+      "shieldHand": [
+       0.601,
+       0.661
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_3.webp",
+      "weaponHand": [
+       0.448,
+       0.65
+      ],
+      "shieldHand": [
+       0.448,
+       0.676
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_4.webp",
+      "weaponHand": [
+       0.338,
+       0.637
+      ],
+      "shieldHand": [
+       0.465,
+       0.692
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_1.webp",
+      "weaponHand": [
+       0.482,
+       0.65
+      ],
+      "shieldHand": [
+       0.461,
+       0.655
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_2.webp",
+      "weaponHand": [
+       0.404,
+       0.661
+      ],
+      "shieldHand": [
+       0.399,
+       0.661
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_3.webp",
+      "weaponHand": [
+       0.552,
+       0.65
+      ],
+      "shieldHand": [
+       0.552,
+       0.676
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_4.webp",
+      "weaponHand": [
+       0.662,
+       0.637
+      ],
+      "shieldHand": [
+       0.535,
+       0.692
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "syla|mathmagician": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/mathmagician/down/Syla_mathmagician_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/mathmagician/up/Syla_mathmagician_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/mathmagician/left/Syla_mathmagician_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/mathmagician/right/Syla_mathmagician_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/mathmagician/down/Syla_mathmagician_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/down/Syla_mathmagician_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/down/Syla_mathmagician_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/down/Syla_mathmagician_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/mathmagician/up/Syla_mathmagician_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/up/Syla_mathmagician_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/up/Syla_mathmagician_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/up/Syla_mathmagician_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_1.webp",
+      "weaponHand": [
+       0.518,
+       0.65
+      ],
+      "shieldHand": [
+       0.539,
+       0.655
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_2.webp",
+      "weaponHand": [
+       0.596,
+       0.661
+      ],
+      "shieldHand": [
+       0.601,
+       0.661
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_3.webp",
+      "weaponHand": [
+       0.448,
+       0.65
+      ],
+      "shieldHand": [
+       0.448,
+       0.676
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_4.webp",
+      "weaponHand": [
+       0.338,
+       0.637
+      ],
+      "shieldHand": [
+       0.465,
+       0.692
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_1.webp",
+      "weaponHand": [
+       0.482,
+       0.65
+      ],
+      "shieldHand": [
+       0.461,
+       0.655
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_2.webp",
+      "weaponHand": [
+       0.404,
+       0.661
+      ],
+      "shieldHand": [
+       0.399,
+       0.661
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_3.webp",
+      "weaponHand": [
+       0.552,
+       0.65
+      ],
+      "shieldHand": [
+       0.552,
+       0.676
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_4.webp",
+      "weaponHand": [
+       0.662,
+       0.637
+      ],
+      "shieldHand": [
+       0.535,
+       0.692
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "syla|noclass": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/noclass/down/Syla_noclass_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/noclass/up/Syla_noclass_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/noclass/left/Syla_noclass_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/noclass/right/Syla_noclass_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/noclass/down/Syla_noclass_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/down/Syla_noclass_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/down/Syla_noclass_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/down/Syla_noclass_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/noclass/up/Syla_noclass_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/up/Syla_noclass_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/up/Syla_noclass_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/up/Syla_noclass_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:left": {
+    "mirrored": true,
+    "frames": [
+     {
+      "img": "animations/Syla/walk/noclass/left/Syla_noclass_walk_left_1.webp",
+      "weaponHand": [
+       0.518,
+       0.65
+      ],
+      "shieldHand": [
+       0.5389999999999999,
+       0.655
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/left/Syla_noclass_walk_left_2.webp",
+      "weaponHand": [
+       0.596,
+       0.661
+      ],
+      "shieldHand": [
+       0.601,
+       0.661
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/left/Syla_noclass_walk_left_3.webp",
+      "weaponHand": [
+       0.44799999999999995,
+       0.65
+      ],
+      "shieldHand": [
+       0.44799999999999995,
+       0.676
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/left/Syla_noclass_walk_left_4.webp",
+      "weaponHand": [
+       0.33799999999999997,
+       0.637
+      ],
+      "shieldHand": [
+       0.46499999999999997,
+       0.692
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_1.webp",
+      "weaponHand": [
+       0.482,
+       0.65
+      ],
+      "shieldHand": [
+       0.461,
+       0.655
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_2.webp",
+      "weaponHand": [
+       0.404,
+       0.661
+      ],
+      "shieldHand": [
+       0.399,
+       0.661
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_3.webp",
+      "weaponHand": [
+       0.552,
+       0.65
+      ],
+      "shieldHand": [
+       0.552,
+       0.676
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_4.webp",
+      "weaponHand": [
+       0.662,
+       0.637
+      ],
+      "shieldHand": [
+       0.535,
+       0.692
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "syla|outlier": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/outlier/down/Syla_outlier_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/outlier/up/Syla_outlier_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/outlier/left/Syla_outlier_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/outlier/right/Syla_outlier_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/outlier/down/Syla_outlier_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/down/Syla_outlier_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/down/Syla_outlier_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/down/Syla_outlier_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/outlier/up/Syla_outlier_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/up/Syla_outlier_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/up/Syla_outlier_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/up/Syla_outlier_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_1.webp",
+      "weaponHand": [
+       0.518,
+       0.65
+      ],
+      "shieldHand": [
+       0.539,
+       0.655
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_2.webp",
+      "weaponHand": [
+       0.596,
+       0.661
+      ],
+      "shieldHand": [
+       0.601,
+       0.661
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_3.webp",
+      "weaponHand": [
+       0.448,
+       0.65
+      ],
+      "shieldHand": [
+       0.448,
+       0.676
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_4.webp",
+      "weaponHand": [
+       0.338,
+       0.637
+      ],
+      "shieldHand": [
+       0.465,
+       0.692
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_1.webp",
+      "weaponHand": [
+       0.482,
+       0.65
+      ],
+      "shieldHand": [
+       0.461,
+       0.655
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_2.webp",
+      "weaponHand": [
+       0.404,
+       0.661
+      ],
+      "shieldHand": [
+       0.399,
+       0.661
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_3.webp",
+      "weaponHand": [
+       0.552,
+       0.65
+      ],
+      "shieldHand": [
+       0.552,
+       0.676
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_4.webp",
+      "weaponHand": [
+       0.662,
+       0.637
+      ],
+      "shieldHand": [
+       0.535,
+       0.692
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "syla|probabilist": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/probabilist/down/Syla_probabilist_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/probabilist/up/Syla_probabilist_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/probabilist/left/Syla_probabilist_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/probabilist/right/Syla_probabilist_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/probabilist/down/Syla_probabilist_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/down/Syla_probabilist_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/down/Syla_probabilist_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/down/Syla_probabilist_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/probabilist/up/Syla_probabilist_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/up/Syla_probabilist_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/up/Syla_probabilist_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/up/Syla_probabilist_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_1.webp",
+      "weaponHand": [
+       0.518,
+       0.65
+      ],
+      "shieldHand": [
+       0.539,
+       0.655
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_2.webp",
+      "weaponHand": [
+       0.596,
+       0.661
+      ],
+      "shieldHand": [
+       0.601,
+       0.661
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_3.webp",
+      "weaponHand": [
+       0.448,
+       0.65
+      ],
+      "shieldHand": [
+       0.448,
+       0.676
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_4.webp",
+      "weaponHand": [
+       0.338,
+       0.637
+      ],
+      "shieldHand": [
+       0.465,
+       0.692
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_1.webp",
+      "weaponHand": [
+       0.482,
+       0.65
+      ],
+      "shieldHand": [
+       0.461,
+       0.655
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_2.webp",
+      "weaponHand": [
+       0.404,
+       0.661
+      ],
+      "shieldHand": [
+       0.399,
+       0.661
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_3.webp",
+      "weaponHand": [
+       0.552,
+       0.65
+      ],
+      "shieldHand": [
+       0.552,
+       0.676
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_4.webp",
+      "weaponHand": [
+       0.662,
+       0.637
+      ],
+      "shieldHand": [
+       0.535,
+       0.692
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "syla|random_walker": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/random_walker/down/Syla_random_walker_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/random_walker/up/Syla_random_walker_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/random_walker/left/Syla_random_walker_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/random_walker/right/Syla_random_walker_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/random_walker/down/Syla_random_walker_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/down/Syla_random_walker_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/down/Syla_random_walker_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/down/Syla_random_walker_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/random_walker/up/Syla_random_walker_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/up/Syla_random_walker_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/up/Syla_random_walker_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/up/Syla_random_walker_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_1.webp",
+      "weaponHand": [
+       0.518,
+       0.65
+      ],
+      "shieldHand": [
+       0.539,
+       0.655
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_2.webp",
+      "weaponHand": [
+       0.596,
+       0.661
+      ],
+      "shieldHand": [
+       0.601,
+       0.661
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_3.webp",
+      "weaponHand": [
+       0.448,
+       0.65
+      ],
+      "shieldHand": [
+       0.448,
+       0.676
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_4.webp",
+      "weaponHand": [
+       0.338,
+       0.637
+      ],
+      "shieldHand": [
+       0.465,
+       0.692
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_1.webp",
+      "weaponHand": [
+       0.482,
+       0.65
+      ],
+      "shieldHand": [
+       0.461,
+       0.655
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_2.webp",
+      "weaponHand": [
+       0.404,
+       0.661
+      ],
+      "shieldHand": [
+       0.399,
+       0.661
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_3.webp",
+      "weaponHand": [
+       0.552,
+       0.65
+      ],
+      "shieldHand": [
+       0.552,
+       0.676
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_4.webp",
+      "weaponHand": [
+       0.662,
+       0.637
+      ],
+      "shieldHand": [
+       0.535,
+       0.692
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "syla|recursionist": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/recursionist/down/Syla_recursionist_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/recursionist/up/Syla_recursionist_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/recursionist/left/Syla_recursionist_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/recursionist/right/Syla_recursionist_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/recursionist/down/Syla_recursionist_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/down/Syla_recursionist_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/down/Syla_recursionist_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/down/Syla_recursionist_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/recursionist/up/Syla_recursionist_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/up/Syla_recursionist_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/up/Syla_recursionist_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/up/Syla_recursionist_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_1.webp",
+      "weaponHand": [
+       0.518,
+       0.65
+      ],
+      "shieldHand": [
+       0.539,
+       0.655
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_2.webp",
+      "weaponHand": [
+       0.596,
+       0.661
+      ],
+      "shieldHand": [
+       0.601,
+       0.661
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_3.webp",
+      "weaponHand": [
+       0.448,
+       0.65
+      ],
+      "shieldHand": [
+       0.448,
+       0.676
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_4.webp",
+      "weaponHand": [
+       0.338,
+       0.637
+      ],
+      "shieldHand": [
+       0.465,
+       0.692
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_1.webp",
+      "weaponHand": [
+       0.482,
+       0.65
+      ],
+      "shieldHand": [
+       0.461,
+       0.655
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_2.webp",
+      "weaponHand": [
+       0.404,
+       0.661
+      ],
+      "shieldHand": [
+       0.399,
+       0.661
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_3.webp",
+      "weaponHand": [
+       0.552,
+       0.65
+      ],
+      "shieldHand": [
+       0.552,
+       0.676
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_4.webp",
+      "weaponHand": [
+       0.662,
+       0.637
+      ],
+      "shieldHand": [
+       0.535,
+       0.692
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "syla|statistician": {
+   "idle:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/statistician/down/Syla_statistician_idle_down_1.webp",
+      "weaponHand": [
+       0,
+       0.926
+      ],
+      "shieldHand": [
+       1,
+       0.757
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -140,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/statistician/up/Syla_statistician_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/statistician/left/Syla_statistician_idle_left_1.webp",
+      "weaponHand": [
+       0.38,
+       0.46
+      ],
+      "shieldHand": [
+       0.6,
+       0.5
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/idle/statistician/right/Syla_statistician_idle_right_1.webp",
+      "weaponHand": [
+       0.62,
+       0.46
+      ],
+      "shieldHand": [
+       0.4,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": -30,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 6,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:down": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/statistician/down/Syla_statistician_walk_down_1.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/down/Syla_statistician_walk_down_2.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/down/Syla_statistician_walk_down_3.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/down/Syla_statistician_walk_down_4.webp",
+      "weaponHand": [
+       0.34,
+       0.48
+      ],
+      "shieldHand": [
+       0.66,
+       0.5
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/statistician/up/Syla_statistician_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/up/Syla_statistician_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/up/Syla_statistician_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/up/Syla_statistician_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:left": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_1.webp",
+      "weaponHand": [
+       0.518,
+       0.65
+      ],
+      "shieldHand": [
+       0.539,
+       0.655
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_2.webp",
+      "weaponHand": [
+       0.596,
+       0.661
+      ],
+      "shieldHand": [
+       0.601,
+       0.661
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_3.webp",
+      "weaponHand": [
+       0.448,
+       0.65
+      ],
+      "shieldHand": [
+       0.448,
+       0.676
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_4.webp",
+      "weaponHand": [
+       0.338,
+       0.637
+      ],
+      "shieldHand": [
+       0.465,
+       0.692
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": -160,
+       "scale": 0.45,
+       "flipX": true,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "front",
+       "rot": -10,
+       "scale": 0.55,
+       "flipX": true,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:right": {
+    "frames": [
+     {
+      "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_1.webp",
+      "weaponHand": [
+       0.482,
+       0.65
+      ],
+      "shieldHand": [
+       0.461,
+       0.655
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "poses": {
+       "wpn_1h_2": {},
+       "wpn_1h_1": {}
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_2.webp",
+      "weaponHand": [
+       0.404,
+       0.661
+      ],
+      "shieldHand": [
+       0.399,
+       0.661
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_3.webp",
+      "weaponHand": [
+       0.552,
+       0.65
+      ],
+      "shieldHand": [
+       0.552,
+       0.676
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_4.webp",
+      "weaponHand": [
+       0.662,
+       0.637
+      ],
+      "shieldHand": [
+       0.535,
+       0.692
+      ],
+      "weapon": {
+       "layer": "front",
+       "rot": 160,
+       "scale": 0.45,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 10,
+       "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": 0.3,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   }
+  },
+  "trix|actuary": {
    "idle:down": {
     "frames": [
      {
@@ -11033,6 +18646,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/actuary/up/Trix_actuary_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -11110,150 +18762,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/actuary/up/Trix_actuary_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/actuary/up/Trix_actuary_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/actuary/up/Trix_actuary_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/actuary/up/Trix_actuary_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -11410,8 +18918,151 @@ export const GEAR_GRIP_DATA = {
      }
     ]
    },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/actuary/up/Trix_actuary_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/actuary/up/Trix_actuary_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/actuary/up/Trix_actuary_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/actuary/up/Trix_actuary_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
    "walk:left": {
-    "mirrored": true,
     "frames": [
      {
       "img": "animations/Trix/walk/actuary/left/Trix_actuary_walk_left_1.webp",
@@ -11698,157 +19349,9 @@ export const GEAR_GRIP_DATA = {
       }
      }
     ]
-   },
-   "walk": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/Trix_actuary_walk_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/Trix_actuary_walk_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/Trix_actuary_walk_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
    }
   },
   "trix|bayesian": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/idle/bayesian/up/Trix_bayesian_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -11877,6 +19380,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/bayesian/up/Trix_bayesian_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -11954,150 +19496,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/bayesian/up/Trix_bayesian_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/bayesian/up/Trix_bayesian_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/bayesian/up/Trix_bayesian_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/bayesian/up/Trix_bayesian_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -12241,6 +19639,150 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/bayesian/up/Trix_bayesian_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/bayesian/up/Trix_bayesian_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/bayesian/up/Trix_bayesian_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/bayesian/up/Trix_bayesian_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": null,
        "flipX": false,
@@ -12544,45 +20086,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "trix|markovian": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/idle/markovian/up/Trix_markovian_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -12611,6 +20114,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/markovian/up/Trix_markovian_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -12688,150 +20230,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/markovian/up/Trix_markovian_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/markovian/up/Trix_markovian_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/markovian/up/Trix_markovian_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/markovian/up/Trix_markovian_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -12975,6 +20373,150 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/markovian/up/Trix_markovian_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/markovian/up/Trix_markovian_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/markovian/up/Trix_markovian_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/markovian/up/Trix_markovian_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": null,
        "flipX": false,
@@ -13278,45 +20820,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "trix|mathmagician": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/idle/mathmagician/up/Trix_mathmagician_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -13345,6 +20848,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/mathmagician/up/Trix_mathmagician_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -13422,150 +20964,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/mathmagician/up/Trix_mathmagician_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/mathmagician/up/Trix_mathmagician_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/mathmagician/up/Trix_mathmagician_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/mathmagician/up/Trix_mathmagician_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -13709,6 +21107,150 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/mathmagician/up/Trix_mathmagician_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/mathmagician/up/Trix_mathmagician_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/mathmagician/up/Trix_mathmagician_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/mathmagician/up/Trix_mathmagician_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": null,
        "flipX": false,
@@ -14012,45 +21554,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "trix|noclass": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/idle/noclass/up/Trix_noclass_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -14079,6 +21582,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/noclass/up/Trix_noclass_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -14156,150 +21698,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/noclass/up/Trix_noclass_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/noclass/up/Trix_noclass_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/noclass/up/Trix_noclass_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/noclass/up/Trix_noclass_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -14443,6 +21841,150 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/noclass/up/Trix_noclass_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/noclass/up/Trix_noclass_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/noclass/up/Trix_noclass_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/noclass/up/Trix_noclass_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": null,
        "flipX": false,
@@ -14746,45 +22288,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "trix|outlier": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/idle/outlier/up/Trix_outlier_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -14813,6 +22316,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/outlier/up/Trix_outlier_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -14890,150 +22432,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/outlier/up/Trix_outlier_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/outlier/up/Trix_outlier_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/outlier/up/Trix_outlier_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/outlier/up/Trix_outlier_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -15177,6 +22575,150 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/outlier/up/Trix_outlier_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/outlier/up/Trix_outlier_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/outlier/up/Trix_outlier_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/outlier/up/Trix_outlier_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": null,
        "flipX": false,
@@ -15480,45 +23022,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "trix|probabilist": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/idle/probabilist/up/Trix_probabilist_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -15547,6 +23050,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/probabilist/up/Trix_probabilist_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -15624,150 +23166,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/probabilist/up/Trix_probabilist_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/probabilist/up/Trix_probabilist_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/probabilist/up/Trix_probabilist_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/probabilist/up/Trix_probabilist_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -15911,6 +23309,150 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/probabilist/up/Trix_probabilist_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/probabilist/up/Trix_probabilist_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/probabilist/up/Trix_probabilist_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/probabilist/up/Trix_probabilist_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": null,
        "flipX": false,
@@ -16214,45 +23756,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "trix|random_walker": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/idle/random_walker/up/Trix_random_walker_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -16281,6 +23784,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/random_walker/up/Trix_random_walker_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -16358,150 +23900,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/random_walker/up/Trix_random_walker_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/random_walker/up/Trix_random_walker_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/random_walker/up/Trix_random_walker_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/random_walker/up/Trix_random_walker_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -16645,6 +24043,150 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/random_walker/up/Trix_random_walker_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/random_walker/up/Trix_random_walker_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/random_walker/up/Trix_random_walker_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/random_walker/up/Trix_random_walker_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": null,
        "flipX": false,
@@ -16948,45 +24490,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "trix|recursionist": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/idle/recursionist/up/Trix_recursionist_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -17015,6 +24518,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/recursionist/up/Trix_recursionist_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -17092,150 +24634,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/recursionist/up/Trix_recursionist_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/recursionist/up/Trix_recursionist_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/recursionist/up/Trix_recursionist_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/recursionist/up/Trix_recursionist_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -17379,6 +24777,150 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/recursionist/up/Trix_recursionist_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/recursionist/up/Trix_recursionist_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/recursionist/up/Trix_recursionist_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/recursionist/up/Trix_recursionist_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": null,
        "flipX": false,
@@ -17682,45 +25224,6 @@ export const GEAR_GRIP_DATA = {
    }
   },
   "trix|statistician": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/idle/statistician/up/Trix_statistician_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
    "idle:down": {
     "frames": [
      {
@@ -17749,6 +25252,45 @@ export const GEAR_GRIP_DATA = {
        "layer": "front",
        "rot": 0,
        "scale": 0.55,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "idle:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/idle/statistician/up/Trix_statistician_idle_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
        "flipX": false,
        "sx": 1,
        "tint": null,
@@ -17826,185 +25368,6 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "back",
        "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_5.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -18218,6 +25581,185 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "front",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     }
+    ]
+   },
+   "walk:up": {
+    "frames": [
+     {
+      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_1.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_2.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_3.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_4.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      }
+     },
+     {
+      "img": "animations/Trix/walk/statistician/up/Trix_statistician_walk_up_5.webp",
+      "weaponHand": [
+       0.68,
+       0.5
+      ],
+      "shieldHand": [
+       0.32,
+       0.48
+      ],
+      "weapon": {
+       "layer": "back",
+       "rot": 0,
+       "scale": null,
+       "flipX": false,
+       "sx": 1,
+       "tint": null,
+       "patch": {
+        "on": true,
+        "r": 0.045
+       }
+      },
+      "shield": {
+       "layer": "back",
        "rot": 0,
        "scale": null,
        "flipX": false,
@@ -18508,7180 +26050,6 @@ export const GEAR_GRIP_DATA = {
        "layer": "back",
        "rot": 6,
        "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|actuary": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/actuary/up/Syla_actuary_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/actuary/down/Syla_actuary_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/actuary/left/Syla_actuary_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/actuary/right/Syla_actuary_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/actuary/up/Syla_actuary_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/up/Syla_actuary_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/up/Syla_actuary_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/actuary/down/Syla_actuary_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/down/Syla_actuary_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/down/Syla_actuary_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/down/Syla_actuary_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:left": {
-    "mirrored": true,
-    "frames": [
-     {
-      "img": "animations/Syla/walk/actuary/left/Syla_actuary_walk_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/left/Syla_actuary_walk_left_2.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/left/Syla_actuary_walk_left_3.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/left/Syla_actuary_walk_left_4.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/actuary/right/Syla_actuary_walk_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/right/Syla_actuary_walk_right_2.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/actuary/right/Syla_actuary_walk_right_3.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/Syla_actuary_walk_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/Syla_actuary_walk_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/Syla_actuary_walk_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|bayesian": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/bayesian/up/Syla_bayesian_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/bayesian/down/Syla_bayesian_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/bayesian/left/Syla_bayesian_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/bayesian/right/Syla_bayesian_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/bayesian/up/Syla_bayesian_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/up/Syla_bayesian_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/up/Syla_bayesian_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/up/Syla_bayesian_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/bayesian/down/Syla_bayesian_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/down/Syla_bayesian_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/down/Syla_bayesian_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/down/Syla_bayesian_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:left": {
-    "mirrored": true,
-    "frames": [
-     {
-      "img": "animations/Syla/walk/bayesian/left/Syla_bayesian_walk_left_1.webp",
-      "weaponHand": [
-       0.388,
-       0.784
-      ],
-      "shieldHand": [
-       0.552,
-       0.483
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/left/Syla_bayesian_walk_left_2.webp",
-      "weaponHand": [
-       0,
-       0.639
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/left/Syla_bayesian_walk_left_3.webp",
-      "weaponHand": [
-       0.769,
-       0.561
-      ],
-      "shieldHand": [
-       0.5389999999999999,
-       0.534
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/bayesian/right/Syla_bayesian_walk_right_1.webp",
-      "weaponHand": [
-       0.612,
-       0.784
-      ],
-      "shieldHand": [
-       0.448,
-       0.483
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/right/Syla_bayesian_walk_right_2.webp",
-      "weaponHand": [
-       1,
-       0.639
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/bayesian/right/Syla_bayesian_walk_right_3.webp",
-      "weaponHand": [
-       0.231,
-       0.561
-      ],
-      "shieldHand": [
-       0.461,
-       0.534
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|markovian": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/markovian/up/Syla_markovian_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/markovian/down/Syla_markovian_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/markovian/left/Syla_markovian_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/markovian/right/Syla_markovian_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/markovian/up/Syla_markovian_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/up/Syla_markovian_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/up/Syla_markovian_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/up/Syla_markovian_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/markovian/down/Syla_markovian_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/down/Syla_markovian_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/down/Syla_markovian_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/down/Syla_markovian_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:left": {
-    "mirrored": true,
-    "frames": [
-     {
-      "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_1.webp",
-      "weaponHand": [
-       0.388,
-       0.784
-      ],
-      "shieldHand": [
-       0.552,
-       0.483
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_2.webp",
-      "weaponHand": [
-       0,
-       0.639
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_3.webp",
-      "weaponHand": [
-       0.769,
-       0.561
-      ],
-      "shieldHand": [
-       0.5389999999999999,
-       0.534
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_4.webp",
-      "weaponHand": [
-       1,
-       0.471
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -173,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_1.webp",
-      "weaponHand": [
-       0.612,
-       0.784
-      ],
-      "shieldHand": [
-       0.448,
-       0.483
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_2.webp",
-      "weaponHand": [
-       1,
-       0.639
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_3.webp",
-      "weaponHand": [
-       0.231,
-       0.561
-      ],
-      "shieldHand": [
-       0.461,
-       0.534
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_4.webp",
-      "weaponHand": [
-       0,
-       0.471
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 173,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|mathmagician": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/mathmagician/up/Syla_mathmagician_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/mathmagician/down/Syla_mathmagician_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/mathmagician/left/Syla_mathmagician_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/mathmagician/right/Syla_mathmagician_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/mathmagician/up/Syla_mathmagician_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/up/Syla_mathmagician_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/up/Syla_mathmagician_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/up/Syla_mathmagician_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/mathmagician/down/Syla_mathmagician_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/down/Syla_mathmagician_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/down/Syla_mathmagician_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/down/Syla_mathmagician_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:left": {
-    "mirrored": true,
-    "frames": [
-     {
-      "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_1.webp",
-      "weaponHand": [
-       0.388,
-       0.784
-      ],
-      "shieldHand": [
-       0.552,
-       0.483
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_2.webp",
-      "weaponHand": [
-       0,
-       0.639
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_3.webp",
-      "weaponHand": [
-       0.769,
-       0.561
-      ],
-      "shieldHand": [
-       0.5389999999999999,
-       0.534
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_4.webp",
-      "weaponHand": [
-       1,
-       0.471
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -173,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_1.webp",
-      "weaponHand": [
-       0.612,
-       0.784
-      ],
-      "shieldHand": [
-       0.448,
-       0.483
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_2.webp",
-      "weaponHand": [
-       1,
-       0.639
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_3.webp",
-      "weaponHand": [
-       0.231,
-       0.561
-      ],
-      "shieldHand": [
-       0.461,
-       0.534
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_4.webp",
-      "weaponHand": [
-       0,
-       0.471
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 173,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|noclass": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/noclass/up/Syla_noclass_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/noclass/down/Syla_noclass_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/noclass/left/Syla_noclass_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/noclass/right/Syla_noclass_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/noclass/up/Syla_noclass_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/noclass/up/Syla_noclass_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/noclass/up/Syla_noclass_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/noclass/up/Syla_noclass_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/noclass/down/Syla_noclass_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/noclass/down/Syla_noclass_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/noclass/down/Syla_noclass_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/noclass/down/Syla_noclass_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_1.webp",
-      "weaponHand": [
-       0.612,
-       0.784
-      ],
-      "shieldHand": [
-       0.448,
-       0.483
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_2.webp",
-      "weaponHand": [
-       1,
-       0.639
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_3.webp",
-      "weaponHand": [
-       0.231,
-       0.561
-      ],
-      "shieldHand": [
-       0.461,
-       0.534
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_4.webp",
-      "weaponHand": [
-       0,
-       0.471
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 173,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|outlier": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/outlier/up/Syla_outlier_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/outlier/down/Syla_outlier_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/outlier/left/Syla_outlier_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/outlier/right/Syla_outlier_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/outlier/up/Syla_outlier_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/up/Syla_outlier_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/up/Syla_outlier_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/up/Syla_outlier_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/outlier/down/Syla_outlier_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/down/Syla_outlier_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/down/Syla_outlier_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/down/Syla_outlier_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:left": {
-    "mirrored": true,
-    "frames": [
-     {
-      "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_1.webp",
-      "weaponHand": [
-       0.388,
-       0.784
-      ],
-      "shieldHand": [
-       0.552,
-       0.483
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_2.webp",
-      "weaponHand": [
-       0,
-       0.639
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_3.webp",
-      "weaponHand": [
-       0.769,
-       0.561
-      ],
-      "shieldHand": [
-       0.5389999999999999,
-       0.534
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_4.webp",
-      "weaponHand": [
-       1,
-       0.471
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -173,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_1.webp",
-      "weaponHand": [
-       0.612,
-       0.784
-      ],
-      "shieldHand": [
-       0.448,
-       0.483
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_2.webp",
-      "weaponHand": [
-       1,
-       0.639
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_3.webp",
-      "weaponHand": [
-       0.231,
-       0.561
-      ],
-      "shieldHand": [
-       0.461,
-       0.534
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_4.webp",
-      "weaponHand": [
-       0,
-       0.471
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 173,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|probabilist": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/probabilist/up/Syla_probabilist_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/probabilist/down/Syla_probabilist_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/probabilist/left/Syla_probabilist_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/probabilist/right/Syla_probabilist_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/probabilist/up/Syla_probabilist_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/up/Syla_probabilist_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/up/Syla_probabilist_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/up/Syla_probabilist_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/probabilist/down/Syla_probabilist_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/down/Syla_probabilist_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/down/Syla_probabilist_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/down/Syla_probabilist_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:left": {
-    "mirrored": true,
-    "frames": [
-     {
-      "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_1.webp",
-      "weaponHand": [
-       0.388,
-       0.784
-      ],
-      "shieldHand": [
-       0.552,
-       0.483
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_2.webp",
-      "weaponHand": [
-       0,
-       0.639
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_3.webp",
-      "weaponHand": [
-       0.769,
-       0.561
-      ],
-      "shieldHand": [
-       0.5389999999999999,
-       0.534
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_4.webp",
-      "weaponHand": [
-       1,
-       0.471
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -173,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_1.webp",
-      "weaponHand": [
-       0.612,
-       0.784
-      ],
-      "shieldHand": [
-       0.448,
-       0.483
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_2.webp",
-      "weaponHand": [
-       1,
-       0.639
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_3.webp",
-      "weaponHand": [
-       0.231,
-       0.561
-      ],
-      "shieldHand": [
-       0.461,
-       0.534
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_4.webp",
-      "weaponHand": [
-       0,
-       0.471
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 173,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|random_walker": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/random_walker/up/Syla_random_walker_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/random_walker/down/Syla_random_walker_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/random_walker/left/Syla_random_walker_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/random_walker/right/Syla_random_walker_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/random_walker/up/Syla_random_walker_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/up/Syla_random_walker_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/up/Syla_random_walker_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/up/Syla_random_walker_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/random_walker/down/Syla_random_walker_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/down/Syla_random_walker_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/down/Syla_random_walker_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/down/Syla_random_walker_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:left": {
-    "mirrored": true,
-    "frames": [
-     {
-      "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_1.webp",
-      "weaponHand": [
-       0.388,
-       0.784
-      ],
-      "shieldHand": [
-       0.552,
-       0.483
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_2.webp",
-      "weaponHand": [
-       0,
-       0.639
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_3.webp",
-      "weaponHand": [
-       0.769,
-       0.561
-      ],
-      "shieldHand": [
-       0.5389999999999999,
-       0.534
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_4.webp",
-      "weaponHand": [
-       1,
-       0.471
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -173,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_1.webp",
-      "weaponHand": [
-       0.612,
-       0.784
-      ],
-      "shieldHand": [
-       0.448,
-       0.483
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_2.webp",
-      "weaponHand": [
-       1,
-       0.639
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_3.webp",
-      "weaponHand": [
-       0.231,
-       0.561
-      ],
-      "shieldHand": [
-       0.461,
-       0.534
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_4.webp",
-      "weaponHand": [
-       0,
-       0.471
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 173,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|recursionist": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/recursionist/up/Syla_recursionist_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/recursionist/down/Syla_recursionist_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/recursionist/left/Syla_recursionist_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/recursionist/right/Syla_recursionist_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/recursionist/up/Syla_recursionist_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/up/Syla_recursionist_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/up/Syla_recursionist_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/up/Syla_recursionist_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/recursionist/down/Syla_recursionist_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/down/Syla_recursionist_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/down/Syla_recursionist_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/down/Syla_recursionist_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:left": {
-    "mirrored": true,
-    "frames": [
-     {
-      "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_1.webp",
-      "weaponHand": [
-       0.388,
-       0.784
-      ],
-      "shieldHand": [
-       0.552,
-       0.483
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_2.webp",
-      "weaponHand": [
-       0,
-       0.639
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_3.webp",
-      "weaponHand": [
-       0.769,
-       0.561
-      ],
-      "shieldHand": [
-       0.5389999999999999,
-       0.534
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_4.webp",
-      "weaponHand": [
-       1,
-       0.471
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -173,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_1.webp",
-      "weaponHand": [
-       0.612,
-       0.784
-      ],
-      "shieldHand": [
-       0.448,
-       0.483
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_2.webp",
-      "weaponHand": [
-       1,
-       0.639
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_3.webp",
-      "weaponHand": [
-       0.231,
-       0.561
-      ],
-      "shieldHand": [
-       0.461,
-       0.534
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_4.webp",
-      "weaponHand": [
-       0,
-       0.471
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 173,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   }
-  },
-  "syla|statistician": {
-   "idle:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/statistician/up/Syla_statistician_idle_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/statistician/down/Syla_statistician_idle_down_1.webp",
-      "weaponHand": [
-       0.251,
-       0.558
-      ],
-      "shieldHand": [
-       0.723,
-       0.581
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -140,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:left": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/statistician/left/Syla_statistician_idle_left_1.webp",
-      "weaponHand": [
-       0.38,
-       0.46
-      ],
-      "shieldHand": [
-       0.6,
-       0.5
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "idle:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/idle/statistician/right/Syla_statistician_idle_right_1.webp",
-      "weaponHand": [
-       0.62,
-       0.46
-      ],
-      "shieldHand": [
-       0.4,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 6,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:up": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/statistician/up/Syla_statistician_walk_up_1.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/up/Syla_statistician_walk_up_2.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/up/Syla_statistician_walk_up_3.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/up/Syla_statistician_walk_up_4.webp",
-      "weaponHand": [
-       0.68,
-       0.5
-      ],
-      "shieldHand": [
-       0.32,
-       0.48
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:down": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/statistician/down/Syla_statistician_walk_down_1.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/down/Syla_statistician_walk_down_2.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/down/Syla_statistician_walk_down_3.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/down/Syla_statistician_walk_down_4.webp",
-      "weaponHand": [
-       0.34,
-       0.48
-      ],
-      "shieldHand": [
-       0.66,
-       0.5
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:left": {
-    "mirrored": true,
-    "frames": [
-     {
-      "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_1.webp",
-      "weaponHand": [
-       0.388,
-       0.784
-      ],
-      "shieldHand": [
-       0.552,
-       0.483
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_2.webp",
-      "weaponHand": [
-       0,
-       0.639
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.5,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_3.webp",
-      "weaponHand": [
-       0.769,
-       0.561
-      ],
-      "shieldHand": [
-       0.5389999999999999,
-       0.534
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -160,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_4.webp",
-      "weaponHand": [
-       1,
-       0.471
-      ],
-      "shieldHand": [
-       0.5329999999999999,
-       0.495
-      ],
-      "weapon": {
-       "layer": "back",
-       "rot": -173,
-       "scale": 0.45,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "front",
-       "rot": -10,
-       "scale": 0.55,
-       "flipX": true,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     }
-    ]
-   },
-   "walk:right": {
-    "frames": [
-     {
-      "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_1.webp",
-      "weaponHand": [
-       0.612,
-       0.784
-      ],
-      "shieldHand": [
-       0.448,
-       0.483
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": 0.3,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_2.webp",
-      "weaponHand": [
-       1,
-       0.639
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.5,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_3.webp",
-      "weaponHand": [
-       0.231,
-       0.561
-      ],
-      "shieldHand": [
-       0.461,
-       0.534
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 160,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      }
-     },
-     {
-      "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_4.webp",
-      "weaponHand": [
-       0,
-       0.471
-      ],
-      "shieldHand": [
-       0.467,
-       0.495
-      ],
-      "weapon": {
-       "layer": "front",
-       "rot": 173,
-       "scale": 0.45,
-       "flipX": false,
-       "sx": 1,
-       "tint": null,
-       "patch": {
-        "on": true,
-        "r": 0.045
-       }
-      },
-      "shield": {
-       "layer": "back",
-       "rot": 10,
-       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
