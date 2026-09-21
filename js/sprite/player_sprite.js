@@ -11,7 +11,7 @@ import { _uspMovementSpeedMult } from '../skills/universal-spells.js';
 import { _applyLowHealthVignette } from '../timer/timer.js';
 import { t } from '../translation/translations.js';
 import { _banterRepositionBubbleIfVisible, hideCharacterBanter } from './character-banter.js';
-import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animRefreshCacheFor, _animSetDefaultDownImage, _animShouldMirrorFor, _animWalkIsDirectionalFor, _playAvatarWalkAnimation, _startAvatarIdleAnimation, _stopAvatarWalkAnimation } from './sprite_animations.js';
+import { ANIM_DIRECTIONS, _animHasDirectionalWalkSync, _animSetDefaultDownImage, _animShouldMirrorFor, _animWalkIsDirectionalFor, _playAvatarWalkAnimation, _startAvatarIdleAnimation, _stopAvatarWalkAnimation } from './sprite_animations.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -41,7 +41,7 @@ export function _getAvatarCharacterName() {
     return names[STATE?.playerCharacter] || 'STOX';
 }
 
-export function _getAvatarCharacterColor() {
+function _getAvatarCharacterColor() {
     const colors = {
         stox: '#4fc3f7',
         trix: '#ce93d8',
@@ -61,15 +61,10 @@ export function _charIs(id) {
 //-------------------SHARED AVATAR BAR STACK------------------------------
 //------------------------------------------------------------------------
 
-// The endgame-style bar stack BOTH avatar variants render (story puzzle
-// levels and endgame monster levels look identical now - the old simple/
-// full split was only ever a markup difference): Health, Mana, Shield
-// (only while absorption is actually up), attack charge - bars above, then
-// the sprite. barWidth pins the stack's width (the simple avatar's wrapper
-// can be wider than the sprite when companions flank it); the full avatar
-// uses the default 100% of its 100px wrapper. The ids are shared, so
-// exactly one avatar may exist at a time (each render removes the other -
-// see _renderPlayerAvatar* below).
+// The bar stack BOTH avatar variants render: Health, Mana, Shield (only
+// while absorption is up) and attack charge - bars above, then the sprite.
+// barWidth pins the stack width; the ids are shared, so exactly one avatar
+// may exist at a time (each render removes the other).
 export function _avatarBarsHTML(barWidth = '100%') {
     // MONSTERLESS: pure puzzling needs no combat readout - the sprite stands
     // alone with no Health / Mana / Shield / charge bars.
@@ -114,7 +109,7 @@ export function _avatarBarsHTML(barWidth = '100%') {
 // shield visibility, charge bar. Mana fill/text are owned by
 // updateClassHUDManaBar() (class-mana.js). Idempotent - call after any
 // avatar (re)build or health change.
-export function _updateAvatarBarStack() {
+function _updateAvatarBarStack() {
     // Health - the text shows only the current value (the bar's shape
     // already communicates the maximum), fill is the percentage.
     const hpText = document.getElementById('avatar-hp-text');
@@ -165,18 +160,15 @@ export function _updateAvatarBarStack() {
     }
 }
 
-
-
 //------------------------------------------------------------------------
 //-------------------SIMPLE IN-GAME AVATAR (non-monster levels)-----------
 //------------------------------------------------------------------------
 
-// Viewport-aware scale factor for the simple avatar. On narrow screens
-// (phones) the fixed 250px anchor position and the 128px sprite would
-// overlap the right-hand HUD/zoom bar, so the whole wrapper is shrunk.
-// Uses CSS zoom (same mechanism as the puzzle scaler) so offsetWidth
-// stays in sync and _setAvatarPos() keeps clamping correctly.
-export function _avatarResponsiveScale() {
+// Viewport-aware scale factor for the simple avatar: on narrow screens the
+// 250px anchor + 128px sprite would overlap the right-hand HUD, so the
+// wrapper shrinks. Uses CSS zoom so offsetWidth stays in sync and
+// _setAvatarPos() keeps clamping correctly.
+function _avatarResponsiveScale() {
     const vw = window.innerWidth || 1280;
     if (vw >= 700) return 1;   // desktop anchor - unchanged behaviour
     if (vw >= 480) return 0.8; // large phones / small tablets
@@ -184,15 +176,10 @@ export function _avatarResponsiveScale() {
 }
 
 // Anchor X/Y for the simple avatar wrapper. On phones the avatar moves to
-// the left edge BELOW the clock/mistake HUD (that HUD is ~74px tall, plus
-// extra rows when the touchpad toggle is shown), so it never covers the
-// timer. Desktop keeps the original 250px/15px anchor.
-//
-// The 128px sprite img sits centered inside the (narrower) wrapper, so on a
-// zoom-scaled phone layout its visual box spills past the wrapper's left
-// edge by (128 - wrapperWidth) * scale / 2 px. The anchor compensates for
-// that spill so the ARTWORK - not the wrapper box - keeps an 8px margin.
-export function _avatarAnchorLeft() {
+// the left edge BELOW the clock/mistake HUD so it never covers the timer;
+// desktop keeps the original 250px/15px anchor. The anchor compensates for
+// the zoom-scaled sprite's horizontal spill so the ARTWORK keeps 8px margin.
+function _avatarAnchorLeft() {
     const vw = window.innerWidth || 1280;
     if (vw >= 700) return '250px';
     const withCompanions = _hasCompanions();
@@ -202,7 +189,7 @@ export function _avatarAnchorLeft() {
     return Math.round(8 + spill) + 'px';
 }
 
-export function _avatarAnchorTop() {
+function _avatarAnchorTop() {
     if ((window.innerWidth || 1280) >= 700) return '15px';
     const hud = document.querySelector('.game-hud-corner');
     const hudBottom = hud ? hud.getBoundingClientRect().bottom : 0;
@@ -211,7 +198,7 @@ export function _avatarAnchorTop() {
 
 // Applies the responsive anchor + zoom scale to a simple-avatar wrapper.
 // Desktop (>700px) is a no-op - behaviour there is byte-for-byte unchanged.
-export function _applyAvatarResponsiveLayout(wrapper) {
+function _applyAvatarResponsiveLayout(wrapper) {
     if (!wrapper) return;
     wrapper.style.left = _avatarAnchorLeft();
     wrapper.style.top = _avatarAnchorTop();
@@ -275,7 +262,7 @@ export function _renderPlayerAvatarSimple() {
             // listener wiring used to leave the sprite drawn but unmovable
             // for the whole session (movement only worked after some later
             // flow re-rendered the avatar, e.g. entering the nexus).
-            if (!window._avatarWASDHandler) _initSimpleAvatarWASD(existing);
+            if (!_avatarWASDHandler) _initSimpleAvatarWASD(existing);
 
             // Keep the mana bar in sync when the avatar is reused (e.g. after
             // a level transition where the pool was reset).
@@ -357,11 +344,9 @@ export function _renderPlayerAvatarSimple() {
     if (_newSimpleImg && typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(_newSimpleImg);
     _initSimpleAvatarWASD(wrapper);
     _updateAvatarFacing(wrapper);
-    // Re-sync anchor/scale once the rest of the level HUD has settled - the
-    // touchpad toggle (FÜLLEN button) can appear after this point and grow
-    // the left HUD, which the phone anchor is derived from.
-    // ... but never yank the sprite back if the player already walked it
-    // during those first 350ms.
+    // Re-sync anchor/scale once the level HUD has settled (the touchpad
+    // toggle can grow the HUD the phone anchor is derived from) - but never
+    // yank the sprite back if the player already walked it in those 350ms.
     setTimeout(() => {
         if (wrapper.isConnected && !wrapper.dataset.avatarUserPos) {
             _applyAvatarResponsiveLayout(wrapper);
@@ -372,21 +357,12 @@ export function _renderPlayerAvatarSimple() {
     if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation('avatar-sprite-img-simple');
 }
 
-// Keeps the simple avatar in sync with viewport changes (phone rotation,
-// window resizing). Position provenance is tracked explicitly via two
-// dataset stamps:
-//   avatarUserPos   - a deliberate placement happened (_setAvatarPos:
-//                     walk, boss push, teleport). Resize handling must
-//                     preserve the spot and only clamp it back in view.
-//   avatarAnchored  - the position is the engine's responsive anchor
-//                     (_applyAvatarResponsiveLayout). A still-anchored
-//                     sprite follows the anchor when the viewport crosses
-//                     the desktop/phone boundary.
-// A sprite stamped by neither (e.g. placed by the tutorial's direct style
-// writes) is treated as deliberately placed: never re-anchored, only
-// clamped. Before this fix, a resize that dipped the window below 700px
-// snapped the sprite to the phone's top-left anchor, and an early return
-// for vw >= 700 meant it stayed stranded there after the window grew back.
+// Keeps the simple avatar in sync with viewport changes. Position
+// provenance is tracked via two dataset stamps: avatarUserPos = deliberate
+// placement (_setAvatarPos: walk, boss push, teleport - resize only clamps
+// it back in view); avatarAnchored = engine anchor - follows the anchor
+// across the desktop/phone boundary. An unstamped sprite is treated as
+// deliberately placed: never re-anchored, only clamped.
 (function _initAvatarResizeSync() {
     let lastVW = window.innerWidth, lastVH = window.innerHeight;
     const DESKTOP_MIN_VW = 700;
@@ -448,7 +424,7 @@ export function _renderPlayerAvatarSimple() {
 })();
 
 // Removes the simple avatar (called when entering a monster level).
-export function _removePlayerAvatarSimple() {
+function _removePlayerAvatarSimple() {
     const simple = document.getElementById('player-avatar-simple');
     if (simple) simple.remove();
     // Clean up WASD listeners
@@ -456,28 +432,6 @@ export function _removePlayerAvatarSimple() {
     if (typeof hideCharacterBanter === 'function') hideCharacterBanter();
 }
 
-// Refreshes the sprite image on the simple avatar (e.g. after class selection).
-export function _updateAvatarSimpleImage() {
-    const img = document.getElementById('avatar-sprite-img-simple');
-    if (img) {
-        if (typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(img);
-        else img.src = _getPlayerCharacterImage();
-    }
-    const imgFull = document.getElementById('avatar-sprite-img');
-    if (imgFull) {
-        if (typeof _animSetDefaultDownImage === 'function') _animSetDefaultDownImage(imgFull);
-        else imgFull.src = _getPlayerCharacterImage();
-    }
-    // New class/variant: drop stale frame cache, warm the new one, and
-    // (re)start the idle loop so fresh idle art appears.
-    if (typeof _animRefreshCacheFor === 'function' && typeof STATE !== 'undefined' && STATE) {
-        _animRefreshCacheFor(STATE.playerCharacter, STATE.playerAscendency || STATE.playerClass || 'noclass');
-    }
-    if (typeof _startAvatarIdleAnimation === 'function') {
-        _startAvatarIdleAnimation('avatar-sprite-img-simple');
-        _startAvatarIdleAnimation('avatar-sprite-img');
-    }
-}
 
 
 //------------------------------------------------------------------------
@@ -491,14 +445,13 @@ export function _updateAvatarSimpleImage() {
 // sprite every animation frame, so it reacts instantly and smoothly.
 
 // Held-key movement. Keys come from the persisted keybind map
-// (js/keybinds.js, actions move-up/down/left/right, WASD by default) so
+// (js/keybinds.js, actions move-up/down/left/right, WASD by default), so
 // player rebindings take effect here too.
 export const AVATAR_MOVE_SPEED_PX_PER_SEC = 320;
 
-// Boots movement-speed modifier (PoE-style). Reads live gear via
-// _egComputePlayerStats().movementSpeedPct which is only rolled on
-// boots (10–35%). Outside endgame or with no boots equipped this
-// stays at 1.0×.
+// Boots movement-speed modifier. Reads live gear via
+// _egComputePlayerStats().movementSpeedPct (only rolled on boots, 10-35%).
+// Outside endgame or with no boots equipped this stays at 1.0x.
 export function _avatarGetMoveSpeed() {
     let base = AVATAR_MOVE_SPEED_PX_PER_SEC;
     try {
@@ -541,7 +494,7 @@ export function _avatarGetMoveSpeed() {
 // player holding a key against a UI block is not walking, and the movement
 // spells must aim where the sprite last went, not where a held key points.
 // Read through getAvatarLastMoveDir() (js/skills/universal-spells.js).
-export let _avatarLastMoveDir = null;
+let _avatarLastMoveDir = null;
 
 export function getAvatarLastMoveDir() {
     return _avatarLastMoveDir;
@@ -554,7 +507,7 @@ export const _avatarMoveState = {
     lastTs: 0,
 };
 
-export function _avatarMoveUiBlocked() {
+function _avatarMoveUiBlocked() {
     const tag = document.activeElement ? document.activeElement.tagName : null;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || !!document.querySelector('.modal-bg.show')) return true;
     // A question modal (quiz overlay / math gate / scouts primer) hides the
@@ -668,7 +621,16 @@ export function _avatarMoveTick(ts) {
     _avatarMoveState.rafId = requestAnimationFrame(_avatarMoveTick);
 }
 
-export function _makeAvatarWasdHandlers(elId) {
+// Listener handles for both avatar variants. Module scope: nothing outside
+// this file reads or writes them (the window park was pre-module legacy).
+let _avatarWASDHandler = null;
+let _avatarWASDKeyUpHandler = null;
+let _avatarWASDBlurHandler = null;
+let _avatarFullWASDHandler = null;
+let _avatarFullWASDKeyUpHandler = null;
+let _avatarFullWASDBlurHandler = null;
+
+function _makeAvatarWasdHandlers(elId) {
     const onKeyDown = (e) => {
         if (_avatarMoveUiBlocked()) return;
         const k = (e.key || '').toLowerCase();
@@ -705,41 +667,39 @@ export function _makeAvatarWasdHandlers(elId) {
     return { onKeyDown, onKeyUp, onBlur };
 }
 
-export function _removeSimpleAvatarWasdListeners() {
-    if (window._avatarWASDHandler) {
-        document.removeEventListener('keydown', window._avatarWASDHandler);
-        window._avatarWASDHandler = null;
+function _removeSimpleAvatarWasdListeners() {
+    if (_avatarWASDHandler) {
+        document.removeEventListener('keydown', _avatarWASDHandler);
+        _avatarWASDHandler = null;
     }
-    if (window._avatarWASDKeyUpHandler) {
-        document.removeEventListener('keyup', window._avatarWASDKeyUpHandler);
-        window._avatarWASDKeyUpHandler = null;
+    if (_avatarWASDKeyUpHandler) {
+        document.removeEventListener('keyup', _avatarWASDKeyUpHandler);
+        _avatarWASDKeyUpHandler = null;
     }
-    if (window._avatarWASDBlurHandler) {
-        window.removeEventListener('blur', window._avatarWASDBlurHandler);
-        window._avatarWASDBlurHandler = null;
+    if (_avatarWASDBlurHandler) {
+        window.removeEventListener('blur', _avatarWASDBlurHandler);
+        _avatarWASDBlurHandler = null;
     }
 }
 
-export function _initSimpleAvatarWASD(wrapper) {
+function _initSimpleAvatarWASD(wrapper) {
     // Remove any previous listeners
     _removeSimpleAvatarWasdListeners();
 
     const h = _makeAvatarWasdHandlers('player-avatar-simple');
-    window._avatarWASDHandler = h.onKeyDown;
-    window._avatarWASDKeyUpHandler = h.onKeyUp;
-    window._avatarWASDBlurHandler = h.onBlur;
+    _avatarWASDHandler = h.onKeyDown;
+    _avatarWASDKeyUpHandler = h.onKeyUp;
+    _avatarWASDBlurHandler = h.onBlur;
 
     document.addEventListener('keydown', h.onKeyDown);
     document.addEventListener('keyup', h.onKeyUp);
     window.addEventListener('blur', h.onBlur);
 }
 
-// Returns true when the random_walker companions should be shown.
-// try/typeof-guard: this runs during avatar render, and a mid-boot STATE
-// hiccup here used to abort the whole render - including the WASD listener
-// wiring below it - leaving the sprite permanently unmovable for the
-// session (the "movement only works after visiting the nexus" report).
-export function _hasCompanions() {
+// Returns true when the random_walker companions should be shown. Guarded
+// because a mid-boot STATE hiccup here once aborted the whole avatar render,
+// leaving the sprite permanently unmovable for the session.
+function _hasCompanions() {
     try {
         return !!(typeof STATE !== 'undefined' && STATE && STATE.playerAscendency === 'random_walker');
     } catch (e) {
@@ -808,15 +768,12 @@ export function _chargeCompanionToCell(companionId, targetR, targetC, onArrival,
     }, 380);
 }
 
-// Facing helper. While moving, the sprite faces its TRAVEL direction:
-//   - directional walk art (up/down/left/right) is drawn facing that way,
-//     so it must never be mirrored (this fixes the Trix left/right swap);
-//   - omni fallback art faces right, so only leftward movement mirrors it.
-// Idle (no direction) keeps the legacy face-the-screen-centre behaviour so
-// the menu-style portrait presentation is unchanged.
-// With companions, also reorders Drifter/Brownian so they stay on the
-// correct side (Drifter left, Brownian right) relative to the character.
-export function _updateAvatarFacing(el, direction) {
+// Facing helper: while moving, the sprite faces its TRAVEL direction
+// (directional walk art is never mirrored - the Trix left/right swap fix;
+// omni fallback art mirrors on leftward movement). Idle keeps the legacy
+// face-the-screen-centre behaviour. With companions, reorders Drifter and
+// Brownian so they stay on the correct side relative to the character.
+function _updateAvatarFacing(el, direction) {
     const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
     const char = st ? st.playerCharacter : null;
     const variant = st ? (st.playerAscendency || st.playerClass || 'noclass') : 'noclass';
@@ -926,8 +883,6 @@ export function _updateAvatarFacing(el, direction) {
     }
 }
 
-
-
 // Sets position clamped to the viewport so the avatar never goes off-screen.
 // Voluntary directed movement also drives the walking animation: it starts/
 // keeps the walk loop running and re-arms its idle debounce (see
@@ -941,7 +896,7 @@ export function _setAvatarPos(el, x, y, direction) {
     const h = el.offsetHeight || 90;
     const maxX = window.innerWidth - w - 4;
     const maxY = window.innerHeight - h - 4;
-    el.style.bottom = 'auto';   // <-- add this
+    el.style.bottom = 'auto';
     el.style.left = Math.max(4, Math.min(maxX, x)) + 'px';
     el.style.top = Math.max(4, Math.min(maxY, y)) + 'px';
     // Deliberate placement (walk, push, teleport): resize handling must
@@ -983,19 +938,14 @@ export function _updateLSAvatarImage() {
 //-------------------GAME SETUP SCREEN-------------------------------------
 //------------------------------------------------------------------------
 
-
-
 // Maps character id → the per-character name-image asset shown on the
 // left page of the setup screen's book. Expected filenames:
 // images/Game_Setup/Stox.webp, Trix.png, Syla.png
-export function _getSetupCharNameImage() {
+function _getSetupCharNameImage() {
     const char = (STATE && STATE.playerCharacter) ? STATE.playerCharacter : 'stox';
     const charCap = char.charAt(0).toUpperCase() + char.slice(1);
     return `images/Game_Setup/${charCap}.webp`;
 }
-
-
-
 
 // Call this inside showSetup() (screens.js) to sync the setup screen's
 // character name image + portrait to whichever character the player chose.
@@ -1006,9 +956,6 @@ export function _updateSetupScreenCharacter() {
     const portraitImg = document.getElementById('setup-char-portrait');
     if (portraitImg) portraitImg.src = _getPlayerCharacterImage();
 }
-
-
-
 
 //------------------------------------------------------------------------
 //-------------------FULL AVATAR (same stack, monster levels)-------------
@@ -1097,37 +1044,33 @@ export function _renderPlayerAvatar() {
     }
 }
 
-export function _removeFullAvatarWasdListeners() {
-    if (window._avatarFullWASDHandler) {
-        document.removeEventListener('keydown', window._avatarFullWASDHandler);
-        window._avatarFullWASDHandler = null;
+function _removeFullAvatarWasdListeners() {
+    if (_avatarFullWASDHandler) {
+        document.removeEventListener('keydown', _avatarFullWASDHandler);
+        _avatarFullWASDHandler = null;
     }
-    if (window._avatarFullWASDKeyUpHandler) {
-        document.removeEventListener('keyup', window._avatarFullWASDKeyUpHandler);
-        window._avatarFullWASDKeyUpHandler = null;
+    if (_avatarFullWASDKeyUpHandler) {
+        document.removeEventListener('keyup', _avatarFullWASDKeyUpHandler);
+        _avatarFullWASDKeyUpHandler = null;
     }
-    if (window._avatarFullWASDBlurHandler) {
-        window.removeEventListener('blur', window._avatarFullWASDBlurHandler);
-        window._avatarFullWASDBlurHandler = null;
+    if (_avatarFullWASDBlurHandler) {
+        window.removeEventListener('blur', _avatarFullWASDBlurHandler);
+        _avatarFullWASDBlurHandler = null;
     }
 }
 
-export function _initFullAvatarWASD(wrapper) {
+function _initFullAvatarWASD(wrapper) {
     _removeFullAvatarWasdListeners();
 
     const h = _makeAvatarWasdHandlers('player-avatar-wrapper');
-    window._avatarFullWASDHandler = h.onKeyDown;
-    window._avatarFullWASDKeyUpHandler = h.onKeyUp;
-    window._avatarFullWASDBlurHandler = h.onBlur;
+    _avatarFullWASDHandler = h.onKeyDown;
+    _avatarFullWASDKeyUpHandler = h.onKeyUp;
+    _avatarFullWASDBlurHandler = h.onBlur;
 
     document.addEventListener('keydown', h.onKeyDown);
     document.addEventListener('keyup', h.onKeyUp);
     window.addEventListener('blur', h.onBlur);
 }
-
-
-
-
 
 export function _hidePlayerAvatarSimple() {
     const el = document.getElementById('player-avatar-simple');
@@ -1143,9 +1086,8 @@ export function _showPlayerAvatarSimple() {
     if (el) el.style.display = 'flex';
 }
 
-// In js/sprite/player_sprite.js - add to wherever _egStopEncounter cleans up,
-// or add a dedicated hide function mirroring the simple one:
-
+// Hides the full (monster-level) avatar - the counterpart of
+// _hidePlayerAvatarSimple above. Encounter teardown calls this directly.
 export function _hidePlayerAvatar() {
     const el = document.getElementById('player-avatar-wrapper');
     if (el) el.style.display = 'none';
@@ -1158,8 +1100,6 @@ export function _showPlayerAvatar() {
     const el = document.getElementById('player-avatar-wrapper');
     if (el) el.style.display = 'flex';
 }
-
-
 
 export function _renderPlayerHealth() {
     _updateAvatarBarStack();
