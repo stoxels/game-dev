@@ -46,16 +46,16 @@ try { Object.defineProperty(globalThis, '_quizCalcTutorSuccessChance', { get() {
 let currentQuizQuestion = null;
 
 // Timer handle for the (currently disabled) auto-finish countdown.
-export let _quizAutoFinishTimer = null;
+let _quizAutoFinishTimer = null;
 
 // How many recently-shown questions to avoid repeating, per world.
-export const QUIZ_RECENT_HISTORY_SIZE = 10;
+const QUIZ_RECENT_HISTORY_SIZE = 10;
 
 // Tracks the last N raw question objects shown per world: { [world]: [raw, raw, ...] }
-export const _quizRecentQuestions = {};
+const _quizRecentQuestions = {};
 
 // Inventory item ids for every Tutor tier, in priority order (lowest tier first).
-export const TUTOR_ITEM_IDS2 = ['tutor', 'tutor4', 'tutor6', 'tutorAll'];
+const TUTOR_ITEM_IDS2 = ['tutor', 'tutor4', 'tutor6', 'tutorAll'];
 
 
 //------------------------------------------------------------------------
@@ -92,7 +92,7 @@ export function _quizCalcTutorSuccessChance() {
 }
 
 // Returns the probability that using a Tutor item does NOT consume it.
-export function _quizCalcTutorNoConsumeChance() {
+function _quizCalcTutorNoConsumeChance() {
     let chance = 0;
     if (PT.hasSkill('careful_study')) chance += 0.10;
     if (PT.hasSkill('efficient_tutoring')) chance += 0.15;
@@ -109,7 +109,7 @@ export function _quizCalcTutorNoConsumeChance() {
 // Builds a flat pool from the world-specific MC pool (BONUS_QUIZ_POOLS)
 // and the math-gate input pool (MATH_GATE_POOLS) for the given world.
 // Returns an array of tagged entries: { _src: 'mc_world'|'input', raw }.
-export function _quizBuildQuestionPool(worldNum) {
+function _quizBuildQuestionPool(worldNum) {
     const pool = [];
 
     if (worldNum && BONUS_QUIZ_POOLS[worldNum]) {
@@ -125,7 +125,7 @@ export function _quizBuildQuestionPool(worldNum) {
 
 // Converts a raw input-question entry into the normalised question object
 // used by the rest of the quiz system.
-export function _quizBuildInputQuestion(raw) {
+function _quizBuildInputQuestion(raw) {
     return {
         type: 'input',
         q: (LANG === 'de' && raw.qDE) ? raw.qDE : raw.q,
@@ -141,7 +141,7 @@ export function _quizBuildInputQuestion(raw) {
 
 // Converts a raw MC entry into the normalised question object.
 // Options are shuffled so the correct answer appears at a random position.
-export function _quizBuildMcQuestion(raw) {
+function _quizBuildMcQuestion(raw) {
     const q = (LANG === 'de' && raw.qDE) ? raw.qDE : raw.q;
     const opts = (LANG === 'de' && raw.optsDE) ? raw.optsDE : raw.opts;
 
@@ -158,7 +158,7 @@ export function _quizBuildMcQuestion(raw) {
 }
 
 // Records a raw question object as "recently shown" for its world.
-export function _quizRecordShownQuestion(worldNum, rawQuestion) {
+function _quizRecordShownQuestion(worldNum, rawQuestion) {
     if (!_quizRecentQuestions[worldNum]) _quizRecentQuestions[worldNum] = [];
     _quizRecentQuestions[worldNum].push(rawQuestion);
     if (_quizRecentQuestions[worldNum].length > QUIZ_RECENT_HISTORY_SIZE) {
@@ -168,7 +168,7 @@ export function _quizRecordShownQuestion(worldNum, rawQuestion) {
 
 // Picks a random question for the given world, avoiding recent repeats
 // where possible. Returns a normalised question object (MC or input).
-export function getQuizQuestion(worldNum) {
+function getQuizQuestion(worldNum) {
     const pool = _quizBuildQuestionPool(worldNum);
 
     if (!pool.length) {
@@ -200,7 +200,7 @@ export function getQuizQuestion(worldNum) {
 
 // Resets shared overlay elements to their default "clean slate" state
 // before populating a new question.
-export function _quizResetOverlay() {
+function _quizResetOverlay() {
     document.getElementById('quiz-result').textContent = '';
     const contBtn = document.getElementById('quiz-continue');
     contBtn.style.display = 'none';
@@ -209,7 +209,7 @@ export function _quizResetOverlay() {
 }
 
 // Hides the numeric-input row (used when rendering an MC question).
-export function _quizHideInputRow() {
+function _quizHideInputRow() {
     const inputRow = document.getElementById('quiz-input-row');
     const hintBox = document.getElementById('quiz-input-hint');
 
@@ -222,7 +222,7 @@ export function _quizHideInputRow() {
 // Called after the MC buttons have been rendered.
 // Eliminates a single wrong-answer button visually (red flash + shake before
 // it fades out) and tracks the stat.
-export function _quizEliminateButton(btn) {
+function _quizEliminateButton(btn) {
     // Inject the elimination keyframes once.
     if (!document.getElementById('quiz-eliminate-style')) {
         const style = document.createElement('style');
@@ -253,7 +253,7 @@ export function _quizEliminateButton(btn) {
 // Converts a chance that may exceed 100% into a concrete removal count.
 // e.g. 1.10 → 1 guaranteed removal, plus a 10% roll for a 2nd.
 //      0.65 → 0 guaranteed, 65% roll for 1.
-export function _quizCalcEliminationCount(elimChance) {
+function _quizCalcEliminationCount(elimChance) {
     if (elimChance <= 0) return 0;
     const guaranteed = Math.floor(elimChance);
     const remainder = elimChance - guaranteed;
@@ -263,7 +263,7 @@ export function _quizCalcEliminationCount(elimChance) {
 
 // Passive-tree: tries to visually strike through wrong answer(s).
 // Called after the MC buttons have been rendered.
-export function _quizTryEliminateWrongAnswer() {
+function _quizTryEliminateWrongAnswer() {
     const elimChance = _quizCalcEliminationChance();
     const count = _quizCalcEliminationCount(elimChance);
     if (count <= 0) return;
@@ -281,7 +281,7 @@ export function _quizTryEliminateWrongAnswer() {
 }
 
 // Toggles the explanation text box open/closed.
-export function quizToggleExplain() {
+function quizToggleExplain() {
     if (!currentQuizQuestion) return;
     const box = document.getElementById('quiz-explain');
     const text = (LANG === 'de' && currentQuizQuestion.explainDE)
@@ -299,7 +299,7 @@ export function quizToggleExplain() {
 
 // Shows/hides the "Tell me why" button depending on whether the current
 // question has an explanation available.
-export function _quizRefreshWhyButton() {
+function _quizRefreshWhyButton() {
     const btn = document.getElementById('quiz-why-btn');
     const box = document.getElementById('quiz-explain');
     if (!btn) return;
@@ -321,7 +321,7 @@ export function _quizRefreshWhyButton() {
 //------------------------------------------------------------------------
 
 // Handles the "already claimed" correct-answer path: message only.
-export function _quizHandleAlreadyClaimedReward(resEl) {
+function _quizHandleAlreadyClaimedReward(resEl) {
     resEl.className = 'quiz-result ok';
     resEl.textContent = t('quiz_correct_claimed');
 }
@@ -329,7 +329,7 @@ export function _quizHandleAlreadyClaimedReward(resEl) {
 // Handles the "first correct answer" path:
 // awards +50 score and marks the bonus as claimed (no item rewards -
 // quiz answers no longer drop items).
-export function _quizHandleFirstCorrectReward(resEl) {
+function _quizHandleFirstCorrectReward(resEl) {
     STATE.totalScore += 50;
     document.getElementById('sc-disp').textContent = STATE.totalScore;
 
@@ -353,7 +353,7 @@ export function _quizHandleFirstCorrectReward(resEl) {
 // Central resolver called by all answer paths (MC, input, and tutor).
 // Delegates reward/penalty logic to the helpers above, then updates
 // the overlay controls to reflect the answered state.
-export function _resolveQuizAnswer(correct) {
+function _resolveQuizAnswer(correct) {
     globalThis.quizAnsweredCorrectly = correct;
     document.getElementById('quiz-tutor-btn').style.display = 'none';
     const resEl = document.getElementById('quiz-result');
@@ -404,7 +404,7 @@ export function _resolveQuizAnswer(correct) {
 //------------------------------------------------------------------------
 
 // Shows the localised hint text below the input field after a wrong answer.
-export function _quizShowInputHint() {
+function _quizShowInputHint() {
     const hint = (LANG === 'de' && currentQuizQuestion.hintDE)
         ? currentQuizQuestion.hintDE
         : currentQuizQuestion.hintEn;
@@ -419,7 +419,7 @@ export function _quizShowInputHint() {
 // Locks all MC buttons after the player's click, highlights the correct
 // answer (and the wrong click in red if applicable), then resolves.
 // Called directly from each MC option button's onclick handler.
-export function answerQuiz(correct, optsEl, clickedBtn) {
+function answerQuiz(correct, optsEl, clickedBtn) {
     // Lock all buttons immediately to prevent double-clicks
     Array.from(optsEl.children).forEach(btn => btn.onclick = null);
 
@@ -476,7 +476,7 @@ export function answerQuizInput() {
 //------------------------------------------------------------------------
 
 // Builds the MC option buttons and appends them to the options container.
-export function _quizRenderMcOptions(q) {
+function _quizRenderMcOptions(q) {
     const optsEl = document.getElementById('quiz-opts');
 
     q.opts.forEach(opt => {
@@ -490,7 +490,7 @@ export function _quizRenderMcOptions(q) {
 }
 
 // Sets up the numeric-input row for an input-type question.
-export function _quizShowInputRow(q) {
+function _quizShowInputRow(q) {
     const inputRow = document.getElementById('quiz-input-row');
     const inputEl = document.getElementById('quiz-input');
     const unitEl = document.getElementById('quiz-input-unit');
@@ -526,19 +526,19 @@ export function _quizShowInputRow(q) {
 
 // Returns the first available Tutor item from inventory, checking all
 // tiers in priority order (lowest tier first).
-export function _quizGetTutorItem() {
+function _quizGetTutorItem() {
     return TUTOR_ITEM_IDS2
         .flatMap(id => STATE.inventory.filter(i => i.defId === id))
         .find(Boolean) ?? null;
 }
 
 // Counts all Tutor items across every tier in the player's inventory.
-export function _quizCountTutorItems() {
+function _quizCountTutorItems() {
     return STATE.inventory.filter(i => TUTOR_ITEM_IDS2.includes(i.defId)).length;
 }
 
 // Removes the given Tutor item from inventory and persists the change.
-export function _quizConsumeTutorItem(tutorItem) {
+function _quizConsumeTutorItem(tutorItem) {
     STATE.inventory = STATE.inventory.filter(i => i.uid !== tutorItem.uid);
     save();
     buildInventoryPanel();
@@ -546,7 +546,7 @@ export function _quizConsumeTutorItem(tutorItem) {
 
 // Locks the current MC question's buttons and highlights the correct answer.
 // Called when the Tutor succeeds on an MC question.
-export function _quizTutorRevealMcAnswer() {
+function _quizTutorRevealMcAnswer() {
     const optsEl = document.getElementById('quiz-opts');
     Array.from(optsEl.children).forEach(btn => {
         btn.onclick = null;
@@ -560,7 +560,7 @@ export function _quizTutorRevealMcAnswer() {
 // Fills the correct answer (formatted via the question's tolerance, see
 // mgFormatTutorAnswer in mathgate.js) before locking, so the player sees
 // WHAT the tutor solved instead of just a "solved" message.
-export function _quizTutorLockInputQuestion() {
+function _quizTutorLockInputQuestion() {
     const inp = document.getElementById('quiz-input');
     if (inp && currentQuizQuestion) {
         const fill = (typeof mgFormatTutorAnswer === 'function') ? mgFormatTutorAnswer(currentQuizQuestion) : '';
@@ -572,7 +572,7 @@ export function _quizTutorLockInputQuestion() {
 
 // Handles the Tutor-success path: plays audio, shows feedback, reveals
 // the answer in the appropriate way, and resolves as correct.
-export function _quizHandleTutorSuccess(resEl) {
+function _quizHandleTutorSuccess(resEl) {
     resEl.textContent = t('qz_tutor_solved');
     resEl.className = 'quiz-result ok';
     Audio_Manager.playSFX('tutorSuccess');
@@ -588,7 +588,7 @@ export function _quizHandleTutorSuccess(resEl) {
 
 // Handles the Tutor-fail path: plays audio and shows feedback.
 // The question remains active so the player can still answer manually.
-export function _quizHandleTutorFail(resEl) {
+function _quizHandleTutorFail(resEl) {
     resEl.textContent = t('qz_tutor_failed');
     resEl.className = 'quiz-result bad';
     Audio_Manager.playSFX('tutorFail');
@@ -596,7 +596,7 @@ export function _quizHandleTutorFail(resEl) {
 
 // Refreshes the Tutor button visibility and label.
 // Called every time the quiz overlay opens.
-export function _quizRefreshTutorButton() {
+function _quizRefreshTutorButton() {
     const btn = document.getElementById('quiz-tutor-btn');
     if (!btn) return;
 
@@ -653,50 +653,6 @@ export function quizUseTutor() {
 //------------------------------------------------------------------------
 //-------------------SHOW QUIZ (MAIN ENTRY POINT)-------------------------
 //------------------------------------------------------------------------
-
-// Injects the character-portrait medallion into the quiz overlay and
-// drives its accent/crack colours from the active character.
-// NOTE: not currently called anywhere in this file - see summary.
-export function _quizInjectPortrait(overlayEl) {
-    // Remove stale portrait if it exists
-    const old = overlayEl.querySelector('.qr-portrait-wrap');
-    if (old) old.remove();
-
-    const imgSrc = (typeof _getPlayerCharacterImage === 'function')
-        ? _getPlayerCharacterImage()
-        : '';
-    if (!imgSrc) return;
-
-    const wrap = document.createElement('div');
-    wrap.className = 'qr-portrait-wrap';
-    wrap.innerHTML = `
-        <div class="qr-portrait-medallion">
-            <img src="${imgSrc}" alt="character">
-        </div>
-        <div class="qr-portrait-ledge"></div>
-    `;
-
-    // The quiz-overlay is position:fixed; we need a relative inner container.
-    // Insert the portrait as the very first child so it sits above the content.
-    const inner = overlayEl.querySelector('.quiz-title');
-    if (inner) overlayEl.insertBefore(wrap, inner);
-    else overlayEl.prepend(wrap);
-
-    // Drive crack/accent colour from character
-    const charColors = {
-        stox: { accent: '#4fc3f7', glow: 'rgba(79,195,247,0.55)', crack: '#b06cff', crackGlow: 'rgba(176,108,255,0.6)' },
-        trix: { accent: '#ce93d8', glow: 'rgba(206,147,216,0.55)', crack: '#ce93d8', crackGlow: 'rgba(206,147,216,0.5)' },
-        syla: { accent: '#66bb6a', glow: 'rgba(102,187,106,0.55)', crack: '#26c6a6', crackGlow: 'rgba(38,198,166,0.5)' },
-    };
-    const c = charColors[STATE?.playerCharacter] || charColors.stox;
-    overlayEl.style.setProperty('--qr-accent', c.accent);
-    overlayEl.style.setProperty('--qr-accent-glow', c.glow);
-    const frame = overlayEl.querySelector('.qr-frame');
-    if (frame) {
-        frame.style.setProperty('--qr-crack', c.crack);
-        frame.style.setProperty('--qr-crack-glow', c.crackGlow);
-    }
-}
 
 // Opens the quiz overlay for the given world, drawing a random question
 // and setting up the correct input mode (MC or numeric input).
@@ -758,7 +714,7 @@ export function closeQuiz() {
 
 // Shows the win overlay after a short delay. Shared by finishQuiz() and
 // skipQuiz() for the non-interstitial exit path.
-export function _quizShowWinOverlay() {
+function _quizShowWinOverlay() {
     setTimeout(() => {
         document.getElementById('ov-win').classList.add('show');
         requestAnimationFrame(() => buildReveal());
@@ -768,7 +724,7 @@ export function _quizShowWinOverlay() {
 // If an endgame interstitial is active, closes the quiz and hands control
 // back to the interstitial chain instead of showing the win overlay.
 // Returns true if the interstitial path was taken (caller should stop).
-export function _quizHandleInterstitialExit() {
+function _quizHandleInterstitialExit() {
     if (typeof window._egInterstitialDone !== 'function') return false;
     const cb = window._egInterstitialDone;
     closeQuiz();
@@ -778,17 +734,17 @@ export function _quizHandleInterstitialExit() {
 
 // Closes the overlay, runs post-quiz world checks, saves, and shows
 // the win overlay. Called from the "CONTINUE" button and (if re-enabled)
-    // the auto-finish timer.
-    export function finishQuiz() {
-        if (_quizHandleInterstitialExit()) return;
-        closeQuiz();
-        checkWorldCodesSync();
-        checkWorldCompletion();
-        save();
-        _quizShowWinOverlay();
-        // Codes popup delayed so it feels distinct
-        setTimeout(() => checkWorldCodes(), 1000);
-    }
+// the auto-finish timer.
+export function finishQuiz() {
+    if (_quizHandleInterstitialExit()) return;
+    closeQuiz();
+    checkWorldCodesSync();
+    checkWorldCompletion();
+    save();
+    _quizShowWinOverlay();
+    // Codes popup delayed so it feels distinct
+    setTimeout(() => checkWorldCodes(), 1000);
+}
 
 // Called when the player clicks "SKIP" or presses Escape.
 // No points or items are awarded; shows the win overlay immediately.
