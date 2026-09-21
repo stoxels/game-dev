@@ -277,6 +277,15 @@
     line-height: 1.6;
 }
 
+/* Puzzle-item art inside win-overlay reward cards: same size as the emoji
+   it replaces so the card layout never shifts. */
+.item-reward img.eg-art-img {
+    width: 1.4em;
+    height: 1.4em;
+    object-fit: contain;
+    vertical-align: -0.25em;
+}
+
 
 
 #ov-lose {

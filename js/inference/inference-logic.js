@@ -5,7 +5,7 @@ import { LANG, t } from '../translation/translations.js';
 import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { pickRandomItem } from '../puzzle-items/item-pool.js';
 import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
-import { showItemGainPopup, showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { _escapeToastHtml, puzzleItemIconHtml, showHtmlToast, showItemGainPopup, showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { LEDGER_CATEGORIES, _MILESTONE_MAP } from './inference-data.js';
 import { _incDirect } from './inference-stats.js';
 import { renderQuestLog } from './inference-ui.js';
@@ -178,21 +178,26 @@ function _reward_grantAll(ms) {
 
 // Resolves a single reward item defId to a short label like an icon plus
 // the item name, falling back to a generic label if resolution fails.
+// The icon is the real item art image (emoji fallback while art loads);
+// the label is embedded in the claim banner's innerHTML.
 function _banner_resolveItemLabel(defId, de) {
     const resolvedId = defId === '__random__' ? pickRandomItem() : defId;
     const def = resolvedId ? ITEM_DEFS[resolvedId] : null;
     return def
-        ? `${def.icon} ${de ? def.nameDE : def.nameEn}`
+        ? `${puzzleItemIconHtml(def)} ${de ? def.nameDE : def.nameEn}`
         : t('qa_item_fallback');
 }
 
-// Builds a localized "item added to inventory" toast message for a single
-// granted item defId.
-function _questItemGrantToastMsg(defId) {
+// Shows the localized "item added to inventory" toast for a single
+// granted item defId, with the item's real art image up front.
+function _questItemGrantToast(defId) {
     const de = LANG === 'de';
     const def = ITEM_DEFS[defId];
-    const label = def ? `${def.icon} ${de ? def.nameDE : def.nameEn}` : t('qa_item_fallback');
-    return `🎒 ${t('qa_added_prefix')}: ${label}`;
+    if (!def) {
+        showToast(`🎒 ${t('qa_added_prefix')}: ${t('qa_item_fallback')}`);
+        return;
+    }
+    showHtmlToast(`🎒 ${_escapeToastHtml(t('qa_added_prefix'))}: ${puzzleItemIconHtml(def)} ${_escapeToastHtml(de ? def.nameDE : def.nameEn)}`);
 }
 
 // Builds the localised reward-parts array shown inside the claim banner.
@@ -386,5 +391,5 @@ export function claimQuest(milestoneId) {
 
     if (typeof buildInventoryPanel === 'function') buildInventoryPanel();
     grantedIds.forEach(defId => showItemGainPopup(defId));
-    grantedIds.forEach(defId => showToast(_questItemGrantToastMsg(defId)));
+    grantedIds.forEach(defId => _questItemGrantToast(defId));
 }

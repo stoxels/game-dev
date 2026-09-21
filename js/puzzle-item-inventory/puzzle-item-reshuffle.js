@@ -5,7 +5,7 @@ import { t } from '../translation/translations.js';
 import { buildInventoryPanel } from './puzzle-item-inventory-panel.js';
 import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { itemDesc, itemName, pickLuckyItem, rarityColors } from '../puzzle-items/item-pool.js';
-import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { showItemToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -136,7 +136,7 @@ export function applyReshuffleChoice(chosenId, modal) {
 
     save();
     buildInventoryPanel();
-    showToast(`${chosenDef.icon} ${t('itm_item_added').replace('{n}', itemName(chosenDef))}`);
+    showItemToast(chosenDef, t('itm_item_added').replace('{n}', itemName(chosenDef)));
     modal.remove();
 }
 
@@ -195,7 +195,7 @@ export function reshuffleRightClickItem(uid) {
     trackAchStat('itemsSold');
     save();
     buildInventoryPanel();          // calls updateReshuffleCounter() internally
-    showToast(`${def.icon} ${t('itm_tossed_pile').replace('{c}', reshuffleCount).replace('{g}', RESHUFFLE_GOAL)}`);
+    showItemToast(def, t('itm_tossed_pile').replace('{c}', reshuffleCount).replace('{g}', RESHUFFLE_GOAL));
 
     checkReshuffleGoalReached();    // resets counter and opens modal if goal is met
 }

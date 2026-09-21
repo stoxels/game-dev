@@ -11,6 +11,7 @@ import { _wdSyncSpriteToLevel } from './screens/screens-world-levels.js';
 import { _ptApplyLevelCompleteRewards } from './passive-tree/passive-tree.js';
 import { STATE } from './state.js';
 import { cur } from './state.js';
+import { puzzleItemIconHtml } from './puzzle-mechanics/toasts-and-popups.js';
 
 
 //------------------------------------------------------------------------
@@ -295,7 +296,7 @@ export function applyAscensionReward(irz) {
     globalThis.showItemGainPopup(defId);
 
     const label = `🌟 ${t('cg_ascension_reward')}:
-            ${codexDef.icon} <strong>${globalThis.itemName(codexDef)}</strong>`;
+            ${puzzleItemIconHtml(codexDef)} <strong>${globalThis.itemName(codexDef)}</strong>`;
     irz.innerHTML = _buildItemRewardCard(defId, codexDef, label);
 }
 
@@ -379,7 +380,7 @@ export function grantLuckyDropItem() {
     globalThis.buildInventoryPanel();
     globalThis.showItemGainPopup(defId);
 
-    const label = `${t('ov_lucky_drop')} ${def.icon} <strong>${globalThis.itemName(def)}</strong>`;
+    const label = `${t('ov_lucky_drop')} ${puzzleItemIconHtml(def)} <strong>${globalThis.itemName(def)}</strong>`;
     return _buildItemRewardCard(defId, def, label);
 }
 
@@ -492,7 +493,7 @@ export function grantBonusItem() {
     globalThis.buildInventoryPanel();
     globalThis.showItemGainPopup(defId);
 
-    const label = `${t('ov_item_earned')}: ${def.icon} <strong>${globalThis.itemName(def)}</strong>`;
+    const label = `${t('ov_item_earned')}: ${puzzleItemIconHtml(def)} <strong>${globalThis.itemName(def)}</strong>`;
     return _buildItemRewardCard(defId, def, label);
 }
 

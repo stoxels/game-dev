@@ -14,6 +14,7 @@ import { PassiveTracker } from './passive-tree/passive-tracker.js';
 import { _binomialBurstOnCorrectFill, _frequentistsBurdenOnCorrectFill, _gamblersRuinOnCorrectFill, _getBayesianBonus, _resetBayesianBonus } from './passive-tree/passive-tree-special-nodes-logic.js';
 import { STATE } from './state.js';
 import { cur } from './state.js';
+import { _escapeToastHtml, puzzleItemIconHtml, showHtmlToast } from './puzzle-mechanics/toasts-and-popups.js';
 
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'dragAxis', { get() { return dragAxis; }, set(v) { dragAxis = v; }, configurable: true }); } catch (e) {}
@@ -497,7 +498,7 @@ export function claimLuckyTileItems() {
         STATE.inventory.push(newItem);
 
         const def = globalThis.ITEM_DEFS[wonItemId];
-        toastMsg = t('cg_lucky_tile_found').replace('{x}', `${def.icon} ${globalThis.itemName(def)}`);
+        toastMsg = t('cg_lucky_tile_found').replace('{x}', `${puzzleItemIconHtml(def)} ${_escapeToastHtml(globalThis.itemName(def))}`);
         grantedIds.push(wonItemId);
     } else {
         toastMsg = t('cg_lucky_tile_found').replace('{x}', t('cg_lucky_tile_suppressed'));
@@ -517,7 +518,7 @@ export function claimLuckyTileItems() {
             };
             STATE.inventory.push(bonusItem);
             const bonusDef = globalThis.ITEM_DEFS[bonusItemId];
-            toastMsg += ` + ${bonusDef.icon} ${globalThis.itemName(bonusDef)}`;
+            toastMsg += ` + ${puzzleItemIconHtml(bonusDef)} ${_escapeToastHtml(globalThis.itemName(bonusDef))}`;
             grantedIds.push(bonusItemId);
         }
     }
@@ -527,10 +528,12 @@ export function claimLuckyTileItems() {
 
 // Applies the keystone_variance_collapse downside: claiming a lucky tile
 // costs the player 10 minutes. Appends a warning to the toast message.
+// The lucky-tile toast renders as HTML (item art images), so the note is
+// escaped before appending.
 export function applyVarianceCollapsePenalty(toastMsg) {
     if (!ptHasSkill('keystone_variance_collapse')) return toastMsg;
     subtractTimeSecs(600);
-    return toastMsg + ` ${t('cg_variance_collapse_note')}`;
+    return toastMsg + ` ${_escapeToastHtml(t('cg_variance_collapse_note'))}`;
 }
 
 // covariance_shift (261-263): after a lucky tile is claimed, reveal 1–3
@@ -593,8 +596,8 @@ export function handleLuckyTileClaim(row, col) {
 
     save();
     globalThis.buildInventoryPanel();
-    grantedIds.forEach(defId => globalThis.showItemGainPopup(defId));
-    globalThis.showToast(toastMsg, 3500);
+    grantedIds.forEach(defId =>     globalThis.showItemGainPopup(defId));
+    showHtmlToast(toastMsg);
 
     applyCovarianceShiftReveal(row, col);
 

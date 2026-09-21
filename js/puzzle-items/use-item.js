@@ -26,7 +26,7 @@ import { _useShadowSeal } from './shadow-seal/shadow-seal.js';
 import { _useShield } from './shield/shield.js';
 import { _useSurveyScope } from './survey-scope/survey-scope.js';
 import { _useTheWitch } from './the-witch/the-witch.js';
-import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { showItemToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 
@@ -163,6 +163,19 @@ function _getFrugalUseChance() {
 }
 
 
+// Shows an item-use toast with the item's real art image. Handlers return
+// messages prefixed with the def emoji (`${def.icon} ...`); the icon is
+// stripped here and re-rendered as art by showItemToast(), so every item
+// use shows the new puzzle-item image instead of the old emoji.
+function _showItemUseToast(def, msg) {
+    if (!msg) return;
+    let text = msg;
+    if (def && def.icon && text.startsWith(def.icon)) {
+        text = text.slice(def.icon.length).trimStart();
+    }
+    showItemToast(def, text);
+}
+
 export function _consumeItem(idx, def, msg) {
     // Only null means "no effect, don't consume". '' means an effect
     // happened but the item's own handler already showed its toast.
@@ -185,7 +198,14 @@ export function _consumeItem(idx, def, msg) {
         _trackItemAchievements(def.id, def);
         updateQuestStats('itemUsed', { defId: def.id, rarity: def.rarity });
         save();
-        if (msg) showToast(msg + t('itm_not_consumed'));
+        if (msg) {
+            const suffix = t('itm_not_consumed');
+            let text = msg + suffix;
+            if (def && def.icon && text.startsWith(def.icon)) {
+                text = text.slice(def.icon.length).trimStart();
+            }
+            showItemToast(def, text);
+        }
         buildInventoryPanel();
         return;
     }
@@ -196,7 +216,7 @@ export function _consumeItem(idx, def, msg) {
     _trackItemAchievements(def.id, def);
     updateQuestStats('itemUsed', { defId: def.id, rarity: def.rarity });
     save();
-    if (msg) showToast(msg);
+    _showItemUseToast(def, msg);
     buildInventoryPanel();
 }
 

@@ -3,7 +3,7 @@ import { subtractTimeSecs } from '../../timer/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
-import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
+import { showItemToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 //-------------------THE WITCH----------------------
@@ -16,11 +16,11 @@ export function _useTheWitch(id, def) {
 
     window.LEVEL_FLAGS.cursedImmune = true;
     playItemEffect(id);
-    showToast(`🧙 ${t('itm_witch_immunity')}`);
+    showItemToast(def, t('itm_witch_immunity'));
 
     setTimeout(() => {
         window.LEVEL_FLAGS.cursedImmune = false;
-        showToast(`🧙 ${t('itm_witch_faded')}`);
+        showItemToast(def, t('itm_witch_faded'));
     }, 60000);
 
     return ''; // toast was already shown above

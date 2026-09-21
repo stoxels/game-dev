@@ -100,11 +100,20 @@ export function resolveItemMeta(data, id) {
     // stored scale is VISIBLE-width based; the drawn image box must be
     // blown up by the trim factors so the visible part hits the target.
     const fullScale = (typeof ov.scale === 'number' ? ov.scale : cat.scale) / bw;
+    // Handle priority (P): explicit tuned handle → autoHandle (measured
+    // from the art: centroid of the lowest band of opaque pixels — where
+    // the drawn handle/pommel of vertical melee weapons lives) → category
+    // default. autoHandle fixes art like the Hand Axe whose handle is far
+    // off the image center line.
+    const handle = Array.isArray(ov.handle) ? ov.handle.slice()
+        : Array.isArray(ov.autoHandle) ? ov.autoHandle.slice()
+        : cat.handle.slice();
     return {
         id,
         role: ov.role || cat.role,
         category: cat.id,
-        handle: Array.isArray(ov.handle) ? ov.handle.slice() : cat.handle.slice(),
+        handle,
+        autoHandle: Array.isArray(ov.autoHandle) ? ov.autoHandle.slice() : null,
         scale: fullScale,
         visibleScale: typeof ov.scale === 'number' ? ov.scale : cat.scale,
         rot: typeof ov.rot === 'number' ? ov.rot : (cat.rot || 0),

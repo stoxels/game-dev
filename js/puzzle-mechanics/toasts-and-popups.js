@@ -94,26 +94,20 @@ export function _discardToastEntry(entry) {
     if (idx !== -1) activeToasts.splice(idx, 1);
 }
 
-// Adds a new message to the bottom of the stack. It fades in independently
-// and fades out on its own timer, without affecting other visible messages.
-// If the same message is already visible, it is replaced so repeated uses of
-// an item always surface a fresh toast instead of being suppressed.
-// `accentColor` (optional) tints the message text - used e.g. for
-// rarity-colored loot / pickup notifications.
-export function showToast(msg, accentColor) {
+// Appends a pre-built toast element to the stack: dedupes identical
+// messages, caps the visible count, and arms the fade-out timer.
+// Shared by the plain-text showToast() and the HTML showHtmlToast().
+function _appendToastEl(el, key, accentColor) {
     const container = document.getElementById('toast-stack');
     if (!container) return;
 
-    const dup = activeToasts.find(t => t.msg === msg);
+    const dup = activeToasts.find(t => t.msg === key);
     if (dup) _discardToastEntry(dup);
 
-    const el = document.createElement('div');
-    el.className = 'toast-msg';
-    el.textContent = msg;
     if (accentColor) el.style.color = accentColor;
     container.appendChild(el);
 
-    const entry = { msg, el, removing: false, timeoutId: null };
+    const entry = { msg: key, el, removing: false, timeoutId: null };
     activeToasts.push(entry);
 
     // Cap how many messages can pile up - trim the oldest first.
@@ -129,6 +123,58 @@ export function showToast(msg, accentColor) {
     // Returns the toast element so callers can add extra styling (e.g. the
     // boss-colored left stripe on boss-ability damage toasts).
     return el;
+}
+
+// Adds a new message to the bottom of the stack. It fades in independently
+// and fades out on its own timer, without affecting other visible messages.
+// If the same message is already visible, it is replaced so repeated uses of
+// an item always surface a fresh toast instead of being suppressed.
+// `accentColor` (optional) tints the message text - used e.g. for
+// rarity-colored loot / pickup notifications.
+export function showToast(msg, accentColor) {
+    const el = document.createElement('div');
+    el.className = 'toast-msg';
+    el.textContent = msg;
+    return _appendToastEl(el, msg, accentColor);
+}
+
+// Escapes plain text for safe embedding in toast HTML.
+export function _escapeToastHtml(s) {
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Returns the HTML for a puzzle item's icon: the real item art image once
+// the items manifest has resolved, otherwise the emoji fallback from the
+// def. Same source the inventory slots use (EG_ART), read lazily off
+// globalThis so this module stays cycle-free.
+export function puzzleItemIconHtml(def) {
+    try {
+        const art = globalThis.EG_ART;
+        if (art && typeof art.html === 'function') return art.html('item', def.id, def.icon);
+    } catch (e) { /* art system not ready - fall through to emoji */ }
+    return _escapeToastHtml((def && def.icon) || '');
+}
+
+// HTML twin of showToast(): renders trusted markup (e.g. an item art <img>)
+// instead of plain text. All interpolated caller text must be escaped with
+// _escapeToastHtml() first - or use showItemToast() below.
+export function showHtmlToast(html, accentColor) {
+    const el = document.createElement('div');
+    el.className = 'toast-msg';
+    el.innerHTML = html;
+    return _appendToastEl(el, html, accentColor);
+}
+
+// Shows a toast for a puzzle item with its real art image in front of the
+// text (falls back to the def emoji while art is still loading). Prefer
+// this over showToast(`${def.icon} ...`) for every puzzle-item toast.
+export function showItemToast(def, text, accentColor) {
+    return showHtmlToast(`${puzzleItemIconHtml(def)} ${_escapeToastHtml(text)}`, accentColor);
 }
 
 // Clears every visible/pending toast immediately. Called on level reset or scene transitions.

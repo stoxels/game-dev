@@ -2,6 +2,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
 import { LEDGER_CATEGORIES, LEDGER_GROUPS } from './inference-data.js';
 import { _milestone_getProgress, _milestone_isClaimed, _milestone_isComplete } from './inference-logic.js';
+import { puzzleItemIconHtml } from '../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
@@ -200,7 +201,7 @@ export function _showQuestRewardTooltip(def, anchorEl) {
     const de = LANG === 'de';
 
     tip.innerHTML = `
-        <div class="inv-tip-name"   style="color:${rc.color}">${def.icon} ${de ? def.nameDE : def.nameEn}</div>
+        <div class="inv-tip-name"   style="color:${rc.color}">${puzzleItemIconHtml(def)} ${de ? def.nameDE : def.nameEn}</div>
         <div class="inv-tip-rarity" style="color:${rc.color}">${def.rarity.toUpperCase()}</div>
         <div class="inv-tip-desc">${de ? def.descDE : def.descEn}</div>`;
     tip.classList.add('visible');
@@ -444,7 +445,7 @@ export function _ledger_buildItemChip(defId, de) {
         <span class="quest-reward-item quest-reward-item-tip"
               onmouseenter="_questChipHover(this,'${defId}')"
               onmouseleave="_hideQuestRewardTooltip()">
-            ${def.icon} ${de ? def.nameDE : def.nameEn}
+            ${puzzleItemIconHtml(def)} ${de ? def.nameDE : def.nameEn}
         </span>`;
 }
 

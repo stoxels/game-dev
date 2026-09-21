@@ -5,7 +5,7 @@ import { t } from '../translation/translations.js';
 import { RESHUFFLE_GOAL, reshuffleCount, reshuffleRightClickItem, updateReshuffleCounter } from './puzzle-item-reshuffle.js';
 import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { itemDesc, itemName, rarityColors } from '../puzzle-items/item-pool.js';
-import { checkInventoryAchievements, showToast } from '../puzzle-mechanics/toasts-and-popups.js';
+import { checkInventoryAchievements, showItemToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -179,7 +179,7 @@ function _discardOneByDefId(defId) {
     trackAchStat('itemsSold');
     save();
     buildInventoryPanel();
-    showToast(`${def.icon} ${t('item_discarded')}`);
+    showItemToast(def, t('item_discarded'));
 }
 
 

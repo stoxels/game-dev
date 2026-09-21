@@ -856,6 +856,15 @@
         animation: toast-fade-out 0.5s ease-in forwards;
     }
 
+/* Puzzle-item art inside toasts (showItemToast/showHtmlToast): scale like
+   the emoji it replaces so toast lines never change height. */
+.toast-msg img.eg-art-img {
+    width: 1.4em;
+    height: 1.4em;
+    object-fit: contain;
+    vertical-align: -0.25em;
+}
+
 @keyframes toast-fade-in {
     from {
         opacity: 0;

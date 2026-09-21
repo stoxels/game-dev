@@ -217,8 +217,7 @@ export let _tqSawMonster = false;
 // the claim task as active: while it is set, every grid input is swallowed
 // unless it is a CORRECT FILL on a cell hosting a gear drop (the empty
 // solution cell under the item claims it). _tqP2GearDropped /
-// _tqP2GearClaimed / _tqP2GearFillsGate drive the remaining task
-// predicates; _tqP2DropsBoardBackstop is a last-resort guard for a board
+// _tqP2GearClaimed / _tqP2GearFillsGate drive the gear-lesson gates; _tqP2DropsBoardBackstop is a last-resort guard for a board
 // filled without picking the gear up (stash grant instead of a dead run).
 // _tqP2RatDead/_tqP2RatDeadAt freeze the fill count once the fight is over
 // so post-kill fills never consume the lesson cap.
@@ -1129,35 +1128,12 @@ export const TQ_TASKS = {
     // Puzzle 3: the ghost was burned down with Fireball.
     fireball_kill: () => _tqSawMonster
         && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0,
-    // Puzzle 2: the fill-limit gate. The cap arms when the rat appears and
-    // counts only fills spent on the rat (frozen at its death). The task
-    // resolves once the limit is reached (then the board locks for the gear
-    // lesson); it also resolves when the rat dies early, so the Professor
-    // never blocks a dead field.
-    fills_half: () => !_tqP2FillsGate || _tqP2FillsCount >= TQ_P2_FILLS_LIMIT || _tqP2RatDead,
-    // Puzzle 2: the starter gear has been picked up with correct fills on
-    // the item cells (the normal empty-solution-cell claim). Completes when
-    // the last piece of the set has left the board; the backstop marks it
-    // complete if the board was filled without picking the gear up.
-    claim_gear: () => {
-        if (_tqP2GearDropped) _tqCheckGearFillsBackstop();
-        return !_tqP2GearDropped || _tqP2GearClaimed;
-    },
-    // Puzzle 2: the remaining solution cells are filled - the puzzle is done
-    // (the gear fill gate is lifted once the loot lesson task completes).
-    fill_remaining: () => !_tqP2GearFillsGate || _tqP2SolvedAfterGear,
     // Puzzle 3: the spellbook was opened.
     open_spellbook: () => typeof isSpellbookOpen === 'function' && isSpellbookOpen(),
     // Puzzle 3: the Scroll of Fireball was dragged into a spell slot, which
     // unlocks the Fireball on the matching hotbar key (slot N = hotbar key N).
     slot_fireball: () => typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.charmSlots)
         && STATE.charmSlots.indexOf('fireball#1') !== -1,
-    // Puzzle 3: Fireball was cast. If the ghost already died, the cast
-    // lesson is moot: auto-skip instead of demanding a cast at nothing.
-    cast_fireball: () => _tqFireballUsed
-        || (typeof _egMonsters !== 'undefined' && _tqSawMonster && globalThis._egMonsters.length === 0),
-    // Puzzle 3: monster defeated.
-    kill_monster_2: () => _tqSawMonster && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0,
     // Puzzle 1: guided demos on the locked grid.
     demo_correct: () => _tqDemoDone.correct,
     demo_mistake: () => _tqDemoDone.mistake,
@@ -1240,8 +1216,8 @@ export function _tqStepsFor(phase) {
             { fn: () => { try { if (typeof isSpellbookOpen === 'function' && isSpellbookOpen() && typeof closeSpellbook === 'function') closeSpellbook(); } catch (e) {} _tqClearHighlights(); try { if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar(); } catch (e) {} } },
             // Fireball lesson: the ghost is immune to blades - burn it down.
             // The ghost spawns HERE, before the player is told to cast, so a
-            // player who dies to the ghost and retries (cast_fireball's
-            // dead-skip) gets a real corpse to celebrate, not an empty field.
+            // player who dies to the ghost and retries gets a real corpse to
+            // celebrate, not an empty field (the bounce re-runs this spawn).
             { say: 'tq_p3_s7', task: 'fireball_kill', fn: () => { _tqSpawnP3Ghost(); _tqPointAt('.skill-hotbar-slot[data-skill="fireball"]'); } },
             { fn: () => { _tqGridLocked = false; _tqClearHighlights(); _tqRefreshGridLockBorder(); } },
             { say: 'tq_p3_s8', task: 'solve_puzzle' },
@@ -1328,7 +1304,7 @@ export function _tqStartTask(name) {
             }
             // Celebration when a combat task's monster goes down (puzzle 2
             // fill-combat kill; puzzle 3 melee / fireball kills).
-            if (name === 'kill_monster' || name === 'kill_monster_2'
+            if (name === 'kill_monster'
                 || name === 'melee_kill' || name === 'fireball_kill') {
                 _tqPlayerReply(5000, 'tutorial_cheer');
             }
@@ -1510,8 +1486,8 @@ export function _tqOnPuzzleSolved() {
     // Retry gates: a lesson requirement was skipped - push the player back
     // to the missed task instead of finishing the phase. The encounter keeps
     // running so nothing is lost. p3 only bounces while the creature still
-    // lives - at solve time it is always dead (see cast_fireball above), so
-    // the bounce can never demand a cast at an empty field.
+    // lives, and each bounce target re-spawns its own creature (s3/s7 setup),
+    // so the bounce can never demand a kill on an empty field.
     if (_tqPhase === 'p1' && !_tqCandleUsed) {
         globalThis.dead = false;
         _tqStepIdx = TQ_P1_STEP_CANDLE_GRANT;   // re-run the candle explanation + task (s10 grant → s11 use → s11b deduce)

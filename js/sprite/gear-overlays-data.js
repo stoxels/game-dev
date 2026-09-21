@@ -42,8 +42,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.5,
-    0.85
+    0.674,
+    0.723
+   ],
+   "autoHandle": [
+    0.674,
+    0.723
    ],
    "scale": 0.5,
    "axis": [
@@ -55,9 +59,9 @@ export const GEAR_GRIP_DATA = {
     739
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
+    0.172,
+    0.824,
     0.824
    ],
    "tuned": false
@@ -66,8 +70,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.5,
-    0.85
+    0.271,
+    0.742
+   ],
+   "autoHandle": [
+    0.271,
+    0.742
    ],
    "scale": 0.5,
    "axis": [
@@ -90,8 +98,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.5,
-    0.85
+    0.339,
+    0.727
+   ],
+   "autoHandle": [
+    0.339,
+    0.727
    ],
    "scale": 0.5,
    "axis": [
@@ -114,8 +126,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.5,
-    0.85
+    0.287,
+    0.735
+   ],
+   "autoHandle": [
+    0.287,
+    0.735
    ],
    "scale": 0.5,
    "axis": [
@@ -130,7 +146,7 @@ export const GEAR_GRIP_DATA = {
     0.18,
     0.172,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": false
   },
@@ -138,8 +154,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.5,
-    0.85
+    0.701,
+    0.729
+   ],
+   "autoHandle": [
+    0.701,
+    0.729
    ],
    "scale": 0.5,
    "axis": [
@@ -151,7 +171,7 @@ export const GEAR_GRIP_DATA = {
     735
    ],
    "bbox": [
-    0.184,
+    0.18,
     0.172,
     0.82,
     0.828
@@ -162,8 +182,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.5,
-    0.85
+    0.306,
+    0.743
+   ],
+   "autoHandle": [
+    0.306,
+    0.743
    ],
    "scale": 0.5,
    "axis": [
@@ -175,9 +199,9 @@ export const GEAR_GRIP_DATA = {
     723
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": false
@@ -186,8 +210,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.5,
-    0.85
+    0.341,
+    0.734
+   ],
+   "autoHandle": [
+    0.341,
+    0.734
    ],
    "scale": 0.5,
    "axis": [
@@ -199,10 +227,10 @@ export const GEAR_GRIP_DATA = {
     711
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
-    0.836
+    0.809,
+    0.84
    ],
    "tuned": false
   },
@@ -210,8 +238,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.5,
-    0.85
+    0.353,
+    0.747
+   ],
+   "autoHandle": [
+    0.353,
+    0.747
    ],
    "scale": 0.5,
    "axis": [
@@ -223,7 +255,7 @@ export const GEAR_GRIP_DATA = {
     715
    ],
    "bbox": [
-    0.191,
+    0.188,
     0.164,
     0.809,
     0.836
@@ -234,8 +266,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.5,
-    0.85
+    0.279,
+    0.733
+   ],
+   "autoHandle": [
+    0.279,
+    0.733
    ],
    "scale": 0.5,
    "axis": [
@@ -258,8 +294,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.306,
+    0.733
+   ],
+   "autoHandle": [
+    0.306,
+    0.733
    ],
    "scale": 0.62,
    "axis": [
@@ -282,8 +322,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.297,
+    0.737
+   ],
+   "autoHandle": [
+    0.297,
+    0.737
    ],
    "scale": 0.62,
    "axis": [
@@ -295,10 +339,10 @@ export const GEAR_GRIP_DATA = {
     720
    ],
    "bbox": [
-    0.188,
-    0.168,
+    0.184,
+    0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": false
   },
@@ -306,8 +350,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.297,
+    0.743
+   ],
+   "autoHandle": [
+    0.297,
+    0.743
    ],
    "scale": 0.62,
    "axis": [
@@ -319,10 +367,10 @@ export const GEAR_GRIP_DATA = {
     710
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
-    0.836
+    0.809,
+    0.84
    ],
    "tuned": false
   },
@@ -330,8 +378,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.275,
+    0.744
+   ],
+   "autoHandle": [
+    0.275,
+    0.744
    ],
    "scale": 0.62,
    "axis": [
@@ -345,7 +397,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -354,8 +406,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.674,
+    0.723
+   ],
+   "autoHandle": [
+    0.674,
+    0.723
    ],
    "scale": 0.62,
    "axis": [
@@ -367,10 +423,10 @@ export const GEAR_GRIP_DATA = {
     737
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": false
   },
@@ -378,8 +434,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.283,
+    0.739
+   ],
+   "autoHandle": [
+    0.283,
+    0.739
    ],
    "scale": 0.62,
    "axis": [
@@ -391,9 +451,9 @@ export const GEAR_GRIP_DATA = {
     724
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": false
@@ -402,8 +462,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.651,
+    0.724
+   ],
+   "autoHandle": [
+    0.651,
+    0.724
    ],
    "scale": 0.62,
    "axis": [
@@ -415,10 +479,10 @@ export const GEAR_GRIP_DATA = {
     737
    ],
    "bbox": [
-    0.18,
+    0.176,
     0.172,
-    0.82,
-    0.824
+    0.824,
+    0.828
    ],
    "tuned": false
   },
@@ -428,6 +492,10 @@ export const GEAR_GRIP_DATA = {
    "handle": [
     0.386,
     0.64
+   ],
+   "autoHandle": [
+    0.323,
+    0.722
    ],
    "scale": 0.5,
    "axis": [
@@ -450,8 +518,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.5,
-    0.85
+    0.341,
+    0.724
+   ],
+   "autoHandle": [
+    0.341,
+    0.724
    ],
    "scale": 0.5,
    "axis": [
@@ -466,7 +538,7 @@ export const GEAR_GRIP_DATA = {
     0.188,
     0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": false
   },
@@ -474,8 +546,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.5,
-    0.85
+    0.696,
+    0.731
+   ],
+   "autoHandle": [
+    0.696,
+    0.731
    ],
    "scale": 0.5,
    "axis": [
@@ -498,8 +574,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.5,
-    0.85
+    0.273,
+    0.738
+   ],
+   "autoHandle": [
+    0.273,
+    0.738
    ],
    "scale": 0.5,
    "axis": [
@@ -522,8 +602,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.5,
-    0.85
+    0.287,
+    0.716
+   ],
+   "autoHandle": [
+    0.287,
+    0.716
    ],
    "scale": 0.5,
    "axis": [
@@ -535,7 +619,7 @@ export const GEAR_GRIP_DATA = {
     720
    ],
    "bbox": [
-    0.168,
+    0.164,
     0.188,
     0.836,
     0.813
@@ -546,8 +630,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.5,
-    0.85
+    0.292,
+    0.744
+   ],
+   "autoHandle": [
+    0.292,
+    0.744
    ],
    "scale": 0.5,
    "axis": [
@@ -570,8 +658,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.29,
+    0.748
+   ],
+   "autoHandle": [
+    0.29,
+    0.748
    ],
    "scale": 0.62,
    "axis": [
@@ -594,8 +686,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.278,
+    0.749
+   ],
+   "autoHandle": [
+    0.278,
+    0.749
    ],
    "scale": 0.62,
    "axis": [
@@ -610,7 +706,7 @@ export const GEAR_GRIP_DATA = {
     0.191,
     0.16,
     0.809,
-    0.836
+    0.84
    ],
    "tuned": false
   },
@@ -618,8 +714,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.307,
+    0.761
+   ],
+   "autoHandle": [
+    0.307,
+    0.761
    ],
    "scale": 0.62,
    "axis": [
@@ -631,7 +731,7 @@ export const GEAR_GRIP_DATA = {
     676
    ],
    "bbox": [
-    0.219,
+    0.215,
     0.145,
     0.781,
     0.855
@@ -645,6 +745,10 @@ export const GEAR_GRIP_DATA = {
     0.86,
     0.78
    ],
+   "autoHandle": [
+    0.338,
+    0.733
+   ],
    "scale": 0.62,
    "axis": [
     0.5,
@@ -655,10 +759,10 @@ export const GEAR_GRIP_DATA = {
     710
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
-    0.836
+    0.809,
+    0.84
    ],
    "tuned": true
   },
@@ -666,8 +770,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.378,
+    0.713
+   ],
+   "autoHandle": [
+    0.378,
+    0.713
    ],
    "scale": 0.62,
    "axis": [
@@ -690,8 +798,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "1h",
    "handle": [
-    0.5,
-    0.85
+    0.358,
+    0.731
+   ],
+   "autoHandle": [
+    0.358,
+    0.731
    ],
    "scale": 0.5,
    "axis": [
@@ -703,10 +815,10 @@ export const GEAR_GRIP_DATA = {
     710
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
-    0.836
+    0.809,
+    0.84
    ],
    "tuned": false
   },
@@ -714,8 +826,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "misc",
    "handle": [
-    0.5,
-    0.85
+    0.281,
+    0.744
+   ],
+   "autoHandle": [
+    0.281,
+    0.744
    ],
    "scale": 0.5,
    "axis": [
@@ -727,9 +843,9 @@ export const GEAR_GRIP_DATA = {
     715
    ],
    "bbox": [
-    0.191,
+    0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -738,8 +854,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.31,
+    0.744
+   ],
+   "autoHandle": [
+    0.31,
+    0.744
    ],
    "scale": 0.62,
    "axis": [
@@ -751,7 +871,7 @@ export const GEAR_GRIP_DATA = {
     699
    ],
    "bbox": [
-    0.203,
+    0.199,
     0.156,
     0.801,
     0.844
@@ -762,8 +882,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "2h",
    "handle": [
-    0.5,
-    0.85
+    0.289,
+    0.731
+   ],
+   "autoHandle": [
+    0.289,
+    0.731
    ],
    "scale": 0.62,
    "axis": [
@@ -786,8 +910,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.306,
+    0.729
+   ],
+   "autoHandle": [
+    0.306,
+    0.729
    ],
    "scale": 0.5,
    "axis": [
@@ -800,7 +928,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.184,
-    0.172,
+    0.168,
     0.816,
     0.832
    ],
@@ -810,8 +938,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.668,
+    0.729
+   ],
+   "autoHandle": [
+    0.668,
+    0.729
    ],
    "scale": 0.5,
    "axis": [
@@ -824,8 +956,8 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.191,
-    0.164,
-    0.809,
+    0.16,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -834,8 +966,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.703,
+    0.728
+   ],
+   "autoHandle": [
+    0.703,
+    0.728
    ],
    "scale": 0.5,
    "axis": [
@@ -858,8 +994,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.336,
+    0.731
+   ],
+   "autoHandle": [
+    0.336,
+    0.731
    ],
    "scale": 0.5,
    "axis": [
@@ -874,7 +1014,7 @@ export const GEAR_GRIP_DATA = {
     0.188,
     0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": false
   },
@@ -882,8 +1022,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.754,
+    0.728
+   ],
+   "autoHandle": [
+    0.754,
+    0.728
    ],
    "scale": 0.42,
    "axis": [
@@ -895,9 +1039,9 @@ export const GEAR_GRIP_DATA = {
     716
    ],
    "bbox": [
-    0.191,
+    0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -906,8 +1050,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.66,
+    0.734
+   ],
+   "autoHandle": [
+    0.66,
+    0.734
    ],
    "scale": 0.5,
    "axis": [
@@ -919,9 +1067,9 @@ export const GEAR_GRIP_DATA = {
     709
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
+    0.809,
     0.84
    ],
    "tuned": false
@@ -930,8 +1078,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.304,
+    0.718
+   ],
+   "autoHandle": [
+    0.304,
+    0.718
    ],
    "scale": 0.42,
    "axis": [
@@ -944,7 +1096,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.168,
-    0.188,
+    0.184,
     0.832,
     0.816
    ],
@@ -954,8 +1106,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.687,
+    0.728
+   ],
+   "autoHandle": [
+    0.687,
+    0.728
    ],
    "scale": 0.5,
    "axis": [
@@ -967,10 +1123,10 @@ export const GEAR_GRIP_DATA = {
     738
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": false
   },
@@ -980,6 +1136,10 @@ export const GEAR_GRIP_DATA = {
    "handle": [
     0.677,
     0.707
+   ],
+   "autoHandle": [
+    0.677,
+    0.738
    ],
    "scale": 0.5,
    "axis": [
@@ -994,7 +1154,7 @@ export const GEAR_GRIP_DATA = {
     0.199,
     0.156,
     0.801,
-    0.84
+    0.844
    ],
    "tuned": true
   },
@@ -1002,8 +1162,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.292,
+    0.718
+   ],
+   "autoHandle": [
+    0.292,
+    0.718
    ],
    "scale": 0.42,
    "axis": [
@@ -1026,8 +1190,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.304,
+    0.726
+   ],
+   "autoHandle": [
+    0.304,
+    0.726
    ],
    "scale": 0.5,
    "axis": [
@@ -1050,8 +1218,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.705,
+    0.73
+   ],
+   "autoHandle": [
+    0.705,
+    0.73
    ],
    "scale": 0.5,
    "axis": [
@@ -1066,7 +1238,7 @@ export const GEAR_GRIP_DATA = {
     0.184,
     0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": false
   },
@@ -1074,8 +1246,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.283,
+    0.727
+   ],
+   "autoHandle": [
+    0.283,
+    0.727
    ],
    "scale": 0.42,
    "axis": [
@@ -1088,7 +1264,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.176,
-    0.18,
+    0.176,
     0.824,
     0.824
    ],
@@ -1098,8 +1274,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.333,
+    0.728
+   ],
+   "autoHandle": [
+    0.333,
+    0.728
    ],
    "scale": 0.5,
    "axis": [
@@ -1111,9 +1291,9 @@ export const GEAR_GRIP_DATA = {
     714
    ],
    "bbox": [
-    0.191,
-    0.164,
-    0.809,
+    0.188,
+    0.16,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -1122,8 +1302,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.7,
+    0.734
+   ],
+   "autoHandle": [
+    0.7,
+    0.734
    ],
    "scale": 0.5,
    "axis": [
@@ -1146,8 +1330,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.302,
+    0.732
+   ],
+   "autoHandle": [
+    0.302,
+    0.732
    ],
    "scale": 0.42,
    "axis": [
@@ -1170,8 +1358,40 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
+    0.337,
+    0.726
+   ],
+   "autoHandle": [
+    0.337,
+    0.726
+   ],
+   "scale": 0.5,
+   "axis": [
     0.5,
-    0.85
+    0.12
+   ],
+   "nat": [
+    724,
+    724
+   ],
+   "bbox": [
+    0.184,
+    0.168,
+    0.816,
+    0.832
+   ],
+   "tuned": false
+  },
+  "wpn_soldier_battle_blade_28": {
+   "role": "weapon",
+   "category": "blade",
+   "handle": [
+    0.351,
+    0.727
+   ],
+   "autoHandle": [
+    0.351,
+    0.727
    ],
    "scale": 0.5,
    "axis": [
@@ -1190,36 +1410,16 @@ export const GEAR_GRIP_DATA = {
    ],
    "tuned": false
   },
-  "wpn_soldier_battle_blade_28": {
-   "role": "weapon",
-   "category": "blade",
-   "handle": [
-    0.5,
-    0.85
-   ],
-   "scale": 0.5,
-   "axis": [
-    0.5,
-    0.12
-   ],
-   "nat": [
-    724,
-    724
-   ],
-   "bbox": [
-    0.188,
-    0.168,
-    0.813,
-    0.832
-   ],
-   "tuned": false
-  },
   "wpn_silvered_arcane_rod_30": {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.305,
+    0.724
+   ],
+   "autoHandle": [
+    0.305,
+    0.724
    ],
    "scale": 0.5,
    "axis": [
@@ -1242,8 +1442,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.376,
+    0.73
+   ],
+   "autoHandle": [
+    0.376,
+    0.73
    ],
    "scale": 0.5,
    "axis": [
@@ -1266,8 +1470,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.321,
+    0.732
+   ],
+   "autoHandle": [
+    0.321,
+    0.732
    ],
    "scale": 0.5,
    "axis": [
@@ -1280,7 +1488,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.188,
-    0.168,
+    0.164,
     0.813,
     0.836
    ],
@@ -1290,8 +1498,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.267,
+    0.723
+   ],
+   "autoHandle": [
+    0.267,
+    0.723
    ],
    "scale": 0.42,
    "axis": [
@@ -1304,9 +1516,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.168,
-    0.188,
+    0.184,
     0.832,
-    0.813
+    0.816
    ],
    "tuned": false
   },
@@ -1314,8 +1526,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.697,
+    0.725
+   ],
+   "autoHandle": [
+    0.697,
+    0.725
    ],
    "scale": 0.5,
    "axis": [
@@ -1327,10 +1543,10 @@ export const GEAR_GRIP_DATA = {
     737
    ],
    "bbox": [
+    0.172,
     0.176,
-    0.18,
-    0.824,
-    0.82
+    0.828,
+    0.824
    ],
    "tuned": false
   },
@@ -1338,8 +1554,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.32,
+    0.726
+   ],
+   "autoHandle": [
+    0.32,
+    0.726
    ],
    "scale": 0.5,
    "axis": [
@@ -1352,9 +1572,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.184,
-    0.172,
+    0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": false
   },
@@ -1362,8 +1582,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.666,
+    0.721
+   ],
+   "autoHandle": [
+    0.666,
+    0.721
    ],
    "scale": 0.5,
    "axis": [
@@ -1386,8 +1610,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.724,
+    0.726
+   ],
+   "autoHandle": [
+    0.724,
+    0.726
    ],
    "scale": 0.42,
    "axis": [
@@ -1399,7 +1627,7 @@ export const GEAR_GRIP_DATA = {
     731
    ],
    "bbox": [
-    0.172,
+    0.168,
     0.18,
     0.828,
     0.816
@@ -1410,8 +1638,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.283,
+    0.731
+   ],
+   "autoHandle": [
+    0.283,
+    0.731
    ],
    "scale": 0.5,
    "axis": [
@@ -1424,9 +1656,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.176,
-    0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": false
   },
@@ -1434,8 +1666,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.693,
+    0.73
+   ],
+   "autoHandle": [
+    0.693,
+    0.73
    ],
    "scale": 0.5,
    "axis": [
@@ -1458,8 +1694,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.3,
+    0.725
+   ],
+   "autoHandle": [
+    0.3,
+    0.725
    ],
    "scale": 0.42,
    "axis": [
@@ -1482,8 +1722,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.294,
+    0.731
+   ],
+   "autoHandle": [
+    0.294,
+    0.731
    ],
    "scale": 0.5,
    "axis": [
@@ -1495,9 +1739,9 @@ export const GEAR_GRIP_DATA = {
     725
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": false
@@ -1506,8 +1750,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.702,
+    0.725
+   ],
+   "autoHandle": [
+    0.702,
+    0.725
    ],
    "scale": 0.5,
    "axis": [
@@ -1519,10 +1767,10 @@ export const GEAR_GRIP_DATA = {
     737
    ],
    "bbox": [
-    0.18,
+    0.176,
     0.172,
     0.82,
-    0.824
+    0.828
    ],
    "tuned": false
   },
@@ -1530,8 +1778,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.332,
+    0.729
+   ],
+   "autoHandle": [
+    0.332,
+    0.729
    ],
    "scale": 0.5,
    "axis": [
@@ -1543,9 +1795,9 @@ export const GEAR_GRIP_DATA = {
     725
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": false
@@ -1554,8 +1806,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.73,
+    0.729
+   ],
+   "autoHandle": [
+    0.73,
+    0.729
    ],
    "scale": 0.42,
    "axis": [
@@ -1578,8 +1834,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.29,
+    0.733
+   ],
+   "autoHandle": [
+    0.29,
+    0.733
    ],
    "scale": 0.5,
    "axis": [
@@ -1591,7 +1851,7 @@ export const GEAR_GRIP_DATA = {
     725
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
     0.816,
     0.832
@@ -1602,8 +1862,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.669,
+    0.725
+   ],
+   "autoHandle": [
+    0.669,
+    0.725
    ],
    "scale": 0.5,
    "axis": [
@@ -1626,8 +1890,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.334,
+    0.727
+   ],
+   "autoHandle": [
+    0.334,
+    0.727
    ],
    "scale": 0.5,
    "axis": [
@@ -1641,7 +1909,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": false
@@ -1650,8 +1918,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.656,
+    0.734
+   ],
+   "autoHandle": [
+    0.656,
+    0.734
    ],
    "scale": 0.42,
    "axis": [
@@ -1664,9 +1936,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.172,
-    0.18,
-    0.824,
-    0.82
+    0.176,
+    0.828,
+    0.824
    ],
    "tuned": false
   },
@@ -1674,8 +1946,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.673,
+    0.726
+   ],
+   "autoHandle": [
+    0.673,
+    0.726
    ],
    "scale": 0.5,
    "axis": [
@@ -1698,8 +1974,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.745,
+    0.725
+   ],
+   "autoHandle": [
+    0.745,
+    0.725
    ],
    "scale": 0.42,
    "axis": [
@@ -1711,10 +1991,10 @@ export const GEAR_GRIP_DATA = {
     738
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": false
   },
@@ -1722,8 +2002,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.275,
+    0.737
+   ],
+   "autoHandle": [
+    0.275,
+    0.737
    ],
    "scale": 0.5,
    "axis": [
@@ -1746,8 +2030,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.3,
+    0.73
+   ],
+   "autoHandle": [
+    0.3,
+    0.73
    ],
    "scale": 0.5,
    "axis": [
@@ -1770,8 +2058,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.329,
+    0.746
+   ],
+   "autoHandle": [
+    0.329,
+    0.746
    ],
    "scale": 0.5,
    "axis": [
@@ -1783,7 +2075,7 @@ export const GEAR_GRIP_DATA = {
     692
    ],
    "bbox": [
-    0.207,
+    0.203,
     0.152,
     0.793,
     0.848
@@ -1794,8 +2086,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.669,
+    0.709
+   ],
+   "autoHandle": [
+    0.669,
+    0.709
    ],
    "scale": 0.42,
    "axis": [
@@ -1807,10 +2103,10 @@ export const GEAR_GRIP_DATA = {
     705
    ],
    "bbox": [
-    0.16,
+    0.156,
     0.195,
-    0.84,
-    0.801
+    0.844,
+    0.805
    ],
    "tuned": false
   },
@@ -1818,8 +2114,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.296,
+    0.752
+   ],
+   "autoHandle": [
+    0.296,
+    0.752
    ],
    "scale": 0.5,
    "axis": [
@@ -1834,7 +2134,7 @@ export const GEAR_GRIP_DATA = {
     0.203,
     0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": false
   },
@@ -1842,8 +2142,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.332,
+    0.741
+   ],
+   "autoHandle": [
+    0.332,
+    0.741
    ],
    "scale": 0.5,
    "axis": [
@@ -1866,8 +2170,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.317,
+    0.731
+   ],
+   "autoHandle": [
+    0.317,
+    0.731
    ],
    "scale": 0.5,
    "axis": [
@@ -1879,7 +2187,7 @@ export const GEAR_GRIP_DATA = {
     724
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
     0.813,
     0.832
@@ -1890,8 +2198,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.705,
+    0.716
+   ],
+   "autoHandle": [
+    0.705,
+    0.716
    ],
    "scale": 0.42,
    "axis": [
@@ -1914,8 +2226,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.327,
+    0.731
+   ],
+   "autoHandle": [
+    0.327,
+    0.731
    ],
    "scale": 0.5,
    "axis": [
@@ -1927,9 +2243,9 @@ export const GEAR_GRIP_DATA = {
     724
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": false
@@ -1938,8 +2254,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.309,
+    0.735
+   ],
+   "autoHandle": [
+    0.309,
+    0.735
    ],
    "scale": 0.5,
    "axis": [
@@ -1953,7 +2273,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -1962,8 +2282,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.694,
+    0.722
+   ],
+   "autoHandle": [
+    0.694,
+    0.722
    ],
    "scale": 0.42,
    "axis": [
@@ -1986,8 +2310,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.326,
+    0.729
+   ],
+   "autoHandle": [
+    0.326,
+    0.729
    ],
    "scale": 0.5,
    "axis": [
@@ -1999,7 +2327,7 @@ export const GEAR_GRIP_DATA = {
     725
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
     0.816,
     0.832
@@ -2010,8 +2338,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.338,
+    0.726
+   ],
+   "autoHandle": [
+    0.338,
+    0.726
    ],
    "scale": 0.5,
    "axis": [
@@ -2034,8 +2366,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.307,
+    0.716
+   ],
+   "autoHandle": [
+    0.307,
+    0.716
    ],
    "scale": 0.42,
    "axis": [
@@ -2047,9 +2383,9 @@ export const GEAR_GRIP_DATA = {
     722
    ],
    "bbox": [
-    0.168,
-    0.188,
-    0.832,
+    0.164,
+    0.184,
+    0.836,
     0.813
    ],
    "tuned": false
@@ -2058,8 +2394,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.297,
+    0.737
+   ],
+   "autoHandle": [
+    0.297,
+    0.737
    ],
    "scale": 0.5,
    "axis": [
@@ -2071,9 +2411,9 @@ export const GEAR_GRIP_DATA = {
     714
    ],
    "bbox": [
-    0.191,
-    0.164,
-    0.809,
+    0.188,
+    0.16,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -2082,8 +2422,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.689,
+    0.729
+   ],
+   "autoHandle": [
+    0.689,
+    0.729
    ],
    "scale": 0.5,
    "axis": [
@@ -2106,8 +2450,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.685,
+    0.729
+   ],
+   "autoHandle": [
+    0.685,
+    0.729
    ],
    "scale": 0.5,
    "axis": [
@@ -2130,8 +2478,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.299,
+    0.717
+   ],
+   "autoHandle": [
+    0.299,
+    0.717
    ],
    "scale": 0.42,
    "axis": [
@@ -2146,7 +2498,7 @@ export const GEAR_GRIP_DATA = {
     0.168,
     0.184,
     0.832,
-    0.813
+    0.816
    ],
    "tuned": false
   },
@@ -2154,8 +2506,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.292,
+    0.734
+   ],
+   "autoHandle": [
+    0.292,
+    0.734
    ],
    "scale": 0.5,
    "axis": [
@@ -2168,7 +2524,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.188,
-    0.168,
+    0.164,
     0.813,
     0.832
    ],
@@ -2178,8 +2534,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.337,
+    0.734
+   ],
+   "autoHandle": [
+    0.337,
+    0.734
    ],
    "scale": 0.5,
    "axis": [
@@ -2193,7 +2553,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -2202,8 +2562,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.34,
+    0.735
+   ],
+   "autoHandle": [
+    0.34,
+    0.735
    ],
    "scale": 0.5,
    "axis": [
@@ -2215,10 +2579,10 @@ export const GEAR_GRIP_DATA = {
     711
    ],
    "bbox": [
-    0.195,
-    0.164,
-    0.805,
-    0.836
+    0.191,
+    0.16,
+    0.809,
+    0.84
    ],
    "tuned": false
   },
@@ -2226,8 +2590,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.702,
+    0.73
+   ],
+   "autoHandle": [
+    0.702,
+    0.73
    ],
    "scale": 0.42,
    "axis": [
@@ -2239,8 +2607,8 @@ export const GEAR_GRIP_DATA = {
     723
    ],
    "bbox": [
-    0.188,
-    0.168,
+    0.184,
+    0.164,
     0.813,
     0.832
    ],
@@ -2250,8 +2618,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.304,
+    0.734
+   ],
+   "autoHandle": [
+    0.304,
+    0.734
    ],
    "scale": 0.5,
    "axis": [
@@ -2264,7 +2636,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.191,
-    0.164,
+    0.16,
     0.809,
     0.836
    ],
@@ -2274,8 +2646,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.347,
+    0.725
+   ],
+   "autoHandle": [
+    0.347,
+    0.725
    ],
    "scale": 0.5,
    "axis": [
@@ -2287,10 +2663,10 @@ export const GEAR_GRIP_DATA = {
     728
    ],
    "bbox": [
-    0.184,
+    0.18,
     0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": false
   },
@@ -2298,8 +2674,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.684,
+    0.729
+   ],
+   "autoHandle": [
+    0.684,
+    0.729
    ],
    "scale": 0.5,
    "axis": [
@@ -2312,9 +2692,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.184,
-    0.172,
+    0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": false
   },
@@ -2322,8 +2702,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.316,
+    0.715
+   ],
+   "autoHandle": [
+    0.316,
+    0.715
    ],
    "scale": 0.42,
    "axis": [
@@ -2336,9 +2720,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.168,
-    0.188,
+    0.184,
     0.832,
-    0.813
+    0.816
    ],
    "tuned": false
   },
@@ -2346,8 +2730,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.279,
+    0.742
+   ],
+   "autoHandle": [
+    0.279,
+    0.742
    ],
    "scale": 0.5,
    "axis": [
@@ -2361,7 +2749,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -2370,8 +2758,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.63,
+    0.723
+   ],
+   "autoHandle": [
+    0.63,
+    0.723
    ],
    "scale": 0.5,
    "axis": [
@@ -2394,8 +2786,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.338,
+    0.729
+   ],
+   "autoHandle": [
+    0.338,
+    0.729
    ],
    "scale": 0.5,
    "axis": [
@@ -2410,7 +2806,7 @@ export const GEAR_GRIP_DATA = {
     0.184,
     0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": false
   },
@@ -2418,8 +2814,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.281,
+    0.74
+   ],
+   "autoHandle": [
+    0.281,
+    0.74
    ],
    "scale": 0.5,
    "axis": [
@@ -2431,7 +2831,7 @@ export const GEAR_GRIP_DATA = {
     723
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
     0.813,
     0.832
@@ -2442,8 +2842,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "blade",
    "handle": [
-    0.5,
-    0.85
+    0.34,
+    0.727
+   ],
+   "autoHandle": [
+    0.34,
+    0.727
    ],
    "scale": 0.5,
    "axis": [
@@ -2466,8 +2870,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "fang",
    "handle": [
-    0.5,
-    0.85
+    0.321,
+    0.716
+   ],
+   "autoHandle": [
+    0.321,
+    0.716
    ],
    "scale": 0.42,
    "axis": [
@@ -2479,9 +2887,9 @@ export const GEAR_GRIP_DATA = {
     727
    ],
    "bbox": [
-    0.172,
+    0.168,
     0.184,
-    0.828,
+    0.832,
     0.816
    ],
    "tuned": false
@@ -2490,8 +2898,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "rod",
    "handle": [
-    0.5,
-    0.85
+    0.317,
+    0.735
+   ],
+   "autoHandle": [
+    0.317,
+    0.735
    ],
    "scale": 0.5,
    "axis": [
@@ -2503,10 +2915,10 @@ export const GEAR_GRIP_DATA = {
     721
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": false
   },
@@ -2514,8 +2926,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.326,
+    0.748
+   ],
+   "autoHandle": [
+    0.326,
+    0.748
    ],
    "scale": 0.55,
    "axis": [
@@ -2538,8 +2954,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.446,
+    0.791
+   ],
+   "autoHandle": [
+    0.446,
+    0.791
    ],
    "scale": 0.55,
    "axis": [
@@ -2554,7 +2974,7 @@ export const GEAR_GRIP_DATA = {
     0.34,
     0.082,
     0.656,
-    0.914
+    0.918
    ],
    "tuned": false
   },
@@ -2562,8 +2982,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.421,
+    0.747
+   ],
+   "autoHandle": [
+    0.421,
+    0.747
    ],
    "scale": 0.55,
    "axis": [
@@ -2576,9 +3000,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.203,
-    0.156,
+    0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": false
   },
@@ -2586,8 +3010,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.415,
+    0.73
+   ],
+   "autoHandle": [
+    0.415,
+    0.73
    ],
    "scale": 0.55,
    "axis": [
@@ -2610,8 +3038,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.715,
+    0.753
+   ],
+   "autoHandle": [
+    0.715,
+    0.753
    ],
    "scale": 0.55,
    "axis": [
@@ -2634,8 +3066,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.41,
+    0.735
+   ],
+   "autoHandle": [
+    0.41,
+    0.735
    ],
    "scale": 0.55,
    "axis": [
@@ -2658,8 +3094,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.49,
+    0.737
+   ],
+   "autoHandle": [
+    0.49,
+    0.737
    ],
    "scale": 0.55,
    "axis": [
@@ -2671,10 +3111,10 @@ export const GEAR_GRIP_DATA = {
     738
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": false
   },
@@ -2682,8 +3122,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.594,
+    0.761
+   ],
+   "autoHandle": [
+    0.594,
+    0.761
    ],
    "scale": 0.55,
    "axis": [
@@ -2695,10 +3139,10 @@ export const GEAR_GRIP_DATA = {
     665
    ],
    "bbox": [
-    0.227,
+    0.223,
     0.137,
-    0.773,
-    0.859
+    0.777,
+    0.863
    ],
    "tuned": false
   },
@@ -2708,6 +3152,10 @@ export const GEAR_GRIP_DATA = {
    "handle": [
     0.09,
     1
+   ],
+   "autoHandle": [
+    0.48,
+    0.721
    ],
    "scale": 0.55,
    "axis": [
@@ -2719,9 +3167,9 @@ export const GEAR_GRIP_DATA = {
     730
    ],
    "bbox": [
-    0.172,
+    0.168,
     0.184,
-    0.828,
+    0.832,
     0.816
    ],
    "tuned": true
@@ -2730,8 +3178,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.745,
+    0.734
+   ],
+   "autoHandle": [
+    0.745,
+    0.734
    ],
    "scale": 0.55,
    "axis": [
@@ -2754,8 +3206,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.605,
+    0.73
+   ],
+   "autoHandle": [
+    0.605,
+    0.73
    ],
    "scale": 0.55,
    "axis": [
@@ -2778,8 +3234,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.644,
+    0.715
+   ],
+   "autoHandle": [
+    0.644,
+    0.715
    ],
    "scale": 0.55,
    "axis": [
@@ -2793,8 +3253,8 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.18,
     0.172,
-    0.82,
-    0.824
+    0.824,
+    0.828
    ],
    "tuned": false
   },
@@ -2802,8 +3262,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.429,
+    0.759
+   ],
+   "autoHandle": [
+    0.429,
+    0.759
    ],
    "scale": 0.55,
    "axis": [
@@ -2826,8 +3290,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.511,
+    0.716
+   ],
+   "autoHandle": [
+    0.511,
+    0.716
    ],
    "scale": 0.55,
    "axis": [
@@ -2850,8 +3318,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.387,
+    0.723
+   ],
+   "autoHandle": [
+    0.387,
+    0.723
    ],
    "scale": 0.55,
    "axis": [
@@ -2863,8 +3335,8 @@ export const GEAR_GRIP_DATA = {
     714
    ],
    "bbox": [
-    0.191,
-    0.164,
+    0.188,
+    0.16,
     0.809,
     0.836
    ],
@@ -2874,8 +3346,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.43,
+    0.74
+   ],
+   "autoHandle": [
+    0.43,
+    0.74
    ],
    "scale": 0.55,
    "axis": [
@@ -2887,10 +3363,10 @@ export const GEAR_GRIP_DATA = {
     686
    ],
    "bbox": [
-    0.211,
+    0.207,
     0.148,
-    0.789,
-    0.848
+    0.793,
+    0.852
    ],
    "tuned": false
   },
@@ -2898,8 +3374,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.654,
+    0.744
+   ],
+   "autoHandle": [
+    0.654,
+    0.744
    ],
    "scale": 0.55,
    "axis": [
@@ -2912,9 +3392,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.203,
-    0.156,
+    0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": false
   },
@@ -2922,8 +3402,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.408,
+    0.734
+   ],
+   "autoHandle": [
+    0.408,
+    0.734
    ],
    "scale": 0.55,
    "axis": [
@@ -2937,7 +3421,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.207,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": false
@@ -2946,8 +3430,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.436,
+    0.751
+   ],
+   "autoHandle": [
+    0.436,
+    0.751
    ],
    "scale": 0.55,
    "axis": [
@@ -2959,7 +3447,7 @@ export const GEAR_GRIP_DATA = {
     668
    ],
    "bbox": [
-    0.223,
+    0.219,
     0.141,
     0.777,
     0.859
@@ -2970,8 +3458,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.569,
+    0.744
+   ],
+   "autoHandle": [
+    0.569,
+    0.744
    ],
    "scale": 0.55,
    "axis": [
@@ -2986,7 +3478,7 @@ export const GEAR_GRIP_DATA = {
     0.188,
     0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": false
   },
@@ -2994,8 +3486,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.601,
+    0.734
+   ],
+   "autoHandle": [
+    0.601,
+    0.734
    ],
    "scale": 0.55,
    "axis": [
@@ -3009,7 +3505,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.203,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": false
@@ -3018,8 +3514,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.5,
-    0.6
+    0.559,
+    0.729
+   ],
+   "autoHandle": [
+    0.559,
+    0.729
    ],
    "scale": 0.55,
    "axis": [
@@ -3032,9 +3532,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.191,
-    0.164,
+    0.16,
     0.809,
-    0.836
+    0.84
    ],
    "tuned": false
   },
@@ -3044,6 +3544,10 @@ export const GEAR_GRIP_DATA = {
    "handle": [
     0.505,
     0.488
+   ],
+   "autoHandle": [
+    0.498,
+    0.726
    ],
    "scale": 0.55,
    "axis": [
@@ -3055,9 +3559,9 @@ export const GEAR_GRIP_DATA = {
     739
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
+    0.172,
+    0.824,
     0.824
    ],
    "tuned": true
@@ -3066,8 +3570,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.497,
+    0.726
+   ],
+   "autoHandle": [
+    0.497,
+    0.726
    ],
    "scale": 0.55,
    "axis": [
@@ -3090,8 +3598,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.497,
+    0.739
+   ],
+   "autoHandle": [
+    0.497,
+    0.739
    ],
    "scale": 0.55,
    "axis": [
@@ -3103,10 +3615,10 @@ export const GEAR_GRIP_DATA = {
     686
    ],
    "bbox": [
-    0.211,
+    0.207,
     0.148,
-    0.789,
-    0.848
+    0.793,
+    0.852
    ],
    "tuned": false
   },
@@ -3114,8 +3626,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.498,
+    0.745
+   ],
+   "autoHandle": [
+    0.498,
+    0.745
    ],
    "scale": 0.55,
    "axis": [
@@ -3127,9 +3643,9 @@ export const GEAR_GRIP_DATA = {
     670
    ],
    "bbox": [
-    0.223,
+    0.219,
     0.141,
-    0.777,
+    0.781,
     0.859
    ],
    "tuned": false
@@ -3138,8 +3654,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.497,
+    0.728
+   ],
+   "autoHandle": [
+    0.497,
+    0.728
    ],
    "scale": 0.55,
    "axis": [
@@ -3162,8 +3682,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.498,
+    0.734
+   ],
+   "autoHandle": [
+    0.498,
+    0.734
    ],
    "scale": 0.55,
    "axis": [
@@ -3178,7 +3702,7 @@ export const GEAR_GRIP_DATA = {
     0.199,
     0.156,
     0.801,
-    0.84
+    0.844
    ],
    "tuned": false
   },
@@ -3186,8 +3710,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.503,
+    0.736
+   ],
+   "autoHandle": [
+    0.503,
+    0.736
    ],
    "scale": 0.55,
    "axis": [
@@ -3201,7 +3729,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.203,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": false
@@ -3210,8 +3738,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.511,
+    0.723
+   ],
+   "autoHandle": [
+    0.511,
+    0.723
    ],
    "scale": 0.55,
    "axis": [
@@ -3226,7 +3758,7 @@ export const GEAR_GRIP_DATA = {
     0.184,
     0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": false
   },
@@ -3234,8 +3766,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.499,
+    0.735
+   ],
+   "autoHandle": [
+    0.499,
+    0.735
    ],
    "scale": 0.55,
    "axis": [
@@ -3248,9 +3784,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.203,
-    0.156,
+    0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": false
   },
@@ -3258,8 +3794,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.497,
+    0.741
+   ],
+   "autoHandle": [
+    0.497,
+    0.741
    ],
    "scale": 0.55,
    "axis": [
@@ -3274,7 +3814,7 @@ export const GEAR_GRIP_DATA = {
     0.215,
     0.145,
     0.785,
-    0.852
+    0.855
    ],
    "tuned": false
   },
@@ -3282,8 +3822,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.498,
+    0.731
+   ],
+   "autoHandle": [
+    0.498,
+    0.731
    ],
    "scale": 0.55,
    "axis": [
@@ -3296,7 +3840,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.199,
-    0.156,
+    0.152,
     0.801,
     0.844
    ],
@@ -3306,8 +3850,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.498,
+    0.743
+   ],
+   "autoHandle": [
+    0.498,
+    0.743
    ],
    "scale": 0.55,
    "axis": [
@@ -3330,8 +3878,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.498,
+    0.735
+   ],
+   "autoHandle": [
+    0.498,
+    0.735
    ],
    "scale": 0.55,
    "axis": [
@@ -3343,10 +3895,10 @@ export const GEAR_GRIP_DATA = {
     697
    ],
    "bbox": [
-    0.203,
-    0.156,
-    0.797,
-    0.844
+    0.199,
+    0.152,
+    0.801,
+    0.848
    ],
    "tuned": false
   },
@@ -3354,8 +3906,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.502,
+    0.718
+   ],
+   "autoHandle": [
+    0.502,
+    0.718
    ],
    "scale": 0.55,
    "axis": [
@@ -3378,8 +3934,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.498,
+    0.737
+   ],
+   "autoHandle": [
+    0.498,
+    0.737
    ],
    "scale": 0.55,
    "axis": [
@@ -3391,7 +3951,7 @@ export const GEAR_GRIP_DATA = {
     692
    ],
    "bbox": [
-    0.207,
+    0.203,
     0.152,
     0.793,
     0.848
@@ -3402,8 +3962,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.498,
+    0.732
+   ],
+   "autoHandle": [
+    0.498,
+    0.732
    ],
    "scale": 0.55,
    "axis": [
@@ -3426,8 +3990,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.498,
+    0.737
+   ],
+   "autoHandle": [
+    0.498,
+    0.737
    ],
    "scale": 0.55,
    "axis": [
@@ -3439,9 +4007,9 @@ export const GEAR_GRIP_DATA = {
     691
    ],
    "bbox": [
-    0.207,
+    0.203,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": false
@@ -3450,8 +4018,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.497,
+    0.73
+   ],
+   "autoHandle": [
+    0.497,
+    0.73
    ],
    "scale": 0.55,
    "axis": [
@@ -3463,10 +4035,10 @@ export const GEAR_GRIP_DATA = {
     713
    ],
    "bbox": [
-    0.191,
+    0.188,
     0.16,
     0.809,
-    0.836
+    0.84
    ],
    "tuned": false
   },
@@ -3476,6 +4048,10 @@ export const GEAR_GRIP_DATA = {
    "handle": [
     0.338,
     0.594
+   ],
+   "autoHandle": [
+    0.497,
+    0.736
    ],
    "scale": 0.55,
    "axis": [
@@ -3487,10 +4063,10 @@ export const GEAR_GRIP_DATA = {
     697
    ],
    "bbox": [
-    0.203,
-    0.156,
+    0.199,
+    0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": true
   },
@@ -3500,6 +4076,10 @@ export const GEAR_GRIP_DATA = {
    "handle": [
     0.484,
     0.516
+   ],
+   "autoHandle": [
+    0.497,
+    0.731
    ],
    "scale": 0.55,
    "axis": [
@@ -3511,9 +4091,9 @@ export const GEAR_GRIP_DATA = {
     709
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
+    0.809,
     0.84
    ],
    "tuned": true
@@ -3522,8 +4102,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.499,
+    0.735
+   ],
+   "autoHandle": [
+    0.499,
+    0.735
    ],
    "scale": 0.55,
    "axis": [
@@ -3538,7 +4122,7 @@ export const GEAR_GRIP_DATA = {
     0.199,
     0.156,
     0.801,
-    0.84
+    0.844
    ],
    "tuned": false
   },
@@ -3546,8 +4130,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.499,
+    0.735
+   ],
+   "autoHandle": [
+    0.499,
+    0.735
    ],
    "scale": 0.55,
    "axis": [
@@ -3559,10 +4147,10 @@ export const GEAR_GRIP_DATA = {
     697
    ],
    "bbox": [
-    0.203,
-    0.156,
-    0.797,
-    0.844
+    0.199,
+    0.152,
+    0.801,
+    0.848
    ],
    "tuned": false
   },
@@ -3570,8 +4158,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.498,
+    0.733
+   ],
+   "autoHandle": [
+    0.498,
+    0.733
    ],
    "scale": 0.55,
    "axis": [
@@ -3584,9 +4176,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.195,
-    0.16,
-    0.801,
-    0.84
+    0.156,
+    0.805,
+    0.844
    ],
    "tuned": false
   },
@@ -3594,8 +4186,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.497,
+    0.734
+   ],
+   "autoHandle": [
+    0.497,
+    0.734
    ],
    "scale": 0.55,
    "axis": [
@@ -3608,9 +4204,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.195,
-    0.16,
+    0.156,
     0.801,
-    0.84
+    0.844
    ],
    "tuned": false
   },
@@ -3618,8 +4214,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.497,
+    0.729
+   ],
+   "autoHandle": [
+    0.497,
+    0.729
    ],
    "scale": 0.55,
    "axis": [
@@ -3633,7 +4233,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": false
@@ -3642,8 +4242,12 @@ export const GEAR_GRIP_DATA = {
    "role": "shield",
    "category": "shield",
    "handle": [
-    0.5,
-    0.5
+    0.497,
+    0.736
+   ],
+   "autoHandle": [
+    0.497,
+    0.736
    ],
    "scale": 0.55,
    "axis": [
@@ -3657,7 +4261,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.203,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": false
@@ -4617,34 +5221,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_1.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4652,34 +5256,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_2.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 17,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4687,34 +5291,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_3.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4722,34 +5326,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/up/Stox_bayesian_walk_up_4.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 3,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4761,18 +5365,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/down/Stox_bayesian_walk_down_1.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -4783,12 +5387,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4796,18 +5400,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/down/Stox_bayesian_walk_down_2.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -4818,12 +5422,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4831,18 +5435,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/down/Stox_bayesian_walk_down_3.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -4853,12 +5457,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4866,18 +5470,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/down/Stox_bayesian_walk_down_4.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -22,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -4888,12 +5492,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4905,34 +5509,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/left/Stox_bayesian_walk_left_1.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4940,34 +5544,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/left/Stox_bayesian_walk_left_2.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -153,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -4975,34 +5579,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/left/Stox_bayesian_walk_left_3.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5014,18 +5618,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/right/Stox_bayesian_walk_right_1.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -160,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5035,13 +5639,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5049,18 +5653,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/right/Stox_bayesian_walk_right_2.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -154,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5070,13 +5674,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5084,18 +5688,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/bayesian/right/Stox_bayesian_walk_right_3.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5105,13 +5709,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5281,34 +5885,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/up/Stox_markovian_walk_up_1.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5316,34 +5920,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/up/Stox_markovian_walk_up_2.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 17,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5351,34 +5955,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/up/Stox_markovian_walk_up_3.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5390,18 +5994,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/down/Stox_markovian_walk_down_1.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5412,12 +6016,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5425,18 +6029,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/down/Stox_markovian_walk_down_2.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5447,12 +6051,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5460,18 +6064,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/down/Stox_markovian_walk_down_3.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5482,12 +6086,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5495,18 +6099,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/down/Stox_markovian_walk_down_4.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -22,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5517,12 +6121,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5534,34 +6138,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/left/Stox_markovian_walk_left_1.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5569,34 +6173,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/left/Stox_markovian_walk_left_2.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -153,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5604,34 +6208,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/left/Stox_markovian_walk_left_3.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5643,18 +6247,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/right/Stox_markovian_walk_right_1.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -160,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5664,13 +6268,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5678,18 +6282,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/right/Stox_markovian_walk_right_2.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -154,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5699,13 +6303,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5713,18 +6317,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/markovian/right/Stox_markovian_walk_right_3.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -5734,13 +6338,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5910,34 +6514,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/up/Stox_mathmagician_walk_up_1.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5945,34 +6549,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/up/Stox_mathmagician_walk_up_2.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 17,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -5980,34 +6584,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/up/Stox_mathmagician_walk_up_3.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6015,34 +6619,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/up/Stox_mathmagician_walk_up_4.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 3,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6054,18 +6658,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/down/Stox_mathmagician_walk_down_1.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6076,12 +6680,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6089,18 +6693,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/down/Stox_mathmagician_walk_down_2.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6111,12 +6715,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6124,18 +6728,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/down/Stox_mathmagician_walk_down_3.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6146,12 +6750,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6163,34 +6767,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/left/Stox_mathmagician_walk_left_1.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6198,34 +6802,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/left/Stox_mathmagician_walk_left_2.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -153,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6233,34 +6837,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/left/Stox_mathmagician_walk_left_3.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6268,34 +6872,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/left/Stox_mathmagician_walk_left_4.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -167,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6307,18 +6911,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/right/Stox_mathmagician_walk_right_1.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -160,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6328,13 +6932,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6342,18 +6946,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/right/Stox_mathmagician_walk_right_2.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -154,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6363,13 +6967,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6377,18 +6981,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/right/Stox_mathmagician_walk_right_3.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6398,13 +7002,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6412,18 +7016,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/mathmagician/right/Stox_mathmagician_walk_right_4.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6433,13 +7037,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6609,34 +7213,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_1.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6644,34 +7248,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_2.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 17,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6679,34 +7283,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_3.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6714,34 +7318,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/up/Stox_noclass_walk_up_4.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 3,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6753,18 +7357,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/down/Stox_noclass_walk_down_1.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6775,12 +7379,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6788,18 +7392,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/down/Stox_noclass_walk_down_2.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6810,12 +7414,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6823,18 +7427,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/down/Stox_noclass_walk_down_3.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6845,12 +7449,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6858,18 +7462,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/down/Stox_noclass_walk_down_4.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -22,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -6880,12 +7484,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6897,34 +7501,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/left/Stox_noclass_walk_left_1.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6932,34 +7536,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/left/Stox_noclass_walk_left_2.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -153,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -6967,34 +7571,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/left/Stox_noclass_walk_left_3.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7002,34 +7606,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/left/Stox_noclass_walk_left_4.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -167,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7041,18 +7645,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/right/Stox_noclass_walk_right_1.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -160,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7062,13 +7666,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7076,18 +7680,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/right/Stox_noclass_walk_right_2.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -154,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7097,13 +7701,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7111,18 +7715,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/noclass/right/Stox_noclass_walk_right_3.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7132,13 +7736,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7308,34 +7912,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/up/Stox_outlier_walk_up_1.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7343,34 +7947,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/up/Stox_outlier_walk_up_2.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 17,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7378,34 +7982,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/up/Stox_outlier_walk_up_3.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7417,18 +8021,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/down/Stox_outlier_walk_down_1.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7439,12 +8043,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7452,18 +8056,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/down/Stox_outlier_walk_down_2.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7474,12 +8078,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7487,18 +8091,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/down/Stox_outlier_walk_down_3.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7509,12 +8113,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7522,18 +8126,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/down/Stox_outlier_walk_down_4.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -22,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7544,12 +8148,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7561,34 +8165,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/left/Stox_outlier_walk_left_1.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7596,34 +8200,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/left/Stox_outlier_walk_left_2.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -153,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7631,34 +8235,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/left/Stox_outlier_walk_left_3.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7670,18 +8274,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/right/Stox_outlier_walk_right_1.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -160,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7691,13 +8295,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7705,18 +8309,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/right/Stox_outlier_walk_right_2.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -154,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7726,13 +8330,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7740,18 +8344,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/outlier/right/Stox_outlier_walk_right_3.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7761,13 +8365,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7937,34 +8541,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/up/Stox_probabilist_walk_up_1.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -7972,34 +8576,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/up/Stox_probabilist_walk_up_2.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 17,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8007,34 +8611,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/up/Stox_probabilist_walk_up_3.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8046,18 +8650,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/down/Stox_probabilist_walk_down_1.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8068,12 +8672,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8081,18 +8685,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/down/Stox_probabilist_walk_down_2.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8103,12 +8707,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8116,18 +8720,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/down/Stox_probabilist_walk_down_3.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8138,12 +8742,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8155,34 +8759,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/left/Stox_probabilist_walk_left_1.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8190,34 +8794,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/left/Stox_probabilist_walk_left_2.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -153,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8225,34 +8829,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/left/Stox_probabilist_walk_left_3.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8264,18 +8868,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/right/Stox_probabilist_walk_right_1.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -160,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8285,13 +8889,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8299,18 +8903,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/right/Stox_probabilist_walk_right_2.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -154,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8320,13 +8924,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8334,18 +8938,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/probabilist/right/Stox_probabilist_walk_right_3.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8355,13 +8959,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8531,34 +9135,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/up/Stox_random_walker_walk_up_1.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8566,34 +9170,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/up/Stox_random_walker_walk_up_2.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 17,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8601,34 +9205,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/up/Stox_random_walker_walk_up_3.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8640,18 +9244,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/down/Stox_random_walker_walk_down_1.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8662,12 +9266,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8675,18 +9279,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/down/Stox_random_walker_walk_down_2.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8697,12 +9301,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8710,18 +9314,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/down/Stox_random_walker_walk_down_3.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8732,12 +9336,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8745,18 +9349,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/down/Stox_random_walker_walk_down_4.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -22,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8767,12 +9371,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8784,34 +9388,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/left/Stox_random_walker_walk_left_1.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8819,34 +9423,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/left/Stox_random_walker_walk_left_2.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -153,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8854,34 +9458,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/left/Stox_random_walker_walk_left_3.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8893,18 +9497,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/right/Stox_random_walker_walk_right_1.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -160,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8914,13 +9518,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8928,18 +9532,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/right/Stox_random_walker_walk_right_2.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -154,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8949,13 +9553,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -8963,18 +9567,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/random_walker/right/Stox_random_walker_walk_right_3.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8984,13 +9588,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9160,34 +9764,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/up/Stox_recursionist_walk_up_1.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9195,34 +9799,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/up/Stox_recursionist_walk_up_2.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 17,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9230,34 +9834,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/up/Stox_recursionist_walk_up_3.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9265,34 +9869,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/up/Stox_recursionist_walk_up_4.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 3,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9304,18 +9908,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/down/Stox_recursionist_walk_down_1.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9326,12 +9930,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9339,18 +9943,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/down/Stox_recursionist_walk_down_2.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9361,12 +9965,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9374,18 +9978,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/down/Stox_recursionist_walk_down_3.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9396,12 +10000,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9413,34 +10017,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/left/Stox_recursionist_walk_left_1.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9448,34 +10052,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/left/Stox_recursionist_walk_left_2.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -153,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9483,34 +10087,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/left/Stox_recursionist_walk_left_3.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9522,18 +10126,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/right/Stox_recursionist_walk_right_1.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -160,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9543,13 +10147,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9557,18 +10161,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/right/Stox_recursionist_walk_right_2.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -154,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9578,13 +10182,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9592,18 +10196,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/recursionist/right/Stox_recursionist_walk_right_3.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9613,13 +10217,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9789,34 +10393,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_1.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9824,34 +10428,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_2.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 17,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9859,34 +10463,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_3.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 10,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9894,34 +10498,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/up/Stox_statistician_walk_up_4.webp",
       "weaponHand": [
-       0.68,
-       0.5
+       0.66,
+       0.58
       ],
       "shieldHand": [
-       0.32,
-       0.48
+       0.36,
+       0.5
       ],
       "weapon": {
        "layer": "back",
-       "rot": 0,
-       "scale": null,
+       "rot": 3,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "back",
        "rot": 0,
-       "scale": null,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
-       "tint": null,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9933,18 +10537,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/down/Stox_statistician_walk_down_1.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9955,12 +10559,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -9968,18 +10572,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/down/Stox_statistician_walk_down_2.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -8,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9990,12 +10594,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10003,18 +10607,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/down/Stox_statistician_walk_down_3.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -15,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10025,12 +10629,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10038,18 +10642,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/down/Stox_statistician_walk_down_4.webp",
       "weaponHand": [
-       0.34,
-       0.48
+       0.16,
+       0.53
       ],
       "shieldHand": [
-       0.66,
-       0.5
+       0.87,
+       0.58
       ],
       "weapon": {
        "layer": "front",
-       "rot": 0,
-       "scale": null,
-       "flipX": false,
+       "rot": -22,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10060,12 +10664,12 @@ export const GEAR_GRIP_DATA = {
       "shield": {
        "layer": "front",
        "rot": 0,
-       "scale": null,
+       "scale": 0.55,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10077,34 +10681,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/left/Stox_statistician_walk_left_1.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10112,34 +10716,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/left/Stox_statistician_walk_left_2.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -153,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10147,34 +10751,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/left/Stox_statistician_walk_left_3.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -160,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10182,34 +10786,34 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/left/Stox_statistician_walk_left_4.webp",
       "weaponHand": [
-       0.38,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.6,
-       0.5
+       0.72,
+       0.53
       ],
       "weapon": {
        "layer": "back",
-       "rot": 30,
-       "scale": null,
+       "rot": -167,
+       "scale": 0.5,
        "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       },
       "shield": {
        "layer": "front",
-       "rot": -6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
+       "sx": 0.8,
        "tint": null,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10221,18 +10825,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/right/Stox_statistician_walk_right_1.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -160,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10242,13 +10846,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10256,18 +10860,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/right/Stox_statistician_walk_right_2.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -154,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10277,13 +10881,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10291,18 +10895,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/right/Stox_statistician_walk_right_3.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10312,13 +10916,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -10326,18 +10930,18 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Stox/walk/statistician/right/Stox_statistician_walk_right_4.webp",
       "weaponHand": [
-       0.62,
-       0.46
+       0.3,
+       0.72
       ],
       "shieldHand": [
-       0.4,
-       0.5
+       0.17,
+       0.55
       ],
       "weapon": {
        "layer": "front",
-       "rot": -30,
-       "scale": null,
-       "flipX": false,
+       "rot": -166,
+       "scale": 0.5,
+       "flipX": true,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10347,13 +10951,13 @@ export const GEAR_GRIP_DATA = {
       },
       "shield": {
        "layer": "back",
-       "rot": 6,
-       "scale": null,
+       "rot": 0,
+       "scale": 0.55,
        "flipX": false,
-       "sx": 1,
-       "tint": null,
+       "sx": 0.55,
+       "tint": 0.65,
        "patch": {
-        "on": true,
+        "on": false,
         "r": 0.045
        }
       }
@@ -17961,12 +18565,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/actuary/down/Syla_actuary_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -18735,12 +19339,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/bayesian/down/Syla_bayesian_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -19141,12 +19745,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/bayesian/left/Syla_bayesian_walk_left_1.webp",
       "weaponHand": [
-       0.504,
-       0.69
+       0.388,
+       0.784
       ],
       "shieldHand": [
-       0.504,
-       0.485
+       0.552,
+       0.483
       ],
       "weapon": {
        "layer": "back",
@@ -19171,23 +19775,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/bayesian/left/Syla_bayesian_walk_left_2.webp",
       "weaponHand": [
-       0.607,
-       0.653
+       0,
+       0.639
       ],
       "shieldHand": [
-       0.506,
-       0.548
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -19217,12 +19815,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/bayesian/left/Syla_bayesian_walk_left_3.webp",
       "weaponHand": [
-       0.393,
-       0.64
+       0.769,
+       0.561
       ],
       "shieldHand": [
-       0.40700000000000003,
-       0.591
+       0.5389999999999999,
+       0.534
       ],
       "weapon": {
        "layer": "back",
@@ -19256,12 +19854,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/bayesian/right/Syla_bayesian_walk_right_1.webp",
       "weaponHand": [
-       0.496,
-       0.69
+       0.612,
+       0.784
       ],
       "shieldHand": [
-       0.496,
-       0.485
+       0.448,
+       0.483
       ],
       "weapon": {
        "layer": "front",
@@ -19286,23 +19884,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/bayesian/right/Syla_bayesian_walk_right_2.webp",
       "weaponHand": [
-       0.393,
-       0.653
+       1,
+       0.639
       ],
       "shieldHand": [
-       0.494,
-       0.548
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -19332,12 +19924,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/bayesian/right/Syla_bayesian_walk_right_3.webp",
       "weaponHand": [
-       0.607,
-       0.64
+       0.231,
+       0.561
       ],
       "shieldHand": [
-       0.593,
-       0.591
+       0.461,
+       0.534
       ],
       "weapon": {
        "layer": "front",
@@ -19412,12 +20004,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/markovian/down/Syla_markovian_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -19818,12 +20410,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_1.webp",
       "weaponHand": [
-       0.504,
-       0.69
+       0.388,
+       0.784
       ],
       "shieldHand": [
-       0.504,
-       0.485
+       0.552,
+       0.483
       ],
       "weapon": {
        "layer": "back",
@@ -19848,23 +20440,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_2.webp",
       "weaponHand": [
-       0.607,
-       0.653
+       0,
+       0.639
       ],
       "shieldHand": [
-       0.506,
-       0.548
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -19894,12 +20480,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_3.webp",
       "weaponHand": [
-       0.393,
-       0.64
+       0.769,
+       0.561
       ],
       "shieldHand": [
-       0.40700000000000003,
-       0.591
+       0.5389999999999999,
+       0.534
       ],
       "weapon": {
        "layer": "back",
@@ -19929,12 +20515,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/markovian/left/Syla_markovian_walk_left_4.webp",
       "weaponHand": [
-       0.28400000000000003,
-       0.653
+       1,
+       0.471
       ],
       "shieldHand": [
-       0.46799999999999997,
-       0.527
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -19968,12 +20554,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_1.webp",
       "weaponHand": [
-       0.496,
-       0.69
+       0.612,
+       0.784
       ],
       "shieldHand": [
-       0.496,
-       0.485
+       0.448,
+       0.483
       ],
       "weapon": {
        "layer": "front",
@@ -19998,23 +20584,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_2.webp",
       "weaponHand": [
-       0.393,
-       0.653
+       1,
+       0.639
       ],
       "shieldHand": [
-       0.494,
-       0.548
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -20044,12 +20624,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_3.webp",
       "weaponHand": [
-       0.607,
-       0.64
+       0.231,
+       0.561
       ],
       "shieldHand": [
-       0.593,
-       0.591
+       0.461,
+       0.534
       ],
       "weapon": {
        "layer": "front",
@@ -20079,12 +20659,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/markovian/right/Syla_markovian_walk_right_4.webp",
       "weaponHand": [
-       0.716,
-       0.653
+       0,
+       0.471
       ],
       "shieldHand": [
-       0.532,
-       0.527
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -20159,12 +20739,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/mathmagician/down/Syla_mathmagician_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -20565,12 +21145,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_1.webp",
       "weaponHand": [
-       0.504,
-       0.69
+       0.388,
+       0.784
       ],
       "shieldHand": [
-       0.504,
-       0.485
+       0.552,
+       0.483
       ],
       "weapon": {
        "layer": "back",
@@ -20595,23 +21175,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_2.webp",
       "weaponHand": [
-       0.607,
-       0.653
+       0,
+       0.639
       ],
       "shieldHand": [
-       0.506,
-       0.548
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -20641,12 +21215,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_3.webp",
       "weaponHand": [
-       0.393,
-       0.64
+       0.769,
+       0.561
       ],
       "shieldHand": [
-       0.40700000000000003,
-       0.591
+       0.5389999999999999,
+       0.534
       ],
       "weapon": {
        "layer": "back",
@@ -20676,12 +21250,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/mathmagician/left/Syla_mathmagician_walk_left_4.webp",
       "weaponHand": [
-       0.28400000000000003,
-       0.653
+       1,
+       0.471
       ],
       "shieldHand": [
-       0.46799999999999997,
-       0.527
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -20715,12 +21289,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_1.webp",
       "weaponHand": [
-       0.496,
-       0.69
+       0.612,
+       0.784
       ],
       "shieldHand": [
-       0.496,
-       0.485
+       0.448,
+       0.483
       ],
       "weapon": {
        "layer": "front",
@@ -20745,23 +21319,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_2.webp",
       "weaponHand": [
-       0.393,
-       0.653
+       1,
+       0.639
       ],
       "shieldHand": [
-       0.494,
-       0.548
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -20791,12 +21359,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_3.webp",
       "weaponHand": [
-       0.607,
-       0.64
+       0.231,
+       0.561
       ],
       "shieldHand": [
-       0.593,
-       0.591
+       0.461,
+       0.534
       ],
       "weapon": {
        "layer": "front",
@@ -20826,12 +21394,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/mathmagician/right/Syla_mathmagician_walk_right_4.webp",
       "weaponHand": [
-       0.716,
-       0.653
+       0,
+       0.471
       ],
       "shieldHand": [
-       0.532,
-       0.527
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -20906,12 +21474,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/noclass/down/Syla_noclass_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -21311,12 +21879,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_1.webp",
       "weaponHand": [
-       0.496,
-       0.69
+       0.612,
+       0.784
       ],
       "shieldHand": [
-       0.496,
-       0.485
+       0.448,
+       0.483
       ],
       "weapon": {
        "layer": "front",
@@ -21341,23 +21909,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_2.webp",
       "weaponHand": [
-       0.393,
-       0.653
+       1,
+       0.639
       ],
       "shieldHand": [
-       0.494,
-       0.548
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -21387,12 +21949,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_3.webp",
       "weaponHand": [
-       0.607,
-       0.64
+       0.231,
+       0.561
       ],
       "shieldHand": [
-       0.593,
-       0.591
+       0.461,
+       0.534
       ],
       "weapon": {
        "layer": "front",
@@ -21422,12 +21984,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/noclass/right/Syla_noclass_walk_right_4.webp",
       "weaponHand": [
-       0.716,
-       0.653
+       0,
+       0.471
       ],
       "shieldHand": [
-       0.532,
-       0.527
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -21502,12 +22064,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/outlier/down/Syla_outlier_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -21908,12 +22470,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_1.webp",
       "weaponHand": [
-       0.504,
-       0.69
+       0.388,
+       0.784
       ],
       "shieldHand": [
-       0.504,
-       0.485
+       0.552,
+       0.483
       ],
       "weapon": {
        "layer": "back",
@@ -21938,23 +22500,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_2.webp",
       "weaponHand": [
-       0.607,
-       0.653
+       0,
+       0.639
       ],
       "shieldHand": [
-       0.506,
-       0.548
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -21984,12 +22540,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_3.webp",
       "weaponHand": [
-       0.393,
-       0.64
+       0.769,
+       0.561
       ],
       "shieldHand": [
-       0.40700000000000003,
-       0.591
+       0.5389999999999999,
+       0.534
       ],
       "weapon": {
        "layer": "back",
@@ -22019,12 +22575,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/outlier/left/Syla_outlier_walk_left_4.webp",
       "weaponHand": [
-       0.28400000000000003,
-       0.653
+       1,
+       0.471
       ],
       "shieldHand": [
-       0.46799999999999997,
-       0.527
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -22058,12 +22614,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_1.webp",
       "weaponHand": [
-       0.496,
-       0.69
+       0.612,
+       0.784
       ],
       "shieldHand": [
-       0.496,
-       0.485
+       0.448,
+       0.483
       ],
       "weapon": {
        "layer": "front",
@@ -22088,23 +22644,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_2.webp",
       "weaponHand": [
-       0.393,
-       0.653
+       1,
+       0.639
       ],
       "shieldHand": [
-       0.494,
-       0.548
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -22134,12 +22684,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_3.webp",
       "weaponHand": [
-       0.607,
-       0.64
+       0.231,
+       0.561
       ],
       "shieldHand": [
-       0.593,
-       0.591
+       0.461,
+       0.534
       ],
       "weapon": {
        "layer": "front",
@@ -22169,12 +22719,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/outlier/right/Syla_outlier_walk_right_4.webp",
       "weaponHand": [
-       0.716,
-       0.653
+       0,
+       0.471
       ],
       "shieldHand": [
-       0.532,
-       0.527
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -22249,12 +22799,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/probabilist/down/Syla_probabilist_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -22655,12 +23205,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_1.webp",
       "weaponHand": [
-       0.504,
-       0.69
+       0.388,
+       0.784
       ],
       "shieldHand": [
-       0.504,
-       0.485
+       0.552,
+       0.483
       ],
       "weapon": {
        "layer": "back",
@@ -22685,23 +23235,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_2.webp",
       "weaponHand": [
-       0.607,
-       0.653
+       0,
+       0.639
       ],
       "shieldHand": [
-       0.506,
-       0.548
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -22731,12 +23275,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_3.webp",
       "weaponHand": [
-       0.393,
-       0.64
+       0.769,
+       0.561
       ],
       "shieldHand": [
-       0.40700000000000003,
-       0.591
+       0.5389999999999999,
+       0.534
       ],
       "weapon": {
        "layer": "back",
@@ -22766,12 +23310,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/probabilist/left/Syla_probabilist_walk_left_4.webp",
       "weaponHand": [
-       0.28400000000000003,
-       0.653
+       1,
+       0.471
       ],
       "shieldHand": [
-       0.46799999999999997,
-       0.527
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -22805,12 +23349,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_1.webp",
       "weaponHand": [
-       0.496,
-       0.69
+       0.612,
+       0.784
       ],
       "shieldHand": [
-       0.496,
-       0.485
+       0.448,
+       0.483
       ],
       "weapon": {
        "layer": "front",
@@ -22835,23 +23379,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_2.webp",
       "weaponHand": [
-       0.393,
-       0.653
+       1,
+       0.639
       ],
       "shieldHand": [
-       0.494,
-       0.548
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -22881,12 +23419,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_3.webp",
       "weaponHand": [
-       0.607,
-       0.64
+       0.231,
+       0.561
       ],
       "shieldHand": [
-       0.593,
-       0.591
+       0.461,
+       0.534
       ],
       "weapon": {
        "layer": "front",
@@ -22916,12 +23454,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/probabilist/right/Syla_probabilist_walk_right_4.webp",
       "weaponHand": [
-       0.716,
-       0.653
+       0,
+       0.471
       ],
       "shieldHand": [
-       0.532,
-       0.527
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -22996,12 +23534,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/random_walker/down/Syla_random_walker_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -23402,12 +23940,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_1.webp",
       "weaponHand": [
-       0.504,
-       0.69
+       0.388,
+       0.784
       ],
       "shieldHand": [
-       0.504,
-       0.485
+       0.552,
+       0.483
       ],
       "weapon": {
        "layer": "back",
@@ -23432,23 +23970,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_2.webp",
       "weaponHand": [
-       0.607,
-       0.653
+       0,
+       0.639
       ],
       "shieldHand": [
-       0.506,
-       0.548
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -23478,12 +24010,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_3.webp",
       "weaponHand": [
-       0.393,
-       0.64
+       0.769,
+       0.561
       ],
       "shieldHand": [
-       0.40700000000000003,
-       0.591
+       0.5389999999999999,
+       0.534
       ],
       "weapon": {
        "layer": "back",
@@ -23513,12 +24045,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/random_walker/left/Syla_random_walker_walk_left_4.webp",
       "weaponHand": [
-       0.28400000000000003,
-       0.653
+       1,
+       0.471
       ],
       "shieldHand": [
-       0.46799999999999997,
-       0.527
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -23552,12 +24084,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_1.webp",
       "weaponHand": [
-       0.496,
-       0.69
+       0.612,
+       0.784
       ],
       "shieldHand": [
-       0.496,
-       0.485
+       0.448,
+       0.483
       ],
       "weapon": {
        "layer": "front",
@@ -23582,23 +24114,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_2.webp",
       "weaponHand": [
-       0.393,
-       0.653
+       1,
+       0.639
       ],
       "shieldHand": [
-       0.494,
-       0.548
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -23628,12 +24154,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_3.webp",
       "weaponHand": [
-       0.607,
-       0.64
+       0.231,
+       0.561
       ],
       "shieldHand": [
-       0.593,
-       0.591
+       0.461,
+       0.534
       ],
       "weapon": {
        "layer": "front",
@@ -23663,12 +24189,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/random_walker/right/Syla_random_walker_walk_right_4.webp",
       "weaponHand": [
-       0.716,
-       0.653
+       0,
+       0.471
       ],
       "shieldHand": [
-       0.532,
-       0.527
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -23743,12 +24269,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/recursionist/down/Syla_recursionist_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -24149,12 +24675,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_1.webp",
       "weaponHand": [
-       0.504,
-       0.69
+       0.388,
+       0.784
       ],
       "shieldHand": [
-       0.504,
-       0.485
+       0.552,
+       0.483
       ],
       "weapon": {
        "layer": "back",
@@ -24179,23 +24705,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_2.webp",
       "weaponHand": [
-       0.607,
-       0.653
+       0,
+       0.639
       ],
       "shieldHand": [
-       0.506,
-       0.548
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -24225,12 +24745,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_3.webp",
       "weaponHand": [
-       0.393,
-       0.64
+       0.769,
+       0.561
       ],
       "shieldHand": [
-       0.40700000000000003,
-       0.591
+       0.5389999999999999,
+       0.534
       ],
       "weapon": {
        "layer": "back",
@@ -24260,12 +24780,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/recursionist/left/Syla_recursionist_walk_left_4.webp",
       "weaponHand": [
-       0.28400000000000003,
-       0.653
+       1,
+       0.471
       ],
       "shieldHand": [
-       0.46799999999999997,
-       0.527
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -24299,12 +24819,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_1.webp",
       "weaponHand": [
-       0.496,
-       0.69
+       0.612,
+       0.784
       ],
       "shieldHand": [
-       0.496,
-       0.485
+       0.448,
+       0.483
       ],
       "weapon": {
        "layer": "front",
@@ -24329,23 +24849,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_2.webp",
       "weaponHand": [
-       0.393,
-       0.653
+       1,
+       0.639
       ],
       "shieldHand": [
-       0.494,
-       0.548
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -24375,12 +24889,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_3.webp",
       "weaponHand": [
-       0.607,
-       0.64
+       0.231,
+       0.561
       ],
       "shieldHand": [
-       0.593,
-       0.591
+       0.461,
+       0.534
       ],
       "weapon": {
        "layer": "front",
@@ -24410,12 +24924,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/recursionist/right/Syla_recursionist_walk_right_4.webp",
       "weaponHand": [
-       0.716,
-       0.653
+       0,
+       0.471
       ],
       "shieldHand": [
-       0.532,
-       0.527
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -24490,12 +25004,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/idle/statistician/down/Syla_statistician_idle_down_1.webp",
       "weaponHand": [
-       0.27,
-       0.6
+       0.251,
+       0.558
       ],
       "shieldHand": [
-       0.725,
-       0.505
+       0.723,
+       0.581
       ],
       "weapon": {
        "layer": "front",
@@ -24896,12 +25410,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_1.webp",
       "weaponHand": [
-       0.504,
-       0.69
+       0.388,
+       0.784
       ],
       "shieldHand": [
-       0.504,
-       0.485
+       0.552,
+       0.483
       ],
       "weapon": {
        "layer": "back",
@@ -24926,23 +25440,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_2.webp",
       "weaponHand": [
-       0.607,
-       0.653
+       0,
+       0.639
       ],
       "shieldHand": [
-       0.506,
-       0.548
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -24972,12 +25480,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_3.webp",
       "weaponHand": [
-       0.393,
-       0.64
+       0.769,
+       0.561
       ],
       "shieldHand": [
-       0.40700000000000003,
-       0.591
+       0.5389999999999999,
+       0.534
       ],
       "weapon": {
        "layer": "back",
@@ -25007,12 +25515,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/statistician/left/Syla_statistician_walk_left_4.webp",
       "weaponHand": [
-       0.28400000000000003,
-       0.653
+       1,
+       0.471
       ],
       "shieldHand": [
-       0.46799999999999997,
-       0.527
+       0.5329999999999999,
+       0.495
       ],
       "weapon": {
        "layer": "back",
@@ -25046,12 +25554,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_1.webp",
       "weaponHand": [
-       0.496,
-       0.69
+       0.612,
+       0.784
       ],
       "shieldHand": [
-       0.496,
-       0.485
+       0.448,
+       0.483
       ],
       "weapon": {
        "layer": "front",
@@ -25076,23 +25584,17 @@ export const GEAR_GRIP_DATA = {
         "on": true,
         "r": 0.045
        }
-      },
-      "poses": {
-       "wpn_1h_2": {
-        "rot": 70,
-        "scale": 0.15
-       }
       }
      },
      {
       "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_2.webp",
       "weaponHand": [
-       0.393,
-       0.653
+       1,
+       0.639
       ],
       "shieldHand": [
-       0.494,
-       0.548
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
@@ -25122,12 +25624,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_3.webp",
       "weaponHand": [
-       0.607,
-       0.64
+       0.231,
+       0.561
       ],
       "shieldHand": [
-       0.593,
-       0.591
+       0.461,
+       0.534
       ],
       "weapon": {
        "layer": "front",
@@ -25157,12 +25659,12 @@ export const GEAR_GRIP_DATA = {
      {
       "img": "animations/Syla/walk/statistician/right/Syla_statistician_walk_right_4.webp",
       "weaponHand": [
-       0.716,
-       0.653
+       0,
+       0.471
       ],
       "shieldHand": [
-       0.532,
-       0.527
+       0.467,
+       0.495
       ],
       "weapon": {
        "layer": "front",
