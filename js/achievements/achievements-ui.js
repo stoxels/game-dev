@@ -1,7 +1,8 @@
-﻿// Phase 3 step 2: REAL ES MODULE (tools/module-manifest.json). Imports the
-// achievement data + core state cross-module; core bindings (_tipAttr,
-// showModal) and the audio module go through globalThis. EXTERNAL consumers
-// call the exported UI entry points bare (entry-scope import bindings).
+// Real ES module (tools/module-manifest.json). Imports the achievement
+// data + core state cross-module. THREE bridge reads are deliberately kept:
+// Audio_Manager (audio.js), _tipAttr (tooltips-hud.js) and showModal
+// (screens.js) all transitively reach achievements.js, which imports this
+// file - converting any of them would create a module cycle.
 import { ACHIEVEMENT_DEFS } from './achievements-data.js';
 import { ACH_STATE, _doResetAchievements } from './achievements.js';
 import { t, LANG } from '../translation/translations.js';
@@ -70,9 +71,9 @@ let _achToastBusy = false; // true while a toast is currently visible; prevents 
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _getAchLang - returns 'de' or 'en' based on the global LANG variable.
+// _getAchLang - returns 'de' or 'en' based on the imported LANG variable.
 function _getAchLang() {
-    return (typeof LANG !== 'undefined' && LANG === 'de') ? 'de' : 'en';
+    return (LANG === 'de') ? 'de' : 'en';
 }
 
 // _pickLang - picks the correct localised string from an object that has
@@ -116,6 +117,7 @@ function _getHighestUnlockedTierIndex(def) {
 
 // _drainAchToastQueue - shows the next queued toast if none is currently visible.
 //   Called after every toast is dismissed and after a new entry is pushed.
+//   achievements.js pushes to _achToastQueue and schedules this directly.
 export function _drainAchToastQueue() {
     if (_achToastBusy || !_achToastQueue.length) return;
     const { def, tier } = _achToastQueue.shift();
@@ -174,14 +176,7 @@ function _showAchToast(def, tier) {
     requestAnimationFrame(() => el.classList.add('show'));
     setTimeout(() => _dismissAchToast(el), 5000);
 
-    globalThis.Audio_Manager.playSFX('achievement'); // audio module (Phase 3 step 1)
-}
-
-// showAchievementToast - public entry point.
-//   Enqueues a toast and starts draining the queue if nothing is currently shown.
-export function showAchievementToast(def, tier) {
-    _achToastQueue.push({ def, tier });
-    setTimeout(_drainAchToastQueue, 0);
+    globalThis.Audio_Manager.playSFX('achievement'); // bridge: audio.js reaches achievements.js (cycle)
 }
 
 
@@ -200,10 +195,6 @@ function _countCategoryTiers(defs) {
 function _countTotalTiers() {
     return _countCategoryTiers(ACHIEVEMENT_DEFS);
 }
-
-// _countTotalAchievements - total number of achievement definitions (tiers ignored).
-
-// _countFullyUnlockedAchievements - number of defs where every tier has been earned.
 
 // _countCategoryUnlocked - total unlocked tier count across all defs in one category.
 function _countCategoryUnlocked(defs) {
@@ -258,7 +249,7 @@ function _buildTierDotsHtml(def, lang) {
         const unlocked = _isTierUnlocked(def, ti);
         const tierLabel = _pickLang(tier, 'label', lang);
         const stateClass = unlocked ? 'earned' : 'locked';
-        const _tip = globalThis._tipAttr; // core binding (tooltips-hud.js)
+        const _tip = globalThis._tipAttr; // bridge: tooltips-hud.js reaches achievements.js (cycle)
         return `<span class="ach-tier-dot ${stateClass}" data-tip="${_tip(tierLabel)}" aria-label="${_tip(tierLabel)}">●</span>`;
     }).join('');
 }
@@ -291,12 +282,6 @@ function _buildCardProgressHtml(def, highestUnlocked, currentVal, lang) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// _buildProgressBlockHtml - returns the HTML for a single labelled progress bar block.
-//   Used twice inside the overall header (once for achievements, once for milestones).
-
-// _buildHeaderHtml - renders the overall progress header with two side-by-side bars:
-//   left = fully completed achievements, right = total milestone tiers unlocked.
-
 // _buildCardHtml - returns the full HTML for a single achievement card,
 //   including icon, name, description, tier dots, earned label, and progress bar.
 function _buildCardHtml(def, lang) {
@@ -325,8 +310,6 @@ function _buildCardHtml(def, lang) {
         </div>`;
 }
 
-// _buildCategoryHtml - returns the HTML for one full category section
-//   (header strip + card grid). Returns an empty string if the category is empty.
 
 
 
@@ -388,12 +371,12 @@ export function showAchievements() {
     _achView = 'overview';
     _achCurrentCategory = null;
     buildAchievementsScreen();
-    globalThis.showModal('achievements-modal'); // core binding (screens.js)
+    globalThis.showModal('achievements-modal'); // bridge: screens.js reaches achievements.js (cycle)
 }
 
-// openAchCategory - shows all achievements of one category inside the
+// _openAchCategory - shows all achievements of one category inside the
 //   achievements screen (the per-category detail view).
-export function openAchCategory(catKey) {
+function _openAchCategory(catKey) {
     _achView = 'category';
     _achCurrentCategory = catKey;
     buildAchievementsScreen();
@@ -422,7 +405,7 @@ document.addEventListener('click', (e) => {
     }
     const card = e.target.closest('.ach-cat-card');
     if (card && card.dataset.cat) {
-        openAchCategory(card.dataset.cat);
+        _openAchCategory(card.dataset.cat);
     }
 });
 document.addEventListener('keydown', (e) => {
@@ -430,7 +413,7 @@ document.addEventListener('keydown', (e) => {
     const card = e.target.closest?.('.ach-cat-card');
     if (card && card.dataset.cat) {
         e.preventDefault();
-        openAchCategory(card.dataset.cat);
+        _openAchCategory(card.dataset.cat);
     }
 });
 
@@ -530,7 +513,6 @@ function _buildCategoryDetailHtml(catKey, lang) {
     if (!cat) return '';
 
     const defs = _groupDefsByCategory()[catKey] || [];
-    _pickLang(cat, 'label', lang);
     const totalTiers = _countCategoryTiers(defs);
     const unlockedTiers = _countCategoryUnlocked(defs);
     const pct = _calcProgressPct(unlockedTiers, totalTiers);
@@ -563,8 +545,8 @@ export function showAchResetModal() {
     document.getElementById('ach-reset-modal').style.display = 'flex';
 }
 
-// hideAchResetModal - closes the achievement-reset confirmation modal.
-export function hideAchResetModal() {
+// _hideAchResetModal - closes the achievement-reset confirmation modal.
+function _hideAchResetModal() {
     document.getElementById('ach-reset-modal').style.display = 'none';
 }
 
@@ -575,7 +557,7 @@ export function hideAchResetModal() {
 //------------------------------------------------------------------------
 (function _bindAchResetModalButtons() {
     const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
-    on('ach-reset-close', hideAchResetModal);
-    on('ach-reset-confirm', () => { hideAchResetModal(); _doResetAchievements(); });
-    on('ach-reset-cancel', hideAchResetModal);
+    on('ach-reset-close', _hideAchResetModal);
+    on('ach-reset-confirm', () => { _hideAchResetModal(); _doResetAchievements(); });
+    on('ach-reset-cancel', _hideAchResetModal);
 })();
