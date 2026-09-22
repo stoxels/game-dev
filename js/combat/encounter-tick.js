@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _egGetMonsterChargeMultiplier, _egGetPlayerChargeMultiplier, _egPlayerStatuses, _egPuzzleEffects, _egRefreshPlayerStatusIcons, _egTickAilments } from './combat-ailments.js';
 import { _egEndMapDefeated } from './encounter-chain.js';
@@ -119,9 +120,11 @@ export function _egIsPlayerChargePaused() {
 }
 
 // Advances the player's melee charge bar (Secret-of-Mana-style). The bar
-// charges over time up to 100% and STAYS full until spent by a manual
-// melee strike (E) - there are no automatic attacks. The full-charge time
-// comes from the equipped weapon (see _egGetPlayerAttackInterval).
+// fills ONLY while the attack key is HELD (see _egMeleeBeginHold in
+// endgame-weapon-swing.js) and the strike is released with the key -
+// tapping E gives a weak poke, holding charges toward 100% and STAYS full
+// until released. The full-charge time comes from the equipped weapon (see
+// _egGetPlayerAttackInterval).
 // OVERCHARGE: past 100% the bar keeps filling up to EG_MELEE_OVERCHARGE_RATIO
 // (200%) - a strike released above the cap deals proportionally more damage
 // (150% charge = 1.5x hit, 200% = 2x). Rewards patience over spam-tapping.
@@ -140,12 +143,28 @@ export function _egTickPlayer() {
     // half speed (see _egGetPlayerChargeMultiplier in endgame-ailments.js).
     const chargeMult = (typeof _egGetPlayerChargeMultiplier === 'function') ? _egGetPlayerChargeMultiplier() : 1;
     if (chargeMult <= 0) return;
+    // Hold-to-charge: no held attack key, no charge. This is what stops
+    // holding E from machine-gunning weak strikes - the key down starts the
+    // charge, the key UP fires it (see combat-weapon-swing.js).
+    if (!globalThis._egMeleeHoldActive) return;
     const max = (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : 0;
     if (!max || max <= 0) return;
     // Charge past full into OVERCHARGE (up to EG_MELEE_OVERCHARGE_RATIO) and
-    // hold there until a manual strike spends it.
+    // hold there until the release strike spends it.
     const overchargeCap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
     globalThis._egPlayerCurrentCharge = Math.min(max * overchargeCap, globalThis._egPlayerCurrentCharge + 0.1 * chargeMult); // Ticks at 10Hz
+    // Charge-level feedback: crossing 100% / 150% / cap plays a rising tick
+    // so holding through multiple levels feels like charging up.
+    try {
+        const pct = globalThis._egPlayerCurrentCharge / max;
+        const level = pct >= overchargeCap - 0.001 ? 3 : pct >= 1.5 ? 2 : pct >= 1 ? 1 : 0;
+        if (level > (globalThis._egMeleeChargeLevel || 0)) {
+            globalThis._egMeleeChargeLevel = level;
+            if (typeof Audio_Manager !== 'undefined' && Audio_Manager && typeof Audio_Manager.playSFX === 'function') {
+                Audio_Manager.playSFX('drifterLevelUp');
+            }
+        }
+    } catch (e) {}
 }
 
 // ── Hold-parry charge pause - freeze own melee charge bar while held ───────

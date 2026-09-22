@@ -6,7 +6,7 @@ import { _incDirect, questStat_revealItemUsed } from '../../inference/inference-
 import { t } from '../../translation/translations.js';
 import { _applyCellEffect } from '../../puzzle-mechanics/cell-fx.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeItemIcon, _fxMakeRing, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
 import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
@@ -180,7 +180,7 @@ export function _fxSurveyScope() {
     });
 
     // Lens icon popping at the centre
-    _fxMakeIcon(r.wrap, '🔬', cx, cy, 54, 'animation:fx-scope-lens 1.2s ease-out forwards;', 1400);
+    _fxMakeItemIcon(r.wrap, 'surveyScope', '🔬', cx, cy, 54, 'animation:fx-scope-lens 1.2s ease-out forwards;', 1400);
 
     Audio_Manager.playSFX('scanner');
 }

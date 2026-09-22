@@ -346,7 +346,6 @@
     text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }
 .mod-title-gray { color: #c9ccd1; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-.mod-icon-super-tutor { font-family: var(--PX); font-size: 54px; display: flex; align-items: center; justify-content: center; }
 
 /* Score tag under the slab */
 .mod-score-tag {
@@ -377,12 +376,36 @@
     display: block;
 }
 
-/* BETA TEST ONLY: Super Tutor is temporary, anchored on the right page */
-.setup-super-tutor-wrapper {
-    position: absolute;
-    right: -13%;
-    top: 40%;
-    z-index: 5;
+/* =========================================================================
+   FLOATING MODIFIER FIGURES (outside the tombstone row)
+   MONSTERLESS - the abyss boss stands up-left of the Time Trial tombstone.
+   SUPER TUTOR (BETA TEST ONLY) - the tutorial Professor stands on the right
+   at the same height. ALL BASE STYLING IS INLINE on the two buttons in
+   index.html: a stale/missed stylesheet used to leave them as default white
+   buttons with natural-size (huge) art. The active states (red cross over
+   the boss, yellow border on the Professor) are mirrored as inline styles
+   by syncDiffModButtons() in difficulty-modifiers.js, so they render even
+   if this sheet never loads. Only progressive polish lives here.
+   ========================================================================= */
+.setup-fig:hover {
+    transform: scale(1.06);
+    filter: brightness(1.15) drop-shadow(0 0 14px rgba(255,255,255,0.35));
+}
+
+/* Title banner above each figure - reuses the tombstone .mod-title plate
+   (position/offset come inline in index.html). The plate carries its own
+   light stone texture, so the dark/gold/grey label text stays readable even
+   where the figures stand outside the parchment on the dark backdrop; the
+   drop-shadow separates the plate from the scene behind it. */
+.setup-fig-title {
+    z-index: 7;
+    pointer-events: none;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6));
+}
+
+.setup-fig:focus-visible {
+    outline: 2px dashed var(--accent2, #66fcf1);
+    outline-offset: 4px;
 }
 
 /* =========================================================================

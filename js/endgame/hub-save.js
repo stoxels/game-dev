@@ -143,7 +143,7 @@ export function _egShowHandMigrationToast(moves) {
                 const mainNm = (_egEquipped.weapon1 && _egEquipped.weapon1.name) || '?';
                 let tpl = null;
                 try { const s = t('eg_migrate_offhand_two_handed'); if (s && s !== 'eg_migrate_offhand_two_handed') tpl = s; } catch (e) {}
-                msg = (tpl || '⚠️ {off} moved to your stash - {main} is two-handed and needs a free off-hand')
+                msg = (tpl || '⚠️ {off} moved to your stash - {main} is a Heavy Weapon and needs a free off-hand')
                     .replace('{off}', nm).replace('{main}', mainNm);
             } else {
                 let tpl = null;

@@ -107,11 +107,75 @@ export function togMod(btn) {
 
 // Refreshes the .sel / .sel-yellow highlighting of every difficulty and
 // modifier button on the page from the current curDiff / curMods state.
+// The two setup-screen figures (monsterless boss, super-tutor Professor)
+// carry their BASE styling inline in index.html, so a stale/missed cache of
+// setup-screen.css can no longer leave them as default white buttons with
+// natural-size art. Their ACTIVE visuals are mirrored as inline styles here
+// (red cross over the boss / yellow border on the Professor) for the same
+// reason: they render even when the stylesheet never arrives.
+
+// Self-healing copy of the base inline styles. syncDiffModButtons() re-applies
+// anything missing, so even a stale cached page (old markup without the
+// inline styles) renders the figures correctly as soon as fresh JS runs.
+// Idempotent: it only fills gaps and never fights the active-state mirror.
+const SETUP_FIG_BASE = {
+    '.setup-fig-monsterless': {
+        btn: 'position:absolute; left:-10%; top:16%; width:190px; height:190px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0;',
+        img: 'display:block; width:170px; height:170px; object-fit:contain; pointer-events:none;',
+        cross: 'position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:125px; font-weight:bold; color:#e02c2c; text-shadow:0 0 18px rgba(224,44,44,0.85), 0 3px 6px rgba(0,0,0,0.7); pointer-events:none; line-height:1; opacity:0; transform:scale(0.4) rotate(-12deg); transition:opacity .15s ease, transform .25s cubic-bezier(.2,2,.4,1);',
+        title: 'position:absolute; top:-46px; left:50%; transform:translateX(-50%);'
+    },
+    '.setup-fig-super-tutor': {
+        btn: 'position:absolute; right:-10%; top:16%; width:145px; height:224px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0;',
+        img: 'display:block; width:132px; height:212px; object-fit:contain; pointer-events:none; border-radius:12px; outline:4px solid transparent; outline-offset:2px;',
+        title: 'position:absolute; top:-46px; left:50%; transform:translateX(-50%);'
+    }
+};
+
+function _ensureSetupFigBaseStyles() {
+    for (const sel of Object.keys(SETUP_FIG_BASE)) {
+        const base = SETUP_FIG_BASE[sel];
+        const btn = document.querySelector(sel);
+        if (!btn) continue;
+        if (!btn.style.position) btn.style.cssText += base.btn;
+        const img = btn.querySelector('.setup-fig-img');
+        if (img && !img.style.width) img.style.cssText += base.img;
+        const cross = btn.querySelector('.setup-fig-cross');
+        if (cross && !cross.style.position) cross.style.cssText += base.cross;
+        const title = btn.querySelector('.setup-fig-title');
+        if (title && !title.style.position) title.style.cssText += base.title;
+    }
+}
+
 export function syncDiffModButtons() {
+    _ensureSetupFigBaseStyles();
     document.querySelectorAll('[data-diff]').forEach(b =>
         b.classList.toggle('sel', b.dataset.diff === curDiff));
     document.querySelectorAll('[data-mod]').forEach(b =>
         b.classList.toggle('sel-yellow', !!curMods[b.dataset.mod]));
+
+    // BETA figure mirror - inline-style fallback for the setup-screen figures.
+    const mlBtn = document.querySelector('.setup-fig-monsterless');
+    if (mlBtn) {
+        const active = !!curMods.monsterless;
+        const cross = mlBtn.querySelector('.setup-fig-cross');
+        const img = mlBtn.querySelector('.setup-fig-img');
+        if (cross) {
+            if (!cross.style.opacity) cross.style.opacity = '0'; // hidden by default
+            cross.style.opacity = active ? '1' : '0';
+            cross.style.transform = active ? 'scale(1) rotate(-6deg)' : 'scale(0.4) rotate(-12deg)';
+        }
+        if (img) img.style.filter = active ? 'grayscale(0.55) brightness(0.75)' : '';
+    }
+    const stBtn = document.querySelector('.setup-fig-super-tutor');
+    if (stBtn) {
+        const active = !!curMods.superTutor;
+        const img = stBtn.querySelector('.setup-fig-img');
+        if (img) {
+            img.style.outlineColor = active ? '#f5c518' : 'transparent';
+            img.style.filter = active ? 'drop-shadow(0 0 14px rgba(245,197,24,0.65))' : '';
+        }
+    }
 }
 
 

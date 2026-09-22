@@ -4,7 +4,7 @@ import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
 import { t } from '../translation/translations.js';
 import { playItemEffect } from './item-fx-dispatcher.js';
 import { _calcMarkWrongCount } from '../puzzle-mechanics/effect-modifiers.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxOverlay, _fxSpawnParticles } from '../puzzle-mechanics/fx-helpers.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeItemIcon, _fxOverlay, _fxSpawnParticles } from '../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------MARK WRONG ITEMS---------------------------------------
@@ -65,21 +65,11 @@ export function _fxEraser() {
 
 // Helper: spawns the broom icon that slides right-to-left across the grid.
 function _fxMakeBroom(wrap, r) {
-    const broom = document.createElement('div');
-    broom.className = 'fx-sweeper-icon';
-    broom.textContent = '🧹';
-    broom.style.cssText = `
-        position:absolute;
-        top:${r.top + r.height / 2 - 24}px;
-        left:${r.right + 20}px;
-        font-size:44px;
-        pointer-events:none; z-index:${FX_Z.above};
-        animation:fx-sweeper-broom 0.85s cubic-bezier(.3,1.3,.6,1) forwards;
-        --broom-start:${r.right + 20}px;
-        --broom-end:${r.left - 50}px;
-    `;
-    wrap.appendChild(broom);
-    setTimeout(() => broom.remove(), 1100);
+    // item art instead of the 🧹 emoji; the sweep animation lives on the
+    // wrapper (translateX only) so it works identically for both looks
+    _fxMakeItemIcon(wrap, 'markWrong4', '🧹', r.right + 20, r.top + r.height / 2 - 24, 44,
+        `z-index:${FX_Z.above}; animation:fx-sweeper-broom 0.85s cubic-bezier(.3,1.3,.6,1) forwards;`
+        + ` --broom-start:${r.right + 20}px; --broom-end:${r.left - 50}px;`, 1100);
 }
 
 // Helper: spawns dust particle divs staggered across the broom's path.
@@ -117,19 +107,13 @@ function _fxMakeMagnetIcon(wrap, r) {
     const magnetX = r.left + r.width / 2;
     const magnetY = r.top - 10;
 
-    const magnet = document.createElement('div');
-    magnet.className = 'fx-magnet-icon';
-    magnet.textContent = '🧲';
-    magnet.style.cssText = `
-        position:absolute;
-        left:${magnetX}px; top:${r.top - 40}px;
-        font-size:52px; transform:translateX(-50%);
-        pointer-events:none; z-index:${FX_Z.high};
-        animation:fx-magnet-drop 0.45s cubic-bezier(.2,1.5,.5,1) forwards;
-        --magnet-land:${magnetY}px;
-    `;
-    wrap.appendChild(magnet);
-    setTimeout(() => magnet.remove(), 1700);
+    // item art instead of the 🧲 emoji; the drop animation animates
+    // translateX/translateY on the wrapper — the art helper centers with
+    // translate(-50%,-50%), and the keyframes' translateX(-50%) matches
+    // that x-centering, so the drop lands exactly like before
+    _fxMakeItemIcon(wrap, 'markWrong6', '🧲', magnetX, r.top - 40, 52,
+        `z-index:${FX_Z.high}; animation:fx-magnet-drop 0.45s cubic-bezier(.2,1.5,.5,1) forwards;`
+        + ` --magnet-land:${magnetY}px;`, 1700);
 
     return { magnetX, magnetY };
 }
@@ -172,19 +156,9 @@ export function _fxErrorMagnet() {
 
 // Helper: creates the large centered gem icon with burst animation.
 function _fxMakeGemIcon(wrap, cx, cy) {
-    const gem = document.createElement('div');
-    gem.className = 'fx-gem-pulse';
-    gem.textContent = '💎';
-    gem.style.cssText = `
-        position:absolute;
-        left:${cx}px; top:${cy}px;
-        transform:translate(-50%,-50%);
-        font-size:64px;
-        pointer-events:none; z-index:${FX_Z.high};
-        animation:fx-gem-burst 1.2s ease-out forwards;
-    `;
-    wrap.appendChild(gem);
-    setTimeout(() => gem.remove(), 1400);
+    // item art instead of the 💎 emoji
+    _fxMakeItemIcon(wrap, 'markWrong8', '💎', cx, cy, 64,
+        `z-index:${FX_Z.high}; animation:fx-gem-burst 1.2s ease-out forwards;`, 1400);
 }
 
 // 💎 Error Gem - gem pulses, then showers coloured sparkles top-down.

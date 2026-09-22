@@ -6,7 +6,7 @@ import { FREEZE_DURATION_MS } from '../freeze/freeze.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../../timer/timer-adjust.js';
 import { _calcAddTimeSecs } from '../../puzzle-mechanics/effect-modifiers.js';
-import { CHRONOBOLT_X_FRACTIONS, FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, playFreezeCountdownOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { CHRONOBOLT_X_FRACTIONS, FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeItemIcon, _fxOverlay, playFreezeCountdownOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE------------------------------------
@@ -94,21 +94,11 @@ export function _fxHourglass() {
     Audio_Manager.playSFX('hourglass');
 }
 
-// _fxMakeHourglassIcon - helper: creates the large hourglass icon with spin
-// animation.
+// _fxMakeHourglassIcon - helper: creates the large hourglass icon (item art
+// with emoji fallback) with spin animation.
 function _fxMakeHourglassIcon(wrap, cx, cy) {
-    const hg = document.createElement('div');
-    hg.className = 'fx-hourglass-icon';
-    hg.textContent = '⏳';
-    hg.style.cssText = `
-        position:absolute;
-        left:${cx}px; top:${cy}px;
-        transform:translate(-50%,-50%);
-        font-size:56px; pointer-events:none; z-index:${FX_Z.high};
-        animation:fx-hourglass-spin 1s ease-in-out forwards;
-    `;
-    wrap.appendChild(hg);
-    setTimeout(() => hg.remove(), 1600);
+    _fxMakeItemIcon(wrap, 'addTime60', '⏳', cx, cy, 56,
+        `z-index:${FX_Z.high}; animation:fx-hourglass-spin 1s ease-in-out forwards;`, 1600);
 }
 
 // _fxMakeSandParticles - helper: spawns sand grain particles falling from the
@@ -140,7 +130,7 @@ export function _fxStopwatch() {
     const maxSize = Math.max(r.width, r.height) * 0.7;
 
     _fxMakeTimeRings(overlay, cx, cy, 4, maxSize);
-    _fxMakeIcon(r.wrap, '⏱️', cx, cy, 42, 'animation:fx-icon-pop 0.6s ease-out forwards;', 900);
+    _fxMakeItemIcon(r.wrap, 'addTime300', '⏱️', cx, cy, 42, 'animation:fx-icon-pop 0.6s ease-out forwards;', 900);
 
     Audio_Manager.playSFX('stopwatch');
 }
@@ -180,7 +170,7 @@ export function _fxChronobolt() {
     // Large ⚡ icon that flashes at the centre
     const cx = r.left + r.width / 2;
     const cy = r.top + r.height / 2;
-    _fxMakeIcon(r.wrap, '⚡', cx, cy, 72, `z-index:${FX_Z.supreme}; animation:fx-bolt-icon 0.5s ease-out forwards;`, 800);
+    _fxMakeItemIcon(r.wrap, 'addTime900', '⚡', cx, cy, 72, `z-index:${FX_Z.supreme}; animation:fx-bolt-icon 0.5s ease-out forwards;`, 800);
 
     Audio_Manager.playSFX('chronobolt');
 }

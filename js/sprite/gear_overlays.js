@@ -39,9 +39,11 @@ const SPRITES_DATA = DATA.sprites || {};
 const HANDEDNESS = DATA.handedness || {};
 const TWO_HANDED = new Set(DATA.twoHandedIds || []);
 
-// The three avatar sprite <img> elements the game animates (full avatar on
-// monster levels, simple avatar on puzzle levels, map-view world sprite).
-const SPRITE_IMG_IDS = ['avatar-sprite-img', 'avatar-sprite-img-simple', 'mv-sprite-img'];
+// The four avatar sprite <img> elements the game animates (full avatar on
+// monster levels, simple avatar on puzzle levels, SELECT LEVEL map-view
+// world sprite, world-detail sprite on world screens like Probability
+// Peaks — wd-sprite-img walks to level nodes there and needs gear too).
+const SPRITE_IMG_IDS = ['avatar-sprite-img', 'avatar-sprite-img-simple', 'mv-sprite-img', 'wd-sprite-img'];
 
 const POLL_MS = 250;   // attachment sweep (observers give instant frame sync)
 const FRONT_Z = 3;     // above the static body img
@@ -268,6 +270,23 @@ function bodyDrawRect(img) {
 }
 
 function isMirrored(img) {
+    // The overworld map screens (SELECT LEVEL map-view + world detail)
+    // mirror omni fallback art with the CSS `scale` property
+    // (img.style.scale = '-1 1', see screens-map-view.js /
+    // screens-world-levels.js), NOT `transform` — detect that flip first.
+    // getPropertyValue covers engines where `style.scale` isn't a named
+    // accessor; a leading '-' on the first scale factor means mirrored.
+    const inlineScale = img.style
+        && (img.style.scale
+            || (typeof img.style.getPropertyValue === 'function'
+                && img.style.getPropertyValue('scale')))
+        || '';
+    if (typeof inlineScale === 'string' && /(^|\s)-/.test(inlineScale)) return true;
+    try {
+        const cs = img.ownerDocument.defaultView.getComputedStyle(img);
+        if (cs && typeof cs.scale === 'string' && cs.scale !== 'none'
+            && /(^|\s)-/.test(cs.scale)) return true;
+    } catch (e) { /* keep inline-only result */ }
     const inline = img.style && img.style.transform;
     if (inline && inline.indexOf('-1') !== -1) return true;
     if (inline && inline.indexOf('scaleX(1)') !== -1) return false;
@@ -474,4 +493,4 @@ startGearOverlays();
 
 // Exported for the test suite and future consumers (the game itself only
 // uses this module's side effects).
-export { sweep as gearOverlaysSweep, parseAnimSrc as _parseAnimSrc, framesFor as _framesFor, readLoadout as _readLoadout, stopGearOverlays };
+export { sweep as gearOverlaysSweep, parseAnimSrc as _parseAnimSrc, framesFor as _framesFor, readLoadout as _readLoadout, stopGearOverlays, isMirrored as _isMirrored, SPRITE_IMG_IDS as _SPRITE_IMG_IDS };

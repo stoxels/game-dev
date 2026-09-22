@@ -138,8 +138,9 @@ function _updateAvatarBarStack() {
         }
     }
 
-    // Manual melee charge - fills toward 100% during combat and holds until
-    // an E strike spends it. On puzzle levels the charge stays parked at 0.
+    // Manual melee charge - fills while the attack key is held, toward 100%
+    // and into overcharge during combat, and holds until the release strike
+    // spends it. On puzzle levels the charge stays parked at 0.
     const chargeFill = document.getElementById('avatar-charge-fill');
     if (chargeFill) {
         const chargeCur = (typeof _egPlayerCurrentCharge === 'number') ? globalThis._egPlayerCurrentCharge : 0;

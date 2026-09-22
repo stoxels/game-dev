@@ -916,6 +916,16 @@
     }
 }
 
+/* Pickup art inside the transient claim/destroy animations: sized to the
+   surrounding emoji type so the art pops exactly where the glyph used to. */
+.eg-pickup-floater img.eg-art-img,
+.eg-pickup-broken-shard img.eg-art-img {
+    width: 1.6em;
+    height: 1.6em;
+    object-fit: contain;
+    pointer-events: none;
+}
+
 
 
 /* ── The Overfitter feedback ───────────────────────────────────────────── */

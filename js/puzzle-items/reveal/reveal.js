@@ -4,7 +4,7 @@ import { questStat_revealItemUsed } from '../../inference/inference-stats.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _calcRevealCount } from '../../puzzle-mechanics/effect-modifiers.js';
-import { FX_Z, _fxGetPuzzleRect, _fxMakeIcon, _fxMakeRing, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeItemIcon, _fxMakeRing, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 
 //------------------------------------------------------------------------
 //-------------------REVEAL - CANDLE / MAGNIFIER / SPYGLASS / SCANNER----------------------
@@ -50,7 +50,7 @@ export function _fxCandle() {
     _fxCandleGlow(overlay, cx, cy);
 
     // Floating flame icon rising from grid top
-    _fxMakeIcon(r.wrap, '🕯️', cx, r.top, 48, 'animation:fx-candle-flame 2s ease-out forwards;', 2000);
+    _fxMakeItemIcon(r.wrap, 'reveal1', '🕯️', cx, r.top, 48, 'animation:fx-candle-flame 2s ease-out forwards;', 2000);
 
     Audio_Manager.playSFX('candle');
 }
@@ -60,21 +60,12 @@ export function _fxMagnifier() {
     const r = _fxGetPuzzleRect();
     if (!r) return;
 
-    const lens = document.createElement('div');
-    lens.className = 'fx-magnifier-lens';
-    lens.textContent = '🔍';
-    lens.style.cssText = `
-        position:absolute;
-        top:${r.top + r.height / 2 - 28}px;
-        left:${r.left - 40}px;
-        font-size:48px;
-        pointer-events:none;
-        z-index:${FX_Z.above};
-        animation:fx-magnifier-slide 0.8s cubic-bezier(.3,1.4,.6,1) forwards;
-        --slide-end:${r.right + 20}px;
-    `;
-    r.wrap.appendChild(lens);
-    setTimeout(() => lens.remove(), 1000);
+    // item art instead of the 🔍 emoji; the slide keyframes drive `left`
+    // and a scale/rotate transform on the wrapper, so top-left anchoring
+    // matches the old emoji div exactly
+    _fxMakeItemIcon(r.wrap, 'reveal2', '🔍', r.left - 40, r.top + r.height / 2 - 28, 48,
+        `z-index:${FX_Z.above}; animation:fx-magnifier-slide 0.8s cubic-bezier(.3,1.4,.6,1) forwards;`
+        + ` --slide-end:${r.right + 20}px;`, 1000);
 
     Audio_Manager.playSFX('magnifier');
 }

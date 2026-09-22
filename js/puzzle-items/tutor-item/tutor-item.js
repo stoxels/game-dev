@@ -6,7 +6,7 @@ import { addTimeSecs } from '../../timer/timer-adjust.js'; // (map-run "% less T
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _calcTutorItemCount } from '../../puzzle-mechanics/effect-modifiers.js';
-import { TUTOR_ITEM_SFX, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { TUTOR_ITEM_SFX, _fxGetPuzzleRect, _fxMakeItemIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
@@ -89,5 +89,5 @@ export function _fxTutorItem(defId) {
 
     const overlay = _fxOverlay(r.wrap, 1300);
     _fxMakeChalkSmears(overlay, r);
-    _fxMakeIcon(r.wrap, '🎓', cx, cy, 56, 'animation:fx-icon-pop 0.6s ease-out forwards;', 900);
+    _fxMakeItemIcon(r.wrap, defId, '🎓', cx, cy, 56, 'animation:fx-icon-pop 0.6s ease-out forwards;', 900);
 }

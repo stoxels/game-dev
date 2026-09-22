@@ -53,6 +53,38 @@ export const CHARM_ORB_DAMAGE_PCT = 1;
 // Charm item glyph. The rank is drawn as a badge on top of it.
 export const CHARM_BASE_ICON = '💫';
 
+// Charm drop art (images/items/charms/): one folder per school, one tier
+// file per rank. Rank r uses tier r (ranks run 1-10 today; tiers 11-16 wait
+// for future ranks). Tiers 1-9 and 16 share their names across schools,
+// tiers 10-15 carry the school's own word. Skills without a mapped school
+// keep the emoji glyph - the markup falls back automatically so unmapped
+// drops never render a broken image.
+const CHARM_ART_TIER_BASE = ['clay', 'wooden', 'copper', 'iron', 'steel', 'soldiers', 'silvered', 'golden', 'runed'];
+const CHARM_ART_TIER_MID = {
+    arcane: ['mana', 'spellstorm', 'elder', 'manawyrm', 'stormweave', 'darkweave'],
+    cold: ['frost', 'blizzard', 'glacier', 'frostwyrm', 'stormfrost', 'voidfrost'],
+    defensive: ['bulwark', 'aegis', 'bastion', 'gargoyle', 'stormwall', 'dreadnought'],
+    fire: ['ember', 'inferno', 'phoenix', 'dragonfire', 'stormfire', 'voidfire'],
+    movement: ['swift', 'gale', 'zephyr', 'pegasus', 'stormwing', 'phantom'],
+    nature: ['thorn', 'wilds', 'eldergrove', 'treant', 'stormwild', 'blight'],
+    physical: ['brawn', 'warlord', 'titan', 'behemoth', 'stormfist', 'ruin'],
+    shadow: ['gloom', 'nightmare', 'eclipse', 'nightwyrm', 'stormshade', 'abyss'],
+    summon: ['familiar', 'pack', 'alpha', 'direwolf', 'stormcall', 'dreadhowl'],
+};
+const CHARM_ART_SCHOOL_BY_SKILL = { fireball: 'fire' };
+
+// Art URL for a charm, or null when the skill has no mapped school (the
+// callers fall back to the emoji glyph in that case).
+export function _charmArtUrl(skillId, rank) {
+    const school = CHARM_ART_SCHOOL_BY_SKILL[skillId];
+    if (!school || !CHARM_ART_TIER_MID[school]) return null;
+    const r = Math.max(1, Math.min(16, Number(rank) || 1));
+    const tierName = r <= 9 ? CHARM_ART_TIER_BASE[r - 1]
+        : r === 16 ? 'godforged' : CHARM_ART_TIER_MID[school][r - 10];
+    if (!tierName) return null;
+    return `images/items/charms/charms_${school}/charms_${school}_${String(r).padStart(2, '0')}_${tierName}.webp`;
+}
+
 // Monster drop tuning (mirrors the loot-drop constants in
 // endgame-grid-pickups.js).
 export const CHARM_DROP_CHANCE_NORMAL = 0.15;   // per normal monster kill
@@ -790,12 +822,17 @@ export function getCharmCastingDamageMult() {
 //-----------------------SPELLBOOK PANEL RENDER---------------------------
 //------------------------------------------------------------------------
 
-// Small inline icon: the charm glyph with its rank badge on top.
+// Small inline icon: the charm art (or the emoji glyph when the skill has
+// no mapped art) with its rank badge on top.
 export function _charmIconMarkup(charm, extraClass) {
     if (!charm) return '';
     const cls = extraClass ? ` ${extraClass}` : '';
+    const art = _charmArtUrl(charm.skillId, charm.rank);
+    const glyph = art
+        ? `<img class="charm-art" src="${art}" alt="" draggable="false">`
+        : `<span class="charm-glyph">${CHARM_BASE_ICON}</span>`;
     return `<span class="charm-icon${cls}">`
-        + `<span class="charm-glyph">${CHARM_BASE_ICON}</span>`
+        + glyph
         + `<span class="charm-rank-badge">${charm.rank}</span>`
         + `</span>`;
 }
@@ -1365,14 +1402,18 @@ export function _charmRemoveOverlay(key) {
     if (span) span.remove();
 }
 
-// Small pop animation when a charm is claimed.
+// Small pop animation when a charm is claimed - the charm art when mapped,
+// else the emoji glyph (mirrors _charmIconMarkup).
 export function _charmAnimateClaim(row, col, charm) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el || typeof globalThis._egGetElementCentre !== 'function') return;
     const centre = globalThis._egGetElementCentre(el);
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater charm-floater';
-    floater.textContent = CHARM_BASE_ICON;
+    const art = charm && _charmArtUrl(charm.skillId, charm.rank);
+    floater.innerHTML = art
+        ? `<img src="${art}" alt="" class="eg-art-img" draggable="false">`
+        : CHARM_BASE_ICON;
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);
@@ -1419,7 +1460,7 @@ export function _charmDiscardDrop(row, col) {
     _egCharmDrops.delete(key);
     _charmRemoveOverlay(key);
     if (typeof globalThis._egAnimatePickupDiscard === 'function') {
-        try { globalThis._egAnimatePickupDiscard(row, col, { emoji: CHARM_BASE_ICON }); } catch (e) { /* anim best-effort */ }
+        try { globalThis._egAnimatePickupDiscard(row, col, { emoji: CHARM_BASE_ICON, artUrl: charm && _charmArtUrl(charm.skillId, charm.rank) }); } catch (e) { /* anim best-effort */ }
     }
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
         try { Audio_Manager.playSFX('player_equip_not_pickup'); } catch (e) { /* audio best-effort */ }

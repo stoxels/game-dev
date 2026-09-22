@@ -1818,7 +1818,7 @@ export function _egDiscardMapDrop(row, col) {
     _egMapDrops.delete(key);
     _egRemoveMapDropOverlay(key);
     if (typeof _egAnimatePickupDiscard === 'function') {
-        _egAnimatePickupDiscard(row, col, { emoji: map.icon || '🗺️' });
+        _egAnimatePickupDiscard(row, col, { emoji: map.icon || '🗺️', artId: EG_ART.artIdForItem(map) });
     }
     Audio_Manager.playSFX('player_equip_not_pickup');
 }

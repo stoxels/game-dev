@@ -2,7 +2,7 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _resolveCursedRowErasureDownside } from '../../puzzle-mechanics/cursed-downside.js';
-import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeItemIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { solveRows } from '../../puzzle-mechanics/grid-actions.js';
 import { _getPreFilledRows } from '../../puzzle-mechanics/puzzle-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
@@ -59,7 +59,7 @@ export function _fxTidalWave() {
         setTimeout(() => _fxMakeWave(overlay, r, wave), wave * 280);
     }
 
-    _fxMakeIcon(r.wrap, '🌊', cx, cy, 72,
+    _fxMakeItemIcon(r.wrap, 'cursedRowSolve', '🌊', cx, cy, 72,
         'animation:fx-icon-pop 0.55s ease-out 0.2s forwards; opacity:0;', 1200);
 
     Audio_Manager.playSFX('tidal_wave');

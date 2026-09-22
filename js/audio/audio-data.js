@@ -650,8 +650,6 @@ export const WORLD_BGM = {
 
 export const SFX = {
     // ── UI ───────────────────────────────────────────────
-    click: 'audio/sfx/ui/sfx_click.ogg',
-    back: 'audio/sfx/ui/sfx_back.ogg',
     button: 'audio/sfx/ui/sfx_button.ogg',
     showtoast: 'audio/sfx/ui/sfx_showtoast.ogg',
     questRewardClaimed: 'audio/sfx/ui/sfx_quest_reward_claimed.ogg',

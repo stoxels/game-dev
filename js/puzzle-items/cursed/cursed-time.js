@@ -3,7 +3,7 @@ import { addTimeSecs } from '../../timer/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _resolveCursedBlackoutDownside } from '../../puzzle-mechanics/cursed-downside.js';
-import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeItemIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
 
 //------------------------------------------------------------------------
@@ -60,7 +60,7 @@ export function _fxCursedTime() {
     const cy = r.top + r.height / 2;
 
     _fxMakeFogTendrils(overlay, r);
-    _fxMakeIcon(r.wrap, '💀', cx, cy, 68, 'animation:fx-skull-rise 0.9s ease-out forwards;', 1400);
+    _fxMakeItemIcon(r.wrap, 'cursedTime', '💀', cx, cy, 68, 'animation:fx-skull-rise 0.9s ease-out forwards;', 1400);
 
     Audio_Manager.playSFX('cursed_clock');
 }

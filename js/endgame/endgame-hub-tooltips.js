@@ -61,9 +61,9 @@ export function _egBuildTooltipBodyHTML(item) {
             : item.slotType.charAt(0).toUpperCase() + item.slotType.slice(1))
         : '';
 
-    // ── Weapon hand line (PoE-style): One-Handed / Two-Handed ──────────
-    // Shown directly under the rarity line so the 1H/2H choice - and with it
-    // the shield / dual-wield decision - is visible before equipping.
+    // ── Weapon hand line (PoE-style): One-Handed / Heavy ────────────────
+    // Shown directly under the rarity line so the 1H/heavy choice - and with
+    // it the shield / dual-wield decision - is visible before equipping.
     let handHTML = '';
     if (item.slotType === 'weapon') {
         let hands = (item.hands === 1 || item.hands === 2) ? item.hands : null;
@@ -83,7 +83,7 @@ export function _egBuildTooltipBodyHTML(item) {
             if (!handLabel) {
                 const de = (typeof LANG !== 'undefined' && LANG === 'de');
                 handLabel = hands === 2
-                    ? (de ? 'Zweihandwaffe' : 'Two-Handed Weapon')
+                    ? (de ? 'Schwerwaffe' : 'Heavy Weapon')
                     : (de ? 'Einhandwaffe' : 'One-Handed Weapon');
             }
             handHTML = `<div class="eg-tt-hands">${handLabel}</div>`;

@@ -116,6 +116,15 @@ export function resolveItemMeta(data, id) {
     //                 opposite direction (x negated) when missing.
     //   rotByDir    — per-direction rotation in degrees, same borrowing
     //                 (negated) for the opposite horizontal direction.
+    //   recScale    — recorded VISIBLE scale (width / sprite width). What
+    //                 the item showed at lock time: without it a record
+    //                 that neutralized a per-frame pose would snap the
+    //                 item back to its category/override size.
+    //   recSx       — recorded screen-space squash (scaleX).
+    //   recTint     — recorded brightness. Explicit: survives the back
+    //                 layer's auto-darken that would otherwise repaint a
+    //                 recorded front-layer look when the item renders
+    //                 behind the body.
     //   offset      — legacy direction-independent offset (fallback).
     //   recMirrored — record-mode override: skip the x-negation when the
     //                 opposite direction borrows this record (gear that
@@ -134,6 +143,9 @@ export function resolveItemMeta(data, id) {
                typeof ov.offset[1] === 'number' ? ov.offset[1] : 0]
             : null,
         recMirrored: !!ov.recMirrored,
+        recScale: typeof ov.recScale === 'number' ? ov.recScale : null,
+        recSx: typeof ov.recSx === 'number' ? ov.recSx : null,
+        recTint: typeof ov.recTint === 'number' ? ov.recTint : null,
         scale: fullScale,
         visibleScale: typeof ov.scale === 'number' ? ov.scale : cat.scale,
         rot: typeof ov.rot === 'number' ? ov.rot : (cat.rot || 0),
@@ -345,7 +357,10 @@ export function resolvePlacement(req) {
     const item = resolveItemMeta(data, itemId);
     const role = slot === 'off' ? (req.offRole || 'shield') : 'weapon';
 
-    // ---- resolution chain: pose (per-item edit) → frame cfg → defaults
+    // ---- resolution chain: pose (per-item edit) → frame cfg → item
+    // record (mass-record lock) → defaults. The per-frame entries win over
+    // the recorded ones: a deliberate pose-lab edit on ONE frame must
+    // still be able to override the item-wide record.
     const OPP = { up: 'down', down: 'up', left: 'right', right: 'left' };
     const opp = OPP[dir];
     // Mass-recorded per-item rotation (rotByDir) wins over everything: it
@@ -367,12 +382,19 @@ export function resolvePlacement(req) {
     const rotSrc = dirRot !== null ? dirRot
         : typeof pose.rot === 'number' ? pose.rot
         : (typeof cfg.rot === 'number' ? cfg.rot : defaultRot(dir, role, handed));
+    // scale precedence: pose (deliberate per-item edit — the pose lab's
+    // size slider writes poses) → recScale (what the mass-record locked in;
+    // seeded frames carry a baked-in cfg.scale seed default, so the record
+    // must sit ABOVE cfg or it would almost never apply) → cfg (rare,
+    // seed/reset value) → item override/category default.
     const scaleSrc = typeof pose.scale === 'number' ? pose.scale
-        : (typeof cfg.scale === 'number' ? cfg.scale : item.visibleScale);
+        : (item.recScale !== null ? item.recScale
+        : (typeof cfg.scale === 'number' ? cfg.scale : item.visibleScale));
     const flipSrc = typeof pose.flipX === 'boolean' ? pose.flipX
         : (typeof cfg.flipX === 'boolean' ? cfg.flipX : item.flipX);
     const sxSrc = typeof pose.sx === 'number' ? pose.sx
-        : (typeof cfg.sx === 'number' ? cfg.sx : 1);
+        : (typeof cfg.sx === 'number' ? cfg.sx
+        : (item.recSx !== null ? item.recSx : 1));
 
     let layer = cfg.layer || defaultLayers(dir, handed)[cfgKey];
     let rot = rotSrc;
@@ -385,10 +407,14 @@ export function resolvePlacement(req) {
         flipX = !flipX;
     }
 
-    // tint (F4): explicit value, else auto-darken what sits behind the body
+    // tint (F4): explicit value (per-frame → recorded) else auto-darken
+    // what sits behind the body. The recorded tint is explicit: it was
+    // visible on screen at lock time and must not be re-derived.
     let tint = typeof pose.tint === 'number' ? pose.tint
-        : (typeof cfg.tint === 'number' ? cfg.tint : null);
-    if (tint === null) tint = (layer === 'back' || dir === 'up') ? 0.65 : 1;
+        : (typeof cfg.tint === 'number' ? cfg.tint : item.recTint);
+    if (tint === null || typeof tint !== 'number') {
+        tint = (layer === 'back' || dir === 'up') ? 0.65 : 1;
+    }
 
     // hand patch (F1): only front-layer items get the fist overlay
     const patchCfg = cfg.patch || {};

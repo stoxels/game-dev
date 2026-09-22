@@ -3,7 +3,7 @@ import { revealTiles } from '../../puzzle-mechanics/grid-actions.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _resolveCursedBlackoutDownside } from '../../puzzle-mechanics/cursed-downside.js';
-import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxShieldBorderAdd } from '../../puzzle-mechanics/fx-helpers.js';
+import { FX_Z, _fxGetPuzzleRect, _fxMakeElement, _fxMakeItemIcon, _fxOverlay, _fxShieldBorderAdd } from '../../puzzle-mechanics/fx-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
 
 //------------------------------------------------------------------------
@@ -56,7 +56,7 @@ export function _fxCursedShield() {
     const cy = r.top + r.height / 2;
 
     _fxMakeEyeScanLines(overlay, r);
-    _fxMakeIcon(r.wrap, '👁️', cx, cy, 80, 'animation:fx-eye-open 1.3s ease-out forwards;', 1800);
+    _fxMakeItemIcon(r.wrap, 'cursedShield', '👁️', cx, cy, 80, 'animation:fx-eye-open 1.3s ease-out forwards;', 1800);
 
     _fxShieldBorderAdd();
 

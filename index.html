@@ -21,16 +21,16 @@
     <link rel="stylesheet" href="css/save-slots.css?v=4">
     <link rel="stylesheet" href="css/screens.css">
     <link rel="stylesheet" href="css/game.css?v=3">
-    <link rel="stylesheet" href="css/setup-screen.css?v=5">
+    <link rel="stylesheet" href="css/setup-screen.css?v=9">
     <link rel="stylesheet" href="css/inventory.css">
     <link rel="stylesheet" href="css/overlays.css">
     <link rel="stylesheet" href="css/modals.css">
     <link rel="stylesheet" href="css/class.css?v=5">
-    <link rel="stylesheet" href="css/skills.css?v=18">
+    <link rel="stylesheet" href="css/skills.css?v=19">
     <link rel="stylesheet" href="css/spellbook-redesign.css?v=22">
     <link rel="stylesheet" href="css/universal-spells.css?v=9">
     <link rel="stylesheet" href="css/achievements.css?v=3">
-    <link rel="stylesheet" href="css/item_effects.css">
+    <link rel="stylesheet" href="css/item_effects.css?v=2">
     <link rel="stylesheet" href="css/probability_tree.css?v=3">
     <link rel="stylesheet" href="css/passive_effects.css">
     <link rel="stylesheet" href="css/quests.css">
@@ -45,7 +45,7 @@
     <link rel="stylesheet" href="css/classes/recursionist.css">
     <link rel="stylesheet" href="css/classes/statistician.css">
     <link rel="stylesheet" href="css/classes/targeting-reticle.css">
-    <link rel="stylesheet" href="css/endgame/monsters.css?v=2">
+    <link rel="stylesheet" href="css/endgame/monsters.css?v=3">
     <!-- bosses2.css (442 KB / 11,290 lines, boss-FX only - verified no
          non-boss code uses its classes; base monster-card styles live in
          monsters.css) is NOT render-blocking: it is warmed up once at idle
@@ -60,7 +60,7 @@
     <link rel="stylesheet" href="css/endgame/endgame-tooltip-styles.css">
     <link rel="stylesheet" href="css/endgame/objectives_hud.css">
     <link rel="stylesheet" href="css/character-select.css?v=7">
-    <link rel="stylesheet" href="css/map-view.css">
+    <link rel="stylesheet" href="css/map-view.css?v=3">
     <link rel="stylesheet" href="css/map-view-topbar.css?v=11">
     <link rel="stylesheet" href="css/quiz-exercises.css?v=5">
     <link rel="stylesheet" href="css/highscore.css?v=5">
@@ -308,15 +308,6 @@
                 <div class="setup-zone setup-zone-mods" id="setup-mods-row">
                     <div class="setup-group-label" data-t="setup_mod">OPTIONAL MODIFIERS</div>
                     <div class="setup-mods-inner">
-                        <div class="mod-wrapper mod-wrapper-monsterless">
-                            <span class="mod-title mod-title-gray" data-t="mod_ml">MONSTERLESS</span>
-                            <button class="setup-opt setup-opt-mod mod-monsterless" data-mod="monsterless">
-                                <span class="mod-icon mod-icon-monsterless"></span>
-                                <span class="mod-monsterless-skull" aria-hidden="true">💀</span>
-                            </button>
-                            <span class="mod-score-tag">×1.0 (NO BONUS)</span>
-                            <span class="mod-per-desc" data-t="mod_desc_ml"></span>
-                        </div>
                         <div class="mod-wrapper">
                             <span class="mod-title mod-title-orange" data-t="mod_tt">TIME TRIAL</span>
                             <button class="setup-opt setup-opt-mod mod-timetrial" data-mod="timetrial">
@@ -360,15 +351,35 @@
                     </div>
                 </div>
 
+                <!-- FLOATING MODIFIER FIGURES: stand outside the modifiers row.
+                     MONSTERLESS - the abyss boss, up-left of the Time Trial
+                     tombstone; a big red cross slams over it while active.
+                     BETA TEST ONLY: Super Tutor - the tutorial Professor on the
+                     right at the same height; a yellow border marks it active.
+                     Both are wired like every other toggle via [data-mod] and
+                     carry data-tip-t so the shared tooltip engine describes
+                     them on hover. ALL BASE STYLING IS INLINE: a cached/stale
+                     stylesheet used to leave these as default white buttons
+                     with natural-size (huge) art - inline styles cannot be
+                     lost that way. Active-state visuals are additionally
+                     mirrored as inline styles from syncDiffModButtons(). -->
+                <button class="setup-fig setup-fig-monsterless" data-mod="monsterless" aria-pressed="false" data-tip-t="mod_desc_ml"
+                        style="position:absolute; left:-10%; top:16%; width:190px; height:190px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0; transition:transform .12s, filter .12s;">
+                    <span class="mod-title mod-title-gray setup-fig-title" data-t="mod_ml"
+                          style="position:absolute; top:-46px; left:50%; transform:translateX(-50%);">MONSTERLESS</span>
+                    <img class="setup-fig-img" src="images/endgame/monsters/boss_abyss.webp" alt="" width="170" height="170"
+                         style="display:block; width:170px; height:170px; object-fit:contain; pointer-events:none;">
+                    <span class="setup-fig-cross" aria-hidden="true"
+                          style="position:absolute; left:0; top:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:var(--PX, monospace); font-size:125px; font-weight:bold; color:#e02c2c; text-shadow:0 0 18px rgba(224,44,44,0.85), 0 3px 6px rgba(0,0,0,0.7); pointer-events:none; line-height:1; opacity:0; transform:scale(0.4) rotate(-12deg); transition:opacity .15s ease, transform .25s cubic-bezier(.2,2,.4,1);">✕</span>
+                </button>
                 <!-- BETA TEST ONLY: Super Tutor is temporary and stays anchored separately. -->
-                <div class="mod-wrapper setup-super-tutor-wrapper">
-                    <span class="mod-title mod-title-gold" data-t="mod_super_tutor">🎓 SUPER TUTOR</span>
-                    <button class="setup-opt setup-opt-mod mod-super-tutor" id="btn-super-tutor" data-mod="superTutor" aria-pressed="false">
-                        <span class="mod-icon mod-icon-super-tutor">🎓</span>
-                    </button>
-                    <span class="mod-score-tag" data-t="mod_super_tutor_tag">BETA FEATURE</span>
-                    <span class="mod-per-desc" data-t="mod_desc_super_tutor">100% correct answers; no Tutor item required. Temporary beta feature.</span>
-                </div>
+                <button class="setup-fig setup-fig-super-tutor" id="btn-super-tutor" data-mod="superTutor" aria-pressed="false" data-tip-t="mod_desc_super_tutor"
+                        style="position:absolute; right:-10%; top:16%; width:145px; height:224px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0; transition:transform .12s, filter .12s;">
+                    <span class="mod-title mod-title-gold setup-fig-title" data-t="mod_super_tutor"
+                          style="position:absolute; top:-46px; left:50%; transform:translateX(-50%);">SUPER TUTOR</span>
+                    <img class="setup-fig-img" src="images/Tutorial/Professor.webp" alt="" width="132" height="212"
+                         style="display:block; width:132px; height:212px; object-fit:contain; pointer-events:none; border-radius:12px; outline:4px solid transparent; outline-offset:2px;">
+                </button>
 
                 </div>
                 <!-- ============ END PAGES ============ -->

@@ -2,7 +2,7 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { renderCell, updClues } from '../../grid.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeItemIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
 import { cur } from '../../state.js';
 
 //------------------------------------------------------------------------
@@ -92,7 +92,7 @@ export function _fxArtifact() {
         duration: 1600, cssClass: 'fx-artifact-star',
     });
 
-    _fxMakeIcon(r.wrap, '🌟', cx, cy, 88,
+    _fxMakeItemIcon(r.wrap, 'artifactComplete', '🌟', cx, cy, 88,
         `z-index:${FX_Z.supreme + 1}; animation:fx-artifact-icon 1.8s ease-out forwards;`, 2200);
 
     Audio_Manager.playSFX('codex_of_completion');

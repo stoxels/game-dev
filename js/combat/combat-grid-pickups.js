@@ -447,7 +447,9 @@ export function _egRemovePickupOverlay(key) {
     if (span) span.remove();
 }
 
-// Plays the floating emoji animation when a pickup is claimed.
+// Plays the floating pickup animation when a pickup is claimed - art image
+// when the manifest covers the pickup id, else the emoji (mirrors the
+// overlay above, so the floater always matches what was sitting on the grid).
 export function _egAnimatePickupClaim(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
@@ -455,7 +457,7 @@ export function _egAnimatePickupClaim(row, col, def) {
 
     const floater = document.createElement('div');
     floater.className = 'eg-pickup-floater';
-    floater.textContent = def.emoji;
+    floater.innerHTML = EG_ART.html('item', def && def.id, (def && def.emoji) || '');
     floater.style.left = `${centre.x}px`;
     floater.style.top = `${centre.y}px`;
     document.body.appendChild(floater);
@@ -685,15 +687,33 @@ export function _egInjectExpireCountdownStyles() {
 
 
 // Plays a broken-heart burst animation over the cell when a pickup is discarded via wrong input.
+// Shard content for the destroy animation: an explicit artUrl wins
+// (charms live outside the manifest), else the manifest art for artId/id,
+// else the emoji - so the shards always match what was sitting on the grid.
+function _egDiscardShardContent(def) {
+    try {
+        if (def && def.artUrl) {
+            return '<img src="' + def.artUrl + '" alt="" class="eg-art-img" draggable="false">';
+        }
+        const artId = def && (def.artId || def.id);
+        if (artId && typeof EG_ART !== 'undefined' && EG_ART) {
+            const u = EG_ART.url('item', artId);
+            if (u) return '<img src="' + u + '" alt="" class="eg-art-img" draggable="false">';
+        }
+    } catch (e) {}
+    return (def && def.emoji) || '';
+}
+
 export function _egAnimatePickupDiscard(row, col, def) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     const centre = _egGetElementCentre(el);
+    const content = _egDiscardShardContent(def);
 
     // Left shard
     const left = document.createElement('div');
     left.className = 'eg-pickup-broken-shard eg-pickup-broken-left';
-    left.textContent = def.emoji;
+    left.innerHTML = content;
     left.style.left = `${centre.x}px`;
     left.style.top = `${centre.y}px`;
     document.body.appendChild(left);
@@ -701,7 +721,7 @@ export function _egAnimatePickupDiscard(row, col, def) {
     // Right shard
     const right = document.createElement('div');
     right.className = 'eg-pickup-broken-shard eg-pickup-broken-right';
-    right.textContent = def.emoji;
+    right.innerHTML = content;
     right.style.left = `${centre.x}px`;
     right.style.top = `${centre.y}px`;
     document.body.appendChild(right);
@@ -1167,7 +1187,7 @@ export function _egDiscardLootDrop(row, col) {
     _egCancelTrackedExpiry(_egLootDrops, key, item);
     _egLootDrops.delete(key);
     _egRemoveLootOverlay(key);
-    _egAnimatePickupDiscard(row, col, { emoji: item.icon || '📦' }); // reuse broken-heart anim
+    _egAnimatePickupDiscard(row, col, { emoji: item.icon || '📦', artId: _egLootArtId(item) }); // reuse broken-heart anim
 
     Audio_Manager.playSFX('player_equip_not_pickup');
 }
@@ -1403,7 +1423,7 @@ export function _egDiscardCurrencyDrop(row, col) {
     _egCancelTrackedExpiry(_egCurrencyDrops, key, def);
     _egCurrencyDrops.delete(key);
     _egRemoveCurrencyDropOverlay(key);
-    _egAnimatePickupDiscard(row, col, { emoji: def.icon || '💰' });
+    _egAnimatePickupDiscard(row, col, { emoji: def.icon || '💰', id: def.id });
 
     Audio_Manager.playSFX('player_equip_not_pickup');
 }
@@ -1578,7 +1598,7 @@ export function _egDiscardItemDrop(row, col) {
     _egCancelTrackedExpiry(_egItemDrops, key, drop);
     _egItemDrops.delete(key);
     _egRemoveItemDropOverlay(key);
-    _egAnimatePickupDiscard(row, col, { emoji: (def && def.icon) || '📦' });
+    _egAnimatePickupDiscard(row, col, { emoji: (def && def.icon) || '📦', id: drop.defId });
 
     Audio_Manager.playSFX('player_equip_not_pickup');
 }

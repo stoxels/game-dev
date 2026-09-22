@@ -453,8 +453,8 @@ export function _egHandErrorMessage(handError, item) {
             if (s && s !== 'eg_cannot_equip_main_shield') return s.replace('{name}', name);
         }
     } catch (e) {}
-    if (handError === 'two_handed_blocks_offhand') return `⚠️ ${name} is two-handed - free the off-hand first`;
-    if (handError === 'offhand_blocked_by_two_hander') return `⚠️ Cannot use the off-hand while a two-handed weapon is equipped`;
+    if (handError === 'two_handed_blocks_offhand') return `⚠️ ${name} is a Heavy Weapon - free the off-hand first`;
+    if (handError === 'offhand_blocked_by_two_hander') return `⚠️ Cannot use the off-hand while a Heavy Weapon is equipped`;
     if (handError === 'offhand_single_handed_only') return `⚠️ ${name} cannot go in the off-hand - one-handed weapons or shields only`;
     return `⚠️ ${name} cannot go into that slot`;
 }

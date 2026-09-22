@@ -188,6 +188,26 @@
     position: absolute;
 }
 
+/* Item ART icon (puzzle_items/<id>.webp via _fxMakeItemIcon): the wrapper
+   carries position/z-index/animation, the img scales to the box the JS
+   sets. display:block kills the inline-image baseline gap so the art is
+   exactly centered like the emoji icons were. */
+.fx-item-icon {
+    pointer-events: none;
+}
+.fx-item-icon.fx-item-art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.fx-item-icon.fx-item-art img {
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
 
 /* ----- Spyglass - concentric expanding rings ----- */
 

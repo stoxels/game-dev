@@ -6,7 +6,7 @@ import { t } from '../../translation/translations.js';
 import { _applyCellEffect } from '../../puzzle-mechanics/cell-fx.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { _cursedDownsideSuppressed } from '../../puzzle-mechanics/cursed-downside.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeElement, _fxMakeItemIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
 import { _trackWitchImmuneCursedUse } from '../../puzzle-mechanics/quest-tracking.js';
 import { cur } from '../../state.js';
 
@@ -76,7 +76,7 @@ export function _fxCursedReveal() {
     const cy = r.top + r.height / 2;
 
     _fxMakeCursedTint(overlay, r);
-    _fxMakeIcon(r.wrap, '☠️', cx, cy, 72, 'animation:fx-skull-rise 1.1s ease-out forwards;', 1400);
+    _fxMakeItemIcon(r.wrap, 'cursedReveal', '☠️', cx, cy, 72, 'animation:fx-skull-rise 1.1s ease-out forwards;', 1400);
 
     // Dissolving ✕ particles burst from the centre
     _fxSpawnParticles({

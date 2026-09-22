@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
-import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { _fxGetPuzzleRect, _fxMakeItemIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { solveCols, solveRows } from '../../puzzle-mechanics/grid-actions.js';
 import { cur } from '../../state.js';
 
@@ -76,7 +76,7 @@ export function _fxRowSolve() {
 
     _fxMakeRowSolveSweep(overlay, r);
     _fxMakeRowSolveLines(overlay, r);
-    _fxMakeIcon(r.wrap, '📐', cx, cy, 56, 'animation:fx-icon-pop 0.6s ease-out forwards;', 1000);
+    _fxMakeItemIcon(r.wrap, 'rowSolve', '📐', cx, cy, 56, 'animation:fx-icon-pop 0.6s ease-out forwards;', 1000);
 
     Audio_Manager.playSFX('set_square');
 }
@@ -124,7 +124,7 @@ export function _fxColSolve() {
 
     _fxMakeColSolveSweep(overlay, r);
     _fxMakeColSolveLines(overlay, r);
-    _fxMakeIcon(r.wrap, '📏', cx, cy, 56, 'animation:fx-icon-pop 0.6s ease-out forwards;', 1000);
+    _fxMakeItemIcon(r.wrap, 'colSolve', '📏', cx, cy, 56, 'animation:fx-icon-pop 0.6s ease-out forwards;', 1000);
 
     Audio_Manager.playSFX('ruler');
 }

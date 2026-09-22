@@ -29,7 +29,7 @@ export const KEYBIND_DEFAULTS = [
     // with a pure-CSS effect (see js/combat/combat-weapon-swing.js) -
     // no per-character/per-class weapon art needed.
     { id: 'eg-parry',    label: 'Parry (hold)',  keys: 'r' },
-    { id: 'eg-attack',   label: 'Melee Attack (spends charge %)', keys: 'e' },
+    { id: 'eg-attack',   label: 'Melee Attack (hold to charge, release to strike)', keys: 'e' },
 
     // Target cycling (Tab by default).
     { id: 'cycle-target', label: 'Cycle Target', keys: 'tab' },

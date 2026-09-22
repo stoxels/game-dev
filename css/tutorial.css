@@ -370,18 +370,35 @@ body.tq-spellbook-open .tq-aside-bubble {
     to   { stroke-dashoffset: 0; }
 }
 .tq-bubble-continue {
-    margin-top: 8px;
-    background: #fdfdfd;
-    color: #1a1a1a;
-    border: 2px solid #222;
-    border-radius: 8px;
-    padding: 5px 16px;
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(180deg, #f5d98a 0%, #d4af37 55%, #b8912a 100%);
+    color: #241c05;
+    border: 2px solid #8a6a1c;
+    border-radius: 10px;
+    padding: 6px 18px;
     font-weight: bold;
     cursor: pointer;
     font-size: 0.85em;
     font-family: var(--F, sans-serif);
+    letter-spacing: 0.06em;
+    box-shadow: 0 2px 8px rgba(212,175,55,0.45), inset 0 1px 0 rgba(255,255,255,0.5);
+    animation: tq-continue-glow 1.6s ease-in-out infinite;
+    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
 }
-.tq-bubble-continue:hover { background: #f0f0f0; }
+.tq-bubble-continue:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(212,175,55,0.6), inset 0 1px 0 rgba(255,255,255,0.5);
+}
+.tq-bubble-continue:active { transform: translateY(1px); filter: brightness(0.96); }
+.tq-bubble-continue:focus-visible { outline: 2px solid #f5d98a; outline-offset: 2px; }
+@keyframes tq-continue-glow {
+    0%, 100% { box-shadow: 0 2px 8px rgba(212,175,55,0.45), inset 0 1px 0 rgba(255,255,255,0.5); }
+    50%      { box-shadow: 0 2px 16px rgba(212,175,55,0.75), inset 0 1px 0 rgba(255,255,255,0.5); }
+}
 
 /* Tutorial focus highlights - pulse whatever the Professor wants the
    player to look at (HUD widgets, clue cells, inventory slots). */

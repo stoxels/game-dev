@@ -1203,6 +1203,17 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
 
 .charm-glyph { filter: drop-shadow(0 0 7px rgba(245, 197, 24, .55)); }
 
+/* Charm drop art (images/items/charms/): fills the tile like the glyph did,
+   keeps the rank badge pinned. Falls back to the emoji glyph when a skill
+   has no mapped school (see _charmArtUrl in js/skills/skill-charms.js). */
+.charm-icon .charm-art {
+    width: 1.6em;
+    height: 1.6em;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 0 7px rgba(245, 197, 24, .55));
+}
+
 /* The rank indicator - the number of the charm's rank, drawn like a coin.
    Pinned to the glyph's TOP-right: the slot index already owns the top-left,
    and the bottom-right corner is where the spell name sits. */

@@ -1,5 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { cur } from '../state.js';
+import { EG_ART } from '../endgame/endgame-art.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - FX HELPERS----------------------
@@ -82,6 +83,49 @@ export function _fxMakeIcon(parent, emoji, cx, cy, fontSize, animationCss, remov
         left:${cx}px; top:${cy}px;
         transform:translate(-50%,-50%);
         font-size:${fontSize}px;
+        pointer-events:none;
+        z-index:${FX_Z.icon};
+        ${animationCss}
+    `;
+    parent.appendChild(el);
+    setTimeout(() => el.remove(), removeAfterMs);
+    return el;
+}
+
+
+// Creates a centered icon for a puzzle item at (cx, cy) inside `parent`,
+// showing the item's ART image (images/puzzle_items/<id>.webp, resolved
+// through the same EG_ART resolver the inventory uses) instead of the
+// emoji. Falls back to the item's emoji when no art exists for the id.
+//
+// `size` is the box size in px; the art scales to fit (art keeps its own
+// aspect inside the box via the CSS class). `animationCss` is applied to
+// the wrapper so existing keyframes (fx-icon-pop etc.) keep working —
+// they animate transform/opacity of the wrapper only, never the img.
+// Auto-removes after `removeAfterMs` like _fxMakeIcon.
+export function _fxMakeItemIcon(parent, defId, fallbackEmoji, cx, cy, size, animationCss, removeAfterMs) {
+    const el = document.createElement('div');
+    el.className = 'fx-item-icon';
+    const url = (typeof EG_ART !== 'undefined' && EG_ART)
+        ? EG_ART.url('item', defId) : null;
+    if (url) {
+        el.classList.add('fx-item-art');
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = '';
+        img.draggable = false;
+        img.decoding = 'async';
+        img.style.width = size + 'px';
+        img.style.height = size + 'px';
+        el.appendChild(img);
+    } else {
+        el.textContent = fallbackEmoji || '❓';
+        el.style.fontSize = size + 'px';
+    }
+    el.style.cssText += `
+        position:absolute;
+        left:${cx}px; top:${cy}px;
+        transform:translate(-50%,-50%);
         pointer-events:none;
         z-index:${FX_Z.icon};
         ${animationCss}
@@ -392,7 +436,9 @@ export function _fxClock() {
 
     _fxMakeClockBurst(overlay, cx, cy);
     _fxMakeClockRays(overlay, cx, cy, rayLength);
-    _fxMakeIcon(r.wrap, '🕰️', cx, cy, 50, 'animation:fx-icon-pop 0.7s ease-out forwards;', 1100);
+    // shared by addTime600 / Golden Clock / Chronofracture: the clock
+    // face shows the GOLDEN CLOCK art (its shared look), emoji fallback
+    _fxMakeItemIcon(r.wrap, 'goldenClock', '🕰️', cx, cy, 50, 'animation:fx-icon-pop 0.7s ease-out forwards;', 1100);
 
     Audio_Manager.playSFX('clock');
 }

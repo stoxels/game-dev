@@ -2,7 +2,7 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { save } from '../../state.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
-import { _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { _fxGetPuzzleRect, _fxMakeItemIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { STATE } from '../../state.js';
 
 //------------------------------------------------------------------------
@@ -51,7 +51,7 @@ export function _fxScoutPrimer() {
     const cy = r.top + r.height / 2;
 
     _fxMakePrimerArrows(overlay, cx, cy, r);
-    _fxMakeIcon(r.wrap, '📜', cx, cy, 52, 'animation:fx-icon-pop 0.6s ease-out forwards;', 1100);
+    _fxMakeItemIcon(r.wrap, 'scoutPrimer', '📜', cx, cy, 52, 'animation:fx-icon-pop 0.6s ease-out forwards;', 1100);
 
     Audio_Manager.playSFX('scouts_primer');
 }

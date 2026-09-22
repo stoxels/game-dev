@@ -15,13 +15,20 @@ import { _egIsActive } from './combat-state.js';
 //  WHY THIS EXISTS: the game has dozens of weapon base types (daggers,
 //  swords, axes, maces, wands, staves, bows …) across three characters
 //  and many classes. Animating every weapon for every character/class
-//  combo would be an enormous art burden, so attacks are a single
-//  character-agnostic CSS overlay anchored to the player avatar
-//  (css/endgame/weapon-swing.css). The overlay is skinned per weapon
-//  FAMILY - not per base item - and rotated toward the facing direction.
+//  combo would be an enormous art burden, so attacks combine two layers
+//  anchored to the player avatar:
+//    1. the EQUIPPED weapon itself swings — the gear-overlay item image
+//       (js/sprite/gear_overlays.js, tuned in the grip lab) rotates around
+//       its grip point via the independent `rotate` CSS property, so the
+//       base placement transform is never touched;
+//    2. a family-skinned CSS arc/trail (css/endgame/weapon-swing.css)
+//       plays underneath for impact readability.
+//  The swing is skinned per weapon FAMILY - not per base item - and rotated
+//  toward the facing direction.
 //
-//  CONTROLS: E = manual attack (this file), parry (hold) lives on the
-//  'eg-parry' keybind (R by default) in endgame-encounter-tick.js.
+//  CONTROLS: E = manual attack (this file) - HOLD to charge Secret-of-Mana-
+//  style, RELEASE to strike. Parry (hold) lives on the 'eg-parry' keybind
+//  (R by default) in endgame-encounter-tick.js.
 //------------------------------------------------------------------------
 //-------------------WEAPON FAMILY RESOLUTION------------------------------
 //------------------------------------------------------------------------
@@ -31,8 +38,9 @@ export const EG_WEAPON_SWING_COOLDOWN_MS = 400;
 export let _egWeaponSwingLastAt = 0;
 
 // Melee reach: the avatar's screen centre must be within this many px of the
-// target card's centre for a strike to land. The avatar roams freely, so the
-// player must walk up to the monster first - no cross-screen hits.
+// target card's centre for a strike to CONNECT. The swing ALWAYS plays -
+// out of range it just hits air (no damage, charge still spent) - so the
+// player must walk up to the monster first for real hits.
 export const EG_MELEE_RANGE_PX = 340;
 // Throttle for the out-of-range toast (E can be held down).
 export let _egMeleeRangeToastAt = 0;
@@ -137,8 +145,64 @@ export function _egFacingFromVector(dx, dy) {
 //-------------------SWING VISUAL------------------------------------------
 //------------------------------------------------------------------------
 
+// Swings the EQUIPPED weapon image itself: the gear-overlay weapon <img>
+// (front or back stage, whichever is currently visible) rotates around its
+// grip point — gear_overlays.js sets transform-origin to the item handle,
+// so a `rotate` animation pivots exactly where the hand holds it. Uses the
+// independent `rotate` CSS property (not `transform`) so the placement
+// transform (scaleX mirror + base rotation from the grip lab) is untouched
+// and the weapon settles back to its tuned pose when the animation ends
+// (fill:none default). Never throws; no weapon visible → arc-only swing.
+export function _egSwingEquippedWeapon(durationMs, heavy) {
+    try {
+        if (typeof document === 'undefined') return;
+        const avatar = document.getElementById('player-avatar-wrapper');
+        if (!avatar) return;
+        let el = null;
+        const candidates = avatar.querySelectorAll('.gear-item.gear-weapon');
+        for (const c of candidates) {
+            if (c && c.style && c.style.display === 'block' && c.getAttribute('src')) { el = c; break; }
+        }
+        if (!el || typeof el.animate !== 'function') return;
+        let reduce = false;
+        try {
+            reduce = !!(typeof window !== 'undefined' && window.matchMedia
+                && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        } catch (e) { reduce = false; }
+        const windup = heavy ? -75 : -65;
+        const follow = heavy ? 65 : 55;
+        const dur = reduce ? 120 : Math.max(120, durationMs || 300);
+        // Fast slash with a soft landing: the strike snaps through the
+        // middle of the swing (the oomph) and eases back to the tuned pose.
+        el.animate(
+            [{ rotate: windup + 'deg' }, { rotate: follow + 'deg' }, { rotate: '0deg' }],
+            { duration: dur, easing: 'cubic-bezier(0.15, 0.6, 0.25, 1)' }
+        );
+    } catch (e) {}
+}
+
+// Impact thump on the struck monster's card: a quick squash that lands with
+// the damage. Uses the independent `scale` property so it COMPOSES with the
+// card's own damage-shake (a `transform` animation) instead of fighting it.
+// Called only on real connects — never on miss/dodge/immune — and skipped
+// under prefers-reduced-motion. Never throws.
+export function _egMeleeImpactThump(targetId) {
+    try {
+        if (typeof document === 'undefined' || targetId == null) return;
+        if (typeof window !== 'undefined' && window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const card = document.getElementById(`eg-card-${targetId}`);
+        if (!card || typeof card.animate !== 'function') return;
+        card.animate(
+            [{ scale: '1' }, { scale: '0.9' }, { scale: '1.03' }, { scale: '1' }],
+            { duration: 200, easing: 'ease-out' }
+        );
+    } catch (e) {}
+}
+
 // Spawns the family-skinned CSS overlay on the avatar, rotated toward
-// `facing`. Character-agnostic: no sprite art is touched, so every
+// `facing`, AND swings the equipped weapon image itself (see above).
+// Character-agnostic: no sprite art is touched, so every
 // character/class combo shares the same effect. No-op without an avatar.
 export function _egShowWeaponSwing(family, facing) {
     const avatar = document.getElementById('player-avatar-wrapper');
@@ -148,6 +212,7 @@ export function _egShowWeaponSwing(family, facing) {
         ? facing : 'down';
     let heavy = false;
     try { heavy = _egGetEquippedWeaponInfo().hands === 2; } catch (e) {}
+    _egSwingEquippedWeapon(EG_WEAPON_SWING_DURATION_MS[fam] || 320, heavy);
 
     const el = document.createElement('div');
     el.className = `eg-weapon-swing eg-swing-${fam} eg-dir-${dir}${heavy ? ' eg-heavy' : ''}`;
@@ -157,12 +222,12 @@ export function _egShowWeaponSwing(family, facing) {
     setTimeout(() => { try { el.remove(); } catch (e) {} }, lifetime);
 }
 
-// Small hop toward `facing` so the swing has weight. Uses WAAPI on the
+// Big hop toward `facing` so the swing lands with weight. Uses WAAPI on the
     // wrapper (the old auto-attack lunge is gone - manual strikes hop only).
 export function _egWeaponSwingHop(facing) {
     const avatar = document.getElementById('player-avatar-wrapper');
     if (!avatar || typeof avatar.animate !== 'function') return;
-    const d = 14;
+    const d = 22;
     const vec = facing === 'up' ? [0, -d] : facing === 'down' ? [0, d]
         : facing === 'left' ? [-d, 0] : [d, 0];
     try {
@@ -170,7 +235,7 @@ export function _egWeaponSwingHop(facing) {
             { transform: 'translate(0px, 0px)' },
             { transform: `translate(${vec[0]}px, ${vec[1]}px)` },
             { transform: 'translate(0px, 0px)' },
-        ], { duration: 180, easing: 'ease-out' });
+        ], { duration: 160, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)' });
     } catch (e) {}
 }
 
@@ -195,8 +260,10 @@ export function _egWeaponSwingSound(family) {
 // damage through the standard melee channel against the CURRENT target
 // (same damage, cleave, accuracy and reflect rules as before). The strike
 // deals charge% of full damage - 100% charge = 100% damage - and spends
-// (resets) the charge bar, even on a miss. Without a target the swing
-// still plays as a whiff but costs nothing, so retargeting never punishes.
+// (resets) the charge bar, even on a miss. The swing ALWAYS plays: out of
+// range it whiffs (no damage - see _egApplyPlayerMeleeImpact) but the
+// charge is still spent. Without a target the swing still plays as a whiff
+// but costs nothing, so retargeting never punishes.
 export function _egDoWeaponAttack() {
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     if (typeof dead !== 'undefined' && globalThis.dead) return;
@@ -208,6 +275,11 @@ export function _egDoWeaponAttack() {
     const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     if (now - _egWeaponSwingLastAt < EG_WEAPON_SWING_COOLDOWN_MS) return;
     _egWeaponSwingLastAt = now;
+
+    // The strike is released - the hold (if any) is over either way.
+    try { globalThis._egMeleeHoldActive = false; } catch (e) {}
+    try { globalThis._egMeleeHoldKey = null; } catch (e) {}
+    try { globalThis._egMeleeChargeLevel = 0; } catch (e) {}
 
     // Weapon gate: no melee weapon (or bow) equipped → no attack at all.
     // Previously this fell through to the 'unarmed' family and let a fresh
@@ -222,16 +294,9 @@ export function _egDoWeaponAttack() {
         return;
     }
 
-    // Range gate: too far away → no swing, no charge spent. The toast is
-    // throttled so holding E doesn't spam it.
-    const hasTargetEarly = !(typeof _egTargetId === 'undefined' || !globalThis._egTargetId);
-    if (hasTargetEarly && !_egMeleeTargetInRange(globalThis._egTargetId)) {
-        if (now - _egMeleeRangeToastAt > 1500) {
-            _egMeleeRangeToastAt = now;
-            if (typeof showToast === 'function') globalThis.showToast('⚔️ ' + t('eg_melee_too_far'));
-        }
-        return;
-    }
+    // NOTE: no range gate here anymore - the swing always plays and range
+    // is resolved at impact time (_egApplyPlayerMeleeImpact whiffs with no
+    // damage when the avatar is too far from the target card).
 
     const { family } = _egGetEquippedWeaponInfo();
     const facing = _egGetAttackFacing();
@@ -263,20 +328,103 @@ export function _egDoWeaponAttack() {
     }, Math.max(80, Math.round((EG_WEAPON_SWING_DURATION_MS[family] || 320) / 2)));
 }
 
+//-------------------HOLD-TO-CHARGE (Secret-of-Mana-style)-----------------
+// Holding the attack key charges the strike through multiple levels (tap =
+// weak poke, 100% = full hit, holding past full overcharges up to
+// EG_MELEE_OVERCHARGE_RATIO for a super strike); RELEASING the key swings.
+// The state lives as plain globalThis properties (not module bindings) so
+// encounter-tick.js can read them without an import cycle back into this
+// file (this file already imports from encounter-tick.js). Unset means
+// "not holding" (falsy) - no top-level init needed, and the module-init
+// timing guard forbids top-level globalThis reads in converted files.
+
+// Normalizes a key event the same way the keybind system does (see
+// _keybindNormalize in keybinds.js: single chars and named keys alike are
+// lowercased) so press/release pairs match even for rebound keys.
+function _egMeleeNormKey(e) {
+    return (e && e.key ? String(e.key) : '').toLowerCase();
+}
+
+// PRESS: begin charging. The charge bar resets and fills only while the key
+// is held (see _egTickPlayer) - this is what makes holding build the super
+// attack instead of machine-gunning weak strikes via key repeat.
+function _egMeleeBeginHold(e) {
+    if (typeof _egIsActive === 'function' && !_egIsActive()) return false;
+    if (typeof dead !== 'undefined' && globalThis.dead) return false;
+    if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return false;
+    if (typeof document !== 'undefined' && document.querySelector('.modal-bg.show')) return false;
+    try {
+        const tag = document.activeElement && document.activeElement.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return false;
+    } catch (err) {}
+    if (globalThis._egMeleeHoldActive) return true;
+    // No weapon equipped → no charge either (same gate as the strike).
+    try {
+        if (typeof _egGetEquippedWeaponInfo === 'function' && !_egGetEquippedWeaponInfo().item) return false;
+    } catch (err) { return false; }
+    try { globalThis._egPlayerCurrentCharge = 0; } catch (err) {}
+    try { globalThis._egMeleeChargeLevel = 0; } catch (err) {}
+    try { globalThis._egMeleeHoldKey = _egMeleeNormKey(e); } catch (err) {}
+    globalThis._egMeleeHoldActive = true;
+    if (typeof _egUpdatePlayerChargeBar === 'function') {
+        try { _egUpdatePlayerChargeBar(); } catch (err) {}
+    }
+    return true;
+}
+
+// Cancels an in-progress hold WITHOUT striking (window blur, tab hidden -
+// the matching keyup will never arrive, so the avatar must not charge
+// forever). The unspent charge simply fizzles.
+function _egMeleeCancelHold() {
+    if (!globalThis._egMeleeHoldActive) return;
+    globalThis._egMeleeHoldActive = false;
+    try { globalThis._egMeleeHoldKey = null; } catch (e) {}
+    try { globalThis._egMeleeChargeLevel = 0; } catch (e) {}
+    if (typeof _egUpdatePlayerChargeBar === 'function') {
+        try { _egUpdatePlayerChargeBar(); } catch (e) {}
+    }
+}
+
+// RELEASE: strike with whatever charge was built while held.
+function _egMeleeReleaseHold() {
+    if (!globalThis._egMeleeHoldActive) return;
+    _egDoWeaponAttack();
+}
+
 export function _initEgWeaponAttackHotkey() {
+    // PRESS starts the charge. The central dispatcher matches the player's
+    // (possibly rebound) eg-attack key; key repeat is ignored so holding
+    // keeps charging instead of re-firing weak strikes.
+    const pressHandler = (e) => {
+        if (e && e.repeat) return false;
+        _egMeleeBeginHold(e);
+        return false;
+    };
     if (typeof onKeybindAction === 'function') {
-        globalThis.onKeybindAction('eg-attack', () => {
-            _egDoWeaponAttack();
-            return false;
-        });
+        globalThis.onKeybindAction('eg-attack', pressHandler);
     } else {
         // Fallback if the keybind system loads later/never: plain E key.
         document.addEventListener('keydown', (e) => {
             if (!e || e.repeat) return;
             if ((e.key || '').toLowerCase() !== 'e') return;
-            _egDoWeaponAttack();
+            _egMeleeBeginHold(e);
         });
     }
+    // RELEASE strikes. The keyup is matched against the key that STARTED
+    // the hold (recorded at press time), so rebound keys just work without
+    // needing the keybind matcher here.
+    document.addEventListener('keyup', (e) => {
+        if (!globalThis._egMeleeHoldActive) return;
+        try {
+            if (globalThis._egMeleeHoldKey != null && _egMeleeNormKey(e) !== globalThis._egMeleeHoldKey) return;
+        } catch (err) {}
+        _egMeleeReleaseHold();
+    });
+    // Never get stuck charging when the page loses focus.
+    window.addEventListener('blur', _egMeleeCancelHold);
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) _egMeleeCancelHold();
+    });
 }
 // Module-eval timing: the import phase runs before concatenated keybinds.js,
 // so registering at top level would take the raw-key fallback branch and the

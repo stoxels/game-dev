@@ -330,7 +330,9 @@ function mgResetModalInputState() {
 
     document.getElementById('mg-why-btn').style.display = 'none';
     document.getElementById('mg-explain').style.display = 'none';
-    document.getElementById('mg-continue-btn').style.display = 'none';
+    const contBtn = document.getElementById('mg-continue-btn');
+    contBtn.style.display = 'none';
+    contBtn.classList.remove('qr-continue-attention', 'qr-continue-wrong');
 }
 
 // Fills the small '#mg-portrait' element (distinct from _mgInjectPortrait's
@@ -493,7 +495,10 @@ function mgHandleTutorSuccess() {
     questStat_tutorAnsweredCorrect();
 
     _mgRefreshWhyButton();
-    document.getElementById('mg-continue-btn').style.display = 'flex'; // was: setTimeout(...)
+    const contBtn = document.getElementById('mg-continue-btn');
+    contBtn.style.display = 'flex'; // was: setTimeout(...)
+    contBtn.classList.remove('qr-continue-wrong');
+    contBtn.classList.add('qr-continue-attention');
 }
 
 // Handles the outcome where the tutor fails to solve the question.
@@ -634,7 +639,10 @@ function mgHandleCorrectAnswer() {
         && typeof _egApplyQuizRewardBuff === 'function') _egApplyQuizRewardBuff();
 
     _mgRefreshWhyButton();
-    document.getElementById('mg-continue-btn').style.display = 'flex'; 
+    const contBtn = document.getElementById('mg-continue-btn');
+    contBtn.style.display = 'flex';
+    contBtn.classList.remove('qr-continue-wrong');
+    contBtn.classList.add('qr-continue-attention');
 }
 
 

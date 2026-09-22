@@ -2,7 +2,7 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { cooldownState, startSlotCooldown } from '../../classes/class-cooldown-state.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
-import { PEARL_VARIANTS, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
+import { PEARL_VARIANTS, _fxGetPuzzleRect, _fxMakeItemIcon, _fxOverlay } from '../../puzzle-mechanics/fx-helpers.js';
 import { STATE } from '../../state.js';
 
 //------------------------------------------------------------------------
@@ -84,6 +84,9 @@ export function _fxPearl(color) {
     const maxSize = Math.max(r.width, r.height) * 0.7;
 
     _fxMakePearlRings(overlay, cx, cy, color, maxSize);
-    _fxMakeIcon(r.wrap, variant.emoji, cx, cy, 64,
+    // PEARL_VARIANTS keys are glow colors; map each to its item id so the
+    // effect shows the pearl's own art (emoji stays as the fallback).
+    const PEARL_IDS = { '#88aaff': 'pearlOfHaste', '#cc88ff': 'pearlOfSwiftness', '#e0e0e0': 'grandPearl' };
+    _fxMakeItemIcon(r.wrap, PEARL_IDS[color] || 'grandPearl', variant.emoji, cx, cy, 64,
         'animation:fx-icon-pop 0.6s ease-out forwards;', 1000);
 }

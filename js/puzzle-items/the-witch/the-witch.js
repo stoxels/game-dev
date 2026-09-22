@@ -2,7 +2,7 @@ import { Audio_Manager } from '../../audio/audio.js';
 import { subtractTimeSecs } from '../../timer/timer-adjust.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
-import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
+import { FX_Z, PARTICLES, _fxGetPuzzleRect, _fxMakeItemIcon, _fxOverlay, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';
 import { showItemToast } from '../../puzzle-mechanics/toasts-and-popups.js';
 
 //------------------------------------------------------------------------
@@ -48,7 +48,7 @@ export function _fxTheWitch() {
         duration: 1400, cssClass: 'fx-artifact-star',
     });
 
-    _fxMakeIcon(r.wrap, '🧙', cx, cy, 80, 'animation:fx-skull-rise 1.2s ease-out forwards;', 1600);
+    _fxMakeItemIcon(r.wrap, 'theWitch', '🧙', cx, cy, 80, 'animation:fx-skull-rise 1.2s ease-out forwards;', 1600);
 
     Audio_Manager.playSFX('the_witch');
 }

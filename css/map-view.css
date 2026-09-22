@@ -214,27 +214,26 @@
     transition: none;
 }
 
-    .mv-sprite img {
-        width: 75px;
-        height: 75px;
+    /* 128px - the exact same sprite box the puzzle screen renders
+       (#avatar-sprite-img-simple). The gear overlay painter normalizes all
+       placements against this box, so the map sprite previously drew its
+       weapon/shield at the feet while the puzzle avatar drew them at the
+       hands. Same box = identical rendering by construction.
+       MUST be a direct-child selector (>): the gear overlay <img>s live
+       inside this wrapper too, and a plain descendant selector used to
+       force every weapon/shield img onto a 128px-tall letterboxed box,
+       shoving them down to the sprite's feet. */
+    .mv-sprite > img {
+        width: 128px;
+        height: 128px;
         object-fit: contain;
         filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
         transition: transform 0.1s;
     }
 
-    .mv-sprite.walking img {
-        animation: mv-sprite-bob 0.35s ease-in-out infinite alternate;
-    }
-
-@keyframes mv-sprite-bob {
-    from {
-        transform: translateY(0px);
-    }
-
-    to {
-        transform: translateY(-4px);
-    }
-}
+    /* No walk bounce here anymore: proper directional walk animations
+        carry the motion now (a CSS bob would only fight the gear
+        overlays, which are glued to this wrapper). */
 
 /* ---- Tooltip ---- */
 .mv-tooltip {
@@ -466,16 +465,16 @@
     pointer-events: none;
 }
 
-    .wd-sprite img {
-        width: 75px;
-        height: 75px;
+    /* Same 128px box as the puzzle avatar - see .mv-sprite > img above
+       for why this must be a direct-child selector. */
+    .wd-sprite > img {
+        width: 128px;
+        height: 128px;
         object-fit: contain;
         filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
     }
 
-    .wd-sprite.walking img {
-        animation: mv-sprite-bob 0.35s ease-in-out infinite alternate;
-    }
+    /* (no walk bounce on the detail sprite either — see above) */
 
 /* Path segment base style */
 .wd-path-segment {
@@ -746,16 +745,6 @@
 /* ========================================================================
    ANIMATION KEYFRAMES
    ======================================================================== */
-
-@keyframes mv-sprite-bob {
-    from {
-        transform: translateY(0px);
-    }
-
-    to {
-        transform: translateY(-4px);
-    }
-}
 
 @keyframes wdRotateX {
     0% {

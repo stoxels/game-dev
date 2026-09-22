@@ -1,17 +1,15 @@
 import { Audio_Manager } from '../audio/audio.js';
-import { _bloodMagicActive, _getPlayerMaxMana, gainMana } from '../classes/class-mana.js';
 import { t } from '../translation/translations.js';
 import { _egIsPolymorphActive } from './combat-ailments.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
 import { EG_ELEMENTS, _egCalcPlayerMeleeDamage, _egLastMeleeElements, _egLastMeleeWasCrit } from './combat-calculations.js';
-import { _egUpdatePlayerChargeBar } from './encounter-tick.js';
 import { EG_MONSTER_PROJ_DURATION_MS, _egAnimatePlayerProjectile, _egApplyPlayerHitFeedback, _egConsumeOnHitGearBonus, _egDamageTargetById, _egFlashImmune, _egPlayerTakeDamage, _egRestartFlashClass, _egShowStatusLabel } from './encounter.js';
 import { _egIsPlayerInDarknessCloud } from './combat-hazards.js';
 import { _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
 import { _egTryMonsterMeleeSidestep } from './combat-monster-roam.js';
 import { _egCalcAccuracyMissChance, _egComputePlayerStats, _egGetDragTier, _egGetDragTierLabelKey } from '../endgame/endgame-player-stats.js';
 import { EG_PLAYER_MELEE_ANIM_DURATION_MS, EG_PLAYER_MELEE_DAMAGE, _egDragChargeElements, _egIsActive } from './combat-state.js';
-import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egShowWeaponSwing, _egWeaponSwingSound } from './combat-weapon-swing.js';
+import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egMeleeImpactThump, _egMeleeTargetInRange, _egShowWeaponSwing, _egWeaponSwingSound } from './combat-weapon-swing.js';
 
 //------------------------------------------------------------------------
 // PHASE 4 split (2026-09-16): extracted into a focused module. The original
@@ -20,7 +18,7 @@ import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egShowWeaponSwing, _egW
 //------------------------------------------------------------------------
 
 // Drag-paint charged shot: per-cell damage stacking into one charging
-// projectile, the accuracy bonus label, release/multishot, melee mana
+// projectile, the accuracy bonus label, release/multishot
 // and the melee impact pipeline.
 
 
@@ -312,13 +310,6 @@ export function _egRollPlayerMiss(targetId, opts) {
     return true;
 }
 
-// Battle Trance tuning - the melee-as-mana-battery loop. Melee strikes and
-// melee KILLS restore mana so the player weaves attacks to pay for spells
-// (spells cost, melee earns). Blood Magic builds skip it - their casts are
-// life-based, so mana income would be dead weight.
-export const EG_MELEE_MANA_PER_HIT = 6;
-export const EG_MELEE_MANA_PER_KILL = 20;
-
 // Execution tuning: a melee strike on a monster below this HP share is a
 // finisher - multiplied damage. Gives melee the "cleanup kill" niche while
 // spells handle wave-clear.
@@ -331,47 +322,6 @@ export const EG_MELEE_EXECUTE_MULT = 3;
 // this multiplier (2 = up to double damage for a patient player).
 export const EG_MELEE_OVERCHARGE_MULT = 2;
 export const EG_MELEE_OVERCHARGE_RATIO = 2;
-
-// Battle Trance - mana restored by the melee channel. Called once per
-// landed strike with the struck monster; grants the per-hit amount, plus
-// the per-kill amount when the strike just killed it (the monster is no
-// longer in the roster). No-ops outside encounters / without a mana pool
-// / under Blood Magic (casts cost life there - mana income is dead weight).
-export function _egGrantMeleeMana(struck) {
-    if (typeof _bloodMagicActive === 'function') {
-        try { if (_bloodMagicActive()) return; } catch (e) { /* fall through */ }
-    }
-    if (typeof gainMana !== 'function' || typeof _getPlayerMaxMana !== 'function') return;
-    if (_getPlayerMaxMana() <= 0 || typeof playerCurrentMana === 'undefined' || globalThis.playerCurrentMana <= 0) return;
-    if (typeof playerMaxMana === 'undefined' || globalThis.playerCurrentMana >= globalThis.playerMaxMana) return;
-
-    const killed = !struck || !globalThis._egMonsters.some(m => m.id === struck.id);
-    const amount = EG_MELEE_MANA_PER_HIT + (killed ? EG_MELEE_MANA_PER_KILL : 0);
-    const gained = gainMana(amount);
-    if (gained > 0) {
-        if (typeof _egUpdatePlayerChargeBar === 'function') _egUpdatePlayerChargeBar();
-        const pct = Math.round(gained);
-        if (killed) {
-            globalThis.showToast(`⚔️ +${pct} ${t('eg_battle_trance_kill')}`);
-        } else {
-            _egShowManaGain(struck.id, gained);
-        }
-    }
-}
-
-// Small floating +N readout over the struck monster (non-kill mana gains -
-// kills get a toast instead so the bigger reward reads as an event).
-export function _egShowManaGain(targetId, amount) {
-    try {
-        const card = document.getElementById(`eg-card-${targetId}`);
-        if (!card) return;
-        const el = document.createElement('div');
-        el.className = 'eg-mana-gain-float';
-        el.textContent = `+${amount} mana`;
-        card.appendChild(el);
-        setTimeout(() => el.remove(), 900);
-    } catch (e) { /* cosmetic only */ }
-}
 
 // Applies a manual melee strike at the moment of impact (Secret-of-Mana-
 // style). The strike deals charge% of full damage - linear: 100% charge =
@@ -387,6 +337,14 @@ export function _egApplyPlayerMeleeImpact(targetId) {
     const chargePct = (typeof _egPendingMeleeChargePct === 'number')
         ? Math.min(EG_MELEE_OVERCHARGE_MULT, Math.max(0, globalThis._egPendingMeleeChargePct)) : 1;
     globalThis._egPendingMeleeChargePct = null;
+
+    // Out-of-range whiff: the swing always plays, but the blade can't reach
+    // a distant target - no damage, no procs, no mana, no reflect. The spent
+    // charge is NOT refunded (follows the miss rule below).
+    if (typeof _egMeleeTargetInRange === 'function' && !_egMeleeTargetInRange(targetId)) {
+        _egShowStatusLabel(targetId, t('eg_melee_too_far'));
+        return;
+    }
 
     // Accuracy: the swing can whiff entirely (no gear procs on a miss).
     // A whiffed swing does NOT refund the spent charge.
@@ -430,8 +388,11 @@ export function _egApplyPlayerMeleeImpact(targetId) {
     // all non-melee sources (spells, reveal projectiles, DoTs) are resisted.
     _egDamageTargetById(targetId, dmg, elements, { isCrit: wasCrit, isMelee: true });
 
-    // Battle Trance: the strike (and a kill it scored) restores mana.
-    _egGrantMeleeMana(meleeTarget);
+    // Impact feel: squash the struck card so the connect lands with weight
+    // (miss/dodge/immune returned above, so this only plays on real hits).
+    if (typeof _egMeleeImpactThump === 'function') {
+        try { _egMeleeImpactThump(targetId); } catch (e) {}
+    }
 
     // Active map run: monsters reflect #% of melee damage back at you.
     if (typeof _egGetActiveMapModValue === 'function') {
