@@ -1,18 +1,23 @@
 import { AssetPreload } from './asset-preload.js';
 
 //------------------------------------------------------------------------
-//-------------------BOOT LOADER----------------------------------------
+//-------------------BOOT LOADER-----------------------------------------
 //------------------------------------------------------------------------
-// Drives the #boot-loader overlay: progress over the boot asset set,
-// then fades into the (already active) title screen and starts the idle
-// preload of everything else. Never hangs: per-image errors settle, and
-// a fail-safe reveals the title no matter what.
+// Drives the #boot-loader overlay: progress over the boot asset set, then
+// fades into the (already active) title screen and starts the idle preload
+// of everything else. Never hangs: image errors settle, and a fail-safe
+// reveals the title no matter what.
 
 (function () {
-    var layer = document.getElementById('boot-loader');
+    const layer = document.getElementById('boot-loader');
     if (!layer) return;
 
-    var LABELS = {
+    //--------------------------------------------------------------------
+    // CONSTANTS & STATE
+    //--------------------------------------------------------------------
+
+    // Friendly progress labels for the asset folders shown while loading.
+    const LABELS = {
         'Title_Screen': 'Title',
         'Highscore_Screen': 'Highscores',
         'Moodle_Codes_Screen': 'Moodle Codes',
@@ -26,26 +31,33 @@ import { AssetPreload } from './asset-preload.js';
         'Convergence_Screen': 'Convergence',
         'Game-Reset': 'Menus',
         'Level_Select_Topbar': 'Level Select',
-        'Class_Selection': 'Classes'
+        'Class_Selection': 'Classes',
     };
 
+    // Which named group a loading URL belongs to ('Assets' fallback).
     function labelFor(url) {
-        var m = /images\/([^/]+)\//.exec(url || '');
+        const m = /images\/([^/]+)\//.exec(url || '');
         return (m && LABELS[m[1]]) || 'Assets';
     }
 
-    var idleStarted = false;
+    let idleStarted = false;
+    let revealed = false;
+
+    //--------------------------------------------------------------------
+    // HELPERS
+    //--------------------------------------------------------------------
+
+    // Start the background preload of everything past the boot set, once.
     function ensureIdle() {
         if (idleStarted) return;
         idleStarted = true;
         try {
-            if (typeof AssetPreload !== 'undefined') {
-                AssetPreload.startIdle();
-                AssetPreload.surfaceShown('screen-title');
-            }
+            AssetPreload.startIdle();
+            AssetPreload.surfaceShown('screen-title');
         } catch (e) { /* title works without preloading */ }
     }
 
+    // Fade the overlay away and remove it from the page.
     function reveal() {
         if (!layer || layer.classList.contains('done')) return;
         layer.classList.add('done');
@@ -55,22 +67,27 @@ import { AssetPreload } from './asset-preload.js';
         ensureIdle();
     }
 
-    // Fail-safe: title always reveals, even if scripts stall.
-    var revealed = false;
+    // Reveal exactly once; also arms the idle preload on every call.
     function revealOnce() {
         if (!revealed) { revealed = true; reveal(); }
         ensureIdle();
     }
+
+    //--------------------------------------------------------------------
+    // MAIN ENTRY POINT
+    //--------------------------------------------------------------------
+
+    // Fail-safe: the title always reveals, even if scripts stall.
     setTimeout(revealOnce, 15000);
 
     try {
-        if (typeof AssetPreload === 'undefined' || !AssetPreload.preloadBoot) {
+        if (!AssetPreload.preloadBoot) {
             revealOnce();
             return;
         }
         if (typeof AssetPreload.installHooks === 'function') AssetPreload.installHooks();
-        var fill = document.getElementById('boot-fill');
-        var status = document.getElementById('boot-status');
+        const fill = document.getElementById('boot-fill');
+        const status = document.getElementById('boot-status');
         AssetPreload.preloadBoot(function (done, total, url) {
             if (fill) fill.style.width = Math.round(done / total * 100) + '%';
             if (status) status.textContent = 'Loading ' + labelFor(url) + '…';
