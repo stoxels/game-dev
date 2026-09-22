@@ -8,13 +8,14 @@ import { _egGetTarget } from './combat/encounter-charged-shot.js';
 import { _egDamageTargetById } from './combat/encounter-damage.js';
 import { _egSpawnMonster } from './combat/encounter-monster-spawning.js';
 import { EG_ALL_BASE_TYPES } from './loot/equipment-base-items.js';
-import { _egCellHasAnyDrop, _egDropHeartPickup, _egFlushRunLootToStash, _egRenderLootOverlay } from './combat/combat-grid-pickups.js';
+import { _egCellHasAnyDrop, _egDropHeartPickup, _egFlushRunLootToStash, _egRenderCurrencyDropOverlay, _egRenderItemDropOverlay, _egRenderLootOverlay } from './combat/combat-grid-pickups.js';
 import { closeHubToGame, isHubGameOverlay, openHubFromGame, showEndgameHub } from './endgame/endgame-hub.js';
 import { _egAddItemToStash, _egInventory } from './endgame/hub-stash.js';
 import { egSaveHubState } from './endgame/hub-save.js';
 import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';
 import { _egGetAllEquippedItems } from './endgame/endgame-player-stats.js';
-import { _egLootDrops, _egPickups } from './combat/combat-state.js';
+import { _egCurrencyDrops, _egItemDrops, _egLootDrops, _egPickups } from './combat/combat-state.js';
+import { EG_CURRENCY_DEFS } from './loot/loot-currency.js';
 import { EG_VENDOR_FREE_BASE_IDS, _egvBuildBaseItemFromBase, _egvGetSlotOrder } from './loot/loot-vendor.js';
 import { renderCell, updClues } from './grid.js';
 import { keybindDisplayLabel, keybindKeyFor, onKeybindAction } from './keybinds.js';
@@ -28,7 +29,7 @@ import { FX_Z, _fxGetPuzzleRectForWrap } from './puzzle-mechanics/fx-helpers.js'
 import { showItemGainPopup, showToast } from './puzzle-mechanics/toasts-and-popups.js';
 import { _consumeItem } from './puzzle-items/use-item.js';
 import { questStat_revealItemUsed } from './inference/inference-stats.js';
-import { isPuzzleSolved } from './scoring.js';
+import { isPuzzleSolved } from './scoring/scoring-core.js';
 import { hideResultOverlays, showSetup } from './screens/screens.js';
 import { _charmMake, _charmRenderOverlay, _egCharmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
 import { SKILL_REGISTRY } from './skills/skill-registry.js';
@@ -185,9 +186,9 @@ export let _tqStepIdx = 0;
 export let _tqPollTimer = null;
 // True once the player has used the tutorial candle in puzzle 1.
 export let _tqCandleUsed = false;
-// True only while the candle-use lesson step is active (puzzle 1 s11): the
-// Professor hands the candle over one step earlier (s10), but using it
-// before he explains it would skip the lesson - early uses are refused with
+// Arms the candle the moment the Professor hands it over (puzzle 1 s10 -
+// grant and use are a single step): using it before the lesson reaches
+// that step would skip the explanation - early uses are refused with
 // a toast (see the useItem wrap).
 export let _tqCandleUsable = false;
 // True once the player has cast Fireball at least once.
@@ -239,18 +240,29 @@ export let _tqP2RatDeadAt = 0;
 // (or immediately when the spawn found no eligible cell).
 export let _tqP2HeartOpen = false;
 export let _tqP2HeartCell = null;
-// Puzzle-3 drop gate: while open (the Professor's sword / charm has spawned
-// and is still unclaimed), the otherwise-locked board accepts input ONLY on
-// the drop's own cell, and ONLY via left-click (a right-click would destroy
-// the drop). One gate serves both drops - they never overlap.
+// Puzzle-3 drop gate: while open (a lesson drop has spawned and is still
+// unclaimed), the otherwise-locked board accepts input ONLY on the drop's
+// own cell, and ONLY via the expected button - left-click claims (sword /
+// charm / candle), right-click destroys on purpose (orb lesson). One gate
+// serves all drops - they never overlap.
 export let _tqP3DropOpen = false;
 export let _tqP3DropCell = null;
+// Expected click on the p3 drop cell: 1 = left-click (claim), 2 =
+// right-click (deliberate destroy lesson).
+export let _tqP3DropButton = 1;
 // Puzzle-3 sword lesson state.
 export let _tqP3SwordKey = null;
 export let _tqP3SwordClaimed = false;
 // Puzzle-3 charm lesson state.
 export let _tqP3CharmKey = null;
 export let _tqP3CharmClaimed = false;
+// Puzzle-3 ghost spoils: a real Candle item drop (correct click claims it
+// into the puzzle-item inventory) and a real Divine Orb currency drop (the
+// wrong click destroys it on purpose - the claim-vs-destroy lesson).
+export let _tqP3CandleKey = null;
+export let _tqP3CandleClaimed = false;
+export let _tqP3OrbKey = null;
+export let _tqP3OrbDestroyed = false;
 // Puzzle-3: set once the ghost (fireball lesson) has spawned - drives the
 // solve-time retry gate back to the right fight.
 export let _tqP3GhostSpawned = false;
@@ -577,6 +589,7 @@ export function _tqTeardownTutorialState() {
     _tqP2HeartCell = null;
     _tqP3DropOpen = false;
     _tqP3DropCell = null;
+    _tqP3DropButton = 1;
     _tqCandleUsable = false;
     _tqSpellbookPause = false;
     _tqUpdateLevelExitButtons();
@@ -672,6 +685,16 @@ export function _tqGridLockToast() {
     if (now - _tqLockToastAt < 1200) return;
     _tqLockToastAt = now;
     showToast('🎓 ' + t('tq_grid_lock'));
+}
+
+// Shown when the player uses the wrong mouse button on a lesson drop:
+// left instead of right (would claim the orb), or right instead of left
+// (would destroy the candle). Throttled like the patience toast.
+export function _tqDropButtonToast(wantRight) {
+    const now = Date.now();
+    if (now - _tqLockToastAt < 1200) return;
+    _tqLockToastAt = now;
+    showToast('🎓 ' + t(wantRight ? 'tq_drop_need_right' : 'tq_drop_need_left'));
 }
 
 // Shown when the player tries to fill the undecidable pair pre-candle.
@@ -950,13 +973,20 @@ export function _tqHighlightAmbiguousCells() {
 //----------------------GRID-LOCK BORDER (RED)-----------------------------
 //------------------------------------------------------------------------
 // While the Professor holds the board (guided demos, the puzzle-2 intro,
-// the post-kill lock, the heart / gear claim gates, the half-fill cap), a
+// the post-kill lock, the heart / drop claim gates, the half-fill cap), a
 // red glowing border rings the puzzle grid - the same wrap-relative recipe
 // as the shield item's gold border (_fxShieldBorderAdd in
 // puzzle-items/shared/fx-helpers.js), recolored. _tqRefreshGridLockBorder()
 // derives visibility from the live lock flags, so every mutator just calls
-// it instead of tracking on/off. Puzzle 2 is excluded - its locks apply
-// silently without the border.
+// it instead of tracking on/off (the step engine also refreshes centrally
+// after every step setup - see _tqRunCurrentPhase).
+//
+// Coherence rule: the border shows ONLY while the grid is FULLY blocked
+// (no cell accepts input - the player reads, listens, equips or fights).
+// Whenever the Professor expects a grid click - a guided demo cell, the
+// heart / sword / charm drop cell, free solving - the board is only
+// partially restricted, so the border stays off (the pointer line +
+// pulsing cell highlight carry the focus instead).
 
 // True when grid input is currently restricted anywhere in the tutorial.
 export function _tqIsGridInputLocked() {
@@ -964,16 +994,27 @@ export function _tqIsGridInputLocked() {
     if (_tqGridLocked) return true;
     if (_tqPhase === 'p2') {
         if (_tqP2HeartOpen) return true;
+        if (_tqP2GateOpen) return true;
     }
+    if (_tqPhase === 'p3' && _tqP3DropOpen) return true;
+    return false;
+}
+
+// True when NO grid cell accepts input right now (drives the red border).
+// Claim gates and guided demos each leave exactly one cell clickable, so
+// they count as interactable - not blocked - even though every other click
+// is swallowed.
+export function _tqIsGridFullyBlocked() {
+    if (typeof cur === 'undefined' || !cur || !cur.isTutorialQuest) return false;
+    if (_tqPhase === 'p2' && (_tqP2HeartOpen || _tqP2GateOpen)) return false;
+    if (_tqPhase === 'p3' && _tqP3DropOpen) return false;
+    if (_tqGridLocked) return _tqActiveDemo == null;
     return false;
 }
 
 export function _tqRefreshGridLockBorder() {
     try {
-        // Puzzle 2 never shows the red border - the input locks still apply,
-        // they just aren't visualized.
-        if (typeof _tqPhase !== 'undefined' && _tqPhase === 'p2') { _tqHideGridLockBorder(); return; }
-        if (_tqIsGridInputLocked()) _tqShowGridLockBorder();
+        if (_tqIsGridFullyBlocked()) _tqShowGridLockBorder();
         else _tqHideGridLockBorder();
     } catch (e) {}
 }
@@ -1128,6 +1169,40 @@ export const TQ_TASKS = {
     // Puzzle 3: the ghost was burned down with Fireball.
     fireball_kill: () => _tqSawMonster
         && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0,
+    // Puzzle 3: the ghost's Candle drop has been picked up with the correct
+    // click (the engine's item-drop pipeline grants it into the inventory).
+    // The gate admits only the left-click, so disappearance means claimed.
+    pick_candle: () => {
+        if (_tqP3CandleClaimed) return true;
+        try {
+            if (typeof _egItemDrops !== 'undefined' && _tqP3CandleKey
+                && !_egItemDrops.has(_tqP3CandleKey)) {
+                _tqP3CandleClaimed = true;
+                _tqP3DropOpen = false;
+                _tqP3DropCell = null;
+                _tqRefreshGridLockBorder();
+                return true;
+            }
+        } catch (e) {}
+        return false;
+    },
+    // Puzzle 3: the ghost's Divine Orb has been destroyed with the deliberate
+    // wrong click. The gate admits only the right-click, so disappearance
+    // means shattered (a claim would need the blocked left-click).
+    orb_destroyed: () => {
+        if (_tqP3OrbDestroyed) return true;
+        try {
+            if (typeof _egCurrencyDrops !== 'undefined' && _tqP3OrbKey
+                && !_egCurrencyDrops.has(_tqP3OrbKey)) {
+                _tqP3OrbDestroyed = true;
+                _tqP3DropOpen = false;
+                _tqP3DropCell = null;
+                _tqRefreshGridLockBorder();
+                return true;
+            }
+        } catch (e) {}
+        return false;
+    },
     // Puzzle 3: the spellbook was opened.
     open_spellbook: () => typeof isSpellbookOpen === 'function' && isSpellbookOpen(),
     // Puzzle 3: the Scroll of Fireball was dragged into a spell slot, which
@@ -1176,9 +1251,8 @@ export function _tqStepsFor(phase) {
             { fn: () => { _tqGridLocked = false; _tqClearHighlights(); _tqActiveDemo = null; } },
             { say: 'tq_p1_s8', task: 'cross_filled' },
             { say: 'tq_p1_s9', wait: true, fn: () => _tqClearHighlights() },
-            { say: 'tq_p1_s10', wait: true, fn: () => { _tqGiveCandle(); _tqOpenRevealFlyout(); _tqHighlightCandleSlot(); _tqShowPointerLine(); } },
-            { say: 'tq_p1_s11', task: 'use_candle', fn: () => { _tqCandleUsable = true; _tqClearHighlights(); _tqHighlightCandleSlot(); _tqHighlightAmbiguousCells(); _tqShowPointerLine(); } },
-            { say: 'tq_p1_s11b', task: 'corner_deduced', fn: () => _tqClearHighlights() },  // candle showed one cell; the clues decide the rest
+            { say: 'tq_p1_s10', task: 'use_candle', fn: () => { _tqGiveCandle(); _tqOpenRevealFlyout(); _tqCandleUsable = true; _tqClearHighlights(); _tqHighlightCandleSlot(); _tqShowPointerLine(); } },
+            { say: 'tq_p1_s11b', task: 'corner_deduced', fn: () => { _tqClearHighlights(); _tqHighlightCell(0, 0); _tqShowPointerLine(); } },  // candle revealed (0,0) - point at its tint, then the clues decide the rest
             { say: 'tq_p1_s12', wait: true, fn: () => { _tqClearHighlights(); _tqCloseInventoryFlyout(); } },  // s12 is ALSO the payoff step (corner solve jumps straight here)
         ];
         case 'p2': return [
@@ -1219,9 +1293,14 @@ export function _tqStepsFor(phase) {
             // player who dies to the ghost and retries gets a real corpse to
             // celebrate, not an empty field (the bounce re-runs this spawn).
             { say: 'tq_p3_s7', task: 'fireball_kill', fn: () => { _tqSpawnP3Ghost(); _tqPointAt('.skill-hotbar-slot[data-skill="fireball"]'); } },
-            { fn: () => { _tqGridLocked = false; _tqClearHighlights(); _tqRefreshGridLockBorder(); } },
-            { say: 'tq_p3_s8', task: 'solve_puzzle' },
-            { say: 'tq_p3_s9', wait: true },
+            // Ghost spoils: a real Candle, claimed with the correct click.
+            { say: 'tq_p3_s8', task: 'pick_candle', fn: () => { _tqPointAtDrop('.eg-item-drop-overlay'); } },
+            // The hard lesson: a Divine Orb, destroyed with the wrong click
+            // on purpose - the gate switches into destroy mode (right only).
+            { say: 'tq_p3_s8b', task: 'orb_destroyed', fn: () => { _tqP3DropCell = _tqP3OrbKey; _tqP3DropButton = 2; _tqP3DropOpen = true; _tqClearHighlights(); _tqPointAtDrop('.eg-currency-drop-overlay'); } },
+            { fn: () => { _tqGridLocked = false; _tqP3DropOpen = false; _tqP3DropCell = null; _tqClearHighlights(); _tqRefreshGridLockBorder(); } },
+            { say: 'tq_p3_s9', task: 'solve_puzzle' },
+            { say: 'tq_p3_s10', wait: true },
         ];
         default: return [];
     }
@@ -1252,8 +1331,8 @@ for (const phase of ['p1', 'p2', 'p3']) {
     TQ_STEP_INDEX[phase] = map;
 }
 
-// p1: the candle grant + explanation step (s10) - re-running it re-grants
-// the candle and re-arms _tqCandleUsable before the use_candle task at s11.
+// p1: the combined candle grant + use step (s10) - re-running it re-grants
+// the candle and re-arms _tqCandleUsable before the use_candle task polls.
 const TQ_P1_STEP_CANDLE_GRANT = TQ_STEP_INDEX.p1['tq_p1_s10'];
 // p2: the defeat-the-rat task step (s1b, task kill_monster).
 const TQ_P2_STEP_KILL_RAT = TQ_STEP_INDEX.p2['tq_p2_s1b'];
@@ -1274,6 +1353,10 @@ export function _tqRunCurrentPhase() {
         const st = steps[_tqStepIdx];
         _tqStepIdx++;
         if (st.fn) st.fn();
+        // Every step setup may flip the lock flags (grid lock, demo, drop
+        // gates) - re-derive the red border here so no step needs its own
+        // refresh call to stay coherent.
+        _tqRefreshGridLockBorder();
         // Show the line FIRST - a combined say+task step must display its
         // explanation while the task polls (wait+task never co-exists).
         if (st.say) _tqSay(st.say, !!st.wait);
@@ -1301,6 +1384,17 @@ export function _tqStartTask(name) {
             if (name === 'kill_monster' && _tqPhase === 'p2') {
                 _tqLockP2Grid();
                 _tqSpawnHeart();
+            }
+            // Puzzle 3 ghost kill: the instant the ghost burns down both
+            // spoils drop onto the grid (a Candle, then a Divine Orb) while
+            // the sealed board keeps everything else locked. The candle
+            // gate opens at once; the orb lesson takes over after the
+            // candle is claimed (see the s8b step setup).
+            if (name === 'fireball_kill' && _tqPhase === 'p3') {
+                _tqGridLocked = true;
+                _tqPlaceCandleDrop();
+                _tqPlaceOrbDrop();
+                _tqRefreshGridLockBorder();
             }
             // Celebration when a combat task's monster goes down (puzzle 2
             // fill-combat kill; puzzle 3 melee / fireball kills).
@@ -1350,6 +1444,7 @@ export function _tqPhaseFinished() {
     _tqP2HeartCell = null;
     _tqP3DropOpen = false;
     _tqP3DropCell = null;
+    _tqP3DropButton = 1;
     _tqRefreshGridLockBorder();
     _tqClearHighlights();
     if (_tqPhase === 'p1') {
@@ -1405,10 +1500,15 @@ export function _tqStartPuzzle(i) {
     // Puzzle-3 lesson state resets with every level boot (retries included).
     _tqP3DropOpen = false;
     _tqP3DropCell = null;
+    _tqP3DropButton = 1;
     _tqP3SwordKey = null;
     _tqP3SwordClaimed = false;
     _tqP3CharmKey = null;
     _tqP3CharmClaimed = false;
+    _tqP3CandleKey = null;
+    _tqP3CandleClaimed = false;
+    _tqP3OrbKey = null;
+    _tqP3OrbDestroyed = false;
     _tqP3GhostSpawned = false;
     _tqSawMonster = false;
     _tqPuzzleSolvedFlag = false;
@@ -1490,7 +1590,7 @@ export function _tqOnPuzzleSolved() {
     // so the bounce can never demand a kill on an empty field.
     if (_tqPhase === 'p1' && !_tqCandleUsed) {
         globalThis.dead = false;
-        _tqStepIdx = TQ_P1_STEP_CANDLE_GRANT;   // re-run the candle explanation + task (s10 grant → s11 use → s11b deduce)
+        _tqStepIdx = TQ_P1_STEP_CANDLE_GRANT;   // re-run the combined candle step (s10 use → s11b deduce)
         _tqRunCurrentPhase();
         return;
     }
@@ -1656,6 +1756,7 @@ export function _tqPlaceSwordDrop() {
     _tqP3DropOpen = false;
     _tqP3DropCell = null;
     _tqP3SwordKey = null;
+    _tqP3DropButton = 1;
     try {
         _tqEnsureFireball();
         if (typeof EG_ALL_BASE_TYPES === 'undefined'
@@ -1711,6 +1812,7 @@ export function _tqPlaceCharmDrop() {
     _tqP3DropOpen = false;
     _tqP3DropCell = null;
     _tqP3CharmKey = null;
+    _tqP3DropButton = 1;
     try {
         _tqEnsureFireball();
         if (typeof _charmMake !== 'function'
@@ -1738,6 +1840,95 @@ export function _tqPlaceCharmDrop() {
     _tqRefreshGridLockBorder();
 }
 
+// First open solution cell for a ghost spoil: the preferred lesson cell
+// when it is still untouched, otherwise the first eligible cell in
+// row-major order (never null while the sealed lesson grid has opens).
+function _tqGhostSpoilCell(prefR, prefC) {
+    try {
+        if (typeof cur === 'undefined' || !cur || !cur.grid
+            || typeof userGrid === 'undefined' || !globalThis.userGrid) return null;
+        const eligible = (r, c) => cur.grid[r][c] === 1
+            && globalThis.userGrid[r][c] === 0
+            && !(typeof revealedGrid !== 'undefined' && globalThis.revealedGrid[r] && globalThis.revealedGrid[r][c])
+            && !(typeof wrongGrid !== 'undefined' && globalThis.wrongGrid[r] && globalThis.wrongGrid[r][c])
+            && !(typeof _egCellHasAnyDrop === 'function' && _egCellHasAnyDrop(r, c));
+        if (eligible(prefR, prefC)) return [prefR, prefC];
+        for (let r = 0; r < cur.grid.length; r++) {
+            for (let c = 0; c < cur.grid[r].length; c++) {
+                if (eligible(r, c)) return [r, c];
+            }
+        }
+    } catch (e) {}
+    return null;
+}
+
+// Puzzle 3: the defeated ghost drops a real Candle puzzle item onto the
+// grid - a genuine item drop (defId 'reveal1'), claimed with a correct
+// left-click fill through the engine's item-drop pipeline. Preferred cell
+// (2,4): a solution cell the sealed lesson grid guarantees untouched.
+// Opens the drop gate in claim mode (left-click only). No expiry: the
+// lesson waits until claimed.
+export function _tqPlaceCandleDrop() {
+    _tqP3DropOpen = false;
+    _tqP3DropCell = null;
+    _tqP3CandleKey = null;
+    _tqP3DropButton = 1;
+    try {
+        if (typeof _egItemDrops === 'undefined'
+            || typeof _egRenderItemDropOverlay !== 'function') {
+            // Engine pipeline unavailable - grant the candle straight into
+            // the inventory so the lesson degrades to a gift, never a lock.
+            _tqGrantPuzzleItem('reveal1');
+            _tqP3CandleClaimed = true;
+            return;
+        }
+        const cell = _tqGhostSpoilCell(2, 4);
+        if (!cell) {
+            _tqGrantPuzzleItem('reveal1');
+            _tqP3CandleClaimed = true;
+            return;
+        }
+        const [r, c] = cell;
+        const key = `${r}-${c}`;
+        _egItemDrops.set(key, { defId: 'reveal1' });
+        _egRenderItemDropOverlay(r, c, { defId: 'reveal1' });
+        _tqP3CandleKey = key;
+        _tqP3DropCell = key;
+        _tqP3DropOpen = true;
+    } catch (e) {}
+    _tqRefreshGridLockBorder();
+}
+
+// Puzzle 3: the defeated ghost drops a real Divine Orb currency drop onto
+// the grid - claimed by the engine on a correct fill, destroyed on a wrong
+// action. The orb lesson switches the already-open gate into destroy mode
+// (right-click only); this only places the drop. Preferred cell (4,2).
+// No expiry: the lesson waits until shattered.
+export function _tqPlaceOrbDrop() {
+    _tqP3OrbKey = null;
+    try {
+        if (typeof _egCurrencyDrops === 'undefined'
+            || typeof _egRenderCurrencyDropOverlay !== 'function'
+            || typeof EG_CURRENCY_DEFS === 'undefined' || !EG_CURRENCY_DEFS.orb_divine) {
+            // Engine pipeline unavailable - skip the destroy lesson rather
+            // than gate the board on a drop that never lands.
+            _tqP3OrbDestroyed = true;
+            return;
+        }
+        const cell = _tqGhostSpoilCell(4, 2);
+        if (!cell) {
+            _tqP3OrbDestroyed = true;
+            return;
+        }
+        const [r, c] = cell;
+        const key = `${r}-${c}`;
+        const def = EG_CURRENCY_DEFS.orb_divine;
+        _egCurrencyDrops.set(key, def);
+        _egRenderCurrencyDropOverlay(r, c, def);
+        _tqP3OrbKey = key;
+    } catch (e) {}
+    _tqRefreshGridLockBorder();
+}
 // Clears stale fill damage (drag-charge + queued reveal projectiles) left
 // over from the sword / charm pickup fills, so the lesson fights start
 // clean and pickups never leak free damage into them.
@@ -1767,14 +1958,16 @@ export function _tqSpawnP3Bat() {
 
 // Puzzle 3 fireball lesson: a ghost arrives once Fireball sits on the
 // hotbar. It is immune to melee (meleeImmune flag - blades flash IMMUNE) so
-// only Fireball can bring it down. Three casts (18 each vs 50 ±15%) end it.
+// only Fireball can bring it down. Two casts (18 each vs 30 ±15% → 25-34)
+// always end it: one cast can never one-shot it, three are never needed
+// (a rare accuracy miss just costs one extra cast).
 export function _tqSpawnP3Ghost() {
     _tqClearStaleFillDamage();
     _tqP3GhostSpawned = true;
     try {
         if (typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length > 0) { _tqSawMonster = true; return; }
         if (typeof cur !== 'undefined' && cur) {
-            cur.campaignMonsterHp = 50;
+            cur.campaignMonsterHp = 30;
             cur.campaignMonsterDamage = 3;
         }
         if (typeof _egSpawnMonster === 'function') _egSpawnMonster('ghost', 1);
@@ -2159,7 +2352,7 @@ export function _tqEnsureFireball() {
         nameDE: 'Feuerball',
         descCursorEn: 'Hurl a fireball at your target',
         descCursorDE: 'Wirf einen Feuerball auf dein Ziel',
-        cooldownSeconds: 6,
+        cooldownSeconds: 3,
         manaCost: 16,
         levels: [{
             descEn: 'Hurls a searing fireball at the targeted creature, dealing fire damage.',
@@ -2211,7 +2404,7 @@ export function _tqCastFireball() {
         }
     } catch (e) {}
     spendMana(16);
-    if (typeof startSlotCooldown === 'function') startSlotCooldown('active6', 6);
+    if (typeof startSlotCooldown === 'function') startSlotCooldown('active6', 3);
     _tqFireballUsed = true;
     // Launch from the avatar itself: the default fallback
     // (#class-hud-drag-handle) doesn't exist for classless characters, which
@@ -2437,16 +2630,18 @@ export function _tqCastFireball() {
                     if (pval !== 1) { _tqGridLockToast(); return true; }
                     return false;  // genuine handler performs the heart claim
                 }
-                // Puzzle-3 drop gate: while the Professor's sword / charm is
-                // on the grid, only a LEFT-click on its own cell is accepted.
-                // A right-click would destroy the drop; everything else is
-                // swallowed until it is claimed.
+                // Puzzle-3 drop gate: while a lesson drop is on the grid, only
+                // the expected click on its own cell is accepted - left-click
+                // claims (sword / charm / candle), right-click destroys on
+                // purpose (orb lesson). Anything else is swallowed until the
+                // lesson moves on.
                 if (_tqPhase === 'p3' && _tqP3DropOpen) {
                     if (_tqP3DropCell == null || `${row}-${col}` !== _tqP3DropCell) {
                         _tqGridLockToast();
                         return true;
                     }
-                    if (pval !== 1) { _tqGridLockToast(); return true; }
+                    const wantRight = _tqP3DropButton === 2;
+                    if (wantRight ? (pval !== 2) : (pval !== 1)) { _tqDropButtonToast(wantRight); return true; }
                     return false;  // genuine handler performs the drop claim
                 }
                 // Guided-demo lock (puzzle 1).
@@ -2590,9 +2785,9 @@ export function _tqCastFireball() {
             const item = STATE.inventory.find(i => i.uid === uid);
             if (item && item.defId === 'reveal1' && item.isTutorialCandle
                 && typeof cur !== 'undefined' && cur && cur.isTutorialQuest) {
-                // The candle may only be lit once the Professor's use-candle
-                // step is showing (puzzle 1 s11) - lighting it straight after
-                // receiving it (s10) would skip the explanation.
+                // The candle may only be lit once the Professor's combined
+                // grant + use step is showing (puzzle 1 s10) - lighting it
+                // before the lesson reaches that step would skip it.
                 if (!_tqCandleUsable && !_tqCandleUsed && _tqPhase === 'p1') {
                     try { showToast('🎓 ' + t('tq_candle_locked')); } catch (e) {}
                     return;

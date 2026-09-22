@@ -9,7 +9,7 @@ import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
 import { _getAsymptoticMasteryReduction, _getPenaltySecondsAtCount } from './penalty.js';
 import { RESHUFFLE_GOAL } from './puzzle-item-inventory/puzzle-item-reshuffle.js';
 import { rarityColors } from './puzzle-items/item-pool.js';
-import { _getLevelSpecialStatus } from './scoring.js';
+import { _getLevelSpecialStatus } from './scoring/scoring-core.js';
 import { _getGridSizeTier } from './start-level-passives.js';
 import { t } from './translation/translations.js';
 import { STATE } from './state.js';

@@ -31,7 +31,9 @@ import { addTimeSecs, previewGainSecs, setTimeSecs, subtractTimeSecs } from '../
 import { bumpFreezeCorrFills, endTimerFreeze, resetFreezeCorrFills, startTimerFreeze } from '../../js/timer/timer-freeze.js';
 import { _adjacencyMatrixCount, _adjacencyMatrixRefreshAll, _adjacencyMatrixUpdateOverlay, _applyColClueState, _applyRowClueState, _buildColClueHeaderRows, _buildColgroup, _buildPuzzleCell, _buildPuzzleRows, _buildRowClueCell, _buildRowClueToggle, _calcCellSize, _calcClueColWidth, _calcCluePositionWindows, _calcFontSize, _clearCellClasses, _clueColCount, _clueColWidth, _colCluesOnBottom, _collectPlayerRuns, _computeColClues, _computeRowClues, _handleRegressionReward, _handleResidualAnalysis, _isColSolved, _isRowSolved, _markZeroClueLinesSolved, _puzzleColCount, _puzzleColWidth, _refreshAdjacencyNeighbours, _rowCluesOnRight, _toggleColCluesSide, _toggleRowCluesSide, _tryAutoMarkAdjacentLine, _wireClueBtnTooltip, buildReveal, clues, getSolvedClueFlags } from '../../js/grid.js';
 import { PEN_FLASH_DURATION_MS, PEN_INFO_CLEAR_DELAY_MS, _applyTimeDeduction, _checkAndFlagPenaltyClutch, _checkTimerExpiry, _formatPenaltyLabel, _getAsymptoticMasteryReduction, _getBasePenaltySeconds, _getIronDoctrineExtraSeconds, _getPenaltySecondsAtCount, _interruptBlackSwanIfActive, _penaltyIsShieldAbsorbed, _resolveActivePenaltyMultiplier, _triggerPenaltyFlash, _tryProcStandardDeviation, _tryProcStochasticResonance, _updateMistakeCounterHUD, _updatePenaltyInfoHUD } from '../../js/penalty.js';
-import { _buildItemRewardCard, _getLevelSpecialStatus, _updateConvergenceTrialWinButton, _updateNexusWinButton, applyAscensionReward, applyConvergenceReward, applyNexusPointReward, buildBonusClaimedNote, buildGainNote, buildMistakeLine, buildScoreColumn, buildTimeColumn, calculateScore, checkIsConvergenceLevel, checkIsLargeAdjMatrix, checkWorldJustCompleted, computePointsAwarded, computeRawScore, countFilledCells, countMarkedCells, currentRunScore, evaluateBonusObjective, fireAchievements, formatTime, getExtraItemChance, getLuckyDropChance, grantBonusItem, grantLuckyDropItem, handleSpecialRewards, isConvergenceLevel, isPuzzleSolved, maybeUpdateHighScore, renderBonusBadge, renderItemRewardZone, renderWinOverlay, rollLuckyDropCount, rollLuckyDrops } from '../../js/scoring.js';
+import '../../js/scoring/scoring.js';
+import { isPuzzleSolved, computeRawScore, computePointsAwarded, maybeUpdateHighScore, calculateScore, evaluateBonusObjective, countFilledCells, countMarkedCells, fireAchievements, isConvergenceLevel, checkIsConvergenceLevel, _getLevelSpecialStatus, checkWorldJustCompleted, checkIsLargeAdjMatrix } from '../../js/scoring/scoring-core.js';
+import { renderWinOverlay, rollLuckyDrops, formatTime } from '../../js/scoring/scoring-rewards.js';
 import { ITEM_DEFS } from '../../js/puzzle-items/item-definitions.js';
 import { RARITY_COLOR_MAP, itemDesc, itemName, pickLuckyItem, pickRandomItem, rarityColors } from '../../js/puzzle-items/item-pool.js';
 import { CELL_FX_DURATION, _applyCellEffect, _ensureCellEffectCSS } from '../../js/puzzle-mechanics/cell-fx.js';
@@ -492,7 +494,6 @@ try { Object.defineProperty(globalThis, "_egGetRevealProjectileDamagePct", { get
 try { Object.defineProperty(globalThis, "_egGetTarget", { get() { return _egGetTarget; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGetUnmetRequirementsText", { get() { return _egGetUnmetRequirementsText; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGourmetDevour", { get() { return _egGourmetDevour; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "_egGrantCampaignLevelXP", { get() { return _egGrantCampaignLevelXP; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egHandleChipMouseDown", { get() { return _egHandleChipMouseDown; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egHideHubInfoTooltip", { get() { return _egHideHubInfoTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egIsActive", { get() { return _egIsActive; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -540,7 +541,6 @@ try { Object.defineProperty(globalThis, "_egOnGateCurrencyCellMove", { get() { r
 try { Object.defineProperty(globalThis, "_egOnMistake", { get() { return _egOnMistake; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egOnPause", { get() { return _egOnPause; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egOnProgrammaticReveal", { get() { return _egOnProgrammaticReveal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "_egOnPuzzleComplete", { get() { return _egOnPuzzleComplete; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egOnResume", { get() { return _egOnResume; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egOnUniqueCellClick", { get() { return _egOnUniqueCellClick; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egOnUniqueCellEnter", { get() { return _egOnUniqueCellEnter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -690,15 +690,11 @@ try { Object.defineProperty(globalThis, "advanceTutStep", { get() { return advan
 try { Object.defineProperty(globalThis, "answerQuizInput", { get() { return answerQuizInput; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "applyAscendencyUpgrade", { get() { return applyAscendencyUpgrade; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "applyClassUpgrade", { get() { return applyClassUpgrade; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "attachItemTooltip", { get() { return attachItemTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "beginRetrySetupRun", { get() { return beginRetrySetupRun; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "buildInventoryPanel", { get() { return buildInventoryPanel; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "cancelRetrySetupModal", { get() { return cancelRetrySetupModal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "cellDown", { get() { return cellDown; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "checkLockedCodesOnSetup", { get() { return checkLockedCodesOnSetup; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "checkWorldCodes", { get() { return checkWorldCodes; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "checkWorldCodesSync", { get() { return checkWorldCodesSync; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "checkWorldCompletion", { get() { return checkWorldCompletion; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "claimQuest", { get() { return claimQuest; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "closeClassOverlay", { get() { return closeClassOverlay; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "closeKeybindsModal", { get() { return closeKeybindsModal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -796,14 +792,12 @@ try { Object.defineProperty(globalThis, "prevTutStep", { get() { return prevTutS
 try { Object.defineProperty(globalThis, "primerUseTutor", { get() { return primerUseTutor; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "ptHasSkill", { get() { return ptHasSkill; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "quizUseTutor", { get() { return quizUseTutor; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "rarityColors", { get() { return rarityColors; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "renderLSCharacterAvatar", { get() { return renderLSCharacterAvatar; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "renderMapViewCharacterPortrait", { get() { return renderMapViewCharacterPortrait; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "replayTutorialFromTitle", { get() { return replayTutorialFromTitle; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "resetAllBeatsForSlot", { get() { return resetAllBeatsForSlot; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "resetKeybinds", { get() { return resetKeybinds; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "resetMarkovianState", { get() { return resetMarkovianState; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "resetRecursionistState", { get() { return resetRecursionistState; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "resetZoom", { get() { return resetZoom; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "retrySetupDefer", { get() { return retrySetupDefer; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "retrySetupIsActive", { get() { return retrySetupIsActive; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -811,9 +805,7 @@ try { Object.defineProperty(globalThis, "retrySetupResolve", { get() { return re
 try { Object.defineProperty(globalThis, "safeGoBackFromHub", { get() { return safeGoBackFromHub; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "saveSettings", { get() { return saveSettings; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "scalePuzzle", { get() { return scalePuzzle; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "scoreMultiplier", { get() { return scoreMultiplier; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "selDiff", { get() { return selDiff; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
-try { Object.defineProperty(globalThis, "setNexusUnlocked", { get() { return setNexusUnlocked; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showAscendencyTooltip", { get() { return showAscendencyTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showAscendencyUpgradeTooltip", { get() { return showAscendencyUpgradeTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showBeat", { get() { return showBeat; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

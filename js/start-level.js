@@ -30,7 +30,7 @@ import { resetToastQueue, showToast } from './puzzle-mechanics/toasts-and-popups
 import { resetQuestLevelCounters, resetWitchImmunityLevelCounter } from './inference/inference-stats.js';
 import { isGatedLevel, isMathGatePassed, tryStartGatedLevel } from './quiz-exercise/mathgate.js';
 import { closeQuiz } from './quiz-exercise/quiz.js';
-import { _getLevelSpecialStatus, isPuzzleSolved } from './scoring.js';
+import { _getLevelSpecialStatus, isPuzzleSolved } from './scoring/scoring-core.js';
 import { hideResultOverlays, switchScreen } from './screens/screens.js';
 import { _uspClearSupportBuffs } from './skills/universal-spells.js';
 import { resetBanterState, triggerBanter } from './sprite/character-banter.js';
