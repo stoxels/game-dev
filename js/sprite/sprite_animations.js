@@ -40,7 +40,7 @@ import { STATE } from '../state.js';
 // Returns nothing; all scheduling is done via setTimeout against the
 // element id (re-queried each frame) so it's safe even if the element
 // is briefly replaced/re-rendered mid-animation.
-export function _playSpriteAnimation(imgElementId, frames, timings, idleSrc, idleDelayMs, onComplete) {
+function _playSpriteAnimation(imgElementId, frames, timings, idleSrc, idleDelayMs, onComplete) {
     if (!frames || frames.length === 0) return;
     if (!timings || timings.length !== frames.length) {
         console.warn(`_playSpriteAnimation: timings length mismatch for ${imgElementId}`);
@@ -79,7 +79,7 @@ export function _playSpriteAnimation(imgElementId, frames, timings, idleSrc, idl
 // Playback wraps through these in time order (1,2,3,1,2,3,...) - see
 // _advanceWalkFrameIndex() below. Pick frames as a closed loop so the
 // last frame flows back into the first.
-export const _WALK_FRAMES = {
+const _WALK_FRAMES = {
     stox: {
         noclass: [
             'animations/Stox/walk/Stox_noclass_walk_1.webp', // contact: left foot forward
@@ -236,8 +236,8 @@ export const _WALK_FRAMES = {
 
 };
 
-export const _WALK_FRAME_INTERVAL_MS = 150; // ms between each walk frame while looping
-export const _WALK_IDLE_DEBOUNCE_MS = 180;  // ms of no movement before snapping back to idle
+const _WALK_FRAME_INTERVAL_MS = 150; // ms between each walk frame while looping
+const _WALK_IDLE_DEBOUNCE_MS = 180;  // ms of no movement before snapping back to idle
 
 // Internal loop/debounce state. Keyed nothing - only one avatar walks at
 // a time, so a single shared state object is fine.
@@ -258,7 +258,7 @@ export const _walkState = {
 // time order). Pick walk frames as a closed loop - the last frame
 // must flow back into the first - otherwise the wrap point visibly
 // "snaps" rather than stepping naturally.
-export function _advanceWalkFrameIndex(frameCount) {
+function _advanceWalkFrameIndex(frameCount) {
     if (frameCount <= 1) return 0;
 
     return (_walkState.frameIndex + 1) % frameCount;
@@ -281,15 +281,13 @@ export function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simp
     // Remember facing so the sprite keeps looking its travel direction
     // once it stops (directional idle). Updated on every directed step.
     if (direction && ANIM_DIRECTIONS.indexOf(direction) !== -1) {
-        try { _lastFacingDir = direction; } catch (e) { /* pre-init: ignore */ }
+        _lastFacingDir = direction;
     }
 
     // Pause the idle loop while walking (no src restore - we take over below).
-    if (typeof _stopAvatarIdleAnimation === 'function') _stopAvatarIdleAnimation(false);
+    _stopAvatarIdleAnimation(false);
 
-    const frames = (typeof _animGetWalkFramesSync === 'function')
-        ? _animGetWalkFramesSync(char, asc, direction)
-        : (_WALK_FRAMES[char]?.[asc] || []);
+    const frames = _animGetWalkFramesSync(char, asc, direction);
     // True directional art is already drawn facing its travel direction and
     // must NEVER be mirrored. Omni fallback art is drawn facing right, so
     // leftward movement still needs the scaleX(-1) mirror (handled by the
@@ -302,7 +300,7 @@ export function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simp
     }
     if (!frames || frames.length === 0) {
         // No walk art at all - hand back to idle (static portrait fallback).
-        if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation(imgElementId);
+        _startAvatarIdleAnimation(imgElementId);
         return;
     }
 
@@ -377,15 +375,7 @@ export function _stopAvatarWalkAnimation() {
     _walkState.imgElementId = null;
     if (!imgElementId) return;
 
-    if (typeof _startAvatarIdleAnimation === 'function') {
-        _startAvatarIdleAnimation(imgElementId, lastDir);
-        return;
-    }
-    const el = document.getElementById(imgElementId);
-    const idleSrc = typeof _getPlayerCharacterImage === 'function'
-        ? _getPlayerCharacterImage()
-        : undefined;
-    if (el && idleSrc) el.src = idleSrc;
+    _startAvatarIdleAnimation(imgElementId, lastDir);
 }
 
 // Single entry point movement code should call on every position change:
@@ -403,7 +393,7 @@ export function _playAvatarWalkAnimation(imgElementId, direction) {
 // Keyed by character -> ascendency -> skillKey -> frames. Combat and
 // puzzle-skill animations both live here, distinguished by skillKey.
 
-export const _SKILL_FRAMES = {
+const _SKILL_FRAMES = {
     trix: {
         random_walker: {
             swing: [
@@ -418,7 +408,7 @@ export const _SKILL_FRAMES = {
 // Per-skill timing config: ms offset for each frame, plus delay before
 // returning to idle. Keyed the same way as _SKILL_FRAMES so each skill
 // can have its own pacing.
-export const _SKILL_TIMINGS = {
+const _SKILL_TIMINGS = {
     trix: {
         random_walker: {
             swing: {
@@ -428,49 +418,6 @@ export const _SKILL_TIMINGS = {
         },
     },
 };
-
-// Plays the named skill animation for the current character/ascendency.
-// Now a thin wrapper over the generic per-spell player below, so new
-// per-spell folders under animations/<Char>/abilities/ are picked up
-// without touching this function. Falls back to doing nothing (the
-// static portrait keeps showing) if no frames are defined yet.
-export function _playAvatarSkillAnimation(skillKey, imgElementId) {
-    if (typeof _playAvatarSkillAnimationGeneric === 'function') {
-        const char = STATE?.playerCharacter;
-        const asc = STATE?.playerAscendency || STATE?.playerClass || 'noclass';
-        _playAvatarSkillAnimationGeneric(char, asc, skillKey, imgElementId);
-        return;
-    }
-    const char = STATE?.playerCharacter;
-    const asc = STATE?.playerAscendency;
-    if (!char || !asc) return;
-
-    const frames = _SKILL_FRAMES[char]?.[asc]?.[skillKey];
-    const timingCfg = _SKILL_TIMINGS[char]?.[asc]?.[skillKey];
-    if (!frames || frames.length === 0 || !timingCfg) return;
-
-    const idleSrc = typeof _getPlayerCharacterImage === 'function'
-        ? _getPlayerCharacterImage()
-        : undefined;
-    if (!idleSrc) return;
-
-    _playSpriteAnimation(
-        imgElementId || 'avatar-sprite-img-simple',
-        frames,
-        timingCfg.frameOffsets,
-        idleSrc,
-        timingCfg.idleDelay
-    );
-}
-
-// Backwards-compatible wrapper: existing call sites use
-// _playAvatarSwingAnimation() directly for Trix/random_walker's swing.
-// Kept as a thin wrapper so player_sprite.js and any other callers don't
-// need to change.
-export function _playAvatarSwingAnimation() {
-    _playAvatarSkillAnimation('swing');
-}
-
 
 //------------------------------------------------------------------------
 //-------------------ANIMATION CATALOG (animations/ folder)----------------
@@ -519,35 +466,34 @@ export function _playAvatarSwingAnimation() {
 // therefore never breaks anything: the regular portrait keeps showing.
 //------------------------------------------------------------------------
 
-export const ANIM_BASE_PATH = 'animations';
+const ANIM_BASE_PATH = 'animations';
 // Upper bound probed per animation - raise if you ever need longer cuts.
-export const ANIM_MAX_FRAMES = 12;
+const ANIM_MAX_FRAMES = 12;
 export const ANIM_DIRECTIONS = ['up', 'down', 'left', 'right'];
-export const ANIM_VARIANTS = ['noclass', 'statistician', 'mathmagician', 'probabilist', 'outlier', 'actuary', 'recursionist', 'markovian', 'bayesian', 'random_walker'];
-export const ANIM_IDLE_INTERVAL_MS = 450;   // ms between idle frames (ping-pong loop)
-export const ANIM_SKILL_FRAME_MS = 120;     // default pacing for one-shot spell anims
-export const ANIM_SKILL_IDLE_DELAY_MS = 400;// ms on the last spell frame before idle resumes
+const ANIM_IDLE_INTERVAL_MS = 450;   // ms between idle frames (ping-pong loop)
+const ANIM_SKILL_FRAME_MS = 120;     // default pacing for one-shot spell anims
+const ANIM_SKILL_IDLE_DELAY_MS = 400;// ms on the last spell frame before idle resumes
 
 // key -> frames[] (empty array = checked, nothing on disk). Warmed
 // fire-and-forget so gameplay never blocks on file probing.
-export const _animCache = {};
-export const _animWarmStarted = {};
+const _animCache = {};
+const _animWarmStarted = {};
 
 // Capitalizes the character id to match folder/file casing (stox -> Stox).
-export function _animCharCap(char) {
+function _animCharCap(char) {
     if (!char) return null;
     return char.charAt(0).toUpperCase() + char.slice(1);
 }
 
 // Ascendency wins over base class, mirroring _getPlayerCharacterImage().
-export function _animVariant() {
-    if (typeof STATE === 'undefined' || !STATE) return 'noclass';
+function _animVariant() {
+    if (!STATE) return 'noclass';
     return STATE.playerAscendency || STATE.playerClass || 'noclass';
 }
 
 // Which avatar <img> should animate right now? Only one of the two
 // avatars exists at a time (simple vs. full endgame avatar).
-export function _animTargetImgId(preferred) {
+function _animTargetImgId(preferred) {
     if (typeof document === 'undefined') return preferred || null;
     if (preferred && document.getElementById(preferred)) return preferred;
     if (document.getElementById('avatar-sprite-img-simple')) return 'avatar-sprite-img-simple';
@@ -556,7 +502,7 @@ export function _animTargetImgId(preferred) {
 }
 
 // Probes one file without adding it to the DOM.
-export function _animProbe(src) {
+function _animProbe(src) {
     return new Promise((resolve) => {
         try {
             const img = new Image();
@@ -570,7 +516,7 @@ export function _animProbe(src) {
 }
 
 // Collects <dir>/<prefix>_1.png, _2.png, ... stopping at the first gap.
-export async function _animDiscoverFrames(dir, prefix) {
+async function _animDiscoverFrames(dir, prefix) {
     const frames = [];
     for (let i = 1; i <= ANIM_MAX_FRAMES; i++) {
         const src = `${dir}/${prefix}_${i}.webp`;
@@ -630,7 +576,7 @@ export function _animRefreshCacheFor(char, variant) {
 // Sync walk-frame lookup: directional nested art (if already discovered)
 // → omnidirectional nested art (if already discovered) → legacy
 // _WALK_FRAMES table (covers all current flat files on day one).
-export function _animGetWalkFramesSync(char, variant, direction) {
+function _animGetWalkFramesSync(char, variant, direction) {
     const charCap = _animCharCap(char);
     if (!charCap) return [];
     if (direction && ANIM_DIRECTIONS.indexOf(direction) !== -1) {
@@ -646,7 +592,7 @@ export function _animGetWalkFramesSync(char, variant, direction) {
 // omnidirectional idle art (already discovered). Empty when neither exists,
 // and callers fall back to the static portrait. Menus always use the static
 // portrait via _getPlayerCharacterImage() directly and never call this.
-export function _animGetIdleFramesSync(char, variant, direction) {
+function _animGetIdleFramesSync(char, variant, direction) {
     const charCap = _animCharCap(char);
     if (!charCap) return [];
     if (direction && ANIM_DIRECTIONS.indexOf(direction) !== -1) {
@@ -662,7 +608,7 @@ export function _animGetIdleFramesSync(char, variant, direction) {
 // fallback art is drawn facing right and still needs the mirror for left.
 export function _animHasDirectionalWalkSync(char, variant, direction) {
     if (!direction || ANIM_DIRECTIONS.indexOf(direction) === -1) return false;
-    const charCap = (typeof _animCharCap === 'function') ? _animCharCap(char) : null;
+    const charCap = _animCharCap(char);
     if (!charCap || !variant) return false;
     const dk = `walk|${charCap}|${variant}|${direction}`;
     return !!(_animCache[dk] && _animCache[dk].length);
@@ -691,8 +637,8 @@ export function _animWalkIsDirectionalFor(imgElementId) {
 // Cached down-facing frame for gameplay defaults (standing pose preferred):
 // directional idle-down frame 1, else directional walk-down frame 1.
 // Null when nothing directional has been discovered yet (cold cache).
-export function _animGetDownFallbackSrc(char, variant) {
-    const charCap = (typeof _animCharCap === 'function') ? _animCharCap(char) : null;
+function _animGetDownFallbackSrc(char, variant) {
+    const charCap = _animCharCap(char);
     if (!charCap || !variant) return null;
     const idleDk = `idle|${charCap}|${variant}|down`;
     if (_animCache[idleDk] && _animCache[idleDk].length) return _animCache[idleDk][0];
@@ -706,14 +652,14 @@ export function _animGetDownFallbackSrc(char, variant) {
 // browser loads directly when the art exists. Callers chain onerror to the
 // walk-down frame and finally the menu portrait, so variants without
 // directional art still land on the portrait instead of a broken image.
-export function _animExpectedDownSrc(char, variant) {
-    const charCap = (typeof _animCharCap === 'function') ? _animCharCap(char) : null;
+function _animExpectedDownSrc(char, variant) {
+    const charCap = _animCharCap(char);
     if (!charCap || !variant) return null;
     return `${ANIM_BASE_PATH}/${charCap}/idle/${variant}/down/${charCap}_${variant}_idle_down_1.webp`;
 }
 
-export function _animExpectedWalkDownSrc(char, variant) {
-    const charCap = (typeof _animCharCap === 'function') ? _animCharCap(char) : null;
+function _animExpectedWalkDownSrc(char, variant) {
+    const charCap = _animCharCap(char);
     if (!charCap || !variant) return null;
     return `${ANIM_BASE_PATH}/${charCap}/walk/${variant}/down/${charCap}_${variant}_walk_down_1.webp`;
 }
@@ -723,18 +669,17 @@ export function _animExpectedWalkDownSrc(char, variant) {
 // optimistic idle-down path (with onerror chain handled by the caller via
 // _animSetDefaultDownImage), otherwise the menu portrait.
 export function _getPlayerPuzzleDefaultImage() {
-    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
-    const char = st ? st.playerCharacter : null;
-    const variant = (typeof _animVariant === 'function') ? _animVariant() : 'noclass';
+    const char = STATE ? STATE.playerCharacter : null;
+    const variant = _animVariant();
     if (!char) {
-        return (typeof _getPlayerCharacterImage === 'function') ? _getPlayerCharacterImage() : '';
+        return _getPlayerCharacterImage();
     }
-    if (typeof _animWarmCacheFor === 'function') _animWarmCacheFor(char, variant);
-    const cached = (typeof _animGetDownFallbackSrc === 'function') ? _animGetDownFallbackSrc(char, variant) : null;
+    _animWarmCacheFor(char, variant);
+    const cached = _animGetDownFallbackSrc(char, variant);
     if (cached) return cached;
-    const expected = (typeof _animExpectedDownSrc === 'function') ? _animExpectedDownSrc(char, variant) : null;
+    const expected = _animExpectedDownSrc(char, variant);
     if (expected) return expected;
-    return (typeof _getPlayerCharacterImage === 'function') ? _getPlayerCharacterImage() : '';
+    return _getPlayerCharacterImage();
 }
 
 // Sets an <img> to the gameplay default (move-down) with a safe fallback
@@ -742,22 +687,21 @@ export function _getPlayerPuzzleDefaultImage() {
 // paint where discovery hasn't confirmed the art yet.
 export function _animSetDefaultDownImage(imgEl) {
     if (!imgEl) return;
-    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
-    const char = st ? st.playerCharacter : null;
-    const variant = (typeof _animVariant === 'function') ? _animVariant() : 'noclass';
-    const menuSrc = (typeof _getPlayerCharacterImage === 'function') ? _getPlayerCharacterImage() : '';
+    const char = STATE ? STATE.playerCharacter : null;
+    const variant = _animVariant();
+    const menuSrc = _getPlayerCharacterImage();
     if (!char) {
         if (menuSrc) imgEl.src = menuSrc;
         return;
     }
-    if (typeof _animWarmCacheFor === 'function') _animWarmCacheFor(char, variant);
-    const cached = (typeof _animGetDownFallbackSrc === 'function') ? _animGetDownFallbackSrc(char, variant) : null;
+    _animWarmCacheFor(char, variant);
+    const cached = _animGetDownFallbackSrc(char, variant);
     if (cached) {
         imgEl.src = cached;
         return;
     }
-    const idleDown = (typeof _animExpectedDownSrc === 'function') ? _animExpectedDownSrc(char, variant) : null;
-    const walkDown = (typeof _animExpectedWalkDownSrc === 'function') ? _animExpectedWalkDownSrc(char, variant) : null;
+    const idleDown = _animExpectedDownSrc(char, variant);
+    const walkDown = _animExpectedWalkDownSrc(char, variant);
     imgEl.onerror = function () {
         imgEl.onerror = function () {
             imgEl.onerror = null;
@@ -779,7 +723,7 @@ export function _animSetDefaultDownImage(imgEl) {
 //-------------------IDLE LOOP---------------------------------------------
 //------------------------------------------------------------------------
 
-export const _idleState = {
+const _idleState = {
     intervalId: null,
     frameIndex: 0,
     direction: 1, // ping-pong direction through frames
@@ -787,27 +731,22 @@ export const _idleState = {
     key: null,    // char|variant|facing the loop was started for
 };
 
-// After this long without moving, an idle sprite turns to face the player
-// (default look-down / standing image) instead of holding its last travel
-// direction. Rearmed every time the idle loop (re)starts; cancelled as soon
-// as walking resumes.
 // Last movement facing, so the gameplay sprite keeps looking its travel
 // direction when it stops (directional idle art) instead of snapping back
-// to the static portrait. Menus are unaffected: they render
-// _getPlayerCharacterImage() on separate elements and never go through
-// the idle loop.
+// to the static portrait. Menus render _getPlayerCharacterImage() on
+// separate elements and never go through the idle loop.
 export let _lastFacingDir = 'down';
 
 // Retry state for the cold-cache case below (first spawn before art
 // discovery finishes). Bounded: at most _IDLE_RETRY_MAX attempts.
-export let _idleRetryKey = null;
-export let _idleRetryCount = 0;
-export const _idleRetryDelays = [600, 1500];
-export const _IDLE_RETRY_MAX = 2;
+let _idleRetryKey = null;
+let _idleRetryCount = 0;
+const _idleRetryDelays = [600, 1500];
+const _IDLE_RETRY_MAX = 2;
 
 // True while the idle art for this char/variant/facing may still be
 // probing (warming started, no result yet) rather than confirmed missing.
-export function _animIdlePending(charCap, variant, face) {
+function _animIdlePending(charCap, variant, face) {
     if (!charCap || !variant) return false;
     const keys = [`idle|${charCap}|${variant}`];
     if (face && ANIM_DIRECTIONS.indexOf(face) !== -1) {
@@ -816,7 +755,7 @@ export function _animIdlePending(charCap, variant, face) {
     return keys.some((k) => _animWarmStarted[k] && typeof _animCache[k] === 'undefined');
 }
 
-export function _stopAvatarIdleAnimation() {
+function _stopAvatarIdleAnimation() {
     if (_idleState.intervalId) {
         clearInterval(_idleState.intervalId);
         _idleState.intervalId = null;
@@ -838,21 +777,21 @@ export function _stopAvatarIdleAnimation() {
 // and get the portrait fallback exactly as before whenever no directional
 // idle art was discovered.
 export function _startAvatarIdleAnimation(imgElementId, direction) {
-    const id = (typeof _animTargetImgId === 'function') ? _animTargetImgId(imgElementId) : imgElementId;
+    const id = _animTargetImgId(imgElementId);
     if (!id || typeof document === 'undefined') return;
-    const char = (typeof STATE !== 'undefined' && STATE) ? STATE.playerCharacter : null;
-    const variant = (typeof _animVariant === 'function') ? _animVariant() : 'noclass';
+    const char = STATE ? STATE.playerCharacter : null;
+    const variant = _animVariant();
     if (!char) return;
     const face = (direction && ANIM_DIRECTIONS.indexOf(direction) !== -1)
         ? direction
-        : ((typeof _lastFacingDir === 'string' && ANIM_DIRECTIONS.indexOf(_lastFacingDir) !== -1) ? _lastFacingDir : null);
+        : ((ANIM_DIRECTIONS.indexOf(_lastFacingDir) !== -1) ? _lastFacingDir : null);
     const key = `${char}|${variant}|${face || 'portrait'}`;
 
     if (_idleState.intervalId && _idleState.imgElementId === id && _idleState.key === key) return;
     _stopAvatarIdleAnimation();
 
-    if (typeof _animWarmCacheFor === 'function') _animWarmCacheFor(char, variant);
-    const frames = (typeof _animGetIdleFramesSync === 'function') ? _animGetIdleFramesSync(char, variant, face) : [];
+    _animWarmCacheFor(char, variant);
+    const frames = _animGetIdleFramesSync(char, variant, face);
 
     const el = document.getElementById(id);
     if (!el) return;
@@ -866,25 +805,19 @@ export function _startAvatarIdleAnimation(imgElementId, direction) {
         // directly and never go through the idle loop). Cold-cache first
         // paint uses the optimistic down path with a safe chain back to the
         // portrait for variants without directional art.
-        if (typeof _animSetDefaultDownImage === 'function') {
-            const cur = el.getAttribute('src') || '';
-            const wantCached = (typeof _animGetDownFallbackSrc === 'function')
-                ? _animGetDownFallbackSrc(char, variant) : null;
-            if (wantCached) {
-                if (cur !== wantCached) el.src = wantCached;
-            } else if (typeof _animExpectedDownSrc === 'function' && _animExpectedDownSrc(char, variant)) {
-                // Only install the optimistic default when the element isn't
-                // already showing a directional frame (avoids clobbering a
-                // walk frame that just played before discovery finished).
-                const isAnimFrame = /_(idle|walk)_(up|down|left|right)_/i.test(cur);
-                if (!isAnimFrame) _animSetDefaultDownImage(el);
-            } else if (typeof _getPlayerCharacterImage === 'function') {
-                const idleSrc = _getPlayerCharacterImage();
-                if (idleSrc && cur !== idleSrc) el.src = idleSrc;
-            }
-        } else if (typeof _getPlayerCharacterImage === 'function') {
+        const cur = el.getAttribute('src') || '';
+        const wantCached = _animGetDownFallbackSrc(char, variant);
+        if (wantCached) {
+            if (cur !== wantCached) el.src = wantCached;
+        } else if (_animExpectedDownSrc(char, variant)) {
+            // Only install the optimistic default when the element isn't
+            // already showing a directional frame (avoids clobbering a
+            // walk frame that just played before discovery finished).
+            const isAnimFrame = /_(idle|walk)_(up|down|left|right)_/i.test(cur);
+            if (!isAnimFrame) _animSetDefaultDownImage(el);
+        } else {
             const idleSrc = _getPlayerCharacterImage();
-            if (idleSrc && el.getAttribute('src') !== idleSrc) el.src = idleSrc;
+            if (idleSrc && cur !== idleSrc) el.src = idleSrc;
         }
         // Cold cache: the facing art may still be probing (first spawn
         // right after load). Retry shortly so the sprite upgrades from
@@ -893,7 +826,6 @@ export function _startAvatarIdleAnimation(imgElementId, direction) {
         // never retries forever.
         if (_idleRetryKey !== key) { _idleRetryKey = key; _idleRetryCount = 0; }
         if (_idleRetryCount < _IDLE_RETRY_MAX
-            && (typeof _animIdlePending === 'function')
             && _animIdlePending(_animCharCap(char), variant, face)) {
             const attempt = _idleRetryCount++;
             const retryId = id, retryFace = face;
@@ -940,11 +872,10 @@ export function _startAvatarIdleAnimation(imgElementId, direction) {
 //------------------------------------------------------------------------
 // Maps a HUD ability slot to its animation folder name. active1/2 ride
 // on the base class, active3/4 on the ascendency, active5 is Heartbloom.
-export function _animSpellKeyForSlot(slot) {
+function _animSpellKeyForSlot(slot) {
     if (slot === 'active5') return 'heartbloom';
-    const st = (typeof STATE !== 'undefined' && STATE) ? STATE : null;
-    const cls = st ? st.playerClass : null;
-    const asc = st ? st.playerAscendency : null;
+    const cls = STATE?.playerClass || null;
+    const asc = STATE?.playerAscendency || null;
     const base = {
         statistician: { active1: 'data_strike', active2: 'diagonal_strike' },
         mathmagician: { active1: 'arcane_reveal', active2: 'absolute_zero' },
@@ -968,8 +899,8 @@ export function _animSpellKeyForSlot(slot) {
 // ability dispatchers in class-abilities.js so every base/ascendency
 // spell (instant or targeted) animates through this one path.
 export function _playAvatarSkillAnimationForSlot(slot, imgElementId) {
-    const char = (typeof STATE !== 'undefined' && STATE) ? STATE.playerCharacter : null;
-    const spell = (typeof _animSpellKeyForSlot === 'function') ? _animSpellKeyForSlot(slot) : null;
+    const char = STATE ? STATE.playerCharacter : null;
+    const spell = _animSpellKeyForSlot(slot);
     if (!char || !spell) return;
     const st = STATE;
     const variant = (slot === 'active1' || slot === 'active2')
@@ -983,10 +914,10 @@ export function _playAvatarSkillAnimationForSlot(slot, imgElementId) {
 // abilities/<variant>/<spell>/ folder. Heartbloom additionally falls
 // back to the shared folder so one set can serve all variants.
 // No art → no-op, the static portrait keeps showing.
-export async function _playAvatarSkillAnimationGeneric(char, variant, spell, imgElementId) {
-    const id = (typeof _animTargetImgId === 'function') ? _animTargetImgId(imgElementId) : (imgElementId || 'avatar-sprite-img-simple');
+async function _playAvatarSkillAnimationGeneric(char, variant, spell, imgElementId) {
+    const id = _animTargetImgId(imgElementId);
     if (!id || !char || !variant || !spell) return;
-    const charCap = (typeof _animCharCap === 'function') ? _animCharCap(char) : null;
+    const charCap = _animCharCap(char);
     if (!charCap) return;
 
     let frames = null;
@@ -1036,13 +967,13 @@ export async function _playAvatarSkillAnimationGeneric(char, variant, spell, img
         clearTimeout(_walkState.idleTimeoutId);
         _walkState.idleTimeoutId = null;
     }
-    if (typeof _stopAvatarIdleAnimation === 'function') _stopAvatarIdleAnimation();
+    _stopAvatarIdleAnimation();
 
-    const idleSrc = (typeof _getPlayerCharacterImage === 'function') ? _getPlayerCharacterImage() : undefined;
+    const idleSrc = _getPlayerCharacterImage();
     if (!idleSrc) return;
     const offsets = (timingCfg && timingCfg.frameOffsets) || frames.map((_, i) => i * ANIM_SKILL_FRAME_MS);
     const idleDelay = (timingCfg && typeof timingCfg.idleDelay === 'number') ? timingCfg.idleDelay : ANIM_SKILL_IDLE_DELAY_MS;
     _playSpriteAnimation(id, frames, offsets, idleSrc, idleDelay, () => {
-        if (typeof _startAvatarIdleAnimation === 'function') _startAvatarIdleAnimation(id);
+        _startAvatarIdleAnimation(id);
     });
 }
