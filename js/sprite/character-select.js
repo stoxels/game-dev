@@ -16,6 +16,10 @@ import { STATE } from '../state.js';
 // tutorial / setup flow resumes.
 //------------------------------------------------------------------------
 
+// How long the bare final artwork stands alone (no UI) after the intro's
+// natural end before the select screen crossfades in over it.
+const CSI_FINAL_FRAME_HOLD_MS = 1000;
+
 export const CHARACTERS = {
     stox: {
         id: 'stox',
@@ -121,7 +125,7 @@ export const CHARACTERS = {
 
 // showCharacterSelect - shows the character select screen.
 // onSelect(characterId) is called once the player confirms.
-export function showCharacterSelect(onSelect) {
+function showCharacterSelect(onSelect) {
     switchScreen('screen-character-select');
     _buildCharacterSelectUI(onSelect);
     // The intro hands us its frozen last frame (37.webp) after the song
@@ -133,19 +137,12 @@ export function showCharacterSelect(onSelect) {
     _csiDissolveIntroOverlay();
 }
 
-// How long the bare final artwork stands alone (no UI) after the intro's
-// natural end before the select screen crossfades in over it.
-export const CSI_FINAL_FRAME_HOLD_MS = 1000;
-
 // Dissolves the intro overlay the engine froze for us (see close() in
-// storyline-engine.js). Only a NATURAL song end hands over a frozen frame
-// flagged __csiIntroFinalFrame: the screen stays hidden behind the bare
-// artwork for ~1s, then crossfades in - the artwork underneath is the very
-// image the song ended on, so the fade reads as one continuous scene.
-// Everything else (a skip hands over no overlay at all; a replay from the
-// gallery tears down normally) removes the frozen overlay immediately and
-// shows the select screen straight away.
-export function _csiDissolveIntroOverlay() {
+// storyline-engine.js): only a NATURAL song end hands over a frozen frame
+// flagged __csiIntroFinalFrame - the screen then stays hidden behind the
+// bare artwork for ~1s before crossfading in, so the fade reads as one
+// continuous scene. Skips and gallery replays remove the overlay at once.
+function _csiDissolveIntroOverlay() {
     const frozen = window.__csiIntroOverlay;
     const isFinalFrame = window.__csiIntroFinalFrame === true;
     window.__csiIntroOverlay = null; // consumed either way
@@ -187,7 +184,7 @@ export function _csiDissolveIntroOverlay() {
 
 // The screen was mounted invisible while the frozen intro frame stood in
 // for it - fade it back in as the frozen frame dissolves.
-export function _csiRevealSelectScreen() {
+function _csiRevealSelectScreen() {
     const screen = document.getElementById('screen-character-select');
     if (!screen) return;
     screen.style.transition = 'opacity 0.7s ease';
@@ -201,7 +198,7 @@ export function _csiRevealSelectScreen() {
     });
 }
 
-export function _csiRemoveFrozenOverlay(frozen) {
+function _csiRemoveFrozenOverlay(frozen) {
     if (frozen && frozen.parentNode) frozen.parentNode.removeChild(frozen);
 }
 
@@ -221,18 +218,18 @@ export function _csiRemoveFrozenOverlay(frozen) {
 // [left, top, width, height] per character (they track the image exactly
 // because the stage keeps the artwork's aspect ratio). Values tuned against
 // a live screenshot of the stage at native aspect.
-export const CSI_HOTSPOTS = {
+const CSI_HOTSPOTS = {
     stox: { left: 34.9, top: 50.6, width: 10.9, height: 40.6 },
     trix: { left: 45.1, top: 48.2, width: 10.5, height: 43.2 },
     syla: { left: 54.9, top: 52.2, width: 14.6, height: 40.2 },
 };
 
-export const CSI_IMAGE_PATH = 'images/Intro/Stoxels_Intro/37.webp';
+const CSI_IMAGE_PATH = 'images/Intro/Stoxels_Intro/37.webp';
 
 // Builds the rich tooltip content for one character - everything the old
 // cards showed, in the map-view tooltip's visual language.
-export function _buildCharacterSelectTipContent(char) {
-    const lang = typeof LANG !== 'undefined' ? LANG : 'en';
+function _buildCharacterSelectTipContent(char) {
+    const lang = LANG;
     const charName = lang === 'de' ? char.nameDE : char.name;
     const tagline = lang === 'de' ? char.taglineDE : char.tagline;
     const background = lang === 'de' ? char.backgroundDE : char.background;
@@ -266,7 +263,7 @@ export function _buildCharacterSelectTipContent(char) {
 // The select screen has its own tooltip element (the map view's #mv-tooltip
 // is shared UI on other screens; a private id avoids any cross-screen leak
 // of the wider width this content needs). Same .mv-tooltip base styling.
-export function _csiEnsureTip() {
+function _csiEnsureTip() {
     let tip = document.getElementById('csi-tooltip');
     if (!tip) {
         tip = document.createElement('div');
@@ -277,7 +274,7 @@ export function _csiEnsureTip() {
     return tip;
 }
 
-export function _csiShowTip(e, char) {
+function _csiShowTip(e, char) {
     const tip = _csiEnsureTip();
     tip.innerHTML = _buildCharacterSelectTipContent(char);
     tip.style.setProperty('--tip-accent', char.accentColor);
@@ -285,7 +282,7 @@ export function _csiShowTip(e, char) {
     _csiTrackTip(e);
 }
 
-export function _csiTrackTip(e) {
+function _csiTrackTip(e) {
     const tip = document.getElementById('csi-tooltip');
     if (!tip) return;
     const rect = tip.getBoundingClientRect();
@@ -297,7 +294,7 @@ export function _csiTrackTip(e) {
     tip.style.top = y + 'px';
 }
 
-export function _csiHideTip() {
+function _csiHideTip() {
     const tip = document.getElementById('csi-tooltip');
     if (tip) tip.classList.remove('show');
 }
@@ -305,7 +302,7 @@ export function _csiHideTip() {
 // The shared confirm handler (image UI + legacy card fallback both funnel
 // here): persist the pick, unlock the intro replays, then roll the chosen
 // character's intro beat.
-export function _csiConfirmSelection(selectedId, onSelect) {
+function _csiConfirmSelection(selectedId, onSelect) {
     // The character-intro beat takes over the screen next; without this the
     // hover tooltip would ride along on top of the cinematic.
     _csiHideTip();
@@ -313,7 +310,7 @@ export function _csiConfirmSelection(selectedId, onSelect) {
     // Picking any character permanently unlocks the opening cinematic and
     // all three character-intro replays in the Replay Gallery, regardless
     // of which save slot is active (see storyline-engine.js).
-    if (typeof unlockReplayIntroBundle === 'function') unlockReplayIntroBundle();
+    unlockReplayIntroBundle();
     save();
     showBeat('character_intro', {
         character: selectedId,
@@ -324,7 +321,7 @@ export function _csiConfirmSelection(selectedId, onSelect) {
 }
 
 // Builds the image-based select UI (see block comment above).
-export function _buildCharacterSelectUI(onSelect) {
+function _buildCharacterSelectUI(onSelect) {
     const container = document.getElementById('char-select-content');
     if (!container) return;
     const screen = document.getElementById('screen-character-select');
@@ -334,7 +331,7 @@ export function _buildCharacterSelectUI(onSelect) {
     // would otherwise stay visible over the fresh screen.
     _csiHideTip();
 
-    const lang = typeof LANG !== 'undefined' ? LANG : 'en';
+    const lang = LANG;
     let selectedId = null;
 
     screen.classList.add('csi-mode');
@@ -406,13 +403,13 @@ export function _buildCharacterSelectUI(onSelect) {
 // _buildCharacterSelectCardsUI - the legacy card-based select UI. Still the
 // live fallback when the intro artwork fails to load (see the .csi-bg error
 // path), and useful as a reference for the data-driven layout.
-export function _buildCharacterSelectCardsUI(onSelect) {
+function _buildCharacterSelectCardsUI(onSelect) {
     const container = document.getElementById('char-select-content');
     if (!container) return;
 
     let selectedId = null;
 
-    const lang = typeof LANG !== 'undefined' ? LANG : 'en';
+    const lang = LANG;
 
     container.innerHTML = `
         <div class="cs-title" data-t="cs_title">${lang === 'de' ? 'WÄHLE DEINEN CHARAKTER' : 'CHOOSE YOUR CHARACTER'}</div>
@@ -533,7 +530,7 @@ export function renderLSCharacterAvatar() {
         document.querySelector('#screen-map-view .ls-topbar-right');
     if (!topbarRight) return;
 
-    const lang = typeof LANG !== 'undefined' ? LANG : 'en';
+    const lang = LANG;
     const charName = lang === 'de' ? char.nameDE : char.name;
 
     const avatar = document.createElement('div');
@@ -551,7 +548,7 @@ export function renderLSCharacterAvatar() {
     topbarRight.prepend(avatar);
 
     // Sync sprite to current class/ascendency
-    if (typeof _updateLSAvatarImage === 'function') _updateLSAvatarImage();
+    _updateLSAvatarImage();
 }
 
 
@@ -564,8 +561,8 @@ export function renderLSCharacterAvatar() {
 // tooltip used for world nodes (see screens-map-view.js), populated
 // with this character's traits instead.
 
-export function _buildCharacterTooltipContent(char) {
-    const lang = typeof LANG !== 'undefined' ? LANG : 'en';
+function _buildCharacterTooltipContent(char) {
+    const lang = LANG;
     const charName = lang === 'de' ? char.nameDE : char.name;
     const tagline = lang === 'de' ? char.taglineDE : char.tagline;
 
@@ -589,16 +586,15 @@ export function _buildCharacterTooltipContent(char) {
     `;
 }
 
-export function _showCharacterTooltip(e, char) {
-    if (typeof _ensureTooltipElement !== 'function') return;
+function _showCharacterTooltip(e, char) {
     const tip = _ensureTooltipElement();
     tip.innerHTML = _buildCharacterTooltipContent(char);
     tip.classList.add('show');
-    if (typeof _trackTooltipToMouse === 'function') _trackTooltipToMouse(e);
+    _trackTooltipToMouse(e);
 }
 
-export function _hideCharacterTooltip() {
-    if (typeof _hideWorldTooltip === 'function') _hideWorldTooltip();
+function _hideCharacterTooltip() {
+    _hideWorldTooltip();
 }
 
 // renderMapViewCharacterPortrait - injects the chosen character's sprite
@@ -617,6 +613,6 @@ export function renderMapViewCharacterPortrait(p = 'mv') {
     wrap.innerHTML = `<img src="${_getPlayerCharacterImage()}" alt="${char.name}" class="mv-char-portrait-img" draggable="false">`;
 
     wrap.onmouseenter = (e) => _showCharacterTooltip(e, char);
-    wrap.onmousemove = (e) => { if (typeof _trackTooltipToMouse === 'function') _trackTooltipToMouse(e); };
+    wrap.onmousemove = (e) => _trackTooltipToMouse(e);
     wrap.onmouseleave = () => _hideCharacterTooltip();
 }
