@@ -1,25 +1,16 @@
-﻿// ============================================================
-//  audio.js  -  Sound effects and background music manager
-// ============================================================
-//  Structure:
-//    1. Volume & State Variables
-//    2. SFX Preload Cache
-//    3. BGM Helper Functions
-//    4. BGM Playback Functions
-//    5. SFX Playback Functions
-//    6. Volume & Toggle Controls
-//    7. Public API
+// audio.js - Sound effects and background music manager.
+// Single public export: Audio_Manager (an object exposing the BGM/SFX
+// playback and volume API). Track/SFX file registries live in audio-data.js.
+// Bridge note: consumers read Audio_Manager through the globalThis bridge
+// (the concatenated core cannot use imports), so the name must stay exported
+// AND bridged; the bridge also doubles as the deliberate patch seam that
+// lets achievements-ui.js feed its cycle back into this manager.
 //
-//  Track/SFX file registries (BGM_TRACKS, LEVEL_BGM, WORLD_BGM, SFX)
-//  now live in audio-data.js, imported below.
-//
-//  PHASE 3 (2026-09-15): first real ES module. entry.mjs imports
-//  Audio_Manager and (while consumers still read it as a global) keeps
-//  ONE bridge line: globalThis.Audio_Manager = Audio_Manager.
-//  See MIGRATION.md §3.1.
-// ============================================================
+// Structure: volume/state -> SFX cache -> BGM helpers -> BGM playback ->
+// SFX playback -> volume/toggle controls -> public API object.
 
 import { BGM_TRACKS, BOSS_BGM, TUTORIAL_BGM, LEVEL_BGM, WORLD_BGM, SFX } from './audio-data.js';
+
 
 export const Audio_Manager = (() => {
 
@@ -75,6 +66,8 @@ export const Audio_Manager = (() => {
             _sfxCache[key] = a;
         });
     }
+
+    preload();
 
 
     //------------------------------------------------------------------------
@@ -160,13 +153,12 @@ export const Audio_Manager = (() => {
         return WORLD_BGM[worldNum] || 'level_1_1';
     }
 
-    // Returns an array of all keys in BGM_TRACKS, optionally excluding
-    // special tracks (title, overworld, convergence, tutorial_*) that are
-    // not regular gameplay music. Tracks whose file previously failed to
-    // load (404 / decode error) are also excluded so the random chain can
-    // never get stuck on silence. Campaign level keys (level_*) and boss
-    // keys (boss_*) share the same files - deduped by src so no track is
-    // double-weighted in random mode.
+    // Candidate keys for the random chain: every BGM_TRACKS key that is a
+    // regular gameplay track. Filters out special tracks (title, overworld,
+    // convergence, tutorial_*) when excludeSpecial is set, files that
+    // previously failed to load (so the chain never stalls on silence), and
+    // duplicate srcs (level_* and boss_* entries share files - deduping
+    // keeps any one file from being double-weighted in random mode).
     const _badBgmSrcs = new Set();
     function _getAllBGMKeys(excludeSpecial = true) {
         const specialKeys = new Set(['title', 'overworld', 'convergence', 'tutorial_1', 'tutorial_2']);
@@ -186,7 +178,7 @@ export const Audio_Manager = (() => {
     // random-BGM chain below (see playBGM): the tutorial owns the music
     // channel while it runs, no matter the player's random-BGM setting.
     function playTutorialBGM() {
-        if (typeof TUTORIAL_BGM === 'undefined' || !TUTORIAL_BGM.length) return;
+        if (!TUTORIAL_BGM.length) return;
         const key = TUTORIAL_BGM[Math.floor(Math.random() * TUTORIAL_BGM.length)];
         playBGM(key);
     }
@@ -196,7 +188,7 @@ export const Audio_Manager = (() => {
     // Unknown ids (e.g. boss_brutus, which ships no music yet) fall back
     // to a random boss theme so the arena never goes silent.
     function playBossBGM(bossId) {
-        let keys = (typeof BOSS_BGM !== 'undefined') ? BOSS_BGM[bossId] : null;
+        let keys = BOSS_BGM[bossId] || null;
         if (!keys || !keys.length) {
             const allBossKeys = Object.keys(BGM_TRACKS).filter(k => k.startsWith('boss_'));
             if (!allBossKeys.length) return;
@@ -311,12 +303,12 @@ export const Audio_Manager = (() => {
         playBGM(randomKey);
     }
 
-
-    // Picks a random track (excluding special tracks), plays it without looping,
-    // and wires an 'ended' listener so the next random track auto-chains.
-    // Missing audio files (e.g. unshipped bgm_48+ tracks) fire 'error' instead
-    // of 'ended' - those are remembered in _badBgmSrcs and skipped so the
-    // chain never gets stuck on silence after a puzzle finishes.
+    // Random-chain player. Picks the next random track (excluding special
+    // tracks), plays it without looping, and wires an 'ended' listener so
+    // the next random track auto-chains. Missing audio files (e.g. unshipped
+    // bgm_48+ tracks) fire 'error' instead of 'ended' - those are remembered
+    // in _badBgmSrcs and skipped so the chain never gets stuck on silence
+    // after a puzzle finishes.
     function _playRandomBGMTrack(attemptsLeft) {
         const keys = _getAllBGMKeys(true);
         if (keys.length === 0) return;
@@ -492,6 +484,9 @@ export const Audio_Manager = (() => {
     return {
         // BGM
         playBGM,
+        // Menu preview convenience. Currently no in-game caller (settings uses
+        // playSFX directly) - kept deliberately as public API (no-delete policy),
+        // reachable via the bridge for debugging.
         playRandomBGM,
         playTutorialBGM,
         playBossBGM,
@@ -510,7 +505,6 @@ export const Audio_Manager = (() => {
         playSFX,
         stopSFX,
         playRandomSFX,
-        preload,
 
         // Volume & toggles
         toggleBGM,
