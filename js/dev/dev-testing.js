@@ -5,36 +5,23 @@ import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect } from '../s
 import { showWorldDetail } from '../screens/screens-world-levels.js';
 import { launchExistingGame, showSetup, showTitle, switchScreen } from '../screens/screens.js';
 import { _doStartLevel } from '../start-level.js';
-import { getActiveSlot, getSlotSummary, save, wipeSlot } from '../state.js';
+import { getActiveSlot, getSlotSummary, save, wipeSlot, STATE } from '../state.js';
 import { markSeen } from '../storyline/storyline-progress.js';
-import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
 //-------------------DEV TESTING HARNESS (dev-testing.js)------------------
 //------------------------------------------------------------------------
-// Dev-time only. Inert for normal players.
+// Dev-time only. Inert for normal players: without a ?devtest/devscale URL
+// param nothing runs and the only trace is the DevTest console object.
 //
-// 1) INSTANT BOOT - every boot screen (save slots, intro cinematic,
-//    character select, tutorial, setup, mode select, maps) can be skipped
-//    by loading a dev URL:
-//
-//       index.html?devtest=game&w=0&l=0      → fresh character, in level 0.0
-//       index.html?devtest=world&w=0         → world-detail map of world 0
-//       index.html?devtest=mapview           → overworld map
-//       index.html?devtest=setup             → difficulty/setup screen
-//       index.html?devtest=title             → just the title screen
-//
-//    Extra params: &slot=N (save slot; default = first empty slot ≥ 1),
-//    &char=stox|trix|syla (default stox), &force=1 (bypass math gates when
-//    starting a level), &keepintro=1 (let the cinematic play).
-//
-//    It calls the same flow functions the buttons call (showSaveSlotSelect,
-//    onSaveSlotChosen, showSetup, launchExistingGame, showWorldDetail,
-//    startLevel) - so the state machine is traversed properly, not
+// 1) INSTANT BOOT - the whole boot chain (save slot → intro → character
+//    → tutorial → setup → mode → maps) can be skipped by loading a URL
+//    like index.html?devtest=game&w=0&l=0. The AUTO-BOOT section at the
+//    bottom lists every param. It calls the same flow functions the
+//    buttons call, so the state machine is traversed properly, not
 //    simulated. Runs on window 'load', when every game global exists.
 //
 // 2) RUNTIME API - in the console (preview tool / devtools):
-//
 //       DevTest.goto({ screen:'game', world:0, level:2, character:'trix' })
 //       DevTest.map() / DevTest.world(1) / DevTest.game(0, 0)
 //       DevTest.setup() / DevTest.title() / DevTest.screen('screen-codes')
@@ -43,23 +30,38 @@ import { STATE } from '../state.js';
 //       DevTest.wipeSlots([1,2,3])            → wipe dev test slots
 //
 // 3) EFFECT TIME SCALE - short effects (ailments, cooldowns, buffs) are
-//    impossible to observe at real speed in a test. Every central duration
-//    site multiplies by window.DEV_EFFECT_TIME_SCALE (default 1 = exact
-//    game behaviour):
-//
-//       DevTest.timeScale(10)   or   index.html?...&devscale=10
-//
-//    scale > 1 = LONGER effects (observe them), scale < 1 = shorter.
-//    Currently wired: endgame ailment durations (_egApplyStatusToMap),
-//    class ability cooldowns (startSlotCooldown), endgame quiz buff stacks
-//    (expiry, FX and the toast label), shield cursed-ward window.
-//    Deliberately NOT scaled: level/puzzle timer, boss-phase timers.
-//
-// The guard: without ?devtest / devscale, nothing runs automatically and
-// the only trace is the DevTest object itself.
+//    impossible to observe at real speed. Every wiring site multiplies its
+//    duration by DEV_EFFECT_TIME_SCALE (default 1 = exact game behaviour);
+//    see the constants section for the current site list. scale > 1 =
+//    LONGER effects (observe them), scale < 1 = shorter. Deliberately NOT
+//    scaled: level/puzzle timer, boss-phase timers.
 //------------------------------------------------------------------------
 
-// Reads the integer query param or returns fallback. Safe pre-STATE.
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
+//------------------------------------------------------------------------
+
+// The global effect-time scale. Multiplied into scalable durations by the
+// wiring sites; kept ≥ 0.01 so a typo can't freeze time silently
+// (_devTestNormalizeScale enforces the same floor for param/console input).
+window.DEV_EFFECT_TIME_SCALE = 1;
+
+// Duration wiring sites for the effect time scale (see header section 3):
+//   combat-ailments.js (_egApplyStatusToMap)         - ailment durations
+//   class-cooldown-state.js (startSlotCooldown)      - ability cooldowns
+//   endgame-quiz-buffs.js (expiry, FX, toast label)  - quiz buff stacks
+//   universal-spells.js                              - spell durations
+//   shield/shield.js (cursed-ward window)            - shield item
+// Deliberately NOT scaled: level/puzzle timer, boss-phase timers.
+// DEV_EFFECT_TIME_SCALE lives on window (not a module export) because the
+// wiring sites read it there - it is a cross-file runtime setting.
+
+//------------------------------------------------------------------------
+//-------------------PARAM + SCALE HELPERS---------------------------------
+//------------------------------------------------------------------------
+
+// Reads the string query param or returns the fallback. Safe before the
+// game state exists (touches only the browser URL).
 export function _devTestParam(name, fallback) {
     try {
         const v = new URLSearchParams(window.location.search).get(name);
@@ -68,18 +70,18 @@ export function _devTestParam(name, fallback) {
     } catch (e) { return fallback; }
 }
 
-// The global effect-time scale. Multiplied into scalable durations by the
-// wiring sites (see file header). Kept ≥ 0.01 so a typo can't freeze time
-// silently; 0 means "0.01×" which is still observable. Default 1 = exact
-// shipped behaviour.
-window.DEV_EFFECT_TIME_SCALE = 1;
-
-// Normalizes the scale param/console value into a finite number ≥ 0.01.
+// Normalizes the scale param/console value into a finite number ≥ 0.01
+// (hard cap 1000). Out-of-range or non-numeric input falls back to 1 =
+// exact shipped behaviour.
 export function _devTestNormalizeScale(v) {
     const n = Number(v);
     if (!isFinite(n) || n <= 0) return 1;
     return Math.min(1000, Math.max(0.01, n));
 }
+
+//------------------------------------------------------------------------
+//-------------------RUNTIME API (DevTest)----------------------------------
+//------------------------------------------------------------------------
 
 export const DevTest = {
     // Full boot chain. spec: { slot, character, skipIntro, skipTutorial,
@@ -97,65 +99,55 @@ export const DevTest = {
         // profile SHARES). Explicit &slot=N is honoured, but a slot that
         // already holds real progress triggers a loud console warning.
         let slotNum = s.slot || 20;
-        if (typeof getSlotSummary === 'function') {
-            if (getSlotSummary(slotNum).empty) {
-                // requested/dev slot is free - use it
-            } else if (!s.slot) {
-                for (let i = 20; i >= 1; i--) {
-                    if (getSlotSummary(i).empty) { slotNum = i; break; }
-                }
+        if (getSlotSummary(slotNum).empty) {
+            // requested/dev slot is free - use it
+        } else if (!s.slot) {
+            for (let i = 20; i >= 1; i--) {
+                if (getSlotSummary(i).empty) { slotNum = i; break; }
             }
-            const summary = getSlotSummary(slotNum);
-            if (!summary.empty && (summary.levelsDone || 0) > 3) {
-                console.warn('[devtest] WARNING: booting on slot ' + slotNum +
-                    ' which holds real progress (' + summary.levelsDone + ' levels). ' +
-                    'Use a different &slot= or wipe it first.');
-            }
+        }
+        const summary = getSlotSummary(slotNum);
+        if (!summary.empty && (summary.levelsDone || 0) > 3) {
+            console.warn('[devtest] WARNING: booting on slot ' + slotNum +
+                ' which holds real progress (' + summary.levelsDone + ' levels). ' +
+                'Use a different &slot= or wipe it first.');
         }
 
         // 1. Save slot: load the slot through the real flow so the pending
         //    callback machinery and hub latches behave exactly like a click.
-        if (typeof showSaveSlotSelect !== 'function' || typeof onSaveSlotChosen !== 'function') {
-            console.warn('[devtest] save-slot flow unavailable - aborting boot');
-            return;
-        }
         // Intro cinematic bypass: the title flow shows it only when the
         // slot-scoped seen-flag is absent; marking it seen routes through
         // the same proceed() the SKIP button takes.
-        if (s.skipIntro && typeof markSeen === 'function') {
+        if (s.skipIntro) {
             try { markSeen('intro_cinematic'); } catch (e) {}
         }
         showSaveSlotSelect(() => {
             // 2. Character + tutorial flags, then straight to setup.
             //    (Bypasses character-select UI and tutorial screens via the
             //    same STATE fields those screens write - no state is skipped.)
-            if (typeof STATE === 'undefined' || !STATE) return;
+            if (!STATE) return;
             STATE.playerCharacter = s.character;
             if (s.skipTutorial) STATE.tutorialDone = true;
-            if (typeof save === 'function') save();
+            save();
 
             if (s.screen === 'title') { log('done: title (slot ' + slotNum + ', char ' + s.character + ')'); return; }
 
-            if (typeof showSetup !== 'function') return;
             showSetup();
             if (s.screen === 'setup') { log('done: setup'); return; }
 
             // 3. Overworld map.
-            if (typeof launchExistingGame !== 'function') return;
             launchExistingGame();
             if (s.screen === 'mapview') { log('done: mapview'); return; }
 
             // 4. World detail.
-            if (typeof showWorldDetail !== 'function') return;
             showWorldDetail(s.world | 0);
             if (s.screen === 'world') { log('done: world ' + s.world); return; }
 
             // 5. In-game. startLevel honours math gates; force=1 calls
             //    _doStartLevel directly (same bypass the boss-test screen uses).
-            const gi = (typeof WORLD_START_GI !== 'undefined' && WORLD_START_GI[s.world | 0] !== undefined)
+            const gi = (WORLD_START_GI[s.world | 0] !== undefined)
                 ? WORLD_START_GI[s.world | 0] + (s.level | 0) : (s.level | 0);
-            if (typeof startLevel !== 'function') return;
-            if (s.force && typeof _doStartLevel === 'function') _doStartLevel(gi);
+            if (s.force) _doStartLevel(gi);
             else globalThis.startLevel(gi);
             log('done: game gi=' + gi + ' (slot ' + slotNum + ', char ' + s.character + ')');
         });
@@ -163,24 +155,24 @@ export const DevTest = {
     },
 
     // --- Screen shortcuts ------------------------------------------------
-    map() { if (typeof showMapView === 'function') showMapView(); },
-    world(wi = 0) { if (typeof showWorldDetail === 'function') showWorldDetail(wi | 0); },
+    map() { showMapView(); },
+    world(wi = 0) { showWorldDetail(wi | 0); },
     // level: startLevel respects math gates; force=true bypasses them.
     game(w = 0, l = 0, force = false) {
-        const gi = (typeof WORLD_START_GI !== 'undefined' && WORLD_START_GI[w] !== undefined)
+        const gi = (WORLD_START_GI[w] !== undefined)
             ? WORLD_START_GI[w] + l : l;
-        if (force && typeof _doStartLevel === 'function') _doStartLevel(gi);
-        else if (typeof startLevel === 'function') globalThis.startLevel(gi);
+        if (force) _doStartLevel(gi);
+        else globalThis.startLevel(gi);
     },
-    setup() { if (typeof showSetup === 'function') showSetup(); },
-    title() { if (typeof showTitle === 'function') showTitle(); },
-    screen(id) { if (typeof switchScreen === 'function') switchScreen(id); },
+    setup() { showSetup(); },
+    title() { showTitle(); },
+    screen(id) { switchScreen(id); },
 
     // --- Introspection ----------------------------------------------------
     state() {
-        if (typeof STATE === 'undefined' || !STATE) return 'no STATE';
+        if (!STATE) return 'no STATE';
         return {
-            slot: (typeof getActiveSlot === 'function') ? getActiveSlot() : null,
+            slot: getActiveSlot(),
             character: STATE.playerCharacter,
             class: STATE.playerClass || STATE.playerAscendency || null,
             levelsDone: STATE.done ? STATE.done.length : 0,
@@ -195,7 +187,7 @@ export const DevTest = {
     timeScale(x) {
         window.DEV_EFFECT_TIME_SCALE = _devTestNormalizeScale(x);
         const msg = '⏱ Effect time scale = ×' + window.DEV_EFFECT_TIME_SCALE;
-        if (typeof showToast === 'function') showToast(msg); else console.info(msg);
+        showToast(msg);
         return window.DEV_EFFECT_TIME_SCALE;
     },
 
@@ -206,7 +198,6 @@ export const DevTest = {
     // false (or nothing) to release. Only meaningful while the harness is
     // active (LEVEL_FLAGS.devTestActive).
     freezeAvatar(freeze = true) {
-        if (typeof window === 'undefined') return;
         window.LEVEL_FLAGS = window.LEVEL_FLAGS || {};
         window.LEVEL_FLAGS.devTestFreezeAvatar = !!freeze;
         return window.LEVEL_FLAGS.devTestFreezeAvatar;
@@ -237,7 +228,6 @@ export const DevTest = {
     // The preview browser profile shares the player's real localStorage, so
     // this guard is the only thing between a test run and a real save.
     wipeSlots(list, opts = {}) {
-        if (typeof wipeSlot !== 'function' || typeof getSlotSummary !== 'function') return 'unavailable';
         const wiped = [];
         const refused = [];
         (list || []).forEach(n => {
@@ -247,7 +237,7 @@ export const DevTest = {
             wipeSlot(n | 0);
             wiped.push(n);
         });
-        if (typeof renderSaveSlotScreen === 'function') renderSaveSlotScreen();
+        renderSaveSlotScreen();
         let out = 'wiped slots: ' + (wiped.join(', ') || 'none');
         if (refused.length) out += ' - REFUSED (real progress, pass {force:true} to override): ' + refused.join(', ');
         return out;
@@ -258,6 +248,15 @@ window.DevTest = DevTest;
 //------------------------------------------------------------------------
 //-------------------AUTO-BOOT (URL driven)---------------------------------
 //------------------------------------------------------------------------
+// URL params read here (all optional):
+//   devtest=title|setup|mapview|map|world|game|level - boot target
+//   w=N / l=N          - world / level (game + world targets)
+//   slot=N             - save slot (default: 20, or first free slot below)
+//   char=stox|trix|syla - character (default stox)
+//   force=1            - bypass math gates when starting a level
+//   keepintro=1        - let the intro cinematic play
+//   keeptutorial=1     - keep the tutorial enabled
+//   devscale=N         - preset DEV_EFFECT_TIME_SCALE
 
 (function _devTestAutoBoot() {
     const mode = _devTestParam('devtest', null);
