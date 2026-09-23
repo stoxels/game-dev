@@ -19,7 +19,14 @@
 //     needs to draw one slot (position, size, transform, tint, patch)
 //
 // No DOM access in here — consumers translate the returned numbers into
-// CSS (lab + game) or canvas ops. All coordinates are normalized 0..1 to
+// CSS (lab + game) or canvas ops.
+//
+// SURFACE NOTE (R3 wave 7, 2026-09-23): all 20 exports stay public
+// deliberately — resolvePlacement/placeItem serve the game runtime
+// (gear_overlays.js), the other 18 are the grip lab's direct import
+// surface (dev/scratch/grip-lab/lab.js) plus the validator
+// (tools/build-grip-data.mjs) and the pin. Privatizing them would break
+// the art-tuning pipeline, so no surface reduction happens here. All coordinates are normalized 0..1 to
 // the body frame image box and the item image box respectively.
 //
 // Data model v2 (dev grips.json; the game loads the resolved export):
@@ -275,6 +282,10 @@ export function wrapDeg(r) {
 //   (resolvePlacement does that via the mirrored flag).
 //------------------------------------------------------------------------
 
+// Direction → opposite direction (shared by resolveFrames' mirrored-set
+// fallback and resolvePlacement's record-borrowing logic).
+const OPP_DIR = { up: 'down', down: 'up', left: 'right', right: 'left' };
+
 const spriteChainCache = new Map();
 
 export function spriteChain(char, cls) {
@@ -292,7 +303,7 @@ export function spriteChain(char, cls) {
 export function resolveFrames(data, req) {
     const sprites = (data && data.sprites) || {};
     const dir = setDir(req.set);
-    const opp = { up: 'down', down: 'up', left: 'right', right: 'left' }[dir];
+    const opp = OPP_DIR[dir];
     const trySets = [req.set];
     if (opp && req.allowMirror !== false) trySets.push(setState(req.set) + ':' + opp);
 
@@ -358,11 +369,10 @@ export function resolvePlacement(req) {
     const role = slot === 'off' ? (req.offRole || 'shield') : 'weapon';
 
     // ---- resolution chain: pose (per-item edit) → frame cfg → item
-    // record (mass-record lock) → defaults. The per-frame entries win over
-    // the recorded ones: a deliberate pose-lab edit on ONE frame must
-    // still be able to override the item-wide record.
-    const OPP = { up: 'down', down: 'up', left: 'right', right: 'left' };
-    const opp = OPP[dir];
+// record (mass-record lock) → defaults. The per-frame entries win over
+// the recorded ones: a deliberate pose-lab edit on ONE frame must
+// still be able to override the item-wide record.
+    const opp = OPP_DIR[dir];
     // Mass-recorded per-item rotation (rotByDir) wins over everything: it
     // is a deliberate, item-specific direction choice made in record mode.
     // Missing direction: borrow the opposite record, negated (screen-space
