@@ -1,4 +1,4 @@
-﻿import { _isColSolved, _isRowSolved, clues, renderCell, updClues } from '../grid.js';
+import { _isColSolved, _isRowSolved, clues, renderCell, updClues } from '../grid.js';
 import { revealTiles, markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { save } from '../state.js';
 import { _calcEmergencyScanDuration, updTimer } from '../timer/timer.js';
@@ -67,7 +67,7 @@ export function _ptxRunExpansion() {
         };
     }
 
-    const has = (key) => (typeof ptHasSkill === 'function') && ptHasSkill(key);
+    const has = (key) => ptHasSkill(key);
 
     //--------------------------------------------------------------------------
     //-----------------------------LEVEL STATE----------------------------------
@@ -434,10 +434,8 @@ export function _ptxRunExpansion() {
 
     ON_START.push(() => {
         let pending = 0;
-        if (typeof STATE !== 'undefined') {
-            if (STATE.ptxSavingsReveals > 0) { pending += STATE.ptxSavingsReveals; STATE.ptxSavingsReveals = 0; }
-            if (STATE.ptxColdReading) { pending += 1; STATE.ptxColdReading = false; }
-        }
+        if (STATE.ptxSavingsReveals > 0) { pending += STATE.ptxSavingsReveals; STATE.ptxSavingsReveals = 0; }
+        if (STATE.ptxColdReading) { pending += 1; STATE.ptxColdReading = false; }
         if (pending > 0) { revealTiles(pending); toast(`🏦 Banked insight: ${pending} reveal${pending > 1 ? 's' : ''}`); }
     });
 
@@ -926,7 +924,7 @@ export function _ptxRunExpansion() {
         let add = 0;
         FLATS.forEach(([key, val]) => { if (has(key)) add += val; });
 
-        if (typeof STATE !== 'undefined' && STATE.ptxSavingsSecs > 0) {
+        if (STATE.ptxSavingsSecs > 0) {
             add += STATE.ptxSavingsSecs;
             STATE.ptxSavingsSecs = 0;
         }
@@ -1168,7 +1166,7 @@ export function _ptxRunExpansion() {
 
     patch('checkWin', function (orig, args) {
         const result = orig(...args);
-        if (S.bankedThisLevel || typeof STATE === 'undefined') return result;
+        if (S.bankedThisLevel) return result;
         const ov = document.getElementById('ov-win');
         if (!ov || !ov.classList.contains('show')) return result;
         S.bankedThisLevel = true;
