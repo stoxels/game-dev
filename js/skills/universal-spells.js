@@ -1,8 +1,8 @@
-﻿import { Audio_Manager } from '../audio/audio.js';
+import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { _getGlobalCooldownReduction } from '../classes/class-cooldown-state.js';
-import { _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost, spendMana } from '../classes/class-mana.js';
+import { _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost } from '../classes/class-mana.js';
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
 import { SKILL_REGISTRY } from './skill-registry.js';
@@ -834,11 +834,11 @@ export function _uspSupportGroupTitle() {
 //------------------------------------------------------------------------
 
 // Behaviours handled as self-casts (no monster target required).
-export const USP_SUPPORT_BEHAVIORS = ['heal', 'hot', 'shield', 'guard', 'evade', 'ward', 'thorns'];
+const USP_SUPPORT_BEHAVIORS = ['heal', 'hot', 'shield', 'guard', 'evade', 'ward', 'thorns'];
 
 // Sweep cadence. Also the paused-clock compensation step (the whole sweep is
 // skipped while paused and every expiry is pushed forward by one tick instead).
-export const USP_BUFF_TICK_MS = 250;
+const USP_BUFF_TICK_MS = 250;
 
 // Aegis Ward only spends a charge on a hit worth at least this share of the
 // player's maximum Life. Without it, a 5-damage ignite tick or a chip hazard
@@ -847,10 +847,10 @@ export const USP_BUFF_TICK_MS = 250;
 export const USP_WARD_MIN_HIT_PCT = 5;
 
 // Active support buffs: { spellId, kind, icon, until, ...payload }.
-export let _uspActiveBuffs = [];
-export let _uspBuffSweepInterval = null;
+let _uspActiveBuffs = [];
+let _uspBuffSweepInterval = null;
 // Remaining full-hit negations from the Aegis Ward.
-export let _uspWardCharges = 0;
+let _uspWardCharges = 0;
 
 // True when the spell (id or def) is part of the defensive family.
 export function isUniversalSupportSpell(spellOrId) {
@@ -860,8 +860,8 @@ export function isUniversalSupportSpell(spellOrId) {
 
 // Cast rank: the slotted charm's rank, else the trained rank (js/skills/
 // skill-charms.js). Falls back to 1 before the charm system loads.
-export function _uspCastRank(spellId) {
-    if (typeof getSkillCastRankFull === 'function') {
+function _uspCastRank(spellId) {
+    {
         try {
             const r = getSkillCastRankFull(spellId);
             if (r) return Math.max(1, r);
@@ -872,7 +872,7 @@ export function _uspCastRank(spellId) {
 
 // Rank multiplier for support magnitudes (the offensive curve).
 export function _uspSupportRankMult(spellId) {
-    if (typeof getSpellRankDamageMultForSkill === 'function') {
+    {
         try {
             const m = getSpellRankDamageMultForSkill(spellId);
             if (m) return m;
@@ -890,14 +890,14 @@ export function _uspSupportRankMult(spellId) {
 // supplied it answers "what would rank N be?" - which is what the spell rank
 // audit screen (js/dev/spell-rank-audit.js) asks. Keeping ONE calculator
 // for both means the audit tool cannot drift from the real cast.
-export function _uspRankFor(spellId, rank) {
+function _uspRankFor(spellId, rank) {
     if (rank != null) return Math.max(1, Math.round(Number(rank) || 1));
     return _uspCastRank(spellId);
 }
 
-export function _uspSupportRankMultFor(spellId, rank) {
+function _uspSupportRankMultFor(spellId, rank) {
     if (rank != null) {
-        if (typeof getSpellRankDamageMult === 'function') {
+        {
             try {
                 const m = getSpellRankDamageMult(rank);
                 if (m) return m;
@@ -968,19 +968,19 @@ export function _uspMaxAbsorption() {
 // The authored magnitude BEFORE healing power - flat×rank + %×pool. Kept
 // separate so the audit screen can show what the spell alone is worth and
 // what the player's gear adds on top of it.
-export function _uspBaseHeal(spell, rank) {
+function _uspBaseHeal(spell, rank) {
     const flat = Math.round((spell.healFlat || 0) * _uspSupportRankMultFor(spell.id, rank));
     const pct = Math.round(_uspMaxLife() * ((spell.healPct || 0) / 100));
     return Math.max(1, flat + pct);
 }
 
-export function _uspBaseHotTick(spell, rank) {
+function _uspBaseHotTick(spell, rank) {
     const flat = Math.round((spell.healTickFlat || 0) * _uspSupportRankMultFor(spell.id, rank));
     const pct = Math.round(_uspMaxLife() * ((spell.healTickPct || 0) / 100));
     return Math.max(1, flat + pct);
 }
 
-export function _uspBaseAbsorb(spell, rank) {
+function _uspBaseAbsorb(spell, rank) {
     const flat = Math.round((spell.absorbFlat || 0) * _uspSupportRankMultFor(spell.id, rank));
     const pct = Math.round(_uspMaxAbsorption() * ((spell.absorbPct || 0) / 100));
     return Math.max(1, flat + pct);
@@ -1023,7 +1023,7 @@ export function _uspCalcWardCharges(spell, rank) {
 // ---------------------------------------------------------------------
 
 // Heals the player; returns the amount actually restored (0 at full Life).
-export function _uspHealPlayer(amount) {
+function _uspHealPlayer(amount) {
     if (typeof globalThis.playerCurrentHP !== 'undefined' && typeof globalThis.playerMaxHP !== 'undefined') {
         const before = globalThis.playerCurrentHP;
         globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, before + Math.max(0, Math.round(amount)));
@@ -1035,7 +1035,7 @@ export function _uspHealPlayer(amount) {
 }
 
 // Adds to the absorption shield; returns the amount actually gained.
-export function _uspRestoreAbsorption(amount) {
+function _uspRestoreAbsorption(amount) {
     if (typeof globalThis._egPlayerAbsorptionCurrent === 'undefined') return 0;
     const max = _uspMaxAbsorption();
     if (max <= 0) return 0;
@@ -1048,12 +1048,12 @@ export function _uspRestoreAbsorption(amount) {
 // Buff registry (sweep, expiry, pause handling)
 // ---------------------------------------------------------------------
 
-export function _uspStartBuffSweep() {
+function _uspStartBuffSweep() {
     if (_uspBuffSweepInterval) return;
     _uspBuffSweepInterval = setInterval(_uspSweepSupportBuffs, USP_BUFF_TICK_MS);
 }
 
-export function _uspSweepSupportBuffs() {
+function _uspSweepSupportBuffs() {
     // Death ends every buff immediately - a corpse must not keep its ward.
     if (typeof globalThis.dead !== 'undefined' && globalThis.dead) {
         if (_uspActiveBuffs.length) _uspClearSupportBuffs();
@@ -1084,7 +1084,7 @@ export function _uspSweepSupportBuffs() {
         const spell = UNIVERSAL_SPELL_MAP[b.spellId];
         if (spell) {
             _uspHealPlayer(_uspCalcHotTick(spell));
-            if (typeof _uspSupportPulseFX === 'function') _uspSupportPulseFX(spell);
+            _uspSupportPulseFX(spell);
         }
         b.ticksLeft -= 1;
         b.nextTickAt = now + (b.tickMs || 1000);
@@ -1109,7 +1109,7 @@ export function _uspSweepSupportBuffs() {
 
 // Adds (or refreshes) a buff. The payload carries the pre-computed, already
 // rank-scaled axis values so the combat hooks never re-derive anything.
-export function _uspAddBuff(spell, payload) {
+function _uspAddBuff(spell, payload) {
     const until = Date.now() + Math.max(1, spell.buffSeconds || 8) * 1000;
     const existing = _uspActiveBuffs.find((b) => b.spellId === spell.id);
     if (existing) {
@@ -1133,7 +1133,7 @@ export function _uspClearSupportBuffs() {
     _uspActiveBuffs = [];
     _uspWardCharges = 0;
     _uspAnchor = null;
-    if (typeof _uspAnchorMarkerClear === 'function') _uspAnchorMarkerClear();
+    _uspAnchorMarkerClear();
     if (_uspBuffSweepInterval) { clearInterval(_uspBuffSweepInterval); _uspBuffSweepInterval = null; }
     _uspForceBuffIconRefresh();
 }
@@ -1143,7 +1143,7 @@ export function _uspClearSupportBuffs() {
 // combat path pays nothing when no support buff is active.
 // ---------------------------------------------------------------------
 
-export function _uspBuffSum(kind, field) {
+function _uspBuffSum(kind, field) {
     let total = 0;
     for (const b of _uspActiveBuffs) if (b.kind === kind) total += (b[field] || 0);
     return total;
@@ -1214,7 +1214,10 @@ export function _uspReflectThorns(attacker, incoming) {
 }
 
 // True while any support buff is up (used by the tooltip / icon strip).
-export function isUspSupportBuffActive(kind) {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
+function isUspSupportBuffActive(kind) {
     const now = Date.now();
     return _uspActiveBuffs.some((b) => b.until > now && (!kind || b.kind === kind));
 }
@@ -1247,7 +1250,7 @@ export function _uspBuildSupportStatusIconsHTML() {
 
 // Forces the shared player status strip to rebuild on its next tick without
 // waiting for an ailment change (the sentinel never matches a real signature).
-export function _uspForceBuffIconRefresh() {
+function _uspForceBuffIconRefresh() {
     const strip = document.getElementById('eg-player-status-strip');
     if (strip) strip.dataset.sig = '__usp_dirty__';
 }
@@ -1258,7 +1261,7 @@ export function _uspForceBuffIconRefresh() {
 
 // Applies a support spell's effect. Called from castUniversalSpell once the
 // mana and the cooldown are committed. Returns a short toast-ready summary.
-export function _uspApplySupportSpell(spell) {
+function _uspApplySupportSpell(spell) {
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     switch (spell.behavior) {
         case 'heal': {
@@ -1414,21 +1417,21 @@ export function getUniversalSpellSupportEstimate(spellId) {
 //------------------------------------------------------------------------
 
 // Behaviours handled as self-casts that reposition the player.
-export const USP_MOVEMENT_BEHAVIORS = ['blink', 'dash', 'disengage', 'windstep', 'anchor'];
+const USP_MOVEMENT_BEHAVIORS = ['blink', 'dash', 'disengage', 'windstep', 'anchor'];
 
 // The four walking directions, as unit vectors.
-export const USP_DIR_VECTORS = {
+const USP_DIR_VECTORS = {
     up: { x: 0, y: -1 }, down: { x: 0, y: 1 },
     left: { x: -1, y: 0 }, right: { x: 1, y: 0 },
 };
 
 // Armed Rift Anchor: { x, y, until } or null. One at a time, by design - a
 // second anchor replaces the first rather than stacking escapes.
-export let _uspAnchor = null;
+let _uspAnchor = null;
 
 // Supersede token for in-flight glides: a newer movement cast cancels the
 // glide it was cast during instead of fighting it for the avatar's position.
-export let _uspGlideSeq = 0;
+let _uspGlideSeq = 0;
 
 // True when the spell (id or def) is part of the movement family.
 export function isUniversalMovementSpell(spellOrId) {
@@ -1437,19 +1440,19 @@ export function isUniversalMovementSpell(spellOrId) {
 }
 
 // True for the families that need a live encounter but no monster target.
-export function _uspIsSelfCastSpell(spell) {
+function _uspIsSelfCastSpell(spell) {
     return isUniversalSupportSpell(spell) || isUniversalMovementSpell(spell);
 }
 
 // Jump distance at the charm's cast rank.
-export function _uspCalcMoveDistance(spell) {
+function _uspCalcMoveDistance(spell) {
     return Math.round(_uspRankAdditive(
         spell.moveBasePx || 0, spell.movePxPerRank || 0, spell.movePxCap || 0,
         _uspCastRank(spell.id)));
 }
 
 // Movement-speed share granted by Windstep / Disengage, at the cast rank.
-export function _uspCalcMoveSpeedPct(spell) {
+function _uspCalcMoveSpeedPct(spell) {
     return Math.round(_uspRankAdditive(
         spell.speedPct || 0, spell.speedPctPerRank || 0, spell.speedPctCap || 0,
         _uspCastRank(spell.id)));
@@ -1471,7 +1474,7 @@ export function _uspMovementSpeedMult() {
 // ---------------------------------------------------------------------
 
 // The live player sprite, or null when the avatar is not on screen.
-export function _uspAvatarEl() {
+function _uspAvatarEl() {
     return document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
 }
@@ -1479,7 +1482,7 @@ export function _uspAvatarEl() {
 // Current sprite position in viewport coordinates. Precedence matches the
 // walk loop's own (js/sprite/player_sprite.js): float accumulator → inline
 // style → rendered rect, so a blink never starts from a stale corner.
-export function _uspAvatarPos() {
+function _uspAvatarPos() {
     const el = _uspAvatarEl();
     if (!el) return null;
     let x = parseFloat(el.dataset.avatarFx);
@@ -1500,7 +1503,7 @@ export function _uspAvatarPos() {
 // snapping back to the pre-cast value. Returns the CLAMPED position that was
 // actually achieved - _setAvatarPos() keeps the sprite inside the viewport,
 // and the FX/toast should report where you really ended up.
-export function _uspAvatarWrite(el, x, y, dir) {
+function _uspAvatarWrite(el, x, y, dir) {
     if (typeof globalThis._setAvatarPos === 'function') {
         try { globalThis._setAvatarPos(el, x, y, dir || null); } catch (e) { /* fall through to the raw write */ }
     } else {
@@ -1519,7 +1522,7 @@ export function _uspAvatarWrite(el, x, y, dir) {
 
 // The direction the sprite's art is mirrored towards ('left' / 'right'), used
 // only until the player has walked once. Null when neither sprite exists.
-export function _uspMirrorDir() {
+function _uspMirrorDir() {
     const img = document.getElementById('avatar-sprite-img')
         || document.getElementById('avatar-sprite-img-simple');
     if (!img || !img.style) return null;
@@ -1530,7 +1533,7 @@ export function _uspMirrorDir() {
 }
 
 // Which way this cast goes: last walked direction → mirrored facing → 'right'.
-export function _uspAimDir() {
+function _uspAimDir() {
     let dir = null;
     if (typeof globalThis.getAvatarLastMoveDir === 'function') {
         try { dir = globalThis.getAvatarLastMoveDir(); } catch (e) { dir = null; }
@@ -1544,7 +1547,7 @@ export function _uspAimDir() {
 // once on the first frame (that is what _setAvatarPos does when handed a
 // direction); intermediate frames pass no direction so the running cycle is
 // not restarted 60 times a second.
-export function _uspGlide(el, fromX, fromY, toX, toY, ms, dir) {
+function _uspGlide(el, fromX, fromY, toX, toY, ms, dir) {
     const seq = ++_uspGlideSeq;
     const dur = Math.max(60, ms || 200);
     const t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
@@ -1569,16 +1572,16 @@ export function isUspAnchorArmed() {
     return !!(_uspAnchor && _uspAnchor.until > Date.now());
 }
 
-export function getUspAnchorRemainingSeconds() {
+function getUspAnchorRemainingSeconds() {
     if (!isUspAnchorArmed()) return 0;
     return Math.max(1, Math.ceil((_uspAnchor.until - Date.now()) / 1000));
 }
 
 // Drops the armed anchor (and its world marker). Safe to call unconditionally.
-export function _uspClearAnchor() {
+function _uspClearAnchor() {
     _uspAnchor = null;
     _uspActiveBuffs = _uspActiveBuffs.filter((b) => b.kind !== 'anchor');
-    if (typeof _uspAnchorMarkerClear === 'function') _uspAnchorMarkerClear();
+    _uspAnchorMarkerClear();
 }
 
 // ---------------------------------------------------------------------
@@ -1588,7 +1591,7 @@ export function _uspClearAnchor() {
 // Applies a movement spell. Returns { text, flavor, cooldown? } - `cooldown`
 // overrides the spell's normal cooldown for this cast (the Rift Anchor's
 // PLACE cast is deliberately cheap so the recall can follow).
-export function _uspApplyMovementSpell(spell) {
+function _uspApplyMovementSpell(spell) {
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     const pos = _uspAvatarPos();
     if (!pos) return { text: de ? 'kein Spielersprite' : 'no player sprite', flavor: 'wasted' };
@@ -1599,7 +1602,7 @@ export function _uspApplyMovementSpell(spell) {
             const dir = _uspAimDir();
             const v = USP_DIR_VECTORS[dir];
             const landed = _uspAvatarWrite(pos.el, pos.x + v.x * dist, pos.y + v.y * dist, dir);
-            if (typeof _uspBlinkFX === 'function') _uspBlinkFX(spell, pos.x, pos.y, landed.x, landed.y);
+            _uspBlinkFX(spell, pos.x, pos.y, landed.x, landed.y);
             _uspSupportCastFX(spell, `${dir}`, 'buff');
             return { text: `${de ? 'teleportiert' : 'blinked'} ${dir} ${dist}px`, flavor: 'buff' };
         }
@@ -1615,7 +1618,7 @@ export function _uspApplyMovementSpell(spell) {
             const tx = pos.x + v.x * dist * sign;
             const ty = pos.y + v.y * dist * sign;
             _uspGlide(pos.el, pos.x, pos.y, tx, ty, spell.glideMs || 200, dir);
-            if (typeof _uspBlinkFX === 'function') {
+            {
                 _uspBlinkFX(spell, pos.x, pos.y, tx, ty, true);
             }
             let speed = 0;
@@ -1645,7 +1648,7 @@ export function _uspApplyMovementSpell(spell) {
                 const secs = getUspAnchorRemainingSeconds();
                 _uspClearAnchor();
                 const landed = _uspAvatarWrite(pos.el, a.x, a.y, null);
-                if (typeof _uspBlinkFX === 'function') _uspBlinkFX(spell, pos.x, pos.y, landed.x, landed.y);
+                _uspBlinkFX(spell, pos.x, pos.y, landed.x, landed.y);
                 _uspSupportCastFX(spell, de ? 'Rückruf' : 'recall', 'buff');
                 return {
                     text: de ? `Rückruf zum Anker (${secs}s vor Ablauf)` : `recalled to the anchor (${secs}s left)`,
@@ -1659,7 +1662,7 @@ export function _uspApplyMovementSpell(spell) {
             // armed window gets the same countdown and pause handling as every
             // other buff (payload `until` overrides the buffSeconds default).
             _uspAddBuff(spell, { until: _uspAnchor.until });
-            if (typeof _uspAnchorMarkerShow === 'function') _uspAnchorMarkerShow(spell, pos.x, pos.y, secs);
+            _uspAnchorMarkerShow(spell, pos.x, pos.y, secs);
             _uspSupportCastFX(spell, '📍', 'buff');
             return {
                 text: de ? `Anker gesetzt - ${secs}s, erneut wirken für Rückruf` : `anchor planted - ${secs}s, cast again to recall`,
@@ -1749,7 +1752,7 @@ export function _uspMovementGroupTitle() {
 // When you design the gating system later, just write the array (and call
 // refreshSkillUI()). Helpers below cover the rest.
 
-export function getUniversalSpellUnlockList() {
+function getUniversalSpellUnlockList() {
     try {
         if (typeof STATE !== 'undefined' && Array.isArray(STATE.universalSpellsUnlocked)) {
             return STATE.universalSpellsUnlocked;
@@ -1764,33 +1767,42 @@ export function isUniversalSpellUnlocked(spellId) {
     return list.indexOf(spellId) !== -1;
 }
 
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
 // Unlock one spell (persists via save()).
-export function unlockUniversalSpell(spellId) {
+function unlockUniversalSpell(spellId) {
     if (typeof STATE === 'undefined' || !STATE) return false;
     if (!UNIVERSAL_SPELL_MAP[spellId]) return false;
     if (!Array.isArray(STATE.universalSpellsUnlocked)) STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
     if (STATE.universalSpellsUnlocked.indexOf(spellId) === -1) {
         STATE.universalSpellsUnlocked.push(spellId);
-        if (typeof save === 'function') save();
-        if (typeof refreshSkillUI === 'function') refreshSkillUI();
+        save();
+        refreshSkillUI();
     }
     return true;
 }
 
 // (Re-)lock one spell - used by the future gating system / testing.
-export function lockUniversalSpell(spellId) {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
+function lockUniversalSpell(spellId) {
     if (typeof STATE === 'undefined' || !STATE) return false;
     if (!Array.isArray(STATE.universalSpellsUnlocked)) STATE.universalSpellsUnlocked = UNIVERSAL_SPELL_DEFS.map((d) => d.id);
     const i = STATE.universalSpellsUnlocked.indexOf(spellId);
     if (i !== -1) {
         STATE.universalSpellsUnlocked.splice(i, 1);
-        if (typeof save === 'function') save();
-        if (typeof refreshSkillUI === 'function') refreshSkillUI();
+        save();
+        refreshSkillUI();
     }
     return true;
 }
 
-export function isUniversalSpellId(skillId) {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
+function isUniversalSpellId(skillId) {
     return !!UNIVERSAL_SPELL_MAP[skillId];
 }
 
@@ -1798,7 +1810,7 @@ export function getUniversalSpellDef(spellId) {
     return UNIVERSAL_SPELL_MAP[spellId] || null;
 }
 
-export function _uspUnlockHint(spell) {
+function _uspUnlockHint(spell) {
     if (!spell) return '';
     if (typeof LANG !== 'undefined' && LANG === 'de') {
         return spell.unlockHintDE || 'Dieser Zauber ist noch versiegelt. Die Bedingung wird später enthüllt.';
@@ -1818,7 +1830,7 @@ export function _uspUnlockHint(spell) {
 //   spell.damageKind: fire|cold|lightning|shadow|arcane|holy|nature|physical
 //   spell.scalingTags: spell + kind + area|projectile|dot|chain|channel
 
-export function getUniversalSpellDamageBonus(spell) {
+function getUniversalSpellDamageBonus(spell) {
     let flat = 0;
     let incPct = 0;
     try {
@@ -1840,11 +1852,11 @@ export function getUniversalSpellManaCost(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell) return 0;
     let cost = spell.manaCost || 0;
-    if (typeof _scaleAbilityManaCost === 'function') {
+    {
         try { cost = _scaleAbilityManaCost(cost); } catch (e) { /* fall through */ }
     }
     // Spell rank multiplies the price (SPELL_RANK_MANA_MULT in skill-charms.js).
-    if (typeof getSpellRankManaMultForSkill === 'function') {
+    {
         cost = Math.round(cost * getSpellRankManaMultForSkill(spellId));
     }
     return cost;
@@ -1854,11 +1866,11 @@ export function canAffordUniversalSpell(spellId) {
     const cost = getUniversalSpellManaCost(spellId);
     if (!cost || cost <= 0) return true;
     try {
-        if (typeof _bloodMagicActive === 'function' && _bloodMagicActive()) {
-            return (typeof canAffordLifeCost === 'function') ? canAffordLifeCost(cost) : true;
+        if (_bloodMagicActive()) {
+            return canAffordLifeCost(cost);
         }
     } catch (e) { /* fall through to mana */ }
-    return (typeof canAffordMana === 'function') ? canAffordMana(cost) : true;
+    return canAffordMana(cost);
 }
 
 export function getUniversalSpellEffectiveCooldown(spellId) {
@@ -1868,7 +1880,7 @@ export function getUniversalSpellEffectiveCooldown(spellId) {
     // Global cooldown-recovery sources (passive tree / keystones) apply to
     // spells too; class-specific ones intentionally do not.
     try {
-        if (typeof _getGlobalCooldownReduction === 'function') {
+        {
             return Math.max(0, base - _getGlobalCooldownReduction());
         }
     } catch (e) { /* fall through */ }
@@ -1876,7 +1888,7 @@ export function getUniversalSpellEffectiveCooldown(spellId) {
 }
 
 // Per-spell live cooldowns (session-only, like the legacy slots).
-export const _uspCooldowns = {}; // spellId → { remaining, interval }
+const _uspCooldowns = {}; // spellId → { remaining, interval }
 
 // ---------------------------------------------------------------------
 // CHARGE-BASED COOLDOWNS
@@ -1899,17 +1911,17 @@ export const _uspCooldowns = {}; // spellId → { remaining, interval }
 // a pause-aware interval, exactly like the plain-cooldown tick below: the
 // sweep skips while _gamePaused / dead, so pausing (spell book open) does
 // not burn recharge time.
-export const _uspCharges = {}; // spellId → charge state
+const _uspCharges = {}; // spellId → charge state
 
 // Charge config for a spell, or null when the spell is plain-cooldown.
-export function _uspChargeConfig(spellOrId) {
+function _uspChargeConfig(spellOrId) {
     const spell = (typeof spellOrId === 'string') ? getUniversalSpellDef(spellOrId) : spellOrId;
     if (!spell || !spell.chargeMax || spell.chargeMax < 1) return null;
     return { max: spell.chargeMax, recharge: spell.chargeRechargeSeconds || spell.cooldownSeconds || 0 };
 }
 
 // Live charge pool for a spell (session-only): starts full, never persists.
-export function _uspChargeState(spellId, cfg) {
+function _uspChargeState(spellId, cfg) {
     let st = _uspCharges[spellId];
     if (!st) {
         st = _uspCharges[spellId] = { current: cfg.max, pending: [], interval: null };
@@ -1920,7 +1932,7 @@ export function _uspChargeState(spellId, cfg) {
 // Schedules one spent charge for recharge and starts the shared ticker.
 // Recharge intentionally ignores cooldown-reduction passives (flat seconds
 // like Celerity would zero out short pools) - it uses the authored time.
-export function _uspScheduleRecharge(spellId, cfg) {
+function _uspScheduleRecharge(spellId, cfg) {
     const st = _uspChargeState(spellId, cfg);
     const scale = (typeof window !== 'undefined' && window.DEV_EFFECT_TIME_SCALE > 0 && window.DEV_EFFECT_TIME_SCALE !== 1)
         ? window.DEV_EFFECT_TIME_SCALE : 1;
@@ -1943,14 +1955,14 @@ export function _uspScheduleRecharge(spellId, cfg) {
             .filter((s) => (s <= 0 ? (landed++, false) : true));
         if (landed > 0) {
             live.current = Math.min(liveCfg.max, live.current + landed);
-            if (typeof renderSkillHotbar === 'function') {
+            {
                 try { renderSkillHotbar(); } catch (e) {}
             }
         }
         if (!live.pending.length) {
             clearInterval(live.interval);
             live.interval = null;
-        } else if (typeof patchHotbarSlotCooldown === 'function') {
+        } else {
             try { patchHotbarSlotCooldown(spellId); } catch (e) {}
         }
     }, 1000);
@@ -1973,14 +1985,14 @@ export function getUniversalSpellChargeRechargeRemaining(spellId) {
 }
 
 // Consumes one charge; returns false when the pool is empty (cast is refused).
-export function _uspConsumeCharge(spellId) {
+function _uspConsumeCharge(spellId) {
     const cfg = _uspChargeConfig(spellId);
     if (!cfg) return true; // not a charge spell - nothing to spend
     const st = _uspChargeState(spellId, cfg);
     if (st.current <= 0) return false;
     st.current -= 1;
     _uspScheduleRecharge(spellId, cfg);
-    if (typeof patchHotbarSlotCooldown === 'function') {
+    {
         try { patchHotbarSlotCooldown(spellId); } catch (e) {}
     }
     return true;
@@ -1988,7 +2000,7 @@ export function _uspConsumeCharge(spellId) {
 
 // Empties the charge pools (round-end reset). Clears the tickers so a reset
 // cannot leave an interval counting down against a dead pool.
-export function _uspClearAllCharges() {
+function _uspClearAllCharges() {
     Object.keys(_uspCharges).forEach((id) => {
         const st = _uspCharges[id];
         if (st.interval) { clearInterval(st.interval); st.interval = null; }
@@ -2014,7 +2026,7 @@ export function getUniversalSpellCooldownRemaining(spellId) {
 // Rift Anchor's `secondsOverride` shortens this one cast's cooldown - used
 // by its PLACE cast, which must be cheap (3s) so the recall can actually
 // follow it; the recall itself takes the spell's full cooldown.
-export function startUniversalSpellCooldown(spellId, secondsOverride) {
+function startUniversalSpellCooldown(spellId, secondsOverride) {
     // Charge-based spells are committed through _uspConsumeCharge (see the
     // cast path). A call here is a deliberate no-op so a late re-time (the
     // Rift Anchor's PLACE cast re-cooldown) can never double-spend a charge.
@@ -2030,7 +2042,7 @@ export function startUniversalSpellCooldown(spellId, secondsOverride) {
         remaining: Math.max(1, Math.round(secs * scale)),
         interval: null,
     };
-    if (typeof patchHotbarSlotCooldown === 'function') {
+    {
         try { patchHotbarSlotCooldown(spellId); } catch (e) {}
     }
     state.interval = setInterval(() => {
@@ -2043,10 +2055,10 @@ export function startUniversalSpellCooldown(spellId, secondsOverride) {
             state.remaining = 0;
             clearInterval(state.interval);
             state.interval = null;
-            if (typeof renderSkillHotbar === 'function') {
+            {
                 try { renderSkillHotbar(); } catch (e) {}
             }
-        } else if (typeof patchHotbarSlotCooldown === 'function') {
+        } else {
             try { patchHotbarSlotCooldown(spellId); } catch (e) {}
         }
     }, 1000);
@@ -2065,7 +2077,7 @@ export function startUniversalSpellCooldown(spellId, secondsOverride) {
 // Physical spells scale with physical gear (physFlat/physIncPct) instead
 // of spell damage - warrior gear, not caster gear.
 
-export function _uspRollCritMult() {
+function _uspRollCritMult() {
     try {
         if (typeof globalThis._egComputePlayerStats === 'function' && typeof globalThis._egRollCrit === 'function') {
             return globalThis._egRollCrit(globalThis._egComputePlayerStats());
@@ -2074,7 +2086,7 @@ export function _uspRollCritMult() {
     return 1;
 }
 
-export function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
+function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
     const stats = (typeof globalThis._egComputePlayerStats === 'function')
         ? globalThis._egComputePlayerStats() : {};
     const tree = getUniversalSpellDamageBonus(spell);
@@ -2101,9 +2113,9 @@ export function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
         if (typeof globalThis._egQuizDamageBuffMult === 'function') dmg *= globalThis._egQuizDamageBuffMult();
         // Charm orbs applied to this spell's charm: +1% damage each
         // (js/skills/skill-charms.js).
-        if (typeof getCharmSkillDamageMult === 'function') dmg *= getCharmSkillDamageMult(spell.id);
+        dmg *= getCharmSkillDamageMult(spell.id);
         // Spell rank: rank 10 hits ~6× a rank-1 cast (SPELL_RANK_DAMAGE_MULT).
-        if (typeof getSpellRankDamageMultForSkill === 'function') dmg *= getSpellRankDamageMultForSkill(spell.id);
+        dmg *= getSpellRankDamageMultForSkill(spell.id);
     } catch (e) { /* mods unavailable */ }
 
     const amount = Math.max(1, Math.round(dmg));
@@ -2136,8 +2148,7 @@ export function getUniversalSpellDamageEstimate(spellId) {
     if (!spell.dmg) return null;
     // Reference values are rank-1; the cast rank scales them
     // (SPELL_RANK_DAMAGE_MULT in skill-charms.js).
-    const rankMult = (typeof getSpellRankDamageMultForSkill === 'function')
-        ? getSpellRankDamageMultForSkill(spellId) : 1;
+    const rankMult = getSpellRankDamageMultForSkill(spellId);
     const perHitMin = Math.max(1, Math.round(spell.dmg[0] * rankMult));
     const perHitMax = Math.max(1, Math.round(spell.dmg[1] * rankMult));
     let count = 1;
@@ -2156,7 +2167,7 @@ export function getUniversalSpellDamageEstimate(spellId) {
 //------------------------------CASTING-----------------------------------
 //------------------------------------------------------------------------
 
-export function _uspPlaySfx(spell) {
+function _uspPlaySfx(spell) {
     try {
         if (spell && spell.sfx && typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
             Audio_Manager.playSFX(spell.sfx);
@@ -2164,14 +2175,14 @@ export function _uspPlaySfx(spell) {
     } catch (e) { /* audio is best-effort */ }
 }
 
-export function _uspLivingMonsters() {
+function _uspLivingMonsters() {
     try {
         if (typeof globalThis._egMonsters === 'undefined' || !globalThis._egMonsters) return [];
         return globalThis._egMonsters.filter((m) => m && m.currentHP > 0);
     } catch (e) { return []; }
 }
 
-export function _uspNoTargetToast(spell) {
+function _uspNoTargetToast(spell) {
     if (typeof globalThis.showToast !== 'function') return;
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     // Self-cast families never need a monster - if they got here it is because
@@ -2185,16 +2196,12 @@ export function _uspNoTargetToast(spell) {
 }
 
 // Deals one rolled hit to a monster id (FX first, damage on impact).
-export function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
+function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
     if (!monsterId) return;
     const hit = calcUniversalSpellHit(spell, dmgMin, dmgMax);
     const fxOpts = Object.assign({ isCrit: hit.isCrit }, opts || {});
     try {
-        if (typeof _uspFireThemedProjectile === 'function') {
-            _uspFireThemedProjectile(spell, monsterId, hit, fxOpts);
-        } else if (typeof globalThis._egDamageTargetById === 'function') {
-            globalThis._egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true });
-        }
+        _uspFireThemedProjectile(spell, monsterId, hit, fxOpts);
     } catch (e) {
         try { globalThis._egDamageTargetById(monsterId, hit.amount, hit.elements, { isCrit: hit.isCrit, isPlayerSpell: true }); } catch (e2) {}
     }
@@ -2252,22 +2259,15 @@ export function castUniversalSpell(spellId) {
 
     // Mana (life under Blood Magic) gate - spend nothing on failure.
     const cost = getUniversalSpellManaCost(spellId);
-    if (typeof payAbilityCost === 'function') {
-        if (!payAbilityCost(cost)) {
-            if (typeof globalThis.showToast === 'function') {
-                let noMana = 'cls_no_mana';
-                try {
-                    if (typeof _bloodMagicActive === 'function' && _bloodMagicActive()) noMana = 'cls_no_life';
-                } catch (e) {}
-                globalThis.showToast(t(noMana));
-            }
-            return false;
+    if (!payAbilityCost(cost)) {
+        if (typeof globalThis.showToast === 'function') {
+            let noMana = 'cls_no_mana';
+            try {
+                if (_bloodMagicActive()) noMana = 'cls_no_life';
+            } catch (e) {}
+            globalThis.showToast(t(noMana));
         }
-    } else if (typeof spendMana === 'function') {
-        if (!spendMana(cost)) {
-            if (typeof globalThis.showToast === 'function') globalThis.showToast(t('cls_no_mana'));
-            return false;
-        }
+        return false;
     }
 
     // Commit point: spend the charge (charge spells) or start the cooldown
@@ -2291,7 +2291,7 @@ export function castUniversalSpell(spellId) {
             const label = (typeof LANG !== 'undefined' && LANG === 'de') ? spell.nameDE : spell.nameEn;
             if (summary) globalThis.showToast(`${spell.icon} ${label} - ${summary}`, '#7fe0b0');
         }
-        if (typeof renderSkillHotbar === 'function') {
+        {
             try { renderSkillHotbar(); } catch (e) {}
         }
         return true;
@@ -2309,7 +2309,7 @@ export function castUniversalSpell(spellId) {
             const label = (typeof LANG !== 'undefined' && LANG === 'de') ? spell.nameDE : spell.nameEn;
             if (res.text) globalThis.showToast(`${spell.icon} ${label} - ${res.text}`, '#7fd9ff');
         }
-        if (typeof renderSkillHotbar === 'function') {
+        {
             try { renderSkillHotbar(); } catch (e) {}
         }
         return true;
@@ -2424,7 +2424,7 @@ export function castUniversalSpell(spellId) {
             // landing across all of them with nova rings.
             const delayMs = spell.delayMs || 900;
             try {
-                if (typeof _uspTelegraph === 'function') {
+                {
                     if (spell.hitsAll) {
                         _uspLivingMonsters().slice(0, 8).forEach((m) => _uspTelegraph(spell, m.id, delayMs));
                     } else {
@@ -2478,7 +2478,7 @@ export function castUniversalSpell(spellId) {
         }
     }
 
-    if (typeof renderSkillHotbar === 'function') {
+    {
         try { renderSkillHotbar(); } catch (e) {}
     }
     return true;
@@ -2535,7 +2535,7 @@ export function _registerUniversalSpells() {
 
 // "Scales with" line: Spell Damage (or Attack Damage for physical) + the
 // design damage kind + the behaviour tags the future dev tree hooks onto.
-export function _uspScalingLine(spell) {
+function _uspScalingLine(spell) {
     // Support spells do not scale off damage stats - they scale off the charm
     // rank plus the max Life / Absorption pool they refill (see SUPPORT
     // SPELLS). Saying "Scales with: Spell Damage" on a heal would be a lie.
