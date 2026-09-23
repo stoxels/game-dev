@@ -281,7 +281,7 @@ import { _egMechRoyalDecree, _egMechCrownRings } from '../../js/combat/bosses/bo
 import { EG_ATLAS_REGION_BOSSES } from '../../js/combat/bosses/boss-rosters.js';
 import { SETTINGS, SETTINGS_DEFAULTS, applySettings, initSettingsControls, loadSettingsUI, saveSettings } from '../../js/settings.js';
 import { _keybindNormalize, closeKeybindsModal, keybindDisplayLabel, keybindKeyFor, keybindMatches, onKeybindAction, openKeybindsModal, resetKeybinds, tutUpdateKeybinds } from '../../js/keybinds.js';
-import { DIFF_CFG, MOD_MULT, MOD_SCROLL_TEXT_KEYS, RETRY_SETUP_MOD_LABEL_KEYS, _retrySetupOriginal, beginRetrySetupRun, cancelRetrySetupModal, curDiff, curMods, formatRetrySetup, isClassless, isMonsterless, isTreeless, openRetrySetupModal, retrySetupDefer, retrySetupIsActive, retrySetupResolve, scoreMultiplier, selDiff, syncDiffModButtons, togMod, updDiffDesc, updModDesc, updateRetryKeepModal } from '../../js/difficulty-modifiers.js';
+import { DIFF_CFG, beginRetrySetupRun, cancelRetrySetupModal, curDiff, curMods, isClassless, isMonsterless, isTreeless, openRetrySetupModal, retrySetupDefer, retrySetupIsActive, retrySetupResolve, scoreMultiplier, selDiff, syncDiffModButtons, togMod, updDiffDesc, updModDesc, updateRetryKeepModal } from '../../js/difficulty-modifiers.js';
 import { G, W1, W10, W11, W12, W13, W14, W15, W16, W17, W18, W19, W2, W20, W21, W22, W3, W4, W5, W6, W7, W8, W9, WORLDS, W_ENDGAME } from '../../js/levels/level-world-data.js';
 import { ALL, NEXUS_WORLD_INDEX, WORLD_START_GI, getNexusPointGi, isAscensionLevel, isNexusPointLevel, isNexusUnlocked, isNexusWorld, isNexusWorldUnlocked, lvText, setNexusUnlocked } from '../../js/levels/levels.js';
 import { BONUS_QUIZ_POOLS } from '../../js/quiz-exercise/quiz-questions.js';

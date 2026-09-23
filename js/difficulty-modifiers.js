@@ -2,7 +2,8 @@ import { hideModal, showModal } from './screens/screens.js';
 import { t } from './translation/translations.js';
 
 //------------------------------------------------------------------------
-//----------------------CONSTANTS & STATE----------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Currently selected difficulty tier. Drives penalty timing and score mult.
@@ -29,7 +30,7 @@ export let curMods = { timetrial: false, hardcore: false, ironman: false, classl
 // MONSTERLESS is deliberately missing here: disabling the Beasts expansion
 // costs nothing and grants nothing (x1.0) - scoreMultiplier() only applies
 // keys present in this table.
-export const MOD_MULT = {
+const MOD_MULT = {
     timetrial: 1.2,
     hardcore: 1.3,
     ironman: 1.15,
@@ -42,7 +43,7 @@ export const MOD_MULT = {
 // used everywhere else (timetrial, hardcore, ironman, classless, treeless).
 // Values are i18n keys resolved through t() at render time (see updModDesc),
 // so a language switch is always reflected.
-export const MOD_SCROLL_TEXT_KEYS = {
+const MOD_SCROLL_TEXT_KEYS = {
     timetrial: 'scr_mod_scroll_tt',
     hardcore: 'scr_mod_scroll_hc',
     ironman: 'scr_mod_scroll_im',
@@ -53,7 +54,8 @@ export const MOD_SCROLL_TEXT_KEYS = {
 
 
 //------------------------------------------------------------------------
-//----------------------GAME DIFFICULTY-----------------------------------
+//-------------------GAME DIFFICULTY---------------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Refreshes the difficulty description ribbon to match curDiff.
@@ -74,7 +76,8 @@ export function selDiff(btn) {
 
 
 //------------------------------------------------------------------------
-//------------------------GAME MODIFIERS----------------------------------
+//-------------------GAME MODIFIERS-----------------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Refreshes the left-page "active modifiers" scroll text with the warning
@@ -105,8 +108,12 @@ export function togMod(btn) {
     updModDesc();
 }
 
-// Refreshes the .sel / .sel-yellow highlighting of every difficulty and
-// modifier button on the page from the current curDiff / curMods state.
+
+//------------------------------------------------------------------------
+//-------------------SETUP-SCREEN FIGURE STYLES-----------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
 // The two setup-screen figures (monsterless boss, super-tutor Professor)
 // carry their BASE styling inline in index.html, so a stale/missed cache of
 // setup-screen.css can no longer leave them as default white buttons with
@@ -114,10 +121,10 @@ export function togMod(btn) {
 // (red cross over the boss / yellow border on the Professor) for the same
 // reason: they render even when the stylesheet never arrives.
 
-// Self-healing copy of the base inline styles. syncDiffModButtons() re-applies
-// anything missing, so even a stale cached page (old markup without the
-// inline styles) renders the figures correctly as soon as fresh JS runs.
-// Idempotent: it only fills gaps and never fights the active-state mirror.
+// Self-healing copy of the base inline styles. _ensureSetupFigBaseStyles()
+// re-applies anything missing, so even a stale cached page (old markup
+// without the inline styles) renders the figures correctly as soon as fresh
+// JS runs. Idempotent: it only fills gaps and never fights the mirror.
 const SETUP_FIG_BASE = {
     '.setup-fig-monsterless': {
         btn: 'position:absolute; left:-10%; top:16%; width:190px; height:190px; z-index:6; background:transparent; border:none; padding:0; cursor:pointer; line-height:0;',
@@ -132,6 +139,7 @@ const SETUP_FIG_BASE = {
     }
 };
 
+// Fills in any missing base inline styles on the two setup-screen figures.
 function _ensureSetupFigBaseStyles() {
     for (const sel of Object.keys(SETUP_FIG_BASE)) {
         const base = SETUP_FIG_BASE[sel];
@@ -147,14 +155,10 @@ function _ensureSetupFigBaseStyles() {
     }
 }
 
-export function syncDiffModButtons() {
-    _ensureSetupFigBaseStyles();
-    document.querySelectorAll('[data-diff]').forEach(b =>
-        b.classList.toggle('sel', b.dataset.diff === curDiff));
-    document.querySelectorAll('[data-mod]').forEach(b =>
-        b.classList.toggle('sel-yellow', !!curMods[b.dataset.mod]));
-
-    // BETA figure mirror - inline-style fallback for the setup-screen figures.
+// Mirrors the ACTIVE state of the two figures as inline styles: the red
+// cross over the boss while monsterless is on, the yellow glow around the
+// Professor while Super Tutor is on.
+function _mirrorSetupFigActiveStyles() {
     const mlBtn = document.querySelector('.setup-fig-monsterless');
     if (mlBtn) {
         const active = !!curMods.monsterless;
@@ -178,9 +182,21 @@ export function syncDiffModButtons() {
     }
 }
 
+// Refreshes the .sel / .sel-yellow highlighting of every difficulty and
+// modifier button on the page from the current curDiff / curMods state.
+export function syncDiffModButtons() {
+    _ensureSetupFigBaseStyles();
+    document.querySelectorAll('[data-diff]').forEach(b =>
+        b.classList.toggle('sel', b.dataset.diff === curDiff));
+    document.querySelectorAll('[data-mod]').forEach(b =>
+        b.classList.toggle('sel-yellow', !!curMods[b.dataset.mod]));
+    _mirrorSetupFigActiveStyles();
+}
+
 
 //------------------------------------------------------------------------
-//-----------------SCORE MULTIPLIERS FOR GAME MODIFIERS-------------------
+//-------------------SCORE MULTIPLIER---------------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Combines the difficulty's base score multiplier with every active
@@ -199,7 +215,8 @@ export function scoreMultiplier() {
 
 
 //------------------------------------------------------------------------
-//------------------MODIFIER ACTIVE CHECKS -------------------------------
+//-------------------MODIFIER ACTIVE CHECKS---------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Returns true when class abilities/passives should be fully suppressed.
@@ -215,18 +232,30 @@ export function isMonsterless() { return !!curMods.monsterless; }
 
 
 //------------------------------------------------------------------------
-//----------RETRY WITH OTHER DIFFICULTY / MODIFIERS-----------------------
+//-------------------RETRY WITH OTHER DIFFICULTY / MODIFIERS----------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Snapshot of the player's original difficulty/modifiers while a
 // "retry with other settings" run (started from the win overlay) is in
 // flight. null = no such run is currently active.
-export let _retrySetupOriginal = null;
+let _retrySetupOriginal = null;
 
 // True while the player is replaying a level with settings that differ
 // from their standing setup and haven't yet decided whether to keep them.
 export function retrySetupIsActive() {
     return _retrySetupOriginal !== null;
+}
+
+// Writes the snapshot's difficulty/modifiers back into the live state and
+// refreshes every settings-dependent UI element. Shared by the cancel and
+// revert paths.
+function _restoreRetrySnapshot(orig) {
+    curDiff = orig.diff;
+    Object.keys(curMods).forEach(m => { curMods[m] = !!orig.mods[m]; });
+    syncDiffModButtons();
+    updDiffDesc();
+    updModDesc();
 }
 
 // Opens the "retry with new settings" modal from the win overlay.
@@ -248,13 +277,7 @@ export function cancelRetrySetupModal() {
     _retrySetupOriginal = null;
     hideModal('retry-setup-modal');
 
-    if (orig) {
-        curDiff = orig.diff;
-        Object.keys(curMods).forEach(m => { curMods[m] = !!orig.mods[m]; });
-        syncDiffModButtons();
-        updDiffDesc();
-        updModDesc();
-    }
+    if (orig) _restoreRetrySnapshot(orig);
 }
 
 // Marks a retry-with-new-settings run as started. Called right before
@@ -274,18 +297,12 @@ export function retrySetupResolve(keep) {
     const orig = _retrySetupOriginal;
     _retrySetupOriginal = null;
 
-    if (orig && !keep) {
-        curDiff = orig.diff;
-        Object.keys(curMods).forEach(m => { curMods[m] = !!orig.mods[m]; });
-        syncDiffModButtons();
-        updDiffDesc();
-        updModDesc();
-    }
+    if (orig && !keep) _restoreRetrySnapshot(orig);
 }
 
 // Modifier key -> i18n key for the short button labels, used to render the
 // keep-modal setup comparison in the active language.
-export const RETRY_SETUP_MOD_LABEL_KEYS = {
+const RETRY_SETUP_MOD_LABEL_KEYS = {
     timetrial: 'mod_tt',
     hardcore: 'mod_hc',
     ironman: 'mod_im',
@@ -299,7 +316,7 @@ export const RETRY_SETUP_MOD_LABEL_KEYS = {
 // "Hard + Hardcore, Ironman" or "Normal (no modifiers)". Used for the
 // keep-modal NEW vs PREVIOUS comparison so the player sees exactly what
 // each choice would keep or restore.
-export function formatRetrySetup(diff, mods) {
+function formatRetrySetup(diff, mods) {
     const diffLabel = t('diff_' + diff);
     const activeMods = Object.keys(mods || {})
         .filter(m => mods[m])
