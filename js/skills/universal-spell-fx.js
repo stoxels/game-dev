@@ -1,4 +1,4 @@
-﻿// universal-spell-fx.js
+// universal-spell-fx.js
 //------------------------------------------------------------------------
 //-------------------UNIVERSAL SPELL VISUAL EFFECTS-----------------------
 //------------------------------------------------------------------------
@@ -7,6 +7,13 @@
 // 44x28 px box - the shared _egFireProjectile() flight code rotates the
 // whole box onto the flight vector, exactly like the class projectiles
 // (see js/combat/combat-class-projectiles.js).
+//
+// SURFACE NOTE (R3 2026-09-23): 9 exports, each with a verified consumer -
+// universal-spells.js imports 7 of them; USP_THEME_PROJ feeds the tutorial
+// Fireball (tutorial-quest.js); _uspProjDefFor + the anchor-marker pair are
+// also imported by the dev audit tool (js/dev/spell-rank-audit.js). The
+// other internals (impact/dot/card visuals, start resolution, support
+// anchor, sprite offsets) are file-private.
 //
 // Entry points used by universal-spells.js:
 //   _uspFireThemedProjectile(spell, monsterId, hit, opts)
@@ -143,7 +150,7 @@ export function _uspProjDefFor(spell) {
 //------------------------------------------------------------------------
 
 // Appends a themed overlay div to a monster card; auto-removes after ms.
-export function _uspCardOverlay(monsterId, className, ms) {
+function _uspCardOverlay(monsterId, className, ms) {
     try {
         const card = document.getElementById(`eg-card-${monsterId}`);
         if (!card) return null;
@@ -157,7 +164,7 @@ export function _uspCardOverlay(monsterId, className, ms) {
 
 // Impact flash + expanding ring in the spell's theme. Big hits (Meteor,
 // Chaos Bolt, crits) get the .is-big treatment.
-export function _uspImpact(spell, monsterId, opts) {
+function _uspImpact(spell, monsterId, opts) {
     const theme = (spell && spell.theme) || 'arcane';
     const big = (opts && (opts.isBig || opts.isCrit)) ? ' is-big' : '';
     _uspCardOverlay(monsterId, `usp-impact usp-impact-${theme}${big}`, opts && opts.isBig ? 900 : 650);
@@ -167,7 +174,7 @@ export function _uspImpact(spell, monsterId, opts) {
 }
 
 // Lingering burn / corruption / consecration sizzle on DoT ticks.
-export function _uspDotTick(spell, monsterId) {
+function _uspDotTick(spell, monsterId) {
     const theme = (spell && spell.theme) || 'arcane';
     _uspCardOverlay(monsterId, `usp-dot usp-dot-${theme}`, 850);
 }
@@ -185,7 +192,7 @@ export function _uspTelegraph(spell, monsterId, delayMs) {
 
 // Source anchor: chain jumps fly card→card; sky strikes fall from above the
 // card; everything else launches from the player avatar (the caster).
-export function _uspResolveStart(spell, targetCard, opts) {
+function _uspResolveStart(spell, targetCard, opts) {
     const centre = (typeof globalThis._egGetElementCentre === 'function') ? globalThis._egGetElementCentre : null;
     if (opts && opts.fromMonsterId && centre) {
         const from = document.getElementById(`eg-card-${opts.fromMonsterId}`);
@@ -215,7 +222,7 @@ export function _uspResolveStart(spell, targetCard, opts) {
 
 // Resolves the avatar centre in viewport coordinates, or null when the avatar
 // is not on screen (then the callers just skip the cosmetic layer).
-export function _uspSupportAnchor() {
+function _uspSupportAnchor() {
     if (typeof globalThis._egGetElementCentre !== 'function') return null;
     const avatar = document.getElementById('player-avatar-wrapper')
         || document.getElementById('class-hud-drag-handle')
@@ -278,7 +285,7 @@ export function _uspSupportPulseFX(spell) {
 // is wider than the sprite, so drawing FX at the raw position would smear the
 // streak off the character. Measured live so it also holds on the simple
 // (level-select style) avatar, which has neither.
-export function _uspMoveSpriteOffset() {
+function _uspMoveSpriteOffset() {
     const wrap = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     const img = document.getElementById('avatar-sprite-img')
@@ -325,13 +332,13 @@ export function _uspBlinkFX(spell, fromX, fromY, toX, toY, soft) {
 // The armed Rift Anchor's world marker. One at a time (a second anchor
 // replaces the first, matching the spell), removed on recall, on expiry and
 // when the encounter ends.
-export let _uspAnchorMarkerEl = null;
+let _uspAnchorMarkerEl = null;
 
 // Where the sprite's FEET are, as an offset from the wrapper's top-left. The
 // anchor is a ground point, and the marker must stay visible - centred on the
 // sprite it would sit behind the character art, so it is pinned at the feet,
 // just below the body, where the ground contact actually is.
-export function _uspMoveSpriteFootOffset() {
+function _uspMoveSpriteFootOffset() {
     const wrap = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     const img = document.getElementById('avatar-sprite-img')
