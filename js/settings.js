@@ -4,12 +4,26 @@ import { PassiveTracker } from './passive-tree/passive-tracker.js';
 import { _applyLowHealthVignette, _applyLowTimeVignette } from './timer/timer.js';
 
 //------------------------------------------------------------------------
+//-------------------CROSS-MODULE CONSTRAINT------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Every module that reads settings at runtime (audio.js, timer.js,
+// mouse-button-handlers.js, passive-tracker.js, toasts-and-popups.js,
+// translations-strings.js, title-bindings.js) does so through the
+// globalThis bridge on purpose: this file sits at the very front of the
+// load order and already imports the four hub modules above, so ANY
+// import added back into this file from a consumer closes an import
+// cycle (BFS over the dependency graph confirms it for every consumer).
+// The bridge is the cycle-avoidance seam for the whole file. Keep it.
+
+//------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // localStorage key used to persist settings across sessions
-export const SETTINGS_KEY = 'stoxels_settings';
+const SETTINGS_KEY = 'stoxels_settings';
 
 // Default values - used as fallback for any missing or corrupt saved data
 export const SETTINGS_DEFAULTS = {
@@ -34,7 +48,7 @@ export const SETTINGS_DEFAULTS = {
 
 // Describes every toggle control in the settings modal.
 // Each entry maps a settings key to its button element ID.
-export const TOGGLE_CONFIGS = [
+const TOGGLE_CONFIGS = [
     { key: 'bgmEnabled', btnId: 'stt-bgm' },
     { key: 'randomBgmEnabled', btnId: 'stt-randombgm' },
     { key: 'sfxEnabled', btnId: 'stt-sfx' },
@@ -54,7 +68,7 @@ export const TOGGLE_CONFIGS = [
 // Each entry maps a settings key to its slider and display-value element IDs.
 // mode: 'percent' (default) stores a 0–1 float and shows a % label;
 //       'seconds' stores the raw slider value and shows an "Ns" label.
-export const SLIDER_CONFIGS = [
+const SLIDER_CONFIGS = [
     { key: 'bgmVolume', sliderId: 'sld-bgm', valueId: 'val-bgm' },
     { key: 'sfxVolume', sliderId: 'sld-sfx', valueId: 'val-sfx' },
     { key: 'toastDuration', sliderId: 'sld-toast', valueId: 'val-toast', mode: 'seconds' },
@@ -64,7 +78,7 @@ export const SLIDER_CONFIGS = [
 //   toStored - converts the raw 0–100 slider integer to the stored settings value
 //   toRaw    - converts the stored settings value back to the slider integer
 //   label    - formats the stored value for the on-screen text
-export function _sliderTransforms(cfg) {
+function _sliderTransforms(cfg) {
     if (cfg.mode === 'seconds') {
         return {
             toStored: raw => parseInt(raw),
@@ -86,7 +100,7 @@ export function _sliderTransforms(cfg) {
 export let SETTINGS = loadSettings();
 
 // Debounce handle for the SFX volume-slider preview sound.
-export let _sfxPreviewTimeout = null;
+let _sfxPreviewTimeout = null;
 
 
 //------------------------------------------------------------------------
@@ -96,7 +110,7 @@ export let _sfxPreviewTimeout = null;
 
 // Reads saved settings from localStorage and merges with defaults.
 // Any key missing from the saved data falls back to SETTINGS_DEFAULTS.
-export function loadSettings() {
+function loadSettings() {
     try {
         const raw = localStorage.getItem(SETTINGS_KEY);
         const saved = raw ? JSON.parse(raw) : {};
@@ -119,7 +133,7 @@ export function saveSettings(settings) {
 
 // Pushes audio settings to the Audio_Manager.
 // Called from applySettings whenever audio-related values change.
-export function applyAudioSettings() {
+function applyAudioSettings() {
     Audio_Manager.toggleBGM(SETTINGS.bgmEnabled);
     Audio_Manager.setBGMVolume(SETTINGS.bgmVolume);
     Audio_Manager.toggleSFX(SETTINGS.sfxEnabled);
@@ -130,7 +144,7 @@ export function applyAudioSettings() {
 // Registers the window focus/blur listeners used by the "mute when
 // unfocused" setting. Called once during init; the handlers re-read
 // SETTINGS each time so they always follow the current toggle state.
-export function _initFocusMuteListeners() {
+function _initFocusMuteListeners() {
     window.addEventListener('blur', () => {
         if (SETTINGS.muteOnFocusLoss) Audio_Manager.setFocusMuted(true);
     });
@@ -141,15 +155,15 @@ export function _initFocusMuteListeners() {
 
 // Pushes gameplay settings to the relevant game-state variables.
 // Called from applySettings whenever gameplay-related values change.
-export function applyGameplaySettings() {
+function applyGameplaySettings() {
+    // axisLockEnabled is declared in state.js, which loads AFTER this
+    // file - the typeof guard is what makes the bridge read safe here.
     if (typeof axisLockEnabled !== 'undefined') {
         globalThis.axisLockEnabled = SETTINGS.axisLock;
     }
 
     // show/hide the touchpad mark-mode button immediately when toggled
-    if (typeof updateTouchpadModeButtonVisibility === 'function') {
-        updateTouchpadModeButtonVisibility();
-    }
+    updateTouchpadModeButtonVisibility();
 }
 
 // Applies all current SETTINGS to audio and gameplay systems.
@@ -166,8 +180,9 @@ export function applySettings() {
 //------------------------------------------------------------------------
 
 // Updates a single toggle button to reflect the given boolean state.
-// Sets the button label and toggles the 'off' CSS class accordingly.
-export function setToggleUI(btnId, isEnabled) {
+// Toggles the 'settings-toggle-off' CSS class; the button's own label
+// stays fixed and only its colour changes.
+function setToggleUI(btnId, isEnabled) {
     const btn = document.getElementById(btnId);
     if (!btn) return;
     btn.classList.toggle('settings-toggle-off', !isEnabled);
@@ -175,7 +190,7 @@ export function setToggleUI(btnId, isEnabled) {
 
 // Updates a single slider and its displayed value.
 // cfg: the matching SLIDER_CONFIGS entry (determines value scaling/label).
-export function setSliderUI(cfg) {
+function setSliderUI(cfg) {
     const { toRaw, label } = _sliderTransforms(cfg);
     const slider = document.getElementById(cfg.sliderId);
     const labelEl = document.getElementById(cfg.valueId);
@@ -204,20 +219,20 @@ export function loadSettingsUI() {
 // then saves, applies, and refreshes the UI.
 // Pass applyOnChange = false for toggles that don't need applySettings
 // (e.g. purely visual options like questionMark).
-export function initToggleControl(btnId, settingsKey, applyOnChange = true) {
+function initToggleControl(btnId, settingsKey, applyOnChange = true) {
     document.getElementById(btnId)?.addEventListener('click', () => {
         SETTINGS[settingsKey] = !SETTINGS[settingsKey];
         saveSettings(SETTINGS);
         if (applyOnChange) applySettings();
         loadSettingsUI();
         // Passive tracker endgame hide needs immediate visual update
-        if (settingsKey === 'hidePassiveTrackerInEndgame' && typeof PassiveTracker !== 'undefined' && PassiveTracker.refreshVisibility) {
+        if (settingsKey === 'hidePassiveTrackerInEndgame' && PassiveTracker.refreshVisibility) {
             PassiveTracker.refreshVisibility();
         }
-        if (settingsKey === 'lowTimeVignette' && typeof _applyLowTimeVignette === 'function') {
+        if (settingsKey === 'lowTimeVignette') {
             _applyLowTimeVignette();
         }
-        if (settingsKey === 'lowHealthVignette' && typeof _applyLowHealthVignette === 'function') {
+        if (settingsKey === 'lowHealthVignette') {
             _applyLowHealthVignette();
         }
     });
@@ -225,7 +240,7 @@ export function initToggleControl(btnId, settingsKey, applyOnChange = true) {
 
 // Wires up a single slider: converts its raw value to the stored form
 // (see SLIDER_CONFIGS mode), updates the live label, then saves and applies.
-export function initSliderControl(cfg) {
+function initSliderControl(cfg) {
     document.getElementById(cfg.sliderId)?.addEventListener('input', e => {
         const { toStored, label } = _sliderTransforms(cfg);
         SETTINGS[cfg.key] = toStored(e.target.value);
