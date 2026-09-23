@@ -1,4 +1,4 @@
-﻿import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { isEndgameLevel } from '../mouse-button-handlers.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from '../classes/ascendency-defs.js';
@@ -8,7 +8,12 @@ import { _abilityCanAfford, _getAbilityManaCost } from '../classes/class-mana.js
 import { getSkillCastRankClamped, getSkillCastRankFull, getSpellRankDamageMult, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { UNIVERSAL_SPELL_DEFS, _registerUniversalSpells, _uspGroupTitle, _uspMovementGroupTitle, _uspSupportGroupTitle, canAffordUniversalSpell, castUniversalSpell, getUniversalSpellCooldownRemaining, getUniversalSpellDamageEstimate, getUniversalSpellEffectiveCooldown, getUniversalSpellManaCost, isUniversalMovementSpell, isUniversalSpellUnlocked, isUniversalSupportSpell } from './universal-spells.js';
 import { STATE } from '../state.js';
-//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+// BRIDGE NOTE: the four globalThis accessors above are live seams —
+// tutorial-quest.js reassigns getPlayerSkillIds/getPlayerSkillGroups/
+// ensureSkillHotbar (auto-seeder stop-gaps), so those reads must stay on
+// the bridge. setHotbarSlot has no outside writer (kept for symmetry).
+// The _-prefixed exports below are internal helpers; the manifest's
+// export list is the authoritative public surface.
 try { Object.defineProperty(globalThis, 'getPlayerSkillIds', { get() { return getPlayerSkillIds; }, set(v) { getPlayerSkillIds = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'getPlayerSkillGroups', { get() { return getPlayerSkillGroups; }, set(v) { getPlayerSkillGroups = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'ensureSkillHotbar', { get() { return ensureSkillHotbar; }, set(v) { ensureSkillHotbar = v; }, configurable: true }); } catch (e) {}
@@ -66,7 +71,7 @@ export const HEARTBLOOM_SKILL_ID = 'heartbloom';
 //   castTime - 'instant' | 'channel' | null, purely informational
 //------------------------------------------------------------------------
 
-export const SKILL_META = {
+const SKILL_META = {
     // ── BASE CLASS ACTIVES ──────────────────────────────────────────────
     mathmagician_active1: {
         tags: ['Spell', 'Reveal', 'Area'],
@@ -200,11 +205,11 @@ export const SKILL_REGISTRY = {};
 // PASSIVE_SKILL_REGISTRY: skill id → passive record. Passives are shown in
 // the class HUD/level-select tooltips but are never castable and therefore
 // never appear in the spell book or the hotbar (see the movable check).
-export const PASSIVE_SKILL_REGISTRY = {};
+const PASSIVE_SKILL_REGISTRY = {};
 
 // Legacy slot key per source kind. Base actives reuse active1/active2,
 // ascendency actives reuse active3/active4, heartbloom owns active5.
-export const _SKILL_LEGACY_SLOT = {
+const _SKILL_LEGACY_SLOT = {
     base1: 'active1',
     base2: 'active2',
     asc1: 'active3',
@@ -213,7 +218,7 @@ export const _SKILL_LEGACY_SLOT = {
 };
 
 // Registers one castable skill from a source ability def.
-export function _registerSkill(id, source, def, slotKind) {
+function _registerSkill(id, source, def, slotKind) {
     const meta = SKILL_META[id] || { tags: [], scaling: [], damage: null, castTime: 'instant' };
     SKILL_REGISTRY[id] = {
         id,
@@ -240,7 +245,7 @@ export function _registerSkill(id, source, def, slotKind) {
 }
 
 // Explicit icons for skills whose def carries none (ascendency actives).
-export const SKILL_ICON_OVERRIDES = {
+const SKILL_ICON_OVERRIDES = {
     outlier_active1: '📈', outlier_active2: '⚡',
     actuary_active1: '🛡️', actuary_active2: '📊',
     recursionist_active1: '🌀', recursionist_active2: '🎲',
@@ -253,7 +258,7 @@ export const SKILL_ICON_OVERRIDES = {
 // class-upgrade screen uses). The hotbar and spell book prefer these over the
 // emoji/`def.icon` fallback whenever an entry exists here. Heartbloom has no
 // artwork yet, so it keeps its glyph. Keyed by skill id.
-export const SKILL_UPGRADE_IMAGES = {
+const SKILL_UPGRADE_IMAGES = {
     mathmagician_active1: 'arcane_reveal.webp',
     mathmagician_active2: 'absolute_zero.webp',
     mathmagician_passive: 'variance_shield.webp',
@@ -278,10 +283,10 @@ export const SKILL_UPGRADE_IMAGES = {
 };
 
 // Folder (relative to index.html) holding SKILL_UPGRADE_IMAGES artwork.
-export const SKILL_UPGRADE_IMAGE_DIR = 'images/class_spell_upgrade/';
+const SKILL_UPGRADE_IMAGE_DIR = 'images/class_spell_upgrade/';
 
 // Resolves the artwork URL for a skill/passive id, or null when none exists.
-export function _skillImageFor(id) {
+function _skillImageFor(id) {
     const file = SKILL_UPGRADE_IMAGES[id];
     return file ? SKILL_UPGRADE_IMAGE_DIR + file : null;
 }
@@ -290,9 +295,9 @@ export function _skillImageFor(id) {
 //   1. an explicit def.icon (heartbloom)
 //   2. the per-class spell icon table (CLASS_SPELL_ICONS)
 //   3. the SKILL_ICON_OVERRIDES table above (ascendencies)
-export function _skillIconFor(id, source, slotKind) {
+function _skillIconFor(id, source, slotKind) {
     if (SKILL_ICON_OVERRIDES[id]) return SKILL_ICON_OVERRIDES[id];
-    if (source.kind === 'class' && typeof CLASS_SPELL_ICONS !== 'undefined') {
+    if (source.kind === 'class') {
         const set = CLASS_SPELL_ICONS[source.ownerId];
         if (set) {
             if (slotKind === 'base1') return set.active1;
@@ -303,8 +308,8 @@ export function _skillIconFor(id, source, slotKind) {
 }
 
 // Registers a non-castable passive ability (Variance Shield, Momentum, …).
-export function _registerPassive(id, def, source) {
-    const classIcons = (typeof CLASS_SPELL_ICONS !== 'undefined' && CLASS_SPELL_ICONS[source.ownerId]) || null;
+function _registerPassive(id, def, source) {
+    const classIcons = CLASS_SPELL_ICONS[source.ownerId] || null;
     PASSIVE_SKILL_REGISTRY[id] = {
         id,
         icon: def.icon || (classIcons && classIcons.passive) || '💠',
@@ -323,25 +328,21 @@ export function _registerPassive(id, def, source) {
 
 // Builds the registry from the class / ascendency / heartbloom defs.
 // Runs once at load, after class-defs.js and ascendency-defs.js.
-export function buildSkillRegistry() {
-    if (typeof CLASS_DEFS !== 'undefined') {
-        for (const classId of Object.keys(CLASS_DEFS)) {
-            const cls = CLASS_DEFS[classId];
-            if (cls.passive) _registerPassive(`${classId}_passive`, cls.passive, { kind: 'class', ownerId: classId, slot: 'passive' });
-            if (cls.active1) _registerSkill(`${classId}_active1`, { kind: 'class', ownerId: classId, slot: 'active1' }, cls.active1, 'base1');
-            if (cls.active2) _registerSkill(`${classId}_active2`, { kind: 'class', ownerId: classId, slot: 'active2' }, cls.active2, 'base2');
-        }
+function buildSkillRegistry() {
+    for (const classId of Object.keys(CLASS_DEFS)) {
+        const cls = CLASS_DEFS[classId];
+        if (cls.passive) _registerPassive(`${classId}_passive`, cls.passive, { kind: 'class', ownerId: classId, slot: 'passive' });
+        if (cls.active1) _registerSkill(`${classId}_active1`, { kind: 'class', ownerId: classId, slot: 'active1' }, cls.active1, 'base1');
+        if (cls.active2) _registerSkill(`${classId}_active2`, { kind: 'class', ownerId: classId, slot: 'active2' }, cls.active2, 'base2');
     }
 
-    if (typeof ASCENDENCY_DEFS !== 'undefined') {
-        for (const ascId of Object.keys(ASCENDENCY_DEFS)) {
-            const asc = ASCENDENCY_DEFS[ascId];
-            if (asc.active1) _registerSkill(`${ascId}_active1`, { kind: 'ascendency', ownerId: ascId, slot: 'active1' }, asc.active1, 'asc1');
-            if (asc.active2) _registerSkill(`${ascId}_active2`, { kind: 'ascendency', ownerId: ascId, slot: 'active2' }, asc.active2, 'asc2');
-        }
+    for (const ascId of Object.keys(ASCENDENCY_DEFS)) {
+        const asc = ASCENDENCY_DEFS[ascId];
+        if (asc.active1) _registerSkill(`${ascId}_active1`, { kind: 'ascendency', ownerId: ascId, slot: 'active1' }, asc.active1, 'asc1');
+        if (asc.active2) _registerSkill(`${ascId}_active2`, { kind: 'ascendency', ownerId: ascId, slot: 'active2' }, asc.active2, 'asc2');
     }
 
-    if (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined' && ENDGAME_HEARTBLOOM_DEF) {
+    if (ENDGAME_HEARTBLOOM_DEF) {
         _registerSkill(HEARTBLOOM_SKILL_ID, { kind: 'heartbloom', ownerId: null, slot: 'active1' }, ENDGAME_HEARTBLOOM_DEF, 'heartbloom');
     }
 }
@@ -373,7 +374,10 @@ export function getSkillImage(skillId) {
 }
 
 // Upgrade artwork URL for a passive ability, or null when it has none.
-export function getPassiveSkillImage(passiveId) {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
+function getPassiveSkillImage(passiveId) {
     const def = getPassiveSkillDef(passiveId);
     return def ? (def.image || null) : null;
 }
@@ -389,17 +393,15 @@ export function getPlayerTraits() {
 
 // True if a skill may be placed into the hotbar. Sealed universal spells
 // are refused (setHotbarSlot funnels through here).
-export function isSkillMovable(skillId) {
+function isSkillMovable(skillId) {
     const def = getSkillDef(skillId);
     if (!def || def.movable === false) return false;
-    if (def.slotKind === 'universal' && typeof isUniversalSpellUnlocked === 'function') {
+    if (def.slotKind === 'universal') {
         try { if (!isUniversalSpellUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
     }
     // Charm gate: a spell can only be placed on the hotbar while its charm
     // sits in one of the spell slots (js/skills/skill-charms.js).
-    if (typeof isSkillCharmUnlocked === 'function') {
-        try { if (!isSkillCharmUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
-    }
+    try { if (!isSkillCharmUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
     return true;
 }
 
@@ -423,14 +425,12 @@ export function getSkillLevel(skillId) {
 // damage estimate's effect lookup - describe the rank-1 variant even while the
 // character has the skill trained to rank 3. getSkillCastRankClamped also
 // clamps to the authored level table, so indexing is always in range.
-export function getSkillLevelData(skillId) {
+function getSkillLevelData(skillId) {
     const def = getSkillDef(skillId);
     if (!def || !def.levels) return null;
     let lvl = getSkillLevel(skillId);
-    if (typeof getSkillCastRankClamped === 'function') {
-        const castRank = getSkillCastRankClamped(skillId);
-        if (castRank) lvl = castRank;
-    }
+    const castRank = getSkillCastRankClamped(skillId);
+    if (castRank) lvl = castRank;
     lvl = Math.max(1, Math.min(lvl, def.levels.length));
     return def.levels[lvl - 1] || def.levels[0] || null;
 }
@@ -456,14 +456,17 @@ export function getSkillDesc(skillId) {
 }
 
 // Localised cursor hint (shown when the skill is armed).
-export function getSkillCursorDesc(skillId) {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
+function getSkillCursorDesc(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return '';
     return LANG === 'de' ? (def.descCursorDE || def.descCursorEn) : def.descCursorEn;
 }
 
 // Base (un-reduced, un-scaled) mana cost of the skill.
-export function getSkillBaseManaCost(skillId) {
+function getSkillBaseManaCost(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return 0;
     // Heartbloom keeps its cost on the def; everything else too.
@@ -477,17 +480,18 @@ export function getSkillBaseManaCost(skillId) {
 export function getSkillManaCost(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return 0;
-    if (def.slotKind === 'universal' && typeof getUniversalSpellManaCost === 'function') {
+    if (def.slotKind === 'universal') {
         try { return getUniversalSpellManaCost(skillId); } catch (e) { /* fall through */ }
     }
-    if (typeof _getAbilityManaCost === 'function') {
-        try { return _getAbilityManaCost(def.legacySlot); } catch (e) { /* fall through */ }
-    }
+    try { return _getAbilityManaCost(def.legacySlot); } catch (e) { /* fall through */ }
     return getSkillBaseManaCost(skillId);
 }
 
 // Base cooldown of the skill in seconds.
-export function getSkillBaseCooldown(skillId) {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
+function getSkillBaseCooldown(skillId) {
     const def = getSkillDef(skillId);
     return def ? (def.cooldownSeconds || 0) : 0;
 }
@@ -497,12 +501,10 @@ export function getSkillBaseCooldown(skillId) {
 export function getSkillCooldown(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return 0;
-    if (def.slotKind === 'universal' && typeof getUniversalSpellEffectiveCooldown === 'function') {
+    if (def.slotKind === 'universal') {
         try { return getUniversalSpellEffectiveCooldown(skillId); } catch (e) { /* fall through */ }
     }
-    if (typeof getEffectiveCooldown === 'function') {
-        try { return getEffectiveCooldown(def.legacySlot, def.cooldownSeconds || 0); } catch (e) { /* fall through */ }
-    }
+    try { return getEffectiveCooldown(def.legacySlot, def.cooldownSeconds || 0); } catch (e) { /* fall through */ }
     return def.cooldownSeconds || 0;
 }
 
@@ -511,10 +513,10 @@ export function getSkillCooldown(skillId) {
 export function getSkillCooldownRemaining(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return 0;
-    if (def.slotKind === 'universal' && typeof getUniversalSpellCooldownRemaining === 'function') {
+    if (def.slotKind === 'universal') {
         try { return getUniversalSpellCooldownRemaining(skillId); } catch (e) { return 0; }
     }
-    const state = (typeof cooldownState !== 'undefined') ? cooldownState[def.legacySlot] : null;
+    const state = cooldownState[def.legacySlot] || null;
     return (state && state.remaining) || 0;
 }
 
@@ -522,12 +524,10 @@ export function getSkillCooldownRemaining(skillId) {
 export function canAffordSkill(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return false;
-    if (def.slotKind === 'universal' && typeof canAffordUniversalSpell === 'function') {
+    if (def.slotKind === 'universal') {
         try { return canAffordUniversalSpell(skillId); } catch (e) { /* fall through */ }
     }
-    if (typeof _abilityCanAfford === 'function') {
-        try { return _abilityCanAfford(def.legacySlot); } catch (e) { /* fall through */ }
-    }
+    try { return _abilityCanAfford(def.legacySlot); } catch (e) { /* fall through */ }
     return true;
 }
 
@@ -537,17 +537,15 @@ export function canAffordSkill(skillId) {
 export function isSkillUsableNow(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return false;
-    if (def.slotKind === 'universal' && typeof isUniversalSpellUnlocked === 'function') {
+    if (def.slotKind === 'universal') {
         try { if (!isUniversalSpellUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
     }
     if (def.endgameOnly) {
-        if (typeof isEndgameLevel === 'function' && !isEndgameLevel()) return false;
+        if (!isEndgameLevel()) return false;
     }
     // Charm gate: only spells whose charm is currently placed in one of the
     // spell slots may be cast (js/skills/skill-charms.js).
-    if (typeof isSkillCharmUnlocked === 'function') {
-        try { if (!isSkillCharmUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
-    }
+    try { if (!isSkillCharmUnlocked(skillId)) return false; } catch (e) { /* treat as unlocked */ }
     return true;
 }
 
@@ -565,7 +563,7 @@ export function isSkillUsableNow(skillId) {
 //------------------------------------------------------------------------
 
 // Returns the live per-projectile reveal damage, or null when unavailable.
-export function _skillLiveRevealDamage() {
+function _skillLiveRevealDamage() {
     if (typeof globalThis._egGetRevealProjectileDamagePct !== 'function') return null;
     if (typeof globalThis._egIsActive !== 'function' || !globalThis._egIsActive()) return null;
     if (typeof globalThis._egCalcPlayerDamage !== 'function') return null;
@@ -584,7 +582,7 @@ export function _skillLiveRevealDamage() {
 export function getSkillDamage(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return null;
-    if (def.slotKind === 'universal' && typeof getUniversalSpellDamageEstimate === 'function') {
+    if (def.slotKind === 'universal') {
         try { return getUniversalSpellDamageEstimate(skillId); } catch (e) { return null; }
     }
     if (!def.damage) return null;
@@ -594,9 +592,9 @@ export function getSkillDamage(skillId) {
     // SPELL_RANK_DAMAGE_MULT in js/skills/skill-charms.js. The reference
     // perHit values are rank-1 baselines, so they are scaled by the rank
     // multiplier instead of indexed per rank.
-    const level = (typeof getSkillCastRankFull === 'function') ? getSkillCastRankFull(skillId) : getSkillLevel(skillId);
+    const level = getSkillCastRankFull(skillId);
     const effect = getSkillEffect(skillId);
-    const rankMult = (typeof getSpellRankDamageMult === 'function') ? getSpellRankDamageMult(level) : 1;
+    const rankMult = getSpellRankDamageMult(level);
     let count = 1;
     try { count = Math.max(1, Number(def.damage.count(effect, level)) || 1); } catch (e) { count = 1; }
 
@@ -634,16 +632,16 @@ export function getSkillDamage(skillId) {
 //------------------------------------------------------------------------
 
 // Returns the base-class skill ids for the active class.
-export function _playerBaseSkillIds() {
+function _playerBaseSkillIds() {
     const cls = STATE.playerClass;
-    if (!cls || typeof CLASS_DEFS === 'undefined' || !CLASS_DEFS[cls]) return [];
+    if (!cls || !CLASS_DEFS[cls]) return [];
     return [`${cls}_active1`, `${cls}_active2`];
 }
 
 // Returns the ascendency skill ids for the chosen ascendency.
-export function _playerAscendencySkillIds() {
+function _playerAscendencySkillIds() {
     const asc = STATE.playerAscendency;
-    if (!asc || typeof ASCENDENCY_DEFS === 'undefined' || !ASCENDENCY_DEFS[asc]) return [];
+    if (!asc || !ASCENDENCY_DEFS[asc]) return [];
     return [`${asc}_active1`, `${asc}_active2`];
 }
 
@@ -656,10 +654,8 @@ function getPlayerSkillIds() {
     ].filter((id) => !!getSkillDef(id));
     if (getSkillDef(HEARTBLOOM_SKILL_ID)) ids.push(HEARTBLOOM_SKILL_ID);
     // Universal spell arsenal (universal-spells.js): open to every class.
-    if (typeof UNIVERSAL_SPELL_DEFS !== 'undefined') {
-        for (const spell of UNIVERSAL_SPELL_DEFS) {
-            if (getSkillDef(spell.id) && !ids.includes(spell.id)) ids.push(spell.id);
-        }
+    for (const spell of UNIVERSAL_SPELL_DEFS) {
+        if (getSkillDef(spell.id) && !ids.includes(spell.id)) ids.push(spell.id);
     }
     return ids;
 }
@@ -681,38 +677,37 @@ function getPlayerSkillGroups() {
     if (getSkillDef(HEARTBLOOM_SKILL_ID)) groups.push({ labelKey: 'spellbook_group_endgame', ids: [HEARTBLOOM_SKILL_ID] });
     // Universal spell arsenal - labelFallback (bilingual via _uspGroupTitle)
     // so no translation keys are required for the section header.
-    if (typeof UNIVERSAL_SPELL_DEFS !== 'undefined') {
-        // The arsenal is split into SUPPORT (defensive self-casts), MOVEMENT
-        // (repositioning self-casts) and the offensive spells, so the handful
-        // of utility spells is findable instead of being buried in the
-        // 40-spell list. Order matters: the self-cast families sit directly
-        // under the player's own skills, support first because it is the one
-        // you reach for under pressure.
-        const isSupport = (typeof isUniversalSupportSpell === 'function')
-            ? isUniversalSupportSpell : () => false;
-        const isMovement = (typeof isUniversalMovementSpell === 'function')
-            ? isUniversalMovementSpell : () => false;
-        const supIds = UNIVERSAL_SPELL_DEFS.filter((s) => isSupport(s)).map((s) => s.id).filter((id) => !!getSkillDef(id));
-        const movIds = UNIVERSAL_SPELL_DEFS.filter((s) => !isSupport(s) && isMovement(s)).map((s) => s.id).filter((id) => !!getSkillDef(id));
-        const uspIds = UNIVERSAL_SPELL_DEFS.filter((s) => !isSupport(s) && !isMovement(s)).map((s) => s.id).filter((id) => !!getSkillDef(id));
-        if (supIds.length) {
-            const supTitle = (typeof _uspSupportGroupTitle === 'function') ? _uspSupportGroupTitle() : 'Support Spells';
-            groups.push({ labelKey: 'spellbook_group_support', labelFallback: supTitle, ids: supIds });
-        }
-        if (movIds.length) {
-            const movTitle = (typeof _uspMovementGroupTitle === 'function') ? _uspMovementGroupTitle() : 'Movement Spells';
-            groups.push({ labelKey: 'spellbook_group_movement', labelFallback: movTitle, ids: movIds });
-        }
-        if (uspIds.length) {
-            const title = (typeof _uspGroupTitle === 'function') ? _uspGroupTitle() : 'Universal Spells';
-            groups.push({ labelKey: 'spellbook_group_universal', labelFallback: title, ids: uspIds });
-        }
+    // The arsenal is split into SUPPORT (defensive self-casts), MOVEMENT
+    // (repositioning self-casts) and the offensive spells, so the handful
+    // of utility spells is findable instead of being buried in the
+    // 40-spell list. Order matters: the self-cast families sit directly
+    // under the player's own skills, support first because it is the one
+    // you reach for under pressure.
+    const isSupport = isUniversalSupportSpell;
+    const isMovement = isUniversalMovementSpell;
+    const supIds = UNIVERSAL_SPELL_DEFS.filter((s) => isSupport(s)).map((s) => s.id).filter((id) => !!getSkillDef(id));
+    const movIds = UNIVERSAL_SPELL_DEFS.filter((s) => !isSupport(s) && isMovement(s)).map((s) => s.id).filter((id) => !!getSkillDef(id));
+    const uspIds = UNIVERSAL_SPELL_DEFS.filter((s) => !isSupport(s) && !isMovement(s)).map((s) => s.id).filter((id) => !!getSkillDef(id));
+    if (supIds.length) {
+        const supTitle = _uspSupportGroupTitle();
+        groups.push({ labelKey: 'spellbook_group_support', labelFallback: supTitle, ids: supIds });
+    }
+    if (movIds.length) {
+        const movTitle = _uspMovementGroupTitle();
+        groups.push({ labelKey: 'spellbook_group_movement', labelFallback: movTitle, ids: movIds });
+    }
+    if (uspIds.length) {
+        const title = _uspGroupTitle();
+        groups.push({ labelKey: 'spellbook_group_universal', labelFallback: title, ids: uspIds });
     }
     return groups;
 }
 
 // The passives the player owns (never movable, shown for reference).
-export function getPlayerPassiveSkillIds() {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
+function getPlayerPassiveSkillIds() {
     const cls = STATE.playerClass;
     if (!cls) return [];
     return [`${cls}_passive`].filter((id) => !!getPassiveSkillDef(id));
@@ -733,17 +728,17 @@ export function getPlayerPassiveSkillIds() {
 // first slots in roster order (active1, active2, ascendency, heartbloom).
 export function _defaultSkillHotbar(state) {
     const slots = new Array(SKILL_HOTBAR_SIZE).fill(null);
-    const s = state || (typeof STATE !== 'undefined' ? STATE : null);
+    const s = state || STATE;
     if (!s || !s.playerClass) return slots;
 
     const ids = [];
-    if (typeof CLASS_DEFS !== 'undefined' && CLASS_DEFS[s.playerClass]) {
+    if (CLASS_DEFS[s.playerClass]) {
         ids.push(`${s.playerClass}_active1`, `${s.playerClass}_active2`);
     }
-    if (s.playerAscendency && typeof ASCENDENCY_DEFS !== 'undefined' && ASCENDENCY_DEFS[s.playerAscendency]) {
+    if (s.playerAscendency && ASCENDENCY_DEFS[s.playerAscendency]) {
         ids.push(`${s.playerAscendency}_active1`, `${s.playerAscendency}_active2`);
     }
-    if (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined' && ENDGAME_HEARTBLOOM_DEF) ids.push(HEARTBLOOM_SKILL_ID);
+    if (ENDGAME_HEARTBLOOM_DEF) ids.push(HEARTBLOOM_SKILL_ID);
 
     ids.slice(0, SKILL_HOTBAR_SIZE).forEach((id, i) => { slots[i] = id; });
     return slots;
@@ -762,7 +757,7 @@ export function _defaultSkillHotbar(state) {
 // an empty slot and the next render (after the def registers, e.g. the
 // tutorial Fireball) shows them.
 function ensureSkillHotbar() {
-    if (typeof STATE === 'undefined' || !STATE) return [];
+    if (!STATE) return [];
     if (!Array.isArray(STATE.skillHotbar) || STATE.skillHotbar.length !== SKILL_HOTBAR_SIZE) {
         const existing = Array.isArray(STATE.skillHotbar) ? STATE.skillHotbar.slice(0, SKILL_HOTBAR_SIZE) : [];
         STATE.skillHotbar = existing;
@@ -790,13 +785,13 @@ export function _charmKeyToSkillId(key) {
 // Rebuilds the whole hotbar from the charm slots (used after charm-slot
 // mutations that bypass setCharmSlot, e.g. starter seeding and stale pruning).
 export function rebuildHotbarFromCharmSlots() {
-    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.charmSlots)) return;
+    if (!STATE || !Array.isArray(STATE.charmSlots)) return;
     ensureSkillHotbar();
 }
 
 // Returns the skill id in a hotbar slot (or null).
 export function getHotbarSkill(slotIndex) {
-    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return null;
+    if (!STATE || !Array.isArray(STATE.skillHotbar)) return null;
     return STATE.skillHotbar[slotIndex] || null;
 }
 
@@ -821,18 +816,24 @@ function setHotbarSlot(slotIndex, skillId) {
     }
 
     STATE.skillHotbar[slotIndex] = skillId;
-    if (typeof save === 'function') save();
+    save();
     return true;
 }
 
 // Empties a hotbar slot.
-export function clearHotbarSlot(slotIndex) {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
+function clearHotbarSlot(slotIndex) {
     return setHotbarSlot(slotIndex, null);
 }
 
 // True if the skill currently sits in any hotbar slot.
-export function isSkillOnHotbar(skillId) {
-    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return false;
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-23): zero references since the export
+// was privatized - kept for a later dead-code decision, not deleted.
+// eslint-disable-next-line no-unused-vars
+function isSkillOnHotbar(skillId) {
+    if (!STATE || !Array.isArray(STATE.skillHotbar)) return false;
     return STATE.skillHotbar.indexOf(skillId) !== -1;
 }
 
@@ -856,7 +857,7 @@ export function activateSkill(skillId) {
     if (!def) return false;
     // Charm gate first so the player gets the actionable message rather than
     // the generic "endgame only" one.
-    if (typeof isSkillCharmUnlocked === 'function' && !isSkillCharmUnlocked(skillId)) {
+    if (!isSkillCharmUnlocked(skillId)) {
         if (typeof globalThis.showToast === 'function') globalThis.showToast(t('charm_locked_toast'), '#ff6b9d');
         return false;
     }
@@ -868,11 +869,10 @@ export function activateSkill(skillId) {
     }
     // Remember the casting skill so its charm orb bonus reaches the reveal
     // projectiles it fires (see getCharmCastingDamageMult).
-    if (typeof noteCharmCast === 'function') noteCharmCast(skillId);
+    noteCharmCast(skillId);
     // Universal spells bypass the legacy slot engine entirely.
     if (def.slotKind === 'universal') {
-        if (typeof castUniversalSpell === 'function') return castUniversalSpell(skillId);
-        return false;
+        return castUniversalSpell(skillId);
     }
     if (typeof globalThis.toggleActiveAbility === 'function') {
         globalThis.toggleActiveAbility(def.legacySlot);
