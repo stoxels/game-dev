@@ -1,4 +1,4 @@
-﻿import { t } from '../translation/translations.js';
+import { t } from '../translation/translations.js';
 import { hideHUDTooltip } from '../classes/class-hud.js';
 import { CHARM_SLOT_COUNT, initCharmPanelInteractions, renderSpellbookCharmPanel } from './skill-charms.js';
 import { _isGameScreenActive, renderSkillHotbar, setHotbarAboveModal } from './skill-hotbar.js';
@@ -28,7 +28,7 @@ import { STATE } from '../state.js';
 //------------------------------------------------------------------------
 
 // Returns the spell book overlay, creating it on first use.
-export function _ensureSpellbookOverlay() {
+function _ensureSpellbookOverlay() {
     let overlay = document.getElementById('spellbook-overlay');
     if (overlay) return overlay;
 
@@ -61,7 +61,7 @@ export function _ensureSpellbookOverlay() {
     overlay.querySelector('#btn-spellbook-close')
         .addEventListener('click', closeSpellbook);
     // Charm drag & drop / shift-click interactions (js/skills/skill-charms.js).
-    if (typeof initCharmPanelInteractions === 'function') initCharmPanelInteractions(overlay);
+    initCharmPanelInteractions(overlay);
     // Clicking the dimmed backdrop (but not the box) closes the book.
     overlay.addEventListener('pointerdown', (e) => {
         if (e.target === overlay) closeSpellbook();
@@ -82,12 +82,12 @@ export function isSpellbookOpen() {
 
 // True while the book itself is the reason the game is paused, so closing it
 // can hand control back (see openSpellbook / closeSpellbook).
-export let _spellbookAutoPaused = false;
+let _spellbookAutoPaused = false;
 
 // True when the book was opened from the pause menu, so closing it brings the
 // pause menu back. A SILENT engine pause (tutorial lesson, chain interstitial)
 // must not pop the pause screen open when the book closes.
-export let _spellbookOpenedFromPauseMenu = false;
+let _spellbookOpenedFromPauseMenu = false;
 
 // Opens the spell book (rendering fresh contents).
 export function openSpellbook() {
@@ -96,7 +96,7 @@ export function openSpellbook() {
     // plus the charm inventory/slots panel. Class/ascendency sections are
     // simply empty until a class is chosen. (The tutorial's puzzle 3 used to
     // be the only classless exception - Fireball before any class.)
-    if (typeof STATE === 'undefined' || !STATE) return;
+    if (!STATE) return;
     // On the title screen / before a character is picked, there's no spellbook
     // to show - no class, no charms, no spells. Only open if a character exists.
     // v3 fix: a returning player's last save slot is auto-loaded into STATE at
@@ -120,7 +120,7 @@ export function openSpellbook() {
     // resumeTimer() → startTimer() would spin up the puzzle countdown while
     // the player is standing on the map. It also keeps the pause overlay
     // from flickering over the map.
-    const inLiveLevel = (typeof _isGameScreenActive === 'function') ? _isGameScreenActive() : true;
+    const inLiveLevel = _isGameScreenActive();
     // If the player was ALREADY paused (opened from the pause menu, or the
     // tutorial's silent pause), that pause is left alone and closing restores
     // the previous state.
@@ -154,19 +154,18 @@ export function openSpellbook() {
     // Tutorial: also lift the Professor + his pointer line above the book so
     // the assignment stays visible while dragging (css/tutorial.css).
     document.body.classList.add('tq-spellbook-open');
-    if (typeof setHotbarAboveModal === 'function') setHotbarAboveModal(true);
+    setHotbarAboveModal(true);
     // Re-render the bar now that it has left the game screen's stacking
     // context: on the overworld screens it was hidden by the previous render
     // and has to come back as a drag target.
     _refreshHotbarForSpellbook();
-    if (typeof hideHUDTooltip === 'function') hideHUDTooltip();
+    hideHUDTooltip();
 }
 
 // Re-evaluates the hotbar's visibility for the book's open/closed state.
 // Safe to call anywhere: renderSkillHotbar() no-ops when the bar should be
 // hidden and the host element does not exist yet.
-export function _refreshHotbarForSpellbook() {
-    if (typeof renderSkillHotbar !== 'function') return;
+function _refreshHotbarForSpellbook() {
     try { renderSkillHotbar(); } catch (e) { /* bar is best-effort */ }
 }
 
@@ -176,11 +175,11 @@ export function closeSpellbook() {
     if (overlay) overlay.classList.remove('show');
     document.body.classList.remove('spellbook-open');
     document.body.classList.remove('tq-spellbook-open');
-    if (typeof setHotbarAboveModal === 'function') setHotbarAboveModal(false);
+    setHotbarAboveModal(false);
     // Back home (or hidden again when the book was opened off the game
     // screen and the player has nothing to cast at yet).
     _refreshHotbarForSpellbook();
-    if (typeof hideHUDTooltip === 'function') hideHUDTooltip();
+    hideHUDTooltip();
     // If the book itself paused the game, hand control right back.
     if (_spellbookAutoPaused) {
         _spellbookAutoPaused = false;
@@ -234,16 +233,16 @@ export function buildSpellbookHeadHTML(title, sub) {
 // SPELLBOOK_SCHOOL_ORDER is the canonical school set (elemental first,
 // physical last). Themes are read defensively: universal-spells.js loads
 // after the registry in some load orders.
-export const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'nature', 'holy', 'shadow', 'arcane', 'physical'];
+const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'nature', 'holy', 'shadow', 'arcane', 'physical'];
 
 // The offensive school of a universal spell id, or null when the spell is
 // not an offensive universal (support / movement live in their own sections;
 // class / ascendency / heartbloom keep their ownership groups).
-export function _sbSpellSchool(skillId) {
-    if (typeof UNIVERSAL_SPELL_MAP === 'undefined' || !UNIVERSAL_SPELL_MAP[skillId]) return null;
+function _sbSpellSchool(skillId) {
+    if (!UNIVERSAL_SPELL_MAP[skillId]) return null;
     const spell = UNIVERSAL_SPELL_MAP[skillId];
-    if (typeof isUniversalSupportSpell === 'function' && isUniversalSupportSpell(spell)) return null;
-    if (typeof isUniversalMovementSpell === 'function' && isUniversalMovementSpell(spell)) return null;
+    if (isUniversalSupportSpell(spell)) return null;
+    if (isUniversalMovementSpell(spell)) return null;
     if (SPELLBOOK_SCHOOL_ORDER.indexOf(spell.theme) !== -1) return spell.theme;
     // Blade / arrow arts are physical weapon schools, not arcane.
     return (spell.theme === 'blade' || spell.theme === 'arrow') ? 'physical' : 'arcane';
@@ -255,7 +254,7 @@ export function _sbSpellSchool(skillId) {
 export function _sbSpellSchoolKey(skillId) {
     const def = getSkillDef(skillId);
     if (!def) return '';
-    if (typeof UNIVERSAL_SPELL_MAP !== 'undefined' && UNIVERSAL_SPELL_MAP[skillId]) {
+    if (UNIVERSAL_SPELL_MAP[skillId]) {
         const spell = UNIVERSAL_SPELL_MAP[skillId];
         if (spell.damageKind) return spell.damageKind;
         const school = _sbSpellSchool(skillId);
@@ -280,10 +279,10 @@ function _classFromSkillId(skillId) {
 // how full the spell slots are. Slotting a charm places its spell on the
 // matching hotbar slot, so there is no spell list to render here.
 export function renderSpellbook() {
-    if (typeof STATE === 'undefined' || !STATE) return;
+    if (!STATE) return;
 
     // Spell slot grid + charm inventory / currency (skill-charms.js).
-    if (typeof renderSpellbookCharmPanel === 'function') renderSpellbookCharmPanel();
+    renderSpellbookCharmPanel();
 
     // v3.6: the meter lives on the RIGHT frame strip (art band y 88-97.5%),
     // how full the spell slots are at a glance. (The hotbar mirrors the slots
@@ -292,7 +291,7 @@ export function renderSpellbook() {
     if (stripRight) {
         const charmSlots = Array.isArray(STATE.charmSlots) ? STATE.charmSlots : [];
         const charmUsed = charmSlots.filter(Boolean).length;
-        const charmTotal = (typeof CHARM_SLOT_COUNT === 'number') ? CHARM_SLOT_COUNT : 10;
+        const charmTotal = CHARM_SLOT_COUNT;
         const slotPct = charmTotal ? Math.round(100 * charmUsed / charmTotal) : 0;
         stripRight.innerHTML = `<div class="sb3-meter">`
             + `<span class="sb3-meter-label">${t('charm_slots_title')} ${charmUsed} / ${charmTotal}</span>`
