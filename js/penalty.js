@@ -1,12 +1,27 @@
-﻿import { stopTimer, timesUp, updTimer } from './timer/timer.js';
+import { stopTimer, timesUp, updTimer } from './timer/timer.js';
 import { subtractTimeSecs } from './timer/timer-adjust.js';
 import { revealTiles } from './puzzle-mechanics/grid-actions.js';
 import { trackAchStat } from './achievements/achievements.js';
 import { Audio_Manager } from './audio/audio.js';
 import { t } from './translation/translations.js';
+
+//------------------------------------------------------------------------
+//-------------------CROSS-MODULE CONSTRAINT------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Every collaborator this file reaches at runtime (showToast, ptHasSkill,
+// mistakeCount, the endgame/combat checks, ...) is read through the
+// globalThis bridge on purpose: this module sits low in the graph and the
+// consumers above it (tooltips-hud.js, mouse-button-handlers.js) are the
+// two biggest import hubs in the codebase. BFS over the dependency graph
+// shows ANY import added here to ANY collaborator closes a cycle, so the
+// bridge is the cycle-avoidance seam for the whole file. Keep it that way.
+
 //--- Phase 3 step 5: write-through accessors for runtime patch() targets ---
 try { Object.defineProperty(globalThis, 'applyPenalty', { get() { return applyPenalty; }, set(v) { applyPenalty = v; }, configurable: true }); } catch (e) {} // PHASE3-SHIM write-through: passive-tree-expansion patch()
 try { Object.defineProperty(globalThis, '_calcEffectivePenalty', { get() { return _calcEffectivePenalty; }, set(v) { _calcEffectivePenalty = v; }, configurable: true }); } catch (e) {} // PHASE3-SHIM write-through: passive-tree-expansion patch()
+
 // penalty.js
 // Handles all penalty behaviour on a wrong cell guess:
 // shield absorption, Black Swan interruption, passive skill procs,
@@ -17,9 +32,8 @@ try { Object.defineProperty(globalThis, '_calcEffectivePenalty', { get() { retur
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-export const PEN_FLASH_DURATION_MS = 350;    // Duration of the red screen flash in milliseconds
-export const PEN_INFO_CLEAR_DELAY_MS = 3000; // How long the penalty label stays visible in the HUD
-
+const PEN_FLASH_DURATION_MS = 350;    // Duration of the red screen flash in milliseconds
+const PEN_INFO_CLEAR_DELAY_MS = 3000; // How long the penalty label stays visible in the HUD
 
 //------------------------------------------------------------------------
 //-------------------SHIELD / BLACK SWAN HELPERS--------------------------
@@ -28,7 +42,7 @@ export const PEN_INFO_CLEAR_DELAY_MS = 3000; // How long the penalty label stays
 
 // Returns true if the current penalty multiplier signals a full shield absorption (penMult === 0).
 // Shows toast and plays the shield SFX when absorbed.
-export function _penaltyIsShieldAbsorbed(penMult) {
+function _penaltyIsShieldAbsorbed(penMult) {
     if (penMult !== 0) return false;
     globalThis.showToast(t('pen_shield'));
     Audio_Manager.playSFX('shield_break');
@@ -37,12 +51,11 @@ export function _penaltyIsShieldAbsorbed(penMult) {
 
 // If Black Swan (SPEEDFORCE) is currently active, end it and notify the player.
 // Called before any real penalty is applied, since a mistake breaks the streak.
-export function _interruptBlackSwanIfActive() {
+function _interruptBlackSwanIfActive() {
     if (!window._blackSwanActive) return;
     globalThis._endBlackSwan(false);
     globalThis.showToast(t('cg_speedforce_broken'));
 }
-
 
 //------------------------------------------------------------------------
 //-------------------PASSIVE SKILL PROC HELPERS---------------------------
@@ -53,7 +66,7 @@ export function _interruptBlackSwanIfActive() {
 // On mistake, 25% chance to reveal 1 correct cell instead of applying a penalty.
 // Cannot trigger twice in a row (anti-repeat guard via window._stochasticLastFired).
 // Returns true if the proc fired (caller should skip the rest of penalty logic).
-export function _tryProcStochasticResonance(row, col) {
+function _tryProcStochasticResonance(row, col) {
     const canProc = globalThis.ptHasSkill('keystone_stochastic_resonance') && !window._stochasticLastFired;
     if (canProc && Math.random() < 0.25) {
         window._stochasticLastFired = true;
@@ -77,7 +90,7 @@ export function _tryProcStochasticResonance(row, col) {
 //   Nodes 1+2+3   → every 2 mistakes → reveal 2 cells
 // Also checks for a pending Bayesian bonus reveal on top of the base reveals.
 // Fires beam effects from the mistake cell to each revealed tile.
-export function _tryProcStandardDeviation(mistakeRow, mistakeCol) {
+function _tryProcStandardDeviation(mistakeRow, mistakeCol) {
     if (!globalThis.ptHasSkill('standard_deviation_1')) return;
 
     const hasNode2 = globalThis.ptHasSkill('standard_deviation_2');
@@ -111,11 +124,11 @@ export function _tryProcStandardDeviation(mistakeRow, mistakeCol) {
     globalThis.showToast(`📏 ${feedbackLabel} ${revealLabel}`);
 }
 
-
 //------------------------------------------------------------------------
 //-------------------PENALTY CALCULATION HELPERS--------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
+
 // Returns the penalty (seconds) for the Nth mistake (1-based), taken from
 // the difficulty config. Clamps to the last entry once past the defined
 // list, and never goes below index 0 - guards against being called before
@@ -133,40 +146,40 @@ export function _getPenaltySecondsAtCount(count) {
 
 // Returns the base penalty seconds for the current (just-made) mistake.
 // Called from applyPenalty() after mistakeCount has already been incremented.
-export function _getBasePenaltySeconds() {
+function _getBasePenaltySeconds() {
     return _getPenaltySecondsAtCount(globalThis.mistakeCount);
 }
 
 // keystone_asymptotic_mastery (node 266):
 // Each completed line permanently reduces all future penalties by 5 seconds.
 // Returns total flat reduction in seconds.
+// (Read via static import by tooltips-hud.js for the mistakes tooltip.)
 export function _getAsymptoticMasteryReduction() {
     return (window._asymptoticLinesCompleted || 0) * 5;
 }
 
 // keystone_iron_doctrine (node 158):
 // Each mistake costs 60 extra seconds on top of the normal penalty.
-export function _getIronDoctrineExtraSeconds() {
+function _getIronDoctrineExtraSeconds() {
     return globalThis.ptHasSkill('keystone_iron_doctrine') ? 60 : 0;
 }
 
 // Resolves the active penalty multiplier for this mistake.
 // Overfitting node overrides the class multiplier when active;
 // otherwise the class multiplier (penMult) is used.
-export function _resolveActivePenaltyMultiplier(penMult) {
+function _resolveActivePenaltyMultiplier(penMult) {
     const overfitMult = globalThis._overfittingPenaltyMultiplier();
     return (overfitMult !== null) ? overfitMult : penMult;
 }
 
 // Combines base seconds, multiplier, and flat reduction into the final penalty.
 // Always returns a non-negative integer.
-export function _calcEffectivePenalty(penMult) {
+function _calcEffectivePenalty(penMult) {
     const base = _getBasePenaltySeconds();
     const multiplier = _resolveActivePenaltyMultiplier(penMult);
     const reduction = _getAsymptoticMasteryReduction();
     return Math.max(0, Math.round(base * multiplier) - reduction + _getIronDoctrineExtraSeconds());
 }
-
 
 //------------------------------------------------------------------------
 //-------------------TIMER & GAME-STATE HELPERS---------------------------
@@ -177,7 +190,7 @@ export function _calcEffectivePenalty(penMult) {
 // and logs the mistake to the Actuary system.
 // keystone_golden_clock: while the Golden Clock is active the timer can no
 // longer decrease, so mistake deductions are skipped entirely.
-export function _applyTimeDeduction(row, col, effectivePen) {
+function _applyTimeDeduction(row, col, effectivePen) {
     if (window.LEVEL_FLAGS.goldenClockActive) {
         updTimer();
         return;
@@ -191,24 +204,23 @@ export function _applyTimeDeduction(row, col, effectivePen) {
 // Flags the penalty_clutch achievement condition:
 // set when a penalty drops the timer from ≥60s to <60s (but not zero).
 // scoring.js reads this flag on win to award the achievement.
-export function _checkAndFlagPenaltyClutch(timerBefore) {
+function _checkAndFlagPenaltyClutch(timerBefore) {
     if (timerBefore >= 60 && globalThis.timerSecs < 60 && globalThis.timerSecs > 0) {
         window._hadPenaltyClutch = true;
     }
 }
 
 // Triggers game-over when the timer hits zero after a penalty.
-export function _checkTimerExpiry() {
+function _checkTimerExpiry() {
     if (globalThis.timerSecs <= 0) {
         globalThis.dead = true;
         stopTimer();
         if (typeof globalThis._arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
-            globalThis._arcaneFreeze_clearAllFrostAndStalagmites();     
+            globalThis._arcaneFreeze_clearAllFrostAndStalagmites();
         }
         timesUp();
     }
 }
-
 
 //------------------------------------------------------------------------
 //-------------------HUD FEEDBACK HELPERS---------------------------------
@@ -217,7 +229,7 @@ export function _checkTimerExpiry() {
 
 // Formats a penalty duration (in seconds) as a HUD label.
 // Displays as −M:SS when ≥60s, or −Ns for shorter amounts.
-export function _formatPenaltyLabel(effectivePen) {
+function _formatPenaltyLabel(effectivePen) {
     const mins = Math.floor(effectivePen / 60);
     const secs = effectivePen % 60;
     return mins > 0
@@ -227,7 +239,7 @@ export function _formatPenaltyLabel(effectivePen) {
 
 // Updates the pen-info element with the penalty label and current mistake count,
 // then auto-clears it after PEN_INFO_CLEAR_DELAY_MS.
-export function _updatePenaltyInfoHUD(effectivePen) {
+function _updatePenaltyInfoHUD(effectivePen) {
     const pi = document.getElementById('pen-info');
     const label = _formatPenaltyLabel(effectivePen);
     pi.textContent = `${label} (#${globalThis.mistakeCount})`;
@@ -254,13 +266,12 @@ export function _updateMistakeCounterHUD() {
 
 // Triggers the brief red screen flash that gives tactile feedback on a mistake.
 // Skipped entirely when the penalty-flash setting is disabled.
-export function _triggerPenaltyFlash() {
+function _triggerPenaltyFlash() {
     if (!globalThis.SETTINGS.penaltyFlash) return;
     const fl = document.getElementById('pen-flash');
     fl.classList.add('show');
     setTimeout(() => fl.classList.remove('show'), PEN_FLASH_DURATION_MS);
 }
-
 
 //------------------------------------------------------------------------
 //-------------------APPLY PENALTY (MAIN ENTRY POINT)--------------------
@@ -273,7 +284,7 @@ export function applyPenalty(row, col) {
     // The Clock's Time Freeze: the mistake counter is frozen - wrong fills
     // still flash red and ring, but cost no mistake and no timer time until
     // the 30s window ends (or the boss is slain). See _egClockStartTimeFreeze.
-    if (typeof window !== 'undefined' && window._egClockTimeFreezeActive) return;
+    if (window._egClockTimeFreezeActive) return;
 
     const penMult = globalThis.getClassPenaltyMultiplier(); // 5.0 during Black Swan, 0 = shield absorbed
 
@@ -336,7 +347,4 @@ export function applyPenalty(row, col) {
 
     // --- End the game if the timer expired from this penalty ---
     _checkTimerExpiry();
-
-    // NOTE: kept as-is from the original - see "Possible bugs spotted" below.
-    _updateMistakeCounterHUD();
 }
