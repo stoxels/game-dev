@@ -1,11 +1,11 @@
-﻿import { _abilityHotkeysBlocked, _formatCooldown, _isModalOpen } from '../classes/class-cooldown-state.js';
+import { _abilityHotkeysBlocked, _formatCooldown, _isModalOpen } from '../classes/class-cooldown-state.js';
 import { hideHUDTooltip } from '../classes/class-hud.js';
 import { SKILL_HOTBAR_COLS, SKILL_HOTBAR_SIZE, activateHotbarSlot, canAffordSkill, getHotbarSkill, getSkillCooldownRemaining, getSkillDef, getSkillImage, getSkillName, isSkillUsableNow } from './skill-registry.js';
 import { isSpellbookOpen, renderSpellbook, toggleSpellbook } from './skill-spellbook.js';
 import { isSkillHoldCast, tryBeginHoldCast } from './spell-casttime.js';
 import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges } from './universal-spells.js';
 import { STATE } from '../state.js';
-// skill-hotbar.js
+
 //------------------------------------------------------------------------
 //---------------------------SKILL HOTBAR---------------------------------
 //------------------------------------------------------------------------
@@ -25,12 +25,21 @@ import { STATE } from '../state.js';
 //
 // Keybinds: the central dispatcher in keybinds.js routes hotbar-1…hotbar-10
 // to activateHotbarSlot(). Default keys are 1,2,3,4,5,6,7,8,9,0.
+//
+// CROSS-MODULE CONSTRAINT: tutorial-quest.js wraps globalThis.renderSkillHotbar
+// and globalThis.ensureSkillHotbar (via the entry.mjs bridge accessors) to
+// stop its auto-seeder from pre-placing Fireball during the tutorial. Those
+// overrides only work while the two functions stay reachable through the
+// bridge, so this file keeps reading them through globalThis where the wrap
+// matters, and consumers keep importing renderSkillHotbar as a real module
+// export (live binding - the wrap reassigns this module's own binding, so
+// imported calls see the wrapped version too).
 //------------------------------------------------------------------------
 
 
 // Set while a hold-to-cast charge is arming so the click event that follows
 // the pointerup is swallowed instead of casting the spell twice.
-export let _suppressHotbarClick = false;
+let _suppressHotbarClick = false;
 
 
 //------------------------------------------------------------------------
@@ -43,7 +52,7 @@ export let _suppressHotbarClick = false;
 // (the grid) paints on top and receives the cell clicks. Keeping the bar out
 // of #screen-game entirely would lift it above the grid and steal those clicks
 // (the bug this replaces).
-export function _hotbarHomeHost() {
+function _hotbarHomeHost() {
     return document.querySelector('.puzzle-and-sidebar')
         || document.getElementById('screen-game')
         || document.body;
@@ -53,14 +62,14 @@ export function _hotbarHomeHost() {
 // must escape the game screen's stacking context (otherwise the modal backdrop
 // traps it and spells cannot be dropped on it), so it hops onto <body> above
 // the backdrop. The book's open/close handlers call setHotbarAboveModal().
-export function _hotbarMountHost() {
+function _hotbarMountHost() {
     if (document.body.classList.contains('spellbook-open')) return document.body;
     return _hotbarHomeHost();
 }
 
 // Returns the hotbar container, creating it on first use and re-homing it
 // whenever the current mount host changed (spell book open/close).
-export function _ensureHotbarContainer() {
+function _ensureHotbarContainer() {
     let bar = document.getElementById('skill-hotbar');
     if (bar) {
         const host = _hotbarMountHost();
@@ -104,7 +113,7 @@ export function _isGameScreenActive() {
 // the whole point of opening the book there is slotting charms - and each
 // spell slot casts from its matching hotbar key. Without this the bar kept
 // `display:none` while the book was open.
-export function _hotbarNeededForSpellbook() {
+function _hotbarNeededForSpellbook() {
     return document.body.classList.contains('spellbook-open')
         || !!(document.getElementById('spellbook-overlay')?.classList.contains('show'));
 }
@@ -115,7 +124,7 @@ export function _hotbarNeededForSpellbook() {
 //------------------------------------------------------------------------
 
 // Returns the display label for a hotbar slot's keybind (1…9,0).
-export function _hotbarKeyLabel(slotIndex) {
+function _hotbarKeyLabel(slotIndex) {
     const action = `hotbar-${slotIndex + 1}`;
     const key = (typeof globalThis.keybindKeyFor === 'function') ? globalThis.keybindKeyFor(action) : null;
     if (key === null || key === undefined) return String((slotIndex + 1) % 10);
@@ -123,7 +132,7 @@ export function _hotbarKeyLabel(slotIndex) {
 }
 
 // Builds the inner HTML of a single slot.
-export function _buildHotbarSlotHTML(slotIndex, skillId) {
+function _buildHotbarSlotHTML(slotIndex, skillId) {
     const keyLabel = `<span class="skill-hotbar-key">${_hotbarKeyLabel(slotIndex)}</span>`;
 
     if (!skillId) {
@@ -133,22 +142,22 @@ export function _buildHotbarSlotHTML(slotIndex, skillId) {
             + `</div>`;
     }
 
-    const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
+    const def = getSkillDef(skillId);
     if (!def) {
         return `<div class="skill-hotbar-slot is-empty" data-slot="${slotIndex}">${keyLabel}<span class="skill-hotbar-empty">·</span></div>`;
     }
 
-    const cdRemaining = (typeof getSkillCooldownRemaining === 'function') ? getSkillCooldownRemaining(skillId) : 0;
+    const cdRemaining = getSkillCooldownRemaining(skillId);
     const isOnCD = cdRemaining > 0;
-    const canAfford = (typeof canAffordSkill === 'function') ? canAffordSkill(skillId) : true;
+    const canAfford = canAffordSkill(skillId);
     const noMana = !canAfford && !isOnCD;
     const isArmed = (typeof globalThis.activeAbilityMode !== 'undefined') && globalThis.activeAbilityMode
         && STATE.classActiveChoice === def.legacySlot;
-    const usableNow = (typeof isSkillUsableNow === 'function') ? isSkillUsableNow(skillId) : true;
+    const usableNow = isSkillUsableNow(skillId);
     const locked = !usableNow;
     // Hold-to-cast spells (spell-casttime.js) get a marker so the longer
     // press-and-hold behaviour is discoverable on the bar itself.
-    const holdCast = (typeof isSkillHoldCast === 'function') ? isSkillHoldCast(skillId) : false;
+    const holdCast = isSkillHoldCast(skillId);
 
     const stateClasses = [
         isArmed ? 'armed' : '',
@@ -163,8 +172,7 @@ export function _buildHotbarSlotHTML(slotIndex, skillId) {
         : '';
     // Charge spells (Blink, Dash, …) show their pool as pips instead of a
     // countdown: filled = ready charge, hollow + countdown = recharging.
-    const charges = (typeof getUniversalSpellCharges === 'function')
-        ? getUniversalSpellCharges(skillId) : null;
+    const charges = getUniversalSpellCharges(skillId);
     const chargePips = charges
         ? `<span class="skill-hotbar-charges" aria-label="${charges.current} / ${charges.max}">`
             + Array.from({ length: charges.max }, (_, p) => {
@@ -185,7 +193,7 @@ export function _buildHotbarSlotHTML(slotIndex, skillId) {
     // Prefer the class-upgrade artwork when the skill ships one, else the
     // emoji/glyph from the registry. The image is a real <img> so it scales
     // cleanly and can't be drag-selected.
-    const image = (typeof getSkillImage === 'function') ? getSkillImage(skillId) : null;
+    const image = getSkillImage(skillId);
     const iconMarkup = image
         ? `<img class="skill-hotbar-icon" src="${image}" alt="${getSkillName(skillId)}" draggable="false">`
         : `<span class="skill-hotbar-icon">${def.icon || '✦'}</span>`;
@@ -204,12 +212,10 @@ export function _buildHotbarSlotHTML(slotIndex, skillId) {
         + `</div>`;
 }
 
-// Formats a slot countdown (m:ss above a minute, else Xs).
-export function _formatHotbarCooldown(secs) {
-    if (typeof _formatCooldown === 'function') return _formatCooldown(Math.ceil(secs));
-    const s = Math.ceil(secs);
-    const m = Math.floor(s / 60);
-    return m > 0 ? `${m}:${String(s % 60).padStart(2, '0')}` : `${s}s`;
+// Formats a slot countdown (m:ss above a minute, else Xs). Delegates to the
+// shared cooldown formatter from class-cooldown-state.js.
+function _formatHotbarCooldown(secs) {
+    return _formatCooldown(Math.ceil(secs));
 }
 
 // True when a pre-class character owns anything castable: a spell on the
@@ -218,7 +224,7 @@ export function _formatHotbarCooldown(secs) {
 // until then (universal charm spells need no class).
 export function _hotbarClasslessHasSpells() {
     try {
-        if (typeof STATE === 'undefined' || !STATE) return false;
+        if (!STATE) return false;
         if (Array.isArray(STATE.skillHotbar) && STATE.skillHotbar.some(Boolean)) return true;
         if (Array.isArray(STATE.charmSlots) && STATE.charmSlots.some(Boolean)) return true;
         if (Array.isArray(STATE.charmInventory) && STATE.charmInventory.length > 0) return true;
@@ -239,7 +245,7 @@ export function renderSkillHotbar() {
     // anything castable (a hotbar spell, a slotted charm, or an inventory
     // charm) - universal spells need no class.
     const tqActive = (typeof globalThis._tqIsTutorialActive === 'function') && globalThis._tqIsTutorialActive();
-    const classlessHidden = (typeof STATE === 'undefined' || !STATE)
+    const classlessHidden = (!STATE)
         || (((!STATE.playerClass && !tqActive)
             || ((typeof globalThis.isClassless === 'function') && globalThis.isClassless()))
             && !_hotbarClasslessHasSpells()
@@ -248,7 +254,7 @@ export function renderSkillHotbar() {
         || !(_isGameScreenActive() || _hotbarNeededForSpellbook())) {
         bar.style.display = 'none';
         document.body.classList.remove('skill-hotbar-visible');
-        if (typeof hideHUDTooltip === 'function') hideHUDTooltip();
+        hideHUDTooltip();
         return;
     }
 
@@ -260,7 +266,7 @@ export function renderSkillHotbar() {
 
     let html = '';
     for (let i = 0; i < SKILL_HOTBAR_SIZE; i++) {
-        html += _buildHotbarSlotHTML(i, (typeof getHotbarSkill === 'function') ? getHotbarSkill(i) : null);
+        html += _buildHotbarSlotHTML(i, getHotbarSkill(i));
     }
     bar.innerHTML = html;
 
@@ -281,7 +287,7 @@ export function patchHotbarSlotCooldown(skillId) {
     const slot = bar.querySelector(`.skill-hotbar-slot[data-skill="${skillId}"]`);
     if (!slot) return;
 
-    const cdRemaining = (typeof getSkillCooldownRemaining === 'function') ? getSkillCooldownRemaining(skillId) : 0;
+    const cdRemaining = getSkillCooldownRemaining(skillId);
 
     // Keep the slot's state classes in sync too. A skill that was unaffordable
     // when the hotbar last rendered would otherwise keep its blue "no mana"
@@ -294,8 +300,7 @@ export function patchHotbarSlotCooldown(skillId) {
     // the <b> inside the first recharging pip is patched - the pips
     // themselves only change when a charge lands (renderSkillHotbar). While
     // the pool is empty the cooldown overlay counts instead (no pip text).
-    const charges = (typeof getUniversalSpellCharges === 'function')
-        ? getUniversalSpellCharges(skillId) : null;
+    const charges = getUniversalSpellCharges(skillId);
     if (charges) {
         const pips = slot.querySelector('.skill-hotbar-charges');
         if (pips) {
@@ -321,10 +326,10 @@ export function patchHotbarSlotCooldown(skillId) {
 // Patches the hotbar slot(s) bound to a legacy slot key (active1…active5).
 // Called from _patchCooldownButton() in class-cooldown-state.js.
 export function patchHotbarCooldownForLegacySlot(legacySlot) {
-    if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return;
+    if (!STATE || !Array.isArray(STATE.skillHotbar)) return;
     for (const skillId of STATE.skillHotbar) {
         if (!skillId) continue;
-        const def = (typeof getSkillDef === 'function') ? getSkillDef(skillId) : null;
+        const def = getSkillDef(skillId);
         if (def && def.legacySlot === legacySlot) patchHotbarSlotCooldown(skillId);
     }
 }
@@ -337,19 +342,13 @@ export function patchHotbarCooldownForLegacySlot(legacySlot) {
 // charges hold-to-cast spells (spell-casttime.js). There is no drag - the
 // slots mirror the spell-book charm slots 1:1 (charm slot N = hotbar key N),
 // so rearranging or removing spells happens by moving charms in the book.
-//------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------
-//-------------------------SLOT INTERACTION-------------------------------
-//------------------------------------------------------------------------
 // Delegated handlers installed once on the container. A press that doesn't
-// move casts the spell; a press that moves starts a hotbar→hotbar drag.
+// move casts the spell; nothing else - click-to-cast, no drag.
 //------------------------------------------------------------------------
 
 // Installs the delegated pointer handlers on the hotbar container.
 // Click casts the spell; hold charges hold-to-cast spells. No drag.
-export function _initHotbarInteractions() {
+function _initHotbarInteractions() {
     const bar = _ensureHotbarContainer();
     if (bar.dataset.skillBound === '1') return;
     bar.dataset.skillBound = '1';
@@ -358,14 +357,14 @@ export function _initHotbarInteractions() {
         const slot = e.target.closest('.skill-hotbar-slot');
         if (!slot) return;
         const slotIndex = Number(slot.getAttribute('data-slot'));
-        const skillId = (typeof getHotbarSkill === 'function') ? getHotbarSkill(slotIndex) : null;
+        const skillId = getHotbarSkill(slotIndex);
         if (!skillId) return;
         e.preventDefault();
         // Hold-to-cast (spell-casttime.js): heavy spells charge while the
         // button is held and fire once the cast bar fills.
         // Primary button only - right-clicks are reserved for the context menu
         // (touch/pen presses have no button to check, so they always pass).
-        if ((e.button === 0 || e.pointerType !== 'mouse') && typeof tryBeginHoldCast === 'function') {
+        if ((e.button === 0 || e.pointerType !== 'mouse')) {
             const hold = tryBeginHoldCast(skillId, slotIndex, 'pointer');
             if (hold === 'started' || hold === 'casting') _suppressHotbarClick = true;
         }
@@ -391,38 +390,30 @@ export function _initHotbarInteractions() {
 
 // True when the hotbar should ignore key presses (has its own gate so the
 // spell book / modals / text fields never cast).
-export function _hotbarKeysBlocked() {
-    if (typeof _abilityHotkeysBlocked === 'function') {
-        if (!_abilityHotkeysBlocked()) return false;
-        // Blocked by the shared gate - but pre-class universal casting is
-        // allowed. Only a PURE no-class block lets the keys through for
-        // per-slot validation in activateSkill (charm / universal / cooldown
-        // / mana gates); input focus, modals (incl. the open spell book) and
-        // death stay blocked exactly as before.
-        try {
-            const tag = document.activeElement?.tagName;
-            if (tag === 'INPUT' || tag === 'TEXTAREA') return true;
-        } catch (e) { /* best-effort */ }
-        try {
-            if (typeof _isModalOpen === 'function' && _isModalOpen()) return true;
-        } catch (e) { /* best-effort */ }
-        try { if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return true; } catch (e) { /* best-effort */ }
-        try {
-            if (typeof STATE !== 'undefined' && STATE && !STATE.playerClass) return false;
-        } catch (e) { /* best-effort */ }
-        return true;
-    }
-    // Fallback when the shared gate is unavailable: same rules. Pre-class
-    // characters cast universal charm spells (per-slot activation still
-    // validates charm / cooldown / mana), so only death blocks here.
-    if (!STATE) return true;
-    if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return true;
-    return false;
+function _hotbarKeysBlocked() {
+    if (!_abilityHotkeysBlocked()) return false;
+    // Blocked by the shared gate - but pre-class universal casting is
+    // allowed. Only a PURE no-class block lets the keys through for
+    // per-slot validation in activateSkill (charm / universal / cooldown
+    // / mana gates); input focus, modals (incl. the open spell book) and
+    // death stay blocked exactly as before.
+    try {
+        const tag = document.activeElement?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return true;
+    } catch (e) { /* best-effort */ }
+    try {
+        if (_isModalOpen()) return true;
+    } catch (e) { /* best-effort */ }
+    try { if (globalThis.dead) return true; } catch (e) { /* best-effort */ }
+    try {
+        if (STATE && !STATE.playerClass) return false;
+    } catch (e) { /* best-effort */ }
+    return true;
 }
 
 // Registers hotbar-1…hotbar-10 and the spell book toggle with the central
 // keybind dispatcher.
-export function _initSkillKeybinds() {
+function _initSkillKeybinds() {
     if (typeof globalThis.onKeybindAction !== 'function') return;
 
     for (let i = 0; i < SKILL_HOTBAR_SIZE; i++) {
@@ -435,11 +426,8 @@ export function _initSkillKeybinds() {
             // Hold-to-cast (spell-casttime.js): heavy spells charge while the
             // key is down and fire on fill; keyup releases. Anything else
             // ('instant', 'refused') falls through to the normal activation.
-            if (typeof tryBeginHoldCast === 'function') {
-                const hold = tryBeginHoldCast(
-                    (typeof getHotbarSkill === 'function') ? getHotbarSkill(i) : null, i, 'key');
-                if (hold === 'started' || hold === 'casting') return false;
-            }
+            const hold = tryBeginHoldCast(getHotbarSkill(i), i, 'key');
+            if (hold === 'started' || hold === 'casting') return false;
             activateHotbarSlot(i);
             return false; // claim the key (prevents page scroll for space etc.)
         });
@@ -449,8 +437,8 @@ export function _initSkillKeybinds() {
         // Toggle-close must work even while the book is open: the book
         // itself is a .modal-bg, which makes _abilityHotkeysBlocked() true,
         // so check for the open book first and let P close it.
-        if (typeof isSpellbookOpen === 'function' && isSpellbookOpen()) {
-            if (typeof toggleSpellbook === 'function') toggleSpellbook();
+        if (isSpellbookOpen()) {
+            toggleSpellbook();
             return false;
         }
         // Pre-class characters open the book for their universal charms
@@ -459,21 +447,20 @@ export function _initSkillKeybinds() {
         // and death stay blocked.
         let classlessAllow = false;
         try {
-            classlessAllow = (typeof STATE !== 'undefined' && STATE && !STATE.playerClass)
+            classlessAllow = (STATE && !STATE.playerClass)
                 && !(document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA'))
-                && !(typeof _isModalOpen === 'function' && _isModalOpen())
-                && !(typeof globalThis.dead !== 'undefined' && globalThis.dead);
+                && !_isModalOpen()
+                && !globalThis.dead;
         } catch (e) { classlessAllow = false; }
-        if (!classlessAllow && typeof _abilityHotkeysBlocked === 'function' && _abilityHotkeysBlocked()) return false;
-        if (typeof toggleSpellbook === 'function') toggleSpellbook();
+        if (!classlessAllow && _abilityHotkeysBlocked()) return false;
+        toggleSpellbook();
         return false;
     });
 }
 
 // Local modal check that also covers the spell book overlay.
-export function _isModalOpenLoose() {
-    if (typeof _isModalOpen === 'function') return _isModalOpen();
-    return !!document.querySelector('.modal-bg.show');
+function _isModalOpenLoose() {
+    return _isModalOpen();
 }
 
 
@@ -484,7 +471,7 @@ export function _isModalOpenLoose() {
 // Full UI refresh: hotbar always, spell book only when open.
 export function refreshSkillUI() {
     renderSkillHotbar();
-    if (typeof isSpellbookOpen === 'function' && isSpellbookOpen() && typeof renderSpellbook === 'function') {
+    if (isSpellbookOpen()) {
         renderSpellbook();
     }
 }
