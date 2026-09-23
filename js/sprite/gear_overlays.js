@@ -491,6 +491,10 @@ function stopGearOverlays() {
 // immediately; the sweep is a no-op until a sprite img exists.
 startGearOverlays();
 
-// Exported for the test suite and future consumers (the game itself only
-// uses this module's side effects).
-export { sweep as gearOverlaysSweep, parseAnimSrc as _parseAnimSrc, framesFor as _framesFor, readLoadout as _readLoadout, stopGearOverlays, isMirrored as _isMirrored, SPRITE_IMG_IDS as _SPRITE_IMG_IDS };
+// SURFACE NOTE (R3 wave 7, 2026-09-23): the game itself only uses this
+// module's side effects — the bridge carries stopGearOverlays alone.
+// The _-prefixed exports below are the TEST surface (imported directly
+// by dev/tests/gear-overlays.test.mjs, which loads this file as a real
+// ES module). The former gearOverlaysSweep export was privatized: zero
+// consumers anywhere (startGearOverlays calls the internal sweep).
+export { parseAnimSrc as _parseAnimSrc, framesFor as _framesFor, readLoadout as _readLoadout, stopGearOverlays, isMirrored as _isMirrored, SPRITE_IMG_IDS as _SPRITE_IMG_IDS };

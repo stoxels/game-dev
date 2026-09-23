@@ -304,7 +304,7 @@ import { _CHAR_LAB_CHARS, _CHAR_LAB_ICONS, _CHAR_LAB_LABELS, _CHAR_LAB_VARIANTS,
 import { _banterRepositionBubbleIfVisible, hideCharacterBanter, resetBanterState, triggerBanter, triggerItemBanter, triggerLowTimeBanterIfNeeded, triggerSkillBanter } from '../../js/sprite/character-banter.js';
 import { GRIP_DATA_VERSION, ITEM_CATEGORIES, categoryForId, looksTwoHanded, resolveItemMeta, defaultLayers, defaultHands, defaultRot, setDir, setState, mirrorPoint, mirrorSlotCfg, mirrorFrame, wrapDeg, spriteChain, resolveFrames, frameAt, resolvePlacement, placeItem, solveTwoHandRot } from '../../js/sprite/grip-render.js';
 import { GEAR_GRIP_DATA } from '../../js/sprite/gear-overlays-data.js';
-import { gearOverlaysSweep, stopGearOverlays } from '../../js/sprite/gear_overlays.js';
+import { stopGearOverlays } from '../../js/sprite/gear_overlays.js';
 import { _isReplayGloballyUnlocked, _replayGlobalKey, _seenKey, _setReplayGloballyUnlocked, getUnlockedReplayEntries, hasSeen, isReplayEntryUnlocked, markSeen, resetAllBeats, resetAllBeatsForSlot, resetBeat, unlockReplayIntroBundle } from '../../js/storyline/storyline-progress.js';
 import { DEFAULT_SLIDE_DURATION_MS, SLIDE_FADE_MS, StorylineRenderer, _imgCache, _preloadImage, _wordsFromLine, showBeat } from '../../js/storyline/storyline-engine.js';
 import { INTRO_CINEMATIC_IMAGE_PATH, INTRO_CINEMATIC_SLIDES, INTRO_SONG } from '../../js/storyline/storyline-intro.js';
