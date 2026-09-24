@@ -1,5 +1,5 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../../probability-tree/probability-tree-state-points.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { FX_Z, _fxGetPuzzleRect, _fxMakeItemIcon, _fxMakeRing, _fxOverlay, _fxShieldBorderAdd, _fxShieldBorderRemove, _fxSpawnParticles } from '../../puzzle-mechanics/fx-helpers.js';

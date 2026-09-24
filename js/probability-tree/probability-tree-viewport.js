@@ -1,5 +1,5 @@
-﻿import { _ptHideTooltip, _pt_container, _pt_world } from './passive-tree-ui.js';
-import { PT_NODE_RADIUS, PT_PADDING, PT_ZOOM_MAX, PT_ZOOM_MIN, PT_ZOOM_STEP } from './passive-tree.js';
+﻿import { _pt_container, _ptUpdateVirtualViewport, _pt_world } from './probability-tree-ui.js';
+import { getPassiveTreeRootId, PT_FOCUS_SCALE, PT_NODE_RADIUS, PT_PADDING, PT_START_ID, PT_ZOOM_MAX, PT_ZOOM_MIN, PT_ZOOM_STEP } from './probability-tree.js';
 import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, '_pt_mouseDownTime', { get() { return _pt_mouseDownTime; }, set(v) { _pt_mouseDownTime = v; }, configurable: true }); } catch (e) {}
@@ -27,6 +27,10 @@ let _pt_mouseDownTime = 0;
 // Active AbortController for _ptBindEvents – lets us cleanly remove all
 // listeners if the viewport is re-initialised without a page reload.
 export let _pt_abortController = null;
+let _pt_transformFrame = 0;
+let _pt_pendingZoomSync = false;
+let _pt_resizeObserver = null;
+let _pt_containerRect = null;
 
 // Tracks the finger-separation distance from the previous touchmove frame,
 // used to calculate the pinch-zoom scale factor.
@@ -39,7 +43,7 @@ export const PT_FIT_OFFSET_Y = -1850;
 
 // Fine-tune the horizontal centering when snapping to the last picked node.
 // Negative = shift camera left, positive = shift right.
-export const PT_LAST_NODE_OFFSET_X = 500;
+export const PT_LAST_NODE_OFFSET_X = 0;
 
 
 
@@ -84,6 +88,34 @@ export function _ptApplyTransform() {
             `translate(${_pt_tx}px, ${_pt_ty}px) scale(${_pt_scale})`;
     }
     _ptSyncZoomBar();
+    _ptUpdateVirtualViewport(_pt_scale, _pt_tx, _pt_ty);
+}
+
+function _ptScheduleTransform(syncZoom) {
+    _pt_pendingZoomSync = _pt_pendingZoomSync || syncZoom;
+    if (_pt_transformFrame) return;
+    const flush = () => {
+        _pt_transformFrame = 0;
+        if (!_pt_world) return;
+        _pt_world.style.transform =
+            `translate(${_pt_tx}px, ${_pt_ty}px) scale(${_pt_scale})`;
+        if (_pt_pendingZoomSync) _ptSyncZoomBar();
+        _pt_pendingZoomSync = false;
+        _ptUpdateVirtualViewport(_pt_scale, _pt_tx, _pt_ty);
+    };
+    if (typeof requestAnimationFrame === 'function') _pt_transformFrame = requestAnimationFrame(flush);
+    else flush();
+}
+
+export function _ptSuspendViewport() {
+    if (_pt_transformFrame && typeof cancelAnimationFrame === 'function') {
+        cancelAnimationFrame(_pt_transformFrame);
+    }
+    _pt_transformFrame = 0;
+    _pt_pendingZoomSync = false;
+    _pt_dragging = false;
+    _pt_lastPinchDist = null;
+    if (_pt_container) _pt_container.style.cursor = 'grab';
 }
 
 
@@ -115,6 +147,13 @@ export function _ptCenterOnNode(skill, bounds) {
     _ptApplyTransform();
 }
 
+export function _ptFocusNode(skill, bounds) {
+    if (!skill || !_pt_container) return false;
+    _pt_scale = _ptClampScale(PT_FOCUS_SCALE);
+    _ptCenterOnNode(skill, bounds);
+    return true;
+}
+
 // Fits the whole tree into the container on first load, then re-centers
 // on the last picked node (if any) so returning players land where they left off.
 export function _ptFitToView(bounds) {
@@ -123,18 +162,17 @@ export function _ptFitToView(bounds) {
     const cW = _pt_container.clientWidth || 800;
     const cH = _pt_container.clientHeight || 600;
 
-    _pt_scale = 1.5;
-
+    _pt_scale = Math.min(PT_ZOOM_MAX, Math.max(PT_ZOOM_MIN, Math.min(cW / treeW, cH / treeH)));
     const scaledW = treeW * _pt_scale;
     const scaledH = treeH * _pt_scale;
-    const offsetY = PT_PADDING + PT_NODE_RADIUS - bounds.minY;
-
-    _pt_tx = (cW - scaledW) / 2 + PT_FIT_OFFSET_X;
-    _pt_ty = (cH - scaledH) / 2 + offsetY * _pt_scale + PT_FIT_OFFSET_Y;
+    _pt_tx = (cW - scaledW) / 2;
+    _pt_ty = (cH - scaledH) / 2;
 
     const lastId = (typeof STATE !== 'undefined') && STATE.passiveTreeLastNode;
-    if (lastId && globalThis._pt_skillMap[lastId]) {
-        _ptCenterOnNode(globalThis._pt_skillMap[lastId], bounds);
+    const rootId = getPassiveTreeRootId();
+    const focusId = (lastId === PT_START_ID && rootId ? rootId : lastId) || rootId;
+    if (focusId && globalThis._pt_skillMap[focusId]) {
+        _ptFocusNode(globalThis._pt_skillMap[focusId], bounds);
     } else {
         _ptApplyTransform();
     }
@@ -159,12 +197,12 @@ export function _ptOnWheel(e) {
     const factor = 1 + dir * PT_ZOOM_STEP;
     const newScale = _ptClampScale(_pt_scale * factor);
 
-    const rect = _pt_container.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
+    if (!_pt_containerRect) _pt_containerRect = _pt_container.getBoundingClientRect();
+    const mx = e.clientX - _pt_containerRect.left;
+    const my = e.clientY - _pt_containerRect.top;
 
     _ptZoomToward(newScale, mx, my);
-    _ptApplyTransform();
+    _ptScheduleTransform(true);
 }
 
 // ---- Mouse drag (pan) ---------------------------------------------------
@@ -187,14 +225,14 @@ export function _ptOnMouseMove(e) {
     if (!_pt_dragging) return;
     _pt_tx = _pt_dragTxStart + (e.clientX - _pt_dragStartX);
     _pt_ty = _pt_dragTyStart + (e.clientY - _pt_dragStartY);
-    _ptApplyTransform();
+    _ptScheduleTransform(false);
 }
 
 // Ends a drag and restores the grab cursor.
 export function _ptOnMouseUp() {
-    if (!_pt_dragging) return;
     _pt_dragging = false;
-    _pt_container.style.cursor = 'grab';
+    _pt_lastPinchDist = null;
+    if (_pt_container) _pt_container.style.cursor = 'grab';
 }
 
 // ---- Touch drag + pinch-zoom --------------------------------------------
@@ -209,7 +247,7 @@ export function _ptTouchDistance(touches) {
 // Handles the start of a one-finger pan or a two-finger pinch.
 export function _ptOnTouchStart(e) {
     if (e.touches.length === 1) {
-        // Single finger -> start a pan
+        if (e.target.closest('.pt-node')) return;
         _pt_dragging = true;
         _pt_dragStartX = e.touches[0].clientX;
         _pt_dragStartY = e.touches[0].clientY;
@@ -231,7 +269,7 @@ export function _ptOnTouchMove(e) {
     if (e.touches.length === 1 && _pt_dragging) {
         _pt_tx = _pt_dragTxStart + (e.touches[0].clientX - _pt_dragStartX);
         _pt_ty = _pt_dragTyStart + (e.touches[0].clientY - _pt_dragStartY);
-        _ptApplyTransform();
+        _ptScheduleTransform(false);
     }
 
     if (e.touches.length === 2 && _pt_lastPinchDist !== null) {
@@ -239,7 +277,7 @@ export function _ptOnTouchMove(e) {
         const factor = dist / _pt_lastPinchDist;
         _pt_scale = _ptClampScale(_pt_scale * factor);
         _pt_lastPinchDist = dist;
-        _ptApplyTransform();
+        _ptScheduleTransform(true);
     }
 }
 
@@ -266,7 +304,7 @@ export function _ptOnZoomBarInput(zoomBar) {
     const pivotY = _pt_container.clientHeight / 2;
 
     _ptZoomToward(newScale, pivotX, pivotY);
-    _ptApplyTransform();
+    _ptScheduleTransform(true);
 }
 
 
@@ -281,33 +319,39 @@ export function _ptOnZoomBarInput(zoomBar) {
 // Calling this a second time safely removes the previous set of listeners
 // via AbortController before adding new ones.
 export function _ptBindEvents() {
-
-    // Remove any listeners from a previous call
     if (_pt_abortController) _pt_abortController.abort();
+    if (_pt_resizeObserver) _pt_resizeObserver.disconnect();
     _pt_abortController = new AbortController();
+    const signal = _pt_abortController.signal;
+    _pt_containerRect = _pt_container.getBoundingClientRect();
 
-    // Zoom on mouse-wheel
-    _pt_container.addEventListener('wheel', _ptOnWheel, { passive: false });
+    _pt_container.addEventListener('wheel', _ptOnWheel, { passive: false, signal });
+    _pt_container.addEventListener('mousedown', _ptOnMouseDown, { signal });
+    window.addEventListener('mousemove', _ptOnMouseMove, { signal });
+    window.addEventListener('mouseup', _ptOnMouseUp, { signal });
+    window.addEventListener('blur', _ptOnMouseUp, { signal });
+    _pt_container.addEventListener('touchstart', _ptOnTouchStart, { passive: true, signal });
+    _pt_container.addEventListener('touchmove', _ptOnTouchMove, { passive: false, signal });
+    _pt_container.addEventListener('touchend', _ptOnTouchEnd, { signal });
+    _pt_container.addEventListener('touchcancel', _ptOnTouchEnd, { signal });
 
-    // Pan on mouse drag (mouseup/mousemove on window so the drag survives
-    // the cursor leaving the container)
-    _pt_container.addEventListener('mousedown', _ptOnMouseDown);
-    window.addEventListener('mousemove', _ptOnMouseMove);
-    window.addEventListener('mouseup', _ptOnMouseUp);
-
-    // Pan and pinch-zoom on touch devices
-    _pt_container.addEventListener('touchstart', _ptOnTouchStart, { passive: true });
-    _pt_container.addEventListener('touchmove', _ptOnTouchMove, { passive: false });
-    _pt_container.addEventListener('touchend', _ptOnTouchEnd);
-
-    // Click on empty canvas -> hide any open tooltip
-    _pt_container.addEventListener('click', () => _ptHideTooltip());
-
-    // Zoom-bar slider
     const zoomBar = document.getElementById('pt-zoom-bar');
     if (zoomBar) {
-        zoomBar.addEventListener('mousedown', _ptOnZoomBarMouseDown);
-        zoomBar.addEventListener('input', () => _ptOnZoomBarInput(zoomBar));
+        zoomBar.addEventListener('mousedown', _ptOnZoomBarMouseDown, { signal });
+        zoomBar.addEventListener('input', () => _ptOnZoomBarInput(zoomBar), { signal });
+    }
+
+    if (typeof ResizeObserver === 'function') {
+        _pt_resizeObserver = new ResizeObserver(() => {
+            _pt_containerRect = _pt_container.getBoundingClientRect();
+            _ptScheduleTransform(false);
+        });
+        _pt_resizeObserver.observe(_pt_container);
+    } else {
+        window.addEventListener('resize', () => {
+            _pt_containerRect = _pt_container.getBoundingClientRect();
+            _ptScheduleTransform(false);
+        }, { passive: true, signal });
     }
 }
 

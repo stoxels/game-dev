@@ -10,6 +10,7 @@ import { _egTryMonsterMeleeSidestep } from './combat-monster-roam.js';
 import { _egCalcAccuracyMissChance, _egComputePlayerStats, _egGetDragTier, _egGetDragTierLabelKey } from '../endgame/endgame-player-stats.js';
 import { EG_PLAYER_MELEE_ANIM_DURATION_MS, EG_PLAYER_MELEE_DAMAGE, _egDragChargeElements, _egIsActive } from './combat-state.js';
 import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egMeleeImpactThump, _egMeleeTargetInRange, _egShowWeaponSwing, _egWeaponSwingSound } from './combat-weapon-swing.js';
+import { EG_MELEE_OVERCHARGE_MULT, _egMeleeTierArt, _egMeleeTierForCharge } from './encounter-melee-arts.js';
 
 //------------------------------------------------------------------------
 // PHASE 4 split (2026-09-16): extracted into a focused module. The original
@@ -316,32 +317,46 @@ export function _egRollPlayerMiss(targetId, opts) {
 export const EG_MELEE_EXECUTE_HP_PCT = 0.25;
 export const EG_MELEE_EXECUTE_MULT = 3;
 
-// Overcharge tuning: the charge bar keeps filling past 100% while held...
-// see _egTickPlayer in endgame-encounter-tick.js. A strike released above
-// the full-charge cap deals proportionally MORE than full damage, up to
-// this multiplier (2 = up to double damage for a patient player).
-export const EG_MELEE_OVERCHARGE_MULT = 2;
-export const EG_MELEE_OVERCHARGE_RATIO = 2;
-
 // Applies a manual melee strike at the moment of impact (Secret-of-Mana-
 // style). The strike deals charge% of full damage - linear: 100% charge =
 // 100% damage, 30% charge = 30% damage - and the charge was already spent
 // (reset to zero) at key-press time by _egDoWeaponAttack. The damage (and
 // its elemental breakdown) is rolled ONCE per swing so cleaved side targets
 // take the same hit as the primary target.
-export function _egApplyPlayerMeleeImpact(targetId) {
-    if (!_egIsActive() || !globalThis._egMonsters.some(m => m.id === targetId)) return;
+// Tiered range rule: plain strikes (below 200% - taps and charged hits
+// without an art) only connect in melee reach, so positioning matters for
+// quick hits. Weapon arts (200%+: dash, leap, novas) carry the sprite to
+// the target across the screen, so range never gates an overcharged
+// release - the dash IS the delivery.
+// opts.sequenced (delivered arts): the avatar was visibly flown onto the
+// target first - the tier art plays its sequenced follow-through (sky-leap
+// legs with hits on arrival) and a Promise is returned that resolves when
+// it lands, so the caller can glide the avatar home afterwards. Without
+// the flag everything is synchronous (and the return is undefined).
+export function _egApplyPlayerMeleeImpact(targetId, opts) {
+    if (!_egIsActive() || !globalThis._egMonsters.some(m => m.id === targetId)) return undefined;
 
-    // Charge share snapshotted at key-press (null = legacy caller, full hit).
-    // May exceed 1 when the player overcharged past 100% (see _egTickPlayer).
-    const chargePct = (typeof _egPendingMeleeChargePct === 'number')
+// Charge share snapshotted at key-press (null = legacy caller, full hit).
+// May exceed 1 when the player overcharged past 100% (see _egTickPlayer).
+// Delivered arts (opts.chargePct) carry their release-time share in the
+// delivery closure instead - the global is left untouched so a second
+// strike released mid-flight can never steal or eat this strike's share.
+let chargePct;
+if (opts && typeof opts.chargePct === 'number') {
+    chargePct = Math.min(EG_MELEE_OVERCHARGE_MULT, Math.max(0, opts.chargePct));
+} else {
+    chargePct = (typeof _egPendingMeleeChargePct === 'number')
         ? Math.min(EG_MELEE_OVERCHARGE_MULT, Math.max(0, globalThis._egPendingMeleeChargePct)) : 1;
     globalThis._egPendingMeleeChargePct = null;
+}
 
-    // Out-of-range whiff: the swing always plays, but the blade can't reach
-    // a distant target - no damage, no procs, no mana, no reflect. The spent
-    // charge is NOT refunded (follows the miss rule below).
-    if (typeof _egMeleeTargetInRange === 'function' && !_egMeleeTargetInRange(targetId)) {
+    // Out-of-range whiff for plain strikes only: the swing always plays,
+    // but a sub-200% blade can't reach a distant target - no damage, no
+    // procs, no reflect. The spent charge is NOT refunded (follows the
+    // miss rule below). At 200%+ the weapon art dashes to the target
+    // instead, so this gate never fires.
+    if (_egMeleeTierForCharge(chargePct) < 1
+        && typeof _egMeleeTargetInRange === 'function' && !_egMeleeTargetInRange(targetId)) {
         _egShowStatusLabel(targetId, t('eg_melee_too_far'));
         return;
     }
@@ -378,8 +393,12 @@ export function _egApplyPlayerMeleeImpact(targetId) {
         execMult = EG_MELEE_EXECUTE_MULT;
         _egShowStatusLabel(targetId, t('eg_execute'));
     }
-    const dmg = Math.max(1, Math.round((
-        _egCurrentMeleeDamage(chargePct) + _egConsumeOnHitGearBonus() * chargePct) * execMult));
+    // rawHit is the charge-scaled swing rolled ONCE - cleaved side targets
+    // AND weapon-art tier victims all take this same hit (the exec finisher
+    // multiplies only the primary target below).
+    const rawHit = Math.max(1, Math.round(
+        _egCurrentMeleeDamage(chargePct) + _egConsumeOnHitGearBonus() * chargePct));
+    const dmg = Math.max(1, Math.round(rawHit * execMult));
     const elements = _egLastMeleeElements;
     const wasCrit = (typeof _egLastMeleeWasCrit !== 'undefined') ? _egLastMeleeWasCrit : false;
 
@@ -406,6 +425,17 @@ export function _egApplyPlayerMeleeImpact(targetId) {
     }
 
     _egTryCleaveHit(targetId, dmg, elements);
+
+    // Weapon arts (Secret-of-Mana-style): a strike released inside an
+    // overcharge tier band unleashes that tier's art on top of the normal
+    // hit - dash-through at 200%+, sky leap at 300%+, weapon nova at 400%+,
+    // grand nova at 500% (see _egMeleeTierArt). Sequenced deliveries return
+    // the follow-through promise so the caller can await the landing.
+    const tier = _egMeleeTierForCharge(chargePct);
+    if (tier >= 1) {
+        try { return _egMeleeTierArt(targetId, tier, rawHit, elements, wasCrit, opts); }
+        catch (e) { return undefined; }
+    }
 
     // Melee sidestep: the struck monster sometimes darts to a different
     // zone panel, forcing the player to walk back into range instead of

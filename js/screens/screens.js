@@ -1,22 +1,20 @@
-﻿import { Audio_Manager } from '../audio/audio.js';
+import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { stopTimer } from '../timer/timer.js';
 import { t } from '../translation/translations.js';
 import { isLevelConvergence, renderLevelSelect } from './screens-level-select.js';
 import { showMapView } from './screens-map-view.js';
 import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
-import { showPassiveTree } from '../passive-tree/passive-tree.js';
-import { _dofNudge } from '../passive-tree/passive-tree-special-nodes-logic.js';
+import { showPassiveTree } from '../probability-tree/probability-tree.js';
+import { _dofNudge } from '../probability-tree/probability-tree-special-nodes-logic.js';
 import { closeInventoryFlyout } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
-import { STATE } from '../state.js';
+import { STATE, endPassiveTreeCharacterPreview } from '../state.js';
 import { cur } from '../state.js';
 
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'replayLevel', { get() { return replayLevel; }, set(v) { replayLevel = v; }, configurable: true }); } catch (e) {}
-// Bridge for classic scripts OUTSIDE the concatenated core (e.g.
-// passive-tree-dev.js, lazy-injected at runtime): bare switchScreen() calls
-// there resolve to globalThis.switchScreen - without this accessor they
-// would throw ReferenceError.
+// Bridge for classic callers that still resolve switchScreen through
+// globalThis instead of an import.
 try { Object.defineProperty(globalThis, 'switchScreen', { get() { return switchScreen; }, set(v) { switchScreen = v; }, configurable: true }); } catch (e) {}
 //------------------------------------------------------------------------
 //------------------------SCREEN SWITCH UTILITY---------------------------
@@ -88,12 +86,12 @@ export function hideResultOverlays() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-export let _convResizeBound = null;
-export let _convCloseTimer = null;
-export let _convSfxTimer = null;
+let _convResizeBound = null;
+let _convCloseTimer = null;
+let _convSfxTimer = null;
 
 // Scales the book modal up to fill the viewport (capped) so it reads large.
-export function _fitConvergenceModal(modal) {
+function _fitConvergenceModal(modal) {
     modal = modal || document.getElementById('convergence-modal');
     const box = modal && modal.querySelector('.convm');
     if (!box) return;
@@ -102,7 +100,7 @@ export function _fitConvergenceModal(modal) {
 }
 
 // Shows the convergence modal and plays its sound effect.
-export function showConvergenceModal() {
+function showConvergenceModal() {
     const modal = document.getElementById('convergence-modal');
     if (modal) {
         if (_convCloseTimer) { clearTimeout(_convCloseTimer); _convCloseTimer = null; }
@@ -139,8 +137,8 @@ export function showConvergenceModal() {
 // Total number of Convergence Trials across all worlds - the "X" in the
 // "earned / total" readout. Leveling Rework: milestones moved from puzzle
 // levels (isLevelConvergence is always false now) to trials.
-export let _convTotalCache = null;
-export function _convergenceTotalMilestones() {
+let _convTotalCache = null;
+function _convergenceTotalMilestones() {
     if (_convTotalCache != null) return _convTotalCache;
     if (typeof globalThis._egTrialCount === 'function') {
         _convTotalCache = globalThis._egTrialCount();
@@ -160,7 +158,7 @@ export function _convergenceTotalMilestones() {
 
 // Fills the convergence modal's total-points chip with the current pool and
 // plays a short count-up from 0 so the reward reveal feels earned.
-export function _updateConvergenceModalPoints(modal) {
+function _updateConvergenceModalPoints(modal) {
     modal = modal || document.getElementById('convergence-modal');
     const plate = modal && modal.querySelector('.convm-total-plate span');
     if (!plate) return;
@@ -183,7 +181,7 @@ export function _updateConvergenceModalPoints(modal) {
 }
 
 // Hides the convergence modal.
-export function hideConvergenceModal() {
+function hideConvergenceModal() {
     if (_convResizeBound) {
         window.removeEventListener('resize', _convResizeBound);
         _convResizeBound = null;
@@ -207,7 +205,7 @@ export function hideConvergenceModal() {
 // Builds a button handler that closes the convergence modal,
 // then optionally runs an extra action. If no extra action is given,
 // it falls through to the intended navigation callback (proceed).
-export function _buildConvergenceButtonHandler(proceed, extraAction) {
+function _buildConvergenceButtonHandler(proceed, extraAction) {
     return () => {
         hideConvergenceModal();
         if (extraAction) extraAction();
@@ -218,7 +216,7 @@ export function _buildConvergenceButtonHandler(proceed, extraAction) {
 // Wires up all three buttons inside the convergence modal to close it
 // and route correctly: tree opens the passive tree, the other two
 // continue with the intended navigation.
-export function _wireConvergenceModalButtons(modal, proceed) {
+function _wireConvergenceModalButtons(modal, proceed) {
     const treeBtn = modal.querySelector('.convm-btn.open');
     const nextBtn = modal.querySelector('.convm-btn.next');
     const levelsBtn = modal.querySelector('.convm-btn.select');
@@ -249,7 +247,7 @@ export function _maybeShowConvergenceModal(proceed) {
 // Builds a callback that first checks for a pending class event,
 // then runs the intended navigation. Used as the post-convergence
 // step in level transitions (next level, replay).
-export function _buildPostConvergenceCallback(proceed) {
+function _buildPostConvergenceCallback(proceed) {
     return () => {
         if (globalThis.triggerClassEventIfPending(proceed)) return;
         proceed();
@@ -265,6 +263,7 @@ export function _buildPostConvergenceCallback(proceed) {
 
 // Navigates to the title screen and resets screen history and BGM.
 export function showTitle() {
+    endPassiveTreeCharacterPreview();
     Audio_Manager.playBGM('title');
     stopTimer();
     globalThis.screenHistory = [];
@@ -274,8 +273,8 @@ export function showTitle() {
 // Scales the setup book (fixed 1376x768 design box) to fit the current
 // viewport so the screen looks right on any window size. Called on show and
 // on window resize (only while the setup screen is active).
-export let _setupResizeBound = false;
-export function _fitSetupBook() {
+let _setupResizeBound = false;
+function _fitSetupBook() {
     const book = document.querySelector('#screen-setup .setup-book');
     if (!book) return;
     const designW = 1376;
@@ -293,7 +292,7 @@ export function _fitSetupBook() {
 // Refreshes the setup-screen Nexus button: visible only once the player
 // has completed the Nexus Point. Kept separate so win-overlay and load
 // flows can refresh it without re-entering the whole setup screen.
-export function refreshSetupNexusButton() {
+function refreshSetupNexusButton() {
     const btn = document.getElementById('btn-enter-nexus-setup');
     if (!btn) return;
     const unlocked = typeof globalThis.isNexusUnlocked === 'function' ? globalThis.isNexusUnlocked() : false;
@@ -461,6 +460,11 @@ export function goToPreviousScreen() {
         // Mid-tutorial there is no valid previous level-select screen -
         // stay put instead of popping history toward the locked screens.
         if (cur && cur.isTutorialQuest) return;
+        // Escape is also a valid close path for the title-screen tree
+        // preview. Restore its temporary character before leaving the screen.
+        if (document.getElementById('screen-passive-tree')?.classList.contains('active')) {
+            endPassiveTreeCharacterPreview();
+        }
         const prev = globalThis.screenHistory.pop();
 
         // The game screen is not directly re-enterable; go to level select instead.
@@ -494,7 +498,7 @@ export function goToPreviousScreen() {
 // captured by reference; the subsequent startLevel's encounter teardown
 // cancels their old expiry timers, and the restore step below re-places them
 // with fresh lifetimes via the shared _egReplaceCarried* helpers.
-export function _campaignSnapshotCarriedDrops() {
+function _campaignSnapshotCarriedDrops() {
     const carried = { loot: [], currency: [], items: [], maps: [], charms: [] };
     try {
         if (typeof globalThis._egLootDrops !== 'undefined' && globalThis._egLootDrops instanceof Map) {
@@ -528,7 +532,7 @@ export function _campaignSnapshotCarriedDrops() {
 // grid. Polls briefly for the new puzzle's grid DOM so math-gated levels
 // (startLevel defers _doStartLevel until the gate passes) don't place drops
 // onto the stale grid just to have them wiped. Restores exactly once.
-export function _campaignRestoreCarriedDrops(carried, nextIndex) {
+function _campaignRestoreCarriedDrops(carried, nextIndex) {
     if (!carried) return;
     const total = (carried.loot?.length || 0) + (carried.currency?.length || 0)
         + (carried.items?.length || 0) + (carried.maps?.length || 0)

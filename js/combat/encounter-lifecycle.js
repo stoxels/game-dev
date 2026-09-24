@@ -82,6 +82,12 @@ export function _egResetEncounterState() {
     // every strike spends the bar, so every fight opens at 0%)
     globalThis._egPlayerCurrentCharge = 0;
     globalThis._egPendingMeleeChargePct = null;
+    // ...and no hold carries over either (a stuck hold would root the hero
+    // + keep them vulnerable with no finger on the key).
+    globalThis._egMeleeHoldActive = false;
+    globalThis._egMeleeHoldKey = null;
+    globalThis._egMeleeHoldStartAt = 0;
+    globalThis._egMeleeChargeLevel = 0;
 
     // Initial low-mistakes check - shows the 3/2/1/0 overlay immediately
     // if the map already starts with a tight mistake budget.

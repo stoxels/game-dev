@@ -186,6 +186,26 @@
     pointer-events: none;
 }
 
+.cs-tree-start-hint {
+    width: min(100%, 720px);
+    margin: -2px 0 2px;
+    color: #ffe9ad;
+    font-family: var(--PX, monospace);
+    font-size: clamp(9px, 1.35vw, 12px);
+    letter-spacing: .08em;
+    line-height: 1.45;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0,0,0,.95);
+}
+
+.csi-bottom .cs-tree-start-hint {
+    max-width: min(720px, 90%);
+    padding: 6px 14px;
+    background: rgba(10, 8, 4, .78);
+    border: 1px solid rgba(255, 233, 173, .32);
+    border-radius: 999px;
+}
+
 .csi-bottom .cs-confirm-btn {
     pointer-events: auto;
     /* Over the artwork the bare wire-frame button was unreadable - give it

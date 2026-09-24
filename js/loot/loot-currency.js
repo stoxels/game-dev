@@ -373,6 +373,14 @@ export const EG_CURRENCY_DEFS = {
     },
 };
 
+for (const [id, def] of Object.entries(EG_CURRENCY_DEFS)) {
+    const nameKey = id === 'mirror_of_kalandra' ? 'eg_orb_mirror' : `eg_${id}`;
+    Object.defineProperties(def, {
+        name: { enumerable: true, get: () => t(nameKey) },
+        description: { enumerable: true, get: () => t(`${nameKey}_desc`) },
+    });
+}
+
 // Helper: eligible uniques for Ancient Orb - same slotType and required level <= source
 export function _egGetAncientOrbEligibleUniques(item) {
     if (!item || typeof EG_UNIQUE_ITEMS === 'undefined' || !Array.isArray(EG_UNIQUE_ITEMS)) return [];

@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { t } from '../translation/translations.js';
 import { playItemEffect } from './item-fx-dispatcher.js';
 import { _calcMarkWrongCount } from '../puzzle-mechanics/effect-modifiers.js';

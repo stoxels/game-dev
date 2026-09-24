@@ -1,4 +1,4 @@
-﻿import { SAVE_SLOT_COUNT, getSlotName, getSlotSummary, loadStateFromSlot, setSlotName } from '../state.js';
+import { SAVE_SLOT_COUNT, getSlotName, getSlotSummary, loadStateFromSlot, setSlotName } from '../state.js';
 import { t } from '../translation/translations.js';
 import { hideModal, showModal, switchScreen } from './screens.js';
 //------------------------------------------------------------------------
@@ -11,7 +11,9 @@ import { hideModal, showModal, switchScreen } from './screens.js';
 // NOTE: adjust these paths/ids if your character-select code uses different
 // keys or a different image folder - this is a best-effort match based on
 // the naming convention seen elsewhere (images/Game_Setup/...).
-export const CHAR_PORTRAIT_SRC = {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-24): retained under the no-delete rule;
+// the live portrait path derives its filename dynamically below.
+const CHAR_PORTRAIT_SRC = {
     stox: 'images/sprites/Stox_noclass.webp',
     trix: 'images/sprites/Trix_noclass.webp',
     syla: 'images/sprites/Syla_noclass.webp',
@@ -33,7 +35,7 @@ export const CHAR_PORTRAIT_SRC = {
 
 
 // Looks up the portrait image for a saved character, factoring in class/ascendency.
-export function getCharPortraitSrc(summary) {
+function getCharPortraitSrc(summary) {
     if (!summary || !summary.playerCharacter) return '';
 
     const char = summary.playerCharacter;
@@ -48,7 +50,7 @@ export function getCharPortraitSrc(summary) {
 }
 
 // Builds the inner markup for a save-slot card, empty or filled.
-export function _buildSlotCardHtml(slotNum, summary) {
+function _buildSlotCardHtml(slotNum, summary) {
     // Custom slot name - shown instead of the default "SLOT {n}" heading
     // whenever the player has named this slot (works for empty slots too,
     // e.g. "Hardcore Run" prepared before the first save).
@@ -87,7 +89,7 @@ export function _buildSlotCardHtml(slotNum, summary) {
 
 
 // Wires up click-to-select and delete-button behavior on a slot card.
-export function _attachSlotCardListeners(card, slotNum) {
+function _attachSlotCardListeners(card, slotNum) {
     card.addEventListener('click', (e) => {
         if (e.target.classList.contains('ssc-delete-btn')) return;
         if (e.target.classList.contains('ssc-name-btn')) return;
@@ -139,7 +141,7 @@ export function onSaveSlotChosen(slotNum) {
 //------------------------------------------------------------------------
 
 // Builds a single save-slot card element, populated from its saved summary.
-export function buildSaveSlotCard(slotNum) {
+function buildSaveSlotCard(slotNum) {
     const summary = getSlotSummary(slotNum);
     const card = document.createElement('div');
     card.className = 'save-slot-card' + (summary.empty ? ' empty' : '');
@@ -175,7 +177,7 @@ export function showSaveSlotSelect(onSlotChosen) {
 // Opens the name-a-slot modal for the given slot. Pre-fills the input with
 // the current name (or empty), focuses it with the text selected so typing
 // replaces it immediately. Enter confirms, Escape cancels.
-export function showSlotNameModal(slotNum) {
+function showSlotNameModal(slotNum) {
     window._pendingSlotNameSlot = slotNum;
     const modal = document.getElementById('slot-name-modal');
     const input = document.getElementById('slot-name-input');
@@ -245,16 +247,17 @@ function _setResetModalTextForSlot(slotNum) {
 // translation re-render doesn't overwrite this slot-specific text; the
 // original wording is restored by _restoreResetModalTextForFullReset()
 // whenever the modal is opened for the title-screen "reset everything" flow.
-export function _setResetModalTextForSlot(slotNum) {
+function _setResetModalTextForSlot(slotNum) {
     const modal = document.getElementById('reset-modal');
     if (!modal) return;
 
+    const slotLabel = getSlotName(slotNum) || slotNum;
     const title = modal.querySelector('.reset-title');
-    if (title) { title.removeAttribute('data-t'); title.textContent = t('scr_delete_slot_title').replace('{n}', slotNum); }
+    if (title) { title.removeAttribute('data-t'); title.textContent = t('scr_delete_slot_title').replace('{n}', () => slotLabel); }
 
     // Target by class and DOM structure instead of [data-t="..."]
     const note1 = modal.querySelector('.reset-note-text span:first-child');
-    if (note1) { note1.removeAttribute('data-t'); note1.textContent = t('scr_delete_slot_note1').replace('{n}', slotNum); }
+    if (note1) { note1.removeAttribute('data-t'); note1.textContent = t('scr_delete_slot_note1').replace('{n}', () => slotLabel); }
 
     // Target by class and DOM structure instead of [data-t="..."]
     const note2 = modal.querySelector('.reset-note-text span:last-child');
@@ -270,7 +273,7 @@ export function _setResetModalTextForSlot(slotNum) {
 // "reset everything" flow. Text is swapped to reference this specific slot;
 // confirmReset() (save-reset.js) checks window._pendingResetSlot to decide
 // whether to wipe just this slot or perform a full reset.
-export function showDeleteSlotConfirm(slotNum) {
+function showDeleteSlotConfirm(slotNum) {
     window._pendingResetSlot = slotNum;
     _setResetModalTextForSlot(slotNum);
     showModal('reset-modal');
@@ -279,7 +282,8 @@ export function showDeleteSlotConfirm(slotNum) {
 // Restores the modal's original "reset everything" copy. Called whenever
 // the title-screen Reset button opens the modal, so slot-delete wording
 // never leaks into the full-reset flow.
-export function _restoreResetModalTextForFullReset() {
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-24): no active consumer; retained for rollback.
+function _restoreResetModalTextForFullReset() {
     const modal = document.getElementById('reset-modal');
     if (!modal) return;
 

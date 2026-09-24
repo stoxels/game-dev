@@ -71,15 +71,16 @@ export let _egLastMeleeCritMult = 1;
 // % increased physical damage and crit. Falls back to the flat base
 // punch when no weapon damage exists. Projectiles use
 // _egCalcPlayerDamage() instead (see _egComputePlayerStats for routing).
-// `chargePct` (0..1) scales the whole roll - callers pass the spent manual
-// charge share (see _egApplyPlayerMeleeImpact in endgame-encounter.js).
+// `chargePct` (0..5) scales the whole roll - callers pass the spent manual
+// charge share (see _egApplyPlayerMeleeImpact in encounter-charged-shot.js).
 export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     const stats = _egComputePlayerStats();
     // Manual charge share (Secret-of-Mana-style, linear): 1 = fully-charged
     // full damage. Applied up front so crit, map mods AND life leech below
     // all operate on the scaled hit - chip hits can't leech full damage.
     // Values above 1 are OVERCHARGE (held past full) and scale the hit
-    // proportionally up to EG_MELEE_OVERCHARGE_MULT (see endgame-encounter.js).
+    // proportionally up to EG_MELEE_OVERCHARGE_MULT (5 = 500% for the grand
+    // nova), on top of which the weapon-art tier fires (see _egMeleeTierArt).
     const charge = Math.min(
         (typeof EG_MELEE_OVERCHARGE_MULT === 'number') ? EG_MELEE_OVERCHARGE_MULT : 1,
         Math.max(0, Number(chargePct) || 0));

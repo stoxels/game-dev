@@ -3,7 +3,7 @@ import { scoreMultiplier } from '../difficulty-modifiers.js';
 import { onLevelCompleteAch, checkWorldCompleteAch } from '../achievements/achievements.js';
 import { WORLDS } from '../levels/level-world-data.js';
 import { isNexusPointLevel, WORLD_START_GI } from '../levels/levels.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 
 //------------------------------------------------------------------------
 //-------------------SCORING CORE (scoring-core.js)------------------------

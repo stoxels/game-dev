@@ -1,6 +1,6 @@
 import { Audio_Manager } from './audio/audio.js';
 import { updateTouchpadModeButtonVisibility } from './mouse-button-handlers.js';
-import { PassiveTracker } from './passive-tree/passive-tracker.js';
+import { PassiveTracker } from './probability-tree/probability-tree-tracker.js';
 import { _applyLowHealthVignette, _applyLowTimeVignette } from './timer/timer.js';
 
 //------------------------------------------------------------------------

@@ -26,7 +26,7 @@ import { STATE } from '../state.js';
 // these 36 spells extend the same universal-spell idea to a full arsenal
 // (24 elemental + 6 physical melee + 6 arrows).
 //
-// DESIGN CONTRACT (for the future dev-passive-tree scaling pass):
+// DESIGN CONTRACT (for the future Probability Tree scaling pass):
 //   Every def carries:
 //     element    - engine resist key: 'fire' | 'cold' | 'lightning' |
 //                  'shadow' | 'physical'. (The combat engine resists the
@@ -35,7 +35,7 @@ import { STATE } from '../state.js';
 //                  Arcane, holy and nature visuals map onto the closest key.)
 //     damageKind - design scaling key: 'fire' | 'cold' | 'lightning' |
 //                  'shadow' | 'arcane' | 'holy' | 'nature' | 'physical'.
-//                  The future dev tree reads this via
+//                  The future Probability Tree reads this via
 //                  getUniversalSpellDamageBonus().
 //     scalingTags- extra tags ('area', 'projectile', 'dot', 'channel') the
 //                  future tree can hook per-spell-type modifiers onto.
@@ -2068,8 +2068,8 @@ function startUniversalSpellCooldown(spellId, secondsOverride) {
 //------------------------------------------------------------------------
 //---------------------------DAMAGE ROLL----------------------------------
 //------------------------------------------------------------------------
-// One rolled hit: base range + flat damage (gear + future dev tree),
-// scaled by increased damage (gear + future dev tree), then crit,
+// One rolled hit: base range + flat damage (gear + future Probability Tree),
+// scaled by increased damage (gear + future Probability Tree), then crit,
 // map mods and quiz buffs. Returns { amount, elements, isCrit }.
 //   elemental spells → elements[element] = amount (monster resists apply).
 //   PHYSICAL spells  → elements = {} (pure physical: only monster physical
@@ -2534,7 +2534,7 @@ export function _registerUniversalSpells() {
 }
 
 // "Scales with" line: Spell Damage (or Attack Damage for physical) + the
-// design damage kind + the behaviour tags the future dev tree hooks onto.
+// design damage kind + the behaviour tags the future Probability Tree hooks onto.
 function _uspScalingLine(spell) {
     // Support spells do not scale off damage stats - they scale off the charm
     // rank plus the max Life / Absorption pool they refill (see SUPPORT

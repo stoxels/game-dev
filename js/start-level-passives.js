@@ -3,8 +3,8 @@ import { revealTiles, markWrongTiles } from './puzzle-mechanics/grid-actions.js'
 import { _executeFieldScanLegacy } from './classes/class-probabilist.js';
 import { _adjacencyMatrixRefreshAll, clues, renderCell, updClues } from './grid.js';
 import { lvText } from './levels/levels.js';
-import { _applyMaximumLikelihood, _interquartileVisionDuration } from './passive-tree/passive-tree-special-nodes-logic.js';
-import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
+import { _applyMaximumLikelihood, _interquartileVisionDuration } from './probability-tree/probability-tree-special-nodes-logic.js';
+import { ptHasSkill } from './probability-tree/probability-tree-state-points.js';
 import { _applyCellEffect } from './puzzle-mechanics/cell-fx.js';
 import { shuffle } from './puzzle-mechanics/puzzle-helpers.js';
 import { showToast } from './puzzle-mechanics/toasts-and-popups.js';

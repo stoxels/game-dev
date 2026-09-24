@@ -1,11 +1,11 @@
-﻿import { Audio_Manager } from '../audio/audio.js';
+import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { MOD_CLASSES, MOD_LABELS, applyClassStatusActiveStyle, applyClassStatusEmptyStyle, buildNextCodeStr, isLevelConvergence, isMaxCleared, renderLevelSelect } from './screens-level-select.js';
 import { showWorldDetail, wdGoBackToMap } from './screens-world-levels.js';
 import { showSetup, switchScreen } from './screens.js';
 import { showQuestLog } from '../inference/inference-ui.js';
-import { showPassiveTree } from '../passive-tree/passive-tree.js';
+import { showPassiveTree } from '../probability-tree/probability-tree.js';
 import { STATE } from '../state.js';
 
 /*
@@ -40,31 +40,31 @@ import { STATE } from '../state.js';
 
 // Aspect ratio of the background map image (width ÷ height).
 // Update this value whenever the map image changes.
-export const MAP_IMAGE_ASPECT = 1376 / 768;
+const MAP_IMAGE_ASPECT = 1376 / 768;
 
 // Walking speed of the player sprite, in canvas pixels per second
 // (calibrated for a ~1000px wide canvas).
-export const WALK_SPEED_PX_PER_SEC = 60;
+const WALK_SPEED_PX_PER_SEC = 60;
 
 // Minimum duration for a single waypoint-to-waypoint step, in milliseconds.
 // Prevents imperceptibly fast micro-steps on very short segments.
-export const WALK_STEP_MIN_MS = 80;
+const WALK_STEP_MIN_MS = 80;
 
 // Fixed reference canvas size used ONLY for speed calculations, so walk
 // speed stays constant regardless of actual window/canvas size.
-export const WALK_REF_WIDTH = 1000;
-export const WALK_REF_HEIGHT = WALK_REF_WIDTH / MAP_IMAGE_ASPECT;
+const WALK_REF_WIDTH = 1000;
+const WALK_REF_HEIGHT = WALK_REF_WIDTH / MAP_IMAGE_ASPECT;
 
 // The home base position (Cartographer's Outpost).
 // Coordinates are percentages of the background IMAGE (not the canvas element).
 // (0,0) = top-left, (100,100) = bottom-right of the image.
-export const MAP_HOME_POS = { x: 7.6, y: 86.3 };
+const MAP_HOME_POS = { x: 7.6, y: 86.3 };
 
 // World node positions and localized names.
 // Index matches the world index (wi) used throughout the codebase.
 // wi=13 is the Nexus World - secret World 14 (Descriptive Statistics).
 // Coordinates are percentages of the background IMAGE.
-export const MAP_WORLD_POSITIONS = [
+const MAP_WORLD_POSITIONS = [
     { x: 25, y: 83.1, labelEN: "Probability Peaks", labelDE: "Probability Peaks" },
     { x: 34.5, y: 88.6, labelEN: "The Distribution Den", labelDE: "The Distribution Den" },
     { x: 14, y: 57, labelEN: "Sampling Savanna", labelDE: "Sampling Savanna" },
@@ -91,7 +91,7 @@ export const MAP_WORLD_POSITIONS = [
 // of n1/n2 does not matter for routing - only the waypoint order matters
 // for visual drawing and sprite movement direction.
 // Coordinates are percentages of the background IMAGE.
-export const ROAD_SEGMENTS = [
+const ROAD_SEGMENTS = [
     {
         n1: 'home',
         n2: 'fork01',
@@ -358,25 +358,29 @@ export const ROAD_SEGMENTS = [
 
 // World index the sprite is currently standing at.
 // null = sprite is at the Cartographer's Outpost (home).
-export let _mvCurrentWorldIdx = null;
+let _mvCurrentWorldIdx = null;
 
 // requestAnimationFrame handle for the active walk animation (used for cancellation).
-export let _mvWalkAnim = null;
+// SUSPECTED DEAD (R3 2026-09-24): retained under the no-delete rule; no current
+// reader or external consumer was found.
+let _mvWalkAnim = null;
 
 // Whether a walk animation is currently in progress.
 // Used to block new walks while one is already running.
-export let _mvWalking = false;
+let _mvWalking = false;
 
 // Reference to the map canvas DOM element, cached after build.
-export let _mvCanvasEl = null;
+// SUSPECTED DEAD (R3 2026-09-24): retained under the no-delete rule; no current
+// reader or external consumer was found.
+let _mvCanvasEl = null;
 
 // Queued redirect target while a walk is in progress. Only applied once
 // the sprite reaches the next real road node, so it never leaves the roads.
-export let _mvPendingRedirect = null;
+let _mvPendingRedirect = null;
 
 // Last world-node click ({ wi, t }) for double-click-to-enter detection in
 // _onWorldNodeClick. null when no recent click is pending.
-export let _lastWorldNodeClick = null;
+let _lastWorldNodeClick = null;
 
 
 //------------------------------------------------------------------------
@@ -394,7 +398,7 @@ export let _lastWorldNodeClick = null;
  * @param {HTMLElement} canvas - The map canvas DOM element
  * @returns {{ x: number, y: number }} Position as % of the canvas element
  */
-export function _imgPctToCanvasPct(imgPctX, imgPctY, canvas) {
+function _imgPctToCanvasPct(imgPctX, imgPctY, canvas) {
     const cw = canvas.offsetWidth;
     const ch = canvas.offsetHeight;
 
@@ -436,7 +440,7 @@ export function _imgPctToCanvasPct(imgPctX, imgPctY, canvas) {
  * @param {number} imgPctY       - Y position as % of the image
  * @param {HTMLElement} [canvas] - The canvas element; resolved from DOM if omitted
  */
-export function _applyPositionToElement(el, imgPctX, imgPctY, canvas) {
+function _applyPositionToElement(el, imgPctX, imgPctY, canvas) {
     if (!canvas) canvas = document.getElementById('mv-canvas');
     if (!canvas) return;
 
@@ -451,7 +455,7 @@ export function _applyPositionToElement(el, imgPctX, imgPctY, canvas) {
  * @param {number} wi - World index
  * @returns {string}
  */
-export function _getWorldLabel(wi) {
+function _getWorldLabel(wi) {
     const pos = MAP_WORLD_POSITIONS[wi];
     return LANG === 'de' ? pos.labelDE : pos.labelEN;
 }
@@ -468,7 +472,7 @@ export function _getWorldLabel(wi) {
  * @param {number} wi - World index
  * @returns {boolean}
  */
-export function _isWorldComplete(wi) {
+function _isWorldComplete(wi) {
     if (!STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
     const finalGi = globalThis.WORLD_START_GI[wi] + (globalThis.WORLDS[wi].data.length - 1);
     return STATE.done && STATE.done.includes(finalGi);
@@ -485,7 +489,7 @@ export function _isWorldComplete(wi) {
  * @param {number} wi - World index
  * @returns {boolean}
  */
-export function _isWorldAccessible(wi) {
+function _isWorldAccessible(wi) {
     // Nexus World gate - must come first so it stays locked even while
     // earlier worlds are still in progress.
     if (typeof globalThis.isNexusWorld === 'function' && globalThis.isNexusWorld(wi)) {
@@ -499,7 +503,7 @@ export function _isWorldAccessible(wi) {
 /**
  * Returns true if every level in the given world has been completed at least once.
  */
-export function _isWorldFullyDone(wi) {
+function _isWorldFullyDone(wi) {
     if (!STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
     const start = globalThis.WORLD_START_GI[wi];
     return globalThis.WORLDS[wi].data.every((_, li) => STATE.done && STATE.done.includes(start + li));
@@ -508,7 +512,7 @@ export function _isWorldFullyDone(wi) {
 /**
  * Returns true if every level in the given world has had its bonus objective claimed.
  */
-export function _isWorldBonusComplete(wi) {
+function _isWorldBonusComplete(wi) {
     if (!STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi]) return false;
     const start = globalThis.WORLD_START_GI[wi];
     return globalThis.WORLDS[wi].data.every((_, li) => STATE.bonusDone && STATE.bonusDone.includes(start + li));
@@ -518,7 +522,7 @@ export function _isWorldBonusComplete(wi) {
  * Returns true if every level in the given world was cleared on Hard with
  * all five modifiers active (reuses isMaxCleared from screens-level-select.js).
  */
-export function _isWorldMaxCleared(wi) {
+function _isWorldMaxCleared(wi) {
     if (!STATE || !globalThis.WORLDS || !globalThis.WORLDS[wi] || typeof isMaxCleared !== 'function') return false;
     const start = globalThis.WORLD_START_GI[wi];
     return globalThis.WORLDS[wi].data.every((_, li) => isMaxCleared(start + li));
@@ -532,7 +536,7 @@ export function _isWorldMaxCleared(wi) {
  *   2 - tier 1 + every bonus claimed: vines and leaves visibly sprout
  *   3 - tier 2 + every level max-cleared (Hard, all mods): full radiant bloom
  */
-export function _getWorldHealingTier(wi) {
+function _getWorldHealingTier(wi) {
     if (!_isWorldFullyDone(wi)) return 0;
     if (!_isWorldBonusComplete(wi)) return 1;
     if (!_isWorldMaxCleared(wi)) return 2;
@@ -552,7 +556,7 @@ export function _getWorldHealingTier(wi) {
  * @param {string|number|null} node
  * @returns {string}
  */
-export function _nodeToKey(node) {
+function _nodeToKey(node) {
     return (node === 'home' || node === null) ? 'home' : String(node);
 }
 
@@ -563,7 +567,7 @@ export function _nodeToKey(node) {
  *
  * @returns {Map<string, Array>}
  */
-export function _buildRoadGraph() {
+function _buildRoadGraph() {
     const adj = new Map();
 
     const addEdge = (a, b, segment) => {
@@ -589,7 +593,7 @@ export function _buildRoadGraph() {
  * @param {Array<{ segment: object, reversed: boolean }>} routeSegments
  * @returns {{ points: Array<{x,y}>, markers: Array<{index:number, key:string}> }}
  */
-export function _routeSegmentsToWaypointsWithMarkers(routeSegments) {
+function _routeSegmentsToWaypointsWithMarkers(routeSegments) {
     const points = [];
     const markers = []; // { index, key } - index into `points` that sits on a real graph node
 
@@ -624,7 +628,7 @@ export function _routeSegmentsToWaypointsWithMarkers(routeSegments) {
  * @param {string|number|null} toNode   - Destination node
  * @returns {{ points: Array<{x,y}>, markers: Array<{index:number, key:string}> }}
  */
-export function _findWalkPathWithMarkers(fromNode, toNode) {
+function _findWalkPathWithMarkers(fromNode, toNode) {
     const adj = _buildRoadGraph();
     const startKey = _nodeToKey(fromNode);
     const endKey = _nodeToKey(toNode);
@@ -670,7 +674,7 @@ export function _findWalkPathWithMarkers(fromNode, toNode) {
  * @param {Array<{ segment: object, reversed: boolean }>} routeSegments
  * @returns {Array<{ x: number, y: number }>}
  */
-export function _routeSegmentsToWaypoints(routeSegments) {
+function _routeSegmentsToWaypoints(routeSegments) {
     const points = [];
 
     for (const { segment, reversed } of routeSegments) {
@@ -699,11 +703,14 @@ export function _routeSegmentsToWaypoints(routeSegments) {
  * fromNode to toNode and returns it as an ordered waypoint array.
  * Falls back to a straight two-point path if no route is found.
  *
+ * ⚠ SUSPECTED DEAD CODE (R3 2026-09-24): retained under the no-delete rule;
+ * the marker-aware replacement above is the active route-finder.
+ *
  * @param {string|number|null} fromNode - Starting node ('home', world index, or junction)
  * @param {string|number|null} toNode   - Destination node
  * @returns {Array<{ x: number, y: number }>} Ordered walk waypoints
  */
-export function _findWalkPath(fromNode, toNode) {
+function _findWalkPath(fromNode, toNode) {
     const adj = _buildRoadGraph();
     const startKey = _nodeToKey(fromNode);
     const endKey = _nodeToKey(toNode);
@@ -750,7 +757,7 @@ export function _findWalkPath(fromNode, toNode) {
  * @param {number} t
  * @returns {number}
  */
-export function _easeInOut(t) {
+function _easeInOut(t) {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
 
@@ -762,7 +769,7 @@ export function _easeInOut(t) {
  * @param {{ x: number, y: number }} endPos   - End position (image %)
  * @returns {number} Duration in milliseconds
  */
-export function _calcStepDurationMs(startPos, endPos) {
+function _calcStepDurationMs(startPos, endPos) {
     const dx = (endPos.x - startPos.x) / 100 * WALK_REF_WIDTH;
     const dy = (endPos.y - startPos.y) / 100 * WALK_REF_HEIGHT;
     const distPx = Math.sqrt(dx * dx + dy * dy);
@@ -778,7 +785,7 @@ export function _calcStepDurationMs(startPos, endPos) {
  * @param {{ x: number }} endPos
  * @returns {'up'|'down'|'left'|'right'}
  */
-export function _mvDirectionForSegment(startPos, endPos) {
+function _mvDirectionForSegment(startPos, endPos) {
     const dx = (endPos.x || 0) - (startPos.x || 0);
     const dy = (endPos.y || 0) - (startPos.y || 0);
     if (Math.abs(dx) >= Math.abs(dy)) return dx < 0 ? 'left' : 'right';
@@ -797,7 +804,7 @@ export function _mvDirectionForSegment(startPos, endPos) {
  * @param {{ x: number, y: number }} startPos
  * @param {{ x: number, y: number }} endPos
  */
-export function _updateSpriteDirection(sprite, startPos, endPos) {
+function _updateSpriteDirection(sprite, startPos, endPos) {
     const img = sprite.querySelector('img');
     if (!img) return;
     const dir = _mvDirectionForSegment(startPos, endPos);
@@ -828,11 +835,12 @@ export function _updateSpriteDirection(sprite, startPos, endPos) {
  * @param {number}       durationMs   - Duration of this step
  * @param {Function}     onStepComplete - Called when t reaches 1
  */
-export function _animateWalkStep(sprite, startPos, endPos, durationMs, onStepComplete) {
+function _animateWalkStep(sprite, startPos, endPos, durationMs, onStepComplete) {
     const canvas = document.getElementById('mv-canvas');
     const startCanvas = _imgPctToCanvasPct(startPos.x, startPos.y, canvas);
     const endCanvas = _imgPctToCanvasPct(endPos.x, endPos.y, canvas);
 
+    const direction = _mvDirectionForSegment(startPos, endPos);
     const startTime = globalThis.performance.now();
 
     const step = (now) => {
@@ -844,6 +852,11 @@ export function _animateWalkStep(sprite, startPos, endPos, durationMs, onStepCom
         sprite.style.top = (startCanvas.y + (endCanvas.y - startCanvas.y) * ease) + '%';
 
         _updateSpriteDirection(sprite, startPos, endPos);
+
+        if (typeof globalThis._playAvatarWalkAnimation === 'function') {
+            try { globalThis._playAvatarWalkAnimation('mv-sprite-img', direction); }
+            catch (e) {}
+        }
 
         if (t < 1) {
             _mvWalkAnim = requestAnimationFrame(step);
@@ -861,7 +874,7 @@ export function _animateWalkStep(sprite, startPos, endPos, durationMs, onStepCom
  *
  * @param {number|null} worldIdx
  */
-export function _saveSpritePosition(worldIdx) {
+function _saveSpritePosition(worldIdx) {
     if (STATE) {
         STATE.mapSpriteWorldIndex = worldIdx;
         if (typeof save === 'function') save();
@@ -886,7 +899,7 @@ export function _saveSpritePosition(worldIdx) {
  * @param {number}      segIdx     - Current waypoint index (recursive)
  * @param {Function}    onComplete - Called after the final step
  */
-export function _walkAlongPath(sprite, points, markers, segIdx, onComplete) {
+function _walkAlongPath(sprite, points, markers, segIdx, onComplete) {
     if (segIdx >= points.length - 1) {
         onComplete();
         return;
@@ -895,15 +908,6 @@ export function _walkAlongPath(sprite, points, markers, segIdx, onComplete) {
     const startPos = points[segIdx];
     const endPos = points[segIdx + 1];
     const durationMs = _calcStepDurationMs(startPos, endPos);
-
-    // Drive the directional walk set for this segment (up/down/left/right)
-    // instead of the old directionless omni loop. Safe to call per segment:
-    // _playAvatarWalkAnimation no-ops when the same loop already runs and
-    // just re-arms the idle debounce otherwise.
-    if (typeof globalThis._playAvatarWalkAnimation === 'function') {
-        try { globalThis._playAvatarWalkAnimation('mv-sprite-img', _mvDirectionForSegment(startPos, endPos)); }
-        catch (e) {}
-    }
 
     _animateWalkStep(sprite, startPos, endPos, durationMs, () => {
         const reachedIndex = segIdx + 1;
@@ -930,7 +934,7 @@ export function _walkAlongPath(sprite, points, markers, segIdx, onComplete) {
  * @param {string|number} target
  * @param {Function|null} onArrived
  */
-export function _continueWalkFromNode(sprite, fromNodeKey, target, onArrived) {
+function _continueWalkFromNode(sprite, fromNodeKey, target, onArrived) {
     const walkingBar = document.getElementById('mv-walking-bar');
     const { points, markers } = _findWalkPathWithMarkers(fromNodeKey, target);
 
@@ -958,7 +962,7 @@ export function _continueWalkFromNode(sprite, fromNodeKey, target, onArrived) {
  * @param {number}   targetWorldIdx - Destination world index
  * @param {Function} onArrived      - Callback fired on arrival
  */
-export function _walkSpriteTo(targetWorldIdx, onArrived) {
+function _walkSpriteTo(targetWorldIdx, onArrived) {
     const sprite = document.getElementById('mv-sprite');
     if (!sprite) return;
 
@@ -981,7 +985,7 @@ export function _walkSpriteTo(targetWorldIdx, onArrived) {
  * Starts a walk animation that returns the sprite to the home outpost.
  * If a walk is already in progress, queues the return as a redirect.
  */
-export function _walkSpriteToHome() {
+function _walkSpriteToHome() {
     const sprite = document.getElementById('mv-sprite');
     if (!sprite) return;
 
@@ -1015,7 +1019,7 @@ export function _walkSpriteToHome() {
  *
  * @returns {HTMLElement}
  */
-export function _buildMapSprite() {
+function _buildMapSprite() {
     const sprite = document.createElement('div');
     sprite.className = 'mv-sprite';
     sprite.id = 'mv-sprite';
@@ -1048,7 +1052,7 @@ export function _buildMapSprite() {
  * @param {HTMLElement}  sprite   - The sprite element
  * @param {number|null}  worldIdx - World index, or null for home
  */
-export function _placeSprite(sprite, worldIdx) {
+function _placeSprite(sprite, worldIdx) {
     const pos = (worldIdx === null) ? MAP_HOME_POS : MAP_WORLD_POSITIONS[worldIdx];
     if (!pos || !sprite) return;
 
@@ -1087,7 +1091,7 @@ export function _ensureTooltipElement() {
  * @param {number} wi - World index
  * @returns {string} Localised progress text (or '' if world data is missing)
  */
-export function _getWorldStoxelProgressText(wi) {
+function _getWorldStoxelProgressText(wi) {
     const worldData = globalThis.WORLDS && globalThis.WORLDS[wi];
     if (!worldData || typeof globalThis.WORLD_START_GI === 'undefined') return '';
 
@@ -1111,7 +1115,7 @@ export function _getWorldStoxelProgressText(wi) {
  * @param {number} wi - World index
  * @returns {string} Localised trial status text (or '' if unavailable)
  */
-export function _getWorldConvergenceText(wi) {
+function _getWorldConvergenceText(wi) {
     // Trial system present: "claimed 1/1" style readout.
     if (typeof globalThis._egTrialIdForWorld === 'function' && typeof STATE !== 'undefined' && STATE) {
         const id = globalThis._egTrialIdForWorld(wi);
@@ -1145,7 +1149,7 @@ export function _getWorldConvergenceText(wi) {
  * @param {number} wi - World index
  * @returns {string} Localised status text
  */
-export function _getWorldClassUpgradeText(wi) {
+function _getWorldClassUpgradeText(wi) {
     // The Nexus World (secret world 14) grants a one-time CLASS CHANGE on
     // its Ascension Level instead of a class upgrade - show that instead.
     if (typeof globalThis.isNexusWorld === 'function' && globalThis.isNexusWorld(wi)) {
@@ -1164,7 +1168,7 @@ export function _getWorldClassUpgradeText(wi) {
  * @param {number}  healingTier - 0–3 completion tier (see _getWorldHealingTier)
  * @returns {string} HTML string
  */
-export function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
+function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
     const label = _getWorldLabel(wi);
     let statusText;
 
@@ -1205,7 +1209,7 @@ export function _buildTooltipContent(wi, isDone, isLocked, healingTier) {
  * @param {number} healingTier
  * @returns {string}
  */
-export function _buildRemainingWorkText(healingTier) {
+function _buildRemainingWorkText(healingTier) {
     if (healingTier === 1) {
         return t('scr_bonus_remaining');
     }
@@ -1225,7 +1229,7 @@ export function _buildRemainingWorkText(healingTier) {
  * @param {boolean} isLocked
  * @param {number}  healingTier
  */
-export function _showWorldTooltip(e, wi, isDone, isLocked, healingTier) {
+function _showWorldTooltip(e, wi, isDone, isLocked, healingTier) {
     const tip = _ensureTooltipElement();
     tip.innerHTML = _buildTooltipContent(wi, isDone, isLocked, healingTier);
     tip.classList.add('show');
@@ -1275,7 +1279,7 @@ export function _hideWorldTooltip() {
  * @param {number} wi - World index
  * @returns {HTMLButtonElement}
  */
-export function _buildEnterButton(wi) {
+function _buildEnterButton(wi) {
     const pos = MAP_WORLD_POSITIONS[wi];
     const label = _getWorldLabel(wi);
     const btnText = t('scr_enter_world').replace('{world}', label);
@@ -1323,7 +1327,7 @@ export function _buildEnterButton(wi) {
  *
  * @param {HTMLButtonElement} btn
  */
-export function _registerEnterButtonDismiss(btn) {
+function _registerEnterButtonDismiss(btn) {
     const canvas = document.getElementById('mv-canvas');
     if (!canvas) return;
 
@@ -1344,7 +1348,7 @@ export function _registerEnterButtonDismiss(btn) {
  *
  * @param {number} wi - World index
  */
-export function _showEnterButton(wi) {
+function _showEnterButton(wi) {
     const existing = document.getElementById('mv-enter-btn');
     if (existing) existing.remove();
 
@@ -1372,7 +1376,7 @@ export function _showEnterButton(wi) {
  * @param {boolean} isLocked - World is locked
  * @returns {string|number}
  */
-export function _getWorldNodeIcon(wi, isDone, isLocked) {
+function _getWorldNodeIcon(wi, isDone, isLocked) {
     if (wi === 13) return '🌌'; // Nexus always shows its galaxy icon
     if (isDone) return `${wi + 1}`;
     if (isLocked) return '🔒';
@@ -1382,7 +1386,7 @@ export function _getWorldNodeIcon(wi, isDone, isLocked) {
 /**
  * Builds the healing-effect HTML for a world node, layered behind the ring.
  */
-export function _buildWorldHealingEffectHtml(tier) {
+function _buildWorldHealingEffectHtml(tier) {
     let html = `<div class="mv-heal-glow mv-heal-glow-${tier}"></div>`;
 
     if (tier >= 2) {
@@ -1414,7 +1418,7 @@ export function _buildWorldHealingEffectHtml(tier) {
  * @param {boolean} isDone
  * @param {boolean} isLocked
  */
-export function _applyWorldNodeStateClass(node, isDone, isLocked, healingTier) {
+function _applyWorldNodeStateClass(node, isDone, isLocked, healingTier) {
     if (isDone) node.classList.add('done');
     else if (isLocked) node.classList.add('locked');
     else node.classList.add('available');
@@ -1431,7 +1435,7 @@ export function _applyWorldNodeStateClass(node, isDone, isLocked, healingTier) {
  * @param {boolean} isLocked
  * @param {number}  healingTier
  */
-export function _attachNodeTooltipEvents(node, wi, isDone, isLocked, healingTier) {
+function _attachNodeTooltipEvents(node, wi, isDone, isLocked, healingTier) {
     node.addEventListener('mouseenter', (e) => _showWorldTooltip(e, wi, isDone, isLocked, healingTier));
     node.addEventListener('mousemove', (e) => _trackTooltipToMouse(e));
     node.addEventListener('mouseleave', () => _hideWorldTooltip());
@@ -1445,7 +1449,7 @@ export function _attachNodeTooltipEvents(node, wi, isDone, isLocked, healingTier
  * @param {number} wi - World index
  * @returns {HTMLElement}
  */
-export function _buildWorldNode(pos, wi) {
+function _buildWorldNode(pos, wi) {
     const canvas = document.getElementById('mv-canvas');
     const isDone = _isWorldComplete(wi);
     const isLocked = !_isWorldAccessible(wi);
@@ -1489,7 +1493,7 @@ export function _buildWorldNode(pos, wi) {
  *
  * @param {number} wi - World index
  */
-export function _onWorldNodeClick(wi) {
+function _onWorldNodeClick(wi) {
     // Double-click enters the world directly, skipping the walk-to-node
     // + enter-button step (parity with the old level-select grid, where
     // clicking the current level opened it immediately).
@@ -1519,7 +1523,7 @@ export function _onWorldNodeClick(wi) {
  * @param {number}          svgH - SVG viewBox height
  * @returns {string} SVG points attribute value
  */
-export function _waypointsToSVGPoints(waypoints, canvas, svgW, svgH) {
+function _waypointsToSVGPoints(waypoints, canvas, svgW, svgH) {
     return waypoints.map(p => {
         const { x, y } = _imgPctToCanvasPct(p.x, p.y, canvas);
         return `${x / 100 * svgW} ${y / 100 * svgH}`;
@@ -1534,11 +1538,14 @@ export function _waypointsToSVGPoints(waypoints, canvas, svgW, svgH) {
  * Clears and redraws all road segments as SVG polylines.
  * Called once on build and again whenever the canvas resizes.
  *
+ * ⚠ SUSPECTED DEAD CODE (R3 2026-09-24): retained under the no-delete rule;
+ * the SVG path builder currently short-circuits without drawing.
+ *
  * @param {SVGElement} svg - The SVG layer element
  * @param {number}     w   - Canvas width in pixels
  * @param {number}     h   - Canvas height in pixels
  */
-export function _drawAllPaths(svg, w, h) {
+function _drawAllPaths(svg, w, h) {
     svg.innerHTML = '';
     const canvas = document.getElementById('mv-canvas');
 
@@ -1566,7 +1573,7 @@ export function _drawAllPaths(svg, w, h) {
  * @param {HTMLElement} canvas - Parent canvas element
  * @returns {SVGElement|null}
  */
-export function _buildPathsSVG(canvas) {
+function _buildPathsSVG(canvas) {
     return null;
 }
 
@@ -1576,7 +1583,7 @@ export function _buildPathsSVG(canvas) {
  *
  * @returns {HTMLElement}
  */
-export function _buildHomeMarker() {
+function _buildHomeMarker() {
     const marker = document.createElement('div');
     marker.className = 'mv-home-marker';
     marker.style.left = MAP_HOME_POS.x + '%';
@@ -1595,7 +1602,7 @@ export function _buildHomeMarker() {
  *
  * @returns {HTMLElement}
  */
-export function _buildOutpostLabel() {
+function _buildOutpostLabel() {
     const label = document.createElement('div');
     label.className = 'mv-outpost-label';
     label.style.left = MAP_HOME_POS.x + '%';
@@ -1609,7 +1616,7 @@ export function _buildOutpostLabel() {
  *
  * @param {HTMLElement} canvas
  */
-export function _appendWorldNodes(canvas) {
+function _appendWorldNodes(canvas) {
     MAP_WORLD_POSITIONS.forEach((pos, wi) => {
         // Skip worlds for which no data exists yet (but always include the Nexus)
         if (wi >= (globalThis.WORLDS ? globalThis.WORLDS.length : 0) && wi < 13) return;
@@ -1625,7 +1632,7 @@ export function _appendWorldNodes(canvas) {
  *
  * @param {HTMLElement} canvas
  */
-export function _attachWaypointDebugLogger(canvas) {
+function _attachWaypointDebugLogger(canvas) {
     canvas.addEventListener('click', (e) => {
         const rect = canvas.getBoundingClientRect();
         const cw = canvas.offsetWidth;
@@ -1660,7 +1667,7 @@ export function _attachWaypointDebugLogger(canvas) {
  * Repositions all map elements (nodes, home marker, sprite, paths) after
  * a canvas resize. Called by the ResizeObserver.
  */
-export function _repositionAllMapElements() {
+function _repositionAllMapElements() {
     const canvas = document.getElementById('mv-canvas');
     if (!canvas) return;
 
@@ -1693,7 +1700,7 @@ export function _repositionAllMapElements() {
  *
  * @param {HTMLElement} canvas
  */
-export function _attachResizeObserver(canvas) {
+function _attachResizeObserver(canvas) {
     if (window._mvResizeObserver) window._mvResizeObserver.disconnect();
     window._mvResizeObserver = new globalThis.ResizeObserver(() => _repositionAllMapElements());
     window._mvResizeObserver.observe(canvas);
@@ -1703,7 +1710,7 @@ export function _attachResizeObserver(canvas) {
  * Builds the entire map canvas and all its child elements from scratch.
  * Clears any previous canvas content first.
  */
-export function _buildMapCanvas() {
+function _buildMapCanvas() {
     const wrap = document.getElementById('mv-canvas-wrap');
     if (!wrap) return;
     wrap.innerHTML = '';
@@ -1740,7 +1747,7 @@ export function _buildMapCanvas() {
 /**
  * Populates the active mods row in the map view top bar.
  */
-export function _renderTopBarMods() {
+function _renderTopBarMods() {
     const modEl = document.getElementById('mv-ls-mods');
     const diffEl = document.getElementById('mv-ls-diff');
     if (!modEl || !diffEl) return;
@@ -1851,7 +1858,7 @@ export function _wireTopBarButtons(p = 'mv') {
  * Builds / updates the entire map view top bar.
  * Renders all stat widgets and wires up navigation buttons.
  */
-export function _buildMapViewTopBar() {
+function _buildMapViewTopBar() {
     _renderTopBarMods();
     _renderTopBarScore();
     _renderTopBarNextCode();
@@ -1879,7 +1886,7 @@ export function _buildMapViewTopBar() {
  * Updates the text and active-state class of all map-view toggle buttons
  * based on the current view mode stored in STATE.
  */
-export function _updateToggleButtonLabels() {
+function _updateToggleButtonLabels() {
     const isMap = STATE && STATE.mapViewEnabled;
     const label = isMap ? t('scr_btn_list') : t('scr_btn_map');
 
@@ -1896,7 +1903,7 @@ export function _updateToggleButtonLabels() {
  * NOTE: calls showMapView(), which is defined below in the "Entry Point"
  * section - see refactor summary for why this forward-reference is kept.
  */
-export function toggleMapView() {
+function toggleMapView() {
     if (!STATE) return;
 
     STATE.mapViewEnabled = !STATE.mapViewEnabled;

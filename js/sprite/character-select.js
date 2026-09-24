@@ -1,10 +1,10 @@
 import { _ensureTooltipElement, _hideWorldTooltip, _trackTooltipToMouse } from '../screens/screens-map-view.js';
 import { switchScreen } from '../screens/screens.js';
-import { save } from '../state.js';
+import { save, reconcilePassiveTreeForClass } from '../state.js';
 import { showBeat } from '../storyline/storyline-engine.js';
 import { unlockReplayIntroBundle } from '../storyline/storyline-progress.js';
 import { _tipAttr } from '../tooltips-hud.js';
-import { LANG } from '../translation/translations.js';
+import { LANG, t } from '../translation/translations.js';
 import { _getPlayerCharacterImage, _updateLSAvatarImage } from './player_sprite.js';
 import { STATE } from '../state.js';
 
@@ -307,6 +307,7 @@ function _csiConfirmSelection(selectedId, onSelect) {
     // hover tooltip would ride along on top of the cinematic.
     _csiHideTip();
     STATE.playerCharacter = selectedId;
+    reconcilePassiveTreeForClass(true);
     // Picking any character permanently unlocks the opening cinematic and
     // all three character-intro replays in the Replay Gallery, regardless
     // of which save slot is active (see storyline-engine.js).
@@ -350,6 +351,7 @@ function _buildCharacterSelectUI(onSelect) {
                 </button>`;
             }).join('')}
             <div class="csi-bottom">
+                <div class="cs-tree-start-hint" data-t="scr_character_select_tree_hint">${t('scr_character_select_tree_hint')}</div>
                 <button class="cs-confirm-btn disabled" id="cs-confirm-btn" disabled>
                     ${lang === 'de' ? '▶ BESTÄTIGEN' : '▶ CONFIRM'}
                 </button>
@@ -413,6 +415,7 @@ function _buildCharacterSelectCardsUI(onSelect) {
 
     container.innerHTML = `
         <div class="cs-title" data-t="cs_title">${lang === 'de' ? 'WÄHLE DEINEN CHARAKTER' : 'CHOOSE YOUR CHARACTER'}</div>
+        <div class="cs-tree-start-hint" data-t="scr_character_select_tree_hint">${t('scr_character_select_tree_hint')}</div>
         <div class="cs-cards" id="cs-cards"></div>
         <button class="cs-confirm-btn disabled" id="cs-confirm-btn" disabled>
             ${lang === 'de' ? '▶ BESTÄTIGEN' : '▶ CONFIRM'}

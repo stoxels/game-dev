@@ -3426,351 +3426,409 @@ export const MATH_GATE_POOLS = {
 
     12: [
         {
-            q: 'n = 7, sum xi = 28. Compute xbar.',
-            qDE: 'n = 7, sum xi = 28. Berechne xquer.',
+            q: 'A data set contains n=7 observations, with Σᵢ₌₁ⁿ xᵢ = 28. Compute the sample mean x̄ and enter the numeric value.',
+            qDE: 'Ein Datensatz besteht aus n=7 Beobachtungen, wobei Σᵢ₌₁ⁿ xᵢ = 28 gilt. Berechne den Stichprobenmittelwert x̄ und gib den Zahlenwert ein.',
             answer: 4, tolerance: 0.001, unit: '',
-            hintEn: 'x̄ = 28/7 = 4 (slide 142).',
-            hintDE: 'x̄ = 28/7 = 4 (Folie 142).',
-            explain: 'x̄ = 28/7 = 4.',
-            explainDE: 'x̄ = 28/7 = 4.'
+            hintEn: 'Divide the sum of the observations by their number: x̄ = 28/7 = 4.',
+            hintDE: 'Teile die Summe der Beobachtungen durch ihre Anzahl: x̄ = 28/7 = 4.',
+            explain: 'The sample mean is the sum of all x values divided by the sample size. Thus x̄ = Σᵢ₌₁ⁿ xᵢ/n = 28/7 = 4.',
+            explainDE: 'Der Stichprobenmittelwert ist die Summe aller x-Werte geteilt durch den Stichprobenumfang. Somit gilt x̄ = Σᵢ₌₁ⁿ xᵢ/n = 28/7 = 4.'
         },
         {
-            q: 'sum xi*yi = 93.5, n·xbar·ybar = 7·4·2.91429 = 81.6. Numerator of b_hat = ? Round to 2 decimals.',
-            qDE: 'sum xi*yi = 93,5, n·xquer·yquer = 7·4·2,91429 = 81,6. Zaehler von b-Dach = ? Auf 2 Dezimalen.',
+            q: 'For the centered cross-product S_xy = Σᵢxᵢyᵢ − nx̄ȳ, the displayed quantities are Σᵢxᵢyᵢ = 93.50 and nx̄ȳ = 81.60. Compute S_xy, rounded to two decimal places.',
+            qDE: 'Für das zentrierte Kreuzprodukt S_xy = Σᵢxᵢyᵢ − nx̄ȳ sind die angegebenen Größen Σᵢxᵢyᵢ = 93,50 und nx̄ȳ = 81,60. Berechne S_xy, gerundet auf zwei Dezimalstellen.',
             answer: 11.9, tolerance: 0.15, unit: '',
-            hintEn: '93.5 − 81.6 = 11.9 (≈12.02 with unrounded ȳ).',
-            hintDE: '93,5 − 81,6 = 11,9 (≈12,02 mit ungerundetem ȳ).',
-            explain: 'Numerator ≈ 12.02 → b̂ ≈ 0.4293.',
-            explainDE: 'Zähler ≈ 12,02 → b̂ ≈ 0,4293.'
+            hintEn: 'Subtract the displayed quantities: S_xy = 93.50 − 81.60 = 11.90.',
+            hintDE: 'Subtrahiere die angegebenen Größen: S_xy = 93,50 − 81,60 = 11,90.',
+            explain: 'Using exactly the displayed values, S_xy = Σᵢxᵢyᵢ − nx̄ȳ = 93.50 − 81.60 = 11.90. This is the numerator used in the least-squares slope b̂ = S_xy/S_x².',
+            explainDE: 'Mit genau den angegebenen Werten gilt S_xy = Σᵢxᵢyᵢ − nx̄ȳ = 93,50 − 81,60 = 11,90. Dieser Wert ist der Zähler in der Kleinste-Quadrate-Steigung b̂ = S_xy/S_x².'
         },
         {
-            q: 'Denominator sum xi² − n·xbar² = 140 − 7·16 = ?',
-            qDE: 'Nenner sum xi² − n·xquer² = 140 − 7·16 = ?',
+            q: 'For n=7 observations, Σᵢxᵢ² = 140 and x̄ = 4. Compute the centered sum S_x² = Σᵢ(xᵢ−x̄)² using S_x² = Σᵢxᵢ² − nx̄².',
+            qDE: 'Für n=7 Beobachtungen gelten Σᵢxᵢ² = 140 und x̄ = 4. Berechne die zentrierte Summe S_x² = Σᵢ(xᵢ−x̄)² mit S_x² = Σᵢxᵢ² − nx̄².',
             answer: 28, tolerance: 0, unit: '',
-            hintEn: '140 − 112 = 28.',
-            hintDE: '140 − 112 = 28.',
-            explain: 'Denominator = 28, so b̂ = 12.02/28 ≈ 0.4293.',
-            explainDE: 'Nenner = 28, also b̂ = 12,02/28 ≈ 0,4293.'
+            hintEn: 'First compute nx̄² = 7·4² = 112, then subtract: S_x² = 140 − 112 = 28.',
+            hintDE: 'Berechne zuerst nx̄² = 7·4² = 112 und ziehe dann ab: S_x² = 140 − 112 = 28.',
+            explain: 'The shortcut avoids computing every squared deviation. It gives S_x² = 140 − 7·16 = 28, which measures the total centered variation in the predictor.',
+            explainDE: 'Diese Abkürzung erspart die Berechnung jedes einzelnen quadrierten Abweichung. Sie liefert S_x² = 140 − 7·16 = 28 und misst damit die gesamte zentrierte Streuung der Prädiktorvariablen.'
         },
         {
-            q: 'ybar = 2.91429, b_hat = 0.4293, xbar = 4. Compute a_hat = ybar − b·xbar. Round to 2 decimals.',
-            qDE: 'yquer = 2,91429, b-Dach = 0,4293, xquer = 4. Berechne a-Dach = yquer − b·xquer. Auf 2 Dezimalen.',
+            q: 'A least-squares line has ȳ = 2.91429, estimated slope b̂ = 0.4293 and x̄ = 4. Compute the intercept â = ȳ − b̂x̄, rounded to two decimal places.',
+            qDE: 'Eine Ausgleichsgerade hat ȳ = 2,91429, die geschätzte Steigung b̂ = 0,4293 und x̄ = 4. Berechne den Achsenabschnitt â = ȳ − b̂x̄, gerundet auf zwei Dezimalstellen.',
             answer: 1.2, tolerance: 0.05, unit: '',
-            hintEn: '2.91429 − 0.4293·4 = 2.91429 − 1.7172 ≈ 1.19.',
-            hintDE: '2,91429 − 0,4293·4 = 2,91429 − 1,7172 ≈ 1,19.',
-            explain: 'â ≈ 1.1928.',
-            explainDE: 'â ≈ 1,1928.'
+            hintEn: 'â = 2.91429 − (0.4293·4) = 2.91429 − 1.71720 = 1.19709 ≈ 1.20.',
+            hintDE: 'â = 2,91429 − (0,4293·4) = 2,91429 − 1,71720 = 1,19709 ≈ 1,20.',
+            explain: 'The slope contribution at the mean predictor is 0.4293·4 = 1.71720. Subtracting it from ȳ gives 1.19709, which rounds to 1.20.',
+            explainDE: 'Der Steigungsbeitrag am mittleren Prädiktorwert beträgt 0,4293·4 = 1,71720. Die Subtraktion von ȳ ergibt 1,19709; auf zwei Dezimalstellen gerundet erhält man 1,20.'
         },
         {
-            q: 'r = 0.6, n = 12. Compute T = r·sqrt(n−2)/sqrt(1−r²). Round to 2 decimals.',
-            qDE: 'r = 0,6, n = 12. Berechne T = r·sqrt(n−2)/sqrt(1−r²). Auf 2 Dezimalen.',
+            q: 'A sample has correlation r = 0.6 and size n = 12. Compute T = r√(n−2)/√(1−r²), rounded to two decimal places.',
+            qDE: 'Eine Stichprobe hat den Korrelationskoeffizienten r = 0,6 und den Umfang n = 12. Berechne T = r√(n−2)/√(1−r²), gerundet auf zwei Dezimalstellen.',
             answer: 2.37, tolerance: 0.05, unit: '',
-            hintEn: 'T = 0.6·√10/√0.64 = 0.6·3.162/0.8 ≈ 2.37.',
-            hintDE: 'T = 0,6·√10/√0,64 = 0,6·3,162/0,8 ≈ 2,37.',
-            explain: 'Compare |T| to t(10) critical value.',
-            explainDE: 'Vergleiche |T| mit t(10)-Quantil.'
+            hintEn: 'T = 0.6√10/√0.64 ≈ 1.89737/0.8 ≈ 2.37.',
+            hintDE: 'T = 0,6√10/√0,64 ≈ 1,89737/0,8 ≈ 2,37.',
+            explain: 'Substituting the values gives T ≈ 2.37. To decide about H₀: ρ = 0, compare |T| with the appropriate critical value from a t-distribution with n−2 = 10 degrees of freedom.',
+            explainDE: 'Einsetzen der Werte ergibt T ≈ 2,37. Um über H₀: ρ = 0 zu entscheiden, wird |T| mit dem passenden kritischen Wert einer t-Verteilung mit n−2 = 10 Freiheitsgraden verglichen.'
         },
         {
-            q: 'Correlation test with n = 27. Degrees of freedom of T under H0?',
-            qDE: 'Korrelationstest mit n = 27. Freiheitsgrade von T unter H0?',
+            q: 'For a two-sided correlation test based on n=27 paired observations, how many degrees of freedom does the test statistic T have under H₀?',
+            qDE: 'Wie viele Freiheitsgrade hat die Teststatistik T eines zweiseitigen Korrelationstests mit n=27 gepaarten Beobachtungen unter H₀?',
             answer: 25, tolerance: 0, unit: '',
-            hintEn: 'df = n − 2 = 25.',
-            hintDE: 'df = n − 2 = 25.',
-            explain: 'T ~ t(n−2).',
-            explainDE: 'T ~ t(n−2).'
+            hintEn: 'A correlation test loses one degree of freedom for the estimated mean of each variable, so df = n−2.',
+            hintDE: 'Beim Korrelationstest geht für den geschätzten Mittelwert jeder Variablen ein Freiheitsgrad verloren, also df = n−2.',
+            explain: 'Under H₀: ρ = 0, the statistic follows a t-distribution with n−2 degrees of freedom. Here 27−2 = 25.',
+            explainDE: 'Unter H₀: ρ = 0 folgt die Statistik einer t-Verteilung mit n−2 Freiheitsgraden. Hier sind das 27−2 = 25.'
         },
         {
-            q: 'sxy = 12.02, s_x² = 4. Compute b_hat = sxy/(n·s_x²)? No - use b = 12.02/28. Round to 3 decimals.',
-            qDE: 'b = 12,02/28. Runde auf 3 Dezimalen.',
+            q: 'For n=7 and S_xy=12.02, the sample variance is s_x²=4, where s_x² = (1/n)Σᵢ(xᵢ−x̄)². Compute b̂ = S_xy/(n·s_x²), rounded to three decimal places.',
+            qDE: 'Für n=7 und S_xy=12,02 ist die Stichprobenvarianz s_x²=4, wobei s_x² = (1/n)Σᵢ(xᵢ−x̄)² gilt. Berechne b̂ = S_xy/(n·s_x²), gerundet auf drei Dezimalstellen.',
             answer: 0.429, tolerance: 0.002, unit: '',
-            hintEn: '12.02/28 ≈ 0.4293.',
-            hintDE: '12,02/28 ≈ 0,4293.',
-            explain: 'Matches slide 142.',
-            explainDE: 'Wie Folie 142.'
+            hintEn: 'First calculate n·s_x² = 7·4 = 28. Then b̂ = 12.02/(7·4) = 12.02/28 ≈ 0.429286.',
+            hintDE: 'Berechne zuerst n·s_x² = 7·4 = 28. Dann gilt b̂ = 12,02/(7·4) = 12,02/28 ≈ 0,429286.',
+            explain: 'Because s_x²=4 already includes the factor 1/n, the slope denominator is n·s_x²=7·4=28. Thus b̂ = 12.02/28 = 0.4292857…, which rounds to 0.429 at three decimal places.',
+            explainDE: 'Da s_x²=4 den Faktor 1/n bereits enthält, ist der Nenner der Steigung n·s_x²=7·4=28. Somit gilt b̂ = 12,02/28 = 0,4292857… und rundet auf drei Dezimalstellen zu 0,429.'
         },
         {
-            q: 'SSR = 30, SST = 50. Compute R². Round to 2 decimals.',
-            qDE: 'SSR = 30, SST = 50. Berechne R². Auf 2 Dezimalen.',
+            q: 'A simple linear regression has SSR=30 and SST=50. Compute R² = SSR/SST, rounded to two decimal places.',
+            qDE: 'Eine einfache lineare Regression hat SSR=30 und SST=50. Berechne R² = SSR/SST, gerundet auf zwei Dezimalstellen.',
             answer: 0.6, tolerance: 0.01, unit: '',
-            hintEn: 'R² = SSR/SST = 30/50 = 0.6.',
-            hintDE: 'R² = SSR/SST = 30/50 = 0,6.',
-            explain: 'R² = r²_XY.',
-            explainDE: 'R² = r²_XY.'
+            hintEn: 'R² is the explained share of total variation: R² = 30/50 = 0.60.',
+            hintDE: 'R² ist der erklärte Anteil der Gesamtstreuung: R² = 30/50 = 0,60.',
+            explain: 'The regression explains SSR/SST = 30/50 = 0.60 of the total response variation. Equivalently, R² = r² in simple linear regression.',
+            explainDE: 'Die Regression erklärt SSR/SST = 30/50 = 0,60 der gesamten Streuung der Zielvariablen. Äquivalent gilt in der einfachen linearen Regression R² = r².'
         },
         {
-            q: 'SST = 100, SSR = 64. Compute SSE = SST − SSR.',
-            qDE: 'SST = 100, SSR = 64. Berechne SSE = SST − SSR.',
+            q: 'A least-squares decomposition has SST=100 and SSR=64. Compute the error sum of squares SSE = SST−SSR and enter the numeric value.',
+            qDE: 'Eine Kleinste-Quadrate-Zerlegung hat SST=100 und SSR=64. Berechne die Fehlersumme der Quadrate SSE = SST−SSR und gib den Zahlenwert ein.',
             answer: 36, tolerance: 0, unit: '',
-            hintEn: '100 − 64 = 36.',
-            hintDE: '100 − 64 = 36.',
-            explain: 'SST = SSR + SSE.',
-            explainDE: 'SST = SSR + SSE.'
+            hintEn: 'Subtract the explained sum of squares from the total: SSE = 100−64 = 36.',
+            hintDE: 'Subtrahiere die erklärte Quadratsumme von der Gesamtquadratsumme: SSE = 100−64 = 36.',
+            explain: 'The decomposition SST = SSR + SSE gives SSE = 100−64 = 36. This part of the total variation is not explained by the fitted line.',
+            explainDE: 'Aus der Zerlegung SST = SSR + SSE folgt SSE = 100−64 = 36. Dieser Anteil der Gesamtstreuung wird von der Ausgleichsgeraden nicht erklärt.'
         },
         {
-            q: 'a_hat = 1.1928, b_hat = 0.4293. Predict y_hat at x = 7. Round to 2 decimals.',
-            qDE: 'a-Dach = 1,1928, b-Dach = 0,4293. Prognose y-Dach an x = 7. Auf 2 Dezimalen.',
+            q: 'A fitted line is ŷ = 1.1928 + 0.4293x. Compute the fitted value ŷ at x=7, rounded to two decimal places.',
+            qDE: 'Eine Ausgleichsgerade ist ŷ = 1,1928 + 0,4293x. Berechne den Prognosewert ŷ für x=7, gerundet auf zwei Dezimalstellen.',
             answer: 4.2, tolerance: 0.05, unit: '',
-            hintEn: '1.1928 + 0.4293·7 = 1.1928 + 3.0051 ≈ 4.20.',
-            hintDE: '1,1928 + 0,4293·7 = 1,1928 + 3,0051 ≈ 4,20.',
-            explain: 'Fitted value on the regression line.',
-            explainDE: 'Prognosewert auf der Ausgleichsgeraden.'
+            hintEn: 'Substitute x=7: ŷ = 1.1928 + 0.4293·7 = 1.1928 + 3.0051 = 4.1979.',
+            hintDE: 'Setze x=7 ein: ŷ = 1,1928 + 0,4293·7 = 1,1928 + 3,0051 = 4,1979.',
+            explain: 'The fitted value is the line evaluated at x=7. The unrounded result 4.1979 rounds to 4.20.',
+            explainDE: 'Der Prognosewert ergibt sich durch Einsetzen von x=7 in die Gerade. Das ungerundete Ergebnis 4,1979 rundet zu 4,20.'
         },
         {
-            q: 'Residual: y = 4.6, y_hat = 4.2. Compute e_hat = y − y_hat. Round to 2 decimals.',
-            qDE: 'Residuum: y = 4,6, y-Dach = 4,2. Berechne e-Dach = y − y-Dach. Auf 2 Dezimalen.',
+            q: 'An observation has observed value y=4.6 and fitted value ŷ=4.2. Compute the residual ê = y−ŷ, rounded to two decimal places.',
+            qDE: 'Eine Beobachtung hat den Wert y=4,6 und den Prognosewert ŷ=4,2. Berechne das Residuum ê = y−ŷ, gerundet auf zwei Dezimalstellen.',
             answer: 0.4, tolerance: 0.02, unit: '',
-            hintEn: '4.6 − 4.2 = 0.4.',
-            hintDE: '4,6 − 4,2 = 0,4.',
-            explain: 'êᵢ = yᵢ − ŷᵢ.',
-            explainDE: 'êᵢ = yᵢ − ŷᵢ.'
+            hintEn: 'Observed minus fitted gives ê = 4.6−4.2 = 0.4.',
+            hintDE: 'Beobachteter Wert minus Prognosewert ergibt ê = 4,6−4,2 = 0,4.',
+            explain: 'A residual is the observed value minus the fitted value. The positive result 0.4 means this observation lies 0.4 units above the fitted line.',
+            explainDE: 'Ein Residuum ist der beobachtete Wert minus den vorhergesagten Wert. Das positive Ergebnis 0,4 bedeutet, dass diese Beobachtung 0,4 Einheiten über der Ausgleichsgeraden liegt.'
         },
         {
-            q: 'Two-sided correlation test, |T| = 2.5, critical t(n−2)_{1−α/2} = 2.06. Reject H0? Enter 1 yes, 0 no.',
-            qDE: 'Zweiseitiger Korrelationstest, |T| = 2,5, kritisch 2,06. H0 verwerfen? 1 ja, 0 nein.',
+            q: 'In a two-sided correlation test of H₀: ρ=0 at α=0.05, |T|=2.5 and the critical value is t_{n−2;1−α/2}=2.06. Is H₀ rejected? Enter 1 for yes or 0 for no.',
+            qDE: 'In einem zweiseitigen Korrelationstest für H₀: ρ=0 bei α=0,05 gilt |T|=2,5 und der kritische Wert ist t_{n−2;1−α/2}=2,06. Wird H₀ verworfen? Gib 1 für ja oder 0 für nein ein.',
             answer: 1, tolerance: 0, unit: '',
-            hintEn: '|T| > critical → reject.',
-            hintDE: '|T| > kritisch → verwerfen.',
-            explain: '2.5 > 2.06 → reject H0: ρ = 0.',
-            explainDE: '2,5 > 2,06 → H0: ρ = 0 verwerfen.'
+            hintEn: 'Compare the magnitude of T with the critical value: 2.5>2.06, so reject H₀.',
+            hintDE: 'Vergleiche den Betrag von T mit dem kritischen Wert: 2,5>2,06, also wird H₀ verworfen.',
+            explain: 'The rejection condition is |T|>t_{n−2;1−α/2}. Since 2.5>2.06, the data provide statistically significant evidence against H₀: ρ=0, so the required entry is 1.',
+            explainDE: 'Die Verwerfungsbedingung lautet |T|>t_{n−2;1−α/2}. Da 2,5>2,06, liefern die Daten statistisch signifikante Evidenz gegen H₀: ρ=0; die einzugebende Antwort ist daher 1.'
         },
     ],
 
 
 
-    // WORLD 13 UNSORTED
     13: [
         {
-            q: 'Var(2X) = ? if Var(X) = 9. Enter the numeric value.',
-            qDE: 'Var(2X) = ? wenn Var(X) = 9. Gib den numerischen Wert ein.',
+            q: 'If Var(X)=9, what is Var(2X)? Enter the numeric value.',
+            qDE: 'Wenn Var(X)=9 gilt, wie groß ist Var(2X)? Gib den Zahlenwert ein.',
             answer: 36, tolerance: 0, unit: '',
-            hintEn: 'Var(aX) = a²·Var(X) = 4 × 9 = 36.',
-            hintDE: 'Var(aX) = a²·Var(X) = 4 × 9 = 36.'
+            hintEn: 'Use Var(aX)=a²·Var(X): Var(2X)=2²·9=36.',
+            hintDE: 'Verwende Var(aX)=a²·Var(X): Var(2X)=2²·9=36.',
+            explain: 'Multiplying a random variable by a constant multiplies its variance by the square of that constant. Hence Var(2X)=2²·Var(X)=4·9=36.',
+            explainDE: 'Die Multiplikation einer Zufallsvariablen mit einer Konstante multipliziert ihre Varianz mit dem Quadrat dieser Konstante. Daher gilt Var(2X)=2²·Var(X)=4·9=36.'
         },
         {
-            q: 'E[X²] = 10 and E[X] = 2. What is Var(X)? (Use Var(X) = E[X²] − (E[X])²)',
-            qDE: 'E[X²] = 10 und E[X] = 2. Wie groß ist Var(X)? (Var(X) = E[X²] − (E[X])²)',
+            q: 'Given E[X²]=10 and E[X]=2, compute Var(X) using Var(X)=E[X²]−(E[X])². Enter the numeric value.',
+            qDE: 'Gegeben sind E[X²]=10 und E[X]=2. Berechne Var(X) mit Var(X)=E[X²]−(E[X])². Gib den Zahlenwert ein.',
             answer: 6, tolerance: 0.01, unit: '',
-            hintEn: 'Var(X) = 10 − 2² = 10 − 4 = 6.',
-            hintDE: 'Var(X) = 10 − 2² = 10 − 4 = 6.'
+            hintEn: 'Subtract the squared mean from the second moment: Var(X)=10−2²=10−4=6.',
+            hintDE: 'Subtrahiere das Quadrat des Erwartungswerts vom zweiten Moment: Var(X)=10−2²=10−4=6.',
+            explain: 'The variance is the second moment minus the square of the mean. Substituting the given values gives Var(X)=10−2²=6.',
+            explainDE: 'Die Varianz ist das zweite Moment minus das Quadrat des Erwartungswerts. Mit den gegebenen Werten ergibt sich Var(X)=10−2²=6.'
         },
         {
-            q: 'P(A|B) = 0.4, P(B) = 0.5, P(A) = 0.3. What is P(B|A)? Use Bayes. Round to 2 decimal places.',
-            qDE: 'P(A|B) = 0,4, P(B) = 0,5, P(A) = 0,3. Wie groß ist P(B|A)? Verwende die Bayesregel. Runde auf 2 Dezimalstellen.',
+            q: 'Given P(A|B)=0.4, P(B)=0.5, and P(A)=0.3, compute P(B|A) using the Bayes formula. Round to two decimal places.',
+            qDE: 'Gegeben sind P(A|B)=0,4, P(B)=0,5 und P(A)=0,3. Berechne P(B|A) mit der Bayesregel. Runde auf zwei Dezimalstellen.',
             answer: 0.67, tolerance: 0.01, unit: '',
-            hintEn: 'P(B|A) = P(A|B)·P(B)/P(A) = (0.4 × 0.5)/0.3 = 0.2/0.3 ≈ 0.67.',
-            hintDE: 'P(B|A) = P(A|B)·P(B)/P(A) = (0,4 × 0,5)/0,3 = 0,2/0,3 ≈ 0,67.'
+            hintEn: 'P(B|A)=P(A|B)·P(B)/P(A)=(0.4×0.5)/0.3=0.2/0.3≈0.67.',
+            hintDE: 'P(B|A)=P(A|B)·P(B)/P(A)=(0,4×0,5)/0,3=0,2/0,3≈0,67.',
+            explain: 'Bayes’ formula reverses the given conditional probability: P(B|A)=P(A|B)P(B)/P(A)=(0.4·0.5)/0.3=0.666…, which rounds to 0.67.',
+            explainDE: 'Die Bayesregel dreht die gegebene bedingte Wahrscheinlichkeit um: P(B|A)=P(A|B)P(B)/P(A)=(0,4·0,5)/0,3=0,666…; auf zwei Dezimalstellen gerundet ergibt sich 0,67.'
         },
         {
-            q: 'X and Y are independent with E[X]=3 and E[Y]=4. What is E[X·Y]?',
-            qDE: 'X und Y sind unabhängig mit E[X]=3 und E[Y]=4. Wie groß ist E[X·Y]?',
+            q: 'If X and Y are independent and E[X]=3 and E[Y]=4, compute E[XY]. Enter the numeric value.',
+            qDE: 'Wenn X und Y unabhängig sind und E[X]=3 sowie E[Y]=4 gilt, berechne E[XY]. Gib den Zahlenwert ein.',
             answer: 12, tolerance: 0, unit: '',
-            hintEn: 'For independent RVs: E[XY] = E[X]·E[Y] = 3 × 4 = 12.',
-            hintDE: 'Für unabhängige ZVs: E[XY] = E[X]·E[Y] = 3 × 4 = 12.'
+            hintEn: 'Independence gives E[XY]=E[X]·E[Y]=3·4=12.',
+            hintDE: 'Unabhängigkeit liefert E[XY]=E[X]·E[Y]=3·4=12.',
+            explain: 'For independent random variables, the expectation of a product factors into the product of the expectations. Thus E[XY]=3·4=12.',
+            explainDE: 'Für unabhängige Zufallsvariablen zerfällt der Erwartungswert eines Produkts in das Produkt der Erwartungswerte. Daher gilt E[XY]=3·4=12.'
         },
         {
-            q: 'What is the variance of a standard normal distribution N(0,1)?',
-            qDE: 'Wie groß ist die Varianz der Standardnormalverteilung N(0,1)?',
+            q: 'What is the variance of a random variable distributed according to the standard normal distribution N(0,1)? Enter the numeric value.',
+            qDE: 'Wie groß ist die Varianz einer Zufallsvariablen mit Standardnormalverteilung N(0,1)? Gib den Zahlenwert ein.',
             answer: 1, tolerance: 0, unit: '',
-            hintEn: 'By definition, N(0,1) has mean 0 and variance 1.',
-            hintDE: 'Per Definition hat N(0,1) Mittelwert 0 und Varianz 1.'
+            hintEn: 'In N(0,1), the second parameter is the variance, so Var(X)=1.',
+            hintDE: 'Bei N(0,1) ist der zweite Parameter die Varianz, also Var(X)=1.',
+            explain: 'The notation N(0,1) specifies mean 0 and variance 1. Therefore the requested variance is exactly 1.',
+            explainDE: 'Die Notation N(0,1) gibt Erwartungswert 0 und Varianz 1 an. Die gesuchte Varianz ist daher genau 1.'
         },
         {
-            q: 'MSE = Bias² + Variance. If Bias = 2 and Variance = 3, what is the MSE?',
-            qDE: 'MSE = Bias² + Varianz. Wenn Bias = 2 und Varianz = 3, wie groß ist der MSE?',
+            q: 'If Bias=2 and Variance=3, compute the mean squared error using MSE=Bias²+Variance. Enter the numeric value.',
+            qDE: 'Wenn Bias=2 und Varianz=3 gilt, berechne den mittleren quadratischen Fehler mit MSE=Bias²+Varianz. Gib den Zahlenwert ein.',
             answer: 7, tolerance: 0, unit: '',
-            hintEn: 'MSE = 2² + 3 = 4 + 3 = 7.',
-            hintDE: 'MSE = 2² + 3 = 4 + 3 = 7.'
+            hintEn: 'MSE=2²+3=4+3=7.',
+            hintDE: 'MSE=2²+3=4+3=7.',
+            explain: 'The bias–variance decomposition adds the squared bias to the variance. Here MSE=2²+3=4+3=7.',
+            explainDE: 'Die Bias-Varianz-Zerlegung addiert das Quadrat des Bias zur Varianz. Hier gilt MSE=2²+3=4+3=7.'
         },
         {
-            q: 'For a Poisson process with rate λ=2 per hour, what is the expected number of events in 3 hours?',
-            qDE: 'Für einen Poisson-Prozess mit Rate λ=2 pro Stunde, wie viele Ereignisse werden in 3 Stunden erwartet?',
+            q: 'For a Poisson process with rate λ=2 events per hour, how many events are expected in 3 hours? Enter the expected number.',
+            qDE: 'Für einen Poisson-Prozess mit einer Rate von λ=2 Ereignissen pro Stunde: Wie viele Ereignisse werden in 3 Stunden erwartet? Gib die erwartete Anzahl ein.',
             answer: 6, tolerance: 0, unit: 'events',
-            hintEn: 'E[events] = λ·t = 2 × 3 = 6.',
-            hintDE: 'E[Ereignisse] = λ·t = 2 × 3 = 6.'
+            hintEn: 'For a Poisson count, E[events]=λ·t=2·3=6.',
+            hintDE: 'Für eine Poisson-Anzahl gilt E[Ereignisse]=λ·t=2·3=6.',
+            explain: 'A Poisson process with constant rate λ has expected count λt over an interval of length t. Therefore three hours contain an expected 2·3=6 events.',
+            explainDE: 'Ein Poisson-Prozess mit konstanter Rate λ hat in einem Zeitintervall der Länge t die erwartete Anzahl λt. In drei Stunden werden daher 2·3=6 Ereignisse erwartet.'
         },
-
-
         {
-            q: 'Cov(X,Y) = 6, Var(X) = 9, Var(Y) = 16. What is the correlation coefficient r? Round to 2 decimal places.',
-            qDE: 'Cov(X,Y) = 6, Var(X) = 9, Var(Y) = 16. Wie groß ist der Korrelationskoeffizient r? Auf 2 Dezimalstellen gerundet.',
+            q: 'Given Cov(X,Y)=6, Var(X)=9, and Var(Y)=16, compute the correlation coefficient ρ. Round to two decimal places.',
+            qDE: 'Gegeben sind Cov(X,Y)=6, Var(X)=9 und Var(Y)=16. Berechne den Korrelationskoeffizienten ρ. Runde auf zwei Dezimalstellen.',
             answer: 0.5, tolerance: 0.01, unit: '',
-            hintEn: 'ρ = Cov(X,Y)/(σₓ·σᵧ) = 6/(3 × 4) = 6/12 = 0.5.',
-            hintDE: 'ρ = Cov(X,Y)/(σₓ·σᵧ) = 6/(3 × 4) = 6/12 = 0,5.'
+            hintEn: 'ρ=Cov(X,Y)/(σₓ·σᵧ)=6/(3·4)=6/12=0.5.',
+            hintDE: 'ρ=Cov(X,Y)/(σₓ·σᵧ)=6/(3·4)=6/12=0,5.',
+            explain: 'The correlation is the covariance divided by the product of the two standard deviations. Here σₓ=√9=3 and σᵧ=√16=4, so ρ=6/(3·4)=0.5.',
+            explainDE: 'Die Korrelation ist die Kovarianz geteilt durch das Produkt der beiden Standardabweichungen. Hier sind σₓ=√9=3 und σᵧ=√16=4, also ρ=6/(3·4)=0,5.'
         },
 
-        // --- WORLD 13 lecture: Wilcoxon (slides 162-165) ---
         {
-            q: 'n1 = 8, n2 = 7. Total n = n1 + n2 = ?',
-            qDE: 'n1 = 8, n2 = 7. Gesamt n = n1 + n2 = ?',
+            q: 'In the independent two-sample Wilcoxon rank-sum test, n₁=8 and n₂=7. What is the pooled sample size n=n₁+n₂? Enter the numeric value.',
+            qDE: 'Im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich gelten n₁=8 und n₂=7. Wie groß ist die gepoolte Gesamtgröße n=n₁+n₂? Gib den Zahlenwert ein.',
             answer: 15, tolerance: 0, unit: '',
-            hintEn: 'n = 8 + 7 = 15.',
-            hintDE: 'n = 8 + 7 = 15.'
+            hintEn: 'Add the two independent sample sizes: n=8+7=15.',
+            hintDE: 'Addiere die beiden unabhängigen Stichprobenumfänge: n=8+7=15.',
+            explain: 'The two-sample rank-sum test pools the observations for ranking, so the pooled size is the sum of the group sizes: n=n₁+n₂=8+7=15.',
+            explainDE: 'Beim Zwei-Stichproben-Rangsummenvergleich werden die Beobachtungen zur Rangvergabe gepoolt. Daher ist die gepoolte Größe die Summe der Gruppenumfänge: n=n₁+n₂=8+7=15.'
         },
         {
-            q: 'n = 10. Rank-sum identity: R1. + R2. = n(n+1)/2 = ?',
-            qDE: 'n = 10. Rangsummen-Identität: R1. + R2. = n(n+1)/2 = ?',
+            q: 'In the independent two-sample Wilcoxon rank-sum test, the pooled sample has n=10 and no tied observations. If R₁ and R₂ are the two rank sums, compute R₁+R₂=n(n+1)/2. Enter the numeric value.',
+            qDE: 'Im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich hat die gepoolte Stichprobe n=10 und keine Rangbindungen. Wenn R₁ und R₂ die beiden Rangsummen sind, berechne R₁+R₂=n(n+1)/2. Gib den Zahlenwert ein.',
             answer: 55, tolerance: 0, unit: '',
-            hintEn: '10×11/2 = 55.',
-            hintDE: '10×11/2 = 55.'
+            hintEn: 'Use the sum of the first n ranks: n(n+1)/2=10·11/2=55.',
+            hintDE: 'Verwende die Summe der ersten n Ränge: n(n+1)/2=10·11/2=55.',
+            explain: 'The two rank sums partition the ranks 1, 2, …, n, so together they equal the triangular number n(n+1)/2=10·11/2=55.',
+            explainDE: 'Die beiden Rangsummen zerlegen die Ränge 1, 2, …, n. Zusammen ergeben sie daher die Dreieckszahl n(n+1)/2=10·11/2=55.'
         },
         {
-            q: 'n2 = 6, n = 11. Null mean E0(W) = n2(n+1)/2 = ?',
-            qDE: 'n2 = 6, n = 11. Null-Erwartung E0(W) = n2(n+1)/2 = ?',
+            q: 'In the independent two-sample Wilcoxon rank-sum test under H₀, with n₂=6, n=11, and no tied observations, compute the null mean E₀(W)=n₂(n+1)/2. Enter the numeric value.',
+            qDE: 'Im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich unter H₀ gelten n₂=6, n=11 und keine Rangbindungen. Berechne den Erwartungswert unter H₀, E₀(W)=n₂(n+1)/2. Gib den Zahlenwert ein.',
             answer: 36, tolerance: 0, unit: '',
-            hintEn: '6×12/2 = 36.',
-            hintDE: '6×12/2 = 36.'
+            hintEn: 'Substitute the sizes: E₀(W)=6·(11+1)/2=6·12/2=36.',
+            hintDE: 'Setze die Umfänge ein: E₀(W)=6·(11+1)/2=6·12/2=36.',
+            explain: 'Under H₀ and without ties, the n₂ ranks in the second sample each have mean (n+1)/2. Therefore E₀(W)=n₂(n+1)/2=6·12/2=36.',
+            explainDE: 'Unter H₀ und ohne Bindungen hat jeder der n₂ Ränge der zweiten Stichprobe den Mittelwert (n+1)/2. Daher gilt E₀(W)=n₂(n+1)/2=6·12/2=36.'
         },
         {
-            q: 'n1 = 5, n2 = 6, n = 11. Null variance Var0(W) = n1·n2(n+1)/12 = ?',
-            qDE: 'n1 = 5, n2 = 6, n = 11. Null-Varianz Var0(W) = n1·n2(n+1)/12 = ?',
+            q: 'In the independent two-sample Wilcoxon rank-sum test under H₀, with n₁=5, n₂=6, n=11, and no tied observations, compute the null variance Var₀(W)=n₁·n₂(n+1)/12. Enter the numeric value.',
+            qDE: 'Im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich unter H₀ gelten n₁=5, n₂=6, n=11 und keine Rangbindungen. Berechne die Null-Varianz Var₀(W)=n₁·n₂(n+1)/12. Gib den Zahlenwert ein.',
             answer: 30, tolerance: 0, unit: '',
-            hintEn: '5×6×12/12 = 30.',
-            hintDE: '5×6×12/12 = 30.'
+            hintEn: 'Substitute the sizes: Var₀(W)=5·6·(11+1)/12=360/12=30.',
+            hintDE: 'Setze die Umfänge ein: Var₀(W)=5·6·(11+1)/12=360/12=30.',
+            explain: 'With no ties, the null rank sum has variance n₁·n₂(n+1)/12. Substitution gives Var₀(W)=5·6·12/12=30.',
+            explainDE: 'Ohne Bindungen hat die Rangsummenstatistik unter H₀ die Varianz n₁·n₂(n+1)/12. Einsetzen ergibt Var₀(W)=5·6·12/12=30.'
         },
         {
-            q: 'W = 45, E0(W) = 36, Var0(W) = 30. T = (W−E0)/sqrt(Var0). Round to 2 decimals.',
-            qDE: 'W = 45, E0(W) = 36, Var0(W) = 30. T = (W−E0)/sqrt(Var0). Auf 2 Dezimalen.',
+            q: 'Under H₀ in the independent two-sample Wilcoxon rank-sum test with no tied observations, W=45, E₀(W)=36, and Var₀(W)=30. Compute T=(W−E₀(W))/√Var₀(W), rounded to two decimal places.',
+            qDE: 'Unter H₀ im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich ohne Rangbindungen gelten W=45, E₀(W)=36 und Var₀(W)=30. Berechne T=(W−E₀(W))/√Var₀(W), gerundet auf zwei Dezimalstellen.',
             answer: 1.64, tolerance: 0.02, unit: '',
-            hintEn: 'T = 9/√30 = 9/5.477 ≈ 1.64.',
-            hintDE: 'T = 9/√30 = 9/5,477 ≈ 1,64.'
+            hintEn: 'Center and scale W: T=(45−36)/√30=9/√30≈1.64.',
+            hintDE: 'Zentriere und skaliere W: T=(45−36)/√30=9/√30≈1,64.',
+            explain: 'Subtracting the null mean gives 45−36=9, and dividing by the null standard deviation √30 gives T=9/√30≈1.64. This is the positive standardized rank sum.',
+            explainDE: 'Die Subtraktion des Null-Erwartungswerts ergibt 45−36=9. Die Division durch die Null-Standardabweichung √30 liefert T=9/√30≈1,64. Das ist die positive standardisierte Rangsummenstatistik.'
         },
         {
-            q: '|T| = 1.64, z_{0.975} = 1.96. Reject H0 at α = 0.05? Enter 1 yes, 0 no.',
-            qDE: '|T| = 1,64, z_{0,975} = 1,96. H0 zu α = 0,05 verwerfen? 1 ja, 0 nein.',
+            q: 'For the independent two-sample Wilcoxon rank-sum test, a two-sided decision is required at α=0.05. Given |T|=1.64 and z_{1−α/2}=1.96, is H₀ rejected? Enter 1 for yes or 0 for no.',
+            qDE: 'Für den unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich ist bei α=0,05 eine zweiseitige Entscheidung nötig. Gegeben sind |T|=1,64 und z_{1−α/2}=1,96. Wird H₀ verworfen? Gib 1 für ja oder 0 für nein ein.',
             answer: 0, tolerance: 0, unit: '',
-            hintEn: '1.64 < 1.96 → not rejected.',
-            hintDE: '1,64 < 1,96 → nicht verworfen.'
+            hintEn: 'Compare the two inputs: 1.64<1.96, so H₀ is not rejected.',
+            hintDE: 'Vergleiche die beiden Eingaben: 1,64<1,96, daher wird H₀ nicht verworfen.',
+            explain: 'The two-sided rejection condition is |T|>z_{1−α/2}. Since 1.64<1.96, the statistic does not enter the rejection region, so the required entry is 0.',
+            explainDE: 'Die zweiseitige Verwerfungsbedingung lautet |T|>z_{1−α/2}. Da 1,64<1,96, liegt die Statistik nicht im Verwerfungsbereich; einzugeben ist daher 0.'
         },
-        // --- WORLD 13 lecture: contingency (slides 166-171) ---
         {
-            q: 'Row total Ni. = 40, column total N.j = 30, N = 200. Expected Êij = Ni.·N.j/N = ?',
-            qDE: 'Zeilensumme Ni. = 40, Spaltensumme N.j = 30, N = 200. Erwartet Êij = Ni.·N.j/N = ?',
+            q: 'Under H₀ of independence in a contingency table, the row total is Nᵢ⋅=40, the column total is N⋅ⱼ=30, and the grand total is N=200. Compute the expected cell count Êᵢⱼ=Nᵢ⋅·N⋅ⱼ/N. Enter the numeric value.',
+            qDE: 'Unter H₀ der Unabhängigkeit beträgt die Zeilensumme in einer Kontingenztafel Nᵢ⋅=40, die Spaltensumme N⋅ⱼ=30 und die Gesamtzahl N=200. Berechne die erwartete Zellbesetzung Êᵢⱼ=Nᵢ⋅·N⋅ⱼ/N. Gib den Zahlenwert ein.',
             answer: 6, tolerance: 0, unit: '',
-            hintEn: '40×30/200 = 6.',
-            hintDE: '40×30/200 = 6.'
+            hintEn: 'Multiply the row and column totals, then divide by the grand total: 40·30/200=6.',
+            hintDE: 'Multipliziere Zeilen- und Spaltensumme und teile durch die Gesamtzahl: 40·30/200=6.',
+            explain: 'Under independence, the expected cell count is the row total times the column total divided by the grand total: Êᵢⱼ=40·30/200=6.',
+            explainDE: 'Unter Unabhängigkeit ist die erwartete Zellbesetzung das Produkt aus Zeilen- und Spaltensumme, geteilt durch die Gesamtzahl: Êᵢⱼ=40·30/200=6.'
         },
         {
-            q: 'Nij = 14, Êij = 10. Contribution (Nij−Êij)²/Êij = ? Round to 2 decimals.',
-            qDE: 'Nij = 14, Êij = 10. Beitrag (Nij−Êij)²/Êij = ? Auf 2 Dezimalen.',
+            q: 'For one cell of a contingency table, the observed count is Nᵢⱼ=14 and the expected count is Êᵢⱼ=10. Compute its contribution (Nᵢⱼ−Êᵢⱼ)²/Êᵢⱼ, rounded to two decimal places.',
+            qDE: 'Für eine Zelle einer Kontingenztafel beträgt die beobachtete Anzahl Nᵢⱼ=14 und die erwartete Anzahl Êᵢⱼ=10. Berechne den Beitrag (Nᵢⱼ−Êᵢⱼ)²/Êᵢⱼ, gerundet auf zwei Dezimalstellen.',
             answer: 1.6, tolerance: 0.02, unit: '',
-            hintEn: '(14−10)²/10 = 16/10 = 1.6.',
-            hintDE: '(14−10)²/10 = 16/10 = 1,6.'
+            hintEn: 'Square the difference and divide by the expected count: (14−10)²/10=16/10=1.6.',
+            hintDE: 'Quadriere die Differenz und teile durch die erwartete Anzahl: (14−10)²/10=16/10=1,6.',
+            explain: 'This cell differs from its expectation by 14−10=4. Its standardized squared contribution is 4²/10=1.6, which is added to the other cells’ contributions to form Q.',
+            explainDE: 'Diese Zelle weicht um 14−10=4 von ihrer Erwartung ab. Ihr standardisierter quadratischer Beitrag beträgt 4²/10=1,6; dieser wird mit den Beiträgen der übrigen Zellen zu Q addiert.'
         },
         {
-            q: 'Table with r = 3 rows, s = 4 columns. df = (r−1)(s−1) = ?',
-            qDE: 'Tafel mit r = 3 Zeilen, s = 4 Spalten. df = (r−1)(s−1) = ?',
+            q: 'For a contingency table with r=3 rows and s=4 columns, compute the degrees of freedom (r−1)(s−1) for the chi-squared statistic. Enter the numeric value.',
+            qDE: 'Berechne für eine Kontingenztafel mit r=3 Zeilen und s=4 Spalten die Freiheitsgrade (r−1)(s−1) für die Chi-Quadrat-Statistik. Gib den Zahlenwert ein.',
             answer: 6, tolerance: 0, unit: '',
-            hintEn: '2×3 = 6.',
-            hintDE: '2×3 = 6.'
+            hintEn: 'Compute the two factors: (3−1)(4−1)=2·3=6.',
+            hintDE: 'Berechne die beiden Faktoren: (3−1)(4−1)=2·3=6.',
+            explain: 'The degrees of freedom are the number of independent row comparisons times the number of independent column comparisons: (r−1)(s−1)=(3−1)(4−1)=6.',
+            explainDE: 'Die Freiheitsgrade ergeben sich aus der Zahl unabhängiger Zeilenvergleiche multipliziert mit der Zahl unabhängiger Spaltenvergleiche: (r−1)(s−1)=(3−1)(4−1)=6.'
         },
         {
-            q: '2×2 table a=20, b=10, c=10, d=20 (n=60). Q = n(ad−bc)²/((a+b)(c+d)(a+c)(b+d)). Round to 2 decimals.',
-            qDE: '2×2-Tafel a=20, b=10, c=10, d=20 (n=60). Q = n(ad−bc)²/((a+b)(c+d)(a+c)(b+d)). Auf 2 Dezimalen.',
+            q: 'For a 2×2 contingency table with a in the upper-left cell, b in the upper-right cell, c in the lower-left cell, and d in the lower-right cell, let n=a+b+c+d. For a=20, b=10, c=10, and d=20, compute Q=n(ad−bc)²/[(a+b)(c+d)(a+c)(b+d)], rounded to two decimal places.',
+            qDE: 'Für eine 2×2-Kontingenztafel mit a in der linken oberen Zelle, b in der rechten oberen Zelle, c in der linken unteren Zelle und d in der rechten unteren Zelle gilt n=a+b+c+d. Berechne für a=20, b=10, c=10 und d=20 den Wert Q=n(ad−bc)²/[(a+b)(c+d)(a+c)(b+d)], gerundet auf zwei Dezimalstellen.',
             answer: 6.67, tolerance: 0.05, unit: '',
-            hintEn: 'ad−bc = 400−100 = 300; Q = 60×90000/(30×30×30×30) = 5400000/810000 ≈ 6.67.',
-            hintDE: 'ad−bc = 400−100 = 300; Q = 60×90000/(30×30×30×30) = 5400000/810000 ≈ 6,67.'
+            hintEn: 'Here n=60 and ad−bc=400−100=300, so Q=60·300²/(30·30·30·30)≈6.67.',
+            hintDE: 'Hier sind n=60 und ad−bc=400−100=300, also Q=60·300²/(30·30·30·30)≈6,67.',
+            explain: 'The four marginal totals are all 30. The determinant ad−bc is 300, so the shortcut gives Q=60·300²/(30·30·30·30)=6.666…, which rounds to 6.67.',
+            explainDE: 'Die vier Randsummen sind jeweils 30. Die Determinante ad−bc beträgt 300, daher ergibt die Abkürzung Q=60·300²/(30·30·30·30)=6,666…; auf zwei Dezimalstellen gerundet ist das 6,67.'
         },
         {
-            q: 'Q = 6.67 with df = 1, critical value 3.842 at α = 0.05. Reject H0? Enter 1 yes, 0 no.',
-            qDE: 'Q = 6,67 bei df = 1, kritisch 3,842 zu α = 0,05. H0 verwerfen? 1 ja, 0 nein.',
+            q: 'For a chi-squared test of independence with one degree of freedom, Q=6.67, α=0.05, and the critical value χ²(1; 0.95)=3.842. Is H₀ rejected? Enter 1 for yes or 0 for no.',
+            qDE: 'Für einen Chi-Quadrat-Unabhängigkeitstest mit einem Freiheitsgrad gelten Q=6,67, α=0,05 und der kritische Wert χ²(1; 0,95)=3,842. Wird H₀ verworfen? Gib 1 für ja oder 0 für nein ein.',
             answer: 1, tolerance: 0, unit: '',
-            hintEn: '6.67 > 3.842 → reject.',
-            hintDE: '6,67 > 3,842 → verwerfen.'
+            hintEn: 'Compare Q with the upper critical value: 6.67>3.842, so reject H₀.',
+            hintDE: 'Vergleiche Q mit dem oberen kritischen Wert: 6,67>3,842, daher wird H₀ verworfen.',
+            explain: 'For one degree of freedom, the upper-tail rejection condition is Q>3.842 at α=0.05. Since 6.67>3.842, the statistic lies in the rejection region, so enter 1.',
+            explainDE: 'Bei einem Freiheitsgrad lautet die Verwerfungsbedingung im oberen Schwanz bei α=0,05: Q>3,842. Da 6,67>3,842, liegt die Statistik im Verwerfungsbereich; einzugeben ist 1.'
         },
         {
-            q: 'N = 500, Ni. = 100, N.j = 125. Êij = ?',
-            qDE: 'N = 500, Ni. = 100, N.j = 125. Êij = ?',
+            q: 'Under H₀ of independence in a contingency table, N=500, the row total is Nᵢ⋅=100, and the column total is N⋅ⱼ=125. Compute the expected cell count Êᵢⱼ=Nᵢ⋅·N⋅ⱼ/N. Enter the numeric value.',
+            qDE: 'Unter H₀ der Unabhängigkeit gilt in einer Kontingenztafel N=500, die Zeilensumme ist Nᵢ⋅=100 und die Spaltensumme N⋅ⱼ=125. Berechne die erwartete Zellbesetzung Êᵢⱼ=Nᵢ⋅·N⋅ⱼ/N. Gib den Zahlenwert ein.',
             answer: 25, tolerance: 0, unit: '',
-            hintEn: '100×125/500 = 25.',
-            hintDE: '100×125/500 = 25.'
+            hintEn: 'Use the expected-count shortcut: 100·125/500=25.',
+            hintDE: 'Verwende die Abkürzung für die erwartete Zellbesetzung: 100·125/500=25.',
+            explain: 'The independence shortcut multiplies the row total by the column total and divides by the grand total: Êᵢⱼ=100·125/500=25.',
+            explainDE: 'Die Unabhängigkeits-Abkürzung multipliziert die Zeilensumme mit der Spaltensumme und teilt durch die Gesamtzahl: Êᵢⱼ=100·125/500=25.'
         },
     ],
 
     14: [
-        // --- WORLD 14 lecture: Descriptive Statistics (STAT EAS 2026) ---
         {
-            q: 'Counts h = [12, 18, 20]. Sample size n = h1+h2+h3 = ?',
-            qDE: 'Anzahlen h = [12, 18, 20]. Stichprobenumfang n = h1+h2+h3 = ?',
+            q: 'A categorical sample has absolute frequencies h₁=12, h₂=18, and h₃=20. What is the sample size n=Σⱼhⱼ?',
+            qDE: 'Eine kategoriale Stichprobe hat die absoluten Häufigkeiten h₁=12, h₂=18 und h₃=20. Wie groß ist der Stichprobenumfang n=Σⱼhⱼ?',
             answer: 50, tolerance: 0, unit: '',
-            hintEn: 'n = 12 + 18 + 20 = 50.',
-            hintDE: 'n = 12 + 18 + 20 = 50.'
+            hintEn: 'Add the three category counts: n=12+18+20=50.',
+            hintDE: 'Addiere die drei Kategorieanzahlen: n=12+18+20=50.',
+            explain: 'Every observation belongs to exactly one of the three categories, so the absolute frequencies add to the sample size: n=12+18+20=50.',
+            explainDE: 'Jede Beobachtung gehört zu genau einer der drei Kategorien, daher addieren sich die absoluten Häufigkeiten zum Stichprobenumfang: n=12+18+20=50.'
         },
         {
-            q: 'hj = 15, n = 60. Relative frequency fj = hj/n = ? Round to 2 decimals.',
-            qDE: 'hj = 15, n = 60. Relative Häufigkeit fj = hj/n = ? Auf 2 Dezimalen.',
+            q: 'In a sample of n=60 observations, category j has absolute frequency hⱼ=15. Compute its relative frequency fⱼ=hⱼ/n, rounded to two decimal places.',
+            qDE: 'In einer Stichprobe mit n=60 Beobachtungen hat die Kategorie j die absolute Häufigkeit hⱼ=15. Berechne ihre relative Häufigkeit fⱼ=hⱼ/n, auf zwei Dezimalstellen gerundet.',
             answer: 0.25, tolerance: 0.01, unit: '',
-            hintEn: 'fj = 15/60 = 0.25.',
-            hintDE: 'fj = 15/60 = 0,25.'
+            hintEn: 'Divide the category count by the sample size: fⱼ=15/60=0.25.',
+            hintDE: 'Teile die Anzahl der Kategorie durch den Stichprobenumfang: fⱼ=15/60=0,25.',
+            explain: 'The relative frequency is the category count divided by all 60 observations. Thus fⱼ=15/60=0.25, meaning that the category accounts for 25% of the sample.',
+            explainDE: 'Die relative Häufigkeit ist die Anzahl der Kategorie geteilt durch alle 60 Beobachtungen. Somit ist fⱼ=15/60=0,25; die Kategorie macht also 25 % der Stichprobe aus.'
         },
         {
-            q: 'fi = 0.25. Pie angle φi = fi·360° = ?',
-            qDE: 'fi = 0,25. Kuchenwinkel φi = fi·360° = ?',
+            q: 'A pie chart allocates a full turn of 360° among categories. What central angle φⱼ corresponds to relative frequency fⱼ=0.25?',
+            qDE: 'Ein Kreisdiagramm verteilt einen Vollwinkel von 360° auf die Kategorien. Welcher Mittelpunktswinkel φⱼ gehört zur relativen Häufigkeit fⱼ=0,25?',
             answer: 90, tolerance: 0, unit: '°',
-            hintEn: '0.25 × 360° = 90°.',
-            hintDE: '0,25 × 360° = 90°.'
+            hintEn: 'Multiply the full angle by the relative frequency: φⱼ=360°·0.25=90°.',
+            hintDE: 'Multipliziere den Vollwinkel mit der relativen Häufigkeit: φⱼ=360°·0,25=90°.',
+            explain: 'A sector occupies the same share of 360° as its category occupies of the sample. Therefore φⱼ=360°fⱼ=360°·0.25=90°.',
+            explainDE: 'Ein Sektor nimmt denselben Anteil von 360° ein wie seine Kategorie am Stichprobenumfang. Daher gilt φⱼ=360°fⱼ=360°·0,25=90°.'
         },
         {
-            q: 'Class borders g1 = 210, g2 = 212.5. Width b1 = g2−g1 = ?',
-            qDE: 'Gruppengrenzen g1 = 210, g2 = 212,5. Breite b1 = g2−g1 = ?',
+            q: 'The first class of a grouped variable has lower boundary gⱼ=210 and upper boundary gⱼ₊₁=212.5. Compute its class width bⱼ=gⱼ₊₁−gⱼ.',
+            qDE: 'Die erste Klasse eines gruppierten Merkmals hat die untere Gruppengrenze gⱼ=210 und die obere Gruppengrenze gⱼ₊₁=212,5. Berechne ihre Gruppenbreite bⱼ=gⱼ₊₁−gⱼ.',
             answer: 2.5, tolerance: 0, unit: '',
-            hintEn: '212.5 − 210 = 2.5.',
-            hintDE: '212,5 − 210 = 2,5.'
+            hintEn: 'Subtract the lower boundary from the upper boundary: bⱼ=212.5−210=2.5.',
+            hintDE: 'Subtrahiere die untere Gruppengrenze von der oberen: bⱼ=212,5−210=2,5.',
+            explain: 'The class width is the distance between its two boundaries. Subtracting 210 from 212.5 gives bⱼ=2.5.',
+            explainDE: 'Die Gruppenbreite ist der Abstand zwischen den beiden Gruppengrenzen. Die Subtraktion 212,5−210 ergibt bⱼ=2,5.'
         },
         {
-            q: 'Same class: midpoint m1 = (g1+g2)/2 = ? Round to 2 decimals.',
-            qDE: 'Gleiche Klasse: Mitte m1 = (g1+g2)/2 = ? Auf 2 Dezimalen.',
+            q: 'For the same class, the boundaries are gⱼ=210 and gⱼ₊₁=212.5. Compute the class midpoint mⱼ=(gⱼ+gⱼ₊₁)/2, rounded to two decimal places.',
+            qDE: 'Für dieselbe Klasse sind die Gruppengrenzen gⱼ=210 und gⱼ₊₁=212,5 gegeben. Berechne die Klassenmitte mⱼ=(gⱼ+gⱼ₊₁)/2, auf zwei Dezimalstellen gerundet.',
             answer: 211.25, tolerance: 0.01, unit: '',
-            hintEn: '(210 + 212.5)/2 = 211.25.',
-            hintDE: '(210 + 212,5)/2 = 211,25.'
+            hintEn: 'Average the two boundaries: mⱼ=(210+212.5)/2=211.25.',
+            hintDE: 'Bilde den Mittelwert der beiden Gruppengrenzen: mⱼ=(210+212,5)/2=211,25.',
+            explain: 'The midpoint lies halfway between the class boundaries. Their sum is 422.5, and dividing by two gives mⱼ=211.25.',
+            explainDE: 'Die Klassenmitte liegt genau in der Mitte zwischen den Gruppengrenzen. Ihre Summe beträgt 422,5; die Division durch zwei ergibt mⱼ=211,25.'
         },
         {
-            q: 'fj = 0.4, bj = 2.5. Histogram height lj = fj/bj = ? Round to 3 decimals.',
-            qDE: 'fj = 0,4, bj = 2,5. Histogrammhöhe lj = fj/bj = ? Auf 3 Dezimalen.',
+            q: 'A histogram encodes relative frequency fⱼ=0.4 by the area of a class of width bⱼ=2.5. Compute the bar height lⱼ=fⱼ/bⱼ, rounded to three decimal places.',
+            qDE: 'Ein Histogramm stellt die relative Häufigkeit fⱼ=0,4 als Fläche einer Klasse mit der Gruppenbreite bⱼ=2,5 dar. Berechne die Balkenhöhe lⱼ=fⱼ/bⱼ, auf drei Dezimalstellen gerundet.',
             answer: 0.16, tolerance: 0.002, unit: '',
-            hintEn: '0.4/2.5 = 0.16.',
-            hintDE: '0,4/2,5 = 0,16.'
+            hintEn: 'Divide relative frequency by class width: lⱼ=0.4/2.5=0.16.',
+            hintDE: 'Teile die relative Häufigkeit durch die Gruppenbreite: lⱼ=0,4/2,5=0,16.',
+            explain: 'The rectangle area is bⱼlⱼ and must equal fⱼ. Hence lⱼ=fⱼ/bⱼ=0.4/2.5=0.16; multiplying height and width recovers the relative frequency.',
+            explainDE: 'Die Rechteckfläche bⱼlⱼ muss fⱼ entsprechen. Daher gilt lⱼ=fⱼ/bⱼ=0,4/2,5=0,16; die Multiplikation von Höhe und Breite ergibt wieder die relative Häufigkeit.'
         },
         {
-            q: 'Ozone sum = 974, n = 13. Mean x̄ = 974/13. Round to 2 decimals.',
-            qDE: 'Ozonsumme = 974, n = 13. Mittel x̄ = 974/13. Auf 2 Dezimalen.',
+            q: 'The sum of 13 ozone readings is Σᵢ xᵢ = 974. Compute the sample mean x̄ = Σᵢ xᵢ/n, rounded to two decimal places.',
+            qDE: 'Die Summe von 13 Ozonmesswerten beträgt Σᵢ xᵢ = 974. Berechne den Stichprobenmittelwert x̄ = Σᵢ xᵢ/n, auf zwei Dezimalstellen gerundet.',
             answer: 74.92, tolerance: 0.02, unit: '',
-            hintEn: '974/13 ≈ 74.923.',
-            hintDE: '974/13 ≈ 74,923.'
+            hintEn: 'Divide the sum by the number of readings: x̄=974/13=74.923….',
+            hintDE: 'Teile die Summe durch die Anzahl der Messwerte: x̄=974/13=74,923….',
+            explain: 'The sample mean is the sum divided by the number of observations. Thus x̄=974/13=74.923…, which rounds to 74.92.',
+            explainDE: 'Der Stichprobenmittelwert ist die Summe geteilt durch die Anzahl der Beobachtungen. Somit gilt x̄=974/13=74,923…; auf zwei Dezimalstellen gerundet ist das 74,92.'
         },
         {
-            q: 'Grouped solar data: x̄g = Σ fj·mj = 217.17 (given f, m from slide 17). Enter 217.17.',
-            qDE: 'Gruppierte Solardaten: x̄g = Σ fj·mj = 217,17 (f, m aus Folie 17). Gib 217,17 ein.',
+            q: 'Five grouped solar-radiation classes have frequencies hⱼ=[5,1,7,12,5] and class midpoints mⱼ=[211.25,213.75,216.25,218.75,221.25]. Compute the grouped mean x̄_g=Σfⱼmⱼ, where fⱼ=hⱼ/n, and round to two decimal places.',
+            qDE: 'Fünf gruppierte Klassen der Solarstrahlung haben die Häufigkeiten hⱼ=[5,1,7,12,5] und die Klassenmitten mⱼ=[211,25;213,75;216,25;218,75;221,25]. Berechne den gruppierten Mittelwert x̄_g=Σfⱼmⱼ mit fⱼ=hⱼ/n und runde auf zwei Dezimalstellen.',
             answer: 217.17, tolerance: 0.1, unit: '',
-            hintEn: 'Σ fⱼ·mⱼ = 0.167×211.25 + 0.033×213.75 + 0.233×216.25 + 0.4×218.75 + 0.167×221.25 ≈ 217.17.',
-            hintDE: 'Σ fⱼ·mⱼ = 0,167×211,25 + 0,033×213,75 + 0,233×216,25 + 0,4×218,75 + 0,167×221,25 ≈ 217,17.'
+            hintEn: 'There are n=30 observations, so x̄_g=(1/30)Σⱼhⱼmⱼ. The weighted sum is 6515, and 6515/30=217.166… .',
+            hintDE: 'Es gibt n=30 Beobachtungen, also x̄_g=(1/30)Σⱼhⱼmⱼ. Die gewichtete Summe beträgt 6515, und 6515/30=217,166… .',
+            explain: 'The five frequencies sum to n=30, so fⱼ=hⱼ/30. The weighted mean is (5·211.25+1·213.75+7·216.25+12·218.75+5·221.25)/30=6515/30=217.166…, which rounds to 217.17.',
+            explainDE: 'Die fünf Häufigkeiten summieren sich zu n=30, also ist fⱼ=hⱼ/30. Der gewichtete Mittelwert ist (5·211,25+1·213,75+7·216,25+12·218,75+5·221,25)/30=6515/30=217,166…; auf zwei Dezimalstellen gerundet ist das 217,17.'
         },
         {
-            q: '13 sorted ozone values, 7th is 66. Median = ?',
-            qDE: '13 sortierte Ozonwerte, 7. ist 66. Median = ?',
+            q: 'A sample contains 13 ozone readings arranged in nondecreasing order. Its seventh order statistic is x₍₇₎=66. Enter the sample median.',
+            qDE: 'Eine Stichprobe enthält 13 Ozonmesswerte in nicht absteigender Reihenfolge. Die siebte Ordnungsstatistik ist x₍₇₎=66. Gib den Stichprobenmedian ein.',
             answer: 66, tolerance: 0, unit: '',
-            hintEn: 'n odd: xmed = x((n+1)/2) = x(7) = 66.',
-            hintDE: 'n ungerade: xmed = x((n+1)/2) = x(7) = 66.'
+            hintEn: 'For odd n=13, the middle order statistic is the seventh, so the median is x₍₇₎=66.',
+            hintDE: 'Bei ungeradem n=13 ist die siebte Ordnungsstatistik die mittlere, also ist der Median x₍₇₎=66.',
+            explain: 'With an odd sample size n=13, the median is order statistic (n+1)/2=7. Since x₍₇₎=66 is given, the sample median is 66.',
+            explainDE: 'Bei ungeradem Stichprobenumfang n=13 ist der Median die Ordnungsstatistik (n+1)/2=7. Da x₍₇₎=66 gegeben ist, beträgt der Stichprobenmedian 66.'
         },
         {
-            q: 'Q1 = 49, Q3 = 86. IQR = Q3−Q1 = ?',
-            qDE: 'Q1 = 49, Q3 = 86. IQR = Q3−Q1 = ?',
+            q: 'For a dataset, the first and third empirical quartiles are Q₁=49 and Q₃=86. Compute the interquartile range IQR=Q₃−Q₁.',
+            qDE: 'Für einen Datensatz sind das erste und dritte empirische Quartil Q₁=49 und Q₃=86. Berechne den Interquartilsabstand IQR=Q₃−Q₁.',
             answer: 37, tolerance: 0, unit: '',
-            hintEn: '86 − 49 = 37.',
-            hintDE: '86 − 49 = 37.'
+            hintEn: 'Subtract the first quartile from the third: IQR=86−49=37.',
+            hintDE: 'Subtrahiere das erste vom dritten Quartil: IQR=86−49=37.',
+            explain: 'The interquartile range is defined as the width from Q₁ to Q₃. It measures the span of the middle half of the ordered data and is less sensitive to extreme values than the full range.',
+            explainDE: 'Der Interquartilsabstand ist als Breite von Q₁ bis Q₃ definiert. Er misst die Spannweite der mittleren Hälfte der geordneten Daten und ist gegenüber extremen Werten weniger empfindlich als die gesamte Spannweite.'
         },
         {
-            q: 'Data 2,4,4,4,5,5,7,9 (mean 5). s² = (1/8)Σ(xi−5)² = ?',
-            qDE: 'Daten 2,4,4,4,5,5,7,9 (Mittel 5). s² = (1/8)Σ(xi−5)² = ?',
+            q: 'The observations [2,4,4,4,5,5,7,9] have mean x̄=5 and n=8. Compute the empirical variance with divisor n: (1/n)Σᵢ(xᵢ−x̄)².',
+            qDE: 'Die Beobachtungen [2,4,4,4,5,5,7,9] haben den Stichprobenmittelwert x̄=5 und n=8. Berechne die empirische Varianz mit Teiler n: (1/n)Σᵢ(xᵢ−x̄)².',
             answer: 4, tolerance: 0, unit: '',
-            hintEn: '(9+1+1+1+0+0+4+16)/8 = 32/8 = 4.',
-            hintDE: '(9+1+1+1+0+0+4+16)/8 = 32/8 = 4.'
+            hintEn: 'The squared deviations sum to 9+1+1+1+0+0+4+16=32, so the empirical variance is 32/8=4.',
+            hintDE: 'Die quadrierten Abweichungen summieren sich zu 9+1+1+1+0+0+4+16=32, also beträgt die empirische Varianz 32/8=4.',
+            explain: 'Dividing the squared deviations by n gives the divisor-n empirical variance: s²=32/8=4. The divisor n−1 instead gives 32/7≈4.57, which is the unbiased estimator of a population variance under independent observations with finite variance, not the empirical variance requested here.',
+            explainDE: 'Die Division der quadrierten Abweichungen durch n ergibt die empirische Varianz mit Teiler n: s²=32/8=4. Der Teiler n−1 ergibt stattdessen 32/7≈4,57; das ist bei unabhängigen Beobachtungen mit endlicher Varianz der erwartungstreue Schätzer der Varianz einer Grundgesamtheit, nicht die hier verlangte empirische Varianz.'
         },
         {
-            q: 'Same data: Σxi² = 232, n = 8, x̄ = 5. Σ(xi−x̄)² = Σxi² − n·x̄² = ?',
-            qDE: 'Gleiche Daten: Σxi² = 232, n = 8, x̄ = 5. Σ(xi−x̄)² = Σxi² − n·x̄² = ?',
+            q: 'For the observations [2,4,4,4,5,5,7,9], n=8, x̄=5, and Σᵢxᵢ²=232. Compute Σᵢ(xᵢ−x̄)² using the shift identity.',
+            qDE: 'Für die Beobachtungen [2,4,4,4,5,5,7,9] gelten n=8, x̄=5 und Σᵢxᵢ²=232. Berechne mit der Verschiebungsformel Σᵢ(xᵢ−x̄)².',
             answer: 32, tolerance: 0, unit: '',
-            hintEn: '232 − 8×25 = 232 − 200 = 32 (shift theorem).',
-            hintDE: '232 − 8×25 = 232 − 200 = 32 (Verschiebungssatz).'
+            hintEn: 'Use Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄²: 232−8·5²=232−200=32.',
+            hintDE: 'Nutze Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄²: 232−8·5²=232−200=32.',
+            explain: 'Because Σᵢ(xᵢ−x̄)=0, the centered sum of squares is Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄². Substitution gives 232−8·25=32.',
+            explainDE: 'Wegen Σᵢ(xᵢ−x̄)=0 gilt für die zentrierte Quadratsumme Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄². Einsetzen ergibt 232−8·25=32.'
         },
     ],
 };

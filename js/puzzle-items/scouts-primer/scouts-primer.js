@@ -9,7 +9,7 @@
 import { trackAchStat } from '../../achievements/achievements.js';
 import { Audio_Manager } from '../../audio/audio.js';
 import { LANG, t } from '../../translation/translations.js';
-import { PT } from '../../passive-tree/passive-tree.js';
+import { PT } from '../../probability-tree/probability-tree.js';
 import { questStat_mcWrongAnswerEliminated, questStat_tutorAnsweredCorrect, updateQuestStats } from '../../inference/inference-stats.js';
 import { _refreshQuestionModalFlag } from '../../screens/screens.js';
 import { save } from '../../state.js';

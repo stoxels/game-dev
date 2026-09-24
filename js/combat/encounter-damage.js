@@ -9,6 +9,12 @@
 // charged-ricochet and the player-take-damage pipeline. Block-lockout
 // writes flow through encounter-constants.js's globalThis accessor.
 
+// Melee-hold vulnerability (Secret-of-Mana risk / reward): while the
+// attack key is HELD to charge an overcharge art, the hero stands rooted
+// (see _avatarMoveUiBlocked) AND takes amplified damage from every hit
+// that lands. Pure - safe to unit-test.
+export const EG_MELEE_HOLD_VULNERABILITY_MULT = 1.5;
+
 import { Audio_Manager } from '../audio/audio.js';
 import { _uspApplySupportMitigation, _uspGetSupportMitigation, _uspReflectThorns, _uspTryWardNegate } from '../skills/universal-spells.js';
 import { t } from '../translation/translations.js';
@@ -318,6 +324,13 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
 
     const stats = _egComputePlayerStats();
 
+    // Charging a melee hold roots the hero: no evasion, no shield block,
+    // and every landed hit is amplified (see
+    // EG_MELEE_HOLD_VULNERABILITY_MULT) - the price of the overcharge
+    // arts. Read straight off globalThis like the parry-hold flag below
+    // (no import cycle back into the weapon-swing module).
+    const chargingMelee = (typeof _egMeleeHoldActive !== 'undefined' && !!globalThis._egMeleeHoldActive);
+
     // Boss special abilities are never negatable - their damage always lands
     // unless the player avoided the ability by movement/position (the
     // telegraphed dodge mechanics are the only boss abilities assigned to be
@@ -376,8 +389,8 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
 
     // Evasion only applies to physical attacks (melee strikes and monster
     // projectiles) - spells, environmental hazards and boss special abilities
-    // cannot be dodged.
-    if (!isSpell && !isBossAbility) {
+    // cannot be dodged. Neither can a hero rooted mid overcharge-charge.
+    if (!isSpell && !isBossAbility && !chargingMelee) {
         const attackerLvl = Number(attackerLevel)
             || (_egGetTarget() && _egGetTarget().level)
             || _egGetEncounterBaseLevel()
@@ -398,11 +411,12 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // still attack while recovering - only blocking is suppressed.
     // Blocking requires an actual shield in the off-hand - block chance
     // from mods/passives on other slots does nothing without one. Boss
-    // special abilities are never blockable.
+    // special abilities are never blockable - nor is anything, while the
+    // hero is rooted charging a melee hold.
     const isBlockLockedOut = Date.now() < globalThis._egPlayerBlockLockoutUntil;
     const hasShieldEquipped = _egGetAllEquippedItems()
         .some(item => item.slotType === 'shield');
-    const blockChance = (!isBossAbility && !isBlockLockedOut && hasShieldEquipped)
+    const blockChance = (!isBossAbility && !isBlockLockedOut && hasShieldEquipped && !chargingMelee)
         ? Math.min(75, isSpell ? stats.spellBlockChance : stats.blockChance)
         : 0;
     if (blockChance > 0 && Math.random() * 100 < blockChance) {
@@ -447,6 +461,11 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
 
     // Ailments: a shocked player takes amplified damage from all hits.
     if (typeof _egApplyPlayerShockAmp === 'function') amount = _egApplyPlayerShockAmp(amount);
+
+    // Melee-hold vulnerability: charging an overcharge art hurts - every
+    // landed hit is amplified while the attack key is held (applied here,
+    // pre-armour, like the shock amp above).
+    if (chargingMelee) amount *= EG_MELEE_HOLD_VULNERABILITY_MULT;
 
     // Active map run: Vulnerability - you take #% increased damage.
     if (typeof _egMapDamageTakenAmpMult === 'function') amount *= _egMapDamageTakenAmpMult();

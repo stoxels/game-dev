@@ -1,5 +1,5 @@
 import { trackAchStat } from '../achievements/achievements.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';

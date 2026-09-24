@@ -6,7 +6,7 @@ import { startTimerFreeze } from '../timer/timer-freeze.js';
 import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../timer/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
-import { ptHasSkill } from './passive-tree-state-points.js';
+import { ptHasSkill } from './probability-tree-state-points.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 
@@ -917,6 +917,8 @@ export function _ptxRunExpansion() {
         if (window._egSuppressEncounterStop || !cur) return result;
 
         const FLATS = [
+            ['trix_time_sense', 10],
+            ['small_lesser_adaptive_correction', 10],
             ['wind_tunnel', 10], ['jet_stream', 15], ['cum_laude', 25],
             ['tick_tock_talent', 20], ['second_hand', 30], ['hourglass_doctrine', 45],
             ['midnight_oil', 20], ['tenure', 15],

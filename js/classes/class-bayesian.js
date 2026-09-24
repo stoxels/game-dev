@@ -1,4 +1,4 @@
-﻿import { trackAchStat } from '../achievements/achievements.js';
+import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { stopTimer, timesUp, updTimer } from '../timer/timer.js';
@@ -7,49 +7,43 @@ import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { hideLsClassTooltip } from './class-hud-levelselect-tooltip.js';
 import { buildClassHUD, hideHUDTooltip } from './class-hud.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
-//--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
-//-------------------------------BAYESIAN CLASS---------------------------
+//-----------------BAYESIAN CLASS-----------------------------------------
 //------------------------------------------------------------------------
 
 
 
 //------------------------------------------------------------------------
-//----------------------------------CONSTANTS-----------------------------
+//-----------------CONSTANTS & STATE--------------------------------------
 //------------------------------------------------------------------------
 
-export const BAYES_FUSE_SECONDS = 7;  // seconds the player has to place all traps before detonation
-export const BAYES_FUSE_PENALTY = 60;  // seconds deducted per unplaced trap at detonation
-export const BAYES_ELIMINATION_REACH = 5;   // how many cells the elimination trap scans in each cardinal direction
-
-
-
-//------------------------------------------------------------------------
-//-------------------------------BAYES TRAPS------------------------------
-//------------------------------------------------------------------------
-//
-//  Flow overview:
-//    Phase 1 – Select:    player picks a trap type for each of their N slots
-//    Phase 2 – Place:     fuse starts; player clicks grid cells to plant each trap
-//    Detonation:          fuse expires (or all placed) → effects fire, penalties applied
-//
-//  Global state lives on window._bayesTrapsState so it survives across calls.
-//  window._bayesTrapProtectedLines tracks active protection lines (row/col keys).
-//
+// The placement fuse starts at seven seconds and ticks once per second until cleanup.
+const BAYES_FUSE_SECONDS = 7;
+const BAYES_FUSE_PENALTY = 60;
+const BAYES_ELIMINATION_REACH = 5;
 
 
 
 //------------------------------------------------------------------------
-//---------------------------TRAP TYPE DEFINITIONS------------------------
+//-----------------BAYES TRAPS--------------------------------------------
+//------------------------------------------------------------------------
+// Selection chooses trap types; placement starts the fuse.
+// Detonation applies placed traps, then charges a penalty for each unplaced slot.
+// Runtime state stays on window so the HUD and mouse handlers share it.
+// title-bindings.js calls cleanup by name, so its bridge remains explicit.
+
+
+
+//------------------------------------------------------------------------
+//-----------------TRAP TYPE DEFINITIONS----------------------------------
 //------------------------------------------------------------------------
 
-// Returns the display metadata for a given trap type string.
-// Used by UI builders and effect handlers throughout the file.
-export function _bayesTrapTypeInfo(type) {
+// Returns the icon, color, label, and hint for one trap type.
+function _bayesTrapTypeInfo(type) {
     const defs = {
         reveal: {
             icon: '🪤',
@@ -76,12 +70,11 @@ export function _bayesTrapTypeInfo(type) {
 
 
 //------------------------------------------------------------------------
-//------------------PHASE 1 HELPERS – TRAP SELECTION UI------------------
+//-----------------SELECTION UI-------------------------------------------
 //------------------------------------------------------------------------
 
-// Builds the HTML for the "already chosen" queue summary shown above the type buttons.
-// Returns an empty string if nothing has been chosen yet.
-export function _buildQueuedTrapsHTML(trapsQueue) {
+// Builds the queue summary shown above the trap type buttons.
+function _buildQueuedTrapsHTML(trapsQueue) {
     if (trapsQueue.length === 0) return '';
 
     const chips = trapsQueue.map(t => {
@@ -98,8 +91,8 @@ export function _buildQueuedTrapsHTML(trapsQueue) {
             </div>`;
 }
 
-// Builds one selection button per available trap type.
-export function _buildTrapTypeButtonsHTML(availableTraps) {
+// Builds one button for each trap type available in the current slot.
+function _buildTrapTypeButtonsHTML(availableTraps) {
     return `<div class="bayes-trap-list">` + availableTraps.map(type => {
         const info = _bayesTrapTypeInfo(type);
         return `
@@ -111,8 +104,8 @@ export function _buildTrapTypeButtonsHTML(availableTraps) {
     }).join('') + `</div>`;
 }
 
-// Assembles the full inner HTML for the trap selection overlay modal.
-export function _buildSelectOverlayHTML(state) {
+// Builds the selection overlay for the current trap queue.
+function _buildSelectOverlayHTML(state) {
     const title = t('cls_bayes_traps_title');
     const selected = state.trapsQueue.length;
     const prompt = t('cls_trap_prompt')
@@ -136,12 +129,11 @@ export function _buildSelectOverlayHTML(state) {
 
 
 //------------------------------------------------------------------------
-//----------------------PHASE 1 – TRAP SELECTION PHASE-------------------
+//-----------------SELECTION PHASE----------------------------------------
 //------------------------------------------------------------------------
 
-// Shows the type-selection overlay for the next trap slot.
-// Called on entry and again after each selection until all slots are filled.
-export function _bayesTrapsShowSelectPhase() {
+// Shows the selection overlay for the next trap slot.
+function _bayesTrapsShowSelectPhase() {
     document.getElementById('bayes-traps-overlay')?.remove();
 
     const state = window._bayesTrapsState;
@@ -157,8 +149,7 @@ export function _bayesTrapsShowSelectPhase() {
     Audio_Manager.playSFX('bayesTrapSelect');
 }
 
-// Called by the type buttons in the overlay.
-// Adds the chosen type to the queue and either shows the next slot or starts placement.
+// Adds the chosen trap type and advances to the next slot or placement.
 export function _bayesTrapsSelectType(type) {
     const state = window._bayesTrapsState;
     if (!state || state.phase !== 'select') return;
@@ -175,19 +166,17 @@ export function _bayesTrapsSelectType(type) {
 
 
 //------------------------------------------------------------------------
-//------------------PHASE 2 HELPERS – FUSE & PLACEMENT HUD---------------
+//-----------------FUSE & PLACEMENT HUD-----------------------------------
 //------------------------------------------------------------------------
 
-// Ticks every second while the fuse burns.
-// Updates both the cursor follower and the per-cell countdown labels.
-export function _bayesTrapsTickFuseDisplay() {
+// Refreshes the cursor follower and cell countdown labels once per fuse tick.
+function _bayesTrapsTickFuseDisplay() {
     _bayesTrapsUpdateCursorFollower();
     _bayesTrapsRefreshGridIndicators();
 }
 
-// Starts the fuse countdown interval.
-// Calls _bayesTrapsDetonateUnplaced when time runs out.
-export function _bayesTrapsStartFuse() {
+// Starts the fuse and detonates unplaced traps when it reaches zero.
+function _bayesTrapsStartFuse() {
     const state = window._bayesTrapsState;
     if (!state) return;
 
@@ -209,12 +198,12 @@ export function _bayesTrapsStartFuse() {
 
 
 //------------------------------------------------------------------------
-//----------------------PHASE 2 – TRAP PLACEMENT PHASE-------------------
+//-----------------PLACEMENT PHASE----------------------------------------
 //------------------------------------------------------------------------
 
-// Transitions from the selection overlay to the grid placement phase.
-// Removes the overlay, switches state.phase, spawns the cursor follower, and starts the fuse.
-export function _bayesTrapsStartPlacementPhase() {
+// Moves from trap selection to grid placement.
+// Removes the overlay, starts the fuse, and creates the cursor follower.
+function _bayesTrapsStartPlacementPhase() {
     document.getElementById('bayes-traps-overlay')?.remove();
 
     const state = window._bayesTrapsState;
@@ -233,8 +222,8 @@ export function _bayesTrapsStartPlacementPhase() {
         .replace('{f}', BAYES_FUSE_SECONDS));
 }
 
-// Called from Mousebutton_Handlers.js when the player clicks a grid cell during placement.
-// Returns true if the click was consumed (caller should return early).
+// Places the next trap when the player clicks a cell during placement.
+// Returns true when the click belongs to this placement flow.
 export function _bayesTrapPlacementClick(row, col) {
     const state = window._bayesTrapsState;
     if (!state || state.phase !== 'place') return false;
@@ -274,11 +263,11 @@ export function _bayesTrapPlacementClick(row, col) {
 
 
 //------------------------------------------------------------------------
-//-------------------DETONATION HELPERS-----------------------------------
+//-----------------DETONATION HELPERS-------------------------------------
 //------------------------------------------------------------------------
 
-// Fires explosion animations and activates game effects for all traps that were placed on the grid.
-export function _bayesTrapsFirePlacedTraps(trapsQueue) {
+// Fires explosions and activates every trap placed on the grid.
+function _bayesTrapsFirePlacedTraps(trapsQueue) {
     trapsQueue
         .filter(t => t.placed && t.r !== null)
         .forEach(trap => {
@@ -287,9 +276,8 @@ export function _bayesTrapsFirePlacedTraps(trapsQueue) {
         });
 }
 
-// Applies the time penalty for each trap that was never placed, then shows feedback.
-// Returns the number of unplaced traps (0 if all were placed).
-export function _bayesTrapsApplyUnplacedPenalty(trapsQueue) {
+// Applies the time penalty for unplaced traps and returns their count.
+function _bayesTrapsApplyUnplacedPenalty(trapsQueue) {
     const unplaced = trapsQueue.filter(t => !t.placed).length;
     if (unplaced === 0) {
         globalThis.showToast(t('cls_traps_detonated'));
@@ -317,12 +305,11 @@ export function _bayesTrapsApplyUnplacedPenalty(trapsQueue) {
 
 
 //------------------------------------------------------------------------
-//-------------------------------DETONATION-------------------------------
+//-----------------DETONATION---------------------------------------------
 //------------------------------------------------------------------------
 
-// Triggered when the fuse reaches zero.
-// Fires all placed traps, penalises unplaced ones, then resolves win/death state.
-export function _bayesTrapsDetonateUnplaced() {
+// Resolves the fuse: activates placed traps, charges penalties, and checks the result.
+function _bayesTrapsDetonateUnplaced() {
     const state = window._bayesTrapsState;
     if (!state) return;
 
@@ -344,10 +331,10 @@ export function _bayesTrapsDetonateUnplaced() {
 
 
 //------------------------------------------------------------------------
-//---------------------------CANCEL & CLEANUP-----------------------------
+//-----------------CANCEL & CLEANUP---------------------------------------
 //------------------------------------------------------------------------
 
-// Player-initiated cancel. Applies the unplaced penalty if already in placement phase.
+// Cancels the active flow and charges the placement penalty when needed.
 export function _bayesTrapsCancel() {
     document.getElementById('bayes-traps-overlay')?.remove();
 
@@ -368,8 +355,8 @@ export function _bayesTrapsCancel() {
     _bayesTrapsCleanup(true);
 }
 
-// Full teardown: clears the fuse timer, removes all DOM nodes, and resets ability mode.
-// Pass buildHUD=false during the initial setup cancel to avoid an unnecessary HUD rebuild.
+// Clears timers, removes Bayes Traps UI, and resets ability mode.
+// Pass false to skip an unnecessary HUD rebuild during setup.
 export function _bayesTrapsCleanup(buildHUD = true) {
     const state = window._bayesTrapsState;
     if (state?.fuseTimer) {
@@ -400,15 +387,14 @@ export function _bayesTrapsCleanup(buildHUD = true) {
 
 
 //------------------------------------------------------------------------
-//-----------------------------ENTRY POINT--------------------------------
+//-----------------ENTRY POINTS-------------------------------------------
 //------------------------------------------------------------------------
 
-// Starts the Bayes Traps ability flow.
-// Resets any lingering previous activation, initialises state, then opens the selection overlay.
+// Starts Bayes Traps by clearing old state and opening trap selection.
 export function _executeBayesTraps(trapCount, availableTraps) {
     if (!cur) return;
-    if (typeof hideHUDTooltip === 'function') hideHUDTooltip();
-    if (typeof hideLsClassTooltip === 'function') hideLsClassTooltip();
+    hideHUDTooltip();
+    hideLsClassTooltip();
 
     // Wipe any leftover state from a previous activation before starting fresh
     _bayesTrapsCleanup(false);
@@ -431,11 +417,11 @@ export function _executeBayesTraps(trapCount, availableTraps) {
 
 
 //------------------------------------------------------------------------
-//---------------------------TRAP EFFECT DISPATCH------------------------
+//-----------------TRAP EFFECT DISPATCH-----------------------------------
 //------------------------------------------------------------------------
 
-// Routes detonation to the correct effect handler based on trap type.
-export function _bayesTrapActivate(type, row, col) {
+// Routes a detonated trap to the effect for its type.
+function _bayesTrapActivate(type, row, col) {
     switch (type) {
         case 'reveal': _bayesTrapReveal(row, col); break;
         case 'elimination': _bayesTrapElimination(row, col); break;
@@ -446,11 +432,11 @@ export function _bayesTrapActivate(type, row, col) {
 
 
 //------------------------------------------------------------------------
-//-----------------------------TRAP EFFECTS-------------------------------
+//-----------------TRAP EFFECTS-------------------------------------------
 //------------------------------------------------------------------------
 
-// Reveal Trap: fills in correct unfilled cells within a 1-step radius (8 neighbours + self).
-export function _bayesTrapReveal(row, col) {
+// Reveals correct unfilled cells in the surrounding 3×3 area.
+function _bayesTrapReveal(row, col) {
     if (!cur) return;
     const sol = cur.grid;
     const rows = sol.length;
@@ -480,14 +466,13 @@ export function _bayesTrapReveal(row, col) {
     }
 
     // Refresh adjacency matrix overlay if the passive skill is active
-    if (typeof _adjacencyMatrixRefreshAll === 'function' && ptHasSkill('adjacency_matrix')) {
+    if (ptHasSkill('adjacency_matrix')) {
         _adjacencyMatrixRefreshAll();
     }
 }
 
-// Elimination Trap: marks wrong empty cells (sol===0) in the four cardinal directions,
-// up to BAYES_ELIMINATION_REACH steps away from the detonation cell.
-export function _bayesTrapElimination(row, col) {
+// Marks wrong empty cells in each cardinal direction from the blast.
+function _bayesTrapElimination(row, col) {
     if (!cur) return;
     const sol = cur.grid;
     const rows = sol.length;
@@ -511,9 +496,8 @@ export function _bayesTrapElimination(row, col) {
     }
 }
 
-// Protection Trap: registers the row and column of the placement cell as protected lines.
-// Protected lines intercept the next wrong fill on that row/col (see _bayesTrapProtectionIntercept).
-export function _bayesTrapProtection(row, col) {
+// Registers the placement row and column as protected lines.
+function _bayesTrapProtection(row, col) {
     if (!window._bayesTrapProtectedLines) window._bayesTrapProtectedLines = new Set();
 
     const rowKey = `row:${row}`;
@@ -532,11 +516,11 @@ export function _bayesTrapProtection(row, col) {
 
 
 //------------------------------------------------------------------------
-//-------------------PROTECTION TRAP VISUALS------------------------------
+//-----------------PROTECTION VISUALS-------------------------------------
 //------------------------------------------------------------------------
 
-// Adds the shield icon span to a single cell element if it doesn't already have one.
-export function _bayesTrapAddShieldIconToCell(el) {
+// Adds one shield icon to a cell when it does not already have one.
+function _bayesTrapAddShieldIconToCell(el) {
     if (el.querySelector('.bayes-trap-indicator-protection')) return;
 
     const info = _bayesTrapTypeInfo('protection');
@@ -554,8 +538,8 @@ export function _bayesTrapAddShieldIconToCell(el) {
     el.appendChild(span);
 }
 
-// Adds shield icons to every cell in the given row or column.
-export function _bayesTrapApplyProtectionVisual(type, idx) {
+// Adds shield icons to every cell in one row or column.
+function _bayesTrapApplyProtectionVisual(type, idx) {
     if (!cur) return;
     const sol = cur.grid;
     const rows = sol.length;
@@ -574,10 +558,8 @@ export function _bayesTrapApplyProtectionVisual(type, idx) {
     }
 }
 
-// Removes protection visuals from every cell in the given row or column.
-// Respects overlapping protections: a cell that is still covered by the other axis
-// keeps its shield icon.
-export function _bayesTrapRemoveProtectionVisual(type, idx) {
+// Removes one protection line while preserving icons shared with the other axis.
+function _bayesTrapRemoveProtectionVisual(type, idx) {
     if (!cur) return;
     const sol = cur.grid;
     const rows = sol.length;
@@ -607,8 +589,11 @@ export function _bayesTrapRemoveProtectionVisual(type, idx) {
     }
 }
 
-// Called from mousebutton_handlers.js before registering a wrong fill.
-// Returns true if a Protection Trap intercepted the mistake (caller should skip the error logic).
+//------------------------------------------------------------------------
+//-----------------PROTECTION INTERCEPTION--------------------------------
+//------------------------------------------------------------------------
+
+// Consumes one matching protection line before a wrong fill is registered.
 export function _bayesTrapProtectionIntercept(row, col) {
     const lines = window._bayesTrapProtectedLines;
     if (!lines || lines.size === 0) return false;
@@ -633,19 +618,18 @@ export function _bayesTrapProtectionIntercept(row, col) {
     const lineWord = (type === 'row' ? t('cls_row_word') : t('cls_col_word')) + ' ' + (parseInt(idxStr, 10) + 1);
     globalThis.showToast(t('cls_protect_triggered').replace('{line}', lineWord));
 
-    Audio_Manager.playSFX('varianceShield'); // window guard removed: module import is always present
+    Audio_Manager.playSFX('varianceShield');
     return true;
 }
 
 
 
 //------------------------------------------------------------------------
-//-----------------------GRID CELL INDICATORS-----------------------------
+//-----------------GRID INDICATORS----------------------------------------
 //------------------------------------------------------------------------
 
-// Draws the countdown + icon overlay on a cell immediately after it is planted.
-// The countdown label is updated each second by _bayesTrapsRefreshGridIndicators.
-export function _bayesTrapDrawIndicator(row, col, type) {
+// Draws a planted trap's countdown and icon on its cell.
+function _bayesTrapDrawIndicator(row, col, type) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
 
@@ -676,9 +660,8 @@ export function _bayesTrapDrawIndicator(row, col, type) {
     el.appendChild(span);
 }
 
-// Updates only the countdown text on every already-placed indicator.
-// Called every second by _bayesTrapsTickFuseDisplay to avoid full redraws.
-export function _bayesTrapsRefreshGridIndicators() {
+// Updates the countdown text on planted trap indicators.
+function _bayesTrapsRefreshGridIndicators() {
     const state = window._bayesTrapsState;
     if (!state) return;
 
@@ -694,11 +677,11 @@ export function _bayesTrapsRefreshGridIndicators() {
 
 
 //------------------------------------------------------------------------
-//-----------------------------CURSOR FOLLOWER----------------------------
+//-----------------CURSOR FOLLOWER----------------------------------------
 //------------------------------------------------------------------------
 
-// Builds the innerHTML string for the cursor follower (timer + icon stacked vertically).
-export function _buildCursorFollowerHTML(info, fuseRemaining) {
+// Builds the cursor follower markup from the timer and trap icon.
+function _buildCursorFollowerHTML(info, fuseRemaining) {
     return `
         <div style="font-size:14px; font-family:var(--PX, monospace); color:#e74c3c;
                     margin-bottom:4px; text-shadow:1px 1px 2px rgba(0,0,0,0.8);">
@@ -708,9 +691,8 @@ export function _buildCursorFollowerHTML(info, fuseRemaining) {
     `;
 }
 
-// Creates the cursor-following trap icon and attaches the mousemove listener.
-// The follower displays the current trap type and remaining fuse time.
-export function _bayesTrapsCreateCursorFollower() {
+// Creates the cursor follower and keeps it positioned over the pointer.
+function _bayesTrapsCreateCursorFollower() {
     document.getElementById('bayes-trap-cursor-follower')?.remove();
 
     const follower = document.createElement('div');
@@ -741,9 +723,8 @@ export function _bayesTrapsCreateCursorFollower() {
     window.addEventListener('mousemove', window._bayesTrapMouseMoveHandler);
 }
 
-// Refreshes the follower's content (type icon + fuse countdown).
-// Removes the follower if all traps have already been placed.
-export function _bayesTrapsUpdateCursorFollower() {
+// Refreshes or removes the cursor follower as placement advances.
+function _bayesTrapsUpdateCursorFollower() {
     const follower = document.getElementById('bayes-trap-cursor-follower');
     const state = window._bayesTrapsState;
 
@@ -758,12 +739,11 @@ export function _bayesTrapsUpdateCursorFollower() {
 
 
 //------------------------------------------------------------------------
-//---------------------------EXPLOSION ANIMATIONS-------------------------
+//-----------------EXPLOSION ANIMATIONS-----------------------------------
 //------------------------------------------------------------------------
 
-// Injects the shared CSS keyframe block for all trap explosion types.
-// Only runs once per page; subsequent calls are no-ops.
-export function _bayesTrapsInjectExplosionStyles() {
+// Injects the shared explosion keyframes once per page.
+function _bayesTrapsInjectExplosionStyles() {
     if (document.getElementById('bayes-explosion-styles')) return;
 
     const styleNode = document.createElement('style');
@@ -788,8 +768,8 @@ export function _bayesTrapsInjectExplosionStyles() {
     document.head.appendChild(styleNode);
 }
 
-// Builds a typed visual effect container element for the given trap type.
-export function _bayesTrapBuildExplosionFX(type) {
+// Builds the visual container for one trap explosion type.
+function _bayesTrapBuildExplosionFX(type) {
     const fxContainer = document.createElement('div');
     fxContainer.style.cssText = `
         position: absolute; top: 50%; left: 50%;
@@ -828,8 +808,8 @@ export function _bayesTrapBuildExplosionFX(type) {
     return fxContainer;
 }
 
-// Spawns a type-specific visual explosion directly over the detonated cell and auto-removes it.
-export function _bayesTrapAnimateExplosion(row, col, type) {
+// Shows a type-specific explosion over a cell and removes it afterward.
+function _bayesTrapAnimateExplosion(row, col, type) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
     if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
@@ -841,257 +821,3 @@ export function _bayesTrapAnimateExplosion(row, col, type) {
     setTimeout(() => fxContainer.remove(), 650);
 }
 
-
-
-//------------------------------------------------------------------------
-//------------------------TYPE I ERROR SHIELD-----------------------------
-//------------------------------------------------------------------------
-//
-//  The Type I Error Shield secretly marks a set of random empty (sol===0)
-//  cells as shielded. If the player tries to fill a shielded cell by
-//  mistake, the shield intercepts the error, auto-marks ✕, and optionally
-//  reveals a bonus correct cell on the same row/column.
-//
-
-
-
-//------------------------------------------------------------------------
-//------------TYPE I ERROR SHIELD HELPERS---------------------------------
-//------------------------------------------------------------------------
-
-// Returns a shuffled list of every empty (sol===0), unrevealed, unshielded cell on the grid.
-export function _typeIGetEligibleCells() {
-    if (!cur) return [];
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-    const shielded = window._typeIShieldedCells || new Set();
-    const eligible = [];
-
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (sol[r][c] === 0
-                && globalThis.revealedGrid[r][c] !== true
-                && !shielded.has(`${r}-${c}`)) {
-                eligible.push([r, c]);
-            }
-        }
-    }
-
-    // Fisher-Yates shuffle for uniform random seeding
-    for (let i = eligible.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [eligible[i], eligible[j]] = [eligible[j], eligible[i]];
-    }
-
-    return eligible;
-}
-
-// Registers and animates a set of cells as shielded.
-// Each cell gets a staggered matrix-flash animation on placement.
-export function _typeISeedShieldedCells(cells) {
-    cells.forEach(([r, c], index) => {
-        window._typeIShieldedCells.add(`${r}-${c}`);
-
-        const cellEl = document.getElementById(`g-${r}-${c}`);
-        if (!cellEl) return;
-
-        // Stagger bursts so they don't all fire simultaneously
-        setTimeout(() => {
-            const matrixFlash = document.createElement('div');
-            matrixFlash.style.cssText = `
-                position: absolute; inset: 0; background: rgba(46, 204, 113, 0.4);
-                z-index: 10; pointer-events: none; border-radius: inherit;
-                animation: type1-matrix-sweep 0.8s ease-out forwards;
-            `;
-            if (getComputedStyle(cellEl).position === 'static') cellEl.style.position = 'relative';
-            cellEl.appendChild(matrixFlash);
-            setTimeout(() => matrixFlash.remove(), 800);
-        }, index * 120);
-    });
-}
-
-// Injects a unique CSS keyframe for a single shard's trajectory and returns the animation name.
-export function _typeIInjectShardKeyframe(row, col, shardIndex, tx, ty, rotation) {
-    const animName = `shard-fly-${row}-${col}-${shardIndex}`;
-    if (!document.getElementById(animName)) {
-        const style = document.createElement('style');
-        style.id = animName;
-        style.textContent = `
-            @keyframes ${animName} {
-                0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-                100% { transform: translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0) rotate(${rotation}deg); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    return animName;
-}
-
-// Creates a single glowing shard element flying outward at the given angle and velocity.
-export function _typeICreateShardElement(row, col, shardIndex) {
-    const angle = (shardIndex / 8) * 2 * Math.PI + (Math.random() * 0.4 - 0.2);
-    const velocity = 30 + Math.random() * 30;
-    const tx = Math.cos(angle) * velocity;
-    const ty = Math.sin(angle) * velocity;
-    const rotation = Math.random() * 360 + 180;
-
-    const shard = document.createElement('div');
-    shard.style.cssText = `
-        position: absolute; top: 50%; left: 50%;
-        width: 4px; height: 4px; background: #2ecc71;
-        box-shadow: 0 0 6px #2ecc71, 0 0 2px #fff;
-        border-radius: ${Math.random() > 0.5 ? '0px' : '50%'};
-        transform: translate(-50%, -50%);
-        opacity: 1;
-    `;
-
-    const animName = _typeIInjectShardKeyframe(row, col, shardIndex, tx, ty, rotation);
-    shard.style.animation = `${animName} 0.6s cubic-bezier(0.1, 0.8, 0.25, 1) forwards`;
-    return shard;
-}
-
-
-
-//------------------------------------------------------------------------
-//--------------------TYPE I ERROR SHIELD – MAIN FUNCTIONS---------------
-//------------------------------------------------------------------------
-
-// Activates the shield: picks eligible empty cells, seeds them, and plays the animation.
-export function _executeTypeIShield(seedCount, bonusReveal) {
-    if (!cur) return;
-
-    if (!window._typeIShieldedCells) window._typeIShieldedCells = new Set();
-    window._typeIBonusReveal = bonusReveal;
-
-    const eligible = _typeIGetEligibleCells();
-
-    if (eligible.length === 0) {
-        globalThis.showToast(t('cls_typei_none'));
-        _setAbilityMode(false);
-        const cd = cooldownState['active4'];
-        if (cd?.interval) { clearInterval(cd.interval); cd.interval = null; }
-        if (cd) cd.remaining = 0;
-        buildClassHUD();
-        return;
-    }
-
-    const toSeed = eligible.slice(0, Math.min(seedCount, eligible.length));
-    _typeISeedShieldedCells(toSeed);
-
-    const bonusNote = bonusReveal
-        ? t('cls_typei_bonus_note')
-        : '';
-
-    globalThis.showToast(t('cls_typei_seeded')
-        .replace('{n}', toSeed.length)
-        .replace('{bonus}', bonusNote));
-
-    Audio_Manager.playSFX('type1errorShieldHide');
-    buildClassHUD();
-    trackAchStat('skillType1ErrorShieldUsed');
-}
-
-// Called from mousebutton_handlers.js before registering a wrong fill.
-// Returns true if a shielded cell intercepted the mistake (caller should skip the error logic).
-export function _typeIShieldIntercept(row, col) {
-    const cells = window._typeIShieldedCells;
-    if (!cells || cells.size === 0) return false;
-
-    const key = `${row}-${col}`;
-    if (!cells.has(key)) return false;
-
-    cells.delete(key);
-
-    globalThis.userGrid[row][col] = 2; // ✕
-    renderCell(row, col);
-    trackAchStat('tilesMarkedWrong', 1);
-
-    _typeIShowShieldBreakEffect(row, col);
-
-    globalThis.showToast(t('cls_typei_triggered'));
-
-    Audio_Manager.playSFX('type1errorShieldBreak');
-    trackAchStat('type1Intercepts');
-
-    if (window._typeIBonusReveal) {
-        _typeIBonusRevealCell(row, col);
-    }
-
-    return true;
-}
-
-// Spawns the particle shatter explosion when a hidden shield breaks.
-export function _typeIShowShieldBreakEffect(row, col) {
-    const el = document.getElementById(`g-${row}-${col}`);
-    if (!el) return;
-    if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
-
-    const container = document.createElement('div');
-    container.style.cssText = `
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        pointer-events: none; z-index: 100; overflow: visible;
-    `;
-    el.appendChild(container);
-
-    // Spawn 8 shards flying outward in evenly-spaced angles
-    const SHARD_COUNT = 8;
-    for (let i = 0; i < SHARD_COUNT; i++) {
-        container.appendChild(_typeICreateShardElement(row, col, i));
-    }
-
-    // Central shield icon that expands and fades out simultaneously
-    const shieldWave = document.createElement('div');
-    shieldWave.textContent = '🛡️';
-    shieldWave.style.cssText = `
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        font-size: 16px; text-shadow: 0 0 8px #2ecc71;
-        animation: type1-shield-shatter 0.5s ease-out forwards;
-    `;
-    container.appendChild(shieldWave);
-
-    // Clean up all injected elements after animation completes
-    setTimeout(() => {
-        container.remove();
-        document.querySelectorAll(`[id^="shard-fly-${row}-${col}-"]`).forEach(s => s.remove());
-    }, 650);
-}
-
-// Reveals one random correct cell on the same row or column as the triggered shield.
-// Runs only when the shield was set up with bonusReveal=true.
-export function _typeIBonusRevealCell(row, col) {
-    if (!cur) return;
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-    const candidates = [];
-
-    // Collect unrevealed correct cells in the same row
-    for (let c = 0; c < cols; c++) {
-        if (sol[row][c] === 1 && !globalThis.revealedGrid[row][c] && globalThis.userGrid[row][c] !== 1)
-            candidates.push([row, c]);
-    }
-    // Collect unrevealed correct cells in the same column
-    for (let r = 0; r < rows; r++) {
-        if (r === row) continue;
-        if (sol[r][col] === 1 && !globalThis.revealedGrid[r][col] && globalThis.userGrid[r][col] !== 1)
-            candidates.push([r, col]);
-    }
-
-    if (!candidates.length) return;
-
-    const [r, c] = candidates[Math.floor(Math.random() * candidates.length)];
-    globalThis.revealedGrid[r][c] = true;
-    globalThis.userGrid[r][c] = 1;
-    renderCell(r, c);
-    updClues(r, c);
-    trackAchStat('tilesRevealed', 1);
-    globalThis._applyCellEffect([`g-${r}-${c}`], 'reveal');
-
-    globalThis.showToast(t('cls_typei_bonus'));
-
-    questStat_classRevealUsed(1);
-    updateQuestStats('classAbilityUsedThisLevel', {});
-
-    globalThis.checkWin();
-}

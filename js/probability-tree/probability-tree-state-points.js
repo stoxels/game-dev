@@ -1,15 +1,15 @@
 ﻿import { setAchStat, trackAchStat } from '../achievements/achievements.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
-import { TALENT_TREE_DATA } from './passive-tree-data.js';
-import { _ptRefreshAllStyles } from './passive-tree-ui.js';
-import { PT_START_ID, _ptInitTreeData } from './passive-tree.js';
+import { TALENT_TREE_DATA } from './probability-tree-data.js';
+import { _ptRefreshAllStyles } from './probability-tree-ui.js';
+import { getPassiveTreeRootId, isPassiveTreeStartNode, _ptInitTreeData } from './probability-tree.js';
 import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, '_pt_skills', { get() { return _pt_skills; }, set(v) { _pt_skills = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_pt_conns', { get() { return _pt_conns; }, set(v) { _pt_conns = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_pt_skillMap', { get() { return _pt_skillMap; }, set(v) { _pt_skillMap = v; }, configurable: true }); } catch (e) {}
-//  passive-tree-state-points.js
+//  probability-tree-state-points.js
 //  Handles all allocation / deallocation logic, point accounting, and the
 //  adjacency graph that the connectivity checks rely on.
 
@@ -28,6 +28,47 @@ let _pt_skills = [];   // layout skill objects
 let _pt_conns = [];   // connection objects
 let _pt_skillMap = {};   // id → layout skill object
 export let _pt_adjacency = {};   // id → Set of adjacent node ids
+let _pt_reachableCache = null;
+
+const PT_TRAVEL_STAT_KEY_ALIASES = new Map([
+    ['travel_tick_tock_talent', 'tick_tock_talent'],
+    ['travel_second_hand', 'second_hand'],
+    ['travel_midnight_oil', 'midnight_oil'],
+    ['travel_wind_tunnel', 'wind_tunnel'],
+    ['travel_jet_stream', 'jet_stream'],
+    ['travel_extended_session_1', 'extended_session_1'],
+    ['travel_extended_session_2', 'extended_session_2'],
+    ['travel_extended_session_3', 'extended_session_3'],
+    ['travel_stronger_light_1', 'stronger_light_1'],
+    ['travel_seeker_of_light_1', 'seeker_of_light_1'],
+    ['travel_targeted_reveal_1', 'targeted_reveal_1'],
+    ['travel_stronger_marks_1', 'stronger_marks_1'],
+    ['travel_reinforced_ward_1', 'reinforced_ward_1'],
+    ['travel_frugal_use_1', 'frugal_use_1'],
+    ['travel_quality_loot_1', 'quality_loot_1'],
+    ['travel_bonus_replay_1', 'bonus_replay_1'],
+    ['travel_dampened_curse_1', 'dampened_curse_1'],
+    ['travel_common_refinement_1', 'common_refinement_1'],
+    ['travel_swift_strike', 'swift_strike'],
+    ['travel_swift_marking', 'swift_marking'],
+    ['travel_swift_scan', 'swift_scan'],
+    ['travel_quick_strike', 'quick_strike'],
+    ['travel_rapid_revelation', 'rapid_revelation'],
+    ['travel_hastened_zero', 'hastened_zero'],
+    ['travel_streak_bonus_1', 'streak_bonus_1'],
+    ['travel_standard_deviation_1', 'standard_deviation_1'],
+    ['travel_residual_analysis_1', 'residual_analysis_1'],
+    ['travel_timed_stasis_1', 'timed_stasis_1'],
+    ['travel_removal_ward_1', 'removal_ward_1'],
+    ['travel_sample_efficiency_1', 'sample_efficiency_1'],
+    ['travel_regression_reward_1', 'regression_reward_1'],
+    ['travel_sparse_region_1', 'sparse_region_1'],
+]);
+
+export function _ptCanonicalStatKey(statKey) {
+    if (typeof statKey !== 'string') return '';
+    return PT_TRAVEL_STAT_KEY_ALIASES.get(statKey) || statKey;
+}
 
 // All statKeys that belong to each of the three main class branches.
 // Defined at module level so they are not recreated on every node click.
@@ -162,13 +203,30 @@ export function _ptAllocated() {
     if (typeof STATE === 'undefined') return new Set();
     if (!(STATE.passiveTreeAllocated instanceof Set)) {
         STATE.passiveTreeAllocated = new Set();
+        _pt_reachableCache = null;
     }
     return STATE.passiveTreeAllocated;
+}
+
+export function ensurePassiveTreeRoot() {
+    const root = getPassiveTreeRootId();
+    if (!root) return false;
+    const alloc = _ptAllocated();
+    if (alloc.has(root)) return false;
+    alloc.add(root);
+    _pt_reachableCache = null;
+    return true;
 }
 
 // Returns the current number of spendable convergence points
 export function _ptPoints() {
     return (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
+}
+
+function _ptSyncBaseAttributes() {
+    if (typeof globalThis._egSyncBaseAttributes === 'function') {
+        globalThis._egSyncBaseAttributes();
+    }
 }
 
 // Decrements the point counter by 1 (floor 0) and refreshes the UI label
@@ -207,11 +265,31 @@ export function _ptRefreshPointsDisplay() {
 // Must be called after _ptInitTreeData() and before any unlock/dealloc checks.
 export function _ptBuildAdjacency() {
     _pt_adjacency = {};
+    _pt_reachableCache = null;
     _pt_skills.forEach(s => { _pt_adjacency[s.id] = new Set(); });
     _pt_conns.forEach(c => {
         if (_pt_adjacency[c.from]) _pt_adjacency[c.from].add(c.to);
         if (_pt_adjacency[c.to]) _pt_adjacency[c.to].add(c.from);
     });
+}
+
+function _ptConnectivityAdjacency() {
+    return _pt_adjacency;
+}
+
+function _ptReachableFromRoots(roots, availableSet, adjacency) {
+    const visited = new Set();
+    const queue = roots.filter(id => availableSet.has(id));
+    while (queue.length) {
+        const current = queue.pop();
+        if (visited.has(current)) continue;
+        visited.add(current);
+        const neighbours = adjacency[current] || [];
+        for (const neighbour of neighbours) {
+            if (availableSet.has(neighbour) && !visited.has(neighbour)) queue.push(neighbour);
+        }
+    }
+    return visited;
 }
 
 
@@ -225,14 +303,14 @@ export function _ptBuildAdjacency() {
 // Traverses from `startId` through nodes present in `availableSet`, visiting
 // every reachable node exactly once. Returns a Set of all reached node IDs.
 // Used by the deallocation check to verify connectivity is not broken.
-export function _ptBfsReachable(startId, availableSet) {
+export function _ptBfsReachable(startId, availableSet, adjacency = _pt_adjacency) {
     const visited = new Set();
     const queue = [startId];
     while (queue.length) {
         const cur = queue.pop();
         if (visited.has(cur)) continue;
         visited.add(cur);
-        const adj = _pt_adjacency[cur] || new Set();
+        const adj = adjacency[cur] || new Set();
         for (const neighbour of adj) {
             if (availableSet.has(neighbour) && !visited.has(neighbour)) {
                 queue.push(neighbour);
@@ -247,7 +325,7 @@ export function _ptBfsReachable(startId, availableSet) {
 export function _ptGetSkillStatKey(nodeId) {
     const skill = _pt_skillMap[nodeId];
     const def = skill ? skill._def : null;
-    return def ? def.statKey : '';
+    return def ? _ptCanonicalStatKey(def.statKey) : '';
 }
 
 // Builds and returns a Set of all statKeys that are currently allocated.
@@ -270,17 +348,41 @@ export function _ptGetAllAllocatedStatKeys() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+function _ptReachableAllocated() {
+    if (_pt_reachableCache) return _pt_reachableCache;
+    const alloc = _ptAllocated();
+    const root = getPassiveTreeRootId();
+    _pt_reachableCache = root && alloc.has(root)
+        ? _ptBfsReachable(root, alloc, _ptConnectivityAdjacency())
+        : new Set();
+    return _pt_reachableCache;
+}
+
+function _ptAffectedNodeIds(ids) {
+    const affected = new Set();
+    ids.forEach(id => {
+        affected.add(id);
+        const neighbours = _pt_adjacency[id];
+        if (neighbours) neighbours.forEach(neighbourId => affected.add(neighbourId));
+    });
+    return affected;
+}
+
 // A node is UNLOCKABLE when:
 //   – it is not already allocated
 //   – at least one adjacent node IS allocated, OR it is the Start node
 export function _ptIsUnlockable(id) {
     const alloc = _ptAllocated();
     if (alloc.has(id)) return false;
-    if (id === PT_START_ID) return true;
+    if (isPassiveTreeStartNode(id)) return false;
 
-    const neighbours = _pt_adjacency[id] || new Set();
+    const root = getPassiveTreeRootId();
+    if (!root || !alloc.has(root)) return false;
+    const adjacency = _ptConnectivityAdjacency();
+    const reachable = _ptReachableAllocated();
+    const neighbours = adjacency[id] || new Set();
     for (const neighbourId of neighbours) {
-        if (alloc.has(neighbourId)) return true;
+        if (reachable.has(neighbourId)) return true;
     }
     return false;
 }
@@ -296,19 +398,21 @@ export function _ptIsAllocated(id) {
 export function _ptIsDeallocatable(id) {
     const alloc = _ptAllocated();
     if (!alloc.has(id)) return false;
-    if (id === PT_START_ID) return false;   // Start node is permanent
+    if (isPassiveTreeStartNode(id)) return false;
 
-    // Simulate removal and verify every remaining allocated node stays
-    // connected to Start through the remaining allocated set.
+    const adjacency = _ptConnectivityAdjacency();
+    const roots = [...alloc].filter(rootId => isPassiveTreeStartNode(rootId));
+    if (!roots.length) return true;
+
+    const before = _ptReachableFromRoots(roots, alloc, adjacency);
+    if (!before.has(id)) return true;
+
     const testSet = new Set(alloc);
     testSet.delete(id);
-
-    // If Start itself was just removed from the test set there is nothing to check
-    if (!testSet.has(PT_START_ID)) return true;
-
-    const reachable = _ptBfsReachable(PT_START_ID, testSet);
+    const reachable = _ptReachableFromRoots(roots, testSet, adjacency);
     for (const allocatedId of testSet) {
-        if (!reachable.has(allocatedId)) return false;   // a node got stranded
+        if (!Object.prototype.hasOwnProperty.call(adjacency, allocatedId)) continue;
+        if (!reachable.has(allocatedId)) return false;
     }
     return true;
 }
@@ -431,9 +535,11 @@ export function _ptHandleDeallocation(id, alloc) {
     if (!_ptIsDeallocatable(id)) return false;
 
     alloc.delete(id);
+    _pt_reachableCache = null;
+    _ptSyncBaseAttributes();
     _ptRefundPoint();
     save();
-    _ptRefreshAllStyles();
+    _ptRefreshAllStyles(_ptAffectedNodeIds([id]));
 
     if (typeof trackAchStat === 'function') {
         trackAchStat('treeNodesDeallocated');
@@ -444,11 +550,14 @@ export function _ptHandleDeallocation(id, alloc) {
 // Handles the allocation path when the player clicks an unallocated node.
 export function _ptHandleAllocation(id, alloc) {
     alloc.add(id);
+    _pt_reachableCache = null;
+    _ptSyncBaseAttributes();
     _ptSpendPoint();
     STATE.passiveTreeLastNode = id;
     save();
-    _ptRefreshAllStyles();
+    _ptRefreshAllStyles(_ptAffectedNodeIds([id]));
     _ptTrackAllocationAchievements(id, alloc);
+    return id;
 }
 
 // Full respec: de-allocates every node except the permanent Start node and
@@ -458,16 +567,18 @@ export function _ptRefundAllPoints() {
     const alloc = _ptAllocated();
 
     // Collect refundable nodes (everything except Start), bail if tree is empty
-    const refundable = [...alloc].filter(id => id !== PT_START_ID);
+    const refundable = [...alloc].filter(id => !isPassiveTreeStartNode(id));
     if (!refundable.length) return;
 
     refundable.forEach(id => alloc.delete(id));
+    _pt_reachableCache = null;
+    _ptSyncBaseAttributes();
 
     if (typeof STATE !== 'undefined') {
         STATE.passiveTreePoints = _ptPoints() + refundable.length;
     }
     save();
-    _ptRefreshAllStyles();
+    _ptRefreshAllStyles(_ptAffectedNodeIds(refundable));
     _ptRefreshPointsDisplay();
 
     if (typeof trackAchStat === 'function') {
@@ -484,13 +595,13 @@ export function _ptOnNodeClick(id) {
 
     if (_ptIsAllocated(id)) {
         _ptHandleDeallocation(id, alloc);
-        return;
+        return null;
     }
 
-    if (!_ptIsUnlockable(id)) return;
-    if (_ptPoints() < 1) return;
+    if (!_ptIsUnlockable(id)) return null;
+    if (_ptPoints() < 1) return null;
 
-    _ptHandleAllocation(id, alloc);
+    return _ptHandleAllocation(id, alloc);
 }
 
 
@@ -501,7 +612,7 @@ export function _ptOnNodeClick(id) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Used by passive-tree-ui.js to determine which colour set to apply to a node.
+// Used by probability-tree-ui.js to determine which colour set to apply to a node.
 // Returns one of: 'allocated' | 'unlockable' | 'locked'
 export function _ptGetNodeVisualState(id) {
     if (_ptIsAllocated(id)) return 'allocated';
@@ -534,9 +645,11 @@ export function ptHasSkill(statKey) {
         _ptInitTreeData();
     }
 
+    ensurePassiveTreeRoot();
+    const wanted = _ptCanonicalStatKey(statKey);
     const alloc = _ptAllocated();
     for (const id of alloc) {
-        if (_ptGetSkillStatKey(id) === statKey) return true;
+        if (_ptGetSkillStatKey(id) === wanted) return true;
     }
     return false;
 }

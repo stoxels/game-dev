@@ -2,7 +2,8 @@ import { updateClassHUDManaBar } from '../classes/class-mana.js';
 import { _egEntrMoveMult } from '../combat/bosses/boss-entropy.js';
 import { _egSnailBroomHeld } from '../combat/bosses/boss-snail.js';
 import { _egPlayerHasAilment } from '../combat/combat-ailments.js';
-import { _egSetHoldEPauseVisual } from '../combat/encounter-tick.js';
+import { _egGetPlayerChargePct, _egSetHoldEPauseVisual } from
+'../combat/encounter-tick.js';
 import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
 import { EG_PLAYER_DEFAULT_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 import { keybindKeyFor, keybindMatches } from '../keybinds.js';
@@ -95,10 +96,14 @@ export function _avatarBarsHTML(barWidth = '100%') {
                     </div>
                 </div>
 
-                <!-- attack charge-up bar (with % readout to the bar's right - see _egUpdatePlayerChargeBar) -->
+                <!-- attack charge-up bar (with % readout to the bar's right - see _egUpdatePlayerChargeBar).
+                     NOTE: no inline background here - the fill wears the
+                     player-charge-bar-color class so the stylesheet owns its
+                     color (an inline background would beat every tier/ready
+                     glow rule and the bar would stay green forever). -->
                 <div style="width: 100%; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">
                     <div style="background: #111; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; border: 1px solid #000; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
-                        <div id="avatar-charge-fill" style="background: #4ade80; width: 0%; height: 100%; transition: width 0.1s linear;"></div>
+                        <div id="avatar-charge-fill" class="player-charge-bar-color" style="width: 0%; height: 100%; transition: width 0.1s linear;"></div>
                     </div>
                     <span id="avatar-charge-text" class="avatar-bar-num avatar-charge-num" style="flex-shrink: 0; min-width: 4ch; margin-bottom: 0;">0%</span>
                 </div>
@@ -138,25 +143,50 @@ function _updateAvatarBarStack() {
         }
     }
 
-    // Manual melee charge - fills while the attack key is held, toward 100%
-    // and into overcharge during combat, and holds until the release strike
-    // spends it. On puzzle levels the charge stays parked at 0.
+    // Manual melee charge - mirrors _egUpdatePlayerChargeBar (the central
+    // owner of the bar's paused styling): the bar auto-fills toward 100%
+    // and overcharges through the weapon-art tiers while the attack key is
+    // held (up to 500% + orange tier glow). This sync runs AFTER the tick's
+    // bar update on every frame, so it must speak the same 0..5 language -
+    // the old 100%-capped mirror is what froze the readout at full charge.
+    // On puzzle levels the charge stays parked at 0.
     const chargeFill = document.getElementById('avatar-charge-fill');
     if (chargeFill) {
-        const chargeCur = (typeof _egPlayerCurrentCharge === 'number') ? globalThis._egPlayerCurrentCharge : 0;
-        const chargeMax = (typeof _egGetPlayerAttackInterval === 'function')
-            ? _egGetPlayerAttackInterval()
-            : (typeof EG_PLAYER_DEFAULT_ATTACK_INTERVAL === 'number' ? EG_PLAYER_DEFAULT_ATTACK_INTERVAL : 5000);
-        const chargePct = Math.min(100, Math.max(0, (chargeCur / chargeMax) * 100));
-        chargeFill.style.width = chargePct + '%';
-        // Ready glow at full charge (paused styling is owned centrally by
-        // _egUpdatePlayerChargeBar - only mirror the ready state here).
-        const chargeReady = chargePct >= 100;
+        let chargePct = 0;
+        if (typeof _egGetPlayerChargePct === 'function') {
+            try { chargePct = _egGetPlayerChargePct(); } catch (e) { chargePct = 0; }
+        } else {
+            const chargeCur = (typeof _egPlayerCurrentCharge === 'number') ? globalThis._egPlayerCurrentCharge : 0;
+            const chargeMax = (typeof _egGetPlayerAttackInterval === 'function')
+                ? _egGetPlayerAttackInterval()
+                : (typeof EG_PLAYER_DEFAULT_ATTACK_INTERVAL === 'number' ? EG_PLAYER_DEFAULT_ATTACK_INTERVAL : 10);
+            chargePct = (chargeMax > 0) ? chargeCur / chargeMax : 0;
+        }
+        chargePct = Math.min(5, Math.max(0, chargePct));
+        // Visual fill caps at 100% - overcharge reads via the glow + label.
+        chargeFill.style.width = Math.min(100, chargePct * 100) + '%';
+        const chargeReady = chargePct >= 1;
+        const chargeOver = chargePct > 1.001;
+        // Milestone look per weapon-art tier (mirrors
+        // _egUpdatePlayerChargeBar - see eg-charge-tier1..4 in CSS). The
+        // bands are inlined (not imported from encounter-melee-arts.js) on
+        // purpose: this file must stay import-light so its test graph never
+        // pulls the whole encounter facade. Bands pinned against the real
+        // _egMeleeTierForCharge in dev/tests/melee-hold-charge.test.mjs.
+        let chargeTier = 0;
+        try {
+            chargeTier = (chargePct >= 5 - 0.001 ? 4 : chargePct >= 4 ? 3
+                : chargePct >= 3 ? 2 : chargePct >= 2 ? 1 : 0);
+        } catch (e) { chargeTier = 0; }
         chargeFill.classList.toggle('eg-charge-ready', chargeReady);
+        chargeFill.classList.toggle('eg-charge-overcharged', chargeOver);
+        for (let i = 1; i <= 4; i++) chargeFill.classList.toggle('eg-charge-tier' + i, chargeTier === i);
         const chargeText = document.getElementById('avatar-charge-text');
         if (chargeText) {
-            chargeText.textContent = `${Math.floor(chargePct)}%`;
+            chargeText.textContent = `${Math.floor(chargePct * 100)}%`;
             chargeText.classList.toggle('eg-charge-ready', chargeReady);
+            chargeText.classList.toggle('eg-charge-overcharged', chargeOver);
+            for (let i = 1; i <= 4; i++) chargeText.classList.toggle('eg-charge-tier' + i, chargeTier === i);
         }
     }
 }
@@ -537,6 +567,11 @@ function _avatarMoveUiBlocked() {
     if (typeof window !== 'undefined' && window.LEVEL_FLAGS && window.LEVEL_FLAGS.devTestActive
         && window.LEVEL_FLAGS.devTestFreezeAvatar) return true;
     if (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive) return true;
+    // Charging a melee hold roots the hero in place (Secret-of-Mana risk /
+    // reward for the overcharge arts): no voluntary movement until the
+    // strike is released. Covers BOTH key registration (below) and the
+    // displacement loop, so held keys neither queue nor lurch on release.
+    if (typeof _egMeleeHoldActive !== 'undefined' && globalThis._egMeleeHoldActive) return true;
     if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('frozen')) return true;
     return false;
 }

@@ -6,7 +6,7 @@ import { _egApplyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
 import { _egIsActive } from '../combat/combat-state.js';
 import { WORLDS } from '../levels/level-world-data.js';
 import { WORLD_START_GI } from '../levels/levels.js';
-import { PT } from '../passive-tree/passive-tree.js';
+import { PT } from '../probability-tree/probability-tree.js';
 import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../inference/inference-stats.js';

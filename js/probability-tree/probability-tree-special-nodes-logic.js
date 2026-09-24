@@ -4,13 +4,13 @@ import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { stopTimer, updTimer } from '../timer/timer.js';
 import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../timer/timer-adjust.js';
 import { t } from '../translation/translations.js';
-import { PassiveTracker } from './passive-tracker.js';
-import { ptHasSkill } from './passive-tree-state-points.js';
+import { PassiveTracker } from './probability-tree-tracker.js';
+import { ptHasSkill } from './probability-tree-state-points.js';
 import { questStat_gamblersRuinTimeAdded } from '../inference/inference-stats.js';
 import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
-//----------------- passive-tree-special-nodes-logic.js ------------------
+//----------------- probability-tree-special-nodes-logic.js ------------------
 //------------------------------------------------------------------------
 // Implementations for passive tree special nodes:
 //   Nodes 270–272  : Poisson Process

@@ -12,7 +12,7 @@ import { trackAchStat } from '../../achievements/achievements.js';
 import { Audio_Manager } from '../../audio/audio.js';
 import { _egOnProgrammaticReveal } from '../../combat/combat-class-projectiles.js';
 import { renderCell, updClues } from '../../grid.js';
-import { PT } from '../../passive-tree/passive-tree.js';
+import { PT } from '../../probability-tree/probability-tree.js';
 import { questStat_primerRowsColsRevealed, updateQuestStats } from '../../inference/inference-stats.js';
 import { t } from '../../translation/translations.js';
 import { shuffle } from '../../puzzle-mechanics/puzzle-helpers.js';

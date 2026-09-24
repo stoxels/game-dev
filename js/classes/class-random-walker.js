@@ -1,8 +1,8 @@
-﻿import { trackAchStat } from '../achievements/achievements.js';
+import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { t } from '../translation/translations.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { cur } from '../state.js';
 
@@ -21,24 +21,24 @@ import { cur } from '../state.js';
 
 // Bear step durations per skill rank (milliseconds per cell move)
 // 30 % faster than the original 5000 / 4000 / 3000 values
-export const BEAR_STEP_MS_BY_RANK = {
+const BEAR_STEP_MS_BY_RANK = {
     1: 3500,
     2: 2800,
     3: 2100,
 };
 
 // Seconds of remaining walk lost per mistake, by Brownian Motion rank
-export const BEAR_TIME_LOSS_S_BY_RANK = {
+const BEAR_TIME_LOSS_S_BY_RANK = {
     1: 15,
     2: 10,
     3: 5,
 };
 
 // Path generation safety cap - prevents infinite loops on large grids
-export const BEAR_PATH_EMERGENCY_STOP = 1500;
+const BEAR_PATH_EMERGENCY_STOP = 1500;
 
 // Throttle bear reveal sound: only plays once every 8–15 seconds
-export let _nextBearRevealSoundTime = 0;
+let _nextBearRevealSoundTime = 0;
 
 // Active bear movement intervals - stored so they can be killed on level end
 let _bearIntervals = [];
@@ -76,7 +76,7 @@ let _drifterFuseInterval;  // setInterval handle for the fuse countdown
 //------------------------------------------------------------------------
 
 // Snaps an element to the center of a grid cell by DOM id (e.g. "g-2-4").
-export function _agentSnapToCellCenter(el, r, c) {
+function _agentSnapToCellCenter(el, r, c) {
     const cellEl = document.getElementById(`g-${r}-${c}`);
     if (!cellEl) return;
     const rect = cellEl.getBoundingClientRect();
@@ -87,7 +87,7 @@ export function _agentSnapToCellCenter(el, r, c) {
 // Reveals a filled cell (value 1) that hasn't been revealed yet.
 // Throttles the reveal sound so it doesn't spam on every step.
 // Also fires quest tracking and win-check after each reveal attempt.
-export function _revealCellForAgent(r, c) {
+function _revealCellForAgent(r, c) {
     if (!cur) return;
 
     const now = Date.now();
@@ -108,7 +108,7 @@ export function _revealCellForAgent(r, c) {
         trackAchStat('brownianCellsRevealed');
         globalThis._applyCellEffect([`g-${r}-${c}`], 'reveal');
 
-        if (typeof ptHasSkill === 'function' && ptHasSkill('adjacency_matrix')) {
+        if (ptHasSkill('adjacency_matrix')) {
             _adjacencyMatrixRefreshAll();
         }
     }
@@ -132,8 +132,8 @@ export function _revealCellForAgent(r, c) {
 // unrevealed filled cell. Columns whose filled cells are all already
 // revealed/filled (or that contain no filled cells at all) count as done.
 // Falls back to 0 when everything is finished or no level is active.
-export function _findFirstUnfinishedColumn() {
-    if (typeof cur === 'undefined' || !cur) return 0;
+function _findFirstUnfinishedColumn() {
+    if (!cur) return 0;
     const sol = cur.grid;
     if (!sol || !sol.length) return 0;
     const rows = sol.length;
@@ -151,7 +151,7 @@ export function _findFirstUnfinishedColumn() {
 // Builds a right-biased random walk path starting from (startR, startC).
 // The bear always drifts rightward across the grid, with random vertical steps.
 // Returns an array of { r, c } positions from the start column to right edge.
-export function _buildBearPath(startR, rows, cols, startC = 0) {
+function _buildBearPath(startR, rows, cols, startC = 0) {
     const path = [];
     let r = startR;
     let c = Math.max(0, Math.min(startC, cols - 1));
@@ -187,7 +187,7 @@ export function _buildBearPath(startR, rows, cols, startC = 0) {
 
 // Creates the floating bear DOM element and sets its initial CSS.
 // Layout: remaining-time number on top, bear emoji below.
-export function _createBearElement(icon, stepDurationMs) {
+function _createBearElement(icon, stepDurationMs) {
     const el = document.createElement('div');
     el.className = 'random-walker-agent bear-agent';
     el.style.cssText = `
@@ -209,13 +209,13 @@ export function _createBearElement(icon, stepDurationMs) {
 }
 
 // Updates the remaining-time number shown above the bear's head.
-export function _updateBearTimerLabel(state) {
+function _updateBearTimerLabel(state) {
     const el = state.bearEl?.querySelector('.bear-timer-text');
     if (el) el.textContent = `${Math.max(0, state.remainingSeconds)}s`;
 }
 
 // Plays the bear's fade-out animation, then removes it from the DOM.
-export function _removeBearElement(bearEl) {
+function _removeBearElement(bearEl) {
     bearEl.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     bearEl.style.opacity = '0';
     bearEl.style.transform = 'translate(-50%, -80%) scale(1.5)';
@@ -227,7 +227,7 @@ export function _removeBearElement(bearEl) {
 // Draws the dashed path preview overlay and cleans up everything when the
 // path ends. pathColor tints the dashed line (yellow Browney / grey Wiener).
 // rank is stored on the agent so the mistake penalty can apply rank-scaled loss.
-export function _startBearAnimation(path, icon, stepDurationMs, bearName, pathColor, rank) {
+function _startBearAnimation(path, icon, stepDurationMs, bearName, pathColor, rank) {
     if (!path || path.length === 0) return;
 
     const bearEl = _createBearElement(icon, stepDurationMs);
@@ -278,7 +278,7 @@ export function _startBearAnimation(path, icon, stepDurationMs, bearName, pathCo
 
 // Tears down one bear agent: kills its intervals and removes the bear visual.
 // Safe to call multiple times (guarded via finished flag).
-export function _finishBearAgent(state) {
+function _finishBearAgent(state) {
     if (state.finished) return;
     state.finished = true;
 
@@ -355,13 +355,13 @@ export function _executeBrownianMotion(row, col, paths, rank) {
 //------------------------------------------------------------------------
 
 // Moves the drifter element to the center of the given grid cell.
-export function _drifterSnapToCell(el, r, c) {
+function _drifterSnapToCell(el, r, c) {
     _agentSnapToCellCenter(el, r, c);
 }
 
 // Returns the adjacent grid cell the drifter should move to next.
 // In smart mode, prefers unrevealed filled cells. Falls back to any neighbor.
-export function _drifterPickNextStep(r, c, rows, cols, smart, sol) {
+function _drifterPickNextStep(r, c, rows, cols, smart, sol) {
     const neighbors = [
         { dr: -1, dc: 0 }, { dr: 1, dc: 0 },
         { dr: 0, dc: -1 }, { dr: 0, dc: 1 },
@@ -382,7 +382,7 @@ export function _drifterPickNextStep(r, c, rows, cols, smart, sol) {
 }
 
 // Builds and appends the drifter DOM element (dog icon with level label and XP bar).
-export function _createDrifterElement(intervalMs) {
+function _createDrifterElement(intervalMs) {
     const el = document.createElement('div');
     el.id = 'drifter-agent';
     el.className = 'random-walker-agent drifter-agent';
@@ -412,7 +412,7 @@ export function _createDrifterElement(intervalMs) {
 
 // Kills all active drifter timers and removes its DOM element.
 // Safe to call even if no drifter is currently active.
-export function _drifterClear() {
+function _drifterClear() {
     _drifterActive = false;
     _drifterCurrPos = null;
     if (_drifterInterval) { clearTimeout(_drifterInterval); _drifterInterval = null; }
@@ -428,12 +428,12 @@ export function _drifterClear() {
 
 // Returns the number of feed points required to reach the next drifter level.
 // Formula: (currentLevel + 1) * 5  → Lv0→1: 5, Lv1→2: 10, Lv2→3: 15 ...
-export function _drifterXpRequiredForNextLevel(currentLevel) {
+function _drifterXpRequiredForNextLevel(currentLevel) {
     return (currentLevel + 1) * 5;
 }
 
 // Triggers the level-up visual and audio effects on the drifter element.
-export function _drifterPlayLevelUpEffects(newLevel) {
+function _drifterPlayLevelUpEffects(newLevel) {
     const drifterEl = document.getElementById('drifter-agent');
     if (drifterEl) {
         // Update CSS transition to reflect the new faster movement speed
@@ -455,7 +455,7 @@ export function _drifterPlayLevelUpEffects(newLevel) {
 }
 
 // Updates the XP bar fill percentage based on current feed progress vs target.
-export function _drifterUpdateXpBar() {
+function _drifterUpdateXpBar() {
     const required = _drifterXpRequiredForNextLevel(_drifterCharges);
     const bar = document.getElementById('drifter-healthbar');
     if (bar) {
@@ -501,7 +501,7 @@ window.feedDrifter = function () {
 
 // Strips the drifter's level UI and replaces the icon with a poop emoji
 // to signal the incoming explosion.
-export function _drifterPrepareExplosionVisual(el) {
+function _drifterPrepareExplosionVisual(el) {
     document.getElementById('drifter-lvl-text')?.remove();
     document.getElementById('drifter-healthbar')?.parentElement?.remove();
     document.getElementById('drifter-timer-text')?.remove();
@@ -515,7 +515,7 @@ export function _drifterPrepareExplosionVisual(el) {
 }
 
 // Builds the fuse countdown label element and inserts it above the poop icon.
-export function _drifterCreateFuseElement(el, iconEl, initialCount) {
+function _drifterCreateFuseElement(el, iconEl, initialCount) {
     const fuseEl = document.createElement('div');
     fuseEl.style.cssText = "color:#e74c3c;font-weight:bold;font-size:20px;font-family:monospace;margin-bottom:2px;";
     fuseEl.innerText = String(initialCount);
@@ -525,7 +525,7 @@ export function _drifterCreateFuseElement(el, iconEl, initialCount) {
 
 // Reveals or marks all cells within the explosion radius around (r, c).
 // Returns the total number of filled cells that were newly revealed.
-export function _drifterExplodeCells(r, c, radius, rows, cols) {
+function _drifterExplodeCells(r, c, radius, rows, cols) {
     let cellsRevealed = 0;
 
     for (let i = r - radius; i <= r + radius; i++) {
@@ -551,7 +551,7 @@ export function _drifterExplodeCells(r, c, radius, rows, cols) {
 }
 
 // Fades out and removes the drifter DOM element after the explosion triggers.
-export function _drifterPlayExplosionAnimation(el) {
+function _drifterPlayExplosionAnimation(el) {
     el.style.transform = 'translate(-50%, -50%) scale(2)';
     el.style.opacity = '0';
     setTimeout(() => el.remove(), 300);
@@ -559,7 +559,7 @@ export function _drifterPlayExplosionAnimation(el) {
 
 // Runs the 3-second fuse countdown, then detonates a radius explosion
 // centered on the drifter's last position. Radius = drifter's final level.
-export function _drifterPoopExplosion(el, r, c, rows, cols) {
+function _drifterPoopExplosion(el, r, c, rows, cols) {
     _drifterActive = false;
 
     if (!el || !document.body.contains(el)) return;
@@ -605,7 +605,7 @@ export function _drifterPoopExplosion(el, r, c, rows, cols) {
 
 // Schedules the next drifter movement step using the current interval speed.
 // Recursively reschedules itself until _drifterActive is false.
-export function _drifterScheduleNextStep(drifterEl, currPos, rows, cols, smartTarget, sol) {
+function _drifterScheduleNextStep(drifterEl, currPos, rows, cols, smartTarget, sol) {
     if (!_drifterActive) return;
 
     _drifterInterval = setTimeout(() => {
@@ -624,11 +624,11 @@ export function _drifterScheduleNextStep(drifterEl, currPos, rows, cols, smartTa
 
 // Starts the 1-second countdown timer that ends the drifter's active roaming phase
 // and kicks off the poop explosion once time runs out.
-export function _drifterStartCountdownTimer(drifterEl, currPos, rows, cols, hudUid) {
+function _drifterStartCountdownTimer(drifterEl, currPos, rows, cols, hudUid) {
     _drifterTimer = setInterval(() => {
         _drifterTimeRemainingSeconds--;
 
-        // Update the Drifter Countdown Timer underneath the Icon 
+        // Update the Drifter Countdown Timer underneath the Icon
         const timerTextEl = document.getElementById('drifter-timer-text');
         if (timerTextEl) {
             timerTextEl.innerText = `${Math.max(0, Math.floor(_drifterTimeRemainingSeconds))}s`;
@@ -713,7 +713,7 @@ export function _executeSummonDrifter(duration, interval, smartTarget) {
 //------------------------------------------------------------------------
 
 // Returns the walker HUD panel container, creating it if it doesn't exist yet.
-export function _getOrCreateHudPanel() {
+function _getOrCreateHudPanel() {
     let container = document.getElementById('walker-hud-panel');
     if (!container) {
         container = document.createElement('div');
@@ -735,7 +735,7 @@ export function _getOrCreateHudPanel() {
 }
 
 // Builds and returns the HUD card DOM element for a single active agent.
-export function _createHudCard(uniqueId, icon, label, initialSeconds) {
+function _createHudCard(uniqueId, icon, label, initialSeconds) {
     const el = document.createElement('div');
     el.id = uniqueId;
     el.className = 'random-walker-agent';
@@ -768,7 +768,7 @@ export function _createHudCard(uniqueId, icon, label, initialSeconds) {
 // (keyed by card ID) so the mistake penalty can shave seconds off it.
 // For the drifter card (isDrifter=true) it reads the global remaining time
 // instead of counting down independently, so it stays in sync with feed bonuses.
-export function _startHudCardTicker(uniqueId, initialSeconds, isDrifter) {
+function _startHudCardTicker(uniqueId, initialSeconds, isDrifter) {
     const holder = { timeRemaining: initialSeconds };
     _walkerHudState[uniqueId] = holder;
 
@@ -800,7 +800,7 @@ export function _startHudCardTicker(uniqueId, initialSeconds, isDrifter) {
 // Spawns a live timer card in the HUD panel for an active agent.
 // Returns a unique ID that can later be passed to _removeWalkerHudIndicator.
 // Set isDrifter=true to sync the timer with the drifter's globally modified duration.
-export function _spawnWalkerHudIndicator(icon, label, initialSeconds, isDrifter = false) {
+function _spawnWalkerHudIndicator(icon, label, initialSeconds, isDrifter = false) {
     const container = _getOrCreateHudPanel();
 
     // Drifter always reuses the same fixed ID so there's never a duplicate card
@@ -818,7 +818,7 @@ export function _spawnWalkerHudIndicator(icon, label, initialSeconds, isDrifter 
 }
 
 // Fades out and removes a HUD card by its ID, and clears its ticker interval.
-export function _removeWalkerHudIndicator(id) {
+function _removeWalkerHudIndicator(id) {
     const el = document.getElementById(id);
     if (el) {
         el.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
@@ -846,7 +846,7 @@ export function _removeWalkerHudIndicator(id) {
 // tail segment flashes red, wiggles vertically, then fades out.
 
 // Returns the viewport-space bounding box of the puzzle grid cells.
-export function _getGridCellBounds() {
+function _getGridCellBounds() {
     if (!cur) return null;
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
@@ -860,7 +860,7 @@ export function _getGridCellBounds() {
 }
 
 // Returns the viewport-space center of a grid cell (or null off-grid).
-export function _getCellCenterPx(r, c) {
+function _getCellCenterPx(r, c) {
     const cellEl = document.getElementById(`g-${r}-${c}`);
     if (!cellEl) return null;
     const rect = cellEl.getBoundingClientRect();
@@ -868,7 +868,7 @@ export function _getCellCenterPx(r, c) {
 }
 
 // Creates (once) and returns the fixed-position SVG overlay element.
-export function _ensureBearPathOverlaySvg() {
+function _ensureBearPathOverlaySvg() {
     let svg = document.getElementById('bear-path-overlay-svg');
     if (!svg) {
         svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -886,7 +886,7 @@ export function _ensureBearPathOverlaySvg() {
 
 // Sizes and positions the SVG so its local coordinates match viewport pixels
 // inside the grid bounds. Returns the SVG or null when the grid is gone.
-export function _positionBearPathOverlaySvg() {
+function _positionBearPathOverlaySvg() {
     const svg = _ensureBearPathOverlaySvg();
     const bounds = _getGridCellBounds();
     if (!bounds) {
@@ -911,7 +911,7 @@ export function _positionBearPathOverlaySvg() {
 }
 
 // Converts path steps to SVG-local polyline points.
-export function _pathStepsToPoints(steps) {
+function _pathStepsToPoints(steps) {
     const bounds = _getGridCellBounds();
     if (!bounds) return '';
 
@@ -925,7 +925,7 @@ export function _pathStepsToPoints(steps) {
 // Redraws the dashed preview line for every currently walking bear.
 // Called on ability cast, after each mistake cut, and whenever the grid
 // moves (window resize / zoom / clue-side toggles).
-export function _redrawBearPathOverlays() {
+function _redrawBearPathOverlays() {
     const svg = _positionBearPathOverlaySvg();
     if (!svg) return;
 
@@ -961,7 +961,7 @@ export function _redrawBearPathOverlays() {
 // Plays the "this part of the path is now gone" animation for a mistake:
 // the removed tail is redrawn in red, wiggles up/down for ~0.5 s, then
 // fades out and removes itself.
-export function _playPathCutAnimation(lostSteps, baseColor) {
+function _playPathCutAnimation(lostSteps, baseColor) {
     const svg = _positionBearPathOverlaySvg();
     if (!svg || !lostSteps || lostSteps.length < 2) return;
 

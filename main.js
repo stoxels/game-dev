@@ -5,8 +5,8 @@ import { _egOnPause, _egOnResume } from './js/combat/encounter-tick.js';
 import { closeHubToGame, isHubGameOverlay } from './js/endgame/endgame-hub.js';
 import { scalePuzzle } from './js/grid-scaling.js';
 import { stopPainting } from './js/mouse-button-handlers.js';
-import { _dofNudge } from './js/passive-tree/passive-tree-special-nodes-logic.js';
-import { closeTreeToGame, isTreeGameOverlay } from './js/passive-tree/passive-tree.js';
+import { _dofNudge } from './js/probability-tree/probability-tree-special-nodes-logic.js';
+import { closeTreeToGame, isTreeGameOverlay } from './js/probability-tree/probability-tree.js';
 import { skipQuiz } from './js/quiz-exercise/quiz.js';
 import { _refreshQuestionModalFlag, goToPreviousScreen, hideResultOverlays } from './js/screens/screens.js';
 import { SETTINGS, applySettings, initSettingsControls } from './js/settings.js';
@@ -31,13 +31,13 @@ try { Object.defineProperty(globalThis, '_gamePaused', { get() { return _gamePau
 let _gamePaused = false;
 
 // Animation timing for the title decoration shimmer wave effect
-export const DECO_PANEL_DELAY_STEP = 0.4;  // seconds between panels
-export const DECO_ROW_DELAY_STEP = 0.08; // seconds between rows within a panel
-export const DECO_COL_DELAY_STEP = 0.05; // seconds between columns within a row
+const DECO_PANEL_DELAY_STEP = 0.4;  // seconds between panels
+const DECO_ROW_DELAY_STEP = 0.08; // seconds between rows within a panel
+const DECO_COL_DELAY_STEP = 0.05; // seconds between columns within a row
 
 // Pixel-art bitmaps (5×5) used on the title screen decoration.
 // 1 = filled cell, 0 = invisible cell.
-export const DECO_PANELS = [
+const DECO_PANELS = [
     // Panel 1 – classic puzzle cross
     [
         [0, 1, 0, 1, 0],
@@ -82,7 +82,7 @@ export const DECO_PANELS = [
 
 // On endgame maps the pause menu offers "Return to Nexus" instead of "Levels".
 // Returns whether the current level is an endgame map.
-export function _updatePauseMenuReturnButtons() {
+function _updatePauseMenuReturnButtons() {
     // Campaign levels also carry isMonsterLevel (their light monster pack),
     // but they are NOT endgame maps - they keep the normal "Levels" button.
     const onEndgameMap = typeof cur !== 'undefined' && cur &&
@@ -126,7 +126,7 @@ export function unpauseGame() {
 
 // Toggles between paused and unpaused.
 // Does nothing if the level has already ended (dead flag).
-export function togglePause() {
+function togglePause() {
     if (globalThis.dead) return;
     _gamePaused ? unpauseGame() : pauseGame();
 }
@@ -142,7 +142,7 @@ export function togglePause() {
 // Runs cleanup for any active special-mechanic overlays before
 // the escape key resolves its main action. These are optional globals
 // defined in their respective mechanic files, so we guard before calling.
-export function _runEscapeCleanup() {
+function _runEscapeCleanup() {
     if (typeof _bayesTrapsCleanup === 'function') {
         _bayesTrapsCleanup(false);
     }
@@ -152,12 +152,12 @@ export function _runEscapeCleanup() {
 }
 
 // Returns true if the quiz overlay is currently visible.
-export function _isQuizOpen() {
+function _isQuizOpen() {
     return document.getElementById('quiz-overlay').classList.contains('show');
 }
 
 // Returns true if any modal backdrop is currently visible.
-export function _isAnyModalOpen() {
+function _isAnyModalOpen() {
     return !!document.querySelector('.modal-bg.show');
 }
 
@@ -165,7 +165,7 @@ export function _isAnyModalOpen() {
 // The Degrees of Freedom choice modal (#dof-modal) is mandatory - its
 // keystone downside must always apply - so it is never dismissed here.
 // It only closes via _dofChoose(); Escape just nudges it instead.
-export function _closeAllModals() {
+function _closeAllModals() {
     document.querySelectorAll('.modal-bg.show')
         .forEach(m => {
             if (m.id === 'dof-modal') {
@@ -188,13 +188,13 @@ export function _closeAllModals() {
 }
 
 // Returns true if the win or lose end-of-level overlay is visible.
-export function _isEndOverlayOpen() {
+function _isEndOverlayOpen() {
     return document.getElementById('ov-win').classList.contains('show') ||
         document.getElementById('ov-lose').classList.contains('show');
 }
 
 // Returns true if the main game screen is the active screen.
-export function _isOnGameScreen() {
+function _isOnGameScreen() {
     return document.getElementById('screen-game').classList.contains('active');
 }
 
@@ -204,7 +204,7 @@ export function _isOnGameScreen() {
 //   3. Win / lose overlay     → hide the overlay (stay on game screen)
 //   4. On the game screen     → toggle pause
 //   5. Anywhere else          → go back to the previous screen (via ui.js)
-export function _handleEscapeKey() {
+function _handleEscapeKey() {
     _runEscapeCleanup();
 
     if (_isQuizOpen()) {
@@ -251,7 +251,7 @@ export function _handleEscapeKey() {
 // Creates a single decoration cell div.
 // Visible cells get a staggered animation delay to produce a wave shimmer.
 // panelIndex, row, col are used to calculate that delay.
-export function buildDecoCell(isFilled, panelIndex, row, col) {
+function buildDecoCell(isFilled, panelIndex, row, col) {
     const cell = document.createElement('div');
     cell.className = 'title-deco-cell';
     cell.style.opacity = isFilled ? '1' : '0';
@@ -271,7 +271,7 @@ export function buildDecoCell(isFilled, panelIndex, row, col) {
 
 // Creates a single decoration panel div from a 5×5 bitmap grid.
 // Appends one cell div per bitmap entry.
-export function buildDecoPanel(grid, panelIndex) {
+function buildDecoPanel(grid, panelIndex) {
     const panel = document.createElement('div');
     panel.className = 'title-deco-panel';
     panel.dataset.panel = panelIndex;
@@ -287,7 +287,7 @@ export function buildDecoPanel(grid, panelIndex) {
 
 // Builds all pixel-art decoration panels and injects them into
 // the #tdeco container on the title screen.
-export function initTitleDecoration() {
+function initTitleDecoration() {
     const container = document.getElementById('tdeco');
 
     DECO_PANELS.forEach((grid, panelIndex) => {

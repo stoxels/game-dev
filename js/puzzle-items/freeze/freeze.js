@@ -1,7 +1,7 @@
 import { trackAchStat } from '../../achievements/achievements.js';
 import { Audio_Manager } from '../../audio/audio.js';
-import { _startBlizzardEffect } from '../../classes/class-mathmagician.js';
-import { ptHasSkill } from '../../passive-tree/passive-tree-state-points.js';
+import { _startBlizzardEffect } from '../../classes/class-mathmagician-absolute-zero.js';
+import { ptHasSkill } from '../../probability-tree/probability-tree-state-points.js';
 import { t } from '../../translation/translations.js';
 import { playItemEffect } from '../item-fx-dispatcher.js';
 import { showToast } from '../../puzzle-mechanics/toasts-and-popups.js';

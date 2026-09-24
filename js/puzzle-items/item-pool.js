@@ -1,4 +1,4 @@
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { LANG } from '../translation/translations.js';
 import { ITEM_DEFS } from './item-definitions.js';
 

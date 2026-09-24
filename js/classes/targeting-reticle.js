@@ -1,4 +1,4 @@
-﻿import { _arcaneReveal_clearPreview, _arcaneReveal_updatePreview } from './class-mathmagician.js';
+import { _arcaneReveal_clearPreview, _arcaneReveal_updatePreview } from './class-mathmagician.js';
 import { _fieldScanClearPreview, _fieldScanUpdatePreview } from './class-probabilist.js';
 import { _diagStrikeClearPreview, _diagStrikeUpdatePreview } from './class-statistician.js';
 import { STATE } from '../state.js';
@@ -21,17 +21,17 @@ import { STATE } from '../state.js';
 //------------------------------------------------------------------------
 
 // Cached references, created lazily on first arm.
-export let _arReticleEl = null;
-export let _arStageEl = null;
+let _arReticleEl = null;
+let _arStageEl = null;
 
 // Bound mousemove handler reference, so we can add/remove the exact same
 // function and avoid leaking listeners across repeated arm/disarm cycles.
-export let _arMoveHandler = null;
+let _arMoveHandler = null;
 
 // Last known pointer position, kept so the reticle can be (re)placed
 // immediately on arm without waiting for the next mousemove.
-export let _arLastX = -9999;
-export let _arLastY = -9999;
+let _arLastX = -9999;
+let _arLastY = -9999;
 
 
 //------------------------------------------------------------------------
@@ -42,7 +42,7 @@ export let _arLastY = -9999;
 // new classes get their own bespoke reticle palette.
 //------------------------------------------------------------------------
 
-export function _arResolveTheme() {
+function _arResolveTheme() {
     const slot = STATE.classActiveChoice;
 
     // Ascendency-specific themes take priority over the base class theme,
@@ -66,7 +66,7 @@ export function _arResolveTheme() {
 
 // _arBuildReticleDOM - builds the reticle markup once and appends it to
 //   <body>. Safe to call multiple times; it is a no-op after the first.
-export function _arBuildReticleDOM() {
+function _arBuildReticleDOM() {
     if (_arReticleEl) return;
 
     const root = document.createElement('div');
@@ -105,7 +105,7 @@ export function _arBuildReticleDOM() {
 // _arMoveTo - positions the reticle at the given viewport coordinates.
 //   Uses a transform on the root element so we only ever touch one
 //   property per move, keeping this cheap even on fast mouse movement.
-export function _arMoveTo(x, y) {
+function _arMoveTo(x, y) {
     _arLastX = x;
     _arLastY = y;
     if (_arReticleEl) {
@@ -116,11 +116,11 @@ export function _arMoveTo(x, y) {
 // _arOnMouseMove - listener bound to the whole document while armed, so
 //   the reticle keeps following the cursor regardless of whether it is
 //   currently over the grid, the HUD, or empty page space.
-export function _arOnMouseMove(e) {
+function _arOnMouseMove(e) {
     _arMoveTo(e.clientX, e.clientY);
-    if (typeof _fieldScanUpdatePreview === 'function') _fieldScanUpdatePreview(e.clientX, e.clientY);
-    if (typeof _arcaneReveal_updatePreview === 'function') _arcaneReveal_updatePreview(e.clientX, e.clientY);
-    if (typeof _diagStrikeUpdatePreview === 'function') _diagStrikeUpdatePreview(e.clientX, e.clientY);
+    _fieldScanUpdatePreview(e.clientX, e.clientY);
+    _arcaneReveal_updatePreview(e.clientX, e.clientY);
+    _diagStrikeUpdatePreview(e.clientX, e.clientY);
 }
 
 
@@ -133,7 +133,7 @@ export function _arOnMouseMove(e) {
 //   re-triggering the CSS animation class (removing then re-adding it on
 //   the next frame, since browsers won't restart an animation just by
 //   re-adding the same class without a reflow in between).
-export function _arShowArmPop() {
+function _arShowArmPop() {
     if (!_arStageEl) return;
     _arStageEl.classList.remove('ar-just-armed');
     void _arStageEl.offsetWidth; // force reflow
@@ -160,19 +160,19 @@ export function activateTargetingReticle(armed) {
 
         // Field Scan gets an extra live NxN boundary preview, synced to the
         // same mousemove handler - see _fieldScanUpdatePreview in class-probabilist.js.
-        if (_arLastX > -9999 && typeof _fieldScanUpdatePreview === 'function') {
+        if (_arLastX > -9999) {
             _fieldScanUpdatePreview(_arLastX, _arLastY);
         }
 
         // Arcane Reveal gets the same treatment: a live radius-square preview,
         // see _arcaneReveal_updatePreview in class-mathmagician.js.
-        if (_arLastX > -9999 && typeof _arcaneReveal_updatePreview === 'function') {
+        if (_arLastX > -9999) {
             _arcaneReveal_updatePreview(_arLastX, _arLastY);
         }
 
         // Diagonal Strike gets a live diagonal-line preview (1/2/4 bars
         // depending on rank), see _diagStrikeUpdatePreview in class-statistician.js.
-        if (_arLastX > -9999 && typeof _diagStrikeUpdatePreview === 'function') {
+        if (_arLastX > -9999) {
             _diagStrikeUpdatePreview(_arLastX, _arLastY);
         }
     } else {
@@ -183,8 +183,8 @@ export function activateTargetingReticle(armed) {
             document.removeEventListener('mousemove', _arMoveHandler);
         }
 
-        if (typeof _fieldScanClearPreview === 'function') _fieldScanClearPreview();
-        if (typeof _arcaneReveal_clearPreview === 'function') _arcaneReveal_clearPreview();
-        if (typeof _diagStrikeClearPreview === 'function') _diagStrikeClearPreview();
+        _fieldScanClearPreview();
+        _arcaneReveal_clearPreview();
+        _diagStrikeClearPreview();
     }
 }

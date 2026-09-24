@@ -1,4 +1,4 @@
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 
 //------------------------------------------------------------------------
 //-------------------SHARED - EFFECT MODIFIERS----------------------

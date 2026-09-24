@@ -13,6 +13,64 @@ export const CHANGELOG_DATA = [
 
 
     {
+        version: "v0.29 BETA",
+        date: "23.09.2026",
+        changes: [
+            {
+                category: ["New Features", "Neue Funktionen"],
+                items: [
+                    ["A large universal-spell arsenal has been added, with new offensive, support and movement spells, cooldowns, cast times, mana costs and visual effects.", "Ein großes universelles Zauberarsenal wurde hinzugefügt, mit neuen Angriffs-, Unterstützungs- und Bewegungszaubern, Abklingzeiten, Cast-Zeiten, Manakosten und visuellen Effekten."],
+                    ["Defeated monsters can now drop skill charms. Place charms in the ten spellbook slots to unlock their spells on the hotbar; duplicate charms become Lemmas, and ten Lemmas prove a permanent Theorem.", "Besiegte Monster lassen jetzt Fähigkeits-Anhänger fallen. Lege Anhänger in die zehn Zauberbuchplätze, um ihre Zauber auf der Hotbar freizuschalten; doppelte Anhänger werden zu Lemmata, und zehn Lemmata beweisen ein dauerhaftes Theorem."],
+                    ["Added a new Monsterless modifier for playing the puzzle and campaign systems without monsters, bosses, Endgame combat or Nexus unlocks.", "Neuer Monsterlos-Modifikator: Spiele die Puzzle- und Kampagnensysteme ohne Monster, Bosse, Endgame-Kämpfe oder Nexus-Freischaltungen."],
+                    ["The Professor tutorial has been expanded into a more interactive introduction covering movement, deduction, items, gear, melee and charms.", "Das Professor-Tutorial wurde zu einer interaktiveren Einführung ausgebaut und behandelt jetzt Bewegung, Deduktion, Items, Ausrüstung, Nahkampf und Anhänger."],
+                    ["A new toast message now tells you which spell was unlocked and which hotbar key casts it.", "Eine neue Toast-Meldung zeigt dir jetzt, welcher Zauber freigeschaltet wurde und welche Hotbar-Taste ihn auslöst."],
+                ],
+            },
+            {
+                category: ["Endgame & Progression", "Endgame & Fortschritt"],
+                items: [
+                    ["The Endgame has been greatly expanded with new Nexus progression, campaign trials, class-change tokens, gear generation, vendor tools and additional encounters and boss mechanics.", "Das Endgame wurde mit neuer Nexus-Fortschrittsmechanik, Kampagnen-Tests, Klassenwechsel-Token, Ausrüstungsgenerierung, Händlerwerkzeugen sowie zusätzlichen Begegnungen und Bossmechaniken stark erweitert."],
+                    ["Many Endgame encounters have been authored or reworked, including new phases, attacks, hazards, movement patterns and finales.", "Viele Endgame-Begegnungen wurden neu erstellt oder überarbeitet, darunter neue Phasen, Angriffe, Gefahren, Bewegungsmuster und Finales."],
+                    ["Endgame map completion now grants adjacency bonuses, and map panels show where potential bonus-map drops can come from.", "Das Abschließen von Endgame-Karten gewährt jetzt Boni für benachbarte Karten, und Kartenpanels zeigen, woher potenzielle Bonuskarten fallen können."],
+                    ["The spellbook has been redesigned into a clearer two-page book with school-colored spell stones, charm slots, filters, rank information and improved hotbar feedback.", "Das Zauberbuch wurde zu einem klareren Buch mit zwei Seiten umgestaltet, mit schulisch farbigen Zaubersteinen, Anhängerplätzen, Filtern, Ranginformationen und verbessertem Hotbar-Feedback."],
+                    ["Endgame runs can now be left with a clear warning explaining which collected progress is kept and which unfinished objectives, map value and Atlas progress are lost.", "Endgame-Durchläufe können jetzt mit einer klaren Warnung verlassen werden, die erklärt, welcher gesammelte Fortschritt bleibt und welche unerledigten Ziele, Kartenwerte und Atlas-Fortschritte verloren gehen."],
+                ],
+            },
+            {
+                category: ["Combat & Gameplay", "Kampf & Gameplay"],
+                items: [
+                    ["Dual wielding and parry are now supported, including off-hand equipment rules and related gear statistics.", "Doppelwaffen und Parieren werden jetzt unterstützt, einschließlich Regeln für die Offhand und zugehöriger Ausrüstungswerte."],
+                    ["Manual melee now uses hold-to-charge and release: a tap is a weak strike, a full charge deals full damage, holding longer overcharges up to twice normal damage, and out-of-range swings whiff while still consuming the charge.", "Manueller Nahkampf nutzt jetzt Halten zum Laden und Loslassen: Ein kurzer Tipp ist ein schwacher Schlag, volle Ladung verursacht vollen Schaden, längeres Halten lädt bis zum doppelten Schaden auf, und Schläge außer Reichweite verfehlen, verbrauchen aber die Ladung."],
+                    ["The Endgame modifier that reduces time gained now applies consistently to all applicable time bonuses.", "Der Endgame-Modifikator, der hinzugefügte Zeit reduziert, gilt jetzt einheitlich für alle anwendbaren Zeitboni."],
+                    ["Normal monster charm drops were reduced, while higher-rank spells now scale more sharply in mana cost.", "Die normale Drop-Chance für Monsteranhänger wurde reduziert, während Zauber höheren Rangs deutlich steiler mit den Manakosten skalieren."],
+                ],
+            },
+            {
+                category: ["General Adjustments", "Allgemeine Anpassungen"],
+                items: [
+                    ["Item art now appears in inventories, pickups, vendor screens, passive-tree rewards and toast messages, with expanded gear rendering and retuned weapon grips.", "Item-Kunst erscheint jetzt in Inventaren, Aufsammelgegenständen, Händlerbildschirmen, Belohnungen des passiven Baums und Toast-Meldungen; außerdem wurden die Ausrüstungsdarstellung und die Waffengriffe neu abgestimmt."],
+                    ["The Mistake Eraser item family is now called Tutor, Professor, Scholar and Grand Mentor; existing saves are migrated automatically.", "Die Item-Fehlerlöscher-Familie heißt jetzt Tutor, Professor, Scholar und Grand Mentor; bestehende Spielstände werden automatisch migriert."],
+                    ["Asset preloading and a broad image-efficiency pass improve loading times and reduce unnecessary asset work.", "Asset-Vorabladen und eine umfassende Bildoptimierung verbessern die Ladezeiten und reduzieren unnötige Asset-Arbeit."],
+                    ["The Atlas Vendor's Back button now returns to the Nexus of Worlds.", "Die Zurück-Schaltfläche des Atlas-Händlers führt jetzt zum Nexus der Welten."],
+                ],
+            },
+            {
+                category: ["Bug Fixes", "Fehlerbehebungen"],
+                items: [
+                    ["Fixed a Laplace's Demon crash when a later encounter reused stale coordinates from a larger grid.", "Ein Absturz von Laplace's Dämon behoben, wenn eine spätere Begegnung veraltete Koordinaten eines größeren Gitters wiederverwendete."],
+                    ["Fixed Veil of Purity so count-based cursed items receive first-use immunity and doubled downsides afterward, matching duration-based items.", "Der Schutzschleier der Reinheit wurde korrigiert: Zählbasierte verfluchte Items erhalten nun bei der ersten Nutzung Immunität und danach verdoppelte Nachteile, passend zu Items mit zeitlich begrenzten Nachteilen."],
+                    ["Fixed inventory flyouts that could remain open after pointer exits, screen changes, level completion or overlay openings.", "Fehler behoben, bei denen Inventar-Overlays nach Mausweg, Bildschirmwechsel, Levelabschluss oder dem Öffnen anderer Overlays offen bleiben konnten."],
+                    ["Fixed a tutorial hotbar recursion and stack overflow, as well as a bug that could remove a manually slotted Fireball.", "Eine Rekursion mit Stack-Overflow in der Tutorial-Hotbar sowie einen Fehler behoben, der einen manuell platzierten Feuerball entfernen konnte."],
+                    ["Fixed incorrect tutorial task progression and premature skipping of a live ghost target.", "Fehlerhafte Fortschritte bei Tutorialaufgaben und das vorzeitige Überspringen eines noch lebenden Geisterziels behoben."],
+                    ["Fixed map sorting, missing English and German Razor text and several navigation issues.", "Fehlerhafte Kartensortierung, fehlenden englischen und deutschen Razor-Text sowie mehrere Navigationsprobleme behoben."],
+                    ["Fixed a Countdown Crisis timer-item crash and several tutorial and passive-tree initialization failures exposed during the module migration.", "Einen Absturz des Countdown-Crisis-Timer-Items sowie mehrere Probleme bei der Initialisierung von Tutorial und passivem Baum behoben, die während der Modulumstellung sichtbar wurden."],
+                    ["Fixed the intro-song resume crash after skipping a story beat while autoplay was blocked.", "Einen Absturz beim Fortsetzen des Intro-Songs behoben, nachdem ein Story-Abschnitt übersprungen wurde, während Autoplay blockiert war."],
+                ],
+            },
+        ],
+    },
+
+    {
         version: "0.28 BETA",
         date: "04.09.2026",
         changes: [

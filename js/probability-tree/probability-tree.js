@@ -2,13 +2,15 @@
 import { showMapView } from '../screens/screens-map-view.js';
 import { showWorldDetail } from '../screens/screens-world-levels.js';
 import { switchScreen } from '../screens/screens.js';
-import { save } from '../state.js';
+import { save, reconcilePassiveTreeForClass, getPassiveTreeCharacterRootId, beginPassiveTreeCharacterPreview, endPassiveTreeCharacterPreview } from '../state.js';
 import { pauseTimer, resumeTimer } from '../timer/timer.js';
 import { LANG, t } from '../translation/translations.js';
-import { PassiveTracker } from './passive-tracker.js';
-import { TALENT_TREE_DATA } from './passive-tree-data.js';
-import { ptHasSkill } from './passive-tree-state-points.js';
-import { _ptRender } from './passive-tree-ui.js';
+import { PassiveTracker } from './probability-tree-tracker.js';
+import { TALENT_TREE_DATA } from './probability-tree-data.js';
+import { resolvePassiveTreeLayout } from './probability-tree-layout.js';
+import { ptHasSkill } from './probability-tree-state-points.js';
+import { _ptRender } from './probability-tree-ui.js';
+import { _ptSuspendViewport } from './probability-tree-viewport.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
@@ -19,10 +21,25 @@ try { Object.defineProperty(globalThis, '_ptReturnWorldIndex', { get() { return 
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// Special node IDs
-// The Start node is always considered reachable / pre-allocated.
-// Set PT_START_ID to match the "id" of your Start node in passive-tree-data.js
+// The legacy ID 1 is the Ascendancy Gate in the development layout. The
+// playable roots are the three character-start nodes.
 export const PT_START_ID = 1;
+export const PT_CLASS_START_IDS = Object.freeze({
+    statistician: 1001,
+    mathmagician: 1002,
+    probabilist: 1003,
+});
+
+export function getPassiveTreeRootId() {
+    if (typeof STATE === 'undefined' || !STATE) return null;
+    return getPassiveTreeCharacterRootId(STATE) || PT_CLASS_START_IDS[STATE.playerClass] || null;
+}
+
+export function isPassiveTreeStartNode(id) {
+    return id === PT_CLASS_START_IDS.statistician
+        || id === PT_CLASS_START_IDS.mathmagician
+        || id === PT_CLASS_START_IDS.probabilist;
+}
 
 // Layout dimensions
 export const PT_NODE_RADIUS = 22;
@@ -30,9 +47,10 @@ export const PT_PADDING = 80;
 export const PT_CONN_WIDTH = 2;
 
 // Zoom limits and step size
-export const PT_ZOOM_MIN = 0.25;
+export const PT_ZOOM_MIN = 0.08;
 export const PT_ZOOM_MAX = 3.0;
 export const PT_ZOOM_STEP = 0.12;
+export const PT_FOCUS_SCALE = 1.0;
 
 // Node colours - one set per state: locked / unlocked / allocated / start
 export const PT_COL_LOCKED_BG = '#111120';
@@ -52,7 +70,7 @@ export const PT_CONN_UNLOCKED = 'rgba(160,130,80,0.45)';
 export const PT_CONN_ALLOCATED = 'rgba(109,191,64,0.7)';
 
 // Tracks which screen - and, if applicable, which world - to return to
-// after closing the Probability Tree. Kept up to date by showWorldDetail(),
+// after closing the passive tree. Kept up to date by showWorldDetail(),
 // showMapView(), and toggleMapView()'s classic-view branch.
 let _ptReturnScreen = 'screen-levels';
 let _ptReturnWorldIndex = null;
@@ -64,19 +82,21 @@ let _ptReturnWorldIndex = null;
 //------------------------------------------------------------------------
 
 // These functions populate the shared _pt_skills, _pt_conns, and
-// _pt_skillMap globals that are declared in passive-tree-ui.js.
-// TALENT_TREE_DATA is the constant defined in passive-tree-data.js.
-// Load order in HTML must be: passive-tree-data.js → passive-tree.js → passive-tree-ui.js
+// _pt_skillMap globals that are declared in probability-tree-ui.js.
+// The development layout is imported from probability-tree-data.js.
 
 // Maps TALENT_TREE_DATA.nodes into internal skill objects and builds
 // the _pt_skillMap lookup table for fast id-based access.
 export function _ptInitSkills() {
-    globalThis._pt_skills = TALENT_TREE_DATA.nodes.map(n => ({
+    const layoutNodes = resolvePassiveTreeLayout(TALENT_TREE_DATA);
+    globalThis._pt_skills = layoutNodes.map(n => ({
         id: n.id,
         x: n.x,
         y: n.y,
         name: n.nameEn,    // used as the fallback display name
         image: n.icon || '',
+        tier: n.tier || null,
+        sprite: n.sprite || '',
         _def: n,           // full node definition kept for tooltip access
     }));
 
@@ -102,7 +122,7 @@ export function _ptInitTreeData() {
 }
 
 // Initialise once the document is ready (deferred). At module-eval time
-// this would run during passive-tree-state-points' import phase, i.e.
+// this would run during probability-tree-state-points' import phase, i.e.
 // BEFORE its accessor prologue exists: globalThis._pt_skills = ... would
 // create a plain property that the prologue then REPLACES with a getter
 // to the still-empty module binding - silently discarding the data (the
@@ -172,10 +192,9 @@ export function _ptUpdatePointsDisplay(lang, points) {
 // then triggers the full tree render.
 export function buildPassiveTreeScreen() {
     const lang = (typeof LANG !== 'undefined') ? LANG : 'en';
+    if (reconcilePassiveTreeForClass()) save();
     const points = (typeof STATE !== 'undefined' && STATE.passiveTreePoints) || 0;
-
     _ptUpdatePointsDisplay(lang, points);
-    _ptShowLoadingPlaceholder(lang);
     PT.reload();
 }
 
@@ -184,10 +203,29 @@ export function buildPassiveTreeScreen() {
 // An optional returnScreen argument (e.g. 'screen-endgame-hub') overrides
 // the return target - used when the tree is opened from the endgame hub.
 export function showPassiveTree(returnScreen) {
-    if (typeof returnScreen === 'string') _ptReturnScreen = returnScreen;
+    const screen = document.getElementById('screen-passive-tree');
+    if (!screen || !screen.classList.contains('active')) {
+        if (typeof returnScreen === 'string') _ptReturnScreen = returnScreen;
+        globalThis.screenHistory.push(_ptReturnScreen);
+        switchScreen('screen-passive-tree');
+    }
     buildPassiveTreeScreen();
-    globalThis.screenHistory.push(_ptReturnScreen);
-    switchScreen('screen-passive-tree');
+}
+
+const _TITLE_TREE_PREVIEW_POINTS = 184;
+
+// Opens the active development tree in a temporary character context. This
+// is used by the title-screen shortcuts: the selected character is restored
+// when the tree is closed, and saves made while previewing are ignored.
+export function showPassiveTreeAsCharacter(characterId, returnScreen = 'screen-title') {
+    if (!beginPassiveTreeCharacterPreview(characterId, _TITLE_TREE_PREVIEW_POINTS)) return false;
+    try {
+        showPassiveTree(returnScreen);
+        return true;
+    } catch (e) {
+        endPassiveTreeCharacterPreview();
+        throw e;
+    }
 }
 
 // Called by the Probability Tree's BACK button (see title-bindings.js).
@@ -195,9 +233,11 @@ export function showPassiveTree(returnScreen) {
 // re-runs the actual screen-build function for the destination so that
 // updated STATE.done / sprite position are reflected immediately.
 export function ptGoBack() {
+    _ptSuspendViewport();
     // Game-overlay close (K keybind mid-puzzle) - never touches the menu
     // return path: the paused run continues exactly where it was.
     if (_ptGameOverlay) { closeTreeToGame(); return; }
+    endPassiveTreeCharacterPreview();
     globalThis.screenHistory.pop(); // discard the entry showPassiveTree() pushed
 
     if (_ptReturnScreen === 'screen-world-detail' && _ptReturnWorldIndex !== null) {
@@ -277,10 +317,13 @@ export function _ptShowAvatars() {
 // Opens the tree over a running puzzle (K keybind path). Skips the menu
 // screen-history push - the overlay close path restores the game directly.
 export function openTreeFromGame() {
+    if (_ptGameOverlay) return;
     _ptGameOverlay = true;
     _ptReturnScreen = 'screen-game';
     _ptOverlayPause();
     _ptHideAvatars();
+    if (typeof switchScreen === 'function') switchScreen('screen-passive-tree');
+    else document.getElementById('screen-passive-tree').style.display = 'block';
     try {
         buildPassiveTreeScreen();
     } catch (e) {
@@ -288,18 +331,22 @@ export function openTreeFromGame() {
         // overlay on top (the keybind handler retries cleanly on next K).
         _ptShowAvatars();
         _ptOverlayResume();
+        if (typeof switchScreen === 'function') switchScreen('screen-game');
+        else document.getElementById('screen-passive-tree').style.display = 'none';
         _ptGameOverlay = false;
         throw e;
     }
-    if (typeof switchScreen === 'function') switchScreen('screen-passive-tree');
-    else document.getElementById('screen-passive-tree').style.display = 'block';
 }
 
 // Closes the overlay and returns to the running puzzle exactly where it was.
 export function closeTreeToGame() {
+    _ptSuspendViewport();
     _ptGameOverlay = false;
     if (typeof switchScreen === 'function') switchScreen('screen-game');
     _ptShowAvatars();
+    try { if (typeof globalThis._egSyncOverlayGearPools === 'function') globalThis._egSyncOverlayGearPools(); } catch (e) {}
+    try { if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth(); } catch (e) {}
+    try { if (typeof globalThis.updateClassHUDManaBar === 'function') globalThis.updateClassHUDManaBar(); } catch (e) {}
     // Newly allocated nodes: refresh the in-puzzle tracker so it picks up
     // newly relevant effects at once (no init() - that would reset the
     // per-level counters mid-puzzle).

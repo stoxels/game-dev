@@ -1,9 +1,9 @@
 ﻿import { isEndgameLevel } from '../mouse-button-handlers.js';
 import { t } from '../translation/translations.js';
-import { _getBayesianBonus, _overfittingGetPhase } from './passive-tree-special-nodes-logic.js';
-import { ptHasSkill } from './passive-tree-state-points.js';
+import { _getBayesianBonus, _overfittingGetPhase } from './probability-tree-special-nodes-logic.js';
+import { ptHasSkill } from './probability-tree-state-points.js';
 import { cur } from '../state.js';
-// passive-tracker.js
+// probability-tree-tracker.js
 // Passive Tree Effect Tracker Panel
 // Shows live countdowns, fill counters, stacked bonuses, and summaries
 // for all active passive-tree effects during gameplay.

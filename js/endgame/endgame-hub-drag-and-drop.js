@@ -1048,6 +1048,11 @@ export function _egRenderCurrencyCell(row, col) {
     const item = _egCurrencyStash[row][col];
     const assignedId = (typeof _egCurrencyIdForSlot === 'function') ? _egCurrencyIdForSlot(row, col) : null;
     const def = assignedId && (typeof _egCurrencyDefForId === 'function') ? _egCurrencyDefForId(assignedId) : null;
+    if (item && def) {
+        item.name = def.name;
+        item.icon = def.icon;
+        item.description = def.description;
+    }
 
     function applyToCell(cell) {
         if (!cell) return;

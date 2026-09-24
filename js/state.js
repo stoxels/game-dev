@@ -1,4 +1,5 @@
 import { migrateQuestState } from './inference/inference-stats.js';
+import { TALENT_TREE_DATA } from './probability-tree/probability-tree-data.js';
 
 //------------------------------------------------------------------------
 // Phase 3 step 3: live globalThis accessors for externally-mutated state.
@@ -73,7 +74,7 @@ export function _resetLevelFlags() {
     // oracleActive survives this reset: _doStartLevel sets it (step 4) before
     // _initClassSystems fires this reset (step 6), so zeroing it here would
     // undo the level-start set. Its per-level reset lives in
-    // _resetNewNodeState (passive-tree-special-nodes-logic.js).
+    // _resetNewNodeState (probability-tree-special-nodes-logic.js).
     // lastFailedGi survives this reset: it must outlive the failed level for
     // the bounceback achievement; it is cleared conditionally in _startSystems
     // (level changed) and after a bounceback win (scoring.js).
@@ -213,13 +214,13 @@ let screenHistory = [];
 export const SAVE_SLOT_COUNT = 20;
 
 // localStorage key used to remember which slot is currently active.
-export const ACTIVE_SLOT_KEY = 'stoxels_active_slot';
+const ACTIVE_SLOT_KEY = 'stoxels_active_slot';
 
 // localStorage key for the slot-name map ({ "1": "Alice", "7": "Hardcore Run" }).
 // Stored OUTSIDE the save blobs on purpose: a name can exist for an empty
 // slot (named before first save) and wiping a slot's data must never be
 // blocked by or entangled with the naming metadata.
-export const SLOT_NAMES_KEY = 'stoxels_slot_names';
+const SLOT_NAMES_KEY = 'stoxels_slot_names';
 
 // Returns the custom name for a save slot (string), or '' when unnamed.
 export function getSlotName(slotNum) {
@@ -254,10 +255,195 @@ export function setSlotName(slotNum, name) {
 //------------------------------------------------------------------------
 
 
+const PT_ACTIVE_TREE_DATA = TALENT_TREE_DATA && Array.isArray(TALENT_TREE_DATA.nodes) && Array.isArray(TALENT_TREE_DATA.connections)
+    ? TALENT_TREE_DATA
+    : { nodes: [], connections: [] };
+const PT_ACTIVE_NODE_IDS = new Set(PT_ACTIVE_TREE_DATA.nodes.map(node => node.id));
+const PT_GATE_ID = 1;
+const PT_CHARACTER_ROOT_IDS = Object.freeze({
+    stox: 1001,
+    trix: 1002,
+    syla: 1003,
+});
+const PT_CLASS_ROOT_IDS = Object.freeze({
+    statistician: PT_CHARACTER_ROOT_IDS.stox,
+    mathmagician: PT_CHARACTER_ROOT_IDS.trix,
+    probabilist: PT_CHARACTER_ROOT_IDS.syla,
+});
+const PT_CLASS_ROOT_SET = new Set(Object.values(PT_CLASS_ROOT_IDS));
+
+export function getPassiveTreeCharacterRootId(s) {
+    if (!s) return null;
+    return PT_CHARACTER_ROOT_IDS[s.playerCharacter] || null;
+}
+
+function _ptNormalizeId(value) {
+    if (typeof value === 'string' && /^-?\d+$/.test(value)) return Number(value);
+    return value;
+}
+
+function _ptAddAdjacency(map, from, to) {
+    if (!map[from] || !map[to] || from === to) return;
+    map[from].add(to);
+    map[to].add(from);
+}
+
+function getPassiveTreeCompatibilityAdjacency() {
+    const map = Object.create(null);
+    for (const node of PT_ACTIVE_TREE_DATA.nodes) map[node.id] = new Set();
+    for (const connection of PT_ACTIVE_TREE_DATA.connections) {
+        _ptAddAdjacency(map, connection.from, connection.to);
+    }
+    return map;
+}
+
+function _ptReachableFromRoots(roots, availableSet, adjacency) {
+    const visited = new Set();
+    const queue = roots.filter(id => availableSet.has(id));
+    while (queue.length) {
+        const current = queue.pop();
+        if (visited.has(current)) continue;
+        visited.add(current);
+        const neighbours = adjacency[current] || [];
+        for (const neighbour of neighbours) {
+            if (availableSet.has(neighbour) && !visited.has(neighbour)) queue.push(neighbour);
+        }
+    }
+    return visited;
+}
+
+export function reconcilePassiveTreeForClass(resetFocus = false) {
+    if (typeof STATE === 'undefined' || !STATE) return false;
+    return reconcilePassiveTreeState(STATE, resetFocus);
+}
+
+// The title-screen character shortcuts open the live tree in a temporary
+// character context. Keep the selected character and tree allocations out of
+// the active save while that preview is open; the normal gameplay tree keeps
+// using the persistent STATE path.
+let _passiveTreeCharacterPreview = null;
+
+export function beginPassiveTreeCharacterPreview(characterId, passiveTreePoints) {
+    if (typeof STATE === 'undefined' || !STATE) return false;
+    if (!PT_CHARACTER_ROOT_IDS[characterId]) return false;
+    if (_passiveTreeCharacterPreview) return false;
+
+    const allocated = STATE.passiveTreeAllocated;
+    _passiveTreeCharacterPreview = {
+        state: STATE,
+        playerCharacter: STATE.playerCharacter,
+        passiveTreePoints: STATE.passiveTreePoints,
+        passiveTreeAllocated: allocated instanceof Set
+            ? new Set(allocated)
+            : Array.isArray(allocated) ? allocated.slice() : new Set(),
+        passiveTreeVersion: STATE.passiveTreeVersion,
+        passiveTreeLastNode: STATE.passiveTreeLastNode,
+        hadPassiveTreeLastNode: Object.prototype.hasOwnProperty.call(STATE, 'passiveTreeLastNode'),
+    };
+
+    STATE.playerCharacter = characterId;
+    reconcilePassiveTreeState(STATE, true);
+    const previewPoints = Number(passiveTreePoints);
+    if (Number.isFinite(previewPoints)) {
+        STATE.passiveTreePoints = Math.max(0, previewPoints);
+    }
+    return true;
+}
+
+export function endPassiveTreeCharacterPreview() {
+    const preview = _passiveTreeCharacterPreview;
+    if (!preview) return false;
+    _passiveTreeCharacterPreview = null;
+
+    // A slot switch during a preview is outside this shortcut's contract.
+    // Do not overwrite the newly-loaded state if one somehow occurred.
+    if (typeof STATE === 'undefined' || STATE !== preview.state) return false;
+
+    STATE.playerCharacter = preview.playerCharacter;
+    STATE.passiveTreePoints = preview.passiveTreePoints;
+    STATE.passiveTreeAllocated = preview.passiveTreeAllocated;
+    STATE.passiveTreeVersion = preview.passiveTreeVersion;
+    if (preview.hadPassiveTreeLastNode) {
+        STATE.passiveTreeLastNode = preview.passiveTreeLastNode;
+    } else {
+        delete STATE.passiveTreeLastNode;
+    }
+    return true;
+}
+
+function reconcilePassiveTreeState(s, resetFocus = false) {
+    if (!s) return false;
+    let changed = false;
+    const rawVersion = Number(s.passiveTreeVersion);
+    const version = Number.isInteger(rawVersion) && rawVersion >= 0 ? rawVersion : 0;
+    const rawPoints = Number(s.passiveTreePoints);
+    let points = Number.isFinite(rawPoints) ? Math.max(0, rawPoints) : 0;
+    if (points !== s.passiveTreePoints) {
+        s.passiveTreePoints = points;
+        changed = true;
+    }
+
+    const source = s.passiveTreeAllocated instanceof Set
+        ? s.passiveTreeAllocated
+        : (Array.isArray(s.passiveTreeAllocated) ? s.passiveTreeAllocated : []);
+    const normalized = new Set();
+    for (const value of source) {
+        const id = _ptNormalizeId(value);
+        if (id !== undefined && id !== null) normalized.add(id);
+    }
+    if (!(s.passiveTreeAllocated instanceof Set)
+        || normalized.size !== source.size
+        || [...normalized].some(id => !source.has(id))) {
+        s.passiveTreeAllocated = normalized;
+        changed = true;
+    }
+
+    const hadLegacyGate = version < 3 && s.passiveTreeAllocated.has(PT_GATE_ID);
+    if (version < 2 && s.passiveTreeAllocated.delete(PT_GATE_ID)) changed = true;
+
+    const root = getPassiveTreeCharacterRootId(s) || PT_CLASS_ROOT_IDS[s.playerClass] || null;
+    if (root && !s.passiveTreeAllocated.has(root)) {
+        s.passiveTreeAllocated.add(root);
+        changed = true;
+    }
+
+    const lastId = _ptNormalizeId(s.passiveTreeLastNode);
+    if (resetFocus || (version < 2 && lastId === PT_GATE_ID) || !PT_ACTIVE_NODE_IDS.has(lastId) || PT_CLASS_ROOT_SET.has(lastId)) {
+        const nextLast = root || null;
+        if (s.passiveTreeLastNode !== nextLast) {
+            s.passiveTreeLastNode = nextLast;
+            changed = true;
+        }
+    } else if (lastId !== s.passiveTreeLastNode) {
+        s.passiveTreeLastNode = lastId;
+        changed = true;
+    }
+
+    const roots = [...s.passiveTreeAllocated].filter(id => PT_CLASS_ROOT_SET.has(id));
+    const preserveLegacyAllocations = version < 2 || hadLegacyGate || resetFocus;
+    if (roots.length && PT_ACTIVE_NODE_IDS.size && !preserveLegacyAllocations) {
+        const adjacency = getPassiveTreeCompatibilityAdjacency();
+        const reachable = _ptReachableFromRoots(roots, s.passiveTreeAllocated, adjacency);
+        for (const id of [...s.passiveTreeAllocated]) {
+            if (id === PT_GATE_ID || !PT_ACTIVE_NODE_IDS.has(id) || reachable.has(id)) continue;
+            s.passiveTreeAllocated.delete(id);
+            if (!PT_CLASS_ROOT_SET.has(id)) points += 1;
+            changed = true;
+        }
+    }
+    s.passiveTreePoints = points;
+
+    if (s.passiveTreeVersion !== 3) {
+        s.passiveTreeVersion = 3;
+        changed = true;
+    }
+    return changed;
+}
+
 // _makeEgGrid - builds an empty rows x cols grid (filled with null) for the
 // endgame hub's inventory/stash storage. Shared by buildFreshState() and
 // migrateOldSave() so the grid-building logic only lives in one place.
-export function _makeEgGrid(rows, cols) {
+function _makeEgGrid(rows, cols) {
     return Array.from({ length: rows }, () => Array(cols).fill(null));
 }
 
@@ -324,6 +510,7 @@ export function buildFreshState() {
         // Passive tree
         passiveTreePoints: 0,
         passiveTreeAllocated: new Set(),
+        passiveTreeVersion: 3,
 
         // Convergence levels (legacy 33%/66% milestone gis) + Convergence
         // Trials (Leveling Rework mini-maps, one per world, 'trial_<n>') and
@@ -474,11 +661,7 @@ export function _migrateAscendencyFields(s) {
 //                            so it needs to become a Set at runtime.
 export function _migratePassiveTreeFields(s) {
     if (!s.passiveTreePoints) s.passiveTreePoints = 0;
-    if (!s.passiveTreeAllocated || !Array.isArray(s.passiveTreeAllocated)) {
-        s.passiveTreeAllocated = new Set();
-    } else {
-        s.passiveTreeAllocated = new Set(s.passiveTreeAllocated);
-    }
+    reconcilePassiveTreeState(s);
 }
 
 // _migrateEndgameFields - fills in endgame hub fields missing from an older save.
@@ -589,7 +772,7 @@ export function migrateOldSave(s) {
 //           Slot 1 reuses the ORIGINAL 'stoxels' key on purpose - this is what makes
 //           existing players' progress show up automatically as "Slot 1" with no
 //           migration step required. Slots 2-20 get their own dedicated keys.
-export function _slotKey(slotNum) {
+function _slotKey(slotNum) {
     return slotNum === 1 ? 'stoxels' : `stoxels_slot_${slotNum}`;
 }
 
@@ -617,7 +800,7 @@ export function loadRawSaveFromSlot(slotNum) {
 // Migrates a legacy slot name that was stored inside the save blob
 // (raw.slotName) into the dedicated names map - used by getSlotSummary so
 // names written by future in-save storage still show up after the split.
-export function _migrateSlotNameFromBlob(slotNum, raw) {
+function _migrateSlotNameFromBlob(slotNum, raw) {
     if (!raw || typeof raw.slotName !== 'string') return;
     if (!getSlotName(slotNum)) setSlotName(slotNum, raw.slotName);
     delete raw.slotName;
@@ -668,7 +851,7 @@ export function getSlotSummary(slotNum) {
 // _saveAnyItem - true when v (a stash grid / object-of-arrays / item) holds
 // at least one real item. Used by the save() degraded-state guard so it can
 // tell "player owns nothing endgame" apart from "hub mirrors failed to load".
-export function _saveAnyItem(v) {
+function _saveAnyItem(v) {
     if (!v) return false;
     if (Array.isArray(v)) {
         for (const x of v) {
@@ -692,7 +875,7 @@ export function _saveAnyItem(v) {
 // since the leveling rework hands out XP from story level 1) legitimately
 // own zero endgame items - the presence of these fields distinguishes
 // "never entered the endgame" from "hub mirrors failed to load".
-export function _saveHasEndgameProgress(v) {
+function _saveHasEndgameProgress(v) {
     return !!v && (
         (v.egGold !== undefined && v.egGold !== null && Number(v.egGold) !== 0) ||
         (v.egAtlasCompleted && typeof v.egAtlasCompleted === 'object' && Object.keys(v.egAtlasCompleted).length > 0) ||
@@ -728,6 +911,10 @@ export function _saveHasEndgameProgress(v) {
 //      Intentional resets are unaffected (the slot key is wiped first, so
 //      there is no previous save to compare against).
 export function save() {
+    // Title-screen tree previews are deliberately session-only. Their
+    // temporary character and allocations must never overwrite a real save.
+    if (_passiveTreeCharacterPreview) return;
+
     const slot = getActiveSlot() || 1;
     const toSave = { ...STATE };
     if (STATE.passiveTreeAllocated instanceof Set) {

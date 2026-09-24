@@ -379,3 +379,69 @@
         animation-duration: 120ms !important;
     }
 }
+
+/* ============================================================================
+   WEAPON-ART NOVA (overcharge tiers 400% / 500%)
+   Built by _egMeleeNovaVisual in js/combat/encounter-charged-shot.js:
+   a ring of the equipped weapon's icon bursts outward around the struck
+   monster card. Each bit flies along its own (--eg-nova-x, --eg-nova-y)
+   unit vector while fading out. The node is removed by JS after the burst.
+   ============================================================================ */
+.eg-melee-nova {
+    position: fixed;
+    width: 0;
+    height: 0;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.eg-melee-nova-bit {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 22px;
+    line-height: 1;
+    text-shadow: 0 0 8px rgba(250, 204, 21, 0.9), 0 1px 2px #000;
+    opacity: 0;
+    animation: eg-melee-nova-burst 600ms ease-out forwards;
+}
+
+.eg-melee-nova-grand .eg-melee-nova-bit {
+    font-size: 30px;
+    text-shadow: 0 0 14px rgba(251, 191, 36, 1), 0 0 30px rgba(251, 146, 60, 0.8), 0 1px 2px #000;
+    animation-duration: 850ms;
+}
+
+@keyframes eg-melee-nova-burst {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--eg-nova-x, 0) * 110px), calc(-50% + var(--eg-nova-y, 0) * 110px)) scale(1.25);
+    }
+}
+
+/* ── Grand-nova fullscreen flash (500% tier, built by _egMeleeGrandFlash) ── */
+.eg-melee-grand-flash {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 55%, rgba(254, 243, 199, 0.85) 0%, rgba(251, 191, 36, 0.45) 35%, transparent 70%);
+    opacity: 0;
+    animation: eg-melee-flash 700ms ease-out forwards;
+}
+
+@keyframes eg-melee-flash {
+    0% { opacity: 0; }
+    15% { opacity: 0.55; }
+    100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .eg-melee-nova-bit {
+        animation-duration: 120ms !important;
+    }
+}

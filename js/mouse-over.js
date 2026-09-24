@@ -1,4 +1,4 @@
-﻿import { applyCell, dragStartCol, dragStartRow } from './mouse-button-handlers.js';
+import { applyCell, dragStartCol, dragStartRow } from './mouse-button-handlers.js';
 import { cur } from './state.js';
 //--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
 try { Object.defineProperty(globalThis, 'painting', { get() { return painting; }, set(v) { painting = v; }, configurable: true }); } catch (e) {}
@@ -31,7 +31,7 @@ let hoverCol = -1;
 //------------------------------------------------------------------------
 
 // Turns the row-clue highlight on/off for every clue cell that belongs to this row.
-export function _setRowClueHighlight(row, on) {
+function _setRowClueHighlight(row, on) {
     document.querySelectorAll(`.rct-${row}`)
         .forEach(el => el.classList.toggle('hov-row', on));
 }
@@ -39,13 +39,13 @@ export function _setRowClueHighlight(row, on) {
 // Turns the column-header highlight on/off for every header cell that belongs
 // to this column. (A column can have multiple stacked header cells for
 // multi-number clues.)
-export function _setColClueHighlight(col, on) {
+function _setColClueHighlight(col, on) {
     document.querySelectorAll(`.cch-${col}`)
         .forEach(el => el.classList.toggle('hov-col', on));
 }
 
 // Turns the row-tint on/off for every grid cell in the given row.
-export function _setRowCellsHighlight(row, on) {
+function _setRowCellsHighlight(row, on) {
     const cols = cur.grid[0].length;
     for (let c = 0; c < cols; c++) {
         const cell = document.getElementById(`g-${row}-${c}`);
@@ -54,7 +54,7 @@ export function _setRowCellsHighlight(row, on) {
 }
 
 // Turns the column-tint on/off for every grid cell in the given column.
-export function _setColCellsHighlight(col, on) {
+function _setColCellsHighlight(col, on) {
     const rows = cur.grid.length;
     for (let r = 0; r < rows; r++) {
         const cell = document.getElementById(`g-${r}-${col}`);
@@ -71,7 +71,7 @@ export function _setColCellsHighlight(col, on) {
 // applyHover - draws the crosshair highlight on the row and column
 //   that pass through (row, col): tints the clue cells and all grid cells
 //   along both axes.
-export function applyHover(row, col) {
+function applyHover(row, col) {
     if (!cur) return;
     _setRowClueHighlight(row, true);
     _setColClueHighlight(col, true);
@@ -99,7 +99,7 @@ export function clearHover() {
 // Returns true if the given cell is reachable under the current axis-lock rules.
 // When axisLockEnabled is off, every cell is always reachable.
 // When it is on, only cells on the locked axis (row or column) are reachable.
-export function _isDragCellAllowed(row, col) {
+function _isDragCellAllowed(row, col) {
     if (!globalThis.axisLockEnabled) return true;
 
     // Determine the axis on the first movement away from the drag-start cell.
@@ -119,7 +119,7 @@ export function _isDragCellAllowed(row, col) {
 
 // True if (row, col) is a cell the player has correctly resolved
 // (either filled themselves or via a reveal).
-export function _isCellCorrectlyFilled(row, col) {
+function _isCellCorrectlyFilled(row, col) {
     return (globalThis.userGrid[row][col] === 1 || globalThis.revealedGrid[row][col]) && cur.grid[row][col] === 1;
 }
 
@@ -184,7 +184,7 @@ export function onHoverOut(row, col) {
 
 // _getOrCreateCounterOverlay - returns the overlay <span> inside a cell,
 //   creating and appending it first if it does not already exist.
-export function _getOrCreateCounterOverlay(cellEl) {
+function _getOrCreateCounterOverlay(cellEl) {
     let overlay = cellEl.querySelector('.drag-count-overlay');
     if (!overlay) {
         overlay = document.createElement('span');

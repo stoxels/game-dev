@@ -472,6 +472,48 @@ html.file-protocol #boot-loader .boot-logo-shimmer {
     }
 
 /*
+   ── DEVELOPMENT-TREE CHARACTER SHORTCUTS ────────────────────
+   These sit in a compact row below PLAY on the desktop title artwork.
+   The buttons deliberately use the same stone plate language as the rest of
+   the title menu, while the wrapper keeps the three development routes
+   together and clear of the disclosure line.
+*/
+.title-tree-shortcuts {
+    position: absolute;
+    left: 50%;
+    top: 92.5%;
+    transform: translateX(-50%);
+    width: min(50%, 600px);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(6px, 1.1cqw, 18px);
+    z-index: 3;
+}
+
+.title-tree-shortcuts .title-tree-shortcut {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 3.6 / 1;
+    background-image: url('../images/Title_Screen/General-Block.webp');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    --tx: 50%;
+    --ty: 50%;
+}
+
+.title-tree-shortcuts .title-tree-shortcut .btn-label {
+    font-size: clamp(7px, 7cqw, 16px);
+    letter-spacing: 0.08em;
+}
+
+/*
    ── STONE-PLATE LABEL POSITIONING (shared) ─────────────────
    .btn-label is positioned at the visual center of each block's stone
    plate - NOT the button box - so decorations (tentacle, claws) never
@@ -735,6 +777,26 @@ html.file-protocol #boot-loader .boot-logo-shimmer {
         margin-top: 5%;
     }
 
+    .title-tree-shortcuts {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        width: min(94%, 620px);
+        margin: 12px auto 0;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        order: 4;
+    }
+
+    .title-tree-shortcuts .title-tree-shortcut {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        aspect-ratio: 3.6 / 1;
+    }
+
     .title-canvas > .title-bg-img ~ * {
         z-index: 2;
     }
@@ -774,7 +836,8 @@ html.file-protocol #boot-loader .boot-logo-shimmer {
     .block-left-1,
     .block-left-2,
     .block-right-1,
-    .block-right-2  { order: 4; width: min(96%, 230px); margin-top: 9%; }
+    .block-right-2  { order: 5; width: min(96%, 230px); margin-top: 9%; }
+    .title-tree-shortcuts { order: 4; grid-column: 1 / -1; width: min(96%, 360px); margin-top: 7%; }
     .title-ai-disclosure     { order: 99; grid-column: 1 / -1; margin: 12px 14px 12px; }
 
     /* Side-by-side menu buttons: 2 per row keeps the whole menu

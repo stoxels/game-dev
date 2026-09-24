@@ -84,11 +84,42 @@ const CHARM_ART_TIER_MID = {
     summon: ['familiar', 'pack', 'alpha', 'direwolf', 'stormcall', 'dreadhowl'],
 };
 const CHARM_ART_SCHOOL_BY_SKILL = { fireball: 'fire' };
+const CHARM_ART_SCHOOL_BY_TAG = {
+    Movement: 'movement',
+    Support: 'defensive',
+    Buff: 'defensive',
+    Protection: 'defensive',
+    Shield: 'defensive',
+    Utility: 'defensive',
+    Summon: 'summon',
+    Companion: 'summon',
+    Fire: 'fire',
+    Cold: 'cold',
+    Nature: 'nature',
+    Shadow: 'shadow',
+    Arcane: 'arcane',
+    Lightning: 'arcane',
+    Holy: 'defensive',
+    Attack: 'physical',
+    Physical: 'physical',
+    Spell: 'arcane',
+};
+
+function _charmArtSchool(skillId) {
+    const explicit = CHARM_ART_SCHOOL_BY_SKILL[skillId];
+    if (explicit) return explicit;
+    const def = getSkillDef(skillId);
+    const tags = def && Array.isArray(def.tags) ? def.tags : [];
+    for (const [tag, school] of Object.entries(CHARM_ART_SCHOOL_BY_TAG)) {
+        if (tags.includes(tag)) return school;
+    }
+    return null;
+}
 
 // Art URL for a charm, or null when the skill has no mapped school (the
 // callers fall back to the emoji glyph in that case).
 function _charmArtUrl(skillId, rank) {
-    const school = CHARM_ART_SCHOOL_BY_SKILL[skillId];
+    const school = _charmArtSchool(skillId);
     if (!school || !CHARM_ART_TIER_MID[school]) return null;
     const r = Math.max(1, Math.min(16, Number(rank) || 1));
     const tierName = r <= 9 ? CHARM_ART_TIER_BASE[r - 1]

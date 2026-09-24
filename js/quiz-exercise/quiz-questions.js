@@ -3386,166 +3386,166 @@ export const BONUS_QUIZ_POOLS = {
 
     12: [
         {
-            q: "The correlation rho = Cor(X,Y) is defined as:",
-            qDE: "Die Korrelation rho = Cor(X,Y) ist definiert als:",
-            opts: ["gammaXY / (sigmaX sigmaY)", "gammaXY · sigmaX sigmaY", "E[X] · E[Y]", "Var(X) + Var(Y)"],
-            optsDE: ["gammaXY / (sigmaX sigmaY)", "gammaXY · sigmaX sigmaY", "E[X] · E[Y]", "Var(X) + Var(Y)"],
+            q: "Which formula defines the population correlation coefficient between random variables X and Y?",
+            qDE: "Welche Formel definiert den Populationskorrelationskoeffizienten zweier Zufallsvariablen X und Y?",
+            opts: ["ρ = Cov(X,Y)/(σₓσᵧ)", "ρ = Cov(X,Y)·σₓσᵧ", "ρ = μₓ·μᵧ", "ρ = Var(X)+Var(Y)"],
+            optsDE: ["ρ = Cov(X,Y)/(σₓσᵧ)", "ρ = Cov(X,Y)·σₓσᵧ", "ρ = μₓ·μᵧ", "ρ = Var(X)+Var(Y)"],
             correct: 0,
-            explain: "Lecture slide 128: rho = gammaXY/(sigmaX sigmaY).",
-            explainDE: "Vorlesung Folie 128: rho = gammaXY/(sigmaX sigmaY)."
+            explain: "Dividing the covariance by the product of the two population standard deviations normalizes the measure of association to the interval from −1 to 1.",
+            explainDE: "Die Kovarianz wird durch das Produkt der beiden Populationsstandardabweichungen geteilt. Dadurch wird das Maß des Zusammenhangs auf den Bereich von −1 bis 1 normiert."
         },
         {
-            q: "The covariance gammaXY is defined as:",
-            qDE: "Die Kovarianz gammaXY ist definiert als:",
-            opts: ["E[(X-muX)(Y-muY)]", "E[X] + E[Y]", "Var(X)·Var(Y)", "E[X²+Y²]"],
-            optsDE: ["E[(X-muX)(Y-muY)]", "E[X] + E[Y]", "Var(X)·Var(Y)", "E[X²+Y²]"],
+            q: "Which expression defines the covariance of random variables X and Y?",
+            qDE: "Welcher Ausdruck definiert die Kovarianz der Zufallsvariablen X und Y?",
+            opts: ["Cov(X,Y) = E[(X−μₓ)(Y−μᵧ)]", "Cov(X,Y) = E[X]+E[Y]", "Cov(X,Y) = Var(X)·Var(Y)", "Cov(X,Y) = E[X²+Y²]"],
+            optsDE: ["Cov(X,Y) = E[(X−μₓ)(Y−μᵧ)]", "Cov(X,Y) = E[X]+E[Y]", "Cov(X,Y) = Var(X)·Var(Y)", "Cov(X,Y) = E[X²+Y²]"],
             correct: 0,
-            explain: "Slide 128: Cov(X,Y) = E(X-muX)(Y-muY).",
-            explainDE: "Folie 128: Cov(X,Y) = E(X-muX)(Y-muY)."
+            explain: "Covariance is the expected product of the centered variables. Products of deviations with the same sign contribute positively, while products with opposite signs contribute negatively.",
+            explainDE: "Die Kovarianz ist das erwartete Produkt der zentrierten Variablen. Produkte gleichgerichteter Abweichungen tragen positiv bei, Produkte entgegengesetzter Abweichungen negativ."
         },
         {
-            q: "The two-sided correlation test (slide 129) tests:",
-            qDE: "Der zweiseitige Korrelationstest (Folie 129) testet:",
-            opts: ["H0: rho = 0 vs H1: rho != 0", "H0: mu = 0 vs H1: mu > 0", "H0: sigma² = 1 vs H1: sigma² < 1", "H0: b = 1 vs H1: b = 2"],
-            optsDE: ["H0: rho = 0 gegen H1: rho != 0", "H0: mu = 0 gegen H1: mu > 0", "H0: sigma² = 1 gegen H1: sigma² < 1", "H0: b = 1 gegen H1: b = 2"],
+            q: "For a two-sided test of whether the population correlation differs from zero, which hypotheses are used?",
+            qDE: "Welche Hypothesen werden für einen zweiseitigen Test verwendet, ob die Populationskorrelation von null abweicht?",
+            opts: ["H₀: ρ = 0 and H₁: ρ ≠ 0", "H₀: μ = 0 and H₁: μ > 0", "H₀: σ² = 1 and H₁: σ² < 1", "H₀: b = 1 and H₁: b = 2"],
+            optsDE: ["H₀: ρ = 0 und H₁: ρ ≠ 0", "H₀: μ = 0 und H₁: μ > 0", "H₀: σ² = 1 und H₁: σ² < 1", "H₀: b = 1 und H₁: b = 2"],
             correct: 0,
-            explain: "Testproblem H0: rho=0 vs H1: rho!=0.",
-            explainDE: "Testproblem H0: rho=0 gegen H1: rho!=0."
+            explain: "The null hypothesis states that X and Y are linearly uncorrelated in the population; the two-sided alternative allows a correlation in either direction.",
+            explainDE: "Die Nullhypothese besagt, dass X und Y in der Grundgesamtheit linear unkorreliert sind. Die zweiseitige Alternative lässt einen Zusammenhang in beide Richtungen zu."
         },
         {
-            q: "The correlation test statistic (slide 129) is:",
-            qDE: "Die Korrelationsteststatistik (Folie 129) lautet:",
-            opts: ["T = r·sqrt(n-2)/sqrt(1-r²)", "T = r·(n-2)", "T = sqrt(r)/(n-2)", "T = r²·(n-2)"],
-            optsDE: ["T = r·sqrt(n-2)/sqrt(1-r²)", "T = r·(n-2)", "T = sqrt(r)/(n-2)", "T = r²·(n-2)"],
+            q: "A sample correlation coefficient r is computed from n paired observations. Which statistic tests H₀: ρ = 0?",
+            qDE: "Aus n gepaarten Beobachtungen wird der Stichprobenkorrelationskoeffizient r berechnet. Welche Statistik prüft H₀: ρ = 0?",
+            opts: ["T = r√(n−2)/√(1−r²)", "T = r(n−2)", "T = √r/(n−2)", "T = r²(n−2)"],
+            optsDE: ["T = r√(n−2)/√(1−r²)", "T = r(n−2)", "T = √r/(n−2)", "T = r²(n−2)"],
             correct: 0,
-            explain: "T = rho_hat·sqrt(n-2)/sqrt(1-rho_hat²) ~ t(n-2) under H0.",
-            explainDE: "T = rho-Dach·sqrt(n-2)/sqrt(1-rho-Dach²) ~ t(n-2) unter H0."
+            explain: "The formula converts the sample correlation r into a t-statistic by accounting for the number of observations and the distance of r from its null value.",
+            explainDE: "Die Formel überführt die Stichprobenkorrelation r in eine t-Statistik. Dabei berücksichtigt sie die Anzahl der Beobachtungen und den Abstand von r zum Nullwert."
         },
         {
-            q: "Under H0: rho = 0, T follows:",
-            qDE: "Unter H0: rho = 0 folgt T:",
-            opts: ["t(n-2)", "N(0,1) exactly", "chi²(n)", "F(1,n)"],
-            optsDE: ["t(n-2)", "N(0,1) exakt", "chi²(n)", "F(1,n)"],
+            q: "Under H₀: ρ = 0, the correlation test statistic T has which reference distribution?",
+            qDE: "Welche Vergleichsverteilung hat die Korrelationsteststatistik T unter H₀: ρ = 0?",
+            opts: ["A t-distribution with n−2 degrees of freedom", "The standard normal distribution N(0,1) exactly", "A chi-squared distribution with n degrees of freedom", "An F-distribution with 1 and n−2 degrees of freedom"],
+            optsDE: ["Eine t-Verteilung mit n−2 Freiheitsgraden", "Exakt die Standardnormalverteilung N(0,1)", "Eine Chi-Quadrat-Verteilung mit n Freiheitsgraden", "Eine F-Verteilung mit 1 und n−2 Freiheitsgraden"],
             correct: 0,
-            explain: "Slide 129: T ~ t(n-2).",
-            explainDE: "Folie 129: T ~ t(n-2)."
+            explain: "The correlation statistic follows a t-distribution with n−2 degrees of freedom under the usual bivariate-normal assumptions for the correlation test.",
+            explainDE: "Unter den üblichen Annahmen bivariate Normalverteilung für den Korrelationstest folgt die Teststatistik einer t-Verteilung mit n−2 Freiheitsgraden."
         },
         {
-            q: "Reject H0: rho = 0 (two-sided) if:",
-            qDE: "H0: rho = 0 (zweiseitig) wird abgelehnt, falls:",
-            opts: ["|T| > t(n-2)_{1-alpha/2}", "|T| < 0", "T = 0", "r = 1 always"],
-            optsDE: ["|T| > t(n-2)_{1-alpha/2}", "|T| < 0", "T = 0", "r = 1 immer"],
+            q: "At significance level α, when is H₀: ρ = 0 rejected in a two-sided correlation test?",
+            qDE: "Wird H₀: ρ = 0 bei einem zweiseitigen Korrelationstest zum Signifikanzniveau α verworfen?",
+            opts: ["|T| > t_{n−2;1−α/2}", "T > t_{n−2;1−α/2}", "|T| < t_{n−2;1−α/2}", "T = 0"],
+            optsDE: ["|T| > t_{n−2;1−α/2}", "T > t_{n−2;1−α/2}", "|T| < t_{n−2;1−α/2}", "T = 0"],
             correct: 0,
-            explain: "Rule 1 on slide 129.",
-            explainDE: "Regel 1 auf Folie 129."
+            explain: "A two-sided test rejects only when the magnitude of the statistic exceeds the upper critical value, thereby covering unusually large positive and negative values with the same rejection region.",
+            explainDE: "Ein zweiseitiger Test verwirft nur dann, wenn der Betrag der Statistik den oberen kritischen Wert übersteigt. So werden ungewöhnlich große positive und negative Werte durch denselben Verwerfungsbereich erfasst."
         },
         {
-            q: "The regression model (slide 131) is:",
-            qDE: "Das Regressionsmodell (Folie 131) lautet:",
-            opts: ["f(x) = a + b·x", "f(x) = a/x + b", "f(x) = a^x", "f(x) = sin(a+bx)"],
-            optsDE: ["f(x) = a + b·x", "f(x) = a/x + b", "f(x) = a^x", "f(x) = sin(a+bx)"],
+            q: "Which function gives the mean response in a simple linear regression?",
+            qDE: "Welche Funktion gibt die mittlere Zielvariable in einer einfachen linearen Regression an?",
+            opts: ["f(x) = a + bx", "f(x) = a + b²x", "f(x) = a + √b·x", "f(x) = a + eᵇˣ"],
+            optsDE: ["f(x) = a + bx", "f(x) = a + b²x", "f(x) = a + √b·x", "f(x) = a + eᵇˣ"],
             correct: 0,
-            explain: "Data scatter around line f(x)=a+b·x.",
-            explainDE: "Daten streuen um Gerade f(x)=a+b·x."
+            explain: "The intercept a is the fitted value at x = 0, and the slope b gives the change in the fitted response for each one-unit increase in x.",
+            explainDE: "Der Achsenabschnitt a ist der Schätzwert bei x = 0, und die Steigung b beschreibt die Änderung des vorhergesagten Werts je Einheit von x."
         },
         {
-            q: "In regression, yi is called:",
-            qDE: "In der Regression heißt yi:",
-            opts: ["target / response / output", "regressor / input", "residual", "quantile"],
-            optsDE: ["Zielwert / Response / Output", "Regressor / Input", "Residuum", "Quantil"],
+            q: "In regression notation, what is the response variable yᵢ called?",
+            qDE: "Wie wird die Zielvariable yᵢ in der Regressionsnotation bezeichnet?",
+            opts: ["The response variable", "The predictor variable", "The residual variable", "The coefficient variable"],
+            optsDE: ["Die Zielvariable", "Die Prädiktorvariable", "Die Residuumvariable", "Die Koeffizientenvariable"],
             correct: 0,
-            explain: "Slide 131: yi target, xi regressor.",
-            explainDE: "Folie 131: yi Zielwert, xi Regressor."
+            explain: "The response yᵢ is the outcome being modeled or predicted. The corresponding predictor xᵢ records the input used to explain that outcome.",
+            explainDE: "Die Zielvariable yᵢ ist das Ergebnis, das modelliert beziehungsweise vorhergesagt wird. Die zugehörige Prädiktorvariable xᵢ erfasst die Eingabe, die dieses Ergebnis erklären soll."
         },
         {
-            q: "KQ minimizes (slide 137):",
-            qDE: "KQ minimiert (Folie 137):",
-            opts: ["Q(a,b) = sum(yi-(a+b·xi))²", "Q = sum|yi-a-b·xi|", "Q = max|yi-a-b·xi|", "Q = sum(yi+a+b·xi)"],
-            optsDE: ["Q(a,b) = sum(yi-(a+b·xi))²", "Q = sum|yi-a-b·xi|", "Q = max|yi-a-b·xi|", "Q = sum(yi+a+b·xi)"],
+            q: "Which objective function does ordinary least squares minimize in simple linear regression?",
+            qDE: "Welche Zielfunktion minimiert die gewöhnliche Kleinste-Quadrate-Methode in der einfachen linearen Regression?",
+            opts: ["Q(a,b) = Σᵢ[yᵢ−(a+bxᵢ)]²", "Q(a,b) = Σᵢ|yᵢ−(a+bxᵢ)|", "Q(a,b) = Σᵢ√|yᵢ−(a+bxᵢ)|", "Q(a,b) = maxᵢ|yᵢ−(a+bxᵢ)|"],
+            optsDE: ["Q(a,b) = Σᵢ[yᵢ−(a+bxᵢ)]²", "Q(a,b) = Σᵢ|yᵢ−(a+bxᵢ)|", "Q(a,b) = Σᵢ√|yᵢ−(a+bxᵢ)|", "Q(a,b) = maxᵢ|yᵢ−(a+bxᵢ)|"],
             correct: 0,
-            explain: "Least squares: minimize sum of squared y-distances.",
-            explainDE: "Kleinste Quadrate: Summe quadrierter y-Abstände minimieren."
+            explain: "Ordinary least squares chooses a and b to minimize the sum of the squared vertical residuals. Squaring prevents positive and negative residuals from cancelling one another.",
+            explainDE: "Die gewöhnliche Kleinste-Quadrate-Methode wählt a und b so, dass die Summe der quadrierten vertikalen Residuen minimal wird. Durch das Quadrieren heben sich positive und negative Residuen nicht auf."
         },
         {
-            q: "The KQ slope solution (slide 137) is:",
-            qDE: "Die KQ-Steigungsloesung (Folie 137) lautet:",
-            opts: ["b_hat = sxy / s_x²", "b_hat = s_x² / sxy", "b_hat = xbar/ybar", "b_hat = sum yi"],
-            optsDE: ["b-Dach = sxy / s_x²", "b-Dach = s_x² / sxy", "b-Dach = xquer/yquer", "b-Dach = sum yi"],
+            q: "In least-squares regression, S_xy = Σᵢ(xᵢ−x̄)(yᵢ−ȳ) and S_x² = Σᵢ(xᵢ−x̄)². Which formula gives the estimated slope b̂?",
+            qDE: "In der Kleinste-Quadrate-Regression gilt S_xy = Σᵢ(xᵢ−x̄)(yᵢ−ȳ) und S_x² = Σᵢ(xᵢ−x̄)². Welche Formel liefert die geschätzte Steigung b̂?",
+            opts: ["b̂ = S_xy/S_x²", "b̂ = S_x²/S_xy", "b̂ = S_xy·S_x²", "b̂ = S_y²/S_x²"],
+            optsDE: ["b̂ = S_xy/S_x²", "b̂ = S_x²/S_xy", "b̂ = S_xy·S_x²", "b̂ = S_y²/S_x²"],
             correct: 0,
-            explain: "b_hat = sxy/s_x², a_hat = ybar-b_hat·xbar.",
-            explainDE: "b-Dach = sxy/s_x², a-Dach = yquer-b-Dach·xquer."
+            explain: "The slope is the covariance term between the centered observations divided by the total centered variation in the predictor.",
+            explainDE: "Die Steigung ist der Kovarianzterm der zentrierten Beobachtungen geteilt durch die gesamte zentrierte Streuung der Prädiktorvariablen."
         },
         {
-            q: "The intercept estimate is:",
-            qDE: "Der Achsenabschnitt-Schaetzer lautet:",
-            opts: ["a_hat = ybar - b_hat·xbar", "a_hat = ybar + b_hat·xbar", "a_hat = b_hat/ybar", "a_hat = 0 always"],
-            optsDE: ["a-Dach = yquer - b-Dach·xquer", "a-Dach = yquer + b-Dach·xquer", "a-Dach = b-Dach/yquer", "a-Dach = 0 immer"],
+            q: "Which expression gives the least-squares estimate of the intercept in a simple linear regression with slope b̂?",
+            qDE: "Welcher Ausdruck liefert die Kleinste-Quadrate-Schätzung des Achsenabschnitts in einer einfachen linearen Regression mit Steigung b̂?",
+            opts: ["â = ȳ − b̂x̄", "â = ȳ + b̂x̄", "â = b̂/x̄", "â = ȳ/(b̂x̄)"],
+            optsDE: ["â = ȳ − b̂x̄", "â = ȳ + b̂x̄", "â = b̂/x̄", "â = ȳ/(b̂x̄)"],
             correct: 0,
-            explain: "Slide 137/139.",
-            explainDE: "Folie 137/139."
+            explain: "A regression line with an intercept passes through the point (x̄, ȳ), so rearranging ŷ = â + b̂x gives â = ȳ − b̂x̄.",
+            explainDE: "Eine Regressionsgerade mit Achsenabschnitt verläuft durch den Punkt (x̄, ȳ). Aus ŷ = â + b̂x folgt daher â = ȳ − b̂x̄."
         },
         {
-            q: "Fitted values and residuals (slide 139):",
-            qDE: "Prognosewerte und Residuen (Folie 139):",
-            opts: ["y_hat_i = a_hat+b_hat·xi; e_hat_i = yi-y_hat_i", "y_hat_i = xi-yi; e = 0", "y_hat = a·b", "e_hat = y_hat + y"],
-            optsDE: ["y-Dach_i = a-Dach+b-Dach·xi; e-Dach_i = yi-y-Dach_i", "y-Dach_i = xi-yi; e = 0", "y-Dach = a·b", "e-Dach = y-Dach + y"],
+            q: "Which expressions correctly define the fitted value ŷᵢ and residual êᵢ at predictor value xᵢ?",
+            qDE: "Welche Ausdrücke definieren den Prognosewert ŷᵢ und das Residuum êᵢ am Prädiktorwert xᵢ korrekt?",
+            opts: ["ŷᵢ = â + b̂xᵢ and êᵢ = yᵢ − ŷᵢ", "ŷᵢ = â + b̂xᵢ and êᵢ = xᵢ − yᵢ", "ŷᵢ = â + b̂xᵢ and êᵢ = ŷᵢ − yᵢ", "ŷᵢ = â + b̂xᵢ and êᵢ = yᵢ + ŷᵢ"],
+            optsDE: ["ŷᵢ = â + b̂xᵢ und êᵢ = yᵢ − ŷᵢ", "ŷᵢ = â + b̂xᵢ und êᵢ = xᵢ − yᵢ", "ŷᵢ = â + b̂xᵢ und êᵢ = ŷᵢ − yᵢ", "ŷᵢ = â + b̂xᵢ und êᵢ = yᵢ + ŷᵢ"],
             correct: 0,
-            explain: "Vorhersage minus Residuum definition.",
-            explainDE: "Definition Prognosewert und Residuum."
+            explain: "Substituting xᵢ into the fitted line gives ŷᵢ. The residual is then the observed value minus the fitted value, so a positive residual means the observation lies above the line.",
+            explainDE: "Durch Einsetzen von xᵢ in die Ausgleichsgeraden erhält man ŷᵢ. Das Residuum ist anschließend der beobachtete minus der vorhergesagte Wert; ein positives Residuum liegt oberhalb der Geraden."
         },
         {
-            q: "Decomposition of variance (slide 141):",
-            qDE: "Streuungszerlegung (Folie 141):",
-            opts: ["SST = SSR + SSE", "SST = SSR - SSE", "SSR = SST·SSE", "SSE = 0 always"],
-            optsDE: ["SST = SSR + SSE", "SST = SSR - SSE", "SSR = SST·SSE", "SSE = 0 immer"],
+            q: "In least-squares regression with an intercept, which identity relates the total, regression, and error sums of squares?",
+            qDE: "Welche Identität verbindet in der Kleinste-Quadrate-Regression mit Achsenabschnitt die Gesamtsumme, die Regressionssumme und die Fehlersumme der Quadrate?",
+            opts: ["SST = SSR + SSE", "SST = SSR − SSE", "SST = SSR·SSE", "SST = SSR/SSE"],
+            optsDE: ["SST = SSR + SSE", "SST = SSR − SSE", "SST = SSR·SSE", "SST = SSR/SSE"],
             correct: 0,
-            explain: "SST = sum(Yi-Ybar)² = SSR + SSE.",
-            explainDE: "SST = sum(Yi-Yquer)² = SSR + SSE."
+            explain: "The variation around the response mean splits into variation explained by the fitted line, SSR, and unexplained residual variation, SSE.",
+            explainDE: "Die Streuung um den Mittelwert der Zielvariablen zerfällt in die durch die Ausgleichsgerade erklärte Streuung SSR und die unerklärte Residuenstreuung SSE."
         },
         {
-            q: "The coefficient of determination (slide 141):",
-            qDE: "Das Bestimmtheitsmaß (Folie 141):",
-            opts: ["R² = SSR/SST = r_XY²", "R² = SSE/SST", "R² = SSR·SST", "R² = 1-SST"],
-            optsDE: ["R² = SSR/SST = r_XY²", "R² = SSE/SST", "R² = SSR·SST", "R² = 1-SST"],
+            q: "In a simple linear regression with an intercept, how is the coefficient of determination R² related to SSR and SST?",
+            qDE: "Wie hängt das Bestimmtheitsmaß R² in einer einfachen linearen Regression mit Achsenabschnitt mit SSR und SST zusammen?",
+            opts: ["R² = SSR/SST = r²", "R² = SSE/SST", "R² = 1 + SSR/SST", "R² = SSR/SSE"],
+            optsDE: ["R² = SSR/SST = r²", "R² = SSE/SST", "R² = 1 + SSR/SST", "R² = SSR/SSE"],
             correct: 0,
-            explain: "R² = SSR/SST = r²_XY.",
-            explainDE: "R² = SSR/SST = r²_XY."
+            explain: "R² is the fraction of the total variation explained by the regression. In simple linear regression it equals the square of the sample correlation coefficient.",
+            explainDE: "R² ist der Anteil der Gesamtstreuung, der durch die Regression erklärt wird. In der einfachen linearen Regression entspricht R² dem Quadrat des Stichprobenkorrelationskoeffizienten."
         },
         {
-            q: "The Zahlenbeispiel (slide 142) gives:",
-            qDE: "Das Zahlenbeispiel (Folie 142) ergibt:",
-            opts: ["f_hat(x) = 1.1928 + 0.4293·x", "f_hat(x) = 0 + 1·x", "f_hat(x) = 5 - 2·x", "f_hat(x) = x²"],
-            optsDE: ["f-Dach(x) = 1,1928 + 0,4293·x", "f-Dach(x) = 0 + 1·x", "f-Dach(x) = 5 - 2·x", "f-Dach(x) = x²"],
+            q: "A least-squares calculation for a simple linear regression produced estimated slope b̂ ≈ 0.4293 and estimated intercept â ≈ 1.1928. Which fitted line results?",
+            qDE: "Eine Kleinste-Quadrate-Berechnung für eine einfache lineare Regression hat die geschätzte Steigung b̂ ≈ 0,4293 und den geschätzten Achsenabschnitt â ≈ 1,1928 ergeben. Welche Ausgleichsgerade folgt daraus?",
+            opts: ["ŷ = 1.1928 + 0.4293x", "ŷ = 0.4293 + 1.1928x", "ŷ = 12.02 + 28x", "ŷ = 1.1928 − 0.4293x"],
+            optsDE: ["ŷ = 1,1928 + 0,4293x", "ŷ = 0,4293 + 1,1928x", "ŷ = 12,02 + 28x", "ŷ = 1,1928 − 0,4293x"],
             correct: 0,
-            explain: "Computed b≈0.4293, a≈1.1928 on [1,7].",
-            explainDE: "Berechnet b≈0,4293, a≈1,1928 auf [1,7]."
+            explain: "The fitted line combines the estimated intercept â ≈ 1.1928 with the estimated slope b̂ ≈ 0.4293.",
+            explainDE: "Die Ausgleichsgerade verbindet den geschätzten Achsenabschnitt â ≈ 1,1928 mit der geschätzten Steigung b̂ ≈ 0,4293."
         },
         {
-            q: "The stochastic model (slide 143) is:",
-            qDE: "Das stochastische Modell (Folie 143) lautet:",
-            opts: ["Yi = a + b·xi + ei", "Yi = a·b·xi", "Yi = ei only", "Yi = a + ei²"],
-            optsDE: ["Yi = a + b·xi + ei", "Yi = a·b·xi", "Yi = nur ei", "Yi = a + ei²"],
+            q: "Which model represents a simple linear regression with random errors εᵢ satisfying E[εᵢ] = 0 and Var(εᵢ) = σ²?",
+            qDE: "Welches Modell beschreibt eine einfache lineare Regression mit zufälligen Fehlern εᵢ, für die E[εᵢ] = 0 und Var(εᵢ) = σ² gilt?",
+            opts: ["Yᵢ = a + bxᵢ + εᵢ", "Yᵢ = abxᵢ + εᵢ", "Yᵢ = a + bεᵢ + xᵢ", "Yᵢ = a + bxᵢ + εᵢ²"],
+            optsDE: ["Yᵢ = a + bxᵢ + εᵢ", "Yᵢ = abxᵢ + εᵢ", "Yᵢ = a + bεᵢ + xᵢ", "Yᵢ = a + bxᵢ + εᵢ²"],
             correct: 0,
-            explain: "With E(ei)=0, Var(ei)=sigma².",
-            explainDE: "Mit E(ei)=0, Var(ei)=sigma²."
+            explain: "The systematic component a + bxᵢ is perturbed by an additive error εᵢ. A zero mean keeps the error from systematically shifting the line, while σ² measures its random spread.",
+            explainDE: "Der systematische Anteil a + bxᵢ wird durch einen additiven Fehler εᵢ gestört. Ein Erwartungswert von null verhindert eine systematische Verschiebung der Geraden, während σ² die zufällige Streuung des Fehlers beschreibt."
         },
         {
-            q: "Slide 144 (4 datasets, identical fits) teaches:",
-            qDE: "Folie 144 (4 Datensaetze, identische Fits) lehrt:",
-            opts: ["Always plot your data", "Never plot data", "R² is useless", "n does not matter"],
-            optsDE: ["Plotte stets deine Daten", "Plotte nie Daten", "R² ist nutzlos", "n ist egal"],
+            q: "Four datasets can have nearly identical regression summaries but very different scatterplots. What should an analyst do?",
+            qDE: "Vier Datensätze können nahezu identische Regressionskennzahlen, aber sehr unterschiedliche Streudiagramme haben. Was sollte vor der Interpretation einer Ausgleichsgeraden oder von R² geschehen?",
+            opts: ["Inspect the scatterplots before interpreting a fitted line or R²", "Rely on R² alone and omit every plot", "Ignore the plots whenever the sample is small", "Choose only the dataset with the largest R²"],
+            optsDE: ["Die Streudiagramme prüfen, bevor eine Ausgleichsgerade oder R² interpretiert wird", "Sich ausschließlich auf R² verlassen und jedes Diagramm weglassen", "Die Diagramme bei kleinen Stichproben ignorieren", "Nur den Datensatz mit dem größten R² auswählen"],
             correct: 0,
-            explain: "Anscombe-style quartet warning.",
-            explainDE: "Anscombe-Warnung."
+            explain: "As the Anscombe quartet demonstrates, similar slopes, intercepts, and R² values can hide very different data patterns. A scatterplot reveals nonlinearity, outliers, and unequal spread.",
+            explainDE: "Wie das Anscombe-Vierfach zeigt, können ähnliche Steigungen, Achsenabschnitte und R²-Werte sehr unterschiedliche Datenmuster verdecken. Ein Streudiagramm macht Nichtlinearität, Ausreißer und ungleiche Streuung sichtbar."
         },
         {
-            q: "Normal equations (slide 155):",
-            qDE: "Normalgleichungen (Folie 155):",
-            opts: ["X'X b_hat = X'Y", "X'X = Y'Y", "b_hat = X+Y", "X'b = 0"],
-            optsDE: ["X'X b-Dach = X'Y", "X'X = Y'Y", "b-Dach = X+Y", "X'b = 0"],
+            q: "For the matrix model Y = Xβ + ε, which equation expresses the ordinary least-squares normal equations for β̂?",
+            qDE: "Für das Matrixmodell Y = Xβ + ε gibt welche Gleichung die Normalgleichungen der gewöhnlichen Kleinste-Quadrate-Methode für β̂ an?",
+            opts: ["(XᵀX)β̂ = XᵀY", "(XᵀX)β̂ = YᵀX", "(XᵀX)β̂ = YᵀY", "(XᵀX)β̂ = 0"],
+            optsDE: ["(XᵀX)β̂ = XᵀY", "(XᵀX)β̂ = YᵀX", "(XᵀX)β̂ = YᵀY", "(XᵀX)β̂ = 0"],
             correct: 0,
-            explain: "KQ solution of Y = Xb+e.",
-            explainDE: "KQ-Loesung von Y = Xb+e."
+            explain: "Setting the derivatives of the least-squares objective to zero produces the normal equations, which determine the fitted coefficient vector β̂.",
+            explainDE: "Die Ableitungen der Kleinste-Quadrate-Zielfunktion gleich null zu setzen liefert die Normalgleichungen. Sie bestimmen den geschätzten Koeffizientenvektor β̂."
         },
     ],
 
@@ -3554,532 +3554,561 @@ export const BONUS_QUIZ_POOLS = {
 
     13: [
 
-        // Unsorted
-
         {
-            q: "The Law of Large Numbers states that as the sample size n → ∞, the sample mean:",
-            qDE: "Das Gesetz der großen Zahlen besagt, dass mit wachsendem Stichprobenumfang n der Stichprobenmittelwert:",
-            opts: ["Converges to the true population mean μ", "Converges to 0", "Increases without bound", "Equals the median"],
-            optsDE: ["Gegen den wahren Erwartungswert μ konvergiert", "Gegen 0 konvergiert", "Unbeschränkt wächst", "Dem Median entspricht"],
-            correct: 0
+            q: "For i.i.d. random variables X₁, …, Xₙ with E[Xᵢ]=μ and finite variance, the law of large numbers says that the sample mean X̄ₙ = (1/n)Σᵢ₌₁ⁿ Xᵢ converges to what as n → ∞?",
+            qDE: "Für i.i.d. Zufallsvariablen X₁, …, Xₙ mit E[Xᵢ]=μ und endlicher Varianz besagt das Gesetz der großen Zahlen, wohin der Stichprobenmittelwert X̄ₙ = (1/n)Σᵢ₌₁ⁿ Xᵢ für n → ∞ konvergiert?",
+            opts: ["Converges in probability to the population mean μ", "Equals the sample median in every sample", "Equals 0 for every distribution", "Has a standard-normal limit with variance 1"],
+            optsDE: ["Konvergiert mit Wahrscheinlichkeit gegen den Populationsmittelwert μ", "Ist in jeder Stichprobe gleich dem Median", "Ist für jede Verteilung gleich 0", "Besitzt eine Standardnormalverteilung als Grenzverteilung mit Varianz 1"],
+            correct: 0,
+            explain: "The law of large numbers says that X̄ₙ converges in probability to the population mean μ as the sample size grows. Individual sample means may vary, but their long-run concentration is centered at μ.",
+            explainDE: "Das Gesetz der großen Zahlen besagt, dass X̄ₙ mit wachsendem Stichprobenumfang mit Wahrscheinlichkeit gegen den Populationsmittelwert μ konvergiert. Einzelne Stichprobenmittelwerte können schwanken, konzentrieren sich langfristig aber um μ."
         },
         {
-            q: "The Central Limit Theorem requires that the random variables are:",
-            qDE: "Der Zentrale Grenzwertsatz setzt voraus, dass die Zufallsvariablen:",
-            opts: ["Independent and identically distributed (i.i.d.) with finite variance", "Normally distributed", "Discrete", "All equal to their mean"],
-            optsDE: ["Unabhängig und identisch verteilt (i.i.d.) mit endlicher Varianz", "Normalverteilt", "Diskret", "Alle gleich ihrem Erwartungswert"],
-            correct: 0
+            q: "Which assumptions define the standard i.i.d. version of the central limit theorem?",
+            qDE: "Welche Annahmen definieren die Standardversion des Zentralen Grenzwertsatzes für i.i.d. Variablen?",
+            opts: ["The Xᵢ are independent, identically distributed, and have finite variance", "The Xᵢ are normally distributed", "The Xᵢ are dependent and have infinite variance", "The Xᵢ are independent, have mean 0, and are necessarily bounded"],
+            optsDE: ["Die Xᵢ sind unabhängig, identisch verteilt und haben endliche Varianz", "Die Xᵢ sind normalverteilt", "Die Xᵢ sind abhängig und haben unendliche Varianz", "Die Xᵢ sind unabhängig, haben Mittelwert 0 und sind notwendigerweise beschränkt"],
+            correct: 0,
+            explain: "The standard i.i.d. central limit theorem assumes independence, a common distribution, and finite variance. Under these conditions the sample mean has a standard-normal limit; the variables need not be normally distributed.",
+            explainDE: "Die Standardversion des Zentralen Grenzwertsatzes für i.i.d. Variablen setzt Unabhängigkeit, eine gemeinsame Verteilung und endliche Varianz voraus. Unter diesen Bedingungen hat der Stichprobenmittelwert eine standardnormalverteilte Grenzverteilung; Normalverteilung der Variablen ist nicht erforderlich."
         },
         {
-            q: "The covariance matrix Σ of a random vector is always:",
-            qDE: "Die Kovarianzmatrix Σ eines Zufallsvektors ist stets:",
-            opts: ["Symmetric and positive semi-definite", "Diagonal", "Invertible", "A scalar"],
-            optsDE: ["Symmetrisch und positiv semidefinit", "Diagonal", "Invertierbar", "Ein Skalar"],
-            correct: 0
+            q: "If the components of a random vector X have finite second moments, which structural properties must its covariance matrix Σ have?",
+            qDE: "Wenn die Komponenten eines Zufallsvektors X endliche zweite Mommente besitzen, welche Struktureigenschaften muss seine Kovarianzmatrix Σ haben?",
+            opts: ["It is symmetric and positive semidefinite", "It is always diagonal", "It is always invertible", "It is a one-dimensional scalar"],
+            optsDE: ["Sie ist symmetrisch und positiv semidefinit", "Sie ist immer diagonal", "Sie ist immer invertierbar", "Sie ist ein eindimensionaler Skalar"],
+            correct: 0,
+            explain: "Finite second moments make every covariance well defined. Covariance is unchanged when the two components are exchanged, so Σ is symmetric. Moreover, for every vector a, aᵀΣa = E[(aᵀ(X−μ))²] ≥ 0, which is positive semidefiniteness.",
+            explainDE: "Endliche zweite Mommente sorgen dafür, dass alle Kovarianzen definiert sind. Beim Vertauschen der beiden Komponenten bleibt die Kovarianz unverändert, daher ist Σ symmetrisch. Außerdem gilt für jeden Vektor a: aᵀΣa = E[(aᵀ(X−μ))²] ≥ 0; genau das ist die positive Semidefinitheit."
         },
         {
-            q: "A Poisson distribution with parameter λ has which expected value?",
-            qDE: "Eine Poisson-Verteilung mit Parameter λ hat welchen Erwartungswert?",
+            q: "A random variable Y has a Poisson distribution with parameter λ > 0. Which value is E[Y]?",
+            qDE: "Eine Zufallsvariable Y folgt einer Poisson-Verteilung mit Parameter λ > 0. Welchen Wert hat E[Y]?",
             opts: ["λ", "1/λ", "λ²", "√λ"],
             optsDE: ["λ", "1/λ", "λ²", "√λ"],
-            correct: 0
+            correct: 0,
+            explain: "The Poisson distribution has both mean and variance equal to its parameter λ. Therefore E[Y] = λ.",
+            explainDE: "Die Poisson-Verteilung hat Erwartungswert und Varianz gleich ihrem Parameter λ. Daher gilt E[Y] = λ."
         },
         {
-            q: "An unbiased estimator θ̂ for a parameter θ satisfies:",
-            qDE: "Ein erwartungstreuer Schätzer θ̂ für einen Parameter θ erfüllt:",
-            opts: ["E[θ̂] = θ", "Var(θ̂) = 0", "θ̂ = θ always", "E[θ̂] = 0"],
-            optsDE: ["E[θ̂] = θ", "Var(θ̂) = 0", "θ̂ = θ immer", "E[θ̂] = 0"],
-            correct: 0
+            q: "An estimator θ̂ is unbiased for a parameter θ if, for every value of θ in the parameter space, which condition holds?",
+            qDE: "Ein Schätzer θ̂ ist für einen Parameter θ erwartungstreu, wenn für jeden Wert von θ im Parameterraum welche Bedingung gilt?",
+            opts: ["E[θ̂] = θ", "Var(θ̂) = 0", "θ̂ = θ in every observed sample", "E[θ̂] = 0"],
+            optsDE: ["E[θ̂] = θ", "Var(θ̂) = 0", "θ̂ = θ in jeder beobachteten Stichprobe", "E[θ̂] = 0"],
+            correct: 0,
+            explain: "Unbiasedness is a statement about averages over repeated samples: the expected value of the estimator equals the parameter θ. It does not require the estimator to equal θ in each individual sample.",
+            explainDE: "Erwartungstreue bezieht sich auf die Mittelung über viele Stichproben: Der Erwartungswert des Schätzers entspricht dem Parameter θ. Der Schätzer muss jedoch nicht in jeder einzelnen Stichprobe genau gleich θ sein."
         },
         {
-            q: "For a random variable X, the moment generating function (MGF) is defined as:",
-            qDE: "Für eine Zufallsvariable X ist die momenterzeugende Funktion (MGF) definiert als:",
-            opts: ["M_X(t) = E[e^(tX)]", "M_X(t) = E[X^t]", "M_X(t) = ln E[X]", "M_X(t) = E[X] · t"],
-            optsDE: ["M_X(t) = E[e^(tX)]", "M_X(t) = E[X^t]", "M_X(t) = ln E[X]", "M_X(t) = E[X] · t"],
-            correct: 0
+            q: "For a random variable X, which definition gives its moment-generating function M_X(t) wherever it exists?",
+            qDE: "Welche Definition gibt für eine Zufallsvariable X ihre momenterzeugende Funktion M_X(t), sofern diese existiert?",
+            opts: ["M_X(t) = E[exp(tX)]", "M_X(t) = E[Xᵗ]", "M_X(t) = ln(E[X])", "M_X(t) = E[X]·t"],
+            optsDE: ["M_X(t) = E[exp(tX)]", "M_X(t) = E[Xᵗ]", "M_X(t) = ln(E[X])", "M_X(t) = E[X]·t"],
+            correct: 0,
+            explain: "The moment-generating function averages exp(tX) over the possible values of X. Its derivatives at t = 0, when they exist, give the moments of X.",
+            explainDE: "Die momenterzeugende Funktion mittelt exp(tX) über die möglichen Werte von X. Ihre Ableitungen bei t = 0 liefern, sofern sie existieren, die Momente von X."
         },
         {
-            q: "The marginal distribution of X is obtained from the joint distribution f(x, y) by:",
-            qDE: "Die Randverteilung von X wird aus der gemeinsamen Verteilung f(x, y) durch folgendes erhalten:",
-            opts: ["Integrating (or summing) over all values of Y", "Dividing by f(y)", "Subtracting f(y) from f(x,y)", "Multiplying f(x,y) by f(y)"],
-            optsDE: ["Integration (oder Summation) über alle Werte von Y", "Division durch f(y)", "Subtraktion von f(y) aus f(x,y)", "Multiplikation von f(x,y) mit f(y)"],
-            correct: 0
+            q: "If X and Y have a joint probability mass function or density f(x, y), how is the marginal distribution of X obtained?",
+            qDE: "Wenn X und Y die gemeinsame Wahrscheinlichkeitsfunktion oder -dichte f(x, y) besitzen, wie erhält man die Randverteilung von X?",
+            opts: ["Integrate or sum f(x, y) over all y values to obtain f_X(x)", "Divide f(x, y) by f(y) at a single value of y", "Subtract the marginal f_Y(y) from f(x, y)", "Multiply f(x, y) by f_Y(y) for all y"],
+            optsDE: ["Integriere oder summiere f(x, y) über alle y-Werte, um f_X(x) zu erhalten", "Teile f(x, y) an einem einzelnen y-Wert durch f(y)", "Subtrahiere die Randfunktion f_Y(y) von f(x, y)", "Multipliziere f(x, y) für alle y mit f_Y(y)"],
+            correct: 0,
+            explain: "Marginalization removes the other coordinate by adding over y for a discrete distribution or integrating over y for a continuous one. The resulting f_X(x) describes the distribution of X alone.",
+            explainDE: "Bei der Marginalisierung wird die andere Koordinate entfernt: Für eine diskrete Verteilung wird über y summiert, für eine stetige über y integriert. Die entstehende Funktion f_X(x) beschreibt allein die Verteilung von X."
         },
         {
-            q: "The variance of the sample mean (1/n)∑Xᵢ of n i.i.d. variables with variance σ² is:",
-            qDE: "Die Varianz des Stichprobenmittelwerts (1/n)∑Xᵢ von n i.i.d. Variablen mit Varianz σ² beträgt:",
-            opts: ["σ² / n", "σ²", "n · σ²", "σ / n"],
-            optsDE: ["σ² / n", "σ²", "n · σ²", "σ / n"],
-            correct: 0
+            q: "For independent, identically distributed variables X₁, …, Xₙ with Var(Xᵢ)=σ², what is Var(X̄ₙ), where X̄ₙ=(1/n)Σᵢ₌₁ⁿ Xᵢ?",
+            qDE: "Wie groß ist Var(X̄ₙ) für unabhängige, identisch verteilte Variablen X₁, …, Xₙ mit Var(Xᵢ)=σ², wobei X̄ₙ=(1/n)Σᵢ₌₁ⁿ Xᵢ gilt?",
+            opts: ["σ² / n", "σ²", "n·σ²", "σ / √n"],
+            optsDE: ["σ² / n", "σ²", "n·σ²", "σ / √n"],
+            correct: 0,
+            explain: "Independence makes the covariance terms in the variance of a sum vanish. Dividing the sum by n therefore divides its variance by n², giving Var(X̄ₙ)=σ²/n.",
+            explainDE: "Durch Unabhängigkeit verschwinden die Kovarianzterme in der Varianz einer Summe. Die Division der Summe durch n teilt ihre Varianz deshalb durch n², sodass Var(X̄ₙ)=σ²/n gilt."
         },
         {
-            q: "Markov's inequality states that for a non-negative RV X and a > 0:",
-            qDE: "Die Markov-Ungleichung besagt für eine nicht-negative ZV X und a > 0:",
-            opts: ["P(X ≥ a) ≤ E[X] / a", "P(X ≥ a) ≥ E[X] / a", "P(X ≥ a) = E[X] / a", "P(X ≤ a) ≤ E[X] / a"],
-            optsDE: ["P(X ≥ a) ≤ E[X] / a", "P(X ≥ a) ≥ E[X] / a", "P(X ≥ a) = E[X] / a", "P(X ≤ a) ≤ E[X] / a"],
-            correct: 0
+            q: "For a non-negative random variable X and a > 0, which inequality is Markov's inequality?",
+            qDE: "Für eine nichtnegative Zufallsvariable X und a > 0 gilt welche Ungleichung nach der Markov-Ungleichung?",
+            opts: ["P(X ≥ a) ≤ E[X]/a", "P(X ≥ a) ≥ E[X]/a", "P(X ≥ a) = E[X]/a", "P(X ≤ a) ≤ E[X]/a"],
+            optsDE: ["P(X ≥ a) ≤ E[X]/a", "P(X ≥ a) ≥ E[X]/a", "P(X ≥ a) = E[X]/a", "P(X ≤ a) ≤ E[X]/a"],
+            correct: 0,
+            explain: "Markov's inequality gives an upper bound on the probability of a large nonnegative value: P(X ≥ a) cannot systematically exceed E[X]/a. It is a bound, not a general equality.",
+            explainDE: "Die Markov-Ungleichung liefert eine obere Schranke für die Wahrscheinlichkeit eines großen nichtnegativen Wertes: P(X ≥ a) kann nicht systematisch größer als E[X]/a sein. Es handelt sich um eine Schranke, nicht allgemein um eine Gleichheit."
         },
         {
-            q: "Chebyshev's inequality states that P(|X − μ| ≥ k·σ) is bounded by:",
-            qDE: "Die Tschebyschow-Ungleichung begrenzt P(|X − μ| ≥ k·σ) durch:",
-            opts: ["1 / k²", "1 / k", "k²", "σ / k"],
-            optsDE: ["1 / k²", "1 / k", "k²", "σ / k"],
-            correct: 0
+            q: "For a random variable X with E[X]=μ and Var(X)=σ², what upper bound does Chebyshev's inequality give for P(|X−μ| ≥ kσ), where k > 0?",
+            qDE: "Für eine Zufallsvariable X mit E[X]=μ und Var(X)=σ² liefert die Tschebyschow-Ungleichung welche obere Schranke für P(|X−μ| ≥ kσ) mit k > 0?",
+            opts: ["1/k²", "1/k", "k²", "σ/k"],
+            optsDE: ["1/k²", "1/k", "k²", "σ/k"],
+            correct: 0,
+            explain: "Chebyshev's inequality bounds the probability of a deviation of at least k standard deviations by 1/k². The bound uses the mean and variance but does not require a normal distribution.",
+            explainDE: "Die Tschebyschow-Ungleichung begrenzt die Wahrscheinlichkeit einer Abweichung von mindestens k Standardabweichungen durch 1/k². Die Schranke verwendet Erwartungswert und Varianz, setzt aber keine Normalverteilung voraus."
         },
 
 
         {
-            q: "What does the Central Limit Theorem state?",
-            qDE: "Was besagt der Zentrale Grenzwertsatz?",
-            opts: ["Sample means approach normality as n grows", "All distributions are normal", "The variance always equals 1", "Large samples have no skewness"],
-            optsDE: ["Stichprobenmittelwerte nähern sich bei wachsendem n der Normalverteilung", "Alle Verteilungen sind normal", "Die Varianz beträgt immer 1", "Große Stichproben haben keine Schiefe"],
-            correct: 0
+            q: "Under the standard i.i.d. finite-variance assumptions with E[Xᵢ]=μ and Var(Xᵢ)=σ², what does the central limit theorem say about the standardized sample mean Zₙ = √n(X̄ₙ−μ)/σ as n → ∞?",
+            qDE: "Unter den i.i.d.-Annahmen mit endlicher Varianz sowie E[Xᵢ]=μ und Var(Xᵢ)=σ² besagt der Zentrale Grenzwertsatz, was gilt für den standardisierten Stichprobenmittelwert Zₙ = √n(X̄ₙ−μ)/σ für n → ∞?",
+            opts: ["Zₙ ⇒ N(0,1)", "Zₙ = (X̄ₙ−μ)/σ ⇒ N(0,1)", "X̄ₙ ⇒ N(0,1) for every n", "Zₙ ⇒ χ²(1)"],
+            optsDE: ["Zₙ ⇒ N(0,1)", "Zₙ = (X̄ₙ−μ)/σ ⇒ N(0,1)", "X̄ₙ ⇒ N(0,1) für jedes n", "Zₙ ⇒ χ²(1)"],
+            correct: 0,
+            explain: "The central limit theorem is a convergence-in-distribution result for the standardized sample mean, not for the individual observations. With E[Xᵢ]=μ and Var(Xᵢ)=σ², the factor √n removes the shrinking spread and σ puts the statistic on the standard-normal scale.",
+            explainDE: "Der Zentrale Grenzwertsatz ist ein Konvergenzresultat in Verteilung für den standardisierten Stichprobenmittelwert, nicht für die einzelnen Beobachtungen. Mit E[Xᵢ]=μ und Var(Xᵢ)=σ² beseitigt der Faktor √n die schrumpfende Streuung, und σ bringt die Statistik auf die standardnormalverteilte Skala."
         },
         {
-            q: "What is the variance of a Ber(p) distribution?",
-            qDE: "Wie lautet die Varianz einer Ber(p)-Verteilung?",
+            q: "If X follows a Bernoulli distribution with success probability p, which expression gives Var(X)?",
+            qDE: "Wenn X einer Bernoulli-Verteilung mit Erfolgswahrscheinlichkeit p folgt, welcher Ausdruck gibt Var(X) an?",
             opts: ["p(1−p)", "p²", "(1−p)²", "1/p"],
             optsDE: ["p(1−p)", "p²", "(1−p)²", "1/p"],
-            correct: 0
+            correct: 0,
+            explain: "A Bernoulli variable has E[X]=p and E[X²]=p, so Var(X)=E[X²]−(E[X])²=p−p²=p(1−p).",
+            explainDE: "Eine Bernoulli-Zufallsvariable hat E[X]=p und E[X²]=p. Daher gilt Var(X)=E[X²]−(E[X])²=p−p²=p(1−p)."
         },
         {
-            q: "What is the Bayes' theorem formula for P(A|B)?",
-            qDE: "Wie lautet die Bayes-Formel für P(A|B)?",
-            opts: ["P(B|A)·P(A)/P(B)", "P(A)·P(B)", "P(A∩B)/P(A)", "P(B)/P(A)"],
-            optsDE: ["P(B|A)·P(A)/P(B)", "P(A)·P(B)", "P(A∩B)/P(A)", "P(B)/P(A)"],
-            correct: 0
+            q: "For events A and B with P(A)>0 and P(B)>0, which formula gives P(B|A)?",
+            qDE: "Für Ereignisse A und B mit P(A)>0 und P(B)>0 liefert welche Formel P(B|A)?",
+            opts: ["P(B|A)=P(A|B)·P(B)/P(A)", "P(B|A)=P(A)·P(B)", "P(B|A)=P(B)/P(A)", "P(B|A)=P(A∩B)/P(B)"],
+            optsDE: ["P(B|A)=P(A|B)·P(B)/P(A)", "P(B|A)=P(A)·P(B)", "P(B|A)=P(B)/P(A)", "P(B|A)=P(A∩B)/P(B)"],
+            correct: 0,
+            explain: "Bayes' theorem reverses a conditional probability by multiplying the known conditional probability by the prior probability of B and dividing by the total probability P(A).",
+            explainDE: "Die Bayesregel dreht eine bedingte Wahrscheinlichkeit um: Man multipliziert die bekannte bedingte Wahrscheinlichkeit mit der vorherigen Wahrscheinlichkeit von B und dividiert durch die Gesamtwahrscheinlichkeit P(A)."
         },
         {
-            q: "If X~N(0,1), what is P(X > 0)?",
-            qDE: "Wenn X~N(0,1) gilt, was ist P(X > 0)?",
+            q: "If X follows the standard normal distribution N(0,1), what is P(X > 0)?",
+            qDE: "Wenn X der Standardnormalverteilung N(0,1) folgt, wie groß ist P(X > 0)?",
             opts: ["0.5", "0.25", "0.75", "1.0"],
             optsDE: ["0,5", "0,25", "0,75", "1,0"],
-            correct: 0
+            correct: 0,
+            explain: "The standard normal distribution is symmetric about zero, so the probabilities immediately below and above zero are equal. Since a continuous normal variable has zero probability at exactly zero, P(X>0)=0.5.",
+            explainDE: "Die Standardnormalverteilung ist um null symmetrisch, daher sind die Wahrscheinlichkeiten unmittelbar unterhalb und oberhalb von null gleich. Da eine stetige normalverteilte Zufallsvariable bei null Wahrscheinlichkeit null hat, gilt P(X>0)=0,5."
         },
         {
-            q: "A correlation coefficient r = −1 means:",
-            qDE: "Ein Korrelationskoeffizient r = −1 bedeutet:",
-            opts: ["Perfect negative linear relationship", "No relationship", "Perfect positive relationship", "Weak negative relationship"],
-            optsDE: ["Perfekter negativer linearer Zusammenhang", "Kein Zusammenhang", "Perfekter positiver Zusammenhang", "Schwacher negativer Zusammenhang"],
-            correct: 0
+            q: "For random variables X and Y with nonzero variances, what does the correlation coefficient r = −1 mean?",
+            qDE: "Was bedeutet der Korrelationskoeffizient r = −1 für Zufallsvariablen X und Y mit positiven Varianzen?",
+            opts: ["A perfect negative linear relationship", "No linear relationship", "A perfect positive linear relationship", "A weak negative linear relationship"],
+            optsDE: ["Einen perfekten negativen linearen Zusammenhang", "Keinen linearen Zusammenhang", "Einen perfekten positiven linearen Zusammenhang", "Einen schwachen negativen linearen Zusammenhang"],
+            correct: 0,
+            explain: "A correlation of −1 is the strongest possible negative linear association: with positive component variances, the observations lie exactly on a decreasing straight line. It is not merely a weak negative relationship.",
+            explainDE: "Eine Korrelation von −1 ist der stärkstmögliche negative lineare Zusammenhang: Bei positiven Varianzen der Komponenten liegen die Beobachtungen exakt auf einer fallenden Geraden. Es handelt sich also nicht bloß um einen schwachen negativen Zusammenhang."
         },
         {
-            q: "If Cov(X,Y) = 0 and X,Y are jointly normal, then:",
-            qDE: "Wenn Cov(X,Y) = 0 und X,Y gemeinsam normalverteilt sind, dann:",
+            q: "If X and Y are jointly normally distributed and Cov(X,Y)=0, what follows?",
+            qDE: "Was folgt daraus, dass X und Y gemeinsam normalverteilt sind und Cov(X,Y)=0 gilt?",
             opts: ["X and Y are independent", "X and Y are identical", "E[X]·E[Y]=0", "Var(X+Y)=0"],
             optsDE: ["X und Y sind unabhängig", "X und Y sind identisch", "E[X]·E[Y]=0", "Var(X+Y)=0"],
-            correct: 0
+            correct: 0,
+            explain: "For a jointly normal pair, zero covariance is equivalent to independence. This implication is special to the joint normal model and does not hold for arbitrary random variables.",
+            explainDE: "Für ein gemeinsam normalverteiltes Paar ist die Kovarianz null gleichbedeutend mit Unabhängigkeit. Diese Implikation gilt speziell für das gemeinsam normalverteilte Modell, nicht für beliebige Zufallsvariablen."
         },
         {
-            q: "For the CDF F(x) = P(X ≤ x), what is lim F(x) for x → ∞?",
-            qDE: "Für die Verteilungsfunktion F(x) = P(X ≤ x), was ist lim F(x) für x → ∞?",
+            q: "For the cumulative distribution function F₁(x)=P(X≤x) of any real-valued random variable X, what value does F₁(x) approach as x → ∞?",
+            qDE: "Welchem Wert nähert sich F₁(x)=P(X≤x) für jede reellwertige Zufallsvariable X, wenn x → ∞ geht?",
             opts: ["1", "0", "0.5", "Undefined"],
-            optsDE: ["1", "0", "0.5", "Undefiniert"],
-            correct: 0
+            optsDE: ["1", "0", "0,5", "Undefiniert"],
+            correct: 0,
+            explain: "As the cutoff x moves to the right, it eventually includes every possible outcome with probability. The cumulative distribution function therefore approaches the total probability 1.",
+            explainDE: "Wenn die Grenze x nach rechts wandert, umfasst sie schließlich jedes mögliche Ergebnis mit Wahrscheinlichkeit. Die Verteilungsfunktion nähert sich deshalb der Gesamtwahrscheinlichkeit 1."
         },
 
-        // --- WORLD 13 lecture: Wilcoxon (slides 162-165) ---
         {
-            q: "The Wilcoxon test works with two samples that are:",
-            qDE: "Der Wilcoxon-Test arbeitet mit zwei Stichproben, die sind:",
-            opts: ["Independent, sizes n1 and n2, total n = n1+n2", "Always paired with equal size", "Both of size 1", "Dependent with known variance"],
-            optsDE: ["Unabhängig, Umfänge n1 und n2, gesamt n = n1+n2", "Immer verbunden mit gleichem Umfang", "Beide vom Umfang 1", "Abhängig mit bekannter Varianz"],
+            q: "In the independent two-sample Wilcoxon rank-sum test, how are the two samples and the pooled sample size described?",
+            qDE: "Wie werden die beiden Stichproben und die Gesamtgröße beim unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich beschrieben?",
+            opts: ["Two independent samples of sizes n₁ and n₂, with pooled size n=n₁+n₂", "One paired sample with n₁=n₂ and no separate groups", "Two dependent samples with shared observations", "One pooled sample with size n=n₁n₂"],
+            optsDE: ["Zwei unabhängige Stichproben mit den Umfängen n₁ und n₂ und der Gesamtgröße n=n₁+n₂", "Eine verbundene Stichprobe mit n₁=n₂ und ohne getrennte Gruppen", "Zwei abhängige Stichproben mit gemeinsamen Beobachtungen", "Eine gepoolte Stichprobe mit der Größe n=n₁n₂"],
             correct: 0,
-            explain: "Slide 162: two independent samples Xi1..Xini ~ Fi, n = n1+n2.",
-            explainDE: "Folie 162: zwei unabhängige Stichproben Xi1..Xini ~ Fi, n = n1+n2."
+            explain: "The independent two-sample rank-sum test combines the observations only when assigning ranks. The two groups remain separate, and their sizes add to the pooled sample size n=n₁+n₂.",
+            explainDE: "Beim unabhängigen Zwei-Stichproben-Rangsummenvergleich werden die Beobachtungen nur zur Rangvergabe zusammengeführt. Die beiden Gruppen bleiben getrennt, und ihre Umfänge addieren sich zur Gesamtgröße n=n₁+n₂."
         },
         {
-            q: "In the shift (location) model, the second sample satisfies:",
-            qDE: "Im Shiftmodell (Lokationsmodell) erfüllt die zweite Stichprobe:",
-            opts: ["X2j - Delta has the same distribution as X1i", "X2j + X1i = 0", "X2j = 2·X1i", "F2(x) = F1(x) + Delta"],
-            optsDE: ["X2j - Delta ist verteilt wie X1i", "X2j + X1i = 0", "X2j = 2·X1i", "F2(x) = F1(x) + Delta"],
+            q: "In the location-shift model for the independent two-sample Wilcoxon rank-sum test, the first-sample observations are X₁ᵢ and the second-sample observations are X₂ⱼ. What relationship describes the second sample?",
+            qDE: "Im Lokationsverschiebungsmodell des unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleichs sind X₁ᵢ die Beobachtungen der ersten Stichprobe und X₂ⱼ die Beobachtungen der zweiten Stichprobe. Welcher Zusammenhang beschreibt die zweite Stichprobe?",
+            opts: ["X₂ⱼ−Δ has the same distribution as X₁ᵢ", "X₂ⱼ+Δ has the same distribution as X₁ᵢ", "X₂ⱼ−Δ has the same distribution as X₂ⱼ", "F₂(x)=F₁(x)+Δ for every x"],
+            optsDE: ["X₂ⱼ−Δ ist genauso verteilt wie X₁ᵢ", "X₂ⱼ+Δ ist genauso verteilt wie X₁ᵢ", "X₂ⱼ−Δ ist genauso verteilt wie X₂ⱼ", "F₂(x)=F₁(x)+Δ für jedes x"],
             correct: 0,
-            explain: "Slide 162: F2(x+Delta) = F1(x), i.e. F2(x) = F1(x-Delta).",
-            explainDE: "Folie 162: F2(x+Delta) = F1(x), d.h. F2(x) = F1(x-Delta)."
+            explain: "Subtracting the location shift Δ from the second population aligns it with the first population. In terms of distribution functions, this is F₂(x+Δ)=F₁(x), or equivalently F₂(x)=F₁(x−Δ).",
+            explainDE: "Durch Subtraktion der Lageverschiebung Δ von der zweiten Grundgesamtheit wird diese an die erste angeglichen. Für die Verteilungsfunktionen bedeutet dies F₂(x+Δ)=F₁(x), also äquivalent F₂(x)=F₁(x−Δ)."
         },
         {
-            q: "The Wilcoxon test problem (slide 162) is:",
-            qDE: "Das Wilcoxon-Testproblem (Folie 162) lautet:",
-            opts: ["H0: F1 = F2 (Delta = 0) vs H1: F1 != F2 (Delta != 0)", "H0: mu = 0 vs H1: mu = 1", "H0: sigma1 = sigma2 vs H1: sigma1 < sigma2", "H0: p = 0.5 vs H1: p > 0.5"],
-            optsDE: ["H0: F1 = F2 (Delta = 0) gegen H1: F1 != F2 (Delta != 0)", "H0: mu = 0 gegen H1: mu = 1", "H0: sigma1 = sigma2 gegen H1: sigma1 < sigma2", "H0: p = 0,5 gegen H1: p > 0,5"],
+            q: "For the independent two-sample Wilcoxon rank-sum test in the location model, where F₁ and F₂ are the population distribution functions, which hypotheses test a zero location shift Δ?",
+            qDE: "Welche Hypothesen prüft der unabhängige Zwei-Stichproben-Wilcoxon-Rangsummenvergleich im Lokationsmodell, in dem F₁ und F₂ die Verteilungsfunktionen der Grundgesamtheiten sind, für eine Verschiebung Δ=0?",
+            opts: ["H₀: F₁(x)=F₂(x) for all x (Δ=0) versus H₁: F₁(x)≠F₂(x) (Δ≠0)", "H₀: μ₁=μ₂ versus H₁: μ₁>μ₂", "H₀: σ₁²=σ₂² versus H₁: σ₁²<σ₂²", "H₀: p=0,5 versus H₁: p>0,5"],
+            optsDE: ["H₀: F₁(x)=F₂(x) für alle x (Δ=0) gegen H₁: F₁(x)≠F₂(x) (Δ≠0)", "H₀: μ₁=μ₂ gegen H₁: μ₁>μ₂", "H₀: σ₁²=σ₂² gegen H₁: σ₁²<σ₂²", "H₀: p=0,5 gegen H₁: p>0,5"],
             correct: 0,
-            explain: "Nonparametric location test on Delta.",
-            explainDE: "Nichtparametrischer Lokationstest auf Delta."
+            explain: "The two-sided location version states that the null distribution has no location difference, Δ=0, while the alternative allows a difference in either direction, Δ≠0. The test is based on ranks rather than directly on means or variances.",
+            explainDE: "Die zweiseitige Lokationsversion besagt, dass unter der Nullhypothese keine Lageverschiebung Δ=0 vorliegt, während die Alternative einen Unterschied in beide Richtungen, Δ≠0, zulässt. Der Test beruht auf Rängen, nicht unmittelbar auf Mittelwerten oder Varianzen."
         },
         {
-            q: "Step 2 of awarding ranks (slide 163) is:",
-            qDE: "Schritt 2 der Rangvergabe (Folie 163) lautet:",
-            opts: ["Write numbers 1..n left to right below the points: the rank numbers", "Sort each sample separately", "Compute the sample means", "Square all observations"],
-            optsDE: ["Schreibe Zahlen 1..n von links nach rechts unter die Punkte: die Rangzahlen", "Sortiere jede Stichprobe einzeln", "Berechne die Stichprobenmittel", "Quadriere alle Beobachtungen"],
+            q: "If there are no tied observations, how are ranks assigned after pooling the two samples in the independent two-sample Wilcoxon rank-sum test?",
+            qDE: "Wie werden die Ränge nach dem Zusammenführen der beiden Stichproben im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich vergeben, wenn keine Rangbindungen auftreten?",
+            opts: ["Pool all n observations, sort them jointly, and assign ranks 1, 2, …, n", "Sort each sample separately and assign ranks 1, 2, … within each sample", "Assign each observation its sample size as its rank", "Use the original numerical values as ranks without sorting"],
+            optsDE: ["Führe alle n Beobachtungen zusammen, ordne sie gemeinsam und vergebe die Ränge 1, 2, …, n", "Sortiere jede Stichprobe getrennt und vergebe innerhalb jeder Stichprobe die Ränge 1, 2, …", "Ordne jeder Beobachtung den Stichprobenumfang als Rang zu", "Verwende die ursprünglichen Zahlenwerte ohne Sortierung als Ränge"],
             correct: 0,
-            explain: "Ranks come from the pooled ordered axis.",
-            explainDE: "Ränge stammen von der gepoolten geordneten Achse."
+            explain: "A common ordered scale makes ranks comparable across the two groups. The smallest observation receives rank 1, the next rank 2, and so on through rank n.",
+            explainDE: "Eine gemeinsame geordnete Skala macht die Ränge der beiden Gruppen vergleichbar. Die kleinste Beobachtung erhält Rang 1, die nächste Rang 2 usw. bis Rang n."
         },
         {
-            q: "The Wilcoxon statistic W is:",
-            qDE: "Die Wilcoxon-Statistik W ist:",
-            opts: ["W := R2. = sum of ranks of sample 2", "W = mean of sample 1", "W = n1·n2", "W = max rank minus min rank"],
-            optsDE: ["W := R2. = Rangsumme der 2. Stichprobe", "W = Mittel der 1. Stichprobe", "W = n1·n2", "W = max. Rang minus min. Rang"],
+            q: "After pooling and ranking, let r(x) denote the rank of observation x. In the independent two-sample Wilcoxon rank-sum test, how is W defined when it is the rank sum of the second sample?",
+            qDE: "Sei r(x) nach dem Zusammenführen und Rangieren der Rang der Beobachtung x. Wie ist W im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich definiert, wenn W die Rangsumme der zweiten Stichprobe ist?",
+            opts: ["W=R₂=Σⱼ₌₁ⁿ² r(X₂ⱼ)", "W=R₂=X̄₂", "W=R₂=n₁·n₂", "W=R₂=max(r)−min(r)"],
+            optsDE: ["W=R₂=Σⱼ₌₁ⁿ² r(X₂ⱼ)", "W=R₂=X̄₂", "W=R₂=n₁·n₂", "W=R₂=max(r)−min(r)"],
             correct: 0,
-            explain: "Slide 163: W := R2. = sum R2j.",
-            explainDE: "Folie 163: W := R2. = Summe R2j."
+            explain: "The statistic W is the sum of the ranks assigned to the second sample. It is a rank sum, so it depends on ordering rather than on the original measurement units.",
+            explainDE: "Die Statistik W ist die Summe der Ränge der zweiten Stichprobe. Sie ist eine Rangsummenstatistik und hängt von der Reihenfolge statt von den ursprünglichen Messeinheiten ab."
         },
         {
-            q: "For the two rank sums holds (slide 163):",
-            qDE: "Für die beiden Rangsummen gilt (Folie 163):",
-            opts: ["R1. + R2. = n(n+1)/2", "R1. + R2. = n²", "R1. = R2. always", "R1. + R2. = n1·n2"],
-            optsDE: ["R1. + R2. = n(n+1)/2", "R1. + R2. = n²", "R1. = R2. immer", "R1. + R2. = n1·n2"],
+            q: "If the pooled observations have no ties and receive ranks 1, 2, …, n, what identity relates the two rank sums R₁ and R₂?",
+            qDE: "Welche Identität verbindet die beiden Rangsummen R₁ und R₂, wenn die zusammengeführten Beobachtungen keine Bindungen aufweisen und die Ränge 1, 2, …, n erhalten?",
+            opts: ["R₁+R₂=n(n+1)/2", "R₁+R₂=n²", "R₁=R₂ in every sample", "R₁+R₂=n₁·n₂"],
+            optsDE: ["R₁+R₂=n(n+1)/2", "R₁+R₂=n²", "R₁=R₂ in jeder Stichprobe", "R₁+R₂=n₁·n₂"],
             correct: 0,
-            explain: "Sum of 1..n.",
-            explainDE: "Summe von 1..n."
+            explain: "Every rank from 1 through n belongs to exactly one of the two samples. Therefore the two rank sums together equal 1+2+…+n=n(n+1)/2.",
+            explainDE: "Jeder Rang von 1 bis n gehört zu genau einer der beiden Stichproben. Daher ergeben sich die beiden Rangsummen zusammen zu 1+2+…+n=n(n+1)/2."
         },
         {
-            q: "Under H0, the null mean of W is:",
-            qDE: "Unter H0 gilt für den Null-Erwartungswert von W:",
-            opts: ["E0(W) = n2(n+1)/2", "E0(W) = 0", "E0(W) = n1·n2", "E0(W) = (n+1)/2"],
-            optsDE: ["E0(W) = n2(n+1)/2", "E0(W) = 0", "E0(W) = n1·n2", "E0(W) = (n+1)/2"],
+            q: "For the independent two-sample Wilcoxon rank-sum test under H₀, with no tied observations, what is the null mean E₀(W) of the second-sample rank sum?",
+            qDE: "Wie groß ist im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich unter H₀ und ohne Rangbindungen der Erwartungswert E₀(W) der Rangsummen der zweiten Stichprobe?",
+            opts: ["E₀(W)=n₂(n+1)/2", "E₀(W)=0", "E₀(W)=n₁·n₂", "E₀(W)=(n+1)/2"],
+            optsDE: ["E₀(W)=n₂(n+1)/2", "E₀(W)=0", "E₀(W)=n₁·n₂", "E₀(W)=(n+1)/2"],
             correct: 0,
-            explain: "Slide 163.",
-            explainDE: "Folie 163."
+            explain: "Under H₀, the n₂ ranks assigned to the second sample have average value (n+1)/2. Multiplying this average by n₂ gives E₀(W)=n₂(n+1)/2.",
+            explainDE: "Unter H₀ haben die n₂ der zweiten Stichprobe zugewiesenen Ränge den Mittelwert (n+1)/2. Multipliziert man diesen Mittelwert mit n₂, erhält man E₀(W)=n₂(n+1)/2."
         },
         {
-            q: "Under H0, the null variance of W is:",
-            qDE: "Unter H0 gilt für die Null-Varianz von W:",
-            opts: ["Var0(W) = n1·n2(n+1)/12", "Var0(W) = n2(n+1)/2", "Var0(W) = 1", "Var0(W) = n1+n2"],
-            optsDE: ["Var0(W) = n1·n2(n+1)/12", "Var0(W) = n2(n+1)/2", "Var0(W) = 1", "Var0(W) = n1+n2"],
+            q: "For the independent two-sample Wilcoxon rank-sum test under H₀, with n=n₁+n₂ and no tied observations, what is the null variance Var₀(W)?",
+            qDE: "Wie groß ist im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich unter H₀ bei n=n₁+n₂ und ohne Rangbindungen die Null-Varianz Var₀(W)?",
+            opts: ["Var₀(W)=n₁·n₂(n+1)/12", "Var₀(W)=n₂(n+1)/2", "Var₀(W)=1", "Var₀(W)=n₁+n₂"],
+            optsDE: ["Var₀(W)=n₁·n₂(n+1)/12", "Var₀(W)=n₂(n+1)/2", "Var₀(W)=1", "Var₀(W)=n₁+n₂"],
             correct: 0,
-            explain: "Slide 163.",
-            explainDE: "Folie 163."
+            explain: "With no ties, the pooled ranks form a permutation of 1, …, n. Viewing the n₂ selected ranks as a sample without replacement and accounting for their negative covariances gives Var₀(W)=n₁·n₂(n+1)/12 under H₀.",
+            explainDE: "Ohne Bindungen bilden die gepoolten Ränge eine Permutation von 1, …, n. Werden die n₂ ausgewählten Ränge als Stichprobe ohne Zurücklegen aufgefasst und ihre negativen Kovarianzen berücksichtigt, ergibt sich unter H₀ Var₀(W)=n₁·n₂(n+1)/12."
         },
         {
-            q: "The standardized Wilcoxon statistic (slide 164) satisfies as n → ∞:",
-            qDE: "Die standardisierte Wilcoxon-Statistik (Folie 164) erfüllt für n → ∞:",
-            opts: ["T = (W-E0(W))/sqrt(Var0(W)) → N(0,1)", "T → chi²(1)", "T → t(n) exactly", "T → 0"],
-            optsDE: ["T = (W-E0(W))/sqrt(Var0(W)) → N(0,1)", "T → chi²(1)", "T → t(n) exakt", "T → 0"],
+            q: "Under H₀ in the independent two-sample Wilcoxon rank-sum test with no tied observations, which standardized statistic has an asymptotic standard-normal limit as n grows?",
+            qDE: "Welche standardisierte Statistik besitzt unter H₀ im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich ohne Rangbindungen bei wachsendem n eine asymptotische Standardnormalverteilung als Grenzverteilung?",
+            opts: ["T=(W−E₀(W))/√Var₀(W) ⇒ N(0,1)", "T=(W−E₀(W))/Var₀(W) ⇒ N(0,1)", "W ⇒ χ²(1)", "T ⇒ t(n) exactly"],
+            optsDE: ["T=(W−E₀(W))/√Var₀(W) ⇒ N(0,1)", "T=(W−E₀(W))/Var₀(W) ⇒ N(0,1)", "W ⇒ χ²(1)", "T ⇒ t(n) exakt"],
             correct: 0,
-            explain: "Asymptotic normality.",
-            explainDE: "Asymptotische Normalität."
+            explain: "Subtracting the null mean and dividing by the null standard deviation centers and scales W. For increasing sample size, the resulting T converges in distribution to N(0,1); the limit is asymptotic rather than exact for every finite n.",
+            explainDE: "Die Subtraktion des Null-Erwartungswerts und die Division durch die Null-Standardabweichung zentrieren und skalieren W. Mit wachsender Stichprobe konvergiert das resultierende T in Verteilung gegen N(0,1); die Grenzverteilung ist asymptotisch und für jedes endliche n nicht exakt."
         },
         {
-            q: "The Wilcoxon test rejects H0 at level alpha if (slide 164):",
-            qDE: "Der Wilcoxon-Test verwirft H0 zum Niveau alpha, falls (Folie 164):",
-            opts: ["|T| > z_{1-alpha/2}", "|T| < 0", "W = E0(W) exactly", "T < 0 always"],
-            optsDE: ["|T| > z_{1-alpha/2}", "|T| < 0", "W = E0(W) exakt", "T < 0 immer"],
+            q: "In the independent two-sample Wilcoxon rank-sum test with no tied observations, a two-sided decision about H₀ is made at level α using T=(W−E₀(W))/√Var₀(W) and the standard-normal critical value z_{1−α/2}. What is the rejection rule?",
+            qDE: "Welche Verwerfungsregel gilt im unabhängigen Zwei-Stichproben-Wilcoxon-Rangsummenvergleich ohne Rangbindungen bei einer zweiseitigen Entscheidung über H₀ zum Niveau α, wenn T=(W−E₀(W))/√Var₀(W) und der Normal-Quantilswert z_{1−α/2} gegeben sind?",
+            opts: ["Reject H₀ if |T| > z_{1−α/2}", "Reject H₀ if |T| < z_{1−α/2}", "Reject H₀ if T=E₀(W)", "Reject H₀ if W<0"],
+            optsDE: ["H₀ verwerfen, wenn |T| > z_{1−α/2}", "H₀ verwerfen, wenn |T| < z_{1−α/2}", "H₀ verwerfen, wenn T=E₀(W)", "H₀ verwerfen, wenn W<0"],
             correct: 0,
-            explain: "Two-sided normal critical value.",
-            explainDE: "Zweiseitiger Normal-Quantilswert."
-        },
-        // --- WORLD 13 lecture: contingency tables (slides 166-171) ---
-        {
-            q: "Contingency tables typically arise in two ways (slide 166):",
-            qDE: "Kontingenztafeln entstehen typischerweise auf zwei Arten (Folie 166):",
-            opts: ["Cross-classification of pairs (Xi,Yi), or comparing r samples with s outcomes", "Only from normal data", "Only from time series", "By sorting one sample"],
-            optsDE: ["Kreuzklassifikation von Paaren (Xi,Yi) oder Vergleich von r Stichproben mit s Ausprägungen", "Nur aus Normaldaten", "Nur aus Zeitreihen", "Durch Sortieren einer Stichprobe"],
-            correct: 0,
-            explain: "Slide 166 lists both data models.",
-            explainDE: "Folie 166 nennt beide Datenmodelle."
+            explain: "A two-sided test uses both tails, so it rejects H₀ only when the magnitude of T exceeds the upper critical quantile z_{1−α/2}. This rule uses the standardized statistic, not the unstandardized value W.",
+            explainDE: "Ein zweiseitiger Test berücksichtigt beide Schwänze und verwirft H₀ nur, wenn der Betrag von T den oberen kritischen Quantilswert z_{1−α/2} übersteigt. Die Regel verwendet die standardisierte Statistik T, nicht den unstandardisierten Wert W."
         },
         {
-            q: "In an r×s table, Nij and Ni. denote (slide 167):",
-            qDE: "In einer r×s-Tafel bezeichnen Nij und Ni. (Folie 167):",
-            opts: ["Nij = count in cell (i,j); Ni. = row sample size sum_j Nij", "Nij = row size; Ni. = cell count", "Both are probabilities", "Nij = expected count; Ni. = observed"],
-            optsDE: ["Nij = Anzahl in Zelle (i,j); Ni. = Zeilenumfang sum_j Nij", "Nij = Zeilenumfang; Ni. = Zellanzahl", "Beides sind Wahrscheinlichkeiten", "Nij = erwartet; Ni. = beobachtet"],
+            q: "Which two data situations commonly lead to an r×s contingency table?",
+            qDE: "Welche beiden Datensituationen führen üblicherweise zu einer r×s-Kontingenztafel?",
+            opts: ["Cross-classifying paired observations (Xᵢ,Yᵢ), or comparing r groups across s outcome categories", "Measuring one continuous variable without recording a second categorical variable", "Ordering one sample by magnitude and recording only its median", "Comparing one time point across r groups with no outcome categories"],
+            optsDE: ["Kreuzklassifikation gepaarter Beobachtungen (Xᵢ,Yᵢ) oder Vergleich von r Gruppen mit s Ausprägungskategorien", "Messung einer einzigen stetigen Variablen ohne zweite kategoriale Variable", "Sortieren einer Stichprobe nach Größe und Aufzeichnen nur ihres Medians", "Vergleich eines einzigen Zeitpunkts über r Gruppen ohne Ausprägungskategorien"],
             correct: 0,
-            explain: "Cell counts and row totals.",
-            explainDE: "Zellanzahlen und Zeilensummen."
+            explain: "A contingency table can cross-classify each paired observation by two categorical variables, or compare several groups across the same outcome categories. Each observation contributes to exactly one cell.",
+            explainDE: "Eine Kontingenztafel kann gepaarte Beobachtungen nach zwei kategorialen Variablen kreuzklassifizieren oder mehrere Gruppen über dieselben Ausprägungskategorien vergleichen. Jede Beobachtung trägt zu genau einer Zelle bei."
         },
         {
-            q: "Under H0 of identical row distributions, pj is estimated by (slide 168):",
-            qDE: "Unter H0 identischer Zeilenverteilungen wird pj geschätzt durch (Folie 168):",
-            opts: ["p̂j = N.j / N", "p̂j = Nij / Ni.", "p̂j = 1/r", "p̂j = Ni. / N"],
-            optsDE: ["p̂j = N.j / N", "p̂j = Nij / Ni.", "p̂j = 1/r", "p̂j = Ni. / N"],
+            q: "In an r×s contingency table, what do Nᵢⱼ, Nᵢ⋅, and N⋅ⱼ represent?",
+            qDE: "Was bezeichnen Nᵢⱼ, Nᵢ⋅ und N⋅ⱼ in einer r×s-Kontingenztafel?",
+            opts: ["Nᵢⱼ is the observed count in cell (i,j); Nᵢ⋅=Σⱼ₌₁ˢNᵢⱼ is the row total; N⋅ⱼ=Σᵢ₌₁ʳNᵢⱼ is the column total", "Nᵢⱼ is the row total; Nᵢ⋅ is the column total; N⋅ⱼ is a probability", "Nᵢⱼ, Nᵢ⋅, and N⋅ⱼ are all expected counts", "Nᵢⱼ is a probability; Nᵢ⋅ and N⋅ⱼ are cell counts"],
+            optsDE: ["Nᵢⱼ ist die beobachtete Anzahl in Zelle (i,j); Nᵢ⋅=Σⱼ₌₁ˢNᵢⱼ ist die Zeilensumme; N⋅ⱼ=Σᵢ₌₁ʳNᵢⱼ ist die Spaltensumme", "Nᵢⱼ ist die Zeilensumme; Nᵢ⋅ ist die Spaltensumme; N⋅ⱼ ist eine Wahrscheinlichkeit", "Nᵢⱼ, Nᵢ⋅ und N⋅ⱼ sind alle erwartete Anzahlen", "Nᵢⱼ ist eine Wahrscheinlichkeit; Nᵢ⋅ und N⋅ⱼ sind Zellanzahlen"],
             correct: 0,
-            explain: "Pooled column relative frequency.",
-            explainDE: "Gepoolte Spalten-Relativhäufigkeit."
+            explain: "The three subscripts distinguish a cell, its row, and its column. Summing all cells gives the grand total N=Σᵢ₌₁ʳΣⱼ₌₁ˢNᵢⱼ.",
+            explainDE: "Die drei Indizes unterscheiden eine Zelle, ihre Zeile und ihre Spalte. Die Summe aller Zellen ergibt die Gesamtzahl N=Σᵢ₌₁ʳΣⱼ₌₁ˢNᵢⱼ."
         },
         {
-            q: "The estimated expected counts are (slides 168/171):",
-            qDE: "Die geschätzten erwarteten Anzahlen lauten (Folien 168/171):",
-            opts: ["Êij = Ni.·N.j / N", "Êij = Nij·N", "Êij = Ni. + N.j", "Êij = N/(Ni.·N.j)"],
-            optsDE: ["Êij = Ni.·N.j / N", "Êij = Nij·N", "Êij = Ni. + N.j", "Êij = N/(Ni.·N.j)"],
+            q: "Under H₀ that all rows have the same outcome distribution, which pooled estimator gives the common column probability pⱼ?",
+            qDE: "Unter H₀, dass alle Zeilen dieselbe Verteilung der Ausprägungen haben, welcher gepoolte Schätzer ergibt die gemeinsame Spaltenwahrscheinlichkeit pⱼ?",
+            opts: ["p̂ⱼ=N⋅ⱼ/N", "p̂ⱼ=Nᵢⱼ/Nᵢ⋅", "p̂ⱼ=1/r", "p̂ⱼ=Nᵢ⋅/N"],
+            optsDE: ["p̂ⱼ=N⋅ⱼ/N", "p̂ⱼ=Nᵢⱼ/Nᵢ⋅", "p̂ⱼ=1/r", "p̂ⱼ=Nᵢ⋅/N"],
             correct: 0,
-            explain: "Row total times column total over N.",
-            explainDE: "Zeilensumme mal Spaltensumme durch N."
+            explain: "The null hypothesis says that every row has the same distribution, so all observations can be pooled to estimate the common probability. The relevant share is the column total N⋅ⱼ divided by the grand total N.",
+            explainDE: "Die Nullhypothese behauptet, dass jede Zeile dieselbe Verteilung hat. Deshalb können alle Beobachtungen zur Schätzung der gemeinsamen Wahrscheinlichkeit gepoolt werden: Die passende relative Häufigkeit ist die Spaltensumme N⋅ⱼ geteilt durch die Gesamtzahl N."
         },
         {
-            q: "The chi-squared statistic (slides 168/171) is:",
-            qDE: "Die Chiquadratstatistik (Folien 168/171) lautet:",
-            opts: ["Q = sum (Nij - Ni.·N.j/N)² / (Ni.·N.j/N)", "Q = sum (Nij - Êij)", "Q = max|Nij - Êij|", "Q = sum Nij·Êij"],
-            optsDE: ["Q = Summe (Nij - Ni.·N.j/N)² / (Ni.·N.j/N)", "Q = Summe (Nij - Êij)", "Q = max|Nij - Êij|", "Q = Summe Nij·Êij"],
+            q: "Under H₀ of identical row distributions in an r×s contingency table, what is the estimated expected cell count Êᵢⱼ?",
+            qDE: "Wie groß ist unter H₀ identischer Zeilenverteilungen in einer r×s-Kontingenztafel die geschätzte erwartete Zellbesetzung Êᵢⱼ?",
+            opts: ["Êᵢⱼ=Nᵢ⋅·N⋅ⱼ/N", "Êᵢⱼ=Nᵢⱼ·N", "Êᵢⱼ=Nᵢ⋅+N⋅ⱼ", "Êᵢⱼ=N/(Nᵢ⋅·N⋅ⱼ)"],
+            optsDE: ["Êᵢⱼ=Nᵢ⋅·N⋅ⱼ/N", "Êᵢⱼ=Nᵢⱼ·N", "Êᵢⱼ=Nᵢ⋅+N⋅ⱼ", "Êᵢⱼ=N/(Nᵢ⋅·N⋅ⱼ)"],
             correct: 0,
-            explain: "Squared standardized deviations summed.",
-            explainDE: "Quadrierte standardisierte Abweichungen summiert."
+            explain: "Under the null model, the expected count in a cell is its row total multiplied by its column total and divided by the grand total. This is the independence shortcut for the expected count.",
+            explainDE: "Unter dem Nullmodell ist die erwartete Anzahl einer Zelle das Produkt ihrer Zeilen- und Spaltensumme, geteilt durch die Gesamtzahl. Das ist die Unabhängigkeits-Abkürzung für die erwartete Zellbesetzung."
         },
         {
-            q: "Under H0, Q is approximately chi-squared with df (slides 168/171):",
-            qDE: "Unter H0 ist Q näherungsweise chiquadrat mit df (Folien 168/171):",
-            opts: ["df = (r-1)(s-1)", "df = r·s", "df = r+s", "df = N-1"],
-            optsDE: ["df = (r-1)(s-1)", "df = r·s", "df = r+s", "df = N-1"],
+            q: "In a contingency table, which expression defines the Pearson chi-squared statistic Q for comparing observed counts Nᵢⱼ with expected counts Êᵢⱼ?",
+            qDE: "Welcher Ausdruck definiert in einer Kontingenztafel die Pearson-Chi-Quadrat-Statistik Q zum Vergleich der beobachteten Anzahlen Nᵢⱼ mit den erwarteten Anzahlen Êᵢⱼ?",
+            opts: ["Q=Σᵢ₌₁ʳΣⱼ₌₁ˢ(Nᵢⱼ−Êᵢⱼ)²/Êᵢⱼ", "Q=Σᵢ₌₁ʳΣⱼ₌₁ˢ(Nᵢⱼ−Êᵢⱼ)", "Q=maxᵢⱼ|Nᵢⱼ−Êᵢⱼ|", "Q=Σᵢ₌₁ʳΣⱼ₌₁ˢNᵢⱼ·Êᵢⱼ"],
+            optsDE: ["Q=Σᵢ₌₁ʳΣⱼ₌₁ˢ(Nᵢⱼ−Êᵢⱼ)²/Êᵢⱼ", "Q=Σᵢ₌₁ʳΣⱼ₌₁ˢ(Nᵢⱼ−Êᵢⱼ)", "Q=maxᵢⱼ|Nᵢⱼ−Êᵢⱼ|", "Q=Σᵢ₌₁ʳΣⱼ₌₁ˢNᵢⱼ·Êᵢⱼ"],
             correct: 0,
-            explain: "Reject if Q > chi²((r-1)(s-1))_{1-alpha}.",
-            explainDE: "Verwerfe falls Q > chi²((r-1)(s-1))_{1-alpha}."
+            explain: "The statistic adds the squared difference between each observed and expected count, divided by that expected count. Squaring makes large departures contribute strongly regardless of direction.",
+            explainDE: "Die Statistik summiert für jede Zelle die quadrierte Differenz zwischen beobachteter und erwarteter Anzahl, geteilt durch die erwartete Anzahl. Durch das Quadrieren tragen große Abweichungen unabhängig von ihrer Richtung stark bei."
         },
         {
-            q: "For a 2×2 table with entries a,b,c,d (slide 169):",
-            qDE: "Für eine 2×2-Tafel mit Einträgen a,b,c,d (Folie 169):",
-            opts: ["Q = n(ad-bc)² / ((a+b)(c+d)(a+c)(b+d))", "Q = (ad-bc)/(a+b+c+d)", "Q = (a+d)-(b+c)", "Q = abcd/n"],
-            optsDE: ["Q = n(ad-bc)² / ((a+b)(c+d)(a+c)(b+d))", "Q = (ad-bc)/(a+b+c+d)", "Q = (a+d)-(b+c)", "Q = abcd/n"],
+            q: "For an r×s contingency table with no structural zeros and a chi-squared test of row homogeneity, how many degrees of freedom does Q have under H₀?",
+            qDE: "Wie viele Freiheitsgrade hat Q unter H₀ bei einer r×s-Kontingenztafel ohne strukturelle Nullen und einem Chi-Quadrat-Test auf Zeilenhomogenität?",
+            opts: ["(r−1)(s−1) degrees of freedom", "r·s degrees of freedom", "(r+s) degrees of freedom", "(N−1) degrees of freedom"],
+            optsDE: ["(r−1)(s−1) Freiheitsgrade", "r·s Freiheitsgrade", "(r+s) Freiheitsgrade", "(N−1) Freiheitsgrade"],
             correct: 0,
-            explain: "Shortcut formula with n = a+b+c+d.",
-            explainDE: "Abkürzungsformel mit n = a+b+c+d."
+            explain: "The row and column constraints account for (r−1)(s−1) independent comparisons. Under H₀ and sufficiently large expected counts, Q therefore has an approximate χ² distribution with that many degrees of freedom.",
+            explainDE: "Die Zeilen- und Spaltenbedingungen berücksichtigen (r−1)(s−1) unabhängige Vergleiche. Unter H₀ und bei ausreichend großen erwarteten Zellbesetzungen folgt Q daher näherungsweise einer χ²-Verteilung mit dieser Anzahl von Freiheitsgraden."
         },
         {
-            q: "At alpha = 0.05 the critical value c_krit is (slide 169):",
-            qDE: "Bei alpha = 0,05 beträgt der kritische Wert c_krit (Folie 169):",
+            q: "For a 2×2 contingency table with a in the upper-left cell, b in the upper-right cell, c in the lower-left cell, and d in the lower-right cell, so n=a+b+c+d, which shortcut gives the Pearson chi-squared statistic Q?",
+            qDE: "Für eine 2×2-Kontingenztafel mit a in der linken oberen Zelle, b in der rechten oberen Zelle, c in der linken unteren Zelle und d in der rechten unteren Zelle, wobei n=a+b+c+d gilt, welche Abkürzung liefert die Pearson-Chi-Quadrat-Statistik Q?",
+            opts: ["Q=n(ad−bc)²/[(a+b)(c+d)(a+c)(b+d)]", "Q=(ad−bc)/(a+b+c+d)", "Q=(a+d)−(b+c)", "Q=abcd/n"],
+            optsDE: ["Q=n(ad−bc)²/[(a+b)(c+d)(a+c)(b+d)]", "Q=(ad−bc)/(a+b+c+d)", "Q=(a+d)−(b+c)", "Q=abcd/n"],
+            correct: 0,
+            explain: "The shortcut uses the four marginal totals: a+b and c+d are the row totals, while a+c and b+d are the column totals. It is algebraically equivalent to summing the four cellwise chi-squared contributions.",
+            explainDE: "Die Abkürzung verwendet die vier Randsummen: a+b und c+d sind die Zeilensummen, a+c und b+d die Spaltensummen. Sie ist algebraisch gleichwertig zur Summe der vier zellenweisen Chi-Quadrat-Beiträge."
+        },
+        {
+            q: "For a chi-squared test with one degree of freedom, what is the upper-tail critical value at α=0.05?",
+            qDE: "Wie groß ist der obere kritische Wert bei α=0,05 für einen Chi-Quadrat-Test mit einem Freiheitsgrad?",
             opts: ["3.842", "2.706", "6.635", "10.83"],
             optsDE: ["3,842", "2,706", "6,635", "10,83"],
             correct: 0,
-            explain: "Table: 0.1→2.706, 0.05→3.842, 0.01→6.635.",
-            explainDE: "Tabelle: 0,1→2,706, 0,05→3,842, 0,01→6,635."
+            explain: "With one degree of freedom, the upper 5% critical value is χ²(1; 0.95)=3.842. A statistic larger than this value falls in the rejection region.",
+            explainDE: "Mit einem Freiheitsgrad beträgt der obere 5%-kritische Wert χ²(1; 0,95)=3,842. Eine größere Statistik liegt im Verwerfungsbereich."
         },
         {
-            q: "H0 of the chi-squared independence test (slide 170):",
-            qDE: "H0 des Chiquadrat-Unabhängigkeitstests (Folie 170):",
-            opts: ["Row variable X and column variable Y are stochastically independent", "All cell counts are equal", "r = s always", "N > 1000"],
-            optsDE: ["Zeilenvariable X und Spaltenvariable Y sind stochastisch unabhängig", "Alle Zellanzahlen sind gleich", "r = s immer", "N > 1000"],
+            q: "What is the null hypothesis H₀ in a chi-squared test of independence for the row variable X and column variable Y in a contingency table?",
+            qDE: "Wie lautet die Nullhypothese H₀ bei einem Chi-Quadrat-Unabhängigkeitstest für die Zeilenvariable X und die Spaltenvariable Y in einer Kontingenztafel?",
+            opts: ["X and Y are independent, so P(X=i,Y=j)=P(X=i)P(Y=j) for every cell", "All r×s cell counts are equal", "The row and column totals are equal", "The observed count equals the expected count in every cell"],
+            optsDE: ["X und Y sind unabhängig, sodass für jede Zelle P(X=i,Y=j)=P(X=i)P(Y=j) gilt", "Alle r×s-Zellanzahlen sind gleich", "Die Zeilen- und Spaltensummen sind gleich", "Die beobachtete Anzahl entspricht in jeder Zelle der erwarteten Anzahl"],
             correct: 0,
-            explain: "With pij = pi·qj under H0; same computation as before, different interpretation.",
-            explainDE: "Mit pij = pi·qj unter H0; gleiche Rechnung wie zuvor, andere Interpretation."
+            explain: "Independence is the null model: every joint cell probability factors into the corresponding row and column probabilities. The alternative is that the two variables are associated, not that all counts must be identical.",
+            explainDE: "Unabhängigkeit ist das Nullmodell: Jede gemeinsame Zellwahrscheinlichkeit zerfällt in das Produkt der zugehörigen Zeilen- und Spaltenwahrscheinlichkeit. Die Alternative besteht in einem Zusammenhang der Variablen, nicht darin, dass alle Anzahlen gleich sein müssen."
         },
 
     ],
 
     14: [
-        // --- WORLD 14 lecture: Descriptive Statistics (STAT EAS 2026, slides 2-46) ---
         {
-            q: "The population G (slide 4) is:",
-            qDE: "Die Grundgesamtheit G (Folie 4) ist:",
-            opts: ["The set of all statistical units", "One observed value", "The sample size n", "A single variable"],
-            optsDE: ["Die Menge aller statistischen Einheiten", "Ein einzelner beobachteter Wert", "Der Stichprobenumfang n", "Eine einzelne Variable"],
+            q: "In a statistical study, G denotes the population under investigation. What does G represent?",
+            qDE: "In einer statistischen Untersuchung bezeichnet G die zu untersuchende Grundgesamtheit. Was repräsentiert G?",
+            opts: ["The set of all units to which the study's conclusions may apply", "Only the units included in the observed sample", "The set of all possible values of one variable", "The collection of summary statistics calculated from the sample"],
+            optsDE: ["Die Menge aller Einheiten, auf die sich die Studienaussagen beziehen sollen", "Nur die Einheiten der beobachteten Stichprobe", "Die Menge aller möglichen Werte eines Merkmals", "Die Zusammenstellung der aus der Stichprobe berechneten Kennzahlen"],
             correct: 0,
-            explain: "G is the set of all units under study.",
-            explainDE: "G ist die Menge aller Untersuchungseinheiten."
+            explain: "The population G is the complete set of units to which a study's target conclusions refer. A sample is only the subset of those units that was actually observed.",
+            explainDE: "Die Grundgesamtheit G ist die vollständige Menge aller Einheiten, auf die sich die Zielaussagen einer Studie beziehen. Die Stichprobe ist nur die Teilmenge dieser Einheiten, die tatsächlich beobachtet wurde."
         },
         {
-            q: "A variable X with values in M (slide 4) is formally:",
-            qDE: "Ein Merkmal X mit Werten in M (Folie 4) ist formal:",
-            opts: ["X: G → M, g ↦ X(g)", "X: M → G", "X = G × M", "X(g) = n"],
-            optsDE: ["X: G → M, g ↦ X(g)", "X: M → G", "X = G × M", "X(g) = n"],
+            q: "Let G be a population of units and M the set of possible values of a variable X. Which definition assigns exactly one value X(g)∈M to every unit g∈G?",
+            qDE: "Sei G eine Grundgesamtheit von Einheiten und M die Menge der möglichen Werte eines Merkmals X. Welche Definition ordnet jeder Einheit g∈G genau einen Wert X(g)∈M zu?",
+            opts: ["X: G → M, so each g∈G is mapped to one value X(g)∈M", "X: M → G, so each possible value is mapped to one unit", "X: G × M, so every unit-value pair is a separate variable", "X: G → R, so every unit must receive a real-number measurement"],
+            optsDE: ["X: G → M, sodass jedes g∈G auf genau einen Wert X(g)∈M abgebildet wird", "X: M → G, sodass jeder mögliche Wert auf eine Einheit abgebildet wird", "X: G × M, sodass jedes Einheit-Wert-Paar ein eigenes Merkmal ist", "X: G → R, sodass jede Einheit zwingend eine reelle Messung erhält"],
             correct: 0,
-            explain: "Each unit g gets a value X(g) in M.",
-            explainDE: "Jede Einheit g erhält einen Wert X(g) in M."
+            explain: "A variable is a function from units to possible values: the input is a unit g∈G and the output is its observed or assigned category or measurement X(g)∈M.",
+            explainDE: "Ein Merkmal ist eine Funktion von Einheiten zu möglichen Werten: Als Eingabe dient eine Einheit g∈G, als Ausgabe ihre beobachtete oder zugewiesene Ausprägung beziehungsweise Messung X(g)∈M."
         },
         {
-            q: "Nominal scale (slide 7) means the values are:",
-            qDE: "Nominalskala (Folie 7) bedeutet, die Ausprägungen sind:",
-            opts: ["Only distinguishable (labels)", "Ordered and comparable", "Measurable with a unit", "Always numeric"],
-            optsDE: ["Nur unterscheidbar (Labels)", "Geordnet und vergleichbar", "Mit Einheit messbar", "Immer numerisch"],
+            q: "Which statement correctly describes a variable measured on a nominal scale?",
+            qDE: "Welche Aussage beschreibt ein Merkmal auf nominalem Skalenniveau korrekt?",
+            opts: ["Its categories are labels only; for example, blood groups A, B, AB, and O have no numerical distance between them", "Its categories are ordered and adjacent categories have equal measurable gaps; for example, school grades 1–5", "Its categories are numeric measurements with a meaningful zero; for example, height in centimetres", "Its categories are numeric measurements whose zero is chosen by convention; for example, temperature in degrees Celsius"],
+            optsDE: ["Seine Ausprägungen sind nur Labels; zwischen den Blutgruppen A, B, AB und O besteht beispielsweise kein messbarer numerischer Abstand", "Seine Ausprägungen sind geordnet, und benachbarte Ausprägungen haben gleich große messbare Abstände; Schulnoten 1–5 sind ein Beispiel", "Seine Ausprägungen sind numerische Messungen mit einem bedeutsamen Nullpunkt; die Körpergröße in Zentimetern ist ein Beispiel", "Seine Ausprägungen sind numerische Messungen mit einem konventionell gewählten Nullpunkt; die Temperatur in Grad Celsius ist ein Beispiel"],
             correct: 0,
-            explain: "Nominal: e.g. study subject, gender.",
-            explainDE: "Nominal: z.B. Studienfach, Geschlecht."
+            explain: "Nominal categories are labels: blood group A can be distinguished from blood group B, but their codes are not measurements and do not imply a distance, order, or meaningful ratio between categories.",
+            explainDE: "Nominale Ausprägungen sind Labels: Blutgruppe A lässt sich von Blutgruppe B unterscheiden, doch ihre Codes sind keine Messungen und implizieren weder einen Abstand noch eine Ordnung oder ein sinnvolles Verhältnis zwischen den Kategorien."
         },
         {
-            q: "Ordinal scale (slide 7): values can be compared. Example:",
-            qDE: "Ordinalskala (Folie 7): Ausprägungen sind vergleichbar. Beispiel:",
-            opts: ["School grades or agreement 1–5", "Hair colour", "Lengths in cm", "Country names"],
-            optsDE: ["Schulnoten oder Zustimmung 1–5", "Haarfarbe", "Längen in cm", "Ländernamen"],
+            q: "Which statement correctly describes a variable measured on an ordinal scale?",
+            qDE: "Welche Aussage beschreibt ein Merkmal auf ordinalem Skalenniveau korrekt?",
+            opts: ["Its categories have a meaningful order, but differences need not be equal or measurable; for example, poor, fair, and good satisfaction ratings", "Its categories are labels without order; for example, hair colour", "Its categories have equal measurable distances; for example, temperature in degrees Celsius", "Its categories have a meaningful zero and meaningful ratios; for example, mass in kilograms"],
+            optsDE: ["Seine Ausprägungen besitzen eine sinnvolle Ordnung, ihre Differenzen müssen aber weder gleich groß noch messbar sein; zufrieden, neutral und unzufrieden sind ein Beispiel", "Seine Ausprägungen sind ungeordnete Labels; die Haarfarbe ist ein Beispiel", "Seine Ausprägungen besitzen gleich große messbare Abstände; die Temperatur in Grad Celsius ist ein Beispiel", "Seine Ausprägungen besitzen einen bedeutsamen Nullpunkt und sinnvolle Quotienten; die Masse in Kilogramm ist ein Beispiel"],
             correct: 0,
-            explain: "Order exists, but differences are not measurable.",
-            explainDE: "Ordnung existiert, Differenzen sind aber nicht messbar."
+            explain: "Ordinal data support statements such as better or worse, so their categories are ordered. The step from poor to fair need not represent the same amount of change as the step from fair to good, and that difference is not treated as a measurable quantity.",
+            explainDE: "Ordinale Daten erlauben Aussagen wie besser oder schlechter; ihre Ausprägungen sind daher geordnet. Der Schritt von unzufrieden zu neutral muss jedoch nicht dieselbe Veränderung darstellen wie der Schritt von neutral zu zufrieden, und diese Differenz wird nicht als messbare Größe behandelt."
         },
         {
-            q: "Ratio scale vs interval scale (slide 7):",
-            qDE: "Ratioskala vs Intervallskala (Folie 7):",
-            opts: ["Ratio has an absolute zero (lengths, money); interval zero is arbitrary (temperature)", "Both lack a zero point", "Interval allows quotients, ratio does not", "They are identical"],
-            optsDE: ["Ratio hat absoluten Nullpunkt (Längen, Geld); Intervall-Null ist willkürlich (Temperatur)", "Beide haben keinen Nullpunkt", "Intervall erlaubt Quotienten, Ratio nicht", "Sie sind identisch"],
+            q: "How do ratio and interval scales differ?",
+            qDE: "Worin unterscheiden sich Ratio- und Intervallskala?",
+            opts: ["A ratio scale has a meaningful zero, as for mass in kilograms, so ratios are meaningful; an interval scale has a conventional zero, as for Celsius temperature", "Both scales have labels only, as for blood group and hair colour", "An interval scale has a meaningful zero, while a ratio scale uses a conventional zero", "Both scales have meaningful zeros, but only interval scales permit meaningful differences"],
+            optsDE: ["Die Ratioskala besitzt einen bedeutsamen Nullpunkt, etwa bei der Masse in Kilogramm, sodass Quotienten sinnvoll sind; die Intervallskala besitzt einen konventionellen Nullpunkt, etwa bei der Temperatur in Grad Celsius", "Beide Skalen besitzen nur Labels, etwa Blutgruppe und Haarfarbe", "Die Intervallskala besitzt einen bedeutsamen Nullpunkt, während die Ratioskala einen konventionellen Nullpunkt verwendet", "Beide Skalen besitzen bedeutsame Nullpunkte, aber nur Intervallskalen erlauben sinnvolle Differenzen"],
             correct: 0,
-            explain: "Only with a true zero can quotients be interpreted.",
-            explainDE: "Nur mit echtem Nullpunkt sind Quotienten interpretierbar."
+            explain: "Differences are meaningful on both scales. A ratio scale additionally has a true zero representing none of the quantity, so a ratio such as 20 kg to 10 kg is meaningful. Celsius zero is conventional, and the ratio of 20°C to 10°C is not a statement about heat content.",
+            explainDE: "Differenzen sind auf beiden Skalen sinnvoll. Eine Ratioskala besitzt zusätzlich einen echten Nullpunkt, der für „keine Menge“ steht, sodass ein Quotient wie 20 kg zu 10 kg sinnvoll ist. Der Celsius-Nullpunkt ist dagegen konventionell; der Quotient 20°C zu 10°C sagt nichts über den Wärmeinhalt aus."
         },
         {
-            q: "Coded data (slide 8, ATTENTION):",
-            qDE: "Kodierte Daten (Folie 8, ACHTUNG):",
-            opts: ["Numbers do not imply meaningful arithmetic; valid methods depend on the scale level", "Any computation is always valid", "Coding destroys all information", "Only means are ever valid"],
-            optsDE: ["Zahlen bedeuten keine sinnvolle Arithmetik; zulässige Methoden hängen vom Skalenniveau ab", "Jede Rechnung ist immer zulässig", "Kodieren zerstört alle Information", "Nur Mittelwerte sind je zulässig"],
+            q: "A researcher assigns codes 1, 2, 3, and 4 to four categories that have no inherent order. Which interpretation is valid?",
+            qDE: "Eine Forscherin oder ein Forscher versieht vier Kategorien ohne natürliche Ordnung mit den Codes 1, 2, 3 und 4. Welche Interpretation ist zulässig?",
+            opts: ["The codes identify categories only; numerical operations are justified only when the scale level supports them", "The codes make the categories ratio-scale because all four labels are numbers", "The codes imply that 4−1 represents three equal category steps", "The codes may always be averaged because arithmetic works on every list of numbers"],
+            optsDE: ["Die Codes identifizieren nur die Kategorien; numerische Operationen sind nur gerechtfertigt, wenn das Skalenniveau sie zulässt", "Die Codes machen die Kategorien zur Ratioskala, weil alle vier Labels Zahlen sind", "Die Codes bedeuten, dass 4−1 drei gleich große Kategorieschritte darstellt", "Die Codes dürfen immer gemittelt werden, weil die Arithmetik für jede Liste von Zahlen funktioniert"],
             correct: 0,
-            explain: "Scale level decides which operations make sense.",
-            explainDE: "Das Skalenniveau entscheidet, welche Rechenoperationen sinnvoll sind."
+            explain: "Coding gives every category a convenient identifier, but it does not change the scale level. Without meaningful order, equal intervals, or measurements, subtraction, division, and averaging of those codes would create structure that the data do not contain.",
+            explainDE: "Die Kodierung gibt jeder Kategorie eine praktische Kennung, ändert aber das Skalenniveau nicht. Ohne sinnvolle Ordnung, gleich große Intervalle oder Messungen würden Subtraktion, Division und Mittelwertbildung dieser Codes Struktur erzeugen, die in den Daten nicht enthalten ist."
         },
         {
-            q: "In the data matrix (slide 9):",
-            qDE: "In der Datenmatrix (Folie 9):",
-            opts: ["Rows = observations, columns = variables", "Rows = variables, columns = observations", "It is always square", "It contains only means"],
-            optsDE: ["Zeilen = Beobachtungen, Spalten = Variablen", "Zeilen = Variablen, Spalten = Beobachtungen", "Sie ist immer quadratisch", "Sie enthält nur Mittelwerte"],
+            q: "A data matrix records height, age, and test score for each of 30 students. Which layout is standard?",
+            qDE: "Eine Datenmatrix enthält für jede der 30 Studierenden die Werte Größe, Alter und Testergebnis. Welche Anordnung ist üblich?",
+            opts: ["Each row is one student (an observation), and each column is one variable", "Each row is one variable, and each column is one student", "Each row is one student, and the single column contains all three variables", "Each row is one summary statistic, and each column is one variable"],
+            optsDE: ["Jede Zeile enthält eine Person (eine Beobachtung), jede Spalte ein Merkmal", "Jede Zeile enthält ein Merkmal, jede Spalte eine Person", "Jede Zeile enthält eine Person, und die einzige Spalte enthält alle drei Merkmale", "Jede Zeile enthält eine Kennzahl, jede Spalte ein Merkmal"],
             correct: 0,
-            explain: "Row i: values of unit i; column j: sample of variable j.",
-            explainDE: "Zeile i: Werte der Einheit i; Spalte j: Stichprobe des Merkmals j."
+            explain: "The data matrix places observations in rows and variables in columns. Thus row i contains all variable values for one unit, while column j contains that variable's observed values across the sample.",
+            explainDE: "In der Datenmatrix stehen Beobachtungen in Zeilen und Merkmale in Spalten. Zeile i enthält daher alle Merkmalswerte einer Einheit, während Spalte j die beobachteten Werte dieses Merkmals in der Stichprobe enthält."
         },
         {
-            q: "Principle of area fidelity (slide 10):",
-            qDE: "Prinzip der Flächentreue (Folie 10):",
-            opts: ["Areas must be proportional to the numbers; for circles (F = πr²) radii ∝ square root", "Heights must equal the numbers", "Colours must match the numbers", "Only bar width matters"],
-            optsDE: ["Flächen müssen proportional zu den Zahlen sein; bei Kreisen (F = πr²) Radien ∝ Wurzel", "Höhen müssen den Zahlen gleichen", "Farben müssen den Zahlen entsprechen", "Nur Balkenbreite zählt"],
+            q: "Two categories have counts 2 and 8 and are represented by circles using the principle of area fidelity. How should their radii be chosen?",
+            qDE: "Zwei Kategorien haben die Anzahlen 2 und 8 und werden nach dem Prinzip der Flächentreue durch Kreise dargestellt. Wie sollten ihre Radien gewählt werden?",
+            opts: ["The radius for 8 should be twice the radius for 2, because the areas then have the ratio 8:2=4:1", "The radius for 8 should be four times the radius for 2, because radii should be proportional to counts", "The radius for 8 should be one quarter of the radius for 2, because areas vary inversely with counts", "Both radii should be equal because all circle areas encode the same quantity"],
+            optsDE: ["Der Radius für 8 sollte doppelt so groß sein wie der für 2, denn dann verhalten sich die Flächen wie 8:2=4:1", "Der Radius für 8 sollte viermal so groß sein wie der für 2, denn Radien sollten proportional zu den Anzahlen sein", "Der Radius für 8 sollte ein Viertel des Radius für 2 sein, denn Flächen verhalten sich umgekehrt proportional zu den Anzahlen", "Beide Radien sollten gleich sein, weil alle Kreisflächen dieselbe Größe darstellen"],
             correct: 0,
-            explain: "The brain responds to area, not height or width.",
-            explainDE: "Das Gehirn reagiert auf Fläche, nicht auf Höhe oder Breite."
+            explain: "Area fidelity is a design principle: a circle's area F=πr² should be proportional to the count it represents. Therefore r must be scaled by the square root of the count ratio; here √(8/2)=2.",
+            explainDE: "Flächentreue ist ein Gestaltungsprinzip: Die Kreisfläche F=πr² soll proportional zur dargestellten Anzahl sein. Deshalb muss der Radius mit der Quadratwurzel des Anzahlverhältnisses skaliert werden; hier gilt √(8/2)=2."
         },
         {
-            q: "Absolute frequencies (slide 11):",
-            qDE: "Absolute Häufigkeiten (Folie 11):",
-            opts: ["hj = count of xi with xi = aj; n = h1 + … + hk", "hj = hj/n always", "hj are always equal", "n = h1 · … · hk"],
-            optsDE: ["hj = Anzahl der xi mit xi = aj; n = h1 + … + hk", "hj = hj/n immer", "hj sind immer gleich", "n = h1 · … · hk"],
+            q: "A sample of n observations is classified into categories aⱼ. Which statement defines the absolute frequency hⱼ correctly?",
+            qDE: "Eine Stichprobe mit n Beobachtungen wird in die Kategorien aⱼ eingeteilt. Welche Aussage definiert die absolute Häufigkeit hⱼ richtig?",
+            opts: ["hⱼ counts the observations equal to aⱼ, and Σⱼhⱼ=n", "hⱼ=hⱼ/n, so the absolute frequencies sum to 1", "hⱼ=n/hⱼ, so the absolute frequencies sum to n", "hⱼ=aⱼ/n, so the category labels are replaced by proportions"],
+            optsDE: ["hⱼ zählt die Beobachtungen mit dem Wert aⱼ, und Σⱼhⱼ=n", "hⱼ=hⱼ/n, sodass sich die absoluten Häufigkeiten zu 1 addieren", "hⱼ=n/hⱼ, sodass sich die absoluten Häufigkeiten zu n addieren", "hⱼ=aⱼ/n, sodass die Kategorielabels durch Anteile ersetzt werden"],
             correct: 0,
-            explain: "Counting occurrences per value aj.",
-            explainDE: "Auszählen der Vorkommen je Wert aj."
+            explain: "An absolute frequency is a count, not a proportion. Each observation belongs to one category, so the counts across all categories add to the sample size n.",
+            explainDE: "Eine absolute Häufigkeit ist eine Anzahl, kein Anteil. Jede Beobachtung gehört zu genau einer Kategorie, daher summieren sich die Anzahlen aller Kategorien zum Stichprobenumfang n."
         },
         {
-            q: "Relative frequencies (slide 12):",
-            qDE: "Relative Häufigkeiten (Folie 12):",
-            opts: ["fj = hj/n, and f1 + … + fk = 1", "fj = hj·n, summing to n", "fj = n/hj, summing to k", "fj are angles in radians"],
-            optsDE: ["fj = hj/n, und f1 + … + fk = 1", "fj = hj·n, Summe n", "fj = n/hj, Summe k", "fj sind Winkel im Bogenmaß"],
+            q: "Using n as the sample size and hⱼ as the absolute category frequency, which formula gives the relative frequency fⱼ?",
+            qDE: "Ist n der Stichprobenumfang und hⱼ die absolute Häufigkeit einer Kategorie, welche Formel liefert die relative Häufigkeit fⱼ?",
+            opts: ["fⱼ=hⱼ/n, and the relative frequencies sum to 1", "fⱼ=hⱼ·n, and the relative frequencies sum to n", "fⱼ=n/hⱼ, and the relative frequencies sum to the number of categories", "fⱼ=n−hⱼ, and the relative frequencies sum to 1"],
+            optsDE: ["fⱼ=hⱼ/n, und die relativen Häufigkeiten summieren sich zu 1", "fⱼ=hⱼ·n, und die relativen Häufigkeiten summieren sich zu n", "fⱼ=n/hⱼ, und die relativen Häufigkeiten summieren sich zur Anzahl der Kategorien", "fⱼ=n−hⱼ, und die relativen Häufigkeiten summieren sich zu 1"],
             correct: 0,
-            explain: "fj is the share of observations with value aj.",
-            explainDE: "fj ist der Anteil der Beobachtungen mit Wert aj."
+            explain: "The relative frequency divides a category's count by the total number of observations. It is the share of the sample in that category, which is why all relative frequencies add to 1.",
+            explainDE: "Die relative Häufigkeit teilt die Anzahl einer Kategorie durch die Gesamtzahl der Beobachtungen. Sie gibt damit den Anteil der Stichprobe in dieser Kategorie an, weshalb sich alle relativen Häufigkeiten zu 1 addieren."
         },
         {
-            q: "In a pie chart (slide 13), a relative frequency fi gets angle:",
-            qDE: "Im Kreisdiagramm (Folie 13) gehört zu relativer Häufigkeit fi der Winkel:",
-            opts: ["φi = 2πfi (fi·360°)", "φi = fi + 360°", "φi = fi/360°", "φi = π/fi"],
-            optsDE: ["φi = 2πfi (fi·360°)", "φi = fi + 360°", "φi = fi/360°", "φi = π/fi"],
+            q: "A pie chart uses a full angle of 360°. What central angle represents a category with relative frequency fⱼ=0.25?",
+            qDE: "Ein Kreisdiagramm nutzt einen Vollwinkel von 360°. Welcher Mittelpunktswinkel steht für eine Kategorie mit der relativen Häufigkeit fⱼ=0,25?",
+            opts: ["90°", "144°", "25°", "360°"],
+            optsDE: ["90°", "144°", "25°", "360°"],
             correct: 0,
-            explain: "The 360° (2π) are split by the frequencies.",
-            explainDE: "Die 360° (2π) werden nach den Häufigkeiten aufgeteilt."
+            explain: "The sector angle is the category's share of the whole circle: φⱼ=360°fⱼ=360°·0.25=90°.",
+            explainDE: "Der Sektorwinkel entspricht dem Anteil der Kategorie am ganzen Kreis: φⱼ=360°fⱼ=360°·0,25=90°."
         },
         {
-            q: "Order statistics (slide 14):",
-            qDE: "Ordnungsstatistik (Folie 14):",
-            opts: ["x(1) ≤ … ≤ x(n); range [xmin, xmax]", "x(1) ≥ … ≥ x(n); range (0,1)", "Sorted means are medians", "xmin is always 0"],
-            optsDE: ["x(1) ≤ … ≤ x(n); Messbereich [xmin, xmax]", "x(1) ≥ … ≥ x(n); Bereich (0,1)", "Sortierte Mittel sind Mediane", "xmin ist immer 0"],
+            q: "After sorting a sample of n numerical observations, its order statistics satisfy x₍₁₎≤⋯≤x₍ₙ₎. Which statement is correct?",
+            qDE: "Nach dem Sortieren einer Stichprobe mit n numerischen Beobachtungen erfüllen die Ordnungsstatistiken x₍₁₎≤⋯≤x₍ₙ₎ welche Aussage?",
+            opts: ["x₍₁₎ is the minimum, x₍ₙ₎ is the maximum, and the gaps between consecutive values may differ", "x₍₁₎ is the maximum, x₍ₙ₎ is the minimum, and the gaps between consecutive values must be equal", "The middle order statistic is always the arithmetic mean, regardless of the sample size", "The first and last order statistics always have the values 0 and 1"],
+            optsDE: ["x₍₁₎ ist das Minimum, x₍ₙ₎ ist das Maximum, und die Abstände zwischen aufeinanderfolgenden Werten dürfen sich unterscheiden", "x₍₁₎ ist das Maximum, x₍ₙ₎ ist das Minimum, und die Abstände zwischen aufeinanderfolgenden Werten müssen gleich sein", "Die mittlere Ordnungsstatistik ist unabhängig vom Stichprobenumfang immer das arithmetische Mittel", "Die erste und letzte Ordnungsstatistik haben immer die Werte 0 und 1"],
             correct: 0,
-            explain: "Parentheses mark the sorting step; range is the smallest interval covering all data.",
-            explainDE: "Klammern markieren den Sortierschritt; Messbereich ist das kleinste Intervall aller Daten."
+            explain: "Sorting orders the observed values from smallest to largest. The parentheses in x₍ᵢ₎ mark the rank i, and sorting imposes an order but no requirement that the numerical gaps between ranks be equal.",
+            explainDE: "Beim Sortieren werden die beobachteten Werte von klein nach groß geordnet. Die Klammern in x₍ᵢ₎ kennzeichnen den Rang i; aus der Ordnung folgt jedoch nicht, dass die numerischen Abstände zwischen den Rängen gleich groß sein müssen."
         },
         {
-            q: "For grouped data (slide 15), class width and midpoint are:",
-            qDE: "Bei gruppierten Daten (Folie 15) sind Gruppenbreite und -mitte:",
-            opts: ["bj = gj+1 − gj, mj = (gj+1 + gj)/2", "bj = mj/2, gj = bj + mj", "bj = fj/n, mj = hj", "bj = k/n, mj = n/k"],
-            optsDE: ["bj = gj+1 − gj, mj = (gj+1 + gj)/2", "bj = mj/2, gj = bj + mj", "bj = fj/n, mj = hj", "bj = k/n, mj = n/k"],
+            q: "Class j of a grouped distribution is Iⱼ=(gⱼ,gⱼ₊₁], with adjacent boundaries gⱼ and gⱼ₊₁. Which formulas give its width bⱼ and midpoint mⱼ?",
+            qDE: "Die Klasse j einer gruppierten Verteilung ist Iⱼ=(gⱼ,gⱼ₊₁] mit den benachbarten Gruppengrenzen gⱼ und gⱼ₊₁. Welche Formeln liefern Gruppenbreite bⱼ und Klassenmitte mⱼ?",
+            opts: ["bⱼ=gⱼ₊₁−gⱼ and mⱼ=(gⱼ+gⱼ₊₁)/2", "bⱼ=mⱼ/2 and mⱼ=bⱼ+gⱼ", "bⱼ=gⱼ/n and mⱼ=hⱼ/n", "bⱼ=n/k and mⱼ=k/n"],
+            optsDE: ["bⱼ=gⱼ₊₁−gⱼ und mⱼ=(gⱼ+gⱼ₊₁)/2", "bⱼ=mⱼ/2 und mⱼ=bⱼ+gⱼ", "bⱼ=gⱼ/n und mⱼ=hⱼ/n", "bⱼ=n/k und mⱼ=k/n"],
             correct: 0,
-            explain: "Classes Ij = (gj, gj+1] cover the range.",
-            explainDE: "Klassen Ij = (gj, gj+1] überdecken den Messbereich."
+            explain: "The class width is the difference between its upper and lower boundaries, and the class midpoint is their arithmetic mean. The convention Iⱼ=(gⱼ,gⱼ₊₁] also prevents adjacent classes from overlapping at a shared boundary.",
+            explainDE: "Die Gruppenbreite ist die Differenz aus oberer und unterer Gruppengrenze, die Klassenmitte ist deren arithmetisches Mittel. Die Konvention Iⱼ=(gⱼ,gⱼ₊₁] verhindert außerdem, dass sich benachbarte Klassen an einer gemeinsamen Grenze überschneiden."
         },
         {
-            q: "Histogram bar height (slide 16):",
-            qDE: "Histogramm-Balkenhöhe (Folie 16):",
-            opts: ["lj = fj/bj, so that area bj·lj = fj", "lj = fj·bj", "lj = bj − fj", "lj = n/k always"],
-            optsDE: ["lj = fj/bj, sodass Fläche bj·lj = fj", "lj = fj·bj", "lj = bj − fj", "lj = n/k immer"],
+            q: "A histogram represents relative frequency fⱼ as the area of class j, whose width is bⱼ. Which formula gives its bar height lⱼ?",
+            qDE: "Ein Histogramm stellt die relative Häufigkeit fⱼ als Fläche der Klasse j mit der Gruppenbreite bⱼ dar. Welche Formel liefert die Balkenhöhe lⱼ?",
+            opts: ["lⱼ=fⱼ/bⱼ, so bⱼlⱼ=fⱼ", "lⱼ=fⱼbⱼ, so bⱼlⱼ=fⱼ²", "lⱼ=bⱼ/fⱼ, so bⱼlⱼ=bⱼ²", "lⱼ=1/(bⱼfⱼ), so bⱼlⱼ=1/fⱼ"],
+            optsDE: ["lⱼ=fⱼ/bⱼ, sodass bⱼlⱼ=fⱼ", "lⱼ=fⱼbⱼ, sodass bⱼlⱼ=fⱼ²", "lⱼ=bⱼ/fⱼ, sodass bⱼlⱼ=bⱼ²", "lⱼ=1/(bⱼfⱼ), sodass bⱼlⱼ=1/fⱼ"],
             correct: 0,
-            explain: "The histogram shows relative frequencies with area fidelity.",
-            explainDE: "Das Histogramm zeigt relative Häufigkeiten flächentreu."
+            explain: "The rectangle's area is width times height, bⱼlⱼ. Equating that area to the relative frequency fⱼ and solving for the height gives lⱼ=fⱼ/bⱼ.",
+            explainDE: "Die Rechteckfläche ist Breite mal Höhe, also bⱼlⱼ. Wird diese Fläche gleich der relativen Häufigkeit fⱼ gesetzt und nach der Höhe aufgelöst, ergibt sich lⱼ=fⱼ/bⱼ."
         },
         {
-            q: "The frequency density f̂(x) (slides 19-20):",
-            qDE: "Die Häufigkeitsdichte f̂(x) (Folien 19-20):",
-            opts: ["Is itself a probability density: ≥ 0 and integrates to 1", "Is always normal", "Sums to n over the classes", "Is zero inside every class"],
-            optsDE: ["Ist selbst eine Wahrscheinlichkeitsdichte: ≥ 0 und Integral 1", "Ist immer normalverteilt", "Summiert sich zu n über Klassen", "Ist in jeder Klasse null"],
+            q: "A grouped histogram estimates a continuous variable's density by f̂(x). Which condition must the density estimate satisfy?",
+            qDE: "Ein gruppiertes Histogramm schätzt die Dichte eines stetigen Merkmals durch f̂(x). Welche Bedingung muss diese Dichteschätzung erfüllen?",
+            opts: ["f̂(x)≥0 and ∫f̂(x)dx=1", "f̂(x) is normally distributed at every class", "Σⱼf̂(mⱼ) equals the sample size n", "f̂(x)=0 inside every class interval"],
+            optsDE: ["f̂(x)≥0 und ∫f̂(x)dx=1", "f̂(x) ist in jeder Klasse normalverteilt", "Σⱼf̂(mⱼ) entspricht dem Stichprobenumfang n", "f̂(x)=0 innerhalb jedes Klassenintervalls"],
             correct: 0,
-            explain: "It estimates the probability density f(x) of the variable.",
-            explainDE: "Sie schätzt die Wahrscheinlichkeitsdichte f(x) des Merkmals."
+            explain: "A probability density cannot be negative and must have total area 1. A histogram-based estimate f̂(x) commonly takes a constant height on each class, but its normalized total area remains 1.",
+            explainDE: "Eine Wahrscheinlichkeitsdichte darf nicht negativ sein und muss insgesamt die Fläche 1 haben. Die histogrammbasierte Schätzung f̂(x) ist auf jeder Klasse häufig konstant, ihre normierte Gesamtfläche bleibt jedoch 1."
         },
         {
-            q: "The median (slides 22-25): for the 13 ozone values, x(7) = 66 means:",
-            qDE: "Der Median (Folien 22-25): Bei 13 Ozonwerten bedeutet x(7) = 66:",
-            opts: ["At least 50% are ≤ 66 and at least 50% are ≥ 66", "Exactly 66% of the data equal 66", "The mean equals 66", "66 is the maximum"],
-            optsDE: ["Mindestens 50% sind ≤ 66 und mindestens 50% sind ≥ 66", "Genau 66% der Daten gleichen 66", "Der Mittelwert ist 66", "66 ist das Maximum"],
+            q: "Thirteen ozone readings are ordered as x₍₁₎≤⋯≤x₍₁₃₎, and x₍₇₎=66. What is the sample median?",
+            qDE: "Dreizehn Ozonmesswerte sind als x₍₁₎≤⋯≤x₍₁₃₎ geordnet, und x₍₇₎=66. Wie groß ist der Stichprobenmedian?",
+            opts: ["66, because for odd n the median is the seventh order statistic", "65.5, because the median is always the average of the third and fourth order statistics", "66.5, because the median is always the average of the seventh and eighth order statistics", "It cannot be determined because the other 12 readings are not given"],
+            optsDE: ["66, denn bei ungeradem n ist der Median die siebte Ordnungsstatistik", "65,5, denn der Median ist immer der Mittelwert der dritten und vierten Ordnungsstatistik", "66,5, denn der Median ist immer der Mittelwert der siebten und achten Ordnungsstatistik", "Er ist nicht bestimmbar, weil die übrigen 12 Messwerte nicht gegeben sind"],
             correct: 0,
-            explain: "n odd: xmed = x((n+1)/2).",
-            explainDE: "n ungerade: xmed = x((n+1)/2)."
+            explain: "For an odd sample size n=13, the unique middle rank is (n+1)/2=7. Therefore the sample median is the given order statistic x₍₇₎=66; the unsorted positions of the other readings are irrelevant.",
+            explainDE: "Bei ungeradem Stichprobenumfang n=13 ist der mittlere Rang (n+1)/2=7. Daher ist der Stichprobenmedian die gegebene Ordnungsstatistik x₍₇₎=66; die unsortierten Positionen der übrigen Messwerte sind unerheblich."
         },
         {
-            q: "The ozone mean (slide 28):",
-            qDE: "Das Ozonmittel (Folie 28):",
-            opts: ["x̄ = 974/13 = 74.923", "x̄ = 66 (like the median)", "x̄ = 974·13", "x̄ = 188 − 26"],
-            optsDE: ["x̄ = 974/13 = 74,923", "x̄ = 66 (wie der Median)", "x̄ = 974·13", "x̄ = 188 − 26"],
+            q: "The sum of 13 ozone readings is 974. What is the sample mean x̄, rounded to two decimal places?",
+            qDE: "Die Summe von 13 Ozonmesswerten beträgt 974. Wie groß ist der Stichprobenmittelwert x̄, auf zwei Dezimalstellen gerundet?",
+            opts: ["x̄=974÷13≈74.92", "x̄=974÷10≈97.4", "x̄=974×13=12662", "x̄=974, because a sum is already a mean"],
+            optsDE: ["x̄=974÷13≈74,92", "x̄=974÷10≈97,4", "x̄=974×13=12662", "x̄=974, weil eine Summe bereits ein Mittelwert ist"],
             correct: 0,
-            explain: "Sum 974 over 13 measurements.",
-            explainDE: "Summe 974 über 13 Messungen."
+            explain: "The sample mean divides the sum of all 13 measurements by their count: x̄=974/13=74.923…, which rounds to 74.92. It does not depend on the order of the readings.",
+            explainDE: "Der Stichprobenmittelwert teilt die Summe aller 13 Messungen durch ihre Anzahl: x̄=974/13=74,923…; auf zwei Dezimalstellen gerundet ist das 74,92. Er hängt nicht von der Reihenfolge der Messwerte ab."
         },
         {
-            q: "Minimizers (slides 26/29):",
-            qDE: "Minimierer (Folien 26/29):",
-            opts: ["Median minimizes Σ|xi − m|; mean minimizes Σ(xi − m)²", "Mean minimizes both", "Median minimizes both", "Neither minimizes anything"],
-            optsDE: ["Median minimiert Σ|xi − m|; Mittel minimiert Σ(xi − m)²", "Mittel minimiert beides", "Median minimiert beides", "Keiner minimiert etwas"],
+            q: "For observed values x₁,…,xₙ, which loss is minimized by the median, and which by the mean?",
+            qDE: "Welche Verlustfunktion wird für die beobachteten Werte x₁,…,xₙ vom Median minimiert und welche vom Mittelwert?",
+            opts: ["The median minimizes Σᵢ|xᵢ−m|; the mean minimizes Σᵢ(xᵢ−m)²", "The mean minimizes both Σᵢ|xᵢ−m| and Σᵢ(xᵢ−m)²", "The median minimizes both Σᵢ|xᵢ−m| and Σᵢ(xᵢ−m)²", "Neither the mean nor the median minimizes either loss"],
+            optsDE: ["Der Median minimiert Σᵢ|xᵢ−m|; der Mittelwert minimiert Σᵢ(xᵢ−m)²", "Der Mittelwert minimiert sowohl Σᵢ|xᵢ−m| als auch Σᵢ(xᵢ−m)²", "Der Median minimiert sowohl Σᵢ|xᵢ−m| als auch Σᵢ(xᵢ−m)²", "Weder der Mittelwert noch der Median minimiert einen der beiden Verluste"],
             correct: 0,
-            explain: "Absolute vs squared loss - different centres.",
-            explainDE: "Absolut- vs Quadratverlust - verschiedene Zentren."
+            explain: "Absolute deviations assign the same penalty regardless of distance, so the median minimizes the absolute-deviation loss. Squared deviations penalize large errors more strongly, so the mean x̄=Σᵢxᵢ/n minimizes the squared-error loss.",
+            explainDE: "Absolute Abweichungen bestrafen unabhängig von der Entfernung gleich stark, daher minimiert der Median den Absolutabweichungsverlust. Quadrierte Abweichungen bestrafen große Fehler stärker, daher minimiert der Mittelwert x̄=Σᵢxᵢ/n den quadratischen Verlust."
         },
         {
-            q: "Robustness (slide 31): 9 farmers earn 1000, one rich earns 20000.",
-            qDE: "Robustheit (Folie 31): 9 Bauern verdienen 1000, ein Reicher 20000.",
-            opts: ["Mean 2900 is outlier-driven; median 1000 is robust", "Mean 1000, median 2900", "Both equal 20000", "Median does not exist here"],
-            optsDE: ["Mittel 2900 ist ausreißergetrieben; Median 1000 ist robust", "Mittel 1000, Median 2900", "Beide sind 20000", "Median existiert hier nicht"],
+            q: "Ten annual incomes are 1000 for nine farmers and 20000 for one farmer. Which comparison is correct?",
+            qDE: "Zehn Jahreseinkommen betragen für neun Farmerinnen und Farmer jeweils 1000 und für eine Farmerin oder einen Farmer 20000. Welcher Vergleich ist richtig?",
+            opts: ["The mean is 2900 and the median is 1000, so the mean is strongly affected by the high outlier", "The mean is 1000 and the median is 2900", "Both the mean and the median are 2900", "The mean is 20000 and the median is 1000, so the mean is unaffected by the outlier"],
+            optsDE: ["Der Mittelwert beträgt 2900 und der Median 1000, sodass der Mittelwert stark vom hohen Ausreißer beeinflusst wird", "Der Mittelwert beträgt 1000 und der Median 2900", "Mittelwert und Median betragen beide 2900", "Der Mittelwert beträgt 20000 und der Median 1000, sodass der Mittelwert vom Ausreißer unbeeinflusst ist"],
             correct: 0,
-            explain: "x̄ reacts sensitively to outliers, xmed does not.",
-            explainDE: "x̄ reagiert empfindlich auf Ausreißer, xmed nicht."
+            explain: "The mean is (9·1000+20000)/10=2900, so one very large income has a substantial effect. With ten ordered values, the median is the fifth value, 1000, and remains close to the typical income when one observation is extreme.",
+            explainDE: "Der Mittelwert ist (9·1000+20000)/10=2900, sodass ein sehr hohes Einkommen einen deutlichen Einfluss hat. Bei zehn geordneten Werten ist der Median der fünfte Wert, also 1000, und bleibt trotz einer extremen Beobachtung nahe am typischen Einkommen."
         },
         {
-            q: "Shannon entropy (slides 36-37):",
-            qDE: "Shannon-Entropie (Folien 36-37):",
-            opts: ["H = −Σ fj log(fj), 0 ≤ H ≤ log(k); max at uniform, min at one-point", "H = Σ fj, always 1", "H is maximal at one-point distributions", "H < 0 always"],
-            optsDE: ["H = −Σ fj log(fj), 0 ≤ H ≤ log(k); max bei Gleichverteilung, min bei Einpunkt", "H = Σ fj, immer 1", "H ist maximal bei Einpunktverteilungen", "H < 0 immer"],
+            q: "For k categories with relative frequencies f₁,…,fₖ that sum to 1, and a fixed logarithm base greater than 1, which statement about Shannon entropy H=−Σⱼfⱼ log fⱼ is correct?",
+            qDE: "Für k Kategorien mit relativen Häufigkeiten f₁,…,fₖ, die sich zu 1 addieren, und eine feste Logarithmusbasis größer als 1: Welche Aussage über die Shannon-Entropie H=−Σⱼfⱼ log fⱼ ist richtig?",
+            opts: ["0≤H≤log k; H is largest for equal frequencies and 0 when all frequency lies in one category", "H=Σⱼfⱼ=1 for every distribution", "H is largest when all frequency lies in one category and smallest for equal frequencies", "H<0 for every distribution with two or more categories"],
+            optsDE: ["0≤H≤log k; H ist bei gleichverteilten Häufigkeiten am größten und 0, wenn die gesamte Häufigkeit in einer Kategorie liegt", "H=Σⱼfⱼ=1 für jede Verteilung", "H ist am größten, wenn die gesamte Häufigkeit in einer Kategorie liegt, und bei gleichverteilten Häufigkeiten am kleinsten", "H<0 für jede Verteilung mit zwei oder mehr Kategorien"],
             correct: 0,
-            explain: "Relative entropy J = H/log(k) lies in [0,1].",
-            explainDE: "Relative Entropie J = H/log(k) liegt in [0,1]."
+            explain: "Entropy measures how broadly the relative frequencies are distributed. It reaches log k when all k frequencies are equal and 0 when one category has all the frequency; terms with fⱼ=0 are interpreted using 0 log 0=0.",
+            explainDE: "Die Entropie misst, wie breit die relativen Häufigkeiten verteilt sind. Sie erreicht log k bei k gleichverteilten Häufigkeiten und 0, wenn eine Kategorie die gesamte Häufigkeit trägt; Terme mit fⱼ=0 werden über 0 log 0=0 behandelt."
         },
         {
-            q: "Sample variance (slide 38):",
-            qDE: "Stichprobenvarianz (Folie 38):",
-            opts: ["s² = (1/n)Σ(xi − x̄)²; grouped s²g = Σ fj(mj − x̄g)²; s = √s²", "s² = Σ|xi − x̄|", "s² = x̄² − n", "s² is always 1"],
-            optsDE: ["s² = (1/n)Σ(xi − x̄)²; gruppiert s²g = Σ fj(mj − x̄g)²; s = √s²", "s² = Σ|xi − x̄|", "s² = x̄² − n", "s² ist immer 1"],
+            q: "For observed values x₁,…,xₙ, which statement correctly defines the empirical variance and its grouped analogue?",
+            qDE: "Welche Aussage definiert die empirische Varianz der beobachteten Werte x₁,…,xₙ und ihr gruppiertes Gegenstück korrekt?",
+            opts: ["The empirical variance is s²=(1/n)Σᵢ(xᵢ−x̄)²; the grouped form is Σⱼfⱼ(mⱼ−x̄_g)², and the standard deviation is √s²", "The empirical variance is s²=(1/(n−1))Σᵢ(xᵢ−x̄)², while the grouped form is Σⱼ(mⱼ−x̄_g)²", "The empirical variance is the mean absolute deviation Σᵢ|xᵢ−x̄|/n, while the grouped form uses only mⱼ", "The empirical variance is Σᵢxᵢ² without centering or averaging, while the grouped form is Σⱼfⱼmⱼ²"],
+            optsDE: ["Die empirische Varianz ist s²=(1/n)Σᵢ(xᵢ−x̄)²; die gruppierte Form ist Σⱼfⱼ(mⱼ−x̄_g)², und die Standardabweichung ist √s²", "Die empirische Varianz ist s²=(1/(n−1))Σᵢ(xᵢ−x̄)², während die gruppierte Form Σⱼ(mⱼ−x̄_g)² lautet", "Die empirische Varianz ist die mittlere Absolutabweichung Σᵢ|xᵢ−x̄|/n, während die gruppierte Form nur mⱼ verwendet", "Die empirische Varianz ist Σᵢxᵢ² ohne Zentrierung oder Mittelung, während die gruppierte Form Σⱼfⱼmⱼ² lautet"],
             correct: 0,
-            explain: "Mean squared deviation from the mean.",
-            explainDE: "Mittlere quadratische Abweichung vom Mittel."
+            explain: "The divisor-n quantity is the empirical variance: the average squared deviation from the sample mean. The grouped analogue uses the grouped mean x̄_g. For independent observations from a distribution with finite variance σ², dividing the same ungrouped sum by n−1 instead gives a different, unbiased estimator of σ²; that estimator is not the empirical variance defined here.",
+            explainDE: "Die Größe mit Teiler n ist die empirische Varianz: die mittlere quadrierte Abweichung vom Stichprobenmittelwert. Das gruppierte Gegenstück verwendet den gruppierten Mittelwert x̄_g. Bei unabhängigen Beobachtungen aus einer Verteilung mit endlicher Varianz σ² liefert die Division derselben ungruppierten Summe durch n−1 stattdessen einen anderen, erwartungstreuen Schätzer von σ²; dieser ist nicht die hier definierte empirische Varianz."
         },
         {
-            q: "Variance rules (slide 39):",
-            qDE: "Varianzregeln (Folie 39):",
-            opts: ["var(a + x) = var(x); var(b·x) = b²·var(x)", "var(a + x) = a + var(x); var(b·x) = b·var(x)", "Variance is always shift-sensitive", "var(b·x) = var(x)/b"],
-            optsDE: ["var(a + x) = var(x); var(b·x) = b²·var(x)", "var(a + x) = a + var(x); var(b·x) = b·var(x)", "Varianz ist immer lageempfindlich", "var(b·x) = var(x)/b"],
+            q: "Let X₁,…,Xₙ be observations and a,b constants. Which variance identities are valid?",
+            qDE: "Seien X₁,…,Xₙ Beobachtungen und a,b Konstanten. Welche Varianzidentitäten sind gültig?",
+            opts: ["Var(a+X)=Var(X) and Var(bX)=b²·Var(X)", "Var(a+X)=a+Var(X) and Var(bX)=b·Var(X)", "Var(a+X)=a²·Var(X) and Var(bX)=b²·Var(X)", "Var(a+X)=Var(X)/a and Var(bX)=Var(X)/b"],
+            optsDE: ["Var(a+X)=Var(X) und Var(bX)=b²·Var(X)", "Var(a+X)=a+Var(X) und Var(bX)=b·Var(X)", "Var(a+X)=a²·Var(X) und Var(bX)=b²·Var(X)", "Var(a+X)=Var(X)/a und Var(bX)=Var(X)/b"],
             correct: 0,
-            explain: "Invariant under shifts, quadratic under scaling.",
-            explainDE: "Invariant unter Lageänderung, quadratisch bei Maßstab."
+            explain: "Adding the same constant shifts every observation and therefore every deviation from the mean by the same amount, leaving variance unchanged. Multiplying observations by b multiplies each deviation by b, so squared deviations and hence variance scale by b².",
+            explainDE: "Die Addition derselben Konstante verschiebt jede Beobachtung und damit jede Abweichung vom Mittelwert um denselben Betrag; die Varianz bleibt unverändert. Bei Multiplikation mit b werden die Abweichungen mit b skaliert, sodass sich quadrierte Abweichungen und damit die Varianz mit b² ändern."
         },
         {
-            q: "Shift theorem and practice (slides 40-41):",
-            qDE: "Verschiebungssatz und Praxis (Folien 40-41):",
-            opts: ["Σ(xi − x̄)² = Σxi² − n·x̄²; practice uses 1/(n−1), unbiased for σ²", "Σ(xi − x̄)² = n·x̄² − Σxi²; practice uses 1/n²", "The shift theorem needs normality", "1/(n−1) is biased but simpler"],
-            optsDE: ["Σ(xi − x̄)² = Σxi² − n·x̄²; Praxis nutzt 1/(n−1), erwartungstreu für σ²", "Σ(xi − x̄)² = n·x̄² − Σxi²; Praxis nutzt 1/n²", "Der Verschiebungssatz braucht Normalität", "1/(n−1) ist verzerrt, aber einfacher"],
+            q: "For observations x₁,…,xₙ with mean x̄, which statement combines the computational identity with the two variance conventions correctly?",
+            qDE: "Welche Aussage verbindet für Beobachtungen x₁,…,xₙ mit Mittelwert x̄ die Rechenidentität und die beiden Varianzkonventionen korrekt?",
+            opts: ["Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄²; empirical variance divides by n, while the unbiased estimator of σ² divides the same sum by n−1", "Σᵢ(xᵢ−x̄)²=nx̄²−Σᵢxᵢ²; empirical variance divides by n, while the unbiased estimator of σ² divides by n−1", "Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄²; empirical variance divides by n−1, while the unbiased estimator of σ² divides by n", "Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄²; both empirical variance and the unbiased estimator of σ² divide by n"],
+            optsDE: ["Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄²; die empirische Varianz teilt durch n, während der erwartungstreue Schätzer von σ² dieselbe Summe durch n−1 teilt", "Σᵢ(xᵢ−x̄)²=nx̄²−Σᵢxᵢ²; die empirische Varianz teilt durch n, während der erwartungstreue Schätzer von σ² durch n−1 teilt", "Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄²; die empirische Varianz teilt durch n−1, während der erwartungstreue Schätzer von σ² durch n teilt", "Σᵢ(xᵢ−x̄)²=Σᵢxᵢ²−nx̄²; empirische Varianz und erwartungstreuer Schätzer von σ² teilen beide durch n"],
             correct: 0,
-            explain: "Computational form plus the unbiased practice estimator.",
-            explainDE: "Rechenform plus erwartungstreuer Praxisschätzer."
+            explain: "Expanding each squared deviation and using Σᵢ(xᵢ−x̄)=0 gives the shift identity. The descriptive empirical variance uses divisor n. Under independent observations with finite population variance σ², the divisor n−1 corrects the loss of one degree of freedom and yields an unbiased estimator of σ².",
+            explainDE: "Durch Ausmultiplizieren jedes quadrierten Differenzterms und die Beziehung Σᵢ(xᵢ−x̄)=0 entsteht die Verschiebungsformel. Die beschreibende empirische Varianz verwendet den Teiler n. Bei unabhängigen Beobachtungen mit endlicher Varianz σ² der Grundgesamtheit korrigiert der Teiler n−1 den Verlust eines Freiheitsgrads und liefert einen erwartungstreuen Schätzer von σ²."
         },
         {
-            q: "Quartiles and IQR (slide 44):",
-            qDE: "Quartile und IQR (Folie 44):",
-            opts: ["Q1 = x̃0.25, Q2 = median, Q3 = x̃0.75; IQR = Q3 − Q1 is robust", "Q1 = minimum, Q3 = maximum", "IQR = Q3 + Q1", "Quartiles need grouped data"],
-            optsDE: ["Q1 = x̃0,25, Q2 = Median, Q3 = x̃0,75; IQR = Q3 − Q1 ist robust", "Q1 = Minimum, Q3 = Maximum", "IQR = Q3 + Q1", "Quartile brauchen gruppierte Daten"],
+            q: "Using the empirical-quantile convention Q_α=x₍⌈αn⌉₎ for a sample of n observations, what are Q₁, Q₃, and IQR when n=13?",
+            qDE: "Welche Werte ergeben sich bei n=13 unter der empirischen Quantilkonvention Q_α=x₍⌈αn⌉₎ für Q₁, Q₃ und IQR?",
+            opts: ["Q₁=x₍₄₎, Q₃=x₍₁₀₎, and IQR=Q₃−Q₁", "Q₁=x₍₃₎, Q₃=x₍₉₎, and IQR=Q₃−Q₁", "Q₁=x₍₄₎, Q₃=x₍₉₎, and IQR=Q₃−Q₁", "Q₁=x₍₁₎, Q₃=x₍₁₃₎, and IQR=Q₃−Q₁"],
+            optsDE: ["Q₁=x₍₄₎, Q₃=x₍₁₀₎ und IQR=Q₃−Q₁", "Q₁=x₍₃₎, Q₃=x₍₉₎ und IQR=Q₃−Q₁", "Q₁=x₍₄₎, Q₃=x₍₉₎ und IQR=Q₃−Q₁", "Q₁=x₍₁₎, Q₃=x₍₁₃₎ und IQR=Q₃−Q₁"],
             correct: 0,
-            explain: "The central 50% lie between Q1 and Q3.",
-            explainDE: "Die zentralen 50% liegen zwischen Q1 und Q3."
+            explain: "Under this convention, Q₁=x₍⌈13·0.25⌉₎=x₍₄₎ and Q₃=x₍⌈13·0.75⌉₎=x₍₁₀₎. The interquartile range is then defined as IQR=Q₃−Q₁, the span of the middle half of the ordered data.",
+            explainDE: "Nach dieser Konvention gilt Q₁=x₍⌈13·0,25⌉₎=x₍₄₎ und Q₃=x₍⌈13·0,75⌉₎=x₍₁₀₎. Der Interquartilsabstand ist dann definiert als IQR=Q₃−Q₁, also die Spannweite der mittleren Hälfte der geordneten Daten."
         },
         {
-            q: "Five-point summary and boxplot (slide 46):",
-            qDE: "Fünf-Punkte-Zusammenfassung und Boxplot (Folie 46):",
-            opts: ["xmin, Q1, median, Q3, xmax - drawn as a boxplot", "Mean, variance, n, min, max", "Five histograms side by side", "Only the three quartiles"],
-            optsDE: ["xmin, Q1, Median, Q3, xmax - dargestellt als Boxplot", "Mittel, Varianz, n, Min, Max", "Fünf Histogramme nebeneinander", "Nur die drei Quartile"],
+            q: "A boxplot encodes the five-number summary—minimum, Q₁, median, Q₃, and maximum—as whiskers, box edges, and a median line. If these values are 26, 49, 66, 86, and 188, what does it show?",
+            qDE: "Ein Boxplot kodiert die Fünfzahlenzusammenfassung – Minimum, Q₁, Median, Q₃ und Maximum – durch Antennen, Boxkanten und eine Medianlinie. Sind diese Werte 26, 49, 66, 86 und 188, was zeigt er?",
+            opts: ["Whiskers at 26 and 188, a box from 49 to 86, and a median line at 66", "Whiskers at 49 and 86, a box from 26 to 188, and a median line at 66", "Whiskers at 26 and 188, a box from 66 to 86, and a median line at 49", "Whiskers at 26 and 188, a box from 49 to 66, and a median line at 86"],
+            optsDE: ["Antennen bei 26 und 188, eine Box von 49 bis 86 und eine Medianlinie bei 66", "Antennen bei 49 und 86, eine Box von 26 bis 188 und eine Medianlinie bei 66", "Antennen bei 26 und 188, eine Box von 66 bis 86 und eine Medianlinie bei 49", "Antennen bei 26 und 188, eine Box von 49 bis 66 und eine Medianlinie bei 86"],
             correct: 0,
-            explain: "Ozone example: 26, 49, 66, 86, 188.",
-            explainDE: "Ozonbeispiel: 26, 49, 66, 86, 188."
+            explain: "A boxplot places the minimum and maximum at the whisker ends, the first and third quartiles at the box edges, and the median inside the box. These five values therefore determine its five-number summary.",
+            explainDE: "Ein Boxplot setzt Minimum und Maximum an die Enden der Antennen, das erste und dritte Quartil an die Kanten der Box und den Median in das Innere der Box. Diese fünf Werte bilden somit seine Fünfzahlenzusammenfassung."
         },
     ],
 };

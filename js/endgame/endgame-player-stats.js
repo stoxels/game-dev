@@ -2,7 +2,7 @@ import { LANG, t } from '../translation/translations.js';
 import { EG_RESIST_CAP_PCT } from '../combat/combat-calculations.js';
 import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT, _egGetDeflectChancePct, _egGetDeflectDamagePct, _egGetDualWieldParryChancePct, _egGetParryChancePct } from '../combat/encounter.js';
 import { _egEquipped } from './endgame-hub.js';
-import { _egGetPlayerLevel } from './endgame-leveling.js';
+import { _egGetPlayerLevel, _egSyncBaseAttributes } from './endgame-leveling.js';
 import { _egGetActiveMapModValue, _egMapAbsorptionMult, _egMapAccuracyMult, _egMapActionSlowMult, _egMapAttackSpeedMult, _egMapBlockMult, _egMapEvasionMult, _egMapPlayerDefenceMult, _egMapSpellDamageMult } from './endgame-map-launch.js';
 import { _egRollInt } from '../loot/loot-mod-application.js';
 import { EG_MOD_TABLE_AMULET } from '../loot/loot-mod-tables-amulet.js';
@@ -597,11 +597,13 @@ export function _egGetItemEffectiveBlockChance(item) {
 // stats object. Recomputed on demand (cheap - ~19 slots, ≤6 mods each) so it
 // never goes stale after an equip/unequip.
 export function _egComputePlayerStats() {
+    const passiveTreeBonuses = _egSyncBaseAttributes() || {};
     const s = {
-        health: 0, mana: 0, healthIncPct: 0,
+        health: 0, mana: passiveTreeBonuses.mana || 0, healthIncPct: 0,
         armourFlat: 0, armourIncPct: 0,
         evasionFlat: 0, evasionIncPct: 0,
-        absorptionFlat: 0, absorptionIncPct: 0,
+        absorptionFlat: passiveTreeBonuses.absorptionFlat || 0,
+        absorptionIncPct: passiveTreeBonuses.absorptionIncPct || 0,
         // Attributes start from the character's base pool (endgame-requirements.js)
         // so the stats panel, derived side-effects and requirement checks all
         // agree on the same totals.
@@ -628,7 +630,7 @@ export function _egComputePlayerStats() {
         meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
         meleeLightningMin: 0, meleeLightningMax: 0,
         meleeShadowMin: 0, meleeShadowMax: 0,
-        spellDamageFlat: 0, spellDamageIncPct: 0,
+        spellDamageFlat: 0, spellDamageIncPct: passiveTreeBonuses.spellDamageIncPct || 0,
         healingPowerFlat: 0, healingPowerIncPct: 0,
         lifeLeechPct: 0,
         blockChance: 0, spellBlockChance: 0, blockRecoveryPct: 0,

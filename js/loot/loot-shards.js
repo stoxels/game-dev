@@ -99,6 +99,14 @@ export const EG_SHARD_DEFS = {
     },
 };
 
+for (const [id, def] of Object.entries(EG_SHARD_DEFS)) {
+    const nameKey = `eg_${id}`;
+    Object.defineProperties(def, {
+        name: { enumerable: true, get: () => t(nameKey) },
+        description: { enumerable: true, get: () => t(`${nameKey}_desc`) },
+    });
+}
+
 
 //------------------------------------------------------------------------
 //-------------------SHARD ROLL (QUALITY BY STAT COUNT)-------------------

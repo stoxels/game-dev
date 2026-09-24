@@ -2503,8 +2503,10 @@
 }
 
 /* OVERCHARGE (hold past 100%): the bar and readout turn fiery orange and
-   the glow intensifies - a strike released in this state deals up to 2x
-   damage (see EG_MELEE_OVERCHARGE_* in endgame-encounter.js). */
+   the glow intensifies - a strike released in this state deals up to 5x
+   damage and unleashes weapon arts per tier (200% dash, 300% sky leap,
+   400% nova, 500% grand nova - see EG_MELEE_OVERCHARGE_* in
+   js/combat/encounter-charged-shot.js). */
 #avatar-charge-fill.eg-charge-overcharged,
 #eg-player-charge-bar.eg-charge-overcharged {
     background: #fb923c;
@@ -2517,6 +2519,77 @@
 @keyframes eg-charge-overcharge-shake {
     0%, 100% { transform: scale(1.15); }
     50% { transform: scale(1.3); }
+}
+
+/* OVERCHARGE MILESTONES: each weapon-art tier restyles the bar + readout a
+   step further so the climb past 100% reads at a glance - ember orange at
+   200% (dash), battle red at 300% (sky leap), arcane violet at 400%
+   (nova), radiant gold-white at 500% (grand nova, max glow + fastest
+   pulse). The generic .eg-charge-overcharged above stays as the base. */
+#avatar-charge-fill.eg-charge-tier1,
+#eg-player-charge-bar.eg-charge-tier1 {
+    background: #fb923c;
+    box-shadow: 0 0 14px rgba(251, 146, 60, 0.95);
+}
+#avatar-charge-fill.eg-charge-tier2,
+#eg-player-charge-bar.eg-charge-tier2 {
+    background: linear-gradient(90deg, #fb923c, #f43f5e);
+    box-shadow: 0 0 18px rgba(244, 63, 94, 0.95);
+}
+#avatar-charge-fill.eg-charge-tier3,
+#eg-player-charge-bar.eg-charge-tier3 {
+    background: linear-gradient(90deg, #f43f5e, #a855f7);
+    box-shadow: 0 0 22px rgba(168, 85, 247, 0.95);
+}
+#avatar-charge-fill.eg-charge-tier4,
+#eg-player-charge-bar.eg-charge-tier4 {
+    background: linear-gradient(90deg, #fbbf24, #fff7ed, #fbbf24);
+    box-shadow: 0 0 28px rgba(253, 224, 71, 1), 0 0 10px rgba(255, 255, 255, 0.9);
+}
+#avatar-charge-text.eg-charge-tier1 { color: #fb923c; }
+#avatar-charge-text.eg-charge-tier2 {
+    color: #fb7185;
+    animation-duration: 0.25s;
+}
+#avatar-charge-text.eg-charge-tier3 {
+    color: #c084fc;
+    animation-duration: 0.2s;
+}
+#avatar-charge-text.eg-charge-tier4 {
+    color: #fde047;
+    font-weight: bold;
+    animation: eg-charge-grand-pulse 0.35s ease-in-out infinite alternate;
+}
+@keyframes eg-charge-grand-pulse {
+    from { transform: scale(1.25); text-shadow: 0 0 6px rgba(253, 224, 71, 0.9); }
+    to { transform: scale(1.5); text-shadow: 0 0 16px rgba(253, 224, 71, 1), 0 0 6px #fff; }
+}
+
+/* ROOTED WHILE CHARGING: holding the attack key plants the hero's feet -
+   no movement, no evasion/block, +50% damage taken (see
+   EG_MELEE_HOLD_VULNERABILITY_MULT). A pulsing red ring + VULNERABLE tag
+   on the avatar so the tradeoff is always visible. */
+#player-avatar-wrapper.eg-melee-rooted {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 18px rgba(239, 68, 68, 0.7);
+    border-radius: 10px;
+    animation: eg-rooted-pulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes eg-rooted-pulse {
+    from { filter: brightness(0.92); }
+    to { filter: brightness(1.08); }
+}
+#eg-melee-rooted-label {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    color: #fca5a5;
+    font-weight: bold;
+    font-size: 11px;
+    white-space: nowrap;
+    text-shadow: 0 0 6px rgba(239, 68, 68, 0.9), 0 1px 2px #000;
+    pointer-events: none;
+    z-index: 5;
 }
 
 /* Battle Trance: small floating "+N mana" readout over the struck monster
@@ -2541,6 +2614,8 @@
 @media (prefers-reduced-motion: reduce) {
     .eg-mana-gain-float { animation-duration: 0.01s; }
     #avatar-charge-text.eg-charge-overcharged { animation: none; }
+    #avatar-charge-text.eg-charge-tier4 { animation: none; }
+    #player-avatar-wrapper.eg-melee-rooted { animation: none; }
 }
 
 /* Hold-parry pause - desaturate the player charge bar while held */

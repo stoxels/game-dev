@@ -1,4 +1,4 @@
-﻿import { trackAchStat } from '../achievements/achievements.js';
+import { trackAchStat } from '../achievements/achievements.js';
 import { markWrongTiles } from '../puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
@@ -9,37 +9,40 @@ import { bumpFreezeCorrFills } from '../timer/timer-freeze.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _executeRegressionToPrior, _executeSignificanceThreshold } from './class-actuary.js';
-import { _executeBayesTraps, _executeTypeIShield } from './class-bayesian.js';
+import { _executeBayesTraps } from './class-bayesian.js';
+import { _executeTypeIShield } from './class-bayesian-type-i.js';
 import { _patchCooldownButton, cooldownState, getEffectiveCooldown, startSlotCooldown } from './class-cooldown-state.js';
 import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
 import { CLASS_HUD_HINT_MAX_USES, buildClassHUD, updateMomentumBar } from './class-hud.js';
 import { _abilityCanAfford, _bloodMagicActive, _getAbilityManaCost, payAbilityCost } from './class-mana.js';
-import { _clearTransitionMatrix, _executeStateRollback, _executeTransitionMatrix, _transitionMatrixCascade, resetMarkovianState } from './class-markovian.js';
-import { _executeArcaneFreeze, _executeArcaneReveal, _varianceShield_playCometImpact, _varianceShield_removeBubble, _varianceShield_updateVisibility } from './class-mathmagician.js';
-import { _endBlackSwan, _executeBlackSwan, _executeTailRisk } from './class-outlier.js';
+import { _executeStateRollback, resetMarkovianState } from './class-markovian.js';
+import { _clearTransitionMatrix, _executeTransitionMatrix, _transitionMatrixCascade } from './class-markovian-transition.js';
+import { _executeArcaneReveal } from './class-mathmagician.js';
+import { _executeArcaneFreeze } from './class-mathmagician-absolute-zero.js';
+import { _varianceShield_playCometImpact, _varianceShield_removeBubble, _varianceShield_updateVisibility } from './class-mathmagician-variance-shield.js';
+import { _executeTailRisk } from './class-outlier.js';
+import { _endBlackSwan, _executeBlackSwan } from './class-outlier-black-swan.js';
 import { _executeFieldScan, _executePrecisionMark, _playBayesianInsightAnimation, _playBayesianRevealEffect } from './class-probabilist.js';
 import { _executeBrownianMotion, _executeSummonDrifter } from './class-random-walker.js';
 import { _executeDegreesOfFreedom, _executeResidual, resetRecursionistState } from './class-recursionist.js';
 import { _executeDataStrike, _executeDiagonalStrike, _momentumClearParticlesImmediate, _momentumParticlesOnMistake, _momentumSpawnParticle, _statisticianTriggerMomentum } from './class-statistician.js';
 import { activateTargetingReticle } from './targeting-reticle.js';
-import { playShieldChargePulseEffect, playTimeGainEffect } from '../passive-tree/passive-effects.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { playShieldChargePulseEffect, playTimeGainEffect } from '../probability-tree/probability-tree-effects.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { getCharmLockedSkillForLegacySlot, getSkillCastRankClampedForSlot, getSkillIdForLegacySlot, noteCharmCast } from '../skills/skill-charms.js';
 import { _incDirect, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 
-//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+// Class ability orchestration: shared cell helpers, active dispatch, and class passives.
+
+//------------------------------------------------------------------------
+//---------------------------RUNTIME STATE BRIDGES-------------------------
+//------------------------------------------------------------------------
+// Legacy hooks can replace these bindings; keep their accessors live.
 try { Object.defineProperty(globalThis, 'correctFillStreak', { get() { return correctFillStreak; }, set(v) { correctFillStreak = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'nextPenaltyHalved', { get() { return nextPenaltyHalved; }, set(v) { nextPenaltyHalved = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'toggleActiveAbility', { get() { return toggleActiveAbility; }, set(v) { toggleActiveAbility = v; }, configurable: true }); } catch (e) {}
-// class-abilities.js
-// Handles all class passive and active ability logic:
-//   - Shared grid/cell helpers used across multiple abilities
-//   - Dispatch routing to per-class and per-ascendency ability functions
-//   - Active ability arming, instant firing, and cell-click execution
-//   - Class passive setup at level start
-//   - Passive reactions to correct fills and mistakes during play
 
 
 //------------------------------------------------------------------------
@@ -132,11 +135,11 @@ export function _filterMarkedIds(ids, sol) {
 //   Reads classActive1Level / classActive2Level from STATE, overridden by
 //   the slotted charm's rank when the charm system has one placed (so
 //   slotting a lower-rank charm really does cast the weaker variant).
-export function _getActiveAbilityData(def, activeKey) {
+function _getActiveAbilityData(def, activeKey) {
     let level = activeKey === 'active1'
         ? (STATE.classActive1Level || 1)
         : (STATE.classActive2Level || 1);
-    if (STATE.playerClass && typeof getSkillCastRankClampedForSlot === 'function') {
+    if (STATE.playerClass) {
         const charmRank = getSkillCastRankClampedForSlot(activeKey);
         if (charmRank) level = charmRank;
     }
@@ -163,7 +166,7 @@ export function _getAscendencySlotData(hudSlot) {
         ? (STATE.ascendencySkill1Level || 1)
         : (STATE.ascendencySkill2Level || 1);
     // Charm rank override (see _getActiveAbilityData above).
-    if (STATE.playerAscendency && typeof getSkillCastRankClampedForSlot === 'function') {
+    if (STATE.playerAscendency) {
         const charmRank = getSkillCastRankClampedForSlot(hudSlot);
         if (charmRank) skillLv = charmRank;
     }
@@ -180,21 +183,17 @@ export function _getAscendencySlotData(hudSlot) {
 //------------------------------------------------------------------------
 
 
-// _setAbilityMode - arms or disarms activeAbilityMode and updates the targeting cursor.
-//   The old approach set `cursor: crosshair` on #puzzle-scaler-wrap only, which was
-//   silently overridden by .gc's `cursor: pointer` whenever the mouse was actually over
-//   a grid cell. activateTargetingReticle() (targeting-reticle.js) replaces the native
-//   cursor everywhere with a custom animated reticle that tracks the mouse via JS, so it
-//   now stays consistent both inside and outside the grid.
+// _setAbilityMode - arms or disarms targeting mode and updates the reticle.
+// The reticle follows the pointer across the grid, so the cursor stays consistent.
 export function _setAbilityMode(armed) {
     globalThis.activeAbilityMode = armed;
-    if (typeof activateTargetingReticle === 'function') activateTargetingReticle(armed);
+    activateTargetingReticle(armed);
 }
 
 
 // _showAbilityArmToast - shows the "click a cell" hint toast for the given HUD slot.
 //   Reads the localised cursor description from the ability definition.
-export function _showAbilityArmToast(slot) {
+function _showAbilityArmToast(slot) {
     let activeData = null;
 
     if (slot === 'active3' || slot === 'active4') {
@@ -228,7 +227,7 @@ export function _showAbilityArmToast(slot) {
 
 
 // _dispatchBaseActive1 - dispatches the active1 ability for base classes.
-export function _dispatchBaseActive1(playerClass, row, col, effect) {
+function _dispatchBaseActive1(playerClass, row, col, effect) {
     switch (playerClass) {
         case 'mathmagician':
             _executeArcaneReveal(row, col, effect.radius, effect.maxReveals);
@@ -247,7 +246,7 @@ export function _dispatchBaseActive1(playerClass, row, col, effect) {
 
 
 // _dispatchBaseActive2 - dispatches the active2 ability for base classes.
-export function _dispatchBaseActive2(playerClass, row, col, effect) {
+function _dispatchBaseActive2(playerClass, row, col, effect) {
     switch (playerClass) {
         case 'mathmagician':
             _executeArcaneFreeze(effect.freezeDuration);
@@ -265,14 +264,9 @@ export function _dispatchBaseActive2(playerClass, row, col, effect) {
 }
 
 
-// _noteCharmCastForSlot - records which skill id a legacy HUD slot ('active1'
-//   … 'active4') is casting, so the reveal projectiles that fire on a stagger
-//   afterwards read THAT skill's charmed rank and orb bonus
-//   (js/skills/skill-charms.js). Without this the HUD entry point - as opposed
-//   to the hotbar, which notes the cast in activateSkill() - would fall back
-//   to the un-charmed damage multiplier.
-export function _noteCharmCastForSlot(slot) {
-    if (typeof noteCharmCast !== 'function' || typeof getSkillIdForLegacySlot !== 'function') return;
+// _noteCharmCastForSlot - records the legacy HUD slot's skill id.
+// Reveal projectiles then use the same charm rank as the hotbar cast.
+function _noteCharmCastForSlot(slot) {
     const castingId = getSkillIdForLegacySlot(slot);
     if (castingId) noteCharmCast(castingId);
 }
@@ -280,7 +274,7 @@ export function _noteCharmCastForSlot(slot) {
 
 // _dispatchBaseAbility - top-level router for base class active abilities.
 //   Calls the correct active1 or active2 dispatcher, then logs the quest stat.
-export function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
+function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
     // The cast rank + orb bonus follow the skill's slotted charm.
     _noteCharmCastForSlot(activeKey);
 
@@ -316,7 +310,7 @@ export function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
 
 // _dispatchAscendencyAbility - routes to the correct ascendency skill implementation.
 //   hudSlot 'active3' → ascendency active1 (skill 1); 'active4' → ascendency active2 (skill 2).
-export function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
+function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
     const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
 
     // The cast rank + orb bonus follow the skill's slotted charm.
@@ -401,7 +395,7 @@ export function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect
 
 // _isInstantAbility - returns true if the given slot fires immediately on button press.
 //   Instant abilities skip the arm → click flow entirely.
-export function _isInstantAbility(slot) {
+function _isInstantAbility(slot) {
     // Heartbloom (active5) is always instant - endgame-only
     if (slot === 'active5') return true;
 
@@ -440,9 +434,9 @@ export function _isInstantAbility(slot) {
 // only make sense under certain conditions. Returns false (with a toast)
 // when the ability must not fire, e.g. Regression to Prior with an empty
 // mistake log. Prevents wasting the cooldown on a no-op.
-export function _canFireInstantAbility(slot) {
+function _canFireInstantAbility(slot) {
     if (slot === 'active5') {
-        if (typeof isEndgameLevel === 'function' && !isEndgameLevel()) {
+        if (!isEndgameLevel()) {
             globalThis.showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
             return false;
         }
@@ -454,7 +448,7 @@ export function _canFireInstantAbility(slot) {
             return false;
         }
         // Fallback manual check when _egBuildPickupEligiblePool not yet available
-        if (!pool && typeof cur !== 'undefined' && cur && cur.grid) {
+        if (!pool && cur && cur.grid) {
             let freeCount = 0;
             for (let r = 0; r < cur.grid.length; r++)
                 for (let c = 0; c < cur.grid[0].length; c++)
@@ -478,7 +472,7 @@ export function _canFireInstantAbility(slot) {
 
 // _fireInstantBaseAbility - fires an instant ability from the base class slot (active1/active2)
 //   and immediately starts its cooldown.
-export function _fireInstantBaseAbility(slot) {
+function _fireInstantBaseAbility(slot) {
     const def = CLASS_DEFS[STATE.playerClass];
     if (!def) return;
 
@@ -498,7 +492,7 @@ export function _fireInstantBaseAbility(slot) {
 
 // _fireInstantAscendencyAbility - fires an instant ability from an ascendency slot (active3/active4)
 //   and immediately starts its cooldown.
-export function _fireInstantAscendencyAbility(slot) {
+function _fireInstantAscendencyAbility(slot) {
     const slotData = _getAscendencySlotData(slot);
     if (!slotData) return;
 
@@ -518,10 +512,11 @@ export function _fireInstantAscendencyAbility(slot) {
 //------------------------------------------------------------------------
 //------------------HEARTBLOOM (ACTIVE5) EXECUTION------------------------
 //------------------------------------------------------------------------
+// Spawns the endgame heart reward without changing the normal pickup cap.
 
 // Picks a random heart pickup def weighted like normal hearts:
 // 60% small, 30% medium, 10% large. Falls back to small if defs missing.
-export function _pickRandomHeartDef() {
+function _pickRandomHeartDef() {
     if (typeof globalThis.EG_PICKUP_DEFS === 'undefined') return null;
     const roll = Math.random() * 100;
     if (roll < 60) return globalThis.EG_PICKUP_DEFS.heart_small;
@@ -532,7 +527,7 @@ export function _pickRandomHeartDef() {
 // Spawns `count` hearts onto eligible grid cells, bypassing the normal
 // EG_PICKUP_MAX_ON_BOARD cap so all 3 appear at once. Each heart gets
 // the standard lifetime/expiry handling.
-export function _spawnHeartbloomHearts(count) {
+function _spawnHeartbloomHearts(count) {
     let spawned = 0;
     for (let i = 0; i < count; i++) {
         let pool = [];
@@ -543,7 +538,7 @@ export function _spawnHeartbloomHearts(count) {
                 if (typeof globalThis._egPickups !== 'undefined' && globalThis._egPickups.has(key)) return false;
                 return true;
             });
-        } else if (typeof cur !== 'undefined' && cur && cur.grid) {
+        } else if (cur && cur.grid) {
             const rows = cur.grid.length;
             const cols = cur.grid[0].length;
             for (let r = 0; r < rows; r++)
@@ -598,8 +593,8 @@ export function _spawnHeartbloomHearts(count) {
 }
 
 // Fires the Heartbloom ability: pays cost, spawns 3 hearts, starts 5-min cooldown.
-export function _fireInstantHeartbloomAbility() {
-    const def = (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined') ? ENDGAME_HEARTBLOOM_DEF : null;
+function _fireInstantHeartbloomAbility() {
+    const def = ENDGAME_HEARTBLOOM_DEF;
     if (!def) return;
 
     // Pay the cost (life under Blood Magic) - abort without firing if it can't be covered.
@@ -610,12 +605,12 @@ export function _fireInstantHeartbloomAbility() {
 
     if (spawned > 0) {
         if (typeof globalThis.showToast === 'function') globalThis.showToast(`💚 Heartbloom: ${spawned} heart${spawned > 1 ? 's' : ''} spawned!`, '#ff6b9d');
-        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('heart_heals');
+        if (Audio_Manager.playSFX) Audio_Manager.playSFX('heart_heals');
         if (typeof globalThis._playAvatarSkillAnimationForSlot === 'function') {
             try { globalThis._playAvatarSkillAnimationForSlot('active5'); } catch (e) {}
         }
-        if (typeof trackAchStat === 'function') trackAchStat('skillHeartbloomUsed');
-        if (typeof globalThis.updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
+        trackAchStat('skillHeartbloomUsed');
+        updateQuestStats('classAbilityUsed', {});
         if (typeof globalThis.triggerSkillBanter === 'function') globalThis.triggerSkillBanter('heartbloom');
     } else {
         if (typeof globalThis.showToast === 'function') globalThis.showToast('💚 Heartbloom: no free cells!', '#ff6b9d');
@@ -628,7 +623,7 @@ export function _fireInstantHeartbloomAbility() {
 
 
 // _fireInstantAbility - router that fires the correct instant handler based on slot.
-export function _fireInstantAbility(slot) {
+function _fireInstantAbility(slot) {
     if (slot === 'active5') {
         _fireInstantHeartbloomAbility();
     } else if (slot === 'active1' || slot === 'active2') {
@@ -644,7 +639,7 @@ export function _fireInstantAbility(slot) {
 // Advances the "press 1/2" HUD hint counter. Only counts activations of the base
 // class slots (1/2), since that's what the arrows point at. Once it reaches
 // CLASS_HUD_HINT_MAX_USES the arrows stop rendering on the next HUD rebuild.
-export function _trackActivationHintProgress(slot) {
+function _trackActivationHintProgress(slot) {
     if (slot !== 'active1' && slot !== 'active2') return;
     if ((STATE.classHudHintUses || 0) >= CLASS_HUD_HINT_MAX_USES) return;
 
@@ -659,22 +654,18 @@ export function _trackActivationHintProgress(slot) {
 //------------------------------------------------------------------------
 
 
-// toggleActiveAbility - entry point when the player presses an ability button.
-//   slot: 'active1' | 'active2' | 'active3' | 'active4' | 'active5'
-//   Instant abilities fire immediately. All others arm the crosshair cursor
-//   so the next grid click calls executeActiveAbility().
+// toggleActiveAbility - handles a class HUD ability button.
+// Instant abilities fire now; targeted abilities arm the reticle for a cell click.
 function toggleActiveAbility(slot) {
     if (globalThis.isClassless()) return;
     const newSlot = slot || 'active1';
 
     // Charm gate (js/skills/skill-charms.js): a spell whose charm is not in a
     // spell slot cannot be armed or fired, even from the legacy class HUD.
-    if (typeof getCharmLockedSkillForLegacySlot === 'function') {
-        const lockedId = getCharmLockedSkillForLegacySlot(newSlot);
-        if (lockedId) {
-            if (typeof globalThis.showToast === 'function') globalThis.showToast(t('charm_locked_toast'), '#ff6b9d');
-            return;
-        }
+    const lockedId = getCharmLockedSkillForLegacySlot(newSlot);
+    if (lockedId) {
+        if (typeof globalThis.showToast === 'function') globalThis.showToast(t('charm_locked_toast'), '#ff6b9d');
+        return;
     }
 
     const cd = cooldownState[newSlot];
@@ -682,7 +673,7 @@ function toggleActiveAbility(slot) {
     if (globalThis.dead || !cd || cd.remaining > 0) return;
 
     // Heartbloom is endgame-only - block entirely outside endgame (HUD also shows locked)
-    if (newSlot === 'active5' && typeof isEndgameLevel === 'function' && !isEndgameLevel()) {
+    if (newSlot === 'active5' && !isEndgameLevel()) {
         globalThis.showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
         return;
     }
@@ -735,7 +726,7 @@ function toggleActiveAbility(slot) {
 
 // _executeAscendencySkillOnCell - fires a targeted ascendency ability on the clicked cell
 //   and handles post-fire cooldown logic.
-export function _executeAscendencySkillOnCell(activeKey, row, col) {
+function _executeAscendencySkillOnCell(activeKey, row, col) {
     const slotData = _getAscendencySlotData(activeKey);
     if (!slotData) return;
 
@@ -756,7 +747,7 @@ export function _executeAscendencySkillOnCell(activeKey, row, col) {
 
 // _executeBaseSkillOnCell - fires a targeted base class ability on the clicked cell
 //   and starts its cooldown immediately.
-export function _executeBaseSkillOnCell(activeKey, row, col) {
+function _executeBaseSkillOnCell(activeKey, row, col) {
     _setAbilityMode(false);
     const def = CLASS_DEFS[STATE.playerClass];
     const actData = _getActiveAbilityData(def, activeKey);
@@ -807,7 +798,7 @@ export function executeActiveAbility(row, col) {
 
 // _resetClassLevelState - zeroes all per-level tracking flags and window globals
 //   before any class-specific passive setup runs.
-export function _resetClassLevelState() {
+function _resetClassLevelState() {
     correctFillStreak = 0;
     nextPenaltyHalved = false;
     window.LEVEL_FLAGS.momentumThisLevel = 0;
@@ -828,8 +819,8 @@ export function _resetClassLevelState() {
 
     updateMomentumBar(0, 15);
 
-    if (typeof resetRecursionistState === 'function') resetRecursionistState();
-    if (typeof resetMarkovianState === 'function') resetMarkovianState();
+    resetRecursionistState();
+    resetMarkovianState();
 }
 
 
@@ -837,7 +828,7 @@ export function _resetClassLevelState() {
 //   Adds bonus charges from passive tree nodes reinforced_shield and fortified_shield.
 //   Recharges to max at the start of every puzzle, including chained puzzles
 //   inside an endgame encounter chain.
-export function _applyMathmagicianPassive(effect) {
+function _applyMathmagicianPassive(effect) {
     let freeMistakes = effect.freeMistakes || 0;
     if (ptHasSkill('reinforced_shield')) freeMistakes += 1;
     if (ptHasSkill('fortified_shield')) freeMistakes += 1;
@@ -848,7 +839,7 @@ export function _applyMathmagicianPassive(effect) {
 
 // _collectProbabilistMarkCount - builds the auto-mark count for the Probabilist passive,
 //   adding bonus marks from passive tree nodes.
-export function _collectProbabilistMarkCount(baseCount) {
+function _collectProbabilistMarkCount(baseCount) {
     let markCount = baseCount;
     if (ptHasSkill('prior_knowledge')) markCount += 1;
     if (ptHasSkill('updated_beliefs')) markCount += 1;
@@ -859,7 +850,7 @@ export function _collectProbabilistMarkCount(baseCount) {
 
 
 // _snapshotMarkedCells - returns a Set of all cell ids that are currently marked (userGrid === 2).
-export function _snapshotMarkedCells() {
+function _snapshotMarkedCells() {
     const marked = new Set();
     if (!cur) return marked;
     const sol = cur.grid;
@@ -871,7 +862,7 @@ export function _snapshotMarkedCells() {
 
 
 // _collectNewlyMarkedCells - returns the cell ids that are now marked but were not in the snapshot.
-export function _collectNewlyMarkedCells(markedBefore) {
+function _collectNewlyMarkedCells(markedBefore) {
     const newlyMarked = [];
     if (!cur) return newlyMarked;
     const sol = cur.grid;
@@ -884,7 +875,7 @@ export function _collectNewlyMarkedCells(markedBefore) {
 
 
 // _applyProbabilistBonusReveals - reveals bonus cells for confirmed_hypothesis / god_of_probabilities.
-export function _applyProbabilistBonusReveals() {
+function _applyProbabilistBonusReveals() {
     let bonusReveals = 0;
     if (ptHasSkill('confirmed_hypothesis')) bonusReveals += 1;
     if (ptHasSkill('god_of_probabilities')) bonusReveals += 1;
@@ -906,9 +897,7 @@ export function _applyProbabilistPassive(effect) {
         trackAchStat('bayesianInsightUsed');
 
         const newlyMarked = _collectNewlyMarkedCells(markedBefore);
-        if (typeof _playBayesianInsightAnimation === 'function') {
-            _playBayesianInsightAnimation(newlyMarked);
-        }
+        _playBayesianInsightAnimation(newlyMarked);
 
         _applyProbabilistBonusReveals();
     }, 300);
@@ -917,7 +906,7 @@ export function _applyProbabilistPassive(effect) {
 
 // _bayesianRevealOneCell - reveals 1 random unrevealed filled cell at level start.
 //   Used by confirmed_hypothesis and god_of_probabilities passive nodes.
-export function _bayesianRevealOneCell() {
+function _bayesianRevealOneCell() {
     if (!cur) return;
     const sol = cur.grid;
     const rows = sol.length;
@@ -939,10 +928,8 @@ export function _bayesianRevealOneCell() {
     trackAchStat('tilesRevealed', 1);
     _incDirect('lifetimeTilesRevealed', 1);
 
-    if (typeof _playBayesianRevealEffect === 'function') {
-        const cellEl = document.getElementById(`g-${r}-${c}`);
-        if (cellEl) _playBayesianRevealEffect(cellEl);
-    }
+    const cellEl = document.getElementById(`g-${r}-${c}`);
+    if (cellEl) _playBayesianRevealEffect(cellEl);
 }
 
 
@@ -980,7 +967,7 @@ export function applyClassPassiveOnLevelStart() {
 
 // _applyMathmagicianShieldAbsorb - consumes one free-mistake charge and optionally
 //   grants bonus time via passive tree nodes. Returns true if the penalty was absorbed.
-export function _applyMathmagicianShieldAbsorb() {
+function _applyMathmagicianShieldAbsorb() {
     if (window._classFreeMistakes <= 0) return false;
 
     window._classFreeMistakes--;
@@ -1014,9 +1001,7 @@ export function _applyMathmagicianShieldAbsorb() {
         globalThis.showToast(msg);
 
         // Floating "+Xs" feedback so the proc is visible beyond the toast
-        if (typeof playTimeGainEffect === 'function') {
-            playTimeGainEffect(`+${bonus}s`, ptHasSkill('calculated_error') && bonus >= 120 ? '#c080ff' : '#70e0ff');
-        }
+        playTimeGainEffect(`+${bonus}s`, ptHasSkill('calculated_error') && bonus >= 120 ? '#c080ff' : '#70e0ff');
 
 
         trackAchStat('timeAdded', bonus);
@@ -1026,11 +1011,8 @@ export function _applyMathmagicianShieldAbsorb() {
 }
 
 
-// getClassPenaltyMultiplier - returns the penalty time multiplier for the current mistake.
-//   Called from applyPenalty() in mousebutton_handlers.js before the time deduction is applied.
-//   Returns 0.0 if the penalty should be fully blocked (absorbed by a free mistake).
-//   Returns 5.0 if a Black Swan streak is broken (heavy punishment).
-//   Returns 1.0 for all other cases (standard penalty).
+// getClassPenaltyMultiplier - returns the time multiplier for a mistake.
+// It can block a mistake, apply Black Swan's heavy penalty, or use the standard rate.
 export function getClassPenaltyMultiplier() {
     if (!STATE.playerClass || globalThis.isClassless()) return 1.0;
 
@@ -1066,10 +1048,8 @@ export function getClassPenaltyMultiplier() {
 
 // _handleTransitionMatrixCascade - if Transition Matrix is active, cascade from the
 //   newly filled cell. Clears the effect if its duration has expired.
-export function _handleTransitionMatrixCascade(row, col) {
+function _handleTransitionMatrixCascade(row, col) {
     if (!window._transitionMatrixActive) return;
-    if (typeof _transitionMatrixCascade !== 'function') return;
-
     const tm = window._transitionMatrixActive;
     if (Date.now() <= tm.endTime) {
         _transitionMatrixCascade(row, col, tm.maxDepth);
@@ -1082,7 +1062,7 @@ export function _handleTransitionMatrixCascade(row, col) {
 // _handleMathmagicianFreezeBonus - during Absolute Zero, awards passive bonuses
 //   for correct fills. frozen_resilience grants +1 shield every 5 fills;
 //   god_of_math reduces the Arcane Reveal cooldown by 1s per fill.
-export function _handleMathmagicianFreezeBonus() {
+function _handleMathmagicianFreezeBonus() {
     if (STATE.playerClass !== 'mathmagician' || !window._freezeActive) return;
 
     if (ptHasSkill('frozen_resilience')) {
@@ -1094,9 +1074,7 @@ export function _handleMathmagicianFreezeBonus() {
             globalThis.showToast(t('cls_frozen_resilience'));
 
             // Icy grid pulse so the charge gain is visible in play
-            if (typeof playShieldChargePulseEffect === 'function') {
-                playShieldChargePulseEffect();
-            }
+            playShieldChargePulseEffect();
         }
     }
 
@@ -1113,7 +1091,7 @@ export function _handleMathmagicianFreezeBonus() {
 // _handlePrecisionMarkMomentum - if momentum_of_certainty is active and the filled
 //   cell is inside the tracked Precision Mark window, grants +20s and clears the
 //   cell from the window (auto-closes when all tracked cells are filled).
-export function _handlePrecisionMarkMomentum(row, col) {
+function _handlePrecisionMarkMomentum(row, col) {
     if (!ptHasSkill('momentum_of_certainty')) return;
     if (!window._pmMomentumActive || !window._pmMomentumSet) return;
 
@@ -1123,7 +1101,7 @@ export function _handlePrecisionMarkMomentum(row, col) {
     window._pmMomentumSet.delete(id);
     addTimeSecs(20, { capSecs: 3600 });
     globalThis.showToast(t('cls_momentum_certainty'));
-    if (typeof playTimeGainEffect === 'function') playTimeGainEffect('+20s', '#ffb830');
+    playTimeGainEffect('+20s', '#ffb830');
     trackAchStat('timeAdded', 20);
 
     if (window._pmMomentumSet.size === 0) {
@@ -1135,7 +1113,7 @@ export function _handlePrecisionMarkMomentum(row, col) {
 
 // _handleStatisticianStreak - advances or triggers the Statistician fill streak.
 //   Black Swan mode bypasses the streak counter and fires momentum on every fill.
-export function _handleStatisticianStreak(effect, row, col) {
+function _handleStatisticianStreak(effect, row, col) {
     if (window._blackSwanActive) {
         // Black Swan: momentum on every correct fill, no streak required
         _momentumSpawnParticle(row, col);
@@ -1181,7 +1159,7 @@ export function onCorrectFill(row, col) {
 // _getStatisticianStreakReduction - returns how many streak points a mistake costs
 //   based on which passive tree nodes are active.
 //   learning_from_mistakes + mistakes_no_matter together: -10. Either alone: -12. Neither: full reset.
-export function _getStatisticianStreakReduction(hasLFM, hasMNM) {
+function _getStatisticianStreakReduction(hasLFM, hasMNM) {
     if (hasLFM && hasMNM) return 10;
     if (hasLFM || hasMNM) return 12;
     return null; // null signals a full reset

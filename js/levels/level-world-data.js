@@ -2630,12 +2630,9 @@ export const W11 = [
         bonusType: "quiz",
         bonusParam: 0,
         grid: G(
-            [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0],
-            [0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0]
-        )
+        [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0], [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1], [1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0], [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1]
+    )
     },
 
 
@@ -2718,10 +2715,10 @@ export const W11 = [
 export const W12 = [
 
     {   //5x5
-        hint: "True Correlation",
-        hintDE: "Wahre Korrelation",
-        reveal: "Rho is the true correlation between X and Y, covariance over both standard deviations",
-        revealDE: "Rho ist die wahre Korrelation zwischen X und Y, Kovarianz geteilt durch beide Standardabweichungen",
+        hint: "Population Correlation",
+        hintDE: "Populationskorrelation",
+        reveal: "ρ = Cov(X,Y)/(σₓ·σᵧ) is the population correlation coefficient between X and Y",
+        revealDE: "ρ = Cov(X,Y)/(σₓ·σᵧ) ist der Populationskorrelationskoeffizient zwischen X und Y",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -2736,8 +2733,8 @@ export const W12 = [
     {   //5x5
         hint: "Covariance",
         hintDE: "Kovarianz",
-        reveal: "Gamma XY is the covariance of X and Y, the mean of the centred product",
-        revealDE: "Gamma XY ist die Kovarianz von X und Y, der Mittelwert des zentrierten Produkts",
+        reveal: "γ denotes the covariance of X and Y: Cov(X,Y) = E[(X−E[X])(Y−E[Y])]",
+        revealDE: "γ bezeichnet die Kovarianz von X und Y: Cov(X,Y) = E[(X−E[X])(Y−E[Y])]",
         timer: 1800,
         bonusHint: "Finish in less than 20 seconds",
         bonusHintDE: "In weniger als 20 Sekunden abschließen",
@@ -2749,43 +2746,43 @@ export const W12 = [
         )
     },
 
-    {   //5x20
-        hint: "Correlation Test",
-        hintDE: "Korrelationstest",
-        reveal: "Two-sided test of no correlation: the null says rho equals zero",
-        revealDE: "Zweiseitiger Test auf fehlende Korrelation: die Nullhypothese besagt, dass Rho gleich null ist",
+    {   //5x30
+        hint: "Zero-Correlation Test",
+        hintDE: "Test auf Nullkorrelation",
+        reveal: "The two-sided test uses H₀: ρ = 0, meaning zero linear correlation in the population",
+        revealDE: "Der zweiseitige Test verwendet H₀: ρ = 0, also keine lineare Korrelation in der Grundgesamtheit",
         timer: 1800,
         bonusHint: "Finish without mistakes",
         bonusHintDE: "Beende das Level ohne Fehler zu machen",
         bonusType: "nomiss",
         bonusParam: 0,
         grid: G(
-        [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0], [0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
-        [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0]
+        [1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1], [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1], [1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0]
     )
     },
 
-    {   //5x25
+    {   //5x50
         hint: "Sample Correlation",
         hintDE: "Stichprobenkorrelation",
-        reveal: "The sample correlation centres every pair and scales the joint sum by both spreads",
-        revealDE: "Die Stichprobenkorrelation zentriert alle Paare und skaliert die gemeinsame Summe mit beiden Streuungen",
+        reveal: "The picture abbreviates Cov as C: r = C/(sₓ·sᵧ) is the sample correlation coefficient between X and Y",
+        revealDE: "Das Bild schreibt Cov als C: r = C/(sₓ·sᵧ) ist der Stichprobenkorrelationskoeffizient zwischen X und Y",
         timer: 1800,
         bonusHint: "Finish without using items",
         bonusHintDE: "Beende das Level ohne Items zu nutzen",
         bonusType: "noitem",
         bonusParam: 0,
         grid: G(
-        [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0]
+        [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1], [0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0],
+        [0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1]
     )
     },
 
     {   //5x20
         hint: "Regression Line",
         hintDE: "Regressionsgerade",
-        reveal: "Observed points scatter around a straight line; the regression line is the best-fitting line",
-        revealDE: "Beobachtete Punkte streuen um eine Gerade; die Regressionsgerade ist die am besten passende Gerade",
+        reveal: "A regression line estimates the conditional mean E[Y | X=x] as a linear function of x",
+        revealDE: "Eine Regressionsgerade schätzt den bedingten Erwartungswert E[Y | X=x] als lineare Funktion von x",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -2800,8 +2797,8 @@ export const W12 = [
     {   //5x25
         hint: "Linear Model",
         hintDE: "Lineares Modell",
-        reveal: "Each observation follows the line plus noise with mean zero and constant variance",
-        revealDE: "Jede Beobachtung folgt der Geraden plus Rauschen mit Mittelwert null und konstanter Varianz",
+        reveal: "The linear model is Y = Xβ + ε, with E[ε]=0 and Var(ε)=σ²I",
+        revealDE: "Das lineare Modell lautet Y = Xβ + ε, wobei E[ε]=0 und Var(ε)=σ²I",
         timer: 1800,
         bonusHint: "Finish with at most 3 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
@@ -2813,27 +2810,27 @@ export const W12 = [
     )
     },
 
-    {   //5x35
+    {   //5x45
         hint: "Slope Estimate",
         hintDE: "Steigungsschätzung",
-        reveal: "The least-squares slope divides the sample covariance by the sample variance of x",
-        revealDE: "Die Kleinste-Quadrate-Steigung teilt die Stichprobenkovarianz durch die Stichprobenvarianz von x",
+        reveal: "The least-squares slope estimate is β̂₁ = Sₓᵧ/Sₓₓ",
+        revealDE: "Der Kleinste-Quadrate-Schätzer der Steigung ist β̂₁ = Sₓᵧ/Sₓₓ",
         timer: 1800,
         bonusHint: "Finish in less than 5 minutes",
         bonusHintDE: "In weniger als 5 Minuten abschließen",
         bonusType: "fast",
         bonusParam: 300,
         grid: G(
-        [1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1], [1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-        [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0], [1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1]
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1], [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+        [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1]
     )
     },
 
     {   //5x35
         hint: "Normal Equations",
         hintDE: "Normalgleichungen",
-        reveal: "The least-squares solution balances the normal equations built from all observations",
-        revealDE: "Die Kleinste-Quadrate-Lösung erfüllt die Normalgleichungen aus allen Beobachtungen",
+        reveal: "For Y = Xβ + ε, the least-squares estimate β̂ satisfies XᵀXβ̂ = XᵀY",
+        revealDE: "Für Y = Xβ + ε erfüllt der Kleinste-Quadrate-Schätzer β̂ die Normalgleichungen XᵀXβ̂ = XᵀY",
         timer: 1800,
         bonusHint: "Finish without using items",
         bonusHintDE: "Beende das Level ohne Items zu nutzen",
@@ -2848,8 +2845,8 @@ export const W12 = [
     {   //5x40
         hint: "Coefficient of Determination",
         hintDE: "Bestimmtheitsmaß",
-        reveal: "R squared is the explained share of the total variation, the model sum over the total sum",
-        revealDE: "Das R-Quadrat ist der erklärte Anteil der Gesamtstreuung, Modellsumme über Gesamtsumme",
+        reveal: "R² = SSR/SST is the proportion of the total sum of squares explained by the regression model",
+        revealDE: "R² = SSR/SST ist der Anteil der Gesamtquadratsumme, der durch das Regressionsmodell erklärt wird",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -2861,27 +2858,27 @@ export const W12 = [
     )
     },
 
-    {   //5x50
+    {   //5x45
         hint: "Fitted Values",
         hintDE: "Angepasste Werte",
-        reveal: "A worked example: the fitted line through x from 1 to 7 with intercept 1.19 and slope 0.43",
-        revealDE: "Ein Zahlenbeispiel: die angepasste Gerade über x von 1 bis 7 mit Achsenabschnitt 1,19 und Steigung 0,43",
+        reveal: "PRED = A + BX gives fitted values; here ŷ = 1.19 + 0.43x",
+        revealDE: "PRED = A + BX ergibt angepasste Werte; hier ist ŷ = 1,19 + 0,43x",
         timer: 1800,
         bonusHint: "Finish in less than 10 minutes",
         bonusHintDE: "In weniger als 10 Minuten abschließen",
         bonusType: "fast",
         bonusParam: 600,
         grid: G(
-        [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0], [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
-        [0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0]
+        [0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1], [0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0], [0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0],
+        [0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1]
     )
     },
 
     {   //10x10
         hint: "Scatter Plot",
         hintDE: "Streudiagramm",
-        reveal: "Plotted pairs form a point cloud that scatters around the hidden line",
-        revealDE: "Geplottete Paare bilden eine Punktwolke, die um die verborgene Gerade streut",
+        reveal: "A scatter plot displays each observed pair (xᵢ,yᵢ) as a point in the x–y plane",
+        revealDE: "Ein Streudiagramm stellt jede beobachtete Beobachtung (xᵢ,yᵢ) als Punkt in der x-y-Ebene dar",
         timer: 1800,
         bonusHint: "Finish without mistakes",
         bonusHintDE: "Beende das Level ohne Fehler zu machen",
@@ -2896,8 +2893,8 @@ export const W12 = [
     {   //10x10
         hint: "Least-Squares Line",
         hintDE: "Ausgleichsgerade",
-        reveal: "The least-squares line through the cloud minimises the squared vertical distances",
-        revealDE: "Die Kleinste-Quadrate-Gerade durch die Wolke minimiert die quadrierten vertikalen Abstände",
+        reveal: "The least-squares regression line minimises SSE = Σᵢ(yᵢ−ŷᵢ)², the sum of squared vertical residuals",
+        revealDE: "Die Kleinste-Quadrate-Regressionsgerade minimiert SSE = Σᵢ(yᵢ−ŷᵢ)², die Summe der quadrierten vertikalen Residuen",
         timer: 1800,
         bonusHint: "Finish with at most 5 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 5 Fehlern",
@@ -2909,27 +2906,27 @@ export const W12 = [
     )
     },
 
-    {   //10x15
+    {   //5x15
         hint: "Squared Residual",
-        hintDE: "Quadrierter Rest",
-        reveal: "Each squared residual measures one vertical gap; least squares minimises their sum",
-        revealDE: "Jeder quadrierte Rest misst einen vertikalen Abstand; die kleinsten Quadrate minimieren ihre Summe",
+        hintDE: "Quadriertes Residuum",
+        reveal: "For each observation, eᵢ = yᵢ−ŷᵢ is the vertical residual; least squares minimises Σᵢeᵢ²",
+        revealDE: "Für jede Beobachtung ist eᵢ = yᵢ−ŷᵢ das vertikale Residuum; die Kleinsten Quadrate minimieren Σᵢeᵢ²",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
         bonusType: "quiz",
         bonusParam: 0,
         grid: G(
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0], [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1], [1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0], [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1]
     )
     },
 
     {   //15x15
         hint: "Residual Plot",
         hintDE: "Residuenplot",
-        reveal: "Plotting each residual against its index reveals hidden structure in the fit",
-        revealDE: "Das Plotten jedes Residuums gegen seinen Index enthüllt verborgene Strukturen der Anpassung",
+        reveal: "A residual plot shows eᵢ = yᵢ−ŷᵢ against the observation index i and helps reveal model misspecification or outliers",
+        revealDE: "Ein Residuenplot zeigt eᵢ = yᵢ−ŷᵢ über dem Beobachtungsindex i und hilft, Fehlmodellierung oder Ausreißer zu erkennen",
         timer: 1800,
         bonusHint: "Finish with at most 3 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
@@ -2943,10 +2940,10 @@ export const W12 = [
     },
 
     {   //20x20
-        hint: "Plot Your Data",
-        hintDE: "Plotte deine Daten",
-        reveal: "Four different datasets share one regression line, so always plot your data first",
-        revealDE: "Vier verschiedene Datensätze teilen eine Ausgleichsgerade, also plotte deine Daten zuerst",
+        hint: "Similar Regression, Different Data",
+        hintDE: "Ähnliche Regression, unterschiedliche Daten",
+        reveal: "Different datasets can have nearly the same regression line, so inspect the data before interpreting the fit",
+        revealDE: "Verschiedene Datensätze können nahezu dieselbe Regressionsgerade haben; deshalb sollten die Daten vor der Interpretation der Anpassung geprüft werden",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -2973,10 +2970,10 @@ export const W12 = [
 export const W13 = [
 
     {   //5x5
-        hint: "Wilcoxon Statistic",
-        hintDE: "Wilcoxon-Statistik",
-        reveal: "W is the Wilcoxon rank sum of the second sample",
-        revealDE: "W ist die Wilcoxon-Rangsumme der zweiten Stichprobe",
+        hint: "Wilcoxon Rank-Sum Statistic",
+        hintDE: "Wilcoxon-Rangsummenstatistik",
+        reveal: "W is the sum of the ranks assigned to the second sample in the Wilcoxon rank-sum test",
+        revealDE: "W ist die Summe der Ränge der zweiten Stichprobe im Wilcoxon-Rangsummentest",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -2991,40 +2988,40 @@ export const W13 = [
     {   //5x5
         hint: "Location Shift",
         hintDE: "Lageverschiebung",
-        reveal: "Delta is the shift between two samples: shifted second-sample values match the first sample",
-        revealDE: "Delta ist die Verschiebung zwischen zwei Stichproben: verschobene Werte der zweiten Stichprobe gleichen der ersten",
+        reveal: "Δ is the location shift: subtracting it from the second sample aligns its distribution with the first",
+        revealDE: "Δ ist die Lageverschiebung: Durch Subtraktion von Δ wird die Verteilung der zweiten Stichprobe an die der ersten angeglichen",
         timer: 1800,
         bonusHint: "Finish in less than 20 seconds",
         bonusHintDE: "In weniger als 20 Sekunden abschließen",
         bonusType: "fast",
         bonusParam: 20,
         grid: G(
-        [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [1, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1], [1, 0, 0, 0, 1]
-    )
+            [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [0, 1, 0, 1, 0],
+            [1, 0, 0, 0, 1], [1, 1, 1, 1, 1]
+        )
     },
 
-    {   //5x20
-        hint: "Shift Hypotheses",
-        hintDE: "Shift-Hypothesen",
-        reveal: "The null says both samples share one distribution, so the shift equals zero",
-        revealDE: "Die Nullhypothese besagt, dass beide Stichproben eine Verteilung teilen, der Shift also null ist",
+    {   //5x30
+        hint: "Location-Shift Hypotheses",
+        hintDE: "Hypothesen zur Lageverschiebung",
+        reveal: "The null hypothesis is H₀: Δ = 0, meaning the two samples have the same distribution under the location-shift model",
+        revealDE: "Die Nullhypothese lautet H₀: Δ = 0; im Modell der Lageverschiebung bedeutet dies, dass beide Stichproben dieselbe Verteilung haben",
         timer: 1800,
         bonusHint: "Finish without mistakes",
         bonusHintDE: "Beende das Level ohne Fehler zu machen",
         bonusType: "nomiss",
         bonusParam: 0,
         grid: G(
-        [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0]
+        [1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0], [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1], [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1], [1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0]
     )
     },
 
     {   //5x20
-        hint: "Ranking",
+        hint: "Rank Assignment",
         hintDE: "Rangvergabe",
-        reveal: "Order all observations, number them from 1 to n, then sum the ranks per sample",
-        revealDE: "Ordne alle Beobachtungen, nummeriere sie von 1 bis n und summiere dann die Ränge pro Stichprobe",
+        reveal: "Assign ranks 1,…,n to the pooled observations, using average ranks for ties, and then sum the ranks within each sample",
+        revealDE: "Ordne den zusammengeführten Beobachtungen die Ränge 1,…,n zu, verwende bei Gleichständen Durchschnittsränge und bilde anschließend für jede Stichprobe die Rangsumme",
         timer: 1800,
         bonusHint: "Finish without using items",
         bonusHintDE: "Beende das Level ohne Items zu nutzen",
@@ -3039,8 +3036,8 @@ export const W13 = [
     {   //5x25
         hint: "Equal Distributions",
         hintDE: "Gleiche Verteilungen",
-        reveal: "Under the null both samples come from the same distribution function",
-        revealDE: "Unter der Nullhypothese stammen beide Stichproben aus derselben Verteilungsfunktion",
+        reveal: "The null hypothesis is H₀: F₁ = F₂, so both samples are drawn from the same population distribution",
+        revealDE: "Die Nullhypothese lautet H₀: F₁ = F₂; beide Stichproben stammen somit aus derselben Grundgesamtheitsverteilung",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -3055,8 +3052,8 @@ export const W13 = [
     {   //5x30
         hint: "Pooled Sample Size",
         hintDE: "Gesamtstichprobenumfang",
-        reveal: "The total size sums both groups; the ranks from 1 to n sum to n times n plus 1 over 2",
-        revealDE: "Der Gesamtumfang summiert beide Gruppen; die Ränge von 1 bis n summieren sich zu n mal n plus 1 durch 2",
+        reveal: "The pooled sample size is n = n₁ + n₂",
+        revealDE: "Der Gesamtstichprobenumfang ist n = n₁ + n₂",
         timer: 1800,
         bonusHint: "Finish with at most 3 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
@@ -3069,10 +3066,10 @@ export const W13 = [
     },
 
     {   //5x35
-        hint: "Standardised Statistic",
+        hint: "Standardized Statistic",
         hintDE: "Standardisierte Statistik",
-        reveal: "Standardising W by its null mean and variance gives an approximately standard normal test",
-        revealDE: "Die Standardisierung von W mit Nullerwartung und Nullvarianz ergibt einen annähernd standardnormalen Test",
+        reveal: "Z = (W−E)/S is the standardized statistic; under H₀, E=E₀(W) and S=√Var₀(W)",
+        revealDE: "Z = (W−E)/S ist die standardisierte Statistik; unter H₀ gilt E=E₀(W) und S=√Var₀(W)",
         timer: 1800,
         bonusHint: "Finish in less than 5 minutes",
         bonusHintDE: "In weniger als 5 Minuten abschließen",
@@ -3085,10 +3082,10 @@ export const W13 = [
     },
 
     {   //5x50
-        hint: "Null Moments",
-        hintDE: "Nullmomente",
-        reveal: "Under the null the rank sum has a known mean and variance depending only on the sample sizes",
-        revealDE: "Unter der Nullhypothese hat die Rangsumme einen bekannten Erwartungswert und eine bekannte Varianz aus den Umfängen",
+        hint: "Null Mean",
+        hintDE: "Erwartungswert unter H₀",
+        reveal: "The compact null-mean identity is E=n₂(n+1)/2; without ties, E=E₀(W)",
+        revealDE: "Die kompakte Identität für den Null-Erwartungswert lautet E=n₂(n+1)/2; ohne Gleichstände gilt E=E₀(W)",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -3103,8 +3100,8 @@ export const W13 = [
     {   //5x30
         hint: "Independence Model",
         hintDE: "Unabhängigkeitsmodell",
-        reveal: "Under independence each cell probability factorises and expected counts follow from the margins",
-        revealDE: "Unter Unabhängigkeit faktorisiert jede Zellwahrscheinlichkeit und die erwarteten Anzahlen folgen aus den Rändern",
+        reveal: "Under independence, joint probability factorizes as Pᵢⱼ=Pᵢ·Pⱼ; the margins then determine expected counts",
+        revealDE: "Unter Unabhängigkeit zerfällt die gemeinsame Wahrscheinlichkeit in Pᵢⱼ=Pᵢ·Pⱼ; die Ränder bestimmen dann die erwarteten Häufigkeiten",
         timer: 1800,
         bonusHint: "Finish without using items",
         bonusHintDE: "Beende das Level ohne Items zu nutzen",
@@ -3119,24 +3116,24 @@ export const W13 = [
     {   //5x40
         hint: "Chi-Square Statistic",
         hintDE: "Chi-Quadrat-Statistik",
-        reveal: "Q sums squared gaps between observed and expected counts, scaled by the expectation",
-        revealDE: "Q summiert quadrierte Abstände zwischen beobachteten und erwarteten Anzahlen, skaliert mit der Erwartung",
+        reveal: "Q = Σ D²/E, where D=N−E is each observed-minus-expected cell difference",
+        revealDE: "Q = Σ D²/E, wobei D=N−E die Differenz jeder beobachteten und erwarteten Zelle ist",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
         bonusType: "quiz",
         bonusParam: 0,
         grid: G(
-        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0], [1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0],
-        [1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0]
+        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1], [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0], [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0],
+        [1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1]
     )
     },
 
     {   //5x50
         hint: "Degrees of Freedom",
         hintDE: "Freiheitsgrade",
-        reveal: "Under the null Q follows a chi-square law with rows minus 1 times columns minus 1 degrees of freedom",
-        revealDE: "Unter der Nullhypothese folgt Q einer Chi-Quadrat-Verteilung mit Zeilen minus 1 mal Spalten minus 1 Freiheitsgraden",
+        reveal: "For sufficiently large expected counts, Q is asymptotically χ²-distributed with (r−1)(s−1) degrees of freedom under H₀",
+        revealDE: "Bei ausreichend großen erwarteten Häufigkeiten ist Q unter H₀ asymptotisch χ²-verteilt mit (r−1)(s−1) Freiheitsgraden",
         timer: 1800,
         bonusHint: "Finish in less than 10 minutes",
         bonusHintDE: "In weniger als 10 Minuten abschließen",
@@ -3151,8 +3148,8 @@ export const W13 = [
     {   //10x10
         hint: "Fourfold Table",
         hintDE: "Vierfeldertafel",
-        reveal: "For two-by-two tables Q simplifies to a closed form in the four cell counts",
-        revealDE: "Für Zwei-mal-zwei-Tafeln vereinfacht sich Q zu einer geschlossenen Formel in den vier Zellzahlen",
+        reveal: "For a 2×2 table with counts a,b,c,d and N=a+b+c+d, Q=N(ad−bc)²/[(a+b)(c+d)(a+c)(b+d)]",
+        revealDE: "Für eine 2×2-Tafel mit den Häufigkeiten a,b,c,d und N=a+b+c+d gilt Q=N(ad−bc)²/[(a+b)(c+d)(a+c)(b+d)]",
         timer: 1800,
         bonusHint: "Finish without mistakes",
         bonusHintDE: "Beende das Level ohne Fehler zu machen",
@@ -3165,10 +3162,10 @@ export const W13 = [
     },
 
     {   //10x15
-        hint: "Counts and Margins",
-        hintDE: "Häufigkeiten und Ränder",
-        reveal: "Cell counts meet row and column totals; together they fix the expected counts under independence",
-        revealDE: "Zellzahlen treffen Zeilen- und Spaltensummen; gemeinsam legen sie die erwarteten Anzahlen unter Unabhängigkeit fest",
+        hint: "Row and Column Totals",
+        hintDE: "Zeilen- und Spaltensummen",
+        reveal: "The row and column totals determine the expected counts under independence: Êᵢⱼ = (Nᵢ⋅·N⋅ⱼ)/N",
+        revealDE: "Die Zeilen- und Spaltensummen bestimmen die erwarteten Häufigkeiten unter Unabhängigkeit: Êᵢⱼ = (Nᵢ⋅·N⋅ⱼ)/N",
         timer: 1800,
         bonusHint: "Finish with at most 5 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 5 Fehlern",
@@ -3183,25 +3180,25 @@ export const W13 = [
     {   //15x15
         hint: "Rejection Region",
         hintDE: "Ablehnbereich",
-        reveal: "Reject independence when Q exceeds the chi-square quantile, for example 3.84 at level 5 percent",
-        revealDE: "Verwirf die Unabhängigkeit, wenn Q das Chi-Quadrat-Quantil übersteigt, zum Beispiel 3,84 beim Niveau 5 Prozent",
+        reveal: "At significance level α=0.05 with one degree of freedom, reject H₀ when Q>3.842",
+        revealDE: "Auf dem Signifikanzniveau α=0,05 mit einem Freiheitsgrad wird H₀ verworfen, wenn Q>3,842",
         timer: 1800,
         bonusHint: "Finish with at most 3 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
         bonusType: "lowmiss",
         bonusParam: 3,
         grid: G(
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0], [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0], [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0], [0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     )
     },
 
     {   //20x20
         hint: "Contingency Table",
         hintDE: "Kontingenztafel",
-        reveal: "A full rows-by-columns table compares every observed count with its expected count via Q",
-        revealDE: "Eine vollständige Zeilen-mal-Spalten-Tafel vergleicht jede beobachtete Anzahl via Q mit ihrer Erwartung",
+        reveal: "An r×s contingency table compares each observed count Nᵢⱼ with its expected count Êᵢⱼ; Q sums the squared differences divided by the expected counts",
+        revealDE: "Eine r×s-Kontingenztafel vergleicht jede beobachtete Häufigkeit Nᵢⱼ mit ihrer Erwartung Êᵢⱼ; Q summiert die quadrierten Differenzen geteilt durch die erwarteten Häufigkeiten",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -3231,8 +3228,8 @@ export const W14 = [
     {   //5x5
         hint: "Population",
         hintDE: "Grundgesamtheit",
-        reveal: "G is the population: the set of all statistical units under study",
-        revealDE: "G ist die Grundgesamtheit: die Menge aller untersuchten statistischen Einheiten",
+        reveal: "G denotes the population: the complete set of statistical units of interest",
+        revealDE: "G bezeichnet die Grundgesamtheit: die vollständige Menge aller betrachteten statistischen Einheiten",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -3247,8 +3244,8 @@ export const W14 = [
     {   //5x5
         hint: "Variable",
         hintDE: "Merkmal",
-        reveal: "A variable assigns every unit its observed value",
-        revealDE: "Ein Merkmal ordnet jeder Einheit ihren beobachteten Wert zu",
+        reveal: "A variable X assigns each unit g∈G a value X(g)∈M",
+        revealDE: "Ein Merkmal X ordnet jeder Einheit g∈G einen Wert X(g)∈M zu",
         timer: 1800,
         bonusHint: "Finish in less than 20 seconds",
         bonusHintDE: "In weniger als 20 Sekunden abschließen",
@@ -3260,43 +3257,43 @@ export const W14 = [
     )
     },
 
-    {   //5x20
-        hint: "Observation Rule",
-        hintDE: "Beobachtungsvorschrift",
-        reveal: "X maps every unit g to its value X of g inside the value set M",
-        revealDE: "X bildet jede Einheit g auf ihren Wert X von g in der Wertemenge M ab",
+    {   //5x25
+        hint: "Variable Mapping",
+        hintDE: "Abbildung des Merkmals",
+        reveal: "The variable defines a map X:G→M that assigns each unit g∈G a value X(g)∈M",
+        revealDE: "Das Merkmal definiert eine Abbildung X:G→M, die jeder Einheit g∈G einen Wert X(g)∈M zuordnet",
         timer: 1800,
         bonusHint: "Finish without mistakes",
         bonusHintDE: "Beende das Level ohne Fehler zu machen",
         bonusType: "nomiss",
         bonusParam: 0,
         grid: G(
-        [1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0], [1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0], [0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0],
-        [1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0], [1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0]
+        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1], [0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+        [0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1], [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1]
     )
     },
 
-    {   //5x20
+    {   //5x15
         hint: "Scales of Measurement",
         hintDE: "Skalenniveaus",
-        reveal: "Nominal values differ only; ordinal values can be ordered; metric values can be measured",
-        revealDE: "Nominale Werte sind nur unterscheidbar; ordinale Werte sind vergleichbar; metrische Werte sind messbar",
+        reveal: "Nominal values can only be distinguished, ordinal values can also be ordered, and metric values additionally support meaningful differences",
+        revealDE: "Nominale Werte lassen sich nur unterscheiden, ordinale Werte lassen sich zusätzlich ordnen und metrische Werte erlauben zusätzlich sinnvolle Differenzen",
         timer: 1800,
         bonusHint: "Finish without using items",
         bonusHintDE: "Beende das Level ohne Items zu nutzen",
         bonusType: "noitem",
         bonusParam: 0,
         grid: G(
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0],
-        [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], [0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0]
+        [1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1], [1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1], [1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1],
+        [1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1], [1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1]
     )
     },
 
     {   //5x25
         hint: "Absolute Frequencies",
         hintDE: "Absolute Häufigkeiten",
-        reveal: "Absolute frequencies count each value; together they sum to the sample size n",
-        revealDE: "Absolute Häufigkeiten zählen jeden Wert; gemeinsam summieren sie sich zum Stichprobenumfang n",
+        reveal: "The absolute frequency hⱼ counts the observations with value xⱼ, and Σⱼhⱼ=n",
+        revealDE: "Die absolute Häufigkeit hⱼ zählt die Beobachtungen mit dem Wert xⱼ; dabei gilt Σⱼhⱼ=n",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -3311,8 +3308,8 @@ export const W14 = [
     {   //5x30
         hint: "Relative Frequencies",
         hintDE: "Relative Häufigkeiten",
-        reveal: "Relative frequency divides the absolute count by n: the share of each value",
-        revealDE: "Die relative Häufigkeit teilt die absolute Anzahl durch n: der Anteil jedes Wertes",
+        reveal: "The relative frequency fⱼ=hⱼ/n is the proportion of observations equal to xⱼ",
+        revealDE: "Die relative Häufigkeit fⱼ=hⱼ/n ist der Anteil der Beobachtungen mit dem Wert xⱼ",
         timer: 1800,
         bonusHint: "Finish with at most 3 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
@@ -3327,8 +3324,8 @@ export const W14 = [
     {   //5x35
         hint: "Frequency Sum",
         hintDE: "Häufigkeitssumme",
-        reveal: "Relative frequencies always sum to one across all observed values",
-        revealDE: "Relative Häufigkeiten summieren sich über alle beobachteten Werte stets zu eins",
+        reveal: "The relative frequencies satisfy Σⱼfⱼ=1",
+        revealDE: "Für die relativen Häufigkeiten gilt Σⱼfⱼ=1",
         timer: 1800,
         bonusHint: "Finish in less than 5 minutes",
         bonusHintDE: "In weniger als 5 Minuten abschließen",
@@ -3343,8 +3340,8 @@ export const W14 = [
     {   //5x35
         hint: "Histogram Height",
         hintDE: "Histogrammhöhe",
-        reveal: "Histogram bars scale frequency by class width, so each bar area matches its share",
-        revealDE: "Histogrammbalken skalieren die Häufigkeit mit der Klassenbreite, sodass jede Fläche dem Anteil entspricht",
+        reveal: "For a relative-frequency histogram, the bar height is lⱼ=fⱼ/bⱼ, so bⱼlⱼ=fⱼ",
+        revealDE: "Bei einem Histogramm relativer Häufigkeiten ist die Balkenhöhe lⱼ=fⱼ/bⱼ, sodass bⱼlⱼ=fⱼ",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -3359,8 +3356,8 @@ export const W14 = [
     {   //5x40
         hint: "Order Statistics",
         hintDE: "Ordnungsstatistiken",
-        reveal: "Sorted values run from smallest to largest and span the observed range",
-        revealDE: "Sortierte Werte laufen vom kleinsten bis zum größten und spannen den Messbereich auf",
+        reveal: "Order statistics list the observations in order, x₍₁₎≤⋯≤x₍ₙ₎",
+        revealDE: "Ordnungsstatistiken ordnen die Beobachtungen, x₍₁₎≤⋯≤x₍ₙ₎",
         timer: 1800,
         bonusHint: "Finish without using items",
         bonusHintDE: "Beende das Level ohne Items zu nutzen",
@@ -3375,8 +3372,8 @@ export const W14 = [
     {   //5x40
         hint: "Sample Mean",
         hintDE: "Stichprobenmittel",
-        reveal: "The arithmetic mean divides the total of all values by their number",
-        revealDE: "Das arithmetische Mittel teilt die Summe aller Werte durch ihre Anzahl",
+        reveal: "The sample mean is x̄=(1/n)Σᵢ₌₁ⁿxᵢ",
+        revealDE: "Das Stichprobenmittel ist x̄=(1/n)Σᵢ₌₁ⁿxᵢ",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",
@@ -3391,8 +3388,8 @@ export const W14 = [
     {   //5x50
         hint: "Sample Variance",
         hintDE: "Stichprobenvarianz",
-        reveal: "The variance averages the squared gaps between each value and the mean",
-        revealDE: "Die Varianz mittelt die quadrierten Abstände jedes Wertes zum Mittelwert",
+        reveal: "For i.i.d. observations, the empirical variance divides the squared-deviation sum by n; the usual unbiased estimator of σ² divides it by n−1",
+        revealDE: "Bei i.i.d. Beobachtungen teilt die empirische Varianz die Summe der quadrierten Abweichungen durch n; der übliche erwartungstreue Schätzer von σ² teilt sie durch n−1",
         timer: 1800,
         bonusHint: "Finish in less than 10 minutes",
         bonusHintDE: "In weniger als 10 Minuten abschließen",
@@ -3407,8 +3404,8 @@ export const W14 = [
     {   //10x10
         hint: "Entropy",
         hintDE: "Entropie",
-        reveal: "Shannon entropy weighs every share by its own surprise; it peaks for the uniform distribution",
-        revealDE: "Die Shannon-Entropie gewichtet jeden Anteil mit seiner Überraschung; sie ist maximal bei Gleichverteilung",
+        reveal: "Shannon entropy is H=−Σⱼfⱼ log fⱼ and is maximized by the uniform distribution on j=1,…,k",
+        revealDE: "Die Shannon-Entropie ist H=−Σⱼfⱼ log fⱼ und wird bei Gleichverteilung auf j=1,…,k maximiert",
         timer: 1800,
         bonusHint: "Finish without mistakes",
         bonusHintDE: "Beende das Level ohne Fehler zu machen",
@@ -3423,8 +3420,8 @@ export const W14 = [
     {   //10x15
         hint: "Solar Histogram",
         hintDE: "Solar-Histogramm",
-        reveal: "A histogram of thirty solar outputs shows where the measurements pile up",
-        revealDE: "Ein Histogramm aus dreißig Solarleistungen zeigt, wo sich die Messungen häufen",
+        reveal: "This histogram has bar frequencies 5, 2, 6, 10, and 5 for 28 solar-output measurements",
+        revealDE: "Dieses Histogramm hat die Balkenhäufigkeiten 5, 2, 6, 10 und 5 für insgesamt 28 Solarleistungsmessungen",
         timer: 1800,
         bonusHint: "Finish with at most 5 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 5 Fehlern",
@@ -3439,8 +3436,8 @@ export const W14 = [
     {   //15x15
         hint: "Ozone Boxplot",
         hintDE: "Ozon-Boxplot",
-        reveal: "The boxplot compresses ozone data into minimum, quartiles, median and maximum",
-        revealDE: "Der Boxplot verdichtet Ozondaten zu Minimum, Quartilen, Median und Maximum",
+        reveal: "This boxplot summarizes the ozone data with its five-number summary: minimum, Q₁, median, Q₃, and maximum",
+        revealDE: "Dieser Boxplot fasst die Ozondaten durch ihre Fünfzahlenzusammenfassung zusammen: Minimum, Q₁, Median, Q₃ und Maximum",
         timer: 1800,
         bonusHint: "Finish with at most 3 mistakes",
         bonusHintDE: "Beende das Level mit höchstens 3 Fehlern",
@@ -3455,8 +3452,8 @@ export const W14 = [
     {   //20x20
         hint: "Nexus Point",
         hintDE: "Nexus-Punkt",
-        reveal: "Five numbers seal the Nexus: minimum, quartiles, median and maximum. Restore the summary to open the Nexus of Worlds",
-        revealDE: "Fünf Zahlen versiegeln den Nexus: Minimum, Quartile, Median und Maximum. Stelle die Zusammenfassung wieder her, um den Nexus der Welten zu öffnen",
+        reveal: "The Nexus Point is the central junction where the worlds meet. Restore the sealed nexus to open the Nexus of Worlds",
+        revealDE: "Der Nexus-Punkt ist die zentrale Verbindung, an der die Welten zusammentreffen. Stelle den versiegelten Nexus wieder her, um den Nexus der Welten zu öffnen",
         timer: 1800,
         bonusHint: "Answer the bonus question correctly",
         bonusHintDE: "Beantworte die Bonusfrage richtig",

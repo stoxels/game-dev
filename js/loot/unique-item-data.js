@@ -11,7 +11,7 @@
 // see the rebalanced curves.
 
 import '../grid.js';
-import '../passive-tree/passive-tree-state-points.js';
+import '../probability-tree/probability-tree-state-points.js';
 import '../state.js';
 import '../translation/translations.js';
 import './equipment-base-items.js';

@@ -562,7 +562,6 @@ export function _egBuildGateTopbarHTML() {
     <button class="eg-back-btn back-btn" onclick="${_egGateBackFn}()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('mg_gate_badge')}</span>
     <span id="eg-gate-level-chip" class="eg-gate-level-chip"
-          onclick="if(typeof _egOpenAttributeWindow==='function')_egOpenAttributeWindow()"
           onmouseenter="if(typeof _egShowLevelBtnTooltip==='function')_egShowLevelBtnTooltip(event)"
           onmousemove="if(typeof moveGameTooltip==='function')moveGameTooltip(event)"
           onmouseleave="if(typeof hideGameTooltip==='function')hideGameTooltip()"></span>

@@ -1,4 +1,4 @@
-﻿import { showAchievements } from './achievements/achievements-ui.js';
+import { showAchievements } from './achievements/achievements-ui.js';
 import { showResetAchievementsModal } from './achievements/achievements.js';
 import { stopTimer } from './timer/timer.js';
 import { setLang, t } from './translation/translations.js';
@@ -7,25 +7,21 @@ import { clearHover } from './mouse-over.js';
 import { showHS } from './screens/screens-highscore.js';
 import { cancelSlotName, confirmSlotName, showSaveSlotSelect } from './screens/screens-save-slots.js';
 import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
-import { ptGoBack, showPassiveTree } from './passive-tree/passive-tree.js';
+import { ptGoBack, showPassiveTree, showPassiveTreeAsCharacter } from './probability-tree/probability-tree.js';
 import { showQuestLog } from './inference/inference-ui.js';
-import { _ptRefundAllPoints } from './passive-tree/passive-tree-state-points.js';
+import { _ptRefundAllPoints } from './probability-tree/probability-tree-state-points.js';
 import { STATE } from './state.js';
 import { cur } from './state.js';
 
 //------------------------------------------------------------------------
-//-------------------REPLAY GALLERY (GLOBAL HELPER)-----------------------
+//-------------------REPLAY GALLERY--------------------------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
-// Kept at file scope (not nested inside the DOMContentLoaded closure below)
-// because it's a public, non-underscore function that other files may call.
+// Kept at file scope so the replay renderer and top-level tooltip tracker
+// are ready before the DOMContentLoaded wiring below runs.
 
-/**
- * Populates #replay-content with a button per unlocked (already-seen)
- * storyline beat, plus a Tutorial entry if the tutorial has been completed.
- * Called from the "REPLAY" button binding inside the title-screen section.
- */
-export function _romanRegionNumber(beatId) {
+// Formats region beat IDs as Roman numerals for replay thumbnails.
+function _romanRegionNumber(beatId) {
     const m = /^region_(\d+)$/.exec(beatId || '');
     if (!m) return '';
     const n = parseInt(m[1], 10);
@@ -33,7 +29,8 @@ export function _romanRegionNumber(beatId) {
     return table[n] || String(n);
 }
 
-export function _buildReplayRow(entry, unlocked, titleText) {
+// Builds one replay track and wires its play button when unlocked.
+function _buildReplayRow(entry, unlocked, titleText) {
     const row = document.createElement('div');
     row.className = 'replay-track' + (unlocked ? '' : ' replay-track-locked');
 
@@ -96,7 +93,8 @@ export function _buildReplayRow(entry, unlocked, titleText) {
     return row;
 }
 
-export function renderReplayModal() {
+// Rebuilds the replay modal from unlocked gallery entries and tutorial progress.
+function renderReplayModal() {
     const container = document.getElementById('replay-content');
     container.innerHTML = '';
 
@@ -142,7 +140,7 @@ export function renderReplayModal() {
 // showGameTooltip/moveGameTooltip/hideGameTooltip live in tooltips-hud.js,
 // which loads after this file - they are referenced lazily inside the
 // handler (at interaction time), never at wiring time.
-export let _replayTipBtn = null;
+let _replayTipBtn = null;
 
 document.addEventListener('mousemove', (e) => {
     // Only active while the replay modal is open; also hides the tooltip
@@ -273,6 +271,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Main menu navigation buttons.
+    // Quick development-tree access from the title screen. These preview a
+    // character root without changing the active save or selected character.
+    document.querySelectorAll('[data-dev-tree-character]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            showPassiveTreeAsCharacter(btn.dataset.devTreeCharacter, 'screen-title');
+        });
+    });
+
     onClick('btn-play', () => {
         showSaveSlotSelect(() => {
             const proceed = () => globalThis.maybeShowCharacterSelect(() => globalThis.showTutorial());
@@ -358,46 +364,12 @@ document.addEventListener('DOMContentLoaded', () => {
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
-    // Lazy-loads the dev sandbox passive tree (passive-tree-dev-data.js +
-    // passive-tree-dev.js are NOT in index.html - together they are ~41k
-    // lines / ~1 MB and would otherwise be parsed on every page load). The
-    // first click on the sandbox button injects both scripts sequentially
-    // (data first - dev.js reads it at load time), then opens the tree.
-    // Subsequent clicks see showDevPassiveTree already defined and go
-    // straight to the screen.
-    function _loadDevPassiveTreeAndOpen() {
-        if (typeof globalThis.showDevPassiveTree === 'function') {
-            globalThis.showDevPassiveTree();
-            return;
-        }
-        const files = [
-            'js/passive-tree/passive-tree-dev-data.js',
-            'js/passive-tree/passive-tree-dev.js',
-        ];
-        let i = 0;
-        const loadNext = () => {
-            if (i >= files.length) {
-                if (typeof globalThis.showDevPassiveTree === 'function') globalThis.showDevPassiveTree();
-                else console.warn('[dev-tree] scripts loaded but showDevPassiveTree is still missing');
-                return;
-            }
-            const s = document.createElement('script');
-            s.src = files[i++];
-            s.onload = loadNext;
-            s.onerror = () => console.warn('[dev-tree] failed to load', s.src);
-            document.head.appendChild(s);
-        };
-        loadNext();
-    }
-
     onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-existing', () => launchExistingGame());
     onClick('btn-mode-endgame-test', () => launchEndgameTestMode());
 
-    // DEV SANDBOX: new passive tree layout playground (not connected to gameplay)
-    onClick('btn-mode-passive-tree-dev', () => _loadDevPassiveTreeAndOpen());
 
 
     //------------------------------------------------------------------------
@@ -773,14 +745,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     //------------------------------------------------------------------------
-    //-------------------PROBABILITY TREE SCREEN------------------------------
+    //-------------------ACTIVE PASSIVE TREE SCREEN---------------------------
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 
     onClick('btn-pt-back', () => ptGoBack());
-
-    // DEV SANDBOX passive tree - BACK returns to the select-mode screen.
-    onClick('btn-dpt-back', () => globalThis.dptGoBack());
 
     /**
      * Shows an "are you sure?" confirmation modal for the passive tree's

@@ -10,7 +10,7 @@
 // requirements-rebalanced at its eval time).
 
 import { renderCell, updClues } from '../grid.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { save } from '../state.js';
 import { LANG } from '../translation/translations.js';
 import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';

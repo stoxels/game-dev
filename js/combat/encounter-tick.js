@@ -3,7 +3,7 @@ import { t } from '../translation/translations.js';
 import { _egGetMonsterChargeMultiplier, _egGetPlayerChargeMultiplier, _egPlayerStatuses, _egPuzzleEffects, _egRefreshPlayerStatusIcons, _egTickAilments } from './combat-ailments.js';
 import { _egEndMapDefeated } from './encounter-chain.js';
 import { _egMaybeShowLowHealthWarning, _egMaybeShowMistakesWarning } from './encounter-overlays.js';
-import { EG_LIFE_REGEN_INTERVAL_MS, EG_MELEE_OVERCHARGE_RATIO, _egFireMonsterAttack, _egUpdateBars } from './encounter.js';
+import { EG_LIFE_REGEN_INTERVAL_MS, EG_MELEE_OVERCHARGE_RATIO, _egFireMonsterAttack, _egMeleeTierForCharge, _egOverchargeRateForTier, _egUpdateBars } from './encounter.js';
 import { _egPauseGridDrops, _egResumeGridDrops } from './combat-grid-pickups.js';
 import { _egHazardsTick } from './combat-hazards.js';
 import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
@@ -90,9 +90,10 @@ export function _egTickMonster(m) {
     }
 }
 
-// Current charge % (0..2) of the manual melee bar. 1 = fully charged and
-// ready for a full-damage strike; above 1 the strike OVERCHARGES (deals
-// proportionally more damage, see EG_MELEE_OVERCHARGE_* in endgame-encounter.js).
+// Current charge % (0..5) of the manual melee bar. 1 = fully charged and
+// ready for a full-damage strike; above 1 the strike OVERCHARGES through
+// the weapon-art tiers (2 = dash, 3 = sky leap, 4 = nova, 5 = grand nova -
+// see EG_MELEE_OVERCHARGE_* in encounter-melee-arts.js).
 // Returns 0 outside encounters with no max.
 export function _egGetPlayerChargePct() {
     if (typeof _egGetPlayerAttackInterval !== 'function') return 0;
@@ -120,18 +121,19 @@ export function _egIsPlayerChargePaused() {
 }
 
 // Advances the player's melee charge bar (Secret-of-Mana-style). The bar
-// fills ONLY while the attack key is HELD (see _egMeleeBeginHold in
-// endgame-weapon-swing.js) and the strike is released with the key -
-// tapping E gives a weak poke, holding charges toward 100% and STAYS full
-// until released. The full-charge time comes from the equipped weapon (see
+// refills ON ITS OWN toward 100% - tapping E spends whatever charge is
+// ready (weak poke right after a strike, full hit when the bar is full),
+// while HOLDING the attack key past full OVERCHARGES through the
+// weapon-art tiers (see combat-weapon-swing.js): the release strike spends
+// the whole bar. The full-charge time comes from the equipped weapon (see
 // _egGetPlayerAttackInterval).
-// OVERCHARGE: past 100% the bar keeps filling up to EG_MELEE_OVERCHARGE_RATIO
-// (200%) - a strike released above the cap deals proportionally more damage
-// (150% charge = 1.5x hit, 200% = 2x). Rewards patience over spam-tapping.
+// OVERCHARGE: past 100% the held bar keeps filling up to
+// EG_MELEE_OVERCHARGE_RATIO (500%) - a strike released in a tier band
+// deals proportionally more damage (200% = 2x hit, 500% = 5x) AND
+// unleashes that tier's weapon art (dash / sky leap / nova / grand nova).
 // NOTE: boss set-piece charge pauses were removed with the manual system -
-// the bar is a charge-up, not free DPS, so finales no longer freeze it and
-// the sprite never lunges on its own. Only the parry hold and ailments
-// (frozen/chill) still gate charging.
+// the bar is a charge-up, not free DPS, so finales no longer freeze it.
+// Only the parry hold and ailments (frozen/chill) still gate charging.
 export function _egTickPlayer() {
     // Hold-parry pause: while the parry key (R by default) is held during an
     // endgame encounter, freeze the player's own melee charge bar.
@@ -143,21 +145,34 @@ export function _egTickPlayer() {
     // half speed (see _egGetPlayerChargeMultiplier in endgame-ailments.js).
     const chargeMult = (typeof _egGetPlayerChargeMultiplier === 'function') ? _egGetPlayerChargeMultiplier() : 1;
     if (chargeMult <= 0) return;
-    // Hold-to-charge: no held attack key, no charge. This is what stops
-    // holding E from machine-gunning weak strikes - the key down starts the
-    // charge, the key UP fires it (see combat-weapon-swing.js).
-    if (!globalThis._egMeleeHoldActive) return;
     const max = (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : 0;
     if (!max || max <= 0) return;
-    // Charge past full into OVERCHARGE (up to EG_MELEE_OVERCHARGE_RATIO) and
-    // hold there until the release strike spends it.
     const overchargeCap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
-    globalThis._egPlayerCurrentCharge = Math.min(max * overchargeCap, globalThis._egPlayerCurrentCharge + 0.1 * chargeMult); // Ticks at 10Hz
-    // Charge-level feedback: crossing 100% / 150% / cap plays a rising tick
-    // so holding through multiple levels feels like charging up.
+    if (!globalThis._egMeleeHoldActive) {
+        // SoM auto-charge: no held key, no overcharge - refill toward 100%
+        // and wait there until the player taps (quick hit) or holds (arts).
+        if (globalThis._egPlayerCurrentCharge < max) {
+            globalThis._egPlayerCurrentCharge = Math.min(max, globalThis._egPlayerCurrentCharge + 0.1 * chargeMult); // Ticks at 10Hz
+        }
+    } else {
+        // Holding: charge (from wherever the bar stands) past full into
+        // OVERCHARGE, up to the cap, and hold there until released. Each
+        // crossed milestone slows the climb (see
+        // EG_MELEE_OVERCHARGE_RATE_PER_TIER) - the 500% grand nova takes
+        // patience, like a Secret-of-Mana weapon level.
+        let bandRate = 1;
+        try {
+            bandRate = _egOverchargeRateForTier(
+                _egMeleeTierForCharge(Math.min(globalThis._egPlayerCurrentCharge / max, overchargeCap)));
+        } catch (e) { bandRate = 1; }
+        globalThis._egPlayerCurrentCharge = Math.min(max * overchargeCap, globalThis._egPlayerCurrentCharge + 0.1 * chargeMult * bandRate); // Ticks at 10Hz
+    }
+    // Charge-level feedback: crossing 100% / 200% / 300% / 400% / 500%
+    // plays a rising tick so auto-ready and each overcharge tier feels
+    // like charging up.
     try {
         const pct = globalThis._egPlayerCurrentCharge / max;
-        const level = pct >= overchargeCap - 0.001 ? 3 : pct >= 1.5 ? 2 : pct >= 1 ? 1 : 0;
+        const level = pct >= overchargeCap - 0.001 ? 5 : pct >= 4 ? 4 : pct >= 3 ? 3 : pct >= 2 ? 2 : pct >= 1 ? 1 : 0;
         if (level > (globalThis._egMeleeChargeLevel || 0)) {
             globalThis._egMeleeChargeLevel = level;
             if (typeof Audio_Manager !== 'undefined' && Audio_Manager && typeof Audio_Manager.playSFX === 'function') {
@@ -280,6 +295,11 @@ export function _egUpdatePlayerChargeBar() {
     const overcharged = pct > 1.001;
     const paused = _egIsPlayerChargePaused();
     const ready = pct >= 1 && !paused;
+    // Overcharge milestone look: each weapon-art tier restyles the bar +
+    // readout a step further (see eg-charge-tier1..4 in monsters.css).
+    let tier = 0;
+    try { tier = (typeof _egMeleeTierForCharge === 'function') ? _egMeleeTierForCharge(pct) : 0; }
+    catch (e) { tier = 0; }
     ['eg-player-charge-bar', 'avatar-charge-fill'].forEach(id => {
         const bar = document.getElementById(id);
         if (!bar) return;
@@ -288,6 +308,7 @@ export function _egUpdatePlayerChargeBar() {
         bar.classList.toggle('eg-charge-paused', paused);
         bar.classList.toggle('eg-charge-ready', ready);
         bar.classList.toggle('eg-charge-overcharged', overcharged);
+        for (let i = 1; i <= 4; i++) bar.classList.toggle('eg-charge-tier' + i, tier === i);
     });
     // % readout next to the avatar's charge bar (pops at 100% - see CSS).
     const label = document.getElementById('avatar-charge-text');
@@ -295,6 +316,53 @@ export function _egUpdatePlayerChargeBar() {
         label.textContent = `${Math.floor(pct * 100)}%`;
         label.classList.toggle('eg-charge-ready', ready);
         label.classList.toggle('eg-charge-overcharged', overcharged);
+        for (let i = 1; i <= 4; i++) label.classList.toggle('eg-charge-tier' + i, tier === i);
+    }
+    // Rooted-while-charging indicator: synced here centrally (10Hz) so
+    // hold-begin, hold-cancel and strike-release can never desync it.
+    try { _egSyncMeleeRootedVisual(!!globalThis._egMeleeHoldActive); } catch (e) {}
+}
+
+// Delay before the rooted warning appears: quick taps must never flash
+// it - only a committed hold earns the ring + tag. Pure - unit-tested.
+export const EG_MELEE_ROOTED_INDICATOR_DELAY_MS = 2000;
+
+// Rooted indicator for a charged melee hold: the avatar wears a warning
+// ring + VULNERABLE tag while the attack key is held (no movement, no
+// evasion/block, amplified damage taken - see _egPlayerTakeDamage). The
+// indicator only appears once the hold is committed (held longer than
+// EG_MELEE_ROOTED_INDICATOR_DELAY_MS) - taps are too short to ever show
+// it. Best-effort; never throws.
+function _egSyncMeleeRootedVisual(rooted) {
+    if (typeof document === 'undefined') return;
+    let show = !!rooted;
+    if (show) {
+        // Taps must not flash the warning: compare against the hold-start
+        // stamp written by _egMeleeBeginHold (missing/zero stamp = show
+        // immediately - fail visible, never fail silent).
+        try {
+            const since = (typeof _egMeleeHoldStartAt !== 'undefined')
+                ? globalThis._egMeleeHoldStartAt : 0;
+            if (since) show = (Date.now() - since) >= EG_MELEE_ROOTED_INDICATOR_DELAY_MS;
+        } catch (e) {}
+    }
+    const avatar = document.getElementById('player-avatar-wrapper');
+    if (avatar) avatar.classList.toggle('eg-melee-rooted', show);
+    let lbl = document.getElementById('eg-melee-rooted-label');
+    if (show) {
+        if (avatar && !lbl) {
+            lbl = document.createElement('div');
+            lbl.id = 'eg-melee-rooted-label';
+            avatar.appendChild(lbl);
+        }
+        if (lbl) {
+            let txt = '';
+            try { txt = (typeof t === 'function') ? t('eg_melee_rooted') : ''; } catch (e) {}
+            lbl.textContent = (txt && txt !== 'eg_melee_rooted') ? txt : '⛓ VULNERABLE!';
+            lbl.style.display = '';
+        }
+    } else if (lbl) {
+        lbl.remove();
     }
 }
 

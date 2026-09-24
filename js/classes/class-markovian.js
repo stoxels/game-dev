@@ -1,4 +1,4 @@
-﻿import { trackAchStat } from '../achievements/achievements.js';
+import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { updTimer } from '../timer/timer.js';
@@ -7,31 +7,19 @@ import { t } from '../translation/translations.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
-import { questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../inference/inference-stats.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
+import { questStat_mistakesRemoved } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
+import { _clearTransitionMatrix } from './class-markovian-transition.js';
 
 //------------------------------------------------------------------------
 //--------------------ASCENDENCY SKILL IMPLEMENTATIONS-------------------
 //------------------------------MARKOVIAN CLASS--------------------------
 //------------------------------------------------------------------------
 //
-// This file implements the two active abilities for the Markovian class:
-//
-//   ACTIVE 1 - STATE ROLLBACK
-//     Records a snapshot of the puzzle state every second (circular buffer).
-//     When activated, rewinds the puzzle back to the snapshot taken
-//     windowSeconds ago, restoring: userGrid, wrongGrid, revealedGrid,
-//     mistakeCount, and timerSecs (with a rank-bonus time gift on top).
-//     Rank 3 bonus: also wipes mistake cells that already existed inside
-//     the rollback window (pre-existing mistakes are forgiven).
-//
-//   ACTIVE 2 - TRANSITION MATRIX
-//     Timed mode. Each correct fill has a cascadeChance of also revealing
-//     a random unfilled correct cardinal neighbour. Rank 3 allows the
-//     cascaded cell to itself cascade once more (maxDepth 2).
-//     Triggered from onCorrectFill() in class-abilities.js.
+// This file implements Markovian State Rollback: snapshot capture, rewind
+// execution, and rollback VFX. Transition Matrix lives in its sibling module.
 //
 //------------------------------------------------------------------------
 
@@ -41,10 +29,10 @@ import { cur } from '../state.js';
 //------------------------------------------------------------------------
 
 // How many seconds of snapshot history to keep in the circular buffer.
-export const MARKOV_SNAPSHOT_BUFFER = 35;
+const MARKOV_SNAPSHOT_BUFFER = 35;
 
 // Colour palette for the lightning bolts in the rollback VFX.
-export const ROLLBACK_BOLT_HUES = [
+const ROLLBACK_BOLT_HUES = [
     'rgba(140,80,255,',
     'rgba(80,140,255,',
     'rgba(80,220,200,',
@@ -52,48 +40,11 @@ export const ROLLBACK_BOLT_HUES = [
 ];
 
 // Particle colour palette for the rollback hourglass VFX.
-export const ROLLBACK_PARTICLE_COLORS = [
+const ROLLBACK_PARTICLE_COLORS = [
     'rgba(200,140,255,',
     'rgba(140,100,255,',
     'rgba(100,160,255,',
 ];
-
-// Glyphs shown in the Transition Matrix rain overlay.
-export const TM_GLYPH_CHARSET = '01アイウエオカキクケコ∑∫∂∇λμπ';
-
-// CSS injected once for the Transition Matrix HUD badge and cell flash animations.
-// Kept here so the style string is easy to find and edit without digging into JS logic.
-export const TM_BADGE_CSS = `
-    #transition-matrix-badge {
-        display: inline-flex; align-items: center; gap: 3px;
-        background: rgba(41,128,185,0.18); border: 1px solid #2980b9;
-        border-radius: 5px; padding: 2px 6px;
-        font-family: var(--PX, monospace); font-size: 10px; color: #7fb3d3;
-        animation: tm-pulse 1s ease-in-out infinite; white-space: nowrap;
-    }
-    .tm-icon  { font-size: 11px; line-height: 1; }
-    .tm-timer { font-variant-numeric: tabular-nums; letter-spacing: .03em; font-weight: bold; }
-    @keyframes tm-pulse {
-        0%, 100% { box-shadow: 0 0 4px 1px rgba(41,128,185,0.4); }
-        50%       { box-shadow: 0 0 10px 3px rgba(41,128,185,0.75); }
-    }
-    .rollback-flash {
-        animation: rollback-wave 0.5s ease-out forwards;
-    }
-    @keyframes rollback-wave {
-        0%   { filter: brightness(2.5) saturate(0.3) hue-rotate(180deg); }
-        60%  { filter: brightness(1.4) saturate(1.2) hue-rotate(30deg); }
-        100% { filter: brightness(1) saturate(1) hue-rotate(0deg); }
-    }
-    .transition-cascade-flash {
-        animation: cascade-pop 0.6s ease-out forwards;
-    }
-    @keyframes cascade-pop {
-        0%   { filter: brightness(2) saturate(0.5) hue-rotate(200deg); transform: scale(1.15); }
-        60%  { filter: brightness(1.3) saturate(1.5); transform: scale(1.05); }
-        100% { filter: brightness(1) saturate(1); transform: scale(1); }
-    }
-`;
 
 
 //------------------------------------------------------------------------
@@ -106,7 +57,7 @@ export const TM_BADGE_CSS = `
 //------------------------------------------------------------------------
 
 // Initialises (or resets) the snapshot buffer for a new level.
-export function _markovSnapshotInit() {
+function _markovSnapshotInit() {
     window._markovSnapshots = [];
 }
 
@@ -144,7 +95,7 @@ export function _markovSnapshotTick() {
 
 // Returns the snapshot whose timestamp is closest to (now - windowSeconds).
 // Returns null when the buffer is empty.
-export function _rollback_findBestSnapshot(windowSeconds) {
+function _rollback_findBestSnapshot(windowSeconds) {
     const snapshots = window._markovSnapshots || [];
     if (snapshots.length === 0) return null;
 
@@ -165,7 +116,7 @@ export function _rollback_findBestSnapshot(windowSeconds) {
 // Collects every cell that was already wrong inside the target snapshot.
 // Used by the Rank 3 "forgive old mistakes" bonus.
 // Returns an array of { r, c } objects.
-export function _rollback_collectPreExistingMistakes(snapshot) {
+function _rollback_collectPreExistingMistakes(snapshot) {
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
     const result = [];
@@ -179,7 +130,7 @@ export function _rollback_collectPreExistingMistakes(snapshot) {
 }
 
 // Writes a snapshot's grid data into the live game grids.
-export function _rollback_applySnapshot(snapshot) {
+function _rollback_applySnapshot(snapshot) {
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
 
@@ -196,7 +147,7 @@ export function _rollback_applySnapshot(snapshot) {
 // Clears the pre-existing mistake cells collected by
 // _rollback_collectPreExistingMistakes. Also credits the quest stat for
 // each cell removed.
-export function _rollback_clearPreExistingMistakes(preExistingWrong) {
+function _rollback_clearPreExistingMistakes(preExistingWrong) {
     if (preExistingWrong.length === 0) return;
 
     preExistingWrong.forEach(({ r, c }) => {
@@ -213,7 +164,7 @@ export function _rollback_clearPreExistingMistakes(preExistingWrong) {
 
 // Re-renders every cell and refreshes all row/column clue indicators
 // after a rollback has been applied.
-export function _rollback_refreshDisplay() {
+function _rollback_refreshDisplay() {
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
 
@@ -318,7 +269,7 @@ export function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMist
 
 // Cancels an in-progress rollback activation (e.g. player pressed Escape).
 // Pass silent=true to suppress the cancellation toast.
-export function _rollbackCancel(silent = false) {
+function _rollbackCancel(silent = false) {
     _setAbilityMode(false);
     STATE.classActiveChoice = 'active3';
 
@@ -340,7 +291,7 @@ export function _rollbackCancel(silent = false) {
 //------------------------------------------------------------------------
 
 // Creates and attaches the full-screen overlay canvas. Returns { cvs, ctx }.
-export function _rollbackVFX_createCanvas() {
+function _rollbackVFX_createCanvas() {
     const cvs = document.createElement('canvas');
     cvs.style.cssText = `
         position: fixed; inset: 0;
@@ -363,7 +314,7 @@ export function _rollbackVFX_createCanvas() {
 // Builds a new lightning bolt starting from a random screen position and
 // pushes it into the bolts array. Each bolt is a chain of random segments
 // drifting downward to mimic a time-crack effect.
-export function _rollbackVFX_spawnBolt(bolts, W, H) {
+function _rollbackVFX_spawnBolt(bolts, W, H) {
     const x1 = W() * 0.05 + Math.random() * W() * 0.9;
     const y1 = Math.random() * H();
     const segs = [];
@@ -382,7 +333,7 @@ export function _rollbackVFX_spawnBolt(bolts, W, H) {
 
 // Draws the dark screen tint and the animated grid-dot pulse layer.
 // OPTIMIZED: step 32px vs 18px (~68% fewer rects), skip near-invisible dots, thinner sweep.
-export function _rollbackVFX_drawBackground(ctx, w, h, elapsed, fade) {
+function _rollbackVFX_drawBackground(ctx, w, h, elapsed, fade) {
     ctx.fillStyle = `rgba(10,5,30,${0.82 * fade})`;
     ctx.fillRect(0, 0, w, h);
 
@@ -414,7 +365,7 @@ export function _rollbackVFX_drawBackground(ctx, w, h, elapsed, fade) {
 }
 
 // Advances and draws all live lightning bolts. Dead bolts are removed.
-export function _rollbackVFX_drawBolts(ctx, bolts, fade) {
+function _rollbackVFX_drawBolts(ctx, bolts, fade) {
     for (let i = bolts.length - 1; i >= 0; i--) {
         const b = bolts[i];
         b.life -= 1 / b.maxLife;
@@ -447,7 +398,7 @@ export function _rollbackVFX_drawBolts(ctx, bolts, fade) {
 
 // Draws the central rotating hourglass emoji with glow, plus drifting
 // sand/time particles orbiting it.
-export function _rollbackVFX_drawHourglass(ctx, w, h, t, fade, particles) {
+function _rollbackVFX_drawHourglass(ctx, w, h, t, fade, particles) {
     const cx = w / 2;
     const cy = h / 2;
 
@@ -507,7 +458,7 @@ export function _rollbackVFX_drawHourglass(ctx, w, h, t, fade, particles) {
 
 // Applies a rippling colour flash to each grid cell with a staggered delay,
 // creating a wave effect that rolls diagonally across the puzzle.
-export function _rollbackVFX_flashCells(rows, cols) {
+function _rollbackVFX_flashCells(rows, cols) {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
             const el = document.getElementById(`g-${r}-${c}`);
@@ -524,7 +475,7 @@ export function _rollbackVFX_flashCells(rows, cols) {
 // Orchestrates the full rollback VFX: spawns the canvas overlay, runs the
 // animation loop for DURATION ms, then removes the canvas.
 // OPTIMIZED: throttled to ~30fps to halve CPU, capped bolt spawn.
-export function _rollbackPlayVFX(rows, cols) {
+function _rollbackPlayVFX(rows, cols) {
     const DURATION = 2200;
 
     const { cvs, ctx, resize } = _rollbackVFX_createCanvas();
@@ -570,677 +521,6 @@ export function _rollbackPlayVFX(rows, cols) {
     animId = requestAnimationFrame(tick);
 
     _rollbackVFX_flashCells(rows, cols);
-}
-
-
-//------------------------------------------------------------------------
-//-------------------TRANSITION MATRIX EXECUTION-------------------------
-//------------------------------------------------------------------------
-
-// Starts a new Transition Matrix session. Cancels any session already running.
-//   durationMs    - how long the mode stays active.
-//   cascadeChance - probability (0–1) of each correct fill triggering a cascade.
-//   maxDepth      - maximum cascade chain length (1 = rank 1–2, 2 = rank 3).
-export function _executeTransitionMatrix(durationMs, cascadeChance, maxDepth) {
-    _clearTransitionMatrix();
-
-    window._transitionMatrixActive = {
-        cascadeChance,
-        maxDepth,
-        endTime: Date.now() + durationMs,
-        timeout: null,
-    };
-
-    const secs = Math.ceil(durationMs / 1000);
-
-    globalThis.showToast(t('cls_tm_active')
-        .replace('{s}', secs)
-        .replace('{p}', Math.round(cascadeChance * 100)));
-
-    Audio_Manager.playSFX('transitionMatrix');
-    trackAchStat('skillTransitionMatrixUsed');
-
-    _transitionMatrixStartOverlay(durationMs);
-    _transitionMatrixSpawnBadge(secs);
-
-    // Tick the badge countdown every second.
-    let remaining = secs;
-    window._transitionMatrixTickInterval = setInterval(() => {
-        remaining--;
-        _transitionMatrixUpdateBadge(remaining);
-        if (remaining <= 0) {
-            clearInterval(window._transitionMatrixTickInterval);
-            window._transitionMatrixTickInterval = null;
-        }
-    }, 1000);
-
-    // Schedule natural expiry.
-    window._transitionMatrixActive.timeout = setTimeout(() => {
-        _clearTransitionMatrix(true);
-    }, durationMs);
-}
-
-// Cleans up a Transition Matrix session.
-// Pass natural=true when the session ends by time-out (shows the expiry toast
-// and rebuilds the class HUD). Pass natural=false (default) when clearing
-// as part of starting a new session or resetting the level.
-export function _clearTransitionMatrix(natural = false) {
-    if (window._transitionMatrixActive?.timeout) {
-        clearTimeout(window._transitionMatrixActive.timeout);
-    }
-    if (window._transitionMatrixTickInterval) {
-        clearInterval(window._transitionMatrixTickInterval);
-        window._transitionMatrixTickInterval = null;
-    }
-    window._transitionMatrixActive = null;
-    _transitionMatrixRemoveBadge();
-
-    // Fade out and remove the canvas overlay if it is still running.
-    const cvs = document.getElementById('tm-canvas-overlay');
-    if (cvs) {
-        if (cvs._animId) globalThis.cancelAnimationFrame(cvs._animId);
-        cvs.style.transition = 'opacity 0.4s ease-out';
-        cvs.style.opacity = '0';
-        setTimeout(() => {
-            if (cvs._resizeHandler) window.removeEventListener('resize', cvs._resizeHandler);
-            cvs.remove();
-        }, 450);
-    }
-
-    if (natural) {
-        globalThis.showToast(t('cls_tm_ended'));
-        buildClassHUD();
-    }
-}
-
-
-//------------------------------------------------------------------------
-//-------------------TRANSITION MATRIX OVERLAY VFX-----------------------
-//------------------------------------------------------------------------
-// Long-running canvas overlay rendered while Transition Matrix is active.
-// The overlay shows: a Matrix-style glyph rain, network nodes mirroring
-// the puzzle grid, animated connection chains, and cascade particles.
-//
-// Each helper builds or draws one visual layer and is placed above the
-// _transitionMatrixStartOverlay orchestrator below.
-//------------------------------------------------------------------------
-
-// Reads the current puzzle grid DOM and returns an array of node objects,
-// one per cell, each positioned at the cell's screen-centre.
-export function _tmOverlay_buildNodes() {
-    if (!cur) return [];
-
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-    const nodes = [];
-
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            const el = document.getElementById(`g-${r}-${c}`);
-            if (!el) continue;
-            const rect = el.getBoundingClientRect();
-            nodes.push({
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2,
-                r, c,
-                pulse: Math.random() * Math.PI * 2,
-                // A node is "active" if the correct cell has already been filled.
-                active: sol[r][c] === 1 && (window.revealedGrid?.[r]?.[c] || window.userGrid?.[r]?.[c] === 1),
-            });
-        }
-    }
-    return nodes;
-}
-
-// Builds a sparse set of animated connection chains between nearby nodes.
-// maxDist controls which node pairs can be linked.
-// OPTIMIZED: cap total chains to 36, use dist² check to avoid sqrt.
-export function _tmOverlay_buildChains(nodes) {
-    const chains = [];
-    const maxDist = 140;
-    const maxDistSq = maxDist * maxDist;
-    const MAX_CHAINS = 36;
-
-    for (let i = 0; i < nodes.length && chains.length < MAX_CHAINS; i++) {
-        for (let j = i + 1; j < nodes.length && chains.length < MAX_CHAINS; j++) {
-            const dx = nodes[j].x - nodes[i].x;
-            const dy = nodes[j].y - nodes[i].y;
-            const distSq = dx * dx + dy * dy;
-            if (distSq < maxDistSq && Math.random() < 0.14) {
-                chains.push({
-                    a: nodes[i],
-                    b: nodes[j],
-                    progress: Math.random(),
-                    speed: 0.004 + Math.random() * 0.004,
-                });
-            }
-        }
-    }
-    return chains;
-}
-
-// Fills the glyphRain array with one column descriptor per screen column.
-// Called once on init; safe to call again if the window is resized.
-// OPTIMIZED: coarser columns (32px vs 22px), shorter trails, cached chars.
-export function _tmOverlay_buildGlyphRain(glyphRain, canvasW, canvasH) {
-    const colW = 32;
-    const colCount = Math.floor(canvasW / colW);
-    for (let i = glyphRain.length; i < colCount; i++) {
-        const len = 3 + Math.floor(Math.random() * 4); // 3-6 vs 4-10
-        const chars = [];
-        for (let k = 0; k < len; k++) {
-            chars.push(TM_GLYPH_CHARSET[Math.floor(Math.random() * TM_GLYPH_CHARSET.length)]);
-        }
-        glyphRain.push({
-            x: i * colW + colW / 2,
-            y: Math.random() * canvasH,
-            speed: 0.6 + Math.random() * 1.1,
-            alpha: 0.045 + Math.random() * 0.045,
-            len,
-            chars,
-            // throttle char cycling to avoid random per-frame per-glyph
-            _tick: Math.floor(Math.random() * 10),
-        });
-    }
-}
-
-// Advances and draws every glyph rain column.
-// OPTIMIZED: fewer fillText calls, cached glyphs, no per-glyph random, reduced alpha calc.
-export function _tmOverlay_drawGlyphRain(ctx, glyphRain, h, fade) {
-    ctx.font = '12px monospace';
-    ctx.textAlign = 'center';
-    for (let idx = 0; idx < glyphRain.length; idx++) {
-        const col = glyphRain[idx];
-        col.y += col.speed;
-        if (col.y > h + col.len * 14) {
-            col.y = -col.len * 14;
-            // refresh chars only on wrap, not every frame
-            for (let k = 0; k < col.len; k++) {
-                if (Math.random() < 0.35) {
-                    col.chars[k] = TM_GLYPH_CHARSET[Math.floor(Math.random() * TM_GLYPH_CHARSET.length)];
-                }
-            }
-        }
-        col._tick++;
-        // only reshuffle head char every ~6 frames
-        if ((col._tick & 7) === 0) {
-            col.chars[0] = TM_GLYPH_CHARSET[Math.floor(Math.random() * TM_GLYPH_CHARSET.length)];
-        }
-
-        const baseA = col.alpha * fade;
-        // Trail - use single green channel calc, avoid per-glyph floor
-        for (let i = 0; i < col.len; i++) {
-            const a = (1 - i / col.len) * baseA * 0.55;
-            if (a < 0.008) continue;
-            // simplified green ramp without Math.floor per glyph
-            ctx.fillStyle = `rgba(30,${110 + (col.len - i) * 12},70,${a})`;
-            ctx.fillText(col.chars[i] || '0', col.x, col.y - i * 14);
-        }
-        // Head - brighter, slightly larger alpha
-        ctx.fillStyle = `rgba(130,255,165,${baseA * 1.1})`;
-        ctx.fillText(col.chars[0], col.x, col.y);
-    }
-}
-
-// Advances and draws every node chain, including the travelling energy pulse.
-// OPTIMIZED: single setLineDash, solid dot instead of radial gradient.
-export function _tmOverlay_drawChains(ctx, chains, fade) {
-    if (chains.length === 0) return;
-    const lineAlpha = 0.18 * fade;
-    ctx.strokeStyle = `rgba(30,180,100,${lineAlpha})`;
-    ctx.lineWidth = 0.7;
-    ctx.setLineDash([4, 7]);
-    for (let i = 0; i < chains.length; i++) {
-        const ch = chains[i];
-        ch.progress += ch.speed;
-        if (ch.progress > 1) ch.progress = 0;
-        ctx.beginPath();
-        ctx.moveTo(ch.a.x, ch.a.y);
-        ctx.lineTo(ch.b.x, ch.b.y);
-        ctx.stroke();
-    }
-    ctx.setLineDash([]);
-
-    // Travelling dots - solid fills, no gradient
-    for (let i = 0; i < chains.length; i++) {
-        const ch = chains[i];
-        const px = ch.a.x + (ch.b.x - ch.a.x) * ch.progress;
-        const py = ch.a.y + (ch.b.y - ch.a.y) * ch.progress;
-        // outer soft dot
-        ctx.fillStyle = `rgba(80,255,140,${0.18 * fade})`;
-        ctx.beginPath();
-        ctx.arc(px, py, 5.5, 0, Math.PI * 2);
-        ctx.fill();
-        // inner bright core
-        ctx.fillStyle = `rgba(200,255,210,${0.55 * fade})`;
-        ctx.beginPath();
-        ctx.arc(px, py, 2.2, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
-
-// Draws each node as a pulsing circle; active (filled) nodes get an extra glow halo.
-// OPTIMIZED: no radial gradients, use globalAlpha + solid fills, cache pulse.
-export function _tmOverlay_drawNodes(ctx, nodes, t2, fade) {
-    for (let i = 0; i < nodes.length; i++) {
-        const n = nodes[i];
-        const pulse = 0.5 + 0.5 * Math.sin(t2 * 2.2 + n.pulse);
-        const r = n.active ? 6 + pulse * 3 : 3.5 + pulse;
-
-        if (n.active) {
-            // soft halo - solid fill with low alpha instead of gradient
-            ctx.fillStyle = `rgba(40,220,110,${0.09 * pulse * fade})`;
-            ctx.beginPath();
-            ctx.arc(n.x, n.y, 14, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        ctx.fillStyle = n.active
-            ? `rgba(60,230,130,${0.35 * fade})`
-            : `rgba(30,110,70,${0.12 * fade})`;
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.strokeStyle = n.active
-            ? `rgba(120,255,170,${0.75 * fade})`
-            : `rgba(50,150,90,${0.25 * fade})`;
-        ctx.lineWidth = 0.8;
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-        ctx.stroke();
-    }
-}
-
-// Spawns occasional cascade particles from random nodes and advances/draws them.
-// OPTIMIZED: lower spawn rate, cap particles to 10, smaller update.
-export function _tmOverlay_drawParticles(ctx, particles, nodes, fade) {
-    if (particles.length < 10 && Math.random() < 0.08 && nodes.length > 0) {
-        const src = nodes[Math.floor(Math.random() * nodes.length)];
-        particles.push({
-            x: src.x,
-            y: src.y,
-            vx: (Math.random() - 0.5) * 1.0,
-            vy: (Math.random() - 0.5) * 1.0,
-            life: 1,
-        });
-    }
-
-    for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.012;
-        p.life -= 0.028;
-        if (p.life <= 0) { particles.splice(i, 1); continue; }
-        ctx.fillStyle = `rgba(100,255,150,${p.life * 0.55 * fade})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
-
-// Builds the canvas overlay and runs the animation loop for the full
-// durationMs of the Transition Matrix session.
-// OPTIMIZED: throttled to ~30fps, reduced overdraw, DPR-aware sizing.
-export function _transitionMatrixStartOverlay(durationMs) {
-    // Respect reduced-motion preference - skip heavy canvas entirely
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    document.getElementById('tm-canvas-overlay')?.remove();
-
-    const cvs = document.createElement('canvas');
-    cvs.id = 'tm-canvas-overlay';
-    cvs.style.cssText = `
-        position: fixed; inset: 0;
-        width: 100vw; height: 100vh;
-        pointer-events: none;
-        z-index: 400;
-        opacity: 0;
-        transition: opacity 0.5s ease-in;
-    `;
-    document.body.appendChild(cvs);
-
-    // Use alpha:true but desynchronized hint for lower latency; prefer low latency
-    const ctx = cvs.getContext('2d', { alpha: true });
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5); // cap DPR to 1.5 to avoid 2x pixel load
-    const resize = () => {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        cvs.width = Math.floor(w * dpr);
-        cvs.height = Math.floor(h * dpr);
-        cvs.style.width = w + 'px';
-        cvs.style.height = h + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    resize();
-    window.addEventListener('resize', resize);
-    cvs._resizeHandler = resize;
-
-    // Double-rAF forces the browser to paint the initial opacity:0 before
-    // we set opacity:1, giving us a CSS fade-in.
-    requestAnimationFrame(() => requestAnimationFrame(() => { cvs.style.opacity = '1'; }));
-
-    const W = () => cvs.width / dpr;
-    const H = () => cvs.height / dpr;
-    const startTime = performance.now();
-
-    const nodes = _tmOverlay_buildNodes();
-    const chains = _tmOverlay_buildChains(nodes);
-    const glyphRain = [];
-    _tmOverlay_buildGlyphRain(glyphRain, W(), H());
-
-    const particles = [];
-    let animId;
-    let lastFrame = 0;
-    const FRAME_INTERVAL = 33; // ~30fps cap
-
-    function tick(now) {
-        const elapsed = now - startTime;
-        const t = elapsed / durationMs;
-
-        // Session ended naturally.
-        if (t >= 1) {
-            globalThis.cancelAnimationFrame(animId);
-            cvs.style.transition = 'opacity 0.5s ease-out';
-            cvs.style.opacity = '0';
-            setTimeout(() => {
-                window.removeEventListener('resize', cvs._resizeHandler);
-                cvs.remove();
-            }, 550);
-            return;
-        }
-
-        // Session was cancelled externally (e.g. level reset, skill deactivated).
-        if (!window._transitionMatrixActive) {
-            globalThis.cancelAnimationFrame(animId);
-            cvs.style.transition = 'opacity 0.4s ease-out';
-            cvs.style.opacity = '0';
-            setTimeout(() => {
-                window.removeEventListener('resize', cvs._resizeHandler);
-                cvs.remove();
-            }, 450);
-            return;
-        }
-
-        // FPS throttling - skip frame if too soon
-        if (now - lastFrame < FRAME_INTERVAL) {
-            animId = requestAnimationFrame(tick);
-            return;
-        }
-        lastFrame = now;
-
-        const fade = t < 0.08 ? t / 0.08 : t > 0.9 ? (1 - t) / 0.1 : 1;
-        const w = W();
-        const h = H();
-        const t2 = elapsed * 0.001; // slow time value used for node pulsing
-
-        // Clear + tint in one fill (semi-transparent dark) instead of clearRect + fillRect
-        ctx.clearRect(0, 0, w, h);
-        if (fade > 0.01) {
-            ctx.fillStyle = `rgba(4,12,6,${0.18 * fade})`;
-            ctx.fillRect(0, 0, w, h);
-        }
-
-        _tmOverlay_drawGlyphRain(ctx, glyphRain, h, fade);
-        _tmOverlay_drawChains(ctx, chains, fade);
-        _tmOverlay_drawNodes(ctx, nodes, t2, fade);
-        _tmOverlay_drawParticles(ctx, particles, nodes, fade);
-
-        animId = requestAnimationFrame(tick);
-    }
-
-    animId = requestAnimationFrame(tick);
-    cvs._animId = animId;
-}
-
-
-//------------------------------------------------------------------------
-//-------------------TRANSITION MATRIX CASCADE LOGIC---------------------
-//------------------------------------------------------------------------
-
-// Called from onCorrectFill() in class-abilities.js whenever the player
-// fills a cell correctly while Transition Matrix is active.
-// Tries to cascade to a random unfilled correct cardinal neighbour.
-//   row / col  - the cell that was just filled correctly.
-//   depth      - remaining cascade depth (decremented on each recursive call).
-export function _transitionMatrixCascade(row, col, depth) {
-    const tm = window._transitionMatrixActive;
-
-    // Abort if the session has expired.
-    if (!tm || Date.now() > tm.endTime) {
-        _clearTransitionMatrix(true);
-        return;
-    }
-    if (depth <= 0 || Math.random() > tm.cascadeChance || !cur) return;
-
-    const sol = cur.grid;
-    const rows = sol.length;
-    const cols = sol[0].length;
-
-    // Collect unfilled, correctly-valued cardinal neighbours.
-    const neighbours = [];
-    const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-    for (const [dr, dc] of dirs) {
-        const nr = row + dr;
-        const nc = col + dc;
-        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
-        if (sol[nr][nc] === 1 && !globalThis.revealedGrid[nr][nc] && globalThis.userGrid[nr][nc] !== 1) {
-            neighbours.push([nr, nc]);
-        }
-    }
-
-    if (neighbours.length === 0) return;
-
-    // Pick a random eligible neighbour and reveal it.
-    const [nr, nc] = neighbours[Math.floor(Math.random() * neighbours.length)];
-
-    globalThis.revealedGrid[nr][nc] = true;
-    globalThis.userGrid[nr][nc] = 1;
-    renderCell(nr, nc);
-    updClues(nr, nc);
-    trackAchStat('tilesRevealed', 1);
-    questStat_classRevealUsed(1);
-    updateQuestStats('classAbilityUsedThisLevel', {});
-    if (ptHasSkill('adjacency_matrix')) _adjacencyMatrixRefreshAll();
-
-    _transitionMatrixCellVFX(nr, nc, row, col);
-
-    globalThis.showToast(t('cls_tm_cascade'));
-
-    // Rank 3: the newly revealed cell can itself cascade after a short delay.
-    if (depth > 1) {
-        setTimeout(() => _transitionMatrixCascade(nr, nc, depth - 1), 250);
-        trackAchStat('transitionMatrixCascades');
-    }
-
-    Audio_Manager.playSFX('transitionCascade');
-    globalThis.checkWin();
-}
-
-
-//------------------------------------------------------------------------
-//-------------------TRANSITION MATRIX BEAM VFX--------------------------
-//------------------------------------------------------------------------
-// Short-lived canvas overlay drawn when a cascade reveal occurs.
-// A green energy beam travels from the source cell to the target cell,
-// and an impact burst plays on arrival.
-//------------------------------------------------------------------------
-
-// Returns the screen-centre of a puzzle cell element, or null if missing.
-export function _tmBeam_getCellCenter(row, col) {
-    const el = document.getElementById(`g-${row}-${col}`);
-    if (!el) return null;
-    const rect = el.getBoundingClientRect();
-    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-}
-
-// Draws the core beam line and its bright white centre stripe up to the
-// current head position (headX, headY).
-export function _tmBeam_drawCore(ctx, x1, y1, hx, hy, alpha) {
-    const grad = ctx.createLinearGradient(x1, y1, hx, hy);
-    grad.addColorStop(0, `rgba(46,204,113,0)`);
-    grad.addColorStop(0.3, `rgba(46,204,113,${0.55 * alpha})`);
-    grad.addColorStop(1, `rgba(150,255,180,${0.95 * alpha})`);
-
-    ctx.save();
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 2.5;
-    ctx.shadowColor = `rgba(46,204,113,${0.8 * alpha})`;
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(hx, hy);
-    ctx.stroke();
-
-    // Bright white core stripe.
-    ctx.strokeStyle = `rgba(220,255,235,${0.6 * alpha})`;
-    ctx.lineWidth = 1;
-    ctx.shadowBlur = 0;
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(hx, hy);
-    ctx.stroke();
-    ctx.restore();
-}
-
-// Draws the glowing spark travelling at the head of the beam.
-export function _tmBeam_drawSpark(ctx, hx, hy, t, alpha) {
-    const sparkR = 5 + 3 * Math.sin(t * Math.PI);
-    const sparkGrad = ctx.createRadialGradient(hx, hy, 0, hx, hy, sparkR * 2.5);
-    sparkGrad.addColorStop(0, `rgba(200,255,210,${alpha})`);
-    sparkGrad.addColorStop(0.4, `rgba(46,204,113,${0.75 * alpha})`);
-    sparkGrad.addColorStop(1, `rgba(46,204,113,0)`);
-    ctx.beginPath();
-    ctx.arc(hx, hy, sparkR * 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = sparkGrad;
-    ctx.fill();
-}
-
-// Draws the radial impact burst that plays once the beam reaches the target.
-// burstT is 0→1 starting from when the head arrives.
-export function _tmBeam_drawBurst(ctx, x2, y2, t, alpha) {
-    const burstT = (t - 0.55) / 0.45;
-    const burstAlpha = alpha * (1 - burstT * 0.5);
-    const burstR = 6 + burstT * 18;
-    const burstGrad = ctx.createRadialGradient(x2, y2, 0, x2, y2, burstR);
-    burstGrad.addColorStop(0, `rgba(180,255,200,${burstAlpha})`);
-    burstGrad.addColorStop(0.5, `rgba(46,204,113,${burstAlpha * 0.6})`);
-    burstGrad.addColorStop(1, `rgba(46,204,113,0)`);
-    ctx.beginPath();
-    ctx.arc(x2, y2, burstR, 0, Math.PI * 2);
-    ctx.fillStyle = burstGrad;
-    ctx.fill();
-}
-
-// Flashes the destination cell and animates a green energy beam from the
-// source cell (srcRow, srcCol) to the target cell (row, col).
-export function _transitionMatrixCellVFX(row, col, srcRow, srcCol) {
-    // CSS flash on the destination cell.
-    const el = document.getElementById(`g-${row}-${col}`);
-    if (el) {
-        el.classList.add('transition-cascade-flash');
-        setTimeout(() => el.classList.remove('transition-cascade-flash'), 600);
-    }
-
-    // No beam without a source.
-    if (srcRow == null || srcCol == null) return;
-
-    const src = _tmBeam_getCellCenter(srcRow, srcCol);
-    const dst = _tmBeam_getCellCenter(row, col);
-    if (!src || !dst) return;
-
-    const { x: x1, y: y1 } = src;
-    const { x: x2, y: y2 } = dst;
-    const DURATION = 1000;
-
-    const cvs = document.createElement('canvas');
-    cvs.style.cssText = `
-        position: fixed; inset: 0;
-        width: 100vw; height: 100vh;
-        pointer-events: none;
-        z-index: 6000;
-    `;
-    document.body.appendChild(cvs);
-
-    const resize = () => { cvs.width = window.innerWidth; cvs.height = window.innerHeight; };
-    resize();
-    window.addEventListener('resize', resize);
-
-    const startTime = performance.now();
-    let animId;
-    const ctx = cvs.getContext('2d');
-
-    function tick(now) {
-        const t = Math.min((now - startTime) / DURATION, 1);
-        const alpha = t < 0.15 ? t / 0.15 : 1 - ((t - 0.15) / 0.85);
-
-        // Use clearRect instead of resetting canvas width (avoids context loss & layout thrash)
-        ctx.clearRect(0, 0, cvs.width, cvs.height);
-
-        // Head travels from source to target, arriving at t=0.55.
-        const headT = Math.min(t / 0.55, 1);
-        const hx = x1 + (x2 - x1) * headT;
-        const hy = y1 + (y2 - y1) * headT;
-
-        _tmBeam_drawCore(ctx, x1, y1, hx, hy, alpha);
-        _tmBeam_drawSpark(ctx, hx, hy, t, alpha);
-        if (headT >= 1) _tmBeam_drawBurst(ctx, x2, y2, t, alpha);
-
-        if (t < 1) {
-            animId = requestAnimationFrame(tick);
-        } else {
-            globalThis.cancelAnimationFrame(animId);
-            window.removeEventListener('resize', resize);
-            cvs.remove();
-        }
-    }
-
-    animId = requestAnimationFrame(tick);
-}
-
-
-//------------------------------------------------------------------------
-//----------------------------HUD BADGE----------------------------------
-//------------------------------------------------------------------------
-// Small countdown badge attached to the class HUD while Transition Matrix
-// is active, so the player can see the remaining time at a glance.
-//------------------------------------------------------------------------
-
-// Injects the badge CSS once, then creates and appends the badge element.
-export function _transitionMatrixSpawnBadge(remainingSecs) {
-    _transitionMatrixRemoveBadge();
-
-    if (!document.getElementById('tm-badge-styles')) {
-        const s = document.createElement('style');
-        s.id = 'tm-badge-styles';
-        s.textContent = TM_BADGE_CSS;
-        document.head.appendChild(s);
-    }
-
-    const badge = document.createElement('div');
-    badge.id = 'transition-matrix-badge';
-    badge.innerHTML = `<span class="tm-icon">⏳</span><span class="tm-timer" id="tm-timer-val">${remainingSecs}s</span>`;
-
-    // Prefer the drag handle; fall back to the main HUD panel.
-    const handle = document.getElementById('class-hud-drag-handle');
-    if (handle) {
-        handle.appendChild(badge);
-    } else {
-        const panel = document.getElementById('class-hud-panel');
-        if (panel) panel.appendChild(badge);
-    }
-}
-
-// Updates the countdown text inside the badge.
-export function _transitionMatrixUpdateBadge(remainingSecs) {
-    const el = document.getElementById('tm-timer-val');
-    if (el) el.textContent = `${Math.max(0, remainingSecs)}s`;
-}
-
-// Removes the badge from the DOM.
-export function _transitionMatrixRemoveBadge() {
-    document.getElementById('transition-matrix-badge')?.remove();
 }
 
 

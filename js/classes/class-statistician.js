@@ -1,4 +1,4 @@
-﻿import { trackAchStat } from '../achievements/achievements.js';
+import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { addTimeSecs, previewGainSecs } from '../timer/timer-adjust.js';
@@ -7,7 +7,7 @@ import { _filterMarkedIds, _filterRevealedIds, _resolveCell, _revealFilledCell, 
 import { cooldownState } from './class-cooldown-state.js';
 import { CLASS_DEFS } from './class-defs.js';
 import { buildClassHUD, updateMomentumBar } from './class-hud.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { getSkillCastRankClamped } from '../skills/skill-charms.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
@@ -33,14 +33,14 @@ import { cur } from '../state.js';
 //   window.LEVEL_FLAGS.momentumThisLevel         - how many times Momentum has triggered this level (exponential_growth scaling)
 
 // Diagonal strike: maximum steps walked per direction before stopping.
-export const DIAG_STRIKE_MAX_STEPS = 3;
+const DIAG_STRIKE_MAX_STEPS = 3;
 
 // Data Strike: default number of cells revealed per line when no cap is specified.
-export const DATA_STRIKE_DEFAULT_REVEAL_CAP = 5;
+const DATA_STRIKE_DEFAULT_REVEAL_CAP = 5;
 
 // Diagonal Strike: default caps when no passive bonuses are present.
-export const DIAG_STRIKE_DEFAULT_REVEAL_CAP = 3;
-export const DIAG_STRIKE_DEFAULT_MARK_CAP = 3;
+const DIAG_STRIKE_DEFAULT_REVEAL_CAP = 3;
+const DIAG_STRIKE_DEFAULT_MARK_CAP = 3;
 
 
 //------------------------------------------------------------------------
@@ -54,7 +54,7 @@ export const DIAG_STRIKE_DEFAULT_MARK_CAP = 3;
 //   count                  : the number to check for singular vs plural
 //   enSingular / enPlural  : English forms
 //   deSingular / dePlural  : German forms
-export function _pluralLabel(count, enSingular, enPlural, deSingular, dePlural) {
+function _pluralLabel(count, enSingular, enPlural, deSingular, dePlural) {
     if (LANG === 'de') return count === 1 ? deSingular : dePlural;
     return count === 1 ? enSingular : enPlural;
 }
@@ -76,7 +76,7 @@ export function _pluralLabel(count, enSingular, enPlural, deSingular, dePlural) 
 //   Returns an array of objects:
 //     rows → [{ r, unrevealed: [colIndex, ...] }, ...]
 //     cols → [{ c, unrevealed: [rowIndex, ...] }, ...]
-export function _collectUnsolvedLines(type, sol, rows, cols) {
+function _collectUnsolvedLines(type, sol, rows, cols) {
     const candidates = [];
 
     if (type === 'rows') {
@@ -112,7 +112,7 @@ export function _collectUnsolvedLines(type, sol, rows, cols) {
 //   lineEntry : { r, unrevealed } for rows  OR  { c, unrevealed } for cols
 //   type      : 'rows' | 'cols'
 //   cap       : maximum number of cells to reveal
-export function _revealCappedCells(lineEntry, type, cap) {
+function _revealCappedCells(lineEntry, type, cap) {
     // Shuffle so the revealed cells are random within the line
     const indices = [...lineEntry.unrevealed].sort(() => Math.random() - 0.5);
     const toReveal = indices.slice(0, cap);
@@ -136,7 +136,7 @@ export function _revealCappedCells(lineEntry, type, cap) {
 //
 //   Returns the total number of cells that were actually revealed (may be <
 //   count * cap if fewer unsolved lines/cells exist).
-export function _solveLinesCapped(type, count, cap) {
+function _solveLinesCapped(type, count, cap) {
     if (!cur) return 0;
 
     const sol = cur.grid;
@@ -164,16 +164,14 @@ export function _solveLinesCapped(type, count, cap) {
 
 // _divineProcPlayAudio - plays the god_of_statistics proc SFX.
 //   Falls back to 'momentum' chime if a dedicated god audio key is not registered.
-export function _divineProcPlayAudio() {
-    if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-        try { Audio_Manager.playSFX('momentum'); } catch (e) { /* no-op if not registered */ }
-    }
+function _divineProcPlayAudio() {
+    try { Audio_Manager.playSFX('momentum'); } catch (e) { /* no-op if not registered */ }
 }
 
 // _divineProcShakeBoard - adds a brief CSS shake animation to the puzzle board.
 //   Forces a reflow between class removal and addition so the animation restarts
 //   cleanly even if already playing.
-export function _divineProcShakeBoard() {
+function _divineProcShakeBoard() {
     const board = document.getElementById('ptable') || document.body;
     board.classList.remove('divine-shake');
     void board.offsetWidth; // force CSS reflow so the animation restarts
@@ -184,7 +182,7 @@ export function _divineProcShakeBoard() {
 // _divineProcSpawnParticles - creates the overlay container with a flash, a beam,
 //   and 16 randomly-placed sparkle glyphs, then appends it to the body.
 //   The container is self-cleaning after 1.5 seconds.
-export function _divineProcSpawnParticles() {
+function _divineProcSpawnParticles() {
     const GLYPH_POOL = ['✨', '✦', '☀️', '🌟', '✟'];
     const SPARKLE_COUNT = 16;
 
@@ -237,7 +235,7 @@ export function _playDivineProcEffect() {
 //
 //   Returns { gridTop, gridLeft, gridBottom, gridRight, gridH, gridW }
 //   or null if corner cells cannot be found.
-export function _slashEffectGetGridBounds(wrap, sol, zoom) {
+function _slashEffectGetGridBounds(wrap, sol, zoom) {
     const rows = sol.length;
     const cols = sol[0].length;
     const firstCell = document.getElementById('g-0-0');
@@ -267,7 +265,7 @@ export function _slashEffectGetGridBounds(wrap, sol, zoom) {
 //   bounds   : grid bounds object from _slashEffectGetGridBounds
 //   index    : slash index (0-based) used for position and animation delay
 //   total    : total number of slashes (used to distribute spacing)
-export function _slashEffectSpawnSlash(wrap, vertical, bounds, index, total) {
+function _slashEffectSpawnSlash(wrap, vertical, bounds, index, total) {
     const { gridTop, gridLeft, gridH, gridW } = bounds;
     const delay = index * 0.12;
 
@@ -309,7 +307,7 @@ export function _slashEffectSpawnSlash(wrap, vertical, bounds, index, total) {
 //   grid to visualise a Data Strike.
 //
 //   vertical : true → vertical slashes (column strike), false → horizontal (row strike)
-export function _playSlashEffect(vertical = false) {
+function _playSlashEffect(vertical = false) {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
     if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
@@ -343,7 +341,7 @@ export function _playSlashEffect(vertical = false) {
 //   zoom     : current zoom level
 //
 //   Returns { cx, cy } or null if the cell element is not found.
-export function _diagSlashGetCenterPoint(wrap, row, col, zoom) {
+function _diagSlashGetCenterPoint(wrap, row, col, zoom) {
     const cellEl = document.getElementById(`g-${row}-${col}`);
     if (!cellEl) {
         console.warn('cellEl is missing');
@@ -370,7 +368,7 @@ export function _diagSlashGetCenterPoint(wrap, row, col, zoom) {
 //   zoom : current zoom level
 //
 //   Returns the diagonal length in logical pixels, or null on failure.
-export function _diagSlashGetDiagLength(wrap, sol, zoom) {
+function _diagSlashGetDiagLength(wrap, sol, zoom) {
     const rows = sol.length;
     const cols = sol[0].length;
     const firstCell = document.getElementById('g-0-0');
@@ -394,7 +392,7 @@ export function _diagSlashGetDiagLength(wrap, sol, zoom) {
 //   diagLen   : total length of the bar
 //   deg       : rotation angle in degrees
 //   delay     : CSS animation-delay in seconds
-export function _diagSlashMakeBar(container, cx, cy, diagLen, deg, delay) {
+function _diagSlashMakeBar(container, cx, cy, diagLen, deg, delay) {
     const bar = document.createElement('div');
     bar.style.cssText = `
         position: absolute;
@@ -427,7 +425,7 @@ export function _diagSlashMakeBar(container, cx, cy, diagLen, deg, delay) {
 //   diagonalCount  : 1 → main diagonal only (↘)
 //                    2 → both diagonals (↘ + ↙)
 //                    4 → both diagonals + horizontal + vertical
-export function _playDiagonalSlashEffect(row, col, diagonalCount) {
+function _playDiagonalSlashEffect(row, col, diagonalCount) {
     const wrap = document.getElementById('puzzle-scaler');
     if (!wrap) return;
     if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
@@ -479,7 +477,7 @@ export function _playDiagonalSlashEffect(row, col, diagonalCount) {
 //
 //   count : preview number of lines that will be solved
 //   cap   : preview max cells revealed per line
-export function _dataStrikeOverlayHTML(count, cap) {
+function _dataStrikeOverlayHTML(count, cap) {
     const title = t('cls_data_strike_title');
 
     let prompt = t('cls_data_strike_prompt')
@@ -516,7 +514,7 @@ export function _dataStrikeOverlayHTML(count, cap) {
 //
 //   count : preview number of lines
 //   cap   : preview reveal cap per line
-export function _dataStrikeShowOverlay(count, cap) {
+function _dataStrikeShowOverlay(count, cap) {
     const overlay = document.createElement('div');
     overlay.id = 'data-strike-overlay';
     overlay.className = 'modal-bg show';
@@ -526,7 +524,7 @@ export function _dataStrikeShowOverlay(count, cap) {
 }
 
 // _dataStrikeRemoveOverlay - plays the Data Strike SFX and removes the modal from the DOM.
-export function _dataStrikeRemoveOverlay() {
+function _dataStrikeRemoveOverlay() {
     Audio_Manager.playSFX('dataStrike');
     const overlay = document.getElementById('data-strike-overlay');
     if (overlay) overlay.remove();
@@ -535,7 +533,7 @@ export function _dataStrikeRemoveOverlay() {
 // _dataStrikeRefundCooldown - cancels any running cooldown interval for active1
 //   and resets its remaining time to 0. Called when the player cancels Data Strike
 //   so they are not penalised for opening the modal.
-export function _dataStrikeRefundCooldown() {
+function _dataStrikeRefundCooldown() {
     const cd = cooldownState['active1'];
     if (cd.interval) {
         clearInterval(cd.interval);
@@ -556,7 +554,7 @@ export function _dataStrikeRefundCooldown() {
 //
 //   count : current base solve count
 //   Returns the adjusted count.
-export function _dataStrikeApplyGodScaling(count) {
+function _dataStrikeApplyGodScaling(count) {
     if (!ptHasSkill('god_of_statistics')) return count;
 
     const uses = window._dataStrikeUsesThisLevel || 0;
@@ -571,7 +569,7 @@ export function _dataStrikeApplyGodScaling(count) {
 //
 //   count : current solve count before extra rolls
 //   Returns the final solve count after all rolls.
-export function _dataStrikeRollExtraLines(count) {
+function _dataStrikeRollExtraLines(count) {
     let extraChances = 0;
     if (ptHasSkill('advanced_data_strike')) extraChances += 1;
     if (ptHasSkill('god_of_statistics')) extraChances += 2; // god = effective 50% via two 25% rolls
@@ -589,7 +587,7 @@ export function _dataStrikeRollExtraLines(count) {
 //   god_of_statistics count scaling, used to show an accurate number in the
 //   modal BEFORE the player commits. Does not touch window._dataStrikeUsesThisLevel.
 //   The random 25% bonus-line rolls are intentionally NOT previewed here.
-export function _dataStrikePreviewCount(baseCount) {
+function _dataStrikePreviewCount(baseCount) {
     let count = baseCount;
     if (ptHasSkill('god_of_statistics')) {
         const uses = window._dataStrikeUsesThisLevel || 0;
@@ -601,7 +599,7 @@ export function _dataStrikePreviewCount(baseCount) {
 // _dataStrikePreviewCap - non-mutating preview of the deterministic reveal-cap
 //   bonuses (monte_carlo, correlation_matrix), used to show an accurate cap in
 //   the modal BEFORE the player commits.
-export function _dataStrikePreviewCap(baseCap) {
+function _dataStrikePreviewCap(baseCap) {
     let cap = baseCap || DATA_STRIKE_DEFAULT_REVEAL_CAP;
     if (ptHasSkill('monte_carlo')) cap += 1;
     if (ptHasSkill('correlation_matrix')) cap += 1;
@@ -611,7 +609,7 @@ export function _dataStrikePreviewCap(baseCap) {
 // _dataStrikeHasRandomBonusChance - true if a 25%+ roll for extra lines could
 //   fire this activation. Used only to decide whether to show a "chance for
 //   more" hint in the modal text.
-export function _dataStrikeHasRandomBonusChance() {
+function _dataStrikeHasRandomBonusChance() {
     return ptHasSkill('advanced_data_strike') || ptHasSkill('god_of_statistics');
 }
 
@@ -620,7 +618,7 @@ export function _dataStrikeHasRandomBonusChance() {
 //   count stored at ability activation. Updates the level-use counter.
 //
 //   Returns the final number of lines to solve.
-export function _dataStrikeCalculateFinalCount() {
+function _dataStrikeCalculateFinalCount() {
     let count = window._dataStrikePendingCount || 1;
     window._dataStrikePendingCount = null;
 
@@ -638,7 +636,7 @@ export function _dataStrikeCalculateFinalCount() {
 //   applying passive bonuses on top of the base cap stored at ability activation.
 //
 //   Returns the final cap and clears the stored value.
-export function _dataStrikeCalculateRevealCap() {
+function _dataStrikeCalculateRevealCap() {
     let cap = window._dataStrikeRevealCap || DATA_STRIKE_DEFAULT_REVEAL_CAP;
     if (ptHasSkill('monte_carlo')) cap += 1;
     if (ptHasSkill('correlation_matrix')) cap += 1;
@@ -720,7 +718,7 @@ export function _dataStrikeCancel() {
 //   on whether the diagonally_wrong passive is active.
 //   _resolveCell    : handles both reveals and wrong-marks (diagonally_wrong)
 //   _revealFilledCell : only reveals filled cells (default)
-export function _diagStrikeGetCellResolver() {
+function _diagStrikeGetCellResolver() {
     return ptHasSkill('diagonally_wrong') ? _resolveCell : _revealFilledCell;
 }
 
@@ -733,7 +731,7 @@ export function _diagStrikeGetCellResolver() {
 //   sol               : solution grid
 //   affected          : output array - resolved cell IDs are pushed here
 //   maxSteps          : how far to walk before stopping
-export function _diagStrikeWalkDirections(originR, originC, dirPairs, rows, cols, sol, affected, maxSteps) {
+function _diagStrikeWalkDirections(originR, originC, dirPairs, rows, cols, sol, affected, maxSteps) {
     const resolver = _diagStrikeGetCellResolver();
 
     dirPairs.forEach(([dr, dc]) => {
@@ -756,7 +754,7 @@ export function _diagStrikeWalkDirections(originR, originC, dirPairs, rows, cols
 //
 //   diagonalCount >= 1 : main diagonal only (↘ ↖)
 //   diagonalCount >= 2 : both diagonals    (↘ ↖ ↙ ↗)
-export function _diagStrikeWalkDiagonals(originR, originC, diagonalCount, rows, cols, sol, affected) {
+function _diagStrikeWalkDiagonals(originR, originC, diagonalCount, rows, cols, sol, affected) {
     const allDirPairs = [
         [[1, 1], [-1, -1]],   // main diagonal ↘ ↖
         [[1, -1], [-1, 1]],   // anti-diagonal ↙ ↗
@@ -771,14 +769,14 @@ export function _diagStrikeWalkDiagonals(originR, originC, diagonalCount, rows, 
 }
 
 // _diagStrikeProcessOriginCell - resolves the cell the player originally clicked.
-export function _diagStrikeProcessOriginCell(row, col, sol, affected) {
+function _diagStrikeProcessOriginCell(row, col, sol, affected) {
     const resolver = _diagStrikeGetCellResolver();
     const id = resolver(row, col, sol);
     if (id) affected.push(id);
 }
 
 // _diagStrikeProcessFullRow - resolves every cell in `row` (used for rank-3 / diagonalCount >= 4).
-export function _diagStrikeProcessFullRow(row, cols, sol, affected) {
+function _diagStrikeProcessFullRow(row, cols, sol, affected) {
     const resolver = _diagStrikeGetCellResolver();
     for (let c = 0; c < cols; c++) {
         const id = resolver(row, c, sol);
@@ -787,7 +785,7 @@ export function _diagStrikeProcessFullRow(row, cols, sol, affected) {
 }
 
 // _diagStrikeProcessFullCol - resolves every cell in `col` (used for rank-3 / diagonalCount >= 4).
-export function _diagStrikeProcessFullCol(col, rows, sol, affected) {
+function _diagStrikeProcessFullCol(col, rows, sol, affected) {
     const resolver = _diagStrikeGetCellResolver();
     for (let r = 0; r < rows; r++) {
         const id = resolver(r, col, sol);
@@ -806,7 +804,7 @@ export function _diagStrikeProcessFullCol(col, rows, sol, affected) {
 //   sol                : solution grid
 //
 //   Returns the array of resolved cell IDs.
-export function _diagStrikeCollectAffected(originR, originC, diagonalCount, rows, cols, sol) {
+function _diagStrikeCollectAffected(originR, originC, diagonalCount, rows, cols, sol) {
     const affected = [];
 
     _diagStrikeWalkDiagonals(originR, originC, diagonalCount, rows, cols, sol, affected);
@@ -831,7 +829,7 @@ export function _diagStrikeCollectAffected(originR, originC, diagonalCount, rows
 //
 //   baseRevealCap : raw reveal cap from the ability definition
 //   Returns { revealCap, markCap }
-export function _diagStrikeCalculateCaps(baseRevealCap) {
+function _diagStrikeCalculateCaps(baseRevealCap) {
     let revealCap = baseRevealCap || DIAG_STRIKE_DEFAULT_REVEAL_CAP;
     let markCap = DIAG_STRIKE_DEFAULT_MARK_CAP;
 
@@ -851,7 +849,7 @@ export function _diagStrikeCalculateCaps(baseRevealCap) {
 //   revealedIds : array of cell ID strings for cells that were revealed
 //   cap         : maximum number of reveals to keep
 //   Returns the array of kept cell IDs (length <= cap).
-export function _diagStrikeUnrevealExcess(revealedIds, cap) {
+function _diagStrikeUnrevealExcess(revealedIds, cap) {
     if (revealedIds.length <= cap) return revealedIds;
 
     const shuffled = [...revealedIds].sort(() => Math.random() - 0.5);
@@ -873,7 +871,7 @@ export function _diagStrikeUnrevealExcess(revealedIds, cap) {
 //   cap       : maximum number of marks to keep
 //   affected  : the combined affected array - excess marked IDs are spliced out
 //   Returns nothing; mutates `affected` directly.
-export function _diagStrikeUnmarkExcess(markedIds, cap, affected) {
+function _diagStrikeUnmarkExcess(markedIds, cap, affected) {
     if (markedIds.length <= cap) return;
 
     const shuffled = [...markedIds].sort(() => Math.random() - 0.5);
@@ -896,7 +894,7 @@ export function _diagStrikeUnmarkExcess(markedIds, cap, affected) {
 //   affected    : the array to rebuild (mutated in place)
 //   keptReveals : Set of kept reveal cell IDs
 //   markedIds   : Set of marked cell IDs
-export function _diagStrikeRebuildAffected(affected, keptReveals, markedIds) {
+function _diagStrikeRebuildAffected(affected, keptReveals, markedIds) {
     affected.length = 0;
     keptReveals.forEach(id => affected.push(id));
     markedIds.forEach(id => affected.push(id));
@@ -910,7 +908,7 @@ export function _diagStrikeRebuildAffected(affected, keptReveals, markedIds) {
 //   sol        : solution grid
 //   revealCap  : max reveals to keep
 //   markCap    : max marks to keep
-export function _diagStrikeApplyCaps(affected, sol, revealCap, markCap) {
+function _diagStrikeApplyCaps(affected, sol, revealCap, markCap) {
     // --- Reveal cap ---
     const revealedIds = _filterRevealedIds(affected, sol);
     if (revealedIds.length > revealCap) {
@@ -934,7 +932,7 @@ export function _diagStrikeApplyCaps(affected, sol, revealCap, markCap) {
 //
 //   affected : array of cell IDs along the strike path
 //   sol      : solution grid
-export function _diagStrikeMarkWrong(affected, sol) {
+function _diagStrikeMarkWrong(affected, sol) {
     affected.forEach(id => {
         const [, r, c] = id.split('-').map(Number);
         if (sol[r][c] === 0 && globalThis.userGrid[r][c] === 1) {
@@ -960,7 +958,7 @@ export function _diagStrikeMarkWrong(affected, sol) {
 //   markCap           : mark cap inherited from the triggering strike
 //   rows / cols       : grid dimensions
 //   sol               : solution grid
-export function _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealCap, markCap, rows, cols, sol) {
+function _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealCap, markCap, rows, cols, sol) {
     const bonusAffected = _diagStrikeCollectAffected(targetR, targetC, diagonalCount, rows, cols, sol);
 
     _diagStrikeApplyCaps(bonusAffected, sol, revealCap, markCap);
@@ -995,7 +993,7 @@ export function _diagStrikeBonusExecute(targetR, targetC, diagonalCount, revealC
 //   markCap       : mark cap to use for the bonus strike
 //   rows / cols   : grid dimensions
 //   sol           : solution grid
-export function _diagStrikeBonusRepeat(diagonalCount, revealCap, markCap, rows, cols, sol) {
+function _diagStrikeBonusRepeat(diagonalCount, revealCap, markCap, rows, cols, sol) {
     // Gather all cells that are filled but not yet revealed
     const candidates = [];
     for (let r = 0; r < rows; r++) {
@@ -1096,8 +1094,8 @@ export function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
 // than a single outline element.
 
 // Module state for the live preview lines.
-export let _diagStrikePreviewEls = [];
-export let _diagStrikePreviewKey = null; // last-rendered "row-col-diagonalCount", to skip redundant rebuilds
+let _diagStrikePreviewEls = [];
+let _diagStrikePreviewKey = null; // last-rendered "row-col-diagonalCount", to skip redundant rebuilds
 
 // _diagStrikeGetEffectiveDiagonalsForPreview - returns the diagonalCount
 // for whatever rank Diagonal Strike is currently at. Kept separate from
@@ -1105,15 +1103,13 @@ export let _diagStrikePreviewKey = null; // last-rendered "row-col-diagonalCount
 // (and thus before row/col are known). No passive scaling applies to
 // diagonalCount itself (only revealCap/markCap get passive bonuses), so
 // this is just a straight level lookup.
-export function _diagStrikeGetEffectiveDiagonalsForPreview() {
+function _diagStrikeGetEffectiveDiagonalsForPreview() {
     const def = CLASS_DEFS?.statistician;
     if (!def) return 1;
     // Effect rank follows the slotted charm when one is placed.
     let level = STATE.classActive2Level || 1;
-    if (typeof getSkillCastRankClamped === 'function') {
-        const charmRank = getSkillCastRankClamped('statistician_active2');
-        if (charmRank) level = charmRank;
-    }
+    const charmRank = getSkillCastRankClamped('statistician_active2');
+    if (charmRank) level = charmRank;
     const actData = def.active2.levels[level - 1];
     if (!actData) return 1;
     return actData.effect.diagonals || 1;
@@ -1121,7 +1117,7 @@ export function _diagStrikeGetEffectiveDiagonalsForPreview() {
 
 // _diagStrikeGetHoveredCell - resolves which grid cell is under the given
 // viewport coordinates, or null if the cursor isn't over the grid at all.
-export function _diagStrikeGetHoveredCell(clientX, clientY) {
+function _diagStrikeGetHoveredCell(clientX, clientY) {
     const el = document.elementFromPoint(clientX, clientY);
     const cellEl = el?.closest('[id^="g-"]');
     if (!cellEl) return null;
@@ -1133,7 +1129,7 @@ export function _diagStrikeGetHoveredCell(clientX, clientY) {
 // _diagStrikeRemovePreviewEls - removes any currently-rendered preview
 // elements without touching _diagStrikePreviewKey (used internally when
 // rebuilding for a new hovered cell/rank).
-export function _diagStrikeRemovePreviewEls() {
+function _diagStrikeRemovePreviewEls() {
     _diagStrikePreviewEls.forEach(el => el.remove());
     _diagStrikePreviewEls = [];
 }
@@ -1152,7 +1148,7 @@ export function _diagStrikeClearPreview() {
 // same centre point / length geometry as the real animated slash bars
 // (_diagSlashMakeBar), just without the fade-in/out animation, since this
 // one needs to persist for as long as the cell stays hovered.
-export function _diagStrikePreviewMakeBar(container, cx, cy, diagLen, deg) {
+function _diagStrikePreviewMakeBar(container, cx, cy, diagLen, deg) {
     const bar = document.createElement('div');
     bar.className = 'diag-strike-preview-line';
     bar.style.cssText = `
@@ -1171,7 +1167,7 @@ export function _diagStrikePreviewMakeBar(container, cx, cy, diagLen, deg) {
 //   diagonalCount >= 1 : main diagonal only (135°)
 //   diagonalCount >= 2 : + anti-diagonal (45°)
 //   diagonalCount >= 4 : + horizontal (0°) and vertical (90°)
-export function _diagStrikeBuildPreviewBars(wrap, row, col, diagonalCount) {
+function _diagStrikeBuildPreviewBars(wrap, row, col, diagonalCount) {
     const sol = cur?.grid;
     if (!sol) return;
 
@@ -1306,14 +1302,14 @@ export function _statisticianTriggerMomentum(bonusSeconds) {
 // and fade out instead.
 
 // How far outside the grid's actual edge the particle loop travels.
-export const MOMENTUM_ORBIT_PADDING_PX = 22;
+const MOMENTUM_ORBIT_PADDING_PX = 22;
 
-export let _momentumParticles = [];   // { el, startX, startY, dist, speed, progress }
-export let _momentumRafId = null;
+let _momentumParticles = [];   // { el, startX, startY, dist, speed, progress }
+let _momentumRafId = null;
 
 // _momentumGetContainer - returns (creating if needed) the overlay that
 // holds all momentum particles, positioned over the puzzle grid.
-export function _momentumGetContainer() {
+function _momentumGetContainer() {
     const wrap = document.getElementById('puzzle-scaler-wrap'); // was 'puzzle-scaler'
     if (!wrap) return null;
     if (!wrap.style.position || wrap.style.position === 'static') wrap.style.position = 'relative';
@@ -1339,7 +1335,7 @@ export function _momentumGetContainer() {
 // perimeter length. Uses the same corner-cell approach as the Variance
 // Shield dome (_varianceShield_reposition in class-mathmagician.js) so the
 // loop hugs the grid border consistently regardless of zoom.
-export function _momentumGetBorderRect() {
+function _momentumGetBorderRect() {
     const r = typeof globalThis._fxGetPuzzleRectForWrap === 'function' ? globalThis._fxGetPuzzleRectForWrap() : null;
     if (!r) return null;
 
@@ -1356,7 +1352,7 @@ export function _momentumGetBorderRect() {
 // _momentumPointAtDistance - walks clockwise from the top-left corner of
 // `rect` by `dist` pixels (wrapping around the perimeter) and returns the
 // {x, y} point landed on: top edge → right edge → bottom edge → left edge.
-export function _momentumPointAtDistance(rect, dist) {
+function _momentumPointAtDistance(rect, dist) {
     const { x0, y0, w, h, perimeter } = rect;
     let d = ((dist % perimeter) + perimeter) % perimeter; // normalise into [0, perimeter)
 
@@ -1371,7 +1367,7 @@ export function _momentumPointAtDistance(rect, dist) {
 
 // _momentumStartLoop - starts the shared requestAnimationFrame loop that
 // advances every active particle. Stops itself once no particles remain.
-export function _momentumStartLoop() {
+function _momentumStartLoop() {
     const tick = () => {
         _momentumUpdateParticles();
         _momentumRafId = _momentumParticles.length > 0 ? requestAnimationFrame(tick) : null;
@@ -1381,7 +1377,7 @@ export function _momentumStartLoop() {
 
 // _momentumUpdateParticles - advances each particle's position along the
 // border loop, easing in from its spawn cell until it merges onto the path.
-export function _momentumUpdateParticles() {
+function _momentumUpdateParticles() {
     const rect = _momentumGetBorderRect();
     if (!rect) return;
 
@@ -1461,7 +1457,7 @@ export function _momentumParticlesOnMistake() {
 
 // _momentumSpawnShockwave - spawns the expanding ring + flash at the grid
 // center after all particles have collided.
-export function _momentumSpawnShockwave(cx, cy) {
+function _momentumSpawnShockwave(cx, cy) {
     const container = _momentumGetContainer();
     if (!container) return;
 
@@ -1483,7 +1479,7 @@ export function _momentumSpawnShockwave(cx, cy) {
 // _momentumCollideParticles - fires when the Momentum streak reaches its
 // cap. Sends every live particle flying in from the border loop to the
 // grid center, then spawns the collision shockwave once they arrive.
-export function _momentumCollideParticles() {
+function _momentumCollideParticles() {
     if (!_momentumParticles.length) return;
 
     const rect = _momentumGetBorderRect();

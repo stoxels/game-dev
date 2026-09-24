@@ -20,18 +20,12 @@ import { STATE } from '../state.js';
 //-------------------HTML ASSEMBLY: FULL SCREEN---------------------------
 //------------------------------------------------------------------------
 
-// Builds the top navigation bar with back button, level/attribute window
-// button and hub title.
+// Builds the top navigation bar with back button and hub title.
 export function _egBuildTopbarHTML() {
     return `
 <div class="eg-topbar">
     <button class="eg-back-btn back-btn" onclick="safeGoBackFromHub()">${t('btn_back')}</button>
     <span class="eg-topbar-title">${t('eg_char_sheet_title')}</span>
-    <button class="eg-level-btn" id="eg-level-btn"
-         onclick="_egOpenAttributeWindow()"
-         onmouseenter="_egShowLevelBtnTooltip(event)"
-         onmousemove="moveGameTooltip(event)"
-         onmouseleave="hideGameTooltip()">✦ ${t('eg_lvl_button_label')}<span class="eg-level-badge" id="eg-level-badge"></span></button>
     <button class="eg-level-btn" id="eg-btn-passive-tree"
          onclick="showPassiveTree('screen-endgame-hub')">🌿 ${t('scr_probability_tree')}</button>
     <button class="eg-level-btn" id="eg-btn-atlas"

@@ -1,29 +1,31 @@
-﻿import { Audio_Manager } from '../audio/audio.js';
+// Shared cooldown state for class abilities, ascendencies, Heartbloom, and tutorial Fireball.
+// Other systems use the small public surface; timing and render details stay in this file.
+
+import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { patchHotbarCooldownForLegacySlot } from '../skills/skill-hotbar.js';
 import { STATE } from '../state.js';
-//--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
+
+// Legacy callers still read and write these bindings through the module bridge.
 try { Object.defineProperty(globalThis, 'activeAbilityMode', { get() { return activeAbilityMode; }, set(v) { activeAbilityMode = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'resetActiveCooldown', { get() { return resetActiveCooldown; }, set(v) { resetActiveCooldown = v; }, configurable: true }); } catch (e) {}
+
 //------------------------------------------------------------------------
-//----------------------------STATE / CONFIG-------------------------------
+//----------------------------CONSTANTS & STATE---------------------------
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
 // Whether an active ability is currently armed and waiting for player input
 let activeAbilityMode = false;
 
-// Per-slot independent cooldown state.
-// active1 / active2 = base class skill slots
-// active3 / active4 = ascendency skill slots
-// active5 = endgame heartbloom (spawns 3 hearts)
-// Each slot tracks its own remaining seconds and its own tick interval handle.
-export let cooldownState = {
+// Per-slot independent cooldown state. The binding stays stable while callers
+// mutate each slot's remaining seconds and interval handle.
+export const cooldownState = {
     active1: { remaining: 0, interval: null },
     active2: { remaining: 0, interval: null },
     active3: { remaining: 0, interval: null },
@@ -57,7 +59,7 @@ export const ASCENDENCY_LIST = {
 // Flat cooldown reduction (seconds) granted by class-specific passives,
 // keyed by class → slot → [skillId, seconds]. Drives _getClassCooldownReduction
 // below instead of one hand-written function per class.
-export const CLASS_COOLDOWN_REDUCTIONS = {
+const CLASS_COOLDOWN_REDUCTIONS = {
     statistician: {
         // active1 = Data Strike, active2 = Diagonal Strike
         active1: [
@@ -138,7 +140,7 @@ export function _formatCooldown(secs) {
 }
 
 // Returns the localised "Ready" label used in the minimized bar and toasts.
-export function _getReadyLabel() {
+function _getReadyLabel() {
     return t('cls_ready');
 }
 
@@ -152,7 +154,7 @@ export function _getReadyLabel() {
 
 // Returns the ability definition object for a base class slot (active1 / active2).
 // Returns null if the class definition can't be found.
-export function _getBaseClassAbilityData(slot) {
+function _getBaseClassAbilityData(slot) {
     const def = CLASS_DEFS[STATE.playerClass];
     if (!def) return null;
     return def[slot] ?? null;
@@ -161,7 +163,7 @@ export function _getBaseClassAbilityData(slot) {
 // Returns the ability definition object for an ascendency slot (active3 / active4).
 // active3 maps to the ascendency's first active, active4 to the second.
 // Returns null if no ascendency is set or the definition is missing.
-export function _getAscendencyAbilityData(slot) {
+function _getAscendencyAbilityData(slot) {
     const asc = STATE.playerAscendency ? ASCENDENCY_DEFS[STATE.playerAscendency] : null;
     if (!asc) return null;
     return slot === 'active3' ? asc.active1 : asc.active2;
@@ -170,7 +172,7 @@ export function _getAscendencyAbilityData(slot) {
 // Returns the ability definition for any slot, routing to the correct source.
 export function _getAbilityData(slot) {
     if (slot === 'active5') {
-        return (typeof ENDGAME_HEARTBLOOM_DEF !== 'undefined') ? ENDGAME_HEARTBLOOM_DEF : null;
+        return ENDGAME_HEARTBLOOM_DEF;
     }
     if (slot === 'active3' || slot === 'active4') {
         return _getAscendencyAbilityData(slot);
@@ -209,7 +211,7 @@ export function _getGlobalCooldownReduction() {
 // Returns the flat cooldown reduction from passives specific to the current
 // class and slot, looked up from CLASS_COOLDOWN_REDUCTIONS above.
 // Returns 0 for unknown classes/slots or slots with no listed passives.
-export function _getClassCooldownReduction(slot) {
+function _getClassCooldownReduction(slot) {
     const slotEntries = CLASS_COOLDOWN_REDUCTIONS[STATE.playerClass]?.[slot];
     if (!slotEntries) return 0;
     return slotEntries.reduce(
@@ -220,13 +222,13 @@ export function _getClassCooldownReduction(slot) {
 
 // Maps every class/ascendency active slot to its arcane cooldown family.
 // One family per skill - mods roll on the arcane slot (EG_MOD_TABLE_ARCANE).
-export const BASE_SKILL_COOLDOWN_FAMILY = {
+const BASE_SKILL_COOLDOWN_FAMILY = {
     mathmagician: { active1: 'cooldown_arcane_reveal', active2: 'cooldown_absolute_zero' },
     statistician: { active1: 'cooldown_data_strike', active2: 'cooldown_diagonal_strike' },
     probabilist: { active1: 'cooldown_precision_shot', active2: 'cooldown_rain_of_arrows' },
 };
 
-export const ASCENDENCY_SKILL_COOLDOWN_FAMILY = {
+const ASCENDENCY_SKILL_COOLDOWN_FAMILY = {
     outlier: { active1: 'cooldown_tail_risk', active2: 'cooldown_speedforce' },
     actuary: { active1: 'cooldown_regression_to_prior', active2: 'cooldown_significance_threshold' },
     recursionist: { active1: 'cooldown_residual', active2: 'cooldown_degrees_of_freedom' },
@@ -239,7 +241,7 @@ export const ASCENDENCY_SKILL_COOLDOWN_FAMILY = {
 // for the given ability slot. Sums all mods whose familyId matches the
 // slot's skill. Handles both the arcane slot and any other slot that might
 // carry the mod (future-proof - loop all equipped items).
-export function _getEquipmentCooldownReduction(slot) {
+function _getEquipmentCooldownReduction(slot) {
     if (slot === 'active5') return 0;
     if (typeof globalThis._egEquipped === 'undefined' || !globalThis._egEquipped) return 0;
 
@@ -300,9 +302,7 @@ export function getEffectiveCooldown(slot, baseSeconds) {
 // Falls back silently if the button can't be found (e.g. panel was re-rendered).
 export function _patchCooldownButton(slot) {
     // Hotbar slots show the same countdown (skills are cast from the bar now).
-    if (typeof patchHotbarCooldownForLegacySlot === 'function') {
-        patchHotbarCooldownForLegacySlot(slot);
-    }
+    patchHotbarCooldownForLegacySlot(slot);
 
     const btn = document.querySelector(
         `#class-hud-panel .chud-skill-btn[data-slot="${slot}"]`
@@ -316,7 +316,7 @@ export function _patchCooldownButton(slot) {
 
 // Builds a single slot's HTML fragment for the minimized cooldown bar.
 // Shows "Ready ✓" when the cooldown has expired, otherwise shows the remaining time.
-export function _buildMiniBarSlotHTML(slot, displayIndex) {
+function _buildMiniBarSlotHTML(slot, displayIndex) {
     const cd = cooldownState[slot].remaining;
     const isReady = cd <= 0;
     const label = String(displayIndex);
@@ -327,8 +327,8 @@ export function _buildMiniBarSlotHTML(slot, displayIndex) {
 
 // Rebuilds the minimized HUD cooldown bar in-place without a full HUD rebuild.
 // Only covers the two base class slots (active1 / active2).
-// Falls back silently if the bar element isn't present in the DOM.
-export function patchMinimizedBar() {
+// SUSPECTED DEAD: the compact class HUD no longer calls this helper.
+function patchMinimizedBar() {
     const bar = document.getElementById('chud-mini-bar');
     if (!bar) return;
     if (!CLASS_DEFS[STATE.playerClass]) return;
@@ -372,7 +372,7 @@ export function _showCooldownReadyToast(slot) {
 
 // Handles the expiry of a slot's cooldown: clears the interval, fires the ready
 // toast, and triggers a full HUD rebuild to restore the ACTIVATE button.
-export function _onSlotCooldownExpired(slot) {
+function _onSlotCooldownExpired(slot) {
     const state = cooldownState[slot];
     state.remaining = 0;
     clearInterval(state.interval);
@@ -384,7 +384,7 @@ export function _onSlotCooldownExpired(slot) {
 // Ticks a slot's countdown by one second.
 // If the cooldown has reached zero, delegates to _onSlotCooldownExpired.
 // Otherwise, patches only the affected button to avoid a full HUD rebuild.
-export function _tickSlotCooldown(slot) {
+function _tickSlotCooldown(slot) {
 
     // If the game is paused or the player is dead, skip the tick
     if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return;
@@ -399,10 +399,8 @@ export function _tickSlotCooldown(slot) {
     }
 }
 
-// Starts an independent per-second countdown for a single skill slot.
-// If a countdown for this slot is already running it is cancelled first.
-// Immediately patches the button to show the initial countdown value,
-// then ticks once per second until the cooldown expires.
+// Starts a per-slot countdown and replaces any timer already running for it.
+// The dev effect-time scale is applied centrally before the first display.
 export function startSlotCooldown(slot, seconds) {
     const state = cooldownState[slot];
 
@@ -426,7 +424,7 @@ export function startSlotCooldown(slot, seconds) {
 //------------------------------------------------------------------------
 
 // Clears the interval and remaining time for a single slot.
-export function _clearSlotCooldown(slot) {
+function _clearSlotCooldown(slot) {
     if (cooldownState[slot].interval) clearInterval(cooldownState[slot].interval);
     cooldownState[slot].interval = null;
     cooldownState[slot].remaining = 0;
@@ -471,14 +469,9 @@ export function _abilityHotkeysBlocked() {
     return false;
 }
 
-// Sets up Escape to disarm a pending (armed) ability.
-//
-// Ability ACTIVATION no longer lives here: the hotbar slots own the
-// hotbar-1…hotbar-10 keybinds and route through activateHotbarSlot()
-// (see js/skills/skill-hotbar.js), so the player can rebind them like any
-// other key and remap spells freely.
-// Registered once at file load time.
-export function _initAbilityEscapeHotkey() {
+// Lets Escape cancel an armed ability. The hotbar owns actual casting keys.
+// Registered once at module load.
+function _initAbilityEscapeHotkey() {
     document.addEventListener('keydown', (e) => {
         if (e.key !== 'Escape') return;
         if (_abilityHotkeysBlocked()) return;

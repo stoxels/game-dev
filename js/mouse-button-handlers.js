@@ -1,4 +1,4 @@
-﻿import { trackAchStat } from './achievements/achievements.js';
+import { trackAchStat } from './achievements/achievements.js';
 import { revealTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from './grid.js';
@@ -8,15 +8,15 @@ import { stopTimer } from './timer/timer.js';
 import { addTimeSecs, previewGainSecs, subtractTimeSecs } from './timer/timer-adjust.js';
 import { t } from './translation/translations.js';
 import { _countAdjacentPrefillRun, dragCounterApply, dragCounterClear } from './mouse-over.js';
-import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from './probability-tree/probability-tree-state-points.js';
 import { _incDirect, questStat_confidenceIntervalIgnored, questStat_hasManuallyFilledCell, questStat_sampleEfficiencyReveal } from './inference/inference-stats.js';
-import { PassiveTracker } from './passive-tree/passive-tracker.js';
-import { _binomialBurstOnCorrectFill, _frequentistsBurdenOnCorrectFill, _gamblersRuinOnCorrectFill, _getBayesianBonus, _resetBayesianBonus } from './passive-tree/passive-tree-special-nodes-logic.js';
+import { PassiveTracker } from './probability-tree/probability-tree-tracker.js';
+import { _binomialBurstOnCorrectFill, _frequentistsBurdenOnCorrectFill, _gamblersRuinOnCorrectFill, _getBayesianBonus, _resetBayesianBonus } from './probability-tree/probability-tree-special-nodes-logic.js';
 import { STATE } from './state.js';
 import { cur } from './state.js';
 import { _escapeToastHtml, puzzleItemIconHtml, showHtmlToast } from './puzzle-mechanics/toasts-and-popups.js';
 
-//--- Phase 3 step 4: live accessors (external write sites stay untouched) ---
+// Live accessors preserve bridge reads and write-through patch seams.
 try { Object.defineProperty(globalThis, 'dragAxis', { get() { return dragAxis; }, set(v) { dragAxis = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'touchpadMarkModeActive', { get() { return touchpadMarkModeActive; }, set(v) { touchpadMarkModeActive = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, 'checkSpecialIntercepts', { get() { return checkSpecialIntercepts; }, set(v) { checkSpecialIntercepts = v; }, configurable: true }); } catch (e) {}
@@ -42,7 +42,7 @@ try { Object.defineProperty(globalThis, 'handleLuckyTileClaim', { get() { return
 export let pval = 0;
 
 // Which mouse button started the current stroke: 0 = left, 2 = right
-export let mbtn = 0;
+let mbtn = 0;
 
 // The cell where the current drag began (-1 when not dragging)
 export let dragStartRow = -1;
@@ -50,27 +50,28 @@ export let dragStartCol = -1;
 
 // Cells already counted toward the current stroke's displayed number,
 // so re-dragging back over the same cell doesn't double/triple count it.
-export let dragCountedCells = new Set();
+// SUSPECTED DEAD: this and the following stroke counters are written but never read.
+let dragCountedCells = new Set();
 
 // The axis the drag is locked to once the player moves: 'row', 'col', or null (undecided)
 let dragAxis = null;
 
 // How many cells have been correctly filled in the current left-click drag stroke
-export let dragStrokeCount = 0;
+let dragStrokeCount = 0;
 
 // How many already-correct cells are contiguous with the drag-start cell,
 // along the row axis and the column axis respectively (computed at cellDown).
-export let dragPrefillRow = 0;
-export let dragPrefillCol = 0;
+let dragPrefillRow = 0;
+let dragPrefillCol = 0;
 
 // Whether the prefill offset has already been folded into dragStrokeCount
 // for the current stroke (only ever applied once, on first real movement).
-export let dragPrefillApplied = false;
+let dragPrefillApplied = false;
 
 // The pre-fill count folded into the current stroke's display total.
 // Starts as a best guess (max of row/col prefill) on the start cell,
 // then gets locked to the correct axis once the drag direction resolves.
-export let dragPrefillOffset = 0;
+let dragPrefillOffset = 0;
 
 // When true (Touchpad Mode active), left-click behaves like a right-click (mark),
 // and right-click behaves like a left-click (fill). Toggled via the in-game button,
@@ -93,7 +94,7 @@ export function isEndgameLevel() {
 // Endgame: discards any pickup, loot drop, or currency drop sitting on a
 // cell. Shared by the real-mistake path and the wrong-fill path in
 // applyCell(), both of which need to invalidate a cell's drop the same way.
-export function _egDiscardAllDrops(row, col) {
+function _egDiscardAllDrops(row, col) {
     if (!isEndgameLevel()) return;
     if (typeof globalThis._egDiscardPickup === 'function') globalThis._egDiscardPickup(row, col);
     if (typeof globalThis._egDiscardLootDrop === 'function') globalThis._egDiscardLootDrop(row, col);
@@ -129,7 +130,7 @@ export function _egCheckAllClaims(row, col) {
 // If the cell is boss-corrupted, dispel it instead of filling.
 // The player must click again afterward to actually fill.
 // Frozen cells simply reject the click until they thaw.
-export function checkBossCorruptionIntercept(row, col) {
+function checkBossCorruptionIntercept(row, col) {
     // Slimed cells (The Snail) block ALL interaction until swept clean -
     // checked first so a slimed cell can never be clicked around.
     if (typeof globalThis._egSnailIsCellSlimed === 'function' && globalThis._egSnailIsCellSlimed(row, col)) {
@@ -148,7 +149,7 @@ export function checkBossCorruptionIntercept(row, col) {
 }
 
 // If a Bayesian trap is waiting for placement, route the click there.
-export function checkBayesianTrapIntercept(row, col) {
+function checkBayesianTrapIntercept(row, col) {
     if (typeof globalThis._bayesTrapPlacementClick === 'function' && globalThis._bayesTrapPlacementClick(row, col)) {
         return true;
     }
@@ -156,7 +157,7 @@ export function checkBayesianTrapIntercept(row, col) {
 }
 
 // If an active class ability is armed, execute it and consume the click.
-export function checkActiveAbilityIntercept(row, col) {
+function checkActiveAbilityIntercept(row, col) {
     if (globalThis.activeAbilityMode) {
         if (pval === 1 || mbtn === 0) {
             globalThis.executeActiveAbility(row, col);
@@ -168,7 +169,7 @@ export function checkActiveAbilityIntercept(row, col) {
 
 // Elemental ailment puzzle effects (endgame): clicks on icy cells may slip
 // onto a random adjacent cell. See endgame-ailments.js.
-export function checkElementalAilmentIntercept(row, col) {
+function checkElementalAilmentIntercept(row, col) {
     if (typeof globalThis._egPuzzleIceRedirect === 'function' && globalThis._egPuzzleIceRedirect(row, col)) {
         return true;
     }
@@ -204,7 +205,7 @@ function checkSpecialIntercepts(row, col) {
 //------------------------------------------------------------------------
 
 // No-op: cell already holds the value we would paint.
-export function isCellAlreadyDesiredValue(row, col) {
+function isCellAlreadyDesiredValue(row, col) {
     return globalThis.userGrid[row][col] === pval;
 }
 
@@ -212,12 +213,12 @@ export function isCellAlreadyDesiredValue(row, col) {
 // Uses pval (the resolved paint value for this stroke) instead of mbtn,
 // so this also works correctly in Touchpad Mode, where a "mark" stroke
 // can be driven by the left mouse button.
-export function isRightClickOnCorrectCell(row, col) {
+function isRightClickOnCorrectCell(row, col) {
     return pval !== 1 && globalThis.userGrid[row][col] === 1 && cur.grid[row][col] === 1;
 }
 
 // No-op: cannot erase a cell that was revealed by an item.
-export function isEraseOnRevealedCell(row, col) {
+function isEraseOnRevealedCell(row, col) {
     return globalThis.revealedGrid[row][col] && pval === 0;
 }
 
@@ -226,16 +227,16 @@ export function isEraseOnRevealedCell(row, col) {
 // the player marked it themselves or it was marked by an item, passive, or
 // ability effect (both share userGrid state 2; systemMarkedGrid only affects
 // styling, not this check).
-export function isPaintingOverMarkedCell(row, col) {
+function isPaintingOverMarkedCell(row, col) {
     return globalThis.SETTINGS.protectMarkedCells && pval === 1 && globalThis.userGrid[row][col] === 2;
 }
 
 // Runs all cell guards. Returns true if the click should be ignored.
-export function checkCellGuards(row, col) {
+function checkCellGuards(row, col) {
     if (isCellAlreadyDesiredValue(row, col)) return true;
     if (isRightClickOnCorrectCell(row, col)) return true;
     if (isEraseOnRevealedCell(row, col)) return true;
-    if (isPaintingOverMarkedCell(row, col)) return true;   
+    if (isPaintingOverMarkedCell(row, col)) return true;
     return false;
 }
 
@@ -248,7 +249,7 @@ export function checkCellGuards(row, col) {
 //------------------------------------------------------------------------
 
 // Freeze: mark wrong visually but charge no time.
-export function tryAbsorbWithFreeze(row, col) {
+function tryAbsorbWithFreeze(row, col) {
     if (!window._freezeActive) return false;
     if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
     globalThis.wrongGrid[row][col] = true;
@@ -261,7 +262,7 @@ export function tryAbsorbWithFreeze(row, col) {
 }
 
 // Shield: absorb the mistake, consume one shield charge.
-export function tryAbsorbWithShield(row, col) {
+function tryAbsorbWithShield(row, col) {
     if (!globalThis.shieldActive) return false;
     if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
 
@@ -281,7 +282,7 @@ export function tryAbsorbWithShield(row, col) {
 }
 
 // Class passive (e.g. Mathmagician): penalty multiplier of 0 means fully absorbed.
-export function tryAbsorbWithClassPassive(row, col) {
+function tryAbsorbWithClassPassive(row, col) {
     if (ptHasSkill('keystone_null_hypothesis') || ptHasSkill('keystone_asymptotic_mastery')) return false;
     // Suppress any shield-visibility sync (e.g. inside getClassPenaltyMultiplier)
     // from hiding the bubble before we know this was absorbed, and before the
@@ -309,7 +310,7 @@ export function tryAbsorbWithClassPassive(row, col) {
 }
 
 // Confidence Interval grace window: absorb the mistake if the window is open.
-export function tryAbsorbWithConfidenceInterval(row, col) {
+function tryAbsorbWithConfidenceInterval(row, col) {
     if (!globalThis._confidenceIntervalActive) return false;
 
     globalThis._confidenceIntervalActive = false;
@@ -327,7 +328,7 @@ export function tryAbsorbWithConfidenceInterval(row, col) {
 
 // Tries all absorb paths in order.
 // Returns true if the mistake was fully absorbed and no penalty should fire.
-export function tryAbsorbMistake(row, col) {
+function tryAbsorbMistake(row, col) {
     const absorbed = tryAbsorbWithFreeze(row, col)
         || tryAbsorbWithShield(row, col)
         || tryAbsorbWithClassPassive(row, col)
@@ -349,7 +350,7 @@ export function tryAbsorbMistake(row, col) {
 
 // Visually mark the cell wrong, play the error sound, deduct time, and
 // discard any endgame drop the mistake invalidates.
-export function markCellWrongAndPenalize(row, col) {
+function markCellWrongAndPenalize(row, col) {
     globalThis.wrongGrid[row][col] = true;
     renderCell(row, col);
     Audio_Manager.playSFX('cellWrong');
@@ -359,7 +360,7 @@ export function markCellWrongAndPenalize(row, col) {
 }
 
 // Reset consecutive-fill streaks and notify passive systems.
-export function breakFillStreaksOnMistake() {
+function breakFillStreaksOnMistake() {
     globalThis.consecutiveCorrectFills = 0;    // sample_efficiency skill: streak reset
     window.LEVEL_FLAGS.streakBonusFills = 0;          // streak_bonus skill: streak reset
 
@@ -379,7 +380,7 @@ export function breakFillStreaksOnMistake() {
 
 // Open (or reset) the Confidence Interval grace window after a real mistake.
 // The window gives the player a brief period where the NEXT mistake is absorbed.
-export function openConfidenceIntervalGraceWindow() {
+function openConfidenceIntervalGraceWindow() {
     if (ptHasSkill('confidence_interval_1') && !globalThis._confidenceIntervalUsed) {
         let windowSecs = 1;
         if (ptHasSkill('confidence_interval_2')) windowSecs++;
@@ -398,7 +399,7 @@ export function openConfidenceIntervalGraceWindow() {
 
 // Golden Clock: decrement its mistake budget and trigger game-over if exhausted.
 // Returns true if the clock fired a game-over (caller should return).
-export function checkGoldenClockAfterMistake() {
+function checkGoldenClockAfterMistake() {
     if (!window.LEVEL_FLAGS.goldenClockActive) return false;
 
     window.LEVEL_FLAGS.goldenClockMistakesLeft = (window.LEVEL_FLAGS.goldenClockMistakesLeft || 0) - 1;
@@ -417,7 +418,7 @@ export function checkGoldenClockAfterMistake() {
         stopTimer();
         window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
         if (typeof globalThis._arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
-            globalThis._arcaneFreeze_clearAllFrostAndStalagmites();   
+            globalThis._arcaneFreeze_clearAllFrostAndStalagmites();
         }
         document.getElementById('lose-title').textContent = t('ov_lose');
         document.getElementById('lose-sub').textContent = t('cg_golden_clock_fail');
@@ -429,7 +430,7 @@ export function checkGoldenClockAfterMistake() {
 
 // Hardcore mode: any real mistake ends the run immediately.
 // Returns true if hardcore game-over was triggered (caller should return).
-export function checkHardcoreAfterMistake() {
+function checkHardcoreAfterMistake() {
     if (!globalThis.curMods.hardcore) return false;
 
     // Endgame maps have their own defeat summary. Do not open the generic
@@ -445,7 +446,7 @@ export function checkHardcoreAfterMistake() {
     stopTimer();
     window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;    // bounceback achievement needs this
     if (typeof globalThis._arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
-        globalThis._arcaneFreeze_clearAllFrostAndStalagmites();    
+        globalThis._arcaneFreeze_clearAllFrostAndStalagmites();
     }
     document.getElementById('lose-title').textContent = t('hc_fail_title');
     document.getElementById('lose-sub').textContent = t('hc_fail_sub');
@@ -485,7 +486,7 @@ export function handleWrongFill(row, col) {
 // Picks a primary item reward and optionally a bonus item (generous_fortune skill).
 // Pushes both into inventory and returns the composed toast message.
 // Returns null item IDs if Apex Collector suppresses the drop.
-export function claimLuckyTileItems() {
+function claimLuckyTileItems() {
     const wonItemId = globalThis.pickLuckyItem();
     const grantedIds = [];
     let toastMsg;
@@ -530,7 +531,7 @@ export function claimLuckyTileItems() {
 // costs the player 10 minutes. Appends a warning to the toast message.
 // The lucky-tile toast renders as HTML (item art images), so the note is
 // escaped before appending.
-export function applyVarianceCollapsePenalty(toastMsg) {
+function applyVarianceCollapsePenalty(toastMsg) {
     if (!ptHasSkill('keystone_variance_collapse')) return toastMsg;
     subtractTimeSecs(600);
     return toastMsg + ` ${_escapeToastHtml(t('cg_variance_collapse_note'))}`;
@@ -538,7 +539,7 @@ export function applyVarianceCollapsePenalty(toastMsg) {
 
 // covariance_shift (261-263): after a lucky tile is claimed, reveal 1–3
 // unrevealed correct cells from the same row or column.
-export function applyCovarianceShiftReveal(row, col) {
+function applyCovarianceShiftReveal(row, col) {
     if (window.LEVEL_FLAGS.oracleActive) return;
     if (!ptHasSkill('covariance_shift_1')) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
@@ -582,7 +583,7 @@ export function applyCovarianceShiftReveal(row, col) {
 
 // Orchestrates the full lucky tile claim: removes the tile, grants items,
 // applies any keystones, saves state, and triggers covariance_shift reveals.
-export function handleLuckyTileClaim(row, col) {
+function handleLuckyTileClaim(row, col) {
     // Only fires when right-clicking an unclaimed lucky tile
     if (pval !== 2 || !globalThis.luckyTiles || !globalThis.luckyTiles.has(`${row}-${col}`)) return;
 
@@ -615,7 +616,7 @@ export function handleLuckyTileClaim(row, col) {
 // (row, col) along the current drag axis. Recomputed fresh on every call,
 // so it's naturally correct regardless of drag direction, revisits, or
 // how many of the cells were already filled before this stroke.
-export function updateDragStrokeCounter(row, col) {
+function updateDragStrokeCounter(row, col) {
     if (!globalThis.painting || pval !== 1) return;
 
     // Figure out which axis to measure along.
@@ -636,7 +637,7 @@ export function updateDragStrokeCounter(row, col) {
 }
 
 // Fires all class and passive system hooks for a correct fill.
-export function fireCorrectFillHooks(row, col) {
+function fireCorrectFillHooks(row, col) {
     if (typeof window.feedDrifter === 'function') window.feedDrifter();
 
     globalThis.onCorrectFill(row, col);    // class.js hook
@@ -649,7 +650,7 @@ export function fireCorrectFillHooks(row, col) {
 
 // sample_efficiency (nodes 1-3): after N consecutive correct fills, reveal a tile.
 // The threshold decreases with higher nodes.
-export function checkSampleEfficiency(row, col) {
+function checkSampleEfficiency(row, col) {
     if (!ptHasSkill('sample_efficiency_1')) return;
     if (ptHasSkill('keystone_ergodic_field')) return;
 
@@ -690,7 +691,7 @@ export function checkSampleEfficiency(row, col) {
 
 // streak_bonus (nodes 1-3): after 15 consecutive correct fills, add bonus seconds.
 // Keystone gamblers_ruin disables this skill entirely.
-export function checkStreakBonus() {
+function checkStreakBonus() {
     if (!ptHasSkill('streak_bonus_1')) return;
     if (ptHasSkill('keystone_gamblers_ruin')) return;
 
@@ -712,7 +713,7 @@ export function checkStreakBonus() {
 }
 
 // Orchestrates everything that happens after a verified correct left-click fill.
-export function handleCorrectFill(row, col) {
+function handleCorrectFill(row, col) {
     questStat_hasManuallyFilledCell();
     Audio_Manager.playSFX('cellFill');
 
@@ -839,7 +840,7 @@ export function applyCell(row, col) {
 // Determines what pval (paint value) a right-click should use,
 // based on the cell's current state and user settings.
 // Cycles: empty → ✕ → question mark (optional) → empty
-export function resolveRightClickValue(row, col) {
+function resolveRightClickValue(row, col) {
     if (globalThis.userGrid[row][col] === 2 && globalThis.SETTINGS.questionMark) {
         return 3;   // ✕ → question mark (if the setting is enabled)
     } else if (globalThis.userGrid[row][col] === 2 && !globalThis.SETTINGS.questionMark) {

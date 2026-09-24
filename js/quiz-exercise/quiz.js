@@ -7,7 +7,7 @@ import { _egOnQuestionAnswered } from '../combat/encounter-chain.js';
 import { _egOnQuizWrongAnswer } from '../endgame/endgame-map-launch.js';
 import { _egApplyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
 import { buildReveal } from '../grid.js';
-import { PT } from '../passive-tree/passive-tree.js';
+import { PT } from '../probability-tree/probability-tree.js';
 import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { shuffle } from '../puzzle-mechanics/puzzle-helpers.js';
 import { questStat_mcWrongAnswerEliminated, questStat_primerHintShown, questStat_tutorAnsweredCorrect, updateQuestStats } from '../inference/inference-stats.js';
@@ -672,6 +672,7 @@ export function showQuiz(worldNum) {
         _quizShowInputRow(q);
         // Delay focus slightly so the overlay transition has time to complete
         setTimeout(() => {
+            if (typeof document === 'undefined') return;
             const inputEl = document.getElementById('quiz-input');
             if (inputEl) inputEl.focus();
         }, 120);

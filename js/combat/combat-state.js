@@ -140,10 +140,11 @@ let _egMapDef = null;
 
 
 // --- PLAYER MELEE CONSTANTS (Secret-of-Mana-style manual charge) ---
-// The melee bar charges WHILE THE ATTACK KEY IS HELD and is spent by the
-// release strike: the hit deals charge% of full damage (100% charge = 100%
-// damage, holding past full overcharges further) and resets the bar to
-// zero. There are no automatic melee strikes.
+// The melee bar auto-charges to 100% on its own and is spent by the
+// release strike: the hit deals charge% of full damage (100% charge =
+// 100% damage, holding past full overcharges through the weapon-art
+// tiers up to 500%) and resets the bar to zero. There are no automatic
+// melee strikes.
 // Base charge time in seconds when no weapon is equipped. The equipped
 // weapon's attackIntervalSeconds defines the actual base (see
 // _egGetPlayerAttackInterval in endgame-player-stats.js); the weapon's

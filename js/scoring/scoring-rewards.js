@@ -2,7 +2,7 @@ import { save, STATE, cur } from '../state.js';
 import { t } from '../translation/translations.js';
 import { _incDirect, questStat_luckyDropClaimed } from '../inference/inference-stats.js';
 import { hideResultOverlays } from '../screens/screens.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { puzzleItemIconHtml, showToast, showItemGainPopup } from '../puzzle-mechanics/toasts-and-popups.js';
 import { buildInventoryPanel, attachItemTooltip } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { rarityColors, itemName, pickRandomItem } from '../puzzle-items/item-pool.js';

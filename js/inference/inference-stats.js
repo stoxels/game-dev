@@ -1,4 +1,4 @@
-import { _ptAllocated, ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { _ptAllocated, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { levelStartTime, save, STATE, cur } from '../state.js';
 import { _MILESTONE_MAP } from './inference-data.js';
 import { _milestone_isClaimed, _milestone_isComplete, _refreshQuestBadge, claimQuest } from './inference-logic.js';
@@ -132,12 +132,12 @@ export function _ptAvailable() {
     return typeof ptHasSkill === 'function';
 }
 
-// Returns how many passive-tree points the player has actually spent. The
-// origin/start node is always free, so we subtract 1 from the allocated set.
-// Returns 0 if the passive tree isn't initialised yet.
+// Returns how many passive-tree nodes the player has actually spent points on.
+// Character-start nodes are free roots and are excluded from the count.
 export function _ptCurrentSpentCount() {
     const allocated = (typeof _ptAllocated === 'function') ? _ptAllocated() : new Set();
-    return Math.max(0, allocated.size - 1);
+    const startIds = new Set([1001, 1002, 1003]);
+    return [...allocated].filter(id => !startIds.has(id)).length;
 }
 
 

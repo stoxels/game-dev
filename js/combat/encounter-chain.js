@@ -1,7 +1,7 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _applyProbabilistPassive, _getPassiveEffect } from '../classes/class-abilities.js';
-import { PassiveTracker } from '../passive-tree/passive-tracker.js';
+import { PassiveTracker } from '../probability-tree/probability-tree-tracker.js';
 import { _refreshQuestionModalFlag } from '../screens/screens.js';
 import { _charmReplaceCarriedDrops, _egCharmDrops } from '../skills/skill-charms.js';
 import { _egClearCenterGridBanners, pauseTimer, resumeTimer, stopTimer } from '../timer/timer.js';

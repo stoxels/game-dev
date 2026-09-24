@@ -14,7 +14,7 @@ import { t } from './translation/translations.js';
 // Removes the persisted save from localStorage - targets ONLY the
 // currently active save slot. Achievements (ACH_SAVE_KEY, achievements.js)
 // and all other save slots are untouched.
-export function wipeSaveData() {
+function wipeSaveData() {
     const slot = (typeof getActiveSlot === 'function' ? getActiveSlot() : null) || 1;
     if (typeof wipeSlot === 'function') wipeSlot(slot);
 }
@@ -26,7 +26,7 @@ export function wipeSaveData() {
 
 // Wipes a single, specific save slot (not necessarily the active one) and
 // returns to the save-slot select screen so the grid reflects the deletion.
-export function confirmSlotDelete(slotNum) {
+function confirmSlotDelete(slotNum) {
     hideModal('reset-modal');
     window._pendingResetSlot = null;
     wipeSlot(slotNum);
@@ -38,7 +38,7 @@ export function confirmSlotDelete(slotNum) {
 // active slot's save, rebuilds a blank STATE using the same fresh-state
 // shape as a brand-new save file, persists it back into that slot, then
 // returns to the title screen with a confirmation toast.
-export function confirmFullReset() {
+function confirmFullReset() {
     hideModal('reset-modal');
     wipeSaveData();
     resetAllBeats();

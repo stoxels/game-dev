@@ -214,18 +214,15 @@
     transition: none;
 }
 
-    /* 128px - the exact same sprite box the puzzle screen renders
-       (#avatar-sprite-img-simple). The gear overlay painter normalizes all
-       placements against this box, so the map sprite previously drew its
-       weapon/shield at the feet while the puzzle avatar drew them at the
-       hands. Same box = identical rendering by construction.
+    /* 80px - a compact map-preview version of the puzzle sprite box. The
+       gear overlay painter normalizes all placements against this box, so
+       the map sprite and its equipment stay aligned.
        MUST be a direct-child selector (>): the gear overlay <img>s live
-       inside this wrapper too, and a plain descendant selector used to
-       force every weapon/shield img onto a 128px-tall letterboxed box,
-       shoving them down to the sprite's feet. */
+       inside this wrapper too, and a plain descendant selector would
+       force every weapon/shield img onto the body image's letterboxed box. */
     .mv-sprite > img {
-        width: 128px;
-        height: 128px;
+        width: 80px;
+        height: 80px;
         object-fit: contain;
         filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
         transition: transform 0.1s;
@@ -465,11 +462,10 @@
     pointer-events: none;
 }
 
-    /* Same 128px box as the puzzle avatar - see .mv-sprite > img above
-       for why this must be a direct-child selector. */
+    /* Same 80px map-preview box as the overworld sprite. */
     .wd-sprite > img {
-        width: 128px;
-        height: 128px;
+        width: 80px;
+        height: 80px;
         object-fit: contain;
         filter: drop-shadow(0 3px 6px rgba(0,0,0,0.8));
     }

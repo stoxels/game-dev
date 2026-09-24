@@ -79,7 +79,7 @@ export function _egCraftingBenchTooltipHTML(entry, tier, costs, disabled, afford
     let html = `<strong style="color:#f1d27b">${label}</strong>`;
     html += `<br><span style="color:#a8c8e8">Range:</span> ${range}`;
     html += `<br><span style="color:#a8c8e8">Cost:</span> ${_egCraftingBenchCostTooltip(costs)}`;
-    if (entry.isReplace) html += `<br><span style="color:#f1d27b">Replaces the existing crafted ${entry.type} (includes +1 Orb of Scouring)</span>`;
+    if (entry.isReplace) html += `<br><span style="color:#f1d27b">Replaces the existing crafted ${entry.type} (includes +1 Hollow Core)</span>`;
     if (disabled) html += `<br><span style="color:#e87d70">Requires item level ${tier.ilvl}</span>`;
     else if (!affordable) html += '<br><span style="color:#e87d70">Not enough currency for this craft</span>';
     return html;

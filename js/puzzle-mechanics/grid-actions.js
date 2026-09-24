@@ -1,6 +1,6 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { _incDirect, questStat_rowsErased } from '../inference/inference-stats.js';
 import { _applyCellEffect } from './cell-fx.js';
 import { _applyDenseMarkerBias, _applyTargetedRevealBias, shuffle } from './puzzle-helpers.js';

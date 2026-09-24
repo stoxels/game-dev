@@ -1,4 +1,4 @@
-﻿import { LANG, t } from '../translation/translations.js';
+import { LANG, t } from '../translation/translations.js';
 import { initMapViewToggle, showMapView } from './screens-map-view.js';
 import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
 import { buildQuestLogButton } from '../inference/inference-logic.js';
@@ -30,7 +30,7 @@ export const MOD_CLASSES = {
 };
 
 // Maps internal modifier keys to their i18n translation keys (used in tooltips)
-export const MOD_I18N_KEYS = {
+const MOD_I18N_KEYS = {
     timetrial: 'mod_tt',
     hardcore: 'mod_hc',
     ironman: 'mod_im',
@@ -40,7 +40,7 @@ export const MOD_I18N_KEYS = {
 };
 
 // Maps bonus types to their display icons (used on level cards)
-export const BONUS_ICONS = {
+const BONUS_ICONS = {
     nomiss: '✨',
     fast: '⚡',
     noitem: '🎒',
@@ -52,23 +52,25 @@ export const BONUS_ICONS = {
 };
 
 // Ordered difficulty tiers used for star counts and tooltip suggestions
-export const DIFF_TIERS = ['easy', 'normal', 'hard'];
+const DIFF_TIERS = ['easy', 'normal', 'hard'];
 
 // All modifier keys in the order they should appear
-export const ALL_MODS = ['timetrial', 'hardcore', 'ironman', 'classless', 'treeless'];
+const ALL_MODS = ['timetrial', 'hardcore', 'ironman', 'classless', 'treeless'];
 
 // Super Tutor is a temporary utility and never contributes to score or
 // completion-star modifier counts.
-export const SCORE_MODS = new Set(ALL_MODS);
+const SCORE_MODS = new Set(ALL_MODS);
 
 // Star character constants used in getStars()
-export const STAR_FILLED = '⭐';
-export const STAR_EMPTY = '☆';
-export const STAR_MOD = '★';
+const STAR_FILLED = '⭐';
+const STAR_EMPTY = '☆';
+const STAR_MOD = '★';
 
 // Convergence points are placed at 33% and 66% of a world's levels
-export const CONVERGENCE_FRACTION_1 = 1 / 3;
-export const CONVERGENCE_FRACTION_2 = 2 / 3;
+// ⚠ SUSPECTED DEAD CODE (R3 2026-09-24): retained under the no-delete rule;
+// campaign convergence levels are no longer represented on this screen.
+const CONVERGENCE_FRACTION_1 = 1 / 3;
+const CONVERGENCE_FRACTION_2 = 2 / 3;
 
 
 //------------------------------------------------------------------------
@@ -78,7 +80,7 @@ export const CONVERGENCE_FRACTION_2 = 2 / 3;
 
 
 // Builds the HTML for a single modifier tag span.
-export function buildModTagSpan(modKey, labelMap, classMap) {
+function buildModTagSpan(modKey, labelMap, classMap) {
     const cls = classMap[modKey] || 'diff';
     const label = labelMap[modKey] || modKey.toUpperCase();
     return `<span class="mod-tag ${cls}">${label}</span>`;
@@ -88,7 +90,7 @@ export function buildModTagSpan(modKey, labelMap, classMap) {
 // tag into the #ls-mods element in the top bar.
 // MONSTERLESS is a content toggle (no score, no stars) so it is not in
 // SCORE_MODS - it is appended explicitly so the active mod stays visible.
-export function renderLSTopBar() {
+function renderLSTopBar() {
     const modEl = document.getElementById('ls-mods');
     const active = Object.keys(globalThis.curMods).filter(m => SCORE_MODS.has(m) && globalThis.curMods[m]);
     if (globalThis.curMods && globalThis.curMods.monsterless) active.push('monsterless');
@@ -109,7 +111,7 @@ export function buildNextCodeStr() {
 }
 
 // Renders the total score and the "points to next unlock code" hint into the top bar.
-export function renderLSScoreRow() {
+function renderLSScoreRow() {
     document.getElementById('ls-score').textContent = STATE.totalScore;
 
     const ptsNextEl = document.getElementById('ls-pts-next');
@@ -153,7 +155,7 @@ export function applyClassStatusEmptyStyle(classEl) {
 }
 
 // Renders the player's current class (or a prompt to pick one) in #ls-class-status.
-export function renderLSClassStatus() {
+function renderLSClassStatus() {
     const classEl = document.getElementById('ls-class-status');
     if (!classEl) return;
 
@@ -170,7 +172,7 @@ export function renderLSClassStatus() {
 // Updates the Probability Tree button highlight based on available points.
 // Shows a golden border and a yellow point count to the right of the label
 // when the player has unspent points to spend.
-export function renderLSPassiveTreeButton() {
+function renderLSPassiveTreeButton() {
     const treePoints = STATE.passiveTreePoints || 0;
     const ptBtn = document.getElementById('btn-go-passive-tree');
     if (!ptBtn) return;
@@ -205,7 +207,7 @@ export function renderLSPassiveTreeButton() {
 
 // Creates the world-block wrapper div (world label heading + empty level grid container).
 // World 14's (Nexus) label is only attached once the world is unlocked.
-export function buildWorldBlock(w, wi) {
+function buildWorldBlock(w, wi) {
     const block = document.createElement('div');
     block.className = 'world-block';
     const worldLabel = LANG === 'de' && w.labelDE ? w.labelDE : w.label;
@@ -216,7 +218,7 @@ export function buildWorldBlock(w, wi) {
 }
 
 // Clears #ls-body and rebuilds all world blocks and their level card grids.
-export function renderLSWorlds() {
+function renderLSWorlds() {
     const body = document.getElementById('ls-body');
     body.innerHTML = '';
 
@@ -235,12 +237,12 @@ export function renderLSWorlds() {
 
         // Inject the special Endgame Hub card at the front of World 14 (index 13, the Nexus World)
 
-      
+
         if (wi === 13) {
             const hubCard = buildEndgameHubCard(w, wi, tip);
             grid.prepend(hubCard);
         }
-        
+
 
     });
 }
@@ -319,7 +321,7 @@ export function isMaxCleared(gi) {
 
 // Returns a star string based on the difficulty and modifiers of the best run.
 // Stars 1–3 reflect difficulty tier; each active modifier appends a bonus star (★).
-export function getStars(gi) {
+function getStars(gi) {
     const hs = STATE.levelHS[gi];
     if (!hs) return '';
 
@@ -341,7 +343,7 @@ export function getStars(gi) {
 
 // Builds the CSS class string for a level card based on its current state.
 // The Nexus Point keeps the ascension frame but adds its own marker class.
-export function buildLevelCardClass({ isUnlocked, isDone, isMathGated, isLastInWorld, isConvergenceLevel, w, gi, isNexusPoint }) {
+function buildLevelCardClass({ isUnlocked, isDone, isMathGated, isLastInWorld, isConvergenceLevel, w, gi, isNexusPoint }) {
     return 'level-card' +
         (isUnlocked ? '' : ' locked') +
         (isDone ? ' done' : '') +
@@ -353,12 +355,12 @@ export function buildLevelCardClass({ isUnlocked, isDone, isMathGated, isLastInW
 }
 
 // Returns the high-score div HTML, or empty string if no score exists yet.
-export function buildHSHtml(hs) {
+function buildHSHtml(hs) {
     return hs ? `<div class="lc-hs">${t('ls_hs_best')}: ${hs.score}</div>` : '';
 }
 
 // Returns the bonus objective div - either a "claimed" badge or the objective hint text.
-export function buildBonusHtml(p, gi, isUnlocked) {
+function buildBonusHtml(p, gi, isUnlocked) {
     if (!isUnlocked) return `<div class="lc-bonus">???</div>`;
 
     const bIcon = BONUS_ICONS[p.bonusType || 'nomiss'] || '🎯';
@@ -372,7 +374,7 @@ export function buildBonusHtml(p, gi, isUnlocked) {
 
 // Returns the modifier-tag row HTML for the mods used in the player's best run.
 // Returns empty string if no score or no mods were active.
-export function buildModTagsHtml(hs) {
+function buildModTagsHtml(hs) {
     if (!hs || !hs.mods) return '';
 
     const activeMods = Object.keys(hs.mods).filter(m => SCORE_MODS.has(m) && hs.mods[m]);
@@ -388,7 +390,7 @@ export function buildModTagsHtml(hs) {
 }
 
 // Returns the grid size string "rows×cols", falling back to the world's default size.
-export function buildGridSizeStr(p, w) {
+function buildGridSizeStr(p, w) {
     return p.grid
         ? `${p.grid.length}×${p.grid[0].length}`
         : (w.size ? `${w.size}×${w.size}` : '?');
@@ -397,14 +399,14 @@ export function buildGridSizeStr(p, w) {
 // Returns the ASCENSION badge HTML for the final level of a world.
 // Only shown when the world has more than one level.
 // The Nexus Point shows its own badge instead of the Ascension badge.
-export function buildAscensionBadge(isLastInWorld, w, isNexusPoint) {
+function buildAscensionBadge(isLastInWorld, w, isNexusPoint) {
     if (!isLastInWorld || w.data.length <= 1) return '';
     if (isNexusPoint) return `<div class="lc-ascension-badge lc-nexus-point-badge">${t('scr_nexus_point_badge')}</div>`;
     return `<div class="lc-ascension-badge">${t('scr_ascension_badge')}</div>`;
 }
 
 // Returns the CONVERGENCE badge HTML, with a checkmark if the reward is already claimed.
-export function buildConvergenceBadge(isConvergenceLevel, gi) {
+function buildConvergenceBadge(isConvergenceLevel, gi) {
     if (!isConvergenceLevel) return '';
 
     const claimed = STATE.convergenceDone && STATE.convergenceDone.includes(gi);
@@ -414,7 +416,7 @@ export function buildConvergenceBadge(isConvergenceLevel, gi) {
 }
 
 // Assembles the full inner HTML for a level card.
-export function buildLevelCardHTML({ p, li, wi, w, gi, isUnlocked, isDone, hs, isLastInWorld, isConvergenceLevel, isNexusPoint }) {
+function buildLevelCardHTML({ p, li, wi, w, gi, isUnlocked, isDone, hs, isLastInWorld, isConvergenceLevel, isNexusPoint }) {
     const stars = isDone ? getStars(gi) : '';
     const hsHtml = buildHSHtml(hs);
     const bonusHtml = buildBonusHtml(p, gi, isUnlocked);
@@ -434,7 +436,7 @@ export function buildLevelCardHTML({ p, li, wi, w, gi, isUnlocked, isDone, hs, i
 }
 
 // Attaches click and tooltip mouse events to an unlocked level card.
-export function attachLevelCardEvents(card, gi, isDone, isMathGated, tip) {
+function attachLevelCardEvents(card, gi, isDone, isMathGated, tip) {
     card.addEventListener('click', () => globalThis.startLevel(gi));
 
     // Decide what tip text to show based on completion state
@@ -459,7 +461,7 @@ export function attachLevelCardEvents(card, gi, isDone, isMathGated, tip) {
 // inside a world follow a linear progression path (level N+1 needs level N
 // done). The Nexus World additionally stays locked until the whole campaign
 // (worlds 1..13) is finished.
-export function buildLevelCard(p, li, wi, w, tip) {
+function buildLevelCard(p, li, wi, w, tip) {
     const gi = globalThis.WORLD_START_GI[wi] + li;
     const isNexusPoint = typeof globalThis.isNexusPointLevel === 'function' && globalThis.isNexusPointLevel(wi, li);
     let isUnlocked = li === 0 ? !!STATE.tutorialDone : STATE.done.includes(gi - 1);
@@ -498,7 +500,7 @@ export function buildLevelCard(p, li, wi, w, tip) {
 // finishing every campaign world first).
 
 
-export function buildEndgameHubCard(w, wi, tip) {
+function buildEndgameHubCard(w, wi, tip) {
     const hubCard = document.createElement('div');
 
     // The Nexus (and its hub card) opens via the Nexus Point completion.
@@ -573,14 +575,14 @@ export function buildEndgameHubCard(w, wi, tip) {
 
 
 // Returns modifiers the player hasn't yet used in their best run for a given level.
-export function getUnusedMods(hs) {
+function getUnusedMods(hs) {
     const usedMods = hs.mods ? Object.keys(hs.mods).filter(m => hs.mods[m]) : [];
     return ALL_MODS.filter(m => !usedMods.includes(m));
 }
 
 // Returns a suggestion string if the player can still try a harder difficulty.
 // Returns null if already on the hardest tier.
-export function getDiffSuggestion(hs) {
+function getDiffSuggestion(hs) {
     const currentDiffIdx = DIFF_TIERS.indexOf(hs.diff || 'easy');
     if (currentDiffIdx >= DIFF_TIERS.length - 1) return null;
 
@@ -590,7 +592,7 @@ export function getDiffSuggestion(hs) {
 
 // Returns a suggestion string listing modifiers the player hasn't tried yet.
 // Returns null if all modifiers have been used.
-export function getModSuggestion(hs) {
+function getModSuggestion(hs) {
     const unusedMods = getUnusedMods(hs);
     if (!unusedMods.length) return null;
 
@@ -600,9 +602,9 @@ export function getModSuggestion(hs) {
 }
 
 // Builds a suggestion string for the level card tooltip.
-// Looks at the player's best run and suggests higher difficulty, unused modifiers, 
+// Looks at the player's best run and suggests higher difficulty, unused modifiers,
 // or performance optimizations (time/mistakes).
-export function getTooltipHint(gi) {
+function getTooltipHint(gi) {
     const hs = STATE.levelHS[gi];
     if (!hs) return t('ls_no_score');
 
@@ -624,7 +626,7 @@ export function getTooltipHint(gi) {
 
 // Injects the tooltip and items-hint CSS rules once into the document head.
 // Safe to call multiple times - skips injection if the style tag already exists.
-export function ensureLSTooltipStyles() {
+function ensureLSTooltipStyles() {
     if (document.getElementById('ls-tooltip-style')) return;
 
     const style = document.createElement('style');
@@ -648,7 +650,7 @@ export function ensureLSTooltipStyles() {
 }
 
 // Returns the shared floating tooltip element, creating it if it doesn't exist yet.
-export function ensureLSTooltip() {
+function ensureLSTooltip() {
     let tip = document.getElementById('lc-tip');
     if (!tip) {
         tip = document.createElement('div');

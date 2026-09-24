@@ -1,10 +1,10 @@
-﻿import { trackAchStat } from '../achievements/achievements.js';
+import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { handleWrongFill } from '../mouse-button-handlers.js';
 import { t } from '../translation/translations.js';
 import { _refundCooldown } from './class-actuary.js';
-import { ptHasSkill } from '../passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { cur } from '../state.js';
 
@@ -18,7 +18,7 @@ import { cur } from '../state.js';
         revealing beams at adjacent correct cells and leaps between mistakes
       - Degrees of Freedom: raises a zombie that wanders the grid and
         challenges the player to correctly fill or mark the cell it haunts
-//------------------------------------------------------------------------  
+//------------------------------------------------------------------------
 */
 
 
@@ -33,10 +33,10 @@ import { cur } from '../state.js';
 window._residualSkeletons = [];
 
 // Milliseconds the skeleton needs to walk from one cell to the next
-export const SKELETON_STEP_MS = 1000;
+const SKELETON_STEP_MS = 1000;
 
 // Milliseconds the arc jump between two mistakes takes
-export const SKELETON_JUMP_MS = 700;
+const SKELETON_JUMP_MS = 700;
 
 // Active DoF zombie instance (single zombie at a time, lasts the whole level):
 // { row, col, nextChallengeAt, moveTimeout, el,
@@ -45,17 +45,17 @@ export const SKELETON_JUMP_MS = 700;
 window._dofZombie = null;
 
 // Zombie movement / challenge timing
-export const ZOMBIE_STEP_MS = 900;        // ms per wandering step
-export const ZOMBIE_DWELL_MS = 5000;      // ms the zombie stands still before the countdown
-export const ZOMBIE_COUNTDOWN_SECS = 10;  // seconds the player has to react
-export const ZOMBIE_CURSE_RADIUS = 2;     // Chebyshev radius for the fake-mistake reward
+const ZOMBIE_STEP_MS = 900;        // ms per wandering step
+const ZOMBIE_DWELL_MS = 5000;      // ms the zombie stands still before the countdown
+const ZOMBIE_COUNTDOWN_SECS = 10;  // seconds the player has to react
+const ZOMBIE_CURSE_RADIUS = 2;     // Chebyshev radius for the fake-mistake reward
 
 // Pause between challenges (ms) - the zombie wanders quietly in between so
 // the player can focus on puzzling instead of watching the zombie
-export const ZOMBIE_CHALLENGE_GRACE_MIN_MS = 25000;
-export const ZOMBIE_CHALLENGE_GRACE_MAX_MS = 40000;
+const ZOMBIE_CHALLENGE_GRACE_MIN_MS = 25000;
+const ZOMBIE_CHALLENGE_GRACE_MAX_MS = 40000;
 // Initial quiet period after summoning before the first challenge can start
-export const ZOMBIE_FIRST_CHALLENGE_DELAY_MS = 12000;
+const ZOMBIE_FIRST_CHALLENGE_DELAY_MS = 12000;
 
 // Tracks cells that were reverted by Degrees of Freedom (used to skip cleanup in renderCell)
 window._dofRevertedCells = new Set();
@@ -93,7 +93,7 @@ export function _executeResidual(row, col, effect) {
 }
 
 // Generates a collision-safe unique ID string for a new skeleton
-export function _generateSkeletonId() {
+function _generateSkeletonId() {
     return `skeleton-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
 }
 
@@ -112,7 +112,7 @@ export function _generateSkeletonId() {
     maxSkeletons (optional): cap on concurrently alive skeletons; child
     spawns are skipped while the cap is reached.
 */
-export function _spawnResidualSkeleton(id, row, col, durationSecs, fireIntervalSecs, visitedKeys, maxSkeletons = 2) {
+function _spawnResidualSkeleton(id, row, col, durationSecs, fireIntervalSecs, visitedKeys, maxSkeletons = 2) {
     const sk = {
         id,
         row,
@@ -149,12 +149,12 @@ export function _spawnResidualSkeleton(id, row, col, durationSecs, fireIntervalS
 }
 
 // Returns the skeleton object with the given id, or undefined if not found
-export function _findSkeletonById(id) {
+function _findSkeletonById(id) {
     return window._residualSkeletons.find(s => s.id === id);
 }
 
 // Returns how many skeletons are currently alive (cap checks for child spawns)
-export function _countAliveSkeletons() {
+function _countAliveSkeletons() {
     return window._residualSkeletons.length;
 }
 
@@ -162,7 +162,7 @@ export function _countAliveSkeletons() {
     Removes a specific skeleton: cancels its timers, fades out its DOM
     element and removes it from the global list.
 */
-export function _clearSpecificSkeleton(id) {
+function _clearSpecificSkeleton(id) {
     const idx = window._residualSkeletons.findIndex(s => s.id === id);
     if (idx === -1) return;
 
@@ -181,7 +181,7 @@ export function _clearSpecificSkeleton(id) {
 }
 
 // Removes all active skeletons (e.g. on level reset)
-export function _clearAllResidualSkeletons() {
+function _clearAllResidualSkeletons() {
     if (!window._residualSkeletons || window._residualSkeletons.length === 0) return;
     for (let i = window._residualSkeletons.length - 1; i >= 0; i--) {
         _clearSpecificSkeleton(window._residualSkeletons[i].id);
@@ -196,7 +196,7 @@ export function _clearAllResidualSkeletons() {
 //------------------------------------------------------------------------
 
 // Schedules the skeleton's next step; idles while an arc jump is in progress
-export function _scheduleNextSkeletonMove(sk) {
+function _scheduleNextSkeletonMove(sk) {
     sk.moveTimeout = setTimeout(() => {
         if (sk.finished) return;
         if (!sk.jumping) _skeletonStep(sk);
@@ -205,7 +205,7 @@ export function _scheduleNextSkeletonMove(sk) {
 }
 
 // Moves the skeleton one row up or down within its column, then checks for jumps
-export function _skeletonStep(sk) {
+function _skeletonStep(sk) {
     if (!cur) return;
     const rows = cur.grid.length;
     if (rows <= 1) { _trySkeletonJump(sk); return; }
@@ -233,7 +233,7 @@ export function _skeletonStep(sk) {
     if no target exists yet, the skeleton may jump from it later when new
     mistakes appear in a valid column.
 */
-export function _trySkeletonJump(sk) {
+function _trySkeletonJump(sk) {
     if (!cur || !globalThis.wrongGrid[sk.row] || !globalThis.wrongGrid[sk.row][sk.col]) return;
 
     const originKey = `${sk.row}-${sk.col}`;
@@ -304,7 +304,7 @@ export function _trySkeletonJump(sk) {
 //------------------------------------------------------------------------
 
 // Repeats the volley every fireIntervalSecs until the skeleton expires
-export function _skeletonFireCycle(id) {
+function _skeletonFireCycle(id) {
     const sk = _findSkeletonById(id);
     if (!sk) return;
 
@@ -316,7 +316,7 @@ export function _skeletonFireCycle(id) {
     Fires beams at all adjacent unrevealed correct cells around the
     skeleton. Each beam is slightly staggered for a nicer visual rhythm.
 */
-export function _skeletonFireVolley(sk) {
+function _skeletonFireVolley(sk) {
     if (!cur) return;
 
     const targets = _findAdjacentRevealableCells(sk.row, sk.col);
@@ -331,7 +331,7 @@ export function _skeletonFireVolley(sk) {
 }
 
 // Scans the 8 neighbours of (row, col) and returns all unrevealed correct cells
-export function _findAdjacentRevealableCells(row, col) {
+function _findAdjacentRevealableCells(row, col) {
     const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
@@ -352,7 +352,7 @@ export function _findAdjacentRevealableCells(row, col) {
 }
 
 // Applies the reveal to a cell and fires all relevant side-effects
-export function _revealCellFromSkeleton(r, c) {
+function _revealCellFromSkeleton(r, c) {
     globalThis.revealedGrid[r][c] = true;
     globalThis.userGrid[r][c] = 1;
     renderCell(r, c);
@@ -370,7 +370,7 @@ export function _revealCellFromSkeleton(r, c) {
     a gradient glow line with a bright travelling pulse and an expanding
     impact ring on the target. Plays the reveal sound, then fades out.
 */
-export function _residualDrawBeam(fromRow, fromCol, toRow, toCol, onComplete) {
+function _residualDrawBeam(fromRow, fromCol, toRow, toCol, onComplete) {
     Audio_Manager.playSFX('residualReveal');
 
     const fromEl = document.getElementById(`g-${fromRow}-${fromCol}`);
@@ -388,7 +388,7 @@ export function _residualDrawBeam(fromRow, fromCol, toRow, toCol, onComplete) {
 }
 
 // Builds and returns a positioned SVG element containing the full beam effect
-export function _buildBeamSvg(fromEl, toEl) {
+function _buildBeamSvg(fromEl, toEl) {
     const fr = fromEl.getBoundingClientRect();
     const tr = toEl.getBoundingClientRect();
 
@@ -515,7 +515,7 @@ export function _fadeOutElement(el, startOpacity, step) {
 //------------------------------------------------------------------------
 
 // Creates the floating skeleton element: countdown label above, skull below
-export function _createSkeletonElement(sk) {
+function _createSkeletonElement(sk) {
     const el = document.createElement('div');
     el.className = 'residual-skeleton';
     el.id = `residual-skeleton-${sk.id}`;
@@ -528,7 +528,7 @@ export function _createSkeletonElement(sk) {
 }
 
 // Snaps the skeleton element to the center of a grid cell by coordinates
-export function _skeletonSnapToCell(el, r, c) {
+function _skeletonSnapToCell(el, r, c) {
     const cellEl = document.getElementById(`g-${r}-${c}`);
     if (!cellEl || !el) return;
     const rect = cellEl.getBoundingClientRect();
@@ -537,13 +537,13 @@ export function _skeletonSnapToCell(el, r, c) {
 }
 
 // Updates the remaining-time label above the skeleton
-export function _updateSkeletonLabel(sk) {
+function _updateSkeletonLabel(sk) {
     const label = sk.el?.querySelector('.residual-skeleton-timer');
     if (label) label.textContent = `${Math.max(0, sk.remainingSecs)}s`;
 }
 
 // Plays the fade-out animation, then removes the skeleton element
-export function _removeSkeletonElement(el) {
+function _removeSkeletonElement(el) {
     if (!el) return;
     el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     el.style.opacity = '0';
@@ -625,7 +625,7 @@ export function _executeDegreesOfFreedom(row, col, effect) {
 }
 
 // Returns a random cell that is unfilled, unmarked and not a mistake
-export function _findZombieSpawnCell() {
+function _findZombieSpawnCell() {
     if (!cur) return null;
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
@@ -641,7 +641,7 @@ export function _findZombieSpawnCell() {
 }
 
 // A cell the zombie may dwell on: empty in the user grid, no mistake, not revealed
-export function _isFreeCellForZombie(r, c) {
+function _isFreeCellForZombie(r, c) {
     return globalThis.userGrid[r][c] === 0 && !globalThis.wrongGrid[r][c] && !globalThis.revealedGrid[r][c];
 }
 
@@ -653,7 +653,7 @@ export function _isFreeCellForZombie(r, c) {
 
 // Creates the floating zombie element: countdown label above, 🧟 icon below.
 // The label stays empty while idle and only shows numbers during challenges.
-export function _createZombieElement(zombie) {
+function _createZombieElement(zombie) {
     const el = document.createElement('div');
     el.className = 'dof-zombie';
     el.innerHTML = `
@@ -665,7 +665,7 @@ export function _createZombieElement(zombie) {
 }
 
 // Snaps the zombie element to the center of a grid cell by coordinates
-export function _zombieSnapToCell(el, r, c) {
+function _zombieSnapToCell(el, r, c) {
     const cellEl = document.getElementById(`g-${r}-${c}`);
     if (!cellEl || !el) return;
     const rect = cellEl.getBoundingClientRect();
@@ -674,7 +674,7 @@ export function _zombieSnapToCell(el, r, c) {
 }
 
 // Tears down the zombie: kills all timers, removes the DOM element
-export function _clearDoFZombie() {
+function _clearDoFZombie() {
     const zombie = window._dofZombie;
     if (!zombie) return;
     if (zombie.finished) return;
@@ -689,7 +689,7 @@ export function _clearDoFZombie() {
 }
 
 // Plays the fade-out animation, then removes the zombie element
-export function _removeZombieElement(el) {
+function _removeZombieElement(el) {
     if (!el) return;
     el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     el.style.opacity = '0';
@@ -719,7 +719,7 @@ window.addEventListener('resize', () => {
 //------------------------------------------------------------------------
 
 // Schedules the zombie's next wandering step; stands still during a challenge
-export function _scheduleNextZombieMove(zombie) {
+function _scheduleNextZombieMove(zombie) {
     zombie.moveTimeout = setTimeout(() => {
         if (zombie.finished) return;
         if (!zombie.challenge) {
@@ -732,7 +732,7 @@ export function _scheduleNextZombieMove(zombie) {
 // Moves the zombie one cell in a random direction (bouncing at edges).
 // Arriving on a free cell starts a dwell - countdown challenge there,
 // but only after the current challenge grace period has elapsed.
-export function _zombieStep(zombie) {
+function _zombieStep(zombie) {
     if (!cur) return;
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
@@ -777,7 +777,7 @@ export function _zombieStep(zombie) {
       - Expired        - zombie fills the cell itself (mistake if sol is 0)
       - Cell no longer free - challenge silently aborted
 */
-export function _startZombieChallenge(zombie) {
+function _startZombieChallenge(zombie) {
     const challenge = {
         row: zombie.row,
         col: zombie.col,
@@ -827,7 +827,7 @@ export function _startZombieChallenge(zombie) {
 }
 
 // Shows the red countdown number above the zombie's head
-export function _updateZombieCountdownLabel(zombie) {
+function _updateZombieCountdownLabel(zombie) {
     const label = zombie.el?.querySelector('.dof-zombie-timer');
     if (label) label.textContent = `${Math.max(0, zombie.challenge.secondsLeft)}s`;
 }
@@ -839,7 +839,7 @@ export function _updateZombieCountdownLabel(zombie) {
         normal click pipeline, so no extra handling is needed.
       - Correctly filled (sol 1) or correctly marked - (sol 0) - reward.
 */
-export function _evaluateZombieChallenge(zombie) {
+function _evaluateZombieChallenge(zombie) {
     const { row, col } = zombie.challenge;
     const sol = cur.grid[row][col];
 
@@ -858,7 +858,7 @@ export function _evaluateZombieChallenge(zombie) {
 }
 
 // Returns true when the cell is in the state the player was supposed to create
-export function _isZombieChallengeResolvedState(row, col, sol) {
+function _isZombieChallengeResolvedState(row, col, sol) {
     if (sol === 1) return globalThis.userGrid[row][col] === 1;
     return globalThis.userGrid[row][col] === 2;
 }
@@ -869,7 +869,7 @@ export function _isZombieChallengeResolvedState(row, col, sol) {
     sol 0: routed through the normal wrong-fill pipeline, so shields /
     freeze can absorb it and otherwise it counts as a real player mistake.
 */
-export function _zombieFillCell(zombie) {
+function _zombieFillCell(zombie) {
     const { row, col } = zombie.challenge;
     const sol = cur.grid[row][col];
 
@@ -885,12 +885,7 @@ export function _zombieFillCell(zombie) {
         globalThis.checkWin();
     } else {
         globalThis.showToast(t('cls_dof_zombie_wrong'));
-        if (typeof handleWrongFill === 'function') {
-            handleWrongFill(row, col); // full mistake pipeline (absorbs, penalty, game-over)
-        } else {
-            globalThis.wrongGrid[row][col] = true;
-            renderCell(row, col);
-        }
+        handleWrongFill(row, col); // full mistake pipeline (absorbs, penalty, game-over)
     }
 }
 
@@ -900,7 +895,7 @@ export function _zombieFillCell(zombie) {
     does NOT count towards the player's mistake statistics - it simply
     fabricates an additional jump node for the Residual skeletons.
 */
-export function _zombieCurseNearbyCell(zombie, row, col) {
+function _zombieCurseNearbyCell(zombie, row, col) {
     if (!cur) return;
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
@@ -938,7 +933,7 @@ export function _zombieCurseNearbyCell(zombie, row, col) {
 // Ends the current challenge: clears its timers and visual state, then
 // schedules a random quiet wandering period before the next challenge so
 // the player is not pressured back-to-back.
-export function _endZombieChallenge(zombie) {
+function _endZombieChallenge(zombie) {
     const challenge = zombie.challenge;
     if (!challenge) return;
 

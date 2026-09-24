@@ -442,8 +442,6 @@ export {
     EG_DRAG_CHARGE_SIZE_PER_STACK_PX,
     EG_MELEE_EXECUTE_HP_PCT,
     EG_MELEE_EXECUTE_MULT,
-    EG_MELEE_OVERCHARGE_MULT,
-    EG_MELEE_OVERCHARGE_RATIO,
     _egAimChargingProjectile,
     _egAnimatePlayerMelee,
     _egApplyPlayerMeleeImpact,
@@ -460,8 +458,28 @@ export {
 } from './encounter-charged-shot.js';
 
 export {
+    EG_MELEE_OVERCHARGE_MULT,
+    EG_MELEE_OVERCHARGE_RATIO,
+    EG_MELEE_OVERCHARGE_RATE_PER_TIER,
+    _egMeleeDashOut,
+    _egMeleeDashVisual,
+    _egMeleeDeliveryAvailable,
+    _egMeleeGlideHome,
+    _egMeleeGrandFlash,
+    _egMeleeLeapTo,
+    _egMeleeLeapVisual,
+    _egMeleeNovaVisual,
+    _egMeleeRaiseAvatar,
+    _egMeleeTierArt,
+    _egMeleeTierForCharge,
+    _egMeleeTierLabel,
+    _egOverchargeRateForTier,
+} from './encounter-melee-arts.js';
+
+export {
     EG_CHARGED_RICOCHET_DURATION_MS,
     EG_CHARGED_RICOCHET_SCALE,
+    EG_MELEE_HOLD_VULNERABILITY_MULT,
     _egApplyHitToMonster,
     _egCycleTarget,
     _egDamageTarget,

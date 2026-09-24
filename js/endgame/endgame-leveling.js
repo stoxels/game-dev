@@ -10,10 +10,11 @@ import { _egRenderGateLevelChip } from './endgame-gate.js';
 import { _egRenderEquipSlots, _egRenderInventory, _egRenderStatsList } from './endgame-hub.js';
 import { _egMapPlayerLifeMult, _egMapXpMult } from './endgame-map-launch.js';
 import { _egCancelAbsorptionRegen, _egComputePlayerStats, _egGetAllEquippedItems } from './endgame-player-stats.js';
-import { EG_PLAYER_BASE_ATTRIBUTES, _egFindUnmetRequirements, _egGetUnmetRequirementsText, _egSumAttributeBonuses } from '../loot/loot-requirements.js';
+import { EG_PLAYER_BASE_ATTRIBUTES, _egFindUnmetRequirements, _egGetUnmetRequirementsText } from '../loot/loot-requirements.js';
 import { _egIsActive } from '../combat/combat-state.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
+import { TALENT_TREE_DATA } from '../probability-tree/probability-tree-data.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME CHARACTER LEVELING---------------------------
@@ -32,17 +33,17 @@ import { cur } from '../state.js';
 //     tools/xp-curve-tune.py.
 //   - Each level grants passivePointsPerLevel (1) passive tree point. Raw
 //     attribute points are no longer granted per level; the character's
-//     +stats now come from the passive tree (not wired into combat yet).
-//   - The legacy attribute window (✦ button) remains for backwards-
-//     compatible saves and refunds; a refund is still verified against the
-//     live equipment loadout first.
+//     +stats come from the travel nodes allocated in the passive tree.
+//   - Legacy attribute allocation helpers remain for backwards-compatible
+//     saves and refunds; the character-level modal is no longer exposed in
+//     the hub.
 //
 // Wiring notes:
 //   - _egSyncBaseAttributes() keeps EG_PLAYER_BASE_ATTRIBUTES
-//     (endgame-requirements.js) in sync with STATE.playerLevel and the
-//     allocated attribute points. That single sync automatically enables
-//     item LEVEL requirements everywhere (equip gate, tooltips) and feeds
-//     allocated points into _egComputePlayerStats() side-effects
+//     (endgame-requirements.js) in sync with STATE.playerLevel, legacy
+//     attribute points, and allocated travel nodes. That single sync
+//     automatically enables item LEVEL requirements everywhere (equip gate,
+//     tooltips) and feeds attributes into _egComputePlayerStats() side-effects
 //     (Str -> life/armour, Agi -> accuracy/evasion, Int -> mana/spell dmg).
 //   - Kill integration lives in _egKillMonster() (endgame-encounter.js),
 //     which calls _egGrantMonsterXP(monsterLevel, isBoss).
@@ -51,7 +52,6 @@ import { cur } from '../state.js';
 //   js/state.js             - STATE, save()
 //   endgame-player-stats.js  - _egGetAllEquippedItems()
 //   endgame-requirements.js - EG_PLAYER_BASE_ATTRIBUTES,
-//                             _egSumAttributeBonuses(),
 //                             _egFindUnmetRequirements(),
 //                             _egGetUnmetRequirementsText()
 //
@@ -63,8 +63,7 @@ import { cur } from '../state.js';
 //   _egAllocateAttribute('str'|'agi'|'int')→ spend one point
 //   _egRefundAttribute('str'|'agi'|'int')  → verify & refund one point
 //   _egCanRefundAttribute(attr)            → refund legality check
-//   _egOpenAttributeWindow()               → open the attribute window
-//   _egRenderLevelHUD()                    → refresh badge + inline chip
+//   _egRenderLevelHUD()                    → refresh the inline level chip
 //------------------------------------------------------------------------
 
 
@@ -150,7 +149,7 @@ export const EG_LEVELING_CONFIG = {
 
     // Regular level-ups no longer hand out spendable attributes - each
     // level now grants a passive tree point instead and the character's
-    // +stats come from the passive tree (not wired into combat yet).
+    // +stats come from allocated travel nodes in the passive tree.
     attrPointsPerLevel: 0,
     passivePointsPerLevel: 1,
 
@@ -172,6 +171,55 @@ export const _EG_ATTR_ORIGINAL_BASE = {
     agi: EG_PLAYER_BASE_ATTRIBUTES.agi,
     int: EG_PLAYER_BASE_ATTRIBUTES.int,
 };
+
+const _EG_PASSIVE_TREE_TRAVEL_BONUSES = {
+    small_strength: { str: 5 },
+    small_agility: { agi: 5 },
+    small_intellect: { int: 5 },
+    travel_arcane_reserve: { mana: 16, absorptionFlat: 14 },
+    trix_absorption_core: { absorptionFlat: 10, absorptionIncPct: 4 },
+    trix_spell_thread: { mana: 16, spellDamageIncPct: 16 },
+    small_martial_poise: { str: 5, agi: 5 },
+    small_sharpshooter: { str: 5, agi: 5 },
+    small_disciplined_body: { str: 5, agi: 5 },
+    small_heavy_draw: { str: 5, agi: 5 },
+    small_force_of_will: { str: 5, int: 5 },
+    small_focused_fury: { str: 5, int: 5 },
+    small_runic_fists: { str: 5, int: 5 },
+    small_battle_mage: { str: 5, int: 5 },
+    small_spell_dancer: { int: 5, agi: 5 },
+    small_arcane_grace: { int: 5, agi: 5 },
+    small_runic_aim: { int: 5, agi: 5 },
+    small_quick_study: { int: 5, agi: 5 },
+};
+
+const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
+    Array.isArray(TALENT_TREE_DATA?.nodes)
+        ? TALENT_TREE_DATA.nodes.map(node => [node.id, node])
+        : []
+);
+
+function _egGetPassiveTreeTravelBonuses() {
+    const totals = { str: 0, agi: 0, int: 0, mana: 0, absorptionFlat: 0, absorptionIncPct: 0, spellDamageIncPct: 0 };
+    const state = typeof globalThis.STATE !== 'undefined' ? globalThis.STATE : null;
+    if (!state || !state.passiveTreeAllocated) return totals;
+    if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;
+
+    for (const nodeId of state.passiveTreeAllocated) {
+        const node = _EG_PASSIVE_TREE_NODES_BY_ID.get(Number(nodeId));
+        if (!node || node.tier !== 'travel') continue;
+        const bonus = _EG_PASSIVE_TREE_TRAVEL_BONUSES[node.statKey];
+        if (!bonus) continue;
+        totals.str += bonus.str || 0;
+        totals.agi += bonus.agi || 0;
+        totals.int += bonus.int || 0;
+        totals.mana += bonus.mana || 0;
+        totals.absorptionFlat += bonus.absorptionFlat || 0;
+        totals.absorptionIncPct += bonus.absorptionIncPct || 0;
+        totals.spellDamageIncPct += bonus.spellDamageIncPct || 0;
+    }
+    return totals;
+}
 
 export const EG_LEVELING_ATTRS = [
     { key: 'str', icon: '💪', nameKey: 'eg_stat_strength' },
@@ -225,15 +273,17 @@ export function _egGetXpForNextLevel(level) {
     return Math.floor(xp);
 }
 
-// Pushes the live player level / allocated attributes into the shared base
-// attributes object so requirement checks and stats aggregation pick them up.
+// Pushes the live player level, legacy attributes, and passive-tree travel
+// bonuses into shared character systems.
 export function _egSyncBaseAttributes() {
-    if (!EG_PLAYER_BASE_ATTRIBUTES) return;
+    if (!EG_PLAYER_BASE_ATTRIBUTES) return null;
     const alloc = _egGetAllocatedAttributes();
+    const tree = _egGetPassiveTreeTravelBonuses();
     EG_PLAYER_BASE_ATTRIBUTES.level = _egGetPlayerLevel();
-    EG_PLAYER_BASE_ATTRIBUTES.str = _EG_ATTR_ORIGINAL_BASE.str + (alloc.str || 0);
-    EG_PLAYER_BASE_ATTRIBUTES.agi = _EG_ATTR_ORIGINAL_BASE.agi + (alloc.agi || 0);
-    EG_PLAYER_BASE_ATTRIBUTES.int = _EG_ATTR_ORIGINAL_BASE.int + (alloc.int || 0);
+    EG_PLAYER_BASE_ATTRIBUTES.str = _EG_ATTR_ORIGINAL_BASE.str + (alloc.str || 0) + tree.str;
+    EG_PLAYER_BASE_ATTRIBUTES.agi = _EG_ATTR_ORIGINAL_BASE.agi + (alloc.agi || 0) + tree.agi;
+    EG_PLAYER_BASE_ATTRIBUTES.int = _EG_ATTR_ORIGINAL_BASE.int + (alloc.int || 0) + tree.int;
+    return tree;
 }
 
 
@@ -595,8 +645,6 @@ export function _egAllocateAttribute(attr) {
 
     _egRenderLevelHUD();
     if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
-    const modal = document.getElementById('eg-attr-modal');
-    if (modal && modal.classList.contains('show')) _egRenderAttrWindow();
     return true;
 }
 
@@ -658,8 +706,6 @@ export function _egRefundAttribute(attr) {
 
     _egRenderLevelHUD();
     if (typeof _egRenderStatsList === 'function') _egRenderStatsList();
-    const attrModal = document.getElementById('eg-attr-modal');
-    if (attrModal && attrModal.classList.contains('show')) _egRenderAttrWindow();
     return true;
 }
 
@@ -686,11 +732,11 @@ export function _egLoadLevelingState() {
 
 
 //------------------------------------------------------------------------
-//-------------------HUD (BADGE + INLINE CHIP)-----------------------------
+//-------------------HUD (INLINE CHIP)---------------------------------------
 //------------------------------------------------------------------------
 
-// Refreshes the ✦ topbar badge and the small level chip on the character
-// panel label. Both elements are optional - this no-ops outside the hub.
+// Refreshes the small level chip on the character panel label. It is optional
+// and this no-ops outside the hub.
 export function _egRenderLevelHUD() {
     const pts = _egGetUnspentPoints();
     const lvl = _egGetPlayerLevel();
@@ -698,19 +744,16 @@ export function _egRenderLevelHUD() {
     const need = _egGetXpForNextLevel(lvl);
     const pct = lvl >= EG_LEVELING_CONFIG.maxLevel ? 100 : Math.min(100, (xp / need) * 100);
 
-    const badge = document.getElementById('eg-level-badge');
-    if (badge) {
-        badge.textContent = pts > 99 ? '99+' : String(pts);
-        badge.style.display = pts > 0 ? 'flex' : 'none';
-    }
-
     const chip = document.getElementById('eg-char-level-inline');
     if (chip) {
         const ptsHtml = pts > 0
             ? `<span class="eg-lvl-chip-points">✦${pts > 99 ? '99+' : pts}</span>`
             : '';
         chip.innerHTML = `
-<span class="eg-lvl-chip" onclick="_egOpenAttributeWindow()">
+<span class="eg-lvl-chip"
+      onmouseenter="_egShowLevelBtnTooltip(event)"
+      onmousemove="moveGameTooltip(event)"
+      onmouseleave="hideGameTooltip()">
     <span class="eg-lvl-chip-lvl">${t('eg_lvl_short').replace('{n}', lvl)}</span>
     <span class="eg-lvl-chip-bar"><span class="eg-lvl-chip-bar-fill" style="width:${pct}%"></span></span>
     ${ptsHtml}
@@ -735,7 +778,7 @@ export function _egRenderLevelHUD() {
 //-------------------TOPBAR BUTTON TOOLTIP--------------------------------
 //------------------------------------------------------------------------
 
-// Hover tooltip for the ✦ LEVEL topbar button, built on the shared game
+// Hover tooltip for the level indicators, built on the shared game
 // tooltip engine (tooltips-hud.js) instead of the native browser title.
 export function _egBuildLevelBtnTooltipHTML() {
     const lvl = _egGetPlayerLevel();
@@ -747,6 +790,7 @@ export function _egBuildLevelBtnTooltipHTML() {
         : t('eg_lvl_xp_progress')
             .replace('{cur}', xp.toLocaleString())
             .replace('{need}', _egGetXpForNextLevel(lvl).toLocaleString());
+    const xpTiers = _egBuildXpTiersHTML();
 
     return `
 <div class="eg-tt-frame" style="--tt-border:#c8a84b;">
@@ -760,6 +804,8 @@ export function _egBuildLevelBtnTooltipHTML() {
             ? t('eg_lvl_points_available').replace('{n}', pts)
             : t('eg_lvl_no_points')}</div>
     </div>
+    ${xpTiers ? `<div class="eg-xp-tiers">${xpTiers}</div>` : ''}
+    <div class="eg-tt-section">${t('eg_lvl_hint')}</div>
 </div>`;
 }
 
@@ -769,158 +815,21 @@ export function _egShowLevelBtnTooltip(e) {
 
 
 //------------------------------------------------------------------------
-//-------------------ATTRIBUTE WINDOW-------------------------------------
-//------------------------------------------------------------------------
-
-// Lazily creates the modal shell (once), mirroring the item-delete modal.
-export function _egEnsureAttrModal() {
-    if (document.getElementById('eg-attr-modal')) return;
-
-    const modal = document.createElement('div');
-    modal.id = 'eg-attr-modal';
-    modal.className = 'eg-delete-modal-bg';
-    modal.innerHTML = `<div class="eg-attr-box" id="eg-attr-box"></div>`;
-    document.body.appendChild(modal);
-    _egInjectLevelingStyles();
-}
-
-export function _egOpenAttributeWindow() {
-    _egEnsureAttrModal();
-    _egRenderAttrWindow();
-    document.getElementById('eg-attr-modal').classList.add('show');
-    // Lift the shared tooltip above this modal (modal z-index 10000 > tip 9999)
-    // so the attribute-row descriptions stay visible.
-    if (typeof getGameTooltip === 'function') globalThis.getGameTooltip().style.zIndex = '10001';
-}
-
-export function _egCloseAttributeWindow() {
-    const modal = document.getElementById('eg-attr-modal');
-    if (modal) modal.classList.remove('show');
-
-    // Allocated/refunded points may have changed which items are
-    // requirement-blocked, so refresh the inventory + equip renders.
-    if (typeof _egRenderInventory === 'function') _egRenderInventory();
-    if (typeof _egRenderEquipSlots === 'function') _egRenderEquipSlots();
-}
-
-// Rebuilds the window body from current state. Called on every open and
-// after each allocate/refund so values stay live.
-export function _egRenderAttrWindow() {
-    const box = document.getElementById('eg-attr-box');
-    if (!box) return;
-
-    const lvl = _egGetPlayerLevel();
-    const xp = _egGetPlayerXP();
-    const atMax = lvl >= EG_LEVELING_CONFIG.maxLevel;
-    const need = _egGetXpForNextLevel(lvl);
-    const pct = atMax ? 100 : Math.min(100, (xp / need) * 100);
-    const pts = _egGetUnspentPoints();
-
-    const gearBonus = (typeof _egSumAttributeBonuses === 'function')
-        ? _egSumAttributeBonuses(typeof _egGetAllEquippedItems === 'function' ? _egGetAllEquippedItems() : [])
-        : { str: 0, agi: 0, int: 0 };
-
-    const xpHTML = atMax
-        ? `<div class="eg-attr-xp-text">${t('eg_lvl_max_level')}</div>`
-        : `<div class="eg-attr-xp-text">${t('eg_lvl_xp_progress')
-            .replace('{cur}', xp.toLocaleString())
-            .replace('{need}', need.toLocaleString())}</div>`;
-
-    const rowsHTML = EG_LEVELING_ATTRS.map(a => {
-        const alloc = _egGetAllocatedAttributes()[a.key] || 0;
-        const baseTotal = _EG_ATTR_ORIGINAL_BASE[a.key] + alloc;
-        const total = baseTotal + (gearBonus[a.key] || 0);
-
-        const canAdd = pts > 0;
-        const canRemove = _egCanRefundAttribute(a.key);
-
-        // Explain WHY removal is blocked (gear verification feedback).
-        let removeTitle = t('eg_lvl_refund');
-        if ((alloc || 0) <= 0) {
-            removeTitle = t('eg_lvl_no_points');
-        } else if (!canRemove) {
-            const list = typeof _egGetUnmetRequirementsText === 'function'
-                ? _egGetUnmetRequirementsText(_egSimulateRefundUnmet(a.key))
-                : '';
-            removeTitle = t('eg_lvl_refund_blocked_title').replace('{list}', list || '?');
-        }
-
-        return `
-<div class="eg-attr-row">
-    <span class="eg-attr-row-icon">${a.icon}</span>
-    <div class="eg-attr-row-info"
-         onmouseenter="if (typeof showGameTooltip === 'function' && typeof _egBuildStatDescTooltipHTML === 'function') showGameTooltip(_egBuildStatDescTooltipHTML('${a.nameKey.replace('eg_stat_', 'eg_statdesc_')}', this.querySelector('.eg-attr-row-name').textContent), event)"
-         onmousemove="if (typeof moveGameTooltip === 'function') moveGameTooltip(event)"
-         onmouseleave="if (typeof hideGameTooltip === 'function') hideGameTooltip()">
-        <div class="eg-attr-row-name">${t(a.nameKey)}</div>
-        <div class="eg-attr-row-detail">${baseTotal}${(gearBonus[a.key] || 0) > 0
-            ? ` <small>+ ${t('eg_lvl_gear_bonus').replace('{n}', gearBonus[a.key])}</small>` : ''}</div>
-    </div>
-    <div class="eg-attr-row-value">${total}</div>
-    <button class="eg-attr-btn eg-attr-btn-add" ${canAdd ? '' : 'disabled'}
-         onclick="_egAllocateAttribute('${a.key}')">+</button>
-    <button class="eg-attr-btn eg-attr-btn-remove" ${canRemove ? '' : 'disabled'}
-         data-tip="${globalThis._tipAttr(removeTitle)}" aria-label="${globalThis._tipAttr(removeTitle)}"
-         onclick="_egRefundAttribute('${a.key}')">−</button>
-</div>`;
-    }).join('');
-
-    box.innerHTML = `
-<button class="eg-attr-close" onclick="_egCloseAttributeWindow()"
-        data-tip-t="ui_close" aria-label="${t('ui_close')}">✕</button>
-<div class="eg-attr-title">${t('eg_lvl_window_title')}</div>
-<div class="eg-attr-level-line">
-    <span class="eg-attr-level-num">${t('eg_lvl_short').replace('{n}', lvl)}</span>
-    <div class="eg-attr-xp-wrap">
-        <div class="eg-attr-xp-bar"><div class="eg-attr-xp-fill" style="width:${pct}%"></div></div>
-        ${xpHTML}
-    </div>
-</div>
-<div class="eg-attr-points ${pts > 0 ? 'has-points' : ''}">${pts > 0
-        ? t('eg_lvl_points_available').replace('{n}', pts)
-        : t('eg_lvl_no_points')}</div>
-<div class="eg-attr-rows">${rowsHTML}</div>
-${(() => { const tiers = _egBuildXpTiersHTML(); return tiers
-    ? `<div class="eg-attr-xp-tiers">${tiers}</div>` : ''; })()}
-<div class="eg-attr-hint">${t('eg_lvl_hint')}</div>
-<div class="eg-delete-modal-btns">
-    <button class="eg-delete-modal-btn eg-delete-modal-cancel"
-         onclick="_egCloseAttributeWindow()">${t('eg_lvl_close')}</button>
-</div>`;
-}
-
-
-//------------------------------------------------------------------------
 //-------------------STYLES------------------------------------------------
 //------------------------------------------------------------------------
 
-// Injects all leveling UI styles once (badge, inline chip, window, effects).
+// Injects all leveling UI styles once (inline chip, XP tiers, effects).
 export function _egInjectLevelingStyles() {
     if (document.getElementById('eg-leveling-styles')) return;
     const style = document.createElement('style');
     style.id = 'eg-leveling-styles';
     style.textContent = `
-/* ── Topbar button + unspent-point badge ── */
+/* ── Topbar buttons ── */
 .eg-level-btn { position: relative; color: #f5d98a; font-size: 14px; }
-.eg-level-badge {
-    display: none;
-    position: absolute;
-    top: -6px; right: -6px;
-    min-width: 15px; height: 15px;
-    padding: 0 3px;
-    align-items: center; justify-content: center;
-    background: #c8a84b;
-    border: 1px solid #7a6526;
-    border-radius: 8px;
-    color: #1a1408;
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 1;
-}
 
 /* ── Inline level chip on the character panel ── */
 .eg-char-label-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-#eg-char-level-inline { cursor: pointer; }
+#eg-char-level-inline { cursor: help; }
 .eg-lvl-chip {
     display: inline-flex;
     align-items: center;
@@ -951,92 +860,7 @@ export function _egInjectLevelingStyles() {
     50% { filter: brightness(1.35); }
 }
 
-/* ── Attribute window ── */
-.eg-attr-box {
-    position: relative;
-    background: #12121e;
-    border: 2px solid #c8a84b;
-    border-radius: 8px;
-    padding: 18px 22px;
-    width: 420px;
-    max-width: 94vw;
-    max-height: 90vh;
-    overflow-y: auto;
-    color: #ddd;
-    font-family: var(--PX, monospace);
-}
-.eg-attr-close {
-    position: absolute; top: 8px; right: 8px;
-    width: 22px; height: 22px; padding: 0;
-    font-family: var(--PX, monospace); font-size: 10px; line-height: 1;
-    color: var(--accent2, #fff); background: transparent;
-    border: 1px solid var(--border2, #656f96); border-radius: 4px;
-    cursor: pointer; transition: all 0.12s;
-}
-.eg-attr-close:hover {
-    color: #ff6b6b; border-color: rgba(255,107,107,0.6);
-    background: rgba(255,107,107,0.12);
-}
-.eg-attr-title {
-    text-align: center;
-    color: #f5d98a;
-    letter-spacing: 2px;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
-.eg-attr-level-line {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
-}
-.eg-attr-level-num { color: #fff; font-size: 16px; font-weight: 700; white-space: nowrap; }
-.eg-attr-xp-wrap { flex: 1; }
-.eg-attr-xp-bar {
-    height: 10px;
-    background: rgba(255,255,255,.08);
-    border: 1px solid rgba(200,168,75,.5);
-    border-radius: 5px;
-    overflow: hidden;
-}
-.eg-attr-xp-fill { display: block; height: 100%; background: linear-gradient(90deg,#8a6d2b,#f5d98a); transition: width .25s; }
-.eg-attr-xp-text { margin-top: 4px; font-size: 10px; opacity: .75; text-align: right; }
-.eg-attr-points { text-align: center; font-size: 12px; margin-bottom: 12px; opacity: .85; }
-.eg-attr-points.has-points { color: #f5b642; font-weight: 700; }
-.eg-attr-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-.eg-attr-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255,255,255,.04);
-    border: 1px solid rgba(255,255,255,.09);
-    border-radius: 6px;
-    padding: 8px 10px;
-}
-.eg-attr-row-icon { font-size: 18px; }
-.eg-attr-row-info { flex: 1; min-width: 0; }
-.eg-attr-row-name { font-size: 13px; font-weight: 700; }
-.eg-attr-row-detail { font-size: 10px; opacity: .65; }
-.eg-attr-row-value { font-size: 16px; font-weight: 700; color: #66fcf1; min-width: 34px; text-align: right; }
-.eg-attr-btn {
-    width: 26px; height: 26px;
-    border-radius: 4px;
-    border: 1px solid #555;
-    background: #2a2a3e;
-    color: #fff;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0;
-}
-.eg-attr-btn-add:not(:disabled) { border-color: #2ecc71; color: #2ecc71; }
-.eg-attr-btn-add:not(:disabled):hover { background: #2ecc71; color: #10241a; }
-.eg-attr-btn-remove:not(:disabled) { border-color: #c8a84b; color: #f5d98a; }
-.eg-attr-btn-remove:not(:disabled):hover { background: #c8a84b; color: #1a1408; }
-.eg-attr-btn:disabled { opacity: .3; cursor: not-allowed; }
-.eg-attr-hint { font-size: 10px; opacity: .55; text-align: center; margin-bottom: 12px; }
-.eg-attr-xp-tiers {
+.eg-xp-tiers {
     display: flex;
     flex-direction: column;
     gap: 3px;
@@ -1095,31 +919,6 @@ export function _egInjectLevelingStyles() {
     text-shadow: 0 0 10px rgba(245,185,66,.8);
 }
 
-/* ── Shared eg modal shell (eg-delete-modal-bg) ──
-   The attribute window borrows the old stash delete-confirm modal's shell
-   classes. Those styles were injected by _egInjectDeleteUIStyles() in
-   endgame-hub.js and silently disappeared when the delete-confirm modal
-   was removed - leaving the window unpositioned (it rendered behind the
-   Orbs & Shards tab) and its buttons unstyled. They live here now. */
-.eg-delete-modal-bg {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 10000;
-    align-items: center; justify-content: center;
-}
-.eg-delete-modal-bg.show { display: flex; }
-.eg-delete-modal-btns { display: flex; gap: 10px; justify-content: center; }
-.eg-delete-modal-btn {
-    padding: 8px 14px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-    font-family: var(--PX, monospace);
-}
-.eg-delete-modal-cancel { background: #444; color: #ddd; }
-.eg-delete-modal-cancel:hover { background: #555; }
 `;
     document.head.appendChild(style);
 }
@@ -1133,15 +932,3 @@ export function _egInjectLevelingStyles() {
 // endgame-hub.js) so level requirements are enforced without visiting the hub.
 _egLoadLevelingState();
 _egInjectLevelingStyles();
-
-// Global Escape handler - closes the attribute window when open.
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        const m = document.getElementById('eg-attr-modal');
-        if (m && m.classList.contains('show')) {
-            _egCloseAttributeWindow();
-            e.preventDefault();
-            e.stopPropagation();
-        }
-    }
-});

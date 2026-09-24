@@ -4,7 +4,7 @@ import { _egMaybeLaunchAscensionTrial } from './campaign-trials.js';
 import { applyClassPassiveOnLevelStart } from './classes/class-abilities.js';
 import { buildClassHUD } from './classes/class-hud.js';
 import { _resetPlayerMana } from './classes/class-mana.js';
-import { _varianceShield_removeBubble } from './classes/class-mathmagician.js';
+import { _varianceShield_removeBubble } from './classes/class-mathmagician-variance-shield.js';
 import { DIFF_CFG, curDiff, curMods } from './difficulty-modifiers.js';
 import { _egOnPuzzleComplete, _egPuzzleCompleteFired, _egUpdateObjectivesHUD } from './combat/encounter-chain.js';
 import { _egMaybeShowMistakesWarning } from './combat/encounter-overlays.js';
@@ -19,9 +19,9 @@ import { _adjacencyMatrixRefreshAll, buildGrid } from './grid.js';
 import { keybindDisplayLabel, keybindKeyFor } from './keybinds.js';
 import { ALL, lvText } from './levels/levels.js';
 import { _refreshTouchpadModeButtonLabel, updateTouchpadModeButtonVisibility } from './mouse-button-handlers.js';
-import { PassiveTracker } from './passive-tree/passive-tracker.js';
-import { _applyDegreesOfFreedom, _applyFrequentistsBurden, _applySignalToNoise, _applySparsePrior, _applyTheOracle, _entropyDrainInit, _resetNewNodeState, resetOverfittingTracker } from './passive-tree/passive-tree-special-nodes-logic.js';
-import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
+import { PassiveTracker } from './probability-tree/probability-tree-tracker.js';
+import { _applyDegreesOfFreedom, _applyFrequentistsBurden, _applySignalToNoise, _applySparsePrior, _applyTheOracle, _entropyDrainInit, _resetNewNodeState, resetOverfittingTracker } from './probability-tree/probability-tree-special-nodes-logic.js';
+import { ptHasSkill } from './probability-tree/probability-tree-state-points.js';
 import { buildInventoryPanel } from './puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { rarityColors } from './puzzle-items/item-pool.js';
 import { showPrimerModal } from './puzzle-items/scouts-primer/scouts-primer.js';
@@ -43,10 +43,7 @@ import { t } from './translation/translations.js';
 import { STATE } from './state.js';
 import { cur } from './state.js';
 
-//------------------------------------------------------------------------
-// Phase 3 step 10: live globalThis accessors for externally-mutated names.
-// (derived from the step-10 write-site audit by dev/scratch/convert-step10.mjs)
-//------------------------------------------------------------------------
+// Live accessors preserve the level-start patch seams.
 try { Object.defineProperty(globalThis, 'startLevel', { get() { return startLevel; }, set(v) { startLevel = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_initTimer', { get() { return _initTimer; }, set(v) { _initTimer = v; }, configurable: true }); } catch (e) {}
 
@@ -57,7 +54,7 @@ try { Object.defineProperty(globalThis, '_initTimer', { get() { return _initTime
 
 // Maps world number (1-based) to its background image path.
 // Place your background images in images/backgrounds/
-export const WORLD_BACKGROUNDS = {
+const WORLD_BACKGROUNDS = {
     1: 'images/backgrounds/Probability-Peaks-Background.webp',
     2: 'images/backgrounds/Distribution-Den-Background.webp',
     3: 'images/backgrounds/Sampling-Savanna-Background.webp',
@@ -82,7 +79,7 @@ export const WORLD_BACKGROUNDS = {
 
 // Sets cur to the puzzle object for the given index.
 // Tracks the replay achievement stat if this level has already been completed.
-export function _initLevelData(gi) {
+function _initLevelData(gi) {
     globalThis.cur = ALL[gi];
 
     if (STATE.done.includes(gi)) {
@@ -92,7 +89,7 @@ export function _initLevelData(gi) {
 
 // Creates fresh userGrid, wrongGrid, and revealedGrid sized to the current puzzle dimensions.
 // All cells start empty/false - no carry-over from a previous level.
-export function _initGrids() {
+function _initGrids() {
     const rows = cur.grid.length;
     const cols = cur.grid[0].length;
 
@@ -109,7 +106,7 @@ export function _initGrids() {
 //------------------------------------------------------------------------
 
 // Resets all simple gameplay flags and numeric counters to their default values.
-export function _resetGameplayFlags() {
+function _resetGameplayFlags() {
     const isChainTransition = !!window._egSuppressEncounterStop;
 
     globalThis._gamePaused = false;
@@ -147,7 +144,7 @@ export function _resetGameplayFlags() {
 
 // Resets all per-level tracking Sets, logs, and boolean flags used by
 // passive nodes and achievement systems.
-export function _resetLevelTrackers() {
+function _resetLevelTrackers() {
     window.LEVEL_FLAGS.mistakeLog = [];
     window._sigThresholdProtected = new Set();
     window._dofRevertedCells = new Set();
@@ -162,7 +159,7 @@ export function _resetLevelTrackers() {
 
 // Resets player HP to full, based on base HP plus any gear health bonus.
 // Reduced by the active map's "% reduced maximum Life" mod during device runs.
-export function _resetPlayerHP() {
+function _resetPlayerHP() {
     const baseHP = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseHP : 100;
     const gearHealthBonus = (typeof _egComputePlayerStats === 'function')
         ? _egComputePlayerStats().health : 0;
@@ -175,7 +172,7 @@ export function _resetPlayerHP() {
 // Cleans up any UI or system state left over from the previous level:
 // toast queue, node state, witch immunity, quest counters, overfitting tracker,
 // endgame encounter, completion glimpse bar, and player HP.
-export function _cleanupPreviousLevel() {
+function _cleanupPreviousLevel() {
     resetToastQueue();
     _resetNewNodeState();
     resetWitchImmunityLevelCounter();
@@ -203,7 +200,7 @@ export function _cleanupPreviousLevel() {
     // (defined in start-level-passives.js, loaded before this file)
     _hideCompletionGlimpseBar();
 
-    if (typeof _varianceShield_removeBubble === 'function') _varianceShield_removeBubble();
+    _varianceShield_removeBubble();
 
     // Clear any low-time / low-health vignette tier left over from the previous level,
     // so a fresh level with a full timer / full HP doesn't flash for a frame.
@@ -222,7 +219,7 @@ export function _cleanupPreviousLevel() {
 }
 
 // Full level state reset - runs all three reset helpers in order.
-export function _resetLevelState() {
+function _resetLevelState() {
     _resetGameplayFlags();
     _resetLevelTrackers();
     _cleanupPreviousLevel();
@@ -235,7 +232,7 @@ export function _resetLevelState() {
 //------------------------------------------------------------------------
 
 // Returns the base timer value for the current level, halved in Time Trial mode.
-export function _calcBaseTime() {
+function _calcBaseTime() {
     const cfg = DIFF_CFG[curDiff];
     let baseTimer;
 
@@ -257,7 +254,7 @@ export function _calcBaseTime() {
 // extended_session (174-176): adds flat bonus seconds at level start.
 // Node 1: +60s | Node 2: +120s | Node 3: +180s (cumulative).
 // Blocked entirely by keystone_gamblers_ruin.
-export function _applyExtendedSessionBonus() {
+function _applyExtendedSessionBonus() {
     if (ptHasSkill('keystone_gamblers_ruin')) return 0;
     let bonus = 0;
     if (ptHasSkill('extended_session_1')) bonus += 60;
@@ -269,7 +266,7 @@ export function _applyExtendedSessionBonus() {
 // expected_value (nodes vary): adds seconds proportional to total cell count.
 // Contributes 5/2/3 seconds per 10 cells for nodes 1/2/3 respectively.
 // Blocked entirely by keystone_gamblers_ruin.
-export function _applyExpectedValueBonus() {
+function _applyExpectedValueBonus() {
     if (ptHasSkill('keystone_gamblers_ruin')) return 0;
     if (!ptHasSkill('expected_value_1') && !ptHasSkill('expected_value_2') && !ptHasSkill('expected_value_3')) return 0;
 
@@ -325,13 +322,13 @@ export function _initTimer() {
 //------------------------------------------------------------------------
 
 // Updates the bonus sidebar hint text from the current level's data.
-export function _updateBonusSidebar() {
+function _updateBonusSidebar() {
     const el = document.getElementById('bonus-sidebar-hint');
     el.textContent = (lvText(cur, 'bonusHint') || '');
 }
 
 // Renders the active modifier and difficulty tags below the timer display.
-export function _updateModTags() {
+function _updateModTags() {
     const mt = document.getElementById('mod-tags');
     mt.innerHTML = '';
     if (curMods.timetrial) mt.innerHTML += `<span class="mod-tag tt">${t('mod_tt')}</span>`;
@@ -383,7 +380,7 @@ export function _setMistakeCounterText(suffix = '') {
 
 // Updates all HUD elements: level id, hint text, score display, penalty info,
 // mistake counter, bonus sidebar, and modifier tags.
-export function _updateHUD() {
+function _updateHUD() {
     document.getElementById('top-id').textContent = `${t('lvl_prefix')} ${cur.world}-${cur.li}`;
     document.getElementById('top-hint').textContent = lvText(cur, 'hint');
     document.getElementById('sc-disp').textContent = STATE.totalScore;
@@ -422,14 +419,14 @@ export function _updateHUD() {
 //------------------------------------------------------------------------
 
 // Hides any win/lose overlays and closes the quiz modal left over from a previous level.
-export function _closeLeftoverOverlays() {
+function _closeLeftoverOverlays() {
     hideResultOverlays();
     closeQuiz();
 }
 
 // Starts the timer, renders the puzzle grid, and builds the inventory panel.
 // Also clears the bounceback flag if we have moved on to a different level.
-export function _startSystems() {
+function _startSystems() {
     updTimer();
     startTimer();
     buildGrid();
@@ -448,7 +445,7 @@ export function _startSystems() {
 }
 
 // Resets class cooldown, applies passive class effects, and rebuilds the class HUD panel.
-export function _initClassSystems() {
+function _initClassSystems() {
     // Encounter chain (endgame): cooldowns for base + ascendency abilities
     // (active1-4) reset between individual puzzles so each puzzle starts
     // with abilities ready. Mana is the balancing factor and is intentionally
@@ -463,7 +460,7 @@ export function _initClassSystems() {
 // Tutorial-quest levels push nothing: there is no level select to go back
 // to mid-lesson (it stays locked until graduation), so history keeps the
 // entry pushed by showTutorial() instead of a stale screen-levels.
-export function _navigateToGameScreen() {
+function _navigateToGameScreen() {
     if (!(cur && cur.isTutorialQuest)) {
         globalThis.screenHistory.push('screen-levels');
     }
@@ -475,7 +472,7 @@ export function _navigateToGameScreen() {
 // During an endgame map chain this is evaluated on EVERY puzzle start
 // (via _doStartLevel called from _egTransitionToChainPuzzle), so a
 // mid-map Primer use correctly fires on the next chain puzzle.
-export function _checkPrimerPending() {
+function _checkPrimerPending() {
     if (!STATE.primerPending) return;
     STATE.primerPending = false;
     save();
@@ -494,7 +491,7 @@ export function _checkPrimerPending() {
 // Backgrounds for the interactive tutorial puzzles (world 15). The tutorial
 // ships its own artwork: puzzle 1 (tqPuzzle 0) gets the Puzzle-1 backdrop,
 // puzzles 2 and 3 (tqPuzzle 1/2) share the Puzzle-2/3 backdrop.
-export const TUTORIAL_QUEST_BACKGROUNDS = {
+const TUTORIAL_QUEST_BACKGROUNDS = {
     0: 'images/Tutorial/Puzzle_1_Background.webp',
     1: 'images/Tutorial/Puzzle_2_3_Background.webp',
     2: 'images/Tutorial/Puzzle_2_3_Background.webp',
@@ -502,7 +499,7 @@ export const TUTORIAL_QUEST_BACKGROUNDS = {
 
 // Applies the background image for the given world number to the game screen.
 // Tutorial quest levels override the world background with their dedicated art.
-export function _applyWorldBackground(worldNum) {
+function _applyWorldBackground(worldNum) {
     const screen = document.getElementById('screen-game');
     let bg = null;
     if (typeof cur !== 'undefined' && cur && cur.isTutorialQuest

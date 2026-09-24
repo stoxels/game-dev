@@ -5,7 +5,7 @@ import { _egGetMapRewardBonuses, _egMapModAffects, _egResolveMapBoss } from './l
 import { _egBuildMergedModLines } from './endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat/combat-state.js';
 import { ALL, lvText } from './levels/levels.js';
-import { ptHasSkill } from './passive-tree/passive-tree-state-points.js';
+import { ptHasSkill } from './probability-tree/probability-tree-state-points.js';
 import { _getAsymptoticMasteryReduction, _getPenaltySecondsAtCount } from './penalty.js';
 import { RESHUFFLE_GOAL } from './puzzle-item-inventory/puzzle-item-reshuffle.js';
 import { rarityColors } from './puzzle-items/item-pool.js';
@@ -35,7 +35,7 @@ import { cur } from './state.js';
 // when the topmost element at the cursor is the trigger itself (or a
 // descendant). For pointer-events:none triggers the pass-through is the
 // whole point, so the plain rect test decides for them.
-export function _wireHoverByRect(el, builder) {
+function _wireHoverByRect(el, builder) {
     if (!el) return;
     let isOver = false;
 
@@ -153,7 +153,7 @@ export function hideGameTooltip() {
 // `data-tip` deliberately takes priority over `data-tip-t` so a caller can
 // hand over rich markup (dynamic numbers, an item's own name) where a
 // translation key would be a lie.
-export const _TIP_SELECTOR = '[data-tip-t],[data-tip]';
+const _TIP_SELECTOR = '[data-tip-t],[data-tip]';
 
 // Escapes dynamic text before it goes into a data-tip attribute. Quotes are
 // required for the attribute itself; &< > are required because the resolver
@@ -166,7 +166,7 @@ export function _tipAttr(text) {
         .replace(/"/g, '&quot;');
 }
 
-export function _resolveTipHTML(el) {
+function _resolveTipHTML(el) {
     const raw = el.getAttribute('data-tip');
     if (raw) return raw;
     const key = el.getAttribute('data-tip-t');
@@ -191,9 +191,9 @@ export function _resolveTipHTML(el) {
 //     to a bespoke-tooltip element never leaves our tip on top of theirs.
 //   • we only ever hide a tooltip this engine itself put up. A bespoke
 //     tooltip that is already showing is left alone.
-export let _tipCurrentEl = null;
+let _tipCurrentEl = null;
 
-export function _installDelegatedTips() {
+function _installDelegatedTips() {
     document.addEventListener('mousemove', (e) => {
         const el = (e.target && e.target.closest) ? e.target.closest(_TIP_SELECTOR) : null;
         if (el === _tipCurrentEl) {
@@ -216,7 +216,7 @@ export function _installDelegatedTips() {
 
 // Formats a whole number of seconds as "Xm Ys" (e.g. 125 -> "2m 5s").
 // Falls back to "0s" for 0/negative input.
-export function _fmtSecsAsMinSec(totalSecs) {
+function _fmtSecsAsMinSec(totalSecs) {
     const safeSecs = Math.max(0, Math.round(totalSecs));
     const m = Math.floor(safeSecs / 60);
     const s = safeSecs % 60;
@@ -226,7 +226,7 @@ export function _fmtSecsAsMinSec(totalSecs) {
 
 
 // 1. Mistakes
-export function _buildMistakesTooltipHTML() {
+function _buildMistakesTooltipHTML() {
     const base = typeof _getPenaltySecondsAtCount === 'function'
         ? _getPenaltySecondsAtCount(globalThis.mistakeCount + 1)
         : 0;
@@ -265,7 +265,7 @@ export function _buildMistakesTooltipHTML() {
 }
 
 // 2. Timer
-export function _buildTimerTooltipHTML() {
+function _buildTimerTooltipHTML() {
     let html = `<strong style="color:var(--accent,#66fcf1)">${t('cg_tt_timer')}</strong>`;
     html += `<br>${t('cg_tt_time_added')} <b>+${_fmtSecsAsMinSec(globalThis._levelTimeAdded || 0)}</b>`;
     html += `<br>${t('cg_tt_time_lost')} <b>−${_fmtSecsAsMinSec(globalThis._levelTimeLost || 0)}</b>`;
@@ -274,17 +274,17 @@ export function _buildTimerTooltipHTML() {
 }
 
 // 3. Levels/back button
-export function _buildLevelsButtonTooltipHTML() {
+function _buildLevelsButtonTooltipHTML() {
     return t('cg_return_levels');
 }
 
 // 4. Level name
-export const _MOD_SHORT = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
+const _MOD_SHORT = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
 
 // Builds the mod lines of an active map-device run map, grouped by their
 // affects category with the same colors as the map item tooltip:
 // monster → orange, player → red, puzzle → blue.
-export function _buildActiveMapModsHTML(map) {
+function _buildActiveMapModsHTML(map) {
     const colors = { monster: '#e67e22', player: '#e74c3c', puzzle: '#5b9cf6' };
     let html = '';
     let hasMods = false;
@@ -315,7 +315,7 @@ export function _buildActiveMapModsHTML(map) {
 // HUD displays the launched map's name instead of the seed level's hint.
 // Contains ONLY the map identity (rarity-colored) + its rolled modifiers
 // + the reward bonuses (xp / quantity / rarity) the run grants.
-export function _buildMapRunTooltipHTML() {
+function _buildMapRunTooltipHTML() {
     const map = (typeof _egActiveMapItem !== 'undefined') ? _egActiveMapItem : null;
     if (!map) return '';
     const rc = (typeof rarityColors === 'function') ? rarityColors(map.rarity) : null;
@@ -354,7 +354,7 @@ export function _buildMapRunTooltipHTML() {
     return html;
 }
 
-export function _buildLevelNameTooltipHTML() {
+function _buildLevelNameTooltipHTML() {
     // Endgame map-device run: the corner HUD shows the map's name, so the
     // tooltip shows ONLY the map identity + its rolled launch modifiers.
     if (typeof _egActiveMapItem !== 'undefined' && _egActiveMapItem
@@ -402,7 +402,7 @@ export function _buildLevelNameTooltipHTML() {
 }
 
 // 5. Inventory label
-export function _buildInventoryLabelTooltipHTML() {
+function _buildInventoryLabelTooltipHTML() {
     return `<strong>${t('inv_title')}</strong>`
         + `<br>${t('cg_inv_reshuffle_hint')}`
         + `<br>${t('cg_inv_reward_pick').replace('{n}', typeof RESHUFFLE_GOAL !== 'undefined' ? RESHUFFLE_GOAL : 3)}`;
@@ -413,7 +413,7 @@ export function _buildInventoryLabelTooltipHTML() {
 // is selected (.mod-per-desc), but as a hover tooltip so the effect can
 // also be read before activating it. Reads the live sibling span, so a
 // language switch is always reflected.
-export function _buildModTombstoneTooltipHTML(btn) {
+function _buildModTombstoneTooltipHTML(btn) {
     const desc = btn.parentElement.querySelector(':scope > .mod-per-desc');
     return desc ? desc.innerHTML : '';
 }
@@ -423,7 +423,7 @@ export function _buildModTombstoneTooltipHTML(btn) {
 // Expansion 2 "Rise of the Beasts" (current), Expansion 1
 // "Cartographers of Chance" (characters, cutscenes, world map,
 // large visual overhaul), Base Game.
-export function _buildExpansionHistoryTooltipHTML() {
+function _buildExpansionHistoryTooltipHTML() {
     return `<strong style="color:#d4b8ff">${t('scr_expansion_tooltip_title')}</strong>`
         + `<br><br><span style="color:#c39bd3">• ${t('scr_expansion_2_badge')}: ${t('scr_expansion_2_name')}</span>`
         + `<br><span style="color:#a9a0c6; opacity:.85">&nbsp;&nbsp;${t('scr_expansion_2_note')}</span>`
@@ -518,23 +518,23 @@ document.addEventListener('DOMContentLoaded', () => {
 //----------------------------SAVE SLOT TOOLTIP----------------------------
 //------------------------------------------------------------------------
 
-export function _fmtPlaytime(totalSecs) {
+function _fmtPlaytime(totalSecs) {
     const h = Math.floor(totalSecs / 3600);
     const m = Math.floor((totalSecs % 3600) / 60);
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
-export const _SAVE_SLOT_ALL_MODS = ['timetrial', 'hardcore', 'ironman', 'classless', 'treeless'];
+const _SAVE_SLOT_ALL_MODS = ['timetrial', 'hardcore', 'ironman', 'classless', 'treeless'];
 
 // Counts levels whose recorded highscore was set on Hard difficulty
 // with every optional modifier active.
-export function _countHardAllModsClears(levelHS) {
+function _countHardAllModsClears(levelHS) {
     return Object.values(levelHS || {}).filter(hs =>
         hs && hs.diff === 'hard' && _SAVE_SLOT_ALL_MODS.every(m => hs.mods && hs.mods[m])
     ).length;
 }
 
-export function _pctOf(part, total) {
+function _pctOf(part, total) {
     if (!total) return '0%';
     return `${Math.round((part / total) * 100)}%`;
 }

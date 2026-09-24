@@ -2,7 +2,14 @@ import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _egGetElementCentre } from './combat-class-projectiles.js';
 import { _egConsumePlayerCharge, _egUpdatePlayerChargeBar } from './encounter-tick.js';
-import { _egApplyPlayerMeleeImpact } from './encounter.js';
+import { _egApplyPlayerMeleeImpact, _egMeleeTierLabel, _egShowStatusLabel } from './encounter.js';
+import {
+    _egMeleeDashOut,
+    _egMeleeDeliveryAvailable,
+    _egMeleeGlideHome,
+    _egMeleeRaiseAvatar,
+    _egMeleeTierForCharge,
+} from './encounter-melee-arts.js';
 import { _egGetAllEquippedItems } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
 
@@ -26,9 +33,11 @@ import { _egIsActive } from './combat-state.js';
 //  The swing is skinned per weapon FAMILY - not per base item - and rotated
 //  toward the facing direction.
 //
-//  CONTROLS: E = manual attack (this file) - HOLD to charge Secret-of-Mana-
-//  style, RELEASE to strike. Parry (hold) lives on the 'eg-parry' keybind
-//  (R by default) in endgame-encounter-tick.js.
+//  CONTROLS: E = manual attack (this file) - the bar auto-charges to 100%
+//  Secret-of-Mana-style: TAP to strike with whatever charge is ready,
+//  HOLD past full to overcharge (200% dash, 300% sky leap, 400% nova,
+//  500% grand nova), RELEASE to strike. Parry (hold) lives on the
+//  'eg-parry' keybind (R by default) in endgame-encounter-tick.js.
 //------------------------------------------------------------------------
 //-------------------WEAPON FAMILY RESOLUTION------------------------------
 //------------------------------------------------------------------------
@@ -37,12 +46,12 @@ import { _egIsActive } from './combat-state.js';
 export const EG_WEAPON_SWING_COOLDOWN_MS = 400;
 export let _egWeaponSwingLastAt = 0;
 
-// Melee reach: the avatar's screen centre must be within this many px of the
-// target card's centre for a strike to CONNECT. The swing ALWAYS plays -
-// out of range it just hits air (no damage, charge still spent) - so the
-// player must walk up to the monster first for real hits.
+// Melee reach: the avatar's screen centre must be within this many px of
+// the target card's centre for a PLAIN strike (<200%) to connect -
+// positioning matters for taps and quick hits. Weapon arts (200%+) dash
+// across the screen, so overcharged releases ignore distance.
 export const EG_MELEE_RANGE_PX = 340;
-// Throttle for the out-of-range toast (E can be held down).
+// Throttle for proximity toasts (E can be held down).
 export let _egMeleeRangeToastAt = 0;
 // Throttle for the no-weapon toast (same hold-E protection).
 export let _egMeleeNoWeaponToastAt = 0;
@@ -256,15 +265,88 @@ export function _egWeaponSwingSound(family) {
 //-------------------MANUAL ATTACK (E)-------------------------------------
 //------------------------------------------------------------------------
 
+//-------------------SEQUENCED ART DELIVERY------------------------------
+// A released overcharge art (200%+) is DELIVERED, not instant: the launch
+// telegraphs the art's name on the target, the avatar visibly charges
+// across the screen (readable travel + arrival beat), and ONLY ON ARRIVAL
+// does the weapon swing play with the impact (damage, cleave, follow-up
+// arts). Afterwards the avatar glides home. Fire-and-forget async - damage
+// correctness never depends on the visuals (every flight has a timeout
+// fallback), and the avatar always glides home + drops its raised z-index
+// via finally. Never throws.
+function _egMeleeDeliverArtStrike(targetId, tier, chargePct) {
+    const run = async () => {
+        let restoreZ = () => {};
+        try {
+            restoreZ = _egMeleeRaiseAvatar();
+            // Launch telegraph: name the incoming art on the target while
+            // the hero is still charging over (the impact-time labels stay
+            // silent in sequenced mode - see _egMeleeTierArt).
+            try {
+                if (tier >= 4) _egShowStatusLabel(targetId, _egMeleeTierLabel('eg_melee_tier4', 'MANA STRIKE!'));
+                else if (tier >= 3) _egShowStatusLabel(targetId, _egMeleeTierLabel('eg_melee_tier3', 'Weapon Nova!'));
+                else _egShowStatusLabel(targetId, _egMeleeTierLabel('eg_melee_tier1', 'Dash Strike!'));
+            } catch (e) {}
+            await _egMeleeDashOut(targetId);
+            if (typeof _egIsActive === 'function' && !_egIsActive()) return;
+            if (typeof dead !== 'undefined' && globalThis.dead) return;
+            // ARRIVAL: the hit animation plays HERE, on the monster - aim
+            // the swing along the real travelled vector, not the last walk
+            // facing (the hero may have dashed in from any direction).
+            let face = _egGetAttackFacing();
+            try {
+                const avatar = document.getElementById('player-avatar-wrapper');
+                const card = document.getElementById(`eg-card-${targetId}`);
+                if (avatar && card) {
+                    const a = _egGetElementCentre(avatar);
+                    const b = _egGetElementCentre(card);
+                    face = _egFacingFromVector(b.x - a.x, b.y - a.y);
+                }
+            } catch (e) {}
+            const { family } = _egGetEquippedWeaponInfo();
+            _egShowWeaponSwing(family, face);
+            _egWeaponSwingSound(family);
+            // The impact (damage + follow-through arts) lands with the
+            // swing - sequenced mode resolves when the leap/nova legs do.
+            // The release-time share travels in the closure (a second
+            // strike mid-flight spends into the global, never into this).
+            await _egApplyPlayerMeleeImpact(targetId, { sequenced: true, chargePct });
+        } catch (e) {
+            // Theatre must never break the strike - damage paths guard
+            // themselves; worst case the avatar simply glides home below.
+        } finally {
+            try { await _egMeleeGlideHome(); } catch (e) {}
+            try { restoreZ(); } catch (e) {}
+        }
+    };
+    try {
+        const p = run();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+    } catch (e) {}
+}
+
 // Manual weapon attack (Secret-of-Mana-style): directional CSS swing + hop,
 // damage through the standard melee channel against the CURRENT target
 // (same damage, cleave, accuracy and reflect rules as before). The strike
-// deals charge% of full damage - 100% charge = 100% damage - and spends
-// (resets) the charge bar, even on a miss. The swing ALWAYS plays: out of
-// range it whiffs (no damage - see _egApplyPlayerMeleeImpact) but the
-// charge is still spent. Without a target the swing still plays as a whiff
-// but costs nothing, so retargeting never punishes.
+// deals charge% of full damage - 100% charge = 100% damage, overcharged
+// tiers hit harder AND trigger weapon arts (see _egMeleeTierArt) - and
+// spends (resets) the charge bar, even on a miss. Plain strikes (<200%)
+// swing instantly in place (and only connect in melee reach - see
+// _egApplyPlayerMeleeImpact); overcharge arts (200%+) are DELIVERED
+// instead (see _egMeleeDeliverArtStrike): the avatar charges across the
+// screen and the swing + impact play ON ARRIVAL. Without a target the
+// swing still plays as a whiff but costs nothing, so retargeting never
+// punishes.
 export function _egDoWeaponAttack() {
+    // The strike is released - the hold (if any) is over either way. This
+    // runs BEFORE every guard below on purpose: a keyup during cooldown,
+    // while dead, or behind a modal must still end the hold, or the hero
+    // would stay rooted + vulnerable with the finger already up (and the
+    // charge would keep overcharging behind the modal).
+    try { globalThis._egMeleeHoldActive = false; } catch (e) {}
+    try { globalThis._egMeleeHoldKey = null; } catch (e) {}
+    try { globalThis._egMeleeHoldStartAt = 0; } catch (e) {}
+    try { globalThis._egMeleeChargeLevel = 0; } catch (e) {}
     if (typeof _egIsActive === 'function' && !_egIsActive()) return;
     if (typeof dead !== 'undefined' && globalThis.dead) return;
     if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
@@ -275,11 +357,6 @@ export function _egDoWeaponAttack() {
     const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     if (now - _egWeaponSwingLastAt < EG_WEAPON_SWING_COOLDOWN_MS) return;
     _egWeaponSwingLastAt = now;
-
-    // The strike is released - the hold (if any) is over either way.
-    try { globalThis._egMeleeHoldActive = false; } catch (e) {}
-    try { globalThis._egMeleeHoldKey = null; } catch (e) {}
-    try { globalThis._egMeleeChargeLevel = 0; } catch (e) {}
 
     // Weapon gate: no melee weapon (or bow) equipped → no attack at all.
     // Previously this fell through to the 'unarmed' family and let a fresh
@@ -294,15 +371,10 @@ export function _egDoWeaponAttack() {
         return;
     }
 
-    // NOTE: no range gate here anymore - the swing always plays and range
-    // is resolved at impact time (_egApplyPlayerMeleeImpact whiffs with no
-    // damage when the avatar is too far from the target card).
-
-    const { family } = _egGetEquippedWeaponInfo();
-    const facing = _egGetAttackFacing();
-    _egShowWeaponSwing(family, facing);
-    _egWeaponSwingHop(facing);
-    _egWeaponSwingSound(family);
+    // NOTE: no range gate here - range is resolved at impact time
+    // (_egApplyPlayerMeleeImpact whiffs sub-200% strikes with no damage
+    // when the avatar is too far from the target card, while 200%+ arts
+    // dash to the target instead).
 
     // Spend the charge at key-press time so the strike matches the bar the
     // player saw (charging during the swing flight doesn't inflate it).
@@ -317,6 +389,35 @@ export function _egDoWeaponAttack() {
         try { _egUpdatePlayerChargeBar(); } catch (e) {}
     }
 
+    // Overcharge arts (200%+) are DELIVERED, not swung in place: the avatar
+    // charges across the screen and the swing + impact play ON ARRIVAL (see
+    // _egMeleeDeliverArtStrike above) - so this path returns before the
+    // instant swing below. Plain strikes (<200%) keep the instant swing.
+    let spentTier = 0;
+    try {
+        spentTier = (typeof _egPendingMeleeChargePct === 'number'
+            && typeof _egMeleeTierForCharge === 'function')
+            ? _egMeleeTierForCharge(globalThis._egPendingMeleeChargePct) : 0;
+    } catch (e) { spentTier = 0; }
+    if (hasTarget && spentTier >= 1
+        && typeof _egMeleeDeliveryAvailable === 'function'
+        && _egMeleeDeliveryAvailable(globalThis._egTargetId)) {
+        // Capture the release-time share into the delivery: the global is
+        // cleared NOW (so the probe-visible "spent" state reads instantly
+        // and a mid-flight second strike can't collide with it) while the
+        // arrival impact uses the captured value (see opts.chargePct).
+        const spentPct = globalThis._egPendingMeleeChargePct;
+        globalThis._egPendingMeleeChargePct = null;
+        _egMeleeDeliverArtStrike(globalThis._egTargetId, spentTier, spentPct);
+        return;
+    }
+
+    const { family } = _egGetEquippedWeaponInfo();
+    const facing = _egGetAttackFacing();
+    _egShowWeaponSwing(family, facing);
+    _egWeaponSwingHop(facing);
+    _egWeaponSwingSound(family);
+
     // Damage at swing impact (matches the visual mid-point).
     setTimeout(() => {
         try {
@@ -328,15 +429,17 @@ export function _egDoWeaponAttack() {
     }, Math.max(80, Math.round((EG_WEAPON_SWING_DURATION_MS[family] || 320) / 2)));
 }
 
-//-------------------HOLD-TO-CHARGE (Secret-of-Mana-style)-----------------
-// Holding the attack key charges the strike through multiple levels (tap =
-// weak poke, 100% = full hit, holding past full overcharges up to
-// EG_MELEE_OVERCHARGE_RATIO for a super strike); RELEASING the key swings.
-// The state lives as plain globalThis properties (not module bindings) so
-// encounter-tick.js can read them without an import cycle back into this
-// file (this file already imports from encounter-tick.js). Unset means
-// "not holding" (falsy) - no top-level init needed, and the module-init
-// timing guard forbids top-level globalThis reads in converted files.
+//-------------------HOLD-TO-OVERCHARGE (Secret-of-Mana-style)-----------
+// The bar auto-charges to 100% on its own (see _egTickPlayer). TAP the
+// attack key = strike with whatever charge is ready; HOLDING past full
+// overcharges through the weapon-art tiers (200% dash, 300% sky leap,
+// 400% nova, 500% grand nova - see _egMeleeTierArt); RELEASING the key
+// swings. The state lives as plain globalThis properties (not module
+// bindings) so encounter-tick.js can read them without an import cycle
+// back into this file (this file already imports from encounter-tick.js).
+// Unset means "not holding" (falsy) - no top-level init needed, and the
+// module-init timing guard forbids top-level globalThis reads in
+// converted files.
 
 // Normalizes a key event the same way the keybind system does (see
 // _keybindNormalize in keybinds.js: single chars and named keys alike are
@@ -345,9 +448,11 @@ function _egMeleeNormKey(e) {
     return (e && e.key ? String(e.key) : '').toLowerCase();
 }
 
-// PRESS: begin charging. The charge bar resets and fills only while the key
-// is held (see _egTickPlayer) - this is what makes holding build the super
-// attack instead of machine-gunning weak strikes via key repeat.
+// PRESS: begin the hold. The bar is NOT reset here - it auto-charged on
+// its own (see _egTickPlayer), so pressing at 100% and holding goes
+// straight into overcharge; pressing right after a strike starts low and
+// builds while held. Key repeat is ignored by the caller so holding keeps
+// charging instead of re-firing weak strikes.
 function _egMeleeBeginHold(e) {
     if (typeof _egIsActive === 'function' && !_egIsActive()) return false;
     if (typeof dead !== 'undefined' && globalThis.dead) return false;
@@ -362,10 +467,12 @@ function _egMeleeBeginHold(e) {
     try {
         if (typeof _egGetEquippedWeaponInfo === 'function' && !_egGetEquippedWeaponInfo().item) return false;
     } catch (err) { return false; }
-    try { globalThis._egPlayerCurrentCharge = 0; } catch (err) {}
-    try { globalThis._egMeleeChargeLevel = 0; } catch (err) {}
     try { globalThis._egMeleeHoldKey = _egMeleeNormKey(e); } catch (err) {}
     globalThis._egMeleeHoldActive = true;
+    // Hold start stamp (wall clock): the ROOTED warning indicator only
+    // appears after a committed hold (see
+    // EG_MELEE_ROOTED_INDICATOR_DELAY_MS) so quick taps never flash it.
+    try { globalThis._egMeleeHoldStartAt = Date.now(); } catch (err) {}
     if (typeof _egUpdatePlayerChargeBar === 'function') {
         try { _egUpdatePlayerChargeBar(); } catch (err) {}
     }
@@ -379,6 +486,7 @@ function _egMeleeCancelHold() {
     if (!globalThis._egMeleeHoldActive) return;
     globalThis._egMeleeHoldActive = false;
     try { globalThis._egMeleeHoldKey = null; } catch (e) {}
+    try { globalThis._egMeleeHoldStartAt = 0; } catch (e) {}
     try { globalThis._egMeleeChargeLevel = 0; } catch (e) {}
     if (typeof _egUpdatePlayerChargeBar === 'function') {
         try { _egUpdatePlayerChargeBar(); } catch (e) {}
