@@ -1,17 +1,10 @@
-//------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
-//------------------------------------------------------------------------
-
 // Encounter constants & configuration: zone ids, monster caps, timing
 // tunables, damage-number durations, block-lockout state. Pure data -
 // every combat submodule imports from here.
 
-// Phase 4 split: write-through globalThis accessors. The facade and sibling
-// split modules rebind these through globalThis.<name> assignment
-// (imported module bindings are read-only views) - the established
-// step-9/step-10 pattern.
+// Write-through globalThis accessor for the cross-module block-lockout state.
+// Siblings rebind it through globalThis.<name> assignment because imported
+// module bindings are read-only views.
 try { Object.defineProperty(globalThis, '_egPlayerBlockLockoutUntil', { get() { return _egPlayerBlockLockoutUntil; }, set(v) { _egPlayerBlockLockoutUntil = v; }, configurable: true }); } catch (e) {}
 
 

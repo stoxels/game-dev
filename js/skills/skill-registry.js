@@ -890,8 +890,9 @@ export function activateSkill(skillId) {
 // registry can be built immediately.
 buildSkillRegistry();
 // Universal spells register themselves as first-class registry entries.
-// This must run AFTER buildSkillRegistry() (classic order: skill-registry
-// pos 84 fully evaluated before universal-spells pos 89) and it must live
-// HERE, not in universal-spells.js, because that module's body executes
-// during the import cycle before SKILL_REGISTRY is initialized.
+// Must run AFTER buildSkillRegistry(). The two skills modules import each
+// other, so this can fire while universal-spells.js is still mid-body;
+// that call is a harmless no-op because _registerUniversalSpells guards
+// itself, and universal-spells.js self-calls at the end of its own body.
+// Registration therefore does not depend on module evaluation order.
 _registerUniversalSpells();

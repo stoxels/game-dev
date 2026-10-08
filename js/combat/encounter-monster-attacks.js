@@ -5,21 +5,30 @@
 //------------------------------------------------------------------------
 
 // Monster attacks (Monster -> Player): attack resolution, projectile and
-// melee animations, dodge/miss/block feedback, block-lockout overlay and
-// the lose-control overlay.
+// melee animations, polymorph routing, dodge and grounded mitigation. Player-facing
+// feedback and block-lockout presentation live in encounter-monster-attack-feedback.js.
 
-import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { EG_MELEE_ANIM_DURATION_MS, EG_MONSTER_PROJ_DURATION_MS, EG_PLAYER_DAMAGE_NUMBER_DURATION_MS, EG_PLAYER_HIT_FLASH_MS } from './encounter-constants.js';
-import { _egDamageTargetById, _egPlayerTakeDamage } from './encounter-damage.js';
-import { _egFlashMonsterAttackCard } from './encounter-lifecycle.js';
-import { _egApplyGroundedReduction } from './encounter-player-attacks.js';
-import { _egEnsurePlayerStatusBar, _egGetPolymorphVictim, _egIsPolymorphActive, _egMaybePuzzleAttack } from './combat-ailments.js';
+import { EG_MELEE_ANIM_DURATION_MS, EG_MONSTER_PROJ_DURATION_MS } from './encounter-constants.js';
+import { _egPlayerTakeDamage } from './encounter-damage.js';
+import { _egDamageTargetById } from './encounter-monster-damage.js';
+import { _egApplyGroundedReduction } from './encounter-player-mitigation.js';
+import { _egApplyPlayerHitFeedback, _egApplyPlayerMissFeedback } from './encounter-monster-attack-feedback.js';
+import { _egGetPolymorphVictim, _egIsPolymorphActive } from './combat-ailments-core.js';
+import { _egMaybePuzzleAttack } from './combat-ailments-puzzle.js';
 import { _egFireProjectile, _egGetElementCentre } from './combat-class-projectiles.js';
 import { _egApplyMonsterHitMods, _egRollMonsterCritMult } from '../endgame/endgame-map-launch.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
 
+// Flashes the monster's card to signal it is attacking.
+export function _egFlashMonsterAttackCard(monster) {
+    const card = document.getElementById(`eg-card-${monster.id}`);
+    if (!card) return;
+    card.classList.remove('eg-flash-attack');
+    void card.offsetWidth; // force reflow so the CSS animation restarts
+    card.classList.add('eg-flash-attack');
+}
 
 // Resolves whether this attack should be melee or ranged.
 // 'both' type randomly picks one each time the monster swings.
@@ -133,133 +142,6 @@ export function _egFireMonsterAttack(monster) {
     } else {
         _egAnimateMonsterProjectile(monster);
     }
-}
-
-
-export function _egApplyPlayerMissFeedback() {
-    const hud = document.getElementById('player-avatar-wrapper');
-    if (!hud) return;
-    const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
-    label.textContent = t('eg_miss');
-    hud.appendChild(label);
-    setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
-}
-
-// Floating "Blocked!" label on the player HUD after a successful block.
-export function _egApplyPlayerBlockFeedback() {
-    const hud = document.getElementById('player-avatar-wrapper');
-    if (!hud) return;
-    const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
-    label.textContent = t('eg_blocked');
-    hud.appendChild(label);
-    setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
-}
-
-// Floating "recovering" label for block-recovery feedback (retained for
-// external callers - attacks no longer fizzle while recovering).
-export function _egApplyPlayerBlockLockoutFeedback() {
-    const hud = document.getElementById('player-avatar-wrapper');
-    if (!hud) return;
-    const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
-    label.textContent = t('eg_block_lockout');
-    hud.appendChild(label);
-    setTimeout(() => label.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
-}
-
-// ── Lose-control overlay (WoW "lose of control" style) ──────────────────
-// Status chip with live countdown shown while the player cannot block
-// again because of a recent block. Purely visual: pointer-events none.
-
-// Interval handle driving the countdown text update.
-export let _egBlockLockoutOverlayTimer = null;
-
-// Shows (or refreshs) the lockout chip in the player status bar for `durationMs`.
-export function _egShowBlockLockoutOverlay(durationMs) {
-    const bar = (typeof _egEnsurePlayerStatusBar === 'function')
-        ? _egEnsurePlayerStatusBar()
-        : document.body;
-
-    let chip = document.getElementById('eg-block-lockout-overlay');
-    if (!chip) {
-        chip = document.createElement('div');
-        chip.id = 'eg-block-lockout-overlay';
-        chip.className = 'eg-status-chip eg-status-chip-lockout';
-        chip.innerHTML = `
-            <div class="eg-lockout-icon">🛡️</div>
-            <div class="eg-lockout-countdown" id="eg-lockout-countdown">0.0</div>
-            <div class="eg-lockout-label">${t('eg_block_lockout')}</div>`;
-        bar.appendChild(chip);
-    }
-
-    const countdownEl = document.getElementById('eg-lockout-countdown');
-    if (countdownEl) countdownEl.textContent = (durationMs / 1000).toFixed(1);
-
-    // Restart the update loop so an overlapping block extends cleanly.
-    if (_egBlockLockoutOverlayTimer) clearInterval(_egBlockLockoutOverlayTimer);
-    _egBlockLockoutOverlayTimer = setInterval(() => {
-        const remaining = globalThis._egPlayerBlockLockoutUntil - Date.now();
-        if (remaining <= 0 || !_egIsActive()) {
-            _egHideBlockLockoutOverlay();
-            return;
-        }
-        const el = document.getElementById('eg-lockout-countdown');
-        if (el) el.textContent = (remaining / 1000).toFixed(1);
-    }, 100);
-}
-
-// Removes the lockout chip and stops its countdown loop.
-export function _egHideBlockLockoutOverlay() {
-    if (_egBlockLockoutOverlayTimer) {
-        clearInterval(_egBlockLockoutOverlayTimer);
-        _egBlockLockoutOverlayTimer = null;
-    }
-    const chip = document.getElementById('eg-block-lockout-overlay');
-    if (chip) chip.remove();
-}
-
-// Applies hit feedback to the player HUD: floating damage number + squish + red glow.
-export function _egApplyPlayerHitFeedback(damageValue, isCrit, element) {
-    const hud = document.getElementById('player-avatar-wrapper');
-    if (!hud) return;
-
-    // Floating damage label - crits & elemental hits get extra pop
-    const dmgLabel = document.createElement('div');
-    let cls = 'eg-player-damage';
-    if (isCrit) cls += ' eg-dmg-crit';
-    if (element) {
-        const map = { fire: 'eg-dmg-fire', cold: 'eg-dmg-cold', lightning: 'eg-dmg-lightning', shadow: 'eg-dmg-shadow' };
-        if (map[element]) cls += ' ' + map[element];
-    }
-    dmgLabel.className = cls;
-    dmgLabel.textContent = `-${damageValue}`;
-    // slight random horizontal jitter so stacked hits don't perfectly overlap
-    dmgLabel.style.marginLeft = `${(Math.random() * 18 - 9).toFixed(1)}px`;
-    hud.appendChild(dmgLabel);
-    setTimeout(() => dmgLabel.remove(), EG_PLAYER_DAMAGE_NUMBER_DURATION_MS);
-
-    // Squish + red-glow flash - crits shake harder
-    if (isCrit) {
-        hud.style.transform = 'scale(0.92)';
-        hud.style.boxShadow = 'inset 0 0 22px rgba(255,40,40,0.95), 0 0 22px rgba(255,0,0,0.95)';
-        if (hud.animate) {
-            hud.animate([
-                { transform: 'translateX(0)' },
-                { transform: 'translateX(-6px)' },
-                { transform: 'translateX(6px)' },
-                { transform: 'translateX(-4px)' },
-                { transform: 'translateX(0)' }
-            ], { duration: 180, easing: 'ease-out' });
-        }
-    } else {
-        hud.style.transform = 'scale(0.95)';
-        hud.style.boxShadow = 'inset 0 0 15px rgba(255,0,0,0.8), 0 0 15px rgba(255,0,0,0.8)';
-    }
-    setTimeout(() => { hud.style.transform = ''; hud.style.boxShadow = ''; }, isCrit ? 220 : EG_PLAYER_HIT_FLASH_MS);
-
-    Audio_Manager.playSFX('player_damage_taken');
 }
 
 // Launches a projectile from the monster's card to the player HUD.

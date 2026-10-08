@@ -1,70 +1,33 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { save } from '../state.js';
-import { _egGetElementCentre } from '../combat/combat-class-projectiles.js';
-import { EG_LOOT_DROP_LIFETIME_MS, _egBuildPickupEligiblePool, _egCancelTrackedExpiry, _egCellHasAnyDrop, _egScheduleTrackedExpiry, _egStartDropExpireCountdown } from '../combat/combat-grid-pickups.js';
-import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
-import { _egIsActive } from '../combat/combat-state.js';
-import { EG_ART } from '../endgame/endgame-art.js';
-
-
-'use strict';
 
 //------------------------------------------------------------------------
-//-------------------ENDGAME GOLD------------------------------------------
+//-------------------ENDGAME GOLD BALANCE--------------------------------
 //------------------------------------------------------------------------
-// Gold is the endgame's soft trade currency. Monsters (and especially
-// bosses) drop gold coins onto the grid like any other drop type; claiming
-// a coin banks it into the player's persistent gold balance
-// (globalThis.STATE.egGold). The Atlas Vendor on the Nexus of Worlds screen sells
-// free Tier 1 Normal maps and other goods for gold.
-//
-// Load AFTER endgame-maps.js (vendor needs _egGenerateMapDrop) and AFTER
-// endgame-hub.js (needs egSaveHubState / _egMapStash helpers).
-//
-// Public API:
-//   egGetGold()            - current gold balance
-//   egSpendGold(n)         - try to spend, returns false when too poor
-//   showEndgameVendor()    - opens the vendor screen (endgame-vendor.js)
+// Gold is the endgame's soft trade currency. Map completions and vendor
+// sales move it in and out of a single persistent balance.
 //------------------------------------------------------------------------
 
-
 //------------------------------------------------------------------------
-//-------------------CONSTANTS---------------------------------------------
-//------------------------------------------------------------------------
-
-// Chance (0–1) that a defeated monster drops a gold coin onto the grid.
-export const EG_GOLD_DROP_CHANCE_NORMAL = 0.30;  // 30% per normal monster kill
-export const EG_GOLD_DROP_CHANCE_BOSS = 1.00;    // bosses always drop gold
-
-// Hard cap: how many gold coins may sit on the board at the same time.
-export const EG_GOLD_DROP_MAX_ON_BOARD = 4;
-
-// Base gold amount range per claimed coin (before map-tier scaling).
-export const EG_GOLD_BASE_MIN = 4;
-export const EG_GOLD_BASE_MAX = 9;
-
-// Boss coins multiply the rolled amount by this factor.
-export const EG_GOLD_BOSS_AMOUNT_MULT = 4;
-
-// The active map's loot quantity bonus also scales the gold amount.
-
-
-//------------------------------------------------------------------------
-//-------------------PERSISTENT BALANCE------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 
+// The player's current gold, seeded from the saved game on load.
 export let _egGoldAmount = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.egGold) || 0;
 
+// Returns the current gold balance.
 export function egGetGold() {
     return _egGoldAmount;
 }
 
+// Copies the live balance into the save and writes the game out.
 export function _egSyncGoldToState() {
     if (typeof globalThis.STATE === 'undefined') return;
     globalThis.STATE.egGold = _egGoldAmount;
     if (typeof save === 'function') save();
 }
 
+// Adds gold to the balance (negative amounts are ignored) and records the earning.
 export function _egAddGold(amount) {
     amount = Math.max(0, Math.round(amount));
     _egGoldAmount += amount;
@@ -82,114 +45,3 @@ export function egSpendGold(amount) {
     if (typeof trackAchStat === 'function') try { trackAchStat('egGoldSpent', amount); } catch(e){}
     return true;
 }
-
-
-//------------------------------------------------------------------------
-//-------------------GRID DROPS--------------------------------------------
-//------------------------------------------------------------------------
-
-export const _egGoldDrops = new Map(); // key "row-col" → { amount }
-
-export function _egRollGoldAmount(isBoss, monsterLevel) {
-    let amount = EG_GOLD_BASE_MIN + Math.floor(Math.random() * (EG_GOLD_BASE_MAX - EG_GOLD_BASE_MIN + 1));
-
-    // Higher-level monsters carry richer coins.
-    const levelBonus = Math.max(0, Math.min(20, Math.round((monsterLevel || 1) - 1)) * 0.15);
-    amount *= (1 + levelBonus);
-
-    // Active map's loot quantity bonus also scales gold.
-    if (typeof _egMapLootQuantityMult === 'function') {
-        amount *= _egMapLootQuantityMult();
-    }
-
-    if (isBoss) amount *= EG_GOLD_BOSS_AMOUNT_MULT;
-
-    return Math.max(1, Math.round(amount));
-}
-
-// Called by the kill handlers in endgame-encounter.js.
-    // Gold no longer drops from monsters - it's now an innate map completion reward.
-    // This function is kept as a no-op for API compatibility.
-export function _egTryDropGold(isBoss, monsterLevel) {
-    return;
-}
-
-export function _egRenderGoldDropOverlay(row, col, drop) {
-    const el = document.getElementById(`g-${row}-${col}`);
-    if (!el) return;
-    const span = document.createElement('span');
-    span.className = `eg-pickup-overlay eg-pickup-rarity-legendary eg-gold-drop-overlay`;
-    span.id = `eg-gold-drop-${row}-${col}`;
-    // Gold coin art (images/items/, id 'gold') when available, else emoji.
-    EG_ART.fillElement(span, 'item', 'gold', '🪙');
-    el.appendChild(span);
-}
-
-export function _egRemoveGoldDropOverlay(key) {
-    const [r, c] = key.split('-').map(Number);
-    const span = document.getElementById(`eg-gold-drop-${r}-${c}`);
-    if (span) span.remove();
-}
-
-export function _egAnimateGoldDropClaim(row, col, drop) {
-    const el = document.getElementById(`g-${row}-${col}`);
-    if (!el) return;
-    const centre = typeof _egGetElementCentre === 'function' ? _egGetElementCentre(el) : { x: 0, y: 0 };
-    const floater = document.createElement('div');
-    floater.className = 'eg-pickup-floater';
-    EG_ART.fillElement(floater, 'item', 'gold', '🪙');
-    floater.style.left = `${centre.x}px`;
-    floater.style.top = `${centre.y}px`;
-    document.body.appendChild(floater);
-    setTimeout(() => floater.remove(), 800);
-}
-
-// Places one gold coin on an eligible grid cell (mirrors _egSpawnCurrencyDrop).
-export function _egSpawnGoldDrop(amount) {
-    if (!_egIsActive() || !(amount > 0)) return;
-    if (_egGoldDrops.size >= EG_GOLD_DROP_MAX_ON_BOARD) return;
-
-    const pool = typeof _egBuildPickupEligiblePool === 'function'
-        ? _egBuildPickupEligiblePool()
-        : [];
-    const filtered = typeof _egCellHasAnyDrop === 'function'
-        ? pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c))
-        : pool;
-    if (filtered.length === 0) return;
-
-    const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
-    const key = `${r}-${c}`;
-    const drop = { amount };
-
-    _egGoldDrops.set(key, drop);
-    _egRenderGoldDropOverlay(r, c, drop);
-
-    const lifetimeMs = EG_LOOT_DROP_LIFETIME_MS;
-    if (typeof _egScheduleTrackedExpiry === 'function') {
-        _egScheduleTrackedExpiry(_egGoldDrops, key, drop, lifetimeMs, `eg-gold-drop-${r}-${c}`, _egRemoveGoldDropOverlay);
-    } else {
-        const timer = setTimeout(() => {
-            if (_egGoldDrops.get(key) === drop) {
-                _egGoldDrops.delete(key);
-                _egRemoveGoldDropOverlay(key);
-            }
-        }, lifetimeMs);
-        if (typeof _egPickupTimers !== 'undefined') globalThis._egPickupTimers.push(timer);
-        if (typeof _egStartDropExpireCountdown === 'function') {
-            _egStartDropExpireCountdown(`eg-gold-drop-${r}-${c}`, lifetimeMs);
-        }
-    }
-}
-
-// Called from _egCheckAllClaims (mouse-button-handlers.js),
-// Gold no longer drops on the grid - these are kept as no-ops for API compatibility.
-export function _egCheckGoldDropClaim(row, col) { return false; }
-export function _egDiscardGoldDrop(row, col) {}
-export function _egStopGoldDrops() {
-    if (typeof _egCancelTrackedExpiry === 'function') {
-        Array.from(_egGoldDrops.entries()).forEach(([key, drop]) => _egCancelTrackedExpiry(_egGoldDrops, key, drop));
-    }
-    _egGoldDrops.forEach((drop, key) => _egRemoveGoldDropOverlay(key));
-    _egGoldDrops.clear();
-}
-export function _egReplaceCarriedGoldDrops(drops) {}

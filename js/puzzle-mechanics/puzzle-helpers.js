@@ -91,8 +91,7 @@ export function _applyTargetedRevealBias(cands, sol, rows, cols) {
 // Attempts to narrow `cands` to cells in the densest unsolved row or
 // column based on the Dense Marker passive chance.
 export function _applyDenseMarkerBias(cands, sol, rows, cols) {
-    const chance = (ptHasSkill('dense_marker_1') ? 0.20 : 0)
-        + (ptHasSkill('dense_marker_2') ? 0.20 : 0)
+    const chance = (ptHasSkill('dense_marker_2') ? 0.20 : 0)
         + (ptHasSkill('dense_marker_3') ? 0.30 : 0);
 
     if (chance <= 0 || Math.random() >= chance || cands.length === 0) return cands;

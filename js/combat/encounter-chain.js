@@ -8,25 +8,32 @@ import { _egClearCenterGridBanners, pauseTimer, resumeTimer, stopTimer } from '.
 import { t } from '../translation/translations.js';
 import { EG_ART } from '../endgame/endgame-art.js';
 import { _egAtlasOnMapCompleted, egAtlasMakeRng, egAtlasNodeName } from '../endgame/endgame-atlas.js';
-import { _egCleanupBossTestSeedLevel, showEndgameBossTest } from './combat-boss-test.js';
-import { _egFlushPendingRevealProjectiles } from './combat-class-projectiles.js';
-import { _egTryDropCurrency } from '../loot/loot-currency.js';
+import { showEndgameBossTest } from './combat-boss-test.js';
+import { _egCleanupBossTestSeedLevel } from './combat-boss-test-launch.js';
+import { _egFlushPendingRevealProjectiles } from './combat-class-projectiles-reveal.js';
+import { _egTryDropCurrency } from '../loot/loot-currency-drops.js';
 import { _egResetLowHealthWarningState, _egResetMistakesWarningState } from './encounter-overlays.js';
-import { _egOnPause, _egOnResume } from './encounter-tick.js';
+import { _egOnPause, _egOnResume } from './encounter-tick-support.js';
 import { EG_BOSS_SPAWN_DELAY_MS, _egBuildBossSpawnListFromDef, _egPlayerTakeDamage, _egRenderPanel, _egRollMonsterLevel, _egSpawnMonster, _egStopEncounter } from './encounter.js';
 import { _egGenerateEquipmentDrop } from '../loot/loot-equipment-generator.js';
-import { egAddEssence } from '../loot/loot-essences.js';
+import { egAddEssence } from '../loot/loot-essences-stash.js';
 import { _egAddGold } from '../loot/loot-gold.js';
-import { _egFlushRunLootToStash, _egRarityToastColor, _egRemovePickupOverlay, _egReplaceCarriedCurrencyDrops, _egReplaceCarriedItemDrops, _egReplaceCarriedLootDrops, _egSpawnLootExplosion } from './combat-grid-pickups.js';
-import { _egHazardsHideForQuiz, _egHazardsShowAfterQuiz } from './combat-hazards.js';
+import { _egRarityToastColor, _egRemovePickupOverlay } from './combat-grid-pickups.js';
+import { _egFlushRunLootToStash, _egReplaceCarriedLootDrops, _egSpawnLootExplosion } from './combat-grid-pickups-loot.js';
+import { _egReplaceCarriedCurrencyDrops } from './combat-grid-pickups-currency.js';
+import { _egReplaceCarriedItemDrops } from './combat-grid-pickups-items.js';
+import { _egHazardsHideForQuiz, _egHazardsShowAfterQuiz } from './combat-hazards-lifecycle.js';
 import { egAddCurrency } from '../endgame/endgame-hub-drag-and-drop.js';
 import { _egBuildTooltipBodyHTML } from '../endgame/endgame-hub-tooltips.js';
 import { _egEquipped, _egInventory, egSaveHubState } from '../endgame/endgame-hub.js';
 import { _egLootFilterAutoVendor } from '../loot/loot-filter.js';
 import { _egActiveMapItem, _egCleanupMapRunSeedLevel, _egGetActiveMapModValue, _egMapQuestionsPerInterstitial } from '../endgame/endgame-map-launch.js';
-import { EG_GRID_SIZE_BUCKETS, _egBankUnclaimedMapDrops, _egBuildMapTooltipBodyHTML, _egGetCompletionRewardDef, _egMapDrops, _egReplaceCarriedMapDrops, _egRollAtlasAdjacentBonusDrop } from '../loot/loot-maps.js';
+import { _egBankUnclaimedMapDrops, _egMapDrops, _egReplaceCarriedMapDrops, _egRollAtlasAdjacentBonusDrop } from '../loot/loot-map-drops.js';
+import { _egBuildMapTooltipBodyHTML } from '../loot/loot-map-tooltip.js';
+import { _egGetCompletionRewardDef } from '../loot/loot-map-completion-reward.js';
 import { showEndgameNexus } from '../endgame/endgame-nexus.js';
 import { _egCreateGeneratedLevel } from './combat-puzzle-generator.js';
+import { _egBucketCriteria, _egPickStoryChainPuzzleGi, _egResetChainRecentGis, _egTrackChainRecentGi } from './encounter-chain-pool.js';
 import { _egConsumePendingQuizRewardHTML, _egResetQuizDamageBuff } from '../endgame/endgame-quiz-buffs.js';
 import { _egCurrencyDrops, _egIsActive, _egIsCampaignRun, _egItemDrops, _egLootDrops, _egPickups } from './combat-state.js';
 import { STATE } from '../state.js';
@@ -769,111 +776,6 @@ export function _egOnAllBossesDead() {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------ENCOUNTER CHAIN: PUZZLE POOL CRITERIA---------------
-//------------------------------------------------------------------------
-
-export let _egChainRecentGis = [];
-
-// ── Encounter-chain size caps (playability) ──────────────────────────
-// 15×30 is the widest comfortable map; 20 rows is allowed only when
-// columns stay ≤20. Anything beyond those on either axis, or tall+wide
-// (>15 rows && >20 cols), is too large for a fun chain step.
-export const EG_CHAIN_MAX_ROWS = 20;
-export const EG_CHAIN_MAX_COLS = 30;
-export const EG_CHAIN_TALL_ROW_THRESHOLD = 15;
-export const EG_CHAIN_MAX_COLS_WHEN_TALL = 20;
-
-export function _egChainPuzzleSizeAllowed(rows, cols) {
-    if (rows > EG_CHAIN_MAX_ROWS || cols > EG_CHAIN_MAX_COLS) return false;
-    if (rows > EG_CHAIN_TALL_ROW_THRESHOLD && cols > EG_CHAIN_MAX_COLS_WHEN_TALL) return false;
-    return true;
-}
-
-export function _egPuzzlePassesCriteria(level, criteria) {
-    const rows = level.grid.length;
-    const cols = level.grid[0].length;
-    const cells = rows * cols;
-
-    // Global encounter-chain cap: keep chains fun, never pick mega grids.
-    if (!_egChainPuzzleSizeAllowed(rows, cols)) return false;
-
-    if (criteria.minCells != null && cells < criteria.minCells) return false;
-    if (criteria.maxCells != null && cells > criteria.maxCells) return false;
-    if (criteria.minRows != null && rows < criteria.minRows) return false;
-    if (criteria.maxRows != null && rows > criteria.maxRows) return false;
-    if (criteria.minCols != null && cols < criteria.minCols) return false;
-    if (criteria.maxCols != null && cols > criteria.maxCols) return false;
-
-    if (criteria.worlds != null && !criteria.worlds.includes(level.world)) return false;
-    if (criteria.excludeWorlds != null && criteria.excludeWorlds.includes(level.world)) return false;
-
-    return true;
-}
-
-export function _egBuildChainPool(criteria) {
-    const avoidRecent = criteria.avoidRecent !== false;
-
-    let pool = globalThis.ALL.filter(level =>
-        !level.isEndgameSandbox &&
-        !level.isGeneratedPuzzle &&  // generated levels are launched directly
-        !level.requiredKills &&
-        !level.totalMonsters &&      // also exclude other map-starter levels
-        !(typeof isGatedLevel === 'function' && globalThis.isGatedLevel(level.gIdx)) &&  // math gates are campaign-only
-        _egPuzzlePassesCriteria(level, criteria)
-    );
-
-    if (avoidRecent && pool.length > _egChainRecentGis.length) {
-        const filtered = pool.filter(level => !_egChainRecentGis.includes(level.gIdx));
-        if (filtered.length > 0) pool = filtered;
-    }
-
-    return pool;
-}
-
-// Picks from the pool; an optional seeded PRNG (chain blueprints) makes
-// the pick deterministic for a given pool state.
-export function _egPickFromPool(pool, recentWindow, rng) {
-    const R = rng || Math.random;
-    const picked = pool[Math.floor(R() * pool.length)];
-    _egChainRecentGis.push(picked.gIdx);
-    if (_egChainRecentGis.length > (recentWindow || 8)) _egChainRecentGis.shift();
-    return picked.gIdx;
-}
-
-export function _egTrackChainRecentGi(gi, recentWindow) {
-    _egChainRecentGis.push(gi);
-    if (_egChainRecentGis.length > (recentWindow || 8)) {
-        _egChainRecentGis.shift();
-    }
-}
-
-// Picks from the story pool honouring the given criteria; relaxes pure
-// size filters when nothing qualifies so the chain never stalls.
-// `rng` (optional seeded PRNG) makes the pick deterministic.
-export function _egPickStoryChainPuzzleGi(criteria, rng) {
-    let pool = _egBuildChainPool(criteria);
-
-    if (pool.length === 0 && (criteria.minCells != null || criteria.maxCells != null)) {
-        pool = _egBuildChainPool({ ...criteria, minCells: null, maxCells: null });
-    }
-
-    if (pool.length === 0) return null;
-    return _egPickFromPool(pool, criteria.recentWindow, rng);
-}
-
-// Clones the chain criteria with a grid-size bucket's cell window applied.
-export function _egBucketCriteria(criteria, bucket) {
-    const range = (typeof EG_GRID_SIZE_BUCKETS !== 'undefined')
-        ? EG_GRID_SIZE_BUCKETS[bucket] : null;
-    const c = { ...criteria };
-    if (range) {
-        c.minCells = Math.max(criteria.minCells || 0, range[0]);
-        c.maxCells = range[1] === Infinity ? null : range[1];
-    }
-    return c;
-}
-
 // Picks one puzzle for a map run. Two modes:
 //   ── Blueprint pull (atlas regions) ── the region's chain blueprint fixes
 //      every step in advance (same map → same chain, every run): the plan
@@ -1120,7 +1022,7 @@ export function _egGrantMapCompletionReward() {
     const difficulty = tierFrac * 0.7 + modFrac * 0.3;
     // Base 50-500 gold depending on difficulty, plus small random variance
     const goldAmount = Math.max(50, Math.round(50 + difficulty * 450 + (Math.random() - 0.5) * 100));
-    if (typeof egGetGold === 'function' && typeof _egAddGold === 'function') {
+    if (typeof _egAddGold === 'function') {
         _egAddGold(goldAmount);
         globalThis.showToast(t('eg_map_gold_reward').replace('{n}', goldAmount), '#f5d98a');
     }
@@ -1572,7 +1474,7 @@ export function _egChainCleanup() {
     _egPendingPuzzleBonusGain = 0;
     _egPendingQuestionBonusGain = 0;
     _egChainCurrentGi = null;
-    _egChainRecentGis = [];
+    _egResetChainRecentGis();
     _egMonsterSpawnCounter = 0;
     _egPuzzleCompleteFired = false;
     _egMapClearedShown = false;

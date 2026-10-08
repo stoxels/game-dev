@@ -257,15 +257,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 288,
-   "x": 0,
-   "y": -1341,
+   "x": -5331,
+   "y": -2978,
    "nameEn": "Keystone: Maximum Likelihood",
    "nameDe": "Schlüsselfertigkeit: Maximale Wahrscheinlichkeit",
    "descEn": "At the start of each level, the single row and single column with the most filled cells are fully solved automatically. You start the level with 15 minutes less on the timer.",
    "descDe": "Zu Beginn jedes Levels werden die Zeile und die Spalte mit den meisten gefüllten Zellen automatisch vollständig gelöst. Du startest das Level mit 15 Minuten weniger auf dem Timer.",
    "icon": "🏔️",
    "statKey": "keystone_maximum_likelihood",
-   "tier": "keystone"
+   "tier": "keystone",
+   "layoutPinned": true
   },
   {
    "id": 340,
@@ -761,15 +762,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 234,
-   "x": -6,
-   "y": -1283,
+   "x": -4904,
+   "y": -3541,
    "nameEn": "Core Insight",
    "nameDe": "Kernblick",
    "descEn": "At the start of each level, the correct filled cell closest to the centre of the grid is revealed. +6% Absorption regen rate.",
    "descDe": "Zu Beginn jedes Levels wird die korrekte gefüllte Zelle aufgedeckt, die der Gittermitte am nächsten liegt. +6% Absorptionsregeneration.",
    "icon": "🎯",
    "statKey": "central_tendency_1",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 235,
@@ -917,15 +919,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 388,
-   "x": -342,
-   "y": -1345,
+   "x": -5170,
+   "y": -3524,
    "nameEn": "Compound Interest",
    "nameDe": "Zinseszins",
    "descEn": "Your Hour Vault savings additionally grant one guaranteed reveal at the next level start. +6% Absorption regen rate.",
    "descDe": "Deine Stunden-Tresor-Ersparnisse gewähren zusätzlich eine garantierte Aufdeckung beim nächsten Levelstart. +6% Absorptionsregeneration.",
    "icon": "💹",
    "statKey": "compound_interest",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 231,
@@ -1159,12 +1162,12 @@ export const TALENT_TREE_DATA = {
    "id": 130,
    "x": -1,
    "y": -1423,
-   "nameEn": "Clustering Signal",
-   "nameDe": "Cluster-Signal",
-   "descEn": "Mark-wrong items have a 20% chance to prioritize cells in rows or columns that already have many filled cells (but are not yet complete). Stacks with Crowded Insight and Density Focus. +6% Absorption regen rate.",
-   "descDe": "Markierungsgegenstände haben eine 20% Chance, Zellen in Zeilen oder Spalten mit vielen bereits gefüllten Zellen zu priorisieren (sofern diese noch nicht vollständig sind). Wirkt zusammen mit Gedrängte Einsicht und Dichtefokus. +6% Absorptionsregeneration.",
-   "icon": "✏️",
-   "statKey": "dense_marker_1",
+   "nameEn": "Casting Sentinel",
+   "nameDe": "Zaubersentinel",
+   "descEn": "+10% to all Elemental Resistances\n+20 to Strength\n+20 to Agility\n25% chance to Avoid Ailments while Casting",
+   "descDe": "+10% auf alle Elementarresistenzen\n+20 Stärke\n+20 Beweglichkeit\n25% Chance, Statuseffekte beim Zaubern zu vermeiden",
+   "icon": "images/passives/passive_012.webp",
+   "statKey": "notable_casting_sentinel",
    "tier": "notable"
   },
   {
@@ -1387,12 +1390,12 @@ export const TALENT_TREE_DATA = {
    "id": 355,
    "x": -278,
    "y": -1476,
-   "nameEn": "Ergodic Recall",
-   "nameDe": "Ergodischer Rückruf",
-   "descEn": "3 times per level, a mistake deals no time penalty (the mistake still counts). +6% Absorption regen rate.",
-   "descDe": "3-mal pro Level verursacht ein Fehler keinen Zeitverlust (der Fehler zählt trotzdem). +6% Absorptionsregeneration.",
-   "icon": "🧿",
-   "statKey": "ergodic_recall",
+   "nameEn": "Arcane Resonance",
+   "nameDe": "Arkane Resonanz",
+   "descEn": "+20% increased Spell Damage\n5% increased Cast Speed\n+20 to Intelligence",
+   "descDe": "+20% erhöhter Zauberschaden\n5% erhöhte Zaubergeschwindigkeit\n+20 Intelligenz",
+   "icon": "",
+   "statKey": "notable_arcane_resonance",
    "tier": "notable"
   },
   {
@@ -2791,12 +2794,12 @@ export const TALENT_TREE_DATA = {
    "id": 134,
    "x": -1,
    "y": -1529,
-   "nameEn": "Radiant Hunter",
-   "nameDe": "Strahlender Jäger",
-   "descEn": "15% increased chance of obtaining Reveal items as rewards. Stacks with Lumina Aspirant and Beacon Pursuit. +6% Absorption regen rate.",
-   "descDe": "15% erhöhte Chance, Enthüllungsgegenstände als Belohnung zu erhalten. Wirkt zusammen mit Lichtaspirant und Leuchtfeuerjagd. +6% Absorptionsregeneration.",
-   "icon": "🔍",
-   "statKey": "seeker_of_light_2",
+   "nameEn": "Deep Vigor",
+   "nameDe": "Tiefe Kraft",
+   "descEn": "+8% increased maximum Life\n+12% increased maximum Mana",
+   "descDe": "+8% erhöhtes maximales Leben\n+12% erhöhtes maximales Mana",
+   "icon": "images/passives/passive_108.webp",
+   "statKey": "notable_deep_vigor",
    "tier": "notable"
   },
   {
@@ -2887,12 +2890,12 @@ export const TALENT_TREE_DATA = {
    "id": 256,
    "x": 276,
    "y": -1476,
-   "nameEn": "Adaptive Correction",
-   "nameDe": "Adaptive Korrektur",
-   "descEn": "Reduces the mistake threshold of Error Feedback to every 2 mistakes instead of 3. +6% Absorption regen rate.",
-   "descDe": "Reduziert den Fehlerschwellenwert von Fehler-Feedback auf je 2 Fehler statt 3. +6% Absorptionsregeneration.",
-   "icon": "📏",
-   "statKey": "standard_deviation_2",
+   "nameEn": "Arcane Bulwark",
+   "nameDe": "Arkaner Schutzwall",
+   "descEn": "+20 maximum Absorption\n+20 maximum Mana\n+20 to Intelligence",
+   "descDe": "+20 maximale Absorption\n+20 max. Mana\n+20 Intelligenz",
+   "icon": "",
+   "statKey": "trix_arcane_bulwark",
    "tier": "notable"
   },
   {
@@ -3019,12 +3022,12 @@ export const TALENT_TREE_DATA = {
    "id": 110,
    "x": -352,
    "y": -1759,
-   "nameEn": "Judgment Sigil",
-   "nameDe": "Urteils-Siegel",
-   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace and Clarity Mark. +6% Absorption regen rate.",
-   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur und Klarheitsmarke. +6% Absorptionsregeneration.",
-   "icon": "✏️",
-   "statKey": "stronger_marks_2",
+   "nameEn": "Verdant Covenant",
+   "nameDe": "Grüner Pakt",
+   "descEn": "25% increased Nature Damage\n5% increased Cast Speed with Nature Skills\n+15% to Nature Resistance",
+   "descDe": "25% erhöhter Naturschaden\n5% erhöhte Zaubergeschwindigkeit mit Naturzaubern\n+15% Naturwiderstand",
+   "icon": "",
+   "statKey": "notable_verdant_covenant",
    "tier": "notable"
   },
   {
@@ -3033,8 +3036,8 @@ export const TALENT_TREE_DATA = {
    "y": 441,
    "nameEn": "Clarity Mark",
    "nameDe": "Klarheitsmarke",
-   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace and Judgment Sigil. +6% Armour.",
-   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur und Urteils-Siegel. +6% Rüstung.",
+   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace. +6% Armour.",
+   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur. +6% Rüstung.",
    "icon": "✏️",
    "statKey": "stronger_marks_3",
    "tier": "notable"
@@ -3365,15 +3368,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 346,
-   "x": -8,
-   "y": -1251,
+   "x": -5086,
+   "y": -3382,
    "nameEn": "Wavefunction Spread",
    "nameDe": "Wellenfunktions-Ausbreitung",
    "descEn": "20% of revealed cells splash information: one truly-empty orthogonal neighbour gets marked automatically. +6% Absorption regen rate.",
    "descDe": "20% der aufgedeckten Zellen spritzen Information ab: Ein wirklich leerer orthogonaler Nachbar wird automatisch markiert. +6% Absorptionsregeneration.",
    "icon": "🫧",
    "statKey": "wavefunction_spread",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 27,
@@ -3619,12 +3623,12 @@ export const TALENT_TREE_DATA = {
    "id": 133,
    "x": -189,
    "y": -1367,
-   "nameEn": "Lumina Aspirant",
-   "nameDe": "Lichtaspirant",
-   "descEn": "15% increased chance of obtaining Reveal items as rewards. Stacks with Radiant Hunter and Beacon Pursuit.",
-   "descDe": "15% erhöhte Chance, Enthüllungsgegenstände als Belohnung zu erhalten. Wirkt zusammen mit Strahlender Jäger und Leuchtfeuerjagd.",
-   "icon": "🕯️",
-   "statKey": "travel_seeker_of_light_1",
+   "nameEn": "Cast Speed",
+   "nameDe": "Zaubergeschwindigkeit",
+   "descEn": "+4% increased Cast Speed",
+   "descDe": "+4% erhöhte Zaubergeschwindigkeit",
+   "icon": "",
+   "statKey": "trix_cast_speed",
    "tier": "travel"
   },
   {
@@ -3681,8 +3685,8 @@ export const TALENT_TREE_DATA = {
    "y": 1254,
    "nameEn": "Insightful Trace",
    "nameDe": "Einsichtsvolle Spur",
-   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Judgment Sigil and Clarity Mark.",
-   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Urteils-Siegel und Klarheitsmarke.",
+   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Clarity Mark.",
+   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Klarheitsmarke.",
    "icon": "✏️",
    "statKey": "travel_stronger_marks_1",
    "tier": "travel"
@@ -8433,8 +8437,8 @@ export const TALENT_TREE_DATA = {
    "y": 388,
    "nameEn": "Lesser Clarity Mark",
    "nameDe": "Klarheitsmarke (klein)",
-   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace and Judgment Sigil. +3% Armour.",
-   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur und Urteils-Siegel. +3% Rüstung.",
+   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace. +3% Armour.",
+   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur. +3% Rüstung.",
    "icon": "✏️",
    "statKey": "small_lesser_clarity_mark",
    "tier": "small"
@@ -8445,8 +8449,8 @@ export const TALENT_TREE_DATA = {
    "y": 441,
    "nameEn": "Lesser Clarity Mark",
    "nameDe": "Klarheitsmarke (klein)",
-   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace and Judgment Sigil. +3% Armour.",
-   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur und Urteils-Siegel. +3% Rüstung.",
+   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace. +3% Armour.",
+   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur. +3% Rüstung.",
    "icon": "✏️",
    "statKey": "small_lesser_clarity_mark",
    "tier": "small"
@@ -18461,15 +18465,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 20172,
-   "x": -1,
-   "y": -1322,
+   "x": -5170,
+   "y": -3159,
    "nameEn": "Frost Ward",
    "nameDe": "Frostwache",
    "descEn": "Monsters that hit you attack 10% slower for 2 seconds.",
    "descDe": "Monster, die dich treffen, greifen 2 Sekunden lang 10% langsamer an.",
    "icon": "◆",
    "statKey": "notable_frost_ward",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 20173,
@@ -18487,24 +18492,24 @@ export const TALENT_TREE_DATA = {
    "id": 20174,
    "x": -242,
    "y": -1759,
-   "nameEn": "Thaumaturge",
-   "nameDe": "Thaumaturg",
-   "descEn": "+2 to Intellect, +8% Critical strike multiplier.",
-   "descDe": "+2 Intelligenz, +8% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "notable_thaumaturge",
+   "nameEn": "Frostweaver",
+   "nameDe": "Frostweber",
+   "descEn": "25% increased Cold Damage\n5% increased Cast Speed with Cold Skills\n+15% to Cold Resistance",
+   "descDe": "25% erhöhter Kälteschaden\n5% erhöhte Zaubergeschwindigkeit mit Kältezaubern\n+15% Kältewiderstand",
+   "icon": "images/passives/passive_017.webp",
+   "statKey": "notable_frostweaver",
    "tier": "notable"
   },
   {
    "id": 20175,
    "x": -462,
    "y": -1759,
-   "nameEn": "Thaumaturge",
-   "nameDe": "Thaumaturg",
-   "descEn": "+2 to Intellect, +8% Critical strike multiplier.",
-   "descDe": "+2 Intelligenz, +8% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "notable_thaumaturge",
+   "nameEn": "Ember Prior",
+   "nameDe": "Glutprior",
+   "descEn": "25% increased Fire Damage\n5% increased Cast Speed with Fire Skills\n+15% to Fire Resistance",
+   "descDe": "25% erhöhter Feuerschaden\n5% erhöhte Zaubergeschwindigkeit mit Feuerzaubern\n+15% Feuerwiderstand",
+   "icon": "",
+   "statKey": "notable_ember_prior",
    "tier": "notable"
   },
   {
@@ -18881,15 +18886,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 20207,
-   "x": 340,
-   "y": -1344,
+   "x": -5400,
+   "y": -3285,
    "nameEn": "Void Absorption",
    "nameDe": "Leerenabsorption",
    "descEn": "When your Absorption breaks, gain +20% Attack speed for 3 seconds.",
    "descDe": "Wenn deine Absorption bricht, erhältst du 3 Sekunden lang +20% Angriffsgeschwindigkeit.",
    "icon": "◆",
    "statKey": "notable_void_absorption",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 20208,
@@ -21235,34 +21241,22 @@ export const TALENT_TREE_DATA = {
    "id": 31209,
    "x": 296,
    "y": -1216,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
-   "tier": "travel"
-  },
-  {
-   "id": 31210,
-   "x": 262,
-   "y": -1273,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "descEn": "+5 to Intelligence",
+   "descDe": "+5 Intelligenz",
+   "icon": "images/passives/passive_002.webp",
+   "statKey": "trix_cerebral_focus",
    "tier": "travel"
   },
   {
    "id": 31211,
    "x": 195,
    "y": -1280,
-   "nameEn": "Time Sense",
-   "nameDe": "Zeitgefühl",
-   "descEn": "+10 Seconds added to the Timer.",
-   "descDe": "+10 Sekunden zur Timerzeit hinzugefügt.",
+   "nameEn": "Time Margin",
+   "nameDe": "Zeitpuffer",
+   "descEn": "+10 seconds added to the Timer",
+   "descDe": "+10 Sekunden werden zu Beginn jedes Levels zum Timer hinzugefügt.",
    "icon": "",
    "statKey": "trix_time_sense",
    "tier": "travel"
@@ -21273,8 +21267,8 @@ export const TALENT_TREE_DATA = {
    "y": -1322,
    "nameEn": "Absorptive Core",
    "nameDe": "Absorptiver Kern",
-   "descEn": "+10 Absorption\n+4% increased Absorption",
-   "descDe": "+10 Absorption\n+4% erhöhte Absorption",
+   "descEn": "+10 maximum Absorption\n+4% increased maximum Absorption",
+   "descDe": "+10 maximale Absorption\n+4% erhöhte maximale Absorption",
    "icon": "",
    "statKey": "trix_absorption_core",
    "tier": "travel"
@@ -21283,48 +21277,48 @@ export const TALENT_TREE_DATA = {
    "id": 31213,
    "x": 187,
    "y": -1367,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Absorption Focus",
+   "nameDe": "Absorptionsfokus",
+   "descEn": "+6% increased maximum Absorption\n+10% increased Absorption regen rate",
+   "descDe": "+6% erhöhte maximale Absorption\n+10% erhöhte Absorptionsregenerationsrate",
+   "icon": "",
+   "statKey": "trix_absorption_focus",
    "tier": "travel"
   },
   {
    "id": 31214,
    "x": 209,
    "y": -1420,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Absorptive Core",
+   "nameDe": "Absorptiver Kern",
+   "descEn": "+10 maximum Absorption\n+4% increased maximum Absorption",
+   "descDe": "+10 maximale Absorption\n+4% erhöhte maximale Absorption",
+   "icon": "",
+   "statKey": "trix_absorption_core",
    "tier": "travel"
   },
   {
    "id": 31215,
    "x": 267,
    "y": -1404,
-   "nameEn": "Lesser Adaptive Correction",
-   "nameDe": "Adaptive Korrektur (klein)",
-   "descEn": "Reduces the mistake threshold of Error Feedback to every 1 mistakes instead of 2. +3% Absorption regen rate. +10 seconds added to the timer.",
-   "descDe": "Reduziert den Fehlerschwellenwert von Fehler-Feedback auf je 1 Fehler statt 2. +3% Absorptionsregeneration. +10 Sekunden werden zum Timer hinzugefügt.",
-   "icon": "📏",
-   "statKey": "small_lesser_adaptive_correction",
+   "nameEn": "Time Margin",
+   "nameDe": "Zeitpuffer",
+   "descEn": "+10 seconds added to the Timer",
+   "descDe": "+10 Sekunden werden zu Beginn jedes Levels zum Timer hinzugefügt.",
+   "icon": "",
+   "statKey": "small_time_margin_2",
    "tier": "small"
   },
   {
    "id": 31216,
    "x": 239,
    "y": -1337,
-   "nameEn": "Lesser Adaptive Correction",
-   "nameDe": "Adaptive Korrektur (klein)",
-   "descEn": "Reduces the mistake threshold of Error Feedback to every 1 mistakes instead of 2. +3% Absorption regen rate. +10 seconds added to the timer.",
-   "descDe": "Reduziert den Fehlerschwellenwert von Fehler-Feedback auf je 1 Fehler statt 2. +3% Absorptionsregeneration. +10 Sekunden werden zum Timer hinzugefügt.",
-   "icon": "📏",
-   "statKey": "small_lesser_adaptive_correction",
+   "nameEn": "Time Margin",
+   "nameDe": "Zeitpuffer",
+   "descEn": "+10 seconds added to the Timer",
+   "descDe": "+10 Sekunden werden zu Beginn jedes Levels zum Timer hinzugefügt.",
+   "icon": "",
+   "statKey": "small_time_margin",
    "tier": "small"
   },
   {
@@ -21333,8 +21327,8 @@ export const TALENT_TREE_DATA = {
    "y": -1236,
    "nameEn": "Arcane Reserve",
    "nameDe": "Arkane Reserve",
-   "descEn": "+14 Absorption\n+16 maximum Mana",
-   "descDe": "+14 Absorption\n+16 max. Mana",
+   "descEn": "+14 maximum Absorption\n+16 maximum Mana",
+   "descDe": "+14 maximale Absorption\n+16 max. Mana",
    "icon": "",
    "statKey": "travel_arcane_reserve",
    "tier": "travel"
@@ -21355,24 +21349,24 @@ export const TALENT_TREE_DATA = {
    "id": 31219,
    "x": 418,
    "y": -1361,
-   "nameEn": "Lesser Critical Flow",
-   "nameDe": "Kritischer Fluss (klein)",
-   "descEn": "+3% Critical strike chance with magical attacks.",
-   "descDe": "+3% kritische Trefferchance bei magischen Angriffen.",
-   "icon": "◆",
-   "statKey": "small_lesser_critical_flow",
+   "nameEn": "Intelligence",
+   "nameDe": "Intelligenz",
+   "descEn": "+5 to Intelligence",
+   "descDe": "+5 Intelligenz",
+   "icon": "images/passives/passive_002.webp",
+   "statKey": "small_focused_intellect",
    "tier": "small"
   },
   {
    "id": 31220,
    "x": 450,
    "y": -1476,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "descEn": "+5 to Intelligence",
+   "descDe": "+5 Intelligenz",
+   "icon": "images/passives/passive_002.webp",
+   "statKey": "travel_profound_intellect",
    "tier": "travel"
   },
   {
@@ -21487,12 +21481,12 @@ export const TALENT_TREE_DATA = {
    "id": 31230,
    "x": -179,
    "y": -1689,
-   "nameEn": "Lesser Ergodic Recall",
-   "nameDe": "Ergodischer Rückruf (klein)",
-   "descEn": "2 times per level, a mistake deals no time penalty (the mistake still counts). +3% Absorption regen rate.",
-   "descDe": "2-mal pro Level verursacht ein Fehler keinen Zeitverlust (der Fehler zählt trotzdem). +3% Absorptionsregeneration.",
-   "icon": "🧿",
-   "statKey": "small_lesser_ergodic_recall",
+   "nameEn": "Lesser Arcane Bulwark",
+   "nameDe": "Arkaner Schutzwall (klein)",
+   "descEn": "+10 maximum Absorption\n+10 maximum Mana",
+   "descDe": "+10 maximale Absorption\n+10 max. Mana",
+   "icon": "",
+   "statKey": "small_arcane_bulwark",
    "tier": "small"
   },
   {
@@ -21559,96 +21553,96 @@ export const TALENT_TREE_DATA = {
    "id": 31236,
    "x": -352,
    "y": -1649,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Elemental Conduction",
+   "nameDe": "Elementare Leitung",
+   "descEn": "+10% increased Elemental Damage",
+   "descDe": "+10% erhöhter elementarer Schaden",
+   "icon": "images/passives/passive_044.webp",
+   "statKey": "travel_elemental_conduction",
    "tier": "travel"
   },
   {
    "id": 31237,
    "x": -452,
    "y": -1476,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "descEn": "+5 to Intelligence",
+   "descDe": "+5 Intelligenz",
+   "icon": "images/passives/passive_002.webp",
+   "statKey": "travel_heightened_intellect",
    "tier": "travel"
   },
   {
    "id": 31238,
    "x": -419,
    "y": -1361,
-   "nameEn": "Lesser Overflowing Spoils",
-   "nameDe": "Überfluss an Beute (klein)",
-   "descEn": "5% chance to receive an additional Item when answering a Multiple Choice question correctly. +3% Absorption regen rate.",
-   "descDe": "5% Chance einen zusätzlichen Gegenstand für die korrekte Beantwortung von Multiple Choice Fragen zu erhalten. +3% Absorptionsregeneration.",
-   "icon": "🪙",
-   "statKey": "small_lesser_overflowing_spoils",
+   "nameEn": "Intelligence",
+   "nameDe": "Intelligenz",
+   "descEn": "+5 to Intelligence",
+   "descDe": "+5 Intelligenz",
+   "icon": "images/passives/passive_002.webp",
+   "statKey": "small_refined_intellect",
    "tier": "small"
   },
   {
    "id": 31239,
    "x": -269,
    "y": -1404,
-   "nameEn": "Lesser Ergodic Recall",
-   "nameDe": "Ergodischer Rückruf (klein)",
-   "descEn": "2 times per level, a mistake deals no time penalty (the mistake still counts). +3% Absorption regen rate.",
-   "descDe": "2-mal pro Level verursacht ein Fehler keinen Zeitverlust (der Fehler zählt trotzdem). +3% Absorptionsregeneration.",
-   "icon": "🧿",
-   "statKey": "small_lesser_ergodic_recall",
+   "nameEn": "Spell Focus",
+   "nameDe": "Zauberfokus",
+   "descEn": "+10% increased Spell Damage",
+   "descDe": "+10% erhöhter Zauberschaden",
+   "icon": "",
+   "statKey": "small_lesser_spell_focus",
    "tier": "small"
   },
   {
    "id": 31240,
    "x": -211,
    "y": -1420,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Cast Speed",
+   "nameDe": "Zaubergeschwindigkeit",
+   "descEn": "+4% increased Cast Speed",
+   "descDe": "+4% erhöhte Zaubergeschwindigkeit",
+   "icon": "",
+   "statKey": "trix_cast_speed",
    "tier": "travel"
   },
   {
    "id": 31241,
    "x": -241,
    "y": -1337,
-   "nameEn": "Lesser Ergodic Recall",
-   "nameDe": "Ergodischer Rückruf (klein)",
-   "descEn": "2 times per level, a mistake deals no time penalty (the mistake still counts). +3% Absorption regen rate.",
-   "descDe": "2-mal pro Level verursacht ein Fehler keinen Zeitverlust (der Fehler zählt trotzdem). +3% Absorptionsregeneration.",
-   "icon": "🧿",
-   "statKey": "small_lesser_ergodic_recall",
+   "nameEn": "Spell Focus",
+   "nameDe": "Zauberfokus",
+   "descEn": "+10% increased Spell Damage",
+   "descDe": "+10% erhöhter Zauberschaden",
+   "icon": "",
+   "statKey": "small_lesser_spell_focus",
    "tier": "small"
   },
   {
    "id": 31242,
    "x": -197,
    "y": -1280,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Spell Focus",
+   "nameDe": "Zauberfokus",
+   "descEn": "+10% increased Spell Damage",
+   "descDe": "+10% erhöhter Zauberschaden",
+   "icon": "",
+   "statKey": "trix_spell_focus",
    "tier": "travel"
   },
   {
    "id": 31243,
    "x": -155,
    "y": -1322,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Cast Speed",
+   "nameDe": "Zaubergeschwindigkeit",
+   "descEn": "+4% increased Cast Speed",
+   "descDe": "+4% erhöhte Zaubergeschwindigkeit",
+   "icon": "",
+   "statKey": "trix_cast_speed",
    "tier": "travel"
   },
   {
@@ -24415,12 +24409,12 @@ export const TALENT_TREE_DATA = {
    "id": 31474,
    "x": -297,
    "y": -1216,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "descEn": "+5 to Intelligence",
+   "descDe": "+5 Intelligenz",
+   "icon": "images/passives/passive_002.webp",
+   "statKey": "travel_keen_intellect",
    "tier": "travel"
   },
   {
@@ -24451,48 +24445,48 @@ export const TALENT_TREE_DATA = {
    "id": 31477,
    "x": -50,
    "y": -1456,
-   "nameEn": "Lesser Clustering Signal",
-   "nameDe": "Cluster-Signal (klein)",
-   "descEn": "Mark-wrong items have a 10% chance to prioritize cells in rows or columns that already have many filled cells (but are not yet complete). Stacks with Crowded Insight and Density Focus. +3% Absorption regen rate.",
-   "descDe": "Markierungsgegenstände haben eine 10% Chance, Zellen in Zeilen oder Spalten mit vielen bereits gefüllten Zellen zu priorisieren (sofern diese noch nicht vollständig sind). Wirkt zusammen mit Gedrängte Einsicht und Dichtefokus. +3% Absorptionsregeneration.",
-   "icon": "✏️",
-   "statKey": "small_lesser_clustering_signal",
+   "nameEn": "Casting Ward",
+   "nameDe": "Zauberwache",
+   "descEn": "+3% to all Elemental Resistances\n15% chance to Avoid Ailments while Casting",
+   "descDe": "+3% auf alle Elementarresistenzen\n15% Chance, Statuseffekte beim Zaubern zu vermeiden",
+   "icon": "images/passives/passive_005.webp",
+   "statKey": "small_casting_ward",
    "tier": "small"
   },
   {
    "id": 31478,
    "x": -50,
    "y": -1496,
-   "nameEn": "Lesser Radiant Hunter",
-   "nameDe": "Strahlender Jäger (klein)",
-   "descEn": "8% increased chance of obtaining Reveal items as rewards. Stacks with Lumina Aspirant and Beacon Pursuit. +3% Absorption regen rate.",
-   "descDe": "8% erhöhte Chance, Enthüllungsgegenstände als Belohnung zu erhalten. Wirkt zusammen mit Lichtaspirant und Leuchtfeuerjagd. +3% Absorptionsregeneration.",
-   "icon": "🔍",
-   "statKey": "small_lesser_radiant_hunter",
+   "nameEn": "Vigor",
+   "nameDe": "Kraft",
+   "descEn": "+5% increased maximum Life\n+8% increased maximum Mana",
+   "descDe": "+5% erhöhtes maximales Leben\n+8% erhöhtes maximales Mana",
+   "icon": "images/passives/passive_154.webp",
+   "statKey": "small_vital_reserve",
    "tier": "small"
   },
   {
    "id": 31479,
    "x": 48,
    "y": -1496,
-   "nameEn": "Lesser Radiant Hunter",
-   "nameDe": "Strahlender Jäger (klein)",
-   "descEn": "8% increased chance of obtaining Reveal items as rewards. Stacks with Lumina Aspirant and Beacon Pursuit. +3% Absorption regen rate.",
-   "descDe": "8% erhöhte Chance, Enthüllungsgegenstände als Belohnung zu erhalten. Wirkt zusammen mit Lichtaspirant und Leuchtfeuerjagd. +3% Absorptionsregeneration.",
-   "icon": "🔍",
-   "statKey": "small_lesser_radiant_hunter",
+   "nameEn": "Vigor",
+   "nameDe": "Kraft",
+   "descEn": "+5% increased maximum Life\n+8% increased maximum Mana",
+   "descDe": "+5% erhöhtes maximales Leben\n+8% erhöhtes maximales Mana",
+   "icon": "images/passives/passive_157.webp",
+   "statKey": "small_steady_vigor",
    "tier": "small"
   },
   {
    "id": 31480,
    "x": 48,
    "y": -1456,
-   "nameEn": "Lesser Clustering Signal",
-   "nameDe": "Cluster-Signal (klein)",
-   "descEn": "Mark-wrong items have a 10% chance to prioritize cells in rows or columns that already have many filled cells (but are not yet complete). Stacks with Crowded Insight and Density Focus. +3% Absorption regen rate.",
-   "descDe": "Markierungsgegenstände haben eine 10% Chance, Zellen in Zeilen oder Spalten mit vielen bereits gefüllten Zellen zu priorisieren (sofern diese noch nicht vollständig sind). Wirkt zusammen mit Gedrängte Einsicht und Dichtefokus. +3% Absorptionsregeneration.",
-   "icon": "✏️",
-   "statKey": "small_lesser_clustering_signal",
+   "nameEn": "Casting Ward",
+   "nameDe": "Zauberwache",
+   "descEn": "+3% to all Elemental Resistances\n15% chance to Avoid Ailments while Casting",
+   "descDe": "+3% auf alle Elementarresistenzen\n15% Chance, Statuseffekte beim Zaubern zu vermeiden",
+   "icon": "images/passives/passive_021.webp",
+   "statKey": "small_casting_vigil",
    "tier": "small"
   },
   {
@@ -25435,11 +25429,167 @@ export const TALENT_TREE_DATA = {
    "from": 31215,
    "to": 256,
    "dotted": false
+  },
+  {
+   "id": 19,
+   "from": 31474,
+   "to": 1002,
+   "dotted": false
+  },
+  {
+   "id": 20,
+   "from": 31238,
+   "to": 31474,
+   "dotted": false
+  },
+  {
+   "id": 21,
+   "from": 31238,
+   "to": 31237,
+   "dotted": false
+  },
+  {
+   "id": 22,
+   "from": 355,
+   "to": 31237,
+   "dotted": false
+  },
+  {
+   "id": 23,
+   "from": 31477,
+   "to": 355,
+   "dotted": false
+  },
+  {
+   "id": 24,
+   "from": 355,
+   "to": 31478,
+   "dotted": false
+  },
+  {
+   "id": 25,
+   "from": 31478,
+   "to": 134,
+   "dotted": false
+  },
+  {
+   "id": 26,
+   "from": 134,
+   "to": 31479,
+   "dotted": false
+  },
+  {
+   "id": 27,
+   "from": 31479,
+   "to": 256,
+   "dotted": false
+  },
+  {
+   "id": 28,
+   "from": 256,
+   "to": 31480,
+   "dotted": false
+  },
+  {
+   "id": 29,
+   "from": 31480,
+   "to": 130,
+   "dotted": false
+  },
+  {
+   "id": 30,
+   "from": 130,
+   "to": 31477,
+   "dotted": false
+  },
+  {
+   "id": 31,
+   "from": 31209,
+   "to": 1002,
+   "dotted": false
+  },
+  {
+   "id": 32,
+   "from": 31209,
+   "to": 31219,
+   "dotted": false
+  },
+  {
+   "id": 33,
+   "from": 31219,
+   "to": 31220,
+   "dotted": false
+  },
+  {
+   "id": 34,
+   "from": 256,
+   "to": 31220,
+   "dotted": false
+  },
+  {
+   "id": 35,
+   "from": 355,
+   "to": 31236,
+   "dotted": false
+  },
+  {
+   "id": 36,
+   "from": 31236,
+   "to": 20175,
+   "dotted": false
+  },
+  {
+   "id": 37,
+   "from": 31236,
+   "to": 20174,
+   "dotted": false
+  },
+  {
+   "id": 38,
+   "from": 31236,
+   "to": 110,
+   "dotted": false
+  },
+  {
+   "id": 39,
+   "from": 20175,
+   "to": 31234,
+   "dotted": false
+  },
+  {
+   "id": 40,
+   "from": 110,
+   "to": 31235,
+   "dotted": false
+  },
+  {
+   "id": 41,
+   "from": 20174,
+   "to": 31232,
+   "dotted": false
+  },
+  {
+   "id": 42,
+   "from": 31235,
+   "to": 31233,
+   "dotted": false
+  },
+  {
+   "id": 43,
+   "from": 31234,
+   "to": 31233,
+   "dotted": false
+  },
+  {
+   "id": 44,
+   "from": 31232,
+   "to": 31233,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "9ff9eeb3dc455485",
+  "fingerprint": "e845628bc20bcf79",
   "positions": [
    [
     156,
@@ -25538,8 +25688,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     288,
-    1,
-    -2434
+    -5331,
+    -2978
    ],
    [
     340,
@@ -25748,8 +25898,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     234,
-    -11,
-    -2282
+    -4904,
+    -3541
    ],
    [
     235,
@@ -25813,8 +25963,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     388,
-    -616,
-    -2421
+    -5170,
+    -3524
    ],
    [
     231,
@@ -26833,8 +26983,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     346,
-    -14,
-    -2165
+    -5086,
+    -3382
    ],
    [
     27,
@@ -33123,8 +33273,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20172,
-    -3,
-    -2359
+    -5170,
+    -3159
    ],
    [
     20173,
@@ -33298,8 +33448,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20207,
-    612,
-    -2419
+    -5400,
+    -3285
    ],
    [
     20208,
@@ -34282,11 +34432,6 @@ export const TALENT_TREE_DATA = {
     -2166
    ],
    [
-    31210,
-    472,
-    -2291
-   ],
-   [
     31211,
     351,
     -2301
@@ -34393,18 +34538,18 @@ export const TALENT_TREE_DATA = {
    ],
    [
     31232,
-    -558,
-    -3350
+    -550,
+    -3348
    ],
    [
     31233,
     -634,
-    -3364
+    -3368
    ],
    [
     31234,
-    -709,
-    -3350
+    -717,
+    -3348
    ],
    [
     31235,

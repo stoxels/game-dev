@@ -1,34 +1,59 @@
-//  endgame-mod-tables-rebalance.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Post-load attribute affix rebalance - evals every EG_MOD_TABLE_*.
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
-//
-//========================================================================
-//-------------------ATTRIBUTE AFFIX REBALANCE (2026)---------------------
-//========================================================================
-// For 100 lvl / 5 pts: gear str/agi/int was 43-50 T1 (~+60% of top pure req).
-// Rebalanced to T1 30-35 (~+40%) so gear supplements but doesn't trivialize.
-// Applied as post-load mutation so all tables stay in one place.
+//------------------------------------------------------------------------
+//-------------------CONSTANTS & STATE-------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Scales the three primary-attribute affixes down across every equipment
+// table. For a level-100 character with 5 points, gear strength/agility/
+// intelligence used to roll 43-50 on tier 1, about 60% of what a pure-stat
+// build reaches. At 0.70 that is 30-35: gear supplements, never replaces.
+const ATTRIBUTE_AFFIX_SCALE = 0.70;
+
+// The only affix families this rebalance touches.
+const ATTRIBUTE_AFFIX_FAMILIES = new Set(['strength', 'agility', 'intelligence']);
+
+// Every equipment table to walk, named by the part of the table name that
+// follows the EG_MOD_TABLE_ prefix.
+const REBALANCED_TABLE_NAMES = [
+    'HEAD', 'EARRING', 'AMULET', 'SHOULDERS', 'CLOAK', 'CHEST', 'BRACERS',
+    'GLOVES', 'BELT', 'PANTS', 'BOOTS', 'RING', 'ARCANE', 'TALISMAN',
+    'WEAPON1', 'WEAPON2', 'SHIELD', 'RANGED',
+];
+
+//------------------------------------------------------------------------
+//-------------------ATTRIBUTE AFFIX REBALANCE----------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// Collects the equipment tables this module can reach by bare name and scales
+// the attribute affix tiers inside them. Runs once at load time and mutates
+// the tables in place, so each table stays defined in one place.
+
+// KNOWN INERT: the lookup uses eval() on a bare name, which resolves against
+// the global object. The tables are module exports, not published on
+// globalThis, so every lookup throws and is swallowed, and no number changes.
+// Real imports would activate a 30% affix nerf — a balance decision. Ledger.
 (() => {
-    const FACTOR = 0.70;
-    const FAMS = new Set(['strength','agility','intelligence']);
-    const ALL_TABLES = [];
-    // Collect every EG_MOD_TABLE_* already defined on window
-    const names = ['HEAD','EARRING','AMULET','SHOULDERS','CLOAK','CHEST','BRACERS','GLOVES','BELT','PANTS','BOOTS','RING','ARCANE','TALISMAN','WEAPON1','WEAPON2','SHIELD','RANGED'];
-    for (const n of names) {
-        const key = 'EG_MOD_TABLE_' + n;
-        try { const t = eval(key); if (t) ALL_TABLES.push(t); } catch(e) {}
+    const tables = [];
+    for (const name of REBALANCED_TABLE_NAMES) {
+        const key = 'EG_MOD_TABLE_' + name;
+        try {
+            const table = eval(key);
+            if (table) tables.push(table);
+        } catch (e) {
+            // Name not reachable as a global — skip this table.
+        }
     }
-    for (const tbl of ALL_TABLES) {
-        if (!tbl) continue;
-        for (const sec of [tbl.prefixes, tbl.suffixes]) {
-            if (!sec) continue;
-            for (const [fid, fam] of Object.entries(sec)) {
-                if (!FAMS.has(fid)) continue;
-                for (const tier of (fam.tiers || [])) {
-                    if (tier.min != null) tier.min = Math.max(1, Math.round(tier.min * FACTOR));
-                    if (tier.max != null) tier.max = Math.max(tier.min || 1, Math.round(tier.max * FACTOR));
+
+    for (const table of tables) {
+        if (!table) continue;
+        for (const section of [table.prefixes, table.suffixes]) {
+            if (!section) continue;
+            for (const [familyId, family] of Object.entries(section)) {
+                if (!ATTRIBUTE_AFFIX_FAMILIES.has(familyId)) continue;
+                for (const tier of (family.tiers || [])) {
+                    if (tier.min != null) tier.min = Math.max(1, Math.round(tier.min * ATTRIBUTE_AFFIX_SCALE));
+                    if (tier.max != null) tier.max = Math.max(tier.min || 1, Math.round(tier.max * ATTRIBUTE_AFFIX_SCALE));
                 }
             }
         }

@@ -1,7 +1,7 @@
 import { Audio_Manager } from './js/audio/audio.js';
 import { _bayesTrapsCleanup } from './js/classes/class-bayesian.js';
 import { _egRenderPauseLootSummary } from './js/combat/encounter-chain.js';
-import { _egOnPause, _egOnResume } from './js/combat/encounter-tick.js';
+import { _egOnPause, _egOnResume } from './js/combat/encounter-tick-support.js';
 import { closeHubToGame, isHubGameOverlay } from './js/endgame/endgame-hub.js';
 import { scalePuzzle } from './js/grid-scaling.js';
 import { stopPainting } from './js/mouse-button-handlers.js';

@@ -1,25 +1,13 @@
 import { LANG } from '../translation/translations.js';
-import { EG_MOD_NAME_WORDS } from './loot-mod-name-words.js';
 
-//  endgame-mod-application.js
-//  Extracted from endgame-equipment-generator.js 2026-09-11 (Pass 6).
-//  Owns everything that TURNS ROLLED MODS INTO A FINISHED ITEM:
-//    - local-defense-mod restriction (_egFamilyAllowedOnBase)
-//    - tier pool / weighted pick / mod assembly (_egEligibleTiers, _egPickTier,
-//      _egRollInt, _egIsHybrid, _egBuildRolledStats, _egBuildModPool,
-//      _egPickModFromPool, _egRollMods)
-//    - item naming (_egBuildItemName + dictionaries). The naming code existed
-//      twice in generator.js; the duplicate (which read the dictionary in the
-//      wrong slot order) was deleted - this is the documented correct version.
-//
-//  Load order: after endgame-mod-name-words.js and all EG_MOD_TABLE_* files,
-//  before endgame-equipment-generator.js. External users of these helpers
-//  (crafting-bench / currency / essences / maps / player-stats) call them at
-//  runtime only, so tag order only matters for the generator itself.
-//
-//------------------------------------------------------------------------
-//-------------------LOCAL DEFENSE MOD RESTRICTION------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-------------------LOCAL DEFENSE MOD RESTRICTION----------------------
+//----------------------------------------------------------------------
+
+// Turns a slot's mod table into a finished set of rolled mods: the local-defense
+// restriction, the eligible-tier pool, the weighted picks, the stat lines and
+// the prefix/suffix assembler. Item naming lives in loot-mod-naming.js.
+
 // Local defense mods (armour / evasion / absorption) may only roll on base
 // items that actually HAVE the stat - a "30% increased Armour" mod on an
 // evasion-only base would be meaningless. Hybrid families count as local
@@ -54,9 +42,9 @@ export function _egFamilyAllowedOnBase(familyId, defenses) {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------ELIGIBLE TIER POOL-----------------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-------------------ELIGIBLE TIER POOL---------------------------------
+//----------------------------------------------------------------------
 // For one mod family (e.g. flat_health), returns the subset of tiers whose
 // ilvl requirement is met by itemLevel, as weighted entries.
 
@@ -65,9 +53,9 @@ export function _egEligibleTiers(family, itemLevel) {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------WEIGHTED TIER PICKER---------------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-------------------WEIGHTED TIER PICKER-------------------------------
+//----------------------------------------------------------------------
 // Picks one tier from an array of tier objects using their .weight field.
 
 export function _egPickTier(tiers) {
@@ -82,9 +70,9 @@ export function _egPickTier(tiers) {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------VALUE ROLLER-----------------------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-------------------VALUE ROLLER---------------------------------------
+//----------------------------------------------------------------------
 // Rolls an integer in [min, max] inclusive.
 
 export function _egRollInt(min, max) {
@@ -92,9 +80,9 @@ export function _egRollInt(min, max) {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------HYBRID DETECTOR--------------------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-------------------HYBRID DETECTOR------------------------------------
+//----------------------------------------------------------------------
 // A mod family is hybrid when its tiers use min1/max1 + min2/max2.
 
 export function _egIsHybrid(tier) {
@@ -106,9 +94,9 @@ export function _egIsHybrid(tier) {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------STAT LINE BUILDER------------------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-------------------STAT LINE BUILDER----------------------------------
+//----------------------------------------------------------------------
 // Given a mod family object and a rolled tier, builds the .rolledStats array.
 //
 // Your label convention:
@@ -144,9 +132,9 @@ export function _egBuildRolledStats(family, tier) {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------MOD POOL BUILDER-------------------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-------------------MOD POOL BUILDER-----------------------------------
+//----------------------------------------------------------------------
 // Builds the pool of (familyId → { family, eligibleTiers }) entries
 // that are available for this roll, excluding families already chosen.
 
@@ -163,9 +151,9 @@ export function _egBuildModPool(modSection, itemLevel, chosenFamilyIds, defenses
 }
 
 
-//------------------------------------------------------------------------
-//-------------------POOL WEIGHTED PICKER---------------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-------------------POOL WEIGHTED PICKER-------------------------------
+//----------------------------------------------------------------------
 // Picks one entry from the pool.  Weight = sum of eligible tier weights
 // for that family (higher-ilvl items get access to rarer tiers, so the
 // effective weight of a family shifts upward - this is intentional).
@@ -191,9 +179,9 @@ export function _egPickModFromPool(pool) {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------MOD ASSEMBLER----------------------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-------------------MOD ASSEMBLER--------------------------------------
+//----------------------------------------------------------------------
 // Rolls prefixCount prefixes and suffixCount suffixes from the slot's mod table.
 // Returns an array of resolved mod objects ready to attach to the item.
 
@@ -240,158 +228,4 @@ export function _egRollMods(prefixCount, suffixCount, modTable, itemLevel, defen
     }
 
     return chosen;
-}
-
-
-//------------------------------------------------------------------------
-//-------------------ITEM NAME BUILDER------------------------------------
-//------------------------------------------------------------------------
-// common   → base name only
-// uncommon → proper-language affix naming (see below)
-// rare/epic→ random two-word name from EG_RARE_NAME_WORDS_* (PoE-style);
-//            the base type stays visible via .baseName on the item
-//
-// Uncommon items use EG_MOD_NAME_WORDS (endgame-mod-tables.js), which
-// provides grammatical name parts per mod family:
-//   [enAdjective, enOfPhrase, deGenitive]
-// EN: adjective before the noun + "of ..." after it
-//     e.g. "Healthy Leather Cap of Vitality"
-// DE: genitive post-position instead of inflected adjectives
-//     e.g. "Lederkappe des Lebens und der Rüstung"
-
-export function _egModNameEntry(familyId) {
-    return (typeof EG_MOD_NAME_WORDS !== 'undefined') ? EG_MOD_NAME_WORDS[familyId] : null;
-}
-
-// Fallback when a family has no dictionary entry: title-case the familyId,
-// stripping generic segments ("flat_hybrid_map").
-export function _egModFallbackWord(familyId) {
-    return familyId
-        .split('_')
-        .filter(w => !['flat', 'inc', 'hybrid', 'map'].includes(w))
-        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' ');
-}
-
-// EN adjective for the prefix position, e.g. "Healthy".
-export function _egModAdjective(familyId) {
-    const entry = _egModNameEntry(familyId);
-    return entry ? entry[0] : _egModFallbackWord(familyId);
-}
-
-// EN "of ..." phrase for the suffix position, e.g. "of Vitality".
-export function _egModOfPhrase(familyId) {
-    const entry = _egModNameEntry(familyId);
-    return entry ? entry[1] : 'of ' + _egModFallbackWord(familyId);
-}
-
-// DE genitive post-position phrase, e.g. "des Lebens" / "der Rüstung".
-export function _egModDeGenitive(familyId) {
-    const entry = _egModNameEntry(familyId);
-    return entry ? entry[2] : 'des ' + _egModFallbackWord(familyId);
-}
-
-export function _egBuildItemName(baseName, rarity, mods) {
-    if (rarity === 'common' || mods.length === 0) return baseName;
-
-    // rare/epic: PoE-style random two-word name ("Doom Bane").
-    if (rarity === 'rare' || rarity === 'epic') return _egPickRareItemName();
-
-    const prefixes = mods.filter(m => m.type === 'prefix');
-    const suffixes = mods.filter(m => m.type === 'suffix');
-    const pre = prefixes.length > 0 ? prefixes[0].familyId : null;
-    const suf = suffixes.length > 0 ? suffixes[0].familyId : null;
-    if (!pre && !suf) return baseName;
-
-    if (LANG === 'de') {
-        // German puts descriptors after the noun: "Lederkappe des Lebens".
-        // With both affixes they are joined: "... des Lebens und des Feuers".
-        const parts = [];
-        if (pre) parts.push(_egModDeGenitive(pre));
-        if (suf) parts.push(_egModDeGenitive(suf));
-        return `${baseName} ${parts.join(' und ')}`;
-    }
-
-    const preStr = pre ? _egModAdjective(pre) + ' ' : '';
-    const sufStr = suf ? ' ' + _egModOfPhrase(suf) : '';
-    return `${preStr}${baseName}${sufStr}`.trim();
-}
-
-
-//------------------------------------------------------------------------
-//-------------------RARE NAME DICTIONARIES-------------------------------
-//------------------------------------------------------------------------
-// PoE-style random names for rare/epic items: a word from the FIRST pool
-// combined with a word from the SECOND pool, e.g. "Doom Bane".
-// Each entry is [englishWord, germanWord]. The base type is still shown
-// separately via .baseName, exactly like PoE handles rare names.
-
-export const EG_RARE_NAME_WORDS_FIRST = [
-    ['Blood', 'Blut'],
-    ['Storm', 'Sturm'],
-    ['Ash', 'Asche'],
-    ['Frost', 'Frost'],
-    ['Doom', 'Verderben'],
-    ['Grim', 'Grimm'],
-    ['Shadow', 'Schatten'],
-    ['Ember', 'Glut'],
-    ['Thorn', 'Dorn'],
-    ['Raven', 'Rabe'],
-    ['Wolf', 'Wolf'],
-    ['Iron', 'Eisen'],
-    ['Bone', 'Knochen'],
-    ['Mist', 'Nebel'],
-    ['Sun', 'Sonne'],
-    ['Moon', 'Mond'],
-    ['Serpent', 'Schlange'],
-    ['Veil', 'Schleier'],
-    ['Hollow', 'Hohl'],
-    ['Sorrow', 'Kummer'],
-    ['Wrath', 'Zorn'],
-    ['Gloom', 'Düster'],
-    ['Pyre', 'Scheiterhaufen'],
-    ['Wraith', 'Geist'],
-    ['Dread', 'Schrecken'],
-    ['Onyx', 'Onyx'],
-    ['Crimson', 'Purpur'],
-    ['Pale', 'Blass'],
-    ['Silent', 'Still'],
-];
-export const EG_RARE_NAME_WORDS_SECOND = [
-    ['Bane', 'Fluch'],
-    ['Song', 'Lied'],
-    ['Grip', 'Griff'],
-    ['Brand', 'Mal'],
-    ['Coil', 'Ring'],
-    ['Charm', 'Charm'],
-    ['Whisper', 'Geflüster'],
-    ['Howl', 'Heulen'],
-    ['Seal', 'Siegel'],
-    ['Crown', 'Krone'],
-    ['Heart', 'Herz'],
-    ['Edge', 'Klinge'],
-    ['Call', 'Ruf'],
-    ['Spark', 'Funke'],
-    ['Shroud', 'Leichentuch'],
-    ['Mark', 'Zeichen'],
-    ['Knot', 'Knoten'],
-    ['Wail', 'Klage'],
-    ['Vow', 'Gelübde'],
-    ['Sigil', 'Sigill'],
-    ['Echo', 'Echo'],
-    ['Tide', 'Flut'],
-    ['Veil', 'Vorhang'],
-    ['Bloom', 'Blüte'],
-    ['Spire', 'Turm'],
-    ['Shard', 'Scherbe'],
-    ['Omen', 'Omen'],
-    ['Wake', 'Wogen'],
-    ['Gaze', 'Blick'],
-    ['Maw', 'Rachen'],
-];
-
-export function _egPickRareItemName() {
-    const first = EG_RARE_NAME_WORDS_FIRST[Math.floor(Math.random() * EG_RARE_NAME_WORDS_FIRST.length)];
-    const second = EG_RARE_NAME_WORDS_SECOND[Math.floor(Math.random() * EG_RARE_NAME_WORDS_SECOND.length)];
-    return (LANG === 'de') ? `${first[1]} ${second[1]}` : `${first[0]} ${second[0]}`;
 }

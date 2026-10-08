@@ -1,4 +1,4 @@
-﻿import { isEndgameLevel } from '../mouse-button-handlers.js';
+import { isEndgameLevel } from '../mouse-button-handlers.js';
 import { t } from '../translation/translations.js';
 import { _getBayesianBonus, _overfittingGetPhase } from './probability-tree-special-nodes-logic.js';
 import { ptHasSkill } from './probability-tree-state-points.js';
@@ -758,8 +758,7 @@ export const PassiveTracker = (() => {
 
     function _getRowErrorFeedback() {
         if (!ptHasSkill('standard_deviation_1')) return null;
-        // Threshold: 2 mistakes with standard_deviation_2, otherwise 3.
-        const threshold = ptHasSkill('standard_deviation_2') ? 2 : 3;
+        const threshold = 3;
         // Reveal count: 2 cells with standard_deviation_3, otherwise 1.
         const revealCount = ptHasSkill('standard_deviation_3') ? 2 : 1;
         return {

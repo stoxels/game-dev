@@ -1,5 +1,5 @@
-import { _egApplyPlayerAilment } from '../combat-ailments.js';
-import { _egDamageTargetById } from '../encounter.js';
+import { _egApplyPlayerAilment } from '../combat-ailments-core.js';
+import { _egDamageTargetById } from '../encounter-monster-damage.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
 

@@ -1,24 +1,12 @@
-//  endgame-mod-name-words.js
-//  Split out of endgame-mod-tables.js 2026-09-10 (Pass 3).
-//  Mod name words used by the item-name builder (_egBuildItemName).
-//  Load order matters only for endgame-mod-tables-rebalance.js,
-//  which evals every EG_MOD_TABLE_* at load time - it MUST load last.
-//
+//----------------------------------------------------------------------
+//-------------------MOD NAME WORDS-------------------------------------
+//----------------------------------------------------------------------
 
-// T1 is the highest/best tier.
-// 'ilvl' is the minimum item level required for this tier to roll.
-// 'weight' determines how common the roll is (higher = more common).
-//
-// LOCALIZATION: every mod family carries 'label' (EN) + 'labelDe' (DE).
-// The display layer picks the right language at generation time
-// (see _egBuildRolledStats in endgame-equipment-generator.js).
-//
-// EG_MOD_NAME_WORDS provides proper-language name parts used by the item
-// name builder (_egBuildItemName): [enAdjective, enOfPhrase, deGenitive].
-//   enAdjective – reads naturally BEFORE a noun ("Healthy Leather Cap")
-//   enOfPhrase  – reads naturally AFTER a noun ("Leather Cap of Vitality")
-//   deGenitive  – German genitive post-position ("Lederkappe des Lebens"),
-//                 which avoids German adjective-declension issues entirely.
+// The grammatical name parts behind every rolled mod: one row per mod
+// family, each [EN adjective, EN "of ..." phrase, DE genitive]. Read by
+// loot-mod-naming.js when it builds an item's display name; a family with
+// no row here falls back to a title-cased family id.
+
 export const EG_MOD_NAME_WORDS = {
     // --- LIFE & MANA ---
     flat_health: ['Healthy', 'of Vitality', 'des Lebens'],
@@ -136,7 +124,7 @@ export const EG_MOD_NAME_WORDS = {
     deflect_damage: ['Vengeful', 'of Vengeance', 'der Vergeltung'],
     movement_speed: ['Swift', 'of Swiftness', 'der Schnelligkeit'],
 
-    // ── MAP MODS (endgame-maps.js EG_MAP_MOD_TABLES) ─────────────────
+    // ── MAP MODS (EG_MAP_MOD_TABLES in loot-map-mod-tables.js) ───────
     // Prefixes
     map_monster_life: ['Beastly', 'of Beasts', 'der Bestien'],
     map_monster_damage: ['Ferocious', 'of Predators', 'der Raubtiere'],

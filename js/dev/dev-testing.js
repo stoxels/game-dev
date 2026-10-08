@@ -47,7 +47,7 @@ import { markSeen } from '../storyline/storyline-progress.js';
 window.DEV_EFFECT_TIME_SCALE = 1;
 
 // Duration wiring sites for the effect time scale (see header section 3):
-//   combat-ailments.js (_egApplyStatusToMap)         - ailment durations
+//   combat-ailments-core.js (_egApplyStatusToMap)   - ailment durations
 //   class-cooldown-state.js (startSlotCooldown)      - ability cooldowns
 //   endgame-quiz-buffs.js (expiry, FX, toast label)  - quiz buff stacks
 //   universal-spells.js                              - spell durations

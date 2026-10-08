@@ -105,14 +105,19 @@ function _skillTooltipCastTime(def) {
     if (!def.castTime) return '';
     const isInstant = def.castTime === 'instant';
     let holdHint = '';
-    try {
-        if (!isInstant && getSkillCastTimeSeconds(def.id) > 0) {
+    let value = t('skill_tip_instant');
+    if (!isInstant) {
+        let effective = 0;
+        try { effective = getSkillCastTimeSeconds(def.id); } catch (e) {}
+        if (effective > 0) {
             holdHint = LANG === 'de' ? ' (halten)' : ' (hold)';
+            const rounded = Math.round(effective * 100) / 100;
+            const formatted = Number.isInteger(rounded * 10) ? rounded.toFixed(1) : String(rounded);
+            value = `${formatted}s${holdHint}`;
+        } else {
+            value = `${def.castTime}`;
         }
-    } catch (e) { /* best-effort */ }
-    const value = isInstant
-        ? t('skill_tip_instant')
-        : `${def.castTime}${holdHint}`;
+    }
     return `<div class="skl-tip-stat">${t('skill_tip_cast_time')}: <b style="color:#e6e6e6">${value}</b></div>`;
 }
 

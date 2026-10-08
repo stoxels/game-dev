@@ -4,34 +4,36 @@
 // are unaffected. See MIGRATION.md "splitting giants".
 //------------------------------------------------------------------------
 
-// Kill handling: target cycling, normal/boss kill rewards (XP, loot,
-// charms, achievements), full-clear detection and game over.
+// Kill orchestration: target cycling, monster removal, achievements,
+// on-kill stats, full-clear detection, and game over.
 
 import { ACH_STATE, saveAchState, setAchStat, trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { gainMana } from '../classes/class-mana.js';
-import { _charmTryMonsterDrop } from '../skills/skill-charms.js';
+
 import { stopTimer } from '../timer/timer.js';
 import { t } from '../translation/translations.js';
 import { EG_PANEL_RERENDER_DELAY_MS } from './encounter-constants.js';
 import { _egPlayerTakeDamage } from './encounter-damage.js';
-import { _egScheduleRespawn } from './encounter-spawn-rules.js';
-import { _egTryDropCurrency } from '../loot/loot-currency.js';
-import { _egBossDefeated, _egEndMapDefeated, _egOnAllBossesDead, _egScheduleArenaAdvance, _egUpdateObjectivesHUD } from './encounter-chain.js';
+
+
+import { _egEndMapDefeated } from './encounter-chain.js';
 import { _egFlashKillCard, _egRenderPanel } from './encounter.js';
-import { _egTryDropEssence } from '../loot/loot-essences.js';
+
 // Live binding of the current level's puzzle object (state.js exports the
 // binding itself, so this always reads the CURRENT level, not a snapshot).
 // Phase-4 split leftover: this file used to read `cur` bare through the
 // classic-script shared scope; the import is the module-era equivalent
 // (same pattern as combat-ailments.js / combat-class-projectiles.js).
 import { cur } from '../state.js';
-import { _egDropHeartPickup, _egSpawnItemDrop } from './combat-grid-pickups.js';
+
+
 import { _egGrantMonsterXP } from '../endgame/endgame-leveling.js';
 import { _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';
-import { _egTryDropMap } from '../loot/loot-maps.js';
+
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive, _egIsCampaignRun } from './combat-state.js';
+import { _egHandleBossKill, _egHandleNormalMonsterKill } from './encounter-kill-rewards.js';
 
 
 
@@ -47,86 +49,6 @@ export function _egUpdateTargetAfterKill() {
     } else {
         globalThis._egTargetId = null;
         _egOnAllMonstersDead();
-    }
-}
-
-// Tutorial quest: creatures must never drop random loot when defeated -
-// every lesson grant is placed explicitly (the rat's starter set, the
-// Professor's sword, the bat's Fireball charm, the Professor's own heart).
-// A random gear drop could land on a non-solution cell, where the
-// tutorial's claim gates turn it into a forced mistake or unclaimable
-// clutter. Guarded here at the kill-reward choke point (rather than only
-// in the tutorial's spawner wraps) so no drop path can slip through; the
-// explicit lesson placements write the drop maps directly and are
-// unaffected.
-function _egTutorialSuppressesDrops() {
-    try {
-        const c = globalThis.cur;
-        return !!(c && c.isTutorialQuest);
-    } catch (e) { return false; }
-}
-
-// Handles all post-kill logic for a normal (non-boss) monster death.
-export function _egHandleNormalMonsterKill(dying) {
-    globalThis._egChainKillCount++;
-
-    // Campaign kills never feed map objectives or respawns.
-    const campaign = (typeof _egIsCampaignRun === 'function') && _egIsCampaignRun();
-    if (!campaign) _egUpdateObjectivesHUD();
-
-    // Keep the field populated: replacements spawn until the player enters
-    // the boss arena (not just until the kill objective is reached - extra
-    // kills after the objective are intentional free XP/loot, see
-    // _egShouldSuppressRespawn).
-    if (!campaign) _egScheduleRespawn();
-
-    // Sacrificial zombie adds (Brutus) never drop loot - their only reward is
-    // a chance to drop a healing heart onto the grid when the PLAYER kills
-    // them (a slam-devoured zombie drops nothing; it feeds Brutus instead).
-    if (dying && dying.noLoot) {
-        const heartChance = dying.zombieHeartDropChance || 0;
-        if (heartChance > 0 && Math.random() * 100 < heartChance * 100
-            && !_egTutorialSuppressesDrops()
-            && typeof _egDropHeartPickup === 'function') {
-            _egDropHeartPickup();
-        }
-    } else if (!_egTutorialSuppressesDrops()) {
-        if (typeof _egSpawnLootDrop === 'function') globalThis._egSpawnLootDrop(false, dying.level);
-        if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false);
-        if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
-        if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false);
-        // Map items are endgame-only - never drop them in the campaign.
-        if (!campaign && typeof _egTryDropMap === 'function') _egTryDropMap(false, dying.level);
-        // Charm drops (js/skills/skill-charms.js) - chance-based like loot.
-        if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(false, dying.level);
-    }
-}
-
-// Handles all post-kill logic for a boss monster death.
-// During the boss arena chain this advances the chain: more bosses left →
-// roll into the next arena; last boss dead → loot party + Complete Map.
-export function _egHandleBossKill(dying) {
-    if (typeof _egBossPhaseActive !== 'undefined' && globalThis._egBossPhaseActive) {
-        globalThis._egBossKilledCount++;
-
-        const allDead = typeof _egBossDefeated === 'function' && _egBossDefeated();
-        if (allDead) {
-            if (typeof _egOnAllBossesDead === 'function') _egOnAllBossesDead();
-        } else if (typeof _egScheduleArenaAdvance === 'function') {
-            _egScheduleArenaAdvance();
-        }
-    }
-
-    _egUpdateObjectivesHUD();
-    // Tutorial quest: no random kill drops (see _egTutorialSuppressesDrops
-    // above) - the lessons place their own rewards explicitly.
-    if (!_egTutorialSuppressesDrops()) {
-        if (typeof _egSpawnLootDrop === 'function') globalThis._egSpawnLootDrop(true,dying.level);
-        if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(true);
-        if (typeof _egTryDropEssence === 'function') _egTryDropEssence(true);
-        if (typeof _egTryDropMap === 'function') _egTryDropMap(true, dying.level);
-        // Bosses always drop a charm (see skill-charms.js).
-        if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(true, dying.level);
     }
 }
 

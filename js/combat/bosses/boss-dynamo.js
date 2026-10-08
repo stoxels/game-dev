@@ -1,7 +1,7 @@
 import { t } from '../../translation/translations.js';
 import { EG_ART } from '../../endgame/endgame-art.js';
 import { _egHpBarClass } from '../encounter.js';
-import { EG_MONSTER_DEFS } from '../combat-monsters.js';
+import { EG_MONSTER_DEFS } from '../combat-monsters-data.js';
 import { _egIsActive } from '../combat-state.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';

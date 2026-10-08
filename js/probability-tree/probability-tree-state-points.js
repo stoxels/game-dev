@@ -1,4 +1,4 @@
-﻿import { setAchStat, trackAchStat } from '../achievements/achievements.js';
+import { setAchStat, trackAchStat } from '../achievements/achievements.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { TALENT_TREE_DATA } from './probability-tree-data.js';
@@ -40,7 +40,6 @@ const PT_TRAVEL_STAT_KEY_ALIASES = new Map([
     ['travel_extended_session_2', 'extended_session_2'],
     ['travel_extended_session_3', 'extended_session_3'],
     ['travel_stronger_light_1', 'stronger_light_1'],
-    ['travel_seeker_of_light_1', 'seeker_of_light_1'],
     ['travel_targeted_reveal_1', 'targeted_reveal_1'],
     ['travel_stronger_marks_1', 'stronger_marks_1'],
     ['travel_reinforced_ward_1', 'reinforced_ward_1'],
@@ -156,7 +155,7 @@ export const PT_CLUSTER_CHECKS = [
     [['interquartile_vision_1', 'interquartile_vision_2', 'interquartile_vision_3'], 'treeInterquartileComplete'],
     [
         ['stronger_light_1', 'stronger_light_2', 'stronger_light_3',
-            'seeker_of_light_1', 'seeker_of_light_2', 'seeker_of_light_3',
+            'seeker_of_light_3',
             'targeted_reveal_1', 'targeted_reveal_2', 'targeted_reveal_3'],
         'treeRevealItemsComplete',
     ],
@@ -166,9 +165,9 @@ export const PT_CLUSTER_CHECKS = [
         'treeShieldItemsComplete',
     ],
     [
-        ['stronger_marks_1', 'stronger_marks_2', 'stronger_marks_3',
+        ['stronger_marks_1', 'stronger_marks_3',
             'error_collector_1', 'error_collector_2', 'error_collector_3',
-            'dense_marker_1', 'dense_marker_2', 'dense_marker_3'],
+            'dense_marker_2', 'dense_marker_3'],
         'treeMarkItemsComplete',
     ],
     [['poisson_process_1', 'poisson_process_2', 'poisson_process_3'], 'treePoissonComplete'],

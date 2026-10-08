@@ -1,7 +1,7 @@
 import { updateClassHUDManaBar } from '../classes/class-mana.js';
 import { _egEntrMoveMult } from '../combat/bosses/boss-entropy.js';
 import { _egSnailBroomHeld } from '../combat/bosses/boss-snail.js';
-import { _egPlayerHasAilment } from '../combat/combat-ailments.js';
+import { _egPlayerHasAilment } from '../combat/combat-ailments-core.js';
 import { _egGetPlayerChargePct, _egSetHoldEPauseVisual } from
 '../combat/encounter-tick.js';
 import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';

@@ -1,20 +1,19 @@
+//------------------------------------------------------------------------
 //-------------------ENDGAME CRAFTING COSTS-------------------------------
 //------------------------------------------------------------------------
-// Single source of truth for crafting-bench costs. Tier 1 is strongest and
-// therefore costs the most. Costs intentionally use every equipment orb;
-// shards are not valid crafting currencies.
+// Single source of truth for crafting-bench costs: which orbs a family costs,
+// and how many at each craft tier. Tier 1 is the strongest craft and costs
+// the most, so the orbs get rarer as the tier number drops. Shards are not
+// valid crafting currencies.
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
-// PoE-style tier ladder:
-//   T5 (weakest) -> common orbs (transmutation / augmentation / alteration / scouring / bloom)
-//   T4           -> common-mid (alchemy / alteration / regal)
-//   T3           -> mid (chaos / regal / alchemy)
-//   T2           -> rare (divine / exalted / elevation / ascension / cataclysm)
-//   T1 (strongest) -> very rare (exalted / divine / ancient) plus a small chaos/regal supplement
-// Amounts deliberately shrink as rarity rises: spamming T5 is cheap, T1 costs genuinely rare orbs.
-// Returning an ARRAY per tier allows PoE-like mixed costs at the top end (e.g. 1x Exalted + 2x Chaos).
+// CONSTANTS & STATE
 //------------------------------------------------------------------------
+
+// Per-orb tier ladder: for each crafting orb, the orbs it costs at craft
+// tier 5 (cheapest) down to tier 1 (most expensive). Each tier holds a list
+// so the top end can mix orbs, e.g. 1x Exalted plus 2x Chaos.
 
 export const EG_CRAFT_TIER_LADDER = {
     orb_transmutation: {
@@ -110,6 +109,8 @@ export const EG_CRAFT_TIER_LADDER = {
     },
 };
 
+// Which crafting orb each mod family is made with. Families missing here
+// fall back to orb_alchemy.
 export const EG_CRAFT_FAMILY_CURRENCIES = {
     // Life, mana and recovery
     flat_health: 'orb_alchemy', inc_health: 'orb_alchemy', heart_heal: 'orb_alchemy',
@@ -166,6 +167,12 @@ export const EG_CRAFT_FAMILY_CURRENCIES = {
     deflect_damage: 'orb_exalted', shield_bash: 'orb_exalted',
 };
 
+//------------------------------------------------------------------------
+// COST LOOKUP
+//------------------------------------------------------------------------
+
+// Returns the orbs needed to craft `familyId` at `tier` as a fresh list, so
+// callers can change it without touching the ladder table.
 export function _egCraftingBenchCostFor(familyId, tier) {
     const baseId = EG_CRAFT_FAMILY_CURRENCIES[familyId] || 'orb_alchemy';
     const ladder = EG_CRAFT_TIER_LADDER[baseId] || EG_CRAFT_TIER_LADDER['orb_alchemy'];
@@ -174,8 +181,8 @@ export function _egCraftingBenchCostFor(familyId, tier) {
     return entry.map(cost => ({ id: cost.id, count: cost.count }));
 }
 
-// Backwards-compat: some tooling may still read tier counts. Derive a simple
-// count map from the ladder (max count per tier) so legacy code does not break.
+// Legacy flat view of the ladder: the largest per-tier orb total across all
+// families. Kept for older tooling; the bench itself uses the ladder above.
 export const EG_CRAFT_TIER_COSTS = (() => {
     const out = {};
     for (let tier = 1; tier <= 5; tier++) {

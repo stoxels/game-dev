@@ -32,7 +32,7 @@ import { isUniversalMovementSpell, isUniversalSupportSpell } from './universal-s
 // Cast time of a skill in seconds (0 = instant). Reads the registry copy
 // first (universal spells mirror their def's castTimeSeconds there, the
 // Fireball carries its own), then falls back to parsing a '1.2s' string.
-export function getSkillCastTimeSeconds(skillId) {
+function _getBaseSkillCastTimeSeconds(skillId) {
     try {
         const def = getSkillDef(skillId);
         if (!def) return 0;
@@ -50,6 +50,92 @@ export function getSkillCastTimeSeconds(skillId) {
     return 0;
 }
 
+// True when the skill deals FIRE damage - the tutorial Fireball and every
+// universal spell whose def is element: 'fire'. Drives the passive tree's
+// fire-only cast speed (see getSkillCastTimeSeconds) and mirrors the
+// theme resolution of _holdCastTheme() below, which tints the same spells.
+function _isFireSpell(skillId) {
+    try {
+        if (skillId === 'fireball') return true;
+        const def = getSkillDef(skillId);
+        if (!def) return false;
+        if (def.element === 'fire') return true;
+        if (def.usp) {
+            if (def.usp.element === 'fire') return true;
+            if (!def.usp.element && def.usp.theme === 'fire') return true;
+        }
+    } catch (e) { /* unknown skill - treat as non-fire */ }
+    return false;
+}
+
+// True when the skill deals COLD damage - every universal spell whose def is
+// element: 'cold' (or, for a def that only declares the visual theme, the
+// 'frost' theme). The cold mirror of _isFireSpell above; drives the passive
+// tree's cold-only cast speed.
+function _isColdSpell(skillId) {
+    try {
+        const def = getSkillDef(skillId);
+        if (!def) return false;
+        if (def.element === 'cold') return true;
+        if (def.usp) {
+            if (def.usp.element === 'cold') return true;
+            if (!def.usp.element && def.usp.theme === 'frost') return true;
+        }
+    } catch (e) { /* unknown skill - treat as non-cold */ }
+    return false;
+}
+
+// True when the skill is a NATURE spell - the third sibling of the two above.
+// Nature is a spell damageKind rather than one of the four combat elements, so
+// both its element and its damageKind are checked: support spells declare
+// element: 'nature' (Renewal, Windward, Windstep) while the nature damage
+// spells (Wrath, Serpent Sting) declare damageKind: 'nature' on a lightning
+// element. Drives the passive tree's nature-only cast speed.
+function _isNatureSpell(skillId) {
+    try {
+        const def = getSkillDef(skillId);
+        if (!def) return false;
+        if (def.element === 'nature') return true;
+        if (def.damageKind === 'nature') return true;
+        if (def.usp) {
+            if (def.usp.element === 'nature') return true;
+            if (def.usp.damageKind === 'nature') return true;
+            if (!def.usp.element && def.usp.theme === 'nature') return true;
+        }
+    } catch (e) { /* unknown skill - treat as non-nature */ }
+    return false;
+}
+
+export function getSkillCastTimeSeconds(skillId) {
+    const base = _getBaseSkillCastTimeSeconds(skillId);
+    if (!(base > 0)) return 0;
+    let speedPct = 0;
+    try {
+        if (typeof globalThis._egComputePlayerStats === 'function') {
+            const stats = globalThis._egComputePlayerStats();
+            speedPct = Number(stats.castSpeedPct) || 0;
+            // Fire/cold/nature-only cast speed (passive tree) stacks on top, but
+            // ONLY for spells of that element - every other element keeps the
+            // general value.
+            if (_isFireSpell(skillId)) {
+                const firePct = Number(stats.fireCastSpeedPct);
+                if (Number.isFinite(firePct)) speedPct += firePct;
+            }
+            if (_isColdSpell(skillId)) {
+                const coldPct = Number(stats.coldCastSpeedPct);
+                if (Number.isFinite(coldPct)) speedPct += coldPct;
+            }
+            if (_isNatureSpell(skillId)) {
+                const naturePct = Number(stats.natureCastSpeedPct);
+                if (Number.isFinite(naturePct)) speedPct += naturePct;
+            }
+        }
+    } catch (e) { /* best-effort - authored cast time */ }
+    if (!Number.isFinite(speedPct)) speedPct = 0;
+    speedPct = Math.max(-50, Math.min(80, speedPct));
+    return Math.max(0.1, base * (1 - speedPct / 100));
+}
+
 
 // True when the skill needs hold-to-cast instead of a plain click.
 export function isSkillHoldCast(skillId) {
@@ -59,6 +145,13 @@ export function isSkillHoldCast(skillId) {
 
 // Live hold state, or null while nothing is charging.
 let _holdCast = null;
+
+// True while a hold-to-cast is running: the player is holding a hotbar button
+// on a cast-time spell and the cast has neither completed nor been cancelled.
+// Combat reads this for cast-gated effects (e.g. avoiding ailments mid-cast).
+export function isHoldCasting() {
+    return !!_holdCast;
+}
 
 // Normalised keys currently driving a keyboard hold (blocks key-repeat
 // from restarting a cast while the key stays down).

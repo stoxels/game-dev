@@ -1,10 +1,10 @@
 import { LANG, t } from '../translation/translations.js';
-import { EG_RESIST_CAP_PCT } from '../combat/combat-calculations.js';
+import { EG_RESIST_CAP_PCT } from '../combat/combat-calculations-resistances.js';
 import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT, _egGetDeflectChancePct, _egGetDeflectDamagePct, _egGetDualWieldParryChancePct, _egGetParryChancePct } from '../combat/encounter.js';
 import { _egEquipped } from './endgame-hub.js';
 import { _egGetPlayerLevel, _egSyncBaseAttributes } from './endgame-leveling.js';
 import { _egGetActiveMapModValue, _egMapAbsorptionMult, _egMapAccuracyMult, _egMapActionSlowMult, _egMapAttackSpeedMult, _egMapBlockMult, _egMapEvasionMult, _egMapPlayerDefenceMult, _egMapSpellDamageMult } from './endgame-map-launch.js';
-import { _egRollInt } from '../loot/loot-mod-application.js';
+import {_egRollInt} from '../loot/loot-mod-application.js';
 import { EG_MOD_TABLE_AMULET } from '../loot/loot-mod-tables-amulet.js';
 import { EG_MOD_TABLE_ARCANE } from '../loot/loot-mod-tables-arcane.js';
 import { EG_MOD_TABLE_BELT } from '../loot/loot-mod-tables-belt.js';
@@ -137,6 +137,7 @@ export const EG_STAT_KEY_MAP = {
 
     spell_damage: { bucket: 'spellDamageFlat', mode: 'add' },
     inc_spell_damage: { bucket: 'spellDamageIncPct', mode: 'add' },
+    cast_speed: { bucket: 'castSpeedPct', mode: 'add' },
 
     // Support analogue of Spell Damage - feeds the magnitude of every SUPPORT
     // spell (heal / HoT / absorption restore). Read by _uspApplyHealingPower()
@@ -599,7 +600,15 @@ export function _egGetItemEffectiveBlockChance(item) {
 export function _egComputePlayerStats() {
     const passiveTreeBonuses = _egSyncBaseAttributes() || {};
     const s = {
-        health: 0, mana: passiveTreeBonuses.mana || 0, healthIncPct: 0,
+        health: 0, mana: passiveTreeBonuses.mana || 0,
+        // % increased maximum Life/Mana from allocated passive-tree nodes ride
+        // the same multiplicative buckets gear uses; they are never added to
+        // the flat pools.
+        healthIncPct: passiveTreeBonuses.healthIncPct || 0, manaIncPct: passiveTreeBonuses.manaIncPct || 0,
+        // Flat bonus to fire/cold/lightning resistance (never shadow) and the
+        // chance to avoid ailments while a hold-to-cast is running.
+        allElementalResist: passiveTreeBonuses.allElementalResist || 0,
+        castingAilmentAvoidPct: passiveTreeBonuses.castingAilmentAvoidPct || 0,
         armourFlat: 0, armourIncPct: 0,
         evasionFlat: 0, evasionIncPct: 0,
         absorptionFlat: passiveTreeBonuses.absorptionFlat || 0,
@@ -611,11 +620,20 @@ export function _egComputePlayerStats() {
         agility: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.agi : 0,
         intelligence: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.int : 0,
         lifeRegen: 0, manaRegen: 0,
-        fireResist: 0, coldResist: 0, lightningResist: 0, shadowResist: 0, arcaneResistFlat: 0,
+        // Fire / cold / nature resistance from allocated passive-tree nodes seed
+        // the very same buckets gear rolls into, so they aggregate, are shown
+        // capped and obey the 75% cap / Elemental Weakness map mod exactly
+        // like gear. Nature is a real resistance element on the incoming-damage
+        // side (see _egCalcPlayerResistanceReduction) even though no gear mod
+        // rolls into it yet.
+        fireResist: passiveTreeBonuses.fireResistFlat || 0,
+        coldResist: passiveTreeBonuses.coldResistFlat || 0,
+        natureResist: passiveTreeBonuses.natureResistFlat || 0,
+        lightningResist: 0, shadowResist: 0, arcaneResistFlat: 0,
         // "Increased maximum Resistance" bonuses (uniques) - raise the per-
         // element resistance cap above the base 75%. allResMax applies to all
         // four elements at once.
-        fireResistMax: 0, coldResistMax: 0, lightningResistMax: 0, shadowResistMax: 0, allResMax: 0,
+        fireResistMax: 0, coldResistMax: 0, lightningResistMax: 0, shadowResistMax: 0, natureResistMax: 0, allResMax: 0,
         accuracy: 0, mistakeCount: 0, focusPct: 0, mistakeNotCountPct: 0,
         revealHintPct: 0, chanceForNewQuestionPct: 0,
         critChance: 0, critMultiplierPct: 0,
@@ -631,6 +649,37 @@ export function _egComputePlayerStats() {
         meleeLightningMin: 0, meleeLightningMax: 0,
         meleeShadowMin: 0, meleeShadowMax: 0,
         spellDamageFlat: 0, spellDamageIncPct: passiveTreeBonuses.spellDamageIncPct || 0,
+        // "% increased elemental damage" (passive tree only - no gear mod
+        // feeds this bucket). Multiplies the ELEMENTAL share of a hit and
+        // nothing else: both gear elemental channels (fireDmg*/meleeFire*)
+        // roll it into their per-element breakdown in
+        // combat-calculations.js, and universal-spells.js adds it to
+        // elemental spells in calcUniversalSpellHit(). Physical shares are
+        // never touched by it.
+        elementalDamageIncPct: passiveTreeBonuses.elementalDamageIncPct || 0,
+        // Fire / cold-only siblings of the buckets above, also passive-tree
+        // only:
+        //   <el>DamageIncPct - that element's share of
+        //                       elementalDamageIncPct, read per element in
+        //                       combat-calculations.js and calcUniversalSpellHit().
+        //   <el>CastSpeedPct - cast speed that only applies while casting a
+        //                       spell of that element (spell-casttime.js adds
+        //                       it to castSpeedPct); every other element
+        //                       ignores it.
+        fireDamageIncPct: passiveTreeBonuses.fireDamageIncPct || 0,
+        coldDamageIncPct: passiveTreeBonuses.coldDamageIncPct || 0,
+        fireCastSpeedPct: passiveTreeBonuses.fireCastSpeedPct || 0,
+        coldCastSpeedPct: passiveTreeBonuses.coldCastSpeedPct || 0,
+        // Nature's siblings of the four buckets above. Nature is a spell
+        // damageKind, not one of the four EG_ELEMENTS, so both channels are
+        // spell-only: calcUniversalSpellHit adds natureDamageIncPct to every
+        // spell with damageKind 'nature' and spell-casttime.js adds
+        // natureCastSpeedPct on top of castSpeedPct while casting one. The
+        // melee/projectile elemental breakdown has no nature share, because no
+        // gear mod adds nature damage to a weapon hit.
+        natureDamageIncPct: passiveTreeBonuses.natureDamageIncPct || 0,
+        natureCastSpeedPct: passiveTreeBonuses.natureCastSpeedPct || 0,
+        castSpeedPct: passiveTreeBonuses.castSpeedPct || 0,
         healingPowerFlat: 0, healingPowerIncPct: 0,
         lifeLeechPct: 0,
         blockChance: 0, spellBlockChance: 0, blockRecoveryPct: 0,
@@ -648,7 +697,7 @@ export function _egComputePlayerStats() {
         movementSpeedPct: 0,
         manaOnKill: 0, absorptionOnKill: 0, lifeOnKill: 0, manaOnMistake: 0,
         heartHealFlat: 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: 0, timeAdded: 0,
-        absorptionRegenRatePct: 0, fasterAbsorptionRegenStart: 0,
+        absorptionRegenRatePct: passiveTreeBonuses.absorptionRegenRatePct || 0, fasterAbsorptionRegenStart: 0,
     };
 
     _egGetAllEquippedItems().forEach(item => {
@@ -766,6 +815,13 @@ export function _egComputePlayerStats() {
     // Apply % increased Health multiplicatively with base + flat health
     if (s.healthIncPct > 0) {
         s.health = Math.round(s.health * (1 + s.healthIncPct / 100));
+    }
+
+    // Same rule for Mana: % increased maximum Mana multiplies the fully
+    // aggregated flat pool (passive tree + gear + Int + level bonus), so a
+    // character sitting on 500 Mana with +8% reads 540, not 508.
+    if (s.manaIncPct > 0) {
+        s.mana = Math.round(s.mana * (1 + s.manaIncPct / 100));
     }
 
     s.armour = Math.round(s.armourFlat * (1 + s.armourIncPct / 100));
@@ -1068,6 +1124,9 @@ export const EG_STAT_DISPLAY_LABELS = {
     health: { label: t('eg_stat_health'), suffix: '' },
     healthIncPct: { label: t('eg_stat_inc_health'), suffix: '%' },
     mana: { label: t('eg_stat_mana'), suffix: '' },
+    manaIncPct: { label: t('eg_stat_inc_mana'), suffix: '%' },
+    allElementalResist: { label: t('eg_stat_all_elemental_resist'), suffix: '%' },
+    castingAilmentAvoidPct: { label: t('eg_stat_casting_ailment_avoid'), suffix: '%' },
     strength: { label: t('eg_stat_strength'), suffix: '' },
     agility: { label: t('eg_stat_agility'), suffix: '' },
     intelligence: { label: t('eg_stat_intelligence'), suffix: '' },
@@ -1086,6 +1145,7 @@ export const EG_STAT_DISPLAY_LABELS = {
 
     fireResist: { label: t('eg_stat_fire_res'), suffix: '%' },
     coldResist: { label: t('eg_stat_cold_res'), suffix: '%' },
+    natureResist: { label: t('eg_stat_nature_res'), suffix: '%' },
     lightningResist: { label: t('eg_stat_lightning_res'), suffix: '%' },
     shadowResist: { label: t('eg_stat_shadow_res'), suffix: '%' },
     arcaneResistFlat: { label: t('eg_stat_arcane_res'), suffix: '' },
@@ -1103,6 +1163,14 @@ export const EG_STAT_DISPLAY_LABELS = {
     physIncPct: { label: t('eg_stat_inc_phys_dmg'), suffix: '%' },
     spellDamageFlat: { label: t('eg_stat_spell_damage'), suffix: '' },
     spellDamageIncPct: { label: t('eg_stat_inc_spell_damage'), suffix: '%' },
+    elementalDamageIncPct: { label: t('eg_stat_inc_elemental_damage'), suffix: '%' },
+    fireDamageIncPct: { label: t('eg_stat_inc_fire_damage'), suffix: '%' },
+    coldDamageIncPct: { label: t('eg_stat_inc_cold_damage'), suffix: '%' },
+    castSpeedPct: { label: t('eg_stat_cast_speed'), suffix: '%' },
+    fireCastSpeedPct: { label: t('eg_stat_fire_cast_speed'), suffix: '%' },
+    coldCastSpeedPct: { label: t('eg_stat_cold_cast_speed'), suffix: '%' },
+    natureDamageIncPct: { label: t('eg_stat_inc_nature_damage'), suffix: '%' },
+    natureCastSpeedPct: { label: t('eg_stat_nature_cast_speed'), suffix: '%' },
     healingPowerFlat: { label: t('eg_stat_healing_power'), suffix: '' },
     healingPowerIncPct: { label: t('eg_stat_inc_healing_power'), suffix: '%' },
 
@@ -1187,14 +1255,15 @@ export const EG_STAT_LAYOUT = {
             'meleeLightningRange', 'meleeShadowRange'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
-            'physIncPct', 'spellDamageFlat', 'spellDamageIncPct',
+            'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
+            'coldDamageIncPct', 'natureDamageIncPct',
             'healingPowerFlat', 'healingPowerIncPct',
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
         { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'ailmentDurationPct', 'ailmentEffectPct'] },
         { catKey: 'eg_statcat_arcane', buckets: [
-            'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
+            'castSpeedPct', 'fireCastSpeedPct', 'coldCastSpeedPct', 'natureCastSpeedPct', 'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
             'channelMaxStacks', 'arcaneSurgeStreak', 'arcaneSurgeMana',
             'manaToDamagePct'] },
     ],
@@ -1208,10 +1277,13 @@ export const EG_STAT_LAYOUT = {
             'blockChance', 'spellBlockChance', 'blockRecoveryPct',
             'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct',
             'parryChancePct', 'deflectChancePct', 'deflectDamagePct',
-            'fatePct'] },
+            'fatePct', 'castingAilmentAvoidPct'] },
         { catKey: 'eg_statcat_resistances', buckets: [
+            // 'allElementalResist' is deliberately NOT listed: it is folded
+            // into the fire/cold/lightning lines by _egBuildStatLine, which is
+            // the same value _egCalcPlayerResistanceReduction mitigates with.
             'fireResist', 'coldResist', 'lightningResist', 'shadowResist',
-            'arcaneResistFlat'] },
+            'natureResist', 'arcaneResistFlat'] },
         { catKey: 'eg_statcat_recovery', buckets: [
             'absorptionRegenRatePct', 'fasterAbsorptionRegenStart',
             'groundedChancePct', 'groundedReductionPct',
@@ -1343,10 +1415,17 @@ export function _egBuildStatLine(bucket, stats) {
         // the uncapped gear total + the current cap are revealed on hover
         // (see _egBuildStatDescTooltipHTML in endgame-hub.js). The cap is
         // 75% base, raised by "increased maximum Resistance" uniques.
-        case 'fireResist': case 'coldResist': case 'lightningResist': case 'shadowResist': {
-            const total = stats[bucket] || 0;
-            if (!total && !(stats[bucket.replace('Resist', 'ResistMax')] || 0) && !stats.allResMax) return null;
+        case 'fireResist': case 'coldResist': case 'lightningResist': case 'shadowResist': case 'natureResist': {
             const element = bucket.replace('Resist', '');
+            // "All Elemental Resistances" (passive tree) is a flat bonus that
+            // raises fire, cold and lightning together. It is folded in here so
+            // the sheet never under-reports the mitigation the player gets.
+            // Shadow resistance is explicitly out of its scope, and so is
+            // nature - it is a damage kind, not one of the four gear-rolled
+            // elements, and _egCalcPlayerResistanceReduction keeps it separate.
+            const allElem = (element === 'shadow' || element === 'nature') ? 0 : Math.max(0, stats.allElementalResist || 0);
+            const total = (stats[bucket] || 0) + allElem;
+            if (!total && !(stats[bucket.replace('Resist', 'ResistMax')] || 0) && !stats.allResMax) return null;
             const cap = (typeof EG_RESIST_CAP_PCT !== 'undefined' ? EG_RESIST_CAP_PCT : 75)
                 + Math.max(0, (stats[element + 'ResistMax'] || 0) + (stats.allResMax || 0));
             const shown = Math.min(Math.max(0, total), cap);

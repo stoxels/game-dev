@@ -1,13 +1,7 @@
-//------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
-//------------------------------------------------------------------------
-
-// Player attacks (Player -> Monster) and gear procs: the correct-cell
-// entry point, arcane on-hit procs, defensive procs (parry/deflect/fate
-// negation) and projectile impact procs. tutorial-quest.js patches
-// _egOnCorrectCell through the write-through accessor.
+// Player attacks (Player -> Monster): the correct-cell entry point, on-hit
+// gear procs, projectile animation, and projectile impact procs. Defensive
+// mitigation lives in encounter-player-mitigation.js. tutorial-quest.js
+// patches _egOnCorrectCell through the write-through accessor.
 
 // Phase 4 split: write-through globalThis accessors. The facade and sibling
 // split modules rebind these through globalThis.<name> assignment
@@ -18,15 +12,14 @@ try { Object.defineProperty(globalThis, '_egOnCorrectCell', { get() { return _eg
 import { gainMana, spendMana } from '../classes/class-mana.js';
 import { t } from '../translation/translations.js';
 import { _egGetTarget, _egRollPlayerMiss, _egUpdateChargedProjectileVisual } from './encounter-charged-shot.js';
-import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT } from './encounter-constants.js';
-import { _egDamageTargetById, _egPlayerTakeDamage, _egShowStatusLabel } from './encounter-damage.js';
-import { _egApplyPlayerMissFeedback } from './encounter-monster-attacks.js';
+import { _egPlayerTakeDamage } from './encounter-damage.js';
+import { _egDamageTargetById, _egShowStatusLabel } from './encounter-monster-damage.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
-import { EG_ELEMENTS, _egCalcPlayerDamage, _egLastHitElements, _egLastHitWasCrit } from './combat-calculations.js';
+import { _egCalcPlayerDamage, _egLastHitElements, _egLastHitWasCrit } from './combat-calculations.js';
+import { EG_ELEMENTS } from './combat-calculations-resistances.js';
 import { _egRestartFlashClass } from './encounter.js';
 import { _egGetActiveMapModValue, _egMapPlayerProjectileMult } from '../endgame/endgame-map-launch.js';
-import { EG_DUAL_WIELD_PARRY_PCT, _egComputePlayerStats, _egScheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
-import { _egIsDualWielding } from '../loot/loot-requirements.js';
+import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egDragChargeElements, _egIsActive, _egRecentFills } from './combat-state.js';
 
 
@@ -94,9 +87,6 @@ function _egOnCorrectCell(row, col) {
 //   channel      - each consecutive correct cell adds a stack worth flat
 //                  bonus damage; released on the next player hit or
 //                  automatically when the max-stack cap is reached.
-
-// Delay before an echo's second instance lands (see _egTryEchoHit).
-export const EG_ECHO_DELAY_MS = 450;
 
 // Called from breakFillStreaksOnMistake() (mouse-button-handlers.js) on any
 // real (unabsorbed) mistake - breaks both correct-cell streak mechanics.
@@ -172,140 +162,6 @@ export function _egConsumeOnHitGearBonus() {
     }
 
     return Math.round(bonus);
-}
-
-
-//------------------------------------------------------------------------
-//-------------------DEFENSIVE GEAR PROCS---------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Gear: fate (talisman suffix) - pure-luck chance to negate ANY incoming hit
-// entirely, including spells and charge attacks. Returns true when negated.
-export function _egRollFateNegation(stats) {
-    const pct = stats.fatePct || 0;
-    if (pct <= 0 || Math.random() * 100 >= pct) return false;
-    globalThis.showToast(t('eg_fate'));
-    _egApplyPlayerMissFeedback();
-    _egScheduleAbsorptionRegen();
-    return true;
-}
-
-// Gear: grounded (boots prefix) - on a monster CHARGE hit, rolls against
-// groundedChancePct and reduces the hit by groundedReductionPct on proc.
-// Ranged (projectile) attacks are not charges and pass through untouched.
-export function _egApplyGroundedReduction(rawDamage) {
-    const stats = _egComputePlayerStats();
-    const chance = stats.groundedChancePct || 0;
-    const reduction = Math.min(100, stats.groundedReductionPct || 0);
-    if (chance <= 0 || reduction <= 0) return rawDamage;
-    if (Math.random() * 100 >= chance) return rawDamage;
-    globalThis.showToast(t('eg_grounded'));
-    return rawDamage * (1 - reduction / 100);
-}
-
-// ── Hold-Parry & Deflect ─────────────────────────────────────────────
-// While holding the parry key (R by default) the player pauses their own charge bar and can parry
-// incoming monster projectile and charge (melee) attacks. Hazards and boss
-// spells (isSpell=true) are never parryable. Baseline 50% + gear parry.
-// On a successful projectile parry there is a 5% + gear deflect chance to
-// redirect the shot to another monster for 30% + gear deflect damage.
-export function _egApplyPlayerParryFeedback() {
-    const hud = document.getElementById('player-avatar-wrapper');
-    if (!hud) return;
-    const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
-    const txt = (typeof t === 'function') ? t('eg_parried') : 'Parried!';
-    label.textContent = (txt && txt !== 'eg_parried') ? txt : 'Parried!';
-    hud.appendChild(label);
-    setTimeout(() => label.remove(), 1050);
-}
-export function _egApplyPlayerDeflectFeedback() {
-    const hud = document.getElementById('player-avatar-wrapper');
-    if (!hud) return;
-    const label = document.createElement('div');
-    label.className = 'eg-player-damage eg-player-miss';
-    const txt = (typeof t === 'function') ? t('eg_deflected') : 'Deflected!';
-    label.textContent = (txt && txt !== 'eg_deflected') ? txt : 'Deflected!';
-    hud.appendChild(label);
-    setTimeout(() => label.remove(), 1050);
-}
-export function _egGetParryChancePct() {
-    const base = (typeof EG_PARRY_BASE_PCT !== 'undefined' ? EG_PARRY_BASE_PCT : 50);
-    const gear = (_egComputePlayerStats().parryChancePct || 0);
-    return base + gear;
-}
-// Dual-wield parry (PoE-style): two 1H weapons grant a base chance to parry
-// WITHOUT holding the parry key (gear parry adds on top). Successful projectile parries
-// roll deflect exactly like held parries.
-export function _egGetDualWieldParryChancePct() {
-    const base = (typeof EG_DUAL_WIELD_PARRY_PCT !== 'undefined' ? EG_DUAL_WIELD_PARRY_PCT : 15);
-    let gear = 0;
-    try { gear = (_egComputePlayerStats().parryChancePct || 0); } catch (e) {}
-    return base + gear;
-}
-export function _egIsDualWieldParryActive() {
-    try {
-        if (typeof _egIsDualWielding === 'function') return _egIsDualWielding();
-    } catch (e) {}
-    return false;
-}
-export function _egGetDeflectChancePct() {
-    const base = (typeof EG_DEFLECT_BASE_PCT !== 'undefined' ? EG_DEFLECT_BASE_PCT : 5);
-    const gear = (_egComputePlayerStats().deflectChancePct || 0);
-    return base + gear;
-}
-export function _egGetDeflectDamagePct() {
-    const base = (typeof EG_DEFLECT_BASE_DMG_PCT !== 'undefined' ? EG_DEFLECT_BASE_DMG_PCT : 30);
-    const gear = (_egComputePlayerStats().deflectDamagePct || 0);
-    return base + gear;
-}
-export function _egRollParry(attacker, isProjectile) {
-    // Hold-parry, or dual-wield auto-parry (two 1H weapons, no key needed)
-    const holding = (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive);
-    const dualWield = (typeof _egIsDualWieldParryActive === 'function' && _egIsDualWieldParryActive());
-    if (!holding && !dualWield) return false;
-    if (typeof _egIsActive === 'function' && !_egIsActive()) return false;
-    // Hazards and boss spells are not parryable - they flow through isSpell=true,
-    // but we also guard here for callers that bypass takeDamage.
-    const chance = holding
-        ? _egGetParryChancePct()
-        : (typeof _egGetDualWieldParryChancePct === 'function' ? _egGetDualWieldParryChancePct() : 15);
-    if (chance <= 0) return false;
-    if (Math.random() * 100 >= chance) return false;
-    globalThis.showToast((typeof t === 'function' ? t('eg_parried') : 'Parried!'));
-    _egApplyPlayerParryFeedback();
-    _egScheduleAbsorptionRegen();
-    return true;
-}
-export function _egTryDeflectProjectile(attacker, isProjectile) {
-    if (!isProjectile) return false;
-    if (!attacker) return false;
-    const others = globalThis._egMonsters.filter(m => m.id !== attacker.id && m.currentHP > 0);
-    if (others.length === 0) return false;
-    const chance = _egGetDeflectChancePct();
-    if (chance <= 0 || Math.random() * 100 >= chance) return false;
-    const dmgPct = _egGetDeflectDamagePct();
-    const deflectDamage = Math.max(1, Math.round((attacker.damageValue || 0) * dmgPct / 100));
-    const victim = others[Math.floor(Math.random() * others.length)];
-    // Visual: fire a quick projectile from player/avatar to the victim
-    const playerEl = document.getElementById('player-avatar-wrapper') || document.getElementById('player-avatar-simple');
-    const targetCard = document.getElementById(`eg-card-${victim.id}`);
-    if (playerEl && targetCard && typeof _egFireProjectile === 'function') {
-        const start = _egGetElementCentre(playerEl);
-        const end = _egGetElementCentre(targetCard);
-        const projDef = (typeof _egGetProjectileDef === 'function') ? _egGetProjectileDef() : { emoji: '↩️', cssClass: 'eg-proj-player', duration: 300, easing: 'linear' };
-        _egFireProjectile(projDef, projDef.cssClass, start, end, 320, 'linear', () => {
-            const toastKey = (typeof t === 'function' ? t('eg_deflected') : 'Deflected!');
-            globalThis.showToast(toastKey !== 'eg_deflected' ? toastKey : `↩️ Deflected to ${victim.name || 'another monster'}!`);
-            _egDamageTargetById(victim.id, deflectDamage);
-        });
-    } else {
-        _egDamageTargetById(victim.id, deflectDamage);
-        globalThis.showToast((typeof t === 'function' ? t('eg_deflected') : 'Deflected!'));
-    }
-    _egApplyPlayerDeflectFeedback();
-    return true;
 }
 
 

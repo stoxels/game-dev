@@ -1,4 +1,4 @@
-import { _egOnProgrammaticReveal } from '../combat/combat-class-projectiles.js';
+import { _egOnProgrammaticReveal } from '../combat/combat-class-projectiles-reveal.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE------------------------------------

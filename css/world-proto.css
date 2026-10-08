@@ -1,0 +1,103 @@
+/*------------------------------------------------------------------------
+   WORLD PROTOTYPE (EXPERIMENTAL) - self-contained screen.
+   Everything is namespaced under .wp-* and only applies while the
+   prototype is mounted. No effect on any existing screen.
+------------------------------------------------------------------------ */
+
+.wp-root {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    display: flex;
+    flex-direction: column;
+    background: #120d1c;
+    font-family: inherit;
+}
+
+/* --- viewport ------------------------------------------------------- */
+
+.wp-stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.wp-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #120d1c;
+}
+
+/* --- top bar -------------------------------------------------------- */
+
+.wp-topbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: linear-gradient(rgba(38, 30, 58, .96), rgba(24, 19, 38, .98));
+    border-bottom: 1px solid rgba(150, 120, 220, .35);
+    color: #e8e2f5;
+    font-size: 13px;
+}
+
+.wp-title {
+    font-weight: 600;
+    letter-spacing: .04em;
+    color: #cdb8ff;
+}
+
+.wp-spacer { flex: 1 1 auto; }
+
+.wp-back {
+    font: inherit;
+    padding: 5px 12px;
+    color: #efe8ff;
+    background: rgba(90, 66, 140, .55);
+    border: 1px solid rgba(170, 140, 240, .5);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.wp-back:hover { background: rgba(120, 90, 180, .7); }
+
+.wp-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #b9aede;
+}
+
+.wp-field select {
+    font: inherit;
+    padding: 3px 6px;
+    color: #efe8ff;
+    background: rgba(40, 32, 62, .95);
+    border: 1px solid rgba(150, 120, 220, .4);
+    border-radius: 4px;
+}
+
+/* --- hint line ------------------------------------------------------ */
+
+.wp-hint {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    background: rgba(18, 13, 28, .95);
+    border-top: 1px solid rgba(150, 120, 220, .25);
+    color: #9d92bd;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* --- select mode card (only shown on the mode-select screen) -------- */
+
+.dms-card.wp-proto-card {
+    border-color: rgba(120, 220, 190, .45);
+}
+
+.dms-card.wp-proto-card .dms-card-title {
+    color: #7fe0c4;
+}

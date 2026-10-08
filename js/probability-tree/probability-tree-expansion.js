@@ -11,10 +11,8 @@ import { STATE } from '../state.js';
 import { cur } from '../state.js';
 
 // --- Expansion-node per-level state (module-owned; was loose window._ptx*
-// globals lazily created on first write). Inits mirror the old unset-window
-// semantics: _ptxRecallLeft stays undefined until armed (=== undefined
-// checks), the rest default falsy to match the old || 0 fallbacks. ---
-let _ptxRecallLeft;               // ergodic_recall: reveals left (undefined = not armed)
+// globals lazily created on first write). The rest default falsy to match the
+// old || 0 fallbacks. ---
 let _ptxSupplyStacks = 0;         // supply_chain: stacked discount charges (max 3)
 let _ptxDoubleNextReveal = false; // doubled reveal armed for the next revealTiles call
 let _ptxBaseTime = 0;             // timer snapshot taken when the tree was opened
@@ -253,15 +251,6 @@ export function _ptxRunExpansion() {
         pen => (has('final_theorem') && baseTime() > 0 && globalThis.timerSecs < baseTime() * 0.1) ? 0 : pen,
         // Rune Insurance / Outlier Immunity: first mistake free.
         pen => ((has('rune_insurance') || has('outlier_immunity')) && globalThis.mistakeCount === 1) ? 0 : pen,
-        // Ergodic Recall: 3 charges per level absorb penalties entirely.
-        pen => {
-            if (has('ergodic_recall') && pen > 0 && (_ptxRecallLeft === undefined || _ptxRecallLeft > 0)) {
-                _ptxRecallLeft = (_ptxRecallLeft === undefined ? 3 : _ptxRecallLeft) - 1;
-                toast('🧿 Ergodic Recall absorbed the penalty');
-                return 0;
-            }
-            return pen;
-        },
         // Tailwind: mistakes cost 50% more.
         pen => has('keystone_tailwind') ? Math.round(pen * 1.5) : pen,
         // Actuary: flat −5s.
@@ -877,7 +866,6 @@ export function _ptxRunExpansion() {
 
     patch('buildGrid', function (orig, args) {
         resetLevel();
-        _ptxRecallLeft = has('ergodic_recall') ? 3 : 0;
         _ptxSupplyStacks = 0;
         _ptxDoubleNextReveal = false;
         const result = orig(...args);
@@ -918,6 +906,8 @@ export function _ptxRunExpansion() {
 
         const FLATS = [
             ['trix_time_sense', 10],
+            ['small_time_margin', 10],
+            ['small_time_margin_2', 10],
             ['small_lesser_adaptive_correction', 10],
             ['wind_tunnel', 10], ['jet_stream', 15], ['cum_laude', 25],
             ['tick_tock_talent', 20], ['second_hand', 30], ['hourglass_doctrine', 45],

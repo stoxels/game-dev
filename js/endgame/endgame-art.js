@@ -1,4 +1,4 @@
-import { _egbtRenderGrid } from '../combat/combat-boss-test.js';
+import { _egbtRenderGrid } from '../combat/combat-boss-test-ui.js';
 import { _egRenderPanel } from '../combat/encounter.js';
 import { _egRenderEquipSlots, _egRenderInventory } from './endgame-hub.js';
 import { _egIsActive } from '../combat/combat-state.js';
@@ -57,7 +57,7 @@ export const EG_ART = (function () {
     // ?v= cache-buster: bump whenever art moves or ids are renamed, so
     // returning visitors never use a cached manifest pointing at old paths
     // (relaid out 2026-09-21: per-slot folders + puzzle_items + new ids).
-    const ITEMS_MANIFEST_URL = 'images/items/manifest.json?v=2';
+    const ITEMS_MANIFEST_URL = 'images/items/manifest.json?v=3';
     let _itemsManifestStarted = false;
     let _itemsManifestSettled = false;
 

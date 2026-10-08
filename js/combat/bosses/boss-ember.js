@@ -1,4 +1,4 @@
-import { EG_AIL_IGNITE_DMG_SHARE, EG_AIL_MIN_DOT_DAMAGE, _egApplyPlayerAilment } from '../combat-ailments.js';
+import { EG_AIL_IGNITE_DMG_SHARE, EG_AIL_MIN_DOT_DAMAGE, _egApplyPlayerAilment } from '../combat-ailments-core.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerRect, _egNkRectsOverlap, _egNkTierDamageFactor, _egNkToast } from './shared-boss-abilities.js';
 

@@ -1,56 +1,31 @@
+//----------------------------------------------------------------------
+//-----------------------EQUIPMENT DROP GENERATOR-----------------------
+//----------------------------------------------------------------------
+
+// The roll pipeline: the rarity ladder config, the rarity and mod-count
+// rollers, and the assembler that turns those rolls into an item. Which
+// mod table a base rolls from lives in loot-equipment-mod-tables.js.
+
 import { LANG } from '../translation/translations.js';
-import { EG_ALL_BASE_TYPES, EG_SLOT_ICONS } from './equipment-base-items.js';
-import { _egRollImplicitsForBase } from './loot-implicits.js';
 import { _egMapLootRarityWeightMult } from '../endgame/endgame-map-launch.js';
-import { _egBuildItemName, _egRollMods } from './loot-mod-application.js';
-import { EG_MOD_TABLE_AMULET } from './loot-mod-tables-amulet.js';
-import { EG_MOD_TABLE_ARCANE } from './loot-mod-tables-arcane.js';
-import { EG_MOD_TABLE_BELT } from './loot-mod-tables-belt.js';
-import { EG_MOD_TABLE_BOOTS } from './loot-mod-tables-boots.js';
-import { EG_MOD_TABLE_BRACERS } from './loot-mod-tables-bracers.js';
-import { EG_MOD_TABLE_CHEST } from './loot-mod-tables-chest.js';
-import { EG_MOD_TABLE_CLOAK } from './loot-mod-tables-cloak.js';
-import { EG_MOD_TABLE_EARRING } from './loot-mod-tables-earring.js';
-import { EG_MOD_TABLE_GLOVES } from './loot-mod-tables-gloves.js';
-import { EG_MOD_TABLE_HEAD } from './loot-mod-tables-head.js';
-import { EG_MOD_TABLE_PANTS } from './loot-mod-tables-pants.js';
-import { EG_MOD_TABLE_RING } from './loot-mod-tables-ring.js';
-import { EG_MOD_TABLE_RANGED, EG_MOD_TABLE_SHIELD } from './loot-mod-tables-shield.js';
-import { EG_MOD_TABLE_SHOULDERS } from './loot-mod-tables-shoulders.js';
-import { EG_MOD_TABLE_TALISMAN } from './loot-mod-tables-talisman.js';
-import { EG_MOD_TABLE_WEAPON_2H } from './loot-mod-tables-weapon-2h.js';
-import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from './loot-mod-tables-weapon1.js';
+import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
+import { EG_SLOT_ICONS } from './equipment-slot-icons.js';
+import { _egGetModTable } from './loot-equipment-mod-tables.js';
+import { _egRollImplicitsForBase } from './loot-implicits.js';
+import {_egBuildItemName} from './loot-mod-naming.js';
+import {_egRollMods} from './loot-mod-application.js';
 
-//  endgame-equipment-generator.js
-//  Pass 6: mod application + item naming moved to endgame-mod-application.js.
-//  This file owns the ROLL PIPELINE only:
-//    - rarity ladder config (EG_ITEM_RARITY_TABLE, EG_MOD_CAPS, EG_SLOT_MOD_TABLE_MAP)
-//    - weapon mod-table accessor (_egGetModTable + _egGetWeaponModTable + _egCurrentWeaponBase)
-//    - rarity + mod-count rollers (_egRollRarity, _egRollModCounts)
-//    - main drop generator (_egGenerateEquipmentDrop, overrides base-items)
-//
-//  Load AFTER endgame-equipment-base-items.js, endgame-mod-name-words.js, all
-//  EG_MOD_TABLE_* files AND endgame-mod-application.js.
-//
-//------------------------------------------------------------------------
-//-------------------ENDGAME ITEM GENERATOR-------------------------------
-//------------------------------------------------------------------------
-// Overrides _egGenerateEquipmentDrop() from endgame-equipment-base-items.js.
-// Load this file AFTER endgame-equipment-base-items.js and AFTER all
-// EG_MOD_TABLE_* files.
-//
-// RARITY LADDER:
+
+//----------------------------------------------------------------------
+//----------------------------RARITY LADDER-----------------------------
+//----------------------------------------------------------------------
+
+// The rarity weights an item rolls against, and how many modifiers
+// each rarity may carry:
 //   common   (white)  - 0 mods
-//   uncommon (green)  - 1–2 mods  (max 1 prefix, max 1 suffix)
-//   rare     (blue)   - 3–4 mods  (max 3 prefix, max 3 suffix)
-//   epic     (purple) - 5–6 mods  (max 3 prefix, max 3 suffix)
-//------------------------------------------------------------------------
-
-
-//------------------------------------------------------------------------
-//-------------------CONFIGURATION----------------------------------------
-//------------------------------------------------------------------------
-
+//   uncommon (green)  - 1-2 mods  (max 1 prefix, max 1 suffix)
+//   rare     (blue)   - 3-4 mods  (max 3 prefix, max 3 suffix)
+//   epic     (purple) - 5-6 mods  (max 3 prefix, max 3 suffix)
 export const EG_ITEM_RARITY_TABLE = [
     { rarity: 'common', weight: 550 },
     { rarity: 'uncommon', weight: 290 },
@@ -65,69 +40,10 @@ export const EG_MOD_CAPS = {
     epic: { maxPre: 3, maxSuf: 3, maxTotal: 6, minTotal: 5 },
 };
 
-// Maps every slotType value (from endgame-equipment-base-items.js) to its
-// mod table.  weapon1/weapon2/ranged share separate tables because melee,
-// off-hand, and ranged have different mod pools.
-// NOTE: melee weapons use slotType 'weapon' - 1H rolls WEAPON_1H, 2H rolls
-// the harder-hitting WEAPON_2H table (PoE-style). Shields use slotType
-// 'shield' (→ SHIELD, a defensive-only derivative of WEAPON2).
-export const EG_SLOT_MOD_TABLE_MAP = {
-    head: () => EG_MOD_TABLE_HEAD,
-    earring: () => EG_MOD_TABLE_EARRING,
-    amulet: () => EG_MOD_TABLE_AMULET,
-    shoulders: () => EG_MOD_TABLE_SHOULDERS,
-    cloak: () => EG_MOD_TABLE_CLOAK,
-    chest: () => EG_MOD_TABLE_CHEST,
-    bracers: () => EG_MOD_TABLE_BRACERS,
-    gloves: () => EG_MOD_TABLE_GLOVES,
-    belt: () => EG_MOD_TABLE_BELT,
-    pants: () => EG_MOD_TABLE_PANTS,
-    boots: () => EG_MOD_TABLE_BOOTS,
-    ring: () => EG_MOD_TABLE_RING,
-    arcane: () => EG_MOD_TABLE_ARCANE,
-    talisman: () => EG_MOD_TABLE_TALISMAN,
-    weapon: (base) => _egGetWeaponModTable(base),
-    shield: () => EG_MOD_TABLE_SHIELD,    // shields (off-hand only)
-    ranged: () => EG_MOD_TABLE_RANGED,
-};
 
-// Returns the melee mod table for the base currently being rolled:
-// two-handed weapons roll the harder-hitting WEAPON_2H pool, everything
-// else (1H main-hand + 1H off-hand dual-wield) rolls WEAPON_1H.
-export function _egGetWeaponModTable(base) {
-    const b = base || _egCurrentWeaponBase || null;
-    const hands = b ? (b.hands === 2 ? 2 : 1) : 1;
-    try {
-        if (hands === 2 && typeof EG_MOD_TABLE_WEAPON_2H !== 'undefined') return EG_MOD_TABLE_WEAPON_2H;
-        if (typeof EG_MOD_TABLE_WEAPON_1H !== 'undefined') return EG_MOD_TABLE_WEAPON_1H;
-        return EG_MOD_TABLE_WEAPON1;
-    } catch (e) {
-        return (typeof EG_MOD_TABLE_WEAPON1 !== 'undefined') ? EG_MOD_TABLE_WEAPON1 : null;
-    }
-}
-
-// Set around the mod-roll so _egGetWeaponModTable can see the base even when
-// called via the slot map without arguments (essences / crafting paths).
-export let _egCurrentWeaponBase = null;
-
-
-//------------------------------------------------------------------------
-//-------------------MOD TABLE ACCESSOR-----------------------------------
-//------------------------------------------------------------------------
-// Returns the correct mod table object for a given base item.
-
-export function _egGetModTable(base) {
-    if (base && base.slotType === 'weapon') _egCurrentWeaponBase = base;
-    const getter = EG_SLOT_MOD_TABLE_MAP[base.slotType];
-    if (!getter) return null;
-    try { return getter(base); }
-    catch (e) { return null; }  // table constant not yet defined - safe fallback
-}
-
-
-//------------------------------------------------------------------------
-//-------------------RARITY ROLLER----------------------------------------
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------
+//----------------------------RARITY ROLLER-----------------------------
+//----------------------------------------------------------------------
 
 export function _egRollRarity() {
     // Active map's loot rarity bonus boosts non-common weights during runs.
@@ -147,11 +63,11 @@ export function _egRollRarity() {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------MOD COUNT ROLLER-------------------------------------
-//------------------------------------------------------------------------
-// Returns { prefixCount, suffixCount } for the given rarity.
+//----------------------------------------------------------------------
+//---------------------------MOD COUNT ROLLER---------------------------
+//----------------------------------------------------------------------
 
+// Returns { prefixCount, suffixCount } for the given rarity.
 export function _egRollModCounts(rarity) {
     const cap = EG_MOD_CAPS[rarity];
     if (!cap || cap.maxTotal === 0) return { prefixCount: 0, suffixCount: 0 };
@@ -185,11 +101,12 @@ export function _egRollModCounts(rarity) {
 }
 
 
-//------------------------------------------------------------------------
-//-------------------MAIN DROP GENERATOR (OVERRIDE)-----------------------
-//------------------------------------------------------------------------
-// Signature matches the original in endgame-equipment-base-items.js.
+//----------------------------------------------------------------------
+//-------------------------MAIN DROP GENERATOR--------------------------
+//----------------------------------------------------------------------
 
+// Picks a base type the monster is high enough for, rolls rarity, mods
+// and implicits off it, and assembles the finished item object.
 export function _egGenerateEquipmentDrop(monsterLevel = 1) {
 
     // ── 1. Pick base type ────────────────────────────────────────────

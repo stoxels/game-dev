@@ -10,15 +10,17 @@
 
 import { _uspClearSupportBuffs } from '../skills/universal-spells.js';
 import { _egClearChargedProjectileVisual } from './encounter-charged-shot.js';
-import { _egBuildSpawnList, _egClearCampaignLevelFields, _egScheduleMonsterSpawns } from './encounter-spawn-rules.js';
+import { _egBuildSpawnList } from './encounter-spawn-rules.js';
+import { _egClearCampaignLevelFields } from './encounter-campaign-spawns.js';
+import { _egScheduleMonsterSpawns } from './encounter-spawn-scheduler.js';
 import { _egAilmentsCleanup, _egAilmentsReset } from './combat-ailments.js';
-import { _egFlushPendingRevealProjectiles } from './combat-class-projectiles.js';
+import { _egFlushPendingRevealProjectiles } from './combat-class-projectiles-reveal.js';
 import { _egChainCleanup } from './encounter-chain.js';
 import { _egMaybeShowMistakesWarning, _egResetAbsorptionBrokenState, _egResetLowHealthWarningState, _egResetMistakesWarningState } from './encounter-overlays.js';
 import { _egSetHoldEPauseVisual, _egTickLoop } from './encounter-tick.js';
 import { _egHideMonsterPanel, _egRenderPanel } from './encounter.js';
-import { _egStartPickupSpawner, _egStopPickupSpawner } from './combat-grid-pickups.js';
-import { _egHazardsCleanup, _egHazardsReset } from './combat-hazards.js';
+import { _egStartPickupSpawner, _egStopPickupSpawner } from './combat-grid-pickups-spawner.js';
+import { _egHazardsCleanup, _egHazardsReset } from './combat-hazards-lifecycle.js';
 import { _egCancelAbsorptionRegen, _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egRecentFills } from './combat-state.js';
 import { cur } from '../state.js';
@@ -188,21 +190,4 @@ export function _egStopEncounter() {
     // Drop any in-flight manual swing snapshot with the encounter
     globalThis._egPlayerCurrentCharge = 0;
     globalThis._egPendingMeleeChargePct = null;
-}
-
-
-
-
-//------------------------------------------------------------------------
-//-------------------MONSTER ATTACKS (Monster → Player)-------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Flashes the monster's card to signal it is attacking.
-export function _egFlashMonsterAttackCard(monster) {
-    const card = document.getElementById(`eg-card-${monster.id}`);
-    if (!card) return;
-    card.classList.remove('eg-flash-attack');
-    void card.offsetWidth; // force reflow so the CSS animation restarts
-    card.classList.add('eg-flash-attack');
 }

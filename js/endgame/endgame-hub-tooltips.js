@@ -1,6 +1,6 @@
 import { LANG, t } from '../translation/translations.js';
 import { EG_ART } from './endgame-art.js';
-import { _egShowTooltip } from '../loot/loot-currency.js';
+import { _egShowTooltip } from '../loot/loot-currency-tooltip.js';
 import { EG_SLOT_ACCEPTS, _dndFindTargetSlot } from './endgame-hub-drag-and-drop.js';
 import { _egEquipped } from './endgame-hub.js';
 import { _egBuildMergedModLines, _egGetAllEquippedItems, _egGetItemEffectiveAttackInterval, _egGetItemEffectiveBlockChance, _egGetItemEffectiveDamage, _egGetItemEffectiveDefenses } from './endgame-player-stats.js';

@@ -83,21 +83,18 @@ function _tryProcStochasticResonance(row, col) {
     return false;
 }
 
-// standard_deviation (nodes 255–257):
+// standard_deviation (nodes 255 and 257):
 // Reveals cells after a threshold number of mistakes.
 //   Node 1 only   → every 3 mistakes → reveal 1 cell
-//   Nodes 1+2     → every 2 mistakes → reveal 1 cell
-//   Nodes 1+2+3   → every 2 mistakes → reveal 2 cells
+//   Nodes 1+3     → every 3 mistakes → reveal 2 cells
 // Also checks for a pending Bayesian bonus reveal on top of the base reveals.
 // Fires beam effects from the mistake cell to each revealed tile.
 function _tryProcStandardDeviation(mistakeRow, mistakeCol) {
     if (!globalThis.ptHasSkill('standard_deviation_1')) return;
 
-    const hasNode2 = globalThis.ptHasSkill('standard_deviation_2');
     const hasNode3 = globalThis.ptHasSkill('standard_deviation_3');
-    const threshold = hasNode2 ? 2 : 3;
 
-    if (globalThis.mistakeCount % threshold !== 0) return;
+    if (globalThis.mistakeCount % 3 !== 0) return;
 
     const revealCount = hasNode3 ? 2 : 1;
     const revealedTiles = revealTiles(revealCount) || [];

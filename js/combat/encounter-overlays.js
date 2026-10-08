@@ -1,16 +1,9 @@
 import { t } from '../translation/translations.js';
-import { _egEndMapDefeated } from './encounter-chain.js';
-import { _egGetMistakesRemaining } from './encounter-tick.js';
+import { _egGetMistakesRemaining } from './encounter-tick-support.js';
 import { _egIsActive } from './combat-state.js';
 import { _egClearCenterGridBanners } from '../timer/timer.js';
-
-
-//  endgame-encounter-overlays.js
-//  WARNINGS & FAIL OVERLAYS - extracted 2026-09-10 from
-//  endgame-encounter.js (mistakes / low-health / absorption-broken
-//  banners + the map-failed overlay interceptor). Loads AFTER
-//  endgame-encounter-tick.js (uses its _egClearCenterGridBanners
-//  fallback guard).
+// Encounter warning overlays: mistake, low-health, and absorption-broken
+// banners with their threshold tracking and reset paths.
 //
 export function _egShowMistakesWarningBanner(remaining) {
     // Dismiss any other center-grid banner so concurrent events don't stack
@@ -217,38 +210,3 @@ export function _egResetAbsorptionBrokenState() {
     const banner = document.getElementById('eg-absorption-broken-banner');
     if (banner) banner.remove();
 }
-
-
-//------------------------------------------------------------------------
-//-------------------MAP FAILED OVERLAY-----------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
-
-// Intercepts every defeat path that opens the generic lose overlay while an
-// endgame map is still running (timer expiry, hardcore fail, golden clock,
-// random walkers, ...): instead of Retry/Levels the player gets the map-lost
-// screen (see _egEndMapDefeated in endgame-encounter-chain.js), which keeps
-// everything collected during the run. Endgame-specific deaths (mistake
-// limit reached, HP zero) call _egEndMapDefeated directly.
-export function _egEnsureLoseOverlayEndgameUI() {
-    const ov = document.getElementById('ov-lose');
-    if (!ov || ov.dataset.egFailUiBound) return;
-    ov.dataset.egFailUiBound = '1';
-
-    new MutationObserver(() => {
-        if (!ov.classList.contains('show')) return;
-        if (typeof _egIsActive !== 'function' || !_egIsActive()) return;
-        if (window._egMapDefeatInProgress) {
-            ov.classList.remove('show', 'eg-map-failed');
-            return;
-        }
-
-        const titleEl = document.getElementById('lose-title');
-        const subEl = document.getElementById('lose-sub');
-        _egEndMapDefeated(
-            titleEl ? titleEl.textContent : null,
-            subEl ? subEl.textContent : null
-        );
-    }).observe(ov, { attributes: true, attributeFilter: ['class'] });
-}
-

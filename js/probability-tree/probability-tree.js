@@ -1,4 +1,4 @@
-﻿import { renderLevelSelect } from '../screens/screens-level-select.js';
+import { renderLevelSelect } from '../screens/screens-level-select.js';
 import { showMapView } from '../screens/screens-map-view.js';
 import { showWorldDetail } from '../screens/screens-world-levels.js';
 import { switchScreen } from '../screens/screens.js';

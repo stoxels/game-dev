@@ -3,8 +3,9 @@ import { _resetPlayerMana, gainMana } from '../classes/class-mana.js';
 import { _incDirect } from '../inference/inference-stats.js';
 import { save } from '../state.js';
 import { t } from '../translation/translations.js';
-import { _egGetRevealProjectileDamagePct } from '../combat/combat-class-projectiles.js';
-import { _egCalcPlayerDamage, _egLastHitElements, _egScaleElements } from '../combat/combat-calculations.js';
+import { _egGetRevealProjectileDamagePct } from '../combat/combat-class-projectiles-reveal.js';
+import { _egCalcPlayerDamage, _egLastHitElements } from '../combat/combat-calculations.js';
+import { _egScaleElements } from '../combat/combat-calculations-resistances.js';
 import { _egAnimatePlayerProjectile } from '../combat/encounter.js';
 import { _egRenderGateLevelChip } from './endgame-gate.js';
 import { _egRenderEquipSlots, _egRenderInventory, _egRenderStatsList } from './endgame-hub.js';
@@ -176,9 +177,23 @@ const _EG_PASSIVE_TREE_TRAVEL_BONUSES = {
     small_strength: { str: 5 },
     small_agility: { agi: 5 },
     small_intellect: { int: 5 },
+    travel_keen_intellect: { int: 5 },
+    travel_heightened_intellect: { int: 5 },
+    travel_profound_intellect: { int: 5 },
+    trix_cerebral_focus: { int: 5 },
     travel_arcane_reserve: { mana: 16, absorptionFlat: 14 },
     trix_absorption_core: { absorptionFlat: 10, absorptionIncPct: 4 },
+    trix_absorption_focus: { absorptionIncPct: 6, absorptionRegenRatePct: 10 },
     trix_spell_thread: { mana: 16, spellDamageIncPct: 16 },
+    trix_spell_focus: { spellDamageIncPct: 10 },
+    // "+% increased elemental damage" - scales the ELEMENTAL share of every
+    // hit, never its physical share. Read in three places (see the stat
+    // comment in endgame-player-stats.js): the projectile channel and the
+    // melee channel roll their own gear elemental ranges
+    // (combat-calculations.js), and elemental universal spells add the
+    // percentage on top of their own roll (universal-spells.js).
+    travel_elemental_conduction: { elementalDamageIncPct: 10 },
+    trix_cast_speed: { castSpeedPct: 4 },
     small_martial_poise: { str: 5, agi: 5 },
     small_sharpshooter: { str: 5, agi: 5 },
     small_disciplined_body: { str: 5, agi: 5 },
@@ -193,6 +208,68 @@ const _EG_PASSIVE_TREE_TRAVEL_BONUSES = {
     small_quick_study: { int: 5, agi: 5 },
 };
 
+const _EG_PASSIVE_TREE_NOTABLE_BONUSES = {
+    trix_arcane_bulwark: { mana: 20, absorptionFlat: 20, int: 20 },
+    notable_arcane_resonance: { spellDamageIncPct: 20, castSpeedPct: 5, int: 20 },
+    notable_deep_vigor: { healthIncPct: 8, manaIncPct: 12 },
+    // Notable parent of small node 31477 (Casting Ward): the same two channels
+    // at notable strength, plus the attributes the notable advertises. Str/Agi
+    // ride the existing attribute totals (EG_LEVELING_ATTRS); the resistance
+    // bonus is a flat add to fire/cold/lightning that still obeys the cap.
+    notable_casting_sentinel: { str: 20, agi: 20, allElementalResist: 10, castingAilmentAvoidPct: 25 },
+    // Fire specialist notable (node 20175). Three separate channels, each
+    // read where its stat already lives:
+    //   fireDamageIncPct - fire-only sibling of elementalDamageIncPct; scales
+    //                      the FIRE share of melee strikes and projectiles
+    //                      (combat-calculations.js) and fire spells
+    //                      (universal-spells.js).
+    //   fireCastSpeedPct - cast speed that only counts for fire spells
+    //                      (spell-casttime.js), added on top of castSpeedPct.
+    //   fireResistFlat   - seeds the fireResist bucket, so it rides the same
+    //                      75% cap (raised only by max-resistance uniques)
+    //                      as any gear fire resistance.
+    notable_ember_prior: { fireDamageIncPct: 25, fireCastSpeedPct: 5, fireResistFlat: 15 },
+    // Cold specialist notable (node 20174) - the exact cold mirror of the
+    // fire node above, one channel per advertised line:
+    //   coldDamageIncPct - cold-only sibling of elementalDamageIncPct; scales
+    //                      the COLD share of melee strikes and projectiles
+    //                      (combat-calculations.js) and cold spells
+    //                      (universal-spells.js).
+    //   coldCastSpeedPct - cast speed that only counts for cold spells
+    //                      (spell-casttime.js), added on top of castSpeedPct.
+    //   coldResistFlat   - seeds the coldResist bucket, so it rides the same
+    //                      75% cap (raised only by max-resistance uniques)
+    //                      as any gear cold resistance.
+    notable_frostweaver: { coldDamageIncPct: 25, coldCastSpeedPct: 5, coldResistFlat: 15 },
+    // Nature specialist notable (node 110, Verdant Covenant). Same three-channel
+    // shape as the fire/cold notables above, but nature is a spell damageKind
+    // rather than one of the four EG_ELEMENTS, so the first two channels key on
+    // damageKind/element 'nature' in universal-spells.js and spell-casttime.js
+    // instead of on the melee/projectile elemental breakdown. The resistance
+    // channel is a real element: _egCalcPlayerResistanceReduction reads
+    // natureResist for incoming 'nature' hits (The Sprout's vines, spores,
+    // motes and dust bursts) under the same 75% cap as any gear resistance.
+    notable_verdant_covenant: { natureDamageIncPct: 25, natureCastSpeedPct: 5, natureResistFlat: 15 },
+};
+
+// Small pathing nodes previously had no stat channel at all - only travel
+// and notable tiers were read. Deliberately narrow: a small node contributes
+// only when its (unique) stat key is listed here, so untouched pathing nodes
+// keep granting nothing.
+const _EG_PASSIVE_TREE_SMALL_BONUSES = {
+    small_lesser_spell_focus: { spellDamageIncPct: 10 },
+    small_focused_intellect: { int: 5 },
+    small_refined_intellect: { int: 5 },
+    small_vital_reserve: { healthIncPct: 5, manaIncPct: 8 },
+    small_steady_vigor: { healthIncPct: 5, manaIncPct: 8 },
+    small_casting_ward: { allElementalResist: 3, castingAilmentAvoidPct: 15 },
+    small_casting_vigil: { allElementalResist: 3, castingAilmentAvoidPct: 15 },
+    // Lesser sibling of notable 256 (Arcane Bulwark): the same two defensive
+    // channels at small strength. absorptionFlat/mana are already read by
+    // endgame-player-stats.js, so no new plumbing is needed.
+    small_arcane_bulwark: { absorptionFlat: 10, mana: 10 },
+};
+
 const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
     Array.isArray(TALENT_TREE_DATA?.nodes)
         ? TALENT_TREE_DATA.nodes.map(node => [node.id, node])
@@ -200,15 +277,22 @@ const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
 );
 
 function _egGetPassiveTreeTravelBonuses() {
-    const totals = { str: 0, agi: 0, int: 0, mana: 0, absorptionFlat: 0, absorptionIncPct: 0, spellDamageIncPct: 0 };
+    const totals = { str: 0, agi: 0, int: 0, mana: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, natureDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, natureCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, natureResistFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0 };
     const state = typeof globalThis.STATE !== 'undefined' ? globalThis.STATE : null;
     if (!state || !state.passiveTreeAllocated) return totals;
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;
 
     for (const nodeId of state.passiveTreeAllocated) {
         const node = _EG_PASSIVE_TREE_NODES_BY_ID.get(Number(nodeId));
-        if (!node || node.tier !== 'travel') continue;
-        const bonus = _EG_PASSIVE_TREE_TRAVEL_BONUSES[node.statKey];
+        if (!node) continue;
+        let bonus = null;
+        if (node.tier === 'travel') {
+            bonus = _EG_PASSIVE_TREE_TRAVEL_BONUSES[node.statKey];
+        } else if (node.tier === 'notable') {
+            bonus = _EG_PASSIVE_TREE_NOTABLE_BONUSES[node.statKey];
+        } else if (node.tier === 'small') {
+            bonus = _EG_PASSIVE_TREE_SMALL_BONUSES[node.statKey];
+        }
         if (!bonus) continue;
         totals.str += bonus.str || 0;
         totals.agi += bonus.agi || 0;
@@ -216,7 +300,25 @@ function _egGetPassiveTreeTravelBonuses() {
         totals.mana += bonus.mana || 0;
         totals.absorptionFlat += bonus.absorptionFlat || 0;
         totals.absorptionIncPct += bonus.absorptionIncPct || 0;
+        totals.absorptionRegenRatePct += bonus.absorptionRegenRatePct || 0;
         totals.spellDamageIncPct += bonus.spellDamageIncPct || 0;
+        totals.elementalDamageIncPct += bonus.elementalDamageIncPct || 0;
+        totals.fireDamageIncPct += bonus.fireDamageIncPct || 0;
+        totals.coldDamageIncPct += bonus.coldDamageIncPct || 0;
+        totals.natureDamageIncPct += bonus.natureDamageIncPct || 0;
+        totals.castSpeedPct += bonus.castSpeedPct || 0;
+        totals.fireCastSpeedPct += bonus.fireCastSpeedPct || 0;
+        totals.coldCastSpeedPct += bonus.coldCastSpeedPct || 0;
+        totals.natureCastSpeedPct += bonus.natureCastSpeedPct || 0;
+        totals.fireResistFlat += bonus.fireResistFlat || 0;
+        totals.coldResistFlat += bonus.coldResistFlat || 0;
+        totals.natureResistFlat += bonus.natureResistFlat || 0;
+        // Percentage maxima are handed to endgame-player-stats.js, which
+        // multiplies them onto the flat Life/Mana totals.
+        totals.healthIncPct += bonus.healthIncPct || 0;
+        totals.manaIncPct += bonus.manaIncPct || 0;
+        totals.allElementalResist += bonus.allElementalResist || 0;
+        totals.castingAilmentAvoidPct += bonus.castingAilmentAvoidPct || 0;
     }
     return totals;
 }

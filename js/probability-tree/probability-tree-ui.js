@@ -1,4 +1,4 @@
-﻿import { t } from '../translation/translations.js';
+import { t } from '../translation/translations.js';
 import { EG_ART } from '../endgame/endgame-art.js';
 import { _ptAllocated, _ptBuildAdjacency, _ptGetNodeVisualState, _ptIsDeallocatable, _ptLang, _ptOnNodeClick, _ptPoints, _ptRefreshPointsDisplay, ensurePassiveTreeRoot } from './probability-tree-state-points.js';
 import { getPassiveTreeRootId, isPassiveTreeStartNode } from './probability-tree.js';
@@ -396,8 +396,6 @@ export function _ptTooltipBuildHtml(id) {
         typeHtml = `<div style="font-size:10px;letter-spacing:1.5px;color:#ffd700;margin-bottom:3px;">${lang === 'de' ? 'KLASSENSTART' : 'CLASS START'}</div>`;
     } else if (tier === PT_TIER_KEYSTONE) {
         typeHtml = `<div style="font-size:10px;letter-spacing:1.5px;color:#e8a020;margin-bottom:3px;">${t('pt_node_keystone')}</div>`;
-    } else if (tier === PT_TIER_SMALL) {
-        typeHtml = `<div style="font-size:10px;letter-spacing:1.5px;color:#5a7a48;margin-bottom:3px;">${lang === 'de' ? 'KLEINER PASSIV' : 'SMALL PASSIVE'}</div>`;
     } else if (tier === PT_TIER_NOTABLE) {
         typeHtml = `<div style="font-size:10px;letter-spacing:1.5px;color:#93a7bd;margin-bottom:3px;">${t('pt_node_notable')}</div>`;
     }
@@ -737,6 +735,16 @@ export function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
         node.appendChild(img);
         return;
     }
+    const icon = (def && def.icon) ? def.icon : skill.image;
+    const isImageUrl = icon && (icon.startsWith('/') || icon.startsWith('http') || icon.startsWith('images/'));
+    const isRealImg = isImageUrl && !icon.includes('axe-hammer-grey');
+    const isEmoji = icon && !isImageUrl && !icon.includes('axe-hammer-grey');
+
+    if (isRealImg) {
+        _ptAppendImageIcon(node, icon, isKeystone, true);
+        return;
+    }
+
     const artKey = (def && def.statKey) || (skill && skill.statKey) || null;
     const legacyArtKey = artKey && artKey.startsWith('travel_') ? artKey.slice(7) : null;
     const artUrl = artKey ? (EG_ART.url('item', artKey) || (legacyArtKey && EG_ART.url('item', legacyArtKey))) : null;
@@ -747,14 +755,8 @@ export function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
     // Art not available (yet) - remember the key so the late-arrival refresh
     // below can swap the fallback without redrawing the whole tree.
     if (artKey) node.dataset.ptArtPending = artKey;
-    const icon = (def && def.icon) ? def.icon : skill.image;
-    const isImageUrl = icon && (icon.startsWith('/') || icon.startsWith('http'));
-    const isRealImg = isImageUrl && !icon.includes('axe-hammer-grey');
-    const isEmoji = icon && !isImageUrl && !icon.includes('axe-hammer-grey');
 
-    if (isRealImg) {
-        _ptAppendImageIcon(node, icon, isKeystone);
-    } else if (isEmoji) {
+    if (isEmoji) {
         _ptAppendEmojiIcon(node, icon, isKeystone, scale);
     } else {
         _ptAppendDotFallback(node, isKeystone);
@@ -832,7 +834,19 @@ function _ptBuildReworkNodeTemplate(id) {
     if (def.tier) lines.push(`Tier: ${def.tier}`);
     if (def.statKey) lines.push(`Stat key: ${def.statKey}`);
     lines.push(`Connections: ${connectionCount || 'none (add one in the Passive Tree Editor)'}`);
-    lines.push('Current stats:', stats, '', 'This node shall receive the following changes:');
+    lines.push(
+        'Current stats (OLD VERSION - reference only; these lines get REPLACED, never appended to):',
+        stats,
+        '',
+        '--- FULL REWORK, NOT AN APPEND ---',
+        'Replace this node from scratch in js/probability-tree/probability-tree-data.js:',
+        '  - new name, new EN/DE description with one stat per line, its own statKey, and real passive art or an art-backlog entry (never an emoji)',
+        '  - keep the numeric Node ID above; do NOT add text to the old description shown here',
+        '  - wire every advertised line to real gameplay, and audit every consumer before renaming a shared statKey',
+        '  - only after lint, tests, phase2:verify and build pass: add this ID to PT_REWORKED_NODE_IDS',
+        '',
+        'The node shall receive the following FULL rework:'
+    );
     return lines.join('\n');
 }
 

@@ -1,5 +1,5 @@
 import { Audio_Manager } from '../../audio/audio.js';
-import { _egDamageTargetById } from '../encounter.js';
+import { _egDamageTargetById } from '../encounter-monster-damage.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egFlingBurst, _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
 

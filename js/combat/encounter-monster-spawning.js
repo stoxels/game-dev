@@ -1,20 +1,14 @@
 //------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
+// Monster spawning owner: spawn-zone assignment, monster-or-boss
+// construction, and live-arrival orchestration. The encounter facade
+// re-exports this focused owner for compatibility.
 //------------------------------------------------------------------------
-
-// Monster spawning: spawn-zone assignment, monster-or-boss construction
-// from defs and the arrival notification.
 
 import { t } from '../translation/translations.js';
 import { EG_MONSTER_ZONES } from './encounter-constants.js';
 import { _egRenderPanel } from './encounter.js';
 import { EG_MAX_CONCURRENT_MONSTERS, _egBuildMonster } from './combat-monsters.js';
 import { _egComputePlayerStats, _egFormatStatValue } from '../endgame/endgame-player-stats.js';
-
-
-
 //------------------------------------------------------------------------
 //-------------------MONSTER SPAWNING-------------------------------------
 //------------------------------------------------------------------------

@@ -8,8 +8,9 @@ import { _varianceShield_removeBubble } from './classes/class-mathmagician-varia
 import { DIFF_CFG, curDiff, curMods } from './difficulty-modifiers.js';
 import { _egOnPuzzleComplete, _egPuzzleCompleteFired, _egUpdateObjectivesHUD } from './combat/encounter-chain.js';
 import { _egMaybeShowMistakesWarning } from './combat/encounter-overlays.js';
-import { _egGetMaxAllowedMistakes } from './combat/encounter-tick.js';
-import { _egPrepareCampaignEncounter, _egStartEncounter, _egStopEncounter } from './combat/encounter.js';
+import { _egGetMaxAllowedMistakes } from './combat/encounter-tick-support.js';
+import { _egPrepareCampaignEncounter } from './combat/encounter-campaign-spawns.js';
+import { _egStartEncounter, _egStopEncounter } from './combat/encounter.js';
 import { _egActiveMapItem, _egMapPlayerLifeMult, _egMapTimeGainMult } from './endgame/endgame-map-launch.js';
 import { EG_PLAYER_STATS, _egComputePlayerStats } from './endgame/endgame-player-stats.js';
 import { _egResetQuizDamageBuff } from './endgame/endgame-quiz-buffs.js';

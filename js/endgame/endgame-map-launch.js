@@ -1,12 +1,15 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { t } from '../translation/translations.js';
 import { egAtlasChainBlueprintForMap, egAtlasMakeRng } from './endgame-atlas.js';
-import { _egBuildChainPool, _egPickMapRunPuzzleGi } from '../combat/encounter-chain.js';
-import { _egEnsureLoseOverlayEndgameUI } from '../combat/encounter-overlays.js';
+import { _egPickMapRunPuzzleGi } from '../combat/encounter-chain.js';
+import { _egBuildChainPool } from '../combat/encounter-chain-pool.js';
+import { _egEnsureLoseOverlayEndgameUI } from '../combat/encounter-defeat-overlay.js';
 import { _egPlayerTakeDamage } from '../combat/encounter.js';
 import { _egRenderMapSlot } from './endgame-gate.js';
 import { egSaveHubState } from './endgame-hub.js';
-import { _egGetMapRewardBonuses, _egRollMapSizeMix, egMapBaseDurationForTier, egMapBaseMistakesForTier, egMapBasePuzzlesForTier, egMapBaseQuestionsForTier } from '../loot/loot-maps.js';
+import { _egGetMapRewardBonuses } from '../loot/loot-map-mod-rewards.js';
+import { _egRollMapSizeMix } from '../loot/loot-map-implicit-parts.js';
+import { egMapBaseDurationForTier, egMapBaseMistakesForTier, egMapBasePuzzlesForTier, egMapBaseQuestionsForTier } from '../loot/loot-map-config.js';
 import { _egIsActive } from '../combat/combat-state.js';
 import { cur } from '../state.js';
 

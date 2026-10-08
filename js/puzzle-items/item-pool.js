@@ -53,7 +53,9 @@ export const RARITY_COLOR_MAP = {
 const WEIGHT_BOOST_NODES = {
     quality: [['quality_loot_1', 0.10], ['quality_loot_2', 0.10], ['quality_loot_3', 0.10]],
     cursed: [['cursed_attraction_1', 0.05], ['cursed_attraction_2', 0.05], ['cursed_attraction_3', 0.10]],
-    reveal: [['seeker_of_light_1', 0.15], ['seeker_of_light_2', 0.15], ['seeker_of_light_3', 0.20]],
+    // Node 134 dropped its Reveal-item boost when it was reworked as Deep
+    // Vigor, so only the still-owned seeker_of_light_3 key boosts this pool.
+    reveal: [['seeker_of_light_3', 0.20]],
     mark: [['error_collector_1', 0.15], ['error_collector_2', 0.15], ['error_collector_3', 0.20]],
     tutor: [['mentors_following_1', 0.15], ['mentors_following_2', 0.15], ['mentors_following_3', 0.20]],
     shield: [['wardens_stockpile_1', 0.15], ['wardens_stockpile_2', 0.15], ['wardens_stockpile_3', 0.20]],

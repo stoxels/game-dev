@@ -1,4 +1,4 @@
-﻿import { _pt_container, _ptUpdateVirtualViewport, _pt_world } from './probability-tree-ui.js';
+import { _pt_container, _ptUpdateVirtualViewport, _pt_world } from './probability-tree-ui.js';
 import { getPassiveTreeRootId, PT_FOCUS_SCALE, PT_NODE_RADIUS, PT_PADDING, PT_START_ID, PT_ZOOM_MAX, PT_ZOOM_MIN, PT_ZOOM_STEP } from './probability-tree.js';
 import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---

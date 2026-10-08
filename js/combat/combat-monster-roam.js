@@ -1,5 +1,6 @@
 import { t } from '../translation/translations.js';
-import { EG_MONSTER_ZONES, _egRenderPanel, _egRestartFlashClass, _egShowStatusLabel } from './encounter.js';
+import { EG_MONSTER_ZONES, _egRenderPanel, _egRestartFlashClass } from './encounter.js';
+import { _egShowStatusLabel } from './encounter-monster-damage.js';
 import { _egIsActive } from './combat-state.js';
 
 // endgame-monster-roam.js
@@ -24,22 +25,22 @@ import { _egIsActive } from './combat-state.js';
 // Loads AFTER endgame-encounter.js (calls its render helpers; encounter.js
 // calls back into _egRoamShouldRoam/_egRoamSync/_egRoamTeardown guarded).
 
-export const EG_ROAM_LAYER_ID = 'eg-roam-layer';
+const EG_ROAM_LAYER_ID = 'eg-roam-layer';
 
 // Minimum time between two sidesteps of the SAME monster (ms). Keeps the
 // behaviour occasional even when the player machine-guns E.
-export const EG_SIDESTEP_COOLDOWN_MS = 5000;
+const EG_SIDESTEP_COOLDOWN_MS = 5000;
 // Grace period after spawn during which a monster never sidesteps (ms) -
 // it should first be targetable where it appeared.
-export const EG_SIDESTEP_SPAWN_GRACE_MS = 3500;
+const EG_SIDESTEP_SPAWN_GRACE_MS = 3500;
 
 // Lore-weighted sidestep chance per successful melee hit. Small vermin dart
 // around, medium beasts shift sometimes, heavy brutes barely move.
-export const EG_SIDESTEP_NIMBLE = new Set([
+const EG_SIDESTEP_NIMBLE = new Set([
     'rat', 'bat', 'bee', 'mosquito', 'ant', 'moth', 'spider', 'ladybug',
     'frog', 'beetle', 'owl'
 ]);
-export const EG_SIDESTEP_HEAVY = new Set([
+const EG_SIDESTEP_HEAVY = new Set([
     'golem', 'golem_iron', 'ogre', 'troll', 'rhino', 'bison', 'zombie',
     'oni', 'volcano', 'meteor', 'moon', 'brain'
 ]);
@@ -52,7 +53,7 @@ export function _egRoamShouldRoam(m) {
 
 // Legacy layer cleanup. The patrol owned #eg-roam-layer; it may still exist
 // in a running session after this patch. Empty it so no ghost cards linger.
-export function _egRoamClearLegacyLayer() {
+function _egRoamClearLegacyLayer() {
     try {
         const layer = document.getElementById(EG_ROAM_LAYER_ID);
         if (layer) layer.innerHTML = '';
@@ -78,13 +79,15 @@ export function _egRoamTeardown() {
 
 // No-op kept so any stale rAF handle from a pre-patch session settles.
 // The patrol tick is gone; monsters no longer move on their own.
-export function _egRoamEnsureTick() {}
-export function _egRoamTick() {}
+// SUSPECTED DEAD: retained for legacy-session compatibility; no current caller.
+function _egRoamEnsureTick() {}
+// SUSPECTED DEAD: retained for legacy-session compatibility; no current caller.
+function _egRoamTick() {}
 
 // Returns the sidestep chance (0..1) for one successful melee hit on `m`.
 // Nimble vermin dart often, heavies plod, everyone else sits in between.
 // Ranged monsters strafe a touch more - they dislike blades up close.
-export function _egMonsterSidestepChance(m) {
+function _egMonsterSidestepChance(m) {
     const baseId = (m && (m.baseId || m.id || '')) + '';
     const key = baseId.split('_')[0];
     let chance = 0.20;
@@ -97,7 +100,7 @@ export function _egMonsterSidestepChance(m) {
 
 // Picks a new zone panel for a sidestep: a different panel than `fromZone`,
 // preferring the least-populated ones so cards never pile up.
-export function _egPickSidestepZone(monster, fromZone) {
+function _egPickSidestepZone(monster, fromZone) {
     let zones = [];
     try {
         zones = (typeof EG_MONSTER_ZONES !== 'undefined' && EG_MONSTER_ZONES.length)

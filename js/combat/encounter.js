@@ -1,19 +1,17 @@
 //------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
+//-------------------ENCOUNTER MONSTER PANEL------------------------------
+//------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// ENDGAME ENCOUNTER - facade module. The real-time combat overlay:
-// monster panel rendering, damage numbers, hit bursts, flash cards and
-// bar updates live here; spawning, attacks, gear procs, targeting, damage
-// and kill handling live in the focused encounter-* modules, all
-// re-exported below unchanged (public surface preserved).
+// The real-time combat overlay: the monster panel, its HTML builders, the
+// damage numbers and hit bursts, and the per-frame bar updates. Spawning,
+// attacks, targeting, damage and kills live in the focused encounter-*
+// modules, re-exported below so existing import sites keep working.
 
 import { t } from '../translation/translations.js';
 import { EG_DAMAGE_NUMBER_DURATION_MS, EG_IMMUNE_FLASH_DURATION_MS, EG_IMMUNE_LABEL_DURATION_MS, EG_MONSTER_ZONES } from './encounter-constants.js';
-import { _egGetDominantElement } from './encounter-damage.js';
-import { _egRenderMonsterStatusStrip } from './combat-ailments.js';
+import { _egGetDominantElement } from './encounter-monster-damage.js';
+import { _egRenderMonsterStatusStrip } from './combat-ailments-core.js';
 import { EG_ART } from '../endgame/endgame-art.js';
 import { _egRoamShouldRoam, _egRoamSync, _egRoamTeardown } from './combat-monster-roam.js';
 import { _egIsActive } from './combat-state.js';
@@ -33,7 +31,7 @@ export function _egShowDamageNumber(monsterId, amount, isCrit, elements) {
     if (!card) return;
 
     const dmgText = document.createElement('div');
-    const domEl = (typeof _egGetDominantElement === 'function') ? _egGetDominantElement(elements) : 'physical';
+    const domEl = _egGetDominantElement(elements);
     let cls = 'eg-damage-number';
     if (domEl && domEl !== 'physical') cls += ' eg-dmg-' + domEl;
     else cls += ' eg-dmg-physical';
@@ -98,10 +96,9 @@ export const EG_HIT_BURST_SPARK_COUNT = 14;
 export const EG_HIT_BURST_DURATION_MS = 750;
 
 // Spawns a short spark burst + expanding shockwave ring at the monster's
-// card centre when damage lands. Both melee strikes and projectiles funnel
-// through _egDamageTargetById, so this fires for every player hit.
-// `elements` optionally maps each element to its share of the hit; the
-// dominant element picks the burst colour. `isCrit` enlarges the burst.
+// card centre when damage lands. `elements` optionally maps each element to
+// its share of the hit; the dominant element picks the burst colour.
+// `isCrit` enlarges the burst.
 export function _egSpawnHitBurst(monsterId, elements, isCrit) {
     const card = document.getElementById(`eg-card-${monsterId}`);
     if (!card) return;
@@ -252,7 +249,7 @@ export function _egUpdateMonsterBars(m) {
     if (hpLabel) hpLabel.textContent = `${m.currentHP} / ${m.maxHP} HP`;
 
     // Elemental ailment icon strip (only rebuilds when statuses change)
-    if (typeof _egRenderMonsterStatusStrip === 'function') _egRenderMonsterStatusStrip(m);
+    _egRenderMonsterStatusStrip(m);
 }
 
 // High-frequency bar update (10Hz). Only touches bar widths and HP text -
@@ -269,9 +266,7 @@ export function _egHideMonsterPanel() {
         if (el) el.innerHTML = '';
     });
     // Legacy roam layer cleanup (encounter over).
-    if (typeof _egRoamTeardown === 'function') {
-        try { _egRoamTeardown(); } catch (e) {}
-    }
+    try { _egRoamTeardown(); } catch (e) {}
     const wrapper = document.getElementById('eg-monster-wrapper');
     if (wrapper) wrapper.classList.add('eg-hidden');
 }
@@ -286,9 +281,8 @@ export function _egClearAllZones() {
 
 // Renders each monster's card into its assigned zone panel.
 // Uses += so multiple monsters assigned to the same zone stack correctly.
-// Monsters hold ground here - the old perimeter patrol is disabled, so every
-// normal monster renders in its static panel. Only Brutus zombies / Dynamo
-// conductors (own layers) and the legacy roam hook skip panels.
+// Only Brutus zombies / Dynamo conductors (own layers) and the legacy
+// roam hook skip panels; every other monster renders in its static panel.
 export function _egRenderMonstersIntoZones() {
     globalThis._egMonsters.forEach(m => {
         // Brutus's sacrificial zombies render as roaming cards in the fixed
@@ -301,7 +295,7 @@ export function _egRenderMonstersIntoZones() {
         // Legacy patrol hook (always false now): normal monsters stay put.
         // Occasional melee sidesteps (endgame-monster-roam.js) just change
         // zoneId and re-render here - no separate layer.
-        if (typeof _egRoamShouldRoam === 'function' && _egRoamShouldRoam(m)) return;
+        if (_egRoamShouldRoam(m)) return;
         const zoneEl = document.getElementById(m.zoneId || 'eg-monster-panel');
         if (zoneEl) zoneEl.innerHTML += _egBuildMonsterCardHTML(m);
     });
@@ -323,9 +317,7 @@ export function _egRenderPanel() {
     _egClearAllZones();
     _egRenderMonstersIntoZones();
     // Legacy patrol cleanup (clears the old #eg-roam-layer if present).
-    if (typeof _egRoamSync === 'function') {
-        try { _egRoamSync(); } catch (e) {}
-    }
+    try { _egRoamSync(); } catch (e) {}
 }
 
 // ---- re-exports from the focused split modules (public surface preserved) ----
@@ -354,42 +346,48 @@ export {
 } from './encounter-constants.js';
 
 export {
-    EG_CAMPAIGN_MONSTER_CONFIG,
-    EG_CAMPAIGN_STAMPED_FIELDS,
     EG_EARLY_VARIANCE_FREE_LEVEL,
-    EG_INITIAL_SPAWN_STAGGER_STEP_MS,
     EG_MONSTER_VARIANCE_DOWN,
     EG_MONSTER_VARIANCE_UP_MAX,
     EG_MONSTER_VARIANCE_UP_MIN,
     _egBuildBossSpawnList,
     _egBuildBossSpawnListFromDef,
-    _egBuildCampaignMonsterList,
     _egBuildFixedBossList,
     _egBuildFixedNormalList,
     _egBuildNormalSpawnList,
     _egBuildRandomBossList,
     _egBuildRandomNormalList,
     _egBuildSpawnList,
-    _egCalcSpawnDelay,
     _egCategorizeMonsterTier,
-    _egCountSolutionCells,
     _egGetEncounterBaseLevel,
     _egIsPuzzleSolved,
     _egPickWeightedMonster,
-    _egPrepareCampaignEncounter,
-    _egRespawnRandomMonster,
     _egRollMonsterLevel,
+} from './encounter-spawn-rules.js';
+
+export {
+    EG_CAMPAIGN_MONSTER_CONFIG,
+    EG_CAMPAIGN_STAMPED_FIELDS,
+    _egBuildCampaignMonsterList,
+    _egClearCampaignLevelFields,
+    _egCountSolutionCells,
+    _egPrepareCampaignEncounter,
+} from './encounter-campaign-spawns.js';
+
+export {
+    EG_INITIAL_SPAWN_STAGGER_STEP_MS,
+    _egCalcSpawnDelay,
+    _egRespawnRandomMonster,
     _egScheduleMonsterSpawns,
     _egScheduleRespawn,
     _egShouldSuppressRespawn,
-} from './encounter-spawn-rules.js';
+} from './encounter-spawn-scheduler.js';
 
 export {
     EG_LIFE_REGEN_INTERVAL_MS,
     EG_STAGGER_DURATION_MS,
     _egAttachBossStylesheet,
     _egCancelSpawnTimers,
-    _egFlashMonsterAttackCard,
     _egResetEncounterState,
     _egStartEncounter,
     _egStartTickLoop,
@@ -401,57 +399,57 @@ export {
     _egAnimateMonsterMelee,
     _egAnimateMonsterProjectile,
     _egApplyMeleeImpact,
+    _egFireMonsterAttack,
+    _egFlashMonsterAttackCard,
+    _egResolveAttackType,
+    _egRollPreemptiveDodge,
+} from './encounter-monster-attacks.js';
+
+export {
     _egApplyPlayerBlockFeedback,
     _egApplyPlayerBlockLockoutFeedback,
     _egApplyPlayerHitFeedback,
     _egApplyPlayerMissFeedback,
     _egBlockLockoutOverlayTimer,
-    _egFireMonsterAttack,
     _egHideBlockLockoutOverlay,
-    _egResolveAttackType,
-    _egRollPreemptiveDodge,
     _egShowBlockLockoutOverlay,
-} from './encounter-monster-attacks.js';
+} from './encounter-monster-attack-feedback.js';
 
 export {
-    EG_ECHO_DELAY_MS,
     _egAnimatePlayerProjectile,
+    _egConsumeOnHitGearBonus,
+    _egOnMistake,
+    _egReleaseChannelAtMax,
+    _egResolveProjectileImpact,
+    _egTickCorrectCellGearProcs,
+    _egTrackRecentFill,
+} from './encounter-player-attacks.js';
+
+export {
     _egApplyGroundedReduction,
     _egApplyPlayerDeflectFeedback,
     _egApplyPlayerParryFeedback,
-    _egConsumeOnHitGearBonus,
     _egGetDeflectChancePct,
     _egGetDeflectDamagePct,
     _egGetDualWieldParryChancePct,
     _egGetParryChancePct,
     _egIsDualWieldParryActive,
-    _egOnMistake,
-    _egReleaseChannelAtMax,
-    _egResolveProjectileImpact,
     _egRollFateNegation,
     _egRollParry,
-    _egTickCorrectCellGearProcs,
-    _egTrackRecentFill,
     _egTryDeflectProjectile,
-} from './encounter-player-attacks.js';
+} from './encounter-player-mitigation.js';
 
 export {
     EG_DRAG_CHARGE_BASE_SIZE_PX,
     EG_DRAG_CHARGE_MAX_VISUAL_STACKS,
     EG_DRAG_CHARGE_SCALE_PER_STACK,
     EG_DRAG_CHARGE_SIZE_PER_STACK_PX,
-    EG_MELEE_EXECUTE_HP_PCT,
-    EG_MELEE_EXECUTE_MULT,
     _egAimChargingProjectile,
-    _egAnimatePlayerMelee,
-    _egApplyPlayerMeleeImpact,
     _egClearChargedProjectileVisual,
     _egClearDragBonusLabel,
-    _egCurrentMeleeDamage,
     _egGetTarget,
     _egReleaseChargedShot,
     _egRollPlayerMiss,
-    _egTryCleaveHit,
     _egTryMultishot,
     _egUpdateChargedProjectileVisual,
     _egUpdateDragBonusLabel,
@@ -461,15 +459,10 @@ export {
     EG_MELEE_OVERCHARGE_MULT,
     EG_MELEE_OVERCHARGE_RATIO,
     EG_MELEE_OVERCHARGE_RATE_PER_TIER,
-    _egMeleeDashOut,
     _egMeleeDashVisual,
-    _egMeleeDeliveryAvailable,
-    _egMeleeGlideHome,
     _egMeleeGrandFlash,
-    _egMeleeLeapTo,
     _egMeleeLeapVisual,
     _egMeleeNovaVisual,
-    _egMeleeRaiseAvatar,
     _egMeleeTierArt,
     _egMeleeTierForCharge,
     _egMeleeTierLabel,
@@ -477,31 +470,51 @@ export {
 } from './encounter-melee-arts.js';
 
 export {
-    EG_CHARGED_RICOCHET_DURATION_MS,
-    EG_CHARGED_RICOCHET_SCALE,
+    EG_MELEE_DELIVERY_ARRIVAL_BEAT_MS,
+    EG_MELEE_DELIVERY_LEAP_MS,
+    EG_MELEE_DELIVERY_OUT_MAX_MS,
+    EG_MELEE_DELIVERY_OUT_MIN_MS,
+    EG_MELEE_DELIVERY_RETURN_MS,
+    _egMeleeDashOut,
+    _egMeleeDeliveryAvailable,
+    _egMeleeGlideHome,
+    _egMeleeLeapTo,
+    _egMeleeRaiseAvatar,
+} from './encounter-melee-delivery.js';
+
+export {
     EG_MELEE_HOLD_VULNERABILITY_MULT,
-    _egApplyHitToMonster,
     _egCycleTarget,
-    _egDamageTarget,
-    _egDamageTargetById,
-    _egGetDominantElement,
     _egPlayerTakeDamage,
     _egSelectTarget,
-    _egShowStatusLabel,
-    _egTryChargedOverkillRicochet,
-    _egTryEchoHit,
-    _egTryOverkillSpread,
     _initEgTargetHotkeys,
 } from './encounter-damage.js';
 
 export {
+    EG_CHARGED_RICOCHET_DURATION_MS,
+    EG_CHARGED_RICOCHET_SCALE,
+    EG_ECHO_DELAY_MS,
+    _egApplyHitToMonster,
+    _egDamageTarget,
+    _egDamageTargetById,
+    _egGetDominantElement,
+    _egShowStatusLabel,
+    _egTryChargedOverkillRicochet,
+    _egTryEchoHit,
+    _egTryOverkillSpread,
+} from './encounter-monster-damage.js';
+
+export {
     _egGameOver,
-    _egHandleBossKill,
-    _egHandleNormalMonsterKill,
     _egKillMonster,
     _egOnAllMonstersDead,
     _egUpdateTargetAfterKill,
 } from './encounter-kills.js';
+
+export {
+    _egHandleBossKill,
+    _egHandleNormalMonsterKill,
+} from './encounter-kill-rewards.js';
 
 export {
     _egAssignRandomSpawnZone,

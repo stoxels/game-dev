@@ -1223,7 +1223,7 @@ function isUspSupportBuffActive(kind) {
 }
 
 // ---------------------------------------------------------------------
-// Player status-strip icons (js/combat/combat-ailments.js appends this)
+// Player status-strip icons (js/combat/combat-ailments-core.js appends this)
 // ---------------------------------------------------------------------
 
 export function _uspSupportStatusSignature() {
@@ -2098,7 +2098,19 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
         dmg *= 1 + ((stats.physIncPct || 0) + (tree.incPct || 0)) / 100;
     } else {
         dmg += (stats.spellDamageFlat || 0) + (tree.flat || 0);
-        dmg *= 1 + ((stats.spellDamageIncPct || 0) + (tree.incPct || 0)) / 100;
+        // Elemental spells (fire / frost / nature / arcane - whatever the
+        // def's element maps to) additionally ride the character's global
+        // "+% increased elemental damage" from the passive tree. Physical
+        // spells never do - they scale with physical gear above.
+        // Fire/cold spells further ride that element's tree-only increase.
+        // Nature keys on damageKind instead of element: no gear mod adds
+        // nature damage to a weapon hit, and its nature spells (usp_wrath,
+        // usp_serpent_sting) sit on a lightning element.
+        const fireBonus = (spell.element === 'fire') ? (stats.fireDamageIncPct || 0) : 0;
+        const coldBonus = (spell.element === 'cold') ? (stats.coldDamageIncPct || 0) : 0;
+        const natureBonus = (spell.damageKind === 'nature') ? (stats.natureDamageIncPct || 0) : 0;
+        dmg *= 1 + ((stats.spellDamageIncPct || 0) + (tree.incPct || 0)
+            + (stats.elementalDamageIncPct || 0) + fireBonus + coldBonus + natureBonus) / 100;
     }
 
     const critMult = _uspRollCritMult();
@@ -2495,41 +2507,56 @@ export function castUniversalSpell(spellId) {
 // lookups for these ids back into this file (typeof-guarded).
 
 export function _registerUniversalSpells() {
-    if (typeof SKILL_REGISTRY === 'undefined') return;
-    for (const spell of UNIVERSAL_SPELL_DEFS) {
-        if (SKILL_REGISTRY[spell.id]) continue;
-        SKILL_REGISTRY[spell.id] = {
-            id: spell.id,
-            icon: spell.icon,
-            image: null,
-            nameEn: spell.nameEn,
-            nameDE: spell.nameDE,
-            descCursorEn: spell.descEn,
-            descCursorDE: spell.descDE,
-            cooldownSeconds: spell.cooldownSeconds,
-            manaCost: spell.manaCost,
-            levels: [{
-                descEn: spell.descEn,
-                descDE: spell.descDE,
-                effect: {},
-            }],
-            source: { kind: 'universal', ownerId: null, slot: 'active1' },
-            legacySlot: null,
-            slotKind: 'universal',
-            isPassive: false,
-            movable: true,
-            endgameOnly: false,
-            tags: spell.tags,
-            scaling: _uspScalingLine(spell),
-            damage: null,
-            // Hold-to-cast: spells with castTimeSeconds need the button held
-            // until the cast bar fills (see js/skills/spell-casttime.js).
-            // The tooltip reads this string; the engine reads
-            // getSkillCastTimeSeconds() in the same file.
-            castTime: spell.castTimeSeconds ? `${spell.castTimeSeconds.toFixed(1)}s` : 'instant',
-            castTimeSeconds: spell.castTimeSeconds || 0,
-            usp: spell,
-        };
+    // Order-independent by design: the two skills modules import each other,
+    // so this can be called while either is still mid-evaluation. See the
+    // note at skill-registry.js:891 and the self-call at the end of this
+    // file. A call that lands too early is a no-op, not a crash; the other
+    // call site completes the registration. Idempotent by construction.
+    try {
+        // Read straight through: if SKILL_REGISTRY is still in its temporal
+        // dead zone the outer catch swallows it and the other call site wins.
+        // (`typeof` would NOT have protected this - it throws on a
+        // declared-but-uninitialised binding.)
+        const registry = SKILL_REGISTRY;
+        if (!registry) return;
+        for (const spell of UNIVERSAL_SPELL_DEFS) {
+            if (registry[spell.id]) continue;
+            registry[spell.id] = {
+                id: spell.id,
+                icon: spell.icon,
+                image: null,
+                nameEn: spell.nameEn,
+                nameDE: spell.nameDE,
+                descCursorEn: spell.descEn,
+                descCursorDE: spell.descDE,
+                cooldownSeconds: spell.cooldownSeconds,
+                manaCost: spell.manaCost,
+                levels: [{
+                    descEn: spell.descEn,
+                    descDE: spell.descDE,
+                    effect: {},
+                }],
+                source: { kind: 'universal', ownerId: null, slot: 'active1' },
+                legacySlot: null,
+                slotKind: 'universal',
+                isPassive: false,
+                movable: true,
+                endgameOnly: false,
+                tags: spell.tags,
+                scaling: _uspScalingLine(spell),
+                damage: null,
+                // Hold-to-cast: spells with castTimeSeconds need the button held
+                // until the cast bar fills (see js/skills/spell-casttime.js).
+                // The tooltip reads this string; the engine reads
+                // getSkillCastTimeSeconds() in the same file.
+                castTime: spell.castTimeSeconds ? `${spell.castTimeSeconds.toFixed(1)}s` : 'instant',
+                castTimeSeconds: spell.castTimeSeconds || 0,
+                usp: spell,
+            };
+        }
+    } catch (e) {
+        // Universal spells are not initialised yet - the sibling call site
+        // (the skill-registry bootstrap, or the self-call below) runs it.
     }
 }
 
@@ -2612,3 +2639,8 @@ if (typeof document !== 'undefined' && document.readyState !== 'complete') {
     _uspWireRoundEndReset();
 }
 
+// Register here as well, at the end of this module body, so registration
+// completes no matter which of the two skills modules the bundler happens
+// to evaluate first. Idempotent: _registerUniversalSpells skips ids the
+// registry already holds.
+_registerUniversalSpells();

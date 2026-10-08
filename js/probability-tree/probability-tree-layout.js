@@ -154,7 +154,9 @@ export function relaxPassiveTreeLayout(nodes, connections) {
     const fixed = new Uint8Array(count);
 
     nodes.forEach((node, index) => {
-        const scale = innerCircleLayoutScale(node, nodesById);
+        const rootFixed = node.id === LAYOUT_START_ID || CLASS_START_IDS.has(node.id);
+        const pinned = node.layoutPinned === true && !rootFixed;
+        const scale = pinned ? 1 : innerCircleLayoutScale(node, nodesById);
         const x = Number(node.x) * scale;
         const y = Number(node.y) * scale;
         xs[index] = x;
@@ -162,7 +164,7 @@ export function relaxPassiveTreeLayout(nodes, connections) {
         targetXs[index] = x;
         targetYs[index] = y;
         radii[index] = layoutRadius(node);
-        fixed[index] = node.id === LAYOUT_START_ID || CLASS_START_IDS.has(node.id) ? 1 : 0;
+        fixed[index] = rootFixed || pinned ? 1 : 0;
     });
 
     const edgePairs = [];
@@ -286,7 +288,7 @@ function hashLayoutText(text, seed) {
 
 export function passiveTreeLayoutFingerprint(nodes, connections) {
     const geometry = JSON.stringify({
-        nodes: (Array.isArray(nodes) ? nodes : []).map(node => [node.id, node.x, node.y, node.tier || '']),
+        nodes: (Array.isArray(nodes) ? nodes : []).map(node => [node.id, node.x, node.y, node.tier || '', node.layoutPinned === true ? 1 : 0]),
         connections: (Array.isArray(connections) ? connections : []).map(connection => [connection.from, connection.to]),
     });
     const first = hashLayoutText(geometry, 2166136261).toString(16).padStart(8, '0');

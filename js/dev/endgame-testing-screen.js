@@ -1,4 +1,4 @@
-import { _egBuildChainPool } from '../combat/encounter-chain.js';
+import { _egBuildChainPool } from '../combat/encounter-chain-pool.js';
 import { ALL } from '../levels/levels.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { isGatedLevel } from '../quiz-exercise/mathgate.js';

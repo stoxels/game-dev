@@ -1,22 +1,13 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
-import { _egGetMonsterChargeMultiplier, _egGetPlayerChargeMultiplier, _egPlayerStatuses, _egPuzzleEffects, _egRefreshPlayerStatusIcons, _egTickAilments } from './combat-ailments.js';
-import { _egEndMapDefeated } from './encounter-chain.js';
-import { _egMaybeShowLowHealthWarning, _egMaybeShowMistakesWarning } from './encounter-overlays.js';
-import { EG_LIFE_REGEN_INTERVAL_MS, EG_MELEE_OVERCHARGE_RATIO, _egFireMonsterAttack, _egMeleeTierForCharge, _egOverchargeRateForTier, _egUpdateBars } from './encounter.js';
-import { _egPauseGridDrops, _egResumeGridDrops } from './combat-grid-pickups.js';
-import { _egHazardsTick } from './combat-hazards.js';
-import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
-import { _egComputePlayerStats, _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
+import { _egGetMonsterChargeMultiplier, _egGetPlayerChargeMultiplier, _egRefreshPlayerStatusIcons, _egTickAilments } from './combat-ailments-core.js';
+import { _egMaybeShowLowHealthWarning } from './encounter-overlays.js';
+import { EG_MELEE_OVERCHARGE_RATIO, _egFireMonsterAttack, _egMeleeTierForCharge, _egOverchargeRateForTier, _egUpdateBars } from './encounter.js';
+import { _egHazardsTick } from './combat-hazards-lifecycle.js';
+import { _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
+import { _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
-import { cur } from '../state.js';
-
-//------------------------------------------------------------------------
-// Phase 3 step 7: live globalThis accessors for externally-mutated state.
-// (derived from write-site audit by dev/scratch/convert-endgame.mjs)
-//------------------------------------------------------------------------
-try { Object.defineProperty(globalThis, '_egLastMistakesRemaining', { get() { return _egLastMistakesRemaining; }, set(v) { _egLastMistakesRemaining = v; }, configurable: true }); } catch (e) {}
-try { Object.defineProperty(globalThis, '_egLastMistakesWarningShown', { get() { return _egLastMistakesWarningShown; }, set(v) { _egLastMistakesWarningShown = v; }, configurable: true }); } catch (e) {}
+import { _egCheckMistakeLimit, _egTickLifeRegen } from './encounter-tick-support.js';
 
 //  endgame-encounter-tick.js
 //  COMBAT TICK LOOP - extracted 2026-09-10 from endgame-encounter.js
@@ -25,10 +16,8 @@ try { Object.defineProperty(globalThis, '_egLastMistakesWarningShown', { get() {
 //  Loads AFTER endgame-encounter.js (its load-time code only touches
 //  window and its own definitions; runtime calls cross freely).
 //
-//------------------------------------------------------------------------
-//-------------------COMBAT TICK LOOP-------------------------------------
-//------------------------------------------------------------------------
-//------------------------------------------------------------------------
+// Encounter tick-loop owner: monster and player charge, melee feedback,
+// and the 10Hz encounter orchestration loop.
 
 // Advances a single monster's charge bar by one tick (0.1s at 10Hz).
 // Fires the monster's attack when the charge bar fills completely.
@@ -367,81 +356,6 @@ function _egSyncMeleeRootedVisual(rooted) {
 }
 
 
-export function _egGetMaxAllowedMistakes() {
-    // Hardcore: no mistake is allowed - overrides map limit and gear bonuses
-    if (typeof curMods !== 'undefined' && globalThis.curMods.hardcore) return 0;
-    const def = globalThis._egMapDef || cur;
-    if (!def || def.egMaxMistakes == null) return null;
-    const gearBonus = (typeof _egComputePlayerStats === 'function')
-        ? (_egComputePlayerStats().mistakeCount || 0) : 0;
-    return def.egMaxMistakes + gearBonus;
-}
-
-export function _egCheckMistakeLimit() {
-    const max = _egGetMaxAllowedMistakes();
-    if (max == null) return;
-    // Low-mistakes overlay - fires when only 3/2/1/0 remain (deduped inside)
-    if (typeof _egMaybeShowMistakesWarning === 'function') _egMaybeShowMistakesWarning();
-    if (typeof mistakeCount !== 'undefined' && globalThis.mistakeCount > max) {
-        // Central defeat handler - the player keeps the loot collected so far.
-        _egEndMapDefeated(t('eg_map_failed'), t('eg_too_many_mistakes'));
-    }
-}
-
-// ── Mistakes-remaining warning (center-grid overlay) ─────────────────────
-// Tracks the last remaining value so repeated HUD refreshes without a
-// count change do not re-fire the banner, and increases (eraser) do not
-// re-trigger a low-mistakes warning.
-let _egLastMistakesWarningShown = null;
-let _egLastMistakesRemaining = null;
-
-export function _egGetMistakesRemaining() {
-    const max = _egGetMaxAllowedMistakes();
-    if (max == null) return null;
-    const curCount = (typeof mistakeCount !== 'undefined') ? globalThis.mistakeCount : 0;
-    return max - curCount;
-}
-
-// Fallback when timer.js hasn't defined it (e.g. isolated test harness):
-// center-grid banners replace each other instead of stacking.
-if (typeof _egClearCenterGridBanners !== 'function') {
-    var _egClearCenterGridBanners = function (exceptId) {
-        var ids = [
-            'eg-low-time-warning-banner',
-            'eg-mistakes-warning-banner',
-            'eg-low-health-warning-banner',
-            'eg-absorption-broken-banner',
-            'eg-clock-call-banner',
-            'eg-boss-arena-available-banner',
-            'eg-map-cleared-banner'
-        ];
-        for (var i = 0; i < ids.length; i++) {
-            if (ids[i] === exceptId) continue;
-            const banner = document.getElementById(ids[i]);
-            if (banner) banner.remove();
-        }
-    };
-}
-
-
-// Gear: lifeRegen - heals the player for lifeRegen HP once per second
-// while an encounter is running. No-ops at full HP or when dead.
-export let _egLastLifeRegenAt = 0;
-export function _egTickLifeRegen() {
-    const now = Date.now();
-    if (now - _egLastLifeRegenAt < EG_LIFE_REGEN_INTERVAL_MS) return;
-    _egLastLifeRegenAt = now;
-
-    const regen = _egComputePlayerStats().lifeRegen || 0;
-    if (regen <= 0 || globalThis.playerCurrentHP <= 0 || globalThis.playerCurrentHP >= globalThis.playerMaxHP) return;
-
-    // Active map run: No Life Regeneration - gear regen is disabled.
-    if (typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration')) return;
-
-    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + regen);
-    if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
-}
-
 // Runs at 10Hz. Advances every monster's charge bar and fires their attack
 // when the bar fills. Also calls _egBossTick for per-tick boss logic.
 export function _egTickLoop() {
@@ -449,7 +363,7 @@ export function _egTickLoop() {
     if (typeof dead !== 'undefined' && globalThis.dead) return;
     if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
 
-    _egCheckMistakeLimit(); 
+    _egCheckMistakeLimit();
     _egMaybeShowLowHealthWarning();
 
     globalThis._egBossTick();
@@ -473,47 +387,4 @@ export function _egTickLoop() {
     //_renderPlayerCharge();
 
     _egUpdateBars();
-}
-
-// ── Pause handling for endgame encounters ────────────────────────────────
-// While the game is paused (Escape) the tick loop already early-returns,
-// freezing charge bars, soft-enrage via _egBossTick, hazards and ailments.
-// Date.now()-based expiries (boss spawn time, ailments, lockouts, etc.)
-// would otherwise keep advancing wall-clock time while paused, so we shift
-// them forward by the paused duration on resume.
-export let _egPauseStartedAt = 0;
-export function _egOnPause() {
-    if (typeof _egIsActive === 'function' && !_egIsActive()) return;
-    _egPauseStartedAt = Date.now();
-    if (typeof _egPauseGridDrops === 'function') {
-        try { _egPauseGridDrops(); } catch (e) {}
-    }
-}
-export function _egOnResume() {
-    if (!_egPauseStartedAt) return;
-    const delta = Date.now() - _egPauseStartedAt;
-    _egPauseStartedAt = 0;
-    if (delta <= 0) {
-        if (typeof _egResumeGridDrops === 'function') {
-            try { _egResumeGridDrops(); } catch (e) {}
-        }
-        return;
-    }
-    globalThis._egMonsters.forEach(m => {
-        if (m.bossSpawnTime) m.bossSpawnTime += delta;
-        if (m.staggeredUntil) m.staggeredUntil += delta;
-        if (m.statuses) Object.values(m.statuses).forEach(st => { if (st.until) st.until += delta; });
-    });
-    if (typeof window._egEncounterStartAt !== 'undefined' && window._egEncounterStartAt) window._egEncounterStartAt += delta;
-    if (typeof _egPlayerBlockLockoutUntil !== 'undefined' && globalThis._egPlayerBlockLockoutUntil) globalThis._egPlayerBlockLockoutUntil += delta;
-    if (typeof _egLastLifeRegenAt !== 'undefined' && _egLastLifeRegenAt) _egLastLifeRegenAt += delta;
-    if (typeof _egPlayerStatuses !== 'undefined' && _egPlayerStatuses) {
-        Object.values(_egPlayerStatuses).forEach(st => { if (st.until) st.until += delta; });
-    }
-    if (typeof _egPuzzleEffects !== 'undefined' && Array.isArray(_egPuzzleEffects)) {
-        _egPuzzleEffects.forEach(e => { if (e.until) e.until += delta; });
-    }
-    if (typeof _egResumeGridDrops === 'function') {
-        try { _egResumeGridDrops(); } catch (e) {}
-    }
 }

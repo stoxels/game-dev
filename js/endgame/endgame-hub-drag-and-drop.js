@@ -1,7 +1,10 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { EG_ART } from './endgame-art.js';
-import { _egCloseCraftingBench, _egRefreshCraftingBench, _egSetCraftingBenchItem } from '../loot/loot-crafting-bench.js';
-import { _egEssenceIdForSlot, _egRenderEssenceCell } from '../loot/loot-essences.js';
+import { _egCloseCraftingBench, _egRefreshCraftingBench } from '../loot/loot-crafting-bench-overlay.js';
+import { _egSetCraftingBenchItem } from '../loot/loot-crafting-bench-apply.js';
+import { _egCraftingBenchItem } from '../loot/loot-crafting-bench-state.js';
+import { _egEssenceIdForSlot } from '../loot/loot-essences.js';
+import { _egRenderEssenceCell } from '../loot/loot-essences-render.js';
 import { _egRenderMapSlot, _egRenderMapStash, _egRenderMapStashCell, _egSwitchMapStashTier } from './endgame-gate.js';
 import { _egClearTooltip } from './endgame-hub-tooltips.js';
 import { _egAddUniqueToCollection, _egUpdateUniqueTabBadge } from './endgame-hub-uniques.js';

@@ -1,16 +1,15 @@
-//------------------------------------------------------------------------
-// PHASE 4 split (2026-09-22): extracted from encounter-charged-shot.js so
-// the melee pipeline file stays under the split size guard. This module
-// owns the Secret-of-Mana-style overcharge tiers and their weapon arts;
-// encounter-charged-shot.js keeps the impact pipeline and calls in via
-// _egMeleeTierArt. See MIGRATION.md "splitting giants".
-//------------------------------------------------------------------------
+// Secret-of-Mana-style overcharge tiers and their weapon arts. This module
+// owns charge mapping, secondary damage, labels, and synchronous visuals;
+// encounter-melee-impact.js owns the impact pipeline. Sequenced avatar
+// movement lives in encounter-melee-delivery.js.
 
 import { t } from '../translation/translations.js';
 import { _egGetElementCentre } from './combat-class-projectiles.js';
-import { _egDamageTargetById, _egShowStatusLabel } from './encounter-damage.js';
+import { _egMeleeLeapTo } from './encounter-melee-delivery.js';
+import { _egDamageTargetById, _egShowStatusLabel } from './encounter-monster-damage.js';
 import { _egRestartFlashClass } from './encounter.js';
-import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egMeleeImpactThump, _egShowWeaponSwing, _egWeaponSwingSound } from './combat-weapon-swing.js';
+import { _egFacingFromVector, _egGetEquippedWeaponInfo } from './combat-weapon-swing-config.js';
+import { _egMeleeImpactThump, _egShowWeaponSwing, _egWeaponSwingSound } from './combat-weapon-swing.js';
 
 // Overcharge tuning (Secret-of-Mana-style weapon arts): the charge bar
 // auto-fills to 100% on its own (see _egTickPlayer in
@@ -37,200 +36,6 @@ export function _egOverchargeRateForTier(tier) {
     if (t < 0) t = 0;
     if (t >= bands.length) t = bands.length - 1;
     return bands[t];
-}
-
-//-------------------SEQUENCED DELIVERY (visible arts)--------------------
-// A released overcharge art (200%+) is DELIVERED: the avatar visibly
-// charges across the screen to the target, the hit animation plays ON
-// ARRIVAL (not at release), follow-up arts (sky leap) travel leg by leg,
-// and the avatar glides home afterwards. All legs are best-effort WAAPI
-// on #player-avatar-wrapper with timeout fallbacks so damage can never
-// get stuck behind a visual; without DOM / animation support (tests,
-// reduced-motion, teardown) every leg resolves instantly and callers fall
-// back to the synchronous path. Never throws.
-export const EG_MELEE_DELIVERY_OUT_MIN_MS = 550;
-export const EG_MELEE_DELIVERY_OUT_MAX_MS = 1150;
-export const EG_MELEE_DELIVERY_ARRIVAL_BEAT_MS = 170;
-export const EG_MELEE_DELIVERY_RETURN_MS = 550;
-export const EG_MELEE_DELIVERY_LEAP_MS = 700;
-
-function _egMeleeReducedMotion() {
-    try {
-        return !!(typeof window !== 'undefined' && window.matchMedia
-            && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    } catch (e) { return false; }
-}
-
-// True when a sequenced delivery can actually be seen: DOM avatar +
-// target card both present, WAAPI available, motion allowed. Everything
-// else (tests, reduced-motion, teardown) takes the instant path.
-export function _egMeleeDeliveryAvailable(targetId) {
-    try {
-        if (typeof document === 'undefined') return false;
-        if (_egMeleeReducedMotion()) return false;
-        const avatar = document.getElementById('player-avatar-wrapper');
-        const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
-        if (!avatar || !card) return false;
-        if (typeof avatar.animate !== 'function') return false;
-        return true;
-    } catch (e) { return false; }
-}
-
-function _egMeleeWaitMs(ms) {
-    return new Promise((resolve) => {
-        try { setTimeout(resolve, Math.max(0, ms || 0)); }
-        catch (e) { resolve(); }
-    });
-}
-
-// Cancels any in-flight avatar motion so each leg starts from the laid-out
-// position (no teleport snaps mid-sequence - legs are awaited one at
-// a time, so a cancel only ever cuts an already-finished leg short).
-function _egMeleeSnapAvatar() {
-    try {
-        const avatar = document.getElementById('player-avatar-wrapper');
-        if (avatar && typeof avatar.getAnimations === 'function') {
-            avatar.getAnimations().forEach((a) => { try { a.cancel(); } catch (e) {} });
-        }
-    } catch (e) {}
-}
-
-// Last visual offset left by _egMeleeFlyLeg (fill:forwards legs park the
-// avatar away from its laid-out spot); _egMeleeGlideHome animates back
-// from exactly there. Theatre-only state - never gates damage.
-let _egMeleeParkedOffset = { x: 0, y: 0 };
-
-// One flight leg: avatar glides from its laid-out spot toward the card's
-// current centre by (dx, dy) px screen-space. `arc` lifts the midpoint
-// (sky-leap hop), `scale` grows the sprite mid-flight. Resolves on finish
-// or on a safety timeout - never rejects, never throws.
-function _egMeleeFlyLeg(targetId, durationMs, arc, scale) {
-    try {
-        const avatar = document.getElementById('player-avatar-wrapper');
-        const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
-        if (!avatar || !card || typeof avatar.animate !== 'function') return Promise.resolve();
-        _egMeleeSnapAvatar();
-        const a = _egGetElementCentre(avatar);
-        const b = _egGetElementCentre(card);
-        // Aim to land ON the card, slightly short so the sprite overlaps
-        // its edge instead of hiding dead-centre behind it.
-        const dx = (b.x - a.x) * 0.82, dy = (b.y - a.y) * 0.82;
-        const dur = Math.max(120, Math.round(durationMs || 600));
-        const x1 = dx.toFixed(1), y1 = dy.toFixed(1);
-        const s1 = (scale && scale > 1) ? scale : 1;
-        let frames;
-        if (arc && arc > 0) {
-            frames = [
-                { transform: 'translate(0px, 0px) scale(1)' },
-                { transform: `translate(${(dx / 2).toFixed(1)}px, ${(dy / 2 - arc).toFixed(1)}px) scale(${((1 + s1) / 2).toFixed(3)})` },
-                { transform: `translate(${x1}px, ${y1}px) scale(${s1})` },
-            ];
-        } else {
-            frames = [
-                { transform: 'translate(0px, 0px) scale(1)' },
-                { transform: `translate(${x1}px, ${y1}px) scale(${s1})` },
-            ];
-        }
-        _egMeleeParkedOffset = { x: dx, y: dy };
-        let anim = null;
-        try { anim = avatar.animate(frames, { duration: dur, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)', fill: 'forwards' }); }
-        catch (e) { return Promise.resolve(); }
-        return new Promise((resolve) => {
-            let done = false;
-            const fin = () => { if (!done) { done = true; resolve(); } };
-            try {
-                if (anim && 'onfinish' in Object(anim)) anim.onfinish = fin;
-                else if (anim && anim.finished && typeof anim.finished.then === 'function') anim.finished.then(fin, fin);
-                else fin();
-            } catch (e) { fin(); }
-            setTimeout(fin, dur + 400);
-        });
-    } catch (e) { return Promise.resolve(); }
-}
-
-// Raises the avatar above monster cards for the flight (a dash that
-// passes UNDER the cards reads as "nothing happened") and returns a
-// restore function. Re-entrant: nested raises share one level.
-export function _egMeleeRaiseAvatar() {
-    try {
-        const avatar = document.getElementById('player-avatar-wrapper');
-        if (!avatar) return () => {};
-        if (avatar.dataset && avatar.dataset.egMeleeRaised === '1') return () => {};
-        if (avatar.dataset) avatar.dataset.egMeleeRaised = '1';
-        const prev = avatar.style.zIndex;
-        avatar.style.zIndex = '9999';
-        let done = false;
-        return () => {
-            if (done) return;
-            done = true;
-            try {
-                if (avatar.dataset) delete avatar.dataset.egMeleeRaised;
-                avatar.style.zIndex = prev;
-            } catch (e) {}
-        };
-    } catch (e) { return () => {}; }
-}
-
-// Delivery out-leg: charge the target across the screen at a readable
-// pace (far dashes take up to ~1.1s - no more teleport pops), then hold
-// a short arrival beat so the eye registers "the hero is THERE" before
-// the caller plays the hit. Resolves - never rejects.
-export function _egMeleeDashOut(targetId) {
-    try {
-        const avatar = document.getElementById('player-avatar-wrapper');
-        const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
-        if (!avatar || !card) return Promise.resolve();
-        const a = _egGetElementCentre(avatar);
-        const b = _egGetElementCentre(card);
-        const dist = Math.hypot(b.x - a.x, b.y - a.y) || 0;
-        const dur = Math.min(EG_MELEE_DELIVERY_OUT_MAX_MS,
-            Math.max(EG_MELEE_DELIVERY_OUT_MIN_MS, Math.round(420 + dist * 0.55)));
-        return _egMeleeFlyLeg(targetId, dur, 0, 1.08)
-            .then(() => _egMeleeWaitMs(EG_MELEE_DELIVERY_ARRIVAL_BEAT_MS));
-    } catch (e) { return Promise.resolve(); }
-}
-
-// Sky-leap leg: high visible arc onto the victim (the follow-up foe of a
-// 300%+ release). Resolves - never rejects.
-export function _egMeleeLeapTo(victimId) {
-    return _egMeleeFlyLeg(victimId, EG_MELEE_DELIVERY_LEAP_MS, 110, 1.18);
-}
-
-// Glide back to the laid-out spot and settle. Resolves - never rejects.
-export function _egMeleeGlideHome() {
-    try {
-        const avatar = document.getElementById('player-avatar-wrapper');
-        if (!avatar || typeof avatar.animate !== 'function') {
-            _egMeleeParkedOffset = { x: 0, y: 0 };
-            return Promise.resolve();
-        }
-        const ox = _egMeleeParkedOffset.x || 0, oy = _egMeleeParkedOffset.y || 0;
-        _egMeleeParkedOffset = { x: 0, y: 0 };
-        if (Math.hypot(ox, oy) < 1) {
-            _egMeleeSnapAvatar();
-            return Promise.resolve();
-        }
-        const dur = EG_MELEE_DELIVERY_RETURN_MS;
-        let anim = null;
-        try {
-            anim = avatar.animate([
-                { transform: `translate(${ox.toFixed(1)}px, ${oy.toFixed(1)}px)` },
-                { transform: 'translate(0px, 0px)' },
-            ], { duration: dur, easing: 'cubic-bezier(0.3, 0.6, 0.4, 1)' });
-        } catch (e) { _egMeleeSnapAvatar(); return Promise.resolve(); }
-        return new Promise((resolve) => {
-            let done = false;
-            const fin = () => {
-                if (!done) { done = true; _egMeleeSnapAvatar(); resolve(); }
-            };
-            try {
-                if (anim && 'onfinish' in Object(anim)) anim.onfinish = fin;
-                else if (anim && anim.finished && typeof anim.finished.then === 'function') anim.finished.then(fin, fin);
-                else fin();
-            } catch (e) { fin(); }
-            setTimeout(fin, dur + 400);
-        });
-    } catch (e) { return Promise.resolve(); }
 }
 
 // Weapon-art tier for a spent charge share (0..5): 0 = plain hit (below
@@ -339,6 +144,15 @@ export function _egMeleeTierArt(targetId, tier, rawHit, elements, wasCrit, opts)
         });
         if (grand) _egMeleeGrandFlash();
     }
+}
+
+// Waits for a frozen presentation beat inside the sequenced follow-through.
+// This private timing helper is separate from the avatar movement owner.
+function _egMeleeWaitMs(ms) {
+    return new Promise((resolve) => {
+        try { setTimeout(resolve, Math.max(0, ms || 0)); }
+        catch (e) { resolve(); }
+    });
 }
 
 // Sequenced follow-through for a delivered art (see _egMeleeTierArt): the

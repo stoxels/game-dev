@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/title-screen.css?v=4">
     <link rel="stylesheet" href="css/save-slots.css?v=4">
     <link rel="stylesheet" href="css/screens.css">
+    <link rel="stylesheet" href="css/world-proto.css?v=1">
     <link rel="stylesheet" href="css/game.css?v=3">
     <link rel="stylesheet" href="css/setup-screen.css?v=9">
     <link rel="stylesheet" href="css/inventory.css">
@@ -428,6 +429,14 @@
                 <button class="dms-card" id="btn-mode-endgame-test">
                     <div class="dms-card-title" data-t="scr_mode_endgame_test">🧪 Endgame</div>
                     <div class="dms-card-desc" data-t="scr_mode_endgame_test_desc">Test the upcoming Endgame Expansion.</div>
+                </button>
+
+                <!-- EXPERIMENTAL: self-contained world prototype. Isolated
+                     from the live game - see js/world-proto/world-proto.js.
+                     Not translated (deliberate: prototype copy, not shipped). -->
+                <button class="dms-card wp-proto-card" id="btn-world-proto">
+                    <div class="dms-card-title">🗺️ World Prototype</div>
+                    <div class="dms-card-desc">Experimental: walk around the Bayesian Bay painting.</div>
                 </button>
 
             </div>

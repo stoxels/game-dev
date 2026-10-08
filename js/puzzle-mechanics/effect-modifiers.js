@@ -39,8 +39,9 @@ export function _calcMarkWrongCount(baseCount) {
     let count = baseCount;
 
     // Passive: Stronger Marks - +1 per node
+    // (travel_stronger_marks_1 alias + stronger_marks_3; the middle node of
+    // the old trio, id 110, was reworked into notable_verdant_covenant)
     count += (ptHasSkill('stronger_marks_1') ? 1 : 0)
-        + (ptHasSkill('stronger_marks_2') ? 1 : 0)
         + (ptHasSkill('stronger_marks_3') ? 1 : 0);
 
     // Keystone: Curse Embrace - 50% weaker

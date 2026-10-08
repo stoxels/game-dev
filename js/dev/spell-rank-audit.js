@@ -1,4 +1,4 @@
-﻿import { switchScreen } from '../screens/screens.js';
+import { switchScreen } from '../screens/screens.js';
 import { t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from '../classes/ascendency-defs.js';
 import { ASCENDENCY_LIST } from '../classes/class-cooldown-state.js';

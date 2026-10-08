@@ -1,12 +1,10 @@
 //------------------------------------------------------------------------
-// PHASE 4 split (2026-09-16): extracted into a focused module. The original
-// path is now a facade that re-exports this module, so existing import sites
-// are unaffected. See MIGRATION.md "splitting giants".
+//-------------------EQUIPMENT BASE TYPE TABLES---------------------------
 //------------------------------------------------------------------------
-
-// Equipment base type tables, grouped by slot. Pure data: the per-slot
-// EG_BASE_TYPES_* arrays plus the arcane-wave IIFE that back-fills
-// procedural arcane bases at eval time. No DOM, no cross-module deps.
+// Every equipment base type, grouped by slot. Pure data: 16 exported arrays
+// plus a frozen gap-fill block that pushes the missing armour tiers into
+// them. No DOM, no cross-module imports, no generation at load.
+//------------------------------------------------------------------------
 
 
 
@@ -7364,6 +7362,6 @@ EG_BASE_TYPES_BELT.push(
 
 
 //------------------------------------------------------------------------
-// (stat requirements were rebalanced once and are now hard-defined on each
-// entry above - frozen 2026-09-21. The rebalance IIFE and its hybrid
-// synthesis were removed; the hybrids live in the frozen block above.)
+// Stat requirements were rebalanced once and are now hard-defined on each
+// entry above - frozen 2026-09-21. The old rebalance IIFE and its hybrid
+// synthesis are gone; the hybrids live in the frozen block above.

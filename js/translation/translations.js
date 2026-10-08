@@ -1,4 +1,4 @@
-﻿// Phase 3 step 2: REAL ES MODULE (tools/module-manifest.json) - imports the
+// Phase 3 step 2: REAL ES MODULE (tools/module-manifest.json) - imports the
 // dictionary T from translations-strings.js; exports the translation API
 // (t, LANG, setLang, ...) as entry-scope bindings for the concatenated core.
 import { T } from './translations-strings.js';
