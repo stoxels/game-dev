@@ -250,6 +250,18 @@ const _EG_PASSIVE_TREE_NOTABLE_BONUSES = {
     // natureResist for incoming 'nature' hits (The Sprout's vines, spores,
     // motes and dust bursts) under the same 75% cap as any gear resistance.
     notable_verdant_covenant: { natureDamageIncPct: 25, natureCastSpeedPct: 5, natureResistFlat: 15 },
+    // Reworked notable 20032 (Champion's Onslaught) - one channel per
+    // advertised line:
+    //   str             - rides the attribute totals (Str grants +2 Life and
+    //                     +1 Armour per point, see _egComputePlayerStats).
+    //   attackSpeedPct  - percentage sibling of the seconds-based attackSpeed
+    //                     bucket: shortens the manual melee charge (the game's
+    //                     attack cadence) in _egGetPlayerAttackIntervalBreakdown.
+    //   physDamageIncPct- passive-only "+% increased physical damage": scales
+    //                     ALL physical damage - the shared projectile/spell
+    //                     bucket (physIncPct) AND the melee bucket
+    //                     (meleePhysIncPct), never double-counted per hit.
+    notable_champion_s_onslaught: { str: 20, attackSpeedPct: 4, physDamageIncPct: 26 },
 };
 
 // Small pathing nodes previously had no stat channel at all - only travel
@@ -298,7 +310,7 @@ const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
 );
 
 function _egGetPassiveTreeTravelBonuses() {
-    const totals = { str: 0, agi: 0, int: 0, mana: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleeChargeSpeedPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, natureDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, natureCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, natureResistFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0 };
+    const totals = { str: 0, agi: 0, int: 0, mana: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleeChargeSpeedPct: 0, attackSpeedPct: 0, physDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, natureDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, natureCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, natureResistFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0 };
     const state = typeof globalThis.STATE !== 'undefined' ? globalThis.STATE : null;
     if (!state || !state.passiveTreeAllocated) return totals;
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;
@@ -324,6 +336,8 @@ function _egGetPassiveTreeTravelBonuses() {
         totals.absorptionRegenRatePct += bonus.absorptionRegenRatePct || 0;
         totals.spellDamageIncPct += bonus.spellDamageIncPct || 0;
         totals.meleeChargeSpeedPct += bonus.meleeChargeSpeedPct || 0;
+        totals.attackSpeedPct += bonus.attackSpeedPct || 0;
+        totals.physDamageIncPct += bonus.physDamageIncPct || 0;
         totals.meleePhysIncPct += bonus.meleePhysIncPct || 0;
         totals.elementalDamageIncPct += bonus.elementalDamageIncPct || 0;
         totals.fireDamageIncPct += bonus.fireDamageIncPct || 0;

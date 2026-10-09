@@ -17,6 +17,7 @@ const NODE_ID = 30195;        // Lesser Melee Force    +12% melee physical damag
 const NODE_MIGHT = 30194;     // Lesser Champion's Might  +16% melee physical damage
 const NODE_TEMPO = 30197;     // Lesser Champion's Tempo  +5% melee charge-up speed
 const NODE_WRATH = 30198;     // Lesser Warrior's Wrath   +12% melee physical damage
+const NODE_ONSLAUGHT = 20032; // Champion's Onslaught    notable: str/attack speed/physical damage
 
 function withAllocated(ids, fn) {
     const prev = STATE.passiveTreeAllocated;
@@ -57,6 +58,23 @@ try {
         statsBothMeleeNodes: withAllocated([NODE_ID, NODE_MIGHT], () => playerStats._egComputePlayerStats().meleePhysIncPct),
         meleeWithBoth: withAllocated([NODE_ID, NODE_MIGHT], () => combat._egCalcPlayerMeleeDamage(1)),
         projWithMight: withAllocated([NODE_MIGHT], () => combat._egCalcPlayerDamage()),
+
+        // Notable 20032 (Champion's Onslaught): three advertised lines.
+        strBonus: withAllocated([NODE_ONSLAUGHT], () => leveling._egSyncBaseAttributes().str),
+        strengthWithout: withAllocated([], () => playerStats._egComputePlayerStats().strength),
+        strengthWith: withAllocated([NODE_ONSLAUGHT], () => playerStats._egComputePlayerStats().strength),
+        healthWithout: withAllocated([], () => playerStats._egComputePlayerStats().health),
+        healthWith: withAllocated([NODE_ONSLAUGHT], () => playerStats._egComputePlayerStats().health),
+        attackSpeedPctWithout: withAllocated([], () => playerStats._egComputePlayerStats().attackSpeedPct),
+        attackSpeedPctWith: withAllocated([NODE_ONSLAUGHT], () => playerStats._egComputePlayerStats().attackSpeedPct),
+        intervalWithOnslaught: withAllocated([NODE_ONSLAUGHT], () => playerStats._egGetPlayerAttackIntervalBreakdown().interval),
+        intervalWithOnslaughtAndTempo: withAllocated([NODE_ONSLAUGHT, NODE_TEMPO], () => playerStats._egGetPlayerAttackIntervalBreakdown().interval),
+        attackSpeedSecondsWith: withAllocated([NODE_ONSLAUGHT], () => playerStats._egComputePlayerStats().attackSpeed),
+        physIncPctWithout: withAllocated([], () => playerStats._egComputePlayerStats().physIncPct),
+        physIncPctWith: withAllocated([NODE_ONSLAUGHT], () => playerStats._egComputePlayerStats().physIncPct),
+        meleePhysIncPctWith: withAllocated([NODE_ONSLAUGHT], () => playerStats._egComputePlayerStats().meleePhysIncPct),
+        projWithOnslaught: withAllocated([NODE_ONSLAUGHT], () => combat._egCalcPlayerDamage()),
+        meleeWithOnslaught: withAllocated([NODE_ONSLAUGHT], () => combat._egCalcPlayerMeleeDamage(1)),
 
         // Node 30198 (Lesser Warrior's Wrath): third melee-only % node.
         bonusWrath: withAllocated([NODE_WRATH], () => leveling._egSyncBaseAttributes().meleePhysIncPct),

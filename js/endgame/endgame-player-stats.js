@@ -637,7 +637,13 @@ export function _egComputePlayerStats() {
         accuracy: 0, mistakeCount: 0, focusPct: 0, mistakeNotCountPct: 0,
         revealHintPct: 0, chanceForNewQuestionPct: 0,
         critChance: 0, critMultiplierPct: 0,
-        physFlatMin: 0, physFlatMax: 0, physIncPct: 0,
+        physFlatMin: 0, physFlatMax: 0,
+        // "+% increased physical damage" from the passive tree (reworked
+        // notable 20032) seeds the shared projectile/spell bucket; the melee
+        // seed below adds the same percentage so a physical melee strike is
+        // never left out (each hit reads exactly one of the two buckets, so
+        // nothing is counted twice).
+        physIncPct: passiveTreeBonuses.physDamageIncPct || 0,
         fireDmgMin: 0, fireDmgMax: 0, coldDmgMin: 0, coldDmgMax: 0,
         lightningDmgMin: 0, lightningDmgMax: 0, shadowDmgMin: 0, shadowDmgMax: 0,
         // Melee-only damage channel - fed by the weapon slot's base damage
@@ -649,7 +655,8 @@ export function _egComputePlayerStats() {
         // gear "% increased Physical Damage" mods add on top via
         // EG_MELEE_BUCKET_MAP.
         meleePhysMin: 0, meleePhysMax: 0,
-        meleePhysIncPct: passiveTreeBonuses.meleePhysIncPct || 0,
+        meleePhysIncPct: (passiveTreeBonuses.meleePhysIncPct || 0)
+            + (passiveTreeBonuses.physDamageIncPct || 0),
         // Passive tree "+% increased melee attack charge-up speed" (reworked
         // node 30197). Unlike the absolute-seconds attackSpeed bucket that
         // gear feeds, this is a percentage applied to the melee charge time
@@ -697,6 +704,11 @@ export function _egComputePlayerStats() {
         ignitePct: 0, freezePct: 0, shockPct: 0, blindPct: 0, convertPct: 0,
         ailmentDurationPct: 0, ailmentEffectPct: 0,
         attackSpeed: 0, cleavePct: 0, piercePct: 0, snipePct: 0, chainPct: 0, splashPct: 0,
+        // Passive-tree percentage attack speed (reworked notable 20032):
+        // the seconds-based attackSpeed bucket above stays gear-only; this
+        // one shortens the melee charge proportionally in
+        // _egGetPlayerAttackIntervalBreakdown().
+        attackSpeedPct: passiveTreeBonuses.attackSpeedPct || 0,
         multishotPct: 0, pushbackFlat: 0, overkillPct: 0, staggerPct: 0, preemptiveDodgePct: 0,
         firstStepSeconds: 0, groundedChancePct: 0, groundedReductionPct: 0,
         shieldBashChancePct: 0, shieldBashDamageFlat: 0,
@@ -915,11 +927,14 @@ export function _egGetPlayerAttackIntervalBreakdown() {
         interval = Math.round(interval * EG_PLAYER_CHARGE_TIME_MULT * 100) / 100;
     }
 
-    // Passive tree "+% increased melee attack charge-up speed" (reworked node
-    // 30197, Lesser Champion's Tempo): a percentage shorter charge, applied on
-    // top of the global manual-pacing multiplier and before the map-run slow,
-    // so a slowed run still slows the charge down. 100% is the hard floor.
-    const chargeSpeedPct = stats.meleeChargeSpeedPct || 0;
+    // Passive-tree percentage attack-speed channels - the manual melee charge
+    // IS the game's attack cadence (see eg_statdesc_attackSpeed), so both
+    // "+% increased melee attack charge-up speed" (30197, Lesser Champion's
+    // Tempo) and the generic "+% increased Attack Speed" (20032, Champion's
+    // Onslaught) shorten the same interval; they add up as one percentage,
+    // applied on top of the global manual-pacing multiplier and before the
+    // map-run slow, so a slowed run still slows the charge down. 100% floor.
+    const chargeSpeedPct = (stats.meleeChargeSpeedPct || 0) + (stats.attackSpeedPct || 0);
     if (chargeSpeedPct > 0) {
         interval = Math.round(interval * (1 - Math.min(chargeSpeedPct, 100) / 100) * 10000) / 10000;
     }
@@ -1188,6 +1203,9 @@ export const EG_STAT_DISPLAY_LABELS = {
     // Melee charge-up speed (reworked node 30197): percentage shorter charge;
     // the resulting time is what the melee attackInterval line above shows.
     meleeChargeSpeedPct: { label: t('eg_stat_inc_melee_charge_speed'), suffix: '%' },
+    // Generic passive-tree attack speed (reworked notable 20032), the
+    // percentage sibling of the seconds-based attackSpeed line above.
+    attackSpeedPct: { label: t('eg_stat_inc_attack_speed'), suffix: '%' },
     spellDamageFlat: { label: t('eg_stat_spell_damage'), suffix: '' },
     spellDamageIncPct: { label: t('eg_stat_inc_spell_damage'), suffix: '%' },
     elementalDamageIncPct: { label: t('eg_stat_inc_elemental_damage'), suffix: '%' },
@@ -1279,7 +1297,8 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange', 'meleeShadowRange', 'meleePhysIncPct', 'meleeChargeSpeedPct'] },
+            'meleeLightningRange', 'meleeShadowRange', 'meleePhysIncPct', 'meleeChargeSpeedPct',
+            'attackSpeedPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',

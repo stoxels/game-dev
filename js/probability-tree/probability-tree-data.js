@@ -5987,12 +5987,12 @@ export const TALENT_TREE_DATA = {
    "id": 20032,
    "x": -1455,
    "y": 589,
-   "nameEn": "Champion's Vigor",
-   "nameDe": "Tatkraft des Champions",
-   "descEn": "+30 maximum Health, +3% Attack speed.",
-   "descDe": "+30 max. Leben, +3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_champion_s_vigor",
+   "nameEn": "Champion's Onslaught",
+   "nameDe": "Ansturm des Champions",
+   "descEn": "+4% increased Attack Speed\n+20 to Strength\n+26% increased Physical Damage",
+   "descDe": "+4% erhöhte Angriffsgeschwindigkeit\n+20 Stärke\n+26% erhöhter physischer Schaden",
+   "icon": "",
+   "statKey": "notable_champion_s_onslaught",
    "tier": "notable"
   },
   {

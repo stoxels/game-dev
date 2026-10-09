@@ -121,7 +121,10 @@ test('30197: +5% shortens the melee charge time and leaves gear attack speed alo
 test('char sheet can display both new buckets (label + layout + tooltip keys, EN/DE)', () => {
     const stats = fs.readFileSync(path.join(ROOT, 'js', 'endgame', 'endgame-player-stats.js'), 'utf8');
     assert.ok(stats.includes("meleeChargeSpeedPct: { label: t('eg_stat_inc_melee_charge_speed')"), 'charge-speed label missing');
-    assert.ok(stats.includes("'meleePhysIncPct', 'meleeChargeSpeedPct'] },"), 'buckets missing from EG_STAT_LAYOUT');
+    const meleeLayout = stats.slice(stats.indexOf("catKey: 'eg_statcat_melee'"), stats.indexOf("catKey: 'eg_statcat_projectiles'"));
+    for (const bucket of ["'meleePhysIncPct'", "'meleeChargeSpeedPct'"]) {
+        assert.ok(meleeLayout.includes(bucket), `${bucket} missing from the Melee Strikes layout`);
+    }
     assert.ok(stats.includes('MELEE_DESC_KEYS'), 'melee-only tooltip keys must override the shared melee derivation');
 
     const tr = fs.readFileSync(path.join(ROOT, 'js', 'translation', 'translations-strings.js'), 'utf8');
