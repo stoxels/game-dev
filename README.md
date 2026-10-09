@@ -42,3 +42,8 @@ Reworking a node (full replace, never an append) follows the order enforced by
 3. Run the full gate: `npm run lint && npm test && npm run phase2:verify && npm run build`.
 4. Only after it passes, add the node ID to `PT_REWORKED_NODE_IDS`
    in `js/probability-tree/probability-tree-rework.js`.
+
+The same steps - including the exact commands above - are embedded in the
+rework template the Passive Tree Editor copies for every un-reworked node
+(`_ptBuildReworkNodeTemplate` in `js/probability-tree/probability-tree-ui.js`),
+so the workflow travels with the node.

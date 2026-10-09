@@ -843,7 +843,11 @@ function _ptBuildReworkNodeTemplate(id) {
         '  - new name, new EN/DE description with one stat per line, its own statKey, and real passive art or an art-backlog entry (never an emoji)',
         '  - keep the numeric Node ID above; do NOT add text to the old description shown here',
         '  - wire every advertised line to real gameplay, and audit every consumer before renaming a shared statKey',
-        '  - only after lint, tests, phase2:verify and build pass: add this ID to PT_REWORKED_NODE_IDS',
+        '  - run the repo gate before registering the rework (fresh clone: npm ci, then all four must pass):',
+        '      npm run lint && npm test && npm run phase2:verify && npm run build',
+        '    (npm run verify = lint + tests + phase2:verify; .github/workflows/ci.yml',
+        '    runs this same gate on every push/PR - see README.md, Passive tree reworks)',
+        '  - only after the gate passes: add this ID to PT_REWORKED_NODE_IDS',
         '',
         'The node shall receive the following FULL rework:'
     );
