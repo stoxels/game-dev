@@ -13,7 +13,9 @@ const playerStats = await import('../../../js/endgame/endgame-player-stats.js');
 const combat = await import('../../../js/combat/combat-calculations.js');
 
 const STATE = globalThis.STATE;
-const NODE_ID = 30195;
+const NODE_ID = 30195;        // Lesser Melee Force    +12% melee physical damage
+const NODE_MIGHT = 30194;     // Lesser Champion's Might  +16% melee physical damage
+const NODE_TEMPO = 30197;     // Lesser Champion's Tempo  +5% melee charge-up speed
 
 function withAllocated(ids, fn) {
     const prev = STATE.passiveTreeAllocated;
@@ -25,7 +27,12 @@ const prevRandom = Math.random;
 const prevEquipped = globalThis._egEquipped;
 Math.random = () => 0; // deterministic: always roll the range minimum
 globalThis._egEquipped = {
-    weapon1: { slotType: 'weapon', damage: { min: 100, max: 150 }, mods: [], implicits: [] },
+    // attackIntervalSeconds gives the manual-strike charge channel a clean
+    // 4s base (interval = 4 * EG_PLAYER_CHARGE_TIME_MULT(0.65) = 2.6s).
+    weapon1: {
+        slotType: 'weapon', damage: { min: 100, max: 150 },
+        attackIntervalSeconds: 4, mods: [], implicits: [],
+    },
 };
 
 let out;
@@ -40,6 +47,24 @@ try {
         meleeWith: withAllocated([NODE_ID], () => combat._egCalcPlayerMeleeDamage(1)),
         projWithout: withAllocated([], () => combat._egCalcPlayerDamage()),
         projWith: withAllocated([NODE_ID], () => combat._egCalcPlayerDamage()),
+
+        // Node 30194 (Lesser Champion's Might): same melee-only % channel.
+        bonusMight: withAllocated([NODE_MIGHT], () => leveling._egSyncBaseAttributes().meleePhysIncPct),
+        statsMight: withAllocated([NODE_MIGHT], () => playerStats._egComputePlayerStats().meleePhysIncPct),
+        meleeWithMight: withAllocated([NODE_MIGHT], () => combat._egCalcPlayerMeleeDamage(1)),
+        // Both melee-damage nodes allocated at once stack additively (12 + 16).
+        statsBothMeleeNodes: withAllocated([NODE_ID, NODE_MIGHT], () => playerStats._egComputePlayerStats().meleePhysIncPct),
+        meleeWithBoth: withAllocated([NODE_ID, NODE_MIGHT], () => combat._egCalcPlayerMeleeDamage(1)),
+        projWithMight: withAllocated([NODE_MIGHT], () => combat._egCalcPlayerDamage()),
+
+        // Node 30197 (Lesser Champion's Tempo): percentage faster melee charge.
+        chargeSpeedWithout: withAllocated([], () => playerStats._egComputePlayerStats().meleeChargeSpeedPct),
+        chargeSpeedWith: withAllocated([NODE_TEMPO], () => playerStats._egComputePlayerStats().meleeChargeSpeedPct),
+        intervalWithout: withAllocated([], () => playerStats._egGetPlayerAttackIntervalBreakdown().interval),
+        intervalWith: withAllocated([NODE_TEMPO], () => playerStats._egGetPlayerAttackIntervalBreakdown().interval),
+        // The charge speed must not touch the gear-driven absolute-seconds
+        // attackSpeed bucket (gear keeps its own channel).
+        attackSpeedWith: withAllocated([NODE_TEMPO], () => playerStats._egComputePlayerStats().attackSpeed),
     };
 } finally {
     Math.random = prevRandom;

@@ -644,11 +644,17 @@ export function _egComputePlayerStats() {
         // range and its "… to Melee Strikes" mods. Projectiles (cell reveals /
         // class abilities) read the shared buckets above; unscoped slots
         // (bracers/rings/amulet) feed BOTH channels.
-        // The % bucket is seeded by the passive tree (reworked node 30195,
-        // Lesser Melee Force: +12% increased melee physical damage) and gear
-        // "% increased Physical Damage" mods add on top via EG_MELEE_BUCKET_MAP.
+        // The % bucket is seeded by the passive tree (reworked nodes 30195
+        // Lesser Melee Force +12% and 30194 Lesser Champion's Might +16%) and
+        // gear "% increased Physical Damage" mods add on top via
+        // EG_MELEE_BUCKET_MAP.
         meleePhysMin: 0, meleePhysMax: 0,
         meleePhysIncPct: passiveTreeBonuses.meleePhysIncPct || 0,
+        // Passive tree "+% increased melee attack charge-up speed" (reworked
+        // node 30197). Unlike the absolute-seconds attackSpeed bucket that
+        // gear feeds, this is a percentage applied to the melee charge time
+        // by _egGetPlayerAttackIntervalBreakdown() below. Nothing else reads it.
+        meleeChargeSpeedPct: passiveTreeBonuses.meleeChargeSpeedPct || 0,
         meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
         meleeLightningMin: 0, meleeLightningMax: 0,
         meleeShadowMin: 0, meleeShadowMax: 0,
@@ -899,13 +905,23 @@ export function _egGetPlayerAttackIntervalBreakdown() {
             base = Math.round((defBase / (Number(weapon.attacksPerSecond) || 1)) * 100) / 100;
         }
     }
-    const reduction = _egComputePlayerStats().attackSpeed || 0;
+    const stats = _egComputePlayerStats();
+    const reduction = stats.attackSpeed || 0;
     let interval = Math.round(Math.max(EG_PLAYER_MIN_ATTACK_INTERVAL, base - reduction) * 100) / 100;
 
     // Manual pacing: the old auto-strike intervals become time-to-full-charge,
     // shortened globally so manual combat feels responsive.
     if (typeof EG_PLAYER_CHARGE_TIME_MULT !== 'undefined') {
         interval = Math.round(interval * EG_PLAYER_CHARGE_TIME_MULT * 100) / 100;
+    }
+
+    // Passive tree "+% increased melee attack charge-up speed" (reworked node
+    // 30197, Lesser Champion's Tempo): a percentage shorter charge, applied on
+    // top of the global manual-pacing multiplier and before the map-run slow,
+    // so a slowed run still slows the charge down. 100% is the hard floor.
+    const chargeSpeedPct = stats.meleeChargeSpeedPct || 0;
+    if (chargeSpeedPct > 0) {
+        interval = Math.round(interval * (1 - Math.min(chargeSpeedPct, 100) / 100) * 10000) / 10000;
     }
 
     // Active map run: Temporal Chains - you act #% slower.
@@ -1169,6 +1185,9 @@ export const EG_STAT_DISPLAY_LABELS = {
     // % physical mods on melee slots. Scaled onto melee strikes only
     // (see _egCalcPlayerMeleeDamage); the projectile channel never reads it.
     meleePhysIncPct: { label: t('eg_stat_inc_melee_phys_dmg'), suffix: '%' },
+    // Melee charge-up speed (reworked node 30197): percentage shorter charge;
+    // the resulting time is what the melee attackInterval line above shows.
+    meleeChargeSpeedPct: { label: t('eg_stat_inc_melee_charge_speed'), suffix: '%' },
     spellDamageFlat: { label: t('eg_stat_spell_damage'), suffix: '' },
     spellDamageIncPct: { label: t('eg_stat_inc_spell_damage'), suffix: '%' },
     elementalDamageIncPct: { label: t('eg_stat_inc_elemental_damage'), suffix: '%' },
@@ -1260,7 +1279,7 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange', 'meleeShadowRange', 'meleePhysIncPct'] },
+            'meleeLightningRange', 'meleeShadowRange', 'meleePhysIncPct', 'meleeChargeSpeedPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
@@ -1459,8 +1478,15 @@ export function _egBuildStatLine(bucket, stats) {
     line.bucket = bucket;
     // Melee damage ranges share tooltips with their projectile counterparts
     // (eg_statdesc_meleeFireRange does not exist - fall back to eg_statdesc_fireRange)
+    // Melee-only percentage stats whose non-melee counterpart means something
+    // broader (physIncPct = ALL physical damage) carry their own description
+    // key; the melee damage RANGES keep sharing their projectile counterpart.
+    const MELEE_DESC_KEYS = {
+        meleePhysIncPct: 'eg_statdesc_meleePhysIncPct',
+        meleeChargeSpeedPct: 'eg_statdesc_meleeChargeSpeedPct',
+    };
     const descBucket = bucket.startsWith('melee') ? bucket.charAt(5).toLowerCase() + bucket.slice(6) : bucket;
-    line.descKey = `eg_statdesc_${descBucket}`;
+    line.descKey = MELEE_DESC_KEYS[bucket] || `eg_statdesc_${descBucket}`;
     return line;
 }
 
