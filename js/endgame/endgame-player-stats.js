@@ -609,7 +609,11 @@ export function _egComputePlayerStats() {
         // chance to avoid ailments while a hold-to-cast is running.
         allElementalResist: passiveTreeBonuses.allElementalResist || 0,
         castingAilmentAvoidPct: passiveTreeBonuses.castingAilmentAvoidPct || 0,
-        armourFlat: 0, armourIncPct: 0,
+        // Flat Armour from the passive tree (reworked node 30516, Bulwark
+        // Endurance) seeds the very same bucket gear and the Str side-effect
+        // feed into, so it aggregates with them and passes through the same
+        // final armour formula at the end of this function.
+        armourFlat: passiveTreeBonuses.armourFlat || 0, armourIncPct: 0,
         evasionFlat: 0, evasionIncPct: 0,
         absorptionFlat: passiveTreeBonuses.absorptionFlat || 0,
         absorptionIncPct: passiveTreeBonuses.absorptionIncPct || 0,

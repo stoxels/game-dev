@@ -301,6 +301,13 @@ const _EG_PASSIVE_TREE_SMALL_BONUSES = {
     // manual melee strike (_egCalcPlayerMeleeDamage), never projectiles
     // or spells.
     small_lesser_warrior_s_wrath: { meleePhysIncPct: 12 },
+    // Reworked node 30516 (Bulwark Endurance): flat Armour seeds the very
+    // same bucket gear and the Str side-effect feed into, so it aggregates
+    // with them and goes through the identical final armour formula
+    // (armourFlat -> * (1 + armourIncPct/100), then map-run penalties).
+    // The maximum-Life percentage rides the existing healthIncPct bucket that
+    // endgame-player-stats.js multiplies the fully aggregated flat pool with.
+    small_bulwark_endurance: { armourFlat: 30, healthIncPct: 5 },
 };
 
 const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
@@ -310,7 +317,7 @@ const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
 );
 
 function _egGetPassiveTreeTravelBonuses() {
-    const totals = { str: 0, agi: 0, int: 0, mana: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleeChargeSpeedPct: 0, attackSpeedPct: 0, physDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, natureDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, natureCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, natureResistFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0 };
+    const totals = { str: 0, agi: 0, int: 0, mana: 0, armourFlat: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleeChargeSpeedPct: 0, attackSpeedPct: 0, physDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, natureDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, natureCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, natureResistFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0 };
     const state = typeof globalThis.STATE !== 'undefined' ? globalThis.STATE : null;
     if (!state || !state.passiveTreeAllocated) return totals;
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;
@@ -332,6 +339,7 @@ function _egGetPassiveTreeTravelBonuses() {
         totals.int += bonus.int || 0;
         totals.mana += bonus.mana || 0;
         totals.absorptionFlat += bonus.absorptionFlat || 0;
+        totals.armourFlat += bonus.armourFlat || 0;
         totals.absorptionIncPct += bonus.absorptionIncPct || 0;
         totals.absorptionRegenRatePct += bonus.absorptionRegenRatePct || 0;
         totals.spellDamageIncPct += bonus.spellDamageIncPct || 0;

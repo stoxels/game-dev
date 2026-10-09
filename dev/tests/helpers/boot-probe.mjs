@@ -18,6 +18,8 @@ const NODE_MIGHT = 30194;     // Lesser Champion's Might  +16% melee physical da
 const NODE_TEMPO = 30197;     // Lesser Champion's Tempo  +5% melee charge-up speed
 const NODE_WRATH = 30198;     // Lesser Warrior's Wrath   +12% melee physical damage
 const NODE_ONSLAUGHT = 20032; // Champion's Onslaught    notable: str/attack speed/physical damage
+const NODE_BULWARK = 30516;   // Bulwark Endurance       +30 Armour, +5% increased maximum Life
+const NODE_VITAL = 31478;     // small_vital_reserve: pre-existing +5% maximum Life node
 
 function withAllocated(ids, fn) {
     const prev = STATE.passiveTreeAllocated;
@@ -93,6 +95,22 @@ try {
         // The charge speed must not touch the gear-driven absolute-seconds
         // attackSpeed bucket (gear keeps its own channel).
         attackSpeedWith: withAllocated([NODE_TEMPO], () => playerStats._egComputePlayerStats().attackSpeed),
+
+        // Node 30516 (Bulwark Endurance): +30 Armour, +5% increased max Life.
+        bonusArmourFlat: withAllocated([NODE_BULWARK], () => leveling._egSyncBaseAttributes().armourFlat),
+        bonusHealthIncPct: withAllocated([NODE_BULWARK], () => leveling._egSyncBaseAttributes().healthIncPct),
+        bonusArmourFlatWithout: withAllocated([], () => leveling._egSyncBaseAttributes().armourFlat),
+        armourFlatWithout: withAllocated([], () => playerStats._egComputePlayerStats().armourFlat),
+        armourFlatWith: withAllocated([NODE_BULWARK], () => playerStats._egComputePlayerStats().armourFlat),
+        armourWithout: withAllocated([], () => playerStats._egComputePlayerStats().armour),
+        armourWith: withAllocated([NODE_BULWARK], () => playerStats._egComputePlayerStats().armour),
+        healthIncPctWithout: withAllocated([], () => playerStats._egComputePlayerStats().healthIncPct),
+        healthIncPctWith: withAllocated([NODE_BULWARK], () => playerStats._egComputePlayerStats().healthIncPct),
+        healthWithBulwark: withAllocated([NODE_BULWARK], () => playerStats._egComputePlayerStats().health),
+        // Stacks with the pre-existing +5% max Life small node 31478.
+        healthIncPctBulwarkAndVital: withAllocated([NODE_BULWARK, NODE_VITAL], () => playerStats._egComputePlayerStats().healthIncPct),
+        healthBulwarkAndVital: withAllocated([NODE_BULWARK, NODE_VITAL], () => playerStats._egComputePlayerStats().health),
+        healthVitalOnly: withAllocated([NODE_VITAL], () => playerStats._egComputePlayerStats().health),
     };
 } finally {
     Math.random = prevRandom;

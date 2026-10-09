@@ -11123,12 +11123,12 @@ export const TALENT_TREE_DATA = {
    "id": 30516,
    "x": -1083,
    "y": 809,
-   "nameEn": "Bulwark March",
-   "nameDe": "Bollwerksmarsch",
-   "descEn": "+2% Movement speed, +10 Armour.",
-   "descDe": "+2% Bewegungsgeschwindigkeit, +10 Rüstung.",
-   "icon": "○",
-   "statKey": "small_bulwark_march",
+   "nameEn": "Bulwark Endurance",
+   "nameDe": "Bollwerk-Ausdauer",
+   "descEn": "+30 Armour\n+5% increased maximum Life",
+   "descDe": "+30 Rüstung\n+5% erhöhtes maximales Leben",
+   "icon": "",
+   "statKey": "small_bulwark_endurance",
    "tier": "small"
   },
   {
