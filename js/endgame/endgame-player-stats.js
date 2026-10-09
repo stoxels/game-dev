@@ -640,11 +640,15 @@ export function _egComputePlayerStats() {
         physFlatMin: 0, physFlatMax: 0, physIncPct: 0,
         fireDmgMin: 0, fireDmgMax: 0, coldDmgMin: 0, coldDmgMax: 0,
         lightningDmgMin: 0, lightningDmgMax: 0, shadowDmgMin: 0, shadowDmgMax: 0,
-        // Melee-only damage channel - fed exclusively by the weapon slot's
-        // base damage range and its "… to Melee Strikes" mods. Projectiles
-        // (cell reveals / class abilities) read the shared buckets above;
-        // unscoped slots (bracers/rings/amulet) feed BOTH channels.
-        meleePhysMin: 0, meleePhysMax: 0, meleePhysIncPct: 0,
+        // Melee-only damage channel - fed by the weapon slot's base damage
+        // range and its "… to Melee Strikes" mods. Projectiles (cell reveals /
+        // class abilities) read the shared buckets above; unscoped slots
+        // (bracers/rings/amulet) feed BOTH channels.
+        // The % bucket is seeded by the passive tree (reworked node 30195,
+        // Lesser Melee Force: +12% increased melee physical damage) and gear
+        // "% increased Physical Damage" mods add on top via EG_MELEE_BUCKET_MAP.
+        meleePhysMin: 0, meleePhysMax: 0,
+        meleePhysIncPct: passiveTreeBonuses.meleePhysIncPct || 0,
         meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
         meleeLightningMin: 0, meleeLightningMax: 0,
         meleeShadowMin: 0, meleeShadowMax: 0,
@@ -1161,6 +1165,10 @@ export const EG_STAT_DISPLAY_LABELS = {
     critMultiplierPct: { label: t('eg_stat_crit_multi'), suffix: '%' },
 
     physIncPct: { label: t('eg_stat_inc_phys_dmg'), suffix: '%' },
+    // Melee-only sibling of physIncPct: passive tree node 30195 plus gear
+    // % physical mods on melee slots. Scaled onto melee strikes only
+    // (see _egCalcPlayerMeleeDamage); the projectile channel never reads it.
+    meleePhysIncPct: { label: t('eg_stat_inc_melee_phys_dmg'), suffix: '%' },
     spellDamageFlat: { label: t('eg_stat_spell_damage'), suffix: '' },
     spellDamageIncPct: { label: t('eg_stat_inc_spell_damage'), suffix: '%' },
     elementalDamageIncPct: { label: t('eg_stat_inc_elemental_damage'), suffix: '%' },
@@ -1252,7 +1260,7 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange', 'meleeShadowRange'] },
+            'meleeLightningRange', 'meleeShadowRange', 'meleePhysIncPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',

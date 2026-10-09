@@ -7271,12 +7271,12 @@ export const TALENT_TREE_DATA = {
    "id": 30195,
    "x": -1199,
    "y": 589,
-   "nameEn": "Lesser Moment Reserves",
-   "nameDe": "Zeitreserven (klein)",
-   "descEn": "Timer items grant 5% more time. Stacks with Time Weavers and Chrono Extension. +3% Armour.",
-   "descDe": "Timer-Gegenstände gewähren 5% mehr Zeit. Wirkt zusammen mit Zeitwebern und Chrono-Verlängerung. +3% Rüstung.",
-   "icon": "⏳",
-   "statKey": "small_lesser_moment_reserves",
+   "nameEn": "Lesser Melee Force",
+   "nameDe": "Nahkampfkraft (klein)",
+   "descEn": "+12% increased melee physical damage.",
+   "descDe": "+12% physischer Nahkampfschaden.",
+   "icon": "",
+   "statKey": "small_lesser_melee_force",
    "tier": "small"
   },
   {

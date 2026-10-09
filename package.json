@@ -1,0 +1,23 @@
+{
+  "name": "stoxels",
+  "version": "0.29.0",
+  "private": true,
+  "type": "module",
+  "description": "STOXELS - probability puzzle game (repo tooling: lint, tests, phase2 build)",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "node --test \"dev/tests/*.test.mjs\"",
+    "build": "node tools/prepare-phase2.mjs",
+    "phase2:verify": "node tools/prepare-phase2.mjs --check",
+    "verify": "npm run lint && npm test && npm run phase2:verify"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "jsdom": "^30.1.2"
+  }
+}

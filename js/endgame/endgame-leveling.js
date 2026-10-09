@@ -268,6 +268,12 @@ const _EG_PASSIVE_TREE_SMALL_BONUSES = {
     // channels at small strength. absorptionFlat/mana are already read by
     // endgame-player-stats.js, so no new plumbing is needed.
     small_arcane_bulwark: { absorptionFlat: 10, mana: 10 },
+    // Reworked node 30195 (Lesser Melee Force): a melee-only "% increased"
+    // channel. Seeded into stats.meleePhysIncPct by endgame-player-stats.js
+    // and multiplied onto the physical share of every manual melee strike in
+    // _egCalcPlayerMeleeDamage() (combat-calculations.js). Projectiles and
+    // spells never read it.
+    small_lesser_melee_force: { meleePhysIncPct: 12 },
 };
 
 const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
@@ -277,7 +283,7 @@ const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
 );
 
 function _egGetPassiveTreeTravelBonuses() {
-    const totals = { str: 0, agi: 0, int: 0, mana: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, natureDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, natureCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, natureResistFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0 };
+    const totals = { str: 0, agi: 0, int: 0, mana: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, natureDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, natureCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, natureResistFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0 };
     const state = typeof globalThis.STATE !== 'undefined' ? globalThis.STATE : null;
     if (!state || !state.passiveTreeAllocated) return totals;
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;
@@ -302,6 +308,7 @@ function _egGetPassiveTreeTravelBonuses() {
         totals.absorptionIncPct += bonus.absorptionIncPct || 0;
         totals.absorptionRegenRatePct += bonus.absorptionRegenRatePct || 0;
         totals.spellDamageIncPct += bonus.spellDamageIncPct || 0;
+        totals.meleePhysIncPct += bonus.meleePhysIncPct || 0;
         totals.elementalDamageIncPct += bonus.elementalDamageIncPct || 0;
         totals.fireDamageIncPct += bonus.fireDamageIncPct || 0;
         totals.coldDamageIncPct += bonus.coldDamageIncPct || 0;
