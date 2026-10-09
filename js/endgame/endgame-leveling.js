@@ -284,6 +284,11 @@ const _EG_PASSIVE_TREE_SMALL_BONUSES = {
     // endgame-player-stats.js - the manual-strike charge channel used by
     // encounter-tick.js (charge accumulation) and player_sprite.js (bar).
     small_lesser_champion_s_tempo: { meleeChargeSpeedPct: 5 },
+    // Reworked node 30198 (Lesser Warrior's Wrath): the third melee-only
+    // "% increased" small node - multiplies the physical share of every
+    // manual melee strike (_egCalcPlayerMeleeDamage), never projectiles
+    // or spells.
+    small_lesser_warrior_s_wrath: { meleePhysIncPct: 12 },
 };
 
 const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(

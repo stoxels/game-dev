@@ -16,6 +16,7 @@ const STATE = globalThis.STATE;
 const NODE_ID = 30195;        // Lesser Melee Force    +12% melee physical damage
 const NODE_MIGHT = 30194;     // Lesser Champion's Might  +16% melee physical damage
 const NODE_TEMPO = 30197;     // Lesser Champion's Tempo  +5% melee charge-up speed
+const NODE_WRATH = 30198;     // Lesser Warrior's Wrath   +12% melee physical damage
 
 function withAllocated(ids, fn) {
     const prev = STATE.passiveTreeAllocated;
@@ -56,6 +57,15 @@ try {
         statsBothMeleeNodes: withAllocated([NODE_ID, NODE_MIGHT], () => playerStats._egComputePlayerStats().meleePhysIncPct),
         meleeWithBoth: withAllocated([NODE_ID, NODE_MIGHT], () => combat._egCalcPlayerMeleeDamage(1)),
         projWithMight: withAllocated([NODE_MIGHT], () => combat._egCalcPlayerDamage()),
+
+        // Node 30198 (Lesser Warrior's Wrath): third melee-only % node.
+        bonusWrath: withAllocated([NODE_WRATH], () => leveling._egSyncBaseAttributes().meleePhysIncPct),
+        statsWrath: withAllocated([NODE_WRATH], () => playerStats._egComputePlayerStats().meleePhysIncPct),
+        meleeWithWrath: withAllocated([NODE_WRATH], () => combat._egCalcPlayerMeleeDamage(1)),
+        projWithWrath: withAllocated([NODE_WRATH], () => combat._egCalcPlayerDamage()),
+        // All three melee-damage small nodes allocated at once: 12 + 16 + 12.
+        statsAllMeleeNodes: withAllocated([NODE_ID, NODE_MIGHT, NODE_WRATH], () => playerStats._egComputePlayerStats().meleePhysIncPct),
+        meleeWithAllMeleeNodes: withAllocated([NODE_ID, NODE_MIGHT, NODE_WRATH], () => combat._egCalcPlayerMeleeDamage(1)),
 
         // Node 30197 (Lesser Champion's Tempo): percentage faster melee charge.
         chargeSpeedWithout: withAllocated([], () => playerStats._egComputePlayerStats().meleeChargeSpeedPct),

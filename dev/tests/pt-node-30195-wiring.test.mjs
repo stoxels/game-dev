@@ -40,11 +40,13 @@ test('node 30195 was reworked from scratch (name, stats, own statKey, no icon)',
     assert.equal(node.tier, 'small');
 });
 
-test('old shared statKey audit - 30195 renamed away, everything else untouched', () => {
-    // The old key was SHARED with node 30198, which keeps it (not reworked).
+test('old shared statKey audit - retired from the tree, no consumer left', () => {
+    // The key was SHARED with node 30198 (the rework of 30195 renamed only
+    // this node); 30198 has since been reworked too, so the key is now fully
+    // retired - nothing in the tree may still carry it.
     const oldKeyHolders = TALENT_TREE_DATA.nodes.filter(n => n.statKey === OLD_KEY).map(n => n.id);
     assert.ok(!oldKeyHolders.includes(NODE_ID), '30195 must not keep the old statKey');
-    assert.ok(oldKeyHolders.length >= 1, `the old key must stay on its other node(s): got ${oldKeyHolders}`);
+    assert.deepEqual(oldKeyHolders, [], `old statKey ${OLD_KEY} must be retired: still on ${oldKeyHolders}`);
 
     // No consumer anywhere may reference the old key for gameplay - the
     // rename has to be a no-op for every other system.
