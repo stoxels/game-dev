@@ -5078,12 +5078,13 @@ export const TALENT_TREE_DATA = {
    "id": 30086,
    "x": -2507,
    "y": -1227,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+1 to Intellect.",
-   "descDe": "+1 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "small_intelligence_30086",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "small"
   },
   {
@@ -5774,12 +5775,13 @@ export const TALENT_TREE_DATA = {
    "id": 30133,
    "x": 2362,
    "y": -1496,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Intelligence",
+   "nameDe": "Intelligenz",
+   "icon": "",
+   "statKey": "travel_intelligence_30133",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17525,12 +17527,13 @@ export const TALENT_TREE_DATA = {
    "id": 30948,
    "x": 2520,
    "y": -1096,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Intelligence",
+   "nameDe": "Intelligenz",
+   "icon": "",
+   "statKey": "travel_intelligence_30948",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -20228,12 +20231,13 @@ export const TALENT_TREE_DATA = {
    "id": 31100,
    "x": 832,
    "y": -2457,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31100",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -20300,12 +20304,13 @@ export const TALENT_TREE_DATA = {
    "id": 31106,
    "x": 1110,
    "y": -2457,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31106",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -20612,12 +20617,13 @@ export const TALENT_TREE_DATA = {
    "id": 31132,
    "x": 1799,
    "y": -2133,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31132",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -20936,12 +20942,13 @@ export const TALENT_TREE_DATA = {
    "id": 31159,
    "x": 1383,
    "y": -2375,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31159",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -21104,12 +21111,13 @@ export const TALENT_TREE_DATA = {
    "id": 31173,
    "x": 2201,
    "y": -1901,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31173",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -22983,12 +22991,13 @@ export const TALENT_TREE_DATA = {
    "id": 31328,
    "x": -2213,
    "y": -1642,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31328",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -23163,12 +23172,13 @@ export const TALENT_TREE_DATA = {
    "id": 31343,
    "x": -2017,
    "y": -1980,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31343",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -23343,12 +23353,13 @@ export const TALENT_TREE_DATA = {
    "id": 31358,
    "x": -1177,
    "y": -2501,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31358",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -23451,12 +23462,13 @@ export const TALENT_TREE_DATA = {
    "id": 31367,
    "x": -842,
    "y": -2457,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31367",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -23739,12 +23751,13 @@ export const TALENT_TREE_DATA = {
    "id": 31391,
    "x": 349,
    "y": -2457,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31391",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -24207,12 +24220,13 @@ export const TALENT_TREE_DATA = {
    "id": 31430,
    "x": -1,
    "y": -2457,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31430",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -24267,12 +24281,13 @@ export const TALENT_TREE_DATA = {
    "id": 31435,
    "x": -355,
    "y": -2457,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31435",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -24303,12 +24318,13 @@ export const TALENT_TREE_DATA = {
    "id": 31438,
    "x": -1393,
    "y": -2374,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31438",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
