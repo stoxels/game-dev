@@ -177,7 +177,7 @@ export const PT_CLUSTER_CHECKS = [
         'treeMarkItemsComplete',
     ],
     [['poisson_process_1', 'poisson_process_2', 'poisson_process_3'], 'treePoissonComplete'],
-    [['expected_value_1', 'expected_value_2', 'expected_value_3'], 'treeExpectedValueComplete'],
+    [['notable_true_aim_252', 'expected_value_2', 'expected_value_3'], 'treeExpectedValueComplete'],
     [['marginal_distribution_1', 'marginal_distribution_2', 'marginal_distribution_3'], 'treeMarginalDistComplete'],
 ];
 

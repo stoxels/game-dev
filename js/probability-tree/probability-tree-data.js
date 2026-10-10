@@ -1171,7 +1171,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Casting Sentinel",
    "nameDe": "Zaubersentinel",
    "icon": "",
-   "statKey": "notable_casting_sentinel",
+   "statKey": "notable_casting_sentinel_130",
    "effects": [
     "all_elemental_resist:10",
     "str_flat:20",
@@ -1405,7 +1405,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Arcane Resonance",
    "nameDe": "Arkane Resonanz",
    "icon": "",
-   "statKey": "notable_arcane_resonance",
+   "statKey": "notable_arcane_resonance_355",
    "effects": [
     "spell_damage_inc_pct:20",
     "cast_speed_pct:5",
@@ -1516,7 +1516,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "True Aim",
    "nameDe": "Wahrer Anschlag",
    "icon": "",
-   "statKey": "expected_value_1",
+   "statKey": "notable_true_aim_252",
    "effects": [
     "movement_speed_pct:5",
     "agi_flat:20",
@@ -2838,7 +2838,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Deep Vigor",
    "nameDe": "Tiefe Kraft",
    "icon": "",
-   "statKey": "notable_deep_vigor",
+   "statKey": "notable_deep_vigor_134",
    "effects": [
     "health_inc_pct:8",
     "mana_inc_pct:12"
@@ -2936,7 +2936,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Arcane Bulwark",
    "nameDe": "Arkaner Schutzwall",
    "icon": "",
-   "statKey": "trix_arcane_bulwark",
+   "statKey": "notable_arcane_bulwark_256",
    "effects": [
     "absorption_flat:20",
     "mana_flat:20",
@@ -3071,7 +3071,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Verdant Covenant",
    "nameDe": "Grüner Pakt",
    "icon": "",
-   "statKey": "notable_verdant_covenant",
+   "statKey": "notable_verdant_covenant_110",
    "effects": [
     "lightning_damage_inc_pct:25",
     "cast_speed_lightning:5",
@@ -3686,7 +3686,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Cast Speed",
    "nameDe": "Zaubergeschwindigkeit",
    "icon": "",
-   "statKey": "trix_cast_speed_133",
+   "statKey": "travel_cast_speed_133",
    "effects": [
     "cast_speed_pct:4"
    ],
@@ -6042,7 +6042,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Anvil Guard",
    "nameDe": "Ambosswache",
    "icon": "",
-   "statKey": "notable_anvil_guard",
+   "statKey": "notable_anvil_guard_20031",
    "effects": [
     "life_flat:20",
     "health_inc_pct:10",
@@ -6057,7 +6057,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Champion's Onslaught",
    "nameDe": "Ansturm des Champions",
    "icon": "",
-   "statKey": "notable_champion_s_onslaught",
+   "statKey": "notable_champion_s_onslaught_20032",
    "effects": [
     "melee_charge_speed_pct:4",
     "str_flat:20",
@@ -6087,7 +6087,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Carnage",
    "nameDe": "Gemetzel",
    "icon": "",
-   "statKey": "notable_carnage",
+   "statKey": "notable_carnage_20034",
    "effects": [
     "melee_phys_1h:25",
     "str_flat:20",
@@ -6232,7 +6232,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Sunder",
    "nameDe": "Spalten",
    "icon": "",
-   "statKey": "notable_melee_explode_20045",
+   "statKey": "notable_sunder_20045",
    "effects": [
     "melee_kill_explode:20",
     "melee_aoe_pct:20"
@@ -6499,7 +6499,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Resolute Advance",
    "nameDe": "Entschlossener Vormarsch",
    "icon": "",
-   "statKey": "notable_resolute_endurance_max_20067",
+   "statKey": "notable_resolute_advance_20067",
    "effects": [
     "endurance_max:1"
    ],
@@ -6551,7 +6551,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Mountain's Heart",
    "nameDe": "Herz des Berges",
    "icon": "",
-   "statKey": "notable_mace_reach_20071",
+   "statKey": "notable_mountain_s_heart_20071",
    "effects": [
     "melee_phys_mace:30",
     "area_of_effect:15"
@@ -7334,7 +7334,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "travel_strength",
+   "statKey": "travel_strength_30192",
    "effects": [
     "str_flat:5"
    ],
@@ -7438,7 +7438,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser True Aim",
    "nameDe": "Wahrer Anschlag (klein)",
    "icon": "",
-   "statKey": "small_true_aim_30200",
+   "statKey": "small_lesser_true_aim_30200",
    "effects": [
     "accuracy_flat:20",
     "accuracy_rating_pct:6"
@@ -7452,7 +7452,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser True Aim",
    "nameDe": "Wahrer Anschlag (klein)",
    "icon": "",
-   "statKey": "small_true_aim_30201",
+   "statKey": "small_lesser_true_aim_30201",
    "effects": [
     "accuracy_flat:20",
     "accuracy_rating_pct:6"
@@ -8071,7 +8071,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30251",
+   "statKey": "travel_strength_30251",
    "effects": [
     "str_flat:5"
    ],
@@ -8153,7 +8153,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Grit",
    "nameDe": "Zähigkeit (klein)",
    "icon": "",
-   "statKey": "small_grit_30257",
+   "statKey": "small_lesser_grit_30257",
    "effects": [
     "melee_charge_speed_pct:3",
     "life_leech_melee:0.4"
@@ -8167,7 +8167,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Grit",
    "nameDe": "Zähigkeit (klein)",
    "icon": "",
-   "statKey": "small_grit_30258",
+   "statKey": "small_lesser_grit_30258",
    "effects": [
     "melee_charge_speed_pct:3",
     "life_leech_melee:0.4"
@@ -8181,7 +8181,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30259",
+   "statKey": "travel_strength_30259",
    "effects": [
     "str_flat:5"
    ],
@@ -8233,7 +8233,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30263",
+   "statKey": "travel_strength_30263",
    "effects": [
     "str_flat:5"
    ],
@@ -8270,7 +8270,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Plated Vitality",
    "nameDe": "Gepanzerte Vitalität (klein)",
    "icon": "",
-   "statKey": "small_plated_vitality_30266",
+   "statKey": "small_lesser_plated_vitality_30266",
    "effects": [
     "armour_inc_pct:8",
     "health_inc_pct:4"
@@ -8284,7 +8284,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Plated Vitality",
    "nameDe": "Gepanzerte Vitalität (klein)",
    "icon": "",
-   "statKey": "small_plated_vitality_30267",
+   "statKey": "small_lesser_plated_vitality_30267",
    "effects": [
     "armour_inc_pct:8",
     "health_inc_pct:4"
@@ -8298,7 +8298,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Skewer",
    "nameDe": "Aufspießen (klein)",
    "icon": "",
-   "statKey": "small_skewer_30268",
+   "statKey": "small_lesser_skewer_30268",
    "effects": [
     "impale_chance_heavy:10"
    ],
@@ -8311,7 +8311,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30269",
+   "statKey": "travel_strength_30269",
    "effects": [
     "str_flat:5"
    ],
@@ -8324,7 +8324,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Swordsman's Edge",
    "nameDe": "Schneide des Schwertkämpfers",
    "icon": "",
-   "statKey": "travel_sword_melee_30270",
+   "statKey": "travel_swordsman_s_edge_30270",
    "effects": [
     "melee_phys_sword:14"
    ],
@@ -8350,7 +8350,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Swift Blade",
    "nameDe": "Flinke Klinge",
    "icon": "",
-   "statKey": "small_sword_tempo_30272",
+   "statKey": "small_swift_blade_30272",
    "effects": [
     "melee_phys_sword:10",
     "sword_charge_speed:4"
@@ -8364,7 +8364,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Swift Blade",
    "nameDe": "Flinke Klinge",
    "icon": "",
-   "statKey": "small_sword_tempo_30273",
+   "statKey": "small_swift_blade_30273",
    "effects": [
     "melee_phys_sword:10",
     "sword_charge_speed:4"
@@ -8378,7 +8378,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Swordsman's Edge",
    "nameDe": "Schneide des Schwertkämpfers",
    "icon": "",
-   "statKey": "small_sword_melee_30274",
+   "statKey": "small_swordsman_s_edge_30274",
    "effects": [
     "melee_phys_sword:16"
    ],
@@ -8443,7 +8443,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Hewing Rhythm",
    "nameDe": "Hackrhythmus",
    "icon": "",
-   "statKey": "travel_axe_tempo_30279",
+   "statKey": "travel_hewing_rhythm_30279",
    "effects": [
     "melee_phys_axe:12",
     "axe_charge_speed:3"
@@ -8457,7 +8457,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Axeman's Might",
    "nameDe": "Macht des Axtkämpfers",
    "icon": "",
-   "statKey": "travel_axe_melee_30280",
+   "statKey": "travel_axeman_s_might_30280",
    "effects": [
     "melee_phys_axe:18"
    ],
@@ -8470,7 +8470,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Axeman's Might",
    "nameDe": "Macht des Axtkämpfers",
    "icon": "",
-   "statKey": "travel_axe_melee_30281",
+   "statKey": "travel_axeman_s_might_30281",
    "effects": [
     "melee_phys_axe:14"
    ],
@@ -8483,7 +8483,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30282",
+   "statKey": "travel_strength_30282",
    "effects": [
     "str_flat:5"
    ],
@@ -8685,7 +8685,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30298",
+   "statKey": "travel_strength_30298",
    "effects": [
     "str_flat:5"
    ],
@@ -8794,7 +8794,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Stormproof",
    "nameDe": "Sturmfest",
    "icon": "",
-   "statKey": "travel_lightning_resist_30307",
+   "statKey": "travel_stormproof_30307",
    "effects": [
     "lightning_resist_flat:8"
    ],
@@ -8832,7 +8832,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Flame Bulwark",
    "nameDe": "Flammenbollwerk",
    "icon": "",
-   "statKey": "travel_fire_resist_max_30310",
+   "statKey": "travel_flame_bulwark_30310",
    "effects": [
     "fire_res_max:1"
    ],
@@ -8871,7 +8871,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Frostproof",
    "nameDe": "Frostfest",
    "icon": "",
-   "statKey": "travel_cold_resist_30313",
+   "statKey": "travel_frostproof_30313",
    "effects": [
     "cold_resist_flat:8"
    ],
@@ -8884,7 +8884,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30314",
+   "statKey": "travel_strength_30314",
    "effects": [
     "str_flat:5"
    ],
@@ -8945,7 +8945,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30319",
+   "statKey": "travel_strength_30319",
    "effects": [
     "str_flat:5"
    ],
@@ -8994,7 +8994,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30323",
+   "statKey": "travel_strength_30323",
    "effects": [
     "str_flat:5"
    ],
@@ -9122,7 +9122,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Bludgeoner's Might",
    "nameDe": "Macht des Keulenschwingers",
    "icon": "",
-   "statKey": "travel_mace_melee_30333",
+   "statKey": "travel_bludgeoner_s_might_30333",
    "effects": [
     "melee_phys_mace:14"
    ],
@@ -9135,7 +9135,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Mountain's Heart",
    "nameDe": "Herz des Berges (klein)",
    "icon": "",
-   "statKey": "small_mace_reach_30334",
+   "statKey": "small_lesser_mountain_s_heart_30334",
    "effects": [
     "melee_phys_mace:14",
     "area_of_effect:8"
@@ -9149,7 +9149,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Mountain's Heart",
    "nameDe": "Herz des Berges (klein)",
    "icon": "",
-   "statKey": "small_mace_reach_30335",
+   "statKey": "small_lesser_mountain_s_heart_30335",
    "effects": [
     "melee_phys_mace:14",
     "area_of_effect:8"
@@ -9187,7 +9187,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30338",
+   "statKey": "travel_strength_30338",
    "effects": [
     "str_flat:5"
    ],
@@ -9226,7 +9226,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Resolute Advance",
    "nameDe": "Entschlossener Vormarsch (klein)",
    "icon": "",
-   "statKey": "small_resolute_endurance_regen_30341",
+   "statKey": "small_lesser_resolute_advance_30341",
    "effects": [
     "endurance_regen:0.2"
    ],
@@ -9265,7 +9265,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Resolute Advance",
    "nameDe": "Entschlossener Vormarsch (klein)",
    "icon": "",
-   "statKey": "small_resolute_endurance_duration_30344",
+   "statKey": "small_lesser_resolute_advance_30344",
    "effects": [
     "endurance_duration:20"
    ],
@@ -9290,7 +9290,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30346",
+   "statKey": "travel_strength_30346",
    "effects": [
     "str_flat:5"
    ],
@@ -9303,7 +9303,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30347",
+   "statKey": "travel_strength_30347",
    "effects": [
     "str_flat:5"
    ],
@@ -9316,7 +9316,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Quick Strike",
    "nameDe": "Schneller Schlag",
    "icon": "",
-   "statKey": "travel_charge_flow_30348",
+   "statKey": "travel_quick_strike_30348",
    "effects": [
     "melee_charge_speed_pct:4"
    ],
@@ -9355,7 +9355,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30351",
+   "statKey": "travel_strength_30351",
    "effects": [
     "str_flat:5"
    ],
@@ -9428,7 +9428,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30357",
+   "statKey": "travel_strength_30357",
    "effects": [
     "str_flat:5"
    ],
@@ -9489,7 +9489,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30362",
+   "statKey": "travel_strength_30362",
    "effects": [
     "str_flat:5"
    ],
@@ -9528,7 +9528,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Brute Force",
    "nameDe": "Rohe Gewalt",
    "icon": "",
-   "statKey": "travel_melee_edge_30365",
+   "statKey": "travel_brute_force_30365",
    "effects": [
     "melee_phys_inc:12"
    ],
@@ -9619,7 +9619,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Sunder",
    "nameDe": "Spalten (klein)",
    "icon": "",
-   "statKey": "small_melee_aoe_30372",
+   "statKey": "small_lesser_sunder_30372",
    "effects": [
     "melee_aoe_pct:12"
    ],
@@ -9632,7 +9632,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Sunder",
    "nameDe": "Spalten (klein)",
    "icon": "",
-   "statKey": "small_melee_aoe_30373",
+   "statKey": "small_lesser_sunder_30373",
    "effects": [
     "melee_aoe_pct:12"
    ],
@@ -11354,7 +11354,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Bulwark Endurance",
    "nameDe": "Bollwerk-Ausdauer",
    "icon": "",
-   "statKey": "small_bulwark_endurance",
+   "statKey": "small_bulwark_endurance_30516",
    "effects": [
     "armour_flat:30",
     "health_inc_pct:5"
@@ -11681,7 +11681,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30543",
+   "statKey": "travel_strength_30543",
    "effects": [
     "str_flat:5"
    ],
@@ -12030,7 +12030,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30572",
+   "statKey": "travel_strength_30572",
    "effects": [
     "str_flat:5"
    ],
@@ -12283,7 +12283,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30593",
+   "statKey": "travel_strength_30593",
    "effects": [
     "str_flat:5"
    ],
@@ -12392,7 +12392,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "icon": "",
-   "statKey": "small_strength_30602",
+   "statKey": "travel_strength_30602",
    "effects": [
     "str_flat:5"
    ],
@@ -18730,7 +18730,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Frostweaver",
    "nameDe": "Frostweber",
    "icon": "",
-   "statKey": "notable_frostweaver",
+   "statKey": "notable_frostweaver_20174",
    "effects": [
     "cold_damage_inc_pct:25",
     "cast_speed_cold:5",
@@ -18745,7 +18745,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Ember Prior",
    "nameDe": "Glutprior",
    "icon": "",
-   "statKey": "notable_ember_prior",
+   "statKey": "notable_ember_prior_20175",
    "effects": [
     "fire_damage_inc_pct:25",
     "cast_speed_fire:5",
@@ -21485,7 +21485,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
    "icon": "",
-   "statKey": "trix_cerebral_focus",
+   "statKey": "travel_intelligence_31209",
    "effects": [
     "int_flat:5"
    ],
@@ -21498,7 +21498,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Time Margin",
    "nameDe": "Zeitpuffer",
    "icon": "",
-   "statKey": "trix_time_sense",
+   "statKey": "travel_time_margin_31211",
    "effects": [
     "timer_start_secs:10"
    ],
@@ -21511,7 +21511,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Absorptive Core",
    "nameDe": "Absorptiver Kern",
    "icon": "",
-   "statKey": "trix_absorption_core_31212",
+   "statKey": "travel_absorptive_core_31212",
    "effects": [
     "absorption_flat:10",
     "absorption_inc_pct:4"
@@ -21525,7 +21525,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Absorption Focus",
    "nameDe": "Absorptionsfokus",
    "icon": "",
-   "statKey": "trix_absorption_focus",
+   "statKey": "travel_absorption_focus_31213",
    "effects": [
     "absorption_inc_pct:6",
     "absorption_regen_rate_pct:10"
@@ -21539,7 +21539,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Absorptive Core",
    "nameDe": "Absorptiver Kern",
    "icon": "",
-   "statKey": "trix_absorption_core_31214",
+   "statKey": "travel_absorptive_core_31214",
    "effects": [
     "absorption_flat:10",
     "absorption_inc_pct:4"
@@ -21553,7 +21553,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Time Margin",
    "nameDe": "Zeitpuffer",
    "icon": "",
-   "statKey": "small_time_margin_2",
+   "statKey": "small_time_margin_31215",
    "effects": [
     "timer_start_secs:10"
    ],
@@ -21566,7 +21566,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Time Margin",
    "nameDe": "Zeitpuffer",
    "icon": "",
-   "statKey": "small_time_margin",
+   "statKey": "small_time_margin_31216",
    "effects": [
     "timer_start_secs:10"
    ],
@@ -21579,7 +21579,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Arcane Reserve",
    "nameDe": "Arkane Reserve",
    "icon": "",
-   "statKey": "travel_arcane_reserve",
+   "statKey": "travel_arcane_reserve_31217",
    "effects": [
     "absorption_flat:14",
     "mana_flat:16"
@@ -21605,7 +21605,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
    "icon": "",
-   "statKey": "small_focused_intellect",
+   "statKey": "small_intelligence_31219",
    "effects": [
     "int_flat:5"
    ],
@@ -21618,7 +21618,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
    "icon": "",
-   "statKey": "travel_profound_intellect",
+   "statKey": "travel_intelligence_31220",
    "effects": [
     "int_flat:5"
    ],
@@ -21739,7 +21739,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Arcane Bulwark",
    "nameDe": "Arkaner Schutzwall (klein)",
    "icon": "",
-   "statKey": "small_arcane_bulwark",
+   "statKey": "small_lesser_arcane_bulwark_31230",
    "effects": [
     "absorption_flat:10",
     "mana_flat:10"
@@ -21765,7 +21765,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Frozen Might",
    "nameDe": "Frostige Macht",
    "icon": "",
-   "statKey": "small_frozen_might",
+   "statKey": "small_frozen_might_31232",
    "effects": [
     "cold_damage_inc_pct:16"
    ],
@@ -21778,7 +21778,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Prismatic Might",
    "nameDe": "Prismatische Macht",
    "icon": "",
-   "statKey": "travel_prismatic_might",
+   "statKey": "travel_prismatic_might_31233",
    "effects": [
     "elemental_damage_inc_pct:10"
    ],
@@ -21791,7 +21791,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Blazing Might",
    "nameDe": "Lodernde Macht",
    "icon": "",
-   "statKey": "small_blazing_might",
+   "statKey": "small_blazing_might_31234",
    "effects": [
     "fire_damage_inc_pct:16"
    ],
@@ -21804,7 +21804,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Verdant Might",
    "nameDe": "Grüne Macht",
    "icon": "",
-   "statKey": "travel_verdant_might",
+   "statKey": "travel_verdant_might_31235",
    "effects": [
     "lightning_damage_inc_pct:16"
    ],
@@ -21830,7 +21830,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
    "icon": "",
-   "statKey": "travel_heightened_intellect",
+   "statKey": "travel_intelligence_31237",
    "effects": [
     "int_flat:5"
    ],
@@ -21843,7 +21843,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
    "icon": "",
-   "statKey": "small_refined_intellect",
+   "statKey": "small_intelligence_31238",
    "effects": [
     "int_flat:5"
    ],
@@ -21856,7 +21856,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Spell Focus",
    "nameDe": "Zauberfokus",
    "icon": "",
-   "statKey": "small_lesser_spell_focus_31239",
+   "statKey": "small_spell_focus_31239",
    "effects": [
     "spell_damage_inc_pct:10"
    ],
@@ -21869,7 +21869,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Cast Speed",
    "nameDe": "Zaubergeschwindigkeit",
    "icon": "",
-   "statKey": "trix_cast_speed_31240",
+   "statKey": "travel_cast_speed_31240",
    "effects": [
     "cast_speed_pct:4"
    ],
@@ -21882,7 +21882,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Spell Focus",
    "nameDe": "Zauberfokus",
    "icon": "",
-   "statKey": "small_lesser_spell_focus_31241",
+   "statKey": "small_spell_focus_31241",
    "effects": [
     "spell_damage_inc_pct:10"
    ],
@@ -21895,7 +21895,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Spell Focus",
    "nameDe": "Zauberfokus",
    "icon": "",
-   "statKey": "trix_spell_focus",
+   "statKey": "travel_spell_focus_31242",
    "effects": [
     "spell_damage_inc_pct:10"
    ],
@@ -21908,7 +21908,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Cast Speed",
    "nameDe": "Zaubergeschwindigkeit",
    "icon": "",
-   "statKey": "trix_cast_speed_31243",
+   "statKey": "travel_cast_speed_31243",
    "effects": [
     "cast_speed_pct:4"
    ],
@@ -21921,7 +21921,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Spell Thread",
    "nameDe": "Zauberfaden",
    "icon": "",
-   "statKey": "trix_spell_thread",
+   "statKey": "travel_spell_thread_31244",
    "effects": [
     "spell_damage_inc_pct:16",
     "mana_flat:16"
@@ -24684,7 +24684,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
    "icon": "",
-   "statKey": "travel_keen_intellect",
+   "statKey": "travel_intelligence_31474",
    "effects": [
     "int_flat:5"
    ],
@@ -24721,7 +24721,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Casting Ward",
    "nameDe": "Zauberwache",
    "icon": "",
-   "statKey": "small_casting_ward",
+   "statKey": "small_casting_ward_31477",
    "effects": [
     "all_elemental_resist:3",
     "avoid_ailment_casting:15"
@@ -24735,7 +24735,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Vigor",
    "nameDe": "Kraft",
    "icon": "",
-   "statKey": "small_vital_reserve",
+   "statKey": "small_vigor_31478",
    "effects": [
     "health_inc_pct:5",
     "mana_inc_pct:8"
@@ -24749,7 +24749,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Vigor",
    "nameDe": "Kraft",
    "icon": "",
-   "statKey": "small_steady_vigor",
+   "statKey": "small_vigor_31479",
    "effects": [
     "health_inc_pct:5",
     "mana_inc_pct:8"
@@ -24763,7 +24763,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Casting Ward",
    "nameDe": "Zauberwache",
    "icon": "",
-   "statKey": "small_casting_vigil",
+   "statKey": "small_casting_ward_31480",
    "effects": [
     "all_elemental_resist:3",
     "avoid_ailment_casting:15"

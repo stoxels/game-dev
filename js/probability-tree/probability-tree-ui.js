@@ -789,7 +789,10 @@ export function _ptAppendStartSprite(skill, def, cx, cy, r, target = _pt_nodesLa
     if (distance > 1) {
         const push = r * 4.5;
         x += (skill.x / distance) * push;
-        y += (skill.y / distance) * push;
+        // The lower class starts (Stox SW, Syla SE) keep their sideways
+        // push but are NOT pushed down: the silhouette's vertical centre
+        // sits level with the start node. Trix (top) still pushes upward.
+        if (skill.y <= 0) y += (skill.y / distance) * push;
     }
     img.style.width = size + 'px';
     img.style.height = size + 'px';
