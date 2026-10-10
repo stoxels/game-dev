@@ -4500,12 +4500,13 @@ export const TALENT_TREE_DATA = {
    "id": 30047,
    "x": 1,
    "y": 2452,
-   "nameEn": "Disciplined Body",
-   "nameDe": "Disziplinierter Körper",
-   "descEn": "+5 Strength, +5 Agility.",
-   "descDe": "+5 Stärke, +5 Beweglichkeit.",
-   "icon": "🛡️",
-   "statKey": "small_disciplined_body",
+   "nameEn": "Agility",
+   "nameDe": "Beweglichkeit",
+   "icon": "",
+   "statKey": "travel_agility_30047",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -14507,10 +14508,11 @@ export const TALENT_TREE_DATA = {
    "y": 2452,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30697",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -14639,10 +14641,11 @@ export const TALENT_TREE_DATA = {
    "y": 2452,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30708",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -14675,10 +14678,11 @@ export const TALENT_TREE_DATA = {
    "y": 2452,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30711",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -14891,10 +14895,11 @@ export const TALENT_TREE_DATA = {
    "y": 2097,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30729",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -15095,10 +15100,11 @@ export const TALENT_TREE_DATA = {
    "y": 1802,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30746",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -15827,10 +15833,11 @@ export const TALENT_TREE_DATA = {
    "y": 1150,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30807",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -15959,10 +15966,11 @@ export const TALENT_TREE_DATA = {
    "y": 701,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30818",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17651,10 +17659,11 @@ export const TALENT_TREE_DATA = {
    "y": -729,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30959",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17795,10 +17804,11 @@ export const TALENT_TREE_DATA = {
    "y": 2,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30971",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17879,10 +17889,11 @@ export const TALENT_TREE_DATA = {
    "y": -357,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30978",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17891,10 +17902,11 @@ export const TALENT_TREE_DATA = {
    "y": -167,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30979",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -18011,10 +18023,11 @@ export const TALENT_TREE_DATA = {
    "y": 308,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30989",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -18419,10 +18432,11 @@ export const TALENT_TREE_DATA = {
    "y": 1531,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_31023",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -18539,10 +18553,11 @@ export const TALENT_TREE_DATA = {
    "y": 2452,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_31033",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
