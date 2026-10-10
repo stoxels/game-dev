@@ -20,6 +20,7 @@
 !/.gitattributes
 !/.gitignore
 !/.nojekyll
+!/README.md
 !/index.html
 !/main.js
 !/animations/

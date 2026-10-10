@@ -12562,15 +12562,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 20097,
-   "x": 1057,
-   "y": 569,
+   "x": 6157,
+   "y": 1224,
    "nameEn": "Trick Shot",
    "nameDe": "Trickschuss",
    "descEn": "Projectiles ricochet to a nearby monster for 30% damage.",
    "descDe": "Projektile prallen auf ein nahes Monster ab (30% Schaden).",
    "icon": "◆",
    "statKey": "notable_trick_shot",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 20098,
@@ -27500,7 +27501,7 @@ export const TALENT_TREE_DATA = {
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "4b267ab3a10286f9",
+  "fingerprint": "998831eb8551e115",
   "positions": [
    [
     156,
@@ -32609,8 +32610,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20097,
-    1701,
-    916
+    6157,
+    1224
    ],
    [
     20098,
