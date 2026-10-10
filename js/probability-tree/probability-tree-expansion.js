@@ -252,8 +252,6 @@ export function _ptxRunExpansion() {
         pen => (has('final_theorem') && baseTime() > 0 && globalThis.timerSecs < baseTime() * 0.1) ? 0 : pen,
         // Rune Insurance / Outlier Immunity: first mistake free.
         pen => ((has('rune_insurance') || has('outlier_immunity')) && globalThis.mistakeCount === 1) ? 0 : pen,
-        // Tailwind: mistakes cost 50% more.
-        pen => has('keystone_tailwind') ? Math.round(pen * 1.5) : pen,
         // Actuary: flat −5s.
         pen => has('actuary') ? Math.max(0, pen - 5) : pen,
         // Supply Chain: −10s per item used (max 3 stacks).
@@ -615,10 +613,6 @@ export function _ptxRunExpansion() {
     //--------------------------------------------------------------------------
     //-----------------------------TICK SYSTEMS---------------------------------
     //--------------------------------------------------------------------------
-
-    TICKS.push(() => {   // Tailwind keystone (350)
-        if (has('keystone_tailwind') && S.tick % 60 === 0) { const s = addSecs(10); if (s > 0) toast(`🪁 Tailwind +${s}s`); }
-    });
 
     TICKS.push(() => {   // Scholar's Debt keystone (364)
         if (has('keystone_scholars_debt') && S.tick % 60 === 0) { loseSecs(30); toast('💸 The interest collector takes 30s'); }

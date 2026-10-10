@@ -258,6 +258,13 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // _egComputePlayerStats; the two flags are read through
     // _egGetTreeChannel() by class-mana.js (max Mana 0, costs paid in Life)
     // and the cost increase scales every spell/ability cost there too.
+    // Primal Flame keystone (node 350): damageToFirePct converts that share of
+    // physical, cold and lightning Damage to Fire; onlyFireDamage then drops
+    // everything non-fire that is left (_egApplyDamageConversion in
+    // combat-calculations-resistances.js, applied by the melee, projectile
+    // and spell hit rolls plus flat player hits).
+    damage_to_fire_pct: { channel: 'damageToFirePct', en: '{v}% of physical, cold and lightning Damage is converted to Fire Damage', de: '{v}% des physischen, Kälte- und Blitzschadens wird in Feuerschaden umgewandelt' },
+    only_fire_damage: { channel: 'onlyFireDamage', flag: true, en: 'You cannot deal non-Fire Damage', de: 'Du kannst keinen Schaden außer Feuerschaden verursachen' },
     life_more_pct: { channel: 'healthMorePct', en: '{v}% more maximum Life', de: '{v}% mehr maximales Leben' },
     mana_removed: { channel: 'manaRemoved', flag: true, en: 'You have no Mana', de: 'Du hast kein Mana' },
     spells_cost_life: { channel: 'spellsCostLife', flag: true, en: 'Spells cost Life instead of Mana', de: 'Zauber kosten Leben statt Mana' },

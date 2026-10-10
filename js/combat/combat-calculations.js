@@ -3,7 +3,7 @@ import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult } from '../endgame/endgam
 import { EG_PLAYER_STATS, _egComputePlayerStats, _egRollCrit } from '../endgame/endgame-player-stats.js';
 import { _egQuizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
 import { EG_PLAYER_MELEE_DAMAGE } from './combat-state.js';
-import { _egRollElementalBreakdown, _egScaleElements } from './combat-calculations-resistances.js';
+import { _egApplyDamageConversion, _egRollElementalBreakdown, _egScaleElements } from './combat-calculations-resistances.js';
 
 //------------------------------------------------------------------------
 //-------------------PLAYER DAMAGE CALCULATION----------------------------
@@ -35,8 +35,11 @@ export function _egCalcPlayerDamage() {
     elements.fire *= 1 + (stats.fireDamageIncPct || 0) / 100;
     elements.cold *= 1 + (stats.coldDamageIncPct || 0) / 100;
     elements.lightning *= 1 + (stats.lightningDamageIncPct || 0) / 100;
-    _egLastHitElements = elements;
-    dmg += elements.fire + elements.cold + elements.lightning + elements.shadow;
+    // Fire conversion / fire-only (Primal Flame keystone).
+    const converted = _egApplyDamageConversion(stats, dmg, elements);
+    dmg = converted.physical;
+    _egLastHitElements = converted.elements;
+    dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
 
     const critMult = _egRollCrit(stats);
     _egLastHitWasCrit = critMult > 1;
@@ -136,8 +139,11 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
         lightning: rollEl(stats.meleeLightningMin, stats.meleeLightningMax) * lightningMult,
         shadow: rollEl(stats.meleeShadowMin, stats.meleeShadowMax) * elemMult,
     };
-    _egLastMeleeElements = elements;
-    dmg += elements.fire + elements.cold + elements.lightning + elements.shadow;
+    // Fire conversion / fire-only (Primal Flame keystone).
+    const converted = _egApplyDamageConversion(stats, dmg, elements);
+    dmg = converted.physical;
+    _egLastMeleeElements = converted.elements;
+    dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
 
     const critMult = _egRollCrit(stats);
     _egLastMeleeWasCrit = critMult > 1;

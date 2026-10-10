@@ -618,6 +618,10 @@ export function _egComputePlayerStats() {
         manaRemoved: passiveTreeBonuses.manaRemoved || 0,
         spellsCostLife: passiveTreeBonuses.spellsCostLife || 0,
         spellCostIncPct: passiveTreeBonuses.spellCostIncPct || 0,
+        // Primal Flame keystone (node 350): fire conversion share and the
+        // fire-only flag, read by _egApplyDamageConversion.
+        damageToFirePct: passiveTreeBonuses.damageToFirePct || 0,
+        onlyFireDamage: passiveTreeBonuses.onlyFireDamage || 0,
         // Flat bonus to fire/cold/lightning resistance (never shadow) and the
         // chance to avoid ailments while a hold-to-cast is running.
         allElementalResist: passiveTreeBonuses.allElementalResist || 0,
@@ -1431,6 +1435,8 @@ export const EG_STAT_DISPLAY_LABELS = {
     manaRemoved: { label: t('eg_stat_mana_removed'), suffix: '' },
     spellsCostLife: { label: t('eg_stat_spells_cost_life'), suffix: '' },
     spellCostIncPct: { label: t('eg_stat_spell_cost_inc'), suffix: '%' },
+    damageToFirePct: { label: t('eg_stat_damage_to_fire'), suffix: '%' },
+    onlyFireDamage: { label: t('eg_stat_only_fire_damage'), suffix: '' },
     retaliationWardBleed: { label: t('eg_stat_retaliation_ward_bleed'), suffix: '' },
     retaliationWardIgnite: { label: t('eg_stat_retaliation_ward_ignite'), suffix: '' },
     meleePhys1HIncPct: { label: t('eg_stat_inc_melee_phys_1h'), suffix: '%' },
@@ -1571,7 +1577,7 @@ export const EG_STAT_LAYOUT = {
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
-        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWardBleed', 'retaliationWardIgnite',
+        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'damageToFirePct', 'onlyFireDamage', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWardBleed', 'retaliationWardIgnite',
             'impaleChanceHeavyPct', 'impaleEffectHeavyPct', 'impaleEffectFreshPct', 'impaleDurationPct'] },
         { catKey: 'eg_statcat_arcane', buckets: [
             'castSpeedPct', 'fireCastSpeedPct', 'coldCastSpeedPct', 'lightningCastSpeedPct', 'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',

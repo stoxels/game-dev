@@ -2,6 +2,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { _getGlobalCooldownReduction } from '../classes/class-cooldown-state.js';
+import { _egApplyDamageConversion } from '../combat/combat-calculations-resistances.js';
 import { _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost } from '../classes/class-mana.js';
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
@@ -2132,10 +2133,18 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
         dmg *= getSpellRankDamageMultForSkill(spell.id);
     } catch (e) { /* mods unavailable */ }
 
-    const amount = Math.max(1, Math.round(dmg));
-    const elements = {};
-    if ((spell.element || 'fire') !== 'physical') {
-        elements[spell.element || 'fire'] = amount;
+    let amount = Math.max(1, Math.round(dmg));
+    let elements = {};
+    const spellElement = spell.element || 'fire';
+    if (spellElement !== 'physical') {
+        elements[spellElement] = amount;
+    }
+    // Fire conversion / fire-only (Primal Flame keystone, node 350).
+    if ((Number(stats.damageToFirePct) || 0) > 0 || (Number(stats.onlyFireDamage) || 0) > 0) {
+        const converted = _egApplyDamageConversion(stats, spellElement === 'physical' ? amount : 0, elements);
+        elements = converted.elements;
+        amount = Math.max(1, Math.round(converted.physical
+            + elements.fire + elements.cold + elements.lightning + elements.shadow));
     }
 
     // Life leech mirrors the weapon channels (heal on spell hits too).

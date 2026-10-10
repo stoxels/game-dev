@@ -135,7 +135,7 @@ export function _egReleaseChannelAtMax() {
     const target = typeof _egGetTarget === 'function' ? _egGetTarget() : null;
     if (target && dmg > 0) {
         _egShowStatusLabel(target.id, t('eg_channel'));
-        _egDamageTargetById(target.id, dmg);
+        _egDamageTargetById(target.id, dmg, null, { isPlayerFlat: true });
     }
 }
 

@@ -238,7 +238,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
             && stats.shieldBashDamageFlat > 0
             && Math.random() * 100 < stats.shieldBashChancePct) {
             const target = _egGetTarget();
-            if (target) _egDamageTargetById(target.id, Math.round(stats.shieldBashDamageFlat));
+            if (target) _egDamageTargetById(target.id, Math.round(stats.shieldBashDamageFlat), null, { isPlayerFlat: true });
         }
 
         const recoveryFactor = Math.max(0, 1 - Math.min(100, stats.blockRecoveryPct) / 100);
@@ -272,7 +272,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (!isSpell && !isBossAbility && !(opts && opts.isProjectile)
         && opts && opts.attacker && opts.attacker.id != null && amount > 0
         && stats.reflectPhysFlat > 0) {
-        _egDamageTargetById(opts.attacker.id, Math.round(stats.reflectPhysFlat));
+        _egDamageTargetById(opts.attacker.id, Math.round(stats.reflectPhysFlat), null, { isPlayerFlat: true });
     }
 
     // Elemental resistances (fire/cold/lightning/shadow %) mitigate

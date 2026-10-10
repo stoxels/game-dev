@@ -37,6 +37,34 @@ export function _egGetElementalDamageBonus(stats) {
     return e.fire + e.cold + e.lightning + e.shadow;
 }
 
+// Fire conversion (Primal Flame keystone, node 350). `physical` is the
+// non-elemental share of the hit, `elements` its per-element breakdown.
+// damageToFirePct moves that share of the physical, cold and lightning parts
+// into fire; onlyFireDamage then drops every non-fire part that is left
+// (including shadow). Conversion runs after the per-type increases, so the
+// converted share keeps the strength it already had. Returns
+// { physical, elements } and hands the inputs back untouched when neither
+// channel is active.
+export function _egApplyDamageConversion(stats, physical, elements) {
+    const el = elements || {};
+    const share = Math.max(0, Math.min(100, Number(stats && stats.damageToFirePct) || 0)) / 100;
+    const fireOnly = (Number(stats && stats.onlyFireDamage) || 0) > 0;
+    if (share <= 0 && !fireOnly) return { physical, elements: el };
+    const keep = fireOnly ? 0 : 1 - share;
+    const phys = physical || 0;
+    const cold = el.cold || 0;
+    const lightning = el.lightning || 0;
+    return {
+        physical: phys * keep,
+        elements: {
+            fire: (el.fire || 0) + share * (phys + cold + lightning),
+            cold: cold * keep,
+            lightning: lightning * keep,
+            shadow: fireOnly ? 0 : (el.shadow || 0),
+        },
+    };
+}
+
 // Returns an element breakdown scaled by `factor` (used when only a % of the
 // original hit is dealt, e.g. reveal projectiles).
 export function _egScaleElements(elements, factor) {

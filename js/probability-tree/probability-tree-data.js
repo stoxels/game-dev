@@ -416,12 +416,14 @@ export const TALENT_TREE_DATA = {
    "id": 350,
    "x": -1944,
    "y": 279,
-   "nameEn": "Keystone: Tailwind",
-   "nameDe": "Schlüsselfertigkeit: Rückenwind",
-   "descEn": "Time flows with you: gain +10 seconds every minute. But mistakes cost 50% more while the wind is at your back.",
-   "descDe": "Die Zeit fließt mit dir: Erhalte jede Minute +10 Sekunden. Aber Fehler kosten 50% mehr, solange der Wind von hinten kommt.",
-   "icon": "🪁",
-   "statKey": "keystone_tailwind",
+   "nameEn": "Primal Flame",
+   "nameDe": "Urflamme",
+   "icon": "",
+   "statKey": "keystone_primal_flame_350",
+   "effects": [
+    "damage_to_fire_pct:50",
+    "only_fire_damage"
+   ],
    "tier": "keystone"
   },
   {

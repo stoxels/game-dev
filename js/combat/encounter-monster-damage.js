@@ -1,7 +1,7 @@
 import { t } from '../translation/translations.js';
 import { _egApplyAilmentShockAmpOnMonster, _egApplyImpaleToHit, _egApplyIntimidateAmp, _egRollIntimidate, _egRollPlayerHitAilments } from './combat-ailments-core.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
-import { EG_ELEMENTS, _egApplyTargetResistances, _egScaleElements } from './combat-calculations-resistances.js';
+import { EG_ELEMENTS, _egApplyDamageConversion, _egApplyTargetResistances, _egScaleElements } from './combat-calculations-resistances.js';
 import { EG_DAMAGE_NUMBER_DURATION_MS } from './encounter-constants.js';
 import { _egKillMonster } from './encounter-kills.js';
 import { EG_STAGGER_DURATION_MS } from './encounter-lifecycle.js';
@@ -129,6 +129,19 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     }
 
     const hpBefore = target.currentHP;
+
+    // Flat player damage that carries no element breakdown (shield bash,
+    // reflect, channel release) is physical; the Primal Flame keystone
+    // (fire conversion / fire-only) converts or drops it like any other hit.
+    if (opts && opts.isPlayerFlat && !elements) {
+        const flatStats = _egComputePlayerStats();
+        if ((Number(flatStats.damageToFirePct) || 0) > 0 || (Number(flatStats.onlyFireDamage) || 0) > 0) {
+            const flat = _egApplyDamageConversion(flatStats, amount, {});
+            elements = flat.elements;
+            amount = Math.max(1, Math.round(flat.physical
+                + elements.fire + elements.cold + elements.lightning + elements.shadow));
+        }
+    }
 
     // Intimidate (node 125): melee hits on an intimidated enemy deal more.
     // Applied before resistances so it scales the whole hit.
