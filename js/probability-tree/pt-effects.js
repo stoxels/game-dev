@@ -126,6 +126,11 @@ export const PT_EFFECT_DEFS = Object.freeze({
     melee_phys_sword: { channel: 'meleePhysSwordIncPct', en: '{v}% increased physical melee Damage with Swords', de: '{v}% erhöhter physischer Nahkampfschaden mit Schwertern' },
     melee_phys_axe: { channel: 'meleePhysAxeIncPct', en: '{v}% increased physical melee Damage with Axes', de: '{v}% erhöhter physischer Nahkampfschaden mit Äxten' },
     sword_charge_speed: { channel: 'swordChargeSpeedPct', en: '{v}% increased melee attack charge-up speed while wielding a Sword', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit mit Schwert' },
+    melee_phys_mace: { channel: 'meleePhysMaceIncPct', en: '{v}% increased physical melee Damage with Maces or Sceptres', de: '{v}% erhöhter physischer Nahkampfschaden mit Streitkolben oder Zeptern' },
+    // Area of Effect (node 30334): a general size scaler for player-placed
+    // spell targeting areas. No spell consumes it yet - the stat is tracked
+    // and shown so the future targeting-area code can read stats.areaOfEffectPct.
+    area_of_effect: { channel: 'areaOfEffectPct', en: '{v}% increased Area of Effect', de: '{v}% vergrößerter Wirkungsbereich' },
     axe_charge_speed: { channel: 'axeChargeSpeedPct', en: '{v}% increased melee attack charge-up speed while wielding an Axe', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit mit Axt' },
     // Rage (axe notable 369): a new stacking resource. Melee hits with an
     // Axe grant rage_on_hit_axe Rage (capped at rage_max); every Rage is a

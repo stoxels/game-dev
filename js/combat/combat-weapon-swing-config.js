@@ -44,6 +44,16 @@ function _egWeaponSwingFamily(item) {
     return 'sword';
 }
 
+// Mace-like weapons for the passive tree's "Maces or Sceptres" lines:
+// maces / mauls / hammers (the 'mace' family) plus sceptres, which the
+// swing visuals file under 'wand' but which are melee-capable one-handers.
+export function _egIsMaceOrSceptre(item) {
+    if (!item) return false;
+    if (_egWeaponSwingFamily(item) === 'mace') return true;
+    const name = `${item.baseName || ''} ${item.name || ''}`.toLowerCase();
+    return /sceptre|scepter|zepter/.test(name);
+}
+
 // Returns { item, family, hands, label } for the currently equipped melee
 // weapon (weapon slot). Falls back to the ranged bow, then unarmed.
 export function _egGetEquippedWeaponInfo() {

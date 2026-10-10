@@ -25,7 +25,7 @@ import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-t
 import { EG_MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding, _egIsTwoHandedWeapon } from '../loot/loot-requirements.js';
 import { EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, _egGetEnduranceCharges, _egGetRage } from '../combat/combat-ailments-state.js';
-import { _egGetEquippedWeaponInfo } from '../combat/combat-weapon-swing-config.js';
+import { _egGetEquippedWeaponInfo, _egIsMaceOrSceptre } from '../combat/combat-weapon-swing-config.js';
 import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
@@ -721,6 +721,12 @@ export function _egComputePlayerStats() {
         rageMeleeMorePct: passiveTreeBonuses.rageMeleeMorePct || 0,
         rageMax: passiveTreeBonuses.rageMax || 0,
         rage: 0,
+        // Mace / sceptre batch (nodes 30333/30334): damage with the family
+        // (read in _egCalcPlayerMeleeDamage) and the new Area of Effect
+        // stat (no consumer yet - future spell targeting areas).
+        meleePhysMaceIncPct: passiveTreeBonuses.meleePhysMaceIncPct || 0,
+        areaOfEffectPct: passiveTreeBonuses.areaOfEffectPct || 0,
+        isMaceEquipped: false,
         isSwordEquipped: false,
         isAxeEquipped: false,
         meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
@@ -970,7 +976,9 @@ export function _egComputePlayerStats() {
     // icon/name based, unknown melee weapons count as swords). Gates the
     // sword/axe tree lines; +accuracy with swords joins the flat pool here
     // so "increased Accuracy Rating" scales it like every other source.
-    const weaponFamily = _egGetEquippedWeaponInfo().family;
+    const weaponInfo = _egGetEquippedWeaponInfo();
+    const weaponFamily = weaponInfo.family;
+    s.isMaceEquipped = _egIsMaceOrSceptre(weaponInfo.item);
     s.isSwordEquipped = weaponFamily === 'sword';
     s.isAxeEquipped = weaponFamily === 'axe';
     if (s.isSwordEquipped) s.accuracy += passiveTreeBonuses.accuracySwordFlat || 0;
@@ -1398,6 +1406,8 @@ export const EG_STAT_DISPLAY_LABELS = {
     rageMeleeMorePct: { label: t('eg_stat_rage_effect'), suffix: '%' },
     rage: { label: t('eg_stat_rage'), suffix: '' },
     rageMax: { label: t('eg_stat_rage_max'), suffix: '' },
+    meleePhysMaceIncPct: { label: t('eg_stat_inc_melee_phys_mace'), suffix: '%' },
+    areaOfEffectPct: { label: t('eg_stat_area_of_effect'), suffix: '%' },
     // Melee charge-up speed (reworked node 30197): percentage shorter charge;
     // the resulting time is what the melee attackInterval line above shows.
     meleeChargeSpeedPct: { label: t('eg_stat_inc_melee_charge_speed'), suffix: '%' },
@@ -1497,7 +1507,7 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'bleedSpeedPct',
+            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'bleedSpeedPct',
             'meleeChargeSpeedPct', 'attackSpeedPct', 'meleeRangeM', 'meleeAoEPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
@@ -1707,6 +1717,7 @@ export function _egBuildStatLine(bucket, stats) {
         meleePhysHeavyIncPct: 'eg_statdesc_meleePhysHeavyIncPct',
         meleePhysSwordIncPct: 'eg_statdesc_meleePhysSwordIncPct',
         meleePhysAxeIncPct: 'eg_statdesc_meleePhysAxeIncPct',
+        meleePhysMaceIncPct: 'eg_statdesc_meleePhysMaceIncPct',
         meleeChargeSpeedPct: 'eg_statdesc_meleeChargeSpeedPct',
     };
     const descBucket = bucket.startsWith('melee') ? bucket.charAt(5).toLowerCase() + bucket.slice(6) : bucket;

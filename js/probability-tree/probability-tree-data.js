@@ -8160,8 +8160,8 @@ export const TALENT_TREE_DATA = {
    "id": 30261,
    "x": -1869,
    "y": 1006,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Elemental Ward",
+   "nameDe": "Elementarschutz",
    "icon": "",
    "statKey": "travel_elemental_ward_30261",
    "effects": [
@@ -8277,8 +8277,8 @@ export const TALENT_TREE_DATA = {
    "id": 30270,
    "x": -2609,
    "y": 1150,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Swordsman's Edge",
+   "nameDe": "Schneide des Schwertkämpfers",
    "icon": "",
    "statKey": "travel_sword_melee_30270",
    "effects": [
@@ -8303,8 +8303,8 @@ export const TALENT_TREE_DATA = {
    "id": 30272,
    "x": -2670,
    "y": 1170,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Swift Blade",
+   "nameDe": "Flinke Klinge",
    "icon": "",
    "statKey": "small_sword_tempo_30272",
    "effects": [
@@ -8317,8 +8317,8 @@ export const TALENT_TREE_DATA = {
    "id": 30273,
    "x": -2768,
    "y": 1170,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Swift Blade",
+   "nameDe": "Flinke Klinge",
    "icon": "",
    "statKey": "small_sword_tempo_30273",
    "effects": [
@@ -8331,8 +8331,8 @@ export const TALENT_TREE_DATA = {
    "id": 30274,
    "x": -2768,
    "y": 1130,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Swordsman's Edge",
+   "nameDe": "Schneide des Schwertkämpfers",
    "icon": "",
    "statKey": "small_sword_melee_30274",
    "effects": [
@@ -8396,8 +8396,8 @@ export const TALENT_TREE_DATA = {
    "id": 30279,
    "x": -2669,
    "y": 815,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Hewing Rhythm",
+   "nameDe": "Hackrhythmus",
    "icon": "",
    "statKey": "travel_axe_tempo_30279",
    "effects": [
@@ -8410,8 +8410,8 @@ export const TALENT_TREE_DATA = {
    "id": 30280,
    "x": -2669,
    "y": 775,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Axeman's Might",
+   "nameDe": "Macht des Axtkämpfers",
    "icon": "",
    "statKey": "travel_axe_melee_30280",
    "effects": [
@@ -8423,8 +8423,8 @@ export const TALENT_TREE_DATA = {
    "id": 30281,
    "x": -2608,
    "y": 795,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Axeman's Might",
+   "nameDe": "Macht des Axtkämpfers",
    "icon": "",
    "statKey": "travel_axe_melee_30281",
    "effects": [
@@ -9063,12 +9063,13 @@ export const TALENT_TREE_DATA = {
    "id": 30333,
    "x": -2608,
    "y": 440,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Bludgeoner's Might",
+   "nameDe": "Macht des Keulenschwingers",
+   "icon": "",
+   "statKey": "travel_mace_melee_30333",
+   "effects": [
+    "melee_phys_mace:14"
+   ],
    "tier": "travel"
   },
   {
@@ -9077,10 +9078,12 @@ export const TALENT_TREE_DATA = {
    "y": 391,
    "nameEn": "Lesser Mountain's Heart",
    "nameDe": "Herz des Berges (klein)",
-   "descEn": "+25 Armour, +8% maximum Health.",
-   "descDe": "+25 Rüstung, +8% max. Leben.",
-   "icon": "◆",
-   "statKey": "small_lesser_mountain_s_heart",
+   "icon": "",
+   "statKey": "small_mace_reach_30334",
+   "effects": [
+    "melee_phys_mace:14",
+    "area_of_effect:8"
+   ],
    "tier": "small"
   },
   {
@@ -9252,8 +9255,8 @@ export const TALENT_TREE_DATA = {
    "id": 30348,
    "x": -1869,
    "y": 589,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Quick Strike",
+   "nameDe": "Schneller Schlag",
    "icon": "",
    "statKey": "travel_charge_flow_30348",
    "effects": [
@@ -9463,8 +9466,8 @@ export const TALENT_TREE_DATA = {
    "id": 30365,
    "x": -1649,
    "y": 589,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Brute Force",
+   "nameDe": "Rohe Gewalt",
    "icon": "",
    "statKey": "travel_melee_edge_30365",
    "effects": [
@@ -9502,8 +9505,8 @@ export const TALENT_TREE_DATA = {
    "id": 30368,
    "x": -1649,
    "y": 1006,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
+   "nameEn": "Elemental Ward",
+   "nameDe": "Elementarschutz",
    "icon": "",
    "statKey": "travel_elemental_ward_30368",
    "effects": [
