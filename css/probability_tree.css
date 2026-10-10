@@ -103,6 +103,15 @@
     color: var(--yellow);
 }
 
+/* -- Rework progress counter (reworked nodes / all nodes), left of the points -- */
+.pt-rework-counter {
+    margin-left: 14px;
+    font-family: var(--PX);
+    font-size: 13px;
+    color: var(--accent2, #aaa);
+    white-space: nowrap;
+}
+
 /* -- Refund All button - pushed to the right edge via auto margin, so it
    sits between the centred search field and the points counter -- */
 #btn-pt-refund-all {

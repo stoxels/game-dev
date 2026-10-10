@@ -8,6 +8,7 @@ import { LANG, t } from '../translation/translations.js';
 import { PassiveTracker } from './probability-tree-tracker.js';
 import { TALENT_TREE_DATA } from './probability-tree-data.js';
 import { resolvePassiveTreeLayout } from './probability-tree-layout.js';
+import { getPassiveTreeReworkProgress } from './probability-tree-rework.js';
 import { ptHasSkill } from './probability-tree-state-points.js';
 import { _ptRender } from './probability-tree-ui.js';
 import { _ptSuspendViewport } from './probability-tree-viewport.js';
@@ -185,6 +186,13 @@ export function _ptUpdatePointsDisplay(lang, points) {
     if (!pointsEl) return;
 
     pointsEl.textContent = t('pt_points_available').replace('{n}', points);
+
+    // Rework progress (reworked nodes / all nodes) next to the points.
+    const reworkEl = document.getElementById('pt-rework-counter');
+    if (reworkEl) {
+        const { done, total } = getPassiveTreeReworkProgress();
+        reworkEl.textContent = t('pt_rework_progress').replace('{done}', done).replace('{total}', total);
+    }
 }
 
 // buildPassiveTreeScreen - entry point called by the UI.

@@ -25,3 +25,12 @@ function _effectReworkedIdSet() {
 export function isPassiveTreeNodeReworked(id) {
     return PT_REWORKED_NODE_IDS.includes(id) || _effectReworkedIdSet().has(Number(id));
 }
+
+// Progress of the tree-wide rework for the counter in the passive tree top
+// bar: how many nodes are reworked out of all nodes in the tree data.
+export function getPassiveTreeReworkProgress() {
+    const nodes = TALENT_TREE_DATA?.nodes || [];
+    let done = 0;
+    for (const node of nodes) if (isPassiveTreeNodeReworked(node.id)) done++;
+    return { done, total: nodes.length };
+}
