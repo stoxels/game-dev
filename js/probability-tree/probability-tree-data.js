@@ -529,14 +529,14 @@ export const TALENT_TREE_DATA = {
    "id": 328,
    "x": 1874,
    "y": 1727,
-   "nameEn": "Nimble Footing",
-   "nameDe": "Flinke Füße",
+   "nameEn": "Agility",
+   "nameDe": "Beweglichkeit",
    "icon": "",
-   "statKey": "notable_nimble_footing_328",
+   "statKey": "travel_agility_328",
    "effects": [
     "agi_flat:5"
    ],
-   "tier": "notable",
+   "tier": "travel",
    "layoutPinned": true
   },
   {
@@ -1085,12 +1085,15 @@ export const TALENT_TREE_DATA = {
    "id": 102,
    "x": 1821,
    "y": 699,
-   "nameEn": "Cursecaller",
-   "nameDe": "Fluchrufer",
-   "descEn": "10% increased chance of receiving Cursed items. Stacks with Hexbound Desire and Dark Temptation. +6% Evasion.",
-   "descDe": "10% erhöhte Chance auf verfluchte Gegenstände. Wirkt zusammen mit Hexengebundene Gier und Dunkle Versuchung. +6% Ausweichen.",
-   "icon": "☠️",
-   "statKey": "cursed_attraction_3",
+   "nameEn": "Reaching Guard",
+   "nameDe": "Weite Deckung",
+   "icon": "",
+   "statKey": "notable_reaching_guard_102",
+   "effects": [
+    "block_dualshield:4",
+    "melee_charge_speed_pct:8",
+    "melee_range_m:0.5"
+   ],
    "tier": "notable"
   },
   {
@@ -2093,12 +2096,14 @@ export const TALENT_TREE_DATA = {
    "id": 248,
    "x": 2243,
    "y": 937,
-   "nameEn": "Marginal Distribution",
-   "nameDe": "Randverteilung",
-   "descEn": "An additional correct cell is revealed in the outermost row or column at the start of each level. +6% Evasion.",
-   "descDe": "Eine weitere richtige Zelle wird zu Beginn des Levels in der äußersten Zeile oder Spalte enthüllt. +6% Ausweichen.",
-   "icon": "📦",
-   "statKey": "marginal_distribution_3",
+   "nameEn": "Hearty Vigor",
+   "nameDe": "Herzhafte Kraft",
+   "icon": "",
+   "statKey": "notable_hearty_vigor_248",
+   "effects": [
+    "health_inc_pct:10",
+    "heart_heal_flat:25"
+   ],
    "tier": "notable"
   },
   {
@@ -2458,12 +2463,15 @@ export const TALENT_TREE_DATA = {
    "id": 170,
    "x": 2243,
    "y": 458,
-   "nameEn": "Calculated Genesis",
-   "nameDe": "Berechneter Ursprung",
-   "descEn": "20% chance to reveal 1 correct filled cell at the start of each level. Rolls independently from Probabilistic Start and Stochastic Awakening. +6% Evasion.",
-   "descDe": "20% Chance, zu Beginn jedes Levels 1 korrekte gefüllte Zelle aufzudecken. Wirkt unabhängig von Probabilistischer Start und Stochastisches Erwachen. +6% Ausweichen.",
-   "icon": "🎲",
-   "statKey": "probabilistic_start_3",
+   "nameEn": "Prismatic Dodge",
+   "nameDe": "Prismatisches Ausweichen",
+   "icon": "",
+   "statKey": "notable_prismatic_dodge_170",
+   "effects": [
+    "evasion_inc_pct:24",
+    "all_elemental_resist:8",
+    "cold_res_max:1"
+   ],
    "tier": "notable"
   },
   {
@@ -2494,15 +2502,15 @@ export const TALENT_TREE_DATA = {
    "id": 383,
    "x": 1942,
    "y": 1383,
-   "nameEn": "Probability Well",
-   "nameDe": "Wahrscheinlichkeitsbrunnen",
+   "nameEn": "Lesser Probability Well",
+   "nameDe": "Wahrscheinlichkeitsbrunnen (klein)",
    "icon": "",
-   "statKey": "notable_probability_well_383",
+   "statKey": "small_lesser_probability_well_383",
    "effects": [
     "evasion_flat:30",
     "health_inc_pct:5"
    ],
-   "tier": "notable",
+   "tier": "small",
    "layoutPinned": true
   },
   {
@@ -3221,12 +3229,15 @@ export const TALENT_TREE_DATA = {
    "id": 149,
    "x": 1968,
    "y": 538,
-   "nameEn": "Temporal Recovery",
-   "nameDe": "Zeitliche Erholung",
-   "descEn": "Using a Tutor item to remove a mistake also adds 60 seconds to the timer. Stacks with Second Wind Study and Chrono Benefit. +6% Evasion.",
-   "descDe": "Das Benutzen eines Tutor-Gegenstands zum Entfernen eines Fehlers fügt dem Timer zusätzlich 60 Sekunden hinzu. Wirkt zusammen mit Zweiter Lernatem und Chrono-Vorteil. +6% Ausweichen.",
-   "icon": "⏱️",
-   "statKey": "time_well_spent_2",
+   "nameEn": "Battle Tempo",
+   "nameDe": "Kampftempo",
+   "icon": "",
+   "statKey": "notable_battle_tempo_149",
+   "effects": [
+    "melee_phys_inc:20",
+    "movement_speed_pct:5",
+    "crit_chance_melee:5"
+   ],
    "tier": "notable"
   },
   {
@@ -3815,12 +3826,13 @@ export const TALENT_TREE_DATA = {
    "id": 195,
    "x": 1894,
    "y": 650,
-   "nameEn": "Timed Stasis",
-   "nameDe": "Zeitstase",
-   "descEn": "Every 10 minutes the timer pauses for 1 second.",
-   "descDe": "Alle 10 Minuten wird der Timer für 1 Sekunde pausiert.",
-   "icon": "⏸️",
-   "statKey": "travel_timed_stasis_1",
+   "nameEn": "Brute Force",
+   "nameDe": "Rohe Gewalt",
+   "icon": "",
+   "statKey": "travel_brute_force_195",
+   "effects": [
+    "melee_phys_inc:12"
+   ],
    "tier": "travel"
   },
   {
@@ -12938,12 +12950,13 @@ export const TALENT_TREE_DATA = {
    "id": 20125,
    "x": 2384,
    "y": 535,
-   "nameEn": "Steady Aim",
-   "nameDe": "Ruhige Hand",
-   "descEn": "Standing still grants +12% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +12% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "notable_steady_aim",
+   "nameEn": "Keen Eye",
+   "nameDe": "Scharfes Auge",
+   "icon": "",
+   "statKey": "notable_keen_eye_20125",
+   "effects": [
+    "projectile_crit_multi:10"
+   ],
    "tier": "notable"
   },
   {
@@ -13359,12 +13372,15 @@ export const TALENT_TREE_DATA = {
    "id": 20160,
    "x": 1968,
    "y": 857,
-   "nameEn": "Eagle Eye",
-   "nameDe": "Adlerauge",
-   "descEn": "+15% Projectile damage, +5% Critical strike chance.",
-   "descDe": "+15% Projektilschaden, +5% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "notable_eagle_eye",
+   "nameEn": "Evasive Instinct",
+   "nameDe": "Ausweichinstinkt",
+   "icon": "",
+   "statKey": "notable_evasive_instinct_20160",
+   "effects": [
+    "parry_spell_chance:5",
+    "evasion_inc_pct:15",
+    "health_inc_pct:5"
+   ],
    "tier": "notable"
   },
   {
@@ -15618,24 +15634,26 @@ export const TALENT_TREE_DATA = {
    "id": 30785,
    "x": 1726,
    "y": 880,
-   "nameEn": "Lesser Horizon Walker",
-   "nameDe": "Horizontwanderer (klein)",
-   "descEn": "At the start of each level, one incorrect empty cell in the leftmost column is automatically marked. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird automatisch eine falsche leere Zelle in der linksten Spalte markiert. +3% Ausweichen.",
-   "icon": "🌄",
-   "statKey": "small_lesser_horizon_walker",
+   "nameEn": "Lesser Elemental Volley",
+   "nameDe": "Elementarsalve (klein)",
+   "icon": "",
+   "statKey": "small_lesser_elemental_volley_30785",
+   "effects": [
+    "projectile_elemental_damage_inc:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30786,
    "x": 1894,
    "y": 748,
-   "nameEn": "Lesser Cursecaller",
-   "nameDe": "Fluchrufer (klein)",
-   "descEn": "5% increased chance of receiving Cursed items. Stacks with Hexbound Desire and Dark Temptation. +3% Evasion.",
-   "descDe": "5% erhöhte Chance auf verfluchte Gegenstände. Wirkt zusammen mit Hexengebundene Gier und Dunkle Versuchung. +3% Ausweichen.",
-   "icon": "☠️",
-   "statKey": "small_lesser_cursecaller",
+   "nameEn": "Lesser Brute Force",
+   "nameDe": "Rohe Gewalt (klein)",
+   "icon": "",
+   "statKey": "small_lesser_brute_force_30786",
+   "effects": [
+    "melee_phys_inc:12"
+   ],
    "tier": "small"
   },
   {
@@ -15703,24 +15721,26 @@ export const TALENT_TREE_DATA = {
    "id": 30792,
    "x": 2292,
    "y": 864,
-   "nameEn": "Lesser Marginal Distribution",
-   "nameDe": "Randverteilung (klein)",
-   "descEn": "An additional correct cell is revealed in the outermost row or column at the start of each level. +3% Evasion.",
-   "descDe": "Eine weitere richtige Zelle wird zu Beginn des Levels in der äußersten Zeile oder Spalte enthüllt. +3% Ausweichen.",
-   "icon": "📦",
-   "statKey": "small_lesser_marginal_distribution",
+   "nameEn": "Lesser Hearty Vigor",
+   "nameDe": "Herzhafte Kraft (klein)",
+   "icon": "",
+   "statKey": "small_lesser_hearty_vigor_30792",
+   "effects": [
+    "health_inc_pct:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30793,
    "x": 2194,
    "y": 864,
-   "nameEn": "Lesser Marginal Distribution",
-   "nameDe": "Randverteilung (klein)",
-   "descEn": "An additional correct cell is revealed in the outermost row or column at the start of each level. +3% Evasion.",
-   "descDe": "Eine weitere richtige Zelle wird zu Beginn des Levels in der äußersten Zeile oder Spalte enthüllt. +3% Ausweichen.",
-   "icon": "📦",
-   "statKey": "small_lesser_marginal_distribution",
+   "nameEn": "Lesser Hearty Vigor",
+   "nameDe": "Herzhafte Kraft (klein)",
+   "icon": "",
+   "statKey": "small_lesser_hearty_vigor_30793",
+   "effects": [
+    "health_inc_pct:6"
+   ],
    "tier": "small"
   },
   {
@@ -16030,48 +16050,54 @@ export const TALENT_TREE_DATA = {
    "id": 30819,
    "x": 2433,
    "y": 608,
-   "nameEn": "Lesser Steady Aim",
-   "nameDe": "Ruhige Hand (klein)",
-   "descEn": "Standing still grants +6% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_steady_aim",
+   "nameEn": "Lesser Keen Eye",
+   "nameDe": "Scharfes Auge (klein)",
+   "icon": "",
+   "statKey": "small_lesser_keen_eye_30819",
+   "effects": [
+    "projectile_crit_chance:1"
+   ],
    "tier": "small"
   },
   {
    "id": 30820,
    "x": 2433,
    "y": 568,
-   "nameEn": "Lesser Steady Aim",
-   "nameDe": "Ruhige Hand (klein)",
-   "descEn": "Standing still grants +6% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_steady_aim",
+   "nameEn": "Lesser Keen Eye",
+   "nameDe": "Scharfes Auge (klein)",
+   "icon": "",
+   "statKey": "small_lesser_keen_eye_30820",
+   "effects": [
+    "projectile_crit_chance:1"
+   ],
    "tier": "small"
   },
   {
    "id": 30821,
    "x": 2292,
    "y": 531,
-   "nameEn": "Lesser Calculated Genesis",
-   "nameDe": "Berechneter Ursprung (klein)",
-   "descEn": "10% chance to reveal 1 correct filled cell at the start of each level. Rolls independently from Probabilistic Start and Stochastic Awakening. +3% Evasion.",
-   "descDe": "10% Chance, zu Beginn jedes Levels 1 korrekte gefüllte Zelle aufzudecken. Wirkt unabhängig von Probabilistischer Start und Stochastisches Erwachen. +3% Ausweichen.",
-   "icon": "🎲",
-   "statKey": "small_lesser_calculated_genesis",
+   "nameEn": "Lesser Prismatic Dodge",
+   "nameDe": "Prismatisches Ausweichen (klein)",
+   "icon": "",
+   "statKey": "small_lesser_prismatic_dodge_30821",
+   "effects": [
+    "evasion_inc_pct:12",
+    "all_elemental_resist:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30822,
    "x": 2194,
    "y": 531,
-   "nameEn": "Lesser Calculated Genesis",
-   "nameDe": "Berechneter Ursprung (klein)",
-   "descEn": "10% chance to reveal 1 correct filled cell at the start of each level. Rolls independently from Probabilistic Start and Stochastic Awakening. +3% Evasion.",
-   "descDe": "10% Chance, zu Beginn jedes Levels 1 korrekte gefüllte Zelle aufzudecken. Wirkt unabhängig von Probabilistischer Start und Stochastisches Erwachen. +3% Ausweichen.",
-   "icon": "🎲",
-   "statKey": "small_lesser_calculated_genesis",
+   "nameEn": "Lesser Prismatic Dodge",
+   "nameDe": "Prismatisches Ausweichen (klein)",
+   "icon": "",
+   "statKey": "small_lesser_prismatic_dodge_30822",
+   "effects": [
+    "evasion_inc_pct:12",
+    "all_elemental_resist:4"
+   ],
    "tier": "small"
   },
   {
@@ -30056,11 +30082,17 @@ export const TALENT_TREE_DATA = {
    "from": 30144,
    "to": 30948,
    "dotted": false
+  },
+  {
+   "id": 719,
+   "from": 30793,
+   "to": 30792,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "16b58a8f9842bafd",
+  "fingerprint": "b2eaeb111464f083",
   "positions": [
    [
     156,

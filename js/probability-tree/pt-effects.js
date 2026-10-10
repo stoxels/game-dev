@@ -225,6 +225,8 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // the crit chance of that same roll; projectile_speed shortens every
     // player projectile's flight time (_egAnimatePlayerProjectile).
     projectile_damage_inc: { channel: 'projectileDamageIncPct', en: '{v}% increased Projectile Damage', de: '{v}% erhöhter Projektilschaden' },
+    // Added to the crit multiplier (base 150%) of projectile rolls only.
+    projectile_crit_multi: { channel: 'projectileCritMultiplierPct', en: '+{v}% to Critical Strike Multiplier of Projectiles', de: '+{v}% auf den kritischen Schadensmultiplikator von Projektilen' },
     projectile_speed: { channel: 'projectileSpeedPct', en: '{v}% increased Projectile Speed', de: '{v}% erhöhte Projektilgeschwindigkeit' },
     projectile_crit_chance: { channel: 'projectileCritChancePct', en: '+{v}% to Critical Strike Chance of Projectiles', de: '+{v}% auf die kritische Trefferchance von Projektilen' },
     // Bow spells (nodes 30857/20102/30858/30859): spells carrying the Bow tag.
@@ -235,6 +237,9 @@ export const PT_EFFECT_DEFS = Object.freeze({
     bow_spell_damage_inc: { channel: 'bowSpellDamageIncPct', en: '{v}% increased Damage with Bow spells', de: '{v}% erhöhter Schaden mit Bogenzaubern' },
     bow_spell_dot_inc: { channel: 'bowSpellDotIncPct', en: 'Bow spells deal {v}% increased Damage over Time', de: 'Bogenzauber verursachen {v}% erhöhten Schaden über Zeit' },
 
+    // Flat bonus to every Heart pickup (node 248): rides the heartHealFlat
+    // bucket gear's heart_heal feeds (_egCalcHeartHeal).
+    heart_heal_flat: { channel: 'heartHealFlat', en: 'Hearts heal for {v} more Life', de: 'Herzen heilen {v} mehr Leben' },
     // Stun avoidance (nodes 30860/30863/20100): tracked and shown only - no
     // enemy can stun the player yet.
     stun_avoid: { channel: 'stunAvoidPct', en: '{v}% Chance to avoid being Stunned', de: '{v}% Chance, nicht betäubt zu werden' },

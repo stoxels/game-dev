@@ -49,7 +49,10 @@ export function _egCalcPlayerDamage() {
 
     // Projectile crit chance (passive tree) is added to the base crit chance
     // for this roll only - melee strikes never read it.
-    const critMult = _egRollCrit(stats, { chance: stats.projectileCritChancePct || 0 });
+    const critMult = _egRollCrit(stats, {
+        chance: stats.projectileCritChancePct || 0,
+        multiplierPct: stats.projectileCritMultiplierPct || 0,
+    });
     _egLastHitWasCrit = critMult > 1;
     _egLastHitCritMult = critMult;
     dmg *= critMult;

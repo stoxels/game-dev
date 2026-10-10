@@ -640,6 +640,7 @@ export function _egComputePlayerStats() {
         projectileDamageIncPct: passiveTreeBonuses.projectileDamageIncPct || 0,
         projectileSpeedPct: passiveTreeBonuses.projectileSpeedPct || 0,
         projectileCritChancePct: passiveTreeBonuses.projectileCritChancePct || 0,
+        projectileCritMultiplierPct: passiveTreeBonuses.projectileCritMultiplierPct || 0,
         bowSpellDamageIncPct: passiveTreeBonuses.bowSpellDamageIncPct || 0,
         bowSpellDotIncPct: passiveTreeBonuses.bowSpellDotIncPct || 0,
         // Stun avoidance (Stalwart Vigor nodes): tracked only - monsters cannot
@@ -912,7 +913,7 @@ export function _egComputePlayerStats() {
         parryChancePct: 0, deflectChancePct: 0, deflectDamagePct: 0,
         movementSpeedPct: passiveTreeBonuses.movementSpeedPct || 0,
         manaOnKill: 0, absorptionOnKill: 0, lifeOnKill: 0, manaOnMistake: 0,
-        heartHealFlat: 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: passiveTreeBonuses.manaHealIncPct || 0, timeAdded: 0,
+        heartHealFlat: passiveTreeBonuses.heartHealFlat || 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: passiveTreeBonuses.manaHealIncPct || 0, timeAdded: 0,
         absorptionRegenRatePct: passiveTreeBonuses.absorptionRegenRatePct || 0, fasterAbsorptionRegenStart: 0,
     };
 
@@ -1513,6 +1514,7 @@ export const EG_STAT_DISPLAY_LABELS = {
     projectileDamageIncPct: { label: t('eg_stat_inc_projectile_damage'), suffix: '%' },
     projectileSpeedPct: { label: t('eg_stat_inc_projectile_speed'), suffix: '%' },
     projectileCritChancePct: { label: t('eg_stat_projectile_crit_chance'), suffix: '%' },
+    projectileCritMultiplierPct: { label: t('eg_stat_projectile_crit_multi'), suffix: '%' },
     bowSpellDamageIncPct: { label: t('eg_stat_inc_bow_spell_damage'), suffix: '%' },
     bowSpellDotIncPct: { label: t('eg_stat_inc_bow_spell_dot'), suffix: '%' },
     stunAvoidPct: { label: t('eg_stat_stun_avoid'), suffix: '%' },
@@ -1659,7 +1661,7 @@ export const EG_STAT_LAYOUT = {
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
             'coldDamageIncPct', 'lightningDamageIncPct',
-            'projectileDamageIncPct', 'projectileSpeedPct', 'projectileCritChancePct', 'projectileElementalDamageIncPct',
+            'projectileDamageIncPct', 'projectileSpeedPct', 'projectileCritChancePct', 'projectileCritMultiplierPct', 'projectileElementalDamageIncPct',
             'bowSpellDamageIncPct', 'bowSpellDotIncPct',
             'healingPowerFlat', 'healingPowerIncPct',
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
