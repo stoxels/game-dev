@@ -15685,24 +15685,26 @@ export const TALENT_TREE_DATA = {
    "id": 30789,
    "x": 2193,
    "y": 679,
-   "nameEn": "Lesser Steady Aim",
-   "nameDe": "Ruhige Hand (klein)",
-   "descEn": "Standing still grants +6% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_steady_aim",
+   "nameEn": "Lesser Agility",
+   "nameDe": "Beweglichkeit (klein)",
+   "icon": "",
+   "statKey": "small_agility_30789",
+   "effects": [
+    "agi_flat:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30790,
    "x": 2291,
    "y": 679,
-   "nameEn": "Lesser Steady Aim",
-   "nameDe": "Ruhige Hand (klein)",
-   "descEn": "Standing still grants +6% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_steady_aim",
+   "nameEn": "Lesser Agility",
+   "nameDe": "Beweglichkeit (klein)",
+   "icon": "",
+   "statKey": "small_agility_30790",
+   "effects": [
+    "agi_flat:10"
+   ],
    "tier": "small"
   },
   {
