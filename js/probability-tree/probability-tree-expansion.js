@@ -386,24 +386,9 @@ export function _ptxRunExpansion() {
     }
 
     // Shadow cluster -------------------------------------------------------------
-
-    ON_START.push(() => {   // Umbral Survey (337)
-        if (!has('umbral_survey')) return;
-        const rows = cur.grid.length, cols = cur.grid[0].length;
-        const midR = Math.floor(rows / 2), midC = Math.floor(cols / 2);
-        const quads = [
-            [0, midR, 0, midC], [0, midR, midC, cols],
-            [midR, rows, 0, midC], [midR, rows, midC, cols],
-        ];
-        let marked = 0;
-        quads.forEach(([r0, r1, c0, c1]) => {
-            const cell = randomCell((r, c) =>
-                r >= r0 && r < r1 && c >= c0 && c < c1 &&
-                cur.grid[r][c] === 0 && globalThis.userGrid[r][c] === 0);
-            if (cell && markAt(cell[0], cell[1])) marked++;
-        });
-        if (marked) toast('🌑 Umbral Survey');
-    });
+    // (Umbral Survey, node 337, left the quadrant auto-mark mechanic for its
+    // block-ward rework and answers to notable_aegis_ward_337 now - the hook
+    // is gone, not kept as a second effect.)
 
     // Generic +reveal / +mark start nodes ---------------------------------------
 

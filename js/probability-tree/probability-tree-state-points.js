@@ -105,9 +105,11 @@ export const PT_BRANCH_PROBABILIST = new Set([
 ]);
 
 // StatKeys required to satisfy the "lucky tile build" achievement
+// (fortunes_tile_3 retired with node 191's melee rework - _ptCheckCluster
+// requires EVERY key, so keeping it would lock the achievement forever.)
 export const PT_LUCKY_BUILD_KEYS = [
     'grid_awareness',
-    'fortunes_tile_1', 'fortunes_tile_2', 'fortunes_tile_3',
+    'fortunes_tile_1', 'fortunes_tile_2',
     'generous_fortune_1', 'generous_fortune_2', 'generous_fortune_3',
     'outlier_detection_1', 'outlier_detection_2',
     'covariance_shift_1', 'covariance_shift_2', 'covariance_shift_3',
@@ -153,10 +155,15 @@ export const PT_CLUSTER_CHECKS = [
     [['blackout_ward_1', 'blackout_ward_2', 'blackout_ward_3'], 'treeBlackoutWardComplete'],
     [['removal_ward_1', 'removal_ward_2', 'removal_ward_3'], 'treeRemovalWardComplete'],
     [['interquartile_vision_1', 'interquartile_vision_2', 'interquartile_vision_3'], 'treeInterquartileComplete'],
+    // Node 129 (Horizon Tracker) left the reveal-priority mechanic for Life
+    // regeneration, so targeted_reveal_3 has no owner left - and _ptCheckCluster
+    // requires EVERY key, so keeping it would lock the achievement forever.
+    // (targeted_reveal_1 survives via its travel_ alias - pre-existing,
+    // deliberately not "fixed" here.)
     [
         ['stronger_light_1', 'stronger_light_2', 'stronger_light_3',
             'seeker_of_light_3',
-            'targeted_reveal_1', 'targeted_reveal_2', 'targeted_reveal_3'],
+            'targeted_reveal_1', 'targeted_reveal_2'],
         'treeRevealItemsComplete',
     ],
     [

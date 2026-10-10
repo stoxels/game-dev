@@ -49,7 +49,8 @@ export function _calcLuckyTileCount(isLarge, isMassive, isLargeOrMassive) {
     if (isLargeOrMassive) {
         if (ptHasSkill('fortunes_tile_1')) extraTileChance += 0.10;
         if (ptHasSkill('fortunes_tile_2')) extraTileChance += 0.15;
-        if (ptHasSkill('fortunes_tile_3')) extraTileChance += 0.25;
+        // fortunes_tile_3 retired with node 191's melee rework - no node
+        // grants it anymore, so its +0.25 line is gone, not kept as dead code.
         if (isTrix) extraTileChance += 0.15; // Loaded Dice: node-independent chance boost
     }
 

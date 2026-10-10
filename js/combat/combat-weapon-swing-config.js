@@ -1,5 +1,5 @@
 import { _egGetElementCentre } from './combat-class-projectiles.js';
-import { _egGetAllEquippedItems } from '../endgame/endgame-player-stats.js';
+import { _egComputePlayerStats, _egGetAllEquippedItems } from '../endgame/endgame-player-stats.js';
 
 //------------------------------------------------------------------------
 //-------------------WEAPON CONFIGURATION AND RESOLUTION----------------
@@ -11,6 +11,11 @@ export const EG_WEAPON_SWING_COOLDOWN_MS = 400;
 // Melee reach: the avatar's screen centre must be within this many px of
 // the target card's centre for a PLAIN strike (<200%) to connect.
 const EG_MELEE_RANGE_PX = 340;
+
+// Screen scale for melee range in meters (reworked node 20033 Champion's
+// Vigor grants +1): the base 340px reach is ~3.4m, so one meter reads as a
+// visible but sane step outward - roughly one extra card spacing.
+export const EG_PX_PER_METER = 100;
 
 // Per-family visual lifetime (ms) - must cover the longest CSS keyframe
 // in weapon-swing.css so the node is removed after the effect finishes.
@@ -88,7 +93,14 @@ export function _egMeleeTargetInRange(targetId) {
             : card.getBoundingClientRect();
         const ax = (a.x != null) ? a.x : a.left, ay = (a.y != null) ? a.y : a.top;
         const bx = (b.x != null) ? b.x : b.left, by = (b.y != null) ? b.y : b.top;
-        return Math.hypot(ax - bx, ay - by) <= EG_MELEE_RANGE_PX;
+        // Champion's Vigor (reworked node 20033): bonus meters stretch the
+        // reach. Guarded like the ailment channels - no stats, no bonus.
+        let bonusPx = 0;
+        try {
+            const ps = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : {};
+            bonusPx = (Number(ps.meleeRangeM) || 0) * EG_PX_PER_METER;
+        } catch (e) { bonusPx = 0; }
+        return Math.hypot(ax - bx, ay - by) <= EG_MELEE_RANGE_PX + bonusPx;
     } catch (e) {
         return true;
     }

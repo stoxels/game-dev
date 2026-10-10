@@ -98,6 +98,14 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     if (stats.meleePhysMax > 0) {
         dmg = stats.meleePhysMin + (stats.meleePhysMax - stats.meleePhysMin) * Math.random();
         dmg *= (1 + stats.meleePhysIncPct / 100);
+        // Weapon-stance split from the passive tree (melee batch): Heavy
+        // with a two-handed weapon equipped, one-handed otherwise (1H +
+        // shield, dual-wield or unarmed). Exactly one side applies, on top
+        // of the generic increase above.
+        const stanceIncPct = stats.isHeavyWeaponEquipped
+            ? (stats.meleePhysHeavyIncPct || 0)
+            : (stats.meleePhys1HIncPct || 0);
+        dmg *= (1 + stanceIncPct / 100);
     } else {
         // Unarmed / no weapon damage - flat fallback strike
         dmg = EG_PLAYER_MELEE_DAMAGE;

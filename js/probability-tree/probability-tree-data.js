@@ -1368,10 +1368,12 @@ export const TALENT_TREE_DATA = {
    "y": 896,
    "nameEn": "Enhanced Rewards",
    "nameDe": "Verbesserte Belohnungen",
-   "descEn": "The legacy item-reward effect is not active in the current progression system. +6% Armour.",
-   "descDe": "Der alte Gegenstands-Belohnungseffekt ist im aktuellen Fortschrittssystem nicht aktiv. +6% Rüstung.",
-   "icon": "🎀",
+   "icon": "",
    "statKey": "enhanced_rewards",
+   "effects": [
+    "armour_inc_pct:28",
+    "reflect_phys_flat:10"
+   ],
    "tier": "notable"
   },
   {
@@ -1650,10 +1652,13 @@ export const TALENT_TREE_DATA = {
    "y": 479,
    "nameEn": "Blessing of Fortune",
    "nameDe": "Segen des Glücks",
-   "descEn": "Large and massive grids have a 25% chance of having an additional Lucky Tile. This stacks additively with other Lucky Tile bonuses. +6% Armour.",
-   "descDe": "Große und massive Gitter haben eine 25% Chance ein weiteres Glücksfeld zu haben. Dies summiert sich mit anderen Glücksfeld-Boni. +6% Rüstung.",
-   "icon": "🍀",
-   "statKey": "fortunes_tile_3",
+   "icon": "",
+   "statKey": "notable_heavy_champion_191",
+   "effects": [
+    "melee_phys_heavy:25",
+    "str_flat:20",
+    "melee_charge_speed_pct:5"
+   ],
    "tier": "notable"
   },
   {
@@ -2478,10 +2483,12 @@ export const TALENT_TREE_DATA = {
    "y": 1006,
    "nameEn": "Promising Answers",
    "nameDe": "Vielversprechende Antworten",
-   "descEn": "The legacy item-reward effect is not active in the current progression system. +6% Armour.",
-   "descDe": "Der alte Gegenstands-Belohnungseffekt ist im aktuellen Fortschrittssystem nicht aktiv. +6% Rüstung.",
-   "icon": "🎁",
+   "icon": "",
    "statKey": "promising_answers",
+   "effects": [
+    "life_regen_pct:1.8",
+    "str_flat:20"
+   ],
    "tier": "notable"
   },
   {
@@ -3102,10 +3109,12 @@ export const TALENT_TREE_DATA = {
    "y": 1116,
    "nameEn": "Horizon Tracker",
    "nameDe": "Horizontverfolger",
-   "descEn": "Reveal items have a 30% chance to prioritize cells in the unsolved row or column with the fewest filled cells. Stacks with Pattern Whisper and Selective Insight. +6% Armour.",
-   "descDe": "Enthüllungsgegenstände haben eine 30% Chance, Zellen in der ungelösten Zeile oder Spalte mit den wenigsten gefüllten Zellen zu priorisieren. Wirkt zusammen mit Musterflüstern und Selektive Einsicht. +6% Rüstung.",
-   "icon": "🔭",
-   "statKey": "targeted_reveal_3",
+   "icon": "",
+   "statKey": "notable_horizon_tracker_129",
+   "effects": [
+    "life_regen_flat:10",
+    "life_regen_pct:1.2"
+   ],
    "tier": "notable"
   },
   {
@@ -3270,10 +3279,12 @@ export const TALENT_TREE_DATA = {
    "y": 1386,
    "nameEn": "Umbral Survey",
    "nameDe": "Schattenlotse",
-   "descEn": "At the start of each level, one incorrect empty cell in each quadrant of the grid is automatically marked. +6% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird in jedem Quadranten des Gitters automatisch eine falsche leere Zelle markiert. +6% Rüstung.",
-   "icon": "🌑",
-   "statKey": "umbral_survey",
+   "icon": "",
+   "statKey": "notable_aegis_ward_337",
+   "effects": [
+    "block_dualshield:10",
+    "block_pulse:300"
+   ],
    "tier": "notable"
   },
   {
@@ -5986,10 +5997,13 @@ export const TALENT_TREE_DATA = {
    "y": 795,
    "nameEn": "Anvil Guard",
    "nameDe": "Ambosswache",
-   "descEn": "Reflect 10% of melee damage taken back at the attacker.",
-   "descDe": "Reflektiere 10% des erlittenen Nahkampfschadens auf den Angreifer.",
-   "icon": "◆",
+   "icon": "",
    "statKey": "notable_anvil_guard",
+   "effects": [
+    "life_flat:20",
+    "health_inc_pct:10",
+    "str_flat:10"
+   ],
    "tier": "notable"
   },
   {
@@ -6001,7 +6015,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_champion_s_onslaught",
    "effects": [
-    "attack_speed_pct:4",
+    "melee_charge_speed_pct:4",
     "str_flat:20",
     "phys_damage_inc:26"
    ],
@@ -6013,10 +6027,10 @@ export const TALENT_TREE_DATA = {
    "y": 589,
    "nameEn": "Champion's Vigor",
    "nameDe": "Tatkraft des Champions",
-   "descEn": "+30 maximum Health, +3% Attack speed.",
-   "descDe": "+30 max. Leben, +3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_champion_s_vigor",
+   "descEn": "+1 meter to melee strike range.\nMelee skills have 12% increased area of effect.",
+   "descDe": "+1 Meter Nahkampf-Reichweite.\nNahkampffertigkeiten haben 12% erhöhten Wirkungsbereich.",
+   "icon": "",
+   "statKey": "notable_champions_vigor_20033",
    "tier": "notable"
   },
   {
@@ -6025,10 +6039,13 @@ export const TALENT_TREE_DATA = {
    "y": 699,
    "nameEn": "Carnage",
    "nameDe": "Gemetzel",
-   "descEn": "+2% Melee damage per monster killed this level, up to +20%.",
-   "descDe": "+2% Nahkampfschaden pro in diesem Level getötetem Monster, bis zu +20%.",
-   "icon": "◆",
+   "icon": "",
    "statKey": "notable_carnage",
+   "effects": [
+    "melee_phys_1h:25",
+    "str_flat:20",
+    "melee_charge_speed_pct:5"
+   ],
    "tier": "notable"
   },
   {
@@ -6037,10 +6054,11 @@ export const TALENT_TREE_DATA = {
    "y": 1006,
    "nameEn": "Carnage",
    "nameDe": "Gemetzel",
-   "descEn": "+2% Melee damage per monster killed this level, up to +20%.",
-   "descDe": "+2% Nahkampfschaden pro in diesem Level getötetem Monster, bis zu +20%.",
-   "icon": "◆",
-   "statKey": "notable_carnage",
+   "icon": "",
+   "statKey": "notable_carnage_20035",
+   "effects": [
+    "all_elemental_resist:15"
+   ],
    "tier": "notable"
   },
   {
@@ -6049,10 +6067,10 @@ export const TALENT_TREE_DATA = {
    "y": 1269,
    "nameEn": "Tithe of Strength",
    "nameDe": "Zehnter der Stärke",
-   "descEn": "+10 to Strength. Melee damage scales further with Strength.",
-   "descDe": "+10 Stärke. Nahkampfschaden skaliert stärker mit Stärke.",
-   "icon": "◆",
-   "statKey": "notable_tithe_of_strength",
+   "descEn": "Bleeding enemies cannot inflict Bleeding on you.\nIgnited enemies cannot inflict Ignite on you.",
+   "descDe": "Blutende Gegner können dir keine Blutung zufügen.\nBrennende Gegner können dich nicht entzünden.",
+   "icon": "",
+   "statKey": "notable_tithe_ward_20036",
    "tier": "notable"
   },
   {
@@ -6133,10 +6151,12 @@ export const TALENT_TREE_DATA = {
    "y": 1265,
    "nameEn": "Grit",
    "nameDe": "Zähigkeit",
-   "descEn": "+10 Armour, +1 Absorption on kill.",
-   "descDe": "+10 Rüstung, +1 Absorption pro Kill.",
-   "icon": "◆",
-   "statKey": "notable_grit",
+   "icon": "",
+   "statKey": "notable_grit_20043",
+   "effects": [
+    "melee_charge_speed_pct:12",
+    "life_leech:1.5"
+   ],
    "tier": "notable"
   },
   {
@@ -6434,10 +6454,13 @@ export const TALENT_TREE_DATA = {
    "y": 642,
    "nameEn": "Resolute Advance",
    "nameDe": "Entschlossener Vormarsch",
-   "descEn": "+10% Armour. You cannot be slowed below 80% Movement speed.",
-   "descDe": "+10% Rüstung. Du kannst nicht unter 80% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
-   "statKey": "notable_resolute_advance",
+   "icon": "",
+   "statKey": "notable_resolute_advance_20068",
+   "effects": [
+    "health_inc_pct:8",
+    "fire_res_max:1",
+    "fire_resist_flat:8"
+   ],
    "tier": "notable"
   },
   {
@@ -7339,10 +7362,11 @@ export const TALENT_TREE_DATA = {
    "y": 746,
    "nameEn": "Lesser Anvil Guard",
    "nameDe": "Ambosswache (klein)",
-   "descEn": "Reflect 5% of melee damage taken back at the attacker.",
-   "descDe": "Reflektiere 5% des erlittenen Nahkampfschadens auf den Angreifer.",
-   "icon": "◆",
+   "icon": "",
    "statKey": "small_lesser_anvil_guard",
+   "effects": [
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
@@ -7379,10 +7403,11 @@ export const TALENT_TREE_DATA = {
    "y": 844,
    "nameEn": "Lesser Anvil Guard",
    "nameDe": "Ambosswache (klein)",
-   "descEn": "Reflect 5% of melee damage taken back at the attacker.",
-   "descDe": "Reflektiere 5% des erlittenen Nahkampfschadens auf den Angreifer.",
-   "icon": "◆",
+   "icon": "",
    "statKey": "small_lesser_anvil_guard",
+   "effects": [
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
@@ -7988,10 +8013,12 @@ export const TALENT_TREE_DATA = {
    "y": 1200,
    "nameEn": "Lesser Tithe of Strength",
    "nameDe": "Zehnter der Stärke (klein)",
-   "descEn": "+5 to Strength. Melee damage scales further with Strength.",
-   "descDe": "+5 Stärke. Nahkampfschaden skaliert stärker mit Stärke.",
-   "icon": "◆",
-   "statKey": "small_lesser_tithe_of_strength",
+   "icon": "",
+   "statKey": "small_ailment_tithe_30252",
+   "effects": [
+    "ignite_duration:25",
+    "bleed_duration:25"
+   ],
    "tier": "small"
   },
   {
@@ -8000,10 +8027,12 @@ export const TALENT_TREE_DATA = {
    "y": 1229,
    "nameEn": "Lesser Tithe of Strength",
    "nameDe": "Zehnter der Stärke (klein)",
-   "descEn": "+5 to Strength. Melee damage scales further with Strength.",
-   "descDe": "+5 Stärke. Nahkampfschaden skaliert stärker mit Stärke.",
-   "icon": "◆",
-   "statKey": "small_lesser_tithe_of_strength",
+   "icon": "",
+   "statKey": "small_ailment_tithe_30253",
+   "effects": [
+    "ignite_duration:25",
+    "bleed_duration:25"
+   ],
    "tier": "small"
   },
   {
@@ -8012,10 +8041,12 @@ export const TALENT_TREE_DATA = {
    "y": 1333,
    "nameEn": "Lesser Umbral Survey",
    "nameDe": "Schattenlotse (klein)",
-   "descEn": "At the start of each level, one incorrect empty cell in each quadrant of the grid is automatically marked. +3% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird in jedem Quadranten des Gitters automatisch eine falsche leere Zelle markiert. +3% Rüstung.",
-   "icon": "🌑",
-   "statKey": "small_lesser_umbral_survey",
+   "icon": "",
+   "statKey": "small_block_ward_30254",
+   "effects": [
+    "block_dualshield:3",
+    "block_recovery:30"
+   ],
    "tier": "small"
   },
   {
@@ -8024,10 +8055,11 @@ export const TALENT_TREE_DATA = {
    "y": 1280,
    "nameEn": "Lesser Umbral Survey",
    "nameDe": "Schattenlotse (klein)",
-   "descEn": "At the start of each level, one incorrect empty cell in each quadrant of the grid is automatically marked. +3% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird in jedem Quadranten des Gitters automatisch eine falsche leere Zelle markiert. +3% Rüstung.",
-   "icon": "🌑",
-   "statKey": "small_lesser_umbral_survey",
+   "icon": "",
+   "statKey": "small_block_ward_30255",
+   "effects": [
+    "block_dualshield:3"
+   ],
    "tier": "small"
   },
   {
@@ -8036,10 +8068,12 @@ export const TALENT_TREE_DATA = {
    "y": 1333,
    "nameEn": "Lesser Umbral Survey",
    "nameDe": "Schattenlotse (klein)",
-   "descEn": "At the start of each level, one incorrect empty cell in each quadrant of the grid is automatically marked. +3% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird in jedem Quadranten des Gitters automatisch eine falsche leere Zelle markiert. +3% Rüstung.",
-   "icon": "🌑",
-   "statKey": "small_lesser_umbral_survey",
+   "icon": "",
+   "statKey": "small_block_ward_30256",
+   "effects": [
+    "block_dualshield:3",
+    "armour_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
@@ -8048,10 +8082,12 @@ export const TALENT_TREE_DATA = {
    "y": 1225,
    "nameEn": "Lesser Grit",
    "nameDe": "Zähigkeit (klein)",
-   "descEn": "+5 Armour, +1 Absorption on kill.",
-   "descDe": "+5 Rüstung, +1 Absorption pro Kill.",
-   "icon": "◆",
-   "statKey": "small_lesser_grit",
+   "icon": "",
+   "statKey": "small_grit_30257",
+   "effects": [
+    "melee_charge_speed_pct:3",
+    "life_leech:0.4"
+   ],
    "tier": "small"
   },
   {
@@ -8060,10 +8096,12 @@ export const TALENT_TREE_DATA = {
    "y": 1196,
    "nameEn": "Lesser Grit",
    "nameDe": "Zähigkeit (klein)",
-   "descEn": "+5 Armour, +1 Absorption on kill.",
-   "descDe": "+5 Rüstung, +1 Absorption pro Kill.",
-   "icon": "◆",
-   "statKey": "small_lesser_grit",
+   "icon": "",
+   "statKey": "small_grit_30258",
+   "effects": [
+    "melee_charge_speed_pct:3",
+    "life_leech:0.4"
+   ],
    "tier": "small"
   },
   {
@@ -8085,10 +8123,11 @@ export const TALENT_TREE_DATA = {
    "y": 1048,
    "nameEn": "Lesser Horizon Tracker",
    "nameDe": "Horizontverfolger (klein)",
-   "descEn": "Reveal items have a 15% chance to prioritize cells in the unsolved row or column with the fewest filled cells. Stacks with Pattern Whisper and Selective Insight. +3% Armour.",
-   "descDe": "Enthüllungsgegenstände haben eine 15% Chance, Zellen in der ungelösten Zeile oder Spalte mit den wenigsten gefüllten Zellen zu priorisieren. Wirkt zusammen mit Musterflüstern und Selektive Einsicht. +3% Rüstung.",
-   "icon": "🔭",
+   "icon": "",
    "statKey": "small_lesser_horizon_tracker",
+   "effects": [
+    "life_regen_pct:0.6"
+   ],
    "tier": "small"
   },
   {
@@ -8097,10 +8136,11 @@ export const TALENT_TREE_DATA = {
    "y": 1006,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_elemental_ward_30261",
+   "effects": [
+    "all_elemental_resist:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8109,10 +8149,11 @@ export const TALENT_TREE_DATA = {
    "y": 964,
    "nameEn": "Lesser Enhanced Rewards",
    "nameDe": "Verbesserte Belohnungen (klein)",
-   "descEn": "5% chance to receive an additional Item when answering a Multiple Choice question correctly. +3% Armour.",
-   "descDe": "5% Chance einen zusätzlichen Gegenstand für die korrekte Beantwortung von Multiple Choice Fragen zu erhalten. +3% Rüstung.",
-   "icon": "🎀",
+   "icon": "",
    "statKey": "small_lesser_enhanced_rewards",
+   "effects": [
+    "armour_inc_pct:14"
+   ],
    "tier": "small"
   },
   {
@@ -8400,10 +8441,12 @@ export const TALENT_TREE_DATA = {
    "y": 589,
    "nameEn": "Lesser Resolute Advance",
    "nameDe": "Entschlossener Vormarsch (klein)",
-   "descEn": "+5% Armour. You cannot be slowed below 40% Movement speed.",
-   "descDe": "+5% Rüstung. Du kannst nicht unter 40% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
+   "icon": "",
    "statKey": "small_lesser_resolute_advance",
+   "effects": [
+    "health_inc_pct:4",
+    "all_elemental_resist:3"
+   ],
    "tier": "small"
   },
   {
@@ -8412,10 +8455,12 @@ export const TALENT_TREE_DATA = {
    "y": 589,
    "nameEn": "Lesser Resolute Advance",
    "nameDe": "Entschlossener Vormarsch (klein)",
-   "descEn": "+5% Armour. You cannot be slowed below 40% Movement speed.",
-   "descDe": "+5% Rüstung. Du kannst nicht unter 40% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
+   "icon": "",
    "statKey": "small_lesser_resolute_advance",
+   "effects": [
+    "health_inc_pct:4",
+    "all_elemental_resist:3"
+   ],
    "tier": "small"
   },
   {
@@ -9078,10 +9123,11 @@ export const TALENT_TREE_DATA = {
    "y": 814,
    "nameEn": "Lesser Resolute Advance",
    "nameDe": "Entschlossener Vormarsch (klein)",
-   "descEn": "+5% Armour. You cannot be slowed below 40% Movement speed.",
-   "descDe": "+5% Rüstung. Du kannst nicht unter 40% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
-   "statKey": "small_lesser_resolute_advance",
+   "icon": "",
+   "statKey": "small_resolute_strength_30342",
+   "effects": [
+    "str_flat:10"
+   ],
    "tier": "small"
   },
   {
@@ -9090,10 +9136,11 @@ export const TALENT_TREE_DATA = {
    "y": 814,
    "nameEn": "Lesser Resolute Advance",
    "nameDe": "Entschlossener Vormarsch (klein)",
-   "descEn": "+5% Armour. You cannot be slowed below 40% Movement speed.",
-   "descDe": "+5% Rüstung. Du kannst nicht unter 40% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
-   "statKey": "small_lesser_resolute_advance",
+   "icon": "",
+   "statKey": "small_resolute_strength_30343",
+   "effects": [
+    "str_flat:10"
+   ],
    "tier": "small"
   },
   {
@@ -9152,10 +9199,11 @@ export const TALENT_TREE_DATA = {
    "y": 589,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_charge_flow_30348",
+   "effects": [
+    "melee_charge_speed_pct:4"
+   ],
    "tier": "travel"
   },
   {
@@ -9164,10 +9212,11 @@ export const TALENT_TREE_DATA = {
    "y": 631,
    "nameEn": "Lesser Champion's Vigor",
    "nameDe": "Tatkraft des Champions (klein)",
-   "descEn": "+15 maximum Health, +2% Attack speed.",
-   "descDe": "+15 max. Leben, +2% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_champion_s_vigor",
+   "icon": "",
+   "statKey": "small_onehand_blow_30349",
+   "effects": [
+    "melee_phys_1h:16"
+   ],
    "tier": "small"
   },
   {
@@ -9176,10 +9225,11 @@ export const TALENT_TREE_DATA = {
    "y": 547,
    "nameEn": "Lesser Champion's Vigor",
    "nameDe": "Tatkraft des Champions (klein)",
-   "descEn": "+15 maximum Health, +2% Attack speed.",
-   "descDe": "+15 max. Leben, +2% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_champion_s_vigor",
+   "icon": "",
+   "statKey": "small_heavy_blow_30350",
+   "effects": [
+    "melee_phys_heavy:16"
+   ],
    "tier": "small"
   },
   {
@@ -9347,10 +9397,11 @@ export const TALENT_TREE_DATA = {
    "y": 547,
    "nameEn": "Lesser Champion's Vigor",
    "nameDe": "Tatkraft des Champions (klein)",
-   "descEn": "+15 maximum Health, +2% Attack speed.",
-   "descDe": "+15 max. Leben, +2% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_champion_s_vigor",
+   "icon": "",
+   "statKey": "small_heavy_blow_30364",
+   "effects": [
+    "melee_phys_heavy:16"
+   ],
    "tier": "small"
   },
   {
@@ -9359,10 +9410,11 @@ export const TALENT_TREE_DATA = {
    "y": 589,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_melee_edge_30365",
+   "effects": [
+    "melee_phys_inc:12"
+   ],
    "tier": "travel"
   },
   {
@@ -9371,10 +9423,11 @@ export const TALENT_TREE_DATA = {
    "y": 631,
    "nameEn": "Lesser Champion's Vigor",
    "nameDe": "Tatkraft des Champions (klein)",
-   "descEn": "+15 maximum Health, +2% Attack speed.",
-   "descDe": "+15 max. Leben, +2% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_champion_s_vigor",
+   "icon": "",
+   "statKey": "small_onehand_blow_30366",
+   "effects": [
+    "melee_phys_1h:16"
+   ],
    "tier": "small"
   },
   {
@@ -9383,10 +9436,11 @@ export const TALENT_TREE_DATA = {
    "y": 964,
    "nameEn": "Lesser Carnage",
    "nameDe": "Gemetzel (klein)",
-   "descEn": "+1% Melee damage per monster killed this level, up to +10%.",
-   "descDe": "+1% Nahkampfschaden pro in diesem Level getötetem Monster, bis zu +10%.",
-   "icon": "◆",
+   "icon": "",
    "statKey": "small_lesser_carnage",
+   "effects": [
+    "armour_inc_pct:14"
+   ],
    "tier": "small"
   },
   {
@@ -9395,10 +9449,11 @@ export const TALENT_TREE_DATA = {
    "y": 1006,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_elemental_ward_30368",
+   "effects": [
+    "all_elemental_resist:5"
+   ],
    "tier": "travel"
   },
   {
@@ -9407,10 +9462,11 @@ export const TALENT_TREE_DATA = {
    "y": 1048,
    "nameEn": "Lesser Horizon Tracker",
    "nameDe": "Horizontverfolger (klein)",
-   "descEn": "Reveal items have a 15% chance to prioritize cells in the unsolved row or column with the fewest filled cells. Stacks with Pattern Whisper and Selective Insight. +3% Armour.",
-   "descDe": "Enthüllungsgegenstände haben eine 15% Chance, Zellen in der ungelösten Zeile oder Spalte mit den wenigsten gefüllten Zellen zu priorisieren. Wirkt zusammen mit Musterflüstern und Selektive Einsicht. +3% Rüstung.",
-   "icon": "🔭",
+   "icon": "",
    "statKey": "small_lesser_horizon_tracker",
+   "effects": [
+    "life_regen_pct:0.6"
+   ],
    "tier": "small"
   },
   {
@@ -27187,11 +27243,23 @@ export const TALENT_TREE_DATA = {
    "from": 30086,
    "to": 31328,
    "dotted": false
+  },
+  {
+   "id": 305,
+   "from": 30365,
+   "to": 30364,
+   "dotted": false
+  },
+  {
+   "id": 306,
+   "from": 30343,
+   "to": 30342,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "406ac7eb3ea6adb1",
+  "fingerprint": "4b267ab3a10286f9",
   "positions": [
    [
     156,
@@ -31055,18 +31123,18 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30364,
-    -2983,
-    985
+    -2984,
+    977
    ],
    [
     30365,
-    -2967,
-    1056
+    -2965,
+    1060
    ],
    [
     30366,
-    -2983,
-    1140
+    -2984,
+    1143
    ],
    [
     30367,

@@ -40,6 +40,13 @@ import { _egAddGroundFireAcc, _egGroundFireAcc, _egPlayerStatuses, _egPuzzleEffe
 const EG_AIL_TICK_INTERVAL_S = 1.0;     // DoT tick every second
 const EG_AIL_IGNITE_DURATION_S = 5;
 const EG_AIL_IGNITE_DMG_SHARE = 0.15;   // dps = share of the triggering hit
+// Bleed mirrors ignite one-to-one: a physical damage-over-time status with
+// the same base duration and damage share. Like cold hits innately chill,
+// physical hits innately bleed (see _egRollPlayerHitAilments and
+// _egRollMonsterHitAilment) - the tithe tree nodes scale both durations.
+const EG_AIL_BLEED_DURATION_S = 5;
+const EG_AIL_BLEED_DMG_SHARE = 0.15;    // dps = share of the triggering hit
+const EG_PHYS_INNATE_BLEED_CHANCE_PCT = 10;   // physical hits bleed even w/o mods
 const EG_AIL_CHILL_DURATION_S = 8;
 const EG_AIL_CHARGE_SLOW_MULT = 0.5;    // chilled attack bar fills at 50%
 const EG_AIL_FROZEN_DURATION_S = 0;     // player freeze removed; retained for compatibility
@@ -72,6 +79,7 @@ const EG_SHOCK_MARK_STRIP_CHANCE = 0.35;      // per reveal, strips a random ✕
 
 const EG_AILMENT_ICONS = {
     ignite: '🔥',
+    bleed: '🩸',
     chill: '❄️',
     frozen: '🧊',
     shocked: '⚡',
@@ -122,8 +130,9 @@ function _egApplyMonsterAilment(monster, key, dps) {
     // Active map run: monsters may avoid ailments entirely (PoE purity).
     if ((monster.avoidAilmentPct || 0) > 0 && Math.random() * 100 < monster.avoidAilmentPct) return;
     if (!monster.statuses) monster.statuses = {};
-    const durationS = ({
+    let durationS = ({
         ignite: EG_AIL_IGNITE_DURATION_S,
+        bleed: EG_AIL_BLEED_DURATION_S,
         chill: EG_AIL_CHILL_DURATION_S,
         frozen: EG_AIL_FROZEN_DURATION_S,
         shocked: EG_AIL_SHOCK_DURATION_S,
@@ -133,6 +142,17 @@ function _egApplyMonsterAilment(monster, key, dps) {
         confused: EG_AIL_CONFUSION_DURATION_S,
     })[key];
     if (!durationS) return;
+    // Passive tree: per-ailment duration for YOUR ailments on enemies
+    // (tithe batch, e.g. reworked nodes 30252/30253). Only ignite and bleed
+    // have tree channels; every other ailment keeps its base duration.
+    if (key === 'ignite' || key === 'bleed') {
+        let pct = 0;
+        try {
+            const ps = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : {};
+            pct = Number(key === 'ignite' ? ps.igniteDurationPct : ps.bleedDurationPct) || 0;
+        } catch (e) { pct = 0; }
+        if (pct > 0) durationS = durationS * (1 + pct / 100);
+    }
     _egApplyStatusToMap(monster.statuses, key, durationS, dps);
     // No application blip on the monster side: elemental hits re-roll and
     // refresh ailments on every strike, so a per-hit cue (ignite especially)
@@ -145,6 +165,7 @@ function _egApplyMonsterAilment(monster, key, dps) {
 function _egApplyPlayerAilment(key, dps) {
     const durationS = ({
         ignite: EG_AIL_IGNITE_DURATION_S,
+        bleed: EG_AIL_BLEED_DURATION_S,
         chill: EG_AIL_CHILL_DURATION_S,
         frozen: EG_AIL_FROZEN_DURATION_S,
         shocked: EG_AIL_SHOCK_DURATION_S,
@@ -336,6 +357,14 @@ function _egRollPlayerHitAilments(target, amount, elements) {
     const fireShare = elements ? (elements.fire || 0) : 0;
     const coldShare = elements ? (elements.cold || 0) : 0;
     const lightningShare = elements ? (elements.lightning || 0) : 0;
+    const shadowShare = elements ? (elements.shadow || 0) : 0;
+    // Physical share: whatever the elemental shares leave over. Like cold
+    // hits innately chill, physical hits innately bleed - this is what the
+    // tithe duration nodes scale (30252/30253), and what 20036 wards against.
+    const physShare = Math.max(0, amount - fireShare - coldShare - lightningShare - shadowShare);
+    if (physShare > 0 && Math.random() * 100 < EG_PHYS_INNATE_BLEED_CHANCE_PCT) {
+        _egApplyMonsterAilment(target, 'bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_BLEED_DMG_SHARE));
+    }
 
     if (fireShare > 0 && stats.ignitePct > 0 && Math.random() * 100 < stats.ignitePct) {
         _egApplyMonsterAilment(target, 'ignite', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_IGNITE_DMG_SHARE));
@@ -374,8 +403,32 @@ function _egTryAvoidAilmentWhileCasting() {
     return Math.random() * 100 < chance;
 }
 
-function _egRollMonsterHitAilment(element, dealt) {
-    if (!_egIsActive() || !element || !(dealt > 0)) return;
+// Attacker-aware retaliation ward (reworked node 20036 Tithe of Strength):
+// a bleeding attacker cannot bleed you, a burning attacker cannot ignite
+// you. Reads the attacker's live statuses, so an expired bleed/ignite stops
+// protecting it - and you. Returns true when the incoming ailment is warded.
+function _egTryRetaliationWard(element, attacker) {
+    let ward = 0;
+    try { ward = Number(_egComputePlayerStats().retaliationWard) || 0; } catch (e) { return false; }
+    if (!(ward > 0)) return false;
+    if (!attacker || !attacker.statuses) return false;
+    if (element === 'fire') return _egHasStatus(attacker.statuses, 'ignite');
+    if (!element) return _egHasStatus(attacker.statuses, 'bleed');
+    return false;
+}
+
+function _egRollMonsterHitAilment(element, dealt, attacker) {
+    if (!_egIsActive() || !(dealt > 0)) return;
+    // Physical hits (no element) can only bleed, and only from a real
+    // attacker - self-inflicted physical damage never bleeds you.
+    if (!element) {
+        if (!attacker) return;
+        if (_egTryRetaliationWard(null, attacker)) return;
+        if (Math.random() * 100 < EG_MONSTER_AILMENT_CHANCE_PCT) {
+            _egApplyPlayerAilment('bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_BLEED_DMG_SHARE));
+        }
+        return;
+    }
     // Active map run: "Monster Hits have +#% chance to inflict Ailments".
     const ailChance = EG_MONSTER_AILMENT_CHANCE_PCT +
         ((typeof _egGetActiveMapModValue === 'function')
@@ -387,6 +440,8 @@ function _egRollMonsterHitAilment(element, dealt) {
     // outright. Rolled after the base chance so it can only ever remove an
     // ailment, never add one.
     if (_egTryAvoidAilmentWhileCasting()) return;
+
+    if (_egTryRetaliationWard(element, attacker)) return;
 
     switch (element) {
         case 'fire':
@@ -663,6 +718,9 @@ function _egStartPlayerShadowClouds() {
 
 export {
     EG_AIL_IGNITE_DMG_SHARE,
+    EG_AIL_BLEED_DURATION_S,
+    EG_AIL_BLEED_DMG_SHARE,
+    EG_PHYS_INNATE_BLEED_CHANCE_PCT,
     EG_AIL_MIN_DOT_DAMAGE,
     EG_PUZZLE_ATTACK_CHANCE_PCT,
     EG_PUZZLE_EFFECT_DURATION_MS,

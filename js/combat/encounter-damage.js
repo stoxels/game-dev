@@ -30,6 +30,7 @@ import { _egCalcPlayerResistanceReduction } from './combat-calculations-resistan
 import { _egMaybeShowAbsorptionBroken } from './encounter-overlays.js';
 import { _egRenderPanel } from './encounter.js';
 import { _egGetPlayerLevel } from '../endgame/endgame-leveling.js';
+import { _egIsDualWielding } from '../loot/loot-requirements.js';
 import { _egGetActiveMapModValue, _egMapDamageTakenAmpMult } from '../endgame/endgame-map-launch.js';
 import { _egCalcArmourMitigation, _egCalcEvasionDodgeChance, _egComputePlayerStats, _egGetAllEquippedItems, _egScheduleAbsorptionRegen } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
@@ -205,10 +206,19 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     const isBlockLockedOut = Date.now() < globalThis._egPlayerBlockLockoutUntil;
     const hasShieldEquipped = _egGetAllEquippedItems()
         .some(item => item.slotType === 'shield');
-    const blockChance = (!isBossAbility && !isBlockLockedOut && hasShieldEquipped && !chargingMelee)
-        ? Math.min(75, isSpell ? stats.spellBlockChance : stats.blockChance)
+    // Passive tree: conditional block chance (effects pipeline, e.g.
+    // reworked node 30255). Fires without a shield while dual-wielding or
+    // holding one, attacks only - spells still use spell block alone. The
+    // boss / lockout / charging gates below apply to both sides equally.
+    const dualWielding = (typeof _egIsDualWielding === 'function' && _egIsDualWielding());
+    const treeBlock = ((hasShieldEquipped || dualWielding) && !isSpell ? stats.blockChanceTree : 0) || 0;
+    const blockChance = (!isBossAbility && !isBlockLockedOut && (hasShieldEquipped || treeBlock > 0) && !chargingMelee)
+        ? Math.min(75, (isSpell ? stats.spellBlockChance : stats.blockChance) + treeBlock)
         : 0;
     if (blockChance > 0 && Math.random() * 100 < blockChance) {
+        // Timestamp for the tree's timed armour pulse (reworked node 337):
+        // _egComputePlayerStats grants the bonus while this is under 10s old.
+        globalThis._egLastBlockAt = Date.now();
         globalThis.showToast(t('eg_blocked'));
         _egApplyPlayerBlockFeedback();
         _egScheduleAbsorptionRegen();
@@ -242,6 +252,19 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (support && support.thornsPct > 0 && opts && opts.attacker && amount > 0
         && typeof _uspReflectThorns === 'function') {
         _uspReflectThorns(opts.attacker, amount);
+    }
+
+    // Passive tree: flat physical retaliation (effects pipeline, e.g.
+    // reworked node 13 Enhanced Rewards). Unlike the buff-gated percentage
+    // Retribution above, this is always on and fires a FLAT amount - but
+    // only against MELEE attackers: the hit must come from a monster
+    // (opts.attacker), not be a spell, a projectile or a boss special, and
+    // the raw incoming amount must be positive. Placed here so it shares
+    // Retribution's "landed hit" semantics (past parry, evasion and block).
+    if (!isSpell && !isBossAbility && !(opts && opts.isProjectile)
+        && opts && opts.attacker && opts.attacker.id != null && amount > 0
+        && stats.reflectPhysFlat > 0) {
+        _egDamageTargetById(opts.attacker.id, Math.round(stats.reflectPhysFlat));
     }
 
     // Elemental resistances (fire/cold/lightning/shadow %) mitigate
@@ -312,7 +335,10 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
 
     // Ailments: elemental hits can ignite / chill / shock / shadow-burn the
     // player (rolled from the monster's attack element).
-    if (typeof _egRollMonsterHitAilment === 'function') _egRollMonsterHitAilment(element, mitigated);
+    // The attacker rides along so physical hits can bleed (which needs a
+    // real attacker, never self-damage) and the retaliation ward (node
+    // 20036) can read its live statuses.
+    if (typeof _egRollMonsterHitAilment === 'function') _egRollMonsterHitAilment(element, mitigated, opts && opts.attacker ? opts.attacker : null);
 
     return mitigated;
 }

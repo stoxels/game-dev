@@ -23,7 +23,7 @@ import { EG_MOD_TABLE_TALISMAN } from '../loot/loot-mod-tables-talisman.js';
 import { EG_MOD_TABLE_WEAPON_2H } from '../loot/loot-mod-tables-weapon-2h.js';
 import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-tables-weapon1.js';
 import { EG_MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
-import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding } from '../loot/loot-requirements.js';
+import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding, _egIsTwoHandedWeapon } from '../loot/loot-requirements.js';
 import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
@@ -599,7 +599,11 @@ export function _egGetItemEffectiveBlockChance(item) {
 export function _egComputePlayerStats() {
     const passiveTreeBonuses = _egSyncBaseAttributes() || {};
     const s = {
-        health: 0, mana: passiveTreeBonuses.mana || 0,
+        // Flat maximum Life from allocated passive-tree nodes (effects
+        // pipeline, e.g. reworked node 20031 Anvil Guard) seeds the very
+        // same flat pool gear's flat_health feeds, so it aggregates with
+        // gear/level bonuses before the % increased multiplier below.
+        health: passiveTreeBonuses.healthFlat || 0, mana: passiveTreeBonuses.mana || 0,
         // % increased maximum Life/Mana from allocated passive-tree nodes ride
         // the same multiplicative buckets gear uses; they are never added to
         // the flat pools.
@@ -623,11 +627,15 @@ export function _egComputePlayerStats() {
         strength: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.str : 0,
         agility: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.agi : 0,
         intelligence: (typeof EG_PLAYER_BASE_ATTRIBUTES !== 'undefined') ? EG_PLAYER_BASE_ATTRIBUTES.int : 0,
-        lifeRegen: 0, manaRegen: 0,
+        // Flat Life regeneration per second from allocated passive-tree
+        // nodes (effects pipeline, e.g. reworked node 129 Horizon Tracker)
+        // seeds the very same bucket gear's life_regen feeds, so tree and
+        // gear regen add up in _egTickLifeRegen().
+        lifeRegen: passiveTreeBonuses.lifeRegenFlat || 0, manaRegen: 0,
         // Tree-sourced percentage Life regeneration per second (effects
-        // pipeline, e.g. reworked node 30206). The flat lifeRegen bucket
-        // above stays gear-only; _egTickLifeRegen() adds both together
-        // each second, scaling this one by the CURRENT maximum Life.
+        // pipeline, e.g. reworked node 30206). _egTickLifeRegen() adds both
+        // buckets together each second, scaling this one by the CURRENT
+        // maximum Life.
         lifeRegenPct: passiveTreeBonuses.lifeRegenPct || 0,
         // Fire / cold / lightning resistance from allocated passive-tree nodes seed
         // the very same buckets gear rolls into, so they aggregate, are shown
@@ -642,7 +650,10 @@ export function _egComputePlayerStats() {
         // "Increased maximum Resistance" bonuses (uniques) - raise the per-
         // element resistance cap above the base 75%. allResMax applies to all
         // four elements at once.
-        fireResistMax: 0, coldResistMax: 0, lightningResistMax: 0, shadowResistMax: 0, allResMax: 0,
+        // Tree-sourced maximum Fire Resistance (effects pipeline, e.g.
+        // reworked node 20068 Resolute Advance) seeds the very same bucket
+        // gear's max_fire_res feeds, so both raise the cap together below.
+        fireResistMax: passiveTreeBonuses.fireResistMax || 0, coldResistMax: 0, lightningResistMax: 0, shadowResistMax: 0, allResMax: 0,
         // accuracyIncPct ("increased Accuracy Rating", effects pipeline) is
         // applied to the aggregated rating AFTER the attribute side-effects
         // below, so it scales gear, tree and Agi accuracy together.
@@ -670,6 +681,14 @@ export function _egComputePlayerStats() {
         meleePhysMin: 0, meleePhysMax: 0,
         meleePhysIncPct: (passiveTreeBonuses.meleePhysIncPct || 0)
             + (passiveTreeBonuses.physDamageIncPct || 0),
+        // Weapon-stance split from the passive tree (melee batch, effects
+        // pipeline): only ONE applies per strike - Heavy with a two-handed
+        // weapon equipped, one-handed otherwise (1H + shield, dual-wield or
+        // unarmed). _egCalcPlayerMeleeDamage picks the side; both stack on
+        // top of the generic meleePhysIncPct bucket above.
+        meleePhys1HIncPct: passiveTreeBonuses.meleePhys1HIncPct || 0,
+        meleePhysHeavyIncPct: passiveTreeBonuses.meleePhysHeavyIncPct || 0,
+        isHeavyWeaponEquipped: _egGetAllEquippedItems().some(item => typeof _egIsTwoHandedWeapon === 'function' && _egIsTwoHandedWeapon(item)),
         // Passive tree "+% increased melee attack charge-up speed" (reworked
         // node 30197). Unlike the absolute-seconds attackSpeed bucket that
         // gear feeds, this is a percentage applied to the melee charge time
@@ -711,11 +730,39 @@ export function _egComputePlayerStats() {
         lightningCastSpeedPct: passiveTreeBonuses.lightningCastSpeedPct || 0,
         castSpeedPct: passiveTreeBonuses.castSpeedPct || 0,
         healingPowerFlat: 0, healingPowerIncPct: 0,
-        lifeLeechPct: 0,
-        blockChance: 0, spellBlockChance: 0, blockRecoveryPct: 0,
+        // Tree-sourced life leech (effects pipeline, e.g. reworked grit
+        // nodes 30257/30258): seeds the very same bucket gear's life_leech
+        // feeds (add-mode, so both stack) - read by both damage calcs in
+        // combat-calculations.js.
+        lifeLeechPct: passiveTreeBonuses.lifeLeechPct || 0,
+        blockChance: 0, spellBlockChance: 0,
+        // Tree-sourced block recovery (effects pipeline, e.g. reworked node
+        // 30254) seeds the very same bucket gear's block_recovery feeds, so
+        // both shorten the post-block lockout together in encounter-damage.
+        blockRecoveryPct: passiveTreeBonuses.blockRecoveryPct || 0,
+        // Tree-sourced conditional block chance (effects pipeline, e.g.
+        // reworked node 30255): fires without a shield while dual-wielding
+        // or holding one. Read by the block roll in _egPlayerTakeDamage.
+        blockChanceTree: passiveTreeBonuses.blockChanceTree || 0,
         dodgeChance: 0, spellDodgeChance: 0,
         ignitePct: 0, freezePct: 0, shockPct: 0, blindPct: 0, convertPct: 0,
         ailmentDurationPct: 0, ailmentEffectPct: 0,
+        // Per-ailment durations for YOUR ailments on enemies (effects
+        // pipeline, e.g. reworked nodes 30252/30253): scale the monster-side
+        // ignite/bleed durations in _egApplyMonsterAilment.
+        igniteDurationPct: passiveTreeBonuses.igniteDurationPct || 0,
+        bleedDurationPct: passiveTreeBonuses.bleedDurationPct || 0,
+        // Retaliation ward (reworked node 20036, legacy-table wired): a
+        // bleeding attacker cannot bleed you, a burning one cannot ignite
+        // you - see _egTryRetaliationWard in combat-ailments-core.js.
+        retaliationWard: passiveTreeBonuses.retaliationWard || 0,
+        // Champion's Vigor (reworked node 20033, legacy-table wired): bonus
+        // melee strike range in meters, the melee splash base radius in px
+        // it unlocks, and the increased AoE % scaling that radius - see
+        // _egMeleeTargetInRange and _egTryMeleeSplashHit.
+        meleeRangeM: passiveTreeBonuses.meleeRangeM || 0,
+        meleeSplashBasePx: passiveTreeBonuses.meleeSplashBasePx || 0,
+        meleeAoEPct: passiveTreeBonuses.meleeAoEPct || 0,
         attackSpeed: 0, cleavePct: 0, piercePct: 0, snipePct: 0, chainPct: 0, splashPct: 0,
         // Passive-tree percentage attack speed (reworked notable 20032):
         // the seconds-based attackSpeed bucket above stays gear-only; this
@@ -725,6 +772,11 @@ export function _egComputePlayerStats() {
         multishotPct: 0, pushbackFlat: 0, overkillPct: 0, staggerPct: 0, preemptiveDodgePct: 0,
         firstStepSeconds: 0, groundedChancePct: 0, groundedReductionPct: 0,
         shieldBashChancePct: 0, shieldBashDamageFlat: 0,
+        // Flat physical retaliation against melee attackers from allocated
+        // passive-tree nodes (effects pipeline, e.g. reworked node 13
+        // Enhanced Rewards). Read by the flat-reflect hook in
+        // _egPlayerTakeDamage (encounter-damage.js), next to Retribution.
+        reflectPhysFlat: passiveTreeBonuses.reflectPhysFlat || 0,
         channelDamagePerStack: 0, channelMaxStacks: 0,
         arcaneSurgeStreak: Infinity, arcaneSurgeMana: 0, manaToDamagePct: 0,
         echoChancePct: 0, echoDamagePct: 0, fatePct: 0, wardingHP: 0,
@@ -825,6 +877,15 @@ export function _egComputePlayerStats() {
     // Int -> +2 mana & +1 spell damage/point.
     s.health += s.strength * 2;
     s.armourFlat += s.strength;
+    // Timed armour pulse from the passive tree (effects pipeline, e.g.
+    // reworked node 337 Umbral Survey): flat Armour while a block landed in
+    // the last 10 seconds. The timestamp lives on globalThis and is
+    // refreshed by every successful block in _egPlayerTakeDamage, so the
+    // pulse lapses on its own without any expiry bookkeeping here.
+    if ((passiveTreeBonuses.blockArmorPulse || 0) > 0
+        && Date.now() - (globalThis._egLastBlockAt || 0) < 10000) {
+        s.armourFlat += passiveTreeBonuses.blockArmorPulse;
+    }
     s.accuracy += s.agility;
     // "Increased Accuracy Rating" multiplies the fully aggregated rating
     // (gear + tree flat + Agi) before the map-run multiplier and the
@@ -1209,12 +1270,19 @@ export const EG_STAT_DISPLAY_LABELS = {
 
     critChance: { label: t('eg_stat_crit_chance'), suffix: '%' },
     critMultiplierPct: { label: t('eg_stat_crit_multi'), suffix: '%' },
+    meleeRangeM: { label: t('eg_stat_melee_range'), suffix: 'm' },
+    meleeAoEPct: { label: t('eg_stat_melee_aoe'), suffix: '%' },
 
     physIncPct: { label: t('eg_stat_inc_phys_dmg'), suffix: '%' },
     // Melee-only sibling of physIncPct: passive tree node 30195 plus gear
     // % physical mods on melee slots. Scaled onto melee strikes only
     // (see _egCalcPlayerMeleeDamage); the projectile channel never reads it.
     meleePhysIncPct: { label: t('eg_stat_inc_melee_phys_dmg'), suffix: '%' },
+    igniteDurationPct: { label: t('eg_stat_ignite_duration'), suffix: '%' },
+    bleedDurationPct: { label: t('eg_stat_bleed_duration'), suffix: '%' },
+    retaliationWard: { label: t('eg_stat_retaliation_ward'), suffix: '' },
+    meleePhys1HIncPct: { label: t('eg_stat_inc_melee_phys_1h'), suffix: '%' },
+    meleePhysHeavyIncPct: { label: t('eg_stat_inc_melee_phys_heavy'), suffix: '%' },
     // Melee charge-up speed (reworked node 30197): percentage shorter charge;
     // the resulting time is what the melee attackInterval line above shows.
     meleeChargeSpeedPct: { label: t('eg_stat_inc_melee_charge_speed'), suffix: '%' },
@@ -1264,6 +1332,7 @@ export const EG_STAT_DISPLAY_LABELS = {
     groundedChancePct: { label: t('eg_stat_grounded_chance'), suffix: '%' },
     groundedReductionPct: { label: t('eg_stat_grounded_reduction'), suffix: '%' },
     shieldBashChancePct: { label: t('eg_stat_shield_bash_chance'), suffix: '%' },
+    blockChanceTree: { label: t('eg_stat_block_dualshield'), suffix: '%' },
     shieldBashDamageFlat: { label: t('eg_stat_shield_bash_damage'), suffix: '' },
     channelDamagePerStack: { label: t('eg_stat_channel_damage'), suffix: '' },
     channelMaxStacks: { label: t('eg_stat_channel_max_stacks'), suffix: '' },
@@ -1278,6 +1347,7 @@ export const EG_STAT_DISPLAY_LABELS = {
     parryChancePct: { label: t('eg_stat_parry'), suffix: '%' },
     deflectChancePct: { label: t('eg_stat_deflect_chance'), suffix: '%' },
     deflectDamagePct: { label: t('eg_stat_deflect_damage'), suffix: '%' },
+    reflectPhysFlat: { label: t('eg_stat_reflect_damage'), suffix: '' },
     movementSpeedPct: { label: t('eg_stat_movement_speed'), suffix: '%' },
 
     absorptionRegenRatePct: { label: t('eg_stat_absorption_regen_rate'), suffix: '%' },
@@ -1312,8 +1382,8 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange', 'meleeShadowRange', 'meleePhysIncPct', 'meleeChargeSpeedPct',
-            'attackSpeedPct'] },
+            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct',
+            'meleeChargeSpeedPct', 'attackSpeedPct', 'meleeRangeM', 'meleeAoEPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
@@ -1322,7 +1392,7 @@ export const EG_STAT_LAYOUT = {
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
-        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'ailmentDurationPct', 'ailmentEffectPct'] },
+        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWard'] },
         { catKey: 'eg_statcat_arcane', buckets: [
             'castSpeedPct', 'fireCastSpeedPct', 'coldCastSpeedPct', 'lightningCastSpeedPct', 'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
             'channelMaxStacks', 'arcaneSurgeStreak', 'arcaneSurgeMana',
@@ -1335,9 +1405,9 @@ export const EG_STAT_LAYOUT = {
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
             'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [
-            'blockChance', 'spellBlockChance', 'blockRecoveryPct',
+            'blockChance', 'spellBlockChance', 'blockChanceTree', 'blockRecoveryPct',
             'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct',
-            'parryChancePct', 'deflectChancePct', 'deflectDamagePct',
+            'parryChancePct', 'deflectChancePct', 'deflectDamagePct', 'reflectPhysFlat',
             'fatePct', 'castingAilmentAvoidPct'] },
         { catKey: 'eg_statcat_resistances', buckets: [
             // 'allElementalResist' is deliberately NOT listed: it is folded
@@ -1516,6 +1586,8 @@ export function _egBuildStatLine(bucket, stats) {
     // key; the melee damage RANGES keep sharing their projectile counterpart.
     const MELEE_DESC_KEYS = {
         meleePhysIncPct: 'eg_statdesc_meleePhysIncPct',
+        meleePhys1HIncPct: 'eg_statdesc_meleePhys1HIncPct',
+        meleePhysHeavyIncPct: 'eg_statdesc_meleePhysHeavyIncPct',
         meleeChargeSpeedPct: 'eg_statdesc_meleeChargeSpeedPct',
     };
     const descBucket = bucket.startsWith('melee') ? bucket.charAt(5).toLowerCase() + bucket.slice(6) : bucket;

@@ -142,6 +142,8 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
 
     _egTryCleaveHit(targetId, dmg, elements);
 
+    _egTryMeleeSplashHit(targetId, dmg, elements);
+
     // Weapon arts (Secret-of-Mana-style): a strike released inside an
     // overcharge tier band unleashes that tier's art on top of the normal
     // hit - dash-through at 200%+, sky leap at 300%+, weapon nova at 400%+,
@@ -186,6 +188,60 @@ export function _egTryCleaveHit(targetId, dmg = _egCurrentMeleeDamage(), element
         const wasCrit = (typeof _egLastMeleeWasCrit !== 'undefined') ? _egLastMeleeWasCrit : false;
         _egDamageTargetById(m.id, dmg, elements, { isCrit: wasCrit });
     });
+}
+
+// Melee splash (reworked node 20033 Champion's Vigor): the strike's area
+// of effect. Every OTHER live monster whose card centre falls inside the
+// splash radius takes the same hit - the exec finisher stays on the primary
+// target only (cleave shares it the same way). Radius = granted base px
+// scaled by increased AoE %; a zero base (no keystone) splashes nothing,
+// so unkeystoned melee is exactly single-target as before. Needs card
+// positions, so without DOM (tests, teardown) it quietly does nothing -
+// fail closed, never fail open onto the whole field.
+export function _egTryMeleeSplashHit(targetId, dmg = _egCurrentMeleeDamage(), elements = _egLastMeleeElements) {
+    let basePx = 0, aoePct = 0;
+    try {
+        const stats = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : {};
+        basePx = Number(stats.meleeSplashBasePx) || 0;
+        aoePct = Number(stats.meleeAoEPct) || 0;
+    } catch (e) { return; }
+    if (!(basePx > 0)) return;
+    const radiusPx = basePx * (1 + aoePct / 100);
+    if (!(radiusPx > 0)) return;
+    const targetCard = typeof document !== 'undefined' ? document.getElementById(`eg-card-${targetId}`) : null;
+    if (!targetCard) return;
+    let centre = null;
+    try {
+        centre = (typeof _egGetElementCentre === 'function')
+            ? _egGetElementCentre(targetCard)
+            : targetCard.getBoundingClientRect();
+    } catch (e) { return; }
+    if (!centre) return;
+    const tx = (centre.x != null) ? centre.x : centre.left;
+    const ty = (centre.y != null) ? centre.y : centre.top;
+    if (tx == null || ty == null) return;
+    const wasCrit = (typeof _egLastMeleeWasCrit !== 'undefined') ? _egLastMeleeWasCrit : false;
+    globalThis._egMonsters
+        .filter(m => m && m.id !== targetId && (m.currentHP || 0) > 0)
+        .forEach(m => {
+            let card = null;
+            try { card = document.getElementById(`eg-card-${m.id}`); } catch (e) { card = null; }
+            if (!card) return;
+            let c = null;
+            try {
+                c = (typeof _egGetElementCentre === 'function')
+                    ? _egGetElementCentre(card)
+                    : card.getBoundingClientRect();
+            } catch (e) { c = null; }
+            if (!c) return;
+            const cx = (c.x != null) ? c.x : c.left;
+            const cy = (c.y != null) ? c.y : c.top;
+            if (cx == null || cy == null) return;
+            if (Math.hypot(cx - tx, cy - ty) > radiusPx) return;
+            if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('cleave');
+            _egRestartFlashClass(card, 'eg-flash-cleave');
+            _egDamageTargetById(m.id, dmg, elements, { isCrit: wasCrit, isMelee: true });
+        });
 }
 
 // Physically lunges the class HUD toward the targeted monster and snaps back.

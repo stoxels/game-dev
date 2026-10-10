@@ -56,6 +56,9 @@ let _pt_tooltipHtml = '';
 let _pt_tooltipWidth = 0;
 let _pt_tooltipHeight = 0;
 const PT_TEMP_REWORK_NODE_COPY = true;
+// Once per module lifetime (one page session in production, one loadModule in
+// tests): the first right-click copies briefing + card, later ones card-only.
+let _ptReworkBriefingCopied = false;
 
 // NOTE: _pt_mouseDownTime is also part of this module's
 // state but is declared in the canvas pan/zoom handler file, not here.
@@ -819,7 +822,45 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 
 
 
-function _ptBuildReworkNodeTemplate(id) {
+// The rework ritual: copied to the clipboard ONCE per session (on the first
+// right-click), so batch rework requests stay short. Every later right-click
+// copies just the per-node card from _ptBuildReworkNodeCard - the user then
+// lists "<id>: <desired effect>" lines, one per node, in a single message.
+function _ptBuildReworkBriefing() {
+    return [
+        '--- PASSIVE-TREE REWORK BRIEFING (applies to every node listed below) ---',
+        '--- REWORK, NOT AN APPEND ---',
+        'Replace each node from scratch in js/probability-tree/probability-tree-data.js.',
+        'STEP 1 - pick the path per node:',
+        '  A) PLAIN STAT REWORK (default - every advertised line is a number bonus):',
+        '     use the EFFECTS pipeline. Replace descEn/descDe with an "effects" array,',
+        '     one entry per advertised line, value after the colon:',
+        '       "effects": ["str_flat:5", "armour_flat:10"]',
+        '     - the registry (js/probability-tree/pt-effects.js) owns the stat channel AND',
+        '       the EN/DE tooltip text per effect; tooltips, character-sheet wiring and',
+        '       "reworked" status all derive from it - no bonus-table entry, no translation',
+        '       strings, no PT_REWORKED_NODE_IDS edit and no per-node test file needed',
+        '     - if the needed effect does not exist yet, add ONE registry entry (channel +',
+        '       en/de template) instead of hand-writing descriptions or table rows',
+        '     - keep/give the node a stable descriptive statKey (address only - an effects',
+        '       node needs no table entry behind it)',
+        '     - the generic pt-effects-integrity suite verifies the node automatically',
+        '  B) UNIQUE KEYSTONE MECHANIC (behaviour, not numbers): keep the full ritual -',
+        '     hand-written EN/DE description with one stat per line, its own statKey wired',
+        '     to real gameplay, a dedicated wiring test, and this ID added to',
+        '     PT_REWORKED_NODE_IDS only after the gate passes',
+        '  - keep the numeric Node ID; do NOT add text to the old description shown per node',
+        '  - set icon to "" and skip art entirely (art is deferred to the separate passive tree art pass; never add an emoji)',
+        '  - audit every consumer before renaming a shared statKey',
+        '  - run the repo gate before considering the rework done (fresh clone: npm ci, then all four must pass):',
+        '      npm run lint && npm test && npm run phase2:verify && npm run build',
+        '    (npm run verify = lint + tests + phase2:verify; .github/workflows/ci.yml',
+        '    runs this same gate on every push/PR - see README.md, Passive tree reworks)',
+    ].join('\n');
+}
+
+// Short per-node card: the facts the rework needs, without the ritual.
+function _ptBuildReworkNodeCard(id) {
     const skill = globalThis._pt_skillMap[id];
     const def = skill ? skill._def : null;
     if (!def) return '';
@@ -841,38 +882,11 @@ function _ptBuildReworkNodeTemplate(id) {
         'Current stats (OLD VERSION - reference only; these lines get REPLACED, never appended to):',
         stats,
         '',
-        '--- REWORK, NOT AN APPEND ---',
-        'Replace this node from scratch in js/probability-tree/probability-tree-data.js.',
-        'STEP 1 - pick the path:',
-        '  A) PLAIN STAT REWORK (default - every advertised line is a number bonus):',
-        '     use the EFFECTS pipeline. Replace descEn/descDe with an "effects" array,',
-        '     one entry per advertised line, value after the colon:',
-        '       "effects": ["str_flat:5", "armour_flat:10"]',
-        '     - the registry (js/probability-tree/pt-effects.js) owns the stat channel AND',
-        '       the EN/DE tooltip text per effect; tooltips, character-sheet wiring and',
-        '       "reworked" status all derive from it - no bonus-table entry, no translation',
-        '       strings, no PT_REWORKED_NODE_IDS edit and no per-node test file needed',
-        '     - if the needed effect does not exist yet, add ONE registry entry (channel +',
-        '       en/de template) instead of hand-writing descriptions or table rows',
-        '     - keep/give the node a stable descriptive statKey (address only - an effects',
-        '       node needs no table entry behind it)',
-        '     - the generic pt-effects-integrity suite verifies the node automatically',
-        '  B) UNIQUE KEYSTONE MECHANIC (behaviour, not numbers): keep the full ritual -',
-        '     hand-written EN/DE description with one stat per line, its own statKey wired',
-        '     to real gameplay, a dedicated wiring test, and this ID added to',
-        '     PT_REWORKED_NODE_IDS only after the gate passes',
-        '  - keep the numeric Node ID above; do NOT add text to the old description shown here',
-        '  - set icon to "" and skip art entirely (art is deferred to the separate passive tree art pass; never add an emoji)',
-        '  - audit every consumer before renaming a shared statKey',
-        '  - run the repo gate before considering the rework done (fresh clone: npm ci, then all four must pass):',
-        '      npm run lint && npm test && npm run phase2:verify && npm run build',
-        '    (npm run verify = lint + tests + phase2:verify; .github/workflows/ci.yml',
-        '    runs this same gate on every push/PR - see README.md, Passive tree reworks)',
-        '',
         'The node shall receive the following rework:'
     );
     return lines.join('\n');
 }
+
 
 function _ptCopyReworkTextFallback(text) {
     if (typeof document.execCommand !== 'function') return false;
@@ -964,11 +978,23 @@ export function _ptBindNodeEvents() {
         if (!node) return;
         event.preventDefault();
         event.stopPropagation();
-        const text = _ptBuildReworkNodeTemplate(Number(node.dataset.id));
-        if (!text) return;
+        // First right-click per session copies the briefing + the node card;
+        // every later one copies just the short card, so batch requests stay
+        // a plain "<id>: <desired effect>" list in a single message.
+        const card = _ptBuildReworkNodeCard(Number(node.dataset.id));
+        if (!card) return;
+        const includeBriefing = !_ptReworkBriefingCopied;
+        const text = includeBriefing ? `${_ptBuildReworkBriefing()}\n\n${card}` : card;
         void _ptCopyReworkText(text).then(copied => {
+            if (!copied) {
+                if (typeof globalThis.showToast === 'function') globalThis.showToast('Could not copy node rework text.');
+                return;
+            }
+            _ptReworkBriefingCopied = true;
             if (typeof globalThis.showToast !== 'function') return;
-            globalThis.showToast(copied ? 'Node rework template copied.' : 'Could not copy node rework template.');
+            globalThis.showToast(includeBriefing
+                ? 'Rework briefing + node card copied. Later right-clicks copy just the card.'
+                : 'Node rework card copied.');
         });
     });
 

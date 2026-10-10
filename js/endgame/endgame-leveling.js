@@ -241,6 +241,19 @@ const _EG_PASSIVE_TREE_TRAVEL_BONUSES = {
 };
 
 const _EG_PASSIVE_TREE_NOTABLE_BONUSES = {
+    // Node 20036 ("Tithe of Strength", reworked): retaliation ward - a
+    // bleeding attacker cannot bleed you, a burning one cannot ignite you
+    // (see _egTryRetaliationWard in combat-ailments-core.js). Legacy-table
+    // wired because the node is a path-B keystone with hand-written text;
+    // its renamed key keeps the retired notable_tithe_of_strength pool
+    // (node 20037) granting nothing, as before.
+    // Node 20033 ("Champion's Vigor", reworked keystone): melee strike
+    // range in meters plus the melee splash it unlocks - a base radius in
+    // px scaled by increased AoE %. Legacy-table wired like the 20036
+    // retaliation ward; its renamed key leaves the retired
+    // notable_champion_s_vigor pool (node 20003) granting nothing, as before.
+    notable_champions_vigor_20033: { meleeRangeM: 1, meleeSplashBasePx: 150, meleeAoEPct: 12 },
+    notable_tithe_ward_20036: { retaliationWard: 1 },
     trix_arcane_bulwark: { mana: 20, absorptionFlat: 20, int: 20 },
     notable_arcane_resonance: { spellDamageIncPct: 20, castSpeedPct: 5, int: 20 },
     notable_deep_vigor: { healthIncPct: 8, manaIncPct: 12 },
@@ -329,7 +342,7 @@ const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
 );
 
 function _egGetPassiveTreeTravelBonuses() {
-    const totals = { str: 0, agi: 0, int: 0, mana: 0, armourFlat: 0, armourIncPct: 0, lifeRegenPct: 0, accuracy: 0, accuracyIncPct: 0, movementSpeedPct: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleeChargeSpeedPct: 0, attackSpeedPct: 0, physDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, lightningDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, lightningCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, lightningResistFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0 };
+    const totals = { str: 0, agi: 0, int: 0, mana: 0, armourFlat: 0, armourIncPct: 0, lifeRegenPct: 0, lifeRegenFlat: 0, accuracy: 0, accuracyIncPct: 0, movementSpeedPct: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleePhys1HIncPct: 0, meleePhysHeavyIncPct: 0, meleeChargeSpeedPct: 0, attackSpeedPct: 0, physDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, lightningDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, lightningCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, lightningResistFlat: 0, fireResistMax: 0, healthFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0, reflectPhysFlat: 0, blockChanceTree: 0, blockRecoveryPct: 0, blockArmorPulse: 0, igniteDurationPct: 0, bleedDurationPct: 0, retaliationWard: 0, meleeRangeM: 0, meleeSplashBasePx: 0, meleeAoEPct: 0, lifeLeechPct: 0 };
     const state = typeof globalThis.STATE !== 'undefined' ? globalThis.STATE : null;
     if (!state || !state.passiveTreeAllocated) return totals;
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;
@@ -383,6 +396,19 @@ function _egGetPassiveTreeTravelBonuses() {
             totals.manaIncPct += bonus.manaIncPct || 0;
             totals.allElementalResist += bonus.allElementalResist || 0;
             totals.castingAilmentAvoidPct += bonus.castingAilmentAvoidPct || 0;
+            // Retaliation ward (reworked node 20036, legacy-table wired):
+            // effects nodes bypass this block via the pipeline below, so
+            // only legacy-table entries need their channels copied here.
+            totals.retaliationWard += bonus.retaliationWard || 0;
+            // Champion's Vigor (reworked node 20033, legacy-table wired) -
+            // same reason: the range/splash channels arrive via statKey.
+            totals.meleeRangeM += bonus.meleeRangeM || 0;
+            totals.meleeSplashBasePx += bonus.meleeSplashBasePx || 0;
+            totals.meleeAoEPct += bonus.meleeAoEPct || 0;
+            // Tree life leech (grit batch, effects pipeline) rides the gear
+            // bucket in _egComputePlayerStats, but the legacy copy keeps
+            // table entries honest if one ever grants it directly.
+            totals.lifeLeechPct += bonus.lifeLeechPct || 0;
         }
         // Effects pipeline: a node authored with an `effects` list grants
         // its channels straight from the registry (pt-effects.js) - no
