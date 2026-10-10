@@ -120,7 +120,7 @@ export const PT_OUTER_RIM_KEYS = new Set([
     'timed_stasis_1', 'timed_stasis_2', 'timed_stasis_3',
     'interquartile_vision_1', 'interquartile_vision_2', 'interquartile_vision_3',
     'bayesian_update_2',
-    'keystone_frequentists_burden', 'keystone_ergodic_field', 'keystone_sparse_prior',
+    'keystone_frequentists_burden', 'keystone_vital_conduit_291', 'keystone_sparse_prior',
     'confidence_interval_1', 'confidence_interval_2', 'confidence_interval_3',
     'adjacency_matrix',
     // Expansion nodes on the far west and east rims

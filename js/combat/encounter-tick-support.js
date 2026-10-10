@@ -95,7 +95,10 @@ export function _egTickLifeRegen() {
     const regenPct = (stats.lifeRegenPct || 0) + (stats.lifeRegenPerEndurancePct || 0) * (stats.enduranceCharges || 0);
     // Life Regeneration rate (node 111) scales the whole per-second amount.
     const regenRate = 1 + Math.max(0, stats.lifeRegenRatePct || 0) / 100;
-    const regen = ((stats.lifeRegen || 0) + (globalThis.playerMaxHP * regenPct) / 100) * regenRate;
+    // "Less" Life Regeneration rate (Vital Conduit keystone): a multiplier
+    // after every increase.
+    const regenLess = Math.max(0, 1 - Math.max(0, stats.lifeRegenLessPct || 0) / 100);
+    const regen = ((stats.lifeRegen || 0) + (globalThis.playerMaxHP * regenPct) / 100) * regenRate * regenLess;
     if (regen <= 0 || globalThis.playerCurrentHP <= 0 || globalThis.playerCurrentHP >= globalThis.playerMaxHP) return;
 
     // Active map run: No Life Regeneration - regeneration is disabled.

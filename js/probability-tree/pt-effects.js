@@ -292,6 +292,14 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Crush (notable 331): a melee strike on an enemy at full Life crushes it
     // for 5 seconds; a crushed enemy's physical Damage reduction is lowered
     // by the value (it can drop below 0 and then amplifies physical hits).
+    // Vital Conduit keystone (node 291): a "less" multiplier on the whole
+    // per-second Life regeneration (_egTickLifeRegen), a "less" multiplier on
+    // every Life leech heal (_egLeechHealMult in the melee, projectile and
+    // spell hit rolls) and a flag that sends the Absorption recharge to Life
+    // (_egScheduleAbsorptionRegen).
+    life_regen_less: { channel: 'lifeRegenLessPct', en: '{v}% less Life Regeneration rate', de: '{v}% weniger Lebensregenerationsrate' },
+    life_leech_less: { channel: 'lifeLeechLessPct', en: '{v}% less Life recovered from Life leech effects', de: '{v}% weniger Leben durch Lebensentzug' },
+    absorption_recharge_life: { channel: 'absorptionRechargesLife', flag: true, en: 'Absorption recharge restores Life instead of Absorption', de: 'Absorptionsaufladung stellt stattdessen Leben wieder her' },
     crush_full_life: { channel: 'crushPhysReductionPct', en: 'Crush enemies for 5 seconds when you hit them with a melee strike while they are on full Life. Crushed enemies have {v}% reduced physical Damage reduction', de: 'Zermalme Gegner für 5 Sekunden, wenn du sie mit einem Nahkampfschlag triffst, während sie volles Leben haben. Zermalmte Gegner haben {v}% reduzierte physische Schadensreduktion' },
 });
 

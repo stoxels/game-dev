@@ -2,7 +2,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { _getGlobalCooldownReduction } from '../classes/class-cooldown-state.js';
-import { _egApplyDamageConversion } from '../combat/combat-calculations-resistances.js';
+import { _egApplyDamageConversion, _egLeechHealMult } from '../combat/combat-calculations-resistances.js';
 import { _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost } from '../classes/class-mana.js';
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
@@ -2151,7 +2151,7 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
     // Life leech mirrors the weapon channels (heal on spell hits too).
     try {
         if (stats.lifeLeechPct > 0 && typeof globalThis.playerCurrentHP !== 'undefined') {
-            const heal = Math.round(amount * (stats.lifeLeechPct / 100));
+            const heal = Math.round(amount * (stats.lifeLeechPct / 100) * _egLeechHealMult(stats));
             if (heal > 0 && typeof globalThis.playerMaxHP !== 'undefined') {
                 globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
                 if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();

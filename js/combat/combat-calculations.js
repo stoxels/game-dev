@@ -3,7 +3,7 @@ import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult } from '../endgame/endgam
 import { EG_PLAYER_STATS, _egComputePlayerStats, _egRollCrit } from '../endgame/endgame-player-stats.js';
 import { _egQuizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
 import { EG_PLAYER_MELEE_DAMAGE } from './combat-state.js';
-import { _egApplyDamageConversion, _egRollElementalBreakdown, _egScaleElements } from './combat-calculations-resistances.js';
+import { _egApplyDamageConversion, _egLeechHealMult, _egRollElementalBreakdown, _egScaleElements } from './combat-calculations-resistances.js';
 
 //------------------------------------------------------------------------
 //-------------------PLAYER DAMAGE CALCULATION----------------------------
@@ -58,7 +58,7 @@ export function _egCalcPlayerDamage() {
 
     // Life leech - heal the player for a % of the damage about to be dealt.
     if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
-        const heal = Math.round(dmg * (stats.lifeLeechPct / 100));
+        const heal = Math.round(dmg * (stats.lifeLeechPct / 100) * _egLeechHealMult(stats));
         if (heal > 0) {
             globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
             if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
@@ -176,7 +176,7 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // Melee strikes also add the tree's melee-only leech (lifeLeechMeleePct).
     const meleeLeechPct = (Number(stats.lifeLeechPct) || 0) + (Number(stats.lifeLeechMeleePct) || 0);
     if (meleeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
-        const heal = Math.round(dmg * (meleeLeechPct / 100));
+        const heal = Math.round(dmg * (meleeLeechPct / 100) * _egLeechHealMult(stats));
         if (heal > 0) {
             globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
             if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();

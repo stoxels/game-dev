@@ -163,12 +163,15 @@ export const TALENT_TREE_DATA = {
    "id": 291,
    "x": -1369,
    "y": 89,
-   "nameEn": "Keystone: Ergodic Field",
-   "nameDe": "Schlüsselfertigkeit: Ergodisches Feld",
-   "descEn": "All automatic cell reveals, marks and field scans are disabled. Instead, every 3 minutes the entire grid briefly flashes, showing the complete solution for 1 second.",
-   "descDe": "Alle automatischen Zellen-Enthüllungen, Markierungen und Feld-Scans sind deaktiviert. Stattdessen zeigt das gesamte Gitter alle 3 Minuten kurz die vollständige Lösung für 1 Sekunde.",
-   "icon": "🌊",
-   "statKey": "keystone_ergodic_field",
+   "nameEn": "Vital Conduit",
+   "nameDe": "Lebensleitung",
+   "icon": "",
+   "statKey": "keystone_vital_conduit_291",
+   "effects": [
+    "life_regen_less:50",
+    "life_leech_less:50",
+    "absorption_recharge_life"
+   ],
    "tier": "keystone"
   },
   {
@@ -3274,12 +3277,13 @@ export const TALENT_TREE_DATA = {
    "id": 33,
    "x": -1762,
    "y": -52,
-   "nameEn": "Total Survey",
-   "nameDe": "Vollständige Erkundung",
-   "descEn": "Scout's Primer have a 5% chance of revealing four additional columns. This rolls independently from other column bonuses. +6% Armour.",
-   "descDe": "Pfadfinder Kompasse haben eine 5% Chance vier weitere Spalten aufzudecken. Dies wird unabhängig von anderen Spaltenboni gewürfelt. +6% Rüstung.",
-   "icon": "🔭",
-   "statKey": "total_survey",
+   "nameEn": "Honed Reflexes",
+   "nameDe": "Geschärfte Reflexe",
+   "icon": "",
+   "statKey": "notable_honed_reflexes_33",
+   "effects": [
+    "agi_flat:30"
+   ],
    "tier": "notable"
   },
   {
@@ -6718,12 +6722,13 @@ export const TALENT_TREE_DATA = {
    "id": 20084,
    "x": -1762,
    "y": 57,
-   "nameEn": "The Colossus",
-   "nameDe": "Der Koloss",
-   "descEn": "+15% Armour, +10% Movement speed.",
-   "descDe": "+15% Rüstung, +10% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_the_colossus",
+   "nameEn": "Arcane Mind",
+   "nameDe": "Arkaner Geist",
+   "icon": "",
+   "statKey": "notable_arcane_mind_20084",
+   "effects": [
+    "int_flat:30"
+   ],
    "tier": "notable"
   },
   {

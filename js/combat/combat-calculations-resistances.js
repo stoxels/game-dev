@@ -90,6 +90,11 @@ export function _egAilmentDamageMult(key, stats) {
     return 1 + Math.max(0, pct || 0) / 100;
 }
 
+// Multiplier on every Life leech heal (Vital Conduit keystone: lifeLeechLessPct).
+export function _egLeechHealMult(stats) {
+    return Math.max(0, 1 - Math.max(0, Number(stats && stats.lifeLeechLessPct) || 0) / 100);
+}
+
 // Applies the target monster's elemental resistances to an incoming hit.
 // `elements` maps each element to the raw elemental damage carried by the hit
 // (proportional to `amount`); everything else counts as physical. Positive

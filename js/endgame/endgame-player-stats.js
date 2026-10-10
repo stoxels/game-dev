@@ -634,6 +634,11 @@ export function _egComputePlayerStats() {
         physAsExtraFirePct: (passiveTreeBonuses.physAsExtraFirePct || 0)
             + (_egFireSurgeActive() ? (passiveTreeBonuses.physAsExtraFireTimedPct || 0) : 0),
         crushPhysReductionPct: passiveTreeBonuses.crushPhysReductionPct || 0,
+        // Vital Conduit keystone (node 291): "less" multipliers on Life
+        // regeneration and Life leech, and the Absorption-recharge flag.
+        lifeRegenLessPct: passiveTreeBonuses.lifeRegenLessPct || 0,
+        lifeLeechLessPct: passiveTreeBonuses.lifeLeechLessPct || 0,
+        absorptionRechargesLife: passiveTreeBonuses.absorptionRechargesLife || 0,
         // Flat bonus to fire/cold/lightning resistance (never shadow) and the
         // chance to avoid ailments while a hold-to-cast is running.
         allElementalResist: passiveTreeBonuses.allElementalResist || 0,
@@ -1378,11 +1383,29 @@ export function _egScheduleAbsorptionRegen() {
     const rateMult = 1 + Math.min(100, stats.absorptionRegenRatePct || 0) / 100;
 
     globalThis._egPlayerAbsorptionRegenDelayTimer = setTimeout(() => {
+        // Vital Conduit keystone: the missing Absorption at the moment the
+        // recharge starts is the budget that is paid out as Life instead.
+        let lifeBudget = null;
         globalThis._egPlayerAbsorptionRegenInterval = setInterval(() => {
             if (!_egIsActive()) { _egCancelAbsorptionRegen(); return; }
-            const max = _egComputePlayerStats().absorption;
-            if (globalThis._egPlayerAbsorptionCurrent >= max) { _egCancelAbsorptionRegen(); return; }
+            const live = _egComputePlayerStats();
+            const max = live.absorption;
+            const toLife = (Number(live.absorptionRechargesLife) || 0) > 0;
+            if (!toLife && globalThis._egPlayerAbsorptionCurrent >= max) { _egCancelAbsorptionRegen(); return; }
             const step = Math.max(1, Math.round(max * EG_ABSORPTION_REGEN_BASE_STEP_PCT * rateMult));
+            if (toLife) {
+                if (lifeBudget === null) lifeBudget = Math.max(0, max - globalThis._egPlayerAbsorptionCurrent);
+                const noRegen = _egGetActiveMapModValue('map_no_regeneration') > 0;
+                if (noRegen || lifeBudget <= 0 || globalThis.playerCurrentHP >= globalThis.playerMaxHP) {
+                    _egCancelAbsorptionRegen();
+                    return;
+                }
+                const heal = Math.min(step, lifeBudget);
+                lifeBudget -= heal;
+                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+                if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+                return;
+            }
             globalThis._egPlayerAbsorptionCurrent = Math.min(max, globalThis._egPlayerAbsorptionCurrent + step);
         }, 200);
     }, delayMs);
@@ -1470,6 +1493,9 @@ export const EG_STAT_DISPLAY_LABELS = {
     physDotMorePct: { label: t('eg_stat_phys_dot_more'), suffix: '%' },
     physAsExtraFirePct: { label: t('eg_stat_phys_as_fire'), suffix: '%' },
     crushPhysReductionPct: { label: t('eg_stat_crush_phys_reduction'), suffix: '%' },
+    lifeRegenLessPct: { label: t('eg_stat_life_regen_less'), suffix: '%' },
+    lifeLeechLessPct: { label: t('eg_stat_life_leech_less'), suffix: '%' },
+    absorptionRechargesLife: { label: t('eg_stat_absorption_recharges_life'), suffix: '' },
     retaliationWardBleed: { label: t('eg_stat_retaliation_ward_bleed'), suffix: '' },
     retaliationWardIgnite: { label: t('eg_stat_retaliation_ward_ignite'), suffix: '' },
     meleePhys1HIncPct: { label: t('eg_stat_inc_melee_phys_1h'), suffix: '%' },
@@ -1620,7 +1646,7 @@ export const EG_STAT_LAYOUT = {
     defense: [
         { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption'] },
         { catKey: 'eg_statcat_life_mana', buckets: [
-            'health', 'healthMorePct', 'mana', 'manaRemoved', 'spellsCostLife', 'spellCostIncPct', 'lifeRegen', 'lifeRegenRatePct', 'manaRegen', 'lifeLeechPct', 'lifeLeechMeleePct',
+            'health', 'healthMorePct', 'mana', 'manaRemoved', 'spellsCostLife', 'spellCostIncPct', 'lifeRegen', 'lifeRegenRatePct', 'lifeRegenLessPct', 'manaRegen', 'lifeLeechPct', 'lifeLeechMeleePct', 'lifeLeechLessPct', 'absorptionRechargesLife',
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
             'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [
