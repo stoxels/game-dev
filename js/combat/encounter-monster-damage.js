@@ -1,5 +1,5 @@
 import { t } from '../translation/translations.js';
-import { _egApplyAilmentShockAmpOnMonster, _egApplyImpaleToHit, _egApplyIntimidateAmp, _egRollIntimidate, _egRollPlayerHitAilments } from './combat-ailments-core.js';
+import { _egApplyAilmentShockAmpOnMonster, _egApplyImpaleToHit, _egApplyIntimidateAmp, _egRollCrush, _egRollIntimidate, _egRollPlayerHitAilments } from './combat-ailments-core.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
 import { EG_ELEMENTS, _egApplyDamageConversion, _egApplyTargetResistances, _egScaleElements } from './combat-calculations-resistances.js';
 import { EG_DAMAGE_NUMBER_DURATION_MS } from './encounter-constants.js';
@@ -129,13 +129,17 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     }
 
     const hpBefore = target.currentHP;
+    // Crush (node 331) is decided on the state BEFORE the hit: only an
+    // enemy that was at full Life when the melee strike landed is crushed.
+    const wasFullLife = target.maxHP > 0 && hpBefore >= target.maxHP;
 
     // Flat player damage that carries no element breakdown (shield bash,
     // reflect, channel release) is physical; the Primal Flame keystone
     // (fire conversion / fire-only) converts or drops it like any other hit.
     if (opts && opts.isPlayerFlat && !elements) {
         const flatStats = _egComputePlayerStats();
-        if ((Number(flatStats.damageToFirePct) || 0) > 0 || (Number(flatStats.onlyFireDamage) || 0) > 0) {
+        if ((Number(flatStats.damageToFirePct) || 0) > 0 || (Number(flatStats.onlyFireDamage) || 0) > 0
+            || (Number(flatStats.physAsExtraFirePct) || 0) > 0) {
             const flat = _egApplyDamageConversion(flatStats, amount, {});
             elements = flat.elements;
             amount = Math.max(1, Math.round(flat.physical
@@ -181,6 +185,10 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     // Intimidate roll: after the hit's own damage so the hit that
     // intimidates does not benefit from the amp it just caused.
     if (_egRollIntimidate(target, opts)) _egShowStatusLabel(target.id, t('eg_intimidated'));
+
+    // Crush (node 331): applied after the hit, like Intimidate, so the
+    // strike that crushes does not benefit from its own debuff.
+    if (_egRollCrush(target, opts, wasFullLife)) _egShowStatusLabel(target.id, t('eg_crushed'));
 
     // Rage (axe notable 369): melee hits while wielding an Axe grant Rage.
     if (opts && opts.isMelee) {

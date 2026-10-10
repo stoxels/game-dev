@@ -137,7 +137,6 @@ export function handleSpecialRewards({ gi, isFirstClear, isAscensionLevel, irz, 
 function getLuckyDropChance() {
     let chance = 0.25;
     if (ptHasSkill('bonus_replay_1')) chance += 0.10;
-    if (ptHasSkill('bonus_replay_2')) chance += 0.15;
     if (ptHasSkill('bonus_replay_3')) chance += 0.20;
     if (_charIs('trix')) chance += 0.15;
     return chance;

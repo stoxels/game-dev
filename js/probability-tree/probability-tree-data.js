@@ -697,12 +697,14 @@ export const TALENT_TREE_DATA = {
    "id": 95,
    "x": -1699,
    "y": 228,
-   "nameEn": "Treasure Resonance",
-   "nameDe": "Schatzresonanz",
-   "descEn": "15% increased chance of Lucky Drops happening. Stacks with Fortune Echo and Golden Recurrence. +6% Armour.",
-   "descDe": "15% erhöhte Chance dass Glücksfunde aktiviert werden. Wirkt zusammen mit Echos des Glücks und Goldene Wiederkehr. +6% Rüstung.",
-   "icon": "🎁",
-   "statKey": "bonus_replay_2",
+   "nameEn": "Smoldering Vigor",
+   "nameDe": "Glimmende Lebenskraft",
+   "icon": "",
+   "statKey": "notable_smoldering_vigor_95",
+   "effects": [
+    "ignite_damage_more:10",
+    "life_regen_pct:1.2"
+   ],
    "tier": "notable"
   },
   {
@@ -905,12 +907,13 @@ export const TALENT_TREE_DATA = {
    "id": 217,
    "x": -1739,
    "y": 130,
-   "nameEn": "Foreseen Outcome",
-   "nameDe": "Vorhergesehenes Ergebnis",
-   "descEn": "Increases the time that the completion text is shown by 30 seconds. Stacks with Vision of Completion. +6% Armour.",
-   "descDe": "Erhöht die Dauer, die der Abschlusstext bereits während des Levels angezeigt wird, um 30 Sekunden. Wirkt zusammen mit Vision des Abschlusses. +6% Rüstung.",
-   "icon": "📋",
-   "statKey": "completion_glimpse_2",
+   "nameEn": "Searing Surge",
+   "nameDe": "Sengende Woge",
+   "icon": "",
+   "statKey": "notable_searing_surge_217",
+   "effects": [
+    "phys_as_fire_timed:30"
+   ],
    "tier": "notable"
   },
   {
@@ -2729,12 +2732,14 @@ export const TALENT_TREE_DATA = {
    "id": 331,
    "x": -2213,
    "y": 207,
-   "nameEn": "Rune Insurance",
-   "nameDe": "Runen-Versicherung",
-   "descEn": "The first mistake of every level deals no time penalty. +6% Armour.",
-   "descDe": "Der erste Fehler jedes Levels verursacht keinen Zeitverlust. +6% Rüstung.",
-   "icon": "📜",
-   "statKey": "rune_insurance",
+   "nameEn": "Pulverize",
+   "nameDe": "Zermalmen",
+   "icon": "",
+   "statKey": "notable_pulverize_331",
+   "effects": [
+    "crush_full_life:15",
+    "phys_damage_inc:40"
+   ],
    "tier": "notable"
   },
   {
@@ -6739,10 +6744,12 @@ export const TALENT_TREE_DATA = {
    "y": 385,
    "nameEn": "The Colossus",
    "nameDe": "Der Koloss",
-   "descEn": "+15% Armour, +10% Movement speed.",
-   "descDe": "+15% Rüstung, +10% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_the_colossus",
+   "icon": "",
+   "statKey": "notable_the_colossus_20086",
+   "effects": [
+    "melee_phys_mace:35",
+    "crit_multi_mace:20"
+   ],
    "tier": "notable"
   },
   {
@@ -8749,48 +8756,54 @@ export const TALENT_TREE_DATA = {
    "id": 30303,
    "x": -2262,
    "y": 174,
-   "nameEn": "Lesser Rune Insurance",
-   "nameDe": "Runen-Versicherung (klein)",
-   "descEn": "The first mistake of every level deals no time penalty. +3% Armour.",
-   "descDe": "Der erste Fehler jedes Levels verursacht keinen Zeitverlust. +3% Rüstung.",
-   "icon": "📜",
-   "statKey": "small_lesser_rune_insurance",
+   "nameEn": "Piercing Force",
+   "nameDe": "Durchdringende Kraft",
+   "icon": "",
+   "statKey": "small_piercing_force_30303",
+   "effects": [
+    "phys_damage_inc:10",
+    "ignore_phys_reduction:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30304,
    "x": -2262,
    "y": 134,
-   "nameEn": "Lesser Rune Insurance",
-   "nameDe": "Runen-Versicherung (klein)",
-   "descEn": "The first mistake of every level deals no time penalty. +3% Armour.",
-   "descDe": "Der erste Fehler jedes Levels verursacht keinen Zeitverlust. +3% Rüstung.",
-   "icon": "📜",
-   "statKey": "small_lesser_rune_insurance",
+   "nameEn": "Piercing Force",
+   "nameDe": "Durchdringende Kraft",
+   "icon": "",
+   "statKey": "small_piercing_force_30304",
+   "effects": [
+    "phys_damage_inc:10",
+    "ignore_phys_reduction:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30305,
    "x": -2213,
    "y": 101,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Raw Power",
+   "nameDe": "Rohe Kraft",
+   "icon": "",
+   "statKey": "travel_raw_power_30305",
+   "effects": [
+    "phys_damage_inc:12"
+   ],
    "tier": "travel"
   },
   {
    "id": 30306,
    "x": -2164,
    "y": 134,
-   "nameEn": "Lesser Rune Insurance",
-   "nameDe": "Runen-Versicherung (klein)",
-   "descEn": "The first mistake of every level deals no time penalty. +3% Armour.",
-   "descDe": "Der erste Fehler jedes Levels verursacht keinen Zeitverlust. +3% Rüstung.",
-   "icon": "📜",
-   "statKey": "small_lesser_rune_insurance",
+   "nameEn": "Festering Wounds",
+   "nameDe": "Eiternde Wunden",
+   "icon": "",
+   "statKey": "small_festering_wounds_30306",
+   "effects": [
+    "phys_dot_more:6"
+   ],
    "tier": "small"
   },
   {
@@ -8823,12 +8836,13 @@ export const TALENT_TREE_DATA = {
    "id": 30309,
    "x": -2164,
    "y": 174,
-   "nameEn": "Lesser Rune Insurance",
-   "nameDe": "Runen-Versicherung (klein)",
-   "descEn": "The first mistake of every level deals no time penalty. +3% Armour.",
-   "descDe": "Der erste Fehler jedes Levels verursacht keinen Zeitverlust. +3% Rüstung.",
-   "icon": "📜",
-   "statKey": "small_lesser_rune_insurance",
+   "nameEn": "Festering Wounds",
+   "nameDe": "Eiternde Wunden",
+   "icon": "",
+   "statKey": "small_festering_wounds_30309",
+   "effects": [
+    "phys_dot_more:6"
+   ],
    "tier": "small"
   },
   {
@@ -9371,60 +9385,66 @@ export const TALENT_TREE_DATA = {
    "id": 30352,
    "x": -1739,
    "y": 385,
-   "nameEn": "Lesser The Colossus",
-   "nameDe": "Der Koloss (klein)",
-   "descEn": "+8% Armour, +5% Movement speed.",
-   "descDe": "+8% Rüstung, +5% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_the_colossus",
+   "nameEn": "Lesser Colossus",
+   "nameDe": "Kleiner Koloss",
+   "icon": "",
+   "statKey": "small_lesser_colossus_30352",
+   "effects": [
+    "crit_multi_mace:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30353,
    "x": -1739,
    "y": 287,
-   "nameEn": "Lesser The Colossus",
-   "nameDe": "Der Koloss (klein)",
-   "descEn": "+8% Armour, +5% Movement speed.",
-   "descDe": "+8% Rüstung, +5% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_the_colossus",
+   "nameEn": "Keen Bludgeon",
+   "nameDe": "Scharfer Knüppel",
+   "icon": "",
+   "statKey": "small_keen_bludgeon_30353",
+   "effects": [
+    "crit_chance_mace:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30354,
    "x": -1699,
    "y": 287,
-   "nameEn": "Lesser The Colossus",
-   "nameDe": "Der Koloss (klein)",
-   "descEn": "+8% Armour, +5% Movement speed.",
-   "descDe": "+8% Rüstung, +5% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_the_colossus",
+   "nameEn": "Bludgeoner's Edge",
+   "nameDe": "Schneide des Keulenschwingers",
+   "icon": "",
+   "statKey": "small_bludgeoner_s_edge_30354",
+   "effects": [
+    "melee_phys_mace:10",
+    "crit_chance_mace:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30355,
    "x": -1739,
    "y": 228,
-   "nameEn": "Lesser Treasure Resonance",
-   "nameDe": "Schatzresonanz (klein)",
-   "descEn": "8% increased chance of Lucky Drops happening. Stacks with Fortune Echo and Golden Recurrence. +3% Armour.",
-   "descDe": "8% erhöhte Chance dass Glücksfunde aktiviert werden. Wirkt zusammen mit Echos des Glücks und Goldene Wiederkehr. +3% Rüstung.",
-   "icon": "🎁",
-   "statKey": "small_lesser_treasure_resonance",
+   "nameEn": "Lesser Smoldering Vigor",
+   "nameDe": "Glimmende Lebenskraft (klein)",
+   "icon": "",
+   "statKey": "small_lesser_smoldering_vigor_30355",
+   "effects": [
+    "ignite_damage_more:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30356,
    "x": -1772,
    "y": 179,
-   "nameEn": "Lesser Foreseen Outcome",
-   "nameDe": "Vorhergesehenes Ergebnis (klein)",
-   "descEn": "Increases the time that the completion text is shown by 15 seconds. Stacks with Vision of Completion. +3% Armour.",
-   "descDe": "Erhöht die Dauer, die der Abschlusstext bereits während des Levels angezeigt wird, um 15 Sekunden. Wirkt zusammen mit Vision des Abschlusses. +3% Rüstung.",
-   "icon": "📋",
-   "statKey": "small_lesser_foreseen_outcome",
+   "nameEn": "Lesser Searing Surge",
+   "nameDe": "Sengende Woge (klein)",
+   "icon": "",
+   "statKey": "small_lesser_searing_surge_30356",
+   "effects": [
+    "phys_as_fire:4"
+   ],
    "tier": "small"
   },
   {
@@ -9444,12 +9464,14 @@ export const TALENT_TREE_DATA = {
    "id": 30358,
    "x": -1670,
    "y": 159,
-   "nameEn": "Lesser Foreseen Outcome",
-   "nameDe": "Vorhergesehenes Ergebnis (klein)",
-   "descEn": "Increases the time that the completion text is shown by 15 seconds. Stacks with Vision of Completion. +3% Armour.",
-   "descDe": "Erhöht die Dauer, die der Abschlusstext bereits während des Levels angezeigt wird, um 15 Sekunden. Wirkt zusammen mit Vision des Abschlusses. +3% Rüstung.",
-   "icon": "📋",
-   "statKey": "small_lesser_foreseen_outcome",
+   "nameEn": "Hearth Fire",
+   "nameDe": "Herdfeuer",
+   "icon": "",
+   "statKey": "small_hearth_fire_30358",
+   "effects": [
+    "fire_damage_inc_pct:12",
+    "life_regen_pct:0.4"
+   ],
    "tier": "small"
   },
   {

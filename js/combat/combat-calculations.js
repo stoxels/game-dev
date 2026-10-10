@@ -36,7 +36,7 @@ export function _egCalcPlayerDamage() {
     elements.cold *= 1 + (stats.coldDamageIncPct || 0) / 100;
     elements.lightning *= 1 + (stats.lightningDamageIncPct || 0) / 100;
     // Fire conversion / fire-only (Primal Flame keystone).
-    const converted = _egApplyDamageConversion(stats, dmg, elements);
+    const converted = _egApplyDamageConversion(stats, dmg, elements, elemMult * (1 + (stats.fireDamageIncPct || 0) / 100));
     dmg = converted.physical;
     _egLastHitElements = converted.elements;
     dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
@@ -140,12 +140,17 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
         shadow: rollEl(stats.meleeShadowMin, stats.meleeShadowMax) * elemMult,
     };
     // Fire conversion / fire-only (Primal Flame keystone).
-    const converted = _egApplyDamageConversion(stats, dmg, elements);
+    const converted = _egApplyDamageConversion(stats, dmg, elements, fireMult);
     dmg = converted.physical;
     _egLastMeleeElements = converted.elements;
     dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
 
-    const critMult = _egRollCrit(stats);
+    // Mace / Sceptre crit lines (Colossus nodes): scoped to melee strikes
+    // with the matching weapon family, added to this roll only.
+    const maceBonus = stats.isMaceEquipped
+        ? { chance: stats.critChanceMeleeMacePct || 0, multiplierPct: stats.critMultiplierMeleeMacePct || 0 }
+        : null;
+    const critMult = _egRollCrit(stats, maceBonus);
     _egLastMeleeWasCrit = critMult > 1;
     _egLastMeleeCritMult = critMult;
     dmg *= critMult;

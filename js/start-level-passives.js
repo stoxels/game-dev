@@ -718,7 +718,6 @@ export function _applyCompletionGlimpse() {
     if (!ptHasSkill('completion_glimpse_1')) return;
 
     let duration = 30000;
-    if (ptHasSkill('completion_glimpse_2')) duration += 30000;
     if (ptHasSkill('completion_glimpse_3')) duration += 30000;
 
     const text = lvText(cur, 'reveal');

@@ -250,8 +250,8 @@ export function _ptxRunExpansion() {
     const PENALTY_MODS = [
         // Final Theorem: below 10% starting time → immune.
         pen => (has('final_theorem') && baseTime() > 0 && globalThis.timerSecs < baseTime() * 0.1) ? 0 : pen,
-        // Rune Insurance / Outlier Immunity: first mistake free.
-        pen => ((has('rune_insurance') || has('outlier_immunity')) && globalThis.mistakeCount === 1) ? 0 : pen,
+        // Outlier Immunity: first mistake free.
+        pen => (has('outlier_immunity') && globalThis.mistakeCount === 1) ? 0 : pen,
         // Actuary: flat −5s.
         pen => has('actuary') ? Math.max(0, pen - 5) : pen,
         // Supply Chain: −10s per item used (max 3 stacks).

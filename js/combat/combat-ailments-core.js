@@ -7,6 +7,7 @@ import { _egGameOver, _egKillMonster, _egPlayerTakeDamage, _egShowDamageNumber }
 import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
+import { EG_CRUSH_DURATION_S, _egAilmentDamageMult } from './combat-calculations-resistances.js';
 import { _egAddGroundFireAcc, _egGroundFireAcc, _egPlayerStatuses, _egPuzzleEffects, _egPlayerStatusBarTicker, _egReplacePuzzleEffects, _egSetPlayerStatusBarTicker } from './combat-ailments-state.js';
 
 //------------------------------------------------------------------------
@@ -161,6 +162,13 @@ function _egApplyMonsterAilment(monster, key, dps) {
             if (key === 'bleed') bleedSpeedPct = Math.max(0, Number(ps.bleedSpeedPct) || 0);
         } catch (e) { pct = 0; }
         if (pct > 0) durationS = durationS * (1 + pct / 100);
+    }
+    // "More Damage" multipliers (nodes 30355/95 ignite, 30306/30309 bleed):
+    // scale the stored damage-per-second once, when the ailment is applied.
+    if (dps > 0 && (key === 'ignite' || key === 'bleed')) {
+        try {
+            dps = dps * _egAilmentDamageMult(key, _egComputePlayerStats());
+        } catch (e) { /* stats unavailable - base damage */ }
     }
     // Bleed speed (nodes 30283/251): the same number of ticks of the same
     // size, just faster - total damage is unchanged, the duration shrinks.
@@ -422,6 +430,20 @@ export function _egApplyIntimidateAmp(target, amount, opts) {
     if (!(target.intimidatedUntil > Date.now())) return amount;
     const ampPct = Math.max(0, Number(_egComputePlayerStats().intimidateMeleeAmpPct) || 0);
     return amount * (1 + ampPct / 100);
+}
+
+// Crush (notable 331): a melee strike that lands on an enemy which was at
+// full Life crushes it for EG_CRUSH_DURATION_S seconds. While crushed the
+// enemy's physical Damage reduction is lowered (_egApplyTargetResistances).
+// Returns true when the enemy was (re)crushed by this hit.
+export function _egRollCrush(target, opts, wasFullLife) {
+    if (!target || !(opts && opts.isMelee) || !wasFullLife || target.currentHP <= 0) return false;
+    const pct = Math.max(0, Number(_egComputePlayerStats().crushPhysReductionPct) || 0);
+    if (!(pct > 0)) return false;
+    const scale = (typeof window !== 'undefined' && window.DEV_EFFECT_TIME_SCALE > 0) ? window.DEV_EFFECT_TIME_SCALE : 1;
+    target.crushedUntil = Date.now() + EG_CRUSH_DURATION_S * scale * 1000;
+    target.crushPhysRedPct = pct;
+    return true;
 }
 
 // Rolls the intimidate chance for one melee hit; returns true when the enemy

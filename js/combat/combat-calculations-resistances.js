@@ -45,11 +45,15 @@ export function _egGetElementalDamageBonus(stats) {
 // converted share keeps the strength it already had. Returns
 // { physical, elements } and hands the inputs back untouched when neither
 // channel is active.
-export function _egApplyDamageConversion(stats, physical, elements) {
+export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1) {
     const el = elements || {};
     const share = Math.max(0, Math.min(100, Number(stats && stats.damageToFirePct) || 0)) / 100;
     const fireOnly = (Number(stats && stats.onlyFireDamage) || 0) > 0;
-    if (share <= 0 && !fireOnly) return { physical, elements: el };
+    // "Gain X% of physical Damage as extra Fire": taken from the physical
+    // share BEFORE conversion, scaled by the caller's fire multiplier, and
+    // added after the fire-only drop (it is fire itself, so it survives).
+    const extraPct = Math.max(0, Number(stats && stats.physAsExtraFirePct) || 0);
+    if (share <= 0 && !fireOnly && extraPct <= 0) return { physical, elements: el };
     const keep = fireOnly ? 0 : 1 - share;
     const phys = physical || 0;
     const cold = el.cold || 0;
@@ -57,7 +61,7 @@ export function _egApplyDamageConversion(stats, physical, elements) {
     return {
         physical: phys * keep,
         elements: {
-            fire: (el.fire || 0) + share * (phys + cold + lightning),
+            fire: (el.fire || 0) + share * (phys + cold + lightning) + (phys * extraPct / 100) * fireMult,
             cold: cold * keep,
             lightning: lightning * keep,
             shadow: fireOnly ? 0 : (el.shadow || 0),
@@ -72,6 +76,18 @@ export function _egScaleElements(elements, factor) {
     const out = {};
     EG_ELEMENTS.forEach(el => { out[el] = (elements[el] || 0) * factor; });
     return out;
+}
+
+// How long a Crushed enemy stays crushed (node 331).
+export const EG_CRUSH_DURATION_S = 5;
+
+// Multiplier on the stored damage-per-second of an ailment the player
+// inflicts: Ignite uses igniteDamageMorePct, Bleeding (the physical damage
+// over time) physDotMorePct. Every other ailment is untouched.
+export function _egAilmentDamageMult(key, stats) {
+    const pct = key === 'ignite' ? Number(stats && stats.igniteDamageMorePct)
+        : key === 'bleed' ? Number(stats && stats.physDotMorePct) : 0;
+    return 1 + Math.max(0, pct || 0) / 100;
 }
 
 // Applies the target monster's elemental resistances to an incoming hit.
@@ -91,13 +107,18 @@ export function _egApplyTargetResistances(amount, target, elements, opts) {
     if ((target.spellproofPct || 0) > 0 && opts && opts.isPlayerSpell && !opts.isMelee) {
         amount = Math.max(1, Math.round(amount * (1 - Math.min(90, target.spellproofPct) / 100)));
     }
-    if (!target.resistances) return amount;
-    const res = target.resistances;
+    // Crushed (node 331): the target's physical Damage reduction is lowered
+    // for the duration; monsters without a resistance table are treated as
+    // having 0% so the lowering still amplifies physical hits.
+    const crushed = (target.crushedUntil > Date.now()) ? Math.max(0, Number(target.crushPhysRedPct) || 0) : 0;
+    if (!target.resistances && !(crushed > 0)) return amount;
+    const res = target.resistances || {};
     const clampRes = (v) => Math.max(-EG_RESIST_CAP_PCT, Math.min(EG_RESIST_CAP_PCT, Number(v) || 0));
     let physRes = (typeof res.physical === 'number') ? clampRes(res.physical) : 0;
     // Armour pierce (node 147): this hit skips positive physical reduction;
     // a negative value (vulnerability) still amplifies.
     if (opts && opts.ignorePhysReduction) physRes = Math.min(0, physRes);
+    if (crushed > 0) physRes = Math.max(-EG_RESIST_CAP_PCT, physRes - crushed);
 
     // Split the hit into its elemental (resisted / amplified) and physical
     // (armored) shares. A missing, empty or oversized breakdown means the

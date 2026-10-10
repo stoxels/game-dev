@@ -253,11 +253,6 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // (_egTryRetaliationWard in combat-ailments-core.js).
     ward_bleed_retaliation: { channel: 'retaliationWardBleed', flag: true, en: 'Bleeding enemies cannot inflict Bleeding on you', de: 'Blutende Gegner können dir keine Blutung zufügen' },
     ward_ignite_retaliation: { channel: 'retaliationWardIgnite', flag: true, en: 'Ignited enemies cannot inflict Ignite on you', de: 'Brennende Gegner können dich nicht entzünden' },
-    // Blood Magic keystone (node 40001). "More" life is a separate
-    // multiplier applied after every % increased source in
-    // _egComputePlayerStats; the two flags are read through
-    // _egGetTreeChannel() by class-mana.js (max Mana 0, costs paid in Life)
-    // and the cost increase scales every spell/ability cost there too.
     // Primal Flame keystone (node 350): damageToFirePct converts that share of
     // physical, cold and lightning Damage to Fire; onlyFireDamage then drops
     // everything non-fire that is left (_egApplyDamageConversion in
@@ -265,10 +260,39 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // and spell hit rolls plus flat player hits).
     damage_to_fire_pct: { channel: 'damageToFirePct', en: '{v}% of physical, cold and lightning Damage is converted to Fire Damage', de: '{v}% des physischen, Kälte- und Blitzschadens wird in Feuerschaden umgewandelt' },
     only_fire_damage: { channel: 'onlyFireDamage', flag: true, en: 'You cannot deal non-Fire Damage', de: 'Du kannst keinen Schaden außer Feuerschaden verursachen' },
+    // Blood Magic keystone (node 40001). "More" life is a separate
+    // multiplier applied after every % increased source where max HP is
+    // composed; the two flags are read through _egGetTreeChannel() by
+    // class-mana.js (max Mana 0, costs paid in Life) and the cost increase
+    // scales every spell/ability cost there too.
     life_more_pct: { channel: 'healthMorePct', en: '{v}% more maximum Life', de: '{v}% mehr maximales Leben' },
     mana_removed: { channel: 'manaRemoved', flag: true, en: 'You have no Mana', de: 'Du hast kein Mana' },
     spells_cost_life: { channel: 'spellsCostLife', flag: true, en: 'Spells cost Life instead of Mana', de: 'Zauber kosten Leben statt Mana' },
     spell_cost_inc_pct: { channel: 'spellCostIncPct', en: '{v}% increased Cost of all spells', de: '{v}% erhöhte Kosten aller Zauber' },
+
+    // Mace / Sceptre critical strikes (Colossus nodes 30353/30354/30352/20086).
+    // Both are ADDITIVE like the gear mods of the same name: the chance is
+    // added to critChance, the multiplier to critMultiplierPct (base 150%).
+    // They only count for melee strikes with a Mace or Sceptre equipped
+    // (_egCalcPlayerMeleeDamage -> _egRollCrit bonus argument).
+    crit_chance_mace: { channel: 'critChanceMeleeMacePct', en: '+{v}% to melee Critical Strike Chance with Maces or Sceptres', de: '+{v}% auf die kritische Nahkampf-Trefferchance mit Streitkolben oder Zeptern' },
+    crit_multi_mace: { channel: 'critMultiplierMeleeMacePct', en: '+{v}% to melee Critical Strike Multiplier with Maces or Sceptres', de: '+{v}% auf den kritischen Nahkampf-Schadensmultiplikator mit Streitkolben oder Zeptern' },
+    // Damage-over-time multipliers (nodes 30355/95, 30306/30309): applied to
+    // the stored damage-per-second of the ailment when it is inflicted
+    // (_egApplyMonsterAilment). Bleeding is the physical damage over time.
+    ignite_damage_more: { channel: 'igniteDamageMorePct', en: 'Ignites you inflict deal {v}% more Damage', de: 'Von dir verursachte Entzündungen verursachen {v}% mehr Schaden' },
+    phys_dot_more: { channel: 'physDotMorePct', en: 'You deal {v}% more physical Damage over Time', de: 'Du verursachst {v}% mehr physischen Schaden über Zeit' },
+    // Physical damage gained as Fire (nodes 30356/217): added to the fire
+    // share of every hit from the hit's physical share, AFTER the fire-only
+    // drop of the Primal Flame keystone (_egApplyDamageConversion). The
+    // timed variant is active for 5 seconds out of every 10 seconds of the
+    // encounter, counted from the second the encounter starts (stats seed).
+    phys_as_fire: { channel: 'physAsExtraFirePct', en: 'Gain {v}% of physical Damage as extra Fire Damage', de: 'Erhalte {v}% des physischen Schadens als zusätzlichen Feuerschaden' },
+    phys_as_fire_timed: { channel: 'physAsExtraFireTimedPct', en: 'Every 10 seconds, gain {v}% of physical Damage as extra Fire Damage for 5 seconds', de: 'Erhalte alle 10 Sekunden für 5 Sekunden {v}% des physischen Schadens als zusätzlichen Feuerschaden' },
+    // Crush (notable 331): a melee strike on an enemy at full Life crushes it
+    // for 5 seconds; a crushed enemy's physical Damage reduction is lowered
+    // by the value (it can drop below 0 and then amplifies physical hits).
+    crush_full_life: { channel: 'crushPhysReductionPct', en: 'Crush enemies for 5 seconds when you hit them with a melee strike while they are on full Life. Crushed enemies have {v}% reduced physical Damage reduction', de: 'Zermalme Gegner für 5 Sekunden, wenn du sie mit einem Nahkampfschlag triffst, während sie volles Leben haben. Zermalmte Gegner haben {v}% reduzierte physische Schadensreduktion' },
 });
 
 // Splits "key:value" (or a bare "key" = value 1) into its parts.

@@ -52,6 +52,9 @@ export function _egResetEncounterState() {
     if (typeof _egResetLowHealthWarningState === 'function') _egResetLowHealthWarningState();
     if (typeof _egResetAbsorptionBrokenState === 'function') _egResetAbsorptionBrokenState();
     globalThis._egEncounterActive = true;
+    // Encounter clock for timed passive effects (Searing Surge 10s cycle);
+    // the tick support shifts it by the length of every pause.
+    window._egEncounterStartAt = Date.now();
     globalThis._egTargetId = null;
     globalThis._egMonsters = [];
     // Do NOT clear _egPendingRevealQueue here - start-of-puzzle passives

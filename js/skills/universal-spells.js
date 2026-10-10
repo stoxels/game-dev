@@ -2140,7 +2140,8 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
         elements[spellElement] = amount;
     }
     // Fire conversion / fire-only (Primal Flame keystone, node 350).
-    if ((Number(stats.damageToFirePct) || 0) > 0 || (Number(stats.onlyFireDamage) || 0) > 0) {
+    if ((Number(stats.damageToFirePct) || 0) > 0 || (Number(stats.onlyFireDamage) || 0) > 0
+        || (Number(stats.physAsExtraFirePct) || 0) > 0) {
         const converted = _egApplyDamageConversion(stats, spellElement === 'physical' ? amount : 0, elements);
         elements = converted.elements;
         amount = Math.max(1, Math.round(converted.physical

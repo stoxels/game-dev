@@ -622,6 +622,18 @@ export function _egComputePlayerStats() {
         // fire-only flag, read by _egApplyDamageConversion.
         damageToFirePct: passiveTreeBonuses.damageToFirePct || 0,
         onlyFireDamage: passiveTreeBonuses.onlyFireDamage || 0,
+        // Colossus / ignite / fire / physical batch (see pt-effects.js).
+        // The mace crit lines are added to the roll only for melee strikes
+        // with a Mace or Sceptre; "gain physical as extra Fire" sums the
+        // permanent channel with the timed one while its 5s window is open
+        // (10s cycle counted from the encounter start).
+        critChanceMeleeMacePct: passiveTreeBonuses.critChanceMeleeMacePct || 0,
+        critMultiplierMeleeMacePct: passiveTreeBonuses.critMultiplierMeleeMacePct || 0,
+        igniteDamageMorePct: passiveTreeBonuses.igniteDamageMorePct || 0,
+        physDotMorePct: passiveTreeBonuses.physDotMorePct || 0,
+        physAsExtraFirePct: (passiveTreeBonuses.physAsExtraFirePct || 0)
+            + (_egFireSurgeActive() ? (passiveTreeBonuses.physAsExtraFireTimedPct || 0) : 0),
+        crushPhysReductionPct: passiveTreeBonuses.crushPhysReductionPct || 0,
         // Flat bonus to fire/cold/lightning resistance (never shadow) and the
         // chance to avoid ailments while a hold-to-cast is running.
         allElementalResist: passiveTreeBonuses.allElementalResist || 0,
@@ -1303,11 +1315,26 @@ export function _egCalcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
 }
 
 // Rolls a crit for the current hit. Returns the damage multiplier (1 = no crit).
-export function _egRollCrit(stats) {
-    if (stats.critChance > 0 && Math.random() * 100 < stats.critChance) {
-        return 1.5 + stats.critMultiplierPct / 100; // 150% base crit damage + bonus multiplier
+// `bonus` ({ chance, multiplierPct }) adds scoped extras to this one roll
+// (e.g. the Mace / Sceptre melee crit lines) without touching the stats.
+export function _egRollCrit(stats, bonus) {
+    const chance = (stats.critChance || 0) + ((bonus && bonus.chance) || 0);
+    if (chance > 0 && Math.random() * 100 < chance) {
+        // 150% base crit damage + additive multiplier bonuses
+        return 1.5 + ((stats.critMultiplierPct || 0) + ((bonus && bonus.multiplierPct) || 0)) / 100;
     }
     return 1;
+}
+
+// Timed fire window of the Searing Surge notable (node 217): active for 5
+// seconds out of every 10 seconds of the encounter, the first window opening
+// after the first 10 seconds. The encounter clock is window._egEncounterStartAt
+// (set in _egResetEncounterState, shifted by pauses in the tick support).
+export function _egFireSurgeActive(now = Date.now()) {
+    const start = Number(globalThis._egEncounterStartAt) || 0;
+    if (!start) return false;
+    const elapsed = now - start;
+    return elapsed >= 10000 && (elapsed % 10000) < 5000;
 }
 
 // _egGetElementalDamageBonus (rolls the total flat elemental damage bonus
@@ -1437,6 +1464,12 @@ export const EG_STAT_DISPLAY_LABELS = {
     spellCostIncPct: { label: t('eg_stat_spell_cost_inc'), suffix: '%' },
     damageToFirePct: { label: t('eg_stat_damage_to_fire'), suffix: '%' },
     onlyFireDamage: { label: t('eg_stat_only_fire_damage'), suffix: '' },
+    critChanceMeleeMacePct: { label: t('eg_stat_crit_chance_mace'), suffix: '%' },
+    critMultiplierMeleeMacePct: { label: t('eg_stat_crit_multi_mace'), suffix: '%' },
+    igniteDamageMorePct: { label: t('eg_stat_ignite_damage_more'), suffix: '%' },
+    physDotMorePct: { label: t('eg_stat_phys_dot_more'), suffix: '%' },
+    physAsExtraFirePct: { label: t('eg_stat_phys_as_fire'), suffix: '%' },
+    crushPhysReductionPct: { label: t('eg_stat_crush_phys_reduction'), suffix: '%' },
     retaliationWardBleed: { label: t('eg_stat_retaliation_ward_bleed'), suffix: '' },
     retaliationWardIgnite: { label: t('eg_stat_retaliation_ward_ignite'), suffix: '' },
     meleePhys1HIncPct: { label: t('eg_stat_inc_melee_phys_1h'), suffix: '%' },
@@ -1568,7 +1601,7 @@ export const EG_STAT_LAYOUT = {
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
             'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'stunChanceMaceChargedPct', 'stunDurationPct', 'stunChanceHeavyPct', 'stunDurationHeavyPct', 'stunDoubleChancePct', 'meleeDoubleDamageChancePct', 'meleeKillExplodeChancePct', 'meleeSpellManaCostReducedPct', 'meleeSpellLifeCostPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'bleedSpeedPct',
-            'meleeChargeSpeedPct', 'attackSpeedPct', 'meleeRangeM', 'meleeAoEPct'] },
+            'meleeChargeSpeedPct', 'attackSpeedPct', 'meleeRangeM', 'meleeAoEPct', 'critChanceMeleeMacePct', 'critMultiplierMeleeMacePct', 'crushPhysReductionPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
@@ -1577,7 +1610,7 @@ export const EG_STAT_LAYOUT = {
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
-        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'damageToFirePct', 'onlyFireDamage', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWardBleed', 'retaliationWardIgnite',
+        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'damageToFirePct', 'onlyFireDamage', 'physAsExtraFirePct', 'igniteDamageMorePct', 'physDotMorePct', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWardBleed', 'retaliationWardIgnite',
             'impaleChanceHeavyPct', 'impaleEffectHeavyPct', 'impaleEffectFreshPct', 'impaleDurationPct'] },
         { catKey: 'eg_statcat_arcane', buckets: [
             'castSpeedPct', 'fireCastSpeedPct', 'coldCastSpeedPct', 'lightningCastSpeedPct', 'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
