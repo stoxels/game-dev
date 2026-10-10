@@ -31,7 +31,42 @@ export function _egDamageTarget(amount) {
 // gear: stagger rolls a chance to pause the charge timer entirely for 1s.
 // Pushback is resisted by high-level monsters (50% at L41, 80% at L90) so
 // low-level players cannot permanently stall a T11+ monster by spamming.
-export function _egApplyHitToMonster(target, amount) {
+// Minimum share of the melee charge-up bar a strike needs for the mace
+// stun roll (node 360): 0.9 = 90% charged.
+export const EG_MACE_STUN_MIN_CHARGE = 0.9;
+
+// Stun / stagger length in ms, lengthened by "% increased Stun Duration"
+// (plus the heavy-weapon line for melee hits made with a two-hander) and
+// doubled by the "chance to double Stun Duration" roll.
+export function _egStunDurationMs(stats, isMeleeHit = false) {
+    const s = stats || {};
+    let incPct = Math.max(0, Number(s.stunDurationPct) || 0);
+    if (isMeleeHit && s.isHeavyWeaponEquipped) incPct += Math.max(0, Number(s.stunDurationHeavyPct) || 0);
+    let ms = EG_STAGGER_DURATION_MS * (1 + incPct / 100);
+    const doubleChance = Math.min(100, Number(s.stunDoubleChancePct) || 0);
+    if (doubleChance > 0 && Math.random() * 100 < doubleChance) ms *= 2;
+    return ms;
+}
+
+// Share of its maximum Life a melee-killed enemy deals to nearby enemies
+// when it explodes (node 20045).
+export const EG_MELEE_EXPLODE_LIFE_SHARE = 0.10;
+
+// Melee-kill explosion: physical damage to the other living enemies in the
+// victim's spawn zone. Untagged damage (no isMelee), so it can never chain
+// into further explosions.
+function _egMeleeKillExplode(dying) {
+    const stats = _egComputePlayerStats();
+    const chance = Math.min(100, Number(stats.meleeKillExplodeChancePct) || 0);
+    if (!(chance > 0) || Math.random() * 100 >= chance) return;
+    const dealt = Math.max(1, Math.round((Number(dying.maxHP) || 0) * EG_MELEE_EXPLODE_LIFE_SHARE));
+    const victims = globalThis._egMonsters.filter(m => m.id !== dying.id && m.zoneId === dying.zoneId && m.currentHP > 0);
+    if (!victims.length) return;
+    _egShowStatusLabel(dying.id, t('eg_corpse_explosion'));
+    victims.forEach(m => _egDamageTargetById(m.id, dealt, null, {}));
+}
+
+export function _egApplyHitToMonster(target, amount, opts) {
     const stats = _egComputePlayerStats();
     target.currentHP = Math.max(0, target.currentHP - amount);
     const basePushback = EG_PLAYER_STATS.chargePushback + (stats.pushbackFlat || 0);
@@ -42,7 +77,7 @@ export function _egApplyHitToMonster(target, amount) {
     target.currentCharge = Math.max(0, target.currentCharge - totalPushback);
 
     if (stats.staggerPct > 0 && Math.random() * 100 < stats.staggerPct) {
-        target.staggeredUntil = Date.now() + EG_STAGGER_DURATION_MS;
+        target.staggeredUntil = Date.now() + _egStunDurationMs(stats, !!(opts && opts.isMelee));
         _egShowStatusLabel(target.id, t('eg_staggered'));
     }
 }
@@ -140,9 +175,24 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
         if (rageStats.isAxeEquipped && (rageStats.rageOnHitAxe || 0) > 0) {
             _egGainRage(rageStats.rageOnHitAxe, rageStats.rageMax);
         }
+        // Mace stun (node 360): a (nearly) fully charged strike with a Mace
+        // or Sceptre may stun - the monster's charge timer pauses.
+        // Heavy-weapon stun (node 30249): any melee hit with a two-hander.
+        // The two rolls are independent; either one stuns.
+        const maceStunPct = Math.min(100, Number(rageStats.stunChanceMaceChargedPct) || 0);
+        const maceStun = rageStats.isMaceEquipped && maceStunPct > 0
+            && (Number(opts.chargePct) || 0) >= EG_MACE_STUN_MIN_CHARGE
+            && Math.random() * 100 < maceStunPct;
+        const heavyStunPct = Math.min(100, Number(rageStats.stunChanceHeavyPct) || 0);
+        const heavyStun = rageStats.isHeavyWeaponEquipped && heavyStunPct > 0
+            && Math.random() * 100 < heavyStunPct;
+        if (maceStun || heavyStun) {
+            target.staggeredUntil = Date.now() + _egStunDurationMs(rageStats, true);
+            _egShowStatusLabel(target.id, t('eg_stunned'));
+        }
     }
 
-    _egApplyHitToMonster(target, amount);
+    _egApplyHitToMonster(target, amount, opts);
     // Pass crit + elemental info so the number can pop with the right colour/size
     const isCrit = !!(opts && opts.isCrit);
     _egShowDamageNumber(target.id, amount, isCrit, elements);
@@ -166,6 +216,7 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
             // Gear: overkill - chance for excess damage to bleed into another monster
             _egTryOverkillSpread(target, amount, hpBefore, isCrit, elements);
         }
+        if (opts && opts.isMelee) _egMeleeKillExplode(target);
         _egKillMonster(target.id);
         return;
     }

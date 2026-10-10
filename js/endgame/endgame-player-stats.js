@@ -655,7 +655,13 @@ export function _egComputePlayerStats() {
         // Tree-sourced maximum Fire Resistance (effects pipeline, e.g.
         // reworked node 20068 Resolute Advance) seeds the very same bucket
         // gear's max_fire_res feeds, so both raise the cap together below.
-        fireResistMax: passiveTreeBonuses.fireResistMax || 0, coldResistMax: 0, lightningResistMax: 0, shadowResistMax: 0, allResMax: 0,
+        fireResistMax: passiveTreeBonuses.fireResistMax || 0,
+        coldResistMax: passiveTreeBonuses.coldResistMax || 0,
+        lightningResistMax: passiveTreeBonuses.lightningResistMax || 0,
+        shadowResistMax: 0, allResMax: 0,
+        // Tree "+% to all maximum Elemental Resistances" (node 250): fire,
+        // cold and lightning only; read by _egGetPlayerResistCap.
+        allElementalResistMax: passiveTreeBonuses.allElementalResistMax || 0,
         // accuracyIncPct ("increased Accuracy Rating", effects pipeline) is
         // applied to the aggregated rating AFTER the attribute side-effects
         // below, so it scales gear, tree and Agi accuracy together.
@@ -726,6 +732,21 @@ export function _egComputePlayerStats() {
         // stat (no consumer yet - future spell targeting areas).
         meleePhysMaceIncPct: passiveTreeBonuses.meleePhysMaceIncPct || 0,
         areaOfEffectPct: passiveTreeBonuses.areaOfEffectPct || 0,
+        // Stun (mace batch): chance for charged mace/sceptre melee hits, and
+        // the duration scaler for every stun / stagger you inflict.
+        stunChanceMaceChargedPct: passiveTreeBonuses.stunChanceMaceChargedPct || 0,
+        stunDurationPct: passiveTreeBonuses.stunDurationPct || 0,
+        // Heavy-weapon stun batch (read in encounter-monster-damage.js and
+        // _egCalcPlayerMeleeDamage).
+        stunChanceHeavyPct: passiveTreeBonuses.stunChanceHeavyPct || 0,
+        stunDurationHeavyPct: passiveTreeBonuses.stunDurationHeavyPct || 0,
+        stunDoubleChancePct: passiveTreeBonuses.stunDoubleChancePct || 0,
+        meleeDoubleDamageChancePct: passiveTreeBonuses.meleeDoubleDamageChancePct || 0,
+        // Melee-spell batch: tracked only, no Melee-tagged spell exists yet.
+        meleeSpellManaCostReducedPct: passiveTreeBonuses.meleeSpellManaCostReducedPct || 0,
+        meleeSpellLifeCostPct: passiveTreeBonuses.meleeSpellLifeCostPct || 0,
+        // Corpse explosion on melee kills (node 20045).
+        meleeKillExplodeChancePct: passiveTreeBonuses.meleeKillExplodeChancePct || 0,
         isMaceEquipped: false,
         isSwordEquipped: false,
         isAxeEquipped: false,
@@ -1408,6 +1429,15 @@ export const EG_STAT_DISPLAY_LABELS = {
     rageMax: { label: t('eg_stat_rage_max'), suffix: '' },
     meleePhysMaceIncPct: { label: t('eg_stat_inc_melee_phys_mace'), suffix: '%' },
     areaOfEffectPct: { label: t('eg_stat_area_of_effect'), suffix: '%' },
+    stunChanceMaceChargedPct: { label: t('eg_stat_stun_chance_mace'), suffix: '%' },
+    stunDurationPct: { label: t('eg_stat_stun_duration'), suffix: '%' },
+    stunChanceHeavyPct: { label: t('eg_stat_stun_chance_heavy'), suffix: '%' },
+    stunDurationHeavyPct: { label: t('eg_stat_stun_duration_heavy'), suffix: '%' },
+    stunDoubleChancePct: { label: t('eg_stat_stun_double_chance'), suffix: '%' },
+    meleeDoubleDamageChancePct: { label: t('eg_stat_melee_double_damage'), suffix: '%' },
+    meleeSpellManaCostReducedPct: { label: t('eg_stat_melee_spell_mana_reduced'), suffix: '%' },
+    meleeSpellLifeCostPct: { label: t('eg_stat_melee_spell_life_cost'), suffix: '%' },
+    meleeKillExplodeChancePct: { label: t('eg_stat_melee_kill_explode'), suffix: '%' },
     // Melee charge-up speed (reworked node 30197): percentage shorter charge;
     // the resulting time is what the melee attackInterval line above shows.
     meleeChargeSpeedPct: { label: t('eg_stat_inc_melee_charge_speed'), suffix: '%' },
@@ -1507,7 +1537,7 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'bleedSpeedPct',
+            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'stunChanceMaceChargedPct', 'stunDurationPct', 'stunChanceHeavyPct', 'stunDurationHeavyPct', 'stunDoubleChancePct', 'meleeDoubleDamageChancePct', 'meleeKillExplodeChancePct', 'meleeSpellManaCostReducedPct', 'meleeSpellLifeCostPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'bleedSpeedPct',
             'meleeChargeSpeedPct', 'attackSpeedPct', 'meleeRangeM', 'meleeAoEPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
@@ -1682,9 +1712,10 @@ export function _egBuildStatLine(bucket, stats) {
             // _egCalcPlayerResistanceReduction uses the same split.
             const allElem = (element === 'shadow') ? 0 : Math.max(0, stats.allElementalResist || 0);
             const total = (stats[bucket] || 0) + allElem;
-            if (!total && !(stats[bucket.replace('Resist', 'ResistMax')] || 0) && !stats.allResMax) return null;
+            const allElemMax = (element === 'shadow') ? 0 : (stats.allElementalResistMax || 0);
+            if (!total && !(stats[bucket.replace('Resist', 'ResistMax')] || 0) && !stats.allResMax && !allElemMax) return null;
             const cap = (typeof EG_RESIST_CAP_PCT !== 'undefined' ? EG_RESIST_CAP_PCT : 75)
-                + Math.max(0, (stats[element + 'ResistMax'] || 0) + (stats.allResMax || 0));
+                + Math.max(0, (stats[element + 'ResistMax'] || 0) + (stats.allResMax || 0) + allElemMax);
             const shown = Math.min(Math.max(0, total), cap);
             line = { label: EG_STAT_DISPLAY_LABELS[bucket].label, value: `${_egFormatStatValue(shown)}%` };
             line.resTotal = Math.max(0, total);

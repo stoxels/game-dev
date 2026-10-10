@@ -144,6 +144,11 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     _egLastMeleeCritMult = critMult;
     dmg *= critMult;
 
+    // Double damage (heavy notable 20037): a flat chance for the whole
+    // strike to deal twice the damage, independent of the crit roll.
+    const doubleChance = Math.min(100, Number(stats.meleeDoubleDamageChancePct) || 0);
+    if (doubleChance > 0 && Math.random() * 100 < doubleChance) dmg *= 2;
+
     // Active map run: apply the "% reduced Melee Attack Damage" map mod.
     if (typeof _egMapPlayerMeleeMult === 'function') dmg *= _egMapPlayerMeleeMult();
 

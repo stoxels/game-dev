@@ -1877,10 +1877,12 @@ export const TALENT_TREE_DATA = {
    "y": 482,
    "nameEn": "Interdisciplinary",
    "nameDe": "Interdisziplinär",
-   "descEn": "One additional cell is revealed at the start of each level. +6% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird eine zusätzliche Zelle aufgedeckt. +6% Rüstung.",
-   "icon": "🔀",
-   "statKey": "interdisciplinary",
+   "icon": "",
+   "statKey": "notable_mace_stun_360",
+   "effects": [
+    "melee_phys_mace:36",
+    "stun_chance_mace_charged:10"
+   ],
    "tier": "notable"
   },
   {
@@ -2658,10 +2660,11 @@ export const TALENT_TREE_DATA = {
    "y": 207,
    "nameEn": "Inference Spillover",
    "nameDe": "Inferenz-Überlauf",
-   "descEn": "Residual Analysis chance increased by 5%. Stacks with Residual Propagation. +6% Armour.",
-   "descDe": "Residualanalyse Chance erhöht um 5%. Wirkt zusammen mit Residuen-Propagation. +6% Rüstung.",
-   "icon": "🔄",
-   "statKey": "residual_analysis_2",
+   "icon": "",
+   "statKey": "notable_elemental_res_max_250",
+   "effects": [
+    "all_elemental_res_max:2"
+   ],
    "tier": "notable"
   },
   {
@@ -6104,10 +6107,13 @@ export const TALENT_TREE_DATA = {
    "y": 1343,
    "nameEn": "Tithe of Strength",
    "nameDe": "Zehnter der Stärke",
-   "descEn": "+10 to Strength. Melee damage scales further with Strength.",
-   "descDe": "+10 Stärke. Nahkampfschaden skaliert stärker mit Stärke.",
-   "icon": "◆",
-   "statKey": "notable_tithe_of_strength",
+   "icon": "",
+   "statKey": "notable_heavy_brutality_20037",
+   "effects": [
+    "melee_phys_heavy:25",
+    "stun_double_chance:10",
+    "melee_double_damage_chance:5"
+   ],
    "tier": "notable"
   },
   {
@@ -6190,10 +6196,12 @@ export const TALENT_TREE_DATA = {
    "y": 1161,
    "nameEn": "Sunder",
    "nameDe": "Spalten",
-   "descEn": "Melee hits reduce monster Armour by 10% for 3 seconds.",
-   "descDe": "Nahkampftreffer reduzieren die Rüstung von Monstern um 10% für 3 Sekunden.",
-   "icon": "◆",
-   "statKey": "notable_sunder",
+   "icon": "",
+   "statKey": "notable_melee_spell_cost_20044",
+   "effects": [
+    "melee_spell_life_cost:10",
+    "melee_spell_mana_reduced:25"
+   ],
    "tier": "notable"
   },
   {
@@ -6202,10 +6210,12 @@ export const TALENT_TREE_DATA = {
    "y": 1307,
    "nameEn": "Sunder",
    "nameDe": "Spalten",
-   "descEn": "Melee hits reduce monster Armour by 10% for 3 seconds.",
-   "descDe": "Nahkampftreffer reduzieren die Rüstung von Monstern um 10% für 3 Sekunden.",
-   "icon": "◆",
-   "statKey": "notable_sunder",
+   "icon": "",
+   "statKey": "notable_melee_explode_20045",
+   "effects": [
+    "melee_kill_explode:20",
+    "melee_aoe_pct:20"
+   ],
    "tier": "notable"
   },
   {
@@ -6519,10 +6529,12 @@ export const TALENT_TREE_DATA = {
    "y": 398,
    "nameEn": "Mountain's Heart",
    "nameDe": "Herz des Berges",
-   "descEn": "+50 Armour, +15% maximum Health.",
-   "descDe": "+50 Rüstung, +15% max. Leben.",
-   "icon": "◆",
-   "statKey": "notable_mountain_s_heart",
+   "icon": "",
+   "statKey": "notable_mace_reach_20071",
+   "effects": [
+    "melee_phys_mace:30",
+    "area_of_effect:15"
+   ],
    "tier": "notable"
   },
   {
@@ -7978,10 +7990,12 @@ export const TALENT_TREE_DATA = {
    "y": 1314,
    "nameEn": "Lesser Tithe of Strength",
    "nameDe": "Zehnter der Stärke (klein)",
-   "descEn": "+5 to Strength. Melee damage scales further with Strength.",
-   "descDe": "+5 Stärke. Nahkampfschaden skaliert stärker mit Stärke.",
-   "icon": "◆",
-   "statKey": "small_lesser_tithe_of_strength",
+   "icon": "",
+   "statKey": "small_heavy_pierce_30247",
+   "effects": [
+    "melee_phys_heavy:14",
+    "ignore_phys_reduction:15"
+   ],
    "tier": "small"
   },
   {
@@ -7990,10 +8004,12 @@ export const TALENT_TREE_DATA = {
    "y": 1245,
    "nameEn": "Lesser Tithe of Strength",
    "nameDe": "Zehnter der Stärke (klein)",
-   "descEn": "+5 to Strength. Melee damage scales further with Strength.",
-   "descDe": "+5 Stärke. Nahkampfschaden skaliert stärker mit Stärke.",
-   "icon": "◆",
-   "statKey": "small_lesser_tithe_of_strength",
+   "icon": "",
+   "statKey": "small_heavy_stun_duration_30248",
+   "effects": [
+    "melee_phys_heavy:10",
+    "stun_duration_heavy:10"
+   ],
    "tier": "small"
   },
   {
@@ -8002,10 +8018,12 @@ export const TALENT_TREE_DATA = {
    "y": 1245,
    "nameEn": "Lesser Tithe of Strength",
    "nameDe": "Zehnter der Stärke (klein)",
-   "descEn": "+5 to Strength. Melee damage scales further with Strength.",
-   "descDe": "+5 Stärke. Nahkampfschaden skaliert stärker mit Stärke.",
-   "icon": "◆",
-   "statKey": "small_lesser_tithe_of_strength",
+   "icon": "",
+   "statKey": "small_heavy_stun_chance_30249",
+   "effects": [
+    "melee_phys_heavy:14",
+    "stun_chance_heavy:5"
+   ],
    "tier": "small"
   },
   {
@@ -8014,10 +8032,12 @@ export const TALENT_TREE_DATA = {
    "y": 1294,
    "nameEn": "Lesser Tithe of Strength",
    "nameDe": "Zehnter der Stärke (klein)",
-   "descEn": "+5 to Strength. Melee damage scales further with Strength.",
-   "descDe": "+5 Stärke. Nahkampfschaden skaliert stärker mit Stärke.",
-   "icon": "◆",
-   "statKey": "small_lesser_tithe_of_strength",
+   "icon": "",
+   "statKey": "small_heavy_stun_duration_30250",
+   "effects": [
+    "melee_phys_heavy:14",
+    "stun_duration_heavy:20"
+   ],
    "tier": "small"
   },
   {
@@ -8747,12 +8767,13 @@ export const TALENT_TREE_DATA = {
    "id": 30307,
    "x": -2134,
    "y": 112,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Stormproof",
+   "nameDe": "Sturmfest",
+   "icon": "",
+   "statKey": "travel_lightning_resist_30307",
+   "effects": [
+    "lightning_resist_flat:8"
+   ],
    "tier": "travel"
   },
   {
@@ -8761,10 +8782,11 @@ export const TALENT_TREE_DATA = {
    "y": 154,
    "nameEn": "Lesser Inference Spillover",
    "nameDe": "Inferenz-Überlauf (klein)",
-   "descEn": "Residual Analysis chance increased by 3%. Stacks with Residual Propagation. +3% Armour.",
-   "descDe": "Residualanalyse Chance erhöht um 3%. Wirkt zusammen mit Residuen-Propagation. +3% Rüstung.",
-   "icon": "🔄",
-   "statKey": "small_lesser_inference_spillover",
+   "icon": "",
+   "statKey": "small_lightning_res_max_30308",
+   "effects": [
+    "lightning_res_max:1"
+   ],
    "tier": "small"
   },
   {
@@ -8783,12 +8805,13 @@ export const TALENT_TREE_DATA = {
    "id": 30310,
    "x": -2032,
    "y": 264,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Flame Bulwark",
+   "nameDe": "Flammenbollwerk",
+   "icon": "",
+   "statKey": "travel_fire_resist_max_30310",
+   "effects": [
+    "fire_res_max:1"
+   ],
    "tier": "travel"
   },
   {
@@ -8797,10 +8820,11 @@ export const TALENT_TREE_DATA = {
    "y": 316,
    "nameEn": "Lesser Inference Spillover",
    "nameDe": "Inferenz-Überlauf (klein)",
-   "descEn": "Residual Analysis chance increased by 3%. Stacks with Residual Propagation. +3% Armour.",
-   "descDe": "Residualanalyse Chance erhöht um 3%. Wirkt zusammen mit Residuen-Propagation. +3% Rüstung.",
-   "icon": "🔄",
-   "statKey": "small_lesser_inference_spillover",
+   "icon": "",
+   "statKey": "small_fire_resist_30311",
+   "effects": [
+    "fire_resist_flat:8"
+   ],
    "tier": "small"
   },
   {
@@ -8809,22 +8833,24 @@ export const TALENT_TREE_DATA = {
    "y": 154,
    "nameEn": "Lesser Inference Spillover",
    "nameDe": "Inferenz-Überlauf (klein)",
-   "descEn": "Residual Analysis chance increased by 3%. Stacks with Residual Propagation. +3% Armour.",
-   "descDe": "Residualanalyse Chance erhöht um 3%. Wirkt zusammen mit Residuen-Propagation. +3% Rüstung.",
-   "icon": "🔄",
-   "statKey": "small_lesser_inference_spillover",
+   "icon": "",
+   "statKey": "small_cold_res_max_30312",
+   "effects": [
+    "cold_res_max:1"
+   ],
    "tier": "small"
   },
   {
    "id": 30313,
    "x": -1930,
    "y": 112,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Frostproof",
+   "nameDe": "Frostfest",
+   "icon": "",
+   "statKey": "travel_cold_resist_30313",
+   "effects": [
+    "cold_resist_flat:8"
+   ],
    "tier": "travel"
   },
   {
@@ -9017,10 +9043,11 @@ export const TALENT_TREE_DATA = {
    "y": 415,
    "nameEn": "Lesser Mountain's Heart",
    "nameDe": "Herz des Berges (klein)",
-   "descEn": "+25 Armour, +8% maximum Health.",
-   "descDe": "+25 Rüstung, +8% max. Leben.",
-   "icon": "◆",
-   "statKey": "small_lesser_mountain_s_heart",
+   "icon": "",
+   "statKey": "small_mace_melee_30329",
+   "effects": [
+    "melee_phys_mace:16"
+   ],
    "tier": "small"
   },
   {
@@ -9029,10 +9056,11 @@ export const TALENT_TREE_DATA = {
    "y": 465,
    "nameEn": "Lesser Interdisciplinary",
    "nameDe": "Interdisziplinär (klein)",
-   "descEn": "One additional cell is revealed at the start of each level. +3% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird eine zusätzliche Zelle aufgedeckt. +3% Rüstung.",
-   "icon": "🔀",
-   "statKey": "small_lesser_interdisciplinary",
+   "icon": "",
+   "statKey": "small_mace_melee_30330",
+   "effects": [
+    "melee_phys_mace:16"
+   ],
    "tier": "small"
   },
   {
@@ -9041,10 +9069,12 @@ export const TALENT_TREE_DATA = {
    "y": 489,
    "nameEn": "Lesser Interdisciplinary",
    "nameDe": "Interdisziplinär (klein)",
-   "descEn": "One additional cell is revealed at the start of each level. +3% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird eine zusätzliche Zelle aufgedeckt. +3% Rüstung.",
-   "icon": "🔀",
-   "statKey": "small_lesser_interdisciplinary",
+   "icon": "",
+   "statKey": "small_mace_stun_30331",
+   "effects": [
+    "melee_phys_mace:16",
+    "stun_duration:20"
+   ],
    "tier": "small"
   },
   {
@@ -9053,10 +9083,12 @@ export const TALENT_TREE_DATA = {
    "y": 489,
    "nameEn": "Lesser Interdisciplinary",
    "nameDe": "Interdisziplinär (klein)",
-   "descEn": "One additional cell is revealed at the start of each level. +3% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird eine zusätzliche Zelle aufgedeckt. +3% Rüstung.",
-   "icon": "🔀",
-   "statKey": "small_lesser_interdisciplinary",
+   "icon": "",
+   "statKey": "small_mace_stun_30332",
+   "effects": [
+    "melee_phys_mace:16",
+    "stun_duration:20"
+   ],
    "tier": "small"
   },
   {
@@ -9092,10 +9124,12 @@ export const TALENT_TREE_DATA = {
    "y": 391,
    "nameEn": "Lesser Mountain's Heart",
    "nameDe": "Herz des Berges (klein)",
-   "descEn": "+25 Armour, +8% maximum Health.",
-   "descDe": "+25 Rüstung, +8% max. Leben.",
-   "icon": "◆",
-   "statKey": "small_lesser_mountain_s_heart",
+   "icon": "",
+   "statKey": "small_mace_reach_30335",
+   "effects": [
+    "melee_phys_mace:14",
+    "area_of_effect:8"
+   ],
    "tier": "small"
   },
   {
@@ -9533,10 +9567,11 @@ export const TALENT_TREE_DATA = {
    "y": 1103,
    "nameEn": "Lesser Sunder",
    "nameDe": "Spalten (klein)",
-   "descEn": "Melee hits reduce monster Armour by 5% for 2 seconds.",
-   "descDe": "Nahkampftreffer reduzieren die Rüstung von Monstern um 5% für 2 Sekunden.",
-   "icon": "◆",
-   "statKey": "small_lesser_sunder",
+   "icon": "",
+   "statKey": "small_melee_spell_cost_30370",
+   "effects": [
+    "melee_spell_mana_reduced:15"
+   ],
    "tier": "small"
   },
   {
@@ -9545,10 +9580,11 @@ export const TALENT_TREE_DATA = {
    "y": 1143,
    "nameEn": "Lesser Sunder",
    "nameDe": "Spalten (klein)",
-   "descEn": "Melee hits reduce monster Armour by 5% for 2 seconds.",
-   "descDe": "Nahkampftreffer reduzieren die Rüstung von Monstern um 5% für 2 Sekunden.",
-   "icon": "◆",
-   "statKey": "small_lesser_sunder",
+   "icon": "",
+   "statKey": "small_melee_spell_cost_30371",
+   "effects": [
+    "melee_spell_mana_reduced:15"
+   ],
    "tier": "small"
   },
   {
@@ -9557,10 +9593,11 @@ export const TALENT_TREE_DATA = {
    "y": 1205,
    "nameEn": "Lesser Sunder",
    "nameDe": "Spalten (klein)",
-   "descEn": "Melee hits reduce monster Armour by 5% for 2 seconds.",
-   "descDe": "Nahkampftreffer reduzieren die Rüstung von Monstern um 5% für 2 Sekunden.",
-   "icon": "◆",
-   "statKey": "small_lesser_sunder",
+   "icon": "",
+   "statKey": "small_melee_aoe_30372",
+   "effects": [
+    "melee_aoe_pct:12"
+   ],
    "tier": "small"
   },
   {
@@ -9569,10 +9606,11 @@ export const TALENT_TREE_DATA = {
    "y": 1205,
    "nameEn": "Lesser Sunder",
    "nameDe": "Spalten (klein)",
-   "descEn": "Melee hits reduce monster Armour by 5% for 2 seconds.",
-   "descDe": "Nahkampftreffer reduzieren die Rüstung von Monstern um 5% für 2 Sekunden.",
-   "icon": "◆",
-   "statKey": "small_lesser_sunder",
+   "icon": "",
+   "statKey": "small_melee_aoe_30373",
+   "effects": [
+    "melee_aoe_pct:12"
+   ],
    "tier": "small"
   },
   {

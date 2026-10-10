@@ -70,10 +70,10 @@ export const PT_EFFECT_DEFS = Object.freeze({
     bleed_duration: { channel: 'bleedDurationPct', en: '+{v}% increased Duration of Bleeds on enemies', de: '+{v}% erhöhte Blutungsdauer bei Gegnern' },
     accuracy_flat: { channel: 'accuracy', en: '+{v} to Accuracy', de: '+{v} Präzision' },
     accuracy_rating_pct: { channel: 'accuracyIncPct', en: '+{v}% increased Accuracy Rating', de: '+{v}% erhöhte Präzision' },
-    all_elemental_resist: { channel: 'allElementalResist', en: '+{v} to all Elemental Resistances', de: '+{v} zu allem elementalen Widerständen' },
-    fire_resist_flat: { channel: 'fireResistFlat', en: '+{v} Fire Resistance', de: '+{v} Feuerwiderstand' },
-    cold_resist_flat: { channel: 'coldResistFlat', en: '+{v} Cold Resistance', de: '+{v} Kältewiderstand' },
-    lightning_resist_flat: { channel: 'lightningResistFlat', en: '+{v} Lightning Resistance', de: '+{v} Blitzwiderstand' },
+    all_elemental_resist: { channel: 'allElementalResist', en: '+{v}% to all Elemental Resistances', de: '+{v}% auf alle elementaren Widerstände' },
+    fire_resist_flat: { channel: 'fireResistFlat', en: '+{v}% to Fire Resistance', de: '+{v}% Feuerwiderstand' },
+    cold_resist_flat: { channel: 'coldResistFlat', en: '+{v}% to Cold Resistance', de: '+{v}% Kältewiderstand' },
+    lightning_resist_flat: { channel: 'lightningResistFlat', en: '+{v}% to Lightning Resistance', de: '+{v}% Blitzwiderstand' },
 
     // Shield batch (reworked nodes 30375/30374/30376/285). Every line is
     // conditional on a shield being equipped. Wiring: blockChanceShieldPct
@@ -131,6 +131,39 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // spell targeting areas. No spell consumes it yet - the stat is tracked
     // and shown so the future targeting-area code can read stats.areaOfEffectPct.
     area_of_effect: { channel: 'areaOfEffectPct', en: '{v}% increased Area of Effect', de: '{v}% vergrößerter Wirkungsbereich' },
+    // Stun (mace batch, nodes 360/30331/30332). A stun is the game's existing
+    // stagger: the monster's charge timer is paused (staggeredUntil). The
+    // chance is rolled on melee hits with a Mace or Sceptre struck at
+    // EG_MACE_STUN_MIN_CHARGE (90%) or more on the charge-up bar
+    // (_egDamageTargetById); the duration line scales every stun and
+    // stagger you inflict (_egApplyHitToMonster).
+    stun_chance_mace_charged: { channel: 'stunChanceMaceChargedPct', en: '{v}% Chance to Stun enemies with melee Hits using a Mace or Sceptre at 90% or more charge', de: '{v}% Chance, Gegner mit Nahkampftreffern mit Streitkolben oder Zepter bei mindestens 90% Aufladung zu betäuben' },
+    stun_duration: { channel: 'stunDurationPct', en: '{v}% increased Stun Duration on enemies', de: '{v}% erhöhte Betäubungsdauer bei Gegnern' },
+    // Heavy-weapon stun batch (nodes 30248/30249/30250/20037): heavy means a
+    // two-handed weapon (stats.isHeavyWeaponEquipped) and melee hits only.
+    // Chance and duration extend the shared stun (= stagger) effect above;
+    // stun_double_chance doubles the length of a stun when one is applied,
+    // melee_double_damage_chance doubles a whole melee strike (rolled next
+    // to the crit roll in _egCalcPlayerMeleeDamage).
+    stun_chance_heavy: { channel: 'stunChanceHeavyPct', en: '{v}% Chance to Stun enemies on Hit with Heavy melee weapons', de: '{v}% Chance, Gegner bei Treffern mit schweren Nahkampfwaffen zu betäuben' },
+    stun_duration_heavy: { channel: 'stunDurationHeavyPct', en: '{v}% increased Stun Duration on enemies with Heavy melee weapons', de: '{v}% erhöhte Betäubungsdauer bei Gegnern mit schweren Nahkampfwaffen' },
+    stun_double_chance: { channel: 'stunDoubleChancePct', en: '{v}% Chance to double Stun Duration', de: '{v}% Chance, die Betäubungsdauer zu verdoppeln' },
+    melee_double_damage_chance: { channel: 'meleeDoubleDamageChancePct', en: '{v}% Chance to deal double Damage with melee attacks', de: '{v}% Chance, mit Nahkampfangriffen doppelten Schaden zu verursachen' },
+    // Melee-spell batch (nodes 30371/30370/20044): "melee spells" are spells
+    // carrying the Melee tag. No spell has that tag yet, so these two stats
+    // are tracked and shown on the sheet but nothing consumes them until
+    // melee spells exist (the cost code should read
+    // stats.meleeSpellManaCostReducedPct / meleeSpellLifeCostPct).
+    melee_spell_mana_reduced: { channel: 'meleeSpellManaCostReducedPct', en: '{v}% reduced Mana Cost of Melee spells', de: '{v}% reduzierte Manakosten von Nahkampfzaubern' },
+    melee_spell_life_cost: { channel: 'meleeSpellLifeCostPct', en: '{v}% of the Mana Cost of Melee spells is paid with Life instead', de: '{v}% der Manakosten von Nahkampfzaubern werden stattdessen mit Leben bezahlt' },
+    // Melee area of effect (nodes 30373/30372/20045): rides the existing
+    // meleeAoEPct bucket (cleave radius in encounter-melee-impact.js).
+    melee_aoe_pct: { channel: 'meleeAoEPct', en: 'Melee skills have {v}% increased Area of Effect', de: 'Nahkampffertigkeiten haben {v}% vergrößerten Wirkungsbereich' },
+    // Corpse explosion (node 20045): rolled when a melee strike kills; the
+    // dying enemy deals EG_MELEE_EXPLODE_LIFE_SHARE of its maximum Life as
+    // physical damage to the other enemies in its spawn zone
+    // (_egDamageTargetById). The 10% is fixed and part of the tooltip text.
+    melee_kill_explode: { channel: 'meleeKillExplodeChancePct', en: 'Enemies killed by melee skills have a {v}% Chance to explode, dealing 10% of their Life as Physical Damage to nearby enemies', de: 'Von Nahkampffertigkeiten getötete Gegner explodieren mit {v}% Chance und verursachen 10% ihres Lebens als physischen Schaden bei Gegnern in der Nähe' },
     axe_charge_speed: { channel: 'axeChargeSpeedPct', en: '{v}% increased melee attack charge-up speed while wielding an Axe', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit mit Axt' },
     // Rage (axe notable 369): a new stacking resource. Melee hits with an
     // Axe grant rage_on_hit_axe Rage (capped at rage_max); every Rage is a
@@ -168,6 +201,13 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // the same fireResistMax bucket gear's max_fire_res feeds, so tree and
     // gear raise the 75% cap together.
     fire_res_max: { channel: 'fireResistMax', en: '+{v}% to maximum Fire Resistance', de: '+{v}% auf maximalen Feuerwiderstand' },
+    // Maximum resistances (resistance batch, nodes 30308/30312/250): feed
+    // the same cap buckets gear's max_*_res mods feed (see
+    // _egGetPlayerResistCap). all_elemental_res_max raises fire, cold and
+    // lightning only - shadow is excluded, exactly like allElementalResist.
+    cold_res_max: { channel: 'coldResistMax', en: '+{v}% to maximum Cold Resistance', de: '+{v}% auf maximalen Kältewiderstand' },
+    lightning_res_max: { channel: 'lightningResistMax', en: '+{v}% to maximum Lightning Resistance', de: '+{v}% auf maximalen Blitzwiderstand' },
+    all_elemental_res_max: { channel: 'allElementalResistMax', en: '+{v}% to all maximum Elemental Resistances', de: '+{v}% auf alle maximalen elementaren Widerstände' },
     spell_damage_inc_pct: { channel: 'spellDamageIncPct', en: '+{v}% increased Spell Damage', de: '+{v}% erhöhter Zauberschaden' },
     elemental_damage_inc_pct: { channel: 'elementalDamageIncPct', en: '+{v}% increased Elemental Damage', de: '+{v}% erhöhter elementarer Schaden' },
     fire_damage_inc_pct: { channel: 'fireDamageIncPct', en: '+{v}% increased Fire Damage', de: '+{v}% erhöhter Feuerschaden' },

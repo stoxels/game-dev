@@ -12,7 +12,9 @@ export const EG_RESIST_CAP_PCT = 75;
 // aggregated max-resist bonuses (per-element + the all-elements bucket).
 // Monsters have no max-resist sources - they are hard-capped at the base.
 export function _egGetPlayerResistCap(stats, element) {
-    const extra = ((stats[element + 'ResistMax']) || 0) + ((stats.allResMax) || 0);
+    // allElementalResistMax (tree) covers fire/cold/lightning, never shadow.
+    const allElemMax = element === 'shadow' ? 0 : ((stats.allElementalResistMax) || 0);
+    const extra = ((stats[element + 'ResistMax']) || 0) + ((stats.allResMax) || 0) + allElemMax;
     return EG_RESIST_CAP_PCT + Math.max(0, extra);
 }
 

@@ -121,7 +121,7 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
     // Uses the existing damage application logic[cite: 1] - tagged isMelee
     // so Spellproof monsters (spellproofPct) take full melee damage while
     // all non-melee sources (spells, reveal projectiles, DoTs) are resisted.
-    _egDamageTargetById(targetId, dmg, elements, { isCrit: wasCrit, isMelee: true });
+    _egDamageTargetById(targetId, dmg, elements, { isCrit: wasCrit, isMelee: true, chargePct });
 
     // Impact feel: squash the struck card so the connect lands with weight
     // (miss/dodge/immune returned above, so this only plays on real hits).
