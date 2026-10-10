@@ -100,6 +100,9 @@ function _getLowTimeVignetteTier(secs) {
 // Suppressed while the timer is frozen or Golden Clock has paused the
 // countdown, since the remaining time isn't actually draining right now.
 export function _applyLowTimeVignette() {
+    // The timer's own intervals can outlive the document (headless test
+    // teardown, a closed tab), so a missing DOM is a no-op, not a crash.
+    if (typeof document === 'undefined') return;
     const el = document.getElementById('low-time-vignette');
     if (!el) return;
 
@@ -132,6 +135,9 @@ function _getLowHealthVignetteTier(pct) {
 // to timerFrozen / Golden Clock. Uses SETTINGS.lowHealthVignette (falls back
 // to lowTimeVignette if the new key is missing from an old save).
 export function _applyLowHealthVignette() {
+    // The 250ms health poll below runs from import time and can outlive the
+    // document (headless test teardown, a closed tab); no DOM, nothing to tint.
+    if (typeof document === 'undefined') return;
     const el = document.getElementById('low-health-vignette');
     if (!el) return;
 

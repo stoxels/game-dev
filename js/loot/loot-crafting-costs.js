@@ -132,7 +132,7 @@ export const EG_CRAFT_FAMILY_CURRENCIES = {
 
     // Resistances and puzzle utility
     fire_resist: 'orb_chaos', cold_resist: 'orb_chaos', lightning_resist: 'orb_chaos',
-    shadow_resist: 'orb_chaos', arcane_resistance: 'orb_divine',
+    shadow_resist: 'orb_chaos',
     mistake_count: 'orb_scouring', mistake_not_count: 'orb_scouring', focus: 'orb_scouring',
     chance_for_new_question: 'orb_scouring', reveal_hint: 'orb_scouring',
 

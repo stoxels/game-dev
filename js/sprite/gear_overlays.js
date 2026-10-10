@@ -466,6 +466,12 @@ function scheduleSync(img) {
 let pollTimer = null;
 
 function sweep() {
+    // This is a 250 ms repaint of every gear overlay. It is pointless
+    // while the page is hidden - nothing can change the loadout then -
+    // and browsers only *throttle* hidden-tab timers, so a forgotten tab
+    // would keep re-syncing DOM it cannot show. The loop stays armed: the
+    // first tick after the tab is visible again repaints everything.
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
     for (const id of SPRITE_IMG_IDS) {
         const img = document.getElementById(id);
         if (img) syncImg(img);

@@ -401,9 +401,6 @@ function _egRollMonsterHitAilment(element, dealt) {
         case 'shadow':
             _egApplyPlayerAilment('shadow');
             break;
-        case 'arcane':
-            _egApplyPlayerAilment('confused');
-            break;
     }
 }
 

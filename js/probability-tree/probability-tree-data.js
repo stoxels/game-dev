@@ -1498,12 +1498,16 @@ export const TALENT_TREE_DATA = {
    "id": 252,
    "x": -1508,
    "y": 795,
-   "nameEn": "Expected Value",
-   "nameDe": "Erwartungswert",
-   "descEn": "At the start of each level, gain bonus seconds equal to 5 seconds per 10 cells in the grid. +6% Armour.",
-   "descDe": "Zu Beginn jedes Levels erhältst du Bonussekunden in Höhe von 5 Sekunden pro 10 Zellen im Gitter. +6% Rüstung.",
-   "icon": "🧮",
+   "nameEn": "True Aim",
+   "nameDe": "Wahrer Anschlag",
+   "icon": "",
    "statKey": "expected_value_1",
+   "effects": [
+    "movement_speed_pct:5",
+    "agi_flat:20",
+    "int_flat:20",
+    "accuracy_rating_pct:15"
+   ],
    "tier": "notable"
   },
   {
@@ -1568,15 +1572,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 120,
-   "x": -1337,
-   "y": 484,
+   "x": -6697,
+   "y": 1043,
    "nameEn": "Moment Reserves",
    "nameDe": "Zeitreserven",
    "descEn": "Timer items grant 10% more time. Stacks with Time Weavers and Chrono Extension. +6% Armour.",
    "descDe": "Timer-Gegenstände gewähren 10% mehr Zeit. Wirkt zusammen mit Zeitwebern und Chrono-Verlängerung. +6% Rüstung.",
    "icon": "⏳",
    "statKey": "extended_hour_3",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 382,
@@ -1628,15 +1633,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 190,
-   "x": -1151,
-   "y": 700,
+   "x": -6698,
+   "y": 1158,
    "nameEn": "Fortune's Growth",
    "nameDe": "Wachsendes Glück",
    "descEn": "Large and massive grids have a 15% chance of having an additional Lucky Tile. This stacks additively with other Lucky Tile bonuses. +6% Armour.",
    "descDe": "Große und massive Gitter haben eine 15% Chance ein weiteres Glücksfeld zu haben. Dies summiert sich mit anderen Glücksfeld-Boni. +6% Rüstung.",
    "icon": "🍀",
    "statKey": "fortunes_tile_2",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 191,
@@ -3024,8 +3030,8 @@ export const TALENT_TREE_DATA = {
    "y": -1759,
    "nameEn": "Verdant Covenant",
    "nameDe": "Grüner Pakt",
-   "descEn": "25% increased Nature Damage\n5% increased Cast Speed with Nature Skills\n+15% to Nature Resistance",
-   "descDe": "25% erhöhter Naturschaden\n5% erhöhte Zaubergeschwindigkeit mit Naturzaubern\n+15% Naturwiderstand",
+   "descEn": "25% increased Lightning Damage\n5% increased Cast Speed with Lightning Skills\n+15% to Lightning Resistance",
+   "descDe": "25% erhöhter Blitzschaden\n5% erhöhte Zaubergeschwindigkeit mit Blitzzaubern\n+15% Blitzwiderstand",
    "icon": "",
    "statKey": "notable_verdant_covenant",
    "tier": "notable"
@@ -3272,15 +3278,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 145,
-   "x": -1054,
-   "y": 968,
+   "x": -6712,
+   "y": 1429,
    "nameEn": "Toolbelt Greed",
    "nameDe": "Werkzeuggier",
    "descEn": "15% increased chance of obtaining Utility items as rewards. Stacks with Practical Accumulation and Inventor's Cache. +6% Armour.",
    "descDe": "15% erhöhte Chance, Nützlichkeitsgegenstände als Belohnung zu erhalten. Wirkt zusammen mit Praktische Anhäufung und Erfinderversteck. +6% Rüstung.",
    "icon": "🔧",
    "statKey": "utility_hoarder_1",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 146,
@@ -4989,15 +4996,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 30085,
-   "x": -2499,
-   "y": -1269,
+   "x": -4598,
+   "y": -2332,
    "nameEn": "Intellect",
    "nameDe": "Intelligenz",
    "descEn": "+1 to Intellect.",
    "descDe": "+1 Intelligenz.",
    "icon": "🧠",
    "statKey": "small_intellect",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 30086,
@@ -5961,15 +5969,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 20030,
-   "x": -1254,
-   "y": 795,
+   "x": -6700,
+   "y": 1289,
    "nameEn": "Anvil Guard",
    "nameDe": "Ambosswache",
    "descEn": "Reflect 10% of melee damage taken back at the attacker.",
    "descDe": "Reflektiere 10% des erlittenen Nahkampfschadens auf den Angreifer.",
    "icon": "◆",
    "statKey": "notable_anvil_guard",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 20031,
@@ -5989,10 +5998,13 @@ export const TALENT_TREE_DATA = {
    "y": 589,
    "nameEn": "Champion's Onslaught",
    "nameDe": "Ansturm des Champions",
-   "descEn": "+4% increased Attack Speed\n+20 to Strength\n+26% increased Physical Damage",
-   "descDe": "+4% erhöhte Angriffsgeschwindigkeit\n+20 Stärke\n+26% erhöhter physischer Schaden",
    "icon": "",
    "statKey": "notable_champion_s_onslaught",
+   "effects": [
+    "attack_speed_pct:4",
+    "str_flat:20",
+    "phys_damage_inc:26"
+   ],
    "tier": "notable"
   },
   {
@@ -6393,15 +6405,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 20066,
-   "x": -2157,
-   "y": 872,
+   "x": -3875,
+   "y": 1562,
    "nameEn": "Resolute Advance",
    "nameDe": "Entschlossener Vormarsch",
    "descEn": "+10% Armour. You cannot be slowed below 80% Movement speed.",
    "descDe": "+10% Rüstung. Du kannst nicht unter 80% Bewegungsgeschwindigkeit verlangsamt werden.",
    "icon": "◆",
    "statKey": "notable_resolute_advance",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 20067,
@@ -6465,15 +6478,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 20072,
-   "x": -2899,
-   "y": 795,
+   "x": -6713,
+   "y": 1575,
    "nameEn": "Stubborn Vitality",
    "nameDe": "Hartnäckige Vitalität",
    "descEn": "+25 maximum Health, +1 Absorption on kill.",
    "descDe": "+25 max. Leben, +1 Absorption pro Kill.",
    "icon": "◆",
    "statKey": "notable_stubborn_vitality",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 20073,
@@ -7237,10 +7251,10 @@ export const TALENT_TREE_DATA = {
    "y": 445,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "descEn": "+5 to Strength",
+   "descDe": "+5 Stärke",
+   "icon": "",
+   "statKey": "travel_strength",
    "tier": "travel"
   },
   {
@@ -7249,10 +7263,10 @@ export const TALENT_TREE_DATA = {
    "y": 427,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "descEn": "+5 to Strength",
+   "descDe": "+5 Stärke",
+   "icon": "",
+   "statKey": "small_strength_30193",
    "tier": "small"
   },
   {
@@ -7261,10 +7275,11 @@ export const TALENT_TREE_DATA = {
    "y": 536,
    "nameEn": "Lesser Champion's Might",
    "nameDe": "Macht des Champions (klein)",
-   "descEn": "+16% increased melee physical damage.",
-   "descDe": "+16% physischer Nahkampfschaden.",
    "icon": "",
    "statKey": "small_lesser_champion_s_might",
+   "effects": [
+    "melee_phys_inc:16"
+   ],
    "tier": "small"
   },
   {
@@ -7273,22 +7288,23 @@ export const TALENT_TREE_DATA = {
    "y": 589,
    "nameEn": "Lesser Melee Force",
    "nameDe": "Nahkampfkraft (klein)",
-   "descEn": "+12% increased melee physical damage.",
-   "descDe": "+12% physischer Nahkampfschaden.",
    "icon": "",
    "statKey": "small_lesser_melee_force",
+   "effects": [
+    "melee_phys_inc:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30196,
    "x": -1133,
    "y": 589,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Melee Force",
+   "nameDe": "Nahkampfkraft",
+   "descEn": "+12% increased Melee Physical Damage",
+   "descDe": "+12% erhöhter physischer Nahkampfschaden",
+   "icon": "",
+   "statKey": "travel_melee_force",
    "tier": "travel"
   },
   {
@@ -7297,10 +7313,11 @@ export const TALENT_TREE_DATA = {
    "y": 642,
    "nameEn": "Lesser Champion's Tempo",
    "nameDe": "Tempo des Champions (klein)",
-   "descEn": "+5% increased melee attack charge-up speed.",
-   "descDe": "+5% Nahkampf-Aufladegeschwindigkeit.",
    "icon": "",
    "statKey": "small_lesser_champion_s_tempo",
+   "effects": [
+    "melee_charge_speed_pct:5"
+   ],
    "tier": "small"
   },
   {
@@ -7309,10 +7326,11 @@ export const TALENT_TREE_DATA = {
    "y": 589,
    "nameEn": "Lesser Warrior's Wrath",
    "nameDe": "Zorn des Kriegers (klein)",
-   "descEn": "+12% increased melee physical damage.",
-   "descDe": "+12% physischer Nahkampfschaden.",
    "icon": "",
    "statKey": "small_lesser_warrior_s_wrath",
+   "effects": [
+    "melee_phys_inc:12"
+   ],
    "tier": "small"
   },
   {
@@ -7331,24 +7349,28 @@ export const TALENT_TREE_DATA = {
    "id": 30200,
    "x": -1475,
    "y": 746,
-   "nameEn": "Lesser Expected Value",
-   "nameDe": "Erwartungswert (klein)",
-   "descEn": "At the start of each level, gain bonus seconds equal to 3 seconds per 5 cells in the grid. +3% Armour.",
-   "descDe": "Zu Beginn jedes Levels erhältst du Bonussekunden in Höhe von 3 Sekunden pro 5 Zellen im Gitter. +3% Rüstung.",
-   "icon": "🧮",
-   "statKey": "small_lesser_expected_value",
+   "nameEn": "Lesser True Aim",
+   "nameDe": "Wahrer Anschlag (klein)",
+   "icon": "",
+   "statKey": "small_true_aim_30200",
+   "effects": [
+    "accuracy_flat:20",
+    "accuracy_rating_pct:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30201,
    "x": -1475,
    "y": 844,
-   "nameEn": "Lesser Expected Value",
-   "nameDe": "Erwartungswert (klein)",
-   "descEn": "At the start of each level, gain bonus seconds equal to 3 seconds per 5 cells in the grid. +3% Armour.",
-   "descDe": "Zu Beginn jedes Levels erhältst du Bonussekunden in Höhe von 3 Sekunden pro 5 Zellen im Gitter. +3% Rüstung.",
-   "icon": "🧮",
-   "statKey": "small_lesser_expected_value",
+   "nameEn": "Lesser True Aim",
+   "nameDe": "Wahrer Anschlag (klein)",
+   "icon": "",
+   "statKey": "small_true_aim_30201",
+   "effects": [
+    "accuracy_flat:20",
+    "accuracy_rating_pct:6"
+   ],
    "tier": "small"
   },
   {
@@ -7367,48 +7389,55 @@ export const TALENT_TREE_DATA = {
    "id": 30203,
    "x": -1305,
    "y": 1006,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Bulwark Growth",
+   "nameDe": "Bollwerkswachstum",
+   "icon": "",
+   "statKey": "travel_bulwark_growth_30203",
+   "effects": [
+    "armour_inc_pct:10",
+    "health_inc_pct:4"
+   ],
    "tier": "travel"
   },
   {
    "id": 30204,
    "x": -1252,
    "y": 953,
-   "nameEn": "Lesser Promising Answers",
-   "nameDe": "Vielversprechende Antworten (klein)",
-   "descEn": "10% probability of receiving an additional item when completing an Excercise. +3% Armour.",
-   "descDe": "10% Wahrscheinlichkeit einen zusätzlichen Gegenstand als Belohnung für das Lösen einer Übungsaufgabe zu erhalten. +3% Rüstung.",
-   "icon": "🎁",
-   "statKey": "small_lesser_promising_answers",
+   "nameEn": "Lesser Bulwark Growth",
+   "nameDe": "Bollwerkswachstum (klein)",
+   "icon": "",
+   "statKey": "small_bulwark_growth_30204",
+   "effects": [
+    "armour_inc_pct:12",
+    "health_inc_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30205,
    "x": -1199,
    "y": 1006,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Bulwark Growth",
+   "nameDe": "Bollwerkswachstum",
+   "icon": "",
+   "statKey": "travel_bulwark_growth_30205",
+   "effects": [
+    "armour_inc_pct:10",
+    "health_inc_pct:4"
+   ],
    "tier": "travel"
   },
   {
    "id": 30206,
    "x": -1252,
    "y": 1059,
-   "nameEn": "Lesser Promising Answers",
-   "nameDe": "Vielversprechende Antworten (klein)",
-   "descEn": "10% probability of receiving an additional item when completing an Excercise. +3% Armour.",
-   "descDe": "10% Wahrscheinlichkeit einen zusätzlichen Gegenstand als Belohnung für das Lösen einer Übungsaufgabe zu erhalten. +3% Rüstung.",
-   "icon": "🎁",
-   "statKey": "small_lesser_promising_answers",
+   "nameEn": "Vital Renewal",
+   "nameDe": "Vitalitätserneuerung",
+   "icon": "",
+   "statKey": "small_vital_renewal_30206",
+   "effects": [
+    "life_regen_pct:0.8"
+   ],
    "tier": "small"
   },
   {
@@ -7417,10 +7446,11 @@ export const TALENT_TREE_DATA = {
    "y": 1168,
    "nameEn": "Lesser Toolbelt Greed",
    "nameDe": "Werkzeuggier (klein)",
-   "descEn": "8% increased chance of obtaining Utility items as rewards. Stacks with Practical Accumulation and Inventor's Cache. +3% Armour.",
-   "descDe": "8% erhöhte Chance, Nützlichkeitsgegenstände als Belohnung zu erhalten. Wirkt zusammen mit Praktische Anhäufung und Erfinderversteck. +3% Rüstung.",
-   "icon": "🔧",
-   "statKey": "small_lesser_toolbelt_greed",
+   "icon": "",
+   "statKey": "small_strength_30207",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "small"
   },
   {
@@ -7945,10 +7975,11 @@ export const TALENT_TREE_DATA = {
    "y": 1168,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30251",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8041,10 +8072,11 @@ export const TALENT_TREE_DATA = {
    "y": 1168,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30259",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8089,10 +8121,11 @@ export const TALENT_TREE_DATA = {
    "y": 1006,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30263",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8161,10 +8194,11 @@ export const TALENT_TREE_DATA = {
    "y": 1150,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30269",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8317,10 +8351,11 @@ export const TALENT_TREE_DATA = {
    "y": 795,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30282",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8509,10 +8544,11 @@ export const TALENT_TREE_DATA = {
    "y": 213,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30298",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8701,10 +8737,11 @@ export const TALENT_TREE_DATA = {
    "y": 3,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30314",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8761,10 +8798,11 @@ export const TALENT_TREE_DATA = {
    "y": 2,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30319",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8809,10 +8847,11 @@ export const TALENT_TREE_DATA = {
    "y": 2,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30323",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -8865,15 +8904,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 30328,
-   "x": -3077,
-   "y": 336,
+   "x": -6704,
+   "y": 875,
    "nameEn": "Strength",
    "nameDe": "Stärke",
    "descEn": "+1 to Strength.",
    "descDe": "+1 Stärke.",
    "icon": "💪",
    "statKey": "small_strength",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 30329,
@@ -8989,10 +9029,11 @@ export const TALENT_TREE_DATA = {
    "y": 440,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30338",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -9085,10 +9126,11 @@ export const TALENT_TREE_DATA = {
    "y": 795,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30346",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -9097,10 +9139,11 @@ export const TALENT_TREE_DATA = {
    "y": 589,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30347",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -9145,10 +9188,11 @@ export const TALENT_TREE_DATA = {
    "y": 427,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30351",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -9217,10 +9261,11 @@ export const TALENT_TREE_DATA = {
    "y": 225,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30357",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -9277,10 +9322,11 @@ export const TALENT_TREE_DATA = {
    "y": 225,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30362",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -9289,10 +9335,10 @@ export const TALENT_TREE_DATA = {
    "y": 427,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "descEn": "+5 to Strength",
+   "descDe": "+5 Stärke",
+   "icon": "",
+   "statKey": "travel_strength_30363",
    "tier": "travel"
   },
   {
@@ -11125,10 +11171,12 @@ export const TALENT_TREE_DATA = {
    "y": 809,
    "nameEn": "Bulwark Endurance",
    "nameDe": "Bollwerk-Ausdauer",
-   "descEn": "+30 Armour\n+5% increased maximum Life",
-   "descDe": "+30 Rüstung\n+5% erhöhtes maximales Leben",
    "icon": "",
    "statKey": "small_bulwark_endurance",
+   "effects": [
+    "armour_flat:30",
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
@@ -11137,10 +11185,11 @@ export const TALENT_TREE_DATA = {
    "y": 1006,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_strength_30517",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -11449,10 +11498,11 @@ export const TALENT_TREE_DATA = {
    "y": 2,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30543",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -11797,10 +11847,11 @@ export const TALENT_TREE_DATA = {
    "y": -471,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30572",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -12049,10 +12100,11 @@ export const TALENT_TREE_DATA = {
    "y": -1116,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30593",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -12157,10 +12209,11 @@ export const TALENT_TREE_DATA = {
    "y": -241,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_strength_30602",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -21505,48 +21558,48 @@ export const TALENT_TREE_DATA = {
    "id": 31232,
    "x": -310,
    "y": -1861,
-   "nameEn": "Lesser Thaumaturge",
-   "nameDe": "Thaumaturg (klein)",
-   "descEn": "+1 to Intellect, +4% Critical strike multiplier.",
-   "descDe": "+1 Intelligenz, +4% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "small_lesser_thaumaturge",
+   "nameEn": "Frozen Might",
+   "nameDe": "Frostige Macht",
+   "descEn": "16% increased Cold Damage",
+   "descDe": "16% erhöhter Kälteschaden",
+   "icon": "",
+   "statKey": "small_frozen_might",
    "tier": "small"
   },
   {
    "id": 31233,
    "x": -352,
    "y": -1869,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Prismatic Might",
+   "nameDe": "Prismatische Macht",
+   "descEn": "10% increased Elemental Damage",
+   "descDe": "10% erhöhter elementarer Schaden",
+   "icon": "",
+   "statKey": "travel_prismatic_might",
    "tier": "travel"
   },
   {
    "id": 31234,
    "x": -394,
    "y": -1861,
-   "nameEn": "Lesser Thaumaturge",
-   "nameDe": "Thaumaturg (klein)",
-   "descEn": "+1 to Intellect, +4% Critical strike multiplier.",
-   "descDe": "+1 Intelligenz, +4% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "small_lesser_thaumaturge",
+   "nameEn": "Blazing Might",
+   "nameDe": "Lodernde Macht",
+   "descEn": "16% increased Fire Damage",
+   "descDe": "16% erhöhter Feuerschaden",
+   "icon": "images/passives/passive_012.webp",
+   "statKey": "small_blazing_might",
    "tier": "small"
   },
   {
    "id": 31235,
    "x": -352,
    "y": -1812,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Verdant Might",
+   "nameDe": "Grüne Macht",
+   "descEn": "16% increased Lightning Damage",
+   "descDe": "16% erhöhter Blitzschaden",
+   "icon": "",
+   "statKey": "travel_verdant_might",
    "tier": "travel"
   },
   {
@@ -22391,15 +22444,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 31306,
-   "x": -1037,
-   "y": -2483,
+   "x": -1867,
+   "y": -4423,
    "nameEn": "Lesser Shrug It Off",
    "nameDe": "Abtrotzen (klein)",
    "descEn": "+4% Armour. You cannot be staggered.",
    "descDe": "+4% Rüstung. Du kannst nicht zurückgestoßen werden.",
    "icon": "◆",
    "statKey": "small_lesser_shrug_it_off",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 31307,
@@ -25287,8 +25341,8 @@ export const TALENT_TREE_DATA = {
    "y": 574,
    "nameEn": "Character Start: Stox",
    "nameDe": "Charakter-Start: Stox",
-   "descEn": "Character start node for Stox. The Analyst walks the armoured path - armour and melee damage await to the southwest.",
-   "descDe": "Charakter-Startknoten für Stox. Der Analyst beschreitet den gepanzerten Weg - Rüstung und Nahkampfschaden warten im Südwesten.",
+   "descEn": "Character start node for Stox",
+   "descDe": "Charakter-Startknoten für Stox",
    "icon": "◉",
    "statKey": "character_start_stox",
    "tier": "start",
@@ -25585,11 +25639,1559 @@ export const TALENT_TREE_DATA = {
    "from": 31232,
    "to": 31233,
    "dotted": false
+  },
+  {
+   "id": 45,
+   "from": 30196,
+   "to": 1001,
+   "dotted": false
+  },
+  {
+   "id": 46,
+   "from": 30196,
+   "to": 30195,
+   "dotted": false
+  },
+  {
+   "id": 47,
+   "from": 30195,
+   "to": 30194,
+   "dotted": false
+  },
+  {
+   "id": 48,
+   "from": 30195,
+   "to": 30197,
+   "dotted": false
+  },
+  {
+   "id": 49,
+   "from": 30197,
+   "to": 30198,
+   "dotted": false
+  },
+  {
+   "id": 50,
+   "from": 30198,
+   "to": 20032,
+   "dotted": false
+  },
+  {
+   "id": 51,
+   "from": 1001,
+   "to": 30192,
+   "dotted": false
+  },
+  {
+   "id": 52,
+   "from": 30192,
+   "to": 30193,
+   "dotted": false
+  },
+  {
+   "id": 53,
+   "from": 30193,
+   "to": 30363,
+   "dotted": false
+  },
+  {
+   "id": 54,
+   "from": 30194,
+   "to": 30198,
+   "dotted": false
+  },
+  {
+   "id": 55,
+   "from": 1001,
+   "to": 30516,
+   "dotted": false
+  },
+  {
+   "id": 56,
+   "from": 30516,
+   "to": 30205,
+   "dotted": false
+  },
+  {
+   "id": 57,
+   "from": 30205,
+   "to": 30204,
+   "dotted": false
+  },
+  {
+   "id": 58,
+   "from": 30204,
+   "to": 30203,
+   "dotted": false
+  },
+  {
+   "id": 59,
+   "from": 30205,
+   "to": 30206,
+   "dotted": false
+  },
+  {
+   "id": 60,
+   "from": 30206,
+   "to": 30203,
+   "dotted": false
+  },
+  {
+   "id": 61,
+   "from": 30203,
+   "to": 4,
+   "dotted": false
+  },
+  {
+   "id": 62,
+   "from": 4,
+   "to": 30202,
+   "dotted": false
+  },
+  {
+   "id": 63,
+   "from": 4,
+   "to": 30201,
+   "dotted": false
+  },
+  {
+   "id": 64,
+   "from": 30202,
+   "to": 20031,
+   "dotted": false
+  },
+  {
+   "id": 65,
+   "from": 20031,
+   "to": 30199,
+   "dotted": false
+  },
+  {
+   "id": 66,
+   "from": 30199,
+   "to": 20032,
+   "dotted": false
+  },
+  {
+   "id": 67,
+   "from": 30201,
+   "to": 252,
+   "dotted": false
+  },
+  {
+   "id": 68,
+   "from": 252,
+   "to": 30200,
+   "dotted": false
+  },
+  {
+   "id": 69,
+   "from": 30200,
+   "to": 20032,
+   "dotted": false
+  },
+  {
+   "id": 70,
+   "from": 20032,
+   "to": 30363,
+   "dotted": false
+  },
+  {
+   "id": 71,
+   "from": 30517,
+   "to": 1001,
+   "dotted": false
+  },
+  {
+   "id": 72,
+   "from": 30517,
+   "to": 30207,
+   "dotted": false
+  },
+  {
+   "id": 73,
+   "from": 30207,
+   "to": 30251,
+   "dotted": false
+  },
+  {
+   "id": 74,
+   "from": 4,
+   "to": 30251,
+   "dotted": false
+  },
+  {
+   "id": 75,
+   "from": 30368,
+   "to": 4,
+   "dotted": false
+  },
+  {
+   "id": 76,
+   "from": 30368,
+   "to": 30367,
+   "dotted": false
+  },
+  {
+   "id": 77,
+   "from": 30367,
+   "to": 13,
+   "dotted": false
+  },
+  {
+   "id": 78,
+   "from": 30368,
+   "to": 30369,
+   "dotted": false
+  },
+  {
+   "id": 79,
+   "from": 30369,
+   "to": 129,
+   "dotted": false
+  },
+  {
+   "id": 80,
+   "from": 129,
+   "to": 30260,
+   "dotted": false
+  },
+  {
+   "id": 81,
+   "from": 30260,
+   "to": 30261,
+   "dotted": false
+  },
+  {
+   "id": 82,
+   "from": 30261,
+   "to": 30262,
+   "dotted": false
+  },
+  {
+   "id": 83,
+   "from": 30262,
+   "to": 13,
+   "dotted": false
+  },
+  {
+   "id": 84,
+   "from": 20032,
+   "to": 30365,
+   "dotted": false
+  },
+  {
+   "id": 85,
+   "from": 30365,
+   "to": 30366,
+   "dotted": false
+  },
+  {
+   "id": 86,
+   "from": 30366,
+   "to": 20034,
+   "dotted": false
+  },
+  {
+   "id": 87,
+   "from": 30364,
+   "to": 20033,
+   "dotted": false
+  },
+  {
+   "id": 88,
+   "from": 30366,
+   "to": 20033,
+   "dotted": false
+  },
+  {
+   "id": 89,
+   "from": 30364,
+   "to": 191,
+   "dotted": false
+  },
+  {
+   "id": 90,
+   "from": 191,
+   "to": 30350,
+   "dotted": false
+  },
+  {
+   "id": 91,
+   "from": 30350,
+   "to": 30348,
+   "dotted": false
+  },
+  {
+   "id": 92,
+   "from": 30348,
+   "to": 30349,
+   "dotted": false
+  },
+  {
+   "id": 93,
+   "from": 30349,
+   "to": 20034,
+   "dotted": false
+  },
+  {
+   "id": 94,
+   "from": 30368,
+   "to": 20035,
+   "dotted": false
+  },
+  {
+   "id": 95,
+   "from": 20035,
+   "to": 30262,
+   "dotted": false
+  },
+  {
+   "id": 96,
+   "from": 20035,
+   "to": 30260,
+   "dotted": false
+  },
+  {
+   "id": 97,
+   "from": 30363,
+   "to": 30351,
+   "dotted": false
+  },
+  {
+   "id": 98,
+   "from": 30348,
+   "to": 30347,
+   "dotted": false
+  },
+  {
+   "id": 99,
+   "from": 30351,
+   "to": 30347,
+   "dotted": false
+  },
+  {
+   "id": 100,
+   "from": 30347,
+   "to": 30346,
+   "dotted": false
+  },
+  {
+   "id": 101,
+   "from": 30346,
+   "to": 30263,
+   "dotted": false
+  },
+  {
+   "id": 102,
+   "from": 30263,
+   "to": 30259,
+   "dotted": false
+  },
+  {
+   "id": 103,
+   "from": 30259,
+   "to": 30251,
+   "dotted": false
+  },
+  {
+   "id": 104,
+   "from": 30363,
+   "to": 30362,
+   "dotted": false
+  },
+  {
+   "id": 105,
+   "from": 30362,
+   "to": 30360,
+   "dotted": false
+  },
+  {
+   "id": 106,
+   "from": 30360,
+   "to": 30359,
+   "dotted": false
+  },
+  {
+   "id": 107,
+   "from": 30359,
+   "to": 174,
+   "dotted": false
+  },
+  {
+   "id": 108,
+   "from": 174,
+   "to": 20085,
+   "dotted": false
+  },
+  {
+   "id": 109,
+   "from": 20085,
+   "to": 30361,
+   "dotted": false
+  },
+  {
+   "id": 110,
+   "from": 30361,
+   "to": 30360,
+   "dotted": false
+  },
+  {
+   "id": 111,
+   "from": 30362,
+   "to": 30543,
+   "dotted": false
+  },
+  {
+   "id": 112,
+   "from": 30543,
+   "to": 291,
+   "dotted": false
+  },
+  {
+   "id": 113,
+   "from": 30543,
+   "to": 30314,
+   "dotted": false
+  },
+  {
+   "id": 114,
+   "from": 30314,
+   "to": 33,
+   "dotted": false
+  },
+  {
+   "id": 115,
+   "from": 30314,
+   "to": 20084,
+   "dotted": false
+  },
+  {
+   "id": 116,
+   "from": 30314,
+   "to": 30357,
+   "dotted": false
+  },
+  {
+   "id": 117,
+   "from": 30357,
+   "to": 30351,
+   "dotted": false
+  },
+  {
+   "id": 118,
+   "from": 30357,
+   "to": 30355,
+   "dotted": false
+  },
+  {
+   "id": 119,
+   "from": 30355,
+   "to": 95,
+   "dotted": false
+  },
+  {
+   "id": 120,
+   "from": 95,
+   "to": 30358,
+   "dotted": false
+  },
+  {
+   "id": 121,
+   "from": 30358,
+   "to": 217,
+   "dotted": false
+  },
+  {
+   "id": 122,
+   "from": 217,
+   "to": 30356,
+   "dotted": false
+  },
+  {
+   "id": 123,
+   "from": 30356,
+   "to": 30357,
+   "dotted": false
+  },
+  {
+   "id": 124,
+   "from": 30357,
+   "to": 30353,
+   "dotted": false
+  },
+  {
+   "id": 125,
+   "from": 30353,
+   "to": 30354,
+   "dotted": false
+  },
+  {
+   "id": 126,
+   "from": 30354,
+   "to": 20086,
+   "dotted": false
+  },
+  {
+   "id": 127,
+   "from": 20086,
+   "to": 30352,
+   "dotted": false
+  },
+  {
+   "id": 128,
+   "from": 30352,
+   "to": 30353,
+   "dotted": false
+  },
+  {
+   "id": 129,
+   "from": 30314,
+   "to": 30319,
+   "dotted": false
+  },
+  {
+   "id": 130,
+   "from": 30319,
+   "to": 30305,
+   "dotted": false
+  },
+  {
+   "id": 131,
+   "from": 30305,
+   "to": 30304,
+   "dotted": false
+  },
+  {
+   "id": 132,
+   "from": 30304,
+   "to": 30303,
+   "dotted": false
+  },
+  {
+   "id": 133,
+   "from": 30305,
+   "to": 30306,
+   "dotted": false
+  },
+  {
+   "id": 134,
+   "from": 30306,
+   "to": 30309,
+   "dotted": false
+  },
+  {
+   "id": 135,
+   "from": 30309,
+   "to": 331,
+   "dotted": false
+  },
+  {
+   "id": 136,
+   "from": 331,
+   "to": 30303,
+   "dotted": false
+  },
+  {
+   "id": 137,
+   "from": 30319,
+   "to": 30307,
+   "dotted": false
+  },
+  {
+   "id": 138,
+   "from": 30307,
+   "to": 30308,
+   "dotted": false
+  },
+  {
+   "id": 139,
+   "from": 30308,
+   "to": 250,
+   "dotted": false
+  },
+  {
+   "id": 140,
+   "from": 250,
+   "to": 30310,
+   "dotted": false
+  },
+  {
+   "id": 141,
+   "from": 30310,
+   "to": 30311,
+   "dotted": false
+  },
+  {
+   "id": 142,
+   "from": 30312,
+   "to": 250,
+   "dotted": false
+  },
+  {
+   "id": 143,
+   "from": 30313,
+   "to": 30312,
+   "dotted": false
+  },
+  {
+   "id": 144,
+   "from": 30314,
+   "to": 30313,
+   "dotted": false
+  },
+  {
+   "id": 145,
+   "from": 30311,
+   "to": 30351,
+   "dotted": false
+  },
+  {
+   "id": 146,
+   "from": 350,
+   "to": 30357,
+   "dotted": false
+  },
+  {
+   "id": 147,
+   "from": 30344,
+   "to": 30346,
+   "dotted": false
+  },
+  {
+   "id": 148,
+   "from": 30344,
+   "to": 20067,
+   "dotted": false
+  },
+  {
+   "id": 149,
+   "from": 20067,
+   "to": 30341,
+   "dotted": false
+  },
+  {
+   "id": 152,
+   "from": 30346,
+   "to": 30343,
+   "dotted": false
+  },
+  {
+   "id": 153,
+   "from": 30282,
+   "to": 30341,
+   "dotted": false
+  },
+  {
+   "id": 154,
+   "from": 30282,
+   "to": 30342,
+   "dotted": false
+  },
+  {
+   "id": 155,
+   "from": 30282,
+   "to": 30281,
+   "dotted": false
+  },
+  {
+   "id": 156,
+   "from": 30281,
+   "to": 30280,
+   "dotted": false
+  },
+  {
+   "id": 157,
+   "from": 30281,
+   "to": 30279,
+   "dotted": false
+  },
+  {
+   "id": 158,
+   "from": 30279,
+   "to": 30277,
+   "dotted": false
+  },
+  {
+   "id": 159,
+   "from": 30277,
+   "to": 30278,
+   "dotted": false
+  },
+  {
+   "id": 160,
+   "from": 30278,
+   "to": 369,
+   "dotted": false
+  },
+  {
+   "id": 161,
+   "from": 30280,
+   "to": 30339,
+   "dotted": false
+  },
+  {
+   "id": 162,
+   "from": 30339,
+   "to": 30340,
+   "dotted": false
+  },
+  {
+   "id": 163,
+   "from": 30340,
+   "to": 125,
+   "dotted": false
+  },
+  {
+   "id": 164,
+   "from": 30263,
+   "to": 30261,
+   "dotted": false
+  },
+  {
+   "id": 165,
+   "from": 30263,
+   "to": 30264,
+   "dotted": false
+  },
+  {
+   "id": 166,
+   "from": 30264,
+   "to": 30265,
+   "dotted": false
+  },
+  {
+   "id": 167,
+   "from": 30265,
+   "to": 20066,
+   "dotted": false
+  },
+  {
+   "id": 168,
+   "from": 30345,
+   "to": 20066,
+   "dotted": false
+  },
+  {
+   "id": 169,
+   "from": 30345,
+   "to": 30264,
+   "dotted": false
+  },
+  {
+   "id": 170,
+   "from": 30263,
+   "to": 30266,
+   "dotted": false
+  },
+  {
+   "id": 171,
+   "from": 30266,
+   "to": 380,
+   "dotted": false
+  },
+  {
+   "id": 172,
+   "from": 380,
+   "to": 30267,
+   "dotted": false
+  },
+  {
+   "id": 173,
+   "from": 30263,
+   "to": 30370,
+   "dotted": false
+  },
+  {
+   "id": 174,
+   "from": 30370,
+   "to": 20044,
+   "dotted": false
+  },
+  {
+   "id": 175,
+   "from": 20044,
+   "to": 30371,
+   "dotted": false
+  },
+  {
+   "id": 176,
+   "from": 30371,
+   "to": 30269,
+   "dotted": false
+  },
+  {
+   "id": 177,
+   "from": 30267,
+   "to": 30269,
+   "dotted": false
+  },
+  {
+   "id": 178,
+   "from": 30282,
+   "to": 30269,
+   "dotted": false
+  },
+  {
+   "id": 179,
+   "from": 30269,
+   "to": 30268,
+   "dotted": false
+  },
+  {
+   "id": 180,
+   "from": 30268,
+   "to": 240,
+   "dotted": false
+  },
+  {
+   "id": 181,
+   "from": 240,
+   "to": 8,
+   "dotted": false
+  },
+  {
+   "id": 182,
+   "from": 30269,
+   "to": 30275,
+   "dotted": false
+  },
+  {
+   "id": 183,
+   "from": 30275,
+   "to": 30276,
+   "dotted": false
+  },
+  {
+   "id": 184,
+   "from": 30276,
+   "to": 347,
+   "dotted": false
+  },
+  {
+   "id": 185,
+   "from": 30269,
+   "to": 30270,
+   "dotted": false
+  },
+  {
+   "id": 186,
+   "from": 30270,
+   "to": 30271,
+   "dotted": false
+  },
+  {
+   "id": 187,
+   "from": 30271,
+   "to": 30274,
+   "dotted": false
+  },
+  {
+   "id": 188,
+   "from": 30274,
+   "to": 147,
+   "dotted": false
+  },
+  {
+   "id": 189,
+   "from": 30270,
+   "to": 30272,
+   "dotted": false
+  },
+  {
+   "id": 190,
+   "from": 30272,
+   "to": 30273,
+   "dotted": false
+  },
+  {
+   "id": 191,
+   "from": 30273,
+   "to": 227,
+   "dotted": false
+  },
+  {
+   "id": 192,
+   "from": 30269,
+   "to": 30375,
+   "dotted": false
+  },
+  {
+   "id": 193,
+   "from": 30375,
+   "to": 30374,
+   "dotted": false
+  },
+  {
+   "id": 194,
+   "from": 30374,
+   "to": 285,
+   "dotted": false
+  },
+  {
+   "id": 195,
+   "from": 30375,
+   "to": 30376,
+   "dotted": false
+  },
+  {
+   "id": 196,
+   "from": 30376,
+   "to": 285,
+   "dotted": false
+  },
+  {
+   "id": 197,
+   "from": 30269,
+   "to": 30417,
+   "dotted": false
+  },
+  {
+   "id": 198,
+   "from": 30417,
+   "to": 30380,
+   "dotted": false
+  },
+  {
+   "id": 199,
+   "from": 30380,
+   "to": 30379,
+   "dotted": false
+  },
+  {
+   "id": 200,
+   "from": 30380,
+   "to": 30381,
+   "dotted": false
+  },
+  {
+   "id": 201,
+   "from": 30381,
+   "to": 30382,
+   "dotted": false
+  },
+  {
+   "id": 202,
+   "from": 30382,
+   "to": 20046,
+   "dotted": false
+  },
+  {
+   "id": 203,
+   "from": 20046,
+   "to": 30383,
+   "dotted": false
+  },
+  {
+   "id": 204,
+   "from": 30379,
+   "to": 30378,
+   "dotted": false
+  },
+  {
+   "id": 205,
+   "from": 30378,
+   "to": 378,
+   "dotted": false
+  },
+  {
+   "id": 206,
+   "from": 378,
+   "to": 30377,
+   "dotted": false
+  },
+  {
+   "id": 207,
+   "from": 30377,
+   "to": 247,
+   "dotted": false
+  },
+  {
+   "id": 208,
+   "from": 30383,
+   "to": 247,
+   "dotted": false
+  },
+  {
+   "id": 209,
+   "from": 30417,
+   "to": 40001,
+   "dotted": false
+  },
+  {
+   "id": 210,
+   "from": 30347,
+   "to": 30287,
+   "dotted": false
+  },
+  {
+   "id": 211,
+   "from": 30287,
+   "to": 20068,
+   "dotted": false
+  },
+  {
+   "id": 212,
+   "from": 20068,
+   "to": 30286,
+   "dotted": false
+  },
+  {
+   "id": 213,
+   "from": 30286,
+   "to": 30338,
+   "dotted": false
+  },
+  {
+   "id": 214,
+   "from": 30338,
+   "to": 30282,
+   "dotted": false
+  },
+  {
+   "id": 215,
+   "from": 30338,
+   "to": 30284,
+   "dotted": false
+  },
+  {
+   "id": 216,
+   "from": 30284,
+   "to": 30283,
+   "dotted": false
+  },
+  {
+   "id": 217,
+   "from": 30283,
+   "to": 251,
+   "dotted": false
+  },
+  {
+   "id": 218,
+   "from": 30284,
+   "to": 30285,
+   "dotted": false
+  },
+  {
+   "id": 219,
+   "from": 30285,
+   "to": 251,
+   "dotted": false
+  },
+  {
+   "id": 220,
+   "from": 30338,
+   "to": 30333,
+   "dotted": false
+  },
+  {
+   "id": 221,
+   "from": 30333,
+   "to": 30334,
+   "dotted": false
+  },
+  {
+   "id": 222,
+   "from": 30334,
+   "to": 30335,
+   "dotted": false
+  },
+  {
+   "id": 223,
+   "from": 30335,
+   "to": 20071,
+   "dotted": false
+  },
+  {
+   "id": 224,
+   "from": 20071,
+   "to": 30329,
+   "dotted": false
+  },
+  {
+   "id": 225,
+   "from": 30333,
+   "to": 30332,
+   "dotted": false
+  },
+  {
+   "id": 226,
+   "from": 30332,
+   "to": 30331,
+   "dotted": false
+  },
+  {
+   "id": 227,
+   "from": 30331,
+   "to": 360,
+   "dotted": false
+  },
+  {
+   "id": 228,
+   "from": 360,
+   "to": 30330,
+   "dotted": false
+  },
+  {
+   "id": 229,
+   "from": 30330,
+   "to": 30329,
+   "dotted": false
+  },
+  {
+   "id": 230,
+   "from": 30293,
+   "to": 30338,
+   "dotted": false
+  },
+  {
+   "id": 231,
+   "from": 30293,
+   "to": 30292,
+   "dotted": false
+  },
+  {
+   "id": 232,
+   "from": 30292,
+   "to": 111,
+   "dotted": false
+  },
+  {
+   "id": 233,
+   "from": 30347,
+   "to": 30288,
+   "dotted": false
+  },
+  {
+   "id": 234,
+   "from": 30288,
+   "to": 30291,
+   "dotted": false
+  },
+  {
+   "id": 235,
+   "from": 30291,
+   "to": 20069,
+   "dotted": false
+  },
+  {
+   "id": 236,
+   "from": 30288,
+   "to": 30289,
+   "dotted": false
+  },
+  {
+   "id": 237,
+   "from": 30289,
+   "to": 30290,
+   "dotted": false
+  },
+  {
+   "id": 238,
+   "from": 30290,
+   "to": 20069,
+   "dotted": false
+  },
+  {
+   "id": 239,
+   "from": 30259,
+   "to": 30257,
+   "dotted": false
+  },
+  {
+   "id": 240,
+   "from": 30257,
+   "to": 30258,
+   "dotted": false
+  },
+  {
+   "id": 241,
+   "from": 30258,
+   "to": 20043,
+   "dotted": false
+  },
+  {
+   "id": 242,
+   "from": 30269,
+   "to": 30373,
+   "dotted": false
+  },
+  {
+   "id": 243,
+   "from": 30373,
+   "to": 30372,
+   "dotted": false
+  },
+  {
+   "id": 244,
+   "from": 30372,
+   "to": 20045,
+   "dotted": false
+  },
+  {
+   "id": 245,
+   "from": 30417,
+   "to": 30415,
+   "dotted": false
+  },
+  {
+   "id": 246,
+   "from": 30415,
+   "to": 30416,
+   "dotted": false
+  },
+  {
+   "id": 247,
+   "from": 30416,
+   "to": 20042,
+   "dotted": false
+  },
+  {
+   "id": 248,
+   "from": 30259,
+   "to": 30255,
+   "dotted": false
+  },
+  {
+   "id": 249,
+   "from": 30255,
+   "to": 30254,
+   "dotted": false
+  },
+  {
+   "id": 250,
+   "from": 30254,
+   "to": 337,
+   "dotted": false
+  },
+  {
+   "id": 251,
+   "from": 337,
+   "to": 30256,
+   "dotted": false
+  },
+  {
+   "id": 252,
+   "from": 30256,
+   "to": 30255,
+   "dotted": false
+  },
+  {
+   "id": 253,
+   "from": 30259,
+   "to": 30253,
+   "dotted": false
+  },
+  {
+   "id": 254,
+   "from": 30253,
+   "to": 30252,
+   "dotted": false
+  },
+  {
+   "id": 255,
+   "from": 30252,
+   "to": 20036,
+   "dotted": false
+  },
+  {
+   "id": 256,
+   "from": 30251,
+   "to": 30248,
+   "dotted": false
+  },
+  {
+   "id": 257,
+   "from": 30248,
+   "to": 30249,
+   "dotted": false
+  },
+  {
+   "id": 258,
+   "from": 30249,
+   "to": 30250,
+   "dotted": false
+  },
+  {
+   "id": 259,
+   "from": 30250,
+   "to": 20037,
+   "dotted": false
+  },
+  {
+   "id": 260,
+   "from": 20037,
+   "to": 30247,
+   "dotted": false
+  },
+  {
+   "id": 261,
+   "from": 30247,
+   "to": 30248,
+   "dotted": false
+  },
+  {
+   "id": 262,
+   "from": 30417,
+   "to": 30409,
+   "dotted": false
+  },
+  {
+   "id": 263,
+   "from": 30409,
+   "to": 30526,
+   "dotted": false
+  },
+  {
+   "id": 264,
+   "from": 30526,
+   "to": 30466,
+   "dotted": false
+  },
+  {
+   "id": 265,
+   "from": 30466,
+   "to": 30492,
+   "dotted": false
+  },
+  {
+   "id": 266,
+   "from": 30492,
+   "to": 30481,
+   "dotted": false
+  },
+  {
+   "id": 267,
+   "from": 30481,
+   "to": 30047,
+   "dotted": false
+  },
+  {
+   "id": 268,
+   "from": 30047,
+   "to": 30711,
+   "dotted": false
+  },
+  {
+   "id": 269,
+   "from": 30711,
+   "to": 30708,
+   "dotted": false
+  },
+  {
+   "id": 270,
+   "from": 30708,
+   "to": 30697,
+   "dotted": false
+  },
+  {
+   "id": 271,
+   "from": 30697,
+   "to": 31033,
+   "dotted": false
+  },
+  {
+   "id": 272,
+   "from": 31033,
+   "to": 30729,
+   "dotted": false
+  },
+  {
+   "id": 273,
+   "from": 30729,
+   "to": 30746,
+   "dotted": false
+  },
+  {
+   "id": 274,
+   "from": 30746,
+   "to": 31023,
+   "dotted": false
+  },
+  {
+   "id": 275,
+   "from": 31023,
+   "to": 30807,
+   "dotted": false
+  },
+  {
+   "id": 276,
+   "from": 30807,
+   "to": 30818,
+   "dotted": false
+  },
+  {
+   "id": 277,
+   "from": 30818,
+   "to": 30989,
+   "dotted": false
+  },
+  {
+   "id": 278,
+   "from": 30989,
+   "to": 30971,
+   "dotted": false
+  },
+  {
+   "id": 279,
+   "from": 30971,
+   "to": 30979,
+   "dotted": false
+  },
+  {
+   "id": 280,
+   "from": 30979,
+   "to": 30978,
+   "dotted": false
+  },
+  {
+   "id": 281,
+   "from": 30978,
+   "to": 30959,
+   "dotted": false
+  },
+  {
+   "id": 282,
+   "from": 30959,
+   "to": 30948,
+   "dotted": false
+  },
+  {
+   "id": 283,
+   "from": 30948,
+   "to": 30133,
+   "dotted": false
+  },
+  {
+   "id": 284,
+   "from": 30133,
+   "to": 31173,
+   "dotted": false
+  },
+  {
+   "id": 285,
+   "from": 31173,
+   "to": 31132,
+   "dotted": false
+  },
+  {
+   "id": 286,
+   "from": 31132,
+   "to": 31159,
+   "dotted": false
+  },
+  {
+   "id": 287,
+   "from": 31159,
+   "to": 31106,
+   "dotted": false
+  },
+  {
+   "id": 288,
+   "from": 31106,
+   "to": 31100,
+   "dotted": false
+  },
+  {
+   "id": 289,
+   "from": 31100,
+   "to": 31391,
+   "dotted": false
+  },
+  {
+   "id": 290,
+   "from": 31391,
+   "to": 31430,
+   "dotted": false
+  },
+  {
+   "id": 291,
+   "from": 31430,
+   "to": 31435,
+   "dotted": false
+  },
+  {
+   "id": 292,
+   "from": 31435,
+   "to": 31367,
+   "dotted": false
+  },
+  {
+   "id": 293,
+   "from": 31367,
+   "to": 31358,
+   "dotted": false
+  },
+  {
+   "id": 294,
+   "from": 31438,
+   "to": 31358,
+   "dotted": false
+  },
+  {
+   "id": 295,
+   "from": 31438,
+   "to": 31343,
+   "dotted": false
+  },
+  {
+   "id": 296,
+   "from": 31343,
+   "to": 31328,
+   "dotted": false
+  },
+  {
+   "id": 297,
+   "from": 30338,
+   "to": 30298,
+   "dotted": false
+  },
+  {
+   "id": 298,
+   "from": 30298,
+   "to": 30323,
+   "dotted": false
+  },
+  {
+   "id": 299,
+   "from": 30323,
+   "to": 30602,
+   "dotted": false
+  },
+  {
+   "id": 300,
+   "from": 30602,
+   "to": 30572,
+   "dotted": false
+  },
+  {
+   "id": 301,
+   "from": 30572,
+   "to": 30588,
+   "dotted": false
+  },
+  {
+   "id": 302,
+   "from": 30588,
+   "to": 30593,
+   "dotted": false
+  },
+  {
+   "id": 303,
+   "from": 30593,
+   "to": 30086,
+   "dotted": false
+  },
+  {
+   "id": 304,
+   "from": 30086,
+   "to": 31328,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "e845628bc20bcf79",
+  "fingerprint": "406ac7eb3ea6adb1",
   "positions": [
    [
     156,
@@ -25868,7 +27470,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     95,
-    -3058,
+    -3051,
     410
    ],
    [
@@ -25938,8 +27540,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     125,
-    -4968,
-    1247
+    -4976,
+    1249
    ],
    [
     126,
@@ -26233,8 +27835,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     120,
-    -2407,
-    871
+    -6697,
+    1043
    ],
    [
     382,
@@ -26258,8 +27860,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     190,
-    -2072,
-    1260
+    -6698,
+    1158
    ],
    [
     191,
@@ -26553,8 +28155,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     369,
-    -4968,
-    1615
+    -4976,
+    1613
    ],
    [
     11,
@@ -26943,8 +28545,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     145,
-    -1897,
-    1742
+    -6712,
+    1429
    ],
    [
     146,
@@ -27658,8 +29260,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30085,
-    -4498,
-    -2284
+    -4598,
+    -2332
    ],
    [
     30086,
@@ -28063,8 +29665,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20030,
-    -2257,
-    1431
+    -6700,
+    1289
    ],
    [
     20031,
@@ -28243,8 +29845,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20066,
-    -3883,
-    1570
+    -3875,
+    1562
    ],
    [
     20067,
@@ -28273,8 +29875,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20072,
-    -5218,
-    1431
+    -6713,
+    1575
    ],
    [
     20073,
@@ -28343,7 +29945,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20086,
-    -3058,
+    -3051,
     693
    ],
    [
@@ -28873,12 +30475,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30248,
-    -2524,
+    -2530,
     2241
    ],
    [
     30249,
-    -2452,
+    -2445,
     2241
    ],
    [
@@ -28933,18 +30535,18 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30260,
-    -3350,
-    1886
+    -3348,
+    1894
    ],
    [
     30261,
-    -3364,
+    -3368,
     1811
    ],
    [
     30262,
-    -3350,
-    1735
+    -3348,
+    1728
    ],
    [
     30263,
@@ -29018,13 +30620,13 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30277,
-    -4817,
-    1615
+    -4809,
+    1613
    ],
    [
     30278,
     -4892,
-    1629
+    1632
    ],
    [
     30279,
@@ -29079,12 +30681,12 @@ export const TALENT_TREE_DATA = {
    [
     30289,
     -3748,
-    830
+    837
    ],
    [
     30290,
     -3748,
-    758
+    751
    ],
    [
     30291,
@@ -29149,12 +30751,12 @@ export const TALENT_TREE_DATA = {
    [
     30303,
     -4072,
-    313
+    320
    ],
    [
     30304,
     -4072,
-    241
+    234
    ],
    [
     30305,
@@ -29164,7 +30766,7 @@ export const TALENT_TREE_DATA = {
    [
     30306,
     -3895,
-    241
+    234
    ],
    [
     30307,
@@ -29179,7 +30781,7 @@ export const TALENT_TREE_DATA = {
    [
     30309,
     -3895,
-    313
+    320
    ],
    [
     30310,
@@ -29273,8 +30875,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30328,
-    -5539,
-    605
+    -6704,
+    875
    ],
    [
     30329,
@@ -29288,12 +30890,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30331,
-    -4826,
+    -4833,
     880
    ],
    [
     30332,
-    -4754,
+    -4747,
     880
    ],
    [
@@ -29303,12 +30905,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30334,
-    -4754,
+    -4747,
     704
    ],
    [
     30335,
-    -4826,
+    -4833,
     704
    ],
    [
@@ -29328,13 +30930,13 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30339,
-    -4817,
-    1247
+    -4809,
+    1249
    ],
    [
     30340,
     -4892,
-    1233
+    1230
    ],
    [
     30341,
@@ -29373,18 +30975,18 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30348,
-    -3364,
+    -3368,
     1060
    ],
    [
     30349,
-    -3350,
-    1136
+    -3348,
+    1143
    ],
    [
     30350,
-    -3350,
-    985
+    -3348,
+    977
    ],
    [
     30351,
@@ -29393,22 +30995,22 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30352,
-    -3130,
+    -3137,
     693
    ],
    [
     30353,
-    -3130,
+    -3137,
     517
    ],
    [
     30354,
-    -3058,
+    -3051,
     517
    ],
    [
     30355,
-    -3130,
+    -3137,
     410
    ],
    [
@@ -29428,12 +31030,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30359,
-    -2840,
+    -2847,
     410
    ],
    [
     30360,
-    -2768,
+    -2762,
     410
    ],
    [
@@ -29458,28 +31060,28 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30365,
-    -2968,
-    1060
+    -2967,
+    1056
    ],
    [
     30366,
     -2983,
-    1136
+    1140
    ],
    [
     30367,
-    -2983,
-    1735
+    -2984,
+    1728
    ],
    [
     30368,
-    -2968,
+    -2965,
     1811
    ],
    [
     30369,
-    -2983,
-    1886
+    -2984,
+    1894
    ],
    [
     30370,
@@ -29493,12 +31095,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30372,
-    -4086,
+    -4079,
     2169
    ],
    [
     30373,
-    -4158,
+    -4165,
     2169
    ],
    [
@@ -29528,18 +31130,18 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30379,
-    -4147,
-    2821
+    -4149,
+    2813
    ],
    [
     30380,
-    -4133,
+    -4129,
     2896
    ],
    [
     30381,
-    -4147,
-    2972
+    -4149,
+    2979
    ],
    [
     30382,
@@ -34909,7 +36511,7 @@ export const TALENT_TREE_DATA = {
    [
     31306,
     -1867,
-    -4469
+    -4423
    ],
    [
     31307,

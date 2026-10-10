@@ -13,19 +13,19 @@ import { cur } from '../../state.js';
 // 60%, a blooming bud dusts cells at 30%, and the boss's own attack bar
 // fires a telegraphed vine lunge.
 //
-// The Sprout is the game's only nature attacker: every one of its hits -
+// The Sprout is the game's only lightning attacker: every one of its hits -
 // vine lunge, spores, bramble whips, pollen motes and dust bursts - is
-// tagged EG_SPROUT_ELEMENT, so the player's Nature Resistance actually
+// tagged EG_SPROUT_ELEMENT, so the player's Lightning Resistance actually
 // reduces them. It replaced the old element: null (untyped physical) tag;
-// with 0 Nature Resistance both tags deal identical damage, so this only
+// with 0 Lightning Resistance both tags deal identical damage, so this only
 // becomes a real difference once the passive tree's Verdant Covenant node
-// (110) is allocated. Nature is deliberately not one of the four
-// EG_ELEMENTS, so these hits are never reduced by elemental resistances -
-// only by Nature Resistance and the all-elemental Arcane Resistance flat.
+// (110) is allocated. Lightning is one of the four EG_ELEMENTS, so these hits
+// ride the full elemental resistance path: Lightning Resistance and the
+// "all elemental resistances" bonus both reduce them, under the shared 75% cap.
 //------------------------------------------------------------------------
 
 // Incoming-damage element for every Sprout hit (see _egCalcPlayerResistanceReduction).
-export const EG_SPROUT_ELEMENT = 'nature';
+export const EG_SPROUT_ELEMENT = 'lightning';
 
 Object.assign(EG_BOSS_DEFS, {
     boss_sprout: {
@@ -59,12 +59,12 @@ export const EG_SPROUT_VINE_CAP = [0, 3, 5, 7];     // vines alive at once per p
 export const EG_SPROUT_VINE_LIFETIME_MS = 12000;    // withers on its own
 // Spore Drift (screen hazard)
 export const EG_SPROUT_SPORE_INTERVAL_MS = [0, 3200, 2400, 1800];
-export const EG_SPROUT_SPORE_DMG = 0.025;   // %maxHP per spore (nature)
+export const EG_SPROUT_SPORE_DMG = 0.025;   // %maxHP per spore (lightning)
 export const EG_SPROUT_SPORE_CD_MS = 500;   // global spore-hit cooldown
 export const EG_SPROUT_SPORE_SPEED = [0, 70, 90, 110]; // px/s drift
 // Bramble Wall (60% gate)
 export const EG_SPROUT_BRAMBLE_MS = 10000;  // wall lifetime
-export const EG_SPROUT_WHIP_DMG = 0.12;     // %maxHP per whip (nature)
+export const EG_SPROUT_WHIP_DMG = 0.12;     // %maxHP per whip (lightning)
 export const EG_SPROUT_WHIP_LEN = 230;      // px a lash reaches beyond the grid edge
 export const EG_SPROUT_WHIP_OUT_MS = 500;   // extend time
 export const EG_SPROUT_WHIP_HOLD_MS = 800;  // fully extended
@@ -75,7 +75,7 @@ export const EG_SPROUT_BUD_MS = 3200;       // bud growth (telegraph)
 export const EG_SPROUT_BUD_R = 34;          // bud visual radius
 export const EG_SPROUT_MOTE_N = 8;          // pollen motes per bloom
 export const EG_SPROUT_MOTE_SPEED = 260;    // px/s
-export const EG_SPROUT_MOTE_DMG = 0.025;    // %maxHP per mote (nature)
+export const EG_SPROUT_MOTE_DMG = 0.025;    // %maxHP per mote (lightning)
 export const EG_SPROUT_MOTE_CD_MS = 450;    // global mote-hit cooldown
 export const EG_SPROUT_MOTE_LIFE_MS = 2200;
 export const EG_SPROUT_DUST_MS = 6500;      // pollen dust on cells

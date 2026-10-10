@@ -332,7 +332,7 @@ function _egApplyPuzzleArcaneBomb() {
         const adjacent = [[pick.r-1,pick.c-1],[pick.r-1,pick.c],[pick.r-1,pick.c+1],[pick.r,pick.c-1],[pick.r,pick.c+1],[pick.r+1,pick.c-1],[pick.r+1,pick.c],[pick.r+1,pick.c+1]];
         const marks = adjacent.filter(([r,c]) => r >= 0 && c >= 0 && r < cur.grid.length && c < cur.grid[0].length && globalThis.userGrid[r][c] === 2).length;
         const amount = Math.max(1, marks * 8);
-        _egPlayerTakeDamage(amount, true, 'arcane');
+        _egPlayerTakeDamage(amount, true, 'shadow');
         _egRemovePuzzleEffect(bomb);
     }, EG_PUZZLE_EFFECT_DURATION_MS);
     _egPuzzleEffects.push(bomb);

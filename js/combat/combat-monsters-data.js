@@ -43,7 +43,7 @@ export const EG_MONSTER_DEFS = {
     snake: {
         id: 'snake', name: t('eg_mon_snake'), emoji: '🐍',
         baseHP: 59, baseDamage: 14, chargeMax: 14, attackType: 'both', // Uses random mix!
-        element: 'arcane' // Polymorph chaos curse
+        element: 'shadow' // Polymorph chaos curse
     },
     skull: {
         id: 'skull', name: t('eg_mon_skull'), emoji: '💀',
@@ -74,7 +74,7 @@ export const EG_MONSTER_DEFS = {
     werewolf: {
         id: 'werewolf', name: t('eg_mon_werewolf'), emoji: '🐺',
         baseHP: 97, baseDamage: 19, chargeMax: 11, attackType: 'both', // Uses random mix!
-        element: 'arcane' // Polymorph chaos curse
+        element: 'shadow' // Polymorph chaos curse
     },
     ogre: {
         id: 'ogre', name: t('eg_mon_ogre'), emoji: '👹',

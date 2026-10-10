@@ -333,7 +333,7 @@ export function _egHzTickArcane(dtMs) {
                 if (pr.bottom > bandTop && pr.top < bandBottom) {
                     b.hitDone = true;
                     const dealt = _egHzDamage(
-                        EG_HZ_ARCANE_BASE_DMG_PCT * st.dmgMult, 'arcane', '#c77dff'
+                        EG_HZ_ARCANE_BASE_DMG_PCT * st.dmgMult, 'shadow', '#c77dff'
                     );
                     if (dealt > 0 && typeof _egApplyPlayerAilment === 'function'
                         && Math.random() * 100 < EG_HZ_ARCANE_POLYMORPH_CHANCE_PCT) {

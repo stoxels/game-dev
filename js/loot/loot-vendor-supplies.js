@@ -60,7 +60,6 @@ const EG_VENDOR_ESSENCE_PRICES = {
     essence_cold_resist: 360,
     essence_lightning_resist: 360,
     essence_shadow_resist: 380,
-    essence_arcane_resistance: 380,
     // Flat defenses - 380-450
     essence_flat_armour: 420,
     essence_flat_evasion: 420,

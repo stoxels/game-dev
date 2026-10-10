@@ -264,6 +264,18 @@ function _advanceWalkFrameIndex(frameCount) {
     return (_walkState.frameIndex + 1) % frameCount;
 }
 
+// True while the page is hidden (background tab, or Firefox minimised).
+// The cosmetic frame loops below must not keep swapping sprite images
+// then: browsers only *throttle* hidden-tab timers (and a tab playing
+// audio is exempt from throttling entirely), so a forgotten game tab
+// would keep decoding frames for as long as it stays open.
+//
+// Read as "not hidden" when the property is missing, so a host without
+// a real document (test harness) never pauses anything.
+function _animPaused() {
+    return typeof document !== 'undefined' && document.visibilityState === 'hidden';
+}
+
 // Starts (or keeps alive) the looping walk animation on the current
 // character's sprite. Safe to call on every movement tick - it only
 // actually starts the interval once, and just resets the idle debounce
@@ -331,6 +343,9 @@ export function _startAvatarWalkAnimation(imgElementId = 'avatar-sprite-img-simp
     el.src = frames[0];
 
     _walkState.intervalId = setInterval(() => {
+        // Hidden tab: keep the loop armed and its frame position intact,
+        // do no work, and resume on the next tick after it is visible.
+        if (_animPaused()) return;
         const frameEl = document.getElementById(imgElementId);
         const liveFrames = _walkState.frames || frames;
         if (!frameEl) return;
@@ -851,6 +866,9 @@ export function _startAvatarIdleAnimation(imgElementId, direction) {
     if (frames.length < 2) return;
 
     _idleState.intervalId = setInterval(() => {
+        // Hidden tab: same freeze as the walk loop (frame position is
+        // kept, so the idle cycle picks up where it left off).
+        if (_animPaused()) return;
         const frameEl = document.getElementById(id);
         if (!frameEl) return;
         let next = _idleState.frameIndex + _idleState.direction;

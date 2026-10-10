@@ -14,12 +14,6 @@
 // at amulet/ring scale, leaning slightly more defensive.
 //
 // Talisman-exclusive mods:
-//   arcane_resistance - flat reduction to ALL elemental damage received
-//                       (fire, cold, lightning, shadow) simultaneously.
-//                       Unique mechanic - every other resistance mod in
-//                       the game is element-specific. A single talisman
-//                       mod that shores up every element at once, at a
-//                       lower value than any single resist could reach.
 //   warding - once per map, the talisman absorbs a killing blow and
 //             leaves you at # health instead of dying. Resets each map.
 //             The rarest and most powerful survival mod in the game.
@@ -93,24 +87,6 @@ export const EG_MOD_TABLE_TALISMAN = {
                 { tier: 2, min: 20, max: 29, weight: 300, ilvl: 55 },
                 { tier: 3, min: 10, max: 19, weight: 600, ilvl: 30 },
                 { tier: 4, min: 3, max: 9, weight: 1200, ilvl: 1 }
-            ]
-        },
-
-        // --- TALISMAN-EXCLUSIVE: ARCANE RESISTANCE ---
-        // A flat reduction applied to all elemental damage types at once
-        // (fire, cold, lightning, shadow). Every other resistance mod in
-        // the game targets a single element. This trades raw per-element
-        // ceiling for universal coverage - invaluable for builds that
-        // struggle to cap multiple resistances simultaneously.
-        // The # value is the flat damage reduced per hit per element.
-        arcane_resistance: {
-            id: 'arcane_resistance',
-            label: 'Reduce all Elemental Damage taken by #', labelDe: 'Verringert allen erlittenen Elementarschaden um #',
-            tiers: [
-                { tier: 1, min: 18, max: 25, weight: 70, ilvl: 84 },
-                { tier: 2, min: 11, max: 17, weight: 180, ilvl: 65 },
-                { tier: 3, min: 5, max: 10, weight: 420, ilvl: 40 },
-                { tier: 4, min: 2, max: 4, weight: 950, ilvl: 15 }
             ]
         },
 

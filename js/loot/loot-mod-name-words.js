@@ -49,7 +49,6 @@ export const EG_MOD_NAME_WORDS = {
     cold_resist: ['Frostproof', 'of Frost', 'des Kältewiderstands'],
     lightning_resist: ['Stormproof', 'of Storms', 'des Blitzwiderstands'],
     shadow_resist: ['Duskward', 'of Shade', 'des Schattenwiderstands'],
-    arcane_resistance: ['Runic', 'of Hexbreaking', 'des Arkanwiderstands'],
 
     // --- PUZZLE / MISTAKE RELATED ---
     mistake_count: ['Careful', 'of Care', 'der Fehleranzahl'],
@@ -193,7 +192,7 @@ export const EG_MOD_NAME_WORDS = {
     map_reduced_block: ['Staved', 'of Splintering', 'des Zersplitterns'],
     map_hazard_lightning: ['Stormy', 'of Tempests', 'der Stürme'],
     map_hazard_darkness: ['Shadowed', 'of Darkness', 'der Finsternis'],
-    map_hazard_arcane: ['Warped', 'of Arcane Storms', 'der Arkanstürme'],
+    map_hazard_arcane: ['Warped', 'of Umbral Storms', 'der Schattenstürme'],
     map_hazard_volatile: ['Unstable', 'of Volatiles', 'der Instabilität'],
     map_hazard_frostnova: ['Shivering', 'of Frost Novas', 'der Frostnovas'],
 };

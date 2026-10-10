@@ -80,17 +80,21 @@ if (typeof _egClearCenterGridBanners !== 'function') {
 //-------------------LIFE REGENERATION-----------------------------------
 //------------------------------------------------------------------------
 
-// Heals the player for lifeRegen HP once per second during an encounter.
+// Heals the player once per second during an encounter: the flat gear
+// lifeRegen bucket (HP per second) PLUS the tree-sourced percentage bucket
+// (lifeRegenPct, effects pipeline) scaled by the CURRENT maximum Life, so
+// the heal grows with the player's Life pool exactly as advertised.
 export let _egLastLifeRegenAt = 0;
 export function _egTickLifeRegen() {
     const now = Date.now();
     if (now - _egLastLifeRegenAt < EG_LIFE_REGEN_INTERVAL_MS) return;
     _egLastLifeRegenAt = now;
 
-    const regen = _egComputePlayerStats().lifeRegen || 0;
+    const stats = _egComputePlayerStats();
+    const regen = (stats.lifeRegen || 0) + (globalThis.playerMaxHP * (stats.lifeRegenPct || 0)) / 100;
     if (regen <= 0 || globalThis.playerCurrentHP <= 0 || globalThis.playerCurrentHP >= globalThis.playerMaxHP) return;
 
-    // Active map run: No Life Regeneration - gear regen is disabled.
+    // Active map run: No Life Regeneration - regeneration is disabled.
     if (typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration')) return;
 
     globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + regen);

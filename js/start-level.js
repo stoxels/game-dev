@@ -265,15 +265,16 @@ function _applyExtendedSessionBonus() {
 }
 
 // expected_value (nodes vary): adds seconds proportional to total cell count.
-// Contributes 5/2/3 seconds per 10 cells for nodes 1/2/3 respectively.
+// Contributes 2/3 seconds per 10 cells for notables 2/3 respectively.
+// Node 252 (expected_value_1) was reworked onto the effects pipeline
+// (accuracy/attributes) and no longer grants time - its branch is gone.
 // Blocked entirely by keystone_gamblers_ruin.
 function _applyExpectedValueBonus() {
     if (ptHasSkill('keystone_gamblers_ruin')) return 0;
-    if (!ptHasSkill('expected_value_1') && !ptHasSkill('expected_value_2') && !ptHasSkill('expected_value_3')) return 0;
+    if (!ptHasSkill('expected_value_2') && !ptHasSkill('expected_value_3')) return 0;
 
     const totalCells = cur.grid.length * cur.grid[0].length;
     let secsPerTen = 0;
-    if (ptHasSkill('expected_value_1')) secsPerTen += 5;
     if (ptHasSkill('expected_value_2')) secsPerTen += 2;
     if (ptHasSkill('expected_value_3')) secsPerTen += 3;
     return Math.floor(totalCells / 10) * secsPerTen;

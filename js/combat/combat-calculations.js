@@ -26,14 +26,15 @@ export function _egCalcPlayerDamage() {
     // Elemental damage adds after the physical multiplier - it isn't scaled by inc_physical_damage.
     // "+% increased elemental damage" (passive tree) multiplies the elemental
     // share of the hit; the physical share above is untouched. The passive tree's
-    // fire-only and cold-only increases (fireDamageIncPct / coldDamageIncPct)
-    // stack ON TOP of it for their own element alone. The per-element
+    // per-element increases (fireDamageIncPct / coldDamageIncPct /
+    // lightningDamageIncPct) stack ON TOP of it for their own element alone. The per-element
     // breakdown is kept in _egLastHitElements (already increased) so the
     // impact site can apply the target monster's elemental resistances.
     const elemMult = 1 + (stats.elementalDamageIncPct || 0) / 100;
     const elements = _egScaleElements(_egRollElementalBreakdown(stats), elemMult);
     elements.fire *= 1 + (stats.fireDamageIncPct || 0) / 100;
     elements.cold *= 1 + (stats.coldDamageIncPct || 0) / 100;
+    elements.lightning *= 1 + (stats.lightningDamageIncPct || 0) / 100;
     _egLastHitElements = elements;
     dmg += elements.fire + elements.cold + elements.lightning + elements.shadow;
 
@@ -107,15 +108,16 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // projectile channel - scaled by charge like the physical share so the
     // stored breakdown stays consistent with the final hit size, then by
     // "+% increased elemental damage" from the passive tree and finally by
-    // that tree's fire-only and cold-only increases.
+    // that tree's per-element increases.
     const rollEl = (min, max) => (min > 0 || max > 0) ? (min + Math.random() * (max - min)) * charge : 0;
     const elemMult = 1 + (stats.elementalDamageIncPct || 0) / 100;
     const fireMult = elemMult * (1 + (stats.fireDamageIncPct || 0) / 100);
     const coldMult = elemMult * (1 + (stats.coldDamageIncPct || 0) / 100);
+    const lightningMult = elemMult * (1 + (stats.lightningDamageIncPct || 0) / 100);
     const elements = {
         fire: rollEl(stats.meleeFireMin, stats.meleeFireMax) * fireMult,
         cold: rollEl(stats.meleeColdMin, stats.meleeColdMax) * coldMult,
-        lightning: rollEl(stats.meleeLightningMin, stats.meleeLightningMax) * elemMult,
+        lightning: rollEl(stats.meleeLightningMin, stats.meleeLightningMax) * lightningMult,
         shadow: rollEl(stats.meleeShadowMin, stats.meleeShadowMax) * elemMult,
     };
     _egLastMeleeElements = elements;

@@ -233,7 +233,7 @@ export function buildSpellbookHeadHTML(title, sub) {
 // SPELLBOOK_SCHOOL_ORDER is the canonical school set (elemental first,
 // physical last). Themes are read defensively: universal-spells.js loads
 // after the registry in some load orders.
-const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'nature', 'holy', 'shadow', 'arcane', 'physical'];
+const SPELLBOOK_SCHOOL_ORDER = ['fire', 'frost', 'lightning', 'holy', 'shadow', 'arcane', 'physical'];
 
 // The offensive school of a universal spell id, or null when the spell is
 // not an offensive universal (support / movement live in their own sections;

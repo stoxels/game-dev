@@ -3,6 +3,7 @@ import { EG_ART } from '../endgame/endgame-art.js';
 import { _ptAllocated, _ptBuildAdjacency, _ptGetNodeVisualState, _ptIsDeallocatable, _ptLang, _ptOnNodeClick, _ptPoints, _ptRefreshPointsDisplay, ensurePassiveTreeRoot } from './probability-tree-state-points.js';
 import { getPassiveTreeRootId, isPassiveTreeStartNode } from './probability-tree.js';
 import { isPassiveTreeNodeReworked } from './probability-tree-rework.js';
+import { ptResolveNodeDesc } from './pt-effects.js';
 import { _ptBindEvents, _ptFitToView } from './probability-tree-viewport.js';
 import { PT_COL_ALLOCATED_BG, PT_COL_ALLOCATED_BORDER, PT_COL_ALLOCATED_DOT, PT_COL_LOCKED_BG, PT_COL_LOCKED_BORDER, PT_COL_LOCKED_DOT, PT_COL_START, PT_COL_UNLOCKED_BG, PT_COL_UNLOCKED_BORDER, PT_COL_UNLOCKED_DOT, PT_CONN_ALLOCATED, PT_CONN_UNLOCKED, PT_CONN_WIDTH, PT_NODE_RADIUS, PT_PADDING } from './probability-tree.js';
 //------------------------------------------------------------------------
@@ -344,7 +345,9 @@ export function _ptTooltipResolveName(skill, def, lang) {
 // Builds the localised description string (newlines → <br>).
 export function _ptTooltipResolveDesc(def, lang) {
     if (!def) return '';
-    const raw = _ptPickLang(lang, def.descEn, def.descDe || def.descEn);
+    // Hand-written descEn/descDe win; effects nodes without authored text
+    // get their lines generated from the registry (pt-effects.js).
+    const raw = ptResolveNodeDesc(def, lang);
     return raw ? raw.replace(/\n/g, '<br>') : '';
 }
 
@@ -823,7 +826,7 @@ function _ptBuildReworkNodeTemplate(id) {
 
     const lang = _ptLang();
     const name = _ptTooltipResolveName(skill, def, lang);
-    const stats = _ptPickLang(lang, def.descEn, def.descDe || def.descEn) || 'No current stats.';
+    const stats = ptResolveNodeDesc(def, lang) || 'No current stats.';
     const connectionCount = Array.isArray(globalThis._pt_conns)
         ? globalThis._pt_conns.filter(connection => connection.from === id || connection.to === id).length
         : 0;
@@ -838,18 +841,35 @@ function _ptBuildReworkNodeTemplate(id) {
         'Current stats (OLD VERSION - reference only; these lines get REPLACED, never appended to):',
         stats,
         '',
-        '--- FULL REWORK, NOT AN APPEND ---',
-        'Replace this node from scratch in js/probability-tree/probability-tree-data.js:',
-        '  - new name, new EN/DE description with one stat per line, its own statKey, and real passive art or an art-backlog entry (never an emoji)',
+        '--- REWORK, NOT AN APPEND ---',
+        'Replace this node from scratch in js/probability-tree/probability-tree-data.js.',
+        'STEP 1 - pick the path:',
+        '  A) PLAIN STAT REWORK (default - every advertised line is a number bonus):',
+        '     use the EFFECTS pipeline. Replace descEn/descDe with an "effects" array,',
+        '     one entry per advertised line, value after the colon:',
+        '       "effects": ["str_flat:5", "armour_flat:10"]',
+        '     - the registry (js/probability-tree/pt-effects.js) owns the stat channel AND',
+        '       the EN/DE tooltip text per effect; tooltips, character-sheet wiring and',
+        '       "reworked" status all derive from it - no bonus-table entry, no translation',
+        '       strings, no PT_REWORKED_NODE_IDS edit and no per-node test file needed',
+        '     - if the needed effect does not exist yet, add ONE registry entry (channel +',
+        '       en/de template) instead of hand-writing descriptions or table rows',
+        '     - keep/give the node a stable descriptive statKey (address only - an effects',
+        '       node needs no table entry behind it)',
+        '     - the generic pt-effects-integrity suite verifies the node automatically',
+        '  B) UNIQUE KEYSTONE MECHANIC (behaviour, not numbers): keep the full ritual -',
+        '     hand-written EN/DE description with one stat per line, its own statKey wired',
+        '     to real gameplay, a dedicated wiring test, and this ID added to',
+        '     PT_REWORKED_NODE_IDS only after the gate passes',
         '  - keep the numeric Node ID above; do NOT add text to the old description shown here',
-        '  - wire every advertised line to real gameplay, and audit every consumer before renaming a shared statKey',
-        '  - run the repo gate before registering the rework (fresh clone: npm ci, then all four must pass):',
+        '  - set icon to "" and skip art entirely (art is deferred to the separate passive tree art pass; never add an emoji)',
+        '  - audit every consumer before renaming a shared statKey',
+        '  - run the repo gate before considering the rework done (fresh clone: npm ci, then all four must pass):',
         '      npm run lint && npm test && npm run phase2:verify && npm run build',
         '    (npm run verify = lint + tests + phase2:verify; .github/workflows/ci.yml',
         '    runs this same gate on every push/PR - see README.md, Passive tree reworks)',
-        '  - only after the gate passes: add this ID to PT_REWORKED_NODE_IDS',
         '',
-        'The node shall receive the following FULL rework:'
+        'The node shall receive the following rework:'
     );
     return lines.join('\n');
 }
@@ -1084,8 +1104,8 @@ export function _ptBuildSearchHaystack(def) {
     return [
         def.nameEn || '',
         def.nameDe || '',
-        def.descEn || '',
-        def.descDe || '',
+        ptResolveNodeDesc(def, 'en') || '',
+        ptResolveNodeDesc(def, 'de') || '',
         def.statKey || '',
     ].join(' ').toLowerCase();
 }

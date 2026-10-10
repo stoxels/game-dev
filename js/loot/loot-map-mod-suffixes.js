@@ -332,7 +332,7 @@ export const EG_MAP_MOD_SUFFIXES = {
         },
         map_hazard_arcane: {
             id: 'map_hazard_arcane', affects: 'player',
-            label: 'Arcane Storms sweep across the Map (#% intensity)', labelDe: 'Arkanstürme fegen über die Karte (#% Intensität)',
+            label: 'Umbral Storms sweep across the Map (#% intensity)', labelDe: 'Schattenstürme fegen über die Karte (#% Intensität)',
             tiers: [
                 { tier: 1, min: 104, max: 130, weight: 85, ilvl: 62 },
                 { tier: 2, min: 65, max: 98, weight: 290, ilvl: 32 },

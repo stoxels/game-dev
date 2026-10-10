@@ -244,8 +244,8 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         _uspReflectThorns(opts.attacker, amount);
     }
 
-    // Elemental resistances (fire/cold/lightning/shadow % + flat Arcane
-    // Resistance) mitigate elemental hits before armour and absorption.
+    // Elemental resistances (fire/cold/lightning/shadow %) mitigate
+    // elemental hits before armour and absorption.
     if (element) amount = _egCalcPlayerResistanceReduction(amount, stats, element);
 
     // Ailments: a shocked player takes amplified damage from all hits.

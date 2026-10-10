@@ -32,9 +32,10 @@ import { STATE } from '../state.js';
 //                  'shadow' | 'physical'. (The combat engine resists the
 //                  four elements per-share; 'physical' hits carry no
 //                  elemental breakdown so only physical resistance applies.
-//                  Arcane, holy and nature visuals map onto the closest key.)
+//                  Spell themes outside this set (holy, a fire-tinted
+//                  'arcane' visual) map onto the closest resist key.)
 //     damageKind - design scaling key: 'fire' | 'cold' | 'lightning' |
-//                  'shadow' | 'arcane' | 'holy' | 'nature' | 'physical'.
+//                  'shadow' | 'holy' | 'physical'.
 //                  The future Probability Tree reads this via
 //                  getUniversalSpellDamageBonus().
 //     scalingTags- extra tags ('area', 'projectile', 'dot', 'channel') the
@@ -148,7 +149,7 @@ export const UNIVERSAL_SPELL_DEFS = [
 
     // ── ARCANE ──────────────────────────────────────────────────────────
     {
-        id: 'usp_arcane_missiles', icon: '✨', theme: 'arcane', element: 'shadow', damageKind: 'arcane',
+        id: 'usp_arcane_missiles', icon: '✨', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'volley', dmg: [3, 5], count: 5, manaCost: 39, cooldownSeconds: 16, castTimeSeconds: 1.0,
         tags: ['Spell', 'Arcane', 'Projectile'], scalingTags: ['spell', 'arcane', 'projectile'],
         nameEn: 'Arcane Missiles', nameDE: 'Arkane Geschosse',
@@ -157,7 +158,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'arcaneReveal',
     },
     {
-        id: 'usp_arcane_explosion', icon: '💫', theme: 'arcane', element: 'shadow', damageKind: 'arcane',
+        id: 'usp_arcane_explosion', icon: '💫', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'nova', dmg: [5, 9], manaCost: 39, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Arcane', 'Area'], scalingTags: ['spell', 'arcane', 'area'],
         nameEn: 'Arcane Explosion', nameDE: 'Arkane Explosion',
@@ -166,7 +167,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'transitionMatrix',
     },
     {
-        id: 'usp_arcane_blast', icon: '🔮', theme: 'arcane', element: 'shadow', damageKind: 'arcane',
+        id: 'usp_arcane_blast', icon: '🔮', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 14, castTimeSeconds: 1.2,
         tags: ['Spell', 'Arcane', 'Projectile'], scalingTags: ['spell', 'arcane', 'projectile'],
         nameEn: 'Arcane Blast', nameDE: 'Arkaner Stoß',
@@ -175,7 +176,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'arcaneReveal',
     },
     {
-        id: 'usp_disintegrate', icon: '⚛️', theme: 'arcane', element: 'shadow', damageKind: 'arcane',
+        id: 'usp_disintegrate', icon: '⚛️', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'volley', dmg: [4, 6], count: 4, volleyDelayMs: 260, manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0,
         tags: ['Spell', 'Arcane', 'Channel'], scalingTags: ['spell', 'arcane', 'channel'],
         nameEn: 'Disintegrate', nameDE: 'Desintegration',
@@ -222,7 +223,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'bayesTrapExplosion',
     },
 
-    // ── LIGHTNING & NATURE ──────────────────────────────────────────────
+    // ── LIGHTNING ──────────────────────────────────────────────────────────
     {
         id: 'usp_lightning_bolt', icon: '⚡', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
         behavior: 'single', dmg: [11, 13], manaCost: 26, cooldownSeconds: 8, castTimeSeconds: 0.6,
@@ -242,16 +243,16 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'gust_thunder',
     },
     {
-        id: 'usp_wrath', icon: '🍃', theme: 'nature', element: 'lightning', damageKind: 'nature',
+        id: 'usp_wrath', icon: '🍃', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
         behavior: 'single', dmg: [10, 12], manaCost: 23, cooldownSeconds: 7, castTimeSeconds: 0.5,
-        tags: ['Spell', 'Nature', 'Projectile'], scalingTags: ['spell', 'nature', 'projectile'],
+        tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Wrath', nameDE: 'Zorn der Natur',
-        descEn: 'Hurls the fury of the storm. Nature damage for modest mana.',
-        descDE: 'Schleudert den Zorn des Sturms. Naturschaden für wenig Mana.',
+        descEn: 'Hurls the fury of the storm. Lightning damage for modest mana.',
+        descDE: 'Schleudert den Zorn des Sturms. Blitzschaden für wenig Mana.',
         sfx: 'syla_nature',
     },
     {
-        id: 'usp_starfall', icon: '🌟', theme: 'arcane', element: 'fire', damageKind: 'arcane',
+        id: 'usp_starfall', icon: '🌟', theme: 'arcane', element: 'fire', damageKind: 'shadow',
         behavior: 'starfall', dmg: [3, 5], count: 6, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
         tags: ['Spell', 'Arcane', 'Area'], scalingTags: ['spell', 'arcane', 'area'],
         nameEn: 'Starfall', nameDE: 'Sternenfall',
@@ -385,12 +386,12 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'fieldScan',
     },
     {
-        id: 'usp_serpent_sting', icon: '🐍', theme: 'arrow', element: 'lightning', damageKind: 'nature',
+        id: 'usp_serpent_sting', icon: '🐍', theme: 'arrow', element: 'lightning', damageKind: 'lightning',
         behavior: 'ticks', dmg: [4, 5], tickDmg: [2, 4], ticks: 4, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.7,
-        tags: ['Spell', 'Nature', 'Damage over Time'], scalingTags: ['spell', 'nature', 'dot', 'projectile'],
+        tags: ['Spell', 'Lightning', 'Damage over Time'], scalingTags: ['spell', 'lightning', 'dot', 'projectile'],
         nameEn: 'Serpent Sting', nameDE: 'Schlangenbiss',
-        descEn: 'A venom-tipped arrow: instant nature damage plus poison over 4 seconds.',
-        descDE: 'Ein vergifteter Pfeil: sofortiger Naturschaden plus Gift über 4 Sekunden.',
+        descEn: 'A venom-tipped arrow: instant lightning damage plus poison over 4 seconds.',
+        descDE: 'Ein vergifteter Pfeil: sofortiger Blitzschaden plus Gift über 4 Sekunden.',
         sfx: 'syla_nature',
     },
     {
@@ -484,9 +485,9 @@ export const UNIVERSAL_SPELL_DEFS = [
         id: 'usp_arc', icon: '🔗', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
         behavior: 'chain', dmg: [10, 13], chainFalloff: 0.8, chainMax: 5, manaCost: 47, cooldownSeconds: 20, castTimeSeconds: 1.2,
         tags: ['Spell', 'Lightning', 'Chaining'], scalingTags: ['spell', 'lightning', 'chain'],
-        nameEn: 'Arc', nameDE: 'Lichtbogen',
+        nameEn: 'Arc', nameDE: 'Naturbogen',
         descEn: 'An arc of lightning that chains across up to 5 enemies, barely weakening.',
-        descDE: 'Ein Lichtbogen, der über bis zu 5 Gegner springt und kaum schwächer wird.',
+        descDE: 'Ein Naturbogen, der über bis zu 5 Gegner springt und kaum schwächer wird.',
         sfx: 'gust_thunder',
     },
     {
@@ -636,7 +637,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     // target check, and they still need a live encounter to be worth
     // casting (and to be castable at all).
     {
-        id: 'usp_mend_wounds', icon: '🩹', theme: 'holy', element: 'arcane', damageKind: 'holy',
+        id: 'usp_mend_wounds', icon: '🩹', theme: 'holy', element: 'fire', damageKind: 'holy',
         behavior: 'heal', selfCast: true, manaCost: 26, cooldownSeconds: 25,
         healFlat: 28, healPct: 10,
         tags: ['Spell', 'Holy', 'Support', 'Heal'], scalingTags: ['spell', 'holy', 'support', 'heal'],
@@ -646,17 +647,17 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'heart_heals',
     },
     {
-        id: 'usp_renewal', icon: '🌿', theme: 'nature', element: 'nature', damageKind: 'nature',
+        id: 'usp_renewal', icon: '🌿', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
         behavior: 'hot', selfCast: true, manaCost: 22, cooldownSeconds: 22,
         healTickFlat: 6, healTickPct: 2, ticks: 6, tickMs: 1000,
-        tags: ['Spell', 'Nature', 'Support', 'Heal over Time'], scalingTags: ['spell', 'nature', 'support', 'heal'],
+        tags: ['Spell', 'Lightning', 'Support', 'Heal over Time'], scalingTags: ['spell', 'lightning', 'support', 'heal'],
         nameEn: 'Renewal', nameDE: 'Erneuerung',
         descEn: 'Plants a renewal bloom on you that heals once per second for 6 seconds. More total Life than Mend Wounds, but it arrives slowly - cast it before the hit, not after.',
         descDE: 'Pflanzt eine Erneuerungsblüte auf dir, die 6 Sekunden lang einmal pro Sekunde heilt. Insgesamt mehr Leben als „Wunden schließen“, aber langsam - wirke sie vor dem Treffer, nicht danach.',
         sfx: 'heart_heals',
     },
     {
-        id: 'usp_barrier', icon: '🔷', theme: 'arcane', element: 'shadow', damageKind: 'arcane',
+        id: 'usp_barrier', icon: '🔷', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'shield', selfCast: true, manaCost: 31, cooldownSeconds: 28,
         absorbFlat: 26, absorbPct: 45,
         tags: ['Spell', 'Arcane', 'Support', 'Shield'], scalingTags: ['spell', 'arcane', 'support', 'shield'],
@@ -666,7 +667,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'player_shield_damage_taken',
     },
     {
-        id: 'usp_bulwark', icon: '🛡️', theme: 'holy', element: 'arcane', damageKind: 'holy',
+        id: 'usp_bulwark', icon: '🛡️', theme: 'holy', element: 'fire', damageKind: 'holy',
         behavior: 'guard', selfCast: true, manaCost: 26, cooldownSeconds: 30, buffSeconds: 8,
         drPct: 18, drPctPerRank: 1.5, drPctCap: 32,
         armourPct: 40, armourPctPerRank: 4, armourPctCap: 76,
@@ -677,17 +678,17 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'player_shield_damage_taken',
     },
     {
-        id: 'usp_windward', icon: '💨', theme: 'nature', element: 'nature', damageKind: 'nature',
+        id: 'usp_windward', icon: '💨', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
         behavior: 'evade', selfCast: true, manaCost: 22, cooldownSeconds: 28, buffSeconds: 8,
         dodgePct: 12, dodgePctPerRank: 1, dodgePctCap: 21,
-        tags: ['Spell', 'Nature', 'Support', 'Buff'], scalingTags: ['spell', 'nature', 'support'],
+        tags: ['Spell', 'Lightning', 'Support', 'Buff'], scalingTags: ['spell', 'lightning', 'support'],
         nameEn: 'Windward', nameDE: 'Windwärts',
         descEn: 'Wind carries your steps: a flat chance to dodge physical attacks outright. Complements Armour rather than stacking with it - evasion negates hits, armour shrinks them.',
         descDE: 'Wind trägt deine Schritte: eine feste Chance, physischen Angriffen komplett auszuweichen. Ergänzt Rüstung, statt sich damit zu stapeln - Ausweichen verhindert Treffer, Rüstung verkleinert sie.',
         sfx: 'classSelected',
     },
     {
-        id: 'usp_aegis_ward', icon: '✨', theme: 'holy', element: 'arcane', damageKind: 'holy',
+        id: 'usp_aegis_ward', icon: '✨', theme: 'holy', element: 'fire', damageKind: 'holy',
         behavior: 'ward', selfCast: true, manaCost: 38, cooldownSeconds: 40, buffSeconds: 12,
         wardCharges: 2, wardChargesPerRank: 0.34, wardChargesCap: 5,
         tags: ['Spell', 'Holy', 'Support', 'Buff'], scalingTags: ['spell', 'holy', 'support'],
@@ -723,7 +724,7 @@ export const UNIVERSAL_SPELL_DEFS = [
     //   Windstep  no jump at all, but the most total distance per cast
     //   Rift Anchor  two-stage: plant it, then leave from anywhere
     {
-        id: 'usp_blink', icon: '🌀', theme: 'arcane', element: 'arcane', damageKind: 'arcane',
+        id: 'usp_blink', icon: '🌀', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'blink', selfCast: true, manaCost: 34, cooldownSeconds: 18,
         // Charge pool instead of a single cooldown: each cast spends one
         // charge, spent charges recharge individually and in parallel (see
@@ -762,17 +763,17 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'classSelected',
     },
     {
-        id: 'usp_windstep', icon: '🪶', theme: 'nature', element: 'nature', damageKind: 'nature',
+        id: 'usp_windstep', icon: '🪶', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
         behavior: 'windstep', selfCast: true, manaCost: 19, cooldownSeconds: 20, buffSeconds: 6,
         speedPct: 30, speedPctPerRank: 3.5, speedPctCap: 62,
-        tags: ['Spell', 'Nature', 'Movement', 'Buff'], scalingTags: ['spell', 'nature', 'movement'],
+        tags: ['Spell', 'Lightning', 'Movement', 'Buff'], scalingTags: ['spell', 'lightning', 'movement'],
         nameEn: 'Windstep', nameDE: 'Windschritt',
         descEn: 'Lightens your feet for 6 seconds. No burst, no teleport - just more total ground covered than any single jump, which is what you want when the fight is a long dance rather than one dodge.',
         descDE: 'Macht deine Füße 6 Sekunden lang leicht. Kein Sprung, keine Teleportation - nur mehr zurückgelegte Strecke als mit jedem einzelnen Sprung, was du willst, wenn der Kampf ein langer Tanz ist statt eines Ausweichmannövers.',
         sfx: 'classSelected',
     },
     {
-        id: 'usp_rift_anchor', icon: '📍', theme: 'arcane', element: 'arcane', damageKind: 'arcane',
+        id: 'usp_rift_anchor', icon: '📍', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
         behavior: 'anchor', selfCast: true, manaCost: 17, cooldownSeconds: 26,
         anchorSeconds: 15, anchorPlaceCooldownSeconds: 3,
         tags: ['Spell', 'Arcane', 'Movement', 'Recall'], scalingTags: ['spell', 'arcane', 'movement'],
@@ -1827,7 +1828,7 @@ function _uspUnlockHint(spell) {
 // here on top of gear. It returns zeros today; when the tree exists,
 // implement getDevTreeSpellBonus(spell) (or edit this function) to sum
 // allocated nodes matching spell.damageKind / spell.scalingTags.
-//   spell.damageKind: fire|cold|lightning|shadow|arcane|holy|nature|physical
+//   spell.damageKind: fire|cold|lightning|shadow|holy|physical
 //   spell.scalingTags: spell + kind + area|projectile|dot|chain|channel
 
 function getUniversalSpellDamageBonus(spell) {
@@ -2098,19 +2099,20 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
         dmg *= 1 + ((stats.physIncPct || 0) + (tree.incPct || 0)) / 100;
     } else {
         dmg += (stats.spellDamageFlat || 0) + (tree.flat || 0);
-        // Elemental spells (fire / frost / nature / arcane - whatever the
+        // Elemental spells (fire / frost / lightning / arcane - whatever the
         // def's element maps to) additionally ride the character's global
         // "+% increased elemental damage" from the passive tree. Physical
         // spells never do - they scale with physical gear above.
-        // Fire/cold spells further ride that element's tree-only increase.
-        // Nature keys on damageKind instead of element: no gear mod adds
-        // nature damage to a weapon hit, and its nature spells (usp_wrath,
-        // usp_serpent_sting) sit on a lightning element.
+        // Fire/cold/lightning spells further ride their own element's tree-only
+        // increase. Lightning is one of the four elemental damage types, so it
+        // keys on the spell's element exactly like fire and cold do; the two
+        // lightning damage spells (Wrath, Serpent Sting) are lightning-element
+        // spells themselves, so they are covered by the same line.
         const fireBonus = (spell.element === 'fire') ? (stats.fireDamageIncPct || 0) : 0;
         const coldBonus = (spell.element === 'cold') ? (stats.coldDamageIncPct || 0) : 0;
-        const natureBonus = (spell.damageKind === 'nature') ? (stats.natureDamageIncPct || 0) : 0;
+        const lightningBonus = (spell.element === 'lightning') ? (stats.lightningDamageIncPct || 0) : 0;
         dmg *= 1 + ((stats.spellDamageIncPct || 0) + (tree.incPct || 0)
-            + (stats.elementalDamageIncPct || 0) + fireBonus + coldBonus + natureBonus) / 100;
+            + (stats.elementalDamageIncPct || 0) + fireBonus + coldBonus + lightningBonus) / 100;
     }
 
     const critMult = _uspRollCritMult();
@@ -2582,8 +2584,8 @@ function _uspScalingLine(spell) {
     const parts = [isPhys ? 'Attack Damage' : 'Spell Damage'];
     const kindName = {
         fire: 'Fire Damage', cold: 'Cold Damage', lightning: 'Lightning Damage',
-        shadow: 'Shadow Damage', arcane: 'Arcane Damage', holy: 'Holy Damage',
-        nature: 'Nature Damage', physical: 'Physical Damage',
+        shadow: 'Shadow Damage', holy: 'Holy Damage',
+        physical: 'Physical Damage',
     }[spell.damageKind];
     if (kindName && parts.indexOf(kindName) === -1) parts.push(kindName);
     const tagName = {

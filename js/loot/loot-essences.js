@@ -37,7 +37,7 @@ try { Object.defineProperty(globalThis, '_egEssenceStash', { get() { return _egE
 
 // Complete list of individual modifier families - one essence per family.
 export const _EG_ESSENCE_FAMILIES = [
-    'absorption_on_kill', 'absorption_regen_rate', 'accuracy', 'agility', 'arcane_resistance', 'arcane_surge',
+    'absorption_on_kill', 'absorption_regen_rate', 'accuracy', 'agility', 'arcane_surge',
     'attack_speed', 'block_chance', 'block_recovery', 'chain', 'chance_for_new_question', 'chance_to_blind',
     'chance_to_convert', 'chance_to_freeze', 'chance_to_ignite', 'chance_to_shock', 'channel', 'cleave',
     'cold_damage', 'cold_resist', 'crit_chance', 'crit_multiplier', 'deflect', 'deflect_damage', 'dodge', 'echo',

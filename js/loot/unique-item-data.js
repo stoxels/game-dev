@@ -837,7 +837,6 @@ export const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 520, absorption: 0 },
         bonuses: [
             { key: 'spell_dodge', value: 15, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
-            { key: 'arcane_resistance', value: 25, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
             { key: 'flat_health', value: 67, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' }
         ],
@@ -1373,7 +1372,6 @@ export const EG_UNIQUE_ITEMS = [
         bonuses: [
             { key: 'dodge', value: 10, en: '+#% chance to Dodge Attacks', de: '+#% Ausweichchance' },
             { key: 'spell_dodge', value: 10, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
-            { key: 'arcane_resistance', value: 20, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
             { key: 'flat_health', value: 73, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [
@@ -1961,8 +1959,7 @@ export const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 240, absorption: 0 },
         bonuses: [
             { key: 'chance_to_blind', value: 12, en: '#% chance to Blind Monsters on hit', de: '#% Chance, Monster bei Treffern zu blenden' },
-            { key: 'spell_dodge', value: 8, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' },
-            { key: 'arcane_resistance', value: 15, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' }
+            { key: 'spell_dodge', value: 8, en: '+#% chance to Dodge Spells', de: '+#% Zauber-Ausweichchance' }
         ],
         downsides: [
             { key: 'cold_resist', value: -22, en: '-#% to Cold Resistance', de: '-#% Kältewiderstand' }
@@ -2138,7 +2135,6 @@ export const EG_UNIQUE_ITEMS = [
         minLevel: 44,
         requirements: { level: 44, str: 0, agi: 0, int: 167 },
         bonuses: [
-            { key: 'arcane_resistance', value: 25, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
             { key: 'flat_health', value: 44, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'flat_mana', value: 35, en: '+# to maximum Mana', de: '+# zu maximalem Mana' }
         ],
@@ -2696,7 +2692,6 @@ export const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 0, absorption: 465 },
         bonuses: [
             { key: 'warding', value: 120, en: '+# Warding', de: '+# Wardschutz' },
-            { key: 'arcane_resistance', value: 20, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
             { key: 'flat_health', value: 79, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'intelligence', value: 20, en: '+# to Intelligence', de: '+# zu Intelligenz' }
         ],
@@ -3856,7 +3851,6 @@ export const EG_UNIQUE_ITEMS = [
         defenses: { armour: 0, evasion: 0, absorption: 167 },
         bonuses: [
             { key: 'spell_block_chance', value: 12, en: '+#% to Spell Block Chance', de: '+#% Zauberblockchance' },
-            { key: 'arcane_resistance', value: 30, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
             { key: 'flat_health', value: 70, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
         ],
@@ -5280,7 +5274,6 @@ export const EG_UNIQUE_ITEMS = [
         requirements: { level: 57, str: 0, agi: 0, int: 216 },
         defenses: { armour: 0, evasion: 60, absorption: 180 },
         bonuses: [
-            { key: 'arcane_resistance', value: 40, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
             { key: 'inc_spell_damage', value: 20, en: '#% increased Spell Damage', de: '#% erhöhter Zauberschaden' },
             { key: 'flat_health', value: 77, en: '+# to maximum Health', de: '+# zu maximalem Leben' },
             { key: 'strength', value: 20, en: '+# to Strength', de: '+# zu Stärke' }
@@ -5575,7 +5568,6 @@ export const EG_UNIQUE_ITEMS = [
         requirements: { level: 23, str: 40, agi: 0, int: 48 },
         bonuses: [
             { key: 'spell_block_chance', value: 12, en: '+#% Spell Block Chance', de: '+#% Zauberblockchance' },
-            { key: 'arcane_resistance', value: 25, en: '+# Arcane Resistance', de: '+# Arkanwiderstand' },
             { key: 'flat_health', value: 30, en: '+# to maximum Health', de: '+# zu maximalem Leben' }
         ],
         downsides: [

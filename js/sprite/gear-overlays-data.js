@@ -46,8 +46,8 @@ export const GEAR_GRIP_DATA = {
     0.693
    ],
    "autoHandle": [
-    0.673,
-    0.722
+    0.674,
+    0.723
    ],
    "scale": 0.685,
    "offsetByDir": {
@@ -75,9 +75,9 @@ export const GEAR_GRIP_DATA = {
     739
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
+    0.172,
+    0.824,
     0.824
    ],
    "tuned": true
@@ -90,8 +90,8 @@ export const GEAR_GRIP_DATA = {
     0.684
    ],
    "autoHandle": [
-    0.272,
-    0.741
+    0.271,
+    0.742
    ],
    "scale": 0.575,
    "offsetByDir": {
@@ -134,8 +134,8 @@ export const GEAR_GRIP_DATA = {
     0.691
    ],
    "autoHandle": [
-    0.338,
-    0.726
+    0.339,
+    0.727
    ],
    "scale": 0.6,
    "offsetByDir": {
@@ -210,7 +210,7 @@ export const GEAR_GRIP_DATA = {
     0.18,
     0.172,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": true
   },
@@ -251,7 +251,7 @@ export const GEAR_GRIP_DATA = {
     735
    ],
    "bbox": [
-    0.184,
+    0.18,
     0.172,
     0.82,
     0.828
@@ -266,7 +266,7 @@ export const GEAR_GRIP_DATA = {
     0.686
    ],
    "autoHandle": [
-    0.305,
+    0.306,
     0.743
    ],
    "scale": 0.4,
@@ -295,9 +295,9 @@ export const GEAR_GRIP_DATA = {
     723
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": true
@@ -311,7 +311,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.341,
-    0.73
+    0.734
    ],
    "scale": 0.52,
    "offsetByDir": {
@@ -339,10 +339,10 @@ export const GEAR_GRIP_DATA = {
     711
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
-    0.836
+    0.809,
+    0.84
    ],
    "tuned": true
   },
@@ -355,7 +355,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.353,
-    0.746
+    0.747
    ],
    "scale": 0.555,
    "offsetByDir": {
@@ -383,7 +383,7 @@ export const GEAR_GRIP_DATA = {
     715
    ],
    "bbox": [
-    0.191,
+    0.188,
     0.164,
     0.809,
     0.836
@@ -398,7 +398,7 @@ export const GEAR_GRIP_DATA = {
     0.732
    ],
    "autoHandle": [
-    0.278,
+    0.279,
     0.733
    ],
    "scale": 0.575,
@@ -476,8 +476,8 @@ export const GEAR_GRIP_DATA = {
     0.748
    ],
    "autoHandle": [
-    0.298,
-    0.734
+    0.297,
+    0.737
    ],
    "scale": 0.58,
    "offsetByDir": null,
@@ -500,10 +500,10 @@ export const GEAR_GRIP_DATA = {
     720
    ],
    "bbox": [
-    0.188,
-    0.168,
+    0.184,
+    0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": true
   },
@@ -515,8 +515,8 @@ export const GEAR_GRIP_DATA = {
     0.678
    ],
    "autoHandle": [
-    0.298,
-    0.74
+    0.297,
+    0.743
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -539,10 +539,10 @@ export const GEAR_GRIP_DATA = {
     710
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
-    0.836
+    0.809,
+    0.84
    ],
    "tuned": true
   },
@@ -554,8 +554,8 @@ export const GEAR_GRIP_DATA = {
     0.72
    ],
    "autoHandle": [
-    0.276,
-    0.743
+    0.275,
+    0.744
    ],
    "scale": 0.56,
    "offsetByDir": null,
@@ -580,7 +580,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -593,8 +593,8 @@ export const GEAR_GRIP_DATA = {
     0.679
    ],
    "autoHandle": [
-    0.67,
-    0.72
+    0.674,
+    0.723
    ],
    "scale": 0.835,
    "offsetByDir": {
@@ -622,10 +622,10 @@ export const GEAR_GRIP_DATA = {
     737
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": true
   },
@@ -666,9 +666,9 @@ export const GEAR_GRIP_DATA = {
     724
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": true
@@ -681,8 +681,8 @@ export const GEAR_GRIP_DATA = {
     0.692
    ],
    "autoHandle": [
-    0.645,
-    0.721
+    0.651,
+    0.724
    ],
    "scale": 0.835,
    "offsetByDir": {
@@ -710,10 +710,10 @@ export const GEAR_GRIP_DATA = {
     737
    ],
    "bbox": [
-    0.18,
+    0.176,
     0.172,
-    0.82,
-    0.824
+    0.824,
+    0.828
    ],
    "tuned": true
   },
@@ -726,7 +726,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.323,
-    0.721
+    0.722
    ],
    "scale": 0.565,
    "offsetByDir": {
@@ -769,8 +769,8 @@ export const GEAR_GRIP_DATA = {
     0.677
    ],
    "autoHandle": [
-    0.344,
-    0.721
+    0.341,
+    0.724
    ],
    "scale": 0.56,
    "offsetByDir": {
@@ -801,7 +801,7 @@ export const GEAR_GRIP_DATA = {
     0.188,
     0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": true
   },
@@ -814,7 +814,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.696,
-    0.73
+    0.731
    ],
    "scale": 0.565,
    "offsetByDir": {
@@ -901,7 +901,7 @@ export const GEAR_GRIP_DATA = {
     0.681
    ],
    "autoHandle": [
-    0.286,
+    0.287,
     0.716
    ],
    "scale": 0.435,
@@ -930,7 +930,7 @@ export const GEAR_GRIP_DATA = {
     720
    ],
    "bbox": [
-    0.168,
+    0.164,
     0.188,
     0.836,
     0.813
@@ -945,7 +945,7 @@ export const GEAR_GRIP_DATA = {
     0.701
    ],
    "autoHandle": [
-    0.291,
+    0.292,
     0.744
    ],
    "scale": 0.585,
@@ -1028,8 +1028,8 @@ export const GEAR_GRIP_DATA = {
     0.73
    ],
    "autoHandle": [
-    0.279,
-    0.746
+    0.278,
+    0.749
    ],
    "scale": 0.575,
    "offsetByDir": null,
@@ -1055,7 +1055,7 @@ export const GEAR_GRIP_DATA = {
     0.191,
     0.16,
     0.809,
-    0.836
+    0.84
    ],
    "tuned": true
   },
@@ -1091,7 +1091,7 @@ export const GEAR_GRIP_DATA = {
     676
    ],
    "bbox": [
-    0.219,
+    0.215,
     0.145,
     0.781,
     0.855
@@ -1106,8 +1106,8 @@ export const GEAR_GRIP_DATA = {
     0.706
    ],
    "autoHandle": [
-    0.341,
-    0.73
+    0.338,
+    0.733
    ],
    "scale": 0.835,
    "offsetByDir": {},
@@ -1130,10 +1130,10 @@ export const GEAR_GRIP_DATA = {
     710
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
-    0.836
+    0.809,
+    0.84
    ],
    "tuned": true
   },
@@ -1145,8 +1145,8 @@ export const GEAR_GRIP_DATA = {
     0.7
    ],
    "autoHandle": [
-    0.377,
-    0.712
+    0.378,
+    0.713
    ],
    "scale": 0.835,
    "offsetByDir": {
@@ -1189,8 +1189,8 @@ export const GEAR_GRIP_DATA = {
     0.687
    ],
    "autoHandle": [
-    0.359,
-    0.728
+    0.358,
+    0.731
    ],
    "scale": 0.535,
    "offsetByDir": {
@@ -1218,10 +1218,10 @@ export const GEAR_GRIP_DATA = {
     710
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
-    0.836
+    0.809,
+    0.84
    ],
    "tuned": true
   },
@@ -1233,7 +1233,7 @@ export const GEAR_GRIP_DATA = {
     0.679
    ],
    "autoHandle": [
-    0.279,
+    0.281,
     0.744
    ],
    "scale": 0.545,
@@ -1262,9 +1262,9 @@ export const GEAR_GRIP_DATA = {
     715
    ],
    "bbox": [
-    0.191,
+    0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -1277,8 +1277,8 @@ export const GEAR_GRIP_DATA = {
     0.736
    ],
    "autoHandle": [
-    0.311,
-    0.743
+    0.31,
+    0.744
    ],
    "scale": 0.515,
    "offsetByDir": null,
@@ -1301,7 +1301,7 @@ export const GEAR_GRIP_DATA = {
     699
    ],
    "bbox": [
-    0.203,
+    0.199,
     0.156,
     0.801,
     0.844
@@ -1316,7 +1316,7 @@ export const GEAR_GRIP_DATA = {
     0.696
    ],
    "autoHandle": [
-    0.288,
+    0.289,
     0.731
    ],
    "scale": 0.835,
@@ -1361,7 +1361,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.306,
-    0.728
+    0.729
    ],
    "scale": 0.475,
    "offsetByDir": null,
@@ -1385,7 +1385,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.184,
-    0.172,
+    0.168,
     0.816,
     0.832
    ],
@@ -1399,8 +1399,8 @@ export const GEAR_GRIP_DATA = {
     0.671
    ],
    "autoHandle": [
-    0.673,
-    0.732
+    0.668,
+    0.729
    ],
    "scale": 0.755,
    "offsetByDir": null,
@@ -1424,8 +1424,8 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.191,
-    0.164,
-    0.809,
+    0.16,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -1439,7 +1439,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.703,
-    0.727
+    0.728
    ],
    "scale": 0.535,
    "offsetByDir": null,
@@ -1477,8 +1477,8 @@ export const GEAR_GRIP_DATA = {
     0.675
    ],
    "autoHandle": [
-    0.338,
-    0.728
+    0.336,
+    0.731
    ],
    "scale": 0.56,
    "offsetByDir": null,
@@ -1504,7 +1504,7 @@ export const GEAR_GRIP_DATA = {
     0.188,
     0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": true
   },
@@ -1517,7 +1517,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.754,
-    0.727
+    0.728
    ],
    "scale": 0.375,
    "offsetByDir": null,
@@ -1540,9 +1540,9 @@ export const GEAR_GRIP_DATA = {
     716
    ],
    "bbox": [
-    0.191,
+    0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -1579,9 +1579,9 @@ export const GEAR_GRIP_DATA = {
     709
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
+    0.809,
     0.84
    ],
    "tuned": true
@@ -1594,7 +1594,7 @@ export const GEAR_GRIP_DATA = {
     0.643
    ],
    "autoHandle": [
-    0.302,
+    0.304,
     0.718
    ],
    "scale": 0.39,
@@ -1619,7 +1619,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.168,
-    0.188,
+    0.184,
     0.832,
     0.816
    ],
@@ -1633,8 +1633,8 @@ export const GEAR_GRIP_DATA = {
     0.684
    ],
    "autoHandle": [
-    0.686,
-    0.725
+    0.687,
+    0.728
    ],
    "scale": 0.545,
    "offsetByDir": null,
@@ -1657,10 +1657,10 @@ export const GEAR_GRIP_DATA = {
     738
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": true
   },
@@ -1672,8 +1672,8 @@ export const GEAR_GRIP_DATA = {
     0.687
    ],
    "autoHandle": [
-    0.674,
-    0.735
+    0.677,
+    0.738
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -1699,7 +1699,7 @@ export const GEAR_GRIP_DATA = {
     0.199,
     0.156,
     0.801,
-    0.84
+    0.844
    ],
    "tuned": true
   },
@@ -1750,7 +1750,7 @@ export const GEAR_GRIP_DATA = {
     0.684
    ],
    "autoHandle": [
-    0.303,
+    0.304,
     0.726
    ],
    "scale": 0.635,
@@ -1789,8 +1789,8 @@ export const GEAR_GRIP_DATA = {
     0.285
    ],
    "autoHandle": [
-    0.703,
-    0.727
+    0.705,
+    0.73
    ],
    "scale": 0.635,
    "offsetByDir": null,
@@ -1816,7 +1816,7 @@ export const GEAR_GRIP_DATA = {
     0.184,
     0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": true
   },
@@ -1828,7 +1828,7 @@ export const GEAR_GRIP_DATA = {
     0.7
    ],
    "autoHandle": [
-    0.282,
+    0.283,
     0.727
    ],
    "scale": 0.39,
@@ -1853,7 +1853,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.176,
-    0.18,
+    0.176,
     0.824,
     0.824
    ],
@@ -1867,8 +1867,8 @@ export const GEAR_GRIP_DATA = {
     0.693
    ],
    "autoHandle": [
-    0.33,
-    0.731
+    0.333,
+    0.728
    ],
    "scale": 0.63,
    "offsetByDir": null,
@@ -1891,9 +1891,9 @@ export const GEAR_GRIP_DATA = {
     714
    ],
    "bbox": [
-    0.191,
-    0.164,
-    0.809,
+    0.188,
+    0.16,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -1907,7 +1907,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.7,
-    0.733
+    0.734
    ],
    "scale": 0.62,
    "offsetByDir": null,
@@ -2010,7 +2010,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": true
@@ -2024,7 +2024,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.351,
-    0.726
+    0.727
    ],
    "scale": 0.635,
    "offsetByDir": null,
@@ -2047,7 +2047,7 @@ export const GEAR_GRIP_DATA = {
     724
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
     0.813,
     0.832
@@ -2063,7 +2063,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.305,
-    0.723
+    0.724
    ],
    "scale": 0.685,
    "offsetByDir": null,
@@ -2101,7 +2101,7 @@ export const GEAR_GRIP_DATA = {
     0.691
    ],
    "autoHandle": [
-    0.375,
+    0.376,
     0.73
    ],
    "scale": 0.67,
@@ -2141,7 +2141,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.321,
-    0.731
+    0.732
    ],
    "scale": 0.65,
    "offsetByDir": null,
@@ -2165,7 +2165,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.188,
-    0.168,
+    0.164,
     0.813,
     0.836
    ],
@@ -2179,7 +2179,7 @@ export const GEAR_GRIP_DATA = {
     0.689
    ],
    "autoHandle": [
-    0.266,
+    0.267,
     0.723
    ],
    "scale": 0.435,
@@ -2204,9 +2204,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.168,
-    0.188,
+    0.184,
     0.832,
-    0.813
+    0.816
    ],
    "tuned": true
   },
@@ -2219,7 +2219,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.697,
-    0.724
+    0.725
    ],
    "scale": 0.51,
    "offsetByDir": null,
@@ -2242,10 +2242,10 @@ export const GEAR_GRIP_DATA = {
     737
    ],
    "bbox": [
+    0.172,
     0.176,
-    0.18,
-    0.824,
-    0.82
+    0.828,
+    0.824
    ],
    "tuned": true
   },
@@ -2282,9 +2282,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.184,
-    0.172,
+    0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": true
   },
@@ -2359,7 +2359,7 @@ export const GEAR_GRIP_DATA = {
     731
    ],
    "bbox": [
-    0.172,
+    0.168,
     0.18,
     0.828,
     0.816
@@ -2374,8 +2374,8 @@ export const GEAR_GRIP_DATA = {
     0.726
    ],
    "autoHandle": [
-    0.285,
-    0.728
+    0.283,
+    0.731
    ],
    "scale": 0.505,
    "offsetByDir": null,
@@ -2399,9 +2399,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.176,
-    0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": true
   },
@@ -2413,7 +2413,7 @@ export const GEAR_GRIP_DATA = {
     0.301
    ],
    "autoHandle": [
-    0.692,
+    0.693,
     0.73
    ],
    "scale": 0.57,
@@ -2491,8 +2491,8 @@ export const GEAR_GRIP_DATA = {
     0.732
    ],
    "autoHandle": [
-    0.295,
-    0.73
+    0.294,
+    0.731
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -2515,9 +2515,9 @@ export const GEAR_GRIP_DATA = {
     725
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": true
@@ -2530,8 +2530,8 @@ export const GEAR_GRIP_DATA = {
     0.282
    ],
    "autoHandle": [
-    0.7,
-    0.722
+    0.702,
+    0.725
    ],
    "scale": 0.865,
    "offsetByDir": null,
@@ -2554,10 +2554,10 @@ export const GEAR_GRIP_DATA = {
     737
    ],
    "bbox": [
-    0.18,
+    0.176,
     0.172,
     0.82,
-    0.824
+    0.828
    ],
    "tuned": true
   },
@@ -2569,8 +2569,8 @@ export const GEAR_GRIP_DATA = {
     0.693
    ],
    "autoHandle": [
-    0.333,
-    0.728
+    0.332,
+    0.729
    ],
    "scale": 0.575,
    "offsetByDir": null,
@@ -2593,9 +2593,9 @@ export const GEAR_GRIP_DATA = {
     725
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": true
@@ -2608,7 +2608,7 @@ export const GEAR_GRIP_DATA = {
     0.627
    ],
    "autoHandle": [
-    0.731,
+    0.73,
     0.729
    ],
    "scale": 0.405,
@@ -2671,7 +2671,7 @@ export const GEAR_GRIP_DATA = {
     725
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
     0.816,
     0.832
@@ -2686,7 +2686,7 @@ export const GEAR_GRIP_DATA = {
     0.689
    ],
    "autoHandle": [
-    0.67,
+    0.669,
     0.725
    ],
    "scale": 0.575,
@@ -2751,7 +2751,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": true
@@ -2764,8 +2764,8 @@ export const GEAR_GRIP_DATA = {
     0.289
    ],
    "autoHandle": [
-    0.654,
-    0.733
+    0.656,
+    0.734
    ],
    "scale": 0.395,
    "offsetByDir": null,
@@ -2789,9 +2789,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.172,
-    0.18,
-    0.824,
-    0.82
+    0.176,
+    0.828,
+    0.824
    ],
    "tuned": true
   },
@@ -2842,8 +2842,8 @@ export const GEAR_GRIP_DATA = {
     0.658
    ],
    "autoHandle": [
-    0.743,
-    0.723
+    0.745,
+    0.725
    ],
    "scale": 0.555,
    "offsetByDir": null,
@@ -2866,10 +2866,10 @@ export const GEAR_GRIP_DATA = {
     738
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": true
   },
@@ -2959,7 +2959,7 @@ export const GEAR_GRIP_DATA = {
     0.681
    ],
    "autoHandle": [
-    0.328,
+    0.329,
     0.746
    ],
    "scale": 0.575,
@@ -2988,7 +2988,7 @@ export const GEAR_GRIP_DATA = {
     692
    ],
    "bbox": [
-    0.207,
+    0.203,
     0.152,
     0.793,
     0.848
@@ -3003,8 +3003,8 @@ export const GEAR_GRIP_DATA = {
     0.663
    ],
    "autoHandle": [
-    0.667,
-    0.706
+    0.669,
+    0.709
    ],
    "scale": 0.5,
    "offsetByDir": null,
@@ -3027,10 +3027,10 @@ export const GEAR_GRIP_DATA = {
     705
    ],
    "bbox": [
-    0.16,
+    0.156,
     0.195,
-    0.84,
-    0.801
+    0.844,
+    0.805
    ],
    "tuned": true
   },
@@ -3042,8 +3042,8 @@ export const GEAR_GRIP_DATA = {
     0.715
    ],
    "autoHandle": [
-    0.298,
-    0.749
+    0.296,
+    0.752
    ],
    "scale": 0.56,
    "offsetByDir": {
@@ -3074,7 +3074,7 @@ export const GEAR_GRIP_DATA = {
     0.203,
     0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": true
   },
@@ -3154,7 +3154,7 @@ export const GEAR_GRIP_DATA = {
     724
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
     0.813,
     0.832
@@ -3237,9 +3237,9 @@ export const GEAR_GRIP_DATA = {
     724
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
-    0.813,
+    0.816,
     0.832
    ],
    "tuned": true
@@ -3283,7 +3283,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -3369,7 +3369,7 @@ export const GEAR_GRIP_DATA = {
     725
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
     0.816,
     0.832
@@ -3385,7 +3385,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.338,
-    0.725
+    0.726
    ],
    "scale": 0.58,
    "offsetByDir": {
@@ -3428,8 +3428,8 @@ export const GEAR_GRIP_DATA = {
     0.688
    ],
    "autoHandle": [
-    0.304,
-    0.719
+    0.307,
+    0.716
    ],
    "scale": 0.465,
    "offsetByDir": {
@@ -3457,9 +3457,9 @@ export const GEAR_GRIP_DATA = {
     722
    ],
    "bbox": [
-    0.168,
-    0.188,
-    0.832,
+    0.164,
+    0.184,
+    0.836,
     0.813
    ],
    "tuned": true
@@ -3472,8 +3472,8 @@ export const GEAR_GRIP_DATA = {
     0.738
    ],
    "autoHandle": [
-    0.295,
-    0.739
+    0.297,
+    0.737
    ],
    "scale": 0.565,
    "offsetByDir": {
@@ -3501,9 +3501,9 @@ export const GEAR_GRIP_DATA = {
     714
    ],
    "bbox": [
-    0.191,
-    0.164,
-    0.809,
+    0.188,
+    0.16,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -3516,7 +3516,7 @@ export const GEAR_GRIP_DATA = {
     0.658
    ],
    "autoHandle": [
-    0.688,
+    0.689,
     0.729
    ],
    "scale": 0.635,
@@ -3560,8 +3560,8 @@ export const GEAR_GRIP_DATA = {
     0.674
    ],
    "autoHandle": [
-    0.687,
-    0.73
+    0.685,
+    0.729
    ],
    "scale": 0.645,
    "offsetByDir": {
@@ -3604,8 +3604,8 @@ export const GEAR_GRIP_DATA = {
     0.675
    ],
    "autoHandle": [
-    0.301,
-    0.714
+    0.299,
+    0.717
    ],
    "scale": 0.385,
    "offsetByDir": null,
@@ -3631,7 +3631,7 @@ export const GEAR_GRIP_DATA = {
     0.168,
     0.184,
     0.832,
-    0.813
+    0.816
    ],
    "tuned": true
   },
@@ -3668,7 +3668,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.188,
-    0.168,
+    0.164,
     0.813,
     0.832
    ],
@@ -3683,7 +3683,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.337,
-    0.733
+    0.734
    ],
    "scale": 0.795,
    "offsetByDir": null,
@@ -3708,7 +3708,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -3721,8 +3721,8 @@ export const GEAR_GRIP_DATA = {
     0.71
    ],
    "autoHandle": [
-    0.341,
-    0.734
+    0.34,
+    0.735
    ],
    "scale": 0.465,
    "offsetByDir": null,
@@ -3745,10 +3745,10 @@ export const GEAR_GRIP_DATA = {
     711
    ],
    "bbox": [
-    0.195,
-    0.164,
-    0.805,
-    0.836
+    0.191,
+    0.16,
+    0.809,
+    0.84
    ],
    "tuned": true
   },
@@ -3761,7 +3761,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.702,
-    0.729
+    0.73
    ],
    "scale": 0.385,
    "offsetByDir": null,
@@ -3784,8 +3784,8 @@ export const GEAR_GRIP_DATA = {
     723
    ],
    "bbox": [
-    0.188,
-    0.168,
+    0.184,
+    0.164,
     0.813,
     0.832
    ],
@@ -3799,8 +3799,8 @@ export const GEAR_GRIP_DATA = {
     0.7
    ],
    "autoHandle": [
-    0.302,
-    0.736
+    0.304,
+    0.734
    ],
    "scale": 0.64,
    "offsetByDir": null,
@@ -3824,7 +3824,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.191,
-    0.164,
+    0.16,
     0.809,
     0.836
    ],
@@ -3838,8 +3838,8 @@ export const GEAR_GRIP_DATA = {
     0.703
    ],
    "autoHandle": [
-    0.35,
-    0.722
+    0.347,
+    0.725
    ],
    "scale": 0.59,
    "offsetByDir": null,
@@ -3862,10 +3862,10 @@ export const GEAR_GRIP_DATA = {
     728
    ],
    "bbox": [
-    0.184,
+    0.18,
     0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": true
   },
@@ -3878,7 +3878,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.684,
-    0.728
+    0.729
    ],
    "scale": 0.6,
    "offsetByDir": null,
@@ -3902,9 +3902,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.184,
-    0.172,
+    0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": true
   },
@@ -3916,7 +3916,7 @@ export const GEAR_GRIP_DATA = {
     0.668
    ],
    "autoHandle": [
-    0.315,
+    0.316,
     0.715
    ],
    "scale": 0.51,
@@ -3941,9 +3941,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.168,
-    0.188,
+    0.184,
     0.832,
-    0.813
+    0.816
    ],
    "tuned": true
   },
@@ -3956,7 +3956,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.279,
-    0.741
+    0.742
    ],
    "scale": 0.535,
    "offsetByDir": null,
@@ -3981,7 +3981,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -4033,8 +4033,8 @@ export const GEAR_GRIP_DATA = {
     0.699
    ],
    "autoHandle": [
-    0.34,
-    0.726
+    0.338,
+    0.729
    ],
    "scale": 0.58,
    "offsetByDir": null,
@@ -4060,7 +4060,7 @@ export const GEAR_GRIP_DATA = {
     0.184,
     0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": true
   },
@@ -4096,7 +4096,7 @@ export const GEAR_GRIP_DATA = {
     723
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.168,
     0.813,
     0.832
@@ -4112,7 +4112,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.34,
-    0.726
+    0.727
    ],
    "scale": 0.575,
    "offsetByDir": null,
@@ -4151,7 +4151,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.321,
-    0.715
+    0.716
    ],
    "scale": 0.455,
    "offsetByDir": null,
@@ -4174,9 +4174,9 @@ export const GEAR_GRIP_DATA = {
     727
    ],
    "bbox": [
-    0.172,
+    0.168,
     0.184,
-    0.828,
+    0.832,
     0.816
    ],
    "tuned": true
@@ -4190,7 +4190,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.317,
-    0.733
+    0.735
    ],
    "scale": 0.47,
    "offsetByDir": null,
@@ -4213,10 +4213,10 @@ export const GEAR_GRIP_DATA = {
     721
    ],
    "bbox": [
-    0.188,
+    0.184,
     0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": true
   },
@@ -4224,12 +4224,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.325,
-    0.747
+    0.326,
+    0.748
    ],
    "autoHandle": [
-    0.325,
-    0.747
+    0.326,
+    0.748
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4258,12 +4258,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.449,
-    0.789
+    0.446,
+    0.791
    ],
    "autoHandle": [
-    0.449,
-    0.789
+    0.446,
+    0.791
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4284,7 +4284,7 @@ export const GEAR_GRIP_DATA = {
     0.34,
     0.082,
     0.656,
-    0.914
+    0.918
    ],
    "tuned": false
   },
@@ -4292,11 +4292,11 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.422,
+    0.421,
     0.747
    ],
    "autoHandle": [
-    0.422,
+    0.421,
     0.747
    ],
    "scale": 0.55,
@@ -4316,9 +4316,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.203,
-    0.156,
+    0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": false
   },
@@ -4327,11 +4327,11 @@ export const GEAR_GRIP_DATA = {
    "category": "ranged",
    "handle": [
     0.415,
-    0.729
+    0.73
    ],
    "autoHandle": [
     0.415,
-    0.729
+    0.73
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4360,12 +4360,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.717,
-    0.754
+    0.715,
+    0.753
    ],
    "autoHandle": [
-    0.717,
-    0.754
+    0.715,
+    0.753
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4394,11 +4394,11 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.411,
+    0.41,
     0.735
    ],
    "autoHandle": [
-    0.411,
+    0.41,
     0.735
    ],
    "scale": 0.55,
@@ -4429,11 +4429,11 @@ export const GEAR_GRIP_DATA = {
    "category": "ranged",
    "handle": [
     0.49,
-    0.735
+    0.737
    ],
    "autoHandle": [
     0.49,
-    0.735
+    0.737
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4451,10 +4451,10 @@ export const GEAR_GRIP_DATA = {
     738
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
-    0.824
+    0.172,
+    0.824,
+    0.828
    ],
    "tuned": false
   },
@@ -4463,11 +4463,11 @@ export const GEAR_GRIP_DATA = {
    "category": "ranged",
    "handle": [
     0.594,
-    0.76
+    0.761
    ],
    "autoHandle": [
     0.594,
-    0.76
+    0.761
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4485,10 +4485,10 @@ export const GEAR_GRIP_DATA = {
     665
    ],
    "bbox": [
-    0.227,
+    0.223,
     0.137,
-    0.773,
-    0.859
+    0.777,
+    0.863
    ],
    "tuned": false
   },
@@ -4519,9 +4519,9 @@ export const GEAR_GRIP_DATA = {
     730
    ],
    "bbox": [
-    0.172,
+    0.168,
     0.184,
-    0.828,
+    0.832,
     0.816
    ],
    "tuned": true
@@ -4530,11 +4530,11 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.746,
+    0.745,
     0.734
    ],
    "autoHandle": [
-    0.746,
+    0.745,
     0.734
    ],
    "scale": 0.55,
@@ -4565,11 +4565,11 @@ export const GEAR_GRIP_DATA = {
    "category": "ranged",
    "handle": [
     0.605,
-    0.729
+    0.73
    ],
    "autoHandle": [
     0.605,
-    0.729
+    0.73
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4599,11 +4599,11 @@ export const GEAR_GRIP_DATA = {
    "category": "ranged",
    "handle": [
     0.644,
-    0.713
+    0.715
    ],
    "autoHandle": [
     0.644,
-    0.713
+    0.715
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4623,8 +4623,8 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.18,
     0.172,
-    0.82,
-    0.824
+    0.824,
+    0.828
    ],
    "tuned": false
   },
@@ -4666,12 +4666,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.513,
-    0.715
+    0.511,
+    0.716
    ],
    "autoHandle": [
-    0.513,
-    0.715
+    0.511,
+    0.716
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4700,12 +4700,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.386,
-    0.724
+    0.387,
+    0.723
    ],
    "autoHandle": [
-    0.386,
-    0.724
+    0.387,
+    0.723
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4723,8 +4723,8 @@ export const GEAR_GRIP_DATA = {
     714
    ],
    "bbox": [
-    0.191,
-    0.164,
+    0.188,
+    0.16,
     0.809,
     0.836
    ],
@@ -4735,11 +4735,11 @@ export const GEAR_GRIP_DATA = {
    "category": "ranged",
    "handle": [
     0.43,
-    0.737
+    0.74
    ],
    "autoHandle": [
     0.43,
-    0.737
+    0.74
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4757,10 +4757,10 @@ export const GEAR_GRIP_DATA = {
     686
    ],
    "bbox": [
-    0.211,
+    0.207,
     0.148,
-    0.789,
-    0.848
+    0.793,
+    0.852
    ],
    "tuned": false
   },
@@ -4768,11 +4768,11 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.655,
+    0.654,
     0.744
    ],
    "autoHandle": [
-    0.655,
+    0.654,
     0.744
    ],
    "scale": 0.55,
@@ -4792,9 +4792,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.203,
-    0.156,
+    0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": false
   },
@@ -4802,12 +4802,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.406,
-    0.735
+    0.408,
+    0.734
    ],
    "autoHandle": [
-    0.406,
-    0.735
+    0.408,
+    0.734
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4827,7 +4827,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.207,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": false
@@ -4836,11 +4836,11 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.437,
+    0.436,
     0.751
    ],
    "autoHandle": [
-    0.437,
+    0.436,
     0.751
    ],
    "scale": 0.55,
@@ -4859,7 +4859,7 @@ export const GEAR_GRIP_DATA = {
     668
    ],
    "bbox": [
-    0.223,
+    0.219,
     0.141,
     0.777,
     0.859
@@ -4870,12 +4870,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.565,
-    0.742
+    0.569,
+    0.744
    ],
    "autoHandle": [
-    0.565,
-    0.742
+    0.569,
+    0.744
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4896,7 +4896,7 @@ export const GEAR_GRIP_DATA = {
     0.188,
     0.164,
     0.813,
-    0.832
+    0.836
    ],
    "tuned": false
   },
@@ -4904,12 +4904,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.599,
-    0.733
+    0.601,
+    0.734
    ],
    "autoHandle": [
-    0.599,
-    0.733
+    0.601,
+    0.734
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4929,7 +4929,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.203,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": false
@@ -4938,12 +4938,12 @@ export const GEAR_GRIP_DATA = {
    "role": "weapon",
    "category": "ranged",
    "handle": [
-    0.564,
-    0.73
+    0.559,
+    0.729
    ],
    "autoHandle": [
-    0.564,
-    0.73
+    0.559,
+    0.729
    ],
    "scale": 0.55,
    "offsetByDir": null,
@@ -4962,9 +4962,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.191,
-    0.164,
+    0.16,
     0.809,
-    0.836
+    0.84
    ],
    "tuned": false
   },
@@ -5005,9 +5005,9 @@ export const GEAR_GRIP_DATA = {
     739
    ],
    "bbox": [
-    0.18,
     0.176,
-    0.82,
+    0.172,
+    0.824,
     0.824
    ],
    "tuned": true
@@ -5021,7 +5021,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.497,
-    0.725
+    0.726
    ],
    "scale": 0.675,
    "offsetByDir": {
@@ -5064,8 +5064,8 @@ export const GEAR_GRIP_DATA = {
     0.502
    ],
    "autoHandle": [
-    0.498,
-    0.736
+    0.497,
+    0.739
    ],
    "scale": 0.73,
    "offsetByDir": {
@@ -5093,10 +5093,10 @@ export const GEAR_GRIP_DATA = {
     686
    ],
    "bbox": [
-    0.211,
+    0.207,
     0.148,
-    0.789,
-    0.848
+    0.793,
+    0.852
    ],
    "tuned": true
   },
@@ -5109,7 +5109,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.498,
-    0.744
+    0.745
    ],
    "scale": 0.73,
    "offsetByDir": {
@@ -5137,9 +5137,9 @@ export const GEAR_GRIP_DATA = {
     670
    ],
    "bbox": [
-    0.223,
+    0.219,
     0.141,
-    0.777,
+    0.781,
     0.859
    ],
    "tuned": true
@@ -5153,7 +5153,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.497,
-    0.727
+    0.728
    ],
    "scale": 0.495,
    "offsetByDir": {
@@ -5196,8 +5196,8 @@ export const GEAR_GRIP_DATA = {
     0.507
    ],
    "autoHandle": [
-    0.497,
-    0.731
+    0.498,
+    0.734
    ],
    "scale": 0.67,
    "offsetByDir": {
@@ -5228,7 +5228,7 @@ export const GEAR_GRIP_DATA = {
     0.199,
     0.156,
     0.801,
-    0.84
+    0.844
    ],
    "tuned": true
   },
@@ -5271,7 +5271,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.203,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": true
@@ -5284,8 +5284,8 @@ export const GEAR_GRIP_DATA = {
     0.497
    ],
    "autoHandle": [
-    0.51,
-    0.72
+    0.511,
+    0.723
    ],
    "scale": 0.695,
    "offsetByDir": {
@@ -5316,7 +5316,7 @@ export const GEAR_GRIP_DATA = {
     0.184,
     0.168,
     0.816,
-    0.828
+    0.832
    ],
    "tuned": true
   },
@@ -5328,8 +5328,8 @@ export const GEAR_GRIP_DATA = {
     0.536
    ],
    "autoHandle": [
-    0.498,
-    0.734
+    0.499,
+    0.735
    ],
    "scale": 0.69,
    "offsetByDir": {
@@ -5358,9 +5358,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.203,
-    0.156,
+    0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": true
   },
@@ -5373,7 +5373,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.497,
-    0.738
+    0.741
    ],
    "scale": 0.665,
    "offsetByDir": {
@@ -5404,7 +5404,7 @@ export const GEAR_GRIP_DATA = {
     0.215,
     0.145,
     0.785,
-    0.852
+    0.855
    ],
    "tuned": true
   },
@@ -5417,7 +5417,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.498,
-    0.733
+    0.731
    ],
    "scale": 0.755,
    "offsetByDir": {
@@ -5446,7 +5446,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.199,
-    0.156,
+    0.152,
     0.801,
     0.844
    ],
@@ -5460,8 +5460,8 @@ export const GEAR_GRIP_DATA = {
     0.51
    ],
    "autoHandle": [
-    0.497,
-    0.742
+    0.498,
+    0.743
    ],
    "scale": 0.665,
    "offsetByDir": {
@@ -5533,10 +5533,10 @@ export const GEAR_GRIP_DATA = {
     697
    ],
    "bbox": [
-    0.203,
-    0.156,
-    0.797,
-    0.844
+    0.199,
+    0.152,
+    0.801,
+    0.848
    ],
    "tuned": true
   },
@@ -5548,8 +5548,8 @@ export const GEAR_GRIP_DATA = {
     0.496
    ],
    "autoHandle": [
-    0.503,
-    0.717
+    0.502,
+    0.718
    ],
    "scale": 0.675,
    "offsetByDir": {
@@ -5592,7 +5592,7 @@ export const GEAR_GRIP_DATA = {
     0.515
    ],
    "autoHandle": [
-    0.497,
+    0.498,
     0.737
    ],
    "scale": 0.76,
@@ -5621,7 +5621,7 @@ export const GEAR_GRIP_DATA = {
     692
    ],
    "bbox": [
-    0.207,
+    0.203,
     0.152,
     0.793,
     0.848
@@ -5636,8 +5636,8 @@ export const GEAR_GRIP_DATA = {
     0.522
    ],
    "autoHandle": [
-    0.499,
-    0.731
+    0.498,
+    0.732
    ],
    "scale": 0.73,
    "offsetByDir": {
@@ -5681,7 +5681,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.498,
-    0.736
+    0.737
    ],
    "scale": 0.725,
    "offsetByDir": {
@@ -5709,9 +5709,9 @@ export const GEAR_GRIP_DATA = {
     691
    ],
    "bbox": [
-    0.207,
+    0.203,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": true
@@ -5725,7 +5725,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.497,
-    0.726
+    0.73
    ],
    "scale": 0.68,
    "offsetByDir": {
@@ -5753,10 +5753,10 @@ export const GEAR_GRIP_DATA = {
     713
    ],
    "bbox": [
-    0.191,
+    0.188,
     0.16,
     0.809,
-    0.836
+    0.84
    ],
    "tuned": true
   },
@@ -5768,7 +5768,7 @@ export const GEAR_GRIP_DATA = {
     0.498
    ],
    "autoHandle": [
-    0.498,
+    0.497,
     0.736
    ],
    "scale": 0.71,
@@ -5797,10 +5797,10 @@ export const GEAR_GRIP_DATA = {
     697
    ],
    "bbox": [
-    0.203,
-    0.156,
+    0.199,
+    0.152,
     0.797,
-    0.844
+    0.848
    ],
    "tuned": true
   },
@@ -5813,7 +5813,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.497,
-    0.73
+    0.731
    ],
    "scale": 0.73,
    "offsetByDir": {
@@ -5841,9 +5841,9 @@ export const GEAR_GRIP_DATA = {
     709
    ],
    "bbox": [
-    0.195,
+    0.191,
     0.16,
-    0.805,
+    0.809,
     0.84
    ],
    "tuned": true
@@ -5857,7 +5857,7 @@ export const GEAR_GRIP_DATA = {
    ],
    "autoHandle": [
     0.499,
-    0.732
+    0.735
    ],
    "scale": 0.675,
    "offsetByDir": {
@@ -5888,7 +5888,7 @@ export const GEAR_GRIP_DATA = {
     0.199,
     0.156,
     0.801,
-    0.84
+    0.844
    ],
    "tuned": true
   },
@@ -5900,8 +5900,8 @@ export const GEAR_GRIP_DATA = {
     0.5
    ],
    "autoHandle": [
-    0.498,
-    0.734
+    0.499,
+    0.735
    ],
    "scale": 0.69,
    "offsetByDir": {
@@ -5929,10 +5929,10 @@ export const GEAR_GRIP_DATA = {
     697
    ],
    "bbox": [
-    0.203,
-    0.156,
-    0.797,
-    0.844
+    0.199,
+    0.152,
+    0.801,
+    0.848
    ],
    "tuned": true
   },
@@ -5944,8 +5944,8 @@ export const GEAR_GRIP_DATA = {
     0.498
    ],
    "autoHandle": [
-    0.497,
-    0.73
+    0.498,
+    0.733
    ],
    "scale": 0.605,
    "offsetByDir": {
@@ -5974,9 +5974,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.195,
-    0.16,
-    0.801,
-    0.84
+    0.156,
+    0.805,
+    0.844
    ],
    "tuned": true
   },
@@ -5988,8 +5988,8 @@ export const GEAR_GRIP_DATA = {
     0.531
    ],
    "autoHandle": [
-    0.498,
-    0.731
+    0.497,
+    0.734
    ],
    "scale": 0.64,
    "offsetByDir": {
@@ -6018,9 +6018,9 @@ export const GEAR_GRIP_DATA = {
    ],
    "bbox": [
     0.195,
-    0.16,
+    0.156,
     0.801,
-    0.84
+    0.844
    ],
    "tuned": true
   },
@@ -6063,7 +6063,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.188,
     0.164,
-    0.809,
+    0.813,
     0.836
    ],
    "tuned": true
@@ -6076,7 +6076,7 @@ export const GEAR_GRIP_DATA = {
     0.498
    ],
    "autoHandle": [
-    0.498,
+    0.497,
     0.736
    ],
    "scale": 0.64,
@@ -6107,7 +6107,7 @@ export const GEAR_GRIP_DATA = {
    "bbox": [
     0.203,
     0.152,
-    0.793,
+    0.797,
     0.848
    ],
    "tuned": true
@@ -6697,7 +6697,7 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -150,
+       "rot": -30,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -6732,7 +6732,7 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -150,
+       "rot": -30,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -6767,7 +6767,7 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -150,
+       "rot": -30,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -6802,7 +6802,7 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -150,
+       "rot": -30,
        "scale": null,
        "flipX": false,
        "sx": 1,
@@ -6995,9 +6995,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7431,9 +7431,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7466,9 +7466,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -154,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7501,9 +7501,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -7659,9 +7659,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8060,9 +8060,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -6,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8095,9 +8095,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -6,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8130,9 +8130,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -6,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8288,9 +8288,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8724,9 +8724,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8759,9 +8759,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -154,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8794,9 +8794,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8829,9 +8829,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -8987,9 +8987,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9458,9 +9458,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9493,9 +9493,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -154,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9528,9 +9528,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -9686,9 +9686,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10087,9 +10087,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10122,9 +10122,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -154,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10157,9 +10157,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10315,9 +10315,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10681,9 +10681,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10716,9 +10716,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -154,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10751,9 +10751,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -10909,9 +10909,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -11310,9 +11310,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -11345,9 +11345,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -154,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -11380,9 +11380,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -11538,9 +11538,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -11939,9 +11939,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -11974,9 +11974,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -154,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -12009,9 +12009,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -12167,9 +12167,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -12638,9 +12638,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -160,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -12673,9 +12673,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -154,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -12708,9 +12708,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {
@@ -12743,9 +12743,9 @@ export const GEAR_GRIP_DATA = {
       ],
       "weapon": {
        "layer": "front",
-       "rot": -166,
+       "rot": -30,
        "scale": null,
-       "flipX": true,
+       "flipX": false,
        "sx": 1,
        "tint": null,
        "patch": {

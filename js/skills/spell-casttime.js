@@ -85,24 +85,24 @@ function _isColdSpell(skillId) {
     return false;
 }
 
-// True when the skill is a NATURE spell - the third sibling of the two above.
-// Nature is a spell damageKind rather than one of the four combat elements, so
-// both its element and its damageKind are checked: support spells declare
-// element: 'nature' (Renewal, Windward, Windstep) while the nature damage
-// spells (Wrath, Serpent Sting) declare damageKind: 'nature' on a lightning
-// element. Drives the passive tree's nature-only cast speed.
-function _isNatureSpell(skillId) {
+// True when the skill is a LIGHTNING spell - the third sibling of the two above.
+// Lightning is one of the four elemental damage types, so both its element and
+// its damageKind are checked: support spells declare element: 'lightning'
+// (Renewal, Windward, Windstep) while the lightning damage spells (Wrath,
+// Serpent Sting) declare damageKind: 'lightning' on a lightning element.
+// Drives the passive tree's lightning-only cast speed.
+function _isLightningSpell(skillId) {
     try {
         const def = getSkillDef(skillId);
         if (!def) return false;
-        if (def.element === 'nature') return true;
-        if (def.damageKind === 'nature') return true;
+        if (def.element === 'lightning') return true;
+        if (def.damageKind === 'lightning') return true;
         if (def.usp) {
-            if (def.usp.element === 'nature') return true;
-            if (def.usp.damageKind === 'nature') return true;
-            if (!def.usp.element && def.usp.theme === 'nature') return true;
+            if (def.usp.element === 'lightning') return true;
+            if (def.usp.damageKind === 'lightning') return true;
+            if (!def.usp.element && def.usp.theme === 'lightning') return true;
         }
-    } catch (e) { /* unknown skill - treat as non-nature */ }
+    } catch (e) { /* unknown skill - treat as non-lightning */ }
     return false;
 }
 
@@ -114,7 +114,7 @@ export function getSkillCastTimeSeconds(skillId) {
         if (typeof globalThis._egComputePlayerStats === 'function') {
             const stats = globalThis._egComputePlayerStats();
             speedPct = Number(stats.castSpeedPct) || 0;
-            // Fire/cold/nature-only cast speed (passive tree) stacks on top, but
+            // Fire/cold/lightning-only cast speed (passive tree) stacks on top, but
             // ONLY for spells of that element - every other element keeps the
             // general value.
             if (_isFireSpell(skillId)) {
@@ -125,9 +125,9 @@ export function getSkillCastTimeSeconds(skillId) {
                 const coldPct = Number(stats.coldCastSpeedPct);
                 if (Number.isFinite(coldPct)) speedPct += coldPct;
             }
-            if (_isNatureSpell(skillId)) {
-                const naturePct = Number(stats.natureCastSpeedPct);
-                if (Number.isFinite(naturePct)) speedPct += naturePct;
+            if (_isLightningSpell(skillId)) {
+                const lightningPct = Number(stats.lightningCastSpeedPct);
+                if (Number.isFinite(lightningPct)) speedPct += lightningPct;
             }
         }
     } catch (e) { /* best-effort - authored cast time */ }

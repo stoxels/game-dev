@@ -99,24 +99,19 @@ export function _egCalcPlayerResistanceReduction(amount, stats, element) {
     // Active map run: Elemental Weakness - #% reduced all Resistances.
     const resistMult = (typeof globalThis._egMapResistMult === 'function') ? globalThis._egMapResistMult() : 1;
     // allElementalResist (passive tree) is a flat bonus to fire, cold and
-    // lightning. It deliberately does NOT touch shadow resistance, and it
-    // still obeys the per-element cap below like any other source. Nature is
-    // out of its scope too: nature damage is a spell damageKind on the
-    // offensive side, and on the defensive side only nature-flavoured
-    // attackers (The Sprout) deal it - the gear-rolled "all elemental" bonus
-    // never covered that axis.
+    // lightning - the three rollable elements. It deliberately does NOT touch
+    // shadow resistance, and it still obeys the per-element cap below like any
+    // other source. Lightning is a full element, covered here like fire and cold.
     const allElem = Math.max(0, stats.allElementalResist || 0);
     const resMap = {
         fire: ((stats.fireResist || 0) + allElem) * resistMult,
         cold: ((stats.coldResist || 0) + allElem) * resistMult,
         lightning: ((stats.lightningResist || 0) + allElem) * resistMult,
         shadow: (stats.shadowResist || 0) * resistMult,
-        nature: (stats.natureResist || 0) * resistMult,
     };
     const cap = (typeof _egGetPlayerResistCap === 'function')
         ? _egGetPlayerResistCap(stats, element) : EG_RESIST_CAP_PCT;
     const resPct = Math.min(cap, Math.max(0, resMap[element] || 0));
     let reduced = amount * (1 - resPct / 100);
-    reduced = Math.max(0, reduced - Math.max(0, stats.arcaneResistFlat || 0));
     return reduced;
 }
