@@ -610,6 +610,14 @@ export function _egComputePlayerStats() {
         // the same multiplicative buckets gear uses; they are never added to
         // the flat pools.
         healthIncPct: passiveTreeBonuses.healthIncPct || 0, manaIncPct: passiveTreeBonuses.manaIncPct || 0,
+        // Blood Magic keystone (node 40001): "more" maximum Life multiplies
+        // the whole composed pool after every increased source (applied
+        // where max HP is built); manaRemoved zeroes the Mana pool;
+        // spellsCostLife / spellCostIncPct are read in class-mana.js.
+        healthMorePct: passiveTreeBonuses.healthMorePct || 0,
+        manaRemoved: passiveTreeBonuses.manaRemoved || 0,
+        spellsCostLife: passiveTreeBonuses.spellsCostLife || 0,
+        spellCostIncPct: passiveTreeBonuses.spellCostIncPct || 0,
         // Flat bonus to fire/cold/lightning resistance (never shadow) and the
         // chance to avoid ailments while a hold-to-cast is running.
         allElementalResist: passiveTreeBonuses.allElementalResist || 0,
@@ -1045,6 +1053,12 @@ export function _egComputePlayerStats() {
         s.mana = Math.round(s.mana * (1 + s.manaIncPct / 100));
     }
 
+    // Blood Magic keystone: all Mana is removed (the pool is also zeroed in
+    // class-mana.js, base Mana included). "More" Life is NOT applied here:
+    // it multiplies the whole pool (base + gear + tree) where the maximum
+    // is composed - _resetPlayerHP, _egSyncOverlayGearPools, level-up.
+    if (s.manaRemoved > 0) s.mana = 0;
+
     s.armour = Math.round(s.armourFlat * (1 + s.armourIncPct / 100));
     s.evasion = Math.round(s.evasionFlat * (1 + s.evasionIncPct / 100));
     s.absorption = Math.round(s.absorptionFlat * (1 + s.absorptionIncPct / 100));
@@ -1413,6 +1427,10 @@ export const EG_STAT_DISPLAY_LABELS = {
     impaleEffectHeavyPct: { label: t('eg_stat_impale_effect'), suffix: '%' },
     impaleEffectFreshPct: { label: t('eg_stat_impale_effect_fresh'), suffix: '%' },
     impaleDurationPct: { label: t('eg_stat_impale_duration'), suffix: '%' },
+    healthMorePct: { label: t('eg_stat_more_health'), suffix: '%' },
+    manaRemoved: { label: t('eg_stat_mana_removed'), suffix: '' },
+    spellsCostLife: { label: t('eg_stat_spells_cost_life'), suffix: '' },
+    spellCostIncPct: { label: t('eg_stat_spell_cost_inc'), suffix: '%' },
     retaliationWardBleed: { label: t('eg_stat_retaliation_ward_bleed'), suffix: '' },
     retaliationWardIgnite: { label: t('eg_stat_retaliation_ward_ignite'), suffix: '' },
     meleePhys1HIncPct: { label: t('eg_stat_inc_melee_phys_1h'), suffix: '%' },
@@ -1563,7 +1581,7 @@ export const EG_STAT_LAYOUT = {
     defense: [
         { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption'] },
         { catKey: 'eg_statcat_life_mana', buckets: [
-            'health', 'mana', 'lifeRegen', 'lifeRegenRatePct', 'manaRegen', 'lifeLeechPct', 'lifeLeechMeleePct',
+            'health', 'healthMorePct', 'mana', 'manaRemoved', 'spellsCostLife', 'spellCostIncPct', 'lifeRegen', 'lifeRegenRatePct', 'manaRegen', 'lifeLeechPct', 'lifeLeechMeleePct',
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
             'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [

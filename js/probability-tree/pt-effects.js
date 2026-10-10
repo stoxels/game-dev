@@ -253,6 +253,15 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // (_egTryRetaliationWard in combat-ailments-core.js).
     ward_bleed_retaliation: { channel: 'retaliationWardBleed', flag: true, en: 'Bleeding enemies cannot inflict Bleeding on you', de: 'Blutende Gegner können dir keine Blutung zufügen' },
     ward_ignite_retaliation: { channel: 'retaliationWardIgnite', flag: true, en: 'Ignited enemies cannot inflict Ignite on you', de: 'Brennende Gegner können dich nicht entzünden' },
+    // Blood Magic keystone (node 40001). "More" life is a separate
+    // multiplier applied after every % increased source in
+    // _egComputePlayerStats; the two flags are read through
+    // _egGetTreeChannel() by class-mana.js (max Mana 0, costs paid in Life)
+    // and the cost increase scales every spell/ability cost there too.
+    life_more_pct: { channel: 'healthMorePct', en: '{v}% more maximum Life', de: '{v}% mehr maximales Leben' },
+    mana_removed: { channel: 'manaRemoved', flag: true, en: 'You have no Mana', de: 'Du hast kein Mana' },
+    spells_cost_life: { channel: 'spellsCostLife', flag: true, en: 'Spells cost Life instead of Mana', de: 'Zauber kosten Leben statt Mana' },
+    spell_cost_inc_pct: { channel: 'spellCostIncPct', en: '{v}% increased Cost of all spells', de: '{v}% erhöhte Kosten aller Zauber' },
 });
 
 // Splits "key:value" (or a bare "key" = value 1) into its parts.

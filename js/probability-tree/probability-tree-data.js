@@ -6002,12 +6002,16 @@ export const TALENT_TREE_DATA = {
    "id": 40001,
    "x": -2205,
    "y": 1679,
-   "nameEn": "Juggernaut",
-   "nameDe": "Der Juggernaut",
-   "descEn": "You cannot be slowed or staggered, but Armour does not regenerate Absorption.",
-   "descDe": "Du kannst nicht verlangsamt oder zurückgeworfen werden, aber Rüstung regeneriert keine Absorption.",
-   "icon": "✦",
-   "statKey": "keystone_juggernaut",
+   "nameEn": "Blood Magic",
+   "nameDe": "Blutmagie",
+   "icon": "",
+   "statKey": "keystone_blood_magic_40001",
+   "effects": [
+    "life_more_pct:10",
+    "mana_removed",
+    "spells_cost_life",
+    "spell_cost_inc_pct:30"
+   ],
    "tier": "keystone"
   },
   {

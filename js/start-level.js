@@ -162,9 +162,11 @@ function _resetLevelTrackers() {
 // Reduced by the active map's "% reduced maximum Life" mod during device runs.
 function _resetPlayerHP() {
     const baseHP = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseHP : 100;
-    const gearHealthBonus = (typeof _egComputePlayerStats === 'function')
-        ? _egComputePlayerStats().health : 0;
+    const stats = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : null;
+    const gearHealthBonus = stats ? stats.health : 0;
     let maxHP = baseHP + gearHealthBonus;
+    // "% more maximum Life" (Blood Magic keystone) multiplies the whole pool.
+    if (stats && stats.healthMorePct > 0) maxHP = Math.round(maxHP * (1 + stats.healthMorePct / 100));
     if (typeof _egMapPlayerLifeMult === 'function') maxHP = Math.round(maxHP * _egMapPlayerLifeMult());
     globalThis.playerMaxHP = Math.max(1, maxHP);
     globalThis.playerCurrentHP = globalThis.playerMaxHP;

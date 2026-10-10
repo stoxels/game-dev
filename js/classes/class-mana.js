@@ -44,6 +44,8 @@ export function _scaleAbilityManaCost(cost) {
     const maxMana = _getPlayerMaxMana();
     const mult = 1 + Math.max(0, maxMana - MANA_COST_SCALE_BASELINE) / MANA_COST_SCALE_DIVISOR;
     let scaled = cost * mult * MANA_COST_GLOBAL_MULT;
+    // "% increased Cost of all spells" (passive tree, Blood Magic keystone).
+    scaled *= 1 + _treeChannel('spellCostIncPct') / 100;
     if (typeof globalThis._egGetActiveMapModValue === 'function') {
         const costPct = globalThis._egGetActiveMapModValue('map_mana_costs');
         if (costPct > 0) scaled *= (1 + costPct / 100);
@@ -58,9 +60,22 @@ function _manaEnabled() {
 }
 
 
+// One summed passive-tree channel (0 before the leveling module is live).
+function _treeChannel(channel) {
+    return (typeof globalThis._egGetTreeChannel === 'function')
+        ? globalThis._egGetTreeChannel(channel) : 0;
+}
+
+
+// True while the Blood Magic keystone removes the whole Mana pool.
+function _manaRemovedByTree() {
+    return _treeChannel('manaRemoved') > 0;
+}
+
+
 // Returns the current maximum mana from the base pool and live gear stats.
 export function _getPlayerMaxMana() {
-    if (!_manaEnabled()) return 0;
+    if (!_manaEnabled() || _manaRemovedByTree()) return 0;
     const base = (typeof globalThis.EG_PLAYER_STATS !== 'undefined') ? globalThis.EG_PLAYER_STATS.baseMana : 0;
     const gearBonus = (typeof globalThis._egComputePlayerStats === 'function')
         ? globalThis._egComputePlayerStats().mana : 0;
@@ -119,8 +134,10 @@ export function canAffordMana(cost) {
 }
 
 
-// True when Blood Magic makes the current map charge abilities from life.
+// True when Blood Magic makes abilities charge their cost from life: either
+// the active map carries the mod or the Blood Magic keystone is allocated.
 export function _bloodMagicActive() {
+    if (_treeChannel('spellsCostLife') > 0) return true;
     return (typeof globalThis._egMapHasBloodMagic === 'function') && globalThis._egMapHasBloodMagic();
 }
 
@@ -215,7 +232,7 @@ export function updateClassHUDManaBar() {
         try {
             classlessSpells = _hotbarClasslessHasSpells();
         } catch (e) { /* best-effort */ }
-        if (!STATE.playerClass && !tqActive && !classlessSpells) {
+        if ((!STATE.playerClass && !tqActive && !classlessSpells) || _manaRemovedByTree()) {
             avatarWrap.style.display = 'none';
         } else {
             avatarWrap.style.display = '';

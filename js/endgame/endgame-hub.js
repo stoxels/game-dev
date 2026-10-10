@@ -1137,6 +1137,7 @@ export function _egSyncOverlayGearPools() {
         if (typeof playerMaxHP !== 'undefined' && typeof playerCurrentHP !== 'undefined') {
             const baseHP = (typeof EG_PLAYER_STATS !== 'undefined') ? EG_PLAYER_STATS.baseHP : 100;
             let newMax = baseHP + (Number(stats.health) || 0);
+            if (Number(stats.healthMorePct) > 0) newMax = Math.round(newMax * (1 + stats.healthMorePct / 100));
             if (typeof _egMapPlayerLifeMult === 'function') {
                 try { newMax = Math.round(newMax * _egMapPlayerLifeMult()); } catch (e) {}
             }
