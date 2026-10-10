@@ -23,6 +23,7 @@ import { EG_BLOCK_LOCKOUT_BASE_MS } from './encounter-constants.js';
 import { _egGameOver } from './encounter-kills.js';
 import { _egApplyPlayerBlockFeedback, _egApplyPlayerMissFeedback, _egShowBlockLockoutOverlay } from './encounter-monster-attack-feedback.js';
 import { _egDamageTargetById } from './encounter-monster-damage.js';
+import { _egRageOnPlayerHit } from './combat-ailments-state.js';
 import { _egApplyPlayerParryFeedback, _egGetDualWieldParryChancePct, _egGetParryChancePct, _egIsDualWieldParryActive, _egRollFateNegation, _egTryDeflectProjectile } from './encounter-player-mitigation.js';
 import { _egGetEncounterBaseLevel } from './encounter-spawn-rules.js';
 import { _egApplyPlayerShockAmp, _egRollMonsterHitAilment } from './combat-ailments-core.js';
@@ -113,6 +114,9 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (window._egGodMode) return 0;
 
     const stats = _egComputePlayerStats();
+
+    // Rage: being hit restarts the grace timer before it starts fading.
+    _egRageOnPlayerHit();
 
     // Charging a melee hold roots the hero: no evasion, no shield block,
     // and every landed hit is amplified (see

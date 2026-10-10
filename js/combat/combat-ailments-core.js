@@ -47,6 +47,13 @@ const EG_AIL_IGNITE_DMG_SHARE = 0.15;   // dps = share of the triggering hit
 const EG_AIL_BLEED_DURATION_S = 5;
 const EG_AIL_BLEED_DMG_SHARE = 0.15;    // dps = share of the triggering hit
 const EG_PHYS_INNATE_BLEED_CHANCE_PCT = 10;   // physical hits bleed even w/o mods
+const EG_AIL_BLEED_MOVING_MULT = 3;     // bleed on the player: +200% while moving
+
+// True while any movement key is held (same signal the boss mechanics use).
+function _egIsAvatarMoving() {
+    const st = globalThis._avatarMoveState;
+    return !!(st && st.held && st.held.size > 0);
+}
 const EG_AIL_CHILL_DURATION_S = 8;
 const EG_AIL_CHARGE_SLOW_MULT = 0.5;    // chilled attack bar fills at 50%
 const EG_AIL_FROZEN_DURATION_S = 0;     // player freeze removed; retained for compatibility
@@ -145,15 +152,23 @@ function _egApplyMonsterAilment(monster, key, dps) {
     // Passive tree: per-ailment duration for YOUR ailments on enemies
     // (tithe batch, e.g. reworked nodes 30252/30253). Only ignite and bleed
     // have tree channels; every other ailment keeps its base duration.
+    let bleedSpeedPct = 0;
     if (key === 'ignite' || key === 'bleed') {
         let pct = 0;
         try {
             const ps = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : {};
             pct = Number(key === 'ignite' ? ps.igniteDurationPct : ps.bleedDurationPct) || 0;
+            if (key === 'bleed') bleedSpeedPct = Math.max(0, Number(ps.bleedSpeedPct) || 0);
         } catch (e) { pct = 0; }
         if (pct > 0) durationS = durationS * (1 + pct / 100);
     }
+    // Bleed speed (nodes 30283/251): the same number of ticks of the same
+    // size, just faster - total damage is unchanged, the duration shrinks.
+    // The 0.1s slack keeps the final tick from racing the expiry.
+    const speedMult = 1 + bleedSpeedPct / 100;
+    if (speedMult > 1) durationS = durationS / speedMult + 0.1;
     _egApplyStatusToMap(monster.statuses, key, durationS, dps);
+    if (speedMult > 1) monster.statuses[key].tickS = EG_AIL_TICK_INTERVAL_S / speedMult;
     // No application blip on the monster side: elemental hits re-roll and
     // refresh ailments on every strike, so a per-hit cue (ignite especially)
     // reads as noise during fast auto-attacks. The per-second DoT tick and
@@ -428,7 +443,7 @@ export function _egRollIntimidate(target, opts) {
 // `amount` is the actual damage dealt and `elements` the per-element share.
 //------------------------------------------------------------------------
 
-function _egRollPlayerHitAilments(target, amount, elements) {
+function _egRollPlayerHitAilments(target, amount, elements, opts) {
     if (!_egIsActive() || !target || target.currentHP <= 0) return;
     const stats = _egComputePlayerStats();
     const _achPreHas = {};
@@ -444,6 +459,17 @@ function _egRollPlayerHitAilments(target, amount, elements) {
     const physShare = Math.max(0, amount - fireShare - coldShare - lightningShare - shadowShare);
     if (physShare > 0 && Math.random() * 100 < EG_PHYS_INNATE_BLEED_CHANCE_PCT) {
         _egApplyMonsterAilment(target, 'bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_BLEED_DMG_SHARE));
+    }
+    // Tree bleed chances (bleed batch): melee attacks and attacks in general
+    // (melee + primary projectile hits; spells never). The bleed deals a
+    // share of the hit's PHYSICAL damage, so a hit with no physical share
+    // cannot cause it.
+    const isMeleeHit = !!(opts && opts.isMelee);
+    const isAttackHit = isMeleeHit || !!(opts && opts.isPlayerHit);
+    const treeBleedPct = (isMeleeHit ? (stats.bleedChanceMeleePct || 0) : 0)
+        + (isAttackHit ? (stats.bleedChanceAttackPct || 0) : 0);
+    if (physShare > 0 && treeBleedPct > 0 && Math.random() * 100 < Math.min(100, treeBleedPct)) {
+        _egApplyMonsterAilment(target, 'bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, physShare * EG_AIL_BLEED_DMG_SHARE));
     }
 
     if (fireShare > 0 && stats.ignitePct > 0 && Math.random() * 100 < stats.ignitePct) {
@@ -617,7 +643,9 @@ function _egTickAilments() {
         st.acc = (st.acc || 0) + deltaS;
         if (st.acc >= EG_AIL_TICK_INTERVAL_S) {
             st.acc -= EG_AIL_TICK_INTERVAL_S;
-            playerDot += Math.max(EG_AIL_MIN_DOT_DAMAGE, Math.round(st.dps));
+            // Bleeding hurts far more while you move: +200% damage.
+            const moveMult = (key === 'bleed' && _egIsAvatarMoving()) ? EG_AIL_BLEED_MOVING_MULT : 1;
+            playerDot += Math.max(EG_AIL_MIN_DOT_DAMAGE, Math.round(st.dps * moveMult));
             if (key === 'shadowburn') playerIgnoresShield = true;
         }
     });
@@ -652,8 +680,9 @@ function _egTickAilments() {
             const st = m.statuses[key];
             if (!(st.dps > 0)) return;
             st.acc = (st.acc || 0) + deltaS;
-            if (st.acc >= EG_AIL_TICK_INTERVAL_S) {
-                st.acc -= EG_AIL_TICK_INTERVAL_S;
+            const tickS = st.tickS || EG_AIL_TICK_INTERVAL_S;
+            if (st.acc >= tickS) {
+                st.acc -= tickS;
                 dotTotal += Math.max(EG_AIL_MIN_DOT_DAMAGE, Math.round(st.dps));
             }
         });

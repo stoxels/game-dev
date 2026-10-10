@@ -111,6 +111,8 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
         const familyIncPct = stats.isSwordEquipped ? (stats.meleePhysSwordIncPct || 0)
             : stats.isAxeEquipped ? (stats.meleePhysAxeIncPct || 0) : 0;
         dmg *= (1 + familyIncPct / 100);
+        // Rage (axe notable 369): each Rage is a "more" step on melee damage.
+        if ((stats.rage || 0) > 0) dmg *= 1 + (stats.rage * (stats.rageMeleeMorePct || 0)) / 100;
     } else {
         // Unarmed / no weapon damage - flat fallback strike
         dmg = EG_PLAYER_MELEE_DAMAGE;

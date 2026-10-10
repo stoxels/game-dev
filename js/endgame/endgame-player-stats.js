@@ -24,7 +24,7 @@ import { EG_MOD_TABLE_WEAPON_2H } from '../loot/loot-mod-tables-weapon-2h.js';
 import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-tables-weapon1.js';
 import { EG_MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding, _egIsTwoHandedWeapon } from '../loot/loot-requirements.js';
-import { EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, _egGetEnduranceCharges } from '../combat/combat-ailments-state.js';
+import { EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, _egGetEnduranceCharges, _egGetRage } from '../combat/combat-ailments-state.js';
 import { _egGetEquippedWeaponInfo } from '../combat/combat-weapon-swing-config.js';
 import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 
@@ -707,6 +707,20 @@ export function _egComputePlayerStats() {
         ignorePhysReductionPct: passiveTreeBonuses.ignorePhysReductionPct || 0,
         intimidateChanceMeleePct: passiveTreeBonuses.intimidateChanceMeleePct || 0,
         intimidateMeleeAmpPct: passiveTreeBonuses.intimidateMeleeAmpPct || 0,
+        // Bleed batch (effects pipeline): extra bleed chances and bleed
+        // speed read in combat-ailments-core.js; regen rate in
+        // _egTickLifeRegen.
+        bleedChanceMeleePct: passiveTreeBonuses.bleedChanceMeleePct || 0,
+        bleedChanceAttackPct: passiveTreeBonuses.bleedChanceAttackPct || 0,
+        bleedSpeedPct: passiveTreeBonuses.bleedSpeedPct || 0,
+        lifeRegenRatePct: passiveTreeBonuses.lifeRegenRatePct || 0,
+        // Axe batch: charge-up speed while wielding an Axe, and Rage
+        // (rage = live count, filled in below; see combat-ailments-state.js).
+        axeChargeSpeedPct: passiveTreeBonuses.axeChargeSpeedPct || 0,
+        rageOnHitAxe: passiveTreeBonuses.rageOnHitAxe || 0,
+        rageMeleeMorePct: passiveTreeBonuses.rageMeleeMorePct || 0,
+        rageMax: passiveTreeBonuses.rageMax || 0,
+        rage: 0,
         isSwordEquipped: false,
         isAxeEquipped: false,
         meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
@@ -947,6 +961,7 @@ export function _egComputePlayerStats() {
     // all-elemental resistance. Flat Armour joins the pool BEFORE the %
     // increased multiplier below, like every other flat source.
     s.enduranceCharges = _egGetEnduranceCharges();
+    s.rage = _egGetRage();
     if (s.enduranceCharges > 0) {
         s.armourFlat += EG_ENDURANCE_ARMOUR_PER_CHARGE * s.enduranceCharges;
         s.allElementalResist += EG_ENDURANCE_ELEM_RES_PER_CHARGE * s.enduranceCharges;
@@ -1086,7 +1101,8 @@ export function _egGetPlayerAttackIntervalBreakdown() {
     // applied on top of the global manual-pacing multiplier and before the
     // map-run slow, so a slowed run still slows the charge down. 100% floor.
     const chargeSpeedPct = (stats.meleeChargeSpeedPct || 0) + (stats.attackSpeedPct || 0)
-        + (stats.isSwordEquipped ? (stats.swordChargeSpeedPct || 0) : 0);
+        + (stats.isSwordEquipped ? (stats.swordChargeSpeedPct || 0) : 0)
+        + (stats.isAxeEquipped ? (stats.axeChargeSpeedPct || 0) : 0);
     if (chargeSpeedPct > 0) {
         interval = Math.round(interval * (1 - Math.min(chargeSpeedPct, 100) / 100) * 10000) / 10000;
     }
@@ -1373,6 +1389,15 @@ export const EG_STAT_DISPLAY_LABELS = {
     ignorePhysReductionPct: { label: t('eg_stat_ignore_phys_reduction'), suffix: '%' },
     intimidateChanceMeleePct: { label: t('eg_stat_intimidate_chance'), suffix: '%' },
     intimidateMeleeAmpPct: { label: t('eg_stat_intimidate_amp'), suffix: '%' },
+    bleedChanceMeleePct: { label: t('eg_stat_bleed_chance_melee'), suffix: '%' },
+    bleedChanceAttackPct: { label: t('eg_stat_bleed_chance_attack'), suffix: '%' },
+    bleedSpeedPct: { label: t('eg_stat_bleed_speed'), suffix: '%' },
+    lifeRegenRatePct: { label: t('eg_stat_life_regen_rate'), suffix: '%' },
+    axeChargeSpeedPct: { label: t('eg_stat_axe_charge_speed'), suffix: '%' },
+    rageOnHitAxe: { label: t('eg_stat_rage_on_hit'), suffix: '' },
+    rageMeleeMorePct: { label: t('eg_stat_rage_effect'), suffix: '%' },
+    rage: { label: t('eg_stat_rage'), suffix: '' },
+    rageMax: { label: t('eg_stat_rage_max'), suffix: '' },
     // Melee charge-up speed (reworked node 30197): percentage shorter charge;
     // the resulting time is what the melee attackInterval line above shows.
     meleeChargeSpeedPct: { label: t('eg_stat_inc_melee_charge_speed'), suffix: '%' },
@@ -1472,7 +1497,7 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct',
+            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'bleedSpeedPct',
             'meleeChargeSpeedPct', 'attackSpeedPct', 'meleeRangeM', 'meleeAoEPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
@@ -1492,7 +1517,7 @@ export const EG_STAT_LAYOUT = {
     defense: [
         { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption'] },
         { catKey: 'eg_statcat_life_mana', buckets: [
-            'health', 'mana', 'lifeRegen', 'manaRegen', 'lifeLeechPct',
+            'health', 'mana', 'lifeRegen', 'lifeRegenRatePct', 'manaRegen', 'lifeLeechPct',
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
             'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [

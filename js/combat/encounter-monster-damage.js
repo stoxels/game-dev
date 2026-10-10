@@ -8,6 +8,7 @@ import { EG_STAGGER_DURATION_MS } from './encounter-lifecycle.js';
 import { _egFlashDamageCard, _egFlashImmune, _egShowDamageNumber, _egSpawnHitBurst, _egUpdateBars } from './encounter.js';
 import { EG_PLAYER_STATS, _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
+import { _egGainRage } from './combat-ailments-state.js';
 
 // Player-to-monster damage: target HP/charge/stagger application, elemental
 // resistance and ailment hooks, hit visuals, echo/overkill/ricochet procs,
@@ -118,7 +119,7 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
         amount = _egApplyAilmentShockAmpOnMonster(target, amount);
     }
     if (typeof _egRollPlayerHitAilments === 'function') {
-        _egRollPlayerHitAilments(target, amount, elements);
+        _egRollPlayerHitAilments(target, amount, elements, opts);
     }
     // Impale (heavy-weapon batch): any hit on an impaled enemy deals its
     // stored damage on top; a heavy melee hit can impale. Runs after the
@@ -132,6 +133,14 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     // Intimidate roll: after the hit's own damage so the hit that
     // intimidates does not benefit from the amp it just caused.
     if (_egRollIntimidate(target, opts)) _egShowStatusLabel(target.id, t('eg_intimidated'));
+
+    // Rage (axe notable 369): melee hits while wielding an Axe grant Rage.
+    if (opts && opts.isMelee) {
+        const rageStats = _egComputePlayerStats();
+        if (rageStats.isAxeEquipped && (rageStats.rageOnHitAxe || 0) > 0) {
+            _egGainRage(rageStats.rageOnHitAxe, rageStats.rageMax);
+        }
+    }
 
     _egApplyHitToMonster(target, amount);
     // Pass crit + elemental info so the number can pop with the right colour/size

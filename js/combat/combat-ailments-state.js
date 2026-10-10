@@ -55,6 +55,7 @@ export function _egSetSparkLastPosition(x, y) {
 // Resets only the player status map at the start of the lifecycle sequence.
 export function _egResetPlayerStatuses() {
     _egResetEnduranceCharges();
+    _egResetRage();
     _egPlayerStatuses = {};
 }
 
@@ -97,6 +98,49 @@ export function _egGainEnduranceCharge(max, durationPct = 0) {
     _egEnduranceUntil = Date.now() + EG_ENDURANCE_DURATION_MS * durationMult;
     _egStartEnduranceOrbs();
     return _egEnduranceCharges;
+}
+
+//------------------------------------------------------------------------
+//-------------------RAGE-------------------------------------------------
+//------------------------------------------------------------------------
+// Axe resource (notable 369). Each Rage is a multiplicative melee-damage
+// step (applied in _egCalcPlayerMeleeDamage). Gaining Rage or being hit
+// restarts a 5s grace timer; once it lapses one Rage fades per second.
+// Like the endurance charges the count is resolved lazily against the
+// clock, so no timer exists.
+export const EG_RAGE_DECAY_GRACE_MS = 5000;
+export const EG_RAGE_DECAY_STEP_MS = 1000;
+
+let _egRage = 0;
+let _egRageDecayAt = 0;
+
+export function _egGetRage() {
+    const now = Date.now();
+    while (_egRage > 0 && now >= _egRageDecayAt) {
+        _egRage -= 1;
+        _egRageDecayAt += EG_RAGE_DECAY_STEP_MS;
+    }
+    return _egRage;
+}
+
+// Adds `amount` Rage up to `max` and restarts the grace timer. Returns the
+// new count. Nothing is gained without a maximum (node not allocated).
+export function _egGainRage(amount, max) {
+    const cap = Math.max(0, Math.floor(Number(max) || 0));
+    if (cap <= 0) return _egGetRage();
+    _egRage = Math.min(cap, _egGetRage() + Math.max(0, Number(amount) || 0));
+    _egRageDecayAt = Date.now() + EG_RAGE_DECAY_GRACE_MS;
+    return _egRage;
+}
+
+// The player being hit also restarts the grace timer (no gain).
+export function _egRageOnPlayerHit() {
+    if (_egGetRage() > 0) _egRageDecayAt = Date.now() + EG_RAGE_DECAY_GRACE_MS;
+}
+
+export function _egResetRage() {
+    _egRage = 0;
+    _egRageDecayAt = 0;
 }
 
 export function _egResetEnduranceCharges() {

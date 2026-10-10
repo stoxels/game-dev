@@ -2357,10 +2357,15 @@ export const TALENT_TREE_DATA = {
    "y": 897,
    "nameEn": "Power Analysis",
    "nameDe": "Machtanalyse",
-   "descEn": "The Emergency Scan fires a second time when the timer reaches 2 minutes. +6% Armour.",
-   "descDe": "Der Notfall-Scan löst ein zweites Mal aus, wenn der Timer 2 Minuten erreicht. +6% Rüstung.",
-   "icon": "💪",
-   "statKey": "power_analysis",
+   "icon": "",
+   "statKey": "notable_axe_rage_369",
+   "effects": [
+    "melee_phys_axe:25",
+    "axe_charge_speed:8",
+    "rage_on_hit_axe:1",
+    "rage_effect:1",
+    "rage_max:30"
+   ],
    "tier": "notable"
   },
   {
@@ -2665,10 +2670,11 @@ export const TALENT_TREE_DATA = {
    "y": 709,
    "nameEn": "Residual Propagation",
    "nameDe": "Residuen-Propagation",
-   "descEn": "Residual Analysis chance increased by 10%. Stacks with Inference Spillover. +6% Armour.",
-   "descDe": "Residualanalyse Chance erhöht um 10%. Wirkt zusammen mit Inferenz-Überlauf. +6% Rüstung.",
-   "icon": "🔄",
-   "statKey": "residual_analysis_3",
+   "icon": "",
+   "statKey": "notable_bleed_speed_251",
+   "effects": [
+    "bleed_speed:15"
+   ],
    "tier": "notable"
   },
   {
@@ -3061,10 +3067,12 @@ export const TALENT_TREE_DATA = {
    "y": 441,
    "nameEn": "Clarity Mark",
    "nameDe": "Klarheitsmarke",
-   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace. +6% Armour.",
-   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur. +6% Rüstung.",
-   "icon": "✏️",
-   "statKey": "stronger_marks_3",
+   "icon": "",
+   "statKey": "notable_regen_rate_111",
+   "effects": [
+    "life_regen_rate:15",
+    "life_regen_pct:1.8"
+   ],
    "tier": "notable"
   },
   {
@@ -8362,10 +8370,12 @@ export const TALENT_TREE_DATA = {
    "y": 897,
    "nameEn": "Lesser Power Analysis",
    "nameDe": "Machtanalyse (klein)",
-   "descEn": "The Emergency Scan fires a second time when the timer reaches 1 minutes. +3% Armour.",
-   "descDe": "Der Notfall-Scan löst ein zweites Mal aus, wenn der Timer 1 Minuten erreicht. +3% Rüstung.",
-   "icon": "💪",
-   "statKey": "small_lesser_power_analysis",
+   "icon": "",
+   "statKey": "small_axe_tempo_30277",
+   "effects": [
+    "melee_phys_axe:12",
+    "axe_charge_speed:3"
+   ],
    "tier": "small"
   },
   {
@@ -8374,10 +8384,12 @@ export const TALENT_TREE_DATA = {
    "y": 905,
    "nameEn": "Lesser Power Analysis",
    "nameDe": "Machtanalyse (klein)",
-   "descEn": "The Emergency Scan fires a second time when the timer reaches 1 minutes. +3% Armour.",
-   "descDe": "Der Notfall-Scan löst ein zweites Mal aus, wenn der Timer 1 Minuten erreicht. +3% Rüstung.",
-   "icon": "💪",
-   "statKey": "small_lesser_power_analysis",
+   "icon": "",
+   "statKey": "small_axe_tempo_30278",
+   "effects": [
+    "melee_phys_axe:12",
+    "axe_charge_speed:3"
+   ],
    "tier": "small"
   },
   {
@@ -8386,10 +8398,12 @@ export const TALENT_TREE_DATA = {
    "y": 815,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_axe_tempo_30279",
+   "effects": [
+    "melee_phys_axe:12",
+    "axe_charge_speed:3"
+   ],
    "tier": "travel"
   },
   {
@@ -8437,10 +8451,11 @@ export const TALENT_TREE_DATA = {
    "y": 660,
    "nameEn": "Lesser Residual Propagation",
    "nameDe": "Residuen-Propagation (klein)",
-   "descEn": "Residual Analysis chance increased by 5%. Stacks with Inference Spillover. +3% Armour.",
-   "descDe": "Residualanalyse Chance erhöht um 5%. Wirkt zusammen mit Inferenz-Überlauf. +3% Rüstung.",
-   "icon": "🔄",
-   "statKey": "small_lesser_residual_propagation",
+   "icon": "",
+   "statKey": "small_bleed_speed_30283",
+   "effects": [
+    "bleed_speed:5"
+   ],
    "tier": "small"
   },
   {
@@ -8449,10 +8464,11 @@ export const TALENT_TREE_DATA = {
    "y": 611,
    "nameEn": "Lesser Residual Propagation",
    "nameDe": "Residuen-Propagation (klein)",
-   "descEn": "Residual Analysis chance increased by 5%. Stacks with Inference Spillover. +3% Armour.",
-   "descDe": "Residualanalyse Chance erhöht um 5%. Wirkt zusammen mit Inferenz-Überlauf. +3% Rüstung.",
-   "icon": "🔄",
-   "statKey": "small_lesser_residual_propagation",
+   "icon": "",
+   "statKey": "small_bleed_melee_30284",
+   "effects": [
+    "bleed_chance_melee:15"
+   ],
    "tier": "small"
   },
   {
@@ -8461,10 +8477,11 @@ export const TALENT_TREE_DATA = {
    "y": 660,
    "nameEn": "Lesser Residual Propagation",
    "nameDe": "Residuen-Propagation (klein)",
-   "descEn": "Residual Analysis chance increased by 5%. Stacks with Inference Spillover. +3% Armour.",
-   "descDe": "Residualanalyse Chance erhöht um 5%. Wirkt zusammen mit Inferenz-Überlauf. +3% Rüstung.",
-   "icon": "🔄",
-   "statKey": "small_lesser_residual_propagation",
+   "icon": "",
+   "statKey": "small_bleed_attack_30285",
+   "effects": [
+    "bleed_chance_attack:15"
+   ],
    "tier": "small"
   },
   {
@@ -8549,10 +8566,11 @@ export const TALENT_TREE_DATA = {
    "y": 388,
    "nameEn": "Lesser Clarity Mark",
    "nameDe": "Klarheitsmarke (klein)",
-   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace. +3% Armour.",
-   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur. +3% Rüstung.",
-   "icon": "✏️",
-   "statKey": "small_lesser_clarity_mark",
+   "icon": "",
+   "statKey": "small_regen_30292",
+   "effects": [
+    "life_regen_pct:0.6"
+   ],
    "tier": "small"
   },
   {
@@ -8561,10 +8579,11 @@ export const TALENT_TREE_DATA = {
    "y": 441,
    "nameEn": "Lesser Clarity Mark",
    "nameDe": "Klarheitsmarke (klein)",
-   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Insightful Trace. +3% Armour.",
-   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Einsichtsvolle Spur. +3% Rüstung.",
-   "icon": "✏️",
-   "statKey": "small_lesser_clarity_mark",
+   "icon": "",
+   "statKey": "small_regen_30293",
+   "effects": [
+    "life_regen_pct:0.6"
+   ],
    "tier": "small"
   },
   {

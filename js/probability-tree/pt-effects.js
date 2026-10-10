@@ -126,6 +126,15 @@ export const PT_EFFECT_DEFS = Object.freeze({
     melee_phys_sword: { channel: 'meleePhysSwordIncPct', en: '{v}% increased physical melee Damage with Swords', de: '{v}% erhöhter physischer Nahkampfschaden mit Schwertern' },
     melee_phys_axe: { channel: 'meleePhysAxeIncPct', en: '{v}% increased physical melee Damage with Axes', de: '{v}% erhöhter physischer Nahkampfschaden mit Äxten' },
     sword_charge_speed: { channel: 'swordChargeSpeedPct', en: '{v}% increased melee attack charge-up speed while wielding a Sword', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit mit Schwert' },
+    axe_charge_speed: { channel: 'axeChargeSpeedPct', en: '{v}% increased melee attack charge-up speed while wielding an Axe', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit mit Axt' },
+    // Rage (axe notable 369): a new stacking resource. Melee hits with an
+    // Axe grant rage_on_hit_axe Rage (capped at rage_max); every Rage is a
+    // multiplicative "more" step of rage_effect % on melee damage
+    // (_egCalcPlayerMeleeDamage). One Rage fades per second once 5 seconds
+    // passed without being hit or gaining Rage (combat-ailments-state.js).
+    rage_on_hit_axe: { channel: 'rageOnHitAxe', en: 'Gain {v} Rage on Hit with Axes', de: 'Erhalte {v} Wut bei Treffern mit Äxten' },
+    rage_effect: { channel: 'rageMeleeMorePct', en: 'Each Rage grants {v}% more Melee Attack Damage', de: 'Jede Wut gewährt {v}% mehr Nahkampfangriffsschaden' },
+    rage_max: { channel: 'rageMax', en: 'Maximum Rage is {v}', de: 'Maximale Wut beträgt {v}' },
     accuracy_sword: { channel: 'accuracySwordFlat', en: '+{v} to Accuracy Rating with Swords', de: '+{v} Präzision mit Schwertern' },
     // Armour pierce (node 147): rolled per player hit in
     // _egDamageTargetById; a successful roll skips the target's POSITIVE
@@ -137,6 +146,18 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // amplification itself is the separate intimidate_amp line.
     intimidate_melee: { channel: 'intimidateChanceMeleePct', en: '{v}% Chance to Intimidate enemies for 10 seconds on Hit with melee attacks', de: '{v}% Chance, Gegner bei Nahkampftreffern für 10 Sekunden einzuschüchtern' },
     intimidate_amp: { channel: 'intimidateMeleeAmpPct', en: 'Intimidated enemies take {v}% increased Melee Attack Damage', de: 'Eingeschüchterte Gegner erleiden {v}% erhöhten Nahkampfschaden' },
+
+    // Bleed batch (reworked nodes 30284/30285/30283/251): extra chances for
+    // your attacks to cause Bleeding (rolled per hit in
+    // _egRollPlayerHitAilments, sized from the hit's physical share) and a
+    // speed-up of the bleeds you inflict (_egApplyMonsterAilment: same total
+    // damage, faster ticks, shorter duration).
+    bleed_chance_melee: { channel: 'bleedChanceMeleePct', en: 'Melee attacks have a {v}% Chance to cause Bleeding', de: 'Nahkampfangriffe haben {v}% Chance, Blutung zu verursachen' },
+    bleed_chance_attack: { channel: 'bleedChanceAttackPct', en: 'Attacks have a {v}% Chance to cause Bleeding', de: 'Angriffe haben {v}% Chance, Blutung zu verursachen' },
+    bleed_speed: { channel: 'bleedSpeedPct', en: 'Bleeding you inflict deals Damage {v}% faster', de: 'Von dir verursachte Blutung verursacht Schaden {v}% schneller' },
+    // Life regeneration rate (reworked node 111): multiplies the whole
+    // per-second regeneration (flat + percentage) in _egTickLifeRegen.
+    life_regen_rate: { channel: 'lifeRegenRatePct', en: '{v}% increased Life Regeneration rate', de: '{v}% erhöhte Lebensregenerationsrate' },
 
     // Maximum Fire Resistance (reworked node 20068 Resolute Advance): seeds
     // the same fireResistMax bucket gear's max_fire_res feeds, so tree and
