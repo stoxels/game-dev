@@ -33,6 +33,7 @@ import { _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';
 
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive, _egIsCampaignRun } from './combat-state.js';
+import { _egGainEnduranceCharge } from './combat-ailments-state.js';
 import { _egHandleBossKill, _egHandleNormalMonsterKill } from './encounter-kill-rewards.js';
 
 
@@ -122,6 +123,13 @@ export function _egKillMonster(monsterId) {
     // On-kill gear stats: mana, life and absorption on kill
     if (typeof _egComputePlayerStats === 'function') {
         const killStats = _egComputePlayerStats();
+
+        // Shield batch (node 285): chance to gain an Endurance Charge on
+        // kill while holding a shield (see combat-ailments-state.js).
+        if (killStats.isShieldEquipped && (killStats.enduranceOnKillShieldPct || 0) > 0
+            && Math.random() * 100 < killStats.enduranceOnKillShieldPct) {
+            _egGainEnduranceCharge(killStats.enduranceChargesMax, killStats.enduranceDurationPct);
+        }
 
         if (typeof gainMana === 'function' && globalThis.playerMaxMana > 0 && (killStats.manaOnKill || 0) > 0) {
             gainMana(killStats.manaOnKill);

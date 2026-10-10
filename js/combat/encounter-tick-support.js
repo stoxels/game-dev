@@ -91,7 +91,9 @@ export function _egTickLifeRegen() {
     _egLastLifeRegenAt = now;
 
     const stats = _egComputePlayerStats();
-    const regen = (stats.lifeRegen || 0) + (globalThis.playerMaxHP * (stats.lifeRegenPct || 0)) / 100;
+    // Endurance batch: % of Life per second for every live Endurance Charge.
+    const regenPct = (stats.lifeRegenPct || 0) + (stats.lifeRegenPerEndurancePct || 0) * (stats.enduranceCharges || 0);
+    const regen = (stats.lifeRegen || 0) + (globalThis.playerMaxHP * regenPct) / 100;
     if (regen <= 0 || globalThis.playerCurrentHP <= 0 || globalThis.playerCurrentHP >= globalThis.playerMaxHP) return;
 
     // Active map run: No Life Regeneration - regeneration is disabled.

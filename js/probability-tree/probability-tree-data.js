@@ -572,12 +572,15 @@ export const TALENT_TREE_DATA = {
    "id": 285,
    "x": -2516,
    "y": 1365,
-   "nameEn": "Bayesian Adjustment",
-   "nameDe": "Bayessche Anpassung",
-   "descEn": "Each mistake you make during a level permanently increases the chance of the next automatic cell mark or reveal triggering by 5%, resetting after it triggers. Stacks with Adaptive Inference and Recursive Belief Update. +6% Armour.",
-   "descDe": "Jeder Fehler während eines Levels erhöht dauerhaft die Chance des nächsten automatischen Markierens oder Aufdeckens um 5% und setzt sich danach zurück. Wirkt zusammen mit Adaptiver Inferenz und Rekursiver Glaubensaktualisierung. +6% Rüstung.",
-   "icon": "🔃",
-   "statKey": "bayesian_update_1",
+   "nameEn": "Unbroken Bulwark",
+   "nameDe": "Ungebrochenes Bollwerk",
+   "icon": "",
+   "statKey": "notable_unbroken_bulwark_285",
+   "effects": [
+    "block_shield:8",
+    "melee_phys_shield:30",
+    "endurance_on_kill_shield:10"
+   ],
    "tier": "notable"
   },
   {
@@ -863,10 +866,13 @@ export const TALENT_TREE_DATA = {
    "y": 693,
    "nameEn": "Uncommon Shift",
    "nameDe": "Ungewöhnliche Wandlung",
-   "descEn": "Common items have a 5% chance to be upgraded to Uncommon when granted as a reward. Stacks with Rarity Spark and Ascending Quality. +6% Armour.",
-   "descDe": "Gewöhnliche Gegenstände haben beim Erhalt als Belohnung eine 5% Chance, auf Ungewöhnlich aufgewertet zu werden. Wirkt zusammen mit Seltenheitsfunke und Aufsteigende Qualität. +6% Rüstung.",
-   "icon": "⬆️",
-   "statKey": "common_refinement_2",
+   "icon": "",
+   "statKey": "notable_axe_intimidate_125",
+   "effects": [
+    "melee_phys_axe:30",
+    "intimidate_melee:15",
+    "intimidate_amp:10"
+   ],
    "tier": "notable"
   },
   {
@@ -2519,12 +2525,15 @@ export const TALENT_TREE_DATA = {
    "id": 8,
    "x": -2429,
    "y": 881,
-   "nameEn": "Quick Study",
-   "nameDe": "Schnelle Studie",
-   "descEn": "Excercise hints now show up after one less unsuccessfull attempt. +6% Armour.",
-   "descDe": "Hinweise bei Übungsaufgaben erscheinen einen Fehlversuch früher. +6% Rüstung.",
-   "icon": "💬",
-   "statKey": "quick_study",
+   "nameEn": "Skewer",
+   "nameDe": "Aufspießen",
+   "icon": "",
+   "statKey": "notable_skewer_8",
+   "effects": [
+    "impale_chance_heavy:20",
+    "impale_effect_fresh:30",
+    "impale_duration:50"
+   ],
    "tier": "notable"
   },
   {
@@ -2557,10 +2566,13 @@ export const TALENT_TREE_DATA = {
    "y": 1175,
    "nameEn": "Completion Surge",
    "nameDe": "Abschlussschub",
-   "descEn": "Increases the time gained from completing a full row or column by 5 seconds. +6% Armour.",
-   "descDe": "Erhöht die Zeit, die du beim Abschließen einer vollständigen Zeile oder Spalte erhältst, um 5 Sekunden. +6% Rüstung.",
-   "icon": "📉",
-   "statKey": "regression_reward_3",
+   "icon": "",
+   "statKey": "notable_sword_precision_227",
+   "effects": [
+    "melee_phys_sword:20",
+    "sword_charge_speed:8",
+    "accuracy_sword:200"
+   ],
    "tier": "notable"
   },
   {
@@ -3318,22 +3330,26 @@ export const TALENT_TREE_DATA = {
    "y": 1125,
    "nameEn": "Inventor's Cache",
    "nameDe": "Erfinderversteck",
-   "descEn": "20% increased chance of obtaining Utility items as rewards. Stacks with Toolbelt Greed and Practical Accumulation. +6% Armour.",
-   "descDe": "20% erhöhte Chance, Nützlichkeitsgegenstände als Belohnung zu erhalten. Wirkt zusammen mit Werkzeuggier und Praktische Anhäufung. +6% Rüstung.",
-   "icon": "🔧",
-   "statKey": "utility_hoarder_3",
+   "icon": "",
+   "statKey": "notable_sword_pierce_147",
+   "effects": [
+    "melee_phys_sword:35",
+    "ignore_phys_reduction:35"
+   ],
    "tier": "notable"
   },
   {
    "id": 380,
    "x": -2310,
    "y": 984,
-   "nameEn": "Variance Swap",
-   "nameDe": "Varianz-Tausch",
-   "descEn": "10% of all reveals are doubled (2 cells instead of 1). +6% Armour.",
-   "descDe": "10% aller Aufdeckungen werden verdoppelt (2 Zellen statt 1). +6% Rüstung.",
-   "icon": "🎚️",
-   "statKey": "variance_swap",
+   "nameEn": "Plated Vitality",
+   "nameDe": "Gepanzerte Vitalität",
+   "icon": "",
+   "statKey": "notable_plated_vitality_380",
+   "effects": [
+    "armour_inc_pct:24",
+    "health_inc_pct:8"
+   ],
    "tier": "notable"
   },
   {
@@ -3653,12 +3669,13 @@ export const TALENT_TREE_DATA = {
    "id": 240,
    "x": -2462,
    "y": 930,
-   "nameEn": "Low Information Zone",
-   "nameDe": "Informationsarme Zone",
-   "descEn": "At the start of each level, automatically mark 1 incorrect empty cell in the row or column with the fewest filled cells.",
-   "descDe": "Zu Beginn jedes Levels werden automatisch 1 falsche leeren Zellen in der Zeile oder Spalte mit den wenigsten gefüllten Zellen markiert.",
-   "icon": "🏜️",
-   "statKey": "travel_sparse_region_1",
+   "nameEn": "Barbed Edge",
+   "nameDe": "Widerhakenklinge",
+   "icon": "",
+   "statKey": "travel_barbed_edge_240",
+   "effects": [
+    "impale_effect_heavy:10"
+   ],
    "tier": "travel"
   },
   {
@@ -6442,10 +6459,11 @@ export const TALENT_TREE_DATA = {
    "y": 741,
    "nameEn": "Resolute Advance",
    "nameDe": "Entschlossener Vormarsch",
-   "descEn": "+10% Armour. You cannot be slowed below 80% Movement speed.",
-   "descDe": "+10% Rüstung. Du kannst nicht unter 80% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
-   "statKey": "notable_resolute_advance",
+   "icon": "",
+   "statKey": "notable_resolute_endurance_max_20067",
+   "effects": [
+    "endurance_max:1"
+   ],
    "tier": "notable"
   },
   {
@@ -8197,36 +8215,41 @@ export const TALENT_TREE_DATA = {
    "id": 30266,
    "x": -2241,
    "y": 1013,
-   "nameEn": "Lesser Variance Swap",
-   "nameDe": "Varianz-Tausch (klein)",
-   "descEn": "5% of all reveals are doubled (1 cells instead of 1). +3% Armour.",
-   "descDe": "5% aller Aufdeckungen werden verdoppelt (1 Zellen statt 1). +3% Rüstung.",
-   "icon": "🎚️",
-   "statKey": "small_lesser_variance_swap",
+   "nameEn": "Lesser Plated Vitality",
+   "nameDe": "Gepanzerte Vitalität (klein)",
+   "icon": "",
+   "statKey": "small_plated_vitality_30266",
+   "effects": [
+    "armour_inc_pct:8",
+    "health_inc_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30267,
    "x": -2339,
    "y": 1053,
-   "nameEn": "Lesser Variance Swap",
-   "nameDe": "Varianz-Tausch (klein)",
-   "descEn": "5% of all reveals are doubled (1 cells instead of 1). +3% Armour.",
-   "descDe": "5% aller Aufdeckungen werden verdoppelt (1 Zellen statt 1). +3% Rüstung.",
-   "icon": "🎚️",
-   "statKey": "small_lesser_variance_swap",
+   "nameEn": "Lesser Plated Vitality",
+   "nameDe": "Gepanzerte Vitalität (klein)",
+   "icon": "",
+   "statKey": "small_plated_vitality_30267",
+   "effects": [
+    "armour_inc_pct:8",
+    "health_inc_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30268,
    "x": -2429,
    "y": 979,
-   "nameEn": "Lesser Quick Study",
-   "nameDe": "Schnelle Studie (klein)",
-   "descEn": "Excercise hints now show up after one less unsuccessfull attempt. +3% Armour.",
-   "descDe": "Hinweise bei Übungsaufgaben erscheinen einen Fehlversuch früher. +3% Rüstung.",
-   "icon": "💬",
-   "statKey": "small_lesser_quick_study",
+   "nameEn": "Lesser Skewer",
+   "nameDe": "Aufspießen (klein)",
+   "icon": "",
+   "statKey": "small_skewer_30268",
+   "effects": [
+    "impale_chance_heavy:10"
+   ],
    "tier": "small"
   },
   {
@@ -8248,10 +8271,11 @@ export const TALENT_TREE_DATA = {
    "y": 1150,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_sword_melee_30270",
+   "effects": [
+    "melee_phys_sword:14"
+   ],
    "tier": "travel"
   },
   {
@@ -8260,10 +8284,11 @@ export const TALENT_TREE_DATA = {
    "y": 1130,
    "nameEn": "Lesser Completion Surge",
    "nameDe": "Abschlussschub (klein)",
-   "descEn": "Increases the time gained from completing a full row or column by 3 seconds. +3% Armour.",
-   "descDe": "Erhöht die Zeit, die du beim Abschließen einer vollständigen Zeile oder Spalte erhältst, um 3 Sekunden. +3% Rüstung.",
-   "icon": "📉",
-   "statKey": "small_lesser_completion_surge",
+   "icon": "",
+   "statKey": "small_sword_melee_30271",
+   "effects": [
+    "melee_phys_sword:16"
+   ],
    "tier": "small"
   },
   {
@@ -8272,10 +8297,12 @@ export const TALENT_TREE_DATA = {
    "y": 1170,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_sword_tempo_30272",
+   "effects": [
+    "melee_phys_sword:10",
+    "sword_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
@@ -8284,10 +8311,12 @@ export const TALENT_TREE_DATA = {
    "y": 1170,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_sword_tempo_30273",
+   "effects": [
+    "melee_phys_sword:10",
+    "sword_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
@@ -8296,10 +8325,11 @@ export const TALENT_TREE_DATA = {
    "y": 1130,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "small_sword_melee_30274",
+   "effects": [
+    "melee_phys_sword:16"
+   ],
    "tier": "small"
   },
   {
@@ -8368,10 +8398,11 @@ export const TALENT_TREE_DATA = {
    "y": 775,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_axe_melee_30280",
+   "effects": [
+    "melee_phys_axe:18"
+   ],
    "tier": "travel"
   },
   {
@@ -8380,10 +8411,11 @@ export const TALENT_TREE_DATA = {
    "y": 795,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_axe_melee_30281",
+   "effects": [
+    "melee_phys_axe:14"
+   ],
    "tier": "travel"
   },
   {
@@ -9087,10 +9119,11 @@ export const TALENT_TREE_DATA = {
    "y": 693,
    "nameEn": "Lesser Uncommon Shift",
    "nameDe": "Ungewöhnliche Wandlung (klein)",
-   "descEn": "Common items have a 3% chance to be upgraded to Uncommon when granted as a reward. Stacks with Rarity Spark and Ascending Quality. +3% Armour.",
-   "descDe": "Gewöhnliche Gegenstände haben beim Erhalt als Belohnung eine 3% Chance, auf Ungewöhnlich aufgewertet zu werden. Wirkt zusammen mit Seltenheitsfunke und Aufsteigende Qualität. +3% Rüstung.",
-   "icon": "⬆️",
-   "statKey": "small_lesser_uncommon_shift",
+   "icon": "",
+   "statKey": "small_axe_melee_30339",
+   "effects": [
+    "melee_phys_axe:18"
+   ],
    "tier": "small"
   },
   {
@@ -9099,10 +9132,11 @@ export const TALENT_TREE_DATA = {
    "y": 685,
    "nameEn": "Lesser Uncommon Shift",
    "nameDe": "Ungewöhnliche Wandlung (klein)",
-   "descEn": "Common items have a 3% chance to be upgraded to Uncommon when granted as a reward. Stacks with Rarity Spark and Ascending Quality. +3% Armour.",
-   "descDe": "Gewöhnliche Gegenstände haben beim Erhalt als Belohnung eine 3% Chance, auf Ungewöhnlich aufgewertet zu werden. Wirkt zusammen mit Seltenheitsfunke und Aufsteigende Qualität. +3% Rüstung.",
-   "icon": "⬆️",
-   "statKey": "small_lesser_uncommon_shift",
+   "icon": "",
+   "statKey": "small_axe_melee_30340",
+   "effects": [
+    "melee_phys_axe:18"
+   ],
    "tier": "small"
   },
   {
@@ -9111,10 +9145,11 @@ export const TALENT_TREE_DATA = {
    "y": 774,
    "nameEn": "Lesser Resolute Advance",
    "nameDe": "Entschlossener Vormarsch (klein)",
-   "descEn": "+5% Armour. You cannot be slowed below 40% Movement speed.",
-   "descDe": "+5% Rüstung. Du kannst nicht unter 40% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
-   "statKey": "small_lesser_resolute_advance",
+   "icon": "",
+   "statKey": "small_resolute_endurance_regen_30341",
+   "effects": [
+    "endurance_regen:0.2"
+   ],
    "tier": "small"
   },
   {
@@ -9149,10 +9184,11 @@ export const TALENT_TREE_DATA = {
    "y": 774,
    "nameEn": "Lesser Resolute Advance",
    "nameDe": "Entschlossener Vormarsch (klein)",
-   "descEn": "+5% Armour. You cannot be slowed below 40% Movement speed.",
-   "descDe": "+5% Rüstung. Du kannst nicht unter 40% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
-   "statKey": "small_lesser_resolute_advance",
+   "icon": "",
+   "statKey": "small_resolute_endurance_duration_30344",
+   "effects": [
+    "endurance_duration:20"
+   ],
    "tier": "small"
   },
   {
@@ -9521,36 +9557,41 @@ export const TALENT_TREE_DATA = {
    "id": 30374,
    "x": -2463,
    "y": 1312,
-   "nameEn": "Lesser Bayesian Adjustment",
-   "nameDe": "Bayessche Anpassung (klein)",
-   "descEn": "Each mistake you make during a level permanently increases the chance of the next automatic cell mark or reveal triggering by 3%, resetting after it triggers. Stacks with Adaptive Inference and Recursive Belief Update. +3% Armour.",
-   "descDe": "Jeder Fehler während eines Levels erhöht dauerhaft die Chance des nächsten automatischen Markierens oder Aufdeckens um 3% und setzt sich danach zurück. Wirkt zusammen mit Adaptiver Inferenz und Rekursiver Glaubensaktualisierung. +3% Rüstung.",
-   "icon": "🔃",
-   "statKey": "small_lesser_bayesian_adjustment",
+   "nameEn": "Lesser Bulwark Stance",
+   "nameDe": "Bollwerkhaltung (klein)",
+   "icon": "",
+   "statKey": "small_bulwark_stance_30374",
+   "effects": [
+    "block_shield:3",
+    "melee_phys_shield:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30375,
    "x": -2516,
    "y": 1259,
-   "nameEn": "Lesser Bayesian Adjustment",
-   "nameDe": "Bayessche Anpassung (klein)",
-   "descEn": "Each mistake you make during a level permanently increases the chance of the next automatic cell mark or reveal triggering by 3%, resetting after it triggers. Stacks with Adaptive Inference and Recursive Belief Update. +3% Armour.",
-   "descDe": "Jeder Fehler während eines Levels erhöht dauerhaft die Chance des nächsten automatischen Markierens oder Aufdeckens um 3% und setzt sich danach zurück. Wirkt zusammen mit Adaptiver Inferenz und Rekursiver Glaubensaktualisierung. +3% Rüstung.",
-   "icon": "🔃",
-   "statKey": "small_lesser_bayesian_adjustment",
+   "nameEn": "Lesser Bulwark Strike",
+   "nameDe": "Bollwerkschlag (klein)",
+   "icon": "",
+   "statKey": "small_bulwark_strike_30375",
+   "effects": [
+    "melee_phys_shield:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30376,
    "x": -2569,
    "y": 1312,
-   "nameEn": "Lesser Bayesian Adjustment",
-   "nameDe": "Bayessche Anpassung (klein)",
-   "descEn": "Each mistake you make during a level permanently increases the chance of the next automatic cell mark or reveal triggering by 3%, resetting after it triggers. Stacks with Adaptive Inference and Recursive Belief Update. +3% Armour.",
-   "descDe": "Jeder Fehler während eines Levels erhöht dauerhaft die Chance des nächsten automatischen Markierens oder Aufdeckens um 3% und setzt sich danach zurück. Wirkt zusammen mit Adaptiver Inferenz und Rekursiver Glaubensaktualisierung. +3% Rüstung.",
-   "icon": "🔃",
-   "statKey": "small_lesser_bayesian_adjustment",
+   "nameEn": "Lesser Tempered Shield",
+   "nameDe": "Gehärteter Schild (klein)",
+   "icon": "",
+   "statKey": "small_tempered_shield_30376",
+   "effects": [
+    "attack_phys_shield:14",
+    "shield_defences:30"
+   ],
    "tier": "small"
   },
   {
@@ -25423,8 +25464,8 @@ export const TALENT_TREE_DATA = {
    "y": 574,
    "nameEn": "Character Start: Syla",
    "nameDe": "Charakter-Start: Syla",
-   "descEn": "Character start node for Syla. The Naturalist walks the ranged path - bows, projectiles and evasion await to the southeast.",
-   "descDe": "Charakter-Startknoten für Syla. Die Naturalistin beschreitet den Fernkampf-Weg - Bögen, Projektile und Ausweichen warten im Südosten.",
+   "descEn": "Character start node for Syla",
+   "descDe": "Charakter-Startknoten für Syla",
    "icon": "◉",
    "statKey": "character_start_syla",
    "tier": "start",

@@ -106,6 +106,11 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
             ? (stats.meleePhysHeavyIncPct || 0)
             : (stats.meleePhys1HIncPct || 0);
         dmg *= (1 + stanceIncPct / 100);
+        // Weapon family (sword/axe batch): its own multiplier, only for the
+        // matching family of the equipped weapon.
+        const familyIncPct = stats.isSwordEquipped ? (stats.meleePhysSwordIncPct || 0)
+            : stats.isAxeEquipped ? (stats.meleePhysAxeIncPct || 0) : 0;
+        dmg *= (1 + familyIncPct / 100);
     } else {
         // Unarmed / no weapon damage - flat fallback strike
         dmg = EG_PLAYER_MELEE_DAMAGE;

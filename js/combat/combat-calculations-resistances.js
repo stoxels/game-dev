@@ -64,7 +64,10 @@ export function _egApplyTargetResistances(amount, target, elements, opts) {
     if (!target.resistances) return amount;
     const res = target.resistances;
     const clampRes = (v) => Math.max(-EG_RESIST_CAP_PCT, Math.min(EG_RESIST_CAP_PCT, Number(v) || 0));
-    const physRes = (typeof res.physical === 'number') ? clampRes(res.physical) : 0;
+    let physRes = (typeof res.physical === 'number') ? clampRes(res.physical) : 0;
+    // Armour pierce (node 147): this hit skips positive physical reduction;
+    // a negative value (vulnerability) still amplifies.
+    if (opts && opts.ignorePhysReduction) physRes = Math.min(0, physRes);
 
     // Split the hit into its elemental (resisted / amplified) and physical
     // (armored) shares. A missing, empty or oversized breakdown means the

@@ -211,7 +211,11 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // holding one, attacks only - spells still use spell block alone. The
     // boss / lockout / charging gates below apply to both sides equally.
     const dualWielding = (typeof _egIsDualWielding === 'function' && _egIsDualWielding());
-    const treeBlock = ((hasShieldEquipped || dualWielding) && !isSpell ? stats.blockChanceTree : 0) || 0;
+    // Shield batch (e.g. reworked nodes 30374/285): extra attack block
+    // chance that needs a shield specifically (dual-wielding alone is not
+    // enough), stacked on the shared tree bucket.
+    const treeBlock = (((hasShieldEquipped || dualWielding) && !isSpell ? stats.blockChanceTree : 0) || 0)
+        + ((hasShieldEquipped && !isSpell ? stats.blockChanceShieldPct : 0) || 0);
     const blockChance = (!isBossAbility && !isBlockLockedOut && (hasShieldEquipped || treeBlock > 0) && !chargingMelee)
         ? Math.min(75, (isSpell ? stats.spellBlockChance : stats.blockChance) + treeBlock)
         : 0;

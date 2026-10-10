@@ -75,6 +75,38 @@ export const PT_EFFECT_DEFS = Object.freeze({
     cold_resist_flat: { channel: 'coldResistFlat', en: '+{v} Cold Resistance', de: '+{v} Kältewiderstand' },
     lightning_resist_flat: { channel: 'lightningResistFlat', en: '+{v} Lightning Resistance', de: '+{v} Blitzwiderstand' },
 
+    // Shield batch (reworked nodes 30375/30374/30376/285). Every line is
+    // conditional on a shield being equipped. Wiring: blockChanceShieldPct
+    // in _egPlayerTakeDamage; the physical-damage lines folded into the
+    // physical buckets and shieldDefencePct applied to the shield's own
+    // defences, both in _egComputePlayerStats; Endurance Charges in
+    // combat-ailments-state.js (gained in _egKillMonster).
+    block_shield: { channel: 'blockChanceShieldPct', en: '+{v}% Chance to Block Attack Damage while Holding a Shield', de: '+{v}% Chance, Angriffsschaden mit Schild zu blocken' },
+    melee_phys_shield: { channel: 'meleePhysShieldIncPct', en: '{v}% increased Physical Melee Attack Damage while Holding a Shield', de: '{v}% erhöhter physischer Nahkampfangriffsschaden mit Schild' },
+    attack_phys_shield: { channel: 'attackPhysShieldIncPct', en: '{v}% increased Physical Attack Damage while Holding a Shield', de: '{v}% erhöhter physischer Angriffsschaden mit Schild' },
+    shield_defences: { channel: 'shieldDefencePct', en: '{v}% increased Defences from equipped Shield', de: '{v}% erhöhte Verteidigung vom ausgerüsteten Schild' },
+    endurance_on_kill_shield: { channel: 'enduranceOnKillShieldPct', en: '{v}% Chance to gain an Endurance Charge on Kill while Holding a Shield', de: '{v}% Chance, beim Töten mit Schild eine Ausdauerladung zu erhalten' },
+
+    // Endurance batch (reworked nodes 30344/20067/30341): charge duration
+    // (applied when a charge is gained, combat-ailments-state.js), the charge
+    // cap (added onto EG_ENDURANCE_BASE_MAX in _egComputePlayerStats) and
+    // Life regeneration per live charge (_egTickLifeRegen).
+    endurance_duration: { channel: 'enduranceDurationPct', en: '{v}% increased Endurance Charge Duration', de: '{v}% erhöhte Dauer von Ausdauerladungen' },
+    endurance_max: { channel: 'enduranceChargesMax', en: '+{v} to maximum Endurance Charges', de: '+{v} auf maximale Ausdauerladungen' },
+    endurance_regen: { channel: 'lifeRegenPerEndurancePct', en: 'Regenerate {v}% of Life per second per Endurance Charge', de: 'Regeneriere {v}% des Lebens pro Sekunde pro Ausdauerladung' },
+
+    // Impale (heavy-weapon batch, e.g. reworked nodes 30268/240/8): a melee
+    // hit with a Heavy (two-handed) weapon can impale the enemy, storing 10%
+    // of the hit's physical damage; the next 5 hits on it (within 8s) each
+    // deal that stored amount again as extra physical damage. Wired in
+    // _egApplyImpaleToHit (combat-ailments-core.js).
+    impale_chance_heavy: { channel: 'impaleChanceHeavyPct', en: '{v}% Chance to impale Enemies on Hit with Heavy weapons', de: '{v}% Chance, Gegner bei Treffern mit schweren Waffen aufzuspießen' },
+    impale_effect_heavy: { channel: 'impaleEffectHeavyPct', en: '{v}% increased Effect of Impales you inflict with Heavy weapons', de: '{v}% erhöhte Wirkung von Aufspießungen, die du mit schweren Waffen verursachst' },
+    // Only applies while the enemy carries no impale at the moment the new
+    // one lands (a still-active impale it refreshes does not count).
+    impale_effect_fresh: { channel: 'impaleEffectFreshPct', en: '{v}% increased Effect of Impales you inflict with Heavy weapons on non-impaled Enemies', de: '{v}% erhöhte Wirkung von Aufspießungen, die du mit schweren Waffen auf nicht aufgespießten Gegnern verursachst' },
+    impale_duration: { channel: 'impaleDurationPct', en: '{v}% increased Impale Duration', de: '{v}% erhöhte Aufspießungsdauer' },
+
     // --- damage -----------------------------------------------------------
     phys_damage_inc: { channel: 'physDamageIncPct', en: '+{v}% increased Physical Damage', de: '+{v}% erhöhter physischer Schaden' },
     melee_phys_inc: { channel: 'meleePhysIncPct', en: '+{v}% increased melee physical damage', de: '+{v}% physischer Nahkampfschaden' },
@@ -85,6 +117,27 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // _egCalcPlayerMeleeDamage via stats.isHeavyWeaponEquipped.
     melee_phys_1h: { channel: 'meleePhys1HIncPct', en: '+{v}% increased melee physical Damage with one-handed weapons', de: '+{v}% erhöhter physischer Nahkampfschaden mit einhändigen Waffen' },
     melee_phys_heavy: { channel: 'meleePhysHeavyIncPct', en: '+{v}% increased melee physical Damage with Heavy weapons', de: '+{v}% erhöhter physischer Nahkampfschaden mit schweren Waffen' },
+    // Weapon-family batch (sword/axe nodes 30270/30271/30274/147/30272/30273/
+    // 227 and 30281/30280/30339/30340/125). The family comes from the
+    // equipped weapon (_egGetEquippedWeaponInfo): the damage lines are a
+    // separate multiplier in _egCalcPlayerMeleeDamage, the charge-up line is
+    // added to the melee charge speed, the accuracy line to the flat
+    // accuracy pool, all in _egComputePlayerStats / the interval breakdown.
+    melee_phys_sword: { channel: 'meleePhysSwordIncPct', en: '{v}% increased physical melee Damage with Swords', de: '{v}% erhöhter physischer Nahkampfschaden mit Schwertern' },
+    melee_phys_axe: { channel: 'meleePhysAxeIncPct', en: '{v}% increased physical melee Damage with Axes', de: '{v}% erhöhter physischer Nahkampfschaden mit Äxten' },
+    sword_charge_speed: { channel: 'swordChargeSpeedPct', en: '{v}% increased melee attack charge-up speed while wielding a Sword', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit mit Schwert' },
+    accuracy_sword: { channel: 'accuracySwordFlat', en: '+{v} to Accuracy Rating with Swords', de: '+{v} Präzision mit Schwertern' },
+    // Armour pierce (node 147): rolled per player hit in
+    // _egDamageTargetById; a successful roll skips the target's POSITIVE
+    // physical resistance for that hit (vulnerability still amplifies).
+    ignore_phys_reduction: { channel: 'ignorePhysReductionPct', en: 'Hits have {v}% Chance to ignore enemy Physical Damage reduction', de: 'Treffer haben {v}% Chance, die physische Schadensreduktion von Gegnern zu ignorieren' },
+    // Intimidate (node 125): new status. Chance is rolled on melee hits
+    // (_egRollIntimidate); an intimidated enemy takes intimidateMeleeAmpPct
+    // % more melee damage for the duration (_egApplyIntimidateAmp), where the
+    // amplification itself is the separate intimidate_amp line.
+    intimidate_melee: { channel: 'intimidateChanceMeleePct', en: '{v}% Chance to Intimidate enemies for 10 seconds on Hit with melee attacks', de: '{v}% Chance, Gegner bei Nahkampftreffern für 10 Sekunden einzuschüchtern' },
+    intimidate_amp: { channel: 'intimidateMeleeAmpPct', en: 'Intimidated enemies take {v}% increased Melee Attack Damage', de: 'Eingeschüchterte Gegner erleiden {v}% erhöhten Nahkampfschaden' },
+
     // Maximum Fire Resistance (reworked node 20068 Resolute Advance): seeds
     // the same fireResistMax bucket gear's max_fire_res feeds, so tree and
     // gear raise the 75% cap together.

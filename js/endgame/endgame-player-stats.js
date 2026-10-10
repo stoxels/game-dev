@@ -24,6 +24,8 @@ import { EG_MOD_TABLE_WEAPON_2H } from '../loot/loot-mod-tables-weapon-2h.js';
 import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-tables-weapon1.js';
 import { EG_MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding, _egIsTwoHandedWeapon } from '../loot/loot-requirements.js';
+import { EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, _egGetEnduranceCharges } from '../combat/combat-ailments-state.js';
+import { _egGetEquippedWeaponInfo } from '../combat/combat-weapon-swing-config.js';
 import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
@@ -694,6 +696,19 @@ export function _egComputePlayerStats() {
         // gear feeds, this is a percentage applied to the melee charge time
         // by _egGetPlayerAttackIntervalBreakdown() below. Nothing else reads it.
         meleeChargeSpeedPct: passiveTreeBonuses.meleeChargeSpeedPct || 0,
+        // Weapon-family batch (effects pipeline, swords/axes): damage
+        // multipliers read in _egCalcPlayerMeleeDamage, charge-up speed in
+        // the attack interval; isSwordEquipped / isAxeEquipped are set from
+        // the equipped weapon below. Accuracy-with-swords is folded into the
+        // flat accuracy pool below, so it has no stat line of its own.
+        meleePhysSwordIncPct: passiveTreeBonuses.meleePhysSwordIncPct || 0,
+        meleePhysAxeIncPct: passiveTreeBonuses.meleePhysAxeIncPct || 0,
+        swordChargeSpeedPct: passiveTreeBonuses.swordChargeSpeedPct || 0,
+        ignorePhysReductionPct: passiveTreeBonuses.ignorePhysReductionPct || 0,
+        intimidateChanceMeleePct: passiveTreeBonuses.intimidateChanceMeleePct || 0,
+        intimidateMeleeAmpPct: passiveTreeBonuses.intimidateMeleeAmpPct || 0,
+        isSwordEquipped: false,
+        isAxeEquipped: false,
         meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
         meleeLightningMin: 0, meleeLightningMax: 0,
         meleeShadowMin: 0, meleeShadowMax: 0,
@@ -752,6 +767,29 @@ export function _egComputePlayerStats() {
         // ignite/bleed durations in _egApplyMonsterAilment.
         igniteDurationPct: passiveTreeBonuses.igniteDurationPct || 0,
         bleedDurationPct: passiveTreeBonuses.bleedDurationPct || 0,
+        // Shield batch (effects pipeline, e.g. reworked nodes 30374/285):
+        // block chance that only exists while a shield is equipped (read in
+        // _egPlayerTakeDamage), the on-kill Endurance Charge chance (read in
+        // _egKillMonster) and the charge cap. The shield-conditional damage
+        // and defence channels are folded in below / in the item loop.
+        blockChanceShieldPct: passiveTreeBonuses.blockChanceShieldPct || 0,
+        enduranceOnKillShieldPct: passiveTreeBonuses.enduranceOnKillShieldPct || 0,
+        enduranceChargesMax: EG_ENDURANCE_BASE_MAX + (passiveTreeBonuses.enduranceChargesMax || 0),
+        enduranceCharges: 0,
+        // Endurance batch (nodes 30344/30341): charge duration scaler and
+        // per-charge Life regen, read in combat-ailments-state.js and
+        // _egTickLifeRegen.
+        enduranceDurationPct: passiveTreeBonuses.enduranceDurationPct || 0,
+        lifeRegenPerEndurancePct: passiveTreeBonuses.lifeRegenPerEndurancePct || 0,
+        isShieldEquipped: false,
+        // Impale (heavy-weapon batch, effects pipeline, e.g. reworked nodes
+        // 30268/240/8): chance, effect and duration scalers read by
+        // _egApplyImpaleToHit in combat-ailments-core.js. Only heavy melee
+        // hits can impale, so the chance is meaningless without the stance.
+        impaleChanceHeavyPct: passiveTreeBonuses.impaleChanceHeavyPct || 0,
+        impaleEffectHeavyPct: passiveTreeBonuses.impaleEffectHeavyPct || 0,
+        impaleEffectFreshPct: passiveTreeBonuses.impaleEffectFreshPct || 0,
+        impaleDurationPct: passiveTreeBonuses.impaleDurationPct || 0,
         // Retaliation ward (reworked node 20036, legacy-table wired): a
         // bleeding attacker cannot bleed you, a burning one cannot ignite
         // you - see _egTryRetaliationWard in combat-ailments-core.js.
@@ -792,9 +830,15 @@ export function _egComputePlayerStats() {
             // Use the LOCAL-modified values (base + flat, scaled by the
             // item's own "% increased" mods) - see _egGetItemEffectiveDefenses.
             const eff = _egGetItemEffectiveDefenses(item);
-            s.armourFlat += eff.armour;
-            s.evasionFlat += eff.evasion;
-            s.absorptionFlat += eff.absorption;
+            // Shield batch (e.g. reworked node 30376): "% increased Defences
+            // from equipped Shield" multiplies ONLY the shield's own
+            // Armour / Evasion / Absorption, before the global % increased
+            // buckets apply on top of the aggregated flat pools.
+            const shieldDefMult = item.slotType === 'shield'
+                ? 1 + (passiveTreeBonuses.shieldDefencePct || 0) / 100 : 1;
+            s.armourFlat += eff.armour * shieldDefMult;
+            s.evasionFlat += eff.evasion * shieldDefMult;
+            s.absorptionFlat += eff.absorption * shieldDefMult;
         }
 
         // Shields carry an implicit base block chance on the base type
@@ -839,6 +883,18 @@ export function _egComputePlayerStats() {
         applyStatsFromList(item.mods);
         applyStatsFromList(item.implicits);
     });
+
+    // Shield batch (reworked nodes 30375/30374/30376/285): physical damage
+    // that only applies while a shield is equipped. "Attack" damage rides
+    // both the projectile and melee physical buckets (the tree's generic
+    // physDamageIncPct does the same); "melee attack" damage only the melee
+    // bucket.
+    s.isShieldEquipped = _egGetAllEquippedItems().some(item => item.slotType === 'shield');
+    if (s.isShieldEquipped) {
+        const attackShield = passiveTreeBonuses.attackPhysShieldIncPct || 0;
+        s.physIncPct += attackShield;
+        s.meleePhysIncPct += attackShield + (passiveTreeBonuses.meleePhysShieldIncPct || 0);
+    }
 
     // Dual-wield balance (PoE-style): two 1H weapons sum their base damage
     // and melee mods, then the strike total is scaled by
@@ -886,6 +942,23 @@ export function _egComputePlayerStats() {
         && Date.now() - (globalThis._egLastBlockAt || 0) < 10000) {
         s.armourFlat += passiveTreeBonuses.blockArmorPulse;
     }
+    // Endurance Charges (shield batch, node 285): live charges (shared 10s
+    // timer, see combat-ailments-state.js) each add flat Armour and
+    // all-elemental resistance. Flat Armour joins the pool BEFORE the %
+    // increased multiplier below, like every other flat source.
+    s.enduranceCharges = _egGetEnduranceCharges();
+    if (s.enduranceCharges > 0) {
+        s.armourFlat += EG_ENDURANCE_ARMOUR_PER_CHARGE * s.enduranceCharges;
+        s.allElementalResist += EG_ENDURANCE_ELEM_RES_PER_CHARGE * s.enduranceCharges;
+    }
+    // Weapon family of the equipped melee weapon (swing-config resolver:
+    // icon/name based, unknown melee weapons count as swords). Gates the
+    // sword/axe tree lines; +accuracy with swords joins the flat pool here
+    // so "increased Accuracy Rating" scales it like every other source.
+    const weaponFamily = _egGetEquippedWeaponInfo().family;
+    s.isSwordEquipped = weaponFamily === 'sword';
+    s.isAxeEquipped = weaponFamily === 'axe';
+    if (s.isSwordEquipped) s.accuracy += passiveTreeBonuses.accuracySwordFlat || 0;
     s.accuracy += s.agility;
     // "Increased Accuracy Rating" multiplies the fully aggregated rating
     // (gear + tree flat + Agi) before the map-run multiplier and the
@@ -1012,7 +1085,8 @@ export function _egGetPlayerAttackIntervalBreakdown() {
     // Onslaught) shorten the same interval; they add up as one percentage,
     // applied on top of the global manual-pacing multiplier and before the
     // map-run slow, so a slowed run still slows the charge down. 100% floor.
-    const chargeSpeedPct = (stats.meleeChargeSpeedPct || 0) + (stats.attackSpeedPct || 0);
+    const chargeSpeedPct = (stats.meleeChargeSpeedPct || 0) + (stats.attackSpeedPct || 0)
+        + (stats.isSwordEquipped ? (stats.swordChargeSpeedPct || 0) : 0);
     if (chargeSpeedPct > 0) {
         interval = Math.round(interval * (1 - Math.min(chargeSpeedPct, 100) / 100) * 10000) / 10000;
     }
@@ -1280,9 +1354,25 @@ export const EG_STAT_DISPLAY_LABELS = {
     meleePhysIncPct: { label: t('eg_stat_inc_melee_phys_dmg'), suffix: '%' },
     igniteDurationPct: { label: t('eg_stat_ignite_duration'), suffix: '%' },
     bleedDurationPct: { label: t('eg_stat_bleed_duration'), suffix: '%' },
+    blockChanceShieldPct: { label: t('eg_stat_block_shield'), suffix: '%' },
+    enduranceOnKillShieldPct: { label: t('eg_stat_endurance_on_kill'), suffix: '%' },
+    enduranceCharges: { label: t('eg_stat_endurance_charges'), suffix: '' },
+    enduranceChargesMax: { label: t('eg_stat_endurance_max'), suffix: '' },
+    enduranceDurationPct: { label: t('eg_stat_endurance_duration'), suffix: '%' },
+    lifeRegenPerEndurancePct: { label: t('eg_stat_life_regen_per_endurance'), suffix: '%' },
+    impaleChanceHeavyPct: { label: t('eg_stat_impale_chance'), suffix: '%' },
+    impaleEffectHeavyPct: { label: t('eg_stat_impale_effect'), suffix: '%' },
+    impaleEffectFreshPct: { label: t('eg_stat_impale_effect_fresh'), suffix: '%' },
+    impaleDurationPct: { label: t('eg_stat_impale_duration'), suffix: '%' },
     retaliationWard: { label: t('eg_stat_retaliation_ward'), suffix: '' },
     meleePhys1HIncPct: { label: t('eg_stat_inc_melee_phys_1h'), suffix: '%' },
     meleePhysHeavyIncPct: { label: t('eg_stat_inc_melee_phys_heavy'), suffix: '%' },
+    meleePhysSwordIncPct: { label: t('eg_stat_inc_melee_phys_sword'), suffix: '%' },
+    meleePhysAxeIncPct: { label: t('eg_stat_inc_melee_phys_axe'), suffix: '%' },
+    swordChargeSpeedPct: { label: t('eg_stat_sword_charge_speed'), suffix: '%' },
+    ignorePhysReductionPct: { label: t('eg_stat_ignore_phys_reduction'), suffix: '%' },
+    intimidateChanceMeleePct: { label: t('eg_stat_intimidate_chance'), suffix: '%' },
+    intimidateMeleeAmpPct: { label: t('eg_stat_intimidate_amp'), suffix: '%' },
     // Melee charge-up speed (reworked node 30197): percentage shorter charge;
     // the resulting time is what the melee attackInterval line above shows.
     meleeChargeSpeedPct: { label: t('eg_stat_inc_melee_charge_speed'), suffix: '%' },
@@ -1382,7 +1472,7 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct',
+            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct',
             'meleeChargeSpeedPct', 'attackSpeedPct', 'meleeRangeM', 'meleeAoEPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
@@ -1392,7 +1482,8 @@ export const EG_STAT_LAYOUT = {
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
-        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWard'] },
+        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWard',
+            'impaleChanceHeavyPct', 'impaleEffectHeavyPct', 'impaleEffectFreshPct', 'impaleDurationPct'] },
         { catKey: 'eg_statcat_arcane', buckets: [
             'castSpeedPct', 'fireCastSpeedPct', 'coldCastSpeedPct', 'lightningCastSpeedPct', 'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
             'channelMaxStacks', 'arcaneSurgeStreak', 'arcaneSurgeMana',
@@ -1406,6 +1497,7 @@ export const EG_STAT_LAYOUT = {
             'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [
             'blockChance', 'spellBlockChance', 'blockChanceTree', 'blockRecoveryPct',
+            'blockChanceShieldPct', 'enduranceCharges', 'enduranceChargesMax', 'enduranceDurationPct', 'lifeRegenPerEndurancePct', 'enduranceOnKillShieldPct',
             'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct',
             'parryChancePct', 'deflectChancePct', 'deflectDamagePct', 'reflectPhysFlat',
             'fatePct', 'castingAilmentAvoidPct'] },
@@ -1588,6 +1680,8 @@ export function _egBuildStatLine(bucket, stats) {
         meleePhysIncPct: 'eg_statdesc_meleePhysIncPct',
         meleePhys1HIncPct: 'eg_statdesc_meleePhys1HIncPct',
         meleePhysHeavyIncPct: 'eg_statdesc_meleePhysHeavyIncPct',
+        meleePhysSwordIncPct: 'eg_statdesc_meleePhysSwordIncPct',
+        meleePhysAxeIncPct: 'eg_statdesc_meleePhysAxeIncPct',
         meleeChargeSpeedPct: 'eg_statdesc_meleeChargeSpeedPct',
     };
     const descBucket = bucket.startsWith('melee') ? bucket.charAt(5).toLowerCase() + bucket.slice(6) : bucket;

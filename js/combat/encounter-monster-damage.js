@@ -1,5 +1,5 @@
 import { t } from '../translation/translations.js';
-import { _egApplyAilmentShockAmpOnMonster, _egRollPlayerHitAilments } from './combat-ailments-core.js';
+import { _egApplyAilmentShockAmpOnMonster, _egApplyImpaleToHit, _egApplyIntimidateAmp, _egRollIntimidate, _egRollPlayerHitAilments } from './combat-ailments-core.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
 import { EG_ELEMENTS, _egApplyTargetResistances, _egScaleElements } from './combat-calculations-resistances.js';
 import { EG_DAMAGE_NUMBER_DURATION_MS } from './encounter-constants.js';
@@ -94,6 +94,19 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
 
     const hpBefore = target.currentHP;
 
+    // Intimidate (node 125): melee hits on an intimidated enemy deal more.
+    // Applied before resistances so it scales the whole hit.
+    amount = _egApplyIntimidateAmp(target, amount, opts);
+
+    // Armour pierce (node 147): per-hit roll to skip the target's physical
+    // reduction. Only tagged player hits (melee strikes / primary projectile
+    // hits) roll; untagged boss and monster-side damage never does.
+    if (opts && (opts.isMelee || opts.isPlayerHit)
+        && ((target.resistances && target.resistances.physical) || 0) > 0) {
+        const pierce = Math.min(100, Number(_egComputePlayerStats().ignorePhysReductionPct) || 0);
+        if (pierce > 0 && Math.random() * 100 < pierce) opts = Object.assign({}, opts, { ignorePhysReduction: true });
+    }
+
     // Elemental resistances reduce only the elemental share of the hit;
     // the physical portion passes through untouched. opts carries source
     // tags (isMelee) read by Spellproof inside.
@@ -107,6 +120,18 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (typeof _egRollPlayerHitAilments === 'function') {
         _egRollPlayerHitAilments(target, amount, elements);
     }
+    // Impale (heavy-weapon batch): any hit on an impaled enemy deals its
+    // stored damage on top; a heavy melee hit can impale. Runs after the
+    // ailment roll so the extra damage never feeds bleed/ignite sizing.
+    if (typeof _egApplyImpaleToHit === 'function') {
+        const impaleBefore = target.impale;
+        amount = _egApplyImpaleToHit(target, amount, elements, opts);
+        if (target.impale && target.impale !== impaleBefore) _egShowStatusLabel(target.id, t('eg_impaled'));
+    }
+
+    // Intimidate roll: after the hit's own damage so the hit that
+    // intimidates does not benefit from the amp it just caused.
+    if (_egRollIntimidate(target, opts)) _egShowStatusLabel(target.id, t('eg_intimidated'));
 
     _egApplyHitToMonster(target, amount);
     // Pass crit + elemental info so the number can pop with the right colour/size

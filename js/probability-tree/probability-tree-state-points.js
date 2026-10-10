@@ -61,7 +61,6 @@ const PT_TRAVEL_STAT_KEY_ALIASES = new Map([
     ['travel_removal_ward_1', 'removal_ward_1'],
     ['travel_sample_efficiency_1', 'sample_efficiency_1'],
     ['travel_regression_reward_1', 'regression_reward_1'],
-    ['travel_sparse_region_1', 'sparse_region_1'],
 ]);
 
 export function _ptCanonicalStatKey(statKey) {

@@ -240,7 +240,7 @@ export function _egResolveProjectileImpact(damage, targetId, elements, opts) {
         }
     }
 
-    const damageOpts = Object.assign({}, opts);
+    const damageOpts = Object.assign({}, opts, { isPlayerHit: true });
     // Preserve charged flag and proportional element share for overkill calc
     if (elements && damage !== finalDamage && damage > 0) {
         // Scale elements to match the post-bonus finalDamage for resistance

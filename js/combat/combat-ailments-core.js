@@ -341,6 +341,86 @@ function _egApplyPlayerShockAmp(amount) {
 
 
 //------------------------------------------------------------------------
+//-------------------IMPALE (HEAVY WEAPONS)-------------------------------
+//------------------------------------------------------------------------
+// Heavy-weapon batch (reworked nodes 30268 / 240 / 8). A melee hit made
+// with a Heavy (two-handed) weapon can impale the enemy: the impale stores
+// EG_IMPALE_STORE_SHARE of that hit's physical damage. While it lasts, EVERY
+// hit on the enemy deals the stored amount again as extra physical damage
+// and uses up one of EG_IMPALE_MAX_HITS charges; it also ends after
+// EG_IMPALE_DURATION_S seconds. One impale per enemy - a new one replaces
+// the old (its charges and timer restart). Impale is not an ailment: it is
+// never blocked by ailment avoidance and has no status chip, only the
+// "Impaled!" label the caller shows when a new one lands.
+const EG_IMPALE_DURATION_S = 8;
+const EG_IMPALE_MAX_HITS = 5;
+const EG_IMPALE_STORE_SHARE = 0.10;
+
+// Called from _egDamageTargetById once the hit's final amount is known
+// (after resistances / shock amplification). Returns the amount to apply:
+// the hit itself plus any stored impale damage it triggers. The impale a hit
+// inflicts stores the hit's own damage, never the extra it just triggered,
+// and a hit can't trigger the impale it creates.
+function _egApplyImpaleToHit(target, amount, elements, opts) {
+    if (!target || !(amount > 0)) return amount;
+    const now = Date.now();
+    let out = amount;
+    if (target.impale && (target.impale.until <= now || target.impale.hits <= 0)) target.impale = null;
+    if (target.impale) {
+        out += target.impale.stored;
+        target.impale.hits -= 1;
+        if (target.impale.hits <= 0) target.impale = null;
+    }
+
+    if (!(opts && opts.isMelee)) return out;
+    const stats = _egComputePlayerStats();
+    if (!stats.isHeavyWeaponEquipped) return out;
+    const chancePct = Math.min(100, Number(stats.impaleChanceHeavyPct) || 0);
+    if (!(chancePct > 0) || Math.random() * 100 >= chancePct) return out;
+
+    // Physical share = whatever the elemental shares leave over (same rule
+    // the innate bleed roll below uses).
+    const el = elements || {};
+    const physical = Math.max(0, amount - (el.fire || 0) - (el.cold || 0) - (el.lightning || 0) - (el.shadow || 0));
+    if (!(physical > 0)) return out;
+
+    const effectPct = (Number(stats.impaleEffectHeavyPct) || 0)
+        + (target.impale ? 0 : (Number(stats.impaleEffectFreshPct) || 0));
+    const durationPct = Math.max(0, Number(stats.impaleDurationPct) || 0);
+    target.impale = {
+        stored: Math.max(1, Math.round(physical * EG_IMPALE_STORE_SHARE * (1 + effectPct / 100))),
+        hits: EG_IMPALE_MAX_HITS,
+        until: now + EG_IMPALE_DURATION_S * (1 + durationPct / 100) * 1000,
+    };
+    return out;
+}
+
+// Intimidate (node 125): a melee hit may intimidate the enemy for
+// EG_INTIMIDATE_DURATION_S seconds; while it lasts, melee hits against it
+// deal intimidateMeleeAmpPct % more damage (the node's second line).
+export const EG_INTIMIDATE_DURATION_S = 10;
+
+// Amplifies a melee hit on an intimidated enemy. Non-melee and
+// un-intimidated hits pass through unchanged.
+export function _egApplyIntimidateAmp(target, amount, opts) {
+    if (!target || !(opts && opts.isMelee) || !(amount > 0)) return amount;
+    if (!(target.intimidatedUntil > Date.now())) return amount;
+    const ampPct = Math.max(0, Number(_egComputePlayerStats().intimidateMeleeAmpPct) || 0);
+    return amount * (1 + ampPct / 100);
+}
+
+// Rolls the intimidate chance for one melee hit; returns true when the enemy
+// was (re)intimidated by it.
+export function _egRollIntimidate(target, opts) {
+    if (!target || !(opts && opts.isMelee) || target.currentHP <= 0) return false;
+    const chance = Math.min(100, Number(_egComputePlayerStats().intimidateChanceMeleePct) || 0);
+    if (!(chance > 0) || Math.random() * 100 >= chance) return false;
+    const scale = (typeof window !== 'undefined' && window.DEV_EFFECT_TIME_SCALE > 0) ? window.DEV_EFFECT_TIME_SCALE : 1;
+    target.intimidatedUntil = Date.now() + EG_INTIMIDATE_DURATION_S * scale * 1000;
+    return true;
+}
+
+//------------------------------------------------------------------------
 //-------------------AILMENT APPLICATION (COMBAT)------------------------
 //------------------------------------------------------------------------
 // Player → Monster: rolled from gear ailment chances when a hit carries the
@@ -737,6 +817,7 @@ export {
     _egApplyAilmentShockAmpOnMonster,
     _egApplyPlayerShockAmp,
     _egRollPlayerHitAilments,
+    _egApplyImpaleToHit,
     _egRollMonsterHitAilment,
     _egTickAilments,
     _egRenderMonsterStatusStrip,
