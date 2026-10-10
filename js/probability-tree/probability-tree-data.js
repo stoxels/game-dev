@@ -1631,12 +1631,14 @@ export const TALENT_TREE_DATA = {
    "id": 400,
    "x": 2625,
    "y": 500,
-   "nameEn": "Final Theorem",
-   "nameDe": "Endtheorem",
-   "descEn": "While the timer is below 10% of its starting value, you are completely immune to time penalties. +6% Evasion.",
-   "descDe": "Solange der Timer unter 10% seines Startwertes liegt, bist du völlig immun gegen Zeitstrafen. +6% Ausweichen.",
-   "icon": "🔚",
-   "statKey": "final_theorem",
+   "nameEn": "Efficient Draw",
+   "nameDe": "Sparsamer Zug",
+   "icon": "",
+   "statKey": "notable_efficient_draw_400",
+   "effects": [
+    "mana_on_projectile_hit:2",
+    "bow_spell_mana_reduced:25"
+   ],
    "tier": "notable"
   },
   {
@@ -12963,24 +12965,28 @@ export const TALENT_TREE_DATA = {
    "id": 20126,
    "x": 2242,
    "y": 752,
-   "nameEn": "Steady Aim",
-   "nameDe": "Ruhige Hand",
-   "descEn": "Standing still grants +12% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +12% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "notable_steady_aim",
+   "nameEn": "Frenzied Focus",
+   "nameDe": "Rasender Fokus",
+   "icon": "",
+   "statKey": "notable_frenzied_focus_20126",
+   "effects": [
+    "frenzy_max:1"
+   ],
    "tier": "notable"
   },
   {
    "id": 20127,
    "x": 2384,
    "y": 864,
-   "nameEn": "Steady Aim",
-   "nameDe": "Ruhige Hand",
-   "descEn": "Standing still grants +12% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +12% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "notable_steady_aim",
+   "nameEn": "Duelist's Edge",
+   "nameDe": "Klingenvorteil",
+   "icon": "",
+   "statKey": "notable_duelists_edge_20127",
+   "effects": [
+    "melee_charge_speed_pct:6",
+    "accuracy_flat:100",
+    "accuracy_rating_pct:20"
+   ],
    "tier": "notable"
   },
   {
@@ -15673,12 +15679,13 @@ export const TALENT_TREE_DATA = {
    "id": 30788,
    "x": 2193,
    "y": 719,
-   "nameEn": "Lesser Steady Aim",
-   "nameDe": "Ruhige Hand (klein)",
-   "descEn": "Standing still grants +6% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_steady_aim",
+   "nameEn": "Lesser Frenzied Focus",
+   "nameDe": "Rasender Fokus (klein)",
+   "icon": "",
+   "statKey": "small_lesser_frenzied_focus_30788",
+   "effects": [
+    "frenzy_duration:20"
+   ],
    "tier": "small"
   },
   {
@@ -15711,12 +15718,13 @@ export const TALENT_TREE_DATA = {
    "id": 30791,
    "x": 2291,
    "y": 719,
-   "nameEn": "Lesser Steady Aim",
-   "nameDe": "Ruhige Hand (klein)",
-   "descEn": "Standing still grants +6% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_steady_aim",
+   "nameEn": "Lesser Frenzied Reflexes",
+   "nameDe": "Rasende Reflexe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_frenzied_reflexes_30791",
+   "effects": [
+    "evasion_per_frenzy:4"
+   ],
    "tier": "small"
   },
   {
@@ -16015,24 +16023,28 @@ export const TALENT_TREE_DATA = {
    "id": 30816,
    "x": 2433,
    "y": 831,
-   "nameEn": "Lesser Steady Aim",
-   "nameDe": "Ruhige Hand (klein)",
-   "descEn": "Standing still grants +6% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_steady_aim",
+   "nameEn": "Lesser Duelist's Edge",
+   "nameDe": "Klingenvorteil (klein)",
+   "icon": "",
+   "statKey": "small_lesser_duelists_edge_30816",
+   "effects": [
+    "melee_charge_speed_pct:4",
+    "accuracy_rating_pct:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30817,
    "x": 2433,
    "y": 791,
-   "nameEn": "Lesser Steady Aim",
-   "nameDe": "Ruhige Hand (klein)",
-   "descEn": "Standing still grants +6% Projectile damage.",
-   "descDe": "Stilles Stehen gewährt +6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_steady_aim",
+   "nameEn": "Lesser Duelist's Edge",
+   "nameDe": "Klingenvorteil (klein)",
+   "icon": "",
+   "statKey": "small_lesser_duelists_edge_30817",
+   "effects": [
+    "melee_charge_speed_pct:4",
+    "accuracy_rating_pct:10"
+   ],
    "tier": "small"
   },
   {
@@ -18367,24 +18379,26 @@ export const TALENT_TREE_DATA = {
    "id": 31008,
    "x": 2645,
    "y": 602,
-   "nameEn": "Lesser Final Theorem",
-   "nameDe": "Endtheorem (klein)",
-   "descEn": "While the timer is below 5% of its starting value, you are completely immune to time penalties. +3% Evasion.",
-   "descDe": "Solange der Timer unter 5% seines Startwertes liegt, bist du völlig immun gegen Zeitstrafen. +3% Ausweichen.",
-   "icon": "🔚",
-   "statKey": "small_lesser_final_theorem",
+   "nameEn": "Lesser Efficient Draw",
+   "nameDe": "Sparsamer Zug (klein)",
+   "icon": "",
+   "statKey": "small_lesser_efficient_draw_31008",
+   "effects": [
+    "bow_spell_mana_reduced:15"
+   ],
    "tier": "small"
   },
   {
    "id": 31009,
    "x": 2605,
    "y": 602,
-   "nameEn": "Lesser Final Theorem",
-   "nameDe": "Endtheorem (klein)",
-   "descEn": "While the timer is below 5% of its starting value, you are completely immune to time penalties. +3% Evasion.",
-   "descDe": "Solange der Timer unter 5% seines Startwertes liegt, bist du völlig immun gegen Zeitstrafen. +3% Ausweichen.",
-   "icon": "🔚",
-   "statKey": "small_lesser_final_theorem",
+   "nameEn": "Lesser Efficient Draw",
+   "nameDe": "Sparsamer Zug (klein)",
+   "icon": "",
+   "statKey": "small_lesser_efficient_draw_31009",
+   "effects": [
+    "bow_spell_mana_reduced:15"
+   ],
    "tier": "small"
   },
   {

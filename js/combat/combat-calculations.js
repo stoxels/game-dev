@@ -46,6 +46,8 @@ export function _egCalcPlayerDamage() {
     // "% increased Projectile Damage" (passive tree): one multiplier over the
     // whole physical + elemental roll, applied before the crit multiplier.
     dmg *= 1 + (stats.projectileDamageIncPct || 0) / 100;
+    // Frenzy Charges: a "more" step on projectile damage per live charge.
+    dmg *= 1 + (stats.frenzyDamageMorePct || 0) / 100;
 
     // Projectile crit chance (passive tree) is added to the base crit chance
     // for this roll only - melee strikes never read it.

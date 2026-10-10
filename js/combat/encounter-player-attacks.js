@@ -236,6 +236,10 @@ export function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     // Drag-painting bonus: longer drags reduce miss chance (threshold-based)
     if (_egRollPlayerMiss(targetId, opts)) return;
 
+    // Passive tree: Mana on every projectile that connects (not on a miss).
+    const manaOnHit = Number(_egComputePlayerStats().manaOnProjectileHitPct) || 0;
+    if (manaOnHit > 0) gainMana(manaOnHit);
+
     // Gear: channel stacks + mana-to-damage are consumed by this hit
     let finalDamage = damage + _egConsumeOnHitGearBonus();
 

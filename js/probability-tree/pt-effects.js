@@ -240,6 +240,18 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Flat bonus to every Heart pickup (node 248): rides the heartHealFlat
     // bucket gear's heart_heal feeds (_egCalcHeartHeal).
     heart_heal_flat: { channel: 'heartHealFlat', en: 'Hearts heal for {v} more Life', de: 'Herzen heilen {v} mehr Leben' },
+    // Mana on projectile hit (node 400): every projectile that connects
+    // (after the accuracy roll) grants this much Mana, see
+    // _egResolveProjectileImpact.
+    mana_on_projectile_hit: { channel: 'manaOnProjectileHitPct', en: 'Gain {v} Mana whenever you hit with a Projectile', de: 'Erhalte {v} Mana, wenn du mit einem Projektil triffst' },
+    // Bow spells (nodes 31008/31009/400): tracked only until Bow-tagged spells
+    // exist (the spell cost code should read stats.bowSpellManaCostReducedPct).
+    bow_spell_mana_reduced: { channel: 'bowSpellManaCostReducedPct', en: '{v}% reduced Mana Cost of Bow spells', de: '{v}% reduzierte Manakosten von Bogenzaubern' },
+    // Frenzy Charges (nodes 30788/20126/30791): cap, duration and the
+    // evasion-per-charge line; see combat-ailments-state.js.
+    frenzy_max: { channel: 'frenzyChargesMax', en: '+{v} to maximum Frenzy Charges', de: '+{v} auf maximale Raserei-Ladungen' },
+    frenzy_duration: { channel: 'frenzyDurationPct', en: '{v}% increased Frenzy Charge Duration', de: '{v}% erhöhte Dauer von Raserei-Ladungen' },
+    evasion_per_frenzy: { channel: 'evasionPerFrenzyChargePct', en: '{v}% increased Evasion Rating per Frenzy Charge', de: '{v}% erhöhte Ausweichwertung pro Raserei-Ladung' },
     // Stun avoidance (nodes 30860/30863/20100): tracked and shown only - no
     // enemy can stun the player yet.
     stun_avoid: { channel: 'stunAvoidPct', en: '{v}% Chance to avoid being Stunned', de: '{v}% Chance, nicht betäubt zu werden' },

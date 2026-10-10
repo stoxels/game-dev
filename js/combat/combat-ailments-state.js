@@ -55,6 +55,7 @@ export function _egSetSparkLastPosition(x, y) {
 // Resets only the player status map at the start of the lifecycle sequence.
 export function _egResetPlayerStatuses() {
     _egResetEnduranceCharges();
+    _egResetFrenzyCharges();
     _egResetRage();
     _egPlayerStatuses = {};
 }
@@ -98,6 +99,45 @@ export function _egGainEnduranceCharge(max, durationPct = 0) {
     _egEnduranceUntil = Date.now() + EG_ENDURANCE_DURATION_MS * durationMult;
     _egStartEnduranceOrbs();
     return _egEnduranceCharges;
+}
+
+//------------------------------------------------------------------------
+//-------------------FRENZY CHARGES---------------------------------------
+//------------------------------------------------------------------------
+// Offensive charge resource (like Path of Exile's Frenzy Charges). Each
+// active charge grants EG_FRENZY_MELEE_SPEED_PER_CHARGE % increased melee
+// charge-up speed and EG_FRENZY_DAMAGE_PER_CHARGE % more projectile damage
+// (folded in _egComputePlayerStats). Charges share one timer: gaining a
+// charge refreshes it, and when it lapses they all expire. Resolved lazily
+// against the clock like Endurance Charges, so no timer exists.
+// Nothing GRANTS charges yet - _egGainFrenzyCharge is the hook for future
+// sources (nodes, gear, skills).
+export const EG_FRENZY_DURATION_MS = 10000;
+export const EG_FRENZY_BASE_MAX = 3;
+export const EG_FRENZY_MELEE_SPEED_PER_CHARGE = 4;
+export const EG_FRENZY_DAMAGE_PER_CHARGE = 4;
+
+let _egFrenzyCharges = 0;
+let _egFrenzyUntil = 0;
+
+export function _egGetFrenzyCharges() {
+    if (_egFrenzyCharges > 0 && Date.now() >= _egFrenzyUntil) _egFrenzyCharges = 0;
+    return _egFrenzyCharges;
+}
+
+// Adds one charge up to `max` and restarts the shared timer (scaled by
+// `durationPct` % increased Frenzy Charge Duration). Returns the new count.
+export function _egGainFrenzyCharge(max, durationPct = 0) {
+    const cap = Math.max(1, Math.floor(Number(max) || EG_FRENZY_BASE_MAX));
+    const durationMult = 1 + Math.max(0, Number(durationPct) || 0) / 100;
+    _egFrenzyCharges = Math.min(cap, _egGetFrenzyCharges() + 1);
+    _egFrenzyUntil = Date.now() + EG_FRENZY_DURATION_MS * durationMult;
+    return _egFrenzyCharges;
+}
+
+export function _egResetFrenzyCharges() {
+    _egFrenzyCharges = 0;
+    _egFrenzyUntil = 0;
 }
 
 //------------------------------------------------------------------------

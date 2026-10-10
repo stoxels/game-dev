@@ -24,7 +24,7 @@ import { EG_MOD_TABLE_WEAPON_2H } from '../loot/loot-mod-tables-weapon-2h.js';
 import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-tables-weapon1.js';
 import { EG_MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding, _egIsTwoHandedWeapon } from '../loot/loot-requirements.js';
-import { EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, _egGetEnduranceCharges, _egGetRage } from '../combat/combat-ailments-state.js';
+import { EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, EG_FRENZY_BASE_MAX, EG_FRENZY_DAMAGE_PER_CHARGE, EG_FRENZY_MELEE_SPEED_PER_CHARGE, _egGetEnduranceCharges, _egGetFrenzyCharges, _egGetRage } from '../combat/combat-ailments-state.js';
 import { EG_PX_PER_METER, _egGetEquippedWeaponInfo, _egIsMaceOrSceptre } from '../combat/combat-weapon-swing-config.js';
 import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 
@@ -646,6 +646,8 @@ export function _egComputePlayerStats() {
         // Stun avoidance (Stalwart Vigor nodes): tracked only - monsters cannot
         // stun the player yet; a future player-stun mechanic should roll this.
         stunAvoidPct: passiveTreeBonuses.stunAvoidPct || 0,
+        manaOnProjectileHitPct: passiveTreeBonuses.manaOnProjectileHitPct || 0,
+        bowSpellManaCostReducedPct: passiveTreeBonuses.bowSpellManaCostReducedPct || 0,
         manaOnMeleeHitChargedPct: passiveTreeBonuses.manaOnMeleeHitChargedPct || 0,
         parrySpellChancePct: passiveTreeBonuses.parrySpellChancePct || 0,
         critChanceMeleePct: passiveTreeBonuses.critChanceMeleePct || 0,
@@ -867,6 +869,14 @@ export function _egComputePlayerStats() {
         enduranceOnKillShieldPct: passiveTreeBonuses.enduranceOnKillShieldPct || 0,
         enduranceChargesMax: EG_ENDURANCE_BASE_MAX + (passiveTreeBonuses.enduranceChargesMax || 0),
         enduranceCharges: 0,
+        // Frenzy Charges (combat-ailments-state.js): cap and duration scaler
+        // from the tree; the live count and charge-derived bonuses are
+        // folded in below.
+        frenzyChargesMax: EG_FRENZY_BASE_MAX + (passiveTreeBonuses.frenzyChargesMax || 0),
+        frenzyCharges: 0,
+        frenzyDurationPct: passiveTreeBonuses.frenzyDurationPct || 0,
+        evasionPerFrenzyChargePct: passiveTreeBonuses.evasionPerFrenzyChargePct || 0,
+        frenzyDamageMorePct: 0,
         // Endurance batch (nodes 30344/30341): charge duration scaler and
         // per-charge Life regen, read in combat-ailments-state.js and
         // _egTickLifeRegen.
@@ -1043,6 +1053,14 @@ export function _egComputePlayerStats() {
     if (s.enduranceCharges > 0) {
         s.armourFlat += EG_ENDURANCE_ARMOUR_PER_CHARGE * s.enduranceCharges;
         s.allElementalResist += EG_ENDURANCE_ELEM_RES_PER_CHARGE * s.enduranceCharges;
+    }
+    // Frenzy Charges: melee charge-up speed, projectile damage and the
+    // tree's evasion-per-charge line scale with the live count.
+    s.frenzyCharges = _egGetFrenzyCharges();
+    if (s.frenzyCharges > 0) {
+        s.meleeChargeSpeedPct += EG_FRENZY_MELEE_SPEED_PER_CHARGE * s.frenzyCharges;
+        s.frenzyDamageMorePct = EG_FRENZY_DAMAGE_PER_CHARGE * s.frenzyCharges;
+        s.evasionIncPct += (s.evasionPerFrenzyChargePct || 0) * s.frenzyCharges;
     }
     // Weapon family of the equipped melee weapon (swing-config resolver:
     // icon/name based, unknown melee weapons count as swords). Gates the
@@ -1492,6 +1510,10 @@ export const EG_STAT_DISPLAY_LABELS = {
     blockChanceShieldPct: { label: t('eg_stat_block_shield'), suffix: '%' },
     enduranceOnKillShieldPct: { label: t('eg_stat_endurance_on_kill'), suffix: '%' },
     enduranceCharges: { label: t('eg_stat_endurance_charges'), suffix: '' },
+    frenzyCharges: { label: t('eg_stat_frenzy_charges'), suffix: '' },
+    frenzyChargesMax: { label: t('eg_stat_frenzy_max'), suffix: '' },
+    frenzyDurationPct: { label: t('eg_stat_frenzy_duration'), suffix: '%' },
+    evasionPerFrenzyChargePct: { label: t('eg_stat_evasion_per_frenzy'), suffix: '%' },
     enduranceChargesMax: { label: t('eg_stat_endurance_max'), suffix: '' },
     enduranceDurationPct: { label: t('eg_stat_endurance_duration'), suffix: '%' },
     lifeRegenPerEndurancePct: { label: t('eg_stat_life_regen_per_endurance'), suffix: '%' },
@@ -1518,6 +1540,8 @@ export const EG_STAT_DISPLAY_LABELS = {
     bowSpellDamageIncPct: { label: t('eg_stat_inc_bow_spell_damage'), suffix: '%' },
     bowSpellDotIncPct: { label: t('eg_stat_inc_bow_spell_dot'), suffix: '%' },
     stunAvoidPct: { label: t('eg_stat_stun_avoid'), suffix: '%' },
+    manaOnProjectileHitPct: { label: t('eg_stat_mana_on_projectile_hit'), suffix: '' },
+    bowSpellManaCostReducedPct: { label: t('eg_stat_bow_spell_mana_reduced'), suffix: '%' },
     manaOnMeleeHitChargedPct: { label: t('eg_stat_mana_on_melee_hit'), suffix: '' },
     parrySpellChancePct: { label: t('eg_stat_parry_spell_chance'), suffix: '%' },
     critChanceMeleePct: { label: t('eg_stat_crit_chance_melee'), suffix: '%' },
@@ -1662,7 +1686,7 @@ export const EG_STAT_LAYOUT = {
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
             'coldDamageIncPct', 'lightningDamageIncPct',
             'projectileDamageIncPct', 'projectileSpeedPct', 'projectileCritChancePct', 'projectileCritMultiplierPct', 'projectileElementalDamageIncPct',
-            'bowSpellDamageIncPct', 'bowSpellDotIncPct',
+            'bowSpellDamageIncPct', 'bowSpellDotIncPct', 'bowSpellManaCostReducedPct', 'manaOnProjectileHitPct',
             'healingPowerFlat', 'healingPowerIncPct',
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
@@ -1682,7 +1706,7 @@ export const EG_STAT_LAYOUT = {
             'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [
             'blockChance', 'spellBlockChance', 'blockChanceTree', 'blockRecoveryPct',
-            'blockChanceShieldPct', 'enduranceCharges', 'enduranceChargesMax', 'enduranceDurationPct', 'lifeRegenPerEndurancePct', 'enduranceOnKillShieldPct',
+            'blockChanceShieldPct', 'frenzyCharges', 'frenzyChargesMax', 'frenzyDurationPct', 'evasionPerFrenzyChargePct', 'enduranceCharges', 'enduranceChargesMax', 'enduranceDurationPct', 'lifeRegenPerEndurancePct', 'enduranceOnKillShieldPct',
             'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct',
             'parryChancePct', 'deflectChancePct', 'deflectDamagePct', 'reflectPhysFlat',
             'fatePct', 'castingAilmentAvoidPct'] },
