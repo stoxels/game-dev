@@ -25,7 +25,7 @@ import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-t
 import { EG_MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding, _egIsTwoHandedWeapon } from '../loot/loot-requirements.js';
 import { EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, _egGetEnduranceCharges, _egGetRage } from '../combat/combat-ailments-state.js';
-import { _egGetEquippedWeaponInfo, _egIsMaceOrSceptre } from '../combat/combat-weapon-swing-config.js';
+import { EG_PX_PER_METER, _egGetEquippedWeaponInfo, _egIsMaceOrSceptre } from '../combat/combat-weapon-swing-config.js';
 import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
@@ -791,6 +791,9 @@ export function _egComputePlayerStats() {
         // feeds (add-mode, so both stack) - read by both damage calcs in
         // combat-calculations.js.
         lifeLeechPct: passiveTreeBonuses.lifeLeechPct || 0,
+        // Melee-only leech from the tree (nodes 30257/30258/20043); applied in
+        // _egCalcPlayerMeleeDamage on top of the gear bucket above.
+        lifeLeechMeleePct: passiveTreeBonuses.lifeLeechMeleePct || 0,
         blockChance: 0, spellBlockChance: 0,
         // Tree-sourced block recovery (effects pipeline, e.g. reworked node
         // 30254) seeds the very same bucket gear's block_recovery feeds, so
@@ -831,16 +834,17 @@ export function _egComputePlayerStats() {
         impaleEffectHeavyPct: passiveTreeBonuses.impaleEffectHeavyPct || 0,
         impaleEffectFreshPct: passiveTreeBonuses.impaleEffectFreshPct || 0,
         impaleDurationPct: passiveTreeBonuses.impaleDurationPct || 0,
-        // Retaliation ward (reworked node 20036, legacy-table wired): a
-        // bleeding attacker cannot bleed you, a burning one cannot ignite
-        // you - see _egTryRetaliationWard in combat-ailments-core.js.
-        retaliationWard: passiveTreeBonuses.retaliationWard || 0,
+        // Retaliation ward (node 20036): a bleeding attacker cannot bleed you,
+        // a burning one cannot ignite you - see _egTryRetaliationWard in
+        // combat-ailments-core.js.
+        retaliationWardBleed: passiveTreeBonuses.retaliationWardBleed || 0,
+        retaliationWardIgnite: passiveTreeBonuses.retaliationWardIgnite || 0,
         // Champion's Vigor (reworked node 20033, legacy-table wired): bonus
         // melee strike range in meters, the melee splash base radius in px
         // it unlocks, and the increased AoE % scaling that radius - see
         // _egMeleeTargetInRange and _egTryMeleeSplashHit.
         meleeRangeM: passiveTreeBonuses.meleeRangeM || 0,
-        meleeSplashBasePx: passiveTreeBonuses.meleeSplashBasePx || 0,
+        meleeSplashBasePx: (passiveTreeBonuses.meleeSplashBaseM || 0) * EG_PX_PER_METER,
         meleeAoEPct: passiveTreeBonuses.meleeAoEPct || 0,
         attackSpeed: 0, cleavePct: 0, piercePct: 0, snipePct: 0, chainPct: 0, splashPct: 0,
         // Passive-tree percentage attack speed (reworked notable 20032):
@@ -1409,7 +1413,8 @@ export const EG_STAT_DISPLAY_LABELS = {
     impaleEffectHeavyPct: { label: t('eg_stat_impale_effect'), suffix: '%' },
     impaleEffectFreshPct: { label: t('eg_stat_impale_effect_fresh'), suffix: '%' },
     impaleDurationPct: { label: t('eg_stat_impale_duration'), suffix: '%' },
-    retaliationWard: { label: t('eg_stat_retaliation_ward'), suffix: '' },
+    retaliationWardBleed: { label: t('eg_stat_retaliation_ward_bleed'), suffix: '' },
+    retaliationWardIgnite: { label: t('eg_stat_retaliation_ward_ignite'), suffix: '' },
     meleePhys1HIncPct: { label: t('eg_stat_inc_melee_phys_1h'), suffix: '%' },
     meleePhysHeavyIncPct: { label: t('eg_stat_inc_melee_phys_heavy'), suffix: '%' },
     meleePhysSwordIncPct: { label: t('eg_stat_inc_melee_phys_sword'), suffix: '%' },
@@ -1458,6 +1463,7 @@ export const EG_STAT_DISPLAY_LABELS = {
     healingPowerIncPct: { label: t('eg_stat_inc_healing_power'), suffix: '%' },
 
     lifeLeechPct: { label: t('eg_stat_life_leech'), suffix: '%' },
+    lifeLeechMeleePct: { label: t('eg_stat_life_leech_melee'), suffix: '%' },
 
     blockChance: { label: t('eg_tt_block_chance'), suffix: '%' },
     spellBlockChance: { label: t('eg_stat_spell_block_chance'), suffix: '%' },
@@ -1547,7 +1553,7 @@ export const EG_STAT_LAYOUT = {
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
-        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWard',
+        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWardBleed', 'retaliationWardIgnite',
             'impaleChanceHeavyPct', 'impaleEffectHeavyPct', 'impaleEffectFreshPct', 'impaleDurationPct'] },
         { catKey: 'eg_statcat_arcane', buckets: [
             'castSpeedPct', 'fireCastSpeedPct', 'coldCastSpeedPct', 'lightningCastSpeedPct', 'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
@@ -1557,7 +1563,7 @@ export const EG_STAT_LAYOUT = {
     defense: [
         { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption'] },
         { catKey: 'eg_statcat_life_mana', buckets: [
-            'health', 'mana', 'lifeRegen', 'lifeRegenRatePct', 'manaRegen', 'lifeLeechPct',
+            'health', 'mana', 'lifeRegen', 'lifeRegenRatePct', 'manaRegen', 'lifeLeechPct', 'lifeLeechMeleePct',
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
             'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [

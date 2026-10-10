@@ -176,56 +176,8 @@ export const _EG_ATTR_ORIGINAL_BASE = {
 
 const _EG_PASSIVE_TREE_TRAVEL_BONUSES = {
     small_strength: { str: 5 },
-    // Node 30192 ("Strength", reworked) rides the very same channel through its
-    // own key, so it grants +5 Strength exactly like the shared pool above while
-    // staying independently tunable from the 171 placeholder small_strength
-    // owners. Both keys are read per allocated node, so the two stack additively.
-    travel_strength: { str: 5 },
-    // Node 30363 ("Strength", reworked): same +5 Strength through its own key,
-    // so it stays tunable apart from the 170 placeholder small_strength owners.
-    travel_strength_30363: { str: 5 },
-    // Node 30196 ("Melee Force", reworked): +12% increased MELEE physical
-    // damage. It rides the existing meleePhysIncPct bucket that gear's
-    // "% increased Physical Damage" mods already feed, which
-    // _egCalcPlayerMeleeDamage() multiplies onto the physical roll of a
-    // manual strike (combat-calculations.js) - no new damage plumbing.
-    // Projectile physIncPct, elemental shares, spells and the unarmed flat
-    // fallback are deliberately untouched.
-    travel_melee_force: { meleePhysIncPct: 12 },
     small_agility: { agi: 5 },
     small_intellect: { int: 5 },
-    travel_keen_intellect: { int: 5 },
-    travel_heightened_intellect: { int: 5 },
-    travel_profound_intellect: { int: 5 },
-    trix_cerebral_focus: { int: 5 },
-    travel_arcane_reserve: { mana: 16, absorptionFlat: 14 },
-    trix_absorption_core: { absorptionFlat: 10, absorptionIncPct: 4 },
-    trix_absorption_focus: { absorptionIncPct: 6, absorptionRegenRatePct: 10 },
-    trix_spell_thread: { mana: 16, spellDamageIncPct: 16 },
-    trix_spell_focus: { spellDamageIncPct: 10 },
-    // "+% increased elemental damage" - scales the ELEMENTAL share of every
-    // hit, never its physical share. Read in three places (see the stat
-    // comment in endgame-player-stats.js): the projectile channel and the
-    // melee channel roll their own gear elemental ranges
-    // (combat-calculations.js), and elemental universal spells add the
-    // percentage on top of their own roll (universal-spells.js).
-    travel_elemental_conduction: { elementalDamageIncPct: 10 },
-    // Node 31233 Prismatic Might - the hub the three "Might" nodes (31232
-    // Frozen, 31234 Blazing, 31235 Verdant) converge into. It rides the very
-    // same elemental channel as Elemental Conduction above, so the two travel
-    // nodes stack: 10% each, 20% together. Its own key keeps 31233 tunable on
-    // its own and leaves travel_elemental_conduction with a single owner.
-    travel_prismatic_might: { elementalDamageIncPct: 10 },
-    // "+% increased lightning damage" - lightning is one of the four
-    // EG_ELEMENTS, so this is the same two-channel shape as the fire and cold
-    // increases above: it scales the lightning share of melee strikes and
-    // projectiles (combat-calculations.js, fed by the lightning damage gear
-    // mods) and every lightning-element spell (universal-spells.js, which also
-    // covers the lightning support/movement spells Renewal, Windward and
-    // Windstep). Notable 110 Verdant Covenant owns the notable-strength version
-    // of the same channel.
-    travel_verdant_might: { lightningDamageIncPct: 16 },
-    trix_cast_speed: { castSpeedPct: 4 },
     small_martial_poise: { str: 5, agi: 5 },
     small_sharpshooter: { str: 5, agi: 5 },
     small_disciplined_body: { str: 5, agi: 5 },
@@ -240,100 +192,15 @@ const _EG_PASSIVE_TREE_TRAVEL_BONUSES = {
     small_quick_study: { int: 5, agi: 5 },
 };
 
-const _EG_PASSIVE_TREE_NOTABLE_BONUSES = {
-    // Node 20036 ("Tithe of Strength", reworked): retaliation ward - a
-    // bleeding attacker cannot bleed you, a burning one cannot ignite you
-    // (see _egTryRetaliationWard in combat-ailments-core.js). Legacy-table
-    // wired because the node is a path-B keystone with hand-written text;
-    // its renamed key keeps the retired notable_tithe_of_strength pool
-    // (node 20037) granting nothing, as before.
-    // Node 20033 ("Champion's Vigor", reworked keystone): melee strike
-    // range in meters plus the melee splash it unlocks - a base radius in
-    // px scaled by increased AoE %. Legacy-table wired like the 20036
-    // retaliation ward; its renamed key leaves the retired
-    // notable_champion_s_vigor pool (node 20003) granting nothing, as before.
-    notable_champions_vigor_20033: { meleeRangeM: 1, meleeSplashBasePx: 150, meleeAoEPct: 12 },
-    notable_tithe_ward_20036: { retaliationWard: 1 },
-    trix_arcane_bulwark: { mana: 20, absorptionFlat: 20, int: 20 },
-    notable_arcane_resonance: { spellDamageIncPct: 20, castSpeedPct: 5, int: 20 },
-    notable_deep_vigor: { healthIncPct: 8, manaIncPct: 12 },
-    // Notable parent of small node 31477 (Casting Ward): the same two channels
-    // at notable strength, plus the attributes the notable advertises. Str/Agi
-    // ride the existing attribute totals (EG_LEVELING_ATTRS); the resistance
-    // bonus is a flat add to fire/cold/lightning that still obeys the cap.
-    notable_casting_sentinel: { str: 20, agi: 20, allElementalResist: 10, castingAilmentAvoidPct: 25 },
-    // Fire specialist notable (node 20175). Three separate channels, each
-    // read where its stat already lives:
-    //   fireDamageIncPct - fire-only sibling of elementalDamageIncPct; scales
-    //                      the FIRE share of melee strikes and projectiles
-    //                      (combat-calculations.js) and fire spells
-    //                      (universal-spells.js).
-    //   fireCastSpeedPct - cast speed that only counts for fire spells
-    //                      (spell-casttime.js), added on top of castSpeedPct.
-    //   fireResistFlat   - seeds the fireResist bucket, so it rides the same
-    //                      75% cap (raised only by max-resistance uniques)
-    //                      as any gear fire resistance.
-    notable_ember_prior: { fireDamageIncPct: 25, fireCastSpeedPct: 5, fireResistFlat: 15 },
-    // Cold specialist notable (node 20174) - the exact cold mirror of the
-    // fire node above, one channel per advertised line:
-    //   coldDamageIncPct - cold-only sibling of elementalDamageIncPct; scales
-    //                      the COLD share of melee strikes and projectiles
-    //                      (combat-calculations.js) and cold spells
-    //                      (universal-spells.js).
-    //   coldCastSpeedPct - cast speed that only counts for cold spells
-    //                      (spell-casttime.js), added on top of castSpeedPct.
-    //   coldResistFlat   - seeds the coldResist bucket, so it rides the same
-    //                      75% cap (raised only by max-resistance uniques)
-    //                      as any gear cold resistance.
-    notable_frostweaver: { coldDamageIncPct: 25, coldCastSpeedPct: 5, coldResistFlat: 15 },
-    // Lightning specialist notable (node 110, Verdant Covenant). Same three-channel
-    // shape as the fire/cold notables above, one channel per advertised line:
-    // lightningDamageIncPct scales the lightning share of melee strikes and
-    // projectiles (combat-calculations.js) plus every lightning-element spell
-    // (universal-spells.js), lightningCastSpeedPct only counts for lightning spells
-    // (spell-casttime.js), and _egCalcPlayerResistanceReduction reads
-    // lightningResist for incoming 'lightning' hits (The Sprout's vines, spores, motes
-    // and dust bursts) under the same 75% cap as any gear resistance.
-    notable_verdant_covenant: { lightningDamageIncPct: 25, lightningCastSpeedPct: 5, lightningResistFlat: 15 },
-};
+// Notable nodes now ride the effects pipeline (pt-effects.js); the table is
+// kept (empty) because the scanner still consults it for unconverted notables.
+const _EG_PASSIVE_TREE_NOTABLE_BONUSES = {};
 
 // Small pathing nodes previously had no stat channel at all - only travel
 // and notable tiers were read. Deliberately narrow: a small node contributes
 // only when its (unique) stat key is listed here, so untouched pathing nodes
 // keep granting nothing.
-const _EG_PASSIVE_TREE_SMALL_BONUSES = {
-    small_lesser_spell_focus: { spellDamageIncPct: 10 },
-    small_focused_intellect: { int: 5 },
-    small_refined_intellect: { int: 5 },
-    small_vital_reserve: { healthIncPct: 5, manaIncPct: 8 },
-    small_steady_vigor: { healthIncPct: 5, manaIncPct: 8 },
-    small_casting_ward: { allElementalResist: 3, castingAilmentAvoidPct: 15 },
-    small_casting_vigil: { allElementalResist: 3, castingAilmentAvoidPct: 15 },
-    // Lesser sibling of notable 256 (Arcane Bulwark): the same two defensive
-    // channels at small strength. absorptionFlat/mana are already read by
-    // endgame-player-stats.js, so no new plumbing is needed.
-    small_arcane_bulwark: { absorptionFlat: 10, mana: 10 },
-    // Fire node 31234 ("Blazing Might"), the fire mirror of lightning's 31235.
-    // fireDamageIncPct is the same fire-only channel notable 20175 already
-    // uses, so no new plumbing is needed: it scales the fire share of melee
-    // strikes and projectiles (combat-calculations.js) plus every fire spell
-    // (universal-spells.js), and never touches cold, lightning, shadow or
-    // physical damage.
-    small_blazing_might: { fireDamageIncPct: 16 },
-    // Cold node 31232 ("Frozen Might"), the cold mirror of fire's 31234 and
-    // lightning's 31235. coldDamageIncPct is the same cold-only channel notable
-    // 20174 already uses, so no new plumbing is needed: it scales the cold share
-    // of melee strikes and projectiles (combat-calculations.js) plus every cold
-    // spell (universal-spells.js), and never touches fire, lightning, shadow or
-    // physical damage.
-    small_frozen_might: { coldDamageIncPct: 16 },
-    // Node 30193 ("Strength", reworked): the small-tier sibling of travel node
-    // 30192, granting the same +5 Strength through its own key. Small nodes are
-    // ONLY read from this table, and the node's old shared small_strength key
-    // lives in the TRAVEL table - so its advertised "+1 to Strength." granted
-    // nothing at all until this rework wired it here.
-    small_strength_30193: { str: 5 },
-};
+const _EG_PASSIVE_TREE_SMALL_BONUSES = {};
 
 const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
     Array.isArray(TALENT_TREE_DATA?.nodes)
@@ -342,7 +209,7 @@ const _EG_PASSIVE_TREE_NODES_BY_ID = new Map(
 );
 
 function _egGetPassiveTreeTravelBonuses() {
-    const totals = { str: 0, agi: 0, int: 0, mana: 0, armourFlat: 0, armourIncPct: 0, lifeRegenPct: 0, lifeRegenFlat: 0, accuracy: 0, accuracyIncPct: 0, movementSpeedPct: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleePhys1HIncPct: 0, meleePhysHeavyIncPct: 0, meleeChargeSpeedPct: 0, attackSpeedPct: 0, physDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, lightningDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, lightningCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, lightningResistFlat: 0, fireResistMax: 0, healthFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0, reflectPhysFlat: 0, blockChanceTree: 0, blockRecoveryPct: 0, blockArmorPulse: 0, igniteDurationPct: 0, bleedDurationPct: 0, retaliationWard: 0, meleeRangeM: 0, meleeSplashBasePx: 0, meleeAoEPct: 0, lifeLeechPct: 0, impaleChanceHeavyPct: 0, impaleEffectHeavyPct: 0, impaleEffectFreshPct: 0, impaleDurationPct: 0, blockChanceShieldPct: 0, meleePhysShieldIncPct: 0, attackPhysShieldIncPct: 0, shieldDefencePct: 0, enduranceOnKillShieldPct: 0, enduranceChargesMax: 0, enduranceDurationPct: 0, lifeRegenPerEndurancePct: 0, meleePhysSwordIncPct: 0, meleePhysAxeIncPct: 0, swordChargeSpeedPct: 0, accuracySwordFlat: 0, ignorePhysReductionPct: 0, intimidateChanceMeleePct: 0, intimidateMeleeAmpPct: 0, bleedChanceMeleePct: 0, bleedChanceAttackPct: 0, bleedSpeedPct: 0, lifeRegenRatePct: 0, axeChargeSpeedPct: 0, rageOnHitAxe: 0, rageMeleeMorePct: 0, rageMax: 0, meleePhysMaceIncPct: 0, areaOfEffectPct: 0, stunChanceMaceChargedPct: 0, stunDurationPct: 0, coldResistMax: 0, lightningResistMax: 0, allElementalResistMax: 0, stunChanceHeavyPct: 0, stunDurationHeavyPct: 0, stunDoubleChancePct: 0, meleeDoubleDamageChancePct: 0, meleeSpellManaCostReducedPct: 0, meleeSpellLifeCostPct: 0, meleeKillExplodeChancePct: 0 };
+    const totals = { str: 0, agi: 0, int: 0, mana: 0, armourFlat: 0, armourIncPct: 0, lifeRegenPct: 0, lifeRegenFlat: 0, accuracy: 0, accuracyIncPct: 0, movementSpeedPct: 0, absorptionFlat: 0, absorptionIncPct: 0, absorptionRegenRatePct: 0, spellDamageIncPct: 0, meleePhysIncPct: 0, meleePhys1HIncPct: 0, meleePhysHeavyIncPct: 0, meleeChargeSpeedPct: 0, attackSpeedPct: 0, physDamageIncPct: 0, elementalDamageIncPct: 0, fireDamageIncPct: 0, coldDamageIncPct: 0, lightningDamageIncPct: 0, castSpeedPct: 0, fireCastSpeedPct: 0, coldCastSpeedPct: 0, lightningCastSpeedPct: 0, fireResistFlat: 0, coldResistFlat: 0, lightningResistFlat: 0, fireResistMax: 0, healthFlat: 0, healthIncPct: 0, manaIncPct: 0, allElementalResist: 0, castingAilmentAvoidPct: 0, reflectPhysFlat: 0, blockChanceTree: 0, blockRecoveryPct: 0, blockArmorPulse: 0, igniteDurationPct: 0, bleedDurationPct: 0, meleeRangeM: 0, meleeSplashBaseM: 0, lifeLeechMeleePct: 0, timerStartSecs: 0, retaliationWardBleed: 0, retaliationWardIgnite: 0, meleeAoEPct: 0, lifeLeechPct: 0, impaleChanceHeavyPct: 0, impaleEffectHeavyPct: 0, impaleEffectFreshPct: 0, impaleDurationPct: 0, blockChanceShieldPct: 0, meleePhysShieldIncPct: 0, attackPhysShieldIncPct: 0, shieldDefencePct: 0, enduranceOnKillShieldPct: 0, enduranceChargesMax: 0, enduranceDurationPct: 0, lifeRegenPerEndurancePct: 0, meleePhysSwordIncPct: 0, meleePhysAxeIncPct: 0, swordChargeSpeedPct: 0, accuracySwordFlat: 0, ignorePhysReductionPct: 0, intimidateChanceMeleePct: 0, intimidateMeleeAmpPct: 0, bleedChanceMeleePct: 0, bleedChanceAttackPct: 0, bleedSpeedPct: 0, lifeRegenRatePct: 0, axeChargeSpeedPct: 0, rageOnHitAxe: 0, rageMeleeMorePct: 0, rageMax: 0, meleePhysMaceIncPct: 0, areaOfEffectPct: 0, stunChanceMaceChargedPct: 0, stunDurationPct: 0, coldResistMax: 0, lightningResistMax: 0, allElementalResistMax: 0, stunChanceHeavyPct: 0, stunDurationHeavyPct: 0, stunDoubleChancePct: 0, meleeDoubleDamageChancePct: 0, meleeSpellManaCostReducedPct: 0, meleeSpellLifeCostPct: 0, meleeKillExplodeChancePct: 0 };
     const state = typeof globalThis.STATE !== 'undefined' ? globalThis.STATE : null;
     if (!state || !state.passiveTreeAllocated) return totals;
     if (typeof globalThis.isTreeless === 'function' && globalThis.isTreeless()) return totals;
@@ -396,19 +263,6 @@ function _egGetPassiveTreeTravelBonuses() {
             totals.manaIncPct += bonus.manaIncPct || 0;
             totals.allElementalResist += bonus.allElementalResist || 0;
             totals.castingAilmentAvoidPct += bonus.castingAilmentAvoidPct || 0;
-            // Retaliation ward (reworked node 20036, legacy-table wired):
-            // effects nodes bypass this block via the pipeline below, so
-            // only legacy-table entries need their channels copied here.
-            totals.retaliationWard += bonus.retaliationWard || 0;
-            // Champion's Vigor (reworked node 20033, legacy-table wired) -
-            // same reason: the range/splash channels arrive via statKey.
-            totals.meleeRangeM += bonus.meleeRangeM || 0;
-            totals.meleeSplashBasePx += bonus.meleeSplashBasePx || 0;
-            totals.meleeAoEPct += bonus.meleeAoEPct || 0;
-            // Tree life leech (grit batch, effects pipeline) rides the gear
-            // bucket in _egComputePlayerStats, but the legacy copy keeps
-            // table entries honest if one ever grants it directly.
-            totals.lifeLeechPct += bonus.lifeLeechPct || 0;
         }
         // Effects pipeline: a node authored with an `effects` list grants
         // its channels straight from the registry (pt-effects.js) - no
@@ -422,6 +276,13 @@ function _egGetPassiveTreeTravelBonuses() {
         }
     }
     return totals;
+}
+
+// Seconds added to the level timer by passive nodes (timer_start_secs
+// effect, nodes 31211/31215/31216). Read by the _initTimer patch in
+// probability-tree-expansion.js.
+export function _egGetTreeTimerStartSecs() {
+    return Number(_egGetPassiveTreeTravelBonuses().timerStartSecs) || 0;
 }
 
 export const EG_LEVELING_ATTRS = [

@@ -509,17 +509,20 @@ function _egTryAvoidAilmentWhileCasting() {
     return Math.random() * 100 < chance;
 }
 
-// Attacker-aware retaliation ward (reworked node 20036 Tithe of Strength):
+// Attacker-aware retaliation ward (reworked node 20036 Retaliation Ward):
 // a bleeding attacker cannot bleed you, a burning attacker cannot ignite
 // you. Reads the attacker's live statuses, so an expired bleed/ignite stops
 // protecting it - and you. Returns true when the incoming ailment is warded.
 function _egTryRetaliationWard(element, attacker) {
-    let ward = 0;
-    try { ward = Number(_egComputePlayerStats().retaliationWard) || 0; } catch (e) { return false; }
-    if (!(ward > 0)) return false;
-    if (!attacker || !attacker.statuses) return false;
-    if (element === 'fire') return _egHasStatus(attacker.statuses, 'ignite');
-    if (!element) return _egHasStatus(attacker.statuses, 'bleed');
+    let stats = null;
+    try { stats = _egComputePlayerStats(); } catch (e) { return false; }
+    if (!stats || !attacker || !attacker.statuses) return false;
+    if (element === 'fire') {
+        return (Number(stats.retaliationWardIgnite) || 0) > 0 && _egHasStatus(attacker.statuses, 'ignite');
+    }
+    if (!element) {
+        return (Number(stats.retaliationWardBleed) || 0) > 0 && _egHasStatus(attacker.statuses, 'bleed');
+    }
     return false;
 }
 

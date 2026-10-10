@@ -864,10 +864,10 @@ export const TALENT_TREE_DATA = {
    "id": 125,
    "x": -2760,
    "y": 693,
-   "nameEn": "Uncommon Shift",
-   "nameDe": "Ungewöhnliche Wandlung",
+   "nameEn": "Fearsome Cleave",
+   "nameDe": "Furchterregender Hieb",
    "icon": "",
-   "statKey": "notable_axe_intimidate_125",
+   "statKey": "notable_fearsome_cleave_125",
    "effects": [
     "melee_phys_axe:30",
     "intimidate_melee:15",
@@ -1170,10 +1170,14 @@ export const TALENT_TREE_DATA = {
    "y": -1423,
    "nameEn": "Casting Sentinel",
    "nameDe": "Zaubersentinel",
-   "descEn": "+10% to all Elemental Resistances\n+20 to Strength\n+20 to Agility\n25% chance to Avoid Ailments while Casting",
-   "descDe": "+10% auf alle Elementarresistenzen\n+20 Stärke\n+20 Beweglichkeit\n25% Chance, Statuseffekte beim Zaubern zu vermeiden",
-   "icon": "images/passives/passive_012.webp",
+   "icon": "",
    "statKey": "notable_casting_sentinel",
+   "effects": [
+    "all_elemental_resist:10",
+    "str_flat:20",
+    "agi_flat:20",
+    "avoid_ailment_casting:25"
+   ],
    "tier": "notable"
   },
   {
@@ -1372,10 +1376,10 @@ export const TALENT_TREE_DATA = {
    "id": 13,
    "x": -1759,
    "y": 896,
-   "nameEn": "Enhanced Rewards",
-   "nameDe": "Verbesserte Belohnungen",
+   "nameEn": "Thorned Hide",
+   "nameDe": "Dornenhaut",
    "icon": "",
-   "statKey": "enhanced_rewards",
+   "statKey": "notable_thorned_hide_13",
    "effects": [
     "armour_inc_pct:28",
     "reflect_phys_flat:10"
@@ -1400,10 +1404,13 @@ export const TALENT_TREE_DATA = {
    "y": -1476,
    "nameEn": "Arcane Resonance",
    "nameDe": "Arkane Resonanz",
-   "descEn": "+20% increased Spell Damage\n5% increased Cast Speed\n+20 to Intelligence",
-   "descDe": "+20% erhöhter Zauberschaden\n5% erhöhte Zaubergeschwindigkeit\n+20 Intelligenz",
    "icon": "",
    "statKey": "notable_arcane_resonance",
+   "effects": [
+    "spell_damage_inc_pct:20",
+    "cast_speed_pct:5",
+    "int_flat:20"
+   ],
    "tier": "notable"
   },
   {
@@ -1656,10 +1663,10 @@ export const TALENT_TREE_DATA = {
    "id": 191,
    "x": -1759,
    "y": 479,
-   "nameEn": "Blessing of Fortune",
-   "nameDe": "Segen des Glücks",
+   "nameEn": "Titan's Might",
+   "nameDe": "Macht des Titanen",
    "icon": "",
-   "statKey": "notable_heavy_champion_191",
+   "statKey": "notable_titan_s_might_191",
    "effects": [
     "melee_phys_heavy:25",
     "str_flat:20",
@@ -1875,10 +1882,10 @@ export const TALENT_TREE_DATA = {
    "id": 360,
    "x": -2763,
    "y": 482,
-   "nameEn": "Interdisciplinary",
-   "nameDe": "Interdisziplinär",
+   "nameEn": "Skullcracker",
+   "nameDe": "Schädelspalter",
    "icon": "",
-   "statKey": "notable_mace_stun_360",
+   "statKey": "notable_skullcracker_360",
    "effects": [
     "melee_phys_mace:36",
     "stun_chance_mace_charged:10"
@@ -2357,10 +2364,10 @@ export const TALENT_TREE_DATA = {
    "id": 369,
    "x": -2760,
    "y": 897,
-   "nameEn": "Power Analysis",
-   "nameDe": "Machtanalyse",
+   "nameEn": "Axe Fury",
+   "nameDe": "Axtraserei",
    "icon": "",
-   "statKey": "notable_axe_rage_369",
+   "statKey": "notable_axe_fury_369",
    "effects": [
     "melee_phys_axe:25",
     "axe_charge_speed:8",
@@ -2494,10 +2501,10 @@ export const TALENT_TREE_DATA = {
    "id": 4,
    "x": -1455,
    "y": 1006,
-   "nameEn": "Promising Answers",
-   "nameDe": "Vielversprechende Antworten",
+   "nameEn": "Hardy Constitution",
+   "nameDe": "Zähe Konstitution",
    "icon": "",
-   "statKey": "promising_answers",
+   "statKey": "notable_hardy_constitution_4",
    "effects": [
     "life_regen_pct:1.8",
     "str_flat:20"
@@ -2571,10 +2578,10 @@ export const TALENT_TREE_DATA = {
    "id": 227,
    "x": -2879,
    "y": 1175,
-   "nameEn": "Completion Surge",
-   "nameDe": "Abschlussschub",
+   "nameEn": "Precision Edge",
+   "nameDe": "Präzise Schneide",
    "icon": "",
-   "statKey": "notable_sword_precision_227",
+   "statKey": "notable_precision_edge_227",
    "effects": [
     "melee_phys_sword:20",
     "sword_charge_speed:8",
@@ -2658,10 +2665,10 @@ export const TALENT_TREE_DATA = {
    "id": 250,
    "x": -2032,
    "y": 207,
-   "nameEn": "Inference Spillover",
-   "nameDe": "Inferenz-Überlauf",
+   "nameEn": "Elemental Bulwark",
+   "nameDe": "Elementarbollwerk",
    "icon": "",
-   "statKey": "notable_elemental_res_max_250",
+   "statKey": "notable_elemental_bulwark_250",
    "effects": [
     "all_elemental_res_max:2"
    ],
@@ -2671,10 +2678,10 @@ export const TALENT_TREE_DATA = {
    "id": 251,
    "x": -2429,
    "y": 709,
-   "nameEn": "Residual Propagation",
-   "nameDe": "Residuen-Propagation",
+   "nameEn": "Bloodletting",
+   "nameDe": "Aderlass",
    "icon": "",
-   "statKey": "notable_bleed_speed_251",
+   "statKey": "notable_bloodletting_251",
    "effects": [
     "bleed_speed:15"
    ],
@@ -2830,10 +2837,12 @@ export const TALENT_TREE_DATA = {
    "y": -1529,
    "nameEn": "Deep Vigor",
    "nameDe": "Tiefe Kraft",
-   "descEn": "+8% increased maximum Life\n+12% increased maximum Mana",
-   "descDe": "+8% erhöhtes maximales Leben\n+12% erhöhtes maximales Mana",
-   "icon": "images/passives/passive_108.webp",
+   "icon": "",
    "statKey": "notable_deep_vigor",
+   "effects": [
+    "health_inc_pct:8",
+    "mana_inc_pct:12"
+   ],
    "tier": "notable"
   },
   {
@@ -2926,10 +2935,13 @@ export const TALENT_TREE_DATA = {
    "y": -1476,
    "nameEn": "Arcane Bulwark",
    "nameDe": "Arkaner Schutzwall",
-   "descEn": "+20 maximum Absorption\n+20 maximum Mana\n+20 to Intelligence",
-   "descDe": "+20 maximale Absorption\n+20 max. Mana\n+20 Intelligenz",
    "icon": "",
    "statKey": "trix_arcane_bulwark",
+   "effects": [
+    "absorption_flat:20",
+    "mana_flat:20",
+    "int_flat:20"
+   ],
    "tier": "notable"
   },
   {
@@ -3058,20 +3070,23 @@ export const TALENT_TREE_DATA = {
    "y": -1759,
    "nameEn": "Verdant Covenant",
    "nameDe": "Grüner Pakt",
-   "descEn": "25% increased Lightning Damage\n5% increased Cast Speed with Lightning Skills\n+15% to Lightning Resistance",
-   "descDe": "25% erhöhter Blitzschaden\n5% erhöhte Zaubergeschwindigkeit mit Blitzzaubern\n+15% Blitzwiderstand",
    "icon": "",
    "statKey": "notable_verdant_covenant",
+   "effects": [
+    "lightning_damage_inc_pct:25",
+    "cast_speed_lightning:5",
+    "lightning_resist_flat:15"
+   ],
    "tier": "notable"
   },
   {
    "id": 111,
    "x": -2258,
    "y": 441,
-   "nameEn": "Clarity Mark",
-   "nameDe": "Klarheitsmarke",
+   "nameEn": "Quickened Renewal",
+   "nameDe": "Beschleunigte Erneuerung",
    "icon": "",
-   "statKey": "notable_regen_rate_111",
+   "statKey": "notable_quickened_renewal_111",
    "effects": [
     "life_regen_rate:15",
     "life_regen_pct:1.8"
@@ -3130,10 +3145,10 @@ export const TALENT_TREE_DATA = {
    "id": 129,
    "x": -1759,
    "y": 1116,
-   "nameEn": "Horizon Tracker",
-   "nameDe": "Horizontverfolger",
+   "nameEn": "Steady Recovery",
+   "nameDe": "Stetige Erholung",
    "icon": "",
-   "statKey": "notable_horizon_tracker_129",
+   "statKey": "notable_steady_recovery_129",
    "effects": [
     "life_regen_flat:10",
     "life_regen_pct:1.2"
@@ -3300,10 +3315,10 @@ export const TALENT_TREE_DATA = {
    "id": 337,
    "x": -1856,
    "y": 1386,
-   "nameEn": "Umbral Survey",
-   "nameDe": "Schattenlotse",
+   "nameEn": "Warding Stance",
+   "nameDe": "Schutzhaltung",
    "icon": "",
-   "statKey": "notable_aegis_ward_337",
+   "statKey": "notable_warding_stance_337",
    "effects": [
     "block_dualshield:10",
     "block_pulse:300"
@@ -3339,10 +3354,10 @@ export const TALENT_TREE_DATA = {
    "id": 147,
    "x": -2879,
    "y": 1125,
-   "nameEn": "Inventor's Cache",
-   "nameDe": "Erfinderversteck",
+   "nameEn": "Piercing Blade",
+   "nameDe": "Durchdringende Klinge",
    "icon": "",
-   "statKey": "notable_sword_pierce_147",
+   "statKey": "notable_piercing_blade_147",
    "effects": [
     "melee_phys_sword:35",
     "ignore_phys_reduction:35"
@@ -3670,10 +3685,11 @@ export const TALENT_TREE_DATA = {
    "y": -1367,
    "nameEn": "Cast Speed",
    "nameDe": "Zaubergeschwindigkeit",
-   "descEn": "+4% increased Cast Speed",
-   "descDe": "+4% erhöhte Zaubergeschwindigkeit",
    "icon": "",
-   "statKey": "trix_cast_speed",
+   "statKey": "trix_cast_speed_133",
+   "effects": [
+    "cast_speed_pct:4"
+   ],
    "tier": "travel"
   },
   {
@@ -6053,12 +6069,15 @@ export const TALENT_TREE_DATA = {
    "id": 20033,
    "x": -1759,
    "y": 589,
-   "nameEn": "Champion's Vigor",
-   "nameDe": "Tatkraft des Champions",
-   "descEn": "+1 meter to melee strike range.\nMelee skills have 12% increased area of effect.",
-   "descDe": "+1 Meter Nahkampf-Reichweite.\nNahkampffertigkeiten haben 12% erhöhten Wirkungsbereich.",
+   "nameEn": "Sweeping Reach",
+   "nameDe": "Ausholende Reichweite",
    "icon": "",
-   "statKey": "notable_champions_vigor_20033",
+   "statKey": "notable_sweeping_reach_20033",
+   "effects": [
+    "melee_range_m:1",
+    "melee_splash_m:1.5",
+    "melee_aoe_pct:12"
+   ],
    "tier": "notable"
   },
   {
@@ -6080,10 +6099,10 @@ export const TALENT_TREE_DATA = {
    "id": 20035,
    "x": -1759,
    "y": 1006,
-   "nameEn": "Carnage",
-   "nameDe": "Gemetzel",
+   "nameEn": "Prismatic Aegis",
+   "nameDe": "Prismatische Aegis",
    "icon": "",
-   "statKey": "notable_carnage_20035",
+   "statKey": "notable_prismatic_aegis_20035",
    "effects": [
     "all_elemental_resist:15"
    ],
@@ -6093,22 +6112,24 @@ export const TALENT_TREE_DATA = {
    "id": 20036,
    "x": -1633,
    "y": 1269,
-   "nameEn": "Tithe of Strength",
-   "nameDe": "Zehnter der Stärke",
-   "descEn": "Bleeding enemies cannot inflict Bleeding on you.\nIgnited enemies cannot inflict Ignite on you.",
-   "descDe": "Blutende Gegner können dir keine Blutung zufügen.\nBrennende Gegner können dich nicht entzünden.",
+   "nameEn": "Retaliation Ward",
+   "nameDe": "Vergeltungsschutz",
    "icon": "",
-   "statKey": "notable_tithe_ward_20036",
+   "statKey": "notable_retaliation_ward_20036",
+   "effects": [
+    "ward_bleed_retaliation",
+    "ward_ignite_retaliation"
+   ],
    "tier": "notable"
   },
   {
    "id": 20037,
    "x": -1362,
    "y": 1343,
-   "nameEn": "Tithe of Strength",
-   "nameDe": "Zehnter der Stärke",
+   "nameEn": "Brutality",
+   "nameDe": "Brutalität",
    "icon": "",
-   "statKey": "notable_heavy_brutality_20037",
+   "statKey": "notable_brutality_20037",
    "effects": [
     "melee_phys_heavy:25",
     "stun_double_chance:10",
@@ -6186,7 +6207,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_grit_20043",
    "effects": [
     "melee_charge_speed_pct:12",
-    "life_leech:1.5"
+    "life_leech_melee:1.5"
    ],
    "tier": "notable"
   },
@@ -6194,10 +6215,10 @@ export const TALENT_TREE_DATA = {
    "id": 20044,
    "x": -2162,
    "y": 1161,
-   "nameEn": "Sunder",
-   "nameDe": "Spalten",
+   "nameEn": "Bloodied Casting",
+   "nameDe": "Blutiges Zaubern",
    "icon": "",
-   "statKey": "notable_melee_spell_cost_20044",
+   "statKey": "notable_bloodied_casting_20044",
    "effects": [
     "melee_spell_life_cost:10",
     "melee_spell_mana_reduced:25"
@@ -6488,10 +6509,10 @@ export const TALENT_TREE_DATA = {
    "id": 20068,
    "x": -2268,
    "y": 642,
-   "nameEn": "Resolute Advance",
-   "nameDe": "Entschlossener Vormarsch",
+   "nameEn": "Emberguard",
+   "nameDe": "Glutwacht",
    "icon": "",
-   "statKey": "notable_resolute_advance_20068",
+   "statKey": "notable_emberguard_20068",
    "effects": [
     "health_inc_pct:8",
     "fire_res_max:1",
@@ -7312,10 +7333,11 @@ export const TALENT_TREE_DATA = {
    "y": 445,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength",
-   "descDe": "+5 Stärke",
    "icon": "",
    "statKey": "travel_strength",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -7324,20 +7346,21 @@ export const TALENT_TREE_DATA = {
    "y": 427,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength",
-   "descDe": "+5 Stärke",
    "icon": "",
    "statKey": "small_strength_30193",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30194,
    "x": -1252,
    "y": 536,
-   "nameEn": "Lesser Champion's Might",
-   "nameDe": "Macht des Champions (klein)",
+   "nameEn": "Brute Force",
+   "nameDe": "Rohe Gewalt",
    "icon": "",
-   "statKey": "small_lesser_champion_s_might",
+   "statKey": "small_brute_force_30194",
    "effects": [
     "melee_phys_inc:16"
    ],
@@ -7347,10 +7370,10 @@ export const TALENT_TREE_DATA = {
    "id": 30195,
    "x": -1199,
    "y": 589,
-   "nameEn": "Lesser Melee Force",
-   "nameDe": "Nahkampfkraft (klein)",
+   "nameEn": "Brute Force",
+   "nameDe": "Rohe Gewalt",
    "icon": "",
-   "statKey": "small_lesser_melee_force",
+   "statKey": "small_brute_force_30195",
    "effects": [
     "melee_phys_inc:12"
    ],
@@ -7360,22 +7383,23 @@ export const TALENT_TREE_DATA = {
    "id": 30196,
    "x": -1133,
    "y": 589,
-   "nameEn": "Melee Force",
-   "nameDe": "Nahkampfkraft",
-   "descEn": "+12% increased Melee Physical Damage",
-   "descDe": "+12% erhöhter physischer Nahkampfschaden",
+   "nameEn": "Brute Force",
+   "nameDe": "Rohe Gewalt",
    "icon": "",
-   "statKey": "travel_melee_force",
+   "statKey": "travel_brute_force_30196",
+   "effects": [
+    "melee_phys_inc:12"
+   ],
    "tier": "travel"
   },
   {
    "id": 30197,
    "x": -1252,
    "y": 642,
-   "nameEn": "Lesser Champion's Tempo",
-   "nameDe": "Tempo des Champions (klein)",
+   "nameEn": "Quick Strike",
+   "nameDe": "Schneller Schlag",
    "icon": "",
-   "statKey": "small_lesser_champion_s_tempo",
+   "statKey": "small_quick_strike_30197",
    "effects": [
     "melee_charge_speed_pct:5"
    ],
@@ -7385,10 +7409,10 @@ export const TALENT_TREE_DATA = {
    "id": 30198,
    "x": -1305,
    "y": 589,
-   "nameEn": "Lesser Warrior's Wrath",
-   "nameDe": "Zorn des Kriegers (klein)",
+   "nameEn": "Brute Force",
+   "nameDe": "Rohe Gewalt",
    "icon": "",
-   "statKey": "small_lesser_warrior_s_wrath",
+   "statKey": "small_brute_force_30198",
    "effects": [
     "melee_phys_inc:12"
    ],
@@ -7401,7 +7425,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Anvil Guard",
    "nameDe": "Ambosswache (klein)",
    "icon": "",
-   "statKey": "small_lesser_anvil_guard",
+   "statKey": "small_lesser_anvil_guard_30199",
    "effects": [
     "health_inc_pct:5"
    ],
@@ -7442,7 +7466,7 @@ export const TALENT_TREE_DATA = {
    "nameEn": "Lesser Anvil Guard",
    "nameDe": "Ambosswache (klein)",
    "icon": "",
-   "statKey": "small_lesser_anvil_guard",
+   "statKey": "small_lesser_anvil_guard_30202",
    "effects": [
     "health_inc_pct:5"
    ],
@@ -7452,10 +7476,10 @@ export const TALENT_TREE_DATA = {
    "id": 30203,
    "x": -1305,
    "y": 1006,
-   "nameEn": "Bulwark Growth",
-   "nameDe": "Bollwerkswachstum",
+   "nameEn": "Plated Growth",
+   "nameDe": "Gepanzertes Wachstum",
    "icon": "",
-   "statKey": "travel_bulwark_growth_30203",
+   "statKey": "travel_plated_growth_30203",
    "effects": [
     "armour_inc_pct:10",
     "health_inc_pct:4"
@@ -7466,10 +7490,10 @@ export const TALENT_TREE_DATA = {
    "id": 30204,
    "x": -1252,
    "y": 953,
-   "nameEn": "Lesser Bulwark Growth",
-   "nameDe": "Bollwerkswachstum (klein)",
+   "nameEn": "Plated Growth",
+   "nameDe": "Gepanzertes Wachstum",
    "icon": "",
-   "statKey": "small_bulwark_growth_30204",
+   "statKey": "small_plated_growth_30204",
    "effects": [
     "armour_inc_pct:12",
     "health_inc_pct:4"
@@ -7480,10 +7504,10 @@ export const TALENT_TREE_DATA = {
    "id": 30205,
    "x": -1199,
    "y": 1006,
-   "nameEn": "Bulwark Growth",
-   "nameDe": "Bollwerkswachstum",
+   "nameEn": "Plated Growth",
+   "nameDe": "Gepanzertes Wachstum",
    "icon": "",
-   "statKey": "travel_bulwark_growth_30205",
+   "statKey": "travel_plated_growth_30205",
    "effects": [
     "armour_inc_pct:10",
     "health_inc_pct:4"
@@ -7507,8 +7531,8 @@ export const TALENT_TREE_DATA = {
    "id": 30207,
    "x": -1143,
    "y": 1168,
-   "nameEn": "Lesser Toolbelt Greed",
-   "nameDe": "Werkzeuggier (klein)",
+   "nameEn": "Strength",
+   "nameDe": "Stärke",
    "icon": "",
    "statKey": "small_strength_30207",
    "effects": [
@@ -7988,10 +8012,10 @@ export const TALENT_TREE_DATA = {
    "id": 30247,
    "x": -1431,
    "y": 1314,
-   "nameEn": "Lesser Tithe of Strength",
-   "nameDe": "Zehnter der Stärke (klein)",
+   "nameEn": "Breaching Blow",
+   "nameDe": "Durchbruchschlag",
    "icon": "",
-   "statKey": "small_heavy_pierce_30247",
+   "statKey": "small_breaching_blow_30247",
    "effects": [
     "melee_phys_heavy:14",
     "ignore_phys_reduction:15"
@@ -8002,10 +8026,10 @@ export const TALENT_TREE_DATA = {
    "id": 30248,
    "x": -1402,
    "y": 1245,
-   "nameEn": "Lesser Tithe of Strength",
-   "nameDe": "Zehnter der Stärke (klein)",
+   "nameEn": "Lingering Impact",
+   "nameDe": "Nachhallender Aufprall",
    "icon": "",
-   "statKey": "small_heavy_stun_duration_30248",
+   "statKey": "small_lingering_impact_30248",
    "effects": [
     "melee_phys_heavy:10",
     "stun_duration_heavy:10"
@@ -8016,10 +8040,10 @@ export const TALENT_TREE_DATA = {
    "id": 30249,
    "x": -1362,
    "y": 1245,
-   "nameEn": "Lesser Tithe of Strength",
-   "nameDe": "Zehnter der Stärke (klein)",
+   "nameEn": "Staggering Blow",
+   "nameDe": "Taumelschlag",
    "icon": "",
-   "statKey": "small_heavy_stun_chance_30249",
+   "statKey": "small_staggering_blow_30249",
    "effects": [
     "melee_phys_heavy:14",
     "stun_chance_heavy:5"
@@ -8030,10 +8054,10 @@ export const TALENT_TREE_DATA = {
    "id": 30250,
    "x": -1329,
    "y": 1294,
-   "nameEn": "Lesser Tithe of Strength",
-   "nameDe": "Zehnter der Stärke (klein)",
+   "nameEn": "Lingering Impact",
+   "nameDe": "Nachhallender Aufprall",
    "icon": "",
-   "statKey": "small_heavy_stun_duration_30250",
+   "statKey": "small_lingering_impact_30250",
    "effects": [
     "melee_phys_heavy:14",
     "stun_duration_heavy:20"
@@ -8057,10 +8081,10 @@ export const TALENT_TREE_DATA = {
    "id": 30252,
    "x": -1662,
    "y": 1200,
-   "nameEn": "Lesser Tithe of Strength",
-   "nameDe": "Zehnter der Stärke (klein)",
+   "nameEn": "Searing Wounds",
+   "nameDe": "Sengende Wunden",
    "icon": "",
-   "statKey": "small_ailment_tithe_30252",
+   "statKey": "small_searing_wounds_30252",
    "effects": [
     "ignite_duration:25",
     "bleed_duration:25"
@@ -8071,10 +8095,10 @@ export const TALENT_TREE_DATA = {
    "id": 30253,
    "x": -1731,
    "y": 1229,
-   "nameEn": "Lesser Tithe of Strength",
-   "nameDe": "Zehnter der Stärke (klein)",
+   "nameEn": "Searing Wounds",
+   "nameDe": "Sengende Wunden",
    "icon": "",
-   "statKey": "small_ailment_tithe_30253",
+   "statKey": "small_searing_wounds_30253",
    "effects": [
     "ignite_duration:25",
     "bleed_duration:25"
@@ -8085,10 +8109,10 @@ export const TALENT_TREE_DATA = {
    "id": 30254,
    "x": -1803,
    "y": 1333,
-   "nameEn": "Lesser Umbral Survey",
-   "nameDe": "Schattenlotse (klein)",
+   "nameEn": "Lesser Warding Stance",
+   "nameDe": "Schutzhaltung (klein)",
    "icon": "",
-   "statKey": "small_block_ward_30254",
+   "statKey": "small_lesser_warding_stance_30254",
    "effects": [
     "block_dualshield:3",
     "block_recovery:30"
@@ -8099,10 +8123,10 @@ export const TALENT_TREE_DATA = {
    "id": 30255,
    "x": -1856,
    "y": 1280,
-   "nameEn": "Lesser Umbral Survey",
-   "nameDe": "Schattenlotse (klein)",
+   "nameEn": "Lesser Warding Stance",
+   "nameDe": "Schutzhaltung (klein)",
    "icon": "",
-   "statKey": "small_block_ward_30255",
+   "statKey": "small_lesser_warding_stance_30255",
    "effects": [
     "block_dualshield:3"
    ],
@@ -8112,10 +8136,10 @@ export const TALENT_TREE_DATA = {
    "id": 30256,
    "x": -1909,
    "y": 1333,
-   "nameEn": "Lesser Umbral Survey",
-   "nameDe": "Schattenlotse (klein)",
+   "nameEn": "Lesser Warding Stance",
+   "nameDe": "Schutzhaltung (klein)",
    "icon": "",
-   "statKey": "small_block_ward_30256",
+   "statKey": "small_lesser_warding_stance_30256",
    "effects": [
     "block_dualshield:3",
     "armour_inc_pct:12"
@@ -8132,7 +8156,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_grit_30257",
    "effects": [
     "melee_charge_speed_pct:3",
-    "life_leech:0.4"
+    "life_leech_melee:0.4"
    ],
    "tier": "small"
   },
@@ -8146,7 +8170,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_grit_30258",
    "effects": [
     "melee_charge_speed_pct:3",
-    "life_leech:0.4"
+    "life_leech_melee:0.4"
    ],
    "tier": "small"
   },
@@ -8167,10 +8191,10 @@ export const TALENT_TREE_DATA = {
    "id": 30260,
    "x": -1861,
    "y": 1048,
-   "nameEn": "Lesser Horizon Tracker",
-   "nameDe": "Horizontverfolger (klein)",
+   "nameEn": "Vital Renewal",
+   "nameDe": "Vitalitätserneuerung",
    "icon": "",
-   "statKey": "small_lesser_horizon_tracker",
+   "statKey": "small_vital_renewal_30260",
    "effects": [
     "life_regen_pct:0.6"
    ],
@@ -8193,10 +8217,10 @@ export const TALENT_TREE_DATA = {
    "id": 30262,
    "x": -1861,
    "y": 964,
-   "nameEn": "Lesser Enhanced Rewards",
-   "nameDe": "Verbesserte Belohnungen (klein)",
+   "nameEn": "Plated Hide",
+   "nameDe": "Gepanzerte Haut",
    "icon": "",
-   "statKey": "small_lesser_enhanced_rewards",
+   "statKey": "small_plated_hide_30262",
    "effects": [
     "armour_inc_pct:14"
    ],
@@ -8310,10 +8334,10 @@ export const TALENT_TREE_DATA = {
    "id": 30271,
    "x": -2670,
    "y": 1130,
-   "nameEn": "Lesser Completion Surge",
-   "nameDe": "Abschlussschub (klein)",
+   "nameEn": "Swordsman's Edge",
+   "nameDe": "Schneide des Schwertkämpfers",
    "icon": "",
-   "statKey": "small_sword_melee_30271",
+   "statKey": "small_swordsman_s_edge_30271",
    "effects": [
     "melee_phys_sword:16"
    ],
@@ -8388,10 +8412,10 @@ export const TALENT_TREE_DATA = {
    "id": 30277,
    "x": -2676,
    "y": 897,
-   "nameEn": "Lesser Power Analysis",
-   "nameDe": "Machtanalyse (klein)",
+   "nameEn": "Hewing Rhythm",
+   "nameDe": "Hackrhythmus",
    "icon": "",
-   "statKey": "small_axe_tempo_30277",
+   "statKey": "small_hewing_rhythm_30277",
    "effects": [
     "melee_phys_axe:12",
     "axe_charge_speed:3"
@@ -8402,10 +8426,10 @@ export const TALENT_TREE_DATA = {
    "id": 30278,
    "x": -2718,
    "y": 905,
-   "nameEn": "Lesser Power Analysis",
-   "nameDe": "Machtanalyse (klein)",
+   "nameEn": "Hewing Rhythm",
+   "nameDe": "Hackrhythmus",
    "icon": "",
-   "statKey": "small_axe_tempo_30278",
+   "statKey": "small_hewing_rhythm_30278",
    "effects": [
     "melee_phys_axe:12",
     "axe_charge_speed:3"
@@ -8469,10 +8493,10 @@ export const TALENT_TREE_DATA = {
    "id": 30283,
    "x": -2462,
    "y": 660,
-   "nameEn": "Lesser Residual Propagation",
-   "nameDe": "Residuen-Propagation (klein)",
+   "nameEn": "Lesser Bloodletting",
+   "nameDe": "Aderlass (klein)",
    "icon": "",
-   "statKey": "small_bleed_speed_30283",
+   "statKey": "small_lesser_bloodletting_30283",
    "effects": [
     "bleed_speed:5"
    ],
@@ -8482,10 +8506,10 @@ export const TALENT_TREE_DATA = {
    "id": 30284,
    "x": -2429,
    "y": 611,
-   "nameEn": "Lesser Residual Propagation",
-   "nameDe": "Residuen-Propagation (klein)",
+   "nameEn": "Lacerating Strikes",
+   "nameDe": "Zerfleischende Hiebe",
    "icon": "",
-   "statKey": "small_bleed_melee_30284",
+   "statKey": "small_lacerating_strikes_30284",
    "effects": [
     "bleed_chance_melee:15"
    ],
@@ -8495,10 +8519,10 @@ export const TALENT_TREE_DATA = {
    "id": 30285,
    "x": -2356,
    "y": 660,
-   "nameEn": "Lesser Residual Propagation",
-   "nameDe": "Residuen-Propagation (klein)",
+   "nameEn": "Lacerating Strikes",
+   "nameDe": "Zerfleischende Hiebe",
    "icon": "",
-   "statKey": "small_bleed_attack_30285",
+   "statKey": "small_lacerating_strikes_30285",
    "effects": [
     "bleed_chance_attack:15"
    ],
@@ -8508,10 +8532,10 @@ export const TALENT_TREE_DATA = {
    "id": 30286,
    "x": -2321,
    "y": 589,
-   "nameEn": "Lesser Resolute Advance",
-   "nameDe": "Entschlossener Vormarsch (klein)",
+   "nameEn": "Steadfast Ward",
+   "nameDe": "Standhafter Schutz",
    "icon": "",
-   "statKey": "small_lesser_resolute_advance",
+   "statKey": "small_steadfast_ward_30286",
    "effects": [
     "health_inc_pct:4",
     "all_elemental_resist:3"
@@ -8522,10 +8546,10 @@ export const TALENT_TREE_DATA = {
    "id": 30287,
    "x": -2215,
    "y": 589,
-   "nameEn": "Lesser Resolute Advance",
-   "nameDe": "Entschlossener Vormarsch (klein)",
+   "nameEn": "Steadfast Ward",
+   "nameDe": "Standhafter Schutz",
    "icon": "",
-   "statKey": "small_lesser_resolute_advance",
+   "statKey": "small_steadfast_ward_30287",
    "effects": [
     "health_inc_pct:4",
     "all_elemental_resist:3"
@@ -8584,10 +8608,10 @@ export const TALENT_TREE_DATA = {
    "id": 30292,
    "x": -2311,
    "y": 388,
-   "nameEn": "Lesser Clarity Mark",
-   "nameDe": "Klarheitsmarke (klein)",
+   "nameEn": "Vital Renewal",
+   "nameDe": "Vitalitätserneuerung",
    "icon": "",
-   "statKey": "small_regen_30292",
+   "statKey": "small_vital_renewal_30292",
    "effects": [
     "life_regen_pct:0.6"
    ],
@@ -8597,10 +8621,10 @@ export const TALENT_TREE_DATA = {
    "id": 30293,
    "x": -2364,
    "y": 441,
-   "nameEn": "Lesser Clarity Mark",
-   "nameDe": "Klarheitsmarke (klein)",
+   "nameEn": "Vital Renewal",
+   "nameDe": "Vitalitätserneuerung",
    "icon": "",
-   "statKey": "small_regen_30293",
+   "statKey": "small_vital_renewal_30293",
    "effects": [
     "life_regen_pct:0.6"
    ],
@@ -8780,10 +8804,10 @@ export const TALENT_TREE_DATA = {
    "id": 30308,
    "x": -2085,
    "y": 154,
-   "nameEn": "Lesser Inference Spillover",
-   "nameDe": "Inferenz-Überlauf (klein)",
+   "nameEn": "Storm Bulwark",
+   "nameDe": "Sturmbollwerk",
    "icon": "",
-   "statKey": "small_lightning_res_max_30308",
+   "statKey": "small_storm_bulwark_30308",
    "effects": [
     "lightning_res_max:1"
    ],
@@ -8818,10 +8842,10 @@ export const TALENT_TREE_DATA = {
    "id": 30311,
    "x": -2032,
    "y": 316,
-   "nameEn": "Lesser Inference Spillover",
-   "nameDe": "Inferenz-Überlauf (klein)",
+   "nameEn": "Flameproof",
+   "nameDe": "Flammenfest",
    "icon": "",
-   "statKey": "small_fire_resist_30311",
+   "statKey": "small_flameproof_30311",
    "effects": [
     "fire_resist_flat:8"
    ],
@@ -8831,10 +8855,10 @@ export const TALENT_TREE_DATA = {
    "id": 30312,
    "x": -1979,
    "y": 154,
-   "nameEn": "Lesser Inference Spillover",
-   "nameDe": "Inferenz-Überlauf (klein)",
+   "nameEn": "Frost Bulwark",
+   "nameDe": "Frostbollwerk",
    "icon": "",
-   "statKey": "small_cold_res_max_30312",
+   "statKey": "small_frost_bulwark_30312",
    "effects": [
     "cold_res_max:1"
    ],
@@ -9041,10 +9065,10 @@ export const TALENT_TREE_DATA = {
    "id": 30329,
    "x": -2821,
    "y": 415,
-   "nameEn": "Lesser Mountain's Heart",
-   "nameDe": "Herz des Berges (klein)",
+   "nameEn": "Bludgeoner's Might",
+   "nameDe": "Macht des Keulenschwingers",
    "icon": "",
-   "statKey": "small_mace_melee_30329",
+   "statKey": "small_bludgeoner_s_might_30329",
    "effects": [
     "melee_phys_mace:16"
    ],
@@ -9054,10 +9078,10 @@ export const TALENT_TREE_DATA = {
    "id": 30330,
    "x": -2821,
    "y": 465,
-   "nameEn": "Lesser Interdisciplinary",
-   "nameDe": "Interdisziplinär (klein)",
+   "nameEn": "Bludgeoner's Might",
+   "nameDe": "Macht des Keulenschwingers",
    "icon": "",
-   "statKey": "small_mace_melee_30330",
+   "statKey": "small_bludgeoner_s_might_30330",
    "effects": [
     "melee_phys_mace:16"
    ],
@@ -9067,10 +9091,10 @@ export const TALENT_TREE_DATA = {
    "id": 30331,
    "x": -2681,
    "y": 489,
-   "nameEn": "Lesser Interdisciplinary",
-   "nameDe": "Interdisziplinär (klein)",
+   "nameEn": "Stunning Might",
+   "nameDe": "Betäubende Macht",
    "icon": "",
-   "statKey": "small_mace_stun_30331",
+   "statKey": "small_stunning_might_30331",
    "effects": [
     "melee_phys_mace:16",
     "stun_duration:20"
@@ -9081,10 +9105,10 @@ export const TALENT_TREE_DATA = {
    "id": 30332,
    "x": -2641,
    "y": 489,
-   "nameEn": "Lesser Interdisciplinary",
-   "nameDe": "Interdisziplinär (klein)",
+   "nameEn": "Stunning Might",
+   "nameDe": "Betäubende Macht",
    "icon": "",
-   "statKey": "small_mace_stun_30332",
+   "statKey": "small_stunning_might_30332",
    "effects": [
     "melee_phys_mace:16",
     "stun_duration:20"
@@ -9173,10 +9197,10 @@ export const TALENT_TREE_DATA = {
    "id": 30339,
    "x": -2676,
    "y": 693,
-   "nameEn": "Lesser Uncommon Shift",
-   "nameDe": "Ungewöhnliche Wandlung (klein)",
+   "nameEn": "Axeman's Might",
+   "nameDe": "Macht des Axtkämpfers",
    "icon": "",
-   "statKey": "small_axe_melee_30339",
+   "statKey": "small_axeman_s_might_30339",
    "effects": [
     "melee_phys_axe:18"
    ],
@@ -9186,10 +9210,10 @@ export const TALENT_TREE_DATA = {
    "id": 30340,
    "x": -2718,
    "y": 685,
-   "nameEn": "Lesser Uncommon Shift",
-   "nameDe": "Ungewöhnliche Wandlung (klein)",
+   "nameEn": "Axeman's Might",
+   "nameDe": "Macht des Axtkämpfers",
    "icon": "",
-   "statKey": "small_axe_melee_30340",
+   "statKey": "small_axeman_s_might_30340",
    "effects": [
     "melee_phys_axe:18"
    ],
@@ -9212,8 +9236,8 @@ export const TALENT_TREE_DATA = {
    "id": 30342,
    "x": -2317,
    "y": 814,
-   "nameEn": "Lesser Resolute Advance",
-   "nameDe": "Entschlossener Vormarsch (klein)",
+   "nameEn": "Resolute Strength",
+   "nameDe": "Entschlossene Stärke",
    "icon": "",
    "statKey": "small_resolute_strength_30342",
    "effects": [
@@ -9225,8 +9249,8 @@ export const TALENT_TREE_DATA = {
    "id": 30343,
    "x": -2219,
    "y": 814,
-   "nameEn": "Lesser Resolute Advance",
-   "nameDe": "Entschlossener Vormarsch (klein)",
+   "nameEn": "Resolute Strength",
+   "nameDe": "Entschlossene Stärke",
    "icon": "",
    "statKey": "small_resolute_strength_30343",
    "effects": [
@@ -9302,10 +9326,10 @@ export const TALENT_TREE_DATA = {
    "id": 30349,
    "x": -1861,
    "y": 631,
-   "nameEn": "Lesser Champion's Vigor",
-   "nameDe": "Tatkraft des Champions (klein)",
+   "nameEn": "One-Hand Blow",
+   "nameDe": "Einhandschlag",
    "icon": "",
-   "statKey": "small_onehand_blow_30349",
+   "statKey": "small_one_hand_blow_30349",
    "effects": [
     "melee_phys_1h:16"
    ],
@@ -9315,8 +9339,8 @@ export const TALENT_TREE_DATA = {
    "id": 30350,
    "x": -1861,
    "y": 547,
-   "nameEn": "Lesser Champion's Vigor",
-   "nameDe": "Tatkraft des Champions (klein)",
+   "nameEn": "Heavy Blow",
+   "nameDe": "Schwerer Schlag",
    "icon": "",
    "statKey": "small_heavy_blow_30350",
    "effects": [
@@ -9477,18 +9501,19 @@ export const TALENT_TREE_DATA = {
    "y": 427,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength",
-   "descDe": "+5 Stärke",
    "icon": "",
    "statKey": "travel_strength_30363",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30364,
    "x": -1657,
    "y": 547,
-   "nameEn": "Lesser Champion's Vigor",
-   "nameDe": "Tatkraft des Champions (klein)",
+   "nameEn": "Heavy Blow",
+   "nameDe": "Schwerer Schlag",
    "icon": "",
    "statKey": "small_heavy_blow_30364",
    "effects": [
@@ -9513,10 +9538,10 @@ export const TALENT_TREE_DATA = {
    "id": 30366,
    "x": -1657,
    "y": 631,
-   "nameEn": "Lesser Champion's Vigor",
-   "nameDe": "Tatkraft des Champions (klein)",
+   "nameEn": "One-Hand Blow",
+   "nameDe": "Einhandschlag",
    "icon": "",
-   "statKey": "small_onehand_blow_30366",
+   "statKey": "small_one_hand_blow_30366",
    "effects": [
     "melee_phys_1h:16"
    ],
@@ -9526,10 +9551,10 @@ export const TALENT_TREE_DATA = {
    "id": 30367,
    "x": -1657,
    "y": 964,
-   "nameEn": "Lesser Carnage",
-   "nameDe": "Gemetzel (klein)",
+   "nameEn": "Plated Hide",
+   "nameDe": "Gepanzerte Haut",
    "icon": "",
-   "statKey": "small_lesser_carnage",
+   "statKey": "small_plated_hide_30367",
    "effects": [
     "armour_inc_pct:14"
    ],
@@ -9552,10 +9577,10 @@ export const TALENT_TREE_DATA = {
    "id": 30369,
    "x": -1657,
    "y": 1048,
-   "nameEn": "Lesser Horizon Tracker",
-   "nameDe": "Horizontverfolger (klein)",
+   "nameEn": "Vital Renewal",
+   "nameDe": "Vitalitätserneuerung",
    "icon": "",
-   "statKey": "small_lesser_horizon_tracker",
+   "statKey": "small_vital_renewal_30369",
    "effects": [
     "life_regen_pct:0.6"
    ],
@@ -9565,10 +9590,10 @@ export const TALENT_TREE_DATA = {
    "id": 30370,
    "x": -2151,
    "y": 1103,
-   "nameEn": "Lesser Sunder",
-   "nameDe": "Spalten (klein)",
+   "nameEn": "Lesser Bloodied Casting",
+   "nameDe": "Blutiges Zaubern (klein)",
    "icon": "",
-   "statKey": "small_melee_spell_cost_30370",
+   "statKey": "small_lesser_bloodied_casting_30370",
    "effects": [
     "melee_spell_mana_reduced:15"
    ],
@@ -9578,10 +9603,10 @@ export const TALENT_TREE_DATA = {
    "id": 30371,
    "x": -2249,
    "y": 1143,
-   "nameEn": "Lesser Sunder",
-   "nameDe": "Spalten (klein)",
+   "nameEn": "Lesser Bloodied Casting",
+   "nameDe": "Blutiges Zaubern (klein)",
    "icon": "",
-   "statKey": "small_melee_spell_cost_30371",
+   "statKey": "small_lesser_bloodied_casting_30371",
    "effects": [
     "melee_spell_mana_reduced:15"
    ],
@@ -9617,8 +9642,8 @@ export const TALENT_TREE_DATA = {
    "id": 30374,
    "x": -2463,
    "y": 1312,
-   "nameEn": "Lesser Bulwark Stance",
-   "nameDe": "Bollwerkhaltung (klein)",
+   "nameEn": "Bulwark Stance",
+   "nameDe": "Bollwerkhaltung",
    "icon": "",
    "statKey": "small_bulwark_stance_30374",
    "effects": [
@@ -9631,8 +9656,8 @@ export const TALENT_TREE_DATA = {
    "id": 30375,
    "x": -2516,
    "y": 1259,
-   "nameEn": "Lesser Bulwark Strike",
-   "nameDe": "Bollwerkschlag (klein)",
+   "nameEn": "Bulwark Strike",
+   "nameDe": "Bollwerkschlag",
    "icon": "",
    "statKey": "small_bulwark_strike_30375",
    "effects": [
@@ -9644,8 +9669,8 @@ export const TALENT_TREE_DATA = {
    "id": 30376,
    "x": -2569,
    "y": 1312,
-   "nameEn": "Lesser Tempered Shield",
-   "nameDe": "Gehärteter Schild (klein)",
+   "nameEn": "Tempered Shield",
+   "nameDe": "Gehärteter Schild",
    "icon": "",
    "statKey": "small_tempered_shield_30376",
    "effects": [
@@ -18704,10 +18729,13 @@ export const TALENT_TREE_DATA = {
    "y": -1759,
    "nameEn": "Frostweaver",
    "nameDe": "Frostweber",
-   "descEn": "25% increased Cold Damage\n5% increased Cast Speed with Cold Skills\n+15% to Cold Resistance",
-   "descDe": "25% erhöhter Kälteschaden\n5% erhöhte Zaubergeschwindigkeit mit Kältezaubern\n+15% Kältewiderstand",
-   "icon": "images/passives/passive_017.webp",
+   "icon": "",
    "statKey": "notable_frostweaver",
+   "effects": [
+    "cold_damage_inc_pct:25",
+    "cast_speed_cold:5",
+    "cold_resist_flat:15"
+   ],
    "tier": "notable"
   },
   {
@@ -18716,10 +18744,13 @@ export const TALENT_TREE_DATA = {
    "y": -1759,
    "nameEn": "Ember Prior",
    "nameDe": "Glutprior",
-   "descEn": "25% increased Fire Damage\n5% increased Cast Speed with Fire Skills\n+15% to Fire Resistance",
-   "descDe": "25% erhöhter Feuerschaden\n5% erhöhte Zaubergeschwindigkeit mit Feuerzaubern\n+15% Feuerwiderstand",
    "icon": "",
    "statKey": "notable_ember_prior",
+   "effects": [
+    "fire_damage_inc_pct:25",
+    "cast_speed_fire:5",
+    "fire_resist_flat:15"
+   ],
    "tier": "notable"
   },
   {
@@ -21453,10 +21484,11 @@ export const TALENT_TREE_DATA = {
    "y": -1216,
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intelligence",
-   "descDe": "+5 Intelligenz",
-   "icon": "images/passives/passive_002.webp",
+   "icon": "",
    "statKey": "trix_cerebral_focus",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -21465,10 +21497,11 @@ export const TALENT_TREE_DATA = {
    "y": -1280,
    "nameEn": "Time Margin",
    "nameDe": "Zeitpuffer",
-   "descEn": "+10 seconds added to the Timer",
-   "descDe": "+10 Sekunden werden zu Beginn jedes Levels zum Timer hinzugefügt.",
    "icon": "",
    "statKey": "trix_time_sense",
+   "effects": [
+    "timer_start_secs:10"
+   ],
    "tier": "travel"
   },
   {
@@ -21477,10 +21510,12 @@ export const TALENT_TREE_DATA = {
    "y": -1322,
    "nameEn": "Absorptive Core",
    "nameDe": "Absorptiver Kern",
-   "descEn": "+10 maximum Absorption\n+4% increased maximum Absorption",
-   "descDe": "+10 maximale Absorption\n+4% erhöhte maximale Absorption",
    "icon": "",
-   "statKey": "trix_absorption_core",
+   "statKey": "trix_absorption_core_31212",
+   "effects": [
+    "absorption_flat:10",
+    "absorption_inc_pct:4"
+   ],
    "tier": "travel"
   },
   {
@@ -21489,10 +21524,12 @@ export const TALENT_TREE_DATA = {
    "y": -1367,
    "nameEn": "Absorption Focus",
    "nameDe": "Absorptionsfokus",
-   "descEn": "+6% increased maximum Absorption\n+10% increased Absorption regen rate",
-   "descDe": "+6% erhöhte maximale Absorption\n+10% erhöhte Absorptionsregenerationsrate",
    "icon": "",
    "statKey": "trix_absorption_focus",
+   "effects": [
+    "absorption_inc_pct:6",
+    "absorption_regen_rate_pct:10"
+   ],
    "tier": "travel"
   },
   {
@@ -21501,10 +21538,12 @@ export const TALENT_TREE_DATA = {
    "y": -1420,
    "nameEn": "Absorptive Core",
    "nameDe": "Absorptiver Kern",
-   "descEn": "+10 maximum Absorption\n+4% increased maximum Absorption",
-   "descDe": "+10 maximale Absorption\n+4% erhöhte maximale Absorption",
    "icon": "",
-   "statKey": "trix_absorption_core",
+   "statKey": "trix_absorption_core_31214",
+   "effects": [
+    "absorption_flat:10",
+    "absorption_inc_pct:4"
+   ],
    "tier": "travel"
   },
   {
@@ -21513,10 +21552,11 @@ export const TALENT_TREE_DATA = {
    "y": -1404,
    "nameEn": "Time Margin",
    "nameDe": "Zeitpuffer",
-   "descEn": "+10 seconds added to the Timer",
-   "descDe": "+10 Sekunden werden zu Beginn jedes Levels zum Timer hinzugefügt.",
    "icon": "",
    "statKey": "small_time_margin_2",
+   "effects": [
+    "timer_start_secs:10"
+   ],
    "tier": "small"
   },
   {
@@ -21525,10 +21565,11 @@ export const TALENT_TREE_DATA = {
    "y": -1337,
    "nameEn": "Time Margin",
    "nameDe": "Zeitpuffer",
-   "descEn": "+10 seconds added to the Timer",
-   "descDe": "+10 Sekunden werden zu Beginn jedes Levels zum Timer hinzugefügt.",
    "icon": "",
    "statKey": "small_time_margin",
+   "effects": [
+    "timer_start_secs:10"
+   ],
    "tier": "small"
   },
   {
@@ -21537,10 +21578,12 @@ export const TALENT_TREE_DATA = {
    "y": -1236,
    "nameEn": "Arcane Reserve",
    "nameDe": "Arkane Reserve",
-   "descEn": "+14 maximum Absorption\n+16 maximum Mana",
-   "descDe": "+14 maximale Absorption\n+16 max. Mana",
    "icon": "",
    "statKey": "travel_arcane_reserve",
+   "effects": [
+    "absorption_flat:14",
+    "mana_flat:16"
+   ],
    "tier": "travel"
   },
   {
@@ -21561,10 +21604,11 @@ export const TALENT_TREE_DATA = {
    "y": -1361,
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intelligence",
-   "descDe": "+5 Intelligenz",
-   "icon": "images/passives/passive_002.webp",
+   "icon": "",
    "statKey": "small_focused_intellect",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "small"
   },
   {
@@ -21573,10 +21617,11 @@ export const TALENT_TREE_DATA = {
    "y": -1476,
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intelligence",
-   "descDe": "+5 Intelligenz",
-   "icon": "images/passives/passive_002.webp",
+   "icon": "",
    "statKey": "travel_profound_intellect",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -21693,10 +21738,12 @@ export const TALENT_TREE_DATA = {
    "y": -1689,
    "nameEn": "Lesser Arcane Bulwark",
    "nameDe": "Arkaner Schutzwall (klein)",
-   "descEn": "+10 maximum Absorption\n+10 maximum Mana",
-   "descDe": "+10 maximale Absorption\n+10 max. Mana",
    "icon": "",
    "statKey": "small_arcane_bulwark",
+   "effects": [
+    "absorption_flat:10",
+    "mana_flat:10"
+   ],
    "tier": "small"
   },
   {
@@ -21717,10 +21764,11 @@ export const TALENT_TREE_DATA = {
    "y": -1861,
    "nameEn": "Frozen Might",
    "nameDe": "Frostige Macht",
-   "descEn": "16% increased Cold Damage",
-   "descDe": "16% erhöhter Kälteschaden",
    "icon": "",
    "statKey": "small_frozen_might",
+   "effects": [
+    "cold_damage_inc_pct:16"
+   ],
    "tier": "small"
   },
   {
@@ -21729,10 +21777,11 @@ export const TALENT_TREE_DATA = {
    "y": -1869,
    "nameEn": "Prismatic Might",
    "nameDe": "Prismatische Macht",
-   "descEn": "10% increased Elemental Damage",
-   "descDe": "10% erhöhter elementarer Schaden",
    "icon": "",
    "statKey": "travel_prismatic_might",
+   "effects": [
+    "elemental_damage_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
@@ -21741,10 +21790,11 @@ export const TALENT_TREE_DATA = {
    "y": -1861,
    "nameEn": "Blazing Might",
    "nameDe": "Lodernde Macht",
-   "descEn": "16% increased Fire Damage",
-   "descDe": "16% erhöhter Feuerschaden",
-   "icon": "images/passives/passive_012.webp",
+   "icon": "",
    "statKey": "small_blazing_might",
+   "effects": [
+    "fire_damage_inc_pct:16"
+   ],
    "tier": "small"
   },
   {
@@ -21753,22 +21803,24 @@ export const TALENT_TREE_DATA = {
    "y": -1812,
    "nameEn": "Verdant Might",
    "nameDe": "Grüne Macht",
-   "descEn": "16% increased Lightning Damage",
-   "descDe": "16% erhöhter Blitzschaden",
    "icon": "",
    "statKey": "travel_verdant_might",
+   "effects": [
+    "lightning_damage_inc_pct:16"
+   ],
    "tier": "travel"
   },
   {
    "id": 31236,
    "x": -352,
    "y": -1649,
-   "nameEn": "Elemental Conduction",
-   "nameDe": "Elementare Leitung",
-   "descEn": "+10% increased Elemental Damage",
-   "descDe": "+10% erhöhter elementarer Schaden",
-   "icon": "images/passives/passive_044.webp",
-   "statKey": "travel_elemental_conduction",
+   "nameEn": "Prismatic Might",
+   "nameDe": "Prismatische Macht",
+   "icon": "",
+   "statKey": "travel_prismatic_might_31236",
+   "effects": [
+    "elemental_damage_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
@@ -21777,10 +21829,11 @@ export const TALENT_TREE_DATA = {
    "y": -1476,
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intelligence",
-   "descDe": "+5 Intelligenz",
-   "icon": "images/passives/passive_002.webp",
+   "icon": "",
    "statKey": "travel_heightened_intellect",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -21789,10 +21842,11 @@ export const TALENT_TREE_DATA = {
    "y": -1361,
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intelligence",
-   "descDe": "+5 Intelligenz",
-   "icon": "images/passives/passive_002.webp",
+   "icon": "",
    "statKey": "small_refined_intellect",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "small"
   },
   {
@@ -21801,10 +21855,11 @@ export const TALENT_TREE_DATA = {
    "y": -1404,
    "nameEn": "Spell Focus",
    "nameDe": "Zauberfokus",
-   "descEn": "+10% increased Spell Damage",
-   "descDe": "+10% erhöhter Zauberschaden",
    "icon": "",
-   "statKey": "small_lesser_spell_focus",
+   "statKey": "small_lesser_spell_focus_31239",
+   "effects": [
+    "spell_damage_inc_pct:10"
+   ],
    "tier": "small"
   },
   {
@@ -21813,10 +21868,11 @@ export const TALENT_TREE_DATA = {
    "y": -1420,
    "nameEn": "Cast Speed",
    "nameDe": "Zaubergeschwindigkeit",
-   "descEn": "+4% increased Cast Speed",
-   "descDe": "+4% erhöhte Zaubergeschwindigkeit",
    "icon": "",
-   "statKey": "trix_cast_speed",
+   "statKey": "trix_cast_speed_31240",
+   "effects": [
+    "cast_speed_pct:4"
+   ],
    "tier": "travel"
   },
   {
@@ -21825,10 +21881,11 @@ export const TALENT_TREE_DATA = {
    "y": -1337,
    "nameEn": "Spell Focus",
    "nameDe": "Zauberfokus",
-   "descEn": "+10% increased Spell Damage",
-   "descDe": "+10% erhöhter Zauberschaden",
    "icon": "",
-   "statKey": "small_lesser_spell_focus",
+   "statKey": "small_lesser_spell_focus_31241",
+   "effects": [
+    "spell_damage_inc_pct:10"
+   ],
    "tier": "small"
   },
   {
@@ -21837,10 +21894,11 @@ export const TALENT_TREE_DATA = {
    "y": -1280,
    "nameEn": "Spell Focus",
    "nameDe": "Zauberfokus",
-   "descEn": "+10% increased Spell Damage",
-   "descDe": "+10% erhöhter Zauberschaden",
    "icon": "",
    "statKey": "trix_spell_focus",
+   "effects": [
+    "spell_damage_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
@@ -21849,10 +21907,11 @@ export const TALENT_TREE_DATA = {
    "y": -1322,
    "nameEn": "Cast Speed",
    "nameDe": "Zaubergeschwindigkeit",
-   "descEn": "+4% increased Cast Speed",
-   "descDe": "+4% erhöhte Zaubergeschwindigkeit",
    "icon": "",
-   "statKey": "trix_cast_speed",
+   "statKey": "trix_cast_speed_31243",
+   "effects": [
+    "cast_speed_pct:4"
+   ],
    "tier": "travel"
   },
   {
@@ -21861,10 +21920,12 @@ export const TALENT_TREE_DATA = {
    "y": -1236,
    "nameEn": "Spell Thread",
    "nameDe": "Zauberfaden",
-   "descEn": "+16% increased Spell Damage\n+16 maximum Mana",
-   "descDe": "+16% erhöhter Zauberschaden\n+16 max. Mana",
    "icon": "",
    "statKey": "trix_spell_thread",
+   "effects": [
+    "spell_damage_inc_pct:16",
+    "mana_flat:16"
+   ],
    "tier": "travel"
   },
   {
@@ -24622,10 +24683,11 @@ export const TALENT_TREE_DATA = {
    "y": -1216,
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intelligence",
-   "descDe": "+5 Intelligenz",
-   "icon": "images/passives/passive_002.webp",
+   "icon": "",
    "statKey": "travel_keen_intellect",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -24658,10 +24720,12 @@ export const TALENT_TREE_DATA = {
    "y": -1456,
    "nameEn": "Casting Ward",
    "nameDe": "Zauberwache",
-   "descEn": "+3% to all Elemental Resistances\n15% chance to Avoid Ailments while Casting",
-   "descDe": "+3% auf alle Elementarresistenzen\n15% Chance, Statuseffekte beim Zaubern zu vermeiden",
-   "icon": "images/passives/passive_005.webp",
+   "icon": "",
    "statKey": "small_casting_ward",
+   "effects": [
+    "all_elemental_resist:3",
+    "avoid_ailment_casting:15"
+   ],
    "tier": "small"
   },
   {
@@ -24670,10 +24734,12 @@ export const TALENT_TREE_DATA = {
    "y": -1496,
    "nameEn": "Vigor",
    "nameDe": "Kraft",
-   "descEn": "+5% increased maximum Life\n+8% increased maximum Mana",
-   "descDe": "+5% erhöhtes maximales Leben\n+8% erhöhtes maximales Mana",
-   "icon": "images/passives/passive_154.webp",
+   "icon": "",
    "statKey": "small_vital_reserve",
+   "effects": [
+    "health_inc_pct:5",
+    "mana_inc_pct:8"
+   ],
    "tier": "small"
   },
   {
@@ -24682,10 +24748,12 @@ export const TALENT_TREE_DATA = {
    "y": -1496,
    "nameEn": "Vigor",
    "nameDe": "Kraft",
-   "descEn": "+5% increased maximum Life\n+8% increased maximum Mana",
-   "descDe": "+5% erhöhtes maximales Leben\n+8% erhöhtes maximales Mana",
-   "icon": "images/passives/passive_157.webp",
+   "icon": "",
    "statKey": "small_steady_vigor",
+   "effects": [
+    "health_inc_pct:5",
+    "mana_inc_pct:8"
+   ],
    "tier": "small"
   },
   {
@@ -24694,10 +24762,12 @@ export const TALENT_TREE_DATA = {
    "y": -1456,
    "nameEn": "Casting Ward",
    "nameDe": "Zauberwache",
-   "descEn": "+3% to all Elemental Resistances\n15% chance to Avoid Ailments while Casting",
-   "descDe": "+3% auf alle Elementarresistenzen\n15% Chance, Statuseffekte beim Zaubern zu vermeiden",
-   "icon": "images/passives/passive_021.webp",
+   "icon": "",
    "statKey": "small_casting_vigil",
+   "effects": [
+    "all_elemental_resist:3",
+    "avoid_ailment_casting:15"
+   ],
    "tier": "small"
   },
   {

@@ -7,6 +7,7 @@ import { addTimeSecs, previewGainSecs, subtractTimeSecs } from '../timer/timer-a
 import { t } from '../translation/translations.js';
 import { _executeFieldScan } from '../classes/class-probabilist.js';
 import { ptHasSkill } from './probability-tree-state-points.js';
+import { _egGetTreeTimerStartSecs } from '../endgame/endgame-leveling.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 
@@ -890,9 +891,6 @@ export function _ptxRunExpansion() {
         if (window._egSuppressEncounterStop || !cur) return result;
 
         const FLATS = [
-            ['trix_time_sense', 10],
-            ['small_time_margin', 10],
-            ['small_time_margin_2', 10],
             ['small_lesser_adaptive_correction', 10],
             ['wind_tunnel', 10], ['jet_stream', 15], ['cum_laude', 25],
             ['tick_tock_talent', 20], ['second_hand', 30], ['hourglass_doctrine', 45],
@@ -900,6 +898,8 @@ export function _ptxRunExpansion() {
         ];
         let add = 0;
         FLATS.forEach(([key, val]) => { if (has(key)) add += val; });
+        // Time Margin nodes (timer_start_secs effect, pt-effects.js).
+        add += _egGetTreeTimerStartSecs();
 
         if (STATE.ptxSavingsSecs > 0) {
             add += STATE.ptxSavingsSecs;

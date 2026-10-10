@@ -162,8 +162,10 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     if (critMult > 1 && charge >= 0.99 && typeof showToast === 'function') globalThis.showToast('💥 Critical Hit!');
 
     // Life leech - heal the player for a % of the damage about to be dealt.
-    if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
-        const heal = Math.round(dmg * (stats.lifeLeechPct / 100));
+    // Melee strikes also add the tree's melee-only leech (lifeLeechMeleePct).
+    const meleeLeechPct = (Number(stats.lifeLeechPct) || 0) + (Number(stats.lifeLeechMeleePct) || 0);
+    if (meleeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
+        const heal = Math.round(dmg * (meleeLeechPct / 100));
         if (heal > 0) {
             globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
             if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();

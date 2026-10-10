@@ -345,13 +345,18 @@ export function _ptTooltipResolveName(skill, def, lang) {
     return skill ? skill.name : t('pt_skill_fallback').replace('{n}', skill?.id);
 }
 
-// Builds the localised description string (newlines → <br>).
+// Builds the localised description HTML. Every newline-separated effect
+// becomes its own block with a gap above it, so a long effect that wraps
+// onto a second row is still clearly distinct from the next effect.
 export function _ptTooltipResolveDesc(def, lang) {
     if (!def) return '';
     // Hand-written descEn/descDe win; effects nodes without authored text
     // get their lines generated from the registry (pt-effects.js).
     const raw = ptResolveNodeDesc(def, lang);
-    return raw ? raw.replace(/\n/g, '<br>') : '';
+    if (!raw) return '';
+    return raw.split('\n')
+        .map((line, i) => `<div style="${i > 0 ? 'margin-top:8px;' : ''}">${line}</div>`)
+        .join('');
 }
 
 // Builds the small status line shown at the bottom of the tooltip.
