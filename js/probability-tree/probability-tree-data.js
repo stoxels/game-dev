@@ -10102,10 +10102,11 @@ export const TALENT_TREE_DATA = {
    "y": 1992,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_strength_30409",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -10198,10 +10199,11 @@ export const TALENT_TREE_DATA = {
    "y": 1609,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_strength_30417",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -10786,10 +10788,11 @@ export const TALENT_TREE_DATA = {
    "y": 2452,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_strength_30466",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -10966,10 +10969,11 @@ export const TALENT_TREE_DATA = {
    "y": 2452,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_strength_30481",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -11098,10 +11102,11 @@ export const TALENT_TREE_DATA = {
    "y": 2452,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_strength_30492",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -11509,10 +11514,11 @@ export const TALENT_TREE_DATA = {
    "y": 2452,
    "nameEn": "Strength",
    "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "icon": "",
+   "statKey": "travel_strength_30526",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
