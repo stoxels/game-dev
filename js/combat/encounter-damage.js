@@ -181,6 +181,20 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         }
     }
 
+    // Spell parry (passive tree): while the parry key is held, spell damage
+    // (not boss abilities / hazards) can also be parried at the tree's chance.
+    if (isSpell && !isBossAbility && holdingE
+        && typeof _egIsActive === 'function' && _egIsActive()) {
+        const spellParryChance = Number(stats.parrySpellChancePct) || 0;
+        if (spellParryChance > 0 && Math.random() * 100 < spellParryChance) {
+            const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
+            globalThis.showToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
+            _egApplyPlayerParryFeedback();
+            _egScheduleAbsorptionRegen();
+            return 0;
+        }
+    }
+
     // Evasion only applies to physical attacks (melee strikes and monster
     // projectiles) - spells, environmental hazards and boss special abilities
     // cannot be dodged. Neither can a hero rooted mid overcharge-charge.

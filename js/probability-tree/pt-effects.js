@@ -33,6 +33,9 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // --- defence ----------------------------------------------------------
     armour_flat: { channel: 'armourFlat', en: '+{v} Armour', de: '+{v} Rüstung' },
     armour_inc_pct: { channel: 'armourIncPct', en: '{v}% increased Armour', de: '{v}% erhöhte Rüstung' },
+    evasion_flat: { channel: 'evasionFlat', en: '+{v} to Evasion Rating', de: '+{v} Ausweichwertung' },
+    parry_spell_chance: { channel: 'parrySpellChancePct', en: '{v}% Chance to Parry Spell Damage', de: '{v}% Chance, Zauberschaden zu parieren' },
+    evasion_inc_pct: { channel: 'evasionIncPct', en: '{v}% increased Evasion Rating', de: '{v}% erhöhte Ausweichwertung' },
     health_inc_pct: { channel: 'healthIncPct', en: '{v}% increased maximum Life', de: '{v}% erhöhtes maximales Leben' },
     // Flat maximum Life (reworked node 20031 Anvil Guard): seeds the same
     // flat pool gear's flat_health feeds, so it is multiplied by
@@ -213,6 +216,39 @@ export const PT_EFFECT_DEFS = Object.freeze({
     fire_damage_inc_pct: { channel: 'fireDamageIncPct', en: '{v}% increased Fire Damage', de: '{v}% erhöhter Feuerschaden' },
     cold_damage_inc_pct: { channel: 'coldDamageIncPct', en: '{v}% increased Cold Damage', de: '{v}% erhöhter Kälteschaden' },
     lightning_damage_inc_pct: { channel: 'lightningDamageIncPct', en: '{v}% increased Lightning Damage', de: '{v}% erhöhter Blitzschaden' },
+
+    // Projectile batch (nodes 97/30867/30866/30865/20101/30868/30869/30864/
+    // 30856/30855/30858/30859/20102). "Projectile" = every shot the player
+    // fires from a revealed cell (the _egCalcPlayerDamage channel).
+    // projectile_damage_inc multiplies the whole roll (physical + elemental,
+    // before crit) in _egCalcPlayerDamage; projectile_crit_chance is added to
+    // the crit chance of that same roll; projectile_speed shortens every
+    // player projectile's flight time (_egAnimatePlayerProjectile).
+    projectile_damage_inc: { channel: 'projectileDamageIncPct', en: '{v}% increased Projectile Damage', de: '{v}% erhöhter Projektilschaden' },
+    projectile_speed: { channel: 'projectileSpeedPct', en: '{v}% increased Projectile Speed', de: '{v}% erhöhte Projektilgeschwindigkeit' },
+    projectile_crit_chance: { channel: 'projectileCritChancePct', en: '+{v}% to Critical Strike Chance of Projectiles', de: '+{v}% auf die kritische Trefferchance von Projektilen' },
+    // Bow spells (nodes 30857/20102/30858/30859): spells carrying the Bow tag.
+    // No spell has that tag yet, so these two stats are tracked and shown on
+    // the sheet but nothing consumes them until bow spells exist (the spell
+    // damage code should read stats.bowSpellDamageIncPct, and the
+    // damage-over-time code stats.bowSpellDotIncPct for Bow + DoT spells).
+    bow_spell_damage_inc: { channel: 'bowSpellDamageIncPct', en: '{v}% increased Damage with Bow spells', de: '{v}% erhöhter Schaden mit Bogenzaubern' },
+    bow_spell_dot_inc: { channel: 'bowSpellDotIncPct', en: 'Bow spells deal {v}% increased Damage over Time', de: 'Bogenzauber verursachen {v}% erhöhten Schaden über Zeit' },
+
+    // Stun avoidance (nodes 30860/30863/20100): tracked and shown only - no
+    // enemy can stun the player yet.
+    stun_avoid: { channel: 'stunAvoidPct', en: '{v}% Chance to avoid being Stunned', de: '{v}% Chance, nicht betäubt zu werden' },
+    // Mana batch (nodes 30861/30862/226): pickups ride the existing
+    // manaHealIncPct bucket gear's inc_mana_heal feeds (_egCalcManaGain);
+    // the melee line is the ONLY built-in source of mana on melee hits
+    // (_egApplyPlayerMeleeImpact: strike must be above 50% charge).
+    mana_pickup_effect: { channel: 'manaHealIncPct', en: 'Mana pickups have {v}% increased effect', de: 'Mana-Pickups haben {v}% erhöhte Wirkung' },
+    mana_on_melee_hit_charged: { channel: 'manaOnMeleeHitChargedPct', en: 'Gain {v} Mana when you hit an enemy with a melee attack above 50% charge-up', de: 'Erhalte {v} Mana, wenn du einen Gegner mit einem Nahkampfangriff über 50% Aufladung triffst' },
+    // Melee crit (node 305): added to the crit chance of melee strikes only.
+    crit_chance_melee: { channel: 'critChanceMeleePct', en: '+{v}% to Critical Strike Chance with melee attacks', de: '+{v}% auf die kritische Trefferchance mit Nahkampfangriffen' },
+    // Elemental damage of projectiles (node 30783): additive with the
+    // general increased elemental damage, projectile channel only.
+    projectile_elemental_damage_inc: { channel: 'projectileElementalDamageIncPct', en: '{v}% increased Elemental Damage with Projectiles', de: '{v}% erhöhter elementarer Schaden mit Projektilen' },
 
     // --- speed ------------------------------------------------------------
     attack_speed_pct: { channel: 'attackSpeedPct', en: '{v}% increased Attack Speed', de: '{v}% erhöhte Angriffsgeschwindigkeit' },

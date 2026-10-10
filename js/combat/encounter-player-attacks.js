@@ -22,6 +22,10 @@ import { _egGetActiveMapModValue, _egMapPlayerProjectileMult } from '../endgame/
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egDragChargeElements, _egIsActive, _egRecentFills } from './combat-state.js';
 
+// Player projectiles fly at half their old speed (2x the class def's flight
+// time) before "% increased Projectile Speed" is applied - see
+// _egAnimatePlayerProjectile.
+const EG_PLAYER_PROJECTILE_BASE_SLOWDOWN = 2;
 
 
 //------------------------------------------------------------------------
@@ -201,7 +205,12 @@ export function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElO
     // Pass the whole def: code-built visuals orient themselves onto the
     // flight vector inside _egFireProjectile (they're drawn tip-forward),
     // so every shot always points at the targeted creature.
-    _egFireProjectile(projDef, projDef.cssClass, start, end, projDef.duration, projDef.easing, () => {
+    // Flight time: every player projectile base-travels at half speed
+    // (EG_PLAYER_PROJECTILE_BASE_SLOWDOWN) so "% increased Projectile Speed"
+    // from the passive tree is worth picking up; the bonus divides the time.
+    const speedPct = Math.max(0, _egComputePlayerStats().projectileSpeedPct || 0);
+    const flightMs = Math.max(60, Math.round(projDef.duration * EG_PLAYER_PROJECTILE_BASE_SLOWDOWN / (1 + speedPct / 100)));
+    _egFireProjectile(projDef, projDef.cssClass, start, end, flightMs, projDef.easing, () => {
         _egResolveProjectileImpact(damage, targetId, elements, opts);
     }, null, startScale);
 }

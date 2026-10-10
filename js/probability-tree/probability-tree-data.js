@@ -527,15 +527,17 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 328,
-   "x": 1023,
-   "y": 915,
-   "nameEn": "Actuary",
-   "nameDe": "Aktuar",
-   "descEn": "All time penalties are reduced by a flat 5 seconds. Stacks with other penalty reductions. +6% Evasion.",
-   "descDe": "Alle Zeitstrafen werden pauschal um 5 Sekunden reduziert. Summiert sich mit anderen Strafreduzierungen. +6% Ausweichen.",
-   "icon": "📊",
-   "statKey": "actuary",
-   "tier": "notable"
+   "x": 1874,
+   "y": 1727,
+   "nameEn": "Nimble Footing",
+   "nameDe": "Flinke Füße",
+   "icon": "",
+   "statKey": "notable_nimble_footing_328",
+   "effects": [
+    "agi_flat:5"
+   ],
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 302,
@@ -726,12 +728,14 @@ export const TALENT_TREE_DATA = {
    "id": 320,
    "x": 1677,
    "y": 807,
-   "nameEn": "Brownian Ratchet",
-   "nameDe": "Brownsche Ratsche",
-   "descEn": "After every 3 mistakes, your next 3 correct fills each grant an additional 3 seconds. +6% Evasion.",
-   "descDe": "Nach jeweils 3 Fehlern gewähren deine nächsten 3 korrekten Füllungen je 3 zusätzliche Sekunden. +6% Ausweichen.",
-   "icon": "⚙️",
-   "statKey": "brownian_ratchet",
+   "nameEn": "Fleet Guardian",
+   "nameDe": "Flinker Wächter",
+   "icon": "",
+   "statKey": "notable_fleet_guardian_320",
+   "effects": [
+    "movement_speed_pct:6",
+    "parry_spell_chance:5"
+   ],
    "tier": "notable"
   },
   {
@@ -748,15 +752,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 35,
-   "x": 1244,
-   "y": 429,
+   "x": 5710,
+   "y": 1196,
    "nameEn": "Celerity",
    "nameDe": "Gewandtheit",
    "descEn": "All active class abilities have their cooldowns reduced by 30 seconds. +6% Evasion.",
    "descDe": "Alle aktiven Klassenfähigkeiten haben 30 Sekunden weniger Abklingzeit. +6% Ausweichen.",
    "icon": "💫",
    "statKey": "celerity",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 385,
@@ -1090,15 +1095,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 151,
-   "x": 1194,
-   "y": -113,
+   "x": 6667,
+   "y": 381,
    "nameEn": "Hexguard Veil",
    "nameDe": "Hexenschutzschleier",
    "descEn": "Using a Shield item also protects you from cursed item downsides for 5 seconds. Stacks with Aegis of Silence and Null Curse Barrier. +6% Evasion.",
    "descDe": "Das Benutzen eines Schild-Gegenstands schützt dich außerdem für 5 Sekunden vor negativen Effekten verfluchter Gegenstände. Wirkt zusammen mit Ägis der Stille und Fluch-Null-Barriere. +6% Ausweichen.",
    "icon": "🛡️",
    "statKey": "cursed_ward_1",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 152,
@@ -1830,12 +1836,15 @@ export const TALENT_TREE_DATA = {
    "id": 305,
    "x": 1677,
    "y": 913,
-   "nameEn": "Horizon Walker",
-   "nameDe": "Horizontwanderer",
-   "descEn": "At the start of each level, one incorrect empty cell in the leftmost column is automatically marked. +6% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird automatisch eine falsche leere Zelle in der linksten Spalte markiert. +6% Ausweichen.",
-   "icon": "🌄",
-   "statKey": "horizon_walker",
+   "nameEn": "Prismatic Aim",
+   "nameDe": "Prismatisches Zielen",
+   "icon": "",
+   "statKey": "notable_prismatic_aim_305",
+   "effects": [
+    "all_elemental_resist:8",
+    "crit_chance_melee:3",
+    "projectile_crit_chance:3"
+   ],
    "tier": "notable"
   },
   {
@@ -2483,15 +2492,18 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 383,
-   "x": 1086,
-   "y": 699,
+   "x": 1942,
+   "y": 1383,
    "nameEn": "Probability Well",
    "nameDe": "Wahrscheinlichkeitsbrunnen",
-   "descEn": "Lucky tiles can now also appear on medium grids (1 tile). +6% Evasion.",
-   "descDe": "Glückskacheln können jetzt auch auf mittleren Gittern erscheinen (1 Kachel). +6% Ausweichen.",
-   "icon": "⛲",
-   "statKey": "probability_well",
-   "tier": "notable"
+   "icon": "",
+   "statKey": "notable_probability_well_383",
+   "effects": [
+    "evasion_flat:30",
+    "health_inc_pct:5"
+   ],
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 25,
@@ -2574,12 +2586,16 @@ export const TALENT_TREE_DATA = {
    "id": 226,
    "x": 1384,
    "y": 699,
-   "nameEn": "Structural Rhythm",
-   "nameDe": "Strukturrhythmus",
-   "descEn": "Increases the time gained from completing a full row or column by 5 seconds. +6% Evasion.",
-   "descDe": "Erhöht die Zeit, die du beim Abschließen einer vollständigen Zeile oder Spalte erhältst, um 5 Sekunden. +6% Ausweichen.",
-   "icon": "📉",
-   "statKey": "regression_reward_2",
+   "nameEn": "Wellspring",
+   "nameDe": "Quellkraft",
+   "icon": "",
+   "statKey": "notable_wellspring_226",
+   "effects": [
+    "mana_inc_pct:20",
+    "str_flat:20",
+    "int_flat:20",
+    "mana_on_melee_hit_charged:2"
+   ],
    "tier": "notable"
   },
   {
@@ -3502,12 +3518,13 @@ export const TALENT_TREE_DATA = {
    "id": 94,
    "x": 1321,
    "y": 837,
-   "nameEn": "Fortune Echo",
-   "nameDe": "Echos des Glücks",
-   "descEn": "10% increased chance of Lucky Drops happening. Stacks with Treasure Resonance and Golden Recurrence.",
-   "descDe": "10% erhöhte Chance dass Glücksfunde aktiviert werden. Wirkt zusammen mit Schatzresonanz und Goldene Wiederkehr.",
-   "icon": "🎁",
-   "statKey": "travel_bonus_replay_1",
+   "nameEn": "Evasive Step",
+   "nameDe": "Flinker Schritt",
+   "icon": "",
+   "statKey": "travel_evasive_step_94",
+   "effects": [
+    "evasion_inc_pct:14"
+   ],
    "tier": "travel"
   },
   {
@@ -3608,15 +3625,17 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 97,
-   "x": 1124,
-   "y": 540,
-   "nameEn": "Jeweled Fortune",
-   "nameDe": "Juwelen des Glücks",
-   "descEn": "10% increased chance of receiving Epic, or Legendary items. Stacks with Mythic Spoils and Legend's Hoard.",
-   "descDe": "10% erhöhte Chance auf Epische oder Legendäre Gegenstände. Wirkt zusammen mit Mythische Beute und Hort der Legenden.",
-   "icon": "💎",
-   "statKey": "travel_quality_loot_1",
-   "tier": "travel"
+   "x": 2016,
+   "y": 993,
+   "nameEn": "Sharpshot",
+   "nameDe": "Scharfschuss",
+   "icon": "",
+   "statKey": "travel_sharpshot_97",
+   "effects": [
+    "projectile_damage_inc:10"
+   ],
+   "tier": "travel",
+   "layoutPinned": true
   },
   {
    "id": 225,
@@ -3682,12 +3701,14 @@ export const TALENT_TREE_DATA = {
    "id": 372,
    "x": 1223,
    "y": 877,
-   "nameEn": "Second Hand",
-   "nameDe": "Sekundenzeiger",
-   "descEn": "Grants 30 additional seconds at the start of each level. Stacks with other time extension bonuses.",
-   "descDe": "Gewährt zu Beginn jedes Levels 30 zusätzliche Sekunden. Summiert sich mit anderen Zeitverlängerungsboni.",
-   "icon": "⏳",
-   "statKey": "travel_second_hand",
+   "nameEn": "Martial Precision",
+   "nameDe": "Kampfpräzision",
+   "icon": "",
+   "statKey": "travel_martial_precision_372",
+   "effects": [
+    "melee_phys_inc:8",
+    "accuracy_rating_pct:8"
+   ],
    "tier": "travel"
   },
   {
@@ -3732,12 +3753,14 @@ export const TALENT_TREE_DATA = {
    "id": 243,
    "x": 1726,
    "y": 840,
-   "nameEn": "Focused Momentum",
-   "nameDe": "Fokussierter Schwung",
-   "descEn": "After correctly filling 15 cells in a row without a mistake, gain 15 seconds.",
-   "descDe": "Nach 15 korrekt ausgefüllten Zellen in Folge ohne Fehler erhältst du 15 Sekunden.",
-   "icon": "🔥",
-   "statKey": "travel_streak_bonus_1",
+   "nameEn": "Fleet Guard",
+   "nameDe": "Flinke Wache",
+   "icon": "",
+   "statKey": "travel_fleet_guard_243",
+   "effects": [
+    "movement_speed_pct:3",
+    "parry_spell_chance:3"
+   ],
    "tier": "travel"
   },
   {
@@ -12562,8 +12585,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 20097,
-   "x": 6157,
-   "y": 1224,
+   "x": 6684,
+   "y": 1162,
    "nameEn": "Trick Shot",
    "nameDe": "Trickschuss",
    "descEn": "Projectiles ricochet to a nearby monster for 30% damage.",
@@ -12575,38 +12598,45 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 20098,
-   "x": 1268,
-   "y": 700,
+   "x": 5697,
+   "y": 1338,
    "nameEn": "Trick Shot",
    "nameDe": "Trickschuss",
    "descEn": "Projectiles ricochet to a nearby monster for 30% damage.",
    "descDe": "Projektile prallen auf ein nahes Monster ab (30% Schaden).",
    "icon": "◆",
    "statKey": "notable_trick_shot",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 20099,
    "x": 1410,
    "y": 857,
-   "nameEn": "Arrow Storm",
-   "nameDe": "Pfeilsturm",
-   "descEn": "+6% Attack speed.",
-   "descDe": "+6% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_arrow_storm",
+   "nameEn": "Quick Strikes",
+   "nameDe": "Schnelle Hiebe",
+   "icon": "",
+   "statKey": "notable_quick_strikes_20099",
+   "effects": [
+    "melee_charge_speed_pct:8",
+    "agi_flat:20",
+    "accuracy_rating_pct:15"
+   ],
    "tier": "notable"
   },
   {
    "id": 20100,
    "x": 1490,
    "y": 699,
-   "nameEn": "Arrow Storm",
-   "nameDe": "Pfeilsturm",
-   "descEn": "+6% Attack speed.",
-   "descDe": "+6% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_arrow_storm",
+   "nameEn": "Stalwart Vigor",
+   "nameDe": "Standhafte Vitalität",
+   "icon": "",
+   "statKey": "notable_stalwart_vigor_20100",
+   "effects": [
+    "health_inc_pct:8",
+    "stun_avoid:20",
+    "life_regen_pct:2"
+   ],
    "tier": "notable"
   },
   {
@@ -12615,22 +12645,29 @@ export const TALENT_TREE_DATA = {
    "y": 538,
    "nameEn": "Windrunner",
    "nameDe": "Windläuferin",
-   "descEn": "+10% Movement speed. +5% Projectile damage while moving.",
-   "descDe": "+10% Bewegungsgeschwindigkeit. +5% Projektilschaden, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "notable_windrunner",
+   "icon": "",
+   "statKey": "notable_windrunner_20101",
+   "effects": [
+    "projectile_damage_inc:20",
+    "projectile_speed:20",
+    "agi_flat:20"
+   ],
    "tier": "notable"
   },
   {
    "id": 20102,
    "x": 1616,
    "y": 538,
-   "nameEn": "Windrunner",
-   "nameDe": "Windläuferin",
-   "descEn": "+10% Movement speed. +5% Projectile damage while moving.",
-   "descDe": "+10% Bewegungsgeschwindigkeit. +5% Projektilschaden, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "notable_windrunner",
+   "nameEn": "Bowmaster",
+   "nameDe": "Bogenmeister",
+   "icon": "",
+   "statKey": "notable_bowmaster_20102",
+   "effects": [
+    "bow_spell_damage_inc:20",
+    "projectile_speed:5",
+    "accuracy_flat:100",
+    "bow_spell_dot_inc:20"
+   ],
    "tier": "notable"
   },
   {
@@ -12983,15 +13020,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 20132,
-   "x": 2799,
-   "y": 523,
+   "x": 6670,
+   "y": 1017,
    "nameEn": "Huntress's Vitality",
    "nameDe": "Vitalität der Jägerin",
    "descEn": "+15 maximum Health, +1 Absorption on kill.",
    "descDe": "+15 max. Leben, +1 Absorption pro Kill.",
    "icon": "◆",
    "statKey": "notable_huntress_s_vitality",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 20133,
@@ -15472,62 +15510,68 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 30777,
-   "x": 1120,
-   "y": 857,
+   "x": 5714,
+   "y": 1463,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
    "descEn": "+5 to Agility.",
    "descDe": "+5 Beweglichkeit.",
    "icon": "🏃",
    "statKey": "small_agility",
-   "tier": "travel"
+   "tier": "travel",
+   "layoutPinned": true
   },
   {
    "id": 30778,
    "x": 1223,
    "y": 837,
-   "nameEn": "Lesser Trick Shot",
-   "nameDe": "Trickschuss (klein)",
-   "descEn": "Projectiles ricochet to a nearby monster for 15% damage.",
-   "descDe": "Projektile prallen auf ein nahes Monster ab (15% Schaden).",
-   "icon": "◆",
-   "statKey": "small_lesser_trick_shot",
+   "nameEn": "Lesser Evasive Step",
+   "nameDe": "Flinker Schritt (klein)",
+   "icon": "",
+   "statKey": "small_lesser_evasive_step_30778",
+   "effects": [
+    "evasion_inc_pct:14"
+   ],
    "tier": "small"
   },
   {
    "id": 30779,
    "x": 1272,
    "y": 804,
-   "nameEn": "Lesser Arrow Storm",
-   "nameDe": "Pfeilsturm (klein)",
-   "descEn": "+3% Attack speed.",
-   "descDe": "+3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_arrow_storm",
+   "nameEn": "Lesser Evasive Step",
+   "nameDe": "Flinker Schritt (klein)",
+   "icon": "",
+   "statKey": "small_lesser_evasive_step_30779",
+   "effects": [
+    "evasion_inc_pct:14"
+   ],
    "tier": "small"
   },
   {
    "id": 30780,
    "x": 1321,
    "y": 877,
-   "nameEn": "Lesser Arrow Storm",
-   "nameDe": "Pfeilsturm (klein)",
-   "descEn": "+3% Attack speed.",
-   "descDe": "+3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_arrow_storm",
+   "nameEn": "Lesser Martial Precision",
+   "nameDe": "Kampfpräzision (klein)",
+   "icon": "",
+   "statKey": "small_lesser_martial_precision_30780",
+   "effects": [
+    "melee_phys_inc:8",
+    "accuracy_rating_pct:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30781,
    "x": 1272,
    "y": 910,
-   "nameEn": "Lesser Arrow Storm",
-   "nameDe": "Pfeilsturm (klein)",
-   "descEn": "+3% Attack speed.",
-   "descDe": "+3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_arrow_storm",
+   "nameEn": "Lesser Quick Strikes",
+   "nameDe": "Schnelle Hiebe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_quick_strikes_30781",
+   "effects": [
+    "melee_charge_speed_pct:4"
+   ],
    "tier": "small"
   },
   {
@@ -15536,34 +15580,38 @@ export const TALENT_TREE_DATA = {
    "y": 1074,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30782",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30783,
    "x": 1628,
    "y": 880,
-   "nameEn": "Lesser Horizon Walker",
-   "nameDe": "Horizontwanderer (klein)",
-   "descEn": "At the start of each level, one incorrect empty cell in the leftmost column is automatically marked. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird automatisch eine falsche leere Zelle in der linksten Spalte markiert. +3% Ausweichen.",
-   "icon": "🌄",
-   "statKey": "small_lesser_horizon_walker",
+   "nameEn": "Lesser Elemental Volley",
+   "nameDe": "Elementarsalve (klein)",
+   "icon": "",
+   "statKey": "small_lesser_elemental_volley_30783",
+   "effects": [
+    "projectile_elemental_damage_inc:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30784,
    "x": 1628,
    "y": 840,
-   "nameEn": "Lesser Brownian Ratchet",
-   "nameDe": "Brownsche Ratsche (klein)",
-   "descEn": "After every 2 mistakes, your next 2 correct fills each grant an additional 2 seconds. +3% Evasion.",
-   "descDe": "Nach jeweils 2 Fehlern gewähren deine nächsten 2 korrekten Füllungen je 2 zusätzliche Sekunden. +3% Ausweichen.",
-   "icon": "⚙️",
-   "statKey": "small_lesser_brownian_ratchet",
+   "nameEn": "Lesser Fleet Guard",
+   "nameDe": "Flinke Wache (klein)",
+   "icon": "",
+   "statKey": "small_lesser_fleet_guard_30784",
+   "effects": [
+    "movement_speed_pct:3",
+    "parry_spell_chance:3"
+   ],
    "tier": "small"
   },
   {
@@ -15596,10 +15644,11 @@ export const TALENT_TREE_DATA = {
    "y": 699,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30787",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -15680,10 +15729,11 @@ export const TALENT_TREE_DATA = {
    "y": 857,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30794",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -16030,10 +16080,11 @@ export const TALENT_TREE_DATA = {
    "y": 534,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30823",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -16402,190 +16453,214 @@ export const TALENT_TREE_DATA = {
    "y": 347,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30854",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30855,
    "x": 1718,
    "y": 496,
-   "nameEn": "Lesser Windrunner",
-   "nameDe": "Windläuferin (klein)",
-   "descEn": "+5% Movement speed. +3% Projectile damage while moving.",
-   "descDe": "+5% Bewegungsgeschwindigkeit. +3% Projektilschaden, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "small_lesser_windrunner",
+   "nameEn": "Lesser Steady Aim",
+   "nameDe": "Ruhiges Zielen (klein)",
+   "icon": "",
+   "statKey": "small_lesser_steady_aim_30855",
+   "effects": [
+    "projectile_speed:5",
+    "accuracy_flat:25"
+   ],
    "tier": "small"
   },
   {
    "id": 30856,
    "x": 1636,
    "y": 489,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Steady Aim",
+   "nameDe": "Ruhiges Zielen",
+   "icon": "",
+   "statKey": "travel_steady_aim_30856",
+   "effects": [
+    "projectile_speed:5",
+    "accuracy_flat:25"
+   ],
    "tier": "travel"
   },
   {
    "id": 30857,
    "x": 1563,
    "y": 538,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Bowcraft",
+   "nameDe": "Bogenkunst",
+   "icon": "",
+   "statKey": "travel_bowcraft_30857",
+   "effects": [
+    "bow_spell_damage_inc:12"
+   ],
    "tier": "travel"
   },
   {
    "id": 30858,
    "x": 1636,
    "y": 587,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Hunter's Focus",
+   "nameDe": "Fokus des Jägers",
+   "icon": "",
+   "statKey": "travel_hunters_focus_30858",
+   "effects": [
+    "bow_spell_damage_inc:15",
+    "projectile_crit_chance:3"
+   ],
    "tier": "travel"
   },
   {
    "id": 30859,
    "x": 1718,
    "y": 580,
-   "nameEn": "Lesser Windrunner",
-   "nameDe": "Windläuferin (klein)",
-   "descEn": "+5% Movement speed. +3% Projectile damage while moving.",
-   "descDe": "+5% Bewegungsgeschwindigkeit. +3% Projektilschaden, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "small_lesser_windrunner",
+   "nameEn": "Lesser Hunter's Focus",
+   "nameDe": "Fokus des Jägers (klein)",
+   "icon": "",
+   "statKey": "small_lesser_hunters_focus_30859",
+   "effects": [
+    "bow_spell_damage_inc:15",
+    "projectile_crit_chance:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30860,
    "x": 1457,
    "y": 650,
-   "nameEn": "Lesser Arrow Storm",
-   "nameDe": "Pfeilsturm (klein)",
-   "descEn": "+3% Attack speed.",
-   "descDe": "+3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_arrow_storm",
+   "nameEn": "Lesser Stalwart Vigor",
+   "nameDe": "Standhafte Vitalität (klein)",
+   "icon": "",
+   "statKey": "small_lesser_stalwart_vigor_30860",
+   "effects": [
+    "health_inc_pct:4",
+    "stun_avoid:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30861,
    "x": 1417,
    "y": 650,
-   "nameEn": "Lesser Structural Rhythm",
-   "nameDe": "Strukturrhythmus (klein)",
-   "descEn": "Increases the time gained from completing a full row or column by 3 seconds. +3% Evasion.",
-   "descDe": "Erhöht die Zeit, die du beim Abschließen einer vollständigen Zeile oder Spalte erhältst, um 3 Sekunden. +3% Ausweichen.",
-   "icon": "📉",
-   "statKey": "small_lesser_structural_rhythm",
+   "nameEn": "Lesser Wellspring",
+   "nameDe": "Quellkraft (klein)",
+   "icon": "",
+   "statKey": "small_lesser_wellspring_30861",
+   "effects": [
+    "mana_inc_pct:8",
+    "mana_pickup_effect:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30862,
    "x": 1417,
    "y": 748,
-   "nameEn": "Lesser Structural Rhythm",
-   "nameDe": "Strukturrhythmus (klein)",
-   "descEn": "Increases the time gained from completing a full row or column by 3 seconds. +3% Evasion.",
-   "descDe": "Erhöht die Zeit, die du beim Abschließen einer vollständigen Zeile oder Spalte erhältst, um 3 Sekunden. +3% Ausweichen.",
-   "icon": "📉",
-   "statKey": "small_lesser_structural_rhythm",
+   "nameEn": "Lesser Wellspring",
+   "nameDe": "Quellkraft (klein)",
+   "icon": "",
+   "statKey": "small_lesser_wellspring_30862",
+   "effects": [
+    "mana_inc_pct:8",
+    "mana_pickup_effect:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30863,
    "x": 1457,
    "y": 748,
-   "nameEn": "Lesser Arrow Storm",
-   "nameDe": "Pfeilsturm (klein)",
-   "descEn": "+3% Attack speed.",
-   "descDe": "+3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_arrow_storm",
+   "nameEn": "Lesser Stalwart Vigor",
+   "nameDe": "Standhafte Vitalität (klein)",
+   "icon": "",
+   "statKey": "small_lesser_stalwart_vigor_30863",
+   "effects": [
+    "health_inc_pct:4",
+    "stun_avoid:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30864,
    "x": 1321,
    "y": 559,
-   "nameEn": "Lesser Windrunner",
-   "nameDe": "Windläuferin (klein)",
-   "descEn": "+5% Movement speed. +3% Projectile damage while moving.",
-   "descDe": "+5% Bewegungsgeschwindigkeit. +3% Projektilschaden, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "small_lesser_windrunner",
+   "nameEn": "Lesser Swift Flight",
+   "nameDe": "Schneller Flug (klein)",
+   "icon": "",
+   "statKey": "small_lesser_swift_flight_30864",
+   "effects": [
+    "projectile_speed:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30865,
    "x": 1321,
    "y": 519,
-   "nameEn": "Lesser Windrunner",
-   "nameDe": "Windläuferin (klein)",
-   "descEn": "+5% Movement speed. +3% Projectile damage while moving.",
-   "descDe": "+5% Bewegungsgeschwindigkeit. +3% Projektilschaden, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "small_lesser_windrunner",
+   "nameEn": "Lesser Sharpshot",
+   "nameDe": "Scharfschuss (klein)",
+   "icon": "",
+   "statKey": "small_lesser_sharpshot_30865",
+   "effects": [
+    "projectile_damage_inc:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30866,
    "x": 1272,
    "y": 486,
-   "nameEn": "Lesser Windrunner",
-   "nameDe": "Windläuferin (klein)",
-   "descEn": "+5% Movement speed. +3% Projectile damage while moving.",
-   "descDe": "+5% Bewegungsgeschwindigkeit. +3% Projektilschaden, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "small_lesser_windrunner",
+   "nameEn": "Lesser Sharpshot",
+   "nameDe": "Scharfschuss (klein)",
+   "icon": "",
+   "statKey": "small_lesser_sharpshot_30866",
+   "effects": [
+    "projectile_damage_inc:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30867,
    "x": 1223,
    "y": 519,
-   "nameEn": "Lesser Celerity",
-   "nameDe": "Gewandtheit (klein)",
-   "descEn": "All active class abilities have their cooldowns reduced by 15 seconds. +3% Evasion.",
-   "descDe": "Alle aktiven Klassenfähigkeiten haben 15 Sekunden weniger Abklingzeit. +3% Ausweichen.",
-   "icon": "💫",
-   "statKey": "small_lesser_celerity",
+   "nameEn": "Lesser Sharpshot",
+   "nameDe": "Scharfschuss (klein)",
+   "icon": "",
+   "statKey": "small_lesser_sharpshot_30867",
+   "effects": [
+    "projectile_damage_inc:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30868,
    "x": 1223,
    "y": 559,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Swift Flight",
+   "nameDe": "Schneller Flug",
+   "icon": "",
+   "statKey": "travel_swift_flight_30868",
+   "effects": [
+    "projectile_speed:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30869,
    "x": 1272,
    "y": 592,
-   "nameEn": "Lesser Windrunner",
-   "nameDe": "Windläuferin (klein)",
-   "descEn": "+5% Movement speed. +3% Projectile damage while moving.",
-   "descDe": "+5% Bewegungsgeschwindigkeit. +3% Projektilschaden, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "small_lesser_windrunner",
+   "nameEn": "Lesser Swift Flight",
+   "nameDe": "Schneller Flug (klein)",
+   "icon": "",
+   "statKey": "small_lesser_swift_flight_30869",
+   "effects": [
+    "projectile_speed:5"
+   ],
    "tier": "small"
   },
   {
@@ -16664,12 +16739,13 @@ export const TALENT_TREE_DATA = {
    "id": 30876,
    "x": 1247,
    "y": 347,
-   "nameEn": "Hunter's Focus",
-   "nameDe": "Fokus der Jägerin",
-   "descEn": "+3% Critical strike chance with projectiles.",
-   "descDe": "+3% kritische Trefferchance bei Projektilen.",
-   "icon": "○",
-   "statKey": "small_hunter_s_focus",
+   "nameEn": "Lesser Agility",
+   "nameDe": "Beweglichkeit (klein)",
+   "icon": "",
+   "statKey": "small_agility_30876",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "small"
   },
   {
@@ -16700,12 +16776,13 @@ export const TALENT_TREE_DATA = {
    "id": 30879,
    "x": 1410,
    "y": 172,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Intelligence",
+   "nameDe": "Intelligenz",
+   "icon": "",
+   "statKey": "travel_intelligence_30879",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -16738,10 +16815,11 @@ export const TALENT_TREE_DATA = {
    "y": 2,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30882",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17122,10 +17200,11 @@ export const TALENT_TREE_DATA = {
    "y": 348,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30914",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17780,27 +17859,29 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 30969,
-   "x": 2660,
-   "y": 3,
+   "x": 6046,
+   "y": 71,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
    "descEn": "+1 to Agility.",
    "descDe": "+1 Beweglichkeit.",
    "icon": "🏃",
    "statKey": "small_agility",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 30970,
-   "x": 2614,
-   "y": 3,
+   "x": 6037,
+   "y": -56,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
    "descEn": "+1 to Agility.",
    "descDe": "+1 Beweglichkeit.",
    "icon": "🏃",
    "statKey": "small_agility",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 30971,
@@ -18108,15 +18189,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 30996,
-   "x": 2779,
-   "y": 43,
+   "x": 6035,
+   "y": 155,
    "nameEn": "Sprinter",
    "nameDe": "Sprinterin",
    "descEn": "+5% Movement speed.",
    "descDe": "+5% Bewegungsgeschwindigkeit.",
    "icon": "○",
    "statKey": "small_sprinter",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 30997,
@@ -18132,39 +18214,42 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 30998,
-   "x": 3103,
-   "y": 43,
+   "x": 6669,
+   "y": 506,
    "nameEn": "Sprinter",
    "nameDe": "Sprinterin",
    "descEn": "+5% Movement speed.",
    "descDe": "+5% Bewegungsgeschwindigkeit.",
    "icon": "○",
    "statKey": "small_sprinter",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 30999,
-   "x": 3002,
-   "y": 225,
+   "x": 6669,
+   "y": 865,
    "nameEn": "Sprinter",
    "nameDe": "Sprinterin",
    "descEn": "+5% Movement speed.",
    "descDe": "+5% Bewegungsgeschwindigkeit.",
    "icon": "○",
    "statKey": "small_sprinter",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 31000,
-   "x": 3101,
-   "y": 410,
+   "x": 6690,
+   "y": 738,
    "nameEn": "Sprinter",
    "nameDe": "Sprinterin",
    "descEn": "+5% Movement speed.",
    "descDe": "+5% Bewegungsgeschwindigkeit.",
    "icon": "○",
    "statKey": "small_sprinter",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 31001,
@@ -18300,15 +18385,16 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 31012,
-   "x": 3313,
-   "y": 42,
+   "x": 6676,
+   "y": 623,
    "nameEn": "Rapid Volley",
    "nameDe": "Schneller Salve",
    "descEn": "+2% Attack speed.",
    "descDe": "+2% Angriffsgeschwindigkeit.",
    "icon": "○",
    "statKey": "small_rapid_volley",
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 31013,
@@ -18545,10 +18631,11 @@ export const TALENT_TREE_DATA = {
    "y": 1074,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_31032",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -27497,11 +27584,2483 @@ export const TALENT_TREE_DATA = {
    "from": 30343,
    "to": 30342,
    "dotted": false
+  },
+  {
+   "id": 307,
+   "from": 383,
+   "to": 1003,
+   "dotted": false
+  },
+  {
+   "id": 308,
+   "from": 1003,
+   "to": 97,
+   "dotted": false
+  },
+  {
+   "id": 309,
+   "from": 1003,
+   "to": 30876,
+   "dotted": false
+  },
+  {
+   "id": 310,
+   "from": 1003,
+   "to": 328,
+   "dotted": false
+  },
+  {
+   "id": 311,
+   "from": 97,
+   "to": 30867,
+   "dotted": false
+  },
+  {
+   "id": 312,
+   "from": 97,
+   "to": 30868,
+   "dotted": false
+  },
+  {
+   "id": 313,
+   "from": 30778,
+   "to": 383,
+   "dotted": false
+  },
+  {
+   "id": 314,
+   "from": 383,
+   "to": 372,
+   "dotted": false
+  },
+  {
+   "id": 315,
+   "from": 30866,
+   "to": 30867,
+   "dotted": false
+  },
+  {
+   "id": 316,
+   "from": 30866,
+   "to": 30865,
+   "dotted": false
+  },
+  {
+   "id": 317,
+   "from": 30865,
+   "to": 20101,
+   "dotted": false
+  },
+  {
+   "id": 318,
+   "from": 30868,
+   "to": 30869,
+   "dotted": false
+  },
+  {
+   "id": 319,
+   "from": 30869,
+   "to": 30864,
+   "dotted": false
+  },
+  {
+   "id": 320,
+   "from": 30864,
+   "to": 20101,
+   "dotted": false
+  },
+  {
+   "id": 321,
+   "from": 30778,
+   "to": 30779,
+   "dotted": false
+  },
+  {
+   "id": 322,
+   "from": 30779,
+   "to": 94,
+   "dotted": false
+  },
+  {
+   "id": 323,
+   "from": 94,
+   "to": 20099,
+   "dotted": false
+  },
+  {
+   "id": 324,
+   "from": 372,
+   "to": 30781,
+   "dotted": false
+  },
+  {
+   "id": 325,
+   "from": 30781,
+   "to": 30780,
+   "dotted": false
+  },
+  {
+   "id": 326,
+   "from": 30780,
+   "to": 20099,
+   "dotted": false
+  },
+  {
+   "id": 327,
+   "from": 20101,
+   "to": 30861,
+   "dotted": false
+  },
+  {
+   "id": 328,
+   "from": 20101,
+   "to": 30860,
+   "dotted": false
+  },
+  {
+   "id": 329,
+   "from": 30860,
+   "to": 20100,
+   "dotted": false
+  },
+  {
+   "id": 330,
+   "from": 20100,
+   "to": 30863,
+   "dotted": false
+  },
+  {
+   "id": 331,
+   "from": 30863,
+   "to": 20099,
+   "dotted": false
+  },
+  {
+   "id": 332,
+   "from": 20099,
+   "to": 30862,
+   "dotted": false
+  },
+  {
+   "id": 333,
+   "from": 226,
+   "to": 30862,
+   "dotted": false
+  },
+  {
+   "id": 334,
+   "from": 226,
+   "to": 30861,
+   "dotted": false
+  },
+  {
+   "id": 335,
+   "from": 20101,
+   "to": 30857,
+   "dotted": false
+  },
+  {
+   "id": 336,
+   "from": 30857,
+   "to": 20102,
+   "dotted": false
+  },
+  {
+   "id": 337,
+   "from": 20102,
+   "to": 30856,
+   "dotted": false
+  },
+  {
+   "id": 338,
+   "from": 30856,
+   "to": 30855,
+   "dotted": false
+  },
+  {
+   "id": 339,
+   "from": 20102,
+   "to": 30858,
+   "dotted": false
+  },
+  {
+   "id": 340,
+   "from": 30858,
+   "to": 30859,
+   "dotted": false
+  },
+  {
+   "id": 341,
+   "from": 20099,
+   "to": 30784,
+   "dotted": false
+  },
+  {
+   "id": 342,
+   "from": 30784,
+   "to": 320,
+   "dotted": false
+  },
+  {
+   "id": 343,
+   "from": 320,
+   "to": 243,
+   "dotted": false
+  },
+  {
+   "id": 344,
+   "from": 20099,
+   "to": 30783,
+   "dotted": false
+  },
+  {
+   "id": 345,
+   "from": 30783,
+   "to": 305,
+   "dotted": false
+  },
+  {
+   "id": 346,
+   "from": 305,
+   "to": 30785,
+   "dotted": false
+  },
+  {
+   "id": 347,
+   "from": 30859,
+   "to": 149,
+   "dotted": false
+  },
+  {
+   "id": 348,
+   "from": 30855,
+   "to": 149,
+   "dotted": false
+  },
+  {
+   "id": 349,
+   "from": 149,
+   "to": 195,
+   "dotted": false
+  },
+  {
+   "id": 350,
+   "from": 195,
+   "to": 102,
+   "dotted": false
+  },
+  {
+   "id": 351,
+   "from": 102,
+   "to": 30786,
+   "dotted": false
+  },
+  {
+   "id": 352,
+   "from": 30786,
+   "to": 195,
+   "dotted": false
+  },
+  {
+   "id": 353,
+   "from": 30786,
+   "to": 20160,
+   "dotted": false
+  },
+  {
+   "id": 354,
+   "from": 20160,
+   "to": 243,
+   "dotted": false
+  },
+  {
+   "id": 355,
+   "from": 20160,
+   "to": 30785,
+   "dotted": false
+  },
+  {
+   "id": 356,
+   "from": 20160,
+   "to": 30794,
+   "dotted": false
+  },
+  {
+   "id": 357,
+   "from": 30794,
+   "to": 30793,
+   "dotted": false
+  },
+  {
+   "id": 358,
+   "from": 30793,
+   "to": 248,
+   "dotted": false
+  },
+  {
+   "id": 359,
+   "from": 248,
+   "to": 30792,
+   "dotted": false
+  },
+  {
+   "id": 360,
+   "from": 30792,
+   "to": 30807,
+   "dotted": false
+  },
+  {
+   "id": 361,
+   "from": 30807,
+   "to": 30806,
+   "dotted": false
+  },
+  {
+   "id": 362,
+   "from": 30806,
+   "to": 30805,
+   "dotted": false
+  },
+  {
+   "id": 363,
+   "from": 30805,
+   "to": 152,
+   "dotted": false
+  },
+  {
+   "id": 364,
+   "from": 152,
+   "to": 30804,
+   "dotted": false
+  },
+  {
+   "id": 365,
+   "from": 30804,
+   "to": 30803,
+   "dotted": false
+  },
+  {
+   "id": 366,
+   "from": 30803,
+   "to": 30806,
+   "dotted": false
+  },
+  {
+   "id": 367,
+   "from": 30818,
+   "to": 30817,
+   "dotted": false
+  },
+  {
+   "id": 368,
+   "from": 30817,
+   "to": 30816,
+   "dotted": false
+  },
+  {
+   "id": 369,
+   "from": 30816,
+   "to": 20127,
+   "dotted": false
+  },
+  {
+   "id": 370,
+   "from": 30794,
+   "to": 30787,
+   "dotted": false
+  },
+  {
+   "id": 371,
+   "from": 149,
+   "to": 30823,
+   "dotted": false
+  },
+  {
+   "id": 372,
+   "from": 30823,
+   "to": 30787,
+   "dotted": false
+  },
+  {
+   "id": 373,
+   "from": 30787,
+   "to": 30789,
+   "dotted": false
+  },
+  {
+   "id": 374,
+   "from": 30789,
+   "to": 30790,
+   "dotted": false
+  },
+  {
+   "id": 375,
+   "from": 30787,
+   "to": 30788,
+   "dotted": false
+  },
+  {
+   "id": 376,
+   "from": 30788,
+   "to": 20126,
+   "dotted": false
+  },
+  {
+   "id": 377,
+   "from": 20126,
+   "to": 30791,
+   "dotted": false
+  },
+  {
+   "id": 378,
+   "from": 30791,
+   "to": 30818,
+   "dotted": false
+  },
+  {
+   "id": 379,
+   "from": 30790,
+   "to": 30818,
+   "dotted": false
+  },
+  {
+   "id": 380,
+   "from": 30823,
+   "to": 30822,
+   "dotted": false
+  },
+  {
+   "id": 381,
+   "from": 30822,
+   "to": 170,
+   "dotted": false
+  },
+  {
+   "id": 382,
+   "from": 170,
+   "to": 30821,
+   "dotted": false
+  },
+  {
+   "id": 383,
+   "from": 30821,
+   "to": 30989,
+   "dotted": false
+  },
+  {
+   "id": 384,
+   "from": 30989,
+   "to": 221,
+   "dotted": false
+  },
+  {
+   "id": 385,
+   "from": 30818,
+   "to": 31009,
+   "dotted": false
+  },
+  {
+   "id": 386,
+   "from": 31009,
+   "to": 31008,
+   "dotted": false
+  },
+  {
+   "id": 387,
+   "from": 31008,
+   "to": 400,
+   "dotted": false
+  },
+  {
+   "id": 388,
+   "from": 30818,
+   "to": 30819,
+   "dotted": false
+  },
+  {
+   "id": 389,
+   "from": 30819,
+   "to": 30820,
+   "dotted": false
+  },
+  {
+   "id": 390,
+   "from": 30820,
+   "to": 20125,
+   "dotted": false
+  },
+  {
+   "id": 391,
+   "from": 30818,
+   "to": 30814,
+   "dotted": false
+  },
+  {
+   "id": 392,
+   "from": 30814,
+   "to": 222,
+   "dotted": false
+  },
+  {
+   "id": 393,
+   "from": 222,
+   "to": 30813,
+   "dotted": false
+  },
+  {
+   "id": 394,
+   "from": 30813,
+   "to": 20128,
+   "dotted": false
+  },
+  {
+   "id": 395,
+   "from": 30814,
+   "to": 30815,
+   "dotted": false
+  },
+  {
+   "id": 396,
+   "from": 30815,
+   "to": 20128,
+   "dotted": false
+  },
+  {
+   "id": 397,
+   "from": 30818,
+   "to": 31004,
+   "dotted": false
+  },
+  {
+   "id": 398,
+   "from": 31004,
+   "to": 31003,
+   "dotted": false
+  },
+  {
+   "id": 399,
+   "from": 31003,
+   "to": 31002,
+   "dotted": false
+  },
+  {
+   "id": 400,
+   "from": 31002,
+   "to": 31001,
+   "dotted": false
+  },
+  {
+   "id": 401,
+   "from": 31001,
+   "to": 20131,
+   "dotted": false
+  },
+  {
+   "id": 402,
+   "from": 31004,
+   "to": 31005,
+   "dotted": false
+  },
+  {
+   "id": 403,
+   "from": 31005,
+   "to": 31006,
+   "dotted": false
+  },
+  {
+   "id": 404,
+   "from": 31006,
+   "to": 31007,
+   "dotted": false
+  },
+  {
+   "id": 405,
+   "from": 31007,
+   "to": 20130,
+   "dotted": false
+  },
+  {
+   "id": 406,
+   "from": 31032,
+   "to": 30794,
+   "dotted": false
+  },
+  {
+   "id": 407,
+   "from": 31032,
+   "to": 30796,
+   "dotted": false
+  },
+  {
+   "id": 408,
+   "from": 30796,
+   "to": 30795,
+   "dotted": false
+  },
+  {
+   "id": 409,
+   "from": 30795,
+   "to": 20134,
+   "dotted": false
+  },
+  {
+   "id": 410,
+   "from": 30796,
+   "to": 30797,
+   "dotted": false
+  },
+  {
+   "id": 411,
+   "from": 30797,
+   "to": 258,
+   "dotted": false
+  },
+  {
+   "id": 412,
+   "from": 31032,
+   "to": 31023,
+   "dotted": false
+  },
+  {
+   "id": 413,
+   "from": 31023,
+   "to": 30800,
+   "dotted": false
+  },
+  {
+   "id": 414,
+   "from": 30800,
+   "to": 30801,
+   "dotted": false
+  },
+  {
+   "id": 415,
+   "from": 30801,
+   "to": 30802,
+   "dotted": false
+  },
+  {
+   "id": 416,
+   "from": 30802,
+   "to": 20135,
+   "dotted": false
+  },
+  {
+   "id": 417,
+   "from": 30800,
+   "to": 30799,
+   "dotted": false
+  },
+  {
+   "id": 418,
+   "from": 30799,
+   "to": 30798,
+   "dotted": false
+  },
+  {
+   "id": 419,
+   "from": 30798,
+   "to": 20135,
+   "dotted": false
+  },
+  {
+   "id": 420,
+   "from": 31032,
+   "to": 31030,
+   "dotted": false
+  },
+  {
+   "id": 421,
+   "from": 31030,
+   "to": 31031,
+   "dotted": false
+  },
+  {
+   "id": 422,
+   "from": 31031,
+   "to": 302,
+   "dotted": false
+  },
+  {
+   "id": 423,
+   "from": 302,
+   "to": 31029,
+   "dotted": false
+  },
+  {
+   "id": 424,
+   "from": 20099,
+   "to": 30782,
+   "dotted": false
+  },
+  {
+   "id": 425,
+   "from": 30782,
+   "to": 31032,
+   "dotted": false
+  },
+  {
+   "id": 426,
+   "from": 30782,
+   "to": 30762,
+   "dotted": false
+  },
+  {
+   "id": 427,
+   "from": 30762,
+   "to": 20158,
+   "dotted": false
+  },
+  {
+   "id": 428,
+   "from": 20158,
+   "to": 30763,
+   "dotted": false
+  },
+  {
+   "id": 429,
+   "from": 30763,
+   "to": 30759,
+   "dotted": false
+  },
+  {
+   "id": 430,
+   "from": 30759,
+   "to": 30760,
+   "dotted": false
+  },
+  {
+   "id": 431,
+   "from": 30760,
+   "to": 20159,
+   "dotted": false
+  },
+  {
+   "id": 432,
+   "from": 20159,
+   "to": 30761,
+   "dotted": false
+  },
+  {
+   "id": 433,
+   "from": 30761,
+   "to": 30782,
+   "dotted": false
+  },
+  {
+   "id": 434,
+   "from": 30759,
+   "to": 31032,
+   "dotted": false
+  },
+  {
+   "id": 435,
+   "from": 30759,
+   "to": 31028,
+   "dotted": false
+  },
+  {
+   "id": 436,
+   "from": 31028,
+   "to": 31027,
+   "dotted": false
+  },
+  {
+   "id": 437,
+   "from": 31027,
+   "to": 128,
+   "dotted": false
+  },
+  {
+   "id": 438,
+   "from": 30759,
+   "to": 30756,
+   "dotted": false
+  },
+  {
+   "id": 439,
+   "from": 30756,
+   "to": 30755,
+   "dotted": false
+  },
+  {
+   "id": 440,
+   "from": 30755,
+   "to": 373,
+   "dotted": false
+  },
+  {
+   "id": 441,
+   "from": 30759,
+   "to": 30757,
+   "dotted": false
+  },
+  {
+   "id": 442,
+   "from": 30757,
+   "to": 30758,
+   "dotted": false
+  },
+  {
+   "id": 443,
+   "from": 30758,
+   "to": 223,
+   "dotted": false
+  },
+  {
+   "id": 444,
+   "from": 30759,
+   "to": 30666,
+   "dotted": false
+  },
+  {
+   "id": 445,
+   "from": 30666,
+   "to": 30667,
+   "dotted": false
+  },
+  {
+   "id": 446,
+   "from": 30667,
+   "to": 30668,
+   "dotted": false
+  },
+  {
+   "id": 447,
+   "from": 30668,
+   "to": 20157,
+   "dotted": false
+  },
+  {
+   "id": 448,
+   "from": 30667,
+   "to": 30669,
+   "dotted": false
+  },
+  {
+   "id": 449,
+   "from": 30669,
+   "to": 30670,
+   "dotted": false
+  },
+  {
+   "id": 450,
+   "from": 30670,
+   "to": 20157,
+   "dotted": false
+  },
+  {
+   "id": 451,
+   "from": 30666,
+   "to": 40004,
+   "dotted": false
+  },
+  {
+   "id": 452,
+   "from": 30666,
+   "to": 30754,
+   "dotted": false
+  },
+  {
+   "id": 453,
+   "from": 30754,
+   "to": 30753,
+   "dotted": false
+  },
+  {
+   "id": 454,
+   "from": 30753,
+   "to": 30752,
+   "dotted": false
+  },
+  {
+   "id": 455,
+   "from": 30752,
+   "to": 20139,
+   "dotted": false
+  },
+  {
+   "id": 456,
+   "from": 30752,
+   "to": 30729,
+   "dotted": false
+  },
+  {
+   "id": 457,
+   "from": 30746,
+   "to": 30751,
+   "dotted": false
+  },
+  {
+   "id": 458,
+   "from": 30751,
+   "to": 20138,
+   "dotted": false
+  },
+  {
+   "id": 459,
+   "from": 20138,
+   "to": 30750,
+   "dotted": false
+  },
+  {
+   "id": 460,
+   "from": 30750,
+   "to": 30751,
+   "dotted": false
+  },
+  {
+   "id": 461,
+   "from": 30746,
+   "to": 30747,
+   "dotted": false
+  },
+  {
+   "id": 462,
+   "from": 30747,
+   "to": 31026,
+   "dotted": false
+  },
+  {
+   "id": 463,
+   "from": 31026,
+   "to": 20137,
+   "dotted": false
+  },
+  {
+   "id": 464,
+   "from": 30747,
+   "to": 30748,
+   "dotted": false
+  },
+  {
+   "id": 465,
+   "from": 30748,
+   "to": 30749,
+   "dotted": false
+  },
+  {
+   "id": 466,
+   "from": 30749,
+   "to": 20137,
+   "dotted": false
+  },
+  {
+   "id": 467,
+   "from": 30746,
+   "to": 30744,
+   "dotted": false
+  },
+  {
+   "id": 468,
+   "from": 30744,
+   "to": 30743,
+   "dotted": false
+  },
+  {
+   "id": 469,
+   "from": 30743,
+   "to": 20161,
+   "dotted": false
+  },
+  {
+   "id": 470,
+   "from": 30744,
+   "to": 30745,
+   "dotted": false
+  },
+  {
+   "id": 471,
+   "from": 30745,
+   "to": 20161,
+   "dotted": false
+  },
+  {
+   "id": 472,
+   "from": 31023,
+   "to": 154,
+   "dotted": false
+  },
+  {
+   "id": 473,
+   "from": 31023,
+   "to": 31021,
+   "dotted": false
+  },
+  {
+   "id": 474,
+   "from": 31021,
+   "to": 31022,
+   "dotted": false
+  },
+  {
+   "id": 475,
+   "from": 31022,
+   "to": 215,
+   "dotted": false
+  },
+  {
+   "id": 476,
+   "from": 215,
+   "to": 31020,
+   "dotted": false
+  },
+  {
+   "id": 477,
+   "from": 31020,
+   "to": 31021,
+   "dotted": false
+  },
+  {
+   "id": 478,
+   "from": 30807,
+   "to": 31017,
+   "dotted": false
+  },
+  {
+   "id": 479,
+   "from": 31017,
+   "to": 31018,
+   "dotted": false
+  },
+  {
+   "id": 480,
+   "from": 31018,
+   "to": 31019,
+   "dotted": false
+  },
+  {
+   "id": 481,
+   "from": 31019,
+   "to": 332,
+   "dotted": false
+  },
+  {
+   "id": 482,
+   "from": 31017,
+   "to": 31015,
+   "dotted": false
+  },
+  {
+   "id": 483,
+   "from": 31015,
+   "to": 31016,
+   "dotted": false
+  },
+  {
+   "id": 484,
+   "from": 31016,
+   "to": 332,
+   "dotted": false
+  },
+  {
+   "id": 485,
+   "from": 30807,
+   "to": 30808,
+   "dotted": false
+  },
+  {
+   "id": 486,
+   "from": 30808,
+   "to": 30810,
+   "dotted": false
+  },
+  {
+   "id": 487,
+   "from": 30810,
+   "to": 30811,
+   "dotted": false
+  },
+  {
+   "id": 488,
+   "from": 30811,
+   "to": 30812,
+   "dotted": false
+  },
+  {
+   "id": 489,
+   "from": 30812,
+   "to": 20129,
+   "dotted": false
+  },
+  {
+   "id": 490,
+   "from": 30808,
+   "to": 30809,
+   "dotted": false
+  },
+  {
+   "id": 491,
+   "from": 30809,
+   "to": 31014,
+   "dotted": false
+  },
+  {
+   "id": 492,
+   "from": 31014,
+   "to": 31013,
+   "dotted": false
+  },
+  {
+   "id": 493,
+   "from": 31013,
+   "to": 211,
+   "dotted": false
+  },
+  {
+   "id": 494,
+   "from": 30989,
+   "to": 30990,
+   "dotted": false
+  },
+  {
+   "id": 495,
+   "from": 30990,
+   "to": 30995,
+   "dotted": false
+  },
+  {
+   "id": 496,
+   "from": 30995,
+   "to": 309,
+   "dotted": false
+  },
+  {
+   "id": 497,
+   "from": 30990,
+   "to": 30993,
+   "dotted": false
+  },
+  {
+   "id": 498,
+   "from": 30993,
+   "to": 20133,
+   "dotted": false
+  },
+  {
+   "id": 499,
+   "from": 30990,
+   "to": 30991,
+   "dotted": false
+  },
+  {
+   "id": 500,
+   "from": 30991,
+   "to": 30994,
+   "dotted": false
+  },
+  {
+   "id": 501,
+   "from": 30994,
+   "to": 101,
+   "dotted": false
+  },
+  {
+   "id": 502,
+   "from": 101,
+   "to": 30992,
+   "dotted": false
+  },
+  {
+   "id": 503,
+   "from": 30992,
+   "to": 30991,
+   "dotted": false
+  },
+  {
+   "id": 504,
+   "from": 30988,
+   "to": 30989,
+   "dotted": false
+  },
+  {
+   "id": 505,
+   "from": 30988,
+   "to": 30984,
+   "dotted": false
+  },
+  {
+   "id": 506,
+   "from": 30984,
+   "to": 30983,
+   "dotted": false
+  },
+  {
+   "id": 507,
+   "from": 30983,
+   "to": 118,
+   "dotted": false
+  },
+  {
+   "id": 508,
+   "from": 30989,
+   "to": 30985,
+   "dotted": false
+  },
+  {
+   "id": 509,
+   "from": 30985,
+   "to": 30986,
+   "dotted": false
+  },
+  {
+   "id": 510,
+   "from": 30986,
+   "to": 30987,
+   "dotted": false
+  },
+  {
+   "id": 511,
+   "from": 30987,
+   "to": 20124,
+   "dotted": false
+  },
+  {
+   "id": 512,
+   "from": 30823,
+   "to": 30854,
+   "dotted": false
+  },
+  {
+   "id": 513,
+   "from": 30854,
+   "to": 30825,
+   "dotted": false
+  },
+  {
+   "id": 514,
+   "from": 30825,
+   "to": 30824,
+   "dotted": false
+  },
+  {
+   "id": 515,
+   "from": 30824,
+   "to": 259,
+   "dotted": false
+  },
+  {
+   "id": 516,
+   "from": 259,
+   "to": 30827,
+   "dotted": false
+  },
+  {
+   "id": 517,
+   "from": 30827,
+   "to": 30826,
+   "dotted": false
+  },
+  {
+   "id": 518,
+   "from": 30854,
+   "to": 30830,
+   "dotted": false
+  },
+  {
+   "id": 519,
+   "from": 30854,
+   "to": 30914,
+   "dotted": false
+  },
+  {
+   "id": 520,
+   "from": 30914,
+   "to": 30876,
+   "dotted": false
+  },
+  {
+   "id": 521,
+   "from": 30914,
+   "to": 20101,
+   "dotted": false
+  },
+  {
+   "id": 522,
+   "from": 30826,
+   "to": 30825,
+   "dotted": false
+  },
+  {
+   "id": 523,
+   "from": 30830,
+   "to": 344,
+   "dotted": false
+  },
+  {
+   "id": 524,
+   "from": 30830,
+   "to": 30829,
+   "dotted": false
+  },
+  {
+   "id": 525,
+   "from": 30829,
+   "to": 30828,
+   "dotted": false
+  },
+  {
+   "id": 526,
+   "from": 30828,
+   "to": 335,
+   "dotted": false
+  },
+  {
+   "id": 527,
+   "from": 30830,
+   "to": 30852,
+   "dotted": false
+  },
+  {
+   "id": 528,
+   "from": 30852,
+   "to": 30853,
+   "dotted": false
+  },
+  {
+   "id": 529,
+   "from": 30853,
+   "to": 20105,
+   "dotted": false
+  },
+  {
+   "id": 530,
+   "from": 20105,
+   "to": 30850,
+   "dotted": false
+  },
+  {
+   "id": 531,
+   "from": 30850,
+   "to": 30851,
+   "dotted": false
+  },
+  {
+   "id": 532,
+   "from": 30851,
+   "to": 30847,
+   "dotted": false
+  },
+  {
+   "id": 533,
+   "from": 30847,
+   "to": 30848,
+   "dotted": false
+  },
+  {
+   "id": 534,
+   "from": 30848,
+   "to": 30849,
+   "dotted": false
+  },
+  {
+   "id": 535,
+   "from": 30849,
+   "to": 20104,
+   "dotted": false
+  },
+  {
+   "id": 536,
+   "from": 30847,
+   "to": 30882,
+   "dotted": false
+  },
+  {
+   "id": 537,
+   "from": 30882,
+   "to": 30879,
+   "dotted": false
+  },
+  {
+   "id": 538,
+   "from": 30879,
+   "to": 30914,
+   "dotted": false
+  },
+  {
+   "id": 539,
+   "from": 30879,
+   "to": 30878,
+   "dotted": false
+  },
+  {
+   "id": 540,
+   "from": 30878,
+   "to": 30877,
+   "dotted": false
+  },
+  {
+   "id": 541,
+   "from": 30877,
+   "to": 379,
+   "dotted": false
+  },
+  {
+   "id": 542,
+   "from": 30879,
+   "to": 30916,
+   "dotted": false
+  },
+  {
+   "id": 543,
+   "from": 30916,
+   "to": 30917,
+   "dotted": false
+  },
+  {
+   "id": 544,
+   "from": 30917,
+   "to": 20103,
+   "dotted": false
+  },
+  {
+   "id": 545,
+   "from": 20103,
+   "to": 30915,
+   "dotted": false
+  },
+  {
+   "id": 546,
+   "from": 30915,
+   "to": 30916,
+   "dotted": false
+  },
+  {
+   "id": 547,
+   "from": 30882,
+   "to": 30881,
+   "dotted": false
+  },
+  {
+   "id": 548,
+   "from": 30881,
+   "to": 30880,
+   "dotted": false
+  },
+  {
+   "id": 549,
+   "from": 30880,
+   "to": 20110,
+   "dotted": false
+  },
+  {
+   "id": 550,
+   "from": 30882,
+   "to": 160,
+   "dotted": false
+  },
+  {
+   "id": 551,
+   "from": 30882,
+   "to": 30908,
+   "dotted": false
+  },
+  {
+   "id": 552,
+   "from": 30908,
+   "to": 30907,
+   "dotted": false
+  },
+  {
+   "id": 553,
+   "from": 30882,
+   "to": 30889,
+   "dotted": false
+  },
+  {
+   "id": 554,
+   "from": 30889,
+   "to": 30888,
+   "dotted": false
+  },
+  {
+   "id": 555,
+   "from": 30888,
+   "to": 20109,
+   "dotted": false
+  },
+  {
+   "id": 556,
+   "from": 30882,
+   "to": 30883,
+   "dotted": false
+  },
+  {
+   "id": 557,
+   "from": 30883,
+   "to": 30884,
+   "dotted": false
+  },
+  {
+   "id": 558,
+   "from": 30884,
+   "to": 238,
+   "dotted": false
+  },
+  {
+   "id": 559,
+   "from": 30782,
+   "to": 328,
+   "dotted": false
+  },
+  {
+   "id": 560,
+   "from": 161,
+   "to": 30971,
+   "dotted": false
+  },
+  {
+   "id": 561,
+   "from": 30971,
+   "to": 30972,
+   "dotted": false
+  },
+  {
+   "id": 562,
+   "from": 30972,
+   "to": 30973,
+   "dotted": false
+  },
+  {
+   "id": 563,
+   "from": 30973,
+   "to": 196,
+   "dotted": false
+  },
+  {
+   "id": 564,
+   "from": 30971,
+   "to": 30981,
+   "dotted": false
+  },
+  {
+   "id": 565,
+   "from": 30981,
+   "to": 30982,
+   "dotted": false
+  },
+  {
+   "id": 566,
+   "from": 30982,
+   "to": 20123,
+   "dotted": false
+  },
+  {
+   "id": 567,
+   "from": 20123,
+   "to": 31010,
+   "dotted": false
+  },
+  {
+   "id": 568,
+   "from": 31010,
+   "to": 30980,
+   "dotted": false
+  },
+  {
+   "id": 569,
+   "from": 30980,
+   "to": 30981,
+   "dotted": false
+  },
+  {
+   "id": 570,
+   "from": 30979,
+   "to": 30967,
+   "dotted": false
+  },
+  {
+   "id": 571,
+   "from": 30967,
+   "to": 30968,
+   "dotted": false
+  },
+  {
+   "id": 572,
+   "from": 30968,
+   "to": 393,
+   "dotted": false
+  },
+  {
+   "id": 573,
+   "from": 393,
+   "to": 30965,
+   "dotted": false
+  },
+  {
+   "id": 574,
+   "from": 30965,
+   "to": 30966,
+   "dotted": false
+  },
+  {
+   "id": 575,
+   "from": 30966,
+   "to": 30967,
+   "dotted": false
+  },
+  {
+   "id": 576,
+   "from": 30979,
+   "to": 30974,
+   "dotted": false
+  },
+  {
+   "id": 577,
+   "from": 30974,
+   "to": 30975,
+   "dotted": false
+  },
+  {
+   "id": 578,
+   "from": 30975,
+   "to": 210,
+   "dotted": false
+  },
+  {
+   "id": 579,
+   "from": 30978,
+   "to": 30963,
+   "dotted": false
+  },
+  {
+   "id": 580,
+   "from": 30963,
+   "to": 30964,
+   "dotted": false
+  },
+  {
+   "id": 581,
+   "from": 30964,
+   "to": 2,
+   "dotted": false
+  },
+  {
+   "id": 582,
+   "from": 30978,
+   "to": 30934,
+   "dotted": false
+  },
+  {
+   "id": 583,
+   "from": 30934,
+   "to": 30960,
+   "dotted": false
+  },
+  {
+   "id": 584,
+   "from": 30961,
+   "to": 30960,
+   "dotted": false
+  },
+  {
+   "id": 585,
+   "from": 30961,
+   "to": 30962,
+   "dotted": false
+  },
+  {
+   "id": 586,
+   "from": 30962,
+   "to": 167,
+   "dotted": false
+  },
+  {
+   "id": 587,
+   "from": 30934,
+   "to": 30935,
+   "dotted": false
+  },
+  {
+   "id": 588,
+   "from": 30935,
+   "to": 30936,
+   "dotted": false
+  },
+  {
+   "id": 589,
+   "from": 30936,
+   "to": 30937,
+   "dotted": false
+  },
+  {
+   "id": 590,
+   "from": 30937,
+   "to": 20118,
+   "dotted": false
+  },
+  {
+   "id": 591,
+   "from": 30959,
+   "to": 30957,
+   "dotted": false
+  },
+  {
+   "id": 592,
+   "from": 30957,
+   "to": 30958,
+   "dotted": false
+  },
+  {
+   "id": 593,
+   "from": 30958,
+   "to": 20116,
+   "dotted": false
+  },
+  {
+   "id": 594,
+   "from": 20116,
+   "to": 30954,
+   "dotted": false
+  },
+  {
+   "id": 595,
+   "from": 30954,
+   "to": 30953,
+   "dotted": false
+  },
+  {
+   "id": 596,
+   "from": 30953,
+   "to": 116,
+   "dotted": false
+  },
+  {
+   "id": 597,
+   "from": 116,
+   "to": 30957,
+   "dotted": false
+  },
+  {
+   "id": 598,
+   "from": 30978,
+   "to": 30933,
+   "dotted": false
+  },
+  {
+   "id": 599,
+   "from": 30933,
+   "to": 30932,
+   "dotted": false
+  },
+  {
+   "id": 600,
+   "from": 30932,
+   "to": 20117,
+   "dotted": false
+  },
+  {
+   "id": 601,
+   "from": 30978,
+   "to": 30931,
+   "dotted": false
+  },
+  {
+   "id": 602,
+   "from": 30931,
+   "to": 241,
+   "dotted": false
+  },
+  {
+   "id": 603,
+   "from": 241,
+   "to": 30930,
+   "dotted": false
+  },
+  {
+   "id": 604,
+   "from": 30930,
+   "to": 30929,
+   "dotted": false
+  },
+  {
+   "id": 605,
+   "from": 30929,
+   "to": 30840,
+   "dotted": false
+  },
+  {
+   "id": 606,
+   "from": 30929,
+   "to": 30928,
+   "dotted": false
+  },
+  {
+   "id": 607,
+   "from": 30928,
+   "to": 20114,
+   "dotted": false
+  },
+  {
+   "id": 608,
+   "from": 20114,
+   "to": 30921,
+   "dotted": false
+  },
+  {
+   "id": 609,
+   "from": 30921,
+   "to": 30920,
+   "dotted": false
+  },
+  {
+   "id": 610,
+   "from": 30920,
+   "to": 30919,
+   "dotted": false
+  },
+  {
+   "id": 611,
+   "from": 30919,
+   "to": 20112,
+   "dotted": false
+  },
+  {
+   "id": 612,
+   "from": 30920,
+   "to": 20113,
+   "dotted": false
+  },
+  {
+   "id": 613,
+   "from": 20113,
+   "to": 30922,
+   "dotted": false
+  },
+  {
+   "id": 614,
+   "from": 30922,
+   "to": 30924,
+   "dotted": false
+  },
+  {
+   "id": 615,
+   "from": 30922,
+   "to": 30923,
+   "dotted": false
+  },
+  {
+   "id": 616,
+   "from": 30923,
+   "to": 232,
+   "dotted": false
+  },
+  {
+   "id": 617,
+   "from": 232,
+   "to": 30924,
+   "dotted": false
+  },
+  {
+   "id": 618,
+   "from": 20112,
+   "to": 30924,
+   "dotted": false
+  },
+  {
+   "id": 619,
+   "from": 30921,
+   "to": 3,
+   "dotted": false
+  },
+  {
+   "id": 620,
+   "from": 3,
+   "to": 30923,
+   "dotted": false
+  },
+  {
+   "id": 621,
+   "from": 30840,
+   "to": 30893,
+   "dotted": false
+  },
+  {
+   "id": 622,
+   "from": 30893,
+   "to": 232,
+   "dotted": false
+  },
+  {
+   "id": 623,
+   "from": 30928,
+   "to": 20115,
+   "dotted": false
+  },
+  {
+   "id": 624,
+   "from": 20115,
+   "to": 30956,
+   "dotted": false
+  },
+  {
+   "id": 625,
+   "from": 30956,
+   "to": 168,
+   "dotted": false
+  },
+  {
+   "id": 626,
+   "from": 30956,
+   "to": 30146,
+   "dotted": false
+  },
+  {
+   "id": 627,
+   "from": 30146,
+   "to": 30955,
+   "dotted": false
+  },
+  {
+   "id": 628,
+   "from": 30955,
+   "to": 30929,
+   "dotted": false
+  },
+  {
+   "id": 629,
+   "from": 30955,
+   "to": 30954,
+   "dotted": false
+  },
+  {
+   "id": 630,
+   "from": 30146,
+   "to": 30952,
+   "dotted": false
+  },
+  {
+   "id": 631,
+   "from": 30952,
+   "to": 20121,
+   "dotted": false
+  },
+  {
+   "id": 632,
+   "from": 20121,
+   "to": 30951,
+   "dotted": false
+  },
+  {
+   "id": 633,
+   "from": 30951,
+   "to": 30948,
+   "dotted": false
+  },
+  {
+   "id": 634,
+   "from": 30948,
+   "to": 30949,
+   "dotted": false
+  },
+  {
+   "id": 635,
+   "from": 30949,
+   "to": 30950,
+   "dotted": false
+  },
+  {
+   "id": 636,
+   "from": 30950,
+   "to": 20120,
+   "dotted": false
+  },
+  {
+   "id": 637,
+   "from": 30948,
+   "to": 30941,
+   "dotted": false
+  },
+  {
+   "id": 638,
+   "from": 20119,
+   "to": 30944,
+   "dotted": false
+  },
+  {
+   "id": 639,
+   "from": 30944,
+   "to": 30943,
+   "dotted": false
+  },
+  {
+   "id": 640,
+   "from": 30943,
+   "to": 30942,
+   "dotted": false
+  },
+  {
+   "id": 641,
+   "from": 30942,
+   "to": 30941,
+   "dotted": false
+  },
+  {
+   "id": 642,
+   "from": 237,
+   "to": 30938,
+   "dotted": false
+  },
+  {
+   "id": 643,
+   "from": 30938,
+   "to": 30939,
+   "dotted": false
+  },
+  {
+   "id": 644,
+   "from": 30939,
+   "to": 30940,
+   "dotted": false
+  },
+  {
+   "id": 645,
+   "from": 30940,
+   "to": 30941,
+   "dotted": false
+  },
+  {
+   "id": 646,
+   "from": 30948,
+   "to": 299,
+   "dotted": false
+  },
+  {
+   "id": 647,
+   "from": 30948,
+   "to": 30947,
+   "dotted": false
+  },
+  {
+   "id": 648,
+   "from": 30947,
+   "to": 30946,
+   "dotted": false
+  },
+  {
+   "id": 649,
+   "from": 30946,
+   "to": 30945,
+   "dotted": false
+  },
+  {
+   "id": 650,
+   "from": 30945,
+   "to": 325,
+   "dotted": false
+  },
+  {
+   "id": 651,
+   "from": 325,
+   "to": 31045,
+   "dotted": false
+  },
+  {
+   "id": 652,
+   "from": 31045,
+   "to": 20029,
+   "dotted": false
+  },
+  {
+   "id": 653,
+   "from": 20029,
+   "to": 30143,
+   "dotted": false
+  },
+  {
+   "id": 654,
+   "from": 30143,
+   "to": 20028,
+   "dotted": false
+  },
+  {
+   "id": 655,
+   "from": 20028,
+   "to": 30141,
+   "dotted": false
+  },
+  {
+   "id": 656,
+   "from": 30141,
+   "to": 30142,
+   "dotted": false
+  },
+  {
+   "id": 657,
+   "from": 30142,
+   "to": 30947,
+   "dotted": false
+  },
+  {
+   "id": 658,
+   "from": 30133,
+   "to": 30132,
+   "dotted": false
+  },
+  {
+   "id": 659,
+   "from": 30132,
+   "to": 30131,
+   "dotted": false
+  },
+  {
+   "id": 660,
+   "from": 30131,
+   "to": 262,
+   "dotted": false
+  },
+  {
+   "id": 661,
+   "from": 30133,
+   "to": 219,
+   "dotted": false
+  },
+  {
+   "id": 662,
+   "from": 30133,
+   "to": 30134,
+   "dotted": false
+  },
+  {
+   "id": 663,
+   "from": 30134,
+   "to": 30136,
+   "dotted": false
+  },
+  {
+   "id": 664,
+   "from": 30136,
+   "to": 30137,
+   "dotted": false
+  },
+  {
+   "id": 665,
+   "from": 30137,
+   "to": 318,
+   "dotted": false
+  },
+  {
+   "id": 666,
+   "from": 318,
+   "to": 30138,
+   "dotted": false
+  },
+  {
+   "id": 667,
+   "from": 30138,
+   "to": 239,
+   "dotted": false
+  },
+  {
+   "id": 668,
+   "from": 239,
+   "to": 30139,
+   "dotted": false
+  },
+  {
+   "id": 669,
+   "from": 30139,
+   "to": 20027,
+   "dotted": false
+  },
+  {
+   "id": 670,
+   "from": 20027,
+   "to": 30140,
+   "dotted": false
+  },
+  {
+   "id": 671,
+   "from": 30140,
+   "to": 30135,
+   "dotted": false
+  },
+  {
+   "id": 672,
+   "from": 30135,
+   "to": 30134,
+   "dotted": false
+  },
+  {
+   "id": 673,
+   "from": 30133,
+   "to": 30150,
+   "dotted": false
+  },
+  {
+   "id": 674,
+   "from": 30150,
+   "to": 30151,
+   "dotted": false
+  },
+  {
+   "id": 675,
+   "from": 30151,
+   "to": 19,
+   "dotted": false
+  },
+  {
+   "id": 676,
+   "from": 19,
+   "to": 31491,
+   "dotted": false
+  },
+  {
+   "id": 677,
+   "from": 31491,
+   "to": 30150,
+   "dotted": false
+  },
+  {
+   "id": 678,
+   "from": 31173,
+   "to": 31490,
+   "dotted": false
+  },
+  {
+   "id": 679,
+   "from": 31490,
+   "to": 31489,
+   "dotted": false
+  },
+  {
+   "id": 680,
+   "from": 31489,
+   "to": 20026,
+   "dotted": false
+  },
+  {
+   "id": 681,
+   "from": 20026,
+   "to": 31488,
+   "dotted": false
+  },
+  {
+   "id": 682,
+   "from": 31488,
+   "to": 31487,
+   "dotted": false
+  },
+  {
+   "id": 683,
+   "from": 31487,
+   "to": 31490,
+   "dotted": false
+  },
+  {
+   "id": 684,
+   "from": 31173,
+   "to": 31169,
+   "dotted": false
+  },
+  {
+   "id": 685,
+   "from": 31169,
+   "to": 31168,
+   "dotted": false
+  },
+  {
+   "id": 686,
+   "from": 31168,
+   "to": 31167,
+   "dotted": false
+  },
+  {
+   "id": 687,
+   "from": 31167,
+   "to": 31166,
+   "dotted": false
+  },
+  {
+   "id": 688,
+   "from": 31166,
+   "to": 20217,
+   "dotted": false
+  },
+  {
+   "id": 689,
+   "from": 31169,
+   "to": 31170,
+   "dotted": false
+  },
+  {
+   "id": 690,
+   "from": 31170,
+   "to": 31171,
+   "dotted": false
+  },
+  {
+   "id": 691,
+   "from": 31171,
+   "to": 31172,
+   "dotted": false
+  },
+  {
+   "id": 692,
+   "from": 31172,
+   "to": 20218,
+   "dotted": false
+  },
+  {
+   "id": 693,
+   "from": 31173,
+   "to": 31174,
+   "dotted": false
+  },
+  {
+   "id": 694,
+   "from": 31174,
+   "to": 31175,
+   "dotted": false
+  },
+  {
+   "id": 695,
+   "from": 31175,
+   "to": 6,
+   "dotted": false
+  },
+  {
+   "id": 696,
+   "from": 31173,
+   "to": 31176,
+   "dotted": false
+  },
+  {
+   "id": 697,
+   "from": 31176,
+   "to": 31177,
+   "dotted": false
+  },
+  {
+   "id": 698,
+   "from": 31176,
+   "to": 90,
+   "dotted": false
+  },
+  {
+   "id": 699,
+   "from": 90,
+   "to": 31178,
+   "dotted": false
+  },
+  {
+   "id": 700,
+   "from": 31179,
+   "to": 40006,
+   "dotted": false
+  },
+  {
+   "id": 701,
+   "from": 31179,
+   "to": 31183,
+   "dotted": false
+  },
+  {
+   "id": 702,
+   "from": 31183,
+   "to": 31178,
+   "dotted": false
+  },
+  {
+   "id": 703,
+   "from": 31177,
+   "to": 31178,
+   "dotted": false
+  },
+  {
+   "id": 704,
+   "from": 30133,
+   "to": 30128,
+   "dotted": false
+  },
+  {
+   "id": 705,
+   "from": 30128,
+   "to": 30127,
+   "dotted": false
+  },
+  {
+   "id": 706,
+   "from": 30127,
+   "to": 387,
+   "dotted": false
+  },
+  {
+   "id": 707,
+   "from": 30128,
+   "to": 30129,
+   "dotted": false
+  },
+  {
+   "id": 708,
+   "from": 30129,
+   "to": 30130,
+   "dotted": false
+  },
+  {
+   "id": 709,
+   "from": 31179,
+   "to": 30120,
+   "dotted": false
+  },
+  {
+   "id": 710,
+   "from": 168,
+   "to": 30120,
+   "dotted": false
+  },
+  {
+   "id": 711,
+   "from": 30120,
+   "to": 30146,
+   "dotted": false
+  },
+  {
+   "id": 712,
+   "from": 30120,
+   "to": 30121,
+   "dotted": false
+  },
+  {
+   "id": 713,
+   "from": 30121,
+   "to": 30122,
+   "dotted": false
+  },
+  {
+   "id": 714,
+   "from": 30122,
+   "to": 20025,
+   "dotted": false
+  },
+  {
+   "id": 715,
+   "from": 30146,
+   "to": 30145,
+   "dotted": false
+  },
+  {
+   "id": 716,
+   "from": 30145,
+   "to": 29,
+   "dotted": false
+  },
+  {
+   "id": 717,
+   "from": 29,
+   "to": 30144,
+   "dotted": false
+  },
+  {
+   "id": 718,
+   "from": 30144,
+   "to": 30948,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "998831eb8551e115",
+  "fingerprint": "16b58a8f9842bafd",
   "positions": [
    [
     156,
@@ -27710,8 +30269,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     328,
-    1841,
-    1647
+    1874,
+    1727
    ],
    [
     302,
@@ -27800,8 +30359,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     35,
-    2239,
-    772
+    5710,
+    1196
    ],
    [
     385,
@@ -27940,13 +30499,13 @@ export const TALENT_TREE_DATA = {
    ],
    [
     151,
-    2149,
-    -203
+    6667,
+    381
    ],
    [
     152,
     4131,
-    1985
+    1979
    ],
    [
     153,
@@ -27990,7 +30549,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     237,
-    4813,
+    4817,
     -1391
    ],
    [
@@ -28000,8 +30559,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     239,
-    4788,
-    -2617
+    4786,
+    -2610
    ],
    [
     310,
@@ -28270,7 +30829,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     258,
-    3875,
+    3882,
     2020
    ],
    [
@@ -28380,13 +30939,13 @@ export const TALENT_TREE_DATA = {
    ],
    [
     309,
-    5038,
+    5042,
     356
    ],
    [
     325,
-    5038,
-    -2147
+    5039,
+    -2143
    ],
    [
     18,
@@ -28511,7 +31070,7 @@ export const TALENT_TREE_DATA = {
    [
     383,
     1942,
-    1250
+    1383
    ],
    [
     25,
@@ -28905,8 +31464,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     318,
-    4788,
-    -2768
+    4786,
+    -2776
    ],
    [
     3,
@@ -28965,8 +31524,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     97,
-    1944,
-    934
+    2016,
+    993
    ],
    [
     225,
@@ -28990,7 +31549,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     222,
-    4761,
+    4768,
     1436
    ],
    [
@@ -29680,23 +32239,23 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20026,
-    3998,
+    4005,
     -2889
    ],
    [
     20027,
     4604,
-    -2495
+    -2491
    ],
    [
     20028,
-    4765,
-    -2331
+    4757,
+    -2329
    ],
    [
     20029,
-    4916,
-    -2331
+    4923,
+    -2329
    ],
    [
     30100,
@@ -29835,12 +32394,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30127,
-    3982,
+    3975,
     -2696
    ],
    [
     30128,
-    4054,
+    4060,
     -2696
    ],
    [
@@ -29855,12 +32414,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30131,
-    4169,
+    4162,
     -2453
    ],
    [
     30132,
-    4241,
+    4248,
     -2453
    ],
    [
@@ -29871,12 +32430,12 @@ export const TALENT_TREE_DATA = {
    [
     30134,
     4406,
-    -2693
+    -2697
    ],
    [
     30135,
-    4421,
-    -2617
+    4422,
+    -2613
    ],
    [
     30136,
@@ -29890,33 +32449,33 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30138,
-    4802,
+    4806,
     -2693
    ],
    [
     30139,
-    4680,
-    -2509
+    4688,
+    -2511
    ],
    [
     30140,
-    4529,
-    -2509
+    4521,
+    -2511
    ],
    [
     30141,
-    4657,
-    -2223
+    4658,
+    -2231
    ],
    [
     30142,
-    4642,
+    4639,
     -2147
    ],
    [
     30143,
     4840,
-    -2345
+    -2349
    ],
    [
     30144,
@@ -32610,13 +35169,13 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20097,
-    6157,
-    1224
+    6684,
+    1162
    ],
    [
     20098,
-    2282,
-    1260
+    5697,
+    1338
    ],
    [
     20099,
@@ -32651,7 +35210,7 @@ export const TALENT_TREE_DATA = {
    [
     20105,
     3130,
-    292
+    298
    ],
    [
     20106,
@@ -32711,12 +35270,12 @@ export const TALENT_TREE_DATA = {
    [
     20117,
     4286,
-    -1055
+    -1062
    ],
    [
     20118,
-    4813,
-    -1229
+    4817,
+    -1230
    ],
    [
     20119,
@@ -32726,7 +35285,7 @@ export const TALENT_TREE_DATA = {
    [
     20120,
     4286,
-    -1660
+    -1653
    ],
    [
     20121,
@@ -32741,7 +35300,7 @@ export const TALENT_TREE_DATA = {
    [
     20123,
     4198,
-    194
+    201
    ],
    [
     20124,
@@ -32785,17 +35344,17 @@ export const TALENT_TREE_DATA = {
    ],
    [
     20132,
-    5038,
-    941
+    6670,
+    1017
    ],
    [
     20133,
-    5038,
-    752
+    5042,
+    753
    ],
    [
     20134,
-    3875,
+    3882,
     1843
    ],
    [
@@ -33281,12 +35840,12 @@ export const TALENT_TREE_DATA = {
    [
     30669,
     2248,
-    2797
+    2804
    ],
    [
     30670,
     2248,
-    2725
+    2718
    ],
    [
     30671,
@@ -33651,12 +36210,12 @@ export const TALENT_TREE_DATA = {
    [
     30743,
     3695,
-    3326
+    3333
    ],
    [
     30744,
     3695,
-    3254
+    3248
    ],
    [
     30745,
@@ -33670,12 +36229,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30747,
-    3514,
+    3520,
     3092
    ],
    [
     30748,
-    3442,
+    3435,
     3092
    ],
    [
@@ -33720,12 +36279,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30757,
-    2871,
+    2878,
     2680
    ],
    [
     30758,
-    2799,
+    2792,
     2680
    ],
    [
@@ -33820,8 +36379,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30777,
-    2016,
-    1543
+    5714,
+    1463
    ],
    [
     30778,
@@ -33910,7 +36469,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30795,
-    3803,
+    3797,
     1843
    ],
    [
@@ -33920,18 +36479,18 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30797,
-    3803,
+    3797,
     2020
    ],
    [
     30798,
     3863,
-    2315
+    2308
    ],
    [
     30799,
     3863,
-    2387
+    2394
    ],
    [
     30800,
@@ -33941,12 +36500,12 @@ export const TALENT_TREE_DATA = {
    [
     30801,
     4039,
-    2387
+    2394
    ],
    [
     30802,
     4039,
-    2315
+    2308
    ],
    [
     30803,
@@ -33956,7 +36515,7 @@ export const TALENT_TREE_DATA = {
    [
     30804,
     4131,
-    2057
+    2064
    ],
    [
     30805,
@@ -33975,28 +36534,28 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30808,
-    4696,
+    4693,
     2070
    ],
    [
     30809,
-    4711,
-    2146
+    4712,
+    2153
    ],
    [
     30810,
-    4711,
-    1994
+    4712,
+    1987
    ],
    [
     30811,
-    4819,
-    1886
+    4814,
+    1887
    ],
    [
     30812,
-    4894,
-    1872
+    4898,
+    1871
    ],
    [
     30813,
@@ -34005,7 +36564,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30814,
-    4689,
+    4682,
     1436
    ],
    [
@@ -34016,12 +36575,12 @@ export const TALENT_TREE_DATA = {
    [
     30816,
     4379,
-    1496
+    1503
    ],
    [
     30817,
     4379,
-    1424
+    1417
    ],
    [
     30818,
@@ -34031,12 +36590,12 @@ export const TALENT_TREE_DATA = {
    [
     30819,
     4379,
-    1094
+    1101
    ],
    [
     30820,
     4379,
-    1022
+    1016
    ],
    [
     30821,
@@ -34065,23 +36624,23 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30826,
-    3809,
+    3802,
     497
    ],
    [
     30827,
-    3881,
+    3888,
     497
    ],
    [
     30828,
     3627,
-    392
+    399
    ],
    [
     30829,
     3627,
-    320
+    314
    ],
    [
     30830,
@@ -34175,18 +36734,18 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30848,
-    3006,
+    3013,
     124
    ],
    [
     30849,
-    2934,
+    2927,
     124
    ],
    [
     30850,
     3130,
-    220
+    213
    ],
    [
     30851,
@@ -34511,12 +37070,12 @@ export const TALENT_TREE_DATA = {
    [
     30915,
     2655,
-    499
+    505
    ],
    [
     30916,
     2655,
-    427
+    420
    ],
    [
     30917,
@@ -34596,7 +37155,7 @@ export const TALENT_TREE_DATA = {
    [
     30932,
     4286,
-    -983
+    -976
    ],
    [
     30933,
@@ -34605,58 +37164,58 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30934,
-    4630,
-    -956
+    4631,
+    -948
    ],
    [
     30935,
-    4615,
+    4612,
     -1031
    ],
    [
     30936,
-    4630,
-    -1107
+    4631,
+    -1115
    ],
    [
     30937,
-    4738,
-    -1215
+    4733,
+    -1214
    ],
    [
     30938,
-    4738,
-    -1406
+    4733,
+    -1407
    ],
    [
     30939,
-    4630,
-    -1514
+    4631,
+    -1506
    ],
    [
     30940,
-    4615,
+    4612,
     -1589
    ],
    [
     30941,
-    4630,
-    -1665
+    4631,
+    -1673
    ],
    [
     30942,
-    4738,
-    -1773
+    4730,
+    -1771
    ],
    [
     30943,
     4813,
-    -1787
+    -1791
    ],
    [
     30944,
-    4889,
-    -1773
+    4896,
+    -1771
    ],
    [
     30945,
@@ -34670,8 +37229,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30947,
-    4657,
-    -2072
+    4658,
+    -2064
    ],
    [
     30948,
@@ -34686,7 +37245,7 @@ export const TALENT_TREE_DATA = {
    [
     30950,
     4286,
-    -1732
+    -1738
    ],
    [
     30951,
@@ -34700,13 +37259,13 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30953,
-    3906,
-    -1388
+    3907,
+    -1392
    ],
    [
     30954,
-    3892,
-    -1312
+    3891,
+    -1308
    ],
    [
     30955,
@@ -34721,12 +37280,12 @@ export const TALENT_TREE_DATA = {
    [
     30957,
     4288,
-    -1312
+    -1316
    ],
    [
     30958,
-    4273,
-    -1237
+    4272,
+    -1232
    ],
    [
     30959,
@@ -34735,18 +37294,18 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30960,
-    4738,
-    -848
+    4730,
+    -850
    ],
    [
     30961,
     4813,
-    -833
+    -830
    ],
    [
     30962,
-    4889,
-    -848
+    4896,
+    -850
    ],
    [
     30963,
@@ -34766,12 +37325,12 @@ export const TALENT_TREE_DATA = {
    [
     30966,
     4736,
-    -383
+    -390
    ],
    [
     30967,
     4736,
-    -311
+    -305
    ],
    [
     30968,
@@ -34780,13 +37339,13 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30969,
-    4788,
-    5
+    6046,
+    71
    ],
    [
     30970,
-    4705,
-    5
+    6037,
+    -56
    ],
    [
     30971,
@@ -34865,12 +37424,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30986,
-    4275,
+    4282,
     684
    ],
    [
     30987,
-    4203,
+    4196,
     684
    ],
    [
@@ -34900,8 +37459,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30993,
-    4963,
-    738
+    4958,
+    737
    ],
    [
     30994,
@@ -34910,13 +37469,13 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30995,
-    4963,
-    371
+    4958,
+    372
    ],
    [
     30996,
-    5002,
-    77
+    6035,
+    155
    ],
    [
     30997,
@@ -34925,68 +37484,68 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30998,
-    5585,
-    77
+    6669,
+    506
    ],
    [
     30999,
-    5404,
-    405
+    6669,
+    865
    ],
    [
     31000,
-    5582,
+    6690,
     738
    ],
    [
     31001,
-    5038,
-    1071
+    5042,
+    1070
    ],
    [
     31002,
-    4963,
-    1085
+    4958,
+    1086
    ],
    [
     31003,
-    4855,
-    1193
+    4856,
+    1186
    ],
    [
     31004,
-    4840,
+    4837,
     1269
    ],
    [
     31005,
-    4855,
-    1345
+    4856,
+    1352
    ],
    [
     31006,
-    4963,
-    1453
+    4958,
+    1452
    ],
    [
     31007,
-    5038,
-    1467
+    5042,
+    1468
    ],
    [
     31008,
-    4761,
+    4768,
     1084
    ],
    [
     31009,
-    4689,
+    4682,
     1084
    ],
    [
     31010,
     4198,
-    122
+    116
    ],
    [
     31011,
@@ -34995,28 +37554,28 @@ export const TALENT_TREE_DATA = {
    ],
    [
     31012,
-    5963,
-    76
+    6676,
+    623
    ],
    [
     31013,
-    4894,
-    2268
+    4898,
+    2269
    ],
    [
     31014,
-    4819,
-    2254
+    4814,
+    2253
    ],
    [
     31015,
     4624,
-    2464
+    2457
    ],
    [
     31016,
     4624,
-    2536
+    2543
    ],
    [
     31017,
@@ -35026,12 +37585,12 @@ export const TALENT_TREE_DATA = {
    [
     31018,
     4448,
-    2464
+    2457
    ],
    [
     31019,
     4448,
-    2536
+    2543
    ],
    [
     31020,
@@ -35160,8 +37719,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     31045,
-    5024,
-    -2223
+    5023,
+    -2227
    ],
    [
     40005,
@@ -35411,7 +37970,7 @@ export const TALENT_TREE_DATA = {
    [
     20217,
     3814,
-    -3712
+    -3718
    ],
    [
     20218,
@@ -36126,7 +38685,7 @@ export const TALENT_TREE_DATA = {
    [
     31166,
     3814,
-    -3640
+    -3633
    ],
    [
     31167,
@@ -36135,23 +38694,23 @@ export const TALENT_TREE_DATA = {
    ],
    [
     31168,
-    3991,
-    -3640
+    3989,
+    -3641
    ],
    [
     31169,
-    4057,
-    -3587
+    4056,
+    -3588
    ],
    [
     31170,
-    4124,
-    -3533
+    4126,
+    -3539
    ],
    [
     31171,
     4124,
-    -3461
+    -3454
    ],
    [
     31172,
@@ -37730,7 +40289,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     31488,
-    3926,
+    3919,
     -2889
    ],
    [

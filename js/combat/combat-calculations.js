@@ -30,7 +30,9 @@ export function _egCalcPlayerDamage() {
     // lightningDamageIncPct) stack ON TOP of it for their own element alone. The per-element
     // breakdown is kept in _egLastHitElements (already increased) so the
     // impact site can apply the target monster's elemental resistances.
-    const elemMult = 1 + (stats.elementalDamageIncPct || 0) / 100;
+    // Projectile-only elemental increase (passive tree) stacks additively
+    // with the general one.
+    const elemMult = 1 + ((stats.elementalDamageIncPct || 0) + (stats.projectileElementalDamageIncPct || 0)) / 100;
     const elements = _egScaleElements(_egRollElementalBreakdown(stats), elemMult);
     elements.fire *= 1 + (stats.fireDamageIncPct || 0) / 100;
     elements.cold *= 1 + (stats.coldDamageIncPct || 0) / 100;
@@ -41,7 +43,13 @@ export function _egCalcPlayerDamage() {
     _egLastHitElements = converted.elements;
     dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
 
-    const critMult = _egRollCrit(stats);
+    // "% increased Projectile Damage" (passive tree): one multiplier over the
+    // whole physical + elemental roll, applied before the crit multiplier.
+    dmg *= 1 + (stats.projectileDamageIncPct || 0) / 100;
+
+    // Projectile crit chance (passive tree) is added to the base crit chance
+    // for this roll only - melee strikes never read it.
+    const critMult = _egRollCrit(stats, { chance: stats.projectileCritChancePct || 0 });
     _egLastHitWasCrit = critMult > 1;
     _egLastHitCritMult = critMult;
     dmg *= critMult;
@@ -147,8 +155,12 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
 
     // Mace / Sceptre crit lines (Colossus nodes): scoped to melee strikes
     // with the matching weapon family, added to this roll only.
-    const maceBonus = stats.isMaceEquipped
-        ? { chance: stats.critChanceMeleeMacePct || 0, multiplierPct: stats.critMultiplierMeleeMacePct || 0 }
+    // The tree's generic melee crit line applies to every melee strike.
+    const maceBonus = (stats.isMaceEquipped || stats.critChanceMeleePct)
+        ? {
+            chance: (stats.critChanceMeleePct || 0) + (stats.isMaceEquipped ? (stats.critChanceMeleeMacePct || 0) : 0),
+            multiplierPct: stats.isMaceEquipped ? (stats.critMultiplierMeleeMacePct || 0) : 0,
+        }
         : null;
     const critMult = _egRollCrit(stats, maceBonus);
     _egLastMeleeWasCrit = critMult > 1;

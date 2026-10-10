@@ -634,6 +634,21 @@ export function _egComputePlayerStats() {
         physAsExtraFirePct: (passiveTreeBonuses.physAsExtraFirePct || 0)
             + (_egFireSurgeActive() ? (passiveTreeBonuses.physAsExtraFireTimedPct || 0) : 0),
         crushPhysReductionPct: passiveTreeBonuses.crushPhysReductionPct || 0,
+        // Projectile batch: damage multiplier + crit chance read in
+        // _egCalcPlayerDamage, speed read in _egAnimatePlayerProjectile.
+        // Bow-spell lines are tracked only - no Bow-tagged spell exists yet.
+        projectileDamageIncPct: passiveTreeBonuses.projectileDamageIncPct || 0,
+        projectileSpeedPct: passiveTreeBonuses.projectileSpeedPct || 0,
+        projectileCritChancePct: passiveTreeBonuses.projectileCritChancePct || 0,
+        bowSpellDamageIncPct: passiveTreeBonuses.bowSpellDamageIncPct || 0,
+        bowSpellDotIncPct: passiveTreeBonuses.bowSpellDotIncPct || 0,
+        // Stun avoidance (Stalwart Vigor nodes): tracked only - monsters cannot
+        // stun the player yet; a future player-stun mechanic should roll this.
+        stunAvoidPct: passiveTreeBonuses.stunAvoidPct || 0,
+        manaOnMeleeHitChargedPct: passiveTreeBonuses.manaOnMeleeHitChargedPct || 0,
+        parrySpellChancePct: passiveTreeBonuses.parrySpellChancePct || 0,
+        critChanceMeleePct: passiveTreeBonuses.critChanceMeleePct || 0,
+        projectileElementalDamageIncPct: passiveTreeBonuses.projectileElementalDamageIncPct || 0,
         // Vital Conduit keystone (node 291): "less" multipliers on Life
         // regeneration and Life leech, and the Absorption-recharge flag.
         lifeRegenLessPct: passiveTreeBonuses.lifeRegenLessPct || 0,
@@ -649,7 +664,9 @@ export function _egComputePlayerStats() {
         // final armour formula at the end of this function.
         armourFlat: passiveTreeBonuses.armourFlat || 0,
         armourIncPct: passiveTreeBonuses.armourIncPct || 0,
-        evasionFlat: 0, evasionIncPct: 0,
+        // Tree evasion (nodes 383/30778/30779/94) joins the gear + Agi pool
+        // and is scaled by the same final evasion formula below.
+        evasionFlat: passiveTreeBonuses.evasionFlat || 0, evasionIncPct: passiveTreeBonuses.evasionIncPct || 0,
         absorptionFlat: passiveTreeBonuses.absorptionFlat || 0,
         absorptionIncPct: passiveTreeBonuses.absorptionIncPct || 0,
         // Attributes start from the character's base pool (endgame-requirements.js)
@@ -895,7 +912,7 @@ export function _egComputePlayerStats() {
         parryChancePct: 0, deflectChancePct: 0, deflectDamagePct: 0,
         movementSpeedPct: passiveTreeBonuses.movementSpeedPct || 0,
         manaOnKill: 0, absorptionOnKill: 0, lifeOnKill: 0, manaOnMistake: 0,
-        heartHealFlat: 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: 0, timeAdded: 0,
+        heartHealFlat: 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: passiveTreeBonuses.manaHealIncPct || 0, timeAdded: 0,
         absorptionRegenRatePct: passiveTreeBonuses.absorptionRegenRatePct || 0, fasterAbsorptionRegenStart: 0,
     };
 
@@ -1493,6 +1510,16 @@ export const EG_STAT_DISPLAY_LABELS = {
     physDotMorePct: { label: t('eg_stat_phys_dot_more'), suffix: '%' },
     physAsExtraFirePct: { label: t('eg_stat_phys_as_fire'), suffix: '%' },
     crushPhysReductionPct: { label: t('eg_stat_crush_phys_reduction'), suffix: '%' },
+    projectileDamageIncPct: { label: t('eg_stat_inc_projectile_damage'), suffix: '%' },
+    projectileSpeedPct: { label: t('eg_stat_inc_projectile_speed'), suffix: '%' },
+    projectileCritChancePct: { label: t('eg_stat_projectile_crit_chance'), suffix: '%' },
+    bowSpellDamageIncPct: { label: t('eg_stat_inc_bow_spell_damage'), suffix: '%' },
+    bowSpellDotIncPct: { label: t('eg_stat_inc_bow_spell_dot'), suffix: '%' },
+    stunAvoidPct: { label: t('eg_stat_stun_avoid'), suffix: '%' },
+    manaOnMeleeHitChargedPct: { label: t('eg_stat_mana_on_melee_hit'), suffix: '' },
+    parrySpellChancePct: { label: t('eg_stat_parry_spell_chance'), suffix: '%' },
+    critChanceMeleePct: { label: t('eg_stat_crit_chance_melee'), suffix: '%' },
+    projectileElementalDamageIncPct: { label: t('eg_stat_inc_projectile_elemental'), suffix: '%' },
     lifeRegenLessPct: { label: t('eg_stat_life_regen_less'), suffix: '%' },
     lifeLeechLessPct: { label: t('eg_stat_life_leech_less'), suffix: '%' },
     absorptionRechargesLife: { label: t('eg_stat_absorption_recharges_life'), suffix: '' },
@@ -1627,11 +1654,13 @@ export const EG_STAT_LAYOUT = {
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
             'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'stunChanceMaceChargedPct', 'stunDurationPct', 'stunChanceHeavyPct', 'stunDurationHeavyPct', 'stunDoubleChancePct', 'meleeDoubleDamageChancePct', 'meleeKillExplodeChancePct', 'meleeSpellManaCostReducedPct', 'meleeSpellLifeCostPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'bleedSpeedPct',
-            'meleeChargeSpeedPct', 'attackSpeedPct', 'meleeRangeM', 'meleeAoEPct', 'critChanceMeleeMacePct', 'critMultiplierMeleeMacePct', 'crushPhysReductionPct'] },
+            'meleeChargeSpeedPct', 'attackSpeedPct', 'critChanceMeleePct', 'manaOnMeleeHitChargedPct', 'meleeRangeM', 'meleeAoEPct', 'critChanceMeleeMacePct', 'critMultiplierMeleeMacePct', 'crushPhysReductionPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
             'coldDamageIncPct', 'lightningDamageIncPct',
+            'projectileDamageIncPct', 'projectileSpeedPct', 'projectileCritChancePct', 'projectileElementalDamageIncPct',
+            'bowSpellDamageIncPct', 'bowSpellDotIncPct',
             'healingPowerFlat', 'healingPowerIncPct',
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
@@ -1644,7 +1673,7 @@ export const EG_STAT_LAYOUT = {
             'manaToDamagePct'] },
     ],
     defense: [
-        { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption'] },
+        { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption', 'stunAvoidPct', 'parrySpellChancePct'] },
         { catKey: 'eg_statcat_life_mana', buckets: [
             'health', 'healthMorePct', 'mana', 'manaRemoved', 'spellsCostLife', 'spellCostIncPct', 'lifeRegen', 'lifeRegenRatePct', 'lifeRegenLessPct', 'manaRegen', 'lifeLeechPct', 'lifeLeechMeleePct', 'lifeLeechLessPct', 'absorptionRechargesLife',
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',

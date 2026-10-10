@@ -123,6 +123,11 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
     // all non-melee sources (spells, reveal projectiles, DoTs) are resisted.
     _egDamageTargetById(targetId, dmg, elements, { isCrit: wasCrit, isMelee: true, chargePct });
 
+    // Mana on a connecting strike above 50% charge-up (passive tree only -
+    // melee strikes grant no mana by default).
+    const manaOnHit = Number(_egComputePlayerStats().manaOnMeleeHitChargedPct) || 0;
+    if (manaOnHit > 0 && chargePct > 0.5 && typeof globalThis.gainMana === 'function') globalThis.gainMana(manaOnHit);
+
     // Impact feel: squash the struck card so the connect lands with weight
     // (miss/dodge/immune returned above, so this only plays on real hits).
     if (typeof _egMeleeImpactThump === 'function') {
