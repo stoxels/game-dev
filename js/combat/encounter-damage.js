@@ -340,6 +340,16 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
 
     globalThis.playerCurrentHP = Math.max(0, globalThis.playerCurrentHP - mitigated);
 
+    // Life Recoup (passive tree): a share of the Life damage taken is paid
+    // back over ~4s by _egTickLifeRegen. The pool belongs to one encounter.
+    if ((Number(stats.lifeRecoupPct) || 0) > 0 && globalThis.playerCurrentHP > 0) {
+        if (globalThis._egRecoupStamp !== globalThis._egEncounterStartAt) {
+            globalThis._egRecoupStamp = globalThis._egEncounterStartAt;
+            globalThis._egRecoupPool = 0;
+        }
+        globalThis._egRecoupPool = (Number(globalThis._egRecoupPool) || 0) + mitigated * stats.lifeRecoupPct / 100;
+    }
+
     // Gear: warding - once per map, a killing blow instead leaves the player
     // at wardingHP health and the ward shatters.
     if (globalThis.playerCurrentHP <= 0 && !globalThis._egWardingUsedThisMap) {

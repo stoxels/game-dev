@@ -2156,7 +2156,9 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
 
     // Life leech mirrors the weapon channels (heal on spell hits too).
     try {
-        if (stats.lifeLeechPct > 0 && typeof globalThis.playerCurrentHP !== 'undefined') {
+        if (stats.lifeLeechPct > 0 && (stats.lifeLeechAsAbsorption || 0) > 0) {
+            _egLeechAbsorption(stats, amount, stats.lifeLeechPct);
+        } else if (stats.lifeLeechPct > 0 && typeof globalThis.playerCurrentHP !== 'undefined') {
             const heal = Math.round(amount * (stats.lifeLeechPct / 100) * _egLeechHealMult(stats));
             if (heal > 0 && typeof globalThis.playerMaxHP !== 'undefined') {
                 globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);

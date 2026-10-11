@@ -659,6 +659,10 @@ export function _egComputePlayerStats() {
         absorptionLeechSpellPct: passiveTreeBonuses.absorptionLeechSpellPct || 0,
         absorptionLeechEffectIncPct: passiveTreeBonuses.absorptionLeechEffectIncPct || 0,
         physAsExtraShadowPct: passiveTreeBonuses.physAsExtraShadowPct || 0,
+        lifeRecoupPct: passiveTreeBonuses.lifeRecoupPct || 0,
+        daggerDamageIncPct: passiveTreeBonuses.daggerDamageIncPct || 0,
+        lifeLeechAsAbsorption: passiveTreeBonuses.lifeLeechAsAbsorption || 0,
+        absorptionNoRecharge: passiveTreeBonuses.absorptionNoRecharge || 0,
         lifeLeechEffectIncPct: passiveTreeBonuses.lifeLeechEffectIncPct || 0,
         dotIncDaggerPct: passiveTreeBonuses.dotIncDaggerPct || 0,
         critMultiplierDaggerPct: passiveTreeBonuses.critMultiplierDaggerPct || 0,
@@ -1437,6 +1441,8 @@ export function _egScheduleAbsorptionRegen() {
     _egCancelAbsorptionRegen();
 
     const stats = _egComputePlayerStats();
+    // Ghost Reaver keystone: Absorption does not recharge on its own.
+    if ((Number(stats.absorptionNoRecharge) || 0) > 0) return;
     let delayMs = Math.max(0, EG_ABSORPTION_REGEN_BASE_DELAY_MS - (stats.fasterAbsorptionRegenStart || 0) * 1000);
     // Active map run: Absorption recharges #% slower.
     if (typeof _egGetActiveMapModValue === 'function') {
@@ -1585,6 +1591,10 @@ export const EG_STAT_DISPLAY_LABELS = {
     absorptionLeechSpellPct: { label: t('eg_stat_absorption_leech_spell'), suffix: '%' },
     absorptionLeechEffectIncPct: { label: t('eg_stat_absorption_leech_effect_inc'), suffix: '%' },
     physAsExtraShadowPct: { label: t('eg_stat_phys_as_shadow'), suffix: '%' },
+    lifeRecoupPct: { label: t('eg_stat_life_recoup'), suffix: '%' },
+    daggerDamageIncPct: { label: t('eg_stat_dagger_damage_inc'), suffix: '%' },
+    lifeLeechAsAbsorption: { label: t('eg_stat_leech_as_absorption'), suffix: '' },
+    absorptionNoRecharge: { label: t('eg_stat_absorption_no_recharge'), suffix: '' },
     lifeLeechEffectIncPct: { label: t('eg_stat_leech_effect_inc'), suffix: '%' },
     dotIncDaggerPct: { label: t('eg_stat_dot_inc_dagger'), suffix: '%' },
     critMultiplierDaggerPct: { label: t('eg_stat_crit_multi_dagger'), suffix: '%' },
@@ -1740,7 +1750,7 @@ export const EG_STAT_LAYOUT = {
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
             'coldDamageIncPct', 'lightningDamageIncPct',
             'projectileDamageIncPct', 'projectileSpeedPct', 'projectileCritChancePct', 'projectileCritMultiplierPct', 'projectileElementalDamageIncPct',
-            'bowSpellDamageIncPct', 'bowSpellDotIncPct', 'bowSpellManaCostReducedPct', 'manaOnProjectileHitPct', 'lifeOnProjectileHit', 'lifeBurstOnProjectileHitChancePct', 'lifeOnMeleeHit', 'lifeOnAttackHit', 'dotIncPct', 'shadowDamageIncPct', 'damageIncPct', 'critChanceDaggerPct', 'spellCritChancePct', 'spellCritMultiplierPct', 'chillEffectIncPct', 'absorptionLeechSpellPct', 'absorptionLeechEffectIncPct', 'physAsExtraShadowPct', 'skillEffectDurationPct', 'lifeLeechEffectIncPct', 'dotIncDaggerPct', 'critMultiplierDaggerPct', 'poisonDurationPct', 'critDotMultiPct',
+            'bowSpellDamageIncPct', 'bowSpellDotIncPct', 'bowSpellManaCostReducedPct', 'manaOnProjectileHitPct', 'lifeOnProjectileHit', 'lifeBurstOnProjectileHitChancePct', 'lifeOnMeleeHit', 'lifeOnAttackHit', 'dotIncPct', 'shadowDamageIncPct', 'damageIncPct', 'critChanceDaggerPct', 'spellCritChancePct', 'spellCritMultiplierPct', 'chillEffectIncPct', 'absorptionLeechSpellPct', 'absorptionLeechEffectIncPct', 'physAsExtraShadowPct', 'lifeRecoupPct', 'daggerDamageIncPct', 'lifeLeechAsAbsorption', 'absorptionNoRecharge', 'skillEffectDurationPct', 'lifeLeechEffectIncPct', 'dotIncDaggerPct', 'critMultiplierDaggerPct', 'poisonDurationPct', 'critDotMultiPct',
             'healingPowerFlat', 'healingPowerIncPct',
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',

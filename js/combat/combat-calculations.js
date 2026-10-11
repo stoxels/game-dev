@@ -3,7 +3,7 @@ import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult } from '../endgame/endgam
 import { EG_PLAYER_STATS, _egComputePlayerStats, _egRollCrit } from '../endgame/endgame-player-stats.js';
 import { _egQuizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
 import { EG_PLAYER_MELEE_DAMAGE } from './combat-state.js';
-import { _egApplyDamageConversion, _egLeechHealMult, _egRollElementalBreakdown, _egScaleElements } from './combat-calculations-resistances.js';
+import { _egApplyDamageConversion, _egLeechAbsorption, _egLeechHealMult, _egRollElementalBreakdown, _egScaleElements } from './combat-calculations-resistances.js';
 
 //------------------------------------------------------------------------
 //-------------------PLAYER DAMAGE CALCULATION----------------------------
@@ -74,7 +74,10 @@ export function _egCalcPlayerDamage() {
     if (critMult > 1 && typeof showToast === 'function') globalThis.showToast('💥 Critical Hit!');
 
     // Life leech - heal the player for a % of the damage about to be dealt.
-    if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
+    if (stats.lifeLeechPct > 0 && (stats.lifeLeechAsAbsorption || 0) > 0) {
+        // Ghost Reaver keystone: the leech refills Absorption instead.
+        _egLeechAbsorption(stats, dmg, stats.lifeLeechPct);
+    } else if (stats.lifeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
         const heal = Math.round(dmg * (stats.lifeLeechPct / 100) * _egLeechHealMult(stats));
         if (heal > 0) {
             globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
@@ -167,6 +170,9 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // Generic "% increased Damage" (passive tree) over the whole melee hit.
     dmg *= 1 + (stats.damageIncPct || 0) / 100;
 
+    // "% increased Damage with Daggers" (passive tree) over the whole hit.
+    if (stats.isDaggerEquipped) dmg *= 1 + (stats.daggerDamageIncPct || 0) / 100;
+
     // Mace / Sceptre crit lines (Colossus nodes): scoped to melee strikes
     // with the matching weapon family, added to this roll only.
     // The tree's generic melee crit line applies to every melee strike.
@@ -203,7 +209,9 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // Life leech - heal the player for a % of the damage about to be dealt.
     // Melee strikes also add the tree's melee-only leech (lifeLeechMeleePct).
     const meleeLeechPct = (Number(stats.lifeLeechPct) || 0) + (Number(stats.lifeLeechMeleePct) || 0);
-    if (meleeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
+    if (meleeLeechPct > 0 && (stats.lifeLeechAsAbsorption || 0) > 0) {
+        _egLeechAbsorption(stats, dmg, meleeLeechPct);
+    } else if (meleeLeechPct > 0 && typeof playerCurrentHP !== 'undefined') {
         const heal = Math.round(dmg * (meleeLeechPct / 100) * _egLeechHealMult(stats));
         if (heal > 0) {
             globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);

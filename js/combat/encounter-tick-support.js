@@ -91,6 +91,17 @@ export function _egTickLifeRegen() {
     _egLastLifeRegenAt = now;
 
     const stats = _egComputePlayerStats();
+    // Life Recoup: the pool of recouped damage drains with a ~4s time
+    // constant (a quarter of what is left per second).
+    if (globalThis._egRecoupStamp === globalThis._egEncounterStartAt && (Number(globalThis._egRecoupPool) || 0) > 0) {
+        const drip = Math.min(globalThis._egRecoupPool, Math.max(1, globalThis._egRecoupPool * EG_LIFE_REGEN_INTERVAL_MS / 4000));
+        globalThis._egRecoupPool -= drip;
+        if (globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP
+            && !(typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration'))) {
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + drip);
+            if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+        }
+    }
     // Endurance batch: % of Life per second for every live Endurance Charge.
     const regenPct = (stats.lifeRegenPct || 0) + (stats.lifeRegenPerEndurancePct || 0) * (stats.enduranceCharges || 0);
     // Life Regeneration rate (node 111) scales the whole per-second amount.

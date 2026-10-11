@@ -238,12 +238,15 @@ export const TALENT_TREE_DATA = {
    "id": 219,
    "x": 2450,
    "y": -1601,
-   "nameEn": "Keystone: Law of Large Numbers",
-   "nameDe": "Schlüsselfertigkeit: Gesetz der Großen Zahlen",
-   "descEn": "Every 5 minutes, automatically reveal one row and column with fewer than 2 correct filled cells. This effect does not trigger in the last 15 minutes of a level.",
-   "descDe": "Alle 5 Minuten wird automatisch eine Zeile oder Spalte mit weniger als 2 korrekt gefüllten Zellen aufgedeckt. Dieser Effekt löst in den letzten 15 Minuten eines Levels nicht aus.",
-   "icon": "📉",
-   "statKey": "keystone_law_of_large_numbers",
+   "nameEn": "Ghost Reaver",
+   "nameDe": "Geisterschnitter",
+   "icon": "",
+   "statKey": "keystone_ghost_reaver",
+   "effects": [
+    "leech_as_absorption",
+    "absorption_leech_effect_inc:100",
+    "absorption_no_recharge"
+   ],
    "tier": "keystone"
   },
   {
@@ -12953,24 +12956,28 @@ export const TALENT_TREE_DATA = {
    "id": 20120,
    "x": 2381,
    "y": -922,
-   "nameEn": "Vital Strike",
-   "nameDe": "Vitaler Treffer",
-   "descEn": "+12% Critical strike multiplier.",
-   "descDe": "+12% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "notable_vital_strike",
+   "nameEn": "Circle of Life",
+   "nameDe": "Kreis des Lebens",
+   "icon": "",
+   "statKey": "notable_circle_of_life_20120",
+   "effects": [
+    "life_on_attack_hit:3",
+    "life_recoup_pct:12"
+   ],
    "tier": "notable"
   },
   {
    "id": 20121,
    "x": 2292,
    "y": -919,
-   "nameEn": "Piercing Shots",
-   "nameDe": "Durchdringende Schüsse",
-   "descEn": "Projectiles pierce one additional monster.",
-   "descDe": "Projektile durchdringen ein zusätzliches Monster.",
-   "icon": "◆",
-   "statKey": "notable_piercing_shots",
+   "nameEn": "Mind Drinker",
+   "nameDe": "Geistschlürfer",
+   "icon": "",
+   "statKey": "notable_mind_drinker_20121",
+   "effects": [
+    "mana_inc_pct:20",
+    "mana_on_kill_flat:3"
+   ],
    "tier": "notable"
   },
   {
@@ -13004,12 +13011,13 @@ export const TALENT_TREE_DATA = {
    "id": 20124,
    "x": 2302,
    "y": 331,
-   "nameEn": "Arcane Battery",
-   "nameDe": "Arkane Batterie",
-   "descEn": "+10 maximum Mana. Absorption regenerates 15% faster.",
-   "descDe": "+10 max. Mana. Absorption regeneriert 15% schneller.",
-   "icon": "◆",
-   "statKey": "notable_arcane_battery",
+   "nameEn": "Inveterate",
+   "nameDe": "Unbeugsam",
+   "icon": "",
+   "statKey": "notable_inveterate_20124",
+   "effects": [
+    "parry_spell_chance:15"
+   ],
    "tier": "notable"
   },
   {
@@ -16207,12 +16215,13 @@ export const TALENT_TREE_DATA = {
    "id": 30825,
    "x": 2087,
    "y": 345,
-   "nameEn": "Lesser Central Scan",
-   "nameDe": "Zentraler Scan (klein)",
-   "descEn": "Extends the Interquartile-Vision Fieldscan duration by 1 second. +3% Evasion.",
-   "descDe": "Verlängert die Interquartil-Vision Feldscan Dauer um 1 Sekunde. +3% Ausweichen.",
-   "icon": "📊",
-   "statKey": "small_lesser_central_scan",
+   "nameEn": "Nimble Step",
+   "nameDe": "Flinker Schritt",
+   "icon": "",
+   "statKey": "small_nimble_step_30825",
+   "effects": [
+    "evasion_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
@@ -16805,10 +16814,11 @@ export const TALENT_TREE_DATA = {
    "y": 436,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30870",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -16839,12 +16849,14 @@ export const TALENT_TREE_DATA = {
    "id": 30873,
    "x": 1043,
    "y": 539,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Keen Volley",
+   "nameDe": "Scharfe Salve",
+   "icon": "",
+   "statKey": "travel_keen_volley_30873",
+   "effects": [
+    "accuracy_flat:30",
+    "projectile_damage_inc:16"
+   ],
    "tier": "travel"
   },
   {
@@ -17679,36 +17691,41 @@ export const TALENT_TREE_DATA = {
    "id": 30939,
    "x": 2572,
    "y": -841,
-   "nameEn": "Lesser Pattern Analysis",
-   "nameDe": "Musteranalyse (klein)",
-   "descEn": "At the start of each level, the row and column with the most filled cells each have 1 incorrect empty cell marked. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird in der Zeile und Spalte mit den meisten gefüllten Zellen je 1 falsche leere Zelle markiert. +3% Ausweichen.",
-   "icon": "🗃️",
-   "statKey": "small_lesser_pattern_analysis",
+   "nameEn": "Dagger Precision",
+   "nameDe": "Dolchpräzision",
+   "icon": "",
+   "statKey": "small_dagger_precision_30939",
+   "effects": [
+    "crit_chance_dagger:2",
+    "crit_multi_dagger:14"
+   ],
    "tier": "small"
   },
   {
    "id": 30940,
    "x": 2564,
    "y": -883,
-   "nameEn": "Featherstep",
-   "nameDe": "Federleicht",
-   "descEn": "+4% Movement speed, +1% chance to evade attacks.",
-   "descDe": "+4% Bewegungsgeschwindigkeit, +1% Chance, Angriffen auszuweichen.",
-   "icon": "○",
-   "statKey": "small_featherstep",
+   "nameEn": "Dagger Precision",
+   "nameDe": "Dolchpräzision",
+   "icon": "",
+   "statKey": "small_dagger_precision_30940",
+   "effects": [
+    "crit_chance_dagger:2",
+    "crit_multi_dagger:14"
+   ],
    "tier": "small"
   },
   {
    "id": 30941,
    "x": 2572,
    "y": -925,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Dagger Edge",
+   "nameDe": "Dolchschneide",
+   "icon": "",
+   "statKey": "travel_dagger_edge_30941",
+   "effects": [
+    "dagger_damage_inc:12"
+   ],
    "tier": "travel"
   },
   {
@@ -17800,36 +17817,39 @@ export const TALENT_TREE_DATA = {
    "id": 30949,
    "x": 2430,
    "y": -995,
-   "nameEn": "Lesser Vital Strike",
-   "nameDe": "Vitaler Treffer (klein)",
-   "descEn": "+6% Critical strike multiplier.",
-   "descDe": "+6% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "small_lesser_vital_strike",
+   "nameEn": "Life Recoup",
+   "nameDe": "Lebensrückgewinn",
+   "icon": "",
+   "statKey": "small_life_recoup_30949",
+   "effects": [
+    "life_recoup_pct:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30950,
    "x": 2381,
    "y": -962,
-   "nameEn": "Lesser Vital Strike",
-   "nameDe": "Vitaler Treffer (klein)",
-   "descEn": "+6% Critical strike multiplier.",
-   "descDe": "+6% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "small_lesser_vital_strike",
+   "nameEn": "Life Recoup",
+   "nameDe": "Lebensrückgewinn",
+   "icon": "",
+   "statKey": "small_life_recoup_30950",
+   "effects": [
+    "life_recoup_pct:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30951,
    "x": 2321,
    "y": -988,
-   "nameEn": "Lesser Piercing Shots",
-   "nameDe": "Durchdringende Schüsse (klein)",
-   "descEn": "Projectiles pierce one additional monster.",
-   "descDe": "Projektile durchdringen ein zusätzliches Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_piercing_shots",
+   "nameEn": "Deep Well",
+   "nameDe": "Tiefer Brunnen",
+   "icon": "",
+   "statKey": "small_deep_well_30951",
+   "effects": [
+    "mana_inc_pct:8"
+   ],
    "tier": "small"
   },
   {
@@ -17897,24 +17917,26 @@ export const TALENT_TREE_DATA = {
    "id": 30957,
    "x": 2382,
    "y": -729,
-   "nameEn": "Lesser Bulwark of Resolve",
-   "nameDe": "Bollwerk der Entschlossenheit (klein)",
-   "descEn": "Shield items absorb 1 additional mistake. Stacks with Aegis Fortification and Guardian's Bastion. +3% Evasion.",
-   "descDe": "Schild-Gegenstände absorbieren 1 zusätzlichen Fehler. Wirkt zusammen mit Ägis-Verstärkung und Bastion des Wächters. +3% Ausweichen.",
-   "icon": "🛡️",
-   "statKey": "small_lesser_bulwark_of_resolve",
+   "nameEn": "Intelligence",
+   "nameDe": "Intelligenz",
+   "icon": "",
+   "statKey": "small_intelligence_30957",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30958,
    "x": 2374,
    "y": -687,
-   "nameEn": "Lesser Ranger's Endurance",
-   "nameDe": "Ausdauer der Jägerin (klein)",
-   "descEn": "+8 maximum Health, +2% chance to evade attacks.",
-   "descDe": "+8 max. Leben, +2% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "small_lesser_ranger_s_endurance",
+   "nameEn": "Frenzied Pace",
+   "nameDe": "Rasender Takt",
+   "icon": "",
+   "statKey": "small_frenzied_pace_30958",
+   "effects": [
+    "frenzy_duration:20"
+   ],
    "tier": "small"
   },
   {
@@ -18215,60 +18237,65 @@ export const TALENT_TREE_DATA = {
    "id": 30983,
    "x": 2392,
    "y": 182,
-   "nameEn": "Lesser Time Weavers",
-   "nameDe": "Zeitweber (klein)",
-   "descEn": "Timer items grant 5% more time. Stacks with Chrono Extension and Moment Reserves. +3% Evasion.",
-   "descDe": "Timer-Gegenstände gewähren 5% mehr Zeit. Wirkt zusammen mit Chrono-Verlängerung und Zeitreserven. +3% Ausweichen.",
-   "icon": "⏳",
-   "statKey": "small_lesser_time_weavers",
+   "nameEn": "Quickening",
+   "nameDe": "Beschleunigung",
+   "icon": "",
+   "statKey": "small_quickening_30983",
+   "effects": [
+    "melee_charge_speed_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30984,
    "x": 2392,
    "y": 258,
-   "nameEn": "Lesser Time Weavers",
-   "nameDe": "Zeitweber (klein)",
-   "descEn": "Timer items grant 5% more time. Stacks with Chrono Extension and Moment Reserves. +3% Evasion.",
-   "descDe": "Timer-Gegenstände gewähren 5% mehr Zeit. Wirkt zusammen mit Chrono-Verlängerung und Zeitreserven. +3% Ausweichen.",
-   "icon": "⏳",
-   "statKey": "small_lesser_time_weavers",
+   "nameEn": "Quickening",
+   "nameDe": "Beschleunigung",
+   "icon": "",
+   "statKey": "small_quickening_30984",
+   "effects": [
+    "melee_charge_speed_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30985,
    "x": 2408,
    "y": 331,
-   "nameEn": "Lesser Arcane Battery",
-   "nameDe": "Arkane Batterie (klein)",
-   "descEn": "+5 maximum Mana. Absorption regenerates 8% faster.",
-   "descDe": "+5 max. Mana. Absorption regeneriert 8% schneller.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_battery",
+   "nameEn": "Spell Veil",
+   "nameDe": "Zauberschleier",
+   "icon": "",
+   "statKey": "small_spell_veil_30985",
+   "effects": [
+    "parry_spell_chance:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30986,
    "x": 2375,
    "y": 380,
-   "nameEn": "Lesser Arcane Battery",
-   "nameDe": "Arkane Batterie (klein)",
-   "descEn": "+5 maximum Mana. Absorption regenerates 8% faster.",
-   "descDe": "+5 max. Mana. Absorption regeneriert 8% schneller.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_battery",
+   "nameEn": "Spell Veil",
+   "nameDe": "Zauberschleier",
+   "icon": "",
+   "statKey": "small_spell_veil_30986",
+   "effects": [
+    "parry_spell_chance:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30987,
    "x": 2335,
    "y": 380,
-   "nameEn": "Lesser Arcane Battery",
-   "nameDe": "Arkane Batterie (klein)",
-   "descEn": "+5 maximum Mana. Absorption regenerates 8% faster.",
-   "descDe": "+5 max. Mana. Absorption regeneriert 8% schneller.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_battery",
+   "nameEn": "Spell Veil",
+   "nameDe": "Zauberschleier",
+   "icon": "",
+   "statKey": "small_spell_veil_30987",
+   "effects": [
+    "parry_spell_chance:8"
+   ],
    "tier": "small"
   },
   {

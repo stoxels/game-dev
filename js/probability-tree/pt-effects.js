@@ -306,6 +306,18 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Gain X% of physical Damage as extra Shadow (node 20218): mirrors
     // phys_as_fire; handled in _egApplyDamageConversion (extra, not converted).
     phys_as_shadow: { channel: 'physAsExtraShadowPct', en: 'Gain {v}% of physical Damage as extra Shadow Damage', de: 'Erhalte {v}% des physischen Schadens als zusätzlichen Schattenschaden' },
+    // Life Recoup (nodes 30950/30949/20120): a share of the Life damage you
+    // take is paid back as Life over about 4 seconds (pool filled in
+    // _egPlayerTakeDamage, drained in _egTickLifeRegen).
+    life_recoup_pct: { channel: 'lifeRecoupPct', en: '{v}% of Damage taken Recouped as Life', de: '{v}% des erlittenen Schadens werden als Leben zurückgewonnen' },
+    // Damage with Daggers (node 30941): multiplier over the whole melee hit
+    // while a dagger is the equipped weapon family.
+    dagger_damage_inc: { channel: 'daggerDamageIncPct', en: '{v}% increased Damage with Daggers', de: '{v}% erhöhter Schaden mit Dolchen' },
+    // Ghost Reaver keystone (node 219): every Life leech (melee, projectile,
+    // spell) refills Absorption instead of Life (_egLeechAbsorption), and the
+    // Absorption recharge is switched off (_egScheduleAbsorptionRegen).
+    leech_as_absorption: { channel: 'lifeLeechAsAbsorption', flag: true, en: 'Life Leech recovers Absorption instead of Life', de: 'Lebensentzug stellt stattdessen Absorption wieder her' },
+    absorption_no_recharge: { channel: 'absorptionNoRecharge', flag: true, en: 'Cannot Recharge Absorption', de: 'Absorption kann sich nicht aufladen' },
     crit_chance_dagger: { channel: 'critChanceDaggerPct', en: '+{v}% to Critical Strike Chance with Daggers', de: '+{v}% auf die kritische Trefferchance mit Dolchen' },
     crit_multi_dagger: { channel: 'critMultiplierDaggerPct', en: '+{v}% to Critical Strike Multiplier with Daggers', de: '+{v}% auf den kritischen Schadensmultiplikator mit Dolchen' },
     poison_duration: { channel: 'poisonDurationPct', en: '{v}% increased Poison Duration on enemies', de: '{v}% erhöhte Giftdauer bei Gegnern' },
