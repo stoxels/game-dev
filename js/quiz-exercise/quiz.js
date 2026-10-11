@@ -7,6 +7,7 @@ import { _egOnQuestionAnswered } from '../combat/encounter-chain.js';
 import { _egOnQuizWrongAnswer } from '../endgame/endgame-map-launch.js';
 import { _egApplyQuizRewardBuff } from '../endgame/endgame-quiz-buffs.js';
 import { buildReveal } from '../grid.js';
+import { addTimeSecs } from '../timer/timer-adjust.js';
 import { PT } from '../probability-tree/probability-tree.js';
 import { buildInventoryPanel } from '../puzzle-item-inventory/puzzle-item-inventory-panel.js';
 import { shuffle } from '../puzzle-mechanics/puzzle-helpers.js';
@@ -240,6 +241,7 @@ function _quizEliminateButton(btn) {
         document.head.appendChild(style);
     }
 
+    btn.dataset.eliminated = '1';
     btn.style.animation = 'quiz-eliminate-flash 0.6s ease-out forwards';
     setTimeout(() => {
         btn.disabled = true;
@@ -278,6 +280,29 @@ function _quizTryEliminateWrongAnswer() {
 
     shuffle(wrongBtns); // reuses the existing shuffle() helper (see _quizBuildMcQuestion)
     wrongBtns.slice(0, toRemove).forEach(_quizEliminateButton);
+}
+
+// Passive-tree stat lookup for the quiz lines (hint / retry / time).
+function _quizTreeStat(key) {
+    if (typeof globalThis._egComputePlayerStats !== 'function') return 0;
+    return Number(globalThis._egComputePlayerStats()[key]) || 0;
+}
+
+// quiz_hint (tree): a chance that the question opens with a hint. Numeric
+// questions show their written hint; multiple-choice questions strike through
+// one more wrong answer (never the last distractor).
+function _quizTryTreeHint() {
+    const chance = Math.min(100, _quizTreeStat('quizHintPct'));
+    if (!(chance > 0) || Math.random() * 100 >= chance || !currentQuizQuestion) return;
+    if (currentQuizQuestion.type === 'input') {
+        _quizShowInputHint();
+        return;
+    }
+    const optsEl = document.getElementById('quiz-opts');
+    const wrongLeft = Array.from(optsEl.children)
+        .filter(b => b.dataset.isCorrect !== '1' && b.dataset.eliminated !== '1');
+    if (wrongLeft.length <= 1) return;
+    _quizEliminateButton(shuffle(wrongLeft)[0]);
 }
 
 // Toggles the explanation text box open/closed.
@@ -350,6 +375,29 @@ function _quizHandleFirstCorrectReward(resEl) {
 //-------------------ANSWER RESOLUTION------------------------------------
 //------------------------------------------------------------------------
 
+// quiz_time (tree): a correct answer adds seconds to the Timer.
+function _quizAddTreeTime() {
+    const secs = _quizTreeStat('quizTimeSecs');
+    if (secs > 0) addTimeSecs(secs);
+}
+
+// quiz_retry (tree): after a wrong answer there is a chance to be given a new
+// question at once. One re-roll per opening so it can never loop.
+let _quizWorldNum = null;
+let _quizRetryUsed = false;
+function _quizMaybeTreeRetry() {
+    if (_quizRetryUsed || _quizWorldNum == null) return;
+    const chance = Math.min(100, _quizTreeStat('quizRetryPct'));
+    if (!(chance > 0) || Math.random() * 100 >= chance) return;
+    _quizRetryUsed = true;
+    const world = _quizWorldNum;
+    setTimeout(() => {
+        if (!currentQuizQuestion || globalThis.quizAnsweredCorrectly) return;
+        globalThis.showToast('🔁 ' + t('quiz_retry_toast'));
+        showQuiz(world, true);
+    }, 900);
+}
+
 // Central resolver called by all answer paths (MC, input, and tutor).
 // Delegates reward/penalty logic to the helpers above, then updates
 // the overlay controls to reflect the answered state.
@@ -368,9 +416,11 @@ function _resolveQuizAnswer(correct) {
             if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();
             // Endgame reward: roll a temporary damage buff / life heal / mana restore
             if (typeof _egApplyQuizRewardBuff === 'function') _egApplyQuizRewardBuff();
+            _quizAddTreeTime();
             resEl.className = 'quiz-result ok';
             resEl.textContent = t('qz_correct_short');
         } else {
+            _quizAddTreeTime();
             if (quizAlreadyClaimed) {
                 _quizHandleAlreadyClaimedReward(resEl);
             } else {
@@ -385,6 +435,7 @@ function _resolveQuizAnswer(correct) {
         if (isInterstitial && typeof _egOnQuizWrongAnswer === 'function') {
             _egOnQuizWrongAnswer();
         }
+        _quizMaybeTreeRetry();
     }
     document.getElementById('quiz-continue').style.display = 'flex';
     // The continue chip must demand attention after EVERY answer - pulse
@@ -657,9 +708,11 @@ export function quizUseTutor() {
 // Opens the quiz overlay for the given world, drawing a random question
 // and setting up the correct input mode (MC or numeric input).
 // Called externally when the player triggers a quiz checkpoint.
-export function showQuiz(worldNum) {
+export function showQuiz(worldNum, isRetry = false) {
     const q = getQuizQuestion(worldNum);
     currentQuizQuestion = q;
+    _quizWorldNum = worldNum;
+    if (!isRetry) _quizRetryUsed = false;
 
     document.getElementById('quiz-q').textContent = q.q;
 
@@ -681,6 +734,7 @@ export function showQuiz(worldNum) {
         _quizRenderMcOptions(q);
         _quizTryEliminateWrongAnswer();
     }
+    _quizTryTreeHint();
 
     const overlayEl = document.getElementById('quiz-overlay');
     overlayEl.classList.add('show');

@@ -1312,6 +1312,19 @@ function _handleStatisticianStreak(effect, row, col) {
         window.LEVEL_FLAGS.residualPlotFills--;
         correctFillStreak++;
     }
+    // quick_fill_streak (tree): a fill within 1 second of the previous one counts
+    // for more; the fractional share is carried over until it adds a whole count.
+    if (window.LEVEL_FLAGS.quickFill && typeof globalThis._egComputePlayerStats === 'function') {
+        const quickPct = Number(globalThis._egComputePlayerStats().quickFillStreakPct) || 0;
+        if (quickPct > 0) {
+            window.LEVEL_FLAGS.quickFillFrac = (Number(window.LEVEL_FLAGS.quickFillFrac) || 0) + quickPct / 100;
+            const whole = Math.floor(window.LEVEL_FLAGS.quickFillFrac);
+            if (whole > 0) {
+                window.LEVEL_FLAGS.quickFillFrac -= whole;
+                correctFillStreak += whole;
+            }
+        }
+    }
     _momentumSpawnParticle(row, col);
 
     if (correctFillStreak >= effect.streakForBonus) {

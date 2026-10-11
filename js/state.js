@@ -62,6 +62,12 @@ window.LEVEL_FLAGS = {
     compoundInterestCount: 0, // Compound Interest: mistakes absorbed by Variance Shield this level
     priorElicitationDone: false, // Prior Elicitation: the 50%-completion Bayesian Insight has fired
     mistakeLog: [],           // Actuary/Markovian: rolling log of {r,c,penaltySecs} mistakes
+    fillRun: 0,               // correct fills in a row since the last mistake (tree streak lines)
+    lastCorrectFillAt: 0,     // timestamp of the previous correct fill (quick_fill_streak)
+    quickFill: false,         // the current correct fill followed the last one within 1 second
+    quickFillFrac: 0,         // quick_fill_streak: fractional Momentum counts carried over
+    firstStepDone: false,     // first_step_time: the level's first correct fill was rewarded
+    stunFreezeUntil: 0,       // freeze_timer_on_stun: cooldown stamp
     damageAfterLineUntil: 0,  // damage_after_line (tree): timestamp until which the bonus lasts
     damageOnMistakePending: false, // damage_on_mistake (tree): next Attack deals more damage
     lastFailedGi: null,       // gIdx of the level the player last failed (bounceback achievement)
@@ -82,6 +88,12 @@ export function _resetLevelFlags() {
     window.LEVEL_FLAGS.compoundInterestCount = 0;
     window.LEVEL_FLAGS.priorElicitationDone = false;
     window.LEVEL_FLAGS.mistakeLog = [];
+    window.LEVEL_FLAGS.fillRun = 0;
+    window.LEVEL_FLAGS.lastCorrectFillAt = 0;
+    window.LEVEL_FLAGS.quickFill = false;
+    window.LEVEL_FLAGS.quickFillFrac = 0;
+    window.LEVEL_FLAGS.firstStepDone = false;
+    window.LEVEL_FLAGS.stunFreezeUntil = 0;
     window.LEVEL_FLAGS.damageAfterLineUntil = 0;
     window.LEVEL_FLAGS.damageOnMistakePending = false;
     // devTestActive survives: it describes the session, not the level.

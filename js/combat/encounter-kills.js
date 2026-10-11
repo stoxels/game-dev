@@ -12,6 +12,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { gainMana } from '../classes/class-mana.js';
 
 import { stopTimer } from '../timer/timer.js';
+import { addTimeSecs } from '../timer/timer-adjust.js';
 import { t } from '../translation/translations.js';
 import { EG_PANEL_RERENDER_DELAY_MS } from './encounter-constants.js';
 import { _egPlayerTakeDamage } from './encounter-damage.js';
@@ -51,6 +52,20 @@ export function _egUpdateTargetAfterKill() {
         globalThis._egTargetId = null;
         _egOnAllMonstersDead();
     }
+}
+
+// Passive-tree puzzle rewards for a kill: timer seconds (more for bosses and
+// elites), and a chance to reveal one correct / mark one wrong cell.
+function _egTreeKillPuzzleLines(dying, stats) {
+    if (!dying) return;
+    const isElite = !!(dying.isBoss || dying.isElite || (Number(dying.baseHP) || 0) >= 110);
+    const secs = (Number(stats.timeOnKill) || 0) + (isElite ? (Number(stats.timeOnElite) || 0) : 0);
+    if (secs > 0) addTimeSecs(secs);
+    if (!cur || !cur.grid || !globalThis.userGrid) return;
+    const reveal = Math.min(100, Number(stats.cellOnKillPct) || 0);
+    if (reveal > 0 && Math.random() * 100 < reveal && typeof globalThis.revealTiles === 'function') globalThis.revealTiles(1, 'item');
+    const mark = Math.min(100, Number(stats.markOnKillPct) || 0);
+    if (mark > 0 && Math.random() * 100 < mark && typeof globalThis.markWrongTiles === 'function') globalThis.markWrongTiles(1);
 }
 
 // Removes a monster from the encounter after its death animation fires.
@@ -159,6 +174,8 @@ export function _egKillMonster(monsterId) {
                 if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
             }
         }
+
+        _egTreeKillPuzzleLines(dying, killStats);
 
         if ((killStats.absorptionOnKill || 0) > 0 && typeof _egIsActive === 'function' && _egIsActive()) {
             const maxAbsorption = killStats.absorption;

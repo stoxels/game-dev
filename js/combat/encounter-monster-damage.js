@@ -8,6 +8,7 @@ import { EG_STAGGER_DURATION_MS } from './encounter-lifecycle.js';
 import { _egFlashDamageCard, _egFlashImmune, _egShowDamageNumber, _egSpawnHitBurst, _egUpdateBars } from './encounter.js';
 import { EG_PLAYER_STATS, _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
+import { startTimerFreeze } from '../timer/timer-freeze.js';
 import { _egGainFortify, _egGainPowerCharge, _egGainRage } from './combat-ailments-state.js';
 
 // Player-to-monster damage: target HP/charge/stagger application, elemental
@@ -66,6 +67,20 @@ function _egMeleeKillExplode(dying) {
     victims.forEach(m => _egDamageTargetById(m.id, dealt, null, {}));
 }
 
+// freeze_timer_on_stun (tree): stunning an enemy pauses the level Timer. A
+// short cooldown keeps repeated stuns from pinning the clock.
+const EG_STUN_FREEZE_COOLDOWN_MS = 6000;
+function _egFreezeTimerOnStun(stats) {
+    const secs = Number(stats && stats.timerFreezeOnStun) || 0;
+    const flags = globalThis.LEVEL_FLAGS;
+    if (!(secs > 0) || !flags || globalThis.timerFrozen) return false;
+    const now = Date.now();
+    if (now < (Number(flags.stunFreezeUntil) || 0)) return false;
+    flags.stunFreezeUntil = now + secs * 1000 + EG_STUN_FREEZE_COOLDOWN_MS;
+    startTimerFreeze(secs * 1000, { overlay: false });
+    return true;
+}
+
 export function _egApplyHitToMonster(target, amount, opts) {
     const stats = _egComputePlayerStats();
     target.currentHP = Math.max(0, target.currentHP - amount);
@@ -78,6 +93,7 @@ export function _egApplyHitToMonster(target, amount, opts) {
 
     if (stats.staggerPct > 0 && Math.random() * 100 < stats.staggerPct) {
         target.staggeredUntil = Date.now() + _egStunDurationMs(stats, !!(opts && opts.isMelee));
+        _egFreezeTimerOnStun(stats);
         _egShowStatusLabel(target.id, t('eg_staggered'));
     }
 }
@@ -270,6 +286,7 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
         const genericStun = genericStunPct > 0 && Math.random() * 100 < genericStunPct;
         if (maceStun || heavyStun || genericStun) {
             target.staggeredUntil = Date.now() + _egStunDurationMs(rageStats, true);
+            _egFreezeTimerOnStun(rageStats);
             _egShowStatusLabel(target.id, t('eg_stunned'));
             // Charges that trigger on a melee stun (Power, Fortify).
             if ((rageStats.powerOnStunPct || 0) > 0 && Math.random() * 100 < Math.min(100, rageStats.powerOnStunPct)) {

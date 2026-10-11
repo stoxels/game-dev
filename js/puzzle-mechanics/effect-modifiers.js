@@ -8,10 +8,17 @@ import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js
 // factoring in keystones and passive nodes (Stronger Light, Iron
 // Doctrine, Curse Embrace, Countdown Crisis, Golden Clock, ...).
 
+// item_effect (passive tree): "Puzzle Items are #% more effective" as a
+// multiplier over the base effect. Read live so equips / respecs apply at once.
+function _treeItemEffectMult() {
+    const stats = typeof globalThis._egComputePlayerStats === 'function' ? globalThis._egComputePlayerStats() : null;
+    return 1 + (Math.max(0, Number(stats && stats.itemEffectPct) || 0) / 100);
+}
+
 // Returns the final reveal count for a reveal item, including all passive
 // and keystone bonuses / penalties.
 export function _calcRevealCount(baseCount) {
-    let count = baseCount;
+    let count = Math.ceil(baseCount * _treeItemEffectMult());
 
     // Passive: Stronger Light - +1 per node
     count += (ptHasSkill('stronger_light_1') ? 1 : 0)
@@ -36,7 +43,7 @@ export function _calcRevealCount(baseCount) {
 
 // Returns the final mark-wrong count for a markWrong item.
 export function _calcMarkWrongCount(baseCount) {
-    let count = baseCount;
+    let count = Math.ceil(baseCount * _treeItemEffectMult());
 
     // Passive: Stronger Marks - +1 per node
     // (travel_stronger_marks_1 alias + stronger_marks_3; the middle node of
@@ -58,7 +65,7 @@ export function _calcMarkWrongCount(baseCount) {
 // Also handles the Countdown Crisis inversion (caller checks and acts on
 // the negative case).
 export function _calcAddTimeSecs(baseSecs) {
-    let multiplier = 1.0;
+    let multiplier = _treeItemEffectMult();
 
     // Passive: Extended Hour - each node adds 10% / 15% / 10%
     if (ptHasSkill('extended_hour_1')) multiplier += 0.10;
@@ -86,7 +93,7 @@ export function _calcAddTimeSecs(baseSecs) {
 export function _calcTutorItemCount(baseCount, isEraseAll) {
     if (isEraseAll) return baseCount; // eraseAll ignores all modifiers
 
-    let count = baseCount;
+    let count = Math.ceil(baseCount * _treeItemEffectMult());
 
     // Passive: Scholarly Aid - +1 per node
     count += (ptHasSkill('scholarly_aid_1') ? 1 : 0)

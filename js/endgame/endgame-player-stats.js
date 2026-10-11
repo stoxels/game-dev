@@ -1324,7 +1324,7 @@ export function _egComputePlayerStats() {
     // Streak armour (armour_per_streak): flat Armour per 10 correct fills in a
     // row; the streak counter resets on every real mistake.
     if ((s.armourPerStreak || 0) > 0) {
-        s.armourFlat += s.armourPerStreak * Math.floor((Number(globalThis.consecutiveCorrectFills) || 0) / 10);
+        s.armourFlat += s.armourPerStreak * Math.floor((Number(globalThis.LEVEL_FLAGS && globalThis.LEVEL_FLAGS.fillRun) || 0) / 10);
     }
     // Endurance Charges (shield batch, node 285): live charges (shared 10s
     // timer, see combat-ailments-state.js) each add flat Armour and

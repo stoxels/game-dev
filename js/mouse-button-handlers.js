@@ -321,6 +321,7 @@ function tryAbsorbWithConfidenceInterval(row, col) {
     globalThis.wrongGrid[row][col] = true;
     renderCell(row, col);
     globalThis.consecutiveCorrectFills = 0;        // CI absorption also breaks the correct-fill streak
+    window.LEVEL_FLAGS.fillRun = 0;
     window.LEVEL_FLAGS.streakBonusFills = 0;
     if (typeof globalThis.PassiveTracker !== 'undefined') PassiveTracker.onStreakReset();
     globalThis.showToast(`📐 ${t('cg_ci_absorb')}`);
@@ -363,6 +364,7 @@ function markCellWrongAndPenalize(row, col) {
 // Reset consecutive-fill streaks and notify passive systems.
 function breakFillStreaksOnMistake() {
     globalThis.consecutiveCorrectFills = 0;    // sample_efficiency skill: streak reset
+    window.LEVEL_FLAGS.fillRun = 0;
     window.LEVEL_FLAGS.streakBonusFills = 0;          // streak_bonus skill: streak reset
 
     // Endgame gear: arcane surge streak + channel stacks break on a mistake
@@ -662,7 +664,26 @@ function updateDragStrokeCounter(row, col) {
 }
 
 // Fires all class and passive system hooks for a correct fill.
+// Passive-tree lines that react to a correct fill: the run counter behind the
+// per-streak lines, the quick-fill stamp for Momentum, and the first-step bonus.
+function _treeCorrectFillLines() {
+    const flags = window.LEVEL_FLAGS;
+    const now = Date.now();
+    flags.fillRun = (Number(flags.fillRun) || 0) + 1;
+    flags.quickFill = (Number(flags.lastCorrectFillAt) || 0) > 0 && now - flags.lastCorrectFillAt <= 1000;
+    flags.lastCorrectFillAt = now;
+    if (flags.firstStepDone) return;
+    flags.firstStepDone = true;
+    const secs = typeof globalThis._egComputePlayerStats === 'function'
+        ? (Number(globalThis._egComputePlayerStats().firstStepTreeSecs) || 0) : 0;
+    if (secs > 0) {
+        addTimeSecs(secs);
+        globalThis.showToast(`👣 +${secs}s`);
+    }
+}
+
 function fireCorrectFillHooks(row, col) {
+    _treeCorrectFillLines();
     if (typeof window.feedDrifter === 'function') window.feedDrifter();
 
     globalThis.onCorrectFill(row, col);    // class.js hook

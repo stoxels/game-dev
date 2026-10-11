@@ -704,11 +704,15 @@ export const TALENT_TREE_DATA = {
    "id": 96,
    "x": -594,
    "y": 1747,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spoils of War",
+   "nameDe": "Kriegsbeute",
    "icon": "",
-   "statKey": "reserved_reserved_node_96",
-   "tier": "notable"
+   "statKey": "notable_spoils_of_war_96",
+   "tier": "notable",
+   "effects": [
+    "time_on_kill:2",
+    "cell_on_kill:10"
+   ]
   },
   {
    "id": 320,
@@ -755,11 +759,15 @@ export const TALENT_TREE_DATA = {
    "id": 235,
    "x": -2682,
    "y": -1413,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Bounce Back",
+   "nameDe": "Zurückfedern",
    "icon": "",
-   "statKey": "reserved_reserved_node_235",
-   "tier": "notable"
+   "statKey": "notable_bounce_back_235",
+   "tier": "notable",
+   "effects": [
+    "lucky_tile_reward:16",
+    "damage_on_mistake:15"
+   ]
   },
   {
    "id": 335,
@@ -1456,11 +1464,15 @@ export const TALENT_TREE_DATA = {
    "id": 26,
    "x": 1738,
    "y": -1944,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spoils of War",
+   "nameDe": "Kriegsbeute",
    "icon": "",
-   "statKey": "reserved_reserved_node_26",
-   "tier": "notable"
+   "statKey": "notable_spoils_of_war_26",
+   "tier": "notable",
+   "effects": [
+    "time_on_kill:2",
+    "cell_on_kill:10"
+   ]
   },
   {
    "id": 252,
@@ -1488,7 +1500,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_retaliation_254",
    "effects": [
     "attack_phys_shield:20",
-    "melee_charge_speed_pct:8"
+    "melee_charge_speed_pct:8",
+    "time_on_elite:6"
    ],
    "tier": "notable"
   },
@@ -1514,7 +1527,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_relentless_tempo_118",
    "effects": [
-    "melee_charge_speed_pct:20"
+    "melee_charge_speed_pct:20",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },
@@ -1982,7 +1996,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_concussive_force_247",
    "effects": [
     "stun_chance:6",
-    "ignite_damage_more:20"
+    "ignite_damage_more:20",
+    "freeze_timer_on_stun:2"
    ],
    "tier": "notable"
   },
@@ -2740,11 +2755,15 @@ export const TALENT_TREE_DATA = {
    "id": 6,
    "x": 2050,
    "y": -1822,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Quick Fingers",
+   "nameDe": "Flinke Finger",
    "icon": "",
-   "statKey": "reserved_trap_mine_6",
-   "tier": "notable"
+   "statKey": "notable_quick_fingers_6",
+   "tier": "notable",
+   "effects": [
+    "damage_after_line:12",
+    "damage_low_time:8"
+   ]
   },
   {
    "id": 134,
@@ -3123,7 +3142,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "melee_phys_inc:20",
     "movement_speed_pct:5",
-    "crit_chance_melee:5"
+    "crit_chance_melee:5",
+    "quick_fill_streak:50"
    ],
    "tier": "notable"
   },
@@ -3131,21 +3151,29 @@ export const TALENT_TREE_DATA = {
    "id": 150,
    "x": 1986,
    "y": 2124,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Line Dancer",
+   "nameDe": "Zeilentänzer",
    "icon": "",
-   "statKey": "reserved_distance_damage_150",
-   "tier": "notable"
+   "statKey": "notable_line_dancer_150",
+   "tier": "notable",
+   "effects": [
+    "life_on_line:10",
+    "mana_on_line:6"
+   ]
   },
   {
    "id": 196,
    "x": 2330,
    "y": -100,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Quick Fingers",
+   "nameDe": "Flinke Finger",
    "icon": "",
-   "statKey": "reserved_flask_196",
-   "tier": "notable"
+   "statKey": "notable_quick_fingers_196",
+   "tier": "notable",
+   "effects": [
+    "damage_after_line:12",
+    "damage_low_time:8"
+   ]
   },
   {
    "id": 197,
@@ -3233,11 +3261,15 @@ export const TALENT_TREE_DATA = {
    "id": 2,
    "x": 2727,
    "y": -357,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Last Minute",
+   "nameDe": "Letzte Minute",
    "icon": "",
-   "statKey": "reserved_marks_2",
-   "tier": "notable"
+   "statKey": "notable_last_minute_2",
+   "tier": "notable",
+   "effects": [
+    "quick_fill_streak:50",
+    "damage_after_line:12"
+   ]
   },
   {
    "id": 337,
@@ -3437,11 +3469,14 @@ export const TALENT_TREE_DATA = {
    "id": 174,
    "x": -1611,
    "y": 179,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_174",
-   "tier": "travel"
+   "statKey": "travel_steady_run_174",
+   "tier": "travel",
+   "effects": [
+    "armour_per_streak:10"
+   ]
   },
   {
    "id": 175,
@@ -3804,7 +3839,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_disciple_of_the_slaughter_20007",
    "effects": [
-    "frenzy_on_kill:8"
+    "frenzy_on_kill:8",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },
@@ -4242,7 +4278,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_attack_damage_and_attack_speed_with_shield_30033",
    "effects": [
     "attack_phys_shield:10",
-    "melee_charge_speed_pct:3"
+    "melee_charge_speed_pct:3",
+    "cell_on_kill:5"
    ],
    "tier": "small"
   },
@@ -4883,41 +4920,53 @@ export const TALENT_TREE_DATA = {
    "id": 30075,
    "x": -1992,
    "y": -1175,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30075",
-   "tier": "small"
+   "statKey": "small_trophy_30075",
+   "tier": "small",
+   "effects": [
+    "cell_on_kill:5"
+   ]
   },
   {
    "id": 30076,
    "x": -2025,
    "y": -1126,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30076",
-   "tier": "travel"
+   "statKey": "travel_trophy_30076",
+   "tier": "travel",
+   "effects": [
+    "time_on_kill:1"
+   ]
   },
   {
    "id": 30077,
    "x": -2065,
    "y": -1126,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30077",
-   "tier": "small"
+   "statKey": "small_trophy_30077",
+   "tier": "small",
+   "effects": [
+    "mark_on_kill:6"
+   ]
   },
   {
    "id": 30078,
    "x": -2098,
    "y": -1175,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30078",
-   "tier": "small"
+   "statKey": "small_trophy_30078",
+   "tier": "small",
+   "effects": [
+    "freeze_timer_on_stun:1"
+   ]
   },
   {
    "id": 30079,
@@ -5036,41 +5085,53 @@ export const TALENT_TREE_DATA = {
    "id": 30087,
    "x": -2536,
    "y": -1413,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30087",
-   "tier": "small"
+   "statKey": "small_trophy_30087",
+   "tier": "small",
+   "effects": [
+    "cell_on_kill:5"
+   ]
   },
   {
    "id": 30088,
    "x": -2413,
    "y": -1596,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_30088",
-   "tier": "small"
+   "statKey": "small_study_habit_30088",
+   "tier": "small",
+   "effects": [
+    "quiz_hint:8"
+   ]
   },
   {
    "id": 30089,
    "x": -2380,
    "y": -1645,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_30089",
-   "tier": "small"
+   "statKey": "small_study_habit_30089",
+   "tier": "small",
+   "effects": [
+    "quiz_retry:10"
+   ]
   },
   {
    "id": 30090,
    "x": -2340,
    "y": -1645,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_30090",
-   "tier": "travel"
+   "statKey": "travel_study_habit_30090",
+   "tier": "travel",
+   "effects": [
+    "quiz_time:3"
+   ]
   },
   {
    "id": 30091,
@@ -5100,41 +5161,53 @@ export const TALENT_TREE_DATA = {
    "id": 30093,
    "x": -2240,
    "y": -1468,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Resilience",
+   "nameDe": "Widerstandskraft",
    "icon": "",
-   "statKey": "reserved_reserved_node_30093",
-   "tier": "small"
+   "statKey": "small_resilience_30093",
+   "tier": "small",
+   "effects": [
+    "reveal_projectile_damage:8"
+   ]
   },
   {
    "id": 30094,
    "x": -2207,
    "y": -1419,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Resilience",
+   "nameDe": "Widerstandskraft",
    "icon": "",
-   "statKey": "reserved_reserved_node_30094",
-   "tier": "small"
+   "statKey": "small_resilience_30094",
+   "tier": "small",
+   "effects": [
+    "lucky_tile_reward:8"
+   ]
   },
   {
    "id": 30095,
    "x": -2207,
    "y": -1517,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Resilience",
+   "nameDe": "Widerstandskraft",
    "icon": "",
-   "statKey": "reserved_reserved_node_30095",
-   "tier": "small"
+   "statKey": "small_resilience_30095",
+   "tier": "small",
+   "effects": [
+    "damage_on_mistake:8"
+   ]
   },
   {
    "id": 30096,
    "x": -2167,
    "y": -1517,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Resilience",
+   "nameDe": "Widerstandskraft",
    "icon": "",
-   "statKey": "reserved_reserved_node_30096",
-   "tier": "small"
+   "statKey": "small_resilience_30096",
+   "tier": "small",
+   "effects": [
+    "mistake_heal:6"
+   ]
   },
   {
    "id": 30097,
@@ -5154,11 +5227,14 @@ export const TALENT_TREE_DATA = {
    "id": 30098,
    "x": -2771,
    "y": -1269,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_30098",
-   "tier": "small"
+   "statKey": "small_neat_line_30098",
+   "tier": "small",
+   "effects": [
+    "charge_on_line:6"
+   ]
   },
   {
    "id": 30099,
@@ -5249,11 +5325,15 @@ export const TALENT_TREE_DATA = {
    "id": 20025,
    "x": 2061,
    "y": -1239,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Scholar's Edge",
+   "nameDe": "Gelehrtenvorsprung",
    "icon": "",
-   "statKey": "reserved_trap_mine_20025",
-   "tier": "notable"
+   "statKey": "notable_scholar_s_edge_20025",
+   "tier": "notable",
+   "effects": [
+    "quiz_retry:20",
+    "quiz_hint:16"
+   ]
   },
   {
    "id": 20026,
@@ -5476,11 +5556,14 @@ export const TALENT_TREE_DATA = {
    "id": 30115,
    "x": 1702,
    "y": -941,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Resilience",
+   "nameDe": "Widerstandskraft",
    "icon": "",
-   "statKey": "reserved_trap_mine_30115",
-   "tier": "travel"
+   "statKey": "travel_resilience_30115",
+   "tier": "travel",
+   "effects": [
+    "mistake_heal:6"
+   ]
   },
   {
    "id": 30116,
@@ -5499,11 +5582,14 @@ export const TALENT_TREE_DATA = {
    "id": 30117,
    "x": 1808,
    "y": -941,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_trap_mine_30117",
-   "tier": "travel"
+   "statKey": "travel_tinkerer_30117",
+   "tier": "travel",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 30118,
@@ -5548,21 +5634,27 @@ export const TALENT_TREE_DATA = {
    "id": 30121,
    "x": 1992,
    "y": -1170,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_trap_mine_30121",
-   "tier": "small"
+   "statKey": "small_study_habit_30121",
+   "tier": "small",
+   "effects": [
+    "quiz_hint:8"
+   ]
   },
   {
    "id": 30122,
    "x": 2079,
    "y": -1152,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_trap_mine_30122",
-   "tier": "small"
+   "statKey": "small_study_habit_30122",
+   "tier": "small",
+   "effects": [
+    "quiz_time:3"
+   ]
   },
   {
    "id": 30123,
@@ -5713,71 +5805,92 @@ export const TALENT_TREE_DATA = {
    "id": 30134,
    "x": 2448,
    "y": -1496,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_mine_damage_30134",
-   "tier": "travel"
+   "statKey": "travel_neat_line_30134",
+   "tier": "travel",
+   "effects": [
+    "life_on_line:5"
+   ]
   },
   {
    "id": 30135,
    "x": 2456,
    "y": -1454,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_mine_damage_30135",
-   "tier": "small"
+   "statKey": "small_neat_line_30135",
+   "tier": "small",
+   "effects": [
+    "mana_on_line:3"
+   ]
   },
   {
    "id": 30136,
    "x": 2505,
    "y": -1496,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30136",
-   "tier": "travel"
+   "statKey": "travel_tinkerer_30136",
+   "tier": "travel",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 30137,
    "x": 2558,
    "y": -1549,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30137",
-   "tier": "travel"
+   "statKey": "travel_tinkerer_30137",
+   "tier": "travel",
+   "effects": [
+    "item_effect:8"
+   ]
   },
   {
    "id": 30138,
    "x": 2668,
    "y": -1496,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_30138",
-   "tier": "small"
+   "statKey": "small_study_habit_30138",
+   "tier": "small",
+   "effects": [
+    "quiz_time:3"
+   ]
   },
   {
    "id": 30139,
    "x": 2600,
    "y": -1394,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Resilience",
+   "nameDe": "Widerstandskraft",
    "icon": "",
-   "statKey": "reserved_reserved_node_30139",
-   "tier": "small"
+   "statKey": "small_resilience_30139",
+   "tier": "small",
+   "effects": [
+    "damage_on_mistake:8"
+   ]
   },
   {
    "id": 30140,
    "x": 2516,
    "y": -1394,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_mine_damage_30140",
-   "tier": "small"
+   "statKey": "small_neat_line_30140",
+   "tier": "small",
+   "effects": [
+    "absorption_on_line:6"
+   ]
   },
   {
    "id": 30141,
@@ -5795,21 +5908,27 @@ export const TALENT_TREE_DATA = {
    "id": 30142,
    "x": 2579,
    "y": -1193,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_30142",
-   "tier": "small"
+   "statKey": "small_neat_line_30142",
+   "tier": "small",
+   "effects": [
+    "mana_on_line:3"
+   ]
   },
   {
    "id": 30143,
    "x": 2689,
    "y": -1303,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30143",
-   "tier": "small"
+   "statKey": "small_tinkerer_30143",
+   "tier": "small",
+   "effects": [
+    "item_effect:8"
+   ]
   },
   {
    "id": 30144,
@@ -5870,11 +5989,14 @@ export const TALENT_TREE_DATA = {
    "id": 30148,
    "x": 1746,
    "y": -1170,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Resilience",
+   "nameDe": "Widerstandskraft",
    "icon": "",
-   "statKey": "reserved_claw_30148",
-   "tier": "small"
+   "statKey": "small_resilience_30148",
+   "tier": "small",
+   "effects": [
+    "lucky_tile_reward:8"
+   ]
   },
   {
    "id": 30149,
@@ -5894,21 +6016,27 @@ export const TALENT_TREE_DATA = {
    "id": 30150,
    "x": 2362,
    "y": -1681,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_cold_dot_30150",
-   "tier": "small"
+   "statKey": "small_study_habit_30150",
+   "tier": "small",
+   "effects": [
+    "quiz_time:3"
+   ]
   },
   {
    "id": 30151,
    "x": 2415,
    "y": -1734,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_cold_dot_30151",
-   "tier": "small"
+   "statKey": "small_study_habit_30151",
+   "tier": "small",
+   "effects": [
+    "quiz_retry:10"
+   ]
   },
   {
    "id": 40000,
@@ -6432,7 +6560,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "armour_inc_pct:10",
     "endurance_on_kill:8",
-    "chill_effect_taken:25"
+    "chill_effect_taken:25",
+    "time_on_kill:2"
    ],
    "tier": "notable",
    "layoutPinned": true
@@ -7367,41 +7496,53 @@ export const TALENT_TREE_DATA = {
    "id": 30224,
    "x": -545,
    "y": 1780,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30224",
-   "tier": "small"
+   "statKey": "small_trophy_30224",
+   "tier": "small",
+   "effects": [
+    "freeze_timer_on_stun:1"
+   ]
   },
   {
    "id": 30225,
    "x": -545,
    "y": 1820,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30225",
-   "tier": "small"
+   "statKey": "small_trophy_30225",
+   "tier": "small",
+   "effects": [
+    "cell_on_kill:5"
+   ]
   },
   {
    "id": 30226,
    "x": -594,
    "y": 1853,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30226",
-   "tier": "small"
+   "statKey": "small_trophy_30226",
+   "tier": "small",
+   "effects": [
+    "time_on_kill:1"
+   ]
   },
   {
    "id": 30227,
    "x": -647,
    "y": 1800,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30227",
-   "tier": "small"
+   "statKey": "small_trophy_30227",
+   "tier": "small",
+   "effects": [
+    "mark_on_kill:6"
+   ]
   },
   {
    "id": 30228,
@@ -7889,21 +8030,27 @@ export const TALENT_TREE_DATA = {
    "id": 30264,
    "x": -2081,
    "y": 948,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_30264",
-   "tier": "small"
+   "statKey": "small_steady_run_30264",
+   "tier": "small",
+   "effects": [
+    "armour_per_streak:10"
+   ]
   },
   {
    "id": 30265,
    "x": -2157,
    "y": 948,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_30265",
-   "tier": "small"
+   "statKey": "small_steady_run_30265",
+   "tier": "small",
+   "effects": [
+    "damage_per_streak:4"
+   ]
   },
   {
    "id": 30266,
@@ -7995,7 +8142,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_swift_blade_30272",
    "effects": [
     "melee_phys_sword:10",
-    "sword_charge_speed:4"
+    "sword_charge_speed:4",
+    "quick_fill_streak:25"
    ],
    "tier": "small"
   },
@@ -8009,7 +8157,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_swift_blade_30273",
    "effects": [
     "melee_phys_sword:10",
-    "sword_charge_speed:4"
+    "sword_charge_speed:4",
+    "quick_fill_streak:25"
    ],
    "tier": "small"
   },
@@ -8888,11 +9037,14 @@ export const TALENT_TREE_DATA = {
    "id": 30345,
    "x": -2081,
    "y": 872,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_30345",
-   "tier": "small"
+   "statKey": "small_steady_run_30345",
+   "tier": "small",
+   "effects": [
+    "block_flawless:3"
+   ]
   },
   {
    "id": 30346,
@@ -9426,31 +9578,40 @@ export const TALENT_TREE_DATA = {
    "id": 30386,
    "x": -1997,
    "y": 1890,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_30386",
-   "tier": "small"
+   "statKey": "small_neat_line_30386",
+   "tier": "small",
+   "effects": [
+    "absorption_on_line:6"
+   ]
   },
   {
    "id": 30387,
    "x": -1937,
    "y": 1950,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_30387",
-   "tier": "small"
+   "statKey": "small_neat_line_30387",
+   "tier": "small",
+   "effects": [
+    "mana_on_line:3"
+   ]
   },
   {
    "id": 30388,
    "x": -1929,
    "y": 1992,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_30388",
-   "tier": "travel"
+   "statKey": "travel_neat_line_30388",
+   "tier": "travel",
+   "effects": [
+    "life_on_line:5"
+   ]
   },
   {
    "id": 30389,
@@ -9480,21 +9641,27 @@ export const TALENT_TREE_DATA = {
    "id": 30391,
    "x": -2141,
    "y": 2034,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30391",
-   "tier": "small"
+   "statKey": "small_tinkerer_30391",
+   "tier": "small",
+   "effects": [
+    "pickup_lifetime:2"
+   ]
   },
   {
    "id": 30392,
    "x": -2141,
    "y": 1950,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30392",
-   "tier": "small"
+   "statKey": "small_tinkerer_30392",
+   "tier": "small",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 30393,
@@ -9651,7 +9818,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_regeneration_30404",
    "effects": [
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.6",
+    "first_step_time:4"
    ],
    "tier": "small"
   },
@@ -9859,7 +10027,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_stun_duration_30420",
    "effects": [
-    "stun_duration:20"
+    "stun_duration:20",
+    "freeze_timer_on_stun:1"
    ],
    "tier": "small"
   },
@@ -10519,7 +10688,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_two_handed_melee_damage_and_attack_speed_30470",
    "effects": [
     "melee_phys_heavy:12",
-    "melee_charge_speed_pct:3"
+    "melee_charge_speed_pct:3",
+    "time_on_elite:3"
    ],
    "tier": "small"
   },
@@ -10547,7 +10717,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_impale_chance_and_attack_speed_30472",
    "effects": [
     "melee_charge_speed_pct:2",
-    "impale_chance_heavy:5"
+    "impale_chance_heavy:5",
+    "mark_on_kill:6"
    ],
    "tier": "small"
   },
@@ -10575,7 +10746,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_impale_chance_and_attack_speed_30474",
    "effects": [
     "melee_charge_speed_pct:2",
-    "impale_chance_heavy:5"
+    "impale_chance_heavy:5",
+    "cell_on_kill:5"
    ],
    "tier": "small"
   },
@@ -10696,7 +10868,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_mace_damage_and_attack_speed_30483",
    "effects": [
     "melee_phys_mace:8",
-    "melee_charge_speed_pct:3"
+    "melee_charge_speed_pct:3",
+    "mark_on_kill:6"
    ],
    "tier": "small"
   },
@@ -10773,11 +10946,14 @@ export const TALENT_TREE_DATA = {
    "id": 30489,
    "x": -729,
    "y": 2309,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_30489",
-   "tier": "small"
+   "statKey": "small_steady_run_30489",
+   "tier": "small",
+   "effects": [
+    "damage_per_streak:4"
+   ]
   },
   {
    "id": 30490,
@@ -10796,11 +10972,14 @@ export const TALENT_TREE_DATA = {
    "id": 30491,
    "x": -680,
    "y": 2382,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_30491",
-   "tier": "small"
+   "statKey": "small_steady_run_30491",
+   "tier": "small",
+   "effects": [
+    "block_flawless:3"
+   ]
   },
   {
    "id": 30492,
@@ -11084,71 +11263,92 @@ export const TALENT_TREE_DATA = {
    "id": 30530,
    "x": -1612,
    "y": 2554,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30530",
-   "tier": "small"
+   "statKey": "small_tinkerer_30530",
+   "tier": "small",
+   "effects": [
+    "item_effect:8"
+   ]
   },
   {
    "id": 30531,
    "x": -1654,
    "y": 2562,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30531",
-   "tier": "small"
+   "statKey": "small_tinkerer_30531",
+   "tier": "small",
+   "effects": [
+    "item_effect:8"
+   ]
   },
   {
    "id": 30532,
    "x": -1756,
    "y": 2494,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30532",
-   "tier": "small"
+   "statKey": "small_trophy_30532",
+   "tier": "small",
+   "effects": [
+    "time_on_elite:3"
+   ]
   },
   {
    "id": 30533,
    "x": -1756,
    "y": 2410,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_30533",
-   "tier": "small"
+   "statKey": "small_trophy_30533",
+   "tier": "small",
+   "effects": [
+    "time_on_kill:1"
+   ]
   },
   {
    "id": 30534,
    "x": -1654,
    "y": 2342,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30534",
-   "tier": "small"
+   "statKey": "small_tinkerer_30534",
+   "tier": "small",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 30535,
    "x": -1612,
    "y": 2350,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30535",
-   "tier": "small"
+   "statKey": "small_tinkerer_30535",
+   "tier": "small",
+   "effects": [
+    "pickup_lifetime:2"
+   ]
   },
   {
    "id": 30536,
    "x": -1544,
    "y": 2452,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30536",
-   "tier": "travel"
+   "statKey": "travel_tinkerer_30536",
+   "tier": "travel",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 30543,
@@ -11187,7 +11387,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_armour_and_life_regeneration_30545",
    "effects": [
     "armour_inc_pct:10",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.6",
+    "first_step_time:4"
    ],
    "tier": "small"
   },
@@ -11847,21 +12048,27 @@ export const TALENT_TREE_DATA = {
    "id": 30594,
    "x": -2609,
    "y": -1159,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_30594",
-   "tier": "small"
+   "statKey": "small_brisk_pace_30594",
+   "tier": "small",
+   "effects": [
+    "damage_after_line:6"
+   ]
   },
   {
    "id": 30595,
    "x": -2651,
    "y": -1167,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_30595",
-   "tier": "small"
+   "statKey": "small_brisk_pace_30595",
+   "tier": "small",
+   "effects": [
+    "damage_low_time:4"
+   ]
   },
   {
    "id": 30596,
@@ -12017,7 +12224,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "melee_charge_speed_pct:8",
     "agi_flat:20",
-    "accuracy_rating_pct:15"
+    "accuracy_rating_pct:15",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },
@@ -12032,7 +12240,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "health_inc_pct:8",
     "stun_avoid:20",
-    "life_regen_pct:2"
+    "life_regen_pct:2",
+    "freeze_timer_on_stun:2"
    ],
    "tier": "notable"
   },
@@ -12217,7 +12426,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "melee_phys_1h:20",
     "dot_inc_pct:15",
-    "melee_charge_speed_pct:8"
+    "melee_charge_speed_pct:8",
+    "mark_on_kill:12"
    ],
    "tier": "notable"
   },
@@ -12304,7 +12514,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_flaying_20119",
    "effects": [
     "dagger_damage_inc:24",
-    "dagger_charge_speed:12"
+    "dagger_charge_speed:12",
+    "quick_fill_streak:50"
    ],
    "tier": "notable"
   },
@@ -13035,7 +13246,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_attack_speed_30638",
    "effects": [
-    "melee_charge_speed_pct:5"
+    "melee_charge_speed_pct:5",
+    "cell_on_kill:5"
    ],
    "tier": "small"
   },
@@ -13103,7 +13315,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_dual_wield_attack_speed_and_block_30643",
    "effects": [
     "dual_block:3",
-    "dual_charge_speed:3"
+    "dual_charge_speed:3",
+    "first_step_time:4"
    ],
    "tier": "small"
   },
@@ -13162,7 +13375,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "damage_inc_pct:12",
     "melee_charge_speed_pct:3",
-    "dot_inc_pct:12"
+    "dot_inc_pct:12",
+    "cell_on_kill:5"
    ],
    "tier": "small"
   },
@@ -13904,21 +14118,27 @@ export const TALENT_TREE_DATA = {
    "id": 30703,
    "x": 648,
    "y": 2798,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_30703",
-   "tier": "small"
+   "statKey": "small_brisk_pace_30703",
+   "tier": "small",
+   "effects": [
+    "quick_fill_streak:25"
+   ]
   },
   {
    "id": 30704,
    "x": 564,
    "y": 2798,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_30704",
-   "tier": "small"
+   "statKey": "small_brisk_pace_30704",
+   "tier": "small",
+   "effects": [
+    "damage_after_line:6"
+   ]
   },
   {
    "id": 30705,
@@ -13948,11 +14168,14 @@ export const TALENT_TREE_DATA = {
    "id": 30707,
    "x": 606,
    "y": 2586,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_30707",
-   "tier": "travel"
+   "statKey": "travel_study_habit_30707",
+   "tier": "travel",
+   "effects": [
+    "quiz_hint:8"
+   ]
   },
   {
    "id": 30708,
@@ -14270,21 +14493,27 @@ export const TALENT_TREE_DATA = {
    "id": 30731,
    "x": 1653,
    "y": 2245,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_aggravate_30731",
-   "tier": "small"
+   "statKey": "small_study_habit_30731",
+   "tier": "small",
+   "effects": [
+    "quiz_hint:8"
+   ]
   },
   {
    "id": 30732,
    "x": 1653,
    "y": 2285,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_30732",
-   "tier": "small"
+   "statKey": "small_tinkerer_30732",
+   "tier": "small",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 30733,
@@ -14850,7 +15079,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_swift_volley_30775",
    "effects": [
-    "projectile_speed:4"
+    "projectile_speed:4",
+    "mark_on_kill:6"
    ],
    "tier": "small"
   },
@@ -14916,7 +15146,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lesser_quick_strikes_30781",
    "effects": [
-    "melee_charge_speed_pct:4"
+    "melee_charge_speed_pct:4",
+    "time_on_elite:3"
    ],
    "tier": "small"
   },
@@ -16887,7 +17118,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_dagger_flurry_30944",
    "effects": [
     "dagger_damage_inc:8",
-    "dagger_charge_speed:4"
+    "dagger_charge_speed:4",
+    "first_step_time:4"
    ],
    "tier": "small"
   },
@@ -16907,21 +17139,27 @@ export const TALENT_TREE_DATA = {
    "id": 30946,
    "x": 2640,
    "y": -1173,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_30946",
-   "tier": "travel"
+   "statKey": "travel_neat_line_30946",
+   "tier": "travel",
+   "effects": [
+    "absorption_on_line:6"
+   ]
   },
   {
    "id": 30947,
    "x": 2587,
    "y": -1151,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_30947",
-   "tier": "travel"
+   "statKey": "travel_neat_line_30947",
+   "tier": "travel",
+   "effects": [
+    "life_on_line:5"
+   ]
   },
   {
    "id": 30948,
@@ -17097,41 +17335,53 @@ export const TALENT_TREE_DATA = {
    "id": 30961,
    "x": 2674,
    "y": -463,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_claws_30961",
-   "tier": "small"
+   "statKey": "small_tinkerer_30961",
+   "tier": "small",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 30962,
    "x": 2716,
    "y": -471,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_claws_30962",
-   "tier": "small"
+   "statKey": "small_tinkerer_30962",
+   "tier": "small",
+   "effects": [
+    "item_effect:8"
+   ]
   },
   {
    "id": 30963,
    "x": 2621,
    "y": -357,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_marked_damage_30963",
-   "tier": "small"
+   "statKey": "small_brisk_pace_30963",
+   "tier": "small",
+   "effects": [
+    "regen_low_time:20"
+   ]
   },
   {
    "id": 30964,
    "x": 2674,
    "y": -304,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_marked_damage_30964",
-   "tier": "small"
+   "statKey": "small_brisk_pace_30964",
+   "tier": "small",
+   "effects": [
+    "first_step_time:4"
+   ]
   },
   {
    "id": 30965,
@@ -17203,21 +17453,27 @@ export const TALENT_TREE_DATA = {
    "id": 30972,
    "x": 2428,
    "y": -60,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_flask_charges_30972",
-   "tier": "small"
+   "statKey": "small_brisk_pace_30972",
+   "tier": "small",
+   "effects": [
+    "first_step_time:4"
+   ]
   },
   {
    "id": 30973,
    "x": 2399,
    "y": -129,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_flask_charges_30973",
-   "tier": "small"
+   "statKey": "small_brisk_pace_30973",
+   "tier": "small",
+   "effects": [
+    "quick_fill_streak:25"
+   ]
   },
   {
    "id": 30974,
@@ -17303,21 +17559,27 @@ export const TALENT_TREE_DATA = {
    "id": 30980,
    "x": 2381,
    "y": 35,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_tincture_30980",
-   "tier": "small"
+   "statKey": "small_tinkerer_30980",
+   "tier": "small",
+   "effects": [
+    "item_effect:8"
+   ]
   },
   {
    "id": 30981,
    "x": 2430,
    "y": 68,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_tincture_30981",
-   "tier": "small"
+   "statKey": "small_tinkerer_30981",
+   "tier": "small",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 30982,
@@ -17342,7 +17604,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_quickening_30983",
    "effects": [
-    "melee_charge_speed_pct:4"
+    "melee_charge_speed_pct:4",
+    "freeze_timer_on_stun:1"
    ],
    "tier": "small"
   },
@@ -17596,7 +17859,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_bow_attack_speed_31007",
    "effects": [
-    "projectile_speed:5"
+    "projectile_speed:5",
+    "time_on_elite:3"
    ],
    "tier": "small"
   },
@@ -17630,11 +17894,14 @@ export const TALENT_TREE_DATA = {
    "id": 31010,
    "x": 2332,
    "y": 68,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_tincture_31010",
-   "tier": "small"
+   "statKey": "small_tinkerer_31010",
+   "tier": "small",
+   "effects": [
+    "pickup_lifetime:2"
+   ]
   },
   {
    "id": 31013,
@@ -17695,11 +17962,14 @@ export const TALENT_TREE_DATA = {
    "id": 31017,
    "x": 2520,
    "y": 1336,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31017",
-   "tier": "travel"
+   "statKey": "travel_brisk_pace_31017",
+   "tier": "travel",
+   "effects": [
+    "first_step_time:4"
+   ]
   },
   {
    "id": 31018,
@@ -17941,11 +18211,14 @@ export const TALENT_TREE_DATA = {
    "id": 31045,
    "x": 2791,
    "y": -1235,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_31045",
-   "tier": "small"
+   "statKey": "small_study_habit_31045",
+   "tier": "small",
+   "effects": [
+    "quiz_time:3"
+   ]
   },
   {
    "id": 40006,
@@ -18330,7 +18603,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_mysticism_20199",
    "effects": [
     "dual_spell_damage:20",
-    "dual_cast_speed:6"
+    "dual_cast_speed:6",
+    "quick_fill_streak:50"
    ],
    "tier": "notable"
   },
@@ -18459,11 +18733,15 @@ export const TALENT_TREE_DATA = {
    "id": 20214,
    "x": 1709,
    "y": -1417,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Unbroken Chain",
+   "nameDe": "Ununterbrochene Kette",
    "icon": "",
-   "statKey": "reserved_trap_mine_20214",
-   "tier": "notable"
+   "statKey": "notable_unbroken_chain_20214",
+   "tier": "notable",
+   "effects": [
+    "damage_flawless:6",
+    "armour_per_streak:20"
+   ]
   },
   {
    "id": 20215,
@@ -18518,7 +18796,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "phys_as_shadow:10",
     "melee_charge_speed_pct:4",
-    "cast_speed_pct:4"
+    "cast_speed_pct:4",
+    "time_on_kill:2"
    ],
    "tier": "notable"
   },
@@ -18559,7 +18838,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_elder_power_20222",
    "effects": [
-    "power_on_kill:10"
+    "power_on_kill:10",
+    "mark_on_kill:12"
    ],
    "tier": "notable"
   },
@@ -18858,7 +19138,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_cast_speed_and_spell_critical_strike_chance_31064",
    "effects": [
     "cast_speed_pct:3",
-    "spell_crit_chance:2"
+    "spell_crit_chance:2",
+    "quick_fill_streak:25"
    ],
    "tier": "small"
   },
@@ -18872,7 +19153,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_cast_speed_and_spell_critical_strike_chance_31065",
    "effects": [
     "cast_speed_pct:3",
-    "spell_crit_chance:2"
+    "spell_crit_chance:2",
+    "time_on_elite:3"
    ],
    "tier": "small"
   },
@@ -19043,7 +19325,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_dual_wield_attack_and_cast_speed_31077",
    "effects": [
     "dual_charge_speed:4",
-    "dual_cast_speed:4"
+    "dual_cast_speed:4",
+    "first_step_time:4"
    ],
    "tier": "small"
   },
@@ -19280,7 +19563,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_cast_speed_and_spell_mana_cost_efficiency_31095",
    "effects": [
-    "cast_speed_pct:3"
+    "cast_speed_pct:3",
+    "cell_on_kill:5"
    ],
    "tier": "small"
   },
@@ -19596,7 +19880,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_steady_cast_31119",
    "effects": [
-    "stun_avoid:15"
+    "stun_avoid:15",
+    "freeze_timer_on_stun:1"
    ],
    "tier": "small"
   },
@@ -19622,7 +19907,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_dual_wield_cast_speed_31121",
    "effects": [
-    "dual_cast_speed:3"
+    "dual_cast_speed:3",
+    "first_step_time:4"
    ],
    "tier": "small"
   },
@@ -19684,21 +19970,27 @@ export const TALENT_TREE_DATA = {
    "id": 31126,
    "x": 1665,
    "y": -1993,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_31126",
-   "tier": "small"
+   "statKey": "small_steady_run_31126",
+   "tier": "small",
+   "effects": [
+    "damage_flawless:3"
+   ]
   },
   {
    "id": 31127,
    "x": 1738,
    "y": -2042,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_31127",
-   "tier": "small"
+   "statKey": "small_steady_run_31127",
+   "tier": "small",
+   "effects": [
+    "damage_per_streak:4"
+   ]
   },
   {
    "id": 31128,
@@ -19722,7 +20014,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_poison_damage_and_cast_speed_31129",
    "effects": [
-    "cast_speed_pct:3"
+    "cast_speed_pct:3",
+    "cell_on_kill:5"
    ],
    "tier": "small"
   },
@@ -19769,101 +20062,131 @@ export const TALENT_TREE_DATA = {
    "id": 31133,
    "x": 1799,
    "y": -2239,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31133",
-   "tier": "travel"
+   "statKey": "travel_brisk_pace_31133",
+   "tier": "travel",
+   "effects": [
+    "damage_after_line:6"
+   ]
   },
   {
    "id": 31134,
    "x": 1819,
    "y": -2300,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31134",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31134",
+   "tier": "small",
+   "effects": [
+    "first_step_time:4"
+   ]
   },
   {
    "id": 31135,
    "x": 1779,
    "y": -2300,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31135",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31135",
+   "tier": "small",
+   "effects": [
+    "quick_fill_streak:25"
+   ]
   },
   {
    "id": 31136,
    "x": 1746,
    "y": -2349,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31136",
-   "tier": "travel"
+   "statKey": "travel_brisk_pace_31136",
+   "tier": "travel",
+   "effects": [
+    "first_step_time:4"
+   ]
   },
   {
    "id": 31137,
    "x": 1697,
    "y": -2391,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31137",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31137",
+   "tier": "small",
+   "effects": [
+    "damage_low_time:4"
+   ]
   },
   {
    "id": 31138,
    "x": 1697,
    "y": -2307,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31138",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31138",
+   "tier": "small",
+   "effects": [
+    "regen_low_time:20"
+   ]
   },
   {
    "id": 31139,
    "x": 1852,
    "y": -2349,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31139",
-   "tier": "travel"
+   "statKey": "travel_brisk_pace_31139",
+   "tier": "travel",
+   "effects": [
+    "regen_low_time:20"
+   ]
   },
   {
    "id": 31140,
    "x": 1901,
    "y": -2307,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31140",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31140",
+   "tier": "small",
+   "effects": [
+    "damage_low_time:4"
+   ]
   },
   {
    "id": 31141,
    "x": 1901,
    "y": -2391,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31141",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31141",
+   "tier": "small",
+   "effects": [
+    "damage_after_line:6"
+   ]
   },
   {
    "id": 31142,
    "x": 1799,
    "y": -2459,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31142",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31142",
+   "tier": "small",
+   "effects": [
+    "quick_fill_streak:25"
+   ]
   },
   {
    "id": 31148,
@@ -20114,7 +20437,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "melee_charge_speed_pct:3",
     "cast_speed_pct:3",
-    "phys_damage_inc:8"
+    "phys_damage_inc:8",
+    "freeze_timer_on_stun:1"
    ],
    "tier": "small"
   },
@@ -20129,7 +20453,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "melee_charge_speed_pct:3",
     "cast_speed_pct:3",
-    "phys_damage_inc:8"
+    "phys_damage_inc:8",
+    "time_on_elite:3"
    ],
    "tier": "small"
   },
@@ -20166,21 +20491,27 @@ export const TALENT_TREE_DATA = {
    "id": 31174,
    "x": 2099,
    "y": -1895,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_trap_cooldown_31174",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31174",
+   "tier": "small",
+   "effects": [
+    "first_step_time:4"
+   ]
   },
   {
    "id": 31175,
    "x": 2001,
    "y": -1895,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_trap_cooldown_31175",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31175",
+   "tier": "small",
+   "effects": [
+    "quick_fill_streak:25"
+   ]
   },
   {
    "id": 31176,
@@ -20241,31 +20572,40 @@ export const TALENT_TREE_DATA = {
    "id": 31180,
    "x": 1815,
    "y": -1417,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_trap_mine_31180",
-   "tier": "small"
+   "statKey": "small_steady_run_31180",
+   "tier": "small",
+   "effects": [
+    "armour_per_streak:10"
+   ]
   },
   {
    "id": 31181,
    "x": 1762,
    "y": -1364,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_trap_mine_31181",
-   "tier": "small"
+   "statKey": "small_steady_run_31181",
+   "tier": "small",
+   "effects": [
+    "block_flawless:3"
+   ]
   },
   {
    "id": 31182,
    "x": 1762,
    "y": -1470,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_trap_mine_31182",
-   "tier": "small"
+   "statKey": "small_steady_run_31182",
+   "tier": "small",
+   "effects": [
+    "damage_per_streak:4"
+   ]
   },
   {
    "id": 31183,
@@ -20683,21 +21023,27 @@ export const TALENT_TREE_DATA = {
    "id": 31227,
    "x": 49,
    "y": -1630,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_31227",
-   "tier": "travel"
+   "statKey": "travel_study_habit_31227",
+   "tier": "travel",
+   "effects": [
+    "quiz_hint:8"
+   ]
   },
   {
    "id": 31228,
    "x": -51,
    "y": -1630,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_31228",
-   "tier": "travel"
+   "statKey": "travel_study_habit_31228",
+   "tier": "travel",
+   "effects": [
+    "quiz_time:3"
+   ]
   },
   {
    "id": 31229,
@@ -21300,11 +21646,14 @@ export const TALENT_TREE_DATA = {
    "id": 31286,
    "x": -726,
    "y": -2308,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_31286",
-   "tier": "small"
+   "statKey": "small_tinkerer_31286",
+   "tier": "small",
+   "effects": [
+    "pickup_lifetime:2"
+   ]
   },
   {
    "id": 31287,
@@ -21457,7 +21806,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_cast_speed_31298",
    "effects": [
-    "cast_speed_pct:4"
+    "cast_speed_pct:4",
+    "mark_on_kill:6"
    ],
    "tier": "small"
   },
@@ -21470,7 +21820,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_cast_speed_31299",
    "effects": [
-    "cast_speed_pct:4"
+    "cast_speed_pct:4",
+    "time_on_kill:1"
    ],
    "tier": "small"
   },
@@ -22111,21 +22462,27 @@ export const TALENT_TREE_DATA = {
    "id": 31347,
    "x": -1781,
    "y": -1954,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_31347",
-   "tier": "small"
+   "statKey": "small_steady_run_31347",
+   "tier": "small",
+   "effects": [
+    "armour_per_streak:10"
+   ]
   },
   {
    "id": 31348,
    "x": -1743,
    "y": -1969,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_31348",
-   "tier": "small"
+   "statKey": "small_steady_run_31348",
+   "tier": "small",
+   "effects": [
+    "block_flawless:3"
+   ]
   },
   {
    "id": 31349,
@@ -22155,41 +22512,53 @@ export const TALENT_TREE_DATA = {
    "id": 31351,
    "x": -1615,
    "y": -2427,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_31351",
-   "tier": "small"
+   "statKey": "small_neat_line_31351",
+   "tier": "small",
+   "effects": [
+    "mana_on_line:3"
+   ]
   },
   {
    "id": 31352,
    "x": -1562,
    "y": -2374,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_31352",
-   "tier": "small"
+   "statKey": "small_neat_line_31352",
+   "tier": "small",
+   "effects": [
+    "life_on_line:5"
+   ]
   },
   {
    "id": 31356,
    "x": -1325,
    "y": -2614,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_31356",
-   "tier": "small"
+   "statKey": "small_trophy_31356",
+   "tier": "small",
+   "effects": [
+    "time_on_kill:1"
+   ]
   },
   {
    "id": 31357,
    "x": -1252,
    "y": -2565,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trophy",
+   "nameDe": "Trophäe",
    "icon": "",
-   "statKey": "reserved_reserved_node_31357",
-   "tier": "small"
+   "statKey": "small_trophy_31357",
+   "tier": "small",
+   "effects": [
+    "time_on_elite:3"
+   ]
   },
   {
    "id": 31358,
@@ -22208,51 +22577,66 @@ export const TALENT_TREE_DATA = {
    "id": 31359,
    "x": -1127,
    "y": -2573,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_31359",
-   "tier": "travel"
+   "statKey": "travel_neat_line_31359",
+   "tier": "travel",
+   "effects": [
+    "absorption_on_line:6"
+   ]
   },
   {
    "id": 31360,
    "x": -1087,
    "y": -2573,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_31360",
-   "tier": "small"
+   "statKey": "small_neat_line_31360",
+   "tier": "small",
+   "effects": [
+    "life_on_line:5"
+   ]
   },
   {
    "id": 31361,
    "x": -1054,
    "y": -2622,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_31361",
-   "tier": "small"
+   "statKey": "small_neat_line_31361",
+   "tier": "small",
+   "effects": [
+    "absorption_on_line:6"
+   ]
   },
   {
    "id": 31362,
    "x": -1127,
    "y": -2671,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_31362",
-   "tier": "small"
+   "statKey": "small_neat_line_31362",
+   "tier": "small",
+   "effects": [
+    "mana_on_line:3"
+   ]
   },
   {
    "id": 31363,
    "x": -1160,
    "y": -2622,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Neat Line",
+   "nameDe": "Saubere Zeile",
    "icon": "",
-   "statKey": "reserved_reserved_node_31363",
-   "tier": "small"
+   "statKey": "small_neat_line_31363",
+   "tier": "small",
+   "effects": [
+    "charge_on_line:6"
+   ]
   },
   {
    "id": 31364,
@@ -22642,41 +23026,53 @@ export const TALENT_TREE_DATA = {
    "id": 31393,
    "x": 300,
    "y": -2332,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_31393",
-   "tier": "small"
+   "statKey": "small_study_habit_31393",
+   "tier": "small",
+   "effects": [
+    "quiz_retry:10"
+   ]
   },
   {
    "id": 31394,
    "x": 300,
    "y": -2292,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Study Habit",
+   "nameDe": "Lerngewohnheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_31394",
-   "tier": "small"
+   "statKey": "small_study_habit_31394",
+   "tier": "small",
+   "effects": [
+    "quiz_hint:8"
+   ]
   },
   {
    "id": 31395,
    "x": 225,
    "y": -2342,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_31395",
-   "tier": "small"
+   "statKey": "small_steady_run_31395",
+   "tier": "small",
+   "effects": [
+    "block_flawless:3"
+   ]
   },
   {
    "id": 31396,
    "x": 192,
    "y": -2391,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Run",
+   "nameDe": "Stetiger Lauf",
    "icon": "",
-   "statKey": "reserved_reserved_node_31396",
-   "tier": "small"
+   "statKey": "small_steady_run_31396",
+   "tier": "small",
+   "effects": [
+    "armour_per_streak:10"
+   ]
   },
   {
    "id": 31397,
@@ -23028,11 +23424,14 @@ export const TALENT_TREE_DATA = {
    "id": 31423,
    "x": 744,
    "y": -2562,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Resilience",
+   "nameDe": "Widerstandskraft",
    "icon": "",
-   "statKey": "reserved_reserved_node_31423",
-   "tier": "small"
+   "statKey": "small_resilience_31423",
+   "tier": "small",
+   "effects": [
+    "mistake_heal:6"
+   ]
   },
   {
    "id": 31424,
@@ -23075,21 +23474,27 @@ export const TALENT_TREE_DATA = {
    "id": 31427,
    "x": 444,
    "y": -2391,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31427",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31427",
+   "tier": "small",
+   "effects": [
+    "first_step_time:4"
+   ]
   },
   {
    "id": 31428,
    "x": 444,
    "y": -2351,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Brisk Pace",
+   "nameDe": "Zügiges Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31428",
-   "tier": "small"
+   "statKey": "small_brisk_pace_31428",
+   "tier": "small",
+   "effects": [
+    "quick_fill_streak:25"
+   ]
   },
   {
    "id": 31429,
@@ -23414,21 +23819,27 @@ export const TALENT_TREE_DATA = {
    "id": 31453,
    "x": -1656,
    "y": -1340,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_31453",
-   "tier": "small"
+   "statKey": "small_tinkerer_31453",
+   "tier": "small",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 31454,
    "x": -1623,
    "y": -1389,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_31454",
-   "tier": "small"
+   "statKey": "small_tinkerer_31454",
+   "tier": "small",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 31455,
@@ -23447,51 +23858,66 @@ export const TALENT_TREE_DATA = {
    "id": 31456,
    "x": -1550,
    "y": -1340,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_31456",
-   "tier": "small"
+   "statKey": "small_tinkerer_31456",
+   "tier": "small",
+   "effects": [
+    "item_effect:8"
+   ]
   },
   {
    "id": 31457,
    "x": -1481,
    "y": -1340,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_31457",
-   "tier": "small"
+   "statKey": "small_tinkerer_31457",
+   "tier": "small",
+   "effects": [
+    "item_effect:8"
+   ]
   },
   {
    "id": 31458,
    "x": -1448,
    "y": -1291,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_31458",
-   "tier": "small"
+   "statKey": "small_tinkerer_31458",
+   "tier": "small",
+   "effects": [
+    "item_drop:15"
+   ]
   },
   {
    "id": 31459,
    "x": -1408,
    "y": -1291,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_31459",
-   "tier": "small"
+   "statKey": "small_tinkerer_31459",
+   "tier": "small",
+   "effects": [
+    "pickup_lifetime:2"
+   ]
   },
   {
    "id": 31460,
    "x": -1375,
    "y": -1340,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_31460",
-   "tier": "small"
+   "statKey": "small_tinkerer_31460",
+   "tier": "small",
+   "effects": [
+    "pickup_lifetime:2"
+   ]
   },
   {
    "id": 31461,
@@ -23510,11 +23936,14 @@ export const TALENT_TREE_DATA = {
    "id": 31462,
    "x": -1623,
    "y": -1291,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tinkerer",
+   "nameDe": "Tüftler",
    "icon": "",
-   "statKey": "reserved_reserved_node_31462",
-   "tier": "small"
+   "statKey": "small_tinkerer_31462",
+   "tier": "small",
+   "effects": [
+    "item_effect:8"
+   ]
   },
   {
    "id": 31463,

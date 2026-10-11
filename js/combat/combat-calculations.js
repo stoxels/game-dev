@@ -27,7 +27,7 @@ export function _egCrossoverDamageMult(stats) {
 
     const perStreak = Number(stats.damagePerStreakPct) || 0;
     if (perStreak > 0) {
-        const steps = Math.floor((Number(globalThis.consecutiveCorrectFills) || 0) / 10);
+        const steps = Math.floor((Number(flags && flags.fillRun) || 0) / 10);
         mult *= 1 + (perStreak * steps) / 100;
     }
 

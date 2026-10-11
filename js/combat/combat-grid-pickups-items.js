@@ -79,7 +79,10 @@ export function _egSpawnItemDrop(isBoss = false) {
 
     const baseItemChance = isBoss ? EG_ITEM_DROP_CHANCE_BOSS : EG_ITEM_DROP_CHANCE_NORMAL;
     const itemQtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
-    const dropChance = Math.min(1, baseItemChance * itemQtyMult);
+    // item_drop (passive tree): increased chance for puzzle Items to drop.
+    const treeDropPct = typeof globalThis._egComputePlayerStats === 'function'
+        ? (Number(globalThis._egComputePlayerStats().itemDropPct) || 0) : 0;
+    const dropChance = Math.min(1, baseItemChance * itemQtyMult * (1 + treeDropPct / 100));
     if (Math.random() > dropChance) return;
 
     // One regular-item drop on the board at a time.

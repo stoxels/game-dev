@@ -719,11 +719,7 @@ export const PT_CROSSOVER_EFFECT_KEYS = Object.freeze([
 // hook is not written yet. The integrity suite fails if any tree node uses
 // one of these, so a node can never advertise a stat that does nothing.
 // Remove a key from this list in the same change that wires it.
-export const PT_UNWIRED_EFFECT_KEYS = Object.freeze([
-    'time_on_kill', 'time_on_elite', 'freeze_timer_on_stun', 'cell_on_kill',
-    'mark_on_kill', 'quick_fill_streak', 'first_step_time',
-    'quiz_hint', 'quiz_retry', 'quiz_time', 'item_drop', 'item_effect',
-]);
+export const PT_UNWIRED_EFFECT_KEYS = Object.freeze([]);
 
 // Splits "key:value" (or a bare "key" = value 1) into its parts.
 // Returns null for unknown keys so a typo can never grant a silent zero.
@@ -800,6 +796,22 @@ const PT_EFFECT_ICON_RULES = [
     [/^(wind_dancer|ghost_|dodge|evasion|agi|agility|cannot_evade)/, '💨'],
     [/^(timer_start|time_added)/, '⏰'],
     [/^mistake_(count|not_count)/, '🛟'],
+    [/^quiz_(hint|retry)/, '🎓'],
+    [/^quiz_time/, '⏳'],
+    [/^item_drop/, '🎁'],
+    [/^item_effect/, '🧰'],
+    [/^pickup_lifetime/, '🕰️'],
+    [/^lucky_tile_reward/, '🍀'],
+    [/^(time_on_kill|time_on_elite)/, '⌛'],
+    [/^cell_on_kill/, '🔎'],
+    [/^mark_on_kill/, '✖️'],
+    [/^first_step_time/, '👣'],
+    [/^quick_fill_streak/, '⚡'],
+    [/^regen_low_time/, '🩹'],
+    [/^mistake_heal/, '💞'],
+    [/^charge_on_line/, '🔋'],
+    [/^reveal_projectile_damage/, '🎯'],
+    [/^damage_(per_streak|flawless|low_time|after_line|on_mistake)/, '🗡️'],
     [/leech/, '🧛'],
     [/^(bleed|crit_multi_vs_bleeding|crit_vs_bleeding|ward_bleed|avoid_bleed)/, '🩸'],
     [/^(crush|ignore_phys_reduction)/, '🔨'],
