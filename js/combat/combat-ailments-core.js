@@ -1,7 +1,8 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _uspBuildSupportStatusIconsHTML, _uspSupportStatusSignature } from '../skills/universal-spells.js';
-import { isHoldCasting } from '../skills/spell-casttime.js';
+import { cancelHoldCast, isHoldCasting } from '../skills/spell-casttime.js';
+import { t } from '../translation/translations.js';
 import { _egMaybeShowAbsorptionBroken } from './encounter-overlays.js';
 import { _egGameOver, _egKillMonster, _egPlayerTakeDamage, _egShowDamageNumber } from './encounter.js';
 import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
@@ -106,6 +107,7 @@ const EG_AILMENT_ICONS = {
     polymorph: '🌀',
     confused: '❓',
     blind: '🕶️',
+    stunned: '💫',
 };
 
 // The display name of an ailment. Only shadowburn needs the mapping (it is
@@ -209,6 +211,57 @@ function _egApplyMonsterAilment(monster, key, dps) {
 }
 
 // Applies an ailment to the player (or refreshes an existing one).
+//------------------------------------------------------------------------
+//-------------------PLAYER STUN------------------------------------------
+//------------------------------------------------------------------------
+// A heavy hit (>= EG_AIL_STUN_MIN_RATIO of max Life after mitigation) can stun
+// the hero; effects can also force a stun (opts.stun on the damage call or
+// _egStunPlayer directly). Stunned: the melee charge bar and holds are
+// interrupted and spells cannot be cast for EG_AIL_STUN_DURATION_S. Stun
+// avoidance (stunAvoidPct) can negate it, and "Stun and Block Recovery"
+// (blockRecoveryPct) shortens it. A short immunity prevents stun-locking.
+const EG_AIL_STUN_DURATION_S = 1.0;
+const EG_AIL_STUN_IMMUNE_MS = 1500;
+const EG_AIL_STUN_MIN_RATIO = 0.08;
+const EG_AIL_STUN_CHANCE_PER_LIFE_PCT = 2;
+const EG_AIL_STUN_MAX_CHANCE_PCT = 60;
+let _egStunImmuneUntil = 0;
+
+// Pure: stun chance (%) of a hit that took `lost` of `maxHP` Life.
+function _egStunChanceFromHit(lost, maxHP) {
+    if (!(maxHP > 0) || !(lost > 0)) return 0;
+    const ratio = lost / maxHP;
+    if (ratio < EG_AIL_STUN_MIN_RATIO) return 0;
+    return Math.min(EG_AIL_STUN_MAX_CHANCE_PCT, ratio * 100 * EG_AIL_STUN_CHANCE_PER_LIFE_PCT);
+}
+
+function _egStunPlayer(durationS = EG_AIL_STUN_DURATION_S) {
+    if (!_egIsActive()) return false;
+    const now = Date.now();
+    if (_egPlayerHasAilment('stunned') || now < _egStunImmuneUntil) return false;
+    let st = {};
+    try { st = _egComputePlayerStats(); } catch (e) { st = {}; }
+    const avoid = Math.min(90, Math.max(0, Number(st.stunAvoidPct) || 0));
+    if (avoid > 0 && Math.random() * 100 < avoid) return false;
+    const recovery = 1 + Math.max(0, Number(st.blockRecoveryPct) || 0) / 100;
+    const d = Math.max(0.3, durationS / recovery);
+    _egStunImmuneUntil = now + d * 1000 + EG_AIL_STUN_IMMUNE_MS;
+    _egApplyStatusToMap(_egPlayerStatuses, 'stunned', d);
+    _egStartPlayerStatusBarTicker();
+    // Interrupt: the charge bar restarts and a running hold-cast is lost.
+    globalThis._egPlayerCurrentCharge = 0;
+    globalThis._egPlayerStunnedUntil = now + d * 1000;
+    try { if (typeof isHoldCasting === 'function' && isHoldCasting()) cancelHoldCast(); } catch (e) { /* best-effort */ }
+    globalThis.showToast(t('eg_stunned'));
+    return true;
+}
+
+// Called after a hit's Life damage lands: rolls the damage-based stun.
+function _egRollPlayerStunFromHit(lost) {
+    const chance = _egStunChanceFromHit(lost, globalThis.playerMaxHP);
+    if (chance > 0 && Math.random() * 100 < chance) _egStunPlayer();
+}
+
 function _egApplyPlayerAilment(key, dps) {
     const durationS = ({
         ignite: EG_AIL_IGNITE_DURATION_S,
@@ -347,7 +400,7 @@ function _egPlayerHasAilment(key) {
 // Charge-bar rate multiplier for the PLAYER (chill/frozen).
 function _egGetPlayerChargeMultiplier() {
     if (!_egIsActive()) return 1;
-    if (_egPlayerHasAilment('frozen')) return 0;
+    if (_egPlayerHasAilment('frozen') || _egPlayerHasAilment('stunned')) return 0;
     // Active map run: a permanent icy aura chills the player.
     if (typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_chilling_aura')) {
         return EG_AIL_CHARGE_SLOW_MULT;
@@ -957,6 +1010,10 @@ export {
     EG_ICE_SLIP_CHANCE,
     EG_SHOCK_MARK_STRIP_CHANCE,
     _egApplyPlayerAilment,
+    _egStunPlayer,
+    _egStunChanceFromHit,
+    _egRollPlayerStunFromHit,
+    EG_AIL_STUN_DURATION_S,
     _egEnsurePlayerStatusBar,
     _egIsPolymorphActive,
     _egGetPolymorphVictim,

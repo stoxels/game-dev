@@ -1,6 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _egCalcPlayerMeleeDamage, _egLastMeleeElements, _egLastMeleeWasCrit } from './combat-calculations.js';
+import { _egSecondaryDamage } from './combat-calculations-resistances.js';
 import { _egGetElementCentre } from './combat-class-projectiles.js';
 import { _egPlayerTakeDamage } from './encounter-damage.js';
 import { _egDamageTargetById, _egShowStatusLabel } from './encounter-monster-damage.js';
@@ -202,7 +203,7 @@ export function _egTryCleaveHit(targetId, dmg = _egCurrentMeleeDamage(), element
         const card = document.getElementById(`eg-card-${m.id}`);
         if (card) _egRestartFlashClass(card, 'eg-flash-cleave');
         const wasCrit = (typeof _egLastMeleeWasCrit !== 'undefined') ? _egLastMeleeWasCrit : false;
-        _egDamageTargetById(m.id, dmg, elements, { isCrit: wasCrit });
+        _egDamageTargetById(m.id, _egSecondaryDamage(dmg, 'cleave', stats), elements, { isCrit: wasCrit });
     });
 }
 

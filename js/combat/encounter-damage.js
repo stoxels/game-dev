@@ -26,7 +26,7 @@ import { _egDamageTargetById } from './encounter-monster-damage.js';
 import { EG_FORTIFY_DR_PER_STACK, _egArmRiposte, _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainPowerCharge, _egGetFortifyStacks, _egRageOnPlayerHit } from './combat-ailments-state.js';
 import { _egApplyPlayerParryFeedback, _egGetDualWieldParryChancePct, _egGetParryChancePct, _egIsDualWieldParryActive, _egRollFateNegation, _egTryDeflectProjectile } from './encounter-player-mitigation.js';
 import { _egGetEncounterBaseLevel } from './encounter-spawn-rules.js';
-import { _egApplyPlayerShockAmp, _egRollMonsterHitAilment } from './combat-ailments-core.js';
+import { _egApplyPlayerShockAmp, _egRollMonsterHitAilment, _egRollPlayerStunFromHit, _egStunPlayer } from './combat-ailments-core.js';
 import { _egCalcPlayerResistanceReduction } from './combat-calculations-resistances.js';
 import { _egMaybeShowAbsorptionBroken } from './encounter-overlays.js';
 import { _egRenderPanel } from './encounter.js';
@@ -391,6 +391,11 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
 
     globalThis.playerCurrentHP = Math.max(0, globalThis.playerCurrentHP - mitigated);
     globalThis._egLastHitTakenAt = Date.now();
+    // Stun: forced by the source (opts.stun) or rolled from how much Life the hit took.
+    if (globalThis.playerCurrentHP > 0) {
+        if (opts && opts.stun) _egStunPlayer();
+        else _egRollPlayerStunFromHit(mitigated);
+    }
     if ((Number(stats.enduranceWhenHitPct) || 0) > 0 && Math.random() * 100 < Math.min(100, stats.enduranceWhenHitPct)) {
         _egGainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
     }

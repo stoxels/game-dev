@@ -130,6 +130,21 @@ export function _egLeechAbsorption(stats, dmg, pct) {
     return whole;
 }
 
+// Secondary hits (pierce, chain, fork, splash, multishot, cleave) deal only a share
+// of the primary hit; the tree's "Damage of Secondary hits" line restores it.
+export const EG_SECONDARY_EFFECTIVENESS = Object.freeze({
+    pierce: 0.7, chain: 0.7, fork: 0.6, multishot: 0.6, splash: 0.5, cleave: 0.5,
+});
+// Each further chain bounce keeps this share of the previous bounce.
+export const EG_CHAIN_FALLOFF = 0.85;
+
+export function _egSecondaryDamage(base, kind, stats, bounce = 0) {
+    const eff = EG_SECONDARY_EFFECTIVENESS[kind] || 1;
+    const inc = 1 + Math.max(0, Number(stats && stats.secondaryDamagePct) || 0) / 100;
+    const fall = kind === 'chain' ? Math.pow(EG_CHAIN_FALLOFF, Math.max(0, bounce)) : 1;
+    return Math.max(1, Math.round(base * eff * inc * fall));
+}
+
 // Mana leech (tree, attack hits): `pct` of the hit's damage becomes Mana, scaled by the
 // leech-effect line. Sub-point amounts accumulate like the Absorption leech.
 let _manaLeechRemainder = 0;

@@ -1,7 +1,7 @@
 import { t } from '../translation/translations.js';
 import { _egIsPolymorphActive } from './combat-ailments-core.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
-import { EG_ELEMENTS } from './combat-calculations-resistances.js';
+import { EG_ELEMENTS, _egSecondaryDamage } from './combat-calculations-resistances.js';
 import { EG_MONSTER_PROJ_DURATION_MS, _egAnimatePlayerProjectile, _egPlayerTakeDamage } from './encounter.js';
 import { _egApplyPlayerHitFeedback } from './encounter-monster-attack-feedback.js';
 import { _egShowStatusLabel } from './encounter-monster-damage.js';
@@ -220,7 +220,7 @@ export function _egReleaseChargedShot() {
 // living monster (falls back to the primary target when it's the only one).
 export function _egTryMultishot(damage, primaryTargetId, elements, sourceEl, wasCrit) {
     const stats = _egComputePlayerStats();
-    const multishotPct = stats.multishotPct || 0;
+    const multishotPct = (stats.multishotPct || 0) + (stats.multishotChanceTreePct || 0);
     if (multishotPct <= 0 || Math.random() * 100 >= multishotPct) return;
 
     const others = globalThis._egMonsters.filter(m => m.id !== primaryTargetId);
@@ -229,7 +229,7 @@ export function _egTryMultishot(damage, primaryTargetId, elements, sourceEl, was
         : primaryTargetId;
     if (!targetId) return;
 
-    _egAnimatePlayerProjectile(Math.round(damage), targetId, undefined, undefined, sourceEl, 1.2, elements, { isCrit: !!wasCrit });
+    _egAnimatePlayerProjectile(_egSecondaryDamage(damage, 'multishot', stats), targetId, undefined, undefined, sourceEl, 1.2, elements, { isCrit: !!wasCrit });
 }
 
 

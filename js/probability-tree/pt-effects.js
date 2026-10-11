@@ -530,6 +530,16 @@ export const PT_EFFECT_DEFS = Object.freeze({
     leech_effect_recent_crit: { channel: 'leechEffectRecentCritPct', en: '{v}% increased Life recovered from Leech if you dealt a Critical Strike Recently', de: '{v}% erhöhtes Leben aus Entzug, wenn du kürzlich kritisch getroffen hast' },
     wand_phys_as_lightning: { channel: 'wandPhysAsLightningPct', en: 'Gain {v}% of Wand physical Damage as extra Lightning Damage', de: 'Erhalte {v}% des physischen Zauberstabschadens als zusätzlichen Blitzschaden' },
     bow_aoe: { channel: 'bowAoePct', en: '{v}% increased Area of Effect while wielding a Bow', de: '{v}% vergrößerter Wirkungsbereich mit Bogen' },
+    // Phase C-3 (batch 36): projectile secondary hits - secondary damage,
+    // pierce, chain, fork and multishot tree lines.
+    secondary_damage: { channel: 'secondaryDamagePct', en: '{v}% increased Damage of Secondary hits', de: '{v}% erhöhter Schaden von Sekundärtreffern' },
+    pierce_chance: { channel: 'pierceChanceTreePct', en: '+{v}% Chance for Projectiles to Pierce', de: '+{v}% Chance, dass Projektile durchbohren' },
+    pierce_targets: { channel: 'pierceTargetsExtra', en: 'Projectiles Pierce +{v} additional Targets', de: 'Projektile durchbohren +{v} zusätzliche Ziele' },
+    chain_chance: { channel: 'chainChanceTreePct', en: '+{v}% Chance for Projectiles to Chain', de: '+{v}% Chance, dass Projektile überspringen' },
+    chain_count: { channel: 'chainCountExtra', en: 'Projectiles Chain +{v} additional times', de: 'Projektile springen +{v} zusätzliche Male über' },
+    fork_chance: { channel: 'forkChancePct', en: '{v}% Chance for Projectile hits to Fork to 2 other enemies', de: '{v}% Chance, dass Projektiltreffer sich auf 2 weitere Gegner gabeln' },
+    fork_extra: { channel: 'forkExtraChancePct', en: '+{v}% Chance for a Fork to hit one additional enemy', de: '+{v}% Chance, dass eine Gabelung einen weiteren Gegner trifft' },
+    multishot_chance: { channel: 'multishotChanceTreePct', en: '+{v}% Chance to fire an additional Projectile', de: '+{v}% Chance auf ein zusätzliches Projektil' },
     avoid_ailment_casting: { channel: 'castingAilmentAvoidPct', en: '{v}% Chance to Avoid Ailments while Casting', de: '{v}% Chance, Statuseffekte beim Zaubern zu vermeiden' },
     // Level-start timer bonus (nodes 31211/31215/31216): read by the _initTimer
     // patch in probability-tree-expansion.js via _egGetTreeTimerStartSecs().

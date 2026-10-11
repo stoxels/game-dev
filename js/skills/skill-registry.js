@@ -867,6 +867,11 @@ export function activateSkill(skillId) {
         }
         return false;
     }
+    // Stunned heroes cannot cast (the stun interrupts and locks actions briefly).
+    if (Date.now() < (Number(globalThis._egPlayerStunnedUntil) || 0)) {
+        if (typeof globalThis.showToast === 'function') globalThis.showToast(t('eg_stunned'), '#ff6b9d');
+        return false;
+    }
     // Remember the casting skill so its charm orb bonus reaches the reveal
     // projectiles it fires (see getCharmCastingDamageMult).
     noteCharmCast(skillId);

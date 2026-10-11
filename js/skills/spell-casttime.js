@@ -271,7 +271,7 @@ function releaseHoldCast(source, slotIndex) {
 
 
 // Cancels the running hold (drag-away, death, manual cancel). Never spends.
-function cancelHoldCast() {
+export function cancelHoldCast() {
     const h = _holdCast;
     _holdCast = null;
     _holdCastHide(true);

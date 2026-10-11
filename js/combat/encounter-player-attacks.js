@@ -16,7 +16,7 @@ import { _egPlayerTakeDamage } from './encounter-damage.js';
 import { _egDamageTargetById, _egShowStatusLabel } from './encounter-monster-damage.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
 import { _egCalcPlayerDamage, _egLastHitElements, _egLastHitWasCrit } from './combat-calculations.js';
-import { EG_ELEMENTS } from './combat-calculations-resistances.js';
+import { EG_ELEMENTS, _egSecondaryDamage } from './combat-calculations-resistances.js';
 import { _egRestartFlashClass } from './encounter.js';
 import { _egGetActiveMapModValue, _egMapPlayerProjectileMult } from '../endgame/endgame-map-launch.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
@@ -282,34 +282,64 @@ export function _egResolveProjectileImpact(damage, targetId, elements, opts) {
 
     if (!target) return;
 
+    const secStats = _egComputePlayerStats();
+    const secCrit = { isCrit: !!(opts && opts.isCrit) };
+    // Picks up to `count` distinct living victims (not in `skip`), random order.
+    const pickVictims = (count, skip, pool) => {
+        const cand = pool.filter(m => !skip.has(m.id));
+        const out = [];
+        while (out.length < count && cand.length) out.push(cand.splice(Math.floor(Math.random() * cand.length), 1)[0]);
+        return out;
+    };
+    const hitSet = new Set([targetId]);
+
     // Splash: hits all OTHER monsters sharing the target's spawn location
-    const splashPct = _egComputePlayerStats().splashPct || 0;
+    const splashPct = secStats.splashPct || 0;
     if (splashPct > 0 && Math.random() * 100 < splashPct) {
         globalThis._egMonsters.filter(m => m.id !== targetId && m.zoneId === target.zoneId).forEach(m => {
             const card = document.getElementById(`eg-card-${m.id}`);
             if (card) _egRestartFlashClass(card, 'eg-flash-damage');
-            _egDamageTargetById(m.id, finalDamage, elements, { isCrit: !!(opts && opts.isCrit) });
+            _egDamageTargetById(m.id, _egSecondaryDamage(finalDamage, 'splash', secStats), elements, secCrit);
         });
     }
 
-    // Chain: bounces to one additional monster in a different spawn location
-    const chainPct = _egComputePlayerStats().chainPct || 0;
+    // Chain: bounces to an additional monster in a different spawn location, then
+    // (tree: chain count) on to further ones, each bounce weaker than the last.
+    const chainPct = (secStats.chainPct || 0) + (secStats.chainChanceTreePct || 0);
     if (chainPct > 0 && Math.random() * 100 < chainPct) {
-        const others = globalThis._egMonsters.filter(m => m.id !== targetId && m.zoneId !== target.zoneId);
-        if (others.length) {
-            const victim = others[Math.floor(Math.random() * others.length)];
-            _egDamageTargetById(victim.id, finalDamage, elements, { isCrit: !!(opts && opts.isCrit) });
+        const bounces = 1 + Math.max(0, Math.floor(secStats.chainCountExtra || 0));
+        let fromZone = target.zoneId;
+        for (let b = 0; b < bounces; b++) {
+            let victim = pickVictims(1, hitSet, globalThis._egMonsters.filter(m => m.zoneId !== fromZone))[0]
+                || pickVictims(1, hitSet, globalThis._egMonsters)[0];
+            if (!victim) break;
+            hitSet.add(victim.id);
+            fromZone = victim.zoneId;
+            _egDamageTargetById(victim.id, _egSecondaryDamage(finalDamage, 'chain', secStats, b), elements, secCrit);
         }
     }
 
-    // Pierce: punches through to one additional monster anywhere on the field
-    // (does not chain further - only one extra target per shot)
-    const piercePct = _egComputePlayerStats().piercePct || 0;
+    // Pierce: punches through to additional monsters anywhere on the field
+    // (one extra target, plus the tree's additional targets).
+    const piercePct = (secStats.piercePct || 0) + (secStats.pierceChanceTreePct || 0);
     if (piercePct > 0 && Math.random() * 100 < piercePct) {
-        const others = globalThis._egMonsters.filter(m => m.id !== targetId);
-        if (others.length) {
-            const victim = others[Math.floor(Math.random() * others.length)];
-            _egDamageTargetById(victim.id, finalDamage, elements, { isCrit: !!(opts && opts.isCrit) });
-        }
+        const targets = 1 + Math.max(0, Math.floor(secStats.pierceTargetsExtra || 0));
+        pickVictims(targets, hitSet, globalThis._egMonsters).forEach((victim) => {
+            hitSet.add(victim.id);
+            _egDamageTargetById(victim.id, _egSecondaryDamage(finalDamage, 'pierce', secStats), elements, secCrit);
+        });
+    }
+
+    // Fork (tree only): the hit forks to 2 other enemies, 3 with the extra-fork chance.
+    const forkPct = secStats.forkChancePct || 0;
+    if (forkPct > 0 && Math.random() * 100 < forkPct) {
+        let forks = 2;
+        if ((secStats.forkExtraChancePct || 0) > 0 && Math.random() * 100 < secStats.forkExtraChancePct) forks += 1;
+        pickVictims(forks, hitSet, globalThis._egMonsters).forEach((victim) => {
+            hitSet.add(victim.id);
+            const card = document.getElementById(`eg-card-${victim.id}`);
+            if (card) _egRestartFlashClass(card, 'eg-flash-damage');
+            _egDamageTargetById(victim.id, _egSecondaryDamage(finalDamage, 'fork', secStats), elements, secCrit);
+        });
     }
 }

@@ -706,10 +706,14 @@ export const TALENT_TREE_DATA = {
    "id": 12,
    "x": 1038,
    "y": 1391,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Overwhelming Barrage",
+   "nameDe": "Überwältigendes Sperrfeuer",
    "icon": "",
-   "statKey": "reserved_flask_tincture_12",
+   "statKey": "notable_overwhelming_barrage_12",
+   "effects": [
+    "secondary_damage:20",
+    "pierce_targets:1"
+   ],
    "tier": "notable"
   },
   {
@@ -1099,10 +1103,14 @@ export const TALENT_TREE_DATA = {
    "id": 101,
    "x": 2852,
    "y": 308,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Split Shot",
+   "nameDe": "Splittschuss",
    "icon": "",
-   "statKey": "reserved_split_101",
+   "statKey": "notable_split_shot_101",
+   "effects": [
+    "fork_chance:20",
+    "fork_extra:50"
+   ],
    "tier": "notable"
   },
   {
@@ -1894,10 +1902,14 @@ export const TALENT_TREE_DATA = {
    "id": 167,
    "x": 2784,
    "y": -573,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Needle Storm",
+   "nameDe": "Nadelsturm",
    "icon": "",
-   "statKey": "reserved_claws_167",
+   "statKey": "notable_needle_storm_167",
+   "effects": [
+    "pierce_chance:15",
+    "secondary_damage:15"
+   ],
    "tier": "notable"
   },
   {
@@ -2292,10 +2304,14 @@ export const TALENT_TREE_DATA = {
    "id": 309,
    "x": 2799,
    "y": 198,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Piercing Shots",
+   "nameDe": "Durchschlagende Schüsse",
    "icon": "",
-   "statKey": "reserved_pierce_309",
+   "statKey": "notable_piercing_shots_309",
+   "effects": [
+    "pierce_chance:25",
+    "pierce_targets:2"
+   ],
    "tier": "notable"
   },
   {
@@ -2923,10 +2939,14 @@ export const TALENT_TREE_DATA = {
    "id": 223,
    "x": 1575,
    "y": 1591,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Twin Volley",
+   "nameDe": "Doppelsalve",
    "icon": "",
-   "statKey": "reserved_reserved_node_223",
+   "statKey": "notable_twin_volley_223",
+   "effects": [
+    "multishot_chance:15",
+    "secondary_damage:10"
+   ],
    "tier": "notable"
   },
   {
@@ -3753,10 +3773,13 @@ export const TALENT_TREE_DATA = {
    "id": 176,
    "x": 1844,
    "y": -1170,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Secondary Damage",
+   "nameDe": "Sekundärschaden",
    "icon": "",
-   "statKey": "reserved_claw_176",
+   "statKey": "travel_secondary_damage_176",
+   "effects": [
+    "secondary_damage:5"
+   ],
    "tier": "travel"
   },
   {
@@ -3869,10 +3892,13 @@ export const TALENT_TREE_DATA = {
    "id": 222,
    "x": 2645,
    "y": 798,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Chain Chance",
+   "nameDe": "Kettenchance",
    "icon": "",
-   "statKey": "reserved_reserved_node_222",
+   "statKey": "travel_chain_chance_222",
+   "effects": [
+    "chain_chance:5"
+   ],
    "tier": "travel"
   },
   {
@@ -5634,10 +5660,14 @@ export const TALENT_TREE_DATA = {
    "id": 20024,
    "x": 1795,
    "y": -1243,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Chain Reaction",
+   "nameDe": "Kettenreaktion",
    "icon": "",
-   "statKey": "reserved_claw_20024",
+   "statKey": "notable_chain_reaction_20024",
+   "effects": [
+    "chain_chance:15",
+    "chain_count:1"
+   ],
    "tier": "notable"
   },
   {
@@ -13182,10 +13212,14 @@ export const TALENT_TREE_DATA = {
    "id": 20104,
    "x": 1650,
    "y": 171,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Ricochet Master",
+   "nameDe": "Meister des Abpralls",
    "icon": "",
-   "statKey": "reserved_tincture_20104",
+   "statKey": "notable_ricochet_master_20104",
+   "effects": [
+    "chain_count:1",
+    "chain_chance:10"
+   ],
    "tier": "notable"
   },
   {
@@ -13377,10 +13411,14 @@ export const TALENT_TREE_DATA = {
    "id": 20118,
    "x": 2674,
    "y": -683,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Splintering Shots",
+   "nameDe": "Splitternde Schüsse",
    "icon": "",
-   "statKey": "reserved_claws_20118",
+   "statKey": "notable_splintering_shots_20118",
+   "effects": [
+    "fork_chance:12",
+    "fork_extra:30"
+   ],
    "tier": "notable"
   },
   {
@@ -13568,10 +13606,14 @@ export const TALENT_TREE_DATA = {
    "id": 20133,
    "x": 2799,
    "y": 418,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Trick Shot",
+   "nameDe": "Trickschuss",
    "icon": "",
-   "statKey": "reserved_chain_20133",
+   "statKey": "notable_trick_shot_20133",
+   "effects": [
+    "chain_chance:20",
+    "chain_count:1"
+   ],
    "tier": "notable"
   },
   {
@@ -15762,30 +15804,39 @@ export const TALENT_TREE_DATA = {
    "id": 30743,
    "x": 2053,
    "y": 1848,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Piercing Chance",
+   "nameDe": "Durchbohrchance",
    "icon": "",
-   "statKey": "reserved_reserved_node_30743",
+   "statKey": "small_piercing_chance_30743",
+   "effects": [
+    "pierce_chance:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30744,
    "x": 2053,
    "y": 1808,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Piercing Chance",
+   "nameDe": "Durchbohrchance",
    "icon": "",
-   "statKey": "reserved_reserved_node_30744",
+   "statKey": "small_piercing_chance_30744",
+   "effects": [
+    "pierce_chance:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30745,
    "x": 2122,
    "y": 1779,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Piercing Chance",
+   "nameDe": "Durchbohrchance",
    "icon": "",
-   "statKey": "reserved_reserved_node_30745",
+   "statKey": "small_piercing_chance_30745",
+   "effects": [
+    "pierce_chance:8"
+   ],
    "tier": "small"
   },
   {
@@ -15937,20 +15988,26 @@ export const TALENT_TREE_DATA = {
    "id": 30757,
    "x": 1595,
    "y": 1489,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Chain Chance",
+   "nameDe": "Kettenchance",
    "icon": "",
-   "statKey": "reserved_reserved_node_30757",
+   "statKey": "small_chain_chance_30757",
+   "effects": [
+    "chain_chance:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30758,
    "x": 1555,
    "y": 1489,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Chain Chance",
+   "nameDe": "Kettenchance",
    "icon": "",
-   "statKey": "reserved_reserved_node_30758",
+   "statKey": "small_chain_chance_30758",
+   "effects": [
+    "chain_chance:8"
+   ],
    "tier": "small"
   },
   {
@@ -15970,20 +16027,26 @@ export const TALENT_TREE_DATA = {
    "id": 30760,
    "x": 1546,
    "y": 1293,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Chain Chance",
+   "nameDe": "Kettenchance",
    "icon": "",
-   "statKey": "reserved_reserved_node_30760",
+   "statKey": "small_chain_chance_30760",
+   "effects": [
+    "chain_chance:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30761,
    "x": 1497,
    "y": 1220,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fork Chance",
+   "nameDe": "Gabelchance",
    "icon": "",
-   "statKey": "reserved_flask_30761",
+   "statKey": "small_fork_chance_30761",
+   "effects": [
+    "fork_chance:4"
+   ],
    "tier": "small"
   },
   {
@@ -16068,50 +16131,65 @@ export const TALENT_TREE_DATA = {
    "id": 30768,
    "x": 1087,
    "y": 1318,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fork Chance",
+   "nameDe": "Gabelchance",
    "icon": "",
-   "statKey": "reserved_tincture_30768",
+   "statKey": "small_fork_chance_30768",
+   "effects": [
+    "fork_chance:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30769,
    "x": 1087,
    "y": 1358,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fork Chance",
+   "nameDe": "Gabelchance",
    "icon": "",
-   "statKey": "reserved_tincture_30769",
+   "statKey": "small_fork_chance_30769",
+   "effects": [
+    "fork_chance:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30770,
    "x": 1038,
    "y": 1285,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fork Chance",
+   "nameDe": "Gabelchance",
    "icon": "",
-   "statKey": "reserved_flask_tincture_30770",
+   "statKey": "travel_fork_chance_30770",
+   "effects": [
+    "fork_chance:3"
+   ],
    "tier": "travel"
   },
   {
    "id": 30771,
    "x": 989,
    "y": 1318,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Piercing Chance",
+   "nameDe": "Durchbohrchance",
    "icon": "",
-   "statKey": "reserved_flask_30771",
+   "statKey": "small_piercing_chance_30771",
+   "effects": [
+    "pierce_chance:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30772,
    "x": 989,
    "y": 1358,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Chain Chance",
+   "nameDe": "Kettenchance",
    "icon": "",
-   "statKey": "reserved_flask_30772",
+   "statKey": "small_chain_chance_30772",
+   "effects": [
+    "chain_chance:8"
+   ],
    "tier": "small"
   },
   {
@@ -16653,30 +16731,39 @@ export const TALENT_TREE_DATA = {
    "id": 30813,
    "x": 2678,
    "y": 847,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Secondary Damage",
+   "nameDe": "Sekundärschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_30813",
+   "statKey": "small_secondary_damage_30813",
+   "effects": [
+    "secondary_damage:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30814,
    "x": 2605,
    "y": 798,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Secondary Damage",
+   "nameDe": "Sekundärschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_30814",
+   "statKey": "small_secondary_damage_30814",
+   "effects": [
+    "secondary_damage:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30815,
    "x": 2572,
    "y": 847,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Secondary Damage",
+   "nameDe": "Sekundärschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_30815",
+   "statKey": "small_secondary_damage_30815",
+   "effects": [
+    "secondary_damage:8"
+   ],
    "tier": "small"
   },
   {
@@ -17113,20 +17200,26 @@ export const TALENT_TREE_DATA = {
    "id": 30848,
    "x": 1670,
    "y": 69,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Secondary Damage",
+   "nameDe": "Sekundärschaden",
    "icon": "",
-   "statKey": "reserved_tincture_30848",
+   "statKey": "small_secondary_damage_30848",
+   "effects": [
+    "secondary_damage:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30849,
    "x": 1630,
    "y": 69,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Secondary Damage",
+   "nameDe": "Sekundärschaden",
    "icon": "",
-   "statKey": "reserved_tincture_30849",
+   "statKey": "small_secondary_damage_30849",
+   "effects": [
+    "secondary_damage:8"
+   ],
    "tier": "small"
   },
   {
@@ -18229,40 +18322,52 @@ export const TALENT_TREE_DATA = {
    "id": 30934,
    "x": 2572,
    "y": -531,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Multishot Chance",
+   "nameDe": "Mehrfachschuss-Chance",
    "icon": "",
-   "statKey": "reserved_claws_30934",
+   "statKey": "travel_multishot_chance_30934",
+   "effects": [
+    "multishot_chance:4"
+   ],
    "tier": "travel"
   },
   {
    "id": 30935,
    "x": 2564,
    "y": -573,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Multishot Chance",
+   "nameDe": "Mehrfachschuss-Chance",
    "icon": "",
-   "statKey": "reserved_claws_30935",
+   "statKey": "small_multishot_chance_30935",
+   "effects": [
+    "multishot_chance:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30936,
    "x": 2572,
    "y": -615,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Multishot Chance",
+   "nameDe": "Mehrfachschuss-Chance",
    "icon": "",
-   "statKey": "reserved_claws_30936",
+   "statKey": "small_multishot_chance_30936",
+   "effects": [
+    "multishot_chance:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30937,
    "x": 2632,
    "y": -675,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Multishot Chance",
+   "nameDe": "Mehrfachschuss-Chance",
    "icon": "",
-   "statKey": "reserved_claws_30937",
+   "statKey": "small_multishot_chance_30937",
+   "effects": [
+    "multishot_chance:6"
+   ],
    "tier": "small"
   },
   {
@@ -18553,10 +18658,13 @@ export const TALENT_TREE_DATA = {
    "id": 30960,
    "x": 2632,
    "y": -471,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Multishot Chance",
+   "nameDe": "Mehrfachschuss-Chance",
    "icon": "",
-   "statKey": "reserved_claws_30960",
+   "statKey": "small_multishot_chance_30960",
+   "effects": [
+    "multishot_chance:6"
+   ],
    "tier": "small"
   },
   {
@@ -18929,50 +19037,68 @@ export const TALENT_TREE_DATA = {
    "id": 30991,
    "x": 2746,
    "y": 308,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Extra Fork Projectile",
+   "nameDe": "Zusätzliches Gabelprojektil",
    "icon": "",
-   "statKey": "reserved_fork_30991",
+   "statKey": "small_extra_fork_projectile_30991",
+   "effects": [
+    "fork_extra:25"
+   ],
    "tier": "small"
   },
   {
    "id": 30992,
    "x": 2799,
    "y": 361,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Forking",
+   "nameDe": "Gabelung",
    "icon": "",
-   "statKey": "reserved_fork_30992",
+   "statKey": "travel_forking_30992",
+   "effects": [
+    "fork_chance:5",
+    "secondary_damage:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30993,
    "x": 2757,
    "y": 410,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Chain Chance",
+   "nameDe": "Kettenchance",
    "icon": "",
-   "statKey": "reserved_chain_30993",
+   "statKey": "small_chain_chance_30993",
+   "effects": [
+    "chain_chance:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30994,
    "x": 2799,
    "y": 255,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Forking",
+   "nameDe": "Gabelung",
    "icon": "",
-   "statKey": "reserved_fork_30994",
+   "statKey": "travel_forking_30994",
+   "effects": [
+    "fork_chance:5",
+    "secondary_damage:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30995,
    "x": 2757,
    "y": 206,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Pierce",
+   "nameDe": "Durchbohren",
    "icon": "",
-   "statKey": "reserved_pierce_30995",
+   "statKey": "small_pierce_30995",
+   "effects": [
+    "pierce_chance:10",
+    "pierce_targets:1"
+   ],
    "tier": "small"
   },
   {
