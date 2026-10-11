@@ -7,7 +7,7 @@ import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
-import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
+import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { patchHotbarCooldownForLegacySlot } from '../skills/skill-hotbar.js';
 import { STATE } from '../state.js';
 
@@ -220,6 +220,28 @@ function _getClassCooldownReduction(slot) {
     );
 }
 
+// Flat cooldown reduction (seconds) from the ascendency wheel nodes of the
+// passive tree: ascendency → skill → [statKey, seconds]. Only counts while
+// the player actually plays that ascendency.
+const ASCENDENCY_TREE_COOLDOWN_REDUCTIONS = {
+    outlier: { active1: [['quick_hunger', 60]] },
+    actuary: { active1: [['quick_audit', 30]], active2: [['rapid_underwriting', 45]] },
+    recursionist: { active1: [['fertile_ground', 24]], active2: [['shallow_grave', 600]] },
+    markovian: { active1: [['quick_reset', 90]], active2: [['rapid_transitions', 60]] },
+    bayesian: { active2: [['quick_shields', 30]] },
+    random_walker: { active1: [['hibernation', 120]] },
+};
+
+// Returns the cooldown reduction (seconds) the ascendency wheel nodes give
+// to an ascendency slot (active3 / active4). 0 for every other slot.
+function _getAscendencyTreeCooldownReduction(slot) {
+    if (slot !== 'active3' && slot !== 'active4') return 0;
+    const asc = STATE.playerAscendency;
+    const entries = ASCENDENCY_TREE_COOLDOWN_REDUCTIONS[asc]?.[slot === 'active3' ? 'active1' : 'active2'];
+    if (!entries) return 0;
+    return entries.reduce((total, [key, seconds]) => total + (ptHasAscendencySkill(asc, key) ? seconds : 0), 0);
+}
+
 // Maps every class/ascendency active slot to its arcane cooldown family.
 // One family per skill - mods roll on the arcane slot (EG_MOD_TABLE_ARCANE).
 const BASE_SKILL_COOLDOWN_FAMILY = {
@@ -286,7 +308,8 @@ export function getEffectiveCooldown(slot, baseSeconds) {
     const globalReduction = _getGlobalCooldownReduction();
     const classReduction = _getClassCooldownReduction(slot);
     const equipmentReduction = _getEquipmentCooldownReduction(slot);
-    return Math.max(0, baseSeconds - globalReduction - classReduction - equipmentReduction);
+    const treeReduction = _getAscendencyTreeCooldownReduction(slot);
+    return Math.max(0, baseSeconds - globalReduction - classReduction - equipmentReduction - treeReduction);
 }
 
 

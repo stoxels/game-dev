@@ -7,7 +7,7 @@ import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { hideLsClassTooltip } from './class-hud-levelselect-tooltip.js';
 import { buildClassHUD, hideHUDTooltip } from './class-hud.js';
-import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
+import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { cur } from '../state.js';
 
@@ -180,7 +180,8 @@ function _bayesTrapsStartFuse() {
     const state = window._bayesTrapsState;
     if (!state) return;
 
-    state.fuseRemaining = BAYES_FUSE_SECONDS;
+    // Long Fuse (Bayesian wheel): 3 extra seconds to place the traps.
+    state.fuseRemaining = BAYES_FUSE_SECONDS + (ptHasAscendencySkill('bayesian', 'long_fuse') ? 3 : 0);
     state.fuseTimer = setInterval(() => {
         if (!window._bayesTrapsState) { clearInterval(state.fuseTimer); return; }
 
@@ -443,8 +444,10 @@ function _bayesTrapReveal(row, col) {
     const cols = sol[0].length;
     const affected = [];
 
-    for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
+    // Wide Blast (Bayesian wheel): reveal radius 2 instead of 1.
+    const radius = ptHasAscendencySkill('bayesian', 'wide_blast') ? 2 : 1;
+    for (let dr = -radius; dr <= radius; dr++) {
+        for (let dc = -radius; dc <= radius; dc++) {
             const r = row + dr, c = col + dc;
             if (r < 0 || r >= rows || c < 0 || c >= cols) continue;
             if (sol[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1) {
@@ -478,9 +481,11 @@ function _bayesTrapElimination(row, col) {
     const rows = sol.length;
     const cols = sol[0].length;
     const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+    // Long Reach (Bayesian wheel): 2 cells further.
+    const reach = BAYES_ELIMINATION_REACH + (ptHasAscendencySkill('bayesian', 'long_reach') ? 2 : 0);
 
     for (const [dr, dc] of dirs) {
-        for (let step = 1; step <= BAYES_ELIMINATION_REACH; step++) {
+        for (let step = 1; step <= reach; step++) {
             const r = row + dr * step;
             const c = col + dc * step;
             if (r < 0 || r >= rows || c < 0 || c >= cols) break;

@@ -18273,8 +18273,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 31058,
-   "x": 658,
-   "y": -1131,
+   "x": 1200,
+   "y": -2000,
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
    "icon": "",
@@ -18282,7 +18282,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "int_flat:5"
    ],
-   "tier": "travel"
+   "tier": "travel",
+   "layoutPinned": true
   },
   {
    "id": 31059,
@@ -23016,8 +23017,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 31472,
-   "x": -676,
-   "y": -1132,
+   "x": -1208,
+   "y": -2000,
    "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
    "icon": "",
@@ -23025,7 +23026,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "int_flat:5"
    ],
-   "tier": "small"
+   "tier": "small",
+   "layoutPinned": true
   },
   {
    "id": 31474,
@@ -23163,223 +23165,241 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 55,
-   "x": -537,
-   "y": 310,
+   "x": -528,
+   "y": 325,
    "nameEn": "God of Statistics",
    "nameDe": "Gott der Statistik",
    "descEn": "Data Strike has 2 additional, independent 25% chances to solve one more random row or column.\nEach Data Strike used earlier this level makes Data Strike solve 1 additional row or column.\nDoubles the time gained from Momentum (applied after all other Momentum bonuses).\nDiagonal Strike has a 50% chance to repeat itself on another random cell.\nDiagonal Strike can reveal and mark 2 additional cells.",
    "descDe": "Datenhieb hat 2 zusätzliche, voneinander unabhängige Chancen von je 25%, eine weitere zufällige Zeile oder Spalte zu lösen.\nJeder in diesem Level bereits genutzte Datenhieb lässt Datenhieb 1 weitere Zeile oder Spalte lösen.\nVerdoppelt die durch Momentum gewonnene Zeit (nach allen anderen Momentum-Boni).\nDiagonalschlag hat eine Chance von 50%, sich auf einer weiteren zufälligen Zelle zu wiederholen.\nDiagonalschlag kann 2 zusätzliche Zellen aufdecken und markieren.",
    "icon": "✨",
    "statKey": "god_of_statistics",
-   "tier": "keystone"
+   "tier": "keystone",
+   "layoutPinned": true
   },
   {
    "id": 36,
-   "x": -537,
-   "y": 190,
+   "x": -2018,
+   "y": 196,
    "nameEn": "Gear of the Statistician",
    "nameDe": "Ausrüstung des Statistikers",
    "descEn": "As a Statistician, you have a 33% chance to receive a Magnifier (reveals 2 correct cells) after completing a level.",
    "descDe": "Als Statistiker hast du nach Abschluss eines Levels eine Chance von 33%, eine Lupe zu erhalten (deckt 2 richtige Zellen auf).",
    "icon": "📊",
    "statKey": "gear_of_the_statistician",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 39,
-   "x": -460,
-   "y": 218,
+   "x": -1047,
+   "y": 1736,
    "nameEn": "Improved Gear of the Statistician",
    "nameDe": "Verbesserte Ausrüstung des Statistikers",
    "descEn": "As a Statistician, you have a 33% chance to receive an Error Gem (marks 8 wrong empty cells) after completing a level.",
    "descDe": "Als Statistiker hast du nach Abschluss eines Levels eine Chance von 33%, einen Fehlerstein zu erhalten (markiert 8 falsche leere Zellen).",
    "icon": "📈",
    "statKey": "improved_gear_of_the_statistician",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 40,
-   "x": -419,
-   "y": 289,
+   "x": -1338,
+   "y": 53,
    "nameEn": "Chain Reaction",
    "nameDe": "Kettenreaktion",
    "descEn": "Each Momentum trigger grants +1 second of additional time.",
    "descDe": "Jede Momentum-Auslösung gewährt +1 Sekunde zusätzliche Zeit.",
    "icon": "⛓️",
    "statKey": "chain_reaction",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41,
-   "x": -433,
-   "y": 370,
+   "x": -613,
+   "y": 1183,
    "nameEn": "Precise Momentum",
    "nameDe": "Präziser Schwung",
    "descEn": "Each Momentum trigger grants +2 seconds of additional time.",
    "descDe": "Jede Momentum-Auslösung gewährt +2 Sekunden zusätzliche Zeit.",
    "icon": "🏹",
    "statKey": "precise_momentum",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 42,
-   "x": -496,
-   "y": 423,
+   "x": -1560,
+   "y": -203,
    "nameEn": "Exponential Growth",
    "nameDe": "Exponentielles Wachstum",
    "descEn": "Each Momentum trigger grants +1 second of additional time for every Momentum already triggered this level.",
    "descDe": "Jede Momentum-Auslösung gewährt +1 Sekunde zusätzliche Zeit für jedes in diesem Level bereits ausgelöste Momentum.",
    "icon": "🚀",
    "statKey": "exponential_growth",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 43,
-   "x": -578,
-   "y": 423,
+   "x": -1938,
+   "y": -115,
    "nameEn": "Learning from Mistakes",
    "nameDe": "Lernen aus Fehlern",
    "descEn": "A mistake reduces your Momentum streak by 12 instead of resetting it.\nWith both Learning from Mistakes and Mistakes no Matter, a mistake reduces it by only 10.",
    "descDe": "Ein Fehler verringert deine Momentum-Serie um 12, statt sie zurückzusetzen.\nMit Lernen aus Fehlern und Fehler zählen nicht zusammen verringert ein Fehler sie nur um 10.",
    "icon": "🩹",
    "statKey": "learning_from_mistakes",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 44,
-   "x": -641,
-   "y": 370,
+   "x": -718,
+   "y": 1791,
    "nameEn": "Mistakes no Matter",
    "nameDe": "Fehler zählen nicht",
    "descEn": "A mistake reduces your Momentum streak by 12 instead of resetting it.\nWith both Learning from Mistakes and Mistakes no Matter, a mistake reduces it by only 10.",
    "descDe": "Ein Fehler verringert deine Momentum-Serie um 12, statt sie zurückzusetzen.\nMit Lernen aus Fehlern und Fehler zählen nicht zusammen verringert ein Fehler sie nur um 10.",
    "icon": "💪",
    "statKey": "mistakes_no_matter",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 45,
-   "x": -655,
-   "y": 289,
+   "x": -1624,
+   "y": 514,
    "nameEn": "Monte Carlo",
    "nameDe": "Monte Carlo Simulation",
    "descEn": "Data Strike reveals up to 1 additional cell in each line it solves.",
    "descDe": "Datenhieb deckt in jeder gelösten Zeile oder Spalte bis zu 1 zusätzliche Zelle auf.",
    "icon": "🎰",
    "statKey": "monte_carlo",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 46,
-   "x": -614,
-   "y": 218,
+   "x": -1158,
+   "y": 1241,
    "nameEn": "Correlation Matrix",
    "nameDe": "Korrelationsmatrix",
    "descEn": "Data Strike reveals up to 1 additional cell in each line it solves.",
    "descDe": "Datenhieb deckt in jeder gelösten Zeile oder Spalte bis zu 1 zusätzliche Zelle auf.",
    "icon": "🔗",
    "statKey": "correlation_matrix",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 47,
-   "x": -453,
-   "y": 101,
+   "x": -1288,
+   "y": 1039,
    "nameEn": "Advanced Data Strike",
    "nameDe": "Verbesserter Datenhieb",
    "descEn": "Data Strike has a 25% chance to solve one more random row or column. Rolled independently from God of Statistics.\nReduces the cooldown of Data Strike by 30 seconds.",
    "descDe": "Datenhieb hat eine Chance von 25%, eine weitere zufällige Zeile oder Spalte zu lösen. Wird unabhängig von Gott der Statistik gewürfelt.\nVerringert die Abklingzeit von Datenhieb um 30 Sekunden.",
    "icon": "⚙️",
    "statKey": "advanced_data_strike",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 49,
-   "x": -330,
-   "y": 222,
+   "x": -1029,
+   "y": 1443,
    "nameEn": "Accelerated Computation",
    "nameDe": "Beschleunigte Berechnung",
    "descEn": "Reduces the cooldown of Data Strike by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Datenhieb um 15 Sekunden.",
    "icon": "🖥️",
    "statKey": "accelerated_computation",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 50,
-   "x": -328,
-   "y": 394,
+   "x": -2136,
+   "y": -239,
    "nameEn": "Diagonal Extension",
    "nameDe": "Diagonale Erweiterung",
    "descEn": "Diagonal Strike can reveal 1 additional cell.\nWith Diagonally Wrong, Diagonal Strike can mark 1 additional wrong cell.",
    "descDe": "Diagonalschlag kann 1 zusätzliche Zelle aufdecken.\nMit Diagonal Falsch kann Diagonalschlag 1 zusätzliche falsche Zelle markieren.",
    "icon": "↗️",
    "statKey": "random_diagonal",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 51,
-   "x": -449,
-   "y": 517,
+   "x": -688,
+   "y": 2020,
    "nameEn": "Diagonal Witch",
    "nameDe": "Diagonale Hexe",
    "descEn": "Diagonal Strike can reveal 1 additional cell.\nWith Diagonally Wrong, Diagonal Strike can mark 1 additional wrong cell.",
    "descDe": "Diagonalschlag kann 1 zusätzliche Zelle aufdecken.\nMit Diagonal Falsch kann Diagonalschlag 1 zusätzliche falsche Zelle markieren.",
    "icon": "🔀",
    "statKey": "diagonal_witch",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 52,
-   "x": -621,
-   "y": 519,
+   "x": -2028,
+   "y": -409,
    "nameEn": "Diagonally Wrong",
    "nameDe": "Diagonal Falsch",
    "descEn": "Diagonal Strike also marks the cells along its path that you filled incorrectly (up to its mark limit).",
    "descDe": "Diagonalschlag markiert zusätzlich die Zellen auf seinem Weg, die du falsch ausgefüllt hast (bis zu seinem Markierungslimit).",
    "icon": "✖️",
    "statKey": "diagonally_wrong",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 54,
-   "x": -744,
-   "y": 398,
+   "x": -1652,
+   "y": 24,
    "nameEn": "Accelerated Striking",
    "nameDe": "Verschnellertes Schlagen",
    "descEn": "Reduces the cooldown of Diagonal Strike by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Diagonalschlag um 15 Sekunden.",
    "icon": "💨",
    "statKey": "accelerated_striking",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 48,
-   "x": -746,
-   "y": 226,
+   "x": -1753,
+   "y": 312,
    "nameEn": "Swift Strike",
    "nameDe": "Schneller Hieb",
    "descEn": "Reduces the cooldown of Data Strike by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Datenhieb um 15 Sekunden.",
    "icon": "⚡",
    "statKey": "travel_swift_strike",
-   "tier": "travel"
+   "tier": "travel",
+   "layoutPinned": true
   },
   {
    "id": 53,
-   "x": -625,
-   "y": 103,
+   "x": -721,
+   "y": 1476,
    "nameEn": "Quick Strike",
    "nameDe": "Schneller Schlag",
    "descEn": "Reduces the cooldown of Diagonal Strike by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Diagonalschlag um 15 Sekunden.",
    "icon": "🏃",
    "statKey": "travel_quick_strike",
-   "tier": "travel"
+   "tier": "travel",
+   "layoutPinned": true
   },
   {
    "id": 72,
-   "x": 0,
+   "x": -2,
    "y": -620,
    "nameEn": "God of Math",
    "nameDe": "Gott der Mathematik",
@@ -23387,427 +23407,463 @@ export const TALENT_TREE_DATA = {
    "descDe": "Der Radius von Arkaner Enthüllung wird um 1 erhöht.\nVerdoppelt die Zeit, die durch vom Varianzschild absorbierte Fehler gewonnen wird.\nJede korrekte Füllung während Absolutem Nullpunkt verringert die verbleibende Abklingzeit von Arkaner Enthüllung um 1 Sekunde.",
    "icon": "✨",
    "statKey": "god_of_math",
-   "tier": "keystone"
+   "tier": "keystone",
+   "layoutPinned": true
   },
   {
    "id": 37,
-   "x": 0,
-   "y": -740,
+   "x": -954,
+   "y": -1850,
    "nameEn": "Gear of the Mathmagician",
    "nameDe": "Ausrüstung des Mathemagiers",
    "descEn": "As a Mathmagician, you have a 25% chance to receive a Professor (reduces your mistake count by 4) after completing a level.",
    "descDe": "Als Mathemagier hast du nach Abschluss eines Levels eine Chance von 25%, einen Professor zu erhalten (verringert deine Fehleranzahl um 4).",
    "icon": "🧮",
    "statKey": "gear_of_the_mathmagician",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 56,
-   "x": 77,
-   "y": -712,
+   "x": 946,
+   "y": -1850,
    "nameEn": "Improved Gear of the Mathmagician",
    "nameDe": "Verbesserte Ausrüstung des Mathemagiers",
    "descEn": "As a Mathmagician, you have a 15% chance to receive a Chronobolt (adds 15 minutes to the timer) after completing a level.",
    "descDe": "Als Mathemagier hast du nach Abschluss eines Levels eine Chance von 15%, einen Chronoblitz zu erhalten (fügt dem Timer 15 Minuten hinzu).",
    "icon": "⚡",
    "statKey": "improved_gear_of_the_mathmagician",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 57,
-   "x": 118,
-   "y": -641,
+   "x": -454,
+   "y": -1642,
    "nameEn": "Arcane Echo",
    "nameDe": "Arkanes Echo",
    "descEn": "Arcane Reveal can reveal 1 additional correct cell.",
    "descDe": "Arkane Enthüllung kann 1 zusätzliche richtige Zelle aufdecken.",
    "icon": "🔮",
    "statKey": "arcane_echo",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 58,
-   "x": 104,
-   "y": -560,
+   "x": 446,
+   "y": -1639,
    "nameEn": "Resonant Reveal",
    "nameDe": "Resonante Enthüllung",
    "descEn": "Arcane Reveal can reveal 1 additional correct cell.",
    "descDe": "Arkane Enthüllung kann 1 zusätzliche richtige Zelle aufdecken.",
    "icon": "🌀",
    "statKey": "resonant_reveal",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 59,
-   "x": 41,
-   "y": -507,
+   "x": 200,
+   "y": -1500,
    "nameEn": "Arcane Exposure",
    "nameDe": "Arkane Bloßstellung",
    "descEn": "Arcane Reveal also marks every empty cell in its area as incorrect.",
    "descDe": "Arkane Enthüllung markiert zusätzlich jede leere Zelle in ihrem Bereich als falsch.",
    "icon": "💥",
    "statKey": "arcane_exposure",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 62,
-   "x": -41,
-   "y": -507,
+   "x": -1184,
+   "y": -1554,
    "nameEn": "Reinforced Shield",
    "nameDe": "Verstärkter Schild",
    "descEn": "Variance Shield can absorb 1 additional mistake per level.",
    "descDe": "Varianzschild kann pro Level 1 zusätzlichen Fehler absorbieren.",
    "icon": "🛡️",
    "statKey": "reinforced_shield",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 63,
-   "x": -104,
-   "y": -560,
+   "x": 1177,
+   "y": -1546,
    "nameEn": "Fortified Shield",
    "nameDe": "Gefestigter Schild",
    "descEn": "Variance Shield can absorb 1 additional mistake per level.",
    "descDe": "Varianzschild kann pro Level 1 zusätzlichen Fehler absorbieren.",
    "icon": "🪖",
    "statKey": "fortified_shield",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 64,
-   "x": -118,
-   "y": -641,
+   "x": -1604,
+   "y": -1818,
    "nameEn": "Calculated Error",
    "nameDe": "Kalkulierter Fehler",
    "descEn": "Each mistake absorbed by Variance Shield has a 50% chance to add 2 minutes to the timer. Rolled independently from Error Dividend and Lucky Lapse.",
    "descDe": "Jeder vom Varianzschild absorbierte Fehler hat eine Chance von 50%, dem Timer 2 Minuten hinzuzufügen. Wird unabhängig von Fehler-Dividende und Glücklicher Lapsus gewürfelt.",
    "icon": "⏳",
    "statKey": "calculated_error",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 65,
-   "x": -77,
-   "y": -712,
+   "x": 1396,
+   "y": -1666,
    "nameEn": "Error Dividend",
    "nameDe": "Fehler-Dividende",
    "descEn": "Each mistake absorbed by Variance Shield has a 25% chance to add 30 seconds to the timer. Rolled independently from Calculated Error and Lucky Lapse.",
    "descDe": "Jeder vom Varianzschild absorbierte Fehler hat eine Chance von 25%, dem Timer 30 Sekunden hinzuzufügen. Wird unabhängig von Kalkulierter Fehler und Glücklicher Lapsus gewürfelt.",
    "icon": "💰",
    "statKey": "error_dividend",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 66,
-   "x": 84,
-   "y": -829,
+   "x": -1404,
+   "y": -1676,
    "nameEn": "Lucky Lapse",
    "nameDe": "Glücklicher Lapsus",
    "descEn": "Each mistake absorbed by Variance Shield has a 25% chance to add 30 seconds to the timer. Rolled independently from Calculated Error and Error Dividend.",
    "descDe": "Jeder vom Varianzschild absorbierte Fehler hat eine Chance von 25%, dem Timer 30 Sekunden hinzuzufügen. Wird unabhängig von Kalkulierter Fehler und Fehler-Dividende gewürfelt.",
    "icon": "🍀",
    "statKey": "lucky_lapse",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 67,
-   "x": 207,
-   "y": -708,
+   "x": -703,
+   "y": -1047,
    "nameEn": "Prolonged Frost",
    "nameDe": "Verlängerter Frost",
    "descEn": "Absolute Zero lasts 0.5 seconds longer.",
    "descDe": "Absoluter Nullpunkt hält 0,5 Sekunden länger an.",
    "icon": "❄️",
    "statKey": "prolonged_frost",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 68,
-   "x": 209,
-   "y": -536,
+   "x": 697,
+   "y": -1042,
    "nameEn": "Deep Freeze",
    "nameDe": "Tiefgefroren",
    "descEn": "Absolute Zero lasts 0.5 seconds longer.",
    "descDe": "Absoluter Nullpunkt hält 0,5 Sekunden länger an.",
    "icon": "🧊",
    "statKey": "deep_freeze",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 69,
-   "x": 88,
-   "y": -413,
+   "x": -1053,
+   "y": -1108,
    "nameEn": "Frozen Resilience",
    "nameDe": "Gefrorene Widerstandskraft",
    "descEn": "Every 5 correct fills during Absolute Zero give Variance Shield 1 additional charge (it absorbs 1 more mistake).",
    "descDe": "Alle 5 korrekten Füllungen während Absolutem Nullpunkt geben dem Varianzschild 1 zusätzliche Ladung (er absorbiert 1 weiteren Fehler).",
    "icon": "🛡️",
    "statKey": "frozen_resilience",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 71,
-   "x": -84,
-   "y": -411,
+   "x": -903,
+   "y": -1351,
    "nameEn": "Accelerated Zero",
    "nameDe": "Beschleunigter Nullpunkt",
    "descEn": "Reduces the cooldown of Absolute Zero by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Absolutem Nullpunkt um 15 Sekunden.",
    "icon": "🔷",
    "statKey": "accelerated_zero",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 61,
-   "x": -207,
-   "y": -532,
+   "x": 696,
+   "y": -1638,
    "nameEn": "Accelerated Revelation",
    "nameDe": "Beschleunigte Offenbarung",
    "descEn": "Reduces the cooldown of Arcane Reveal by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Arkaner Enthüllung um 15 Sekunden.",
    "icon": "🔷",
    "statKey": "accelerated_revelation",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 60,
-   "x": -209,
-   "y": -704,
+   "x": -704,
+   "y": -1643,
    "nameEn": "Rapid Revelation",
    "nameDe": "Schnelle Offenbarung",
    "descEn": "Reduces the cooldown of Arcane Reveal by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Arkaner Enthüllung um 15 Sekunden.",
    "icon": "🔵",
    "statKey": "travel_rapid_revelation",
-   "tier": "travel"
+   "tier": "travel",
+   "layoutPinned": true
   },
   {
    "id": 70,
-   "x": -88,
-   "y": -827,
+   "x": 897,
+   "y": -1345,
    "nameEn": "Hastened Zero",
    "nameDe": "Verkürzter Nullpunkt",
    "descEn": "Reduces the cooldown of Absolute Zero by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Absolutem Nullpunkt um 15 Sekunden.",
    "icon": "🔵",
    "statKey": "travel_hastened_zero",
-   "tier": "travel"
+   "tier": "travel",
+   "layoutPinned": true
   },
   {
    "id": 88,
-   "x": 537,
-   "y": 310,
+   "x": 523,
+   "y": 332,
    "nameEn": "God of Probabilities",
    "nameDe": "Gott der Wahrscheinlichkeiten",
    "descEn": "Precision Shot can mark 2 additional wrong cells.\nBayesian Insight reveals 1 additional random correct cell at the start of each level.\nRain of Arrows permanently keeps up to 3 correct cells and every ✕ mark that its scan shows.",
    "descDe": "Präzisionsschuss kann 2 zusätzliche falsche Zellen markieren.\nBayesianische Einsicht deckt zu Beginn jedes Levels 1 zusätzliche zufällige richtige Zelle auf.\nPfeilregen behält dauerhaft bis zu 3 richtige Zellen und jedes ✕, das sein Scan anzeigt.",
    "icon": "✨",
    "statKey": "god_of_probabilities",
-   "tier": "keystone"
+   "tier": "keystone",
+   "layoutPinned": true
   },
   {
    "id": 38,
-   "x": 537,
-   "y": 190,
+   "x": 1931,
+   "y": 202,
    "nameEn": "Gear of the Probabilist",
    "nameDe": "Ausrüstung des Probabilisten",
    "descEn": "As a Probabilist, you have a 25% chance to receive a Sweeper (marks 4 wrong empty cells) after completing a level.",
    "descDe": "Als Probabilist hast du nach Abschluss eines Levels eine Chance von 25%, einen Besen zu erhalten (markiert 4 falsche leere Zellen).",
    "icon": "🎲",
    "statKey": "gear_of_the_probabilist",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 89,
-   "x": 614,
-   "y": 218,
+   "x": 1005,
+   "y": 1661,
    "nameEn": "Improved Gear of the Probabilist",
    "nameDe": "Verbesserte Ausrüstung des Probabilisten",
    "descEn": "As a Probabilist, you have a 15% chance to receive an Error Magnet (marks 6 wrong empty cells) after completing a level.",
    "descDe": "Als Probabilist hast du nach Abschluss eines Levels eine Chance von 15%, einen Fehlermagneten zu erhalten (markiert 6 falsche leere Zellen).",
    "icon": "🎯",
    "statKey": "improved_gear_of_the_probabilist",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 73,
-   "x": 655,
-   "y": 289,
+   "x": 1191,
+   "y": 1,
    "nameEn": "Probabilistic Sweep",
    "nameDe": "Probabilistischer Schwung",
    "descEn": "Precision Shot can mark 1 additional wrong cell.",
    "descDe": "Präzisionsschuss kann 1 zusätzliche falsche Zelle markieren.",
    "icon": "🖊️",
    "statKey": "probabilistic_sweep",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 74,
-   "x": 641,
-   "y": 370,
+   "x": 509,
+   "y": 1076,
    "nameEn": "Expanded Inference",
    "nameDe": "Erweiterte Schlussfolgerung",
    "descEn": "Precision Shot can mark 1 additional wrong cell.",
    "descDe": "Präzisionsschuss kann 1 zusätzliche falsche Zelle markieren.",
    "icon": "📝",
    "statKey": "expanded_inference",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 75,
-   "x": 578,
-   "y": 423,
+   "x": 1408,
+   "y": -237,
    "nameEn": "Momentum of Certainty",
    "nameDe": "Schwung der Gewissheit",
    "descEn": "After Precision Shot, each correct cell you fill in its rows or columns within 5 seconds grants +20 seconds on the timer.",
    "descDe": "Nach einem Präzisionsschuss gibt jede korrekte Zelle, die du innerhalb von 5 Sekunden in seinen Zeilen oder Spalten ausfüllst, +20 Sekunden auf dem Timer.",
    "icon": "⚡",
    "statKey": "momentum_of_certainty",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 77,
-   "x": 496,
-   "y": 423,
+   "x": 964,
+   "y": 1365,
    "nameEn": "Accelerated Marking",
    "nameDe": "Beschleunigte Markierung",
    "descEn": "Reduces the cooldown of Precision Shot by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Präzisionsschuss um 15 Sekunden.",
    "icon": "🔷",
    "statKey": "accelerated_marking",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 78,
-   "x": 433,
-   "y": 370,
+   "x": 1524,
+   "y": 482,
    "nameEn": "Prior Knowledge",
    "nameDe": "Vorwissen",
    "descEn": "Bayesian Insight marks 1 additional wrong cell at the start of each level.",
    "descDe": "Bayesianische Einsicht markiert zu Beginn jedes Levels 1 zusätzliche falsche Zelle.",
    "icon": "🧪",
    "statKey": "prior_knowledge",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 79,
-   "x": 419,
-   "y": 289,
+   "x": 1086,
+   "y": 1173,
    "nameEn": "Updated Beliefs",
    "nameDe": "Aktualisierte Überzeugungen",
    "descEn": "Bayesian Insight marks 1 additional wrong cell at the start of each level.",
    "descDe": "Bayesianische Einsicht markiert zu Beginn jedes Levels 1 zusätzliche falsche Zelle.",
    "icon": "🔬",
    "statKey": "updated_beliefs",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 80,
-   "x": 460,
-   "y": 218,
+   "x": 1208,
+   "y": 981,
    "nameEn": "Confirmed Hypothesis",
    "nameDe": "Bestätigte Hypothese",
    "descEn": "Bayesian Insight also reveals 1 random correct cell at the start of each level.",
    "descDe": "Bayesianische Einsicht deckt zu Beginn jedes Levels zusätzlich 1 zufällige richtige Zelle auf.",
    "icon": "💡",
    "statKey": "confirmed_hypothesis",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 81,
-   "x": 621,
-   "y": 101,
+   "x": 1811,
+   "y": -122,
    "nameEn": "Posterior Insight",
    "nameDe": "Nachträgliche Erkenntnis",
    "descEn": "Bayesian Insight marks 1 additional wrong cell at the start of each level.",
    "descDe": "Bayesianische Einsicht markiert zu Beginn jedes Levels 1 zusätzliche falsche Zelle.",
    "icon": "📋",
    "statKey": "posterior_insight",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 82,
-   "x": 744,
-   "y": 222,
+   "x": 661,
+   "y": 1690,
    "nameEn": "Convergent Evidence",
    "nameDe": "Konvergente Beweise",
    "descEn": "Bayesian Insight marks 1 additional wrong cell at the start of each level.",
    "descDe": "Bayesianische Einsicht markiert zu Beginn jedes Levels 1 zusätzliche falsche Zelle.",
    "icon": "🗂️",
    "statKey": "convergent_evidence",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 83,
-   "x": 746,
-   "y": 394,
+   "x": 2011,
+   "y": -232,
    "nameEn": "Wider Lens",
    "nameDe": "Weiteres Sichtfeld",
    "descEn": "The scan area of Rain of Arrows is 1 larger in width and in height.",
    "descDe": "Der Scan-Bereich von Pfeilregen ist in Breite und Höhe um 1 größer.",
    "icon": "🔍",
    "statKey": "wider_lens",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 84,
-   "x": 625,
-   "y": 517,
+   "x": 647,
+   "y": 1918,
    "nameEn": "Panoramic View",
    "nameDe": "Panoramablick",
    "descEn": "The scan area of Rain of Arrows is 1 larger in width and in height.",
    "descDe": "Der Scan-Bereich von Pfeilregen ist in Breite und Höhe um 1 größer.",
    "icon": "🌄",
    "statKey": "panoramic_view",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 85,
-   "x": 453,
-   "y": 519,
+   "x": 1885,
+   "y": -409,
    "nameEn": "Photographic Memory",
    "nameDe": "Fotografisches Gedächtnis",
    "descEn": "The scan of Rain of Arrows lasts 1 second longer.",
    "descDe": "Der Scan von Pfeilregen hält 1 Sekunde länger an.",
    "icon": "📸",
    "statKey": "photographic_memory",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 87,
-   "x": 330,
-   "y": 398,
+   "x": 1520,
+   "y": -5,
    "nameEn": "Accelerated Scan",
    "nameDe": "Beschleunigter Scan",
    "descEn": "Reduces the cooldown of Rain of Arrows by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Pfeilregen um 15 Sekunden.",
    "icon": "🔷",
    "statKey": "accelerated_scan",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 76,
-   "x": 328,
-   "y": 226,
+   "x": 1646,
+   "y": 290,
    "nameEn": "Swift Marking",
    "nameDe": "Schnelle Markierung",
    "descEn": "Reduces the cooldown of Precision Shot by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Präzisionsschuss um 15 Sekunden.",
    "icon": "🔵",
    "statKey": "travel_swift_marking",
-   "tier": "travel"
+   "tier": "travel",
+   "layoutPinned": true
   },
   {
    "id": 86,
-   "x": 449,
-   "y": 103,
+   "x": 643,
+   "y": 1377,
    "nameEn": "Swift Scan",
    "nameDe": "Schneller Scan",
    "descEn": "Reduces the cooldown of Rain of Arrows by 15 seconds.",
    "descDe": "Verringert die Abklingzeit von Pfeilregen um 15 Sekunden.",
    "icon": "🔵",
    "statKey": "travel_swift_scan",
-   "tier": "travel"
+   "tier": "travel",
+   "layoutPinned": true
   },
   {
    "id": 1001,
@@ -23850,363 +23906,1017 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41001,
-   "x": -870,
-   "y": 381,
+   "x": -1020,
+   "y": 206,
    "nameEn": "Rolling Mean",
    "nameDe": "Gleitender Mittelwert",
    "descEn": "Momentum triggers after 14 correct fills in a row instead of 15.",
    "descDe": "Momentum wird nach 14 statt 15 korrekten Füllungen hintereinander ausgelöst.",
    "icon": "📉",
    "statKey": "rolling_mean",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41002,
-   "x": -848,
-   "y": 172,
+   "x": -1817,
+   "y": -416,
    "nameEn": "Large Sample",
    "nameDe": "Große Stichprobe",
    "descEn": "Reveal projectiles deal 2% increased damage for each projectile fired by the same reveal (max 40%).",
    "descDe": "Aufdeckungsprojektile verursachen 2% erhöhten Schaden für jedes Projektil, das von derselben Aufdeckung abgefeuert wird (max. 40%).",
    "icon": "🧮",
    "statKey": "large_sample",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41003,
-   "x": -707,
-   "y": 16,
+   "x": -475,
+   "y": 1492,
    "nameEn": "Outlier Rejection",
    "nameDe": "Ausreißer-Ablehnung",
    "descEn": "The first mistake each level does not reduce your Momentum streak.",
    "descDe": "Der erste Fehler in jedem Level verringert deine Momentum-Serie nicht.",
    "icon": "🚫",
    "statKey": "outlier_rejection",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41004,
-   "x": -501,
-   "y": -28,
+   "x": -596,
+   "y": 853,
    "nameEn": "Weighted Average",
    "nameDe": "Gewichteter Durchschnitt",
    "descEn": "Momentum grants 25% more time.\nReveal projectiles deal 6% increased damage for each Momentum triggered this level (max 5 stacks).",
    "descDe": "Momentum gewährt 25% mehr Zeit.\nAufdeckungsprojektile verursachen 6% erhöhten Schaden für jedes in diesem Level ausgelöste Momentum (max. 5 Stapel).",
    "icon": "⚖️",
    "statKey": "weighted_average",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41005,
-   "x": -309,
-   "y": 57,
+   "x": -947,
+   "y": 601,
    "nameEn": "Sample Reuse",
    "nameDe": "Stichproben-Wiederverwendung",
    "descEn": "Each Momentum trigger reduces the cooldowns of Data Strike and Diagonal Strike by 10 seconds.",
    "descDe": "Jede Momentum-Auslösung verringert die Abklingzeiten von Datenhieb und Diagonalschlag um 10 Sekunden.",
    "icon": "♻️",
    "statKey": "sample_reuse",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41006,
-   "x": -204,
-   "y": 239,
+   "x": -1494,
+   "y": 716,
    "nameEn": "Stratified Sampling",
    "nameDe": "Geschichtete Stichprobe",
    "descEn": "Data Strike solves the rows or columns with the most unsolved cells first.\nReveal projectiles from Data Strike deal 20% increased damage.",
    "descDe": "Datenhieb löst zuerst die Zeilen oder Spalten mit den meisten ungelösten Zellen.\nAufdeckungsprojektile von Datenhieb verursachen 20% erhöhten Schaden.",
    "icon": "🗂️",
    "statKey": "stratified_sampling",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41007,
-   "x": -226,
-   "y": 448,
+   "x": -487,
+   "y": 1996,
    "nameEn": "Best Fit Line",
    "nameDe": "Ausgleichsgerade",
    "descEn": "If Diagonal Strike reveals 7 or more cells, its cooldown is reduced by 30 seconds.\nReveal projectiles from Diagonal Strike deal 30% increased damage.",
    "descDe": "Wenn Diagonalschlag 7 oder mehr Zellen aufdeckt, wird seine Abklingzeit um 30 Sekunden verringert.\nAufdeckungsprojektile von Diagonalschlag verursachen 30% erhöhten Schaden.",
    "icon": "📈",
    "statKey": "best_fit_line",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41008,
-   "x": -367,
-   "y": 604,
+   "x": -1243,
+   "y": 785,
    "nameEn": "Bootstrap",
    "nameDe": "Bootstrap",
    "descEn": "Data Strike has a 20% chance not to go on cooldown.\nReveal projectiles from Data Strike have a 25% chance to also hit another enemy.",
    "descDe": "Datenhieb hat eine Chance von 20%, keine Abklingzeit auszulösen.\nAufdeckungsprojektile von Datenhieb haben eine Chance von 25%, zusätzlich einen weiteren Gegner zu treffen.",
    "icon": "🥾",
    "statKey": "bootstrap",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41009,
-   "x": -573,
-   "y": 648,
+   "x": -1533,
+   "y": 966,
    "nameEn": "Central Limit",
    "nameDe": "Zentraler Grenzwertsatz",
    "descEn": "Every 3rd Momentum trigger each level also reveals 1 random correct cell.\nMomentum triggers shock the targeted enemy.",
    "descDe": "Jede 3. Momentum-Auslösung in einem Level deckt zusätzlich 1 zufällige richtige Zelle auf.\nMomentum-Auslösungen schocken den anvisierten Gegner.",
    "icon": "🔔",
    "statKey": "central_limit",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41010,
-   "x": -765,
-   "y": 563,
+   "x": -389,
+   "y": 1812,
    "nameEn": "Residual Plot",
    "nameDe": "Residuenplot",
    "descEn": "After using Data Strike, your next 5 correct fills count twice toward Momentum.\nAfter using Data Strike, you deal 15% increased damage for 10 seconds.",
    "descDe": "Nach der Nutzung von Datenhieb zählen deine nächsten 5 korrekten Füllungen doppelt für Momentum.\nNach der Nutzung von Datenhieb verursachst du 10 Sekunden lang 15% erhöhten Schaden.",
    "icon": "📊",
    "statKey": "residual_plot",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41011,
-   "x": 105,
-   "y": -943,
+   "x": 1596,
+   "y": -1807,
    "nameEn": "Compound Interest",
    "nameDe": "Zinseszins",
    "descEn": "Mistakes absorbed by Variance Shield add 10 seconds to the timer for each mistake already absorbed this level.",
    "descDe": "Vom Varianzschild absorbierte Fehler fügen dem Timer 10 Sekunden für jeden in diesem Level bereits absorbierten Fehler hinzu.",
    "icon": "💰",
    "statKey": "compound_interest",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41012,
-   "x": 275,
-   "y": -820,
+   "x": 1047,
+   "y": -1101,
    "nameEn": "Frozen Assets",
    "nameDe": "Eingefrorene Vermögenswerte",
    "descEn": "Absolute Zero lasts 0.25 seconds longer for each unused Variance Shield charge (max 1 second).\nAbsolute Zero freezes all enemies on the screen.",
    "descDe": "Absoluter Nullpunkt hält für jede ungenutzte Varianzschild-Ladung 0,25 Sekunden länger an (max. 1 Sekunde).\nAbsoluter Nullpunkt friert alle Gegner auf dem Bildschirm ein.",
    "icon": "🧊",
    "statKey": "frozen_assets",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41013,
-   "x": 340,
-   "y": -620,
+   "x": 402,
+   "y": -841,
    "nameEn": "Zero Sum",
    "nameDe": "Nullsumme",
    "descEn": "Every 2 correct fills during Absolute Zero add 1 second to the timer.\nCorrect fills during Absolute Zero chill the targeted enemy.",
    "descDe": "Alle 2 korrekten Füllungen während Absolutem Nullpunkt fügen dem Timer 1 Sekunde hinzu.\nKorrekte Füllungen während Absolutem Nullpunkt unterkühlen den anvisierten Gegner.",
    "icon": "➕",
    "statKey": "zero_sum",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41014,
-   "x": 275,
-   "y": -420,
+   "x": 0,
+   "y": -1650,
    "nameEn": "Echo Chamber",
    "nameDe": "Echokammer",
    "descEn": "Arcane Reveal has a 25% chance to cast a second time on the same area.",
    "descDe": "Arkane Enthüllung hat eine Chance von 25%, ein zweites Mal im selben Bereich gewirkt zu werden.",
    "icon": "🔊",
    "statKey": "echo_chamber",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41015,
-   "x": 105,
-   "y": -297,
+   "x": -200,
+   "y": -1500,
    "nameEn": "Series Expansion",
    "nameDe": "Reihenentwicklung",
    "descEn": "Arcane Reveal can reveal 1 additional cell for each Variance Shield charge you hold (max 3).",
    "descDe": "Arkane Enthüllung kann für jede gehaltene Varianzschild-Ladung 1 zusätzliche Zelle aufdecken (max. 3).",
    "icon": "🔢",
    "statKey": "series_expansion",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41016,
-   "x": -105,
-   "y": -297,
+   "x": -398,
+   "y": -843,
    "nameEn": "Limit Theorem",
    "nameDe": "Grenzwertsatz",
    "descEn": "Each mistake absorbed by Variance Shield reduces the cooldown of Absolute Zero by 10 seconds.",
    "descDe": "Jeder vom Varianzschild absorbierte Fehler verringert die Abklingzeit von Absolutem Nullpunkt um 10 Sekunden.",
    "icon": "🎯",
    "statKey": "limit_theorem",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41017,
-   "x": -275,
-   "y": -420,
+   "x": 0,
+   "y": -1350,
    "nameEn": "Derivative",
    "nameDe": "Ableitung",
    "descEn": "Using Arcane Reveal reduces the cooldown of Absolute Zero by 30 seconds.\nReveal projectiles from Arcane Reveal deal 25% increased damage.",
    "descDe": "Die Nutzung von Arkaner Enthüllung verringert die Abklingzeit von Absolutem Nullpunkt um 30 Sekunden.\nAufdeckungsprojektile von Arkaner Enthüllung verursachen 25% erhöhten Schaden.",
    "icon": "∂",
    "statKey": "derivative",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41018,
-   "x": -340,
-   "y": -620,
+   "x": -3,
+   "y": -1004,
    "nameEn": "Integral",
    "nameDe": "Integral",
    "descEn": "Using Absolute Zero reduces the cooldown of Arcane Reveal by 30 seconds.",
    "descDe": "Die Nutzung von Absolutem Nullpunkt verringert die Abklingzeit von Arkaner Enthüllung um 30 Sekunden.",
    "icon": "∫",
    "statKey": "integral",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41019,
-   "x": -275,
-   "y": -820,
+   "x": 1786,
+   "y": -1920,
    "nameEn": "Asymptote",
    "nameDe": "Asymptote",
    "descEn": "While Variance Shield has no charges left, mistakes cost 25% less time.",
    "descDe": "Solange der Varianzschild keine Ladungen mehr hat, kosten Fehler 25% weniger Zeit.",
    "icon": "〰️",
    "statKey": "asymptote",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41020,
-   "x": -105,
-   "y": -943,
+   "x": -1794,
+   "y": -1920,
    "nameEn": "Convergent Series",
    "nameDe": "Konvergente Reihe",
    "descEn": "Variance Shield regains 1 charge every 90 seconds (up to its maximum).\nEach mistake absorbed by Variance Shield fires 4 reveal projectiles at the targeted enemy.",
    "descDe": "Der Varianzschild erhält alle 90 Sekunden 1 Ladung zurück (bis zu seinem Maximum).\nJeder vom Varianzschild absorbierte Fehler feuert 4 Aufdeckungsprojektile auf den anvisierten Gegner ab.",
    "icon": "🌀",
    "statKey": "convergent_series",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41021,
-   "x": 765,
-   "y": 563,
+   "x": 1144,
+   "y": 726,
    "nameEn": "Prior Elicitation",
    "nameDe": "Vorannahmen-Erhebung",
    "descEn": "Bayesian Insight triggers a second time with half its marks when the puzzle is half solved.",
    "descDe": "Bayesianische Einsicht wird ein zweites Mal mit der Hälfte ihrer Markierungen ausgelöst, wenn das Rätsel zur Hälfte gelöst ist.",
    "icon": "🧠",
    "statKey": "prior_elicitation",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41022,
-   "x": 573,
-   "y": 648,
+   "x": 1468,
+   "y": 931,
    "nameEn": "Posterior Predictive",
    "nameDe": "Posteriori-Prädiktion",
    "descEn": "Precision Shot also reveals 1 correct cell in the clicked row and 1 in the clicked column.",
    "descDe": "Präzisionsschuss deckt zusätzlich 1 richtige Zelle in der angeklickten Zeile und 1 in der angeklickten Spalte auf.",
    "icon": "🔭",
    "statKey": "posterior_predictive",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41023,
-   "x": 367,
-   "y": 604,
+   "x": 819,
+   "y": 519,
    "nameEn": "Credible Interval",
    "nameDe": "Glaubwürdigkeitsintervall",
    "descEn": "Precision Shot marks every wrong cell in the clicked row and column without counting toward its mark limit.\nEach cell marked by Precision Shot fires a reveal projectile at half strength.",
    "descDe": "Präzisionsschuss markiert jede falsche Zelle in der angeklickten Zeile und Spalte, ohne dass sie auf sein Markierungslimit zählt.\nJede von Präzisionsschuss markierte Zelle feuert ein Aufdeckungsprojektil mit halber Stärke ab.",
    "icon": "↔️",
    "statKey": "credible_interval",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41024,
-   "x": 226,
-   "y": 448,
+   "x": 433,
+   "y": 1879,
    "nameEn": "Lasting Impression",
    "nameDe": "Bleibender Eindruck",
    "descEn": "Rain of Arrows permanently reveals 1 correct cell from its scan.",
    "descDe": "Pfeilregen deckt 1 richtige Zelle seines Scans dauerhaft auf.",
    "icon": "📌",
    "statKey": "lasting_impression",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41025,
-   "x": 204,
-   "y": 239,
+   "x": 969,
+   "y": 211,
    "nameEn": "Expected Value",
    "nameDe": "Erwartungswert",
    "descEn": "Each cell marked by Precision Shot adds 1 second to the timer.",
    "descDe": "Jede von Präzisionsschuss markierte Zelle fügt dem Timer 1 Sekunde hinzu.",
    "icon": "🎲",
    "statKey": "expected_value",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41026,
-   "x": 309,
-   "y": 57,
+   "x": 1403,
+   "y": 674,
    "nameEn": "Naive Bayes",
    "nameDe": "Naive Bayes",
    "descEn": "The cooldown of Rain of Arrows is reduced by 2 seconds for each wrong cell marked on the grid when it is cast (max 40 seconds).\nReveal projectiles deal 2% increased damage for each wrong cell marked on the grid (max 30%).",
    "descDe": "Die Abklingzeit von Pfeilregen wird für jede beim Wirken auf dem Gitter markierte falsche Zelle um 2 Sekunden verringert (max. 40 Sekunden).\nAufdeckungsprojektile verursachen 2% erhöhten Schaden für jede auf dem Gitter markierte falsche Zelle (max. 30%).",
    "icon": "🧩",
    "statKey": "naive_bayes",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41027,
-   "x": 501,
-   "y": -28,
+   "x": 385,
+   "y": 1375,
    "nameEn": "Hot Zone",
    "nameDe": "Brennpunkt",
    "descEn": "If at least half of the cells scanned by Rain of Arrows are correct, its cooldown is reduced by 20 seconds.\nEach correct cell scanned by Rain of Arrows fires a reveal projectile at half strength (max 8).",
    "descDe": "Wenn mindestens die Hälfte der von Pfeilregen gescannten Zellen richtig ist, wird seine Abklingzeit um 20 Sekunden verringert.\nJede von Pfeilregen gescannte richtige Zelle feuert ein Aufdeckungsprojektil mit halber Stärke ab (max. 8).",
    "icon": "🔥",
    "statKey": "hot_zone",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41028,
-   "x": 707,
-   "y": 16,
+   "x": 481,
+   "y": 750,
    "nameEn": "Sample Space",
    "nameDe": "Stichprobenraum",
    "descEn": "Precision Shot can mark 1 additional wrong cell for every 25% of the puzzle solved (max 3).",
    "descDe": "Präzisionsschuss kann für je 25% des gelösten Rätsels 1 zusätzliche falsche Zelle markieren (max. 3).",
    "icon": "🗺️",
    "statKey": "sample_space",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41029,
-   "x": 848,
-   "y": 172,
+   "x": 1661,
+   "y": -433,
    "nameEn": "Heads or Tails",
    "nameDe": "Kopf oder Zahl",
    "descEn": "Precision Shot has a 25% chance to fire a second time on the same cell.",
    "descDe": "Präzisionsschuss hat eine Chance von 25%, ein zweites Mal auf dieselbe Zelle zu feuern.",
    "icon": "🪙",
    "statKey": "heads_or_tails",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
   },
   {
    "id": 41030,
-   "x": 870,
-   "y": 381,
+   "x": 317,
+   "y": 1688,
    "nameEn": "Odds Maker",
    "nameDe": "Quotenmacher",
    "descEn": "Increases the chance of the bonus items from Gear of the Probabilist after a level by 10 percentage points.\nReveal projectiles have a 10% chance to deal double damage.",
    "descDe": "Erhöht die Chance auf die Bonus-Gegenstände von Ausrüstung des Probabilisten nach einem Level um 10 Prozentpunkte.\nAufdeckungsprojektile haben eine Chance von 10%, doppelten Schaden zu verursachen.",
    "icon": "🎰",
    "statKey": "odds_maker",
-   "tier": "notable"
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41031,
+   "x": -489,
+   "y": 160,
+   "nameEn": "Hunger Discount",
+   "nameDe": "Hungerrabatt",
+   "descEn": "Tail Risk costs 10 seconds less per cell.",
+   "descDe": "Tail-Risiko kostet 10 Sekunden weniger pro Zelle.",
+   "icon": "📉",
+   "statKey": "hunger_discount",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41032,
+   "x": -591,
+   "y": 86,
+   "nameEn": "Bigger Appetite",
+   "nameDe": "Größerer Appetit",
+   "descEn": "Tail Risk can reveal up to 5 additional cells.",
+   "descDe": "Tail-Risiko kann bis zu 5 zusätzliche Zellen enthüllen.",
+   "icon": "🍽️",
+   "statKey": "bigger_appetite",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41033,
+   "x": -610,
+   "y": -39,
+   "nameEn": "Quick Hunger",
+   "nameDe": "Schneller Hunger",
+   "descEn": "Tail Risk has a 60 second shorter cooldown.",
+   "descDe": "Tail-Risiko hat 60 Sekunden weniger Abklingzeit.",
+   "icon": "⏩",
+   "statKey": "quick_hunger",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41034,
+   "x": -536,
+   "y": -141,
+   "nameEn": "Free Lunch",
+   "nameDe": "Gratis-Mahlzeit",
+   "descEn": "Each cell revealed by Tail Risk has a 20% chance to cost no time.",
+   "descDe": "Jede von Tail-Risiko enthüllte Zelle kostet mit einer Chance von 20% keine Zeit.",
+   "icon": "🥪",
+   "statKey": "free_lunch",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41035,
+   "x": -411,
+   "y": -160,
+   "nameEn": "Extended Force",
+   "nameDe": "Verlängerte Kraft",
+   "descEn": "SPEEDFORCE lasts 3 seconds longer.",
+   "descDe": "SPEEDFORCE hält 3 Sekunden länger an.",
+   "icon": "⚡",
+   "statKey": "extended_force",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41036,
+   "x": -309,
+   "y": -86,
+   "nameEn": "Steady Footing",
+   "nameDe": "Fester Stand",
+   "descEn": "A mistake during SPEEDFORCE is 3 times as severe instead of 5 times.",
+   "descDe": "Ein Fehler während SPEEDFORCE ist 3-mal statt 5-mal so schwerwiegend.",
+   "icon": "🦶",
+   "statKey": "steady_footing",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41037,
+   "x": -290,
+   "y": 39,
+   "nameEn": "Rolling Thunder",
+   "nameDe": "Rollender Donner",
+   "descEn": "Each correct fill during SPEEDFORCE extends it by 0.5 seconds.",
+   "descDe": "Jede korrekte Füllung während SPEEDFORCE verlängert sie um 0,5 Sekunden.",
+   "icon": "⛈️",
+   "statKey": "rolling_thunder",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41038,
+   "x": -364,
+   "y": 141,
+   "nameEn": "Afterburn",
+   "nameDe": "Nachbrenner",
+   "descEn": "When SPEEDFORCE ends by itself, its remaining cooldown is reduced by 30 seconds.",
+   "descDe": "Wenn SPEEDFORCE von selbst endet, wird ihre verbleibende Abklingzeit um 30 Sekunden verringert.",
+   "icon": "🔥",
+   "statKey": "afterburn",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41039,
+   "x": -386,
+   "y": 355,
+   "nameEn": "Deeper Memory",
+   "nameDe": "Tieferes Gedächtnis",
+   "descEn": "Regression to Prior corrects 1 additional mistake.",
+   "descDe": "Regression zum Prior korrigiert 1 zusätzlichen Fehler.",
+   "icon": "🧠",
+   "statKey": "deeper_memory",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41040,
+   "x": -315,
+   "y": 251,
+   "nameEn": "Loss Recovery",
+   "nameDe": "Verlustausgleich",
+   "descEn": "Regression to Prior recovers 25% more of the lost time (up to 100%).",
+   "descDe": "Regression zum Prior erhält 25% mehr der verlorenen Zeit zurück (bis zu 100%).",
+   "icon": "💰",
+   "statKey": "loss_recovery",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41041,
+   "x": -191,
+   "y": 228,
+   "nameEn": "Dividends",
+   "nameDe": "Dividenden",
+   "descEn": "Regression to Prior reveals 1 additional correct cell per corrected mistake.",
+   "descDe": "Regression zum Prior enthüllt 1 zusätzliche korrekte Zelle pro korrigiertem Fehler.",
+   "icon": "📊",
+   "statKey": "dividends",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41042,
+   "x": -87,
+   "y": 300,
+   "nameEn": "Quick Audit",
+   "nameDe": "Schnelle Prüfung",
+   "descEn": "Regression to Prior has a 30 second shorter cooldown.",
+   "descDe": "Regression zum Prior hat 30 Sekunden weniger Abklingzeit.",
+   "icon": "🧾",
+   "statKey": "quick_audit",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41043,
+   "x": -64,
+   "y": 424,
+   "nameEn": "Wide Coverage",
+   "nameDe": "Breite Deckung",
+   "descEn": "Significance Threshold also protects the 3×3 area around the mistake.",
+   "descDe": "Signifikanzschwelle schützt zusätzlich den 3×3-Bereich um den Fehler.",
+   "icon": "☂️",
+   "statKey": "wide_coverage",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41044,
+   "x": -135,
+   "y": 528,
+   "nameEn": "Rapid Underwriting",
+   "nameDe": "Schnelle Zeichnung",
+   "descEn": "Significance Threshold has a 45 second shorter cooldown.",
+   "descDe": "Signifikanzschwelle hat 45 Sekunden weniger Abklingzeit.",
+   "icon": "🖋️",
+   "statKey": "rapid_underwriting",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41045,
+   "x": -259,
+   "y": 551,
+   "nameEn": "Premium Return",
+   "nameDe": "Prämienrückerstattung",
+   "descEn": "Each mistake absorbed by Significance Threshold gives 5 seconds.",
+   "descDe": "Jeder von der Signifikanzschwelle absorbierte Fehler gibt 5 Sekunden.",
+   "icon": "💵",
+   "statKey": "premium_return",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41046,
+   "x": -363,
+   "y": 479,
+   "nameEn": "Reinsurance",
+   "nameDe": "Rückversicherung",
+   "descEn": "Each mistake absorbed by Significance Threshold has a 25% chance to reset its cooldown.",
+   "descDe": "Jeder von der Signifikanzschwelle absorbierte Fehler setzt mit einer Chance von 25% ihre Abklingzeit zurück.",
+   "icon": "🔁",
+   "statKey": "reinsurance",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41047,
+   "x": -110,
+   "y": -508,
+   "nameEn": "Lingering Bones",
+   "nameDe": "Verweilende Knochen",
+   "descEn": "Residual skeletons live 10 seconds longer.",
+   "descDe": "Residual-Skelette leben 10 Sekunden länger.",
+   "icon": "🦴",
+   "statKey": "lingering_bones",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41048,
+   "x": -60,
+   "y": -392,
+   "nameEn": "Rapid Volleys",
+   "nameDe": "Schnelle Salven",
+   "descEn": "Residual skeletons fire 2 seconds faster.",
+   "descDe": "Residual-Skelette feuern 2 Sekunden schneller.",
+   "icon": "🏹",
+   "statKey": "rapid_volleys",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41049,
+   "x": -106,
+   "y": -275,
+   "nameEn": "Bone Pile",
+   "nameDe": "Knochenhaufen",
+   "descEn": "Residual can have 1 additional skeleton alive at the same time.",
+   "descDe": "Residual kann 1 zusätzliches Skelett gleichzeitig am Leben haben.",
+   "icon": "💀",
+   "statKey": "bone_pile",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41050,
+   "x": -222,
+   "y": -225,
+   "nameEn": "Fertile Ground",
+   "nameDe": "Fruchtbarer Boden",
+   "descEn": "Residual has a 24 second shorter cooldown.",
+   "descDe": "Residual hat 24 Sekunden weniger Abklingzeit.",
+   "icon": "🪦",
+   "statKey": "fertile_ground",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41051,
+   "x": -340,
+   "y": -271,
+   "nameEn": "Shallow Grave",
+   "nameDe": "Flaches Grab",
+   "descEn": "Degrees of Freedom has a 10 minute shorter cooldown.",
+   "descDe": "Freiheitsgrade hat 10 Minuten weniger Abklingzeit.",
+   "icon": "⚰️",
+   "statKey": "shallow_grave",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41052,
+   "x": -390,
+   "y": -387,
+   "nameEn": "Patient Curse",
+   "nameDe": "Geduldiger Fluch",
+   "descEn": "The zombie's countdown lasts 5 seconds longer.",
+   "descDe": "Der Countdown des Zombies dauert 5 Sekunden länger.",
+   "icon": "⌛",
+   "statKey": "patient_curse",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41053,
+   "x": -344,
+   "y": -504,
+   "nameEn": "Double Curse",
+   "nameDe": "Doppelter Fluch",
+   "descEn": "The zombie curses 2 cells for each correct click.",
+   "descDe": "Der Zombie verflucht 2 Zellen pro korrektem Klick.",
+   "icon": "☠️",
+   "statKey": "double_curse",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41054,
+   "x": -228,
+   "y": -555,
+   "nameEn": "Mercy of the Dead",
+   "nameDe": "Gnade der Toten",
+   "descEn": "A mistake made by the zombie costs half the time.",
+   "descDe": "Ein vom Zombie verursachter Fehler kostet nur die halbe Zeit.",
+   "icon": "🕊️",
+   "statKey": "mercy_of_the_dead",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41055,
+   "x": 109,
+   "y": -507,
+   "nameEn": "Longer Rewind",
+   "nameDe": "Längerer Rücklauf",
+   "descEn": "State Rollback rewinds 10 seconds further.",
+   "descDe": "Zustandsrücksetzer spult 10 Sekunden weiter zurück.",
+   "icon": "⏪",
+   "statKey": "longer_rewind",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41056,
+   "x": 226,
+   "y": -555,
+   "nameEn": "Quick Reset",
+   "nameDe": "Schneller Neustart",
+   "descEn": "State Rollback has a 90 second shorter cooldown.",
+   "descDe": "Zustandsrücksetzer hat 90 Sekunden weniger Abklingzeit.",
+   "icon": "🔄",
+   "statKey": "quick_reset",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41057,
+   "x": 343,
+   "y": -506,
+   "nameEn": "Clean Slate",
+   "nameDe": "Reiner Tisch",
+   "descEn": "State Rollback always forgives the mistakes that already existed in the restored state.",
+   "descDe": "Zustandsrücksetzer vergibt immer die Fehler, die im wiederhergestellten Zustand bereits existierten.",
+   "icon": "🧽",
+   "statKey": "clean_slate",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41058,
+   "x": 390,
+   "y": -389,
+   "nameEn": "Hindsight",
+   "nameDe": "Rückblick",
+   "descEn": "State Rollback also reveals 2 correct cells.",
+   "descDe": "Zustandsrücksetzer enthüllt zusätzlich 2 korrekte Zellen.",
+   "icon": "🔍",
+   "statKey": "hindsight",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41059,
+   "x": 341,
+   "y": -272,
+   "nameEn": "Strong Transitions",
+   "nameDe": "Starke Übergänge",
+   "descEn": "Transition Matrix has a 15% higher cascade chance.",
+   "descDe": "Übergangsmatrix hat eine um 15% höhere Übertragungschance.",
+   "icon": "🔗",
+   "statKey": "strong_transitions",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41060,
+   "x": 224,
+   "y": -225,
+   "nameEn": "Extended Matrix",
+   "nameDe": "Erweiterte Matrix",
+   "descEn": "Transition Matrix lasts 5 seconds longer.",
+   "descDe": "Übergangsmatrix hält 5 Sekunden länger an.",
+   "icon": "🧮",
+   "statKey": "extended_matrix",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41061,
+   "x": 107,
+   "y": -274,
+   "nameEn": "Deep Chain",
+   "nameDe": "Tiefe Kette",
+   "descEn": "Cascaded fills of Transition Matrix can cascade 1 additional time.",
+   "descDe": "Übertragene Füllungen der Übergangsmatrix können 1 weiteres Mal übertragen werden.",
+   "icon": "⛓️",
+   "statKey": "deep_chain",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41062,
+   "x": 60,
+   "y": -391,
+   "nameEn": "Rapid Transitions",
+   "nameDe": "Schnelle Übergänge",
+   "descEn": "Transition Matrix has a 60 second shorter cooldown.",
+   "descDe": "Übergangsmatrix hat 60 Sekunden weniger Abklingzeit.",
+   "icon": "💨",
+   "statKey": "rapid_transitions",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41063,
+   "x": 387,
+   "y": 358,
+   "nameEn": "Extra Trap",
+   "nameDe": "Zusätzliche Falle",
+   "descEn": "Bayes Traps lets you place 1 additional trap.",
+   "descDe": "Bayes-Fallen lässt dich 1 zusätzliche Falle platzieren.",
+   "icon": "🪤",
+   "statKey": "extra_trap",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41064,
+   "x": 362,
+   "y": 482,
+   "nameEn": "Long Fuse",
+   "nameDe": "Lange Zündschnur",
+   "descEn": "The fuse of Bayes Traps lasts 3 seconds longer.",
+   "descDe": "Die Zündschnur der Bayes-Fallen brennt 3 Sekunden länger.",
+   "icon": "🧨",
+   "statKey": "long_fuse",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41065,
+   "x": 256,
+   "y": 552,
+   "nameEn": "Wide Blast",
+   "nameDe": "Große Explosion",
+   "descEn": "Reveal Traps reveal correct cells within a 2-step radius instead of 1.",
+   "descDe": "Enthüllungsfallen decken korrekte Zellen in einem 2-Schritt-Radius statt 1 auf.",
+   "icon": "💥",
+   "statKey": "wide_blast",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41066,
+   "x": 133,
+   "y": 526,
+   "nameEn": "Long Reach",
+   "nameDe": "Große Reichweite",
+   "descEn": "Elimination Traps reach 2 cells further.",
+   "descDe": "Eliminierungsfallen reichen 2 Zellen weiter.",
+   "icon": "📏",
+   "statKey": "long_reach",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41067,
+   "x": 63,
+   "y": 421,
+   "nameEn": "More Shields",
+   "nameDe": "Mehr Schilde",
+   "descEn": "Type I Error Shield seeds 5 additional shields.",
+   "descDe": "Typ-I-Fehlerschutz versieht 5 zusätzliche Zellen mit Schilden.",
+   "icon": "🛡️",
+   "statKey": "more_shields",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41068,
+   "x": 88,
+   "y": 297,
+   "nameEn": "Informed Prior",
+   "nameDe": "Informierter Prior",
+   "descEn": "Each shield of Type I Error Shield also reveals a correct cell in its row or column when it triggers.",
+   "descDe": "Jedes Schild des Typ-I-Fehlerschutzes enthüllt bei Auslösung zusätzlich eine korrekte Zelle in seiner Zeile oder Spalte.",
+   "icon": "🎯",
+   "statKey": "informed_prior",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41069,
+   "x": 194,
+   "y": 228,
+   "nameEn": "Shield Dividend",
+   "nameDe": "Schilddividende",
+   "descEn": "Each triggered shield of Type I Error Shield gives 3 seconds.",
+   "descDe": "Jedes ausgelöste Schild des Typ-I-Fehlerschutzes gibt 3 Sekunden.",
+   "icon": "🪙",
+   "statKey": "shield_dividend",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41070,
+   "x": 317,
+   "y": 253,
+   "nameEn": "Quick Shields",
+   "nameDe": "Schnelle Schilde",
+   "descEn": "Type I Error Shield has a 30 second shorter cooldown.",
+   "descDe": "Typ-I-Fehlerschutz hat 30 Sekunden weniger Abklingzeit.",
+   "icon": "⚙️",
+   "statKey": "quick_shields",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41071,
+   "x": 485,
+   "y": 161,
+   "nameEn": "Hibernation",
+   "nameDe": "Winterschlaf",
+   "descEn": "Brownian Motion has a 2 minute shorter cooldown.",
+   "descDe": "Brownsche Bewegung hat 2 Minuten weniger Abklingzeit.",
+   "icon": "🐻",
+   "statKey": "hibernation",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41072,
+   "x": 361,
+   "y": 139,
+   "nameEn": "Brisk Walk",
+   "nameDe": "Flotter Spaziergang",
+   "descEn": "Browney and Wiener take each step 0.5 seconds faster.",
+   "descDe": "Browney und Wiener machen jeden Schritt 0,5 Sekunden schneller.",
+   "icon": "🚶",
+   "statKey": "brisk_walk",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41073,
+   "x": 289,
+   "y": 35,
+   "nameEn": "Thick Fur",
+   "nameDe": "Dichtes Fell",
+   "descEn": "Mistakes cut the walks of Browney and Wiener by only half as much.",
+   "descDe": "Fehler verkürzen die Wanderungen von Browney und Wiener nur halb so stark.",
+   "icon": "🧶",
+   "statKey": "thick_fur",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41074,
+   "x": 311,
+   "y": -89,
+   "nameEn": "Brotherly Bond",
+   "nameDe": "Brüderliche Bindung",
+   "descEn": "Wiener always walks along with Browney.",
+   "descDe": "Wiener wandert immer mit Browney.",
+   "icon": "🐼",
+   "statKey": "brotherly_bond",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41075,
+   "x": 415,
+   "y": -161,
+   "nameEn": "Long Leash",
+   "nameDe": "Lange Leine",
+   "descEn": "Drifter lasts 10 seconds longer.",
+   "descDe": "Drifter bleibt 10 Sekunden länger.",
+   "icon": "🦮",
+   "statKey": "long_leash",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41076,
+   "x": 539,
+   "y": -139,
+   "nameEn": "Restless Paws",
+   "nameDe": "Rastlose Pfoten",
+   "descEn": "Drifter takes each step 3 seconds faster.",
+   "descDe": "Drifter macht jeden Schritt 3 Sekunden schneller.",
+   "icon": "🐾",
+   "statKey": "restless_paws",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41077,
+   "x": 611,
+   "y": -35,
+   "nameEn": "Treats",
+   "nameDe": "Leckerlis",
+   "descEn": "Feeding Drifter adds 1 second of lifetime instead of 0.5 seconds.",
+   "descDe": "Das Füttern von Drifter verlängert seine Lebensdauer um 1 statt 0,5 Sekunden.",
+   "icon": "🦴",
+   "statKey": "treats",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41078,
+   "x": 589,
+   "y": 89,
+   "nameEn": "Keen Nose",
+   "nameDe": "Feine Nase",
+   "descEn": "Drifter always heads for correct cells that are not revealed yet.",
+   "descDe": "Drifter steuert immer korrekte Zellen an, die noch nicht aufgedeckt sind.",
+   "icon": "👃",
+   "statKey": "keen_nose",
+   "tier": "notable",
+   "layoutPinned": true
   }
  ],
  "connections": [
@@ -36707,11 +37417,947 @@ export const TALENT_TREE_DATA = {
    "from": 30124,
    "to": 30125,
    "dotted": false
+  },
+  {
+   "id": 2103,
+   "from": 31472,
+   "to": 37,
+   "dotted": false
+  },
+  {
+   "id": 2104,
+   "from": 31058,
+   "to": 56,
+   "dotted": false
+  },
+  {
+   "id": 2105,
+   "from": 60,
+   "to": 37,
+   "dotted": false
+  },
+  {
+   "id": 2106,
+   "from": 37,
+   "to": 62,
+   "dotted": false
+  },
+  {
+   "id": 2107,
+   "from": 37,
+   "to": 71,
+   "dotted": false
+  },
+  {
+   "id": 2108,
+   "from": 56,
+   "to": 61,
+   "dotted": false
+  },
+  {
+   "id": 2109,
+   "from": 56,
+   "to": 63,
+   "dotted": false
+  },
+  {
+   "id": 2110,
+   "from": 56,
+   "to": 70,
+   "dotted": false
+  },
+  {
+   "id": 2111,
+   "from": 57,
+   "to": 60,
+   "dotted": false
+  },
+  {
+   "id": 2112,
+   "from": 57,
+   "to": 41015,
+   "dotted": false
+  },
+  {
+   "id": 2113,
+   "from": 41015,
+   "to": 41014,
+   "dotted": false
+  },
+  {
+   "id": 2114,
+   "from": 41014,
+   "to": 59,
+   "dotted": false
+  },
+  {
+   "id": 2115,
+   "from": 59,
+   "to": 41017,
+   "dotted": false
+  },
+  {
+   "id": 2116,
+   "from": 41017,
+   "to": 41015,
+   "dotted": false
+  },
+  {
+   "id": 2117,
+   "from": 59,
+   "to": 58,
+   "dotted": false
+  },
+  {
+   "id": 2118,
+   "from": 58,
+   "to": 61,
+   "dotted": false
+  },
+  {
+   "id": 2119,
+   "from": 62,
+   "to": 66,
+   "dotted": false
+  },
+  {
+   "id": 2120,
+   "from": 66,
+   "to": 64,
+   "dotted": false
+  },
+  {
+   "id": 2121,
+   "from": 63,
+   "to": 65,
+   "dotted": false
+  },
+  {
+   "id": 2122,
+   "from": 65,
+   "to": 41011,
+   "dotted": false
+  },
+  {
+   "id": 2123,
+   "from": 64,
+   "to": 41020,
+   "dotted": false
+  },
+  {
+   "id": 2124,
+   "from": 41011,
+   "to": 41019,
+   "dotted": false
+  },
+  {
+   "id": 2125,
+   "from": 67,
+   "to": 71,
+   "dotted": false
+  },
+  {
+   "id": 2126,
+   "from": 70,
+   "to": 68,
+   "dotted": false
+  },
+  {
+   "id": 2127,
+   "from": 63,
+   "to": 41012,
+   "dotted": false
+  },
+  {
+   "id": 2128,
+   "from": 62,
+   "to": 69,
+   "dotted": false
+  },
+  {
+   "id": 2129,
+   "from": 69,
+   "to": 71,
+   "dotted": false
+  },
+  {
+   "id": 2130,
+   "from": 41012,
+   "to": 70,
+   "dotted": false
+  },
+  {
+   "id": 2131,
+   "from": 41017,
+   "to": 41018,
+   "dotted": false
+  },
+  {
+   "id": 2132,
+   "from": 72,
+   "to": 41018,
+   "dotted": false
+  },
+  {
+   "id": 2133,
+   "from": 41016,
+   "to": 72,
+   "dotted": false
+  },
+  {
+   "id": 2134,
+   "from": 41013,
+   "to": 72,
+   "dotted": false
+  },
+  {
+   "id": 2135,
+   "from": 67,
+   "to": 41016,
+   "dotted": false
+  },
+  {
+   "id": 2136,
+   "from": 68,
+   "to": 41013,
+   "dotted": false
+  },
+  {
+   "id": 2137,
+   "from": 36,
+   "to": 48,
+   "dotted": false
+  },
+  {
+   "id": 2138,
+   "from": 39,
+   "to": 49,
+   "dotted": false
+  },
+  {
+   "id": 2139,
+   "from": 48,
+   "to": 45,
+   "dotted": false
+  },
+  {
+   "id": 2140,
+   "from": 49,
+   "to": 46,
+   "dotted": false
+  },
+  {
+   "id": 2141,
+   "from": 45,
+   "to": 41006,
+   "dotted": false
+  },
+  {
+   "id": 2142,
+   "from": 46,
+   "to": 47,
+   "dotted": false
+  },
+  {
+   "id": 2143,
+   "from": 41006,
+   "to": 41009,
+   "dotted": false
+  },
+  {
+   "id": 2144,
+   "from": 47,
+   "to": 41009,
+   "dotted": false
+  },
+  {
+   "id": 2145,
+   "from": 41006,
+   "to": 41008,
+   "dotted": false
+  },
+  {
+   "id": 2146,
+   "from": 47,
+   "to": 41008,
+   "dotted": false
+  },
+  {
+   "id": 2147,
+   "from": 41008,
+   "to": 41005,
+   "dotted": false
+  },
+  {
+   "id": 2148,
+   "from": 41005,
+   "to": 55,
+   "dotted": false
+  },
+  {
+   "id": 2149,
+   "from": 55,
+   "to": 41001,
+   "dotted": false
+  },
+  {
+   "id": 2150,
+   "from": 55,
+   "to": 41004,
+   "dotted": false
+  },
+  {
+   "id": 2151,
+   "from": 36,
+   "to": 43,
+   "dotted": false
+  },
+  {
+   "id": 2152,
+   "from": 39,
+   "to": 44,
+   "dotted": false
+  },
+  {
+   "id": 2153,
+   "from": 36,
+   "to": 54,
+   "dotted": false
+  },
+  {
+   "id": 2154,
+   "from": 39,
+   "to": 53,
+   "dotted": false
+  },
+  {
+   "id": 2155,
+   "from": 43,
+   "to": 42,
+   "dotted": false
+  },
+  {
+   "id": 2156,
+   "from": 44,
+   "to": 41003,
+   "dotted": false
+  },
+  {
+   "id": 2157,
+   "from": 42,
+   "to": 54,
+   "dotted": false
+  },
+  {
+   "id": 2158,
+   "from": 41003,
+   "to": 53,
+   "dotted": false
+  },
+  {
+   "id": 2159,
+   "from": 54,
+   "to": 40,
+   "dotted": false
+  },
+  {
+   "id": 2160,
+   "from": 53,
+   "to": 41,
+   "dotted": false
+  },
+  {
+   "id": 2161,
+   "from": 43,
+   "to": 50,
+   "dotted": false
+  },
+  {
+   "id": 2162,
+   "from": 44,
+   "to": 51,
+   "dotted": false
+  },
+  {
+   "id": 2163,
+   "from": 50,
+   "to": 52,
+   "dotted": false
+  },
+  {
+   "id": 2164,
+   "from": 51,
+   "to": 41007,
+   "dotted": false
+  },
+  {
+   "id": 2165,
+   "from": 52,
+   "to": 41002,
+   "dotted": false
+  },
+  {
+   "id": 2166,
+   "from": 41007,
+   "to": 41010,
+   "dotted": false
+  },
+  {
+   "id": 2167,
+   "from": 30187,
+   "to": 36,
+   "dotted": false
+  },
+  {
+   "id": 2168,
+   "from": 30216,
+   "to": 39,
+   "dotted": false
+  },
+  {
+   "id": 2169,
+   "from": 38,
+   "to": 76,
+   "dotted": false
+  },
+  {
+   "id": 2170,
+   "from": 89,
+   "to": 77,
+   "dotted": false
+  },
+  {
+   "id": 2171,
+   "from": 76,
+   "to": 78,
+   "dotted": false
+  },
+  {
+   "id": 2172,
+   "from": 77,
+   "to": 79,
+   "dotted": false
+  },
+  {
+   "id": 2173,
+   "from": 78,
+   "to": 41026,
+   "dotted": false
+  },
+  {
+   "id": 2174,
+   "from": 79,
+   "to": 80,
+   "dotted": false
+  },
+  {
+   "id": 2175,
+   "from": 41026,
+   "to": 41022,
+   "dotted": false
+  },
+  {
+   "id": 2176,
+   "from": 80,
+   "to": 41022,
+   "dotted": false
+  },
+  {
+   "id": 2177,
+   "from": 41026,
+   "to": 41021,
+   "dotted": false
+  },
+  {
+   "id": 2178,
+   "from": 80,
+   "to": 41021,
+   "dotted": false
+  },
+  {
+   "id": 2179,
+   "from": 41021,
+   "to": 41023,
+   "dotted": false
+  },
+  {
+   "id": 2180,
+   "from": 41023,
+   "to": 88,
+   "dotted": false
+  },
+  {
+   "id": 2181,
+   "from": 88,
+   "to": 41025,
+   "dotted": false
+  },
+  {
+   "id": 2182,
+   "from": 88,
+   "to": 41028,
+   "dotted": false
+  },
+  {
+   "id": 2183,
+   "from": 38,
+   "to": 81,
+   "dotted": false
+  },
+  {
+   "id": 2184,
+   "from": 89,
+   "to": 82,
+   "dotted": false
+  },
+  {
+   "id": 2185,
+   "from": 38,
+   "to": 87,
+   "dotted": false
+  },
+  {
+   "id": 2186,
+   "from": 89,
+   "to": 86,
+   "dotted": false
+  },
+  {
+   "id": 2187,
+   "from": 81,
+   "to": 75,
+   "dotted": false
+  },
+  {
+   "id": 2188,
+   "from": 82,
+   "to": 41027,
+   "dotted": false
+  },
+  {
+   "id": 2189,
+   "from": 75,
+   "to": 87,
+   "dotted": false
+  },
+  {
+   "id": 2190,
+   "from": 41027,
+   "to": 86,
+   "dotted": false
+  },
+  {
+   "id": 2191,
+   "from": 87,
+   "to": 73,
+   "dotted": false
+  },
+  {
+   "id": 2192,
+   "from": 86,
+   "to": 74,
+   "dotted": false
+  },
+  {
+   "id": 2193,
+   "from": 81,
+   "to": 83,
+   "dotted": false
+  },
+  {
+   "id": 2194,
+   "from": 82,
+   "to": 84,
+   "dotted": false
+  },
+  {
+   "id": 2195,
+   "from": 83,
+   "to": 85,
+   "dotted": false
+  },
+  {
+   "id": 2196,
+   "from": 84,
+   "to": 41024,
+   "dotted": false
+  },
+  {
+   "id": 2197,
+   "from": 85,
+   "to": 41029,
+   "dotted": false
+  },
+  {
+   "id": 2198,
+   "from": 41024,
+   "to": 41030,
+   "dotted": false
+  },
+  {
+   "id": 2199,
+   "from": 30907,
+   "to": 38,
+   "dotted": false
+  },
+  {
+   "id": 2200,
+   "from": 175,
+   "to": 89,
+   "dotted": false
+  },
+  {
+   "id": 2201,
+   "from": 40,
+   "to": 41001,
+   "dotted": false
+  },
+  {
+   "id": 2202,
+   "from": 41,
+   "to": 41004,
+   "dotted": false
+  },
+  {
+   "id": 2203,
+   "from": 74,
+   "to": 41028,
+   "dotted": false
+  },
+  {
+   "id": 2204,
+   "from": 41025,
+   "to": 73,
+   "dotted": false
+  },
+  {
+   "id": 2205,
+   "from": 55,
+   "to": 41031,
+   "dotted": false
+  },
+  {
+   "id": 2206,
+   "from": 41031,
+   "to": 41032,
+   "dotted": false
+  },
+  {
+   "id": 2207,
+   "from": 41032,
+   "to": 41033,
+   "dotted": false
+  },
+  {
+   "id": 2208,
+   "from": 41033,
+   "to": 41034,
+   "dotted": false
+  },
+  {
+   "id": 2209,
+   "from": 41034,
+   "to": 41035,
+   "dotted": false
+  },
+  {
+   "id": 2210,
+   "from": 41035,
+   "to": 41036,
+   "dotted": false
+  },
+  {
+   "id": 2211,
+   "from": 41036,
+   "to": 41037,
+   "dotted": false
+  },
+  {
+   "id": 2212,
+   "from": 41037,
+   "to": 41038,
+   "dotted": false
+  },
+  {
+   "id": 2213,
+   "from": 41038,
+   "to": 41031,
+   "dotted": false
+  },
+  {
+   "id": 2214,
+   "from": 55,
+   "to": 41039,
+   "dotted": false
+  },
+  {
+   "id": 2215,
+   "from": 41039,
+   "to": 41040,
+   "dotted": false
+  },
+  {
+   "id": 2216,
+   "from": 41040,
+   "to": 41041,
+   "dotted": false
+  },
+  {
+   "id": 2217,
+   "from": 41041,
+   "to": 41042,
+   "dotted": false
+  },
+  {
+   "id": 2218,
+   "from": 41042,
+   "to": 41043,
+   "dotted": false
+  },
+  {
+   "id": 2219,
+   "from": 41043,
+   "to": 41044,
+   "dotted": false
+  },
+  {
+   "id": 2220,
+   "from": 41044,
+   "to": 41045,
+   "dotted": false
+  },
+  {
+   "id": 2221,
+   "from": 41045,
+   "to": 41046,
+   "dotted": false
+  },
+  {
+   "id": 2222,
+   "from": 41046,
+   "to": 41039,
+   "dotted": false
+  },
+  {
+   "id": 2223,
+   "from": 72,
+   "to": 41047,
+   "dotted": false
+  },
+  {
+   "id": 2224,
+   "from": 41047,
+   "to": 41048,
+   "dotted": false
+  },
+  {
+   "id": 2225,
+   "from": 41048,
+   "to": 41049,
+   "dotted": false
+  },
+  {
+   "id": 2226,
+   "from": 41049,
+   "to": 41050,
+   "dotted": false
+  },
+  {
+   "id": 2227,
+   "from": 41050,
+   "to": 41051,
+   "dotted": false
+  },
+  {
+   "id": 2228,
+   "from": 41051,
+   "to": 41052,
+   "dotted": false
+  },
+  {
+   "id": 2229,
+   "from": 41052,
+   "to": 41053,
+   "dotted": false
+  },
+  {
+   "id": 2230,
+   "from": 41053,
+   "to": 41054,
+   "dotted": false
+  },
+  {
+   "id": 2231,
+   "from": 41054,
+   "to": 41047,
+   "dotted": false
+  },
+  {
+   "id": 2232,
+   "from": 72,
+   "to": 41055,
+   "dotted": false
+  },
+  {
+   "id": 2233,
+   "from": 41055,
+   "to": 41056,
+   "dotted": false
+  },
+  {
+   "id": 2234,
+   "from": 41056,
+   "to": 41057,
+   "dotted": false
+  },
+  {
+   "id": 2235,
+   "from": 41057,
+   "to": 41058,
+   "dotted": false
+  },
+  {
+   "id": 2236,
+   "from": 41058,
+   "to": 41059,
+   "dotted": false
+  },
+  {
+   "id": 2237,
+   "from": 41059,
+   "to": 41060,
+   "dotted": false
+  },
+  {
+   "id": 2238,
+   "from": 41060,
+   "to": 41061,
+   "dotted": false
+  },
+  {
+   "id": 2239,
+   "from": 41061,
+   "to": 41062,
+   "dotted": false
+  },
+  {
+   "id": 2240,
+   "from": 41062,
+   "to": 41055,
+   "dotted": false
+  },
+  {
+   "id": 2241,
+   "from": 88,
+   "to": 41063,
+   "dotted": false
+  },
+  {
+   "id": 2242,
+   "from": 41063,
+   "to": 41064,
+   "dotted": false
+  },
+  {
+   "id": 2243,
+   "from": 41064,
+   "to": 41065,
+   "dotted": false
+  },
+  {
+   "id": 2244,
+   "from": 41065,
+   "to": 41066,
+   "dotted": false
+  },
+  {
+   "id": 2245,
+   "from": 41066,
+   "to": 41067,
+   "dotted": false
+  },
+  {
+   "id": 2246,
+   "from": 41067,
+   "to": 41068,
+   "dotted": false
+  },
+  {
+   "id": 2247,
+   "from": 41068,
+   "to": 41069,
+   "dotted": false
+  },
+  {
+   "id": 2248,
+   "from": 41069,
+   "to": 41070,
+   "dotted": false
+  },
+  {
+   "id": 2249,
+   "from": 41070,
+   "to": 41063,
+   "dotted": false
+  },
+  {
+   "id": 2250,
+   "from": 88,
+   "to": 41071,
+   "dotted": false
+  },
+  {
+   "id": 2251,
+   "from": 41071,
+   "to": 41072,
+   "dotted": false
+  },
+  {
+   "id": 2252,
+   "from": 41072,
+   "to": 41073,
+   "dotted": false
+  },
+  {
+   "id": 2253,
+   "from": 41073,
+   "to": 41074,
+   "dotted": false
+  },
+  {
+   "id": 2254,
+   "from": 41074,
+   "to": 41075,
+   "dotted": false
+  },
+  {
+   "id": 2255,
+   "from": 41075,
+   "to": 41076,
+   "dotted": false
+  },
+  {
+   "id": 2256,
+   "from": 41076,
+   "to": 41077,
+   "dotted": false
+  },
+  {
+   "id": 2257,
+   "from": 41077,
+   "to": 41078,
+   "dotted": false
+  },
+  {
+   "id": 2258,
+   "from": 41078,
+   "to": 41071,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 2,
-  "fingerprint": "06220b7cf99558ee",
+  "fingerprint": "99b23a7b079cfe59",
   "positions": [
    [
     156,
@@ -43750,8 +45396,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     31058,
-    1184,
-    -2036
+    1200,
+    -2000
    ],
    [
     31059,
@@ -45635,8 +47281,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     31472,
-    -1217,
-    -2038
+    -1208,
+    -2000
    ],
    [
     31474,
@@ -45690,273 +47336,273 @@ export const TALENT_TREE_DATA = {
    ],
    [
     55,
-    -676,
-    390
+    -528,
+    325
    ],
    [
     36,
-    -676,
-    268
+    -2018,
+    196
    ],
    [
     39,
-    -597,
-    297
+    -1047,
+    1736
    ],
    [
     40,
-    -556,
-    369
+    -1338,
+    53
    ],
    [
     41,
-    -570,
-    451
+    -613,
+    1183
    ],
    [
     42,
-    -634,
-    505
+    -1560,
+    -203
    ],
    [
     43,
-    -717,
-    505
+    -1938,
+    -115
    ],
    [
     44,
-    -781,
-    451
+    -718,
+    1791
    ],
    [
     45,
-    -795,
-    369
+    -1624,
+    514
    ],
    [
     46,
-    -754,
-    297
+    -1158,
+    1241
    ],
    [
     47,
-    -590,
-    178
+    -1288,
+    1039
    ],
    [
     49,
-    -465,
-    301
+    -1029,
+    1443
    ],
    [
     50,
-    -463,
-    475
+    -2136,
+    -239
    ],
    [
     51,
-    -586,
-    600
+    -688,
+    2020
    ],
    [
     52,
-    -761,
-    602
+    -2028,
+    -409
    ],
    [
     54,
-    -886,
-    479
+    -1652,
+    24
    ],
    [
     48,
-    -888,
-    305
+    -1753,
+    312
    ],
    [
     53,
-    -765,
-    180
+    -721,
+    1476
    ],
    [
     72,
-    0,
-    -780
+    -2,
+    -620
    ],
    [
     37,
-    0,
-    -902
+    -954,
+    -1850
    ],
    [
     56,
-    78,
-    -873
+    946,
+    -1850
    ],
    [
     57,
-    120,
-    -801
+    -454,
+    -1642
    ],
    [
     58,
-    106,
-    -719
+    446,
+    -1639
    ],
    [
     59,
-    42,
-    -665
+    200,
+    -1500
    ],
    [
     62,
-    -42,
-    -665
+    -1184,
+    -1554
    ],
    [
     63,
-    -106,
-    -719
+    1177,
+    -1546
    ],
    [
     64,
-    -120,
-    -801
+    -1604,
+    -1818
    ],
    [
     65,
-    -78,
-    -873
+    1396,
+    -1666
    ],
    [
     66,
-    85,
-    -992
+    -1404,
+    -1676
    ],
    [
     67,
-    210,
-    -869
+    -703,
+    -1047
    ],
    [
     68,
-    212,
-    -695
+    697,
+    -1042
    ],
    [
     69,
-    89,
-    -570
+    -1053,
+    -1108
    ],
    [
     71,
-    -85,
-    -568
+    -903,
+    -1351
    ],
    [
     61,
-    -210,
-    -691
+    696,
+    -1638
    ],
    [
     60,
-    -212,
-    -865
+    -704,
+    -1643
    ],
    [
     70,
-    -89,
-    -990
+    897,
+    -1345
    ],
    [
     88,
-    676,
-    390
+    523,
+    332
    ],
    [
     38,
-    676,
-    268
+    1931,
+    202
    ],
    [
     89,
-    754,
-    297
+    1005,
+    1661
    ],
    [
     73,
-    795,
-    369
+    1191,
+    1
    ],
    [
     74,
-    781,
-    451
+    509,
+    1076
    ],
    [
     75,
-    717,
-    505
+    1408,
+    -237
    ],
    [
     77,
-    634,
-    505
+    964,
+    1365
    ],
    [
     78,
-    570,
-    451
+    1524,
+    482
    ],
    [
     79,
-    556,
-    369
+    1086,
+    1173
    ],
    [
     80,
-    597,
-    297
+    1208,
+    981
    ],
    [
     81,
-    761,
-    178
+    1811,
+    -122
    ],
    [
     82,
-    886,
-    301
+    661,
+    1690
    ],
    [
     83,
-    888,
-    475
+    2011,
+    -232
    ],
    [
     84,
-    765,
-    600
+    647,
+    1918
    ],
    [
     85,
-    590,
-    602
+    1885,
+    -409
    ],
    [
     87,
-    465,
-    479
+    1520,
+    -5
    ],
    [
     76,
-    463,
-    305
+    1646,
+    290
    ],
    [
     86,
-    586,
-    180
+    643,
+    1377
    ],
    [
     1001,
@@ -45975,153 +47621,393 @@ export const TALENT_TREE_DATA = {
    ],
    [
     41001,
-    -1014,
-    462
+    -1020,
+    206
    ],
    [
     41002,
-    -991,
-    250
+    -1817,
+    -416
    ],
    [
     41003,
-    -848,
-    92
+    -475,
+    1492
    ],
    [
     41004,
-    -639,
-    47
+    -596,
+    853
    ],
    [
     41005,
-    -444,
-    133
+    -947,
+    601
    ],
    [
     41006,
-    -338,
-    318
+    -1494,
+    716
    ],
    [
     41007,
-    -360,
-    530
+    -487,
+    1996
    ],
    [
     41008,
-    -503,
-    688
+    -1243,
+    785
    ],
    [
     41009,
-    -712,
-    733
+    -1533,
+    966
    ],
    [
     41010,
-    -907,
-    647
+    -389,
+    1812
    ],
    [
     41011,
-    107,
-    -1108
+    1596,
+    -1807
    ],
    [
     41012,
-    279,
-    -983
+    1047,
+    -1101
    ],
    [
     41013,
-    345,
-    -780
+    402,
+    -841
    ],
    [
     41014,
-    279,
-    -577
+    0,
+    -1650
    ],
    [
     41015,
-    107,
-    -452
+    -200,
+    -1500
    ],
    [
     41016,
-    -107,
-    -452
+    -398,
+    -843
    ],
    [
     41017,
-    -279,
-    -577
+    0,
+    -1350
    ],
    [
     41018,
-    -345,
-    -780
+    -3,
+    -1004
    ],
    [
     41019,
-    -279,
-    -983
+    1786,
+    -1920
    ],
    [
     41020,
-    -107,
-    -1108
+    -1794,
+    -1920
    ],
    [
     41021,
-    907,
-    647
+    1144,
+    726
    ],
    [
     41022,
-    712,
-    733
+    1468,
+    931
    ],
    [
     41023,
-    503,
-    688
+    819,
+    519
    ],
    [
     41024,
-    360,
-    530
+    433,
+    1879
    ],
    [
     41025,
-    338,
-    318
+    969,
+    211
    ],
    [
     41026,
-    444,
-    133
+    1403,
+    674
    ],
    [
     41027,
-    639,
-    47
+    385,
+    1375
    ],
    [
     41028,
-    848,
-    92
+    481,
+    750
    ],
    [
     41029,
-    991,
-    250
+    1661,
+    -433
    ],
    [
     41030,
-    1014,
-    462
+    317,
+    1688
+   ],
+   [
+    41031,
+    -489,
+    160
+   ],
+   [
+    41032,
+    -591,
+    86
+   ],
+   [
+    41033,
+    -610,
+    -39
+   ],
+   [
+    41034,
+    -536,
+    -141
+   ],
+   [
+    41035,
+    -411,
+    -160
+   ],
+   [
+    41036,
+    -309,
+    -86
+   ],
+   [
+    41037,
+    -290,
+    39
+   ],
+   [
+    41038,
+    -364,
+    141
+   ],
+   [
+    41039,
+    -386,
+    355
+   ],
+   [
+    41040,
+    -315,
+    251
+   ],
+   [
+    41041,
+    -191,
+    228
+   ],
+   [
+    41042,
+    -87,
+    300
+   ],
+   [
+    41043,
+    -64,
+    424
+   ],
+   [
+    41044,
+    -135,
+    528
+   ],
+   [
+    41045,
+    -259,
+    551
+   ],
+   [
+    41046,
+    -363,
+    479
+   ],
+   [
+    41047,
+    -110,
+    -508
+   ],
+   [
+    41048,
+    -60,
+    -392
+   ],
+   [
+    41049,
+    -106,
+    -275
+   ],
+   [
+    41050,
+    -222,
+    -225
+   ],
+   [
+    41051,
+    -340,
+    -271
+   ],
+   [
+    41052,
+    -390,
+    -387
+   ],
+   [
+    41053,
+    -344,
+    -504
+   ],
+   [
+    41054,
+    -228,
+    -555
+   ],
+   [
+    41055,
+    109,
+    -507
+   ],
+   [
+    41056,
+    226,
+    -555
+   ],
+   [
+    41057,
+    343,
+    -506
+   ],
+   [
+    41058,
+    390,
+    -389
+   ],
+   [
+    41059,
+    341,
+    -272
+   ],
+   [
+    41060,
+    224,
+    -225
+   ],
+   [
+    41061,
+    107,
+    -274
+   ],
+   [
+    41062,
+    60,
+    -391
+   ],
+   [
+    41063,
+    387,
+    358
+   ],
+   [
+    41064,
+    362,
+    482
+   ],
+   [
+    41065,
+    256,
+    552
+   ],
+   [
+    41066,
+    133,
+    526
+   ],
+   [
+    41067,
+    63,
+    421
+   ],
+   [
+    41068,
+    88,
+    297
+   ],
+   [
+    41069,
+    194,
+    228
+   ],
+   [
+    41070,
+    317,
+    253
+   ],
+   [
+    41071,
+    485,
+    161
+   ],
+   [
+    41072,
+    361,
+    139
+   ],
+   [
+    41073,
+    289,
+    35
+   ],
+   [
+    41074,
+    311,
+    -89
+   ],
+   [
+    41075,
+    415,
+    -161
+   ],
+   [
+    41076,
+    539,
+    -139
+   ],
+   [
+    41077,
+    611,
+    -35
+   ],
+   [
+    41078,
+    589,
+    89
    ]
   ]
  }

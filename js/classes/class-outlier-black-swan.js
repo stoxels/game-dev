@@ -3,6 +3,8 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
+import { ptHasAscendencySkill } from '../probability-tree/probability-tree-state-points.js';
+import { reduceSlotCooldown } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 
 //------------------------------------------------------------------------
@@ -298,6 +300,8 @@ export function _endBlackSwan(natural = false) {
     _blackSwanRemoveBadge();
 
     if (natural) {
+        // Afterburn (Outlier wheel): a natural end shortens SPEEDFORCE's cooldown by 30 s.
+        if (ptHasAscendencySkill('outlier', 'afterburn')) reduceSlotCooldown('active4', 30);
         // Only track and announce when the effect ran its full duration
         trackAchStat('speedforceNaturalCompletions');
         globalThis.showToast(t('cls_speedforce_leave'));
@@ -310,10 +314,34 @@ export function _endBlackSwan(natural = false) {
 
 // Entry point: activates Black Swan (Speedforce mode) for durationMs milliseconds.
 // Starts the hyperspeed overlay, countdown badge, and schedules the auto-end timeout.
+// Adds extraMs to the running SPEEDFORCE: moves the end timer, the fade-out
+// of the hyperspeed canvas and the badge countdown (end time is the truth).
+export function _blackSwanExtend(extraMs) {
+    if (!window._blackSwanActive || !window._blackSwanEndAt) return;
+    window._blackSwanEndAt += extraMs;
+    window._blackSwanDurationMs += extraMs;
+
+    if (window._blackSwanTimeout) clearTimeout(window._blackSwanTimeout);
+    window._blackSwanTimeout = setTimeout(
+        () => _endBlackSwan(true),
+        Math.max(0, window._blackSwanEndAt - Date.now())
+    );
+
+    const canvas = document.getElementById('black-swan-hyperspeed');
+    if (canvas && canvas._stopTimeout) {
+        clearTimeout(canvas._stopTimeout);
+        canvas._stopTimeout = setTimeout(
+            () => _blackSwanFadeOutHyperspeed(),
+            Math.max(0, window._blackSwanEndAt - Date.now() - BSW_FADE_LEAD_MS)
+        );
+    }
+}
+
 export function _executeBlackSwan(durationMs) {
     window._blackSwanActive = true;
     window._blackSwanDurationMs = durationMs;
     window._blackSwanStartTime = Date.now();
+    window._blackSwanEndAt = Date.now() + durationMs;
 
     // Clear any stale timers from a previous cast
     if (window._blackSwanTimeout) clearTimeout(window._blackSwanTimeout);
@@ -332,7 +360,7 @@ export function _executeBlackSwan(durationMs) {
 
     // Tick the badge countdown every second
     window._blackSwanTickInterval = setInterval(() => {
-        remaining--;
+        remaining = Math.ceil((window._blackSwanEndAt - Date.now()) / 1000);
         _blackSwanUpdateBadge(remaining);
         if (remaining <= 0) {
             clearInterval(window._blackSwanTickInterval);

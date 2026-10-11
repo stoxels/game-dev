@@ -13,15 +13,16 @@ const INNER_CIRCLE_APPROACH_RADIUS = 700;
 const INNER_CIRCLE_APPROACH_ANGLE = 65;
 const INNER_CIRCLE_HUB_IDS = Object.freeze([55, 72, 88]);
 const INNER_CIRCLE_HUB_ANGLES = Object.freeze([240, 0, 120]);
-// The three class wheels (a hub keystone plus its ring of passives, authored
-// within INNER_CIRCLE_WHEEL_RADIUS of the hub) are placed by hand-tuned
-// numbers instead of the generic scale: each hub sits INNER_CIRCLE_HUB_DISTANCE
-// from the Ascendancy Gate and the wheel's own spacing is opened up by
-// INNER_CIRCLE_WHEEL_SPREAD, so the wheels fill the centre instead of leaving
-// a wide empty disc inside the first travel ring. Wheel shape is unchanged.
-const INNER_CIRCLE_WHEEL_RADIUS = 400;
-const INNER_CIRCLE_HUB_DISTANCE = 780;
-const INNER_CIRCLE_WHEEL_SPREAD = 1.45;
+// Where each hub was authored (same order as INNER_CIRCLE_HUB_IDS). The scale
+// of the travel nodes around the wheels is measured from these fixed anchors,
+// not from the hub node's current x/y: the god nodes (and their wheels) are
+// placed by hand in the editor, and moving one must not rescale and shove the
+// nodes around it.
+const INNER_CIRCLE_HUB_ANCHORS = Object.freeze([[-537, 310], [0, -620], [537, 310]]);
+// The three class wheels (hub keystone + its passives) are placed by hand in
+// the tree editor and stored pinned (layoutPinned), so the layout never
+// repositions them. Membership is NOT derived from distance to a hub: a god
+// node dragged next to other nodes must not capture them.
 const LAYOUT_CLEANUP_ITERATIONS = 160;
 const LAYOUT_ROUND_SAFETY = 1.5;
 const LAYOUT_RADII = Object.freeze({
@@ -43,9 +44,9 @@ function innerCircleLayoutScale(node, nodesById) {
 
     let nearest = null;
     for (let i = 0; i < INNER_CIRCLE_HUB_IDS.length; i++) {
-        const hub = nodesById.get(INNER_CIRCLE_HUB_IDS[i]);
-        if (!hub) continue;
-        const distance = Math.hypot(Number(node.x) - Number(hub.x), Number(node.y) - Number(hub.y));
+        if (!nodesById.has(INNER_CIRCLE_HUB_IDS[i])) continue;
+        const hub = INNER_CIRCLE_HUB_ANCHORS[i];
+        const distance = Math.hypot(Number(node.x) - hub[0], Number(node.y) - hub[1]);
         if (distance > INNER_CIRCLE_APPROACH_RADIUS) continue;
         const angle = Math.atan2(Number(node.x), -Number(node.y)) * 180 / Math.PI;
         const wanted = INNER_CIRCLE_HUB_ANGLES[i];
@@ -60,28 +61,6 @@ function innerCircleLayoutScale(node, nodesById) {
         (nearest.distance - 250) / (INNER_CIRCLE_APPROACH_RADIUS - 250)));
     const smoothT = t * t * (3 - 2 * t);
     return INNER_CIRCLE_SCALE + (LAYOUT_SCALE - INNER_CIRCLE_SCALE) * smoothT;
-}
-
-// Returns the final [x, y] for a class-wheel member (hub included), or null
-// for every other node. Positions are fixed: the wheels keep the exact shape
-// they were authored with, only spread outward from the gate.
-function classWheelPosition(node, nodesById) {
-    if (node.id === LAYOUT_START_ID || CLASS_START_IDS.has(node.id)) return null;
-    for (let i = 0; i < INNER_CIRCLE_HUB_IDS.length; i++) {
-        const hub = nodesById.get(INNER_CIRCLE_HUB_IDS[i]);
-        if (!hub) continue;
-        const offsetX = Number(node.x) - Number(hub.x);
-        const offsetY = Number(node.y) - Number(hub.y);
-        if (Math.hypot(offsetX, offsetY) > INNER_CIRCLE_WHEEL_RADIUS) continue;
-        const hubRadius = Math.hypot(Number(hub.x), Number(hub.y)) || 1;
-        const hubScale = INNER_CIRCLE_HUB_DISTANCE / hubRadius;
-        const memberScale = INNER_CIRCLE_SCALE * INNER_CIRCLE_WHEEL_SPREAD;
-        return [
-            Number(hub.x) * hubScale + offsetX * memberScale,
-            Number(hub.y) * hubScale + offsetY * memberScale,
-        ];
-    }
-    return null;
 }
 
 function enforceLayoutConstraints(xs, ys, radii, fixed, edgePairs) {
@@ -187,16 +166,15 @@ export function relaxPassiveTreeLayout(nodes, connections) {
     nodes.forEach((node, index) => {
         const rootFixed = node.id === LAYOUT_START_ID || CLASS_START_IDS.has(node.id);
         const pinned = node.layoutPinned === true && !rootFixed;
-        const wheel = pinned ? null : classWheelPosition(node, nodesById);
         const scale = pinned ? 1 : innerCircleLayoutScale(node, nodesById);
-        const x = wheel ? wheel[0] : Number(node.x) * scale;
-        const y = wheel ? wheel[1] : Number(node.y) * scale;
+        const x = Number(node.x) * scale;
+        const y = Number(node.y) * scale;
         xs[index] = x;
         ys[index] = y;
         targetXs[index] = x;
         targetYs[index] = y;
         radii[index] = layoutRadius(node);
-        fixed[index] = rootFixed || pinned || wheel ? 1 : 0;
+        fixed[index] = rootFixed || pinned ? 1 : 0;
     });
 
     const edgePairs = [];

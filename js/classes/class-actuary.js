@@ -9,6 +9,7 @@ import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { _fadeOutElement } from './class-recursionist.js';
 import { questStat_classMarkUsed, questStat_classRevealUsed, questStat_mistakesRemoved, updateQuestStats } from '../inference/inference-stats.js';
+import { ptHasAscendencySkill } from '../probability-tree/probability-tree-state-points.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
 
@@ -300,7 +301,13 @@ function _sigThreshIterateLine(key, cb) {
     const [type, idxStr] = key.split(':');
     const idx = parseInt(idxStr, 10);
 
-    if (type === 'row') {
+    if (type === 'box') {
+        // Wide Coverage: key is 'box:<row>_<col>' - the 3x3 area around that cell.
+        const [br, bc] = idxStr.split('_').map(Number);
+        for (let r = Math.max(0, br - 1); r <= Math.min(rows - 1, br + 1); r++) {
+            for (let c = Math.max(0, bc - 1); c <= Math.min(cols - 1, bc + 1); c++) cb(r, c);
+        }
+    } else if (type === 'row') {
         if (idx < 0 || idx >= rows) return;
         for (let c = 0; c < cols; c++) cb(idx, c);
     } else if (type === 'col') {
@@ -341,6 +348,7 @@ function _sigThreshRemoveVisual(key) {
 function _sigThreshLineName(key) {
     const [type, idxStr] = key.split(':');
     const n = parseInt(idxStr, 10) + 1;
+    if (type === 'box') return '3×3';
     if (type === 'row') return `${t('cls_row_word')} ${n}`;
     if (type === 'col') return `${t('cls_col_word')} ${n}`;
     return t('cls_diag_word');
@@ -360,6 +368,8 @@ function _sigThreshApplyShieldsAt(row, col, lines) {
     if (lines.includes('row')) keys.push(`row:${row}`);
     if (lines.includes('col')) keys.push(`col:${col}`);
     if (lines.includes('diagonals')) keys.push(..._sigThreshDiagKeys(row, col));
+    // Wide Coverage (Actuary wheel): the 3x3 area around the mistake is protected too.
+    if (ptHasAscendencySkill('actuary', 'wide_coverage')) keys.push(`box:${row}_${col}`);
 
     keys.forEach(key => {
         if (window._sigThresholdProtected.has(key)) return;
@@ -367,6 +377,18 @@ function _sigThreshApplyShieldsAt(row, col, lines) {
         _sigThreshApplyVisual(key);
         globalThis.showToast(t('cls_line_protected').replace('{name}', _sigThreshLineName(key)));
     });
+}
+
+// _sigThreshOnAbsorb - Premium Return / Reinsurance (Actuary wheel). Runs once
+// for every mistake Significance Threshold absorbs.
+function _sigThreshOnAbsorb() {
+    if (ptHasAscendencySkill('actuary', 'premium_return')) {
+        addTimeSecs(previewGainSecs(5), { capSecs: 3600, raw: true });
+    }
+    if (ptHasAscendencySkill('actuary', 'reinsurance') && Math.random() < 0.25) {
+        _refundCooldown('active4');
+        buildClassHUD();
+    }
 }
 
 // _sigThreshConsumeShield - consumes a matching shield charge for the given
@@ -379,6 +401,7 @@ function _sigThreshConsumeShield(matchKey) {
     globalThis.showToast(t('cls_thresh_triggered').replace('{line}', _sigThreshLineName(matchKey)));
 
     Audio_Manager.playSFX('varianceShield');
+    _sigThreshOnAbsorb();
 }
 
 
@@ -414,6 +437,7 @@ export function _sigThresholdIntercept(row, col) {
         window._sigThreshLines = null;
 
         Audio_Manager.playSFX('varianceShield');
+        _sigThreshOnAbsorb();
         buildClassHUD();
 
         return true;
@@ -425,11 +449,20 @@ export function _sigThresholdIntercept(row, col) {
     const colKey = `col:${col}`;
     const diagKeys = _sigThreshDiagKeys(row, col);
 
-    const matchKey = protected_.has(rowKey) ? rowKey
+    let matchKey = protected_.has(rowKey) ? rowKey
         : protected_.has(colKey) ? colKey
             : protected_.has(diagKeys[0]) ? diagKeys[0]
                 : protected_.has(diagKeys[1]) ? diagKeys[1]
                     : null;
+
+    // Wide Coverage boxes ('box:<row>_<col>') protect their 3x3 area.
+    if (!matchKey) {
+        for (const key of protected_) {
+            if (!key.startsWith('box:')) continue;
+            const [br, bc] = key.slice(4).split('_').map(Number);
+            if (Math.abs(row - br) <= 1 && Math.abs(col - bc) <= 1) { matchKey = key; break; }
+        }
+    }
 
     if (!matchKey) return false;
 

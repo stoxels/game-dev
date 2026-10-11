@@ -21,14 +21,14 @@ import { _executeArcaneReveal } from './class-mathmagician.js';
 import { _executeArcaneFreeze } from './class-mathmagician-absolute-zero.js';
 import { _varianceShield_playCometImpact, _varianceShield_removeBubble, _varianceShield_updateVisibility } from './class-mathmagician-variance-shield.js';
 import { _executeTailRisk } from './class-outlier.js';
-import { _endBlackSwan, _executeBlackSwan } from './class-outlier-black-swan.js';
+import { _blackSwanExtend, _endBlackSwan, _executeBlackSwan } from './class-outlier-black-swan.js';
 import { _executeFieldScan, _executePrecisionMark, _playBayesianInsightAnimation, _playBayesianRevealEffect } from './class-probabilist.js';
 import { _executeBrownianMotion, _executeSummonDrifter } from './class-random-walker.js';
 import { _executeDegreesOfFreedom, _executeResidual, resetRecursionistState } from './class-recursionist.js';
 import { _executeDataStrike, _executeDiagonalStrike, _momentumClearParticlesImmediate, _momentumParticlesOnMistake, _momentumSpawnParticle, _statisticianTriggerMomentum } from './class-statistician.js';
 import { activateTargetingReticle } from './targeting-reticle.js';
 import { playShieldChargePulseEffect, playTimeGainEffect } from '../probability-tree/probability-tree-effects.js';
-import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
+import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { getCharmLockedSkillForLegacySlot, getSkillCastRankClampedForSlot, getSkillIdForLegacySlot, noteCharmCast } from '../skills/skill-charms.js';
 import { _incDirect, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
@@ -313,10 +313,66 @@ function _dispatchBaseAbility(activeKey, playerClass, row, col, effect) {
 //------------------------------------------------------------------------
 
 
+// _applyAscendencyTreeEffect - returns a copy of an ascendency skill's effect
+//   numbers adjusted by the player's ascendency wheel nodes. The shared
+//   definition object is never mutated. Cooldown nodes live in
+//   class-cooldown-state.js; mechanic nodes sit next to their skills.
+function _applyAscendencyTreeEffect(ascendency, ascSlot, effect) {
+    const out = { ...effect };
+    const has = (key) => ptHasAscendencySkill(ascendency, key);
+    const key = `${ascendency}:${ascSlot}`;
+    switch (key) {
+        case 'outlier:active1':
+            if (has('hunger_discount')) out.secondsPerCell = Math.max(10, out.secondsPerCell - 10);
+            if (has('bigger_appetite')) out.maxCells += 5;
+            break;
+        case 'outlier:active2':
+            if (has('extended_force')) out.duration += 3000;
+            break;
+        case 'actuary:active1':
+            if (has('deeper_memory')) out.correctCount += 1;
+            if (has('loss_recovery')) out.recoverPct = Math.min(1, out.recoverPct + 0.25);
+            if (has('dividends')) out.revealCount += 1;
+            break;
+        case 'recursionist:active1':
+            if (has('lingering_bones')) out.durationSecs += 10;
+            if (has('rapid_volleys')) out.fires = Math.max(2, out.fires - 2);
+            if (has('bone_pile')) out.maxSkeletons += 1;
+            break;
+        case 'markovian:active1':
+            if (has('longer_rewind')) { out.windowSeconds += 10; out.rewindSeconds += 10; }
+            if (has('clean_slate')) out.clearOldMistakes = true;
+            break;
+        case 'markovian:active2':
+            if (has('strong_transitions')) out.cascadeChance = Math.min(1, out.cascadeChance + 0.15);
+            if (has('extended_matrix')) out.duration += 5000;
+            if (has('deep_chain')) out.maxDepth += 1;
+            break;
+        case 'bayesian:active1':
+            if (has('extra_trap')) out.trapCount += 1;
+            break;
+        case 'bayesian:active2':
+            if (has('more_shields')) out.seedCount += 5;
+            if (has('informed_prior')) out.bonusReveal = true;
+            break;
+        case 'random_walker:active1':
+            if (has('brotherly_bond')) out.paths = Math.max(2, out.paths);
+            break;
+        case 'random_walker:active2':
+            if (has('long_leash')) out.duration += 10000;
+            if (has('restless_paws')) out.interval = Math.max(3000, out.interval - 3000);
+            if (has('keen_nose')) out.smartTarget = true;
+            break;
+    }
+    return out;
+}
+
+
 // _dispatchAscendencyAbility - routes to the correct ascendency skill implementation.
 //   hudSlot 'active3' → ascendency active1 (skill 1); 'active4' → ascendency active2 (skill 2).
 function _dispatchAscendencyAbility(hudSlot, ascendency, row, col, effect) {
     const ascSlot = hudSlot === 'active3' ? 'active1' : 'active2';
+    effect = _applyAscendencyTreeEffect(ascendency, ascSlot, effect);
 
     // The cast rank + orb bonus follow the skill's slotted charm.
     _noteCharmCastForSlot(hudSlot);
@@ -1121,7 +1177,14 @@ export function getClassPenaltyMultiplier() {
     if (window._blackSwanActive) {
         _endBlackSwan(false);
         globalThis.showToast(t('cls_speedforce_broken'));
-        return 5.0;
+        // Steady Footing (Outlier wheel): the broken streak hurts 3x instead of 5x.
+        return ptHasAscendencySkill('outlier', 'steady_footing') ? 3.0 : 5.0;
+    }
+
+    // Mercy of the Dead (Recursionist wheel): a mistake made by the zombie
+    // itself costs half the time.
+    if (window._dofZombieMistake && ptHasAscendencySkill('recursionist', 'mercy_of_the_dead')) {
+        return 0.5;
     }
 
     // Mathmagician Variance Shield absorbs the mistake entirely.
@@ -1235,6 +1298,8 @@ function _handlePrecisionMarkMomentum(row, col) {
 function _handleStatisticianStreak(effect, row, col) {
     if (window._blackSwanActive) {
         // Black Swan: momentum on every correct fill, no streak required
+        // Rolling Thunder (Outlier wheel): every correct fill extends it by 0.5 s.
+        if (ptHasAscendencySkill('outlier', 'rolling_thunder')) _blackSwanExtend(500);
         _momentumSpawnParticle(row, col);
         _statisticianTriggerMomentum(effect.bonusSeconds);
         updateMomentumBar(correctFillStreak, effect.streakForBonus);

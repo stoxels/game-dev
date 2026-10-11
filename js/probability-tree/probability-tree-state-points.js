@@ -633,6 +633,13 @@ export function _ptGetNodeVisualState(id) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Returns true if the player has allocated the node AND plays the given
+// ascendency. Ascendency wheel nodes can be taken by anyone (for pathing)
+// but only do something for the ascendency they belong to.
+export function ptHasAscendencySkill(ascendencyId, statKey) {
+    return STATE.playerAscendency === ascendencyId && ptHasSkill(statKey);
+}
+
 // Returns true if the player has allocated a node whose statKey matches the given key.
 // This is the main public API used by the rest of the game to check passive bonuses.
 //

@@ -2,7 +2,7 @@ import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { t } from '../translation/translations.js';
-import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
+import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { cur } from '../state.js';
 
@@ -304,7 +304,9 @@ export function _executeBrownianMotion(row, col, paths, rank) {
     const rows = sol.length;
     const cols = sol[0].length;
 
-    const stepDurationMs = BEAR_STEP_MS_BY_RANK[rank] ?? BEAR_STEP_MS_BY_RANK[1];
+    let stepDurationMs = BEAR_STEP_MS_BY_RANK[rank] ?? BEAR_STEP_MS_BY_RANK[1];
+    // Brisk Walk (Random Walker wheel): every step takes 0.5 s less.
+    if (ptHasAscendencySkill('random_walker', 'brisk_walk')) stepDurationMs -= 500;
 
     // Both bears start in the first column from the left that is not fully
     // filled yet, so the walk is spent where work remains.
@@ -469,7 +471,8 @@ window.feedDrifter = function () {
     if (!_drifterActive) return;
 
     // Each feed point adds a small bonus to the drifter's remaining lifetime
-    _drifterTimeRemainingSeconds += 0.5;
+    // Treats (Random Walker wheel): each feeding adds 1 s instead of 0.5 s.
+    _drifterTimeRemainingSeconds += ptHasAscendencySkill('random_walker', 'treats') ? 1 : 0.5;
 
     _drifterCurrentFeed++;
 
@@ -1042,7 +1045,9 @@ window.penalizeRandomWalkersOnMistake = function () {
     // The removed tail flashes red on the path preview, then fades out.
     // Loss is rank-scaled: 15s / 10s / 5s for rank 1 / 2 / 3.
     (_activeBearAgents || []).slice().forEach(state => {
-        const bearLoss = BEAR_TIME_LOSS_S_BY_RANK[state.rank] ?? BEAR_TIME_LOSS_S_BY_RANK[1];
+        let bearLoss = BEAR_TIME_LOSS_S_BY_RANK[state.rank] ?? BEAR_TIME_LOSS_S_BY_RANK[1];
+        // Thick Fur (Random Walker wheel): mistakes cut walks by half as much.
+        if (ptHasAscendencySkill('random_walker', 'thick_fur')) bearLoss /= 2;
         const remainingSteps = state.path.length - state.step - 1; // steps after the current one
         const stepsToCut = Math.ceil((bearLoss * 1000) / state.stepDurationMs);
 

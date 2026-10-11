@@ -4,7 +4,7 @@ import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { handleWrongFill } from '../mouse-button-handlers.js';
 import { t } from '../translation/translations.js';
 import { _refundCooldown } from './class-actuary.js';
-import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
+import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { cur } from '../state.js';
 
@@ -781,7 +781,8 @@ function _startZombieChallenge(zombie) {
     const challenge = {
         row: zombie.row,
         col: zombie.col,
-        secondsLeft: ZOMBIE_COUNTDOWN_SECS,
+        // Patient Curse (Recursionist wheel): 5 extra seconds to react.
+        secondsLeft: ZOMBIE_COUNTDOWN_SECS + (ptHasAscendencySkill('recursionist', 'patient_curse') ? 5 : 0),
         dwellTimeout: null,
         countdownInterval: null,
         pollInterval: null,
@@ -854,6 +855,8 @@ function _evaluateZombieChallenge(zombie) {
     // Correct click!
     Audio_Manager.playSFX('questRewardClaimed');
     _zombieCurseNearbyCell(zombie, row, col);
+    // Double Curse (Recursionist wheel): a second cell is cursed as well.
+    if (ptHasAscendencySkill('recursionist', 'double_curse')) _zombieCurseNearbyCell(zombie, row, col);
     _endZombieChallenge(zombie);
 }
 
@@ -885,7 +888,13 @@ function _zombieFillCell(zombie) {
         globalThis.checkWin();
     } else {
         globalThis.showToast(t('cls_dof_zombie_wrong'));
-        handleWrongFill(row, col); // full mistake pipeline (absorbs, penalty, game-over)
+        // Flag read by getClassPenaltyMultiplier (Mercy of the Dead halves the cost).
+        window._dofZombieMistake = true;
+        try {
+            handleWrongFill(row, col); // full mistake pipeline (absorbs, penalty, game-over)
+        } finally {
+            window._dofZombieMistake = false;
+        }
     }
 }
 

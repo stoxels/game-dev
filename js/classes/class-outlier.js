@@ -6,7 +6,7 @@ import { t } from '../translation/translations.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
-import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
+import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
@@ -221,7 +221,13 @@ export function _tailRiskResolve() {
 
     const count = parseInt(slider.value, 10);
     const data = window._tailRiskData;
-    const totalCost = count * data.secondsPerCell;
+    // Free Lunch (Outlier wheel): each revealed cell has a 20% chance to cost no time.
+    let paidCells = count;
+    if (ptHasAscendencySkill('outlier', 'free_lunch')) {
+        paidCells = 0;
+        for (let i = 0; i < count; i++) if (Math.random() >= 0.2) paidCells++;
+    }
+    const totalCost = paidCells * data.secondsPerCell;
 
     _tailRiskRemoveOverlay();
     window._tailRiskData = null;

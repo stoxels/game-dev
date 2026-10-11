@@ -6,6 +6,8 @@ import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
 import { questStat_classRevealUsed, updateQuestStats } from '../inference/inference-stats.js';
+import { ptHasAscendencySkill } from '../probability-tree/probability-tree-state-points.js';
+import { addTimeSecs, previewGainSecs } from '../timer/timer-adjust.js';
 import { cur } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -259,6 +261,11 @@ export function _typeIShieldIntercept(row, col) {
 
     if (window._typeIBonusReveal) {
         _typeIBonusRevealCell(row, col);
+    }
+
+    // Shield Dividend (Bayesian wheel): every triggered shield pays 3 seconds.
+    if (ptHasAscendencySkill('bayesian', 'shield_dividend')) {
+        addTimeSecs(previewGainSecs(3), { capSecs: 3600, raw: true });
     }
 
     return true;

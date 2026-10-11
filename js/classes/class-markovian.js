@@ -7,7 +7,8 @@ import { t } from '../translation/translations.js';
 import { _setAbilityMode } from './class-abilities.js';
 import { cooldownState } from './class-cooldown-state.js';
 import { buildClassHUD } from './class-hud.js';
-import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
+import { ptHasAscendencySkill, ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
+import { revealTiles } from '../puzzle-mechanics/grid-actions.js';
 import { questStat_mistakesRemoved } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
 import { cur } from '../state.js';
@@ -79,8 +80,10 @@ export function _markovSnapshotTick() {
         ts: Date.now(),
     });
 
-    // Drop the oldest entry once the buffer is full.
-    if (window._markovSnapshots.length > MARKOV_SNAPSHOT_BUFFER) {
+    // Drop the oldest entry once the buffer is full. Longer Rewind (Markovian
+    // wheel) rewinds 10 s further, so it keeps 10 more snapshots.
+    const bufferSize = MARKOV_SNAPSHOT_BUFFER + (ptHasAscendencySkill('markovian', 'longer_rewind') ? 10 : 0);
+    if (window._markovSnapshots.length > bufferSize) {
         window._markovSnapshots.shift();
     }
 }
@@ -238,6 +241,9 @@ export function _executeStateRollback(windowSeconds, rewindSeconds, clearOldMist
 
     const mistakesForgiven = Math.max(0, mistakesBefore - globalThis.mistakeCount);
     if (mistakesForgiven > 0) globalThis._levelMistakesErased += mistakesForgiven; 
+
+    // Hindsight (Markovian wheel): the rollback also reveals 2 correct cells.
+    if (ptHasAscendencySkill('markovian', 'hindsight')) revealTiles(2);
 
     // ── Refresh all UI that depends on grid state ────────────────
     _rollback_refreshDisplay();
