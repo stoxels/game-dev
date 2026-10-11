@@ -17943,18 +17943,6 @@ export const TALENT_TREE_DATA = {
    "tier": "notable"
   },
   {
-   "id": 20211,
-   "x": 997,
-   "y": -746,
-   "nameEn": "Storm's Grasp",
-   "nameDe": "Griff des Sturms",
-   "descEn": "+12% Elemental damage, +1 Absorption on kill.",
-   "descDe": "+12% Elementarschaden, +1 Absorption pro Kill.",
-   "icon": "◆",
-   "statKey": "notable_storm_s_grasp",
-   "tier": "notable"
-  },
-  {
    "id": 20212,
    "x": 1027,
    "y": -1476,
@@ -36353,11 +36341,29 @@ export const TALENT_TREE_DATA = {
    "from": 30210,
    "to": 30251,
    "dotted": false
+  },
+  {
+   "id": 2100,
+   "from": 15,
+   "to": 30123,
+   "dotted": false
+  },
+  {
+   "id": 2101,
+   "from": 30123,
+   "to": 30124,
+   "dotted": false
+  },
+  {
+   "id": 2102,
+   "from": 30124,
+   "to": 30125,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 2,
-  "fingerprint": "35c28ca7f5033a61",
+  "fingerprint": "94520fb42ce759a6",
   "positions": [
    [
     156,
@@ -38411,12 +38417,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30123,
-    3674,
+    3681,
     -2367
    ],
    [
     30124,
-    3602,
+    3595,
     -2367
    ],
    [
@@ -43268,11 +43274,6 @@ export const TALENT_TREE_DATA = {
     20206,
     826,
     -3166
-   ],
-   [
-    20211,
-    1795,
-    -1343
    ],
    [
     20212,
