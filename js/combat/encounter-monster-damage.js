@@ -8,7 +8,7 @@ import { EG_STAGGER_DURATION_MS } from './encounter-lifecycle.js';
 import { _egFlashDamageCard, _egFlashImmune, _egShowDamageNumber, _egSpawnHitBurst, _egUpdateBars } from './encounter.js';
 import { EG_PLAYER_STATS, _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
-import { _egGainRage } from './combat-ailments-state.js';
+import { _egGainFortify, _egGainPowerCharge, _egGainRage } from './combat-ailments-state.js';
 
 // Player-to-monster damage: target HP/charge/stagger application, elemental
 // resistance and ailment hooks, hit visuals, echo/overkill/ricochet procs,
@@ -139,7 +139,8 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (opts && opts.isPlayerFlat && !elements) {
         const flatStats = _egComputePlayerStats();
         if ((Number(flatStats.damageToFirePct) || 0) > 0 || (Number(flatStats.onlyFireDamage) || 0) > 0
-            || (Number(flatStats.physAsExtraFirePct) || 0) > 0 || (Number(flatStats.physAsExtraShadowPct) || 0) > 0) {
+            || (Number(flatStats.physAsExtraFirePct) || 0) > 0 || (Number(flatStats.physAsExtraShadowPct) || 0) > 0
+            || (Number(flatStats.physAsExtraColdPct) || 0) > 0 || (Number(flatStats.physAsExtraLightningPct) || 0) > 0) {
             const flat = _egApplyDamageConversion(flatStats, amount, {});
             elements = flat.elements;
             amount = Math.max(1, Math.round(flat.physical
@@ -150,6 +151,15 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     // Intimidate (node 125): melee hits on an intimidated enemy deal more.
     // Applied before resistances so it scales the whole hit.
     amount = _egApplyIntimidateAmp(target, amount, opts);
+
+    // Phase C-1 conditional damage (tree): enemies on Low Life (<=35%), recently Shocked an enemy.
+    if (opts && (opts.isMelee || opts.isPlayerHit || opts.isPlayerSpell)) {
+        const cs = _egComputePlayerStats();
+        let condInc = 0;
+        if ((Number(cs.dmgVsLowLifePct) || 0) > 0 && target.maxHP > 0 && hpBefore / target.maxHP <= 0.35) condInc += cs.dmgVsLowLifePct;
+        if ((Number(cs.dmgRecentShockPct) || 0) > 0 && Date.now() - (Number(globalThis._egLastShockAt) || 0) < 4000) condInc += cs.dmgRecentShockPct;
+        if (condInc > 0) amount = Math.max(1, Math.round(amount * (1 + condInc / 100)));
+    }
 
     // Armour pierce (node 147): per-hit roll to skip the target's physical
     // reduction. Only tagged player hits (melee strikes / primary projectile
@@ -163,6 +173,19 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     // Elemental resistances reduce only the elemental share of the hit;
     // the physical portion passes through untouched. opts carries source
     // tags (isMelee) read by Spellproof inside.
+    // Penetration (tree lines pen_*): player hits ignore a share of the
+    // monster's elemental resistance. Untagged boss / monster damage is untouched.
+    if (opts && (opts.isMelee || opts.isPlayerHit || opts.isPlayerSpell)) {
+        const penStats = _egComputePlayerStats();
+        const penAll = Number(penStats.penElementalPct) || 0;
+        const pen = {
+            fire: penAll + (Number(penStats.penFirePct) || 0),
+            cold: penAll + (Number(penStats.penColdPct) || 0),
+            lightning: penAll + (Number(penStats.penLightningPct) || 0),
+            shadow: Number(penStats.penShadowPct) || 0,
+        };
+        if (pen.fire || pen.cold || pen.lightning || pen.shadow) opts = Object.assign({}, opts, { penetration: pen });
+    }
     amount = _egApplyTargetResistances(amount, target, elements, opts);
 
     // Ailments: shocked monsters take amplified damage; elemental hits can
@@ -207,9 +230,18 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
         const heavyStunPct = Math.min(100, Number(rageStats.stunChanceHeavyPct) || 0);
         const heavyStun = rageStats.isHeavyWeaponEquipped && heavyStunPct > 0
             && Math.random() * 100 < heavyStunPct;
-        if (maceStun || heavyStun) {
+        const genericStunPct = Math.min(100, Number(rageStats.stunChancePct) || 0);
+        const genericStun = genericStunPct > 0 && Math.random() * 100 < genericStunPct;
+        if (maceStun || heavyStun || genericStun) {
             target.staggeredUntil = Date.now() + _egStunDurationMs(rageStats, true);
             _egShowStatusLabel(target.id, t('eg_stunned'));
+            // Charges that trigger on a melee stun (Power, Fortify).
+            if ((rageStats.powerOnStunPct || 0) > 0 && Math.random() * 100 < Math.min(100, rageStats.powerOnStunPct)) {
+                _egGainPowerCharge(rageStats.powerChargesMax, rageStats.powerDurationPct);
+            }
+            if ((rageStats.fortifyOnStunPct || 0) > 0 && Math.random() * 100 < Math.min(100, rageStats.fortifyOnStunPct)) {
+                _egGainFortify(rageStats.fortifyMax, rageStats.fortifyDurationPct);
+            }
         }
     }
 

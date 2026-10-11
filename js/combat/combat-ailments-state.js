@@ -56,6 +56,10 @@ export function _egSetSparkLastPosition(x, y) {
 export function _egResetPlayerStatuses() {
     _egResetEnduranceCharges();
     _egResetFrenzyCharges();
+    _egResetOnslaught();
+    _egResetPowerCharges();
+    _egResetFortify();
+    _egResetRiposte();
     _egResetRage();
     _egPlayerStatuses = {};
 }
@@ -141,6 +145,123 @@ export function _egResetFrenzyCharges() {
 }
 
 //------------------------------------------------------------------------
+//-------------------ONSLAUGHT--------------------------------------------
+//------------------------------------------------------------------------
+// Timed speed buff (PoE Onslaught): while active, melee charge-up, cast and
+// movement speed rise by EG_ONSLAUGHT_SPEED_PCT (scaled by the effect line).
+// Gained on kill through the tree; every gain refreshes the timer.
+export const EG_ONSLAUGHT_DURATION_MS = 4000;
+export const EG_ONSLAUGHT_SPEED_PCT = 20;
+
+let _egOnslaughtUntil = 0;
+
+export function _egOnslaughtActive() {
+    return Date.now() < _egOnslaughtUntil;
+}
+
+export function _egGainOnslaught() {
+    _egOnslaughtUntil = Date.now() + EG_ONSLAUGHT_DURATION_MS;
+}
+
+export function _egResetOnslaught() {
+    _egOnslaughtUntil = 0;
+}
+
+//------------------------------------------------------------------------
+//-------------------POWER CHARGES----------------------------------------
+//------------------------------------------------------------------------
+// Critical-strike charge resource (PoE Power Charges). Each live charge adds
+// EG_POWER_CRIT_PER_CHARGE % crit chance (attacks and spells) and feeds the
+// tree's damage-per-charge line (folded in _egComputePlayerStats). Shared
+// timer like Frenzy/Endurance; resolved lazily against the clock.
+export const EG_POWER_DURATION_MS = 10000;
+export const EG_POWER_BASE_MAX = 3;
+export const EG_POWER_CRIT_PER_CHARGE = 1.5;
+
+let _egPowerCharges = 0;
+let _egPowerUntil = 0;
+
+export function _egGetPowerCharges() {
+    if (_egPowerCharges > 0 && Date.now() >= _egPowerUntil) _egPowerCharges = 0;
+    return _egPowerCharges;
+}
+
+// Adds one charge up to `max` and restarts the shared timer (scaled by
+// `durationPct` % increased Power Charge Duration). Returns the new count.
+export function _egGainPowerCharge(max, durationPct = 0) {
+    const cap = Math.max(1, Math.floor(Number(max) || EG_POWER_BASE_MAX));
+    const durationMult = 1 + Math.max(0, Number(durationPct) || 0) / 100;
+    _egPowerCharges = Math.min(cap, _egGetPowerCharges() + 1);
+    _egPowerUntil = Date.now() + EG_POWER_DURATION_MS * durationMult;
+    return _egPowerCharges;
+}
+
+export function _egResetPowerCharges() {
+    _egPowerCharges = 0;
+    _egPowerUntil = 0;
+}
+
+//------------------------------------------------------------------------
+//-------------------FORTIFICATION----------------------------------------
+//------------------------------------------------------------------------
+// Defensive stacks (PoE Fortify, stack form): each stack takes
+// EG_FORTIFY_DR_PER_STACK % less damage from hits (scaled by the effect line).
+// Gaining a stack refreshes the shared timer; all stacks expire together.
+export const EG_FORTIFY_DURATION_MS = 4000;
+export const EG_FORTIFY_BASE_MAX = 10;
+export const EG_FORTIFY_DR_PER_STACK = 1;
+
+let _egFortifyStacks = 0;
+let _egFortifyUntil = 0;
+
+export function _egGetFortifyStacks() {
+    if (_egFortifyStacks > 0 && Date.now() >= _egFortifyUntil) _egFortifyStacks = 0;
+    return _egFortifyStacks;
+}
+
+export function _egGainFortify(max, durationPct = 0) {
+    const cap = Math.max(1, Math.floor(Number(max) || EG_FORTIFY_BASE_MAX));
+    const durationMult = 1 + Math.max(0, Number(durationPct) || 0) / 100;
+    _egFortifyStacks = Math.min(cap, _egGetFortifyStacks() + 1);
+    _egFortifyUntil = Date.now() + EG_FORTIFY_DURATION_MS * durationMult;
+    return _egFortifyStacks;
+}
+
+export function _egResetFortify() {
+    _egFortifyStacks = 0;
+    _egFortifyUntil = 0;
+}
+
+//------------------------------------------------------------------------
+//-------------------RIPOSTE (SWORD IDENTITY)-----------------------------
+//------------------------------------------------------------------------
+// A successful Parry with a sword readies a riposte: the next melee strike
+// deals EG_RIPOSTE_BASE_MORE_PCT (+ tree) % more damage and consumes it.
+export const EG_RIPOSTE_DURATION_MS = 4000;
+export const EG_RIPOSTE_BASE_MORE_PCT = 25;
+
+let _egRiposteUntil = 0;
+
+export function _egArmRiposte(durationPct = 0) {
+    _egRiposteUntil = Date.now() + EG_RIPOSTE_DURATION_MS * (1 + Math.max(0, Number(durationPct) || 0) / 100);
+}
+
+export function _egRiposteReady() {
+    return Date.now() < _egRiposteUntil;
+}
+
+// Spends the riposte; returns true when one was ready.
+export function _egConsumeRiposte() {
+    const ready = _egRiposteReady();
+    _egRiposteUntil = 0;
+    return ready;
+}
+
+export function _egResetRiposte() {
+    _egRiposteUntil = 0;
+}
+
+//------------------------------------------------------------------------
 //-------------------RAGE-------------------------------------------------
 //------------------------------------------------------------------------
 // Axe resource (notable 369). Each Rage is a multiplicative melee-damage
@@ -153,12 +274,17 @@ export const EG_RAGE_DECAY_STEP_MS = 1000;
 
 let _egRage = 0;
 let _egRageDecayAt = 0;
+// Tree line "Inherent loss of Rage is X% slower": stretches the 1s fade step.
+let _egRageDecayMult = 1;
+export function _egSetRageDecayMult(mult) {
+    _egRageDecayMult = Math.max(1, Number(mult) || 1);
+}
 
 export function _egGetRage() {
     const now = Date.now();
     while (_egRage > 0 && now >= _egRageDecayAt) {
         _egRage -= 1;
-        _egRageDecayAt += EG_RAGE_DECAY_STEP_MS;
+        _egRageDecayAt += EG_RAGE_DECAY_STEP_MS * _egRageDecayMult;
     }
     return _egRage;
 }
@@ -174,8 +300,9 @@ export function _egGainRage(amount, max) {
 }
 
 // The player being hit also restarts the grace timer (no gain).
-export function _egRageOnPlayerHit() {
-    if (_egGetRage() > 0) _egRageDecayAt = Date.now() + EG_RAGE_DECAY_GRACE_MS;
+export function _egRageOnPlayerHit(gain = 0, max = 0) {
+    if (gain > 0 && max > 0) _egGainRage(gain, max);
+    else if (_egGetRage() > 0) _egRageDecayAt = Date.now() + EG_RAGE_DECAY_GRACE_MS;
 }
 
 export function _egResetRage() {

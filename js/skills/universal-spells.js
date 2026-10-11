@@ -2094,7 +2094,7 @@ function _uspRollCritMult() {
     return 1;
 }
 
-function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
+function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     const stats = (typeof globalThis._egComputePlayerStats === 'function')
         ? globalThis._egComputePlayerStats() : {};
     const tree = getUniversalSpellDamageBonus(spell);
@@ -2122,6 +2122,13 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
             + (stats.elementalDamageIncPct || 0) + fireBonus + coldBonus + lightningBonus) / 100;
     }
 
+    // Tree: Area Damage (skills with the Area tag) and Spell Damage over Time (tick hits).
+    if (Array.isArray(spell.tags) && spell.tags.includes('Area') && (stats.areaDamagePct || 0) > 0) {
+        dmg *= 1 + stats.areaDamagePct / 100;
+    }
+    if (hitOpts && hitOpts.isTick) {
+        dmg *= (1 + Math.max(0, stats.spellDotIncPct || 0) / 100) * (1 + Math.max(0, stats.spellDotMultiPct || 0) / 100);
+    }
     const critMult = _uspRollCritMult();
     const isCrit = critMult > 1;
     dmg *= critMult;
@@ -2147,7 +2154,8 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
     }
     // Fire conversion / fire-only (Primal Flame keystone, node 350).
     if ((Number(stats.damageToFirePct) || 0) > 0 || (Number(stats.onlyFireDamage) || 0) > 0
-        || (Number(stats.physAsExtraFirePct) || 0) > 0 || (Number(stats.physAsExtraShadowPct) || 0) > 0) {
+        || (Number(stats.physAsExtraFirePct) || 0) > 0 || (Number(stats.physAsExtraShadowPct) || 0) > 0
+        || (Number(stats.physAsExtraColdPct) || 0) > 0 || (Number(stats.physAsExtraLightningPct) || 0) > 0) {
         const converted = _egApplyDamageConversion(stats, spellElement === 'physical' ? amount : 0, elements);
         elements = converted.elements;
         amount = Math.max(1, Math.round(converted.physical
@@ -2235,7 +2243,7 @@ function _uspNoTargetToast(spell) {
 // Deals one rolled hit to a monster id (FX first, damage on impact).
 function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
     if (!monsterId) return;
-    const hit = calcUniversalSpellHit(spell, dmgMin, dmgMax);
+    const hit = calcUniversalSpellHit(spell, dmgMin, dmgMax, opts);
     const fxOpts = Object.assign({ isCrit: hit.isCrit }, opts || {});
     try {
         _uspFireThemedProjectile(spell, monsterId, hit, fxOpts);

@@ -85,6 +85,7 @@ if (typeof _egClearCenterGridBanners !== 'function') {
 // (lifeRegenPct, effects pipeline) scaled by the CURRENT maximum Life, so
 // the heal grows with the player's Life pool exactly as advertised.
 export let _egLastLifeRegenAt = 0;
+let _egLastLifePulseAt = 0;
 export function _egTickLifeRegen() {
     const now = Date.now();
     if (now - _egLastLifeRegenAt < EG_LIFE_REGEN_INTERVAL_MS) return;
@@ -103,7 +104,19 @@ export function _egTickLifeRegen() {
         }
     }
     // Endurance batch: % of Life per second for every live Endurance Charge.
-    const regenPct = (stats.lifeRegenPct || 0) + (stats.lifeRegenPerEndurancePct || 0) * (stats.enduranceCharges || 0);
+    // Surge of Vigour (tree): every 4 seconds a share of max Life is regenerated.
+    if ((stats.lifePulsePct || 0) > 0 && now - _egLastLifePulseAt >= 4000) {
+        _egLastLifePulseAt = now;
+        if (globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP
+            && !(typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration'))) {
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + globalThis.playerMaxHP * stats.lifePulsePct / 100);
+            if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+        }
+    }
+    // Brink of Death (tree): extra regeneration while on Low Life (<=35%).
+    const lowLifeRegen = ((stats.lowLifeRegenPct || 0) > 0 && globalThis.playerMaxHP > 0
+        && globalThis.playerCurrentHP <= globalThis.playerMaxHP * 0.35) ? stats.lowLifeRegenPct : 0;
+    const regenPct = (stats.lifeRegenPct || 0) + lowLifeRegen + (stats.lifeRegenPerEndurancePct || 0) * (stats.enduranceCharges || 0);
     // Life Regeneration rate (node 111) scales the whole per-second amount.
     const regenRate = 1 + Math.max(0, stats.lifeRegenRatePct || 0) / 100;
     // "Less" Life Regeneration rate (Vital Conduit keystone): a multiplier

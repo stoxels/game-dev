@@ -24,7 +24,7 @@ import { EG_MOD_TABLE_WEAPON_2H } from '../loot/loot-mod-tables-weapon-2h.js';
 import { EG_MOD_TABLE_WEAPON1, EG_MOD_TABLE_WEAPON_1H } from '../loot/loot-mod-tables-weapon1.js';
 import { EG_MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding, _egIsTwoHandedWeapon } from '../loot/loot-requirements.js';
-import { EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, EG_FRENZY_BASE_MAX, EG_FRENZY_DAMAGE_PER_CHARGE, EG_FRENZY_MELEE_SPEED_PER_CHARGE, _egGetEnduranceCharges, _egGetFrenzyCharges, _egGetRage } from '../combat/combat-ailments-state.js';
+import { EG_ONSLAUGHT_SPEED_PCT, _egOnslaughtActive, _egSetRageDecayMult, EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, EG_FRENZY_BASE_MAX, EG_FRENZY_DAMAGE_PER_CHARGE, EG_FRENZY_MELEE_SPEED_PER_CHARGE, _egGetEnduranceCharges, _egGetFrenzyCharges, _egGetRage, EG_FORTIFY_BASE_MAX, EG_POWER_BASE_MAX, EG_POWER_CRIT_PER_CHARGE, _egGetFortifyStacks, _egGetPowerCharges } from '../combat/combat-ailments-state.js';
 import { EG_PX_PER_METER, _egGetEquippedWeaponInfo, _egIsMaceOrSceptre } from '../combat/combat-weapon-swing-config.js';
 import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 
@@ -833,6 +833,132 @@ export function _egComputePlayerStats() {
         isDaggerEquipped: false,
         isSwordEquipped: false,
         isAxeEquipped: false,
+        isStaffEquipped: false,
+        staffBlockPct: passiveTreeBonuses.staffBlockPct || 0,
+        staffSpellBlockPct: passiveTreeBonuses.staffSpellBlockPct || 0,
+        shieldSpellBlockPct: passiveTreeBonuses.shieldSpellBlockPct || 0,
+        isWandEquipped: false,
+        isBowEquipped: false,
+        onslaught: false,
+        costEfficiencyPct: passiveTreeBonuses.costEfficiencyPct || 0,
+        onslaughtEffectPct: passiveTreeBonuses.onslaughtEffectPct || 0,
+        onslaughtOnKillPct: passiveTreeBonuses.onslaughtOnKillPct || 0,
+        onslaughtDefencePct: passiveTreeBonuses.onslaughtDefencePct || 0,
+        leechEffectRecentCritPct: passiveTreeBonuses.leechEffectRecentCritPct || 0,
+        wandPhysAsLightningPct: passiveTreeBonuses.wandPhysAsLightningPct || 0,
+        bowAoePct: passiveTreeBonuses.bowAoePct || 0,
+        dmgFullAbsorptionPct: passiveTreeBonuses.dmgFullAbsorptionPct || 0,
+        critMultiHeavy: passiveTreeBonuses.critMultiHeavy || 0,
+        dmgVsLowLifePct: passiveTreeBonuses.dmgVsLowLifePct || 0,
+        aoeRecentKillPct: passiveTreeBonuses.aoeRecentKillPct || 0,
+        ailmentDurationTakenPct: passiveTreeBonuses.ailmentDurationTakenPct || 0,
+        chillShockTakenPct: passiveTreeBonuses.chillShockTakenPct || 0,
+        spellDotMultiPct: passiveTreeBonuses.spellDotMultiPct || 0,
+        manaLeechAttackPct: passiveTreeBonuses.manaLeechAttackPct || 0,
+        spellBlockFlat: passiveTreeBonuses.spellBlockFlat || 0,
+        dmgRecentShockPct: passiveTreeBonuses.dmgRecentShockPct || 0,
+        shockDurationPct: passiveTreeBonuses.shockDurationPct || 0,
+        shockEffectPct: passiveTreeBonuses.shockEffectPct || 0,
+        lifePulsePct: passiveTreeBonuses.lifePulsePct || 0,
+        dotFasterPct: passiveTreeBonuses.dotFasterPct || 0,
+        enduranceMin: passiveTreeBonuses.enduranceMin || 0,
+        enduranceOnKillPct: passiveTreeBonuses.enduranceOnKillPct || 0,
+        damagePerEndurancePct: passiveTreeBonuses.damagePerEndurancePct || 0,
+        enduranceWhenHitPct: passiveTreeBonuses.enduranceWhenHitPct || 0,
+        lowLifeRegenPct: passiveTreeBonuses.lowLifeRegenPct || 0,
+        physTakenFlat: passiveTreeBonuses.physTakenFlat || 0,
+        manaLeechEffectPct: passiveTreeBonuses.manaLeechEffectPct || 0,
+        critVsBleedingPct: passiveTreeBonuses.critVsBleedingPct || 0,
+        critMultiVsBleedingPct: passiveTreeBonuses.critMultiVsBleedingPct || 0,
+        avoidPhysHitPct: passiveTreeBonuses.avoidPhysHitPct || 0,
+        armourIfHitPct: passiveTreeBonuses.armourIfHitPct || 0,
+        evasionIfNotHitPct: passiveTreeBonuses.evasionIfNotHitPct || 0,
+        igniteFasterPct: passiveTreeBonuses.igniteFasterPct || 0,
+        freezeDurationPct: passiveTreeBonuses.freezeDurationPct || 0,
+        critVsShockedPct: passiveTreeBonuses.critVsShockedPct || 0,
+        shadowResDouble: passiveTreeBonuses.shadowResDouble || 0,
+        armourPerEndurancePct: passiveTreeBonuses.armourPerEndurancePct || 0,
+        moveSpeedPerFrenzyPct: passiveTreeBonuses.moveSpeedPerFrenzyPct || 0,
+        chargeSpeedPerFrenzyPct: passiveTreeBonuses.chargeSpeedPerFrenzyPct || 0,
+        stunPerEndurancePct: passiveTreeBonuses.stunPerEndurancePct || 0,
+        aoePerEndurancePct: passiveTreeBonuses.aoePerEndurancePct || 0,
+        areaDamagePct: passiveTreeBonuses.areaDamagePct || 0,
+        shieldElementalRes: passiveTreeBonuses.shieldElementalRes || 0,
+        ailmentEffectTreePct: passiveTreeBonuses.ailmentEffectTreePct || 0,
+        blindDurationPct: passiveTreeBonuses.blindDurationPct || 0,
+        chillDurationPct: passiveTreeBonuses.chillDurationPct || 0,
+        poisonChanceSpellPct: passiveTreeBonuses.poisonChanceSpellPct || 0,
+        igniteDurationTakenPct: passiveTreeBonuses.igniteDurationTakenPct || 0,
+        shockEffectTakenPct: passiveTreeBonuses.shockEffectTakenPct || 0,
+        chillEffectTakenPct: passiveTreeBonuses.chillEffectTakenPct || 0,
+        freezeDurationTakenPct: passiveTreeBonuses.freezeDurationTakenPct || 0,
+        spellDotIncPct: passiveTreeBonuses.spellDotIncPct || 0,
+        critPerPowerCharge: passiveTreeBonuses.critPerPowerCharge || 0,
+        manaRegenPerPowerPct: passiveTreeBonuses.manaRegenPerPowerPct || 0,
+        critMultiPerPowerCharge: passiveTreeBonuses.critMultiPerPowerCharge || 0,
+        shieldCastSpeedPct: passiveTreeBonuses.shieldCastSpeedPct || 0,
+        shieldSpellDamagePct: passiveTreeBonuses.shieldSpellDamagePct || 0,
+        spellDamagePerPowerPct: passiveTreeBonuses.spellDamagePerPowerPct || 0,
+        shieldAbsorptionPct: passiveTreeBonuses.shieldAbsorptionPct || 0,
+        rageDecaySlowerPct: passiveTreeBonuses.rageDecaySlowerPct || 0,
+        ragePerArmourPct: passiveTreeBonuses.ragePerArmourPct || 0,
+        rageWhenHitAmount: passiveTreeBonuses.rageWhenHitAmount || 0,
+        powerChargesMax: EG_POWER_BASE_MAX + (passiveTreeBonuses.powerChargesMax || 0),
+        powerDurationPct: passiveTreeBonuses.powerDurationPct || 0,
+        powerOnCritPct: passiveTreeBonuses.powerOnCritPct || 0,
+        powerOnKillPct: passiveTreeBonuses.powerOnKillPct || 0,
+        powerOnBlockPct: passiveTreeBonuses.powerOnBlockPct || 0,
+        powerOnStunPct: passiveTreeBonuses.powerOnStunPct || 0,
+        powerDamagePerChargePct: passiveTreeBonuses.powerDamagePerChargePct || 0,
+        frenzyOnKillPct: passiveTreeBonuses.frenzyOnKillPct || 0,
+        frenzyOnBlockPct: passiveTreeBonuses.frenzyOnBlockPct || 0,
+        enduranceOnBlockPct: passiveTreeBonuses.enduranceOnBlockPct || 0,
+        enduranceOnMeleeCritPct: passiveTreeBonuses.enduranceOnMeleeCritPct || 0,
+        blindChancePct: passiveTreeBonuses.blindChancePct || 0,
+        blindEffectIncPct: passiveTreeBonuses.blindEffectIncPct || 0,
+        critChanceVsBlindedPct: passiveTreeBonuses.critChanceVsBlindedPct || 0,
+        fortifyMax: EG_FORTIFY_BASE_MAX + (passiveTreeBonuses.fortifyMax || 0),
+        fortifyDurationPct: passiveTreeBonuses.fortifyDurationPct || 0,
+        fortifyOnStunPct: passiveTreeBonuses.fortifyOnStunPct || 0,
+        fortifyEffectIncPct: passiveTreeBonuses.fortifyEffectIncPct || 0,
+        fortifiedDefencePct: passiveTreeBonuses.fortifiedDefencePct || 0,
+        stunChancePct: passiveTreeBonuses.stunChancePct || 0,
+        riposteDamagePct: passiveTreeBonuses.riposteDamagePct || 0,
+        riposteDurationPct: passiveTreeBonuses.riposteDurationPct || 0,
+        poisonChanceDaggerPct: passiveTreeBonuses.poisonChanceDaggerPct || 0,
+        daggerCritPoisons: passiveTreeBonuses.daggerCritPoisons || 0,
+        powerCharges: 0,
+        fortifyStacks: 0,
+        critChanceSwordPct: passiveTreeBonuses.critChanceSwordPct || 0,
+        critMultiplierSwordPct: passiveTreeBonuses.critMultiplierSwordPct || 0,
+        critChanceAxePct: passiveTreeBonuses.critChanceAxePct || 0,
+        critMultiplierAxePct: passiveTreeBonuses.critMultiplierAxePct || 0,
+        staffDamageIncPct: passiveTreeBonuses.staffDamageIncPct || 0,
+        staffChargeSpeedPct: passiveTreeBonuses.staffChargeSpeedPct || 0,
+        critChanceStaffPct: passiveTreeBonuses.critChanceStaffPct || 0,
+        critMultiplierStaffPct: passiveTreeBonuses.critMultiplierStaffPct || 0,
+        wandDamageIncPct: passiveTreeBonuses.wandDamageIncPct || 0,
+        wandChargeSpeedPct: passiveTreeBonuses.wandChargeSpeedPct || 0,
+        critChanceWandPct: passiveTreeBonuses.critChanceWandPct || 0,
+        critMultiplierWandPct: passiveTreeBonuses.critMultiplierWandPct || 0,
+        dualDamageIncPct: passiveTreeBonuses.dualDamageIncPct || 0,
+        dualChargeSpeedPct: passiveTreeBonuses.dualChargeSpeedPct || 0,
+        dualAccuracyIncPct: passiveTreeBonuses.dualAccuracyIncPct || 0,
+        dualCritChancePct: passiveTreeBonuses.dualCritChancePct || 0,
+        dualCritMultiPct: passiveTreeBonuses.dualCritMultiPct || 0,
+        dualCastSpeedPct: passiveTreeBonuses.dualCastSpeedPct || 0,
+        dualSpellDamagePct: passiveTreeBonuses.dualSpellDamagePct || 0,
+        dualMoveSpeedPct: passiveTreeBonuses.dualMoveSpeedPct || 0,
+        dualBlockPct: passiveTreeBonuses.dualBlockPct || 0,
+        physAsExtraColdPct: passiveTreeBonuses.physAsExtraColdPct || 0,
+        physAsExtraLightningPct: passiveTreeBonuses.physAsExtraLightningPct || 0,
+        freezeChancePct: passiveTreeBonuses.freezeChancePct || 0,
+        shockChancePct: passiveTreeBonuses.shockChancePct || 0,
+        penFirePct: passiveTreeBonuses.penFirePct || 0,
+        penColdPct: passiveTreeBonuses.penColdPct || 0,
+        penLightningPct: passiveTreeBonuses.penLightningPct || 0,
+        penShadowPct: passiveTreeBonuses.penShadowPct || 0,
+        penElementalPct: passiveTreeBonuses.penElementalPct || 0,
         meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
         meleeLightningMin: 0, meleeLightningMax: 0,
         meleeShadowMin: 0, meleeShadowMax: 0,
@@ -887,7 +1013,7 @@ export function _egComputePlayerStats() {
         // or holding one. Read by the block roll in _egPlayerTakeDamage.
         blockChanceTree: passiveTreeBonuses.blockChanceTree || 0,
         dodgeChance: 0, spellDodgeChance: 0,
-        ignitePct: passiveTreeBonuses.igniteChancePct || 0, freezePct: 0, shockPct: 0, blindPct: 0, convertPct: 0,
+        ignitePct: passiveTreeBonuses.igniteChancePct || 0, freezePct: passiveTreeBonuses.freezeChancePct || 0, shockPct: passiveTreeBonuses.shockChancePct || 0, blindPct: passiveTreeBonuses.blindChancePct || 0, convertPct: 0,
         ailmentDurationPct: 0, ailmentEffectPct: 0,
         // Per-ailment durations for YOUR ailments on enemies (effects
         // pipeline, e.g. reworked nodes 30252/30253): scale the monster-side
@@ -975,7 +1101,8 @@ export function _egComputePlayerStats() {
                 ? 1 + (passiveTreeBonuses.shieldDefencePct || 0) / 100 : 1;
             s.armourFlat += eff.armour * shieldDefMult;
             s.evasionFlat += eff.evasion * shieldDefMult;
-            s.absorptionFlat += eff.absorption * shieldDefMult;
+            s.absorptionFlat += eff.absorption * shieldDefMult
+                * (item.slotType === 'shield' ? 1 + (passiveTreeBonuses.shieldAbsorptionPct || 0) / 100 : 1);
         }
 
         // Shields carry an implicit base block chance on the base type
@@ -1041,6 +1168,16 @@ export function _egComputePlayerStats() {
     if (typeof _egIsDualWielding === 'function' && _egIsDualWielding()) {
         const dw = (typeof EG_DUAL_WIELD_DAMAGE_MULT !== 'undefined') ? EG_DUAL_WIELD_DAMAGE_MULT : 0.7;
         s.isDualWielding = true;
+        // Dual-wield tree lines fold into the shared channels while two
+        // one-handed weapons are equipped (accuracy is applied further down).
+        s.damageIncPct += s.dualDamageIncPct || 0;
+        s.meleeChargeSpeedPct += s.dualChargeSpeedPct || 0;
+        s.accuracyIncPct += s.dualAccuracyIncPct || 0;
+        s.critChance += s.dualCritChancePct || 0;
+        s.critMultiplierPct += s.dualCritMultiPct || 0;
+        s.castSpeedPct += s.dualCastSpeedPct || 0;
+        s.spellDamageIncPct += s.dualSpellDamagePct || 0;
+        s.movementSpeedPct += s.dualMoveSpeedPct || 0;
         for (const k of ['meleePhysMin', 'meleePhysMax',
             'meleeFireMin', 'meleeFireMax', 'meleeColdMin', 'meleeColdMax',
             'meleeLightningMin', 'meleeLightningMax', 'meleeShadowMin', 'meleeShadowMax']) {
@@ -1083,8 +1220,11 @@ export function _egComputePlayerStats() {
     // timer, see combat-ailments-state.js) each add flat Armour and
     // all-elemental resistance. Flat Armour joins the pool BEFORE the %
     // increased multiplier below, like every other flat source.
-    s.enduranceCharges = _egGetEnduranceCharges();
+    s.enduranceCharges = Math.max(_egGetEnduranceCharges(), Math.floor(Number(s.enduranceMin) || 0));
     s.rage = _egGetRage();
+    // Rage tree extras: slower fade, Armour per Rage.
+    _egSetRageDecayMult(1 + Math.max(0, s.rageDecaySlowerPct || 0) / 100);
+    if (s.rage > 0 && (s.ragePerArmourPct || 0) > 0) s.armourIncPct += s.rage * s.ragePerArmourPct;
     if (s.enduranceCharges > 0) {
         s.armourFlat += EG_ENDURANCE_ARMOUR_PER_CHARGE * s.enduranceCharges;
         s.allElementalResist += EG_ENDURANCE_ELEM_RES_PER_CHARGE * s.enduranceCharges;
@@ -1097,6 +1237,54 @@ export function _egComputePlayerStats() {
         s.frenzyDamageMorePct = EG_FRENZY_DAMAGE_PER_CHARGE * s.frenzyCharges;
         s.evasionIncPct += (s.evasionPerFrenzyChargePct || 0) * s.frenzyCharges;
     }
+    // Power Charges: crit chance (attacks and spells) and the tree's damage-per-charge line.
+    s.powerCharges = _egGetPowerCharges();
+    if (s.powerCharges > 0) {
+        s.critChance += EG_POWER_CRIT_PER_CHARGE * s.powerCharges;
+        s.spellCritChancePct = (s.spellCritChancePct || 0) + EG_POWER_CRIT_PER_CHARGE * s.powerCharges;
+        s.damageIncPct = (s.damageIncPct || 0) + (s.powerDamagePerChargePct || 0) * s.powerCharges;
+    }
+    // Fortification: live stack count; the defences line applies while any stack is up.
+    s.fortifyStacks = _egGetFortifyStacks();
+    if (s.fortifyStacks > 0 && (s.fortifiedDefencePct || 0) > 0) {
+        s.armourIncPct += s.fortifiedDefencePct;
+        s.evasionIncPct += s.fortifiedDefencePct;
+    }
+    // Phase C-1: per-charge tree lines, shield / heavy-weapon conditionals and
+    // the "recently" conditions (4s windows stamped by the combat code).
+    if (s.enduranceCharges > 0) {
+        s.armourIncPct += (s.armourPerEndurancePct || 0) * s.enduranceCharges;
+        s.damageIncPct += (s.damagePerEndurancePct || 0) * s.enduranceCharges;
+        s.areaOfEffectPct += (s.aoePerEndurancePct || 0) * s.enduranceCharges;
+        s.stunDurationPct += (s.stunPerEndurancePct || 0) * s.enduranceCharges;
+    }
+    if (s.frenzyCharges > 0) {
+        s.movementSpeedPct += (s.moveSpeedPerFrenzyPct || 0) * s.frenzyCharges;
+        s.meleeChargeSpeedPct += (s.chargeSpeedPerFrenzyPct || 0) * s.frenzyCharges;
+    }
+    if (s.powerCharges > 0) {
+        s.critChance += (s.critPerPowerCharge || 0) * s.powerCharges;
+        s.spellCritChancePct = (s.spellCritChancePct || 0) + (s.critPerPowerCharge || 0) * s.powerCharges;
+        s.critMultiplierPct += (s.critMultiPerPowerCharge || 0) * s.powerCharges;
+        s.manaRegenIncPct += (s.manaRegenPerPowerPct || 0) * s.powerCharges;
+        s.spellDamageIncPct += (s.spellDamagePerPowerPct || 0) * s.powerCharges;
+    }
+    if (s.isShieldEquipped) {
+        s.allElementalResist += s.shieldElementalRes || 0;
+        s.castSpeedPct += s.shieldCastSpeedPct || 0;
+        s.spellDamageIncPct += s.shieldSpellDamagePct || 0;
+    }
+    if (s.isHeavyWeaponEquipped) s.critMultiplierPct += s.critMultiHeavy || 0;
+    {
+        const nowMs = Date.now();
+        if (nowMs - (Number(globalThis._egLastKillAt) || 0) < 4000) s.areaOfEffectPct += s.aoeRecentKillPct || 0;
+        if (nowMs - (Number(globalThis._egLastHitTakenAt) || 0) < 4000) s.armourIncPct += s.armourIfHitPct || 0;
+        else s.evasionIncPct += s.evasionIfNotHitPct || 0;
+        if ((s.dmgFullAbsorptionPct || 0) > 0) {
+            const absMax = Math.round((s.absorptionFlat || 0) * (1 + (s.absorptionIncPct || 0) / 100));
+            if (absMax > 0 && (Number(globalThis._egPlayerAbsorptionCurrent) || 0) >= absMax) s.damageIncPct += s.dmgFullAbsorptionPct;
+        }
+    }
     // Weapon family of the equipped melee weapon (swing-config resolver:
     // icon/name based, unknown melee weapons count as swords). Gates the
     // sword/axe tree lines; +accuracy with swords joins the flat pool here
@@ -1107,6 +1295,26 @@ export function _egComputePlayerStats() {
     s.isSwordEquipped = weaponFamily === 'sword';
     s.isAxeEquipped = weaponFamily === 'axe';
     s.isDaggerEquipped = weaponFamily === 'dagger';
+    // Staves and Wands are separate families; sceptres count as Maces.
+    s.isStaffEquipped = weaponFamily === 'staff';
+    s.isWandEquipped = weaponFamily === 'wand' && !s.isMaceEquipped;
+    s.isBowEquipped = weaponFamily === 'bow';
+    // Phase C-2: wand / bow conditional lines, Onslaught, recent-crit leech.
+    if (s.isWandEquipped) s.physAsExtraLightningPct = (s.physAsExtraLightningPct || 0) + (s.wandPhysAsLightningPct || 0);
+    if (s.isBowEquipped) s.areaOfEffectPct += s.bowAoePct || 0;
+    if (Date.now() - (Number(globalThis._egLastCritAt) || 0) < 4000) {
+        s.lifeLeechEffectIncPct = (s.lifeLeechEffectIncPct || 0) + (s.leechEffectRecentCritPct || 0);
+    }
+    if (_egOnslaughtActive()) {
+        const onsMult = 1 + Math.max(0, s.onslaughtEffectPct || 0) / 100;
+        const onsSpeed = EG_ONSLAUGHT_SPEED_PCT * onsMult;
+        s.movementSpeedPct += onsSpeed;
+        s.meleeChargeSpeedPct += onsSpeed;
+        s.castSpeedPct += onsSpeed;
+        s.armourIncPct += s.onslaughtDefencePct || 0;
+        s.evasionIncPct += s.onslaughtDefencePct || 0;
+        s.onslaught = true;
+    }
     if (s.isSwordEquipped) s.accuracy += passiveTreeBonuses.accuracySwordFlat || 0;
     s.accuracy += s.agility;
     // "Increased Accuracy Rating" multiplies the fully aggregated rating
@@ -1152,6 +1360,8 @@ export function _egComputePlayerStats() {
     // is composed - _resetPlayerHP, _egSyncOverlayGearPools, level-up.
     if (s.manaRemoved > 0) s.mana = 0;
 
+    // Cleansed Thoughts: Shadow Resistance is doubled (before the cap).
+    if ((s.shadowResDouble || 0) > 0 && s.shadowResist > 0) s.shadowResist *= 2;
     s.armour = Math.round(s.armourFlat * (1 + s.armourIncPct / 100));
     s.evasion = Math.round(s.evasionFlat * (1 + s.evasionIncPct / 100));
     s.absorption = Math.round(s.absorptionFlat * (1 + s.absorptionIncPct / 100));
@@ -1243,7 +1453,9 @@ export function _egGetPlayerAttackIntervalBreakdown() {
     const chargeSpeedPct = (stats.meleeChargeSpeedPct || 0) + (stats.attackSpeedPct || 0)
         + (stats.isSwordEquipped ? (stats.swordChargeSpeedPct || 0) : 0)
         + (stats.isAxeEquipped ? (stats.axeChargeSpeedPct || 0) : 0)
-        + (stats.isDaggerEquipped ? (stats.daggerChargeSpeedPct || 0) : 0);
+        + (stats.isDaggerEquipped ? (stats.daggerChargeSpeedPct || 0) : 0)
+        + (stats.isStaffEquipped ? (stats.staffChargeSpeedPct || 0) : 0)
+        + (stats.isWandEquipped ? (stats.wandChargeSpeedPct || 0) : 0);
     if (chargeSpeedPct > 0) {
         interval = Math.round(interval * (1 - Math.min(chargeSpeedPct, 100) / 100) * 10000) / 10000;
     }
@@ -1398,6 +1610,7 @@ export function _egCalcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
 export function _egRollCrit(stats, bonus) {
     const chance = (stats.critChance || 0) + ((bonus && bonus.chance) || 0);
     if (chance > 0 && Math.random() * 100 < chance) {
+        globalThis._egLastCritAt = Date.now();
         // 150% base crit damage + additive multiplier bonuses
         return 1.5 + ((stats.critMultiplierPct || 0) + ((bonus && bonus.multiplierPct) || 0)) / 100;
     }
@@ -1639,6 +1852,128 @@ export const EG_STAT_DISPLAY_LABELS = {
     bleedSpeedPct: { label: t('eg_stat_bleed_speed'), suffix: '%' },
     lifeRegenRatePct: { label: t('eg_stat_life_regen_rate'), suffix: '%' },
     axeChargeSpeedPct: { label: t('eg_stat_axe_charge_speed'), suffix: '%' },
+    costEfficiencyPct: { label: t('eg_stat_cost_efficiency'), suffix: '%' },
+    onslaughtEffectPct: { label: t('eg_stat_onslaught_effect'), suffix: '%' },
+    onslaughtOnKillPct: { label: t('eg_stat_onslaught_on_kill'), suffix: '%' },
+    onslaughtDefencePct: { label: t('eg_stat_onslaught_defences'), suffix: '%' },
+    leechEffectRecentCritPct: { label: t('eg_stat_leech_effect_recent_crit'), suffix: '%' },
+    wandPhysAsLightningPct: { label: t('eg_stat_wand_phys_as_lightning'), suffix: '%' },
+    bowAoePct: { label: t('eg_stat_bow_aoe'), suffix: '%' },
+    dmgFullAbsorptionPct: { label: t('eg_stat_dmg_full_absorption'), suffix: '%' },
+    critMultiHeavy: { label: t('eg_stat_crit_multi_heavy'), suffix: '%' },
+    dmgVsLowLifePct: { label: t('eg_stat_dmg_vs_low_life'), suffix: '%' },
+    aoeRecentKillPct: { label: t('eg_stat_aoe_recent_kill'), suffix: '%' },
+    ailmentDurationTakenPct: { label: t('eg_stat_ailment_duration_taken'), suffix: '%' },
+    chillShockTakenPct: { label: t('eg_stat_chill_shock_effect_taken'), suffix: '%' },
+    spellDotMultiPct: { label: t('eg_stat_spell_dot_multi'), suffix: '%' },
+    manaLeechAttackPct: { label: t('eg_stat_mana_leech_attack'), suffix: '%' },
+    spellBlockFlat: { label: t('eg_stat_spell_block_flat'), suffix: '%' },
+    dmgRecentShockPct: { label: t('eg_stat_dmg_recent_shock'), suffix: '%' },
+    shockDurationPct: { label: t('eg_stat_lightning_ailment_duration'), suffix: '%' },
+    shockEffectPct: { label: t('eg_stat_shock_effect_inc'), suffix: '%' },
+    lifePulsePct: { label: t('eg_stat_life_pulse'), suffix: '%' },
+    dotFasterPct: { label: t('eg_stat_dot_faster'), suffix: '%' },
+    enduranceMin: { label: t('eg_stat_endurance_min'), suffix: '' },
+    enduranceOnKillPct: { label: t('eg_stat_endurance_on_kill_tree'), suffix: '%' },
+    damagePerEndurancePct: { label: t('eg_stat_damage_per_endurance'), suffix: '%' },
+    enduranceWhenHitPct: { label: t('eg_stat_endurance_when_hit'), suffix: '%' },
+    lowLifeRegenPct: { label: t('eg_stat_low_life_regen_pct'), suffix: '%' },
+    physTakenFlat: { label: t('eg_stat_phys_taken_flat'), suffix: '' },
+    manaLeechEffectPct: { label: t('eg_stat_mana_leech_effect_inc'), suffix: '%' },
+    critVsBleedingPct: { label: t('eg_stat_crit_vs_bleeding'), suffix: '%' },
+    critMultiVsBleedingPct: { label: t('eg_stat_crit_multi_vs_bleeding'), suffix: '%' },
+    avoidPhysHitPct: { label: t('eg_stat_avoid_phys_hit_pct'), suffix: '%' },
+    armourIfHitPct: { label: t('eg_stat_armour_if_hit_recently'), suffix: '%' },
+    evasionIfNotHitPct: { label: t('eg_stat_evasion_if_not_hit'), suffix: '%' },
+    igniteFasterPct: { label: t('eg_stat_ignite_faster'), suffix: '%' },
+    freezeDurationPct: { label: t('eg_stat_freeze_duration_inc'), suffix: '%' },
+    critVsShockedPct: { label: t('eg_stat_crit_vs_shocked'), suffix: '%' },
+    shadowResDouble: { label: t('eg_stat_shadow_res_double'), suffix: '' },
+    armourPerEndurancePct: { label: t('eg_stat_armour_per_endurance'), suffix: '%' },
+    moveSpeedPerFrenzyPct: { label: t('eg_stat_move_per_frenzy'), suffix: '%' },
+    chargeSpeedPerFrenzyPct: { label: t('eg_stat_charge_per_frenzy'), suffix: '%' },
+    stunPerEndurancePct: { label: t('eg_stat_stun_per_endurance'), suffix: '%' },
+    aoePerEndurancePct: { label: t('eg_stat_aoe_per_endurance'), suffix: '%' },
+    areaDamagePct: { label: t('eg_stat_area_damage_inc'), suffix: '%' },
+    shieldElementalRes: { label: t('eg_stat_shield_elemental_res'), suffix: '%' },
+    ailmentEffectTreePct: { label: t('eg_stat_ailment_effect_inc'), suffix: '%' },
+    blindDurationPct: { label: t('eg_stat_blind_duration'), suffix: '%' },
+    chillDurationPct: { label: t('eg_stat_cold_ailment_duration'), suffix: '%' },
+    poisonChanceSpellPct: { label: t('eg_stat_poison_chance_spell'), suffix: '%' },
+    igniteDurationTakenPct: { label: t('eg_stat_ignite_duration_taken'), suffix: '%' },
+    shockEffectTakenPct: { label: t('eg_stat_shock_effect_taken'), suffix: '%' },
+    chillEffectTakenPct: { label: t('eg_stat_chill_effect_taken'), suffix: '%' },
+    freezeDurationTakenPct: { label: t('eg_stat_freeze_duration_taken'), suffix: '%' },
+    spellDotIncPct: { label: t('eg_stat_spell_dot_inc'), suffix: '%' },
+    critPerPowerCharge: { label: t('eg_stat_crit_per_power'), suffix: '%' },
+    manaRegenPerPowerPct: { label: t('eg_stat_mana_regen_per_power'), suffix: '%' },
+    critMultiPerPowerCharge: { label: t('eg_stat_crit_multi_per_power'), suffix: '%' },
+    shieldCastSpeedPct: { label: t('eg_stat_shield_cast_speed'), suffix: '%' },
+    shieldSpellDamagePct: { label: t('eg_stat_shield_spell_damage'), suffix: '%' },
+    spellDamagePerPowerPct: { label: t('eg_stat_spell_damage_per_power'), suffix: '%' },
+    shieldAbsorptionPct: { label: t('eg_stat_shield_absorption_inc'), suffix: '%' },
+    rageDecaySlowerPct: { label: t('eg_stat_rage_decay'), suffix: '%' },
+    ragePerArmourPct: { label: t('eg_stat_rage_armour'), suffix: '%' },
+    rageWhenHitAmount: { label: t('eg_stat_rage_when_hit'), suffix: '' },
+    powerChargesMax: { label: t('eg_stat_power_max'), suffix: '' },
+    powerDurationPct: { label: t('eg_stat_power_duration'), suffix: '%' },
+    powerOnCritPct: { label: t('eg_stat_power_on_crit'), suffix: '%' },
+    powerOnKillPct: { label: t('eg_stat_power_on_kill'), suffix: '%' },
+    powerOnBlockPct: { label: t('eg_stat_power_on_block'), suffix: '%' },
+    powerOnStunPct: { label: t('eg_stat_power_on_stun'), suffix: '%' },
+    powerDamagePerChargePct: { label: t('eg_stat_power_damage'), suffix: '%' },
+    frenzyOnKillPct: { label: t('eg_stat_frenzy_on_kill'), suffix: '%' },
+    frenzyOnBlockPct: { label: t('eg_stat_frenzy_on_block'), suffix: '%' },
+    enduranceOnBlockPct: { label: t('eg_stat_endurance_on_block'), suffix: '%' },
+    enduranceOnMeleeCritPct: { label: t('eg_stat_endurance_on_melee_crit'), suffix: '%' },
+    blindChancePct: { label: t('eg_stat_blind_chance_tree'), suffix: '%' },
+    blindEffectIncPct: { label: t('eg_stat_blind_effect'), suffix: '%' },
+    critChanceVsBlindedPct: { label: t('eg_stat_crit_vs_blinded'), suffix: '%' },
+    fortifyMax: { label: t('eg_stat_fortify_max'), suffix: '' },
+    fortifyDurationPct: { label: t('eg_stat_fortify_duration'), suffix: '%' },
+    fortifyOnStunPct: { label: t('eg_stat_fortify_on_stun'), suffix: '%' },
+    fortifyEffectIncPct: { label: t('eg_stat_fortify_effect'), suffix: '%' },
+    fortifiedDefencePct: { label: t('eg_stat_fortified_defences'), suffix: '%' },
+    stunChancePct: { label: t('eg_stat_stun_chance_tree'), suffix: '%' },
+    riposteDamagePct: { label: t('eg_stat_riposte_damage'), suffix: '%' },
+    riposteDurationPct: { label: t('eg_stat_riposte_duration'), suffix: '%' },
+    poisonChanceDaggerPct: { label: t('eg_stat_dagger_poison_chance'), suffix: '%' },
+    daggerCritPoisons: { label: t('eg_stat_dagger_crit_poison'), suffix: '%' },
+    powerCharges: { label: t('eg_stat_power_charges'), suffix: '' },
+    fortifyStacks: { label: t('eg_stat_fortify_stacks'), suffix: '' },
+    staffBlockPct: { label: t('eg_stat_staff_block'), suffix: '%' },
+    staffSpellBlockPct: { label: t('eg_stat_staff_spell_block'), suffix: '%' },
+    shieldSpellBlockPct: { label: t('eg_stat_shield_spell_block'), suffix: '%' },
+    critChanceSwordPct: { label: t('eg_stat_crit_chance_sword'), suffix: '%' },
+    critMultiplierSwordPct: { label: t('eg_stat_crit_multi_sword'), suffix: '%' },
+    critChanceAxePct: { label: t('eg_stat_crit_chance_axe'), suffix: '%' },
+    critMultiplierAxePct: { label: t('eg_stat_crit_multi_axe'), suffix: '%' },
+    staffDamageIncPct: { label: t('eg_stat_staff_damage'), suffix: '%' },
+    staffChargeSpeedPct: { label: t('eg_stat_staff_charge_speed'), suffix: '%' },
+    critChanceStaffPct: { label: t('eg_stat_crit_chance_staff'), suffix: '%' },
+    critMultiplierStaffPct: { label: t('eg_stat_crit_multi_staff'), suffix: '%' },
+    wandDamageIncPct: { label: t('eg_stat_wand_damage'), suffix: '%' },
+    wandChargeSpeedPct: { label: t('eg_stat_wand_charge_speed'), suffix: '%' },
+    critChanceWandPct: { label: t('eg_stat_crit_chance_wand'), suffix: '%' },
+    critMultiplierWandPct: { label: t('eg_stat_crit_multi_wand'), suffix: '%' },
+    dualDamageIncPct: { label: t('eg_stat_dual_damage'), suffix: '%' },
+    dualChargeSpeedPct: { label: t('eg_stat_dual_charge_speed'), suffix: '%' },
+    dualAccuracyIncPct: { label: t('eg_stat_dual_accuracy'), suffix: '%' },
+    dualCritChancePct: { label: t('eg_stat_dual_crit_chance'), suffix: '%' },
+    dualCritMultiPct: { label: t('eg_stat_dual_crit_multi'), suffix: '%' },
+    dualCastSpeedPct: { label: t('eg_stat_dual_cast_speed'), suffix: '%' },
+    dualSpellDamagePct: { label: t('eg_stat_dual_spell_damage'), suffix: '%' },
+    dualMoveSpeedPct: { label: t('eg_stat_dual_move_speed'), suffix: '%' },
+    dualBlockPct: { label: t('eg_stat_dual_block'), suffix: '%' },
+    physAsExtraColdPct: { label: t('eg_stat_phys_as_cold'), suffix: '%' },
+    physAsExtraLightningPct: { label: t('eg_stat_phys_as_lightning'), suffix: '%' },
+    freezeChancePct: { label: t('eg_stat_freeze_chance_tree'), suffix: '%' },
+    shockChancePct: { label: t('eg_stat_shock_chance_tree'), suffix: '%' },
+    penFirePct: { label: t('eg_stat_pen_fire'), suffix: '%' },
+    penColdPct: { label: t('eg_stat_pen_cold'), suffix: '%' },
+    penLightningPct: { label: t('eg_stat_pen_lightning'), suffix: '%' },
+    penShadowPct: { label: t('eg_stat_pen_shadow'), suffix: '%' },
+    penElementalPct: { label: t('eg_stat_pen_elemental'), suffix: '%' },
     rageOnHitAxe: { label: t('eg_stat_rage_on_hit'), suffix: '' },
     rageMeleeMorePct: { label: t('eg_stat_rage_effect'), suffix: '%' },
     rage: { label: t('eg_stat_rage'), suffix: '' },
@@ -1754,8 +2089,8 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'stunChanceMaceChargedPct', 'stunDurationPct', 'stunChanceHeavyPct', 'stunDurationHeavyPct', 'stunDoubleChancePct', 'meleeDoubleDamageChancePct', 'meleeKillExplodeChancePct', 'meleeSpellManaCostReducedPct', 'meleeSpellLifeCostPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'poisonChanceAttackPct', 'poisonDotMultiPct', 'bleedSpeedPct',
-            'meleeChargeSpeedPct', 'attackSpeedPct', 'critChanceMeleePct', 'manaOnMeleeHitChargedPct', 'meleeRangeM', 'meleeAoEPct', 'critChanceMeleeMacePct', 'critMultiplierMeleeMacePct', 'crushPhysReductionPct'] },
+            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'stunChanceMaceChargedPct', 'stunDurationPct', 'stunChanceHeavyPct', 'stunDurationHeavyPct', 'stunDoubleChancePct', 'meleeDoubleDamageChancePct', 'meleeKillExplodeChancePct', 'meleeSpellManaCostReducedPct', 'meleeSpellLifeCostPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'costEfficiencyPct', 'onslaughtEffectPct', 'onslaughtOnKillPct', 'onslaughtDefencePct', 'leechEffectRecentCritPct', 'wandPhysAsLightningPct', 'bowAoePct', 'dmgFullAbsorptionPct', 'critMultiHeavy', 'dmgVsLowLifePct', 'aoeRecentKillPct', 'ailmentDurationTakenPct', 'chillShockTakenPct', 'spellDotMultiPct', 'manaLeechAttackPct', 'spellBlockFlat', 'dmgRecentShockPct', 'shockDurationPct', 'shockEffectPct', 'lifePulsePct', 'dotFasterPct', 'enduranceMin', 'enduranceOnKillPct', 'damagePerEndurancePct', 'enduranceWhenHitPct', 'lowLifeRegenPct', 'physTakenFlat', 'manaLeechEffectPct', 'critVsBleedingPct', 'critMultiVsBleedingPct', 'avoidPhysHitPct', 'armourIfHitPct', 'evasionIfNotHitPct', 'igniteFasterPct', 'freezeDurationPct', 'critVsShockedPct', 'shadowResDouble', 'armourPerEndurancePct', 'moveSpeedPerFrenzyPct', 'chargeSpeedPerFrenzyPct', 'stunPerEndurancePct', 'aoePerEndurancePct', 'areaDamagePct', 'shieldElementalRes', 'ailmentEffectTreePct', 'blindDurationPct', 'chillDurationPct', 'poisonChanceSpellPct', 'igniteDurationTakenPct', 'shockEffectTakenPct', 'chillEffectTakenPct', 'freezeDurationTakenPct', 'spellDotIncPct', 'critPerPowerCharge', 'manaRegenPerPowerPct', 'critMultiPerPowerCharge', 'shieldCastSpeedPct', 'shieldSpellDamagePct', 'spellDamagePerPowerPct', 'shieldAbsorptionPct', 'rageDecaySlowerPct', 'ragePerArmourPct', 'rageWhenHitAmount', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'poisonChanceAttackPct', 'poisonDotMultiPct', 'bleedSpeedPct',
+            'meleeChargeSpeedPct', 'attackSpeedPct', 'critChanceMeleePct', 'manaOnMeleeHitChargedPct', 'meleeRangeM', 'meleeAoEPct', 'critChanceMeleeMacePct', 'critMultiplierMeleeMacePct', 'crushPhysReductionPct', 'blindChancePct', 'blindEffectIncPct', 'critChanceVsBlindedPct', 'stunChancePct', 'riposteDamagePct', 'riposteDurationPct', 'poisonChanceDaggerPct', 'daggerCritPoisons', 'staffBlockPct', 'staffSpellBlockPct', 'shieldSpellBlockPct', 'critChanceSwordPct', 'critMultiplierSwordPct', 'critChanceAxePct', 'critMultiplierAxePct', 'staffDamageIncPct', 'staffChargeSpeedPct', 'critChanceStaffPct', 'critMultiplierStaffPct', 'wandDamageIncPct', 'wandChargeSpeedPct', 'critChanceWandPct', 'critMultiplierWandPct', 'dualDamageIncPct', 'dualChargeSpeedPct', 'dualAccuracyIncPct', 'dualCritChancePct', 'dualCritMultiPct', 'dualCastSpeedPct', 'dualSpellDamagePct', 'dualMoveSpeedPct', 'dualBlockPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
@@ -1766,7 +2101,7 @@ export const EG_STAT_LAYOUT = {
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
             'pushbackFlat'] },
-        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'damageToFirePct', 'onlyFireDamage', 'physAsExtraFirePct', 'igniteDamageMorePct', 'physDotMorePct', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWardBleed', 'retaliationWardIgnite',
+        { catKey: 'eg_statcat_ailments', buckets: ['ignitePct', 'freezePct', 'shockPct', 'blindPct', 'convertPct', 'damageToFirePct', 'onlyFireDamage', 'physAsExtraFirePct', 'physAsExtraColdPct', 'physAsExtraLightningPct', 'freezeChancePct', 'shockChancePct', 'penFirePct', 'penColdPct', 'penLightningPct', 'penShadowPct', 'penElementalPct', 'igniteDamageMorePct', 'physDotMorePct', 'ailmentDurationPct', 'ailmentEffectPct', 'igniteDurationPct', 'bleedDurationPct', 'retaliationWardBleed', 'retaliationWardIgnite',
             'impaleChanceHeavyPct', 'impaleEffectHeavyPct', 'impaleEffectFreshPct', 'impaleDurationPct'] },
         { catKey: 'eg_statcat_arcane', buckets: [
             'castSpeedPct', 'fireCastSpeedPct', 'coldCastSpeedPct', 'lightningCastSpeedPct', 'echoChancePct', 'echoDamagePct', 'channelDamagePerStack',
@@ -1781,7 +2116,7 @@ export const EG_STAT_LAYOUT = {
             'heartHealFlat', 'heartHealIncPct', 'heartSpawnIncPct', 'manaHealFlat', 'manaHealIncPct', 'manaSpawnIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [
             'blockChance', 'spellBlockChance', 'blockChanceTree', 'blockRecoveryPct',
-            'blockChanceShieldPct', 'frenzyCharges', 'frenzyChargesMax', 'frenzyDurationPct', 'evasionPerFrenzyChargePct', 'enduranceCharges', 'enduranceChargesMax', 'enduranceDurationPct', 'lifeRegenPerEndurancePct', 'enduranceOnKillShieldPct',
+            'blockChanceShieldPct', 'powerCharges', 'powerChargesMax', 'powerDurationPct', 'powerOnCritPct', 'powerOnKillPct', 'powerOnBlockPct', 'powerOnStunPct', 'powerDamagePerChargePct', 'frenzyOnKillPct', 'frenzyOnBlockPct', 'enduranceOnBlockPct', 'enduranceOnMeleeCritPct', 'fortifyStacks', 'fortifyMax', 'fortifyDurationPct', 'fortifyOnStunPct', 'fortifyEffectIncPct', 'fortifiedDefencePct', 'frenzyCharges', 'frenzyChargesMax', 'frenzyDurationPct', 'evasionPerFrenzyChargePct', 'enduranceCharges', 'enduranceChargesMax', 'enduranceDurationPct', 'lifeRegenPerEndurancePct', 'enduranceOnKillShieldPct',
             'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct',
             'parryChancePct', 'deflectChancePct', 'deflectDamagePct', 'reflectPhysFlat',
             'fatePct', 'castingAilmentAvoidPct', 'bleedAvoidPct', 'poisonAvoidPct', 'shockAvoidPct', 'igniteAvoidPct', 'chillAvoidPct', 'elementalAilmentAvoidPct'] },

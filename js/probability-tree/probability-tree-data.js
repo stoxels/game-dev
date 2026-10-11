@@ -520,12 +520,13 @@ export const TALENT_TREE_DATA = {
    "id": 9,
    "x": 1918,
    "y": 2265,
-   "nameEn": "Accelerated Insight",
-   "nameDe": "Beschleunigte Erkenntnis",
-   "descEn": "Excercise hints now show up after one less unsuccessfull attempt. +6% Evasion.",
-   "descDe": "Hinweise bei Übungsaufgaben erscheinen einen Fehlversuch früher. +6% Ausweichen.",
-   "icon": "🧩",
-   "statKey": "accelerated_insight",
+   "nameEn": "Twin Terrors",
+   "nameDe": "Zwillingsschrecken",
+   "icon": "",
+   "statKey": "notable_twin_terrors_9",
+   "effects": [
+    "dual_crit_chance:5"
+   ],
    "tier": "notable"
   },
   {
@@ -569,12 +570,15 @@ export const TALENT_TREE_DATA = {
    "id": 395,
    "x": 1096,
    "y": 2160,
-   "nameEn": "Base Rate",
-   "nameDe": "Basisrate",
-   "descEn": "Each fully completed column grants an additional +2 seconds. Stacks with Probability Current. +6% Evasion.",
-   "descDe": "Jede vollständig abgeschlossene Spalte gewährt zusätzliche +2 Sekunden. Wirkt zusammen mit Wahrscheinlichkeitsstrom. +6% Ausweichen.",
-   "icon": "🧱",
-   "statKey": "base_rate",
+   "nameEn": "Dazzling Strikes",
+   "nameDe": "Blendende Schläge",
+   "icon": "",
+   "statKey": "notable_dazzling_strikes_395",
+   "effects": [
+    "crit_vs_blinded:4",
+    "blind_chance:20",
+    "blind_effect:20"
+   ],
    "tier": "notable"
   },
   {
@@ -622,34 +626,38 @@ export const TALENT_TREE_DATA = {
    "id": 282,
    "x": -647,
    "y": 2040,
-   "nameEn": "Binomial Burst",
-   "nameDe": "Binomialer Ausbruch",
-   "descEn": "Each time you fill 10 cells correctly in a single level, there is a 20% chance to instantly mark 1 random incorrect empty cell. +6% Armour.",
-   "descDe": "Jedes Mal, wenn du 10 Zellen korrekt in einem Level ausfüllst, besteht eine 20% Chance, sofort 1 zufällige falsche leere Zelle zu markieren. +6% Rüstung.",
-   "icon": "💢",
-   "statKey": "binomial_burst_1",
+   "nameEn": "Rampart",
+   "nameDe": "Bollwerk",
+   "icon": "",
+   "statKey": "notable_rampart_282",
+   "effects": [
+    "fortified_defences:30",
+    "fortify_effect:100"
+   ],
    "tier": "notable"
   },
   {
    "id": 283,
    "x": 1209,
    "y": -1021,
-   "nameEn": "Combo Trigger",
-   "nameDe": "Kombinationsauslöser",
-   "descEn": "Binomial Burst chance increased by 10%. Stacks with Probability Spike. +6% Absorption regen rate.",
-   "descDe": "Binomialer Ausbruch hat 10% erhöhte Chance. Wirkt zusammen mit Wahrscheinlichkeitsspitze. +6% Absorptionsregeneration.",
-   "icon": "💢",
-   "statKey": "binomial_burst_2",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_283",
    "tier": "notable"
   },
   {
    "id": 284,
    "x": 764,
    "y": 1764,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spirit Void",
+   "nameDe": "Geistleere",
    "icon": "",
-   "statKey": "reserved_mana_leech_284",
+   "statKey": "notable_spirit_void_284",
+   "effects": [
+    "mana_leech_attack:1",
+    "mana_leech_effect_inc:13"
+   ],
    "tier": "notable"
   },
   {
@@ -669,12 +677,14 @@ export const TALENT_TREE_DATA = {
    "id": 211,
    "x": 2821,
    "y": 1192,
-   "nameEn": "Shadow Resistance",
-   "nameDe": "Schattenresistenz",
-   "descEn": "Increases the Blackout Ward protection chance by 10%. Stacks with Curse Immunity. +6% Evasion.",
-   "descDe": "Erhöht die Schutzchance des Verdunklungsschutzes um 10%. Wirkt zusammen mit Fluchimmunität. +6% Ausweichen.",
-   "icon": "🌑",
-   "statKey": "blackout_ward_2",
+   "nameEn": "Fatal Blade",
+   "nameDe": "Tödliche Klinge",
+   "icon": "",
+   "statKey": "notable_fatal_blade_211",
+   "effects": [
+    "crit_chance_sword:4",
+    "crit_multi_sword:25"
+   ],
    "tier": "notable"
   },
   {
@@ -720,12 +730,10 @@ export const TALENT_TREE_DATA = {
    "id": 96,
    "x": -594,
    "y": 1747,
-   "nameEn": "Golden Recurrence",
-   "nameDe": "Goldene Wiederkehr",
-   "descEn": "20% increased chance of Lucky Drops happening. Stacks with Fortune Echo and Treasure Resonance. +6% Armour.",
-   "descDe": "20% erhöhte Chance dass Glücksfunde aktiviert werden. Wirkt zusammen mit Echos des Glücks und Schatzresonanz. +6% Rüstung.",
-   "icon": "🎁",
-   "statKey": "bonus_replay_3",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_96",
    "tier": "notable"
   },
   {
@@ -831,12 +839,13 @@ export const TALENT_TREE_DATA = {
    "id": 335,
    "x": 2117,
    "y": 198,
-   "nameEn": "Chaos Buffer",
-   "nameDe": "Chaos-Puffer",
-   "descEn": "Every 2nd mistake grants a consolation of 10 additional seconds. +6% Evasion.",
-   "descDe": "Jeder zweite Fehler gewährt einen Trost von 10 zusätzlichen Sekunden. +6% Ausweichen.",
-   "icon": "🌪️",
-   "statKey": "chaos_buffer",
+   "nameEn": "Forces of Nature",
+   "nameDe": "Kräfte der Natur",
+   "icon": "",
+   "statKey": "notable_forces_of_nature_335",
+   "effects": [
+    "pen_elemental:10"
+   ],
    "tier": "notable"
   },
   {
@@ -869,12 +878,10 @@ export const TALENT_TREE_DATA = {
    "id": 347,
    "x": -2631,
    "y": 960,
-   "nameEn": "Collapse Point",
-   "nameDe": "Kollapspunkt",
-   "descEn": "Completing a column collapses its neighbours: one correct cell is revealed in each directly adjacent column. +6% Armour.",
-   "descDe": "Das Abschließen einer Spalte lässt ihre Nachbarn kollabieren: In jeder direkt angrenzenden Spalte wird eine korrekte Zelle aufgedeckt. +6% Rüstung.",
-   "icon": "🎯",
-   "statKey": "collapse_point",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_347",
    "tier": "notable"
   },
   {
@@ -1033,6 +1040,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_arcing_blows_262",
    "effects": [
+    "pen_lightning:8",
     "lightning_damage_inc_pct:30"
    ],
    "tier": "notable"
@@ -1041,24 +1049,26 @@ export const TALENT_TREE_DATA = {
    "id": 263,
    "x": -1489,
    "y": -2158,
-   "nameEn": "Chain Revelation",
-   "nameDe": "Kettenenthüllung",
-   "descEn": "Covariance Shift now reveals one more random correctly filled cell in the same row or column. Stacks with Lucky Echo. +6% Absorption regen rate.",
-   "descDe": "Kovarianz-Verschiebung kann nun eine weitere zufällige korrekt gefüllte Zelle in derselben Zeile oder Spalte aufdecken. Wirkt zusammen mit Glücksecho. +6% Absorptionsregeneration.",
-   "icon": "↔️",
-   "statKey": "covariance_shift_3",
+   "nameEn": "Arcane Guarding",
+   "nameDe": "Arkane Bewachung",
+   "icon": "",
+   "statKey": "notable_arcane_guarding_263",
+   "effects": [
+    "shield_spell_block:10"
+   ],
    "tier": "notable"
   },
   {
    "id": 361,
    "x": 788,
    "y": 2271,
-   "nameEn": "Cross Faculty",
-   "nameDe": "Fakultätsübergreifend",
-   "descEn": "One additional incorrect empty cell is automatically marked at the start of each level. +6% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird automatisch eine zusätzliche falsche leere Zelle markiert. +6% Ausweichen.",
-   "icon": "🧩",
-   "statKey": "cross_faculty",
+   "nameEn": "Savage Skewering",
+   "nameDe": "Wildes Aufspießen",
+   "icon": "",
+   "statKey": "notable_savage_skewering_361",
+   "effects": [
+    "impale_effect_heavy:15"
+   ],
    "tier": "notable"
   },
   {
@@ -1075,12 +1085,14 @@ export const TALENT_TREE_DATA = {
    "id": 100,
    "x": -1936,
    "y": -1448,
-   "nameEn": "Hexbound Desire",
-   "nameDe": "Hexengebundene Gier",
-   "descEn": "5% increased chance of receiving Cursed items. Stacks with Dark Temptation. +6% Absorption regen rate.",
-   "descDe": "5% erhöhte Chance auf verfluchte Gegenstände. Wirkt zusammen mit Dunkle Versuchung und Fluchrufer. +6% Absorptionsregeneration.",
-   "icon": "☠️",
-   "statKey": "cursed_attraction_1",
+   "nameEn": "Safeguard",
+   "nameDe": "Schutzmaßnahme",
+   "icon": "",
+   "statKey": "notable_safeguard_100",
+   "effects": [
+    "staff_spell_block:10",
+    "shield_spell_block:10"
+   ],
    "tier": "notable"
   },
   {
@@ -1144,7 +1156,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_harvester_of_foes_153",
    "effects": [
-    "melee_phys_axe:30"
+    "melee_phys_axe:30",
+    "impale_effect_heavy:12"
    ],
    "tier": "notable"
   },
@@ -1166,22 +1179,28 @@ export const TALENT_TREE_DATA = {
    "id": 123,
    "x": -610,
    "y": -1618,
-   "nameEn": "Veil of Relief",
-   "nameDe": "Schleier der Erleichterung",
-   "descEn": "Cursed item downsides are 15% less severe. Stacks with Mist of Mercy and Hexsoftening. +6% Absorption regen rate.",
-   "descDe": "Negative Effekte von verfluchten Gegenständen sind 15% schwächer (kürzere Dauer, weniger betroffene Felder). Wirkt zusammen mit Nebel der Gnade und Fluchmilderung. +6% Absorptionsregeneration.",
-   "icon": "🌫️",
-   "statKey": "dampened_curse_3",
+   "nameEn": "Enduring Bond",
+   "nameDe": "Dauerhafte Bindung",
+   "icon": "",
+   "statKey": "notable_enduring_bond_123",
+   "effects": [
+    "skill_effect_duration:20"
+   ],
    "tier": "notable"
   },
   {
    "id": 390,
    "x": -187,
    "y": -2101,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Enigmatic Defence",
+   "nameDe": "Rätselhafte Verteidigung",
    "icon": "",
-   "statKey": "reserved_reserved_node_390",
+   "statKey": "notable_enigmatic_defence_390",
+   "effects": [
+    "spell_damage_inc_pct:20",
+    "staff_block:8",
+    "staff_spell_block:8"
+   ],
    "tier": "notable"
   },
   {
@@ -1236,7 +1255,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_heart_of_ice_132",
    "effects": [
-    "cold_damage_inc_pct:30"
+    "cold_damage_inc_pct:30",
+    "pen_cold:6"
    ],
    "tier": "notable"
   },
@@ -1282,24 +1302,28 @@ export const TALENT_TREE_DATA = {
    "id": 310,
    "x": -807,
    "y": 2105,
-   "nameEn": "Dialectic",
-   "nameDe": "Dialektik",
-   "descEn": "After every mistake, your next correct fill grants +5 seconds. +6% Armour.",
-   "descDe": "Nach jedem Fehler gewährt deine nächste korrekte Füllung +5 Sekunden. +6% Rüstung.",
-   "icon": "🧠",
-   "statKey": "dialectic",
+   "nameEn": "Merciless Skewering",
+   "nameDe": "Gnadenloses Aufspießen",
+   "icon": "",
+   "statKey": "notable_merciless_skewering_310",
+   "effects": [
+    "impale_chance_heavy:15",
+    "impale_effect_heavy:12"
+   ],
    "tier": "notable"
   },
   {
    "id": 397,
    "x": -686,
    "y": -2605,
-   "nameEn": "Dream Logic",
-   "nameDe": "Traumlogik",
-   "descEn": "While above 50% time, all of your start-of-level luck rolls gain 5% chance. Below 50% time, all mark effects gain 5% chance instead. +6% Absorption regen rate.",
-   "descDe": "Über 50% Zeit erhalten alle deine Glückswürfe zu Beginn des Levels 5% Chance. Unter 50% Zeit erhalten stattdessen alle Markierungseffekte 5% Chance. +6% Absorptionsregeneration.",
-   "icon": "💤",
-   "statKey": "dream_logic",
+   "nameEn": "Disciple of the Forbidden",
+   "nameDe": "Jünger des Verbotenen",
+   "icon": "",
+   "statKey": "notable_disciple_of_the_forbidden_397",
+   "effects": [
+    "power_on_kill:8",
+    "power_damage:8"
+   ],
    "tier": "notable"
   },
   {
@@ -1335,12 +1359,15 @@ export const TALENT_TREE_DATA = {
    "id": 21,
    "x": 899,
    "y": -2366,
-   "nameEn": "Efficient Tutoring",
-   "nameDe": "Effiziente Betreuung",
-   "descEn": "15% chance of not spending the Tutor item when using a Tutor to answer a question. +6% Absorption regen rate.",
-   "descDe": "15% Chance, dass der Tutor Gegenstand beim Beantworten einer Frage nicht verbraucht wird. +6% Absorptionsregeneration.",
-   "icon": "📗",
-   "statKey": "efficient_tutoring",
+   "nameEn": "Light Eater",
+   "nameDe": "Lichtfresser",
+   "icon": "",
+   "statKey": "notable_light_eater_21",
+   "effects": [
+    "absorption_leech_spell:0.8",
+    "absorption_leech_effect_inc:10",
+    "dmg_full_absorption:24"
+   ],
    "tier": "notable"
   },
   {
@@ -1375,12 +1402,14 @@ export const TALENT_TREE_DATA = {
    "id": 201,
    "x": -1015,
    "y": 2738,
-   "nameEn": "Emergency Scan",
-   "nameDe": "Notfall-Scan",
-   "descEn": "When the timer drops to 5 minutes or below for the first time in a level, a Field Scan of the entire grid is triggered, lasting 2 seconds. +6% Armour.",
-   "descDe": "Wenn der Timer zum ersten Mal auf 5 Minuten oder darunter fällt, wird ein Feldscan des gesamten Gitters ausgelöst, der 2 Sekunden anhält. +6% Rüstung.",
-   "icon": "🚨",
-   "statKey": "emergency_scan_1",
+   "nameEn": "Executioner",
+   "nameDe": "Scharfrichter",
+   "icon": "",
+   "statKey": "notable_executioner_201",
+   "effects": [
+    "dmg_vs_low_life:60",
+    "aoe_recent_kill:15"
+   ],
    "tier": "notable"
   },
   {
@@ -1536,12 +1565,14 @@ export const TALENT_TREE_DATA = {
    "id": 173,
    "x": -769,
    "y": 1506,
-   "nameEn": "Precision Insight",
-   "nameDe": "Präzisionsblick",
-   "descEn": "20% chance to mark 1 incorrect empty cell at the start of each level. Rolls independently from Fault Sensing and Error Guidance. +6% Armour.",
-   "descDe": "20% Chance, zu Beginn jedes Levels 1 falsche leere Zelle zu markieren. Wirkt unabhängig von Fehlersinn und Fehlerführung. +6% Rüstung.",
-   "icon": "❌",
-   "statKey": "error_elimination_3",
+   "nameEn": "Wicked Blade",
+   "nameDe": "Böse Klinge",
+   "icon": "",
+   "statKey": "notable_wicked_blade_173",
+   "effects": [
+    "dot_inc_pct:30",
+    "bleed_duration:20"
+   ],
    "tier": "notable"
   },
   {
@@ -1661,10 +1692,13 @@ export const TALENT_TREE_DATA = {
    "id": 382,
    "x": -1542,
    "y": 1938,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steadfast",
+   "nameDe": "Standhaft",
    "icon": "",
-   "statKey": "reserved_reserved_node_382",
+   "statKey": "notable_steadfast_382",
+   "effects": [
+    "fortify_max:3"
+   ],
    "tier": "notable"
   },
   {
@@ -1685,12 +1719,13 @@ export const TALENT_TREE_DATA = {
    "id": 324,
    "x": -1395,
    "y": 1828,
-   "nameEn": "Fortune Well",
-   "nameDe": "Glücksbrunnen",
-   "descEn": "Claiming a lucky tile additionally reveals one correct cell. +6% Armour.",
-   "descDe": "Das Einsammeln einer Glückskachel deckt zusätzlich eine korrekte Zelle auf. +6% Rüstung.",
-   "icon": "🕳️",
-   "statKey": "fortune_well",
+   "nameEn": "Unfaltering",
+   "nameDe": "Unerschütterlich",
+   "icon": "",
+   "statKey": "notable_unfaltering_324",
+   "effects": [
+    "stun_avoid:25"
+   ],
    "tier": "notable"
   },
   {
@@ -1735,12 +1770,14 @@ export const TALENT_TREE_DATA = {
    "id": 104,
    "x": -2825,
    "y": -836,
-   "nameEn": "Resource Preservation",
-   "nameDe": "Ressourcenschonung",
-   "descEn": "5% chance that an item is not consumed when used. Stacks with Enduring Supplies and Unending Utility. +6% Armour.",
-   "descDe": "5% Chance, dass ein Gegenstand beim Benutzen nicht verbraucht wird. Wirkt zusammen mit Beständige Vorräte und Unendlicher Nutzen. +6% Rüstung.",
-   "icon": "♻️",
-   "statKey": "frugal_use_2",
+   "nameEn": "Divine Wrath",
+   "nameDe": "Göttliche Wut",
+   "icon": "",
+   "statKey": "notable_divine_wrath_104",
+   "effects": [
+    "phys_as_lightning:5",
+    "pen_lightning:5"
+   ],
    "tier": "notable"
   },
   {
@@ -1784,24 +1821,24 @@ export const TALENT_TREE_DATA = {
    "id": 194,
    "x": 85,
    "y": 2626,
-   "nameEn": "Overflowing Blessing",
-   "nameDe": "Überfließendes Glück",
-   "descEn": "Revealing a Lucky Tile has 25% chance of granting an additional item. This stacks additively with other Lucky Tile reward bonuses. +6% Evasion.",
-   "descDe": "Das Enthüllen eines Glücksfelds hat eine 25% Chance einen weiteren Gegenstand zu gewähren. Dies summiert sich mit anderen Glücksfeld-Belohnungsboni. +6% Ausweichen.",
-   "icon": "🎁",
-   "statKey": "generous_fortune_3",
+   "nameEn": "Ambidexterity",
+   "nameDe": "Beidhändigkeit",
+   "icon": "",
+   "statKey": "notable_ambidexterity_194",
+   "effects": [
+    "dual_damage:30",
+    "dual_charge_speed:15"
+   ],
    "tier": "notable"
   },
   {
    "id": 326,
    "x": -1696,
    "y": 2554,
-   "nameEn": "Gilded Cage",
-   "nameDe": "Vergoldeter Käfig",
-   "descEn": "Claiming a lucky tile grants an additional +20 seconds. +6% Armour.",
-   "descDe": "Das Einsammeln einer Glückskachel gewährt zusätzliche +20 Sekunden. +6% Rüstung.",
-   "icon": "🐦",
-   "statKey": "gilded_cage",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_326",
    "tier": "notable"
   },
   {
@@ -1843,12 +1880,14 @@ export const TALENT_TREE_DATA = {
    "id": 166,
    "x": 557,
    "y": 2255,
-   "nameEn": "Grand Pearl",
-   "nameDe": "Große Perle",
-   "descEn": "Enables the Grand Pearl as an item reward. Using a Grand Pearl reduces the cooldowns of both active class skills to 1 second. +6% Evasion.",
-   "descDe": "Ermöglicht die Große Perle als Gegenstandsbelohnung. Das Benutzen einer Großen Perle setzt die Abklingzeit beider aktiver Klassenfähigkeiten auf 1 Sekunde. +6% Ausweichen.",
-   "icon": "⚪",
-   "statKey": "grand_pearl",
+   "nameEn": "Deflection",
+   "nameDe": "Ablenkung",
+   "icon": "",
+   "statKey": "notable_deflection_166",
+   "effects": [
+    "block_shield:8",
+    "endurance_on_block:25"
+   ],
    "tier": "notable"
   },
   {
@@ -1920,10 +1959,14 @@ export const TALENT_TREE_DATA = {
    "id": 368,
    "x": 1209,
    "y": -2762,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fusillade",
+   "nameDe": "Geschosssalve",
    "icon": "",
-   "statKey": "reserved_reserved_node_368",
+   "statKey": "notable_fusillade_368",
+   "effects": [
+    "wand_charge_speed:15",
+    "accuracy_rating_pct:30"
+   ],
    "tier": "notable"
   },
   {
@@ -1962,7 +2005,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_flash_freeze_258",
    "effects": [
-    "cold_damage_inc_pct:25"
+    "cold_damage_inc_pct:25",
+    "freeze_chance_pct:15"
    ],
    "tier": "notable"
   },
@@ -1975,7 +2019,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_silent_steps_259",
    "effects": [
-    "evasion_inc_pct:20"
+    "evasion_inc_pct:20",
+    "blind_effect:40"
    ],
    "tier": "notable"
   },
@@ -1996,34 +2041,42 @@ export const TALENT_TREE_DATA = {
    "id": 323,
    "x": 124,
    "y": -2101,
-   "nameEn": "Karmic Residue",
-   "nameDe": "Karmische Rückstände",
-   "descEn": "+10% chance for one additional lucky tile per level. +6% Absorption regen rate.",
-   "descDe": "+10% Chance auf eine zusätzliche Glückskachel pro Level. +6% Absorptionsregeneration.",
-   "icon": "🪙",
-   "statKey": "karmic_residue",
+   "nameEn": "Mystic Bulwark",
+   "nameDe": "Mystisches Bollwerk",
+   "icon": "",
+   "statKey": "notable_mystic_bulwark_323",
+   "effects": [
+    "spell_block_flat:6"
+   ],
    "tier": "notable"
   },
   {
    "id": 358,
    "x": 542,
    "y": 1610,
-   "nameEn": "Law of Averages",
-   "nameDe": "Gesetz der Durchschnittswerte",
-   "descEn": "Increases the success chance of all start-of-level reveal and mark effects by 5%. Stacks with Statistical Bridge. +6% Evasion.",
-   "descDe": "Erhöht die Erfolgswahrscheinlichkeit aller Aufdeckungs- und Markierungseffekte zu Beginn jedes Levels um 5%. Wirkt zusammen mit Statistische Brücke. +6% Ausweichen.",
-   "icon": "⚖️",
-   "statKey": "law_of_averages",
+   "nameEn": "Feline Swiftness",
+   "nameDe": "Katzenhafte Schnelligkeit",
+   "icon": "",
+   "statKey": "notable_feline_swiftness_358",
+   "effects": [
+    "dual_block:10",
+    "dual_move_speed:8"
+   ],
    "tier": "notable"
   },
   {
    "id": 341,
    "x": 903,
    "y": 2104,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Graceful Assault",
+   "nameDe": "Anmutiger Ansturm",
    "icon": "",
-   "statKey": "reserved_reserved_node_341",
+   "statKey": "notable_graceful_assault_341",
+   "effects": [
+    "onslaught_effect:30",
+    "onslaught_on_kill:10",
+    "onslaught_defences:30"
+   ],
    "tier": "notable"
   },
   {
@@ -2137,12 +2190,14 @@ export const TALENT_TREE_DATA = {
    "id": 247,
    "x": -2516,
    "y": 1609,
-   "nameEn": "Perimeter Insight",
-   "nameDe": "Randblick",
-   "descEn": "An additional correct cell is revealed in the outermost row or column at the start of each level. +6% Armour.",
-   "descDe": "Eine weitere richtige Zelle wird zu Beginn des Levels in der äußersten Zeile oder Spalte enthüllt. +6% Rüstung.",
-   "icon": "📦",
-   "statKey": "marginal_distribution_2",
+   "nameEn": "Concussive Force",
+   "nameDe": "Erschütternde Kraft",
+   "icon": "",
+   "statKey": "notable_concussive_force_247",
+   "effects": [
+    "stun_chance:6",
+    "ignite_damage_more:20"
+   ],
    "tier": "notable"
   },
   {
@@ -2173,22 +2228,26 @@ export const TALENT_TREE_DATA = {
    "id": 24,
    "x": -1468,
    "y": -1791,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Contemplative Meditation",
+   "nameDe": "Besinnliche Meditation",
    "icon": "",
-   "statKey": "reserved_reserved_node_24",
+   "statKey": "notable_contemplative_meditation_24",
+   "effects": [
+    "cost_efficiency:20"
+   ],
    "tier": "notable"
   },
   {
    "id": 343,
    "x": -54,
    "y": -2220,
-   "nameEn": "Measure Zero",
-   "nameDe": "Maß Null",
-   "descEn": "Rows and columns whose solution is completely empty are automatically marked in their entirety at the start of each level. +6% Absorption regen rate.",
-   "descDe": "Reihen und Spalten, deren Lösung komplett leer ist, werden zu Beginn jedes Levels vollständig automatisch markiert. +6% Absorptionsregeneration.",
-   "icon": "∅",
-   "statKey": "measure_zero",
+   "nameEn": "Instability",
+   "nameDe": "Instabilität",
+   "icon": "",
+   "statKey": "notable_instability_343",
+   "effects": [
+    "power_max:1"
+   ],
    "tier": "notable"
   },
   {
@@ -2210,6 +2269,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_sanctuary_140",
    "effects": [
+    "block_shield:4",
+    "shield_spell_block:4",
     "all_elemental_res_max:1"
    ],
    "tier": "notable"
@@ -2405,34 +2466,40 @@ export const TALENT_TREE_DATA = {
    "id": 270,
    "x": -1400,
    "y": -1937,
-   "nameEn": "Poisson Process",
-   "nameDe": "Poisson-Prozess",
-   "descEn": "Every 2 minutes a random incorrect empty cell is automatically marked. +6% Absorption regen rate.",
-   "descDe": "Alle 2 Minuten wird eine zufällige falsche leere Zelle automatisch markiert. +6% Absorptionsregeneration.",
-   "icon": "⚗️",
-   "statKey": "poisson_process_1",
+   "nameEn": "Serpent Stance",
+   "nameDe": "Schlangenhaltung",
+   "icon": "",
+   "statKey": "notable_serpent_stance_270",
+   "effects": [
+    "crit_chance_staff:4",
+    "crit_multi_staff:30"
+   ],
    "tier": "notable"
   },
   {
    "id": 271,
    "x": -1185,
    "y": 1621,
-   "nameEn": "Poisson Drift",
-   "nameDe": "Poisson-Drift",
-   "descEn": "The Poisson Process effect now occurs every 90 seconds. +6% Armour.",
-   "descDe": "Der Poisson - Prozess Effekt wird nun alle 90 Sekunden ausgeführt. +6% Rüstung.",
-   "icon": "⚗️",
-   "statKey": "poisson_process_2",
+   "nameEn": "Savage Intensity",
+   "nameDe": "Wilde Intensität",
+   "icon": "",
+   "statKey": "notable_savage_intensity_271",
+   "effects": [
+    "rage_decay:20"
+   ],
    "tier": "notable"
   },
   {
    "id": 272,
    "x": 376,
    "y": -2154,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wandslinger",
+   "nameDe": "Zauberstabschleuderer",
    "icon": "",
-   "statKey": "reserved_reserved_node_272",
+   "statKey": "notable_wandslinger_272",
+   "effects": [
+    "wand_charge_speed:10"
+   ],
    "tier": "notable"
   },
   {
@@ -2507,10 +2574,13 @@ export const TALENT_TREE_DATA = {
    "id": 169,
    "x": 1769,
    "y": -1772,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Instinct",
+   "nameDe": "Instinkt",
    "icon": "",
-   "statKey": "reserved_reserved_node_169",
+   "statKey": "notable_instinct_169",
+   "effects": [
+    "parry_spell_chance:12"
+   ],
    "tier": "notable"
   },
   {
@@ -2602,12 +2672,13 @@ export const TALENT_TREE_DATA = {
    "id": 98,
    "x": -2387,
    "y": 69,
-   "nameEn": "Mythic Spoils",
-   "nameDe": "Mythische Beute",
-   "descEn": "10% increased chance of receiving Epic, or Legendary items. Stacks with Jeweled Fortune and Legend's Hoard. +6% Armour.",
-   "descDe": "10% erhöhte Chance auf Epische oder Legendäre Gegenstände. Wirkt zusammen mit Juwelen des Glücks und Hort der Legenden. +6% Rüstung.",
-   "icon": "💎",
-   "statKey": "quality_loot_2",
+   "nameEn": "Battle Trance",
+   "nameDe": "Kampftrance",
+   "icon": "",
+   "statKey": "notable_battle_trance_98",
+   "effects": [
+    "rage_max_add:10"
+   ],
    "tier": "notable"
   },
   {
@@ -2699,36 +2770,38 @@ export const TALENT_TREE_DATA = {
    "id": 116,
    "x": 2272,
    "y": -839,
-   "nameEn": "Bulwark of Resolve",
-   "nameDe": "Bollwerk der Entschlossenheit",
-   "descEn": "Shield items absorb 1 additional mistake. Stacks with Aegis Fortification and Guardian's Bastion. +6% Evasion.",
-   "descDe": "Schild-Gegenstände absorbieren 1 zusätzlichen Fehler. Wirkt zusammen mit Ägis-Verstärkung und Bastion des Wächters. +6% Ausweichen.",
-   "icon": "🛡️",
-   "statKey": "reinforced_ward_2",
+   "nameEn": "Infused",
+   "nameDe": "Durchtränkt",
+   "icon": "",
+   "statKey": "notable_infused_116",
+   "effects": [
+    "power_max:1"
+   ],
    "tier": "notable"
   },
   {
    "id": 117,
    "x": 1125,
    "y": -1626,
-   "nameEn": "Guardian's Bastion",
-   "nameDe": "Bastion des Wächters",
-   "descEn": "Shield items absorb 1 additional mistake. Stacks with Aegis Fortification and Bulwark of Resolve. +6% Absorption regen rate.",
-   "descDe": "Schild-Gegenstände absorbieren 1 zusätzlichen Fehler. Wirkt zusammen mit Ägis-Verstärkung und Bollwerk der Entschlossenheit. +6% Absorptionsregeneration.",
-   "icon": "🛡️",
-   "statKey": "reinforced_ward_3",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_117",
    "tier": "notable"
   },
   {
    "id": 214,
    "x": 41,
    "y": 1710,
-   "nameEn": "Structural Safeguard",
-   "nameDe": "Strukturschutz",
-   "descEn": "Integrity Shield has 10% increased chance. +6% Evasion.",
-   "descDe": "Integritätsschild hat eine um 10% erhöhte Chance. +6% Ausweichen.",
-   "icon": "🔒",
-   "statKey": "removal_ward_2",
+   "nameEn": "Dervish",
+   "nameDe": "Derwisch",
+   "icon": "",
+   "statKey": "notable_dervish_214",
+   "effects": [
+    "dual_block:3",
+    "dual_damage:24",
+    "dual_charge_speed:6"
+   ],
    "tier": "notable"
   },
   {
@@ -2811,12 +2884,15 @@ export const TALENT_TREE_DATA = {
    "id": 329,
    "x": 632,
    "y": -2371,
-   "nameEn": "Risk Auditor",
-   "nameDe": "Risikoprüfer",
-   "descEn": "Each mistake has a 20% chance to refund half of its time penalty. +6% Absorption regen rate.",
-   "descDe": "Jeder Fehler hat 20% Chance, die Hälfte seiner Zeitstrafe zu erstatten. +6% Absorptionsregeneration.",
-   "icon": "🧾",
-   "statKey": "risk_auditor",
+   "nameEn": "Static Blows",
+   "nameDe": "Statische Schläge",
+   "icon": "",
+   "statKey": "notable_static_blows_329",
+   "effects": [
+    "dmg_recent_shock:30",
+    "lightning_ailment_duration:50",
+    "shock_effect_inc:30"
+   ],
    "tier": "notable"
   },
   {
@@ -2886,12 +2962,13 @@ export const TALENT_TREE_DATA = {
    "id": 112,
    "x": -1404,
    "y": 2222,
-   "nameEn": "Academy Intervention",
-   "nameDe": "Akademische Intervention",
-   "descEn": "Tutor items reduce an additional mistake when used. Stacks with Mentor's Insight and Codex Assistance. +6% Armour.",
-   "descDe": "Tutor-Gegenstände reduzieren beim Benutzen einen zusätzlichen Fehler. Wirkt zusammen mit Einsicht des Mentors und Kodex-Unterstützung. +6% Rüstung.",
-   "icon": "🎓",
-   "statKey": "scholarly_aid_1",
+   "nameEn": "Tribal Fury",
+   "nameDe": "Stammeswut",
+   "icon": "",
+   "statKey": "notable_tribal_fury_112",
+   "effects": [
+    "melee_splash_m:1"
+   ],
    "tier": "notable"
   },
   {
@@ -2977,12 +3054,13 @@ export const TALENT_TREE_DATA = {
    "id": 313,
    "x": -556,
    "y": 1639,
-   "nameEn": "Shannon Bound",
-   "nameDe": "Shannon-Grenze",
-   "descEn": "At the start of each level, one incorrect empty cell orthogonally adjacent to an already revealed cell is automatically marked. +6% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird automatisch eine falsche leere Zelle markiert, die orthogonal an eine bereits aufgedeckte Zelle angrenzt. +6% Rüstung.",
-   "icon": "📶",
-   "statKey": "shannon_bound",
+   "nameEn": "Spirit of War",
+   "nameDe": "Kriegsgeist",
+   "icon": "",
+   "statKey": "notable_spirit_of_war_313",
+   "effects": [
+    "mana_leech_attack:0.5"
+   ],
    "tier": "notable"
   },
   {
@@ -2999,12 +3077,14 @@ export const TALENT_TREE_DATA = {
    "id": 308,
    "x": 678,
    "y": -1756,
-   "nameEn": "Socratic Method",
-   "nameDe": "Sokratische Methode",
-   "descEn": "At the start of each level, there is a 25% chance that one additional cell is revealed. +6% Absorption regen rate.",
-   "descDe": "Zu Beginn jedes Levels besteht eine 25% Chance, dass eine zusätzliche Zelle aufgedeckt wird. +6% Absorptionsregeneration.",
-   "icon": "❓",
-   "statKey": "socratic_method",
+   "nameEn": "Harsh Lessons",
+   "nameDe": "Harte Lektionen",
+   "icon": "",
+   "statKey": "notable_harsh_lessons_308",
+   "effects": [
+    "spell_dot_multi:12",
+    "ailment_duration_taken:20"
+   ],
    "tier": "notable"
   },
   {
@@ -3060,12 +3140,13 @@ export const TALENT_TREE_DATA = {
    "id": 356,
    "x": -2379,
    "y": -968,
-   "nameEn": "Stationary State",
-   "nameDe": "Stationärer Zustand",
-   "descEn": "Once per level, when the timer drops below 60 seconds, it freezes for 15 seconds. +6% Armour.",
-   "descDe": "Einmal pro Level friert der Timer für 15 Sekunden ein, sobald er unter 60 Sekunden fällt. +6% Rüstung.",
-   "icon": "⏸️",
-   "statKey": "stationary_state",
+   "nameEn": "Surge of Vigour",
+   "nameDe": "Woge der Vitalität",
+   "icon": "",
+   "statKey": "notable_surge_of_vigour_356",
+   "effects": [
+    "life_pulse:15"
+   ],
    "tier": "notable"
   },
   {
@@ -3155,12 +3236,10 @@ export const TALENT_TREE_DATA = {
    "id": 108,
    "x": -1546,
    "y": 1261,
-   "nameEn": "Radiant Sight",
-   "nameDe": "Strahlende Sicht",
-   "descEn": "Reveal items reveal 1 additional cell. Stacks with Beacon of Clarity and Lantern Expansion. +6% Armour.",
-   "descDe": "Enthüllungsgegenstände enthüllen 1 zusätzliche Zelle. Wirkt zusammen mit Leuchtfeuer der Klarheit und Laternenausweitung. +6% Rüstung.",
-   "icon": "🕯️",
-   "statKey": "stronger_light_3",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_108",
    "tier": "notable"
   },
   {
@@ -3201,6 +3280,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_lava_lash_378",
    "effects": [
+    "pen_fire:8",
     "fire_damage_inc_pct:30"
    ],
    "tier": "notable"
@@ -3333,12 +3413,13 @@ export const TALENT_TREE_DATA = {
    "id": 197,
    "x": 358,
    "y": 2190,
-   "nameEn": "Chrono Freeze",
-   "nameDe": "Chronofrost",
-   "descEn": "Increases the freeze duration by 0.5 seconds. +6% Evasion.",
-   "descDe": "Erhöt die Einfrier - Zeit um 0.5 Sekunden. +6% Ausweichen.",
-   "icon": "⏸️",
-   "statKey": "timed_stasis_3",
+   "nameEn": "Titanic Impacts",
+   "nameDe": "Titanische Einschläge",
+   "icon": "",
+   "statKey": "notable_titanic_impacts_197",
+   "effects": [
+    "crit_multi_heavy:45"
+   ],
    "tier": "notable"
   },
   {
@@ -3360,12 +3441,14 @@ export const TALENT_TREE_DATA = {
    "id": 394,
    "x": 1577,
    "y": -260,
-   "nameEn": "Law of Total Probability",
-   "nameDe": "Totale Wahrscheinlichkeit",
-   "descEn": "25% of revealed cells propagate: one unfilled orthogonal neighbour that truly belongs filled cascades open as well. +6% Evasion.",
-   "descDe": "25% der aufgedeckten Zellen propagieren: Ein nicht ausgefüllter orthogonaler Nachbar, der wirklich gefüllt sein sollte, öffnet sich kaskadenartig mit. +6% Ausweichen.",
-   "icon": "➗",
-   "statKey": "total_probability",
+   "nameEn": "Adder's Touch",
+   "nameDe": "Natternberührung",
+   "icon": "",
+   "statKey": "notable_adder_s_touch_394",
+   "effects": [
+    "crit_dot_multi:25",
+    "dagger_crit_poison:1"
+   ],
    "tier": "notable"
   },
   {
@@ -3493,7 +3576,10 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_holy_dominion_30",
    "effects": [
     "all_elemental_resist:12",
-    "elemental_damage_inc_pct:24"
+    "elemental_damage_inc_pct:24",
+    "freeze_chance_pct:10",
+    "shock_chance_pct:10",
+    "ignite_chance_pct:10"
    ],
    "tier": "notable"
   },
@@ -3513,12 +3599,14 @@ export const TALENT_TREE_DATA = {
    "id": 143,
    "x": 336,
    "y": 2027,
-   "nameEn": "Guardian Hoard",
-   "nameDe": "Wächterhort",
-   "descEn": "15% increased chance of obtaining Shield items as rewards. Stacks with Aegis Reserve and Bulwark Treasury. +6% Evasion.",
-   "descDe": "15% erhöhte Chance, Schild-Gegenstände als Belohnung zu erhalten. Wirkt zusammen mit Ägis-Reserve und Bollwerkschatzkammer. +6% Ausweichen.",
-   "icon": "🛡️",
-   "statKey": "wardens_stockpile_2",
+   "nameEn": "Forceful Skewering",
+   "nameDe": "Kraftvolles Aufspießen",
+   "icon": "",
+   "statKey": "notable_forceful_skewering_143",
+   "effects": [
+    "impale_chance_heavy:15",
+    "impale_effect_heavy:10"
+   ],
    "tier": "notable"
   },
   {
@@ -3548,12 +3636,14 @@ export const TALENT_TREE_DATA = {
    "id": 27,
    "x": 655,
    "y": 2255,
-   "nameEn": "Widened Formation",
-   "nameDe": "Erweiterte Formation",
-   "descEn": "Scout's Primer have a 25% chance of revealing two additional rows. This rolls independently from other row bonuses. +6% Evasion.",
-   "descDe": "Pfadfinder Kompasse haben eine 25% Chance zwei weitere Zeilen aufzudecken. Dies wird unabhängig von anderen Zeilenboni gewürfelt. +6% Ausweichen.",
-   "icon": "🗺️",
-   "statKey": "widened_formation",
+   "nameEn": "Swagger",
+   "nameDe": "Großspurigkeit",
+   "icon": "",
+   "statKey": "notable_swagger_27",
+   "effects": [
+    "dual_block:8",
+    "frenzy_on_block:25"
+   ],
    "tier": "notable"
   },
   {
@@ -3627,12 +3717,13 @@ export const TALENT_TREE_DATA = {
    "id": 121,
    "x": -1974,
    "y": 1450,
-   "nameEn": "Mist of Mercy",
-   "nameDe": "Nebel der Gnade",
-   "descEn": "Cursed item downsides are 10% less severe. Stacks with Hexsoftening and Veil of Relief.",
-   "descDe": "Negative Effekte von verfluchten Gegenständen sind 10% schwächer. Wirkt zusammen mit Fluchmilderung und Schleier der Erleichterung.",
-   "icon": "🌫️",
-   "statKey": "travel_dampened_curse_1",
+   "nameEn": "Slower Rage Decay",
+   "nameDe": "Langsamerer Wutverfall",
+   "icon": "",
+   "statKey": "travel_slower_rage_decay_121",
+   "effects": [
+    "rage_decay:10"
+   ],
    "tier": "travel"
   },
   {
@@ -3751,24 +3842,27 @@ export const TALENT_TREE_DATA = {
    "id": 213,
    "x": -1913,
    "y": -361,
-   "nameEn": "Integrity Shield",
-   "nameDe": "Integritätsschild",
-   "descEn": "30% chance to be protected from filled row or column removal effects from cursed items.",
-   "descDe": "30% Chance, gegen Effekte verfluchter Gegenstände geschützt zu sein, die gefüllte Zeilen oder Spalten entfernen.",
-   "icon": "🔒",
-   "statKey": "travel_removal_ward_1",
+   "nameEn": "Shield Block",
+   "nameDe": "Schildblock",
+   "icon": "",
+   "statKey": "travel_shield_block_213",
+   "effects": [
+    "block_shield:3"
+   ],
    "tier": "travel"
   },
   {
    "id": 249,
    "x": -1185,
    "y": -1281,
-   "nameEn": "Residual Analysis",
-   "nameDe": "Residualanalyse",
-   "descEn": "Whenever you complete a row or column you have a 10% chance of automatically marking a random incorrect empty cell in an adjacent row or column.",
-   "descDe": "Immer wenn du eine Zeile oder Spalte abschließt hast du eine 10% Chance eine zufällige falsche leere Zelle in einer benachbarten Zeile oder Spalte automatisch zu markieren.",
-   "icon": "🔄",
-   "statKey": "travel_residual_analysis_1",
+   "nameEn": "Elemental Resistances",
+   "nameDe": "Elementarwiderstände",
+   "icon": "",
+   "statKey": "travel_elemental_resistances_249",
+   "effects": [
+    "ailment_duration_taken:10",
+    "chill_shock_effect_taken:10"
+   ],
    "tier": "travel"
   },
   {
@@ -3930,10 +4024,13 @@ export const TALENT_TREE_DATA = {
    "id": 20000,
    "x": 1,
    "y": 1185,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Jagged Wounds",
+   "nameDe": "Gezackte Wunden",
    "icon": "",
-   "statKey": "reserved_leech_crit_20000",
+   "statKey": "notable_jagged_wounds_20000",
+   "effects": [
+    "leech_effect_recent_crit:7"
+   ],
    "tier": "notable"
   },
   {
@@ -3975,6 +4072,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_defiance_20003",
    "effects": [
+    "block_shield:3",
     "attack_phys_shield:24"
    ],
    "tier": "notable"
@@ -3996,60 +4094,70 @@ export const TALENT_TREE_DATA = {
    "id": 20005,
    "x": 112,
    "y": 2394,
-   "nameEn": "Siege Mentality",
-   "nameDe": "Belagerungsmentalität",
-   "descEn": "+12% Melee damage while at least 3 monsters are alive.",
-   "descDe": "+12% Nahkampfschaden, solange mindestens 3 Monster am Leben sind.",
-   "icon": "◆",
-   "statKey": "notable_siege_mentality",
+   "nameEn": "Dirty Techniques",
+   "nameDe": "Schmutzige Techniken",
+   "icon": "",
+   "statKey": "notable_dirty_techniques_20005",
+   "effects": [
+    "dot_faster:15"
+   ],
    "tier": "notable"
   },
   {
    "id": 20006,
    "x": 237,
    "y": 2728,
-   "nameEn": "Evasive Maneuver",
-   "nameDe": "Ausweichmanöver",
-   "descEn": "Gain +6% Movement speed for 2 seconds after evading.",
-   "descDe": "Erhalte nach dem Ausweichen 2 Sekunden lang +6% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_evasive_maneuver",
+   "nameEn": "Blade Barrier",
+   "nameDe": "Klingenbarriere",
+   "icon": "",
+   "statKey": "notable_blade_barrier_20006",
+   "effects": [
+    "dual_block:10",
+    "block_recovery:50",
+    "dual_damage:25"
+   ],
    "tier": "notable"
   },
   {
    "id": 20007,
    "x": 44,
    "y": 2823,
-   "nameEn": "Blade Frenzy",
-   "nameDe": "Klingenrausch",
-   "descEn": "+15% Critical strike multiplier, +4% Melee damage.",
-   "descDe": "+15% kritischer Schadensmultiplikator, +4% Nahkampfschaden.",
-   "icon": "◆",
-   "statKey": "notable_blade_frenzy",
+   "nameEn": "Disciple of the Slaughter",
+   "nameDe": "Jünger des Gemetzels",
+   "icon": "",
+   "statKey": "notable_disciple_of_the_slaughter_20007",
+   "effects": [
+    "frenzy_on_kill:8"
+   ],
    "tier": "notable"
   },
   {
    "id": 20008,
    "x": -40,
    "y": 2823,
-   "nameEn": "Trick Shot",
-   "nameDe": "Trickschuss",
-   "descEn": "Projectiles ricochet to a nearby monster for 30% damage.",
-   "descDe": "Projektile prallen auf ein nahes Monster ab (30% Schaden).",
-   "icon": "◆",
-   "statKey": "notable_trick_shot",
+   "nameEn": "Disciple of the Unyielding",
+   "nameDe": "Jünger der Unnachgiebigen",
+   "icon": "",
+   "statKey": "notable_disciple_of_the_unyielding_20008",
+   "effects": [
+    "endurance_min:1",
+    "endurance_on_kill:8",
+    "damage_per_endurance:8"
+   ],
    "tier": "notable"
   },
   {
    "id": 20009,
    "x": -259,
    "y": 2728,
-   "nameEn": "Arrow Storm",
-   "nameDe": "Pfeilsturm",
-   "descEn": "+6% Attack speed.",
-   "descDe": "+6% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_arrow_storm",
+   "nameEn": "Testudo",
+   "nameDe": "Testudo",
+   "icon": "",
+   "statKey": "notable_testudo_20009",
+   "effects": [
+    "block_shield:10",
+    "block_recovery:60"
+   ],
    "tier": "notable"
   },
   {
@@ -4244,60 +4352,65 @@ export const TALENT_TREE_DATA = {
    "id": 30014,
    "x": 114,
    "y": 1661,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Dual Wield Damage",
+   "nameDe": "Beidhändiger Schaden",
+   "icon": "",
+   "statKey": "small_dual_wield_damage_30014",
+   "effects": [
+    "dual_damage:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30015,
    "x": 147,
    "y": 1710,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Dual Wield Accuracy",
+   "nameDe": "Beidhändige Präzision",
+   "icon": "",
+   "statKey": "small_dual_wield_accuracy_30015",
+   "effects": [
+    "dual_accuracy:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30016,
    "x": 114,
    "y": 1759,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Dual Wield Damage",
+   "nameDe": "Beidhändiger Schaden",
+   "icon": "",
+   "statKey": "small_dual_wield_damage_30016",
+   "effects": [
+    "dual_damage:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30017,
    "x": 74,
    "y": 1759,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Dual Wield Attack Speed",
+   "nameDe": "Beidhändiges Angriffstempo",
+   "icon": "",
+   "statKey": "small_dual_wield_attack_speed_30017",
+   "effects": [
+    "dual_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30018,
    "x": -73,
    "y": 1759,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Defences with Shield",
+   "nameDe": "Verteidigung mit Schild",
+   "icon": "",
+   "statKey": "small_defences_with_shield_30018",
+   "effects": [
+    "shield_defences:40"
+   ],
    "tier": "small"
   },
   {
@@ -4343,12 +4456,13 @@ export const TALENT_TREE_DATA = {
    "id": 30022,
    "x": -185,
    "y": 1768,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+1 to Strength.",
-   "descDe": "+1 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Two Handed Melee Accuracy",
+   "nameDe": "Zweihand-Präzision",
+   "icon": "",
+   "statKey": "small_two_handed_melee_accuracy_30022",
+   "effects": [
+    "accuracy_rating_pct:12"
+   ],
    "tier": "small"
   },
   {
@@ -4481,6 +4595,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_block_chance_and_attack_damage_with_shield_30032",
    "effects": [
+    "block_shield:2",
     "attack_phys_shield:8"
    ],
    "tier": "travel"
@@ -4503,132 +4618,146 @@ export const TALENT_TREE_DATA = {
    "id": 30034,
    "x": -18,
    "y": 2672,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Armour per Endurance Charge",
+   "nameDe": "Rüstung pro Ausdauerladung",
+   "icon": "",
+   "statKey": "small_armour_per_endurance_charge_30034",
+   "effects": [
+    "armour_per_endurance:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30035,
    "x": 22,
    "y": 2672,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Evasion per Frenzy Charge",
+   "nameDe": "Ausweichen pro Raserei-Ladung",
+   "icon": "",
+   "statKey": "small_evasion_per_frenzy_charge_30035",
+   "effects": [
+    "evasion_per_frenzy:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30036,
    "x": 55,
    "y": 2721,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Movement Speed per Frenzy Charge",
+   "nameDe": "Bewegungstempo pro Raserei-Ladung",
+   "icon": "",
+   "statKey": "travel_movement_speed_per_frenzy_charge_30036",
+   "effects": [
+    "move_per_frenzy:2"
+   ],
    "tier": "travel"
   },
   {
    "id": 30037,
    "x": 104,
    "y": 2763,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Attack Speed per Frenzy Charge",
+   "nameDe": "Angriffstempo pro Raserei-Ladung",
+   "icon": "",
+   "statKey": "small_attack_speed_per_frenzy_charge_30037",
+   "effects": [
+    "charge_per_frenzy:2"
+   ],
    "tier": "small"
   },
   {
    "id": 30038,
    "x": -51,
    "y": 2721,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Stun Duration per Endurance Charge",
+   "nameDe": "Betäubungsdauer pro Ausdauerladung",
+   "icon": "",
+   "statKey": "travel_stun_duration_per_endurance_charge_30038",
+   "effects": [
+    "stun_per_endurance:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30039,
    "x": -100,
    "y": 2763,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Area of Effect per Endurance Charge",
+   "nameDe": "Wirkungsbereich pro Ausdauerladung",
+   "icon": "",
+   "statKey": "small_area_of_effect_per_endurance_charge_30039",
+   "effects": [
+    "aoe_per_endurance:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30040,
    "x": 93,
    "y": 2584,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Dual Wield Damage and Attack Speed",
+   "nameDe": "Beidhändiger Schaden und Angriffstempo",
+   "icon": "",
+   "statKey": "small_dual_wield_damage_and_attack_speed_30040",
+   "effects": [
+    "dual_damage:10",
+    "dual_charge_speed:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30041,
    "x": 153,
    "y": 2524,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Dual Wield Damage and Attack Speed",
+   "nameDe": "Beidhändiger Schaden und Angriffstempo",
+   "icon": "",
+   "statKey": "small_dual_wield_damage_and_attack_speed_30041",
+   "effects": [
+    "dual_damage:10",
+    "dual_charge_speed:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30042,
    "x": 237,
    "y": 2524,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Dual Wield Damage and Block",
+   "nameDe": "Beidhändiger Schaden und Block",
+   "icon": "",
+   "statKey": "travel_dual_wield_damage_and_block_30042",
+   "effects": [
+    "dual_block:2",
+    "dual_damage:8"
+   ],
    "tier": "travel"
   },
   {
    "id": 30043,
    "x": 210,
    "y": 2394,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Faster Ailments",
+   "nameDe": "Schnellere Zustände",
+   "icon": "",
+   "statKey": "small_faster_ailments_30043",
+   "effects": [
+    "dot_faster:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30044,
    "x": 161,
    "y": 2321,
-   "nameEn": "Disciplined Body",
-   "nameDe": "Disziplinierter Körper",
-   "descEn": "+1 Strength, +1 Agility.",
-   "descDe": "+1 Stärke, +1 Beweglichkeit.",
-   "icon": "🛡️",
-   "statKey": "small_disciplined_body",
+   "nameEn": "Faster Ailments",
+   "nameDe": "Schnellere Zustände",
+   "icon": "",
+   "statKey": "small_faster_ailments_30044",
+   "effects": [
+    "dot_faster:5"
+   ],
    "tier": "small"
   },
   {
@@ -4797,12 +4926,15 @@ export const TALENT_TREE_DATA = {
    "id": 20018,
    "x": -2472,
    "y": -1780,
-   "nameEn": "Carnage",
-   "nameDe": "Gemetzel",
-   "descEn": "+2% Melee damage per monster killed this level, up to +20%.",
-   "descDe": "+2% Nahkampfschaden pro in diesem Level getötetem Monster, bis zu +20%.",
-   "icon": "◆",
-   "statKey": "notable_carnage",
+   "nameEn": "Galvanic Hammer",
+   "nameDe": "Galvanischer Hammer",
+   "icon": "",
+   "statKey": "notable_galvanic_hammer_20018",
+   "effects": [
+    "accuracy_rating_pct:10",
+    "elemental_damage_inc_pct:30",
+    "pen_elemental:5"
+   ],
    "tier": "notable"
   },
   {
@@ -5130,12 +5262,13 @@ export const TALENT_TREE_DATA = {
    "id": 30073,
    "x": -1793,
    "y": -1030,
-   "nameEn": "Focused Fury",
-   "nameDe": "Fokussierte Wut",
-   "descEn": "+1 Strength, +1 Intellect.",
-   "descDe": "+1 Stärke, +1 Intelligenz.",
-   "icon": "💥",
-   "statKey": "small_focused_fury",
+   "nameEn": "Area of Effect Damage",
+   "nameDe": "Flächenschaden",
+   "icon": "",
+   "statKey": "small_area_of_effect_damage_30073",
+   "effects": [
+    "area_damage_inc:10"
+   ],
    "tier": "small"
   },
   {
@@ -5399,12 +5532,14 @@ export const TALENT_TREE_DATA = {
    "id": 30097,
    "x": -2443,
    "y": -1711,
-   "nameEn": "Battle Mage",
-   "nameDe": "Kriegsmagier",
-   "descEn": "+1 Strength, +1 Intellect.",
-   "descDe": "+1 Stärke, +1 Intelligenz.",
-   "icon": "🔥",
-   "statKey": "small_battle_mage",
+   "nameEn": "Mace Elemental Damage and Accuracy",
+   "nameDe": "Streitkolben-Elementarschaden und Präzision",
+   "icon": "",
+   "statKey": "small_mace_elemental_damage_and_accuracy_30097",
+   "effects": [
+    "accuracy_rating_pct:8",
+    "elemental_damage_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
@@ -6367,12 +6502,13 @@ export const TALENT_TREE_DATA = {
    "id": 20039,
    "x": -1645,
    "y": 1601,
-   "nameEn": "Iron Bulwark",
-   "nameDe": "Eisernes Bollwerk",
-   "descEn": "+60 Armour, +5 maximum Health.",
-   "descDe": "+60 Rüstung, +5 max. Leben.",
-   "icon": "◆",
-   "statKey": "notable_iron_bulwark",
+   "nameEn": "Goliath",
+   "nameDe": "Goliath",
+   "icon": "",
+   "statKey": "notable_goliath_20039",
+   "effects": [
+    "stun_double_chance:50"
+   ],
    "tier": "notable"
   },
   {
@@ -6392,24 +6528,26 @@ export const TALENT_TREE_DATA = {
    "id": 20041,
    "x": -1925,
    "y": 1483,
-   "nameEn": "Brute Force",
-   "nameDe": "Rohe Gewalt",
-   "descEn": "+10% Melee physical damage.",
-   "descDe": "+10% physischer Nahkampfschaden.",
-   "icon": "◆",
-   "statKey": "notable_brute_force",
+   "nameEn": "Veteran's Wrath",
+   "nameDe": "Zorn des Veteranen",
+   "icon": "",
+   "statKey": "notable_veteran_s_wrath_20041",
+   "effects": [
+    "rage_on_hit_axe:2"
+   ],
    "tier": "notable"
   },
   {
    "id": 20042,
    "x": -2122,
    "y": 1390,
-   "nameEn": "Grit",
-   "nameDe": "Zähigkeit",
-   "descEn": "+10 Armour, +1 Absorption on kill.",
-   "descDe": "+10 Rüstung, +1 Absorption pro Kill.",
-   "icon": "◆",
-   "statKey": "notable_grit",
+   "nameEn": "Inexorable",
+   "nameDe": "Unaufhaltsam",
+   "icon": "",
+   "statKey": "notable_inexorable_20042",
+   "effects": [
+    "endurance_when_hit:25"
+   ],
    "tier": "notable"
   },
   {
@@ -6458,24 +6596,23 @@ export const TALENT_TREE_DATA = {
    "id": 20046,
    "x": -2406,
    "y": 1662,
-   "nameEn": "Sunder",
-   "nameDe": "Spalten",
-   "descEn": "Melee hits reduce monster Armour by 10% for 3 seconds.",
-   "descDe": "Nahkampftreffer reduzieren die Rüstung von Monstern um 10% für 3 Sekunden.",
-   "icon": "◆",
-   "statKey": "notable_sunder",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20046",
    "tier": "notable"
   },
   {
    "id": 20047,
    "x": -2122,
    "y": 1824,
-   "nameEn": "Unrelenting",
-   "nameDe": "Unerbittlich",
-   "descEn": "+6% Attack speed.",
-   "descDe": "+6% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_unrelenting",
+   "nameEn": "As The Mountain",
+   "nameDe": "Wie der Berg",
+   "icon": "",
+   "statKey": "notable_as_the_mountain_20047",
+   "effects": [
+    "block_dualshield:12"
+   ],
    "tier": "notable"
   },
   {
@@ -6492,24 +6629,23 @@ export const TALENT_TREE_DATA = {
    "id": 20049,
    "x": -1696,
    "y": 2350,
-   "nameEn": "Executioner",
-   "nameDe": "Henker",
-   "descEn": "+25% Melee damage against slowed monsters.",
-   "descDe": "+25% Nahkampfschaden gegen verlangsamte Monster.",
-   "icon": "◆",
-   "statKey": "notable_executioner",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20049",
    "tier": "notable"
   },
   {
    "id": 20050,
    "x": -1542,
    "y": 2082,
-   "nameEn": "Executioner",
-   "nameDe": "Henker",
-   "descEn": "+25% Melee damage against slowed monsters.",
-   "descDe": "+25% Nahkampfschaden gegen verlangsamte Monster.",
-   "icon": "◆",
-   "statKey": "notable_executioner",
+   "nameEn": "Brink of Death",
+   "nameDe": "Rand des Todes",
+   "icon": "",
+   "statKey": "notable_brink_of_death_20050",
+   "effects": [
+    "low_life_regen_pct:4"
+   ],
    "tier": "notable"
   },
   {
@@ -6552,12 +6688,13 @@ export const TALENT_TREE_DATA = {
    "id": 20054,
    "x": -554,
    "y": 1318,
-   "nameEn": "Blood and Steel",
-   "nameDe": "Blut und Stahl",
-   "descEn": "+8% Melee damage. Killing a monster restores 1 Health.",
-   "descDe": "+8% Nahkampfschaden. Das Töten eines Monsters stellt 1 Leben wieder her.",
-   "icon": "◆",
-   "statKey": "notable_blood_and_steel",
+   "nameEn": "Command of Steel",
+   "nameDe": "Befehl des Stahls",
+   "icon": "",
+   "statKey": "notable_command_of_steel_20054",
+   "effects": [
+    "block_shield:8"
+   ],
    "tier": "notable"
   },
   {
@@ -6601,12 +6738,14 @@ export const TALENT_TREE_DATA = {
    "id": 20058,
    "x": -630,
    "y": 2195,
-   "nameEn": "Unbreakable",
-   "nameDe": "Unzerstörbar",
-   "descEn": "+20% maximum Health.",
-   "descDe": "+20% max. Leben.",
-   "icon": "◆",
-   "statKey": "notable_unbreakable",
+   "nameEn": "Vengeance",
+   "nameDe": "Vergeltung",
+   "icon": "",
+   "statKey": "notable_vengeance_20058",
+   "effects": [
+    "rage_armour:1",
+    "rage_when_hit:3"
+   ],
    "tier": "notable"
   },
   {
@@ -6655,7 +6794,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_feller_of_foes_20062",
    "effects": [
-    "melee_phys_axe:30"
+    "melee_phys_axe:30",
+    "crit_multi_axe:40"
    ],
    "tier": "notable"
   },
@@ -6663,12 +6803,15 @@ export const TALENT_TREE_DATA = {
    "id": 20063,
    "x": -1230,
    "y": 2586,
-   "nameEn": "Battering Ram",
-   "nameDe": "Sturmbock",
-   "descEn": "+8% Movement speed, +6% Melee damage.",
-   "descDe": "+8% Bewegungsgeschwindigkeit, +6% Nahkampfschaden.",
-   "icon": "◆",
-   "statKey": "notable_battering_ram",
+   "nameEn": "Blade of Cunning",
+   "nameDe": "Klinge der List",
+   "icon": "",
+   "statKey": "notable_blade_of_cunning_20063",
+   "effects": [
+    "accuracy_rating_pct:15",
+    "crit_chance_sword:4",
+    "crit_multi_sword:15"
+   ],
    "tier": "notable"
   },
   {
@@ -6689,12 +6832,13 @@ export const TALENT_TREE_DATA = {
    "id": 20065,
    "x": -710,
    "y": 2635,
-   "nameEn": "Blood Frenzy",
-   "nameDe": "Blutrausch",
-   "descEn": "Gain +3 Absorption for every monster killed.",
-   "descDe": "Erhalte +3 Absorption für jedes getötete Monster.",
-   "icon": "◆",
-   "statKey": "notable_blood_frenzy",
+   "nameEn": "Brutal Skewering",
+   "nameDe": "Brutales Aufspießen",
+   "icon": "",
+   "statKey": "notable_brutal_skewering_20065",
+   "effects": [
+    "impale_duration:20"
+   ],
    "tier": "notable"
   },
   {
@@ -6742,12 +6886,10 @@ export const TALENT_TREE_DATA = {
    "id": 20069,
    "x": -2131,
    "y": 388,
-   "nameEn": "Mountain's Heart",
-   "nameDe": "Herz des Berges",
-   "descEn": "+50 Armour, +15% maximum Health.",
-   "descDe": "+50 Rüstung, +15% max. Leben.",
-   "icon": "◆",
-   "statKey": "notable_mountain_s_heart",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20069",
    "tier": "notable"
   },
   {
@@ -6795,70 +6937,81 @@ export const TALENT_TREE_DATA = {
    "id": 20073,
    "x": -2708,
    "y": -155,
-   "nameEn": "Stubborn Vitality",
-   "nameDe": "Hartnäckige Vitalität",
-   "descEn": "+25 maximum Health, +1 Absorption on kill.",
-   "descDe": "+25 max. Leben, +1 Absorption pro Kill.",
-   "icon": "◆",
-   "statKey": "notable_stubborn_vitality",
+   "nameEn": "Persistence",
+   "nameDe": "Beharrlichkeit",
+   "icon": "",
+   "statKey": "notable_persistence_20073",
+   "effects": [
+    "phys_taken_flat:5"
+   ],
    "tier": "notable"
   },
   {
    "id": 20074,
    "x": -2710,
    "y": -369,
-   "nameEn": "Rampage",
-   "nameDe": "Tobsucht",
-   "descEn": "Killing a monster grants +4% Attack speed for 3 seconds (stacks up to 5 times).",
-   "descDe": "Das Töten eines Monsters gewährt 3 Sekunden lang +4% Angriffsgeschwindigkeit (bis zu 5-mal stapelbar).",
-   "icon": "◆",
-   "statKey": "notable_rampage",
+   "nameEn": "Whirling Barrier",
+   "nameDe": "Wirbelnde Barriere",
+   "icon": "",
+   "statKey": "notable_whirling_barrier_20074",
+   "effects": [
+    "power_on_block:20",
+    "staff_block:8",
+    "staff_spell_block:8"
+   ],
    "tier": "notable"
   },
   {
    "id": 20075,
    "x": -2778,
    "y": -471,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Counterweight",
+   "nameDe": "Gegengewicht",
    "icon": "",
-   "statKey": "reserved_reserved_node_20075",
+   "statKey": "notable_counterweight_20075",
+   "effects": [
+    "crit_chance_staff:5",
+    "crit_multi_staff:30"
+   ],
    "tier": "notable"
   },
   {
    "id": 20076,
    "x": -2710,
    "y": -573,
-   "nameEn": "Last Stand",
-   "nameDe": "Letztes Gefecht",
-   "descEn": "+20% Melee damage while below 30% Health.",
-   "descDe": "+20% Nahkampfschaden bei unter 30% Leben.",
-   "icon": "◆",
-   "statKey": "notable_last_stand",
+   "nameEn": "Smashing Strikes",
+   "nameDe": "Zerschmetternde Schläge",
+   "icon": "",
+   "statKey": "notable_smashing_strikes_20076",
+   "effects": [
+    "staff_damage:30",
+    "crit_chance_staff:4",
+    "endurance_on_melee_crit:10"
+   ],
    "tier": "notable"
   },
   {
    "id": 20077,
    "x": -2825,
    "y": -752,
-   "nameEn": "Last Stand",
-   "nameDe": "Letztes Gefecht",
-   "descEn": "+20% Melee damage while below 30% Health.",
-   "descDe": "+20% Nahkampfschaden bei unter 30% Leben.",
-   "icon": "◆",
-   "statKey": "notable_last_stand",
+   "nameEn": "Divine Fury",
+   "nameDe": "Göttlicher Zorn",
+   "icon": "",
+   "statKey": "notable_divine_fury_20077",
+   "effects": [
+    "phys_as_fire:5",
+    "pen_fire:5"
+   ],
    "tier": "notable"
   },
   {
    "id": 20078,
    "x": -2379,
    "y": -622,
-   "nameEn": "Siege Mentality",
-   "nameDe": "Belagerungsmentalität",
-   "descEn": "+12% Melee damage while at least 3 monsters are alive.",
-   "descDe": "+12% Nahkampfschaden, solange mindestens 3 Monster am Leben sind.",
-   "icon": "◆",
-   "statKey": "notable_siege_mentality",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20078",
    "tier": "notable"
   },
   {
@@ -6970,24 +7123,24 @@ export const TALENT_TREE_DATA = {
    "id": 20088,
    "x": -1514,
    "y": -286,
-   "nameEn": "Immovable",
-   "nameDe": "Unbeweglich",
-   "descEn": "-5% Movement speed, +15% Armour.",
-   "descDe": "-5% Bewegungsgeschwindigkeit, +15% Rüstung.",
-   "icon": "◆",
-   "statKey": "notable_immovable",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20088",
    "tier": "notable"
   },
   {
    "id": 20089,
    "x": -1678,
    "y": -361,
-   "nameEn": "Immovable",
-   "nameDe": "Unbeweglich",
-   "descEn": "-5% Movement speed, +15% Armour.",
-   "descDe": "-5% Bewegungsgeschwindigkeit, +15% Rüstung.",
-   "icon": "◆",
-   "statKey": "notable_immovable",
+   "nameEn": "Steelwood Stance",
+   "nameDe": "Stahlholz-Haltung",
+   "icon": "",
+   "statKey": "notable_steelwood_stance_20089",
+   "effects": [
+    "staff_damage:30",
+    "staff_block:10"
+   ],
    "tier": "notable"
   },
   {
@@ -7019,12 +7172,10 @@ export const TALENT_TREE_DATA = {
    "id": 20092,
    "x": -1322,
    "y": -359,
-   "nameEn": "Berserker's Blood",
-   "nameDe": "Blut des Berserkers",
-   "descEn": "Regenerate 1.5% of maximum Health per second.",
-   "descDe": "Regeneriere 1,5% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "notable_berserker_s_blood",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20092",
    "tier": "notable"
   },
   {
@@ -7043,24 +7194,23 @@ export const TALENT_TREE_DATA = {
    "id": 20094,
    "x": -1986,
    "y": -410,
-   "nameEn": "Gladiator's Timing",
-   "nameDe": "Timing des Gladiators",
-   "descEn": "+10% Attack speed while your Absorption regenerates.",
-   "descDe": "+10% Angriffsgeschwindigkeit, während sich deine Absorption regeneriert.",
-   "icon": "◆",
-   "statKey": "notable_gladiator_s_timing",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20094",
    "tier": "notable"
   },
   {
    "id": 20095,
    "x": -2222,
    "y": -896,
-   "nameEn": "Gladiator's Timing",
-   "nameDe": "Timing des Gladiators",
-   "descEn": "+10% Attack speed while your Absorption regenerates.",
-   "descDe": "+10% Angriffsgeschwindigkeit, während sich deine Absorption regeneriert.",
-   "icon": "◆",
-   "statKey": "notable_gladiator_s_timing",
+   "nameEn": "Overcharge",
+   "nameDe": "Überladung",
+   "icon": "",
+   "statKey": "notable_overcharge_20095",
+   "effects": [
+    "power_max:1"
+   ],
    "tier": "notable"
   },
   {
@@ -7779,12 +7929,13 @@ export const TALENT_TREE_DATA = {
    "id": 30208,
    "x": -1129,
    "y": 1294,
-   "nameEn": "Lesser Heavy Impact",
-   "nameDe": "Schwerer Einschlag (klein)",
-   "descEn": "+4% Melee damage. Hits stagger monsters, slowing them by 5%.",
-   "descDe": "+4% Nahkampfschaden. Treffer werfen Monster zurück und verlangsamen sie um 5%.",
-   "icon": "◆",
-   "statKey": "small_lesser_heavy_impact",
+   "nameEn": "Maximum Fire Resistance",
+   "nameDe": "Maximaler Feuerwiderstand",
+   "icon": "",
+   "statKey": "small_maximum_fire_resistance_30208",
+   "effects": [
+    "fire_res_max:1"
+   ],
    "tier": "small"
   },
   {
@@ -7899,24 +8050,26 @@ export const TALENT_TREE_DATA = {
    "id": 30217,
    "x": -607,
    "y": 1265,
-   "nameEn": "Lesser Blood and Steel",
-   "nameDe": "Blut und Stahl (klein)",
-   "descEn": "+4% Melee damage. Killing a monster restores 1 Health.",
-   "descDe": "+4% Nahkampfschaden. Das Töten eines Monsters stellt 1 Leben wieder her.",
-   "icon": "◆",
-   "statKey": "small_lesser_blood_and_steel",
+   "nameEn": "Shield Defences",
+   "nameDe": "Schildverteidigung",
+   "icon": "",
+   "statKey": "small_shield_defences_30217",
+   "effects": [
+    "shield_defences:50"
+   ],
    "tier": "small"
   },
   {
    "id": 30218,
    "x": -656,
    "y": 1338,
-   "nameEn": "Lesser Blood and Steel",
-   "nameDe": "Blut und Stahl (klein)",
-   "descEn": "+4% Melee damage. Killing a monster restores 1 Health.",
-   "descDe": "+4% Nahkampfschaden. Das Töten eines Monsters stellt 1 Leben wieder her.",
-   "icon": "◆",
-   "statKey": "small_lesser_blood_and_steel",
+   "nameEn": "Shield Defences",
+   "nameDe": "Schildverteidigung",
+   "icon": "",
+   "statKey": "small_shield_defences_30218",
+   "effects": [
+    "shield_defences:50"
+   ],
    "tier": "small"
   },
   {
@@ -7962,44 +8115,46 @@ export const TALENT_TREE_DATA = {
    "id": 30222,
    "x": -605,
    "y": 1566,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Attack Cost Efficiency",
+   "nameDe": "Angriffs-Kosteneffizienz",
    "icon": "",
-   "statKey": "reserved_reserved_node_30222",
+   "statKey": "small_attack_cost_efficiency_30222",
+   "effects": [
+    "melee_spell_mana_reduced:15"
+   ],
    "tier": "small"
   },
   {
    "id": 30223,
    "x": -507,
    "y": 1566,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Attack Cost Efficiency",
+   "nameDe": "Angriffs-Kosteneffizienz",
    "icon": "",
-   "statKey": "reserved_reserved_node_30223",
+   "statKey": "small_attack_cost_efficiency_30223",
+   "effects": [
+    "melee_spell_mana_reduced:15"
+   ],
    "tier": "small"
   },
   {
    "id": 30224,
    "x": -545,
    "y": 1780,
-   "nameEn": "Lesser Golden Recurrence",
-   "nameDe": "Goldene Wiederkehr (klein)",
-   "descEn": "10% increased chance of Lucky Drops happening. Stacks with Fortune Echo and Treasure Resonance. +3% Armour.",
-   "descDe": "10% erhöhte Chance dass Glücksfunde aktiviert werden. Wirkt zusammen mit Echos des Glücks und Schatzresonanz. +3% Rüstung.",
-   "icon": "🎁",
-   "statKey": "small_lesser_golden_recurrence",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30224",
    "tier": "small"
   },
   {
    "id": 30225,
    "x": -545,
    "y": 1820,
-   "nameEn": "Lesser Golden Recurrence",
-   "nameDe": "Goldene Wiederkehr (klein)",
-   "descEn": "10% increased chance of Lucky Drops happening. Stacks with Fortune Echo and Treasure Resonance. +3% Armour.",
-   "descDe": "10% erhöhte Chance dass Glücksfunde aktiviert werden. Wirkt zusammen mit Echos des Glücks und Schatzresonanz. +3% Rüstung.",
-   "icon": "🎁",
-   "statKey": "small_lesser_golden_recurrence",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30225",
    "tier": "small"
   },
   {
@@ -8057,7 +8212,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_bleed_damage_and_chance_30230",
    "effects": [
-    "bleed_chance_attack:10"
+    "bleed_chance_attack:10",
+    "dot_inc_pct:15"
    ],
    "tier": "travel"
   },
@@ -8152,24 +8308,26 @@ export const TALENT_TREE_DATA = {
    "id": 30238,
    "x": -1238,
    "y": 1674,
-   "nameEn": "Lesser Poisson Drift",
-   "nameDe": "Poisson-Drift (klein)",
-   "descEn": "The Poisson Process effect now occurs every 45 seconds. +3% Armour.",
-   "descDe": "Der Poisson - Prozess Effekt wird nun alle 45 Sekunden ausgeführt. +3% Rüstung.",
-   "icon": "⚗️",
-   "statKey": "small_lesser_poisson_drift",
+   "nameEn": "Rage on Hit",
+   "nameDe": "Wut bei Treffern",
+   "icon": "",
+   "statKey": "small_rage_on_hit_30238",
+   "effects": [
+    "rage_on_hit_axe:1"
+   ],
    "tier": "small"
   },
   {
    "id": 30239,
    "x": -1291,
    "y": 1621,
-   "nameEn": "Lesser Poisson Drift",
-   "nameDe": "Poisson-Drift (klein)",
-   "descEn": "The Poisson Process effect now occurs every 45 seconds. +3% Armour.",
-   "descDe": "Der Poisson - Prozess Effekt wird nun alle 45 Sekunden ausgeführt. +3% Rüstung.",
-   "icon": "⚗️",
-   "statKey": "small_lesser_poisson_drift",
+   "nameEn": "Rage on Hit",
+   "nameDe": "Wut bei Treffern",
+   "icon": "",
+   "statKey": "small_rage_on_hit_30239",
+   "effects": [
+    "rage_on_hit_axe:1"
+   ],
    "tier": "small"
   },
   {
@@ -8235,7 +8393,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_impale_chance_30244",
    "effects": [
-    "melee_phys_axe:14"
+    "melee_phys_axe:14",
+    "impale_chance_heavy:10"
    ],
    "tier": "small"
   },
@@ -8253,12 +8412,10 @@ export const TALENT_TREE_DATA = {
    "id": 30246,
    "x": -1493,
    "y": 1314,
-   "nameEn": "Lesser Radiant Sight",
-   "nameDe": "Strahlende Sicht (klein)",
-   "descEn": "Reveal items reveal 1 additional cell. Stacks with Beacon of Clarity and Lantern Expansion. +3% Armour.",
-   "descDe": "Enthüllungsgegenstände enthüllen 1 zusätzliche Zelle. Wirkt zusammen mit Leuchtfeuer der Klarheit und Laternenausweitung. +3% Rüstung.",
-   "icon": "🕯️",
-   "statKey": "small_lesser_radiant_sight",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30246",
    "tier": "small"
   },
   {
@@ -8496,24 +8653,20 @@ export const TALENT_TREE_DATA = {
    "id": 30264,
    "x": -2081,
    "y": 948,
-   "nameEn": "Lesser Resolute Advance",
-   "nameDe": "Entschlossener Vormarsch (klein)",
-   "descEn": "+5% Armour. You cannot be slowed below 40% Movement speed.",
-   "descDe": "+5% Rüstung. Du kannst nicht unter 40% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
-   "statKey": "small_lesser_resolute_advance",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30264",
    "tier": "small"
   },
   {
    "id": 30265,
    "x": -2157,
    "y": 948,
-   "nameEn": "Lesser Resolute Advance",
-   "nameDe": "Entschlossener Vormarsch (klein)",
-   "descEn": "+5% Armour. You cannot be slowed below 40% Movement speed.",
-   "descDe": "+5% Rüstung. Du kannst nicht unter 40% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
-   "statKey": "small_lesser_resolute_advance",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30265",
    "tier": "small"
   },
   {
@@ -8641,24 +8794,20 @@ export const TALENT_TREE_DATA = {
    "id": 30275,
    "x": -2631,
    "y": 1058,
-   "nameEn": "Lesser Collapse Point",
-   "nameDe": "Kollapspunkt (klein)",
-   "descEn": "Completing a column collapses its neighbours: one correct cell is revealed in each directly adjacent column. +3% Armour.",
-   "descDe": "Das Abschließen einer Spalte lässt ihre Nachbarn kollabieren: In jeder direkt angrenzenden Spalte wird eine korrekte Zelle aufgedeckt. +3% Rüstung.",
-   "icon": "🎯",
-   "statKey": "small_lesser_collapse_point",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30275",
    "tier": "small"
   },
   {
    "id": 30276,
    "x": -2664,
    "y": 1009,
-   "nameEn": "Lesser Collapse Point",
-   "nameDe": "Kollapspunkt (klein)",
-   "descEn": "Completing a column collapses its neighbours: one correct cell is revealed in each directly adjacent column. +3% Armour.",
-   "descDe": "Das Abschließen einer Spalte lässt ihre Nachbarn kollabieren: In jeder direkt angrenzenden Spalte wird eine korrekte Zelle aufgedeckt. +3% Rüstung.",
-   "icon": "🎯",
-   "statKey": "small_lesser_collapse_point",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30276",
    "tier": "small"
   },
   {
@@ -8813,48 +8962,40 @@ export const TALENT_TREE_DATA = {
    "id": 30288,
    "x": -2131,
    "y": 494,
-   "nameEn": "Lesser Mountain's Heart",
-   "nameDe": "Herz des Berges (klein)",
-   "descEn": "+25 Armour, +8% maximum Health.",
-   "descDe": "+25 Rüstung, +8% max. Leben.",
-   "icon": "◆",
-   "statKey": "small_lesser_mountain_s_heart",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30288",
    "tier": "small"
   },
   {
    "id": 30289,
    "x": -2082,
    "y": 461,
-   "nameEn": "Lesser Mountain's Heart",
-   "nameDe": "Herz des Berges (klein)",
-   "descEn": "+25 Armour, +8% maximum Health.",
-   "descDe": "+25 Rüstung, +8% max. Leben.",
-   "icon": "◆",
-   "statKey": "small_lesser_mountain_s_heart",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30289",
    "tier": "small"
   },
   {
    "id": 30290,
    "x": -2082,
    "y": 421,
-   "nameEn": "Lesser Mountain's Heart",
-   "nameDe": "Herz des Berges (klein)",
-   "descEn": "+25 Armour, +8% maximum Health.",
-   "descDe": "+25 Rüstung, +8% max. Leben.",
-   "icon": "◆",
-   "statKey": "small_lesser_mountain_s_heart",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30290",
    "tier": "small"
   },
   {
    "id": 30291,
    "x": -2184,
    "y": 441,
-   "nameEn": "Lesser Mountain's Heart",
-   "nameDe": "Herz des Berges (klein)",
-   "descEn": "+25 Armour, +8% maximum Health.",
-   "descDe": "+25 Rüstung, +8% max. Leben.",
-   "icon": "◆",
-   "statKey": "small_lesser_mountain_s_heart",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30291",
    "tier": "small"
   },
   {
@@ -8954,48 +9095,52 @@ export const TALENT_TREE_DATA = {
    "id": 30299,
    "x": -2425,
    "y": 160,
-   "nameEn": "Lesser Mythic Spoils",
-   "nameDe": "Mythische Beute (klein)",
-   "descEn": "5% increased chance of receiving Epic, or Legendary items. Stacks with Jeweled Fortune and Legend's Hoard. +3% Armour.",
-   "descDe": "5% erhöhte Chance auf Epische oder Legendäre Gegenstände. Wirkt zusammen mit Juwelen des Glücks und Hort der Legenden. +3% Rüstung.",
-   "icon": "💎",
-   "statKey": "small_lesser_mythic_spoils",
+   "nameEn": "Rage on Hit",
+   "nameDe": "Wut bei Treffern",
+   "icon": "",
+   "statKey": "small_rage_on_hit_30299",
+   "effects": [
+    "rage_on_hit_axe:1"
+   ],
    "tier": "small"
   },
   {
    "id": 30300,
    "x": -2436,
    "y": 102,
-   "nameEn": "Lesser Mythic Spoils",
-   "nameDe": "Mythische Beute (klein)",
-   "descEn": "5% increased chance of receiving Epic, or Legendary items. Stacks with Jeweled Fortune and Legend's Hoard. +3% Armour.",
-   "descDe": "5% erhöhte Chance auf Epische oder Legendäre Gegenstände. Wirkt zusammen mit Juwelen des Glücks und Hort der Legenden. +3% Rüstung.",
-   "icon": "💎",
-   "statKey": "small_lesser_mythic_spoils",
+   "nameEn": "Rage on Hit",
+   "nameDe": "Wut bei Treffern",
+   "icon": "",
+   "statKey": "small_rage_on_hit_30300",
+   "effects": [
+    "rage_on_hit_axe:1"
+   ],
    "tier": "small"
   },
   {
    "id": 30301,
    "x": -2338,
    "y": 102,
-   "nameEn": "Lesser Mythic Spoils",
-   "nameDe": "Mythische Beute (klein)",
-   "descEn": "5% increased chance of receiving Epic, or Legendary items. Stacks with Jeweled Fortune and Legend's Hoard. +3% Armour.",
-   "descDe": "5% erhöhte Chance auf Epische oder Legendäre Gegenstände. Wirkt zusammen mit Juwelen des Glücks und Hort der Legenden. +3% Rüstung.",
-   "icon": "💎",
-   "statKey": "small_lesser_mythic_spoils",
+   "nameEn": "Slower Rage Decay",
+   "nameDe": "Langsamerer Wutverfall",
+   "icon": "",
+   "statKey": "small_slower_rage_decay_30301",
+   "effects": [
+    "rage_decay:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30302,
    "x": -2349,
    "y": 160,
-   "nameEn": "Lesser Mythic Spoils",
-   "nameDe": "Mythische Beute (klein)",
-   "descEn": "5% increased chance of receiving Epic, or Legendary items. Stacks with Jeweled Fortune and Legend's Hoard. +3% Armour.",
-   "descDe": "5% erhöhte Chance auf Epische oder Legendäre Gegenstände. Wirkt zusammen mit Juwelen des Glücks und Hort der Legenden. +3% Rüstung.",
-   "icon": "💎",
-   "statKey": "small_lesser_mythic_spoils",
+   "nameEn": "Slower Rage Decay",
+   "nameDe": "Langsamerer Wutverfall",
+   "icon": "",
+   "statKey": "small_slower_rage_decay_30302",
+   "effects": [
+    "rage_decay:10"
+   ],
    "tier": "small"
   },
   {
@@ -9537,12 +9682,10 @@ export const TALENT_TREE_DATA = {
    "id": 30345,
    "x": -2081,
    "y": 872,
-   "nameEn": "Lesser Resolute Advance",
-   "nameDe": "Entschlossener Vormarsch (klein)",
-   "descEn": "+5% Armour. You cannot be slowed below 40% Movement speed.",
-   "descDe": "+5% Rüstung. Du kannst nicht unter 40% Bewegungsgeschwindigkeit verlangsamt werden.",
-   "icon": "◆",
-   "statKey": "small_lesser_resolute_advance",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30345",
    "tier": "small"
   },
   {
@@ -9947,12 +10090,13 @@ export const TALENT_TREE_DATA = {
    "id": 30377,
    "x": -2448,
    "y": 1507,
-   "nameEn": "Lesser Study Group",
-   "nameDe": "Lerngruppe (klein)",
-   "descEn": "One additional incorrect empty cell is automatically marked at the start of each level. +3% Armour.",
-   "descDe": "Zu Beginn jedes Levels wird automatisch eine zusätzliche falsche leere Zelle markiert. +3% Rüstung.",
-   "icon": "👥",
-   "statKey": "small_lesser_study_group",
+   "nameEn": "Stun Threshold Reduction",
+   "nameDe": "Betäubungsschwellen-Senkung",
+   "icon": "",
+   "statKey": "small_stun_threshold_reduction_30377",
+   "effects": [
+    "stun_chance:5"
+   ],
    "tier": "small"
   },
   {
@@ -10024,36 +10168,39 @@ export const TALENT_TREE_DATA = {
    "id": 30383,
    "x": -2448,
    "y": 1711,
-   "nameEn": "Lesser Sunder",
-   "nameDe": "Spalten (klein)",
-   "descEn": "Melee hits reduce monster Armour by 5% for 2 seconds.",
-   "descDe": "Nahkampftreffer reduzieren die Rüstung von Monstern um 5% für 2 Sekunden.",
-   "icon": "◆",
-   "statKey": "small_lesser_sunder",
+   "nameEn": "Stun Threshold Reduction",
+   "nameDe": "Betäubungsschwellen-Senkung",
+   "icon": "",
+   "statKey": "small_stun_threshold_reduction_30383",
+   "effects": [
+    "stun_chance:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30384,
    "x": -2122,
    "y": 1718,
-   "nameEn": "Lesser Unrelenting",
-   "nameDe": "Unerbittlich (klein)",
-   "descEn": "+3% Attack speed.",
-   "descDe": "+3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_unrelenting",
+   "nameEn": "Block",
+   "nameDe": "Block",
+   "icon": "",
+   "statKey": "small_block_30384",
+   "effects": [
+    "block_dualshield:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30385,
    "x": -2069,
    "y": 1771,
-   "nameEn": "Lesser Unrelenting",
-   "nameDe": "Unerbittlich (klein)",
-   "descEn": "+3% Attack speed.",
-   "descDe": "+3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_unrelenting",
+   "nameEn": "Block",
+   "nameDe": "Block",
+   "icon": "",
+   "statKey": "small_block_30385",
+   "effects": [
+    "block_dualshield:4"
+   ],
    "tier": "small"
   },
   {
@@ -10135,7 +10282,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mace_damage_and_reduced_enemy_stun_threshold_30393",
    "effects": [
-    "melee_phys_mace:16"
+    "melee_phys_mace:16",
+    "stun_chance:5"
    ],
    "tier": "small"
   },
@@ -10162,7 +10310,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mace_damage_and_stun_duration_30395",
    "effects": [
-    "melee_phys_mace:16"
+    "melee_phys_mace:16",
+    "stun_double_chance:10"
    ],
    "tier": "small"
   },
@@ -10196,50 +10345,65 @@ export const TALENT_TREE_DATA = {
    "id": 30398,
    "x": -1575,
    "y": 1889,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fortification Duration",
+   "nameDe": "Befestigungsdauer",
    "icon": "",
-   "statKey": "reserved_reserved_node_30398",
+   "statKey": "small_fortification_duration_30398",
+   "effects": [
+    "fortify_duration:40"
+   ],
    "tier": "small"
   },
   {
    "id": 30399,
    "x": -1615,
    "y": 1889,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fortification Duration",
+   "nameDe": "Befestigungsdauer",
    "icon": "",
-   "statKey": "reserved_reserved_node_30399",
+   "statKey": "small_fortification_duration_30399",
+   "effects": [
+    "fortify_duration:40"
+   ],
    "tier": "small"
   },
   {
    "id": 30400,
    "x": -1648,
    "y": 1938,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Maximum Fortification",
+   "nameDe": "Maximale Befestigung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30400",
+   "statKey": "travel_maximum_fortification_30400",
+   "effects": [
+    "fortify_max:1"
+   ],
    "tier": "travel"
   },
   {
    "id": 30401,
    "x": -1615,
    "y": 1987,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Maximum Fortification",
+   "nameDe": "Maximale Befestigung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30401",
+   "statKey": "small_maximum_fortification_30401",
+   "effects": [
+    "fortify_max:1"
+   ],
    "tier": "small"
   },
   {
    "id": 30402,
    "x": -1575,
    "y": 1987,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Maximum Fortification",
+   "nameDe": "Maximale Befestigung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30402",
+   "statKey": "small_maximum_fortification_30402",
+   "effects": [
+    "fortify_max:1"
+   ],
    "tier": "small"
   },
   {
@@ -10272,24 +10436,26 @@ export const TALENT_TREE_DATA = {
    "id": 30405,
    "x": -1742,
    "y": 2150,
-   "nameEn": "Lesser Second Wind Study",
-   "nameDe": "Zweiter Lernatem (klein)",
-   "descEn": "Using a Tutor item to remove a mistake also adds 15 seconds to the timer. Stacks with Temporal Recovery and Chrono Benefit. +3% Armour.",
-   "descDe": "Das Benutzen eines Tutor-Gegenstands zum Entfernen eines Fehlers fügt dem Timer zusätzlich 15 Sekunden hinzu. Wirkt zusammen mit Zeitlicher Erholung und Chrono-Vorteil. +3% Rüstung.",
-   "icon": "⏱️",
-   "statKey": "small_lesser_second_wind_study",
+   "nameEn": "Bleed Duration",
+   "nameDe": "Blutungsdauer",
+   "icon": "",
+   "statKey": "small_bleed_duration_30405",
+   "effects": [
+    "bleed_duration:25"
+   ],
    "tier": "small"
   },
   {
    "id": 30406,
    "x": -1742,
    "y": 2190,
-   "nameEn": "Lesser Second Wind Study",
-   "nameDe": "Zweiter Lernatem (klein)",
-   "descEn": "Using a Tutor item to remove a mistake also adds 15 seconds to the timer. Stacks with Temporal Recovery and Chrono Benefit. +3% Armour.",
-   "descDe": "Das Benutzen eines Tutor-Gegenstands zum Entfernen eines Fehlers fügt dem Timer zusätzlich 15 Sekunden hinzu. Wirkt zusammen mit Zeitlicher Erholung und Chrono-Vorteil. +3% Rüstung.",
-   "icon": "⏱️",
-   "statKey": "small_lesser_second_wind_study",
+   "nameEn": "Bleed Duration",
+   "nameDe": "Blutungsdauer",
+   "icon": "",
+   "statKey": "small_bleed_duration_30406",
+   "effects": [
+    "bleed_duration:25"
+   ],
    "tier": "small"
   },
   {
@@ -10309,12 +10475,13 @@ export const TALENT_TREE_DATA = {
    "id": 30408,
    "x": -1844,
    "y": 2170,
-   "nameEn": "Lesser Second Wind Study",
-   "nameDe": "Zweiter Lernatem (klein)",
-   "descEn": "Using a Tutor item to remove a mistake also adds 15 seconds to the timer. Stacks with Temporal Recovery and Chrono Benefit. +3% Armour.",
-   "descDe": "Das Benutzen eines Tutor-Gegenstands zum Entfernen eines Fehlers fügt dem Timer zusätzlich 15 Sekunden hinzu. Wirkt zusammen mit Zeitlicher Erholung und Chrono-Vorteil. +3% Rüstung.",
-   "icon": "⏱️",
-   "statKey": "small_lesser_second_wind_study",
+   "nameEn": "Faster Bleeding",
+   "nameDe": "Schnelleres Bluten",
+   "icon": "",
+   "statKey": "small_faster_bleeding_30408",
+   "effects": [
+    "bleed_speed:5"
+   ],
    "tier": "small"
   },
   {
@@ -10360,36 +10527,39 @@ export const TALENT_TREE_DATA = {
    "id": 30412,
    "x": -1974,
    "y": 1556,
-   "nameEn": "Lesser Brute Force",
-   "nameDe": "Rohe Gewalt (klein)",
-   "descEn": "+5% Melee physical damage.",
-   "descDe": "+5% physischer Nahkampfschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_brute_force",
+   "nameEn": "Maximum Rage",
+   "nameDe": "Maximale Wut",
+   "icon": "",
+   "statKey": "small_maximum_rage_30412",
+   "effects": [
+    "rage_max_add:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30413,
    "x": -2023,
    "y": 1523,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Rage on Hit",
+   "nameDe": "Wut bei Treffern",
+   "icon": "",
+   "statKey": "travel_rage_on_hit_30413",
+   "effects": [
+    "rage_on_hit_axe:1"
+   ],
    "tier": "travel"
   },
   {
    "id": 30414,
    "x": -2023,
    "y": 1483,
-   "nameEn": "Lesser Brute Force",
-   "nameDe": "Rohe Gewalt (klein)",
-   "descEn": "+5% Melee physical damage.",
-   "descDe": "+5% physischer Nahkampfschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_brute_force",
+   "nameEn": "Slower Rage Decay",
+   "nameDe": "Langsamerer Wutverfall",
+   "icon": "",
+   "statKey": "small_slower_rage_decay_30414",
+   "effects": [
+    "rage_decay:10"
+   ],
    "tier": "small"
   },
   {
@@ -10435,24 +10605,26 @@ export const TALENT_TREE_DATA = {
    "id": 30418,
    "x": -1925,
    "y": 1523,
-   "nameEn": "Lesser Brute Force",
-   "nameDe": "Rohe Gewalt (klein)",
-   "descEn": "+5% Melee physical damage.",
-   "descDe": "+5% physischer Nahkampfschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_brute_force",
+   "nameEn": "Maximum Rage",
+   "nameDe": "Maximale Wut",
+   "icon": "",
+   "statKey": "small_maximum_rage_30418",
+   "effects": [
+    "rage_max_add:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30419,
    "x": -1592,
    "y": 1548,
-   "nameEn": "Lesser Iron Bulwark",
-   "nameDe": "Eisernes Bollwerk (klein)",
-   "descEn": "+30 Armour, +3 maximum Health.",
-   "descDe": "+30 Rüstung, +3 max. Leben.",
-   "icon": "◆",
-   "statKey": "small_lesser_iron_bulwark",
+   "nameEn": "Stun Threshold Reduction",
+   "nameDe": "Betäubungsschwellen-Senkung",
+   "icon": "",
+   "statKey": "small_stun_threshold_reduction_30419",
+   "effects": [
+    "stun_chance:5"
+   ],
    "tier": "small"
   },
   {
@@ -10511,24 +10683,26 @@ export const TALENT_TREE_DATA = {
    "id": 30424,
    "x": -1395,
    "y": 1722,
-   "nameEn": "Lesser Fortune Well",
-   "nameDe": "Glücksbrunnen (klein)",
-   "descEn": "Claiming a lucky tile additionally reveals one correct cell. +3% Armour.",
-   "descDe": "Das Einsammeln einer Glückskachel deckt zusätzlich eine korrekte Zelle auf. +3% Rüstung.",
-   "icon": "🕳️",
-   "statKey": "small_lesser_fortune_well",
+   "nameEn": "Stun Threshold",
+   "nameDe": "Betäubungsschwelle",
+   "icon": "",
+   "statKey": "small_stun_threshold_30424",
+   "effects": [
+    "stun_avoid:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30425,
    "x": -1342,
    "y": 1775,
-   "nameEn": "Lesser Fortune Well",
-   "nameDe": "Glücksbrunnen (klein)",
-   "descEn": "Claiming a lucky tile additionally reveals one correct cell. +3% Armour.",
-   "descDe": "Das Einsammeln einer Glückskachel deckt zusätzlich eine korrekte Zelle auf. +3% Rüstung.",
-   "icon": "🕳️",
-   "statKey": "small_lesser_fortune_well",
+   "nameEn": "Stun Threshold",
+   "nameDe": "Betäubungsschwelle",
+   "icon": "",
+   "statKey": "small_stun_threshold_30425",
+   "effects": [
+    "stun_avoid:8"
+   ],
    "tier": "small"
   },
   {
@@ -10666,24 +10840,26 @@ export const TALENT_TREE_DATA = {
    "id": 30437,
    "x": -856,
    "y": 2032,
-   "nameEn": "Lesser Dialectic",
-   "nameDe": "Dialektik (klein)",
-   "descEn": "After every mistake, your next correct fill grants +3 seconds. +3% Armour.",
-   "descDe": "Nach jedem Fehler gewährt deine nächste korrekte Füllung +3 Sekunden. +3% Rüstung.",
-   "icon": "🧠",
-   "statKey": "small_lesser_dialectic",
+   "nameEn": "Impale Effect",
+   "nameDe": "Aufspießwirkung",
+   "icon": "",
+   "statKey": "small_impale_effect_30437",
+   "effects": [
+    "impale_effect_heavy:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30438,
    "x": -856,
    "y": 2072,
-   "nameEn": "Lesser Dialectic",
-   "nameDe": "Dialektik (klein)",
-   "descEn": "After every mistake, your next correct fill grants +3 seconds. +3% Armour.",
-   "descDe": "Nach jedem Fehler gewährt deine nächste korrekte Füllung +3 Sekunden. +3% Rüstung.",
-   "icon": "🧠",
-   "statKey": "small_lesser_dialectic",
+   "nameEn": "Impale Effect",
+   "nameDe": "Aufspießwirkung",
+   "icon": "",
+   "statKey": "small_impale_effect_30438",
+   "effects": [
+    "impale_effect_heavy:6"
+   ],
    "tier": "small"
   },
   {
@@ -10695,7 +10871,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_impale_chance_and_physical_attack_damage_30439",
    "effects": [
-    "phys_damage_inc:10"
+    "phys_damage_inc:10",
+    "impale_chance_heavy:5"
    ],
    "tier": "travel"
   },
@@ -10703,44 +10880,52 @@ export const TALENT_TREE_DATA = {
    "id": 30440,
    "x": -758,
    "y": 2032,
-   "nameEn": "Lesser Dialectic",
-   "nameDe": "Dialektik (klein)",
-   "descEn": "After every mistake, your next correct fill grants +3 seconds. +3% Armour.",
-   "descDe": "Nach jedem Fehler gewährt deine nächste korrekte Füllung +3 Sekunden. +3% Rüstung.",
-   "icon": "🧠",
-   "statKey": "small_lesser_dialectic",
+   "nameEn": "Impale Chance",
+   "nameDe": "Aufspießchance",
+   "icon": "",
+   "statKey": "small_impale_chance_30440",
+   "effects": [
+    "impale_chance_heavy:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30441,
    "x": -758,
    "y": 2072,
-   "nameEn": "Lesser Dialectic",
-   "nameDe": "Dialektik (klein)",
-   "descEn": "After every mistake, your next correct fill grants +3 seconds. +3% Armour.",
-   "descDe": "Nach jedem Fehler gewährt deine nächste korrekte Füllung +3 Sekunden. +3% Rüstung.",
-   "icon": "🧠",
-   "statKey": "small_lesser_dialectic",
+   "nameEn": "Impale Chance",
+   "nameDe": "Aufspießchance",
+   "icon": "",
+   "statKey": "small_impale_chance_30441",
+   "effects": [
+    "impale_chance_heavy:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30442,
    "x": -614,
    "y": 2089,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fortification Gain",
+   "nameDe": "Befestigungsgewinn",
    "icon": "",
-   "statKey": "reserved_reserved_node_30442",
+   "statKey": "small_fortification_gain_30442",
+   "effects": [
+    "fortify_effect:40"
+   ],
    "tier": "small"
   },
   {
    "id": 30443,
    "x": -574,
    "y": 2089,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fortification Gain",
+   "nameDe": "Befestigungsgewinn",
    "icon": "",
-   "statKey": "reserved_reserved_node_30443",
+   "statKey": "small_fortification_gain_30443",
+   "effects": [
+    "fortify_effect:40"
+   ],
    "tier": "small"
   },
   {
@@ -10800,24 +10985,26 @@ export const TALENT_TREE_DATA = {
    "id": 30449,
    "x": -574,
    "y": 1991,
-   "nameEn": "Lesser Binomial Burst",
-   "nameDe": "Binomialer Ausbruch (klein)",
-   "descEn": "Each time you fill 5 cells correctly in a single level, there is a 10% chance to instantly mark 1 random incorrect empty cell. +3% Armour.",
-   "descDe": "Jedes Mal, wenn du 5 Zellen korrekt in einem Level ausfüllst, besteht eine 10% Chance, sofort 1 zufällige falsche leere Zelle zu markieren. +3% Rüstung.",
-   "icon": "💢",
-   "statKey": "small_lesser_binomial_burst",
+   "nameEn": "Fortify on Melee Stun",
+   "nameDe": "Befestigung beim Betäuben",
+   "icon": "",
+   "statKey": "small_fortify_on_melee_stun_30449",
+   "effects": [
+    "fortify_on_stun:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30450,
    "x": -614,
    "y": 1991,
-   "nameEn": "Lesser Binomial Burst",
-   "nameDe": "Binomialer Ausbruch (klein)",
-   "descEn": "Each time you fill 5 cells correctly in a single level, there is a 10% chance to instantly mark 1 random incorrect empty cell. +3% Armour.",
-   "descDe": "Jedes Mal, wenn du 5 Zellen korrekt in einem Level ausfüllst, besteht eine 10% Chance, sofort 1 zufällige falsche leere Zelle zu markieren. +3% Rüstung.",
-   "icon": "💢",
-   "statKey": "small_lesser_binomial_burst",
+   "nameEn": "Fortify on Melee Stun",
+   "nameDe": "Befestigung beim Betäuben",
+   "icon": "",
+   "statKey": "small_fortify_on_melee_stun_30450",
+   "effects": [
+    "fortify_on_stun:10"
+   ],
    "tier": "small"
   },
   {
@@ -10909,24 +11096,27 @@ export const TALENT_TREE_DATA = {
    "id": 30458,
    "x": -1279,
    "y": 2513,
-   "nameEn": "Lesser Battering Ram",
-   "nameDe": "Sturmbock (klein)",
-   "descEn": "+4% Movement speed, +3% Melee damage.",
-   "descDe": "+4% Bewegungsgeschwindigkeit, +3% Nahkampfschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_battering_ram",
+   "nameEn": "Sword Critical Strike Chance",
+   "nameDe": "Schwert-Krit-Chance",
+   "icon": "",
+   "statKey": "small_sword_critical_strike_chance_30458",
+   "effects": [
+    "crit_chance_sword:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30459,
    "x": -1279,
    "y": 2553,
-   "nameEn": "Lesser Battering Ram",
-   "nameDe": "Sturmbock (klein)",
-   "descEn": "+4% Movement speed, +3% Melee damage.",
-   "descDe": "+4% Bewegungsgeschwindigkeit, +3% Nahkampfschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_battering_ram",
+   "nameEn": "Sword Accuracy and Critical Strike Chance",
+   "nameDe": "Schwertpräzision und kritische Trefferchance",
+   "icon": "",
+   "statKey": "small_sword_accuracy_and_critical_strike_chance_30459",
+   "effects": [
+    "accuracy_rating_pct:6",
+    "crit_chance_sword:3"
+   ],
    "tier": "small"
   },
   {
@@ -10964,7 +11154,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_critical_strike_chance_30462",
    "effects": [
-    "melee_phys_axe:10"
+    "melee_phys_axe:10",
+    "crit_chance_axe:3"
    ],
    "tier": "small"
   },
@@ -10977,7 +11168,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_critical_strike_chance_30463",
    "effects": [
-    "melee_phys_axe:10"
+    "melee_phys_axe:10",
+    "crit_chance_axe:3"
    ],
    "tier": "small"
   },
@@ -10990,7 +11182,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_accuracy_30464",
    "effects": [
-    "melee_phys_axe:10"
+    "melee_phys_axe:10",
+    "accuracy_rating_pct:10"
    ],
    "tier": "small"
   },
@@ -11098,7 +11291,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_impale_chance_and_attack_speed_30472",
    "effects": [
-    "melee_charge_speed_pct:2"
+    "melee_charge_speed_pct:2",
+    "impale_chance_heavy:5"
    ],
    "tier": "small"
   },
@@ -11111,7 +11305,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_impale_chance_and_attack_speed_30473",
    "effects": [
-    "melee_charge_speed_pct:2"
+    "melee_charge_speed_pct:2",
+    "impale_chance_heavy:5"
    ],
    "tier": "small"
   },
@@ -11124,7 +11319,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_impale_chance_and_attack_speed_30474",
    "effects": [
-    "melee_charge_speed_pct:2"
+    "melee_charge_speed_pct:2",
+    "impale_chance_heavy:5"
    ],
    "tier": "small"
   },
@@ -11184,24 +11380,28 @@ export const TALENT_TREE_DATA = {
    "id": 30479,
    "x": -327,
    "y": 2626,
-   "nameEn": "Lesser Arrow Storm",
-   "nameDe": "Pfeilsturm (klein)",
-   "descEn": "+3% Attack speed.",
-   "descDe": "+3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_arrow_storm",
+   "nameEn": "Shield Block and Block Recovery",
+   "nameDe": "Schildblock und Blockerholung",
+   "icon": "",
+   "statKey": "small_shield_block_and_block_recovery_30479",
+   "effects": [
+    "block_shield:3",
+    "block_recovery:30"
+   ],
    "tier": "small"
   },
   {
    "id": 30480,
    "x": -319,
    "y": 2668,
-   "nameEn": "Lesser Arrow Storm",
-   "nameDe": "Pfeilsturm (klein)",
-   "descEn": "+3% Attack speed.",
-   "descDe": "+3% Angriffsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_arrow_storm",
+   "nameEn": "Shield Block and Block Recovery",
+   "nameDe": "Schildblock und Blockerholung",
+   "icon": "",
+   "statKey": "small_shield_block_and_block_recovery_30480",
+   "effects": [
+    "block_shield:3",
+    "block_recovery:30"
+   ],
    "tier": "small"
   },
   {
@@ -11282,7 +11482,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_slower_rage_decay_and_armour_30486",
    "effects": [
-    "armour_inc_pct:8"
+    "armour_inc_pct:8",
+    "rage_decay:8"
    ],
    "tier": "small"
   },
@@ -11290,12 +11491,13 @@ export const TALENT_TREE_DATA = {
    "id": 30487,
    "x": -630,
    "y": 2301,
-   "nameEn": "Lesser Unbreakable",
-   "nameDe": "Unzerstörbar (klein)",
-   "descEn": "+10% maximum Health.",
-   "descDe": "+10% max. Leben.",
-   "icon": "◆",
-   "statKey": "small_lesser_unbreakable",
+   "nameEn": "Rage on Hit",
+   "nameDe": "Wut bei Treffern",
+   "icon": "",
+   "statKey": "small_rage_on_hit_30487",
+   "effects": [
+    "rage_on_hit_axe:1"
+   ],
    "tier": "small"
   },
   {
@@ -11307,7 +11509,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_maximum_rage_and_armour_30488",
    "effects": [
-    "armour_inc_pct:8"
+    "armour_inc_pct:8",
+    "rage_max_add:2"
    ],
    "tier": "small"
   },
@@ -11714,12 +11917,13 @@ export const TALENT_TREE_DATA = {
    "id": 30521,
    "x": -1038,
    "y": 1416,
-   "nameEn": "Lesser Heavy Impact",
-   "nameDe": "Schwerer Einschlag (klein)",
-   "descEn": "+4% Melee damage. Hits stagger monsters, slowing them by 5%.",
-   "descDe": "+4% Nahkampfschaden. Treffer werfen Monster zurück und verlangsamen sie um 5%.",
-   "icon": "◆",
-   "statKey": "small_lesser_heavy_impact",
+   "nameEn": "Maximum Cold Resistance",
+   "nameDe": "Maximaler Kältewiderstand",
+   "icon": "",
+   "statKey": "small_maximum_cold_resistance_30521",
+   "effects": [
+    "cold_res_max:1"
+   ],
    "tier": "small"
   },
   {
@@ -11831,24 +12035,20 @@ export const TALENT_TREE_DATA = {
    "id": 30530,
    "x": -1612,
    "y": 2554,
-   "nameEn": "Lesser Gilded Cage",
-   "nameDe": "Vergoldeter Käfig (klein)",
-   "descEn": "Claiming a lucky tile grants an additional +10 seconds. +3% Armour.",
-   "descDe": "Das Einsammeln einer Glückskachel gewährt zusätzliche +10 Sekunden. +3% Rüstung.",
-   "icon": "🐦",
-   "statKey": "small_lesser_gilded_cage",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30530",
    "tier": "small"
   },
   {
    "id": 30531,
    "x": -1654,
    "y": 2562,
-   "nameEn": "Lesser Gilded Cage",
-   "nameDe": "Vergoldeter Käfig (klein)",
-   "descEn": "Claiming a lucky tile grants an additional +10 seconds. +3% Armour.",
-   "descDe": "Das Einsammeln einer Glückskachel gewährt zusätzliche +10 Sekunden. +3% Rüstung.",
-   "icon": "🐦",
-   "statKey": "small_lesser_gilded_cage",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30531",
    "tier": "small"
   },
   {
@@ -11875,36 +12075,30 @@ export const TALENT_TREE_DATA = {
    "id": 30534,
    "x": -1654,
    "y": 2342,
-   "nameEn": "Lesser Executioner",
-   "nameDe": "Henker (klein)",
-   "descEn": "+13% Melee damage against slowed monsters.",
-   "descDe": "+13% Nahkampfschaden gegen verlangsamte Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_executioner",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30534",
    "tier": "small"
   },
   {
    "id": 30535,
    "x": -1612,
    "y": 2350,
-   "nameEn": "Lesser Executioner",
-   "nameDe": "Henker (klein)",
-   "descEn": "+13% Melee damage against slowed monsters.",
-   "descDe": "+13% Nahkampfschaden gegen verlangsamte Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_executioner",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30535",
    "tier": "small"
   },
   {
    "id": 30536,
    "x": -1544,
    "y": 2452,
-   "nameEn": "Strength",
-   "nameDe": "Stärke",
-   "descEn": "+5 to Strength.",
-   "descDe": "+5 Stärke.",
-   "icon": "💪",
-   "statKey": "small_strength",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30536",
    "tier": "travel"
   },
   {
@@ -12068,6 +12262,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_staff_damage_and_armour_30549",
    "effects": [
+    "staff_damage:15",
     "armour_inc_pct:15"
    ],
    "tier": "small"
@@ -12076,30 +12271,40 @@ export const TALENT_TREE_DATA = {
    "id": 30550,
    "x": -1727,
    "y": -394,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Block",
+   "nameDe": "Stabblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_30550",
+   "statKey": "small_staff_block_30550",
+   "effects": [
+    "staff_block:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30551,
    "x": -1776,
    "y": -361,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Block",
+   "nameDe": "Stabblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_30551",
+   "statKey": "small_staff_block_30551",
+   "effects": [
+    "staff_block:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30552,
    "x": -1776,
    "y": -321,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Damage and Block",
+   "nameDe": "Stabschaden und Block",
    "icon": "",
-   "statKey": "reserved_reserved_node_30552",
+   "statKey": "small_staff_damage_and_block_30552",
+   "effects": [
+    "staff_damage:10",
+    "staff_block:2"
+   ],
    "tier": "small"
   },
   {
@@ -12119,36 +12324,39 @@ export const TALENT_TREE_DATA = {
    "id": 30554,
    "x": -1776,
    "y": -212,
-   "nameEn": "Lesser Disciple's Growth",
-   "nameDe": "Wachstum des Schülers (klein)",
-   "descEn": "8% increased chance of obtaining Tutor items as rewards. Stacks with Scholar's Path and Academy Legacy. +3% Armour.",
-   "descDe": "8% erhöhte Chance, Tutor-Gegenstände als Belohnung zu erhalten. Wirkt zusammen mit Pfad des Gelehrten und Erbe der Akademie. +3% Rüstung.",
-   "icon": "📚",
-   "statKey": "small_lesser_disciple_s_growth",
+   "nameEn": "Elemental Resistances with a Shield",
+   "nameDe": "Elementarwiderstände mit Schild",
+   "icon": "",
+   "statKey": "small_elemental_resistances_with_a_shield_30554",
+   "effects": [
+    "shield_elemental_res:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30555,
    "x": -1776,
    "y": -172,
-   "nameEn": "Lesser Disciple's Growth",
-   "nameDe": "Wachstum des Schülers (klein)",
-   "descEn": "8% increased chance of obtaining Tutor items as rewards. Stacks with Scholar's Path and Academy Legacy. +3% Armour.",
-   "descDe": "8% erhöhte Chance, Tutor-Gegenstände als Belohnung zu erhalten. Wirkt zusammen mit Pfad des Gelehrten und Erbe der Akademie. +3% Rüstung.",
-   "icon": "📚",
-   "statKey": "small_lesser_disciple_s_growth",
+   "nameEn": "Shield Block and Elemental Resistances with a Shield",
+   "nameDe": "Schildblock und Elementarwiderstände",
+   "icon": "",
+   "statKey": "small_shield_block_and_elemental_resistances_with_a_shield_30555",
+   "effects": [
+    "block_shield:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30556,
    "x": -1678,
    "y": -212,
-   "nameEn": "Lesser Disciple's Growth",
-   "nameDe": "Wachstum des Schülers (klein)",
-   "descEn": "8% increased chance of obtaining Tutor items as rewards. Stacks with Scholar's Path and Academy Legacy. +3% Armour.",
-   "descDe": "8% erhöhte Chance, Tutor-Gegenstände als Belohnung zu erhalten. Wirkt zusammen mit Pfad des Gelehrten und Erbe der Akademie. +3% Rüstung.",
-   "icon": "📚",
-   "statKey": "small_lesser_disciple_s_growth",
+   "nameEn": "Shield Spell Block and Elemental Resistances with a Shield",
+   "nameDe": "Schild-Zauberblock und Elementarwiderstände",
+   "icon": "",
+   "statKey": "small_shield_spell_block_and_elemental_resistances_with_a_shield_30556",
+   "effects": [
+    "shield_spell_block:3"
+   ],
    "tier": "small"
   },
   {
@@ -12233,24 +12441,23 @@ export const TALENT_TREE_DATA = {
    "id": 30563,
    "x": -1946,
    "y": -312,
-   "nameEn": "Lesser Gladiator's Timing",
-   "nameDe": "Timing des Gladiators (klein)",
-   "descEn": "+5% Attack speed while your Absorption regenerates.",
-   "descDe": "+5% Angriffsgeschwindigkeit, während sich deine Absorption regeneriert.",
-   "icon": "◆",
-   "statKey": "small_lesser_gladiator_s_timing",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30563",
    "tier": "small"
   },
   {
    "id": 30564,
    "x": -1986,
    "y": -312,
-   "nameEn": "Lesser Gladiator's Timing",
-   "nameDe": "Timing des Gladiators (klein)",
-   "descEn": "+5% Attack speed while your Absorption regenerates.",
-   "descDe": "+5% Angriffsgeschwindigkeit, während sich deine Absorption regeneriert.",
-   "icon": "◆",
-   "statKey": "small_lesser_gladiator_s_timing",
+   "nameEn": "Shield Spell Block",
+   "nameDe": "Schild-Zauberblock",
+   "icon": "",
+   "statKey": "small_shield_spell_block_30564",
+   "effects": [
+    "shield_spell_block:3"
+   ],
    "tier": "small"
   },
   {
@@ -12362,92 +12569,125 @@ export const TALENT_TREE_DATA = {
    "id": 30573,
    "x": -2619,
    "y": -491,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Damage and Stun Duration",
+   "nameDe": "Stabschaden und Betäubungsdauer",
    "icon": "",
-   "statKey": "reserved_reserved_node_30573",
+   "statKey": "small_staff_damage_and_stun_duration_30573",
+   "effects": [
+    "staff_damage:16",
+    "stun_duration:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30574,
    "x": -2619,
    "y": -451,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Block",
+   "nameDe": "Stabblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_30574",
+   "statKey": "small_staff_block_30574",
+   "effects": [
+    "staff_block:3",
+    "staff_spell_block:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30575,
    "x": -2668,
    "y": -418,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Block",
+   "nameDe": "Stabblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_30575",
+   "statKey": "small_staff_block_30575",
+   "effects": [
+    "staff_block:3",
+    "staff_spell_block:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30576,
    "x": -2717,
    "y": -451,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Block",
+   "nameDe": "Stabblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_30576",
+   "statKey": "travel_staff_block_30576",
+   "effects": [
+    "staff_block:3",
+    "staff_spell_block:3"
+   ],
    "tier": "travel"
   },
   {
    "id": 30577,
    "x": -2717,
    "y": -491,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Damage and Stun Duration",
+   "nameDe": "Stabschaden und Betäubungsdauer",
    "icon": "",
-   "statKey": "reserved_reserved_node_30577",
+   "statKey": "small_staff_damage_and_stun_duration_30577",
+   "effects": [
+    "staff_damage:16",
+    "stun_duration:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30578,
    "x": -2770,
    "y": -513,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Critical Strike Chance",
+   "nameDe": "Stab-Krit-Chance",
    "icon": "",
-   "statKey": "reserved_reserved_node_30578",
+   "statKey": "small_staff_critical_strike_chance_30578",
+   "effects": [
+    "crit_chance_staff:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30579,
    "x": -2770,
    "y": -429,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Critical Strike Chance",
+   "nameDe": "Stab-Krit-Chance",
    "icon": "",
-   "statKey": "reserved_reserved_node_30579",
+   "statKey": "small_staff_critical_strike_chance_30579",
+   "effects": [
+    "crit_chance_staff:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30580,
    "x": -2668,
    "y": -524,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Damage and Stun Duration",
+   "nameDe": "Stabschaden und Betäubungsdauer",
    "icon": "",
-   "statKey": "reserved_reserved_node_30580",
+   "statKey": "small_staff_damage_and_stun_duration_30580",
+   "effects": [
+    "staff_damage:16",
+    "stun_duration:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30581,
    "x": -2723,
    "y": -741,
-   "nameEn": "Lesser Extended Horizon",
-   "nameDe": "Erweiterter Horizont (klein)",
-   "descEn": "Scout's Primer have a 6.3% chance of revealing three additional rows. This rolls independently from other row bonuses. +3% Armour.",
-   "descDe": "Pfadfinder Kompasse haben eine 6.3% Chance drei weitere Zeilen aufzudecken. Dies wird unabhängig von anderen Zeilenboni gewürfelt. +3% Rüstung.",
-   "icon": "🌅",
-   "statKey": "small_lesser_extended_horizon",
+   "nameEn": "Chance to Ignite, Freeze and Shock",
+   "nameDe": "Entzünden, Einfrieren und Schocken",
+   "icon": "",
+   "statKey": "small_chance_to_ignite_freeze_and_shock_30581",
+   "effects": [
+    "freeze_chance_pct:15",
+    "shock_chance_pct:15",
+    "ignite_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
@@ -12508,12 +12748,13 @@ export const TALENT_TREE_DATA = {
    "id": 30586,
    "x": -2723,
    "y": -847,
-   "nameEn": "Lesser Extended Horizon",
-   "nameDe": "Erweiterter Horizont (klein)",
-   "descEn": "Scout's Primer have a 6.3% chance of revealing three additional rows. This rolls independently from other row bonuses. +3% Armour.",
-   "descDe": "Pfadfinder Kompasse haben eine 6.3% Chance drei weitere Zeilen aufzudecken. Dies wird unabhängig von anderen Zeilenboni gewürfelt. +3% Rüstung.",
-   "icon": "🌅",
-   "statKey": "small_lesser_extended_horizon",
+   "nameEn": "Ailment Effect",
+   "nameDe": "Zustandswirkung",
+   "icon": "",
+   "statKey": "small_ailment_effect_30586",
+   "effects": [
+    "ailment_effect_inc:20"
+   ],
    "tier": "small"
   },
   {
@@ -12560,12 +12801,13 @@ export const TALENT_TREE_DATA = {
    "id": 30590,
    "x": -2306,
    "y": -896,
-   "nameEn": "Lesser Gladiator's Timing",
-   "nameDe": "Timing des Gladiators (klein)",
-   "descEn": "+5% Attack speed while your Absorption regenerates.",
-   "descDe": "+5% Angriffsgeschwindigkeit, während sich deine Absorption regeneriert.",
-   "icon": "◆",
-   "statKey": "small_lesser_gladiator_s_timing",
+   "nameEn": "Power Charge Duration",
+   "nameDe": "Dauer der Kraftladungen",
+   "icon": "",
+   "statKey": "small_power_charge_duration_30590",
+   "effects": [
+    "power_duration:20"
+   ],
    "tier": "small"
   },
   {
@@ -13281,6 +13523,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_brutal_blade_20129",
    "effects": [
+    "block_dualshield:6",
     "melee_phys_sword:24"
    ],
    "tier": "notable"
@@ -13289,12 +13532,10 @@ export const TALENT_TREE_DATA = {
    "id": 20130,
    "x": 2901,
    "y": 747,
-   "nameEn": "Pack Hunter",
-   "nameDe": "Rudeljägerin",
-   "descEn": "+4% Attack speed, +6% Projectile damage.",
-   "descDe": "+4% Angriffsgeschwindigkeit, +6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "notable_pack_hunter",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20130",
    "tier": "notable"
   },
   {
@@ -13337,12 +13578,13 @@ export const TALENT_TREE_DATA = {
    "id": 20134,
    "x": 2153,
    "y": 1024,
-   "nameEn": "Nature's Grace",
-   "nameDe": "Gnade der Natur",
-   "descEn": "+8% chance to evade attacks, +8% Movement speed.",
-   "descDe": "+8% Chance, Angriffen auszuweichen, +8% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_nature_s_grace",
+   "nameEn": "Winter Spirit",
+   "nameDe": "Wintergeist",
+   "icon": "",
+   "statKey": "notable_winter_spirit_20134",
+   "effects": [
+    "phys_as_cold:10"
+   ],
    "tier": "notable"
   },
   {
@@ -13362,12 +13604,14 @@ export const TALENT_TREE_DATA = {
    "id": 20136,
    "x": 2006,
    "y": 1451,
-   "nameEn": "Second Wind",
-   "nameDe": "Zweiter Atem",
-   "descEn": "Once per level, evading an attack restores 10 Health.",
-   "descDe": "Einmal pro Level stellt das Ausweichen eines Angriffs 10 Leben wieder her.",
-   "icon": "◆",
-   "statKey": "notable_second_wind",
+   "nameEn": "Essence Sap",
+   "nameDe": "Essenzsog",
+   "icon": "",
+   "statKey": "notable_essence_sap_20136",
+   "effects": [
+    "mana_leech_attack:0.5",
+    "mana_leech_effect_inc:50"
+   ],
    "tier": "notable"
   },
   {
@@ -13402,10 +13646,13 @@ export const TALENT_TREE_DATA = {
    "id": 20139,
    "x": 1636,
    "y": 1751,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Entrench",
+   "nameDe": "Verschanzen",
    "icon": "",
-   "statKey": "reserved_reserved_node_20139",
+   "statKey": "notable_entrench_20139",
+   "effects": [
+    "parry_spell_chance:12"
+   ],
    "tier": "notable"
   },
   {
@@ -13701,24 +13948,27 @@ export const TALENT_TREE_DATA = {
    "id": 20162,
    "x": 1702,
    "y": 2318,
-   "nameEn": "Rain of Arrows",
-   "nameDe": "Pfeilregen",
-   "descEn": "+12% Projectile damage.",
-   "descDe": "+12% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "notable_rain_of_arrows",
+   "nameEn": "Cornered Prey",
+   "nameDe": "In die Enge getrieben",
+   "icon": "",
+   "statKey": "notable_cornered_prey_20162",
+   "effects": [
+    "crit_vs_bleeding:5",
+    "crit_multi_vs_bleeding:30"
+   ],
    "tier": "notable"
   },
   {
    "id": 20163,
    "x": 1664,
    "y": 2452,
-   "nameEn": "Rain of Arrows",
-   "nameDe": "Pfeilregen",
-   "descEn": "+12% Projectile damage.",
-   "descDe": "+12% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "notable_rain_of_arrows",
+   "nameEn": "Aspect of Stone",
+   "nameDe": "Aspekt des Steins",
+   "icon": "",
+   "statKey": "notable_aspect_of_stone_20163",
+   "effects": [
+    "avoid_phys_hit_pct:20"
+   ],
    "tier": "notable"
   },
   {
@@ -13762,12 +14012,15 @@ export const TALENT_TREE_DATA = {
    "id": 20167,
    "x": 863,
    "y": 2104,
-   "nameEn": "Silent Steps",
-   "nameDe": "Lautlose Schritte",
-   "descEn": "+6% Movement speed, +2% chance to evade attacks.",
-   "descDe": "+6% Bewegungsgeschwindigkeit, +2% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "notable_silent_steps",
+   "nameEn": "Courage",
+   "nameDe": "Mut",
+   "icon": "",
+   "statKey": "notable_courage_20167",
+   "effects": [
+    "armour_if_hit_recently:30",
+    "evasion_if_not_hit:30",
+    "parry_spell_chance:15"
+   ],
    "tier": "notable"
   },
   {
@@ -14200,36 +14453,42 @@ export const TALENT_TREE_DATA = {
    "id": 30641,
    "x": 489,
    "y": 1557,
-   "nameEn": "Lesser Law of Averages",
-   "nameDe": "Gesetz der Durchschnittswerte (klein)",
-   "descEn": "Increases the success chance of all start-of-level reveal and mark effects by 3%. Stacks with Statistical Bridge. +3% Evasion.",
-   "descDe": "Erhöht die Erfolgswahrscheinlichkeit aller Aufdeckungs- und Markierungseffekte zu Beginn jedes Levels um 3%. Wirkt zusammen mit Statistische Brücke. +3% Ausweichen.",
-   "icon": "⚖️",
-   "statKey": "small_lesser_law_of_averages",
+   "nameEn": "Dual Wield Attack Speed and Block",
+   "nameDe": "Beidhändiges Angriffstempo und Block",
+   "icon": "",
+   "statKey": "small_dual_wield_attack_speed_and_block_30641",
+   "effects": [
+    "dual_block:3",
+    "dual_charge_speed:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30642,
    "x": 522,
    "y": 1508,
-   "nameEn": "Lesser Law of Averages",
-   "nameDe": "Gesetz der Durchschnittswerte (klein)",
-   "descEn": "Increases the success chance of all start-of-level reveal and mark effects by 3%. Stacks with Statistical Bridge. +3% Evasion.",
-   "descDe": "Erhöht die Erfolgswahrscheinlichkeit aller Aufdeckungs- und Markierungseffekte zu Beginn jedes Levels um 3%. Wirkt zusammen mit Statistische Brücke. +3% Ausweichen.",
-   "icon": "⚖️",
-   "statKey": "small_lesser_law_of_averages",
+   "nameEn": "Dual Wield Attack Speed and Block",
+   "nameDe": "Beidhändiges Angriffstempo und Block",
+   "icon": "",
+   "statKey": "small_dual_wield_attack_speed_and_block_30642",
+   "effects": [
+    "dual_block:3",
+    "dual_charge_speed:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30643,
    "x": 562,
    "y": 1508,
-   "nameEn": "Lesser Law of Averages",
-   "nameDe": "Gesetz der Durchschnittswerte (klein)",
-   "descEn": "Increases the success chance of all start-of-level reveal and mark effects by 3%. Stacks with Statistical Bridge. +3% Evasion.",
-   "descDe": "Erhöht die Erfolgswahrscheinlichkeit aller Aufdeckungs- und Markierungseffekte zu Beginn jedes Levels um 3%. Wirkt zusammen mit Statistische Brücke. +3% Ausweichen.",
-   "icon": "⚖️",
-   "statKey": "small_lesser_law_of_averages",
+   "nameEn": "Dual Wield Attack Speed and Block",
+   "nameDe": "Beidhändiges Angriffstempo und Block",
+   "icon": "",
+   "statKey": "small_dual_wield_attack_speed_and_block_30643",
+   "effects": [
+    "dual_block:3",
+    "dual_charge_speed:3"
+   ],
    "tier": "small"
   },
   {
@@ -14348,10 +14607,13 @@ export const TALENT_TREE_DATA = {
    "id": 30652,
    "x": 731,
    "y": 1813,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Mana Leech Speed",
+   "nameDe": "Manaentzug-Tempo",
    "icon": "",
-   "statKey": "reserved_mana_leech_30652",
+   "statKey": "small_mana_leech_speed_30652",
+   "effects": [
+    "mana_leech_effect_inc:20"
+   ],
    "tier": "small"
   },
   {
@@ -14440,24 +14702,26 @@ export const TALENT_TREE_DATA = {
    "id": 30659,
    "x": 1043,
    "y": 2107,
-   "nameEn": "Lesser Base Rate",
-   "nameDe": "Basisrate (klein)",
-   "descEn": "Each fully completed column grants an additional +1 seconds. Stacks with Probability Current. +3% Evasion.",
-   "descDe": "Jede vollständig abgeschlossene Spalte gewährt zusätzliche +1 Sekunden. Wirkt zusammen mit Wahrscheinlichkeitsstrom. +3% Ausweichen.",
-   "icon": "🧱",
-   "statKey": "small_lesser_base_rate",
+   "nameEn": "Blind Chance",
+   "nameDe": "Blendchance",
+   "icon": "",
+   "statKey": "small_blind_chance_30659",
+   "effects": [
+    "blind_chance:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30660,
    "x": 1096,
    "y": 2054,
-   "nameEn": "Lesser Base Rate",
-   "nameDe": "Basisrate (klein)",
-   "descEn": "Each fully completed column grants an additional +1 seconds. Stacks with Probability Current. +3% Evasion.",
-   "descDe": "Jede vollständig abgeschlossene Spalte gewährt zusätzliche +1 Sekunden. Wirkt zusammen mit Wahrscheinlichkeitsstrom. +3% Ausweichen.",
-   "icon": "🧱",
-   "statKey": "small_lesser_base_rate",
+   "nameEn": "Critical Strikes against Blinded Enemies",
+   "nameDe": "Kritische Treffer gegen Geblendete",
+   "icon": "",
+   "statKey": "small_critical_strikes_against_blinded_enemies_30660",
+   "effects": [
+    "crit_vs_blinded:3"
+   ],
    "tier": "small"
   },
   {
@@ -14686,10 +14950,13 @@ export const TALENT_TREE_DATA = {
    "id": 30678,
    "x": 602,
    "y": 1693,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Bow Area of Effect",
+   "nameDe": "Bogen-Wirkungsbereich",
    "icon": "",
-   "statKey": "reserved_bow_aoe_30678",
+   "statKey": "small_bow_area_of_effect_30678",
+   "effects": [
+    "bow_aoe:12"
+   ],
    "tier": "small"
   },
   {
@@ -14709,48 +14976,54 @@ export const TALENT_TREE_DATA = {
    "id": 30680,
    "x": 438,
    "y": 2007,
-   "nameEn": "Lesser Guardian Hoard",
-   "nameDe": "Wächterhort (klein)",
-   "descEn": "8% increased chance of obtaining Shield items as rewards. Stacks with Aegis Reserve and Bulwark Treasury. +3% Evasion.",
-   "descDe": "8% erhöhte Chance, Schild-Gegenstände als Belohnung zu erhalten. Wirkt zusammen mit Ägis-Reserve und Bollwerkschatzkammer. +3% Ausweichen.",
-   "icon": "🛡️",
-   "statKey": "small_lesser_guardian_hoard",
+   "nameEn": "Impale Chance",
+   "nameDe": "Aufspießchance",
+   "icon": "",
+   "statKey": "small_impale_chance_30680",
+   "effects": [
+    "impale_chance_heavy:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30681,
    "x": 405,
    "y": 2056,
-   "nameEn": "Lesser Guardian Hoard",
-   "nameDe": "Wächterhort (klein)",
-   "descEn": "8% increased chance of obtaining Shield items as rewards. Stacks with Aegis Reserve and Bulwark Treasury. +3% Evasion.",
-   "descDe": "8% erhöhte Chance, Schild-Gegenstände als Belohnung zu erhalten. Wirkt zusammen mit Ägis-Reserve und Bollwerkschatzkammer. +3% Ausweichen.",
-   "icon": "🛡️",
-   "statKey": "small_lesser_guardian_hoard",
+   "nameEn": "Impale Effect",
+   "nameDe": "Aufspießwirkung",
+   "icon": "",
+   "statKey": "small_impale_effect_30681",
+   "effects": [
+    "impale_effect_heavy:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30682,
    "x": 387,
    "y": 2121,
-   "nameEn": "Lesser Chrono Freeze",
-   "nameDe": "Chronofrost (klein)",
-   "descEn": "Increases the freeze duration by 0.3 seconds. +3% Evasion.",
-   "descDe": "Erhöt die Einfrier - Zeit um 0.3 Sekunden. +3% Ausweichen.",
-   "icon": "⏸️",
-   "statKey": "small_lesser_chrono_freeze",
+   "nameEn": "Two Handed Melee Critical Strike Chance and Accuracy",
+   "nameDe": "Zweihand-Krit-Chance und Präzision",
+   "icon": "",
+   "statKey": "small_two_handed_melee_critical_strike_chance_and_accuracy_30682",
+   "effects": [
+    "accuracy_rating_pct:8",
+    "crit_chance_melee:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30683,
    "x": 318,
    "y": 2092,
-   "nameEn": "Lesser Chrono Freeze",
-   "nameDe": "Chronofrost (klein)",
-   "descEn": "Increases the freeze duration by 0.3 seconds. +3% Evasion.",
-   "descDe": "Erhöt die Einfrier - Zeit um 0.3 Sekunden. +3% Ausweichen.",
-   "icon": "⏸️",
-   "statKey": "small_lesser_chrono_freeze",
+   "nameEn": "Two Handed Melee Critical Strike Chance and Accuracy",
+   "nameDe": "Zweihand-Krit-Chance und Präzision",
+   "icon": "",
+   "statKey": "small_two_handed_melee_critical_strike_chance_and_accuracy_30683",
+   "effects": [
+    "accuracy_rating_pct:8",
+    "crit_chance_melee:3"
+   ],
    "tier": "small"
   },
   {
@@ -14852,60 +15125,66 @@ export const TALENT_TREE_DATA = {
    "id": 30692,
    "x": 557,
    "y": 2295,
-   "nameEn": "Lesser Grand Pearl",
-   "nameDe": "Große Perle (klein)",
-   "descEn": "Enables the Grand Pearl as an item reward. Using a Grand Pearl reduces the cooldowns of both active class skills to 1 second. +3% Evasion.",
-   "descDe": "Ermöglicht die Große Perle als Gegenstandsbelohnung. Das Benutzen einer Großen Perle setzt die Abklingzeit beider aktiver Klassenfähigkeiten auf 1 Sekunde. +3% Ausweichen.",
-   "icon": "⚪",
-   "statKey": "small_lesser_grand_pearl",
+   "nameEn": "Shield Block and Elemental Resistances",
+   "nameDe": "Schildblock und Elementarwiderstände",
+   "icon": "",
+   "statKey": "small_shield_block_and_elemental_resistances_30692",
+   "effects": [
+    "block_shield:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30693,
    "x": 606,
    "y": 2328,
-   "nameEn": "Lesser Grand Pearl",
-   "nameDe": "Große Perle (klein)",
-   "descEn": "Enables the Grand Pearl as an item reward. Using a Grand Pearl reduces the cooldowns of both active class skills to 1 second. +3% Evasion.",
-   "descDe": "Ermöglicht die Große Perle als Gegenstandsbelohnung. Das Benutzen einer Großen Perle setzt die Abklingzeit beider aktiver Klassenfähigkeiten auf 1 Sekunde. +3% Ausweichen.",
-   "icon": "⚪",
-   "statKey": "small_lesser_grand_pearl",
+   "nameEn": "Block",
+   "nameDe": "Block",
+   "icon": "",
+   "statKey": "small_block_30693",
+   "effects": [
+    "block_dualshield:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30694,
    "x": 655,
    "y": 2295,
-   "nameEn": "Lesser Widened Formation",
-   "nameDe": "Erweiterte Formation (klein)",
-   "descEn": "Scout's Primer have a 13% chance of revealing two additional rows. This rolls independently from other row bonuses. +3% Evasion.",
-   "descDe": "Pfadfinder Kompasse haben eine 13% Chance zwei weitere Zeilen aufzudecken. Dies wird unabhängig von anderen Zeilenboni gewürfelt. +3% Ausweichen.",
-   "icon": "🗺️",
-   "statKey": "small_lesser_widened_formation",
+   "nameEn": "Dual Wield Block and Attack Speed",
+   "nameDe": "Beidhändiger Block und Angriffstempo",
+   "icon": "",
+   "statKey": "small_dual_wield_block_and_attack_speed_30694",
+   "effects": [
+    "dual_block:3",
+    "dual_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30695,
    "x": 739,
    "y": 2344,
-   "nameEn": "Lesser Cross Faculty",
-   "nameDe": "Fakultätsübergreifend (klein)",
-   "descEn": "One additional incorrect empty cell is automatically marked at the start of each level. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird automatisch eine zusätzliche falsche leere Zelle markiert. +3% Ausweichen.",
-   "icon": "🧩",
-   "statKey": "small_lesser_cross_faculty",
+   "nameEn": "Impale Effect",
+   "nameDe": "Aufspießwirkung",
+   "icon": "",
+   "statKey": "small_impale_effect_30695",
+   "effects": [
+    "impale_effect_heavy:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30696,
    "x": 837,
    "y": 2344,
-   "nameEn": "Lesser Cross Faculty",
-   "nameDe": "Fakultätsübergreifend (klein)",
-   "descEn": "One additional incorrect empty cell is automatically marked at the start of each level. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird automatisch eine zusätzliche falsche leere Zelle markiert. +3% Ausweichen.",
-   "icon": "🧩",
-   "statKey": "small_lesser_cross_faculty",
+   "nameEn": "Impale Effect",
+   "nameDe": "Aufspießwirkung",
+   "icon": "",
+   "statKey": "small_impale_effect_30696",
+   "effects": [
+    "impale_effect_heavy:6"
+   ],
    "tier": "small"
   },
   {
@@ -15091,24 +15370,28 @@ export const TALENT_TREE_DATA = {
    "id": 30712,
    "x": 305,
    "y": 2626,
-   "nameEn": "Lesser Evasive Maneuver",
-   "nameDe": "Ausweichmanöver (klein)",
-   "descEn": "Gain +3% Movement speed for 1 seconds after evading.",
-   "descDe": "Erhalte nach dem Ausweichen 1 Sekunden lang +3% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_evasive_maneuver",
+   "nameEn": "Dual Wield Damage and Block",
+   "nameDe": "Beidhändiger Schaden und Block",
+   "icon": "",
+   "statKey": "small_dual_wield_damage_and_block_30712",
+   "effects": [
+    "dual_block:3",
+    "dual_damage:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30713,
    "x": 297,
    "y": 2668,
-   "nameEn": "Lesser Evasive Maneuver",
-   "nameDe": "Ausweichmanöver (klein)",
-   "descEn": "Gain +3% Movement speed for 1 seconds after evading.",
-   "descDe": "Erhalte nach dem Ausweichen 1 Sekunden lang +3% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_evasive_maneuver",
+   "nameEn": "Dual Wield Damage and Block",
+   "nameDe": "Beidhändiger Schaden und Block",
+   "icon": "",
+   "statKey": "small_dual_wield_damage_and_block_30713",
+   "effects": [
+    "dual_block:3",
+    "dual_damage:10"
+   ],
    "tier": "small"
   },
   {
@@ -15333,12 +15616,10 @@ export const TALENT_TREE_DATA = {
    "id": 30732,
    "x": 1653,
    "y": 2285,
-   "nameEn": "Lesser Rain of Arrows",
-   "nameDe": "Pfeilregen (klein)",
-   "descEn": "+6% Projectile damage.",
-   "descDe": "+6% Projektilschaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_rain_of_arrows",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_30732",
    "tier": "small"
   },
   {
@@ -15359,36 +15640,41 @@ export const TALENT_TREE_DATA = {
    "id": 30734,
    "x": 1816,
    "y": 2245,
-   "nameEn": "Lesser Accelerated Insight",
-   "nameDe": "Beschleunigte Erkenntnis (klein)",
-   "descEn": "Excercise hints now show up after one less unsuccessfull attempt. +3% Evasion.",
-   "descDe": "Hinweise bei Übungsaufgaben erscheinen einen Fehlversuch früher. +3% Ausweichen.",
-   "icon": "🧩",
-   "statKey": "small_lesser_accelerated_insight",
+   "nameEn": "Dual Wield Critical Strike Chance",
+   "nameDe": "Beidhändige kritische Trefferchance",
+   "icon": "",
+   "statKey": "small_dual_wield_critical_strike_chance_30734",
+   "effects": [
+    "dual_crit_chance:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30735,
    "x": 1845,
    "y": 2314,
-   "nameEn": "Lesser Accelerated Insight",
-   "nameDe": "Beschleunigte Erkenntnis (klein)",
-   "descEn": "Excercise hints now show up after one less unsuccessfull attempt. +3% Evasion.",
-   "descDe": "Hinweise bei Übungsaufgaben erscheinen einen Fehlversuch früher. +3% Ausweichen.",
-   "icon": "🧩",
-   "statKey": "small_lesser_accelerated_insight",
+   "nameEn": "Dual Wield Critical Strike Multiplier and Accuracy",
+   "nameDe": "Beidhändiger Krit-Multiplikator und Präzision",
+   "icon": "",
+   "statKey": "small_dual_wield_critical_strike_multiplier_and_accuracy_30735",
+   "effects": [
+    "dual_accuracy:8",
+    "dual_crit_multi:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30736,
    "x": 1885,
    "y": 2314,
-   "nameEn": "Lesser Accelerated Insight",
-   "nameDe": "Beschleunigte Erkenntnis (klein)",
-   "descEn": "Excercise hints now show up after one less unsuccessfull attempt. +3% Evasion.",
-   "descDe": "Hinweise bei Übungsaufgaben erscheinen einen Fehlversuch früher. +3% Ausweichen.",
-   "icon": "🧩",
-   "statKey": "small_lesser_accelerated_insight",
+   "nameEn": "Dual Wield Critical Strike Multiplier and Accuracy",
+   "nameDe": "Beidhändiger Krit-Multiplikator und Präzision",
+   "icon": "",
+   "statKey": "small_dual_wield_critical_strike_multiplier_and_accuracy_30736",
+   "effects": [
+    "dual_accuracy:8",
+    "dual_crit_multi:10"
+   ],
    "tier": "small"
   },
   {
@@ -15586,30 +15872,39 @@ export const TALENT_TREE_DATA = {
    "id": 30752,
    "x": 1705,
    "y": 1722,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spell Suppression",
+   "nameDe": "Zauberunterdrückung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30752",
+   "statKey": "small_spell_suppression_30752",
+   "effects": [
+    "parry_spell_chance:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30753,
    "x": 1676,
    "y": 1653,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spell Suppression",
+   "nameDe": "Zauberunterdrückung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30753",
+   "statKey": "small_spell_suppression_30753",
+   "effects": [
+    "parry_spell_chance:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30754,
    "x": 1607,
    "y": 1682,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spell Suppression",
+   "nameDe": "Zauberunterdrückung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30754",
+   "statKey": "small_spell_suppression_30754",
+   "effects": [
+    "parry_spell_chance:5"
+   ],
    "tier": "small"
   },
   {
@@ -16111,12 +16406,13 @@ export const TALENT_TREE_DATA = {
    "id": 30795,
    "x": 2113,
    "y": 1024,
-   "nameEn": "Lesser Nature's Grace",
-   "nameDe": "Gnade der Natur (klein)",
-   "descEn": "+4% chance to evade attacks, +4% Movement speed.",
-   "descDe": "+4% Chance, Angriffen auszuweichen, +4% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_nature_s_grace",
+   "nameEn": "Physical Damage as Extra Cold Damage",
+   "nameDe": "Physischer Schaden als zusätzliche Kälte",
+   "icon": "",
+   "statKey": "small_physical_damage_as_extra_cold_damage_30795",
+   "effects": [
+    "phys_as_cold:4"
+   ],
    "tier": "small"
   },
   {
@@ -16154,6 +16450,9 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_weapon_elemental_damage_status_ailment_chance_30798",
    "effects": [
+    "freeze_chance_pct:10",
+    "shock_chance_pct:10",
+    "ignite_chance_pct:10",
     "elemental_damage_inc_pct:10"
    ],
    "tier": "small"
@@ -16167,6 +16466,9 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_weapon_elemental_damage_status_ailment_chance_30799",
    "effects": [
+    "freeze_chance_pct:10",
+    "shock_chance_pct:10",
+    "ignite_chance_pct:10",
     "elemental_damage_inc_pct:10"
    ],
    "tier": "small"
@@ -16295,12 +16597,14 @@ export const TALENT_TREE_DATA = {
    "id": 30809,
    "x": 2617,
    "y": 1192,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Sword Critical Strike Chance and Multiplier",
+   "nameDe": "Schwert-Krit-Chance und -Multiplikator",
+   "icon": "",
+   "statKey": "small_sword_critical_strike_chance_and_multiplier_30809",
+   "effects": [
+    "crit_chance_sword:3",
+    "crit_multi_sword:10"
+   ],
    "tier": "small"
   },
   {
@@ -16312,6 +16616,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_sword_damage_and_block_30810",
    "effects": [
+    "block_dualshield:2",
     "melee_phys_sword:12"
    ],
    "tier": "small"
@@ -16325,6 +16630,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_sword_damage_and_block_30811",
    "effects": [
+    "block_dualshield:2",
     "melee_phys_sword:12"
    ],
    "tier": "small"
@@ -16338,6 +16644,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_sword_damage_and_block_30812",
    "effects": [
+    "block_dualshield:2",
     "melee_phys_sword:12"
    ],
    "tier": "small"
@@ -16484,12 +16791,13 @@ export const TALENT_TREE_DATA = {
    "id": 30824,
    "x": 2136,
    "y": 378,
-   "nameEn": "Lesser Central Scan",
-   "nameDe": "Zentraler Scan (klein)",
-   "descEn": "Extends the Interquartile-Vision Fieldscan duration by 1 second. +3% Evasion.",
-   "descDe": "Verlängert die Interquartil-Vision Feldscan Dauer um 1 Sekunde. +3% Ausweichen.",
-   "icon": "📊",
-   "statKey": "small_lesser_central_scan",
+   "nameEn": "Blind Duration",
+   "nameDe": "Blenddauer",
+   "icon": "",
+   "statKey": "small_blind_duration_30824",
+   "effects": [
+    "blind_duration:40"
+   ],
    "tier": "small"
   },
   {
@@ -16514,7 +16822,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_evasion_and_blind_effect_30826",
    "effects": [
-    "evasion_inc_pct:12"
+    "evasion_inc_pct:12",
+    "blind_effect:15"
    ],
    "tier": "small"
   },
@@ -16527,7 +16836,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_evasion_and_blind_effect_30827",
    "effects": [
-    "evasion_inc_pct:12"
+    "evasion_inc_pct:12",
+    "blind_effect:15"
    ],
    "tier": "small"
   },
@@ -18151,12 +18461,13 @@ export const TALENT_TREE_DATA = {
    "id": 30953,
    "x": 2170,
    "y": -771,
-   "nameEn": "Lesser Bulwark of Resolve",
-   "nameDe": "Bollwerk der Entschlossenheit (klein)",
-   "descEn": "Shield items absorb 1 additional mistake. Stacks with Aegis Fortification and Guardian's Bastion. +3% Evasion.",
-   "descDe": "Schild-Gegenstände absorbieren 1 zusätzlichen Fehler. Wirkt zusammen mit Ägis-Verstärkung und Bastion des Wächters. +3% Ausweichen.",
-   "icon": "🛡️",
-   "statKey": "small_lesser_bulwark_of_resolve",
+   "nameEn": "Power Charge Duration",
+   "nameDe": "Dauer der Kraftladungen",
+   "icon": "",
+   "statKey": "small_power_charge_duration_30953",
+   "effects": [
+    "power_duration:20"
+   ],
    "tier": "small"
   },
   {
@@ -18888,24 +19199,28 @@ export const TALENT_TREE_DATA = {
    "id": 31013,
    "x": 2719,
    "y": 1260,
-   "nameEn": "Lesser Shadow Resistance",
-   "nameDe": "Schattenresistenz (klein)",
-   "descEn": "Increases the Blackout Ward protection chance by 5%. Stacks with Curse Immunity. +3% Evasion.",
-   "descDe": "Erhöht die Schutzchance des Verdunklungsschutzes um 5%. Wirkt zusammen mit Fluchimmunität. +3% Ausweichen.",
-   "icon": "🌑",
-   "statKey": "small_lesser_shadow_resistance",
+   "nameEn": "Sword Critical Strike Chance and Multiplier",
+   "nameDe": "Schwert-Krit-Chance und -Multiplikator",
+   "icon": "",
+   "statKey": "small_sword_critical_strike_chance_and_multiplier_31013",
+   "effects": [
+    "crit_chance_sword:3",
+    "crit_multi_sword:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31014,
    "x": 2677,
    "y": 1252,
-   "nameEn": "Lesser Shadow Resistance",
-   "nameDe": "Schattenresistenz (klein)",
-   "descEn": "Increases the Blackout Ward protection chance by 5%. Stacks with Curse Immunity. +3% Evasion.",
-   "descDe": "Erhöht die Schutzchance des Verdunklungsschutzes um 5%. Wirkt zusammen mit Fluchimmunität. +3% Ausweichen.",
-   "icon": "🌑",
-   "statKey": "small_lesser_shadow_resistance",
+   "nameEn": "Sword Critical Strike Chance and Multiplier",
+   "nameDe": "Schwert-Krit-Chance und -Multiplikator",
+   "icon": "",
+   "statKey": "small_sword_critical_strike_chance_and_multiplier_31014",
+   "effects": [
+    "crit_chance_sword:3",
+    "crit_multi_sword:10"
+   ],
    "tier": "small"
   },
   {
@@ -19005,10 +19320,13 @@ export const TALENT_TREE_DATA = {
    "id": 31024,
    "x": 2055,
    "y": 1524,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Mana Leech",
+   "nameDe": "Manaentzug",
    "icon": "",
-   "statKey": "reserved_mana_leech_31024",
+   "statKey": "small_mana_leech_31024",
+   "effects": [
+    "mana_leech_attack:0.4"
+   ],
    "tier": "small"
   },
   {
@@ -19441,24 +19759,28 @@ export const TALENT_TREE_DATA = {
    "id": 20182,
    "x": -1223,
    "y": -2286,
-   "nameEn": "Shrug It Off",
-   "nameDe": "Abtrotzen",
-   "descEn": "+8% Armour. You cannot be staggered.",
-   "descDe": "+8% Rüstung. Du kannst nicht zurückgestoßen werden.",
-   "icon": "◆",
-   "statKey": "notable_shrug_it_off",
+   "nameEn": "Enigmatic Reach",
+   "nameDe": "Rätselhafte Reichweite",
+   "icon": "",
+   "statKey": "notable_enigmatic_reach_20182",
+   "effects": [
+    "staff_spell_block:8"
+   ],
    "tier": "notable"
   },
   {
    "id": 20183,
    "x": -1086,
    "y": -2410,
-   "nameEn": "Shrug It Off",
-   "nameDe": "Abtrotzen",
-   "descEn": "+8% Armour. You cannot be staggered.",
-   "descDe": "+8% Rüstung. Du kannst nicht zurückgestoßen werden.",
-   "icon": "◆",
-   "statKey": "notable_shrug_it_off",
+   "nameEn": "Prism Weave",
+   "nameDe": "Prismengeflecht",
+   "icon": "",
+   "statKey": "notable_prism_weave_20183",
+   "effects": [
+    "wand_charge_speed:6",
+    "elemental_damage_inc_pct:24",
+    "pen_elemental:5"
+   ],
    "tier": "notable"
   },
   {
@@ -19490,12 +19812,13 @@ export const TALENT_TREE_DATA = {
    "id": 20186,
    "x": -595,
    "y": -2357,
-   "nameEn": "Static Barrier",
-   "nameDe": "Statische Barriere",
-   "descEn": "+30 maximum Mana. Absorption regeneration starts 10% earlier.",
-   "descDe": "+30 max. Mana. Absorptionsregeneration beginnt 10% früher.",
-   "icon": "◆",
-   "statKey": "notable_static_barrier",
+   "nameEn": "Arcane Sanctuary",
+   "nameDe": "Arkanes Heiligtum",
+   "icon": "",
+   "statKey": "notable_arcane_sanctuary_20186",
+   "effects": [
+    "shield_spell_block:8"
+   ],
    "tier": "notable"
   },
   {
@@ -19581,36 +19904,36 @@ export const TALENT_TREE_DATA = {
    "id": 20194,
    "x": 991,
    "y": -2242,
-   "nameEn": "Runic Warding",
-   "nameDe": "Runenbeschwörung",
-   "descEn": "+15% Absorption regen rate, +10 maximum Mana.",
-   "descDe": "+15% Absorptionsregeneration, +10 max. Mana.",
-   "icon": "◆",
-   "statKey": "notable_runic_warding",
+   "nameEn": "Searing Heat",
+   "nameDe": "Sengende Hitze",
+   "icon": "",
+   "statKey": "notable_searing_heat_20194",
+   "effects": [
+    "ignite_faster:15"
+   ],
    "tier": "notable"
   },
   {
    "id": 20195,
    "x": 1089,
    "y": -2307,
-   "nameEn": "Arcane Battery",
-   "nameDe": "Arkane Batterie",
-   "descEn": "+10 maximum Mana. Absorption regenerates 15% faster.",
-   "descDe": "+10 max. Mana. Absorption regeneriert 15% schneller.",
-   "icon": "◆",
-   "statKey": "notable_arcane_battery",
+   "nameEn": "Winter's Embrace",
+   "nameDe": "Umarmung des Winters",
+   "icon": "",
+   "statKey": "notable_winter_s_embrace_20195",
+   "effects": [
+    "freeze_duration_inc:60"
+   ],
    "tier": "notable"
   },
   {
    "id": 20196,
    "x": 1129,
    "y": -2307,
-   "nameEn": "Arcane Battery",
-   "nameDe": "Arkane Batterie",
-   "descEn": "+10 maximum Mana. Absorption regenerates 15% faster.",
-   "descDe": "+10 max. Mana. Absorption regeneriert 15% schneller.",
-   "icon": "◆",
-   "statKey": "notable_arcane_battery",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20196",
    "tier": "notable"
   },
   {
@@ -19640,58 +19963,63 @@ export const TALENT_TREE_DATA = {
    "id": 20199,
    "x": 1557,
    "y": -2038,
-   "nameEn": "Absorption Reactor",
-   "nameDe": "Absorptionsreaktor",
-   "descEn": "Gain +2 Absorption for every monster killed.",
-   "descDe": "Erhalte +2 Absorption für jedes getötete Monster.",
-   "icon": "◆",
-   "statKey": "notable_absorption_reactor",
+   "nameEn": "Mysticism",
+   "nameDe": "Mystik",
+   "icon": "",
+   "statKey": "notable_mysticism_20199",
+   "effects": [
+    "dual_spell_damage:20",
+    "dual_cast_speed:6"
+   ],
    "tier": "notable"
   },
   {
    "id": 20200,
    "x": 1361,
    "y": -1891,
-   "nameEn": "Runic Feedback",
-   "nameDe": "Runenrückkopplung",
-   "descEn": "Killing a monster with a critical strike restores 3 Mana.",
-   "descDe": "Das Töten eines Monsters mit einem kritischen Treffer stellt 3 Mana wieder her.",
-   "icon": "◆",
-   "statKey": "notable_runic_feedback",
+   "nameEn": "Conjured Barrier",
+   "nameDe": "Beschworene Barriere",
+   "icon": "",
+   "statKey": "notable_conjured_barrier_20200",
+   "effects": [
+    "block_recovery:50"
+   ],
    "tier": "notable"
   },
   {
    "id": 20201,
    "x": 1198,
    "y": -1795,
-   "nameEn": "Runic Feedback",
-   "nameDe": "Runenrückkopplung",
-   "descEn": "Killing a monster with a critical strike restores 3 Mana.",
-   "descDe": "Das Töten eines Monsters mit einem kritischen Treffer stellt 3 Mana wieder her.",
-   "icon": "◆",
-   "statKey": "notable_runic_feedback",
+   "nameEn": "Arcane Expanse",
+   "nameDe": "Arkane Weite",
+   "icon": "",
+   "statKey": "notable_arcane_expanse_20201",
+   "effects": [
+    "area_of_effect:20"
+   ],
    "tier": "notable"
   },
   {
    "id": 20202,
    "x": 946,
    "y": -1886,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Tempest Blast",
+   "nameDe": "Sturmexplosion",
    "icon": "",
-   "statKey": "reserved_reserved_node_20202",
+   "statKey": "notable_tempest_blast_20202",
+   "effects": [
+    "wand_phys_as_lightning:20"
+   ],
    "tier": "notable"
   },
   {
    "id": 20203,
    "x": 830,
    "y": -1846,
-   "nameEn": "Lucid Dreaming",
-   "nameDe": "Klares Träumen",
-   "descEn": "Regenerate 2% of maximum Mana per second.",
-   "descDe": "Regeneriere 2% deines max. Mana pro Sekunde.",
-   "icon": "◆",
-   "statKey": "notable_lucid_dreaming",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20203",
    "tier": "notable"
   },
   {
@@ -19793,12 +20121,15 @@ export const TALENT_TREE_DATA = {
    "id": 20212,
    "x": 1027,
    "y": -1476,
-   "nameEn": "Evocation",
-   "nameDe": "Beschwörung",
-   "descEn": "Up to +15% Attack speed, scaling with missing Mana.",
-   "descDe": "Bis zu +15% Angriffsgeschwindigkeit, skalierend mit fehlendem Mana.",
-   "icon": "◆",
-   "statKey": "notable_evocation",
+   "nameEn": "Dark Arts",
+   "nameDe": "Dunkle Künste",
+   "icon": "",
+   "statKey": "notable_dark_arts_20212",
+   "effects": [
+    "dual_block:8",
+    "dual_charge_speed:10",
+    "dual_cast_speed:10"
+   ],
    "tier": "notable"
   },
   {
@@ -19843,12 +20174,13 @@ export const TALENT_TREE_DATA = {
    "id": 20216,
    "x": 1903,
    "y": -1939,
-   "nameEn": "Chain Lightning",
-   "nameDe": "Kettenblitz",
-   "descEn": "Critical strikes arc to a second monster for 40% damage.",
-   "descDe": "Kritische Treffer springen auf ein zweites Monster über (40% Schaden).",
-   "icon": "◆",
-   "statKey": "notable_chain_lightning",
+   "nameEn": "Serpentine Spellslinger",
+   "nameDe": "Schlangenhafter Zauberschleuderer",
+   "icon": "",
+   "statKey": "notable_serpentine_spellslinger_20216",
+   "effects": [
+    "spell_dot_multi:12"
+   ],
    "tier": "notable"
   },
   {
@@ -19884,24 +20216,26 @@ export const TALENT_TREE_DATA = {
    "id": 20219,
    "x": 1623,
    "y": -2364,
-   "nameEn": "Arcane Focus",
-   "nameDe": "Fokus des Arkanen",
-   "descEn": "+10% Absorption regen rate. Focus channels power into the shield.",
-   "descDe": "+10% Absorptionsregeneration. Fokus leitet Kraft in den Schild.",
-   "icon": "◆",
-   "statKey": "notable_arcane_focus",
+   "nameEn": "High Voltage",
+   "nameDe": "Hochspannung",
+   "icon": "",
+   "statKey": "notable_high_voltage_20219",
+   "effects": [
+    "crit_vs_shocked:5"
+   ],
    "tier": "notable"
   },
   {
    "id": 20220,
    "x": 1383,
    "y": -2611,
-   "nameEn": "Arc Lightning",
-   "nameDe": "Lichtbogen",
-   "descEn": "+8% Critical strike chance. Critical strikes make monsters take +15% damage for 2 seconds.",
-   "descDe": "+8% kritische Trefferchance. Kritische Treffer lassen Monster 2 Sekunden lang 15% mehr Schaden erleiden.",
-   "icon": "◆",
-   "statKey": "notable_arc_lightning",
+   "nameEn": "Cleansed Thoughts",
+   "nameDe": "Geläuterte Gedanken",
+   "icon": "",
+   "statKey": "notable_cleansed_thoughts_20220",
+   "effects": [
+    "shadow_res_double:1"
+   ],
    "tier": "notable"
   },
   {
@@ -19913,6 +20247,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_disintegration_20221",
    "effects": [
+    "crit_chance_wand:5",
+    "crit_multi_wand:30",
     "int_flat:10"
    ],
    "tier": "notable"
@@ -19921,12 +20257,13 @@ export const TALENT_TREE_DATA = {
    "id": 20222,
    "x": 1005,
    "y": -2762,
-   "nameEn": "Arc Lightning",
-   "nameDe": "Lichtbogen",
-   "descEn": "+8% Critical strike chance. Critical strikes make monsters take +15% damage for 2 seconds.",
-   "descDe": "+8% kritische Trefferchance. Kritische Treffer lassen Monster 2 Sekunden lang 15% mehr Schaden erleiden.",
-   "icon": "◆",
-   "statKey": "notable_arc_lightning",
+   "nameEn": "Elder Power",
+   "nameDe": "Macht der Ältesten",
+   "icon": "",
+   "statKey": "notable_elder_power_20222",
+   "effects": [
+    "power_on_kill:10"
+   ],
    "tier": "notable"
   },
   {
@@ -19951,7 +20288,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_heart_of_thunder_20224",
    "effects": [
-    "lightning_damage_inc_pct:30"
+    "lightning_damage_inc_pct:30",
+    "pen_lightning:6"
    ],
    "tier": "notable"
   },
@@ -19964,7 +20302,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_heart_of_flame_20225",
    "effects": [
-    "fire_damage_inc_pct:30"
+    "fire_damage_inc_pct:30",
+    "pen_fire:6"
    ],
    "tier": "notable"
   },
@@ -19977,7 +20316,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_heart_of_darkness_20226",
    "effects": [
-    "shadow_damage_inc_pct:27"
+    "shadow_damage_inc_pct:27",
+    "pen_shadow:7"
    ],
    "tier": "notable"
   },
@@ -20005,12 +20345,10 @@ export const TALENT_TREE_DATA = {
    "id": 20229,
    "x": -1711,
    "y": -1840,
-   "nameEn": "Perfect Focus",
-   "nameDe": "Perfekter Fokus",
-   "descEn": "+25% Absorption regeneration rate, but it pauses while you attack.",
-   "descDe": "+25% Absorptionsregeneration, die pausiert, während du angreifst.",
-   "icon": "◆",
-   "statKey": "notable_perfect_focus",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_20229",
    "tier": "notable"
   },
   {
@@ -20046,12 +20384,13 @@ export const TALENT_TREE_DATA = {
    "id": 20232,
    "x": -1550,
    "y": -1515,
-   "nameEn": "Elemental Focus",
-   "nameDe": "Elementarfokus",
-   "descEn": "+20% Elemental damage, -10% Absorption regeneration rate.",
-   "descDe": "+20% Elementarschaden, -10% Absorptionsregeneration.",
-   "icon": "◆",
-   "statKey": "notable_elemental_focus",
+   "nameEn": "Trial of the Faith",
+   "nameDe": "Prüfung des Glaubens",
+   "icon": "",
+   "statKey": "notable_trial_of_the_faith_20232",
+   "effects": [
+    "block_recovery:50"
+   ],
    "tier": "notable"
   },
   {
@@ -20103,22 +20442,28 @@ export const TALENT_TREE_DATA = {
    "id": 20237,
    "x": -1915,
    "y": -2221,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Blunt Trauma",
+   "nameDe": "Stumpfes Trauma",
    "icon": "",
-   "statKey": "reserved_reserved_node_20237",
+   "statKey": "notable_blunt_trauma_20237",
+   "effects": [
+    "crit_chance_staff:4",
+    "crit_multi_staff:20"
+   ],
    "tier": "notable"
   },
   {
    "id": 20238,
    "x": -2119,
    "y": -2221,
-   "nameEn": "Mana Engine",
-   "nameDe": "Mana-Triebwerk",
-   "descEn": "Gain +1 maximum Mana per monster killed, up to +50.",
-   "descDe": "Erhalte +1 max. Mana pro getötetem Monster, bis zu +50.",
-   "icon": "◆",
-   "statKey": "notable_mana_engine",
+   "nameEn": "One with the River",
+   "nameDe": "Eins mit dem Fluss",
+   "icon": "",
+   "statKey": "notable_one_with_the_river_20238",
+   "effects": [
+    "elemental_damage_inc_pct:30",
+    "pen_elemental:5"
+   ],
    "tier": "notable"
   },
   {
@@ -20130,7 +20475,9 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_pain_forger_20239",
    "effects": [
-    "crit_chance_mace:5"
+    "crit_chance_mace:5",
+    "stun_chance:5",
+    "power_on_stun:10"
    ],
    "tier": "notable"
   },
@@ -20509,48 +20856,57 @@ export const TALENT_TREE_DATA = {
    "id": 31075,
    "x": 978,
    "y": -1443,
-   "nameEn": "Lesser Evocation",
-   "nameDe": "Beschwörung (klein)",
-   "descEn": "Up to +8% Attack speed, scaling with missing Mana.",
-   "descDe": "Bis zu +8% Angriffsgeschwindigkeit, skalierend mit fehlendem Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_evocation",
+   "nameEn": "Dual Wield Attack and Cast Speed and Block",
+   "nameDe": "Beidhändiges Tempo und Block",
+   "icon": "",
+   "statKey": "small_dual_wield_attack_and_cast_speed_and_block_31075",
+   "effects": [
+    "dual_block:3",
+    "dual_charge_speed:4",
+    "dual_cast_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 31076,
    "x": 925,
    "y": -1496,
-   "nameEn": "Lesser Evocation",
-   "nameDe": "Beschwörung (klein)",
-   "descEn": "Up to +8% Attack speed, scaling with missing Mana.",
-   "descDe": "Bis zu +8% Angriffsgeschwindigkeit, skalierend mit fehlendem Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_evocation",
+   "nameEn": "Dual Wield Attack and Cast Speed and Block",
+   "nameDe": "Beidhändiges Tempo und Block",
+   "icon": "",
+   "statKey": "small_dual_wield_attack_and_cast_speed_and_block_31076",
+   "effects": [
+    "dual_block:3",
+    "dual_charge_speed:4",
+    "dual_cast_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 31077,
    "x": 978,
    "y": -1549,
-   "nameEn": "Lesser Evocation",
-   "nameDe": "Beschwörung (klein)",
-   "descEn": "Up to +8% Attack speed, scaling with missing Mana.",
-   "descDe": "Bis zu +8% Angriffsgeschwindigkeit, skalierend mit fehlendem Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_evocation",
+   "nameEn": "Dual Wield Attack and Cast Speed",
+   "nameDe": "Beidhändiges Angriffs- und Zaubertempo",
+   "icon": "",
+   "statKey": "small_dual_wield_attack_and_cast_speed_31077",
+   "effects": [
+    "dual_charge_speed:4",
+    "dual_cast_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 31078,
    "x": 1027,
    "y": -1516,
-   "nameEn": "Lesser Evocation",
-   "nameDe": "Beschwörung (klein)",
-   "descEn": "Up to +8% Attack speed, scaling with missing Mana.",
-   "descDe": "Bis zu +8% Angriffsgeschwindigkeit, skalierend mit fehlendem Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_evocation",
+   "nameEn": "Dual Wield Spell Damage and Spell Block",
+   "nameDe": "Beidhändiger Zauberschaden und Zauberblock",
+   "icon": "",
+   "statKey": "small_dual_wield_spell_damage_and_spell_block_31078",
+   "effects": [
+    "dual_spell_damage:10"
+   ],
    "tier": "small"
   },
   {
@@ -20577,24 +20933,20 @@ export const TALENT_TREE_DATA = {
    "id": 31081,
    "x": 1092,
    "y": -1675,
-   "nameEn": "Lesser Guardian's Bastion",
-   "nameDe": "Bastion des Wächters (klein)",
-   "descEn": "Shield items absorb 1 additional mistake. Stacks with Aegis Fortification and Bulwark of Resolve. +3% Absorption regen rate.",
-   "descDe": "Schild-Gegenstände absorbieren 1 zusätzlichen Fehler. Wirkt zusammen mit Ägis-Verstärkung und Bollwerk der Entschlossenheit. +3% Absorptionsregeneration.",
-   "icon": "🛡️",
-   "statKey": "small_lesser_guardian_s_bastion",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_31081",
    "tier": "small"
   },
   {
    "id": 31082,
    "x": 1052,
    "y": -1675,
-   "nameEn": "Lesser Guardian's Bastion",
-   "nameDe": "Bastion des Wächters (klein)",
-   "descEn": "Shield items absorb 1 additional mistake. Stacks with Aegis Fortification and Bulwark of Resolve. +3% Absorption regen rate.",
-   "descDe": "Schild-Gegenstände absorbieren 1 zusätzlichen Fehler. Wirkt zusammen mit Ägis-Verstärkung und Bollwerk der Entschlossenheit. +3% Absorptionsregeneration.",
-   "icon": "🛡️",
-   "statKey": "small_lesser_guardian_s_bastion",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_reserved_node_31082",
    "tier": "small"
   },
   {
@@ -20634,12 +20986,13 @@ export const TALENT_TREE_DATA = {
    "id": 31086,
    "x": 879,
    "y": -1773,
-   "nameEn": "Lesser Lucid Dreaming",
-   "nameDe": "Klares Träumen (klein)",
-   "descEn": "Regenerate 1% of maximum Mana per second.",
-   "descDe": "Regeneriere 1% deines max. Mana pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_lucid_dreaming",
+   "nameEn": "Cold Ailment Duration",
+   "nameDe": "Kälte-Dauer",
+   "icon": "",
+   "statKey": "small_cold_ailment_duration_31086",
+   "effects": [
+    "cold_ailment_duration:20"
+   ],
    "tier": "small"
   },
   {
@@ -20659,36 +21012,40 @@ export const TALENT_TREE_DATA = {
    "id": 31088,
    "x": 781,
    "y": -1773,
-   "nameEn": "Lesser Lucid Dreaming",
-   "nameDe": "Klares Träumen (klein)",
-   "descEn": "Regenerate 1% of maximum Mana per second.",
-   "descDe": "Regeneriere 1% deines max. Mana pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_lucid_dreaming",
+   "nameEn": "Freeze Chance",
+   "nameDe": "Einfrierchance",
+   "icon": "",
+   "statKey": "small_freeze_chance_31088",
+   "effects": [
+    "freeze_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
    "id": 31089,
    "x": 678,
    "y": -1854,
-   "nameEn": "Lesser Socratic Method",
-   "nameDe": "Sokratische Methode (klein)",
-   "descEn": "At the start of each level, there is a 13% chance that one additional cell is revealed. +3% Absorption regen rate.",
-   "descDe": "Zu Beginn jedes Levels besteht eine 13% Chance, dass eine zusätzliche Zelle aufgedeckt wird. +3% Absorptionsregeneration.",
-   "icon": "❓",
-   "statKey": "small_lesser_socratic_method",
+   "nameEn": "Spell Damage Over Time Multiplier and Duration",
+   "nameDe": "Zauber-DoT-Multiplikator und Dauer",
+   "icon": "",
+   "statKey": "small_spell_damage_over_time_multiplier_and_duration_31089",
+   "effects": [
+    "spell_dot_multi:4",
+    "skill_effect_duration:6"
+   ],
    "tier": "small"
   },
   {
    "id": 31090,
    "x": 638,
    "y": -1854,
-   "nameEn": "Lesser Socratic Method",
-   "nameDe": "Sokratische Methode (klein)",
-   "descEn": "At the start of each level, there is a 13% chance that one additional cell is revealed. +3% Absorption regen rate.",
-   "descDe": "Zu Beginn jedes Levels besteht eine 13% Chance, dass eine zusätzliche Zelle aufgedeckt wird. +3% Absorptionsregeneration.",
-   "icon": "❓",
-   "statKey": "small_lesser_socratic_method",
+   "nameEn": "Spell Damage Over Time Multiplier",
+   "nameDe": "Zauber-DoT-Multiplikator",
+   "icon": "",
+   "statKey": "small_spell_damage_over_time_multiplier_31090",
+   "effects": [
+    "spell_dot_multi:4"
+   ],
    "tier": "small"
   },
   {
@@ -20782,24 +21139,26 @@ export const TALENT_TREE_DATA = {
    "id": 31098,
    "x": 734,
    "y": -2351,
-   "nameEn": "Lesser Risk Auditor",
-   "nameDe": "Risikoprüfer (klein)",
-   "descEn": "Each mistake has a 10% chance to refund half of its time penalty. +3% Absorption regen rate.",
-   "descDe": "Jeder Fehler hat 10% Chance, die Hälfte seiner Zeitstrafe zu erstatten. +3% Absorptionsregeneration.",
-   "icon": "🧾",
-   "statKey": "small_lesser_risk_auditor",
+   "nameEn": "Lightning Ailment Effect",
+   "nameDe": "Schock-Wirkung",
+   "icon": "",
+   "statKey": "small_lightning_ailment_effect_31098",
+   "effects": [
+    "shock_effect_inc:20"
+   ],
    "tier": "small"
   },
   {
    "id": 31099,
    "x": 734,
    "y": -2391,
-   "nameEn": "Lesser Risk Auditor",
-   "nameDe": "Risikoprüfer (klein)",
-   "descEn": "Each mistake has a 10% chance to refund half of its time penalty. +3% Absorption regen rate.",
-   "descDe": "Jeder Fehler hat 10% Chance, die Hälfte seiner Zeitstrafe zu erstatten. +3% Absorptionsregeneration.",
-   "icon": "🧾",
-   "statKey": "small_lesser_risk_auditor",
+   "nameEn": "Shock Chance",
+   "nameDe": "Schockchance",
+   "icon": "",
+   "statKey": "small_shock_chance_31099",
+   "effects": [
+    "shock_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
@@ -20819,48 +21178,52 @@ export const TALENT_TREE_DATA = {
    "id": 31101,
    "x": 928,
    "y": -2435,
-   "nameEn": "Lesser Efficient Tutoring",
-   "nameDe": "Effiziente Betreuung (klein)",
-   "descEn": "8% chance of not spending the Tutor item when using a Tutor to answer a question. +3% Absorption regen rate.",
-   "descDe": "8% Chance, dass der Tutor Gegenstand beim Beantworten einer Frage nicht verbraucht wird. +3% Absorptionsregeneration.",
-   "icon": "📗",
-   "statKey": "small_lesser_efficient_tutoring",
+   "nameEn": "Increased Absorption Leeched",
+   "nameDe": "Erhöhter Absorptionsentzug",
+   "icon": "",
+   "statKey": "small_increased_absorption_leeched_31101",
+   "effects": [
+    "absorption_leech_effect_inc:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31102,
    "x": 997,
    "y": -2406,
-   "nameEn": "Lesser Efficient Tutoring",
-   "nameDe": "Effiziente Betreuung (klein)",
-   "descEn": "8% chance of not spending the Tutor item when using a Tutor to answer a question. +3% Absorption regen rate.",
-   "descDe": "8% Chance, dass der Tutor Gegenstand beim Beantworten einer Frage nicht verbraucht wird. +3% Absorptionsregeneration.",
-   "icon": "📗",
-   "statKey": "small_lesser_efficient_tutoring",
+   "nameEn": "Absorption Leech",
+   "nameDe": "Absorptionsentzug",
+   "icon": "",
+   "statKey": "small_absorption_leech_31102",
+   "effects": [
+    "absorption_leech_spell:0.3"
+   ],
    "tier": "small"
   },
   {
    "id": 31103,
    "x": 1056,
    "y": -2356,
-   "nameEn": "Lesser Arcane Battery",
-   "nameDe": "Arkane Batterie (klein)",
-   "descEn": "+5 maximum Mana. Absorption regenerates 8% faster.",
-   "descDe": "+5 max. Mana. Absorption regeneriert 8% schneller.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_battery",
+   "nameEn": "Freeze Chance",
+   "nameDe": "Einfrierchance",
+   "icon": "",
+   "statKey": "small_freeze_chance_31103",
+   "effects": [
+    "freeze_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
    "id": 31104,
    "x": 1089,
    "y": -2405,
-   "nameEn": "Lesser Arcane Battery",
-   "nameDe": "Arkane Batterie (klein)",
-   "descEn": "+5 maximum Mana. Absorption regenerates 8% faster.",
-   "descDe": "+5 max. Mana. Absorption regeneriert 8% schneller.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_battery",
+   "nameEn": "Freeze Chance",
+   "nameDe": "Einfrierchance",
+   "icon": "",
+   "statKey": "small_freeze_chance_31104",
+   "effects": [
+    "freeze_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
@@ -20945,50 +21308,67 @@ export const TALENT_TREE_DATA = {
    "id": 31111,
    "x": 986,
    "y": -1984,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Physical Damage",
+   "nameDe": "Physischer Zauberstabschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_31111",
+   "statKey": "travel_wand_physical_damage_31111",
+   "effects": [
+    "wand_damage:12"
+   ],
    "tier": "travel"
   },
   {
    "id": 31112,
    "x": 946,
    "y": -1984,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Physical Damage and Attack Speed",
+   "nameDe": "Physischer Zauberstabschaden und Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31112",
+   "statKey": "small_wand_physical_damage_and_attack_speed_31112",
+   "effects": [
+    "wand_damage:12",
+    "wand_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 31113,
    "x": 913,
    "y": -1935,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Physical Damage and Attack Speed",
+   "nameDe": "Physischer Zauberstabschaden und Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31113",
+   "statKey": "small_wand_physical_damage_and_attack_speed_31113",
+   "effects": [
+    "wand_damage:12",
+    "wand_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 31114,
    "x": 986,
    "y": -1886,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Lightning Damage",
+   "nameDe": "Zauberstab-Blitzschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_31114",
+   "statKey": "small_wand_lightning_damage_31114",
+   "effects": [
+    "wand_phys_as_lightning:5"
+   ],
    "tier": "small"
   },
   {
    "id": 31115,
    "x": 1019,
    "y": -1935,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Lightning Damage",
+   "nameDe": "Zauberstab-Blitzschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_31115",
+   "statKey": "small_wand_lightning_damage_31115",
+   "effects": [
+    "wand_phys_as_lightning:5"
+   ],
    "tier": "small"
   },
   {
@@ -21008,24 +21388,26 @@ export const TALENT_TREE_DATA = {
    "id": 31117,
    "x": 1100,
    "y": -1795,
-   "nameEn": "Lesser Runic Feedback",
-   "nameDe": "Runenrückkopplung (klein)",
-   "descEn": "Killing a monster with a critical strike restores 2 Mana.",
-   "descDe": "Das Töten eines Monsters mit einem kritischen Treffer stellt 2 Mana wieder her.",
-   "icon": "◆",
-   "statKey": "small_lesser_runic_feedback",
+   "nameEn": "Spell Area of Effect",
+   "nameDe": "Zauber-Wirkungsbereich",
+   "icon": "",
+   "statKey": "small_spell_area_of_effect_31117",
+   "effects": [
+    "area_of_effect:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31118,
    "x": 1149,
    "y": -1722,
-   "nameEn": "Lesser Runic Feedback",
-   "nameDe": "Runenrückkopplung (klein)",
-   "descEn": "Killing a monster with a critical strike restores 2 Mana.",
-   "descDe": "Das Töten eines Monsters mit einem kritischen Treffer stellt 2 Mana wieder her.",
-   "icon": "◆",
-   "statKey": "small_lesser_runic_feedback",
+   "nameEn": "Spell Area of Effect",
+   "nameDe": "Zauber-Wirkungsbereich",
+   "icon": "",
+   "statKey": "small_spell_area_of_effect_31118",
+   "effects": [
+    "area_of_effect:10"
+   ],
    "tier": "small"
   },
   {
@@ -21045,72 +21427,80 @@ export const TALENT_TREE_DATA = {
    "id": 31120,
    "x": 1255,
    "y": -1891,
-   "nameEn": "Lesser Runic Feedback",
-   "nameDe": "Runenrückkopplung (klein)",
-   "descEn": "Killing a monster with a critical strike restores 2 Mana.",
-   "descDe": "Das Töten eines Monsters mit einem kritischen Treffer stellt 2 Mana wieder her.",
-   "icon": "◆",
-   "statKey": "small_lesser_runic_feedback",
+   "nameEn": "Avoid Interruption while Casting",
+   "nameDe": "Unterbrechung beim Zaubern vermeiden",
+   "icon": "",
+   "statKey": "small_avoid_interruption_while_casting_31120",
+   "effects": [
+    "avoid_ailment_casting:15"
+   ],
    "tier": "small"
   },
   {
    "id": 31121,
    "x": 1524,
    "y": -2087,
-   "nameEn": "Lesser Absorption Reactor",
-   "nameDe": "Absorptionsreaktor (klein)",
-   "descEn": "Gain +1 Absorption for every monster killed.",
-   "descDe": "Erhalte +1 Absorption für jedes getötete Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_absorption_reactor",
+   "nameEn": "Dual Wield Cast Speed",
+   "nameDe": "Beidhändiges Zaubertempo",
+   "icon": "",
+   "statKey": "small_dual_wield_cast_speed_31121",
+   "effects": [
+    "dual_cast_speed:3"
+   ],
    "tier": "small"
   },
   {
    "id": 31122,
    "x": 1557,
    "y": -2136,
-   "nameEn": "Lesser Absorption Reactor",
-   "nameDe": "Absorptionsreaktor (klein)",
-   "descEn": "Gain +1 Absorption for every monster killed.",
-   "descDe": "Erhalte +1 Absorption für jedes getötete Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_absorption_reactor",
+   "nameEn": "Dual Wield Cast Speed",
+   "nameDe": "Beidhändiges Zaubertempo",
+   "icon": "",
+   "statKey": "small_dual_wield_cast_speed_31122",
+   "effects": [
+    "dual_cast_speed:3"
+   ],
    "tier": "small"
   },
   {
    "id": 31123,
    "x": 1597,
    "y": -2136,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Dual Wield Cast Speed",
+   "nameDe": "Beidhändiges Zaubertempo",
+   "icon": "",
+   "statKey": "travel_dual_wield_cast_speed_31123",
+   "effects": [
+    "dual_cast_speed:4"
+   ],
    "tier": "travel"
   },
   {
    "id": 31124,
    "x": 1630,
    "y": -2087,
-   "nameEn": "Lesser Absorption Reactor",
-   "nameDe": "Absorptionsreaktor (klein)",
-   "descEn": "Gain +1 Absorption for every monster killed.",
-   "descDe": "Erhalte +1 Absorption für jedes getötete Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_absorption_reactor",
+   "nameEn": "Dual Wield Spell Damage and Movement Speed",
+   "nameDe": "Beidhändiger Zauberschaden und Bewegungstempo",
+   "icon": "",
+   "statKey": "small_dual_wield_spell_damage_and_movement_speed_31124",
+   "effects": [
+    "dual_spell_damage:10",
+    "dual_move_speed:3"
+   ],
    "tier": "small"
   },
   {
    "id": 31125,
    "x": 1597,
    "y": -2038,
-   "nameEn": "Lesser Absorption Reactor",
-   "nameDe": "Absorptionsreaktor (klein)",
-   "descEn": "Gain +1 Absorption for every monster killed.",
-   "descDe": "Erhalte +1 Absorption für jedes getötete Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_absorption_reactor",
+   "nameEn": "Dual Wield Spell Damage and Movement Speed",
+   "nameDe": "Beidhändiger Zauberschaden und Bewegungstempo",
+   "icon": "",
+   "statKey": "small_dual_wield_spell_damage_and_movement_speed_31125",
+   "effects": [
+    "dual_spell_damage:10",
+    "dual_move_speed:3"
+   ],
    "tier": "small"
   },
   {
@@ -21163,24 +21553,26 @@ export const TALENT_TREE_DATA = {
    "id": 31130,
    "x": 1936,
    "y": -1988,
-   "nameEn": "Lesser Chain Lightning",
-   "nameDe": "Kettenblitz (klein)",
-   "descEn": "Critical strikes arc to a second monster for 20% damage.",
-   "descDe": "Kritische Treffer springen auf ein zweites Monster über (20% Schaden).",
-   "icon": "◆",
-   "statKey": "small_lesser_chain_lightning",
+   "nameEn": "Chance to Poison with Spells",
+   "nameDe": "Vergiftungschance mit Zaubern",
+   "icon": "",
+   "statKey": "small_chance_to_poison_with_spells_31130",
+   "effects": [
+    "poison_chance_spell:15"
+   ],
    "tier": "small"
   },
   {
    "id": 31131,
    "x": 1863,
    "y": -2037,
-   "nameEn": "Lesser Chain Lightning",
-   "nameDe": "Kettenblitz (klein)",
-   "descEn": "Critical strikes arc to a second monster for 20% damage.",
-   "descDe": "Kritische Treffer springen auf ein zweites Monster über (20% Schaden).",
-   "icon": "◆",
-   "statKey": "small_lesser_chain_lightning",
+   "nameEn": "Chance to Poison with Spells",
+   "nameDe": "Vergiftungschance mit Zaubern",
+   "icon": "",
+   "statKey": "small_chance_to_poison_with_spells_31131",
+   "effects": [
+    "poison_chance_spell:10"
+   ],
    "tier": "small"
   },
   {
@@ -21360,90 +21752,122 @@ export const TALENT_TREE_DATA = {
    "id": 31148,
    "x": 1149,
    "y": -2822,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Critical Strike Chance and Multiplier",
+   "nameDe": "Zauberstab-Krit-Chance und -Multiplikator",
    "icon": "",
-   "statKey": "reserved_reserved_node_31148",
+   "statKey": "small_wand_critical_strike_chance_and_multiplier_31148",
+   "effects": [
+    "crit_chance_wand:4",
+    "crit_multi_wand:12"
+   ],
    "tier": "small"
   },
   {
    "id": 31149,
    "x": 1065,
    "y": -2822,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Critical Strike Chance and Multiplier",
+   "nameDe": "Zauberstab-Krit-Chance und -Multiplikator",
    "icon": "",
-   "statKey": "reserved_reserved_node_31149",
+   "statKey": "small_wand_critical_strike_chance_and_multiplier_31149",
+   "effects": [
+    "crit_chance_wand:4",
+    "crit_multi_wand:12"
+   ],
    "tier": "small"
   },
   {
    "id": 31150,
    "x": 997,
    "y": -2720,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Damage",
+   "nameDe": "Zauberstabschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_31150",
+   "statKey": "small_wand_damage_31150",
+   "effects": [
+    "wand_damage:16"
+   ],
    "tier": "small"
   },
   {
    "id": 31151,
    "x": 1005,
    "y": -2678,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Damage",
+   "nameDe": "Zauberstabschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_31151",
+   "statKey": "small_wand_damage_31151",
+   "effects": [
+    "wand_damage:16"
+   ],
    "tier": "small"
   },
   {
    "id": 31152,
    "x": 1065,
    "y": -2618,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Damage",
+   "nameDe": "Zauberstabschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_31152",
+   "statKey": "small_wand_damage_31152",
+   "effects": [
+    "wand_damage:16"
+   ],
    "tier": "small"
   },
   {
    "id": 31153,
    "x": 1107,
    "y": -2610,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Damage",
+   "nameDe": "Zauberstabschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_31153",
+   "statKey": "travel_wand_damage_31153",
+   "effects": [
+    "wand_damage:12"
+   ],
    "tier": "travel"
   },
   {
    "id": 31154,
    "x": 1149,
    "y": -2618,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Attack Speed and Accuracy",
+   "nameDe": "Zauberstab-Tempo und Präzision",
    "icon": "",
-   "statKey": "reserved_reserved_node_31154",
+   "statKey": "small_wand_attack_speed_and_accuracy_31154",
+   "effects": [
+    "wand_charge_speed:4",
+    "accuracy_rating_pct:8"
+   ],
    "tier": "small"
   },
   {
    "id": 31155,
    "x": 1209,
    "y": -2678,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Attack Speed and Accuracy",
+   "nameDe": "Zauberstab-Tempo und Präzision",
    "icon": "",
-   "statKey": "reserved_reserved_node_31155",
+   "statKey": "small_wand_attack_speed_and_accuracy_31155",
+   "effects": [
+    "wand_charge_speed:4",
+    "accuracy_rating_pct:8"
+   ],
    "tier": "small"
   },
   {
    "id": 31156,
    "x": 1217,
    "y": -2720,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Attack Speed and Accuracy",
+   "nameDe": "Zauberstab-Tempo und Präzision",
    "icon": "",
-   "statKey": "reserved_reserved_node_31156",
+   "statKey": "small_wand_attack_speed_and_accuracy_31156",
+   "effects": [
+    "wand_charge_speed:4",
+    "accuracy_rating_pct:8"
+   ],
    "tier": "small"
   },
   {
@@ -21509,24 +21933,26 @@ export const TALENT_TREE_DATA = {
    "id": 31162,
    "x": 1521,
    "y": -2384,
-   "nameEn": "Lesser Arcane Focus",
-   "nameDe": "Fokus des Arkanen (klein)",
-   "descEn": "+5% Absorption regen rate. Focus channels power into the shield.",
-   "descDe": "+5% Absorptionsregeneration. Fokus leitet Kraft in den Schild.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_focus",
+   "nameEn": "Lightning Critical Strike Multiplier",
+   "nameDe": "Kritischer Blitz-Multiplikator",
+   "icon": "",
+   "statKey": "small_lightning_critical_strike_multiplier_31162",
+   "effects": [
+    "spell_crit_multi:12"
+   ],
    "tier": "small"
   },
   {
    "id": 31163,
    "x": 1554,
    "y": -2433,
-   "nameEn": "Lesser Arcane Focus",
-   "nameDe": "Fokus des Arkanen (klein)",
-   "descEn": "+5% Absorption regen rate. Focus channels power into the shield.",
-   "descDe": "+5% Absorptionsregeneration. Fokus leitet Kraft in den Schild.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_focus",
+   "nameEn": "Lightning Critical Strike Multiplier",
+   "nameDe": "Kritischer Blitz-Multiplikator",
+   "icon": "",
+   "statKey": "small_lightning_critical_strike_multiplier_31163",
+   "effects": [
+    "spell_crit_multi:12"
+   ],
    "tier": "small"
   },
   {
@@ -21557,30 +21983,39 @@ export const TALENT_TREE_DATA = {
    "id": 31166,
    "x": 2119,
    "y": -2022,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Shadow Damage Over Time Multiplier",
+   "nameDe": "Schatten-DoT-Multiplikator",
    "icon": "",
-   "statKey": "reserved_chaos_dot_31166",
+   "statKey": "small_shadow_damage_over_time_multiplier_31166",
+   "effects": [
+    "poison_dot_multi:6"
+   ],
    "tier": "small"
   },
   {
    "id": 31167,
    "x": 2168,
    "y": -1989,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Shadow Damage Over Time Multiplier",
+   "nameDe": "Schatten-DoT-Multiplikator",
    "icon": "",
-   "statKey": "reserved_chaos_dot_31167",
+   "statKey": "small_shadow_damage_over_time_multiplier_31167",
+   "effects": [
+    "poison_dot_multi:6"
+   ],
    "tier": "small"
   },
   {
    "id": 31168,
    "x": 2217,
    "y": -2022,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Shadow Damage Over Time Multiplier",
+   "nameDe": "Schatten-DoT-Multiplikator",
    "icon": "",
-   "statKey": "reserved_chaos_dot_31168",
+   "statKey": "small_shadow_damage_over_time_multiplier_31168",
+   "effects": [
+    "poison_dot_multi:6"
+   ],
    "tier": "small"
   },
   {
@@ -22288,12 +22723,13 @@ export const TALENT_TREE_DATA = {
    "id": 31225,
    "x": 124,
    "y": -1654,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Area of Effect Damage",
+   "nameDe": "Flächenschaden",
+   "icon": "",
+   "statKey": "travel_area_of_effect_damage_31225",
+   "effects": [
+    "area_damage_inc:10"
+   ],
    "tier": "travel"
   },
   {
@@ -22726,60 +23162,66 @@ export const TALENT_TREE_DATA = {
    "id": 31260,
    "x": -1227,
    "y": -1232,
-   "nameEn": "Lesser Fault Sensing",
-   "nameDe": "Fehlersinn (klein)",
-   "descEn": "5% chance to mark 1 incorrect empty cell at the start of each level. Rolls independently from Error Guidance and Precision Insight. +3% Absorption regen rate.",
-   "descDe": "5% Chance, zu Beginn jedes Levels 1 falsche leere Zelle zu markieren. Wirkt unabhängig von Fehlerführung und Präzisionsblick. +3% Absorptionsregeneration.",
-   "icon": "❌",
-   "statKey": "small_lesser_fault_sensing",
+   "nameEn": "Ignite Resistance",
+   "nameDe": "Entzündungsresistenz",
+   "icon": "",
+   "statKey": "small_ignite_resistance_31260",
+   "effects": [
+    "ignite_duration_taken:20"
+   ],
    "tier": "small"
   },
   {
    "id": 31261,
    "x": -1234,
    "y": -1354,
-   "nameEn": "Lesser Fault Sensing",
-   "nameDe": "Fehlersinn (klein)",
-   "descEn": "5% chance to mark 1 incorrect empty cell at the start of each level. Rolls independently from Error Guidance and Precision Insight. +3% Absorption regen rate.",
-   "descDe": "5% Chance, zu Beginn jedes Levels 1 falsche leere Zelle zu markieren. Wirkt unabhängig von Fehlerführung und Präzisionsblick. +3% Absorptionsregeneration.",
-   "icon": "❌",
-   "statKey": "small_lesser_fault_sensing",
+   "nameEn": "Shock Resistance",
+   "nameDe": "Schockresistenz",
+   "icon": "",
+   "statKey": "small_shock_resistance_31261",
+   "effects": [
+    "shock_effect_taken:20"
+   ],
    "tier": "small"
   },
   {
    "id": 31262,
    "x": -1136,
    "y": -1354,
-   "nameEn": "Lesser Fault Sensing",
-   "nameDe": "Fehlersinn (klein)",
-   "descEn": "5% chance to mark 1 incorrect empty cell at the start of each level. Rolls independently from Error Guidance and Precision Insight. +3% Absorption regen rate.",
-   "descDe": "5% Chance, zu Beginn jedes Levels 1 falsche leere Zelle zu markieren. Wirkt unabhängig von Fehlerführung und Präzisionsblick. +3% Absorptionsregeneration.",
-   "icon": "❌",
-   "statKey": "small_lesser_fault_sensing",
+   "nameEn": "Chill and Freeze Resistance",
+   "nameDe": "Kälte- und Gefrierresistenz",
+   "icon": "",
+   "statKey": "small_chill_and_freeze_resistance_31262",
+   "effects": [
+    "chill_effect_taken:20",
+    "freeze_duration_taken:20"
+   ],
    "tier": "small"
   },
   {
    "id": 31263,
    "x": -996,
    "y": -1437,
-   "nameEn": "Lesser Mana Spring",
-   "nameDe": "Manaquelle (klein)",
-   "descEn": "Regenerate 1% of maximum Mana per second.",
-   "descDe": "Regeneriere 1% deines max. Mana pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_mana_spring",
+   "nameEn": "Spell Damage Over Time",
+   "nameDe": "Zauber-Schaden über Zeit",
+   "icon": "",
+   "statKey": "small_spell_damage_over_time_31263",
+   "effects": [
+    "spell_dot_inc:16"
+   ],
    "tier": "small"
   },
   {
    "id": 31264,
    "x": -976,
    "y": -1539,
-   "nameEn": "Lesser Mana Spring",
-   "nameDe": "Manaquelle (klein)",
-   "descEn": "Regenerate 1% of maximum Mana per second.",
-   "descDe": "Regeneriere 1% deines max. Mana pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_mana_spring",
+   "nameEn": "Spell Damage Over Time",
+   "nameDe": "Zauber-Schaden über Zeit",
+   "icon": "",
+   "statKey": "small_spell_damage_over_time_31264",
+   "effects": [
+    "spell_dot_inc:12"
+   ],
    "tier": "small"
   },
   {
@@ -23067,84 +23509,91 @@ export const TALENT_TREE_DATA = {
    "id": 31289,
    "x": -686,
    "y": -2507,
-   "nameEn": "Lesser Dream Logic",
-   "nameDe": "Traumlogik (klein)",
-   "descEn": "While above 25% time, all of your start-of-level luck rolls gain 3% chance. Below 25% time, all mark effects gain 3% chance instead. +3% Absorption regen rate.",
-   "descDe": "Über 25% Zeit erhalten alle deine Glückswürfe zu Beginn des Levels 3% Chance. Unter 25% Zeit erhalten stattdessen alle Markierungseffekte 3% Chance. +3% Absorptionsregeneration.",
-   "icon": "💤",
-   "statKey": "small_lesser_dream_logic",
+   "nameEn": "Critical Strike Chance per Power Charge",
+   "nameDe": "Krit-Chance pro Kraftladung",
+   "icon": "",
+   "statKey": "small_critical_strike_chance_per_power_charge_31289",
+   "effects": [
+    "crit_per_power:2"
+   ],
    "tier": "small"
   },
   {
    "id": 31290,
    "x": -726,
    "y": -2507,
-   "nameEn": "Lesser Dream Logic",
-   "nameDe": "Traumlogik (klein)",
-   "descEn": "While above 25% time, all of your start-of-level luck rolls gain 3% chance. Below 25% time, all mark effects gain 3% chance instead. +3% Absorption regen rate.",
-   "descDe": "Über 25% Zeit erhalten alle deine Glückswürfe zu Beginn des Levels 3% Chance. Unter 25% Zeit erhalten stattdessen alle Markierungseffekte 3% Chance. +3% Absorptionsregeneration.",
-   "icon": "💤",
-   "statKey": "small_lesser_dream_logic",
+   "nameEn": "Mana Regeneration per Power Charge",
+   "nameDe": "Manaregeneration pro Kraftladung",
+   "icon": "",
+   "statKey": "small_mana_regeneration_per_power_charge_31290",
+   "effects": [
+    "mana_regen_per_power:8"
+   ],
    "tier": "small"
   },
   {
    "id": 31291,
    "x": -653,
    "y": -2556,
-   "nameEn": "Lesser Dream Logic",
-   "nameDe": "Traumlogik (klein)",
-   "descEn": "While above 25% time, all of your start-of-level luck rolls gain 3% chance. Below 25% time, all mark effects gain 3% chance instead. +3% Absorption regen rate.",
-   "descDe": "Über 25% Zeit erhalten alle deine Glückswürfe zu Beginn des Levels 3% Chance. Unter 25% Zeit erhalten stattdessen alle Markierungseffekte 3% Chance. +3% Absorptionsregeneration.",
-   "icon": "💤",
-   "statKey": "small_lesser_dream_logic",
+   "nameEn": "Critical Strike Multiplier per Power Charge",
+   "nameDe": "Krit-Multiplikator pro Kraftladung",
+   "icon": "",
+   "statKey": "small_critical_strike_multiplier_per_power_charge_31291",
+   "effects": [
+    "crit_multi_per_power:5"
+   ],
    "tier": "small"
   },
   {
    "id": 31292,
    "x": -562,
    "y": -2406,
-   "nameEn": "Lesser Static Barrier",
-   "nameDe": "Statische Barriere (klein)",
-   "descEn": "+15 maximum Mana. Absorption regeneration starts 5% earlier.",
-   "descDe": "+15 max. Mana. Absorptionsregeneration beginnt 5% früher.",
-   "icon": "◆",
-   "statKey": "small_lesser_static_barrier",
+   "nameEn": "Shield Cast Speed",
+   "nameDe": "Schild-Zaubertempo",
+   "icon": "",
+   "statKey": "small_shield_cast_speed_31292",
+   "effects": [
+    "shield_cast_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 31293,
    "x": -489,
    "y": -2357,
-   "nameEn": "Lesser Static Barrier",
-   "nameDe": "Statische Barriere (klein)",
-   "descEn": "+15 maximum Mana. Absorption regeneration starts 5% earlier.",
-   "descDe": "+15 max. Mana. Absorptionsregeneration beginnt 5% früher.",
-   "icon": "◆",
-   "statKey": "small_lesser_static_barrier",
+   "nameEn": "Shield Spell Damage",
+   "nameDe": "Schild-Zauberschaden",
+   "icon": "",
+   "statKey": "small_shield_spell_damage_31293",
+   "effects": [
+    "shield_spell_damage:12"
+   ],
    "tier": "small"
   },
   {
    "id": 31294,
    "x": -522,
    "y": -2308,
-   "nameEn": "Lesser Static Barrier",
-   "nameDe": "Statische Barriere (klein)",
-   "descEn": "+15 maximum Mana. Absorption regeneration starts 5% earlier.",
-   "descDe": "+15 max. Mana. Absorptionsregeneration beginnt 5% früher.",
-   "icon": "◆",
-   "statKey": "small_lesser_static_barrier",
+   "nameEn": "Shield Spell Damage and Spell Block",
+   "nameDe": "Schild-Zauberschaden und Zauberblock",
+   "icon": "",
+   "statKey": "small_shield_spell_damage_and_spell_block_31294",
+   "effects": [
+    "shield_spell_block:3"
+   ],
    "tier": "small"
   },
   {
    "id": 31295,
    "x": -562,
    "y": -2308,
-   "nameEn": "Lesser Static Barrier",
-   "nameDe": "Statische Barriere (klein)",
-   "descEn": "+15 maximum Mana. Absorption regeneration starts 5% earlier.",
-   "descDe": "+15 max. Mana. Absorptionsregeneration beginnt 5% früher.",
-   "icon": "◆",
-   "statKey": "small_lesser_static_barrier",
+   "nameEn": "Shield Spell Damage and Spell Block",
+   "nameDe": "Schild-Zauberschaden und Zauberblock",
+   "icon": "",
+   "statKey": "small_shield_spell_damage_and_spell_block_31295",
+   "effects": [
+    "shield_spell_block:3"
+   ],
    "tier": "small"
   },
   {
@@ -23255,22 +23704,27 @@ export const TALENT_TREE_DATA = {
    "id": 31304,
    "x": -988,
    "y": -2410,
-   "nameEn": "Lesser Shrug It Off",
-   "nameDe": "Abtrotzen (klein)",
-   "descEn": "+4% Armour. You cannot be staggered.",
-   "descDe": "+4% Rüstung. Du kannst nicht zurückgestoßen werden.",
-   "icon": "◆",
-   "statKey": "small_lesser_shrug_it_off",
+   "nameEn": "Wand Elemental Damage and Penetration",
+   "nameDe": "Zauberstab-Elementarschaden und Durchdringung",
+   "icon": "",
+   "statKey": "small_wand_elemental_damage_and_penetration_31304",
+   "effects": [
+    "elemental_damage_inc_pct:10",
+    "pen_elemental:2"
+   ],
    "tier": "small"
   },
   {
    "id": 31305,
    "x": -988,
    "y": -2450,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Elemental Damage",
+   "nameDe": "Zauberstab-Elementarschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_31305",
+   "statKey": "travel_wand_elemental_damage_31305",
+   "effects": [
+    "elemental_damage_inc_pct:12"
+   ],
    "tier": "travel"
   },
   {
@@ -23290,62 +23744,80 @@ export const TALENT_TREE_DATA = {
    "id": 31307,
    "x": -1086,
    "y": -2450,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Attack Speed and Accuracy",
+   "nameDe": "Zauberstab-Tempo und Präzision",
    "icon": "",
-   "statKey": "reserved_reserved_node_31307",
+   "statKey": "small_wand_attack_speed_and_accuracy_31307",
+   "effects": [
+    "wand_charge_speed:5",
+    "accuracy_rating_pct:8"
+   ],
    "tier": "small"
   },
   {
    "id": 31308,
    "x": -1037,
    "y": -2377,
-   "nameEn": "Lesser Shrug It Off",
-   "nameDe": "Abtrotzen (klein)",
-   "descEn": "+4% Armour. You cannot be staggered.",
-   "descDe": "+4% Rüstung. Du kannst nicht zurückgestoßen werden.",
-   "icon": "◆",
-   "statKey": "small_lesser_shrug_it_off",
+   "nameEn": "Wand Elemental Damage and Penetration",
+   "nameDe": "Zauberstab-Elementarschaden und Durchdringung",
+   "icon": "",
+   "statKey": "small_wand_elemental_damage_and_penetration_31308",
+   "effects": [
+    "elemental_damage_inc_pct:10",
+    "pen_elemental:2"
+   ],
    "tier": "small"
   },
   {
    "id": 31309,
    "x": -1150,
    "y": -2335,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Spell Block",
+   "nameDe": "Stab-Zauberblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_31309",
+   "statKey": "small_staff_spell_block_31309",
+   "effects": [
+    "staff_spell_block:4"
+   ],
    "tier": "small"
   },
   {
    "id": 31310,
    "x": -1183,
    "y": -2384,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Area of Effect",
+   "nameDe": "Stab-Wirkungsbereich",
    "icon": "",
-   "statKey": "reserved_reserved_node_31310",
+   "statKey": "small_staff_area_of_effect_31310",
+   "effects": [
+    "area_of_effect:12"
+   ],
    "tier": "small"
   },
   {
    "id": 31311,
    "x": -1256,
    "y": -2335,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Area of Effect",
+   "nameDe": "Stab-Wirkungsbereich",
    "icon": "",
-   "statKey": "reserved_reserved_node_31311",
+   "statKey": "small_staff_area_of_effect_31311",
+   "effects": [
+    "area_of_effect:15"
+   ],
    "tier": "small"
   },
   {
    "id": 31312,
    "x": -1183,
    "y": -2286,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Spell Block",
+   "nameDe": "Stab-Zauberblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_31312",
+   "statKey": "small_staff_spell_block_31312",
+   "effects": [
+    "staff_spell_block:4"
+   ],
    "tier": "small"
   },
   {
@@ -23391,50 +23863,67 @@ export const TALENT_TREE_DATA = {
    "id": 31316,
    "x": -1302,
    "y": -1897,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Critical Strike Chance",
+   "nameDe": "Stab-Krit-Chance",
    "icon": "",
-   "statKey": "reserved_reserved_node_31316",
+   "statKey": "small_staff_critical_strike_chance_31316",
+   "effects": [
+    "crit_chance_staff:3"
+   ],
    "tier": "small"
   },
   {
    "id": 31317,
    "x": -1351,
    "y": -1864,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Critical Strike Chance and Multiplier",
+   "nameDe": "Stab-Krit-Chance und -Multiplikator",
    "icon": "",
-   "statKey": "reserved_reserved_node_31317",
+   "statKey": "small_staff_critical_strike_chance_and_multiplier_31317",
+   "effects": [
+    "crit_chance_staff:3",
+    "crit_multi_staff:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31318,
    "x": -1400,
    "y": -1897,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Critical Strike Chance and Multiplier",
+   "nameDe": "Stab-Krit-Chance und -Multiplikator",
    "icon": "",
-   "statKey": "reserved_reserved_node_31318",
+   "statKey": "small_staff_critical_strike_chance_and_multiplier_31318",
+   "effects": [
+    "crit_chance_staff:3",
+    "crit_multi_staff:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31319,
    "x": -1570,
    "y": -1811,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Cost Efficiency",
+   "nameDe": "Kosteneffizienz",
    "icon": "",
-   "statKey": "reserved_reserved_node_31319",
+   "statKey": "small_cost_efficiency_31319",
+   "effects": [
+    "cost_efficiency:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31320,
    "x": -1570,
    "y": -1771,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Cost Efficiency",
+   "nameDe": "Kosteneffizienz",
    "icon": "",
-   "statKey": "reserved_reserved_node_31320",
+   "statKey": "small_cost_efficiency_31320",
+   "effects": [
+    "cost_efficiency:15"
+   ],
    "tier": "small"
   },
   {
@@ -23446,7 +23935,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_spell_damage_and_stun_recovery_31321",
    "effects": [
-    "spell_damage_inc_pct:10"
+    "spell_damage_inc_pct:10",
+    "block_recovery:10"
    ],
    "tier": "small"
   },
@@ -23459,7 +23949,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_spell_damage_and_stun_recovery_31322",
    "effects": [
-    "spell_damage_inc_pct:10"
+    "spell_damage_inc_pct:10",
+    "block_recovery:10"
    ],
    "tier": "small"
   },
@@ -23591,12 +24082,14 @@ export const TALENT_TREE_DATA = {
    "id": 31332,
    "x": -2374,
    "y": -1740,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Mace Elemental Damage and Accuracy",
+   "nameDe": "Streitkolben-Elementarschaden und Präzision",
+   "icon": "",
+   "statKey": "travel_mace_elemental_damage_and_accuracy_31332",
+   "effects": [
+    "accuracy_rating_pct:8",
+    "elemental_damage_inc_pct:12"
+   ],
    "tier": "travel"
   },
   {
@@ -23617,12 +24110,13 @@ export const TALENT_TREE_DATA = {
    "id": 31334,
    "x": -2199,
    "y": -1927,
-   "nameEn": "Lesser Stratosphere Read",
-   "nameDe": "Stratosphären-Blick (klein)",
-   "descEn": "At the start of each level, one correct cell in the bottommost row is revealed. +3% Absorption regen rate.",
-   "descDe": "Zu Beginn jedes Levels wird eine korrekte Zelle in der untersten Reihe aufgedeckt. +3% Absorptionsregeneration.",
-   "icon": "🎈",
-   "statKey": "small_lesser_stratosphere_read",
+   "nameEn": "Chance to Ignite",
+   "nameDe": "Entzündungschance",
+   "icon": "",
+   "statKey": "small_chance_to_ignite_31334",
+   "effects": [
+    "ignite_chance_pct:20"
+   ],
    "tier": "small"
   },
   {
@@ -23655,64 +24149,82 @@ export const TALENT_TREE_DATA = {
    "id": 31337,
    "x": -2037,
    "y": -2130,
-   "nameEn": "Lesser Mana Engine",
-   "nameDe": "Mana-Triebwerk (klein)",
-   "descEn": "Gain +1 maximum Mana per monster killed, up to +25.",
-   "descDe": "Erhalte +1 max. Mana pro getötetem Monster, bis zu +25.",
-   "icon": "◆",
-   "statKey": "small_lesser_mana_engine",
+   "nameEn": "Staff Elemental Damage and Penetration",
+   "nameDe": "Stab-Elementarschaden und Durchdringung",
+   "icon": "",
+   "statKey": "small_staff_elemental_damage_and_penetration_31337",
+   "effects": [
+    "elemental_damage_inc_pct:10",
+    "pen_elemental:2"
+   ],
    "tier": "small"
   },
   {
    "id": 31338,
    "x": -1997,
    "y": -2130,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Critical Strike Chance and Multiplier",
+   "nameDe": "Stab-Krit-Chance und -Multiplikator",
    "icon": "",
-   "statKey": "reserved_reserved_node_31338",
+   "statKey": "small_staff_critical_strike_chance_and_multiplier_31338",
+   "effects": [
+    "crit_chance_staff:3",
+    "crit_multi_staff:12"
+   ],
    "tier": "small"
   },
   {
    "id": 31339,
    "x": -1964,
    "y": -2179,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Critical Strike Chance and Multiplier",
+   "nameDe": "Stab-Krit-Chance und -Multiplikator",
    "icon": "",
-   "statKey": "reserved_reserved_node_31339",
+   "statKey": "travel_staff_critical_strike_chance_and_multiplier_31339",
+   "effects": [
+    "crit_chance_staff:3",
+    "crit_multi_staff:12"
+   ],
    "tier": "travel"
   },
   {
    "id": 31340,
    "x": -1975,
    "y": -2281,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Accuracy",
+   "nameDe": "Stab-Präzision",
    "icon": "",
-   "statKey": "reserved_reserved_node_31340",
+   "statKey": "small_staff_accuracy_31340",
+   "effects": [
+    "accuracy_rating_pct:14"
+   ],
    "tier": "small"
   },
   {
    "id": 31341,
    "x": -2059,
    "y": -2281,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Accuracy",
+   "nameDe": "Stab-Präzision",
    "icon": "",
-   "statKey": "reserved_reserved_node_31341",
+   "statKey": "small_staff_accuracy_31341",
+   "effects": [
+    "accuracy_rating_pct:14"
+   ],
    "tier": "small"
   },
   {
    "id": 31342,
    "x": -2070,
    "y": -2179,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Staff Elemental Damage and Penetration",
+   "nameDe": "Stab-Elementarschaden und Durchdringung",
+   "icon": "",
+   "statKey": "travel_staff_elemental_damage_and_penetration_31342",
+   "effects": [
+    "elemental_damage_inc_pct:10",
+    "pen_elemental:2"
+   ],
    "tier": "travel"
   },
   {
@@ -24079,24 +24591,28 @@ export const TALENT_TREE_DATA = {
    "id": 31374,
    "x": -223,
    "y": -2602,
-   "nameEn": "Lesser Error Guidance",
-   "nameDe": "Fehlerführung (klein)",
-   "descEn": "8% chance to mark 1 incorrect empty cell at the start of each level. Rolls independently from Fault Sensing and Precision Insight. +3% Absorption regen rate.",
-   "descDe": "8% Chance, zu Beginn jedes Levels 1 falsche leere Zelle zu markieren. Wirkt unabhängig von Fehlersinn und Präzisionsblick. +3% Absorptionsregeneration.",
-   "icon": "❌",
-   "statKey": "small_lesser_error_guidance",
+   "nameEn": "Ignite Chance and Duration",
+   "nameDe": "Entzündungschance und -dauer",
+   "icon": "",
+   "statKey": "small_ignite_chance_and_duration_31374",
+   "effects": [
+    "ignite_duration:15",
+    "ignite_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
    "id": 31375,
    "x": -190,
    "y": -2651,
-   "nameEn": "Lesser Error Guidance",
-   "nameDe": "Fehlerführung (klein)",
-   "descEn": "8% chance to mark 1 incorrect empty cell at the start of each level. Rolls independently from Fault Sensing and Precision Insight. +3% Absorption regen rate.",
-   "descDe": "8% Chance, zu Beginn jedes Levels 1 falsche leere Zelle zu markieren. Wirkt unabhängig von Fehlersinn und Präzisionsblick. +3% Absorptionsregeneration.",
-   "icon": "❌",
-   "statKey": "small_lesser_error_guidance",
+   "nameEn": "Ignite Chance and Duration",
+   "nameDe": "Entzündungschance und -dauer",
+   "icon": "",
+   "statKey": "small_ignite_chance_and_duration_31375",
+   "effects": [
+    "ignite_duration:15",
+    "ignite_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
@@ -24160,7 +24676,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lightning_damage_and_shock_chance_31380",
    "effects": [
-    "lightning_damage_inc_pct:10"
+    "lightning_damage_inc_pct:10",
+    "shock_chance_pct:10"
    ],
    "tier": "small"
   },
@@ -24173,7 +24690,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lightning_damage_and_shock_chance_31381",
    "effects": [
-    "lightning_damage_inc_pct:10"
+    "lightning_damage_inc_pct:10",
+    "shock_chance_pct:10"
    ],
    "tier": "small"
   },
@@ -24186,7 +24704,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lightning_damage_and_shock_chance_31382",
    "effects": [
-    "lightning_damage_inc_pct:10"
+    "lightning_damage_inc_pct:10",
+    "shock_chance_pct:10"
    ],
    "tier": "small"
   },
@@ -24225,7 +24744,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_cold_damage_and_freeze_chance_31385",
    "effects": [
-    "cold_damage_inc_pct:10"
+    "cold_damage_inc_pct:10",
+    "freeze_chance_pct:10"
    ],
    "tier": "small"
   },
@@ -24290,7 +24810,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_cold_damage_and_freeze_chance_31390",
    "effects": [
-    "cold_damage_inc_pct:10"
+    "cold_damage_inc_pct:10",
+    "freeze_chance_pct:15"
    ],
    "tier": "travel"
   },
@@ -24394,24 +24915,26 @@ export const TALENT_TREE_DATA = {
    "id": 31400,
    "x": -21,
    "y": -2269,
-   "nameEn": "Lesser Measure Zero",
-   "nameDe": "Maß Null (klein)",
-   "descEn": "Rows and columns whose solution is completely empty are automatically marked in their entirety at the start of each level. +3% Absorption regen rate.",
-   "descDe": "Reihen und Spalten, deren Lösung komplett leer ist, werden zu Beginn jedes Levels vollständig automatisch markiert. +3% Absorptionsregeneration.",
-   "icon": "∅",
-   "statKey": "small_lesser_measure_zero",
+   "nameEn": "Spell Damage per Power Charge",
+   "nameDe": "Zauberschaden pro Kraftladung",
+   "icon": "",
+   "statKey": "small_spell_damage_per_power_charge_31400",
+   "effects": [
+    "spell_damage_per_power:4"
+   ],
    "tier": "small"
   },
   {
    "id": 31401,
    "x": -21,
    "y": -2171,
-   "nameEn": "Lesser Measure Zero",
-   "nameDe": "Maß Null (klein)",
-   "descEn": "Rows and columns whose solution is completely empty are automatically marked in their entirety at the start of each level. +3% Absorption regen rate.",
-   "descDe": "Reihen und Spalten, deren Lösung komplett leer ist, werden zu Beginn jedes Levels vollständig automatisch markiert. +3% Absorptionsregeneration.",
-   "icon": "∅",
-   "statKey": "small_lesser_measure_zero",
+   "nameEn": "Power Charge Duration",
+   "nameDe": "Dauer der Kraftladungen",
+   "icon": "",
+   "statKey": "small_power_charge_duration_31401",
+   "effects": [
+    "power_duration:20"
+   ],
    "tier": "small"
   },
   {
@@ -24431,30 +24954,41 @@ export const TALENT_TREE_DATA = {
    "id": 31403,
    "x": -118,
    "y": -2130,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Spell Damage and Spell Block",
+   "nameDe": "Stab-Zauberschaden und Zauberblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_31403",
+   "statKey": "small_staff_spell_damage_and_spell_block_31403",
+   "effects": [
+    "spell_damage_inc_pct:10",
+    "staff_spell_block:3"
+   ],
    "tier": "small"
   },
   {
    "id": 31404,
    "x": -89,
    "y": -2061,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Spell Damage",
+   "nameDe": "Stab-Zauberschaden",
    "icon": "",
-   "statKey": "reserved_reserved_node_31404",
+   "statKey": "small_staff_spell_damage_31404",
+   "effects": [
+    "spell_damage_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
    "id": 31405,
    "x": -158,
    "y": -2032,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Staff Spell Damage and Block",
+   "nameDe": "Stab-Zauberschaden und Block",
    "icon": "",
-   "statKey": "reserved_reserved_node_31405",
+   "statKey": "small_staff_spell_damage_and_block_31405",
+   "effects": [
+    "spell_damage_inc_pct:10",
+    "staff_block:3"
+   ],
    "tier": "small"
   },
   {
@@ -24525,10 +25059,13 @@ export const TALENT_TREE_DATA = {
    "id": 31411,
    "x": 396,
    "y": -2052,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wand Damage and Attack Speed",
+   "nameDe": "Zauberstabschaden und Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_31411",
+   "statKey": "small_wand_damage_and_attack_speed_31411",
+   "effects": [
+    "wand_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
@@ -24588,12 +25125,13 @@ export const TALENT_TREE_DATA = {
    "id": 31416,
    "x": 638,
    "y": -1756,
-   "nameEn": "Lesser Socratic Method",
-   "nameDe": "Sokratische Methode (klein)",
-   "descEn": "At the start of each level, there is a 13% chance that one additional cell is revealed. +3% Absorption regen rate.",
-   "descDe": "Zu Beginn jedes Levels besteht eine 13% Chance, dass eine zusätzliche Zelle aufgedeckt wird. +3% Absorptionsregeneration.",
-   "icon": "❓",
-   "statKey": "small_lesser_socratic_method",
+   "nameEn": "Spell Damage Over Time Multiplier",
+   "nameDe": "Zauber-DoT-Multiplikator",
+   "icon": "",
+   "statKey": "small_spell_damage_over_time_multiplier_31416",
+   "effects": [
+    "spell_dot_multi:6"
+   ],
    "tier": "small"
   },
   {
@@ -24623,36 +25161,39 @@ export const TALENT_TREE_DATA = {
    "id": 31419,
    "x": 918,
    "y": -2193,
-   "nameEn": "Lesser Runic Warding",
-   "nameDe": "Runenbeschwörung (klein)",
-   "descEn": "+8% Absorption regen rate, +5 maximum Mana.",
-   "descDe": "+8% Absorptionsregeneration, +5 max. Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_runic_warding",
+   "nameEn": "Ignite Chance",
+   "nameDe": "Entzündungschance",
+   "icon": "",
+   "statKey": "small_ignite_chance_31419",
+   "effects": [
+    "ignite_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
    "id": 31420,
    "x": 958,
    "y": -2193,
-   "nameEn": "Lesser Runic Warding",
-   "nameDe": "Runenbeschwörung (klein)",
-   "descEn": "+8% Absorption regen rate, +5 maximum Mana.",
-   "descDe": "+8% Absorptionsregeneration, +5 max. Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_runic_warding",
+   "nameEn": "Faster Ignite",
+   "nameDe": "Schnelleres Entzünden",
+   "icon": "",
+   "statKey": "small_faster_ignite_31420",
+   "effects": [
+    "ignite_faster:5"
+   ],
    "tier": "small"
   },
   {
    "id": 31421,
    "x": 918,
    "y": -2291,
-   "nameEn": "Lesser Runic Warding",
-   "nameDe": "Runenbeschwörung (klein)",
-   "descEn": "+8% Absorption regen rate, +5 maximum Mana.",
-   "descDe": "+8% Absorptionsregeneration, +5 max. Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_runic_warding",
+   "nameEn": "Ignite Chance",
+   "nameDe": "Entzündungschance",
+   "icon": "",
+   "statKey": "small_ignite_chance_31421",
+   "effects": [
+    "ignite_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
@@ -24862,48 +25403,52 @@ export const TALENT_TREE_DATA = {
    "id": 31439,
    "x": -1460,
    "y": -2227,
-   "nameEn": "Lesser Chain Revelation",
-   "nameDe": "Kettenenthüllung (klein)",
-   "descEn": "Covariance Shift now reveals one more random correctly filled cell in the same row or column. Stacks with Lucky Echo. +3% Absorption regen rate.",
-   "descDe": "Kovarianz-Verschiebung kann nun eine weitere zufällige korrekt gefüllte Zelle in derselben Zeile oder Spalte aufdecken. Wirkt zusammen mit Glücksecho. +3% Absorptionsregeneration.",
-   "icon": "↔️",
-   "statKey": "small_lesser_chain_revelation",
+   "nameEn": "Block Recovery and Energy Shield",
+   "nameDe": "Blockerholung und Absorption",
+   "icon": "",
+   "statKey": "small_block_recovery_and_energy_shield_31439",
+   "effects": [
+    "block_recovery:50"
+   ],
    "tier": "small"
   },
   {
    "id": 31440,
    "x": -1391,
    "y": -2198,
-   "nameEn": "Lesser Chain Revelation",
-   "nameDe": "Kettenenthüllung (klein)",
-   "descEn": "Covariance Shift now reveals one more random correctly filled cell in the same row or column. Stacks with Lucky Echo. +3% Absorption regen rate.",
-   "descDe": "Kovarianz-Verschiebung kann nun eine weitere zufällige korrekt gefüllte Zelle in derselben Zeile oder Spalte aufdecken. Wirkt zusammen mit Glücksecho. +3% Absorptionsregeneration.",
-   "icon": "↔️",
-   "statKey": "small_lesser_chain_revelation",
+   "nameEn": "Absorption from Shield",
+   "nameDe": "Absorption vom Schild",
+   "icon": "",
+   "statKey": "small_absorption_from_shield_31440",
+   "effects": [
+    "shield_absorption_inc:30"
+   ],
    "tier": "small"
   },
   {
    "id": 31441,
    "x": -1391,
    "y": -2158,
-   "nameEn": "Lesser Chain Revelation",
-   "nameDe": "Kettenenthüllung (klein)",
-   "descEn": "Covariance Shift now reveals one more random correctly filled cell in the same row or column. Stacks with Lucky Echo. +3% Absorption regen rate.",
-   "descDe": "Kovarianz-Verschiebung kann nun eine weitere zufällige korrekt gefüllte Zelle in derselben Zeile oder Spalte aufdecken. Wirkt zusammen mit Glücksecho. +3% Absorptionsregeneration.",
-   "icon": "↔️",
-   "statKey": "small_lesser_chain_revelation",
+   "nameEn": "Shield Spell Block",
+   "nameDe": "Schild-Zauberblock",
+   "icon": "",
+   "statKey": "small_shield_spell_block_31441",
+   "effects": [
+    "shield_spell_block:4"
+   ],
    "tier": "small"
   },
   {
    "id": 31442,
    "x": -1440,
    "y": -2125,
-   "nameEn": "Lesser Chain Revelation",
-   "nameDe": "Kettenenthüllung (klein)",
-   "descEn": "Covariance Shift now reveals one more random correctly filled cell in the same row or column. Stacks with Lucky Echo. +3% Absorption regen rate.",
-   "descDe": "Kovarianz-Verschiebung kann nun eine weitere zufällige korrekt gefüllte Zelle in derselben Zeile oder Spalte aufdecken. Wirkt zusammen mit Glücksecho. +3% Absorptionsregeneration.",
-   "icon": "↔️",
-   "statKey": "small_lesser_chain_revelation",
+   "nameEn": "Shield Spell Block",
+   "nameDe": "Schild-Zauberblock",
+   "icon": "",
+   "statKey": "small_shield_spell_block_31442",
+   "effects": [
+    "shield_spell_block:4"
+   ],
    "tier": "small"
   },
   {
@@ -24963,12 +25508,13 @@ export const TALENT_TREE_DATA = {
    "id": 31447,
    "x": -1656,
    "y": -1515,
-   "nameEn": "Lesser Elemental Focus",
-   "nameDe": "Elementarfokus (klein)",
-   "descEn": "+10% Elemental damage, -5% Absorption regeneration rate.",
-   "descDe": "+10% Elementarschaden, -5% Absorptionsregeneration.",
-   "icon": "◆",
-   "statKey": "small_lesser_elemental_focus",
+   "nameEn": "Stun Recovery",
+   "nameDe": "Betäubungserholung",
+   "icon": "",
+   "statKey": "small_stun_recovery_31447",
+   "effects": [
+    "block_recovery:15"
+   ],
    "tier": "small"
   },
   {
@@ -24993,7 +25539,9 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_spell_block_and_elemental_resistances_31449",
    "effects": [
-    "all_elemental_resist:4"
+    "all_elemental_resist:4",
+    "staff_spell_block:3",
+    "shield_spell_block:3"
    ],
    "tier": "small"
   },
@@ -25001,20 +25549,28 @@ export const TALENT_TREE_DATA = {
    "id": 31450,
    "x": -1867,
    "y": -1517,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spell Block",
+   "nameDe": "Zauberblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_31450",
+   "statKey": "small_spell_block_31450",
+   "effects": [
+    "staff_spell_block:3",
+    "shield_spell_block:3"
+   ],
    "tier": "small"
   },
   {
    "id": 31451,
    "x": -1907,
    "y": -1517,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spell Block",
+   "nameDe": "Zauberblock",
    "icon": "",
-   "statKey": "reserved_reserved_node_31451",
+   "statKey": "small_spell_block_31451",
+   "effects": [
+    "staff_spell_block:4",
+    "shield_spell_block:4"
+   ],
    "tier": "small"
   },
   {
@@ -25026,7 +25582,9 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_spell_block_and_elemental_resistances_31452",
    "effects": [
-    "all_elemental_resist:4"
+    "all_elemental_resist:4",
+    "staff_spell_block:3",
+    "shield_spell_block:3"
    ],
    "tier": "small"
   },
@@ -25054,12 +25612,13 @@ export const TALENT_TREE_DATA = {
    "id": 31455,
    "x": -1603,
    "y": -1462,
-   "nameEn": "Lesser Elemental Focus",
-   "nameDe": "Elementarfokus (klein)",
-   "descEn": "+10% Elemental damage, -5% Absorption regeneration rate.",
-   "descDe": "+10% Elementarschaden, -5% Absorptionsregeneration.",
-   "icon": "◆",
-   "statKey": "small_lesser_elemental_focus",
+   "nameEn": "Stun Recovery",
+   "nameDe": "Betäubungserholung",
+   "icon": "",
+   "statKey": "small_stun_recovery_31455",
+   "effects": [
+    "block_recovery:15"
+   ],
    "tier": "small"
   },
   {

@@ -23,7 +23,7 @@ import { EG_BLOCK_LOCKOUT_BASE_MS } from './encounter-constants.js';
 import { _egGameOver } from './encounter-kills.js';
 import { _egApplyPlayerBlockFeedback, _egApplyPlayerMissFeedback, _egShowBlockLockoutOverlay } from './encounter-monster-attack-feedback.js';
 import { _egDamageTargetById } from './encounter-monster-damage.js';
-import { _egRageOnPlayerHit } from './combat-ailments-state.js';
+import { EG_FORTIFY_DR_PER_STACK, _egArmRiposte, _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainPowerCharge, _egGetFortifyStacks, _egRageOnPlayerHit } from './combat-ailments-state.js';
 import { _egApplyPlayerParryFeedback, _egGetDualWieldParryChancePct, _egGetParryChancePct, _egIsDualWieldParryActive, _egRollFateNegation, _egTryDeflectProjectile } from './encounter-player-mitigation.js';
 import { _egGetEncounterBaseLevel } from './encounter-spawn-rules.js';
 import { _egApplyPlayerShockAmp, _egRollMonsterHitAilment } from './combat-ailments-core.js';
@@ -116,7 +116,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     const stats = _egComputePlayerStats();
 
     // Rage: being hit restarts the grace timer before it starts fading.
-    _egRageOnPlayerHit();
+    _egRageOnPlayerHit(Number(stats.rageWhenHitAmount) || 0, Number(stats.rageMax) || 0);
 
     // Charging a melee hold roots the hero: no evasion, no shield block,
     // and every landed hit is amplified (see
@@ -175,6 +175,8 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
                 globalThis.showToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
                 _egApplyPlayerParryFeedback();
                 _egScheduleAbsorptionRegen();
+                // Sword identity: a successful Parry readies a riposte strike.
+                if (stats.isSwordEquipped) _egArmRiposte(stats.riposteDurationPct);
                 if (isProjectile && attacker) _egTryDeflectProjectile(attacker, true);
                 return 0;
             }
@@ -195,6 +197,22 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         }
     }
 
+    // Blind (player hits): a blinded attacker misses 50% of the time (scaled by
+    // the Blind Effect line). Spells, hazards and boss abilities are unaffected.
+    if (!isSpell && !isBossAbility && !chargingMelee && opts && opts.attacker && opts.attacker.id != null) {
+        const blindAttacker = (globalThis._egMonsters || []).find(m => m.id === opts.attacker.id);
+        const blindSt = blindAttacker && blindAttacker.statuses && blindAttacker.statuses.blind;
+        if (blindSt && blindSt.until > Date.now()) {
+            const missPct = Math.min(90, 50 * (1 + (Number(blindSt.effectPct) || 0) / 100));
+            if (Math.random() * 100 < missPct) {
+                globalThis.showToast(t('eg_blind_miss'));
+                _egApplyPlayerMissFeedback();
+                _egScheduleAbsorptionRegen();
+                return 0;
+            }
+        }
+    }
+
     // Evasion only applies to physical attacks (melee strikes and monster
     // projectiles) - spells, environmental hazards and boss special abilities
     // cannot be dodged. Neither can a hero rooted mid overcharge-charge.
@@ -211,6 +229,14 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
             _egScheduleAbsorptionRegen();
             return 0;
         }
+    }
+
+    // Aspect of Stone (tree): chance to avoid physical damage from hits.
+    if (!isSpell && !isBossAbility && !chargingMelee && (Number(stats.avoidPhysHitPct) || 0) > 0
+        && (!element || element === 'physical') && Math.random() * 100 < Math.min(75, stats.avoidPhysHitPct)) {
+        globalThis.showToast(t('eg_dodged'));
+        _egScheduleAbsorptionRegen();
+        return 0;
     }
 
     // Block roll: attacks use block chance, spells use spell block chance.
@@ -233,7 +259,11 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // chance that needs a shield specifically (dual-wielding alone is not
     // enough), stacked on the shared tree bucket.
     const treeBlock = (((hasShieldEquipped || dualWielding) && !isSpell ? stats.blockChanceTree : 0) || 0)
-        + ((hasShieldEquipped && !isSpell ? stats.blockChanceShieldPct : 0) || 0);
+        + ((hasShieldEquipped && !isSpell ? stats.blockChanceShieldPct : 0) || 0)
+        + ((dualWielding && !isSpell ? stats.dualBlockPct : 0) || 0)
+        + ((stats.isStaffEquipped ? (isSpell ? stats.staffSpellBlockPct : stats.staffBlockPct) : 0) || 0)
+        + ((hasShieldEquipped && isSpell ? stats.shieldSpellBlockPct : 0) || 0)
+        + ((isSpell ? stats.spellBlockFlat : 0) || 0);
     const blockChance = (!isBossAbility && !isBlockLockedOut && (hasShieldEquipped || treeBlock > 0) && !chargingMelee)
         ? Math.min(75, (isSpell ? stats.spellBlockChance : stats.blockChance) + treeBlock)
         : 0;
@@ -241,6 +271,16 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         // Timestamp for the tree's timed armour pulse (reworked node 337):
         // _egComputePlayerStats grants the bonus while this is under 10s old.
         globalThis._egLastBlockAt = Date.now();
+        // Phase B: charges gained on a successful block.
+        if ((stats.powerOnBlockPct || 0) > 0 && Math.random() * 100 < Math.min(100, stats.powerOnBlockPct)) {
+            _egGainPowerCharge(stats.powerChargesMax, stats.powerDurationPct);
+        }
+        if ((stats.frenzyOnBlockPct || 0) > 0 && Math.random() * 100 < Math.min(100, stats.frenzyOnBlockPct)) {
+            _egGainFrenzyCharge(stats.frenzyChargesMax, stats.frenzyDurationPct);
+        }
+        if ((stats.enduranceOnBlockPct || 0) > 0 && Math.random() * 100 < Math.min(100, stats.enduranceOnBlockPct)) {
+            _egGainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
+        }
         globalThis.showToast(t('eg_blocked'));
         _egApplyPlayerBlockFeedback();
         _egScheduleAbsorptionRegen();
@@ -318,11 +358,22 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         effectiveArmour = Math.round(effectiveArmour * (1 + support.armourPct / 100));
     }
 
+    // Persistence (tree): flat physical damage taken from hits is reduced.
+    if (!isSpell && (Number(stats.physTakenFlat) || 0) > 0 && (!element || element === 'physical')) {
+        amount = Math.max(1, amount - stats.physTakenFlat);
+    }
     let mitigated = _egCalcArmourMitigation(amount, effectiveArmour);
 
     // Bulwark - flat percentage damage reduction, applied AFTER armour and
     // BEFORE the absorption shield so a Bulwark also stretches the shield.
     if (support) mitigated = _uspApplySupportMitigation(mitigated);
+
+    // Fortification: each live stack takes a share of the damage away.
+    const fortifyStacks = _egGetFortifyStacks();
+    if (fortifyStacks > 0) {
+        const drPct = Math.min(40, fortifyStacks * EG_FORTIFY_DR_PER_STACK * (1 + (Number(stats.fortifyEffectIncPct) || 0) / 100));
+        mitigated *= 1 - drPct / 100;
+    }
 
     if (globalThis._egPlayerAbsorptionCurrent > 0) {
         const prevAbs = globalThis._egPlayerAbsorptionCurrent;
@@ -339,6 +390,10 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (mitigated <= 0) return 0;
 
     globalThis.playerCurrentHP = Math.max(0, globalThis.playerCurrentHP - mitigated);
+    globalThis._egLastHitTakenAt = Date.now();
+    if ((Number(stats.enduranceWhenHitPct) || 0) > 0 && Math.random() * 100 < Math.min(100, stats.enduranceWhenHitPct)) {
+        _egGainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
+    }
 
     // Life Recoup (passive tree): a share of the Life damage taken is paid
     // back over ~4s by _egTickLifeRegen. The pool belongs to one encounter.

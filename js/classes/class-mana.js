@@ -46,6 +46,8 @@ export function _scaleAbilityManaCost(cost) {
     let scaled = cost * mult * MANA_COST_GLOBAL_MULT;
     // "% increased Cost of all spells" (passive tree, Blood Magic keystone).
     scaled *= 1 + _treeChannel('spellCostIncPct') / 100;
+    // Cost Efficiency (passive tree): cost / (1 + efficiency).
+    scaled /= 1 + Math.max(0, _treeChannel('costEfficiencyPct')) / 100;
     if (typeof globalThis._egGetActiveMapModValue === 'function') {
         const costPct = globalThis._egGetActiveMapModValue('map_mana_costs');
         if (costPct > 0) scaled *= (1 + costPct / 100);

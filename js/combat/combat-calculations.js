@@ -3,7 +3,9 @@ import { _egMapPlayerDamageMult, _egMapPlayerMeleeMult } from '../endgame/endgam
 import { EG_PLAYER_STATS, _egComputePlayerStats, _egRollCrit } from '../endgame/endgame-player-stats.js';
 import { _egQuizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
 import { EG_PLAYER_MELEE_DAMAGE } from './combat-state.js';
-import { _egApplyDamageConversion, _egLeechAbsorption, _egLeechHealMult, _egRollElementalBreakdown, _egScaleElements } from './combat-calculations-resistances.js';
+import { EG_RIPOSTE_BASE_MORE_PCT, _egConsumeRiposte } from './combat-ailments-state.js';
+import { _egGetTarget } from './encounter-charged-shot.js';
+import { _egApplyDamageConversion, _egLeechAbsorption, _egLeechHealMult, _egLeechMana, _egRollElementalBreakdown, _egScaleElements } from './combat-calculations-resistances.js';
 
 //------------------------------------------------------------------------
 //-------------------PLAYER DAMAGE CALCULATION----------------------------
@@ -73,6 +75,7 @@ export function _egCalcPlayerDamage() {
 
     if (critMult > 1 && typeof showToast === 'function') globalThis.showToast('💥 Critical Hit!');
 
+    if ((stats.manaLeechAttackPct || 0) > 0) _egLeechMana(stats, dmg, stats.manaLeechAttackPct);
     // Life leech - heal the player for a % of the damage about to be dealt.
     if (stats.lifeLeechPct > 0 && (stats.lifeLeechAsAbsorption || 0) > 0) {
         // Ghost Reaver keystone: the leech refills Absorption instead.
@@ -133,7 +136,9 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
         // matching family of the equipped weapon.
         const familyIncPct = stats.isSwordEquipped ? (stats.meleePhysSwordIncPct || 0)
             : stats.isAxeEquipped ? (stats.meleePhysAxeIncPct || 0)
-            : stats.isMaceEquipped ? (stats.meleePhysMaceIncPct || 0) : 0;
+            : stats.isMaceEquipped ? (stats.meleePhysMaceIncPct || 0)
+            : stats.isStaffEquipped ? (stats.staffDamageIncPct || 0)
+            : stats.isWandEquipped ? (stats.wandDamageIncPct || 0) : 0;
         dmg *= (1 + familyIncPct / 100);
         // Rage (axe notable 369): each Rage is a "more" step on melee damage.
         if ((stats.rage || 0) > 0) dmg *= 1 + (stats.rage * (stats.rageMeleeMorePct || 0)) / 100;
@@ -170,6 +175,11 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // Generic "% increased Damage" (passive tree) over the whole melee hit.
     dmg *= 1 + (stats.damageIncPct || 0) / 100;
 
+    // Sword riposte: the strike after a successful Parry deals more damage.
+    if (stats.isSwordEquipped && charge >= 0.5 && _egConsumeRiposte()) {
+        dmg *= 1 + (EG_RIPOSTE_BASE_MORE_PCT + (stats.riposteDamagePct || 0)) / 100;
+    }
+
     // "% increased Damage with Daggers" (passive tree) over the whole hit.
     if (stats.isDaggerEquipped) dmg *= 1 + (stats.daggerDamageIncPct || 0) / 100;
 
@@ -178,10 +188,39 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // The tree's generic melee crit line applies to every melee strike.
     const daggerMultiPct = stats.isDaggerEquipped ? (stats.critMultiplierDaggerPct || 0) : 0;
     const daggerChancePct = stats.isDaggerEquipped ? (stats.critChanceDaggerPct || 0) : 0;
-    const maceBonus = (stats.isMaceEquipped || stats.critChanceMeleePct || daggerMultiPct || daggerChancePct)
+    // Sword / Axe / Staff / Wand crit lines (PoE-port phase A), same scoping.
+    const famChancePct = stats.isSwordEquipped ? (stats.critChanceSwordPct || 0)
+        : stats.isAxeEquipped ? (stats.critChanceAxePct || 0)
+        : stats.isStaffEquipped ? (stats.critChanceStaffPct || 0)
+        : stats.isWandEquipped ? (stats.critChanceWandPct || 0) : 0;
+    const famMultiPct = stats.isSwordEquipped ? (stats.critMultiplierSwordPct || 0)
+        : stats.isAxeEquipped ? (stats.critMultiplierAxePct || 0)
+        : stats.isStaffEquipped ? (stats.critMultiplierStaffPct || 0)
+        : stats.isWandEquipped ? (stats.critMultiplierWandPct || 0) : 0;
+    // Crit chance against Blinded enemies (Blind batch).
+    let blindCritPct = 0;
+    if ((stats.critChanceVsBlindedPct || 0) > 0) {
+        const blindTarget = _egGetTarget();
+        const bl = blindTarget && blindTarget.statuses && blindTarget.statuses.blind;
+        if (bl && bl.until > Date.now()) blindCritPct = stats.critChanceVsBlindedPct;
+    }
+    // Crit against Shocked / Bleeding enemies (Phase C-1).
+    let statusCritPct = 0;
+    let statusCritMultiPct = 0;
+    if ((stats.critVsShockedPct || 0) > 0 || (stats.critVsBleedingPct || 0) > 0 || (stats.critMultiVsBleedingPct || 0) > 0) {
+        const stTarget = _egGetTarget();
+        const sts = stTarget && stTarget.statuses;
+        const now = Date.now();
+        if (sts && sts.shocked && sts.shocked.until > now) statusCritPct += stats.critVsShockedPct || 0;
+        if (sts && sts.bleed && sts.bleed.until > now) {
+            statusCritPct += stats.critVsBleedingPct || 0;
+            statusCritMultiPct += stats.critMultiVsBleedingPct || 0;
+        }
+    }
+    const maceBonus = (stats.isMaceEquipped || stats.critChanceMeleePct || daggerMultiPct || daggerChancePct || famChancePct || famMultiPct || blindCritPct || statusCritPct || statusCritMultiPct)
         ? {
-            chance: (stats.critChanceMeleePct || 0) + (stats.isMaceEquipped ? (stats.critChanceMeleeMacePct || 0) : 0) + daggerChancePct,
-            multiplierPct: (stats.isMaceEquipped ? (stats.critMultiplierMeleeMacePct || 0) : 0) + daggerMultiPct,
+            chance: (stats.critChanceMeleePct || 0) + (stats.isMaceEquipped ? (stats.critChanceMeleeMacePct || 0) : 0) + daggerChancePct + famChancePct + blindCritPct + statusCritPct,
+            multiplierPct: (stats.isMaceEquipped ? (stats.critMultiplierMeleeMacePct || 0) : 0) + daggerMultiPct + famMultiPct + statusCritMultiPct,
         }
         : null;
     const critMult = _egRollCrit(stats, maceBonus);
@@ -208,6 +247,7 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
 
     // Life leech - heal the player for a % of the damage about to be dealt.
     // Melee strikes also add the tree's melee-only leech (lifeLeechMeleePct).
+    if ((stats.manaLeechAttackPct || 0) > 0) _egLeechMana(stats, dmg, stats.manaLeechAttackPct);
     const meleeLeechPct = (Number(stats.lifeLeechPct) || 0) + (Number(stats.lifeLeechMeleePct) || 0);
     if (meleeLeechPct > 0 && (stats.lifeLeechAsAbsorption || 0) > 0) {
         _egLeechAbsorption(stats, dmg, meleeLeechPct);

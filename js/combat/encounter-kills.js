@@ -33,7 +33,7 @@ import { _egMapKillRecoveryMult } from '../endgame/endgame-map-launch.js';
 
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive, _egIsCampaignRun } from './combat-state.js';
-import { _egGainEnduranceCharge } from './combat-ailments-state.js';
+import { _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainOnslaught, _egGainPowerCharge } from './combat-ailments-state.js';
 import { _egHandleBossKill, _egHandleNormalMonsterKill } from './encounter-kill-rewards.js';
 
 
@@ -129,6 +129,20 @@ export function _egKillMonster(monsterId) {
         if (killStats.isShieldEquipped && (killStats.enduranceOnKillShieldPct || 0) > 0
             && Math.random() * 100 < killStats.enduranceOnKillShieldPct) {
             _egGainEnduranceCharge(killStats.enduranceChargesMax, killStats.enduranceDurationPct);
+        }
+        globalThis._egLastKillAt = Date.now();
+        if ((killStats.onslaughtOnKillPct || 0) > 0 && Math.random() * 100 < Math.min(100, killStats.onslaughtOnKillPct)) {
+            _egGainOnslaught();
+        }
+        if ((killStats.enduranceOnKillPct || 0) > 0 && Math.random() * 100 < Math.min(100, killStats.enduranceOnKillPct)) {
+            _egGainEnduranceCharge(killStats.enduranceChargesMax, killStats.enduranceDurationPct);
+        }
+        // Phase B: Power / Frenzy charges on kill.
+        if ((killStats.powerOnKillPct || 0) > 0 && Math.random() * 100 < Math.min(100, killStats.powerOnKillPct)) {
+            _egGainPowerCharge(killStats.powerChargesMax, killStats.powerDurationPct);
+        }
+        if ((killStats.frenzyOnKillPct || 0) > 0 && Math.random() * 100 < Math.min(100, killStats.frenzyOnKillPct)) {
+            _egGainFrenzyCharge(killStats.frenzyChargesMax, killStats.frenzyDurationPct);
         }
 
         if (typeof gainMana === 'function' && globalThis.playerMaxMana > 0 && (killStats.manaOnKill || 0) > 0) {

@@ -56,7 +56,14 @@ export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1
     // Same for "as extra Shadow" (node 20218): extra, taken from physical,
     // scaled by the shadow increase; dropped under fire-only like any shadow.
     const extraShadowPct = Math.max(0, Number(stats && stats.physAsExtraShadowPct) || 0);
-    if (share <= 0 && !fireOnly && extraPct <= 0 && extraShadowPct <= 0) return { physical, elements: el };
+    // Extra cold / lightning (PoE-port phase A): same shape, scaled by the
+    // element's own increases; dropped under fire-only like any non-fire part.
+    const extraColdPct = Math.max(0, Number(stats && stats.physAsExtraColdPct) || 0);
+    const extraLightningPct = Math.max(0, Number(stats && stats.physAsExtraLightningPct) || 0);
+    const elemInc = 1 + Math.max(0, Number(stats && stats.elementalDamageIncPct) || 0) / 100;
+    const coldMult = elemInc * (1 + Math.max(0, Number(stats && stats.coldDamageIncPct) || 0) / 100);
+    const lightningMult = elemInc * (1 + Math.max(0, Number(stats && stats.lightningDamageIncPct) || 0) / 100);
+    if (share <= 0 && !fireOnly && extraPct <= 0 && extraShadowPct <= 0 && extraColdPct <= 0 && extraLightningPct <= 0) return { physical, elements: el };
     const keep = fireOnly ? 0 : 1 - share;
     const phys = physical || 0;
     const cold = el.cold || 0;
@@ -65,8 +72,8 @@ export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1
         physical: phys * keep,
         elements: {
             fire: (el.fire || 0) + share * (phys + cold + lightning) + (phys * extraPct / 100) * fireMult,
-            cold: cold * keep,
-            lightning: lightning * keep,
+            cold: cold * keep + (fireOnly ? 0 : (phys * extraColdPct / 100) * coldMult),
+            lightning: lightning * keep + (fireOnly ? 0 : (phys * extraLightningPct / 100) * lightningMult),
             shadow: fireOnly ? 0 : (el.shadow || 0)
                 + (phys * extraShadowPct / 100) * (1 + Math.max(0, Number(stats && stats.shadowDamageIncPct) || 0) / 100),
         },
@@ -123,6 +130,19 @@ export function _egLeechAbsorption(stats, dmg, pct) {
     return whole;
 }
 
+// Mana leech (tree, attack hits): `pct` of the hit's damage becomes Mana, scaled by the
+// leech-effect line. Sub-point amounts accumulate like the Absorption leech.
+let _manaLeechRemainder = 0;
+export function _egLeechMana(stats, dmg, pct) {
+    if (!(pct > 0) || !(dmg > 0) || typeof globalThis.gainMana !== 'function' || !(globalThis.playerMaxMana > 0)) return 0;
+    const effect = 1 + Math.max(0, Number(stats && stats.manaLeechEffectPct) || 0) / 100;
+    const raw = dmg * (pct / 100) * effect + _manaLeechRemainder;
+    const whole = Math.floor(raw);
+    _manaLeechRemainder = raw - whole;
+    if (whole > 0) globalThis.gainMana(whole);
+    return whole;
+}
+
 // Applies the target monster's elemental resistances to an incoming hit.
 // `elements` maps each element to the raw elemental damage carried by the hit
 // (proportional to `amount`); everything else counts as physical. Positive
@@ -168,7 +188,10 @@ export function _egApplyTargetResistances(amount, target, elements, opts) {
             EG_ELEMENTS.forEach(el => {
                 const part = (elements[el] || 0) * factor;
                 if (part <= 0) return;
-                mitigated += part * (1 - clampRes(res[el]) / 100);
+                // Penetration (opts.penetration, PoE-port phase A) lowers the
+                // monster's resistance for this hit only.
+                const penV = (opts && opts.penetration && opts.penetration[el]) || 0;
+                mitigated += part * (1 - clampRes((Number(res[el]) || 0) - penV) / 100);
             });
             physical = amount - elemTotal;
             elemental = mitigated;

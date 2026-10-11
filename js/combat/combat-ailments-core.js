@@ -8,7 +8,7 @@ import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
 import { EG_CRUSH_DURATION_S, _egAilmentDamageMult } from './combat-calculations-resistances.js';
-import { _egAddGroundFireAcc, _egGroundFireAcc, _egPlayerStatuses, _egPuzzleEffects, _egPlayerStatusBarTicker, _egReplacePuzzleEffects, _egSetPlayerStatusBarTicker } from './combat-ailments-state.js';
+import { _egGainEnduranceCharge, _egGainPowerCharge, _egAddGroundFireAcc, _egGroundFireAcc, _egPlayerStatuses, _egPuzzleEffects, _egPlayerStatusBarTicker, _egReplacePuzzleEffects, _egSetPlayerStatusBarTicker } from './combat-ailments-state.js';
 
 //------------------------------------------------------------------------
 //-------------------ELEMENTAL AILMENTS SYSTEM----------------------------
@@ -74,6 +74,7 @@ const EG_AIL_POLYMORPH_DURATION_S = 6;  // legacy conversion status
 const EG_AIL_SHADOW_DURATION_S = 6;
 const EG_AIL_BLIND_HIT_CHANCE = 0.7;
 const EG_AIL_CONFUSION_DURATION_S = 6;
+const EG_AIL_BLIND_DURATION_S = 4;           // monster blinded by the player's hits
 const EG_AIL_CONFUSION_SELF_HIT_CHANCE = 0.08;
 const EG_AIL_PLAYER_FIRE_DROP_INTERVAL_MS = 1000;
 const EG_AIL_PLAYER_GROUND_DURATION_MS = 5000;
@@ -104,6 +105,7 @@ const EG_AILMENT_ICONS = {
     shadow: '☁️',
     polymorph: '🌀',
     confused: '❓',
+    blind: '🕶️',
 };
 
 // The display name of an ailment. Only shadowburn needs the mapping (it is
@@ -158,6 +160,7 @@ function _egApplyMonsterAilment(monster, key, dps) {
         shadow: EG_AIL_SHADOW_DURATION_S,
         polymorph: EG_AIL_POLYMORPH_DURATION_S,
         confused: EG_AIL_CONFUSION_DURATION_S,
+        blind: EG_AIL_BLIND_DURATION_S,
     })[key];
     if (!durationS) return;
     // Passive tree: per-ailment duration for YOUR ailments on enemies
@@ -169,10 +172,21 @@ function _egApplyMonsterAilment(monster, key, dps) {
         try {
             const ps = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : {};
             pct = Number(key === 'ignite' ? ps.igniteDurationPct : key === 'poison' ? ps.poisonDurationPct : ps.bleedDurationPct) || 0;
-            if (key === 'bleed') bleedSpeedPct = Math.max(0, Number(ps.bleedSpeedPct) || 0);
+            bleedSpeedPct = Math.max(0, (key === 'bleed' ? Number(ps.bleedSpeedPct) || 0 : 0)
+                + (Number(ps.dotFasterPct) || 0) + (key === 'ignite' ? Number(ps.igniteFasterPct) || 0 : 0));
         } catch (e) { pct = 0; }
         if (pct > 0) durationS = durationS * (1 + pct / 100);
     }
+    // Phase C-1: Shock / Chill / Freeze / Blind durations (tree lines).
+    if (key === 'shocked' || key === 'chill' || key === 'frozen' || key === 'blind') {
+        try {
+            const px = _egComputePlayerStats();
+            const extra = key === 'shocked' ? px.shockDurationPct : key === 'chill' ? px.chillDurationPct
+                : key === 'frozen' ? (Number(px.chillDurationPct) || 0) + (Number(px.freezeDurationPct) || 0) : px.blindDurationPct;
+            if ((Number(extra) || 0) > 0) durationS *= 1 + extra / 100;
+        } catch (e) { /* base duration */ }
+    }
+    if (key === 'shocked') globalThis._egLastShockAt = Date.now();
     // "More Damage" multipliers (nodes 30355/95 ignite, 30306/30309 bleed):
     // scale the stored damage-per-second once, when the ailment is applied.
     if (dps > 0 && (key === 'ignite' || key === 'bleed' || key === 'poison')) {
@@ -218,6 +232,11 @@ function _egApplyPlayerAilment(key, dps) {
     const playerStats = typeof _egComputePlayerStats === 'function' ? _egComputePlayerStats() : {};
     const durationPct = Math.max(0, playerStats.ailmentDurationPct || 0);
     if (durationPct > 0) scaled *= 1 + durationPct / 100;
+    // Tree: reduced ailment duration on you (all / ignite / freeze).
+    const takenRed = (Number(playerStats.ailmentDurationTakenPct) || 0)
+        + (key === 'ignite' ? Number(playerStats.igniteDurationTakenPct) || 0 : 0)
+        + (key === 'frozen' ? Number(playerStats.freezeDurationTakenPct) || 0 : 0);
+    if (takenRed > 0) scaled *= Math.max(0.1, 1 - Math.min(90, takenRed) / 100);
     _egApplyStatusToMap(_egPlayerStatuses, key, scaled, dps);
     _egStartPlayerStatusBarTicker();
     _egShowPlayerAilmentOverlay(key);
@@ -333,7 +352,11 @@ function _egGetPlayerChargeMultiplier() {
     if (typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_chilling_aura')) {
         return EG_AIL_CHARGE_SLOW_MULT;
     }
-    if (_egPlayerHasAilment('chill')) return EG_AIL_CHARGE_SLOW_MULT;
+    if (_egPlayerHasAilment('chill')) {
+        let red = 0;
+        try { const ps = _egComputePlayerStats(); red = (Number(ps.chillEffectTakenPct) || 0) + (Number(ps.chillShockTakenPct) || 0); } catch (e) { red = 0; }
+        return 1 - (1 - EG_AIL_CHARGE_SLOW_MULT) * Math.max(0, 1 - Math.min(90, red) / 100);
+    }
     return 1;
 }
 
@@ -349,7 +372,7 @@ function _egGetMonsterChargeMultiplier(m) {
     } else if (_egHasStatus(m.statuses, 'chill')) {
         // Passive tree "increased Effect of Chill": a stronger slow on enemies.
         let eff = 0;
-        try { eff = Math.max(0, Number(_egComputePlayerStats().chillEffectIncPct) || 0); } catch (e) { eff = 0; }
+        try { const ps = _egComputePlayerStats(); eff = Math.max(0, (Number(ps.chillEffectIncPct) || 0) + (Number(ps.ailmentEffectTreePct) || 0)); } catch (e) { eff = 0; }
         mult = Math.max(0.1, 1 - (1 - EG_AIL_CHARGE_SLOW_MULT) * (1 + eff / 100));
     }
     if (mult > 0 && typeof _egBossFeedChargeMult === 'function') {
@@ -362,7 +385,9 @@ function _egGetMonsterChargeMultiplier(m) {
 // +shock damage-taken amplification for a MONSTER target.
 function _egApplyAilmentShockAmpOnMonster(target, amount) {
     if (!target || !target.statuses || !_egHasStatus(target.statuses, 'shocked')) return amount;
-    return amount * (1 + EG_AIL_SHOCK_AMP_PCT / 100);
+    let eff = 0;
+    try { const ps = _egComputePlayerStats(); eff = (Number(ps.shockEffectPct) || 0) + (Number(ps.ailmentEffectTreePct) || 0); } catch (e) { eff = 0; }
+    return amount * (1 + EG_AIL_SHOCK_AMP_PCT * (1 + Math.max(0, eff) / 100) / 100);
 }
 
 // +shock damage-taken amplification for the PLAYER.
@@ -373,7 +398,9 @@ function _egPlayerHitChanceMultiplier() {
 function _egApplyPlayerShockAmp(amount) {
     if (!_egIsActive()) return amount;
     if (!_egPlayerHasAilment('shocked')) return amount;
-    return amount * (1 + EG_AIL_SHOCK_AMP_PCT / 100);
+    let red = 0;
+    try { const ps = _egComputePlayerStats(); red = (Number(ps.shockEffectTakenPct) || 0) + (Number(ps.chillShockTakenPct) || 0); } catch (e) { red = 0; }
+    return amount * (1 + EG_AIL_SHOCK_AMP_PCT * Math.max(0, 1 - Math.min(90, red) / 100) / 100);
 }
 
 
@@ -508,6 +535,30 @@ function _egRollPlayerHitAilments(target, amount, elements, opts) {
         + (isAttackHit ? (stats.bleedChanceAttackPct || 0) : 0);
     if (physShare > 0 && treeBleedPct > 0 && Math.random() * 100 < Math.min(100, treeBleedPct)) {
         _egApplyMonsterAilment(target, 'bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, physShare * EG_AIL_BLEED_DMG_SHARE) * critDotMult);
+    }
+
+    // Phase B hooks: Power charge on crit, Endurance charge on melee crit,
+    // Blind on attack hits and the dagger poison lines.
+    if (opts && opts.isCrit) {
+        const powerCritPct = Math.min(100, Number(stats.powerOnCritPct) || 0);
+        if (powerCritPct > 0 && Math.random() * 100 < powerCritPct) _egGainPowerCharge(stats.powerChargesMax, stats.powerDurationPct);
+        const endCritPct = Math.min(100, Number(stats.enduranceOnMeleeCritPct) || 0);
+        if (isMeleeHit && endCritPct > 0 && Math.random() * 100 < endCritPct) _egGainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
+    }
+    if (isAttackHit && (Number(stats.blindPct) || 0) > 0 && Math.random() * 100 < Math.min(100, stats.blindPct)) {
+        _egApplyMonsterAilment(target, 'blind');
+        if (target.statuses && target.statuses.blind) target.statuses.blind.effectPct = Math.max(0, Number(stats.blindEffectIncPct) || 0);
+    }
+    if (opts && opts.isPlayerSpell && (Number(stats.poisonChanceSpellPct) || 0) > 0
+        && Math.random() * 100 < Math.min(100, stats.poisonChanceSpellPct)) {
+        _egApplyMonsterAilment(target, 'poison', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_POISON_DMG_SHARE) * critDotMult);
+    }
+    if (isAttackHit && stats.isDaggerEquipped) {
+        const critPoison = !!(opts && opts.isCrit) && (Number(stats.daggerCritPoisons) || 0) > 0;
+        const daggerPoisonPct = Math.min(100, Number(stats.poisonChanceDaggerPct) || 0);
+        if (critPoison || (daggerPoisonPct > 0 && Math.random() * 100 < daggerPoisonPct)) {
+            _egApplyMonsterAilment(target, 'poison', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_POISON_DMG_SHARE) * critDotMult);
+        }
     }
 
     // Poison (shadow DoT): attack hits only (melee + primary projectile), and
