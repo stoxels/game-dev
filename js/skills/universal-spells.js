@@ -2,7 +2,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { _getGlobalCooldownReduction } from '../classes/class-cooldown-state.js';
-import { _egApplyDamageConversion, _egLeechHealMult } from '../combat/combat-calculations-resistances.js';
+import { _egApplyDamageConversion, _egLeechAbsorption, _egLeechHealMult } from '../combat/combat-calculations-resistances.js';
 import { _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost } from '../classes/class-mana.js';
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
@@ -2082,7 +2082,13 @@ function startUniversalSpellCooldown(spellId, secondsOverride) {
 function _uspRollCritMult() {
     try {
         if (typeof globalThis._egComputePlayerStats === 'function' && typeof globalThis._egRollCrit === 'function') {
-            return globalThis._egRollCrit(globalThis._egComputePlayerStats());
+            const critStats = globalThis._egComputePlayerStats();
+            // Spell-only crit lines from the passive tree (spell_crit_chance /
+            // spell_crit_multi) ride along as this roll's bonus.
+            return globalThis._egRollCrit(critStats, {
+                chance: critStats.spellCritChancePct || 0,
+                multiplierPct: critStats.spellCritMultiplierPct || 0,
+            });
         }
     } catch (e) { /* no crit backend - normal hit */ }
     return 1;
@@ -2141,7 +2147,7 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
     }
     // Fire conversion / fire-only (Primal Flame keystone, node 350).
     if ((Number(stats.damageToFirePct) || 0) > 0 || (Number(stats.onlyFireDamage) || 0) > 0
-        || (Number(stats.physAsExtraFirePct) || 0) > 0) {
+        || (Number(stats.physAsExtraFirePct) || 0) > 0 || (Number(stats.physAsExtraShadowPct) || 0) > 0) {
         const converted = _egApplyDamageConversion(stats, spellElement === 'physical' ? amount : 0, elements);
         elements = converted.elements;
         amount = Math.max(1, Math.round(converted.physical
@@ -2157,6 +2163,11 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax) {
                 if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
             }
         }
+    } catch (e) { /* leech is best-effort */ }
+
+    // Absorption leech from spell damage (passive tree: absorption_leech_spell).
+    try {
+        if (stats.absorptionLeechSpellPct > 0) _egLeechAbsorption(stats, amount, stats.absorptionLeechSpellPct);
     } catch (e) { /* leech is best-effort */ }
 
     return { amount, elements, isCrit };

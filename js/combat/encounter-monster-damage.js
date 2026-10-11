@@ -139,7 +139,7 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (opts && opts.isPlayerFlat && !elements) {
         const flatStats = _egComputePlayerStats();
         if ((Number(flatStats.damageToFirePct) || 0) > 0 || (Number(flatStats.onlyFireDamage) || 0) > 0
-            || (Number(flatStats.physAsExtraFirePct) || 0) > 0) {
+            || (Number(flatStats.physAsExtraFirePct) || 0) > 0 || (Number(flatStats.physAsExtraShadowPct) || 0) > 0) {
             const flat = _egApplyDamageConversion(flatStats, amount, {});
             elements = flat.elements;
             amount = Math.max(1, Math.round(flat.physical

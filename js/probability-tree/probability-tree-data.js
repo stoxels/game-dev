@@ -1865,12 +1865,14 @@ export const TALENT_TREE_DATA = {
    "id": 387,
    "x": 2179,
    "y": -1449,
-   "nameEn": "Hour Vault",
-   "nameDe": "Stunden-Tresor",
-   "descEn": "Finish a level with more than 5 minutes remaining to bank 10% of it as bonus starting time for your next level (maximum of 120 seconds banked, persists between sessions). +6% Absorption regen rate.",
-   "descDe": "Beende ein Level mit mehr als 5 Minuten Restzeit, um 10% davon als Bonus-Startzeit für dein nächstes Level anzusparen (maximal 120 Sekunden, bleibt zwischen Sitzungen erhalten). +6% Absorptionsregeneration.",
-   "icon": "🏦",
-   "statKey": "hour_vault",
+   "nameEn": "Ethereal Feast",
+   "nameDe": "Ätherisches Mahl",
+   "icon": "",
+   "statKey": "notable_ethereal_feast_387",
+   "effects": [
+    "absorption_leech_spell:1",
+    "absorption_leech_effect_inc:13"
+   ],
    "tier": "notable"
   },
   {
@@ -2014,12 +2016,15 @@ export const TALENT_TREE_DATA = {
    "id": 90,
    "x": 1974,
    "y": -1626,
-   "nameEn": "Lucky Drops",
-   "nameDe": "Glücksfunde",
-   "descEn": "Completing an already completed level has a 25% chance of granting an item. +6% Absorption regen rate.",
-   "descDe": "Das erneute Abschließen eines bereits abgeschlossenen Levels gewährt mit 25 % Wahrscheinlichkeit einen Gegenstand. +6% Absorptionsregeneration.",
-   "icon": "🍀",
-   "statKey": "lucky_drops",
+   "nameEn": "Written in Blood",
+   "nameDe": "In Blut geschrieben",
+   "icon": "",
+   "statKey": "notable_written_in_blood_90",
+   "effects": [
+    "absorption_inc_pct:10",
+    "health_inc_pct:10",
+    "str_flat:5"
+   ],
    "tier": "notable"
   },
   {
@@ -2875,12 +2880,10 @@ export const TALENT_TREE_DATA = {
    "id": 6,
    "x": 2050,
    "y": -1822,
-   "nameEn": "Scholar's Fortune",
-   "nameDe": "Vermögen des Gelehrten",
-   "descEn": "The legacy item-reward effect is not active in the current progression system. +6% Absorption regen rate.",
-   "descDe": "Der alte Gegenstands-Belohnungseffekt ist im aktuellen Fortschrittssystem nicht aktiv. +6% Absorptionsregeneration.",
-   "icon": "🪙",
-   "statKey": "scholars_fortune",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_6",
    "tier": "notable"
   },
   {
@@ -5376,24 +5379,24 @@ export const TALENT_TREE_DATA = {
    "id": 20025,
    "x": 2061,
    "y": -1239,
-   "nameEn": "Elemental Overload",
-   "nameDe": "Elementare Überladung",
-   "descEn": "+12% Elemental damage. Critical strikes overload your Absorption.",
-   "descDe": "+12% Elementarschaden. Kritische Treffer überladen deine Absorption.",
-   "icon": "◆",
-   "statKey": "notable_elemental_overload",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_20025",
    "tier": "notable"
   },
   {
    "id": 20026,
    "x": 2221,
    "y": -1605,
-   "nameEn": "Quick Recovery",
-   "nameDe": "Schnelle Erholung",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "notable_quick_recovery",
+   "nameEn": "Doom Cast",
+   "nameDe": "Verhängniszauber",
+   "icon": "",
+   "statKey": "notable_doom_cast_20026",
+   "effects": [
+    "spell_crit_chance:5",
+    "spell_crit_multi:15"
+   ],
    "tier": "notable"
   },
   {
@@ -5708,24 +5711,20 @@ export const TALENT_TREE_DATA = {
    "id": 30121,
    "x": 1992,
    "y": -1170,
-   "nameEn": "Quick Study",
-   "nameDe": "Schnelle Auffassung",
-   "descEn": "+1 Intellect, +1 Agility.",
-   "descDe": "+1 Intelligenz, +1 Beweglichkeit.",
-   "icon": "⚡",
-   "statKey": "small_quick_study",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_30121",
    "tier": "small"
   },
   {
    "id": 30122,
    "x": 2079,
    "y": -1152,
-   "nameEn": "Quick Study",
-   "nameDe": "Schnelle Auffassung",
-   "descEn": "+1 Intellect, +1 Agility.",
-   "descDe": "+1 Intelligenz, +1 Beweglichkeit.",
-   "icon": "⚡",
-   "statKey": "small_quick_study",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_30122",
    "tier": "small"
   },
   {
@@ -5768,84 +5767,91 @@ export const TALENT_TREE_DATA = {
    "id": 30126,
    "x": 2021,
    "y": -1417,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Mending",
+   "nameDe": "Heilung",
+   "icon": "",
+   "statKey": "small_mending_30126",
+   "effects": [
+    "life_regen_pct:0.8"
+   ],
    "tier": "small"
   },
   {
    "id": 30127,
    "x": 2212,
    "y": -1498,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Draining Flow",
+   "nameDe": "Zehrender Fluss",
+   "icon": "",
+   "statKey": "small_draining_flow_30127",
+   "effects": [
+    "absorption_leech_effect_inc:25"
+   ],
    "tier": "small"
   },
   {
    "id": 30128,
    "x": 2252,
    "y": -1498,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Soul Drain",
+   "nameDe": "Seelenentzug",
+   "icon": "",
+   "statKey": "small_soul_drain_30128",
+   "effects": [
+    "absorption_leech_spell:0.3"
+   ],
    "tier": "small"
   },
   {
    "id": 30129,
    "x": 2285,
    "y": -1449,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Draining Flow",
+   "nameDe": "Zehrender Fluss",
+   "icon": "",
+   "statKey": "small_draining_flow_30129",
+   "effects": [
+    "absorption_leech_effect_inc:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30130,
    "x": 2252,
    "y": -1400,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Draining Flow",
+   "nameDe": "Zehrender Fluss",
+   "icon": "",
+   "statKey": "small_draining_flow_30130",
+   "effects": [
+    "absorption_leech_effect_inc:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30131,
    "x": 2316,
    "y": -1363,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Storm Edge",
+   "nameDe": "Sturmschneide",
+   "icon": "",
+   "statKey": "small_storm_edge_30131",
+   "effects": [
+    "lightning_damage_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30132,
    "x": 2356,
    "y": -1363,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Storm Edge",
+   "nameDe": "Sturmschneide",
+   "icon": "",
+   "statKey": "small_storm_edge_30132",
+   "effects": [
+    "lightning_damage_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
@@ -5865,24 +5871,20 @@ export const TALENT_TREE_DATA = {
    "id": 30134,
    "x": 2448,
    "y": -1496,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_mine_damage_30134",
    "tier": "travel"
   },
   {
    "id": 30135,
    "x": 2456,
    "y": -1454,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_mine_damage_30135",
    "tier": "small"
   },
   {
@@ -5937,12 +5939,10 @@ export const TALENT_TREE_DATA = {
    "id": 30140,
    "x": 2516,
    "y": -1394,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_mine_damage_30140",
    "tier": "small"
   },
   {
@@ -5985,36 +5985,41 @@ export const TALENT_TREE_DATA = {
    "id": 30144,
    "x": 2303,
    "y": -1103,
-   "nameEn": "Arcane Grace",
-   "nameDe": "Arkane Anmut",
-   "descEn": "+1 Intellect, +1 Agility.",
-   "descDe": "+1 Intelligenz, +1 Beweglichkeit.",
-   "icon": "🪶",
-   "statKey": "small_arcane_grace",
+   "nameEn": "Nimble Ward",
+   "nameDe": "Flinker Schutz",
+   "icon": "",
+   "statKey": "small_nimble_ward_30144",
+   "effects": [
+    "evasion_inc_pct:8",
+    "absorption_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30145,
    "x": 2254,
    "y": -1070,
-   "nameEn": "Arcane Grace",
-   "nameDe": "Arkane Anmut",
-   "descEn": "+1 Intellect, +1 Agility.",
-   "descDe": "+1 Intelligenz, +1 Beweglichkeit.",
-   "icon": "🪶",
-   "statKey": "small_arcane_grace",
+   "nameEn": "Nimble Ward",
+   "nameDe": "Flinker Schutz",
+   "icon": "",
+   "statKey": "small_nimble_ward_30145",
+   "effects": [
+    "evasion_inc_pct:8",
+    "absorption_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30146,
    "x": 2102,
    "y": -941,
-   "nameEn": "Arcane Grace",
-   "nameDe": "Arkane Anmut",
-   "descEn": "+5 Intellect, +5 Agility.",
-   "descDe": "+5 Intelligenz, +5 Beweglichkeit.",
-   "icon": "🪶",
-   "statKey": "small_arcane_grace",
+   "nameEn": "Intelligence",
+   "nameDe": "Intelligenz",
+   "icon": "",
+   "statKey": "travel_intelligence_30146",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17831,12 +17836,13 @@ export const TALENT_TREE_DATA = {
    "id": 30952,
    "x": 2223,
    "y": -948,
-   "nameEn": "Lesser Piercing Shots",
-   "nameDe": "Durchdringende Schüsse (klein)",
-   "descEn": "Projectiles pierce one additional monster.",
-   "descDe": "Projektile durchdringen ein zusätzliches Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_piercing_shots",
+   "nameEn": "Deep Well",
+   "nameDe": "Tiefer Brunnen",
+   "icon": "",
+   "statKey": "small_deep_well_30952",
+   "effects": [
+    "mana_inc_pct:8"
+   ],
    "tier": "small"
   },
   {
@@ -19536,12 +19542,10 @@ export const TALENT_TREE_DATA = {
    "id": 20214,
    "x": 1709,
    "y": -1417,
-   "nameEn": "Focus Barrier",
-   "nameDe": "Fokusbarriere",
-   "descEn": "Absorption begins regenerating 10% earlier after taking damage.",
-   "descDe": "Absorption beginnt sich 10% früher zu regenerieren, nachdem du Schaden erlitten hast.",
-   "icon": "◆",
-   "statKey": "notable_focus_barrier",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_20214",
    "tier": "notable"
   },
   {
@@ -19574,24 +19578,29 @@ export const TALENT_TREE_DATA = {
    "id": 20217,
    "x": 2119,
    "y": -2062,
-   "nameEn": "Chain Lightning",
-   "nameDe": "Kettenblitz",
-   "descEn": "Critical strikes arc to a second monster for 40% damage.",
-   "descDe": "Kritische Treffer springen auf ein zweites Monster über (40% Schaden).",
-   "icon": "◆",
-   "statKey": "notable_chain_lightning",
+   "nameEn": "Atrophy",
+   "nameDe": "Schwund",
+   "icon": "",
+   "statKey": "notable_atrophy_20217",
+   "effects": [
+    "shadow_damage_inc_pct:27",
+    "skill_effect_duration:12"
+   ],
    "tier": "notable"
   },
   {
    "id": 20218,
    "x": 2389,
    "y": -1923,
-   "nameEn": "Arcane Focus",
-   "nameDe": "Fokus des Arkanen",
-   "descEn": "+10% Absorption regen rate. Focus channels power into the shield.",
-   "descDe": "+10% Absorptionsregeneration. Fokus leitet Kraft in den Schild.",
-   "icon": "◆",
-   "statKey": "notable_arcane_focus",
+   "nameEn": "Force Shaper",
+   "nameDe": "Kraftformer",
+   "icon": "",
+   "statKey": "notable_force_shaper_20218",
+   "effects": [
+    "phys_as_shadow:10",
+    "melee_charge_speed_pct:4",
+    "cast_speed_pct:4"
+   ],
    "tier": "notable"
   },
   {
@@ -20183,12 +20192,13 @@ export const TALENT_TREE_DATA = {
    "id": 31073,
    "x": 1224,
    "y": -1330,
-   "nameEn": "Lesser Endless Instructions",
-   "nameDe": "Endlose Anweisungen (klein)",
-   "descEn": "10% chance of not spending the Tutor item when using a Tutor to answer a question. +3% Absorption regen rate.",
-   "descDe": "10% Chance, dass der Tutor Gegenstand beim Beantworten einer Frage nicht verbraucht wird. +3% Absorptionsregeneration.",
-   "icon": "📘",
-   "statKey": "small_lesser_endless_instructions",
+   "nameEn": "Bleed Guard",
+   "nameDe": "Blutwächter",
+   "icon": "",
+   "statKey": "small_bleed_guard_31073",
+   "effects": [
+    "avoid_bleed_pct:20"
+   ],
    "tier": "small"
   },
   {
@@ -20737,12 +20747,13 @@ export const TALENT_TREE_DATA = {
    "id": 31119,
    "x": 1308,
    "y": -1838,
-   "nameEn": "Lesser Runic Feedback",
-   "nameDe": "Runenrückkopplung (klein)",
-   "descEn": "Killing a monster with a critical strike restores 2 Mana.",
-   "descDe": "Das Töten eines Monsters mit einem kritischen Treffer stellt 2 Mana wieder her.",
-   "icon": "◆",
-   "statKey": "small_lesser_runic_feedback",
+   "nameEn": "Steady Cast",
+   "nameDe": "Ruhiger Zauber",
+   "icon": "",
+   "statKey": "small_steady_cast_31119",
+   "effects": [
+    "stun_avoid:15"
+   ],
    "tier": "small"
   },
   {
@@ -21339,48 +21350,59 @@ export const TALENT_TREE_DATA = {
    "id": 31169,
    "x": 2254,
    "y": -1993,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Savage Shadow",
+   "nameDe": "Wilder Schatten",
+   "icon": "",
+   "statKey": "travel_savage_shadow_31169",
+   "effects": [
+    "shadow_damage_inc_pct:10",
+    "phys_damage_inc:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 31170,
    "x": 2291,
    "y": -1963,
-   "nameEn": "Lesser Arcane Focus",
-   "nameDe": "Fokus des Arkanen (klein)",
-   "descEn": "+5% Absorption regen rate. Focus channels power into the shield.",
-   "descDe": "+5% Absorptionsregeneration. Fokus leitet Kraft in den Schild.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_focus",
+   "nameEn": "Rapid Might",
+   "nameDe": "Rasche Macht",
+   "icon": "",
+   "statKey": "small_rapid_might_31170",
+   "effects": [
+    "melee_charge_speed_pct:3",
+    "cast_speed_pct:3",
+    "phys_damage_inc:8"
+   ],
    "tier": "small"
   },
   {
    "id": 31171,
    "x": 2291,
    "y": -1923,
-   "nameEn": "Lesser Arcane Focus",
-   "nameDe": "Fokus des Arkanen (klein)",
-   "descEn": "+5% Absorption regen rate. Focus channels power into the shield.",
-   "descDe": "+5% Absorptionsregeneration. Fokus leitet Kraft in den Schild.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_focus",
+   "nameEn": "Rapid Might",
+   "nameDe": "Rasche Macht",
+   "icon": "",
+   "statKey": "small_rapid_might_31171",
+   "effects": [
+    "melee_charge_speed_pct:3",
+    "cast_speed_pct:3",
+    "phys_damage_inc:8"
+   ],
    "tier": "small"
   },
   {
    "id": 31172,
    "x": 2340,
    "y": -1890,
-   "nameEn": "Lesser Arcane Focus",
-   "nameDe": "Fokus des Arkanen (klein)",
-   "descEn": "+5% Absorption regen rate. Focus channels power into the shield.",
-   "descDe": "+5% Absorptionsregeneration. Fokus leitet Kraft in den Schild.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_focus",
+   "nameEn": "Rapid Might",
+   "nameDe": "Rasche Macht",
+   "icon": "",
+   "statKey": "small_rapid_might_31172",
+   "effects": [
+    "melee_charge_speed_pct:3",
+    "cast_speed_pct:3",
+    "phys_damage_inc:8"
+   ],
    "tier": "small"
   },
   {
@@ -21400,180 +21422,186 @@ export const TALENT_TREE_DATA = {
    "id": 31174,
    "x": 2099,
    "y": -1895,
-   "nameEn": "Lesser Scholar's Fortune",
-   "nameDe": "Vermögen des Gelehrten (klein)",
-   "descEn": "10% probability of receiving an additional item when completing an Excercise. +3% Absorption regen rate.",
-   "descDe": "10% Wahrscheinlichkeit einen zusätzlichen Gegenstand als Belohnung für das Lösen einer Übungsaufgabe zu erhalten. +3% Absorptionsregeneration.",
-   "icon": "🪙",
-   "statKey": "small_lesser_scholar_s_fortune",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_cooldown_31174",
    "tier": "small"
   },
   {
    "id": 31175,
    "x": 2001,
    "y": -1895,
-   "nameEn": "Lesser Scholar's Fortune",
-   "nameDe": "Vermögen des Gelehrten (klein)",
-   "descEn": "10% probability of receiving an additional item when completing an Excercise. +3% Absorption regen rate.",
-   "descDe": "10% Wahrscheinlichkeit einen zusätzlichen Gegenstand als Belohnung für das Lösen einer Übungsaufgabe zu erhalten. +3% Absorptionsregeneration.",
-   "icon": "🪙",
-   "statKey": "small_lesser_scholar_s_fortune",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_cooldown_31175",
    "tier": "small"
   },
   {
    "id": 31176,
    "x": 2043,
    "y": -1655,
-   "nameEn": "Lesser Lucky Drops",
-   "nameDe": "Glücksfunde (klein)",
-   "descEn": "Completing an already completed level has a 13% chance of granting an item. +3% Absorption regen rate.",
-   "descDe": "Das erneute Abschließen eines bereits abgeschlossenen Levels gewährt mit 13 % Wahrscheinlichkeit einen Gegenstand. +3% Absorptionsregeneration.",
-   "icon": "🍀",
-   "statKey": "small_lesser_lucky_drops",
+   "nameEn": "Hardy Ward",
+   "nameDe": "Robuster Schutz",
+   "icon": "",
+   "statKey": "small_hardy_ward_31176",
+   "effects": [
+    "absorption_inc_pct:5",
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 31177,
    "x": 2072,
    "y": -1586,
-   "nameEn": "Lesser Lucky Drops",
-   "nameDe": "Glücksfunde (klein)",
-   "descEn": "Completing an already completed level has a 13% chance of granting an item. +3% Absorption regen rate.",
-   "descDe": "Das erneute Abschließen eines bereits abgeschlossenen Levels gewährt mit 13 % Wahrscheinlichkeit einen Gegenstand. +3% Absorptionsregeneration.",
-   "icon": "🍀",
-   "statKey": "small_lesser_lucky_drops",
+   "nameEn": "Hardy Ward",
+   "nameDe": "Robuster Schutz",
+   "icon": "",
+   "statKey": "small_hardy_ward_31177",
+   "effects": [
+    "absorption_inc_pct:5",
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 31178,
    "x": 2003,
    "y": -1557,
-   "nameEn": "Lesser Lucky Drops",
-   "nameDe": "Glücksfunde (klein)",
-   "descEn": "Completing an already completed level has a 13% chance of granting an item. +3% Absorption regen rate.",
-   "descDe": "Das erneute Abschließen eines bereits abgeschlossenen Levels gewährt mit 13 % Wahrscheinlichkeit einen Gegenstand. +3% Absorptionsregeneration.",
-   "icon": "🍀",
-   "statKey": "small_lesser_lucky_drops",
+   "nameEn": "Hardy Ward",
+   "nameDe": "Robuster Schutz",
+   "icon": "",
+   "statKey": "small_hardy_ward_31178",
+   "effects": [
+    "absorption_inc_pct:5",
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 31179,
    "x": 1897,
    "y": -1419,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31179",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 31180,
    "x": 1815,
    "y": -1417,
-   "nameEn": "Lesser Focus Barrier",
-   "nameDe": "Fokusbarriere (klein)",
-   "descEn": "Absorption begins regenerating 5% earlier after taking damage.",
-   "descDe": "Absorption beginnt sich 5% früher zu regenerieren, nachdem du Schaden erlitten hast.",
-   "icon": "◆",
-   "statKey": "small_lesser_focus_barrier",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_31180",
    "tier": "small"
   },
   {
    "id": 31181,
    "x": 1762,
    "y": -1364,
-   "nameEn": "Lesser Focus Barrier",
-   "nameDe": "Fokusbarriere (klein)",
-   "descEn": "Absorption begins regenerating 5% earlier after taking damage.",
-   "descDe": "Absorption beginnt sich 5% früher zu regenerieren, nachdem du Schaden erlitten hast.",
-   "icon": "◆",
-   "statKey": "small_lesser_focus_barrier",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_31181",
    "tier": "small"
   },
   {
    "id": 31182,
    "x": 1762,
    "y": -1470,
-   "nameEn": "Lesser Focus Barrier",
-   "nameDe": "Fokusbarriere (klein)",
-   "descEn": "Absorption begins regenerating 5% earlier after taking damage.",
-   "descDe": "Absorption beginnt sich 5% früher zu regenerieren, nachdem du Schaden erlitten hast.",
-   "icon": "◆",
-   "statKey": "small_lesser_focus_barrier",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_31182",
    "tier": "small"
   },
   {
    "id": 31183,
    "x": 1808,
    "y": -1563,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31183",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 31184,
    "x": 1818,
    "y": -1699,
-   "nameEn": "Lesser Stochastic Awakening",
-   "nameDe": "Stochastisches Erwachen (klein)",
-   "descEn": "8% chance to reveal 1 correct filled cell at the start of each level. Rolls independently from Probabilistic Start and Calculated Genesis. +3% Absorption regen rate.",
-   "descDe": "8% Chance, zu Beginn jedes Levels 1 korrekte gefüllte Zelle aufzudecken. Wirkt unabhängig von Probabilistischer Start und Berechneter Ursprung. +3% Absorptionsregeneration.",
-   "icon": "🎲",
-   "statKey": "small_lesser_stochastic_awakening",
+   "nameEn": "Warded Calm",
+   "nameDe": "Geschützte Ruhe",
+   "icon": "",
+   "statKey": "small_warded_calm_31184",
+   "effects": [
+    "parry_spell_chance:5",
+    "absorption_regen_rate_pct:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31185,
    "x": 1720,
    "y": -1699,
-   "nameEn": "Lesser Stochastic Awakening",
-   "nameDe": "Stochastisches Erwachen (klein)",
-   "descEn": "8% chance to reveal 1 correct filled cell at the start of each level. Rolls independently from Probabilistic Start and Calculated Genesis. +3% Absorption regen rate.",
-   "descDe": "8% Chance, zu Beginn jedes Levels 1 korrekte gefüllte Zelle aufzudecken. Wirkt unabhängig von Probabilistischer Start und Berechneter Ursprung. +3% Absorptionsregeneration.",
-   "icon": "🎲",
-   "statKey": "small_lesser_stochastic_awakening",
+   "nameEn": "Warded Calm",
+   "nameDe": "Geschützte Ruhe",
+   "icon": "",
+   "statKey": "small_warded_calm_31185",
+   "effects": [
+    "parry_spell_chance:5",
+    "absorption_regen_rate_pct:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31186,
    "x": 1649,
    "y": -1559,
-   "nameEn": "Lesser Evocation",
-   "nameDe": "Beschwörung (klein)",
-   "descEn": "Up to +8% Attack speed, scaling with missing Mana.",
-   "descDe": "Bis zu +8% Angriffsgeschwindigkeit, skalierend mit fehlendem Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_evocation",
+   "nameEn": "Frostfire Edge",
+   "nameDe": "Frostfeuerschärfe",
+   "icon": "",
+   "statKey": "small_frostfire_edge_31186",
+   "effects": [
+    "fire_damage_inc_pct:8",
+    "cold_damage_inc_pct:8"
+   ],
    "tier": "small"
   },
   {
    "id": 31187,
    "x": 1576,
    "y": -1608,
-   "nameEn": "Lesser Evocation",
-   "nameDe": "Beschwörung (klein)",
-   "descEn": "Up to +8% Attack speed, scaling with missing Mana.",
-   "descDe": "Bis zu +8% Angriffsgeschwindigkeit, skalierend mit fehlendem Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_evocation",
+   "nameEn": "Frost Edge",
+   "nameDe": "Frostschärfe",
+   "icon": "",
+   "statKey": "small_frost_edge_31187",
+   "effects": [
+    "cold_damage_inc_pct:16"
+   ],
    "tier": "small"
   },
   {
    "id": 31188,
    "x": 1576,
    "y": -1510,
-   "nameEn": "Lesser Evocation",
-   "nameDe": "Beschwörung (klein)",
-   "descEn": "Up to +8% Attack speed, scaling with missing Mana.",
-   "descDe": "Bis zu +8% Angriffsgeschwindigkeit, skalierend mit fehlendem Mana.",
-   "icon": "◆",
-   "statKey": "small_lesser_evocation",
+   "nameEn": "Ember Edge",
+   "nameDe": "Glutschärfe",
+   "icon": "",
+   "statKey": "small_ember_edge_31188",
+   "effects": [
+    "fire_damage_inc_pct:16"
+   ],
    "tier": "small"
   },
   {
@@ -25196,60 +25224,65 @@ export const TALENT_TREE_DATA = {
    "id": 31487,
    "x": 2148,
    "y": -1654,
-   "nameEn": "Lesser Quick Recovery",
-   "nameDe": "Schnelle Erholung (klein)",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_quick_recovery",
+   "nameEn": "Arcane Edge",
+   "nameDe": "Arkane Schärfe",
+   "icon": "",
+   "statKey": "small_arcane_edge_31487",
+   "effects": [
+    "spell_crit_multi:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31488,
    "x": 2181,
    "y": -1605,
-   "nameEn": "Lesser Quick Recovery",
-   "nameDe": "Schnelle Erholung (klein)",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_quick_recovery",
+   "nameEn": "Arcane Edge",
+   "nameDe": "Arkane Schärfe",
+   "icon": "",
+   "statKey": "small_arcane_edge_31488",
+   "effects": [
+    "spell_crit_multi:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31489,
    "x": 2250,
    "y": -1674,
-   "nameEn": "Lesser Quick Recovery",
-   "nameDe": "Schnelle Erholung (klein)",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_quick_recovery",
+   "nameEn": "Arcane Focus",
+   "nameDe": "Arkaner Fokus",
+   "icon": "",
+   "statKey": "small_arcane_focus_31489",
+   "effects": [
+    "spell_crit_chance:2"
+   ],
    "tier": "small"
   },
   {
    "id": 31490,
    "x": 2201,
    "y": -1707,
-   "nameEn": "Lesser Quick Recovery",
-   "nameDe": "Schnelle Erholung (klein)",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_quick_recovery",
+   "nameEn": "Arcane Focus",
+   "nameDe": "Arkaner Fokus",
+   "icon": "",
+   "statKey": "small_arcane_focus_31490",
+   "effects": [
+    "spell_crit_chance:2"
+   ],
    "tier": "small"
   },
   {
    "id": 31491,
    "x": 2309,
    "y": -1734,
-   "nameEn": "Lesser Careful Study",
-   "nameDe": "Vorsichtige Studie (klein)",
-   "descEn": "5% chance of not spending the Tutor item when using a Tutor to answer a question. +3% Absorption regen rate.",
-   "descDe": "5% Chance, dass der Tutor Gegenstand beim Beantworten einer Frage nicht verbraucht wird. +3% Absorptionsregeneration.",
-   "icon": "📖",
-   "statKey": "small_lesser_careful_study",
+   "nameEn": "Biting Cold",
+   "nameDe": "Beißende Kälte",
+   "icon": "",
+   "statKey": "small_biting_cold_31491",
+   "effects": [
+    "chill_effect_inc_pct:20"
+   ],
    "tier": "small"
   },
   {
@@ -30920,11 +30953,131 @@ export const TALENT_TREE_DATA = {
    "from": 20024,
    "to": 30148,
    "dotted": false
+  },
+  {
+   "id": 831,
+   "from": 20213,
+   "to": 31188,
+   "dotted": false
+  },
+  {
+   "id": 832,
+   "from": 31186,
+   "to": 31188,
+   "dotted": false
+  },
+  {
+   "id": 833,
+   "from": 31186,
+   "to": 31187,
+   "dotted": false
+  },
+  {
+   "id": 834,
+   "from": 31183,
+   "to": 31186,
+   "dotted": false
+  },
+  {
+   "id": 835,
+   "from": 23,
+   "to": 31073,
+   "dotted": false
+  },
+  {
+   "id": 836,
+   "from": 30125,
+   "to": 30126,
+   "dotted": false
+  },
+  {
+   "id": 837,
+   "from": 15,
+   "to": 30126,
+   "dotted": false
+  },
+  {
+   "id": 838,
+   "from": 20213,
+   "to": 31187,
+   "dotted": false
+  },
+  {
+   "id": 839,
+   "from": 31179,
+   "to": 31180,
+   "dotted": false
+  },
+  {
+   "id": 840,
+   "from": 30125,
+   "to": 31179,
+   "dotted": false
+  },
+  {
+   "id": 841,
+   "from": 31183,
+   "to": 31184,
+   "dotted": false
+  },
+  {
+   "id": 842,
+   "from": 31116,
+   "to": 31183,
+   "dotted": false
+  },
+  {
+   "id": 843,
+   "from": 31184,
+   "to": 31185,
+   "dotted": false
+  },
+  {
+   "id": 844,
+   "from": 169,
+   "to": 31185,
+   "dotted": false
+  },
+  {
+   "id": 845,
+   "from": 20214,
+   "to": 31182,
+   "dotted": false
+  },
+  {
+   "id": 846,
+   "from": 31180,
+   "to": 31182,
+   "dotted": false
+  },
+  {
+   "id": 847,
+   "from": 20214,
+   "to": 31181,
+   "dotted": false
+  },
+  {
+   "id": 848,
+   "from": 31180,
+   "to": 31181,
+   "dotted": false
+  },
+  {
+   "id": 849,
+   "from": 20200,
+   "to": 31119,
+   "dotted": false
+  },
+  {
+   "id": 850,
+   "from": 31119,
+   "to": 31120,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "ed5ef0f82c13a94a",
+  "fingerprint": "5b4c66306f280476",
   "positions": [
    [
     156,

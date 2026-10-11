@@ -53,7 +53,10 @@ export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1
     // share BEFORE conversion, scaled by the caller's fire multiplier, and
     // added after the fire-only drop (it is fire itself, so it survives).
     const extraPct = Math.max(0, Number(stats && stats.physAsExtraFirePct) || 0);
-    if (share <= 0 && !fireOnly && extraPct <= 0) return { physical, elements: el };
+    // Same for "as extra Shadow" (node 20218): extra, taken from physical,
+    // scaled by the shadow increase; dropped under fire-only like any shadow.
+    const extraShadowPct = Math.max(0, Number(stats && stats.physAsExtraShadowPct) || 0);
+    if (share <= 0 && !fireOnly && extraPct <= 0 && extraShadowPct <= 0) return { physical, elements: el };
     const keep = fireOnly ? 0 : 1 - share;
     const phys = physical || 0;
     const cold = el.cold || 0;
@@ -64,7 +67,8 @@ export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1
             fire: (el.fire || 0) + share * (phys + cold + lightning) + (phys * extraPct / 100) * fireMult,
             cold: cold * keep,
             lightning: lightning * keep,
-            shadow: fireOnly ? 0 : (el.shadow || 0),
+            shadow: fireOnly ? 0 : (el.shadow || 0)
+                + (phys * extraShadowPct / 100) * (1 + Math.max(0, Number(stats && stats.shadowDamageIncPct) || 0) / 100),
         },
     };
 }
@@ -100,6 +104,23 @@ export function _egAilmentDamageMult(key, stats) {
 export function _egLeechHealMult(stats) {
     return Math.max(0, 1 - Math.max(0, Number(stats && stats.lifeLeechLessPct) || 0) / 100)
         * (1 + Math.max(0, Number(stats && stats.lifeLeechEffectIncPct) || 0) / 100);
+}
+
+// Absorption leech (passive tree, spell hits): `pct` of the hit's damage
+// refills the Absorption layer instantly, scaled by the leech-effect line.
+// Sub-point amounts accumulate so 0.3% leeches are not rounded away.
+let _absorptionLeechRemainder = 0;
+export function _egLeechAbsorption(stats, dmg, pct) {
+    const max = Number(stats && stats.absorption) || 0;
+    if (!(pct > 0) || !(dmg > 0) || max <= 0) return 0;
+    const effect = 1 + Math.max(0, Number(stats.absorptionLeechEffectIncPct) || 0) / 100;
+    const raw = dmg * (pct / 100) * effect + _absorptionLeechRemainder;
+    const whole = Math.floor(raw);
+    _absorptionLeechRemainder = raw - whole;
+    if (whole <= 0) return 0;
+    const cur = Number(globalThis._egPlayerAbsorptionCurrent) || 0;
+    globalThis._egPlayerAbsorptionCurrent = Math.min(max, cur + whole);
+    return whole;
 }
 
 // Applies the target monster's elemental resistances to an incoming hit.

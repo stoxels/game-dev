@@ -291,6 +291,21 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // mana_regen_inc_pct (node 168): scales the whole mana regen tick
     // (base + gear manaRegen) in class-mana.js.
     mana_regen_inc_pct: { channel: 'manaRegenIncPct', en: '{v}% increased Mana Regeneration Rate', de: '{v}% erhöhte Manaregenerationsrate' },
+    // Spell-only crit lines (nodes 31487/31488/31490/31489/20026): added to the
+    // crit roll of spell hits only (universal-spells.js _uspRollCritMult), on
+    // top of the generic crit chance / multiplier.
+    spell_crit_chance: { channel: 'spellCritChancePct', en: '+{v}% to Critical Strike Chance with Spells', de: '+{v}% auf die kritische Trefferchance mit Zaubern' },
+    spell_crit_multi: { channel: 'spellCritMultiplierPct', en: '+{v}% to Critical Strike Multiplier with Spells', de: '+{v}% auf den kritischen Schadensmultiplikator mit Zaubern' },
+    // Chill effect (node 31491): scales the slow of chills YOU inflict on
+    // enemies (_egGetMonsterChargeMultiplier). Absorption leech (nodes
+    // 30128/387): spell hits leech a share of their damage as Absorption
+    // (_egLeechAbsorption); the effect line scales every such recovery.
+    chill_effect_inc_pct: { channel: 'chillEffectIncPct', en: '{v}% increased Effect of Chill', de: '{v}% erhöhte Wirkung von Unterkühlung' },
+    absorption_leech_spell: { channel: 'absorptionLeechSpellPct', en: '+{v}% of Spell Damage leeched as Absorption', de: '+{v}% des Zauberschadens als Absorption entzogen' },
+    absorption_leech_effect_inc: { channel: 'absorptionLeechEffectIncPct', en: '{v}% increased Absorption recovered from Leech', de: '{v}% erhöhte durch Entzug erhaltene Absorption' },
+    // Gain X% of physical Damage as extra Shadow (node 20218): mirrors
+    // phys_as_fire; handled in _egApplyDamageConversion (extra, not converted).
+    phys_as_shadow: { channel: 'physAsExtraShadowPct', en: 'Gain {v}% of physical Damage as extra Shadow Damage', de: 'Erhalte {v}% des physischen Schadens als zusätzlichen Schattenschaden' },
     crit_chance_dagger: { channel: 'critChanceDaggerPct', en: '+{v}% to Critical Strike Chance with Daggers', de: '+{v}% auf die kritische Trefferchance mit Dolchen' },
     crit_multi_dagger: { channel: 'critMultiplierDaggerPct', en: '+{v}% to Critical Strike Multiplier with Daggers', de: '+{v}% auf den kritischen Schadensmultiplikator mit Dolchen' },
     poison_duration: { channel: 'poisonDurationPct', en: '{v}% increased Poison Duration on enemies', de: '{v}% erhöhte Giftdauer bei Gegnern' },

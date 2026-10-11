@@ -347,7 +347,10 @@ function _egGetMonsterChargeMultiplier(m) {
     } else if (_egHasStatus(m.statuses, 'frozen')) {
         mult = 0;
     } else if (_egHasStatus(m.statuses, 'chill')) {
-        mult = EG_AIL_CHARGE_SLOW_MULT;
+        // Passive tree "increased Effect of Chill": a stronger slow on enemies.
+        let eff = 0;
+        try { eff = Math.max(0, Number(_egComputePlayerStats().chillEffectIncPct) || 0); } catch (e) { eff = 0; }
+        mult = Math.max(0.1, 1 - (1 - EG_AIL_CHARGE_SLOW_MULT) * (1 + eff / 100));
     }
     if (mult > 0 && typeof _egBossFeedChargeMult === 'function') {
         const feed = globalThis._egBossFeedChargeMult(m);
