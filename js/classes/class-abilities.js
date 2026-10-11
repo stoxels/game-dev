@@ -11,7 +11,7 @@ import { ASCENDENCY_DEFS } from './ascendency-defs.js';
 import { _executeRegressionToPrior, _executeSignificanceThreshold } from './class-actuary.js';
 import { _executeBayesTraps } from './class-bayesian.js';
 import { _executeTypeIShield } from './class-bayesian-type-i.js';
-import { _patchCooldownButton, cooldownState, getEffectiveCooldown, startSlotCooldown } from './class-cooldown-state.js';
+import { _patchCooldownButton, cooldownState, getEffectiveCooldown, reduceSlotCooldown, startSlotCooldown } from './class-cooldown-state.js';
 import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
 import { CLASS_HUD_HINT_MAX_USES, buildClassHUD, updateMomentumBar } from './class-hud.js';
 import { _abilityCanAfford, _bloodMagicActive, _getAbilityManaCost, payAbilityCost } from './class-mana.js';
@@ -152,7 +152,12 @@ function _getActiveAbilityData(def, activeKey) {
 export function _getPassiveEffect() {
     const def = CLASS_DEFS[STATE.playerClass];
     const passLv = STATE.classPassiveLevel || 1;
-    return def.passive.levels[passLv - 1].effect;
+    const base = def.passive.levels[passLv - 1].effect;
+    // Rolling Mean: Momentum triggers after one correct fill fewer.
+    if (base.streakForBonus && ptHasSkill('rolling_mean')) {
+        return Object.assign({}, base, { streakForBonus: Math.max(1, base.streakForBonus - 1) });
+    }
+    return base;
 }
 
 
@@ -483,10 +488,49 @@ function _fireInstantBaseAbility(slot) {
     if (!payAbilityCost(_getAbilityManaCost(slot))) return;
 
     // Row/col are 0,0 - instant abilities ignore position.
+    _noteBaseAbilityCast(slot);
     _dispatchBaseAbility(slot, STATE.playerClass, 0, 0, effect);
 
     const cdSeconds = getEffectiveCooldown(slot, def[slot].cooldownSeconds);
+    _startBaseAbilityCooldown(slot, cdSeconds);
+}
+
+// Remembers which base ability is casting so reveal projectiles can pick up
+// that ability's passive-node damage bonuses (see combat-class-projectiles-reveal.js).
+function _noteBaseAbilityCast(slot) {
+    if (!STATE.playerClass) return;
+    window._egLastBaseCast = { id: `${STATE.playerClass}_${slot}`, at: Date.now() };
+}
+
+// Starts a base ability's cooldown and applies the class-wheel nodes that
+// bend it:
+//   bootstrap     Data Strike: 20% chance not to go on cooldown
+//   naive_bayes   Rain of Arrows: -2 s cooldown per marked wrong cell (max 40 s)
+//   derivative    Arcane Reveal cast: -30 s on Absolute Zero
+//   integral      Absolute Zero cast: -30 s on Arcane Reveal
+//   residual_plot Data Strike cast: next 5 fills count double + 10 s damage bonus
+function _startBaseAbilityCooldown(slot, cdSeconds) {
+    const cls = STATE.playerClass;
+    if (cls === 'statistician' && slot === 'active1') {
+        if (ptHasSkill('residual_plot')) {
+            window.LEVEL_FLAGS.residualPlotFills = 5;
+            window.LEVEL_FLAGS.residualPlotUntil = Date.now() + 10000;
+        }
+        if (ptHasSkill('bootstrap') && Math.random() < 0.20) {
+            globalThis.showToast(t('cls_bootstrap_free'));
+            return;
+        }
+    }
+    if (cls === 'probabilist' && slot === 'active2' && ptHasSkill('naive_bayes') && globalThis.userGrid) {
+        let marked = 0;
+        for (const row of globalThis.userGrid) for (const v of row) if (v === 2) marked++;
+        cdSeconds = Math.max(0, cdSeconds - Math.min(40, marked * 2));
+    }
     startSlotCooldown(slot, cdSeconds);
+    if (cls === 'mathmagician') {
+        if (slot === 'active1' && ptHasSkill('derivative')) reduceSlotCooldown('active2', 30);
+        if (slot === 'active2' && ptHasSkill('integral')) reduceSlotCooldown('active1', 30);
+    }
 }
 
 
@@ -759,10 +803,11 @@ function _executeBaseSkillOnCell(activeKey, row, col) {
         return;
     }
 
+    _noteBaseAbilityCast(activeKey);
     _dispatchBaseAbility(activeKey, STATE.playerClass, row, col, effect);
 
     const cdSeconds = getEffectiveCooldown(activeKey, def[activeKey].cooldownSeconds);
-    startSlotCooldown(activeKey, cdSeconds);
+    _startBaseAbilityCooldown(activeKey, cdSeconds);
 }
 
 
@@ -816,6 +861,10 @@ function _resetClassLevelState() {
     window._bayesTrapProtectedLines = new Set();
     _varianceShield_removeBubble();
     _momentumClearParticlesImmediate();
+    if (window._convergentSeriesTimer) {
+        clearInterval(window._convergentSeriesTimer);
+        window._convergentSeriesTimer = null;
+    }
 
     updateMomentumBar(0, 15);
 
@@ -833,7 +882,48 @@ function _applyMathmagicianPassive(effect) {
     if (ptHasSkill('reinforced_shield')) freeMistakes += 1;
     if (ptHasSkill('fortified_shield')) freeMistakes += 1;
     window._classFreeMistakes = freeMistakes;
+    window._classFreeMistakesMax = freeMistakes;
+    _startConvergentSeries();
     _varianceShield_updateVisibility();
+}
+
+// Convergent Series: Variance Shield regains 1 charge every 90 seconds
+// (never above its starting maximum). Counts game seconds - paused or dead
+// ticks do not advance it.
+const CONVERGENT_SERIES_INTERVAL_S = 90;
+function _startConvergentSeries() {
+    if (window._convergentSeriesTimer) {
+        clearInterval(window._convergentSeriesTimer);
+        window._convergentSeriesTimer = null;
+    }
+    if (STATE.playerClass !== 'mathmagician' || !ptHasSkill('convergent_series')) return;
+    let elapsed = 0;
+    window._convergentSeriesTimer = setInterval(() => {
+        if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return;
+        if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return;
+        elapsed++;
+        if (elapsed < CONVERGENT_SERIES_INTERVAL_S) return;
+        elapsed = 0;
+        if ((window._classFreeMistakes || 0) < (window._classFreeMistakesMax || 0)) {
+            window._classFreeMistakes++;
+            _varianceShield_updateVisibility();
+            globalThis.showToast(t('cls_convergent_series'));
+            playShieldChargePulseEffect();
+        }
+    }, 1000);
+}
+
+// Fires `count` reveal-strength projectiles at the current target from random
+// grid cells (Convergent Series: each absorbed mistake). No-op outside combat.
+function _fireTreeProjectilesFromGrid(count) {
+    if (typeof globalThis._egOnProgrammaticReveal !== 'function' || !cur || !cur.grid) return;
+    const rows = cur.grid.length;
+    const cols = cur.grid[0].length;
+    const ids = [];
+    for (let i = 0; i < count; i++) {
+        ids.push(`g-${Math.floor(Math.random() * rows)}-${Math.floor(Math.random() * cols)}`);
+    }
+    globalThis._egOnProgrammaticReveal(ids, 'ability');
 }
 
 
@@ -981,6 +1071,17 @@ function _applyMathmagicianShieldAbsorb() {
 
     // Each passive node has its own independent chance to grant bonus time
     let bonus = 0;
+
+    // Limit Theorem: each absorbed mistake shortens the Absolute Zero cooldown.
+    if (ptHasSkill('limit_theorem')) reduceSlotCooldown('active2', 10);
+
+    // Compound Interest: +10 s for every mistake already absorbed this level.
+    const absorbedBefore = window.LEVEL_FLAGS.compoundInterestCount || 0;
+    window.LEVEL_FLAGS.compoundInterestCount = absorbedBefore + 1;
+    if (ptHasSkill('compound_interest')) bonus += 10 * absorbedBefore;
+
+    // Convergent Series (combat): an absorbed mistake fires 4 projectiles.
+    if (ptHasSkill('convergent_series')) _fireTreeProjectilesFromGrid(4);
     if (ptHasSkill('calculated_error') && Math.random() < 0.50) bonus += 120;
     if (ptHasSkill('error_dividend') && Math.random() < 0.25) bonus += 30;
     if (ptHasSkill('lucky_lapse') && Math.random() < 0.25) bonus += 30;
@@ -1031,6 +1132,8 @@ export function getClassPenaltyMultiplier() {
         && !ptHasSkill('keystone_asymptotic_mastery')) {
         const absorbed = _applyMathmagicianShieldAbsorb();
         if (absorbed) return 0.0;
+        // Asymptote: with Variance Shield spent, mistakes cost 25% less time.
+        if (ptHasSkill('asymptote')) return 0.75;
     }
 
     return 1.0;
@@ -1078,6 +1181,22 @@ function _handleMathmagicianFreezeBonus() {
         }
     }
 
+    // Zero Sum: every 2nd correct fill during Absolute Zero adds 1 second.
+    if (ptHasSkill('zero_sum')) {
+        window._zeroSumFills = (window._zeroSumFills || 0) + 1;
+        if (window._zeroSumFills % 2 === 0) {
+            addTimeSecs(1, { capSecs: 3600 });
+            trackAchStat('timeAdded', 1);
+        }
+    }
+
+    // Zero Sum (combat): correct fills during Absolute Zero
+    // chill the targeted monster.
+    if (ptHasSkill('zero_sum') && typeof globalThis._egApplyMonsterAilment === 'function') {
+        const targetMon = (globalThis._egMonsters || []).find(m => m.id === globalThis._egTargetId);
+        if (targetMon && targetMon.currentHP > 0) globalThis._egApplyMonsterAilment(targetMon, 'chill');
+    }
+
     if (ptHasSkill('god_of_math')) {
         const cd = cooldownState['active1'];
         if (cd.remaining > 0) {
@@ -1123,6 +1242,11 @@ function _handleStatisticianStreak(effect, row, col) {
     }
 
     correctFillStreak++;
+    // Residual Plot: the next fills after Data Strike count twice.
+    if (window.LEVEL_FLAGS.residualPlotFills > 0) {
+        window.LEVEL_FLAGS.residualPlotFills--;
+        correctFillStreak++;
+    }
     _momentumSpawnParticle(row, col);
 
     if (correctFillStreak >= effect.streakForBonus) {
@@ -1134,9 +1258,38 @@ function _handleStatisticianStreak(effect, row, col) {
 }
 
 
+// _handlePriorElicitation - Prior Elicitation: once the puzzle is half solved,
+//   Bayesian Insight triggers a second time with half its marks.
+function _handlePriorElicitation() {
+    if (STATE.playerClass !== 'probabilist' || globalThis.isClassless()) return;
+    if (window.LEVEL_FLAGS.priorElicitationDone || !ptHasSkill('prior_elicitation')) return;
+    if (!cur || !cur.grid || !globalThis.userGrid) return;
+    let total = 0;
+    let done = 0;
+    for (let r = 0; r < cur.grid.length; r++) {
+        for (let c = 0; c < cur.grid[0].length; c++) {
+            if (cur.grid[r][c] !== 1) continue;
+            total++;
+            if (globalThis.userGrid[r][c] === 1) done++;
+        }
+    }
+    if (total === 0 || done * 2 < total) return;
+    window.LEVEL_FLAGS.priorElicitationDone = true;
+
+    const effect = _getPassiveEffect();
+    if (!effect.autoMarkCount) return;
+    const markCount = Math.max(1, Math.ceil(_collectProbabilistMarkCount(effect.autoMarkCount) / 2));
+    const markedBefore = _snapshotMarkedCells();
+    markWrongTiles(markCount);
+    Audio_Manager.playSFX('bayesianInsight');
+    _playBayesianInsightAnimation(_collectNewlyMarkedCells(markedBefore));
+}
+
+
 // onCorrectFill - called from ac() in mouse-button-handlers.js whenever the player
 //   correctly fills a cell. Runs all passive reactions in priority order.
 export function onCorrectFill(row, col) {
+    _handlePriorElicitation();
     _handleTransitionMatrixCascade(row, col);
     _handleMathmagicianFreezeBonus();
     _handlePrecisionMarkMomentum(row, col);
@@ -1171,6 +1324,12 @@ function _getStatisticianStreakReduction(hasLFM, hasMNM) {
 //   Resets or reduces the Statistician fill streak depending on passive tree nodes.
 export function onMistake() {
     if (STATE.playerClass === 'statistician' && !globalThis.isClassless()) {
+        // Outlier Rejection: the first mistake each level leaves the streak alone.
+        if (ptHasSkill('outlier_rejection') && !window.LEVEL_FLAGS.outlierRejectionUsed) {
+            window.LEVEL_FLAGS.outlierRejectionUsed = true;
+            updateMomentumBar(correctFillStreak, _getPassiveEffect().streakForBonus || 15);
+            return;
+        }
         _momentumParticlesOnMistake();
 
         const effect = _getPassiveEffect();

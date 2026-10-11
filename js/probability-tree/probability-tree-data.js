@@ -23162,25 +23162,13 @@ export const TALENT_TREE_DATA = {
    "tier": "small"
   },
   {
-   "id": 1,
-   "x": 0,
-   "y": 0,
-   "nameEn": "Ascendancy Gate",
-   "nameDe": "Aszendenz-Tor",
-   "descEn": "KEYSTONE (placeholder) - reserved center of the tree. Will one day unlock Ascendancy improvements and fundamentally change how the game is played. Deliberately unconnected.",
-   "descDe": "SCHLÜSSELSTEIN (Platzhalter) - reserviertes Zentrum des Baumes. Soll eines Tages Aszendenz-Verbesserungen freischalten und grundlegend verändern, wie das Spiel gespielt wird. Bewusst nicht verbunden.",
-   "icon": "✦",
-   "statKey": "keystone_ascendancy_gate",
-   "tier": "keystone"
-  },
-  {
    "id": 55,
    "x": -537,
    "y": 310,
    "nameEn": "God of Statistics",
    "nameDe": "Gott der Statistik",
-   "descEn": "Data Strike has a 25% chance of revealing cells in an additional random row or column. This rolls twice and independently from Advanced Data Strike. Each previous use of Data Strike this level increases its solved lines by 1.\nDoubles the Momentum Bonus. Stacks with other effects that increase Momentum time.\nDiagonal Strike has a 50% chance to be repeated on another random cell. Diagonal Strike can reveal and mark 2 additional cells.",
-   "descDe": "Datenhieb hat eine 25% Chance Zellen in einer weiteren zufälligen Zeile oder Spalte aufzudecken. Dies wird zweimal und unabhängig von Verbesserter Datenhieb gewürfelt. Jede vorherige Anwendung von Datenhieb in diesem Level erhöht seine gelösten Linien um 1.\nVerdoppelt den Momentum - Bonus. Wirkt zusammen mit anderen Effekten, die die Momentumzeit erhöhen.\nDiagonalschlag hat eine Chance von 50% zusätzlich auf eine andere zufällige Zelle angewendet zu werden. Diagonalschlag kann 2 zusätzliche Zellen aufdecken und markieren.",
+   "descEn": "Data Strike has 2 additional, independent 25% chances to solve one more random row or column.\nEach Data Strike used earlier this level makes Data Strike solve 1 additional row or column.\nDoubles the time gained from Momentum (applied after all other Momentum bonuses).\nDiagonal Strike has a 50% chance to repeat itself on another random cell.\nDiagonal Strike can reveal and mark 2 additional cells.",
+   "descDe": "Datenhieb hat 2 zusätzliche, voneinander unabhängige Chancen von je 25%, eine weitere zufällige Zeile oder Spalte zu lösen.\nJeder in diesem Level bereits genutzte Datenhieb lässt Datenhieb 1 weitere Zeile oder Spalte lösen.\nVerdoppelt die durch Momentum gewonnene Zeit (nach allen anderen Momentum-Boni).\nDiagonalschlag hat eine Chance von 50%, sich auf einer weiteren zufälligen Zelle zu wiederholen.\nDiagonalschlag kann 2 zusätzliche Zellen aufdecken und markieren.",
    "icon": "✨",
    "statKey": "god_of_statistics",
    "tier": "keystone"
@@ -23191,8 +23179,8 @@ export const TALENT_TREE_DATA = {
    "y": 190,
    "nameEn": "Gear of the Statistician",
    "nameDe": "Ausrüstung des Statistikers",
-   "descEn": "Statisticians have a 33% chance to receive an additional Magnifier after completing a level.",
-   "descDe": "Statistiker haben eine 33% Chance eine Lupe nach dem Abschluss eines Levels zu erhalten.",
+   "descEn": "As a Statistician, you have a 33% chance to receive a Magnifier (reveals 2 correct cells) after completing a level.",
+   "descDe": "Als Statistiker hast du nach Abschluss eines Levels eine Chance von 33%, eine Lupe zu erhalten (deckt 2 richtige Zellen auf).",
    "icon": "📊",
    "statKey": "gear_of_the_statistician",
    "tier": "notable"
@@ -23203,8 +23191,8 @@ export const TALENT_TREE_DATA = {
    "y": 218,
    "nameEn": "Improved Gear of the Statistician",
    "nameDe": "Verbesserte Ausrüstung des Statistikers",
-   "descEn": "Statisticians have a 33% chance to receive an additional Error Gem after completing a level.",
-   "descDe": "Statistiker haben eine 33% Chance einen Fehlerstein nach dem Abschluss eines Levels zu erhalten.",
+   "descEn": "As a Statistician, you have a 33% chance to receive an Error Gem (marks 8 wrong empty cells) after completing a level.",
+   "descDe": "Als Statistiker hast du nach Abschluss eines Levels eine Chance von 33%, einen Fehlerstein zu erhalten (markiert 8 falsche leere Zellen).",
    "icon": "📈",
    "statKey": "improved_gear_of_the_statistician",
    "tier": "notable"
@@ -23215,8 +23203,8 @@ export const TALENT_TREE_DATA = {
    "y": 289,
    "nameEn": "Chain Reaction",
    "nameDe": "Kettenreaktion",
-   "descEn": "Gain +1 second whenever Momentum triggers. Stacks with other effects that increase Momentum time.",
-   "descDe": "Erhalte +1 Sekunde wenn Momentum ausgelöst wird. Wirkt zusammen mit anderen Effekten, die die Momentumzeit erhöhen.",
+   "descEn": "Each Momentum trigger grants +1 second of additional time.",
+   "descDe": "Jede Momentum-Auslösung gewährt +1 Sekunde zusätzliche Zeit.",
    "icon": "⛓️",
    "statKey": "chain_reaction",
    "tier": "notable"
@@ -23227,8 +23215,8 @@ export const TALENT_TREE_DATA = {
    "y": 370,
    "nameEn": "Precise Momentum",
    "nameDe": "Präziser Schwung",
-   "descEn": "Gain +2 seconds whenever Momentum triggers. Stacks with other effects that increase Momentum time.",
-   "descDe": "Erhalte +2 Sekunden wenn Momentum ausgelöst wird. Wirkt zusammen mit anderen Effekten, die die Momentumzeit erhöhen.",
+   "descEn": "Each Momentum trigger grants +2 seconds of additional time.",
+   "descDe": "Jede Momentum-Auslösung gewährt +2 Sekunden zusätzliche Zeit.",
    "icon": "🏹",
    "statKey": "precise_momentum",
    "tier": "notable"
@@ -23239,8 +23227,8 @@ export const TALENT_TREE_DATA = {
    "y": 423,
    "nameEn": "Exponential Growth",
    "nameDe": "Exponentielles Wachstum",
-   "descEn": "Each Momentum activation increases future Momentums by +1 seconds. Stacks with other effects that increase Momentum time.",
-   "descDe": "Jede Momentum - Aktivierung erhöht zukünftige Schwünge um 1 Sekunde. Wirkt zusammen mit anderen Effekten, die die Momentumzeit erhöhen.",
+   "descEn": "Each Momentum trigger grants +1 second of additional time for every Momentum already triggered this level.",
+   "descDe": "Jede Momentum-Auslösung gewährt +1 Sekunde zusätzliche Zeit für jedes in diesem Level bereits ausgelöste Momentum.",
    "icon": "🚀",
    "statKey": "exponential_growth",
    "tier": "notable"
@@ -23251,8 +23239,8 @@ export const TALENT_TREE_DATA = {
    "y": 423,
    "nameEn": "Learning from Mistakes",
    "nameDe": "Lernen aus Fehlern",
-   "descEn": "Mistakes reduce the Momentum Streak by 12 instead of fully resetting it. Combines with Mistakes no Matter for a reduced penalty of 10.",
-   "descDe": "Fehler verringern den Momentum-Zähler um 12 statt ihn vollständig zurückzusetzen. Kombiniert mit 'Fehler zählen nicht' für eine reduzierte Strafe von 10.",
+   "descEn": "A mistake reduces your Momentum streak by 12 instead of resetting it.\nWith both Learning from Mistakes and Mistakes no Matter, a mistake reduces it by only 10.",
+   "descDe": "Ein Fehler verringert deine Momentum-Serie um 12, statt sie zurückzusetzen.\nMit Lernen aus Fehlern und Fehler zählen nicht zusammen verringert ein Fehler sie nur um 10.",
    "icon": "🩹",
    "statKey": "learning_from_mistakes",
    "tier": "notable"
@@ -23263,8 +23251,8 @@ export const TALENT_TREE_DATA = {
    "y": 370,
    "nameEn": "Mistakes no Matter",
    "nameDe": "Fehler zählen nicht",
-   "descEn": "Mistakes reduce the Momentum Streak by 12 instead of fully resetting it. Combines with Learning from Mistakes for a reduced penalty of 10.",
-   "descDe": "Fehler verringern den Momentum-Zähler um 12 statt ihn vollständig zurückzusetzen. Kombiniert mit 'Lernen aus Fehlern' für eine reduzierte Strafe von 10.",
+   "descEn": "A mistake reduces your Momentum streak by 12 instead of resetting it.\nWith both Learning from Mistakes and Mistakes no Matter, a mistake reduces it by only 10.",
+   "descDe": "Ein Fehler verringert deine Momentum-Serie um 12, statt sie zurückzusetzen.\nMit Lernen aus Fehlern und Fehler zählen nicht zusammen verringert ein Fehler sie nur um 10.",
    "icon": "💪",
    "statKey": "mistakes_no_matter",
    "tier": "notable"
@@ -23275,8 +23263,8 @@ export const TALENT_TREE_DATA = {
    "y": 289,
    "nameEn": "Monte Carlo",
    "nameDe": "Monte Carlo Simulation",
-   "descEn": "Data Strike reveal cap increased by 1. Stacks with Correlation Matrix.",
-   "descDe": "Datenhieb löst eine weitere ungelöste Zelle. Wirkt zusammen mit Korrelationsmatrix.",
+   "descEn": "Data Strike reveals up to 1 additional cell in each line it solves.",
+   "descDe": "Datenhieb deckt in jeder gelösten Zeile oder Spalte bis zu 1 zusätzliche Zelle auf.",
    "icon": "🎰",
    "statKey": "monte_carlo",
    "tier": "notable"
@@ -23287,8 +23275,8 @@ export const TALENT_TREE_DATA = {
    "y": 218,
    "nameEn": "Correlation Matrix",
    "nameDe": "Korrelationsmatrix",
-   "descEn": "Data Strike reveal cap increased by 1. Stacks with Monte Carlo.",
-   "descDe": "Datenhieb löst eine weitere ungelöste Zelle. Wirkt zusammen mit Monte Carlo.",
+   "descEn": "Data Strike reveals up to 1 additional cell in each line it solves.",
+   "descDe": "Datenhieb deckt in jeder gelösten Zeile oder Spalte bis zu 1 zusätzliche Zelle auf.",
    "icon": "🔗",
    "statKey": "correlation_matrix",
    "tier": "notable"
@@ -23299,8 +23287,8 @@ export const TALENT_TREE_DATA = {
    "y": 101,
    "nameEn": "Advanced Data Strike",
    "nameDe": "Verbesserter Datenhieb",
-   "descEn": "Data Strike has a 25% chance of revealing cells in an additional random row or column. This rolls independently from God of Statistics. \nReduces the cooldown of Data Strike by 30 seconds.",
-   "descDe": "Datenhieb hat eine 25% Chance Zellen in einer weiteren zufälligen Zeile oder Spalte aufzudecken. Dies wird unabhängig von Gott der Statistik gewürfelt.\nReduziert die Abklingzeit von Datenhieb um 30 Sekunden.",
+   "descEn": "Data Strike has a 25% chance to solve one more random row or column. Rolled independently from God of Statistics.\nReduces the cooldown of Data Strike by 30 seconds.",
+   "descDe": "Datenhieb hat eine Chance von 25%, eine weitere zufällige Zeile oder Spalte zu lösen. Wird unabhängig von Gott der Statistik gewürfelt.\nVerringert die Abklingzeit von Datenhieb um 30 Sekunden.",
    "icon": "⚙️",
    "statKey": "advanced_data_strike",
    "tier": "notable"
@@ -23311,8 +23299,8 @@ export const TALENT_TREE_DATA = {
    "y": 222,
    "nameEn": "Accelerated Computation",
    "nameDe": "Beschleunigte Berechnung",
-   "descEn": "Reduces the cooldown of Data Strike by 15 seconds. Stacks with Swift Strike.",
-   "descDe": "Reduziert die Abklingzeit von Datenhieb um 15 Sekunden. Wirkt zusammen mit Schneller Hieb.",
+   "descEn": "Reduces the cooldown of Data Strike by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Datenhieb um 15 Sekunden.",
    "icon": "🖥️",
    "statKey": "accelerated_computation",
    "tier": "notable"
@@ -23323,8 +23311,8 @@ export const TALENT_TREE_DATA = {
    "y": 394,
    "nameEn": "Diagonal Extension",
    "nameDe": "Diagonale Erweiterung",
-   "descEn": "Diagonal Strike can reveal 1 additional cell. Stacks with Diagonal Witch.",
-   "descDe": "Diagonalschlag kann 1 zusätzliche Zelle enthüllen. Wirkt zusammen mit Diagonale Hexe.",
+   "descEn": "Diagonal Strike can reveal 1 additional cell.\nWith Diagonally Wrong, Diagonal Strike can mark 1 additional wrong cell.",
+   "descDe": "Diagonalschlag kann 1 zusätzliche Zelle aufdecken.\nMit Diagonal Falsch kann Diagonalschlag 1 zusätzliche falsche Zelle markieren.",
    "icon": "↗️",
    "statKey": "random_diagonal",
    "tier": "notable"
@@ -23335,8 +23323,8 @@ export const TALENT_TREE_DATA = {
    "y": 517,
    "nameEn": "Diagonal Witch",
    "nameDe": "Diagonale Hexe",
-   "descEn": "Diagonal Strike can reveal 1 additional cell. Stacks with Diagonal Extension.",
-   "descDe": "Diagonalschlag kann 1 zusätzliche Zelle enthüllen. Wirkt zusammen mit Diagonale Erweiterung.",
+   "descEn": "Diagonal Strike can reveal 1 additional cell.\nWith Diagonally Wrong, Diagonal Strike can mark 1 additional wrong cell.",
+   "descDe": "Diagonalschlag kann 1 zusätzliche Zelle aufdecken.\nMit Diagonal Falsch kann Diagonalschlag 1 zusätzliche falsche Zelle markieren.",
    "icon": "🔀",
    "statKey": "diagonal_witch",
    "tier": "notable"
@@ -23347,8 +23335,8 @@ export const TALENT_TREE_DATA = {
    "y": 519,
    "nameEn": "Diagonally Wrong",
    "nameDe": "Diagonal Falsch",
-   "descEn": "Diagonal Strike now also marks incorrect cells as incorrect.",
-   "descDe": "Diagonalschlag markiert nun auch falsche Zellen als falsch.",
+   "descEn": "Diagonal Strike also marks the cells along its path that you filled incorrectly (up to its mark limit).",
+   "descDe": "Diagonalschlag markiert zusätzlich die Zellen auf seinem Weg, die du falsch ausgefüllt hast (bis zu seinem Markierungslimit).",
    "icon": "✖️",
    "statKey": "diagonally_wrong",
    "tier": "notable"
@@ -23359,8 +23347,8 @@ export const TALENT_TREE_DATA = {
    "y": 398,
    "nameEn": "Accelerated Striking",
    "nameDe": "Verschnellertes Schlagen",
-   "descEn": "Reduces the cooldown of Diagonal Strike by 15 seconds. Stacks with Quick Strike.",
-   "descDe": "Reduziert die Abklingzeit von Diagonalschlag um 15 Sekunden. Wirkt zusammen mit Schneller Schlag.",
+   "descEn": "Reduces the cooldown of Diagonal Strike by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Diagonalschlag um 15 Sekunden.",
    "icon": "💨",
    "statKey": "accelerated_striking",
    "tier": "notable"
@@ -23371,8 +23359,8 @@ export const TALENT_TREE_DATA = {
    "y": 226,
    "nameEn": "Swift Strike",
    "nameDe": "Schneller Hieb",
-   "descEn": "Reduces the cooldown of Data Strike by 15 seconds. Stacks with Accelerated Computation.",
-   "descDe": "Reduziert die Abklingzeit von Datenhieb um 15 Sekunden. Wirkt zusammen mit Beschleunigte Berechnung.",
+   "descEn": "Reduces the cooldown of Data Strike by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Datenhieb um 15 Sekunden.",
    "icon": "⚡",
    "statKey": "travel_swift_strike",
    "tier": "travel"
@@ -23383,8 +23371,8 @@ export const TALENT_TREE_DATA = {
    "y": 103,
    "nameEn": "Quick Strike",
    "nameDe": "Schneller Schlag",
-   "descEn": "Reduces the cooldown of Diagonal Strike by 15 seconds. Stacks with Accelerated Striking.",
-   "descDe": "Reduziert die Abklingzeit von Diagonalschlag um 15 Sekunden. Wirkt zusammen mit Verschnellertes Schlagen.",
+   "descEn": "Reduces the cooldown of Diagonal Strike by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Diagonalschlag um 15 Sekunden.",
    "icon": "🏃",
    "statKey": "travel_quick_strike",
    "tier": "travel"
@@ -23395,8 +23383,8 @@ export const TALENT_TREE_DATA = {
    "y": -620,
    "nameEn": "God of Math",
    "nameDe": "Gott der Mathematik",
-   "descEn": "Arcane Reveal's radius is increased by 1.\nDoubles the amount of seconds absorbed mistakes add to the timer.\nEach correct cell fill during Absolute Zero reduces the remaining cooldown of Arcane Reveal by 1 second.",
-   "descDe": "Der Radius von Arkaner Enthüllung wird um 1 erhöht.\nVerdoppelt die Sekunden, die absorbierte Fehler zum Timer hinzufügen.\nJedes korrekt ausgefüllte Feld während des Absoluten Nullpunkts reduziert die verbleibende Abklingzeit von Arkaner Enthüllung um 1 Sekunde.",
+   "descEn": "Arcane Reveal's radius is increased by 1.\nDoubles the time gained from mistakes absorbed by Variance Shield.\nEach correct fill during Absolute Zero reduces the remaining cooldown of Arcane Reveal by 1 second.",
+   "descDe": "Der Radius von Arkaner Enthüllung wird um 1 erhöht.\nVerdoppelt die Zeit, die durch vom Varianzschild absorbierte Fehler gewonnen wird.\nJede korrekte Füllung während Absolutem Nullpunkt verringert die verbleibende Abklingzeit von Arkaner Enthüllung um 1 Sekunde.",
    "icon": "✨",
    "statKey": "god_of_math",
    "tier": "keystone"
@@ -23407,8 +23395,8 @@ export const TALENT_TREE_DATA = {
    "y": -740,
    "nameEn": "Gear of the Mathmagician",
    "nameDe": "Ausrüstung des Mathemagiers",
-   "descEn": "Mathmagicians have a 25% chance to receive an additional Professor after completing a level.",
-   "descDe": "Mathemagier haben eine 25% Chance einen Professor nach dem Abschluss eines Levels zu erhalten.",
+   "descEn": "As a Mathmagician, you have a 25% chance to receive a Professor (reduces your mistake count by 4) after completing a level.",
+   "descDe": "Als Mathemagier hast du nach Abschluss eines Levels eine Chance von 25%, einen Professor zu erhalten (verringert deine Fehleranzahl um 4).",
    "icon": "🧮",
    "statKey": "gear_of_the_mathmagician",
    "tier": "notable"
@@ -23417,10 +23405,10 @@ export const TALENT_TREE_DATA = {
    "id": 56,
    "x": 77,
    "y": -712,
-   "nameEn": "Improved Gear of the Mathmatigican",
+   "nameEn": "Improved Gear of the Mathmagician",
    "nameDe": "Verbesserte Ausrüstung des Mathemagiers",
-   "descEn": "Mathmagicians have a 15% chance to receive an additional Chronobolt after completing a level.",
-   "descDe": "Mathemagier haben eine 15% Chance einen Chronoblitz nach dem Abschluss eines Levels zu erhalten.",
+   "descEn": "As a Mathmagician, you have a 15% chance to receive a Chronobolt (adds 15 minutes to the timer) after completing a level.",
+   "descDe": "Als Mathemagier hast du nach Abschluss eines Levels eine Chance von 15%, einen Chronoblitz zu erhalten (fügt dem Timer 15 Minuten hinzu).",
    "icon": "⚡",
    "statKey": "improved_gear_of_the_mathmagician",
    "tier": "notable"
@@ -23431,8 +23419,8 @@ export const TALENT_TREE_DATA = {
    "y": -641,
    "nameEn": "Arcane Echo",
    "nameDe": "Arkanes Echo",
-   "descEn": "Arcane Reveal can reveal 1 additional cell. Stacks with Resonant Reveal.",
-   "descDe": "Arkane Enthüllung kann 1 zusätzliche Zelle enthüllen. Wirkt zusammen mit Resonante Enthüllung.",
+   "descEn": "Arcane Reveal can reveal 1 additional correct cell.",
+   "descDe": "Arkane Enthüllung kann 1 zusätzliche richtige Zelle aufdecken.",
    "icon": "🔮",
    "statKey": "arcane_echo",
    "tier": "notable"
@@ -23443,8 +23431,8 @@ export const TALENT_TREE_DATA = {
    "y": -560,
    "nameEn": "Resonant Reveal",
    "nameDe": "Resonante Enthüllung",
-   "descEn": "Arcane Reveal can reveal 1 additional cell. Stacks with Arcane Echo.",
-   "descDe": "Arkane Enthüllung kann 1 zusätzliche Zelle enthüllen. Wirkt zusammen mit Arkanes Echo.",
+   "descEn": "Arcane Reveal can reveal 1 additional correct cell.",
+   "descDe": "Arkane Enthüllung kann 1 zusätzliche richtige Zelle aufdecken.",
    "icon": "🌀",
    "statKey": "resonant_reveal",
    "tier": "notable"
@@ -23455,8 +23443,8 @@ export const TALENT_TREE_DATA = {
    "y": -507,
    "nameEn": "Arcane Exposure",
    "nameDe": "Arkane Bloßstellung",
-   "descEn": "Arcane Reveal now also marks all empty cells in the affected area as incorrect.",
-   "descDe": "Arkane Enthüllung markiert nun auch alle leeren Zellen im betroffenen Bereich als falsch.",
+   "descEn": "Arcane Reveal also marks every empty cell in its area as incorrect.",
+   "descDe": "Arkane Enthüllung markiert zusätzlich jede leere Zelle in ihrem Bereich als falsch.",
    "icon": "💥",
    "statKey": "arcane_exposure",
    "tier": "notable"
@@ -23467,8 +23455,8 @@ export const TALENT_TREE_DATA = {
    "y": -507,
    "nameEn": "Reinforced Shield",
    "nameDe": "Verstärkter Schild",
-   "descEn": "Variance Shield absorbs 1 additional mistake per level. Stacks with Fortified Shield.",
-   "descDe": "Varianzschild absorbiert 1 weiteren Fehler pro Level. Wirkt zusammen mit Gefestigtem Schild.",
+   "descEn": "Variance Shield can absorb 1 additional mistake per level.",
+   "descDe": "Varianzschild kann pro Level 1 zusätzlichen Fehler absorbieren.",
    "icon": "🛡️",
    "statKey": "reinforced_shield",
    "tier": "notable"
@@ -23479,8 +23467,8 @@ export const TALENT_TREE_DATA = {
    "y": -560,
    "nameEn": "Fortified Shield",
    "nameDe": "Gefestigter Schild",
-   "descEn": "Variance Shield absorbs 1 additional mistake per level. Stacks with Reinforced Shield.",
-   "descDe": "Varianzschild absorbiert 1 weiteren Fehler pro Level. Wirkt zusammen mit Verstärktem Schild.",
+   "descEn": "Variance Shield can absorb 1 additional mistake per level.",
+   "descDe": "Varianzschild kann pro Level 1 zusätzlichen Fehler absorbieren.",
    "icon": "🪖",
    "statKey": "fortified_shield",
    "tier": "notable"
@@ -23491,8 +23479,8 @@ export const TALENT_TREE_DATA = {
    "y": -641,
    "nameEn": "Calculated Error",
    "nameDe": "Kalkulierter Fehler",
-   "descEn": "Absorbed mistakes have a 50% chance to add 2 minutes to the timer. Works independently from Error Dividend and Lucky Lapse.",
-   "descDe": "Absorbierte Fehler haben eine 50% Chance, 2 Minuten zum Timer hinzuzufügen. Wirkt unabhängig von Fehler-Dividende und Glücklicher Lapsus.",
+   "descEn": "Each mistake absorbed by Variance Shield has a 50% chance to add 2 minutes to the timer. Rolled independently from Error Dividend and Lucky Lapse.",
+   "descDe": "Jeder vom Varianzschild absorbierte Fehler hat eine Chance von 50%, dem Timer 2 Minuten hinzuzufügen. Wird unabhängig von Fehler-Dividende und Glücklicher Lapsus gewürfelt.",
    "icon": "⏳",
    "statKey": "calculated_error",
    "tier": "notable"
@@ -23503,8 +23491,8 @@ export const TALENT_TREE_DATA = {
    "y": -712,
    "nameEn": "Error Dividend",
    "nameDe": "Fehler-Dividende",
-   "descEn": "Absorbed mistakes have a 25% chance of adding 30 seconds to the timer. Works independently from Calculated Error and Lucky Lapse.",
-   "descDe": "Absorbierte Fehler haben eine 25% Chance, 30 Sekunden zum Timer hinzuzufügen. Wirkt unabhängig von Kalkulierter Fehler und Glücklicher Lapsus.",
+   "descEn": "Each mistake absorbed by Variance Shield has a 25% chance to add 30 seconds to the timer. Rolled independently from Calculated Error and Lucky Lapse.",
+   "descDe": "Jeder vom Varianzschild absorbierte Fehler hat eine Chance von 25%, dem Timer 30 Sekunden hinzuzufügen. Wird unabhängig von Kalkulierter Fehler und Glücklicher Lapsus gewürfelt.",
    "icon": "💰",
    "statKey": "error_dividend",
    "tier": "notable"
@@ -23515,8 +23503,8 @@ export const TALENT_TREE_DATA = {
    "y": -829,
    "nameEn": "Lucky Lapse",
    "nameDe": "Glücklicher Lapsus",
-   "descEn": "Absorbed mistakes have a 25% chance of adding 30 seconds to the timer. Works independently from Calculated Error and Error Dividend.",
-   "descDe": "Absorbierte Fehler haben eine 25% Chance, 30 Sekunden zum Timer hinzuzufügen. Wirkt unabhängig von Kalkulierter Fehler und Fehler-Dividende.",
+   "descEn": "Each mistake absorbed by Variance Shield has a 25% chance to add 30 seconds to the timer. Rolled independently from Calculated Error and Error Dividend.",
+   "descDe": "Jeder vom Varianzschild absorbierte Fehler hat eine Chance von 25%, dem Timer 30 Sekunden hinzuzufügen. Wird unabhängig von Kalkulierter Fehler und Fehler-Dividende gewürfelt.",
    "icon": "🍀",
    "statKey": "lucky_lapse",
    "tier": "notable"
@@ -23527,8 +23515,8 @@ export const TALENT_TREE_DATA = {
    "y": -708,
    "nameEn": "Prolonged Frost",
    "nameDe": "Verlängerter Frost",
-   "descEn": "Absolute Zero lasts 0.5 seconds longer. Stacks with Deep Freeze.",
-   "descDe": "Absoluter Nullpunkt hält 0,5 Sekunden länger an. Wirkt zusammen mit Tiefgefroren.",
+   "descEn": "Absolute Zero lasts 0.5 seconds longer.",
+   "descDe": "Absoluter Nullpunkt hält 0,5 Sekunden länger an.",
    "icon": "❄️",
    "statKey": "prolonged_frost",
    "tier": "notable"
@@ -23539,8 +23527,8 @@ export const TALENT_TREE_DATA = {
    "y": -536,
    "nameEn": "Deep Freeze",
    "nameDe": "Tiefgefroren",
-   "descEn": "Absolute Zero lasts 0.5 seconds longer. Stacks with Prolonged Frost.",
-   "descDe": "Absoluter Nullpunkt hält 0,5 Sekunden länger an. Wirkt zusammen mit Verlängerter Frost.",
+   "descEn": "Absolute Zero lasts 0.5 seconds longer.",
+   "descDe": "Absoluter Nullpunkt hält 0,5 Sekunden länger an.",
    "icon": "🧊",
    "statKey": "deep_freeze",
    "tier": "notable"
@@ -23551,8 +23539,8 @@ export const TALENT_TREE_DATA = {
    "y": -413,
    "nameEn": "Frozen Resilience",
    "nameDe": "Gefrorene Widerstandskraft",
-   "descEn": "Every 5 correct cell fills during Absolute Zero allows the Variance Shield to absorb 1 additional mistake.",
-   "descDe": "Alle 5 korrekt ausgefüllten Zellen während des Absoluten Nullpunkts laden den Varianzschild um 1 absorbierten Fehler auf.",
+   "descEn": "Every 5 correct fills during Absolute Zero give Variance Shield 1 additional charge (it absorbs 1 more mistake).",
+   "descDe": "Alle 5 korrekten Füllungen während Absolutem Nullpunkt geben dem Varianzschild 1 zusätzliche Ladung (er absorbiert 1 weiteren Fehler).",
    "icon": "🛡️",
    "statKey": "frozen_resilience",
    "tier": "notable"
@@ -23563,8 +23551,8 @@ export const TALENT_TREE_DATA = {
    "y": -411,
    "nameEn": "Accelerated Zero",
    "nameDe": "Beschleunigter Nullpunkt",
-   "descEn": "Reduces the cooldown of Absolute Zero by 15 seconds. Stacks with Hastened Zero.",
-   "descDe": "Reduziert die Abklingzeit von Absolutem Nullpunkt um 15 Sekunden. Wirkt zusammen mit Beschleunigter Nullpunkt.",
+   "descEn": "Reduces the cooldown of Absolute Zero by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Absolutem Nullpunkt um 15 Sekunden.",
    "icon": "🔷",
    "statKey": "accelerated_zero",
    "tier": "notable"
@@ -23575,8 +23563,8 @@ export const TALENT_TREE_DATA = {
    "y": -532,
    "nameEn": "Accelerated Revelation",
    "nameDe": "Beschleunigte Offenbarung",
-   "descEn": "Reduces the cooldown of Arcane Reveal by 15 seconds. Stacks with Rapid Revelation.",
-   "descDe": "Reduziert die Abklingzeit von Arkaner Enthüllung um 15 Sekunden. Wirkt zusammen mit Schneller Offenbarung.",
+   "descEn": "Reduces the cooldown of Arcane Reveal by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Arkaner Enthüllung um 15 Sekunden.",
    "icon": "🔷",
    "statKey": "accelerated_revelation",
    "tier": "notable"
@@ -23587,8 +23575,8 @@ export const TALENT_TREE_DATA = {
    "y": -704,
    "nameEn": "Rapid Revelation",
    "nameDe": "Schnelle Offenbarung",
-   "descEn": "Reduces the cooldown of Arcane Reveal by 15 seconds. Stacks with Accelerated Revelation.",
-   "descDe": "Reduziert die Abklingzeit von Arkaner Enthüllung um 15 Sekunden. Wirkt zusammen mit Beschleunigter Offenbarung.",
+   "descEn": "Reduces the cooldown of Arcane Reveal by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Arkaner Enthüllung um 15 Sekunden.",
    "icon": "🔵",
    "statKey": "travel_rapid_revelation",
    "tier": "travel"
@@ -23599,8 +23587,8 @@ export const TALENT_TREE_DATA = {
    "y": -827,
    "nameEn": "Hastened Zero",
    "nameDe": "Verkürzter Nullpunkt",
-   "descEn": "Reduces the cooldown of Absolute Zero by 15 seconds. Stacks with Accelerated Zero.",
-   "descDe": "Reduziert die Abklingzeit von Absolutem Nullpunkt um 15 Sekunden. Wirkt zusammen mit Beschleunigter Nullpunkt.",
+   "descEn": "Reduces the cooldown of Absolute Zero by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Absolutem Nullpunkt um 15 Sekunden.",
    "icon": "🔵",
    "statKey": "travel_hastened_zero",
    "tier": "travel"
@@ -23611,8 +23599,8 @@ export const TALENT_TREE_DATA = {
    "y": 310,
    "nameEn": "God of Probabilities",
    "nameDe": "Gott der Wahrscheinlichkeiten",
-   "descEn": "Precision Shot can mark two additional incorrect cells.\nBayesian Insight reveals 1 additional random correct filled cell at the start of each level.\n3 filled cells and every ✕ mark shown during a field scan from Rain of Arrows remain after the field scan ends.",
-   "descDe": "Präzisionsschuss kann zwei weitere falsche Zellen markieren.\nBayesianische Intuition enthüllt zu Beginn jedes Levels eine weitere zufällige korrekte gefüllte Zelle.\n3 ausgefüllte Zellen und jedes ✕, das der Feldscan von Pfeilregen zeigt, bleiben auch nach dem Feldscan bestehen.",
+   "descEn": "Precision Shot can mark 2 additional wrong cells.\nBayesian Insight reveals 1 additional random correct cell at the start of each level.\nRain of Arrows permanently keeps up to 3 correct cells and every ✕ mark that its scan shows.",
+   "descDe": "Präzisionsschuss kann 2 zusätzliche falsche Zellen markieren.\nBayesianische Einsicht deckt zu Beginn jedes Levels 1 zusätzliche zufällige richtige Zelle auf.\nPfeilregen behält dauerhaft bis zu 3 richtige Zellen und jedes ✕, das sein Scan anzeigt.",
    "icon": "✨",
    "statKey": "god_of_probabilities",
    "tier": "keystone"
@@ -23623,8 +23611,8 @@ export const TALENT_TREE_DATA = {
    "y": 190,
    "nameEn": "Gear of the Probabilist",
    "nameDe": "Ausrüstung des Probabilisten",
-   "descEn": "Probabilists have a 25% chance to receive an additional Sweeper after completing a level.",
-   "descDe": "Probabilisten haben eine 25% Chance einen Besen nach dem Abschluss eines Levels zu erhalten.",
+   "descEn": "As a Probabilist, you have a 25% chance to receive a Sweeper (marks 4 wrong empty cells) after completing a level.",
+   "descDe": "Als Probabilist hast du nach Abschluss eines Levels eine Chance von 25%, einen Besen zu erhalten (markiert 4 falsche leere Zellen).",
    "icon": "🎲",
    "statKey": "gear_of_the_probabilist",
    "tier": "notable"
@@ -23635,8 +23623,8 @@ export const TALENT_TREE_DATA = {
    "y": 218,
    "nameEn": "Improved Gear of the Probabilist",
    "nameDe": "Verbesserte Ausrüstung des Probabilisten",
-   "descEn": "Probabilists have a 15% chance to receive an additional Error Magnet after completing a level.",
-   "descDe": "Probabilisten haben eine 15% Chance einen Fehler-Magneten nach dem Abschluss eines Levels zu erhalten.",
+   "descEn": "As a Probabilist, you have a 15% chance to receive an Error Magnet (marks 6 wrong empty cells) after completing a level.",
+   "descDe": "Als Probabilist hast du nach Abschluss eines Levels eine Chance von 15%, einen Fehlermagneten zu erhalten (markiert 6 falsche leere Zellen).",
    "icon": "🎯",
    "statKey": "improved_gear_of_the_probabilist",
    "tier": "notable"
@@ -23647,8 +23635,8 @@ export const TALENT_TREE_DATA = {
    "y": 289,
    "nameEn": "Probabilistic Sweep",
    "nameDe": "Probabilistischer Schwung",
-   "descEn": "Precision Shot can mark one additional incorrect cell. Stacks with Expanded Inference.",
-   "descDe": "Präzisionsschuss kann eine zusätzliche falsche Zelle markieren. Wirkt zusammen mit Erweiterte Schlussfolgerung.",
+   "descEn": "Precision Shot can mark 1 additional wrong cell.",
+   "descDe": "Präzisionsschuss kann 1 zusätzliche falsche Zelle markieren.",
    "icon": "🖊️",
    "statKey": "probabilistic_sweep",
    "tier": "notable"
@@ -23659,8 +23647,8 @@ export const TALENT_TREE_DATA = {
    "y": 370,
    "nameEn": "Expanded Inference",
    "nameDe": "Erweiterte Schlussfolgerung",
-   "descEn": "Precision Shot can mark one additional incorrect cell. Stacks with Probabilistic Sweep.",
-   "descDe": "Präzisionsschuss kann eine zusätzliche falsche Zelle markieren. Wirkt zusammen mit Probabilistischer Schwung.",
+   "descEn": "Precision Shot can mark 1 additional wrong cell.",
+   "descDe": "Präzisionsschuss kann 1 zusätzliche falsche Zelle markieren.",
    "icon": "📝",
    "statKey": "expanded_inference",
    "tier": "notable"
@@ -23671,8 +23659,8 @@ export const TALENT_TREE_DATA = {
    "y": 423,
    "nameEn": "Momentum of Certainty",
    "nameDe": "Schwung der Gewissheit",
-   "descEn": "After Precision Shot resolves, correctly filling a cell in the affected rows or columns within 5 seconds grants 20 seconds added to the timer.",
-   "descDe": "Nach dem Präzisionsschuss gibt das korrekte Ausfüllen einer Zelle in den betroffenen Zeilen oder Spalten innerhalb von 5 Sekunden +20 Sekunden Zeit.",
+   "descEn": "After Precision Shot, each correct cell you fill in its rows or columns within 5 seconds grants +20 seconds on the timer.",
+   "descDe": "Nach einem Präzisionsschuss gibt jede korrekte Zelle, die du innerhalb von 5 Sekunden in seinen Zeilen oder Spalten ausfüllst, +20 Sekunden auf dem Timer.",
    "icon": "⚡",
    "statKey": "momentum_of_certainty",
    "tier": "notable"
@@ -23683,8 +23671,8 @@ export const TALENT_TREE_DATA = {
    "y": 423,
    "nameEn": "Accelerated Marking",
    "nameDe": "Beschleunigte Markierung",
-   "descEn": "Reduces the cooldown of Precision Shot by 15 seconds. Stacks with Swift Marking.",
-   "descDe": "Reduziert die Abklingzeit von Präzisionsschuss um 15 Sekunden. Wirkt zusammen mit Schnelle Markierung.",
+   "descEn": "Reduces the cooldown of Precision Shot by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Präzisionsschuss um 15 Sekunden.",
    "icon": "🔷",
    "statKey": "accelerated_marking",
    "tier": "notable"
@@ -23695,8 +23683,8 @@ export const TALENT_TREE_DATA = {
    "y": 370,
    "nameEn": "Prior Knowledge",
    "nameDe": "Vorwissen",
-   "descEn": "Bayesian Insight auto-marks an additional random wrong tile at the start of each level. Stacks with Updated Beliefs, Posterior Insight and Convergent Evidence.",
-   "descDe": "Bayesianische Intuition markiert zu Beginn jedes Levels eine zusätzliche zufällige falsche Zelle automatisch. Wirkt zusammen mit Aktualisierten Überzeugungen, Nachträgliche Erkenntnis und Konvergente Beweise.",
+   "descEn": "Bayesian Insight marks 1 additional wrong cell at the start of each level.",
+   "descDe": "Bayesianische Einsicht markiert zu Beginn jedes Levels 1 zusätzliche falsche Zelle.",
    "icon": "🧪",
    "statKey": "prior_knowledge",
    "tier": "notable"
@@ -23707,8 +23695,8 @@ export const TALENT_TREE_DATA = {
    "y": 289,
    "nameEn": "Updated Beliefs",
    "nameDe": "Aktualisierte Überzeugungen",
-   "descEn": "Bayesian Insight auto-marks an additional random wrong tile at the start of each level. Stacks with Prior Knowledge, Posterior Insight and Convergent Evidence.",
-   "descDe": "Bayesianische Intuition markiert zu Beginn jedes Levels eine zusätzliche zufällige falsche Zelle automatisch. Wirkt zusammen mit Vorwissen, Nachträgliche Erkenntnis und Konvergente Beweise.",
+   "descEn": "Bayesian Insight marks 1 additional wrong cell at the start of each level.",
+   "descDe": "Bayesianische Einsicht markiert zu Beginn jedes Levels 1 zusätzliche falsche Zelle.",
    "icon": "🔬",
    "statKey": "updated_beliefs",
    "tier": "notable"
@@ -23719,8 +23707,8 @@ export const TALENT_TREE_DATA = {
    "y": 218,
    "nameEn": "Confirmed Hypothesis",
    "nameDe": "Bestätigte Hypothese",
-   "descEn": "Bayesian Insight also reveals 1 random correct filled cell at the start of each level.",
-   "descDe": "Bayesianische Intuition enthüllt zu Beginn jedes Levels auch 1 zufällige korrekte gefüllte Zelle.",
+   "descEn": "Bayesian Insight also reveals 1 random correct cell at the start of each level.",
+   "descDe": "Bayesianische Einsicht deckt zu Beginn jedes Levels zusätzlich 1 zufällige richtige Zelle auf.",
    "icon": "💡",
    "statKey": "confirmed_hypothesis",
    "tier": "notable"
@@ -23731,8 +23719,8 @@ export const TALENT_TREE_DATA = {
    "y": 101,
    "nameEn": "Posterior Insight",
    "nameDe": "Nachträgliche Erkenntnis",
-   "descEn": "Bayesian Insight auto-marks an additional random wrong tile at the start of each level. Stacks with Prior Knowledge, Updated Beliefs and Convergent Evidence.",
-   "descDe": "Bayesianische Intuition markiert zu Beginn jedes Levels eine zusätzliche zufällige falsche Zelle automatisch. Wirkt zusammen mit Vorwissen, Aktualisierte Überzeugung und Konvergente Beweise.",
+   "descEn": "Bayesian Insight marks 1 additional wrong cell at the start of each level.",
+   "descDe": "Bayesianische Einsicht markiert zu Beginn jedes Levels 1 zusätzliche falsche Zelle.",
    "icon": "📋",
    "statKey": "posterior_insight",
    "tier": "notable"
@@ -23743,8 +23731,8 @@ export const TALENT_TREE_DATA = {
    "y": 222,
    "nameEn": "Convergent Evidence",
    "nameDe": "Konvergente Beweise",
-   "descEn": "Bayesian Insight auto-marks an additional random wrong tile at the start of each level. Stacks with Prior Knowledge, Updated Beliefs and Posterior Insight.",
-   "descDe": "Bayesianische Intuition markiert zu Beginn jedes Levels eine zusätzliche zufällige falsche Zelle automatisch. Wirkt zusammen mit Vorwissen, Aktualisierte Überzeugung und Nachträgliche Erkenntnis. ",
+   "descEn": "Bayesian Insight marks 1 additional wrong cell at the start of each level.",
+   "descDe": "Bayesianische Einsicht markiert zu Beginn jedes Levels 1 zusätzliche falsche Zelle.",
    "icon": "🗂️",
    "statKey": "convergent_evidence",
    "tier": "notable"
@@ -23755,8 +23743,8 @@ export const TALENT_TREE_DATA = {
    "y": 394,
    "nameEn": "Wider Lens",
    "nameDe": "Weiteres Sichtfeld",
-   "descEn": "Rain of Arrows region is increased by 1 in both width and height. Stacks with Panoramic View.",
-   "descDe": "Der Bereich des Pfeilregens wird um 1 in Breite und Höhe vergrößert. Wirkt zusammen mit Panoramablick.",
+   "descEn": "The scan area of Rain of Arrows is 1 larger in width and in height.",
+   "descDe": "Der Scan-Bereich von Pfeilregen ist in Breite und Höhe um 1 größer.",
    "icon": "🔍",
    "statKey": "wider_lens",
    "tier": "notable"
@@ -23767,8 +23755,8 @@ export const TALENT_TREE_DATA = {
    "y": 517,
    "nameEn": "Panoramic View",
    "nameDe": "Panoramablick",
-   "descEn": "Rain of Arrows region is increased by 1 in both width and height. Stacks with Wider Lens.",
-   "descDe": "Der Bereich des Pfeilregens wird um 1 in Breite und Höhe vergrößert. Wirkt zusammen mit Weiteres Sichtfeld.",
+   "descEn": "The scan area of Rain of Arrows is 1 larger in width and in height.",
+   "descDe": "Der Scan-Bereich von Pfeilregen ist in Breite und Höhe um 1 größer.",
    "icon": "🌄",
    "statKey": "panoramic_view",
    "tier": "notable"
@@ -23779,8 +23767,8 @@ export const TALENT_TREE_DATA = {
    "y": 519,
    "nameEn": "Photographic Memory",
    "nameDe": "Fotografisches Gedächtnis",
-   "descEn": "Rain of Arrows scan effect lasts 1 second longer.",
-   "descDe": "Der Scan - Effekt von Pfeilregen hält 1 Sekunde länger an.",
+   "descEn": "The scan of Rain of Arrows lasts 1 second longer.",
+   "descDe": "Der Scan von Pfeilregen hält 1 Sekunde länger an.",
    "icon": "📸",
    "statKey": "photographic_memory",
    "tier": "notable"
@@ -23791,8 +23779,8 @@ export const TALENT_TREE_DATA = {
    "y": 398,
    "nameEn": "Accelerated Scan",
    "nameDe": "Beschleunigter Scan",
-   "descEn": "Reduces the cooldown of Rain of Arrows by 15 seconds. Stacks with Swift Scan.",
-   "descDe": "Reduziert die Abklingzeit von Pfeilregen um 15 Sekunden. Wirkt zusammen mit Schneller Scan.",
+   "descEn": "Reduces the cooldown of Rain of Arrows by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Pfeilregen um 15 Sekunden.",
    "icon": "🔷",
    "statKey": "accelerated_scan",
    "tier": "notable"
@@ -23803,8 +23791,8 @@ export const TALENT_TREE_DATA = {
    "y": 226,
    "nameEn": "Swift Marking",
    "nameDe": "Schnelle Markierung",
-   "descEn": "Reduces the cooldown of Precision Shot by 15 seconds. Stacks with Accelerated Marking.",
-   "descDe": "Reduziert die Abklingzeit von Präzisionsschuss um 15 Sekunden. Wirkt zusammen mit Beschleunigter Markierung.",
+   "descEn": "Reduces the cooldown of Precision Shot by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Präzisionsschuss um 15 Sekunden.",
    "icon": "🔵",
    "statKey": "travel_swift_marking",
    "tier": "travel"
@@ -23815,8 +23803,8 @@ export const TALENT_TREE_DATA = {
    "y": 103,
    "nameEn": "Swift Scan",
    "nameDe": "Schneller Scan",
-   "descEn": "Reduces the cooldown of Rain of Arrows by 15 seconds. Stacks with Accelerated Scan.",
-   "descDe": "Reduziert die Abklingzeit von Pfeilregen um 15 Sekunden. Wirkt zusammen mit Beschleunigter Scan.",
+   "descEn": "Reduces the cooldown of Rain of Arrows by 15 seconds.",
+   "descDe": "Verringert die Abklingzeit von Pfeilregen um 15 Sekunden.",
    "icon": "🔵",
    "statKey": "travel_swift_scan",
    "tier": "travel"
@@ -23859,6 +23847,366 @@ export const TALENT_TREE_DATA = {
    "statKey": "character_start_syla",
    "tier": "start",
    "sprite": "images/sprites/Syla_noclass.webp"
+  },
+  {
+   "id": 41001,
+   "x": -870,
+   "y": 381,
+   "nameEn": "Rolling Mean",
+   "nameDe": "Gleitender Mittelwert",
+   "descEn": "Momentum triggers after 14 correct fills in a row instead of 15.",
+   "descDe": "Momentum wird nach 14 statt 15 korrekten Füllungen hintereinander ausgelöst.",
+   "icon": "📉",
+   "statKey": "rolling_mean",
+   "tier": "notable"
+  },
+  {
+   "id": 41002,
+   "x": -848,
+   "y": 172,
+   "nameEn": "Large Sample",
+   "nameDe": "Große Stichprobe",
+   "descEn": "Reveal projectiles deal 2% increased damage for each projectile fired by the same reveal (max 40%).",
+   "descDe": "Aufdeckungsprojektile verursachen 2% erhöhten Schaden für jedes Projektil, das von derselben Aufdeckung abgefeuert wird (max. 40%).",
+   "icon": "🧮",
+   "statKey": "large_sample",
+   "tier": "notable"
+  },
+  {
+   "id": 41003,
+   "x": -707,
+   "y": 16,
+   "nameEn": "Outlier Rejection",
+   "nameDe": "Ausreißer-Ablehnung",
+   "descEn": "The first mistake each level does not reduce your Momentum streak.",
+   "descDe": "Der erste Fehler in jedem Level verringert deine Momentum-Serie nicht.",
+   "icon": "🚫",
+   "statKey": "outlier_rejection",
+   "tier": "notable"
+  },
+  {
+   "id": 41004,
+   "x": -501,
+   "y": -28,
+   "nameEn": "Weighted Average",
+   "nameDe": "Gewichteter Durchschnitt",
+   "descEn": "Momentum grants 25% more time.\nReveal projectiles deal 6% increased damage for each Momentum triggered this level (max 5 stacks).",
+   "descDe": "Momentum gewährt 25% mehr Zeit.\nAufdeckungsprojektile verursachen 6% erhöhten Schaden für jedes in diesem Level ausgelöste Momentum (max. 5 Stapel).",
+   "icon": "⚖️",
+   "statKey": "weighted_average",
+   "tier": "notable"
+  },
+  {
+   "id": 41005,
+   "x": -309,
+   "y": 57,
+   "nameEn": "Sample Reuse",
+   "nameDe": "Stichproben-Wiederverwendung",
+   "descEn": "Each Momentum trigger reduces the cooldowns of Data Strike and Diagonal Strike by 10 seconds.",
+   "descDe": "Jede Momentum-Auslösung verringert die Abklingzeiten von Datenhieb und Diagonalschlag um 10 Sekunden.",
+   "icon": "♻️",
+   "statKey": "sample_reuse",
+   "tier": "notable"
+  },
+  {
+   "id": 41006,
+   "x": -204,
+   "y": 239,
+   "nameEn": "Stratified Sampling",
+   "nameDe": "Geschichtete Stichprobe",
+   "descEn": "Data Strike solves the rows or columns with the most unsolved cells first.\nReveal projectiles from Data Strike deal 20% increased damage.",
+   "descDe": "Datenhieb löst zuerst die Zeilen oder Spalten mit den meisten ungelösten Zellen.\nAufdeckungsprojektile von Datenhieb verursachen 20% erhöhten Schaden.",
+   "icon": "🗂️",
+   "statKey": "stratified_sampling",
+   "tier": "notable"
+  },
+  {
+   "id": 41007,
+   "x": -226,
+   "y": 448,
+   "nameEn": "Best Fit Line",
+   "nameDe": "Ausgleichsgerade",
+   "descEn": "If Diagonal Strike reveals 7 or more cells, its cooldown is reduced by 30 seconds.\nReveal projectiles from Diagonal Strike deal 30% increased damage.",
+   "descDe": "Wenn Diagonalschlag 7 oder mehr Zellen aufdeckt, wird seine Abklingzeit um 30 Sekunden verringert.\nAufdeckungsprojektile von Diagonalschlag verursachen 30% erhöhten Schaden.",
+   "icon": "📈",
+   "statKey": "best_fit_line",
+   "tier": "notable"
+  },
+  {
+   "id": 41008,
+   "x": -367,
+   "y": 604,
+   "nameEn": "Bootstrap",
+   "nameDe": "Bootstrap",
+   "descEn": "Data Strike has a 20% chance not to go on cooldown.\nReveal projectiles from Data Strike have a 25% chance to also hit another enemy.",
+   "descDe": "Datenhieb hat eine Chance von 20%, keine Abklingzeit auszulösen.\nAufdeckungsprojektile von Datenhieb haben eine Chance von 25%, zusätzlich einen weiteren Gegner zu treffen.",
+   "icon": "🥾",
+   "statKey": "bootstrap",
+   "tier": "notable"
+  },
+  {
+   "id": 41009,
+   "x": -573,
+   "y": 648,
+   "nameEn": "Central Limit",
+   "nameDe": "Zentraler Grenzwertsatz",
+   "descEn": "Every 3rd Momentum trigger each level also reveals 1 random correct cell.\nMomentum triggers shock the targeted enemy.",
+   "descDe": "Jede 3. Momentum-Auslösung in einem Level deckt zusätzlich 1 zufällige richtige Zelle auf.\nMomentum-Auslösungen schocken den anvisierten Gegner.",
+   "icon": "🔔",
+   "statKey": "central_limit",
+   "tier": "notable"
+  },
+  {
+   "id": 41010,
+   "x": -765,
+   "y": 563,
+   "nameEn": "Residual Plot",
+   "nameDe": "Residuenplot",
+   "descEn": "After using Data Strike, your next 5 correct fills count twice toward Momentum.\nAfter using Data Strike, you deal 15% increased damage for 10 seconds.",
+   "descDe": "Nach der Nutzung von Datenhieb zählen deine nächsten 5 korrekten Füllungen doppelt für Momentum.\nNach der Nutzung von Datenhieb verursachst du 10 Sekunden lang 15% erhöhten Schaden.",
+   "icon": "📊",
+   "statKey": "residual_plot",
+   "tier": "notable"
+  },
+  {
+   "id": 41011,
+   "x": 105,
+   "y": -943,
+   "nameEn": "Compound Interest",
+   "nameDe": "Zinseszins",
+   "descEn": "Mistakes absorbed by Variance Shield add 10 seconds to the timer for each mistake already absorbed this level.",
+   "descDe": "Vom Varianzschild absorbierte Fehler fügen dem Timer 10 Sekunden für jeden in diesem Level bereits absorbierten Fehler hinzu.",
+   "icon": "💰",
+   "statKey": "compound_interest",
+   "tier": "notable"
+  },
+  {
+   "id": 41012,
+   "x": 275,
+   "y": -820,
+   "nameEn": "Frozen Assets",
+   "nameDe": "Eingefrorene Vermögenswerte",
+   "descEn": "Absolute Zero lasts 0.25 seconds longer for each unused Variance Shield charge (max 1 second).\nAbsolute Zero freezes all enemies on the screen.",
+   "descDe": "Absoluter Nullpunkt hält für jede ungenutzte Varianzschild-Ladung 0,25 Sekunden länger an (max. 1 Sekunde).\nAbsoluter Nullpunkt friert alle Gegner auf dem Bildschirm ein.",
+   "icon": "🧊",
+   "statKey": "frozen_assets",
+   "tier": "notable"
+  },
+  {
+   "id": 41013,
+   "x": 340,
+   "y": -620,
+   "nameEn": "Zero Sum",
+   "nameDe": "Nullsumme",
+   "descEn": "Every 2 correct fills during Absolute Zero add 1 second to the timer.\nCorrect fills during Absolute Zero chill the targeted enemy.",
+   "descDe": "Alle 2 korrekten Füllungen während Absolutem Nullpunkt fügen dem Timer 1 Sekunde hinzu.\nKorrekte Füllungen während Absolutem Nullpunkt unterkühlen den anvisierten Gegner.",
+   "icon": "➕",
+   "statKey": "zero_sum",
+   "tier": "notable"
+  },
+  {
+   "id": 41014,
+   "x": 275,
+   "y": -420,
+   "nameEn": "Echo Chamber",
+   "nameDe": "Echokammer",
+   "descEn": "Arcane Reveal has a 25% chance to cast a second time on the same area.",
+   "descDe": "Arkane Enthüllung hat eine Chance von 25%, ein zweites Mal im selben Bereich gewirkt zu werden.",
+   "icon": "🔊",
+   "statKey": "echo_chamber",
+   "tier": "notable"
+  },
+  {
+   "id": 41015,
+   "x": 105,
+   "y": -297,
+   "nameEn": "Series Expansion",
+   "nameDe": "Reihenentwicklung",
+   "descEn": "Arcane Reveal can reveal 1 additional cell for each Variance Shield charge you hold (max 3).",
+   "descDe": "Arkane Enthüllung kann für jede gehaltene Varianzschild-Ladung 1 zusätzliche Zelle aufdecken (max. 3).",
+   "icon": "🔢",
+   "statKey": "series_expansion",
+   "tier": "notable"
+  },
+  {
+   "id": 41016,
+   "x": -105,
+   "y": -297,
+   "nameEn": "Limit Theorem",
+   "nameDe": "Grenzwertsatz",
+   "descEn": "Each mistake absorbed by Variance Shield reduces the cooldown of Absolute Zero by 10 seconds.",
+   "descDe": "Jeder vom Varianzschild absorbierte Fehler verringert die Abklingzeit von Absolutem Nullpunkt um 10 Sekunden.",
+   "icon": "🎯",
+   "statKey": "limit_theorem",
+   "tier": "notable"
+  },
+  {
+   "id": 41017,
+   "x": -275,
+   "y": -420,
+   "nameEn": "Derivative",
+   "nameDe": "Ableitung",
+   "descEn": "Using Arcane Reveal reduces the cooldown of Absolute Zero by 30 seconds.\nReveal projectiles from Arcane Reveal deal 25% increased damage.",
+   "descDe": "Die Nutzung von Arkaner Enthüllung verringert die Abklingzeit von Absolutem Nullpunkt um 30 Sekunden.\nAufdeckungsprojektile von Arkaner Enthüllung verursachen 25% erhöhten Schaden.",
+   "icon": "∂",
+   "statKey": "derivative",
+   "tier": "notable"
+  },
+  {
+   "id": 41018,
+   "x": -340,
+   "y": -620,
+   "nameEn": "Integral",
+   "nameDe": "Integral",
+   "descEn": "Using Absolute Zero reduces the cooldown of Arcane Reveal by 30 seconds.",
+   "descDe": "Die Nutzung von Absolutem Nullpunkt verringert die Abklingzeit von Arkaner Enthüllung um 30 Sekunden.",
+   "icon": "∫",
+   "statKey": "integral",
+   "tier": "notable"
+  },
+  {
+   "id": 41019,
+   "x": -275,
+   "y": -820,
+   "nameEn": "Asymptote",
+   "nameDe": "Asymptote",
+   "descEn": "While Variance Shield has no charges left, mistakes cost 25% less time.",
+   "descDe": "Solange der Varianzschild keine Ladungen mehr hat, kosten Fehler 25% weniger Zeit.",
+   "icon": "〰️",
+   "statKey": "asymptote",
+   "tier": "notable"
+  },
+  {
+   "id": 41020,
+   "x": -105,
+   "y": -943,
+   "nameEn": "Convergent Series",
+   "nameDe": "Konvergente Reihe",
+   "descEn": "Variance Shield regains 1 charge every 90 seconds (up to its maximum).\nEach mistake absorbed by Variance Shield fires 4 reveal projectiles at the targeted enemy.",
+   "descDe": "Der Varianzschild erhält alle 90 Sekunden 1 Ladung zurück (bis zu seinem Maximum).\nJeder vom Varianzschild absorbierte Fehler feuert 4 Aufdeckungsprojektile auf den anvisierten Gegner ab.",
+   "icon": "🌀",
+   "statKey": "convergent_series",
+   "tier": "notable"
+  },
+  {
+   "id": 41021,
+   "x": 765,
+   "y": 563,
+   "nameEn": "Prior Elicitation",
+   "nameDe": "Vorannahmen-Erhebung",
+   "descEn": "Bayesian Insight triggers a second time with half its marks when the puzzle is half solved.",
+   "descDe": "Bayesianische Einsicht wird ein zweites Mal mit der Hälfte ihrer Markierungen ausgelöst, wenn das Rätsel zur Hälfte gelöst ist.",
+   "icon": "🧠",
+   "statKey": "prior_elicitation",
+   "tier": "notable"
+  },
+  {
+   "id": 41022,
+   "x": 573,
+   "y": 648,
+   "nameEn": "Posterior Predictive",
+   "nameDe": "Posteriori-Prädiktion",
+   "descEn": "Precision Shot also reveals 1 correct cell in the clicked row and 1 in the clicked column.",
+   "descDe": "Präzisionsschuss deckt zusätzlich 1 richtige Zelle in der angeklickten Zeile und 1 in der angeklickten Spalte auf.",
+   "icon": "🔭",
+   "statKey": "posterior_predictive",
+   "tier": "notable"
+  },
+  {
+   "id": 41023,
+   "x": 367,
+   "y": 604,
+   "nameEn": "Credible Interval",
+   "nameDe": "Glaubwürdigkeitsintervall",
+   "descEn": "Precision Shot marks every wrong cell in the clicked row and column without counting toward its mark limit.\nEach cell marked by Precision Shot fires a reveal projectile at half strength.",
+   "descDe": "Präzisionsschuss markiert jede falsche Zelle in der angeklickten Zeile und Spalte, ohne dass sie auf sein Markierungslimit zählt.\nJede von Präzisionsschuss markierte Zelle feuert ein Aufdeckungsprojektil mit halber Stärke ab.",
+   "icon": "↔️",
+   "statKey": "credible_interval",
+   "tier": "notable"
+  },
+  {
+   "id": 41024,
+   "x": 226,
+   "y": 448,
+   "nameEn": "Lasting Impression",
+   "nameDe": "Bleibender Eindruck",
+   "descEn": "Rain of Arrows permanently reveals 1 correct cell from its scan.",
+   "descDe": "Pfeilregen deckt 1 richtige Zelle seines Scans dauerhaft auf.",
+   "icon": "📌",
+   "statKey": "lasting_impression",
+   "tier": "notable"
+  },
+  {
+   "id": 41025,
+   "x": 204,
+   "y": 239,
+   "nameEn": "Expected Value",
+   "nameDe": "Erwartungswert",
+   "descEn": "Each cell marked by Precision Shot adds 1 second to the timer.",
+   "descDe": "Jede von Präzisionsschuss markierte Zelle fügt dem Timer 1 Sekunde hinzu.",
+   "icon": "🎲",
+   "statKey": "expected_value",
+   "tier": "notable"
+  },
+  {
+   "id": 41026,
+   "x": 309,
+   "y": 57,
+   "nameEn": "Naive Bayes",
+   "nameDe": "Naive Bayes",
+   "descEn": "The cooldown of Rain of Arrows is reduced by 2 seconds for each wrong cell marked on the grid when it is cast (max 40 seconds).\nReveal projectiles deal 2% increased damage for each wrong cell marked on the grid (max 30%).",
+   "descDe": "Die Abklingzeit von Pfeilregen wird für jede beim Wirken auf dem Gitter markierte falsche Zelle um 2 Sekunden verringert (max. 40 Sekunden).\nAufdeckungsprojektile verursachen 2% erhöhten Schaden für jede auf dem Gitter markierte falsche Zelle (max. 30%).",
+   "icon": "🧩",
+   "statKey": "naive_bayes",
+   "tier": "notable"
+  },
+  {
+   "id": 41027,
+   "x": 501,
+   "y": -28,
+   "nameEn": "Hot Zone",
+   "nameDe": "Brennpunkt",
+   "descEn": "If at least half of the cells scanned by Rain of Arrows are correct, its cooldown is reduced by 20 seconds.\nEach correct cell scanned by Rain of Arrows fires a reveal projectile at half strength (max 8).",
+   "descDe": "Wenn mindestens die Hälfte der von Pfeilregen gescannten Zellen richtig ist, wird seine Abklingzeit um 20 Sekunden verringert.\nJede von Pfeilregen gescannte richtige Zelle feuert ein Aufdeckungsprojektil mit halber Stärke ab (max. 8).",
+   "icon": "🔥",
+   "statKey": "hot_zone",
+   "tier": "notable"
+  },
+  {
+   "id": 41028,
+   "x": 707,
+   "y": 16,
+   "nameEn": "Sample Space",
+   "nameDe": "Stichprobenraum",
+   "descEn": "Precision Shot can mark 1 additional wrong cell for every 25% of the puzzle solved (max 3).",
+   "descDe": "Präzisionsschuss kann für je 25% des gelösten Rätsels 1 zusätzliche falsche Zelle markieren (max. 3).",
+   "icon": "🗺️",
+   "statKey": "sample_space",
+   "tier": "notable"
+  },
+  {
+   "id": 41029,
+   "x": 848,
+   "y": 172,
+   "nameEn": "Heads or Tails",
+   "nameDe": "Kopf oder Zahl",
+   "descEn": "Precision Shot has a 25% chance to fire a second time on the same cell.",
+   "descDe": "Präzisionsschuss hat eine Chance von 25%, ein zweites Mal auf dieselbe Zelle zu feuern.",
+   "icon": "🪙",
+   "statKey": "heads_or_tails",
+   "tier": "notable"
+  },
+  {
+   "id": 41030,
+   "x": 870,
+   "y": 381,
+   "nameEn": "Odds Maker",
+   "nameDe": "Quotenmacher",
+   "descEn": "Increases the chance of the bonus items from Gear of the Probabilist after a level by 10 percentage points.\nReveal projectiles have a 10% chance to deal double damage.",
+   "descDe": "Erhöht die Chance auf die Bonus-Gegenstände von Ausrüstung des Probabilisten nach einem Level um 10 Prozentpunkte.\nAufdeckungsprojektile haben eine Chance von 10%, doppelten Schaden zu verursachen.",
+   "icon": "🎰",
+   "statKey": "odds_maker",
+   "tier": "notable"
   }
  ],
  "connections": [
@@ -36363,7 +36711,7 @@ export const TALENT_TREE_DATA = {
  ],
  "precomputedLayout": {
   "version": 2,
-  "fingerprint": "94520fb42ce759a6",
+  "fingerprint": "06220b7cf99558ee",
   "positions": [
    [
     156,
@@ -45341,11 +45689,6 @@ export const TALENT_TREE_DATA = {
     -3121
    ],
    [
-    1,
-    0,
-    0
-   ],
-   [
     55,
     -676,
     390
@@ -45629,6 +45972,156 @@ export const TALENT_TREE_DATA = {
     1003,
     1789,
     1033
+   ],
+   [
+    41001,
+    -1014,
+    462
+   ],
+   [
+    41002,
+    -991,
+    250
+   ],
+   [
+    41003,
+    -848,
+    92
+   ],
+   [
+    41004,
+    -639,
+    47
+   ],
+   [
+    41005,
+    -444,
+    133
+   ],
+   [
+    41006,
+    -338,
+    318
+   ],
+   [
+    41007,
+    -360,
+    530
+   ],
+   [
+    41008,
+    -503,
+    688
+   ],
+   [
+    41009,
+    -712,
+    733
+   ],
+   [
+    41010,
+    -907,
+    647
+   ],
+   [
+    41011,
+    107,
+    -1108
+   ],
+   [
+    41012,
+    279,
+    -983
+   ],
+   [
+    41013,
+    345,
+    -780
+   ],
+   [
+    41014,
+    279,
+    -577
+   ],
+   [
+    41015,
+    107,
+    -452
+   ],
+   [
+    41016,
+    -107,
+    -452
+   ],
+   [
+    41017,
+    -279,
+    -577
+   ],
+   [
+    41018,
+    -345,
+    -780
+   ],
+   [
+    41019,
+    -279,
+    -983
+   ],
+   [
+    41020,
+    -107,
+    -1108
+   ],
+   [
+    41021,
+    907,
+    647
+   ],
+   [
+    41022,
+    712,
+    733
+   ],
+   [
+    41023,
+    503,
+    688
+   ],
+   [
+    41024,
+    360,
+    530
+   ],
+   [
+    41025,
+    338,
+    318
+   ],
+   [
+    41026,
+    444,
+    133
+   ],
+   [
+    41027,
+    639,
+    47
+   ],
+   [
+    41028,
+    848,
+    92
+   ],
+   [
+    41029,
+    991,
+    250
+   ],
+   [
+    41030,
+    1014,
+    462
    ]
   ]
  }

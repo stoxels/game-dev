@@ -68,6 +68,10 @@ function _arcaneReveal_calcMaxReveals(baseMax) {
     let max = baseMax;
     if (ptHasSkill('arcane_echo')) max += 1;
     if (ptHasSkill('resonant_reveal')) max += 1;
+    // Series Expansion: +1 cell per Variance Shield charge held (max +3).
+    if (ptHasSkill('series_expansion')) {
+        max += Math.min(3, Math.max(0, Number(window._classFreeMistakes) || 0));
+    }
     return max;
 }
 
@@ -625,8 +629,13 @@ export function _arcaneReveal_updatePreview(clientX, clientY) {
 // _executeArcaneReveal - main entry point for the Arcane Reveal ability.
 // Reveals up to maxReveals correct cells within radius steps of (row, col),
 // including diagonals. Passive nodes can extend radius and reveal cap.
-export function _executeArcaneReveal(row, col, radius, maxReveals = 4) {
+export function _executeArcaneReveal(row, col, radius, maxReveals = 4, isEcho = false) {
     if (!cur) return;
+
+    // Echo Chamber: 25% chance to cast a second time on the same area.
+    if (!isEcho && ptHasSkill('echo_chamber') && Math.random() < 0.25) {
+        setTimeout(() => _executeArcaneReveal(row, col, radius, maxReveals, true), 1800);
+    }
 
     const sol = cur.grid;
     const rows = sol.length;

@@ -39,6 +39,11 @@ function _arcaneFreeze_calcDuration(baseDurationMs) {
     let duration = baseDurationMs;
     if (ptHasSkill('prolonged_frost')) duration += ABSOLUTE_ZERO_FROST_BONUS_MS;
     if (ptHasSkill('deep_freeze')) duration += ABSOLUTE_ZERO_FROST_BONUS_MS;
+    // Frozen Assets: +0.25 s per unused Variance Shield charge (max +1 s).
+    if (ptHasSkill('frozen_assets')) {
+        const charges = Math.max(0, Number(window._classFreeMistakes) || 0);
+        duration += Math.min(1000, charges * 250);
+    }
     return duration;
 }
 
@@ -308,6 +313,12 @@ export function _executeArcaneFreeze(durationMs) {
     // fill intercepts, so the cast must carry it. Overlay stays on (matches
     // the item cast); the blizzard + frozen floor below are the extras.
     startTimerFreeze(effectiveDuration, { freezeActive: true });
+    window._zeroSumFills = 0;
+    // Frozen Assets (combat): every enemy on screen freezes for as long as
+    // the timer does - frozen monsters' attacks stop charging.
+    if (ptHasSkill('frozen_assets') && typeof globalThis._egFreezeAllMonsters === 'function') {
+        globalThis._egFreezeAllMonsters(effectiveDuration / 1000);
+    }
     // Tracks correct fills during freeze (for frozen_resilience passive);
     // the counter itself is owned by the timer-freeze mechanic.
     resetFreezeCorrFills();

@@ -23,7 +23,6 @@ const ACH_CATEGORIES = [
     { key: 'items', icon: '🎁', labelEn: 'Items & Inventory', labelDE: 'Items & Inventar' },
     { key: 'quiz', icon: '🧠', labelEn: 'Quiz & Exercises', labelDE: 'Quiz & Aufgaben' },
     { key: 'class', icon: '🔮', labelEn: 'Classes & Abilities', labelDE: 'Klassen & Fähigkeiten' },
-    { key: 'tree', icon: '🌳', labelEn: 'Probability Tree', labelDE: 'Wahrscheinlichkeitsbaum' },
     { key: 'inference', icon: '🔍', labelEn: 'Inference', labelDE: 'Inferenz' },
     { key: 'endgame', icon: '⚔️', labelEn: 'Endgame', labelDE: 'Endgame' },
 ];
@@ -49,7 +48,6 @@ const ACH_CATEGORY_ASSETS = {
     items:      { img: 'images/Achievement_Screen/Achievements_Category_ItemsInventory.webp',   glow: '#5ad8ff' },
     quiz:       { img: 'images/Achievement_Screen/Achievements_Category_QuizExcercises.webp',   glow: '#5ad8ff' },
     class:      { img: 'images/Achievement_Screen/Achievements_Category_ClassesAbilities.webp', glow: '#7ef29a' },
-    tree:       { img: 'images/Achievement_Screen/Achievements_Category_ProbabilityTree.webp',  glow: '#7ef29a' },
     inference:  { img: 'images/Achievement_Screen/Achievements_Category_Inference.webp',        glow: '#ffc857' },
     endgame:    { img: 'images/Achievement_Screen/Achievements_Category_Endgame.webp',          glow: '#c07bff' },
 };

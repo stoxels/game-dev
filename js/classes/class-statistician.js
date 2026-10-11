@@ -4,7 +4,7 @@ import { _adjacencyMatrixRefreshAll, renderCell, updClues } from '../grid.js';
 import { addTimeSecs, previewGainSecs } from '../timer/timer-adjust.js';
 import { LANG, t } from '../translation/translations.js';
 import { _filterMarkedIds, _filterRevealedIds, _resolveCell, _revealFilledCell, _setAbilityMode } from './class-abilities.js';
-import { cooldownState } from './class-cooldown-state.js';
+import { cooldownState, reduceSlotCooldown } from './class-cooldown-state.js';
 import { CLASS_DEFS } from './class-defs.js';
 import { buildClassHUD, updateMomentumBar } from './class-hud.js';
 import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
@@ -103,6 +103,11 @@ function _collectUnsolvedLines(type, sol, rows, cols) {
 
     // Shuffle so the same lines are not always picked first
     candidates.sort(() => Math.random() - 0.5);
+    // Stratified Sampling: take the lines with the most unsolved cells first
+    // (the shuffle above still breaks ties randomly - Array.sort is stable).
+    if (ptHasSkill('stratified_sampling')) {
+        candidates.sort((a, b) => b.unrevealed.length - a.unrevealed.length);
+    }
     return candidates;
 }
 
@@ -125,6 +130,15 @@ function _revealCappedCells(lineEntry, type, cap) {
         renderCell(r, c);
         updClues(r, c);
     });
+
+    // Every revealed cell fires a reveal projectile in combat (like every
+    // other class-ability reveal).
+    if (toReveal.length && typeof globalThis._applyCellEffect === 'function') {
+        const ids = toReveal.map(idx => type === 'rows'
+            ? `g-${lineEntry.r}-${idx}`
+            : `g-${idx}-${lineEntry.c}`);
+        globalThis._applyCellEffect(ids, 'reveal', 'ability');
+    }
 }
 
 // _solveLinesCapped - reveals at most `cap` cells in each of `count` randomly
@@ -676,6 +690,7 @@ export function _executeDataStrike(count, revealCap) {
 //   type : 'rows' | 'cols'
 export function _dataStrikeResolve(type) {
     _dataStrikeRemoveOverlay();
+    window._egLastBaseCast = { id: 'statistician_active1', at: Date.now() };
 
     const count = _dataStrikeCalculateFinalCount();
     const cap = _dataStrikeCalculateRevealCap();
@@ -1053,6 +1068,13 @@ export function _executeDiagonalStrike(row, col, diagonalCount, revealCap) {
 
     const diagRevealed = _filterRevealedIds(affected, sol).length;
 
+    // Best Fit Line: a strike that reveals 7+ cells refunds 30 s of its
+    // cooldown. The cooldown starts right after this function returns, so
+    // the refund is applied on the next tick.
+    if (diagRevealed >= 7 && ptHasSkill('best_fit_line')) {
+        setTimeout(() => reduceSlotCooldown('active2', 30), 0);
+    }
+
     if (diagRevealed > 0) {
         trackAchStat('tilesRevealed', diagRevealed);
 
@@ -1242,6 +1264,31 @@ export function _diagStrikeUpdatePreview(clientX, clientY) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// _centralLimitReveal - reveals one random unrevealed correct cell (Central
+//   Limit). The reveal goes through the normal cell-effect path, so in combat
+//   it fires a reveal projectile like any other ability reveal.
+function _centralLimitReveal() {
+    if (!cur) return;
+    const sol = cur.grid;
+    const candidates = [];
+    for (let r = 0; r < sol.length; r++) {
+        for (let c = 0; c < sol[0].length; c++) {
+            if (sol[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1) {
+                candidates.push([r, c]);
+            }
+        }
+    }
+    if (!candidates.length) return;
+    const [r, c] = candidates[Math.floor(Math.random() * candidates.length)];
+    globalThis.revealedGrid[r][c] = true;
+    globalThis.userGrid[r][c] = 1;
+    renderCell(r, c);
+    updClues(r, c);
+    trackAchStat('tilesRevealed', 1);
+    if (typeof globalThis._applyCellEffect === 'function') globalThis._applyCellEffect([`g-${r}-${c}`], 'reveal', 'ability');
+    globalThis.checkWin();
+}
+
 // _statisticianTriggerMomentum - awards bonus time when the Momentum passive
 //   fires (triggered externally after a correct-fill streak).
 //
@@ -1265,6 +1312,9 @@ export function _statisticianTriggerMomentum(bonusSeconds) {
         bonus += (window.LEVEL_FLAGS.momentumThisLevel || 0);
     }
 
+    // Weighted Average: Momentum grants 25% more time (before the god doubling)
+    if (ptHasSkill('weighted_average')) bonus = Math.round(bonus * 1.25);
+
     // god_of_statistics doubles the total bonus (applied last)
     if (ptHasSkill('god_of_statistics')) bonus *= 2;
 
@@ -1283,6 +1333,21 @@ export function _statisticianTriggerMomentum(bonusSeconds) {
 
     window.LEVEL_FLAGS.momentumThisLevel = (window.LEVEL_FLAGS.momentumThisLevel || 0) + 1;
     if (window.LEVEL_FLAGS.momentumThisLevel === 10) trackAchStat('statistician3MomentumOneLevel');
+
+    // Sample Reuse: each trigger shortens both strike cooldowns by 10 s.
+    if (ptHasSkill('sample_reuse')) {
+        reduceSlotCooldown('active1', 10);
+        reduceSlotCooldown('active2', 10);
+    }
+    // Central Limit: every 3rd trigger this level also reveals a correct cell.
+    if (ptHasSkill('central_limit') && window.LEVEL_FLAGS.momentumThisLevel % 3 === 0) {
+        _centralLimitReveal();
+    }
+    // Central Limit (combat): a trigger shocks the targeted monster.
+    if (ptHasSkill('central_limit') && typeof globalThis._egApplyMonsterAilment === 'function') {
+        const targetMon = (globalThis._egMonsters || []).find(m => m.id === globalThis._egTargetId);
+        if (targetMon && targetMon.currentHP > 0) globalThis._egApplyMonsterAilment(targetMon, 'shocked');
+    }
 
     Audio_Manager.playSFX('momentum');
     updateMomentumBar(0, 15); // reset momentum bar after it fires

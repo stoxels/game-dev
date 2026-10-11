@@ -496,10 +496,13 @@ export function _ptApplyMathmagicianRewards() {
 
 // Probabilist gear drops - base gear: 25% sweeper, improved: 15% error magnet
 export function _ptApplyProbabilistRewards() {
-    _ptRollGearReward('gear_of_the_probabilist', 0.25, 'markWrong4',
+    // Odds Maker: +10 percentage points on both Probabilist gear drops.
+    const oddsBonus = ptHasSkill('odds_maker') ? 0.10 : 0;
+
+    _ptRollGearReward('gear_of_the_probabilist', 0.25 + oddsBonus, 'markWrong4',
         'pt_gear_probabilist_sweeper');
 
-    _ptRollGearReward('improved_gear_of_the_probabilist', 0.15, 'markWrong6',
+    _ptRollGearReward('improved_gear_of_the_probabilist', 0.15 + oddsBonus, 'markWrong6',
         'pt_gear_probabilist_errormagnet');
 }
 

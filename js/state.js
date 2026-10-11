@@ -56,6 +56,11 @@ window.LEVEL_FLAGS = {
     streakBonusFills: 0,      // streak_bonus skill: consecutive correct fills since last mistake
     goldenClockMistakesLeft: null, // Golden Clock: mistakes remaining before the timer resumes
     momentumThisLevel: 0,     // Statistician Momentum: triggers this level (exponential_growth scaling)
+    outlierRejectionUsed: false, // Outlier Rejection: the free first mistake of the level is spent
+    residualPlotFills: 0,     // Residual Plot: remaining double-count fills after Data Strike
+    residualPlotUntil: 0,     // Residual Plot: timestamp until which the damage bonus lasts
+    compoundInterestCount: 0, // Compound Interest: mistakes absorbed by Variance Shield this level
+    priorElicitationDone: false, // Prior Elicitation: the 50%-completion Bayesian Insight has fired
     mistakeLog: [],           // Actuary/Markovian: rolling log of {r,c,penaltySecs} mistakes
     lastFailedGi: null,       // gIdx of the level the player last failed (bounceback achievement)
 };
@@ -69,6 +74,11 @@ export function _resetLevelFlags() {
     window.LEVEL_FLAGS.streakBonusFills = 0;
     window.LEVEL_FLAGS.goldenClockMistakesLeft = null;
     window.LEVEL_FLAGS.momentumThisLevel = 0;
+    window.LEVEL_FLAGS.outlierRejectionUsed = false;
+    window.LEVEL_FLAGS.residualPlotFills = 0;
+    window.LEVEL_FLAGS.residualPlotUntil = 0;
+    window.LEVEL_FLAGS.compoundInterestCount = 0;
+    window.LEVEL_FLAGS.priorElicitationDone = false;
     window.LEVEL_FLAGS.mistakeLog = [];
     // devTestActive survives: it describes the session, not the level.
     // oracleActive survives this reset: _doStartLevel sets it (step 4) before

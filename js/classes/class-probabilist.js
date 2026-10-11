@@ -1,7 +1,9 @@
 import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { renderCell, updClues } from '../grid.js';
+import { addTimeSecs } from '../timer/timer-adjust.js';
 import { t } from '../translation/translations.js';
+import { reduceSlotCooldown } from './class-cooldown-state.js';
 import { CLASS_DEFS } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
 import { _playDivineProcEffect } from './class-statistician.js';
@@ -104,6 +106,19 @@ function _precisionMarkComputeMarkCap() {
     const charmRank = getSkillCastRankClamped('probabilist_active1');
     if (charmRank) level = charmRank;
     let markCap = 3 + (level * 2); // lv1→5, lv2→7, lv3→9
+    // Sample Space: +1 per 25% of the puzzle already solved (max +3).
+    if (ptHasSkill('sample_space') && cur && cur.grid && globalThis.userGrid) {
+        let total = 0;
+        let done = 0;
+        for (let r = 0; r < cur.grid.length; r++) {
+            for (let c = 0; c < cur.grid[0].length; c++) {
+                if (cur.grid[r][c] !== 1) continue;
+                total++;
+                if (globalThis.userGrid[r][c] === 1) done++;
+            }
+        }
+        if (total > 0) markCap += Math.min(3, Math.floor((done / total) * 4));
+    }
     if (ptHasSkill('probabilistic_sweep')) markCap += 1;
     if (ptHasSkill('expanded_inference')) markCap += 1;
     if (ptHasSkill('god_of_probabilities')) markCap += 2;
@@ -154,6 +169,17 @@ function _precisionMarkCommitMark(id) {
     globalThis.userGrid[r][c] = 2;
     renderCell(r, c);
     globalThis._applyCellEffect([id], 'mark');
+
+    // Expected Value: each cell Precision Shot marks adds +1 second.
+    if (ptHasSkill('expected_value')) {
+        addTimeSecs(1, { capSecs: 3600 });
+        trackAchStat('timeAdded', 1);
+    }
+    // Credible Interval (combat): each marked cell fires a half-strength
+    // reveal projectile at the target.
+    if (ptHasSkill('credible_interval') && typeof globalThis._egOnProgrammaticReveal === 'function') {
+        globalThis._egOnProgrammaticReveal([id], 'ability', { strengthMult: 0.5 });
+    }
 }
 
 // _precisionMarkApply - selects all cells Precision Mark will mark across
@@ -163,9 +189,9 @@ function _precisionMarkCommitMark(id) {
 // (rows AND columns, interleaved), so both orientations reliably receive
 // marks - a naive rows-first pass could let rows consume the entire cap
 // and leave the columns empty.
-function _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap) {
+function _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap, preClaimed) {
     const affected = [];
-    const claimed = new Set();
+    const claimed = new Set(preClaimed || []);
 
     // Build an interleaved row/col line list (row, col, row, col, ...).
     const rowArr = [...targetRows];
@@ -579,12 +605,77 @@ function _fieldScanFadeOutCells(scanned) {
     });
 }
 
+// _precisionRevealInLines - Posterior Predictive: reveals one random
+//   unrevealed correct cell in the clicked row and one in the clicked column.
+function _precisionRevealInLines(row, col, rows, cols, sol) {
+    const pick = (cells) => {
+        const pool = cells.filter(([r, c]) =>
+            sol[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1);
+        return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
+    };
+    const rowCells = [];
+    for (let c = 0; c < cols; c++) rowCells.push([row, c]);
+    const colCells = [];
+    for (let r = 0; r < rows; r++) colCells.push([r, col]);
+
+    const revealed = [];
+    [pick(rowCells), pick(colCells)].forEach(cell => {
+        if (!cell) return;
+        const [r, c] = cell;
+        if (globalThis.revealedGrid[r][c]) return; // same cell picked twice
+        globalThis.revealedGrid[r][c] = true;
+        globalThis.userGrid[r][c] = 1;
+        renderCell(r, c);
+        updClues(r, c);
+        trackAchStat('tilesRevealed', 1);
+        questStat_classRevealUsed(1);
+        revealed.push(`g-${r}-${c}`);
+    });
+    if (revealed.length) {
+        globalThis._applyCellEffect(revealed, 'reveal', 'ability');
+        globalThis.checkWin();
+    }
+}
+
+// _fieldScanHotZone - Hot Zone: every correct cell Rain of Arrows scans fires
+//   a half-strength reveal projectile (max 8), and a scan that is at least
+//   half correct refunds 20 seconds of the Rain of Arrows cooldown.
+function _fieldScanHotZone(prevStates, sol) {
+    if (!prevStates.length) return;
+    const correct = prevStates.filter(({ r, c }) => sol[r][c] === 1);
+    if (correct.length * 2 >= prevStates.length) reduceSlotCooldown('active2', 20);
+    if (!correct.length || typeof globalThis._egOnProgrammaticReveal !== 'function') return;
+    _shuffleArray(correct);
+    const ids = correct.slice(0, 8).map(({ r, c }) => `g-${r}-${c}`);
+    globalThis._egOnProgrammaticReveal(ids, 'ability', { strengthMult: 0.5 });
+}
+
+// _fieldScanKeepOneCorrectCell - Lasting Impression: permanently reveals one
+//   random correct cell from the scan (same bookkeeping as the God of
+//   Probabilities keep, for a single cell and without the divine effect).
+function _fieldScanKeepOneCorrectCell(prevStates) {
+    const pool = prevStates.filter(({ r, c }) =>
+        cur.grid[r][c] === 1 && !globalThis.revealedGrid[r][c] && globalThis.userGrid[r][c] !== 1);
+    if (!pool.length) return;
+    const { r, c } = pool[Math.floor(Math.random() * pool.length)];
+    globalThis.revealedGrid[r][c] = true;
+    globalThis.userGrid[r][c] = 1;
+    updClues(r, c);
+    trackAchStat('tilesRevealed', 1);
+    questStat_classRevealUsed(1);
+    updateQuestStats('classAbilityUsedThisLevel', {});
+    if (typeof window.feedDrifter === 'function') window.feedDrifter();
+}
+
 // Restores all scanned cells to their real state after the scan timer expires.
 // If god_of_probabilities is active, permanently keeps up to 3 filled cells first
 // (plus, on rain-of-arrows casts of the actual class ability, every ✕ mark shown).
 function _fieldScanRestore(scanned, prevStates, isClassAbility = false) {
     if (ptHasSkill('god_of_probabilities')) {
         _fieldScanRestoreGodOfProbabilities(prevStates, isClassAbility);
+    } else if (isClassAbility && ptHasSkill('lasting_impression')) {
+        // Lasting Impression: Rain of Arrows permanently reveals 1 correct cell.
+        _fieldScanKeepOneCorrectCell(prevStates);
     }
 
     // Re-render all cells (correctly handles both kept and restored cells)
@@ -1094,6 +1185,7 @@ function _fieldScanFinishLanding(scanned, prevStates, sol, startRow, startCol, s
     _playScanBeamEffect(startRow, startCol, scanSize, durationMs);
     globalThis.showToast(`🎯 ${t('cls_field_scan')}`);
     _fieldScanCheckBigScanAchievement(prevStates, sol);
+    if (isClassAbility && ptHasSkill('hot_zone')) _fieldScanHotZone(prevStates, sol);
 
     setTimeout(() => _fieldScanRestore(scanned, prevStates, isClassAbility), durationMs);
 }
@@ -1586,15 +1678,39 @@ export function _playBayesianRevealEffect(cellEl) {
 
 // Main entry point for the Precision Mark ability.
 // Marks empty cells in the target row/col and adjacent lines, then fires VFX.
-export function _executePrecisionMark(row, col, extraLines) {
+export function _executePrecisionMark(row, col, extraLines, isEcho = false) {
     if (!cur) return;
     const sol = cur.grid;
     const rows = sol.length;
     const cols = sol[0].length;
 
+    // Heads or Tails: 25% chance to fire a second time on the same cell.
+    if (!isEcho && ptHasSkill('heads_or_tails') && Math.random() < 0.25) {
+        setTimeout(() => _executePrecisionMark(row, col, extraLines, true), 1600);
+    }
+
     const markCap = _precisionMarkComputeMarkCap();
     const { targetRows, targetCols } = _precisionMarkBuildTargets(row, col, extraLines, rows, cols);
-    const affected = _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap);
+
+    // Credible Interval: every wrong cell in the clicked row and column is
+    // marked without counting toward the mark limit.
+    const freeAffected = [];
+    const freeClaimed = new Set();
+    if (ptHasSkill('credible_interval')) {
+        for (let c = 0; c < cols; c++) {
+            if (sol[row][c] === 0 && globalThis.userGrid[row][c] === 0) freeClaimed.add(`${row}-${c}`);
+        }
+        for (let r = 0; r < rows; r++) {
+            if (sol[r][col] === 0 && globalThis.userGrid[r][col] === 0) freeClaimed.add(`${r}-${col}`);
+        }
+        freeClaimed.forEach(k => freeAffected.push(`g-${k}`));
+    }
+    const affected = freeAffected.concat(
+        _precisionMarkApply(targetRows, targetCols, rows, cols, sol, markCap, freeClaimed));
+
+    // Posterior Predictive: also reveals 1 correct cell in the clicked row
+    // and 1 in the clicked column.
+    if (ptHasSkill('posterior_predictive')) _precisionRevealInLines(row, col, rows, cols, sol);
 
     _playPrecisionMarkEffect(row, col, affected);
     // (the _applyCellEffect(affected, 'mark') call that used to be here is gone -

@@ -228,6 +228,19 @@ function _egApplyMonsterAilment(monster, key, dps) {
     // in _egApplyPlayerAilment below keep their warning cue.)
 }
 
+// Freezes EVERY living monster for durationS seconds (Frozen Assets: Absolute
+// Zero). A frozen monster's attack charge bar stops (see
+// _egGetMonsterChargeMultiplier). Monsters that avoid ailments may resist it.
+function _egFreezeAllMonsters(durationS) {
+    const list = globalThis._egMonsters || [];
+    for (const m of list) {
+        if (!m || !(m.currentHP > 0)) continue;
+        if ((m.avoidAilmentPct || 0) > 0 && Math.random() * 100 < m.avoidAilmentPct) continue;
+        if (!m.statuses) m.statuses = {};
+        _egApplyStatusToMap(m.statuses, 'frozen', durationS, 0);
+    }
+}
+
 // Applies an ailment to the player (or refreshes an existing one).
 //------------------------------------------------------------------------
 //-------------------PLAYER STUN------------------------------------------
@@ -1056,6 +1069,8 @@ function _egStartPlayerShadowClouds() {
 //------------------------------------------------------------------------
 
 export {
+    _egApplyMonsterAilment,
+    _egFreezeAllMonsters,
     EG_AIL_IGNITE_DMG_SHARE,
     EG_AIL_BLEED_DURATION_S,
     EG_AIL_BLEED_DMG_SHARE,

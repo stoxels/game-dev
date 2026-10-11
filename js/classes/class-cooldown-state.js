@@ -415,6 +415,18 @@ export function startSlotCooldown(slot, seconds) {
     state.interval = setInterval(() => _tickSlotCooldown(slot), 1000);
 }
 
+// Shortens a slot's RUNNING cooldown by `seconds` (passive tree refunds and
+// cross-ability reductions). No-op while the slot is ready. A reduction that
+// reaches zero ends the cooldown exactly like a natural expiry would.
+export function reduceSlotCooldown(slot, seconds) {
+    const state = cooldownState[slot];
+    const amount = Number(seconds) || 0;
+    if (!state || !(state.remaining > 0) || amount <= 0) return;
+    state.remaining = Math.max(0, state.remaining - amount);
+    if (state.remaining <= 0) _onSlotCooldownExpired(slot);
+    else _patchCooldownButton(slot);
+}
+
 
 
 

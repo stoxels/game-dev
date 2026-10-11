@@ -279,13 +279,13 @@ export const CLASS_DEFS = {
                 {
                     level: 2,
                     descEn: 'Scans a 3×3 region on the grid for 1.5 seconds. Cooldown: 5 minutes.',
-                    descDE: 'Enthüllt eine 3×3-Region auf dem Spielfeld für 1,5 Sekunden. Abklingzeit: 5 Minuten.',
+                    descDE: 'Scannt eine 3×3-Region auf dem Spielfeld für 1,5 Sekunden. Abklingzeit: 5 Minuten.',
                     effect: { scanSize: 3, scanDuration: 1500 }
                 },
                 {
                     level: 3,
-                    descEn: 'Reveals a 4×4 region on the grid for 2 seconds. Cooldown: 5 minutes.',
-                    descDE: 'Enthüllt eine 4×4-Region auf dem Spielfeld für 2 Sekunden. Abklingzeit: 5 Minuten.',
+                    descEn: 'Scans a 4×4 region on the grid for 2 seconds. Cooldown: 5 minutes.',
+                    descDE: 'Scannt eine 4×4-Region auf dem Spielfeld für 2 Sekunden. Abklingzeit: 5 Minuten.',
                     effect: { scanSize: 4, scanDuration: 2000 }
                 },
             ]

@@ -54,6 +54,9 @@ export function _egCalcPlayerDamage() {
     dmg *= 1 + (stats.projectileDamageIncPct || 0) / 100;
     // Frenzy Charges: a "more" step on projectile damage per live charge.
     dmg *= 1 + (stats.frenzyDamageMorePct || 0) / 100;
+    // Residual Plot (Statistician passive node): 15% increased damage for 10
+    // seconds after Data Strike (LEVEL_FLAGS.residualPlotUntil, set on cast).
+    if (globalThis.LEVEL_FLAGS && Number(globalThis.LEVEL_FLAGS.residualPlotUntil) > Date.now()) dmg *= 1.15;
 
     // Projectile crit chance (passive tree) is added to the base crit chance
     // for this roll only - melee strikes never read it.

@@ -19,7 +19,7 @@ const INNER_CIRCLE_HUB_ANGLES = Object.freeze([240, 0, 120]);
 // from the Ascendancy Gate and the wheel's own spacing is opened up by
 // INNER_CIRCLE_WHEEL_SPREAD, so the wheels fill the centre instead of leaving
 // a wide empty disc inside the first travel ring. Wheel shape is unchanged.
-const INNER_CIRCLE_WHEEL_RADIUS = 260;
+const INNER_CIRCLE_WHEEL_RADIUS = 400;
 const INNER_CIRCLE_HUB_DISTANCE = 780;
 const INNER_CIRCLE_WHEEL_SPREAD = 1.45;
 const LAYOUT_CLEANUP_ITERATIONS = 160;
