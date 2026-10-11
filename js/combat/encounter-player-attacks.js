@@ -16,7 +16,7 @@ import { _egPlayerTakeDamage } from './encounter-damage.js';
 import { _egDamageTargetById, _egShowStatusLabel } from './encounter-monster-damage.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
 import { _egCalcPlayerDamage, _egLastHitElements, _egLastHitWasCrit } from './combat-calculations.js';
-import { EG_ELEMENTS, _egSecondaryDamage } from './combat-calculations-resistances.js';
+import { EG_ELEMENTS, _egScaleElements, _egSecondaryDamage } from './combat-calculations-resistances.js';
 import { _egRestartFlashClass } from './encounter.js';
 import { _egGetActiveMapModValue, _egMapPlayerProjectileMult } from '../endgame/endgame-map-launch.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
@@ -212,7 +212,18 @@ export function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElO
     // Flight time: every player projectile base-travels at half speed
     // (EG_PLAYER_PROJECTILE_BASE_SLOWDOWN) so "% increased Projectile Speed"
     // from the passive tree is worth picking up; the bonus divides the time.
-    const speedPct = Math.max(0, _egComputePlayerStats().projectileSpeedPct || 0);
+    const flightStats = _egComputePlayerStats();
+    // Point Blank keystone: up to +N% damage at the start of the flight, scaling down
+    // to -N% as the projectile travels farther (distance relative to the screen width).
+    const pointBlank = Number(flightStats.pointBlankPct) || 0;
+    if (pointBlank > 0 && damage != null) {
+        const dist = Math.hypot(end.x - start.x, end.y - start.y);
+        const ref = Math.max(300, 0.7 * (Number(globalThis.innerWidth) || 1200));
+        const pbMult = 1 + (pointBlank / 100) * (1 - 2 * Math.min(1, dist / ref));
+        damage = Math.max(1, Math.round(damage * pbMult));
+        elements = _egScaleElements(elements, pbMult);
+    }
+    const speedPct = Math.max(0, flightStats.projectileSpeedPct || 0);
     const flightMs = Math.max(60, Math.round(projDef.duration * EG_PLAYER_PROJECTILE_BASE_SLOWDOWN / (1 + speedPct / 100)));
     _egFireProjectile(projDef, projDef.cssClass, start, end, flightMs, projDef.easing, () => {
         _egResolveProjectileImpact(damage, targetId, elements, opts);
@@ -230,6 +241,15 @@ export function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElO
 //   chain   - chance to bounce to one monster in a DIFFERENT spawn location
 //   pierce  - chance to punch through and hit one additional monster anywhere
 export function _egResolveProjectileImpact(damage, targetId, elements, opts) {
+    // Arrow Dancing: a projectile cannot hit the same enemy as the previous one; it
+    // picks another living enemy when there is one.
+    if ((Number(_egComputePlayerStats().noRepeatTarget) || 0) > 0) {
+        if (globalThis._egLastProjectileTargetId === targetId) {
+            const others = (globalThis._egMonsters || []).filter(m => m.id !== targetId && m.currentHP > 0);
+            if (others.length) targetId = others[Math.floor(Math.random() * others.length)].id;
+        }
+        globalThis._egLastProjectileTargetId = targetId;
+    }
     const target = globalThis._egMonsters.find(m => m.id === targetId);
 
     // Every projectile landing here is a player MAGIC/ranged source -
@@ -252,7 +272,7 @@ export function _egResolveProjectileImpact(damage, targetId, elements, opts) {
         const burstChance = Number(hitStats.lifeBurstOnProjectileHitChancePct) || 0;
         if (burstChance > 0 && Math.random() * 100 < burstChance) lifeGain += EG_PROJECTILE_HIT_LIFE_BURST;
         if (lifeGain > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP) {
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + lifeGain);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(lifeGain) : (lifeGain)));
             if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         }
     }

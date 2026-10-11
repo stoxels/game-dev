@@ -164,7 +164,7 @@ export const EG_PICKUP_DEFS = {
         id: 'heart_small', emoji: '💛', label: () => t('eg_pickup_heart_small'), rarity: 'common',
         onPickup(row, col) {
             const heal = _egCalcHeartHeal(10);
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
             globalThis._renderPlayerHealth();
             globalThis.showToast(t('eg_pickup_heal_small').replace('{n}', heal), _egRarityToastColor(this.rarity));
             Audio_Manager.playSFX('heart_heals');
@@ -174,7 +174,7 @@ export const EG_PICKUP_DEFS = {
         id: 'heart_medium', emoji: '🧡', label: () => t('eg_pickup_heart'), rarity: 'uncommon',
         onPickup(row, col) {
             const heal = _egCalcHeartHeal(25);
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
             globalThis._renderPlayerHealth();
             globalThis.showToast(t('eg_pickup_heal_medium').replace('{n}', heal), _egRarityToastColor(this.rarity));
             Audio_Manager.playSFX('heart_heals');
@@ -184,7 +184,7 @@ export const EG_PICKUP_DEFS = {
         id: 'heart_large', emoji: '❤️', label: () => t('eg_pickup_heart_large'), rarity: 'rare',
         onPickup(row, col) {
             const heal = _egCalcHeartHeal(50);
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
             globalThis._renderPlayerHealth();
             globalThis.showToast(t('eg_pickup_heal_large').replace('{n}', heal), _egRarityToastColor(this.rarity));
             Audio_Manager.playSFX('heart_heals');

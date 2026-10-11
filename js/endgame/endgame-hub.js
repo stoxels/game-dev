@@ -1141,6 +1141,7 @@ export function _egSyncOverlayGearPools() {
             if (typeof _egMapPlayerLifeMult === 'function') {
                 try { newMax = Math.round(newMax * _egMapPlayerLifeMult()); } catch (e) {}
             }
+            if (Number(stats.lifeBecomesOne) > 0) newMax = 1;
             newMax = Math.max(1, newMax);
             const delta = newMax - globalThis.playerMaxHP;
             globalThis.playerMaxHP = newMax;

@@ -23,7 +23,7 @@ import { EG_BLOCK_LOCKOUT_BASE_MS } from './encounter-constants.js';
 import { _egGameOver } from './encounter-kills.js';
 import { _egApplyPlayerBlockFeedback, _egApplyPlayerMissFeedback, _egShowBlockLockoutOverlay } from './encounter-monster-attack-feedback.js';
 import { _egDamageTargetById } from './encounter-monster-damage.js';
-import { EG_FORTIFY_DR_PER_STACK, _egArmRiposte, _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainPowerCharge, _egGetFortifyStacks, _egRageOnPlayerHit } from './combat-ailments-state.js';
+import { EG_FORTIFY_DR_PER_STACK, _egConsumeGhostShroud, _egArmRiposte, _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainPowerCharge, _egGetFortifyStacks, _egRageOnPlayerHit } from './combat-ailments-state.js';
 import { _egApplyPlayerParryFeedback, _egGetDualWieldParryChancePct, _egGetParryChancePct, _egIsDualWieldParryActive, _egRollFateNegation, _egTryDeflectProjectile } from './encounter-player-mitigation.js';
 import { _egGetEncounterBaseLevel } from './encounter-spawn-rules.js';
 import { _egApplyPlayerShockAmp, _egRollMonsterHitAilment, _egRollPlayerStunFromHit, _egStunPlayer } from './combat-ailments-core.js';
@@ -114,6 +114,11 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (window._egGodMode) return 0;
 
     const stats = _egComputePlayerStats();
+
+    // Shadow Inoculation: immune to Shadow damage.
+    if (element === 'shadow' && (Number(stats.shadowImmune) || 0) > 0) return 0;
+    // Wind Dancer: whether an Attack hit you recently (read before this hit stamps it).
+    const attackHitRecently = Date.now() - (Number(globalThis._egLastAttackHitAt) || 0) < 4000;
 
     // Rage: being hit restarts the grace timer before it starts fading.
     _egRageOnPlayerHit(Number(stats.rageWhenHitAmount) || 0, Number(stats.rageMax) || 0);
@@ -216,13 +221,17 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // Evasion only applies to physical attacks (melee strikes and monster
     // projectiles) - spells, environmental hazards and boss special abilities
     // cannot be dodged. Neither can a hero rooted mid overcharge-charge.
-    if (!isSpell && !isBossAbility && !chargingMelee) {
+    if (!isSpell && !isBossAbility && !chargingMelee && !((Number(stats.cannotEvade) || 0) > 0)) {
         const attackerLvl = Number(attackerLevel)
             || (_egGetTarget() && _egGetTarget().level)
             || _egGetEncounterBaseLevel()
             || _egGetPlayerLevel();
-        const dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, attackerLvl)
+        let dodgeChance = Math.min(75, stats.dodgeChance + _egCalcEvasionDodgeChance(stats.evasion, attackerLvl)
             + ((support && support.dodgePct) || 0));
+        // Wind Dancer: more chance to Evade after an Attack hit you recently.
+        if (attackHitRecently && (Number(stats.windDancerEvadePct) || 0) > 0) {
+            dodgeChance = Math.min(75, dodgeChance * (1 + stats.windDancerEvadePct / 100));
+        }
         if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
             globalThis.showToast(t('eg_dodged'));
             _egApplyPlayerMissFeedback();
@@ -264,9 +273,25 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         + ((stats.isStaffEquipped ? (isSpell ? stats.staffSpellBlockPct : stats.staffBlockPct) : 0) || 0)
         + ((hasShieldEquipped && isSpell ? stats.shieldSpellBlockPct : 0) || 0)
         + ((isSpell ? stats.spellBlockFlat : 0) || 0);
+    // Glancing Blows doubles the chance; Versatile Combatant lowers the caps and turns
+    // overcapped attack block into spell block.
+    const blockMult = (Number(stats.blockDoubled) || 0) > 0 ? 2 : 1;
+    const blockCapAttack = Math.max(0, 75 - (Number(stats.blockMaxAttackLess) || 0));
+    const blockCapSpell = Math.max(0, 75 - (Number(stats.blockMaxSpellLess) || 0));
+    let overcapSpellBonus = 0;
+    if (isSpell && (Number(stats.spellBlockPerOvercap) || 0) > 0) {
+        const attackRaw = ((stats.blockChance || 0)
+            + (((hasShieldEquipped || dualWielding) ? stats.blockChanceTree : 0) || 0)
+            + ((hasShieldEquipped ? stats.blockChanceShieldPct : 0) || 0)
+            + ((dualWielding ? stats.dualBlockPct : 0) || 0)
+            + ((stats.isStaffEquipped ? stats.staffBlockPct : 0) || 0)) * blockMult;
+        overcapSpellBonus = Math.max(0, attackRaw - blockCapAttack) * stats.spellBlockPerOvercap;
+    }
     const blockChance = (!isBossAbility && !isBlockLockedOut && (hasShieldEquipped || treeBlock > 0) && !chargingMelee)
-        ? Math.min(75, (isSpell ? stats.spellBlockChance : stats.blockChance) + treeBlock)
+        ? Math.min(isSpell ? blockCapSpell : blockCapAttack,
+            ((isSpell ? stats.spellBlockChance : stats.blockChance) + treeBlock) * blockMult + overcapSpellBonus)
         : 0;
+    let blockedHitMult = 1;
     if (blockChance > 0 && Math.random() * 100 < blockChance) {
         // Timestamp for the tree's timed armour pulse (reworked node 337):
         // _egComputePlayerStats grants the bonus while this is under 10s old.
@@ -304,7 +329,19 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         }
         globalThis._egPlayerBlockLockoutUntil = Date.now() + lockoutDuration;
         _egShowBlockLockoutOverlay(lockoutDuration);
-        return 0;
+        // Glancing Blows: a blocked hit still deals a share of its damage.
+        if ((Number(stats.blockedHitTakenPct) || 0) > 0) blockedHitMult = stats.blockedHitTakenPct / 100;
+        else return 0;
+    }
+    if (blockedHitMult !== 1) amount *= blockedHitMult;
+
+    // The hit has landed (past parry, evasion and block).
+    if (!isSpell) globalThis._egLastAttackHitAt = Date.now();
+    // Ghost Dance: a Ghost Shroud breaks and restores Absorption from your Evasion.
+    if ((Number(stats.ghostShroudRecoverPct) || 0) > 0 && _egConsumeGhostShroud(stats.ghostShroudMax)) {
+        const ghostMax = Number(stats.absorption) || 0;
+        const ghostGain = Math.round((Number(stats.evasion) || 0) * stats.ghostShroudRecoverPct / 100);
+        globalThis._egPlayerAbsorptionCurrent = Math.min(ghostMax, (Number(globalThis._egPlayerAbsorptionCurrent) || 0) + ghostGain);
     }
 
     // Retribution - the hit has been confirmed to land (it got past parry,
@@ -331,7 +368,13 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
 
     // Elemental resistances (fire/cold/lightning/shadow %) mitigate
     // elemental hits before armour and absorption.
-    if (element) amount = _egCalcPlayerResistanceReduction(amount, stats, element);
+    // Imbalanced Guard caps the Damage Reduction of any type (resistances included).
+    const drCap = Number(stats.maxDamageReductionCap) || 0;
+    if (element) {
+        const preResist = amount;
+        amount = _egCalcPlayerResistanceReduction(amount, stats, element);
+        if (drCap > 0) amount = Math.max(amount, preResist * (1 - drCap / 100));
+    }
 
     // Ailments: a shocked player takes amplified damage from all hits.
     if (typeof _egApplyPlayerShockAmp === 'function') amount = _egApplyPlayerShockAmp(amount);
@@ -340,6 +383,12 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // landed hit is amplified while the attack key is held (applied here,
     // pre-armour, like the shock amp above).
     if (chargingMelee) amount *= EG_MELEE_HOLD_VULNERABILITY_MULT;
+
+    // Wind Dancer: less Attack damage when no Attack hit you recently, more when one did.
+    if (!isSpell) {
+        if (attackHitRecently && (Number(stats.windDancerMorePct) || 0) > 0) amount *= 1 + stats.windDancerMorePct / 100;
+        else if (!attackHitRecently && (Number(stats.windDancerLessPct) || 0) > 0) amount *= 1 - Math.min(90, stats.windDancerLessPct) / 100;
+    }
 
     // Active map run: Vulnerability - you take #% increased damage.
     if (typeof _egMapDamageTakenAmpMult === 'function') amount *= _egMapDamageTakenAmpMult();
@@ -362,7 +411,10 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (!isSpell && (Number(stats.physTakenFlat) || 0) > 0 && (!element || element === 'physical')) {
         amount = Math.max(1, amount - stats.physTakenFlat);
     }
+    // Imbalanced Guard: defend with 200% of Armour.
+    if ((Number(stats.armourDefendDouble) || 0) > 0) effectiveArmour *= 2;
     let mitigated = _egCalcArmourMitigation(amount, effectiveArmour);
+    if (drCap > 0) mitigated = Math.max(mitigated, amount * (1 - drCap / 100));
 
     // Bulwark - flat percentage damage reduction, applied AFTER armour and
     // BEFORE the absorption shield so a Bulwark also stretches the shield.
@@ -373,6 +425,15 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (fortifyStacks > 0) {
         const drPct = Math.min(40, fortifyStacks * EG_FORTIFY_DR_PER_STACK * (1 + (Number(stats.fortifyEffectIncPct) || 0) / 100));
         mitigated *= 1 - drPct / 100;
+    }
+
+    // Mind over Matter: a share of the damage is taken from Mana before anything else.
+    const momPct = Math.min(100, Number(stats.damageFromManaPct) || 0);
+    if (momPct > 0 && mitigated > 0 && (Number(globalThis.playerCurrentMana) || 0) > 0) {
+        const fromMana = Math.min(mitigated * momPct / 100, globalThis.playerCurrentMana);
+        globalThis.playerCurrentMana = Math.max(0, Math.round(globalThis.playerCurrentMana - fromMana));
+        mitigated -= fromMana;
+        if (typeof globalThis.updateClassHUDManaBar === 'function') globalThis.updateClassHUDManaBar();
     }
 
     if (globalThis._egPlayerAbsorptionCurrent > 0) {

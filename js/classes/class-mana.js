@@ -130,6 +130,13 @@ function _getAbilityScaledBaseCost(hudSlot) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Eldritch Battery keystone: spell costs are paid from Absorption before Mana.
+// Returns how much of `cost` the current Absorption can cover (0 when off).
+function _absorptionCostShare(cost) {
+    if (!(cost > 0) || _treeChannel('spellCostFromAbsorption') <= 0) return 0;
+    return Math.min(cost, Math.max(0, Math.floor(Number(globalThis._egPlayerAbsorptionCurrent) || 0)));
+}
+
 // Returns true when the current mana pool covers a cost.
 export function canAffordMana(cost) {
     return Math.round(globalThis.playerCurrentMana) >= cost;
@@ -155,7 +162,7 @@ export function canAffordLifeCost(cost) {
 export function _abilityCanAfford(hudSlot) {
     const cost = _getAbilityManaCost(hudSlot);
     if (_bloodMagicActive()) return canAffordLifeCost(cost);
-    return canAffordMana(cost);
+    return canAffordMana(cost - _absorptionCostShare(cost));
 }
 
 
@@ -210,6 +217,12 @@ export function payAbilityCost(cost) {
         globalThis.playerCurrentHP -= cost;
         if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         return true;
+    }
+    const fromAbsorption = _absorptionCostShare(cost);
+    if (fromAbsorption > 0) {
+        if (!canAffordMana(cost - fromAbsorption)) return false;
+        globalThis._egPlayerAbsorptionCurrent = Math.max(0, globalThis._egPlayerAbsorptionCurrent - fromAbsorption);
+        return spendMana(cost - fromAbsorption);
     }
     return spendMana(cost);
 }

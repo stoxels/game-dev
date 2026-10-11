@@ -155,7 +155,7 @@ export function _egKillMonster(monsterId) {
                 ? _egMapKillRecoveryMult() : 1;
             const lifeGain = Math.round(killStats.lifeOnKill * recoveryMult);
             if (lifeGain > 0) {
-                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + lifeGain);
+                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(lifeGain) : (lifeGain)));
                 if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
             }
         }

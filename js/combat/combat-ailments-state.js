@@ -57,6 +57,7 @@ export function _egResetPlayerStatuses() {
     _egResetEnduranceCharges();
     _egResetFrenzyCharges();
     _egResetOnslaught();
+    _egResetGhostShrouds();
     _egResetPowerCharges();
     _egResetFortify();
     _egResetRiposte();
@@ -165,6 +166,45 @@ export function _egGainOnslaught() {
 
 export function _egResetOnslaught() {
     _egOnslaughtUntil = 0;
+}
+
+//------------------------------------------------------------------------
+//-------------------GHOST SHROUDS (Ghost Dance keystone)------------------
+//------------------------------------------------------------------------
+// One shroud every EG_GHOST_SHROUD_INTERVAL_MS up to the keystone's maximum.
+// Lazy clock: the count is brought up to date whenever it is read or spent.
+export const EG_GHOST_SHROUD_INTERVAL_MS = 2000;
+let _egGhostShrouds = 0;
+let _egGhostShroudClock = 0;
+
+function _egSyncGhostShrouds(max) {
+    const now = Date.now();
+    const cap = Math.max(0, Math.floor(Number(max) || 0));
+    if (!_egGhostShroudClock || _egGhostShrouds >= cap) _egGhostShroudClock = now;
+    const gained = Math.floor((now - _egGhostShroudClock) / EG_GHOST_SHROUD_INTERVAL_MS);
+    if (gained > 0) {
+        _egGhostShrouds = Math.min(cap, _egGhostShrouds + gained);
+        _egGhostShroudClock += gained * EG_GHOST_SHROUD_INTERVAL_MS;
+    }
+    if (_egGhostShrouds > cap) _egGhostShrouds = cap;
+}
+
+export function _egGetGhostShrouds(max) {
+    _egSyncGhostShrouds(max);
+    return _egGhostShrouds;
+}
+
+// Spends one shroud; returns true when one was available.
+export function _egConsumeGhostShroud(max) {
+    _egSyncGhostShrouds(max);
+    if (_egGhostShrouds <= 0) return false;
+    _egGhostShrouds -= 1;
+    return true;
+}
+
+export function _egResetGhostShrouds() {
+    _egGhostShrouds = 0;
+    _egGhostShroudClock = Date.now();
 }
 
 //------------------------------------------------------------------------

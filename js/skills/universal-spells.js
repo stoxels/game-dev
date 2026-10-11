@@ -2,7 +2,7 @@ import { Audio_Manager } from '../audio/audio.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { _getGlobalCooldownReduction } from '../classes/class-cooldown-state.js';
-import { _egApplyDamageConversion, _egLeechAbsorption, _egLeechHealMult } from '../combat/combat-calculations-resistances.js';
+import { _egApplyDamageConversion, _egHasDamageConversion, _egLeechAbsorption, _egLeechHealMult } from '../combat/combat-calculations-resistances.js';
 import { _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost } from '../classes/class-mana.js';
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
@@ -1028,7 +1028,7 @@ export function _uspCalcWardCharges(spell, rank) {
 function _uspHealPlayer(amount) {
     if (typeof globalThis.playerCurrentHP !== 'undefined' && typeof globalThis.playerMaxHP !== 'undefined') {
         const before = globalThis.playerCurrentHP;
-        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, before + Math.max(0, Math.round(amount)));
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, before + (globalThis._egLifeGain ? globalThis._egLifeGain(Math.max(0, Math.round(amount))) : (Math.max(0, Math.round(amount)))));
         const gained = globalThis.playerCurrentHP - before;
         if (gained > 0 && typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         return gained;
@@ -2153,9 +2153,7 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
         elements[spellElement] = amount;
     }
     // Fire conversion / fire-only (Primal Flame keystone, node 350).
-    if ((Number(stats.damageToFirePct) || 0) > 0 || (Number(stats.onlyFireDamage) || 0) > 0
-        || (Number(stats.physAsExtraFirePct) || 0) > 0 || (Number(stats.physAsExtraShadowPct) || 0) > 0
-        || (Number(stats.physAsExtraColdPct) || 0) > 0 || (Number(stats.physAsExtraLightningPct) || 0) > 0) {
+    if (_egHasDamageConversion(stats) === true) {
         const converted = _egApplyDamageConversion(stats, spellElement === 'physical' ? amount : 0, elements);
         elements = converted.elements;
         amount = Math.max(1, Math.round(converted.physical

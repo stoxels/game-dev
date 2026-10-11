@@ -1,7 +1,7 @@
 import { t } from '../translation/translations.js';
-import { _egApplyAilmentShockAmpOnMonster, _egApplyImpaleToHit, _egApplyIntimidateAmp, _egRollCrush, _egRollIntimidate, _egRollPlayerHitAilments } from './combat-ailments-core.js';
+import { _egApplyAilmentShockAmpOnMonster, _egApplyImpaleToHit, _egChilledColdTakenMult, _egApplyIntimidateAmp, _egRollCrush, _egRollIntimidate, _egRollPlayerHitAilments } from './combat-ailments-core.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
-import { EG_ELEMENTS, _egApplyDamageConversion, _egApplyTargetResistances, _egScaleElements } from './combat-calculations-resistances.js';
+import { EG_ELEMENTS, _egApplyDamageConversion, _egApplyTargetResistances, _egHasDamageConversion, _egScaleElements } from './combat-calculations-resistances.js';
 import { EG_DAMAGE_NUMBER_DURATION_MS } from './encounter-constants.js';
 import { _egKillMonster } from './encounter-kills.js';
 import { EG_STAGGER_DURATION_MS } from './encounter-lifecycle.js';
@@ -138,9 +138,7 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     // (fire conversion / fire-only) converts or drops it like any other hit.
     if (opts && opts.isPlayerFlat && !elements) {
         const flatStats = _egComputePlayerStats();
-        if ((Number(flatStats.damageToFirePct) || 0) > 0 || (Number(flatStats.onlyFireDamage) || 0) > 0
-            || (Number(flatStats.physAsExtraFirePct) || 0) > 0 || (Number(flatStats.physAsExtraShadowPct) || 0) > 0
-            || (Number(flatStats.physAsExtraColdPct) || 0) > 0 || (Number(flatStats.physAsExtraLightningPct) || 0) > 0) {
+        if (_egHasDamageConversion(flatStats) === true) {
             const flat = _egApplyDamageConversion(flatStats, amount, {});
             elements = flat.elements;
             amount = Math.max(1, Math.round(flat.physical
@@ -159,6 +157,44 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
         if ((Number(cs.dmgVsLowLifePct) || 0) > 0 && target.maxHP > 0 && hpBefore / target.maxHP <= 0.35) condInc += cs.dmgVsLowLifePct;
         if ((Number(cs.dmgRecentShockPct) || 0) > 0 && Date.now() - (Number(globalThis._egLastShockAt) || 0) < 4000) condInc += cs.dmgRecentShockPct;
         if (condInc > 0) amount = Math.max(1, Math.round(amount * (1 + condInc / 100)));
+    }
+
+    // Keystone "more" lines: Elemental Overload (after a crit), Pain Attunement (spells
+    // on Low Life), Precise Technique (accuracy above max Life), Bitter Frost (chilled).
+    if (opts && (opts.isMelee || opts.isPlayerHit || opts.isPlayerSpell)) {
+        const ks = _egComputePlayerStats();
+        let kMult = 1;
+        const el = elements || {};
+        const elemSum = (el.fire || 0) + (el.cold || 0) + (el.lightning || 0) + (el.shadow || 0);
+        if ((Number(ks.elementalOverloadPct) || 0) > 0 && elemSum > 0
+            && Date.now() - (Number(globalThis._egLastCritAt) || 0) < 4000) {
+            kMult *= 1 + (ks.elementalOverloadPct / 100) * Math.min(1, elemSum / Math.max(1, amount));
+        }
+        if (opts.isPlayerSpell && (Number(ks.spellDmgLowLifeMorePct) || 0) > 0 && globalThis.playerMaxHP > 0
+            && globalThis.playerCurrentHP <= globalThis.playerMaxHP * 0.35) {
+            kMult *= 1 + ks.spellDmgLowLifeMorePct / 100;
+        }
+        if ((opts.isMelee || opts.isPlayerHit) && (Number(ks.preciseTechniquePct) || 0) > 0
+            && (Number(ks.accuracy) || 0) > (Number(globalThis.playerMaxHP) || 0)) {
+            kMult *= 1 + ks.preciseTechniquePct / 100;
+        }
+        if ((Number(ks.chilledColdTaken) || 0) > 0 && (el.cold || 0) > 0) {
+            kMult *= _egChilledColdTakenMult(target, ks, Math.min(1, (el.cold || 0) / Math.max(1, amount)));
+        }
+        // Elemental Equilibrium: single-element hits deal more, but enemies resist the
+        // element you used last. Overcharge reads the last-attack stamp.
+        globalThis._egLastPlayerAttackAt = Date.now();
+        if ((Number(ks.singleElementMorePct) || 0) > 0 || (Number(ks.lastElementResistPct) || 0) > 0) {
+            const used = EG_ELEMENTS.filter(e => (el[e] || 0) > 0);
+            const physShare = Math.max(0, amount - elemSum);
+            if (used.length === 1 && physShare <= amount * 0.05) kMult *= 1 + (Number(ks.singleElementMorePct) || 0) / 100;
+            const last = globalThis._egLastElementUsed;
+            if ((Number(ks.lastElementResistPct) || 0) > 0 && last && (el[last] || 0) > 0) {
+                kMult *= 1 - (ks.lastElementResistPct / 100) * Math.min(1, (el[last] || 0) / Math.max(1, amount));
+            }
+            if (used.length) globalThis._egLastElementUsed = used.reduce((a, b) => ((el[b] || 0) > (el[a] || 0) ? b : a));
+        }
+        if (kMult !== 1) amount = Math.max(1, Math.round(amount * kMult));
     }
 
     // Armour pierce (node 147): per-hit roll to skip the target's physical

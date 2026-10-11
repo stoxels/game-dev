@@ -130,7 +130,7 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
         const meleeStats = _egComputePlayerStats();
         const lifeGain = (Number(meleeStats.lifeOnMeleeHit) || 0) + (Number(meleeStats.lifeOnAttackHit) || 0);
         if (lifeGain > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP) {
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + lifeGain);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(lifeGain) : (lifeGain)));
             if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         }
     }

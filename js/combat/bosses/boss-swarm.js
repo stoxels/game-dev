@@ -83,7 +83,7 @@ export function _egSwPC() { const c = _egNkPlayerCenter(); return c || { x: wind
 export function _egSwHeal(amount) {
     if (typeof playerCurrentHP !== 'number') return;
     const before = globalThis.playerCurrentHP;
-    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + Math.max(1, Math.round(amount)));
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(Math.max(1, Math.round(amount))) : (Math.max(1, Math.round(amount)))));
     if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 

@@ -201,7 +201,25 @@ function _egApplyMonsterAilment(monster, key, dps) {
     // The 0.1s slack keeps the final tick from racing the expiry.
     const speedMult = 1 + bleedSpeedPct / 100;
     if (speedMult > 1) durationS = durationS / speedMult + 0.1;
+    // Crimson Dance: Bleeding deals less damage but stacks up to N times on one enemy
+    // (every stack adds its damage per second; the duration refreshes).
+    let bleedStacks = 1;
+    if (key === 'bleed') {
+        try {
+            const bs = _egComputePlayerStats();
+            const less = Math.min(95, Math.max(0, Number(bs.bleedLessPct) || 0));
+            if (less > 0) dps *= 1 - less / 100;
+            const stackMax = Math.floor(Number(bs.bleedStackMax) || 0);
+            const ex = monster.statuses.bleed;
+            if (stackMax > 1 && ex && ex.until > Date.now()) {
+                const c = ex.stacks || 1;
+                if (c < stackMax) { dps = (ex.dps || 0) + dps; bleedStacks = c + 1; }
+                else { dps = ex.dps || dps; bleedStacks = c; }
+            }
+        } catch (e) { /* base bleed */ }
+    }
     _egApplyStatusToMap(monster.statuses, key, durationS, dps);
+    if (key === 'bleed' && monster.statuses.bleed) monster.statuses.bleed.stacks = bleedStacks;
     if (speedMult > 1) monster.statuses[key].tickS = EG_AIL_TICK_INTERVAL_S / speedMult;
     // No application blip on the monster side: elemental hits re-roll and
     // refresh ailments on every strike, so a per-hit cue (ignite especially)
@@ -237,6 +255,8 @@ function _egStunChanceFromHit(lost, maxHP) {
 
 function _egStunPlayer(durationS = EG_AIL_STUN_DURATION_S) {
     if (!_egIsActive()) return false;
+    // Unwavering Stance: cannot be Stunned.
+    try { if ((Number(_egComputePlayerStats().cannotBeStunned) || 0) > 0) return false; } catch (e) { /* not immune */ }
     const now = Date.now();
     if (_egPlayerHasAilment('stunned') || now < _egStunImmuneUntil) return false;
     let st = {};
@@ -263,6 +283,10 @@ function _egRollPlayerStunFromHit(lost) {
 }
 
 function _egApplyPlayerAilment(key, dps) {
+    // Shadow Inoculation: immune to Shadow damage, so shadow-type ailments never land.
+    if (key === 'shadow' || key === 'shadowburn' || key === 'poison') {
+        try { if ((Number(_egComputePlayerStats().shadowImmune) || 0) > 0) return; } catch (e) { /* not immune */ }
+    }
     const durationS = ({
         ignite: EG_AIL_IGNITE_DURATION_S,
         bleed: EG_AIL_BLEED_DURATION_S,
@@ -478,6 +502,15 @@ const EG_IMPALE_STORE_SHARE = 0.10;
 // the hit itself plus any stored impale damage it triggers. The impale a hit
 // inflicts stores the hit's own damage, never the extra it just triggered,
 // and a hit can't trigger the impale it creates.
+// Bitter Frost: a chilled target takes extra Cold damage equal to the Chill effect
+// (the % slow of its attack bar, scaled by the chill-effect lines).
+function _egChilledColdTakenMult(target, stats, coldShare) {
+    if (!target || !target.statuses || !_egHasStatus(target.statuses, 'chill')) return 1;
+    const eff = Math.max(0, (Number(stats.chillEffectIncPct) || 0) + (Number(stats.ailmentEffectTreePct) || 0));
+    const slowPct = Math.min(90, (1 - EG_AIL_CHARGE_SLOW_MULT) * 100 * (1 + eff / 100));
+    return 1 + (slowPct / 100) * coldShare;
+}
+
 function _egApplyImpaleToHit(target, amount, elements, opts) {
     if (!target || !(amount > 0)) return amount;
     const now = Date.now();
@@ -494,6 +527,8 @@ function _egApplyImpaleToHit(target, amount, elements, opts) {
     if (!stats.isHeavyWeaponEquipped) return out;
     const chancePct = Math.min(100, Number(stats.impaleChanceHeavyPct) || 0);
     if (!(chancePct > 0) || Math.random() * 100 >= chancePct) return out;
+    // The Impaler: a freshly impaled enemy cannot be impaled again for a few seconds.
+    if ((Number(target.impaleLockUntil) || 0) > now) return out;
 
     // Physical share = whatever the elemental shares leave over (same rule
     // the innate bleed roll below uses).
@@ -504,11 +539,23 @@ function _egApplyImpaleToHit(target, amount, elements, opts) {
     const effectPct = (Number(stats.impaleEffectHeavyPct) || 0)
         + (target.impale ? 0 : (Number(stats.impaleEffectFreshPct) || 0));
     const durationPct = Math.max(0, Number(stats.impaleDurationPct) || 0);
+    const impaleExtra = Math.max(0, Math.floor(Number(stats.impaleExtra) || 0));
     target.impale = {
         stored: Math.max(1, Math.round(physical * EG_IMPALE_STORE_SHARE * (1 + effectPct / 100))),
-        hits: EG_IMPALE_MAX_HITS,
+        hits: EG_IMPALE_MAX_HITS + impaleExtra,
         until: now + EG_IMPALE_DURATION_S * (1 + durationPct / 100) * 1000,
     };
+    const lockS = Math.max(0, Number(stats.impaleLockout) || 0);
+    if (lockS > 0) target.impaleLockUntil = now + lockS * 1000;
+    // The Impaler: the impale also lands on the other enemies in the same area.
+    if ((Number(stats.impaleSpread) || 0) > 0 && Array.isArray(globalThis._egMonsters)) {
+        globalThis._egMonsters.forEach((m) => {
+            if (!m || m === target || m.id === target.id || m.currentHP <= 0 || m.zoneId !== target.zoneId) return;
+            if ((Number(m.impaleLockUntil) || 0) > now) return;
+            m.impale = Object.assign({}, target.impale);
+            if (lockS > 0) m.impaleLockUntil = now + lockS * 1000;
+        });
+    }
     return out;
 }
 
@@ -563,7 +610,14 @@ function _egRollPlayerHitAilments(target, amount, elements, opts) {
     if (!_egIsActive() || !target || target.currentHP <= 0) return;
     const stats = _egComputePlayerStats();
     // Ailments inflicted by a critical hit deal more damage over time.
-    const critDotMult = (opts && opts.isCrit) ? 1 + Math.max(0, Number(stats.critDotMultiPct) || 0) / 100 : 1;
+    // Perfect Agony: only Critical Strikes inflict ailments, and their DoT multiplier is
+    // the Critical Strike multiplier.
+    if ((Number(stats.nonCritNoAilments) || 0) > 0 && !(opts && opts.isCrit)) return;
+    const critDotMult = (opts && opts.isCrit)
+        ? ((Number(stats.dotMultiEqualsCrit) || 0) > 0
+            ? 1.5 + Math.max(0, Number(stats.critMultiplierPct) || 0) / 100
+            : 1 + Math.max(0, Number(stats.critDotMultiPct) || 0) / 100)
+        : 1;
     const _achPreHas = {};
     if (target.statuses) { for (const k in target.statuses) if (target.statuses[k] && target.statuses[k].until > Date.now()) _achPreHas[k]=true; }
 
@@ -748,6 +802,9 @@ function _egRollMonsterHitAilment(element, dealt, attacker) {
 
 function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
     if (typeof dead !== 'undefined' && globalThis.dead) return;
+    // Shadow Inoculation: with Life 1 every damage over time (shadow burn included)
+    // must go through Absorption first.
+    try { if ((Number(_egComputePlayerStats().lifeBecomesOne) || 0) > 0) ignoreShield = false; } catch (e) { /* default */ }
 
     let amount = rawAmount;
 
@@ -1024,6 +1081,7 @@ export {
     _egApplyPlayerShockAmp,
     _egRollPlayerHitAilments,
     _egApplyImpaleToHit,
+    _egChilledColdTakenMult,
     _egRollMonsterHitAilment,
     _egTickAilments,
     _egRenderMonsterStatusStrip,

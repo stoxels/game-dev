@@ -78,7 +78,7 @@ export function _egShrPC() { const c = _egNkPlayerCenter(); return c || { x: win
 export function _egShrHeal(amount) {
     if (typeof playerCurrentHP === 'undefined') return;
     const before = globalThis.playerCurrentHP;
-    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + amount);
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP || before, before + (globalThis._egLifeGain ? globalThis._egLifeGain(amount) : (amount)));
     if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 

@@ -351,7 +351,7 @@ export function _egApplyQuizRewardBuff() {
     } else if (pick === 'heal') {
         // ── Life heal ────────────────────────────────────────────────────
         const heal = Math.max(1, Math.round(globalThis.playerMaxHP * 0.25));
-        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
         if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         if (typeof showToast === 'function') globalThis.showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
         _egShowQuizBuffBurst('heal', `+${heal} HP`);
@@ -375,7 +375,7 @@ export function _egApplyQuizRewardBuff() {
             // Prefer heal if not at full life, otherwise fall back to damage.
             if (needsHeal) {
                 const heal = Math.max(1, Math.round(globalThis.playerMaxHP * 0.25));
-                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
                 if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
                 if (typeof showToast === 'function') globalThis.showToast(`💚 Scholar's Blessing: restored ${heal} HP!`);
                 _egShowQuizBuffBurst('heal', `+${heal} HP`);

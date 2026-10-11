@@ -99,7 +99,7 @@ export function _egTickLifeRegen() {
         globalThis._egRecoupPool -= drip;
         if (globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP
             && !(typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration'))) {
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + drip);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(drip) : (drip)));
             if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         }
     }
@@ -109,7 +109,7 @@ export function _egTickLifeRegen() {
         _egLastLifePulseAt = now;
         if (globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP
             && !(typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration'))) {
-            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + globalThis.playerMaxHP * stats.lifePulsePct / 100);
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(globalThis.playerMaxHP * stats.lifePulsePct / 100) : (globalThis.playerMaxHP * stats.lifePulsePct / 100)));
             if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
         }
     }
@@ -123,12 +123,31 @@ export function _egTickLifeRegen() {
     // after every increase.
     const regenLess = Math.max(0, 1 - Math.max(0, stats.lifeRegenLessPct || 0) / 100);
     const regen = ((stats.lifeRegen || 0) + (globalThis.playerMaxHP * regenPct) / 100) * regenRate * regenLess;
+    // The Agnostic: while not on full Life, a share of max Mana per second is sacrificed
+    // to recover that much Life.
+    if ((stats.manaToLifePct || 0) > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP
+        && (Number(globalThis.playerCurrentMana) || 0) > 0 && (Number(globalThis.playerMaxMana) || 0) > 0) {
+        const dtS = EG_LIFE_REGEN_INTERVAL_MS / 1000;
+        const spend = Math.min(globalThis.playerCurrentMana, Math.max(1, globalThis.playerMaxMana * stats.manaToLifePct / 100 * dtS));
+        globalThis.playerCurrentMana = Math.max(0, Math.round(globalThis.playerCurrentMana - spend));
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + spend);
+        if (typeof globalThis.updateClassHUDManaBar === 'function') globalThis.updateClassHUDManaBar();
+        if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+    }
+    // Zealot's Oath: Life Regeneration refills Absorption instead of Life.
+    if ((stats.lifeRegenToAbsorption || 0) > 0) {
+        const absMax = Number(stats.absorption) || 0;
+        if (regen > 0 && absMax > 0 && !(typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration'))) {
+            globalThis._egPlayerAbsorptionCurrent = Math.min(absMax, (Number(globalThis._egPlayerAbsorptionCurrent) || 0) + regen);
+        }
+        return;
+    }
     if (regen <= 0 || globalThis.playerCurrentHP <= 0 || globalThis.playerCurrentHP >= globalThis.playerMaxHP) return;
 
     // Active map run: No Life Regeneration - regeneration is disabled.
     if (typeof _egHasActiveMapMod === 'function' && _egHasActiveMapMod('map_no_regeneration')) return;
 
-    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + regen);
+    globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(regen) : (regen)));
     if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
 }
 

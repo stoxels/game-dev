@@ -286,6 +286,8 @@ export function _egRollPlayerMiss(targetId, opts) {
     }
 
     const stats = _egComputePlayerStats();
+    // Resolute Technique: attacks can no longer miss.
+    if ((Number(stats.attacksNeverMiss) || 0) > 0) return false;
     const stacks = (opts && opts.isChargedStacks) ? opts.isChargedStacks : 0;
     // Also support a plain number being passed as second arg (legacy callers)
     const dragStacks = (typeof opts === 'number') ? opts : stacks;

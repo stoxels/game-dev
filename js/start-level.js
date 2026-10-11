@@ -168,6 +168,8 @@ function _resetPlayerHP() {
     // "% more maximum Life" (Blood Magic keystone) multiplies the whole pool.
     if (stats && stats.healthMorePct > 0) maxHP = Math.round(maxHP * (1 + stats.healthMorePct / 100));
     if (typeof _egMapPlayerLifeMult === 'function') maxHP = Math.round(maxHP * _egMapPlayerLifeMult());
+    // Shadow Inoculation keystone: maximum Life becomes 1.
+    if (stats && stats.lifeBecomesOne > 0) maxHP = 1;
     globalThis.playerMaxHP = Math.max(1, maxHP);
     globalThis.playerCurrentHP = globalThis.playerMaxHP;
 }

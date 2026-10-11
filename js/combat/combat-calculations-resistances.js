@@ -45,8 +45,21 @@ export function _egGetElementalDamageBonus(stats) {
 // converted share keeps the strength it already had. Returns
 // { physical, elements } and hands the inputs back untouched when neither
 // channel is active.
+// True when any conversion / only-element / extra-as channel is active.
+export function _egHasDamageConversion(stats) {
+    if (!stats) return false;
+    return ['damageToFirePct', 'onlyFireDamage', 'damageToColdPct', 'onlyColdDamage', 'damageToLightningPct', 'onlyLightningDamage',
+        'physAsExtraFirePct', 'physAsExtraShadowPct', 'physAsExtraColdPct', 'physAsExtraLightningPct']
+        .some((k) => (Number(stats[k]) || 0) > 0);
+}
+
 export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1) {
     const el = elements || {};
+    // Cold / lightning keystones (Bitter Frost, Roiling Tempest) use the general path.
+    if ((Number(stats && stats.damageToColdPct) || 0) > 0 || (Number(stats && stats.onlyColdDamage) || 0) > 0
+        || (Number(stats && stats.damageToLightningPct) || 0) > 0 || (Number(stats && stats.onlyLightningDamage) || 0) > 0) {
+        return _egApplyDamageConversionGeneral(stats, physical, el, fireMult);
+    }
     const share = Math.max(0, Math.min(100, Number(stats && stats.damageToFirePct) || 0)) / 100;
     const fireOnly = (Number(stats && stats.onlyFireDamage) || 0) > 0;
     // "Gain X% of physical Damage as extra Fire": taken from the physical
@@ -78,6 +91,44 @@ export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1
                 + (phys * extraShadowPct / 100) * (1 + Math.max(0, Number(stats && stats.shadowDamageIncPct) || 0) / 100),
         },
     };
+}
+
+// General conversion: fire, then cold, then lightning conversion (each moves its
+// share of every other part), then the only-element drop. Extras survive when
+// their element is the allowed one. Used when a cold / lightning keystone is active.
+function _egApplyDamageConversionGeneral(stats, physical, el, fireMult) {
+    const pct = (k) => Math.max(0, Math.min(100, Number(stats[k]) || 0)) / 100;
+    const only = ((Number(stats.onlyFireDamage) || 0) > 0) ? 'fire'
+        : ((Number(stats.onlyColdDamage) || 0) > 0) ? 'cold'
+        : ((Number(stats.onlyLightningDamage) || 0) > 0) ? 'lightning' : null;
+    const elemInc = 1 + Math.max(0, Number(stats.elementalDamageIncPct) || 0) / 100;
+    const coldMult = elemInc * (1 + Math.max(0, Number(stats.coldDamageIncPct) || 0) / 100);
+    const lightningMult = elemInc * (1 + Math.max(0, Number(stats.lightningDamageIncPct) || 0) / 100);
+    const shadowMult = 1 + Math.max(0, Number(stats.shadowDamageIncPct) || 0) / 100;
+    const p = { phys: physical || 0, fire: el.fire || 0, cold: el.cold || 0, lightning: el.lightning || 0, shadow: el.shadow || 0 };
+    const order = [['fire', 'damageToFirePct'], ['cold', 'damageToColdPct'], ['lightning', 'damageToLightningPct']];
+    for (const [target, key] of order) {
+        const share = pct(key);
+        if (share <= 0) continue;
+        let moved = 0;
+        for (const src of ['phys', 'fire', 'cold', 'lightning']) {
+            if (src === target) continue;
+            const take = p[src] * share;
+            p[src] -= take;
+            moved += take;
+        }
+        p[target] += moved;
+    }
+    const physBase = physical || 0;
+    p.fire += physBase * Math.max(0, Number(stats.physAsExtraFirePct) || 0) / 100 * fireMult;
+    p.cold += physBase * Math.max(0, Number(stats.physAsExtraColdPct) || 0) / 100 * coldMult;
+    p.lightning += physBase * Math.max(0, Number(stats.physAsExtraLightningPct) || 0) / 100 * lightningMult;
+    p.shadow += physBase * Math.max(0, Number(stats.physAsExtraShadowPct) || 0) / 100 * shadowMult;
+    if (only) {
+        p.phys = 0;
+        for (const k of ['fire', 'cold', 'lightning', 'shadow']) if (k !== only) p[k] = 0;
+    }
+    return { physical: p.phys, elements: { fire: p.fire, cold: p.cold, lightning: p.lightning, shadow: p.shadow } };
 }
 
 // Returns an element breakdown scaled by `factor` (used when only a % of the

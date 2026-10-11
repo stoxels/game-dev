@@ -93,7 +93,7 @@ export function _egGmbHealPct(pct) {
         if (globalThis.playerCurrentHP <= 0) return;
         const heal = Math.round(_egNkMaxHP() * pct);
         const before = globalThis.playerCurrentHP;
-        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
         if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }

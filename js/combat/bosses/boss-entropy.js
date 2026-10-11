@@ -98,7 +98,7 @@ export function _egEntrHeal(amount) {
         if (typeof playerCurrentHP === 'undefined' || typeof playerMaxHP === 'undefined') return;
         if (globalThis.playerCurrentHP <= 0) return;
         const before = globalThis.playerCurrentHP;
-        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + amount);
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(amount) : (amount)));
         if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }

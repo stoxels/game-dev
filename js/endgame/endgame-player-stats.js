@@ -838,6 +838,65 @@ export function _egComputePlayerStats() {
         staffSpellBlockPct: passiveTreeBonuses.staffSpellBlockPct || 0,
         shieldSpellBlockPct: passiveTreeBonuses.shieldSpellBlockPct || 0,
         isWandEquipped: false,
+        attacksNeverMiss: passiveTreeBonuses.attacksNeverMiss || 0,
+        movementSpeedLessPct: passiveTreeBonuses.movementSpeedLessPct || 0,
+        noRepeatTarget: passiveTreeBonuses.noRepeatTarget || 0,
+        singleElementMorePct: passiveTreeBonuses.singleElementMorePct || 0,
+        lastElementResistPct: passiveTreeBonuses.lastElementResistPct || 0,
+        absorptionStopsWhileAttacking: passiveTreeBonuses.absorptionStopsWhileAttacking || 0,
+        absorptionRegenDelaySecs: passiveTreeBonuses.absorptionRegenDelaySecs || 0,
+        evasionToArmour: passiveTreeBonuses.evasionToArmour || 0,
+        agilityNoEvasion: passiveTreeBonuses.agilityNoEvasion || 0,
+        lifeLeechInstant: passiveTreeBonuses.lifeLeechInstant || 0,
+        lifeOnlyFromLeech: passiveTreeBonuses.lifeOnlyFromLeech || 0,
+        windDancerLessPct: passiveTreeBonuses.windDancerLessPct || 0,
+        windDancerEvadePct: passiveTreeBonuses.windDancerEvadePct || 0,
+        windDancerMorePct: passiveTreeBonuses.windDancerMorePct || 0,
+        lifeBecomesOne: passiveTreeBonuses.lifeBecomesOne || 0,
+        shadowImmune: passiveTreeBonuses.shadowImmune || 0,
+        chilledColdTaken: passiveTreeBonuses.chilledColdTaken || 0,
+        damageToColdPct: passiveTreeBonuses.damageToColdPct || 0,
+        onlyColdDamage: passiveTreeBonuses.onlyColdDamage || 0,
+        bleedStackMax: passiveTreeBonuses.bleedStackMax || 0,
+        bleedLessPct: passiveTreeBonuses.bleedLessPct || 0,
+        absorptionRemoved: passiveTreeBonuses.absorptionRemoved || 0,
+        manaToLifePct: passiveTreeBonuses.manaToLifePct || 0,
+        elementalOverloadPct: passiveTreeBonuses.elementalOverloadPct || 0,
+        critsNoExtraDamage: passiveTreeBonuses.critsNoExtraDamage || 0,
+        dotMultiEqualsCrit: passiveTreeBonuses.dotMultiEqualsCrit || 0,
+        nonCritNoAilments: passiveTreeBonuses.nonCritNoAilments || 0,
+        absorptionRegenUninterrupted: passiveTreeBonuses.absorptionRegenUninterrupted || 0,
+        absorptionRegenLessPct: passiveTreeBonuses.absorptionRegenLessPct || 0,
+        armourDefendDouble: passiveTreeBonuses.armourDefendDouble || 0,
+        maxDamageReductionCap: passiveTreeBonuses.maxDamageReductionCap || 0,
+        spellDmgLowLifeMorePct: passiveTreeBonuses.spellDmgLowLifeMorePct || 0,
+        damageFromManaPct: passiveTreeBonuses.damageFromManaPct || 0,
+        ghostDance: passiveTreeBonuses.ghostDance || 0,
+        ghostShroudMax: passiveTreeBonuses.ghostShroudMax || 0,
+        ghostShroudRecoverPct: passiveTreeBonuses.ghostShroudRecoverPct || 0,
+        blockDoubled: passiveTreeBonuses.blockDoubled || 0,
+        blockedHitTakenPct: passiveTreeBonuses.blockedHitTakenPct || 0,
+        damageToLightningPct: passiveTreeBonuses.damageToLightningPct || 0,
+        onlyLightningDamage: passiveTreeBonuses.onlyLightningDamage || 0,
+        lightningMaxMorePct: passiveTreeBonuses.lightningMaxMorePct || 0,
+        lightningMinLessPct: passiveTreeBonuses.lightningMinLessPct || 0,
+        cannotEvade: passiveTreeBonuses.cannotEvade || 0,
+        cannotBeStunned: passiveTreeBonuses.cannotBeStunned || 0,
+        pointBlankPct: passiveTreeBonuses.pointBlankPct || 0,
+        blockMaxAttackLess: passiveTreeBonuses.blockMaxAttackLess || 0,
+        blockMaxSpellLess: passiveTreeBonuses.blockMaxSpellLess || 0,
+        spellBlockPerOvercap: passiveTreeBonuses.spellBlockPerOvercap || 0,
+        dodgeChanceTreePct: passiveTreeBonuses.dodgeChanceTreePct || 0,
+        armourLessPct: passiveTreeBonuses.armourLessPct || 0,
+        absorptionLessPct: passiveTreeBonuses.absorptionLessPct || 0,
+        spellCostFromAbsorption: passiveTreeBonuses.spellCostFromAbsorption || 0,
+        strengthSpellDamage: passiveTreeBonuses.strengthSpellDamage || 0,
+        lifeRegenToAbsorption: passiveTreeBonuses.lifeRegenToAbsorption || 0,
+        preciseTechniquePct: passiveTreeBonuses.preciseTechniquePct || 0,
+        neverCrit: passiveTreeBonuses.neverCrit || 0,
+        impaleSpread: passiveTreeBonuses.impaleSpread || 0,
+        impaleExtra: passiveTreeBonuses.impaleExtra || 0,
+        impaleLockout: passiveTreeBonuses.impaleLockout || 0,
         secondaryDamagePct: passiveTreeBonuses.secondaryDamagePct || 0,
         pierceChanceTreePct: passiveTreeBonuses.pierceChanceTreePct || 0,
         pierceTargetsExtra: passiveTreeBonuses.pierceTargetsExtra || 0,
@@ -1208,6 +1267,14 @@ export function _egComputePlayerStats() {
         }
     }
 
+    // Roiling Tempest: the lightning damage range is skewed (min lower, max higher).
+    if ((s.lightningMinLessPct || 0) > 0 || (s.lightningMaxMorePct || 0) > 0) {
+        const minMult = 1 - Math.min(100, s.lightningMinLessPct || 0) / 100;
+        const maxMult = 1 + Math.max(0, s.lightningMaxMorePct || 0) / 100;
+        for (const k of ['meleeLightningMin', 'lightningDmgMin']) s[k] = Math.round((s[k] || 0) * minMult);
+        for (const k of ['meleeLightningMax', 'lightningDmgMax']) s[k] = Math.round((s[k] || 0) * maxMult);
+    }
+
     if (s.arcaneSurgeStreak === Infinity) s.arcaneSurgeStreak = 0;
 
     // Attribute side-effects per the design notes above:
@@ -1323,15 +1390,22 @@ export function _egComputePlayerStats() {
         s.evasionIncPct += s.onslaughtDefencePct || 0;
         s.onslaught = true;
     }
+    // Stalwart Stance: reduced Movement Speed.
+    if ((s.movementSpeedLessPct || 0) > 0) s.movementSpeedPct -= s.movementSpeedLessPct;
     if (s.isSwordEquipped) s.accuracy += passiveTreeBonuses.accuracySwordFlat || 0;
     s.accuracy += s.agility;
     // "Increased Accuracy Rating" multiplies the fully aggregated rating
     // (gear + tree flat + Agi) before the map-run multiplier and the
     // miss-chance formula downstream read it.
     if (s.accuracyIncPct) s.accuracy = Math.round(s.accuracy * (1 + s.accuracyIncPct / 100));
-    s.evasionFlat += s.agility;
+    // Iron Reflexes: Agility grants no Evasion Rating.
+    if (!((s.agilityNoEvasion || 0) > 0)) s.evasionFlat += s.agility;
     s.mana += s.intelligence * 2;
     s.spellDamageFlat += s.intelligence;
+    // Iron Will: Strength also adds flat Spell Damage like Intelligence.
+    if ((s.strengthSpellDamage || 0) > 0) s.spellDamageFlat += s.strength;
+    // Acrobatics: extra chance to Evade Attacks from the tree.
+    s.dodgeChance = (s.dodgeChance || 0) + (s.dodgeChanceTreePct || 0);
 
     // Active map run: apply the "% reduced Spell Damage" mod to the fully
     // aggregated spell damage buckets (feeds reveal-projectile scaling).
@@ -1373,6 +1447,12 @@ export function _egComputePlayerStats() {
     s.armour = Math.round(s.armourFlat * (1 + s.armourIncPct / 100));
     s.evasion = Math.round(s.evasionFlat * (1 + s.evasionIncPct / 100));
     s.absorption = Math.round(s.absorptionFlat * (1 + s.absorptionIncPct / 100));
+    // Keystones (batch 40): Iron Reflexes, Acrobatics / Phase Acrobatics, Ghost Dance, The Agnostic.
+    if ((s.evasionToArmour || 0) > 0) { s.armour += s.evasion; s.evasion = 0; }
+    if ((s.armourLessPct || 0) > 0) s.armour = Math.round(s.armour * (1 - Math.min(95, s.armourLessPct) / 100));
+    if ((s.absorptionLessPct || 0) > 0) s.absorption = Math.round(s.absorption * (1 - Math.min(95, s.absorptionLessPct) / 100));
+    if ((s.ghostDance || 0) > 0) s.absorption = Math.min(s.absorption, s.evasion);
+    if ((s.absorptionRemoved || 0) > 0) s.absorption = 0;
 
     // Active map run: apply the "% reduced Armour, Evasion and Absorption" mod.
     if (typeof _egMapPlayerDefenceMult === 'function') {
@@ -1616,9 +1696,14 @@ export function _egCalcAccuracyMissChance(accuracy, monsterLevel, dragStacks) {
 // `bonus` ({ chance, multiplierPct }) adds scoped extras to this one roll
 // (e.g. the Mace / Sceptre melee crit lines) without touching the stats.
 export function _egRollCrit(stats, bonus) {
+    // Precise Technique: never deal Critical Strikes.
+    if ((Number(stats.neverCrit) || 0) > 0) return 1;
     const chance = (stats.critChance || 0) + ((bonus && bonus.chance) || 0);
     if (chance > 0 && Math.random() * 100 < chance) {
         globalThis._egLastCritAt = Date.now();
+        // Elemental Overload / Perfect Agony: the crit counts (ailments, "recently" lines)
+        // but deals no extra damage. 1.0001 keeps the `> 1` crit tests true.
+        if ((Number(stats.critsNoExtraDamage) || 0) > 0) return 1.0001;
         // 150% base crit damage + additive multiplier bonuses
         return 1.5 + ((stats.critMultiplierPct || 0) + ((bonus && bonus.multiplierPct) || 0)) / 100;
     }
@@ -1665,18 +1750,23 @@ export function _egCancelAbsorptionRegen() {
 
 // Called on every hit taken - interrupts any in-progress regen and restarts the delay.
 export function _egScheduleAbsorptionRegen() {
+    const stats = _egComputePlayerStats();
+    // Wicked Ward: a regeneration that already began is not interrupted by damage.
+    if ((Number(stats.absorptionRegenUninterrupted) || 0) > 0 && globalThis._egPlayerAbsorptionRegenInterval) return;
     _egCancelAbsorptionRegen();
 
-    const stats = _egComputePlayerStats();
     // Ghost Reaver keystone: Absorption does not recharge on its own.
     if ((Number(stats.absorptionNoRecharge) || 0) > 0) return;
     let delayMs = Math.max(0, EG_ABSORPTION_REGEN_BASE_DELAY_MS - (stats.fasterAbsorptionRegenStart || 0) * 1000);
+    // Infinite Focus: regeneration begins a fixed number of seconds after damage.
+    if ((Number(stats.absorptionRegenDelaySecs) || 0) > 0) delayMs = stats.absorptionRegenDelaySecs * 1000;
     // Active map run: Absorption recharges #% slower.
     if (typeof _egGetActiveMapModValue === 'function') {
         const slowPct = _egGetActiveMapModValue('map_slower_absorption');
         if (slowPct > 0) delayMs = Math.round(delayMs * (1 + slowPct / 100));
     }
-    const rateMult = 1 + Math.min(100, stats.absorptionRegenRatePct || 0) / 100;
+    const rateMult = (1 + Math.min(100, stats.absorptionRegenRatePct || 0) / 100)
+        * Math.max(0, 1 - Math.min(100, Number(stats.absorptionRegenLessPct) || 0) / 100);
 
     globalThis._egPlayerAbsorptionRegenDelayTimer = setTimeout(() => {
         // Vital Conduit keystone: the missing Absorption at the moment the
@@ -1686,6 +1776,9 @@ export function _egScheduleAbsorptionRegen() {
             if (!_egIsActive()) { _egCancelAbsorptionRegen(); return; }
             const live = _egComputePlayerStats();
             const max = live.absorption;
+            // Overcharge: no regeneration while you are attacking (a hit landed in the last 2s).
+            if ((Number(live.absorptionStopsWhileAttacking) || 0) > 0
+                && Date.now() - (Number(globalThis._egLastPlayerAttackAt) || 0) < 2000) return;
             const toLife = (Number(live.absorptionRechargesLife) || 0) > 0;
             if (!toLife && globalThis._egPlayerAbsorptionCurrent >= max) { _egCancelAbsorptionRegen(); return; }
             const step = Math.max(1, Math.round(max * EG_ABSORPTION_REGEN_BASE_STEP_PCT * rateMult));
@@ -1698,7 +1791,7 @@ export function _egScheduleAbsorptionRegen() {
                 }
                 const heal = Math.min(step, lifeBudget);
                 lifeBudget -= heal;
-                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + heal);
+                globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(heal) : (heal)));
                 if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
                 return;
             }
@@ -1860,6 +1953,65 @@ export const EG_STAT_DISPLAY_LABELS = {
     bleedSpeedPct: { label: t('eg_stat_bleed_speed'), suffix: '%' },
     lifeRegenRatePct: { label: t('eg_stat_life_regen_rate'), suffix: '%' },
     axeChargeSpeedPct: { label: t('eg_stat_axe_charge_speed'), suffix: '%' },
+    attacksNeverMiss: { label: t('eg_stat_never_miss'), suffix: '' },
+    movementSpeedLessPct: { label: t('eg_stat_movement_speed_less'), suffix: '%' },
+    noRepeatTarget: { label: t('eg_stat_no_repeat_target'), suffix: '' },
+    singleElementMorePct: { label: t('eg_stat_single_element_more'), suffix: '%' },
+    lastElementResistPct: { label: t('eg_stat_last_element_resist'), suffix: '%' },
+    absorptionStopsWhileAttacking: { label: t('eg_stat_absorption_stops_attacking'), suffix: '' },
+    absorptionRegenDelaySecs: { label: t('eg_stat_absorption_regen_delay'), suffix: '%' },
+    evasionToArmour: { label: t('eg_stat_evasion_to_armour'), suffix: '' },
+    agilityNoEvasion: { label: t('eg_stat_agility_no_evasion'), suffix: '' },
+    lifeLeechInstant: { label: t('eg_stat_life_leech_instant'), suffix: '' },
+    lifeOnlyFromLeech: { label: t('eg_stat_life_only_leech'), suffix: '' },
+    windDancerLessPct: { label: t('eg_stat_wind_dancer_less'), suffix: '%' },
+    windDancerEvadePct: { label: t('eg_stat_wind_dancer_evade'), suffix: '%' },
+    windDancerMorePct: { label: t('eg_stat_wind_dancer_more'), suffix: '%' },
+    lifeBecomesOne: { label: t('eg_stat_life_becomes_one'), suffix: '' },
+    shadowImmune: { label: t('eg_stat_shadow_immune'), suffix: '' },
+    chilledColdTaken: { label: t('eg_stat_chilled_cold_taken'), suffix: '' },
+    damageToColdPct: { label: t('eg_stat_damage_to_cold_pct'), suffix: '%' },
+    onlyColdDamage: { label: t('eg_stat_only_cold_damage'), suffix: '' },
+    bleedStackMax: { label: t('eg_stat_bleed_stack_max'), suffix: '' },
+    bleedLessPct: { label: t('eg_stat_bleed_dmg_less'), suffix: '%' },
+    absorptionRemoved: { label: t('eg_stat_absorption_removed'), suffix: '' },
+    manaToLifePct: { label: t('eg_stat_mana_to_life'), suffix: '%' },
+    elementalOverloadPct: { label: t('eg_stat_elemental_overload'), suffix: '%' },
+    critsNoExtraDamage: { label: t('eg_stat_no_crit_damage'), suffix: '' },
+    dotMultiEqualsCrit: { label: t('eg_stat_dot_multi_equals_crit'), suffix: '' },
+    nonCritNoAilments: { label: t('eg_stat_non_crit_no_ailments'), suffix: '' },
+    absorptionRegenUninterrupted: { label: t('eg_stat_absorption_regen_uninterrupted'), suffix: '' },
+    absorptionRegenLessPct: { label: t('eg_stat_absorption_regen_less'), suffix: '%' },
+    armourDefendDouble: { label: t('eg_stat_armour_defend_double'), suffix: '' },
+    maxDamageReductionCap: { label: t('eg_stat_max_damage_reduction'), suffix: '%' },
+    spellDmgLowLifeMorePct: { label: t('eg_stat_spell_dmg_low_life'), suffix: '%' },
+    damageFromManaPct: { label: t('eg_stat_damage_from_mana'), suffix: '%' },
+    ghostDance: { label: t('eg_stat_ghost_dance'), suffix: '' },
+    ghostShroudMax: { label: t('eg_stat_ghost_shroud_max'), suffix: '' },
+    ghostShroudRecoverPct: { label: t('eg_stat_ghost_shroud_recover'), suffix: '%' },
+    blockDoubled: { label: t('eg_stat_block_doubled'), suffix: '' },
+    blockedHitTakenPct: { label: t('eg_stat_blocked_hit_taken'), suffix: '%' },
+    damageToLightningPct: { label: t('eg_stat_damage_to_lightning_pct'), suffix: '%' },
+    onlyLightningDamage: { label: t('eg_stat_only_lightning_damage'), suffix: '' },
+    lightningMaxMorePct: { label: t('eg_stat_lightning_max_more'), suffix: '%' },
+    lightningMinLessPct: { label: t('eg_stat_lightning_min_less'), suffix: '%' },
+    cannotEvade: { label: t('eg_stat_cannot_evade'), suffix: '' },
+    cannotBeStunned: { label: t('eg_stat_cannot_be_stunned'), suffix: '' },
+    pointBlankPct: { label: t('eg_stat_point_blank'), suffix: '%' },
+    blockMaxAttackLess: { label: t('eg_stat_block_max_attack_less'), suffix: '%' },
+    blockMaxSpellLess: { label: t('eg_stat_block_max_spell_less'), suffix: '%' },
+    spellBlockPerOvercap: { label: t('eg_stat_spell_block_per_overcap'), suffix: '%' },
+    dodgeChanceTreePct: { label: t('eg_stat_dodge_chance_tree'), suffix: '%' },
+    armourLessPct: { label: t('eg_stat_armour_less'), suffix: '%' },
+    absorptionLessPct: { label: t('eg_stat_absorption_less'), suffix: '%' },
+    spellCostFromAbsorption: { label: t('eg_stat_spell_cost_from_absorption'), suffix: '' },
+    strengthSpellDamage: { label: t('eg_stat_strength_spell_damage'), suffix: '' },
+    lifeRegenToAbsorption: { label: t('eg_stat_life_regen_to_absorption'), suffix: '' },
+    preciseTechniquePct: { label: t('eg_stat_precise_technique'), suffix: '%' },
+    neverCrit: { label: t('eg_stat_never_crit'), suffix: '' },
+    impaleSpread: { label: t('eg_stat_impale_spread'), suffix: '' },
+    impaleExtra: { label: t('eg_stat_impale_extra'), suffix: '' },
+    impaleLockout: { label: t('eg_stat_impale_lockout'), suffix: '' },
     secondaryDamagePct: { label: t('eg_stat_secondary_damage'), suffix: '%' },
     pierceChanceTreePct: { label: t('eg_stat_pierce_chance'), suffix: '%' },
     pierceTargetsExtra: { label: t('eg_stat_pierce_targets'), suffix: '%' },
@@ -2105,7 +2257,7 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'stunChanceMaceChargedPct', 'stunDurationPct', 'stunChanceHeavyPct', 'stunDurationHeavyPct', 'stunDoubleChancePct', 'meleeDoubleDamageChancePct', 'meleeKillExplodeChancePct', 'meleeSpellManaCostReducedPct', 'meleeSpellLifeCostPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'secondaryDamagePct', 'pierceChanceTreePct', 'pierceTargetsExtra', 'chainChanceTreePct', 'chainCountExtra', 'forkChancePct', 'forkExtraChancePct', 'multishotChanceTreePct', 'costEfficiencyPct', 'onslaughtEffectPct', 'onslaughtOnKillPct', 'onslaughtDefencePct', 'leechEffectRecentCritPct', 'wandPhysAsLightningPct', 'bowAoePct', 'dmgFullAbsorptionPct', 'critMultiHeavy', 'dmgVsLowLifePct', 'aoeRecentKillPct', 'ailmentDurationTakenPct', 'chillShockTakenPct', 'spellDotMultiPct', 'manaLeechAttackPct', 'spellBlockFlat', 'dmgRecentShockPct', 'shockDurationPct', 'shockEffectPct', 'lifePulsePct', 'dotFasterPct', 'enduranceMin', 'enduranceOnKillPct', 'damagePerEndurancePct', 'enduranceWhenHitPct', 'lowLifeRegenPct', 'physTakenFlat', 'manaLeechEffectPct', 'critVsBleedingPct', 'critMultiVsBleedingPct', 'avoidPhysHitPct', 'armourIfHitPct', 'evasionIfNotHitPct', 'igniteFasterPct', 'freezeDurationPct', 'critVsShockedPct', 'shadowResDouble', 'armourPerEndurancePct', 'moveSpeedPerFrenzyPct', 'chargeSpeedPerFrenzyPct', 'stunPerEndurancePct', 'aoePerEndurancePct', 'areaDamagePct', 'shieldElementalRes', 'ailmentEffectTreePct', 'blindDurationPct', 'chillDurationPct', 'poisonChanceSpellPct', 'igniteDurationTakenPct', 'shockEffectTakenPct', 'chillEffectTakenPct', 'freezeDurationTakenPct', 'spellDotIncPct', 'critPerPowerCharge', 'manaRegenPerPowerPct', 'critMultiPerPowerCharge', 'shieldCastSpeedPct', 'shieldSpellDamagePct', 'spellDamagePerPowerPct', 'shieldAbsorptionPct', 'rageDecaySlowerPct', 'ragePerArmourPct', 'rageWhenHitAmount', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'poisonChanceAttackPct', 'poisonDotMultiPct', 'bleedSpeedPct',
+            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'stunChanceMaceChargedPct', 'stunDurationPct', 'stunChanceHeavyPct', 'stunDurationHeavyPct', 'stunDoubleChancePct', 'meleeDoubleDamageChancePct', 'meleeKillExplodeChancePct', 'meleeSpellManaCostReducedPct', 'meleeSpellLifeCostPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'attacksNeverMiss', 'movementSpeedLessPct', 'noRepeatTarget', 'singleElementMorePct', 'lastElementResistPct', 'absorptionStopsWhileAttacking', 'absorptionRegenDelaySecs', 'evasionToArmour', 'agilityNoEvasion', 'lifeLeechInstant', 'lifeOnlyFromLeech', 'windDancerLessPct', 'windDancerEvadePct', 'windDancerMorePct', 'lifeBecomesOne', 'shadowImmune', 'chilledColdTaken', 'damageToColdPct', 'onlyColdDamage', 'bleedStackMax', 'bleedLessPct', 'absorptionRemoved', 'manaToLifePct', 'elementalOverloadPct', 'critsNoExtraDamage', 'dotMultiEqualsCrit', 'nonCritNoAilments', 'absorptionRegenUninterrupted', 'absorptionRegenLessPct', 'armourDefendDouble', 'maxDamageReductionCap', 'spellDmgLowLifeMorePct', 'damageFromManaPct', 'ghostDance', 'ghostShroudMax', 'ghostShroudRecoverPct', 'blockDoubled', 'blockedHitTakenPct', 'damageToLightningPct', 'onlyLightningDamage', 'lightningMaxMorePct', 'lightningMinLessPct', 'cannotEvade', 'cannotBeStunned', 'pointBlankPct', 'blockMaxAttackLess', 'blockMaxSpellLess', 'spellBlockPerOvercap', 'dodgeChanceTreePct', 'armourLessPct', 'absorptionLessPct', 'spellCostFromAbsorption', 'strengthSpellDamage', 'lifeRegenToAbsorption', 'preciseTechniquePct', 'neverCrit', 'impaleSpread', 'impaleExtra', 'impaleLockout', 'secondaryDamagePct', 'pierceChanceTreePct', 'pierceTargetsExtra', 'chainChanceTreePct', 'chainCountExtra', 'forkChancePct', 'forkExtraChancePct', 'multishotChanceTreePct', 'costEfficiencyPct', 'onslaughtEffectPct', 'onslaughtOnKillPct', 'onslaughtDefencePct', 'leechEffectRecentCritPct', 'wandPhysAsLightningPct', 'bowAoePct', 'dmgFullAbsorptionPct', 'critMultiHeavy', 'dmgVsLowLifePct', 'aoeRecentKillPct', 'ailmentDurationTakenPct', 'chillShockTakenPct', 'spellDotMultiPct', 'manaLeechAttackPct', 'spellBlockFlat', 'dmgRecentShockPct', 'shockDurationPct', 'shockEffectPct', 'lifePulsePct', 'dotFasterPct', 'enduranceMin', 'enduranceOnKillPct', 'damagePerEndurancePct', 'enduranceWhenHitPct', 'lowLifeRegenPct', 'physTakenFlat', 'manaLeechEffectPct', 'critVsBleedingPct', 'critMultiVsBleedingPct', 'avoidPhysHitPct', 'armourIfHitPct', 'evasionIfNotHitPct', 'igniteFasterPct', 'freezeDurationPct', 'critVsShockedPct', 'shadowResDouble', 'armourPerEndurancePct', 'moveSpeedPerFrenzyPct', 'chargeSpeedPerFrenzyPct', 'stunPerEndurancePct', 'aoePerEndurancePct', 'areaDamagePct', 'shieldElementalRes', 'ailmentEffectTreePct', 'blindDurationPct', 'chillDurationPct', 'poisonChanceSpellPct', 'igniteDurationTakenPct', 'shockEffectTakenPct', 'chillEffectTakenPct', 'freezeDurationTakenPct', 'spellDotIncPct', 'critPerPowerCharge', 'manaRegenPerPowerPct', 'critMultiPerPowerCharge', 'shieldCastSpeedPct', 'shieldSpellDamagePct', 'spellDamagePerPowerPct', 'shieldAbsorptionPct', 'rageDecaySlowerPct', 'ragePerArmourPct', 'rageWhenHitAmount', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'poisonChanceAttackPct', 'poisonDotMultiPct', 'bleedSpeedPct',
             'meleeChargeSpeedPct', 'attackSpeedPct', 'critChanceMeleePct', 'manaOnMeleeHitChargedPct', 'meleeRangeM', 'meleeAoEPct', 'critChanceMeleeMacePct', 'critMultiplierMeleeMacePct', 'crushPhysReductionPct', 'blindChancePct', 'blindEffectIncPct', 'critChanceVsBlindedPct', 'stunChancePct', 'riposteDamagePct', 'riposteDurationPct', 'poisonChanceDaggerPct', 'daggerCritPoisons', 'staffBlockPct', 'staffSpellBlockPct', 'shieldSpellBlockPct', 'critChanceSwordPct', 'critMultiplierSwordPct', 'critChanceAxePct', 'critMultiplierAxePct', 'staffDamageIncPct', 'staffChargeSpeedPct', 'critChanceStaffPct', 'critMultiplierStaffPct', 'wandDamageIncPct', 'wandChargeSpeedPct', 'critChanceWandPct', 'critMultiplierWandPct', 'dualDamageIncPct', 'dualChargeSpeedPct', 'dualAccuracyIncPct', 'dualCritChancePct', 'dualCritMultiPct', 'dualCastSpeedPct', 'dualSpellDamagePct', 'dualMoveSpeedPct', 'dualBlockPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
