@@ -675,6 +675,8 @@ export function _egComputePlayerStats() {
         // chance to avoid ailments while a hold-to-cast is running.
         allElementalResist: passiveTreeBonuses.allElementalResist || 0,
         castingAilmentAvoidPct: passiveTreeBonuses.castingAilmentAvoidPct || 0,
+        bleedAvoidPct: passiveTreeBonuses.bleedAvoidPct || 0,
+        poisonAvoidPct: passiveTreeBonuses.poisonAvoidPct || 0,
         // Flat Armour from the passive tree (reworked node 30516, Bulwark
         // Endurance) seeds the very same bucket gear and the Str side-effect
         // feed into, so it aggregates with them and passes through the same
@@ -939,7 +941,7 @@ export function _egComputePlayerStats() {
         echoChancePct: 0, echoDamagePct: 0, fatePct: 0, wardingHP: 0,
         parryChancePct: 0, deflectChancePct: 0, deflectDamagePct: 0,
         movementSpeedPct: passiveTreeBonuses.movementSpeedPct || 0,
-        manaOnKill: passiveTreeBonuses.manaOnKillFlat || 0, absorptionOnKill: 0, lifeOnKill: 0, manaOnMistake: 0,
+        manaOnKill: passiveTreeBonuses.manaOnKillFlat || 0, absorptionOnKill: 0, lifeOnKill: passiveTreeBonuses.lifeOnKillFlat || 0, manaOnMistake: 0,
         heartHealFlat: passiveTreeBonuses.heartHealFlat || 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: passiveTreeBonuses.manaHealIncPct || 0, timeAdded: 0,
         heartSpawnIncPct: passiveTreeBonuses.heartSpawnIncPct || 0, manaSpawnIncPct: passiveTreeBonuses.manaSpawnIncPct || 0,
         absorptionRegenRatePct: passiveTreeBonuses.absorptionRegenRatePct || 0, fasterAbsorptionRegenStart: 0,
@@ -1486,6 +1488,8 @@ export const EG_STAT_DISPLAY_LABELS = {
     manaIncPct: { label: t('eg_stat_inc_mana'), suffix: '%' },
     allElementalResist: { label: t('eg_stat_all_elemental_resist'), suffix: '%' },
     castingAilmentAvoidPct: { label: t('eg_stat_casting_ailment_avoid'), suffix: '%' },
+    bleedAvoidPct: { label: t('eg_stat_bleed_avoid'), suffix: '%' },
+    poisonAvoidPct: { label: t('eg_stat_poison_avoid'), suffix: '%' },
     strength: { label: t('eg_stat_strength'), suffix: '' },
     agility: { label: t('eg_stat_agility'), suffix: '' },
     intelligence: { label: t('eg_stat_intelligence'), suffix: '' },
@@ -1746,7 +1750,7 @@ export const EG_STAT_LAYOUT = {
             'blockChanceShieldPct', 'frenzyCharges', 'frenzyChargesMax', 'frenzyDurationPct', 'evasionPerFrenzyChargePct', 'enduranceCharges', 'enduranceChargesMax', 'enduranceDurationPct', 'lifeRegenPerEndurancePct', 'enduranceOnKillShieldPct',
             'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct',
             'parryChancePct', 'deflectChancePct', 'deflectDamagePct', 'reflectPhysFlat',
-            'fatePct', 'castingAilmentAvoidPct'] },
+            'fatePct', 'castingAilmentAvoidPct', 'bleedAvoidPct', 'poisonAvoidPct'] },
         { catKey: 'eg_statcat_resistances', buckets: [
             // 'allElementalResist' is deliberately NOT listed: it is folded
             // into the fire/cold/lightning lines by _egBuildStatLine, which is

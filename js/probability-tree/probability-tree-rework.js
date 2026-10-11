@@ -3,7 +3,7 @@ import { TALENT_TREE_DATA } from './probability-tree-data.js';
 // Only nodes WITHOUT an effects list live here: the three class start
 // nodes. Every stat node is authored through the effects pipeline (below)
 // and counts as reworked by definition.
-export const PT_REWORKED_NODE_IDS = Object.freeze([1002, 1001, 1003, 20104, 30848, 30849]);
+export const PT_REWORKED_NODE_IDS = Object.freeze([1002, 1001, 1003, 20104, 30848, 30849, 30115, 30117, 31193, 31194, 20022, 20019]);
 
 // Nodes authored through the effects pipeline (pt-effects.js) are reworked
 // BY DEFINITION - their channels and both localised descriptions come from

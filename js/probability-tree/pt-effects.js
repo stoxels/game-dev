@@ -267,6 +267,9 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // multiplier over the whole physical + elemental hit (melee AND
     // projectile), applied before crit in combat-calculations.js.
     damage_inc_pct: { channel: 'damageIncPct', en: '{v}% increased Damage', de: '{v}% erhöhter Schaden' },
+    // life_on_kill_flat (node 399) feeds the existing lifeOnKill stat read in
+    // encounter-kills.js (gear's life_on_kill bucket adds on top).
+    life_on_kill_flat: { channel: 'lifeOnKillFlat', en: 'Gain {v} Life per Enemy Killed', de: 'Erhalte {v} Leben pro getötetem Gegner' },
     mana_on_kill_flat: { channel: 'manaOnKillFlat', en: 'Gain {v} Mana per Enemy Killed', de: 'Erhalte {v} Mana pro getötetem Gegner' },
     // Leech / crit / shadow resistance (nodes 30888/20109/30889/20111/30884).
     // life_leech_attack feeds the shared lifeLeechPct (melee AND projectile
@@ -345,6 +348,10 @@ export const PT_EFFECT_DEFS = Object.freeze({
     cast_speed_lightning: { channel: 'lightningCastSpeedPct', en: '{v}% increased Cast Speed with Lightning Skills', de: '{v}% erhöhte Zaubergeschwindigkeit mit Blitzzaubern' },
     // While holding a cast-time spell button, an incoming ailment is avoided
     // with this chance (_egTryAvoidAilmentWhileCasting, nodes 130/31477/31480).
+    // Chance to avoid being Bled / Poisoned by monster hits
+    // (_egTryAvoidPlayerAilmentStat in combat-ailments-core.js; nodes 31071...).
+    avoid_bleed_pct: { channel: 'bleedAvoidPct', en: '{v}% chance to Avoid Bleeding', de: '{v}% Chance, Blutung zu vermeiden' },
+    avoid_poison_pct: { channel: 'poisonAvoidPct', en: '{v}% chance to Avoid being Poisoned', de: '{v}% Chance, Vergiftung zu vermeiden' },
     avoid_ailment_casting: { channel: 'castingAilmentAvoidPct', en: '{v}% Chance to Avoid Ailments while Casting', de: '{v}% Chance, Statuseffekte beim Zaubern zu vermeiden' },
     // Level-start timer bonus (nodes 31211/31215/31216): read by the _initTimer
     // patch in probability-tree-expansion.js via _egGetTreeTimerStartSecs().

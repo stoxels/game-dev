@@ -51,7 +51,9 @@ const EG_PHYS_INNATE_BLEED_CHANCE_PCT = 10;   // physical hits bleed even w/o mo
 // Poison is the SHADOW damage-over-time status (PoE's chaos poison). It has
 // no innate chance: only the passive tree's poisonChanceAttackPct causes it,
 // and it deals a share of the hit's SHADOW damage, so a hit with no shadow
-// share can never poison. Player -> monster only.
+// share can never poison. Monsters can poison the player too: a monster hit
+// that carries shadow damage rolls poison on the player (see
+// _egRollMonsterHitAilment); it burns straight from HP like Shadow Burn.
 const EG_AIL_POISON_DURATION_S = 5;
 const EG_AIL_POISON_DMG_SHARE = 0.15;    // dps = share of the hit's shadow damage
 const EG_AIL_BLEED_MOVING_MULT = 3;     // bleed on the player: +200% while moving
@@ -197,6 +199,7 @@ function _egApplyPlayerAilment(key, dps) {
     const durationS = ({
         ignite: EG_AIL_IGNITE_DURATION_S,
         bleed: EG_AIL_BLEED_DURATION_S,
+        poison: EG_AIL_POISON_DURATION_S,
         chill: EG_AIL_CHILL_DURATION_S,
         frozen: EG_AIL_FROZEN_DURATION_S,
         shocked: EG_AIL_SHOCK_DURATION_S,
@@ -548,6 +551,15 @@ function _egTryAvoidAilmentWhileCasting() {
     return Math.random() * 100 < chance;
 }
 
+// Passive-tree "% chance to avoid being Bled / Poisoned" (bleedAvoidPct,
+// poisonAvoidPct). Rolled after the base ailment chance, so it can only
+// ever remove an ailment. Returns true when the incoming ailment is avoided.
+function _egTryAvoidPlayerAilmentStat(statName) {
+    let chance = 0;
+    try { chance = Number(_egComputePlayerStats()[statName]) || 0; } catch (e) { return false; }
+    return chance > 0 && Math.random() * 100 < Math.min(100, chance);
+}
+
 // Attacker-aware retaliation ward (reworked node 20036 Retaliation Ward):
 // a bleeding attacker cannot bleed you, a burning attacker cannot ignite
 // you. Reads the attacker's live statuses, so an expired bleed/ignite stops
@@ -572,7 +584,7 @@ function _egRollMonsterHitAilment(element, dealt, attacker) {
     if (!element) {
         if (!attacker) return;
         if (_egTryRetaliationWard(null, attacker)) return;
-        if (Math.random() * 100 < EG_MONSTER_AILMENT_CHANCE_PCT) {
+        if (Math.random() * 100 < EG_MONSTER_AILMENT_CHANCE_PCT && !_egTryAvoidPlayerAilmentStat('bleedAvoidPct')) {
             _egApplyPlayerAilment('bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_BLEED_DMG_SHARE));
         }
         return;
@@ -581,6 +593,15 @@ function _egRollMonsterHitAilment(element, dealt, attacker) {
     const ailChance = EG_MONSTER_AILMENT_CHANCE_PCT +
         ((typeof _egGetActiveMapModValue === 'function')
             ? _egGetActiveMapModValue('map_monster_ailments') : 0);
+
+    // Poison: a shadow hit may also poison the player (a shadow DoT sized
+    // from the hit). Its own roll, independent of the Shadow cloud below;
+    // the casting-avoidance and the tree's poison avoidance can remove it.
+    if (element === 'shadow' && Math.random() * 100 < ailChance
+        && !_egTryAvoidAilmentWhileCasting() && !_egTryAvoidPlayerAilmentStat('poisonAvoidPct')) {
+        _egApplyPlayerAilment('poison', Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_POISON_DMG_SHARE));
+    }
+
     if (Math.random() * 100 >= ailChance) return;
 
     // Passive-tree "Avoid Ailments while Casting": while the player holds a
@@ -688,7 +709,7 @@ function _egTickAilments() {
             // Bleeding hurts far more while you move: +200% damage.
             const moveMult = (key === 'bleed' && _egIsAvatarMoving()) ? EG_AIL_BLEED_MOVING_MULT : 1;
             playerDot += Math.max(EG_AIL_MIN_DOT_DAMAGE, Math.round(st.dps * moveMult));
-            if (key === 'shadowburn') playerIgnoresShield = true;
+            if (key === 'shadowburn' || key === 'poison') playerIgnoresShield = true;
         }
     });
     if (playerDot > 0) {

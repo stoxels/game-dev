@@ -2596,12 +2596,15 @@ export const TALENT_TREE_DATA = {
    "id": 399,
    "x": 1605,
    "y": -729,
-   "nameEn": "Razor's Edge",
-   "nameDe": "Rasierklinge",
-   "descEn": "Each fully completed row grants an additional +5 seconds. Stacks with Data Hygiene. +6% Evasion.",
-   "descDe": "Jede vollständig abgeschlossene Reihe gewährt zusätzliche +5 Sekunden. Wirkt zusammen mit Datenhygiene. +6% Ausweichen.",
-   "icon": "✂️",
-   "statKey": "razors_edge",
+   "nameEn": "Blood Siphon",
+   "nameDe": "Blutentzug",
+   "icon": "",
+   "statKey": "notable_blood_siphon_399",
+   "effects": [
+    "health_inc_pct:10",
+    "life_on_kill_flat:5",
+    "str_flat:10"
+   ],
    "tier": "notable"
   },
   {
@@ -5297,12 +5300,10 @@ export const TALENT_TREE_DATA = {
    "id": 20019,
    "x": 1274,
    "y": -696,
-   "nameEn": "Wind Dancer",
-   "nameDe": "Windtänzer",
-   "descEn": "+8% chance to evade attacks while moving.",
-   "descDe": "+8% Chance, Angriffe auszuweichen, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "notable_wind_dancer",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_20019",
    "tier": "notable"
   },
   {
@@ -5324,24 +5325,26 @@ export const TALENT_TREE_DATA = {
    "id": 20021,
    "x": 1495,
    "y": -941,
-   "nameEn": "Arcane Focus",
-   "nameDe": "Fokus des Arkanen",
-   "descEn": "+10% Absorption regen rate. Focus channels power into the shield.",
-   "descDe": "+10% Absorptionsregeneration. Fokus leitet Kraft in den Schild.",
-   "icon": "◆",
-   "statKey": "notable_arcane_focus",
+   "nameEn": "Trickery",
+   "nameDe": "Trickserei",
+   "icon": "",
+   "statKey": "notable_trickery_20021",
+   "effects": [
+    "damage_inc_pct:20",
+    "crit_chance_flat:3",
+    "agi_flat:5",
+    "int_flat:5"
+   ],
    "tier": "notable"
   },
   {
    "id": 20022,
    "x": 1755,
    "y": -941,
-   "nameEn": "Nature's Grace",
-   "nameDe": "Gnade der Natur",
-   "descEn": "+8% chance to evade attacks, +8% Movement speed.",
-   "descDe": "+8% Chance, Angriffen auszuweichen, +8% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_nature_s_grace",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_20022",
    "tier": "notable"
   },
   {
@@ -5632,12 +5635,10 @@ export const TALENT_TREE_DATA = {
    "id": 30115,
    "x": 1702,
    "y": -941,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_30115",
    "tier": "travel"
   },
   {
@@ -5657,12 +5658,10 @@ export const TALENT_TREE_DATA = {
    "id": 30117,
    "x": 1808,
    "y": -941,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_30117",
    "tier": "travel"
   },
   {
@@ -20115,12 +20114,14 @@ export const TALENT_TREE_DATA = {
    "id": 31068,
    "x": 943,
    "y": -1219,
-   "nameEn": "Lesser Fortune Cascade",
-   "nameDe": "Kaskade des Glücks (klein)",
-   "descEn": "5% increased chance of obtaining two instead of one additional items when Lucky Drops triggers. Stacks with Jackpot Echo and Overflowing Fortune. +3% Absorption regen rate.",
-   "descDe": "5% erhöhte Chance zwei anstatt einem weiteren Gegenstand zu erhalten wenn Glücksfunde aktiviert werden. Wirkt zusammen mit Jackpot-Echo und Überströmendes Glück. +3% Absorptionsregeneration.",
-   "icon": "🎲",
-   "statKey": "small_lesser_fortune_cascade",
+   "nameEn": "Hardy Ward",
+   "nameDe": "Robuster Schutz",
+   "icon": "",
+   "statKey": "small_hardy_ward_31068",
+   "effects": [
+    "absorption_inc_pct:5",
+    "health_inc_pct:3"
+   ],
    "tier": "small"
   },
   {
@@ -20154,12 +20155,15 @@ export const TALENT_TREE_DATA = {
    "id": 31071,
    "x": 1175,
    "y": -1257,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Venom Guard",
+   "nameDe": "Giftwächter",
+   "icon": "",
+   "statKey": "travel_venom_guard_31071",
+   "effects": [
+    "shadow_resist_flat:7",
+    "avoid_poison_pct:10",
+    "avoid_bleed_pct:10"
+   ],
    "tier": "travel"
   },
   {
@@ -21627,24 +21631,20 @@ export const TALENT_TREE_DATA = {
    "id": 31193,
    "x": 1404,
    "y": -1210,
-   "nameEn": "Lesser Forgiveness Threshold",
-   "nameDe": "Fehlertoleranz (klein)",
-   "descEn": "The duration, during which your next mistake is ignored, is increased by 1 second. +3% Absorption regen rate.",
-   "descDe": "Die Dauer, in dem dein nächster Fehler ignoriert wird, wird um 1 Sekunde erhöht. +3% Absorptionsregeneration.",
-   "icon": "📐",
-   "statKey": "small_lesser_forgiveness_threshold",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_31193",
    "tier": "small"
   },
   {
    "id": 31194,
    "x": 1364,
    "y": -1210,
-   "nameEn": "Lesser Forgiveness Threshold",
-   "nameDe": "Fehlertoleranz (klein)",
-   "descEn": "The duration, during which your next mistake is ignored, is increased by 1 second. +3% Absorption regen rate.",
-   "descDe": "Die Dauer, in dem dein nächster Fehler ignoriert wird, wird um 1 Sekunde erhöht. +3% Absorptionsregeneration.",
-   "icon": "📐",
-   "statKey": "small_lesser_forgiveness_threshold",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_trap_mine_31194",
    "tier": "small"
   },
   {
@@ -30840,11 +30840,53 @@ export const TALENT_TREE_DATA = {
    "from": 91,
    "to": 31069,
    "dotted": false
+  },
+  {
+   "id": 818,
+   "from": 20022,
+   "to": 30115,
+   "dotted": false
+  },
+  {
+   "id": 819,
+   "from": 20022,
+   "to": 30117,
+   "dotted": false
+  },
+  {
+   "id": 820,
+   "from": 31193,
+   "to": 31194,
+   "dotted": false
+  },
+  {
+   "id": 821,
+   "from": 233,
+   "to": 31194,
+   "dotted": false
+  },
+  {
+   "id": 822,
+   "from": 31071,
+   "to": 31073,
+   "dotted": false
+  },
+  {
+   "id": 823,
+   "from": 31071,
+   "to": 31074,
+   "dotted": false
+  },
+  {
+   "id": 824,
+   "from": 31067,
+   "to": 31068,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "2cf0ef75a3bb5f1f",
+  "fingerprint": "55088b8053956a2e",
   "positions": [
    [
     156,
@@ -39603,12 +39645,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     31193,
-    2527,
+    2534,
     -2178
    ],
    [
     31194,
-    2455,
+    2448,
     -2178
    ],
    [
