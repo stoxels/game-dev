@@ -312,6 +312,21 @@
     box-sizing: border-box;
 }
 
+/* PoE-port review overlay: nodes awaiting approval glow blue instead of
+   red. Declared after the unreworked rule so it wins at equal specificity. */
+.pt-node-proposed::after,
+.pt-node-unreworked.pt-node-proposed::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border: 2px solid #4da3ff;
+    border-radius: inherit;
+    box-shadow: 0 0 7px rgba(77, 163, 255, 0.95), 0 0 16px rgba(77, 163, 255, 0.6);
+    pointer-events: none;
+    z-index: 3;
+    box-sizing: border-box;
+}
+
 #pt-world.pt-overview .pt-node-unreworked::after {
     box-shadow: none;
 }

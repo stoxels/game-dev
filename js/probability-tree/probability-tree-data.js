@@ -965,12 +965,16 @@ export const TALENT_TREE_DATA = {
    "id": 232,
    "x": 1496,
    "y": -526,
-   "nameEn": "Recovery Window",
-   "nameDe": "Erholungsfenster",
-   "descEn": "The duration, during which your next mistake is ignored, is increased by 1 second. +6% Evasion.",
-   "descDe": "Die Dauer, in dem dein nächster Fehler ignoriert wird, wird um 1 Sekunde erhöht. +6% Ausweichen.",
-   "icon": "📐",
-   "statKey": "confidence_interval_2",
+   "nameEn": "Coordination",
+   "nameDe": "Koordination",
+   "icon": "",
+   "statKey": "notable_coordination_232",
+   "effects": [
+    "attack_speed_pct:10",
+    "cast_speed_pct:8",
+    "agi_flat:10",
+    "int_flat:10"
+   ],
    "tier": "notable"
   },
   {
@@ -1237,12 +1241,14 @@ export const TALENT_TREE_DATA = {
    "id": 238,
    "x": 1247,
    "y": -102,
-   "nameEn": "Cluster Detection",
-   "nameDe": "Clustererkennung",
-   "descEn": "Pattern Analysis marks one additional incorrect empty cell in the row or column with the most filled cells. Stacks with Density Mapping. +6% Evasion.",
-   "descDe": "Musteranalyse markiert eine zusätzliche falsche leere Zelle in der Zeile oder Spalte mit den meisten gefüllten Zellen. Wirkt zusammen mit Dichtekartierung. +6% Ausweichen.",
-   "icon": "🗃️",
-   "statKey": "density_mapping_2",
+   "nameEn": "Dire Torment",
+   "nameDe": "Düstere Qual",
+   "icon": "",
+   "statKey": "notable_dire_torment_238",
+   "effects": [
+    "crit_dot_multi:25",
+    "crit_chance_flat:4"
+   ],
    "tier": "notable"
   },
   {
@@ -1297,12 +1303,15 @@ export const TALENT_TREE_DATA = {
    "id": 339,
    "x": 2117,
    "y": -91,
-   "nameEn": "Eclipse Focus",
-   "nameDe": "Finsternis-Fokus",
-   "descEn": "Every 4 minutes, one cell is revealed. +6% Evasion.",
-   "descDe": "Alle 4 Minuten wird eine Zelle aufgedeckt. +6% Ausweichen.",
-   "icon": "🌘",
-   "statKey": "eclipse_focus",
+   "nameEn": "Hunter's Venom",
+   "nameDe": "Gift des Jägers",
+   "icon": "",
+   "statKey": "notable_hunters_venom_339",
+   "effects": [
+    "poison_dot_multi:10",
+    "bow_spell_dot_inc:25",
+    "skill_effect_duration:10"
+   ],
    "tier": "notable"
   },
   {
@@ -1990,12 +1999,15 @@ export const TALENT_TREE_DATA = {
    "id": 17,
    "x": 2117,
    "y": 80,
-   "nameEn": "Logical Deductions",
-   "nameDe": "Logische Schlussfolgerungen",
-   "descEn": "20% chance to automatically remove one wrong answer from a Multiple Choice question. +6% Evasion.",
-   "descDe": "20% Wahrscheinlichkeit, dass eine falsche Antwort bei Multiple - Choice Fragen automatisch entfernt wird. +6% Ausweichen.",
-   "icon": "🔬",
-   "statKey": "logical_deductions",
+   "nameEn": "Poised Footing",
+   "nameDe": "Sicherer Stand",
+   "icon": "",
+   "statKey": "notable_poised_footing_17",
+   "effects": [
+    "movement_speed_pct:5",
+    "stun_avoid:30",
+    "block_recovery:50"
+   ],
    "tier": "notable"
   },
   {
@@ -3008,12 +3020,13 @@ export const TALENT_TREE_DATA = {
    "id": 357,
    "x": 1764,
    "y": -260,
-   "nameEn": "Statistical Bridge",
-   "nameDe": "Statistische Brücke",
-   "descEn": "Increases the success chance of all start-of-level reveal and mark effects by 5%. +6% Evasion.",
-   "descDe": "Erhöht die Erfolgswahrscheinlichkeit aller Aufdeckungs- und Markierungseffekte zu Beginn jedes Levels um 5%. +6% Ausweichen.",
-   "icon": "🌉",
-   "statKey": "statistical_bridge",
+   "nameEn": "Life Raker",
+   "nameDe": "Lebensernte",
+   "icon": "",
+   "statKey": "notable_life_raker_357",
+   "effects": [
+    "life_on_attack_hit:6"
+   ],
    "tier": "notable"
   },
   {
@@ -5296,12 +5309,15 @@ export const TALENT_TREE_DATA = {
    "id": 20020,
    "x": 1384,
    "y": -729,
-   "nameEn": "Arcane Battery",
-   "nameDe": "Arkane Batterie",
-   "descEn": "+10 maximum Mana. Absorption regenerates 15% faster.",
-   "descDe": "+10 max. Mana. Absorption regeneriert 15% schneller.",
-   "icon": "◆",
-   "statKey": "notable_arcane_battery",
+   "nameEn": "Soul Siphon",
+   "nameDe": "Seelenentzug",
+   "icon": "",
+   "statKey": "notable_soul_siphon_20020",
+   "effects": [
+    "mana_flat:20",
+    "mana_inc_pct:18",
+    "mana_on_kill_flat:3"
+   ],
    "tier": "notable"
   },
   {
@@ -5440,24 +5456,29 @@ export const TALENT_TREE_DATA = {
    "id": 30102,
    "x": 1001,
    "y": -609,
-   "nameEn": "Spell Dancer",
-   "nameDe": "Zaubertänzer",
-   "descEn": "+5 Intellect, +5 Agility.",
-   "descDe": "+5 Intelligenz, +5 Beweglichkeit.",
-   "icon": "🌀",
-   "statKey": "small_spell_dancer",
+   "nameEn": "Surge of Might",
+   "nameDe": "Machtschub",
+   "icon": "",
+   "statKey": "travel_surge_of_might_30102",
+   "effects": [
+    "damage_inc_pct:14",
+    "absorption_flat:12"
+   ],
    "tier": "travel"
   },
   {
    "id": 30103,
    "x": 1028,
    "y": -526,
-   "nameEn": "Spell Dancer",
-   "nameDe": "Zaubertänzer",
-   "descEn": "+5 Intellect, +5 Agility.",
-   "descDe": "+5 Intelligenz, +5 Beweglichkeit.",
-   "icon": "🌀",
-   "statKey": "small_spell_dancer",
+   "nameEn": "Dark Might and Vigor",
+   "nameDe": "Dunkle Macht und Kraft",
+   "icon": "",
+   "statKey": "travel_dark_might_vigor_30103",
+   "effects": [
+    "phys_damage_inc:14",
+    "shadow_damage_inc_pct:14",
+    "life_flat:12"
+   ],
    "tier": "travel"
   },
   {
@@ -5476,120 +5497,135 @@ export const TALENT_TREE_DATA = {
    "id": 30105,
    "x": 1131,
    "y": -526,
-   "nameEn": "Spell Dancer",
-   "nameDe": "Zaubertänzer",
-   "descEn": "+1 Intellect, +1 Agility.",
-   "descDe": "+1 Intelligenz, +1 Beweglichkeit.",
-   "icon": "🌀",
-   "statKey": "small_spell_dancer",
+   "nameEn": "Dark Might",
+   "nameDe": "Dunkle Macht",
+   "icon": "",
+   "statKey": "small_dark_might_30105",
+   "effects": [
+    "phys_damage_inc:12",
+    "shadow_damage_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30106,
    "x": 1293,
    "y": -579,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+1 to Intellect.",
-   "descDe": "+1 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Lesser Dark Might",
+   "nameDe": "Dunkle Macht (klein)",
+   "icon": "",
+   "statKey": "small_lesser_dark_might_30106",
+   "effects": [
+    "phys_damage_inc:10",
+    "shadow_damage_inc_pct:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30107,
    "x": 1291,
    "y": -817,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+1 to Intellect.",
-   "descDe": "+1 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Nimble Ward",
+   "nameDe": "Flinker Schutz",
+   "icon": "",
+   "statKey": "small_nimble_ward_30107",
+   "effects": [
+    "evasion_inc_pct:10",
+    "absorption_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30108,
    "x": 1251,
    "y": -817,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+1 to Intellect.",
-   "descDe": "+1 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Nimble Ward",
+   "nameDe": "Flinker Schutz",
+   "icon": "",
+   "statKey": "small_nimble_ward_30108",
+   "effects": [
+    "evasion_inc_pct:10",
+    "absorption_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30109,
    "x": 1218,
    "y": -866,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Elemental Edge",
+   "nameDe": "Elementare Schärfe",
+   "icon": "",
+   "statKey": "travel_elemental_edge_30109",
+   "effects": [
+    "elemental_damage_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30110,
    "x": 1291,
    "y": -915,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+1 to Intellect.",
-   "descDe": "+1 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Lesser Elemental Edge",
+   "nameDe": "Elementare Schärfe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_elemental_edge_30110",
+   "effects": [
+    "elemental_damage_inc_pct:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30111,
    "x": 1324,
    "y": -866,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+1 to Intellect.",
-   "descDe": "+1 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Nimble Ward",
+   "nameDe": "Flinker Schutz",
+   "icon": "",
+   "statKey": "small_nimble_ward_30111",
+   "effects": [
+    "evasion_inc_pct:10",
+    "absorption_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30112,
    "x": 1446,
    "y": -847,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+1 to Intellect.",
-   "descDe": "+1 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Deep Well",
+   "nameDe": "Tiefer Brunnen",
+   "icon": "",
+   "statKey": "small_deep_well_30112",
+   "effects": [
+    "mana_inc_pct:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30113,
    "x": 1543,
    "y": -847,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+1 to Intellect.",
-   "descDe": "+1 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Vitality",
+   "nameDe": "Vitalität",
+   "icon": "",
+   "statKey": "small_vitality_30113",
+   "effects": [
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30114,
    "x": 1653,
    "y": -899,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Elemental Edge",
+   "nameDe": "Elementare Schärfe",
+   "icon": "",
+   "statKey": "travel_elemental_edge_30114",
+   "effects": [
+    "elemental_damage_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
@@ -5608,12 +5644,13 @@ export const TALENT_TREE_DATA = {
    "id": 30116,
    "x": 1653,
    "y": -983,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Keen Eye",
+   "nameDe": "Scharfes Auge",
+   "icon": "",
+   "statKey": "travel_keen_eye_30116",
+   "effects": [
+    "crit_chance_flat:2"
+   ],
    "tier": "travel"
   },
   {
@@ -5632,24 +5669,26 @@ export const TALENT_TREE_DATA = {
    "id": 30118,
    "x": 1857,
    "y": -983,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Keen Eye",
+   "nameDe": "Scharfes Auge",
+   "icon": "",
+   "statKey": "travel_keen_eye_30118",
+   "effects": [
+    "crit_chance_flat:2"
+   ],
    "tier": "travel"
   },
   {
    "id": 30119,
    "x": 1857,
    "y": -899,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Elemental Edge",
+   "nameDe": "Elementare Schärfe",
+   "icon": "",
+   "statKey": "travel_elemental_edge_30119",
+   "effects": [
+    "elemental_damage_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
@@ -6005,12 +6044,14 @@ export const TALENT_TREE_DATA = {
    "id": 30149,
    "x": 1127,
    "y": -793,
-   "nameEn": "Runic Aim",
-   "nameDe": "Runisches Zielen",
-   "descEn": "+1 Intellect, +1 Agility.",
-   "descDe": "+1 Intelligenz, +1 Beweglichkeit.",
-   "icon": "🎯",
-   "statKey": "small_runic_aim",
+   "nameEn": "Lesser Surge of Might",
+   "nameDe": "Machtschub (klein)",
+   "icon": "",
+   "statKey": "small_lesser_surge_of_might_30149",
+   "effects": [
+    "damage_inc_pct:12",
+    "absorption_flat:10"
+   ],
    "tier": "small"
   },
   {
@@ -12688,132 +12729,150 @@ export const TALENT_TREE_DATA = {
    "id": 20103,
    "x": 1573,
    "y": 277,
-   "nameEn": "Agile Reload",
-   "nameDe": "Flinkes Nachladen",
-   "descEn": "+4% Attack speed, +3% Movement speed.",
-   "descDe": "+4% Angriffsgeschwindigkeit, +3% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_agile_reload",
+   "nameEn": "Wellspring Bounty",
+   "nameDe": "Quellenfülle",
+   "icon": "",
+   "statKey": "notable_wellspring_bounty_20103",
+   "effects": [
+    "mana_spawn_inc:20",
+    "heart_spawn_inc:10"
+   ],
    "tier": "notable"
   },
   {
    "id": 20104,
    "x": 1650,
    "y": 171,
-   "nameEn": "Agile Reload",
-   "nameDe": "Flinkes Nachladen",
-   "descEn": "+4% Attack speed, +3% Movement speed.",
-   "descDe": "+4% Angriffsgeschwindigkeit, +3% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_agile_reload",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_20104",
    "tier": "notable"
   },
   {
    "id": 20105,
    "x": 1739,
    "y": 162,
-   "nameEn": "Falcon's Precision",
-   "nameDe": "Präzision des Falken",
-   "descEn": "+10% Projectile damage, +4% Critical strike chance.",
-   "descDe": "+10% Projektilschaden, +4% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "notable_falcon_s_precision",
+   "nameEn": "Quarry's Instinct",
+   "nameDe": "Instinkt der Beute",
+   "icon": "",
+   "statKey": "notable_quarrys_instinct_20105",
+   "effects": [
+    "evasion_inc_pct:18",
+    "health_inc_pct:10",
+    "parry_spell_chance:10"
+   ],
    "tier": "notable"
   },
   {
    "id": 20106,
    "x": 1845,
    "y": 57,
-   "nameEn": "Falcon's Precision",
-   "nameDe": "Präzision des Falken",
-   "descEn": "+10% Projectile damage, +4% Critical strike chance.",
-   "descDe": "+10% Projektilschaden, +4% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "notable_falcon_s_precision",
+   "nameEn": "Scholarly Craft",
+   "nameDe": "Gelehrtes Handwerk",
+   "icon": "",
+   "statKey": "notable_scholarly_craft_20106",
+   "effects": [
+    "int_flat:30"
+   ],
    "tier": "notable"
   },
   {
    "id": 20107,
    "x": 1845,
    "y": -52,
-   "nameEn": "Falcon's Precision",
-   "nameDe": "Präzision des Falken",
-   "descEn": "+10% Projectile damage, +4% Critical strike chance.",
-   "descDe": "+10% Projektilschaden, +4% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "notable_falcon_s_precision",
+   "nameEn": "Brute Prowess",
+   "nameDe": "Rohe Stärke",
+   "icon": "",
+   "statKey": "notable_brute_prowess_20107",
+   "effects": [
+    "str_flat:30"
+   ],
    "tier": "notable"
   },
   {
    "id": 20108,
    "x": 1674,
    "y": -154,
-   "nameEn": "Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz",
-   "descEn": "Monsters that hit you take 20 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 20 Schaden.",
-   "icon": "◆",
-   "statKey": "notable_thorned_undergrowth",
+   "nameEn": "Void Barrier",
+   "nameDe": "Leerenbarriere",
+   "icon": "",
+   "statKey": "notable_void_barrier_20108",
+   "effects": [
+    "evasion_inc_pct:18",
+    "absorption_inc_pct:12",
+    "parry_spell_chance:10"
+   ],
    "tier": "notable"
   },
   {
    "id": 20109,
    "x": 1575,
    "y": -102,
-   "nameEn": "Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz",
-   "descEn": "Monsters that hit you take 20 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 20 Schaden.",
-   "icon": "◆",
-   "statKey": "notable_thorned_undergrowth",
+   "nameEn": "Taste of Blood",
+   "nameDe": "Geschmack von Blut",
+   "icon": "",
+   "statKey": "notable_taste_of_blood_20109",
+   "effects": [
+    "life_leech_attack:1",
+    "life_leech_effect_inc:30"
+   ],
    "tier": "notable"
   },
   {
    "id": 20110,
    "x": 1555,
    "y": 136,
-   "nameEn": "Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz",
-   "descEn": "Monsters that hit you take 20 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 20 Schaden.",
-   "icon": "◆",
-   "statKey": "notable_thorned_undergrowth",
+   "nameEn": "Thorned Recovery",
+   "nameDe": "Dornige Erholung",
+   "icon": "",
+   "statKey": "notable_thorned_recovery_20110",
+   "effects": [
+    "life_burst_on_projectile_hit:2"
+   ],
    "tier": "notable"
   },
   {
    "id": 20111,
    "x": 1246,
    "y": -263,
-   "nameEn": "Predator's Instinct",
-   "nameDe": "Instinkt der Jägerin",
-   "descEn": "+15% Critical strike multiplier against slowed monsters.",
-   "descDe": "+15% kritischer Schadensmultiplikator gegen verlangsamte Monster.",
-   "icon": "◆",
-   "statKey": "notable_predator_s_instinct",
+   "nameEn": "Wasting",
+   "nameDe": "Verfall",
+   "icon": "",
+   "statKey": "notable_wasting_20111",
+   "effects": [
+    "poison_dot_multi:10",
+    "shadow_resist_flat:17"
+   ],
    "tier": "notable"
   },
   {
    "id": 20112,
    "x": 1755,
    "y": -416,
-   "nameEn": "Predator's Instinct",
-   "nameDe": "Instinkt der Jägerin",
-   "descEn": "+15% Critical strike multiplier against slowed monsters.",
-   "descDe": "+15% kritischer Schadensmultiplikator gegen verlangsamte Monster.",
-   "icon": "◆",
-   "statKey": "notable_predator_s_instinct",
+   "nameEn": "Entropy",
+   "nameDe": "Entropie",
+   "icon": "",
+   "statKey": "notable_entropy_20112",
+   "effects": [
+    "dot_inc_pct:23",
+    "skill_effect_duration:10"
+   ],
    "tier": "notable"
   },
   {
    "id": 20113,
    "x": 1755,
    "y": -526,
-   "nameEn": "Wind Dancer",
-   "nameDe": "Windtänzer",
-   "descEn": "+8% chance to evade attacks while moving.",
-   "descDe": "+8% Chance, Angriffe auszuweichen, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "notable_wind_dancer",
+   "nameEn": "Deft Hand",
+   "nameDe": "Flinke Hand",
+   "icon": "",
+   "statKey": "notable_deft_hand_20113",
+   "effects": [
+    "melee_phys_1h:20",
+    "dot_inc_pct:15",
+    "melee_charge_speed_pct:8"
+   ],
    "tier": "notable"
   },
   {
@@ -12916,12 +12975,15 @@ export const TALENT_TREE_DATA = {
    "id": 20122,
    "x": 2113,
    "y": -235,
-   "nameEn": "Piercing Shots",
-   "nameDe": "Durchdringende Schüsse",
-   "descEn": "Projectiles pierce one additional monster.",
-   "descDe": "Projektile durchdringen ein zusätzliches Monster.",
-   "icon": "◆",
-   "statKey": "notable_piercing_shots",
+   "nameEn": "Sundering Mastery",
+   "nameDe": "Meisterschaft der Brechung",
+   "icon": "",
+   "statKey": "notable_sundering_mastery_20122",
+   "effects": [
+    "phys_damage_inc:30",
+    "ignore_phys_reduction:30",
+    "str_flat:30"
+   ],
    "tier": "notable"
   },
   {
@@ -16179,24 +16241,26 @@ export const TALENT_TREE_DATA = {
    "id": 30828,
    "x": 2015,
    "y": 218,
-   "nameEn": "Lesser Chaos Buffer",
-   "nameDe": "Chaos-Puffer (klein)",
-   "descEn": "Every 1nd mistake grants a consolation of 5 additional seconds. +3% Evasion.",
-   "descDe": "Jeder zweite Fehler gewährt einen Trost von 5 zusätzlichen Sekunden. +3% Ausweichen.",
-   "icon": "🌪️",
-   "statKey": "small_lesser_chaos_buffer",
+   "nameEn": "Lesser Elemental Edge",
+   "nameDe": "Elementare Schärfe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_elemental_edge_30828",
+   "effects": [
+    "elemental_damage_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30829,
    "x": 2015,
    "y": 178,
-   "nameEn": "Lesser Chaos Buffer",
-   "nameDe": "Chaos-Puffer (klein)",
-   "descEn": "Every 1nd mistake grants a consolation of 5 additional seconds. +3% Evasion.",
-   "descDe": "Jeder zweite Fehler gewährt einen Trost von 5 zusätzlichen Sekunden. +3% Ausweichen.",
-   "icon": "🌪️",
-   "statKey": "small_lesser_chaos_buffer",
+   "nameEn": "Lesser Elemental Edge",
+   "nameDe": "Elementare Schärfe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_elemental_edge_30829",
+   "effects": [
+    "elemental_damage_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
@@ -16205,34 +16269,37 @@ export const TALENT_TREE_DATA = {
    "y": 168,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30830",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30831,
    "x": 2015,
    "y": 100,
-   "nameEn": "Lesser Logical Deductions",
-   "nameDe": "Logische Schlussfolgerungen (klein)",
-   "descEn": "10% chance to automatically remove one wrong answer from a Multiple Choice question. +3% Evasion.",
-   "descDe": "10% Wahrscheinlichkeit, dass eine falsche Antwort bei Multiple - Choice Fragen automatisch entfernt wird. +3% Ausweichen.",
-   "icon": "🔬",
-   "statKey": "small_lesser_logical_deductions",
+   "nameEn": "Lesser Steadfast",
+   "nameDe": "Standhaftigkeit (klein)",
+   "icon": "",
+   "statKey": "small_lesser_steadfast_30831",
+   "effects": [
+    "stun_avoid:15"
+   ],
    "tier": "small"
   },
   {
    "id": 30832,
    "x": 2015,
    "y": 60,
-   "nameEn": "Lesser Logical Deductions",
-   "nameDe": "Logische Schlussfolgerungen (klein)",
-   "descEn": "10% chance to automatically remove one wrong answer from a Multiple Choice question. +3% Evasion.",
-   "descDe": "10% Wahrscheinlichkeit, dass eine falsche Antwort bei Multiple - Choice Fragen automatisch entfernt wird. +3% Ausweichen.",
-   "icon": "🔬",
-   "statKey": "small_lesser_logical_deductions",
+   "nameEn": "Lesser Steadfast",
+   "nameDe": "Standhaftigkeit (klein)",
+   "icon": "",
+   "statKey": "small_lesser_steadfast_30832",
+   "effects": [
+    "stun_avoid:15"
+   ],
    "tier": "small"
   },
   {
@@ -16241,82 +16308,93 @@ export const TALENT_TREE_DATA = {
    "y": 2,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30833",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30834,
    "x": 2044,
    "y": -42,
-   "nameEn": "Lesser Eclipse Focus",
-   "nameDe": "Finsternis-Fokus (klein)",
-   "descEn": "Every 2 minutes, one cell is revealed. +3% Evasion.",
-   "descDe": "Alle 2 Minuten wird eine Zelle aufgedeckt. +3% Ausweichen.",
-   "icon": "🌘",
-   "statKey": "small_lesser_eclipse_focus",
+   "nameEn": "Lesser Venomous Edge",
+   "nameDe": "Giftige Schärfe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_venomous_edge_30834",
+   "effects": [
+    "poison_dot_multi:4",
+    "poison_chance_attack:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30835,
    "x": 2084,
    "y": -42,
-   "nameEn": "Lesser Eclipse Focus",
-   "nameDe": "Finsternis-Fokus (klein)",
-   "descEn": "Every 2 minutes, one cell is revealed. +3% Evasion.",
-   "descDe": "Alle 2 Minuten wird eine Zelle aufgedeckt. +3% Ausweichen.",
-   "icon": "🌘",
-   "statKey": "small_lesser_eclipse_focus",
+   "nameEn": "Lesser Venomous Edge",
+   "nameDe": "Giftige Schärfe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_venomous_edge_30835",
+   "effects": [
+    "poison_dot_multi:4",
+    "poison_chance_attack:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30836,
    "x": 2011,
    "y": -91,
-   "nameEn": "Lesser Eclipse Focus",
-   "nameDe": "Finsternis-Fokus (klein)",
-   "descEn": "Every 2 minutes, one cell is revealed. +3% Evasion.",
-   "descDe": "Alle 2 Minuten wird eine Zelle aufgedeckt. +3% Ausweichen.",
-   "icon": "🌘",
-   "statKey": "small_lesser_eclipse_focus",
+   "nameEn": "Lesser Lingering Volley",
+   "nameDe": "Anhaltende Salve (klein)",
+   "icon": "",
+   "statKey": "small_lesser_lingering_volley_30836",
+   "effects": [
+    "bow_spell_dot_inc:16"
+   ],
    "tier": "small"
   },
   {
    "id": 30837,
    "x": 2064,
    "y": -144,
-   "nameEn": "Lesser Eclipse Focus",
-   "nameDe": "Finsternis-Fokus (klein)",
-   "descEn": "Every 2 minutes, one cell is revealed. +3% Evasion.",
-   "descDe": "Alle 2 Minuten wird eine Zelle aufgedeckt. +3% Ausweichen.",
-   "icon": "🌘",
-   "statKey": "small_lesser_eclipse_focus",
+   "nameEn": "Lingering Volley",
+   "nameDe": "Anhaltende Salve",
+   "icon": "",
+   "statKey": "small_lingering_volley_30837",
+   "effects": [
+    "bow_spell_dot_inc:20"
+   ],
    "tier": "small"
   },
   {
    "id": 30838,
    "x": 2015,
    "y": -235,
-   "nameEn": "Lesser Piercing Shots",
-   "nameDe": "Durchdringende Schüsse (klein)",
-   "descEn": "Projectiles pierce one additional monster.",
-   "descDe": "Projektile durchdringen ein zusätzliches Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_piercing_shots",
+   "nameEn": "Lesser Sundering Force",
+   "nameDe": "Brechende Kraft (klein)",
+   "icon": "",
+   "statKey": "small_lesser_sundering_force_30838",
+   "effects": [
+    "phys_damage_inc:14",
+    "ignore_phys_reduction:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30839,
    "x": 2064,
    "y": -308,
-   "nameEn": "Lesser Piercing Shots",
-   "nameDe": "Durchdringende Schüsse (klein)",
-   "descEn": "Projectiles pierce one additional monster.",
-   "descDe": "Projektile durchdringen ein zusätzliches Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_piercing_shots",
+   "nameEn": "Lesser Sundering Force",
+   "nameDe": "Brechende Kraft (klein)",
+   "icon": "",
+   "statKey": "small_lesser_sundering_force_30839",
+   "effects": [
+    "phys_damage_inc:14",
+    "ignore_phys_reduction:10"
+   ],
    "tier": "small"
   },
   {
@@ -16325,82 +16403,93 @@ export const TALENT_TREE_DATA = {
    "y": -364,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30840",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30841,
    "x": 1870,
    "y": -260,
-   "nameEn": "Lesser Statistical Bridge",
-   "nameDe": "Statistische Brücke (klein)",
-   "descEn": "Increases the success chance of all start-of-level reveal and mark effects by 3%. +3% Evasion.",
-   "descDe": "Erhöht die Erfolgswahrscheinlichkeit aller Aufdeckungs- und Markierungseffekte zu Beginn jedes Levels um 3%. +3% Ausweichen.",
-   "icon": "🌉",
-   "statKey": "small_lesser_statistical_bridge",
+   "nameEn": "Lesser Vital Strikes",
+   "nameDe": "Vitale Hiebe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_vital_strikes_30841",
+   "effects": [
+    "life_on_melee_hit:2"
+   ],
    "tier": "small"
   },
   {
    "id": 30842,
    "x": 1817,
    "y": -313,
-   "nameEn": "Lesser Statistical Bridge",
-   "nameDe": "Statistische Brücke (klein)",
-   "descEn": "Increases the success chance of all start-of-level reveal and mark effects by 3%. +3% Evasion.",
-   "descDe": "Erhöht die Erfolgswahrscheinlichkeit aller Aufdeckungs- und Markierungseffekte zu Beginn jedes Levels um 3%. +3% Ausweichen.",
-   "icon": "🌉",
-   "statKey": "small_lesser_statistical_bridge",
+   "nameEn": "Lesser Vital Strikes",
+   "nameDe": "Vitale Hiebe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_vital_strikes_30842",
+   "effects": [
+    "life_on_melee_hit:2"
+   ],
    "tier": "small"
   },
   {
    "id": 30843,
    "x": 1723,
    "y": -187,
-   "nameEn": "Lesser Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz (klein)",
-   "descEn": "Monsters that hit you take 10 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 10 Schaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_thorned_undergrowth",
+   "nameEn": "Nimble Ward",
+   "nameDe": "Flinker Schutz",
+   "icon": "",
+   "statKey": "small_nimble_ward_30843",
+   "effects": [
+    "evasion_inc_pct:10",
+    "absorption_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30844,
    "x": 1772,
    "y": -154,
-   "nameEn": "Lesser Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz (klein)",
-   "descEn": "Monsters that hit you take 10 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 10 Schaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_thorned_undergrowth",
+   "nameEn": "Lesser Nimble Ward",
+   "nameDe": "Flinker Schutz (klein)",
+   "icon": "",
+   "statKey": "small_lesser_nimble_ward_30844",
+   "effects": [
+    "evasion_inc_pct:10",
+    "absorption_inc_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30845,
    "x": 1723,
    "y": -81,
-   "nameEn": "Lesser Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz (klein)",
-   "descEn": "Monsters that hit you take 10 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 10 Schaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_thorned_undergrowth",
+   "nameEn": "Lesser Nimble Ward",
+   "nameDe": "Flinker Schutz (klein)",
+   "icon": "",
+   "statKey": "small_lesser_nimble_ward_30845",
+   "effects": [
+    "evasion_inc_pct:10",
+    "absorption_inc_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30846,
    "x": 1674,
    "y": -114,
-   "nameEn": "Lesser Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz (klein)",
-   "descEn": "Monsters that hit you take 10 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 10 Schaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_thorned_undergrowth",
+   "nameEn": "Nimble Ward",
+   "nameDe": "Flinker Schutz",
+   "icon": "",
+   "statKey": "small_nimble_ward_30846",
+   "effects": [
+    "evasion_inc_pct:10",
+    "absorption_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
@@ -16409,82 +16498,87 @@ export const TALENT_TREE_DATA = {
    "y": 2,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30847",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30848,
    "x": 1670,
    "y": 69,
-   "nameEn": "Lesser Agile Reload",
-   "nameDe": "Flinkes Nachladen (klein)",
-   "descEn": "+2% Attack speed, +2% Movement speed.",
-   "descDe": "+2% Angriffsgeschwindigkeit, +2% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_agile_reload",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_30848",
    "tier": "small"
   },
   {
    "id": 30849,
    "x": 1630,
    "y": 69,
-   "nameEn": "Lesser Agile Reload",
-   "nameDe": "Flinkes Nachladen (klein)",
-   "descEn": "+2% Attack speed, +2% Movement speed.",
-   "descDe": "+2% Angriffsgeschwindigkeit, +2% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_agile_reload",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_30849",
    "tier": "small"
   },
   {
    "id": 30850,
    "x": 1739,
    "y": 122,
-   "nameEn": "Lesser Falcon's Precision",
-   "nameDe": "Präzision des Falken (klein)",
-   "descEn": "+5% Projectile damage, +2% Critical strike chance.",
-   "descDe": "+5% Projektilschaden, +2% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "small_lesser_falcon_s_precision",
+   "nameEn": "Nimble Vitality",
+   "nameDe": "Flinke Vitalität",
+   "icon": "",
+   "statKey": "small_nimble_vitality_30850",
+   "effects": [
+    "evasion_inc_pct:10",
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30851,
    "x": 1788,
    "y": 89,
-   "nameEn": "Lesser Falcon's Precision",
-   "nameDe": "Präzision des Falken (klein)",
-   "descEn": "+5% Projectile damage, +2% Critical strike chance.",
-   "descDe": "+5% Projektilschaden, +2% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "small_lesser_falcon_s_precision",
+   "nameEn": "Lesser Nimble Vitality",
+   "nameDe": "Flinke Vitalität (klein)",
+   "icon": "",
+   "statKey": "small_lesser_nimble_vitality_30851",
+   "effects": [
+    "evasion_inc_pct:10",
+    "health_inc_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30852,
    "x": 1837,
    "y": 162,
-   "nameEn": "Lesser Falcon's Precision",
-   "nameDe": "Präzision des Falken (klein)",
-   "descEn": "+5% Projectile damage, +2% Critical strike chance.",
-   "descDe": "+5% Projektilschaden, +2% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "small_lesser_falcon_s_precision",
+   "nameEn": "Lesser Nimble Vitality",
+   "nameDe": "Flinke Vitalität (klein)",
+   "icon": "",
+   "statKey": "small_lesser_nimble_vitality_30852",
+   "effects": [
+    "evasion_inc_pct:10",
+    "health_inc_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30853,
    "x": 1788,
    "y": 195,
-   "nameEn": "Lesser Falcon's Precision",
-   "nameDe": "Präzision des Falken (klein)",
-   "descEn": "+5% Projectile damage, +2% Critical strike chance.",
-   "descDe": "+5% Projektilschaden, +2% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "small_lesser_falcon_s_precision",
+   "nameEn": "Nimble Vitality",
+   "nameDe": "Flinke Vitalität",
+   "icon": "",
+   "statKey": "small_nimble_vitality_30853",
+   "effects": [
+    "evasion_inc_pct:10",
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
@@ -16829,24 +16923,26 @@ export const TALENT_TREE_DATA = {
    "id": 30880,
    "x": 1479,
    "y": 136,
-   "nameEn": "Lesser Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz (klein)",
-   "descEn": "Monsters that hit you take 10 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 10 Schaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_thorned_undergrowth",
+   "nameEn": "Lesser Thorned Recovery",
+   "nameDe": "Dornige Erholung (klein)",
+   "icon": "",
+   "statKey": "small_lesser_thorned_recovery_30880",
+   "effects": [
+    "life_on_projectile_hit:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30881,
    "x": 1479,
    "y": 60,
-   "nameEn": "Lesser Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz (klein)",
-   "descEn": "Monsters that hit you take 10 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 10 Schaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_thorned_undergrowth",
+   "nameEn": "Lesser Thorned Recovery",
+   "nameDe": "Dornige Erholung (klein)",
+   "icon": "",
+   "statKey": "small_lesser_thorned_recovery_30881",
+   "effects": [
+    "life_on_projectile_hit:3"
+   ],
    "tier": "small"
   },
   {
@@ -16866,120 +16962,132 @@ export const TALENT_TREE_DATA = {
    "id": 30883,
    "x": 1345,
    "y": -62,
-   "nameEn": "Lesser Cluster Detection",
-   "nameDe": "Clustererkennung (klein)",
-   "descEn": "Pattern Analysis marks one additional incorrect empty cell in the row or column with the most filled cells. Stacks with Density Mapping. +3% Evasion.",
-   "descDe": "Musteranalyse markiert eine zusätzliche falsche leere Zelle in der Zeile oder Spalte mit den meisten gefüllten Zellen. Wirkt zusammen mit Dichtekartierung. +3% Ausweichen.",
-   "icon": "🗃️",
-   "statKey": "small_lesser_cluster_detection",
+   "nameEn": "Lesser Cruel Ruin",
+   "nameDe": "Grausamer Ruin (klein)",
+   "icon": "",
+   "statKey": "small_lesser_cruel_ruin_30883",
+   "effects": [
+    "crit_dot_multi:14"
+   ],
    "tier": "small"
   },
   {
    "id": 30884,
    "x": 1316,
    "y": -131,
-   "nameEn": "Lesser Cluster Detection",
-   "nameDe": "Clustererkennung (klein)",
-   "descEn": "Pattern Analysis marks one additional incorrect empty cell in the row or column with the most filled cells. Stacks with Density Mapping. +3% Evasion.",
-   "descDe": "Musteranalyse markiert eine zusätzliche falsche leere Zelle in der Zeile oder Spalte mit den meisten gefüllten Zellen. Wirkt zusammen mit Dichtekartierung. +3% Ausweichen.",
-   "icon": "🗃️",
-   "statKey": "small_lesser_cluster_detection",
+   "nameEn": "Keen Eye",
+   "nameDe": "Scharfes Auge",
+   "icon": "",
+   "statKey": "small_keen_eye_30884",
+   "effects": [
+    "crit_chance_flat:2"
+   ],
    "tier": "small"
   },
   {
    "id": 30885,
    "x": 1275,
    "y": -194,
-   "nameEn": "Lesser Predator's Instinct",
-   "nameDe": "Instinkt der Jägerin (klein)",
-   "descEn": "+8% Critical strike multiplier against slowed monsters.",
-   "descDe": "+8% kritischer Schadensmultiplikator gegen verlangsamte Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_predator_s_instinct",
+   "nameEn": "Lesser Wasting",
+   "nameDe": "Verfall (klein)",
+   "icon": "",
+   "statKey": "small_lesser_wasting_30885",
+   "effects": [
+    "poison_dot_multi:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30886,
    "x": 1344,
    "y": -223,
-   "nameEn": "Lesser Predator's Instinct",
-   "nameDe": "Instinkt der Jägerin (klein)",
-   "descEn": "+8% Critical strike multiplier against slowed monsters.",
-   "descDe": "+8% kritischer Schadensmultiplikator gegen verlangsamte Monster.",
-   "icon": "◆",
-   "statKey": "small_lesser_predator_s_instinct",
+   "nameEn": "Lesser Wasting",
+   "nameDe": "Verfall (klein)",
+   "icon": "",
+   "statKey": "small_lesser_wasting_30886",
+   "effects": [
+    "poison_dot_multi:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30887,
    "x": 1411,
    "y": -160,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Strength",
+   "nameDe": "Stärke",
+   "icon": "",
+   "statKey": "travel_strength_30887",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30888,
    "x": 1506,
    "y": -131,
-   "nameEn": "Lesser Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz (klein)",
-   "descEn": "Monsters that hit you take 10 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 10 Schaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_thorned_undergrowth",
+   "nameEn": "Lesser Bloodthirst",
+   "nameDe": "Blutdurst (klein)",
+   "icon": "",
+   "statKey": "small_lesser_bloodthirst_30888",
+   "effects": [
+    "life_leech_attack:0.4"
+   ],
    "tier": "small"
   },
   {
    "id": 30889,
    "x": 1477,
    "y": -62,
-   "nameEn": "Lesser Thorned Undergrowth",
-   "nameDe": "Dorniges Unterholz (klein)",
-   "descEn": "Monsters that hit you take 10 damage.",
-   "descDe": "Monster, die dich treffen, erleiden 10 Schaden.",
-   "icon": "◆",
-   "statKey": "small_lesser_thorned_undergrowth",
+   "nameEn": "Lesser Sanguine Flow",
+   "nameDe": "Blutiger Fluss (klein)",
+   "icon": "",
+   "statKey": "small_lesser_sanguine_flow_30889",
+   "effects": [
+    "life_leech_effect_inc:20"
+   ],
    "tier": "small"
   },
   {
    "id": 30890,
    "x": 1504,
    "y": -211,
-   "nameEn": "Lesser Law of Total Probability",
-   "nameDe": "Totale Wahrscheinlichkeit (klein)",
-   "descEn": "13% of revealed cells propagate: one unfilled orthogonal neighbour that truly belongs filled cascades open as well. +3% Evasion.",
-   "descDe": "13% der aufgedeckten Zellen propagieren: Ein nicht ausgefüllter orthogonaler Nachbar, der wirklich gefüllt sein sollte, öffnet sich kaskadenartig mit. +3% Ausweichen.",
-   "icon": "➗",
-   "statKey": "small_lesser_law_of_total_probability",
+   "nameEn": "Lesser Fang Precision",
+   "nameDe": "Zahnpräzision (klein)",
+   "icon": "",
+   "statKey": "small_lesser_fang_precision_30890",
+   "effects": [
+    "crit_multi_dagger:15",
+    "poison_duration:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30891,
    "x": 1471,
    "y": -260,
-   "nameEn": "Lesser Law of Total Probability",
-   "nameDe": "Totale Wahrscheinlichkeit (klein)",
-   "descEn": "13% of revealed cells propagate: one unfilled orthogonal neighbour that truly belongs filled cascades open as well. +3% Evasion.",
-   "descDe": "13% der aufgedeckten Zellen propagieren: Ein nicht ausgefüllter orthogonaler Nachbar, der wirklich gefüllt sein sollte, öffnet sich kaskadenartig mit. +3% Ausweichen.",
-   "icon": "➗",
-   "statKey": "small_lesser_law_of_total_probability",
+   "nameEn": "Lesser Fang Venom",
+   "nameDe": "Giftzahn (klein)",
+   "icon": "",
+   "statKey": "small_lesser_fang_venom_30891",
+   "effects": [
+    "dot_inc_dagger:16"
+   ],
    "tier": "small"
   },
   {
    "id": 30892,
    "x": 1504,
    "y": -309,
-   "nameEn": "Lesser Law of Total Probability",
-   "nameDe": "Totale Wahrscheinlichkeit (klein)",
-   "descEn": "13% of revealed cells propagate: one unfilled orthogonal neighbour that truly belongs filled cascades open as well. +3% Evasion.",
-   "descDe": "13% der aufgedeckten Zellen propagieren: Ein nicht ausgefüllter orthogonaler Nachbar, der wirklich gefüllt sein sollte, öffnet sich kaskadenartig mit. +3% Ausweichen.",
-   "icon": "➗",
-   "statKey": "small_lesser_law_of_total_probability",
+   "nameEn": "Fang Venom",
+   "nameDe": "Giftzahn",
+   "icon": "",
+   "statKey": "small_fang_venom_30892",
+   "effects": [
+    "dot_inc_dagger:20",
+    "poison_chance_attack:15"
+   ],
    "tier": "small"
   },
   {
@@ -16988,70 +17096,81 @@ export const TALENT_TREE_DATA = {
    "y": -365,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30893",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30894,
    "x": 1342,
    "y": -506,
-   "nameEn": "Lesser Recovery Window",
-   "nameDe": "Erholungsfenster (klein)",
-   "descEn": "The duration, during which your next mistake is ignored, is increased by 1 second. +3% Evasion.",
-   "descDe": "Die Dauer, in dem dein nächster Fehler ignoriert wird, wird um 1 Sekunde erhöht. +3% Ausweichen.",
-   "icon": "📐",
-   "statKey": "small_lesser_recovery_window",
+   "nameEn": "Quickened Pace",
+   "nameDe": "Beschleunigtes Tempo",
+   "icon": "",
+   "statKey": "small_quickened_pace_30894",
+   "effects": [
+    "attack_speed_pct:4",
+    "cast_speed_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30895,
    "x": 1342,
    "y": -546,
-   "nameEn": "Lesser Recovery Window",
-   "nameDe": "Erholungsfenster (klein)",
-   "descEn": "The duration, during which your next mistake is ignored, is increased by 1 second. +3% Evasion.",
-   "descDe": "Die Dauer, in dem dein nächster Fehler ignoriert wird, wird um 1 Sekunde erhöht. +3% Ausweichen.",
-   "icon": "📐",
-   "statKey": "small_lesser_recovery_window",
+   "nameEn": "Lesser Dark Might",
+   "nameDe": "Dunkle Macht (klein)",
+   "icon": "",
+   "statKey": "small_lesser_dark_might_30895",
+   "effects": [
+    "phys_damage_inc:10",
+    "shadow_damage_inc_pct:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30896,
    "x": 1293,
    "y": -473,
-   "nameEn": "Lesser Recovery Window",
-   "nameDe": "Erholungsfenster (klein)",
-   "descEn": "The duration, during which your next mistake is ignored, is increased by 1 second. +3% Evasion.",
-   "descDe": "Die Dauer, in dem dein nächster Fehler ignoriert wird, wird um 1 Sekunde erhöht. +3% Ausweichen.",
-   "icon": "📐",
-   "statKey": "small_lesser_recovery_window",
+   "nameEn": "Quickened Pace",
+   "nameDe": "Beschleunigtes Tempo",
+   "icon": "",
+   "statKey": "small_quickened_pace_30896",
+   "effects": [
+    "attack_speed_pct:4",
+    "cast_speed_pct:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30897,
    "x": 1244,
    "y": -506,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Quickened Pace",
+   "nameDe": "Beschleunigtes Tempo",
+   "icon": "",
+   "statKey": "small_quickened_pace_30897",
+   "effects": [
+    "attack_speed_pct:4",
+    "cast_speed_pct:4"
+   ],
    "tier": "travel"
   },
   {
    "id": 30898,
    "x": 1244,
    "y": -546,
-   "nameEn": "Barbed Tips",
-   "nameDe": "Widerhaken",
-   "descEn": "+5% Projectile damage.",
-   "descDe": "+5% Projektilschaden.",
-   "icon": "○",
-   "statKey": "small_barbed_tips",
+   "nameEn": "Lesser Dark Might",
+   "nameDe": "Dunkle Macht (klein)",
+   "icon": "",
+   "statKey": "small_lesser_dark_might_30898",
+   "effects": [
+    "phys_damage_inc:10",
+    "shadow_damage_inc_pct:10"
+   ],
    "tier": "small"
   },
   {
@@ -17060,10 +17179,11 @@ export const TALENT_TREE_DATA = {
    "y": -364,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30899",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17072,10 +17192,11 @@ export const TALENT_TREE_DATA = {
    "y": -395,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30900",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17156,22 +17277,24 @@ export const TALENT_TREE_DATA = {
    "y": 9,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30907",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30908,
    "x": 1250,
    "y": 9,
-   "nameEn": "Lesser Fleet Footed",
-   "nameDe": "Leichtfüßig (klein)",
-   "descEn": "+3% Movement speed, +2% chance to evade attacks.",
-   "descDe": "+3% Bewegungsgeschwindigkeit, +2% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "small_lesser_fleet_footed",
+   "nameEn": "Agility",
+   "nameDe": "Beweglichkeit",
+   "icon": "",
+   "statKey": "travel_agility_30908",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "small"
   },
   {
@@ -17251,36 +17374,40 @@ export const TALENT_TREE_DATA = {
    "id": 30915,
    "x": 1475,
    "y": 277,
-   "nameEn": "Lesser Agile Reload",
-   "nameDe": "Flinkes Nachladen (klein)",
-   "descEn": "+2% Attack speed, +2% Movement speed.",
-   "descDe": "+2% Angriffsgeschwindigkeit, +2% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_agile_reload",
+   "nameEn": "Lesser Wellspring",
+   "nameDe": "Quelle (klein)",
+   "icon": "",
+   "statKey": "small_lesser_wellspring_30915",
+   "effects": [
+    "mana_spawn_inc:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30916,
    "x": 1475,
    "y": 237,
-   "nameEn": "Lesser Agile Reload",
-   "nameDe": "Flinkes Nachladen (klein)",
-   "descEn": "+2% Attack speed, +2% Movement speed.",
-   "descDe": "+2% Angriffsgeschwindigkeit, +2% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_agile_reload",
+   "nameEn": "Lesser Wellspring",
+   "nameDe": "Quelle (klein)",
+   "icon": "",
+   "statKey": "small_lesser_wellspring_30916",
+   "effects": [
+    "heart_spawn_inc:5",
+    "mana_spawn_inc:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30917,
    "x": 1524,
    "y": 204,
-   "nameEn": "Lesser Agile Reload",
-   "nameDe": "Flinkes Nachladen (klein)",
-   "descEn": "+2% Attack speed, +2% Movement speed.",
-   "descDe": "+2% Angriffsgeschwindigkeit, +2% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_agile_reload",
+   "nameEn": "Heartfinder",
+   "nameDe": "Herzfinder",
+   "icon": "",
+   "statKey": "small_heartfinder_30917",
+   "effects": [
+    "heart_spawn_inc:10"
+   ],
    "tier": "small"
   },
   {
@@ -17289,106 +17416,117 @@ export const TALENT_TREE_DATA = {
    "y": -160,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30918",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30919,
    "x": 1857,
    "y": -484,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Lingering Harm",
+   "nameDe": "Anhaltender Schaden",
+   "icon": "",
+   "statKey": "travel_lingering_harm_30919",
+   "effects": [
+    "dot_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30920,
    "x": 1808,
    "y": -526,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "One-Handed Cruelty",
+   "nameDe": "Grausamkeit einer Hand",
+   "icon": "",
+   "statKey": "travel_one_handed_cruelty_30920",
+   "effects": [
+    "melee_phys_1h:14",
+    "dot_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30921,
    "x": 1857,
    "y": -568,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Brute Force",
+   "nameDe": "Rohe Gewalt",
+   "icon": "",
+   "statKey": "travel_brute_force_30921",
+   "effects": [
+    "phys_damage_inc:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30922,
    "x": 1702,
    "y": -526,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "One-Handed Cruelty",
+   "nameDe": "Grausamkeit einer Hand",
+   "icon": "",
+   "statKey": "travel_one_handed_cruelty_30922",
+   "effects": [
+    "melee_phys_1h:14",
+    "dot_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30923,
    "x": 1653,
    "y": -568,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Brute Force",
+   "nameDe": "Rohe Gewalt",
+   "icon": "",
+   "statKey": "travel_brute_force_30923",
+   "effects": [
+    "phys_damage_inc:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30924,
    "x": 1653,
    "y": -484,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Lingering Harm",
+   "nameDe": "Anhaltender Schaden",
+   "icon": "",
+   "statKey": "travel_lingering_harm_30924",
+   "effects": [
+    "dot_inc_pct:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30925,
    "x": 1545,
    "y": -616,
-   "nameEn": "Greenhorn's Luck",
-   "nameDe": "Anfängerglück",
-   "descEn": "+3% Critical strike chance.",
-   "descDe": "+3% kritische Trefferchance.",
-   "icon": "○",
-   "statKey": "small_greenhorn_s_luck",
+   "nameEn": "Vitality",
+   "nameDe": "Vitalität",
+   "icon": "",
+   "statKey": "small_vitality_30925",
+   "effects": [
+    "health_inc_pct:5"
+   ],
    "tier": "small"
   },
   {
    "id": 30926,
    "x": 1446,
    "y": -616,
-   "nameEn": "Greenhorn's Luck",
-   "nameDe": "Anfängerglück",
-   "descEn": "+3% Critical strike chance.",
-   "descDe": "+3% kritische Trefferchance.",
-   "icon": "○",
-   "statKey": "small_greenhorn_s_luck",
+   "nameEn": "Deep Well",
+   "nameDe": "Tiefer Brunnen",
+   "icon": "",
+   "statKey": "small_deep_well_30926",
+   "effects": [
+    "mana_inc_pct:8"
+   ],
    "tier": "small"
   },
   {
@@ -19989,24 +20127,27 @@ export const TALENT_TREE_DATA = {
    "id": 31069,
    "x": 914,
    "y": -1150,
-   "nameEn": "Lesser Fortune Cascade",
-   "nameDe": "Kaskade des Glücks (klein)",
-   "descEn": "5% increased chance of obtaining two instead of one additional items when Lucky Drops triggers. Stacks with Jackpot Echo and Overflowing Fortune. +3% Absorption regen rate.",
-   "descDe": "5% erhöhte Chance zwei anstatt einem weiteren Gegenstand zu erhalten wenn Glücksfunde aktiviert werden. Wirkt zusammen mit Jackpot-Echo und Überströmendes Glück. +3% Absorptionsregeneration.",
-   "icon": "🎲",
-   "statKey": "small_lesser_fortune_cascade",
+   "nameEn": "Hardy Ward",
+   "nameDe": "Robuster Schutz",
+   "icon": "",
+   "statKey": "small_hardy_ward_31069",
+   "effects": [
+    "absorption_inc_pct:5",
+    "health_inc_pct:3"
+   ],
    "tier": "small"
   },
   {
    "id": 31070,
    "x": 1120,
    "y": -1215,
-   "nameEn": "Intellect",
-   "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "nameEn": "Strength",
+   "nameDe": "Stärke",
+   "icon": "",
+   "statKey": "travel_strength_31070",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -20025,12 +20166,13 @@ export const TALENT_TREE_DATA = {
    "id": 31072,
    "x": 1217,
    "y": -1208,
-   "nameEn": "Lesser Endless Instructions",
-   "nameDe": "Endlose Anweisungen (klein)",
-   "descEn": "10% chance of not spending the Tutor item when using a Tutor to answer a question. +3% Absorption regen rate.",
-   "descDe": "10% Chance, dass der Tutor Gegenstand beim Beantworten einer Frage nicht verbraucht wird. +3% Absorptionsregeneration.",
-   "icon": "📘",
-   "statKey": "small_lesser_endless_instructions",
+   "nameEn": "Umbral Ward",
+   "nameDe": "Schattenschutz",
+   "icon": "",
+   "statKey": "small_umbral_ward_31072",
+   "effects": [
+    "shadow_resist_flat:13"
+   ],
    "tier": "small"
   },
   {
@@ -21446,36 +21588,39 @@ export const TALENT_TREE_DATA = {
    "id": 31190,
    "x": 1507,
    "y": -1189,
-   "nameEn": "Lesser Focus Barrier",
-   "nameDe": "Fokusbarriere (klein)",
-   "descEn": "Absorption begins regenerating 5% earlier after taking damage.",
-   "descDe": "Absorption beginnt sich 5% früher zu regenerieren, nachdem du Schaden erlitten hast.",
-   "icon": "◆",
-   "statKey": "small_lesser_focus_barrier",
+   "nameEn": "Fang Focus",
+   "nameDe": "Zahnfokus",
+   "icon": "",
+   "statKey": "small_fang_focus_31190",
+   "effects": [
+    "crit_chance_dagger:2"
+   ],
    "tier": "small"
   },
   {
    "id": 31191,
    "x": 1556,
    "y": -1156,
-   "nameEn": "Lesser Focus Barrier",
-   "nameDe": "Fokusbarriere (klein)",
-   "descEn": "Absorption begins regenerating 5% earlier after taking damage.",
-   "descDe": "Absorption beginnt sich 5% früher zu regenerieren, nachdem du Schaden erlitten hast.",
-   "icon": "◆",
-   "statKey": "small_lesser_focus_barrier",
+   "nameEn": "Lesser Fang Precision",
+   "nameDe": "Zahnpräzision (klein)",
+   "icon": "",
+   "statKey": "small_lesser_fang_precision_31191",
+   "effects": [
+    "crit_multi_dagger:15"
+   ],
    "tier": "small"
   },
   {
    "id": 31192,
    "x": 1419,
    "y": -1107,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31192",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -21506,36 +21651,39 @@ export const TALENT_TREE_DATA = {
    "id": 31195,
    "x": 1279,
    "y": -1102,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_31195",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 31196,
    "x": 1251,
    "y": -915,
-   "nameEn": "Lesser Arcane Focus",
-   "nameDe": "Fokus des Arkanen (klein)",
-   "descEn": "+5% Absorption regen rate. Focus channels power into the shield.",
-   "descDe": "+5% Absorptionsregeneration. Fokus leitet Kraft in den Schild.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_focus",
+   "nameEn": "Lesser Elemental Edge",
+   "nameDe": "Elementare Schärfe (klein)",
+   "icon": "",
+   "statKey": "small_lesser_elemental_edge_31196",
+   "effects": [
+    "elemental_damage_inc_pct:10"
+   ],
    "tier": "small"
   },
   {
    "id": 31197,
    "x": 1002,
    "y": -825,
-   "nameEn": "Lesser Combo Trigger",
-   "nameDe": "Kombinationsauslöser (klein)",
-   "descEn": "Binomial Burst chance increased by 5%. Stacks with Probability Spike. +3% Absorption regen rate.",
-   "descDe": "Binomialer Ausbruch hat 5% erhöhte Chance. Wirkt zusammen mit Wahrscheinlichkeitsspitze. +3% Absorptionsregeneration.",
-   "icon": "💢",
-   "statKey": "small_lesser_combo_trigger",
+   "nameEn": "Intelligence",
+   "nameDe": "Intelligenz",
+   "icon": "",
+   "statKey": "small_intelligence_31197",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "small"
   },
   {
@@ -30104,11 +30252,599 @@ export const TALENT_TREE_DATA = {
    "from": 30793,
    "to": 30792,
    "dotted": false
+  },
+  {
+   "id": 720,
+   "from": 30845,
+   "to": 30847,
+   "dotted": false
+  },
+  {
+   "id": 721,
+   "from": 30833,
+   "to": 30847,
+   "dotted": false
+  },
+  {
+   "id": 722,
+   "from": 30830,
+   "to": 30833,
+   "dotted": false
+  },
+  {
+   "id": 723,
+   "from": 20106,
+   "to": 30833,
+   "dotted": false
+  },
+  {
+   "id": 724,
+   "from": 20107,
+   "to": 30833,
+   "dotted": false
+  },
+  {
+   "id": 725,
+   "from": 30831,
+   "to": 30832,
+   "dotted": false
+  },
+  {
+   "id": 726,
+   "from": 17,
+   "to": 30831,
+   "dotted": false
+  },
+  {
+   "id": 727,
+   "from": 30832,
+   "to": 30833,
+   "dotted": false
+  },
+  {
+   "id": 728,
+   "from": 30833,
+   "to": 30971,
+   "dotted": false
+  },
+  {
+   "id": 729,
+   "from": 30833,
+   "to": 30918,
+   "dotted": false
+  },
+  {
+   "id": 730,
+   "from": 30833,
+   "to": 30836,
+   "dotted": false
+  },
+  {
+   "id": 731,
+   "from": 30844,
+   "to": 30918,
+   "dotted": false
+  },
+  {
+   "id": 732,
+   "from": 30841,
+   "to": 30918,
+   "dotted": false
+  },
+  {
+   "id": 733,
+   "from": 30840,
+   "to": 30918,
+   "dotted": false
+  },
+  {
+   "id": 734,
+   "from": 30838,
+   "to": 30918,
+   "dotted": false
+  },
+  {
+   "id": 735,
+   "from": 30834,
+   "to": 30835,
+   "dotted": false
+  },
+  {
+   "id": 736,
+   "from": 30834,
+   "to": 30836,
+   "dotted": false
+  },
+  {
+   "id": 737,
+   "from": 339,
+   "to": 30835,
+   "dotted": false
+  },
+  {
+   "id": 738,
+   "from": 30836,
+   "to": 30837,
+   "dotted": false
+  },
+  {
+   "id": 739,
+   "from": 339,
+   "to": 30837,
+   "dotted": false
+  },
+  {
+   "id": 740,
+   "from": 30843,
+   "to": 30844,
+   "dotted": false
+  },
+  {
+   "id": 741,
+   "from": 20108,
+   "to": 30843,
+   "dotted": false
+  },
+  {
+   "id": 742,
+   "from": 30845,
+   "to": 30846,
+   "dotted": false
+  },
+  {
+   "id": 743,
+   "from": 30838,
+   "to": 30839,
+   "dotted": false
+  },
+  {
+   "id": 744,
+   "from": 20122,
+   "to": 30839,
+   "dotted": false
+  },
+  {
+   "id": 745,
+   "from": 30841,
+   "to": 30842,
+   "dotted": false
+  },
+  {
+   "id": 746,
+   "from": 357,
+   "to": 30842,
+   "dotted": false
+  },
+  {
+   "id": 747,
+   "from": 20108,
+   "to": 30846,
+   "dotted": false
+  },
+  {
+   "id": 748,
+   "from": 20114,
+   "to": 30840,
+   "dotted": false
+  },
+  {
+   "id": 749,
+   "from": 20114,
+   "to": 30919,
+   "dotted": false
+  },
+  {
+   "id": 750,
+   "from": 232,
+   "to": 30925,
+   "dotted": false
+  },
+  {
+   "id": 751,
+   "from": 399,
+   "to": 30925,
+   "dotted": false
+  },
+  {
+   "id": 752,
+   "from": 232,
+   "to": 30895,
+   "dotted": false
+  },
+  {
+   "id": 753,
+   "from": 232,
+   "to": 30894,
+   "dotted": false
+  },
+  {
+   "id": 754,
+   "from": 232,
+   "to": 30926,
+   "dotted": false
+  },
+  {
+   "id": 755,
+   "from": 30882,
+   "to": 30887,
+   "dotted": false
+  },
+  {
+   "id": 756,
+   "from": 30886,
+   "to": 30887,
+   "dotted": false
+  },
+  {
+   "id": 757,
+   "from": 30887,
+   "to": 30893,
+   "dotted": false
+  },
+  {
+   "id": 758,
+   "from": 30887,
+   "to": 30891,
+   "dotted": false
+  },
+  {
+   "id": 759,
+   "from": 30893,
+   "to": 30899,
+   "dotted": false
+  },
+  {
+   "id": 760,
+   "from": 30885,
+   "to": 30886,
+   "dotted": false
+  },
+  {
+   "id": 761,
+   "from": 20111,
+   "to": 30885,
+   "dotted": false
+  },
+  {
+   "id": 762,
+   "from": 30894,
+   "to": 30896,
+   "dotted": false
+  },
+  {
+   "id": 763,
+   "from": 30899,
+   "to": 30900,
+   "dotted": false
+  },
+  {
+   "id": 764,
+   "from": 30896,
+   "to": 30897,
+   "dotted": false
+  },
+  {
+   "id": 765,
+   "from": 30105,
+   "to": 30897,
+   "dotted": false
+  },
+  {
+   "id": 766,
+   "from": 30890,
+   "to": 30891,
+   "dotted": false
+  },
+  {
+   "id": 767,
+   "from": 30891,
+   "to": 30892,
+   "dotted": false
+  },
+  {
+   "id": 768,
+   "from": 394,
+   "to": 30892,
+   "dotted": false
+  },
+  {
+   "id": 769,
+   "from": 394,
+   "to": 30890,
+   "dotted": false
+  },
+  {
+   "id": 770,
+   "from": 30106,
+   "to": 30895,
+   "dotted": false
+  },
+  {
+   "id": 771,
+   "from": 30105,
+   "to": 30898,
+   "dotted": false
+  },
+  {
+   "id": 772,
+   "from": 30106,
+   "to": 30898,
+   "dotted": false
+  },
+  {
+   "id": 773,
+   "from": 30103,
+   "to": 30105,
+   "dotted": false
+  },
+  {
+   "id": 774,
+   "from": 30103,
+   "to": 30900,
+   "dotted": false
+  },
+  {
+   "id": 775,
+   "from": 20020,
+   "to": 30926,
+   "dotted": false
+  },
+  {
+   "id": 776,
+   "from": 20020,
+   "to": 30112,
+   "dotted": false
+  },
+  {
+   "id": 777,
+   "from": 30107,
+   "to": 30111,
+   "dotted": false
+  },
+  {
+   "id": 778,
+   "from": 30107,
+   "to": 30108,
+   "dotted": false
+  },
+  {
+   "id": 779,
+   "from": 30108,
+   "to": 30149,
+   "dotted": false
+  },
+  {
+   "id": 780,
+   "from": 30102,
+   "to": 31197,
+   "dotted": false
+  },
+  {
+   "id": 781,
+   "from": 30102,
+   "to": 30149,
+   "dotted": false
+  },
+  {
+   "id": 782,
+   "from": 30109,
+   "to": 30149,
+   "dotted": false
+  },
+  {
+   "id": 783,
+   "from": 31195,
+   "to": 31197,
+   "dotted": false
+  },
+  {
+   "id": 784,
+   "from": 31192,
+   "to": 31195,
+   "dotted": false
+  },
+  {
+   "id": 785,
+   "from": 30109,
+   "to": 31196,
+   "dotted": false
+  },
+  {
+   "id": 786,
+   "from": 30110,
+   "to": 31196,
+   "dotted": false
+  },
+  {
+   "id": 787,
+   "from": 20021,
+   "to": 30110,
+   "dotted": false
+  },
+  {
+   "id": 788,
+   "from": 20021,
+   "to": 30111,
+   "dotted": false
+  },
+  {
+   "id": 789,
+   "from": 20021,
+   "to": 30112,
+   "dotted": false
+  },
+  {
+   "id": 790,
+   "from": 20021,
+   "to": 30113,
+   "dotted": false
+  },
+  {
+   "id": 791,
+   "from": 399,
+   "to": 30113,
+   "dotted": false
+  },
+  {
+   "id": 792,
+   "from": 20023,
+   "to": 30114,
+   "dotted": false
+  },
+  {
+   "id": 793,
+   "from": 30114,
+   "to": 30115,
+   "dotted": false
+  },
+  {
+   "id": 794,
+   "from": 20021,
+   "to": 30114,
+   "dotted": false
+  },
+  {
+   "id": 795,
+   "from": 168,
+   "to": 30119,
+   "dotted": false
+  },
+  {
+   "id": 796,
+   "from": 20023,
+   "to": 30119,
+   "dotted": false
+  },
+  {
+   "id": 797,
+   "from": 30117,
+   "to": 30119,
+   "dotted": false
+  },
+  {
+   "id": 798,
+   "from": 30120,
+   "to": 31192,
+   "dotted": false
+  },
+  {
+   "id": 799,
+   "from": 31192,
+   "to": 31193,
+   "dotted": false
+  },
+  {
+   "id": 800,
+   "from": 31070,
+   "to": 31192,
+   "dotted": false
+  },
+  {
+   "id": 801,
+   "from": 20021,
+   "to": 31192,
+   "dotted": false
+  },
+  {
+   "id": 802,
+   "from": 31190,
+   "to": 31192,
+   "dotted": false
+  },
+  {
+   "id": 803,
+   "from": 31066,
+   "to": 31070,
+   "dotted": false
+  },
+  {
+   "id": 804,
+   "from": 31070,
+   "to": 31071,
+   "dotted": false
+  },
+  {
+   "id": 805,
+   "from": 20021,
+   "to": 30116,
+   "dotted": false
+  },
+  {
+   "id": 806,
+   "from": 30115,
+   "to": 30116,
+   "dotted": false
+  },
+  {
+   "id": 807,
+   "from": 22,
+   "to": 30116,
+   "dotted": false
+  },
+  {
+   "id": 808,
+   "from": 22,
+   "to": 30118,
+   "dotted": false
+  },
+  {
+   "id": 809,
+   "from": 30117,
+   "to": 30118,
+   "dotted": false
+  },
+  {
+   "id": 810,
+   "from": 168,
+   "to": 30118,
+   "dotted": false
+  },
+  {
+   "id": 811,
+   "from": 20215,
+   "to": 31191,
+   "dotted": false
+  },
+  {
+   "id": 812,
+   "from": 31190,
+   "to": 31191,
+   "dotted": false
+  },
+  {
+   "id": 813,
+   "from": 31189,
+   "to": 31190,
+   "dotted": false
+  },
+  {
+   "id": 814,
+   "from": 23,
+   "to": 31072,
+   "dotted": false
+  },
+  {
+   "id": 815,
+   "from": 31071,
+   "to": 31072,
+   "dotted": false
+  },
+  {
+   "id": 816,
+   "from": 31068,
+   "to": 31069,
+   "dotted": false
+  },
+  {
+   "id": 817,
+   "from": 91,
+   "to": 31069,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "b2eaeb111464f083",
+  "fingerprint": "2cf0ef75a3bb5f1f",
   "positions": [
    [
     156,
@@ -32342,12 +33078,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30107,
-    2324,
+    2331,
     -1471
    ],
    [
     30108,
-    2252,
+    2245,
     -1471
    ],
    [
@@ -32357,7 +33093,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30110,
-    2324,
+    2331,
     -1647
    ],
    [
@@ -35273,7 +36009,7 @@ export const TALENT_TREE_DATA = {
    [
     20108,
     3013,
-    -277
+    -284
    ],
    [
     20109,
@@ -36698,12 +37434,12 @@ export const TALENT_TREE_DATA = {
    [
     30831,
     3627,
-    180
+    187
    ],
    [
     30832,
     3627,
-    108
+    101
    ],
    [
     30833,
@@ -36712,12 +37448,12 @@ export const TALENT_TREE_DATA = {
    ],
    [
     30834,
-    3679,
+    3672,
     -76
    ],
    [
     30835,
-    3751,
+    3758,
     -76
    ],
    [
@@ -36773,7 +37509,7 @@ export const TALENT_TREE_DATA = {
    [
     30846,
     3013,
-    -205
+    -198
    ],
    [
     30847,
@@ -38848,12 +39584,12 @@ export const TALENT_TREE_DATA = {
    [
     31189,
     2713,
-    -2212
+    -2219
    ],
    [
     31190,
     2713,
-    -2140
+    -2133
    ],
    [
     31191,
@@ -38882,7 +39618,7 @@ export const TALENT_TREE_DATA = {
    ],
    [
     31196,
-    2252,
+    2245,
     -1647
    ],
    [

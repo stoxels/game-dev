@@ -348,11 +348,23 @@ export function _egRarityToastColor(rarity) {
 }
 
 // Returns a random pickup def selected by weighted random from EG_PICKUP_WEIGHTS.
+// Passive tree "% increased chance for Hearts / Mana pickups to appear"
+// scale the weight of that pickup family in this roll only.
 export function _egPickRandomPickup() {
-    const total = EG_PICKUP_WEIGHTS.reduce((sum, e) => sum + e.weight, 0);
+    let heartMult = 1;
+    let manaMult = 1;
+    if (typeof _egComputePlayerStats === 'function') {
+        try {
+            const s = _egComputePlayerStats();
+            heartMult += (Number(s.heartSpawnIncPct) || 0) / 100;
+            manaMult += (Number(s.manaSpawnIncPct) || 0) / 100;
+        } catch (e) { /* stats unavailable - use base weights */ }
+    }
+    const weightOf = (e) => e.weight * (e.id.startsWith('heart_') ? heartMult : e.id.startsWith('mana_') ? manaMult : 1);
+    const total = EG_PICKUP_WEIGHTS.reduce((sum, e) => sum + weightOf(e), 0);
     let roll = Math.random() * total;
     for (const entry of EG_PICKUP_WEIGHTS) {
-        roll -= entry.weight;
+        roll -= weightOf(entry);
         if (roll <= 0) return EG_PICKUP_DEFS[entry.id];
     }
     return EG_PICKUP_DEFS['heart_small']; // fallback - should never be reached

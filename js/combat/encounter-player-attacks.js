@@ -27,6 +27,10 @@ import { _egDragChargeElements, _egIsActive, _egRecentFills } from './combat-sta
 // _egAnimatePlayerProjectile.
 const EG_PLAYER_PROJECTILE_BASE_SLOWDOWN = 2;
 
+// Life of the chance-based burst on a projectile hit (node 20110); the
+// amount is part of that node's tooltip text.
+const EG_PROJECTILE_HIT_LIFE_BURST = 300;
+
 
 //------------------------------------------------------------------------
 //-------------------PLAYER ATTACKS (Player → Monster)--------------------
@@ -239,6 +243,19 @@ export function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     // Passive tree: Mana on every projectile that connects (not on a miss).
     const manaOnHit = Number(_egComputePlayerStats().manaOnProjectileHitPct) || 0;
     if (manaOnHit > 0) gainMana(manaOnHit);
+
+    // Passive tree: Life on every projectile that connects - a flat amount,
+    // plus a chance for a large burst (EG_PROJECTILE_HIT_LIFE_BURST).
+    {
+        const hitStats = _egComputePlayerStats();
+        let lifeGain = (Number(hitStats.lifeOnProjectileHit) || 0) + (Number(hitStats.lifeOnAttackHit) || 0);
+        const burstChance = Number(hitStats.lifeBurstOnProjectileHitChancePct) || 0;
+        if (burstChance > 0 && Math.random() * 100 < burstChance) lifeGain += EG_PROJECTILE_HIT_LIFE_BURST;
+        if (lifeGain > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP) {
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + lifeGain);
+            if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+        }
+    }
 
     // Gear: channel stacks + mana-to-damage are consumed by this hit
     let finalDamage = damage + _egConsumeOnHitGearBonus();

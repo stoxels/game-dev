@@ -83,16 +83,23 @@ export const EG_CRUSH_DURATION_S = 5;
 
 // Multiplier on the stored damage-per-second of an ailment the player
 // inflicts: Ignite uses igniteDamageMorePct, Bleeding (the physical damage
-// over time) physDotMorePct. Every other ailment is untouched.
+// over time) physDotMorePct, Poison (the shadow damage over time)
+// poisonDotMultiPct. Every other ailment is untouched.
 export function _egAilmentDamageMult(key, stats) {
     const pct = key === 'ignite' ? Number(stats && stats.igniteDamageMorePct)
-        : key === 'bleed' ? Number(stats && stats.physDotMorePct) : 0;
-    return 1 + Math.max(0, pct || 0) / 100;
+        : key === 'bleed' ? Number(stats && stats.physDotMorePct)
+        : key === 'poison' ? Number(stats && stats.poisonDotMultiPct) : 0;
+    // General "increased Damage over Time" (dotIncPct) stacks on top of the
+    // ailment-specific "more" step for every DoT ailment.
+    const inc = (Math.max(0, Number(stats && stats.dotIncPct) || 0)
+        + (stats && stats.isDaggerEquipped ? Math.max(0, Number(stats.dotIncDaggerPct) || 0) : 0)) / 100;
+    return (1 + Math.max(0, pct || 0) / 100) * (1 + inc);
 }
 
 // Multiplier on every Life leech heal (Vital Conduit keystone: lifeLeechLessPct).
 export function _egLeechHealMult(stats) {
-    return Math.max(0, 1 - Math.max(0, Number(stats && stats.lifeLeechLessPct) || 0) / 100);
+    return Math.max(0, 1 - Math.max(0, Number(stats && stats.lifeLeechLessPct) || 0) / 100)
+        * (1 + Math.max(0, Number(stats && stats.lifeLeechEffectIncPct) || 0) / 100);
 }
 
 // Applies the target monster's elemental resistances to an incoming hit.

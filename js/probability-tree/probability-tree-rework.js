@@ -3,7 +3,7 @@ import { TALENT_TREE_DATA } from './probability-tree-data.js';
 // Only nodes WITHOUT an effects list live here: the three class start
 // nodes. Every stat node is authored through the effects pipeline (below)
 // and counts as reworked by definition.
-export const PT_REWORKED_NODE_IDS = Object.freeze([1002, 1001, 1003]);
+export const PT_REWORKED_NODE_IDS = Object.freeze([1002, 1001, 1003, 20104, 30848, 30849]);
 
 // Nodes authored through the effects pipeline (pt-effects.js) are reworked
 // BY DEFINITION - their channels and both localised descriptions come from
@@ -33,4 +33,21 @@ export function getPassiveTreeReworkProgress() {
     let done = 0;
     for (const node of nodes) if (isPassiveTreeNodeReworked(node.id)) done++;
     return { done, total: nodes.length };
+}
+
+// PoE-port review overlay. While a batch of nodes is waiting for the
+// owner's approval, each one has an entry here describing the Path of
+// Exile 1 original and the planned Stoxels effect. The tree draws these
+// nodes with a BLUE marker and the tooltip shows both texts. The map is
+// emptied again as soon as a batch is approved and implemented, so a
+// published game never carries pending proposals. Presentation only: it
+// does not change allocation, stats or the reworked status.
+//   id -> { poe: { name, stats: [...] },
+//           plan: { name, lines: [...] | [], note? } }
+// An empty `lines` array means "deliberately left empty for now" (a PoE
+// mechanic the game does not have yet - reserved for future puzzle work).
+export const PT_REWORK_PROPOSALS = Object.freeze({});
+
+export function getPassiveTreeNodeProposal(id) {
+    return PT_REWORK_PROPOSALS[Number(id)] || null;
 }

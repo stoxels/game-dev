@@ -252,6 +252,59 @@ export const PT_EFFECT_DEFS = Object.freeze({
     frenzy_max: { channel: 'frenzyChargesMax', en: '+{v} to maximum Frenzy Charges', de: '+{v} auf maximale Raserei-Ladungen' },
     frenzy_duration: { channel: 'frenzyDurationPct', en: '{v}% increased Frenzy Charge Duration', de: '{v}% erhöhte Dauer von Raserei-Ladungen' },
     evasion_per_frenzy: { channel: 'evasionPerFrenzyChargePct', en: '{v}% increased Evasion Rating per Frenzy Charge', de: '{v}% erhöhte Ausweichwertung pro Raserei-Ladung' },
+    // Life on projectile hit (nodes 30881/30880/20110): rolled for every
+    // projectile that connects (after the accuracy roll) in
+    // _egResolveProjectileImpact. The burst amount is fixed (300) and part
+    // of the tooltip text; the value is the chance.
+    life_on_projectile_hit: { channel: 'lifeOnProjectileHit', en: 'Gain {v} Life whenever a Projectile hits an enemy', de: 'Erhalte {v} Leben, wenn ein Projektil einen Gegner trifft' },
+    life_burst_on_projectile_hit: { channel: 'lifeBurstOnProjectileHitChancePct', en: '{v}% Chance to gain 300 Life when a Projectile hits an enemy', de: '{v}% Chance, 300 Leben zu erhalten, wenn ein Projektil einen Gegner trifft' },
+    // Shadow damage / mana on kill (nodes 30895/30898/30106/30105/30103/20020).
+    // shadow_damage_inc_pct scales the shadow share of every player hit
+    // (combat-calculations.js); mana_on_kill_flat feeds the existing
+    // manaOnKill stat read in encounter-kills.js.
+    shadow_damage_inc_pct: { channel: 'shadowDamageIncPct', en: '{v}% increased Shadow Damage', de: '{v}% erhöhter Schattenschaden' },
+    // damage_inc_pct (nodes 30102/30149): generic "increased Damage" - one
+    // multiplier over the whole physical + elemental hit (melee AND
+    // projectile), applied before crit in combat-calculations.js.
+    damage_inc_pct: { channel: 'damageIncPct', en: '{v}% increased Damage', de: '{v}% erhöhter Schaden' },
+    mana_on_kill_flat: { channel: 'manaOnKillFlat', en: 'Gain {v} Mana per Enemy Killed', de: 'Erhalte {v} Mana pro getötetem Gegner' },
+    // Leech / crit / shadow resistance (nodes 30888/20109/30889/20111/30884).
+    // life_leech_attack feeds the shared lifeLeechPct (melee AND projectile
+    // hits); life_leech_effect_inc scales every leech heal (_egLeechHealMult);
+    // crit_chance_flat adds to the base crit chance (melee + projectile).
+    life_leech_attack: { channel: 'lifeLeechPct', en: '+{v}% of Attack Damage leeched as Life', de: '+{v}% des Angriffsschadens als Leben entzogen' },
+    life_leech_effect_inc: { channel: 'lifeLeechEffectIncPct', en: '{v}% increased Life recovered from Leech', de: '{v}% erhöhtes durch Lebensentzug erhaltenes Leben' },
+    shadow_resist_flat: { channel: 'shadowResistFlat', en: '+{v}% to Shadow Resistance', de: '+{v}% Schattenwiderstand' },
+    crit_chance_flat: { channel: 'critChanceFlat', en: '+{v}% to Critical Strike Chance', de: '+{v}% auf die kritische Trefferchance' },
+    // Dagger / crit-ailment / poison duration (nodes 30891/30892/30890/30883/238).
+    // The dagger lines read stats.isDaggerEquipped (weapon family 'dagger').
+    dot_inc_dagger: { channel: 'dotIncDaggerPct', en: '{v}% increased Damage over Time while wielding a Dagger', de: '{v}% erhöhter Schaden über Zeit mit einem Dolch' },
+    // crit_chance_dagger (node 31190): flat crit chance that only applies to
+    // melee strikes while a dagger is equipped (combat-calculations.js).
+    crit_chance_dagger: { channel: 'critChanceDaggerPct', en: '+{v}% to Critical Strike Chance with Daggers', de: '+{v}% auf die kritische Trefferchance mit Dolchen' },
+    crit_multi_dagger: { channel: 'critMultiplierDaggerPct', en: '+{v}% to Critical Strike Multiplier with Daggers', de: '+{v}% auf den kritischen Schadensmultiplikator mit Dolchen' },
+    poison_duration: { channel: 'poisonDurationPct', en: '{v}% increased Poison Duration on enemies', de: '{v}% erhöhte Giftdauer bei Gegnern' },
+    crit_dot_multi: { channel: 'critDotMultiPct', en: '+{v}% to the Damage over Time Multiplier for Ailments from Critical Strikes', de: '+{v}% auf den Schaden-über-Zeit-Multiplikator für Statuseffekte durch kritische Treffer' },
+    // Damage over Time (nodes 20112/30919/30924/...): scales the stored dps of
+    // every DoT ailment you inflict (ignite, bleed, poison) once, when it is
+    // applied (_egAilmentDamageMult).
+    dot_inc_pct: { channel: 'dotIncPct', en: '{v}% increased Damage over Time', de: '{v}% erhöhter Schaden über Zeit' },
+    // Skill Effect Duration (nodes 20112/339): tracked on the stat sheet for
+    // the buff spells to come - they read stats.skillEffectDurationPct.
+    skill_effect_duration: { channel: 'skillEffectDurationPct', en: '{v}% increased Skill Effect Duration', de: '{v}% erhöhte Dauer von Fertigkeitseffekten' },
+    // Life on attack hits (nodes 30841/30842/357): melee-only and
+    // melee + projectile variants, see encounter-melee-impact.js and
+    // encounter-player-attacks.js.
+    life_on_melee_hit: { channel: 'lifeOnMeleeHit', en: 'Gain {v} Life whenever a Melee strike hits an enemy', de: 'Erhalte {v} Leben, wenn ein Nahkampfschlag einen Gegner trifft' },
+    life_on_attack_hit: { channel: 'lifeOnAttackHit', en: 'Gain {v} Life per Enemy hit with Attacks', de: 'Erhalte {v} Leben pro getroffenem Gegner mit Angriffen' },
+    // Poison (nodes 30834/30835): shadow damage over time, see
+    // combat-ailments-core.js (_egRollPlayerHitAilments).
+    poison_chance_attack: { channel: 'poisonChanceAttackPct', en: '{v}% Chance to Poison on Hit with Attacks', de: '{v}% Chance, bei Angriffstreffern zu vergiften' },
+    poison_dot_multi: { channel: 'poisonDotMultiPct', en: '+{v}% to the Damage over Time Multiplier for Poison', de: '+{v}% auf den Schaden-über-Zeit-Multiplikator für Gift' },
+    // Grid pickup spawn weights (nodes 30917/20103): scale the weight of the
+    // heart / mana family in the ambient pickup roll (combat-grid-pickups.js).
+    heart_spawn_inc: { channel: 'heartSpawnIncPct', en: '{v}% increased chance for Hearts to appear on the Grid', de: '{v}% erhöhte Chance, dass Herzen auf dem Raster erscheinen' },
+    mana_spawn_inc: { channel: 'manaSpawnIncPct', en: '{v}% increased chance for Mana pickups to appear on the Grid', de: '{v}% erhöhte Chance, dass Mana-Pickups auf dem Raster erscheinen' },
     // Stun avoidance (nodes 30860/30863/20100): tracked and shown only - no
     // enemy can stun the player yet.
     stun_avoid: { channel: 'stunAvoidPct', en: '{v}% Chance to avoid being Stunned', de: '{v}% Chance, nicht betäubt zu werden' },

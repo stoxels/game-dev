@@ -123,6 +123,17 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
     // all non-melee sources (spells, reveal projectiles, DoTs) are resisted.
     _egDamageTargetById(targetId, dmg, elements, { isCrit: wasCrit, isMelee: true, chargePct });
 
+    // Life on a connecting strike (passive tree): melee-only line plus the
+    // generic "per Enemy hit with Attacks" line shared with projectiles.
+    {
+        const meleeStats = _egComputePlayerStats();
+        const lifeGain = (Number(meleeStats.lifeOnMeleeHit) || 0) + (Number(meleeStats.lifeOnAttackHit) || 0);
+        if (lifeGain > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP) {
+            globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + lifeGain);
+            if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+        }
+    }
+
     // Mana on a connecting strike above 50% charge-up (passive tree only -
     // melee strikes grant no mana by default).
     const manaOnHit = Number(_egComputePlayerStats().manaOnMeleeHitChargedPct) || 0;

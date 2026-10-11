@@ -8,7 +8,7 @@ import { LANG, t } from '../translation/translations.js';
 import { PassiveTracker } from './probability-tree-tracker.js';
 import { TALENT_TREE_DATA } from './probability-tree-data.js';
 import { resolvePassiveTreeLayout } from './probability-tree-layout.js';
-import { getPassiveTreeReworkProgress } from './probability-tree-rework.js';
+import { PT_REWORK_PROPOSALS, getPassiveTreeReworkProgress } from './probability-tree-rework.js';
 import { ptHasSkill } from './probability-tree-state-points.js';
 import { _ptRender } from './probability-tree-ui.js';
 import { _ptSuspendViewport } from './probability-tree-viewport.js';
@@ -186,6 +186,10 @@ export function _ptUpdatePointsDisplay(lang, points) {
     if (!pointsEl) return;
 
     pointsEl.textContent = t('pt_points_available').replace('{n}', points);
+
+    // The PoE-port review button only exists while proposals are pending.
+    const jumpEl = document.getElementById('btn-pt-jump-proposals');
+    if (jumpEl) jumpEl.style.display = Object.keys(PT_REWORK_PROPOSALS).length ? '' : 'none';
 
     // Rework progress (reworked nodes / all nodes) next to the points.
     const reworkEl = document.getElementById('pt-rework-counter');

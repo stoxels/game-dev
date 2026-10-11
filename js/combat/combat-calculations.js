@@ -37,12 +37,16 @@ export function _egCalcPlayerDamage() {
     elements.fire *= 1 + (stats.fireDamageIncPct || 0) / 100;
     elements.cold *= 1 + (stats.coldDamageIncPct || 0) / 100;
     elements.lightning *= 1 + (stats.lightningDamageIncPct || 0) / 100;
+    elements.shadow *= 1 + (stats.shadowDamageIncPct || 0) / 100;
     // Fire conversion / fire-only (Primal Flame keystone).
     const converted = _egApplyDamageConversion(stats, dmg, elements, elemMult * (1 + (stats.fireDamageIncPct || 0) / 100));
     dmg = converted.physical;
     _egLastHitElements = converted.elements;
     dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
 
+    // Generic "% increased Damage" (passive tree): one multiplier over the
+    // whole physical + elemental roll, shared with the melee channel.
+    dmg *= 1 + (stats.damageIncPct || 0) / 100;
     // "% increased Projectile Damage" (passive tree): one multiplier over the
     // whole physical + elemental roll, applied before the crit multiplier.
     dmg *= 1 + (stats.projectileDamageIncPct || 0) / 100;
@@ -152,19 +156,26 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
         lightning: rollEl(stats.meleeLightningMin, stats.meleeLightningMax) * lightningMult,
         shadow: rollEl(stats.meleeShadowMin, stats.meleeShadowMax) * elemMult,
     };
+    // "% increased Shadow Damage" (passive tree) on the melee shadow share.
+    elements.shadow *= 1 + (stats.shadowDamageIncPct || 0) / 100;
     // Fire conversion / fire-only (Primal Flame keystone).
     const converted = _egApplyDamageConversion(stats, dmg, elements, fireMult);
     dmg = converted.physical;
     _egLastMeleeElements = converted.elements;
     dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
 
+    // Generic "% increased Damage" (passive tree) over the whole melee hit.
+    dmg *= 1 + (stats.damageIncPct || 0) / 100;
+
     // Mace / Sceptre crit lines (Colossus nodes): scoped to melee strikes
     // with the matching weapon family, added to this roll only.
     // The tree's generic melee crit line applies to every melee strike.
-    const maceBonus = (stats.isMaceEquipped || stats.critChanceMeleePct)
+    const daggerMultiPct = stats.isDaggerEquipped ? (stats.critMultiplierDaggerPct || 0) : 0;
+    const daggerChancePct = stats.isDaggerEquipped ? (stats.critChanceDaggerPct || 0) : 0;
+    const maceBonus = (stats.isMaceEquipped || stats.critChanceMeleePct || daggerMultiPct || daggerChancePct)
         ? {
-            chance: (stats.critChanceMeleePct || 0) + (stats.isMaceEquipped ? (stats.critChanceMeleeMacePct || 0) : 0),
-            multiplierPct: stats.isMaceEquipped ? (stats.critMultiplierMeleeMacePct || 0) : 0,
+            chance: (stats.critChanceMeleePct || 0) + (stats.isMaceEquipped ? (stats.critChanceMeleeMacePct || 0) : 0) + daggerChancePct,
+            multiplierPct: (stats.isMaceEquipped ? (stats.critMultiplierMeleeMacePct || 0) : 0) + daggerMultiPct,
         }
         : null;
     const critMult = _egRollCrit(stats, maceBonus);

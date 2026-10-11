@@ -2,7 +2,7 @@ import { t } from '../translation/translations.js';
 import { EG_ART } from '../endgame/endgame-art.js';
 import { _ptAllocated, _ptBuildAdjacency, _ptGetNodeVisualState, _ptIsDeallocatable, _ptLang, _ptOnNodeClick, _ptPoints, _ptRefreshPointsDisplay, ensurePassiveTreeRoot } from './probability-tree-state-points.js';
 import { getPassiveTreeRootId, isPassiveTreeStartNode } from './probability-tree.js';
-import { isPassiveTreeNodeReworked } from './probability-tree-rework.js';
+import { getPassiveTreeNodeProposal, isPassiveTreeNodeReworked } from './probability-tree-rework.js';
 import { ptResolveNodeDesc } from './pt-effects.js';
 import { _ptBindEvents, _ptFitToView } from './probability-tree-viewport.js';
 import { PT_COL_ALLOCATED_BG, PT_COL_ALLOCATED_BORDER, PT_COL_ALLOCATED_DOT, PT_COL_LOCKED_BG, PT_COL_LOCKED_BORDER, PT_COL_LOCKED_DOT, PT_COL_START, PT_COL_UNLOCKED_BG, PT_COL_UNLOCKED_BORDER, PT_COL_UNLOCKED_DOT, PT_CONN_ALLOCATED, PT_CONN_UNLOCKED, PT_CONN_WIDTH, PT_NODE_RADIUS, PT_PADDING } from './probability-tree.js';
@@ -385,6 +385,25 @@ export function _ptTooltipBuildStatusHtml(id, state, lang) {
     return `<div style="margin-top:7px;font-size:11px;color:#555;">${lockedText}</div>`;
 }
 
+// Blue "awaiting approval" block of the PoE-port review overlay: the PoE 1
+// original next to the planned Stoxels effect (see PT_REWORK_PROPOSALS).
+function _ptTooltipBuildProposalHtml(proposal) {
+    const esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const poeLines = (proposal.poe.stats || []).map(esc).join('<br>') || '-';
+    const plan = proposal.plan || {};
+    const planLines = (plan.lines && plan.lines.length)
+        ? plan.lines.map(esc).join('<br>')
+        : '<i>(left empty for now)</i>';
+    return `<div style="margin-top:8px;padding:6px 8px;border:1px solid #4da3ff;border-radius:4px;background:rgba(40,90,160,0.18);font-size:11px;color:#bcd9ff;">`
+        + `<div style="font-size:10px;letter-spacing:1px;color:#4da3ff;">PROPOSAL - AWAITING APPROVAL</div>`
+        + `<div style="margin-top:4px;color:#8fb4e0;">PoE 1: ${esc(proposal.poe.name || '')}</div>`
+        + `<div>${poeLines}</div>`
+        + `<div style="margin-top:5px;color:#8fb4e0;">Planned${plan.name ? ': ' + esc(plan.name) : ''}</div>`
+        + `<div>${planLines}</div>`
+        + (plan.note ? `<div style="margin-top:4px;color:#8fb4e0;">${esc(plan.note)}</div>` : '')
+        + `</div>`;
+}
+
 // Assembles the full tooltip inner HTML from name, description, and status.
 export function _ptTooltipBuildHtml(id) {
     const skill = globalThis._pt_skillMap[id];
@@ -395,7 +414,9 @@ export function _ptTooltipBuildHtml(id) {
     const name = _ptTooltipResolveName(skill, def, lang);
     const desc = _ptTooltipResolveDesc(def, lang);
     const statusHtml = _ptTooltipBuildStatusHtml(id, state, lang);
-    const reworkHtml = isPassiveTreeNodeReworked(id)
+    const proposal = getPassiveTreeNodeProposal(id);
+    const reworkHtml = proposal ? _ptTooltipBuildProposalHtml(proposal)
+        : isPassiveTreeNodeReworked(id)
         ? ''
         : `<div style="margin-top:6px;font-size:10px;letter-spacing:1px;color:#ff5d7e;">${lang === 'de' ? 'NICHT VOLLSTÄNDIG ÜBERARBEITET' : 'NOT FULLY REWORKED'}</div>`;
 
@@ -1081,6 +1102,7 @@ function _ptMountNode(skill, target) {
         : 'pt-node';
     if (skill.id === getPassiveTreeRootId()) node.classList.add('pt-node-selected-character-start');
     if (!isReworked) node.classList.add('pt-node-unreworked');
+    if (getPassiveTreeNodeProposal(skill.id)) node.classList.add('pt-node-proposed');
     node.dataset.id = skill.id;
     node.dataset.ptRework = isReworked ? 'reworked' : 'unreworked';
 

@@ -48,6 +48,12 @@ const EG_AIL_IGNITE_DMG_SHARE = 0.15;   // dps = share of the triggering hit
 const EG_AIL_BLEED_DURATION_S = 5;
 const EG_AIL_BLEED_DMG_SHARE = 0.15;    // dps = share of the triggering hit
 const EG_PHYS_INNATE_BLEED_CHANCE_PCT = 10;   // physical hits bleed even w/o mods
+// Poison is the SHADOW damage-over-time status (PoE's chaos poison). It has
+// no innate chance: only the passive tree's poisonChanceAttackPct causes it,
+// and it deals a share of the hit's SHADOW damage, so a hit with no shadow
+// share can never poison. Player -> monster only.
+const EG_AIL_POISON_DURATION_S = 5;
+const EG_AIL_POISON_DMG_SHARE = 0.15;    // dps = share of the hit's shadow damage
 const EG_AIL_BLEED_MOVING_MULT = 3;     // bleed on the player: +200% while moving
 
 // True while any movement key is held (same signal the boss mechanics use).
@@ -88,6 +94,7 @@ const EG_SHOCK_MARK_STRIP_CHANCE = 0.35;      // per reveal, strips a random ✕
 const EG_AILMENT_ICONS = {
     ignite: '🔥',
     bleed: '🩸',
+    poison: '☠️',
     chill: '❄️',
     frozen: '🧊',
     shocked: '⚡',
@@ -141,6 +148,7 @@ function _egApplyMonsterAilment(monster, key, dps) {
     let durationS = ({
         ignite: EG_AIL_IGNITE_DURATION_S,
         bleed: EG_AIL_BLEED_DURATION_S,
+        poison: EG_AIL_POISON_DURATION_S,
         chill: EG_AIL_CHILL_DURATION_S,
         frozen: EG_AIL_FROZEN_DURATION_S,
         shocked: EG_AIL_SHOCK_DURATION_S,
@@ -154,18 +162,18 @@ function _egApplyMonsterAilment(monster, key, dps) {
     // (tithe batch, e.g. reworked nodes 30252/30253). Only ignite and bleed
     // have tree channels; every other ailment keeps its base duration.
     let bleedSpeedPct = 0;
-    if (key === 'ignite' || key === 'bleed') {
+    if (key === 'ignite' || key === 'bleed' || key === 'poison') {
         let pct = 0;
         try {
             const ps = (typeof _egComputePlayerStats === 'function') ? _egComputePlayerStats() : {};
-            pct = Number(key === 'ignite' ? ps.igniteDurationPct : ps.bleedDurationPct) || 0;
+            pct = Number(key === 'ignite' ? ps.igniteDurationPct : key === 'poison' ? ps.poisonDurationPct : ps.bleedDurationPct) || 0;
             if (key === 'bleed') bleedSpeedPct = Math.max(0, Number(ps.bleedSpeedPct) || 0);
         } catch (e) { pct = 0; }
         if (pct > 0) durationS = durationS * (1 + pct / 100);
     }
     // "More Damage" multipliers (nodes 30355/95 ignite, 30306/30309 bleed):
     // scale the stored damage-per-second once, when the ailment is applied.
-    if (dps > 0 && (key === 'ignite' || key === 'bleed')) {
+    if (dps > 0 && (key === 'ignite' || key === 'bleed' || key === 'poison')) {
         try {
             dps = dps * _egAilmentDamageMult(key, _egComputePlayerStats());
         } catch (e) { /* stats unavailable - base damage */ }
@@ -468,6 +476,8 @@ export function _egRollIntimidate(target, opts) {
 function _egRollPlayerHitAilments(target, amount, elements, opts) {
     if (!_egIsActive() || !target || target.currentHP <= 0) return;
     const stats = _egComputePlayerStats();
+    // Ailments inflicted by a critical hit deal more damage over time.
+    const critDotMult = (opts && opts.isCrit) ? 1 + Math.max(0, Number(stats.critDotMultiPct) || 0) / 100 : 1;
     const _achPreHas = {};
     if (target.statuses) { for (const k in target.statuses) if (target.statuses[k] && target.statuses[k].until > Date.now()) _achPreHas[k]=true; }
 
@@ -480,7 +490,7 @@ function _egRollPlayerHitAilments(target, amount, elements, opts) {
     // tithe duration nodes scale (30252/30253), and what 20036 wards against.
     const physShare = Math.max(0, amount - fireShare - coldShare - lightningShare - shadowShare);
     if (physShare > 0 && Math.random() * 100 < EG_PHYS_INNATE_BLEED_CHANCE_PCT) {
-        _egApplyMonsterAilment(target, 'bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_BLEED_DMG_SHARE));
+        _egApplyMonsterAilment(target, 'bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_BLEED_DMG_SHARE) * critDotMult);
     }
     // Tree bleed chances (bleed batch): melee attacks and attacks in general
     // (melee + primary projectile hits; spells never). The bleed deals a
@@ -491,11 +501,18 @@ function _egRollPlayerHitAilments(target, amount, elements, opts) {
     const treeBleedPct = (isMeleeHit ? (stats.bleedChanceMeleePct || 0) : 0)
         + (isAttackHit ? (stats.bleedChanceAttackPct || 0) : 0);
     if (physShare > 0 && treeBleedPct > 0 && Math.random() * 100 < Math.min(100, treeBleedPct)) {
-        _egApplyMonsterAilment(target, 'bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, physShare * EG_AIL_BLEED_DMG_SHARE));
+        _egApplyMonsterAilment(target, 'bleed', Math.max(EG_AIL_MIN_DOT_DAMAGE, physShare * EG_AIL_BLEED_DMG_SHARE) * critDotMult);
+    }
+
+    // Poison (shadow DoT): attack hits only (melee + primary projectile), and
+    // only when the hit actually carries shadow damage.
+    if (shadowShare > 0 && isAttackHit && (stats.poisonChanceAttackPct || 0) > 0
+        && Math.random() * 100 < Math.min(100, stats.poisonChanceAttackPct)) {
+        _egApplyMonsterAilment(target, 'poison', Math.max(EG_AIL_MIN_DOT_DAMAGE, shadowShare * EG_AIL_POISON_DMG_SHARE) * critDotMult);
     }
 
     if (fireShare > 0 && stats.ignitePct > 0 && Math.random() * 100 < stats.ignitePct) {
-        _egApplyMonsterAilment(target, 'ignite', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_IGNITE_DMG_SHARE));
+        _egApplyMonsterAilment(target, 'ignite', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_IGNITE_DMG_SHARE) * critDotMult);
     }
     if (coldShare > 0) {
         if (stats.freezePct > 0 && Math.random() * 100 < stats.freezePct) {

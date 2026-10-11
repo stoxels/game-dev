@@ -647,6 +647,20 @@ export function _egComputePlayerStats() {
         // stun the player yet; a future player-stun mechanic should roll this.
         stunAvoidPct: passiveTreeBonuses.stunAvoidPct || 0,
         manaOnProjectileHitPct: passiveTreeBonuses.manaOnProjectileHitPct || 0,
+        lifeOnProjectileHit: passiveTreeBonuses.lifeOnProjectileHit || 0,
+        lifeOnMeleeHit: passiveTreeBonuses.lifeOnMeleeHit || 0,
+        dotIncPct: passiveTreeBonuses.dotIncPct || 0,
+        shadowDamageIncPct: passiveTreeBonuses.shadowDamageIncPct || 0,
+        damageIncPct: passiveTreeBonuses.damageIncPct || 0,
+        critChanceDaggerPct: passiveTreeBonuses.critChanceDaggerPct || 0,
+        lifeLeechEffectIncPct: passiveTreeBonuses.lifeLeechEffectIncPct || 0,
+        dotIncDaggerPct: passiveTreeBonuses.dotIncDaggerPct || 0,
+        critMultiplierDaggerPct: passiveTreeBonuses.critMultiplierDaggerPct || 0,
+        poisonDurationPct: passiveTreeBonuses.poisonDurationPct || 0,
+        critDotMultiPct: passiveTreeBonuses.critDotMultiPct || 0,
+        skillEffectDurationPct: passiveTreeBonuses.skillEffectDurationPct || 0,
+        lifeOnAttackHit: passiveTreeBonuses.lifeOnAttackHit || 0,
+        lifeBurstOnProjectileHitChancePct: passiveTreeBonuses.lifeBurstOnProjectileHitChancePct || 0,
         bowSpellManaCostReducedPct: passiveTreeBonuses.bowSpellManaCostReducedPct || 0,
         manaOnMeleeHitChargedPct: passiveTreeBonuses.manaOnMeleeHitChargedPct || 0,
         parrySpellChancePct: passiveTreeBonuses.parrySpellChancePct || 0,
@@ -697,7 +711,7 @@ export function _egComputePlayerStats() {
         // incoming lightning hits with it.
         fireResist: passiveTreeBonuses.fireResistFlat || 0,
         coldResist: passiveTreeBonuses.coldResistFlat || 0,
-        lightningResist: passiveTreeBonuses.lightningResistFlat || 0, shadowResist: 0,
+        lightningResist: passiveTreeBonuses.lightningResistFlat || 0, shadowResist: passiveTreeBonuses.shadowResistFlat || 0,
         // "Increased maximum Resistance" bonuses (uniques) - raise the per-
         // element resistance cap above the base 75%. allResMax applies to all
         // four elements at once.
@@ -717,7 +731,7 @@ export function _egComputePlayerStats() {
         accuracy: passiveTreeBonuses.accuracy || 0, accuracyIncPct: passiveTreeBonuses.accuracyIncPct || 0,
         mistakeCount: 0, focusPct: 0, mistakeNotCountPct: 0,
         revealHintPct: 0, chanceForNewQuestionPct: 0,
-        critChance: 0, critMultiplierPct: 0,
+        critChance: passiveTreeBonuses.critChanceFlat || 0, critMultiplierPct: 0,
         physFlatMin: 0, physFlatMax: 0,
         // "+% increased physical damage" from the passive tree (reworked
         // notable 20032) seeds the shared projectile/spell bucket; the melee
@@ -767,6 +781,8 @@ export function _egComputePlayerStats() {
         // _egTickLifeRegen.
         bleedChanceMeleePct: passiveTreeBonuses.bleedChanceMeleePct || 0,
         bleedChanceAttackPct: passiveTreeBonuses.bleedChanceAttackPct || 0,
+        poisonChanceAttackPct: passiveTreeBonuses.poisonChanceAttackPct || 0,
+        poisonDotMultiPct: passiveTreeBonuses.poisonDotMultiPct || 0,
         bleedSpeedPct: passiveTreeBonuses.bleedSpeedPct || 0,
         lifeRegenRatePct: passiveTreeBonuses.lifeRegenRatePct || 0,
         // Axe batch: charge-up speed while wielding an Axe, and Rage
@@ -797,6 +813,7 @@ export function _egComputePlayerStats() {
         // Corpse explosion on melee kills (node 20045).
         meleeKillExplodeChancePct: passiveTreeBonuses.meleeKillExplodeChancePct || 0,
         isMaceEquipped: false,
+        isDaggerEquipped: false,
         isSwordEquipped: false,
         isAxeEquipped: false,
         meleeFireMin: 0, meleeFireMax: 0, meleeColdMin: 0, meleeColdMax: 0,
@@ -922,8 +939,9 @@ export function _egComputePlayerStats() {
         echoChancePct: 0, echoDamagePct: 0, fatePct: 0, wardingHP: 0,
         parryChancePct: 0, deflectChancePct: 0, deflectDamagePct: 0,
         movementSpeedPct: passiveTreeBonuses.movementSpeedPct || 0,
-        manaOnKill: 0, absorptionOnKill: 0, lifeOnKill: 0, manaOnMistake: 0,
+        manaOnKill: passiveTreeBonuses.manaOnKillFlat || 0, absorptionOnKill: 0, lifeOnKill: 0, manaOnMistake: 0,
         heartHealFlat: passiveTreeBonuses.heartHealFlat || 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: passiveTreeBonuses.manaHealIncPct || 0, timeAdded: 0,
+        heartSpawnIncPct: passiveTreeBonuses.heartSpawnIncPct || 0, manaSpawnIncPct: passiveTreeBonuses.manaSpawnIncPct || 0,
         absorptionRegenRatePct: passiveTreeBonuses.absorptionRegenRatePct || 0, fasterAbsorptionRegenStart: 0,
     };
 
@@ -1071,6 +1089,7 @@ export function _egComputePlayerStats() {
     s.isMaceEquipped = _egIsMaceOrSceptre(weaponInfo.item);
     s.isSwordEquipped = weaponFamily === 'sword';
     s.isAxeEquipped = weaponFamily === 'axe';
+    s.isDaggerEquipped = weaponFamily === 'dagger';
     if (s.isSwordEquipped) s.accuracy += passiveTreeBonuses.accuracySwordFlat || 0;
     s.accuracy += s.agility;
     // "Increased Accuracy Rating" multiplies the fully aggregated rating
@@ -1478,6 +1497,8 @@ export const EG_STAT_DISPLAY_LABELS = {
     lifeOnKill: { label: t('eg_stat_life_on_kill'), suffix: '' },
     manaOnMistake: { label: t('eg_stat_mana_on_mistake'), suffix: '' },
     heartHealFlat: { label: t('eg_stat_heart_heal'), suffix: '' },
+    heartSpawnIncPct: { label: t('eg_stat_heart_spawn'), suffix: '%' },
+    manaSpawnIncPct: { label: t('eg_stat_mana_spawn'), suffix: '%' },
     heartHealIncPct: { label: t('eg_stat_inc_heart_heal'), suffix: '%' },
     manaHealFlat: { label: t('eg_stat_mana_heal'), suffix: '' },
     manaHealIncPct: { label: t('eg_stat_inc_mana_heal'), suffix: '%' },
@@ -1541,6 +1562,20 @@ export const EG_STAT_DISPLAY_LABELS = {
     bowSpellDotIncPct: { label: t('eg_stat_inc_bow_spell_dot'), suffix: '%' },
     stunAvoidPct: { label: t('eg_stat_stun_avoid'), suffix: '%' },
     manaOnProjectileHitPct: { label: t('eg_stat_mana_on_projectile_hit'), suffix: '' },
+    lifeOnProjectileHit: { label: t('eg_stat_life_on_projectile_hit'), suffix: '' },
+    lifeOnMeleeHit: { label: t('eg_stat_life_on_melee_hit'), suffix: '' },
+    dotIncPct: { label: t('eg_stat_dot_inc'), suffix: '%' },
+    shadowDamageIncPct: { label: t('eg_stat_shadow_damage_inc'), suffix: '%' },
+    damageIncPct: { label: t('eg_stat_damage_inc'), suffix: '%' },
+    critChanceDaggerPct: { label: t('eg_stat_crit_chance_dagger'), suffix: '%' },
+    lifeLeechEffectIncPct: { label: t('eg_stat_leech_effect_inc'), suffix: '%' },
+    dotIncDaggerPct: { label: t('eg_stat_dot_inc_dagger'), suffix: '%' },
+    critMultiplierDaggerPct: { label: t('eg_stat_crit_multi_dagger'), suffix: '%' },
+    poisonDurationPct: { label: t('eg_stat_poison_duration'), suffix: '%' },
+    critDotMultiPct: { label: t('eg_stat_crit_dot_multi'), suffix: '%' },
+    skillEffectDurationPct: { label: t('eg_stat_skill_effect_duration'), suffix: '%' },
+    lifeOnAttackHit: { label: t('eg_stat_life_on_attack_hit'), suffix: '' },
+    lifeBurstOnProjectileHitChancePct: { label: t('eg_stat_life_burst_projectile_hit'), suffix: '%' },
     bowSpellManaCostReducedPct: { label: t('eg_stat_bow_spell_mana_reduced'), suffix: '%' },
     manaOnMeleeHitChargedPct: { label: t('eg_stat_mana_on_melee_hit'), suffix: '' },
     parrySpellChancePct: { label: t('eg_stat_parry_spell_chance'), suffix: '%' },
@@ -1561,6 +1596,8 @@ export const EG_STAT_DISPLAY_LABELS = {
     intimidateMeleeAmpPct: { label: t('eg_stat_intimidate_amp'), suffix: '%' },
     bleedChanceMeleePct: { label: t('eg_stat_bleed_chance_melee'), suffix: '%' },
     bleedChanceAttackPct: { label: t('eg_stat_bleed_chance_attack'), suffix: '%' },
+    poisonChanceAttackPct: { label: t('eg_stat_poison_chance_attack'), suffix: '%' },
+    poisonDotMultiPct: { label: t('eg_stat_poison_dot_multi'), suffix: '%' },
     bleedSpeedPct: { label: t('eg_stat_bleed_speed'), suffix: '%' },
     lifeRegenRatePct: { label: t('eg_stat_life_regen_rate'), suffix: '%' },
     axeChargeSpeedPct: { label: t('eg_stat_axe_charge_speed'), suffix: '%' },
@@ -1679,14 +1716,14 @@ export const EG_STAT_LAYOUT = {
         // the combined-at-70% ranges below read correctly.
         { catKey: 'eg_statcat_melee', buckets: [
             'dualWield', 'attackInterval', 'attackSpeed', 'meleePhysRange', 'meleeFireRange', 'meleeColdRange',
-            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'stunChanceMaceChargedPct', 'stunDurationPct', 'stunChanceHeavyPct', 'stunDurationHeavyPct', 'stunDoubleChancePct', 'meleeDoubleDamageChancePct', 'meleeKillExplodeChancePct', 'meleeSpellManaCostReducedPct', 'meleeSpellLifeCostPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'bleedSpeedPct',
+            'meleeLightningRange',            'meleeShadowRange', 'meleePhysIncPct', 'meleePhys1HIncPct', 'meleePhysHeavyIncPct', 'meleePhysSwordIncPct', 'meleePhysAxeIncPct', 'meleePhysMaceIncPct', 'areaOfEffectPct', 'stunChanceMaceChargedPct', 'stunDurationPct', 'stunChanceHeavyPct', 'stunDurationHeavyPct', 'stunDoubleChancePct', 'meleeDoubleDamageChancePct', 'meleeKillExplodeChancePct', 'meleeSpellManaCostReducedPct', 'meleeSpellLifeCostPct', 'swordChargeSpeedPct', 'ignorePhysReductionPct', 'intimidateChanceMeleePct', 'intimidateMeleeAmpPct', 'axeChargeSpeedPct', 'rage', 'rageMax', 'rageOnHitAxe', 'rageMeleeMorePct', 'bleedChanceMeleePct', 'bleedChanceAttackPct', 'poisonChanceAttackPct', 'poisonDotMultiPct', 'bleedSpeedPct',
             'meleeChargeSpeedPct', 'attackSpeedPct', 'critChanceMeleePct', 'manaOnMeleeHitChargedPct', 'meleeRangeM', 'meleeAoEPct', 'critChanceMeleeMacePct', 'critMultiplierMeleeMacePct', 'crushPhysReductionPct'] },
         { catKey: 'eg_statcat_projectiles', buckets: [
             'physRange', 'fireRange', 'coldRange', 'lightningRange', 'shadowRange',
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
             'coldDamageIncPct', 'lightningDamageIncPct',
             'projectileDamageIncPct', 'projectileSpeedPct', 'projectileCritChancePct', 'projectileCritMultiplierPct', 'projectileElementalDamageIncPct',
-            'bowSpellDamageIncPct', 'bowSpellDotIncPct', 'bowSpellManaCostReducedPct', 'manaOnProjectileHitPct',
+            'bowSpellDamageIncPct', 'bowSpellDotIncPct', 'bowSpellManaCostReducedPct', 'manaOnProjectileHitPct', 'lifeOnProjectileHit', 'lifeBurstOnProjectileHitChancePct', 'lifeOnMeleeHit', 'lifeOnAttackHit', 'dotIncPct', 'shadowDamageIncPct', 'damageIncPct', 'critChanceDaggerPct', 'skillEffectDurationPct', 'lifeLeechEffectIncPct', 'dotIncDaggerPct', 'critMultiplierDaggerPct', 'poisonDurationPct', 'critDotMultiPct',
             'healingPowerFlat', 'healingPowerIncPct',
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
@@ -1703,7 +1740,7 @@ export const EG_STAT_LAYOUT = {
         { catKey: 'eg_statcat_life_mana', buckets: [
             'health', 'healthMorePct', 'mana', 'manaRemoved', 'spellsCostLife', 'spellCostIncPct', 'lifeRegen', 'lifeRegenRatePct', 'lifeRegenLessPct', 'manaRegen', 'lifeLeechPct', 'lifeLeechMeleePct', 'lifeLeechLessPct', 'absorptionRechargesLife',
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
-            'heartHealFlat', 'heartHealIncPct', 'manaHealFlat', 'manaHealIncPct', 'wardingHP'] },
+            'heartHealFlat', 'heartHealIncPct', 'heartSpawnIncPct', 'manaHealFlat', 'manaHealIncPct', 'manaSpawnIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [
             'blockChance', 'spellBlockChance', 'blockChanceTree', 'blockRecoveryPct',
             'blockChanceShieldPct', 'frenzyCharges', 'frenzyChargesMax', 'frenzyDurationPct', 'evasionPerFrenzyChargePct', 'enduranceCharges', 'enduranceChargesMax', 'enduranceDurationPct', 'lifeRegenPerEndurancePct', 'enduranceOnKillShieldPct',
