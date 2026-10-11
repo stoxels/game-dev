@@ -657,12 +657,13 @@ export const TALENT_TREE_DATA = {
    "id": 210,
    "x": 2341,
    "y": -232,
-   "nameEn": "Blackout Ward",
-   "nameDe": "Verdunklungsschutz",
-   "descEn": "30% chance to be protected against row and column blackout effects from cursed items. +6% Evasion.",
-   "descDe": "30% Chance, gegen Effekte verfluchter Gegenstände geschützt zu sein, die Zeilen- oder Spaltenhinweise verstecken. +6% Ausweichen.",
-   "icon": "🌑",
-   "statKey": "blackout_ward_1",
+   "nameEn": "From the Shadows",
+   "nameDe": "Aus den Schatten",
+   "icon": "",
+   "statKey": "notable_from_the_shadows_210",
+   "effects": [
+    "dagger_charge_speed:12"
+   ],
    "tier": "notable"
   },
   {
@@ -693,12 +694,10 @@ export const TALENT_TREE_DATA = {
    "id": 12,
    "x": 1038,
    "y": 1391,
-   "nameEn": "Bonus Acquisition",
-   "nameDe": "Vermehrte Gewinne",
-   "descEn": "The legacy item-reward effect is not active in the current progression system. +6% Evasion.",
-   "descDe": "Der alte Gegenstands-Belohnungseffekt ist im aktuellen Fortschrittssystem nicht aktiv. +6% Ausweichen.",
-   "icon": "🎁",
-   "statKey": "bonus_acquisition",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_flask_tincture_12",
    "tier": "notable"
   },
   {
@@ -1080,12 +1079,10 @@ export const TALENT_TREE_DATA = {
    "id": 101,
    "x": 2852,
    "y": 308,
-   "nameEn": "Dark Temptation",
-   "nameDe": "Dunkle Versuchung",
-   "descEn": "5% increased chance of receiving Cursed items. Stacks with Hexbound Desire and Cursecaller. +6% Evasion.",
-   "descDe": "5% erhöhte Chance auf verfluchte Gegenstände. Wirkt zusammen mit Hexengebundene Gier und Fluchrufer. +6% Ausweichen.",
-   "icon": "☠️",
-   "statKey": "cursed_attraction_2",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_split_101",
    "tier": "notable"
   },
   {
@@ -1180,12 +1177,13 @@ export const TALENT_TREE_DATA = {
    "id": 374,
    "x": 2234,
    "y": -282,
-   "nameEn": "Data Hygiene",
-   "nameDe": "Datenhygiene",
-   "descEn": "Each fully completed row grants +5 seconds. Stacks with Razor's Edge. +6% Evasion.",
-   "descDe": "Jede vollständig abgeschlossene Reihe gewährt +5 Sekunden. Wirkt zusammen mit Rasierklinge. +6% Ausweichen.",
-   "icon": "🧼",
-   "statKey": "data_hygiene",
+   "nameEn": "Clever Thief",
+   "nameDe": "Schlauer Dieb",
+   "icon": "",
+   "statKey": "notable_clever_thief_374",
+   "effects": [
+    "life_leech_attack:1"
+   ],
    "tier": "notable"
   },
   {
@@ -1232,12 +1230,14 @@ export const TALENT_TREE_DATA = {
    "id": 237,
    "x": 2674,
    "y": -773,
-   "nameEn": "Pattern Analysis",
-   "nameDe": "Musteranalyse",
-   "descEn": "At the start of each level, the row and column with the most filled cells each have 1 incorrect empty cell marked. +6% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird in der Zeile und Spalte mit den meisten gefüllten Zellen je 1 falsche leere Zelle markiert. +6% Ausweichen.",
-   "icon": "🗃️",
-   "statKey": "density_mapping_1",
+   "nameEn": "Backstabbing",
+   "nameDe": "Meuchelstich",
+   "icon": "",
+   "statKey": "notable_backstabbing_237",
+   "effects": [
+    "crit_chance_dagger:4",
+    "crit_multi_dagger:30"
+   ],
    "tier": "notable"
   },
   {
@@ -1594,12 +1594,13 @@ export const TALENT_TREE_DATA = {
    "id": 118,
    "x": 2468,
    "y": 182,
-   "nameEn": "Time Weavers",
-   "nameDe": "Zeitweber",
-   "descEn": "Timer items grant 10% more time. Stacks with Chrono Extension and Moment Reserves. +6% Evasion.",
-   "descDe": "Timer-Gegenstände gewähren 10% mehr Zeit. Wirkt zusammen mit Chrono-Verlängerung und Zeitreserven. +6% Ausweichen.",
-   "icon": "⏳",
-   "statKey": "extended_hour_1",
+   "nameEn": "Relentless Tempo",
+   "nameDe": "Unerbittliches Tempo",
+   "icon": "",
+   "statKey": "notable_relentless_tempo_118",
+   "effects": [
+    "melee_charge_speed_pct:20"
+   ],
    "tier": "notable"
   },
   {
@@ -1829,12 +1830,10 @@ export const TALENT_TREE_DATA = {
    "id": 167,
    "x": 2784,
    "y": -573,
-   "nameEn": "Grid Awareness",
-   "nameDe": "Gitterbewusstsein",
-   "descEn": "Grids are now categorized based on their sizes:\nSmall: Less than 100 cells.\nMedium: 100 to 199 cells.\nLarge: 200 to 399 cells.\nMassive: 400 or more cells.\n\nIn large and massive grids one random incorrect cell is now a Lucky Tile (massive grids may contain a second Lucky Tile). Correctly marking it as incorrect grants a random item. +6% Evasion.",
-   "descDe": "Gitter werden jetzt auf Basis ihrer Größe kategorisiert:\nKlein: Weniger als 100 Zellen.\nMittel: 100 bis 199 Zellen.\nGroß: 200 bis 399 Zellen.\nMassiv: 400 oder mehr Zellen\n\nIn großen und massiven Gittern ist eine zufällige falsche Zelle ein Glücksfeld (massive Gitter können ein zweites Glücksfeld enthalten). Wer es korrekt als falsch markiert, erhält einen zufälligen Gegenstand. +6% Ausweichen.",
-   "icon": "🎯",
-   "statKey": "grid_awareness",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claws_167",
    "tier": "notable"
   },
   {
@@ -2204,12 +2203,10 @@ export const TALENT_TREE_DATA = {
    "id": 309,
    "x": 2799,
    "y": 198,
-   "nameEn": "Meta Analysis",
-   "nameDe": "Metaanalyse",
-   "descEn": "Increases the success chance of all start-of-level reveal and mark effects by 10%. +6% Evasion.",
-   "descDe": "Erhöht die Erfolgswahrscheinlichkeit aller Aufdeckungs- und Markierungseffekte zu Beginn jedes Levels um 10%. +6% Ausweichen.",
-   "icon": "🔍",
-   "statKey": "meta_analysis",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_pierce_309",
    "tier": "notable"
   },
   {
@@ -2967,12 +2964,14 @@ export const TALENT_TREE_DATA = {
    "id": 241,
    "x": 2292,
    "y": -549,
-   "nameEn": "Weak Signal Exploit",
-   "nameDe": "Schwaches Signal",
-   "descEn": "Low Information Zone marks 1 additional incorrect empty cell in the row or column with the fewest filled cells. Stacks with Sparse Region. +6% Evasion.",
-   "descDe": "Informationsarme Zone markiert 1 zusätzliche falsche leere Zelle in der Zeile oder Spalte mit den wenigsten gefüllten Zellen. Wirkt zusammen mit Dünnbesiedelte Region. +6% Ausweichen.",
-   "icon": "🏜️",
-   "statKey": "sparse_region_2",
+   "nameEn": "Blood Drinker",
+   "nameDe": "Blutsäufer",
+   "icon": "",
+   "statKey": "notable_blood_drinker_241",
+   "effects": [
+    "health_inc_pct:10",
+    "life_on_kill_flat:3"
+   ],
    "tier": "notable"
   },
   {
@@ -3232,12 +3231,14 @@ export const TALENT_TREE_DATA = {
    "id": 393,
    "x": 2733,
    "y": -193,
-   "nameEn": "Thesis Defense",
-   "nameDe": "Disputation",
-   "descEn": "At the start of each level, one cell is revealed and one incorrect empty cell is automatically marked. +6% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird eine Zelle aufgedeckt und eine falsche leere Zelle automatisch markiert. +6% Ausweichen.",
-   "icon": "📑",
-   "statKey": "thesis_defense",
+   "nameEn": "Fatal Toxins",
+   "nameDe": "Tödliche Toxine",
+   "icon": "",
+   "statKey": "notable_fatal_toxins_393",
+   "effects": [
+    "poison_dot_multi:10",
+    "shadow_resist_flat:10"
+   ],
    "tier": "notable"
   },
   {
@@ -3283,12 +3284,10 @@ export const TALENT_TREE_DATA = {
    "id": 196,
    "x": 2330,
    "y": -100,
-   "nameEn": "Temporal Suspension",
-   "nameDe": "Zeitliche Aussetzung",
-   "descEn": "Increases the freeze duration by 0.5 seconds. +6% Evasion.",
-   "descDe": "Erhöt die Einfrier - Zeit um 0.5 Sekunden. +6% Ausweichen.",
-   "icon": "⏸️",
-   "statKey": "timed_stasis_2",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_flask_196",
    "tier": "notable"
   },
   {
@@ -3307,12 +3306,15 @@ export const TALENT_TREE_DATA = {
    "id": 29,
    "x": 2234,
    "y": -1172,
-   "nameEn": "Total Coverage",
-   "nameDe": "Maximale Abdeckung",
-   "descEn": "Scout's Primer have a 5% chance of revealing four additional rows. This rolls independently from other row bonuses. +6% Evasion.",
-   "descDe": "Pfadfinder Kompasse haben eine 5% Chance vier weitere Zeilen aufzudecken. Dies wird unabhängig von anderen Zeilenboni gewürfelt. +6% Ausweichen.",
-   "icon": "🌐",
-   "statKey": "total_coverage",
+   "nameEn": "Soul Thief",
+   "nameDe": "Seelendieb",
+   "icon": "",
+   "statKey": "notable_soul_thief_29",
+   "effects": [
+    "evasion_inc_pct:15",
+    "absorption_inc_pct:10",
+    "absorption_on_kill_flat:3"
+   ],
    "tier": "notable"
   },
   {
@@ -3368,12 +3370,10 @@ export const TALENT_TREE_DATA = {
    "id": 2,
    "x": 2727,
    "y": -357,
-   "nameEn": "Tutor",
-   "nameDe": "Tutor",
-   "descEn": "Tutor Items can now be used during an Excercise or Multiple Choice question. The Tutor has a 10% chance of automatically answering the question for you. Requires a Tutor item to be in the inventory and consumes the item on use. +6% Evasion.",
-   "descDe": "Tutor Gegenstände können nun während Übungsaufgaben und Multiple - Choice Fragen verwendet werden. Der Tutor beantwortet die Frage mit 10% Wahrscheinlichkeit automatisch korrekt. Benötigt einen Tutor Gegenstand im Inventar und entfernt den Gegenstand danach aus dem Inventar. +6% Ausweichen.",
-   "icon": "🎓",
-   "statKey": "tutor_enable",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_marks_2",
    "tier": "notable"
   },
   {
@@ -3607,12 +3607,13 @@ export const TALENT_TREE_DATA = {
    "id": 175,
    "x": 622,
    "y": 1115,
-   "nameEn": "Temporal Extension",
-   "nameDe": "Zeitverlängerung",
-   "descEn": "Gain 2 additional minutes at the start of each level. Stacks with other time extension bonuses.",
-   "descDe": "Erhalte zu Beginn jedes Levels 2 zusätzliche Minuten. Summiert sich mit anderen Zeitverlängerungsboni.",
-   "icon": "⏰",
-   "statKey": "travel_extended_session_2",
+   "nameEn": "Agility",
+   "nameDe": "Beweglichkeit",
+   "icon": "",
+   "statKey": "travel_agility_175",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -3653,12 +3654,13 @@ export const TALENT_TREE_DATA = {
    "id": 362,
    "x": 1120,
    "y": 1074,
-   "nameEn": "Midnight Oil",
-   "nameDe": "Mitternachtsöl",
-   "descEn": "Grants 20 additional seconds at the start of each level. Stacks with other time extension bonuses.",
-   "descDe": "Gewährt zu Beginn jedes Levels 20 zusätzliche Sekunden. Summiert sich mit anderen Zeitverlängerungsboni.",
-   "icon": "🕯️",
-   "statKey": "travel_midnight_oil",
+   "nameEn": "Agility",
+   "nameDe": "Beweglichkeit",
+   "icon": "",
+   "statKey": "travel_agility_362",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -3817,12 +3819,13 @@ export const TALENT_TREE_DATA = {
    "id": 109,
    "x": 782,
    "y": 1254,
-   "nameEn": "Insightful Trace",
-   "nameDe": "Einsichtsvolle Spur",
-   "descEn": "Mark-wrong items mark 1 additional cell. Stacks with Clarity Mark.",
-   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle. Wirkt zusammen mit Klarheitsmarke.",
-   "icon": "✏️",
-   "statKey": "travel_stronger_marks_1",
+   "nameEn": "Hunter's Edge",
+   "nameDe": "Schneide des Jägers",
+   "icon": "",
+   "statKey": "travel_hunters_edge_109",
+   "effects": [
+    "projectile_damage_inc:12"
+   ],
    "tier": "travel"
   },
   {
@@ -5360,12 +5363,14 @@ export const TALENT_TREE_DATA = {
    "id": 20023,
    "x": 1755,
    "y": -831,
-   "nameEn": "Perfect Focus",
-   "nameDe": "Perfekter Fokus",
-   "descEn": "+25% Absorption regeneration rate, but it pauses while you attack.",
-   "descDe": "+25% Absorptionsregeneration, die pausiert, während du angreifst.",
-   "icon": "◆",
-   "statKey": "notable_perfect_focus",
+   "nameEn": "Elemental Focus",
+   "nameDe": "Elementarfokus",
+   "icon": "",
+   "statKey": "notable_elemental_focus_20023",
+   "effects": [
+    "elemental_damage_inc_pct:20",
+    "chill_effect_inc_pct:20"
+   ],
    "tier": "notable"
   },
   {
@@ -12884,72 +12889,83 @@ export const TALENT_TREE_DATA = {
    "id": 20114,
    "x": 2015,
    "y": -526,
-   "nameEn": "Wind Dancer",
-   "nameDe": "Windtänzer",
-   "descEn": "+8% chance to evade attacks while moving.",
-   "descDe": "+8% Chance, Angriffe auszuweichen, während du dich bewegst.",
-   "icon": "◆",
-   "statKey": "notable_wind_dancer",
+   "nameEn": "Fangs of the Viper",
+   "nameDe": "Vipernzähne",
+   "icon": "",
+   "statKey": "notable_fangs_of_the_viper_20114",
+   "effects": [
+    "shadow_damage_inc_pct:20",
+    "movement_speed_pct:5",
+    "agi_flat:10",
+    "phys_damage_inc:20"
+   ],
    "tier": "notable"
   },
   {
    "id": 20115,
    "x": 1992,
    "y": -729,
-   "nameEn": "Ranger's Endurance",
-   "nameDe": "Ausdauer der Jägerin",
-   "descEn": "+15 maximum Health, +3% chance to evade attacks.",
-   "descDe": "+15 max. Leben, +3% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "notable_ranger_s_endurance",
+   "nameEn": "Resourcefulness",
+   "nameDe": "Findigkeit",
+   "icon": "",
+   "statKey": "notable_resourcefulness_20115",
+   "effects": [
+    "parry_spell_chance:8",
+    "absorption_inc_pct:10",
+    "health_inc_pct:5"
+   ],
    "tier": "notable"
   },
   {
    "id": 20116,
    "x": 2272,
    "y": -619,
-   "nameEn": "Ranger's Endurance",
-   "nameDe": "Ausdauer der Jägerin",
-   "descEn": "+15 maximum Health, +3% chance to evade attacks.",
-   "descDe": "+15 max. Leben, +3% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "notable_ranger_s_endurance",
+   "nameEn": "Frenetic",
+   "nameDe": "Fieberhaft",
+   "icon": "",
+   "statKey": "notable_frenetic_20116",
+   "effects": [
+    "frenzy_max:1"
+   ],
    "tier": "notable"
   },
   {
    "id": 20117,
    "x": 2381,
    "y": -586,
-   "nameEn": "Ranger's Endurance",
-   "nameDe": "Ausdauer der Jägerin",
-   "descEn": "+15 maximum Health, +3% chance to evade attacks.",
-   "descDe": "+15 max. Leben, +3% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "notable_ranger_s_endurance",
+   "nameEn": "Depth Perception",
+   "nameDe": "Tiefenwahrnehmung",
+   "icon": "",
+   "statKey": "notable_depth_perception_20117",
+   "effects": [
+    "accuracy_flat:100",
+    "accuracy_rating_pct:20",
+    "crit_chance_flat:3"
+   ],
    "tier": "notable"
   },
   {
    "id": 20118,
    "x": 2674,
    "y": -683,
-   "nameEn": "Vital Strike",
-   "nameDe": "Vitaler Treffer",
-   "descEn": "+12% Critical strike multiplier.",
-   "descDe": "+12% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "notable_vital_strike",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claws_20118",
    "tier": "notable"
   },
   {
    "id": 20119,
    "x": 2784,
    "y": -883,
-   "nameEn": "Vital Strike",
-   "nameDe": "Vitaler Treffer",
-   "descEn": "+12% Critical strike multiplier.",
-   "descDe": "+12% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "notable_vital_strike",
+   "nameEn": "Flaying",
+   "nameDe": "Häuten",
+   "icon": "",
+   "statKey": "notable_flaying_20119",
+   "effects": [
+    "dagger_damage_inc:24",
+    "dagger_charge_speed:12"
+   ],
    "tier": "notable"
   },
   {
@@ -12999,12 +13015,10 @@ export const TALENT_TREE_DATA = {
    "id": 20123,
    "x": 2332,
    "y": 108,
-   "nameEn": "Arcane Battery",
-   "nameDe": "Arkane Batterie",
-   "descEn": "+10 maximum Mana. Absorption regenerates 15% faster.",
-   "descDe": "+10 max. Mana. Absorption regeneriert 15% schneller.",
-   "icon": "◆",
-   "statKey": "notable_arcane_battery",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_20123",
    "tier": "notable"
   },
   {
@@ -13126,12 +13140,10 @@ export const TALENT_TREE_DATA = {
    "id": 20133,
    "x": 2799,
    "y": 418,
-   "nameEn": "Nature's Grace",
-   "nameDe": "Gnade der Natur",
-   "descEn": "+8% chance to evade attacks, +8% Movement speed.",
-   "descDe": "+8% Chance, Angriffen auszuweichen, +8% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_nature_s_grace",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_chain_20133",
    "tier": "notable"
   },
   {
@@ -13270,12 +13282,14 @@ export const TALENT_TREE_DATA = {
    "id": 20145,
    "x": 716,
    "y": 1619,
-   "nameEn": "Phantom Approach",
-   "nameDe": "Phantommarsch",
-   "descEn": "+8% Movement speed.",
-   "descDe": "+8% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "notable_phantom_approach",
+   "nameEn": "Burning Brutality",
+   "nameDe": "Brennende Brutalität",
+   "icon": "",
+   "statKey": "notable_burning_brutality_20145",
+   "effects": [
+    "ignite_damage_more:12",
+    "melee_charge_speed_pct:6"
+   ],
    "tier": "notable"
   },
   {
@@ -13378,12 +13392,15 @@ export const TALENT_TREE_DATA = {
    "id": 20154,
    "x": 822,
    "y": 1156,
-   "nameEn": "Quick Recovery",
-   "nameDe": "Schnelle Erholung",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "notable_quick_recovery",
+   "nameEn": "Avatar of the Hunt",
+   "nameDe": "Avatar der Jagd",
+   "icon": "",
+   "statKey": "notable_avatar_of_the_hunt_20154",
+   "effects": [
+    "projectile_damage_inc:30",
+    "evasion_flat:200",
+    "movement_speed_pct:6"
+   ],
    "tier": "notable"
   },
   {
@@ -13402,12 +13419,14 @@ export const TALENT_TREE_DATA = {
    "id": 20156,
    "x": 1198,
    "y": 1394,
-   "nameEn": "Double Draw",
-   "nameDe": "Doppelter Zug",
-   "descEn": "+10% chance for projectiles to deal double damage.",
-   "descDe": "+10% Chance, dass Projektile doppelten Schaden verursachen.",
-   "icon": "◆",
-   "statKey": "notable_double_draw",
+   "nameEn": "Crystal Skin",
+   "nameDe": "Kristallhaut",
+   "icon": "",
+   "statKey": "notable_crystal_skin_20156",
+   "effects": [
+    "all_elemental_res_max:1",
+    "avoid_elemental_ailment_pct:20"
+   ],
    "tier": "notable"
   },
   {
@@ -13426,12 +13445,13 @@ export const TALENT_TREE_DATA = {
    "id": 20158,
    "x": 1361,
    "y": 1373,
-   "nameEn": "Double Draw",
-   "nameDe": "Doppelter Zug",
-   "descEn": "+10% chance for projectiles to deal double damage.",
-   "descDe": "+10% Chance, dass Projektile doppelten Schaden verursachen.",
-   "icon": "◆",
-   "statKey": "notable_double_draw",
+   "nameEn": "Druidic Rite",
+   "nameDe": "Druidenritus",
+   "icon": "",
+   "statKey": "notable_druidic_rite_20158",
+   "effects": [
+    "mana_inc_pct:20"
+   ],
    "tier": "notable"
   },
   {
@@ -13585,12 +13605,10 @@ export const TALENT_TREE_DATA = {
    "id": 20171,
    "x": 564,
    "y": 713,
-   "nameEn": "Fleet Footed",
-   "nameDe": "Leichtfüßig",
-   "descEn": "+6% Movement speed, +4% chance to evade attacks.",
-   "descDe": "+6% Bewegungsgeschwindigkeit, +4% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "notable_fleet_footed",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_flask_20171",
    "tier": "notable"
   },
   {
@@ -13609,12 +13627,14 @@ export const TALENT_TREE_DATA = {
    "id": 30611,
    "x": 975,
    "y": 641,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Hardy Footing",
+   "nameDe": "Fester Stand",
+   "icon": "",
+   "statKey": "travel_hardy_footing_30611",
+   "effects": [
+    "evasion_flat:20",
+    "life_flat:14"
+   ],
    "tier": "travel"
   },
   {
@@ -13647,10 +13667,11 @@ export const TALENT_TREE_DATA = {
    "y": 748,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30614",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -13729,36 +13750,41 @@ export const TALENT_TREE_DATA = {
    "id": 30621,
    "x": 782,
    "y": 1156,
-   "nameEn": "Lesser Quick Recovery",
-   "nameDe": "Schnelle Erholung (klein)",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_quick_recovery",
+   "nameEn": "Hunter's Guard",
+   "nameDe": "Wache des Jägers",
+   "icon": "",
+   "statKey": "small_hunters_guard_30621",
+   "effects": [
+    "projectile_damage_inc:12",
+    "evasion_inc_pct:15"
+   ],
    "tier": "small"
   },
   {
    "id": 30622,
    "x": 749,
    "y": 1205,
-   "nameEn": "Lesser Quick Recovery",
-   "nameDe": "Schnelle Erholung (klein)",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_quick_recovery",
+   "nameEn": "Hunter's Guard",
+   "nameDe": "Wache des Jägers",
+   "icon": "",
+   "statKey": "small_hunters_guard_30622",
+   "effects": [
+    "projectile_damage_inc:12",
+    "evasion_inc_pct:15"
+   ],
    "tier": "small"
   },
   {
    "id": 30623,
    "x": 671,
    "y": 1188,
-   "nameEn": "Lesser Fleet Footed",
-   "nameDe": "Leichtfüßig (klein)",
-   "descEn": "+3% Movement speed, +2% chance to evade attacks.",
-   "descDe": "+3% Bewegungsgeschwindigkeit, +2% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "small_lesser_fleet_footed",
+   "nameEn": "Agility",
+   "nameDe": "Beweglichkeit",
+   "icon": "",
+   "statKey": "small_agility_30623",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "small"
   },
   {
@@ -14005,84 +14031,99 @@ export const TALENT_TREE_DATA = {
    "id": 30644,
    "x": 569,
    "y": 1410,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Intelligence",
+   "nameDe": "Intelligenz",
+   "icon": "",
+   "statKey": "travel_intelligence_30644",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30645,
    "x": 669,
    "y": 1424,
-   "nameEn": "Lesser Pinning Shot",
-   "nameDe": "Fesselnder Schuss (klein)",
-   "descEn": "Projectiles slow monsters by 8% for 1 seconds.",
-   "descDe": "Projektile verlangsamen Monster um 8% für 1 Sekunden.",
-   "icon": "◆",
-   "statKey": "small_lesser_pinning_shot",
+   "nameEn": "Rending Strikes",
+   "nameDe": "Reißende Schläge",
+   "icon": "",
+   "statKey": "small_rending_strikes_30645",
+   "effects": [
+    "damage_inc_pct:12",
+    "life_leech_effect_inc:20",
+    "dot_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30646,
    "x": 709,
    "y": 1424,
-   "nameEn": "Lesser Pinning Shot",
-   "nameDe": "Fesselnder Schuss (klein)",
-   "descEn": "Projectiles slow monsters by 8% for 1 seconds.",
-   "descDe": "Projektile verlangsamen Monster um 8% für 1 Sekunden.",
-   "icon": "◆",
-   "statKey": "small_lesser_pinning_shot",
+   "nameEn": "Rending Strikes",
+   "nameDe": "Reißende Schläge",
+   "icon": "",
+   "statKey": "small_rending_strikes_30646",
+   "effects": [
+    "damage_inc_pct:12",
+    "life_leech_attack:0.4",
+    "dot_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30647,
    "x": 742,
    "y": 1473,
-   "nameEn": "Lesser Pinning Shot",
-   "nameDe": "Fesselnder Schuss (klein)",
-   "descEn": "Projectiles slow monsters by 8% for 1 seconds.",
-   "descDe": "Projektile verlangsamen Monster um 8% für 1 Sekunden.",
-   "icon": "◆",
-   "statKey": "small_lesser_pinning_shot",
+   "nameEn": "Rending Strikes",
+   "nameDe": "Reißende Schläge",
+   "icon": "",
+   "statKey": "small_rending_strikes_30647",
+   "effects": [
+    "damage_inc_pct:12",
+    "melee_charge_speed_pct:3",
+    "dot_inc_pct:12"
+   ],
    "tier": "small"
   },
   {
    "id": 30648,
    "x": 749,
    "y": 1570,
-   "nameEn": "Lesser Phantom Approach",
-   "nameDe": "Phantommarsch (klein)",
-   "descEn": "+4% Movement speed.",
-   "descDe": "+4% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_phantom_approach",
+   "nameEn": "Kindling Strikes",
+   "nameDe": "Zündelnde Schläge",
+   "icon": "",
+   "statKey": "small_kindling_strikes_30648",
+   "effects": [
+    "melee_charge_speed_pct:3",
+    "ignite_chance_pct:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30649,
    "x": 789,
    "y": 1570,
-   "nameEn": "Lesser Phantom Approach",
-   "nameDe": "Phantommarsch (klein)",
-   "descEn": "+4% Movement speed.",
-   "descDe": "+4% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_phantom_approach",
+   "nameEn": "Kindling Strikes",
+   "nameDe": "Zündelnde Schläge",
+   "icon": "",
+   "statKey": "small_kindling_strikes_30649",
+   "effects": [
+    "melee_charge_speed_pct:3",
+    "ignite_chance_pct:10"
+   ],
    "tier": "small"
   },
   {
    "id": 30650,
    "x": 822,
    "y": 1619,
-   "nameEn": "Lesser Phantom Approach",
-   "nameDe": "Phantommarsch (klein)",
-   "descEn": "+4% Movement speed.",
-   "descDe": "+4% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_phantom_approach",
+   "nameEn": "Kindling Strikes",
+   "nameDe": "Zündelnde Schläge",
+   "icon": "",
+   "statKey": "small_kindling_strikes_30650",
+   "effects": [
+    "ignite_chance_pct:15"
+   ],
    "tier": "small"
   },
   {
@@ -15414,180 +15455,177 @@ export const TALENT_TREE_DATA = {
    "id": 30761,
    "x": 1497,
    "y": 1220,
-   "nameEn": "Lesser Eagle Eye",
-   "nameDe": "Adlerauge (klein)",
-   "descEn": "+8% Projectile damage, +3% Critical strike chance.",
-   "descDe": "+8% Projektilschaden, +3% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "small_lesser_eagle_eye",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_flask_30761",
    "tier": "small"
   },
   {
    "id": 30762,
    "x": 1410,
    "y": 1300,
-   "nameEn": "Lesser Double Draw",
-   "nameDe": "Doppelter Zug (klein)",
-   "descEn": "+5% chance for projectiles to deal double damage.",
-   "descDe": "+5% Chance, dass Projektile doppelten Schaden verursachen.",
-   "icon": "◆",
-   "statKey": "small_lesser_double_draw",
+   "nameEn": "Deep Well",
+   "nameDe": "Tiefer Brunnen",
+   "icon": "",
+   "statKey": "small_deep_well_30762",
+   "effects": [
+    "mana_inc_pct:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30763,
    "x": 1459,
    "y": 1373,
-   "nameEn": "Lesser Double Draw",
-   "nameDe": "Doppelter Zug (klein)",
-   "descEn": "+5% chance for projectiles to deal double damage.",
-   "descDe": "+5% Chance, dass Projektile doppelten Schaden verursachen.",
-   "icon": "◆",
-   "statKey": "small_lesser_double_draw",
+   "nameEn": "Deep Well",
+   "nameDe": "Tiefer Brunnen",
+   "icon": "",
+   "statKey": "small_deep_well_30763",
+   "effects": [
+    "mana_inc_pct:8"
+   ],
    "tier": "small"
   },
   {
    "id": 30764,
    "x": 1247,
    "y": 1304,
-   "nameEn": "Lesser Double Draw",
-   "nameDe": "Doppelter Zug (klein)",
-   "descEn": "+5% chance for projectiles to deal double damage.",
-   "descDe": "+5% Chance, dass Projektile doppelten Schaden verursachen.",
-   "icon": "◆",
-   "statKey": "small_lesser_double_draw",
+   "nameEn": "Thaw",
+   "nameDe": "Auftauen",
+   "icon": "",
+   "statKey": "small_thaw_30764",
+   "effects": [
+    "avoid_chill_pct:20"
+   ],
    "tier": "small"
   },
   {
    "id": 30765,
    "x": 1198,
    "y": 1231,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Elemental Ward",
+   "nameDe": "Elementarschutz",
+   "icon": "",
+   "statKey": "travel_elemental_ward_30765",
+   "effects": [
+    "avoid_elemental_ailment_pct:10"
+   ],
    "tier": "travel"
   },
   {
    "id": 30766,
    "x": 1240,
    "y": 1182,
-   "nameEn": "Lesser Double Draw",
-   "nameDe": "Doppelter Zug (klein)",
-   "descEn": "+5% chance for projectiles to deal double damage.",
-   "descDe": "+5% Chance, dass Projektile doppelten Schaden verursachen.",
-   "icon": "◆",
-   "statKey": "small_lesser_double_draw",
+   "nameEn": "Grounding",
+   "nameDe": "Erdung",
+   "icon": "",
+   "statKey": "small_grounding_30766",
+   "effects": [
+    "avoid_shock_pct:20"
+   ],
    "tier": "small"
   },
   {
    "id": 30767,
    "x": 1149,
    "y": 1304,
-   "nameEn": "Lesser Double Draw",
-   "nameDe": "Doppelter Zug (klein)",
-   "descEn": "+5% chance for projectiles to deal double damage.",
-   "descDe": "+5% Chance, dass Projektile doppelten Schaden verursachen.",
-   "icon": "◆",
-   "statKey": "small_lesser_double_draw",
+   "nameEn": "Cooling Mind",
+   "nameDe": "Kühler Kopf",
+   "icon": "",
+   "statKey": "small_cooling_mind_30767",
+   "effects": [
+    "avoid_ignite_pct:20"
+   ],
    "tier": "small"
   },
   {
    "id": 30768,
    "x": 1087,
    "y": 1318,
-   "nameEn": "Lesser Bonus Acquisition",
-   "nameDe": "Vermehrte Gewinne (klein)",
-   "descEn": "5% chance to receive an additional Item when answering a Multiple Choice question correctly. +3% Evasion.",
-   "descDe": "5% Chance einen zusätzlichen Gegenstand für die korrekte Beantwortung von Multiple Choice Fragen zu erhalten. +3% Ausweichen.",
-   "icon": "🎁",
-   "statKey": "small_lesser_bonus_acquisition",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_30768",
    "tier": "small"
   },
   {
    "id": 30769,
    "x": 1087,
    "y": 1358,
-   "nameEn": "Lesser Bonus Acquisition",
-   "nameDe": "Vermehrte Gewinne (klein)",
-   "descEn": "5% chance to receive an additional Item when answering a Multiple Choice question correctly. +3% Evasion.",
-   "descDe": "5% Chance einen zusätzlichen Gegenstand für die korrekte Beantwortung von Multiple Choice Fragen zu erhalten. +3% Ausweichen.",
-   "icon": "🎁",
-   "statKey": "small_lesser_bonus_acquisition",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_30769",
    "tier": "small"
   },
   {
    "id": 30770,
    "x": 1038,
    "y": 1285,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_flask_tincture_30770",
    "tier": "travel"
   },
   {
    "id": 30771,
    "x": 989,
    "y": 1318,
-   "nameEn": "Lesser Bonus Acquisition",
-   "nameDe": "Vermehrte Gewinne (klein)",
-   "descEn": "5% chance to receive an additional Item when answering a Multiple Choice question correctly. +3% Evasion.",
-   "descDe": "5% Chance einen zusätzlichen Gegenstand für die korrekte Beantwortung von Multiple Choice Fragen zu erhalten. +3% Ausweichen.",
-   "icon": "🎁",
-   "statKey": "small_lesser_bonus_acquisition",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_flask_30771",
    "tier": "small"
   },
   {
    "id": 30772,
    "x": 989,
    "y": 1358,
-   "nameEn": "Lesser Bonus Acquisition",
-   "nameDe": "Vermehrte Gewinne (klein)",
-   "descEn": "5% chance to receive an additional Item when answering a Multiple Choice question correctly. +3% Evasion.",
-   "descDe": "5% Chance einen zusätzlichen Gegenstand für die korrekte Beantwortung von Multiple Choice Fragen zu erhalten. +3% Ausweichen.",
-   "icon": "🎁",
-   "statKey": "small_lesser_bonus_acquisition",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_flask_30772",
    "tier": "small"
   },
   {
    "id": 30773,
    "x": 1085,
    "y": 1204,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Strength",
+   "nameDe": "Stärke",
+   "icon": "",
+   "statKey": "travel_strength_30773",
+   "effects": [
+    "str_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30774,
    "x": 855,
    "y": 1205,
-   "nameEn": "Lesser Quick Recovery",
-   "nameDe": "Schnelle Erholung (klein)",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_quick_recovery",
+   "nameEn": "Swift Volley",
+   "nameDe": "Flinke Salve",
+   "icon": "",
+   "statKey": "small_swift_volley_30774",
+   "effects": [
+    "projectile_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30775,
    "x": 822,
    "y": 1254,
-   "nameEn": "Lesser Quick Recovery",
-   "nameDe": "Schnelle Erholung (klein)",
-   "descEn": "Regenerate 1% of maximum Health per second.",
-   "descDe": "Regeneriere 1% deines max. Lebens pro Sekunde.",
-   "icon": "◆",
-   "statKey": "small_lesser_quick_recovery",
+   "nameEn": "Swift Volley",
+   "nameDe": "Flinke Salve",
+   "icon": "",
+   "statKey": "small_swift_volley_30775",
+   "effects": [
+    "projectile_speed:4"
+   ],
    "tier": "small"
   },
   {
@@ -15596,10 +15634,11 @@ export const TALENT_TREE_DATA = {
    "y": 1339,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30776",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -17559,12 +17598,14 @@ export const TALENT_TREE_DATA = {
    "id": 30928,
    "x": 2053,
    "y": -616,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Spoils of War",
+   "nameDe": "Kriegsbeute",
+   "icon": "",
+   "statKey": "travel_spoils_of_war_30928",
+   "effects": [
+    "life_on_kill_flat:3",
+    "absorption_on_kill_flat:3"
+   ],
    "tier": "travel"
   },
   {
@@ -17573,118 +17614,119 @@ export const TALENT_TREE_DATA = {
    "y": -526,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30929",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30930,
    "x": 2223,
    "y": -520,
-   "nameEn": "Lesser Weak Signal Exploit",
-   "nameDe": "Schwaches Signal (klein)",
-   "descEn": "Low Information Zone marks 1 additional incorrect empty cell in the row or column with the fewest filled cells. Stacks with Sparse Region. +3% Evasion.",
-   "descDe": "Informationsarme Zone markiert 1 zusätzliche falsche leere Zelle in der Zeile oder Spalte mit den wenigsten gefüllten Zellen. Wirkt zusammen mit Dünnbesiedelte Region. +3% Ausweichen.",
-   "icon": "🏜️",
-   "statKey": "small_lesser_weak_signal_exploit",
+   "nameEn": "Vitality",
+   "nameDe": "Vitalität",
+   "icon": "",
+   "statKey": "small_vitality_30930",
+   "effects": [
+    "health_inc_pct:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30931,
    "x": 2321,
    "y": -480,
-   "nameEn": "Lesser Weak Signal Exploit",
-   "nameDe": "Schwaches Signal (klein)",
-   "descEn": "Low Information Zone marks 1 additional incorrect empty cell in the row or column with the fewest filled cells. Stacks with Sparse Region. +3% Evasion.",
-   "descDe": "Informationsarme Zone markiert 1 zusätzliche falsche leere Zelle in der Zeile oder Spalte mit den wenigsten gefüllten Zellen. Wirkt zusammen mit Dünnbesiedelte Region. +3% Ausweichen.",
-   "icon": "🏜️",
-   "statKey": "small_lesser_weak_signal_exploit",
+   "nameEn": "Vitality",
+   "nameDe": "Vitalität",
+   "icon": "",
+   "statKey": "small_vitality_30931",
+   "effects": [
+    "health_inc_pct:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30932,
    "x": 2381,
    "y": -546,
-   "nameEn": "Lesser Ranger's Endurance",
-   "nameDe": "Ausdauer der Jägerin (klein)",
-   "descEn": "+8 maximum Health, +2% chance to evade attacks.",
-   "descDe": "+8 max. Leben, +2% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "small_lesser_ranger_s_endurance",
+   "nameEn": "Keen Eye",
+   "nameDe": "Scharfes Auge",
+   "icon": "",
+   "statKey": "small_keen_eye_30932",
+   "effects": [
+    "accuracy_rating_pct:10",
+    "crit_chance_flat:2"
+   ],
    "tier": "small"
   },
   {
    "id": 30933,
    "x": 2430,
    "y": -513,
-   "nameEn": "Lesser Ranger's Endurance",
-   "nameDe": "Ausdauer der Jägerin (klein)",
-   "descEn": "+8 maximum Health, +2% chance to evade attacks.",
-   "descDe": "+8 max. Leben, +2% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "small_lesser_ranger_s_endurance",
+   "nameEn": "Keen Eye",
+   "nameDe": "Scharfes Auge",
+   "icon": "",
+   "statKey": "small_keen_eye_30933",
+   "effects": [
+    "accuracy_rating_pct:10",
+    "crit_chance_flat:2"
+   ],
    "tier": "small"
   },
   {
    "id": 30934,
    "x": 2572,
    "y": -531,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claws_30934",
    "tier": "travel"
   },
   {
    "id": 30935,
    "x": 2564,
    "y": -573,
-   "nameEn": "Featherstep",
-   "nameDe": "Federleicht",
-   "descEn": "+4% Movement speed, +1% chance to evade attacks.",
-   "descDe": "+4% Bewegungsgeschwindigkeit, +1% Chance, Angriffen auszuweichen.",
-   "icon": "○",
-   "statKey": "small_featherstep",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claws_30935",
    "tier": "small"
   },
   {
    "id": 30936,
    "x": 2572,
    "y": -615,
-   "nameEn": "Lesser Vital Strike",
-   "nameDe": "Vitaler Treffer (klein)",
-   "descEn": "+6% Critical strike multiplier.",
-   "descDe": "+6% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "small_lesser_vital_strike",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claws_30936",
    "tier": "small"
   },
   {
    "id": 30937,
    "x": 2632,
    "y": -675,
-   "nameEn": "Lesser Vital Strike",
-   "nameDe": "Vitaler Treffer (klein)",
-   "descEn": "+6% Critical strike multiplier.",
-   "descDe": "+6% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "small_lesser_vital_strike",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claws_30937",
    "tier": "small"
   },
   {
    "id": 30938,
    "x": 2632,
    "y": -781,
-   "nameEn": "Lesser Pattern Analysis",
-   "nameDe": "Musteranalyse (klein)",
-   "descEn": "At the start of each level, the row and column with the most filled cells each have 1 incorrect empty cell marked. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird in der Zeile und Spalte mit den meisten gefüllten Zellen je 1 falsche leere Zelle markiert. +3% Ausweichen.",
-   "icon": "🗃️",
-   "statKey": "small_lesser_pattern_analysis",
+   "nameEn": "Dagger Precision",
+   "nameDe": "Dolchpräzision",
+   "icon": "",
+   "statKey": "small_dagger_precision_30938",
+   "effects": [
+    "crit_chance_dagger:2",
+    "crit_multi_dagger:14"
+   ],
    "tier": "small"
   },
   {
@@ -17732,36 +17774,42 @@ export const TALENT_TREE_DATA = {
    "id": 30942,
    "x": 2632,
    "y": -985,
-   "nameEn": "Early Recovery",
-   "nameDe": "Frühe Erholung",
-   "descEn": "+5% earlier Absorption regen start.",
-   "descDe": "+5% früherer Start der Absorptionsregeneration.",
-   "icon": "○",
-   "statKey": "small_early_recovery",
+   "nameEn": "Dagger Flurry",
+   "nameDe": "Dolchhagel",
+   "icon": "",
+   "statKey": "small_dagger_flurry_30942",
+   "effects": [
+    "dagger_damage_inc:8",
+    "dagger_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30943,
    "x": 2674,
    "y": -993,
-   "nameEn": "Lesser Vital Strike",
-   "nameDe": "Vitaler Treffer (klein)",
-   "descEn": "+6% Critical strike multiplier.",
-   "descDe": "+6% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "small_lesser_vital_strike",
+   "nameEn": "Dagger Flurry",
+   "nameDe": "Dolchhagel",
+   "icon": "",
+   "statKey": "small_dagger_flurry_30943",
+   "effects": [
+    "dagger_damage_inc:8",
+    "dagger_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
    "id": 30944,
    "x": 2716,
    "y": -985,
-   "nameEn": "Lesser Vital Strike",
-   "nameDe": "Vitaler Treffer (klein)",
-   "descEn": "+6% Critical strike multiplier.",
-   "descDe": "+6% kritischer Schadensmultiplikator.",
-   "icon": "◆",
-   "statKey": "small_lesser_vital_strike",
+   "nameEn": "Dagger Flurry",
+   "nameDe": "Dolchhagel",
+   "icon": "",
+   "statKey": "small_dagger_flurry_30944",
+   "effects": [
+    "dagger_damage_inc:8",
+    "dagger_charge_speed:4"
+   ],
    "tier": "small"
   },
   {
@@ -17881,12 +17929,13 @@ export const TALENT_TREE_DATA = {
    "id": 30954,
    "x": 2162,
    "y": -729,
-   "nameEn": "Lesser Ranger's Endurance",
-   "nameDe": "Ausdauer der Jägerin (klein)",
-   "descEn": "+8 maximum Health, +2% chance to evade attacks.",
-   "descDe": "+8 max. Leben, +2% Chance, Angriffen auszuweichen.",
-   "icon": "◆",
-   "statKey": "small_lesser_ranger_s_endurance",
+   "nameEn": "Agility",
+   "nameDe": "Beweglichkeit",
+   "icon": "",
+   "statKey": "small_agility_30954",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "small"
   },
   {
@@ -17895,22 +17944,25 @@ export const TALENT_TREE_DATA = {
    "y": -729,
    "nameEn": "Agility",
    "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "icon": "",
+   "statKey": "travel_agility_30955",
+   "effects": [
+    "agi_flat:5"
+   ],
    "tier": "travel"
   },
   {
    "id": 30956,
    "x": 2055,
    "y": -847,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Spoils of War",
+   "nameDe": "Kriegsbeute",
+   "icon": "",
+   "statKey": "travel_spoils_of_war_30956",
+   "effects": [
+    "life_on_kill_flat:3",
+    "absorption_on_kill_flat:3"
+   ],
    "tier": "travel"
   },
   {
@@ -17956,108 +18008,103 @@ export const TALENT_TREE_DATA = {
    "id": 30960,
    "x": 2632,
    "y": -471,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+1 to Agility.",
-   "descDe": "+1 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claws_30960",
    "tier": "small"
   },
   {
    "id": 30961,
    "x": 2674,
    "y": -463,
-   "nameEn": "Lesser Grid Awareness",
-   "nameDe": "Gitterbewusstsein (klein)",
-   "descEn": "Grids are now categorized based on their sizes:\nSmall: Less than 50 cells.\nMedium: 50 to 100 cells.\nLarge: 100 to 200 cells.\nMassive: 200 or more cells.\n\nIn large and massive grids one random incorrect cell is now a Lucky Tile (massive grids may contain a second Lucky Tile). Correctly marking it as incorrect grants a random item. +3% Evasion.",
-   "descDe": "Gitter werden jetzt auf Basis ihrer Größe kategorisiert:\nKlein: Weniger als 50 Zellen.\nMittel: 50 bis 100 Zellen.\nGroß: 100 bis 200 Zellen.\nMassiv: 200 oder mehr Zellen\n\nIn großen und massiven Gittern ist eine zufällige falsche Zelle ein Glücksfeld (massive Gitter können ein zweites Glücksfeld enthalten). Wer es korrekt als falsch markiert, erhält einen zufälligen Gegenstand. +3% Ausweichen.",
-   "icon": "🎯",
-   "statKey": "small_lesser_grid_awareness",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claws_30961",
    "tier": "small"
   },
   {
    "id": 30962,
    "x": 2716,
    "y": -471,
-   "nameEn": "Lesser Grid Awareness",
-   "nameDe": "Gitterbewusstsein (klein)",
-   "descEn": "Grids are now categorized based on their sizes:\nSmall: Less than 50 cells.\nMedium: 50 to 100 cells.\nLarge: 100 to 200 cells.\nMassive: 200 or more cells.\n\nIn large and massive grids one random incorrect cell is now a Lucky Tile (massive grids may contain a second Lucky Tile). Correctly marking it as incorrect grants a random item. +3% Evasion.",
-   "descDe": "Gitter werden jetzt auf Basis ihrer Größe kategorisiert:\nKlein: Weniger als 50 Zellen.\nMittel: 50 bis 100 Zellen.\nGroß: 100 bis 200 Zellen.\nMassiv: 200 oder mehr Zellen\n\nIn großen und massiven Gittern ist eine zufällige falsche Zelle ein Glücksfeld (massive Gitter können ein zweites Glücksfeld enthalten). Wer es korrekt als falsch markiert, erhält einen zufälligen Gegenstand. +3% Ausweichen.",
-   "icon": "🎯",
-   "statKey": "small_lesser_grid_awareness",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claws_30962",
    "tier": "small"
   },
   {
    "id": 30963,
    "x": 2621,
    "y": -357,
-   "nameEn": "Lesser Tutor",
-   "nameDe": "Tutor (klein)",
-   "descEn": "Tutor Items can now be used during an Excercise or Multiple Choice question. The Tutor has a 5% chance of automatically answering the question for you. Requires a Tutor item to be in the inventory and consumes the item on use. +3% Evasion.",
-   "descDe": "Tutor Gegenstände können nun während Übungsaufgaben und Multiple - Choice Fragen verwendet werden. Der Tutor beantwortet die Frage mit 5% Wahrscheinlichkeit automatisch korrekt. Benötigt einen Tutor Gegenstand im Inventar und entfernt den Gegenstand danach aus dem Inventar. +3% Ausweichen.",
-   "icon": "🎓",
-   "statKey": "small_lesser_tutor",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_marked_damage_30963",
    "tier": "small"
   },
   {
    "id": 30964,
    "x": 2674,
    "y": -304,
-   "nameEn": "Lesser Tutor",
-   "nameDe": "Tutor (klein)",
-   "descEn": "Tutor Items can now be used during an Excercise or Multiple Choice question. The Tutor has a 5% chance of automatically answering the question for you. Requires a Tutor item to be in the inventory and consumes the item on use. +3% Evasion.",
-   "descDe": "Tutor Gegenstände können nun während Übungsaufgaben und Multiple - Choice Fragen verwendet werden. Der Tutor beantwortet die Frage mit 5% Wahrscheinlichkeit automatisch korrekt. Benötigt einen Tutor Gegenstand im Inventar und entfernt den Gegenstand danach aus dem Inventar. +3% Ausweichen.",
-   "icon": "🎓",
-   "statKey": "small_lesser_tutor",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_marked_damage_30964",
    "tier": "small"
   },
   {
    "id": 30965,
    "x": 2680,
    "y": -246,
-   "nameEn": "Lesser Thesis Defense",
-   "nameDe": "Disputation (klein)",
-   "descEn": "At the start of each level, one cell is revealed and one incorrect empty cell is automatically marked. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird eine Zelle aufgedeckt und eine falsche leere Zelle automatisch markiert. +3% Ausweichen.",
-   "icon": "📑",
-   "statKey": "small_lesser_thesis_defense",
+   "nameEn": "Venom Depth",
+   "nameDe": "Gifttiefe",
+   "icon": "",
+   "statKey": "small_venom_depth_30965",
+   "effects": [
+    "poison_dot_multi:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30966,
    "x": 2631,
    "y": -213,
-   "nameEn": "Lesser Thesis Defense",
-   "nameDe": "Disputation (klein)",
-   "descEn": "At the start of each level, one cell is revealed and one incorrect empty cell is automatically marked. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird eine Zelle aufgedeckt und eine falsche leere Zelle automatisch markiert. +3% Ausweichen.",
-   "icon": "📑",
-   "statKey": "small_lesser_thesis_defense",
+   "nameEn": "Venom Depth",
+   "nameDe": "Gifttiefe",
+   "icon": "",
+   "statKey": "small_venom_depth_30966",
+   "effects": [
+    "poison_dot_multi:6"
+   ],
    "tier": "small"
   },
   {
    "id": 30967,
    "x": 2631,
    "y": -173,
-   "nameEn": "Lesser Thesis Defense",
-   "nameDe": "Disputation (klein)",
-   "descEn": "At the start of each level, one cell is revealed and one incorrect empty cell is automatically marked. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird eine Zelle aufgedeckt und eine falsche leere Zelle automatisch markiert. +3% Ausweichen.",
-   "icon": "📑",
-   "statKey": "small_lesser_thesis_defense",
+   "nameEn": "Venom Touch",
+   "nameDe": "Giftberührung",
+   "icon": "",
+   "statKey": "small_venom_touch_30967",
+   "effects": [
+    "poison_chance_attack:15"
+   ],
    "tier": "small"
   },
   {
    "id": 30968,
    "x": 2680,
    "y": -140,
-   "nameEn": "Lesser Thesis Defense",
-   "nameDe": "Disputation (klein)",
-   "descEn": "At the start of each level, one cell is revealed and one incorrect empty cell is automatically marked. +3% Evasion.",
-   "descDe": "Zu Beginn jedes Levels wird eine Zelle aufgedeckt und eine falsche leere Zelle automatisch markiert. +3% Ausweichen.",
-   "icon": "📑",
-   "statKey": "small_lesser_thesis_defense",
+   "nameEn": "Lingering Venom",
+   "nameDe": "Haftendes Gift",
+   "icon": "",
+   "statKey": "small_lingering_venom_30968",
+   "effects": [
+    "poison_chance_attack:10",
+    "poison_duration:5"
+   ],
    "tier": "small"
   },
   {
@@ -18103,72 +18150,74 @@ export const TALENT_TREE_DATA = {
    "id": 30972,
    "x": 2428,
    "y": -60,
-   "nameEn": "Lesser Temporal Suspension",
-   "nameDe": "Zeitliche Aussetzung (klein)",
-   "descEn": "Increases the freeze duration by 0.3 seconds. +3% Evasion.",
-   "descDe": "Erhöt die Einfrier - Zeit um 0.3 Sekunden. +3% Ausweichen.",
-   "icon": "⏸️",
-   "statKey": "small_lesser_temporal_suspension",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_flask_charges_30972",
    "tier": "small"
   },
   {
    "id": 30973,
    "x": 2399,
    "y": -129,
-   "nameEn": "Lesser Temporal Suspension",
-   "nameDe": "Zeitliche Aussetzung (klein)",
-   "descEn": "Increases the freeze duration by 0.3 seconds. +3% Evasion.",
-   "descDe": "Erhöt die Einfrier - Zeit um 0.3 Sekunden. +3% Ausweichen.",
-   "icon": "⏸️",
-   "statKey": "small_lesser_temporal_suspension",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_flask_charges_30973",
    "tier": "small"
   },
   {
    "id": 30974,
    "x": 2439,
    "y": -232,
-   "nameEn": "Lesser Blackout Ward",
-   "nameDe": "Verdunklungsschutz (klein)",
-   "descEn": "15% chance to be protected against row and column blackout effects from cursed items. +3% Evasion.",
-   "descDe": "15% Chance, gegen Effekte verfluchter Gegenstände geschützt zu sein, die Zeilen- oder Spaltenhinweise verstecken. +3% Ausweichen.",
-   "icon": "🌑",
-   "statKey": "small_lesser_blackout_ward",
+   "nameEn": "Swift Blade",
+   "nameDe": "Flinke Klinge",
+   "icon": "",
+   "statKey": "small_swift_blade_30974",
+   "effects": [
+    "dagger_damage_inc:10",
+    "movement_speed_pct:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30975,
    "x": 2390,
    "y": -305,
-   "nameEn": "Lesser Blackout Ward",
-   "nameDe": "Verdunklungsschutz (klein)",
-   "descEn": "15% chance to be protected against row and column blackout effects from cursed items. +3% Evasion.",
-   "descDe": "15% Chance, gegen Effekte verfluchter Gegenstände geschützt zu sein, die Zeilen- oder Spaltenhinweise verstecken. +3% Ausweichen.",
-   "icon": "🌑",
-   "statKey": "small_lesser_blackout_ward",
+   "nameEn": "Swift Blade",
+   "nameDe": "Flinke Klinge",
+   "icon": "",
+   "statKey": "small_swift_blade_30975",
+   "effects": [
+    "dagger_damage_inc:10",
+    "movement_speed_pct:3"
+   ],
    "tier": "small"
   },
   {
    "id": 30976,
    "x": 2303,
    "y": -351,
-   "nameEn": "Lesser Data Hygiene",
-   "nameDe": "Datenhygiene (klein)",
-   "descEn": "Each fully completed row grants +3 seconds. Stacks with Razor's Edge. +3% Evasion.",
-   "descDe": "Jede vollständig abgeschlossene Reihe gewährt +3 Sekunden. Wirkt zusammen mit Rasierklinge. +3% Ausweichen.",
-   "icon": "🧼",
-   "statKey": "small_lesser_data_hygiene",
+   "nameEn": "Vital Touch",
+   "nameDe": "Lebensberührung",
+   "icon": "",
+   "statKey": "small_vital_touch_30976",
+   "effects": [
+    "life_on_attack_hit:1"
+   ],
    "tier": "small"
   },
   {
    "id": 30977,
    "x": 2254,
    "y": -384,
-   "nameEn": "Lesser Data Hygiene",
-   "nameDe": "Datenhygiene (klein)",
-   "descEn": "Each fully completed row grants +3 seconds. Stacks with Razor's Edge. +3% Evasion.",
-   "descDe": "Jede vollständig abgeschlossene Reihe gewährt +3 Sekunden. Wirkt zusammen mit Rasierklinge. +3% Ausweichen.",
-   "icon": "🧼",
-   "statKey": "small_lesser_data_hygiene",
+   "nameEn": "Vital Touch",
+   "nameDe": "Lebensberührung",
+   "icon": "",
+   "statKey": "small_vital_touch_30977",
+   "effects": [
+    "life_on_attack_hit:1"
+   ],
    "tier": "small"
   },
   {
@@ -18201,36 +18250,30 @@ export const TALENT_TREE_DATA = {
    "id": 30980,
    "x": 2381,
    "y": 35,
-   "nameEn": "Lesser Arcane Battery",
-   "nameDe": "Arkane Batterie (klein)",
-   "descEn": "+5 maximum Mana. Absorption regenerates 8% faster.",
-   "descDe": "+5 max. Mana. Absorption regeneriert 8% schneller.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_battery",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_30980",
    "tier": "small"
   },
   {
    "id": 30981,
    "x": 2430,
    "y": 68,
-   "nameEn": "Lesser Arcane Battery",
-   "nameDe": "Arkane Batterie (klein)",
-   "descEn": "+5 maximum Mana. Absorption regenerates 8% faster.",
-   "descDe": "+5 max. Mana. Absorption regeneriert 8% schneller.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_battery",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_30981",
    "tier": "small"
   },
   {
    "id": 30982,
    "x": 2401,
    "y": 137,
-   "nameEn": "Lesser Arcane Battery",
-   "nameDe": "Arkane Batterie (klein)",
-   "descEn": "+5 maximum Mana. Absorption regenerates 8% faster.",
-   "descDe": "+5 max. Mana. Absorption regeneriert 8% schneller.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_battery",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_30982",
    "tier": "small"
   },
   {
@@ -18302,12 +18345,13 @@ export const TALENT_TREE_DATA = {
    "id": 30988,
    "x": 2468,
    "y": 258,
-   "nameEn": "Lesser Time Weavers",
-   "nameDe": "Zeitweber (klein)",
-   "descEn": "Timer items grant 5% more time. Stacks with Chrono Extension and Moment Reserves. +3% Evasion.",
-   "descDe": "Timer-Gegenstände gewähren 5% mehr Zeit. Wirkt zusammen mit Chrono-Verlängerung und Zeitreserven. +3% Ausweichen.",
-   "icon": "⏳",
-   "statKey": "small_lesser_time_weavers",
+   "nameEn": "Quickening",
+   "nameDe": "Beschleunigung",
+   "icon": "",
+   "statKey": "small_quickening_30988",
+   "effects": [
+    "melee_charge_speed_pct:4"
+   ],
    "tier": "small"
   },
   {
@@ -18327,72 +18371,63 @@ export const TALENT_TREE_DATA = {
    "id": 30990,
    "x": 2689,
    "y": 308,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Hunter's Edge",
+   "nameDe": "Schneide des Jägers",
+   "icon": "",
+   "statKey": "travel_hunters_edge_30990",
+   "effects": [
+    "projectile_damage_inc:12"
+   ],
    "tier": "travel"
   },
   {
    "id": 30991,
    "x": 2746,
    "y": 308,
-   "nameEn": "Lesser Nature's Grace",
-   "nameDe": "Gnade der Natur (klein)",
-   "descEn": "+4% chance to evade attacks, +4% Movement speed.",
-   "descDe": "+4% Chance, Angriffen auszuweichen, +4% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_nature_s_grace",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_fork_30991",
    "tier": "small"
   },
   {
    "id": 30992,
    "x": 2799,
    "y": 361,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_fork_30992",
    "tier": "travel"
   },
   {
    "id": 30993,
    "x": 2757,
    "y": 410,
-   "nameEn": "Lesser Nature's Grace",
-   "nameDe": "Gnade der Natur (klein)",
-   "descEn": "+4% chance to evade attacks, +4% Movement speed.",
-   "descDe": "+4% Chance, Angriffen auszuweichen, +4% Bewegungsgeschwindigkeit.",
-   "icon": "◆",
-   "statKey": "small_lesser_nature_s_grace",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_chain_30993",
    "tier": "small"
   },
   {
    "id": 30994,
    "x": 2799,
    "y": 255,
-   "nameEn": "Agility",
-   "nameDe": "Beweglichkeit",
-   "descEn": "+5 to Agility.",
-   "descDe": "+5 Beweglichkeit.",
-   "icon": "🏃",
-   "statKey": "small_agility",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_fork_30994",
    "tier": "travel"
   },
   {
    "id": 30995,
    "x": 2757,
    "y": 206,
-   "nameEn": "Lesser Meta Analysis",
-   "nameDe": "Metaanalyse (klein)",
-   "descEn": "Increases the success chance of all start-of-level reveal and mark effects by 5%. +3% Evasion.",
-   "descDe": "Erhöht die Erfolgswahrscheinlichkeit aller Aufdeckungs- und Markierungseffekte zu Beginn jedes Levels um 5%. +3% Ausweichen.",
-   "icon": "🔍",
-   "statKey": "small_lesser_meta_analysis",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_pierce_30995",
    "tier": "small"
   },
   {
@@ -18463,36 +18498,42 @@ export const TALENT_TREE_DATA = {
    "id": 31001,
    "x": 2799,
    "y": 595,
-   "nameEn": "Lesser Huntress's Vitality",
-   "nameDe": "Vitalität der Jägerin (klein)",
-   "descEn": "+8 maximum Health, +1 Absorption on kill.",
-   "descDe": "+8 max. Leben, +1 Absorption pro Kill.",
-   "icon": "◆",
-   "statKey": "small_lesser_huntress_s_vitality",
+   "nameEn": "Hunter's Focus",
+   "nameDe": "Fokus des Jägers",
+   "icon": "",
+   "statKey": "small_hunters_focus_31001",
+   "effects": [
+    "projectile_crit_chance:2",
+    "projectile_crit_multi:12"
+   ],
    "tier": "small"
   },
   {
    "id": 31002,
    "x": 2757,
    "y": 603,
-   "nameEn": "Lesser Huntress's Vitality",
-   "nameDe": "Vitalität der Jägerin (klein)",
-   "descEn": "+8 maximum Health, +1 Absorption on kill.",
-   "descDe": "+8 max. Leben, +1 Absorption pro Kill.",
-   "icon": "◆",
-   "statKey": "small_lesser_huntress_s_vitality",
+   "nameEn": "Hunter's Focus",
+   "nameDe": "Fokus des Jägers",
+   "icon": "",
+   "statKey": "small_hunters_focus_31002",
+   "effects": [
+    "projectile_crit_chance:2",
+    "projectile_crit_multi:12"
+   ],
    "tier": "small"
   },
   {
    "id": 31003,
    "x": 2697,
    "y": 663,
-   "nameEn": "Sprinter",
-   "nameDe": "Sprinterin",
-   "descEn": "+5% Movement speed.",
-   "descDe": "+5% Bewegungsgeschwindigkeit.",
-   "icon": "○",
-   "statKey": "small_sprinter",
+   "nameEn": "Hunter's Focus",
+   "nameDe": "Fokus des Jägers",
+   "icon": "",
+   "statKey": "small_hunters_focus_31003",
+   "effects": [
+    "projectile_crit_chance:2",
+    "projectile_crit_multi:12"
+   ],
    "tier": "small"
   },
   {
@@ -18573,12 +18614,10 @@ export const TALENT_TREE_DATA = {
    "id": 31010,
    "x": 2332,
    "y": 68,
-   "nameEn": "Lesser Arcane Battery",
-   "nameDe": "Arkane Batterie (klein)",
-   "descEn": "+5 maximum Mana. Absorption regenerates 8% faster.",
-   "descDe": "+5 max. Mana. Absorption regeneriert 8% schneller.",
-   "icon": "◆",
-   "statKey": "small_lesser_arcane_battery",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_tincture_31010",
    "tier": "small"
   },
   {
@@ -31100,11 +31139,23 @@ export const TALENT_TREE_DATA = {
    "from": 31119,
    "to": 31120,
    "dotted": false
+  },
+  {
+   "id": 851,
+   "from": 362,
+   "to": 30614,
+   "dotted": false
+  },
+  {
+   "id": 852,
+   "from": 30611,
+   "to": 30614,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "5b4c66306f280476",
+  "fingerprint": "6c8934148f963f56",
   "positions": [
    [
     156,

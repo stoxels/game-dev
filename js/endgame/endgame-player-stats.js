@@ -661,6 +661,7 @@ export function _egComputePlayerStats() {
         physAsExtraShadowPct: passiveTreeBonuses.physAsExtraShadowPct || 0,
         lifeRecoupPct: passiveTreeBonuses.lifeRecoupPct || 0,
         daggerDamageIncPct: passiveTreeBonuses.daggerDamageIncPct || 0,
+        daggerChargeSpeedPct: passiveTreeBonuses.daggerChargeSpeedPct || 0,
         lifeLeechAsAbsorption: passiveTreeBonuses.lifeLeechAsAbsorption || 0,
         absorptionNoRecharge: passiveTreeBonuses.absorptionNoRecharge || 0,
         lifeLeechEffectIncPct: passiveTreeBonuses.lifeLeechEffectIncPct || 0,
@@ -687,6 +688,10 @@ export function _egComputePlayerStats() {
         castingAilmentAvoidPct: passiveTreeBonuses.castingAilmentAvoidPct || 0,
         bleedAvoidPct: passiveTreeBonuses.bleedAvoidPct || 0,
         poisonAvoidPct: passiveTreeBonuses.poisonAvoidPct || 0,
+        shockAvoidPct: passiveTreeBonuses.shockAvoidPct || 0,
+        igniteAvoidPct: passiveTreeBonuses.igniteAvoidPct || 0,
+        chillAvoidPct: passiveTreeBonuses.chillAvoidPct || 0,
+        elementalAilmentAvoidPct: passiveTreeBonuses.elementalAilmentAvoidPct || 0,
         // Flat Armour from the passive tree (reworked node 30516, Bulwark
         // Endurance) seeds the very same bucket gear and the Str side-effect
         // feed into, so it aggregates with them and passes through the same
@@ -882,7 +887,7 @@ export function _egComputePlayerStats() {
         // or holding one. Read by the block roll in _egPlayerTakeDamage.
         blockChanceTree: passiveTreeBonuses.blockChanceTree || 0,
         dodgeChance: 0, spellDodgeChance: 0,
-        ignitePct: 0, freezePct: 0, shockPct: 0, blindPct: 0, convertPct: 0,
+        ignitePct: passiveTreeBonuses.igniteChancePct || 0, freezePct: 0, shockPct: 0, blindPct: 0, convertPct: 0,
         ailmentDurationPct: 0, ailmentEffectPct: 0,
         // Per-ailment durations for YOUR ailments on enemies (effects
         // pipeline, e.g. reworked nodes 30252/30253): scale the monster-side
@@ -951,7 +956,7 @@ export function _egComputePlayerStats() {
         echoChancePct: 0, echoDamagePct: 0, fatePct: 0, wardingHP: 0,
         parryChancePct: 0, deflectChancePct: 0, deflectDamagePct: 0,
         movementSpeedPct: passiveTreeBonuses.movementSpeedPct || 0,
-        manaOnKill: passiveTreeBonuses.manaOnKillFlat || 0, absorptionOnKill: 0, lifeOnKill: passiveTreeBonuses.lifeOnKillFlat || 0, manaOnMistake: 0,
+        manaOnKill: passiveTreeBonuses.manaOnKillFlat || 0, absorptionOnKill: passiveTreeBonuses.absorptionOnKillFlat || 0, lifeOnKill: passiveTreeBonuses.lifeOnKillFlat || 0, manaOnMistake: 0,
         heartHealFlat: passiveTreeBonuses.heartHealFlat || 0, heartHealIncPct: 0, manaHealFlat: 0, manaHealIncPct: passiveTreeBonuses.manaHealIncPct || 0, timeAdded: 0,
         heartSpawnIncPct: passiveTreeBonuses.heartSpawnIncPct || 0, manaSpawnIncPct: passiveTreeBonuses.manaSpawnIncPct || 0,
         absorptionRegenRatePct: passiveTreeBonuses.absorptionRegenRatePct || 0, fasterAbsorptionRegenStart: 0,
@@ -1237,7 +1242,8 @@ export function _egGetPlayerAttackIntervalBreakdown() {
     // map-run slow, so a slowed run still slows the charge down. 100% floor.
     const chargeSpeedPct = (stats.meleeChargeSpeedPct || 0) + (stats.attackSpeedPct || 0)
         + (stats.isSwordEquipped ? (stats.swordChargeSpeedPct || 0) : 0)
-        + (stats.isAxeEquipped ? (stats.axeChargeSpeedPct || 0) : 0);
+        + (stats.isAxeEquipped ? (stats.axeChargeSpeedPct || 0) : 0)
+        + (stats.isDaggerEquipped ? (stats.daggerChargeSpeedPct || 0) : 0);
     if (chargeSpeedPct > 0) {
         interval = Math.round(interval * (1 - Math.min(chargeSpeedPct, 100) / 100) * 10000) / 10000;
     }
@@ -1502,6 +1508,10 @@ export const EG_STAT_DISPLAY_LABELS = {
     castingAilmentAvoidPct: { label: t('eg_stat_casting_ailment_avoid'), suffix: '%' },
     bleedAvoidPct: { label: t('eg_stat_bleed_avoid'), suffix: '%' },
     poisonAvoidPct: { label: t('eg_stat_poison_avoid'), suffix: '%' },
+    shockAvoidPct: { label: t('eg_stat_shock_avoid'), suffix: '%' },
+    igniteAvoidPct: { label: t('eg_stat_ignite_avoid'), suffix: '%' },
+    chillAvoidPct: { label: t('eg_stat_chill_avoid'), suffix: '%' },
+    elementalAilmentAvoidPct: { label: t('eg_stat_elemental_ailment_avoid'), suffix: '%' },
     strength: { label: t('eg_stat_strength'), suffix: '' },
     agility: { label: t('eg_stat_agility'), suffix: '' },
     intelligence: { label: t('eg_stat_intelligence'), suffix: '' },
@@ -1593,6 +1603,7 @@ export const EG_STAT_DISPLAY_LABELS = {
     physAsExtraShadowPct: { label: t('eg_stat_phys_as_shadow'), suffix: '%' },
     lifeRecoupPct: { label: t('eg_stat_life_recoup'), suffix: '%' },
     daggerDamageIncPct: { label: t('eg_stat_dagger_damage_inc'), suffix: '%' },
+    daggerChargeSpeedPct: { label: t('eg_stat_dagger_charge_speed'), suffix: '%' },
     lifeLeechAsAbsorption: { label: t('eg_stat_leech_as_absorption'), suffix: '' },
     absorptionNoRecharge: { label: t('eg_stat_absorption_no_recharge'), suffix: '' },
     lifeLeechEffectIncPct: { label: t('eg_stat_leech_effect_inc'), suffix: '%' },
@@ -1750,7 +1761,7 @@ export const EG_STAT_LAYOUT = {
             'physIncPct', 'spellDamageFlat', 'spellDamageIncPct', 'elementalDamageIncPct', 'fireDamageIncPct',
             'coldDamageIncPct', 'lightningDamageIncPct',
             'projectileDamageIncPct', 'projectileSpeedPct', 'projectileCritChancePct', 'projectileCritMultiplierPct', 'projectileElementalDamageIncPct',
-            'bowSpellDamageIncPct', 'bowSpellDotIncPct', 'bowSpellManaCostReducedPct', 'manaOnProjectileHitPct', 'lifeOnProjectileHit', 'lifeBurstOnProjectileHitChancePct', 'lifeOnMeleeHit', 'lifeOnAttackHit', 'dotIncPct', 'shadowDamageIncPct', 'damageIncPct', 'critChanceDaggerPct', 'spellCritChancePct', 'spellCritMultiplierPct', 'chillEffectIncPct', 'absorptionLeechSpellPct', 'absorptionLeechEffectIncPct', 'physAsExtraShadowPct', 'lifeRecoupPct', 'daggerDamageIncPct', 'lifeLeechAsAbsorption', 'absorptionNoRecharge', 'skillEffectDurationPct', 'lifeLeechEffectIncPct', 'dotIncDaggerPct', 'critMultiplierDaggerPct', 'poisonDurationPct', 'critDotMultiPct',
+            'bowSpellDamageIncPct', 'bowSpellDotIncPct', 'bowSpellManaCostReducedPct', 'manaOnProjectileHitPct', 'lifeOnProjectileHit', 'lifeBurstOnProjectileHitChancePct', 'lifeOnMeleeHit', 'lifeOnAttackHit', 'dotIncPct', 'shadowDamageIncPct', 'damageIncPct', 'critChanceDaggerPct', 'spellCritChancePct', 'spellCritMultiplierPct', 'chillEffectIncPct', 'absorptionLeechSpellPct', 'absorptionLeechEffectIncPct', 'physAsExtraShadowPct', 'lifeRecoupPct', 'daggerDamageIncPct', 'daggerChargeSpeedPct', 'lifeLeechAsAbsorption', 'absorptionNoRecharge', 'skillEffectDurationPct', 'lifeLeechEffectIncPct', 'dotIncDaggerPct', 'critMultiplierDaggerPct', 'poisonDurationPct', 'critDotMultiPct',
             'healingPowerFlat', 'healingPowerIncPct',
             'accuracy', 'multishotPct', 'splashPct', 'chainPct',
             'piercePct', 'cleavePct', 'snipePct', 'overkillPct', 'staggerPct',
@@ -1773,7 +1784,7 @@ export const EG_STAT_LAYOUT = {
             'blockChanceShieldPct', 'frenzyCharges', 'frenzyChargesMax', 'frenzyDurationPct', 'evasionPerFrenzyChargePct', 'enduranceCharges', 'enduranceChargesMax', 'enduranceDurationPct', 'lifeRegenPerEndurancePct', 'enduranceOnKillShieldPct',
             'dodgeChance', 'spellDodgeChance', 'preemptiveDodgePct',
             'parryChancePct', 'deflectChancePct', 'deflectDamagePct', 'reflectPhysFlat',
-            'fatePct', 'castingAilmentAvoidPct', 'bleedAvoidPct', 'poisonAvoidPct'] },
+            'fatePct', 'castingAilmentAvoidPct', 'bleedAvoidPct', 'poisonAvoidPct', 'shockAvoidPct', 'igniteAvoidPct', 'chillAvoidPct', 'elementalAilmentAvoidPct'] },
         { catKey: 'eg_statcat_resistances', buckets: [
             // 'allElementalResist' is deliberately NOT listed: it is folded
             // into the fire/cold/lightning lines by _egBuildStatLine, which is

@@ -312,14 +312,20 @@ export const PT_EFFECT_DEFS = Object.freeze({
     life_recoup_pct: { channel: 'lifeRecoupPct', en: '{v}% of Damage taken Recouped as Life', de: '{v}% des erlittenen Schadens werden als Leben zurückgewonnen' },
     // Damage with Daggers (node 30941): multiplier over the whole melee hit
     // while a dagger is the equipped weapon family.
-    dagger_damage_inc: { channel: 'daggerDamageIncPct', en: '{v}% increased Damage with Daggers', de: '{v}% erhöhter Schaden mit Dolchen' },
+    dagger_damage_inc: { channel: 'daggerDamageIncPct', en: '{v}% increased melee Damage with Daggers', de: '{v}% erhöhter Nahkampfschaden mit Dolchen' },
     // Ghost Reaver keystone (node 219): every Life leech (melee, projectile,
     // spell) refills Absorption instead of Life (_egLeechAbsorption), and the
     // Absorption recharge is switched off (_egScheduleAbsorptionRegen).
     leech_as_absorption: { channel: 'lifeLeechAsAbsorption', flag: true, en: 'Life Leech recovers Absorption instead of Life', de: 'Lebensentzug stellt stattdessen Absorption wieder her' },
     absorption_no_recharge: { channel: 'absorptionNoRecharge', flag: true, en: 'Cannot Recharge Absorption', de: 'Absorption kann sich nicht aufladen' },
-    crit_chance_dagger: { channel: 'critChanceDaggerPct', en: '+{v}% to Critical Strike Chance with Daggers', de: '+{v}% auf die kritische Trefferchance mit Dolchen' },
-    crit_multi_dagger: { channel: 'critMultiplierDaggerPct', en: '+{v}% to Critical Strike Multiplier with Daggers', de: '+{v}% auf den kritischen Schadensmultiplikator mit Dolchen' },
+    // Dagger charge-up speed (nodes 30942-30944/20119): shortens the melee
+    // charge interval only while a dagger is equipped (mirrors the sword/axe lines).
+    dagger_charge_speed: { channel: 'daggerChargeSpeedPct', en: '{v}% increased melee attack charge-up speed while wielding a Dagger', de: '{v}% erhöhte Nahkampf-Aufladegeschwindigkeit mit Dolch' },
+    // Absorption on kill (nodes 30928/30956): flat Absorption per kill,
+    // paid out by the existing kill hook (encounter-kills.js).
+    absorption_on_kill_flat: { channel: 'absorptionOnKillFlat', en: 'Gain {v} Absorption per Enemy Killed', de: 'Erhalte {v} Absorption pro getötetem Gegner' },
+    crit_chance_dagger: { channel: 'critChanceDaggerPct', en: '+{v}% to melee Critical Strike Chance with Daggers', de: '+{v}% auf die kritische Nahkampf-Trefferchance mit Dolchen' },
+    crit_multi_dagger: { channel: 'critMultiplierDaggerPct', en: '+{v}% to melee Critical Strike Multiplier with Daggers', de: '+{v}% auf den kritischen Nahkampf-Schadensmultiplikator mit Dolchen' },
     poison_duration: { channel: 'poisonDurationPct', en: '{v}% increased Poison Duration on enemies', de: '{v}% erhöhte Giftdauer bei Gegnern' },
     crit_dot_multi: { channel: 'critDotMultiPct', en: '+{v}% to the Damage over Time Multiplier for Ailments from Critical Strikes', de: '+{v}% auf den Schaden-über-Zeit-Multiplikator für Statuseffekte durch kritische Treffer' },
     // Damage over Time (nodes 20112/30919/30924/...): scales the stored dps of
@@ -386,6 +392,15 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // (_egTryAvoidPlayerAilmentStat in combat-ailments-core.js; nodes 31071...).
     avoid_bleed_pct: { channel: 'bleedAvoidPct', en: '{v}% chance to Avoid Bleeding', de: '{v}% Chance, Blutung zu vermeiden' },
     avoid_poison_pct: { channel: 'poisonAvoidPct', en: '{v}% chance to Avoid being Poisoned', de: '{v}% Chance, Vergiftung zu vermeiden' },
+    // Elemental ailment avoidance (nodes 30766/30767/30764/30765/20156):
+    // rolled in _egRollMonsterHitAilment after the base ailment chance.
+    avoid_shock_pct: { channel: 'shockAvoidPct', en: '{v}% chance to Avoid being Shocked', de: '{v}% Chance, nicht geschockt zu werden' },
+    avoid_ignite_pct: { channel: 'igniteAvoidPct', en: '{v}% chance to Avoid being Ignited', de: '{v}% Chance, nicht entzündet zu werden' },
+    avoid_chill_pct: { channel: 'chillAvoidPct', en: '{v}% chance to Avoid being Chilled or Frozen', de: '{v}% Chance, nicht unterkühlt oder eingefroren zu werden' },
+    avoid_elemental_ailment_pct: { channel: 'elementalAilmentAvoidPct', en: '{v}% chance to Avoid Elemental Ailments', de: '{v}% Chance, elementare Statuseffekte zu vermeiden' },
+    // Tree-sourced Chance to Ignite on Hit (nodes 30648/30649/30650): seeds the
+    // same ignitePct stat gear uses; still needs fire damage in the hit.
+    ignite_chance_pct: { channel: 'igniteChancePct', en: '+{v}% Chance to Ignite on Hit', de: '+{v}% Chance, bei Treffern zu entzünden' },
     avoid_ailment_casting: { channel: 'castingAilmentAvoidPct', en: '{v}% Chance to Avoid Ailments while Casting', de: '{v}% Chance, Statuseffekte beim Zaubern zu vermeiden' },
     // Level-start timer bonus (nodes 31211/31215/31216): read by the _initTimer
     // patch in probability-tree-expansion.js via _egGetTreeTimerStartSecs().

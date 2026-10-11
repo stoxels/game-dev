@@ -617,12 +617,15 @@ function _egRollMonsterHitAilment(element, dealt, attacker) {
 
     switch (element) {
         case 'fire':
+            if (_egTryAvoidPlayerAilmentStat('igniteAvoidPct') || _egTryAvoidPlayerAilmentStat('elementalAilmentAvoidPct')) break;
             _egApplyPlayerAilment('ignite', Math.max(EG_AIL_MIN_DOT_DAMAGE, dealt * EG_AIL_IGNITE_DMG_SHARE));
             break;
         case 'cold':
+            if (_egTryAvoidPlayerAilmentStat('chillAvoidPct') || _egTryAvoidPlayerAilmentStat('elementalAilmentAvoidPct')) break;
             _egApplyPlayerAilment('chill');
             break;
         case 'lightning':
+            if (_egTryAvoidPlayerAilmentStat('shockAvoidPct') || _egTryAvoidPlayerAilmentStat('elementalAilmentAvoidPct')) break;
             _egApplyPlayerAilment('shocked');
             break;
         case 'shadow':
