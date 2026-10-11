@@ -2429,12 +2429,10 @@ export const TALENT_TREE_DATA = {
    "id": 34,
    "x": 1180,
    "y": -431,
-   "nameEn": "Primed Scout",
-   "nameDe": "Vorbereiteter Pfadfinder",
-   "descEn": "Doubles the amount of rows and columns Scout's Primer reveal. +6% Evasion.",
-   "descDe": "Verdoppelt die Anzahl der Zeilen und Spalten, die vom Pfadfinder Kompass aufgedeckt werden. +6% Ausweichen.",
-   "icon": "⭐",
-   "statKey": "primed_scout",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_elusive_34",
    "tier": "notable"
   },
   {
@@ -2453,12 +2451,15 @@ export const TALENT_TREE_DATA = {
    "id": 168,
    "x": 2015,
    "y": -941,
-   "nameEn": "Probabilistic Start",
-   "nameDe": "Probabilistischer Start",
-   "descEn": "10% chance to reveal 1 correct filled cell at the start of each level. Rolls independently from Stochastic Awakening and Calculated Genesis. +6% Evasion.",
-   "descDe": "10% Chance, zu Beginn jedes Levels 1 korrekte gefüllte Zelle aufzudecken. Wirkt unabhängig von Stochastisches Erwachen und Berechneter Ursprung. +6% Ausweichen.",
-   "icon": "🎲",
-   "statKey": "probabilistic_start_1",
+   "nameEn": "Calm Calculation",
+   "nameDe": "Ruhige Berechnung",
+   "icon": "",
+   "statKey": "notable_calm_calculation_168",
+   "effects": [
+    "damage_inc_pct:12",
+    "mana_regen_inc_pct:20",
+    "int_flat:10"
+   ],
    "tier": "notable"
   },
   {
@@ -3036,12 +3037,14 @@ export const TALENT_TREE_DATA = {
    "id": 22,
    "x": 1755,
    "y": -1051,
-   "nameEn": "Statistics Tutor",
-   "nameDe": "Statistik Tutor",
-   "descEn": "Increases the chance that the tutor can solve the question by an additional 10%. +6% Absorption regen rate.",
-   "descDe": "Erhöht die Chance, dass der Tutor die Frage beantworten kann, um weitere 10%. +6% Absorptionsregeneration.",
-   "icon": "📏",
-   "statKey": "statistics_tutor",
+   "nameEn": "Assassination",
+   "nameDe": "Attentat",
+   "icon": "",
+   "statKey": "notable_assassination_22",
+   "effects": [
+    "crit_multi_flat:25",
+    "crit_chance_flat:3"
+   ],
    "tier": "notable"
   },
   {
@@ -3523,12 +3526,14 @@ export const TALENT_TREE_DATA = {
    "id": 3,
    "x": 1755,
    "y": -636,
-   "nameEn": "Wisdom Through Failure",
-   "nameDe": "Weisheit durch Fehler",
-   "descEn": "Excercises will show a hint after 5 unsuccessfull attempts. +6% Evasion.",
-   "descDe": "Übungsaufgaben zeigen einen Hinweis nach 5 Fehlversuchen. +6% Ausweichen.",
-   "icon": "💡",
-   "statKey": "wisdom_through_failure",
+   "nameEn": "Will of Blades",
+   "nameDe": "Wille der Klingen",
+   "icon": "",
+   "statKey": "notable_will_of_blades_3",
+   "effects": [
+    "crit_chance_flat:4",
+    "phys_damage_inc:20"
+   ],
    "tier": "notable"
   },
   {
@@ -3608,12 +3613,10 @@ export const TALENT_TREE_DATA = {
    "id": 176,
    "x": 1844,
    "y": -1170,
-   "nameEn": "Chrono Surplus",
-   "nameDe": "Chrono-Überschuss",
-   "descEn": "Gain 3 additional minutes at the start of each level. Stacks with other time extension bonuses.",
-   "descDe": "Erhalte zu Beginn jedes Levels 3 zusätzliche Minuten. Summiert sich mit anderen Zeitverlängerungsboni.",
-   "icon": "⏰",
-   "statKey": "travel_extended_session_3",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claw_176",
    "tier": "travel"
   },
   {
@@ -5363,12 +5366,10 @@ export const TALENT_TREE_DATA = {
    "id": 20024,
    "x": 1795,
    "y": -1243,
-   "nameEn": "Eagle Eye",
-   "nameDe": "Adlerauge",
-   "descEn": "+15% Projectile damage, +5% Critical strike chance.",
-   "descDe": "+15% Projektilschaden, +5% kritische Trefferchance.",
-   "icon": "◆",
-   "statKey": "notable_eagle_eye",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claw_20024",
    "tier": "notable"
   },
   {
@@ -5694,12 +5695,13 @@ export const TALENT_TREE_DATA = {
    "id": 30120,
    "x": 1940,
    "y": -1103,
-   "nameEn": "Intellect",
+   "nameEn": "Intelligence",
    "nameDe": "Intelligenz",
-   "descEn": "+5 to Intellect.",
-   "descDe": "+5 Intelligenz.",
-   "icon": "🧠",
-   "statKey": "small_intellect",
+   "icon": "",
+   "statKey": "travel_intelligence_30120",
+   "effects": [
+    "int_flat:5"
+   ],
    "tier": "travel"
   },
   {
@@ -6019,24 +6021,20 @@ export const TALENT_TREE_DATA = {
    "id": 30147,
    "x": 1844,
    "y": -1210,
-   "nameEn": "Runic Aim",
-   "nameDe": "Runisches Zielen",
-   "descEn": "+1 Intellect, +1 Agility.",
-   "descDe": "+1 Intelligenz, +1 Beweglichkeit.",
-   "icon": "🎯",
-   "statKey": "small_runic_aim",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claw_30147",
    "tier": "small"
   },
   {
    "id": 30148,
    "x": 1746,
    "y": -1170,
-   "nameEn": "Runic Aim",
-   "nameDe": "Runisches Zielen",
-   "descEn": "+1 Intellect, +1 Agility.",
-   "descDe": "+1 Intelligenz, +1 Beweglichkeit.",
-   "icon": "🎯",
-   "statKey": "small_runic_aim",
+   "nameEn": "Reserved Node",
+   "nameDe": "Reservierter Knoten",
+   "icon": "",
+   "statKey": "reserved_claw_30148",
    "tier": "small"
   },
   {
@@ -19550,12 +19548,14 @@ export const TALENT_TREE_DATA = {
    "id": 20215,
    "x": 1605,
    "y": -1229,
-   "nameEn": "Focus Barrier",
-   "nameDe": "Fokusbarriere",
-   "descEn": "Absorption begins regenerating 10% earlier after taking damage.",
-   "descDe": "Absorption beginnt sich 10% früher zu regenerieren, nachdem du Schaden erlitten hast.",
-   "icon": "◆",
-   "statKey": "notable_focus_barrier",
+   "nameEn": "Dusk Stalker",
+   "nameDe": "Dämmerungsjäger",
+   "icon": "",
+   "statKey": "notable_dusk_stalker_20215",
+   "effects": [
+    "crit_multi_dagger:30",
+    "life_leech_attack:0.6"
+   ],
    "tier": "notable"
   },
   {
@@ -21580,12 +21580,14 @@ export const TALENT_TREE_DATA = {
    "id": 31189,
    "x": 1507,
    "y": -1229,
-   "nameEn": "Lesser Focus Barrier",
-   "nameDe": "Fokusbarriere (klein)",
-   "descEn": "Absorption begins regenerating 5% earlier after taking damage.",
-   "descDe": "Absorption beginnt sich 5% früher zu regenerieren, nachdem du Schaden erlitten hast.",
-   "icon": "◆",
-   "statKey": "small_lesser_focus_barrier",
+   "nameEn": "Fang Thirst",
+   "nameDe": "Zahndurst",
+   "icon": "",
+   "statKey": "small_fang_thirst_31189",
+   "effects": [
+    "crit_chance_dagger:2",
+    "life_leech_attack:0.8"
+   ],
    "tier": "small"
   },
   {
@@ -30882,11 +30884,47 @@ export const TALENT_TREE_DATA = {
    "from": 31067,
    "to": 31068,
    "dotted": false
+  },
+  {
+   "id": 825,
+   "from": 176,
+   "to": 30120,
+   "dotted": false
+  },
+  {
+   "id": 826,
+   "from": 20215,
+   "to": 31189,
+   "dotted": false
+  },
+  {
+   "id": 827,
+   "from": 176,
+   "to": 30147,
+   "dotted": false
+  },
+  {
+   "id": 828,
+   "from": 176,
+   "to": 30148,
+   "dotted": false
+  },
+  {
+   "id": 829,
+   "from": 20024,
+   "to": 30147,
+   "dotted": false
+  },
+  {
+   "id": 830,
+   "from": 20024,
+   "to": 30148,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 1,
-  "fingerprint": "55088b8053956a2e",
+  "fingerprint": "ed5ef0f82c13a94a",
   "positions": [
    [
     156,
@@ -32331,7 +32369,7 @@ export const TALENT_TREE_DATA = {
    [
     176,
     3319,
-    -2106
+    -2099
    ],
    [
     103,
@@ -33321,7 +33359,7 @@ export const TALENT_TREE_DATA = {
    [
     30147,
     3319,
-    -2178
+    -2185
    ],
    [
     30148,

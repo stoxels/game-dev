@@ -698,7 +698,7 @@ export function _egComputePlayerStats() {
         // nodes (effects pipeline, e.g. reworked node 129 Horizon Tracker)
         // seeds the very same bucket gear's life_regen feeds, so tree and
         // gear regen add up in _egTickLifeRegen().
-        lifeRegen: passiveTreeBonuses.lifeRegenFlat || 0, manaRegen: 0,
+        lifeRegen: passiveTreeBonuses.lifeRegenFlat || 0, manaRegen: 0, manaRegenIncPct: passiveTreeBonuses.manaRegenIncPct || 0,
         // Tree-sourced percentage Life regeneration per second (effects
         // pipeline, e.g. reworked node 30206). _egTickLifeRegen() adds both
         // buckets together each second, scaling this one by the CURRENT
@@ -733,7 +733,7 @@ export function _egComputePlayerStats() {
         accuracy: passiveTreeBonuses.accuracy || 0, accuracyIncPct: passiveTreeBonuses.accuracyIncPct || 0,
         mistakeCount: 0, focusPct: 0, mistakeNotCountPct: 0,
         revealHintPct: 0, chanceForNewQuestionPct: 0,
-        critChance: passiveTreeBonuses.critChanceFlat || 0, critMultiplierPct: 0,
+        critChance: passiveTreeBonuses.critChanceFlat || 0, critMultiplierPct: passiveTreeBonuses.critMultiplierFlatPct || 0,
         physFlatMin: 0, physFlatMax: 0,
         // "+% increased physical damage" from the passive tree (reworked
         // notable 20032) seeds the shared projectile/spell bucket; the melee
@@ -1496,6 +1496,7 @@ export const EG_STAT_DISPLAY_LABELS = {
 
     lifeRegen: { label: t('eg_stat_life_regen'), suffix: '/s' },
     manaRegen: { label: t('eg_stat_mana_regen'), suffix: '/5s' },
+    manaRegenIncPct: { label: t('eg_stat_mana_regen_inc'), suffix: '%' },
     manaOnKill: { label: t('eg_stat_mana_on_kill'), suffix: '' },
     absorptionOnKill: { label: t('eg_stat_absorption_on_kill'), suffix: '' },
     lifeOnKill: { label: t('eg_stat_life_on_kill'), suffix: '' },
@@ -1742,7 +1743,7 @@ export const EG_STAT_LAYOUT = {
     defense: [
         { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption', 'stunAvoidPct', 'parrySpellChancePct'] },
         { catKey: 'eg_statcat_life_mana', buckets: [
-            'health', 'healthMorePct', 'mana', 'manaRemoved', 'spellsCostLife', 'spellCostIncPct', 'lifeRegen', 'lifeRegenRatePct', 'lifeRegenLessPct', 'manaRegen', 'lifeLeechPct', 'lifeLeechMeleePct', 'lifeLeechLessPct', 'absorptionRechargesLife',
+            'health', 'healthMorePct', 'mana', 'manaRemoved', 'spellsCostLife', 'spellCostIncPct', 'lifeRegen', 'lifeRegenRatePct', 'lifeRegenLessPct', 'manaRegen', 'manaRegenIncPct', 'lifeLeechPct', 'lifeLeechMeleePct', 'lifeLeechLessPct', 'absorptionRechargesLife',
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
             'heartHealFlat', 'heartHealIncPct', 'heartSpawnIncPct', 'manaHealFlat', 'manaHealIncPct', 'manaSpawnIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [

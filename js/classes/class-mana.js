@@ -269,7 +269,8 @@ function _ensureManaRegenLoop() {
         if (globalThis.dead) return;
         const stats = (typeof globalThis._egComputePlayerStats === 'function')
             ? globalThis._egComputePlayerStats() : null;
-        const regen = MANA_BASE_REGEN + (stats ? (stats.manaRegen || 0) : 0);
+        const regenIncPct = stats ? (stats.manaRegenIncPct || 0) : 0;
+        const regen = (MANA_BASE_REGEN + (stats ? (stats.manaRegen || 0) : 0)) * (1 + regenIncPct / 100);
         if (regen > 0 && globalThis.playerMaxMana > 0 && globalThis.playerCurrentMana < globalThis.playerMaxMana) {
             gainMana(regen);
         }

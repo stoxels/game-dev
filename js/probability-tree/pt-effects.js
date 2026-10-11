@@ -226,9 +226,9 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // player projectile's flight time (_egAnimatePlayerProjectile).
     projectile_damage_inc: { channel: 'projectileDamageIncPct', en: '{v}% increased Projectile Damage', de: '{v}% erhöhter Projektilschaden' },
     // Added to the crit multiplier (base 150%) of projectile rolls only.
-    projectile_crit_multi: { channel: 'projectileCritMultiplierPct', en: '+{v}% to Critical Strike Multiplier of Projectiles', de: '+{v}% auf den kritischen Schadensmultiplikator von Projektilen' },
+    projectile_crit_multi: { channel: 'projectileCritMultiplierPct', en: '+{v}% to Critical Strike Multiplier with Projectiles', de: '+{v}% auf den kritischen Schadensmultiplikator mit Projektilen' },
     projectile_speed: { channel: 'projectileSpeedPct', en: '{v}% increased Projectile Speed', de: '{v}% erhöhte Projektilgeschwindigkeit' },
-    projectile_crit_chance: { channel: 'projectileCritChancePct', en: '+{v}% to Critical Strike Chance of Projectiles', de: '+{v}% auf die kritische Trefferchance von Projektilen' },
+    projectile_crit_chance: { channel: 'projectileCritChancePct', en: '+{v}% to Critical Strike Chance with Projectiles', de: '+{v}% auf die kritische Trefferchance mit Projektilen' },
     // Bow spells (nodes 30857/20102/30858/30859): spells carrying the Bow tag.
     // No spell has that tag yet, so these two stats are tracked and shown on
     // the sheet but nothing consumes them until bow spells exist (the spell
@@ -284,6 +284,13 @@ export const PT_EFFECT_DEFS = Object.freeze({
     dot_inc_dagger: { channel: 'dotIncDaggerPct', en: '{v}% increased Damage over Time while wielding a Dagger', de: '{v}% erhöhter Schaden über Zeit mit einem Dolch' },
     // crit_chance_dagger (node 31190): flat crit chance that only applies to
     // melee strikes while a dagger is equipped (combat-calculations.js).
+    // crit_multi_flat (node 22): generic Critical Strike Multiplier, adds to the
+    // 150% base of EVERY crit (melee + projectile) via critMultiplierPct. The
+    // scoped lines (daggers, maces, projectiles) stack on top of it.
+    crit_multi_flat: { channel: 'critMultiplierFlatPct', en: '+{v}% to Critical Strike Multiplier', de: '+{v}% auf den kritischen Schadensmultiplikator' },
+    // mana_regen_inc_pct (node 168): scales the whole mana regen tick
+    // (base + gear manaRegen) in class-mana.js.
+    mana_regen_inc_pct: { channel: 'manaRegenIncPct', en: '{v}% increased Mana Regeneration Rate', de: '{v}% erhöhte Manaregenerationsrate' },
     crit_chance_dagger: { channel: 'critChanceDaggerPct', en: '+{v}% to Critical Strike Chance with Daggers', de: '+{v}% auf die kritische Trefferchance mit Dolchen' },
     crit_multi_dagger: { channel: 'critMultiplierDaggerPct', en: '+{v}% to Critical Strike Multiplier with Daggers', de: '+{v}% auf den kritischen Schadensmultiplikator mit Dolchen' },
     poison_duration: { channel: 'poisonDurationPct', en: '{v}% increased Poison Duration on enemies', de: '{v}% erhöhte Giftdauer bei Gegnern' },
