@@ -804,7 +804,7 @@ export function _ptxRunExpansion() {
             S.clueOriginals.cols[c] = readLineSpans('col', c);
             blankLineSpans('col', c);
         }
-        toast('🌃 Nightfall Protocol: clues hidden for 2 minutes');
+        toast('🌃 Nightfall Protocol: clues hidden for 1 minute');
 
         setTimeout(() => {
             if (!cur || !S.clueOriginals) return;
@@ -813,7 +813,7 @@ export function _ptxRunExpansion() {
             S.clueOriginals = null;
             revealTiles(3);
             toast('🌅 Night lifts - clues restored, 3 reveals granted');
-        }, 120000);
+        }, 60000);
     }
 
     //--------------------------------------------------------------------------
@@ -911,6 +911,8 @@ export function _ptxRunExpansion() {
         if (has('keystone_scholars_debt')) globalThis.timerSecs += globalThis.timerSecs;
 
         _ptxBaseTime = globalThis.timerSecs;
+        // Level-start timer snapshot for combat-side "below 25% of the Timer" lines.
+        globalThis._levelStartTimerSecs = globalThis.timerSecs;
         updTimer();
         return result;
     });

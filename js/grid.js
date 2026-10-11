@@ -919,6 +919,30 @@ function _handleRegressionReward(row, col, rowDone, colDone, sol) {
 }
 
 
+// _handleLineResourceRewards - the puzzle <-> combat crossover: every row or
+//   column the player completes for the first time this level pays out the
+//   tree's life_on_line / absorption_on_line / mana_on_line / charge_on_line
+//   resources (see _egOnLinesCompleted in combat-grid-pickups-claims.js).
+//   Same guards as the regression reward: genuine player fill, once per line.
+function _handleLineResourceRewards(row, col, rowDone, colDone, sol) {
+    if (typeof globalThis._egOnLinesCompleted !== 'function') return;
+    const cellWasPlayerFilled = (sol[row][col] === 1) && (globalThis.userGrid[row][col] === 1) && !globalThis.revealedGrid[row][col];
+    if (!cellWasPlayerFilled) return;
+    if (!window._lineResourceRewardedLines) window._lineResourceRewardedLines = new Set();
+
+    let fresh = 0;
+    if (rowDone && !window._lineResourceRewardedLines.has(`r${row}`)) {
+        window._lineResourceRewardedLines.add(`r${row}`);
+        fresh++;
+    }
+    if (colDone && !window._lineResourceRewardedLines.has(`c${col}`)) {
+        window._lineResourceRewardedLines.add(`c${col}`);
+        fresh++;
+    }
+    if (fresh > 0) globalThis._egOnLinesCompleted(fresh);
+}
+
+
 // _tryAutoMarkAdjacentLine - attempts to auto-mark exactly one wrong empty
 //   cell in one of the given adjacent lines.  Used by residual analysis to
 //   reward line completion with a free cross mark in a neighbouring line.
@@ -1098,6 +1122,7 @@ export function updClues(row, col, isInitial = false) {
 
     // --- Skill reward processing ---
     _handleRegressionReward(row, col, rowDone, colDone, sol);
+    _handleLineResourceRewards(row, col, rowDone, colDone, sol);
     _handleResidualAnalysis(row, col, rowDone, colDone, sol);
 }
 

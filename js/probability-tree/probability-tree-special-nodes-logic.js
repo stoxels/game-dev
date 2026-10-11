@@ -556,8 +556,9 @@ export function _applyMaximumLikelihood() {
 
     const sol = cur.grid;
 
-    // Apply the time penalty first (-15 minutes)
-    subtractTimeSecs(900);
+    // Apply the time penalty first: 30% of the starting timer (scaled so it
+    // stays a trade-off whatever the base time + passives are).
+    subtractTimeSecs(Math.round((globalThis.timerSecs || 0) * 0.3));
 
     const densestRow = _findDensestRow(sol);
     const densestCol = _findDensestCol(sol);
@@ -601,7 +602,7 @@ export function _gamblersRuinOnCorrectFill() {
 // Deducts 60 seconds for a mistake. Called from penalty.js.
 export function _gamblersRuinOnMistake() {
     if (!ptHasSkill('keystone_gamblers_ruin')) return;
-    subtractTimeSecs(60);
+    subtractTimeSecs(30);
 }
 
 

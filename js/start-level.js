@@ -5,7 +5,7 @@ import { applyClassPassiveOnLevelStart } from './classes/class-abilities.js';
 import { buildClassHUD } from './classes/class-hud.js';
 import { _resetPlayerMana } from './classes/class-mana.js';
 import { _varianceShield_removeBubble } from './classes/class-mathmagician-variance-shield.js';
-import { DIFF_CFG, curDiff, curMods } from './difficulty-modifiers.js';
+import { CAMPAIGN_BUDGET_ACTIVE, DIFF_CFG, campaignBaseTimeSecs, campaignCapForLevel, curDiff, curMods } from './difficulty-modifiers.js';
 import { _egOnPuzzleComplete, _egPuzzleCompleteFired, _egUpdateObjectivesHUD } from './combat/encounter-chain.js';
 import { _egMaybeShowMistakesWarning } from './combat/encounter-overlays.js';
 import { _egGetMaxAllowedMistakes } from './combat/encounter-tick-support.js';
@@ -150,6 +150,7 @@ function _resetLevelTrackers() {
     window._sigThresholdProtected = new Set();
     window._dofRevertedCells = new Set();
     window._regressionRewardedLines = new Set();
+    window._lineResourceRewardedLines = new Set();
     window._sigThreshArmed = false;
     window._sigThreshLines = null;
     window._hadPenaltyClutch = false;
@@ -250,7 +251,15 @@ function _calcBaseTime() {
         const gearMult = (typeof _egMapTimeGainMult === 'function') ? _egMapTimeGainMult() : 1;
         baseTimer = cur.egTimeLimit + Math.round(gearBonus * gearMult);
     } else {
-        baseTimer = cur.timer || cfg.timerStart;
+        // Campaign level: grid-size base time once the puzzle budget is
+        // active, today's authored timer until then. Gear time_added counts
+        // in both cases (tree time_added is added in the _initTimer patch).
+        const gearBonus = (typeof _egComputePlayerStats === 'function')
+            ? (_egComputePlayerStats().timeAdded || 0) : 0;
+        const authored = (CAMPAIGN_BUDGET_ACTIVE && cur.grid && cur.grid[0])
+            ? campaignBaseTimeSecs(cur.grid.length * cur.grid[0].length)
+            : (cur.timer || cfg.timerStart);
+        baseTimer = authored + gearBonus;
     }
 
     return curMods.timetrial ? Math.round(baseTimer * 0.5) : baseTimer;
@@ -285,7 +294,7 @@ function _applyExpectedValueBonus() {
 }
 
 // Calculates and sets timerSecs from the base time plus all passive bonuses.
-// keystone_dead_reckoning (264) grants +10 minutes (600s), also blocked by gamblers_ruin.
+// keystone_dead_reckoning (264) grants +30% of the timer, also blocked by gamblers_ruin.
 export function _initTimer() {
     if (window._egSuppressEncounterStop) {
         // Chain puzzle - keep low-time banner state but sync the tracker to
@@ -313,7 +322,7 @@ export function _initTimer() {
     addTimeSecs(expValueBonus, { raw: true });
 
     if (ptHasSkill('keystone_dead_reckoning') && !ptHasSkill('keystone_gamblers_ruin')) {
-        addTimeSecs(600, { raw: true });
+        addTimeSecs(Math.round((globalThis.timerSecs || 0) * 0.3), { raw: true });
     }
     // Fresh level - reset low-time center banners (keeps _lowTimeLastSecs
     // as null so the first updTimer can immediately surface the relevant
@@ -347,6 +356,18 @@ function _updateModTags() {
 }
 
 
+// Allowed-mistake cap of the running CAMPAIGN level (null = no cap).
+// Maps and trials keep egMaxMistakes (_egGetMaxAllowedMistakes); hardcore
+// is handled separately (0 allowed). Base cap by difficulty and grid
+// size + tree + gear allowed mistakes. The same rule is applied by
+// checkMistakeCapAfterMistake in mouse-button-handlers.js.
+function getCampaignMistakeCap() {
+    if (typeof _egIsActive === 'function' && _egIsActive()) return null;
+    const bonus = (typeof _egComputePlayerStats === 'function')
+        ? (_egComputePlayerStats().mistakeCount || 0) : 0;
+    return campaignCapForLevel(cur, bonus);
+}
+
 // Writes the mistake counter text in the one canonical format, so every
 // caller (HUD refresh, mistake eraser, golden clock) stays in sync.
 // On endgame maps with a mistake limit the format is "x / y" (done / allowed);
@@ -370,6 +391,8 @@ export function _setMistakeCounterText(suffix = '') {
         }
     } else if (typeof _egIsActive === 'function' && typeof _egGetMaxAllowedMistakes === 'function' && _egIsActive()) {
         maxMistakes = _egGetMaxAllowedMistakes();
+    } else {
+        maxMistakes = getCampaignMistakeCap();
     }
 
     mc.textContent = (maxMistakes != null)

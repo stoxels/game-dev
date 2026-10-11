@@ -130,11 +130,13 @@ export const TALENT_TREE_DATA = {
    "id": 264,
    "x": 524,
    "y": -2080,
-   "nameEn": "Reserved Keystone",
-   "nameDe": "Reservierter Keystone",
+   "nameEn": "The Oracle",
+   "nameDe": "Das Orakel",
    "icon": "",
-   "statKey": "reserved_keystone_264",
-   "tier": "keystone"
+   "statKey": "keystone_the_oracle",
+   "tier": "keystone",
+   "descEn": "At the start of each level, the entire solution is revealed for 5 seconds, then hidden. All row and column clue numbers are hidden. All automatic cell reveals and marks are disabled except for class abilities. Only works on large and massive grids. All Class Ability Cooldowns are reduced by 30 seconds. ",
+   "descDe": "Zu Beginn jedes Levels wird die gesamte Lösung 5 Sekunden lang enthüllt und dann verborgen. Alle Zeilen- und Spaltenhinweise werden verborgen. Alle automatischen Enthüllungen, Markierungen und Hinweise sind deaktiviert, außer für Klassenfähigkeiten. Nur auf großen und massiven Gittern wirksam. Alle Klassenfähigkeiten haben 30 Sekunden weniger Abklingzeit."
   },
   {
    "id": 298,
@@ -154,11 +156,13 @@ export const TALENT_TREE_DATA = {
    "id": 293,
    "x": -1370,
    "y": 2555,
-   "nameEn": "Reserved Keystone",
-   "nameDe": "Reservierter Keystone",
+   "nameEn": "Entropy Drain",
+   "nameDe": "Entropie-Abbau",
    "icon": "",
-   "statKey": "reserved_keystone_293",
-   "tier": "keystone"
+   "statKey": "keystone_entropy_drain",
+   "tier": "keystone",
+   "descEn": "Whenever you leave a row or column unfinished for more than 3 minutes, all revealed correct cells and all marked incorrect cells in this row and column are reverted back to the blank state . Class Ability Cooldowns are reduced by 30 seconds.",
+   "descDe": "Wenn du eine Zeile oder Spalte länger als 3 Minuten unfertig lässt, werden alle Enthüllungen und Markierungen in dieser Zeile und Spalte zurückgesetzt.  Klassenfähigkeiten haben 30 Sekunden weniger Abklingzeit."
   },
   {
    "id": 291,
@@ -193,11 +197,13 @@ export const TALENT_TREE_DATA = {
    "id": 289,
    "x": -1868,
    "y": 2066,
-   "nameEn": "Reserved Keystone",
-   "nameDe": "Reservierter Keystone",
+   "nameEn": "Stochastic Resonance",
+   "nameDe": "Stochastische Resonanz",
    "icon": "",
-   "statKey": "reserved_keystone_289",
-   "tier": "keystone"
+   "statKey": "keystone_stochastic_resonance",
+   "tier": "keystone",
+   "descEn": "Every mistake has a 25% chance to instead reveal 1 random correct filled cell rather than counting as a mistake. This effect cannot trigger twice in a row.",
+   "descDe": "Jeder Fehler hat eine 25% Chance, stattdessen 1 zufällige korrekte gefüllte Zelle aufzudecken, anstatt als Fehler gezählt zu werden. Dieser Effekt kann nicht zweimal in Folge ausgelöst werden."
   },
   {
    "id": 161,
@@ -274,11 +280,13 @@ export const TALENT_TREE_DATA = {
    "id": 220,
    "x": -2608,
    "y": 160,
-   "nameEn": "Reserved Keystone",
-   "nameDe": "Reservierter Keystone",
+   "nameEn": "Golden Clock",
+   "nameDe": "Goldene Uhr",
    "icon": "",
-   "statKey": "reserved_keystone_220",
-   "tier": "keystone"
+   "statKey": "keystone_golden_clock",
+   "tier": "keystone",
+   "descEn": "Enables the Golden Clock as an item reward. The Golden Clock stops the timer - it can no longer decrease, only increase. Timer items are 100% more effective for the remainder of the level. However, the player may only make 3 more mistakes before the level fails.",
+   "descDe": "Ermöglicht die Goldene Uhr als Gegenstandsbelohnung. Die Goldene Uhr stoppt den Timer - er kann nicht mehr sinken, nur noch steigen. Timer-Gegenstände sind für den Rest des Levels 100% effektiver. Allerdings darf der Spieler nur noch 3 weitere Fehler machen, bevor das Level fehlschlägt."
   },
   {
    "id": 353,
@@ -312,11 +320,13 @@ export const TALENT_TREE_DATA = {
    "id": 333,
    "x": 862,
    "y": 1375,
-   "nameEn": "Reserved Keystone",
-   "nameDe": "Reservierter Keystone",
+   "nameEn": "Ergodic Field",
+   "nameDe": "Ergodisches Feld",
    "icon": "",
-   "statKey": "reserved_keystone_333",
-   "tier": "keystone"
+   "statKey": "keystone_ergodic_field",
+   "tier": "keystone",
+   "descEn": "All automatic cell reveals, marks and field scans are disabled. Instead, every 3 minutes the entire grid briefly flashes, showing the complete solution for 1 second.",
+   "descDe": "Alle automatischen Zellen-Enthüllungen, Markierungen und Feld-Scans sind deaktiviert. Stattdessen zeigt das gesamte Gitter alle 3 Minuten kurz die vollständige Lösung für 1 Sekunde."
   },
   {
    "id": 327,
@@ -366,11 +376,13 @@ export const TALENT_TREE_DATA = {
    "id": 162,
    "x": -2213,
    "y": -1756,
-   "nameEn": "Reserved Keystone",
-   "nameDe": "Reservierter Keystone",
+   "nameEn": "Signal to Noise",
+   "nameDe": "Signal-Rausch-Verhältnis",
    "icon": "",
-   "statKey": "reserved_keystone_162",
-   "tier": "keystone"
+   "statKey": "keystone_signal_to_noise",
+   "tier": "keystone",
+   "descEn": "15% of all row and column clues are randomized to incorrect values at the start of each level. Completing 75% of the grid resets all clues to their true values. All Class Ability Cooldowns lowered by 15 seconds.",
+   "descDe": "15% aller Zeilen- und Spaltenhinweise werden zu Beginn jedes Levels auf falsche Werte gesetzt. Das Abschließen von 75% des Gitters setzt alle Hinweise auf ihre wahren Werte zurück. Alle Klassenfähigkeiten haben 15 Sekunden weniger Abklingzeit."
   },
   {
    "id": 296,
@@ -389,21 +401,25 @@ export const TALENT_TREE_DATA = {
    "id": 290,
    "x": -1917,
    "y": -1232,
-   "nameEn": "Reserved Keystone",
-   "nameDe": "Reservierter Keystone",
+   "nameEn": "Degrees of Freedom",
+   "nameDe": "Freiheitsgrade",
    "icon": "",
-   "statKey": "reserved_keystone_290",
-   "tier": "keystone"
+   "statKey": "keystone_degrees_of_freedom",
+   "tier": "keystone",
+   "descEn": "At the start of each level, choose to hide either all row clues or all column clues. The hidden clues are briefly revealed for 5 seconds every 30 seconds. Class Ability cooldowns are reduced by 30 seconds.",
+   "descDe": "Zu Beginn jedes Levels wählhst du, ob alle Zeilen- oder alle Spaltenhinweise verborgen werden. Die verborgenen Hinweise werden alle 30 Sekunden für 5 Sekunden sichtbar gemacht. Klassenfähigkeiten haben 30 Sekunden weniger Abklingzeit."
   },
   {
    "id": 265,
    "x": 978,
    "y": -1793,
-   "nameEn": "Reserved Keystone",
-   "nameDe": "Reservierter Keystone",
+   "nameEn": "Apex Collector",
+   "nameDe": "Spitzenwert-Sammler",
    "icon": "",
-   "statKey": "reserved_keystone_265",
-   "tier": "keystone"
+   "statKey": "keystone_apex_collector",
+   "tier": "keystone",
+   "descEn": "Codex of Completion can now be obtained as a bonus reward with a drop rate of 3%. Items below Epic grade cannot be obtained as rewards.",
+   "descDe": "Kodex der Fertigstellung kann nun als Bonusbelohnung erhalten werden mit einer Chance von 3%. Gegenstände unterhalb der Epischen Qualitätsstufe können nicht als Belohnungen erhalten werden."
   },
   {
    "id": 350,
@@ -423,11 +439,13 @@ export const TALENT_TREE_DATA = {
    "id": 160,
    "x": 1326,
    "y": 85,
-   "nameEn": "Reserved Keystone",
-   "nameDe": "Reservierter Keystone",
+   "nameEn": "Random Walk",
+   "nameDe": "Zufällige Wanderung",
    "icon": "",
-   "statKey": "reserved_keystone_160",
-   "tier": "keystone"
+   "statKey": "keystone_random_walk",
+   "tier": "keystone",
+   "descEn": "Every 30 seconds, 1 random unfilled cell on the board is either automatically correctly filled or marked as incorrect. Fail the level on 2 mistakes.",
+   "descDe": "Alle 30 Sekunden wird eine zufällige nicht ausgefüllte Zelle auf dem Spielfeld automatisch korrekt ausgefüllt oder als falsch markiert. Verliere das Level nach 2 Fehlern."
   },
   {
    "id": 367,
@@ -531,11 +549,14 @@ export const TALENT_TREE_DATA = {
    "id": 342,
    "x": 1018,
    "y": 2601,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Room to Learn",
+   "nameDe": "Raum zum Lernen",
    "icon": "",
-   "statKey": "reserved_reserved_node_342",
-   "tier": "notable"
+   "statKey": "notable_room_to_learn_342",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:3"
+   ]
   },
   {
    "id": 395,
@@ -783,11 +804,13 @@ export const TALENT_TREE_DATA = {
    "id": 347,
    "x": -2631,
    "y": 960,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Precision Insight",
+   "nameDe": "Präzisionsblick",
    "icon": "",
-   "statKey": "reserved_reserved_node_347",
-   "tier": "notable"
+   "statKey": "error_elimination_3",
+   "tier": "notable",
+   "descEn": "20% chance to mark 1 incorrect empty cell at the start of each level. Rolls independently from Fault Sensing and Error Guidance.",
+   "descDe": "20% Chance, zu Beginn jedes Levels 1 falsche leere Zelle zu markieren. Wirkt unabhängig von Fehlersinn und Fehlerführung."
   },
   {
    "id": 125,
@@ -863,11 +886,13 @@ export const TALENT_TREE_DATA = {
    "id": 233,
    "x": 1384,
    "y": -1312,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Residual Propagation",
+   "nameDe": "Residuen-Propagation",
    "icon": "",
-   "statKey": "reserved_reserved_node_233",
-   "tier": "notable"
+   "statKey": "residual_analysis_3",
+   "tier": "notable",
+   "descEn": "Residual Analysis chance increased by 10%. Stacks with Inference Spillover.",
+   "descDe": "Residualanalyse Chance erhöht um 10%. Wirkt zusammen mit Inferenz-Überlauf."
   },
   {
    "id": 401,
@@ -942,11 +967,13 @@ export const TALENT_TREE_DATA = {
    "id": 379,
    "x": 1219,
    "y": 178,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Stochastic Pulse",
+   "nameDe": "Stochastischer Impuls",
    "icon": "",
-   "statKey": "reserved_reserved_node_379",
-   "tier": "notable"
+   "statKey": "poisson_process_3",
+   "tier": "notable",
+   "descEn": "The Poisson Process effect now occurs every 60 seconds.",
+   "descDe": "Der Poisson - Prozess Effekt wird nun alle 60 Sekunden ausgeführt."
   },
   {
    "id": 100,
@@ -987,7 +1014,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "block_dualshield:4",
     "melee_charge_speed_pct:8",
-    "melee_range_m:0.5"
+    "melee_range_m:0.5",
+    "block_flawless:6"
    ],
    "tier": "notable"
   },
@@ -1029,7 +1057,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_crackling_speed_122",
    "effects": [
     "lightning_damage_inc_pct:24",
-    "cast_speed_pct:8"
+    "cast_speed_pct:8",
+    "damage_low_time:8"
    ],
    "tier": "notable"
   },
@@ -1150,11 +1179,13 @@ export const TALENT_TREE_DATA = {
    "id": 239,
    "x": 2660,
    "y": -1454,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Wiener Process",
+   "nameDe": "Wiener-Prozess",
    "icon": "",
-   "statKey": "reserved_reserved_node_239",
-   "tier": "notable"
+   "statKey": "wiener_process",
+   "tier": "notable",
+   "descEn": "Every 90 seconds, a random unsolved cell briefly flashes its true value for 2 seconds.",
+   "descDe": "Alle 90 Sekunden zeigt eine zufällige ungelöste Zelle für 2 Sekunden kurz ihren wahren Wert an."
   },
   {
    "id": 310,
@@ -1491,11 +1522,14 @@ export const TALENT_TREE_DATA = {
    "id": 119,
    "x": -1323,
    "y": 1918,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Patient Study",
+   "nameDe": "Geduldiges Studium",
    "icon": "",
-   "statKey": "reserved_reserved_node_119",
-   "tier": "notable"
+   "statKey": "notable_patient_study_119",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 382,
@@ -1597,11 +1631,13 @@ export const TALENT_TREE_DATA = {
    "id": 193,
    "x": -2719,
    "y": -1269,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Hypothesis Testing",
+   "nameDe": "Hypothesentest",
    "icon": "",
-   "statKey": "reserved_reserved_node_193",
-   "tier": "notable"
+   "statKey": "hypothesis_testing",
+   "tier": "notable",
+   "descEn": "When the timer first drops below 75%, one cell is revealed. When it first drops below 50%, one incorrect empty cell is automatically marked.",
+   "descDe": "Wenn der Timer erstmals unter 75% fällt, wird eine Zelle aufgedeckt. Wenn er erstmals unter 50% fällt, wird automatisch eine falsche leere Zelle markiert."
   },
   {
    "id": 194,
@@ -1621,21 +1657,26 @@ export const TALENT_TREE_DATA = {
    "id": 326,
    "x": -1696,
    "y": 2554,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Measure Zero",
+   "nameDe": "Maß Null",
    "icon": "",
-   "statKey": "reserved_reserved_node_326",
-   "tier": "notable"
+   "statKey": "measure_zero",
+   "tier": "notable",
+   "descEn": "Rows and columns whose solution is completely empty are automatically marked in their entirety at the start of each level.",
+   "descDe": "Reihen und Spalten, deren Lösung komplett leer ist, werden zu Beginn jedes Levels vollständig automatisch markiert."
   },
   {
    "id": 332,
    "x": 2520,
    "y": 1442,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Patient Study",
+   "nameDe": "Geduldiges Studium",
    "icon": "",
-   "statKey": "reserved_reserved_node_332",
-   "tier": "notable"
+   "statKey": "notable_patient_study_332",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 311,
@@ -1660,7 +1701,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_deflection_166",
    "effects": [
     "block_shield:8",
-    "endurance_on_block:25"
+    "endurance_on_block:25",
+    "charge_on_line:12"
    ],
    "tier": "notable"
   },
@@ -1674,7 +1716,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_needle_storm_167",
    "effects": [
     "pierce_chance:15",
-    "secondary_damage:15"
+    "secondary_damage:15",
+    "reveal_projectile_damage:16"
    ],
    "tier": "notable"
   },
@@ -1771,7 +1814,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_flash_freeze_258",
    "effects": [
     "cold_damage_inc_pct:25",
-    "freeze_chance_pct:15"
+    "freeze_chance_pct:15",
+    "damage_on_mistake:15"
    ],
    "tier": "notable"
   },
@@ -1811,7 +1855,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_mystic_bulwark_323",
    "effects": [
-    "spell_block_flat:6"
+    "spell_block_flat:6",
+    "block_flawless:6"
    ],
    "tier": "notable"
   },
@@ -1959,11 +2004,13 @@ export const TALENT_TREE_DATA = {
    "id": 319,
    "x": -1087,
    "y": -2671,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Thesis Defense",
+   "nameDe": "Disputation",
    "icon": "",
-   "statKey": "reserved_reserved_node_319",
-   "tier": "notable"
+   "statKey": "thesis_defense",
+   "tier": "notable",
+   "descEn": "At the start of each level, one cell is revealed and one incorrect empty cell is automatically marked.",
+   "descDe": "Zu Beginn jedes Levels wird eine Zelle aufgedeckt und eine falsche leere Zelle automatisch markiert."
   },
   {
    "id": 24,
@@ -2037,11 +2084,13 @@ export const TALENT_TREE_DATA = {
    "id": 325,
    "x": 2799,
    "y": -1193,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Guided Serendipity",
+   "nameDe": "Gelenkter Zufall",
    "icon": "",
-   "statKey": "reserved_reserved_node_325",
-   "tier": "notable"
+   "statKey": "outlier_detection_2",
+   "tier": "notable",
+   "descEn": "One Lucky Tile is highlighted until revealed. This stacks additively with Fate's Whisper.",
+   "descDe": "Ein Glücksfeld wird markiert bis es aufgedeckt wird. Dies summiert sich mit Flüstern des Schicksals."
   },
   {
    "id": 18,
@@ -2062,11 +2111,13 @@ export const TALENT_TREE_DATA = {
    "id": 314,
    "x": -2065,
    "y": -1224,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Clarity Mark",
+   "nameDe": "Klarheitsmarke",
    "icon": "",
-   "statKey": "reserved_reserved_node_314",
-   "tier": "notable"
+   "statKey": "stronger_marks_3",
+   "tier": "notable",
+   "descEn": "Mark-wrong items mark 1 additional cell.",
+   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle."
   },
   {
    "id": 16,
@@ -2155,11 +2206,13 @@ export const TALENT_TREE_DATA = {
    "id": 391,
    "x": 1799,
    "y": -2402,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Stochastics Tutor",
+   "nameDe": "Stochastik Tutor",
    "icon": "",
-   "statKey": "reserved_reserved_node_391",
-   "tier": "notable"
+   "statKey": "stochastics_tutor",
+   "tier": "notable",
+   "descEn": "Increases the chance that the tutor can solve the question by an additional 10%.",
+   "descDe": "Erhöht die Chance, dass der Tutor die Frage beantworten kann, um weitere 10%."
   },
   {
    "id": 270,
@@ -2311,7 +2364,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lesser_probability_well_383",
    "effects": [
     "evasion_flat:30",
-    "health_inc_pct:5"
+    "health_inc_pct:5",
+    "life_on_line:5"
    ],
    "tier": "small",
    "layoutPinned": true
@@ -2437,11 +2491,14 @@ export const TALENT_TREE_DATA = {
    "id": 359,
    "x": 763,
    "y": -1935,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Open Afternoon",
+   "nameDe": "Offener Nachmittag",
    "icon": "",
-   "statKey": "reserved_reserved_node_359",
-   "tier": "notable"
+   "statKey": "notable_open_afternoon_359",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 116,
@@ -2460,11 +2517,14 @@ export const TALENT_TREE_DATA = {
    "id": 117,
    "x": 1125,
    "y": -1626,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Unhurried Mind",
+   "nameDe": "Gelassener Geist",
    "icon": "",
-   "statKey": "reserved_reserved_node_117",
-   "tier": "notable"
+   "statKey": "notable_unhurried_mind_117",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 214,
@@ -2485,11 +2545,15 @@ export const TALENT_TREE_DATA = {
    "id": 215,
    "x": 2421,
    "y": 1531,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Second Chances",
+   "nameDe": "Zweite Chancen",
    "icon": "",
-   "statKey": "reserved_reserved_node_215",
-   "tier": "notable"
+   "statKey": "notable_second_chances_215",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:2",
+    "mistake_not_count_pct:5"
+   ]
   },
   {
    "id": 354,
@@ -2590,11 +2654,15 @@ export const TALENT_TREE_DATA = {
    "id": 389,
    "x": -884,
    "y": -2768,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Open Afternoon",
+   "nameDe": "Offener Nachmittag",
    "icon": "",
-   "statKey": "reserved_reserved_node_389",
-   "tier": "notable"
+   "statKey": "notable_open_afternoon_389",
+   "tier": "notable",
+   "effects": [
+    "time_added:300",
+    "life_flat:30"
+   ]
   },
   {
    "id": 223,
@@ -2728,7 +2796,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_spirit_of_war_313",
    "effects": [
-    "mana_leech_attack:0.5"
+    "mana_leech_attack:0.5",
+    "mana_on_line:6"
    ],
    "tier": "notable"
   },
@@ -2736,11 +2805,15 @@ export const TALENT_TREE_DATA = {
    "id": 303,
    "x": -1,
    "y": -1753,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Long Session",
+   "nameDe": "Lange Sitzung",
    "icon": "",
-   "statKey": "reserved_reserved_node_303",
-   "tier": "notable"
+   "statKey": "notable_long_session_303",
+   "tier": "notable",
+   "effects": [
+    "time_added:300",
+    "life_flat:30"
+   ]
   },
   {
    "id": 308,
@@ -2766,7 +2839,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_blood_drinker_241",
    "effects": [
     "health_inc_pct:10",
-    "life_on_kill_flat:3"
+    "life_on_kill_flat:3",
+    "life_on_line:10"
    ],
    "tier": "notable"
   },
@@ -2774,11 +2848,13 @@ export const TALENT_TREE_DATA = {
    "id": 242,
    "x": -2714,
    "y": 266,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Overload Scan",
+   "nameDe": "Überlastungs-Scan",
    "icon": "",
-   "statKey": "reserved_reserved_node_242",
-   "tier": "notable"
+   "statKey": "emergency_scan_3",
+   "tier": "notable",
+   "descEn": "Increases the Emergency Scan duration by 2 seconds. Stacks with Critical Scan Extension.",
+   "descDe": "Erhöht die Dauer des Notfall-Scans um 2 Sekunden. Wirkt zusammen mit Kritische Scan-Verlängerung."
   },
   {
    "id": 256,
@@ -2799,11 +2875,13 @@ export const TALENT_TREE_DATA = {
    "id": 257,
    "x": -1615,
    "y": -2321,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Density Focus",
+   "nameDe": "Dichtefokus",
    "icon": "",
-   "statKey": "reserved_reserved_node_257",
-   "tier": "notable"
+   "statKey": "dense_marker_3",
+   "tier": "notable",
+   "descEn": "Mark-wrong items have a 30% chance to prioritize cells in rows or columns that already have many filled cells (but are not yet complete).",
+   "descDe": "Markierungsgegenstände haben eine 30% Chance, Zellen in Zeilen oder Spalten mit vielen bereits gefüllten Zellen zu priorisieren (sofern diese noch nicht vollständig sind)."
   },
   {
    "id": 356,
@@ -2863,41 +2941,51 @@ export const TALENT_TREE_DATA = {
    "id": 244,
    "x": 646,
    "y": -2602,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Calculated Genesis",
+   "nameDe": "Berechneter Ursprung",
    "icon": "",
-   "statKey": "reserved_reserved_node_244",
-   "tier": "notable"
+   "statKey": "probabilistic_start_3",
+   "tier": "notable",
+   "descEn": "20% chance to reveal 1 correct filled cell at the start of each level. Rolls independently from Probabilistic Start and Stochastic Awakening.",
+   "descDe": "20% Chance, zu Beginn jedes Levels 1 korrekte gefüllte Zelle aufzudecken. Wirkt unabhängig von Probabilistischer Start und Stochastisches Erwachen."
   },
   {
    "id": 245,
    "x": 969,
    "y": 2304,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Quiet Hours",
+   "nameDe": "Stille Stunden",
    "icon": "",
-   "statKey": "reserved_reserved_node_245",
-   "tier": "notable"
+   "statKey": "notable_quiet_hours_245",
+   "tier": "notable",
+   "effects": [
+    "time_added:300",
+    "life_flat:30"
+   ]
   },
   {
    "id": 107,
    "x": -890,
    "y": -1791,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Focused Analysis",
+   "nameDe": "Fokussierte Analyse",
    "icon": "",
-   "statKey": "reserved_reserved_node_107",
-   "tier": "notable"
+   "statKey": "interquartile_vision_3",
+   "tier": "notable",
+   "descEn": "Extends the Interquartile-Vision Fieldscan duration by 1 second.",
+   "descDe": "Verlängert die Interquartil-Vision Feldscan Dauer um 1 Sekunde."
   },
   {
    "id": 108,
    "x": -1546,
    "y": 1261,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Forgiveness Threshold",
+   "nameDe": "Fehlertoleranz",
    "icon": "",
-   "statKey": "reserved_reserved_node_108",
-   "tier": "notable"
+   "statKey": "confidence_interval_3",
+   "tier": "notable",
+   "descEn": "The duration, during which your next mistake is ignored, is increased by 1 second.",
+   "descDe": "Die Dauer, in dem dein nächster Fehler ignoriert wird, wird um 1 Sekunde erhöht."
   },
   {
    "id": 110,
@@ -2962,11 +3050,14 @@ export const TALENT_TREE_DATA = {
    "id": 128,
    "x": 1801,
    "y": 1429,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Long Session",
+   "nameDe": "Lange Sitzung",
    "icon": "",
-   "statKey": "reserved_reserved_node_128",
-   "tier": "notable"
+   "statKey": "notable_long_session_128",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 129,
@@ -2986,11 +3077,13 @@ export const TALENT_TREE_DATA = {
    "id": 363,
    "x": -2081,
    "y": 1890,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Cross Faculty",
+   "nameDe": "Fakultätsübergreifend",
    "icon": "",
-   "statKey": "reserved_reserved_node_363",
-   "tier": "notable"
+   "statKey": "cross_faculty",
+   "tier": "notable",
+   "descEn": "One additional incorrect empty cell is automatically marked at the start of each level.",
+   "descDe": "Zu Beginn jedes Levels wird automatisch eine zusätzliche falsche leere Zelle markiert."
   },
   {
    "id": 393,
@@ -3164,11 +3257,13 @@ export const TALENT_TREE_DATA = {
    "id": 146,
    "x": -2138,
    "y": -1448,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Statistics Tutor",
+   "nameDe": "Statistik Tutor",
    "icon": "",
-   "statKey": "reserved_reserved_node_146",
-   "tier": "notable"
+   "statKey": "statistics_tutor",
+   "tier": "notable",
+   "descEn": "Increases the chance that the tutor can solve the question by an additional 10%.",
+   "descDe": "Erhöht die Chance, dass der Tutor die Frage beantworten kann, um weitere 10%."
   },
   {
    "id": 147,
@@ -3233,11 +3328,14 @@ export const TALENT_TREE_DATA = {
    "id": 144,
    "x": -1162,
    "y": 2364,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Deep Focus",
+   "nameDe": "Tiefer Fokus",
    "icon": "",
-   "statKey": "reserved_reserved_node_144",
-   "tier": "notable"
+   "statKey": "notable_deep_focus_144",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 27,
@@ -3257,11 +3355,13 @@ export const TALENT_TREE_DATA = {
    "id": 318,
    "x": 2660,
    "y": -1538,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Maths Tutor",
+   "nameDe": "Mathe Tutor",
    "icon": "",
-   "statKey": "reserved_reserved_node_318",
-   "tier": "notable"
+   "statKey": "maths_tutor",
+   "tier": "notable",
+   "descEn": "Increases the chance that the tutor can solve the question by an additional 10%.",
+   "descDe": "Erhöht die Chance, dass der Tutor die Frage beantworten kann, um weitere 10%."
   },
   {
    "id": 3,
@@ -3661,7 +3761,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_adamant_20004",
    "effects": [
-    "armour_inc_pct:25"
+    "armour_inc_pct:25",
+    "armour_per_streak:20"
    ],
    "tier": "notable"
   },
@@ -3689,7 +3790,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "dual_block:10",
     "block_recovery:50",
-    "dual_damage:25"
+    "dual_damage:25",
+    "block_flawless:6"
    ],
    "tier": "notable"
   },
@@ -3717,7 +3819,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "endurance_min:1",
     "endurance_on_kill:8",
-    "damage_per_endurance:8"
+    "damage_per_endurance:8",
+    "charge_on_line:12"
    ],
    "tier": "notable"
   },
@@ -3731,7 +3834,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_testudo_20009",
    "effects": [
     "block_shield:10",
-    "block_recovery:60"
+    "block_recovery:60",
+    "block_flawless:6"
    ],
    "tier": "notable"
   },
@@ -3831,7 +3935,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_mana_and_mana_regeneration_30010",
    "effects": [
     "mana_inc_pct:8",
-    "mana_regen_inc_pct:10"
+    "mana_regen_inc_pct:10",
+    "lucky_tile_reward:8"
    ],
    "tier": "small"
   },
@@ -4296,7 +4401,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mana_and_aura_area_of_effect_30045",
    "effects": [
-    "mana_inc_pct:8"
+    "mana_inc_pct:8",
+    "mana_on_line:3"
    ],
    "tier": "small"
   },
@@ -4309,7 +4415,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mana_and_aura_area_of_effect_30046",
    "effects": [
-    "mana_inc_pct:8"
+    "mana_inc_pct:8",
+    "lucky_tile_reward:8"
    ],
    "tier": "small"
   },
@@ -4349,7 +4456,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_discipline_and_training_20011",
    "effects": [
     "life_flat:30",
-    "health_inc_pct:10"
+    "health_inc_pct:10",
+    "life_on_line:10"
    ],
    "tier": "notable"
   },
@@ -4423,7 +4531,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_arcane_capacitor_20016",
    "effects": [
-    "mana_inc_pct:15"
+    "mana_inc_pct:15",
+    "mana_on_line:6"
    ],
    "tier": "notable"
   },
@@ -4431,11 +4540,13 @@ export const TALENT_TREE_DATA = {
    "id": 20017,
    "x": -2380,
    "y": -1547,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Chain Revelation",
+   "nameDe": "Kettenenthüllung",
    "icon": "",
-   "statKey": "reserved_reserved_node_20017",
-   "tier": "notable"
+   "statKey": "covariance_shift_3",
+   "tier": "notable",
+   "descEn": "Covariance Shift now reveals one more random correctly filled cell in the same row or column. Stacks with Lucky Echo.",
+   "descDe": "Kovarianz-Verschiebung kann nun eine weitere zufällige korrekt gefüllte Zelle in derselben Zeile oder Spalte aufdecken. Wirkt zusammen mit Glücksecho."
   },
   {
    "id": 20018,
@@ -4448,7 +4559,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "accuracy_rating_pct:10",
     "elemental_damage_inc_pct:30",
-    "pen_elemental:5"
+    "pen_elemental:5",
+    "damage_after_line:12"
    ],
    "tier": "notable"
   },
@@ -4506,7 +4618,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_mana_and_life_regeneration_30055",
    "effects": [
     "mana_regen_inc_pct:15",
-    "life_regen_pct:0.4"
+    "life_regen_pct:0.4",
+    "mana_on_line:3"
    ],
    "tier": "small"
   },
@@ -4613,7 +4726,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_elemental_damage_30063",
    "effects": [
-    "elemental_damage_inc_pct:10"
+    "elemental_damage_inc_pct:10",
+    "damage_after_line:6"
    ],
    "tier": "small"
   },
@@ -4809,11 +4923,13 @@ export const TALENT_TREE_DATA = {
    "id": 30079,
    "x": -2025,
    "y": -1224,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Insightful Trace",
+   "nameDe": "Einsichtsvolle Spur",
    "icon": "",
-   "statKey": "reserved_reserved_node_30079",
-   "tier": "small"
+   "statKey": "stronger_marks_1",
+   "tier": "small",
+   "descEn": "Mark-wrong items mark 1 additional cell.",
+   "descDe": "Markierungsgegenstände markieren 1 zusätzliche Zelle."
   },
   {
    "id": 30080,
@@ -4825,7 +4941,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_armour_and_energy_shield_30080",
    "effects": [
     "armour_inc_pct:8",
-    "absorption_inc_pct:5"
+    "absorption_inc_pct:5",
+    "armour_per_streak:10"
    ],
    "tier": "small"
   },
@@ -4839,7 +4956,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_armour_and_energy_shield_30081",
    "effects": [
     "armour_inc_pct:8",
-    "absorption_inc_pct:5"
+    "absorption_inc_pct:5",
+    "armour_per_streak:10"
    ],
    "tier": "small"
   },
@@ -4879,7 +4997,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mana_and_arcane_surge_effect_30084",
    "effects": [
-    "mana_inc_pct:8"
+    "mana_inc_pct:8",
+    "lucky_tile_reward:8"
    ],
    "tier": "small"
   },
@@ -4893,7 +5012,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_intellect_30085",
    "effects": [
     "int_flat:5",
-    "mana_regen_inc_pct:10"
+    "mana_regen_inc_pct:10",
+    "pickup_lifetime:2"
    ],
    "tier": "small",
    "layoutPinned": true
@@ -4956,21 +5076,25 @@ export const TALENT_TREE_DATA = {
    "id": 30091,
    "x": -2307,
    "y": -1596,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Covariance Shift",
+   "nameDe": "Kovarianz-Verschiebung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30091",
-   "tier": "small"
+   "statKey": "covariance_shift_1",
+   "tier": "small",
+   "descEn": "Whenever a Lucky Tile is revealed a random correctly filled cell in the same row or column is also revealed.",
+   "descDe": "Wenn ein Glücksfeld enthüllt wird, wird auch eine zufällige korrekte gefüllte Zelle in derselben Zeile oder Spalte aufgedeckt."
   },
   {
    "id": 30092,
    "x": -2340,
    "y": -1547,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Lucky Echo",
+   "nameDe": "Glücksecho",
    "icon": "",
-   "statKey": "reserved_reserved_node_30092",
-   "tier": "small"
+   "statKey": "covariance_shift_2",
+   "tier": "small",
+   "descEn": "Covariance Shift can now reveal one more random correctly filled cell in the same row or column. Stacks with Chain Revelation.",
+   "descDe": "Kovarianz-Verschiebung kann nun eine weitere zufällige korrekt gefüllte Zelle in derselben Zeile oder Spalte aufdecken. Wirkt zusammen mit Kettenenthüllung."
   },
   {
    "id": 30093,
@@ -5084,11 +5208,14 @@ export const TALENT_TREE_DATA = {
    "id": 20022,
    "x": 1755,
    "y": -941,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Borrowed Evening",
+   "nameDe": "Geborgter Abend",
    "icon": "",
-   "statKey": "reserved_trap_mine_20022",
-   "tier": "notable"
+   "statKey": "notable_borrowed_evening_20022",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 20023,
@@ -5146,21 +5273,25 @@ export const TALENT_TREE_DATA = {
    "id": 20027,
    "x": 2558,
    "y": -1386,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Honorary Degree",
+   "nameDe": "Ehrendoktor",
    "icon": "",
-   "statKey": "reserved_reserved_node_20027",
-   "tier": "notable"
+   "statKey": "honorary_degree",
+   "tier": "notable",
+   "descEn": "The Tutor's auto-answer chance is increased by 10 percentage points.",
+   "descDe": "Die Auto-Antwort-Chance des Tutors wird um 10 Prozentpunkte erhöht."
   },
   {
    "id": 20028,
    "x": 2647,
    "y": -1295,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fortune's Growth",
+   "nameDe": "Wachsendes Glück",
    "icon": "",
-   "statKey": "reserved_reserved_node_20028",
-   "tier": "notable"
+   "statKey": "fortunes_tile_2",
+   "tier": "notable",
+   "descEn": "Large and massive grids have a 15% chance of having an additional Lucky Tile. This stacks additively with other Lucky Tile bonuses.",
+   "descDe": "Große und massive Gitter haben eine 15% Chance ein weiteres Glücksfeld zu haben. Dies summiert sich mit anderen Glücksfeld-Boni."
   },
   {
    "id": 20029,
@@ -5214,7 +5345,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_dark_might_30105",
    "effects": [
     "phys_damage_inc:12",
-    "shadow_damage_inc_pct:12"
+    "shadow_damage_inc_pct:12",
+    "damage_after_line:6"
    ],
    "tier": "small"
   },
@@ -5282,7 +5414,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lesser_elemental_edge_30110",
    "effects": [
-    "elemental_damage_inc_pct:10"
+    "elemental_damage_inc_pct:10",
+    "damage_on_mistake:8"
    ],
    "tier": "small"
   },
@@ -5532,7 +5665,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_draining_flow_30130",
    "effects": [
-    "absorption_leech_effect_inc:5"
+    "absorption_leech_effect_inc:5",
+    "absorption_on_line:6"
    ],
    "tier": "small"
   },
@@ -5649,11 +5783,13 @@ export const TALENT_TREE_DATA = {
    "id": 30141,
    "x": 2587,
    "y": -1235,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Lucky Foundations",
+   "nameDe": "Glücksgrundlage",
    "icon": "",
-   "statKey": "reserved_reserved_node_30141",
-   "tier": "small"
+   "statKey": "fortunes_tile_1",
+   "tier": "small",
+   "descEn": "Large and massive grids have a 10% chance of having an additional Lucky Tile. This stacks additively with other Lucky Tile bonuses.",
+   "descDe": "Große und massive Gitter haben eine 10% Chance ein weiteres Glücksfeld zu haben. Dies summiert sich mit anderen Glücksfeld-Boni."
   },
   {
    "id": 30142,
@@ -5720,11 +5856,15 @@ export const TALENT_TREE_DATA = {
    "id": 30147,
    "x": 1844,
    "y": -1210,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_claw_30147",
-   "tier": "small"
+   "statKey": "small_spare_minute_30147",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_flat:14"
+   ]
   },
   {
    "id": 30148,
@@ -6029,11 +6169,15 @@ export const TALENT_TREE_DATA = {
    "id": 20046,
    "x": -2406,
    "y": 1662,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Borrowed Evening",
+   "nameDe": "Geborgter Abend",
    "icon": "",
-   "statKey": "reserved_reserved_node_20046",
-   "tier": "notable"
+   "statKey": "notable_borrowed_evening_20046",
+   "tier": "notable",
+   "effects": [
+    "time_added:300",
+    "life_flat:30"
+   ]
   },
   {
    "id": 20047,
@@ -6052,21 +6196,25 @@ export const TALENT_TREE_DATA = {
    "id": 20048,
    "x": -2081,
    "y": 2094,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Recursive Belief Update",
+   "nameDe": "Rekursive Glaubensaktualisierung",
    "icon": "",
-   "statKey": "reserved_reserved_node_20048",
-   "tier": "notable"
+   "statKey": "bayesian_update_3",
+   "tier": "notable",
+   "descEn": "Each mistake you make during a level permanently increases the chance of the next automatic cell mark or reveal triggering by 5%, resetting after it triggers. Stacks with Bayesian Adjustment and Adaptive Inference.",
+   "descDe": "Jeder Fehler während eines Levels erhöht dauerhaft die Chance des nächsten automatischen Markierens oder Aufdeckens um 5% und setzt sich danach zurück. Wirkt zusammen mit Bayesscher Anpassung und Adaptiver Inferenz."
   },
   {
    "id": 20049,
    "x": -1696,
    "y": 2350,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Variance Swap",
+   "nameDe": "Varianz-Tausch",
    "icon": "",
-   "statKey": "reserved_reserved_node_20049",
-   "tier": "notable"
+   "statKey": "variance_swap",
+   "tier": "notable",
+   "descEn": "10% of all reveals are doubled (2 cells instead of 1).",
+   "descDe": "10% aller Aufdeckungen werden verdoppelt (2 Zellen statt 1)."
   },
   {
    "id": 20050,
@@ -6077,7 +6225,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_brink_of_death_20050",
    "effects": [
-    "low_life_regen_pct:4"
+    "low_life_regen_pct:4",
+    "regen_low_time:40"
    ],
    "tier": "notable"
   },
@@ -6111,11 +6260,13 @@ export const TALENT_TREE_DATA = {
    "id": 20053,
    "x": -663,
    "y": 1647,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Chrono Freeze",
+   "nameDe": "Chronofrost",
    "icon": "",
-   "statKey": "reserved_reserved_node_20053",
-   "tier": "notable"
+   "statKey": "timed_stasis_3",
+   "tier": "notable",
+   "descEn": "Increases the freeze duration by 0.5 seconds.",
+   "descDe": "Erhöt die Einfrier - Zeit um 0.5 Sekunden."
   },
   {
    "id": 20054,
@@ -6126,7 +6277,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_command_of_steel_20054",
    "effects": [
-    "block_shield:8"
+    "block_shield:8",
+    "block_flawless:6"
    ],
    "tier": "notable"
   },
@@ -6149,11 +6301,15 @@ export const TALENT_TREE_DATA = {
    "id": 20057,
    "x": -413,
    "y": 2097,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Safety Net",
+   "nameDe": "Sicherheitsnetz",
    "icon": "",
-   "statKey": "reserved_reserved_node_20057",
-   "tier": "notable"
+   "statKey": "notable_safety_net_20057",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:3",
+    "life_more_pct:8"
+   ]
   },
   {
    "id": 20058,
@@ -6187,11 +6343,13 @@ export const TALENT_TREE_DATA = {
    "id": 20060,
    "x": -778,
    "y": 2382,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Eclipse Focus",
+   "nameDe": "Finsternis-Fokus",
    "icon": "",
-   "statKey": "reserved_reserved_node_20060",
-   "tier": "notable"
+   "statKey": "eclipse_focus",
+   "tier": "notable",
+   "descEn": "Every 4 minutes, one cell is revealed.",
+   "descDe": "Alle 4 Minuten wird eine Zelle aufgedeckt."
   },
   {
    "id": 20061,
@@ -6202,7 +6360,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_bastion_breaker_20061",
    "effects": [
-    "phys_damage_inc:30"
+    "phys_damage_inc:30",
+    "damage_on_mistake:15"
    ],
    "tier": "notable"
   },
@@ -6310,11 +6469,15 @@ export const TALENT_TREE_DATA = {
    "id": 20069,
    "x": -2131,
    "y": 388,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Margin of Error",
+   "nameDe": "Fehlerspielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_20069",
-   "tier": "notable"
+   "statKey": "notable_margin_of_error_20069",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:2",
+    "mistake_not_count_pct:5"
+   ]
   },
   {
    "id": 20070,
@@ -6406,11 +6569,13 @@ export const TALENT_TREE_DATA = {
    "id": 20078,
    "x": -2379,
    "y": -622,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Overflowing Blessing",
+   "nameDe": "Überfließendes Glück",
    "icon": "",
-   "statKey": "reserved_reserved_node_20078",
-   "tier": "notable"
+   "statKey": "generous_fortune_3",
+   "tier": "notable",
+   "descEn": "Revealing a Lucky Tile has 25% chance of granting an additional item. This stacks additively with other Lucky Tile reward bonuses.",
+   "descDe": "Das Enthüllen eines Glücksfelds hat eine 25% Chance einen weiteren Gegenstand zu gewähren. Dies summiert sich mit anderen Glücksfeld-Belohnungsboni."
   },
   {
    "id": 20079,
@@ -6429,31 +6594,40 @@ export const TALENT_TREE_DATA = {
    "id": 20080,
    "x": -2374,
    "y": -390,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Marathon Pace",
+   "nameDe": "Marathon-Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_20080",
-   "tier": "notable"
+   "statKey": "notable_marathon_pace_20080",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 20081,
    "x": -2399,
    "y": -155,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Unhurried Mind",
+   "nameDe": "Gelassener Geist",
    "icon": "",
-   "statKey": "reserved_reserved_node_20081",
-   "tier": "notable"
+   "statKey": "notable_unhurried_mind_20081",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 20082,
    "x": -2346,
    "y": -102,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Unhurried Mind",
+   "nameDe": "Gelassener Geist",
    "icon": "",
-   "statKey": "reserved_reserved_node_20082",
-   "tier": "notable"
+   "statKey": "notable_unhurried_mind_20082",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 20083,
@@ -6464,7 +6638,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_tireless_20083",
    "effects": [
-    "health_inc_pct:10"
+    "health_inc_pct:10",
+    "pickup_lifetime:4"
    ],
    "tier": "notable"
   },
@@ -6485,11 +6660,15 @@ export const TALENT_TREE_DATA = {
    "id": 20085,
    "x": -1578,
    "y": 130,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Long Session",
+   "nameDe": "Lange Sitzung",
    "icon": "",
-   "statKey": "reserved_reserved_node_20085",
-   "tier": "notable"
+   "statKey": "notable_long_session_20085",
+   "tier": "notable",
+   "effects": [
+    "time_added:300",
+    "life_flat:30"
+   ]
   },
   {
    "id": 20086,
@@ -6509,11 +6688,14 @@ export const TALENT_TREE_DATA = {
    "id": 20088,
    "x": -1514,
    "y": -286,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Second Chances",
+   "nameDe": "Zweite Chancen",
    "icon": "",
-   "statKey": "reserved_reserved_node_20088",
-   "tier": "notable"
+   "statKey": "notable_second_chances_20088",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:3"
+   ]
   },
   {
    "id": 20089,
@@ -6546,21 +6728,27 @@ export const TALENT_TREE_DATA = {
    "id": 20092,
    "x": -1322,
    "y": -359,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Slow Hour",
+   "nameDe": "Langsame Stunde",
    "icon": "",
-   "statKey": "reserved_reserved_node_20092",
-   "tier": "notable"
+   "statKey": "notable_slow_hour_20092",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 20094,
    "x": -1986,
    "y": -410,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Forgiving Grid",
+   "nameDe": "Nachsichtiges Raster",
    "icon": "",
-   "statKey": "reserved_reserved_node_20094",
-   "tier": "notable"
+   "statKey": "notable_forgiving_grid_20094",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:3"
+   ]
   },
   {
    "id": 20095,
@@ -6917,7 +7105,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_plated_growth_30204",
    "effects": [
     "armour_inc_pct:12",
-    "health_inc_pct:4"
+    "health_inc_pct:4",
+    "life_on_line:5"
    ],
    "tier": "small"
   },
@@ -6944,7 +7133,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_vital_renewal_30206",
    "effects": [
-    "life_regen_pct:0.8"
+    "life_regen_pct:0.8",
+    "mistake_heal:6"
    ],
    "tier": "small"
   },
@@ -7283,21 +7473,25 @@ export const TALENT_TREE_DATA = {
    "id": 30233,
    "x": -765,
    "y": 1667,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Temporal Suspension",
+   "nameDe": "Zeitliche Aussetzung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30233",
-   "tier": "small"
+   "statKey": "timed_stasis_2",
+   "tier": "small",
+   "descEn": "Increases the freeze duration by 0.5 seconds.",
+   "descDe": "Erhöt die Einfrier - Zeit um 0.5 Sekunden."
   },
   {
    "id": 30234,
    "x": -765,
    "y": 1627,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Timed Stasis",
+   "nameDe": "Zeitstase",
    "icon": "",
-   "statKey": "reserved_reserved_node_30234",
-   "tier": "small"
+   "statKey": "timed_stasis_1",
+   "tier": "small",
+   "descEn": "Every 10 minutes the timer pauses for 1 second.",
+   "descDe": "Alle 10 Minuten wird der Timer für 1 Sekunde pausiert."
   },
   {
    "id": 30235,
@@ -7322,7 +7516,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_accuracy_and_critical_strike_chance_30236",
    "effects": [
     "crit_chance_flat:2",
-    "accuracy_rating_pct:12"
+    "accuracy_rating_pct:12",
+    "reveal_projectile_damage:8"
    ],
    "tier": "small"
   },
@@ -7376,7 +7571,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_armour_and_elemental_resistances_30240",
    "effects": [
     "armour_inc_pct:10",
-    "all_elemental_resist:5"
+    "all_elemental_resist:5",
+    "armour_per_streak:10"
    ],
    "tier": "small"
   },
@@ -7438,21 +7634,25 @@ export const TALENT_TREE_DATA = {
    "id": 30245,
    "x": -1546,
    "y": 1367,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Confidence Interval",
+   "nameDe": "Konfidenzintervall",
    "icon": "",
-   "statKey": "reserved_reserved_node_30245",
-   "tier": "small"
+   "statKey": "confidence_interval_1",
+   "tier": "small",
+   "descEn": "After making a mistake, gain a 1-second window during which your next mistake is ignored. This cannot occur twice in a row.",
+   "descDe": "Nach einem Fehler hast du ein 1-Sekunden-Fenster, in dem dein nächster Fehler ignoriert wird. Dies kann nicht zweimal hintereinander auftreten."
   },
   {
    "id": 30246,
    "x": -1493,
    "y": 1314,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Recovery Window",
+   "nameDe": "Erholungsfenster",
    "icon": "",
-   "statKey": "reserved_reserved_node_30246",
-   "tier": "small"
+   "statKey": "confidence_interval_2",
+   "tier": "small",
+   "descEn": "The duration, during which your next mistake is ignored, is increased by 1 second.",
+   "descDe": "Die Dauer, in dem dein nächster Fehler ignoriert wird, wird um 1 Sekunde erhöht."
   },
   {
    "id": 30247,
@@ -7830,21 +8030,25 @@ export const TALENT_TREE_DATA = {
    "id": 30275,
    "x": -2631,
    "y": 1058,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fault Sensing",
+   "nameDe": "Fehlersinn",
    "icon": "",
-   "statKey": "reserved_reserved_node_30275",
-   "tier": "small"
+   "statKey": "error_elimination_1",
+   "tier": "small",
+   "descEn": "10% chance to mark 1 incorrect empty cell at the start of each level. Rolls independently from Error Guidance and Precision Insight.",
+   "descDe": "10% Chance, zu Beginn jedes Levels 1 falsche leere Zelle zu markieren. Wirkt unabhängig von Fehlerführung und Präzisionsblick."
   },
   {
    "id": 30276,
    "x": -2664,
    "y": 1009,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Error Guidance",
+   "nameDe": "Fehlerführung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30276",
-   "tier": "small"
+   "statKey": "error_elimination_2",
+   "tier": "small",
+   "descEn": "15% chance to mark 1 incorrect empty cell at the start of each level. Rolls independently from Fault Sensing and Precision Insight.",
+   "descDe": "15% Chance, zu Beginn jedes Levels 1 falsche leere Zelle zu markieren. Wirkt unabhängig von Fehlersinn und Präzisionsblick."
   },
   {
    "id": 30277,
@@ -7998,41 +8202,53 @@ export const TALENT_TREE_DATA = {
    "id": 30288,
    "x": -2131,
    "y": 494,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30288",
-   "tier": "small"
+   "statKey": "small_leeway_30288",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30289,
    "x": -2082,
    "y": 461,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30289",
-   "tier": "small"
+   "statKey": "small_leeway_30289",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30290,
    "x": -2082,
    "y": 421,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30290",
-   "tier": "small"
+   "statKey": "small_leeway_30290",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30291,
    "x": -2184,
    "y": 441,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30291",
-   "tier": "small"
+   "statKey": "small_leeway_30291",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30292,
@@ -8070,7 +8286,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_melee_critical_strike_chance_30294",
    "effects": [
     "crit_chance_melee:3",
-    "crit_multi_flat:10"
+    "crit_multi_flat:10",
+    "reveal_projectile_damage:8"
    ],
    "tier": "small"
   },
@@ -8189,7 +8406,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_piercing_force_30303",
    "effects": [
     "phys_damage_inc:10",
-    "ignore_phys_reduction:10"
+    "ignore_phys_reduction:10",
+    "damage_low_time:4"
    ],
    "tier": "small"
   },
@@ -8203,7 +8421,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_piercing_force_30304",
    "effects": [
     "phys_damage_inc:10",
-    "ignore_phys_reduction:10"
+    "ignore_phys_reduction:10",
+    "damage_flawless:3"
    ],
    "tier": "small"
   },
@@ -8406,31 +8625,40 @@ export const TALENT_TREE_DATA = {
    "id": 30320,
    "x": -2399,
    "y": -49,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30320",
-   "tier": "small"
+   "statKey": "small_spare_minute_30320",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30321,
    "x": -2437,
    "y": -64,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30321",
-   "tier": "small"
+   "statKey": "small_spare_minute_30321",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30322,
    "x": -2452,
    "y": -102,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30322",
-   "tier": "small"
+   "statKey": "small_spare_minute_30322",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30323,
@@ -8544,21 +8772,25 @@ export const TALENT_TREE_DATA = {
    "id": 30336,
    "x": -2661,
    "y": 319,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Critical Scan Extension",
+   "nameDe": "Kritische Scan-Verlängerung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30336",
-   "tier": "small"
+   "statKey": "emergency_scan_2",
+   "tier": "small",
+   "descEn": "Increases the Emergency Scan duration by 1 second. Stacks with Overload Scan.",
+   "descDe": "Erhöht die Dauer des Notfall-Scans um 1 Sekunde. Wirkt zusammen mit Überlastungs-Scan."
   },
   {
    "id": 30337,
    "x": -2608,
    "y": 266,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Emergency Scan",
+   "nameDe": "Notfall-Scan",
    "icon": "",
-   "statKey": "reserved_reserved_node_30337",
-   "tier": "small"
+   "statKey": "emergency_scan_1",
+   "tier": "small",
+   "descEn": "When the timer drops to 5 minutes or below for the first time in a level, a Field Scan of the entire grid is triggered, lasting 2 seconds.",
+   "descDe": "Wenn der Timer zum ersten Mal auf 5 Minuten oder darunter fällt, wird ein Feldscan des gesamten Gitters ausgelöst, der 2 Sekunden anhält."
   },
   {
    "id": 30338,
@@ -8647,7 +8879,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lesser_resolute_advance_30344",
    "effects": [
-    "endurance_duration:20"
+    "endurance_duration:20",
+    "charge_on_line:6"
    ],
    "tier": "small"
   },
@@ -8828,7 +9061,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_hearth_fire_30358",
    "effects": [
     "fire_damage_inc_pct:12",
-    "life_regen_pct:0.4"
+    "life_regen_pct:0.4",
+    "damage_per_streak:4"
    ],
    "tier": "small"
   },
@@ -8836,31 +9070,41 @@ export const TALENT_TREE_DATA = {
    "id": 30359,
    "x": -1578,
    "y": 228,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30359",
-   "tier": "small"
+   "statKey": "small_spare_minute_30359",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30360,
    "x": -1538,
    "y": 228,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30360",
-   "tier": "small"
+   "statKey": "small_spare_minute_30360",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_flat:14"
+   ]
   },
   {
    "id": 30361,
    "x": -1509,
    "y": 159,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30361",
-   "tier": "small"
+   "statKey": "small_spare_minute_30361",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30362,
@@ -9081,7 +9325,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_weapon_fire_damage_30378",
    "effects": [
-    "fire_damage_inc_pct:16"
+    "fire_damage_inc_pct:16",
+    "damage_low_time:4"
    ],
    "tier": "small"
   },
@@ -9094,7 +9339,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_weapon_fire_damage_30379",
    "effects": [
-    "fire_damage_inc_pct:16"
+    "fire_damage_inc_pct:16",
+    "damage_after_line:6"
    ],
    "tier": "small"
   },
@@ -9210,21 +9456,25 @@ export const TALENT_TREE_DATA = {
    "id": 30389,
    "x": -1937,
    "y": 2034,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Bayesian Adjustment",
+   "nameDe": "Bayessche Anpassung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30389",
-   "tier": "small"
+   "statKey": "bayesian_update_1",
+   "tier": "small",
+   "descEn": "Each mistake you make during a level permanently increases the chance of the next automatic cell mark or reveal triggering by 5%, resetting after it triggers. Stacks with Adaptive Inference and Recursive Belief Update.",
+   "descDe": "Jeder Fehler während eines Levels erhöht dauerhaft die Chance des nächsten automatischen Markierens oder Aufdeckens um 5% und setzt sich danach zurück. Wirkt zusammen mit Adaptiver Inferenz und Rekursiver Glaubensaktualisierung."
   },
   {
    "id": 30390,
    "x": -1997,
    "y": 2094,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Adaptive Inference",
+   "nameDe": "Adaptive Inferenz",
    "icon": "",
-   "statKey": "reserved_reserved_node_30390",
-   "tier": "small"
+   "statKey": "bayesian_update_2",
+   "tier": "small",
+   "descEn": "Each mistake you make during a level permanently increases the chance of the next automatic cell mark or reveal triggering by 5%, resetting after it triggers. Stacks with Bayesian Adjustment and Recursive Belief Update.",
+   "descDe": "Jeder Fehler während eines Levels erhöht dauerhaft die Chance des nächsten automatischen Markierens oder Aufdeckens um 5% und setzt sich danach zurück. Wirkt zusammen mit Bayesscher Anpassung und Rekursiver Glaubensaktualisierung."
   },
   {
    "id": 30391,
@@ -9648,7 +9898,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_30423",
    "effects": [
-    "health_inc_pct:6"
+    "health_inc_pct:6",
+    "pickup_lifetime:2"
    ],
    "tier": "small"
   },
@@ -9682,41 +9933,53 @@ export const TALENT_TREE_DATA = {
    "id": 30426,
    "x": -1294,
    "y": 1849,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30426",
-   "tier": "small"
+   "statKey": "small_spare_minute_30426",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30427,
    "x": -1254,
    "y": 1849,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30427",
-   "tier": "small"
+   "statKey": "small_spare_minute_30427",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30428,
    "x": -1225,
    "y": 1918,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30428",
-   "tier": "small"
+   "statKey": "small_spare_minute_30428",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30429,
    "x": -1274,
    "y": 1951,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30429",
-   "tier": "small"
+   "statKey": "small_spare_minute_30429",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30430,
@@ -9905,41 +10168,53 @@ export const TALENT_TREE_DATA = {
    "id": 30444,
    "x": -486,
    "y": 2048,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30444",
-   "tier": "small"
+   "statKey": "small_leeway_30444",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30445,
    "x": -453,
    "y": 2097,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30445",
-   "tier": "small"
+   "statKey": "small_leeway_30445",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30446,
    "x": -384,
    "y": 2028,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30446",
-   "tier": "small"
+   "statKey": "small_leeway_30446",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30447,
    "x": -453,
    "y": 1999,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30447",
-   "tier": "small"
+   "statKey": "small_leeway_30447",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30448,
@@ -10028,7 +10303,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_physical_attack_damage_30454",
    "effects": [
-    "phys_damage_inc:14"
+    "phys_damage_inc:14",
+    "damage_after_line:6"
    ],
    "tier": "small"
   },
@@ -10049,21 +10325,27 @@ export const TALENT_TREE_DATA = {
    "id": 30456,
    "x": -1211,
    "y": 2291,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30456",
-   "tier": "small"
+   "statKey": "small_spare_minute_30456",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30457,
    "x": -1260,
    "y": 2364,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30457",
-   "tier": "small"
+   "statKey": "small_spare_minute_30457",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30458,
@@ -10542,7 +10824,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_30493",
    "effects": [
-    "health_inc_pct:6"
+    "health_inc_pct:6",
+    "life_on_line:5"
    ],
    "tier": "small"
   },
@@ -10620,7 +10903,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_physical_attack_damage_30499",
    "effects": [
-    "phys_damage_inc:16"
+    "phys_damage_inc:16",
+    "damage_on_mistake:8"
    ],
    "tier": "small"
   },
@@ -10888,7 +11172,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_regeneration_30544",
    "effects": [
-    "life_regen_pct:0.5"
+    "life_regen_pct:0.5",
+    "regen_low_time:20"
    ],
    "tier": "small"
   },
@@ -11100,7 +11385,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mana_and_mana_cost_efficiency_30560",
    "effects": [
-    "mana_inc_pct:6"
+    "mana_inc_pct:6",
+    "lucky_tile_reward:8"
    ],
    "tier": "small"
   },
@@ -11134,11 +11420,14 @@ export const TALENT_TREE_DATA = {
    "id": 30563,
    "x": -1946,
    "y": -312,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30563",
-   "tier": "small"
+   "statKey": "small_spare_minute_30563",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30564,
@@ -11177,7 +11466,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_armour_and_energy_shield_30566",
    "effects": [
     "armour_inc_pct:10",
-    "absorption_inc_pct:4"
+    "absorption_inc_pct:4",
+    "absorption_on_line:6"
    ],
    "tier": "small"
   },
@@ -11205,7 +11495,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_armour_and_energy_shield_30568",
    "effects": [
     "armour_inc_pct:10",
-    "absorption_inc_pct:5"
+    "absorption_inc_pct:5",
+    "absorption_on_line:6"
    ],
    "tier": "small"
   },
@@ -11239,11 +11530,15 @@ export const TALENT_TREE_DATA = {
    "id": 30571,
    "x": -2432,
    "y": -401,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30571",
-   "tier": "small"
+   "statKey": "small_spare_minute_30571",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_flat:14"
+   ]
   },
   {
    "id": 30572,
@@ -11419,7 +11714,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_physical_and_fire_damage_30584",
    "effects": [
     "fire_damage_inc_pct:8",
-    "phys_damage_inc:8"
+    "phys_damage_inc:8",
+    "damage_flawless:3"
    ],
    "tier": "small",
    "layoutPinned": true
@@ -11434,7 +11730,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_physical_and_lightning_damage_30585",
    "effects": [
     "lightning_damage_inc_pct:8",
-    "phys_damage_inc:8"
+    "phys_damage_inc:8",
+    "damage_per_streak:4"
    ],
    "tier": "small",
    "layoutPinned": true
@@ -11514,7 +11811,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_regeneration_30591",
    "effects": [
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.6",
+    "life_on_line:5"
    ],
    "tier": "small"
   },
@@ -11527,7 +11825,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_regeneration_30592",
    "effects": [
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.6",
+    "regen_low_time:20"
    ],
    "tier": "small"
   },
@@ -11612,7 +11911,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_30599",
    "effects": [
-    "health_inc_pct:6"
+    "health_inc_pct:6",
+    "mistake_heal:6"
    ],
    "tier": "small"
   },
@@ -11620,21 +11920,25 @@ export const TALENT_TREE_DATA = {
    "id": 30600,
    "x": -2379,
    "y": -582,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fortune’s Bounty",
+   "nameDe": "Glücksfund",
    "icon": "",
-   "statKey": "reserved_reserved_node_30600",
-   "tier": "small"
+   "statKey": "generous_fortune_2",
+   "tier": "small",
+   "descEn": "Revealing a Lucky Tile has 15% chance of granting an additional item. This stacks additively with other Lucky Tile reward bonuses.",
+   "descDe": "Das Enthüllen eines Glücksfelds hat eine 15% Chance einen weiteren Gegenstand zu gewähren. Dies summiert sich mit anderen Glücksfeld-Belohnungsboni."
   },
   {
    "id": 30601,
    "x": -2428,
    "y": -549,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Lucky Offering",
+   "nameDe": "Glücksangebot",
    "icon": "",
-   "statKey": "reserved_reserved_node_30601",
-   "tier": "small"
+   "statKey": "generous_fortune_1",
+   "tier": "small",
+   "descEn": "Revealing a Lucky Tile has 10% chance of granting an additional item. This stacks additively with other Lucky Tile reward bonuses.",
+   "descDe": "Das Enthüllen eines Glücksfelds hat eine 10% Chance einen weiteren Gegenstand zu gewähren. Dies summiert sich mit anderen Glücksfeld-Belohnungsboni."
   },
   {
    "id": 30602,
@@ -12051,11 +12355,14 @@ export const TALENT_TREE_DATA = {
    "id": 20123,
    "x": 2332,
    "y": 108,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Deep Focus",
+   "nameDe": "Tiefer Fokus",
    "icon": "",
-   "statKey": "reserved_tincture_20123",
-   "tier": "notable"
+   "statKey": "notable_deep_focus_20123",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 20124,
@@ -12115,11 +12422,15 @@ export const TALENT_TREE_DATA = {
    "id": 20128,
    "x": 2625,
    "y": 900,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Marathon Pace",
+   "nameDe": "Marathon-Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_20128",
-   "tier": "notable"
+   "statKey": "notable_marathon_pace_20128",
+   "tier": "notable",
+   "effects": [
+    "time_added:300",
+    "life_flat:30"
+   ]
   },
   {
    "id": 20129,
@@ -12139,11 +12450,14 @@ export const TALENT_TREE_DATA = {
    "id": 20130,
    "x": 2901,
    "y": 747,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Nerves",
+   "nameDe": "Ruhige Nerven",
    "icon": "",
-   "statKey": "reserved_reserved_node_20130",
-   "tier": "notable"
+   "statKey": "notable_steady_nerves_20130",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:3"
+   ]
   },
   {
    "id": 20131,
@@ -12270,11 +12584,15 @@ export const TALENT_TREE_DATA = {
    "id": 20141,
    "x": 1285,
    "y": 1919,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Forgiving Grid",
+   "nameDe": "Nachsichtiges Raster",
    "icon": "",
-   "statKey": "reserved_reserved_node_20141",
-   "tier": "notable"
+   "statKey": "notable_forgiving_grid_20141",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:3",
+    "life_more_pct:8"
+   ]
   },
   {
    "id": 20142,
@@ -12314,7 +12632,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "projectile_damage_inc:30",
     "stun_duration:50",
-    "dot_inc_pct:30"
+    "dot_inc_pct:30",
+    "damage_low_time:8"
    ],
    "tier": "notable"
   },
@@ -12457,7 +12776,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_druidic_rite_20158",
    "effects": [
-    "mana_inc_pct:20"
+    "mana_inc_pct:20",
+    "lucky_tile_reward:16"
    ],
    "tier": "notable"
   },
@@ -12465,11 +12785,15 @@ export const TALENT_TREE_DATA = {
    "id": 20159,
    "x": 1595,
    "y": 1220,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Endless Study",
+   "nameDe": "Endloses Studium",
    "icon": "",
-   "statKey": "reserved_reserved_node_20159",
-   "tier": "notable"
+   "statKey": "notable_endless_study_20159",
+   "tier": "notable",
+   "effects": [
+    "time_added:300",
+    "life_flat:30"
+   ]
   },
   {
    "id": 20160,
@@ -12490,11 +12814,14 @@ export const TALENT_TREE_DATA = {
    "id": 20161,
    "x": 2155,
    "y": 1828,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Unhurried Mind",
+   "nameDe": "Gelassener Geist",
    "icon": "",
-   "statKey": "reserved_reserved_node_20161",
-   "tier": "notable"
+   "statKey": "notable_unhurried_mind_20161",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 20162,
@@ -12519,7 +12846,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_fangs_of_frost_20164",
    "effects": [
-    "cold_damage_inc_pct:30"
+    "cold_damage_inc_pct:30",
+    "damage_flawless:6"
    ],
    "tier": "notable"
   },
@@ -12541,11 +12869,13 @@ export const TALENT_TREE_DATA = {
    "id": 20166,
    "x": 1235,
    "y": 2528,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Probability Spike",
+   "nameDe": "Wahrscheinlichkeitsspitze",
    "icon": "",
-   "statKey": "reserved_culling_20166",
-   "tier": "notable"
+   "statKey": "binomial_burst_3",
+   "tier": "notable",
+   "descEn": "Binomial Burst chance increased by 20%. Stacks with Combo Trigger.",
+   "descDe": "Binomialer Ausbruch hat 20% erhöhte Chance. Wirkt zusammen mit Kombinationsauslöser."
   },
   {
    "id": 20167,
@@ -12558,7 +12888,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "armour_if_hit_recently:30",
     "evasion_if_not_hit:30",
-    "parry_spell_chance:15"
+    "parry_spell_chance:15",
+    "armour_per_streak:20"
    ],
    "tier": "notable"
   },
@@ -12566,31 +12897,38 @@ export const TALENT_TREE_DATA = {
    "id": 20168,
    "x": 580,
    "y": 2101,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Slow Hour",
+   "nameDe": "Langsame Stunde",
    "icon": "",
-   "statKey": "reserved_reserved_node_20168",
-   "tier": "notable"
+   "statKey": "notable_slow_hour_20168",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 20169,
    "x": 504,
    "y": 2738,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Density Mapping",
+   "nameDe": "Dichtekartierung",
    "icon": "",
-   "statKey": "reserved_reserved_node_20169",
-   "tier": "notable"
+   "statKey": "density_mapping_3",
+   "tier": "notable",
+   "descEn": "Pattern Analysis marks one additional incorrect empty cell in the two rows and two columns with the most filled cells. Stacks with Cluster Detection.",
+   "descDe": "Musteranalyse markiert eine zusätzliche falsche leere Zelle in den zwei Zeilen und zwei Spalten mit den meisten gefüllten Zellen. Wirkt zusammen mit Clustererkennung."
   },
   {
    "id": 20170,
    "x": 708,
    "y": 2738,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Sparse Region",
+   "nameDe": "Dünnbesiedelte Region",
    "icon": "",
-   "statKey": "reserved_reserved_node_20170",
-   "tier": "notable"
+   "statKey": "sparse_region_3",
+   "tier": "notable",
+   "descEn": "Low Information Zone marks 1 additional incorrect empty cell in the row or column with the fewest filled cells. Stacks with Weak Signal Exploit.",
+   "descDe": "Informationsarme Zone markiert 1 zusätzliche falsche leere Zelle in der Zeile oder Spalte mit den wenigsten gefüllten Zellen. Wirkt zusammen mit Schwaches Signal."
   },
   {
    "id": 30611,
@@ -12631,7 +12969,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_hunters_guard_30622",
    "effects": [
     "projectile_damage_inc:12",
-    "evasion_inc_pct:15"
+    "evasion_inc_pct:15",
+    "reveal_projectile_damage:8"
    ],
    "tier": "small"
   },
@@ -12807,7 +13146,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "damage_inc_pct:12",
     "life_leech_attack:0.4",
-    "dot_inc_pct:12"
+    "dot_inc_pct:12",
+    "damage_flawless:3"
    ],
    "tier": "small"
   },
@@ -12943,7 +13283,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_armour_evasion_30656",
    "effects": [
     "armour_inc_pct:10",
-    "evasion_inc_pct:10"
+    "evasion_inc_pct:10",
+    "armour_per_streak:10"
    ],
    "tier": "small"
   },
@@ -13018,21 +13359,27 @@ export const TALENT_TREE_DATA = {
    "id": 30662,
    "x": 1187,
    "y": 1919,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30662",
-   "tier": "small"
+   "statKey": "small_leeway_30662",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30663,
    "x": 1236,
    "y": 1846,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_30663",
-   "tier": "small"
+   "statKey": "small_leeway_30663",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30664,
@@ -13372,31 +13719,41 @@ export const TALENT_TREE_DATA = {
    "id": 30689,
    "x": 540,
    "y": 2003,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30689",
-   "tier": "small"
+   "statKey": "small_spare_minute_30689",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30690,
    "x": 580,
    "y": 2003,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30690",
-   "tier": "small"
+   "statKey": "small_spare_minute_30690",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 30691,
    "x": 540,
    "y": 2101,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_30691",
-   "tier": "small"
+   "statKey": "small_spare_minute_30691",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30692,
@@ -13523,21 +13880,25 @@ export const TALENT_TREE_DATA = {
    "id": 30701,
    "x": 708,
    "y": 2654,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Low Information Zone",
+   "nameDe": "Informationsarme Zone",
    "icon": "",
-   "statKey": "reserved_reserved_node_30701",
-   "tier": "small"
+   "statKey": "sparse_region_1",
+   "tier": "small",
+   "descEn": "At the start of each level, automatically mark 1 incorrect empty cell in the row or column with the fewest filled cells.",
+   "descDe": "Zu Beginn jedes Levels werden automatisch 1 falsche leeren Zellen in der Zeile oder Spalte mit den wenigsten gefüllten Zellen markiert."
   },
   {
    "id": 30702,
    "x": 716,
    "y": 2696,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Weak Signal Exploit",
+   "nameDe": "Schwaches Signal",
    "icon": "",
-   "statKey": "reserved_reserved_node_30702",
-   "tier": "small"
+   "statKey": "sparse_region_2",
+   "tier": "small",
+   "descEn": "Low Information Zone marks 1 additional incorrect empty cell in the row or column with the fewest filled cells. Stacks with Sparse Region.",
+   "descDe": "Informationsarme Zone markiert 1 zusätzliche falsche leere Zelle in der Zeile oder Spalte mit den wenigsten gefüllten Zellen. Wirkt zusammen mit Dünnbesiedelte Region."
   },
   {
    "id": 30703,
@@ -13563,21 +13924,25 @@ export const TALENT_TREE_DATA = {
    "id": 30705,
    "x": 496,
    "y": 2696,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Cluster Detection",
+   "nameDe": "Clustererkennung",
    "icon": "",
-   "statKey": "reserved_reserved_node_30705",
-   "tier": "small"
+   "statKey": "density_mapping_2",
+   "tier": "small",
+   "descEn": "Pattern Analysis marks one additional incorrect empty cell in the row or column with the most filled cells. Stacks with Density Mapping.",
+   "descDe": "Musteranalyse markiert eine zusätzliche falsche leere Zelle in der Zeile oder Spalte mit den meisten gefüllten Zellen. Wirkt zusammen mit Dichtekartierung."
   },
   {
    "id": 30706,
    "x": 504,
    "y": 2654,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Pattern Analysis",
+   "nameDe": "Musteranalyse",
    "icon": "",
-   "statKey": "reserved_reserved_node_30706",
-   "tier": "small"
+   "statKey": "density_mapping_1",
+   "tier": "small",
+   "descEn": "At the start of each level, the row and column with the most filled cells each have 1 incorrect empty cell marked.",
+   "descDe": "Zu Beginn jedes Levels wird in der Zeile und Spalte mit den meisten gefüllten Zellen je 1 falsche leere Zelle markiert."
   },
   {
    "id": 30707,
@@ -13675,61 +14040,82 @@ export const TALENT_TREE_DATA = {
    "id": 30714,
    "x": 998,
    "y": 2499,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_totem_30714",
-   "tier": "small"
+   "statKey": "small_leeway_30714",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30715,
    "x": 1038,
    "y": 2499,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_totem_30715",
-   "tier": "small"
+   "statKey": "small_leeway_30715",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 30716,
    "x": 1071,
    "y": 2548,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_totem_30716",
-   "tier": "small"
+   "statKey": "small_leeway_30716",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 30717,
    "x": 1038,
    "y": 2373,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_stance_30717",
-   "tier": "small"
+   "statKey": "small_spare_minute_30717",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 30718,
    "x": 998,
    "y": 2373,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_stance_30718",
-   "tier": "small"
+   "statKey": "small_spare_minute_30718",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 30719,
    "x": 1067,
    "y": 2304,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_stance_30719",
-   "tier": "small"
+   "statKey": "small_spare_minute_30719",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_flat:14"
+   ]
   },
   {
    "id": 30720,
@@ -13780,7 +14166,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_weapon_cold_30723",
    "effects": [
-    "cold_damage_inc_pct:12"
+    "cold_damage_inc_pct:12",
+    "damage_on_mistake:8"
    ],
    "tier": "small"
   },
@@ -14293,7 +14680,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_deep_well_30762",
    "effects": [
-    "mana_inc_pct:8"
+    "mana_inc_pct:8",
+    "mana_on_line:3"
    ],
    "tier": "small"
   },
@@ -14620,7 +15008,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lesser_frenzied_focus_30788",
    "effects": [
-    "frenzy_duration:20"
+    "frenzy_duration:20",
+    "charge_on_line:6"
    ],
    "tier": "small"
   },
@@ -14724,7 +15113,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_cold_damage_30796",
    "effects": [
-    "cold_damage_inc_pct:12"
+    "cold_damage_inc_pct:12",
+    "damage_per_streak:4"
    ],
    "tier": "small"
   },
@@ -14737,7 +15127,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_cold_damage_and_cold_ailment_effect_30797",
    "effects": [
-    "cold_damage_inc_pct:12"
+    "cold_damage_inc_pct:12",
+    "damage_low_time:4"
    ],
    "tier": "small"
   },
@@ -15172,7 +15563,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lesser_elemental_edge_30829",
    "effects": [
-    "elemental_damage_inc_pct:12"
+    "elemental_damage_inc_pct:12",
+    "damage_after_line:6"
    ],
    "tier": "small"
   },
@@ -15359,7 +15751,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_nimble_ward_30843",
    "effects": [
     "evasion_inc_pct:10",
-    "absorption_inc_pct:5"
+    "absorption_inc_pct:5",
+    "absorption_on_line:6"
    ],
    "tier": "small"
   },
@@ -15387,7 +15780,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lesser_nimble_ward_30845",
    "effects": [
     "evasion_inc_pct:10",
-    "absorption_inc_pct:4"
+    "absorption_inc_pct:4",
+    "absorption_on_line:6"
    ],
    "tier": "small"
   },
@@ -15468,7 +15862,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lesser_nimble_vitality_30851",
    "effects": [
     "evasion_inc_pct:10",
-    "health_inc_pct:4"
+    "health_inc_pct:4",
+    "life_on_line:5"
    ],
    "tier": "small"
   },
@@ -15592,7 +15987,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lesser_stalwart_vigor_30860",
    "effects": [
     "health_inc_pct:4",
-    "stun_avoid:8"
+    "stun_avoid:8",
+    "mistake_heal:6"
    ],
    "tier": "small"
   },
@@ -15634,7 +16030,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lesser_stalwart_vigor_30863",
    "effects": [
     "health_inc_pct:4",
-    "stun_avoid:8"
+    "stun_avoid:8",
+    "regen_low_time:20"
    ],
    "tier": "small"
   },
@@ -15748,21 +16145,25 @@ export const TALENT_TREE_DATA = {
    "id": 30877,
    "x": 1268,
    "y": 251,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Poisson Drift",
+   "nameDe": "Poisson-Drift",
    "icon": "",
-   "statKey": "reserved_reserved_node_30877",
-   "tier": "small"
+   "statKey": "poisson_process_2",
+   "tier": "small",
+   "descEn": "The Poisson Process effect now occurs every 90 seconds.",
+   "descDe": "Der Poisson - Prozess Effekt wird nun alle 90 Sekunden ausgeführt."
   },
   {
    "id": 30878,
    "x": 1317,
    "y": 178,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Poisson Process",
+   "nameDe": "Poisson-Prozess",
    "icon": "",
-   "statKey": "reserved_reserved_node_30878",
-   "tier": "small"
+   "statKey": "poisson_process_1",
+   "tier": "small",
+   "descEn": "Every 2 minutes a random incorrect empty cell is automatically marked.",
+   "descDe": "Alle 2 Minuten wird eine zufällige falsche leere Zelle automatisch markiert."
   },
   {
    "id": 30879,
@@ -16027,7 +16428,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lesser_dark_might_30898",
    "effects": [
     "phys_damage_inc:10",
-    "shadow_damage_inc_pct:10"
+    "shadow_damage_inc_pct:10",
+    "damage_per_streak:4"
    ],
    "tier": "small"
   },
@@ -16119,7 +16521,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lesser_wellspring_30916",
    "effects": [
     "heart_spawn_inc:5",
-    "mana_spawn_inc:5"
+    "mana_spawn_inc:5",
+    "pickup_lifetime:2"
    ],
    "tier": "small"
   },
@@ -16238,7 +16641,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_vitality_30925",
    "effects": [
-    "health_inc_pct:5"
+    "health_inc_pct:5",
+    "pickup_lifetime:2"
    ],
    "tier": "small"
   },
@@ -16291,7 +16695,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_vitality_30930",
    "effects": [
-    "health_inc_pct:6"
+    "health_inc_pct:6",
+    "regen_low_time:20"
    ],
    "tier": "small"
   },
@@ -16304,7 +16709,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_vitality_30931",
    "effects": [
-    "health_inc_pct:6"
+    "health_inc_pct:6",
+    "mistake_heal:6"
    ],
    "tier": "small"
   },
@@ -16489,11 +16895,13 @@ export const TALENT_TREE_DATA = {
    "id": 30945,
    "x": 2709,
    "y": -1144,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Fate's Whisper",
+   "nameDe": "Flüstern des Schicksals",
    "icon": "",
-   "statKey": "reserved_reserved_node_30945",
-   "tier": "small"
+   "statKey": "outlier_detection_1",
+   "tier": "small",
+   "descEn": "One Lucky Tile is highlighted until revealed. This stacks additively with Guided Serendipity.",
+   "descDe": "Ein Glücksfeld wird markiert bis es aufgedeckt wird. Dies summiert sich mit Gelenkter Zufall."
   },
   {
    "id": 30946,
@@ -16915,11 +17323,15 @@ export const TALENT_TREE_DATA = {
    "id": 30982,
    "x": 2401,
    "y": 137,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_tincture_30982",
-   "tier": "small"
+   "statKey": "small_spare_minute_30982",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_flat:14"
+   ]
   },
   {
    "id": 30983,
@@ -17256,21 +17668,28 @@ export const TALENT_TREE_DATA = {
    "id": 31015,
    "x": 2569,
    "y": 1369,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31015",
-   "tier": "small"
+   "statKey": "small_spare_minute_31015",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31016,
    "x": 2569,
    "y": 1409,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31016",
-   "tier": "small"
+   "statKey": "small_spare_minute_31016",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 31017,
@@ -17286,51 +17705,68 @@ export const TALENT_TREE_DATA = {
    "id": 31018,
    "x": 2471,
    "y": 1369,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31018",
-   "tier": "small"
+   "statKey": "small_spare_minute_31018",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 31019,
    "x": 2471,
    "y": 1409,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31019",
-   "tier": "small"
+   "statKey": "small_spare_minute_31019",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31020,
    "x": 2368,
    "y": 1478,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31020",
-   "tier": "small"
+   "statKey": "small_leeway_31020",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 31021,
    "x": 2315,
    "y": 1531,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31021",
-   "tier": "small"
+   "statKey": "small_leeway_31021",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2",
+    "life_flat:14"
+   ]
   },
   {
    "id": 31022,
    "x": 2368,
    "y": 1584,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31022",
-   "tier": "small"
+   "statKey": "small_leeway_31022",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 31023,
@@ -17388,21 +17824,29 @@ export const TALENT_TREE_DATA = {
    "id": 31027,
    "x": 1819,
    "y": 1342,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31027",
-   "tier": "small"
+   "statKey": "small_spare_minute_31027",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 31028,
    "x": 1728,
    "y": 1380,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31028",
-   "tier": "small"
+   "statKey": "small_spare_minute_31028",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 31029,
@@ -17473,21 +17917,25 @@ export const TALENT_TREE_DATA = {
    "id": 31037,
    "x": 1333,
    "y": 2528,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Binomial Burst",
+   "nameDe": "Binomialer Ausbruch",
    "icon": "",
-   "statKey": "reserved_reserved_node_31037",
-   "tier": "small"
+   "statKey": "binomial_burst_1",
+   "tier": "small",
+   "descEn": "Each time you fill 10 cells correctly in a single level, there is a 20% chance to instantly mark 1 random incorrect empty cell.",
+   "descDe": "Jedes Mal, wenn du 10 Zellen korrekt in einem Level ausfüllst, besteht eine 20% Chance, sofort 1 zufällige falsche leere Zelle zu markieren."
   },
   {
    "id": 31038,
    "x": 1284,
    "y": 2601,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Combo Trigger",
+   "nameDe": "Kombinationsauslöser",
    "icon": "",
-   "statKey": "reserved_reserved_node_31038",
-   "tier": "small"
+   "statKey": "binomial_burst_2",
+   "tier": "small",
+   "descEn": "Binomial Burst chance increased by 10%. Stacks with Probability Spike.",
+   "descDe": "Binomialer Ausbruch hat 10% erhöhte Chance. Wirkt zusammen mit Wahrscheinlichkeitsspitze."
   },
   {
    "id": 31045,
@@ -17575,21 +18023,28 @@ export const TALENT_TREE_DATA = {
    "id": 20176,
    "x": -731,
    "y": -1861,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Room to Learn",
+   "nameDe": "Raum zum Lernen",
    "icon": "",
-   "statKey": "reserved_reserved_node_20176",
-   "tier": "notable"
+   "statKey": "notable_room_to_learn_20176",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:2",
+    "mistake_not_count_pct:5"
+   ]
   },
   {
    "id": 20177,
    "x": -841,
    "y": -1924,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Patient Study",
+   "nameDe": "Geduldiges Studium",
    "icon": "",
-   "statKey": "reserved_reserved_node_20177",
-   "tier": "notable"
+   "statKey": "notable_patient_study_20177",
+   "tier": "notable",
+   "effects": [
+    "time_added:300"
+   ]
   },
   {
    "id": 20178,
@@ -17622,11 +18077,15 @@ export const TALENT_TREE_DATA = {
    "id": 20180,
    "x": -778,
    "y": -1542,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Steady Nerves",
+   "nameDe": "Ruhige Nerven",
    "icon": "",
-   "statKey": "reserved_reserved_node_20180",
-   "tier": "notable"
+   "statKey": "notable_steady_nerves_20180",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:3",
+    "life_flat:30"
+   ]
   },
   {
    "id": 20181,
@@ -17688,11 +18147,13 @@ export const TALENT_TREE_DATA = {
    "id": 20185,
    "x": -686,
    "y": -2308,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "tier": "keystone",
+   "nameEn": "Adjacency Matrix",
+   "nameDe": "Adjazenzmatrix",
    "icon": "",
-   "statKey": "reserved_reserved_node_20185",
-   "tier": "notable"
+   "statKey": "adjacency_matrix",
+   "descEn": "Hides row and column clues. Each empty cell instead shows how many of its 8 neighbours are solution cells.",
+   "descDe": "Blendet Zeilen- und Spaltenhinweise aus. Jede leere Zelle zeigt stattdessen, wie viele ihrer 8 Nachbarn Lösungszellen sind."
   },
   {
    "id": 20186,
@@ -17724,41 +18185,49 @@ export const TALENT_TREE_DATA = {
    "id": 20188,
    "x": 152,
    "y": -2293,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Codex Assistance",
+   "nameDe": "Kodex-Unterstützung",
    "icon": "",
-   "statKey": "reserved_reserved_node_20188",
-   "tier": "notable"
+   "statKey": "scholarly_aid_3",
+   "tier": "notable",
+   "descEn": "Tutor items reduce an additional mistake when used. Stacks with Academy Intervention and Mentor's Insight.",
+   "descDe": "Tutor-Gegenstände reduzieren beim Benutzen einen zusätzlichen Fehler. Wirkt zusammen mit Akademische Intervention und Einsicht des Mentors."
   },
   {
    "id": 20189,
    "x": 192,
    "y": -2293,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Socratic Method",
+   "nameDe": "Sokratische Methode",
    "icon": "",
-   "statKey": "reserved_reserved_node_20189",
-   "tier": "notable"
+   "statKey": "socratic_method",
+   "tier": "notable",
+   "descEn": "At the start of each level, there is a 25% chance that one additional cell is revealed.",
+   "descDe": "Zu Beginn jedes Levels besteht eine 25% Chance, dass eine zusätzliche Zelle aufgedeckt wird."
   },
   {
    "id": 20190,
    "x": 349,
    "y": -2259,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Radiant Sight",
+   "nameDe": "Strahlende Sicht",
    "icon": "",
-   "statKey": "reserved_reserved_node_20190",
-   "tier": "notable"
+   "statKey": "stronger_light_3",
+   "tier": "notable",
+   "descEn": "Reveal items reveal 1 additional cell. Stacks with Beacon of Clarity and Lantern Expansion.",
+   "descDe": "Enthüllungsgegenstände enthüllen 1 zusätzliche Zelle. Wirkt zusammen mit Leuchtfeuer der Klarheit und Laternenausweitung."
   },
   {
    "id": 20191,
    "x": 546,
    "y": -2371,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Grand Pearl",
+   "nameDe": "Große Perle",
    "icon": "",
-   "statKey": "reserved_reserved_node_20191",
-   "tier": "notable"
+   "statKey": "grand_pearl",
+   "tier": "notable",
+   "descEn": "Enables the Grand Pearl as an item reward. Using a Grand Pearl reduces the cooldowns of both active class skills to 1 second.",
+   "descDe": "Ermöglicht die Große Perle als Gegenstandsbelohnung. Das Benutzen einer Großen Perle setzt die Abklingzeit beider aktiver Klassenfähigkeiten auf 1 Sekunde."
   },
   {
    "id": 20192,
@@ -17816,11 +18285,15 @@ export const TALENT_TREE_DATA = {
    "id": 20196,
    "x": 1129,
    "y": -2307,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Marathon Pace",
+   "nameDe": "Marathon-Tempo",
    "icon": "",
-   "statKey": "reserved_reserved_node_20196",
-   "tier": "notable"
+   "statKey": "notable_marathon_pace_20196",
+   "tier": "notable",
+   "effects": [
+    "time_added:300",
+    "life_flat:30"
+   ]
   },
   {
    "id": 20197,
@@ -17839,11 +18312,13 @@ export const TALENT_TREE_DATA = {
    "id": 20198,
    "x": 1383,
    "y": -2152,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Heart of the Grid",
+   "nameDe": "Herz des Gitters",
    "icon": "",
-   "statKey": "reserved_reserved_node_20198",
-   "tier": "notable"
+   "statKey": "central_tendency_3",
+   "tier": "notable",
+   "descEn": "At the start of each level, 1 more correct filled cell near the centre of the grid is revealed (stacks with Core Insight and Centered Vision).",
+   "descDe": "Zu Beginn jedes Levels wird 1 weitere korrekte gefüllte Zelle nahe der Gittermitte aufgedeckt (wirkt zusammen mit Kernblick und Zentrierte Sicht)."
   },
   {
    "id": 20199,
@@ -17902,31 +18377,40 @@ export const TALENT_TREE_DATA = {
    "id": 20203,
    "x": 830,
    "y": -1846,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Slow Hour",
+   "nameDe": "Langsame Stunde",
    "icon": "",
-   "statKey": "reserved_reserved_node_20203",
-   "tier": "notable"
+   "statKey": "notable_slow_hour_20203",
+   "tier": "notable",
+   "effects": [
+    "time_added:300",
+    "life_more_pct:8"
+   ]
   },
   {
    "id": 20204,
    "x": 745,
    "y": -1648,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Margin of Error",
+   "nameDe": "Fehlerspielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_20204",
-   "tier": "notable"
+   "statKey": "notable_margin_of_error_20204",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:3"
+   ]
   },
   {
    "id": 20205,
    "x": 601,
    "y": -1622,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Advanced Sample Efficiency",
+   "nameDe": "Erweiterte Stichprobeneffizienz",
    "icon": "",
-   "statKey": "reserved_reserved_node_20205",
-   "tier": "notable"
+   "statKey": "sample_efficiency_3",
+   "tier": "notable",
+   "descEn": "Reduces the amount of required correctly filled cells for Sample Efficiency without mistakes by 3. Stacks with Improved Sample Efficiency.",
+   "descDe": "Reduziert die Anzahl der benötigten in Folge richtig ausgefüllten Zellen für Stichprobeneffizienz ohne Fehler um 3. Summiert sich mit Verbesserte Stichprobeneffizienz."
   },
   {
    "id": 20206,
@@ -18018,7 +18502,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_atrophy_20217",
    "effects": [
     "shadow_damage_inc_pct:27",
-    "skill_effect_duration:12"
+    "skill_effect_duration:12",
+    "damage_per_streak:8"
    ],
    "tier": "notable"
   },
@@ -18115,7 +18600,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_heart_of_flame_20225",
    "effects": [
     "fire_damage_inc_pct:30",
-    "pen_fire:6"
+    "pen_fire:6",
+    "damage_low_time:8"
    ],
    "tier": "notable"
   },
@@ -18137,31 +18623,38 @@ export const TALENT_TREE_DATA = {
    "id": 20227,
    "x": -1252,
    "y": -2663,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Professor Tutor",
+   "nameDe": "Professor Tutor",
    "icon": "",
-   "statKey": "reserved_reserved_node_20227",
-   "tier": "notable"
+   "statKey": "professor_tutor",
+   "tier": "notable",
+   "descEn": "Increases the chance that the tutor can solve the question by an additional 20%.\n20% chance of not spending the Tutor item when using a Tutor to answer a question.",
+   "descDe": "Erhöht die Chance, dass der Tutor die Frage beantworten kann, um weitere 20%.\n20% Chance, dass der Tutor Gegenstand beim Beantworten einer Frage nicht verbraucht wird."
   },
   {
    "id": 20228,
    "x": -1732,
    "y": -2027,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Marginal Distribution",
+   "nameDe": "Randverteilung",
    "icon": "",
-   "statKey": "reserved_reserved_node_20228",
-   "tier": "notable"
+   "statKey": "marginal_distribution_3",
+   "tier": "notable",
+   "descEn": "An additional correct cell is revealed in the outermost row or column at the start of each level.",
+   "descDe": "Eine weitere richtige Zelle wird zu Beginn des Levels in der äußersten Zeile oder Spalte enthüllt."
   },
   {
    "id": 20229,
    "x": -1711,
    "y": -1840,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Safety Net",
+   "nameDe": "Sicherheitsnetz",
    "icon": "",
-   "statKey": "reserved_reserved_node_20229",
-   "tier": "notable"
+   "statKey": "notable_safety_net_20229",
+   "tier": "notable",
+   "effects": [
+    "mistake_count:3"
+   ]
   },
   {
    "id": 20230,
@@ -18188,7 +18681,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "absorption_inc_pct:8",
     "health_inc_pct:10",
-    "shadow_resist_flat:8"
+    "shadow_resist_flat:8",
+    "mistake_heal:12"
    ],
    "tier": "notable"
   },
@@ -18214,7 +18708,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_sacrifice_20233",
    "effects": [
-    "life_regen_pct:1"
+    "life_regen_pct:1",
+    "life_on_line:10"
    ],
    "tier": "notable"
   },
@@ -18222,11 +18717,13 @@ export const TALENT_TREE_DATA = {
    "id": 20234,
    "x": -1583,
    "y": -1291,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Interdisciplinary",
+   "nameDe": "Interdisziplinär",
    "icon": "",
-   "statKey": "reserved_reserved_node_20234",
-   "tier": "notable"
+   "statKey": "interdisciplinary",
+   "tier": "notable",
+   "descEn": "One additional cell is revealed at the start of each level.",
+   "descDe": "Zu Beginn jedes Levels wird eine zusätzliche Zelle aufgedeckt."
   },
   {
    "id": 20237,
@@ -18267,7 +18764,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "crit_chance_mace:5",
     "stun_chance:5",
-    "power_on_stun:10"
+    "power_on_stun:10",
+    "charge_on_line:12"
    ],
    "tier": "notable"
   },
@@ -18308,7 +18806,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_life_on_kill_and_recoup_31060",
    "effects": [
     "life_on_kill_flat:5",
-    "life_recoup_pct:4"
+    "life_recoup_pct:4",
+    "mistake_heal:6"
    ],
    "tier": "small"
   },
@@ -18329,21 +18828,25 @@ export const TALENT_TREE_DATA = {
    "id": 31062,
    "x": 581,
    "y": -1520,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Sample Efficiency",
+   "nameDe": "Stichprobeneffizienz",
    "icon": "",
-   "statKey": "reserved_reserved_node_31062",
-   "tier": "small"
+   "statKey": "sample_efficiency_1",
+   "tier": "small",
+   "descEn": "Correctly filling 20 cells in a row without a mistake reveals 1 random correctly filled cell.",
+   "descDe": "20 korrekt ausgefüllte Zellen in Folge ohne Fehler decken 1 zufällige korrekte gefüllte Zelle auf."
   },
   {
    "id": 31063,
    "x": 621,
    "y": -1520,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Improved Sample Efficiency",
+   "nameDe": "Verbesserte Stichprobeneffizienz",
    "icon": "",
-   "statKey": "reserved_reserved_node_31063",
-   "tier": "small"
+   "statKey": "sample_efficiency_2",
+   "tier": "small",
+   "descEn": "Reduces the amount of required correctly filled cells for Sample Efficiency without mistakes by 2. Stacks with Advanced Sample Efficiency.",
+   "descDe": "Reduziert die Anzahl der benötigten in Folge richtig ausgefüllten Zellen für Stichprobeneffizienz ohne Fehler um 2. Summiert sich mit Erweiterte Stichprobeneffizienz."
   },
   {
    "id": 31064,
@@ -18396,7 +18899,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_life_and_energy_shield_31067",
    "effects": [
     "absorption_inc_pct:5",
-    "health_inc_pct:3"
+    "health_inc_pct:3",
+    "life_on_line:5"
    ],
    "tier": "small"
   },
@@ -18560,41 +19064,53 @@ export const TALENT_TREE_DATA = {
    "id": 31079,
    "x": 1052,
    "y": -1577,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31079",
-   "tier": "small"
+   "statKey": "small_spare_minute_31079",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31080,
    "x": 1092,
    "y": -1577,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31080",
-   "tier": "small"
+   "statKey": "small_spare_minute_31080",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31081,
    "x": 1092,
    "y": -1675,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31081",
-   "tier": "small"
+   "statKey": "small_spare_minute_31081",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31082,
    "x": 1052,
    "y": -1675,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31082",
-   "tier": "small"
+   "statKey": "small_spare_minute_31082",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31083,
@@ -18613,21 +19129,28 @@ export const TALENT_TREE_DATA = {
    "id": 31084,
    "x": 847,
    "y": -1668,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31084",
-   "tier": "small"
+   "statKey": "small_leeway_31084",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 31085,
    "x": 847,
    "y": -1628,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31085",
-   "tier": "small"
+   "statKey": "small_leeway_31085",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 31086,
@@ -18699,21 +19222,28 @@ export const TALENT_TREE_DATA = {
    "id": 31091,
    "x": 665,
    "y": -1935,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31091",
-   "tier": "small"
+   "statKey": "small_spare_minute_31091",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31092,
    "x": 665,
    "y": -1975,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31092",
-   "tier": "small"
+   "statKey": "small_spare_minute_31092",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_flat:14"
+   ]
   },
   {
    "id": 31093,
@@ -19474,21 +20004,25 @@ export const TALENT_TREE_DATA = {
    "id": 31160,
    "x": 1383,
    "y": -2258,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Core Insight",
+   "nameDe": "Kernblick",
    "icon": "",
-   "statKey": "reserved_reserved_node_31160",
-   "tier": "small"
+   "statKey": "central_tendency_1",
+   "tier": "small",
+   "descEn": "At the start of each level, the correct filled cell closest to the centre of the grid is revealed.",
+   "descDe": "Zu Beginn jedes Levels wird die korrekte gefüllte Zelle aufgedeckt, die der Gittermitte am nächsten liegt."
   },
   {
    "id": 31161,
    "x": 1436,
    "y": -2205,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Centered Vision",
+   "nameDe": "Zentrierte Sicht",
    "icon": "",
-   "statKey": "reserved_reserved_node_31161",
-   "tier": "small"
+   "statKey": "central_tendency_2",
+   "tier": "small",
+   "descEn": "At the start of each level, 1 more correct filled cell near the centre of the grid is revealed (stacks with Core Insight and Heart of the Grid).",
+   "descDe": "Zu Beginn jedes Levels wird 1 weitere korrekte gefüllte Zelle nahe der Gittermitte aufgedeckt (stapelt sich mit Kernblick und Herz des Gitters)."
   },
   {
    "id": 31162,
@@ -19610,7 +20144,8 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "melee_charge_speed_pct:3",
     "cast_speed_pct:3",
-    "phys_damage_inc:8"
+    "phys_damage_inc:8",
+    "damage_flawless:3"
    ],
    "tier": "small"
   },
@@ -19870,21 +20405,25 @@ export const TALENT_TREE_DATA = {
    "id": 31193,
    "x": 1404,
    "y": -1210,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Residual Analysis",
+   "nameDe": "Residualanalyse",
    "icon": "",
-   "statKey": "reserved_trap_mine_31193",
-   "tier": "small"
+   "statKey": "residual_analysis_1",
+   "tier": "small",
+   "descEn": "Whenever you complete a row or column you have a 10% chance of automatically marking a random incorrect empty cell in an adjacent row or column.",
+   "descDe": "Immer wenn du eine Zeile oder Spalte abschließt hast du eine 10% Chance eine zufällige falsche leere Zelle in einer benachbarten Zeile oder Spalte automatisch zu markieren."
   },
   {
    "id": 31194,
    "x": 1364,
    "y": -1210,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Inference Spillover",
+   "nameDe": "Inferenz-Überlauf",
    "icon": "",
-   "statKey": "reserved_trap_mine_31194",
-   "tier": "small"
+   "statKey": "residual_analysis_2",
+   "tier": "small",
+   "descEn": "Residual Analysis chance increased by 5%. Stacks with Residual Propagation.",
+   "descDe": "Residualanalyse Chance erhöht um 5%. Wirkt zusammen mit Residuen-Propagation."
   },
   {
    "id": 31195,
@@ -20081,7 +20620,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_energy_shield_recharge_rate_31222",
    "effects": [
-    "absorption_regen_rate_pct:15"
+    "absorption_regen_rate_pct:15",
+    "absorption_on_line:6"
    ],
    "tier": "small"
   },
@@ -20095,7 +20635,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_mana_and_mana_regeneration_31223",
    "effects": [
     "mana_inc_pct:8",
-    "mana_regen_inc_pct:10"
+    "mana_regen_inc_pct:10",
+    "mana_on_line:3"
    ],
    "tier": "small"
   },
@@ -20572,21 +21113,25 @@ export const TALENT_TREE_DATA = {
    "id": 31272,
    "x": -963,
    "y": -1840,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Central Scan",
+   "nameDe": "Zentraler Scan",
    "icon": "",
-   "statKey": "reserved_reserved_node_31272",
-   "tier": "small"
+   "statKey": "interquartile_vision_2",
+   "tier": "small",
+   "descEn": "Extends the Interquartile-Vision Fieldscan duration by 1 second.",
+   "descDe": "Verlängert die Interquartil-Vision Feldscan Dauer um 1 Sekunde."
   },
   {
    "id": 31273,
    "x": -963,
    "y": -1742,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Interquartile Vision",
+   "nameDe": "Interquartil-Vision",
    "icon": "",
-   "statKey": "reserved_reserved_node_31273",
-   "tier": "small"
+   "statKey": "interquartile_vision_1",
+   "tier": "small",
+   "descEn": "When a large grid level starts a Field Scan is applied to the center of the grid for 2 seconds.",
+   "descDe": "Wenn ein Level mit großem Gitter startet wird ein Feldscan für 2 Sekunden in der Mitte des Gitters ausgeführt."
   },
   {
    "id": 31274,
@@ -20618,71 +21163,95 @@ export const TALENT_TREE_DATA = {
    "id": 31276,
    "x": -698,
    "y": -1812,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31276",
-   "tier": "small"
+   "statKey": "small_leeway_31276",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 31277,
    "x": -658,
    "y": -1812,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31277",
-   "tier": "small"
+   "statKey": "small_leeway_31277",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 31278,
    "x": -658,
    "y": -1910,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31278",
-   "tier": "small"
+   "statKey": "small_leeway_31278",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 31279,
    "x": -698,
    "y": -1910,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31279",
-   "tier": "small"
+   "statKey": "small_leeway_31279",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2",
+    "life_regen_pct:0.6"
+   ]
   },
   {
    "id": 31280,
    "x": -788,
    "y": -1977,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31280",
-   "tier": "small"
+   "statKey": "small_spare_minute_31280",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31281,
    "x": -841,
    "y": -2030,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31281",
-   "tier": "small"
+   "statKey": "small_spare_minute_31281",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31282,
    "x": -894,
    "y": -1977,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31282",
-   "tier": "small"
+   "statKey": "small_spare_minute_31282",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_flat:14"
+   ]
   },
   {
    "id": 31283,
@@ -20707,7 +21276,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lightning_damage_and_cast_speed_31284",
    "effects": [
     "lightning_damage_inc_pct:8",
-    "cast_speed_pct:3"
+    "cast_speed_pct:3",
+    "damage_per_streak:4"
    ],
    "tier": "small"
   },
@@ -20721,7 +21291,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lightning_damage_and_cast_speed_31285",
    "effects": [
     "lightning_damage_inc_pct:8",
-    "cast_speed_pct:3"
+    "cast_speed_pct:3",
+    "damage_flawless:3"
    ],
    "tier": "small"
   },
@@ -20739,21 +21310,25 @@ export const TALENT_TREE_DATA = {
    "id": 31287,
    "x": -726,
    "y": -2406,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Pattern Whisper",
+   "nameDe": "Musterflüstern",
    "icon": "",
-   "statKey": "reserved_reserved_node_31287",
-   "tier": "small"
+   "statKey": "targeted_reveal_1",
+   "tier": "small",
+   "descEn": "Reveal items have a 20% chance to prioritize cells in the unsolved row or column with the fewest filled cells.",
+   "descDe": "Enthüllungsgegenstände haben eine 20% Chance, Zellen in der ungelösten Zeile oder Spalte mit den wenigsten gefüllten Zellen zu priorisieren."
   },
   {
    "id": 31288,
    "x": -686,
    "y": -2406,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Selective Insight",
+   "nameDe": "Selektive Einsicht",
    "icon": "",
-   "statKey": "reserved_reserved_node_31288",
-   "tier": "small"
+   "statKey": "targeted_reveal_2",
+   "tier": "small",
+   "descEn": "Reveal items have a 20% chance to prioritize cells in the unsolved row or column with the fewest filled cells.",
+   "descDe": "Enthüllungsgegenstände haben eine 20% Chance, Zellen in der ungelösten Zeile oder Spalte mit den wenigsten gefüllten Zellen zu priorisieren."
   },
   {
    "id": 31289,
@@ -20868,7 +21443,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_31297",
    "effects": [
-    "health_inc_pct:6"
+    "health_inc_pct:6",
+    "regen_low_time:20"
    ],
    "tier": "small"
   },
@@ -21202,7 +21778,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_spell_damage_and_stun_recovery_31322",
    "effects": [
     "spell_damage_inc_pct:10",
-    "block_recovery:10"
+    "block_recovery:10",
+    "reveal_projectile_damage:8"
    ],
    "tier": "small"
   },
@@ -21522,11 +22099,13 @@ export const TALENT_TREE_DATA = {
    "id": 31346,
    "x": -1830,
    "y": -1987,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Edge Discovery",
+   "nameDe": "Randentdeckung",
    "icon": "",
-   "statKey": "reserved_reserved_node_31346",
-   "tier": "small"
+   "statKey": "marginal_distribution_1",
+   "tier": "small",
+   "descEn": "At the start of each level, a correct cell in the outermost row or the outermost column is revealed as either filled or empty.",
+   "descDe": "Zu Beginn jedes Levels wird eine richtige Zelle in der äußersten Zeile oder der äußersten Spalte als gefüllt oder leer enthüllt."
   },
   {
    "id": 31347,
@@ -21552,21 +22131,25 @@ export const TALENT_TREE_DATA = {
    "id": 31349,
    "x": -1801,
    "y": -2056,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Perimeter Insight",
+   "nameDe": "Randblick",
    "icon": "",
-   "statKey": "reserved_reserved_node_31349",
-   "tier": "small"
+   "statKey": "marginal_distribution_2",
+   "tier": "small",
+   "descEn": "An additional correct cell is revealed in the outermost row or column at the start of each level.",
+   "descDe": "Eine weitere richtige Zelle wird zu Beginn des Levels in der äußersten Zeile oder Spalte enthüllt."
   },
   {
    "id": 31350,
    "x": -1668,
    "y": -2374,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Crowded Insight",
+   "nameDe": "Gedrängte Einsicht",
    "icon": "",
-   "statKey": "reserved_reserved_node_31350",
-   "tier": "small"
+   "statKey": "dense_marker_2",
+   "tier": "small",
+   "descEn": "Mark-wrong items have a 20% chance to prioritize cells in rows or columns that already have many filled cells (but are not yet complete).",
+   "descDe": "Markierungsgegenstände haben eine 20% Chance, Zellen in Zeilen oder Spalten mit vielen bereits gefüllten Zellen zu priorisieren (sofern diese noch nicht vollständig sind)."
   },
   {
    "id": 31351,
@@ -21771,7 +22354,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_fire_damage_31371",
    "effects": [
-    "fire_damage_inc_pct:16"
+    "fire_damage_inc_pct:16",
+    "damage_on_mistake:8"
    ],
    "tier": "small"
   },
@@ -22046,11 +22630,13 @@ export const TALENT_TREE_DATA = {
    "id": 31392,
    "x": 349,
    "y": -2365,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Beacon of Clarity",
+   "nameDe": "Leuchtfeuer der Klarheit",
    "icon": "",
-   "statKey": "reserved_reserved_node_31392",
-   "tier": "small"
+   "statKey": "stronger_light_1",
+   "tier": "small",
+   "descEn": "Reveal items reveal 1 additional cell. Stacks with Lantern Expansion and Radiant Sight.",
+   "descDe": "Enthüllungsgegenstände enthüllen 1 zusätzliche Zelle. Wirkt zusammen mit Laternenausweitung und Strahlende Sicht."
   },
   {
    "id": 31393,
@@ -22096,21 +22682,25 @@ export const TALENT_TREE_DATA = {
    "id": 31397,
    "x": 152,
    "y": -2391,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Academy Intervention",
+   "nameDe": "Akademische Intervention",
    "icon": "",
-   "statKey": "reserved_reserved_node_31397",
-   "tier": "small"
+   "statKey": "scholarly_aid_1",
+   "tier": "small",
+   "descEn": "Tutor items reduce an additional mistake when used. Stacks with Mentor's Insight and Codex Assistance.",
+   "descDe": "Tutor-Gegenstände reduzieren beim Benutzen einen zusätzlichen Fehler. Wirkt zusammen mit Einsicht des Mentors und Kodex-Unterstützung."
   },
   {
    "id": 31398,
    "x": 119,
    "y": -2342,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Mentor's Insight",
+   "nameDe": "Einsicht des Mentors",
    "icon": "",
-   "statKey": "reserved_reserved_node_31398",
-   "tier": "small"
+   "statKey": "scholarly_aid_2",
+   "tier": "small",
+   "descEn": "Tutor items reduce an additional mistake when used. Stacks with Academy Intervention and Codex Assistance.",
+   "descDe": "Tutor-Gegenstände reduzieren beim Benutzen einen zusätzlichen Fehler. Wirkt zusammen mit Akademische Intervention und Kodex-Unterstützung."
   },
   {
    "id": 31399,
@@ -22147,7 +22737,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_power_charge_duration_31401",
    "effects": [
-    "power_duration:20"
+    "power_duration:20",
+    "charge_on_line:6"
    ],
    "tier": "small"
   },
@@ -22187,7 +22778,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_staff_spell_damage_31404",
    "effects": [
-    "spell_damage_inc_pct:12"
+    "spell_damage_inc_pct:12",
+    "reveal_projectile_damage:8"
    ],
    "tier": "small"
   },
@@ -22255,7 +22847,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_mana_and_spell_damage_31409",
    "effects": [
     "spell_damage_inc_pct:10",
-    "mana_inc_pct:5"
+    "mana_inc_pct:5",
+    "lucky_tile_reward:8"
    ],
    "tier": "small"
   },
@@ -22263,11 +22856,14 @@ export const TALENT_TREE_DATA = {
    "id": 31410,
    "x": 356,
    "y": -2052,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31410",
-   "tier": "small"
+   "statKey": "small_spare_minute_31410",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31411,
@@ -22304,7 +22900,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mana_regeneration_31413",
    "effects": [
-    "mana_regen_inc_pct:20"
+    "mana_regen_inc_pct:20",
+    "pickup_lifetime:2"
    ],
    "tier": "small"
   },
@@ -22352,11 +22949,15 @@ export const TALENT_TREE_DATA = {
    "id": 31417,
    "x": 763,
    "y": -1975,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31417",
-   "tier": "small"
+   "statKey": "small_spare_minute_31417",
+   "tier": "small",
+   "effects": [
+    "time_added:120",
+    "life_flat:14"
+   ]
   },
   {
    "id": 31418,
@@ -22437,21 +23038,25 @@ export const TALENT_TREE_DATA = {
    "id": 31424,
    "x": 695,
    "y": -2529,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Probabilistic Start",
+   "nameDe": "Probabilistischer Start",
    "icon": "",
-   "statKey": "reserved_reserved_node_31424",
-   "tier": "small"
+   "statKey": "probabilistic_start_1",
+   "tier": "small",
+   "descEn": "10% chance to reveal 1 correct filled cell at the start of each level. Rolls independently from Stochastic Awakening and Calculated Genesis.",
+   "descDe": "10% Chance, zu Beginn jedes Levels 1 korrekte gefüllte Zelle aufzudecken. Wirkt unabhängig von Stochastisches Erwachen und Berechneter Ursprung."
   },
   {
    "id": 31425,
    "x": 646,
    "y": -2562,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Stochastic Awakening",
+   "nameDe": "Stochastisches Erwachen",
    "icon": "",
-   "statKey": "reserved_reserved_node_31425",
-   "tier": "small"
+   "statKey": "probabilistic_start_2",
+   "tier": "small",
+   "descEn": "15% chance to reveal 1 correct filled cell at the start of each level. Rolls independently from Probabilistic Start and Calculated Genesis.",
+   "descDe": "15% Chance, zu Beginn jedes Levels 1 korrekte gefüllte Zelle aufzudecken. Wirkt unabhängig von Probabilistischer Start und Berechneter Ursprung."
   },
   {
    "id": 31426,
@@ -22490,11 +23095,13 @@ export const TALENT_TREE_DATA = {
    "id": 31429,
    "x": 402,
    "y": -2312,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Lantern Expansion",
+   "nameDe": "Laternenausweitung",
    "icon": "",
-   "statKey": "reserved_reserved_node_31429",
-   "tier": "small"
+   "statKey": "stronger_light_2",
+   "tier": "small",
+   "descEn": "Reveal items reveal 1 additional cell. Stacks with Beacon of Clarity and Radiant Sight.",
+   "descDe": "Enthüllungsgegenstände enthüllen 1 zusätzliche Zelle. Wirkt zusammen mit Leuchtfeuer der Klarheit und Strahlende Sicht."
   },
   {
    "id": 31430,
@@ -22622,7 +23229,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_block_recovery_and_energy_shield_31439",
    "effects": [
-    "block_recovery:50"
+    "block_recovery:50",
+    "block_flawless:3"
    ],
    "tier": "small"
   },
@@ -22953,41 +23561,53 @@ export const TALENT_TREE_DATA = {
    "id": 31466,
    "x": -798,
    "y": -1440,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31466",
-   "tier": "small"
+   "statKey": "small_leeway_31466",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 31467,
    "x": -758,
    "y": -1440,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Leeway",
+   "nameDe": "Spielraum",
    "icon": "",
-   "statKey": "reserved_reserved_node_31467",
-   "tier": "small"
+   "statKey": "small_leeway_31467",
+   "tier": "small",
+   "effects": [
+    "mistake_count:2"
+   ]
   },
   {
    "id": 31468,
    "x": -630,
    "y": -1516,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31468",
-   "tier": "small"
+   "statKey": "small_spare_minute_31468",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31469,
    "x": -590,
    "y": -1516,
-   "nameEn": "Reserved Node",
-   "nameDe": "Reservierter Knoten",
+   "nameEn": "Spare Minute",
+   "nameDe": "Zusatzminute",
    "icon": "",
-   "statKey": "reserved_reserved_node_31469",
-   "tier": "small"
+   "statKey": "small_spare_minute_31469",
+   "tier": "small",
+   "effects": [
+    "time_added:120"
+   ]
   },
   {
    "id": 31470,
@@ -24917,6 +25537,989 @@ export const TALENT_TREE_DATA = {
    "statKey": "keen_nose",
    "tier": "notable",
    "layoutPinned": true
+  },
+  {
+   "id": 41101,
+   "x": 3092,
+   "y": 1725,
+   "nameEn": "Night Vision",
+   "nameDe": "Nachtsicht",
+   "descEn": "At the start of each level, 2 additional incorrect empty cells anywhere on the grid are automatically marked.",
+   "descDe": "Zu Beginn jedes Levels werden 2 zusätzliche falsche leere Zellen irgendwo im Gitter automatisch markiert.",
+   "icon": "",
+   "statKey": "night_vision",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41102,
+   "x": 2959,
+   "y": 2755,
+   "nameEn": "Gnostic Echo",
+   "nameDe": "Gnostisches Echo",
+   "descEn": "Every 10th correct fill has a 15% chance to reveal one cell.",
+   "descDe": "Jede zehnte korrekte Füllung hat 15% Chance, eine Zelle aufzudecken.",
+   "icon": "",
+   "statKey": "gnostic_echo",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41103,
+   "x": 3985,
+   "y": 2550,
+   "nameEn": "Coding Theory",
+   "nameDe": "Kodierungstheorie",
+   "descEn": "Every 20th correct fill reveals one cell.",
+   "descDe": "Bei jeder 20. korrekten Füllung wird eine Zelle aufgedeckt.",
+   "icon": "",
+   "statKey": "coding_theory",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41104,
+   "x": 3845,
+   "y": 790,
+   "nameEn": "Fortune Well",
+   "nameDe": "Glücksbrunnen",
+   "descEn": "Claiming a lucky tile additionally reveals one correct cell.",
+   "descDe": "Das Einsammeln einer Glückskachel deckt zusätzlich eine korrekte Zelle auf.",
+   "icon": "",
+   "statKey": "fortune_well",
+   "tier": "notable",
+   "layoutPinned": true
+  },
+  {
+   "id": 41105,
+   "x": -2114,
+   "y": 2635,
+   "nameEn": "Aegis Fortification",
+   "nameDe": "Ägis-Verstärkung",
+   "icon": "",
+   "statKey": "reinforced_ward_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Shield items absorb 1 additional mistake. Stacks with Bulwark of Resolve and Guardian's Bastion.",
+   "descDe": "Schild-Gegenstände absorbieren 1 zusätzlichen Fehler. Wirkt zusammen mit Bollwerk der Entschlossenheit und Bastion des Wächters."
+  },
+  {
+   "id": 41106,
+   "x": -2149,
+   "y": 2739,
+   "nameEn": "Bulwark of Resolve",
+   "nameDe": "Bollwerk der Entschlossenheit",
+   "icon": "",
+   "statKey": "reinforced_ward_2",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Shield items absorb 1 additional mistake. Stacks with Aegis Fortification and Guardian's Bastion.",
+   "descDe": "Schild-Gegenstände absorbieren 1 zusätzlichen Fehler. Wirkt zusammen mit Ägis-Verstärkung und Bastion des Wächters."
+  },
+  {
+   "id": 41107,
+   "x": -2217,
+   "y": 2826,
+   "nameEn": "Guardian's Bastion",
+   "nameDe": "Bastion des Wächters",
+   "icon": "",
+   "statKey": "reinforced_ward_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Shield items absorb 1 additional mistake. Stacks with Aegis Fortification and Bulwark of Resolve.",
+   "descDe": "Schild-Gegenstände absorbieren 1 zusätzlichen Fehler. Wirkt zusammen mit Ägis-Verstärkung und Bollwerk der Entschlossenheit."
+  },
+  {
+   "id": 41108,
+   "x": -3205,
+   "y": 2721,
+   "nameEn": "Hexguard Veil",
+   "nameDe": "Hexenschutzschleier",
+   "icon": "",
+   "statKey": "cursed_ward_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Using a Shield item also protects you from cursed item downsides for 5 seconds. Stacks with Aegis of Silence and Null Curse Barrier.",
+   "descDe": "Das Benutzen eines Schild-Gegenstands schützt dich außerdem für 5 Sekunden vor negativen Effekten verfluchter Gegenstände. Wirkt zusammen mit Ägis der Stille und Fluch-Null-Barriere."
+  },
+  {
+   "id": 41109,
+   "x": -3308,
+   "y": 2759,
+   "nameEn": "Aegis of Silence",
+   "nameDe": "Ägis der Stille",
+   "icon": "",
+   "statKey": "cursed_ward_2",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Using a Shield item also protects you from cursed item downsides for 5 seconds. Stacks with Hexguard Veil and Null Curse Barrier.",
+   "descDe": "Das Benutzen eines Schild-Gegenstands schützt dich außerdem für 5 Sekunden vor negativen Effekten verfluchter Gegenstände. Wirkt zusammen mit Hexenschutzschleier und Fluch-Null-Barriere."
+  },
+  {
+   "id": 41110,
+   "x": -3253,
+   "y": 2854,
+   "nameEn": "Null Curse Barrier",
+   "nameDe": "Fluch-Null-Barriere",
+   "icon": "",
+   "statKey": "cursed_ward_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Using a Shield item also protects you from cursed item downsides for 5 seconds. Stacks with Hexguard Veil and Aegis of Silence.",
+   "descDe": "Das Benutzen eines Schild-Gegenstands schützt dich außerdem für 5 Sekunden vor negativen Effekten verfluchter Gegenstände. Wirkt zusammen mit Hexenschutzschleier und Ägis der Stille."
+  },
+  {
+   "id": 41111,
+   "x": -664,
+   "y": 1281,
+   "nameEn": "Mist of Mercy",
+   "nameDe": "Nebel der Gnade",
+   "icon": "",
+   "statKey": "dampened_curse_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Cursed item downsides are 10% less severe. Stacks with Hexsoftening and Veil of Relief.",
+   "descDe": "Negative Effekte von verfluchten Gegenständen sind 10% schwächer. Wirkt zusammen mit Fluchmilderung und Schleier der Erleichterung."
+  },
+  {
+   "id": 41112,
+   "x": -769,
+   "y": 1248,
+   "nameEn": "Hexsoftening",
+   "nameDe": "Fluchmilderung",
+   "icon": "",
+   "statKey": "dampened_curse_2",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Cursed item downsides are 10% less severe. Stacks with Mist of Mercy and Veil of Relief.",
+   "descDe": "Negative Effekte von verfluchten Gegenständen sind 10% schwächer. Wirkt zusammen mit Nebel der Gnade und Schleier der Erleichterung."
+  },
+  {
+   "id": 41113,
+   "x": -827,
+   "y": 1342,
+   "nameEn": "Veil of Relief",
+   "nameDe": "Schleier der Erleichterung",
+   "icon": "",
+   "statKey": "dampened_curse_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Cursed item downsides are 15% less severe. Stacks with Mist of Mercy and Hexsoftening.",
+   "descDe": "Negative Effekte von verfluchten Gegenständen sind 15% schwächer (kürzere Dauer, weniger betroffene Felder). Wirkt zusammen mit Nebel der Gnade und Fluchmilderung."
+  },
+  {
+   "id": 41114,
+   "x": -3121,
+   "y": 4687,
+   "nameEn": "Enduring Supplies",
+   "nameDe": "Beständige Vorräte",
+   "icon": "",
+   "statKey": "frugal_use_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "5% chance that an item is not consumed when used. Stacks with Resource Preservation and Unending Utility.",
+   "descDe": "5% Chance, dass ein Gegenstand beim Benutzen nicht verbraucht wird. Wirkt zusammen mit Ressourcenschonung und Unendlicher Nutzen."
+  },
+  {
+   "id": 41115,
+   "x": -3182,
+   "y": 4779,
+   "nameEn": "Resource Preservation",
+   "nameDe": "Ressourcenschonung",
+   "icon": "",
+   "statKey": "frugal_use_2",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "5% chance that an item is not consumed when used. Stacks with Enduring Supplies and Unending Utility.",
+   "descDe": "5% Chance, dass ein Gegenstand beim Benutzen nicht verbraucht wird. Wirkt zusammen mit Beständige Vorräte und Unendlicher Nutzen."
+  },
+  {
+   "id": 41116,
+   "x": -3243,
+   "y": 4871,
+   "nameEn": "Unending Utility",
+   "nameDe": "Unendlicher Nutzen",
+   "icon": "",
+   "statKey": "frugal_use_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "7% chance that an item is not consumed when used. Stacks with Enduring Supplies and Resource Preservation.",
+   "descDe": "7% Chance, dass ein Gegenstand beim Benutzen nicht verbraucht wird. Wirkt zusammen mit Beständige Vorräte und Ressourcenschonung."
+  },
+  {
+   "id": 41117,
+   "x": -2811,
+   "y": 1482,
+   "nameEn": "Pattern Momentum",
+   "nameDe": "Musterdynamik",
+   "icon": "",
+   "statKey": "regression_reward_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Each time you complete a full row or column, gain 5 seconds.",
+   "descDe": "Jedes Mal, wenn du eine vollständige Zeile oder Spalte abschließt, erhältst du 5 Sekunden."
+  },
+  {
+   "id": 41118,
+   "x": -2908,
+   "y": 1533,
+   "nameEn": "Structural Rhythm",
+   "nameDe": "Strukturrhythmus",
+   "icon": "",
+   "statKey": "regression_reward_2",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Increases the time gained from completing a full row or column by 5 seconds.",
+   "descDe": "Erhöht die Zeit, die du beim Abschließen einer vollständigen Zeile oder Spalte erhältst, um 5 Sekunden."
+  },
+  {
+   "id": 41119,
+   "x": -3016,
+   "y": 1510,
+   "nameEn": "Completion Surge",
+   "nameDe": "Abschlussschub",
+   "icon": "",
+   "statKey": "regression_reward_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Increases the time gained from completing a full row or column by 5 seconds.",
+   "descDe": "Erhöht die Zeit, die du beim Abschließen einer vollständigen Zeile oder Spalte erhältst, um 5 Sekunden."
+  },
+  {
+   "id": 41120,
+   "x": -2001,
+   "y": 3901,
+   "nameEn": "Tutor",
+   "nameDe": "Tutor",
+   "icon": "",
+   "statKey": "tutor_enable",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Tutor Items can now be used during an Excercise or Multiple Choice question. The Tutor has a 10% chance of automatically answering the question for you. Requires a Tutor item to be in the inventory and consumes the item on use.",
+   "descDe": "Tutor Gegenstände können nun während Übungsaufgaben und Multiple - Choice Fragen verwendet werden. Der Tutor beantwortet die Frage mit 10% Wahrscheinlichkeit automatisch korrekt. Benötigt einen Tutor Gegenstand im Inventar und entfernt den Gegenstand danach aus dem Inventar."
+  },
+  {
+   "id": 41121,
+   "x": -3767,
+   "y": 2335,
+   "nameEn": "Careful Study",
+   "nameDe": "Vorsichtige Studie",
+   "icon": "",
+   "statKey": "careful_study",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "10% chance of not spending the Tutor item when using a Tutor to answer a question.",
+   "descDe": "10% Chance, dass der Tutor Gegenstand beim Beantworten einer Frage nicht verbraucht wird."
+  },
+  {
+   "id": 41122,
+   "x": -1762,
+   "y": 26,
+   "nameEn": "Efficient Tutoring",
+   "nameDe": "Effiziente Betreuung",
+   "icon": "",
+   "statKey": "efficient_tutoring",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "15% chance of not spending the Tutor item when using a Tutor to answer a question.",
+   "descDe": "15% Chance, dass der Tutor Gegenstand beim Beantworten einer Frage nicht verbraucht wird."
+  },
+  {
+   "id": 41123,
+   "x": -1374,
+   "y": 1108,
+   "nameEn": "Quick Study",
+   "nameDe": "Schnelle Studie",
+   "icon": "",
+   "statKey": "quick_study",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Excercise hints now show up after one less unsuccessfull attempt.",
+   "descDe": "Hinweise bei Übungsaufgaben erscheinen einen Fehlversuch früher."
+  },
+  {
+   "id": 41124,
+   "x": -5284,
+   "y": 2157,
+   "nameEn": "Pearl of Haste",
+   "nameDe": "Perle der Schnelligkeit",
+   "icon": "",
+   "statKey": "pearl_of_haste",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Enables the Pearl of Haste as an item reward. Using a Pearl of Haste reduces the cooldown of your first active class skill to 1 second.",
+   "descDe": "Ermöglicht die Perle der Schnelligkeit als Gegenstandsbelohnung. Das Benutzen einer Perle der Schnelligkeit reduziert die Abklingzeit deiner ersten aktiven Klassenfähigkeit auf 1 Sekunde."
+  },
+  {
+   "id": 41125,
+   "x": 229,
+   "y": -3899,
+   "nameEn": "Shadow Seal",
+   "nameDe": "Schattensiegel",
+   "icon": "",
+   "statKey": "keystone_shadow_seal",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Enables the Shadow Seal as an item reward. Using the Shadow Seal permanently hides all row and column clues for the rest of the level, but instantly marks 75% of all wrong empty tiles on the entire board. Lowers the timer to 5 minutes.",
+   "descDe": "Ermöglicht das Schattensiegel als Gegenstandsbelohnung. Das Benutzen des Schattensiegels versteckt dauerhaft alle Zeilen- und Spaltenhinweise für den Rest des Levels, markiert aber sofort 75% aller falschen leeren Felder auf dem gesamten Spielfeld. Reduziert die verbleibende Zeit auf 5 Minuten."
+  },
+  {
+   "id": 41126,
+   "x": 2782,
+   "y": 1305,
+   "nameEn": "Blackout Ward",
+   "nameDe": "Verdunklungsschutz",
+   "icon": "",
+   "statKey": "blackout_ward_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "30% chance to be protected against row and column blackout effects from cursed items.",
+   "descDe": "30% Chance, gegen Effekte verfluchter Gegenstände geschützt zu sein, die Zeilen- oder Spaltenhinweise verstecken."
+  },
+  {
+   "id": 41127,
+   "x": 2882,
+   "y": 1352,
+   "nameEn": "Shadow Resistance",
+   "nameDe": "Schattenresistenz",
+   "icon": "",
+   "statKey": "blackout_ward_2",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Increases the Blackout Ward protection chance by 10%. Stacks with Curse Immunity.",
+   "descDe": "Erhöht die Schutzchance des Verdunklungsschutzes um 10%. Wirkt zusammen mit Fluchimmunität."
+  },
+  {
+   "id": 41128,
+   "x": 2972,
+   "y": 1289,
+   "nameEn": "Curse Immunity",
+   "nameDe": "Fluchimmunität",
+   "icon": "",
+   "statKey": "blackout_ward_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Increases the Blackout Ward protection by 20%. Stacks with Shadow Resistance.",
+   "descDe": "Erhöht die Schutzchance des Verdunklungsschutzes um 20%. Wirkt zusammen mit Schattenresistenz."
+  },
+  {
+   "id": 41129,
+   "x": 2195,
+   "y": 3548,
+   "nameEn": "Integrity Shield",
+   "nameDe": "Integritätsschild",
+   "icon": "",
+   "statKey": "removal_ward_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "30% chance to be protected from filled row or column removal effects from cursed items.",
+   "descDe": "30% Chance, gegen Effekte verfluchter Gegenstände geschützt zu sein, die gefüllte Zeilen oder Spalten entfernen."
+  },
+  {
+   "id": 41130,
+   "x": 2253,
+   "y": 3642,
+   "nameEn": "Structural Safeguard",
+   "nameDe": "Strukturschutz",
+   "icon": "",
+   "statKey": "removal_ward_2",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Integrity Shield has 10% increased chance.",
+   "descDe": "Integritätsschild hat eine um 10% erhöhte Chance."
+  },
+  {
+   "id": 41131,
+   "x": 2275,
+   "y": 3750,
+   "nameEn": "Removal Ward",
+   "nameDe": "Entfernungsschutz",
+   "icon": "",
+   "statKey": "removal_ward_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Integrity Shield has 20% increased chance.",
+   "descDe": "Integritätsschild hat eine um 20% erhöhte Chance."
+  },
+  {
+   "id": 41132,
+   "x": 2360,
+   "y": 4781,
+   "nameEn": "Fortune Cascade",
+   "nameDe": "Kaskade des Glücks",
+   "icon": "",
+   "statKey": "lucky_replay_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "10% increased chance of obtaining two instead of one additional items when Lucky Drops triggers. Stacks with Jackpot Echo and Overflowing Fortune.",
+   "descDe": "10% erhöhte Chance zwei anstatt einem weiteren Gegenstand zu erhalten wenn Glücksfunde aktiviert werden. Wirkt zusammen mit Jackpot-Echo und Überströmendes Glück."
+  },
+  {
+   "id": 41133,
+   "x": 2409,
+   "y": 4880,
+   "nameEn": "Jackpot Echo",
+   "nameDe": "Jackpot-Echo",
+   "icon": "",
+   "statKey": "lucky_replay_2",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "15% increased chance of obtaining two instead of one additional items when Lucky Drops triggers. Stacks with Fortune Cascade and Overflowing Fortune.",
+   "descDe": "15% erhöhte Chance zwei anstatt einem weiteren Gegenstand zu erhalten wenn Glücksfunde aktiviert werden. Wirkt zusammen mit Kaskade des Glücks und Überströmendes Glück."
+  },
+  {
+   "id": 41134,
+   "x": 2458,
+   "y": 4979,
+   "nameEn": "Overflowing Fortune",
+   "nameDe": "Überströmendes Glück",
+   "icon": "",
+   "statKey": "lucky_replay_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "20% increased chance of obtaining two instead of one additional items when Lucky Drops triggers. Stacks with Fortune Cascade and Jackpot Echo.",
+   "descDe": "20% erhöhte Chance zwei anstatt einem weiteren Gegenstand zu erhalten wenn Glücksfunde aktiviert werden. Wirkt zusammen mit Kaskade des Glücks und Jackpot-Echo."
+  },
+  {
+   "id": 41135,
+   "x": 5329,
+   "y": 1372,
+   "nameEn": "Focused Momentum",
+   "nameDe": "Fokussierter Schwung",
+   "icon": "",
+   "statKey": "streak_bonus_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "After correctly filling 15 cells in a row without a mistake, gain 15 seconds.",
+   "descDe": "Nach 15 korrekt ausgefüllten Zellen in Folge ohne Fehler erhältst du 15 Sekunden."
+  },
+  {
+   "id": 41136,
+   "x": 5436,
+   "y": 1399,
+   "nameEn": "Flawless Rhythm",
+   "nameDe": "Makelloser Rhythmus",
+   "icon": "",
+   "statKey": "streak_bonus_2",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "Increases the Time gained from Focused Momentum by 5 seconds. Stacks with Perfect Flow.",
+   "descDe": "Erhöht die Zeit, die durch Fokussierter Schwung gewonnen wird, um 5 Sekunden. Wirkt zusammen mit Perfekter Fluss."
+  },
+  {
+   "id": 41137,
+   "x": 5543,
+   "y": 1426,
+   "nameEn": "Perfect Flow",
+   "nameDe": "Perfekter Fluss",
+   "icon": "",
+   "statKey": "streak_bonus_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Increases the Time gained from Focused Momentum by 10 seconds. Stacks with Flawless Rhythm.",
+   "descDe": "Erhöht die Zeit, die durch Fokussierter Schwung gewonnen wird, um 10 Sekunden. Wirkt zusammen mit Makelloser Rhythmus."
+  },
+  {
+   "id": 41138,
+   "x": 2390,
+   "y": 473,
+   "nameEn": "Fortune Echo",
+   "nameDe": "Echos des Glücks",
+   "icon": "",
+   "statKey": "bonus_replay_1",
+   "tier": "small",
+   "layoutPinned": true,
+   "descEn": "10% increased chance of Lucky Drops happening.",
+   "descDe": "10% erhöhte Chance dass Glücksfunde aktiviert werden."
+  },
+  {
+   "id": 41139,
+   "x": 2462,
+   "y": 390,
+   "nameEn": "Golden Recurrence",
+   "nameDe": "Goldene Wiederkehr",
+   "icon": "",
+   "statKey": "bonus_replay_3",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "20% increased chance of Lucky Drops happening.",
+   "descDe": "20% erhöhte Chance dass Glücksfunde aktiviert werden."
+  },
+  {
+   "id": 41140,
+   "x": 690,
+   "y": 1477,
+   "nameEn": "Tutor",
+   "nameDe": "Tutor",
+   "icon": "",
+   "statKey": "tutor_enable",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Tutor Items can now be used during an Excercise or Multiple Choice question. The Tutor has a 10% chance of automatically answering the question for you. Requires a Tutor item to be in the inventory and consumes the item on use.",
+   "descDe": "Tutor Gegenstände können nun während Übungsaufgaben und Multiple - Choice Fragen verwendet werden. Der Tutor beantwortet die Frage mit 10% Wahrscheinlichkeit automatisch korrekt. Benötigt einen Tutor Gegenstand im Inventar und entfernt den Gegenstand danach aus dem Inventar."
+  },
+  {
+   "id": 41141,
+   "x": 3980,
+   "y": 2071,
+   "nameEn": "Lucky Drops",
+   "nameDe": "Glücksfunde",
+   "icon": "",
+   "statKey": "lucky_drops",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Completing an already completed level has a 25% chance of granting an item.",
+   "descDe": "Das erneute Abschließen eines bereits abgeschlossenen Levels gewährt mit 25 % Wahrscheinlichkeit einen Gegenstand."
+  },
+  {
+   "id": 41142,
+   "x": 2948,
+   "y": -486,
+   "nameEn": "Elimination Clue",
+   "nameDe": "Mörderische Eingebung",
+   "icon": "",
+   "statKey": "elimination_clue",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "10% chance to automatically remove one wrong answer from a Multiple Choice question.",
+   "descDe": "10% Wahrscheinlichkeit, dass eine falsche Antwort bei Multiple - Choice Fragen automatisch entfernt wird."
+  },
+  {
+   "id": 41143,
+   "x": 5029,
+   "y": -355,
+   "nameEn": "Wisdom Through Failure",
+   "nameDe": "Weisheit durch Fehler",
+   "icon": "",
+   "statKey": "wisdom_through_failure",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Excercises will show a hint after 5 unsuccessfull attempts.\n10% probability of receiving an additional Item reward when completing an Excercise.",
+   "descDe": "Übungsaufgaben zeigen einen Hinweis nach 5 Fehlversuchen.\n10% Wahrscheinlichkeit einen zusätzlichen Gegenstand als Belohnung für das Absolvieren einer Übungsaufgabe zu erhalten."
+  },
+  {
+   "id": 41144,
+   "x": 912,
+   "y": 578,
+   "nameEn": "Pearl of Swiftness",
+   "nameDe": "Perle der Gewandheit",
+   "icon": "",
+   "statKey": "pearl_of_swiftness",
+   "tier": "notable",
+   "layoutPinned": true,
+   "descEn": "Enables the Pearl of Swiftness as an item reward. Using a Pearl of Swiftness reduces the cooldown of your second active class skill to 1 second.",
+   "descDe": "Ermöglicht die Perle der Gewandtheit als Gegenstandsbelohnung. Das Benutzen einer Perle der Gewandtheit setzt die Abklingzeit deiner zweiten aktiven Klassenfähigkeit auf 1 Sekunde."
+  },
+  {
+   "id": 41145,
+   "x": 3777,
+   "y": 3407,
+   "nameEn": "The Witch",
+   "nameDe": "Die Hexe",
+   "icon": "",
+   "statKey": "keystone_the_witch",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Enables The Witch as an item reward. Using The Witch grants immunity to all cursed item downsides for 60 seconds, but reduces the timer by 10 minutes.",
+   "descDe": "Ermöglicht Die Hexe als Gegenstandsbelohnung. Das Benutzen der Hexe gewährt 60 Sekunden Immunität gegen alle negativen Effekte verfluchter Gegenstände, reduziert aber den Timer um 10 Minuten."
+  },
+  {
+   "id": 41146,
+   "x": -3526,
+   "y": 2462,
+   "nameEn": "Gambler's Ruin",
+   "nameDe": "Ruin des Spielers",
+   "icon": "",
+   "statKey": "keystone_gamblers_ruin",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Each correct cell fill adds 3 seconds to the timer. Each mistake removes 30 additional seconds from the timer. Bonus time from all other sources is disabled.",
+   "descDe": "Jede korrekt ausgefüllte Zelle fügt dem Timer 3 Sekunden hinzu. Jeder Fehler entfernt 30 zusätzliche Sekunden vom Timer. Bonuszeit aus allen anderen Quellen ist deaktiviert."
+  },
+  {
+   "id": 41147,
+   "x": -1963,
+   "y": 3104,
+   "nameEn": "Scholar's Debt",
+   "nameDe": "Gelehrten-Schuld",
+   "icon": "",
+   "statKey": "keystone_scholars_debt",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "You start every level with double time - but 30 seconds are deducted every 60 seconds.",
+   "descDe": "Du startest jedes Level mit doppelter Zeit – aber alle 60 Sekunden werden 30 Sekunden abgezogen."
+  },
+  {
+   "id": 41148,
+   "x": -3691,
+   "y": -579,
+   "nameEn": "Martingale",
+   "nameDe": "Martingal",
+   "icon": "",
+   "statKey": "keystone_martingale",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "You carry a payout stake starting at 15 seconds. Every mistake doubles it, up to a maximum of 480 seconds. Every fully completed line pays out the stake as bonus time and resets it back to 15 seconds.",
+   "descDe": "Du führst einen Auszahlungs-Einsatz ab 15 Sekunden. Jeder Fehler verdoppelt ihn, bis zu einem Maximum von 480 Sekunden. Jede vollständig abgeschlossene Linie zahlt den Einsatz als Bonuszeit aus und setzt ihn auf 15 Sekunden zurück."
+  },
+  {
+   "id": 41149,
+   "x": -3293,
+   "y": 4087,
+   "nameEn": "Zero Variance",
+   "nameDe": "Nullvarianz",
+   "icon": "",
+   "statKey": "keystone_zero_variance",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Every mistake costs exactly 45 seconds - no matter how far into the level you are, which class you play or what modifiers are active.",
+   "descDe": "Jeder Fehler kostet exakt 45 Sekunden – egal wie weit du im Level bist, welche Klasse du spielst oder welche Modifikatoren aktiv sind."
+  },
+  {
+   "id": 41150,
+   "x": -5187,
+   "y": 855,
+   "nameEn": "Perpetual Frost",
+   "nameDe": "Ewiger Frost",
+   "icon": "",
+   "statKey": "keystone_perpetual_frost",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Every fully completed line freezes the timer for 8 seconds.",
+   "descDe": "Jede vollständig abgeschlossene Linie friert den Timer für 8 Sekunden ein."
+  },
+  {
+   "id": 41151,
+   "x": -1338,
+   "y": 2302,
+   "nameEn": "Overfitting",
+   "nameDe": "Überanpassung",
+   "icon": "",
+   "statKey": "keystone_overfitting",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "The first 15% of cells you fill are filled for free - mistakes in this phase cost no time. After 50% completion, each mistake costs triple the normal time.",
+   "descDe": "Die ersten 15% der Zellen, die du ausfüllst, sind kostenlos - Fehler in dieser Phase kosten keine Zeit. Nach 50% Abschluss kostet jeder Fehler dreimal so viel Zeit wie normal."
+  },
+  {
+   "id": 41152,
+   "x": -643,
+   "y": 2320,
+   "nameEn": "Asymptotic Mastery",
+   "nameDe": "Asymptotische Meisterschaft",
+   "icon": "",
+   "statKey": "keystone_asymptotic_mastery",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Each completed row or column permanently reduces the time cost of all future mistakes in this level by 5 seconds. Shields of all kinds are disabled.",
+   "descDe": "Schlüsselfertigkeit: Jede abgeschlossene Zeile oder Spalte reduziert die Zeitkosten aller zukünftigen Fehler in diesem Level dauerhaft um 5 Sekunden. Schilde jeder Art sind deaktiviert."
+  },
+  {
+   "id": 41153,
+   "x": -1878,
+   "y": -1192,
+   "nameEn": "Iron Doctrine",
+   "nameDe": "Eiserne Doktrin",
+   "icon": "",
+   "statKey": "keystone_iron_doctrine",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Shield items cannot be used. Each mistake costs 30 extra seconds. Tutor and Timer items have 300% increased effectiveness.",
+   "descDe": "Schild-Gegenstände können nicht benutzt werden. Jeder Fehler kostet 30 zusätzliche Sekunden. Tutor- und Timer-Gegenstände haben 300% erhöhte Effektivität."
+  },
+  {
+   "id": 41154,
+   "x": -1460,
+   "y": 1177,
+   "nameEn": "Countdown Crisis",
+   "nameDe": "Countdown-Krise",
+   "icon": "",
+   "statKey": "keystone_countdown_crisis",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Timer items reduce the timer instead of increasing it. Reveal items are 5 times as strong while the timer is below 3 minutes.",
+   "descDe": "Timer-Gegenstände reduzieren den Timer anstatt ihn zu erhöhen. Enthüllungsgegenstände sind 5-mal so stark, während der Timer unter 3 Minuten liegt."
+  },
+  {
+   "id": 41155,
+   "x": -5081,
+   "y": 1647,
+   "nameEn": "Veil of Purity",
+   "nameDe": "Schleier der Reinheit",
+   "icon": "",
+   "statKey": "keystone_veil_of_purity",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "The first cursed item used each level has no downside. Any further use of a cursed item has double the downside.",
+   "descDe": "Der erste verfluchte Gegenstand pro Level hat keine negativen Effekte. Jeder weitere verfluchte Gegenstand hat doppelt so starke negative Effekte."
+  },
+  {
+   "id": 41156,
+   "x": -2432,
+   "y": -45,
+   "nameEn": "Thin Margin",
+   "nameDe": "Schmaler Grat",
+   "icon": "",
+   "statKey": "keystone_thin_margin_41156",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "-3 Allowed Mistakes\n25% more maximum Life",
+   "descDe": "-3 erlaubte Fehler\n25% mehr maximales Leben",
+   "effects": [
+    "mistake_count:-3",
+    "life_more_pct:25"
+   ]
+  },
+  {
+   "id": 41157,
+   "x": 1538,
+   "y": -4916,
+   "nameEn": "Frequentist's Burden",
+   "nameDe": "Last des Frequentisten",
+   "icon": "",
+   "statKey": "keystone_frequentists_burden",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Hides all row and column clues. Every 5 correct cell fills 1 random clue gets revealed. Reduces all Class Ability cooldowns by 15 seconds.",
+   "descDe": "Versteckt alle Zeilen - und Spaltenhinweise. Alle 5 korrekt ausgefüllten Zellen wird ein Hinweis wieder angezeigt. Reduziert die Abklingzeit aller Klassenfähigkeiten um 15 Sekunden."
+  },
+  {
+   "id": 41158,
+   "x": -2968,
+   "y": -4461,
+   "nameEn": "Sparse Prior",
+   "nameDe": "Schwacher Prior",
+   "icon": "",
+   "statKey": "keystone_sparse_prior",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "All row and column clues are hidden at the start of the level. Each completed row or column reveals the clues of all adjacent rows and columns.",
+   "descDe": "Alle Zeilen- und Spaltenhinweise sind zu Beginn des Levels verborgen. Jede abgeschlossene Zeile oder Spalte enthüllt die Hinweise aller benachbarten Zeilen und Spalten."
+  },
+  {
+   "id": 41159,
+   "x": -4137,
+   "y": -3637,
+   "nameEn": "Cartographer's Oath",
+   "nameDe": "Eid des Kartographen",
+   "icon": "",
+   "statKey": "keystone_cartographers_oath",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "The entire border ring of the grid is resolved at the start of each level: filled border cells are revealed and empty border cells are automatically marked as incorrect.",
+   "descDe": "Der gesamte Rand des Gitters wird zu Beginn jedes Levels aufgelöst: Gefüllte Randzellen werden aufgedeckt und leere Randzellen werden automatisch als falsch markiert."
+  },
+  {
+   "id": 41160,
+   "x": 4340,
+   "y": -3283,
+   "nameEn": "Kolmogorov Complexity",
+   "nameDe": "Kolmogorow-Komplexität",
+   "icon": "",
+   "statKey": "keystone_kolmogorov",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "All clue numbers are compressed: each row and column only shows its first and last run length. Everything in between stays hidden.",
+   "descDe": "Alle Hinweiszahlen werden komprimiert: Jede Reihe und Spalte zeigt nur ihre erste und letzte Blocklänge. Alles dazwischen bleibt verborgen."
+  },
+  {
+   "id": 41161,
+   "x": 1167,
+   "y": -2838,
+   "nameEn": "Uniform Prior",
+   "nameDe": "Uniformer Prior",
+   "icon": "",
+   "statKey": "keystone_uniform_prior",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "All clue numbers are shuffled between the lines at the start of each level. Every fully completed line restores its true clues.",
+   "descDe": "Alle Hinweiszahlen werden zu Beginn jedes Levels zwischen den Linien gemischt. Jede vollständig abgeschlossene Linie stellt ihre wahren Hinweise wieder her."
+  },
+  {
+   "id": 41162,
+   "x": -2295,
+   "y": -2518,
+   "nameEn": "Nightfall Protocol",
+   "nameDe": "Nachtprotokoll",
+   "icon": "",
+   "statKey": "keystone_nightfall_protocol",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "All clue numbers are hidden for the first minute of every level. When night lifts, all clues return and you are rewarded with 3 free reveals.",
+   "descDe": "Alle Hinweiszahlen sind in der ersten Minute jedes Levels verborgen. Wenn die Nacht weicht, kehren alle Hinweise zurück und du wirst mit 3 kostenlosen Aufdeckungen belohnt."
+  },
+  {
+   "id": 41163,
+   "x": 2571,
+   "y": -2438,
+   "nameEn": "Dead Reckoning",
+   "nameDe": "Koppelnavigation",
+   "icon": "",
+   "statKey": "keystone_dead_reckoning",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "At the start of each level, every row and column clue is shown as the sum of the amount of filled cells in this row and column instead of the exact value. Completing 25% of the grid reveals all exact clues. Increases the Timer by 30%.",
+   "descDe": "Zu Beginn jedes Levels wird jeder Zeilen- und Spaltenhinweis als Summe statt als genauen Wert angezeigt. Das Abschließen von 25% des Gitters enthüllt alle genauen Hinweise. Erhöht den Timer um 30%."
+  },
+  {
+   "id": 41164,
+   "x": -2301,
+   "y": -4893,
+   "nameEn": "Maximum Likelihood",
+   "nameDe": "Maximale Wahrscheinlichkeit",
+   "icon": "",
+   "statKey": "keystone_maximum_likelihood",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "At the start of each level, the single row and single column with the most filled cells are fully solved automatically. You start the level with 30% less time on the timer.",
+   "descDe": "Zu Beginn jedes Levels werden die Zeile und die Spalte mit den meisten gefüllten Zellen automatisch vollständig gelöst. Du startest das Level mit 30% weniger Zeit auf dem Timer."
+  },
+  {
+   "id": 41165,
+   "x": -524,
+   "y": -5064,
+   "nameEn": "Blinding Truth",
+   "nameDe": "Blendende Wahrheit",
+   "icon": "",
+   "statKey": "keystone_blinding_truth",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Reveal items are 50% more effective. Mark-wrong items cannot be used.",
+   "descDe": "Enthüllungsgegenstände sind 50% effektiver. Markierungsgegenstände können nicht benutzt werden."
+  },
+  {
+   "id": 41166,
+   "x": 2289,
+   "y": 2448,
+   "nameEn": "Null Hypothesis",
+   "nameDe": "Nullhypothese",
+   "icon": "",
+   "statKey": "keystone_null_hypothesis",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "At the start of each level, all incorrect empty cells in the row and column with the fewest filled cells are automatically marked. You cannot gain mistake shields of any kind.",
+   "descDe": "Zu Beginn jedes Levels werden alle falschen leeren Zellen in der Zeile und Spalte mit den wenigsten gefüllten Zellen automatisch markiert. Du kannst keine Fehlerschilde jeglicher Art erhalten."
+  },
+  {
+   "id": 41167,
+   "x": 3300,
+   "y": -287,
+   "nameEn": "Law of Large Numbers",
+   "nameDe": "Gesetz der Großen Zahlen",
+   "icon": "",
+   "statKey": "keystone_law_of_large_numbers",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Every 2 minutes, automatically reveal one row and column with fewer than 2 correct filled cells. This effect does not trigger in the last minute of a level.",
+   "descDe": "Alle 2 Minuten wird automatisch eine Zeile oder Spalte mit weniger als 2 korrekt gefüllten Zellen aufgedeckt. Dieser Effekt löst in der letzten Minute eines Levels nicht aus."
+  },
+  {
+   "id": 41168,
+   "x": 1161,
+   "y": 1254,
+   "nameEn": "Butterfly Effect",
+   "nameDe": "Schmetterlingseffekt",
+   "icon": "",
+   "statKey": "keystone_butterfly_effect",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Every correct fill has a 10% chance to cause up to 3 correctly-filled orthogonal neighbours to cascade-reveal for free.",
+   "descDe": "Jede korrekte Füllung hat eine 10% Chance, dass bis zu 3 korrekt gefüllte orthogonale Nachbarn kostenlos kaskadenartig aufgedeckt werden."
+  },
+  {
+   "id": 41169,
+   "x": 5139,
+   "y": -363,
+   "nameEn": "Axiom of Choice",
+   "nameDe": "Auswahlaxiom",
+   "icon": "",
+   "statKey": "keystone_axiom_of_choice",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Once per level, when the timer first drops below 25%, 5% of all remaining correct cells are revealed instantly. This effect triggers automatically.",
+   "descDe": "Einmal pro Level, wenn der Timer erstmals unter 25% fällt, werden 5% aller verbleibenden korrekten Zellen sofort aufgedeckt. Dieser Effekt löst automatisch aus."
+  },
+  {
+   "id": 41170,
+   "x": 4924,
+   "y": -1257,
+   "nameEn": "Type I Error",
+   "nameDe": "Fehler 1. Art",
+   "icon": "",
+   "statKey": "keystone_type_i_error",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Your first ✕ mark of every level resonates: ALL truly empty cells of that row AND column are mass-marked instantly.",
+   "descDe": "Dein erstes ✕-Zeichen jedes Levels hallt nach: ALLE wirklich leeren Zellen dieser Reihe UND Spalte werden sofort massenmarkiert."
+  },
+  {
+   "id": 41171,
+   "x": 1226,
+   "y": 2247,
+   "nameEn": "Variance Collapse",
+   "nameDe": "Varianzkollaps",
+   "icon": "",
+   "statKey": "keystone_variance_collapse",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Lucky Tiles appear in all grids regardless of size. Revealing a Lucky Tile reduces the Timer by 15%.",
+   "descDe": "Glücksfelder erscheinen in allen Gittern unabhängig von der Größe. Das Enthüllen eines Glücksfelds reduziert den Timer um 15%."
+  },
+  {
+   "id": 41172,
+   "x": 4451,
+   "y": 2815,
+   "nameEn": "Curse Embrace",
+   "nameDe": "Fluchsumarmung",
+   "icon": "",
+   "statKey": "keystone_curse_embrace",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "You are immune to cursed item downsides. Reveal, Mark-wrong, Timer and Eraser items are 50% weaker.",
+   "descDe": "Du bist immun gegen negative Effekte verfluchter Gegenstände. Aufdeck-, Markier-, Timer- und Radier-Gegenstände sind 50% schwächer."
+  },
+  {
+   "id": 41173,
+   "x": 3129,
+   "y": 4261,
+   "nameEn": "Open Bazaar",
+   "nameDe": "Offener Basar",
+   "icon": "",
+   "statKey": "keystone_open_bazaar",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Every item use during a level reveals 2 correct cells and grants an additional 5 seconds.",
+   "descDe": "Jede Gegenstandsbenutzung während eines Levels deckt 2 korrekte Zellen auf und gewährt zusätzlich 5 Sekunden."
+  },
+  {
+   "id": 41174,
+   "x": 1971,
+   "y": 4687,
+   "nameEn": "Philosopher's Grid",
+   "nameDe": "Gitter des Philosophen",
+   "icon": "",
+   "statKey": "keystone_philosophers_grid",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "Lucky tiles no longer shimmer and are completely invisible. In exchange, claiming one grants 60 additional seconds and reveals 2 cells.",
+   "descDe": "Glückskacheln schimmern nicht mehr und sind komplett unsichtbar. Dafür gewährt das Einsammeln 60 zusätzliche Sekunden und deckt 2 Zellen auf."
+  },
+  {
+   "id": 41175,
+   "x": 698,
+   "y": 105,
+   "nameEn": "Borrowed Hours",
+   "nameDe": "Geliehene Stunden",
+   "icon": "",
+   "statKey": "keystone_borrowed_hours_41175",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "descEn": "+600 seconds added to the Timer\n-4 Allowed Mistakes",
+   "descDe": "+600 Sekunden zum Timer hinzugefügt\n-4 erlaubte Fehler",
+   "effects": [
+    "time_added:600",
+    "mistake_count:-4"
+   ]
   }
  ],
  "connections": [
@@ -38353,11 +39956,461 @@ export const TALENT_TREE_DATA = {
    "from": 41078,
    "to": 41071,
    "dotted": false
+  },
+  {
+   "id": 2259,
+   "from": 305,
+   "to": 41101,
+   "dotted": false
+  },
+  {
+   "id": 2260,
+   "from": 30757,
+   "to": 41102,
+   "dotted": false
+  },
+  {
+   "id": 2261,
+   "from": 30800,
+   "to": 41103,
+   "dotted": false
+  },
+  {
+   "id": 2262,
+   "from": 30824,
+   "to": 41104,
+   "dotted": false
+  },
+  {
+   "id": 2263,
+   "from": 30522,
+   "to": 41105,
+   "dotted": false
+  },
+  {
+   "id": 2264,
+   "from": 41105,
+   "to": 41106,
+   "dotted": false
+  },
+  {
+   "id": 2265,
+   "from": 41106,
+   "to": 41107,
+   "dotted": false
+  },
+  {
+   "id": 2266,
+   "from": 153,
+   "to": 41108,
+   "dotted": false
+  },
+  {
+   "id": 2267,
+   "from": 41108,
+   "to": 41109,
+   "dotted": false
+  },
+  {
+   "id": 2268,
+   "from": 41109,
+   "to": 41110,
+   "dotted": false
+  },
+  {
+   "id": 2269,
+   "from": 41,
+   "to": 41111,
+   "dotted": false
+  },
+  {
+   "id": 2270,
+   "from": 41111,
+   "to": 41112,
+   "dotted": false
+  },
+  {
+   "id": 2271,
+   "from": 41112,
+   "to": 41113,
+   "dotted": false
+  },
+  {
+   "id": 2272,
+   "from": 326,
+   "to": 41114,
+   "dotted": false
+  },
+  {
+   "id": 2273,
+   "from": 41114,
+   "to": 41115,
+   "dotted": false
+  },
+  {
+   "id": 2274,
+   "from": 41115,
+   "to": 41116,
+   "dotted": false
+  },
+  {
+   "id": 2275,
+   "from": 252,
+   "to": 41117,
+   "dotted": false
+  },
+  {
+   "id": 2276,
+   "from": 41117,
+   "to": 41118,
+   "dotted": false
+  },
+  {
+   "id": 2277,
+   "from": 41118,
+   "to": 41119,
+   "dotted": false
+  },
+  {
+   "id": 2278,
+   "from": 30434,
+   "to": 41120,
+   "dotted": false
+  },
+  {
+   "id": 2279,
+   "from": 20043,
+   "to": 41121,
+   "dotted": false
+  },
+  {
+   "id": 2280,
+   "from": 54,
+   "to": 41122,
+   "dotted": false
+  },
+  {
+   "id": 2281,
+   "from": 47,
+   "to": 41123,
+   "dotted": false
+  },
+  {
+   "id": 2282,
+   "from": 227,
+   "to": 41124,
+   "dotted": false
+  },
+  {
+   "id": 2283,
+   "from": 323,
+   "to": 41125,
+   "dotted": false
+  },
+  {
+   "id": 2284,
+   "from": 20100,
+   "to": 41126,
+   "dotted": false
+  },
+  {
+   "id": 2285,
+   "from": 41126,
+   "to": 41127,
+   "dotted": false
+  },
+  {
+   "id": 2286,
+   "from": 41127,
+   "to": 41128,
+   "dotted": false
+  },
+  {
+   "id": 2287,
+   "from": 30662,
+   "to": 41129,
+   "dotted": false
+  },
+  {
+   "id": 2288,
+   "from": 41129,
+   "to": 41130,
+   "dotted": false
+  },
+  {
+   "id": 2289,
+   "from": 41130,
+   "to": 41131,
+   "dotted": false
+  },
+  {
+   "id": 2290,
+   "from": 31038,
+   "to": 41132,
+   "dotted": false
+  },
+  {
+   "id": 2291,
+   "from": 41132,
+   "to": 41133,
+   "dotted": false
+  },
+  {
+   "id": 2292,
+   "from": 41133,
+   "to": 41134,
+   "dotted": false
+  },
+  {
+   "id": 2293,
+   "from": 20130,
+   "to": 41135,
+   "dotted": false
+  },
+  {
+   "id": 2294,
+   "from": 41135,
+   "to": 41136,
+   "dotted": false
+  },
+  {
+   "id": 2295,
+   "from": 41136,
+   "to": 41137,
+   "dotted": false
+  },
+  {
+   "id": 2296,
+   "from": 30877,
+   "to": 41138,
+   "dotted": false
+  },
+  {
+   "id": 2297,
+   "from": 41138,
+   "to": 41139,
+   "dotted": false
+  },
+  {
+   "id": 2298,
+   "from": 86,
+   "to": 41140,
+   "dotted": false
+  },
+  {
+   "id": 2299,
+   "from": 258,
+   "to": 41141,
+   "dotted": false
+  },
+  {
+   "id": 2300,
+   "from": 394,
+   "to": 41142,
+   "dotted": false
+  },
+  {
+   "id": 2301,
+   "from": 393,
+   "to": 41143,
+   "dotted": false
+  },
+  {
+   "id": 2302,
+   "from": 41023,
+   "to": 41144,
+   "dotted": false
+  },
+  {
+   "id": 2303,
+   "from": 30743,
+   "to": 41145,
+   "dotted": false
+  },
+  {
+   "id": 2304,
+   "from": 30256,
+   "to": 41146,
+   "dotted": false
+  },
+  {
+   "id": 2305,
+   "from": 30237,
+   "to": 41147,
+   "dotted": false
+  },
+  {
+   "id": 2306,
+   "from": 30564,
+   "to": 41148,
+   "dotted": false
+  },
+  {
+   "id": 2307,
+   "from": 148,
+   "to": 41149,
+   "dotted": false
+  },
+  {
+   "id": 2308,
+   "from": 30330,
+   "to": 41150,
+   "dotted": false
+  },
+  {
+   "id": 2309,
+   "from": 30215,
+   "to": 41151,
+   "dotted": false
+  },
+  {
+   "id": 2310,
+   "from": 30507,
+   "to": 41152,
+   "dotted": false
+  },
+  {
+   "id": 2311,
+   "from": 30052,
+   "to": 41153,
+   "dotted": false
+  },
+  {
+   "id": 2312,
+   "from": 41123,
+   "to": 41154,
+   "dotted": false
+  },
+  {
+   "id": 2313,
+   "from": 369,
+   "to": 41155,
+   "dotted": false
+  },
+  {
+   "id": 2314,
+   "from": 30186,
+   "to": 41156,
+   "dotted": false
+  },
+  {
+   "id": 2315,
+   "from": 31426,
+   "to": 41157,
+   "dotted": false
+  },
+  {
+   "id": 2316,
+   "from": 31351,
+   "to": 41158,
+   "dotted": false
+  },
+  {
+   "id": 2317,
+   "from": 304,
+   "to": 41159,
+   "dotted": false
+  },
+  {
+   "id": 2318,
+   "from": 19,
+   "to": 41160,
+   "dotted": false
+  },
+  {
+   "id": 2319,
+   "from": 31063,
+   "to": 41161,
+   "dotted": false
+  },
+  {
+   "id": 2320,
+   "from": 31261,
+   "to": 41162,
+   "dotted": false
+  },
+  {
+   "id": 2321,
+   "from": 233,
+   "to": 41163,
+   "dotted": false
+  },
+  {
+   "id": 2322,
+   "from": 20227,
+   "to": 41164,
+   "dotted": false
+  },
+  {
+   "id": 2323,
+   "from": 20225,
+   "to": 41165,
+   "dotted": false
+  },
+  {
+   "id": 2324,
+   "from": 30764,
+   "to": 41166,
+   "dotted": false
+  },
+  {
+   "id": 2325,
+   "from": 30844,
+   "to": 41167,
+   "dotted": false
+  },
+  {
+   "id": 2326,
+   "from": 79,
+   "to": 41168,
+   "dotted": false
+  },
+  {
+   "id": 2327,
+   "from": 41143,
+   "to": 41169,
+   "dotted": false
+  },
+  {
+   "id": 2328,
+   "from": 20118,
+   "to": 41170,
+   "dotted": false
+  },
+  {
+   "id": 2329,
+   "from": 30623,
+   "to": 41171,
+   "dotted": false
+  },
+  {
+   "id": 2330,
+   "from": 215,
+   "to": 41172,
+   "dotted": false
+  },
+  {
+   "id": 2331,
+   "from": 20162,
+   "to": 41173,
+   "dotted": false
+  },
+  {
+   "id": 2332,
+   "from": 30716,
+   "to": 41174,
+   "dotted": false
+  },
+  {
+   "id": 2333,
+   "from": 41078,
+   "to": 41175,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 2,
-  "fingerprint": "99b23a7b079cfe59",
+  "fingerprint": "aa28cf1410858ace",
   "positions": [
    [
     156,
@@ -48008,6 +50061,381 @@ export const TALENT_TREE_DATA = {
     41078,
     589,
     89
+   ],
+   [
+    41101,
+    3092,
+    1725
+   ],
+   [
+    41102,
+    2959,
+    2755
+   ],
+   [
+    41103,
+    3985,
+    2550
+   ],
+   [
+    41104,
+    3845,
+    790
+   ],
+   [
+    41105,
+    -2114,
+    2635
+   ],
+   [
+    41106,
+    -2149,
+    2739
+   ],
+   [
+    41107,
+    -2217,
+    2826
+   ],
+   [
+    41108,
+    -3205,
+    2721
+   ],
+   [
+    41109,
+    -3308,
+    2759
+   ],
+   [
+    41110,
+    -3253,
+    2854
+   ],
+   [
+    41111,
+    -664,
+    1281
+   ],
+   [
+    41112,
+    -769,
+    1248
+   ],
+   [
+    41113,
+    -827,
+    1342
+   ],
+   [
+    41114,
+    -3121,
+    4687
+   ],
+   [
+    41115,
+    -3182,
+    4779
+   ],
+   [
+    41116,
+    -3243,
+    4871
+   ],
+   [
+    41117,
+    -2811,
+    1482
+   ],
+   [
+    41118,
+    -2908,
+    1533
+   ],
+   [
+    41119,
+    -3016,
+    1510
+   ],
+   [
+    41120,
+    -2001,
+    3901
+   ],
+   [
+    41121,
+    -3767,
+    2335
+   ],
+   [
+    41122,
+    -1762,
+    26
+   ],
+   [
+    41123,
+    -1374,
+    1108
+   ],
+   [
+    41124,
+    -5284,
+    2157
+   ],
+   [
+    41125,
+    229,
+    -3899
+   ],
+   [
+    41126,
+    2782,
+    1305
+   ],
+   [
+    41127,
+    2882,
+    1352
+   ],
+   [
+    41128,
+    2972,
+    1289
+   ],
+   [
+    41129,
+    2195,
+    3548
+   ],
+   [
+    41130,
+    2253,
+    3642
+   ],
+   [
+    41131,
+    2275,
+    3750
+   ],
+   [
+    41132,
+    2360,
+    4781
+   ],
+   [
+    41133,
+    2409,
+    4880
+   ],
+   [
+    41134,
+    2458,
+    4979
+   ],
+   [
+    41135,
+    5329,
+    1372
+   ],
+   [
+    41136,
+    5436,
+    1399
+   ],
+   [
+    41137,
+    5543,
+    1426
+   ],
+   [
+    41138,
+    2390,
+    473
+   ],
+   [
+    41139,
+    2462,
+    390
+   ],
+   [
+    41140,
+    690,
+    1477
+   ],
+   [
+    41141,
+    3980,
+    2071
+   ],
+   [
+    41142,
+    2948,
+    -486
+   ],
+   [
+    41143,
+    5029,
+    -355
+   ],
+   [
+    41144,
+    912,
+    578
+   ],
+   [
+    41145,
+    3777,
+    3407
+   ],
+   [
+    41146,
+    -3526,
+    2462
+   ],
+   [
+    41147,
+    -1963,
+    3104
+   ],
+   [
+    41148,
+    -3691,
+    -579
+   ],
+   [
+    41149,
+    -3293,
+    4087
+   ],
+   [
+    41150,
+    -5187,
+    855
+   ],
+   [
+    41151,
+    -1338,
+    2302
+   ],
+   [
+    41152,
+    -643,
+    2320
+   ],
+   [
+    41153,
+    -1878,
+    -1192
+   ],
+   [
+    41154,
+    -1460,
+    1177
+   ],
+   [
+    41155,
+    -5081,
+    1647
+   ],
+   [
+    41156,
+    -2432,
+    -45
+   ],
+   [
+    41157,
+    1538,
+    -4916
+   ],
+   [
+    41158,
+    -2968,
+    -4461
+   ],
+   [
+    41159,
+    -4137,
+    -3637
+   ],
+   [
+    41160,
+    4340,
+    -3283
+   ],
+   [
+    41161,
+    1167,
+    -2838
+   ],
+   [
+    41162,
+    -2295,
+    -2518
+   ],
+   [
+    41163,
+    2571,
+    -2438
+   ],
+   [
+    41164,
+    -2301,
+    -4893
+   ],
+   [
+    41165,
+    -524,
+    -5064
+   ],
+   [
+    41166,
+    2289,
+    2448
+   ],
+   [
+    41167,
+    3300,
+    -287
+   ],
+   [
+    41168,
+    1161,
+    1254
+   ],
+   [
+    41169,
+    5139,
+    -363
+   ],
+   [
+    41170,
+    4924,
+    -1257
+   ],
+   [
+    41171,
+    1226,
+    2247
+   ],
+   [
+    41172,
+    4451,
+    2815
+   ],
+   [
+    41173,
+    3129,
+    4261
+   ],
+   [
+    41174,
+    1971,
+    4687
+   ],
+   [
+    41175,
+    698,
+    105
    ]
   ]
  }

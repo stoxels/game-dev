@@ -97,9 +97,11 @@ function _egRevealVolleyIncPct(castId, volleySize) {
 // live gear stats (recomputed on demand, so equips apply instantly).
 export function _egGetRevealProjectileDamagePct() {
     const stats = _egComputePlayerStats();
-    return EG_REVEAL_PROJECTILE_DAMAGE_PCT
+    const base = EG_REVEAL_PROJECTILE_DAMAGE_PCT
         + (stats.spellDamageFlat || 0) * EG_REVEAL_PCT_PER_FLAT_SPELL_DMG
         + (stats.spellDamageIncPct || 0) * EG_REVEAL_PCT_PER_INC_SPELL_DMG;
+    // reveal_projectile_damage (passive tree): increased reveal-projectile damage.
+    return base * (1 + (stats.revealProjectileDamagePct || 0) / 100);
 }
 
 // Entry point for programmatic reveals (items, passives, class abilities).

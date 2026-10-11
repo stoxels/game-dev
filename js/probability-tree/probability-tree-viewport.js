@@ -1,5 +1,4 @@
-import { _pt_container, _ptGetBounds, _ptUpdateVirtualViewport, _pt_world } from './probability-tree-ui.js';
-import { PT_REWORK_PROPOSALS } from './probability-tree-rework.js';
+import { _pt_container, _ptUpdateVirtualViewport, _pt_world } from './probability-tree-ui.js';
 import { getPassiveTreeRootId, PT_FOCUS_SCALE, PT_NODE_RADIUS, PT_PADDING, PT_START_ID, PT_ZOOM_MAX, PT_ZOOM_MIN, PT_ZOOM_STEP } from './probability-tree.js';
 import { STATE } from '../state.js';
 //--- Phase 3 step 5: live accessors (external write sites stay untouched) ---
@@ -152,31 +151,6 @@ export function _ptFocusNode(skill, bounds) {
     if (!skill || !_pt_container) return false;
     _pt_scale = _ptClampScale(PT_FOCUS_SCALE);
     _ptCenterOnNode(skill, bounds);
-    return true;
-}
-
-// PoE-port review helper: frames every node that currently carries a
-// proposal (blue marker) so the owner does not have to hunt for them in the
-// full tree. Zoom is capped at the normal focus scale. Returns false when
-// no proposal exists or the tree is not mounted.
-export function _ptJumpToProposals() {
-    if (!_pt_container || !globalThis._pt_skillMap) return false;
-    const skills = Object.keys(PT_REWORK_PROPOSALS)
-        .map(id => globalThis._pt_skillMap[id])
-        .filter(Boolean);
-    if (!skills.length) return false;
-    const bounds = _ptGetBounds();
-    const pts = skills.map(s => _ptGetNodeWorldPos(s, bounds));
-    const minX = Math.min(...pts.map(p => p.wx)), maxX = Math.max(...pts.map(p => p.wx));
-    const minY = Math.min(...pts.map(p => p.wy)), maxY = Math.max(...pts.map(p => p.wy));
-    const cW = _pt_container.clientWidth || 800;
-    const cH = _pt_container.clientHeight || 600;
-    const margin = 260;
-    const fit = Math.min(cW / (maxX - minX + margin * 2), cH / (maxY - minY + margin * 2));
-    _pt_scale = _ptClampScale(Math.min(PT_FOCUS_SCALE, fit));
-    _pt_tx = (cW / 2) - ((minX + maxX) / 2) * _pt_scale;
-    _pt_ty = (cH / 2) - ((minY + maxY) / 2) * _pt_scale;
-    _ptApplyTransform();
     return true;
 }
 

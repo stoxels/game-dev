@@ -83,6 +83,14 @@ function _tryProcStochasticResonance(row, col) {
     return false;
 }
 
+// True when this mistake is not counted towards the allowed mistakes.
+// Chance = tree (mistake_not_count_pct) + gear (mistake_not_count), capped at 100.
+function _rollUncountedMistake() {
+    if (typeof globalThis._egComputePlayerStats !== 'function') return false;
+    const pct = Number(globalThis._egComputePlayerStats().mistakeNotCountPct) || 0;
+    return pct > 0 && Math.random() * 100 < Math.min(100, pct);
+}
+
 // standard_deviation (nodes 255 and 257):
 // Reveals cells after a threshold number of mistakes.
 //   Node 1 only   → every 3 mistakes → reveal 1 cell
@@ -156,9 +164,9 @@ export function _getAsymptoticMasteryReduction() {
 }
 
 // keystone_iron_doctrine (node 158):
-// Each mistake costs 60 extra seconds on top of the normal penalty.
+// Each mistake costs 30 extra seconds on top of the normal penalty.
 function _getIronDoctrineExtraSeconds() {
-    return globalThis.ptHasSkill('keystone_iron_doctrine') ? 60 : 0;
+    return globalThis.ptHasSkill('keystone_iron_doctrine') ? 30 : 0;
 }
 
 // Resolves the active penalty multiplier for this mistake.
@@ -295,7 +303,9 @@ export function applyPenalty(row, col) {
     if (_tryProcStochasticResonance(row, col)) return;
 
     // --- Register the mistake and fire dependent systems ---
-    globalThis.mistakeCount++;
+    // Uncounted mistakes (tree + gear "mistake not counted" chance) still
+    // cost their time penalty but do not eat into the allowed mistakes.
+    if (!_rollUncountedMistake()) globalThis.mistakeCount++;
     globalThis._incDirect('lifetimeMistakesMade');
     globalThis._onMistakeBayesianUpdate();
     globalThis._gamblersRuinOnMistake();

@@ -102,6 +102,19 @@ export function _egOnMistake() {
     globalThis._egArcaneSurgeStreak = 0;
     globalThis._egChannelStacks = 0;
 
+    // mistake_heal (tree): a mistake restores some Life.
+    const mistakeHeal = Number(_egComputePlayerStats().mistakeHeal) || 0;
+    if (mistakeHeal > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP) {
+        const gain = globalThis._egLifeGain ? globalThis._egLifeGain(mistakeHeal) : mistakeHeal;
+        globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + gain);
+        if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+    }
+
+    // damage_on_mistake (tree): the next Attack deals more damage.
+    if ((Number(_egComputePlayerStats().damageOnMistakePct) || 0) > 0 && globalThis.LEVEL_FLAGS) {
+        globalThis.LEVEL_FLAGS.damageOnMistakePending = true;
+    }
+
     // Active map run: mistakes burn a share of maximum Life.
     if (typeof _egIsActive === 'function' && _egIsActive()
         && typeof _egGetActiveMapModValue === 'function') {

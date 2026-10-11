@@ -62,6 +62,8 @@ window.LEVEL_FLAGS = {
     compoundInterestCount: 0, // Compound Interest: mistakes absorbed by Variance Shield this level
     priorElicitationDone: false, // Prior Elicitation: the 50%-completion Bayesian Insight has fired
     mistakeLog: [],           // Actuary/Markovian: rolling log of {r,c,penaltySecs} mistakes
+    damageAfterLineUntil: 0,  // damage_after_line (tree): timestamp until which the bonus lasts
+    damageOnMistakePending: false, // damage_on_mistake (tree): next Attack deals more damage
     lastFailedGi: null,       // gIdx of the level the player last failed (bounceback achievement)
 };
 
@@ -80,6 +82,8 @@ export function _resetLevelFlags() {
     window.LEVEL_FLAGS.compoundInterestCount = 0;
     window.LEVEL_FLAGS.priorElicitationDone = false;
     window.LEVEL_FLAGS.mistakeLog = [];
+    window.LEVEL_FLAGS.damageAfterLineUntil = 0;
+    window.LEVEL_FLAGS.damageOnMistakePending = false;
     // devTestActive survives: it describes the session, not the level.
     // oracleActive survives this reset: _doStartLevel sets it (step 4) before
     // _initClassSystems fires this reset (step 6), so zeroing it here would

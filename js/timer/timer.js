@@ -420,9 +420,9 @@ function _initSkillTimers() {
         _timedStasisNext = Date.now() + 10 * 60 * 1000;
     }
 
-    // keystone_law_of_large_numbers (219): first trigger after 5 minutes.
+    // keystone_law_of_large_numbers (219): first trigger after 2 minutes.
     if (globalThis.ptHasSkill('keystone_law_of_large_numbers')) {
-        _lawOfLargeNext = Date.now() + 5 * 60 * 1000;
+        _lawOfLargeNext = Date.now() + 2 * 60 * 1000;
     }
 
     // poisson_process (270-272): schedule first auto-mark.
@@ -589,16 +589,16 @@ function _triggerLawOfLargeNumbers() {
 }
 
 
-// Handles keystone_law_of_large_numbers (219): every 5 minutes, reveal
-// one sparse row and one sparse column. Does not fire in the last 15
-// minutes of a level (timerSecs ≤ 900).
+// Handles keystone_law_of_large_numbers (219): every 2 minutes, reveal
+// one sparse row and one sparse column. Does not fire in the last
+// minute of a level (timerSecs ≤ 60).
 function _tickLawOfLargeNumbers() {
     if (!_lawOfLargeNext) return;
     if (Date.now() < _lawOfLargeNext) return;
-    if (timerSecs <= 900) return; // last 15 min - no reveal
+    if (timerSecs <= 60) return; // last minute - no reveal
 
-    // Schedule the next trigger 5 minutes from now.
-    _lawOfLargeNext = Date.now() + 5 * 60 * 1000;
+    // Schedule the next trigger 2 minutes from now.
+    _lawOfLargeNext = Date.now() + 2 * 60 * 1000;
 
     _triggerLawOfLargeNumbers();
 }

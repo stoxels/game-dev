@@ -10,7 +10,6 @@ import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goTo
 import { ptGoBack, showPassiveTree, showPassiveTreeAsCharacter } from './probability-tree/probability-tree.js';
 import { showQuestLog } from './inference/inference-ui.js';
 import { _ptRefundAllPoints } from './probability-tree/probability-tree-state-points.js';
-import { _ptJumpToProposals } from './probability-tree/probability-tree-viewport.js';
 import { STATE } from './state.js';
 import { cur } from './state.js';
 
@@ -799,7 +798,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     onClick('btn-pt-refund-all', () => showPtRefundConfirm(() => _ptRefundAllPoints()));
-    onClick('btn-pt-jump-proposals', () => _ptJumpToProposals());
 
 
     //------------------------------------------------------------------------

@@ -17,6 +17,49 @@ export const DIFF_CFG = {
     hard: { scoreMult: 1.5, pens: [75, 150, 225, 300] },
 };
 
+// ---------------------------------------------------------------------------
+// Campaign puzzle budget (time + allowed mistakes)
+// ---------------------------------------------------------------------------
+// Base time and the mistake cap of a campaign level depend on the grid size
+// (small < 100 cells, medium 100-199, large 200+). Tree and gear bonuses are
+// added on top. The whole budget sits behind ONE switch (on since the tree
+// offers the time / mistake clusters); false restores the authored level
+// timers and no cap.
+export const CAMPAIGN_BUDGET_ACTIVE = true;
+export const CAMPAIGN_BASE_TIME_SECS = { small: 300, medium: 600, large: 900 };
+export const CAMPAIGN_MISTAKE_CAPS = {
+    easy: { small: 15, medium: 25, large: 35 },
+    normal: { small: 10, medium: 15, large: 20 },
+    hard: { small: 5, medium: 10, large: 15 },
+};
+
+// 'small' | 'medium' | 'large' for a grid with the given cell count.
+export function campaignGridSizeClass(cells) {
+    if (cells < 100) return 'small';
+    if (cells < 200) return 'medium';
+    return 'large';
+}
+
+// Base level timer (seconds) for a grid with the given cell count.
+export function campaignBaseTimeSecs(cells) {
+    return CAMPAIGN_BASE_TIME_SECS[campaignGridSizeClass(cells)];
+}
+
+// Mistake cap for a difficulty and grid size; `bonus` = tree + gear
+// allowed mistakes. Unknown difficulties fall back to normal.
+export function campaignMistakeCap(diff, cells, bonus = 0) {
+    const table = CAMPAIGN_MISTAKE_CAPS[diff] || CAMPAIGN_MISTAKE_CAPS.normal;
+    // Negative bonuses (keystone trade-offs) lower the cap but never below 1.
+    return Math.max(1, table[campaignGridSizeClass(cells)] + (Math.trunc(bonus) || 0));
+}
+
+// Mistake cap for a level object (needs .grid) at the current difficulty,
+// or null while the budget is off / the level has no grid.
+export function campaignCapForLevel(level, bonus = 0) {
+    if (!CAMPAIGN_BUDGET_ACTIVE || !level || !level.grid || !level.grid[0]) return null;
+    return campaignMistakeCap(curDiff, level.grid.length * level.grid[0].length, bonus);
+}
+
 // Currently toggled optional modifiers. Keys drive UI, scoring and gameplay
 // checks below - order here also determines score-multiplier application
 // order, so don't reorder without checking scoreMultiplier().

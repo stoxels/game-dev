@@ -605,6 +605,43 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Level-start timer bonus (nodes 31211/31215/31216): read by the _initTimer
     // patch in probability-tree-expansion.js via _egGetTreeTimerStartSecs().
     timer_start_secs: { channel: 'timerStartSecs', en: '+{v} seconds added to the Timer', de: '+{v} Sekunden zum Timer hinzugefügt' },
+    // Puzzle budget (campaign levels, maps and trials): time_added shares the
+    // timer_start_secs channel (_initTimer patch in probability-tree-expansion.js),
+    // mistake_count raises the allowed-mistake cap, mistake_not_count_pct is
+    // the "uncounted mistake" roll (penalty.js applyPenalty).
+    time_added: { channel: 'timerStartSecs', en: '+{v} seconds added to the Timer', de: '+{v} Sekunden zum Timer hinzugefügt' },
+    mistake_count: { channel: 'mistakeCountTree', en: '+{v} Allowed Mistakes', de: '+{v} erlaubte Fehler' },
+    mistake_not_count_pct: { channel: 'mistakeNotCountTreePct', en: '{v}% Chance that a Mistake is not counted', de: '{v}% Chance, dass ein Fehler nicht gezählt wird' },
+    // Puzzle <-> combat crossover lines (REGISTERED ONLY - see
+    // PT_UNWIRED_EFFECT_KEYS below; no node may use them until wired).
+    life_on_line: { channel: 'lifeOnLine', en: 'Recover {v} Life for each completed Row or Column', de: 'Stelle {v} Leben pro abgeschlossener Zeile oder Spalte wieder her' },
+    absorption_on_line: { channel: 'absorptionOnLine', en: 'Gain {v} Absorption for each completed Row or Column', de: 'Erhalte {v} Absorption pro abgeschlossener Zeile oder Spalte' },
+    mana_on_line: { channel: 'manaOnLine', en: 'Gain {v} Mana for each completed Row or Column', de: 'Erhalte {v} Mana pro abgeschlossener Zeile oder Spalte' },
+    charge_on_line: { channel: 'chargeOnLinePct', en: '{v}% Chance to gain a Charge for each completed Row or Column', de: '{v}% Chance auf eine Aufladung pro abgeschlossener Zeile oder Spalte' },
+    armour_per_streak: { channel: 'armourPerStreak', en: '+{v} Armour per 10 correct Fills in a row', de: '+{v} Rüstung pro 10 richtigen Füllungen in Folge' },
+    block_flawless: { channel: 'blockFlawlessPct', en: '+{v}% Chance to Block while you have made no Mistakes this level', de: '+{v}% Blockchance, solange du in diesem Level keinen Fehler gemacht hast' },
+    mistake_heal: { channel: 'mistakeHeal', en: 'Recover {v} Life when you make a Mistake', de: 'Stelle {v} Leben wieder her, wenn du einen Fehler machst' },
+    damage_per_streak: { channel: 'damagePerStreakPct', en: '{v}% increased Damage per 10 correct Fills in a row', de: '{v}% erhöhter Schaden pro 10 richtigen Füllungen in Folge' },
+    damage_flawless: { channel: 'damageFlawlessPct', en: '{v}% more Damage while you have made no Mistakes this level', de: '{v}% mehr Schaden, solange du in diesem Level keinen Fehler gemacht hast' },
+    damage_low_time: { channel: 'damageLowTimePct', en: '{v}% more Damage while below 25% of the Timer', de: '{v}% mehr Schaden, solange weniger als 25% des Timers übrig sind' },
+    damage_after_line: { channel: 'damageAfterLinePct', en: '{v}% increased Damage for 5 seconds after completing a Row or Column', de: '{v}% erhöhter Schaden für 5 Sekunden nach einer abgeschlossenen Zeile oder Spalte' },
+    reveal_projectile_damage: { channel: 'revealProjectileDamagePct', en: 'Reveal Projectiles deal {v}% increased Damage', de: 'Aufdeckungs-Projektile verursachen {v}% erhöhten Schaden' },
+    damage_on_mistake: { channel: 'damageOnMistakePct', en: 'After a Mistake your next Attack deals {v}% more Damage', de: 'Nach einem Fehler verursacht dein nächster Angriff {v}% mehr Schaden' },
+    time_on_kill: { channel: 'timeOnKill', en: '+{v} seconds on the Timer for each Monster killed', de: '+{v} Sekunden auf dem Timer für jedes getötete Monster' },
+    time_on_elite: { channel: 'timeOnElite', en: '+{v} seconds on the Timer for each Boss or Elite killed', de: '+{v} Sekunden auf dem Timer für jeden getöteten Boss oder Elite' },
+    freeze_timer_on_stun: { channel: 'timerFreezeOnStun', en: 'Stunning an enemy pauses the Timer for {v} seconds', de: 'Das Betäuben eines Gegners pausiert den Timer für {v} Sekunden' },
+    cell_on_kill: { channel: 'cellOnKillPct', en: '{v}% Chance that a killed Monster reveals one correct Cell', de: '{v}% Chance, dass ein getötetes Monster eine richtige Zelle aufdeckt' },
+    mark_on_kill: { channel: 'markOnKillPct', en: '{v}% Chance that a killed Monster marks one wrong Cell', de: '{v}% Chance, dass ein getötetes Monster eine falsche Zelle markiert' },
+    quick_fill_streak: { channel: 'quickFillStreakPct', en: 'Correct Fills within 1 second of each other count {v}% more towards Momentum', de: 'Richtige Füllungen im Abstand von höchstens 1 Sekunde zählen {v}% stärker für Schwung' },
+    first_step_time: { channel: 'firstStepTreeSecs', en: 'Your first correct Fill each level grants +{v} seconds', de: 'Deine erste richtige Füllung pro Level gewährt +{v} Sekunden' },
+    pickup_lifetime: { channel: 'pickupLifetimeSecs', en: 'Heart and Mana pickups stay {v} seconds longer', de: 'Herz- und Manaaufnahmen bleiben {v} Sekunden länger' },
+    lucky_tile_reward: { channel: 'luckyTileRewardAmount', en: 'Lucky Tiles also restore {v} Life and Mana', de: 'Glücksfelder stellen zusätzlich {v} Leben und Mana wieder her' },
+    regen_low_time: { channel: 'regenLowTimePct', en: '{v}% faster Life Regeneration while below 25% of the Timer', de: '{v}% schnellere Lebensregeneration, solange weniger als 25% des Timers übrig sind' },
+    quiz_hint: { channel: 'quizHintPct', en: '{v}% Chance that a Quiz answer shows a Hint', de: '{v}% Chance, dass eine Quizantwort einen Hinweis zeigt' },
+    quiz_retry: { channel: 'quizRetryPct', en: '{v}% Chance for a new Question after a wrong Answer', de: '{v}% Chance auf eine neue Frage nach einer falschen Antwort' },
+    quiz_time: { channel: 'quizTimeSecs', en: 'A correct Quiz answer adds {v} seconds to the Timer', de: 'Eine richtige Quizantwort fügt dem Timer {v} Sekunden hinzu' },
+    item_drop: { channel: 'itemDropPct', en: 'Monsters have {v}% increased Chance to drop puzzle Items', de: 'Monster haben {v}% erhöhte Chance, Rätselgegenstände fallen zu lassen' },
+    item_effect: { channel: 'itemEffectPct', en: 'Puzzle Items are {v}% more effective', de: 'Rätselgegenstände sind {v}% effektiver' },
     // Champion's Vigor (node 20033): extra melee strike range, and the melee
     // splash it unlocks (radius in meters, converted to px in
     // _egComputePlayerStats; scaled by melee_aoe_pct in _egTryMeleeSplashHit).
@@ -665,6 +702,29 @@ export const PT_EFFECT_DEFS = Object.freeze({
     crush_full_life: { channel: 'crushPhysReductionPct', en: 'Crush enemies for 5 seconds when you hit them with a melee strike while they are on full Life. Crushed enemies have {v}% reduced physical Damage reduction', de: 'Zermalme Gegner für 5 Sekunden, wenn du sie mit einem Nahkampfschlag triffst, während sie volles Leben haben. Zermalmte Gegner haben {v}% reduzierte physische Schadensreduktion' },
 });
 
+// The puzzle <-> combat crossover lines. They are appended to existing combat
+// nodes as an extra line, so tests that pin a node's base effects compare
+// against the node WITHOUT these keys.
+export const PT_CROSSOVER_EFFECT_KEYS = Object.freeze([
+    'life_on_line', 'absorption_on_line', 'mana_on_line', 'charge_on_line',
+    'armour_per_streak', 'block_flawless', 'mistake_heal', 'damage_per_streak',
+    'damage_flawless', 'damage_low_time', 'damage_after_line', 'reveal_projectile_damage',
+    'damage_on_mistake', 'time_on_kill', 'time_on_elite', 'freeze_timer_on_stun',
+    'cell_on_kill', 'mark_on_kill', 'quick_fill_streak', 'first_step_time',
+    'pickup_lifetime', 'lucky_tile_reward', 'regen_low_time', 'quiz_hint',
+    'quiz_retry', 'quiz_time', 'item_drop', 'item_effect',
+]);
+
+// Effect keys that exist in the registry (text + channel) but whose gameplay
+// hook is not written yet. The integrity suite fails if any tree node uses
+// one of these, so a node can never advertise a stat that does nothing.
+// Remove a key from this list in the same change that wires it.
+export const PT_UNWIRED_EFFECT_KEYS = Object.freeze([
+    'time_on_kill', 'time_on_elite', 'freeze_timer_on_stun', 'cell_on_kill',
+    'mark_on_kill', 'quick_fill_streak', 'first_step_time',
+    'quiz_hint', 'quiz_retry', 'quiz_time', 'item_drop', 'item_effect',
+]);
+
 // Splits "key:value" (or a bare "key" = value 1) into its parts.
 // Returns null for unknown keys so a typo can never grant a silent zero.
 export function ptParseEffectSpec(spec) {
@@ -722,4 +782,151 @@ export function ptResolveNodeDesc(node, lang) {
     const hand = lang === 'de' ? node.descDe : node.descEn;
     if (hand) return hand;
     return ptGenerateNodeDesc(node, lang);
+}
+
+// ---------------------------------------------------------------------------
+// Node icons (emoji), derived from what a node DOES - not stored per node.
+// One emoji per effect family so identical effects always share an icon and
+// similar effects (same family) look alike. Nodes with real art keep their
+// art; this only replaces the neutral dot / hand-picked emoji. Reserved
+// placeholder nodes share the lock icon.
+// ---------------------------------------------------------------------------
+
+// Registry effect keys -> emoji. First matching rule wins, so order matters
+// (specific mechanics before generic damage / duration families).
+const PT_EFFECT_ICON_RULES = [
+    [/^(life_becomes_one)$/, '💔'],
+    [/^shadow_immune$/, '🌑'],
+    [/^(wind_dancer|ghost_|dodge|evasion|agi|agility|cannot_evade)/, '💨'],
+    [/^(timer_start|time_added)/, '⏰'],
+    [/^mistake_(count|not_count)/, '🛟'],
+    [/leech/, '🧛'],
+    [/^(bleed|crit_multi_vs_bleeding|crit_vs_bleeding|ward_bleed|avoid_bleed)/, '🩸'],
+    [/^(crush|ignore_phys_reduction)/, '🔨'],
+    [/^dmg_vs_low_life/, '💪'],
+    [/^(dot_multi_equals_crit|no_crit_damage)/, '💥'],
+    [/^(fortif|fortified)/, '🏰'],
+    [/^(poison|dagger_crit_poison|avoid_poison|phys_dot)/, '🧪'],
+    [/^(ignite|avoid_ignite|ward_ignite)/, '🔥'],
+    [/^(freeze|chill|chilled|avoid_chill|cold_ailment)/, '🧊'],
+    [/^(shock|avoid_shock|crit_vs_shocked|dmg_recent_shock|lightning_ailment)/, '⚡'],
+    [/^(blind|crit_vs_blinded)/, '🕶️'],
+    [/^stun/, '😵'],
+    [/^(cannot_be_stunned)/, '🛑'],
+    [/^(avoid_|non_crit_no_ailments)/, '🛑'],
+    [/^ailment_/, '🤢'],
+    [/^impale/, '🗡️'],
+    [/^intimidate/, '😨'],
+    [/^(rage)/, '😡'],
+    [/^(frenzy|evasion_per_frenzy|move_per_frenzy|charge_per_frenzy)/, '🌀'],
+    [/^(onslaught)/, '🏃'],
+    [/^(power_|mana_on_melee_hit_charged|mana_regen_per_power|crit_multi_per_power|crit_per_power|spell_damage_per_power)/, '🔋'],
+    [/^(endurance|armour_per_endurance|damage_per_endurance|aoe_per_endurance|stun_per_endurance)/, '🪨'],
+    [/^(attack_speed|cast_speed|dual_cast_speed|shield_cast_speed|dual_charge|.*charge_speed|melee_charge)/, '⏩'],
+    [/^shield_spell_damage/, '🔮'],
+    [/^(attack_phys_shield|melee_phys_shield)/, '⚔️'],
+    [/^shield_absorption_inc/, '🔰'],
+    [/^all_elemental_res/, '☔'],
+    [/^fire_res/, '🧯'],
+    [/^cold_res/, '🥶'],
+    [/^lightning_res/, '🌩️'],
+    [/^(shadow_resist)/, '🌑'],
+    [/^(last_element_resist|shield_elemental_res)/, '☔'],
+    [/^(pen_)/, '🔻'],
+    [/^(phys_as_|damage_to_|wand_phys_as)/, '🔄'],
+    [/^(only_fire|fire_|ignite)/, '🔥'],
+    [/^(only_cold|cold_)/, '❄️'],
+    [/^(only_lightning|lightning_)/, '⚡'],
+    [/^(shadow_)/, '🌑'],
+    [/^(elemental_|single_element)/, '🌈'],
+    [/^(block|spell_block|staff_spell_block|staff_block|dual_block|shield_spell_block|blocked_hit|parry|frenzy_on_block|endurance_on_block|power_on_block)/, '🧱'],
+    [/^(armour|shield_|attack_phys_shield|melee_phys_shield|max_damage_reduction|rage_armour|armour_defend|fortified_defences)/, '🛡️'],
+    [/^(absorption|spell_cost_from_absorption|dmg_full_absorption|leech_as_absorption)/, '🔰'],
+    [/^(reflect)/, '🪞'],
+    [/^(life_regen|low_life_regen|life_pulse|heart_|life_on_|life_recoup|life_burst)/, '💗'],
+    [/^(life_|health_)/, '❤️'],
+    [/^(mana_regen|mana_on_|mana_pickup|mana_spawn|mana_removed)/, '💧'],
+    [/^(mana_|damage_from_mana)/, '🔷'],
+    [/^(spells_cost|spell_cost|cost_efficiency|melee_spell_|bow_spell_mana)/, '🪙'],
+    [/^(accuracy|never_miss|dual_accuracy)/, '👁️'],
+    [/crit_multi|crit_dot|dual_crit_multi|projectile_crit_multi/, '💥'],
+    [/crit|never_crit|no_crit/, '🎯'],
+    [/^(chain)/, '⛓️'],
+    [/^(fork)/, '🔱'],
+    [/^(pierce|projectile|multishot|bow_|point_blank|secondary_damage|no_repeat)/, '🏹'],
+    [/aoe|area|melee_splash|melee_range/, '⭕'],
+    [/^(attack_speed|cast_speed|dual_cast_speed|dual_charge|.*charge_speed|melee_charge|axe_charge)/, '⏩'],
+    [/^(movement_speed|dual_move|move_)/, '👟'],
+    [/^(spell_|shield_cast|dual_spell|staff_damage|wand_damage|bow_spell)/, '🔮'],
+    [/^(dot_|spell_dot|dot)/, '☣️'],
+    [/^(melee_|phys_|sword|dagger|dual_damage|axe|mace|melee_phys|impale|accuracy_sword|crit_chance_)/, '⚔️'],
+    [/^(damage_inc|dual_)/, '💪'],
+    [/_duration|duration/, '⏳'],
+    [/^(str_)/, '💪'],
+    [/^(int_)/, '🧠'],
+];
+
+// Attribute-only effects are the weakest hint about what a node is for, so
+// any other effect on the same node decides the icon first.
+const PT_WEAK_ICON_EFFECT = /^(str_flat|agi_flat|int_flat)$/;
+
+// Class-skill nodes still carry hand-written descriptions instead of effects.
+// They are matched on the FIRST sentence only (what the node mainly does).
+const PT_DESC_ICON_RULES = [
+    [/^(As an? \w+, you have)|bonus items/i, '🎁'],
+    [/cooldown|not to go on cooldown/i, '⏱️'],
+    [/(chance to|can) (cast|fire|trigger)s? a second time|triggers a second time/i, '🔁'],
+    [/(add|adds|gives|grants|recovers).*(seconds?|minutes?|time)|on the timer|to the timer|costs? .*less per cell|cost no time|more time/i, '⏰'],
+    [/(lasts?|live|extends it|lifetime|countdown lasts).*(longer|by)|lasts? \d+(\.\d+)? seconds longer|lifetime/i, '⏳'],
+    [/rewinds/i, '⏪'],
+    [/fire \d+ seconds faster|step .*faster|take each step/i, '⏩'],
+    [/mark(s)? .*wrong|incorrect|marks every|marks the cells/i, '🚩'],
+    [/reveal(s)? .*correct|reveal(s)? 1 additional cell|reveal(s)? up to .*cell|can reveal|reveals correct|reveal up to/i, '🔍'],
+    [/mistake|Variance Shield|shields?|Threshold|forgives|absorb/i, '🛡️'],
+    [/momentum|streak/i, '🔥'],
+    [/scan area|3×3|radius|reach/i, '⭕'],
+    [/cascade/i, '🔗'],
+    [/trap/i, '🪤'],
+    [/skeleton/i, '💀'],
+    [/zombie|curse/i, '🧟'],
+    [/Drifter|Browney|Wiener/i, '🐾'],
+    [/reveal projectiles/i, '🏹'],
+    [/solves|solve /i, '🎯'],
+];
+const PT_DESC_ICON_BY_ID = { 55: '📊', 72: '🧮', 88: '🎲', 41006: '🎯', 41053: '🧟', 41063: '🪤', 41049: '💀', 41039: '🩹', 41078: '🐾', 41061: '🔗', 41077: '⏳', 41065: '⭕',
+    // Restored puzzle chains (batches 2, 4, 5 + 6): one emoji per chain / keystone
+    107: '📊', 108: '📐', 160: '🚶', 162: '📡', 233: '🔄', 242: '🚨', 264: '👁️', 289: '〰️', 290: '🎛️', 293: '🌡️', 333: '🌊', 379: '⚗️', 20053: '⏸️', 20166: '💢', 20205: '📈', 30233: '⏸️', 30234: '⏸️', 30245: '📐', 30246: '📐', 30336: '🚨', 30337: '🚨', 30877: '⚗️', 30878: '⚗️', 31037: '💢', 31038: '💢', 31062: '📈', 31063: '📈', 31193: '🔄', 31194: '🔄', 31272: '📊', 31273: '📊',
+    193: '📐', 239: '🌊', 244: '🎲', 319: '📑', 325: '🔎', 326: '∅', 347: '❌', 363: '🧩', 20017: '↔️', 20028: '🍀', 20048: '🔃', 20049: '🎚️', 20060: '🌘', 20078: '🎁', 20169: '🗃️', 20170: '🏜️', 20189: '❓', 20198: '🎯', 20228: '📦', 20234: '🔀', 30091: '↔️', 30092: '↔️', 30141: '🍀', 30275: '❌', 30276: '❌', 30389: '🔃', 30390: '🔃', 30600: '🎁', 30601: '🎁', 30701: '🏜️', 30702: '🏜️', 30705: '🗃️', 30706: '🗃️', 30945: '🔎', 31160: '🎯', 31161: '🎯', 31346: '📦', 31349: '📦', 31424: '🎲', 31425: '🎲', 41101: '👁️', 41102: '🔁', 41103: '🧮', 41104: '🕳️',
+    146: '📏', 220: '🕰️', 257: '🧲', 265: '🌟', 314: '✏️', 318: '🔢', 391: '📐', 20027: '🎓', 20188: '🎓', 20190: '🕯️', 20191: '⚪', 20227: '🎩', 30079: '✏️', 31287: '🕯️', 31288: '🔍', 31350: '🧹', 31392: '🕯️', 31397: '🎓', 31398: '🎓', 31429: '🕯️', 41105: '🛡️', 41106: '🛡️', 41107: '🛡️', 41108: '🛡️', 41109: '🛡️', 41110: '🛡️', 41111: '🌫️', 41112: '🌫️', 41113: '🌫️', 41114: '♻️', 41115: '♻️', 41116: '♻️', 41117: '📉', 41118: '📉', 41119: '📉', 41120: '🎓', 41121: '📖', 41122: '📗', 41123: '💬', 41124: '🔵', 41125: '🌑', 41126: '🌑', 41127: '🌑', 41128: '🌑', 41129: '🔒', 41130: '🔒', 41131: '🔒', 41132: '🎲', 41133: '🎲', 41134: '🎲', 41135: '🔥', 41136: '🔥', 41137: '🔥', 41138: '🎁', 41139: '🎁', 41140: '🎓', 41141: '🍀', 41142: '✂️', 41143: '💡', 41144: '🟣', 41145: '🧙',
+    20185: '🔢', 41146: '🎰', 41147: '💸', 41148: '🎰', 41149: '➖', 41150: '❄️', 41151: '📉', 41152: '♾️', 41153: '⚔️', 41154: '⚡', 41155: '✨', 41156: '🪡', 41157: '📜', 41158: '🫥', 41159: '🗺️', 41160: '🧬', 41161: '❔', 41162: '🌃', 41163: '🧭', 41164: '🏔️', 41165: '💡', 41166: '🔬', 41167: '📉', 41168: '🦋', 41169: '🎲', 41170: '🚨', 41171: '💥', 41172: '👁️', 41173: '🏪', 41174: '🧪', 41175: '⌛' };
+
+// Emoji for a node definition (TALENT_TREE_DATA entry) or '' when the node
+// has no derivable meaning. Pure function of the node data.
+// Placeholder slots that exist in the layout but have no effects yet.
+export function ptIsReservedNode(node) {
+    if (!node || ptNodeHasEffects(node)) return false;
+    return /^Reserved/.test(node.nameEn || '') || /^reserved_/.test(node.statKey || '');
+}
+
+export function ptDerivedNodeEmoji(node) {
+    if (!node || node.tier === 'start') return '';
+    if (PT_DESC_ICON_BY_ID[node.id]) return PT_DESC_ICON_BY_ID[node.id];
+    if (ptNodeHasEffects(node)) {
+        const keys = node.effects.map(e => String(e).split(':')[0]);
+        const ordered = keys.filter(k => !PT_WEAK_ICON_EFFECT.test(k))
+            .concat(keys.filter(k => PT_WEAK_ICON_EFFECT.test(k)));
+        for (const key of ordered) {
+            for (const [re, emoji] of PT_EFFECT_ICON_RULES) {
+                if (re.test(key)) return emoji;
+            }
+        }
+        return '';
+    }
+    if (ptIsReservedNode(node)) return '🔒';
+    const desc = String(node.descEn || '');
+    const first = desc.split(/\n|\. (?=[A-Z])/)[0];
+    for (const [re, emoji] of PT_DESC_ICON_RULES) {
+        if (re.test(first)) return emoji;
+    }
+    return '';
 }

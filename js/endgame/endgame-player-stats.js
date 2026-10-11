@@ -746,7 +746,37 @@ export function _egComputePlayerStats() {
         // applied to the aggregated rating AFTER the attribute side-effects
         // below, so it scales gear, tree and Agi accuracy together.
         accuracy: passiveTreeBonuses.accuracy || 0, accuracyIncPct: passiveTreeBonuses.accuracyIncPct || 0,
-        mistakeCount: 0, focusPct: 0, mistakeNotCountPct: 0,
+        mistakeCount: passiveTreeBonuses.mistakeCountTree || 0, focusPct: 0, mistakeNotCountPct: passiveTreeBonuses.mistakeNotCountTreePct || 0,
+        // Puzzle <-> combat crossover lines (tree channels; each is read by its own hook).
+        lifeOnLine: passiveTreeBonuses.lifeOnLine || 0,
+        absorptionOnLine: passiveTreeBonuses.absorptionOnLine || 0,
+        manaOnLine: passiveTreeBonuses.manaOnLine || 0,
+        chargeOnLinePct: passiveTreeBonuses.chargeOnLinePct || 0,
+        armourPerStreak: passiveTreeBonuses.armourPerStreak || 0,
+        // Only counts while no mistake was made this level (block_flawless).
+        blockFlawlessPct: (Number(globalThis.mistakeCount) || 0) === 0 ? (passiveTreeBonuses.blockFlawlessPct || 0) : 0,
+        mistakeHeal: passiveTreeBonuses.mistakeHeal || 0,
+        damagePerStreakPct: passiveTreeBonuses.damagePerStreakPct || 0,
+        damageFlawlessPct: passiveTreeBonuses.damageFlawlessPct || 0,
+        damageLowTimePct: passiveTreeBonuses.damageLowTimePct || 0,
+        damageAfterLinePct: passiveTreeBonuses.damageAfterLinePct || 0,
+        revealProjectileDamagePct: passiveTreeBonuses.revealProjectileDamagePct || 0,
+        damageOnMistakePct: passiveTreeBonuses.damageOnMistakePct || 0,
+        timeOnKill: passiveTreeBonuses.timeOnKill || 0,
+        timeOnElite: passiveTreeBonuses.timeOnElite || 0,
+        timerFreezeOnStun: passiveTreeBonuses.timerFreezeOnStun || 0,
+        cellOnKillPct: passiveTreeBonuses.cellOnKillPct || 0,
+        markOnKillPct: passiveTreeBonuses.markOnKillPct || 0,
+        quickFillStreakPct: passiveTreeBonuses.quickFillStreakPct || 0,
+        firstStepTreeSecs: passiveTreeBonuses.firstStepTreeSecs || 0,
+        pickupLifetimeSecs: passiveTreeBonuses.pickupLifetimeSecs || 0,
+        luckyTileRewardAmount: passiveTreeBonuses.luckyTileRewardAmount || 0,
+        regenLowTimePct: passiveTreeBonuses.regenLowTimePct || 0,
+        quizHintPct: passiveTreeBonuses.quizHintPct || 0,
+        quizRetryPct: passiveTreeBonuses.quizRetryPct || 0,
+        quizTimeSecs: passiveTreeBonuses.quizTimeSecs || 0,
+        itemDropPct: passiveTreeBonuses.itemDropPct || 0,
+        itemEffectPct: passiveTreeBonuses.itemEffectPct || 0,
         revealHintPct: 0, chanceForNewQuestionPct: 0,
         critChance: passiveTreeBonuses.critChanceFlat || 0, critMultiplierPct: passiveTreeBonuses.critMultiplierFlatPct || 0,
         physFlatMin: 0, physFlatMax: 0,
@@ -1290,6 +1320,11 @@ export function _egComputePlayerStats() {
     if ((passiveTreeBonuses.blockArmorPulse || 0) > 0
         && Date.now() - (globalThis._egLastBlockAt || 0) < 10000) {
         s.armourFlat += passiveTreeBonuses.blockArmorPulse;
+    }
+    // Streak armour (armour_per_streak): flat Armour per 10 correct fills in a
+    // row; the streak counter resets on every real mistake.
+    if ((s.armourPerStreak || 0) > 0) {
+        s.armourFlat += s.armourPerStreak * Math.floor((Number(globalThis.consecutiveCorrectFills) || 0) / 10);
     }
     // Endurance Charges (shield batch, node 285): live charges (shared 10s
     // timer, see combat-ailments-state.js) each add flat Armour and

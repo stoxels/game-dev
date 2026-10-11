@@ -504,7 +504,9 @@ export function _egCancelExpireCountdown(overlayId) {
 // Removes both the state entry and the DOM overlay when it fires.
 export function _egSchedulePickupExpiry(key, def) {
     const [r, c] = key.split('-').map(Number);
-    _egScheduleTrackedExpiry(_egPickups, key, def, EG_PICKUP_LIFETIME_MS, `eg-pickup-${r}-${c}`, _egRemovePickupOverlay);
+    // pickup_lifetime (tree): Heart and Mana pickups stay longer.
+    const extraMs = Math.max(0, Number(_egComputePlayerStats().pickupLifetimeSecs) || 0) * 1000;
+    _egScheduleTrackedExpiry(_egPickups, key, def, EG_PICKUP_LIFETIME_MS + extraMs, `eg-pickup-${r}-${c}`, _egRemovePickupOverlay);
 }
 
 // Shows a live countdown above a drop overlay during its final

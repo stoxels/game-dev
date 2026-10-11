@@ -3,7 +3,7 @@ import { EG_ART } from '../endgame/endgame-art.js';
 import { _ptAllocated, _ptBuildAdjacency, _ptGetNodeVisualState, _ptIsDeallocatable, _ptLang, _ptOnNodeClick, _ptPoints, _ptRefreshPointsDisplay, ensurePassiveTreeRoot } from './probability-tree-state-points.js';
 import { getPassiveTreeRootId, isPassiveTreeStartNode } from './probability-tree.js';
 import { getPassiveTreeNodeProposal, isPassiveTreeNodeReworked } from './probability-tree-rework.js';
-import { ptResolveNodeDesc } from './pt-effects.js';
+import { ptDerivedNodeEmoji, ptIsReservedNode, ptResolveNodeDesc } from './pt-effects.js';
 import { _ptBindEvents, _ptFitToView } from './probability-tree-viewport.js';
 import { PT_COL_ALLOCATED_BG, PT_COL_ALLOCATED_BORDER, PT_COL_ALLOCATED_DOT, PT_COL_LOCKED_BG, PT_COL_LOCKED_BORDER, PT_COL_LOCKED_DOT, PT_COL_START, PT_COL_UNLOCKED_BG, PT_COL_UNLOCKED_BORDER, PT_COL_UNLOCKED_DOT, PT_CONN_ALLOCATED, PT_CONN_UNLOCKED, PT_CONN_WIDTH, PT_NODE_RADIUS, PT_PADDING } from './probability-tree.js';
 //------------------------------------------------------------------------
@@ -788,7 +788,12 @@ export function _ptAppendNodeIcon(node, skill, def, isKeystone, scale) {
     // below can swap the fallback without redrawing the whole tree.
     if (artKey) node.dataset.ptArtPending = artKey;
 
-    if (isEmoji) {
+    // Effect-derived emoji (same effect -> same icon); it also replaces the
+    // old hand-picked emoji so every node of a family looks the same.
+    const derivedEmoji = ptDerivedNodeEmoji(def || skill._def);
+    if (derivedEmoji) {
+        _ptAppendEmojiIcon(node, derivedEmoji, isKeystone, scale);
+    } else if (isEmoji) {
         _ptAppendEmojiIcon(node, icon, isKeystone, scale);
     } else {
         _ptAppendDotFallback(node, isKeystone);
@@ -1102,7 +1107,8 @@ function _ptMountNode(skill, target) {
         : 'pt-node';
     if (skill.id === getPassiveTreeRootId()) node.classList.add('pt-node-selected-character-start');
     if (!isReworked) node.classList.add('pt-node-unreworked');
-    if (getPassiveTreeNodeProposal(skill.id)) node.classList.add('pt-node-proposed');
+    // Reserved placeholders without effects glow blue (the proposal colour).
+    if (getPassiveTreeNodeProposal(skill.id) || ptIsReservedNode(def)) node.classList.add('pt-node-proposed');
     node.dataset.id = skill.id;
     node.dataset.ptRework = isReworked ? 'reworked' : 'unreworked';
 

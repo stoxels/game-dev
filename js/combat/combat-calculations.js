@@ -18,6 +18,39 @@ export let _egLastHitElements = null;
 export let _egLastHitWasCrit = false;
 export let _egLastHitCritMult = 1;
 
+// Situational passive-tree damage lines (per 10 correct fills, flawless, low
+// timer, after a line, after a mistake). Returns one multiplier for a single
+// Attack roll; the "next Attack after a mistake" bonus is consumed here.
+export function _egCrossoverDamageMult(stats) {
+    let mult = 1;
+    const flags = globalThis.LEVEL_FLAGS;
+
+    const perStreak = Number(stats.damagePerStreakPct) || 0;
+    if (perStreak > 0) {
+        const steps = Math.floor((Number(globalThis.consecutiveCorrectFills) || 0) / 10);
+        mult *= 1 + (perStreak * steps) / 100;
+    }
+
+    const flawless = Number(stats.damageFlawlessPct) || 0;
+    if (flawless > 0 && (Number(globalThis.mistakeCount) || 0) === 0) mult *= 1 + flawless / 100;
+
+    const lowTime = Number(stats.damageLowTimePct) || 0;
+    const startTimer = Number(globalThis._levelStartTimerSecs) || 0;
+    if (lowTime > 0 && startTimer > 0 && (Number(globalThis.timerSecs) || 0) < startTimer * 0.25) {
+        mult *= 1 + lowTime / 100;
+    }
+
+    const afterLine = Number(stats.damageAfterLinePct) || 0;
+    if (afterLine > 0 && flags && Number(flags.damageAfterLineUntil) > Date.now()) mult *= 1 + afterLine / 100;
+
+    const onMistake = Number(stats.damageOnMistakePct) || 0;
+    if (flags && flags.damageOnMistakePending) {
+        flags.damageOnMistakePending = false;
+        if (onMistake > 0) mult *= 1 + onMistake / 100;
+    }
+    return mult;
+}
+
 export function _egCalcPlayerDamage() {
     const stats = _egComputePlayerStats();
 
@@ -57,6 +90,7 @@ export function _egCalcPlayerDamage() {
     // Residual Plot (Statistician passive node): 15% increased damage for 10
     // seconds after Data Strike (LEVEL_FLAGS.residualPlotUntil, set on cast).
     if (globalThis.LEVEL_FLAGS && Number(globalThis.LEVEL_FLAGS.residualPlotUntil) > Date.now()) dmg *= 1.15;
+    dmg *= _egCrossoverDamageMult(stats);
 
     // Projectile crit chance (passive tree) is added to the base crit chance
     // for this roll only - melee strikes never read it.
@@ -177,6 +211,7 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
 
     // Generic "% increased Damage" (passive tree) over the whole melee hit.
     dmg *= 1 + (stats.damageIncPct || 0) / 100;
+    dmg *= _egCrossoverDamageMult(stats);
 
     // Sword riposte: the strike after a successful Parry deals more damage.
     if (stats.isSwordEquipped && charge >= 0.5 && _egConsumeRiposte()) {

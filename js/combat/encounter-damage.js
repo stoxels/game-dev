@@ -272,7 +272,9 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         + ((dualWielding && !isSpell ? stats.dualBlockPct : 0) || 0)
         + ((stats.isStaffEquipped ? (isSpell ? stats.staffSpellBlockPct : stats.staffBlockPct) : 0) || 0)
         + ((hasShieldEquipped && isSpell ? stats.shieldSpellBlockPct : 0) || 0)
-        + ((isSpell ? stats.spellBlockFlat : 0) || 0);
+        + ((isSpell ? stats.spellBlockFlat : 0) || 0)
+        // block_flawless (tree): only non-zero while no mistake was made this level.
+        + (Number(stats.blockFlawlessPct) || 0);
     // Glancing Blows doubles the chance; Versatile Combatant lowers the caps and turns
     // overcapped attack block into spell block.
     const blockMult = (Number(stats.blockDoubled) || 0) > 0 ? 2 : 1;

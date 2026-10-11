@@ -165,6 +165,8 @@ export const T = {
         pen_display: '−{n}s (#{m})',
 
         // Hardcore fail overlay
+        cap_fail_title: 'TOO MANY MISTAKES!',
+        cap_fail_sub: 'You made more mistakes than this puzzle allows.',
         hc_fail_title: 'HARDCORE FAIL!',
         hc_fail_sub: 'One mistake = game over in Hardcore mode!',
 
@@ -623,6 +625,8 @@ export const T = {
         pen_display: '−{n}s (#{m})',
 
         // Hardcore fail overlay
+        cap_fail_title: 'ZU VIELE FEHLER!',
+        cap_fail_sub: 'Du hast mehr Fehler gemacht, als dieses Rätsel erlaubt.',
         hc_fail_title: 'HARDCORE GESCHEITERT!',
         hc_fail_sub: 'Ein Fehler = Spielende im Hardcore-Modus!',
 
@@ -3592,9 +3596,7 @@ Object.assign(T.en, {
     pt_momentum_plus2: '+2s/trigger',
     pt_momentum_stack: '+1s stack',
     pt_points_available: 'Available points: {n}',
-    pt_rework_progress: 'Reworked: {done} / {total}',
     pt_refund_all_btn: '♻ REFUND ALL',
-    pt_jump_proposals_btn: '◎ PROPOSALS',
     pt_refund_all_body: 'This will de-allocate ALL of your allocated nodes (except character start nodes) and refund every spent Convergence Point. Do you want to continue?',
     pt_refund_all_cancel: 'CANCEL',
     pt_refund_all_confirm: '♻ YES, REFUND EVERYTHING',
@@ -6862,9 +6864,7 @@ Object.assign(T.de, {
     pt_momentum_plus2: '+2s/Auslösung',
     pt_momentum_stack: '+1s Anstieg',
     pt_points_available: 'Verfügbare Punkte: {n}',
-    pt_rework_progress: 'Überarbeitet: {done} / {total}',
     pt_refund_all_btn: '♻ ALLES ERSTATTEN',
-    pt_jump_proposals_btn: '◎ VORSCHLÄGE',
     pt_refund_all_body: 'Hiermit werden ALLE zugewiesenen Knoten deaktiviert (außer Charakter-Startknoten) und alle ausgegebenen Konvergenzpunkte zurückerstattet. Möchtest du fortfahren?',
     pt_refund_all_cancel: 'ABBRECHEN',
     pt_refund_all_confirm: '♻ JA, ALLES ERSTATTEN',

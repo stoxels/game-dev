@@ -3,6 +3,7 @@ import { revealTiles } from './puzzle-mechanics/grid-actions.js';
 import { Audio_Manager } from './audio/audio.js';
 import { _adjacencyMatrixRefreshAll, renderCell, updClues } from './grid.js';
 import { applyPenalty } from './penalty.js';
+import { campaignCapForLevel } from './difficulty-modifiers.js';
 import { save } from './state.js';
 import { stopTimer } from './timer/timer.js';
 import { addTimeSecs, previewGainSecs, subtractTimeSecs } from './timer/timer-adjust.js';
@@ -454,6 +455,28 @@ function checkHardcoreAfterMistake() {
     return true;
 }
 
+// Campaign allowed-mistake cap: one mistake past the cap ends the level.
+// Maps and trials are handled by _egCheckMistakeLimit instead.
+// Returns true if the level was failed (caller should return).
+function checkMistakeCapAfterMistake() {
+    if (typeof globalThis._egIsActive === 'function' && globalThis._egIsActive()) return false;
+    const bonus = (typeof globalThis._egComputePlayerStats === 'function')
+        ? (globalThis._egComputePlayerStats().mistakeCount || 0) : 0;
+    const cap = campaignCapForLevel(cur, bonus);
+    if (cap == null || globalThis.mistakeCount <= cap) return false;
+
+    globalThis.dead = true;
+    stopTimer();
+    window.LEVEL_FLAGS.lastFailedGi = cur.gIdx;
+    if (typeof globalThis._arcaneFreeze_clearAllFrostAndStalagmites === 'function') {
+        globalThis._arcaneFreeze_clearAllFrostAndStalagmites();
+    }
+    document.getElementById('lose-title').textContent = t('cap_fail_title');
+    document.getElementById('lose-sub').textContent = t('cap_fail_sub');
+    document.getElementById('ov-lose').classList.add('show');
+    return true;
+}
+
 // Orchestrates all consequences of a real (unabsorbed) wrong fill.
 // Returns true if a game-over was triggered (caller must return immediately).
 function applyRealMistake(row, col) {
@@ -462,6 +485,7 @@ function applyRealMistake(row, col) {
     openConfidenceIntervalGraceWindow();
     if (checkGoldenClockAfterMistake()) return true;
     if (checkHardcoreAfterMistake()) return true;
+    if (checkMistakeCapAfterMistake()) return true;
     return false;
 }
 
@@ -528,12 +552,12 @@ function claimLuckyTileItems() {
 }
 
 // Applies the keystone_variance_collapse downside: claiming a lucky tile
-// costs the player 10 minutes. Appends a warning to the toast message.
+// costs the player 15% of the current timer. Appends a warning to the toast message.
 // The lucky-tile toast renders as HTML (item art images), so the note is
 // escaped before appending.
 function applyVarianceCollapsePenalty(toastMsg) {
     if (!ptHasSkill('keystone_variance_collapse')) return toastMsg;
-    subtractTimeSecs(600);
+    subtractTimeSecs(Math.max(60, Math.round((globalThis.timerSecs || 0) * 0.15)));
     return toastMsg + ` ${_escapeToastHtml(t('cg_variance_collapse_note'))}`;
 }
 
@@ -601,6 +625,7 @@ function handleLuckyTileClaim(row, col) {
     showHtmlToast(toastMsg);
 
     applyCovarianceShiftReveal(row, col);
+    if (typeof globalThis._egOnLuckyTileClaimed === 'function') globalThis._egOnLuckyTileClaimed();
 
     if (typeof globalThis.triggerBanter === 'function') globalThis.triggerBanter('lucky_tile');
 }

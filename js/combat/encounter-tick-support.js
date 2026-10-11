@@ -27,7 +27,9 @@ export function _egGetMaxAllowedMistakes() {
     if (!def || def.egMaxMistakes == null) return null;
     const gearBonus = (typeof _egComputePlayerStats === 'function')
         ? (_egComputePlayerStats().mistakeCount || 0) : 0;
-    return def.egMaxMistakes + gearBonus;
+    const total = def.egMaxMistakes + gearBonus;
+    // Negative tree bonuses (keystone trade-offs) never drop the limit below 1.
+    return gearBonus < 0 ? Math.max(1, total) : total;
 }
 
 // Checks the current mistake count and ends an active map when it passes its limit.
@@ -118,7 +120,11 @@ export function _egTickLifeRegen() {
         && globalThis.playerCurrentHP <= globalThis.playerMaxHP * 0.35) ? stats.lowLifeRegenPct : 0;
     const regenPct = (stats.lifeRegenPct || 0) + lowLifeRegen + (stats.lifeRegenPerEndurancePct || 0) * (stats.enduranceCharges || 0);
     // Life Regeneration rate (node 111) scales the whole per-second amount.
-    const regenRate = 1 + Math.max(0, stats.lifeRegenRatePct || 0) / 100;
+    // regen_low_time (tree): faster regeneration while below 25% of the level's
+    // starting timer (snapshot written by the passive-tree timer patch).
+    const startTimer = Number(globalThis._levelStartTimerSecs) || 0;
+    const lowTime = startTimer > 0 && (Number(globalThis.timerSecs) || 0) < startTimer * 0.25;
+    const regenRate = 1 + (Math.max(0, stats.lifeRegenRatePct || 0) + (lowTime ? Math.max(0, stats.regenLowTimePct || 0) : 0)) / 100;
     // "Less" Life Regeneration rate (Vital Conduit keystone): a multiplier
     // after every increase.
     const regenLess = Math.max(0, 1 - Math.max(0, stats.lifeRegenLessPct || 0) / 100);
