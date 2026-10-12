@@ -599,10 +599,10 @@ export function _gamblersRuinOnCorrectFill() {
     questStat_gamblersRuinTimeAdded(gained);
 }
 
-// Deducts 60 seconds for a mistake. Called from penalty.js.
+// Deducts 20 seconds for a mistake (on top of the normal penalty). Called from penalty.js.
 export function _gamblersRuinOnMistake() {
     if (!ptHasSkill('keystone_gamblers_ruin')) return;
-    subtractTimeSecs(30);
+    subtractTimeSecs(20);
 }
 
 

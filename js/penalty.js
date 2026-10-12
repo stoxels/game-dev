@@ -166,7 +166,7 @@ export function _getAsymptoticMasteryReduction() {
 // keystone_iron_doctrine (node 158):
 // Each mistake costs 30 extra seconds on top of the normal penalty.
 function _getIronDoctrineExtraSeconds() {
-    return globalThis.ptHasSkill('keystone_iron_doctrine') ? 30 : 0;
+    return globalThis.ptHasSkill('keystone_iron_doctrine') ? 20 : 0;
 }
 
 // Resolves the active penalty multiplier for this mistake.

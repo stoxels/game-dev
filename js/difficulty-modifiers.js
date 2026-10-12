@@ -12,9 +12,12 @@ export let curDiff = 'normal';
 // Per-difficulty config: scoreMult applied to final score, pens = mistake
 // penalty (seconds) at 1st/2nd/3rd/4th+ wrong fill.
 export const DIFF_CFG = {
-    easy: { scoreMult: 0.5, pens: [15, 30, 45, 60] },
-    normal: { scoreMult: 1, pens: [40, 80, 120, 150] },
-    hard: { scoreMult: 1.5, pens: [75, 150, 225, 300] },
+    // Tuning pass 1 (playtest bot, see dev/docs/balance-playtest.md): with the
+    // 5/10/15 minute budgets the old 40/80/120/150 s table ended a small level
+    // after 4 mistakes and made the mistake cap unreachable.
+    easy: { scoreMult: 0.5, pens: [10, 16, 22, 28] },
+    normal: { scoreMult: 1, pens: [25, 40, 55, 70] },
+    hard: { scoreMult: 1.5, pens: [50, 80, 110, 140] },
 };
 
 // ---------------------------------------------------------------------------
@@ -33,16 +36,33 @@ export const CAMPAIGN_MISTAKE_CAPS = {
     hard: { small: 5, medium: 10, large: 15 },
 };
 
-// 'small' | 'medium' | 'large' for a grid with the given cell count.
-export function campaignGridSizeClass(cells) {
-    if (cells < 100) return 'small';
-    if (cells < 200) return 'medium';
-    return 'large';
+const CAMPAIGN_SIZE_ORDER = ['small', 'medium', 'large'];
+
+// 'small' | 'medium' | 'large' for a grid with the given cell count. `shift`
+// moves the class up (+1) or down (-1) and is clamped to the three classes.
+export function campaignGridSizeClass(cells, shift = 0) {
+    const base = cells < 100 ? 0 : cells < 200 ? 1 : 2;
+    return CAMPAIGN_SIZE_ORDER[Math.max(0, Math.min(2, base + shift))];
 }
+
+// Marathon keystone: the time budget counts the grid one size larger, the
+// mistake cap one size smaller (flag read lazily: this file has no stats import).
+function _marathonShift() {
+    if (typeof globalThis._egComputePlayerStats !== 'function') return 0;
+    const s = globalThis._egComputePlayerStats();
+    return s && Number(s.marathon) > 0 ? 1 : 0;
+}
+
+// Oversize grids: every cell beyond this count adds extra seconds on top of
+// the size-class budget, so a 25x40 board is not squeezed into the same
+// 15 minutes as a 200-cell one.
+export const CAMPAIGN_OVERSIZE_CELLS = 400;
+export const CAMPAIGN_OVERSIZE_SECS_PER_CELL = 1;
 
 // Base level timer (seconds) for a grid with the given cell count.
 export function campaignBaseTimeSecs(cells) {
-    return CAMPAIGN_BASE_TIME_SECS[campaignGridSizeClass(cells)];
+    const base = CAMPAIGN_BASE_TIME_SECS[campaignGridSizeClass(cells, _marathonShift())];
+    return base + Math.max(0, Math.round((cells - CAMPAIGN_OVERSIZE_CELLS) * CAMPAIGN_OVERSIZE_SECS_PER_CELL));
 }
 
 // Mistake cap for a difficulty and grid size; `bonus` = tree + gear
@@ -50,7 +70,7 @@ export function campaignBaseTimeSecs(cells) {
 export function campaignMistakeCap(diff, cells, bonus = 0) {
     const table = CAMPAIGN_MISTAKE_CAPS[diff] || CAMPAIGN_MISTAKE_CAPS.normal;
     // Negative bonuses (keystone trade-offs) lower the cap but never below 1.
-    return Math.max(1, table[campaignGridSizeClass(cells)] + (Math.trunc(bonus) || 0));
+    return Math.max(1, table[campaignGridSizeClass(cells, -_marathonShift())] + (Math.trunc(bonus) || 0));
 }
 
 // Mistake cap for a level object (needs .grid) at the current difficulty,

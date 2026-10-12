@@ -247,6 +247,12 @@ export function _ptxRunExpansion() {
     //--------------------------------------------------------------------------
     // Each modifier receives the current penalty and returns the new penalty.
 
+    // Live passive-tree stat channel (0 while the stats module is not loaded).
+    function _ptxTreeStat(key) {
+        if (typeof globalThis._egComputePlayerStats !== 'function') return 0;
+        return Number((globalThis._egComputePlayerStats() || {})[key]) || 0;
+    }
+
     const PENALTY_MODS = [
         // Final Theorem: below 10% starting time → immune.
         pen => (has('final_theorem') && baseTime() > 0 && globalThis.timerSecs < baseTime() * 0.1) ? 0 : pen,
@@ -258,8 +264,13 @@ export function _ptxRunExpansion() {
         pen => has('supply_chain') ? Math.max(0, pen - 10 * Math.min(3, _ptxSupplyStacks || 0)) : pen,
         // Graceful Degradation: cap at 30s.
         pen => has('graceful_degradation') ? Math.min(30, pen) : pen,
+        // Perfectionist keystone: every mistake costs more time.
+        pen => {
+            const more = _ptxTreeStat('mistakeTimeCostMorePct');
+            return more > 0 ? Math.round(pen * (1 + more / 100)) : pen;
+        },
         // Zero Variance: everything becomes exactly 45s (overrides all above).
-        pen => has('keystone_zero_variance') ? 45 : pen,
+        pen => has('keystone_zero_variance') ? 30 : pen,
     ];
 
     //--------------------------------------------------------------------------
@@ -909,6 +920,10 @@ export function _ptxRunExpansion() {
         // purpose - this is level-start setup, not a player-facing time gain,
         // so it must not feed the time-added bookkeeping.
         if (has('keystone_scholars_debt')) globalThis.timerSecs += globalThis.timerSecs;
+
+        // Glass Clock keystone: the level timer is a share shorter.
+        const glassLess = Math.min(90, _ptxTreeStat('glassClockTimerLessPct'));
+        if (glassLess > 0) globalThis.timerSecs = Math.max(1, Math.round(globalThis.timerSecs * (1 - glassLess / 100)));
 
         _ptxBaseTime = globalThis.timerSecs;
         // Level-start timer snapshot for combat-side "below 25% of the Timer" lines.

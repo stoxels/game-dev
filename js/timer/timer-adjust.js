@@ -39,6 +39,13 @@ export function previewGainSecs(deltaSecs) {
 // the new timer value.
 function _applyTimerDelta(deltaSecs, opts) {
     if (deltaSecs > 0) deltaSecs = Math.round(deltaSecs * _mapGainMult());
+    // Glass Clock / Long Game: gains that land while a correct fill is being
+    // processed (fill, streak and line rewards) are doubled / removed.
+    if (deltaSecs > 0 && globalThis.LEVEL_FLAGS) {
+        const mode = globalThis.LEVEL_FLAGS.fillGainMode;
+        if (mode === 'none') deltaSecs = 0;
+        else if (mode === 'double') deltaSecs *= 2;
+    }
     const current = globalThis.timerSecs;
     let next = current + deltaSecs;
     if (opts.capSecs !== null) next = Math.min(next, opts.capSecs);

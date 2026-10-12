@@ -26562,8 +26562,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "keystone_gamblers_ruin",
    "tier": "keystone",
    "layoutPinned": true,
-   "descEn": "Each correct cell fill adds 3 seconds to the timer. Each mistake removes 30 additional seconds from the timer. Bonus time from all other sources is disabled.",
-   "descDe": "Jede korrekt ausgefüllte Zelle fügt dem Timer 3 Sekunden hinzu. Jeder Fehler entfernt 30 zusätzliche Sekunden vom Timer. Bonuszeit aus allen anderen Quellen ist deaktiviert."
+   "descEn": "Each correct cell fill adds 3 seconds to the timer. Each mistake removes 20 additional seconds from the timer. Bonus time from all other sources is disabled.",
+   "descDe": "Jede korrekt ausgefüllte Zelle fügt dem Timer 3 Sekunden hinzu. Jeder Fehler entfernt 20 zusätzliche Sekunden vom Timer. Bonuszeit aus allen anderen Quellen ist deaktiviert."
   },
   {
    "id": 41147,
@@ -26601,8 +26601,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "keystone_zero_variance",
    "tier": "keystone",
    "layoutPinned": true,
-   "descEn": "Every mistake costs exactly 45 seconds - no matter how far into the level you are, which class you play or what modifiers are active.",
-   "descDe": "Jeder Fehler kostet exakt 45 Sekunden – egal wie weit du im Level bist, welche Klasse du spielst oder welche Modifikatoren aktiv sind."
+   "descEn": "Every mistake costs exactly 30 seconds - no matter how far into the level you are, which class you play or what modifiers are active.",
+   "descDe": "Jeder Fehler kostet exakt 30 Sekunden – egal wie weit du im Level bist, welche Klasse du spielst oder welche Modifikatoren aktiv sind."
   },
   {
    "id": 41150,
@@ -26653,8 +26653,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "keystone_iron_doctrine",
    "tier": "keystone",
    "layoutPinned": true,
-   "descEn": "Shield items cannot be used. Each mistake costs 30 extra seconds. Tutor and Timer items have 300% increased effectiveness.",
-   "descDe": "Schild-Gegenstände können nicht benutzt werden. Jeder Fehler kostet 30 zusätzliche Sekunden. Tutor- und Timer-Gegenstände haben 300% erhöhte Effektivität."
+   "descEn": "Shield items cannot be used. Each mistake costs 20 extra seconds. Tutor and Timer items have 300% increased effectiveness.",
+   "descDe": "Schild-Gegenstände können nicht benutzt werden. Jeder Fehler kostet 20 zusätzliche Sekunden. Tutor- und Timer-Gegenstände haben 300% erhöhte Effektivität."
   },
   {
    "id": 41154,
@@ -26948,6 +26948,65 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "time_added:600",
     "mistake_count:-4"
+   ]
+  },
+  {
+   "id": 41176,
+   "x": -3934,
+   "y": 3737,
+   "nameEn": "Long Game",
+   "nameDe": "Langes Spiel",
+   "icon": "",
+   "statKey": "keystone_long_game_41176",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "effects": [
+    "time_added:600",
+    "long_game_no_gain"
+   ]
+  },
+  {
+   "id": 41177,
+   "x": 1335,
+   "y": 5027,
+   "nameEn": "Glass Clock",
+   "nameDe": "Glasuhr",
+   "icon": "",
+   "statKey": "keystone_glass_clock_41177",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "effects": [
+    "glass_clock_timer:25",
+    "glass_clock_gain"
+   ]
+  },
+  {
+   "id": 41178,
+   "x": -4539,
+   "y": -3268,
+   "nameEn": "Perfectionist",
+   "nameDe": "Perfektionist",
+   "icon": "",
+   "statKey": "keystone_perfectionist_41178",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "effects": [
+    "mistake_count:6",
+    "perfectionist_cost:100"
+   ]
+  },
+  {
+   "id": 41179,
+   "x": 4880,
+   "y": -2553,
+   "nameEn": "Marathon",
+   "nameDe": "Marathon",
+   "icon": "",
+   "statKey": "keystone_marathon_41179",
+   "tier": "keystone",
+   "layoutPinned": true,
+   "effects": [
+    "marathon_size"
    ]
   }
  ],
@@ -40835,11 +40894,35 @@ export const TALENT_TREE_DATA = {
    "from": 41078,
    "to": 41175,
    "dotted": false
+  },
+  {
+   "id": 2334,
+   "from": 30391,
+   "to": 41176,
+   "dotted": false
+  },
+  {
+   "id": 2335,
+   "from": 20170,
+   "to": 41177,
+   "dotted": false
+  },
+  {
+   "id": 2336,
+   "from": 20018,
+   "to": 41178,
+   "dotted": false
+  },
+  {
+   "id": 2337,
+   "from": 239,
+   "to": 41179,
+   "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 2,
-  "fingerprint": "aa28cf1410858ace",
+  "fingerprint": "5e3c3ae3e06b8b49",
   "positions": [
    [
     156,
@@ -50865,6 +50948,26 @@ export const TALENT_TREE_DATA = {
     41175,
     698,
     105
+   ],
+   [
+    41176,
+    -3934,
+    3737
+   ],
+   [
+    41177,
+    1335,
+    5027
+   ],
+   [
+    41178,
+    -4539,
+    -3268
+   ],
+   [
+    41179,
+    4880,
+    -2553
    ]
   ]
  }

@@ -663,6 +663,16 @@ function updateDragStrokeCounter(row, col) {
     }
 }
 
+// 'double' (Glass Clock) | 'none' (Long Game) | null: how time gained while a
+// correct fill is processed is treated. Long Game wins when both are owned.
+function _fillGainModeFromTree() {
+    if (typeof globalThis._egComputePlayerStats !== 'function') return null;
+    const s = globalThis._egComputePlayerStats();
+    if ((Number(s.noFillTimeGain) || 0) > 0) return 'none';
+    if ((Number(s.glassClockGain) || 0) > 0) return 'double';
+    return null;
+}
+
 // Fires all class and passive system hooks for a correct fill.
 // Passive-tree lines that react to a correct fill: the run counter behind the
 // per-streak lines, the quick-fill stamp for Momentum, and the first-step bonus.
@@ -861,19 +871,26 @@ export function applyCell(row, col) {
     // with the 'marked-system' ability styling.
     globalThis.systemMarkedGrid[row][col] = false;
 
-    // Extra logic that only applies to a correct left-click fill
-    if (pval === 1 && cur.grid[row][col] === 1) {
-        handleCorrectFill(row, col);
-    }
+    // Extra logic that only applies to a correct left-click fill. Glass Clock /
+    // Long Game change what time gains landing during this fill are worth.
+    const fillGainMode = (pval === 1 && cur.grid[row][col] === 1) ? _fillGainModeFromTree() : null;
+    if (fillGainMode) window.LEVEL_FLAGS.fillGainMode = fillGainMode;
+    try {
+        if (pval === 1 && cur.grid[row][col] === 1) {
+            handleCorrectFill(row, col);
+        }
 
     // Endgame: correct right-click mark on an empty-solution cell claims any drop there
     if (pval === 2 && cur.grid[row][col] === 0) {
         _egCheckAllClaims(row, col);
     }
 
-    // Refresh display and check for puzzle completion
+    // Refresh display (line completion rewards land here)
     renderCell(row, col);
     updClues(row, col);
+    } finally {
+        window.LEVEL_FLAGS.fillGainMode = null;
+    }
     globalThis.checkWin();
 }
 

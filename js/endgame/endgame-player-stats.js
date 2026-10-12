@@ -682,6 +682,11 @@ export function _egComputePlayerStats() {
         lifeRegenLessPct: passiveTreeBonuses.lifeRegenLessPct || 0,
         lifeLeechLessPct: passiveTreeBonuses.lifeLeechLessPct || 0,
         absorptionRechargesLife: passiveTreeBonuses.absorptionRechargesLife || 0,
+        glassClockTimerLessPct: passiveTreeBonuses.glassClockTimerLessPct || 0,
+        glassClockGain: passiveTreeBonuses.glassClockGain || 0,
+        noFillTimeGain: passiveTreeBonuses.noFillTimeGain || 0,
+        mistakeTimeCostMorePct: passiveTreeBonuses.mistakeTimeCostMorePct || 0,
+        marathon: passiveTreeBonuses.marathon || 0,
         // Flat bonus to fire/cold/lightning resistance (never shadow) and the
         // chance to avoid ailments while a hold-to-cast is running.
         allElementalResist: passiveTreeBonuses.allElementalResist || 0,

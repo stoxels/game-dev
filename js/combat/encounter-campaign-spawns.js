@@ -24,6 +24,8 @@ try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { g
 //
 // Campaign packs never respawn and never include bosses.
 export const EG_CAMPAIGN_MONSTER_CONFIG = {
+    earlyHpBudgetFraction: 0.55, // level-1 share; ramps up to hpBudgetFraction (tuning pass 1: big early puzzles were HP spikes)
+    earlyHpRampLevels: 24,       // monster level at which the full share applies
     hpBudgetFraction: 0.85,   // share of the level's total player damage (~2x, so packs survive ~12 hits each with starter gear instead of ~6)
     minHp: 18,
     countBase: 2,
@@ -102,11 +104,12 @@ export function _egPrepareCampaignEncounter() {
     count = Math.max(1, Math.min(cfg.countMax, count));
     count = Math.min(count, Math.max(1, Math.floor(cells / cfg.minCellsPerMonster)));
 
-    const budget = cells * perCellDamage * cfg.hpBudgetFraction;
-    const perHp = Math.max(cfg.minHp, Math.round(budget / Math.max(1, count)));
-
     const level = (typeof _egCampaignMonsterLevel === 'function')
         ? _egCampaignMonsterLevel(cur.gIdx) : 1;
+    const ramp = Math.max(0, Math.min(1, (level - 1) / Math.max(1, cfg.earlyHpRampLevels)));
+    const fraction = cfg.earlyHpBudgetFraction + (cfg.hpBudgetFraction - cfg.earlyHpBudgetFraction) * ramp;
+    const budget = cells * perCellDamage * fraction;
+    const perHp = Math.max(cfg.minHp, Math.round(budget / Math.max(1, count)));
     const damage = Math.max(1, Math.round(cfg.damageBase + cfg.damagePerLevel * level));
 
     cur.campaignMonsters = true;

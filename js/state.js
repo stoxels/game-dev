@@ -62,6 +62,7 @@ window.LEVEL_FLAGS = {
     compoundInterestCount: 0, // Compound Interest: mistakes absorbed by Variance Shield this level
     priorElicitationDone: false, // Prior Elicitation: the 50%-completion Bayesian Insight has fired
     mistakeLog: [],           // Actuary/Markovian: rolling log of {r,c,penaltySecs} mistakes
+    fillGainMode: null,       // Glass Clock / Long Game: 'double' | 'none' while a correct fill is processed
     fillRun: 0,               // correct fills in a row since the last mistake (tree streak lines)
     lastCorrectFillAt: 0,     // timestamp of the previous correct fill (quick_fill_streak)
     quickFill: false,         // the current correct fill followed the last one within 1 second
@@ -88,6 +89,7 @@ export function _resetLevelFlags() {
     window.LEVEL_FLAGS.compoundInterestCount = 0;
     window.LEVEL_FLAGS.priorElicitationDone = false;
     window.LEVEL_FLAGS.mistakeLog = [];
+    window.LEVEL_FLAGS.fillGainMode = null;
     window.LEVEL_FLAGS.fillRun = 0;
     window.LEVEL_FLAGS.lastCorrectFillAt = 0;
     window.LEVEL_FLAGS.quickFill = false;
