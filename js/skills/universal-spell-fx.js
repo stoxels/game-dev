@@ -8,10 +8,11 @@
 // whole box onto the flight vector, exactly like the class projectiles
 // (see js/combat/combat-class-projectiles.js).
 //
-// SURFACE NOTE (R3 2026-09-23): 9 exports, each with a verified consumer -
+// SURFACE NOTE (R3 2026-09-23, +1 in spell pass 1): 10 exports, each with a verified consumer -
 // universal-spells.js imports 7 of them; USP_THEME_PROJ feeds the tutorial
 // Fireball (tutorial-quest.js); _uspProjDefFor + the anchor-marker pair are
-// also imported by the dev audit tool (js/dev/spell-rank-audit.js). The
+// also imported by the dev audit tool (js/dev/spell-rank-audit.js);
+// _uspMoveSpriteOffset is read by the cursor-aimed movement spells. The
 // other internals (impact/dot/card visuals, start resolution, support
 // anchor, sprite offsets) are file-private.
 //
@@ -285,7 +286,7 @@ export function _uspSupportPulseFX(spell) {
 // is wider than the sprite, so drawing FX at the raw position would smear the
 // streak off the character. Measured live so it also holds on the simple
 // (level-select style) avatar, which has neither.
-function _uspMoveSpriteOffset() {
+export function _uspMoveSpriteOffset() {
     const wrap = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     const img = document.getElementById('avatar-sprite-img')
@@ -386,6 +387,16 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
     opts = opts || {};
     const damageFn = (typeof globalThis._egDamageTargetById === 'function') ? globalThis._egDamageTargetById : null;
     if (!damageFn) return;
+
+    // Melee strikes (spell pass 1): the swing already played beside the
+    // hero, so the hit lands at once - no projectile flight. Tagged isMelee
+    // so Spellproof monsters take full damage, like a weapon strike.
+    if (opts.isMelee) {
+        damageFn(monsterId, hit.amount, hit.elements, { isCrit: !!hit.isCrit, isMelee: true });
+        if (opts.isTick) _uspDotTick(spell, monsterId);
+        else _uspImpact(spell, monsterId, opts);
+        return;
+    }
 
     // DoT ticks: no travel time, just the themed sizzle + damage.
     if (opts.isTick) {

@@ -3,7 +3,7 @@ import { hideHUDTooltip } from '../classes/class-hud.js';
 import { SKILL_HOTBAR_COLS, SKILL_HOTBAR_SIZE, activateHotbarSlot, canAffordSkill, getHotbarSkill, getSkillCooldownRemaining, getSkillDef, getSkillImage, getSkillName, isSkillUsableNow } from './skill-registry.js';
 import { isSpellbookOpen, renderSpellbook, toggleSpellbook } from './skill-spellbook.js';
 import { isSkillHoldCast, tryBeginHoldCast } from './spell-casttime.js';
-import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges } from './universal-spells.js';
+import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, isUniversalAuraActive } from './universal-spells.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -165,6 +165,7 @@ function _buildHotbarSlotHTML(slotIndex, skillId) {
         noMana ? 'no-mana' : '',
         locked ? 'locked' : '',
         holdCast ? 'has-cast' : '',
+        isUniversalAuraActive(skillId) ? 'is-toggled' : '',
     ].filter(Boolean).join(' ');
 
     const cdOverlay = isOnCD

@@ -1,4 +1,10 @@
-import { _charmTryMonsterDrop } from '../skills/skill-charms.js';
+import { CHARM_DROP_CHANCE_NORMAL, _charmTryMonsterDrop } from '../skills/skill-charms.js';
+import { EG_LOOT_DROP_CHANCE_NORMAL } from './combat-grid-pickups.js';
+import { EG_ITEM_DROP_CHANCE_NORMAL } from './combat-grid-pickups-items.js';
+import { EG_CURRENCY_DROP_CHANCE_NORMAL } from '../loot/loot-currency-drops.js';
+import { EG_ESSENCE_DROP_CHANCE_NORMAL } from '../loot/loot-essences-drops.js';
+import { EG_MAP_DROP_CHANCE_NORMAL } from '../loot/loot-map-config.js';
+import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import { _egScheduleRespawn } from './encounter-spawn-scheduler.js';
 import { _egTryDropCurrency } from '../loot/loot-currency-drops.js';
 import { _egBossDefeated, _egOnAllBossesDead, _egScheduleArenaAdvance, _egUpdateObjectivesHUD } from './encounter-chain.js';
@@ -19,6 +25,44 @@ function _egTutorialSuppressesDrops() {
         const c = globalThis.cur;
         return !!(c && c.isTutorialQuest);
     } catch (e) { return false; }
+}
+
+// ONE DROP PER CREATURE. A normal kill used to roll every loot bucket
+// (equipment, puzzle item, currency, essence, map, charm) independently, so a
+// single monster could shower several drops and the board filled with loot.
+// Now a kill first rolls "does anything drop" and, if so, picks exactly ONE
+// bucket, weighted by each bucket's own base chance (so the relative
+// frequencies players know are preserved). Charms carry a deliberately small
+// weight. The chosen bucket's own chance roll is skipped (force = true);
+// its other rules (board caps, free cells, level gates) still apply.
+export const EG_KILL_DROP_CHANCE_NORMAL = 0.6;   // P(something drops) per normal kill
+
+// Returns the bucket id to drop, or null for "nothing". `rng` is injectable
+// for tests (defaults to Math.random).
+export function _egRollKillDropBucket(opts, rng) {
+    const rand = rng || Math.random;
+    const o = opts || {};
+    const qty = Math.max(1, Number(o.quantityMult) || 1);
+    if (rand() >= Math.min(1, EG_KILL_DROP_CHANCE_NORMAL * qty)) return null;
+
+    const buckets = [
+        ['loot', EG_LOOT_DROP_CHANCE_NORMAL],
+        ['currency', EG_CURRENCY_DROP_CHANCE_NORMAL],
+        ['essence', EG_ESSENCE_DROP_CHANCE_NORMAL],
+        ['charm', CHARM_DROP_CHANCE_NORMAL],
+    ];
+    // Puzzle items never spawn on Ironman; the passive tree boosts their weight.
+    if (!o.ironman) buckets.push(['item', EG_ITEM_DROP_CHANCE_NORMAL * (1 + (Number(o.itemDropPct) || 0) / 100)]);
+    // Maps: endgame only (never campaign) and only from level-55+ monsters.
+    if (!o.campaign && (Number(o.monsterLevel) || 0) >= 55) buckets.push(['map', EG_MAP_DROP_CHANCE_NORMAL]);
+
+    const total = buckets.reduce((s, b) => s + b[1], 0);
+    let roll = rand() * total;
+    for (const [id, w] of buckets) {
+        roll -= w;
+        if (roll <= 0) return id;
+    }
+    return buckets[0][0];
 }
 
 // Handles all post-kill logic for a normal (non-boss) monster death.
@@ -46,14 +90,28 @@ export function _egHandleNormalMonsterKill(dying) {
             _egDropHeartPickup();
         }
     } else if (!_egTutorialSuppressesDrops()) {
-        if (typeof _egSpawnLootDrop === 'function') globalThis._egSpawnLootDrop(false, dying.level);
-        if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false);
-        if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false);
-        if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false);
-        // Map items are endgame-only - never drop them in the campaign.
-        if (!campaign && typeof _egTryDropMap === 'function') _egTryDropMap(false, dying.level);
-        // Charm drops (js/skills/skill-charms.js) - chance-based like loot.
-        if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(false, dying.level);
+        let itemDropPct = 0;
+        try {
+            if (typeof globalThis._egComputePlayerStats === 'function') {
+                itemDropPct = Number(globalThis._egComputePlayerStats().itemDropPct) || 0;
+            }
+        } catch (e) { /* tree bonus is best-effort */ }
+        const bucket = _egRollKillDropBucket({
+            quantityMult: (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1,
+            ironman: !!(typeof globalThis.curMods !== 'undefined' && globalThis.curMods && globalThis.curMods.ironman),
+            itemDropPct,
+            campaign,
+            monsterLevel: dying.level,
+        });
+        switch (bucket) {
+            case 'loot': if (typeof globalThis._egSpawnLootDrop === 'function') globalThis._egSpawnLootDrop(false, dying.level, true); break;
+            case 'item': if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false, true); break;
+            case 'currency': if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false, true); break;
+            case 'essence': if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false, true); break;
+            case 'map': if (typeof _egTryDropMap === 'function') _egTryDropMap(false, dying.level, true); break;
+            case 'charm': if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(false, dying.level, true); break;
+            default: break;
+        }
     }
 }
 

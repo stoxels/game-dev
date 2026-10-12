@@ -1,9 +1,7 @@
 import { Audio_Manager } from './audio/audio.js';
-import { cooldownState, startSlotCooldown } from './classes/class-cooldown-state.js';
-import { _getAbilityManaCost, _getPlayerMaxMana, canAffordMana, spendMana, updateClassHUDManaBar } from './classes/class-mana.js';
+import { _getPlayerMaxMana, updateClassHUDManaBar } from './classes/class-mana.js';
 import { _egOnPause, _egOnResume } from './combat/encounter-tick-support.js';
 import { _egStopEncounter } from './combat/encounter-lifecycle.js';
-import { _egAnimatePlayerProjectile } from './combat/encounter-player-attacks.js';
 import { _egGetTarget } from './combat/encounter-charged-shot.js';
 import { _egDamageTargetById } from './combat/encounter-monster-damage.js';
 import { _egSpawnMonster } from './combat/encounter-monster-spawning.js';
@@ -38,7 +36,7 @@ import { hideResultOverlays, showSetup } from './screens/screens.js';
 import { _charmMake, _charmRenderOverlay, _egCharmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
 import { SKILL_REGISTRY } from './skills/skill-registry.js';
 import { closeSpellbook, isSpellbookOpen } from './skills/skill-spellbook.js';
-import { USP_THEME_PROJ } from './skills/universal-spell-fx.js';
+import { getUniversalSpellManaCost } from './skills/universal-spells.js';
 import { triggerBanter } from './sprite/character-banter.js';
 import { _hidePlayerAvatar, _hidePlayerAvatarSimple } from './sprite/player_sprite.js';
 import { save } from './state.js';
@@ -195,8 +193,6 @@ let _tqCandleUsed = false;
 // that step would skip the explanation - early uses are refused with
 // a toast (see the useItem wrap).
 let _tqCandleUsable = false;
-// True once the player has cast Fireball at least once.
-let _tqFireballUsed = false;
 // Puzzle 3: true only while the spellbook is open during the drag lesson -
 // pauses the encounter so the rat cannot chew on the player while they read
 // the book. Cleared when the book closes or the lesson ends.
@@ -406,13 +402,13 @@ function _tqFormatLine(textKey) {
         // {key_fireball_slot}: the keybind of whichever hotbar slot the player
         // actually dragged Fireball into (falls back to slot 1).
         const fbSlot = (typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.skillHotbar))
-            ? STATE.skillHotbar.indexOf('fireball') : -1;
+            ? STATE.skillHotbar.indexOf(TQ_FIREBALL_ID) : -1;
         const fbIdx = fbSlot >= 0 ? fbSlot : 0;
         const fbKey = keybindKeyFor(`hotbar-${fbIdx + 1}`);
         if (fbKey) line = line.replace(/\{key_fireball_slot\}/g, keybindDisplayLabel(fbKey));
         // Live numbers for the mana lesson: the pool grows with the starter
         // gear granted before puzzle 3, so the copy must not hardcode 60.
-        line = line.replace(/\{fireball_cost\}/g, String((typeof _getAbilityManaCost === 'function') ? _getAbilityManaCost('active6') : 12));
+        line = line.replace(/\{fireball_cost\}/g, String(getUniversalSpellManaCost(TQ_FIREBALL_ID) || 16));
         line = line.replace(/\{mana_pool\}/g, String((typeof _getPlayerMaxMana === 'function') ? _getPlayerMaxMana() : 60));
         for (let slot = 1; slot <= 10; slot++) {
             const hk = keybindKeyFor(`hotbar-${slot}`);
@@ -1211,7 +1207,7 @@ const TQ_TASKS = {
     // Puzzle 3: the Scroll of Fireball was dragged into a spell slot, which
     // unlocks the Fireball on the matching hotbar key (slot N = hotbar key N).
     slot_fireball: () => typeof STATE !== 'undefined' && STATE && Array.isArray(STATE.charmSlots)
-        && STATE.charmSlots.indexOf('fireball#1') !== -1,
+        && STATE.charmSlots.indexOf(TQ_FIREBALL_ID + '#1') !== -1,
     // Puzzle 1: guided demos on the locked grid.
     demo_correct: () => _tqDemoDone.correct,
     demo_mistake: () => _tqDemoDone.mistake,
@@ -1288,14 +1284,14 @@ function _tqStepsFor(phase) {
             { say: 'tq_p3_s5' },
             { fn: () => { _tqShowKeycapChip('spellbook', t('tq_chip_spellbook')); } },
             { task: 'open_spellbook' },
-            { say: 'tq_p3_s6', wait: true, fn: () => { _tqClearHighlights(); _tqPointAtDrop('.charm-item[data-charm-key="fireball#1"]'); } },
+            { say: 'tq_p3_s6', wait: true, fn: () => { _tqClearHighlights(); _tqPointAtDrop('.charm-item[data-charm-key="' + TQ_FIREBALL_ID + '#1"]'); } },
             { task: 'slot_fireball' },
             { fn: () => { try { if (typeof isSpellbookOpen === 'function' && isSpellbookOpen() && typeof closeSpellbook === 'function') closeSpellbook(); } catch (e) {} _tqClearHighlights(); try { if (typeof updateClassHUDManaBar === 'function') updateClassHUDManaBar(); } catch (e) {} } },
             // Fireball lesson: the ghost is immune to blades - burn it down.
             // The ghost spawns HERE, before the player is told to cast, so a
             // player who dies to the ghost and retries gets a real corpse to
             // celebrate, not an empty field (the bounce re-runs this spawn).
-            { say: 'tq_p3_s7', task: 'fireball_kill', fn: () => { _tqSpawnP3Ghost(); _tqPointAt('.skill-hotbar-slot[data-skill="fireball"]'); } },
+            { say: 'tq_p3_s7', task: 'fireball_kill', fn: () => { _tqSpawnP3Ghost(); _tqPointAt('.skill-hotbar-slot[data-skill="' + TQ_FIREBALL_ID + '"]'); } },
             // Ghost spoils: a real Candle, claimed with the correct click.
             { say: 'tq_p3_s8', task: 'pick_candle', fn: () => { _tqPointAtDrop('.eg-item-drop-overlay'); } },
             // The hard lesson: a Divine Orb, destroyed with the wrong click
@@ -1528,7 +1524,6 @@ function _tqStartPuzzle(i) {
     // re-shows it against the fresh grid rect.
     _tqHideGridLockBorder();
     if (_tqPhase === 'p2' || _tqPhase === 'p3') _tqGridLocked = true;
-    if (_tqPhase === 'p3') _tqEnsureFireball();
     globalThis.startLevel(base + i);
     _tqUpdateLevelExitButtons();
     // Kick off the Professor's explanation once the level has booted (the
@@ -1804,7 +1799,6 @@ function _tqPlaceSwordDrop() {
         return;
     }
     try {
-        _tqEnsureFireball();
         if (typeof EG_ALL_BASE_TYPES === 'undefined'
             || typeof _egvBuildBaseItemFromBase !== 'function'
             || typeof cur === 'undefined' || !cur || !cur.grid
@@ -1865,17 +1859,16 @@ function _tqPlaceCharmDrop() {
     _tqP3CharmKey = null;
     _tqP3DropButton = 1;
     try {
-        _tqEnsureFireball();
         if (typeof _charmMake !== 'function'
             || typeof _egCharmDrops === 'undefined'
             || typeof cur === 'undefined' || !cur || !cur.grid
             || typeof userGrid === 'undefined' || !globalThis.userGrid
             || cur.grid[2][0] !== 1 || globalThis.userGrid[2][0] !== 0) {
-            if (typeof grantCharm === 'function') grantCharm('fireball', 1);
+            if (typeof grantCharm === 'function') grantCharm(TQ_FIREBALL_ID, 1);
             _tqP3CharmClaimed = true;
             return;
         }
-        const charm = _charmMake('fireball', 1);
+        const charm = _charmMake(TQ_FIREBALL_ID, 1);
         const key = '2-0';
         _egCharmDrops.set(key, charm);
         if (typeof _charmRenderOverlay === 'function') _charmRenderOverlay(2, 0, charm);
@@ -1885,7 +1878,7 @@ function _tqPlaceCharmDrop() {
         _tqP3DropCell = key;
         _tqP3DropOpen = true;
     } catch (e) {
-        try { if (typeof grantCharm === 'function') grantCharm('fireball', 1); } catch (e2) {}
+        try { if (typeof grantCharm === 'function') grantCharm(TQ_FIREBALL_ID, 1); } catch (e2) {}
         _tqP3CharmClaimed = true;
     }
     _tqRefreshGridLockBorder();
@@ -2385,96 +2378,12 @@ function _tqEnsureIntermissionDom() {
 //------------------------------------------------------------------------
 //---------------------------FIREBALL SPELL--------------------------------
 //------------------------------------------------------------------------
-
-// Registers Fireball as a real, persistable skill (spellbook + hotbar +
-// keybind routing all read the shared skill registry).
-// NOTE: the charm itself is no longer granted directly - the defeated bat
-// drops a Fireball charm onto the grid and the claim grants it via the
-// engine's charm pipeline.
-// keybind routing all read the shared skill registry).
-function _tqEnsureFireball() {
-    if (typeof SKILL_REGISTRY === 'undefined') return;
-    if (SKILL_REGISTRY.fireball) return;
-    SKILL_REGISTRY.fireball = {
-        id: 'fireball',
-        icon: '🔥',
-        image: null,
-        nameEn: 'Fireball',
-        nameDE: 'Feuerball',
-        descCursorEn: 'Hurl a fireball at your target',
-        descCursorDE: 'Wirf einen Feuerball auf dein Ziel',
-        cooldownSeconds: 3,
-        manaCost: 16,
-        levels: [{
-            descEn: 'Hurls a searing fireball at the targeted creature, dealing fire damage.',
-            descDE: 'Wirft einen glühenden Feuerball auf das anvisierte Monster und verursacht Feuerschaden.',
-            effect: {},
-        }],
-        source: { kind: 'fireball', ownerId: null, slot: 'active1' },
-        legacySlot: 'active6',
-        slotKind: 'fireball',
-        isPassive: false,
-        movable: true,
-        endgameOnly: false,
-        tags: ['Spell', 'Fire', 'Projectile'],
-        scaling: [],
-        damage: null,
-        // Hold-to-cast (see js/skills/spell-casttime.js): the button must be
-        // held for 1.0s while the cast bar fills - then the fireball flies.
-        castTime: '1.0s',
-        castTimeSeconds: 1.0,
-    };
-}
-
-// Casts Fireball at the current target: pays mana, starts the cooldown and
-// animates a real fire projectile through the shared encounter pipeline.
-function _tqCastFireball() {
-    if (typeof dead !== 'undefined' && globalThis.dead) return;
-    // The spell stays locked until its scroll sits in a spell slot.
-    if (typeof isSkillCharmUnlocked === 'function' && !isSkillCharmUnlocked('fireball')) {
-        showToast('🔒 ' + t('charm_locked_toast'), '#ff6b9d');
-        return;
-    }
-    const target = (typeof _egGetTarget === 'function') ? _egGetTarget() : null;
-    if (!target) {
-        showToast('🔥 ' + t('tq_fireball_no_target'));
-        return;
-    }
-    if (typeof canAffordMana !== 'function' || !canAffordMana(16)) {
-        showToast(t('cls_no_mana'));
-        return;
-    }
-    // Cooldown gate (mirrors the class pipeline in class-abilities.js) -
-    // without it the spell could be re-cast while the slot was cooling down.
-    try {
-        const cd = (typeof cooldownState !== 'undefined' && cooldownState)
-            ? cooldownState.active6 : null;
-        if (cd && cd.remaining > 0) {
-            showToast('🔥 ' + t('tq_fireball_cooldown'));
-            return;
-        }
-    } catch (e) {}
-    spendMana(16);
-    if (typeof startSlotCooldown === 'function') startSlotCooldown('active6', 3);
-    _tqFireballUsed = true;
-    // Launch from the avatar itself: the default fallback
-    // (#class-hud-drag-handle) doesn't exist for classless characters, which
-    // skipped the flight animation entirely and resolved the hit instantly.
-    const _fbSource = document.getElementById('player-avatar-wrapper')
-        || document.getElementById('player-avatar-simple')
-        || undefined;
-    // Fire the FIRE visual (USP_THEME_PROJ.fire - the molten-comet the
-    // universal fire spells use), not the generic reveal projectile:
-    // _egAnimatePlayerProjectile defaults to the class/reveal look, which
-    // made a cast Fireball indistinguishable from a reveal shot.
-    const _fbProj = (typeof USP_THEME_PROJ !== 'undefined' && USP_THEME_PROJ.fire) ? USP_THEME_PROJ.fire : null;
-    try {
-        _egAnimatePlayerProjectile(18, target.id, undefined, undefined, _fbSource, undefined, ['fire'], _fbProj ? { projDef: _fbProj } : undefined);
-    } catch (e) {
-        try { _egDamageTargetById(target.id, 18, ['fire']); } catch (e2) {}
-    }
-    showToast('🔥 ' + t('tq_fireball_cast'));
-}
+// Fireball is a REGULAR universal spell now (usp_fireball in
+// js/skills/universal-spells.js): same registry entry, tooltip, charm art,
+// cast path, cast bar and projectile as every other spell. The tutorial only
+// hands the player its rank-1 charm (see _tqPlaceCharmDrop) - there is no
+// tutorial-only Fireball any more.
+const TQ_FIREBALL_ID = 'usp_fireball';
 
 
 //------------------------------------------------------------------------
@@ -2486,44 +2395,6 @@ function _tqCastFireball() {
     // every wrap is deferred to DOMContentLoaded - by then the full global
     // surface exists and gameplay has not started yet.
     function _integrate() {
-    // 1. Register Fireball and make it show up in the spellbook + hotbar
-    //    seeding for every character. Registration is lazy (the skill
-    //    registry may load after this file) - ensured on first roster query.
-    if (typeof getPlayerSkillIds === 'function' && !window._tqWrappedSkillIds) {
-        window._tqWrappedSkillIds = true;
-        const _orig = globalThis.getPlayerSkillIds;
-        globalThis.getPlayerSkillIds = function () {
-            _tqEnsureFireball();
-            const ids = _orig();
-            if (!ids.includes('fireball')) ids.push('fireball');
-            return ids;
-        };
-    }
-    if (typeof getPlayerSkillGroups === 'function' && !window._tqWrappedSkillGroups) {
-        window._tqWrappedSkillGroups = true;
-        const _orig = globalThis.getPlayerSkillGroups;
-        globalThis.getPlayerSkillGroups = function () {
-            const groups = _orig();
-            // Put the tutorial Fireball section FIRST so the scroll lesson's
-            // "unlocked" entry is visible without scrolling past the whole
-            // universal arsenal.
-            if (!groups.some(g => g.ids && g.ids.includes('fireball'))) {
-                groups.unshift({ labelKey: 'tq_spellbook_group', ids: ['fireball'] });
-            }
-            return groups;
-        };
-    }
-
-    // 2. Route hotbar/keybind casts of Fireball to the tutorial handler.
-    if (typeof toggleActiveAbility === 'function' && !window._tqWrappedToggle) {
-        window._tqWrappedToggle = true;
-        const _orig = globalThis.toggleActiveAbility;
-        globalThis.toggleActiveAbility = function (slot) {
-            if (slot === 'active6') { _tqCastFireball(); return; }
-            return _orig(slot);
-        };
-    }
-
     // 2b. Prevent the hotbar auto-seeder from placing Fireball on the bar -
     // the player must slot its charm first (lesson 3). The hotbar mirrors
     // the spell slots 1:1, so the auto-seeder must not pre-place it.
@@ -2555,8 +2426,8 @@ function _tqCastFireball() {
             // strip below used to fire unconditionally, so every setCharmSlot()
             // call was instantly undone and the slotted spell never showed
             // up on the bar. Only clear it while the charm is still unslotted.
-            const idx = STATE.skillHotbar.indexOf('fireball');
-            if (idx !== -1 && (typeof isSkillCharmUnlocked !== 'function' || !isSkillCharmUnlocked('fireball'))) {
+            const idx = STATE.skillHotbar.indexOf(TQ_FIREBALL_ID);
+            if (idx !== -1 && (typeof isSkillCharmUnlocked !== 'function' || !isSkillCharmUnlocked(TQ_FIREBALL_ID))) {
                 STATE.skillHotbar[idx] = null;
             }
             // No renderSkillHotbar() call here! The two strip paths only ever
@@ -2907,7 +2778,6 @@ export function startTutorialQuest() {
     _tqStepIdx = 0;
     _tqCandleUsed = false;
     _tqCandleUsable = false;
-    _tqFireballUsed = false;
     _tqPuzzleSolvedFlag = false;
     _tqSawMonster = false;
     // Tutorial entry: play one random tutorial track (kept across all three

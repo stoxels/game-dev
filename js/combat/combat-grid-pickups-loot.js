@@ -95,7 +95,9 @@ export function _egAnimateLootClaim(row, col, item) {
 
 // Attempts to place one loot drop on the grid after a monster dies.
 // isBoss - pass true for guaranteed drop chance.
-function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
+// force  - skip the chance roll (the kill handler already picked THIS bucket
+//          as the creature's one drop, see _egRollKillDropBucket).
+function _egSpawnLootDrop(isBoss = false, monsterLevel = 1, force = false) {
     if (!_egIsActive()) return;
 
     // Unlimited stash: no longer gated - _egStashHasFreeSlot() always true
@@ -104,7 +106,7 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1) {
     // Active map's loot quantity bonus scales the drop chance up.
     const qtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
     const dropChance = Math.min(1, baseChance * qtyMult);
-    if (Math.random() > dropChance) return;
+    if (!force && Math.random() > dropChance) return;
 
     // Don't place a second loot drop if one is already on the board.
     if (_egLootDrops.size >= 1) return;

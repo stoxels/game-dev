@@ -27,7 +27,7 @@ import { STATE } from '../state.js';
 //   • every skill + rank pair has its own charm - key "<skillId>#<rank>"
 //   • picking up a charm you already own yields a Lemma instead
 //   • 10 Lemmas automatically prove 1 Theorem
-//   • shift-left-clicking a charm spends 1 Theorem → +1% damage for its spell
+//   • right-click the Theorems pill, then left-click a charm: spends 1 Theorem → +1% damage for its spell
 //   • placing a charm into one of the 10 SPELL SLOTS unlocks that spell
 //     directly on the matching hotbar slot (spell slot N = hotbar key N -
 //     there is no separate drag-to-hotbar step)
@@ -60,7 +60,7 @@ const CHARM_SLOT_COLS = 5;
 const CHARM_SHARDS_PER_ORB = 10;
 
 // Every applied Theorem adds this much damage to the charm's spell.
-const CHARM_ORB_DAMAGE_PCT = 1;
+export const CHARM_ORB_DAMAGE_PCT = 1;
 
 // Charm item glyph. The rank is drawn as a badge on top of it.
 export const CHARM_BASE_ICON = '💫';
@@ -83,7 +83,7 @@ const CHARM_ART_TIER_MID = {
     shadow: ['gloom', 'nightmare', 'eclipse', 'nightwyrm', 'stormshade', 'abyss'],
     summon: ['familiar', 'pack', 'alpha', 'direwolf', 'stormcall', 'dreadhowl'],
 };
-const CHARM_ART_SCHOOL_BY_SKILL = { fireball: 'fire' };
+const CHARM_ART_SCHOOL_BY_SKILL = {};
 const CHARM_ART_SCHOOL_BY_TAG = {
     Movement: 'movement',
     Support: 'defensive',
@@ -109,7 +109,10 @@ function _charmArtSchool(skillId) {
     const explicit = CHARM_ART_SCHOOL_BY_SKILL[skillId];
     if (explicit) return explicit;
     const def = getSkillDef(skillId);
-    const tags = def && Array.isArray(def.tags) ? def.tags : [];
+    // Universal spells: the authored tags (the tooltip tags are derived and
+    // describe the mechanics, which must not change the art).
+    const own = def && def.usp && Array.isArray(def.usp.schoolTags) ? def.usp.schoolTags : null;
+    const tags = own || (def && Array.isArray(def.tags) ? def.tags : []);
     for (const [tag, school] of Object.entries(CHARM_ART_SCHOOL_BY_TAG)) {
         if (tags.includes(tag)) return school;
     }
@@ -130,7 +133,11 @@ function _charmArtUrl(skillId, rank) {
 
 // Monster drop tuning (mirrors the loot-drop constants in
 // endgame-grid-pickups.js).
-const CHARM_DROP_CHANCE_NORMAL = 0.15;   // per normal monster kill
+// Spell pass 1: 0.15 -> 0.03. Normal kills now drop ONE thing from a shared
+// weighted pool (encounter-kill-rewards.js), and this value is the charm's
+// WEIGHT in it, next to equipment 0.35 / currency 0.25: charms are ~4% of
+// drops instead of showering in on top of everything else.
+export const CHARM_DROP_CHANCE_NORMAL = 0.03;
 const CHARM_DROP_CHANCE_BOSS = 1.00;     // bosses always drop
 const CHARM_DROP_LIFETIME_MS = 60000;    // uncollected charm lifetime
 const CHARM_DROP_MAX_ON_BOARD = 2;       // simultaneous charm drops
@@ -495,6 +502,47 @@ export function grantCharm(skillId, rank) {
     return { duplicate, orbsMade, shards: STATE.charmShards };
 }
 
+// THEOREM MODE: right-click the Theorems pill to arm it, then left-click any
+// charm (list or slot) to spend one Theorem on it. It stays armed - so several
+// can be spent in a row - until the pill is right-clicked again, Esc is
+// pressed, the Theorems run out or the book closes.
+let _charmTheoremMode = false;
+let _charmTheoremObserver = null;
+
+function _charmSetTheoremMode(on) {
+    on = !!on;
+    _charmTheoremMode = on;
+    try {
+        document.body.classList.toggle('charm-theorem-mode', on);
+        document.querySelectorAll('.sb3-theorem').forEach((el) => el.classList.toggle('is-armed', on));
+    } catch (e) { /* DOM-less */ }
+    if (_charmTheoremObserver) { _charmTheoremObserver.disconnect(); _charmTheoremObserver = null; }
+    if (on && typeof MutationObserver !== 'undefined') {
+        const overlay = document.getElementById('spellbook-overlay');
+        if (overlay) {
+            _charmTheoremObserver = new MutationObserver(() => {
+                if (!overlay.classList.contains('show')) _charmSetTheoremMode(false);
+            });
+            _charmTheoremObserver.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+        }
+    }
+}
+
+// Right-click on the Theorems pill: arm / disarm.
+function _charmToggleTheoremMode() {
+    ensureCharmState();
+    if (_charmTheoremMode) {
+        _charmSetTheoremMode(false);
+        return;
+    }
+    if ((STATE.charmOrbs || 0) <= 0) {
+        showToast(`🔮 ${t('charm_no_orbs')}`, '#c39bd3');
+        return;
+    }
+    _charmSetTheoremMode(true);
+    showToast(`🔮 ${t('charm_thm_armed')}`, '#c39bd3');
+}
+
 // Spends one orb on a charm → +CHARM_ORB_DAMAGE_PCT% damage for its spell.
 function applyOrbToCharm(key) {
     ensureCharmState();
@@ -508,6 +556,7 @@ function applyOrbToCharm(key) {
     charm.orbs = (charm.orbs || 0) + 1;
     if (save) { try { save(); } catch (e) { /* best effort */ } }
     showToast(`🔮 ${getCharmName(charm)} - ${t('charm_orb_applied')} +${CHARM_ORB_DAMAGE_PCT}%`, '#f5d98b');
+    if ((STATE.charmOrbs || 0) <= 0) _charmSetTheoremMode(false);
     _charmRefreshSpellbook();
     return true;
 }
@@ -544,7 +593,7 @@ export function isSkillCharmUnlocked(skillId) {
     const tqActive = (typeof globalThis._tqIsTutorialActive === 'function')
         && (function () { try { return globalThis._tqIsTutorialActive(); } catch (e) { return false; } })();
     if (tqActive) {
-        if (skillId !== 'fireball') return true;
+        if (skillId !== 'usp_fireball') return true;
     } else if (!STATE.playerClass) {
         // Before a class is chosen nothing is charm-gated.
         return true;
@@ -889,6 +938,26 @@ function _charmIconMarkup(charm, extraClass) {
         + `</span>`;
 }
 
+// The charm art URL for a skill (used by the hotbar icon and the spell
+// tooltip): at `rank` when given, else the slotted rank, else rank 1. Null
+// when the skill has no mapped art school (callers fall back to the emoji).
+export function getCharmArtForSkill(skillId, rank) {
+    let r = Number(rank) || 0;
+    if (!r) {
+        try { r = getCharmSlottedRank(skillId) || 1; } catch (e) { r = 1; }
+    }
+    return _charmArtUrl(skillId, r);
+}
+
+// The charm's own art as a bare <img> (spellbook slots + list rows), or the
+// emoji glyph when the skill has no mapped art school.
+function _charmArtOrGlyph(charm) {
+    const art = charm && _charmArtUrl(charm.skillId, charm.rank);
+    return art
+        ? `<img class="charm-art-img" src="${art}" alt="" draggable="false">`
+        : CHARM_BASE_ICON;
+}
+
 // The 2 × 5 spell slot grid.
 function _charmBuildSlotsHTML() {
     ensureCharmState();
@@ -921,7 +990,7 @@ function _charmBuildSlotsHTML() {
         cells.push(`<div class="sb3-slot is-filled"${schoolAttr} data-charm-slot="${i}" data-charm-key="${charm.key}"`
             + ` onmouseenter="handleSkillTip(event,'${charm.skillId}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
             + `<span class="sb3-slot-head">${i + 1}</span>`
-            + `<span class="sb3-slot-socket"><span class="sb3-slot-icon">${CHARM_BASE_ICON}</span></span>`
+            + `<span class="sb3-slot-socket"><span class="sb3-slot-icon">${_charmArtOrGlyph(charm)}</span></span>`
             + `<span class="sb3-slot-foot">${nameTxt}${bonusTxt}</span>`
             + `</div>`);
     }
@@ -953,7 +1022,7 @@ function _charmBuildCurrencyHTML() {
         + ` onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
     return `<div class="sb3-charm-tools">`
         + `<span class="sb3-lemma"${tipAttrs('shards')}><b>${shards}</b>/${CHARM_SHARDS_PER_ORB} ${t('charm_currency_shards')}</span>`
-        + `<span class="sb3-theorem"${tipAttrs('orbs')}><b>${orbs}</b> ${orbLabel}</span>`
+        + `<span class="sb3-theorem${_charmTheoremMode ? ' is-armed' : ''}"${tipAttrs('orbs')}><b>${orbs}</b> ${orbLabel}</span>`
         + `</div>`;
 }
 
@@ -1017,9 +1086,9 @@ function _charmBuildInventoryHTML() {
             ? `<span class="sb3-charm-slotref" data-tip-slot="${slotNums.join(',')}">▸ ${slotNums.join(',')}</span>`
             : '';
         return `<div class="sb3-charm-row${slotted}"${schoolAttr} data-charm-key="${charm.key}"`
-            + ` onmouseenter="handleCharmTip(event,'${charm.key}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
+            + ` onmouseenter="handleSkillTip(event,'${charm.skillId}','${charm.key}')" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">`
             + `<span class="sb3-charm-num">${index + 1}</span>`
-            + `<span class="sb3-charm-glyph">${CHARM_BASE_ICON}</span>`
+            + `<span class="sb3-charm-glyph">${_charmArtOrGlyph(charm)}</span>`
             + `<span class="sb3-charm-name">${getSkillName(charm.skillId) || charm.skillId}</span>`
             + `<span class="sb3-charm-rank">${charm.rank}</span>`
             + slotRef
@@ -1046,13 +1115,14 @@ export function renderSpellbookCharmPanel() {
     const invHost = document.getElementById('spellbook-charms');
     if (invHost) {
         const head = buildSpellbookHeadHTML(t('charm_inventory_title'));
-        // v3.6: "Max rank only" is a left-aligned row directly under the
-        // plaque (grid row 2); the Lemmas/Theorems counters moved OUT of the
-        // page onto the LEFT frame strip (renderSpellbook fills it).
+        // v3.7: "Max rank only" lives on the book FRAME, top-left above the
+        // CHARMS plaque (#spellbook-filter, created by skill-spellbook.js);
+        // the Lemmas/Theorems counters sit on the LEFT frame strip below.
         invHost.innerHTML = head
-            + `<div class="sb3-page-filter">${_charmBuildFilterHTML()}</div>`
             + `<div class="sb-charm-rail">${_charmBuildInventoryHTML()}</div>`;
     }
+    const filterHost = document.getElementById('spellbook-filter');
+    if (filterHost) filterHost.innerHTML = _charmBuildFilterHTML();
     // Counters on the left frame strip (the carved band under the page).
     // v4: detect value increases vs the previous render and flash a glow
     // animation on the changed number (see .sb3-count-glow in CSS).
@@ -1096,11 +1166,6 @@ function _charmRefreshSpellbook() {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-export function handleCharmTip(e, charmKey) {
-        const html = buildCharmTooltipHTML(charmKey);
-    if (html) showHUDTooltip(html, e);
-}
-
 // Hover tooltip for the Lemma / Theorem currency widgets. Called from inline
 // attributes, so it must stay a global.
 export function handleCharmCurrencyTip(e, kind) {
@@ -1125,24 +1190,12 @@ function buildCharmCurrencyTipHTML(kind) {
         ? `${t('charm_orbs_owned')}: <b style="color:#c39bd3">${count}</b>`
         : `${t('charm_tip_shards_progress')}: <b style="color:#7fd9ff">${count} / ${CHARM_SHARDS_PER_ORB}</b>`;
 
-    // The Lemma meter also says how many are still missing, with the singular
-    // form at exactly one.
-    let tail = '';
-    if (!isOrb) {
-        const need = CHARM_SHARDS_PER_ORB - (count % CHARM_SHARDS_PER_ORB);
-        tail = `<div class="skl-tip-note">${need === 1
-            ? t('charm_tip_shards_need_one')
-            : t('charm_tip_shards_need_many').replace('{n}', need)}</div>`;
-    }
-
     return `<div class="skl-tip charm-tip">`
         + `<div class="skl-tip-title">${title}</div>`
         + `<div class="skl-tip-tags">${t('charm_tip_currency_tags')}</div>`
         + `<div class="skl-tip-stat">${stat}</div>`
         + `<div class="skl-tip-sep"></div>`
         + `<div class="skl-tip-desc">${isOrb ? t('charm_orbs_hint') : t('charm_shards_hint')}</div>`
-        + tail
-        + (isOrb ? `<div class="skl-tip-foot">${t('charm_shift_hint')}</div>` : '')
         + `</div>`;
 }
 
@@ -1163,47 +1216,6 @@ function buildCharmEmptySlotTipHTML(slotIndex) {
         + `<div class="skl-tip-desc">${t('charm_slot_tip_desc')}</div>`
         + `</div>`;
 }
-
-// Builds the hover tooltip for a charm (mirrors the skill tooltip look).
-function buildCharmTooltipHTML(charmKey) {
-    const charm = getCharmByKey(charmKey);
-    if (!charm) return '';
-    const slotted = (STATE && Array.isArray(STATE.charmSlots)
-        && STATE.charmSlots.includes(charm.key));
-    const bonus = charm.orbs * CHARM_ORB_DAMAGE_PCT;
-    const desc = getSkillDesc(charm.skillId);
-    const usable = charmRankMeetsPlayerLevel(charm.rank);
-    // v3.3: the "drops at monster Lv X" hint is gone - the drop table is an
-    // in-world discovery, the tooltip only gates on the PLAYER level.
-    const needPlvl = getCharmRankMinPlayerLevel(charm.rank);
-    // Level line: green when usable, red when the character is too low.
-    // t() keys fall back to English when a translation is missing.
-    const reqColor = usable ? '#2ecc71' : '#e06c55';
-    const reqLine = `<div class="skl-tip-stat">${t('charm_tip_req_player')}: <b style="color:${reqColor}">${needPlvl}</b></div>`;
-    const lockedLine = usable ? '' : `<div class="skl-tip-note" style="color:#e06c55">${
-        t('charm_tip_locked_level')
-    }</div>`;
-
-    return `<div class="skl-tip charm-tip"${_sbSpellSchoolKey(charm.skillId) !== null
-        ? (() => { const s = _sbSpellSchoolKey(charm.skillId); return s ? ` data-school="${s}"` : ''; })()
-        : ''}>`
-        + `<div class="skl-tip-title">${CHARM_BASE_ICON} ${getSkillName(charm.skillId)}</div>`
-        + `<div class="skl-tip-tags">${t('charm_tip_type')}</div>`
-        + `<div class="skl-tip-stat">${t('skill_tip_rank')}: <b style="color:#f1c40f">${charm.rank}</b></div>`
-        + reqLine
-        + lockedLine
-        + (bonus > 0
-            ? `<div class="skl-tip-stat">${t('charm_tip_orb_bonus')}: <b style="color:#7fd9ff">+${bonus}%</b></div>`
-            : '')
-        + (slotted ? `<div class="skl-tip-note">${t('charm_tip_slotted')}</div>` : '')
-        + `<div class="skl-tip-sep"></div>`
-        + `<div class="skl-tip-desc">${desc}</div>`
-        + `<div class="skl-tip-note">${t('charm_tip_unlock')}</div>`
-        + `<div class="skl-tip-foot">${t('charm_shift_hint')} · ${t('charm_orbs_owned')}: ${(STATE.charmOrbs || 0)}</div>`
-        + (!slotted ? `<div class="skl-tip-foot">${t('charm_rightclick_hint')}</div>` : '')
-        + `</div>`;
-}
-
 
 //------------------------------------------------------------------------
 //-------------------------DRAG & DROP------------------------------------
@@ -1295,8 +1307,9 @@ function _charmCleanupDrag() {
 }
 
 // Installs the delegated charm interactions on the (persistent) spell book
-// overlay: shift-click applies an orb, right-click slots into the next free
-// spell slot, a normal press starts a drag.
+// overlay: right-clicking the Theorems pill arms Theorem mode (then a left
+// click on a charm applies one), right-click on a charm slots it into the
+// next free spell slot, a normal press starts a drag.
 export function initCharmPanelInteractions(host) {
     if (!host || host.dataset.charmBound === '1') return;
     host.dataset.charmBound = '1';
@@ -1305,6 +1318,13 @@ export function initCharmPanelInteractions(host) {
     // use .sb3-slot and are intentionally excluded) to slot it into the first
     // empty spell slot.
     host.addEventListener('contextmenu', (e) => {
+        const pill = e.target.closest ? e.target.closest('.sb3-theorem') : null;
+        if (pill) {
+            e.preventDefault();
+            e.stopPropagation();
+            _charmToggleTheoremMode();
+            return;
+        }
         const target = e.target.closest ? e.target.closest('.sb3-charm-row[data-charm-key]') : null;
         if (!target) return;   // anywhere else: leave the menu alone
         e.preventDefault();
@@ -1318,8 +1338,8 @@ export function initCharmPanelInteractions(host) {
         if (!target) return;
         const charmKey = target.getAttribute('data-charm-key');
         if (!charmKey) return;
-        // Shift-left-click spends an orb on the charm.
-        if (e.shiftKey && e.button === 0) {
+        // Theorem mode: a left click spends a Theorem on the charm.
+        if (_charmTheoremMode && e.button === 0) {
             e.preventDefault();
             e.stopPropagation();
             applyOrbToCharm(charmKey);
@@ -1330,6 +1350,11 @@ export function initCharmPanelInteractions(host) {
         const fromSlot = slotEl ? Number(slotEl.getAttribute('data-charm-slot')) : null;
         e.preventDefault();
         startCharmDrag(charmKey, e, Number.isNaN(fromSlot) ? null : fromSlot);
+    });
+
+    // Esc leaves Theorem mode (the book's own Esc handling is untouched).
+    document.addEventListener('keydown', (e) => {
+        if (_charmTheoremMode && e.key === 'Escape') _charmSetTheoremMode(false);
     });
 
     // Suppress the click that follows a drag so it can't re-apply an orb.
@@ -1403,12 +1428,14 @@ function _charmRollDropKey(isBoss, monsterLevel) {
 // Chance-driven charm drop after a monster death (bosses always drop).
 // `monsterLevel` gates the drop rank via getCharmRankMaxForMonsterLevel -
 // bosses share the same cap, they only guarantee a drop within it.
-export function _charmTryMonsterDrop(isBoss, monsterLevel) {
+// `force` skips the chance roll (the kill handler already picked charms as
+// this creature's one drop - see _egRollKillDropBucket).
+export function _charmTryMonsterDrop(isBoss, monsterLevel, force = false) {
     if (typeof globalThis._egIsActive !== 'function' || !globalThis._egIsActive()) return false;
     if (_egCharmDrops.size >= CHARM_DROP_MAX_ON_BOARD) return false;
 
     const chance = isBoss ? CHARM_DROP_CHANCE_BOSS : CHARM_DROP_CHANCE_NORMAL;
-    if (Math.random() > chance) return false;
+    if (!force && Math.random() > chance) return false;
 
     const dropKey = _charmRollDropKey(isBoss, monsterLevel);
     if (!dropKey) return false;

@@ -67,14 +67,15 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
         globalThis._egPendingMeleeChargePct = null;
     }
 
-    // Out-of-range whiff for plain strikes only: the swing always plays,
-    // but a sub-200% blade can't reach a distant target - no damage, no
-    // procs, no reflect. The spent charge is NOT refunded (follows the
-    // miss rule below). At 200%+ the weapon art dashes to the target
+    // Out-of-reach whiff for plain strikes only: a sub-200% blade can't
+    // reach a distant target - no damage, no procs, no reflect, and no
+    // "too far" text either: the swing playing next to the hero IS the
+    // feedback (the manual attack picks its victim from what is actually in
+    // reach, see _egMeleeFindVictim, so this is a backstop for callers that
+    // name a far target). At 200%+ the weapon art dashes to the target
     // instead, so this gate never fires.
     if (_egMeleeTierForCharge(chargePct) < 1
         && typeof _egMeleeTargetInRange === 'function' && !_egMeleeTargetInRange(targetId)) {
-        _egShowStatusLabel(targetId, t('eg_melee_too_far'));
         return;
     }
 

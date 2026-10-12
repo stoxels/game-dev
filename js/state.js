@@ -674,6 +674,21 @@ export function _migrateCharmFields(s) {
     if (!Number.isFinite(Number(s.charmShards))) s.charmShards = 0;
     if (!Number.isFinite(Number(s.charmOrbs))) s.charmOrbs = 0;
     if (s.charmSeedKey === undefined) s.charmSeedKey = null;
+
+    // The tutorial-only 'fireball' became the regular universal spell
+    // 'usp_fireball': carry old saves over (inventory entries, slotted keys
+    // and the hotbar mirror). Idempotent - new ids never match.
+    const OLD = 'fireball';
+    const NEW = 'usp_fireball';
+    const fixKey = (k) => ((typeof k === 'string' && (k === OLD || k.startsWith(OLD + '#')))
+        ? NEW + k.slice(OLD.length) : k);
+    s.charmInventory.forEach((c) => {
+        if (!c || typeof c !== 'object') return;
+        if (c.skillId === OLD) c.skillId = NEW;
+        if (typeof c.key === 'string') c.key = fixKey(c.key);
+    });
+    s.charmSlots = s.charmSlots.map(fixKey);
+    if (Array.isArray(s.skillHotbar)) s.skillHotbar = s.skillHotbar.map((id) => (id === OLD ? NEW : id));
 }
 
 // _migrateAscendencyFields - fills in ascendency-progression fields missing from an older save.

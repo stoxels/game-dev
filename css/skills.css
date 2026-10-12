@@ -1041,9 +1041,20 @@ body.spellbook-open.skill-hotbar-visible .spellbook-box { /* neutralized - see s
    ----------------------------------------------------------------------- */
 
 /* Skill tooltips need more room than the tiny class-HUD tooltips. */
-#chud-floating-tip:has(.skl-tip) { max-width: 330px; }
+/* !important: getHUDTooltip() sets an inline max-width:260px that would
+   otherwise always win, which made these tooltips tall and narrow. */
+#chud-floating-tip:has(.skl-tip) { max-width: 440px !important; min-width: 320px; }
 
 .skl-tip { font-size: 11px; line-height: 1.55; }
+
+.skl-tip-art {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    vertical-align: -7px;
+    margin-right: 6px;
+    filter: drop-shadow(0 0 5px rgba(245, 197, 24, .5));
+}
 
 .skl-tip-title {
     font-size: 13px;

@@ -1,6 +1,6 @@
 import { isSkillCharmUnlocked } from './skill-charms.js';
 import { activateSkill, canAffordSkill, getSkillCooldownRemaining, getSkillDef, getSkillName, isSkillUsableNow } from './skill-registry.js';
-import { isUniversalMovementSpell, isUniversalSupportSpell } from './universal-spells.js';
+import { endUniversalChannel, fireUniversalChannelTick, getUniversalSpellCastKind, isUniversalMovementSpell, isUniversalSupportSpell } from './universal-spells.js';
 // spell-casttime.js
 //------------------------------------------------------------------------
 //----------------------HOLD-TO-CAST (CAST BAR)---------------------------
@@ -56,7 +56,6 @@ function _getBaseSkillCastTimeSeconds(skillId) {
 // theme resolution of _holdCastTheme() below, which tints the same spells.
 function _isFireSpell(skillId) {
     try {
-        if (skillId === 'fireball') return true;
         const def = getSkillDef(skillId);
         if (!def) return false;
         if (def.element === 'fire') return true;
@@ -137,9 +136,40 @@ export function getSkillCastTimeSeconds(skillId) {
 }
 
 
+// Sustained kinds that ride on the hold machinery: 'channel' (fires every
+// tick while held, mana drains) and 'charge' (power builds while held, fires
+// on release). Null for everything else. Toggles are plain taps.
+function _sustainedKind(skillId) {
+    try {
+        const def = getSkillDef(skillId);
+        if (def && def.slotKind === 'universal' && def.usp) {
+            const k = getUniversalSpellCastKind(def.usp);
+            if (k === 'channel' || k === 'charge') return k;
+        }
+    } catch (e) { /* plain cast */ }
+    return null;
+}
+
+function _channelTickSeconds(skillId) {
+    try {
+        const def = getSkillDef(skillId);
+        if (def && def.usp && def.usp.channel && def.usp.channel.tickSeconds > 0) return def.usp.channel.tickSeconds;
+    } catch (e) { /* default */ }
+    return 0.5;
+}
+
+function _chargeConfig(skillId) {
+    const dflt = { minFrac: 0.2, minPower: 0.6, maxPower: 1.5 };
+    try {
+        const def = getSkillDef(skillId);
+        if (def && def.usp && def.usp.charge) return Object.assign(dflt, def.usp.charge);
+    } catch (e) { /* default */ }
+    return dflt;
+}
+
 // True when the skill needs hold-to-cast instead of a plain click.
 export function isSkillHoldCast(skillId) {
-    return getSkillCastTimeSeconds(skillId) > 0.05;
+    return getSkillCastTimeSeconds(skillId) > 0.05 || _sustainedKind(skillId) === 'channel';
 }
 
 
@@ -169,7 +199,6 @@ const SPELL_CAST_THEME_COLORS = {
 // theme, everything else → arcane).
 function _holdCastTheme(skillId) {
     try {
-        if (skillId === 'fireball') return 'fire';
         const def = getSkillDef(skillId);
         if (def && def.usp && def.usp.theme) return def.usp.theme;
     } catch (e) { /* fall through */ }
@@ -191,8 +220,7 @@ function _holdCastCanBegin(skillId) {
 
         const def = getSkillDef(skillId);
         const isUniversal = !!def && def.slotKind === 'universal';
-        const isFireball = skillId === 'fireball';
-        if (isUniversal || isFireball) {
+        if (isUniversal) {
             let encounterOn = false;
             try { encounterOn = (typeof globalThis._egIsActive === 'function') && globalThis._egIsActive(); } catch (e) {}
             if (!encounterOn) return false;
@@ -202,6 +230,8 @@ function _holdCastCanBegin(skillId) {
             try {
                 if (isUniversalSupportSpell(def.usp)) selfCast = true;
                 if (isUniversalMovementSpell(def.usp)) selfCast = true;
+                // Melee swings need the fight, not a selected target.
+                if (getUniversalSpellCastKind(def.usp) === 'melee') selfCast = true;
             } catch (e) {}
             if (!selfCast) {
                 let target = null;
@@ -230,7 +260,10 @@ export function tryBeginHoldCast(skillId, slotIndex, source) {
     if (_holdCast) cancelHoldCast();
     if (!_holdCastCanBegin(skillId)) return 'refused';
 
-    const secs = getSkillCastTimeSeconds(skillId);
+    const mode = _sustainedKind(skillId) || 'cast';
+    // cast: the bar fills once. charge: the bar is the charge (full = max
+    // power). channel: the bar sweeps once per tick.
+    const secs = (mode === 'channel') ? _channelTickSeconds(skillId) : getSkillCastTimeSeconds(skillId);
     const theme = _holdCastTheme(skillId);
     let name = skillId;
     try {
@@ -238,8 +271,9 @@ export function tryBeginHoldCast(skillId, slotIndex, source) {
     } catch (e) {}
 
     _holdCast = {
-        skillId, slotIndex, source: source || 'pointer',
-        secs, elapsed: 0, held: true, lastTs: performance.now(),
+        skillId, slotIndex, source: source || 'pointer', mode, ticks: 0,
+        // a channel fires its first tick on the first frame
+        secs, elapsed: (mode === 'channel') ? secs : 0, held: true, lastTs: performance.now(),
         raf: null, name, theme,
         startX: null, startY: null,
     };
@@ -265,6 +299,13 @@ function releaseHoldCast(source, slotIndex) {
     if (!h || h.source !== source) return;
     if (typeof slotIndex === 'number' && h.slotIndex !== slotIndex) return;
     h.held = false;
+    if (h.mode === 'channel') { cancelHoldCast(); return; }   // ends the channel + cooldown
+    if (h.mode === 'charge') {
+        const frac = Math.min(1, h.elapsed / h.secs);
+        if (frac >= _chargeConfig(h.skillId).minFrac) finishChargeCast(h, frac);
+        else cancelHoldCast();
+        return;
+    }
     if (h.elapsed >= h.secs) finishHoldCast();
     else cancelHoldCast();
 }
@@ -276,6 +317,27 @@ export function cancelHoldCast() {
     _holdCast = null;
     _holdCastHide(true);
     if (h) _holdCastMarkSlot(h.skillId, false);
+    // A channel that already fired is a real cast: its cooldown starts now.
+    if (h && h.mode === 'channel') {
+        try { endUniversalChannel(h.skillId, h.ticks); } catch (e) { /* best-effort */ }
+    }
+}
+
+
+// Releases a charge: fires through the normal activation path with the power
+// the hold earned (pays mana, starts the cooldown like any other cast).
+function finishChargeCast(h, frac) {
+    _holdCast = null;
+    _holdCastHide(false);
+    _holdCastMarkSlot(h.skillId, false);
+    try {
+        if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return;
+    } catch (e) { return; }
+    const c = _chargeConfig(h.skillId);
+    const power = c.minPower + (c.maxPower - c.minPower) * frac;
+    try {
+        activateSkill(h.skillId, { chargePower: power });
+    } catch (e) { /* cast is best-effort */ }
 }
 
 
@@ -310,10 +372,23 @@ function _holdCastTick() {
     const now = performance.now();
     const dt = Math.min(0.1, Math.max(0, (now - h.lastTs) / 1000));
     h.lastTs = now;
-    if (!paused && h.held) h.elapsed += dt;
+    if (!paused && h.held) {
+        h.elapsed += dt;
+        if (h.mode === 'channel') {
+            let guard = 0;
+            while (h.elapsed >= h.secs && guard++ < 3) {
+                h.elapsed -= h.secs;
+                let fired = false;
+                try { fired = fireUniversalChannelTick(h.skillId, h.ticks === 0); } catch (e) { fired = false; }
+                if (!fired) { cancelHoldCast(); return; }
+                h.ticks++;
+            }
+        }
+    }
     const p = Math.min(1, h.elapsed / h.secs);
     _holdCastPaint(p, h.theme);
-    if (p >= 1) { finishHoldCast(); return; }
+    // Only a plain cast completes by itself; a charge waits for the release.
+    if (p >= 1 && h.mode === 'cast') { finishHoldCast(); return; }
     h.raf = requestAnimationFrame(_holdCastTick);
 }
 
@@ -446,6 +521,8 @@ function _holdCastPaint(p, theme) {
         const els = _holdCastBarEls();
         if (els.fill) els.fill.style.width = `${Math.round(p * 100)}%`;
         if (els.spark) els.spark.style.left = `${Math.round(p * 100)}%`;
+        // A fully drawn charge glows: it is at maximum power, release any time.
+        els.bar.classList.toggle('is-ready', !!_holdCast && _holdCast.mode === 'charge' && p >= 1);
         _holdCastPositionBar();
         const orb = document.getElementById('spell-charge-orb');
         if (orb) {
@@ -557,4 +634,363 @@ if (typeof document !== 'undefined' && !window._spellCasttimeWired) {
     document.addEventListener('pointercancel', _holdCastPointerUp, { capture: true });
     document.addEventListener('pointermove', _holdCastPointerMove, { capture: true });
     document.addEventListener('keydown', _holdCastKeydownForget, { capture: true });
+}
+
+
+//------------------------------------------------------------------------
+//------------------------GROUND-TARGETED SPELLS--------------------------
+//------------------------------------------------------------------------
+// The "tap the key, aim with the mouse, click to place it" cast kind (spell
+// pass 1). Lives beside the hold-to-cast code because both are "how a spell
+// gets from key press to effect".
+//
+//   1. Tapping the hotbar key arms a targeting reticle in the spell's SHAPE
+//      (circle / square / beam / cone) that follows the cursor.
+//   2. A left click places the effect; right click, Escape, or tapping any
+//      other spell cancels. Cancelling is free - mana and cooldown are only
+//      spent when the click lands (universal-spells.js re-runs its normal
+//      gates inside the confirm callback).
+//   3. While armed, clicks are swallowed in the CAPTURE phase so aiming never
+//      fills a puzzle cell by accident (hotbar slots and modals pass through).
+//
+// This section owns the geometry, the reticle DOM, the click capture and the
+// zone visuals, and talks to the spell engine through the callbacks handed to
+// beginSpellTargeting(). It also keeps the last known cursor position, which
+// the move-to-cursor family (Blink, Dash, Disengage) reads - getCursorPoint().
+//------------------------------------------------------------------------
+
+//------------------------------------------------------------------------
+//-----------------------------CURSOR TRACKING----------------------------
+//------------------------------------------------------------------------
+
+let _stgCursor = null;   // { x, y } in viewport px, or null before any movement
+
+function _stgTrackCursor(e) {
+    if (typeof e.clientX !== 'number') return;
+    _stgCursor = { x: e.clientX, y: e.clientY };
+}
+
+// Last known pointer position, or null when the mouse has not moved yet
+// (touch-only play) - callers fall back to the walking direction.
+export function getCursorPoint() {
+    return _stgCursor ? { x: _stgCursor.x, y: _stgCursor.y } : null;
+}
+
+
+//------------------------------------------------------------------------
+//--------------------------------GEOMETRY--------------------------------
+//------------------------------------------------------------------------
+// A shape spec (authored per spell, in "design px"):
+//   { kind: 'circle', radius }
+//   { kind: 'square', radius }             half-side, so 2r x 2r
+//   { kind: 'beam',   length, width }      from the caster through the cursor
+//   { kind: 'cone',   length, angle }      apex at the caster, full angle deg
+// resolveGroundShape() scales it to the current viewport so a spell covers
+// about the same share of the arena on any window size; the reticle and the
+// hit test both read the SAME resolved shape, so what you see is what hits.
+
+// Design resolution the authored sizes assume (a typical 16:9 laptop window).
+const STG_DESIGN_W = 1366;
+const STG_DESIGN_H = 768;
+
+function _stgViewScale() {
+    if (typeof window === 'undefined') return 1;
+    const s = Math.min(window.innerWidth / STG_DESIGN_W, window.innerHeight / STG_DESIGN_H);
+    return Math.max(0.75, Math.min(1.5, s || 1));
+}
+
+export function resolveGroundShape(spec) {
+    if (!spec) return null;
+    const s = _stgViewScale();
+    const kind = spec.kind || 'circle';
+    switch (kind) {
+        case 'square':
+            return { kind, radius: (spec.radius || 90) * s };
+        case 'beam':
+            return { kind, length: (spec.length || 520) * s, width: (spec.width || 70) * s };
+        case 'cone':
+            return { kind, length: (spec.length || 380) * s, angle: spec.angle || 70 };
+        default:
+            return { kind: 'circle', radius: (spec.radius || 100) * s };
+    }
+}
+
+// True when a monster card rect (viewport px, DOMRect-like) overlaps the
+// shape. `point` is the aimed position, `origin` the caster (beam / cone).
+export function shapeHitsRect(shape, point, origin, r) {
+    if (!shape || !point || !r) return false;
+    const left = r.left, top = r.top, right = r.right, bottom = r.bottom;
+    const cx = (left + right) / 2;
+    const cy = (top + bottom) / 2;
+    const halfMin = Math.min(right - left, bottom - top) / 2;
+    const halfDiag = Math.hypot(right - left, bottom - top) / 2;
+
+    if (shape.kind === 'circle') {
+        const nx = Math.max(left, Math.min(point.x, right));
+        const ny = Math.max(top, Math.min(point.y, bottom));
+        return Math.hypot(point.x - nx, point.y - ny) <= shape.radius;
+    }
+    if (shape.kind === 'square') {
+        return right >= point.x - shape.radius && left <= point.x + shape.radius
+            && bottom >= point.y - shape.radius && top <= point.y + shape.radius;
+    }
+    if (!origin) return false;
+    let ux = point.x - origin.x;
+    let uy = point.y - origin.y;
+    const ulen = Math.hypot(ux, uy);
+    if (ulen < 1) { ux = 1; uy = 0; } else { ux /= ulen; uy /= ulen; }
+    const vx = cx - origin.x;
+    const vy = cy - origin.y;
+
+    if (shape.kind === 'beam') {
+        const t = Math.max(0, Math.min(shape.length, vx * ux + vy * uy));
+        const px = origin.x + ux * t;
+        const py = origin.y + uy * t;
+        return Math.hypot(cx - px, cy - py) <= shape.width / 2 + halfMin;
+    }
+    if (shape.kind === 'cone') {
+        const d = Math.hypot(vx, vy);
+        if (d > shape.length + halfDiag) return false;
+        if (d <= halfDiag) return true;            // sitting on the apex
+        const ang = Math.acos(Math.max(-1, Math.min(1, (vx * ux + vy * uy) / d)));
+        const slack = Math.asin(Math.min(1, halfDiag / d));
+        return (ang - slack) <= (shape.angle * Math.PI / 360);
+    }
+    return false;
+}
+
+
+//------------------------------------------------------------------------
+//------------------------------SHAPE ELEMENTS----------------------------
+//------------------------------------------------------------------------
+
+const STG_THEME_COLORS = {
+    fire: '#ff7a2f', frost: '#7fd9ff', arcane: '#c792ff', shadow: '#a678ff',
+    holy: '#ffd76b', nature: '#7fe0a0', lightning: '#ffe45e',
+    blade: '#cfd6e4', arrow: '#b5e07f',
+};
+
+// Caster centre in viewport px (beam / cone origin), or null.
+export function getAvatarCentre() {
+    try {
+        if (typeof document === 'undefined') return null;
+        const el = document.getElementById('player-avatar-wrapper')
+            || document.getElementById('player-avatar-simple')
+            || document.getElementById('class-hud-drag-handle');
+        if (!el) return null;
+        if (typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(el);
+        const r = el.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    } catch (e) { return null; }
+}
+
+// Lays an element out as the shape: position, size and rotation. Beam / cone
+// are anchored at the caster and rotate towards the aimed point.
+function _stgLayoutShape(el, shape, point, origin) {
+    el.classList.remove('stg-circle', 'stg-square', 'stg-beam', 'stg-cone');
+    el.style.transform = '';
+    el.style.clipPath = '';
+    if (shape.kind === 'circle' || shape.kind === 'square') {
+        const d = shape.radius * 2;
+        el.classList.add(shape.kind === 'circle' ? 'stg-circle' : 'stg-square');
+        el.style.left = `${point.x - shape.radius}px`;
+        el.style.top = `${point.y - shape.radius}px`;
+        el.style.width = `${d}px`;
+        el.style.height = `${d}px`;
+        return;
+    }
+    const o = origin || point;
+    const ang = Math.atan2(point.y - o.y, point.x - o.x);
+    if (shape.kind === 'beam') {
+        el.classList.add('stg-beam');
+        el.style.left = `${o.x}px`;
+        el.style.top = `${o.y - shape.width / 2}px`;
+        el.style.width = `${shape.length}px`;
+        el.style.height = `${shape.width}px`;
+    } else {
+        const h = 2 * shape.length * Math.tan(shape.angle * Math.PI / 360);
+        el.classList.add('stg-cone');
+        el.style.left = `${o.x}px`;
+        el.style.top = `${o.y - h / 2}px`;
+        el.style.width = `${shape.length}px`;
+        el.style.height = `${h}px`;
+        el.style.clipPath = 'polygon(0 50%, 100% 0, 100% 100%)';
+    }
+    el.style.transform = `rotate(${ang}rad)`;
+}
+
+function _stgThemeColor(theme) {
+    return STG_THEME_COLORS[theme] || STG_THEME_COLORS.arcane;
+}
+
+// Drops a self-removing zone visual where a ground spell landed.
+//   mode 'telegraph'  pulsing warning until `ms`, then gone (delayed spells)
+//   mode 'burst'      quick flash (instant blasts)
+//   mode 'zone'       steady glowing field for `ms` (damage-over-time ground)
+export function showSpellZone(shape, point, origin, theme, ms, mode) {
+    if (typeof document === 'undefined' || !shape || !point) return null;
+    try {
+        const el = document.createElement('div');
+        el.className = `stg-zone stg-zone-${mode || 'burst'}`;
+        el.style.setProperty('--stg-color', _stgThemeColor(theme));
+        _stgLayoutShape(el, shape, point, origin);
+        document.body.appendChild(el);
+        setTimeout(() => { try { el.remove(); } catch (e) { /* already gone */ } }, Math.max(200, ms || 700));
+        return el;
+    } catch (e) { return null; }
+}
+
+
+//------------------------------------------------------------------------
+//-------------------------------TARGETING MODE---------------------------
+//------------------------------------------------------------------------
+
+let _stgActive = null;   // { id, shape, theme, onConfirm, onCancel, reticle, hint, raf }
+
+// True while the reticle is armed (optionally for one specific spell id).
+export function isSpellTargeting(id) {
+    if (!_stgActive) return false;
+    return id === undefined || _stgActive.id === id;
+}
+
+function _stgEnsureReticle() {
+    const el = document.createElement('div');
+    el.id = 'spell-target-reticle';
+    el.className = 'stg-reticle';
+    document.body.appendChild(el);
+    return el;
+}
+
+function _stgPaint() {
+    const a = _stgActive;
+    if (!a) return;
+    const p = _stgCursor || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    _stgLayoutShape(a.reticle, a.shape, p, getAvatarCentre());
+    if (a.hint) {
+        a.hint.style.left = `${p.x}px`;
+        a.hint.style.top = `${p.y}px`;
+    }
+}
+
+function _stgLoop() {
+    if (!_stgActive) return;
+    _stgPaint();
+    _stgActive.raf = requestAnimationFrame(_stgLoop);
+}
+
+// Anything that is not part of the playfield keeps working while aiming: the
+// hotbar (tapping another spell swaps / cancels) and open modals.
+function _stgPassesThrough(e) {
+    const t = e.target;
+    if (!t || !t.closest) return false;
+    return !!t.closest('#skill-hotbar, .modal-bg, .modal-box, #pause-overlay');
+}
+
+// Capture-phase handler for every pointer event while armed.
+function _stgOnPointer(e) {
+    if (!_stgActive || _stgPassesThrough(e)) return;
+    if (e.type === 'pointerdown') {
+        _stgTrackCursor(e);
+        const a = _stgActive;
+        if (e.button === 2) {                    // right click: cancel
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            cancelSpellTargeting();
+            return;
+        }
+        if (e.button === 0) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            const point = { x: e.clientX, y: e.clientY };
+            _stgEnd(true);
+            try { a.onConfirm && a.onConfirm(point); } catch (err) { /* cast is best-effort */ }
+            return;
+        }
+    }
+    // Every other pointer / mouse / click event is swallowed so the grid under
+    // the reticle never sees the aiming click.
+    e.preventDefault();
+    e.stopImmediatePropagation();
+}
+
+function _stgOnKey(e) {
+    if (!_stgActive) return;
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        cancelSpellTargeting();
+    }
+}
+
+const STG_SWALLOWED_EVENTS = ['pointerdown', 'pointerup', 'mousedown', 'mouseup', 'click', 'dblclick', 'contextmenu', 'auxclick'];
+
+// Tears the mode down. `confirmed` keeps swallowing the trailing mouseup /
+// click of the confirming press for a moment so it cannot reach the grid.
+function _stgEnd(confirmed) {
+    const a = _stgActive;
+    if (!a) return;
+    _stgActive = null;
+    STG_SWALLOWED_EVENTS.forEach((n) => document.removeEventListener(n, _stgOnPointer, true));
+    document.removeEventListener('keydown', _stgOnKey, true);
+    if (a.raf) cancelAnimationFrame(a.raf);
+    try { a.reticle.remove(); } catch (e) { /* already gone */ }
+    try { if (a.hint) a.hint.remove(); } catch (e) { /* already gone */ }
+    document.body.classList.remove('spell-targeting');
+
+    if (confirmed) {
+        const swallow = (ev) => { ev.stopImmediatePropagation(); };
+        ['pointerup', 'mouseup', 'click'].forEach((n) => document.addEventListener(n, swallow, true));
+        setTimeout(() => {
+            ['pointerup', 'mouseup', 'click'].forEach((n) => document.removeEventListener(n, swallow, true));
+        }, 350);
+    }
+}
+
+// Cancels the armed reticle (no cost - nothing was spent yet).
+export function cancelSpellTargeting() {
+    const a = _stgActive;
+    if (!a) return false;
+    _stgEnd(false);
+    try { a.onCancel && a.onCancel(); } catch (e) { /* best-effort */ }
+    return true;
+}
+
+// Arms the reticle. Returns true when it armed. Any previous targeting is
+// cancelled first (one reticle at a time).
+//   opts: { id, spec, theme, name, hint, onConfirm(point), onCancel() }
+export function beginSpellTargeting(opts) {
+    if (typeof document === 'undefined' || !opts || !opts.spec) return false;
+    if (_stgActive) cancelSpellTargeting();
+    const shape = resolveGroundShape(opts.spec);
+    if (!shape) return false;
+
+    const reticle = _stgEnsureReticle();
+    reticle.style.setProperty('--stg-color', _stgThemeColor(opts.theme));
+    let hint = null;
+    if (opts.hint) {
+        hint = document.createElement('div');
+        hint.className = 'stg-hint';
+        hint.textContent = opts.hint;
+        document.body.appendChild(hint);
+    }
+    _stgActive = {
+        id: opts.id, shape, theme: opts.theme,
+        onConfirm: opts.onConfirm, onCancel: opts.onCancel,
+        reticle, hint, raf: 0,
+    };
+    STG_SWALLOWED_EVENTS.forEach((n) => document.addEventListener(n, _stgOnPointer, true));
+    document.addEventListener('keydown', _stgOnKey, true);
+    document.body.classList.add('spell-targeting');
+    _stgPaint();
+    _stgActive.raf = requestAnimationFrame(_stgLoop);
+    return true;
+}
+
+//------------------------------------------------------------------------
+//--------------------------------BOOTSTRAP-------------------------------
+//------------------------------------------------------------------------
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('pointermove', _stgTrackCursor, { passive: true, capture: true });
+    document.addEventListener('mousemove', _stgTrackCursor, { passive: true, capture: true });
 }

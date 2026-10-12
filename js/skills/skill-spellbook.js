@@ -38,6 +38,10 @@ function _ensureSpellbookOverlay() {
     overlay.innerHTML = `
         <div class="modal-box spellbook-box">
             <button class="modal-close" id="btn-spellbook-close">${t('reset_close')}</button>
+            <!-- "Max rank only" sits on the frame itself, top-left, level with
+                 the SPELLBOOK plaque and above the CHARMS header (filled by
+                 renderSpellbookCharmPanel). -->
+            <div class="sb3-frame-filter" id="spellbook-filter"></div>
             <div class="spellbook-plaque">
                 <span class="spellbook-plaque-text">${t('spellbook_title')}</span>
             </div>

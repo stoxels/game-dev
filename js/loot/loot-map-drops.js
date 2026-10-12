@@ -88,7 +88,8 @@ export function _egAddMapToMapStash(item, tierOverride) {
 // PoE-style sustain: while running a map the drop chance is multiplied by the
 // active map's Quantity bonus (EG_MAP_MOD_REWARDS.quantity). Harder maps
 // (more / higher-tier mods) therefore sustain maps much better.
-export function _egTryDropMap(isBoss, monsterLevel) {
+// force - skip the chance roll (the kill handler already picked this bucket).
+export function _egTryDropMap(isBoss, monsterLevel, force = false) {
     // PoE-style: map items only drop from monsters level 55 or higher
     // (allows drops in late campaign: World 13 EXPECTATION PLATEAU and Nexus World)
     const MIN_MONSTER_LEVEL_FOR_MAP_DROPS = 55;
@@ -125,7 +126,7 @@ export function _egTryDropMap(isBoss, monsterLevel) {
     }
 
     const baseChance = Math.min(1, EG_MAP_DROP_CHANCE_NORMAL * qtyMult);
-    if (Math.random() > baseChance) return;
+    if (!force && Math.random() > baseChance) return;
 
     const map = _egGenerateMapDrop(monsterLevel, null, { atlasNodeId: targetNodeId });
     if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(map);

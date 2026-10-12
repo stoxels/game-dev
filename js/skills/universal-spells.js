@@ -4,10 +4,11 @@ import { LANG, t } from '../translation/translations.js';
 import { _getGlobalCooldownReduction } from '../classes/class-cooldown-state.js';
 import { _egApplyDamageConversion, _egHasDamageConversion, _egLeechAbsorption, _egLeechHealMult } from '../combat/combat-calculations-resistances.js';
 import { _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost } from '../classes/class-mana.js';
-import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill } from './skill-charms.js';
+import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
 import { SKILL_REGISTRY } from './skill-registry.js';
-import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspBlinkFX, _uspFireThemedProjectile, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph } from './universal-spell-fx.js';
+import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspBlinkFX, _uspFireThemedProjectile, _uspMoveSpriteOffset, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph } from './universal-spell-fx.js';
+import { beginSpellTargeting, cancelSpellTargeting, getAvatarCentre, getCursorPoint, isSpellTargeting, resolveGroundShape, shapeHitsRect, showSpellZone } from './spell-casttime.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
 
@@ -23,8 +24,8 @@ import { STATE } from '../state.js';
 //   - plays a code-drawn themed effect (see universal-spell-fx.js +
 //     css/universal-spells.css - no emoji in combat visuals).
 //
-// The tutorial Fireball (id 'fireball', tutorial-quest.js) stays untouched;
-// these 36 spells extend the same universal-spell idea to a full arsenal
+// Fireball (usp_fireball) is the first spell of the arsenal - the tutorial
+// just grants its rank-1 charm. The rest extend the same universal-spell idea to a full arsenal
 // (24 elemental + 6 physical melee + 6 arrows).
 //
 // DESIGN CONTRACT (for the future Probability Tree scaling pass):
@@ -45,6 +46,24 @@ import { STATE } from '../state.js';
 //                  'delayed' | 'starfall' | 'wild'. Drives cast + FX, never
 //                  balance. 'wild' = Spark-style random-target projectiles.
 //
+// CAST KINDS (spell pass 1) - how a spell is cast, from getUniversalSpellCastKind():
+//     'hold'    hold the key / slot; the cast bar fills, release fires it
+//               (castTimeSeconds > 0 - spell-casttime.js). Cancel by releasing early.
+//     'instant' tap: the effect lands on the TARGETED monster, no cast time.
+//     'self'    tap: the effect lands on the PLAYER (heals, shields, buffs).
+//     'move'    tap: the player moves towards the CURSOR (Blink, Dash,
+//               Disengage - Disengage goes directly AWAY from it).
+//     'melee'   the effect plays NEXT TO THE PLAYER (a cone in front, or a
+//               ring around) and the surroundings are then checked for what
+//               it actually hit. No target needed; whiffing is possible.
+//               May be instant or carry a cast time (hold).
+//     'ground'  tap: a shaped reticle (circle / square / beam / cone, see
+//               `ground` on the def) follows the cursor; left click places
+//               the effect, right click / Esc cancels. Mana and cooldown are
+//               spent on the click, not on the tap (spell-targeting.js).
+//   The assignment lives in USP_CAST_KIND_TABLE below the defs - one place to
+//   retune "which spells feel how".
+//
 // LOCKING (future-gating infrastructure, all open for now):
 //   STATE.universalSpellsUnlocked === null/undefined → everything unlocked.
 //   Set it to an array of ids to lock everything else behind whatever
@@ -64,6 +83,18 @@ import { STATE } from '../state.js';
 
 export const UNIVERSAL_SPELL_DEFS = [
     // ── FIRE ────────────────────────────────────────────────────────────
+    {
+        // The starter spell: the tutorial hands out its rank-1 charm. A
+        // 1.0s cast bar and ~18 damage (the numbers the old tutorial-only
+        // Fireball had), cheap enough to be the first spell you learn.
+        id: 'usp_fireball', icon: '🔥', theme: 'fire', element: 'fire', damageKind: 'fire',
+        behavior: 'single', dmg: [16, 20], manaCost: 16, cooldownSeconds: 4, castTimeSeconds: 1.0,
+        tags: ['Spell', 'Fire', 'Projectile'], scalingTags: ['spell', 'fire', 'projectile'],
+        nameEn: 'Fireball', nameDE: 'Feuerball',
+        descEn: 'Hurls a searing fireball at the targeted creature, dealing fire damage.',
+        descDE: 'Wirft einen glühenden Feuerball auf das anvisierte Monster und verursacht Feuerschaden.',
+        sfx: 'dofBurn',
+    },
     {
         id: 'usp_pyroblast', icon: '☄️', theme: 'fire', element: 'fire', damageKind: 'fire',
         behavior: 'single', dmg: [19, 24], manaCost: 51, cooldownSeconds: 22, castTimeSeconds: 2.0,
@@ -96,8 +127,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'delayed', dmg: [20, 27], delayMs: 900, manaCost: 53, cooldownSeconds: 24, castTimeSeconds: 1.6,
         tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area'],
         nameEn: 'Meteor', nameDE: 'Meteor',
-        descEn: 'A meteor crashes from the sky after a short delay, crushing the target for massive fire damage.',
-        descDE: 'Nach kurzer Verzögerung schlägt ein Meteor ein und zerschmettert das Ziel mit gewaltigem Feuerschaden.',
+        descEn: 'A meteor crashes onto the spot you aim at after a short delay, crushing everything under it for massive fire damage.',
+        descDE: 'Ein Meteor schlägt nach kurzer Verzögerung an der anvisierten Stelle ein und zerschmettert alles darunter mit gewaltigem Feuerschaden.',
         sfx: 'drifterExplosion',
     },
     {
@@ -105,8 +136,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
         tags: ['Spell', 'Fire', 'Area', 'Damage over Time'], scalingTags: ['spell', 'fire', 'area', 'dot'],
         nameEn: 'Rain of Fire', nameDE: 'Feuerregen',
-        descEn: 'Burning embers rain down for 4 seconds, striking EVERY enemy each second.',
-        descDE: 'Brennende Glut regnet 4 Sekunden lang herab und trifft JEGLICHEN Gegner pro Sekunde.',
+        descEn: 'Burning embers rain onto the ground you aim at for 4 seconds, striking every enemy inside it each second.',
+        descDE: 'Brennende Glut regnet 4 Sekunden lang auf die anvisierte Fläche und trifft jeden Gegner darin pro Sekunde.',
         sfx: 'drifterExplosion',
     },
 
@@ -125,8 +156,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
         tags: ['Spell', 'Cold', 'Area', 'Damage over Time'], scalingTags: ['spell', 'cold', 'area', 'dot'],
         nameEn: 'Blizzard', nameDE: 'Blizzard',
-        descEn: 'A freezing storm rages for 4 seconds, battering EVERY enemy each second.',
-        descDE: 'Ein Eissturm tobt 4 Sekunden lang und trifft JEGLICHEN Gegner pro Sekunde.',
+        descEn: 'A freezing storm rages on the ground you aim at for 4 seconds, battering every enemy inside it each second.',
+        descDE: 'Ein Eissturm tobt 4 Sekunden lang auf der anvisierten Fläche und trifft jeden Gegner darin pro Sekunde.',
         sfx: 'time_freeze',
     },
     {
@@ -134,8 +165,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'nova', dmg: [5, 8], manaCost: 36, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Cold', 'Area'], scalingTags: ['spell', 'cold', 'area'],
         nameEn: 'Cone of Cold', nameDE: 'Kältekegel',
-        descEn: 'A cone of freezing wind blasts EVERY enemy on the battlefield.',
-        descDE: 'Ein Kegel aus Eiswind trifft ALLE Gegner auf dem Schlachtfeld.',
+        descEn: 'A cone of freezing wind blasts from you towards the cursor, hitting every enemy inside it.',
+        descDE: 'Ein Kegel aus Eiswind fährt von dir Richtung Cursor und trifft jeden Gegner darin.',
         sfx: 'absoluteZero',
     },
     {
@@ -181,8 +212,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'volley', dmg: [4, 6], count: 4, volleyDelayMs: 260, manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0,
         tags: ['Spell', 'Arcane', 'Channel'], scalingTags: ['spell', 'arcane', 'channel'],
         nameEn: 'Disintegrate', nameDE: 'Desintegration',
-        descEn: 'Channels a beam of unraveling energy, striking the target 4 times in rapid succession.',
-        descDE: 'Kanalisiert einen Strahl auflösender Energie: 4 Treffer in schneller Folge.',
+        descEn: 'Channels a beam of unraveling energy along a line to the cursor, striking everything on it 4 times in rapid succession.',
+        descDE: 'Kanalisiert einen Strahl auflösender Energie entlang einer Linie zum Cursor: 4 Treffer in schneller Folge auf alles darauf.',
         sfx: 'transitionCascade',
     },
 
@@ -286,8 +317,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 3, hitsAll: true, manaCost: 44, cooldownSeconds: 20, castTimeSeconds: 1.0,
         tags: ['Spell', 'Holy', 'Area', 'Damage over Time'], scalingTags: ['spell', 'holy', 'area', 'dot'],
         nameEn: 'Consecration', nameDE: 'Weihe',
-        descEn: 'Consecrates the ground for 3 seconds, searing EVERY enemy each second.',
-        descDE: 'Weiht den Boden für 3 Sekunden: JEGLICHER Gegner wird pro Sekunde versengt.',
+        descEn: 'Consecrates the ground you aim at for 3 seconds, searing every enemy standing in it each second.',
+        descDE: 'Weiht die anvisierte Fläche 3 Sekunden lang: Jeder Gegner darin wird pro Sekunde versengt.',
         sfx: 'holyHealing',
     },
 
@@ -299,8 +330,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'single', dmg: [11, 13], manaCost: 23, cooldownSeconds: 7, castTimeSeconds: 0.6,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Heroic Strike', nameDE: 'Heroischer Stoß',
-        descEn: 'A mighty empowered strike. Reliable physical damage for modest mana.',
-        descDE: 'Ein gewaltiger verstärkter Hieb. Verlässlicher physischer Schaden für wenig Mana.',
+        descEn: 'A mighty empowered strike in front of you. Reliable physical damage for modest mana, instantly - hits whatever is in reach, no target needed.',
+        descDE: 'Ein gewaltiger verstärkter Hieb vor dir. Verlässlicher physischer Schaden für wenig Mana, sofort - trifft, was in Reichweite ist, ohne Ziel.',
         sfx: 'cleave',
     },
     {
@@ -308,8 +339,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'single', dmg: [17, 23], manaCost: 49, cooldownSeconds: 20, castTimeSeconds: 1.4,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Mortal Strike', nameDE: 'Tödlicher Stoß',
-        descEn: 'A devastating blow that crushes the target for heavy physical damage.',
-        descDE: 'Ein verheerender Hieb, der das Ziel mit schwerem physischem Schaden zerschmettert.',
+        descEn: 'Wind up and bring the blade down in front of you: a devastating blow that crushes whatever is in reach for heavy physical damage.',
+        descDE: 'Hol aus und lass die Klinge vor dir niedergehen: ein verheerender Hieb, der alles in Reichweite mit schwerem physischem Schaden zerschmettert.',
         sfx: 'diagonalStrike',
     },
     {
@@ -317,8 +348,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'nova', dmg: [5, 9], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Whirlwind', nameDE: 'Wirbelwind',
-        descEn: 'Spin into a steel storm, slashing EVERY enemy on the battlefield.',
-        descDE: 'Wirble in einem Stahlsturm und triff ALLE Gegner auf dem Schlachtfeld.',
+        descEn: 'Spin into a steel storm around you, slashing EVERY enemy within reach.',
+        descDE: 'Wirble in einem Stahlsturm um dich herum und triff JEDEN Gegner in Reichweite.',
         sfx: 'cleave',
     },
     {
@@ -326,8 +357,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'ticks', dmg: [3, 4], tickDmg: [2, 4], ticks: 5, manaCost: 31, cooldownSeconds: 14, castTimeSeconds: 0.7,
         tags: ['Spell', 'Physical', 'Damage over Time'], scalingTags: ['spell', 'physical', 'dot'],
         nameEn: 'Rend', nameDE: 'Verwunden',
-        descEn: 'Rips the target open: instant damage plus bleeding over 5 seconds.',
-        descDE: 'Reißt das Ziel auf: sofortiger Schaden plus 5 Sekunden Blutung.',
+        descEn: 'Rips open whatever is in front of you: instant damage plus bleeding over 5 seconds.',
+        descDE: 'Reißt auf, was vor dir steht: sofortiger Schaden plus 5 Sekunden Blutung.',
         sfx: 'diagonalStrike',
     },
     {
@@ -335,8 +366,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'single', dmg: [20, 27], manaCost: 53, cooldownSeconds: 24, castTimeSeconds: 1.8,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Execute', nameDE: 'Hinrichten',
-        descEn: 'A finishing execution. The hardest-hitting physical strike in the arsenal.',
-        descDE: 'Eine finale Hinrichtung. Der härteste physische Hieb des Arsenals.',
+        descEn: 'A finishing execution in front of you. The hardest-hitting physical strike in the arsenal.',
+        descDE: 'Eine finale Hinrichtung vor dir. Der härteste physische Hieb des Arsenals.',
         sfx: 'diagonalStrike',
     },
     {
@@ -344,8 +375,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'nova', dmg: [5, 8], manaCost: 36, cooldownSeconds: 16, castTimeSeconds: 0.8, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Cleave', nameDE: 'Spalten',
-        descEn: 'A sweeping arc of steel that cleaves EVERY enemy on the battlefield.',
-        descDE: 'Ein weiter Stahlbogen, der ALLE Gegner auf dem Schlachtfeld spaltet.',
+        descEn: 'A wide arc of steel in front of you that cleaves every enemy inside it. Instant.',
+        descDE: 'Ein weiter Stahlbogen vor dir, der jeden Gegner darin spaltet. Sofort.',
         sfx: 'cleave',
     },
 
@@ -364,8 +395,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'nova', dmg: [5, 8], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area', 'projectile'],
         nameEn: 'Multi-Shot', nameDE: 'Mehrfachschuss',
-        descEn: 'A fan of arrows that rains onto EVERY enemy on the battlefield.',
-        descDE: 'Ein Pfeilfächer, der auf ALLE Gegner auf dem Schlachtfeld niedergeht.',
+        descEn: 'A fan of arrows loosed towards the cursor that rains onto every enemy inside the cone.',
+        descDE: 'Ein Pfeilfächer Richtung Cursor, der auf jeden Gegner im Kegel niedergeht.',
         sfx: 'precisionMark',
     },
     {
@@ -382,8 +413,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'ticks', dmg: [3, 5], tickDmg: [4, 6], ticks: 4, hitsAll: true, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
         tags: ['Spell', 'Physical', 'Area', 'Damage over Time'], scalingTags: ['spell', 'physical', 'area', 'dot'],
         nameEn: 'Volley', nameDE: 'Salve',
-        descEn: 'Arrows darken the sky for 4 seconds, striking EVERY enemy each second.',
-        descDE: 'Pfeile verdunkeln 4 Sekunden lang den Himmel und treffen JEGLICHEN Gegner pro Sekunde.',
+        descEn: 'Arrows darken the sky over the square you aim at for 4 seconds, striking every enemy inside it each second.',
+        descDE: 'Pfeile verdunkeln 4 Sekunden lang den Himmel über dem anvisierten Feld und treffen jeden Gegner darin pro Sekunde.',
         sfx: 'fieldScan',
     },
     {
@@ -400,8 +431,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'delayed', dmg: [20, 27], delayMs: 900, manaCost: 53, cooldownSeconds: 24, castTimeSeconds: 1.6,
         tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area', 'projectile'],
         nameEn: 'Explosive Shot', nameDE: 'Explosivschuss',
-        descEn: 'An explosive charge sticks to the target and detonates after a short delay.',
-        descDE: 'Eine Sprengladung haftet am Ziel und explodiert nach kurzer Verzögerung.',
+        descEn: 'Plants an explosive charge on the spot you aim at; it detonates after a short delay and hits every enemy in the blast.',
+        descDE: 'Platziert eine Sprengladung an der anvisierten Stelle; sie explodiert nach kurzer Verzögerung und trifft jeden Gegner in der Explosion.',
         sfx: 'drifterExplosion',
     },
 
@@ -514,8 +545,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 14, castTimeSeconds: 1.2,
         tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Crackling Lance', nameDE: 'Knisterlanze',
-        descEn: 'A focused lance of crackling energy. Heavy single-target lightning damage.',
-        descDE: 'Eine fokussierte Lanze aus knisternder Energie. Schwerer Blitzschaden.',
+        descEn: 'A focused lance of crackling energy fired along a line to the cursor. It pierces: every enemy on the line takes heavy lightning damage.',
+        descDE: 'Eine fokussierte Lanze aus knisternder Energie entlang einer Linie zum Cursor. Sie durchbohrt: Jeder Gegner auf der Linie erleidet schweren Blitzschaden.',
         sfx: 'gust_thunder',
     },
     {
@@ -590,8 +621,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'nova', dmg: [7, 9], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0, perTarget: true,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Reap', nameDE: 'Ernte',
-        descEn: 'A spectral scythe reaps EVERY enemy on the battlefield.',
-        descDE: 'Eine Geistersense erntet ALLE Gegner auf dem Schlachtfeld.',
+        descEn: 'A spectral scythe sweeps a wide arc and reaps EVERY enemy in it.',
+        descDE: 'Eine Geistersense fegt in einem weiten Bogen und erntet JEDEN Gegner darin.',
         sfx: 'cleave',
     },
     {
@@ -617,8 +648,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'ticks', dmg: [5, 6], tickDmg: [4, 5], ticks: 3, manaCost: 39, cooldownSeconds: 16, castTimeSeconds: 0.8,
         tags: ['Spell', 'Physical', 'Damage over Time'], scalingTags: ['spell', 'physical', 'dot'],
         nameEn: 'Blade Vortex', nameDE: 'Klingenwirbel',
-        descEn: 'Orbiting spirit blades shred the target instantly, then 3 more times.',
-        descDE: 'Kreisende Geistklingen zerfetzen das Ziel sofort und 3 weitere Male.',
+        descEn: 'Spirit blades orbit you, shredding every enemy within reach instantly, then 3 more times.',
+        descDE: 'Geistklingen umkreisen dich und zerfetzen jeden Gegner in Reichweite sofort und 3 weitere Male.',
         sfx: 'cleave',
     },
     {
@@ -626,8 +657,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'delayed', dmg: [19, 24], delayMs: 800, manaCost: 51, cooldownSeconds: 22, castTimeSeconds: 1.6,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Blade Blast', nameDE: 'Klingenexplosion',
-        descEn: 'Detonates a buried blade under the target after a short delay.',
-        descDE: 'Sprengt nach kurzer Verzögerung eine vergrabene Klinge unter dem Ziel.',
+        descEn: 'Detonates a buried blade on the spot you aim at after a short delay, hitting every enemy in the square.',
+        descDE: 'Sprengt nach kurzer Verzögerung eine vergrabene Klinge an der anvisierten Stelle und trifft jeden Gegner im Feld.',
         sfx: 'drifterExplosion',
     },
 
@@ -735,8 +766,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         moveBasePx: 220, movePxPerRank: 20, movePxCap: 400,
         tags: ['Spell', 'Arcane', 'Movement', 'Teleport'], scalingTags: ['spell', 'arcane', 'movement'],
         nameEn: 'Blink', nameDE: 'Blinzeln',
-        descEn: 'Tears a hole in space and steps through it instantly in the direction you were walking. Nothing on the path can touch you - the step is a teleport, not a sprint, so a pool of lava or a wall of projectiles on the way is simply not there. You can still land somewhere bad: blink into the wrong spot and the next hit finds you.',
-        descDE: 'Reißt ein Loch in den Raum und tritt sofort in die Richtung hindurch, in die du gelaufen bist. Auf dem Weg kann dich nichts treffen - der Schritt ist eine Teleportation, kein Sprint, also existiert ein Lavasee oder ein Projektilvorhang dazwischen schlicht nicht. Du kannst trotzdem falsch landen: Blinzel an die falsche Stelle und der nächste Treffer findet dich.',
+        descEn: 'Tears a hole in space and steps through it instantly to your cursor (up to its range). Nothing on the path can touch you - the step is a teleport, not a sprint, so a pool of lava or a wall of projectiles on the way is simply not there. You can still land somewhere bad: blink into the wrong spot and the next hit finds you.',
+        descDE: 'Reißt ein Loch in den Raum und tritt sofort zu deinem Cursor hindurch (bis zur Reichweite des Zaubers). Auf dem Weg kann dich nichts treffen - der Schritt ist eine Teleportation, kein Sprint, also existiert ein Lavasee oder ein Projektilvorhang dazwischen schlicht nicht. Du kannst trotzdem falsch landen: Blinzel an die falsche Stelle und der nächste Treffer findet dich.',
         sfx: 'classSelected',
     },
     {
@@ -748,8 +779,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         moveBasePx: 130, movePxPerRank: 8, movePxCap: 210,
         tags: ['Spell', 'Physical', 'Movement', 'Dash'], scalingTags: ['spell', 'physical', 'movement'],
         nameEn: 'Shadow Dash', nameDE: 'Schattensprint',
-        descEn: 'A short burst of speed along the ground you pick - cheap, fast to come back, and short enough that it will not cross the whole arena. Unlike Blink you still travel, so anything in the way still bites.',
-        descDE: 'Ein kurzer Geschwindigkeitsschub über den Boden deiner Wahl - günstig, schnell wieder bereit und zu kurz, um die ganze Arena zu überqueren. Anders als beim Blinzeln reist du tatsächlich, also beißt alles im Weg weiterhin zu.',
+        descEn: 'A short burst of speed towards your cursor (up to its range) - cheap, fast to come back, and short enough that it will not cross the whole arena. Unlike Blink you still travel, so anything in the way still bites.',
+        descDE: 'Ein kurzer Geschwindigkeitsschub in Richtung deines Cursors (bis zur Reichweite) - günstig, schnell wieder bereit und zu kurz, um die ganze Arena zu überqueren. Anders als beim Blinzeln reist du tatsächlich, also beißt alles im Weg weiterhin zu.',
         sfx: 'classSelected',
     },
     {
@@ -759,8 +790,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         moveBasePx: 190, movePxPerRank: 14, movePxCap: 320,
         tags: ['Spell', 'Physical', 'Movement', 'Leap'], scalingTags: ['spell', 'physical', 'movement'],
         nameEn: 'Disengage', nameDE: 'Rückzugssprung',
-        descEn: 'Leaps BACKWARD - opposite the direction you were walking - and the momentum carries into a short burst of foot speed. The escape tool: it creates distance even when the boss is between you and the exit.',
-        descDE: 'Springt RÜCKWÄRTS - entgegen der Richtung, in die du gelaufen bist - und der Schwung trägt in einen kurzen Laufschub. Das Fluchttalent: Es schafft Abstand, selbst wenn der Boss zwischen dir und dem Ausgang steht.',
+        descEn: 'Leaps directly AWAY from your cursor and the momentum carries into a short burst of foot speed. The escape tool: it creates distance even when the boss is between you and the exit.',
+        descDE: 'Springt direkt VOM CURSOR WEG und der Schwung trägt in einen kurzen Laufschub. Das Fluchttalent: Es schafft Abstand, selbst wenn der Boss zwischen dir und dem Ausgang steht.',
         sfx: 'classSelected',
     },
     {
@@ -787,6 +818,242 @@ export const UNIVERSAL_SPELL_DEFS = [
 
 export const UNIVERSAL_SPELL_MAP = {};
 UNIVERSAL_SPELL_DEFS.forEach((d) => { UNIVERSAL_SPELL_MAP[d.id] = d; });
+
+//------------------------------------------------------------------------
+//---------------------------CAST KIND TABLE------------------------------
+//------------------------------------------------------------------------
+// Everything not listed here keeps hold-to-cast (its castTimeSeconds above).
+// Sizes are "design px" (a 1366x768 window) and scale with the viewport -
+// see resolveGroundShape() in spell-targeting.js.
+//
+// Why these: INSTANT is the cheap, fast-cooldown bread-and-butter bolts and
+// the damage-over-time applications (a quick DoT you can weave in). GROUND is
+// the "place it" family - delayed impacts, storms / fields and the lines /
+// cones whose value is in where you aim. HOLD stays on the heavy single hits
+// and the all-enemy novas, where the cast bar is the price of the power.
+const USP_INSTANT_SPELLS = [
+    'usp_frostbolt', 'usp_ice_lance', 'usp_shadow_bolt', 'usp_lightning_bolt',
+    'usp_wrath', 'usp_smite',
+    'usp_corruption', 'usp_shadow_word_pain', 'usp_serpent_sting',
+    'usp_immolate', 'usp_holy_fire',
+];
+
+const USP_GROUND_SPELLS = {
+    // Delayed impacts: telegraph at the spot, strike after delayMs.
+    usp_meteor:         { kind: 'circle', radius: 115 },
+    usp_explosive_shot: { kind: 'circle', radius: 90 },
+    usp_blade_blast:    { kind: 'square', radius: 100 },
+    // Fields: damage everything inside once a second while the zone lasts.
+    usp_blizzard:       { kind: 'circle', radius: 150 },
+    usp_rain_of_fire:   { kind: 'circle', radius: 135 },
+    usp_arrow_volley:   { kind: 'square', radius: 140 },
+    // Cones from the caster towards the cursor.
+    usp_cone_of_cold:   { kind: 'cone', length: 420, angle: 70 },
+    usp_multi_shot:     { kind: 'cone', length: 460, angle: 55 },
+    // Beams from the caster through the cursor: pierce everything on the line.
+    usp_crackling_lance: { kind: 'beam', length: 620, width: 64 },
+};
+
+// MELEE: the effect is played beside the player and the area is checked for
+// victims (spell pass 1). reach is px from the caster (viewport-scaled like
+// ground shapes). `all` hits everything inside; without it only ONE victim
+// takes the hit - the selected monster when it is inside, else the nearest.
+// Cast times are untouched (instant stays instant, hold stays hold).
+const USP_MELEE_SPELLS = {
+    usp_heroic_strike: { kind: 'cone', reach: 210, angle: 80 },
+    usp_mortal_strike: { kind: 'cone', reach: 230, angle: 80 },
+    usp_execute:       { kind: 'cone', reach: 240, angle: 60 },
+    usp_rend:          { kind: 'cone', reach: 210, angle: 70 },
+    usp_cleave:        { kind: 'cone', reach: 250, angle: 110, all: true },
+    usp_reap:          { kind: 'cone', reach: 280, angle: 150, all: true },
+    usp_whirlwind:     { kind: 'circle', reach: 230, all: true },
+};
+
+// CHANNEL: hold the button and the spell keeps firing every tickSeconds, each
+// tick draining manaCost x tickSeconds mana (manaCost is mana PER SECOND for
+// these). It stops on release, when the mana runs out or when nothing is left
+// to hit; the cooldown starts when the channel ends. dmg is damage PER TICK.
+const USP_CHANNEL_SPELLS = {
+    usp_arcane_missiles: {
+        tickSeconds: 0.5, dmg: [2, 4], manaCost: 6, cooldownSeconds: 6,
+        descEn: 'Hold the button to channel a stream of arcane missiles at your target, one every half second, for as long as you keep holding and have mana to pay for it. Release to stop.',
+        descDE: 'Halte die Taste, um einen Strom arkaner Geschosse auf dein Ziel zu lenken, alle halbe Sekunde eines, solange du hältst und Mana dafür hast. Loslassen beendet den Zauber.',
+    },
+    usp_disintegrate: {
+        tickSeconds: 0.5, dmg: [3, 5], manaCost: 7, cooldownSeconds: 8,
+        descEn: 'Hold the button to focus a beam of disintegrating energy on your target. It strikes every half second and drains mana the whole time. Release to stop.',
+        descDE: 'Halte die Taste, um einen Strahl zersetzender Energie auf dein Ziel zu bündeln. Er trifft alle halbe Sekunde und zieht die ganze Zeit Mana ab. Loslassen beendet den Zauber.',
+    },
+    usp_incinerate: {
+        tickSeconds: 0.4, dmg: [2, 4], manaCost: 7, cooldownSeconds: 8,
+        descEn: 'Hold the button to spray a flamethrower stream of fire at your target: rapid fire damage for as long as you hold and can pay for it. Release to stop.',
+        descDE: 'Halte die Taste, um einen flammenwerferartigen Feuerstrahl auf dein Ziel zu sprühen: schneller Feuerschaden, solange du hältst und zahlen kannst. Loslassen beendet den Zauber.',
+    },
+    usp_soulrend: {
+        tickSeconds: 0.5, dmg: [3, 4], manaCost: 6, cooldownSeconds: 7,
+        descEn: 'Hold the button to rend your target\'s soul: a steady drain of shadow damage every half second while you channel. Release to stop.',
+        descDE: 'Halte die Taste, um die Seele deines Ziels zu zerreißen: ein stetiger Schattenschaden alle halbe Sekunde, solange du kanalisierst. Loslassen beendet den Zauber.',
+    },
+};
+
+// CHARGE: hold to build power, release at any time to fire. A quick tap fires
+// a weak shot (minPower), a full charge fires maxPower - same mana either
+// way. Releasing before minFrac of the bar is filled cancels for free.
+// The full-charge time is the def's castTimeSeconds (so cast speed applies).
+const USP_CHARGE_SPELLS = {
+    usp_aimed_shot: {
+        descEn: 'Hold the button to draw the bow and release to loose the arrow. The longer you hold, the harder it hits: a quick snap shot does about 60% damage, a full draw 150%.',
+        descDE: 'Halte die Taste, um den Bogen zu spannen, und lasse los, um den Pfeil zu schießen. Je länger du hältst, desto härter trifft er: ein schneller Schuss macht etwa 60 % Schaden, ein voll gespannter Bogen 150 %.',
+    },
+    usp_ice_spear: {
+        descEn: 'Hold the button to condense a spear of ice and release to throw it. Longer charge means more damage: about 60% for a quick throw, 150% when fully charged.',
+        descDE: 'Halte die Taste, um einen Eisspeer zu verdichten, und lasse los, um ihn zu werfen. Längeres Aufladen bedeutet mehr Schaden: etwa 60 % für einen schnellen Wurf, 150 % voll aufgeladen.',
+    },
+    usp_arcane_blast: {
+        descEn: 'Hold the button to gather arcane power and release it as a blast. A short charge does about 60% damage, a full charge 150%.',
+        descDE: 'Halte die Taste, um arkane Kraft zu sammeln, und entlade sie als Explosion. Kurzes Aufladen macht etwa 60 % Schaden, volles Aufladen 150 %.',
+    },
+    usp_pyroblast: {
+        descEn: 'Hold the button to swell a huge ball of fire and release when you are ready. Charge it for up to 150% damage, or let it go early for about 60%.',
+        descDE: 'Halte die Taste, um einen riesigen Feuerball anschwellen zu lassen, und lasse los, wenn du bereit bist. Voll aufgeladen macht er bis zu 150 % Schaden, früh losgelassen etwa 60 %.',
+    },
+};
+
+// TOGGLE: tap to switch an aura on, tap again to switch it off. While it is
+// on it pulses every second (manaCost is mana PER SECOND), hitting every enemy
+// within `radius` of the hero for dmg. It switches itself off when the mana
+// runs out or the fight ends; the cooldown starts when it goes off.
+const USP_TOGGLE_SPELLS = {
+    usp_blade_vortex: {
+        radius: 200, dmg: [2, 4], manaCost: 5, cooldownSeconds: 4,
+        descEn: 'Tap to set blades spinning around you; they cut every enemy within reach once a second. Tap again to dismiss them. Drains mana for as long as they spin.',
+        descDE: 'Tippe, um Klingen um dich kreisen zu lassen; sie schneiden jede Sekunde jeden Gegner in Reichweite. Tippe erneut, um sie zu beenden. Zieht Mana ab, solange sie kreisen.',
+    },
+    usp_orb_of_storms: {
+        radius: 190, dmg: [2, 4], manaCost: 5, cooldownSeconds: 4,
+        descEn: 'Tap to wreathe yourself in a storm orb that zaps every enemy near you once a second. Tap again to end it. Drains mana while it is active.',
+        descDE: 'Tippe, um dich mit einer Sturmkugel zu umgeben, die jede Sekunde jeden Gegner in deiner Nähe trifft. Tippe erneut, um sie zu beenden. Zieht Mana ab, solange sie aktiv ist.',
+    },
+    usp_vortex: {
+        radius: 210, dmg: [2, 4], manaCost: 5, cooldownSeconds: 4,
+        descEn: 'Tap to raise a freezing vortex around you that damages every enemy within reach each second. Tap again to end it. Drains mana while it is active.',
+        descDE: 'Tippe, um einen eisigen Wirbel um dich aufzuziehen, der jede Sekunde jeden Gegner in Reichweite verletzt. Tippe erneut, um ihn zu beenden. Zieht Mana ab, solange er aktiv ist.',
+    },
+    usp_consecration: {
+        radius: 220, dmg: [2, 4], manaCost: 5, cooldownSeconds: 4,
+        descEn: 'Tap to sanctify the ground around you; holy light burns every enemy nearby each second. Tap again to end it. Drains mana while it is active.',
+        descDE: 'Tippe, um den Boden um dich zu weihen; heiliges Licht verbrennt jede Sekunde jeden Gegner in der Nähe. Tippe erneut, um es zu beenden. Zieht Mana ab, solange es aktiv ist.',
+    },
+};
+
+// Rewrites a def into one of the sustained kinds (see the three tables above).
+function _uspConvertSustained(d, o, kind, tag) {
+    ['count', 'volleyDelayMs', 'ticks', 'tickDmg', 'hitsAll', 'delayMs', 'perTarget'].forEach((k) => { delete d[k]; });
+    d.castKind = kind;
+    d.behavior = (kind === 'toggle') ? 'aura' : 'single';
+    if (o.dmg) d.dmg = o.dmg.slice();
+    if (o.manaCost) d.manaCost = o.manaCost;
+    if (o.cooldownSeconds !== undefined) d.cooldownSeconds = o.cooldownSeconds;
+    d.descEn = o.descEn;
+    d.descDE = o.descDE;
+    const stale = (kind === 'toggle') ? ['Damage over Time', 'Projectile'] : (kind === 'channel' ? ['Channel'] : []);
+    d.tags = (d.tags || []).filter((x) => stale.indexOf(x) === -1).concat([tag]);
+    d.scalingTags = (d.scalingTags || []).slice();
+    if (kind === 'toggle') d.scalingTags = d.scalingTags.filter((x) => x !== 'dot' && x !== 'projectile');
+    if (kind === 'channel' && d.scalingTags.indexOf('channel') === -1) d.scalingTags.push('channel');
+    if (kind === 'toggle') d.scalingTags.push('area');
+}
+
+// The tag line the tooltip shows, derived from what the spell really does
+// (cast kind, behaviour, damage type) so it can never drift from the engine:
+//   Spell | Attack      physical damage scales with Attack Damage
+//   Arcane              the arcane school (its damage type is Shadow)
+//   <damage type>       Fire / Cold / Lightning / Shadow / Holy / Physical
+//   delivery            Melee, Projectile, Area, Chaining
+//   mechanic            Damage over Time, Aura, Channelling, Charged
+// Support and movement spells keep their authored tags.
+const USP_DAMAGE_TAG = {
+    fire: 'Fire', cold: 'Cold', lightning: 'Lightning', shadow: 'Shadow',
+    holy: 'Holy', physical: 'Physical',
+};
+function _uspDeriveTags(d) {
+    const tags = [d.damageKind === 'physical' ? 'Attack' : 'Spell'];
+    if (d.theme === 'arcane') tags.push('Arcane');
+    if (USP_DAMAGE_TAG[d.damageKind]) tags.push(USP_DAMAGE_TAG[d.damageKind]);
+    const add = (x) => { if (tags.indexOf(x) === -1) tags.push(x); };
+    const k = d.castKind;
+    if (k === 'melee') {
+        add('Melee');
+        if (d.melee.all || d.melee.kind === 'circle') add('Area');
+    } else if (k === 'toggle') {
+        add('Area');
+    } else if (k === 'ground') {
+        add('Area');
+        if ((d.scalingTags || []).indexOf('projectile') !== -1) add('Projectile');
+    } else {
+        switch (d.behavior) {
+            case 'single': case 'volley': case 'wild': add('Projectile'); break;
+            case 'nova': case 'starfall': case 'delayed': add('Area'); break;
+            case 'chain': add('Chaining'); break;
+            case 'ticks': if (d.hitsAll) add('Area'); break;
+            default: break;
+        }
+    }
+    if (d.behavior === 'ticks') add('Damage over Time');
+    if (k === 'toggle') add('Aura');
+    if (k === 'channel') add('Channelling');
+    if (k === 'charge') add('Charged');
+    return tags;
+}
+
+// Movement spells that aim at the cursor (the rest of the family - Windstep,
+// Rift Anchor - are plain self-casts).
+const USP_CURSOR_MOVE_BEHAVIORS = ['blink', 'dash', 'disengage'];
+
+UNIVERSAL_SPELL_DEFS.forEach((d) => {
+    // The hand-authored tags decide which charm ART school a spell gets
+    // (skill-charms.js); the tooltip tags are derived below and may differ.
+    d.schoolTags = (d.tags || []).slice();
+    if (USP_TOGGLE_SPELLS[d.id]) {
+        _uspConvertSustained(d, USP_TOGGLE_SPELLS[d.id], 'toggle', 'Aura');
+        d.aura = { radius: USP_TOGGLE_SPELLS[d.id].radius, intervalSeconds: 1 };
+        d.castTimeSeconds = 0;
+    } else if (USP_CHANNEL_SPELLS[d.id]) {
+        _uspConvertSustained(d, USP_CHANNEL_SPELLS[d.id], 'channel', 'Channelling');
+        d.channel = { tickSeconds: USP_CHANNEL_SPELLS[d.id].tickSeconds };
+        d.castTimeSeconds = 0;
+    } else if (USP_CHARGE_SPELLS[d.id]) {
+        // Keeps its castTimeSeconds: that is the time to a FULL charge.
+        _uspConvertSustained(d, USP_CHARGE_SPELLS[d.id], 'charge', 'Charged');
+        d.charge = { minFrac: 0.2, minPower: 0.6, maxPower: 1.5 };
+    } else if (USP_MELEE_SPELLS[d.id]) {
+        d.castKind = 'melee';
+        d.melee = USP_MELEE_SPELLS[d.id];
+        // Quick strikes lose their cast bar; the heavy ones keep theirs.
+        if (['usp_heroic_strike', 'usp_rend', 'usp_cleave'].indexOf(d.id) !== -1) d.castTimeSeconds = 0;
+    } else if (USP_GROUND_SPELLS[d.id]) {
+        d.castKind = 'ground';
+        d.ground = USP_GROUND_SPELLS[d.id];
+        d.castTimeSeconds = 0;
+    } else if (USP_INSTANT_SPELLS.indexOf(d.id) !== -1) {
+        d.castKind = 'instant';
+        d.castTimeSeconds = 0;
+    } else if (USP_CURSOR_MOVE_BEHAVIORS.indexOf(d.behavior) !== -1) {
+        d.castKind = 'move';
+    } else if (d.selfCast) {
+        d.castKind = 'self';
+    } else {
+        d.castKind = 'hold';
+    }
+    if (!d.selfCast && d.dmg) d.tags = _uspDeriveTags(d);
+});
+
+// How the spell (id or def) is cast: 'hold' | 'instant' | 'self' | 'move' |
+// 'ground' | 'melee' | 'channel' | 'charge' | 'toggle'. Null for an unknown id. Used by the tooltip and the cast path.
+export function getUniversalSpellCastKind(spellOrId) {
+    const spell = (typeof spellOrId === 'string') ? UNIVERSAL_SPELL_MAP[spellOrId] : spellOrId;
+    return (spell && spell.castKind) || null;
+}
 
 // Group label fallback (used directly so no translation keys are required).
 // No emoji here - the spell book prefixes the section icon itself
@@ -1398,10 +1665,12 @@ export function getUniversalSpellSupportEstimate(spellId) {
 // fill: they buy POSITION, never immunity. Nothing here negates a hit - a
 // blink into bad ground dies to bad ground.
 //
-// AIM - every spell fires along the direction the sprite last actually WALKED
-// (js/sprite/player_sprite.js → getAvatarLastMoveDir), falling back to the
-// direction its art is mirrored towards, then to 'right'. Disengage is the
-// same vector REVERSED.
+// AIM - Blink / Dash travel TOWARDS THE CURSOR (capped at the spell's range,
+// landing on the cursor when it is closer); Disengage leaps directly AWAY
+// from it. Only when no mouse position is known (touch-only play, or the
+// cursor sits on the sprite) do they fall back to the direction the sprite
+// last actually WALKED (js/sprite/player_sprite.js → getAvatarLastMoveDir),
+// then the way its art is mirrored, then 'right'.
 //
 // SCALING - distance and speed are ADDITIVE per rank and hard-capped, like
 // every other non-damage axis (see the support-family note above): a rank-10
@@ -1443,7 +1712,8 @@ export function isUniversalMovementSpell(spellOrId) {
 
 // True for the families that need a live encounter but no monster target.
 function _uspIsSelfCastSpell(spell) {
-    return isUniversalSupportSpell(spell) || isUniversalMovementSpell(spell);
+    return isUniversalSupportSpell(spell) || isUniversalMovementSpell(spell)
+        || getUniversalSpellCastKind(spell) === 'toggle';
 }
 
 // Jump distance at the charm's cast rank.
@@ -1586,6 +1856,29 @@ function _uspClearAnchor() {
     _uspAnchorMarkerClear();
 }
 
+// Where a cursor-aimed jump lands. Returns { x, y, dist, dir } in wrapper
+// coordinates (same space as _uspAvatarPos), or null when there is no usable
+// cursor (callers then fall back to the walking direction). `away` flips the
+// vector (Disengage). The jump is capped at maxDist and, towards the cursor,
+// never overshoots it.
+function _uspCursorMove(pos, maxDist, away) {
+    const cur = getCursorPoint();
+    if (!cur) return null;
+    const off = _uspMoveSpriteOffset();
+    const dx = cur.x - (pos.x + off.x);
+    const dy = cur.y - (pos.y + off.y);
+    const d = Math.hypot(dx, dy);
+    if (!(d >= 8)) return null;
+    const travel = away ? maxDist : Math.min(maxDist, d);
+    const k = (away ? -1 : 1) * travel / d;
+    const sx = dx * k;
+    const sy = dy * k;
+    const dir = Math.abs(sx) >= Math.abs(sy)
+        ? (sx >= 0 ? 'right' : 'left')
+        : (sy >= 0 ? 'down' : 'up');
+    return { x: pos.x + sx, y: pos.y + sy, dist: Math.round(travel), dir };
+}
+
 // ---------------------------------------------------------------------
 // Cast application
 // ---------------------------------------------------------------------
@@ -1600,10 +1893,14 @@ function _uspApplyMovementSpell(spell) {
 
     switch (spell.behavior) {
         case 'blink': {
-            const dist = _uspCalcMoveDistance(spell);
-            const dir = _uspAimDir();
+            const maxDist = _uspCalcMoveDistance(spell);
+            const aim = _uspCursorMove(pos, maxDist, false);
+            const dir = aim ? aim.dir : _uspAimDir();
             const v = USP_DIR_VECTORS[dir];
-            const landed = _uspAvatarWrite(pos.el, pos.x + v.x * dist, pos.y + v.y * dist, dir);
+            const dist = aim ? aim.dist : maxDist;
+            const landed = aim
+                ? _uspAvatarWrite(pos.el, aim.x, aim.y, dir)
+                : _uspAvatarWrite(pos.el, pos.x + v.x * dist, pos.y + v.y * dist, dir);
             _uspBlinkFX(spell, pos.x, pos.y, landed.x, landed.y);
             _uspSupportCastFX(spell, `${dir}`, 'buff');
             return { text: `${de ? 'teleportiert' : 'blinked'} ${dir} ${dist}px`, flavor: 'buff' };
@@ -1611,14 +1908,26 @@ function _uspApplyMovementSpell(spell) {
 
         case 'dash':
         case 'disengage': {
-            const dist = _uspCalcMoveDistance(spell);
-            const dir = _uspAimDir();
-            // Disengage is the same vector REVERSED: it buys distance in the
-            // direction you were backing away from, not the way you headed.
-            const v = USP_DIR_VECTORS[dir];
-            const sign = (spell.behavior === 'disengage') ? -1 : 1;
-            const tx = pos.x + v.x * dist * sign;
-            const ty = pos.y + v.y * dist * sign;
+            const maxDist = _uspCalcMoveDistance(spell);
+            // Towards the cursor (Dash) or directly away from it (Disengage);
+            // without a cursor, the walking direction (Disengage reversed).
+            const aim = _uspCursorMove(pos, maxDist, spell.behavior === 'disengage');
+            let dist = maxDist;
+            let dir;
+            let tx;
+            let ty;
+            if (aim) {
+                dist = aim.dist;
+                dir = aim.dir;
+                tx = aim.x;
+                ty = aim.y;
+            } else {
+                dir = _uspAimDir();
+                const v = USP_DIR_VECTORS[dir];
+                const sign = (spell.behavior === 'disengage') ? -1 : 1;
+                tx = pos.x + v.x * dist * sign;
+                ty = pos.y + v.y * dist * sign;
+            }
             _uspGlide(pos.el, pos.x, pos.y, tx, ty, spell.glideMs || 200, dir);
             {
                 _uspBlinkFX(spell, pos.x, pos.y, tx, ty, true);
@@ -1688,8 +1997,8 @@ export function getUniversalSpellMovementEstimate(spellId) {
     const base = {
         kind: spell.behavior,
         rank,
-        aimEn: 'the direction you were walking',
-        aimDe: 'die Richtung, in die du gelaufen bist',
+        aimEn: 'your cursor',
+        aimDe: 'deinen Cursor',
     };
     if (spell.behavior === 'anchor') {
         if (isUspAnchorArmed()) {
@@ -1722,19 +2031,19 @@ export function getUniversalSpellMovementEstimate(spellId) {
         const secs = Math.round(spell.buffSeconds || 3);
         return Object.assign(base, {
             distance: dist, speedPct: pct, seconds: secs,
-            lineEn: `Leaps ${dist}px BACKWARD, then walk speed +${pct}% for ${secs}s`,
-            lineDe: `Springt ${dist}px RÜCKWÄRTS, danach Lauftempo +${pct}% für ${secs}s`,
+            lineEn: `Leaps up to ${dist}px AWAY from the cursor, then walk speed +${pct}% for ${secs}s`,
+            lineDe: `Springt bis zu ${dist}px VOM CURSOR WEG, danach Lauftempo +${pct}% für ${secs}s`,
         });
     }
     const glide = Math.round(spell.glideMs || 0);
     return Object.assign(base, {
         distance: dist,
         lineEn: spell.behavior === 'blink'
-            ? `Teleports ${dist}px in an instant - nothing on the way can touch you`
-            : `Dashes ${dist}px over ${glide}ms - fast, but you are still travelling`,
+            ? `Teleports up to ${dist}px towards the cursor in an instant - nothing on the way can touch you`
+            : `Dashes up to ${dist}px towards the cursor over ${glide}ms - fast, but you are still travelling`,
         lineDe: spell.behavior === 'blink'
-            ? `Teleportiert ${dist}px in einem Augenblick - unterwegs kann dich nichts treffen`
-            : `Sprintet ${dist}px in ${glide}ms - schnell, aber du bist weiterhin unterwegs`,
+            ? `Teleportiert bis zu ${dist}px Richtung Cursor in einem Augenblick - unterwegs kann dich nichts treffen`
+            : `Sprintet bis zu ${dist}px Richtung Cursor in ${glide}ms - schnell, aber du bist weiterhin unterwegs`,
     });
 }
 
@@ -2250,13 +2559,369 @@ function _uspStrike(spell, monsterId, dmgMin, dmgMax, opts) {
     }
 }
 
+// Where a melee spell points: the selected monster, else the nearest living
+// one, else the cursor, else the way the hero is facing. Always returns a
+// point so the effect has a direction even when it is a pure whiff.
+function _uspMeleeAimPoint(origin) {
+    const centreOf = (id) => {
+        const card = document.getElementById(`eg-card-${id}`);
+        if (!card || typeof globalThis._egGetElementCentre !== 'function') return null;
+        const r = card.getBoundingClientRect();
+        if (!r.width && !r.height) return null;
+        return globalThis._egGetElementCentre(card);
+    };
+    try {
+        const sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null;
+        if (sel && sel.currentHP > 0) {
+            const c = centreOf(sel.id);
+            if (c) return c;
+        }
+    } catch (e) { /* fall through */ }
+    let best = null;
+    let bestD = Infinity;
+    for (const m of _uspLivingMonsters()) {
+        const c = centreOf(m.id);
+        if (!c) continue;
+        const d = Math.hypot(c.x - origin.x, c.y - origin.y);
+        if (d < bestD) { best = c; bestD = d; }
+    }
+    if (best) return best;
+    const cur = getCursorPoint();
+    if (cur) return cur;
+    const v = USP_DIR_VECTORS[_uspAimDir()];
+    return { x: origin.x + v.x * 120, y: origin.y + v.y * 120 };
+}
+
+// Applies a MELEE-kind spell: plays the effect beside the player, then checks
+// the surroundings for what it actually hit. Returns the number of victims.
+function _uspApplyMeleeSpell(spell) {
+    const m = spell.melee;
+    const origin = getAvatarCentre() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const aim = _uspMeleeAimPoint(origin);
+    const shape = resolveGroundShape(m.kind === 'circle'
+        ? { kind: 'circle', radius: m.reach }
+        : { kind: 'cone', length: m.reach, angle: m.angle });
+    // A ring is centred on the caster; a cone points at the aim point.
+    const point = m.kind === 'circle' ? origin : aim;
+    const live = () => {
+        try { return typeof globalThis._egIsActive !== 'function' || !!globalThis._egIsActive(); } catch (e) { return false; }
+    };
+    const inside = () => _uspLivingMonsters().filter((mon) => {
+        const card = document.getElementById(`eg-card-${mon.id}`);
+        if (!card) return false;
+        const r = card.getBoundingClientRect();
+        if (!r.width && !r.height) return false;
+        return shapeHitsRect(shape, point, origin, r);
+    });
+    // Single-victim strikes: the selected monster when inside, else nearest.
+    const pickOne = (list) => {
+        if (!list.length) return [];
+        let selId = null;
+        try {
+            const sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null;
+            selId = sel ? sel.id : null;
+        } catch (e) { selId = null; }
+        const chosen = list.find((mon) => mon.id === selId);
+        if (chosen) return [chosen];
+        let best = list[0];
+        let bestD = Infinity;
+        for (const mon of list) {
+            const card = document.getElementById(`eg-card-${mon.id}`);
+            const c = card && typeof globalThis._egGetElementCentre === 'function' ? globalThis._egGetElementCentre(card) : null;
+            const d = c ? Math.hypot(c.x - origin.x, c.y - origin.y) : Infinity;
+            if (d < bestD) { best = mon; bestD = d; }
+        }
+        return [best];
+    };
+    const victims = () => (m.all ? inside().slice(0, 8) : pickOne(inside()));
+
+    showSpellZone(shape, point, origin, spell.theme, 420, 'burst');
+    const first = victims();
+    first.forEach((mon, i) => {
+        setTimeout(() => {
+            if (!live()) return;
+            _uspStrike(spell, mon.id, spell.dmg[0], spell.dmg[1], { isMelee: true, isAoE: !!m.all });
+        }, i * 50);
+    });
+
+    // Damage-over-time follow-up (Rend bleeds one victim, Blade Vortex keeps
+    // spinning): re-checks the area each second.
+    if (spell.behavior === 'ticks') {
+        const td = spell.tickDmg || spell.dmg;
+        const total = spell.ticks || 3;
+        const lockId = (!m.all && first[0]) ? first[0].id : null;
+        for (let i = 0; i < total; i++) {
+            setTimeout(() => {
+                if (!live()) return;
+                if (m.all) {
+                    showSpellZone(shape, point === origin ? getAvatarCentre() || origin : point, getAvatarCentre() || origin, spell.theme, 350, 'burst');
+                    inside().slice(0, 8).forEach((mon) => _uspStrike(spell, mon.id, td[0], td[1], { isMelee: true, isDot: true, isTick: true }));
+                } else if (lockId && _uspLivingMonsters().some((mon) => mon.id === lockId)) {
+                    _uspStrike(spell, lockId, td[0], td[1], { isDot: true, isTick: true });
+                }
+            }, (i + 1) * 1000);
+        }
+    }
+    return first.length;
+}
+
+// Applies a GROUND-kind spell at the placed point: everything whose card
+// overlaps the spell's shape is hit. The shape is the SAME one the reticle
+// showed (resolveGroundShape), so what you aimed at is what lands.
+//   delayed  telegraph the spot, strike after delayMs (Meteor, Blade Blast)
+//   ticks    a lingering field: an opening hit, then one hit per second on
+//            whatever stands inside at that moment (Blizzard, Rain of Fire)
+//   other    instant blast, repeated `count` times for volley spells
+//            (beams / cones: Cone of Cold, Disintegrate, ...)
+function _uspApplyGroundSpell(spell, point) {
+    const shape = resolveGroundShape(spell.ground);
+    if (!shape || !point) return;
+    const origin = getAvatarCentre();
+    const live = () => {
+        try { return typeof globalThis._egIsActive !== 'function' || !!globalThis._egIsActive(); } catch (e) { return false; }
+    };
+    const victims = () => _uspLivingMonsters().filter((m) => {
+        const card = document.getElementById(`eg-card-${m.id}`);
+        if (!card) return false;
+        const r = card.getBoundingClientRect();
+        if (!r.width && !r.height) return false;
+        return shapeHitsRect(shape, point, origin, r);
+    }).slice(0, 8);
+    const dmg = spell.dmg;
+
+    if (spell.behavior === 'delayed') {
+        const delayMs = spell.delayMs || 900;
+        showSpellZone(shape, point, origin, spell.theme, delayMs + 150, 'telegraph');
+        setTimeout(() => {
+            if (!live()) return;
+            showSpellZone(shape, point, origin, spell.theme, 600, 'burst');
+            victims().forEach((m, i) => {
+                setTimeout(() => {
+                    if (!live()) return;
+                    _uspStrike(spell, m.id, dmg[0], dmg[1], { fromSky: true, isAoE: true, isBig: true });
+                }, i * 70);
+            });
+        }, delayMs);
+        return;
+    }
+
+    if (spell.behavior === 'ticks') {
+        const td = spell.tickDmg || dmg;
+        const total = spell.ticks || 3;
+        showSpellZone(shape, point, origin, spell.theme, (total + 0.5) * 1000, 'zone');
+        victims().forEach((m) => _uspStrike(spell, m.id, dmg[0], dmg[1], { isDot: true, isAoE: true }));
+        for (let i = 0; i < total; i++) {
+            setTimeout(() => {
+                if (!live()) return;
+                victims().forEach((m) => _uspStrike(spell, m.id, td[0], td[1], { isDot: true, isTick: true }));
+            }, (i + 1) * 1000);
+        }
+        return;
+    }
+
+    const pulses = (spell.behavior === 'volley') ? (spell.count || 3) : 1;
+    const step = spell.volleyDelayMs || 200;
+    for (let i = 0; i < pulses; i++) {
+        setTimeout(() => {
+            if (!live()) return;
+            showSpellZone(shape, point, origin, spell.theme, 450, 'burst');
+            victims().forEach((m) => _uspStrike(spell, m.id, dmg[0], dmg[1], { isAoE: true, volleyIndex: i }));
+        }, i * step);
+    }
+}
+
+// Arms the aiming reticle for a ground spell. Nothing is spent here: the
+// click re-enters castUniversalSpell with `groundPoint`, which runs the normal
+// cooldown / mana gates and then lands the effect.
+function _uspBeginGroundTargeting(spell) {
+    const de = (typeof LANG !== 'undefined' && LANG === 'de');
+    const spellId = spell.id;
+    return beginSpellTargeting({
+        id: spellId,
+        spec: spell.ground,
+        theme: spell.theme,
+        hint: de ? 'Klick: wirken · Rechtsklick / Esc: abbrechen' : 'Click: cast · Right-click / Esc: cancel',
+        onConfirm: (point) => {
+            try {
+                if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return;
+                if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return;
+            } catch (e) { return; }
+            if (!isSkillCharmUnlocked(spellId)) return;
+            if (Date.now() < (Number(globalThis._egPlayerStunnedUntil) || 0)) {
+                if (typeof globalThis.showToast === 'function') globalThis.showToast(t('eg_stunned'), '#ff6b9d');
+                return;
+            }
+            noteCharmCast(spellId);
+            castUniversalSpell(spellId, { groundPoint: point });
+        },
+    });
+}
+
+//------------------------------------------------------------------------
+//------------------------SUSTAINED SPELLS (spell pass 2)-----------------
+//------------------------------------------------------------------------
+// channel / charge / toggle. The press-and-hold bookkeeping of the first two
+// lives in spell-casttime.js (it owns the hold, the bar and the input
+// listeners) and calls fireUniversalChannelTick / endUniversalChannel here;
+// a released charge re-enters castUniversalSpell with opts.chargePower. The
+// toggle auras are fully owned by this file.
+
+const _uspAuras = {};   // spellId -> { timer }
+
+export function isUniversalAuraActive(spellId) {
+    return !!_uspAuras[spellId];
+}
+
+function _uspNoManaToast() {
+    if (typeof globalThis.showToast !== 'function') return;
+    let key = 'cls_no_mana';
+    try { if (_bloodMagicActive()) key = 'cls_no_life'; } catch (e) { /* mana wording */ }
+    globalThis.showToast(t(key));
+}
+
+function _uspEncounterLive() {
+    try { return typeof globalThis._egIsActive !== 'function' || !!globalThis._egIsActive(); } catch (e) { return false; }
+}
+
+function _uspPlayerDead() {
+    try { return typeof globalThis.dead !== 'undefined' && !!globalThis.dead; } catch (e) { return true; }
+}
+
+// Per-cast bookkeeping shared by every sustained spell's FIRST action.
+function _uspSustainedCastBegan(spell) {
+    _uspPlaySfx(spell);
+    try {
+        if (typeof globalThis.updateQuestStats === 'function') updateQuestStats('classAbilityUsed', {});
+        if (typeof globalThis.triggerSkillBanter === 'function') globalThis.triggerSkillBanter(spell.id);
+    } catch (e) { /* non-combat progress is best-effort */ }
+}
+
+// One channel tick: pays mana x tickSeconds and hits the selected monster
+// (else the first living one). Returns false when the channel must end - dead,
+// fight over, nothing to hit, or out of mana.
+export function fireUniversalChannelTick(spellId, isFirst) {
+    const spell = getUniversalSpellDef(spellId);
+    if (!spell || !spell.channel) return false;
+    if (_uspPlayerDead() || !_uspEncounterLive()) return false;
+    const living = _uspLivingMonsters();
+    if (!living.length) return false;
+    let victim = null;
+    try {
+        const sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null;
+        if (sel) victim = living.find((m) => m.id === sel.id) || null;
+    } catch (e) { victim = null; }
+    if (!victim) victim = living[0];
+
+    const cost = getUniversalSpellManaCost(spellId) * spell.channel.tickSeconds;
+    if (!payAbilityCost(cost)) {
+        _uspNoManaToast();
+        return false;
+    }
+    if (isFirst) _uspSustainedCastBegan(spell);
+    _uspStrike(spell, victim.id, spell.dmg[0], spell.dmg[1], { isChannelTick: true });
+    return true;
+}
+
+// The channel is over (release / out of mana / interrupted): starts the cooldown.
+export function endUniversalChannel(spellId, ticks) {
+    if (ticks > 0) startUniversalSpellCooldown(spellId);
+    try { renderSkillHotbar(); } catch (e) { /* hotbar is best-effort */ }
+}
+
+// One aura pulse: pays a second of mana and hits everything in the ring.
+// Returns false when the aura must switch off.
+function _uspPulseAura(spell) {
+    if (_uspPlayerDead() || !_uspEncounterLive()) return false;
+    try { if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return true; } catch (e) { /* not paused */ }
+    const interval = spell.aura.intervalSeconds || 1;
+    if (!payAbilityCost(getUniversalSpellManaCost(spell.id) * interval)) {
+        _uspNoManaToast();
+        return false;
+    }
+    const origin = getAvatarCentre() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const shape = resolveGroundShape({ kind: 'circle', radius: spell.aura.radius });
+    showSpellZone(shape, origin, origin, spell.theme, 450, 'burst');
+    _uspLivingMonsters().filter((mon) => {
+        const card = document.getElementById(`eg-card-${mon.id}`);
+        if (!card) return false;
+        const r = card.getBoundingClientRect();
+        if (!r.width && !r.height) return false;
+        return shapeHitsRect(shape, origin, origin, r);
+    }).slice(0, 8).forEach((mon, i) => {
+        setTimeout(() => {
+            if (!_uspAuras[spell.id] || !_uspEncounterLive()) return;
+            _uspStrike(spell, mon.id, spell.dmg[0], spell.dmg[1], { isMelee: true, isAoE: true });
+        }, i * 40);
+    });
+    return true;
+}
+
+function _uspStopAura(spellId, withCooldown) {
+    const a = _uspAuras[spellId];
+    if (!a) return;
+    if (a.timer) clearTimeout(a.timer);
+    delete _uspAuras[spellId];
+    if (withCooldown) startUniversalSpellCooldown(spellId);
+    try { renderSkillHotbar(); } catch (e) { /* hotbar is best-effort */ }
+}
+
+// Switches every running aura off (round end / reset). No cooldown.
+export function stopAllUniversalAuras() {
+    Object.keys(_uspAuras).forEach((id) => _uspStopAura(id, false));
+}
+
+function _uspStartAura(spell) {
+    const spellId = spell.id;
+    if (!canAffordUniversalSpell(spellId)) {
+        _uspNoManaToast();
+        return false;
+    }
+    _uspAuras[spellId] = { timer: null };
+    _uspSustainedCastBegan(spell);
+    if (!_uspPulseAura(spell)) {
+        _uspStopAura(spellId, false);
+        return false;
+    }
+    const intervalMs = Math.round((spell.aura.intervalSeconds || 1) * 1000);
+    const run = () => {
+        const a = _uspAuras[spellId];
+        if (!a) return;
+        if (!_uspPulseAura(spell)) { _uspStopAura(spellId, true); return; }
+        a.timer = setTimeout(run, intervalMs);
+    };
+    _uspAuras[spellId].timer = setTimeout(run, intervalMs);
+    try { renderSkillHotbar(); } catch (e) { /* hotbar is best-effort */ }
+    return true;
+}
+
 // Main entry: cast a universal spell by id. Returns true if cast.
-export function castUniversalSpell(spellId) {
+// `opts.chargePower` (0.6 - 1.5) is set when a charged spell is released;
+// without it a charge spell fires at normal strength.
+// `opts.groundPoint` ({x, y} viewport px) is set by the reticle's confirm
+// click for ground-kind spells; without it a ground spell only ARMS the reticle.
+export function castUniversalSpell(spellId, opts) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell) return false;
     try {
         if (typeof globalThis.dead !== 'undefined' && globalThis.dead) return false;
     } catch (e) {}
+
+    // One reticle at a time. Pressing the spell that is already aiming
+    // cancels it (tap again to back out); any other cast replaces it.
+    const groundPoint = opts && opts.groundPoint;
+    if (isSpellTargeting()) {
+        const same = isSpellTargeting(spellId);
+        cancelSpellTargeting();
+        if (same && !groundPoint) return true;
+    }
+
+    // A running aura is switched OFF by the same tap that switched it on -
+    // always allowed (no mana, cooldown or target needed to stop it).
+    const isToggle = getUniversalSpellCastKind(spell) === 'toggle';
+    if (isToggle && isUniversalAuraActive(spellId)) {
+        _uspStopAura(spellId, true);
+        return true;
+    }
 
     // Locked (future gating) - show the requirement, spend nothing.
     if (!isUniversalSpellUnlocked(spellId)) {
@@ -2273,10 +2938,14 @@ export function castUniversalSpell(spellId) {
     try { encounterOn = (typeof globalThis._egIsActive === 'function') && globalThis._egIsActive(); } catch (e) {}
     const isSupport = isUniversalSupportSpell(spell);
     const isMovement = isUniversalMovementSpell(spell);
+    // Ground spells aim at a spot, not a target - they only need the fight.
+    const isGround = getUniversalSpellCastKind(spell) === 'ground';
+    // Melee spells swing at whatever is around - they need the fight, not a target.
+    const isMelee = getUniversalSpellCastKind(spell) === 'melee';
     const living = _uspLivingMonsters();
     let target = null;
     try { target = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null; } catch (e) {}
-    if (!encounterOn || (!(isSupport || isMovement) && (living.length === 0 || !target))) {
+    if (!encounterOn || (!(isSupport || isMovement || isGround || isMelee || isToggle) && (living.length === 0 || !target))) {
         _uspNoTargetToast(spell);
         return false;
     }
@@ -2299,6 +2968,25 @@ export function castUniversalSpell(spellId) {
     // start, so a refused cast (no target, no mana) spends nothing - the
     // mirror of "cost and cooldown are NOT consumed when the cast is refused".
     if (getUniversalSpellCooldownRemaining(spellId) > 0) return false;
+
+    // Toggle auras: switch on (pays a second of mana up front, then drains).
+    if (isToggle) return _uspStartAura(spell);
+
+    // Ground spells: the tap only arms the reticle (after a cheap "can I even
+    // afford it" look, so you are not aiming a spell you cannot pay for).
+    if (isGround && !groundPoint) {
+        if (!canAffordUniversalSpell(spellId)) {
+            if (typeof globalThis.showToast === 'function') {
+                let noMana = 'cls_no_mana';
+                try {
+                    if (_bloodMagicActive()) noMana = 'cls_no_life';
+                } catch (e) {}
+                globalThis.showToast(t(noMana));
+            }
+            return false;
+        }
+        return _uspBeginGroundTargeting(spell);
+    }
 
     // Mana (life under Blood Magic) gate - spend nothing on failure.
     const cost = getUniversalSpellManaCost(spellId);
@@ -2352,6 +3040,25 @@ export function castUniversalSpell(spellId) {
             const label = (typeof LANG !== 'undefined' && LANG === 'de') ? spell.nameDE : spell.nameEn;
             if (res.text) globalThis.showToast(`${spell.icon} ${label} - ${res.text}`, '#7fd9ff');
         }
+        {
+            try { renderSkillHotbar(); } catch (e) {}
+        }
+        return true;
+    }
+
+    // Melee family: swings beside the hero and checks what it reached. A
+    // swing that finds nothing still costs the cast (it was a real swing).
+    if (isMelee) {
+        _uspApplyMeleeSpell(spell);
+        {
+            try { renderSkillHotbar(); } catch (e) {}
+        }
+        return true;
+    }
+
+    // Ground family: lands on the placed spot, not on the targeted monster.
+    if (isGround) {
+        _uspApplyGroundSpell(spell, groundPoint);
         {
             try { renderSkillHotbar(); } catch (e) {}
         }
@@ -2515,8 +3222,12 @@ export function castUniversalSpell(spellId) {
             break;
         }
         default: {
-            // 'single' - one projectile, one impact.
-            _uspStrike(spell, targetId, spell.dmg[0], spell.dmg[1], {});
+            // 'single' - one projectile, one impact. A released charge
+            // scales the hit by how long the button was held.
+            const pw = (opts && opts.chargePower) || 1;
+            _uspStrike(spell, targetId,
+                Math.max(1, Math.round(spell.dmg[0] * pw)), Math.max(1, Math.round(spell.dmg[1] * pw)),
+                pw >= 1.3 ? { isBig: true } : {});
             break;
         }
     }
@@ -2647,6 +3358,7 @@ function _uspWireRoundEndReset() {
     const _origResetActiveCooldown = globalThis.resetActiveCooldown;
     globalThis.resetActiveCooldown = function () {
         try {
+            stopAllUniversalAuras();
             Object.keys(_uspCooldowns).forEach((id) => {
                 const cd = _uspCooldowns[id];
                 if (cd && cd.interval) clearInterval(cd.interval);

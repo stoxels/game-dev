@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _egGetElementCentre } from './combat-class-projectiles.js';
-import { _egConsumePlayerCharge, _egUpdatePlayerChargeBar } from './encounter-tick.js';
+import { _egConsumePlayerCharge, _egGetPlayerChargePct, _egUpdatePlayerChargeBar } from './encounter-tick.js';
 import { _egMeleeTierLabel } from './encounter.js';
 import { _egShowStatusLabel } from './encounter-monster-damage.js';
 import { _egApplyPlayerMeleeImpact } from './encounter-melee-impact.js';
@@ -12,7 +12,7 @@ import {
     _egMeleeRaiseAvatar,
 } from './encounter-melee-delivery.js';
 import { _egMeleeTierForCharge } from './encounter-melee-arts.js';
-import { EG_WEAPON_SWING_COOLDOWN_MS, EG_WEAPON_SWING_DURATION_MS, _egFacingFromVector, _egGetAttackFacing, _egGetEquippedWeaponInfo } from './combat-weapon-swing-config.js';
+import { EG_WEAPON_SWING_COOLDOWN_MS, EG_WEAPON_SWING_DURATION_MS, _egFacingFromVector, _egGetAttackFacing, _egGetEquippedWeaponInfo, _egMeleeAimFacing, _egMeleeFindVictim } from './combat-weapon-swing-config.js';
 import { _egIsActive } from './combat-state.js';
 
 //  endgame-weapon-swing.js
@@ -267,15 +267,26 @@ export function _egDoWeaponAttack() {
         return;
     }
 
-    // NOTE: no range gate here - range is resolved at impact time
-    // (_egApplyPlayerMeleeImpact whiffs sub-200% strikes with no damage
-    // when the avatar is too far from the target card, while 200%+ arts
-    // dash to the target instead).
-
+    // LOOK AROUND (spell pass 1): a swing does not need a selected target.
+    // The strike lands on the SELECTED monster when it is in reach, else on
+    // the nearest monster that is (see _egMeleeFindVictim); with nothing in
+    // reach it is a clean whiff - the swing plays next to the hero and no
+    // "too far" text is shown. Overcharge arts (200%+) still dash to the
+    // selected target from anywhere.
+    const selectedId = (typeof _egTargetId === 'undefined' || !globalThis._egTargetId)
+        ? null : globalThis._egTargetId;
+    const victimId = _egMeleeFindVictim(selectedId);
+    let peekTier = 0;
+    try {
+        peekTier = (typeof _egGetPlayerChargePct === 'function' && typeof _egMeleeTierForCharge === 'function')
+            ? _egMeleeTierForCharge(_egGetPlayerChargePct()) : 0;
+    } catch (e) { peekTier = 0; }
     // Spend the charge at key-press time so the strike matches the bar the
     // player saw (charging during the swing flight doesn't inflate it).
-    // No target selected → whiff visual only, charge is kept.
-    const hasTarget = !(typeof _egTargetId === 'undefined' || !globalThis._egTargetId);
+    // Nothing to hit (and no art to dash with) → whiff visual only, the
+    // charge is kept so a stray press never wastes a full bar.
+    const strikeId = (peekTier >= 1 && selectedId) ? selectedId : (victimId || null);
+    const hasTarget = !!strikeId;
     if (hasTarget && typeof _egConsumePlayerCharge === 'function') {
         try { globalThis._egPendingMeleeChargePct = _egConsumePlayerCharge(); } catch (e) { globalThis._egPendingMeleeChargePct = 1; }
     } else {
@@ -297,19 +308,19 @@ export function _egDoWeaponAttack() {
     } catch (e) { spentTier = 0; }
     if (hasTarget && spentTier >= 1
         && typeof _egMeleeDeliveryAvailable === 'function'
-        && _egMeleeDeliveryAvailable(globalThis._egTargetId)) {
+        && _egMeleeDeliveryAvailable(strikeId)) {
         // Capture the release-time share into the delivery: the global is
         // cleared NOW (so the probe-visible "spent" state reads instantly
         // and a mid-flight second strike can't collide with it) while the
         // arrival impact uses the captured value (see opts.chargePct).
         const spentPct = globalThis._egPendingMeleeChargePct;
         globalThis._egPendingMeleeChargePct = null;
-        _egMeleeDeliverArtStrike(globalThis._egTargetId, spentTier, spentPct);
+        _egMeleeDeliverArtStrike(strikeId, spentTier, spentPct);
         return;
     }
 
     const { family } = _egGetEquippedWeaponInfo();
-    const facing = _egGetAttackFacing();
+    const facing = _egMeleeAimFacing(strikeId || selectedId);
     _egShowWeaponSwing(family, facing);
     _egWeaponSwingHop(facing);
     _egWeaponSwingSound(family);
@@ -319,8 +330,15 @@ export function _egDoWeaponAttack() {
         try {
             if (typeof _egIsActive === 'function' && !_egIsActive()) return;
             if (typeof dead !== 'undefined' && globalThis.dead) return;
-            if (typeof _egTargetId === 'undefined' || !globalThis._egTargetId) return;
-            if (typeof _egApplyPlayerMeleeImpact === 'function') _egApplyPlayerMeleeImpact(globalThis._egTargetId);
+            // Re-check the surroundings at the moment of impact: monsters
+            // roam, so the victim is whatever is in reach NOW (the one the
+            // swing was aimed at when it is still there).
+            // (A press with nothing in reach kept its charge and is a pure
+            // whiff - it never strikes, or a free full-power hit would leak.)
+            if (!hasTarget) return;
+            const live = _egMeleeFindVictim(globalThis._egTargetId || strikeId || null);
+            if (!live) return;
+            if (typeof _egApplyPlayerMeleeImpact === 'function') _egApplyPlayerMeleeImpact(live);
         } catch (e) {}
     }, Math.max(80, Math.round((EG_WEAPON_SWING_DURATION_MS[family] || 320) / 2)));
 }

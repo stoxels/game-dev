@@ -3,10 +3,10 @@ import { LANG, t } from '../translation/translations.js';
 import { _formatCooldown } from '../classes/class-cooldown-state.js';
 import { hideHUDTooltip, moveHUDTooltip, showHUDTooltip } from '../classes/class-hud.js';
 import { _bloodMagicActive } from '../classes/class-mana.js';
-import { charmRankMeetsPlayerLevel, getCharmRankMinPlayerLevel, getCharmSkillOrbBonusPct, getCharmSlottedRank, isSkillCharmUnlocked } from './skill-charms.js';
+import { CHARM_ORB_DAMAGE_PCT, charmRankMeetsPlayerLevel, getCharmArtForSkill, getCharmByKey, getCharmRankMinPlayerLevel, getCharmSkillOrbBonusPct, getCharmSlottedRank, isSkillCharmUnlocked } from './skill-charms.js';
 import { canAffordSkill, getPassiveSkillDef, getPlayerTraits, getSkillCooldown, getSkillDamage, getSkillDef, getSkillDesc, getSkillLevel, getSkillManaCost, getSkillName, isSkillPassive } from './skill-registry.js';
 import { getSkillCastTimeSeconds } from './spell-casttime.js';
-import { getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, getUniversalSpellMovementEstimate, getUniversalSpellSupportEstimate } from './universal-spells.js';
+import { getUniversalSpellCastKind, getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, getUniversalSpellMovementEstimate, getUniversalSpellSupportEstimate } from './universal-spells.js';
 import { STATE } from '../state.js';
 
 //------------------------------------------------------------------------
@@ -41,7 +41,6 @@ import { STATE } from '../state.js';
 //   <mechanics description>
 //   Deals 8 to 12 Damage per revealed cell (up to 5 cells)
 //   Total: 40 to 60 Damage
-//   Scales with: Spell Damage, Area of Effect
 //
 // The floating element itself is owned by class-hud.js (getHUDTooltip /
 // showHUDTooltip), so both tooltips share one visual + positioning system.
@@ -70,7 +69,13 @@ function _skillTooltipCost(def) {
     const label = blood ? t('cls_life') : t('cls_mana');
     const affordable = canAffordSkill(def.id);
     const color = blood ? '#ff7a7a' : '#7fb3ff';
-    return `<div class="skl-tip-stat">${t('skill_tip_cost')}: <b style="color:${affordable ? color : '#ff5252'}">${cost} ${label}</b></div>`;
+    // Channels and auras drain continuously: their cost is per second.
+    let per = '';
+    try {
+        const kind = def.slotKind === 'universal' ? getUniversalSpellCastKind(def.id) : null;
+        if (kind === 'channel' || kind === 'toggle') per = ' / s';
+    } catch (e) { /* plain cost */ }
+    return `<div class="skl-tip-stat">${t('skill_tip_cost')}: <b style="color:${affordable ? color : '#ff5252'}">${cost} ${label}${per}</b></div>`;
 }
 
 // Cooldown line - shows the effective cooldown and, when passive nodes or
@@ -99,6 +104,19 @@ function _skillTooltipCooldown(def) {
     return `<div class="skl-tip-stat">${line}</div>`;
 }
 
+// How a universal spell is aimed once the key is tapped (spell pass 1). Hold
+// spells say it in their cast-time value instead ("1.2s (hold)").
+const SKILL_CAST_KIND_HINT = {
+    instant: { en: 'on target', de: 'aufs Ziel' },
+    self: { en: 'on you', de: 'auf dich' },
+    move: { en: 'to cursor', de: 'zum Cursor' },
+    ground: { en: 'aim & click', de: 'zielen & klicken' },
+    melee: { en: 'melee swing', de: 'Nahkampf-Schlag' },
+    channel: { en: 'hold to channel', de: 'halten zum Kanalisieren' },
+    charge: { en: 'release to fire', de: 'loslassen zum Schießen' },
+    toggle: { en: 'tap: on / off', de: 'Tippen: an / aus' },
+};
+
 // Cast-time line - instant skills fire on click; timed ones need the button
 // held until the cast bar fills (see js/skills/spell-casttime.js).
 function _skillTooltipCastTime(def) {
@@ -106,6 +124,10 @@ function _skillTooltipCastTime(def) {
     const isInstant = def.castTime === 'instant';
     let holdHint = '';
     let value = t('skill_tip_instant');
+    if (isInstant && def.slotKind === 'universal') {
+        const hint = SKILL_CAST_KIND_HINT[getUniversalSpellCastKind(def.id)];
+        if (hint) value = `${value} · ${LANG === 'de' ? hint.de : hint.en}`;
+    }
     if (!isInstant) {
         let effective = 0;
         try { effective = getSkillCastTimeSeconds(def.id); } catch (e) {}
@@ -117,6 +139,18 @@ function _skillTooltipCastTime(def) {
         } else {
             value = `${def.castTime}`;
         }
+    }
+    // Melee spells can be instant OR carry a cast time: the hint rides along either way.
+    if (!isInstant && def.slotKind === 'universal' && getUniversalSpellCastKind(def.id) === 'melee') {
+        const mh = SKILL_CAST_KIND_HINT.melee;
+        value = `${value} · ${LANG === 'de' ? mh.de : mh.en}`;
+    }
+    // Sustained kinds say how they are used instead of a cast time.
+    if (def.slotKind === 'universal') {
+        const kind = getUniversalSpellCastKind(def.id);
+        const sh = SKILL_CAST_KIND_HINT[kind];
+        if (sh && (kind === 'channel' || kind === 'toggle')) value = LANG === 'de' ? sh.de : sh.en;
+        else if (sh && kind === 'charge') value = `${value.replace(holdHint, '')} · ${LANG === 'de' ? sh.de : sh.en}`;
     }
     return `<div class="skl-tip-stat">${t('skill_tip_cast_time')}: <b style="color:#e6e6e6">${value}</b></div>`;
 }
@@ -184,6 +218,16 @@ function _uspTooltipDamage(def, dmg) {
             case 'wild': suffix = de ? ` in ${spell.count} Funken, zufällige Gegner` : ` across ${spell.count} sparks at random enemies`; break;
             default: break;
         }
+        if (spell.castKind === 'channel') {
+            const ts = spell.channel.tickSeconds;
+            suffix = de ? ` pro Treffer (alle ${ts}s)` : ` per tick (every ${ts}s)`;
+        } else if (spell.castKind === 'toggle') {
+            suffix = de ? ', jeden Gegner in Reichweite, jede Sekunde' : ', each enemy in range, every second';
+        } else if (spell.castKind === 'charge') {
+            const lo = Math.round(spell.charge.minPower * 100);
+            const hi = Math.round(spell.charge.maxPower * 100);
+            suffix = de ? ` (${lo}% schneller Schuss bis ${hi}% voll aufgeladen)` : ` (${lo}% quick shot up to ${hi}% fully charged)`;
+        }
     }
     const total = dmg.totalMin === dmg.totalMax
         ? `${dmg.totalMin}`
@@ -232,12 +276,6 @@ function _skillTooltipCharmBonus(skillId) {
     return `<div class="skl-tip-stat">${t('charm_tip_orb_bonus')}: <b style="color:#7fd9ff">+${pct}%</b></div>`;
 }
 
-// Scaling line: "Scales with: Spell Damage, Cooldown Recovery".
-function _skillTooltipScaling(def) {
-    if (!def.scaling || !def.scaling.length) return '';
-    return `<div class="skl-tip-scaling">${t('skill_tip_scales_with')}: <b>${def.scaling.join(', ')}</b></div>`;
-}
-
 // Endgame-only warning for Heartbloom.
 function _skillTooltipGating(def) {
     if (!def.endgameOnly) return '';
@@ -263,41 +301,66 @@ function _skillTooltipCharmLock(skillId) {
     return `<div class="skl-tip-note">🔒 ${t('charm_locked_hint')}</div>`;
 }
 
-// Small footer hint telling the player they can drag the skill.
-function _skillTooltipDragHint() {
-    return `<div class="skl-tip-foot">${t('skill_tip_drag_hint')}</div>`;
-}
-
 //------------------------------------------------------------------------
 //-------------------------PUBLIC BUILDERS--------------------------------
 //------------------------------------------------------------------------
 
-// Builds the full tooltip HTML for a castable skill.
-function buildSkillTooltipHTML(skillId) {
+// Title row: the charm's own art (the same image the spell slot, hotbar and
+// drop show) next to the name. Falls back to the plain name when the skill
+// has no mapped art.
+function _skillTooltipTitle(skillId, rank) {
+    let art = null;
+    try { art = getCharmArtForSkill(skillId, rank); } catch (e) { art = null; }
+    const img = art ? `<img class="skl-tip-art" src="${art}" alt="" draggable="false">` : '';
+    return `<div class="skl-tip-title">${img}${getSkillName(skillId)}</div>`;
+}
+
+// Extra lines when the tooltip is for a charm sitting in the charm LIST (not
+// yet / not necessarily slotted): the level it needs and its orb bonus.
+// Together with the spell's own stats this is the ONE spell tooltip - there
+// is no separate charm tooltip any more.
+function _skillTooltipCharmInfo(charm) {
+    if (!charm) return '';
+    const usable = charmRankMeetsPlayerLevel(charm.rank);
+    const need = getCharmRankMinPlayerLevel(charm.rank);
+    const reqColor = usable ? '#2ecc71' : '#e06c55';
+    let html = `<div class="skl-tip-stat">${t('charm_tip_req_player')}: <b style="color:${reqColor}">${need}</b></div>`;
+    if (!usable) html += `<div class="skl-tip-note" style="color:#e06c55">${t('charm_tip_locked_level')}</div>`;
+    const bonus = (charm.orbs || 0) * CHARM_ORB_DAMAGE_PCT;
+    if (bonus > 0) {
+        html += `<div class="skl-tip-stat">${t('charm_tip_orb_bonus')}: <b style="color:#7fd9ff">+${bonus}%</b></div>`;
+    }
+    return html;
+}
+
+// Builds the full tooltip HTML for a castable skill. `charmKey` (optional)
+// is the charm the pointer is over in the charm list: the tooltip then shows
+// THAT charm's rank and requirements instead of the slotted one.
+function buildSkillTooltipHTML(skillId, charmKey) {
     const def = getSkillDef(skillId);
     if (!def) return '';
 
+    const hovered = charmKey ? getCharmByKey(charmKey) : null;
     // While the spell's charm is slotted, the charm's rank is the rank the
     // player actually casts at (js/skills/skill-charms.js).
-    const charmRank = getCharmSlottedRank(skillId);
+    const charmRank = hovered ? hovered.rank : getCharmSlottedRank(skillId);
     const rank = charmRank || getSkillLevel(skillId);
     const desc = getSkillDesc(skillId);
 
     return `<div class="skl-tip">`
-        + `<div class="skl-tip-title">${getSkillName(skillId)}</div>`
+        + _skillTooltipTitle(skillId, rank)
         + _skillTooltipTags(def)
         + `<div class="skl-tip-stat">${t('skill_tip_rank')}: <b style="color:#f1c40f">${rank}</b></div>`
         + _skillTooltipCost(def)
         + _skillTooltipCastTime(def)
         + _skillTooltipCooldown(def)
+        + _skillTooltipCharmInfo(hovered)
         + `<div class="skl-tip-sep"></div>`
         + `<div class="skl-tip-desc">${desc}</div>`
         + _skillTooltipDamage(def)
-        + _skillTooltipCharmBonus(skillId)
-        + _skillTooltipScaling(def)
+        + (hovered ? '' : _skillTooltipCharmBonus(skillId))
         + _skillTooltipGating(def)
-        + _skillTooltipCharmLock(skillId)
-        + _skillTooltipDragHint()
+        + (hovered ? '' : _skillTooltipCharmLock(skillId))
         + `</div>`;
 }
 
@@ -363,10 +426,10 @@ function handleTraitTip(e, traitIndex) {
 }
 
 // Shows the tooltip for a castable OR passive skill id.
-export function handleSkillTip(e, skillId) {
+export function handleSkillTip(e, skillId, charmKey) {
     const html = isSkillPassive(skillId)
         ? buildPassiveSkillTooltipHTML(skillId)
-        : buildSkillTooltipHTML(skillId);
+        : buildSkillTooltipHTML(skillId, charmKey);
     if (html) showHUDTooltip(html, e);
 }
 

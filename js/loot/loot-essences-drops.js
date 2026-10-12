@@ -31,11 +31,12 @@ export function _egRollEssenceDef() {
 
 // Called when a monster dies. Essences land on the grid as pickup drops
 // and are claimed like currency orbs.
-export function _egTryDropEssence(isBoss) {
+// force - skip the chance roll (the kill handler already picked this bucket).
+export function _egTryDropEssence(isBoss, force = false) {
     const baseChance = isBoss ? EG_ESSENCE_DROP_CHANCE_BOSS : EG_ESSENCE_DROP_CHANCE_NORMAL;
     const qtyMult = (typeof _egMapLootQuantityMult === 'function') ? _egMapLootQuantityMult() : 1;
     const chance = Math.min(1, baseChance * qtyMult);
-    if (Math.random() > chance) return;
+    if (!force && Math.random() > chance) return;
     const def = _egRollEssenceDef();
     if (!def) return;
     if (typeof _egSpawnCurrencyDrop === 'function') {

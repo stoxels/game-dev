@@ -177,14 +177,24 @@
 .sb-charm-rail { overflow-y: auto; scrollbar-width: none; min-height: 0; padding-bottom: clamp(4px, .6cqw, 9px); }
 .sb-charm-rail::-webkit-scrollbar { width: 0; height: 0; }
 
-/* "Max rank only" filter - TOP-LEFT of the left page (v3.2: it used to
-   share the bottom cluster with the counters; spec puts it top-left). */
-/* v3.6: "Max rank only" is a left-aligned GRID ROW directly under the
-   plaque - the top-left corner of the left page. */
-.sb3-page-filter {
+/* v3.7: the charm page has only two rows now (CHARMS plaque, list) - the
+   "Max rank only" filter moved onto the book frame (below). */
+.sb-page-charms { grid-template-rows: auto 1fr; }
+
+/* "Max rank only" filter - the top-left CORNER of the left parchment page,
+   tucked above the CHARMS plaque (measured off the art: the page paper
+   starts at ~13.4% of the frame height, the plaque sits at ~21%). It is a
+   child of the BOOK FRAME (.spellbook-box is position:relative), not of the
+   page, so the page's overflow:hidden cannot clip it. Without this rule the
+   element is a plain block in the frame's flex column and stretches into a
+   full-width bar across the top. */
+.sb3-frame-filter {
+    position: absolute;
+    left: 5.9%;
+    top: 12.4%;
     display: flex;
-    justify-content: flex-start;
-    margin: 0 0 clamp(1px, .25cqw, 4px);
+    align-items: center;
+    z-index: 5;
 }
 
 /* Bottom cluster of the left page (last row of the page grid). */
@@ -537,9 +547,30 @@
 
 .sb3-slot-icon {
     flex: 0 0 auto;
+    width: 64%;
+    height: 64%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: clamp(15px, 1.9cqw, 27px);
     line-height: 1;
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .85));
+}
+/* The charm's real art fills the socket's inner circle (the octagon's
+   rim takes the outer ~third of the box). */
+.sb3-slot-icon .charm-art-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+.sb3-charm-glyph .charm-art-img {
+    display: block;
+    width: 1.6em;
+    height: 1.6em;
+    object-fit: contain;
+    pointer-events: none;
 }
 
 /* Name (+orb bonus) on the parchment UNDER the socket, mirroring the
@@ -548,19 +579,29 @@
 .sb3-slot-foot {
     flex: 0 0 auto;
     max-width: 100%;
-    margin-top: clamp(1px, .2cqw, 4px);
-    font-family: var(--C, 'Cinzel', serif);
-    font-size: clamp(7.5px, .8cqw, 11.5px);
-    font-weight: 700;
-    line-height: 1.15;
+    margin-top: clamp(2px, .3cqw, 5px);
+    /* v3.7 readability pass: the old 7.5-11.5px Cinzel bold in mid-brown on
+       the parchment was hard to read, and long names were cut to "Probabil...".
+       Larger, a sturdier face (Cinzel's thin hairlines vanish on paper at
+       small sizes), near-black brown, and a paper-coloured halo so the
+       letters stay crisp over the page texture. Names wrap to two lines
+       instead of ellipsizing, so every spell name stays whole. */
+    font-family: 'Segoe UI', 'Trebuchet MS', Verdana, system-ui, sans-serif;
+    font-size: clamp(10px, 1.05cqw, 15px);
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: .01em;
     text-align: center;
-    color: #4a2c12;
-    text-shadow: 0 1px 0 rgba(255, 240, 200, .55);
-    /* v3.6: single line like the reference (name + orb bonus share it);
-       long names ellipsize instead of wrapping into the fold crease. */
-    white-space: nowrap;
+    color: #2a1507;
+    text-shadow:
+        0 0 3px rgba(255, 244, 214, .95),
+        0 1px 0 rgba(255, 244, 214, .8);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .sb3-slot-orbs {
@@ -697,13 +738,13 @@
 
 /* ---------- ELEMENT GLOWS ------------------------------------------------ */
 
-[data-school="fire"]     { --sb-glow: rgba(255, 110, 40, .95); }
-[data-school="frost"]    { --sb-glow: rgba(90, 190, 255, .95); }
-[data-school="cold"]     { --sb-glow: rgba(90, 190, 255, .95); }
-[data-school="lightning"]{ --sb-glow: rgba(190, 140, 255, .95); }
-[data-school="shadow"]   { --sb-glow: rgba(160, 90, 220, .95); }
-[data-school="nature"]   { --sb-glow: rgba(100, 220, 120, .95); }
-[data-school="holy"]     { --sb-glow: rgba(255, 220, 110, .95); }
+[data-school="fire"]     { --sb-glow: rgba(255, 96, 20, 1); }
+[data-school="frost"]    { --sb-glow: rgba(40, 170, 255, 1); }
+[data-school="cold"]     { --sb-glow: rgba(40, 170, 255, 1); }
+[data-school="lightning"]{ --sb-glow: rgba(176, 110, 255, 1); }
+[data-school="shadow"]   { --sb-glow: rgba(140, 60, 230, 1); }
+[data-school="nature"]   { --sb-glow: rgba(70, 230, 100, 1); }
+[data-school="holy"]     { --sb-glow: rgba(255, 210, 70, 1); }
 [data-school="arcane"]   { --sb-glow: rgba(200, 140, 240, .95); }
 [data-school="physical"] { --sb-glow: rgba(216, 200, 168, .9); }
 [data-school="blood"]    { --sb-glow: rgba(230, 60, 80, .95); }
@@ -770,7 +811,10 @@
 /* Filled socket feet: parchment-safe element colour (the dark --sb-title
    set) so the label stays readable on the paper. */
 .sb3-slot.is-filled[data-school] .sb3-slot-foot {
-    color: var(--sb-title, #4a2c12);
+    /* Element tint, but pulled 45% toward the near-black brown so it never
+       drops below readable contrast on the paper (raw --sb-title yellows
+       and greens were washed out). */
+    color: color-mix(in srgb, var(--sb-title, #2a1507) 55%, #1c0e04);
     font-weight: 900;
 }
 
@@ -798,21 +842,79 @@
     white-space: nowrap;
 }
 
-/* Filled socket: glowing rim + aura in the element colour. */
+/* Filled socket: a strong, ANIMATED element shimmer (spell pass 2 - the old
+   single soft drop-shadow was too faint to read as an element at a glance).
+   Three layers, all driven by the element's colours:
+     socket filter  a tight + a wide halo in --sb-glow (pulses)
+     ::after        a bright --sb-hi core behind the icon
+     ::before       a light sweep rotating around the rim (--sb-hi on --sb-glow)
+   --sb-hi is the element's bright highlight (icy white-blue for Cold,
+   white-gold for Fire, ...); --sb-pulse sets how restless the element feels
+   (fire flickers fast, cold and shadow breathe slowly). */
+[data-school="fire"]      { --sb-hi: #ffd9a0; --sb-pulse: 1.1s; }
+[data-school="frost"],
+[data-school="cold"]      { --sb-hi: #d6f4ff; --sb-pulse: 2.6s; }
+[data-school="lightning"] { --sb-hi: #f0e2ff; --sb-pulse: .8s; }
+[data-school="shadow"]    { --sb-hi: #d9b3ff; --sb-pulse: 3.2s; }
+[data-school="nature"]    { --sb-hi: #d5ffd0; --sb-pulse: 2.2s; }
+[data-school="holy"]      { --sb-hi: #fff7cf; --sb-pulse: 2s; }
+[data-school="arcane"]    { --sb-hi: #f1dcff; --sb-pulse: 2.4s; }
+[data-school="physical"]  { --sb-hi: #ffffff; --sb-pulse: 2.8s; }
+[data-school="blood"]     { --sb-hi: #ffc2c8; --sb-pulse: 1.6s; }
+[data-school="air"]       { --sb-hi: #ecfdff; --sb-pulse: 1.8s; }
+/* class-keyed skills (class / ascendency spells) borrow their class glow */
+[data-school="mathmagician"], [data-school="statistician"], [data-school="probabilist"],
+[data-school="outlier"], [data-school="actuary"], [data-school="recursionist"],
+[data-school="markovian"], [data-school="bayesian"], [data-school="random_walker"] {
+    --sb-hi: #ffffff; --sb-pulse: 2.4s;
+}
+
 .sb3-slot.is-filled[data-school] .sb3-slot-socket {
-    filter: drop-shadow(0 0 9px var(--sb-glow)) drop-shadow(0 2px 4px rgba(0, 0, 0, .5));
+    filter: drop-shadow(0 0 5px var(--sb-glow)) drop-shadow(0 0 14px var(--sb-glow))
+        drop-shadow(0 2px 4px rgba(0, 0, 0, .5));
+    animation: sb-socket-pulse var(--sb-pulse, 2.4s) ease-in-out infinite;
 }
 .sb3-slot.is-filled[data-school] .sb3-slot-socket::after {
     content: '';
     position: absolute;
-    inset: 14% 16%;
+    inset: 12% 14%;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--sb-glow) 0%, transparent 72%);
-    opacity: .65;
+    background: radial-gradient(circle, var(--sb-hi, #fff) 0%, var(--sb-glow) 38%, transparent 74%);
+    opacity: .8;
+    mix-blend-mode: screen;
     pointer-events: none;
     z-index: 0;
+    animation: sb-core-pulse var(--sb-pulse, 2.4s) ease-in-out infinite;
+}
+.sb3-slot.is-filled[data-school] .sb3-slot-socket::before {
+    content: '';
+    position: absolute;
+    inset: 4%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0 40%, var(--sb-glow) 62%, var(--sb-hi, #fff) 78%, transparent 92%);
+    -webkit-mask: radial-gradient(circle, transparent 60%, #000 66%, #000 82%, transparent 90%);
+    mask: radial-gradient(circle, transparent 60%, #000 66%, #000 82%, transparent 90%);
+    opacity: .95;
+    pointer-events: none;
+    z-index: 2;
+    animation: sb-rim-sweep calc(var(--sb-pulse, 2.4s) * 1.6) linear infinite;
 }
 .sb3-slot.is-filled[data-school] .sb3-slot-socket > * { position: relative; z-index: 1; }
+
+@keyframes sb-socket-pulse {
+    0%, 100% { filter: drop-shadow(0 0 5px var(--sb-glow)) drop-shadow(0 0 12px var(--sb-glow)) drop-shadow(0 2px 4px rgba(0, 0, 0, .5)); }
+    50%      { filter: drop-shadow(0 0 8px var(--sb-glow)) drop-shadow(0 0 22px var(--sb-glow)) drop-shadow(0 2px 4px rgba(0, 0, 0, .5)); }
+}
+@keyframes sb-core-pulse {
+    0%, 100% { opacity: .6; transform: scale(.94); }
+    50%      { opacity: .95; transform: scale(1.04); }
+}
+@keyframes sb-rim-sweep { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+    .sb3-slot.is-filled[data-school] .sb3-slot-socket,
+    .sb3-slot.is-filled[data-school] .sb3-slot-socket::after,
+    .sb3-slot.is-filled[data-school] .sb3-slot-socket::before { animation: none; }
+}
 
 /* Spell stone: glowing frame in the element colour. */
 .sb3-stone[data-school] {
@@ -956,4 +1058,30 @@
 .sb3-slot.drop-target .sb3-slot-socket {
     filter: drop-shadow(0 0 10px rgba(79, 195, 247, .95)) drop-shadow(0 2px 4px rgba(0, 0, 0, .5)) brightness(1.35);
     transform: scale(1.08);
+}
+
+/* ---- Theorem mode: right-click the Theorems pill, then left-click a charm - */
+.sb3-theorem { cursor: context-menu; }
+.sb3-theorem.is-armed {
+    border-color: #e9c8ff;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .45),
+        inset 0 -2px 4px rgba(0, 0, 0, .55),
+        0 0 0 2px rgba(213, 168, 245, .55),
+        0 0 16px 4px rgba(176, 127, 232, .85);
+    animation: sb3-theorem-armed 1.1s ease-in-out infinite;
+}
+@keyframes sb3-theorem-armed {
+    0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 4px rgba(0,0,0,.55), 0 0 0 2px rgba(213,168,245,.45), 0 0 10px 2px rgba(176,127,232,.6); }
+    50%      { box-shadow: inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 4px rgba(0,0,0,.55), 0 0 0 2px rgba(233,200,255,.9), 0 0 22px 6px rgba(176,127,232,1); }
+}
+body.charm-theorem-mode .sb3-charm-row,
+body.charm-theorem-mode .sb3-slot[data-charm-key] { cursor: copy; }
+body.charm-theorem-mode .sb3-charm-row:hover,
+body.charm-theorem-mode .sb3-slot[data-charm-key]:hover {
+    outline: 2px solid #d5a8f5;
+    outline-offset: 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+    .sb3-theorem.is-armed { animation: none; }
 }

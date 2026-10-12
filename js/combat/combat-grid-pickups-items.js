@@ -73,7 +73,8 @@ export function _egAnimateItemDropClaim(row, col, drop) {
 // Attempts to place one regular-item drop on the grid after a monster dies.
 // isBoss - pass true for the higher boss drop chance.
 // Ironman: puzzle items never spawn - only currency/equipment/maps/hearts/mana/eraser/surge do.
-export function _egSpawnItemDrop(isBoss = false) {
+// force - skip the chance roll (the kill handler already picked this bucket).
+export function _egSpawnItemDrop(isBoss = false, force = false) {
     if (!_egIsActive()) return;
     if (typeof curMods !== 'undefined' && globalThis.curMods.ironman) return;
 
@@ -83,7 +84,7 @@ export function _egSpawnItemDrop(isBoss = false) {
     const treeDropPct = typeof globalThis._egComputePlayerStats === 'function'
         ? (Number(globalThis._egComputePlayerStats().itemDropPct) || 0) : 0;
     const dropChance = Math.min(1, baseItemChance * itemQtyMult * (1 + treeDropPct / 100));
-    if (Math.random() > dropChance) return;
+    if (!force && Math.random() > dropChance) return;
 
     // One regular-item drop on the board at a time.
     if (_egItemDrops.size >= EG_ITEM_DROP_MAX_ON_BOARD) return;

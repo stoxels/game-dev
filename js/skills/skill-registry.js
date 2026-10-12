@@ -5,7 +5,7 @@ import { ASCENDENCY_DEFS } from '../classes/ascendency-defs.js';
 import { cooldownState, getEffectiveCooldown } from '../classes/class-cooldown-state.js';
 import { CLASS_DEFS, CLASS_SPELL_ICONS, ENDGAME_HEARTBLOOM_DEF } from '../classes/class-defs.js';
 import { _abilityCanAfford, _getAbilityManaCost } from '../classes/class-mana.js';
-import { getSkillCastRankClamped, getSkillCastRankFull, getSpellRankDamageMult, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
+import { getCharmArtForSkill, getSkillCastRankClamped, getSkillCastRankFull, getSpellRankDamageMult, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { UNIVERSAL_SPELL_DEFS, _registerUniversalSpells, _uspGroupTitle, _uspMovementGroupTitle, _uspSupportGroupTitle, canAffordUniversalSpell, castUniversalSpell, getUniversalSpellCooldownRemaining, getUniversalSpellDamageEstimate, getUniversalSpellEffectiveCooldown, getUniversalSpellManaCost, isUniversalMovementSpell, isUniversalSpellUnlocked, isUniversalSupportSpell } from './universal-spells.js';
 import { STATE } from '../state.js';
 // BRIDGE NOTE: the four globalThis accessors above are live seams —
@@ -370,7 +370,14 @@ export function isSkillPassive(skillId) {
 // Upgrade artwork URL for a castable skill, or null when it has none.
 export function getSkillImage(skillId) {
     const def = getSkillDef(skillId);
-    return def ? (def.image || null) : null;
+    if (!def) return null;
+    if (def.image) return def.image;
+    // Universal spells wear their charm's art (at the slotted rank) wherever a
+    // skill icon is drawn - the hotbar included - instead of the emoji glyph.
+    if (def.slotKind === 'universal') {
+        try { return getCharmArtForSkill(skillId) || null; } catch (e) { return null; }
+    }
+    return null;
 }
 
 // Upgrade artwork URL for a passive ability, or null when it has none.
@@ -852,7 +859,7 @@ export function activateHotbarSlot(slotIndex) {
 // Activates a skill by id. Routes through the existing ability toggle so
 // arming, affordability, instant firing and cooldowns stay untouched.
 // Returns true if the attempt was dispatched.
-export function activateSkill(skillId) {
+export function activateSkill(skillId, opts) {
     const def = getSkillDef(skillId);
     if (!def) return false;
     // Charm gate first so the player gets the actionable message rather than
@@ -877,7 +884,7 @@ export function activateSkill(skillId) {
     noteCharmCast(skillId);
     // Universal spells bypass the legacy slot engine entirely.
     if (def.slotKind === 'universal') {
-        return castUniversalSpell(skillId);
+        return castUniversalSpell(skillId, opts);
     }
     if (typeof globalThis.toggleActiveAbility === 'function') {
         globalThis.toggleActiveAbility(def.legacySlot);
