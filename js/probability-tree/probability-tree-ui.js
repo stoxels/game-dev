@@ -1548,22 +1548,19 @@ export function _ptRenderStatSummary() {
     const countEl = document.getElementById('pt-summary-count');
     if (countEl) countEl.textContent = '(' + t('pt_summary_nodes').replace('{n}', summary.nodes) + ')';
 
-    const head = (label) => `<div class="pt-summary-head">${label}</div>`;
+    const card = (label, inner, wide) => `<div class="pt-summary-card${wide ? ' is-wide' : ''}">`
+        + `<div class="pt-summary-head">${label}</div>${inner}</div>`;
     const html = [];
     summary.sections.forEach(section => {
-        html.push(head(section.label));
-        section.lines.forEach(line => html.push(`<div class="pt-summary-line">${line}</div>`));
+        html.push(card(section.label,
+            section.lines.map(line => `<div class="pt-summary-line">${line}</div>`).join(''), false));
     });
-    const entry = (e) => `<div class="pt-summary-line pt-summary-name">${e.name}</div>`
-        + (e.desc ? `<div class="pt-summary-desc">${String(e.desc).split('\n').join('<br>')}</div>` : '');
-    if (summary.specials.length) {
-        html.push(head(t('pt_summary_specials')));
-        summary.specials.forEach(e => html.push(entry(e)));
-    }
-    if (summary.keystones.length) {
-        html.push(head(t('pt_summary_keystones')));
-        summary.keystones.forEach(e => html.push(entry(e)));
-    }
+    const entries = (list) => '<div class="pt-summary-cols">' + list.map(e =>
+        `<div class="pt-summary-entry"><div class="pt-summary-name">${e.name}</div>`
+        + (e.desc ? `<div class="pt-summary-desc">${String(e.desc).split(String.fromCharCode(10)).join('<br>')}</div>` : '')
+        + '</div>').join('') + '</div>';
+    if (summary.specials.length) html.push(card(t('pt_summary_specials'), entries(summary.specials), true));
+    if (summary.keystones.length) html.push(card(t('pt_summary_keystones'), entries(summary.keystones), true));
     body.innerHTML = html.length ? html.join('') : `<div class="pt-summary-empty">${t('pt_summary_empty')}</div>`;
 }
 
