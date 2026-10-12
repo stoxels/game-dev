@@ -5,7 +5,7 @@ Solve grid puzzles against the clock, learn real maths from the quizzes,
 level up a class, grow a 2,000-node passive tree and push into an
 endgame of loot, maps and bosses - all in the browser, no install.
 
-**[▶ Play it online](https://stoxels.github.io/game-dev/)** · Version 0.29 BETA · English and German
+**[▶ Play it online](https://stoxels.github.io/game-dev/)** · Version 0.30 BETA · English and German
 
 ---
 
@@ -91,30 +91,40 @@ two further abilities.
 
 ### Charms, spells and the spell book
 
-Skills have ten ranks. **Charms** drop from defeated monsters (bosses
-always drop one) and are slotted into a **spell book** with hotbar keys.
-Duplicates turn into *Lemmas*, and ten Lemmas prove a *Theorem* that you
-can spend for a permanent bonus. A large arsenal of **universal spells**
-(fire, frost, lightning, arcane, shadow, holy, blade and arrow families)
-is available on top of class abilities.
+Skills have ten ranks. **Charms** drop from defeated monsters and are
+slotted into a **spell book** with hotbar keys. Duplicates turn into
+*Lemmas*, and ten Lemmas prove a *Theorem* that you apply to a charm for
+a permanent bonus. A large arsenal of **universal spells** (fire, frost,
+lightning, arcane, shadow, holy, blade and arrow families) is available
+on top of class abilities, and spells cast in several ways: tap, hold,
+channel (keep firing while mana drains), charge-and-release, ground
+targeting, melee swings and toggled auras.
 
 ---
 
 ## The Probability Tree
 
-The passive tree has **about 2,100 nodes**: 53 keystones, 528 notables
-and over 1,500 small and travel nodes, laid out around three starting
-points. You spend Convergence points to allocate nodes.
+The passive tree has **about 2,000 nodes**: 81 keystones, 566 notables
+and around 1,400 small and travel nodes, laid out as three class wheels
+around the centre, one per starting point. You spend Convergence points
+to allocate nodes, and a **stat summary** tab in the corner of the tree
+shows the combined total of everything you have picked, grouped into
+Life, Mana, Defence, Spells, Melee, Puzzle and more.
 
-The tree is **being reworked node by node** onto a shared *effects
-registry*: every reworked node is just a list such as
+The **rework is complete**: almost every node (about 1,700) runs on a
+shared *effects registry*. A node is just a list such as
 `["str_flat:5", "armour_flat:10"]`, and its tooltip, stat wiring and
-character-sheet entry are generated from the registry in both languages.
+character-sheet entry are generated from the registry in both
+languages. Nodes cover attributes, life, mana, absorption, elemental and
+weapon-class damage, projectiles and ailments, plus **puzzle effects**
+that tie the nonogram to combat (line completion, streaks, flawless
+solves, kills and quizzes can grant resources, time or damage).
 Keystones change the rules - for example *Blood Magic* (spells cost Life
 instead of Mana), *Primal Flame* (convert damage to fire, deal no other
-damage) and *Vital Conduit* (trade regeneration and leech for
-Absorption-to-Life). The in-game counter in the tree's top bar shows how
-many nodes are done.
+damage), *Vital Conduit* (trade regeneration and leech for
+Absorption-to-Life) and *Glass Clock* (a shorter timer for a bigger
+payout). Each base class and ascendency has its own hand-placed wheel of
+notables.
 
 ---
 
@@ -177,7 +187,7 @@ full local project folder.
   the game is a static site served as-is by GitHub Pages.
 - **Data-driven**: levels, quizzes, items, mod tables, bosses and the
   passive tree are plain data files.
-- **Tested**: more than 1,500 automated tests run the real game modules
+- **Tested**: more than 3,000 automated tests run the real game modules
   in a simulated browser; a headless boot check confirms a clean console.
 - **Bilingual**: every player-facing string exists in English and German.
 - Best tested in **Firefox**; Chromium browsers work too.
@@ -187,5 +197,7 @@ full local project folder.
 ## Status
 
 STOXELS is a work-in-progress **beta** under active development. The
-passive tree rework, endgame balance and art are still moving, and
-saves from older versions may be migrated or reset between releases.
+passive tree rework is done; balance (mana costs, spell and monster
+scaling) and art are still moving, and saves from older versions may be
+migrated or reset between releases. See the in-game changelog for the
+latest patch notes.

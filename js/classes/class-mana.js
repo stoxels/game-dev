@@ -1,7 +1,7 @@
 import { _getAscendencySlotData } from './class-abilities.js';
 import { CLASS_DEFS, ENDGAME_HEARTBLOOM_DEF } from './class-defs.js';
 import { buildClassHUD } from './class-hud.js';
-import { getSkillRankManaMultForSlot } from '../skills/skill-charms.js';
+import { getSkillManaCostOverrideForSlot, getSkillRankManaMultForSlot } from '../skills/skill-charms.js';
 import { _hotbarClasslessHasSpells } from '../skills/skill-hotbar.js';
 import { STATE } from '../state.js';
 // class-mana.js
@@ -18,13 +18,13 @@ const MANA_REGEN_INTERVAL_MS = 5000;
 // outside endgame (story levels have no equipment). Tunable in one place.
 const MANA_BASE_REGEN = 4;
 
-// Scales flat ability costs as max mana grows; each divisor step above the
-// day-one baseline adds 100% to every cost.
-const MANA_COST_SCALE_BASELINE = 100;
-const MANA_COST_SCALE_DIVISOR = 340;
-
 // Global balance multiplier applied inside _scaleAbilityManaCost so every
-// cost source and tooltip uses the same value.
+// cost source and tooltip uses the same value. A cost is exactly:
+//   base cost (per spell / skill) x this x charm-rank multiplier
+// (SPELL_RANK_MANA_MULT in skill-charms.js), then the passive-tree and map
+// modifiers below. It no longer grows with the player's max mana pool - that
+// old proxy for "gear makes spells cheap" compounded with the rank curve and
+// priced high ranks above any pool the player could own.
 const MANA_COST_GLOBAL_MULT = 1.5;
 
 // Lazily created handle for the passive regen tick (null until first use).
@@ -41,9 +41,15 @@ let _manaRegenInterval = null;
 // both use this helper.
 export function _scaleAbilityManaCost(cost) {
     if (!cost || cost <= 0) return 0;
-    const maxMana = _getPlayerMaxMana();
-    const mult = 1 + Math.max(0, maxMana - MANA_COST_SCALE_BASELINE) / MANA_COST_SCALE_DIVISOR;
-    let scaled = cost * mult * MANA_COST_GLOBAL_MULT;
+    return _applyManaCostModifiers(cost * MANA_COST_GLOBAL_MULT);
+}
+
+// Passive-tree and map modifiers on an already-listed cost. A per-spell
+// override (SPELL_MANA_COST_OVERRIDES in skill-charms.js) is a listed cost,
+// so it comes through here and skips the global multiplier and rank curve.
+export function _applyManaCostModifiers(cost) {
+    if (!cost || cost <= 0) return 0;
+    let scaled = cost;
     // "% increased Cost of all spells" (passive tree, Blood Magic keystone).
     scaled *= 1 + _treeChannel('spellCostIncPct') / 100;
     // Cost Efficiency (passive tree): cost / (1 + efficiency).
@@ -90,6 +96,8 @@ export function _getPlayerMaxMana() {
 export function _getAbilityManaCost(hudSlot) {
     const base = _getAbilityScaledBaseCost(hudSlot);
     if (!base) return base;
+    const listed = getSkillManaCostOverrideForSlot(hudSlot);
+    if (listed != null) return _applyManaCostModifiers(listed);
     const rankMult = getSkillRankManaMultForSlot(hudSlot);
     return Math.round(base * rankMult);
 }

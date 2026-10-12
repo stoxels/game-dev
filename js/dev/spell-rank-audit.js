@@ -3,9 +3,9 @@ import { t } from '../translation/translations.js';
 import { ASCENDENCY_DEFS } from '../classes/ascendency-defs.js';
 import { ASCENDENCY_LIST } from '../classes/class-cooldown-state.js';
 import { CLASS_DEFS, CLASS_LIST } from '../classes/class-defs.js';
-import { _scaleAbilityManaCost } from '../classes/class-mana.js';
+import { _applyManaCostModifiers, _scaleAbilityManaCost } from '../classes/class-mana.js';
 import { _clsGetLocalizedName } from '../classes/class-ui.js';
-import { SPELL_MAX_RANK, getCharmSlottedRank, getSkillCastRankFull, getSkillMaxRank, getSpellRankDamageMult, getSpellRankManaMult } from '../skills/skill-charms.js';
+import { SPELL_MAX_RANK, getCharmSlottedRank, getSkillCastRankFull, getSkillMaxRank, getSpellManaCostOverride, getSpellRankDamageMult, getSpellRankManaMult } from '../skills/skill-charms.js';
 import { HEARTBLOOM_SKILL_ID, getSkillDamage, getSkillDef, getSkillEffect, getSkillImage, getSkillManaCost, getSkillName } from '../skills/skill-registry.js';
 import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspProjDefFor } from '../skills/universal-spell-fx.js';
 import { UNIVERSAL_SPELL_DEFS, USP_WARD_MIN_HIT_PCT, _uspCalcAbsorb, _uspCalcArmourPct, _uspCalcDodgePct, _uspCalcDrPct, _uspCalcHeal, _uspCalcHotTick, _uspCalcThornsPct, _uspCalcWardCharges, _uspHealingPower, _uspMaxAbsorption, _uspMaxLife, _uspRankAdditive, getUniversalSpellDef, isUniversalMovementSpell, isUniversalSupportSpell, isUspAnchorArmed } from '../skills/universal-spells.js';
@@ -171,6 +171,9 @@ export function _sraRankAdditive(base, perRank, cap, rank) {
 // inherits gear/map cost scaling and the Blood Magic swap rather than
 // re-deriving them. Falls back to the authored base when the live value is 0.
 export function _sraMana(spellId, rank) {
+    // A per-spell override pins the listed cost for that rank.
+    const listed = (typeof getSpellManaCostOverride === 'function') ? getSpellManaCostOverride(spellId, rank) : null;
+    if (listed != null) return Math.max(0, Math.round(_applyManaCostModifiers(listed)));
     const usp = _sraUniversal(spellId);
     const def = _sraDef(spellId);
     const liveRank = (typeof getSkillCastRankFull === 'function') ? getSkillCastRankFull(spellId) : 1;

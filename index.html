@@ -13,7 +13,7 @@
         } catch (e) { /* class absent → default (hosted) styling */ }
     </script>
     <link rel="icon" type="image/png" href="images/favicon.png">
-    <title>STOXELS - v0.29 BETA</title>
+    <title>STOXELS - v0.30 BETA</title>
     <link rel="stylesheet" href="css/base.css?v=3">
     <link rel="stylesheet" href="css/pause.css?v=4">
     <link rel="stylesheet" href="css/settings.css">
@@ -32,7 +32,7 @@
     <link rel="stylesheet" href="css/universal-spells.css?v=11">
     <link rel="stylesheet" href="css/achievements.css?v=3">
     <link rel="stylesheet" href="css/item_effects.css?v=2">
-    <link rel="stylesheet" href="css/probability_tree.css?v=6">
+    <link rel="stylesheet" href="css/probability_tree.css?v=7">
     <link rel="stylesheet" href="css/passive_effects.css">
     <link rel="stylesheet" href="css/quests.css">
     <link rel="stylesheet" href="css/passive-tracker.css">
@@ -137,7 +137,7 @@
 
             <!-- Expansion logo (EN/DE swapped by setLang) - hover shows expansion history -->
             <img class="title-expansion-logo" id="title-expansion-logo" src="images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp" alt="Rise of the Beasts">
-            <div class="title-version-line">v0.29 BETA</div>
+            <div class="title-version-line">v0.30 BETA</div>
             <div class="title-ai-disclosure" data-t="scr_ai_disclosure">This game contains AI-generated art, sound, music, and code.</div>
             <div class="title-lang-overlay">
                 <button class="lang-btn active" data-lang="en"><span class="btn-label">EN</span></button>
@@ -1408,6 +1408,11 @@
             <span class="pt-points" id="pt-points"></span>
         </div>
         <div class="pt-canvas" id="pt-canvas"></div>
+        <!-- Stat summary: totals of every allocated node, built on hover -->
+        <div class="pt-summary" id="pt-summary">
+            <div class="pt-summary-tab">&Sigma; <span data-t="pt_summary_title">STAT SUMMARY</span> <span class="pt-summary-count" id="pt-summary-count"></span></div>
+            <div class="pt-summary-body" id="pt-summary-body"></div>
+        </div>
     </div>
 
     <!-- CONVERGENCE -->

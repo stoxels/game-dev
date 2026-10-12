@@ -3,8 +3,8 @@ import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { _getGlobalCooldownReduction } from '../classes/class-cooldown-state.js';
 import { _egApplyDamageConversion, _egHasDamageConversion, _egLeechAbsorption, _egLeechHealMult } from '../combat/combat-calculations-resistances.js';
-import { _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost } from '../classes/class-mana.js';
-import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
+import { _applyManaCostModifiers, _bloodMagicActive, _scaleAbilityManaCost, canAffordLifeCost, canAffordMana, payAbilityCost } from '../classes/class-mana.js';
+import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellManaCostOverrideForSkill, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
 import { SKILL_REGISTRY } from './skill-registry.js';
 import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspBlinkFX, _uspFireThemedProjectile, _uspMoveSpriteOffset, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph } from './universal-spell-fx.js';
@@ -2162,6 +2162,10 @@ function getUniversalSpellDamageBonus(spell) {
 export function getUniversalSpellManaCost(spellId) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell) return 0;
+    // Per-spell override: the listed cost for this rank, then only the
+    // passive-tree / map modifiers (no global multiplier, no rank curve).
+    const listed = getSpellManaCostOverrideForSkill(spellId);
+    if (listed != null) return Math.round(_applyManaCostModifiers(listed));
     let cost = spell.manaCost || 0;
     {
         try { cost = _scaleAbilityManaCost(cost); } catch (e) { /* fall through */ }

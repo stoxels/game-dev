@@ -3,7 +3,7 @@ import { EG_ART } from '../endgame/endgame-art.js';
 import { _ptAllocated, _ptBuildAdjacency, _ptGetNodeVisualState, _ptIsDeallocatable, _ptLang, _ptOnNodeClick, _ptPoints, _ptRefreshPointsDisplay, ensurePassiveTreeRoot } from './probability-tree-state-points.js';
 import { getPassiveTreeRootId, isPassiveTreeStartNode } from './probability-tree.js';
 import { getPassiveTreeNodeProposal, isPassiveTreeNodeReworked } from './probability-tree-rework.js';
-import { ptDerivedNodeEmoji, ptIsReservedNode, ptResolveNodeDesc } from './pt-effects.js';
+import { ptBuildStatSummary, ptDerivedNodeEmoji, ptIsReservedNode, ptResolveNodeDesc } from './pt-effects.js';
 import { _ptBindEvents, _ptFitToView } from './probability-tree-viewport.js';
 import { PT_COL_ALLOCATED_BG, PT_COL_ALLOCATED_BORDER, PT_COL_ALLOCATED_DOT, PT_COL_LOCKED_BG, PT_COL_LOCKED_BORDER, PT_COL_LOCKED_DOT, PT_COL_START, PT_COL_UNLOCKED_BG, PT_COL_UNLOCKED_BORDER, PT_COL_UNLOCKED_DOT, PT_CONN_ALLOCATED, PT_CONN_UNLOCKED, PT_CONN_WIDTH, PT_NODE_RADIUS, PT_PADDING } from './probability-tree.js';
 //------------------------------------------------------------------------
@@ -329,6 +329,7 @@ export function _ptRefreshAllStyles(affectedIds) {
         });
     }
     _ptRefreshPointsDisplay();
+    if (typeof document !== 'undefined' && document.getElementById('pt-summary')) _ptRenderStatSummary();
 }
 
 
@@ -808,6 +809,9 @@ export function _ptAppendStartSprite(skill, def, cx, cy, r, target = _pt_nodesLa
     img.alt = '';
     img.className = 'pt-start-sprite';
     img.draggable = false;
+    // Stox's silhouette is drawn facing right; mirror it so he looks left,
+    // out toward the edge of the tree like the other two classes.
+    if (/stox/i.test(src)) img.style.transform = 'scaleX(-1)';
     const size = Math.round(r * 2 * 4.5);
     let x = cx;
     let y = cy;
@@ -1526,6 +1530,52 @@ export function _ptUpdateVirtualViewport(scale, tx, ty) {
     return { nodes: visibleNodeIds.size, connections: visibleConnectionIds.size };
 }
 
+// Fills the hover panel with the totals of every allocated node. Runs on
+// mouseenter only, so a closed panel costs nothing and the numbers are always
+// current (nodes allocated since the last hover are included).
+export function _ptRenderStatSummary() {
+    const body = document.getElementById('pt-summary-body');
+    if (!body) return;
+    const lang = _ptLang();
+    const skillMap = globalThis._pt_skillMap || {};
+    const defs = [];
+    _ptAllocated().forEach(id => {
+        const skill = skillMap[id];
+        if (skill && skill._def) defs.push(skill._def);
+    });
+    const summary = ptBuildStatSummary(defs, lang);
+
+    const countEl = document.getElementById('pt-summary-count');
+    if (countEl) countEl.textContent = '(' + t('pt_summary_nodes').replace('{n}', summary.nodes) + ')';
+
+    const head = (label) => `<div class="pt-summary-head">${label}</div>`;
+    const html = [];
+    summary.sections.forEach(section => {
+        html.push(head(section.label));
+        section.lines.forEach(line => html.push(`<div class="pt-summary-line">${line}</div>`));
+    });
+    const entry = (e) => `<div class="pt-summary-line pt-summary-name">${e.name}</div>`
+        + (e.desc ? `<div class="pt-summary-desc">${String(e.desc).split('\n').join('<br>')}</div>` : '');
+    if (summary.specials.length) {
+        html.push(head(t('pt_summary_specials')));
+        summary.specials.forEach(e => html.push(entry(e)));
+    }
+    if (summary.keystones.length) {
+        html.push(head(t('pt_summary_keystones')));
+        summary.keystones.forEach(e => html.push(entry(e)));
+    }
+    body.innerHTML = html.length ? html.join('') : `<div class="pt-summary-empty">${t('pt_summary_empty')}</div>`;
+}
+
+// Wires the hover rebuild once; the panel element lives in index.html.
+export function _ptBindStatSummary() {
+    const panel = document.getElementById('pt-summary');
+    if (!panel || panel.dataset.ptBound === '1') return;
+    panel.dataset.ptBound = '1';
+    panel.addEventListener('mouseenter', _ptRenderStatSummary);
+    _ptRenderStatSummary();
+}
+
 // Injects search bar DOM children into the pre-existing #pt-search-wrap
 // placeholder element in the topbar.  Only runs when the wrap is empty, so
 // re-renders do not duplicate the search input.
@@ -1578,6 +1628,7 @@ export function _ptRender() {
 
     _ptBindNodeEvents();
     _ptInjectSearchBar();
+    _ptBindStatSummary();
     _ptBindEvents();
     _ptFitToView(bounds);
     _ptRefreshAllStyles();

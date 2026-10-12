@@ -322,10 +322,6 @@
     box-shadow: none;
 }
 
-#pt-world.pt-overview .pt-node > * {
-    display: none;
-}
-
 .pt-node-selected-character-start {
     outline: 3px solid #ffe680;
     outline-offset: 4px;
@@ -340,4 +336,94 @@
     50% {
         outline-color: #ffffff;
     }
+}
+
+
+/* ------------------------------------------------------------------------
+   --- STAT SUMMARY --------------------------------------------------------
+   ------------------------------------------------------------------------
+   Small tab in the corner of the tree. Hovering it opens a panel with the
+   totals of every allocated node, grouped by category (built in JS on
+   mouseenter, so it costs nothing while closed).
+   ------------------------------------------------------------------------ */
+.pt-summary {
+    position: absolute;
+    left: 14px;
+    top: 66px;
+    z-index: 20;
+    max-width: min(380px, calc(100% - 28px));
+    font-family: var(--PX);
+}
+
+.pt-summary-tab {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--pt-zoom-color);
+    background: var(--pt-zoom-wrap-bg);
+    border: 1px solid var(--pt-zoom-border);
+    border-radius: 6px;
+    box-shadow: 0 2px 10px var(--pt-zoom-wrap-shadow);
+    cursor: default;
+    user-select: none;
+}
+
+.pt-summary-count {
+    opacity: 0.7;
+    margin-left: 6px;
+}
+
+.pt-summary-body {
+    display: none;
+    margin-top: 4px;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+    padding: 10px 12px;
+    background: rgba(10, 10, 20, 0.94);
+    border: 1px solid var(--pt-zoom-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.35;
+    color: #e8e2cf;
+}
+
+.pt-summary:hover .pt-summary-body {
+    display: block;
+}
+
+.pt-summary-head {
+    margin: 10px 0 4px;
+    padding-bottom: 2px;
+    font-family: var(--PX);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--pt-zoom-color-hover);
+    border-bottom: 1px solid var(--pt-zoom-border);
+}
+
+.pt-summary-head:first-child {
+    margin-top: 0;
+}
+
+.pt-summary-line {
+    padding: 1px 0;
+}
+
+.pt-summary-name {
+    font-weight: 600;
+    color: #ffe9a8;
+}
+
+.pt-summary-desc {
+    margin: 0 0 6px;
+    color: #b9b3a0;
+    font-size: 12px;
+}
+
+.pt-summary-empty {
+    opacity: 0.7;
 }

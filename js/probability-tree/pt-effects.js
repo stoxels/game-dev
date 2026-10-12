@@ -948,3 +948,106 @@ export function ptDerivedNodeEmoji(node) {
     }
     return '';
 }
+
+// ---------------------------------------------------------------------------
+// Stat summary (the "total of everything I have allocated" panel).
+// Sums every allocated node's effects per effect key, then groups the totals
+// into a few readable categories. Pure function of the node data - the UI
+// layer only renders what comes back.
+// ---------------------------------------------------------------------------
+
+// Display order of the summary sections. `rule` is matched against the
+// effect key; the FIRST category whose rule matches wins, so specific
+// families (puzzle, life, mana, defence) come before broad ones.
+export const PT_STAT_CATEGORIES = Object.freeze([
+    { id: 'puzzle', en: 'Puzzle', de: 'Rätsel',
+        rule: /^(timer_start|time_added|mistake_|quiz_|item_(drop|effect)|pickup_lifetime|lucky_tile|first_step|cell_on_kill|mark_on_kill|quick_fill|time_on_|freeze_timer|regen_low_time|glass_clock|long_game|perfectionist|marathon|reveal_projectile|damage_(per_streak|flawless|low_time|after_line|on_mistake)|armour_per_streak|block_flawless|.*_on_line)/ },
+    { id: 'attr', en: 'Attributes', de: 'Attribute', rule: /^(str|agi|int)_flat$/ },
+    { id: 'life', en: 'Life', de: 'Leben',
+        rule: /^(life_|health_|heart_|low_life_regen|life_pulse|leech_effect_recent_crit)/ },
+    { id: 'mana', en: 'Mana', de: 'Mana',
+        rule: /^(mana_|spells_cost|spell_cost|cost_efficiency|melee_spell_|bow_spell_mana|damage_from_mana)/ },
+    { id: 'defence', en: 'Defence & Movement', de: 'Verteidigung & Bewegung',
+        rule: /(^|_)(armour|evasion|block|absorption|parry|dodge|reflect|fortif\w*|endurance|ghost|wind_dancer|riposte|resist|res|taken|shroud|movement_speed)(_|$)|^(avoid_|cannot_|stun_avoid|max_damage_reduction|phys_taken|dmg_full_absorption|spell_block|shield_(defences|elemental|absorption))|^(rage_armour|agility_no_evasion|shadow_immune|last_element_resist|leech_as_absorption)/ },
+    { id: 'ailments', en: 'Ailments & Damage over Time', de: 'Zustände & Schaden über Zeit',
+        rule: /(poison|bleed|ignite|chill|shock|freeze|blind|ailment|^dot_|_dot_|^dot|stun|impale|crush|intimidate|dagger_crit_poison)/ },
+    { id: 'projectiles', en: 'Projectiles', de: 'Projektile',
+        rule: /^(projectile_|pierce|chain_|fork_|multishot|point_blank|secondary_damage|bow_aoe|frenzy|evasion_per_frenzy|move_per_frenzy|charge_per_frenzy|life_on_projectile|mana_on_projectile)/ },
+    { id: 'melee', en: 'Melee & Attacks', de: 'Nahkampf & Angriffe',
+        rule: /^(melee_|sword|axe|mace|dagger|attack_|rage|accuracy|ignore_phys|dual_(damage|charge|accuracy|crit|move|block)|crit_(chance|multi)_(melee|sword|axe|mace|dagger|heavy)|phys_dot|never_miss|no_repeat|precise_technique|riposte|onslaught|crit_multi_heavy)/ },
+    { id: 'spells', en: 'Spells & Elements', de: 'Zauber & Elemente',
+        rule: /^(spell_|cast_speed|dual_(cast|spell)|shield_(cast|spell)|bow_spell|wand|staff|power_|strength_spell|elemental_|fire_|cold_|lightning_|pen_|only_(fire|cold|lightning)|damage_to_|phys_as_|single_element|skill_effect|area_of_effect|area_damage|spell_dmg|lightning_(max|min)|crit_(chance|multi)_(staff|wand)|mana_leech|absorption_leech_spell|crit_(per|multi_per)_power)/ },
+    { id: 'damage', en: 'Damage & Critical Hits', de: 'Schaden & Kritische Treffer',
+        rule: /^(damage_|phys_damage|shadow_|crit_|never_crit|no_crit|dmg_|aoe_|dot_multi_equals_crit)/ },
+]);
+
+const PT_STAT_OTHER = Object.freeze({ id: 'other', en: 'Other', de: 'Sonstiges' });
+
+// Category id for an effect key ('other' when no rule matches).
+export function ptStatCategoryId(key) {
+    const k = String(key || '');
+    for (const cat of PT_STAT_CATEGORIES) {
+        if (cat.rule.test(k)) return cat.id;
+    }
+    return PT_STAT_OTHER.id;
+}
+
+// Builds the summary for a list of allocated node definitions.
+//   sections  - [{ id, label, lines: [text, ...] }] in display order, only
+//               categories that have at least one line.
+//   keystones - [{ name, desc }] allocated keystones (their text, not sums).
+//   specials  - [{ name, desc }] hand-written puzzle/class-skill nodes that
+//               have no numeric effects (they cannot be summed).
+//   nodes     - how many nodes were counted (start nodes excluded).
+// Same effect key on several nodes is summed into one line; flag effects
+// (no number) appear once. Keystones appear only in their own list so their
+// text is not repeated inside the numeric sections.
+export function ptBuildStatSummary(nodeDefs, lang) {
+    const de = lang === 'de';
+    const totals = new Map();   // effect key -> summed value (insertion order)
+    const keystones = [];
+    const specials = [];
+    let nodes = 0;
+    const isKeystone = (n) => Boolean(n && ((n.statKey && String(n.statKey).startsWith('keystone_'))
+        || (n.nameEn && String(n.nameEn).startsWith('Keystone:'))
+        || (n.nameDe && String(n.nameDe).startsWith('Schlüsselfertigkeit:'))));
+    const cleanName = (n) => String((de ? n.nameDe : n.nameEn) || n.nameEn || '')
+        .replace(/^(Keystone:|Schlüsselfertigkeit:)\s*/, '');
+
+    for (const node of nodeDefs || []) {
+        if (!node || node.tier === 'start') continue;
+        nodes += 1;
+        if (isKeystone(node)) {
+            keystones.push({ name: cleanName(node), desc: ptResolveNodeDesc(node, lang) });
+            continue;
+        }
+        if (ptNodeHasEffects(node)) {
+            for (const spec of node.effects) {
+                const parsed = ptParseEffectSpec(spec);
+                if (!parsed) continue;
+                totals.set(parsed.key, (totals.get(parsed.key) || 0) + parsed.value);
+            }
+        } else if (!ptIsReservedNode(node)) {
+            const desc = ptResolveNodeDesc(node, lang);
+            if (desc) specials.push({ name: cleanName(node), desc });
+        }
+    }
+
+    const byCat = new Map();
+    for (const [key, value] of totals) {
+        const def = PT_EFFECT_DEFS[key];
+        const template = de ? def.de : def.en;
+        // Round away float noise from summing decimals (0.1 + 0.2).
+        const shown = Math.round(value * 100) / 100;
+        const text = String(template).replace('{v}', String(shown));
+        const id = ptStatCategoryId(key);
+        if (!byCat.has(id)) byCat.set(id, []);
+        byCat.get(id).push(text);
+    }
+    const sections = [];
+    for (const cat of [...PT_STAT_CATEGORIES, PT_STAT_OTHER]) {
+        const lines = byCat.get(cat.id);
+        if (lines && lines.length) sections.push({ id: cat.id, label: de ? cat.de : cat.en, lines });
+    }
+    return { sections, keystones, specials, nodes };
+}

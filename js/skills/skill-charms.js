@@ -175,11 +175,15 @@ const CHARM_RANK_MIN_PLAYER_LEVEL = [1, 1, 1, 35, 50, 68, 74, 79, 84, 89];
 //
 // The multipliers below are ABSOLUTE (rank 1 = 1.00) and compound per rank:
 //   damage ×~1.28 →  rank 3 = 1.65×, rank 5 = 2.50×, rank 10 = 6.00×
-//   mana   ×1.18  →  rank 3 = 1.40×, rank 5 = 1.95×, rank 10 = 4.45×
-// Damage per mana still rises with rank (1.35× by rank 10), so pushing a
-// spell's rank pays off while a low rank stays the frugal option. The damage
-// curve was flattened from its old 9.00× top (2026-09 balance pass) because
-// max-rank nukes one-shot same-level bosses and made mana irrelevant.
+//   mana   explicit table (below) → rank 3 = 1.70×, rank 5 = 3.80×, rank 10 = 8.00×
+// The mana table is the ONLY rank-based cost scaling (the old "cost grows
+// with max mana" factor is gone). It is sized against the mana pool a player
+// typically owns when that rank first drops - roughly 80 / 110 / 160 / 260 /
+// 370 / 500 / 560 / 620 / 700 / 780 at ranks 1..10 - so a mid-priced spell
+// (base cost ~42, x1.5 global) costs about two thirds of that pool at every
+// rank. Gear beyond that is what makes casts cheaper, which is its job.
+// The damage curve was flattened from its old 9.00× top (2026-09 balance pass)
+// because max-rank nukes one-shot same-level bosses and made mana irrelevant.
 // Ranks 1-3 line up with the authored 3-rank curves the class defs already
 // shipped (rank 3 ≈ 1.65× the rank-1 reference damage), so existing content
 // keeps its feel and ranks 4-10 simply continue the curve.
@@ -187,7 +191,18 @@ export const SPELL_MAX_RANK = 10;
 
 // Index = rank - 1.
 export const SPELL_RANK_DAMAGE_MULT = [1.00, 1.30, 1.65, 2.05, 2.50, 3.00, 3.60, 4.30, 5.10, 6.00];
-export const SPELL_RANK_MANA_MULT = [1.00, 1.22, 1.52, 1.90, 2.40, 3.05, 3.90, 5.00, 6.40, 8.20];
+export const SPELL_RANK_MANA_MULT = [1.00, 1.20, 1.70, 2.70, 3.80, 5.20, 5.80, 6.40, 7.20, 8.00];
+
+// PER-SPELL MANA OVERRIDES. The rank curve above prices every spell the same
+// way (base cost x rank multiplier). When one spell needs its own numbers,
+// list its cost for each rank here: the array holds the LISTED cost at ranks
+// 1..10 (what the tooltip shows before gear / passive-tree / map modifiers).
+// Use null for a rank that should keep following the curve. Spells not
+// listed here are unaffected. Example:
+//     usp_fireball: [20, 24, 32, 50, 70, 95, 105, 118, 130, 145],
+//     usp_meteor:   [null, null, null, 120, null, null, null, null, null, 520],
+// Keys are skill ids (universal 'usp_*' spells, class abilities, Heartbloom).
+export const SPELL_MANA_COST_OVERRIDES = {};
 
 // Relative chance a monster drops each rank's charm. Normal monsters skew hard
 // to low ranks; bosses roll a linear table so high ranks are a boss-farm
@@ -737,6 +752,27 @@ export function getSkillRankManaMultForSlot(slot) {
     const id = getSkillIdForLegacySlot(slot);
     if (!id) return 1;
     return getSpellRankManaMult(getSkillCastRankFull(id));
+}
+
+// Per-spell listed mana cost for a skill at a rank, or null when the spell
+// has no override for that rank (see SPELL_MANA_COST_OVERRIDES).
+export function getSpellManaCostOverride(skillId, rank) {
+    const table = SPELL_MANA_COST_OVERRIDES[skillId];
+    if (!Array.isArray(table)) return null;
+    const v = table[_spellRankClamp(rank) - 1];
+    return (typeof v === 'number' && Number.isFinite(v) && v >= 0) ? v : null;
+}
+
+// Same, for the spell currently feeding a legacy ability slot.
+export function getSkillManaCostOverrideForSlot(slot) {
+    const id = getSkillIdForLegacySlot(slot);
+    if (!id) return null;
+    return getSpellManaCostOverride(id, getSkillCastRankFull(id));
+}
+
+// Same, for a skill id at its current rank.
+export function getSpellManaCostOverrideForSkill(skillId) {
+    return getSpellManaCostOverride(skillId, getSkillCastRankFull(skillId));
 }
 
 // Damage multiplier for a skill id.
