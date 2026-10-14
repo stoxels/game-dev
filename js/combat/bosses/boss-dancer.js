@@ -1,13 +1,15 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast, _egNkWatchFinale } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE DANCER (boss_dancer)-----------------------
 //------------------------------------------------------------------------
 // Mirror-ball rhythm siege - everything lands on a beat: waltzing ball,
 // spotlight steps, sweeping rhythm ribbons, CURTAIN CALL drops at 60%,
-// PETAL STORM at 30%, and the PIROUETTE ring-dodge charge attack.
+// PETAL STORM at 30%, the PIROUETTE ring-dodge charge attack (all three
+// rings share one opening - dance into it), and the GRAND FINALE (shared
+// finale waves) at ≤10%.
 //
 // Shared mechanics (fated_cell) live in shared-puzzle-mechanics.js and are
 // referenced by handler-name string.
@@ -24,9 +26,10 @@ Object.assign(EG_BOSS_DEFS, {
 Object.assign(EG_BOSS_MECHANICS, {
     boss_dancer: {
         phases: [
+            // The charge attack IS the Pirouette: keep its tempo readable.
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 9, damageMultiplier: 1.50 },
-            { threshold: 0.30, chargeMax: 6, damageMultiplier: 2.00 },
+            { threshold: 0.60, chargeMax: 11, damageMultiplier: 1.20 },
+            { threshold: 0.30, chargeMax: 10, damageMultiplier: 1.40 },
         ],
         immunityDuration: 2500,
         mechanics: [
@@ -36,9 +39,22 @@ Object.assign(EG_BOSS_MECHANICS, {
             { name: 'dance_steps', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechDanceSteps' },
             { name: 'fated_cell', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechFatedCell' },
         ],
-        onInit: _egDancerArenaInit,
+        onInit: (m) => { _egDancerArenaInit(m); _egNkWatchFinale(m, EG_DAN_FINALE); },
     },
 });
+
+// GRAND FINALE (shared waves): the last number of the night.
+const EG_DAN_FINALE = {
+    name: 'The Dancer', title: '💃 GRAND FINALE', element: 'lightning', cls: 'eg-nk-fin-dance', color: '#f9a8d4',
+    toastKey: 'eg_dancer_final',
+    hint: 'The last number - read each circle!',
+    waves: [
+        { kind: 'avoid', ms: 2100, dmg: 0.15, extra: 3, label: 'Grand Finale' },
+        { kind: 'shelter', ms: 2700, dmg: 0.22, label: 'Grand Finale' },
+        { kind: 'avoid', ms: 1900, dmg: 0.15, extra: 4, label: 'Grand Finale' },
+        { kind: 'shelter', ms: 2500, dmg: 0.28, label: 'Final Bow' },
+    ],
+};
 
 
 // ── Ballroom tuning ──────────────────────────────────────────────────────
@@ -89,6 +105,7 @@ export const EG_DAN_PIRO_RINGS = 3;                 // expanding rings
 export const EG_DAN_PIRO_EDGE = 30;                 // ring edge half-thickness
 export const EG_DAN_PIRO_RING_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP per ring touch
 export const EG_DAN_PIRO_HIT_CD_MS = 800;           // global ring-hit cooldown
+const EG_DAN_PIRO_GAP_DEG = 80;                     // the shared opening in every ring
 
 
 export let _egDancerWatcher = null; // per-fight ballroom state
@@ -125,7 +142,7 @@ export function _egDancerTeardown() {
         if (st.ball && st.ball.el) { try { st.ball.el.remove(); } catch (e) {} }
         try { if (st.run) _egNkKillRun(st.run); } catch (e) {} // removes ball el too
     }
-    document.querySelectorAll('.eg-dan-ball, .eg-dan-ribbon, .eg-dan-petal, .eg-dan-piro, .eg-dan-step, .eg-dan-curtain, .eg-dan-piro-warn').forEach(el => el.remove());
+    document.querySelectorAll('.eg-dan-ball, .eg-dan-ribbon, .eg-dan-petal, .eg-dan-piro, .eg-dan-piro-gap, .eg-dan-step, .eg-dan-curtain, .eg-dan-piro-warn').forEach(el => el.remove());
 }
 
 
@@ -248,6 +265,7 @@ export function _egDancerArenaInit(monster) {
                 }
                 if (pi.t >= EG_DAN_PIRO_MS) {
                     pi.el.classList.remove('spin');
+                    try { pi.wedge.remove(); } catch (e) {}
                     st.piro = null;
                 }
             }
@@ -264,11 +282,19 @@ export function _egDancerStartSteps(st, p) {
     const steps = EG_DAN_STEPS_N[p];
     const radius = 55;
     const pts = [];
+    // Each step lands within walking reach of the previous one (the first
+    // of you): 320 px/s over the beat minus ~0.7s reaction. Steps that were
+    // anywhere on screen made the "missed beat" zap unavoidable.
+    const reach = Math.max(200, Math.min(520, 320 * (EG_DAN_BEAT_MS[p] - 700) / 1000 * 0.85));
+    const W = window.innerWidth, H = window.innerHeight;
+    let prev = _egNkPlayerCenter() || { x: W / 2, y: H / 2 };
     let guard = 0;
-    while (pts.length < steps && guard++ < 80) {
-        const x = 100 + Math.random() * Math.max(60, window.innerWidth - 200);
-        const y = 120 + Math.random() * Math.max(60, window.innerHeight - 240);
-        if (pts.every(q => Math.hypot(q.x - x, q.y - y) > 200)) pts.push({ x, y });
+    while (pts.length < steps && guard++ < 200) {
+        const a = Math.random() * Math.PI * 2, d = 150 + Math.random() * (reach - 150);
+        const x = prev.x + Math.cos(a) * d, y = prev.y + Math.sin(a) * d;
+        if (x < 100 || x > W - 100 || y < 120 || y > H - 120) continue;
+        pts.push({ x, y });
+        prev = { x, y };
     }
     const els = pts.map((q, i) => {
         const el = _egNkEl(st.run, 'div', 'eg-dan-step', String(i + 1));
@@ -549,7 +575,19 @@ export function _egDancerPirouette(monster) {
     if (!st || _egNkDodgeBusy() || _egNkFrozen()) return;
     if (st.piro) return;
     const p = Math.max(1, Math.min(3, Number(monster && monster.bossPhase) || 1));
-    st.piro = { phase: 'warn', t: 0, ringsOut: 0, nextRingAt: 0, p, el: st.ball.el };
+    // The three rings share ONE opening (clockwise from 12 o'clock, like the
+    // Gale's rings). It opens 25-50° to one side of you, so a short sidestep
+    // reaches it; the green wedge shows it during the warning.
+    const c = _egNkPlayerCenter() || { x: st.ball.x, y: st.ball.y + 200 };
+    let pa = Math.atan2(c.x - st.ball.x, -(c.y - st.ball.y)) * 180 / Math.PI;
+    const gapMid = pa + (Math.random() < 0.5 ? -1 : 1) * (25 + Math.random() * 25);
+    const gapStart = ((gapMid - EG_DAN_PIRO_GAP_DEG / 2) % 360 + 360) % 360;
+    const wedge = _egNkEl(st.run, 'div', 'eg-dan-piro-gap');
+    wedge.style.left = st.ball.x + 'px';
+    wedge.style.top = st.ball.y + 'px';
+    wedge.style.setProperty('--gap', gapStart + 'deg');
+    wedge.style.setProperty('--gapw', EG_DAN_PIRO_GAP_DEG + 'deg');
+    st.piro = { phase: 'warn', t: 0, ringsOut: 0, nextRingAt: 0, p, el: st.ball.el, gapStart, wedge };
     st.ball.el.classList.add('piro-warn');
     setTimeout(() => { try { if (_egDancerWatcher === st && st.ball) st.ball.el.classList.remove('piro-warn'); } catch (e) {} }, EG_DAN_PIRO_WARN_MS);
     _egNkToast('eg_dancer_piro', '💫 PIROUETTE! Dodge the rings - dance the gaps!');
@@ -569,6 +607,8 @@ export function _egDancerPiroRing(st, pi, p) {
     const el = _egNkEl(ringRun, 'div', 'eg-dan-piro');
     el.style.left = x + 'px';
     el.style.top = y + 'px';
+    el.style.setProperty('--gap', pi.gapStart + 'deg');
+    el.style.setProperty('--gapw', EG_DAN_PIRO_GAP_DEG + 'deg');
     let t = 0;
     _egNkLoop(ringRun, (dtS) => {
         t += dtS * 1000;
@@ -580,7 +620,10 @@ export function _egDancerPiroRing(st, pi, p) {
         const cc = _egNkPlayerCenter();
         if (cc && st.piroHitCd <= 0) {
             const d = Math.hypot(cc.x - x, cc.y - y);
-            if (Math.abs(d - r) < EG_DAN_PIRO_EDGE) {
+            let ang = Math.atan2(cc.x - x, -(cc.y - y)) * 180 / Math.PI;
+            const into = ((ang - pi.gapStart) % 360 + 360) % 360;
+            const inGap = into >= 6 && into <= EG_DAN_PIRO_GAP_DEG - 6;
+            if (Math.abs(d - r) < EG_DAN_PIRO_EDGE && !inGap) {
                 st.piroHitCd = EG_DAN_PIRO_HIT_CD_MS;
                 const dealt = _egNkHit(EG_DAN_PIRO_RING_DMG[p], 'lightning', st.level);
                 _egNkAbilityHitToast(dealt, 'The Dancer', 'Pirouette');

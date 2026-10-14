@@ -4330,10 +4330,25 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 /* Pirouette: expanding lightning rings from the ball. */
 .eg-dan-piro {
     position: fixed; left: 0; top: 0; z-index: 9004; pointer-events: none;
+    --gap: 0deg; --gapw: 80deg;
     border-radius: 50%;
-    border: 4px solid rgba(253, 224, 71, 0.95);
+    border: 8px solid rgba(253, 224, 71, 0.95);
     box-shadow: 0 0 22px rgba(250, 204, 21, 0.9), inset 0 0 18px rgba(253, 224, 71, 0.45);
+    /* the shared opening (same convention as the Gale's rings) */
+    -webkit-mask-image: conic-gradient(from var(--gap), transparent 0 var(--gapw), #000 var(--gapw) 360deg);
+    mask-image: conic-gradient(from var(--gap), transparent 0 var(--gapw), #000 var(--gapw) 360deg);
     will-change: width, height, margin;
+}
+/* The opening shown as a green wedge from the ball while the rings bloom. */
+.eg-dan-piro-gap {
+    position: fixed; z-index: 9003; pointer-events: none;
+    --gap: 0deg; --gapw: 80deg;
+    width: 900px; height: 900px; margin: -450px 0 0 -450px;
+    border-radius: 50%;
+    background: conic-gradient(from var(--gap), rgba(134, 239, 172, 0.30) 0 var(--gapw), transparent var(--gapw) 360deg);
+    -webkit-mask-image: radial-gradient(circle, transparent 0 40px, #000 46px, #000 66%, transparent 70%);
+    mask-image: radial-gradient(circle, transparent 0 40px, #000 46px, #000 66%, transparent 70%);
+    animation: eg-nk-fin-pulse 0.4s ease-in-out infinite alternate;
 }
 
 /* ── The Gale: the storm never leaves ──────────────────────────────── */
@@ -4922,6 +4937,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 }
 .eg-nk-fin-stack { --nk-fin: #a5b4fc; }
 .eg-nk-fin-water { --nk-fin: #7dd3fc; }
+.eg-nk-fin-dance { --nk-fin: #f9a8d4; }
 
 /* ------------------------------------------------------------------
    THE TACTICIAN - persistent chess-siege arena (boss-tactician.js)
