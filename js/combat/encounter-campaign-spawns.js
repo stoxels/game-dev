@@ -38,6 +38,11 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     countBase: 2,
     countPerWorlds: 4,        // +1 monster every N worlds
     countMax: 5,
+    // Large puzzles run long, so they get extra monsters: +1 per this many
+    // solution cells (up to sizeBonusMax) on top of the world count, beyond
+    // countMax.
+    cellsPerExtraMonster: 45,
+    sizeBonusMax: 3,
     minCellsPerMonster: 6,    // small puzzles support fewer monsters
     damageBase: 7,            // per-hit damage at monster level 1 (pass 2: was 6)
     damagePerLevel: 0.38,     // +damage per monster level (pass 2: was 0.32)
@@ -138,6 +143,7 @@ export function _egPrepareCampaignEncounter() {
     const world = cur.world || 1;
     let count = cfg.countBase + Math.floor((world - 1) / cfg.countPerWorlds);
     count = Math.max(1, Math.min(cfg.countMax, count));
+    count += Math.min(cfg.sizeBonusMax, Math.floor(cells / cfg.cellsPerExtraMonster));
     count = Math.min(count, Math.max(1, Math.floor(cells / cfg.minCellsPerMonster)));
 
     const level = (typeof _egCampaignMonsterLevel === 'function')

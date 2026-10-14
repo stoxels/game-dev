@@ -65,10 +65,16 @@ export const EG_GAUNTLET_CONFIG = {
     // Difficulty tiers: pick one on the intro card. Higher tiers pay more gold.
     tiers: {
         normal: { countMult: 1,   hpMult: 1,    dmgMult: 1,   gold: 1 },
-        hard:   { countMult: 1.3, hpMult: 1.25, dmgMult: 1.2, gold: 1.6 },
-        brutal: { countMult: 1.7, hpMult: 1.6,  dmgMult: 1.5, gold: 2.6 },
+        hard:   { countMult: 1.3, hpMult: 1.35, dmgMult: 1.3, gold: 1.6 },
+        brutal: { countMult: 1.7, hpMult: 1.8,  dmgMult: 1.7, gold: 2.6 },
     },
     maxMonstersCap: 12,
+    // Monster HP follows the player's real power hit (best of projectile,
+    // 60% of a charged melee strike and 60% of a spell cast) so spell and
+    // melee builds are not facing projectile-sized HP pools.
+    powerHitShare: 0.6,
+    // Raw monster hit is at least this share of max life (before tier).
+    damageHpShare: 0.11,
     goldBase: 30,
     goldPerLevel: 4,
     challengeGoldShare: 0.25,       // extra gold per side challenge, as a share of base
@@ -188,14 +194,29 @@ function _alive() {
     return (globalThis._egMonsters || []).filter(m => m.currentHP > 0).length;
 }
 
-// Average damage of one normal player hit (sampled; the roll is random).
+// Typical damage of one player action: the larger of an average projectile
+// hit, a share of a full-charge melee strike and a share of a spell cast
+// (sampled / estimated from the character sheet).
 function _avgHit() {
     let sum = 0;
     const n = 6;
     for (let i = 0; i < n; i++) {
         try { sum += Number(_egCalcPlayerDamage()) || 0; } catch (e) { /* sample failed */ }
     }
-    return Math.max(5, sum / n);
+    const proj = Math.max(5, sum / n);
+    let best = proj;
+    try {
+        const st = _egComputePlayerStats() || {};
+        const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
+        const melee = (mid(st.meleePhysMin, st.meleePhysMax)
+            + mid(st.meleeFireMin, st.meleeFireMax) + mid(st.meleeColdMin, st.meleeColdMax)
+            + mid(st.meleeLightningMin, st.meleeLightningMax) + mid(st.meleeShadowMin, st.meleeShadowMax))
+            * (1 + (Number(st.meleePhysIncPct) || 0) / 100);
+        const spell = ((Number(st.spellDamageFlat) || 0) + 22) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
+        const share = EG_GAUNTLET_CONFIG.powerHitShare;
+        best = Math.max(best, melee * share, spell * share);
+    } catch (e) { /* stats optional */ }
+    return Math.max(5, best);
 }
 
 function _tierCfg() {
@@ -233,9 +254,9 @@ function _arenaRect() {
     };
 }
 
-// Height of the strip at the top of the arena that holds the monster cards;
-// the sprite may only walk below it.
-const _CARD_BAND_PX = 205;
+// Top margin of the walkable floor. The sprite may walk the whole arena up to
+// the frame (monster cards simply render behind it).
+const _CARD_BAND_PX = 8;
 
 function _layout() {
     if (!_g.overlay) return;
@@ -540,8 +561,9 @@ function _begin() {
     const hits = cfg.hitsToKillBase + cfg.hitsToKillPerLevel * lvl;
     const tier = _tierCfg();
     cur.campaignMonsterHp = Math.max(EG_CAMPAIGN_MONSTER_CONFIG.minHp, Math.round(_avgHit() * hits * tier.hpMult));
-    cur.campaignMonsterDamage = Math.max(1, Math.round(
-        (EG_CAMPAIGN_MONSTER_CONFIG.damageBase + EG_CAMPAIGN_MONSTER_CONFIG.damagePerLevel * lvl) * tier.dmgMult));
+    const curveDamage = EG_CAMPAIGN_MONSTER_CONFIG.damageBase + EG_CAMPAIGN_MONSTER_CONFIG.damagePerLevel * lvl;
+    const floorDamage = Math.min(curveDamage * 3, (Number(globalThis.playerMaxHP) || 0) * cfg.damageHpShare);
+    cur.campaignMonsterDamage = Math.max(1, Math.round(Math.max(curveDamage, floorDamage) * tier.dmgMult));
     cur.monsterLevel = lvl;
     cur.gauntlet = true;
     globalThis._egGauntletFlag = true;
@@ -642,8 +664,22 @@ function _spawnNextWave() {
     _hud();
 }
 
+// The arena is a fixed overlay; full screens (character sheet on B, tree,
+// atlas) must sit above it, so it is hidden while one of them is shown.
+function _syncArenaVisibility() {
+    if (!_g.overlay) return;
+    let blocked = false;
+    for (const id of ['screen-endgame-hub', 'screen-passive-tree', 'screen-endgame-atlas']) {
+        const el = document.getElementById(id);
+        if (el && el.style.display && el.style.display !== 'none') { blocked = true; break; }
+        if (el && el.classList.contains('active')) { blocked = true; break; }
+    }
+    _g.overlay.style.visibility = blocked ? 'hidden' : '';
+}
+
 function _tick() {
     if (!_g.active) return;
+    _syncArenaVisibility();
     // The player left the level / the encounter was torn down: abort quietly.
     if (cur !== _g.level || !_egIsActive()) { _finish(false, 'aborted'); return; }
     if (globalThis.playerCurrentHP <= 0) { _finish(false, 'defeat'); return; }

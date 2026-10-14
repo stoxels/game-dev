@@ -360,6 +360,9 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
 export function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCrit, elements) {
     const stats = _egComputePlayerStats();
     const overkillPct = Math.max(0, stats.overkillPct || 0);
+    // Excess damage only spreads for characters that invested in Overkill;
+    // otherwise a single spell kill would splash the whole pack unexpectedly.
+    if (overkillPct <= 0) return;
 
     const overkill = (hpBefore != null)
         ? Math.round(appliedDamage - hpBefore)
