@@ -1,7 +1,7 @@
 import { _egApplyPlayerAilment } from '../combat-ailments-core.js';
 import { _egDamageTargetById } from '../encounter-monster-damage.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast, _egPtSegDist } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE NULL (boss_null)----------------------------
@@ -231,7 +231,10 @@ export function _egMechNulLattice(monster, phase) {
                     l.cx + Math.cos(l.ang) * l.len / 2, l.cy + Math.sin(l.ang) * l.len / 2
                 ) < EG_NUL_LINE_W / 2 + 9) ||
                 _egNulRing.some(r => _egPtSegDist(pc.x, pc.y, r.x1, r.y1, r.x2, r.y2) < EG_NUL_LINE_W / 2 + 9);
-            if (onLine) _egNkDotTick(run, EG_NUL_LINE_DPS, 0.1, level, 'shadow');
+            // A real hit on the shared touch cooldown (not a silent DoT): the
+            // player gets the hit flash + damage toast, so standing on a void
+            // line visibly hurts. Same 9%/s as before: pct per touch = dps * cd.
+            if (onLine) _egNulTouch(EG_NUL_LINE_DPS / 100 * (EG_NUL_HIT_CD_MS / 1000), level, 'Void Line');
         }
         return true;
     });

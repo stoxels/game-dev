@@ -152,43 +152,63 @@
     100%    { opacity: 0; transform: scale(1.6); }
 }
 
-/* ── AXE: heavy overhead chop ───────────────────────────────────────────
-   Amber wedge biting downward + dust-burst ring on impact. */
-.eg-swing-axe .egw-blade {
-    left: 78px;
-    top: 18px;
-    width: 56px;
-    height: 60px;
-    background: linear-gradient(135deg, #ffe0b2 0%, #ff9800 55%, #e65100 100%);
-    clip-path: polygon(0 0, 100% 12%, 78% 100%, 12% 88%);
-    filter: drop-shadow(0 0 7px rgba(255, 152, 0, 0.85));
-    opacity: 0;
-    transform-origin: 20% 10%;
-    animation: egw-axe-chop 380ms cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
-}
-
+/* ── AXE: heavy cleave ──────────────────────────────────────────────────
+   A thick amber crescent winds back, then chops through the facing
+   direction; a tapered slash line + spark burst lands at the target
+   side on impact. Drawn aiming +x like every other family. */
 .eg-swing-axe .egw-arc {
-    left: 92px;
-    top: 92px;
-    width: 44px;
-    height: 22px;
+    left: 8px;
+    top: 8px;
+    width: 134px;
+    height: 134px;
     border-radius: 50%;
-    border: 3px solid rgba(255, 224, 178, 0.9);
+    border: 13px solid transparent;
+    border-right-color: #ffcc80;
+    border-top-color: rgba(255, 152, 0, 0.55);
+    filter: drop-shadow(0 0 8px rgba(255, 143, 0, 0.9));
     opacity: 0;
-    animation: egw-axe-ring 380ms ease-out forwards;
+    animation: egw-axe-cleave 360ms cubic-bezier(0.55, 0, 0.35, 1) forwards;
 }
 
-@keyframes egw-axe-chop {
-    0%   { opacity: 0; transform: rotate(-55deg) translateY(-16px); }
-    30%  { opacity: 1; transform: rotate(-12deg) translateY(-4px); }
-    55%  { opacity: 1; transform: rotate(14deg) translateY(10px); }
-    100% { opacity: 0; transform: rotate(20deg) translateY(16px); }
+.eg-heavy.eg-swing-axe .egw-arc {
+    left: 10px;
+    top: 10px;
+    width: 170px;
+    height: 170px;
+    border-width: 16px;
 }
 
-@keyframes egw-axe-ring {
-    0%, 50%  { opacity: 0; transform: scale(0.4); }
-    70%      { opacity: 1; transform: scale(1); }
-    100%     { opacity: 0; transform: scale(1.7); }
+.eg-swing-axe .egw-blade {
+    left: 128px;
+    top: 30px;
+    width: 14px;
+    height: 90px;
+    background: linear-gradient(to bottom, rgba(255, 224, 178, 0), #ffffff 50%, rgba(255, 224, 178, 0));
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    filter: drop-shadow(0 0 9px rgba(255, 152, 0, 1));
+    opacity: 0;
+    transform-origin: 50% 50%;
+    animation: egw-axe-slash 360ms ease-out forwards;
+}
+
+.eg-heavy.eg-swing-axe .egw-blade {
+    left: 150px;
+    top: 36px;
+    height: 118px;
+    width: 18px;
+}
+
+@keyframes egw-axe-cleave {
+    0%   { opacity: 0; transform: rotate(-110deg) scale(0.9); }
+    20%  { opacity: 1; transform: rotate(-95deg) scale(0.92); }
+    70%  { opacity: 1; transform: rotate(35deg) scale(1.04); }
+    100% { opacity: 0; transform: rotate(55deg) scale(1.08); }
+}
+
+@keyframes egw-axe-slash {
+    0%, 52% { opacity: 0; transform: scaleY(0.2) scaleX(0.6); }
+    64%     { opacity: 1; transform: scaleY(1.1) scaleX(1.5); }
+    100%    { opacity: 0; transform: scaleY(1.25) scaleX(0.7); }
 }
 
 /* ── MACE: blunt slam + shockwave ───────────────────────────────────────
