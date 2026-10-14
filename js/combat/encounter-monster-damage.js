@@ -96,7 +96,9 @@ export function _egApplyHitToMonster(target, amount, opts) {
     const resistFactor = Math.max(0.20, 1 - 0.014 * (lvl - 1)); // 0.44@L41, 0.20@L90
     // The gauntlet arena scales pushback down (see gauntlet.js) so melee
     // spam cannot keep every monster's attack bar at zero.
-    let totalPushback = basePushback * resistFactor;
+    // Only melee strikes (the attack key) push the attack bar back; spells,
+    // grid projectiles and aura ticks never do.
+    let totalPushback = (opts && opts.isMelee) ? basePushback * resistFactor : 0;
     if (typeof globalThis._egGauntletPushback === 'function') totalPushback = globalThis._egGauntletPushback(target, totalPushback);
     // Token bucket for every fight: one full hit always lands, but spam
     // (spells, melee taps, aura ticks) can only refill EG_PUSHBACK_* seconds
