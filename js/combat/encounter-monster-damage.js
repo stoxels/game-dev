@@ -82,6 +82,11 @@ function _egFreezeTimerOnStun(stats) {
     return true;
 }
 
+// Seconds of attack bar one monster can lose per real second (see below).
+const EG_PUSHBACK_BUDGET = 0.5;
+const EG_PUSHBACK_BUDGET_BOSS = 0.3;
+const EG_PUSHBACK_BURST = 1.6;
+
 export function _egApplyHitToMonster(target, amount, opts) {
     const stats = _egComputePlayerStats();
     target.currentHP = Math.max(0, target.currentHP - amount);
@@ -93,8 +98,20 @@ export function _egApplyHitToMonster(target, amount, opts) {
     // spam cannot keep every monster's attack bar at zero.
     let totalPushback = basePushback * resistFactor;
     if (typeof globalThis._egGauntletPushback === 'function') totalPushback = globalThis._egGauntletPushback(target, totalPushback);
+    // Token bucket for every fight: one full hit always lands, but spam
+    // (spells, melee taps, aura ticks) can only refill EG_PUSHBACK_* seconds
+    // of pushback per real second, so attack bars are slowed, never frozen.
+    {
+        const now = Date.now();
+        const rate = target.isBoss ? EG_PUSHBACK_BUDGET_BOSS : EG_PUSHBACK_BUDGET;
+        const last = target._pbAt || now;
+        let tokens = target._pbTokens == null ? EG_PUSHBACK_BURST : target._pbTokens;
+        tokens = Math.min(EG_PUSHBACK_BURST, tokens + (now - last) / 1000 * rate);
+        totalPushback = Math.min(totalPushback, tokens);
+        target._pbTokens = tokens - totalPushback;
+        target._pbAt = now;
+    }
     target.currentCharge = Math.max(0, target.currentCharge - totalPushback);
-
     if (stats.staggerPct > 0 && Math.random() * 100 < stats.staggerPct) {
         target.staggeredUntil = Date.now() + _egStunDurationMs(stats, !!(opts && opts.isMelee));
         _egFreezeTimerOnStun(stats);

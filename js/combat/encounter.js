@@ -350,12 +350,9 @@ export function _egRenderPanel() {
     _egStartGridOverlapSync();
 }
 
-// Monster cards are drawn ABOVE the puzzle grid (so a monster behind the
-// grid is never hard to see), but a card that overlaps the grid must never
-// take clicks from it. This keeps an `eg-over-grid` class on exactly those
-// cards (CSS: click-through + see-through art). Cards clear of the grid stay
-// fully clickable for targeting. One light interval per encounter; it stops
-// itself when the encounter ends.
+// Cards overlapping the grid get `eg-over-grid` (CSS: click-through and
+// see-through art) so monsters can draw above the grid without blocking
+// cells. One light interval per encounter; it stops itself afterwards.
 let _egGridOverlapTimer = null;
 function _egSyncGridOverlap() {
     const grid = document.getElementById('ptable');

@@ -152,7 +152,19 @@ export function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
     const dmgScale = 1 + EG_BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
 
     const maxHP = Math.round(def.baseHP * hpScale * hpMult * _egBossGearHpMult(lvl));
-    const damage = Math.round(def.baseDamage * dmgScale);
+    // Early bosses must always be able to hurt: their level-curve damage can
+    // be a rounding error next to a geared character's life pool. Floor the
+    // basic attack at a share of the player's max life (fades out by L50,
+    // where the curve itself is strong enough).
+    let damage = Math.round(def.baseDamage * dmgScale);
+    try {
+        const pMax = Number(globalThis.playerMaxHP) || 0;
+        if (pMax > 0 && lvl < EG_BOSS_GEAR_HP_FADE_TO) {
+            const fade = lvl <= EG_BOSS_GEAR_HP_FADE_FROM ? 1
+                : 1 - (lvl - EG_BOSS_GEAR_HP_FADE_FROM) / (EG_BOSS_GEAR_HP_FADE_TO - EG_BOSS_GEAR_HP_FADE_FROM);
+            damage = Math.max(damage, Math.round(pMax * 0.13 * fade));
+        }
+    } catch (e) { /* floor is best-effort */ }
 
     const monster = {
         id: `${def.id}_${++globalThis._egMonsterSpawnCounter}`,
