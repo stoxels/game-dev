@@ -4939,6 +4939,23 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
 .eg-nk-fin-water { --nk-fin: #7dd3fc; }
 .eg-nk-fin-dance { --nk-fin: #f9a8d4; }
 
+/* THE CREEPER: real blast reach (pack fuses, TNT cluster) + finale edge. */
+.eg-crp-reach {
+    position: fixed; z-index: 8999; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.9);
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.16) 92%, transparent 100%);
+}
+.eg-crp-reach-pack { border-color: rgba(134, 239, 172, 0.9); background: radial-gradient(circle, rgba(34, 197, 94, 0.04), rgba(34, 197, 94, 0.14) 92%, transparent 100%); }
+.eg-crp-reach-tnt { animation: eg-nk-warn-pulse 0.3s ease-in-out infinite alternate; }
+.eg-crp-finaledge {
+    position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    border: 4px dashed rgba(248, 113, 113, 0.95);
+    box-shadow: 0 0 24px rgba(239, 68, 68, 0.6);
+    animation: eg-nk-warn-pulse 0.3s ease-in-out infinite alternate;
+}
+
 /* ------------------------------------------------------------------
    THE TACTICIAN - persistent chess-siege arena (boss-tactician.js)
    Gliding queen, intent banners, knight orbs, pawn ranks, rook
