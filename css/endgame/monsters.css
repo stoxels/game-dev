@@ -326,65 +326,44 @@
     will-change: transform, opacity, filter;
 }
 
-/* ── Quiz reward: WeakAuras-style barrier wings ────────────────────── */
-/* Two glowing red arc segments flanking the character sprite while the
-   quiz damage buff is active. Anchored to the avatar wrapper; the sprite
-   image is the wrapper's last child, so bottom-aligned wings hug it. */
-.eg-quiz-shield-wing {
+/* ── Quiz reward: damage-buff aura ─────────────────────────────────── */
+/* A red ring around the character sprite while the quiz damage buff is
+   active. --qi (0..1) is set from the stack count by endgame-quiz-buffs.js:
+   more stacks = wider, brighter, stronger glow. Anchored to the avatar
+   wrapper at the sprite's centre (the wrapper holds bars above the sprite). */
+.eg-quiz-aura {
+    --qi: 0.12;
     position: absolute;
-    bottom: 4px;
-    width: 26px;
-    height: 72px;
+    left: 50%;
+    top: 62%;
+    width: calc(92px + 56px * var(--qi));
+    height: calc(92px + 56px * var(--qi));
+    border-radius: 50%;
     pointer-events: none;
     z-index: 5;
-    border: 3px solid transparent;
-    animation: eg-quiz-shield-in 0.35s ease-out, eg-quiz-shield-pulse 1.6s ease-in-out 0.35s infinite alternate;
-}
-
-.eg-quiz-shield-left {
-    left: -22px;
-    border-right: none;
-    border-radius: 40px 0 0 40px;
-    border-left-color: #ff5533;
-    border-top-color: rgba(255, 85, 51, 0.55);
-    border-bottom-color: rgba(255, 85, 51, 0.55);
-    background: linear-gradient(to left, transparent, rgba(255, 85, 51, 0.30));
-    filter: drop-shadow(0 0 7px rgba(255, 85, 51, 0.8));
-}
-
-.eg-quiz-shield-right {
-    right: -22px;
-    border-left: none;
-    border-radius: 0 40px 40px 0;
-    border-right-color: #ff5533;
-    border-top-color: rgba(255, 85, 51, 0.55);
-    border-bottom-color: rgba(255, 85, 51, 0.55);
-    background: linear-gradient(to right, transparent, rgba(255, 85, 51, 0.30));
-    filter: drop-shadow(0 0 7px rgba(255, 85, 51, 0.8));
+    border: calc(2px + 3px * var(--qi)) solid rgba(255, 70, 40, calc(0.45 + 0.5 * var(--qi)));
+    background: radial-gradient(circle,
+        rgba(255, 60, 30, 0) 52%,
+        rgba(255, 60, 30, calc(0.10 + 0.32 * var(--qi))) 78%,
+        rgba(255, 40, 20, calc(0.18 + 0.45 * var(--qi))) 100%);
+    box-shadow:
+        0 0 calc(8px + 30px * var(--qi)) rgba(255, 60, 30, calc(0.45 + 0.5 * var(--qi))),
+        inset 0 0 calc(8px + 26px * var(--qi)) rgba(255, 60, 30, calc(0.3 + 0.5 * var(--qi)));
+    transform: translate(-50%, -50%);
+    animation: eg-quiz-shield-in 0.35s ease-out, eg-quiz-aura-pulse 1.4s ease-in-out 0.35s infinite alternate;
+    transition: width 0.4s, height 0.4s, border-width 0.4s;
 }
 
 /* Fade-in on apply … */
 @keyframes eg-quiz-shield-in {
-    from {
-        opacity: 0;
-        transform: scaleX(0.4);
-    }
-
-    to {
-        opacity: 1;
-        transform: scaleX(1);
-    }
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
-/* … soft pulse while active … */
-@keyframes eg-quiz-shield-pulse {
-    from {
-        opacity: 0.65;
-    }
-
-    to {
-        opacity: 1;
-    }
+/* … soft pulse while active (faster / bigger swing with more stacks)… */
+@keyframes eg-quiz-aura-pulse {
+    from { opacity: 0.7; transform: translate(-50%, -50%) scale(0.97); }
+    to   { opacity: 1;   transform: translate(-50%, -50%) scale(1.04); }
 }
 
 /* … and fade-out when the buff expires */
@@ -399,7 +378,7 @@
 
     to {
         opacity: 0;
-        transform: scaleX(0.4);
+        transform: translate(-50%, -50%) scale(0.5);
     }
 }
 

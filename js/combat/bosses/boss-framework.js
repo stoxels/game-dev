@@ -103,6 +103,39 @@ export function _egScaleBossChargeMax(raw) {
     return Math.max(3, Math.round(raw * EG_BOSS_CHARGE_SPEED_MULT));
 }
 
+// Early bosses used to die in seconds to geared characters: their HP only
+// followed the level curve, while a character's output follows its gear.
+// This multiplier compares what the current character hits for (best of
+// grid projectile and spell) with a bare character, and fades out by L50
+// where the late-HP curve takes over. Capped so it can never become a wall.
+const EG_BOSS_GEAR_HP_CAP = 2.5;
+const EG_BOSS_GEAR_HP_EXP = 0.5;
+const EG_BOSS_GEAR_HP_FADE_FROM = 20;
+const EG_BOSS_GEAR_HP_FADE_TO = 50;
+function _egBossGearHpMult(lvl) {
+    if (lvl >= EG_BOSS_GEAR_HP_FADE_TO) return 1;
+    try {
+        const g = globalThis;
+        if (typeof g._egComputePlayerStats !== 'function') return 1;
+        const st = g._egComputePlayerStats() || {};
+        const base = (g.EG_PLAYER_STATS && g.EG_PLAYER_STATS.baseDamage) || 10;
+        const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
+        const phys = (base + mid(st.physFlatMin, st.physFlatMax)) * (1 + (Number(st.physIncPct) || 0) / 100);
+        const elem = (mid(st.fireDmgMin, st.fireDmgMax) + mid(st.coldDmgMin, st.coldDmgMax)
+            + mid(st.lightningDmgMin, st.lightningDmgMax) + mid(st.shadowDmgMin, st.shadowDmgMax))
+            * (1 + ((Number(st.elementalDamageIncPct) || 0) + (Number(st.projectileElementalDamageIncPct) || 0)) / 100);
+        const proj = (phys + elem) * (1 + (Number(st.damageIncPct) || 0) / 100) * (1 + (Number(st.projectileDamageIncPct) || 0) / 100);
+        const spell = (base + (Number(st.spellDamageFlat) || 0)) * (1 + (Number(st.spellDamageIncPct) || 0) / 100) * 0.5;
+        const ratio = Math.max(1, Math.max(proj, spell) / base);
+        let m = Math.min(EG_BOSS_GEAR_HP_CAP, Math.pow(ratio, EG_BOSS_GEAR_HP_EXP));
+        if (lvl > EG_BOSS_GEAR_HP_FADE_FROM) {
+            const f = (lvl - EG_BOSS_GEAR_HP_FADE_FROM) / (EG_BOSS_GEAR_HP_FADE_TO - EG_BOSS_GEAR_HP_FADE_FROM);
+            m = 1 + (m - 1) * (1 - Math.min(1, f));
+        }
+        return Math.max(1, m);
+    } catch (e) { return 1; }
+}
+
 // Returns the scaled stats for a boss at the given level.
 // Accepts either a string id (looks up EG_BOSS_DEFS) or a def object directly.
 // hpMult: optional multiplier for boss max HP only (e.g., 500k HP test
@@ -118,7 +151,7 @@ export function _egBuildBoss(defOrId, level = 1, hpMult = 1) {
     const hpScale = baseHpScale * lateMult;
     const dmgScale = 1 + EG_BOSS_LEVEL_DAMAGE_SCALE * (lvl - 1);
 
-    const maxHP = Math.round(def.baseHP * hpScale * hpMult);
+    const maxHP = Math.round(def.baseHP * hpScale * hpMult * _egBossGearHpMult(lvl));
     const damage = Math.round(def.baseDamage * dmgScale);
 
     const monster = {

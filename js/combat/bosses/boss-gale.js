@@ -1,6 +1,6 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkNudgeAvatar, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE GALE (boss_gale)---------------------------
@@ -44,20 +44,21 @@ Object.assign(EG_BOSS_MECHANICS, {
 // ── Storm tuning ─────────────────────────────────────────────────────────
 // The Eye (boss body)
 export const EG_GAL_EYE_R = 48;                     // eye visual radius
-export const EG_GAL_EYE_SPEED = [0, 30, 40, 52];    // px/s wander per phase
+export const EG_GAL_EYE_SPEED = [0, 24, 32, 42];    // px/s wander per phase
 export const EG_GAL_EYE_REPICK_MS = 6200;           // max time on one wander target
 export const EG_GAL_UPDRAFT_DMG = [0, 0.06, 0.07, 0.09]; // %maxHP touching the eye
 export const EG_GAL_UPDRAFT_CD_MS = 1100;           // per-eye touch cooldown
 export const EG_GAL_UPDRAFT_FLING = [0, 130, 155, 180]; // px fling (upward-biased)
 // Crosswind (global breeze)
 export const EG_GAL_WIND_INTERVAL_MS = 7000;        // direction swap cadence
-export const EG_GAL_WIND_PUSH = [0, 34, 46, 60];    // px/s breeze per phase
+export const EG_GAL_WIND_PUSH = [0, 22, 30, 40];    // px/s breeze per phase
 export const EG_GAL_WIND_STREAKS = 7;               // streak elements per side
 // Cyclone funnels (perpetual Vault)
-export const EG_GAL_FUNNEL_N = [0, 2, 3, 4];        // alive per phase
-export const EG_GAL_FUNNEL_SPAWN_MS = [0, 5200, 4000, 3000]; // spawn cadence
-export const EG_GAL_FUNNEL_SPEED = [0, 95, 125, 160]; // px/s hunt
-export const EG_GAL_FUNNEL_DMG = [0, 7, 9, 12];     // %maxHP per second (DoT)
+export const EG_GAL_FUNNEL_N = [0, 1, 2, 2];        // alive per phase
+export const EG_GAL_FUNNEL_SPAWN_MS = [0, 6500, 5200, 4500]; // spawn cadence
+export const EG_GAL_FUNNEL_SPEED = [0, 80, 100, 125]; // px/s hunt
+export const EG_GAL_FUNNEL_DMG = [0, 7, 9, 12];     // %maxHP per second of contact (paid as one hit per EG_GAL_FUNNEL_CD_MS)
+export const EG_GAL_FUNNEL_CD_MS = 700;             // per-funnel hit cooldown (real hit + feedback, not a silent DoT)
 export const EG_GAL_FUNNEL_R = 52;                  // contact radius
 // Tornado Ladder (60% gate)
 export const EG_GAL_LADDER_N = 3;                   // twisters in the column
@@ -70,11 +71,13 @@ export const EG_GAL_LADDER_GAP_MS = 350;            // stagger between twisters
 export const EG_GAL_CONTRACT_RINGS = 4;             // contracting rings in sequence
 export const EG_GAL_CONTRACT_START_R = 520;         // px starting radius
 export const EG_GAL_CONTRACT_MIN_R = 56;            // fully contracted
-export const EG_GAL_CONTRACT_TIME_MS = 2400;        // per-ring contraction
-export const EG_GAL_CONTRACT_GAP_MS = 500;          // between rings
+export const EG_GAL_CONTRACT_TIME_MS = 3000;        // per-ring contraction
+export const EG_GAL_CONTRACT_GAP_MS = 700;          // between rings
+export const EG_GAL_CONTRACT_GAP_DEG = 78;          // width of the safe opening in each ring
+export const EG_GAL_CONTRACT_BAND_PX = 20;          // half-thickness of the damaging band
 export const EG_GAL_CONTRACT_DMG = 0.13;            // %maxHP caught in a ring
 // Cyclone Lance (charge attack)
-export const EG_GAL_LANCE_WARN_MS = 1000;           // lane telegraph
+export const EG_GAL_LANCE_WARN_MS = 1500;           // lane telegraph
 export const EG_GAL_LANCE_FLIGHT_MS = 520;          // bolt travel
 export const EG_GAL_LANCE_DMG = [0, 0.12, 0.14, 0.17]; // %maxHP by phase
 export const EG_GAL_LANCE_FLING = [0, 170, 200, 230];  // px fling when hit
@@ -134,7 +137,8 @@ export function _egGaleArenaInit(monster) {
     st.run = run;
 
     // The Eye: the boss's arena body.
-    const el = _egNkEl(run, 'div', 'eg-gal-eye', '🌪️');
+    const el = _egNkEl(run, 'div', 'eg-gal-eye');
+    el.innerHTML = '<i class="eg-gal-eye-ring"></i><i class="eg-gal-eye-ring r2"></i><i class="eg-gal-eye-core"></i>';
     el.style.width = el.style.height = (EG_GAL_EYE_R * 2) + 'px';
     st.eye = {
         x: window.innerWidth / 2, y: window.innerHeight * 0.32,
@@ -166,8 +170,8 @@ export function _egGaleArenaInit(monster) {
         const ed = Math.hypot(edx, edy) || 1;
         const estep = EG_GAL_EYE_SPEED[p] * dtS;
         if (ed <= estep || e.repickAt <= 0) {
-            e.tx = 90 + Math.random() * Math.max(60, W - 180);
-            e.ty = 90 + Math.random() * Math.max(60, H - 200);
+            e.tx = 150 + Math.random() * Math.max(60, W - 300);
+            e.ty = 120 + Math.random() * Math.max(60, H - 360);
             e.repickAt = EG_GAL_EYE_REPICK_MS;
         } else {
             e.x += (edx / ed) * estep;
@@ -202,7 +206,7 @@ export function _egGaleArenaInit(monster) {
 
         // ── Cyclone funnels: perpetual hunt ──
         st.funnelAcc += dtS * 1000;
-        if (st.funnels.length < EG_GAL_FUNNEL_N[p] && st.funnelAcc >= EG_GAL_FUNNEL_SPAWN_MS[p]) {
+        if (st.funnels.length < EG_GAL_FUNNEL_N[p] && st.funnelAcc >= EG_GAL_FUNNEL_SPAWN_MS[p] && !st.ladder && !st.rings) {
             st.funnelAcc = 0;
             _egGaleSpawnFunnel(st);
         }
@@ -216,7 +220,7 @@ export function _egGaleArenaInit(monster) {
 
         // ── Cyclone Lance volleys (ambient pressure between gates) ──
         st.lanceAcc += dtS * 1000;
-        if (st.lanceAcc >= 6800 && st.lances.length < 2 && !st.ladder && !st.rings) {
+        if (st.lanceAcc >= 9000 && st.lances.length < 1 && !st.ladder && !st.rings) {
             st.lanceAcc = 0;
             _egGaleLance(st, p);
         }
@@ -239,7 +243,8 @@ export function _egGaleShowWindBanner(st, dir) {
     st.streaks = [];
     const fromLeft = dir > 0;
     for (let i = 0; i < EG_GAL_WIND_STREAKS; i++) {
-        const sEl = _egNkEl(st.run, 'div', 'eg-gal-streak', '〰️');
+        const sEl = _egNkEl(st.run, 'div', 'eg-gal-streak');
+        sEl.style.width = (70 + Math.random() * 90) + 'px';
         const s = {
             x: fromLeft ? -40 - Math.random() * 260 : window.innerWidth + 40 + Math.random() * 260,
             y: 60 + Math.random() * Math.max(60, window.innerHeight - 120),
@@ -266,6 +271,12 @@ export function _egGaleTickStreaks(st, dtS) {
 }
 
 
+// Layered rings that read as a spinning cone (pure CSS, see bosses2.css).
+function _egGaleSwirlHTML() {
+    return '<i class="eg-gal-sw s1"></i><i class="eg-gal-sw s2"></i><i class="eg-gal-sw s3"></i><i class="eg-gal-sw s4"></i>';
+}
+
+
 // ── Cyclone funnels: spawn with a dust telegraph, hunt the player ────────
 export function _egGaleSpawnFunnel(st) {
     const W = window.innerWidth, H = window.innerHeight;
@@ -279,7 +290,8 @@ export function _egGaleSpawnFunnel(st) {
     setTimeout(() => {
         try { dust.remove(); } catch (e) {}
         if (_egGaleWatcher !== st) return;
-        const el = _egNkEl(st.run, 'div', 'eg-gal-funnel', '🌪️');
+        const el = _egNkEl(st.run, 'div', 'eg-gal-funnel');
+        el.innerHTML = _egGaleSwirlHTML();
         el.style.transform = 'translate(' + Math.round(funnel.x - 30) + 'px,' + Math.round(funnel.y - 30) + 'px)';
         funnel.el = el;
         funnel.born = true;
@@ -305,7 +317,11 @@ export function _egGaleTickFunnels(st, dtS, now, c, pr, p) {
         if (f.y > H + 70) f.y = -60;
         f.el.style.transform = 'translate(' + Math.round(f.x - 30) + 'px,' + Math.round(f.y - 30) + 'px)';
         if (pr && c && _egNkCircleHit(f.x, f.y, EG_GAL_FUNNEL_R, pr, 0)) {
-            _egNkDotTick(st.run, EG_GAL_FUNNEL_DMG[p], dtS, st.level, 'cold');
+            if (now >= (f.cdUntil || 0)) {
+                f.cdUntil = now + EG_GAL_FUNNEL_CD_MS;
+                const dealt = _egNkHit(EG_GAL_FUNNEL_DMG[p] / 100 * (EG_GAL_FUNNEL_CD_MS / 1000), 'cold', st.level);
+                _egNkAbilityHitToast(dealt, 'The Gale', 'Cyclone');
+            }
         }
         // Funnel life: roams 9s, then dissolves (respawn handled by cadence).
         f.life = (f.life || 9000) - dtS * 1000;
@@ -335,7 +351,7 @@ export function _egGaleLadder(st, now) {
         lanes.push({ x, at: 300 + i * (EG_GAL_LADDER_GAP_MS + EG_GAL_LADDER_WARN_MS + EG_GAL_LADDER_RISE_MS) });
     }
     st.ladder = { lanes, idx: 0, t: 0, twisters: [] };
-    _egNkToast('eg_gale_ladder', '🌪️ TORNADO LADDER! The twisters climb!');
+    _egNkToast('eg_gale_ladder', '🌪️ TORNADO LADDER! Stay OUT of the glowing lanes!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
 }
 
@@ -349,6 +365,7 @@ export function _egGaleTickLadder(st, dtS, pr) {
     while (ld.idx < ld.lanes.length && ld.t >= ld.lanes[ld.idx].at) {
         const lane = ld.lanes[ld.idx];
         const warnEl = _egNkEl(st.run, 'div', 'eg-gal-lane');
+        warnEl.innerHTML = '<span class="eg-gal-lane-chev">▲ ▲ ▲</span>';
         warnEl.style.left = (lane.x - EG_GAL_LADDER_W / 2) + 'px';
         warnEl.style.width = EG_GAL_LADDER_W + 'px';
         const twister = { x: lane.x, y: H + 90, warnEl, el: null, phase: 'warn', t: 0 };
@@ -363,7 +380,8 @@ export function _egGaleTickLadder(st, dtS, pr) {
                 tw.phase = 'rise';
                 tw.t = 0;
                 tw.warnEl.classList.add('hot');
-                tw.el = _egNkEl(st.run, 'div', 'eg-gal-twister', '🌪️');
+                tw.el = _egNkEl(st.run, 'div', 'eg-gal-twister');
+                tw.el.innerHTML = _egGaleSwirlHTML();
                 tw.el.style.left = (tw.x - 60) + 'px';
                 try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
             }
@@ -402,10 +420,10 @@ export function _egGaleContract(st, now) {
     st.eye.tx = W / 2; st.eye.ty = H / 2; // eye parks at center
     const rings = [];
     for (let i = 0; i < EG_GAL_CONTRACT_RINGS; i++) {
-        rings.push({ at: 500 + i * (EG_GAL_CONTRACT_TIME_MS + EG_GAL_CONTRACT_GAP_MS) });
+        rings.push({ at: 600 + i * (EG_GAL_CONTRACT_TIME_MS + EG_GAL_CONTRACT_GAP_MS) });
     }
     st.rings = { rings, idx: 0, t: 0, live: null };
-    _egNkToast('eg_gale_contract', '🌀 EYE OF THE STORM! Thread the rings!');
+    _egNkToast('eg_gale_contract', '🌀 EYE OF THE STORM! Run through the GAP in each ring!');
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
 }
 
@@ -421,7 +439,12 @@ export function _egGaleTickRings(st, dtS, c) {
         const el = _egNkEl(st.run, 'div', 'eg-gal-ring');
         el.style.left = ex + 'px';
         el.style.top = ey + 'px';
-        rg.live = { el, t: 0, hit: false };
+        // The opening: a wedge (clockwise from 12 o'clock) with no band. Each
+        // ring puts it somewhere new; the player runs through it.
+        const gapStart = Math.round(Math.random() * 360);
+        el.style.setProperty('--gap', gapStart + 'deg');
+        el.style.setProperty('--gapw', EG_GAL_CONTRACT_GAP_DEG + 'deg');
+        rg.live = { el, t: 0, hit: false, gapStart };
         rg.idx++;
     }
     // Contract the live ring.
@@ -433,11 +456,18 @@ export function _egGaleTickRings(st, dtS, c) {
         r.el.style.width = r.el.style.height = Math.round(rad * 2) + 'px';
         r.el.style.marginLeft = r.el.style.marginTop = (-rad) + 'px';
         if (!r.hit && c) {
+            // Hurt only while the BAND passes over you, and only outside the gap.
             const d = Math.hypot(c.x - ex, c.y - ey);
-            if (d <= rad) {
-                r.hit = true;
-                const dealt = _egNkHit(EG_GAL_CONTRACT_DMG, 'cold', st.level);
-                _egNkAbilityHitToast(dealt, 'The Gale', 'Vortex Ring');
+            if (Math.abs(d - rad) < EG_GAL_CONTRACT_BAND_PX) {
+                let ang = Math.atan2(c.x - ex, -(c.y - ey)) * 180 / Math.PI;   // clockwise from 12 o'clock
+                ang = ((ang % 360) + 360) % 360;
+                const into = (((ang - r.gapStart) % 360) + 360) % 360;
+                const inGap = into >= 6 && into <= EG_GAL_CONTRACT_GAP_DEG - 6;
+                if (!inGap) {
+                    r.hit = true;
+                    const dealt = _egNkHit(EG_GAL_CONTRACT_DMG, 'cold', st.level);
+                    _egNkAbilityHitToast(dealt, 'The Gale', 'Vortex Ring');
+                }
             }
         }
         if (k >= 1) {
@@ -482,6 +512,10 @@ export function _egGaleLance(st, p) {
         el.style.top = '0px';
         el.style.height = H + 'px';
     }
+    // Arrows on the side the bolt enters from, so the direction is readable.
+    const side = horizontal ? (fromLeft ? 'l' : 'r') : (fromLeft ? 't' : 'b');
+    const glyph = horizontal ? (fromLeft ? '▶ ▶ ▶' : '◀ ◀ ◀') : (fromLeft ? '▼<br>▼<br>▼' : '▲<br>▲<br>▲');
+    el.innerHTML = '<span class="eg-gal-lance-arrow ' + side + '">' + glyph + '</span>';
     const lance = { horizontal, fixed: horizontal ? c.y : c.x, fromLeft, t: 0, el, boltEl: null, hit: false, p };
     st.lances.push(lance);
     try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
@@ -505,9 +539,9 @@ export function _egGaleTickLances(st, dtS, pr, p) {
         const k = Math.min(1, (l.t - EG_GAL_LANCE_WARN_MS) / EG_GAL_LANCE_FLIGHT_MS);
         const travel = (l.horizontal ? W : H) * (l.fromLeft ? k : 1 - k);
         if (l.horizontal) {
-            l.boltEl.style.transform = 'translate(' + Math.round(travel - 30) + 'px,' + Math.round(l.fixed - 30) + 'px)';
+            l.boltEl.style.transform = 'translate(' + Math.round(travel - 44) + 'px,' + Math.round(l.fixed - 44) + 'px)';
         } else {
-            l.boltEl.style.transform = 'translate(' + Math.round(l.fixed - 30) + 'px,' + Math.round(travel - 30) + 'px)';
+            l.boltEl.style.transform = 'translate(' + Math.round(l.fixed - 44) + 'px,' + Math.round(travel - 44) + 'px)';
         }
         if (!l.hit && pr) {
             const bx = l.horizontal ? travel : l.fixed;

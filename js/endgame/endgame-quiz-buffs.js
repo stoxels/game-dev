@@ -11,8 +11,8 @@ import { _egMapHasBloodMagic } from './endgame-map-launch.js';
 //     each stack lasts 30 minutes (EG_QUIZ_BUFF_DURATION_MS)
 //   • heal for 25% of max life
 //   • restore 25% of max mana
-// The damage buff shows a WeakAuras-style barrier (two glowing red wings
-// flanking the character sprite) while active. Every reward fires a toast
+// The damage buff shows a red aura ring around the character sprite while
+// active; it grows brighter and wider with every stack. Every reward fires a toast
 // and is summarised on the next chain-countdown transition screen.
 //
 // Consumed by:
@@ -97,6 +97,7 @@ export function _egScheduleQuizShieldExpiry() {
         _egRemoveQuizShieldFX(false);
         return;
     }
+    _egSyncQuizAuraIntensity();
     const nextExpiry = Math.min(..._egQuizDmgBuffStacks);
     const delay = Math.max(0, nextExpiry - Date.now());
     _egQuizShieldTimer = setTimeout(() => {
@@ -174,22 +175,34 @@ export const EG_QUIZ_BUFF_SPARK_COUNT = 12;
 export const EG_QUIZ_BUFF_FX_DURATION_MS = 900;
 export const EG_QUIZ_SHIELD_FADE_MS = 400;
 
-// Adds the WeakAuras-style barrier: two glowing red wings flanking the
-// character sprite, pulsing while at least one damage stack is active.
+// Stacks at which the aura reaches full intensity.
+const EG_QUIZ_AURA_FULL_STACKS = 8;
+
+// Sets the aura's intensity (0..1) from the number of live damage stacks.
+function _egSyncQuizAuraIntensity() {
+    const stacks = _egPruneQuizDamageStacks();
+    const qi = Math.min(1, Math.max(0, stacks / EG_QUIZ_AURA_FULL_STACKS));
+    document.querySelectorAll('.eg-quiz-aura').forEach(el => {
+        el.style.setProperty('--qi', qi.toFixed(3));
+        el.dataset.stacks = String(stacks);
+    });
+}
+
+// Adds the damage-buff aura: a red ring around the character sprite that
+// pulses while at least one damage stack is active and scales with stacks.
 export function _egAddQuizShieldFX(durationMs) {
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
 
-    // Create wings only if they don't already exist - stacking should not
-    // flicker the visual. Each new stack just refreshes the expiry scheduler.
-    if (!document.querySelector('.eg-quiz-shield-wing')) {
-        const left = document.createElement('div');
-        left.className = 'eg-quiz-shield-wing eg-quiz-shield-left';
-        const right = document.createElement('div');
-        right.className = 'eg-quiz-shield-wing eg-quiz-shield-right';
-        hud.appendChild(left);
-        hud.appendChild(right);
+    // Create the aura only if it doesn't already exist - stacking should not
+    // flicker the visual. Each new stack just updates intensity + the expiry
+    // scheduler.
+    if (!document.querySelector('.eg-quiz-aura')) {
+        const aura = document.createElement('div');
+        aura.className = 'eg-quiz-shield-wing eg-quiz-aura';
+        hud.appendChild(aura);
     }
+    _egSyncQuizAuraIntensity();
 
     // (Re)schedule expiry based on the earliest stack's remaining time.
     // durationMs is kept as optional legacy param but the true schedule
@@ -205,7 +218,7 @@ export function _egAddQuizShieldFX(durationMs) {
     }
 }
 
-// Removes the barrier wings - immediately, or after a short fade-out.
+// Removes the aura - immediately, or after a short fade-out.
 export function _egRemoveQuizShieldFX(immediate) {
     const wings = document.querySelectorAll('.eg-quiz-shield-wing');
     if (!wings.length) return;
