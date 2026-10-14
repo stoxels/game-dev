@@ -347,6 +347,41 @@ export function _egRenderPanel() {
     _egRenderMonstersIntoZones();
     // Legacy patrol cleanup (clears the old #eg-roam-layer if present).
     try { _egRoamSync(); } catch (e) {}
+    _egStartGridOverlapSync();
+}
+
+// Monster cards are drawn ABOVE the puzzle grid (so a monster behind the
+// grid is never hard to see), but a card that overlaps the grid must never
+// take clicks from it. This keeps an `eg-over-grid` class on exactly those
+// cards (CSS: click-through + see-through art). Cards clear of the grid stay
+// fully clickable for targeting. One light interval per encounter; it stops
+// itself when the encounter ends.
+let _egGridOverlapTimer = null;
+function _egSyncGridOverlap() {
+    const grid = document.getElementById('ptable');
+    const gr = grid ? grid.getBoundingClientRect() : null;
+    const cards = document.querySelectorAll('#eg-monster-wrapper .eg-monster-card-compact, .eg-floating-panel .eg-monster-card-compact');
+    cards.forEach(card => {
+        let over = false;
+        if (gr && gr.width > 0 && gr.height > 0) {
+            const r = card.getBoundingClientRect();
+            over = r.right > gr.left + 4 && r.left < gr.right - 4 && r.bottom > gr.top + 4 && r.top < gr.bottom - 4;
+        }
+        card.classList.toggle('eg-over-grid', over);
+    });
+}
+
+function _egStartGridOverlapSync() {
+    _egSyncGridOverlap();
+    if (_egGridOverlapTimer) return;
+    _egGridOverlapTimer = setInterval(() => {
+        if (!_egIsActive()) {
+            clearInterval(_egGridOverlapTimer);
+            _egGridOverlapTimer = null;
+            return;
+        }
+        _egSyncGridOverlap();
+    }, 200);
 }
 
 // ---- re-exports from the focused split modules (public surface preserved) ----

@@ -3034,3 +3034,30 @@ body.eg-cursor-shocked .gc {
         opacity: 0;
     }
 }
+
+/* ── Monsters above the grid, click-through where they overlap it ─────────
+   Monster layers sit just above the puzzle scaler (z 10) and below the class
+   HUD / toasts (15+), so art is never hidden behind the grid. A card that
+   overlaps the grid gets .eg-over-grid (js/combat/encounter.js): it takes no
+   clicks, so every cell stays clickable, and its art turns see-through so the
+   clues underneath stay readable. Cards clear of the grid stay clickable. */
+#eg-monster-wrapper,
+.eg-floating-panel {
+    z-index: 12;
+}
+
+.eg-monster-card-compact.eg-over-grid {
+    pointer-events: none !important;
+}
+
+.eg-monster-card-compact .eg-emoji-wrapper {
+    transition: opacity 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.eg-monster-card-compact.eg-over-grid .eg-emoji-wrapper {
+    opacity: 0.6;
+}
+
+.eg-monster-card-compact.eg-over-grid .eg-compact-bars {
+    opacity: 0.85;
+}
