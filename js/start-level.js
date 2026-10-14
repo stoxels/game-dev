@@ -256,7 +256,7 @@ function _calcBaseTime() {
         // in both cases (tree time_added is added in the _initTimer patch).
         const gearBonus = (typeof _egComputePlayerStats === 'function')
             ? (_egComputePlayerStats().timeAdded || 0) : 0;
-        const authored = (CAMPAIGN_BUDGET_ACTIVE && cur.grid && cur.grid[0])
+        const authored = (CAMPAIGN_BUDGET_ACTIVE && !cur.isTutorialQuest && cur.grid && cur.grid[0])
             ? campaignBaseTimeSecs(cur.grid.length * cur.grid[0].length)
             : (cur.timer || cfg.timerStart);
         baseTimer = authored + gearBonus;

@@ -54,15 +54,26 @@ const SPELLS = {
     soul_drain:      { el: 'shadow',    mult: 1.0,  en: 'Soul Drain',      de: 'Seelenentzug' },
     mend:            { el: 'heal',      mult: 0,    en: 'Mend',            de: 'Heilung' },
     summon:          { el: 'summon',    mult: 0,    en: 'Summon',          de: 'Beschwörung' },
+    meteor:          { el: 'fire',      mult: 2.2,  en: 'Meteor',          de: 'Meteor' },
+    ember_rain:      { el: 'fire',      mult: 0.8,  en: 'Ember Rain',      de: 'Glutregen' },
+    ice_lance:       { el: 'cold',      mult: 1.5,  en: 'Ice Lance',       de: 'Eislanze' },
+    hailstorm:       { el: 'cold',      mult: 0.8,  en: 'Hailstorm',       de: 'Hagelsturm' },
+    thunder_strike:  { el: 'lightning', mult: 1.1,  en: 'Thunder Strike',  de: 'Donnerschlag' },
+    doom_orb:        { el: 'shadow',    mult: 2.0,  en: 'Doom Orb',        de: 'Verderbniskugel' },
+    shadow_volley:   { el: 'shadow',    mult: 0.6,  en: 'Shadow Volley',   de: 'Schattensalve' },
+    enrage:          { el: 'rage',      mult: 0,    en: 'Enrage',          de: 'Wutanfall' },
 };
 
 const POOLS = {
-    fire: ['fire_bolt', 'mend'],
-    cold: ['frost_nova', 'mend'],
-    lightning: ['chain_lightning'],
-    shadow: ['soul_drain', 'summon'],
-    none: ['mend', 'summon'],
+    fire: ['fire_bolt', 'meteor', 'ember_rain', 'mend', 'enrage'],
+    cold: ['frost_nova', 'ice_lance', 'hailstorm', 'mend'],
+    lightning: ['chain_lightning', 'thunder_strike', 'enrage'],
+    shadow: ['soul_drain', 'summon', 'doom_orb', 'shadow_volley'],
+    none: ['mend', 'summon', 'enrage'],
 };
+
+const ENRAGE_MULT = 1.35;
+const ENRAGE_MS = 9000;
 
 const SUMMON_DEFS = ['rat', 'bat', 'beetle'];
 
@@ -367,6 +378,174 @@ function _castSummon(monster) {
     });
 }
 
+// Telegraphed ground circle that lands after `teleMs`. Hits only when the
+// player is still inside it (moving out dodges). `fall` adds a falling
+// meteor visual. Returns nothing; `onResolve(hit)` runs after detonation.
+function _msGroundStrike(monster, el, x, y, r, teleMs, mult, fall, onResolve) {
+    const falling = fall ? `<span class="ms-meteor" style="--ms-tele-ms:${teleMs}ms"></span>` : '';
+    const tele = _msFx(el, x, y, teleMs + 80,
+        `<div class="ms-ground-tele" style="left:${-r}px;top:${-r}px;width:${r * 2}px;height:${r * 2}px;--ms-tele-ms:${teleMs}ms"></div>${falling}`);
+    setTimeout(() => {
+        tele.remove();
+        _msFx(el, x, y, 650,
+            `<div class="ms-ground-blast" style="left:${-r}px;top:${-r}px;width:${r * 2}px;height:${r * 2}px"></div>`);
+        _msParticles(el, x, y, fall ? 16 : 8, el === 'cold' ? 'ms-shard' : '', r);
+        Audio_Manager.playSFX('monster_projectile_hit');
+        if (!_msAlive(monster)) return;
+        const rect = _egGetPlayerRectForAilment();
+        const hit = !!(rect && _egCircleOverlapsRect(x, y, r, rect));
+        if (hit) _msHit(monster, mult, el, true);
+        else if (cur && cur.gauntlet && typeof globalThis.gainMana === 'function') {
+            // Gauntlet reward for reading the telegraph: a dodge restores a little mana.
+            globalThis.gainMana(Math.max(1, Math.round((Number(globalThis.playerMaxMana) || 0) * 0.02)));
+        }
+        if (onResolve) onResolve(hit);
+    }, teleMs);
+}
+
+function _msDodgeToast() {
+    if (typeof globalThis.showToast === 'function') {
+        globalThis.showToast(LANG === 'de' ? '💨 Ausgewichen!' : '💨 Dodged!');
+    }
+}
+
+function _msScatter(centre, spread) {
+    const a = Math.random() * Math.PI * 2;
+    const d = spread * Math.sqrt(Math.random());
+    return { x: centre.x + Math.cos(a) * d, y: centre.y + Math.sin(a) * d };
+}
+
+function _castMeteor(monster) {
+    _msWindup(monster, 'meteor', EG_MONSTER_SPELL_CONFIG.windupMs + 150, () => {
+        const c = _msCentre(_msPlayerEl());
+        if (!c) return;
+        Audio_Manager.playSFX('monster_charge_windup');
+        _msGroundStrike(monster, 'fire', c.x, c.y, 76, 1150, SPELLS.meteor.mult, true,
+            hit => { if (!hit) _msDodgeToast(); });
+    });
+}
+
+function _castEmberRain(monster) {
+    _msWindup(monster, 'ember_rain', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
+        const c = _msCentre(_msPlayerEl());
+        if (!c) return;
+        for (let i = 0; i < 4; i++) {
+            setTimeout(() => {
+                if (!_msAlive(monster)) return;
+                const p = i === 0 ? c : _msScatter(c, 150);
+                _msGroundStrike(monster, 'fire', p.x, p.y, 42, 850, SPELLS.ember_rain.mult, true);
+            }, i * 220);
+        }
+    });
+}
+
+function _castIceLance(monster) {
+    _msWindup(monster, 'ice_lance', EG_MONSTER_SPELL_CONFIG.windupMs - 150, () => {
+        const from = _msCentre(_msCard(monster));
+        const to = _msCentre(_msPlayerEl());
+        if (!from || !to) return;
+        Audio_Manager.playSFX('monster_projectile_launch');
+        _msProjectile('ms-orb-cold', 'ms-trail-cold', from, to, 360, 'linear', () => {
+            Audio_Manager.playSFX('monster_projectile_hit');
+            _msImpact('cold', _msCentre(_msPlayerEl()) || to);
+            _msHit(monster, SPELLS.ice_lance.mult, 'cold', true);
+        });
+    });
+}
+
+function _castHailstorm(monster) {
+    _msWindup(monster, 'hailstorm', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
+        const c = _msCentre(_msPlayerEl());
+        if (!c) return;
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                if (!_msAlive(monster)) return;
+                const p = i === 0 ? c : _msScatter(c, 170);
+                _msGroundStrike(monster, 'cold', p.x, p.y, 38, 800, SPELLS.hailstorm.mult, false);
+            }, i * 160);
+        }
+    });
+}
+
+function _castThunderStrike(monster) {
+    _msWindup(monster, 'thunder_strike', EG_MONSTER_SPELL_CONFIG.windupMs - 100, () => {
+        // Three strikes, each aimed where the player stands at that moment:
+        // keep moving.
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                if (!_msAlive(monster)) return;
+                const c = _msCentre(_msPlayerEl());
+                if (!c) return;
+                _msGroundStrike(monster, 'lightning', c.x, c.y, 50, 650, SPELLS.thunder_strike.mult, false);
+            }, i * 620);
+        }
+    });
+}
+
+function _castDoomOrb(monster) {
+    _msWindup(monster, 'doom_orb', EG_MONSTER_SPELL_CONFIG.windupMs + 250, () => {
+        const from = _msCentre(_msCard(monster));
+        const to = _msCentre(_msPlayerEl());
+        if (!from || !to) return;
+        Audio_Manager.playSFX('monster_projectile_launch');
+        _msProjectile('ms-orb-shadow ms-orb-big', 'ms-trail-shadow', from, to, 1400, 'linear', () => {
+            Audio_Manager.playSFX('monster_projectile_hit');
+            const hit = _msCentre(_msPlayerEl()) || to;
+            _msFx('shadow', hit.x, hit.y, 1000, '<span class="ms-vortex"></span>');
+            _msImpact('shadow', hit);
+            _msHit(monster, SPELLS.doom_orb.mult, 'shadow', true);
+        });
+    });
+}
+
+function _castShadowVolley(monster) {
+    _msWindup(monster, 'shadow_volley', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                if (!_msAlive(monster)) return;
+                const from = _msCentre(_msCard(monster));
+                const to = _msCentre(_msPlayerEl());
+                if (!from || !to) return;
+                const aim = { x: to.x + (i - 1) * 34, y: to.y + (i - 1) * 18 };
+                Audio_Manager.playSFX('monster_projectile_launch');
+                _msProjectile('ms-orb-shadow', 'ms-trail-shadow', from, aim, 520, 'ease-in', () => {
+                    Audio_Manager.playSFX('monster_projectile_hit');
+                    _msImpact('shadow', _msCentre(_msPlayerEl()) || aim);
+                    _msHit(monster, SPELLS.shadow_volley.mult, 'shadow', i === 2);
+                });
+            }, i * 150);
+        }
+    });
+}
+
+// Support: an ally (or the caster) hits harder for a few seconds.
+function _castEnrage(monster) {
+    _msWindup(monster, 'enrage', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
+        const pool = (globalThis._egMonsters || []).filter(m =>
+            !m.isBoss && !m.isSacrificialZombie && m.currentHP > 0 && !m._enraged);
+        const target = pool.find(m => m.id !== monster.id) || pool[0];
+        if (!target) return;
+        target._enraged = true;
+        target._preEnrageDamage = target.damageValue;
+        target.damageValue = Math.round(target.damageValue * ENRAGE_MULT);
+        const card = _msCard(target);
+        if (card) card.classList.add('ms-enraged');
+        const pos = _msCentre(card);
+        if (pos) {
+            _msFx('rage', pos.x, pos.y, 1100,
+                '<span class="ms-burst-ring"></span><span class="ms-heal-num ms-rage-num">⚔ ' + (LANG === 'de' ? 'WUT' : 'RAGE') + '</span>');
+            _msParticles('rage', pos.x, pos.y, 10, '', 48);
+        }
+        Audio_Manager.playSFX('monster_charge_windup');
+        setTimeout(() => {
+            target._enraged = false;
+            if (target._preEnrageDamage != null) target.damageValue = target._preEnrageDamage;
+            const c = _msCard(target);
+            if (c) c.classList.remove('ms-enraged');
+        }, ENRAGE_MS);
+    });
+}
+
 const CASTERS = {
     fire_bolt: _castFireBolt,
     frost_nova: _castFrostNova,
@@ -374,6 +553,14 @@ const CASTERS = {
     soul_drain: _castSoulDrain,
     mend: _castMend,
     summon: _castSummon,
+    meteor: _castMeteor,
+    ember_rain: _castEmberRain,
+    ice_lance: _castIceLance,
+    hailstorm: _castHailstorm,
+    thunder_strike: _castThunderStrike,
+    doom_orb: _castDoomOrb,
+    shadow_volley: _castShadowVolley,
+    enrage: _castEnrage,
 };
 
 //------------------------------------------------------------------------
@@ -391,6 +578,9 @@ export function _egMonsterSpellChance(monster) {
 
 function _msCanUse(id, monster) {
     if (id === 'mend') return !!_woundedAlly(monster);
+    if (id === 'enrage') {
+        return (globalThis._egMonsters || []).some(m => !m.isBoss && !m.isSacrificialZombie && m.currentHP > 0 && !m._enraged);
+    }
     if (id === 'summon') {
         if (monster._summoned) return false;                       // minions never chain-summon
         if ((monster._summonsCast || 0) >= 1) return false;        // one summon per caster
@@ -409,6 +599,7 @@ function _msPick(monster) {
 // started (the caller must then skip the plain attack).
 export function _egMaybeCastMonsterSpell(monster) {
     if (!monster || monster.isBoss || monster.isSacrificialZombie || !_egIsActive()) return false;
+    if (cur && cur.isTutorialQuest) return false;   // tutorial monsters only ever attack plainly
     const now = Date.now();
     if (monster._spellReadyAt && now < monster._spellReadyAt) return false;
     if (Math.random() >= _egMonsterSpellChance(monster)) return false;

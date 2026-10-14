@@ -31,6 +31,7 @@ export function _egCurrentMeleeDamage(chargePct = 1) {
 // Execution tuning: a melee strike on a monster below this HP share is a
 // finisher - multiplied damage. Gives melee the "cleanup kill" niche while
 // spells handle wave-clear.
+export const EG_MELEE_EXECUTE_ENABLED = false;
 export const EG_MELEE_EXECUTE_HP_PCT = 0.25;
 export const EG_MELEE_EXECUTE_MULT = 3;
 
@@ -105,7 +106,8 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
     // way so dumping stacks with 0%-charge taps can't cheat full damage.
     // Execution: a strike on a low-HP monster is a finisher (multiplied).
     let execMult = 1;
-    if (meleeTarget && (meleeTarget.maxHP || 0) > 0
+    // Disabled for now (EG_MELEE_EXECUTE_ENABLED) - melee no longer needs it.
+    if (EG_MELEE_EXECUTE_ENABLED && meleeTarget && (meleeTarget.maxHP || 0) > 0
         && meleeTarget.currentHP > 0
         && meleeTarget.currentHP <= meleeTarget.maxHP * EG_MELEE_EXECUTE_HP_PCT) {
         execMult = EG_MELEE_EXECUTE_MULT;
@@ -116,7 +118,11 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
     // multiplies only the primary target below).
     const rawHit = Math.max(1, Math.round(
         _egCurrentMeleeDamage(chargePct) + _egConsumeOnHitGearBonus() * chargePct));
-    const dmg = Math.max(1, Math.round(rawHit * execMult));
+    // Gauntlet combo: a melee strike soon after a spell hit crits harder.
+    const gauntletHooks = globalThis._egGauntletMeleeHooks;
+    const comboMult = gauntletHooks ? gauntletHooks.pre(targetId) : 1;
+    if (comboMult > 1) _egShowStatusLabel(targetId, t('eg_combo') !== 'eg_combo' ? t('eg_combo') : 'COMBO!');
+    const dmg = Math.max(1, Math.round(rawHit * execMult * comboMult));
     const elements = _egLastMeleeElements;
     const wasCrit = (typeof _egLastMeleeWasCrit !== 'undefined') ? _egLastMeleeWasCrit : false;
 
@@ -124,6 +130,8 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
     // so Spellproof monsters (spellproofPct) take full melee damage while
     // all non-melee sources (spells, reveal projectiles, DoTs) are resisted.
     _egDamageTargetById(targetId, dmg, elements, { isCrit: wasCrit, isMelee: true, chargePct });
+
+    if (gauntletHooks) gauntletHooks.post(targetId, chargePct, comboMult > 1);
 
     // Life on a connecting strike (passive tree): melee-only line plus the
     // generic "per Enemy hit with Attacks" line shared with projectiles.

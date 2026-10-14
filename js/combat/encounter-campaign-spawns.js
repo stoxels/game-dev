@@ -6,7 +6,7 @@
 import { cur } from '../state.js';
 import { _egCampaignMonsterLevel } from '../endgame/endgame-leveling.js';
 import { EG_MONSTER_DEFS } from './combat-monsters-data.js';
-import { EG_PLAYER_STATS } from '../endgame/endgame-player-stats.js';
+import { EG_PLAYER_STATS, _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 
 try { Object.defineProperty(globalThis, '_egClearCampaignLevelFields', { get() { return _egClearCampaignLevelFields; }, set(v) { _egClearCampaignLevelFields = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { get() { return _egShouldPrepareCampaignEncounter; }, set(v) { _egShouldPrepareCampaignEncounter = v; }, configurable: true }); } catch (e) {}
@@ -24,18 +24,52 @@ try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { g
 //
 // Campaign packs never respawn and never include bosses.
 export const EG_CAMPAIGN_MONSTER_CONFIG = {
-    earlyHpBudgetFraction: 0.55, // level-1 share; ramps up to hpBudgetFraction (tuning pass 1: big early puzzles were HP spikes)
+    earlyHpBudgetFraction: 0.8, // level-1 share; ramps up to hpBudgetFraction (tuning pass 1: big early puzzles were HP spikes)
     earlyHpRampLevels: 24,       // monster level at which the full share applies
-    hpBudgetFraction: 0.85,   // share of the level's total player damage (~2x, so packs survive ~12 hits each with starter gear instead of ~6)
+    hpBudgetFraction: 1.05,   // share of the level's total player damage (~2x, so packs survive ~12 hits each with starter gear instead of ~6)
     minHp: 18,
+    // Gear awareness (pass 2): the HP budget used to assume the un-geared
+    // base hit, so a level-7 character with a Light Bow (3-4x the base hit)
+    // one- or two-shot everything and late bows (15x) made packs trivial.
+    // The budget now follows the player's EXPECTED projectile hit, raised to
+    // this power so gear still feels strong without deleting the monsters
+    // (1 = monsters always take the same number of hits, 0 = old behaviour).
+    gearScaleExponent: 0.85,
     countBase: 2,
     countPerWorlds: 4,        // +1 monster every N worlds
     countMax: 5,
     minCellsPerMonster: 6,    // small puzzles support fewer monsters
-    damageBase: 6,            // per-hit damage at monster level 1 (was 3 - never threatened 100 HP + starter armour)
-    damagePerLevel: 0.32,     // +damage per monster level (was 0.18 - mid-campaign now ramps to ~16 at lvl 30)
-    chargeMult: 1.15,         // campaign monsters wind up slightly slower than atlas ones (was 1.35 - too slow + pushback meant they rarely attacked)
+    damageBase: 7,            // per-hit damage at monster level 1 (pass 2: was 6)
+    damagePerLevel: 0.38,     // +damage per monster level (pass 2: was 0.32)
+    chargeMult: 1.0,          // campaign monsters wind up as fast as atlas ones (pass 2: was 1.15; player hits already push the bar back)
+    // Damage floor as a share of the player's max life: a level-7 character
+    // with 280 life, 78 armour and parry could idle next to a lone 10-damage
+    // monster forever. Raw hit = max(curve, share * maxHP), capped at
+    // damageHpCapMult x the curve so tiny levels never spike.
+    damageHpShare: 0.09,
+    damageHpCapMult: 3,
 };
+
+// Expected (non-random, non-crit) projectile hit of the current character:
+// base + average flat gear damage, with the physical / elemental / generic /
+// projectile "increased" buckets applied the way _egCalcPlayerDamage does.
+function _egExpectedProjectileHit() {
+    const base = (EG_PLAYER_STATS && EG_PLAYER_STATS.baseDamage) || 10;
+    try {
+        const st = _egComputePlayerStats() || {};
+        const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
+        const phys = (base + mid(st.physFlatMin, st.physFlatMax)) * (1 + (Number(st.physIncPct) || 0) / 100);
+        const elem = (mid(st.fireDmgMin, st.fireDmgMax) + mid(st.coldDmgMin, st.coldDmgMax)
+            + mid(st.lightningDmgMin, st.lightningDmgMax) + mid(st.shadowDmgMin, st.shadowDmgMax))
+            * (1 + ((Number(st.elementalDamageIncPct) || 0) + (Number(st.projectileElementalDamageIncPct) || 0)) / 100);
+        const total = (phys + elem)
+            * (1 + (Number(st.damageIncPct) || 0) / 100)
+            * (1 + (Number(st.projectileDamageIncPct) || 0) / 100);
+        return Math.max(base, total);
+    } catch (e) {
+        return base;
+    }
+}
 
 // Fields _egPrepareCampaignEncounter stamps onto the level object. Listed so
 // _egClearCampaignLevelFields can restore the story level to its pristine
@@ -97,7 +131,9 @@ export function _egPrepareCampaignEncounter() {
 
     const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
     const cells = _egCountSolutionCells();
-    const perCellDamage = (typeof EG_PLAYER_STATS !== 'undefined' && EG_PLAYER_STATS.baseDamage) || 10;
+    const baseHit = (typeof EG_PLAYER_STATS !== 'undefined' && EG_PLAYER_STATS.baseDamage) || 10;
+    const gearRatio = Math.max(1, _egExpectedProjectileHit() / baseHit);
+    const perCellDamage = baseHit * Math.pow(gearRatio, cfg.gearScaleExponent);
 
     const world = cur.world || 1;
     let count = cfg.countBase + Math.floor((world - 1) / cfg.countPerWorlds);
@@ -110,7 +146,10 @@ export function _egPrepareCampaignEncounter() {
     const fraction = cfg.earlyHpBudgetFraction + (cfg.hpBudgetFraction - cfg.earlyHpBudgetFraction) * ramp;
     const budget = cells * perCellDamage * fraction;
     const perHp = Math.max(cfg.minHp, Math.round(budget / Math.max(1, count)));
-    const damage = Math.max(1, Math.round(cfg.damageBase + cfg.damagePerLevel * level));
+    const curveDamage = cfg.damageBase + cfg.damagePerLevel * level;
+    const maxHp = Number(globalThis.playerMaxHP) || 0;
+    const floorDamage = Math.min(curveDamage * cfg.damageHpCapMult, maxHp * cfg.damageHpShare);
+    const damage = Math.max(1, Math.round(Math.max(curveDamage, floorDamage)));
 
     cur.campaignMonsters = true;
     cur.isMonsterLevel = true;

@@ -134,6 +134,67 @@ body.gauntlet-open #puzzle-scaler-wrap { pointer-events: none; }
     100% { opacity: 1; transform: scale(1); }
 }
 
+/* ── Counter-traits (melee purpose) ─────────────────────────────────────── */
+.ga-trait-badge {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    font-size: 1.1rem;
+    line-height: 1;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.9));
+}
+.eg-monster-card-compact.ga-trait-warded .eg-emoji-wrapper {
+    box-shadow: 0 0 14px 2px rgba(255, 200, 70, 0.75), inset 0 0 12px rgba(255, 200, 70, 0.35);
+    border-radius: 12px;
+}
+.eg-monster-card-compact.ga-trait-phased .eg-monster-emoji-compact {
+    opacity: 0.62;
+    filter: drop-shadow(0 0 8px rgba(150, 190, 255, 0.95)) saturate(0.7);
+    animation: ga-phase 1.6s ease-in-out infinite alternate;
+}
+@keyframes ga-phase {
+    from { opacity: 0.45; }
+    to   { opacity: 0.8; }
+}
+
+/* ── Tiers, modifiers, goals ────────────────────────────────────────────── */
+.ga-tiers { display: flex; gap: 8px; justify-content: center; margin: 10px 0 4px; }
+.ga-btn.ga-tier { padding: 7px 14px; opacity: 0.6; }
+.ga-btn.ga-tier-on { opacity: 1; background: linear-gradient(180deg, #d98a1f, #8a4d0a); color: #fff; box-shadow: 0 0 12px rgba(255, 170, 40, 0.6); }
+.ga-card .ga-mod { color: #ffd98a; font-weight: 700; }
+
+.ga-lava, .ga-shrine { position: absolute; border-radius: 50%; pointer-events: none; z-index: 1; }
+.ga-lava {
+    background: radial-gradient(circle, #ffd24a 0, #ff6a1a 38%, #8a1c04 72%, rgba(60, 5, 0, 0.1) 100%);
+    box-shadow: 0 0 26px 6px rgba(255, 90, 10, 0.7), inset 0 0 18px rgba(255, 210, 90, 0.7);
+    animation: ga-lava 1.8s ease-in-out infinite alternate;
+}
+@keyframes ga-lava { from { filter: brightness(0.85); transform: scale(0.97); } to { filter: brightness(1.2); transform: scale(1.03); } }
+.ga-shrine {
+    background: radial-gradient(circle, rgba(200, 255, 220, 0.85) 0, rgba(93, 255, 138, 0.45) 45%, rgba(93, 255, 138, 0.05) 100%);
+    border: 2px dashed rgba(180, 255, 205, 0.85);
+    box-shadow: 0 0 22px rgba(93, 255, 138, 0.6);
+    transition: left 0.6s ease, top 0.6s ease, box-shadow 0.2s;
+}
+.ga-shrine.ga-shrine-active { box-shadow: 0 0 40px 10px rgba(93, 255, 138, 0.9); }
+.ga-safe {
+    position: absolute;
+    border: 2px solid rgba(255, 90, 90, 0.8);
+    box-shadow: 0 0 0 4000px rgba(10, 0, 20, 0.55), inset 0 0 24px rgba(255, 60, 60, 0.35);
+    pointer-events: none;
+    z-index: 1;
+    transition: left 0.3s linear, top 0.3s linear, width 0.3s linear, height 0.3s linear;
+}
+.ga-goals { display: flex; gap: 14px; justify-content: center; margin-top: 12px; font: 800 14px/1 system-ui, sans-serif; }
+.ga-goal-ok { color: #b9ffcf; }
+.ga-goal-no { color: #8a7da0; }
+.ga-gold { color: #ffe27a; }
+.eg-monster-card-compact.ga-trait-champion .eg-emoji-wrapper {
+    box-shadow: 0 0 18px 4px rgba(255, 90, 90, 0.75);
+    border-radius: 12px;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .gauntlet-arena { animation: none; }
 }

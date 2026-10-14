@@ -164,6 +164,8 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
         return;
     }
 
+    if (opts && opts.isPlayerSpell) target._lastSpellHitAt = Date.now();
+
     const hpBefore = target.currentHP;
     // Crush (node 331) is decided on the state BEFORE the hit: only an
     // enemy that was at full Life when the melee strike landed is crushed.

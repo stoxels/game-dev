@@ -17,6 +17,7 @@
     --ms-shadow-lo: #1c0733;
     --ms-heal: #5dff8a;
     --ms-summon: #c77dff;
+    --ms-rage: #ff3b3b;
 }
 
 /* ── Wind-up: the casting monster's card glows in the spell's colour ───── */
@@ -35,6 +36,7 @@
 .ms-casting.ms-el-shadow::after    { box-shadow: 0 0 22px 6px var(--ms-shadow),    inset 0 0 18px #3a0f66; }
 .ms-casting.ms-el-heal::after      { box-shadow: 0 0 22px 6px var(--ms-heal),      inset 0 0 18px #d6ffe2; }
 .ms-casting.ms-el-summon::after    { box-shadow: 0 0 22px 6px var(--ms-summon),    inset 0 0 18px #f0d9ff; }
+.ms-casting.ms-el-rage::after      { box-shadow: 0 0 22px 6px var(--ms-rage),      inset 0 0 18px #ffd0d0; }
 @keyframes ms-cast-glow  { from { opacity: 0.45; } to { opacity: 1; } }
 @keyframes ms-cast-shake {
     0%   { transform: translate(0, 0); }
@@ -70,6 +72,7 @@
 .ms-spell-name.ms-el-shadow    { color: #d9b3ff; }
 .ms-spell-name.ms-el-heal      { color: var(--ms-heal); }
 .ms-spell-name.ms-el-summon    { color: var(--ms-summon); }
+.ms-spell-name.ms-el-rage      { color: #ff8a8a; }
 @keyframes ms-name-rise {
     0%   { opacity: 0; transform: translate(-50%, 8px) scale(0.8); }
     15%  { opacity: 1; transform: translate(-50%, 0) scale(1.05); }
@@ -123,6 +126,12 @@
     box-shadow: 0 0 16px 5px rgba(93, 255, 138, 0.85);
 }
 .ms-trail-heal   { background: linear-gradient(to left, rgba(150, 255, 190, 0.9), transparent); }
+.ms-orb-cold {
+    background: radial-gradient(circle at 40% 40%, #fff 0 20%, var(--ms-cold-hi) 38%, var(--ms-cold) 78%, #2a7fb8 100%);
+    box-shadow: 0 0 16px 5px rgba(110, 203, 255, 0.9), 0 0 30px 10px rgba(110, 203, 255, 0.4);
+}
+.ms-trail-cold   { background: linear-gradient(to left, rgba(210, 240, 255, 0.95), rgba(110, 203, 255, 0.5), transparent); }
+.ms-proj .ms-orb.ms-orb-big { left: -22px; top: -22px; width: 44px; height: 44px; }
 @keyframes ms-orb-pulse {
     from { transform: scale(0.85); filter: brightness(1); }
     to   { transform: scale(1.18); filter: brightness(1.35); }
@@ -151,6 +160,7 @@
 .ms-fx.ms-el-shadow    { color: var(--ms-shadow); }
 .ms-fx.ms-el-heal      { color: var(--ms-heal); }
 .ms-fx.ms-el-summon    { color: var(--ms-summon); }
+.ms-fx.ms-el-rage      { color: var(--ms-rage); }
 @keyframes ms-ring-out { from { transform: scale(0.4); opacity: 1; } to { transform: scale(7); opacity: 0; } }
 @keyframes ms-flash    { 0% { transform: scale(0.3); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
 
@@ -281,6 +291,47 @@
     75%  { transform: scale(1) rotate(360deg); opacity: 1; }
     100% { transform: scale(0.2) rotate(520deg); opacity: 0; }
 }
+
+/* ── Ground strikes (Meteor, Ember Rain, Hailstorm, Thunder Strike) ────── */
+.ms-ground-tele {
+    border-radius: 50%;
+    border: 3px dashed currentColor;
+    background: radial-gradient(circle, transparent 0, currentColor 140%);
+    box-shadow: 0 0 18px currentColor, inset 0 0 18px currentColor;
+    animation: ms-ground-charge var(--ms-tele-ms, 800ms) linear forwards;
+}
+@keyframes ms-ground-charge {
+    0%   { opacity: 0.25; transform: scale(0.5); }
+    70%  { opacity: 0.8;  transform: scale(1); }
+    100% { opacity: 1;    transform: scale(1.05); border-color: #fff; }
+}
+.ms-ground-blast {
+    border-radius: 50%;
+    border: 5px solid #fff;
+    background: radial-gradient(circle, #fff 0, currentColor 55%, transparent 80%);
+    box-shadow: 0 0 36px currentColor;
+    animation: ms-ground-blast 0.5s ease-out forwards;
+}
+@keyframes ms-ground-blast {
+    from { transform: scale(0.5); opacity: 1; }
+    to   { transform: scale(1.35); opacity: 0; }
+}
+.ms-meteor {
+    left: -16px; top: -16px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, #fffbe0 0 18%, var(--ms-fire-hi) 32%, var(--ms-fire) 65%, #7a1604 100%);
+    box-shadow: 0 0 20px 8px rgba(255, 106, 26, 0.85), 0 -40px 30px 4px rgba(255, 90, 0, 0.45);
+    animation: ms-meteor-fall var(--ms-tele-ms, 1000ms) cubic-bezier(0.5, 0, 1, 0.8) forwards;
+}
+@keyframes ms-meteor-fall {
+    from { transform: translate(-90px, -420px) scale(0.7); opacity: 0.4; }
+    to   { transform: translate(0, 0) scale(1.1); opacity: 1; }
+}
+
+/* ── Enrage ────────────────────────────────────────────────────────────── */
+.ms-enraged { filter: saturate(1.4) drop-shadow(0 0 8px var(--ms-rage)); outline: 2px solid var(--ms-rage); border-radius: 10px; }
+.ms-heal-num.ms-rage-num { color: #ff8a8a; text-shadow: 0 0 8px #000, 0 0 12px var(--ms-rage); }
 
 /* ── Resist feedback on the player ─────────────────────────────────────── */
 .ms-resist-tag {

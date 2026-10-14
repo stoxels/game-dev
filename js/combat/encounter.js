@@ -192,9 +192,10 @@ export function _egBuildMonsterCardHTML(m) {
     const isTarget = (m.id === globalThis._egTargetId);
     const bossCls = m.isBoss ? ' eg-boss-card' : '';
     const targetedCls = isTarget ? ' eg-card-targeted' : '';
+    const traitCls = m.gauntletTrait ? ` ga-trait-${m.gauntletTrait}` : '';
 
     return `
-    <div class="eg-monster-card-compact${bossCls}${targetedCls}" id="eg-card-${m.id}" onclick="_egSelectTarget('${m.id}')" style="--eg-art:${m.artScale || 1}">
+    <div class="eg-monster-card-compact${bossCls}${targetedCls}${traitCls}" id="eg-card-${m.id}" onclick="_egSelectTarget('${m.id}')" style="--eg-art:${m.artScale || 1}">
         <!-- Bars stacked top-to-bottom: Charge bar then HP bar above the icon -->
         <div class="eg-compact-bars">
             <div class="eg-charge-track-compact">
@@ -213,6 +214,7 @@ export function _egBuildMonsterCardHTML(m) {
             ${m.isBoss ? '<span class="eg-boss-crown">👑</span>' : ''}
             <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
+            ${m.gauntletTrait ? `<span class="ga-trait-badge" title="${m.gauntletTrait === 'warded' ? 'Spell Ward: spells deal far less damage - use melee' : (m.gauntletTrait === 'champion' ? 'Champion: tougher and hits harder' : 'Phased: immune to melee - use spells')}">${m.gauntletTrait === 'warded' ? '🛡' : (m.gauntletTrait === 'champion' ? '👑' : '👻')}</span>` : ''}
 
             <div class="eg-monster-compact-tooltip">
                 <div class="eg-tooltip-name">${m.name}</div>
@@ -226,6 +228,31 @@ export function _egBuildMonsterCardHTML(m) {
 
 
 
+
+// Mirrors a monster's art so it looks toward the player's avatar. Art is
+// drawn facing right; ids in EG_ART_FACES_LEFT are drawn facing left and
+// get the opposite flip. A small dead-zone stops flicker when the player
+// is roughly above/below the monster.
+const EG_ART_FACES_LEFT = new Set([]);
+const EG_FACE_DEADZONE_PX = 14;
+
+function _egFaceMonsterTowardPlayer(m) {
+    const card = document.getElementById(`eg-card-${m.id}`);
+    const art = card && card.querySelector('.eg-monster-emoji-compact');
+    const player = document.getElementById('player-avatar-wrapper');
+    if (!art || !player) return;
+    const c = card.getBoundingClientRect();
+    const p = player.getBoundingClientRect();
+    if (!c.width || !p.width) return;
+    const dx = (p.left + p.width / 2) - (c.left + c.width / 2);
+    if (Math.abs(dx) < EG_FACE_DEADZONE_PX) return;
+    const playerIsLeft = dx < 0;
+    const nativeLeft = EG_ART_FACES_LEFT.has(m.artId || m.baseId);
+    const flip = (playerIsLeft !== nativeLeft) ? -1 : 1;
+    if (art._egFlip === flip) return;
+    art._egFlip = flip;
+    art.style.transform = flip === -1 ? 'scaleX(-1)' : '';
+}
 
 // Updates the HP bar, charge bar, and HP label for a single monster.
 // Cheap DOM update used by the 10Hz tick loop - no full rebuild.
@@ -247,6 +274,8 @@ export function _egUpdateMonsterBars(m) {
         else chargeBar.classList.remove('eg-charge-danger');
     }
     if (hpLabel) hpLabel.textContent = `${m.currentHP} / ${m.maxHP} HP`;
+
+    _egFaceMonsterTowardPlayer(m);
 
     // Elemental ailment icon strip (only rebuilds when statuses change)
     _egRenderMonsterStatusStrip(m);
