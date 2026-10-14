@@ -876,6 +876,7 @@ export function _egPickMapRunPuzzleGi(criteria) {
             mode: criteria.genMode,
             tier: criteria.genTier,
             minCells: criteria.minCells,
+            maxCells: criteria.maxCells,
         });
         if (gi !== null) { _egTrackChainRecentGi(gi, criteria.recentWindow); return gi; }
         console.warn('EG chain: puzzle generation failed, falling back to story pool');

@@ -25,7 +25,7 @@ import { _maybeShowConvergenceModal, goToLevelSelect } from './screens/screens.j
 import { _hidePlayerAvatar, _hidePlayerAvatarSimple } from './sprite/player_sprite.js';
 import { save } from './state.js';
 import { stopTimer } from './timer/timer.js';
-import { t } from './translation/translations.js';
+import { LANG, t } from './translation/translations.js';
 import { STATE } from './state.js';
 import { cur } from './state.js';
 
@@ -237,15 +237,135 @@ export function _egTrialTriggerLevels(wi) {
 //-------------------LAUNCH------------------------------------------------
 //------------------------------------------------------------------------
 
+// ---- pre-launch briefing --------------------------------------------------
+// Trials play very differently from the ordinary puzzle levels before them
+// (a chain of puzzles + questions ending in a boss), so every launch first
+// shows a short briefing. "Begin" starts the run; "Back" returns to the level
+// select without launching anything.
+function _egTrialIntroText() {
+    const de = LANG === 'de';
+    return {
+        convergence: de ? 'Konvergenz-Prüfung' : 'Convergence Trial',
+        ascension: de ? 'Aufstiegs-Prüfung' : 'Ascension Trial',
+        lead: de
+            ? 'Das ist KEIN normales Rätsel. Eine Prüfung ist ein kurzer Lauf aus mehreren verbundenen Etappen, der mit einem Bosskampf endet.'
+            : 'This is NOT a normal puzzle level. A trial is a short run through several connected stages that ends in a boss fight.',
+        puzzles: (n) => (de ? `Löse ${n} Rätsel nacheinander.` : `Solve ${n} puzzles, one after another.`),
+        questions: (n) => (de
+            ? `Beantworte ${n} Quizfragen zu dieser Welt zwischen den Rätseln.`
+            : `Answer ${n} quiz question${n === 1 ? '' : 's'} about this world between the puzzles.`),
+        monsters: (max, total, lvl) => (de
+            ? `Monster greifen währenddessen an (bis zu ${max} gleichzeitig, insgesamt ${total}, Stufe ${lvl}). Besiege sie mit Projektilen, Zaubern und Nahkampf.`
+            : `Monsters attack while you work (up to ${max} at once, ${total} in total, level ${lvl}). Beat them with grid projectiles, spells and melee.`),
+        boss: (name) => (de ? `Besiege am Ende den Boss: ${name}.` : `Defeat the boss at the end: ${name}.`),
+        finish: de ? 'Danach „Prüfung beenden“ wählen, um die Belohnung zu erhalten.' : 'Then choose "Finish Trial" to claim your reward.',
+        rules: (min, mistakes) => (de
+            ? `⏱ Zeitlimit ${min} Min · ✖ höchstens ${mistakes} Fehler · stirbst du, endet der Lauf (du kannst es jederzeit erneut versuchen).`
+            : `⏱ ${min} min time limit · ✖ at most ${mistakes} mistakes · if you fall the run ends (you can retry any time).`),
+        rewardConv: de ? 'Belohnung (erster Abschluss): +1 Talentpunkt und Erfahrung.' : 'Reward (first clear): +1 passive point and XP.',
+        rewardAsc: de
+            ? 'Belohnung (erster Abschluss): Kodex der Vollendung, Weltabschluss-Boni und Klassenereignis.'
+            : 'Reward (first clear): Codex of Completion, world-completion rewards and the class event.',
+        begin: de ? 'PRÜFUNG BEGINNEN' : 'BEGIN TRIAL',
+        back: de ? 'Zurück' : 'Back',
+        monsterless: de ? 'Monsterlos: nur Rätsel und Fragen, kein Boss.' : 'Monsterless: puzzles and questions only, no boss.',
+    };
+}
+
+function _egShowTrialIntro(wi, kind, info, onBegin) {
+    const old = document.getElementById('trial-intro-modal');
+    if (old) old.remove();
+    const tx = _egTrialIntroText();
+    const name = kind === 'convergence' ? _egTrialName(wi) : _egAscensionTrialName(wi);
+    const steps = [];
+    steps.push(`🧩 ${tx.puzzles(info.requiredPuzzles)}`);
+    if (info.requiredQuestions > 0) steps.push(`❓ ${tx.questions(info.requiredQuestions)}`);
+    if (info.monsterless) {
+        steps.push(`🕊 ${tx.monsterless}`);
+    } else {
+        steps.push(`👹 ${tx.monsters(info.maxMonsters, info.totalMonsters, info.monsterLevel)}`);
+        steps.push(`👑 ${tx.boss(info.bossName)}`);
+    }
+    steps.push(`🏁 ${tx.finish}`);
+    const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const el = document.createElement('div');
+    el.id = 'trial-intro-modal';
+    el.innerHTML = `
+<style>
+#trial-intro-modal{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(4,2,10,.78);font-family:system-ui,sans-serif}
+#trial-intro-modal .ti-card{max-width:560px;width:calc(100vw - 32px);box-sizing:border-box;padding:22px 26px;border-radius:14px;border:2px solid #b8862b;background:linear-gradient(180deg,#1b1030,#0d0818);color:#efe6ff;box-shadow:0 0 40px rgba(255,170,40,.35)}
+#trial-intro-modal .ti-kind{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#b9a8d6;text-align:center}
+#trial-intro-modal h2{margin:4px 0 12px;font-size:24px;letter-spacing:.06em;text-align:center;color:#ffd98a;text-shadow:0 0 12px rgba(255,160,30,.6)}
+#trial-intro-modal p{margin:0 0 12px;font-size:14px;line-height:1.5;color:#e4d8ff}
+#trial-intro-modal ol{margin:0 0 12px;padding:0;list-style:none;counter-reset:s}
+#trial-intro-modal li{position:relative;margin:0 0 8px;padding:8px 10px 8px 38px;border-radius:8px;background:rgba(255,255,255,.05);font-size:14px;line-height:1.4}
+#trial-intro-modal li::before{counter-increment:s;content:counter(s);position:absolute;left:10px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:50%;background:#8a4d0a;color:#fff;font-size:12px;font-weight:800;text-align:center;line-height:20px}
+#trial-intro-modal .ti-rules{font-size:13px;color:#cbb8f0}
+#trial-intro-modal .ti-reward{font-size:13px;color:#ffe9a8}
+#trial-intro-modal .ti-actions{display:flex;gap:10px;justify-content:center;margin-top:14px}
+#trial-intro-modal button{font:800 13px/1 system-ui,sans-serif;letter-spacing:.1em;padding:11px 20px;border-radius:8px;cursor:pointer;border:1px solid #b8862b;color:#ffe9b8;background:#3a2410}
+#trial-intro-modal button.ti-go{background:linear-gradient(180deg,#d98a1f,#8a4d0a);color:#fff}
+#trial-intro-modal button:hover{filter:brightness(1.2)}
+</style>
+<div class="ti-card" role="dialog" aria-modal="true">
+    <div class="ti-kind">${esc(kind === 'convergence' ? tx.convergence : tx.ascension)}</div>
+    <h2>⚔ ${esc(name)}</h2>
+    <p>${esc(tx.lead)}</p>
+    <ol>${steps.map((st) => `<li>${esc(st)}</li>`).join('')}</ol>
+    <p class="ti-rules">${esc(tx.rules(Math.round(info.timeLimitSecs / 60), info.maxMistakes))}</p>
+    <p class="ti-reward">${esc(kind === 'convergence' ? tx.rewardConv : tx.rewardAsc)}</p>
+    <div class="ti-actions">
+        <button class="ti-back" id="ti-back">${esc(tx.back)}</button>
+        <button class="ti-go" id="ti-go">${esc(tx.begin)}</button>
+    </div>
+</div>`;
+    document.body.appendChild(el);
+    const close = () => { const m = document.getElementById('trial-intro-modal'); if (m) m.remove(); };
+    document.getElementById('ti-go').addEventListener('click', () => { close(); onBegin(); });
+    document.getElementById('ti-back').addEventListener('click', () => {
+        close();
+        try { goToLevelSelect(); } catch (e) { /* level select optional */ }
+    });
+}
+
+// Largest puzzle (in cells) a trial may hand out. Trials used to draw from
+// every generated size (25 to 450 cells), so a first-world trial could throw
+// a 15x30 grid at a new player. The cap grows with the world: world 1 stays
+// at 5x10, later worlds open up gradually; ascension trials (end of a world)
+// allow one step more.
+function _egTrialMaxCells(wi, kind) {
+    const step = Math.max(0, wi) + (kind === 'ascension' ? 1 : 0);
+    return Math.min(400, 50 + 50 * step);
+}
+
 // Stamps a seed story level with trial run parameters and launches it.
 // Mirrors _egLaunchMapFromDevice() minus the map-item consumption.
-export function _egLaunchTrialRun(wi, kind) {
+// Without opts.confirmed the player first sees the trial briefing; the run
+// starts from its "Begin" button (which calls back here with confirmed).
+export function _egLaunchTrialRun(wi, kind, opts) {
     if (typeof startLevel !== 'function' || typeof ALL === 'undefined' || !ALL.length) return false;
     if (typeof _egPickMapRunSeedGi !== 'function' && typeof _egBuildChainPool !== 'function') return false;
 
     const chain = _egTrialChainParams(wi);
     const monsterLevel = _egTrialMonsterLevel(wi, kind === 'ascension');
     const bossId = _egTrialBossId(wi, kind === 'ascension' ? 1 : 0);
+
+    if (!(opts && opts.confirmed)) {
+        const bossDef = (typeof EG_BOSS_DEFS !== 'undefined' && EG_BOSS_DEFS && bossId) ? EG_BOSS_DEFS[bossId] : null;
+        const isMonsterless = !!(typeof curMods !== 'undefined' && curMods && curMods.monsterless);
+        _egShowTrialIntro(wi, kind, {
+            requiredPuzzles: chain.requiredPuzzles,
+            requiredQuestions: chain.requiredQuestions,
+            maxMonsters: chain.maxMonsters,
+            totalMonsters: chain.totalMonsters,
+            monsterLevel,
+            bossName: (bossDef && (bossDef.name || bossDef.id)) || '???',
+            monsterless: isMonsterless,
+            timeLimitSecs: 1200,
+            maxMistakes: 10,
+        }, () => _egLaunchTrialRun(wi, kind, { confirmed: true }));
+        return true;
+    }
     const trialId = kind === 'convergence' ? _egTrialIdForWorld(wi) : ('asc_' + (wi + 1));
     // MONSTERLESS: trials stay puzzle chains with question intermissions but
     // run with no monsters and no boss finale.
@@ -269,7 +389,7 @@ export function _egLaunchTrialRun(wi, kind) {
         requiredQuestions: chain.requiredQuestions,
         egTimeLimit: 1200,
         egMaxMistakes: 10,
-        puzzlePool: { generated: true, genMode: 'mixed' },
+        puzzlePool: { generated: true, genMode: 'mixed', genTier: 1, maxCells: _egTrialMaxCells(wi, kind) },
     };
 
     let gi = null;

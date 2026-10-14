@@ -226,12 +226,12 @@ function _egGenerateRandomStructure(rows, cols, rng) {
 // arenas to keep the fight on a small board.
 // Biases toward bigger grids as the map tier climbs. Falls back to the
 // closest eligible size when no size sits inside the window.
-function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng) {
+function _egPickGeneratedSize(tier, minCells, bucket, maxRows, maxCols, rng, maxCells) {
     let lo = minCells || 0;
-    let hi = Infinity;
+    let hi = (maxCells != null && maxCells > 0) ? maxCells : Infinity;
     if (bucket && EG_GEN_BUCKETS[bucket]) {
         lo = Math.max(lo, EG_GEN_BUCKETS[bucket][0]);
-        hi = EG_GEN_BUCKETS[bucket][1];
+        hi = Math.min(hi, EG_GEN_BUCKETS[bucket][1]);
     }
 
     const fits = s => {
@@ -297,7 +297,7 @@ export function _egCreateGeneratedLevel(opts) {
     let effMode = mode;
     if (mode === 'mixed') effMode = R() < 0.7 ? 'symbol' : 'random';
 
-    const size = _egPickGeneratedSize(tier, opts.minCells, opts.bucket, opts.maxRows, opts.maxCols, rng);
+    const size = _egPickGeneratedSize(tier, opts.minCells, opts.bucket, opts.maxRows, opts.maxCols, rng, opts.maxCells);
 
     let grid = null;
     let symbolMeta = null;
