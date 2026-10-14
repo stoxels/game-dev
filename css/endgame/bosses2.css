@@ -9841,6 +9841,21 @@ body.eg-shp-flash::after {
     border-right: none;
     border-bottom: 3px solid rgba(255, 214, 102, 0.95);
 }
+/* The opening in the wall: a green lane that travels with it. */
+.eg-bar-gap {
+    position: fixed;
+    z-index: 8652;
+    pointer-events: none;
+    box-sizing: border-box;
+    border: 3px solid rgba(134, 239, 172, 0.95);
+    background: linear-gradient(90deg, rgba(134,239,172,0.10), rgba(134,239,172,0.28));
+    box-shadow: 0 0 26px rgba(74, 222, 128, 0.75), inset 0 0 20px rgba(74, 222, 128, 0.35);
+    display: flex; align-items: center; justify-content: center;
+    font: 900 1.1rem/1 system-ui, sans-serif; letter-spacing: 0.2em;
+    color: #14532d; text-shadow: 0 0 8px rgba(255,255,255,0.9);
+    writing-mode: vertical-rl;
+}
+.eg-bar-gap-v { writing-mode: horizontal-tb; }
 .eg-bar-splash {
     position: fixed;
     z-index: 8651;

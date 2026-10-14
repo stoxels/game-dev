@@ -1,5 +1,5 @@
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE BARRAGE (boss_barrage)---------------------------
@@ -41,10 +41,10 @@ Object.assign(EG_BOSS_MECHANICS, {
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'shelling_curtain', intervalBase: 19000, intervalVariance: 4500, handler: '_egMechBarCurtain' },
-            { name: 'corrupt_cells', intervalBase: 17000, intervalVariance: 4000, handler: '_egMechCorruptCells' },
-            { name: 'supply_drop', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechBarSupplyDrop', phase2Only: true },
-            { name: 'shot_shells', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechBarShotShells', phase2Only: true },
+            { name: 'shelling_curtain', intervalBase: 12000, intervalVariance: 3000, handler: '_egMechBarCurtain' },
+            { name: 'corrupt_cells', intervalBase: 15000, intervalVariance: 3500, handler: '_egMechCorruptCells' },
+            { name: 'supply_drop', intervalBase: 17000, intervalVariance: 4000, handler: '_egMechBarSupplyDrop', phase2Only: true },
+            { name: 'shot_shells', intervalBase: 15000, intervalVariance: 4000, handler: '_egMechBarShotShells', phase2Only: true },
         ],
         onPhaseEnter: _egBarOnPhaseEnter,
     },
@@ -95,8 +95,10 @@ export function _egBarHeal(amount) {
 // Phase 3: a second curtain sweeps from the top edge simultaneously, so the
 // safe wedge is a moving diagonal.
 export const EG_BAR_CURTAIN_W   = 120;        // splash band width (px)
-export const EG_BAR_CURTAIN_DMG = [0, 0.13, 0.15, 0.17];  // %maxHP standing in the wall
-export const EG_BAR_CURTAIN_ROWS = [0, 4, 6]; // splash rows per cast, by phase
+export const EG_BAR_CURTAIN_DMG = [0, 0.13, 0.15, 0.17];  // %maxHP when the wall catches you
+export const EG_BAR_CURTAIN_ROWS = [0, 4, 6]; // (legacy) splash rows per cast, by phase
+const EG_BAR_CURTAIN_GAP = 260;        // px opening you must be standing in
+const EG_BAR_CURTAIN_SPEED = 0.30;     // screen widths per second
 
 export function _egMechBarCurtain(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
@@ -104,23 +106,33 @@ export function _egMechBarCurtain(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
-    const speed = (W * 0.42) * _EG_BAR_DEBUG_MULT;      // px/s sweep speed
+    const speed = (W * EG_BAR_CURTAIN_SPEED) * _EG_BAR_DEBUG_MULT;      // px/s sweep speed
     const fromTop = p >= 3;
+    const span = fromTop ? W : H;        // length of the wall along its own axis
 
-    _egNkToast('eg_mech_bar_curtain', '🍎 SHELLING CURTAIN - the wall of splashes advances! Fight through it!', '#ff6b35');
+    _egNkToast('eg_mech_bar_curtain', '🍎 SHELLING CURTAIN - get into the GAP before the wall reaches you!', '#ff6b35');
 
-    // The curtain sweeps left→right (or top→bottom in phase 3), with the
-    // leading edge telegraphed as a live splash band.
+    // The wall has one opening. Stand inside it when the wall passes.
+    const gapC = span * (0.2 + Math.random() * 0.6);
+    const gapLo = gapC - EG_BAR_CURTAIN_GAP / 2;
+    const gapHi = gapC + EG_BAR_CURTAIN_GAP / 2;
+    const pieces = [[0, gapLo], [gapHi, span]].map(([lo, hi]) => ({
+        lo, hi, el: _egNkEl(run, 'div', 'eg-bar-curtain' + (fromTop ? ' eg-bar-curtain-v' : '')),
+    }));
+    const gapEl = _egNkEl(run, 'div', 'eg-bar-gap' + (fromTop ? ' eg-bar-gap-v' : ''), 'GAP');
+
     let x = fromTop ? 0 : -EG_BAR_CURTAIN_W;
+    let hit = false;
     const splashes = [];
     let lastSplash = 0;
     _egNkLoop(run, (dtS, now) => {
         x += speed * dtS;
-        // Splash dots inside the wall for readability.
+        // Splash dots inside the wall for readability (never inside the gap).
         if (now - lastSplash > 90) {
             lastSplash = now;
             for (let i = 0; i < 3; i++) {
-                const along = fromTop ? Math.random() * W : Math.random() * H;
+                const along = Math.random() * span;
+                if (along > gapLo && along < gapHi) continue;
                 const el = _egNkEl(run, 'div', 'eg-bar-splash');
                 const sw = fromTop
                     ? [Math.round(along - 6), Math.round(x - 8)]
@@ -130,28 +142,38 @@ export function _egMechBarCurtain(monster, phase) {
                 splashes.push({ el, born: now });
             }
         }
-        // Prune expired splashes.
         for (let i = splashes.length - 1; i >= 0; i--) {
             if (now - splashes[i].born > 700) { try { splashes[i].el.remove(); } catch (e) {} splashes.splice(i, 1); }
         }
-        // Draw the advancing wall.
-        if (!run.wallEl) {
-            run.wallEl = _egNkEl(run, 'div', 'eg-bar-curtain' + (fromTop ? ' eg-bar-curtain-v' : ''));
-        }
-        const wall = run.wallEl;
+        // Draw the advancing wall (two pieces around the gap).
+        pieces.forEach(pc2 => {
+            const len = Math.max(0, pc2.hi - pc2.lo);
+            if (fromTop) {
+                pc2.el.style.left = Math.round(pc2.lo) + 'px'; pc2.el.style.top = Math.round(x) + 'px';
+                pc2.el.style.width = Math.round(len) + 'px'; pc2.el.style.height = EG_BAR_CURTAIN_W + 'px';
+            } else {
+                pc2.el.style.left = Math.round(x) + 'px'; pc2.el.style.top = Math.round(pc2.lo) + 'px';
+                pc2.el.style.width = EG_BAR_CURTAIN_W + 'px'; pc2.el.style.height = Math.round(len) + 'px';
+            }
+        });
         if (fromTop) {
-            wall.style.left = '0px'; wall.style.top = Math.round(x) + 'px';
-            wall.style.width = W + 'px'; wall.style.height = EG_BAR_CURTAIN_W + 'px';
+            gapEl.style.left = Math.round(gapLo) + 'px'; gapEl.style.top = Math.round(x) + 'px';
+            gapEl.style.width = EG_BAR_CURTAIN_GAP + 'px'; gapEl.style.height = EG_BAR_CURTAIN_W + 'px';
         } else {
-            wall.style.left = Math.round(x) + 'px'; wall.style.top = '0px';
-            wall.style.width = EG_BAR_CURTAIN_W + 'px'; wall.style.height = H + 'px';
+            gapEl.style.left = Math.round(x) + 'px'; gapEl.style.top = Math.round(gapLo) + 'px';
+            gapEl.style.width = EG_BAR_CURTAIN_W + 'px'; gapEl.style.height = EG_BAR_CURTAIN_GAP + 'px';
         }
-        // Standing in the wall = heavy DoT chunked through the shared helper.
+        // One real hit (with feedback) if the wall passes over you outside the gap.
         const pc = _egBarPC();
-        const inWall = fromTop
-            ? (pc.y > x && pc.y < x + EG_BAR_CURTAIN_W)
-            : (pc.x > x && pc.x < x + EG_BAR_CURTAIN_W);
-        if (inWall) _egNkDotTick(run, EG_BAR_CURTAIN_DMG[p], dtS, level, 'fire');
+        const across = fromTop ? pc.y : pc.x;
+        const along = fromTop ? pc.x : pc.y;
+        const inBand = across > x && across < x + EG_BAR_CURTAIN_W;
+        const inGap = along > gapLo + 12 && along < gapHi - 12;
+        if (inBand && !inGap && !hit) {
+            hit = true;
+            const dealt = _egNkHit(EG_BAR_CURTAIN_DMG[p], 'fire', level);
+            _egNkAbilityHitToast(dealt, 'The Barrage', 'Shelling Curtain');
+        }
         // Done once the wall crosses the far edge.
         if (x > (fromTop ? H : W) + EG_BAR_CURTAIN_W) return false;
         return true;
@@ -375,6 +397,25 @@ export let _egBarShrapCd = 0;
 // SALVO detonates everything except the single untouched safe tile. Charge
 // bar frozen (gate in _egTickPlayer via _egBarFinalActive).
 export const EG_BAR_VOLLEYS   = 3;       // big strikes before the salvo
+const EG_BAR_WALK_PX_S = 320;     // avatar speed (AVATAR_MOVE_SPEED_PX_PER_SEC)
+const EG_BAR_REACT_MS  = 700;     // reaction time we always leave the player
+
+// Picks a tile index whose centre the player can really reach before the
+// strike lands: within walk-speed x (telegraph - reaction), but not the tile
+// they already stand on (so there is something to do).
+function _egBarReachableTile(cols, rows, cw, rh, telegraphMs) {
+    const pc = _egBarPC();
+    const reach = Math.max(150, EG_BAR_WALK_PX_S * Math.max(0, telegraphMs - EG_BAR_REACT_MS) / 1000 * 0.9);
+    const ok = [], near = [];
+    for (let c = 0; c < cols; c++) {
+        for (let r = 0; r < rows; r++) {
+            const d = Math.hypot(pc.x - (c * cw + cw / 2), pc.y - (r * rh + rh / 2));
+            if (d <= reach) { near.push([c, r]); if (d >= Math.max(cw, rh) * 0.9) ok.push([c, r]); }
+        }
+    }
+    const pool = ok.length ? ok : (near.length ? near : [[Math.floor(cols / 2), Math.floor(rows / 2)]]);
+    return pool[Math.floor(Math.random() * pool.length)];
+}
 export const EG_BAR_VOLLEY_GAP = 4600;   // ms between strikes
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
@@ -456,7 +497,7 @@ export function _egBarFinalStart(monster) {
     ov.className = 'eg-bar-cd';
     ov.innerHTML =
         '<div class="eg-bar-cd-label">🍎 FINAL BOMBARDMENT</div>' +
-        '<div class="eg-bar-cd-hint">Three massive strikes - then the ALL-OUT SALVO. Read the volley gaps!</div>';
+        '<div class="eg-bar-cd-hint">Three strikes - then the ALL-OUT SALVO. Run to a GREEN tile each time!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -488,9 +529,11 @@ export function _egBarFinalStart(monster) {
         // Each strike: a full-screen shelling grid with 2 safe gaps that
         // wander slightly between volleys. Telegraphed 2.2s.
         const cols = 8, rows = 6;
-        const safeCols = [Math.floor(Math.random() * cols), Math.floor(Math.random() * cols)];
-        const safeRows = [Math.floor(Math.random() * rows), Math.floor(Math.random() * rows)];
         const cw = W / cols, rh = H / rows;
+        // One safe cell is always within the player's reach; the second is random.
+        const reach1 = _egBarReachableTile(cols, rows, cw, rh, 2200 * _EG_BAR_DEBUG_MULT);
+        const safeCols = [reach1[0], Math.floor(Math.random() * cols)];
+        const safeRows = [reach1[1], Math.floor(Math.random() * rows)];
         g.fxRun.els.forEach(el => { try { if (el.classList && el.classList.contains('eg-bar-strike')) el.remove(); } catch (e) {} });
         const cells = [];
         for (let c = 0; c < cols; c++) {
@@ -530,12 +573,12 @@ export function _egBarFinalStart(monster) {
     // ── The ALL-OUT SALVO: everything detonates except one safe tile. ────
     const runSalvo = () => {
         if (g.finished) return;
-        _egNkToast('eg_mech_bar_salvo', '🍎💀 ALL-OUT SALVO - one safe tile remains. Reach it!', '#ff6b35');
+        _egNkToast('eg_mech_bar_salvo', '🍎💀 ALL-OUT SALVO - run to the GREEN tile!', '#ff6b35');
 
         const cols = 10, rows = 7;
         const cw = W / cols, rh = H / rows;
-        const safeC = Math.floor(Math.random() * cols);
-        const safeR = Math.floor(Math.random() * rows);
+        // The one safe tile is always within reach of where the player stands.
+        const [safeC, safeR] = _egBarReachableTile(cols, rows, cw, rh, 3300 * _EG_BAR_DEBUG_MULT);
         g.safe = { x: safeC * cw + cw / 2, y: safeR * rh + rh / 2, hw: cw / 2, hh: rh / 2 };
         g.salvoTiles = [];
         for (let c = 0; c < cols; c++) {
@@ -550,7 +593,7 @@ export function _egBarFinalStart(monster) {
             }
         }
 
-        _egBarAfter(g, 2600 * _EG_BAR_DEBUG_MULT, () => {
+        _egBarAfter(g, 3300 * _EG_BAR_DEBUG_MULT, () => {
             if (g.finished) return;
             g.salvoTiles.forEach(t => { if (!t.isSafe) t.el.classList.add('eg-bar-strike-hot'); });
             const pc = _egBarPC();
