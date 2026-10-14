@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { _egHzGridRect } from '../combat-hazards.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDotTick, _egNkEl, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast } from './shared-boss-abilities.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkEl, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRectsOverlap, _egNkToast, _egNkWatchFinale } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE PUDDLE (boss_puddle)-----------------------------
@@ -9,6 +9,7 @@ import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDotTick, _egNkEl, _egNkHit, 
 // Drowning-weather siege: endless cold rain, water rising in thirds at HP
 // gates with sweeping GATE WAVES, crown-splash fountains, and popping air
 // bubbles - the flood never climbs above the puzzle grid's lower border.
+// ≤10%: THE DELUGE (shared finale waves).
 //
 // Shared mechanics (fated_cell) live in shared-puzzle-mechanics.js and are
 // referenced by handler-name string.
@@ -25,17 +26,32 @@ Object.assign(EG_BOSS_DEFS, {
 Object.assign(EG_BOSS_MECHANICS, {
     boss_puddle: {
         phases: [
+            // Basic attacks stay a steady pressure (the framework floors
+            // them at 13% of max life); the weather is the real threat.
             { threshold: 1.00, chargeMax: 13, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 10, damageMultiplier: 1.35 },
-            { threshold: 0.30, chargeMax: 8, damageMultiplier: 1.75 },
+            { threshold: 0.60, chargeMax: 12, damageMultiplier: 1.20 },
+            { threshold: 0.30, chargeMax: 11, damageMultiplier: 1.40 },
         ],
         immunityDuration: 2000,
         mechanics: [
             { name: 'fated_cell', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechFatedCell' },
         ],
-        onInit: _egPuddleArenaInit,
+        onInit: (m) => { _egPuddleArenaInit(m); _egNkWatchFinale(m, EG_PUD_FINALE); },
     },
 });
+
+// THE DELUGE finale (shared waves): the sky falls in sheets.
+const EG_PUD_FINALE = {
+    name: 'The Puddle', title: '💧 THE DELUGE', element: 'cold', cls: 'eg-nk-fin-water', color: '#7dd3fc',
+    toastKey: 'eg_pud_final',
+    hint: 'The sky falls - read each circle!',
+    waves: [
+        { kind: 'avoid', ms: 2200, dmg: 0.15, extra: 2, label: 'Deluge' },
+        { kind: 'shelter', ms: 2800, dmg: 0.22, label: 'Deluge' },
+        { kind: 'avoid', ms: 2000, dmg: 0.15, extra: 3, label: 'Deluge' },
+        { kind: 'shelter', ms: 2600, dmg: 0.26, label: 'The Deluge' },
+    ],
+};
 
 
 // ── Weather tuning ──────────────────────────────────────────────────────
@@ -46,8 +62,9 @@ export const EG_PUD_RAIN_DMG = 0.035;        // %maxHP per drop impact (cold)
 export const EG_PUD_RAIN_HIT_CD_MS = 400;    // global rain-hit cooldown
 export const EG_PUD_WATER_PCT = [0, 1 / 6, 2 / 6, 3 / 6]; // of viewport height per band
 export const EG_PUD_WATER_RISE = 130;        // px/s the flood visibly rises
-export const EG_PUD_WATER_DOT = [0, 7, 9, 12];  // %maxHP/s standing in the water
-export const EG_PUD_FOUNTAIN_DMG = 8;        // %maxHP/s touching a fountain jet
+export const EG_PUD_WATER_DOT = [0, 7, 9, 12];  // %maxHP/s standing in the water (paid as hits)
+export const EG_PUD_FOUNTAIN_DMG = 8;        // %maxHP/s touching a fountain jet (paid as hits)
+const EG_PUD_TOUCH_CD_MS = 700;              // water/fountain hit cadence (real hits, not a silent DoT)
 export const EG_PUD_FOUNTAIN_MS = 2000;      // fountain lifetime - quick crown splash
 export const EG_PUD_FOUNTAIN_H = 260;        // full jet height (px) - tall, since the flood stays low
 export const EG_PUD_FOUNTAIN_CANOPY_W = 3.4; // canopy spread at full flare (× stem width)
@@ -236,7 +253,7 @@ export function _egPuddleArenaInit(monster) {
         drops: [], fountains: [], bubbles: [], shards: [],
         wave: null, waveQ: 0,
         respawnQ: [],
-        rainAcc: 0, rainCd: 0, shardCd: 0, fountainSfxAt: 0, warnAt: 0,
+        rainAcc: 0, rainCd: 0, shardCd: 0, fountainSfxAt: 0, warnAt: 0, waterCd: 0, fountainCd: 0,
     };
     _egPudWatcher = st;
     _egNkToast('eg_mech_puddle', '💧 The Puddle: The sky opens - rain, rising water and drifting bubbles. Stay dry!');
@@ -282,9 +299,14 @@ export function _egPuddleArenaInit(monster) {
         st.waterY = H - st.waterH;
         st.waterEl.style.height = Math.round(st.waterH) + 'px';
 
-        // Standing in water: cold DoT (scales with how deep the flood is).
+        // Standing in water: a real cold hit every 0.7s (flash + number),
+        // scaled with how deep the flood is.
         if (pr && st.waterH > 4 && pr.bottom > st.waterY + 6) {
-            _egNkDotTick(run, EG_PUD_WATER_DOT[st.waterBand], dtS, level, 'cold');
+            if (now >= st.waterCd) {
+                st.waterCd = now + EG_PUD_TOUCH_CD_MS;
+                const dealt = _egNkHit(EG_PUD_WATER_DOT[st.waterBand] / 100 * (EG_PUD_TOUCH_CD_MS / 1000), 'cold', level);
+                _egNkAbilityHitToast(dealt, 'The Puddle', 'Freezing Flood');
+            }
             if (now - st.warnAt > 3000) {
                 st.warnAt = now;
                 _egNkToast('eg_nk_move', '⚠️ Move!', '#7dd3fc');
@@ -350,6 +372,8 @@ export function _egPuddleArenaInit(monster) {
         const p = Math.max(1, Math.min(3, Number(live.bossPhase) || 1));
         st.rainAcc += dtS * 1000;
         const interval = EG_PUD_RAIN_INTERVAL_MS[p] || EG_PUD_RAIN_INTERVAL_MS[1];
+        // The deluge finale owns the sky: no rain while the boss is immune.
+        if (live._nkFinaleDone && live.bossImmune) st.rainAcc = 0;
         while (st.rainAcc >= interval) {
             st.rainAcc -= interval;
             _egPudSpawnDrop(st, W);
@@ -413,7 +437,11 @@ export function _egPuddleArenaInit(monster) {
                         { left: f.x - stemW, right: f.x + stemW, top: st.waterY - h, bottom: st.waterY }, pr) ||
                         _egNkRectsOverlap(
                         { left: f.x - canW, right: f.x + canW, top: st.waterY - h, bottom: st.waterY - h + canH }, pr))) {
-                    _egNkDotTick(run, EG_PUD_FOUNTAIN_DMG, dtS, level, 'cold');
+                    if (now >= st.fountainCd) {
+                        st.fountainCd = now + EG_PUD_TOUCH_CD_MS;
+                        const dealt = _egNkHit(EG_PUD_FOUNTAIN_DMG / 100 * (EG_PUD_TOUCH_CD_MS / 1000), 'cold', level);
+                        _egNkAbilityHitToast(dealt, 'The Puddle', 'Fountain');
+                    }
                 }
                 // Splash vs air bubbles → burst (spawn-grace honoured).
                 for (const b of st.bubbles) {

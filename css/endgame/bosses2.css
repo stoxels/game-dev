@@ -4921,6 +4921,7 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     animation: eg-nk-warn-pulse 0.35s ease-in-out infinite alternate;
 }
 .eg-nk-fin-stack { --nk-fin: #a5b4fc; }
+.eg-nk-fin-water { --nk-fin: #7dd3fc; }
 
 /* ------------------------------------------------------------------
    THE TACTICIAN - persistent chess-siege arena (boss-tactician.js)
