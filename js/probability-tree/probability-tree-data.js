@@ -5130,7 +5130,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "travel_study_habit_30090",
    "tier": "travel",
    "effects": [
-    "quiz_time:3"
+    "quiz_time:30"
    ]
   },
   {
@@ -5653,7 +5653,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_study_habit_30122",
    "tier": "small",
    "effects": [
-    "quiz_time:3"
+    "quiz_time:30"
    ]
   },
   {
@@ -5863,7 +5863,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_study_habit_30138",
    "tier": "small",
    "effects": [
-    "quiz_time:3"
+    "quiz_time:30"
    ]
   },
   {
@@ -6022,7 +6022,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_study_habit_30150",
    "tier": "small",
    "effects": [
-    "quiz_time:3"
+    "quiz_time:30"
    ]
   },
   {
@@ -18217,7 +18217,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_study_habit_31045",
    "tier": "small",
    "effects": [
-    "quiz_time:3"
+    "quiz_time:30"
    ]
   },
   {
@@ -21042,7 +21042,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "travel_study_habit_31228",
    "tier": "travel",
    "effects": [
-    "quiz_time:3"
+    "quiz_time:30"
    ]
   },
   {
