@@ -8263,6 +8263,23 @@ body.eg-shp-flash::after {
     border-color: rgba(214, 200, 168, 0.85) !important;
     box-shadow: 0 0 22px rgba(214, 200, 168, 0.55), inset 0 0 26px rgba(146, 122, 84, 0.35);
 }
+/* The shockwave's reach: dashed circle while the foot is raised, a faint
+   quake-dust disc once it slams (the wave stops at its edge). */
+.eg-colo-quake-zone {
+    position: fixed; z-index: 8999; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    border: 3px dashed rgba(251, 191, 36, 0.9);
+    background:
+        repeating-radial-gradient(circle, transparent 0 34px, rgba(214, 200, 168, 0.10) 34px 38px),
+        radial-gradient(circle, rgba(146, 122, 84, 0.10), rgba(146, 122, 84, 0.24) 92%, transparent 100%);
+    box-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
+    animation: eg-colo-zone-kf 0.45s ease-in-out infinite alternate;
+}
+@keyframes eg-colo-zone-kf { from { opacity: 0.6; } to { opacity: 1; } }
+.eg-colo-quake-zone.eg-colo-quake-live {
+    border-style: solid; border-color: rgba(214, 200, 168, 0.55);
+    animation: none; opacity: 0.6;
+}
 
 /* Rock chips + rubble puffs (shared Colossus debris burst). */
 .eg-colo-chip {
@@ -8281,9 +8298,23 @@ body.eg-shp-flash::after {
 /* BOULDER RAIN: the falling boulder and its rolling fragments. */
 .eg-colo-boulder {
     position: fixed; z-index: 9002; pointer-events: none;
-    display: flex; align-items: center; justify-content: center;
-    width: 52px; height: 52px; font-size: 2.4rem;
-    filter: drop-shadow(0 14px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 10px rgba(214, 200, 168, 0.7));
+    width: 52px; height: 52px;
+    border-radius: 46% 54% 50% 48% / 52% 44% 56% 48%;
+    background:
+        radial-gradient(circle at 34% 30%, rgba(255, 250, 235, 0.55) 0 10%, transparent 26%),
+        linear-gradient(130deg, transparent 46%, rgba(41, 37, 36, 0.55) 47% 50%, transparent 51%),
+        linear-gradient(40deg, transparent 58%, rgba(41, 37, 36, 0.45) 59% 61%, transparent 62%),
+        radial-gradient(circle at 40% 38%, #d6d3d1, #a8a29e 45%, #57534e 80%, #292524);
+    box-shadow: inset -6px -8px 12px rgba(0, 0, 0, 0.45), 0 0 10px rgba(214, 200, 168, 0.6);
+    filter: drop-shadow(0 14px 10px rgba(0, 0, 0, 0.55));
+}
+/* Landing shadow = the impact ring: darkens and tightens as the rock falls. */
+.eg-colo-boulder-mark {
+    position: fixed; z-index: 8999; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    border: 3px dashed rgba(248, 113, 113, 0.9);
+    background: radial-gradient(circle, rgba(28, 25, 23, calc(0.25 + 0.5 * var(--fall, 0))) 0 calc(20% + 40% * var(--fall, 0)), rgba(28, 25, 23, 0.12) 70%, transparent 72%);
+    box-shadow: 0 0 16px rgba(248, 113, 113, 0.45);
 }
 .eg-colo-frag {
     position: fixed; z-index: 9002; pointer-events: none;
@@ -8300,10 +8331,23 @@ body.eg-shp-flash::after {
 /* GRANITE GOLEMS: the pusher statue with its two crack stages. */
 .eg-colo-golem {
     position: fixed; z-index: 9001; pointer-events: none;
-    display: flex; align-items: center; justify-content: center;
-    width: 56px; height: 56px; font-size: 2.5rem;
+    width: 56px; height: 56px;
+    border-radius: 12px 12px 8px 8px;
+    background:
+        linear-gradient(180deg, transparent 62%, rgba(41, 37, 36, 0.55) 62% 66%, transparent 66%),
+        linear-gradient(90deg, transparent 48%, rgba(41, 37, 36, 0.4) 48% 52%, transparent 52%),
+        radial-gradient(circle at 30% 25%, #e7e5e4, #a8a29e 50%, #57534e 95%);
+    border: 2px solid rgba(41, 37, 36, 0.8);
+    box-shadow: inset -5px -7px 10px rgba(0, 0, 0, 0.45);
     filter: drop-shadow(0 0 12px rgba(168, 162, 158, 0.9));
     transition: filter 0.25s ease;
+}
+.eg-colo-golem-eyes {
+    position: absolute; left: 12px; right: 12px; top: 17px; height: 8px;
+    background:
+        radial-gradient(circle at 25% 50%, #fde68a 0 3px, transparent 4px),
+        radial-gradient(circle at 75% 50%, #fde68a 0 3px, transparent 4px);
+    filter: drop-shadow(0 0 4px rgba(251, 191, 36, 1));
 }
 .eg-colo-golem.eg-colo-golem-crack1 { filter: drop-shadow(0 0 12px rgba(250, 204, 21, 0.85)) saturate(0.8); }
 .eg-colo-golem.eg-colo-golem-crack2 { filter: drop-shadow(0 0 14px rgba(248, 113, 113, 0.95)) saturate(0.6) brightness(0.85); }
@@ -8365,7 +8409,7 @@ body.eg-shp-flash::after {
 .eg-colo-cavein {
     position: fixed; inset: 0; z-index: 9003; pointer-events: none;
     background:
-        radial-gradient(circle at 50% 50%, transparent 0 90px, rgba(87, 83, 78, 0.55) 30%, rgba(41, 37, 36, 0.92) 68%);
+        radial-gradient(circle at var(--cx, 50%) var(--cy, 50%), transparent 0 118px, rgba(87, 83, 78, 0.6) 140px, rgba(41, 37, 36, 0.92) 70%);
     animation: eg-colo-cavein-kf 1.6s ease-out forwards;
 }
 @keyframes eg-colo-cavein-kf {
@@ -8373,6 +8417,21 @@ body.eg-shp-flash::after {
     22% { opacity: 1; }
     80% { opacity: 0.95; }
     100% { opacity: 0; }
+}
+
+/* CAVE-IN warning: the one safe ring around the last seal, with its 3-2-1. */
+.eg-colo-cavein-ring {
+    position: fixed; z-index: 9003; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    border: 4px solid rgba(134, 239, 172, 0.95);
+    background: radial-gradient(circle, rgba(134, 239, 172, 0.28), rgba(134, 239, 172, 0.06) 70%);
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.8), inset 0 0 24px rgba(74, 222, 128, 0.4);
+    display: flex; align-items: center; justify-content: center;
+    animation: eg-colo-seal-kf 0.6s ease-in-out infinite alternate;
+}
+.eg-colo-cavein-count {
+    font: 900 2.6rem/1 system-ui, sans-serif; color: #fff;
+    text-shadow: 0 0 12px rgba(74, 222, 128, 1), 0 2px 6px rgba(0, 0, 0, 0.9);
 }
 
 /* Finale countdown overlay + kneeling boss-card state. */
