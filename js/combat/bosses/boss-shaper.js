@@ -1,6 +1,6 @@
 import { _egRenderPanel } from '../encounter.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE SHAPER (boss_shaper)------------------------
@@ -26,9 +26,11 @@ Object.assign(EG_BOSS_DEFS, {
 Object.assign(EG_BOSS_MECHANICS, {
     boss_shaper: {
         phases: [
+            // Basic attacks stay a steady pressure (the framework floors
+            // them at 13% of max life); the mechanics are the real threat.
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 9, damageMultiplier: 1.50 },
-            { threshold: 0.30, chargeMax: 6, damageMultiplier: 2.00 },
+            { threshold: 0.60, chargeMax: 11, damageMultiplier: 1.20 },
+            { threshold: 0.30, chargeMax: 10, damageMultiplier: 1.40 },
         ],
         immunityDuration: 2500,
         mechanics: [
@@ -43,7 +45,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
-export const EG_SHP_POOL_DMG      = [0, 9, 11, 13];   // %maxHP/s ice pool DoT
+export const EG_SHP_POOL_DMG      = [0, 9, 11, 13];   // %maxHP/s in an ice pool (paid as hits on the touch cooldown)
 export const EG_SHP_FRONT_DMG     = [0, 0.11, 0.13, 0.16]; // %maxHP rift-front eruption
 export const EG_SHP_WALL_DMG      = 0.10;             // %maxHP frost wall contact
 export const EG_SHP_WALKER_DMG    = [0, 0, 0.10, 0.12]; // %maxHP walker contact
@@ -105,11 +107,12 @@ export function _egShpPrunePools(now) {
 //-------------------MECHANIC: GLACIER RIFT (signature, upgraded)-----------
 //------------------------------------------------------------------------
 // Frost fissures spider out from a random side and erupt in a ROLLING
-// WAVE: a crested front (≈180px band) sweeps the screen over ~2.2s and
-// erupts as it passes - outpace it or slip between the fissure gaps.
-// Where the front settles, LINGERING ICE POOLS remain (the old frozen
-// domains, now clearly the aftermath of the front) that drain while you
-// stand in them.
+// WAVE: a crested front (≈180px band) sweeps the screen over ~2.2s - far
+// faster than you can run. The three glowing FISSURE LANES are the only
+// safe ground (one always opens within reach of you): stand in one while
+// the front passes. Where the front settles, LINGERING ICE POOLS form in
+// the lanes (0.8s grace while they freeze over) and hurt while you stand
+// in them - step out once the front is gone.
 export const EG_SHP_RIFT_FRONT_MS = 2200;
 export const EG_SHP_POOL_LIFE = 7000;
 
@@ -129,8 +132,13 @@ export function _egMechShpRift(monster, phase) {
     const fromLeft = Math.random() < 0.5;
     const warnMs = 1100 * _EG_SHP_DEBUG_MULT;
     const bandH = 180;
-    const gaps = [];
-    for (let i = 0; i < 3; i++) gaps.push(140 + Math.random() * (H - 280));
+    // One lane always within reach (≤160px above/below you), two more apart.
+    const pc0 = _egNkPlayerCenter() || { x: W / 2, y: H / 2 };
+    const gaps = [Math.max(110, Math.min(H - 110, pc0.y + (Math.random() * 320 - 160)))];
+    for (let tries = 0; gaps.length < 3 && tries < 40; tries++) {
+        const g = 110 + Math.random() * (H - 220);
+        if (gaps.every(o => Math.abs(o - g) > 150)) gaps.push(g);
+    }
     gaps.sort((a, b) => a - b);
 
     // Telegraph: fissure lines across the sweep axis + arrows on the origin.
@@ -139,13 +147,14 @@ export function _egMechShpRift(monster, phase) {
     warn.style.width = W + 'px';
     warn.style.height = H + 'px';
     gaps.forEach(g => {
-        const line = _egNkEl(run, 'div', 'eg-shp-fissure');
-        line.style.top = Math.round(g - 3) + 'px';
+        // The safe lane: as tall as the real safe band (±52px).
+        const line = _egNkEl(run, 'div', 'eg-shp-fissure', fromLeft ? 'SAFE LANE ▶' : '◀ SAFE LANE');
+        line.style.top = Math.round(g - 52) + 'px';
         line.style.left = '0px';
         line.style.width = W + 'px';
     });
 
-    _egNkToast('eg_mech_shp_rift', '❄️ The Shaper: GLACIER RIFT - outrun the front!', '#7dd3fc');
+    _egNkToast('eg_mech_shp_rift', '❄️ GLACIER RIFT - stand in a glowing SAFE LANE while the front passes!', '#7dd3fc');
 
     const poolEls = new Map();  // zone → its element (persistent per pool)
     let t = 0, erupted = false, frontX = fromLeft ? 0 : W;
@@ -190,7 +199,10 @@ export function _egMechShpRift(monster, phase) {
                     el.style.width = '190px';
                     el.style.height = '190px';
                     el.style.transform = 'translate(' + Math.round(W / 2 - 95) + 'px,' + Math.round(g - 95) + 'px)';
-                    const zone = { x: W / 2, y: g, radius: 95, until: now + poolLife };
+                    el.classList.add('eg-shp-pool-forming');
+                    const fid = setTimeout(() => el.classList.remove('eg-shp-pool-forming'), 800 * _EG_SHP_DEBUG_MULT);
+                    run.timers.push(fid);
+                    const zone = { x: W / 2, y: g, radius: 95, until: now + poolLife, armAt: now + 800 * _EG_SHP_DEBUG_MULT };
                     _egShpPools.push(zone);
                     poolEls.set(zone, el);
                 });
@@ -210,15 +222,15 @@ export function _egMechShpRift(monster, phase) {
             }
         });
         if (pr) {
-            const inside = _egShpPools.some(z => _egNkCircleHit(z.x, z.y, z.radius, pr, 0));
+            // A real hit per touch cooldown (flash + number), not a silent DoT.
+            const pc = { x: pr.left + pr.width / 2, y: pr.top + pr.height / 2 };
+            const inside = _egShpPools.some(z => now >= (z.armAt || 0) && Math.hypot(pc.x - z.x, pc.y - z.y) < z.radius);
             if (inside) {
-                _egNkDotTick(run, poolDot, dtS, level, 'cold');
+                _egShpTouch(poolDot * (EG_SHP_HIT_CD_MS / 1000), level, 'Ice Pool');
                 if (now - dotWarnAt > 3000) {
                     dotWarnAt = now;
                     _egNkToast('eg_nk_move', '⚠️ Move!', '#7dd3fc');
                 }
-            } else {
-                run.dotAcc = 0;
             }
         }
         // The run must outlive the pools: the DoT tick AND the pool visuals
@@ -471,12 +483,11 @@ export function _egMechShpWalker(monster, phase) {
 // The Shaper assembles a colossal ice monolith at the centre and goes
 // immune. Three frost arms sweep the arena like a radar blade, spinning
 // faster each beat - and three CORES on the monolith's faces light up one
-// at a time. Reach the lit core's arc and stand there to SHATTER it (3
-// stage-cracks, each stalling the sweep briefly); a shattered core stops
-// its arm pair. Shatter all three before the final beat to break the
-// sculpture - otherwise the MONOLITH BREAK: a full-screen ice shockwave
-// (only the eye at the centre is safe). Charge bar frozen for the whole
-// set-piece (gate in _egTickPlayer via _egShpFinalActive).
+// at a time. The lit core shelters you from the arms: stand on it to
+// SHATTER it (3 stage-cracks); a shattered core stops its arm and the next
+// core lights at once. Shatter all three before the last beat (~19s) to
+// break the sculpture - otherwise the MONOLITH BREAK: a 3-2-1, then a
+// full-screen ice shockwave (only the ring at the centre is safe).
 export const EG_SHP_FINAL_BEATS = 3;
 export const EG_SHP_CORE_HITS = 3;          // player touches to shatter a core
 export const EG_SHP_CORE_TOUCH_CD = 420;    // ms between crack touches
@@ -594,7 +605,7 @@ export function _egShpFinalStart(monster) {
     ov.innerHTML =
         '<div class="eg-shp-cd-label">⛄ THE SHAPED WINTER</div>' +
         '<div class="eg-shp-cd-num eg-bmb-cd-pop">' + g.count + '</div>' +
-        '<div class="eg-shp-cd-hint">Body-check the lit core - shatter all three!</div>';
+        '<div class="eg-shp-cd-hint">Stand on the lit core - it shields you from the arms. Shatter all three!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
@@ -625,16 +636,22 @@ export function _egShpFinalStart(monster) {
         const c = _egNkPlayerCenter();
         _egNkPlayerRect();
 
-        // Arm sweep damage (outside the monolith hub).
-        if (c && now >= touchCd) {
+        // Arm sweep damage (outside the monolith hub; the lit core shelters).
+        const lit0 = litCore();
+        const sheltered = c && lit0 && Math.hypot(c.x - (g.px + Math.cos(lit0.ang * Math.PI / 180) * 120),
+            c.y - (g.py + Math.sin(lit0.ang * Math.PI / 180) * 120)) < 70;
+        if (c && now >= touchCd && !sheltered && !g.breaking) {
             const dx = c.x - g.px, dy = c.y - g.py;
             const d = Math.hypot(dx, dy);
             if (d > 90) {
                 const pa = Math.atan2(dy, dx) * 180 / Math.PI;
                 for (let i = 0; i < 3; i++) {
                     if (g.cores[i].shattered) continue; // shattered core's arm stalls out
+                    // Distance to the painted beam (22px wide), not an angle,
+                    // so near and far hits match what you see.
                     const diff = ((pa - (g.arm + i * 120)) % 360 + 360) % 360;
-                    if (diff < 4 || diff > 356) {
+                    const off = Math.abs(Math.sin(diff * Math.PI / 180)) * d;
+                    if ((diff < 90 || diff > 270) && off < 11 + 14) {
                         touchCd = now + EG_SHP_HIT_CD_MS;
                         _egShpTouch(EG_SHP_ARM_DMG, level, 'Frost Arm');
                         break;
@@ -667,40 +684,38 @@ export function _egShpFinalStart(monster) {
                         return false;
                     }
                     _egNkToast('eg_mech_shp_core_down', '❄️ Core shattered - ' + g.coresUp + ' to go!', '#4ade80');
+                    // The next core lights at once - no waiting for a beat.
+                    const nx = g.cores.find(c2 => !c2.shattered);
+                    g.cores.forEach(c2 => { c2.lit = c2 === nx; c2.el.classList.toggle('eg-shp-core-lit', c2 === nx); });
+                    const num = g.overlay && g.overlay.querySelector('.eg-shp-cd-num');
+                    if (num) num.textContent = g.coresUp;
                 }
             }
         }
         return true;
     });
 
-    // Beat driver: lights a core each beat and speeds the arms up. Final
-    // beat without all cores shattered → the MONOLITH BREAK.
+    // Beat driver: the first beat lights a core, every beat speeds the arms
+    // up; after EG_SHP_FINAL_BEATS beats with cores left → the MONOLITH
+    // BREAK. (The old driver broke the monolith on the 3rd beat, when only
+    // two cores had ever been lit - shattering all three was impossible.)
+    // The big number in the banner is the cores left.
     const beatMs = EG_SHP_BEAT_MS * (_EG_SHP_DEBUG_SLOW ? 8 : 1);
+    const numEl = g.overlay && g.overlay.querySelector('.eg-shp-cd-num');
+    if (numEl) numEl.textContent = g.coresUp;
     const lightNext = () => {
         if (!_egShpFinal || _egShpFinal !== g || g.finished) return;
         if (_egNkFrozen()) { setTimeout(lightNext, 200); return; }
-        g.count--;
-        const num = g.overlay && g.overlay.querySelector('.eg-shp-cd-num');
-        if (num) {
-            num.textContent = Math.max(0, g.count);
-            num.classList.remove('eg-bmb-cd-pop');
-            void num.offsetWidth;
-            num.classList.add('eg-bmb-cd-pop');
-        }
-        if (g.count <= 0) {
-            // THE MONOLITH BREAK: full-screen ice shockwave - only the eye
-            // at the centre is safe.
+        g.beat++;
+        if (g.beat > EG_SHP_FINAL_BEATS) {
             _egShpBreak(g, level);
             return;
         }
-        g.beat++;
-        g.omega = EG_SHP_ARM_OMEGAS[Math.min(EG_SHP_ARM_OMEGAS.length - 1, g.beat)];
-        // Light the next intact core (and unlight stale ones).
-        const next = g.cores.find(c2 => !c2.shattered && !c2.lit) || g.cores.find(c2 => !c2.shattered);
-        g.cores.forEach(c2 => { if (c2 !== next) c2.lit = false; c2.el.classList.toggle('eg-shp-core-lit', c2 === next); });
-        if (next) {
-            next.lit = true;
-            _egNkToast('eg_mech_shp_core_lit', '💎 A core lights up - crack it!', '#7dd3fc');
+        g.omega = EG_SHP_ARM_OMEGAS[Math.min(EG_SHP_ARM_OMEGAS.length - 1, g.beat - 1)];
+        if (!g.cores.some(c2 => c2.lit && !c2.shattered)) {
+            const next = g.cores.find(c2 => !c2.shattered);
+            g.cores.forEach(c2 => { c2.lit = c2 === next; c2.el.classList.toggle('eg-shp-core-lit', c2 === next); });
+            if (next) _egNkToast('eg_mech_shp_core_lit', '💎 A core lights up - stand on it to crack it!', '#7dd3fc');
         }
         g.beatTimer = setTimeout(lightNext, beatMs);
     };
@@ -711,16 +726,29 @@ export function _egShpFinalStart(monster) {
 // shockwave with a safe eye at the centre.
 export function _egShpBreak(g, level) {
     if (!g || g.finished) return;
-    _egNkToast('eg_mech_shp_break', '⛄💀 THE MONOLITH BREAK - reach the eye!', '#7dd3fc');
-    // Ring telegraph, then detonate. Safe: within 130px of the centre.
+    _egNkToast('eg_mech_shp_break', '⛄💀 THE MONOLITH BREAK - get into the ring at the centre!', '#7dd3fc');
+    // Ring telegraph with a 3-2-1, then detonate. Safe: within 130px of the
+    // centre - 3.2s covers a walk from any corner (320 px/s + reaction).
+    g.breaking = true;
     const ring = document.createElement('div');
     ring.className = 'eg-shp-breakring';
     ring.style.left = Math.round(g.px) + 'px';
     ring.style.top = Math.round(g.py) + 'px';
+    ring.innerHTML = '<span class="eg-shp-break-count"></span>';
     document.body.appendChild(ring);
     g.fxRun.els.push(ring);
+    const hint = g.overlay && g.overlay.querySelector('.eg-shp-cd-hint');
+    if (hint) hint.textContent = 'MONOLITH BREAK - get into the ring at the centre!';
     const SAFE_R = 130;
-    const warnMs = 1500 * (_EG_SHP_DEBUG_SLOW ? 8 : 1);
+    const warnMs = 3200 * (_EG_SHP_DEBUG_SLOW ? 8 : 1);
+    const t0 = performance.now();
+    const countEl = ring.querySelector('.eg-shp-break-count');
+    const cd = setInterval(() => {
+        const left = warnMs - (performance.now() - t0);
+        if (countEl) countEl.textContent = left > 0 ? String(Math.ceil(left / 1000)) : '';
+        if (left <= 0) clearInterval(cd);
+    }, 100);
+    if (g.fxRun) g.fxRun.timers.push(cd);
     setTimeout(() => {
         if (!g || g.finished) return;
         try { ring.remove(); } catch (e) {}
