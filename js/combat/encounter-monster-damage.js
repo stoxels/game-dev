@@ -91,8 +91,8 @@ export function _egApplyHitToMonster(target, amount, opts) {
     const resistFactor = Math.max(0.20, 1 - 0.014 * (lvl - 1)); // 0.44@L41, 0.20@L90
     // The gauntlet arena scales pushback down (see gauntlet.js) so melee
     // spam cannot keep every monster's attack bar at zero.
-    const arenaMult = (typeof globalThis._egGauntletPushbackMult === 'function') ? globalThis._egGauntletPushbackMult() : 1;
-    const totalPushback = basePushback * resistFactor * arenaMult;
+    let totalPushback = basePushback * resistFactor;
+    if (typeof globalThis._egGauntletPushback === 'function') totalPushback = globalThis._egGauntletPushback(target, totalPushback);
     target.currentCharge = Math.max(0, target.currentCharge - totalPushback);
 
     if (stats.staggerPct > 0 && Math.random() * 100 < stats.staggerPct) {

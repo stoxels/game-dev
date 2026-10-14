@@ -58,6 +58,7 @@ export const EG_GAUNTLET_CONFIG = {
     traitChanceWave2: 0.34,
     traitChanceWave3: 0.55,
     pushbackMult: 0.25,          // share of the normal charge pushback a hit applies in the arena
+    pushbackPerSecMax: 0.25,     // hard cap: seconds of attack bar one monster can lose per real second
     manaPerMeleePct: 0.03,       // (unused) strikes no longer refund mana
     manaPerChargePct: 0.04,      // extra at full charge
     comboWindowMs: 2500,         // melee within this long of a spell hit combos
@@ -65,8 +66,8 @@ export const EG_GAUNTLET_CONFIG = {
     comboManaPct: 0.04,
     // Difficulty tiers: pick one on the intro card. Higher tiers pay more gold.
     tiers: {
-        normal: { countMult: 1,   hpMult: 1,    dmgMult: 1,   gold: 1 },
-        hard:   { countMult: 1.3, hpMult: 1.35, dmgMult: 1.3, gold: 1.6 },
+        normal: { countMult: 1,   hpMult: 1.1,  dmgMult: 1.15, gold: 1 },
+        hard:   { countMult: 1.3, hpMult: 1.5,  dmgMult: 1.55, gold: 1.6 },
         brutal: { countMult: 1.7, hpMult: 1.8,  dmgMult: 1.7, gold: 2.6 },
     },
     maxMonstersCap: 12,
@@ -161,7 +162,20 @@ function _installMeleeHooks() {
     };
     // Inside an arena, hits push a monster's attack bar back far less, so
     // spamming melee cannot lock every monster out of attacking.
-    globalThis._egGauntletPushbackMult = () => (_g.fighting ? EG_GAUNTLET_CONFIG.pushbackMult : 1);
+    // On top of the per-hit scale there is a hard budget per monster per
+    // second: tapping E (a weak hit still pushed back a full amount) or
+    // standing in an aura (a tick every second on every monster) can then
+    // slow an attack bar but never freeze it.
+    globalThis._egGauntletPushback = (target, amount) => {
+        if (!_g.fighting) return amount;
+        const cfg = EG_GAUNTLET_CONFIG;
+        const now = Date.now();
+        if (!target._gaPbAt || now - target._gaPbAt >= 1000) { target._gaPbAt = now; target._gaPbSpent = 0; }
+        const room = Math.max(0, cfg.pushbackPerSecMax - (target._gaPbSpent || 0));
+        const give = Math.min(amount * cfg.pushbackMult, room);
+        target._gaPbSpent = (target._gaPbSpent || 0) + give;
+        return give;
+    };
 }
 _installMeleeHooks();
 
