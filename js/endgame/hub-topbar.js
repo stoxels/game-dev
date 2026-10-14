@@ -32,11 +32,64 @@ export function _egBuildTopbarHTML() {
          onclick="showEndgameAtlas('showEndgameHub')">🗺 ${t('eg_atlas_title')}</button>
     <button class="eg-level-btn" id="eg-btn-gate"
          onclick="showEndgameGate('showEndgameHub')">🎲 ${t('mg_gate_badge')}</button>
+    <button class="eg-level-btn" id="eg-btn-export-build"
+         title="Saves your gear, passive tree, spells and stats to a small file (for balance testing)"
+         onclick="_egExportBuildSnapshot()">📤 Export build</button>
     <button class="eg-info-btn" id="eg-hub-info-btn" aria-label="Info"
          onmouseenter="_egShowHubInfoTooltip(event)"
          onmousemove="moveGameTooltip(event)"
          onmouseleave="_egHideHubInfoTooltip()">?</button>
 </div>`;
+}
+
+// Export build: downloads one JSON file with everything the balance tooling
+// needs to recreate this character (equipped gear with all rolled mods, the
+// allocated passive nodes, spells / hotbar / charms, level and class, and the
+// computed character sheet). Read-only - nothing in the save is changed.
+export function _egExportBuildSnapshot() {
+    try {
+        const g = globalThis;
+        const S = STATE || {};
+        const sheet = {};
+        const stats = typeof g._egComputePlayerStats === 'function' ? (g._egComputePlayerStats() || {}) : {};
+        for (const [k, v] of Object.entries(stats)) {
+            if (typeof v === 'number' && Number.isFinite(v) && v !== 0) sheet[k] = Math.round(v * 100) / 100;
+        }
+        const pick = {};
+        for (const k of Object.keys(S)) {
+            if (/^(class|ascend|skill|charm|player|passive|difficulty|eg(Gold|Level))/i.test(k)
+                && k !== 'passiveTreeAllocated' && k !== 'charmInventory') pick[k] = S[k];
+        }
+        const snapshot = {
+            exportVersion: 1,
+            exportedAt: new Date().toISOString(),
+            game: document.title,
+            level: S.playerLevel,
+            xp: S.playerXP,
+            playerClass: S.playerClass,
+            levelsCleared: Array.isArray(S.done) ? S.done.length : null,
+            maxHP: g.playerMaxHP,
+            maxMana: g.playerMaxMana,
+            passiveTreeAllocated: Array.from(S.passiveTreeAllocated || []),
+            passiveTreePoints: S.passiveTreePoints,
+            charmInventory: S.charmInventory,
+            equipped: g._egEquipped || S.egEquipped || {},
+            sheet,
+            state: pick,
+        };
+        const blob = new Blob([JSON.stringify(snapshot, null, 1)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `stoxels-build-L${S.playerLevel || 0}-${S.playerClass || 'class'}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        if (typeof g.showToast === 'function') g.showToast('📤 Build exported - send me the downloaded file');
+    } catch (e) {
+        if (typeof globalThis.showToast === 'function') globalThis.showToast('Export failed: ' + (e && e.message));
+    }
 }
 
 // Updates the Probability Tree button highlight based on available points.

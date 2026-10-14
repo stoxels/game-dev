@@ -269,6 +269,20 @@ function _layout() {
                 safe.style.height = `${b.bottom - b.top}px`;
             }
         }
+        // The avatar wrapper also holds the HP / mana bars above the sprite;
+        // the bounds apply to the whole wrapper, so shift them by the bar
+        // height so the VISIBLE sprite is what meets the arena border.
+        const wrap = document.getElementById('player-avatar-wrapper');
+        const img = document.getElementById('avatar-sprite-img');
+        if (wrap && img) {
+            const wr = wrap.getBoundingClientRect();
+            const ir = img.getBoundingClientRect();
+            if (ir.height > 0) {
+                const topInset = Math.max(0, ir.top - wr.top);
+                const bottomInset = Math.max(0, wr.bottom - ir.bottom);
+                b = { ...b, top: b.top - topInset, bottom: b.bottom + bottomInset };
+            }
+        }
         globalThis._egAvatarBounds = b;
     }
 }

@@ -1310,6 +1310,7 @@ export {
 export {
     _egBuildHubInfoTooltipHTML,
     _egBuildTopbarHTML,
+    _egExportBuildSnapshot,
     _egHideHubInfoTooltip,
     _egShowHubInfoTooltip,
     _egShowItemLevelToggleTooltip,

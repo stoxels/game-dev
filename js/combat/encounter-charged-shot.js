@@ -215,10 +215,8 @@ export function _egReleaseChargedShot() {
         return;
     }
 
-    // Only a really charged drag (2+ stacks) gets the release sound; a plain
-    // single-cell fill also releases a 1-stack shot and must keep sounding
-    // like just the normal cell-fill click.
-    if (stacks >= 2) Audio_Manager.playSFX('charged_shot_release');
+    // The charged-shot release sound was removed on request (it was grating
+    // on repeated drags); impact sounds still play on hit.
     _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, startScale, elements, { isCharged: true, isChargedStacks: stacks, isCrit: wasCrit });
     _egTryMultishot(damage, targetIdAtFire, elements, sourceEl, wasCrit);
 }
