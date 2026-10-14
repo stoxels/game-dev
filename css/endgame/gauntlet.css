@@ -71,6 +71,8 @@ body.gauntlet-open #puzzle-scaler-wrap { pointer-events: none; }
     pointer-events: none;
 }
 .ga-center.ga-intro { pointer-events: auto; background: rgba(5, 2, 10, 0.55); }
+/* result screen: goals + gold sit UNDER the banner */
+.ga-center.ga-result { flex-direction: column; }
 
 .ga-card {
     max-width: 380px;

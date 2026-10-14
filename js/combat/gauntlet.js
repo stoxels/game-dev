@@ -57,7 +57,8 @@ export const EG_GAUNTLET_CONFIG = {
     wardedSpellReductionPct: 80,
     traitChanceWave2: 0.34,
     traitChanceWave3: 0.55,
-    manaPerMeleePct: 0.03,       // share of max mana restored by a connecting strike
+    pushbackMult: 0.25,          // share of the normal charge pushback a hit applies in the arena
+    manaPerMeleePct: 0.03,       // (unused) strikes no longer refund mana
     manaPerChargePct: 0.04,      // extra at full charge
     comboWindowMs: 2500,         // melee within this long of a spell hit combos
     comboMult: 1.6,
@@ -152,16 +153,15 @@ function _installMeleeHooks() {
         },
         post(targetId, chargePct, wasCombo) {
             if (!_g.fighting) return;
+            // Strikes no longer refund mana: mana comes from the character's
+            // own regen (gear / passives), same as everywhere else.
             _g.meleeStrikes++;
-            if (typeof globalThis.gainMana !== 'function') return;
-            const cfg = EG_GAUNTLET_CONFIG;
-            const max = Number(globalThis.playerMaxMana) || 0;
-            if (max <= 0) return;
-            let pct = cfg.manaPerMeleePct + cfg.manaPerChargePct * Math.min(1, Math.max(0, chargePct));
-            if (wasCombo) pct += cfg.comboManaPct;
-            globalThis.gainMana(Math.max(1, Math.round(max * pct)));
+            void chargePct; void wasCombo;
         },
     };
+    // Inside an arena, hits push a monster's attack bar back far less, so
+    // spamming melee cannot lock every monster out of attacking.
+    globalThis._egGauntletPushbackMult = () => (_g.fighting ? EG_GAUNTLET_CONFIG.pushbackMult : 1);
 }
 _installMeleeHooks();
 
@@ -510,7 +510,7 @@ function _renderIntro(lvl) {
         <div class="ga-card">
             <div class="ga-card-title">⚔ ${_tr('Gauntlet', 'Gauntlet')}</div>
             <p>${_tr('Defeat every monster to claim the bonus.', 'Besiege jedes Monster, um den Bonus zu erhalten.')}</p>
-            <p class="ga-sub">🛡 ${_tr('Warded: use melee', 'Geschützt: Nahkampf nutzen')} · 👻 ${_tr('Phased: use spells', 'Phasend: Zauber nutzen')} · ${_tr('Melee restores mana', 'Nahkampf stellt Mana wieder her')}</p>
+            <p class="ga-sub">🛡 ${_tr('Warded: use melee', 'Geschützt: Nahkampf nutzen')} · 👻 ${_tr('Phased: use spells', 'Phasend: Zauber nutzen')} · ${_tr('Spell then melee = combo damage', 'Zauber, dann Nahkampf = Kombo-Schaden')}</p>
             <p class="ga-sub ga-mod">${mod.icon} ${_tr(mod.en, mod.de)}</p>
             <p class="ga-sub">👑 ${_tr('A champion leads the final wave', 'Ein Champion führt die letzte Welle an')}</p>
             <div class="ga-tiers">
