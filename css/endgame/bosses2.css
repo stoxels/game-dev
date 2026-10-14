@@ -4905,6 +4905,22 @@ body.eg-gust-spike-hot-r .eg-nk-gust-spike-right {
     box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.5);
     will-change: transform;
 }
+/* The flood below the crest rows: everything here grinds you. */
+.eg-stk-garbage.fill {
+    background:
+        repeating-linear-gradient(to right, rgba(82, 82, 91, 0.9) 0 44px, rgba(55, 55, 62, 0.9) 44px 46px),
+        repeating-linear-gradient(to bottom, rgba(82, 82, 91, 0.9) 0 44px, rgba(55, 55, 62, 0.9) 44px 46px);
+    border-top: none;
+}
+/* Hard Drop: the landing shockwave's reach, shown before the piece lands. */
+.eg-stk-shock-zone {
+    position: fixed; z-index: 9000; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    border: 3px dashed rgba(250, 204, 21, 0.9);
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.06), rgba(250, 204, 21, 0.2) 92%, transparent 100%);
+    animation: eg-nk-warn-pulse 0.35s ease-in-out infinite alternate;
+}
+.eg-nk-fin-stack { --nk-fin: #a5b4fc; }
 
 /* ------------------------------------------------------------------
    THE TACTICIAN - persistent chess-siege arena (boss-tactician.js)

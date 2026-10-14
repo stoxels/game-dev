@@ -1,13 +1,14 @@
 import { Audio_Manager } from '../../audio/audio.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFlingAvatar, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast, _egNkWatchFinale } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE STACK (boss_stack)--------------------------
 //------------------------------------------------------------------------
 // Living-tetromino construction siege - GRAVITY is the fight: drifting core
 // stack, SOFT DROP terrain, HARD DROP at 60%, LINE CLEAR bands at 30%, and
-// the GARBAGE RISE charge attack. One _egNkLoop drives every state machine.
+// the GARBAGE RISE charge attack, and TOP OUT (shared finale waves) at ≤10%.
+// One _egNkLoop drives every state machine.
 //
 // Shared mechanics (fog_bank in shared-puzzle-mechanics.js, probability_shift
 // in shared-boss-abilities.js) are referenced by handler-name string.
@@ -24,9 +25,12 @@ Object.assign(EG_BOSS_DEFS, {
 Object.assign(EG_BOSS_MECHANICS, {
     boss_stack: {
         phases: [
+            // Basic attacks stay a steady pressure (the framework floors
+            // them at 13% of max life); the mechanics are the real threat.
+            // (The Stack's charge attack is the Garbage Rise.)
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 9, damageMultiplier: 1.50 },
-            { threshold: 0.30, chargeMax: 6, damageMultiplier: 2.00 },
+            { threshold: 0.60, chargeMax: 11, damageMultiplier: 1.20 },
+            { threshold: 0.30, chargeMax: 10, damageMultiplier: 1.40 },
         ],
         immunityDuration: 2500,
         mechanics: [
@@ -37,9 +41,22 @@ Object.assign(EG_BOSS_MECHANICS, {
             { name: 'fog_bank', intervalBase: 22000, intervalVariance: 5000, handler: '_egMechFogBank' },
             { name: 'probability_shift', intervalBase: 18000, intervalVariance: 4000, handler: '_egMechProbabilityShift' },
         ],
-        onInit: _egStackArenaInit,
+        onInit: (m) => { _egStackArenaInit(m); _egNkWatchFinale(m, EG_STK_FINALE); },
     },
 });
+
+// TOP OUT finale (shared waves): the board fills to the top.
+const EG_STK_FINALE = {
+    name: 'The Stack', title: '🧩 TOP OUT', element: null, cls: 'eg-nk-fin-stack', color: '#a5b4fc',
+    toastKey: 'eg_stk_final',
+    hint: 'The board is full - read each circle!',
+    waves: [
+        { kind: 'avoid', ms: 2200, dmg: 0.16, extra: 2, label: 'Top Out' },
+        { kind: 'shelter', ms: 2800, dmg: 0.22, label: 'Top Out' },
+        { kind: 'avoid', ms: 2000, dmg: 0.16, extra: 4, label: 'Top Out' },
+        { kind: 'shelter', ms: 2600, dmg: 0.28, label: 'GAME OVER' },
+    ],
+};
 
 
 // ── Construction tuning ──────────────────────────────────────────────────
@@ -112,7 +129,7 @@ export function _egStackTeardown() {
         if (st.garbage) { try { if (st.garbage.els) st.garbage.els.forEach(g => g.remove()); } catch (e) {} }
         try { if (st.run) _egNkKillRun(st.run); } catch (e) {} // removes the core
     }
-    document.querySelectorAll('.eg-stk-core, .eg-stk-cell, .eg-stk-warn, .eg-stk-row, .eg-stk-shock, .eg-stk-garbage').forEach(el => el.remove());
+    document.querySelectorAll('.eg-stk-core, .eg-stk-cell, .eg-stk-warn, .eg-stk-row, .eg-stk-shock, .eg-stk-shock-zone, .eg-stk-garbage').forEach(el => el.remove());
 }
 
 // Removes a piece's cell elements.
@@ -174,6 +191,15 @@ export function _egStackArenaInit(monster) {
         const pr = _egNkPlayerRect();
         const p = Math.max(1, Math.min(3, Number(live.bossPhase) || 1));
 
+        // TOP OUT finale: the shared waves own the arena - sink the garbage
+        // and drop the gate set-pieces.
+        if (live._nkFinaleDone && live.bossImmune) {
+            if (st.garbage && st.garbage.phase !== 'sink') { st.garbage.phase = 'sink'; st.garbage.t = 0; }
+            if (st.hard && st.hard.ghost) { try { st.hard.ghost.remove(); } catch (e) {} }
+            st.hard = null;
+            st.lineClear = null;
+        }
+
         // ── HP gates ──
         const hpPct = live.maxHP > 0 ? live.currentHP / live.maxHP : 1;
         if (!st.gate60Done && hpPct <= 0.60) { st.gate60Done = true; _egStkHardDrop(st, live); }
@@ -209,7 +235,7 @@ export function _egStackArenaInit(monster) {
 
         // ── Soft drop cadence: warn column → piece falls → floor terrain ──
         st.softAcc += dtS * 1000;
-        if (!st.hard && st.softAcc >= EG_STK_SOFT_EVERY_MS[p]) {
+        if (!st.hard && !live.bossImmune && st.softAcc >= EG_STK_SOFT_EVERY_MS[p]) {
             st.softAcc = 0;
             _egStkQueuePiece(st, W, 0, false);
         }
@@ -499,6 +525,16 @@ export function _egStkGhost(st, x, type) {
     const el = _egNkEl(st.run, 'div', 'eg-stk-warn giant ghost');
     el.style.left = Math.round(x) + 'px';
     el.style.width = Math.round(EG_STK_CELL * 4) + 'px';
+    // The landing shockwave's reach, drawn where the giant piece will land
+    // (same centre as _egStkLand) - it stays until the shock has rolled.
+    const H = window.innerHeight;
+    const ring = _egNkEl(st.run, 'div', 'eg-stk-shock-zone');
+    const lx = x + EG_STK_CELL * 2, ly = H - EG_STK_CELL * 2 - 20 + EG_STK_CELL;
+    ring.style.left = Math.round(lx - EG_STK_HD_SHOCK_R) + 'px';
+    ring.style.top = Math.round(ly - EG_STK_HD_SHOCK_R) + 'px';
+    ring.style.width = ring.style.height = (EG_STK_HD_SHOCK_R * 2) + 'px';
+    const rm = setTimeout(() => { try { ring.remove(); } catch (e) {} }, EG_STK_HD_WARN_MS + 2400);
+    st.run.timers.push(rm);
     return el;
 }
 
@@ -542,6 +578,7 @@ export function _egStkQueueRow(st, W, H) {
 export function _egStackGarbage(monster) {
     const st = _egStackWatcher;
     if (!st || st.garbage || _egNkDodgeBusy() || _egNkFrozen()) return;
+    if (monster && monster.bossImmune) return;   // not during the finale / phase shifts
     const H = window.innerHeight;
     const rows = 3;
     const els = [];
@@ -549,7 +586,10 @@ export function _egStackGarbage(monster) {
         const gel = _egNkEl(st.run, 'div', 'eg-stk-garbage');
         gel.style.left = '0px';
         gel.style.width = window.innerWidth + 'px';
-        gel.style.height = (EG_STK_CELL - 2) + 'px';
+        // The last row fills down to the floor: everything below the crest
+        // hurts, so everything below the crest is painted.
+        gel.style.height = (i === rows - 1 ? H : (EG_STK_CELL - 2)) + 'px';
+        if (i === rows - 1) gel.classList.add('fill');
         gel.style.top = '0px';
         gel.style.transform = 'translateY(' + H + 'px)';
         els.push(gel);
