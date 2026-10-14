@@ -63,7 +63,7 @@ export const EG_NUL_RAY_HIT     = 0.14;   // %maxHP crossing a null ray
 export const EG_NUL_RAYS        = 2;      // orbiting eye-beams
 export const EG_NUL_RAY_SPEED   = 0.7;    // rad/s orbit
 export const EG_NUL_STRIKE_HIT  = 0.15;   // %maxHP caught on the strike side
-export const EG_NUL_EXPOSE_R    = 150;    // exposure reach around the phantom
+export const EG_NUL_EXPOSE_R    = 105;    // radius of the safe STAND-HERE ring around the phantom
 export const EG_NUL_WINDOW_MS   = 9000;   // per counter-example window
 export const EG_NUL_NULLIFY     = 0.30;   // NULLIFICATION hit (outside the ring)
 export const EG_NUL_RING_R      = 130;    // white safe ring radius
@@ -419,8 +419,8 @@ export function _egMechNulRays(monster, phase) {
 // darkness returns except one white ring (30% hit).
 export const EG_NUL_EXPOSE_GOAL  = 3;     // shells to shatter (the kill)
 export const EG_NUL_STRIKE_WALK  = 2500;  // ms the phantom replays (x mult)
-export const EG_NUL_STRIKE_DELAY = 1400;  // ms telegraph after the walk
-export const EG_NUL_STRIKE_LEN   = 90;    // px the strike lands from the phantom
+export const EG_NUL_STRIKE_DELAY = 3000;  // ms countdown (3-2-1) after the walk
+export const EG_NUL_STRIKE_LEN   = 200;   // px between the safe ring and the strike circle
 
 // Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
 export let _egNulFinal = null;
@@ -513,9 +513,9 @@ export function _egNulFinalStart(monster) {
     ov.className = 'eg-nul-cd';
     ov.innerHTML =
         '<div class="eg-nul-cd-label">🧿💀 PROOF BY CONTRADICTION</div>' +
-        '<div class="eg-nul-cd-status">SHELLS 0/' + EG_NUL_EXPOSE_GOAL + '</div>' +
+        '<div class="eg-nul-cd-status">SHELLS ○○○   MISSES 0/3</div>' +
         '<div class="eg-nul-cd-timer">-</div>' +
-        '<div class="eg-nul-cd-hint">The phantom replays YOUR path - stand OPPOSITE its strike to expose the contradiction!</div>';
+        '<div class="eg-nul-cd-hint">Stand in the glowing ring. Avoid the red circle.</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
     g.statusEl = ov.querySelector('.eg-nul-cd-status');
@@ -570,30 +570,60 @@ export function _egNulFinalStart(monster) {
 
         _egNulAfter(g, walkMs, () => {
             if (g.finished) return;
-            // Strike telegraph: toward the phantom's final heading.
-            const endS = buf[buf.length - 1];
-            const prevS = buf[Math.max(0, buf.length - 4)];
-            const dx = endS.x - prevS.x, dy = endS.y - prevS.y;
-            const d = Math.hypot(dx, dy) || 1;
-            const sx = endS.x + dx / d * EG_NUL_STRIKE_LEN;
-            const sy = endS.y + dy / d * EG_NUL_STRIKE_LEN;
+            // Safe ring around the phantom + a danger circle at a FIXED distance
+            // on a side with room (never depends on how you were moving, so
+            // standing still is not an accidental fail).
+            const W2 = window.innerWidth, H2 = window.innerHeight;
+            const endRaw = buf[buf.length - 1];
+            const endS = {
+                x: Math.max(EG_NUL_EXPOSE_R + 10, Math.min(W2 - EG_NUL_EXPOSE_R - 10, endRaw.x)),
+                y: Math.max(EG_NUL_EXPOSE_R + 10, Math.min(H2 - EG_NUL_EXPOSE_R - 10, endRaw.y)),
+            };
+            let ang = Math.atan2(H2 / 2 - endS.y, W2 / 2 - endS.x) + (Math.random() - 0.5) * 1.2;
+            if (Math.hypot(W2 / 2 - endS.x, H2 / 2 - endS.y) < 40) ang = Math.random() * Math.PI * 2;
+            const sx = endS.x + Math.cos(ang) * EG_NUL_STRIKE_LEN;
+            const sy = endS.y + Math.sin(ang) * EG_NUL_STRIKE_LEN;
+            phantom.style.left = Math.round(endS.x - 16) + 'px';
+            phantom.style.top = Math.round(endS.y - 16) + 'px';
+
+            const safe = _egNkEl(g.fxRun, 'div', 'eg-nul-safe-ring');
+            safe.style.left = Math.round(endS.x - EG_NUL_EXPOSE_R) + 'px';
+            safe.style.top = Math.round(endS.y - EG_NUL_EXPOSE_R) + 'px';
+            safe.style.width = safe.style.height = (EG_NUL_EXPOSE_R * 2) + 'px';
+            safe.innerHTML = '<span class="eg-nul-ring-label">STAND HERE</span><span class="eg-nul-ring-count"></span>';
             const warn = _egNkEl(g.fxRun, 'div', 'eg-nul-strike-warn');
             warn.style.left = Math.round(sx - 55) + 'px';
             warn.style.top = Math.round(sy - 55) + 'px';
+            warn.innerHTML = '<span class="eg-nul-ring-label eg-nul-danger-label">DANGER</span>';
 
-            _egNulAfter(g, EG_NUL_STRIKE_DELAY * _EG_NUL_DEBUG_MULT, () => {
+            // Visible 3-2-1 on the ring.
+            g.counting = true;
+            const countEl = safe.querySelector('.eg-nul-ring-count');
+            const cdMs = EG_NUL_STRIKE_DELAY * _EG_NUL_DEBUG_MULT;
+            const cdStart = performance.now();
+            const cdTick = () => {
+                if (g.finished || !safe.isConnected) return;
+                const left = cdMs - (performance.now() - cdStart);
+                const n = Math.max(0, Math.ceil(left / 1000));
+                if (countEl) countEl.textContent = n > 0 ? String(n) : '';
+                if (g.timerEl) g.timerEl.textContent = n > 0 ? String(n) : '';
+                if (left > 0) _egNulAfter(g, 100, cdTick);
+            };
+            cdTick();
+
+            _egNulAfter(g, cdMs, () => {
                 if (g.finished) return;
+                g.counting = false;
                 try { warn.remove(); } catch (e) {}
+                try { safe.remove(); } catch (e) {}
                 const pc = _egNulPC();
                 const onStrike = Math.hypot(pc.x - sx, pc.y - sy) < 60;
-                const nearPhantom = Math.hypot(pc.x - endS.x, pc.y - endS.y) < EG_NUL_EXPOSE_R;
+                const inRing = Math.hypot(pc.x - endS.x, pc.y - endS.y) < EG_NUL_EXPOSE_R;
                 if (onStrike) {
-                    // Standing WHERE it strikes: the hypothesis holds.
                     g.fails++;
                     _egNulTouch(EG_NUL_STRIKE_HIT, level, 'Void Strike');
-                    _egNkToast('eg_mech_nul_fail', '🧿 The strike found you - the hypothesis holds!', '#f87171');
-                } else if (nearPhantom) {
-                    // Opposite the strike, within reach: CONTRADICTION.
+                    _egNkToast('eg_mech_nul_fail', '🧿 You stood in the red - the hypothesis holds!', '#f87171');
+                } else if (inRing) {
                     g.shatters++;
                     const shatter = _egNkEl(g.fxRun, 'div', 'eg-nul-shatter');
                     shatter.style.left = Math.round(endS.x - 70) + 'px';
@@ -602,9 +632,10 @@ export function _egNulFinalStart(monster) {
                     _egNkToast('eg_mech_nul_expose', '🧿💥 CONTRADICTION EXPOSED - shell ' + g.shatters + '/' + EG_NUL_EXPOSE_GOAL + ' shatters!', '#a7f3d0');
                 } else {
                     g.fails++;
-                    _egNkToast('eg_mech_nul_fail', '🧿 You never engaged the phantom - the hypothesis holds!', '#f87171');
+                    _egNkToast('eg_mech_nul_fail', '🧿 You were not in the ring - the hypothesis holds!', '#f87171');
                 }
-                if (g.statusEl) g.statusEl.textContent = 'SHELLS ' + g.shatters + '/' + EG_NUL_EXPOSE_GOAL;
+                if (g.statusEl) g.statusEl.textContent = 'SHELLS ' + '●'.repeat(g.shatters) + '○'.repeat(Math.max(0, EG_NUL_EXPOSE_GOAL - g.shatters))
+                    + '   MISSES ' + g.fails + '/3';
                 try { phantom.remove(); } catch (e) {}
 
                 if (g.shatters >= EG_NUL_EXPOSE_GOAL) {
@@ -623,7 +654,7 @@ export function _egNulFinalStart(monster) {
         const tick = () => {
             if (g.finished || g.window !== myWin) return;
             const left = deadline - performance.now();
-            if (g.timerEl) g.timerEl.textContent = Math.max(0, Math.ceil(left / 1000)) + 's';
+            if (g.timerEl && !g.counting) g.timerEl.textContent = '';
             if (left > 0) _egNulAfter(g, 250, tick);
         };
         tick();
@@ -686,7 +717,7 @@ export function _egNulFinalEnd(g, monster) {
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
     document.querySelectorAll('.eg-nul-white, .eg-nul-cd, .eg-nul-phantom, .eg-nul-strike-warn, ' +
-        '.eg-nul-shatter, .eg-nul-implode, .eg-nul-dark, .eg-nul-ring-safe').forEach(el => {
+        '.eg-nul-shatter, .eg-nul-implode, .eg-nul-dark, .eg-nul-ring-safe, .eg-nul-safe-ring').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
     const card = document.getElementById('eg-card-' + g.monsterId);
@@ -724,7 +755,7 @@ export function _egNulTeardown() {
     document.querySelectorAll('.eg-nul-line, .eg-nul-ring-seg, .eg-nul-anchor, .eg-nul-ray, ' +
         '.eg-nul-erase-marker, .eg-nul-erase-marker-free, .eg-nul-white, .eg-nul-cd, ' +
         '.eg-nul-phantom, .eg-nul-strike-warn, .eg-nul-shatter, .eg-nul-implode, ' +
-        '.eg-nul-dark, .eg-nul-ring-safe').forEach(el => {
+        '.eg-nul-dark, .eg-nul-ring-safe, .eg-nul-safe-ring').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
