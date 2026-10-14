@@ -148,6 +148,9 @@ export function _egTrialBossId(wi, salt) {
     if (typeof EG_BOSS_DEFS === 'undefined' || !EG_BOSS_DEFS) return null;
     const keys = Object.keys(EG_BOSS_DEFS);
     if (!keys.length) return null;
+    // World 1's convergence trial is always The Null (kept explicit so adding
+    // bosses to the roster can never reshuffle it).
+    if (wi === 0 && !salt && EG_BOSS_DEFS.boss_null) return 'boss_null';
     // Spread neighbouring worlds across the roster (11 is coprime to most
     // roster sizes; modulo keeps it stable even if bosses are added later).
     return keys[Math.abs(wi * 11 + (salt || 0) * 5 + 3) % keys.length];

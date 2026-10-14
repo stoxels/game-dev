@@ -190,8 +190,7 @@ export function _egMechNulLattice(monster, phase) {
             // body-absolute px geometry (left/top/width/height inline + rotate),
             // so the box never changes after creation - reading it live every
             // damage tick (6 gBCR per 100 ms) was pure layout thrash.
-            const segBox = seg.getBoundingClientRect();
-            _egNulRing.push({ el: seg, rect: { left: segBox.left, right: segBox.right, top: segBox.top, bottom: segBox.bottom } });
+            _egNulRing.push({ el: seg, x1, y1, x2, y2 });
         }
     };
 
@@ -231,10 +230,7 @@ export function _egMechNulLattice(monster, phase) {
                     l.cx - Math.cos(l.ang) * l.len / 2, l.cy - Math.sin(l.ang) * l.len / 2,
                     l.cx + Math.cos(l.ang) * l.len / 2, l.cy + Math.sin(l.ang) * l.len / 2
                 ) < EG_NUL_LINE_W / 2 + 9) ||
-                _egNulRing.some(r => {
-                    const rect = r.rect || r.el.getBoundingClientRect(); // rect cached at draw time (static geometry - Pass 5)
-                    return pc.x > rect.left - 9 && pc.x < rect.right + 9 && pc.y > rect.top - 9 && pc.y < rect.bottom + 9;
-                });
+                _egNulRing.some(r => _egPtSegDist(pc.x, pc.y, r.x1, r.y1, r.x2, r.y2) < EG_NUL_LINE_W / 2 + 9);
             if (onLine) _egNkDotTick(run, EG_NUL_LINE_DPS, 0.1, level, 'shadow');
         }
         return true;
@@ -315,6 +311,11 @@ export function _egMechNulErasure(monster, phase) {
     if (host) {
         host.style.position = host.style.position || '';
         if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+        // the stylesheet pins the marker to the screen centre; inside a host it
+        // must centre on the host instead
+        marker.style.position = 'absolute';
+        marker.style.left = '50%';
+        marker.style.top = '50%';
         host.appendChild(marker);
     } else {
         document.body.appendChild(marker);
@@ -375,6 +376,9 @@ export function _egMechNulRays(monster, phase) {
         el.style.top = Math.round(cy - 11) + 'px';
         el.style.width = Math.round(len) + 'px';
         el.style.height = '22px';
+        // pivot at the anchor end: the damage test sweeps a segment from the
+        // anchor, so the painted beam must rotate around the same point
+        el.style.transformOrigin = '0 50%';
         beams.push({ off: i * Math.PI * 2 / (EG_NUL_RAYS + (p >= 3 ? 1 : 0)), el });
     }
 
@@ -545,6 +549,21 @@ export function _egNulFinalStart(monster) {
         const startS = buf[0];
         phantom.style.left = Math.round(startS.x - 16) + 'px';
         phantom.style.top = Math.round(startS.y - 16) + 'px';
+
+        // walk the phantom along the recorded path so the player can read it
+        {
+            const walkStart = performance.now();
+            const walkRun = _egNkNewRun(monster.id, false);
+            walkRun.passive = true;
+            _egNkLoop(walkRun, () => {
+                if (g.finished || !phantom.isConnected) return false;
+                const f = Math.min(1, (performance.now() - walkStart) / walkMs);
+                const i = Math.min(buf.length - 1, Math.round(f * (buf.length - 1)));
+                phantom.style.left = Math.round(buf[i].x - 16) + 'px';
+                phantom.style.top = Math.round(buf[i].y - 16) + 'px';
+                return f < 1;
+            });
+        }
 
         _egNulAfter(g, walkMs, () => {
             if (g.finished) return;
