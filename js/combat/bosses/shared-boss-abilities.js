@@ -702,7 +702,7 @@ export function _egPriorBombBoom(x, y, radius) {
     setTimeout(() => shakeBody.classList.remove('eg-screen-shake'), 550);
 
     if (typeof Audio_Manager !== 'undefined' && Audio_Manager && typeof Audio_Manager.playSFX === 'function') {
-        try { Audio_Manager.playSFX('drifterExplosion'); } catch (e) {}
+        try { Audio_Manager.playSFX('boss_explosion', 'drifterExplosion'); } catch (e) {}
     }
 }
 
@@ -758,6 +758,7 @@ export function _egMechSummonAdds(monster, phase) {
         summoned++;
     }
     if (summoned > 0) {
+        Audio_Manager.playSFX('boss_summon');
         globalThis.showToast(t('eg_boss_summon').replace('{name}', name).replace('{n}', summoned), '#f87171');
         if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();
     }
@@ -1464,6 +1465,7 @@ export function _egMechGridInvert(monster, phase) {
     tbl.classList.add('eg-grid-invert');
 
     const duration = phase >= 3 ? 9000 : 6000;
+    Audio_Manager.playSFX('grid_invert');
     globalThis.showToast(t('eg_mech_grid_invert').replace('{n}', duration / 1000));
     globalThis._egGridInvertTimer = setTimeout(_egRemoveGridInvert, duration);
 }

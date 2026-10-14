@@ -9,6 +9,7 @@
 // begins or ends.
 
 import { _uspClearSupportBuffs } from '../skills/universal-spells.js';
+import { _uspBarrierStart, _uspBarrierStop } from '../skills/universal-spell-fx.js';
 import { _egClearChargedProjectileVisual } from './encounter-charged-shot.js';
 import { _egBuildSpawnList } from './encounter-spawn-rules.js';
 import { _egClearCampaignLevelFields } from './encounter-campaign-spawns.js';
@@ -132,6 +133,8 @@ export function _egStartEncounter() {
     _egStartTickLoop();
     _egStartPickupSpawner();
     _egScheduleMonsterSpawns(_egBuildSpawnList());
+    // Absorption starts full, but the shell latches on Barrier casts only - warm the tracker, show nothing yet.
+    if (typeof _uspBarrierStart === 'function') { try { _uspBarrierStart(); } catch (e) { /* shell is cosmetic */ } }
     // Flush any auto-reveals that fired before the encounter went live
     // (start-of-puzzle passives run before _egStartEncounter in start-level.js).
     if (typeof _egFlushPendingRevealProjectiles === 'function') {
@@ -183,6 +186,7 @@ export function _egStopEncounter() {
     _egCancelAbsorptionRegen();
     // Support-spell buffs never survive the encounter they were cast in.
     if (typeof _uspClearSupportBuffs === 'function') _uspClearSupportBuffs();
+    if (typeof _uspBarrierStop === 'function') _uspBarrierStop();
     if (typeof _egResetMistakesWarningState === 'function') _egResetMistakesWarningState();
     if (typeof _egResetLowHealthWarningState === 'function') _egResetLowHealthWarningState();
     if (typeof _egResetAbsorptionBrokenState === 'function') _egResetAbsorptionBrokenState();

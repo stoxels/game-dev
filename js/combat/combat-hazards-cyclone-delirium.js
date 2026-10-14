@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { _egApplyPlayerAilment } from './combat-ailments-core.js';
 import {
     EG_HZ_CYCLONE_BASE_DMG_PCT, EG_HZ_CYCLONE_R_MAX, EG_HZ_CYCLONE_R_MIN, EG_HZ_CYCLONE_SPEED_MAX,
@@ -40,6 +41,7 @@ export function _egHzInitCyclone(intensity) {
             dmgAcc: 0, el,
         });
     }
+    Audio_Manager.playSFX('hz_cyclone_loop');
     _egSetHzCyclone({ vortices, dmgMult: _egHzMult(intensity) });
 }
 
@@ -102,6 +104,7 @@ export function _egHzTickDelirium(dtMs) {
                 `${EG_HZ_DELIRIUM_FADE_IN_MS}ms, ${EG_HZ_DELIRIUM_FADE_OUT_MS}ms`;
             mist.style.animationDelay = `0ms, ${EG_HZ_DELIRIUM_FADE_IN_MS + EG_HZ_DELIRIUM_HOLD_MS}ms`;
             document.body.appendChild(mist);
+            Audio_Manager.playSFX('hz_delirium_pulse');
             st.el = mist;
             st.phase = 'mist';
             st.t = EG_HZ_DELIRIUM_FADE_IN_MS + EG_HZ_DELIRIUM_HOLD_MS;

@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { switchScreen } from '../screens/screens.js';
 import { t } from '../translation/translations.js';
 import { EG_ART } from './endgame-art.js';
@@ -538,6 +539,7 @@ export function _egAtlasRefreshSelection() {
 export function _egAtlasSelectNode(nodeId) {
     if (performance.now() - _egAtlasPanEndedAt < 150) return;
     _egAtlasSelectedNodeId = (_egAtlasSelectedNodeId === nodeId) ? null : nodeId;
+    if (_egAtlasSelectedNodeId) Audio_Manager.playSFX('map_select');
     _egAtlasRefreshSelection();
 }
 

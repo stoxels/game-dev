@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { EG_ART } from '../endgame/endgame-art.js';
 import { _ptAllocated, _ptBuildAdjacency, _ptGetNodeVisualState, _ptIsDeallocatable, _ptLang, _ptOnNodeClick, _ptPoints, _ptRefreshPointsDisplay, ensurePassiveTreeRoot } from './probability-tree-state-points.js';
@@ -1569,7 +1570,10 @@ export function _ptBindStatSummary() {
     const panel = document.getElementById('pt-summary');
     if (!panel || panel.dataset.ptBound === '1') return;
     panel.dataset.ptBound = '1';
-    panel.addEventListener('mouseenter', _ptRenderStatSummary);
+    panel.addEventListener('mouseenter', () => {
+        Audio_Manager.playSFX('stat_summary_open');
+        _ptRenderStatSummary();
+    });
     _ptRenderStatSummary();
 }
 

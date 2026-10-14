@@ -487,7 +487,7 @@ export function _egGustArenaTick(st, dtS, now) {
 // crack, so the player can pre-position before the shove even announces.
 export function _egGustLightningWarn(st, side) {
     try {
-        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gust_thunder');
+        if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('hz_lightning_warn', 'gust_thunder');
     } catch (e) {}
     const el = _egNkEl(st.run, 'div', 'eg-gust-lightning ' +
         (side === 1 ? 'eg-gust-lightning-left' : 'eg-gust-lightning-right'));

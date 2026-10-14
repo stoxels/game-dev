@@ -132,6 +132,10 @@ function _egSpawnLootDrop(isBoss = false, monsterLevel = 1, force = false) {
 
     _egLootDrops.set(key, item);
     _egRenderLootOverlay(r, c, item);
+    // Escalating drop sting: uniques > rare/epic > everything else.
+    Audio_Manager.playSFX(item && item.isUnique ? 'loot_drop_unique'
+        : (item && (item.rarity === 'rare' || item.rarity === 'epic')) ? 'loot_drop_rare'
+        : 'loot_drop_normal');
 
     _egScheduleTrackedExpiry(_egLootDrops, key, item, EG_LOOT_DROP_LIFETIME_MS, `eg-loot-${r}-${c}`, _egRemoveLootOverlay);
 }
@@ -165,6 +169,7 @@ export function _egPlaceLootDropForce(item) {
 // essence and a usable item onto the grid in a staggered cascade.
 export function _egSpawnLootExplosion(monsterLevel = 1) {
     if (!_egIsActive()) return;
+    Audio_Manager.playSFX('loot_explosion');
 
     const tryScheduleOne = () => {
         // Unlimited stash: always has room

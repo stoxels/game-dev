@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
 import { _egRenderPanel } from '../encounter.js';
 import { _egApplyMapModsToMonster, _egGetActiveMapModValue } from '../../endgame/endgame-map-launch.js';
@@ -190,6 +191,7 @@ export function _egBossTick() {
     });
 
     if (anyNewlyEnraged && typeof showToast === 'function') {
+        Audio_Manager.playSFX('boss_enrage');
         globalThis.showToast(t('eg_boss_soft_enrage'));
     }
 }
@@ -338,6 +340,7 @@ export function _egBossTransition(monster, newPhase) {
     _egBossApplyPhaseStats(monster, newPhase);
     _egBossClearMechanicTimers(monster);
     _egBossPlayTransitionFeedback(monster, newPhase);
+    Audio_Manager.playSFX('boss_phase_change');
     _egRenderPanel();
 
     // Optional per-boss phase-enter hook. A boss can define
@@ -387,6 +390,9 @@ export function _egCalcMechanicInterval(mech, phase) {
 }
 
 
+// Bosses whose mechanics already play bespoke sounds (see their boss-*.js).
+const EG_BOSSES_WITH_OWN_SFX = /^boss_(bumper|centipede|clock|coil|dancer|gale|gambler|gourmet|lodestone|puddle|sprout|stack|striker|tactician|thwomp|gust|marksman)/;
+
 // Mechanic → activation-sting category. Shared mechanics (used by 2+ bosses)
 // are mapped explicitly; boss-unique names fall back to a keyword heuristic
 // (most one-off moves are hazard-style attacks).
@@ -431,6 +437,13 @@ export function _egBossScheduleSingleMechanic(monster, mech, phase) {
         if (stillAlive && !monster.bossImmune) {
             const fn = window[mech.handler];
             if (typeof fn === 'function') {
+                // Generic activation cue for bosses that have no sounds of
+                // their own yet; bosses with bespoke sounds play those in-handler.
+                if (!EG_BOSSES_WITH_OWN_SFX.test(String(monster.id || ''))) {
+                    const cat = _egBossMechCategory(String(mech.name || ''));
+                    Audio_Manager.playSFX(cat === 'summon' ? 'boss_summon_adds'
+                        : cat === 'grid' ? 'grid_scramble' : 'boss_telegraph_warn');
+                }
                 fn(monster, phase);
             }
         }

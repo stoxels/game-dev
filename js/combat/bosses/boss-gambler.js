@@ -195,7 +195,7 @@ export function _egGamblerArenaInit(monster) {
             _egNkFlingAvatar((dx / d) * EG_GMB_SLAM_FLING[p], (dy / d) * EG_GMB_SLAM_FLING[p], ch.x, ch.y);
             const dealt = _egNkHit(EG_GMB_SLAM_DMG[p], 'shadow', st.level);
             _egNkAbilityHitToast(dealt, 'The Gambler', 'Croupier Slam');
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gambler_deal'); } catch (e2) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_gambler_revolver', 'gambler_deal'); } catch (e2) {}
         }
 
         // ── Chip volley: cards whip from the stack at the player ──
@@ -289,7 +289,7 @@ export function _egGamblerThrowCard(st, p) {
         t: 0, hit: false, el,
     };
     st.cards.push(card);
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gambler_deal'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_gambler_revolver', 'gambler_deal'); } catch (e) {}
 }
 
 
@@ -331,7 +331,7 @@ export function _egGamblerWheel(st, live) {
     el.style.top = Math.round(H * 0.38 - 80) + 'px';
     st.wheel = { phase: 'spin', t: 0, wedge: -1, el, resultEl: null, live };
     _egNkToast('eg_gmb_wheel', '🎡 WHEEL OF FORTUNE! Where it lands, everyone pays!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gambler_deal'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_gambler_revolver', 'gambler_deal'); } catch (e) {}
 }
 
 
@@ -370,7 +370,7 @@ export function _egGamblerWheelResolve(st, wl, live) {
         resultEl.textContent = '⭐ YOU WIN!';
         _egGmbHealPct(EG_GMB_WHEEL_HEAL_PLAYER);
     }
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gambler_deal'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_gambler_revolver', 'gambler_deal'); } catch (e) {}
 }
 
 
@@ -381,7 +381,7 @@ export function _egGamblerRush(st, now) {
     if (st.rush) return;
     st.rush = { wave: 0, t: 0 };
     _egNkToast('eg_gmb_rush', '🎰 JACKPOT RUSH! Dodge the reels - mind the 7s!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gambler_deal'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_gambler_revolver', 'gambler_deal'); } catch (e) {}
 }
 
 
@@ -486,7 +486,7 @@ export function _egGamblerRoulette(monster) {
     el.style.top = c.y + 'px';
     st.rr = { x: c.x, y: c.y, t: 0, chamber: 6, p, el, shellEl: null };
     _egNkToast('eg_gmb_rr', '🔫 RUSSIAN ROULETTE! Step out before the hammer falls!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gambler_deal'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_gambler_revolver', 'gambler_deal'); } catch (e) {}
 }
 
 

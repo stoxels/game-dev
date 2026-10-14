@@ -5,7 +5,8 @@ import { _egEnsurePlayerStatusBar } from './combat-ailments-core.js';
 import { _egIsActive } from './combat-state.js';
 
 // Shows a short miss label above the player avatar.
-export function _egApplyPlayerMissFeedback() {
+export function _egApplyPlayerMissFeedback(silent) {
+    if (!silent) Audio_Manager.playSFX('player_dodge');
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -17,6 +18,7 @@ export function _egApplyPlayerMissFeedback() {
 
 // Shows a short blocked label above the player avatar.
 export function _egApplyPlayerBlockFeedback() {
+    Audio_Manager.playSFX('player_block');
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -48,6 +50,8 @@ export function _egShowBlockLockoutOverlay(durationMs) {
 
     let chip = document.getElementById('eg-block-lockout-overlay');
     if (!chip) {
+        // Guard-broken sting, slightly after the block clang so they don't mask each other.
+        setTimeout(() => Audio_Manager.playSFX('player_block_lockout'), 180);
         chip = document.createElement('div');
         chip.id = 'eg-block-lockout-overlay';
         chip.className = 'eg-status-chip eg-status-chip-lockout';
@@ -124,4 +128,6 @@ export function _egApplyPlayerHitFeedback(damageValue, isCrit, element) {
     setTimeout(() => { hud.style.transform = ''; hud.style.boxShadow = ''; }, isCrit ? 220 : EG_PLAYER_HIT_FLASH_MS);
 
     Audio_Manager.playSFX('player_damage_taken');
+    // Crits layer a heavier accent on top of the base hit sound.
+    if (isCrit) Audio_Manager.playSFX('player_crit_taken');
 }

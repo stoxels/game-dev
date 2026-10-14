@@ -38,6 +38,7 @@ import { EG_MAP_STASH_COLS, EG_MAP_STASH_INITIAL_ROWS, EG_MAP_TIER_COUNT, _egIsT
 import { _egLoadMassSellSettings, _egMassSellKeep, _egMassSellKeepUnique, _egMassSellMinItemLevel, _egMassSellMinReqLevel } from './hub-mass-sell.js';
 import { EG_INV_COLS, EG_INV_INITIAL_ROWS, _egEnsureInvRows, _egEquipped, _egInventory } from './hub-stash.js';
 import { _egHealUniqueItem } from '../loot/unique-item-logic.js';
+import { _egHealItemRequirements } from '../loot/equipment-base-types.js';
 
 
 
@@ -467,6 +468,26 @@ function _egLoadHubState() {
     _egLoadMassSellSettings();
     // Loot filter - load (or default-initialise) from the persisted save.
     if (typeof _egLoadLootFilter === 'function') _egLoadLootFilter();
+
+    // Refresh attribute requirements of saved gear from its base type, so a
+    // requirement rebalance (requirement curve in equipment-base-types.js) reaches existing items.
+    try {
+        let reqChanged = false;
+        if (Array.isArray(_egInventory)) {
+            for (let r = 0; r < _egInventory.length; r++) {
+                for (let c = 0; c < EG_INV_COLS; c++) {
+                    const it = _egInventory[r][c];
+                    if (it && it.category === 'equip' && _egHealItemRequirements(it)) reqChanged = true;
+                }
+            }
+        }
+        if (typeof _egEquipped === 'object' && _egEquipped) {
+            Object.values(_egEquipped).forEach(it => { if (it && _egHealItemRequirements(it)) reqChanged = true; });
+        }
+        const _benchItem = globalThis._egCraftingBenchItem;
+        if (_benchItem && _egHealItemRequirements(_benchItem)) reqChanged = true;
+        if (reqChanged && typeof egSaveHubState === 'function') { try { egSaveHubState(); } catch (e) {} }
+    } catch (e) { /* ignore */ }
 
     // Heal legacy equipment items that were saved before implicits existed.
     try {

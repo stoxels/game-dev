@@ -64,17 +64,18 @@ export function _egvBuildCardHTML({ icon, title, subtitle, desc, price, buyCall,
 export function _egvPurchase(price, grantFn) {
     if (!egSpendGold(price)) {
         globalThis.showToast(t('eg_vendor_no_gold').replace('{n}', price - egGetGold()));
-        Audio_Manager.playSFX('player_equip_not_pickup');
+        Audio_Manager.playSFX('ui_error', 'player_equip_not_pickup');
         return false;
     }
     if (typeof _egLoadHubState === 'function') globalThis._egLoadHubState();
     if (!grantFn()) {
         _egAddGold(price); // refund
         globalThis.showToast(t('eg_vendor_no_space'));
-        Audio_Manager.playSFX('player_equip_not_pickup');
+        Audio_Manager.playSFX('ui_error', 'player_equip_not_pickup');
         return false;
     }
     egSaveHubState();
+    Audio_Manager.playSFX('gold_spend');
     try { trackAchStat('egVendorPurchases', 1); } catch (e) { /* never block a purchase */ }
     return true;
 }

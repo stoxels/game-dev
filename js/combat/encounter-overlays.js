@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _egGetMistakesRemaining } from './encounter-tick-support.js';
 import { _egIsActive } from './combat-state.js';
@@ -6,6 +7,7 @@ import { _egClearCenterGridBanners } from '../timer/timer.js';
 // banners with their threshold tracking and reset paths.
 //
 export function _egShowMistakesWarningBanner(remaining) {
+    Audio_Manager.playSFX('mistakes_warning');
     // Dismiss any other center-grid banner so concurrent events don't stack
     _egClearCenterGridBanners('eg-mistakes-warning-banner');
     // Remove any stale banner so a rapid 3→2→1 cascade always shows the newest count
@@ -98,6 +100,7 @@ export function _egGetLowHealthWarningTier(pct) {
 }
 
 export function _egShowLowHealthWarningBanner() {
+    Audio_Manager.playSFX('low_health_warning');
     _egClearCenterGridBanners('eg-low-health-warning-banner');
     const old = document.getElementById('eg-low-health-warning-banner');
     if (old) old.remove();
@@ -167,6 +170,7 @@ export function _egResetLowHealthWarningState() {
 // not at percentage thresholds like the health warning.
 
 export function _egShowAbsorptionBrokenBanner() {
+    Audio_Manager.playSFX('absorption_broken');
     _egClearCenterGridBanners('eg-absorption-broken-banner');
     const old = document.getElementById('eg-absorption-broken-banner');
     if (old) old.remove();

@@ -1,3 +1,4 @@
+import { applyGauntletBonuses } from './gauntlet-levels.js';
 // Helper function to convert shorthand rows [1,0,1] into objects {v:1, m:0}
 //------------------------------------------------------------------------
 
@@ -3820,3 +3821,7 @@ export const WORLDS = [
     { label: '⚔ ENDGAME SANDBOX', labelDE: '⚔ ENDGAME SANDBOX', data: W_ENDGAME },
     */
 ];
+
+// Gauntlet bonus levels (2-3 per world, deterministic seed): stamped onto the
+// level objects once at load so every consumer sees the same bonusType.
+applyGauntletBonuses(WORLDS);

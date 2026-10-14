@@ -20,6 +20,7 @@
 // split modules rebind these lets through globalThis.<name> assignment
 // (imported module bindings are read-only views) - the established
 // step-9/step-10 pattern.
+import { Audio_Manager } from '../audio/audio.js';
 import { cur } from '../state.js';
 
 try { Object.defineProperty(globalThis, '_egTooltipItem', { get() { return _egTooltipItem; }, set(v) { _egTooltipItem = v; }, configurable: true }); } catch (e) {}
@@ -350,6 +351,7 @@ export function _egBuildStashPanelHTML() {
 </div>`;
 }
 export function _egSwitchStashTab(tab) {
+    Audio_Manager.playSFX('ui_tab_switch');
     globalThis._egStashTab = (tab === 'uniques' ? 'uniques' : 'inventory');
     const invBody = document.getElementById('eg-stash-tab-inventory');
     const uniqBody = document.getElementById('eg-stash-tab-uniques');

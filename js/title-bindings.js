@@ -1,3 +1,4 @@
+import { Audio_Manager } from './audio/audio.js';
 import { showAchievements } from './achievements/achievements-ui.js';
 import { showResetAchievementsModal } from './achievements/achievements.js';
 import { stopTimer } from './timer/timer.js';
@@ -271,14 +272,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Main menu navigation buttons.
-    // Quick development-tree access from the title screen. These preview a
-    // character root without changing the active save or selected character.
-    document.querySelectorAll('[data-dev-tree-character]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            showPassiveTreeAsCharacter(btn.dataset.devTreeCharacter, 'screen-title');
-        });
-    });
-
     onClick('btn-play', () => {
         showSaveSlotSelect(() => {
             const proceed = () => globalThis.maybeShowCharacterSelect(() => globalThis.showTutorial());
@@ -823,3 +816,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // binding works immediately. Not moved into the closure to avoid any change
 // in execution timing relative to the rest of the file's bindings.
 document.getElementById('btn-touchpad-mode')?.addEventListener('click', toggleTouchpadMarkMode);
+
+// Menu button hover tick: one delegated listener instead of per-button wiring.
+// Only fires when the pointer enters a different button than last time.
+if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    let _uiHoverLast = null;
+    document.addEventListener('mouseover', (e) => {
+        const btn = e.target && e.target.closest ? e.target.closest('button, .ob, .ssc-delete-btn, .ssc-name-btn') : null;
+        if (btn === _uiHoverLast) return;
+        _uiHoverLast = btn;
+        if (btn && !btn.disabled) Audio_Manager.playSFX('ui_hover');
+    });
+}

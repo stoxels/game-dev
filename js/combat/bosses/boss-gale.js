@@ -185,7 +185,7 @@ export function _egGaleArenaInit(monster) {
             _egNkFlingAvatar(fx, fy, e.x, e.y);
             const dealt = _egNkHit(EG_GAL_UPDRAFT_DMG[p], 'cold', st.level);
             _egNkAbilityHitToast(dealt, 'The Gale', 'Updraft');
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gale_howl'); } catch (e2) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e2) {}
         }
 
         // ── Crosswind: direction swap + push + streak visuals ──
@@ -336,7 +336,7 @@ export function _egGaleLadder(st, now) {
     }
     st.ladder = { lanes, idx: 0, t: 0, twisters: [] };
     _egNkToast('eg_gale_ladder', '🌪️ TORNADO LADDER! The twisters climb!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gale_howl'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
 }
 
 
@@ -365,7 +365,7 @@ export function _egGaleTickLadder(st, dtS, pr) {
                 tw.warnEl.classList.add('hot');
                 tw.el = _egNkEl(st.run, 'div', 'eg-gal-twister', '🌪️');
                 tw.el.style.left = (tw.x - 60) + 'px';
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gale_howl'); } catch (e) {}
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
             }
         } else if (tw.phase === 'rise') {
             const k = tw.t / EG_GAL_LADDER_RISE_MS;
@@ -406,7 +406,7 @@ export function _egGaleContract(st, now) {
     }
     st.rings = { rings, idx: 0, t: 0, live: null };
     _egNkToast('eg_gale_contract', '🌀 EYE OF THE STORM! Thread the rings!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gale_howl'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
 }
 
 
@@ -484,7 +484,7 @@ export function _egGaleLance(st, p) {
     }
     const lance = { horizontal, fixed: horizontal ? c.y : c.x, fromLeft, t: 0, el, boltEl: null, hit: false, p };
     st.lances.push(lance);
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gale_howl'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
 }
 
 
@@ -500,7 +500,7 @@ export function _egGaleTickLances(st, dtS, pr, p) {
             l.boltEl = _egNkEl(st.run, 'div', 'eg-gal-lance-bolt');
             l.boltEl.style.left = '0px';
             l.boltEl.style.top = '0px';
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gale_howl'); } catch (e) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'gale_howl'); } catch (e) {}
         }
         const k = Math.min(1, (l.t - EG_GAL_LANCE_WARN_MS) / EG_GAL_LANCE_FLIGHT_MS);
         const travel = (l.horizontal ? W : H) * (l.fromLeft ? k : 1 - k);

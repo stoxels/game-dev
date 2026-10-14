@@ -148,11 +148,18 @@ function _egWeaponSwingHop(facing) {
 export function _egWeaponSwingSound(family) {
     try {
         if (typeof Audio_Manager === 'undefined' || !Audio_Manager.playSFX) return;
-        const sfx = family === 'wand' || family === 'staff' ? 'arcaneReveal'
-            : family === 'mace' ? 'bump_thwack'
-            : family === 'bow' ? 'precisionMark'
-            : 'cleave';
-        Audio_Manager.playSFX(sfx);
+        // [new per-family sound, placeholder that plays until it is recorded]
+        const map = {
+            wand: ['melee_swing_staff', 'arcaneReveal'],
+            staff: ['melee_swing_staff', 'arcaneReveal'],
+            mace: ['melee_swing_mace', 'bump_thwack'],
+            bow: ['bow_shot', 'precisionMark'],
+            axe: ['melee_swing_axe', 'cleave'],
+            dagger: ['melee_swing_dagger', 'cleave'],
+            unarmed: ['unarmed_punch', 'cleave'],
+        };
+        const [sfx, fallback] = map[family] || ['melee_swing_sword', 'cleave'];
+        Audio_Manager.playSFX(sfx, fallback);
     } catch (e) {}
 }
 
@@ -239,6 +246,7 @@ export function _egDoWeaponAttack() {
     // while dead, or behind a modal must still end the hold, or the hero
     // would stay rooted + vulnerable with the finger already up (and the
     // charge would keep overcharging behind the modal).
+    Audio_Manager.stopSFX('charge_loop');
     try { globalThis._egMeleeHoldActive = false; } catch (e) {}
     try { globalThis._egMeleeHoldKey = null; } catch (e) {}
     try { globalThis._egMeleeHoldStartAt = 0; } catch (e) {}
@@ -399,6 +407,7 @@ function _egMeleeBeginHold(e) {
 function _egMeleeCancelHold() {
     if (!globalThis._egMeleeHoldActive) return;
     globalThis._egMeleeHoldActive = false;
+    Audio_Manager.stopSFX('charge_loop');
     try { globalThis._egMeleeHoldKey = null; } catch (e) {}
     try { globalThis._egMeleeHoldStartAt = 0; } catch (e) {}
     try { globalThis._egMeleeChargeLevel = 0; } catch (e) {}

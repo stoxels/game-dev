@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { switchScreen } from '../screens/screens.js';
 import { t } from '../translation/translations.js';
 import { _egvBuildEssencesTabHTML, _egvBuildItemsTabHTML } from './loot-vendor-supplies.js';
@@ -112,6 +113,7 @@ function _egvRenderTabContent() {
 // Switches to another tab. Called from the generated tab-bar buttons, so the
 // name is an inline handler and must stay reachable as a global.
 export function _egvSwitchTab(tabId) {
+    Audio_Manager.playSFX('ui_tab_switch');
     _egvActiveTab = tabId;
     document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
     const btn = document.getElementById(`egv-tab-btn-${tabId}`);

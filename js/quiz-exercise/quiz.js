@@ -738,6 +738,7 @@ export function showQuiz(worldNum, isRetry = false) {
 
     const overlayEl = document.getElementById('quiz-overlay');
     overlayEl.classList.add('show');
+    Audio_Manager.playSFX('quiz_start');
     if (typeof _refreshQuestionModalFlag === 'function') _refreshQuestionModalFlag();
 
     // Inject character portrait

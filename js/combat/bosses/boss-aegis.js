@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../../audio/audio.js';
 import { _egRenderPanel, _egSpawnMonster } from '../encounter.js';
 import { EG_MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
@@ -136,6 +137,7 @@ export function _egMechAgAegisProtocol(monster, phase) {
     monster.bossImmune = true;
     const card = document.getElementById('eg-card-' + monster.id);
     if (card) card.classList.add('eg-nk-shielded');
+    Audio_Manager.playSFX('boss_shield_up');
     // Arena glow so the shielded state reads at a glance.
     _egAgAegisGlow(true);
     _egNkToast('eg_mech_aegis', '🛡️ The Aegis: Aegis Protocol! Kill the guards to break the shield!', '#7dd3fc');
@@ -158,6 +160,7 @@ export function _egMechAgAegisProtocol(monster, phase) {
             boss.bossImmune = false;
             const c2 = document.getElementById('eg-card-' + monster.id);
             if (c2) c2.classList.remove('eg-nk-shielded');
+            Audio_Manager.playSFX('boss_shield_down');
             _egAgAegisGlow(false);
             _egNkToast('eg_mech_aegis_down', '🛡️ Aegis shield down - burn the boss!', '#4ade80');
             if (typeof _egRenderPanel === 'function') { try { _egRenderPanel(); } catch (e2) {} }

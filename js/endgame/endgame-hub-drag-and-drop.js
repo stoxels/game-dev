@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { EG_ART } from './endgame-art.js';
 import { _egCloseCraftingBench, _egRefreshCraftingBench } from '../loot/loot-crafting-bench-overlay.js';
@@ -318,6 +319,7 @@ export function _dndPickUp(e, chip) {
     };
 
     resolved.clearFn(); // remove item from its origin cell
+    Audio_Manager.playSFX('item_drag_pick');
     _dndCreateGhost(resolved.item);
     _dndMoveGhost(e.clientX, e.clientY);
 }
@@ -416,6 +418,7 @@ export function _dndReturnDisplacedToSource(item) {
 // Briefly flashes a red reject animation on the given element,
 // then returns the dragged item to its source.
 export function _dndShowRejectFlash(el) {
+    Audio_Manager.playSFX('ui_error');
     el.classList.add('eg-slot-reject');
     setTimeout(() => el.classList.remove('eg-slot-reject'), 600);
     _dndReturnToSource();
@@ -426,7 +429,11 @@ export function _dndShowRejectFlash(el) {
 // items are flagged as requirement-blocked (red cells).
 // Also re-renders the map device slot and map stash - those elements live on
 // the Probability Gate screen and no-op when that screen is not in the DOM.
+let _dndEquipSfxPlayed = false;
 export function _dndFinalizeDrop() {
+    // An equip already played its own sound; don't stack the generic drop on it.
+    if (!_dndEquipSfxPlayed) Audio_Manager.playSFX('item_drag_drop');
+    _dndEquipSfxPlayed = false;
     egSaveHubState();
     _dndReset();
     _egUpdateInvCount();
@@ -756,6 +763,8 @@ export function _dndDropOnEquipSlot(equipSlotEl) {
     }
     const displaced = _egEquipped[slotId] || null;
     _egEquipped[slotId] = _dnd.item;
+    Audio_Manager.playSFX('item_equip');
+    _dndEquipSfxPlayed = true;
     _egRenderEquipSlot(slotId);
     if (displaced) _dndReturnDisplacedToSource(displaced);
     return true;
@@ -859,6 +868,7 @@ export function _dndQuickEquipFromStash(invCell) {
 
     const displaced = _egEquipped[slotId] || null;
     _egEquipped[slotId] = item;
+    Audio_Manager.playSFX('item_equip');
     _egInventory[r][c] = displaced; // displaced may be null - that's fine
     _egRenderEquipSlot(slotId);
     _egRenderInventoryCell(r, c);
@@ -885,6 +895,7 @@ export function _dndQuickUnequipToStash(equipSlotEl) {
     }
 
     const free = _dndFirstFreeInvCell();
+    Audio_Manager.playSFX('item_unequip');
     delete _egEquipped[slotId];
     if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(free.r + 1);
     _egInventory[free.r][free.c] = item;

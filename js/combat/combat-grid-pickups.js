@@ -201,7 +201,7 @@ export const EG_PICKUP_DEFS = {
             if (gained > 0) {
                 globalThis.showToast(t('eg_pickup_mana_gain_small').replace('{n}', gained),
                     _egRarityToastColor(this.rarity));
-                Audio_Manager.playSFX('mana_pickup');
+                Audio_Manager.playSFX('pickup_mana', 'mana_pickup');
             } else {
                 globalThis.showToast(t('eg_pickup_mana_full'), _egRarityToastColor(this.rarity));
             }
@@ -214,7 +214,7 @@ export const EG_PICKUP_DEFS = {
             if (gained > 0) {
                 globalThis.showToast(t('eg_pickup_mana_gain_medium').replace('{n}', gained),
                     _egRarityToastColor(this.rarity));
-                Audio_Manager.playSFX('mana_pickup');
+                Audio_Manager.playSFX('pickup_mana', 'mana_pickup');
             } else {
                 globalThis.showToast(t('eg_pickup_mana_full'), _egRarityToastColor(this.rarity));
             }
@@ -228,7 +228,7 @@ export const EG_PICKUP_DEFS = {
             if (gained > 0) {
                 globalThis.showToast(t('eg_pickup_mana_gain_full').replace('{n}', globalThis.playerCurrentMana - before),
                     _egRarityToastColor(this.rarity));
-                Audio_Manager.playSFX('mana_pickup');
+                Audio_Manager.playSFX('mana_restored_full', 'mana_pickup');
             } else {
                 globalThis.showToast(t('eg_pickup_mana_full'), _egRarityToastColor(this.rarity));
             }
@@ -251,6 +251,7 @@ export const EG_PICKUP_DEFS = {
                 } else if (typeof _setMistakeCounterText === 'function') {
                     globalThis._setMistakeCounterText();
                 }
+                Audio_Manager.playSFX('pickup_mistake_erase');
                 globalThis.showToast(t('eg_pickup_mistake_erased'), _egRarityToastColor(this.rarity));
             } else {
                 globalThis.showToast(t('eg_pickup_mistake_none'), _egRarityToastColor(this.rarity));
@@ -289,6 +290,7 @@ export const EG_PICKUP_DEFS = {
                 _patchCooldownButton(slot);
             }
 
+            Audio_Manager.playSFX('pickup_cooldown');
             globalThis.showToast(t('eg_pickup_cooldown_reduced')
                 .replace('{name}', displayName)
                 .replace('{n}', before - state.remaining),

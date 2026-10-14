@@ -2,6 +2,7 @@
 // travels to each victim and returns home; damage remains owned by
 // encounter-melee-arts.js and is never gated by this presentation layer.
 
+import { Audio_Manager } from '../audio/audio.js';
 import { _egGetElementCentre } from './combat-class-projectiles.js';
 
 //------------------------------------------------------------------------
@@ -132,6 +133,7 @@ export function _egMeleeRaiseAvatar() {
 // Moves the avatar to the primary target at a readable pace, then holds
 // the frozen arrival beat before the caller applies the impact.
 export function _egMeleeDashOut(targetId) {
+    Audio_Manager.playSFX('art_dash_strike');
     try {
         const avatar = document.getElementById('player-avatar-wrapper');
         const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
@@ -148,6 +150,7 @@ export function _egMeleeDashOut(targetId) {
 
 // Moves the avatar along the frozen high arc to the secondary victim.
 export function _egMeleeLeapTo(victimId) {
+    Audio_Manager.playSFX('art_sky_leap');
     return _egMeleeFlyLeg(victimId, EG_MELEE_DELIVERY_LEAP_MS, 110, 1.18);
 }
 

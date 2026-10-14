@@ -7,6 +7,7 @@
 // held/dual-wield parries, and projectile deflection. All tuning and public
 // names remain shared with the rest of the encounter system.
 
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT } from './encounter-constants.js';
 import { _egApplyPlayerMissFeedback } from './encounter-monster-attack-feedback.js';
@@ -23,7 +24,8 @@ export function _egRollFateNegation(stats) {
     const pct = stats.fatePct || 0;
     if (pct <= 0 || Math.random() * 100 >= pct) return false;
     globalThis.showToast(t('eg_fate'));
-    _egApplyPlayerMissFeedback();
+    Audio_Manager.playSFX('player_fate_negate');
+    _egApplyPlayerMissFeedback(true);
     _egScheduleAbsorptionRegen();
     return true;
 }
@@ -37,11 +39,13 @@ export function _egApplyGroundedReduction(rawDamage) {
     if (chance <= 0 || reduction <= 0) return rawDamage;
     if (Math.random() * 100 >= chance) return rawDamage;
     globalThis.showToast(t('eg_grounded'));
+    Audio_Manager.playSFX('player_grounded');
     return rawDamage * (1 - reduction / 100);
 }
 
 // Creates the short-lived HUD label shown after a held or dual-wield parry.
 export function _egApplyPlayerParryFeedback() {
+    Audio_Manager.playSFX('player_parry');
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -54,6 +58,7 @@ export function _egApplyPlayerParryFeedback() {
 
 // Creates the short-lived HUD label shown after redirecting a projectile.
 export function _egApplyPlayerDeflectFeedback() {
+    Audio_Manager.playSFX('player_deflect');
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');

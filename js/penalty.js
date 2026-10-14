@@ -202,6 +202,7 @@ function _applyTimeDeduction(row, col, effectivePen) {
     }
     subtractTimeSecs(effectivePen);
     if (effectivePen > 0) {
+        Audio_Manager.playSFX('penalty_time_lost');
         globalThis.actuaryLogMistake(row, col, effectivePen);
     }
 }

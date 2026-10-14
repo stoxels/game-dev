@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _egApplyAilmentShockAmpOnMonster, _egApplyImpaleToHit, _egChilledColdTakenMult, _egApplyIntimidateAmp, _egRollCrush, _egRollIntimidate, _egRollPlayerHitAilments } from './combat-ailments-core.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
@@ -95,7 +96,26 @@ export function _egApplyHitToMonster(target, amount, opts) {
         target.staggeredUntil = Date.now() + _egStunDurationMs(stats, !!(opts && opts.isMelee));
         _egFreezeTimerOnStun(stats);
         _egShowStatusLabel(target.id, t('eg_staggered'));
+        Audio_Manager.playSFX('monster_stunned');
     }
+}
+
+// Impact sound for a landed player hit: crit beats element, element wins
+// when elemental damage is the larger share, otherwise a physical thump.
+function _egPlayHitSound(amount, elements, isCrit) {
+    if (isCrit) { Audio_Manager.playSFX('hit_crit'); return; }
+    let key = 'hit_flesh';
+    if (elements) {
+        let best = null;
+        let sum = 0;
+        for (const el of ['fire', 'cold', 'lightning', 'shadow']) {
+            const v = Number(elements[el]) || 0;
+            sum += v;
+            if (v > 0 && (best === null || v > (Number(elements[best]) || 0))) best = el;
+        }
+        if (best && sum * 2 >= Math.max(1, amount)) key = 'hit_' + best;
+    }
+    Audio_Manager.playSFX(key);
 }
 
 // Appends a short floating status label (stagger/snipe/...) to a monster card.
@@ -288,6 +308,7 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
             target.staggeredUntil = Date.now() + _egStunDurationMs(rageStats, true);
             _egFreezeTimerOnStun(rageStats);
             _egShowStatusLabel(target.id, t('eg_stunned'));
+            Audio_Manager.playSFX('monster_stunned');
             // Charges that trigger on a melee stun (Power, Fortify).
             if ((rageStats.powerOnStunPct || 0) > 0 && Math.random() * 100 < Math.min(100, rageStats.powerOnStunPct)) {
                 _egGainPowerCharge(rageStats.powerChargesMax, rageStats.powerDurationPct);
@@ -304,6 +325,7 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     _egShowDamageNumber(target.id, amount, isCrit, elements);
     _egFlashDamageCard(target.id);
     _egSpawnHitBurst(target.id, elements, isCrit);
+    if (!(opts && opts.uspSfx)) _egPlayHitSound(amount, elements, isCrit);
 
     // Gear: echo (rings) - chance for the hit to repeat as a delayed
     // second instance of echoDamagePct of its damage
@@ -346,6 +368,7 @@ export function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCri
     if (!others.length) return;
     const victim = others[Math.floor(Math.random() * others.length)];
     const transferredDamage = Math.round(overkill * (1 + overkillPct / 100));
+    Audio_Manager.playSFX('overkill_spread');
     _egDamageTargetById(victim.id, transferredDamage, elements, { isCrit: !!isCrit });
 }
 
@@ -374,6 +397,7 @@ export function _egTryChargedOverkillRicochet(dyingTarget, appliedDamage, hpBefo
         // factor above already approximates; true scaled share is fine for visuals/resist.
     }
 
+    Audio_Manager.playSFX('overkill_spread');
     const sourceCard = document.getElementById(`eg-card-${dyingTarget.id}`);
     const targetCard = document.getElementById(`eg-card-${victim.id}`);
     if (sourceCard && targetCard) {
@@ -412,6 +436,7 @@ export function _egTryEchoHit(targetId, appliedAmount, elements, isCrit) {
         const target = globalThis._egMonsters.find(m => m.id === targetId);
         if (!target) return;
         _egShowStatusLabel(targetId, t('eg_echo'));
+        Audio_Manager.playSFX('echo_hit');
         _egDamageTargetById(targetId, Math.max(1, Math.round(appliedAmount * dmgPct / 100)), elements, { isEcho: true, isCrit: !!isCrit });
     }, EG_ECHO_DELAY_MS);
 }

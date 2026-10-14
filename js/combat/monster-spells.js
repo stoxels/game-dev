@@ -1,0 +1,420 @@
+//------------------------------------------------------------------------
+// Monster spells: regular (non-boss) monsters may cast an elemental or
+// support spell instead of their plain melee/projectile attack. Hooked in
+// from _egFireMonsterAttack (encounter-monster-attacks.js) when the charge
+// bar fills.
+//
+// Damage goes through _egPlayerTakeDamage with isSpell = true and the
+// spell's element, so the player's resistances, spell block, armour and
+// absorption all apply; elemental hits also roll the normal ailments
+// (ignite / chill / shock / shadow) - spells roll them an extra time.
+// Bosses keep their own ability sets and never cast these.
+//------------------------------------------------------------------------
+
+import { Audio_Manager } from '../audio/audio.js';
+import { LANG } from '../translation/translations.js';
+import { updateClassHUDManaBar } from '../classes/class-mana.js';
+import { _egCircleOverlapsRect, _egGetPlayerRectForAilment, _egRollMonsterHitAilment } from './combat-ailments-core.js';
+import { _egFireProjectile, _egGetElementCentre } from './combat-class-projectiles.js';
+import { EG_MAX_CONCURRENT_MONSTERS } from './combat-monsters.js';
+import { _egIsActive } from './combat-state.js';
+import { _egPlayerTakeDamage } from './encounter-damage.js';
+import { _egApplyPlayerHitFeedback } from './encounter-monster-attack-feedback.js';
+import { _egSpawnMonster } from './encounter-monster-spawning.js';
+import { _egRenderPanel, _egUpdateBars } from './encounter.js';
+import { cur } from '../state.js';
+
+//------------------------------------------------------------------------
+//-------------------TUNING-----------------------------------------------
+//------------------------------------------------------------------------
+
+export const EG_MONSTER_SPELL_CONFIG = {
+    baseChance: 0.12,        // cast chance per full charge bar at monster level 1
+    chancePerLevel: 0.004,   // + per monster level (capped at levelCap)
+    levelCap: 60,
+    maxChance: 0.36,
+    eliteMult: 1.35,
+    gauntletMult: 1.5,       // arenas are spell-heavier
+    cooldownMs: 6000,        // per monster, between casts
+    windupMs: 550,
+    novaRadiusPx: 84,
+    novaTelegraphMs: 1000,
+    mendWoundedBelow: 0.7,   // an ally must be below this life share
+    mendHealPct: 0.28,
+    drainManaPct: 0.15,
+    drainManaMin: 6,
+};
+
+// Which spells each element can roll. Non-elemental monsters are support
+// casters. `mult` scales monster.damageValue.
+const SPELLS = {
+    fire_bolt:       { el: 'fire',      mult: 1.3,  en: 'Fire Bolt',       de: 'Feuerblitz' },
+    frost_nova:      { el: 'cold',      mult: 1.7,  en: 'Frost Nova',      de: 'Frostnova' },
+    chain_lightning: { el: 'lightning', mult: 0.7,  en: 'Chain Lightning', de: 'Kettenblitz' },
+    soul_drain:      { el: 'shadow',    mult: 1.0,  en: 'Soul Drain',      de: 'Seelenentzug' },
+    mend:            { el: 'heal',      mult: 0,    en: 'Mend',            de: 'Heilung' },
+    summon:          { el: 'summon',    mult: 0,    en: 'Summon',          de: 'Beschwörung' },
+};
+
+const POOLS = {
+    fire: ['fire_bolt', 'mend'],
+    cold: ['frost_nova', 'mend'],
+    lightning: ['chain_lightning'],
+    shadow: ['soul_drain', 'summon'],
+    none: ['mend', 'summon'],
+};
+
+const SUMMON_DEFS = ['rat', 'bat', 'beetle'];
+
+//------------------------------------------------------------------------
+//-------------------SMALL HELPERS----------------------------------------
+//------------------------------------------------------------------------
+
+function _msName(id) {
+    const s = SPELLS[id];
+    return LANG === 'de' ? s.de : s.en;
+}
+
+function _msAlive(monster) {
+    return !!(monster && _egIsActive() && (globalThis._egMonsters || []).some(m => m.id === monster.id && m.currentHP > 0));
+}
+
+function _msCard(monster) {
+    return document.getElementById(`eg-card-${monster.id}`);
+}
+
+function _msPlayerEl() {
+    return document.getElementById('player-avatar-wrapper');
+}
+
+function _msCentre(el) {
+    return el ? _egGetElementCentre(el) : null;
+}
+
+// Fixed-position holder at (x, y). `inner` is appended; removed after ms.
+function _msFx(el, x, y, ms, inner) {
+    const holder = document.createElement('div');
+    holder.className = `ms-fx ms-el-${el}`;
+    holder.style.left = `${x}px`;
+    holder.style.top = `${y}px`;
+    holder.innerHTML = inner;
+    document.body.appendChild(holder);
+    setTimeout(() => holder.remove(), ms);
+    return holder;
+}
+
+function _msParticles(el, x, y, count, extraClass, spread) {
+    let html = '';
+    for (let i = 0; i < count; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const d = (spread || 46) * (0.5 + Math.random() * 0.8);
+        html += `<span class="ms-particle ${extraClass || ''}" style="--dx:${(Math.cos(a) * d).toFixed(1)}px;--dy:${(Math.sin(a) * d).toFixed(1)}px"></span>`;
+    }
+    return _msFx(el, x, y, 800, html);
+}
+
+function _msImpact(el, pos) {
+    if (!pos) return;
+    _msFx(el, pos.x, pos.y, 700,
+        '<span class="ms-burst-flash"></span><span class="ms-burst-ring"></span>');
+    _msParticles(el, pos.x, pos.y, el === 'cold' ? 9 : 12, el === 'cold' ? 'ms-shard' : '', 52);
+}
+
+// Glow the caster for the wind-up and pop its name banner.
+function _msWindup(monster, id, ms, then) {
+    const spell = SPELLS[id];
+    const card = _msCard(monster);
+    if (card) {
+        card.classList.add('ms-casting', `ms-el-${spell.el}`);
+        const tag = document.createElement('div');
+        tag.className = `ms-spell-name ms-el-${spell.el}`;
+        tag.textContent = _msName(id);
+        card.appendChild(tag);
+        setTimeout(() => tag.remove(), 1600);
+    }
+    Audio_Manager.playSFX('monster_charge_windup');
+    setTimeout(() => {
+        const c = _msCard(monster);
+        if (c) c.classList.remove('ms-casting', `ms-el-${spell.el}`);
+        if (_msAlive(monster)) then();
+    }, ms);
+}
+
+// One damaging hit on the player through the normal mitigation pipeline.
+// Returns HP actually lost. Shows a small "resisted" tag when resistances
+// ate a large share of the hit.
+function _msHit(monster, mult, element, rollAilment) {
+    if (!_msAlive(monster)) return 0;
+    const raw = Math.max(1, Math.round(monster.damageValue * mult));
+    const dealt = _egPlayerTakeDamage(raw, true, element, monster.level, { attacker: monster, isMonsterSpell: true });
+    if (dealt > 0) {
+        _egApplyPlayerHitFeedback(dealt, false, element);
+        if (rollAilment) _egRollMonsterHitAilment(element, dealt, monster);
+    }
+    if (raw >= 4 && dealt < raw * 0.6) {
+        const hud = _msPlayerEl();
+        if (hud) {
+            const tag = document.createElement('div');
+            tag.className = 'ms-resist-tag';
+            const pct = Math.round((1 - dealt / raw) * 100);
+            tag.textContent = LANG === 'de' ? `🛡 Resistiert −${pct}%` : `🛡 Resisted −${pct}%`;
+            hud.appendChild(tag);
+            setTimeout(() => tag.remove(), 1300);
+        }
+    }
+    return dealt;
+}
+
+// Projectile with a built orb + trail visual.
+function _msProjectile(orbClass, trailClass, from, to, ms, easing, onArrive) {
+    const visual = {
+        build(el) {
+            el.classList.add('ms-proj');
+            el.innerHTML = `<span class="ms-trail ${trailClass}"></span><span class="ms-orb ${orbClass}"></span>`;
+        },
+        rotate: true,
+    };
+    _egFireProjectile(visual, 'ms-proj', from, to, ms, easing, onArrive, undefined, 1);
+}
+
+//------------------------------------------------------------------------
+//-------------------THE SPELLS-------------------------------------------
+//------------------------------------------------------------------------
+
+function _castFireBolt(monster) {
+    const cfg = EG_MONSTER_SPELL_CONFIG;
+    _msWindup(monster, 'fire_bolt', cfg.windupMs, () => {
+        const from = _msCentre(_msCard(monster));
+        const to = _msCentre(_msPlayerEl());
+        if (!from || !to) return;
+        Audio_Manager.playSFX('monster_projectile_launch');
+        _msProjectile('ms-orb-fire', 'ms-trail-fire', from, to, 620, 'ease-in', () => {
+            Audio_Manager.playSFX('monster_projectile_hit');
+            _msImpact('fire', _msCentre(_msPlayerEl()) || to);
+            _msHit(monster, SPELLS.fire_bolt.mult, 'fire', true);
+        });
+    });
+}
+
+function _castFrostNova(monster) {
+    const cfg = EG_MONSTER_SPELL_CONFIG;
+    _msWindup(monster, 'frost_nova', cfg.windupMs, () => {
+        const centre = _msCentre(_msPlayerEl());
+        if (!centre) return;
+        const r = cfg.novaRadiusPx;
+        // The telegraph is planted where the player stands NOW - moving
+        // out of the circle before it detonates avoids the hit.
+        const tele = _msFx('cold', centre.x, centre.y, cfg.novaTelegraphMs + 80,
+            `<div class="ms-nova-tele" style="left:${-r}px;top:${-r}px;width:${r * 2}px;height:${r * 2}px;--ms-nova-ms:${cfg.novaTelegraphMs}ms"></div>`);
+        Audio_Manager.playSFX('monster_charge_windup');
+        setTimeout(() => {
+            tele.remove();
+            _msFx('cold', centre.x, centre.y, 650,
+                `<div class="ms-nova-blast" style="left:${-r}px;top:${-r}px;width:${r * 2}px;height:${r * 2}px"></div>`);
+            _msParticles('cold', centre.x, centre.y, 14, 'ms-shard', r);
+            Audio_Manager.playSFX('monster_projectile_hit');
+            if (!_msAlive(monster)) return;
+            const rect = _egGetPlayerRectForAilment();
+            if (rect && _egCircleOverlapsRect(centre.x, centre.y, r, rect)) {
+                _msHit(monster, SPELLS.frost_nova.mult, 'cold', true);
+            } else if (typeof globalThis.showToast === 'function') {
+                globalThis.showToast(LANG === 'de' ? '💨 Der Frostnova ausgewichen!' : '💨 Dodged the Frost Nova!');
+            }
+        }, cfg.novaTelegraphMs);
+    });
+}
+
+function _boltSvg(a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len;
+    const ny = dx / len;
+    const segs = Math.max(5, Math.round(len / 36));
+    const pts = [];
+    for (let i = 0; i <= segs; i++) {
+        const k = i / segs;
+        const jitter = (i === 0 || i === segs) ? 0 : (Math.random() * 2 - 1) * 16;
+        pts.push(`${(a.x + dx * k + nx * jitter).toFixed(1)},${(a.y + dy * k + ny * jitter).toFixed(1)}`);
+    }
+    const p = pts.join(' ');
+    return `<svg class="ms-bolt" xmlns="http://www.w3.org/2000/svg"><polyline class="ms-bolt-glow" points="${p}"/><polyline class="ms-bolt-core" points="${p}"/></svg>`;
+}
+
+function _castChainLightning(monster) {
+    const cfg = EG_MONSTER_SPELL_CONFIG;
+    _msWindup(monster, 'chain_lightning', cfg.windupMs - 150, () => {
+        const strikes = 3;
+        for (let i = 0; i < strikes; i++) {
+            setTimeout(() => {
+                if (!_msAlive(monster)) return;
+                const from = _msCentre(_msCard(monster));
+                const to = _msCentre(_msPlayerEl());
+                if (!from || !to) return;
+                const wrap = document.createElement('div');
+                wrap.innerHTML = _boltSvg(from, to);
+                const svg = wrap.firstChild;
+                document.body.appendChild(svg);
+                setTimeout(() => svg.remove(), 300);
+                Audio_Manager.playSFX('monster_projectile_hit');
+                _msImpact('lightning', to);
+                _msHit(monster, SPELLS.chain_lightning.mult, 'lightning', i === strikes - 1);
+            }, i * 170);
+        }
+    });
+}
+
+function _castSoulDrain(monster) {
+    const cfg = EG_MONSTER_SPELL_CONFIG;
+    _msWindup(monster, 'soul_drain', cfg.windupMs, () => {
+        const from = _msCentre(_msCard(monster));
+        const to = _msCentre(_msPlayerEl());
+        if (!from || !to) return;
+        Audio_Manager.playSFX('monster_projectile_launch');
+        _msProjectile('ms-orb-shadow', 'ms-trail-shadow', from, to, 820, 'ease-in-out', () => {
+            Audio_Manager.playSFX('monster_projectile_hit');
+            const hit = _msCentre(_msPlayerEl()) || to;
+            _msFx('shadow', hit.x, hit.y, 1000, '<span class="ms-vortex"></span>');
+            _msImpact('shadow', hit);
+            const dealt = _msHit(monster, SPELLS.soul_drain.mult, 'shadow', true);
+
+            // Mana burn: the player loses a slice of their mana pool.
+            let drained = 0;
+            const max = Number(globalThis.playerMaxMana) || 0;
+            if (max > 0) {
+                drained = Math.min(Math.round(globalThis.playerCurrentMana || 0),
+                    Math.max(cfg.drainManaMin, Math.round(max * cfg.drainManaPct)));
+                if (drained > 0) {
+                    globalThis.playerCurrentMana = Math.max(0, Math.round(globalThis.playerCurrentMana) - drained);
+                    try { updateClassHUDManaBar(); } catch (e) { /* HUD optional */ }
+                }
+            }
+            if (dealt <= 0 && drained <= 0) return;
+            if (drained > 0 && typeof globalThis.showToast === 'function') {
+                globalThis.showToast(LANG === 'de' ? `🌑 −${drained} Mana entzogen` : `🌑 −${drained} mana drained`);
+            }
+            // The stolen essence flows back to the caster as life.
+            const heal = Math.max(1, Math.round((dealt + drained) * 0.6));
+            if (_msAlive(monster)) {
+                const back = _msCentre(_msCard(monster));
+                if (back) {
+                    _msProjectile('ms-orb-shadow', 'ms-trail-shadow', hit, back, 600, 'ease-out', () => {
+                        if (!_msAlive(monster)) return;
+                        monster.currentHP = Math.min(monster.maxHP, monster.currentHP + heal);
+                        _egUpdateBars();
+                    });
+                }
+            }
+        });
+    });
+}
+
+function _woundedAlly(monster) {
+    const cfg = EG_MONSTER_SPELL_CONFIG;
+    let best = null;
+    let bestRatio = cfg.mendWoundedBelow;
+    (globalThis._egMonsters || []).forEach(m => {
+        if (m.isBoss || m.isSacrificialZombie || !(m.maxHP > 0) || !(m.currentHP > 0)) return;
+        const ratio = m.currentHP / m.maxHP;
+        if (ratio < bestRatio) { best = m; bestRatio = ratio; }
+    });
+    return best || (monster.currentHP < monster.maxHP * cfg.mendWoundedBelow ? monster : null);
+}
+
+function _castMend(monster) {
+    const cfg = EG_MONSTER_SPELL_CONFIG;
+    const target = _woundedAlly(monster);
+    if (!target) return;
+    _msWindup(monster, 'mend', cfg.windupMs, () => {
+        const apply = () => {
+            if (!(globalThis._egMonsters || []).some(m => m.id === target.id && m.currentHP > 0)) return;
+            const heal = Math.max(1, Math.round(target.maxHP * cfg.mendHealPct));
+            target.currentHP = Math.min(target.maxHP, target.currentHP + heal);
+            _egUpdateBars();
+            const pos = _msCentre(_msCard(target));
+            if (!pos) return;
+            let html = `<span class="ms-burst-ring"></span><span class="ms-heal-num">+${heal}</span>`;
+            for (let i = 0; i < 6; i++) {
+                html += `<span class="ms-rise" style="--dx:${(Math.random() * 56 - 28).toFixed(0)}px;animation-delay:${(i * 0.08).toFixed(2)}s">✚</span>`;
+            }
+            _msFx('heal', pos.x, pos.y, 1400, html);
+            Audio_Manager.playSFX('mana_restored_full');
+        };
+        if (target.id === monster.id) { apply(); return; }
+        const from = _msCentre(_msCard(monster));
+        const to = _msCentre(_msCard(target));
+        if (!from || !to) { apply(); return; }
+        _msProjectile('ms-orb-heal', 'ms-trail-heal', from, to, 450, 'ease-in-out', apply);
+    });
+}
+
+function _castSummon(monster) {
+    const cfg = EG_MONSTER_SPELL_CONFIG;
+    _msWindup(monster, 'summon', cfg.windupMs + 150, () => {
+        if ((globalThis._egMonsters || []).length >= EG_MAX_CONCURRENT_MONSTERS) return;
+        const pos = _msCentre(_msCard(monster));
+        if (pos) _msFx('summon', pos.x, pos.y + 40, 1200, '<span class="ms-portal"></span>');
+        monster._summonsCast = (monster._summonsCast || 0) + 1;
+        const defId = SUMMON_DEFS[Math.floor(Math.random() * SUMMON_DEFS.length)];
+        setTimeout(() => {
+            if (!_msAlive(monster)) return;
+            if ((globalThis._egMonsters || []).length >= EG_MAX_CONCURRENT_MONSTERS) return;
+            const before = new Set((globalThis._egMonsters || []).map(m => m.id));
+            _egSpawnMonster(defId, Math.max(1, (monster.level || 1) - 2));
+            (globalThis._egMonsters || []).forEach(m => { if (!before.has(m.id)) { m._summoned = true; m.noLoot = true; } });
+            _egRenderPanel();
+        }, 500);
+    });
+}
+
+const CASTERS = {
+    fire_bolt: _castFireBolt,
+    frost_nova: _castFrostNova,
+    chain_lightning: _castChainLightning,
+    soul_drain: _castSoulDrain,
+    mend: _castMend,
+    summon: _castSummon,
+};
+
+//------------------------------------------------------------------------
+//-------------------SELECTION / ENTRY POINT------------------------------
+//------------------------------------------------------------------------
+
+export function _egMonsterSpellChance(monster) {
+    const cfg = EG_MONSTER_SPELL_CONFIG;
+    const lvl = Math.min(cfg.levelCap, Math.max(1, Number(monster.level) || 1));
+    let chance = cfg.baseChance + cfg.chancePerLevel * (lvl - 1);
+    if (monster.isElite) chance *= cfg.eliteMult;
+    if (cur && cur.gauntlet) chance *= cfg.gauntletMult;
+    return Math.min(cfg.maxChance * (cur && cur.gauntlet ? cfg.gauntletMult : 1), chance);
+}
+
+function _msCanUse(id, monster) {
+    if (id === 'mend') return !!_woundedAlly(monster);
+    if (id === 'summon') {
+        if (monster._summoned) return false;                       // minions never chain-summon
+        if ((monster._summonsCast || 0) >= 1) return false;        // one summon per caster
+        return (globalThis._egMonsters || []).length < EG_MAX_CONCURRENT_MONSTERS - 1;
+    }
+    return true;
+}
+
+function _msPick(monster) {
+    const pool = (POOLS[monster.element] || POOLS.none).filter(id => _msCanUse(id, monster));
+    if (!pool.length) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// Called when a monster's charge bar fills. Returns true when a spell was
+// started (the caller must then skip the plain attack).
+export function _egMaybeCastMonsterSpell(monster) {
+    if (!monster || monster.isBoss || monster.isSacrificialZombie || !_egIsActive()) return false;
+    const now = Date.now();
+    if (monster._spellReadyAt && now < monster._spellReadyAt) return false;
+    if (Math.random() >= _egMonsterSpellChance(monster)) return false;
+    const id = _msPick(monster);
+    if (!id) return false;
+    monster._spellReadyAt = now + EG_MONSTER_SPELL_CONFIG.cooldownMs;
+    CASTERS[id](monster);
+    return true;
+}

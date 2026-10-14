@@ -143,6 +143,7 @@ function checkBossCorruptionIntercept(row, col) {
         return true;
     }
     if (typeof globalThis._egIsCellFrozen === 'function' && globalThis._egIsCellFrozen(row, col)) {
+        Audio_Manager.playSFX('grid_cell_frozen');
         globalThis.showToast(t('eg_cell_frozen'));
         return true;
     }
@@ -763,6 +764,7 @@ function checkStreakBonus() {
         const shown = previewGainSecs(bonus);
         addTimeSecs(bonus);
         if (typeof globalThis.playTimeGainEffect === 'function') globalThis.playTimeGainEffect(`+${shown}s`, '#ffb830');
+        Audio_Manager.playSFX('puzzle_streak_up');
         globalThis.showToast(`🔥 ${t('cg_streak_bonus').replace('{n}', shown)}`);
         PassiveTracker.onStreakBonusTrigger();
     }

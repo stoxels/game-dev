@@ -34,7 +34,7 @@ export function _egAddUniqueToCollection(item) {
     try {
         const nm = item.name || uid;
         globalThis.showToast(t('eg_unique_added_to_collection').replace('{name}', nm), '#f5b642');
-        if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('player_equip_pickup');
+        if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('unique_discovered', 'player_equip_pickup');
     } catch(e) {}
 }
 export function _egGetUniqueCount(uid) {

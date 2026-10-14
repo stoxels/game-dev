@@ -324,6 +324,8 @@ export function _initTimer() {
     if (ptHasSkill('keystone_dead_reckoning') && !ptHasSkill('keystone_gamblers_ruin')) {
         addTimeSecs(Math.round((globalThis.timerSecs || 0) * 0.3), { raw: true });
     }
+    // Low-time vignette thresholds are a share of this level's starting timer.
+    globalThis._lowTimeRefSecs = globalThis.timerSecs;
     // Fresh level - reset low-time center banners (keeps _lowTimeLastSecs
     // as null so the first updTimer can immediately surface the relevant
     // 300/120/30 banner if the level already starts below a threshold).

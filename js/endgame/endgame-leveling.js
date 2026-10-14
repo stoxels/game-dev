@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { setAchStat } from '../achievements/achievements.js';
 import { _resetPlayerMana, gainMana } from '../classes/class-mana.js';
 import { _incDirect } from '../inference/inference-stats.js';
@@ -468,6 +469,7 @@ export function _egAwardXP(xpGain) {
 
     const gain = Math.max(0, Math.round(Number(xpGain) || 0));
     if (gain <= 0) return 0;
+    Audio_Manager.playSFX('xp_gain');
     STATE.playerXP = _egGetPlayerXP() + gain;
 
     let levelsGained = 0;
@@ -487,6 +489,8 @@ export function _egAwardXP(xpGain) {
     if (passiveGained > 0) {
         STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + passiveGained;
         if (typeof _incDirect === 'function') try { _incDirect('lifetimePassivePointsObtained', passiveGained); } catch (e) {}
+        // Slightly after the level-up fanfare so the two don't mask each other.
+        setTimeout(() => Audio_Manager.playSFX('passive_point_gain'), 700);
     }
 
     _egSyncBaseAttributes();
@@ -688,6 +692,7 @@ export function _egPlayLevelUpReward() {
 // element removes itself after the effect finishes. Safe mid-combat (the
 // overlay ignores pointer events).
 export function _egPlayLevelUpEffect(newLevel) {
+    Audio_Manager.playSFX('level_up');
     const el = document.createElement('div');
     el.className = 'eg-levelup-fx';
     el.innerHTML = `
@@ -716,6 +721,7 @@ export function _egAllocateAttribute(attr) {
     STATE.egAttrAllocated[attr] = (STATE.egAttrAllocated[attr] || 0) + 1;
     _egSyncBaseAttributes();
     egSaveLevelingState();
+    Audio_Manager.playSFX('attribute_allocate');
 
     if (typeof showToast === 'function') {
         const name = t(EG_LEVELING_ATTRS.find(a => a.key === attr).nameKey);
@@ -777,6 +783,7 @@ export function _egRefundAttribute(attr) {
     STATE.egAttrPoints = (STATE.egAttrPoints || 0) + 1;
     _egSyncBaseAttributes();
     egSaveLevelingState();
+    Audio_Manager.playSFX('attribute_refund');
 
     if (typeof showToast === 'function') {
         const name = t(EG_LEVELING_ATTRS.find(a => a.key === attr).nameKey);

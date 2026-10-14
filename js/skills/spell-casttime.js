@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { isSkillCharmUnlocked } from './skill-charms.js';
 import { activateSkill, canAffordSkill, getSkillCooldownRemaining, getSkillDef, getSkillName, isSkillUsableNow } from './skill-registry.js';
 import { endUniversalChannel, fireUniversalChannelTick, getUniversalSpellCastKind, isUniversalMovementSpell, isUniversalSupportSpell } from './universal-spells.js';
@@ -285,6 +286,7 @@ export function tryBeginHoldCast(skillId, slotIndex, source) {
         }
     } catch (e) {}
 
+    Audio_Manager.playSFX('spell_cast_start');
     _holdCastShow(name, theme);
     _holdCastMarkSlot(skillId, true);
     _holdCast.raf = requestAnimationFrame(_holdCastTick);
@@ -314,6 +316,9 @@ function releaseHoldCast(source, slotIndex) {
 // Cancels the running hold (drag-away, death, manual cancel). Never spends.
 export function cancelHoldCast() {
     const h = _holdCast;
+    // Only an unfinished cast counts as interrupted (a channel that already
+    // fired ends normally below).
+    if (h && h.mode !== 'channel') Audio_Manager.playSFX('spell_cast_interrupt');
     _holdCast = null;
     _holdCastHide(true);
     if (h) _holdCastMarkSlot(h.skillId, false);
@@ -462,6 +467,25 @@ function _holdCastOrbEl(theme) {
     orb.className = `spell-charge-orb spell-charge-orb-${theme || 'arcane'}`;
     const color = SPELL_CAST_THEME_COLORS[theme] || SPELL_CAST_THEME_COLORS.arcane;
     orb.style.setProperty('--cast-color', color);
+    // Ice Spear condenses a real spear of ice while held (not a plain orb):
+    // the spear canvas rides the orb's own scale transform, so it grows
+    // with the charge and pops into the matching flight on release.
+    try {
+        const def = (_holdCast && _holdCast.skillId) ? getSkillDef(_holdCast.skillId) : null;
+        if (def && def.usp && def.usp.id === 'usp_ice_spear') {
+            orb.classList.add('spell-charge-spear');
+            orb.innerHTML =
+                '<div class="egp usp-charge-spear-canvas">' +
+                    '<div class="usp-p-lance-vapor"></div>' +
+                    '<div class="usp-p-lance-shaft">' +
+                        '<div class="usp-p-lance-facet"></div>' +
+                    '</div>' +
+                    '<div class="usp-p-lance-tip"></div>' +
+                    '<div class="usp-p-lance-mote usp-p-lance-mote-1"></div>' +
+                    '<div class="usp-p-lance-mote usp-p-lance-mote-2"></div>' +
+                '</div>';
+        }
+    } catch (e) { /* plain orb fallback */ }
     if (anchor) {
         orb.style.left = `${anchor.x}px`;
         orb.style.top = `${anchor.y}px`;
@@ -470,6 +494,35 @@ function _holdCastOrbEl(theme) {
         orb.style.top = '40%';
     }
     document.body.appendChild(orb);
+    // Discharge gathers an overcharge shell around the caster while held
+    // (not a ball): the aura-shell art at a fixed span, intensifying with
+    // the hold, popping with the blast on release.
+    try {
+        const def = (_holdCast && _holdCast.skillId) ? getSkillDef(_holdCast.skillId) : null;
+        if (def && def.usp && def.usp.id === 'usp_discharge') {
+            _holdCastRemoveShell();
+            const shell = document.createElement('div');
+            shell.id = 'spell-charge-shell';
+            shell.className = 'usp-aura-vortex usp-aura-discharge';
+            shell.style.width = '150px';
+            shell.style.height = '150px';
+            if (anchor) {
+                shell.style.left = `${anchor.x}px`;
+                shell.style.top = `${anchor.y}px`;
+            } else {
+                shell.style.left = '50%';
+                shell.style.top = '40%';
+            }
+            shell.innerHTML =
+                '<div class="usp-aura-floor"></div>' +
+                '<div class="usp-aura-mist"></div>' +
+                '<div class="usp-aura-ring"></div>' +
+                '<div class="usp-aura-mote usp-aura-mote-1"></div>' +
+                '<div class="usp-aura-mote usp-aura-mote-2"></div>' +
+                '<div class="usp-aura-mote usp-aura-mote-3"></div>';
+            document.body.appendChild(shell);
+        }
+    } catch (e) { /* shell is cosmetic */ }
     return orb;
 }
 
@@ -477,6 +530,14 @@ function _holdCastOrbEl(theme) {
 function _holdCastRemoveOrb() {
     try {
         const old = document.getElementById('spell-charge-orb');
+        if (old) old.remove();
+    } catch (e) { /* best-effort */ }
+}
+
+
+function _holdCastRemoveShell() {
+    try {
+        const old = document.getElementById('spell-charge-shell');
         if (old) old.remove();
     } catch (e) { /* best-effort */ }
 }
@@ -539,7 +600,22 @@ function _holdCastPaint(p, theme) {
             }
             if (orb.classList.contains('spell-charge-orb-fire')) {
                 orb.style.filter = `blur(${Math.max(0, 0.8 - p * 0.4).toFixed(2)}px) drop-shadow(0 0 ${Math.round(10 + p * 18)}px var(--cast-color))`;
+            } else if (orb.classList.contains('spell-charge-spear')) {
+                // The condensing spear sharpens and glows colder as it grows.
+                orb.style.filter = `blur(${Math.max(0, 0.6 - p * 0.4).toFixed(2)}px) drop-shadow(0 0 ${Math.round(8 + p * 20)}px rgba(179,229,252,.95))`;
             }
+        }
+        // The Discharge shell travels with the avatar and charges up with
+        // the hold (same paint loop as the orb, so they never desync).
+        const shell = document.getElementById('spell-charge-shell');
+        if (shell) {
+            const centre = _holdCastAvatarCentre();
+            if (centre) {
+                shell.style.left = `${centre.x}px`;
+                shell.style.top = `${centre.y}px`;
+            }
+            shell.style.opacity = `${(0.45 + p * 0.55).toFixed(2)}`;
+            shell.style.filter = `brightness(${(0.85 + p * 0.6).toFixed(2)}) drop-shadow(0 0 ${Math.round(6 + p * 22)}px rgba(206,147,216,.9))`;
         }
     } catch (e) { /* best-effort */ }
 }
@@ -560,6 +636,12 @@ function _holdCastHide(cancelled) {
                 orb.classList.add('is-fizzle');
                 setTimeout(() => { try { orb.remove(); } catch (e) {} }, 150);
             }
+        }
+        // The shell pops with the blast, fizzles with a cancel.
+        const shell = document.getElementById('spell-charge-shell');
+        if (shell) {
+            if (!cancelled) shell.classList.add('is-pulse');
+            setTimeout(() => { try { shell.remove(); } catch (e) {} }, cancelled ? 150 : 480);
         }
     } catch (e) { /* best-effort */ }
 }

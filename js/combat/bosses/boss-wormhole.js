@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../../audio/audio.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
 
@@ -42,6 +43,7 @@ export function _egTeleportAvatarTo(x, y) {
     const el = document.getElementById('player-avatar-wrapper')
         || document.getElementById('player-avatar-simple');
     if (!el) return;
+    Audio_Manager.playSFX('boss_teleport');
     if (typeof _setAvatarPos === 'function') {
         try { globalThis._setAvatarPos(el, Math.round(x), Math.round(y)); } catch (e) {}
     } else {

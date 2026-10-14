@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
 import { EG_RESIST_CAP_PCT } from '../combat/combat-calculations-resistances.js';
 import { EG_DEFLECT_BASE_DMG_PCT, EG_DEFLECT_BASE_PCT, EG_PARRY_BASE_PCT, _egGetDeflectChancePct, _egGetDeflectDamagePct, _egGetDualWieldParryChancePct, _egGetParryChancePct } from '../combat/encounter.js';
@@ -1809,6 +1810,9 @@ export function _egScheduleAbsorptionRegen() {
         * Math.max(0, 1 - Math.min(100, Number(stats.absorptionRegenLessPct) || 0) / 100);
 
     globalThis._egPlayerAbsorptionRegenDelayTimer = setTimeout(() => {
+        if (_egIsActive() && globalThis._egPlayerAbsorptionCurrent < _egComputePlayerStats().absorption) {
+            Audio_Manager.playSFX('absorption_regen');
+        }
         // Vital Conduit keystone: the missing Absorption at the moment the
         // recharge starts is the budget that is paid out as Life instead.
         let lifeBudget = null;

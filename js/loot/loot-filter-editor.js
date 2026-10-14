@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
 import { EG_INV_COLS, _egInventory } from '../endgame/endgame-hub.js';
 import { _egLootFilter, _egLoadLootFilter, _egSaveLootFilter, _eglfNormaliseRule, _eglfNormaliseState } from './loot-filter-state.js';
@@ -197,6 +198,7 @@ export function _eglfSaveModal() {
     _eglfWorking = null;
     _egSaveLootFilter();
     _eglfCloseModal();
+    Audio_Manager.playSFX('loot_filter_save');
     if (typeof showToast === 'function') globalThis.showToast(t('eg_loot_filter_saved'));
 }
 

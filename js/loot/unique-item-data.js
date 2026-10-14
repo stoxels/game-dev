@@ -17,6 +17,7 @@ import '../translation/translations.js';
 import './equipment-base-items.js';
 import '../endgame/endgame-hub.js';
 import './loot-implicits.js';
+import { egRequirementStatTarget, egScaleRequirements } from './equipment-base-types.js';
 import '../endgame/endgame-map-launch.js';
 
 //------------------------------------------------------------------------
@@ -6242,17 +6243,23 @@ export const EG_UNIQUE_ITEMS = [
 //-------------------UNIQUE STAT REQUIREMENT REBALANCE (2026)-------------
 //========================================================================
 // Zero-req chase uniques were free for any build - now enforce identity.
-// Progressive: armor pure 0.60@10->0.85@88, jewelry pure 0.50->0.68, hybrid 0.40->0.55 / 0.32->0.44.
-// Keeps starter uniques (minLevel <=10) untouched.
+// 2026-10: the curve now follows the passive-tree attribute supply (see
+// equipment-base-types.js) instead of the old 5-free-points-per-level
+// economy. Hand-authored literals are scaled by the same curve first, then
+// anything still below the curve is raised to it. Jewelry asks ~82% of armour
+// (pure) / 80% (hybrid), as before. Keeps starter uniques (minLevel <=10)
+// from being bumped.
 (() => {
-    const pureForArmor = (lvl) => { const t=Math.min(1,(lvl-10)/78); const f=0.60+0.25*t; return Math.round(20+(lvl-1)*5*f); };
-    const pureForJewelry = (lvl) => { const t=Math.min(1,(lvl-10)/78); const f=0.50+0.18*t; return Math.round(16+(lvl-1)*5*f); };
-    const hybridForArmor = (lvl) => { if(lvl<40) return null; return Math.round(20+(lvl-1)*2.75); };
-    const hybridForJewelry = (lvl) => { if(lvl<40) return null; return Math.round(16+(lvl-1)*2.20); };
+    const pureForArmor = (lvl) => Math.round(egRequirementStatTarget(lvl, 1));
+    const pureForJewelry = (lvl) => Math.round(16 + (egRequirementStatTarget(lvl, 1) - 20) * 0.82);
+    const hybridForArmor = (lvl) => { if(lvl<40) return null; return Math.round(egRequirementStatTarget(lvl, 2)); };
+    const hybridForJewelry = (lvl) => { if(lvl<40) return null; return Math.round(16 + (egRequirementStatTarget(lvl, 2) - 20) * 0.80); };
     const JEWELRY = new Set(['ring','earring','amulet','talisman']);
     new Set(['head','chest','pants','shoulders','cloak','bracers','gloves','boots','belt','weapon','shield','ranged','arcane']);
     for (const u of EG_UNIQUE_ITEMS) {
         const lvl = u.minLevel || 1;
+        // Authored literals were written for the old economy: scale them first.
+        if (u.requirements) egScaleRequirements(u.requirements);
         if (lvl <= 10) continue;
         const cur = u.requirements || { level: lvl, str:0, agi:0, int:0 };
         const hasStat = (cur.str||0)+(cur.agi||0)+(cur.int||0) > 0;

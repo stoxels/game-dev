@@ -1,0 +1,139 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   GAUNTLET ARENA (js/combat/gauntlet.js)
+   A large centred modal over the sealed puzzle. Monster cards render in the
+   arena's own zone (#ga-monster-zone) while it is open.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.gauntlet-arena {
+    position: fixed;
+    z-index: 40;                 /* above the puzzle grid, below the avatar (1000) */
+    box-sizing: border-box;
+    border-radius: 14px;
+    border: 2px solid #b8862b;
+    box-shadow: 0 0 0 3px rgba(20, 10, 2, 0.9), 0 0 38px rgba(255, 170, 40, 0.45), inset 0 0 60px rgba(0, 0, 0, 0.75);
+    overflow: hidden;
+    background: #0b0612;
+    animation: ga-open 0.45s ease-out;
+}
+@keyframes ga-open {
+    from { opacity: 0; transform: scale(0.94); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* The sealed grid underneath must not be reachable. */
+body.gauntlet-open #puzzle-scaler-wrap { pointer-events: none; }
+
+.ga-floor {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 50% 55%, rgba(120, 60, 160, 0.38) 0, rgba(30, 10, 50, 0.1) 55%, transparent 80%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 46px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 2px, transparent 2px 46px),
+        linear-gradient(180deg, #160a22 0%, #0b0612 100%);
+}
+.ga-header {
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+    font: 800 14px/1 system-ui, sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffd98a;
+    text-shadow: 0 0 10px rgba(255, 160, 30, 0.7);
+}
+.ga-wave, .ga-left { color: #e8dcff; font-size: 12px; text-shadow: none; }
+
+.ga-monsters {
+    position: absolute;
+    left: 0; right: 0; top: 40px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0 12px;
+    pointer-events: auto;
+}
+
+.ga-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+.ga-center.ga-intro { pointer-events: auto; background: rgba(5, 2, 10, 0.55); }
+
+.ga-card {
+    max-width: 380px;
+    padding: 18px 22px;
+    border-radius: 12px;
+    border: 1px solid #b8862b;
+    background: rgba(18, 9, 30, 0.96);
+    color: #f0e6ff;
+    text-align: center;
+    font: 500 14px/1.45 system-ui, sans-serif;
+    box-shadow: 0 0 26px rgba(255, 170, 40, 0.35);
+}
+.ga-card-title {
+    font: 900 22px/1.1 system-ui, sans-serif;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #ffd98a;
+    margin-bottom: 8px;
+}
+.ga-card p { margin: 6px 0; }
+.ga-card .ga-sub { font-size: 12px; color: #b9a8d6; }
+.ga-actions { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+.ga-btn {
+    font: 800 13px/1 system-ui, sans-serif;
+    letter-spacing: 0.1em;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid #b8862b;
+    color: #ffe9b8;
+    background: #3a2410;
+}
+.ga-btn.ga-go { background: linear-gradient(180deg, #d98a1f, #8a4d0a); color: #fff; }
+.ga-btn:hover { filter: brightness(1.2); }
+
+.ga-banner {
+    padding: 10px 26px;
+    border-radius: 10px;
+    background: rgba(8, 4, 16, 0.82);
+    border: 1px solid rgba(255, 190, 80, 0.7);
+    font: 900 26px/1.1 system-ui, sans-serif;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #ffe0a0;
+    text-shadow: 0 0 14px rgba(255, 160, 30, 0.9);
+}
+.ga-banner.ga-cleared { color: #b9ffcf; border-color: rgba(120, 255, 170, 0.7); text-shadow: 0 0 14px rgba(60, 255, 130, 0.8); }
+.ga-banner.ga-win     { color: #fff3b0; font-size: 30px; box-shadow: 0 0 40px rgba(255, 200, 60, 0.8); }
+.ga-banner.ga-lose    { color: #ffb3b3; border-color: rgba(255, 90, 90, 0.7); text-shadow: 0 0 14px rgba(255, 60, 60, 0.8); font-size: 20px; }
+.ga-flash .ga-banner { animation: ga-banner 1.3s ease-out forwards; }
+.ga-result .ga-banner { animation: ga-banner-hold 1.7s ease-out forwards; }
+@keyframes ga-banner {
+    0%   { opacity: 0; transform: scale(0.7); }
+    18%  { opacity: 1; transform: scale(1.08); }
+    75%  { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.04); }
+}
+@keyframes ga-banner-hold {
+    0%   { opacity: 0; transform: scale(0.7); }
+    20%  { opacity: 1; transform: scale(1.08); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gauntlet-arena { animation: none; }
+}

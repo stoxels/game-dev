@@ -165,7 +165,10 @@ export function _egTickPlayer() {
         if (level > (globalThis._egMeleeChargeLevel || 0)) {
             globalThis._egMeleeChargeLevel = level;
             if (typeof Audio_Manager !== 'undefined' && Audio_Manager && typeof Audio_Manager.playSFX === 'function') {
-                Audio_Manager.playSFX('drifterLevelUp');
+                // 100% = ready ping; 200%+ = overcharge tier-up. The hum
+                // loop runs while holding past full (stopped on release).
+                Audio_Manager.playSFX(level === 1 ? 'charge_ready' : 'charge_tier_up', 'drifterLevelUp');
+                if (level >= 2 && globalThis._egMeleeHoldActive) Audio_Manager.playSFX('charge_loop');
             }
         }
     } catch (e) {}

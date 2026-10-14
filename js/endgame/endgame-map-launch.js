@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { t } from '../translation/translations.js';
 import { egAtlasChainBlueprintForMap, egAtlasMakeRng } from './endgame-atlas.js';
@@ -661,6 +662,7 @@ export function _egLaunchMapFromDevice(mapItem) {
     }
 
     // Consume the map BEFORE launching so a mid-run save can't duplicate it.
+    Audio_Manager.playSFX('map_launch');
     _egActiveMapItem = mapItem;
     globalThis._egMapSlotItem = null;
     if (typeof egSaveHubState === 'function') egSaveHubState();

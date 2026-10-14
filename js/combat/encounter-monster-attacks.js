@@ -8,6 +8,7 @@
 // melee animations, polymorph routing, dodge and grounded mitigation. Player-facing
 // feedback and block-lockout presentation live in encounter-monster-attack-feedback.js.
 
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { EG_MELEE_ANIM_DURATION_MS, EG_MONSTER_PROJ_DURATION_MS } from './encounter-constants.js';
 import { _egPlayerTakeDamage } from './encounter-damage.js';
@@ -20,10 +21,12 @@ import { _egFireProjectile, _egGetElementCentre } from './combat-class-projectil
 import { _egApplyMonsterHitMods, _egRollMonsterCritMult } from '../endgame/endgame-map-launch.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
+import { _egMaybeCastMonsterSpell } from './monster-spells.js';
 
 // Flashes the monster's card to signal it is attacking.
 export function _egFlashMonsterAttackCard(monster) {
     const card = document.getElementById(`eg-card-${monster.id}`);
+    Audio_Manager.playSFX('monster_charge_windup');
     if (!card) return;
     card.classList.remove('eg-flash-attack');
     void card.offsetWidth; // force reflow so the CSS animation restarts
@@ -136,6 +139,9 @@ export function _egFireMonsterAttack(monster) {
         globalThis._egCoilCobraStrike(monster);
         return;
     }
+    // Regular monsters may cast an elemental / support spell instead of the
+    // plain melee or projectile swing (monster-spells.js; bosses excluded).
+    if (_egMaybeCastMonsterSpell(monster)) return;
     const attackType = _egResolveAttackType(monster);
     if (attackType === 'melee') {
         _egAnimateMonsterMelee(monster);
@@ -166,7 +172,9 @@ export function _egAnimateMonsterProjectile(monster) {
         ? _egGetElementCentre(document.getElementById(`eg-card-${polymorphVictim.id}`) || targetHud)
         : _egGetElementCentre(targetHud);
 
+    Audio_Manager.playSFX('monster_projectile_launch');
     _egFireProjectile(monster.emoji, 'eg-proj-monster', start, end, EG_MONSTER_PROJ_DURATION_MS, 'ease-in', () => {
+        Audio_Manager.playSFX('monster_projectile_hit');
         if (polymorphVictim) {
             // Confused attack hits the other monster - no player mitigation
             globalThis.showToast(`🌀 ${monster.name || 'The monster'} hit ${polymorphVictim.name} instead!`);
@@ -262,6 +270,7 @@ export function _egAnimateMonsterMelee(monster) {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
 
+    Audio_Manager.playSFX('monster_melee_lunge');
     // Ensure the lunging card renders on top of everything else during flight
     sourceCard.style.zIndex = '999';
 

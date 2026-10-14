@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../../audio/audio.js';
 import { _egRenderPanel } from '../encounter.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
@@ -64,6 +65,7 @@ export function _egJsHeal(amount) {
         if (globalThis.playerCurrentHP <= 0) return;
         const before = globalThis.playerCurrentHP;
         globalThis.playerCurrentHP = Math.min(globalThis.playerMaxHP, globalThis.playerCurrentHP + (globalThis._egLifeGain ? globalThis._egLifeGain(amount) : (amount)));
+        if (globalThis.playerCurrentHP !== before) Audio_Manager.playSFX('boss_heal');
         if (globalThis.playerCurrentHP !== before && typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     } catch (e) {}
 }

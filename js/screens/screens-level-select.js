@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { LANG, t } from '../translation/translations.js';
 import { initMapViewToggle, showMapView } from './screens-map-view.js';
 import { _wdCurrentWi, showWorldDetail } from './screens-world-levels.js';
@@ -45,6 +46,7 @@ const BONUS_ICONS = {
     fast: '⚡',
     noitem: '🎒',
     quiz: '🧠',
+    gauntlet: '⚔️',
     combo: '🔥',
     lowmiss: '🎯',
     noitem_nomiss: '🎒✨',
@@ -437,7 +439,11 @@ function buildLevelCardHTML({ p, li, wi, w, gi, isUnlocked, isDone, hs, isLastIn
 
 // Attaches click and tooltip mouse events to an unlocked level card.
 function attachLevelCardEvents(card, gi, isDone, isMathGated, tip) {
-    card.addEventListener('click', () => globalThis.startLevel(gi));
+    card.addEventListener('click', () => {
+        Audio_Manager.playSFX('level_enter');
+        globalThis.startLevel(gi);
+    });
+    card.addEventListener('mouseenter', () => Audio_Manager.playSFX('level_select_hover'));
 
     // Decide what tip text to show based on completion state
     const tipText = isDone ? getTooltipHint(gi)

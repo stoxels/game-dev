@@ -1,0 +1,311 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   MONSTER SPELLS (js/combat/monster-spells.js)
+   Wind-up glow, spell-name banner, element projectiles, telegraphed nova,
+   chain lightning, soul drain, mend and summon portals.
+   Element palette: fire #ff6a1a, cold #6ecbff, lightning #ffe94d,
+   shadow #a24dff, heal #5dff8a.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+    --ms-fire: #ff6a1a;
+    --ms-fire-hi: #ffd27a;
+    --ms-cold: #6ecbff;
+    --ms-cold-hi: #e9f8ff;
+    --ms-lightning: #ffe94d;
+    --ms-lightning-hi: #ffffff;
+    --ms-shadow: #a24dff;
+    --ms-shadow-lo: #1c0733;
+    --ms-heal: #5dff8a;
+    --ms-summon: #c77dff;
+}
+
+/* ── Wind-up: the casting monster's card glows in the spell's colour ───── */
+.ms-casting { position: relative; animation: ms-cast-shake 0.16s linear infinite; }
+.ms-casting::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 14px;
+    pointer-events: none;
+    animation: ms-cast-glow 0.5s ease-in-out infinite alternate;
+}
+.ms-casting.ms-el-fire::after      { box-shadow: 0 0 22px 6px var(--ms-fire),      inset 0 0 18px var(--ms-fire-hi); }
+.ms-casting.ms-el-cold::after      { box-shadow: 0 0 22px 6px var(--ms-cold),      inset 0 0 18px var(--ms-cold-hi); }
+.ms-casting.ms-el-lightning::after { box-shadow: 0 0 22px 6px var(--ms-lightning), inset 0 0 18px var(--ms-lightning-hi); }
+.ms-casting.ms-el-shadow::after    { box-shadow: 0 0 22px 6px var(--ms-shadow),    inset 0 0 18px #3a0f66; }
+.ms-casting.ms-el-heal::after      { box-shadow: 0 0 22px 6px var(--ms-heal),      inset 0 0 18px #d6ffe2; }
+.ms-casting.ms-el-summon::after    { box-shadow: 0 0 22px 6px var(--ms-summon),    inset 0 0 18px #f0d9ff; }
+@keyframes ms-cast-glow  { from { opacity: 0.45; } to { opacity: 1; } }
+@keyframes ms-cast-shake {
+    0%   { transform: translate(0, 0); }
+    25%  { transform: translate(-1.5px, 0.5px); }
+    50%  { transform: translate(1px, -1px); }
+    75%  { transform: translate(-1px, 1px); }
+    100% { transform: translate(0, 0); }
+}
+
+/* ── Spell-name banner above the caster ────────────────────────────────── */
+.ms-spell-name {
+    position: absolute;
+    left: 50%;
+    top: -6px;
+    transform: translate(-50%, 0);
+    padding: 2px 10px;
+    border-radius: 999px;
+    font: 800 12px/1.4 system-ui, sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #fff;
+    background: rgba(10, 8, 20, 0.82);
+    border: 1px solid currentColor;
+    text-shadow: 0 0 8px currentColor;
+    pointer-events: none;
+    z-index: 5;
+    animation: ms-name-rise 1.5s ease-out forwards;
+}
+.ms-spell-name.ms-el-fire      { color: var(--ms-fire-hi); }
+.ms-spell-name.ms-el-cold      { color: var(--ms-cold); }
+.ms-spell-name.ms-el-lightning { color: var(--ms-lightning); }
+.ms-spell-name.ms-el-shadow    { color: #d9b3ff; }
+.ms-spell-name.ms-el-heal      { color: var(--ms-heal); }
+.ms-spell-name.ms-el-summon    { color: var(--ms-summon); }
+@keyframes ms-name-rise {
+    0%   { opacity: 0; transform: translate(-50%, 8px) scale(0.8); }
+    15%  { opacity: 1; transform: translate(-50%, 0) scale(1.05); }
+    80%  { opacity: 1; transform: translate(-50%, -16px) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -26px) scale(1); }
+}
+
+/* ── Generic fixed-position FX holder ──────────────────────────────────── */
+.ms-fx {
+    position: fixed;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 9000;
+}
+.ms-fx > * { position: absolute; left: 0; top: 0; }
+
+/* ── Projectiles (built visuals fed to _egFireProjectile) ──────────────── */
+.eg-projectile.ms-proj { width: 0; height: 0; z-index: 9000; }
+.ms-proj .ms-orb {
+    position: absolute;
+    left: -14px;
+    top: -14px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    animation: ms-orb-pulse 0.32s ease-in-out infinite alternate;
+}
+.ms-proj .ms-trail {
+    position: absolute;
+    right: 8px;
+    top: -9px;
+    width: 64px;
+    height: 18px;
+    border-radius: 50%;
+    filter: blur(3px);
+    opacity: 0.8;
+}
+.ms-orb-fire {
+    background: radial-gradient(circle at 40% 40%, #fffbe0 0 18%, var(--ms-fire-hi) 30%, var(--ms-fire) 62%, #b3220a 100%);
+    box-shadow: 0 0 18px 6px rgba(255, 106, 26, 0.9), 0 0 36px 12px rgba(255, 60, 0, 0.45);
+}
+.ms-trail-fire   { background: linear-gradient(to left, rgba(255, 190, 80, 0.95), rgba(255, 70, 0, 0.55), transparent); }
+.ms-orb-shadow {
+    background: radial-gradient(circle at 50% 50%, #0b0214 0 28%, #4b1580 55%, var(--ms-shadow) 100%);
+    box-shadow: 0 0 18px 6px rgba(162, 77, 255, 0.85), inset 0 0 8px #000;
+}
+.ms-trail-shadow { background: linear-gradient(to left, rgba(190, 120, 255, 0.85), rgba(60, 10, 110, 0.5), transparent); }
+.ms-orb-heal {
+    background: radial-gradient(circle at 40% 40%, #fff 0 20%, #b6ffd0 40%, var(--ms-heal) 80%);
+    box-shadow: 0 0 16px 5px rgba(93, 255, 138, 0.85);
+}
+.ms-trail-heal   { background: linear-gradient(to left, rgba(150, 255, 190, 0.9), transparent); }
+@keyframes ms-orb-pulse {
+    from { transform: scale(0.85); filter: brightness(1); }
+    to   { transform: scale(1.18); filter: brightness(1.35); }
+}
+
+/* ── Impact bursts ─────────────────────────────────────────────────────── */
+.ms-burst-ring {
+    left: -10px; top: -10px;
+    width: 20px; height: 20px;
+    margin: 0;
+    border-radius: 50%;
+    border: 4px solid currentColor;
+    box-shadow: 0 0 18px currentColor, inset 0 0 12px currentColor;
+    animation: ms-ring-out 0.55s ease-out forwards;
+}
+.ms-burst-flash {
+    left: -40px; top: -40px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0, currentColor 38%, transparent 70%);
+    animation: ms-flash 0.4s ease-out forwards;
+}
+.ms-fx.ms-el-fire      { color: var(--ms-fire); }
+.ms-fx.ms-el-cold      { color: var(--ms-cold); }
+.ms-fx.ms-el-lightning { color: var(--ms-lightning); }
+.ms-fx.ms-el-shadow    { color: var(--ms-shadow); }
+.ms-fx.ms-el-heal      { color: var(--ms-heal); }
+.ms-fx.ms-el-summon    { color: var(--ms-summon); }
+@keyframes ms-ring-out { from { transform: scale(0.4); opacity: 1; } to { transform: scale(7); opacity: 0; } }
+@keyframes ms-flash    { 0% { transform: scale(0.3); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+
+/* Particles: --dx/--dy set inline from JS */
+.ms-particle {
+    left: -3px; top: -3px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+    animation: ms-particle 0.7s ease-out forwards;
+}
+.ms-particle.ms-shard {
+    width: 5px; height: 14px;
+    border-radius: 2px 2px 50% 50%;
+    background: linear-gradient(to bottom, var(--ms-cold-hi), var(--ms-cold));
+}
+@keyframes ms-particle {
+    from { transform: translate(0, 0) scale(1); opacity: 1; }
+    to   { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
+}
+
+/* ── Frost Nova: telegraphed circle on the ground at the player ────────── */
+.ms-nova-tele {
+    border-radius: 50%;
+    border: 3px dashed var(--ms-cold);
+    background: radial-gradient(circle, rgba(110, 203, 255, 0.05) 0, rgba(110, 203, 255, 0.28) 100%);
+    box-shadow: 0 0 22px rgba(110, 203, 255, 0.7), inset 0 0 22px rgba(190, 235, 255, 0.5);
+    animation: ms-nova-charge var(--ms-nova-ms, 1000ms) linear forwards;
+}
+.ms-nova-tele::after {
+    content: '❄';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 38px;
+    color: var(--ms-cold-hi);
+    text-shadow: 0 0 12px var(--ms-cold);
+    animation: ms-spin 1.6s linear infinite;
+}
+@keyframes ms-nova-charge {
+    0%   { opacity: 0.35; transform: scale(0.55); border-color: rgba(110, 203, 255, 0.5); }
+    70%  { opacity: 0.9;  transform: scale(1); }
+    100% { opacity: 1;    transform: scale(1.04); border-color: #fff; background: radial-gradient(circle, rgba(255, 255, 255, 0.35), rgba(110, 203, 255, 0.5)); }
+}
+@keyframes ms-spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+.ms-nova-blast {
+    border-radius: 50%;
+    border: 6px solid var(--ms-cold-hi);
+    box-shadow: 0 0 40px var(--ms-cold), inset 0 0 40px var(--ms-cold);
+    animation: ms-nova-blast 0.5s ease-out forwards;
+}
+@keyframes ms-nova-blast {
+    from { transform: scale(0.6); opacity: 1; background: rgba(233, 248, 255, 0.55); }
+    to   { transform: scale(1.5); opacity: 0; background: rgba(233, 248, 255, 0); }
+}
+
+/* ── Chain Lightning ───────────────────────────────────────────────────── */
+.ms-bolt {
+    position: fixed;
+    left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 9000;
+    overflow: visible;
+    animation: ms-bolt-flick 0.26s steps(3, end) forwards;
+}
+.ms-bolt polyline {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.ms-bolt .ms-bolt-glow { stroke: var(--ms-lightning); stroke-width: 9; opacity: 0.55; filter: blur(3px); }
+.ms-bolt .ms-bolt-core { stroke: #fff; stroke-width: 3; }
+@keyframes ms-bolt-flick { 0% { opacity: 1; } 50% { opacity: 0.35; } 70% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ── Soul Drain / Mend / Summon ────────────────────────────────────────── */
+.ms-vortex {
+    left: -34px; top: -34px;
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent, currentColor, transparent, currentColor, transparent);
+    mask: radial-gradient(circle, transparent 0 34%, #000 36% 70%, transparent 72%);
+    -webkit-mask: radial-gradient(circle, transparent 0 34%, #000 36% 70%, transparent 72%);
+    animation: ms-vortex 0.9s ease-out forwards;
+}
+@keyframes ms-vortex {
+    from { transform: rotate(0deg) scale(0.3); opacity: 0; }
+    30%  { opacity: 1; }
+    to   { transform: rotate(540deg) scale(1.3); opacity: 0; }
+}
+.ms-rise {
+    left: -8px; top: -8px;
+    font: 900 18px/1 system-ui, sans-serif;
+    color: var(--ms-heal);
+    text-shadow: 0 0 8px var(--ms-heal);
+    animation: ms-rise 1s ease-out forwards;
+}
+@keyframes ms-rise {
+    from { transform: translate(var(--dx, 0px), 10px) scale(0.6); opacity: 0; }
+    20%  { opacity: 1; }
+    to   { transform: translate(var(--dx, 0px), -54px) scale(1.1); opacity: 0; }
+}
+.ms-heal-num {
+    left: 0; top: 0;
+    transform: translate(-50%, -50%);
+    font: 900 22px/1 system-ui, sans-serif;
+    color: var(--ms-heal);
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.9), 0 0 10px var(--ms-heal);
+    animation: ms-heal-num 1.1s ease-out forwards;
+}
+@keyframes ms-heal-num {
+    from { transform: translate(-50%, -20%); opacity: 0; }
+    20%  { opacity: 1; }
+    to   { transform: translate(-50%, -140%); opacity: 0; }
+}
+.ms-portal {
+    left: -42px; top: -42px;
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #05010a 0 35%, var(--ms-summon) 62%, transparent 72%);
+    box-shadow: 0 0 26px var(--ms-summon);
+    animation: ms-portal 1.1s ease-in-out forwards;
+}
+@keyframes ms-portal {
+    0%   { transform: scale(0.1) rotate(0deg); opacity: 0; }
+    35%  { transform: scale(1) rotate(180deg); opacity: 1; }
+    75%  { transform: scale(1) rotate(360deg); opacity: 1; }
+    100% { transform: scale(0.2) rotate(520deg); opacity: 0; }
+}
+
+/* ── Resist feedback on the player ─────────────────────────────────────── */
+.ms-resist-tag {
+    position: absolute;
+    left: 50%;
+    top: 12%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font: 800 12px/1 system-ui, sans-serif;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: #cfe9ff;
+    background: rgba(8, 20, 40, 0.85);
+    border: 1px solid #6ea8ff;
+    pointer-events: none;
+    z-index: 6;
+    animation: ms-resist 1.2s ease-out forwards;
+}
+@keyframes ms-resist {
+    from { opacity: 0; transform: translate(-50%, 6px); }
+    15%  { opacity: 1; transform: translate(-50%, 0); }
+    to   { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ms-casting { animation: none; }
+    .ms-particle, .ms-burst-ring { animation-duration: 0.01s; }
+}

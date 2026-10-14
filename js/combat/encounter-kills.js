@@ -19,6 +19,7 @@ import { _egPlayerTakeDamage } from './encounter-damage.js';
 
 
 import { _egEndMapDefeated } from './encounter-chain.js';
+import { _egGauntletOnDefeat } from './gauntlet.js';
 import { _egFlashKillCard, _egRenderPanel } from './encounter.js';
 
 // Live binding of the current level's puzzle object (state.js exports the
@@ -98,6 +99,7 @@ export function _egKillMonster(monsterId) {
 
     globalThis._egBossCleanup(monsterId);
     _egFlashKillCard(monsterId);
+    if (dying) Audio_Manager.playSFX(dying.isBoss ? 'boss_killed' : 'monster_killed');
 
     // Dynamo conductors: beam-network sockets whose power source is gone.
     // _egRemoveConductor fires the destruction burst and lets the roaming
@@ -199,6 +201,8 @@ export function _egOnAllMonstersDead() { }
 
 // Triggers the game-over sequence when the player's HP reaches zero.
 export function _egGameOver() {
+    // Gauntlet arena: dying only forfeits the bonus (the level is already won).
+    if (_egGauntletOnDefeat()) return;
     // Campaign defeat: fall back to the normal lose overlay (retry/levels)
     // instead of the endgame map-failed screen, which routes to the Nexus.
     if (typeof _egIsCampaignRun === 'function' && _egIsCampaignRun()) {

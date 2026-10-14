@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { hideHUDTooltip } from '../classes/class-hud.js';
 import { CHARM_SLOT_COUNT, initCharmPanelInteractions, renderSpellbookCharmPanel } from './skill-charms.js';
@@ -155,6 +156,7 @@ export function openSpellbook() {
     // slot casts from while slotting charms (see setHotbarAboveModal +
     // css/skills.css).
     document.body.classList.add('spellbook-open');
+    Audio_Manager.playSFX('spellbook_open');
     // Tutorial: also lift the Professor + his pointer line above the book so
     // the assignment stays visible while dragging (css/tutorial.css).
     document.body.classList.add('tq-spellbook-open');

@@ -493,7 +493,7 @@ export function _egClockStartTimeFreezeWarn(monster, level) {
     _egNkToast('eg_mech_clock_freeze_warn',
         '🕐 The Clock: The hands are stopping - get ready!',
         EG_CLOCK_FREEZE_COLOR);
-    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('clock');
+    if (typeof Audio_Manager !== 'undefined') Audio_Manager.playSFX('boss_clock_tick', 'clock');
 
     const run = _egNkNewRun(bossId, false);
     run.onKill = _egClockClearFreezeWarn;

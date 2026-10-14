@@ -204,7 +204,7 @@ export function _egDancerArenaInit(monster) {
             _egNkFlingAvatar((dx / d) * EG_DAN_TWIRL_FLING[p], (dy / d) * EG_DAN_TWIRL_FLING[p], b.x, b.y);
             const dealt = _egNkHit(EG_DAN_TWIRL_DMG[p], 'lightning', st.level);
             _egNkAbilityHitToast(dealt, 'The Dancer', 'Twirl');
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('dancer_beat'); } catch (e) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_dancer_discoball', 'dancer_beat'); } catch (e) {}
         }
 
         // ── Spotlight steps: perpetual sequenced footprints ──
@@ -239,7 +239,7 @@ export function _egDancerArenaInit(monster) {
                 pi.t = 0;
                 pi.nextRingAt = 0;
                 pi.el.classList.add('spin');
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('dancer_beat'); } catch (e) {}
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_dancer_discoball', 'dancer_beat'); } catch (e) {}
             } else if (pi.phase === 'spin') {
                 if (pi.t >= pi.nextRingAt && pi.ringsOut < EG_DAN_PIRO_RINGS) {
                     pi.ringsOut++;
@@ -295,7 +295,7 @@ export function _egDancerTickSteps(st, dtS, c, p) {
         el.style.display = '';
         el.classList.add('on');
         seq.t = 0;
-        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('dancer_beat'); } catch (e) {}
+        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_dancer_discoball', 'dancer_beat'); } catch (e) {}
     }
     seq.t += dtS * 1000;
     if (c && Math.hypot(c.x - pt.x, c.y - pt.y) <= 55) {
@@ -351,7 +351,7 @@ export function _egDancerTickRibbons(st, dtS, pr, p) {
             rb.live = true;
             rb.el.classList.remove('warn');
             rb.el.classList.add('live');
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('dancer_beat'); } catch (e) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_dancer_discoball', 'dancer_beat'); } catch (e) {}
         }
         // Live sweep: the beam slowly rotates like a dance-floor laser.
         rb.ang += dtS * 0.55;
@@ -408,7 +408,7 @@ export function _egDancerCurtainCall(st, now) {
     }
     st.curtain = { drops, idx: 0, t: 0 };
     _egNkToast('eg_dancer_curtain', '🎭 CURTAIN CALL! The stage lights are falling!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('dancer_beat'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_dancer_discoball', 'dancer_beat'); } catch (e) {}
 }
 
 
@@ -474,7 +474,7 @@ export function _egDancerPetalStorm(st, now) {
     if (st.storm) return;
     st.storm = { wave: 0, t: 0 };
     _egNkToast('eg_dancer_storm', '🌸 PETAL STORM! The finale begins!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('dancer_beat'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_dancer_discoball', 'dancer_beat'); } catch (e) {}
 }
 
 

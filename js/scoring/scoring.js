@@ -14,6 +14,7 @@ import { isConvergenceLevel as _questIsConvergenceLevel } from './scoring-core.j
 import { Audio_Manager } from '../audio/audio.js';
 import { _egIsActive } from '../combat/combat-state.js';
 import { _egOnPuzzleComplete } from '../combat/encounter-chain.js';
+import { _egGauntletPlayable, startGauntlet } from '../combat/gauntlet.js';
 import { resetRecursionistState } from '../classes/class-recursionist.js';
 import { _arcaneFreeze_clearAllFrostAndStalagmites } from '../classes/class-mathmagician-absolute-zero.js';
 import { _endBlackSwan } from '../classes/class-outlier-black-swan.js';
@@ -151,54 +152,73 @@ function checkWin() {
     // Bonus objective
     const bonusMet = evaluateBonusObjective(elapsed);
 
-    triggerBanter('win');
+    // Everything that depends on the bonus result lives here so the
+    // gauntlet bonus (a monster arena) can run FIRST and report its result.
+    const completeWin = (bonusResult) => {
+        triggerBanter('win');
 
-    // Render the win overlay content (buildReveal() is deferred until
-    // #ov-win is actually visible - see the two branches below, and
-    // finishQuiz()/skipQuiz() in quiz.js for the quiz-bonus path)
-    renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet, isAscensionLevel, isFirstClear, isNexusPoint });
+        // Render the win overlay content (buildReveal() is deferred until
+        // #ov-win is actually visible - see the two branches below, and
+        // finishQuiz()/skipQuiz() in quiz.js for the quiz-bonus path)
+        renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet: bonusResult, isAscensionLevel, isFirstClear, isNexusPoint });
 
-    // World completion hooks - persist code unlocks immediately so they're
-    // not lost if the player closes the game before the delayed modal shows.
-    checkWorldCodesSync();
-    checkWorldCompletion();
+        // World completion hooks - persist code unlocks immediately so they're
+        // not lost if the player closes the game before the delayed modal shows.
+        checkWorldCodesSync();
+        checkWorldCompletion();
 
-    // Show the win overlay (or quiz flow if the bonus type is 'quiz')
-    if (bonusMet && cur.bonusType === 'quiz') {
-        // ov-win itself isn't shown yet here - showQuiz() opens the separate
-        // quiz-overlay first. buildReveal() runs later, in finishQuiz()/skipQuiz()
-        // in quiz.js, right when ov-win actually becomes visible.
-        setTimeout(() => showQuiz(cur.world), 1500);
-    } else {
-        setTimeout(() => {
-            document.getElementById('ov-win').classList.add('show');
-            requestAnimationFrame(() => buildReveal());
-        }, 1000);
-    }
+        // Show the win overlay (or quiz flow if the bonus type is 'quiz')
+        if (bonusResult && cur.bonusType === 'quiz') {
+            // ov-win itself isn't shown yet here - showQuiz() opens the separate
+            // quiz-overlay first. buildReveal() runs later, in finishQuiz()/skipQuiz()
+            // in quiz.js, right when ov-win actually becomes visible.
+            setTimeout(() => showQuiz(cur.world), 1500);
+        } else {
+            setTimeout(() => {
+                document.getElementById('ov-win').classList.add('show');
+                requestAnimationFrame(() => buildReveal());
+            }, 1000);
+        }
 
-    // Codes popup delayed so it feels distinct from the win overlay
-    setTimeout(() => checkWorldCodes(), 2000);
+        // Codes popup delayed so it feels distinct from the win overlay
+        setTimeout(() => checkWorldCodes(), 2000);
+
+        // Quest stats update
+        updateQuestStats('levelComplete', {
+            gi,
+            world: cur.world,
+            diff: globalThis.curDiff,
+            mods: { ...globalThis.curMods },
+            mistakeCount: globalThis.mistakeCount,
+            itemsUsed: globalThis.itemsUsedThisLevel,
+            playerClass: STATE.playerClass,
+            elapsed,
+            bonusMet: bonusResult,
+            isConvergence: checkIsConvergenceLevel(worldData, isAscensionLevel) && isFirstClear,
+            worldJustCompleted: checkWorldJustCompleted(worldData, isFirstClear),
+            worldIndex: cur.world - 1,
+            luckyDropTriggered: false,
+            timerSecsAtWin: globalThis.timerSecs,
+            isLargeAdjMatrix: checkIsLargeAdjMatrix(),
+        });
+    };
 
     Audio_Manager.playSFX('win');
 
-    // Quest stats update
-    updateQuestStats('levelComplete', {
-        gi,
-        world: cur.world,
-        diff: globalThis.curDiff,
-        mods: { ...globalThis.curMods },
-        mistakeCount: globalThis.mistakeCount,
-        itemsUsed: globalThis.itemsUsedThisLevel,
-        playerClass: STATE.playerClass,
-        elapsed,
-        bonusMet,
-        isConvergence: checkIsConvergenceLevel(worldData, isAscensionLevel) && isFirstClear,
-        worldJustCompleted: checkWorldJustCompleted(worldData, isFirstClear),
-        worldIndex: cur.world - 1,
-        luckyDropTriggered: false,
-        timerSecsAtWin: globalThis.timerSecs,
-        isLargeAdjMatrix: checkIsLargeAdjMatrix(),
-    });
+    if (cur.bonusType === 'gauntlet' && _egGauntletPlayable()) {
+        // Gauntlet bonus: the arena opens over the solved grid; the win
+        // overlay (and its rewards) follow once the arena reports back.
+        const levelAtWin = cur;
+        setTimeout(() => {
+            if (cur !== levelAtWin) return;   // player already left the level
+            startGauntlet((success) => {
+                if (cur !== levelAtWin) return;
+                completeWin(!!success);
+            });
+        }, 900);
+    } else {
+        completeWin(bonusMet);
+    }
 
     _endBlackSwan(false);
 }

@@ -1,3 +1,4 @@
+import { Audio_Manager } from './audio/audio.js';
 import { trackAchStat } from './achievements/achievements.js';
 import { areAllWorldLevelsDone, grantClassChangeToken, triggerClassEventIfPending } from './classes/class-ui.js';
 import { curMods } from './difficulty-modifiers.js';
@@ -379,6 +380,7 @@ export function _egGrantConvergenceTrialReward(wi) {
     if (isFirstClear) {
         STATE.trialsDone.push(id);
         STATE.passiveTreePoints = (STATE.passiveTreePoints || 0) + 1;
+        Audio_Manager.playSFX('passive_point_gain');
         if (typeof _incDirect === 'function') try { _incDirect('lifetimePassivePointsObtained', 1); } catch (e) {}
         // Trials are the new convergence milestones - keep the Inference
         // ledger's convergence counter moving (legacy levels no longer feed it).

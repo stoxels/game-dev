@@ -195,7 +195,7 @@ export function _egBumpSlingBall(st, b, now, tilting) {
                 sl.flashUntil = now + 260;
                 sl.el.classList.add('fired');
                 setTimeout(() => { try { sl.el.classList.remove('fired'); } catch (e) {} }, 260);
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
             }
         }
     });
@@ -325,7 +325,7 @@ export function _egBumperArenaInit(monster) {
                         _egBumpCapBallSpeed(b);
                         bp.el.classList.add('eg-nk-boom');
                         setTimeout(() => bp.el.classList.remove('eg-nk-boom'), 300);
-                        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
+                        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
                     }
                 }
             });
@@ -405,7 +405,7 @@ export function _egBumperFlipperFrenzy(st, now) {
         document.querySelectorAll('.eg-bump-sling.tilt').forEach(r => { try { r.classList.remove('tilt'); } catch (e) {} });
     }, EG_BUMP_TILT_MS + 400);
     _egNkToast('eg_bump_tilt', '⚠️ TILT! The flippers are furious - stay off the lower lanes!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
 }
 
 
@@ -432,7 +432,7 @@ export function _egBumperSpawnBand(st, slap, W, H) {
             top: Math.min(pivotY, ey) - pad, bottom: Math.max(pivotY, ey) + pad,
         }),
     });
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
 }
 
 
@@ -455,7 +455,7 @@ export function _egBumperMultiball(st, now) {
         });
     }
     _egNkToast('eg_bump_multiball', '🎯 MULTIBALL! The machine is going wild - keep moving!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
 }
 
 
@@ -480,7 +480,7 @@ export function _egBumperSlam(monster) {
     ring.style.top = c.y + 'px';
     ring.style.width = ring.style.height = (EG_BUMP_SLAM_R * 2) + 'px';
     _egNkToast('eg_bump_slam', '🎪 BUMPER SLAM! Clear the target ring!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('bump_thwack'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_push_fling', 'bump_thwack'); } catch (e) {}
     let t = 0, slammed = false;
     _egNkLoop(run, (dtS) => {
         t += dtS * 1000;

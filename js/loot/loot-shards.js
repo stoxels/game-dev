@@ -246,6 +246,7 @@ export function _egConvertShardsToOrb(shardDef) {
         description: nameKey ? t(nameKey + '_desc') : '',
     });
     const stackMax = shardDef.stackSize || EG_SHARD_STACK_MAX;
+    Audio_Manager.playSFX('shard_convert');
     globalThis.showToast(t('eg_shards_converted')
         .replace('{count}', String(stackMax))
         .replace('{shard}', shardDef.name)
@@ -303,6 +304,7 @@ export function _egSellStashItem(row, col) {
     _egClearTooltip();
     egSaveHubState();
 
+    Audio_Manager.playSFX('item_sell');
     globalThis.showToast(t('eg_sell_item_sold')
         .replace('{name}', item.name || '???')
         .replace('{icon}', shardDef.icon)
@@ -328,6 +330,7 @@ export function _egSellMapItem(map, sourceEl) {
     }
 
     _egClearTooltip();
+    Audio_Manager.playSFX('item_sell');
     globalThis.showToast(t('eg_sell_item_sold')
         .replace('{name}', map.name || '???')
         .replace('{icon}', shardDef.icon)

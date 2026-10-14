@@ -204,7 +204,7 @@ export function _egStackArenaInit(monster) {
             _egNkFlingAvatar((dx / d) * EG_STK_SLAM_FLING[p], (dy / d) * EG_STK_SLAM_FLING[p], co.x + EG_STK_CELL, co.y + EG_STK_CELL);
             const dealt = _egNkHit(EG_STK_SLAM_DMG[p], null, st.level);
             _egNkAbilityHitToast(dealt, 'The Stack', 'Stack Slam');
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('stk_thud'); } catch (e2) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'stk_thud'); } catch (e2) {}
         }
 
         // ── Soft drop cadence: warn column → piece falls → floor terrain ──
@@ -336,7 +336,7 @@ export function _egStackArenaInit(monster) {
                     const dealt = _egNkHit(r.dmg, null, st.level);
                     _egNkAbilityHitToast(dealt, 'The Stack', 'Line Clear');
                 }
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('stk_thud'); } catch (e) {}
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'stk_thud'); } catch (e) {}
             }
             if (r.t >= r.warnMs + EG_STK_LC_DET_MS) {
                 try { r.el.remove(); } catch (e) {}
@@ -490,7 +490,7 @@ export function _egStkLand(st, pc, pr, p) {
         floor.cells.push({ dx: cl.dx, dy: cl.dy, el: cell });
     });
     st.floors.push(floor);
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('stk_thud'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'stk_thud'); } catch (e) {}
 }
 
 
@@ -511,7 +511,7 @@ export function _egStkHardDrop(st, live) {
     const x = c ? Math.max(20, Math.min(W - EG_STK_CELL * 5 - 20, c.x - EG_STK_CELL * 2)) : W / 2 - EG_STK_CELL * 2;
     st.hard = { idx: 0, x, phase: 'warn', t: 0, ghost: _egStkGhost(st, x, 'I') };
     _egNkToast('eg_stk_harddrop', '🧱 HARD DROP! Giant pieces slamming your column!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('stk_thud'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'stk_thud'); } catch (e) {}
 }
 
 
@@ -522,7 +522,7 @@ export function _egStkLineClear(st, live) {
     st.lcTimer = 0;
     st.lcSpawned = 0;
     _egNkToast('eg_stk_lineclear', '✨ LINE CLEAR! Flashing rows are about to detonate!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('stk_thud'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'stk_thud'); } catch (e) {}
 }
 
 
@@ -556,7 +556,7 @@ export function _egStackGarbage(monster) {
     }
     st.garbage = { phase: 'rise', t: 0, topY: H, els, hitCd: 0 };
     _egNkToast('eg_stk_garbage', '🧱 GARBAGE RISE! Stay high - the floor is rising!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('stk_thud'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'stk_thud'); } catch (e) {}
 }
 
 

@@ -7,7 +7,7 @@ import { _applyManaCostModifiers, _bloodMagicActive, _scaleAbilityManaCost, canA
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellManaCostOverrideForSkill, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
 import { SKILL_REGISTRY } from './skill-registry.js';
-import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspBlinkFX, _uspFireThemedProjectile, _uspMoveSpriteOffset, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph } from './universal-spell-fx.js';
+import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspArrowFan, _uspAuraClear, _uspAuraPulse, _uspAuraShow, _uspBladeBlastPlant, _uspBarrierRaise, _uspBarrierStart, _uspBulwarkClear, _uspBulwarkWall, _uspWindwardClear, _uspWindwardGale, _uspAegisWardClear, _uspAegisWardHit, _uspAegisWardShow, _uspRetributionClear, _uspRetributionFlare, _uspRetributionShow, _uspWindstepClear, _uspWindstepTailwind, _uspBlinkFX, _uspRenewalBloom, _uspRenewalClear, _uspRenewalPulse, _uspMendHearts, _uspFireThemedProjectile, _uspMeleeSwing, _uspMoveSpriteOffset, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph, _uspZoneBlast, _uspZoneRain } from './universal-spell-fx.js';
 import { beginSpellTargeting, cancelSpellTargeting, getAvatarCentre, getCursorPoint, isSpellTargeting, resolveGroundShape, shapeHitsRect, showSpellZone } from './spell-casttime.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
@@ -140,6 +140,15 @@ export const UNIVERSAL_SPELL_DEFS = [
         descDE: 'Brennende Glut regnet 4 Sekunden lang auf die anvisierte Fläche und trifft jeden Gegner darin pro Sekunde.',
         sfx: 'drifterExplosion',
     },
+    {
+        id: 'usp_holy_fire', icon: '☀️', theme: 'fire', element: 'fire', damageKind: 'fire',
+        behavior: 'ticks', dmg: [6, 9], tickDmg: [2, 4], ticks: 3, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.6,
+        tags: ['Spell', 'Fire', 'Damage over Time'], scalingTags: ['spell', 'fire', 'dot'],
+        nameEn: 'Sunfire', nameDE: 'Sonnenfeuer',
+        descEn: 'Searing sunfire burns the target instantly and keeps burning for 3 more seconds.',
+        descDE: 'Versengendes Sonnenfeuer verbrennt das Ziel sofort und brennt 3 Sekunden nach.',
+        sfx: 'dofBurn',
+    },
 
     // ── FROST ───────────────────────────────────────────────────────────
     {
@@ -240,7 +249,7 @@ export const UNIVERSAL_SPELL_DEFS = [
         id: 'usp_shadow_word_pain', icon: '🖤', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
         behavior: 'ticks', dmg: [5, 6], tickDmg: [3, 5], ticks: 4, manaCost: 36, cooldownSeconds: 16, castTimeSeconds: 0.8,
         tags: ['Spell', 'Shadow', 'Damage over Time'], scalingTags: ['spell', 'shadow', 'dot'],
-        nameEn: 'Shadow Word: Pain', nameDE: 'Schattenwort: Schmerz',
+        nameEn: 'Pain', nameDE: 'Schmerz',
         descEn: 'A word of agony: instant shadow damage plus lingering pain over 4 seconds.',
         descDE: 'Ein Wort der Qual: sofortiger Schattenschaden plus 4 Sekunden Nachschmerz.',
         sfx: 'bayesTrapExplosion',
@@ -253,6 +262,15 @@ export const UNIVERSAL_SPELL_DEFS = [
         descEn: 'A cataclysmic bolt of chaos. The hardest-hitting single spell in the arsenal.',
         descDE: 'Ein katastrophaler Chaosblitz. Der härteste Einzelzauber des Arsenals.',
         sfx: 'bayesTrapExplosion',
+    },
+    {
+        id: 'usp_consecration', icon: '🕳️', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
+        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 3, hitsAll: true, manaCost: 44, cooldownSeconds: 20, castTimeSeconds: 1.0,
+        tags: ['Spell', 'Shadow', 'Area', 'Damage over Time'], scalingTags: ['spell', 'shadow', 'area', 'dot'],
+        nameEn: 'Desecration', nameDE: 'Entweihung',
+        descEn: 'Desecrates the ground for 3 seconds, consuming every enemy in shadow each second.',
+        descDE: 'Entweiht den Boden 3 Sekunden lang: Jeder Gegner wird pro Sekunde von Schatten verzehrt.',
+        sfx: 'demon_eye',
     },
 
     // ── LIGHTNING ──────────────────────────────────────────────────────────
@@ -292,34 +310,14 @@ export const UNIVERSAL_SPELL_DEFS = [
         descDE: '6 brennende Sternensplitter schlagen über einige Sekunden auf zufällige Gegner ein.',
         sfx: 'transitionMatrix',
     },
-
-    // ── HOLY ────────────────────────────────────────────────────────────
     {
-        id: 'usp_smite', icon: '🔆', theme: 'holy', element: 'fire', damageKind: 'holy',
+        id: 'usp_smite', icon: '🌦️', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
         behavior: 'single', dmg: [9, 12], manaCost: 23, cooldownSeconds: 7, castTimeSeconds: 0.5,
-        tags: ['Spell', 'Holy', 'Projectile'], scalingTags: ['spell', 'holy', 'projectile'],
-        nameEn: 'Smite', nameDE: 'Züchtigung',
-        descEn: 'A bolt of righteous light. Reliable holy damage.',
-        descDE: 'Ein Blitz gerechten Lichts. Verlässlicher Heilschaden.',
-        sfx: 'holySpell',
-    },
-    {
-        id: 'usp_holy_fire', icon: '🕊️', theme: 'holy', element: 'fire', damageKind: 'holy',
-        behavior: 'ticks', dmg: [6, 9], tickDmg: [2, 4], ticks: 3, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.6,
-        tags: ['Spell', 'Holy', 'Damage over Time'], scalingTags: ['spell', 'holy', 'dot'],
-        nameEn: 'Holy Fire', nameDE: 'Heiliges Feuer',
-        descEn: 'Sacred flames sear the target instantly and burn for 3 more seconds.',
-        descDE: 'Heilige Flammen versengen das Ziel sofort und brennen 3 Sekunden nach.',
-        sfx: 'holySpell',
-    },
-    {
-        id: 'usp_consecration', icon: '🌞', theme: 'holy', element: 'fire', damageKind: 'holy',
-        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 3, hitsAll: true, manaCost: 44, cooldownSeconds: 20, castTimeSeconds: 1.0,
-        tags: ['Spell', 'Holy', 'Area', 'Damage over Time'], scalingTags: ['spell', 'holy', 'area', 'dot'],
-        nameEn: 'Consecration', nameDE: 'Weihe',
-        descEn: 'Consecrates the ground you aim at for 3 seconds, searing every enemy standing in it each second.',
-        descDE: 'Weiht die anvisierte Fläche 3 Sekunden lang: Jeder Gegner darin wird pro Sekunde versengt.',
-        sfx: 'holyHealing',
+        tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
+        nameEn: 'Storm Smite', nameDE: 'Sturmschlag',
+        descEn: 'Calls a bolt of storm wrath down from the sky onto the target. Reliable lightning damage.',
+        descDE: 'Ruft einen Blitz des Sturmzorns vom Himmel auf das Ziel herab. Verlässlicher Blitzschaden.',
+        sfx: 'gust_thunder',
     },
 
     // ── PHYSICAL (melee strikes - thrown-blade visuals) ─────────────────
@@ -418,37 +416,37 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'fieldScan',
     },
     {
-        id: 'usp_serpent_sting', icon: '🐍', theme: 'arrow', element: 'lightning', damageKind: 'lightning',
+        id: 'usp_serpent_sting', icon: '🧪', theme: 'arrow', element: 'lightning', damageKind: 'lightning',
         behavior: 'ticks', dmg: [4, 5], tickDmg: [2, 4], ticks: 4, manaCost: 34, cooldownSeconds: 14, castTimeSeconds: 0.7,
         tags: ['Spell', 'Lightning', 'Damage over Time'], scalingTags: ['spell', 'lightning', 'dot', 'projectile'],
-        nameEn: 'Serpent Sting', nameDE: 'Schlangenbiss',
-        descEn: 'A venom-tipped arrow: instant lightning damage plus poison over 4 seconds.',
-        descDE: 'Ein vergifteter Pfeil: sofortiger Blitzschaden plus Gift über 4 Sekunden.',
+        nameEn: 'Poison Arrow', nameDE: 'Giftpfeil',
+        descEn: 'An arrow dripping with venom: instant lightning damage plus poison over 4 seconds.',
+        descDE: 'Ein vor Gift triefender Pfeil: sofortiger Blitzschaden plus Gift über 4 Sekunden.',
         sfx: 'syla_nature',
     },
     {
         id: 'usp_explosive_shot', icon: '🧨', theme: 'arrow', element: 'fire', damageKind: 'fire',
-        behavior: 'delayed', dmg: [20, 27], delayMs: 900, manaCost: 53, cooldownSeconds: 24, castTimeSeconds: 1.6,
-        tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area', 'projectile'],
+        behavior: 'single', dmg: [20, 27], manaCost: 53, cooldownSeconds: 24, castTimeSeconds: 1.6,
+        tags: ['Spell', 'Fire', 'Projectile'], scalingTags: ['spell', 'fire', 'projectile'],
         nameEn: 'Explosive Shot', nameDE: 'Explosivschuss',
-        descEn: 'Plants an explosive charge on the spot you aim at; it detonates after a short delay and hits every enemy in the blast.',
-        descDE: 'Platziert eine Sprengladung an der anvisierten Stelle; sie explodiert nach kurzer Verzögerung und trifft jeden Gegner in der Explosion.',
+        descEn: 'Looses an arrow with a bomb strapped to it; the bomb detonates on impact for massive fire damage.',
+        descDE: 'Verschießt einen Pfeil mit angeschnallter Bombe; die Bombe detoniert beim Aufschlag mit gewaltigem Feuerschaden.',
         sfx: 'drifterExplosion',
     },
 
     // ── PATH OF EXILE: FIRE ─────────────────────────────────────────────
     {
         id: 'usp_firestorm', icon: '🌋', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'starfall', dmg: [3, 5], count: 8, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
-        tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area'],
+        behavior: 'ticks', dmg: [3, 5], tickDmg: [3, 5], ticks: 5, hitsAll: true, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
+        tags: ['Spell', 'Fire', 'Area', 'Damage over Time'], scalingTags: ['spell', 'fire', 'area', 'dot'],
         nameEn: 'Firestorm', nameDE: 'Feuersturm',
-        descEn: 'A storm of 8 flaming bolts crashes onto random enemies over a few seconds.',
-        descDE: 'Ein Sturm aus 8 Flammenblitzen schlägt über einige Sekunden auf zufällige Gegner ein.',
+        descEn: 'A whirlwind of fire rages on the ground you aim at for 5 seconds, burning every enemy inside it each second.',
+        descDE: 'Ein Feuerwirbel tobt 5 Sekunden lang auf der anvisierten Fläche und verbrennt jede Sekunde jeden Gegner darin.',
         sfx: 'drifterExplosion',
     },
     {
         id: 'usp_flameblast', icon: '💣', theme: 'fire', element: 'fire', damageKind: 'fire',
-        behavior: 'delayed', dmg: [8, 11], delayMs: 1100, hitsAll: true, manaCost: 49, cooldownSeconds: 22, castTimeSeconds: 1.4,
+        behavior: 'delayed', dmg: [8, 11], delayMs: 350, hitsAll: true, manaCost: 49, cooldownSeconds: 22, castTimeSeconds: 1.4,
         tags: ['Spell', 'Fire', 'Area'], scalingTags: ['spell', 'fire', 'area'],
         nameEn: 'Flameblast', nameDE: 'Flammenexplosion',
         descEn: 'Charges a massive explosion that detonates on EVERY enemy after a delay.',
@@ -553,9 +551,9 @@ export const UNIVERSAL_SPELL_DEFS = [
         id: 'usp_orb_of_storms', icon: '🌐', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
         behavior: 'ticks', dmg: [4, 5], tickDmg: [3, 5], ticks: 3, manaCost: 36, cooldownSeconds: 16, castTimeSeconds: 0.8,
         tags: ['Spell', 'Lightning', 'Damage over Time'], scalingTags: ['spell', 'lightning', 'dot'],
-        nameEn: 'Orb of Storms', nameDE: 'Sturmkugel',
-        descEn: 'Conjures a storm orb that zaps the target instantly, then 3 more times.',
-        descDE: 'Beschwört eine Sturmkugel: sofortiger Blitz plus 3 weitere Entladungen.',
+        nameEn: 'Aura of Storm', nameDE: 'Sturmaura',
+        descEn: 'Tap to raise a storm aura around you that zaps every enemy within reach each second. Tap again to end it. Drains mana while it is active.',
+        descDE: 'Tippe, um eine Sturmaura um dich zu errichten, die jede Sekunde jeden Gegner in Reichweite trifft. Tippe erneut, um sie zu beenden. Zieht Mana ab, solange sie aktiv ist.',
         sfx: 'gust_thunder',
     },
     {
@@ -612,8 +610,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'single', dmg: [15, 19], manaCost: 42, cooldownSeconds: 16, castTimeSeconds: 1.2,
         tags: ['Spell', 'Physical', 'Projectile'], scalingTags: ['spell', 'physical', 'projectile'],
         nameEn: 'Exsanguinate', nameDE: 'Ausbluten',
-        descEn: 'Rips blood from the target in a crimson cascade. A physical SPELL, not a strike.',
-        descDE: 'Reißt das Blut kaskadenartig aus dem Ziel. Ein physischer ZAUBER, kein Hieb.',
+        descEn: 'Rips blood from whatever stands before you in melee range in a crimson cascade. A physical SPELL, not a strike - step close.',
+        descDE: 'Reißt das Blut kaskadenartig aus dem, was in Nahkampfreichweite vor dir steht. Ein physischer ZAUBER, kein Hieb - geh nah heran.',
         sfx: 'diagonalStrike',
     },
     {
@@ -639,8 +637,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'starfall', dmg: [3, 5], count: 6, manaCost: 47, cooldownSeconds: 22, castTimeSeconds: 1.2,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Bladefall', nameDE: 'Klingenfall',
-        descEn: '6 conjured blades rain from the sky onto random enemies.',
-        descDE: '6 beschworene Klingen regnen vom Himmel auf zufällige Gegner.',
+        descEn: 'Aim a square at the battlefield, then 6 conjured blades rain from the sky onto the enemies inside it.',
+        descDE: 'Ziele ein Feld auf dem Schlachtfeld an, dann regnen 6 beschworene Klingen vom Himmel auf die Gegner darin.',
         sfx: 'cleave',
     },
     {
@@ -657,8 +655,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'delayed', dmg: [19, 24], delayMs: 800, manaCost: 51, cooldownSeconds: 22, castTimeSeconds: 1.6,
         tags: ['Spell', 'Physical', 'Area'], scalingTags: ['spell', 'physical', 'area'],
         nameEn: 'Blade Blast', nameDE: 'Klingenexplosion',
-        descEn: 'Detonates a buried blade on the spot you aim at after a short delay, hitting every enemy in the square.',
-        descDE: 'Sprengt nach kurzer Verzögerung eine vergrabene Klinge an der anvisierten Stelle und trifft jeden Gegner im Feld.',
+        descEn: 'Hurls a bomb-lashed greatblade onto the spot you aim at; it sticks in the ground and detonates after a short delay, hitting every enemy in the square.',
+        descDE: 'Schleudert eine bombenbehangene Großklinge auf die anvisierte Stelle; sie bleibt stecken und detoniert nach kurzer Verzögerung, trifft jeden Gegner im Feld.',
         sfx: 'drifterExplosion',
     },
 
@@ -684,8 +682,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         healTickFlat: 6, healTickPct: 2, ticks: 6, tickMs: 1000,
         tags: ['Spell', 'Lightning', 'Support', 'Heal over Time'], scalingTags: ['spell', 'lightning', 'support', 'heal'],
         nameEn: 'Renewal', nameDE: 'Erneuerung',
-        descEn: 'Plants a renewal bloom on you that heals once per second for 6 seconds. More total Life than Mend Wounds, but it arrives slowly - cast it before the hit, not after.',
-        descDE: 'Pflanzt eine Erneuerungsblüte auf dir, die 6 Sekunden lang einmal pro Sekunde heilt. Insgesamt mehr Leben als „Wunden schließen“, aber langsam - wirke sie vor dem Treffer, nicht danach.',
+        descEn: 'Plants a living bloom on you that mends you once per second for 6 seconds. A slow, steady heal - cast it before the hit, not after.',
+        descDE: 'Pflanzt eine lebende Blüte auf dir, die dich 6 Sekunden lang einmal pro Sekunde heilt. Eine langsame, stetige Heilung - wirke sie vor dem Treffer, nicht danach.',
         sfx: 'heart_heals',
     },
     {
@@ -705,8 +703,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         armourPct: 40, armourPctPerRank: 4, armourPctCap: 76,
         tags: ['Spell', 'Holy', 'Support', 'Buff'], scalingTags: ['spell', 'holy', 'support'],
         nameEn: 'Bulwark', nameDE: 'Bollwerk',
-        descEn: 'Braces you in consecrated stone: greatly increased Armour and reduced damage taken. The classic "brace for the big hit" cooldown.',
-        descDE: 'Panzerst dich in geweihtem Stein: stark erhöhte Rüstung und reduzierter erlittener Schaden. Der klassische „jetzt kommt der große Treffer“-Cooldown.',
+        descEn: 'Raises a ring of consecrated stone that circles you for 8 seconds: greatly increased Armour and reduced damage taken. Cast it before the big hit lands.',
+        descDE: 'Erhebt einen Ring aus geweihtem Stein, der dich 8 Sekunden lang umkreist: stark erhöhte Rüstung und reduzierter erlittener Schaden. Wirke ihn, bevor der große Treffer landet.',
         sfx: 'player_shield_damage_taken',
     },
     {
@@ -841,11 +839,14 @@ const USP_INSTANT_SPELLS = [
 const USP_GROUND_SPELLS = {
     // Delayed impacts: telegraph at the spot, strike after delayMs.
     usp_meteor:         { kind: 'circle', radius: 115 },
-    usp_explosive_shot: { kind: 'circle', radius: 90 },
     usp_blade_blast:    { kind: 'square', radius: 100 },
+    // Aimed skyfall: the reticle picks the square, then the counted
+    // blades crash from above onto the enemies inside it (Bladefall).
+    usp_bladefall:      { kind: 'square', radius: 120 },
     // Fields: damage everything inside once a second while the zone lasts.
     usp_blizzard:       { kind: 'circle', radius: 150 },
     usp_rain_of_fire:   { kind: 'circle', radius: 135 },
+    usp_firestorm:       { kind: 'circle', radius: 120 },
     usp_arrow_volley:   { kind: 'square', radius: 140 },
     // Cones from the caster towards the cursor.
     usp_cone_of_cold:   { kind: 'cone', length: 420, angle: 70 },
@@ -864,6 +865,7 @@ const USP_MELEE_SPELLS = {
     usp_mortal_strike: { kind: 'cone', reach: 230, angle: 80 },
     usp_execute:       { kind: 'cone', reach: 240, angle: 60 },
     usp_rend:          { kind: 'cone', reach: 210, angle: 70 },
+    usp_exsanguinate:  { kind: 'cone', reach: 220, angle: 70 },
     usp_cleave:        { kind: 'cone', reach: 250, angle: 110, all: true },
     usp_reap:          { kind: 'cone', reach: 280, angle: 150, all: true },
     usp_whirlwind:     { kind: 'circle', reach: 230, all: true },
@@ -917,6 +919,10 @@ const USP_CHARGE_SPELLS = {
         descEn: 'Hold the button to swell a huge ball of fire and release when you are ready. Charge it for up to 150% damage, or let it go early for about 60%.',
         descDE: 'Halte die Taste, um einen riesigen Feuerball anschwellen zu lassen, und lasse los, wenn du bereit bist. Voll aufgeladen macht er bis zu 150 % Schaden, früh losgelassen etwa 60 %.',
     },
+    usp_flameblast: {
+        descEn: 'Hold the button to grow a ring of flame around EVERY enemy - the longer you hold, the wider it gets. Release and the flames erupt inward from the outer edge, detonating everything inside. A quick release does about 60% damage, a full charge 150%.',
+        descDE: 'Halte die Taste, um einen Flammenring um JEGLICHEN Gegner wachsen zu lassen - je länger, desto größer. Lass los und die Flammen schlagen vom äußeren Rand nach innen und detonieren alles darin. Schnelles Loslassen macht etwa 60 % Schaden, voll aufgeladen 150 %.',
+    },
 };
 
 // TOGGLE: tap to switch an aura on, tap again to switch it off. While it is
@@ -931,8 +937,8 @@ const USP_TOGGLE_SPELLS = {
     },
     usp_orb_of_storms: {
         radius: 190, dmg: [2, 4], manaCost: 5, cooldownSeconds: 4,
-        descEn: 'Tap to wreathe yourself in a storm orb that zaps every enemy near you once a second. Tap again to end it. Drains mana while it is active.',
-        descDE: 'Tippe, um dich mit einer Sturmkugel zu umgeben, die jede Sekunde jeden Gegner in deiner Nähe trifft. Tippe erneut, um sie zu beenden. Zieht Mana ab, solange sie aktiv ist.',
+        descEn: 'Tap to raise a storm aura around you that zaps every enemy within reach each second. Tap again to end it. Drains mana while it is active.',
+        descDE: 'Tippe, um eine Sturmaura um dich zu errichten, die jede Sekunde jeden Gegner in Reichweite trifft. Tippe erneut, um sie zu beenden. Zieht Mana ab, solange sie aktiv ist.',
     },
     usp_vortex: {
         radius: 210, dmg: [2, 4], manaCost: 5, cooldownSeconds: 4,
@@ -941,8 +947,8 @@ const USP_TOGGLE_SPELLS = {
     },
     usp_consecration: {
         radius: 220, dmg: [2, 4], manaCost: 5, cooldownSeconds: 4,
-        descEn: 'Tap to sanctify the ground around you; holy light burns every enemy nearby each second. Tap again to end it. Drains mana while it is active.',
-        descDE: 'Tippe, um den Boden um dich zu weihen; heiliges Licht verbrennt jede Sekunde jeden Gegner in der Nähe. Tippe erneut, um es zu beenden. Zieht Mana ab, solange es aktiv ist.',
+        descEn: 'Tap to desecrate the ground around you; shadow consumes every enemy nearby each second. Tap again to end it. Drains mana while it is active.',
+        descDE: 'Tippe, um den Boden um dich zu entweihen; Schatten verzehrt jede Sekunde jeden Gegner in der Nähe. Tippe erneut, um es zu beenden. Zieht Mana ab, solange es aktiv ist.',
     },
 };
 
@@ -1026,6 +1032,16 @@ UNIVERSAL_SPELL_DEFS.forEach((d) => {
         // Keeps its castTimeSeconds: that is the time to a FULL charge.
         _uspConvertSustained(d, USP_CHARGE_SPELLS[d.id], 'charge', 'Charged');
         d.charge = { minFrac: 0.2, minPower: 0.6, maxPower: 1.5 };
+        if (d.id === 'usp_flameblast') {
+            // A charged DETONATION, not a charged shot: the hold grows the
+            // ring, the release erupts it. Keeps its delayed all-enemy
+            // behavior - only the firing rhythm becomes hold-and-release.
+            // delayMs shrinks to a short detonation beat (the hold itself
+            // was the telegraph).
+            d.behavior = 'delayed';
+            d.hitsAll = true;
+            d.delayMs = 350;
+        }
     } else if (USP_MELEE_SPELLS[d.id]) {
         d.castKind = 'melee';
         d.melee = USP_MELEE_SPELLS[d.id];
@@ -1354,6 +1370,7 @@ function _uspSweepSupportBuffs() {
         if (spell) {
             _uspHealPlayer(_uspCalcHotTick(spell));
             _uspSupportPulseFX(spell);
+            try { _uspRenewalPulse(b.spellId); } catch (e) { /* bloom is cosmetic */ }
         }
         b.ticksLeft -= 1;
         b.nextTickAt = now + (b.tickMs || 1000);
@@ -1371,6 +1388,24 @@ function _uspSweepSupportBuffs() {
     if (_uspWardCharges > 0 && !_uspActiveBuffs.some((b) => b.kind === 'ward')) _uspWardCharges = 0;
 
     if (_uspActiveBuffs.length !== before) _uspForceBuffIconRefresh();
+    if (!_uspActiveBuffs.some((x) => x.kind === 'hot')) {
+        try { _uspRenewalClear(); } catch (e) { /* bloom is cosmetic */ }
+    }
+    if (!_uspActiveBuffs.some((x) => x.kind === 'guard')) {
+        try { _uspBulwarkClear(); } catch (e) { /* wall is cosmetic */ }
+    }
+    if (!_uspActiveBuffs.some((x) => x.kind === 'evade')) {
+        try { _uspWindwardClear(); } catch (e) { /* gale is cosmetic */ }
+    }
+    if (!_uspActiveBuffs.some((x) => x.kind === 'ward')) {
+        try { _uspAegisWardClear(); } catch (e) { /* lattice is cosmetic */ }
+    }
+    if (!_uspActiveBuffs.some((x) => x.kind === 'thorns')) {
+        try { _uspRetributionClear(); } catch (e) { /* wreath is cosmetic */ }
+    }
+    if (!_uspActiveBuffs.some((x) => x.kind === 'windstep')) {
+        try { _uspWindstepClear(); } catch (e) { /* tailwind is cosmetic */ }
+    }
     if (!_uspActiveBuffs.length) {
         if (_uspBuffSweepInterval) { clearInterval(_uspBuffSweepInterval); _uspBuffSweepInterval = null; }
     }
@@ -1403,6 +1438,12 @@ export function _uspClearSupportBuffs() {
     _uspWardCharges = 0;
     _uspAnchor = null;
     _uspAnchorMarkerClear();
+    try { _uspRenewalClear(); } catch (e) { /* bloom is cosmetic */ }
+    try { _uspBulwarkClear(); } catch (e) { /* wall is cosmetic */ }
+    try { _uspWindwardClear(); } catch (e) { /* gale is cosmetic */ }
+    try { _uspAegisWardClear(); } catch (e) { /* lattice is cosmetic */ }
+    try { _uspRetributionClear(); } catch (e) { /* wreath is cosmetic */ }
+    try { _uspWindstepClear(); } catch (e) { /* tailwind is cosmetic */ }
     if (_uspBuffSweepInterval) { clearInterval(_uspBuffSweepInterval); _uspBuffSweepInterval = null; }
     _uspForceBuffIconRefresh();
 }
@@ -1454,6 +1495,7 @@ export function _uspTryWardNegate(incoming) {
         return false;
     }
     _uspWardCharges -= 1;
+    try { _uspAegisWardHit(_uspWardCharges); } catch (e) { /* flash is cosmetic */ }
     const de = (typeof LANG !== 'undefined' && LANG === 'de');
     if (typeof globalThis.showToast === 'function') {
         const left = _uspWardCharges > 0 ? ` (${_uspWardCharges} ${de ? 'übrig' : 'left'})` : '';
@@ -1477,6 +1519,7 @@ export function _uspReflectThorns(attacker, incoming) {
     const dealt = Math.max(1, Math.round(incoming * pct / 100));
     try {
         globalThis._egDamageTargetById(attacker.id, dealt, {}, {});
+        try { _uspRetributionFlare(); } catch (fxe) { /* flare is cosmetic */ }
         const de = (typeof LANG !== 'undefined' && LANG === 'de');
         if (typeof globalThis.showToast === 'function') globalThis.showToast(`🔥 ${de ? 'Vergeltung' : 'Retribution'} (-${dealt})`, '#ff8a65');
     } catch (e) { /* reflection is best-effort - never break the damage path */ }
@@ -1537,6 +1580,7 @@ function _uspApplySupportSpell(spell) {
             const wanted = _uspCalcHeal(spell);
             const gained = _uspHealPlayer(wanted);
             _uspSupportCastFX(spell, `+${gained}`, gained > 0 ? 'heal' : 'wasted');
+            try { _uspMendHearts(spell); } catch (e) { /* hearts are cosmetic */ }
             if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
                 try { Audio_Manager.playSFX('heart_heals'); } catch (e) { /* best-effort */ }
             }
@@ -1553,6 +1597,7 @@ function _uspApplySupportSpell(spell) {
                 until: Date.now() + ticks * tickMs,
             });
             _uspSupportCastFX(spell, `+${_uspCalcHotTick(spell)}/s`, 'heal');
+            try { _uspRenewalBloom(spell, ticks * tickMs); } catch (e) { /* bloom is cosmetic */ }
             return `${de ? 'Heilung über' : 'healing over'} ${Math.round(ticks * tickMs / 1000)}s`;
         }
 
@@ -1569,6 +1614,7 @@ function _uspApplySupportSpell(spell) {
             const wanted = _uspCalcAbsorb(spell);
             const gained = _uspRestoreAbsorption(wanted);
             _uspSupportCastFX(spell, `+${gained}`, gained > 0 ? 'shield' : 'wasted');
+            try { if (gained > 0) _uspBarrierRaise(); } catch (e) { /* shell is cosmetic */ }
             return `${de ? 'Schild' : 'shield'} +${gained}`;
         }
 
@@ -1577,6 +1623,7 @@ function _uspApplySupportSpell(spell) {
             const armourPct = _uspCalcArmourPct(spell);
             _uspAddBuff(spell, { drPct, armourPct });
             _uspSupportCastFX(spell, `-${drPct}%`, 'buff');
+            try { _uspBulwarkWall(spell, Math.max(1, spell.buffSeconds || 8) * 1000); } catch (e) { /* wall is cosmetic */ }
             return `${de ? 'Schaden' : 'damage'} -${drPct}% ${de ? '+' : '+'}${armourPct}% ${de ? 'Rüstung' : 'Armour'}`;
         }
 
@@ -1584,6 +1631,7 @@ function _uspApplySupportSpell(spell) {
             const dodgePct = _uspCalcDodgePct(spell);
             _uspAddBuff(spell, { dodgePct });
             _uspSupportCastFX(spell, `+${dodgePct}%`, 'buff');
+            try { _uspWindwardGale(spell, Math.max(1, spell.buffSeconds || 8) * 1000); } catch (e) { /* gale is cosmetic */ }
             return `${de ? 'Ausweichen' : 'dodge'} +${dodgePct}%`;
         }
 
@@ -1592,6 +1640,7 @@ function _uspApplySupportSpell(spell) {
             _uspWardCharges = charges;
             _uspAddBuff(spell, { charges });
             _uspSupportCastFX(spell, `×${charges}`, 'buff');
+            try { _uspAegisWardShow(spell, Math.max(1, spell.buffSeconds || 12) * 1000, charges); } catch (e) { /* lattice is cosmetic */ }
             return `${de ? 'negiert' : 'negates'} ${charges} ${de ? 'Treffer' : 'hits'}`;
         }
 
@@ -1599,6 +1648,7 @@ function _uspApplySupportSpell(spell) {
             const thornsPct = _uspCalcThornsPct(spell);
             _uspAddBuff(spell, { thornsPct });
             _uspSupportCastFX(spell, `🔥${thornsPct}%`, 'buff');
+            try { _uspRetributionShow(spell, Math.max(1, spell.buffSeconds || 10) * 1000); } catch (e) { /* wreath is cosmetic */ }
             return `${de ? 'Vergeltung' : 'retribution'} ${thornsPct}%`;
         }
 
@@ -1949,6 +1999,7 @@ function _uspApplyMovementSpell(spell) {
             const pct = _uspCalcMoveSpeedPct(spell);
             _uspAddBuff(spell, { speedPct: pct });
             _uspSupportCastFX(spell, `+${pct}%`, 'buff');
+            try { _uspWindstepTailwind(spell, Math.max(1, spell.buffSeconds || 6) * 1000); } catch (e) { /* tailwind is cosmetic */ }
             return { text: `${de ? 'Tempo' : 'speed'} +${pct}% ${spell.buffSeconds}s`, flavor: 'buff' };
         }
 
@@ -2523,11 +2574,38 @@ export function getUniversalSpellDamageEstimate(spellId) {
 //------------------------------CASTING-----------------------------------
 //------------------------------------------------------------------------
 
+// Cast sound per spell: the new family sound, with the spell's old
+// placeholder (spell.sfx) as fallback until the family sound is recorded.
+function _uspCastSfxKey(spell) {
+    switch (spell.behavior) {
+        case 'heal': case 'hot': return 'spell_heal';
+        case 'shield': case 'guard': return 'spell_barrier';
+        case 'ward': case 'evade': case 'thorns': return 'spell_buff';
+        case 'blink': case 'anchor': return 'spell_blink';
+        case 'dash': case 'disengage': case 'windstep': return 'spell_dash';
+        default: break;
+    }
+    switch (spell.id) {
+        case 'usp_whirlwind': case 'usp_blade_vortex': return 'spell_whirlwind';
+        case 'usp_execute': return 'spell_execute';
+        case 'usp_explosive_shot': return 'spell_explosive_arrow';
+        case 'usp_arrow_volley': case 'usp_barrage': return 'spell_arrow_volley';
+        default: break;
+    }
+    const byTheme = {
+        arrow: 'spell_arrow_shot', blade: 'spell_blade_strike', fire: 'spell_fire_cast',
+        frost: 'spell_frost_cast', lightning: 'spell_lightning_cast', arcane: 'spell_arcane_cast',
+        shadow: 'spell_shadow_cast', holy: 'spell_holy_cast',
+    };
+    return byTheme[spell.theme] || null;
+}
+
 function _uspPlaySfx(spell) {
     try {
-        if (spell && spell.sfx && typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-            Audio_Manager.playSFX(spell.sfx);
-        }
+        if (!spell || typeof Audio_Manager === 'undefined' || !Audio_Manager.playSFX) return;
+        const key = _uspCastSfxKey(spell);
+        if (key) Audio_Manager.playSFX(key, spell.sfx);
+        else if (spell.sfx) Audio_Manager.playSFX(spell.sfx);
     } catch (e) { /* audio is best-effort */ }
 }
 
@@ -2640,6 +2718,7 @@ function _uspApplyMeleeSpell(spell) {
     const victims = () => (m.all ? inside().slice(0, 8) : pickOne(inside()));
 
     showSpellZone(shape, point, origin, spell.theme, 420, 'burst');
+    try { _uspMeleeSwing(spell, origin, aim); } catch (e) { /* swing is cosmetic */ }
     const first = victims();
     first.forEach((mon, i) => {
         setTimeout(() => {
@@ -2675,6 +2754,8 @@ function _uspApplyMeleeSpell(spell) {
 //   delayed  telegraph the spot, strike after delayMs (Meteor, Blade Blast)
 //   ticks    a lingering field: an opening hit, then one hit per second on
 //            whatever stands inside at that moment (Blizzard, Rain of Fire)
+//   starfall the counted blades crash from above onto random enemies
+//            inside the placed shape (Bladefall)
 //   other    instant blast, repeated `count` times for volley spells
 //            (beams / cones: Cone of Cold, Disintegrate, ...)
 function _uspApplyGroundSpell(spell, point) {
@@ -2696,6 +2777,12 @@ function _uspApplyGroundSpell(spell, point) {
     if (spell.behavior === 'delayed') {
         const delayMs = spell.delayMs || 900;
         showSpellZone(shape, point, origin, spell.theme, delayMs + 150, 'telegraph');
+        // Blade Blast - the delivery IS the visual: a bomb-lashed blade is
+        // hurled onto the square and sticks there, bomb ticking, until the
+        // detonation below lands.
+        if (spell.id === 'usp_blade_blast') {
+            try { _uspBladeBlastPlant(spell, origin, point, delayMs); } catch (e) { /* throw is cosmetic */ }
+        }
         setTimeout(() => {
             if (!live()) return;
             showSpellZone(shape, point, origin, spell.theme, 600, 'burst');
@@ -2709,10 +2796,26 @@ function _uspApplyGroundSpell(spell, point) {
         return;
     }
 
+    if (spell.behavior === 'starfall') {
+        const n = spell.count || 6;
+        showSpellZone(shape, point, origin, spell.theme, n * 260 + 500, 'burst');
+        for (let i = 0; i < n; i++) {
+            setTimeout(() => {
+                if (!live()) return;
+                const pool = victims();
+                if (!pool.length) return;
+                const m = pool[Math.floor(Math.random() * pool.length)];
+                _uspStrike(spell, m.id, dmg[0], dmg[1], { fromSky: true, isAoE: true });
+            }, i * 260);
+        }
+        return;
+    }
+
     if (spell.behavior === 'ticks') {
         const td = spell.tickDmg || dmg;
         const total = spell.ticks || 3;
-        showSpellZone(shape, point, origin, spell.theme, (total + 0.5) * 1000, 'zone');
+        const zoneEl = showSpellZone(shape, point, origin, spell.theme, (total + 0.5) * 1000, 'zone');
+        try { _uspZoneRain(spell, zoneEl); } catch (e) { /* weather is cosmetic */ }
         victims().forEach((m) => _uspStrike(spell, m.id, dmg[0], dmg[1], { isDot: true, isAoE: true }));
         for (let i = 0; i < total; i++) {
             setTimeout(() => {
@@ -2728,7 +2831,11 @@ function _uspApplyGroundSpell(spell, point) {
     for (let i = 0; i < pulses; i++) {
         setTimeout(() => {
             if (!live()) return;
-            showSpellZone(shape, point, origin, spell.theme, 450, 'burst');
+            const zoneEl = showSpellZone(shape, point, origin, spell.theme, 450, 'burst');
+            try { _uspZoneBlast(spell, zoneEl); } catch (e) { /* blast is cosmetic */ }
+            if (spell.id === 'usp_multi_shot') {
+                try { _uspArrowFan(spell, origin, point); } catch (e) { /* fan is cosmetic */ }
+            }
             victims().forEach((m) => _uspStrike(spell, m.id, dmg[0], dmg[1], { isAoE: true, volleyIndex: i }));
         }, i * step);
     }
@@ -2777,6 +2884,8 @@ export function isUniversalAuraActive(spellId) {
 }
 
 function _uspNoManaToast() {
+    Audio_Manager.playSFX('spell_fizzle');
+    Audio_Manager.playSFX('mana_empty');
     if (typeof globalThis.showToast !== 'function') return;
     let key = 'cls_no_mana';
     try { if (_bloodMagicActive()) key = 'cls_no_life'; } catch (e) { /* mana wording */ }
@@ -2845,6 +2954,7 @@ function _uspPulseAura(spell) {
     const origin = getAvatarCentre() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const shape = resolveGroundShape({ kind: 'circle', radius: spell.aura.radius });
     showSpellZone(shape, origin, origin, spell.theme, 450, 'burst');
+    try { _uspAuraPulse(spell.id); } catch (e) { /* flash is cosmetic */ }
     _uspLivingMonsters().filter((mon) => {
         const card = document.getElementById(`eg-card-${mon.id}`);
         if (!card) return false;
@@ -2865,6 +2975,7 @@ function _uspStopAura(spellId, withCooldown) {
     if (!a) return;
     if (a.timer) clearTimeout(a.timer);
     delete _uspAuras[spellId];
+    try { _uspAuraClear(spellId); } catch (e) { /* visual is cosmetic */ }
     if (withCooldown) startUniversalSpellCooldown(spellId);
     try { renderSkillHotbar(); } catch (e) { /* hotbar is best-effort */ }
 }
@@ -2882,6 +2993,7 @@ function _uspStartAura(spell) {
     }
     _uspAuras[spellId] = { timer: null };
     _uspSustainedCastBegan(spell);
+    try { _uspAuraShow(spell, spell.aura.radius); } catch (e) { /* visual is cosmetic */ }
     if (!_uspPulseAura(spell)) {
         _uspStopAura(spellId, false);
         return false;
@@ -2971,7 +3083,10 @@ export function castUniversalSpell(spellId, opts) {
     // then). The charge itself is spent LATER, together with the cooldown
     // start, so a refused cast (no target, no mana) spends nothing - the
     // mirror of "cost and cooldown are NOT consumed when the cast is refused".
-    if (getUniversalSpellCooldownRemaining(spellId) > 0) return false;
+    if (getUniversalSpellCooldownRemaining(spellId) > 0) {
+        Audio_Manager.playSFX('spell_fizzle');
+        return false;
+    }
 
     // Toggle auras: switch on (pays a second of mana up front, then drains).
     if (isToggle) return _uspStartAura(spell);
@@ -2980,6 +3095,8 @@ export function castUniversalSpell(spellId, opts) {
     // afford it" look, so you are not aiming a spell you cannot pay for).
     if (isGround && !groundPoint) {
         if (!canAffordUniversalSpell(spellId)) {
+            Audio_Manager.playSFX('spell_fizzle');
+            Audio_Manager.playSFX('mana_empty');
             if (typeof globalThis.showToast === 'function') {
                 let noMana = 'cls_no_mana';
                 try {
@@ -3079,7 +3196,7 @@ export function castUniversalSpell(spellId, opts) {
                     try {
                         if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                     } catch (e) { return; }
-                    _uspStrike(spell, targetId, spell.dmg[0], spell.dmg[1], { volleyIndex: i });
+                    _uspStrike(spell, targetId, spell.dmg[0], spell.dmg[1], { volleyIndex: i, volleyTotal: n });
                 }, i * step);
             }
             break;
@@ -3175,8 +3292,13 @@ export function castUniversalSpell(spellId, opts) {
         case 'delayed': {
             // Telegraph the impact zone(s), then strike hard. hitsAll spells
             // (Flameblast, Storm Call, ...) mark EVERY enemy and split the
-            // landing across all of them with nova rings.
+            // landing across all of them with nova rings. A released charge
+            // (Flameblast) scales the landing by the held power - damage and
+            // blast size both grow with the hold.
             const delayMs = spell.delayMs || 900;
+            const pw = (opts && opts.chargePower) || 1;
+            const lo = Math.max(1, Math.round(spell.dmg[0] * pw));
+            const hi = Math.max(1, Math.round(spell.dmg[1] * pw));
             try {
                 {
                     if (spell.hitsAll) {
@@ -3196,14 +3318,14 @@ export function castUniversalSpell(spellId, opts) {
                             try {
                                 if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
                             } catch (e) { return; }
-                            _uspStrike(spell, m.id, spell.dmg[0], spell.dmg[1], { fromSky: true, isAoE: true });
+                            _uspStrike(spell, m.id, lo, hi, { fromSky: true, isAoE: true, blastPower: pw, isBig: pw >= 1.3 });
                         }, i * 70);
                     });
                     return;
                 }
                 const stillAlive = _uspLivingMonsters().some((m) => m.id === targetId);
                 if (!stillAlive) return;
-                _uspStrike(spell, targetId, spell.dmg[0], spell.dmg[1], { fromSky: true, isBig: true });
+                _uspStrike(spell, targetId, lo, hi, { fromSky: true, isBig: true, blastPower: pw });
             }, delayMs);
             break;
         }

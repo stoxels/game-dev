@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import {
     _egCurrencyDefForId,
@@ -80,6 +81,7 @@ export function _egCraftingBenchApply() {
     item.name = _egBuildItemName(item.baseName || item.name, item.rarity, item.mods);
 
     _egSetCraftingBenchSelectionState(null);
+    Audio_Manager.playSFX('craft_bench_apply');
     try { trackAchStat('egBenchCrafts', 1); } catch (e) { /* never block a craft */ }
     _egRenderAll();
     egSaveHubState();

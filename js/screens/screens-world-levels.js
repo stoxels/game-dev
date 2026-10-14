@@ -62,7 +62,7 @@ const WD_WALK_REF_WIDTH = 1000;
 const WD_MOD_LABELS = { timetrial: 'TT', hardcore: 'HC', ironman: 'IM', classless: 'CL', treeless: 'TR' };
 const WD_MOD_CLASSES = { timetrial: 'tt', hardcore: 'hc', ironman: 'im', classless: 'cl', treeless: 'tl' };
 const WD_BONUS_ICONS = {
-    nomiss: '✨', fast: '⚡', noitem: '🎒', quiz: '🧠', combo: '🔥', lowmiss: '🎯',
+    nomiss: '✨', fast: '⚡', noitem: '🎒', quiz: '🧠', gauntlet: '⚔️', combo: '🔥', lowmiss: '🎯',
     noitem_nomiss: '🎒✨', noitem_fast: '🎒⚡'
 };
 const WD_DIFF_TIERS = ['easy', 'normal', 'hard'];
@@ -196,6 +196,7 @@ function _wdImgPctToCanvasPct(imgPctX, imgPctY, canvas, cfg) {
  */
 function _wdGetNodePos(cfg, nodeRef) {
     if (nodeRef === null || nodeRef === 'entrance') return cfg.entrancePos;
+    if (nodeRef === 'trial') return cfg.trialNode;
     return cfg.nodes[nodeRef];
 }
 
@@ -451,12 +452,15 @@ function _wdWaypointToSvgPoint(point, canvas, cfg, svgWidth, svgHeight) {
 /**
  * Returns true if a node has been reached by the player (entrance is always
  * reached; level nodes are reached once done or currently occupied by the sprite;
- * the 'trial' endpoint is reached once the world's Convergence Trial is done).
+ * the 'trial' endpoint is reached once the world's Convergence Trial is unlocked or done).
  */
 function _wdIsNodeReached(n, wi) {
     if (n === 'entrance') return true;
     if (n === 'trial') {
-        return (typeof globalThis._egIsTrialDone === 'function') && globalThis._egIsTrialDone(wi);
+        // Lit once the trial is unlocked (not only when cleared), so the spur
+        // reads as a real, open road to the trial node.
+        return ((typeof globalThis._egIsTrialDone === 'function') && globalThis._egIsTrialDone(wi))
+            || ((typeof globalThis._egIsTrialUnlocked === 'function') && globalThis._egIsTrialUnlocked(wi));
     }
     const gi = globalThis.WORLD_START_GI[wi] + n;
     if (STATE && STATE.done && STATE.done.includes(gi)) return true;
@@ -1079,7 +1083,7 @@ function _wdPlaceSprite(sprite, wi, levelIdx) {
     const cfg = WD_WORLD_CONFIGS[wi];
     if (!cfg || !sprite) return;
 
-    const pos = (levelIdx === null) ? cfg.entrancePos : cfg.nodes[levelIdx];
+    const pos = _wdGetNodePos(cfg, levelIdx);
     if (!pos) return;
 
     const canvas = _wdGetCanvas();
@@ -1475,14 +1479,15 @@ function _wdBuildTrialNode(wi, pos) {
 }
 
 /**
- * Handles a click on a Convergence Trial node: drops any open enter button
- * and shows the trial enter button (no sprite walk - trial nodes sit
- * outside the road graph).
+ * Handles a click on a Convergence Trial node: drops any open enter button,
+ * walks the sprite along the roads (via the spur off the 66% level) to the
+ * trial node, then shows the trial enter button on arrival - same flow as a
+ * level node.
  */
 function _wdOnTrialNodeClick(wi) {
     const existing = document.getElementById('wd-enter-btn');
     if (existing) existing.remove();
-    _wdShowTrialEnterButton(wi);
+    _wdWalkSpriteTo(wi, 'trial', () => _wdShowTrialEnterButton(wi));
 }
 
 /**

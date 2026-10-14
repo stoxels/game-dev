@@ -9,6 +9,7 @@
 // step-9/step-10 pattern.
 try { Object.defineProperty(globalThis, '_egOnCorrectCell', { get() { return _egOnCorrectCell; }, set(v) { _egOnCorrectCell = v; }, configurable: true }); } catch (e) {}
 
+import { Audio_Manager } from '../audio/audio.js';
 import { gainMana, spendMana } from '../classes/class-mana.js';
 import { t } from '../translation/translations.js';
 import { _egGetTarget, _egRollPlayerMiss, _egUpdateChargedProjectileVisual } from './encounter-charged-shot.js';
@@ -272,6 +273,7 @@ export function _egResolveProjectileImpact(damage, targetId, elements, opts) {
     // Accuracy: projectiles can miss (no snipe/splash/chain/pierce on a miss)
     // Drag-painting bonus: longer drags reduce miss chance (threshold-based)
     if (_egRollPlayerMiss(targetId, opts)) return;
+    Audio_Manager.playSFX('projectile_impact');
 
     // Passive tree: Mana on every projectile that connects (not on a miss).
     const manaOnHit = Number(_egComputePlayerStats().manaOnProjectileHitPct) || 0;

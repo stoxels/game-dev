@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { ITEM_DEFS } from '../puzzle-items/item-definitions.js';
 import { STATE } from '../state.js';
@@ -94,6 +95,26 @@ export function _discardToastEntry(entry) {
     if (idx !== -1) activeToasts.splice(idx, 1);
 }
 
+// Toast tone from its accent color: red-ish = warning, green/gold = reward,
+// anything else (or none) = neutral info. Throttled so a burst of toasts
+// (e.g. several combat messages in one tick) makes a single sound.
+let _toastSfxLastMs = 0;
+function _playToastSfx(accentColor) {
+    const nowMs = Date.now();
+    if (nowMs - _toastSfxLastMs < 300) return;
+    _toastSfxLastMs = nowMs;
+    let key = 'toast_info';
+    const m = /^#([0-9a-f]{6})$/i.exec(String(accentColor || '').trim());
+    if (m) {
+        const n = parseInt(m[1], 16);
+        const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+        if (r > 170 && g < 130 && b < 130) key = 'toast_warning';
+        else if (g > 150 && r < 190 && b < 170) key = 'toast_reward';
+        else if (r > 200 && g > 170 && b < 160) key = 'toast_reward';
+    }
+    Audio_Manager.playSFX(key);
+}
+
 // Appends a pre-built toast element to the stack: dedupes identical
 // messages, caps the visible count, and arms the fade-out timer.
 // Shared by the plain-text showToast() and the HTML showHtmlToast().
@@ -105,6 +126,7 @@ function _appendToastEl(el, key, accentColor) {
     if (dup) _discardToastEntry(dup);
 
     if (accentColor) el.style.color = accentColor;
+    _playToastSfx(accentColor);
     container.appendChild(el);
 
     const entry = { msg: key, el, removing: false, timeoutId: null };

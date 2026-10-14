@@ -267,7 +267,7 @@ export function _egCheckMapDropClaim(row, col) {
         .replace('{icon}', map.icon || '')
         .replace('{name}', map.name)
         .replace('{tier}', map.mapTier != null ? map.mapTier : '?'), _egRarityToastColor(map.rarity));
-    Audio_Manager.playSFX('player_equip_pickup');
+    Audio_Manager.playSFX('pickup_map', 'player_equip_pickup');
     egSaveHubState();
     return true;
 }

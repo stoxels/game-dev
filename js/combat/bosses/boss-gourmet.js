@@ -215,7 +215,7 @@ export function _egGourmetArenaInit(monster) {
             const dealt = _egNkHit(EG_GMT_CHOMP_DMG[p], null, st.level);
             _egNkAbilityHitToast(dealt, 'The Gourmet', 'Chomp');
             _egGmtHealBoss(live, EG_GMT_CHOMP_HEAL); // it eats you a little
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gourmet_bite'); } catch (e2) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'gourmet_bite'); } catch (e2) {}
         }
 
         // ── Aroma inhale → food spit (persistent cadence) ──
@@ -253,7 +253,7 @@ export function _egGourmetArenaInit(monster) {
                     const a = base + (k - (n - 1) / 2) * 0.26;
                     _egGmtSpitFood(st, mh.x, mh.y, Math.cos(a) * EG_GMT_FOOD_SPEED, Math.sin(a) * EG_GMT_FOOD_SPEED);
                 }
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gourmet_bite'); } catch (e) {}
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'gourmet_bite'); } catch (e) {}
             }
         }
 
@@ -318,7 +318,7 @@ export function _egGourmetArenaInit(monster) {
                 }
                 // The slammed cloche leaves a grease pool behind.
                 _egGmtDropPool(st, cl.x, cl.y, EG_GMT_CLOCHE_POOL_TTL);
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gourmet_bite'); } catch (e) {}
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'gourmet_bite'); } catch (e) {}
                 setTimeout(() => { try { el2.remove(); } catch (e) {} }, 650);
             }
             if (cl.slammed && cl.t >= EG_GMT_CLOCHE_GAP_MS) {
@@ -417,7 +417,7 @@ export function _egGourmetArenaInit(monster) {
                     } else {
                         _egNkToast('eg_gmt_escaped', '🫧 It swallowed air. You escaped the maw!', '#4ade80');
                     }
-                    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gourmet_bite'); } catch (e) {}
+                    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'gourmet_bite'); } catch (e) {}
                 }
             } else { // chomp flash, then done
                 if (dv.t >= 500) {
@@ -470,7 +470,7 @@ export function _egGourmetDinnerService(st) {
     const y = c ? c.y : window.innerHeight / 2;
     st.cloche = { idx: 0, x, y, t: 0, slammed: false, el: _egGmtWarn(st, x, y, EG_GMT_CLOCHE_R) };
     _egNkToast('eg_gmt_dinner', '🍽️ DINNER SERVICE! Three courses, plated where you stand!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gourmet_bite'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'gourmet_bite'); } catch (e) {}
 }
 
 
@@ -480,7 +480,7 @@ export function _egGourmetBanquet(st, p) {
     if (st.banquet) return;
     st.banquet = { wave: 0, t: 0 };
     _egNkToast('eg_gmt_banquet', '🍰 BANQUET TOSS! The dessert course is landing on YOU!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gourmet_bite'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'gourmet_bite'); } catch (e) {}
 }
 
 
@@ -501,7 +501,7 @@ export function _egGourmetDevour(monster) {
     const el = _egNkEl(st.run, 'div', 'eg-gmt-maw');
     st.devour = { phase: 'lock', t: 0, el };
     _egNkToast('eg_gmt_devour', '👄 DEVOUR! Fight the suction - get out of the ring!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('gourmet_bite'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'gourmet_bite'); } catch (e) {}
 }
 
 

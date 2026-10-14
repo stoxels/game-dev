@@ -9,7 +9,7 @@
 // Structure: volume/state -> SFX cache -> BGM helpers -> BGM playback ->
 // SFX playback -> volume/toggle controls -> public API object.
 
-import { BGM_TRACKS, BOSS_BGM, TUTORIAL_BGM, LEVEL_BGM, WORLD_BGM, SFX } from './audio-data.js';
+import { BGM_TRACKS, BOSS_BGM, TUTORIAL_BGM, LEVEL_BGM, WORLD_BGM, SFX, SFX_LOOPS } from './audio-data.js';
 
 
 export const Audio_Manager = (() => {
@@ -47,6 +47,10 @@ export const Audio_Manager = (() => {
     // Stores the most recently played instance of each SFX key,
     // so individual sounds can be stopped via stopSFX(key).
     const _sfxInstances = {};
+
+    // Last start time per SFX key (see the re-trigger guard in playSFX).
+    const _sfxLastPlayed = {};
+    const SFX_RETRIGGER_MS = 25;
 
     // Preloaded Audio objects, one per SFX entry (populated by preload()).
     const _sfxCache = {};
@@ -368,17 +372,41 @@ export const Audio_Manager = (() => {
     // Plays the sound effect identified by key.
     // Clones the preloaded Audio object so the same sound can overlap itself.
     // The played instance is stored in _sfxInstances so it can be stopped early.
-    function playSFX(key) {
+    //
+    // Optional fallbackKey: used when `key` has no registered file yet (new
+    // sounds that are wired in code but not recorded). The caller passes the
+    // placeholder that used to play, so behaviour is unchanged until the real
+    // file is activated (dev/tools/activate-sfx.mjs). Unknown key + no
+    // fallback is a silent no-op.
+    function playSFX(key, fallbackKey) {
         if (!sfxEnabled || focusMuted) return;
 
+        if (!SFX[key]) {
+            if (!fallbackKey || !SFX[fallbackKey]) return;
+            key = fallbackKey;
+        }
         const src = SFX[key];
         if (!src) return;
 
+        // Same-key re-trigger guard: multi-hit effects (novas, DoT ticks,
+        // volleys) would otherwise stack identical samples in one frame.
+        const nowMs = Date.now();
+        if (nowMs - (_sfxLastPlayed[key] || 0) < SFX_RETRIGGER_MS) return;
+        _sfxLastPlayed[key] = nowMs;
+
         // Use the preloaded cache entry if available, otherwise create a fresh element
+        const isLoop = SFX_LOOPS.indexOf(key) !== -1;
+        if (isLoop) {
+            // A loop already running is left alone; stopSFX(key) ends it.
+            const running = _sfxInstances[key];
+            if (running && !running.paused) return;
+        }
         const base = _sfxCache[key];
         const a = base ? base.cloneNode() : new Audio(src);
+        a.loop = isLoop;
         a.volume = SFX_VOLUME;
-        a.play().catch(() => { });
+        const p = a.play();
+        if (p && typeof p.catch === 'function') p.catch(() => { });
 
         // Keep track of the latest instance for this key so it can be cancelled
         _sfxInstances[key] = a;

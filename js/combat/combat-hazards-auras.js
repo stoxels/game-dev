@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { EG_AIL_IGNITE_DMG_SHARE, EG_AIL_MIN_DOT_DAMAGE, _egApplyPlayerAilment } from './combat-ailments-core.js';
 import {
     EG_HZ_FIREWALL_BASE_DMG_PCT, EG_HZ_FIREWALL_BOTTOM_SAFE_MAX, EG_HZ_FIREWALL_BOTTOM_SAFE_MIN,
@@ -61,6 +62,7 @@ export function _egHzActivateVolatileWisp(wisp) {
 export function _egHzDetonateVolatile(wisp) {
     const st = _egHzVolatile;
     wisp.state = 'dead';
+    Audio_Manager.playSFX('hz_volatile_detonate');
     if (wisp.el) {
         wisp.el.classList.add('eg-hz-volatile-blast');
         const el = wisp.el;
@@ -117,6 +119,7 @@ export function _egHzTickVolatile(dtMs) {
                 const dist = Math.sqrt(dx * dx + dy * dy) || 1;
                 if (_egHzCircleRectOverlap(w.x, w.y, EG_HZ_VOLATILE_TRIGGER_R, pr) || w.life <= 0) {
                     w.state = 'fuse';
+                    Audio_Manager.playSFX('hz_volatile_arm');
                     w.t = EG_HZ_VOLATILE_FUSE_MS;
                     w.el.classList.add('eg-hz-volatile-fuse');
                     return;
@@ -171,6 +174,7 @@ export function _egHzSpawnFrostNova() {
     el.style.top = y + 'px';
     _egHzLayer.appendChild(el);
 
+    Audio_Manager.playSFX('hz_frostnova_burst');
     _egHzFrostNova.novas.push({ x, y, t: EG_HZ_FROSTNOVA_EXPAND_MS, r: 0, el, hitDone: false });
 }
 
@@ -410,6 +414,7 @@ export function _egHzTickFirewall(dtMs) {
             const totalDist = Math.abs(endY - startY);
             const wallEls = _egHzCreateFirewallWallEls(variant, gapX, gapW, startY);
             const warningEls = _egHzCreateFirewallWarningEls(variant, gapX, gapW, startY);
+            Audio_Manager.playSFX('hz_firewall_warn');
             // Remove telegraph after wind-up; wall becomes visible then.
             const warnElsSnapshot = warningEls.slice();
             setTimeout(() => warnElsSnapshot.forEach(el => { try { el.remove(); } catch(e){} }), EG_HZ_FIREWALL_WARNING_MS);
@@ -445,6 +450,7 @@ export function _egHzTickFirewall(dtMs) {
         if (w.t > 0) {
             w.t -= dtMs;
             if (w.t <= 0) {
+                Audio_Manager.playSFX('hz_firewall_sweep');
                 w.wallEls.forEach(el => { el.style.display = 'block'; });
             }
             continue;

@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { _egApplyPlayerAilment } from './combat-ailments-core.js';
 import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import {
@@ -47,6 +48,7 @@ export function _egHzTickLightning(dtMs) {
         el.style.left = pos.x + 'px';
         el.style.top = pos.y + 'px';
         _egHzLayer.appendChild(el);
+        Audio_Manager.playSFX('hz_lightning_warn');
         st.pending.push({ x: pos.x, y: pos.y, t: EG_HZ_LIGHTNING_WARNING_MS, el });
     }
 
@@ -59,6 +61,7 @@ export function _egHzTickLightning(dtMs) {
 
         // Impact: bolt flash, then remove the warning ring.
         strike.el.classList.add('eg-hz-lightning-bolt');
+        Audio_Manager.playSFX('hz_lightning_strike');
         const warnEl = strike.el;
         setTimeout(() => warnEl.remove(), 350);
         st.pending.splice(i, 1);
@@ -91,6 +94,7 @@ export function _egHzInitBlizzard(intensity) {
         overlay.appendChild(flake);
     }
     _egHzLayer.appendChild(overlay);
+    Audio_Manager.playSFX('hz_blizzard_loop');
 
     const maxIcicles = Math.min(6, 3 + Math.round(intensity / 40));
     _egSetHzBlizzard({
@@ -151,6 +155,7 @@ export function _egHzTickBlizzard(dtMs) {
             ic.t -= dtMs;
             if (ic.t <= 0) {
                 ic.state = 'fall';
+                Audio_Manager.playSFX('hz_icicle_fall');
                 ic.el.classList.remove('eg-hz-icicle-shake');
                 ic.el.classList.add('eg-hz-icicle-fall');
             }
@@ -225,6 +230,7 @@ export function _egHzInitDarkness(intensity) {
         clouds.push(cloud);
     }
     document.body.appendChild(darkLayer);
+    Audio_Manager.playSFX('hz_darkness_spawn');
     _egSetHzDarkness({ clouds, layer: darkLayer, blinded: false });
 }
 
@@ -295,6 +301,7 @@ export function _egHzStartArcaneCharge() {
         orb.style.height = '90px';
     });
 
+    Audio_Manager.playSFX('hz_arcane_charge');
     _egHzArcane.charge = { y, t: chargeMs, total: chargeMs, orb, size };
 }
 
@@ -360,6 +367,7 @@ export function _egHzFireArcaneBeam() {
     const w = window.innerWidth + 80;
     const el = document.createElement('div');
     el.className = 'eg-hz-arcane-beam';
+    Audio_Manager.playSFX('hz_arcane_beam');
     el.style.width = w + 'px';
     el.style.height = EG_HZ_ARCANE_BEAM_HEIGHT + 'px';
     el.style.top = (y - EG_HZ_ARCANE_BEAM_HEIGHT / 2) + 'px';
@@ -434,6 +442,7 @@ export function _egHzTickMeteor(dtMs) {
             m.t -= dtMs;
             if (m.t <= 0) {
                 m.state = 'fall';
+                Audio_Manager.playSFX('hz_meteor_incoming');
                 // Start well above the screen, fall down onto the telegraph.
                 m.fallDist = window.innerHeight * 0.6;
                 m.y = m.ty - m.fallDist;
@@ -455,6 +464,7 @@ export function _egHzTickMeteor(dtMs) {
 
             if (m.y >= m.ty) {
                 // Impact: flash ring, remove warning + meteor.
+                Audio_Manager.playSFX('hz_meteor_impact');
                 m.fallEl.remove();
                 if (m.warnEl && m.warnEl.isConnected) {
                     m.warnEl.classList.add('eg-hz-meteor-impact');

@@ -237,6 +237,16 @@ export function _egHealUniqueItem(item) {
     if (typeof EG_UNIQUE_ITEMS !== 'undefined' && Array.isArray(EG_UNIQUE_ITEMS)) {
         def = EG_UNIQUE_ITEMS.find(u => u.uniqueId === item.baseId) || null;
     }
+    // --- requirements: re-sync attributes after a requirement rebalance ---
+    if (def && def.requirements && item.requirements) {
+        for (const k of ['str', 'agi', 'int']) {
+            const want = def.requirements[k] || 0;
+            if ((item.requirements[k] || 0) !== want) {
+                item.requirements[k] = want;
+                changed = true;
+            }
+        }
+    }
     // --- defenses ---
     let expDef = null;
     if (def && def.defenses) expDef = def.defenses;

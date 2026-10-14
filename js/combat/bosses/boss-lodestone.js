@@ -188,7 +188,7 @@ export function _egLodestoneArenaInit(monster) {
             _egNkFlingAvatar((dx / d) * EG_LDS_CLAMP_FLING[p], (dy / d) * EG_LDS_CLAMP_FLING[p], sn.x, sn.y);
             const dealt = _egNkHit(EG_LDS_CLAMP_DMG[p], 'lightning', st.level);
             _egNkAbilityHitToast(dealt, 'The Lodestone', 'Magnetic Clamp');
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e2) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e2) {}
         }
 
         // ── Polarity cycle: attraction between flips, pulse on flip ──
@@ -207,7 +207,7 @@ export function _egLodestoneArenaInit(monster) {
                 _egLdsPulseRing(st, sn.x, sn.y);
             }
             _egNkToast('eg_lds_flip', st.polarity === 'N' ? '🧲 POLARITY FLIP - N! Repulsion pulse!' : '🧲 POLARITY FLIP - S! Repulsion pulse!');
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
         } else if (!vortexing && !st.leash && c) {
             // Gentle attraction toward the stone between flips.
             const dx = sn.x - c.x, dy = sn.y - c.y;
@@ -301,7 +301,7 @@ export function _egLodestoneArenaInit(monster) {
             const sel = _egNkEl(st.run, 'div', 'eg-lds-slug', '⚡');
             st.slugs.push({ horiz: rw.horiz, pos: rw.pos, x: rw.horiz ? -30 : rw.pos, y: rw.horiz ? rw.pos : -30,
                 vx: rw.horiz ? EG_LDS_RAIL_SLUG_SPEED : 0, vy: rw.horiz ? 0 : EG_LDS_RAIL_SLUG_SPEED, t: 0, hit: false, el: sel });
-            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
+            try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
         }
         // Slugs travel down their lanes.
         for (let i = st.slugs.length - 1; i >= 0; i--) {
@@ -356,7 +356,7 @@ export function _egLodestoneArenaInit(monster) {
                         const chEl = _egNkEl(st.run, 'div', 'eg-lds-chain', '🔗');
                         ls.chainEl = chEl;
                         _egNkToast('eg_lds_leash', '🔗 MAGNETIC LEASH! Fight the reel-in!');
-                        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
+                        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
                     } else {
                         // Missed: the chain sticks harmlessly.
                         _egNkToast('eg_lds_miss', '💨 The chain snaps past you.', '#93c5fd');
@@ -393,7 +393,7 @@ export function _egLodestoneArenaInit(monster) {
                     }
                     try { if (ls.chainEl) ls.chainEl.remove(); } catch (e) {}
                     st.leash = null;
-                    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
+                    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
                 }
             }
         }
@@ -444,7 +444,7 @@ export function _egLdsVortex(st) {
     const el = _egNkEl(st.run, 'div', 'eg-lds-vortex');
     st.vortex = { t: 0, el, grindAcc: 0 };
     _egNkToast('eg_lds_vortex', '🌀 MAGNETIC VORTEX! Fight the pull - the stone grinds!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
 }
 
 
@@ -454,7 +454,7 @@ export function _egLdsRailgun(st, live) {
     st.railgun = { fired: 0 };
     st.railTimer = 0;
     _egNkToast('eg_lds_railgun', '⚡ RAILGUN! Clear the magnetic rails!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
 }
 
 
@@ -484,7 +484,7 @@ export function _egLodestoneLeash(monster) {
     _egLdsPlaceLine(warnEl, st.stone.x, st.stone.y, c.x, c.y);
     st.leash = { phase: 'warn', t: 0, px: c.x, py: c.y, locked: false, warnEl, chainEl: null };
     _egNkToast('eg_lds_leash_warn', '🔗 The Lodestone coils a chain - dodge the line!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('lds_snap'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_pull', 'lds_snap'); } catch (e) {}
 }
 
 

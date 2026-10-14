@@ -41,12 +41,21 @@ export function switchScreen(id) {
 // add 'show' directly), this hook stays for the showModal-based paths.
 export function showModal(id) {
     if (id === 'ov-win' || id === 'ov-lose') closeInventoryFlyout();
-    document.getElementById(id).classList.add('show');
+    const modalEl = document.getElementById(id);
+    // Win/lose overlays have their own stings; only fresh opens make a sound.
+    if (id !== 'ov-win' && id !== 'ov-lose' && !modalEl.classList.contains('show')) {
+        Audio_Manager.playSFX('modal_open');
+    }
+    modalEl.classList.add('show');
 }
 
 // Hides a modal overlay by its element ID
 export function hideModal(id) {
-    document.getElementById(id).classList.remove('show');
+    const modalEl = document.getElementById(id);
+    if (id !== 'ov-win' && id !== 'ov-lose' && modalEl.classList.contains('show')) {
+        Audio_Manager.playSFX('modal_close');
+    }
+    modalEl.classList.remove('show');
 }
 
 

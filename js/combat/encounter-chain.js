@@ -628,6 +628,7 @@ export function _egEnterBossArena() {
     const availBanner = document.getElementById('eg-boss-arena-available-banner');
     if (availBanner) availBanner.remove();
 
+    Audio_Manager.playSFX('boss_arena_enter');
     globalThis.showToast(t('eg_boss_arena_entered'), '#f5d98a');
     _egUpdateObjectivesHUD();
 
@@ -1007,6 +1008,7 @@ export function _egGrantMapCompletionReward() {
         count: reward.count,
     });
 
+    Audio_Manager.playSFX('map_reward');
     globalThis.showToast(t('eg_map_reward_granted')
         .replace('{icon}', def.icon || '💰')
         .replace('{n}', reward.count)
@@ -1318,6 +1320,7 @@ export function _egUpdateObjectivesHUD() {
     if (canLeave && !_egMapClearedShown) {
         _egMapClearedShown = true;
         _egShowMapClearedBanner();
+        Audio_Manager.playSFX('map_complete');
         globalThis.showToast(t('eg_map_cleared_toast'), '#4ade80');
     }
 

@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { _abilityHotkeysBlocked, _formatCooldown, _isModalOpen } from '../classes/class-cooldown-state.js';
 import { hideHUDTooltip } from '../classes/class-hud.js';
 import { SKILL_HOTBAR_COLS, SKILL_HOTBAR_SIZE, activateHotbarSlot, canAffordSkill, getHotbarSkill, getSkillCooldownRemaining, getSkillDef, getSkillImage, getSkillName, isSkillUsableNow } from './skill-registry.js';
@@ -321,6 +322,7 @@ export function patchHotbarSlotCooldown(skillId) {
         cdEl.textContent = _formatHotbarCooldown(cdRemaining);
     } else if (cdEl) {
         cdEl.remove();
+        Audio_Manager.playSFX('spell_cooldown_ready');
     }
 }
 

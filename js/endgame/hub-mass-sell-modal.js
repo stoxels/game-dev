@@ -393,7 +393,7 @@ export function _egExecuteMassSell() {
         _egClearTooltip();
         egSaveHubState();
         if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) {
-            try { Audio_Manager.playSFX('player_equip_pickup'); } catch (e) {}
+            try { Audio_Manager.playSFX('mass_sell_confirm', 'player_equip_pickup'); } catch (e) {}
         }
         if (typeof showToast === 'function') {
             if (failed > 0) {

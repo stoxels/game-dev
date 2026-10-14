@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { save, STATE, cur } from '../state.js';
 import { t } from '../translation/translations.js';
 import { _incDirect, questStat_luckyDropClaimed } from '../inference/inference-stats.js';
@@ -338,6 +339,8 @@ function renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNe
 export function renderWinOverlay({ gi, pts, ptsAwarded, prevBest, mult, elapsed, bonusMet, isAscensionLevel, isFirstClear, isNexusPoint }) {
     document.getElementById('ov-reveal-quote').innerHTML = `"${lvText(cur, 'reveal')}"`;
     buildScoreColumn(pts, ptsAwarded, prevBest, mult);
+    // Beating an existing personal best (a first clear has no prior score).
+    if (ptsAwarded > 0 && Number(prevBest) > 0) Audio_Manager.playSFX('new_highscore');
     buildTimeColumn(elapsed);
     renderBonusBadge(bonusMet);
     renderItemRewardZone(gi, bonusMet, isFirstClear, isAscensionLevel, isNexusPoint);

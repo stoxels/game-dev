@@ -2404,14 +2404,6 @@ const TQ_FIREBALL_ID = 'usp_fireball';
         globalThis.ensureSkillHotbar = function () {
             const r = _orig();
             if (typeof STATE === 'undefined' || !STATE || !Array.isArray(STATE.skillHotbar)) return r;
-            // A classless tutorial player must not see Heartbloom (endgame-
-            // only) auto-seeded onto the bar - it renders locked and clutters
-            // exactly the slot the Fireball lesson invites the drop into. It
-            // comes back legitimately once a class is chosen.
-            if (!STATE.playerClass) {
-                const hb = STATE.skillHotbar.indexOf('heartbloom');
-                if (hb !== -1) STATE.skillHotbar[hb] = null;
-            }
             // The Fireball self-slot lesson only runs inside the tutorial:
             // outside it a classless campaign character may legitimately keep
             // Fireball on the bar (universal charm play), so never strip it
@@ -2419,6 +2411,16 @@ const TQ_FIREBALL_ID = 'usp_fireball';
             try {
                 if ((typeof _tqIsTutorialActive === 'function') && !_tqIsTutorialActive()) return r;
             } catch (e) { return r; }
+            // A classless TUTORIAL player must not see Heartbloom (endgame-
+            // only) auto-seeded onto the bar - it renders locked and clutters
+            // exactly the slot the Fireball lesson invites the drop into. It
+            // comes back legitimately once a class is chosen. Tutorial-only: a
+            // classless campaign character who slots the Heartbloom charm must
+            // keep it on the bar (this strip used to run everywhere and ate it).
+            if (!STATE.playerClass) {
+                const hb = STATE.skillHotbar.indexOf('heartbloom');
+                if (hb !== -1) STATE.skillHotbar[hb] = null;
+            }
             // Since the hotbar mirrors charm slots 1:1, Fireball appears only
             // once its charm is slotted. The auto-seeder must not pre-place
             // it - but the player's OWN slotting (right-click quick-slot or

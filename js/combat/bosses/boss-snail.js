@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../../audio/audio.js';
 import { t } from '../../translation/translations.js';
 import { _egRenderPanel } from '../encounter.js';
 import { _egHzGridRect } from '../combat-hazards.js';
@@ -140,6 +141,7 @@ export function _egSnailSlimeCell(r, c) {
     ov.appendChild(fill);
     cell.appendChild(ov);
     _egSnailSlimed.set(key, { el: ov, fill, r, c });
+    Audio_Manager.playSFX('boss_snail_slime');
 }
 
 

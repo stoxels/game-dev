@@ -25995,8 +25995,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41103,
-   "x": 3985,
-   "y": 2550,
+   "x": 4046,
+   "y": 2537,
    "nameEn": "Coding Theory",
    "nameDe": "Kodierungstheorie",
    "descEn": "Every 20th correct fill reveals one cell.",
@@ -26281,8 +26281,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41125,
-   "x": 229,
-   "y": -3899,
+   "x": 208,
+   "y": -3439,
    "nameEn": "Shadow Seal",
    "nameDe": "Schattensiegel",
    "icon": "",
@@ -26541,8 +26541,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41145,
-   "x": 3777,
-   "y": 3407,
+   "x": 1881,
+   "y": 1987,
    "nameEn": "The Witch",
    "nameDe": "Die Hexe",
    "icon": "",
@@ -26554,8 +26554,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41146,
-   "x": -3526,
-   "y": 2462,
+   "x": -3587,
+   "y": 2002,
    "nameEn": "Gambler's Ruin",
    "nameDe": "Ruin des Spielers",
    "icon": "",
@@ -26567,8 +26567,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41147,
-   "x": -1963,
-   "y": 3104,
+   "x": -1760,
+   "y": 2780,
    "nameEn": "Scholar's Debt",
    "nameDe": "Gelehrten-Schuld",
    "icon": "",
@@ -26580,8 +26580,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41148,
-   "x": -3691,
-   "y": -579,
+   "x": -3638,
+   "y": -884,
    "nameEn": "Martingale",
    "nameDe": "Martingal",
    "icon": "",
@@ -26593,8 +26593,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41149,
-   "x": -3293,
-   "y": 4087,
+   "x": 121,
+   "y": 4154,
    "nameEn": "Zero Variance",
    "nameDe": "Nullvarianz",
    "icon": "",
@@ -26606,8 +26606,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41150,
-   "x": -5187,
-   "y": 855,
+   "x": -4679,
+   "y": 1002,
    "nameEn": "Perpetual Frost",
    "nameDe": "Ewiger Frost",
    "icon": "",
@@ -26619,8 +26619,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41151,
-   "x": -1338,
-   "y": 2302,
+   "x": -1410,
+   "y": 2115,
    "nameEn": "Overfitting",
    "nameDe": "Überanpassung",
    "icon": "",
@@ -26645,8 +26645,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41153,
-   "x": -1878,
-   "y": -1192,
+   "x": -1614,
+   "y": -1203,
    "nameEn": "Iron Doctrine",
    "nameDe": "Eiserne Doktrin",
    "icon": "",
@@ -26658,8 +26658,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41154,
-   "x": -1460,
-   "y": 1177,
+   "x": -2826,
+   "y": 1958,
    "nameEn": "Countdown Crisis",
    "nameDe": "Countdown-Krise",
    "icon": "",
@@ -26671,8 +26671,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41155,
-   "x": -5081,
-   "y": 1647,
+   "x": -3434,
+   "y": 1430,
    "nameEn": "Veil of Purity",
    "nameDe": "Schleier der Reinheit",
    "icon": "",
@@ -26684,8 +26684,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41156,
-   "x": -2432,
-   "y": -45,
+   "x": -885,
+   "y": -3423,
    "nameEn": "Thin Margin",
    "nameDe": "Schmaler Grat",
    "icon": "",
@@ -26714,8 +26714,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41158,
-   "x": -2968,
-   "y": -4461,
+   "x": -2634,
+   "y": -4413,
    "nameEn": "Sparse Prior",
    "nameDe": "Schwacher Prior",
    "icon": "",
@@ -26727,8 +26727,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41159,
-   "x": -4137,
-   "y": -3637,
+   "x": -3645,
+   "y": -3220,
    "nameEn": "Cartographer's Oath",
    "nameDe": "Eid des Kartographen",
    "icon": "",
@@ -26740,8 +26740,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41160,
-   "x": 4340,
-   "y": -3283,
+   "x": 1954,
+   "y": -2029,
    "nameEn": "Kolmogorov Complexity",
    "nameDe": "Kolmogorow-Komplexität",
    "icon": "",
@@ -26753,8 +26753,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41161,
-   "x": 1167,
-   "y": -2838,
+   "x": 1204,
+   "y": -2640,
    "nameEn": "Uniform Prior",
    "nameDe": "Uniformer Prior",
    "icon": "",
@@ -26766,8 +26766,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41162,
-   "x": -2295,
-   "y": -2518,
+   "x": -1870,
+   "y": -2130,
    "nameEn": "Nightfall Protocol",
    "nameDe": "Nachtprotokoll",
    "icon": "",
@@ -26779,8 +26779,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41163,
-   "x": 2571,
-   "y": -2438,
+   "x": 2432,
+   "y": -1825,
    "nameEn": "Dead Reckoning",
    "nameDe": "Koppelnavigation",
    "icon": "",
@@ -26792,8 +26792,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41164,
-   "x": -2301,
-   "y": -4893,
+   "x": -2368,
+   "y": -4492,
    "nameEn": "Maximum Likelihood",
    "nameDe": "Maximale Wahrscheinlichkeit",
    "icon": "",
@@ -26805,8 +26805,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41165,
-   "x": -524,
-   "y": -5064,
+   "x": -323,
+   "y": -4535,
    "nameEn": "Blinding Truth",
    "nameDe": "Blendende Wahrheit",
    "icon": "",
@@ -26818,8 +26818,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41166,
-   "x": 2289,
-   "y": 2448,
+   "x": 2730,
+   "y": 1734,
    "nameEn": "Null Hypothesis",
    "nameDe": "Nullhypothese",
    "icon": "",
@@ -26831,8 +26831,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41167,
-   "x": 3300,
-   "y": -287,
+   "x": 3274,
+   "y": -390,
    "nameEn": "Law of Large Numbers",
    "nameDe": "Gesetz der Großen Zahlen",
    "icon": "",
@@ -26844,8 +26844,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41168,
-   "x": 1161,
-   "y": 1254,
+   "x": -2804,
+   "y": 887,
    "nameEn": "Butterfly Effect",
    "nameDe": "Schmetterlingseffekt",
    "icon": "",
@@ -26857,8 +26857,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41169,
-   "x": 5139,
-   "y": -363,
+   "x": 4637,
+   "y": -476,
    "nameEn": "Axiom of Choice",
    "nameDe": "Auswahlaxiom",
    "icon": "",
@@ -26870,8 +26870,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41170,
-   "x": 4924,
-   "y": -1257,
+   "x": 4394,
+   "y": -1455,
    "nameEn": "Type I Error",
    "nameDe": "Fehler 1. Art",
    "icon": "",
@@ -26909,8 +26909,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41173,
-   "x": 3129,
-   "y": 4261,
+   "x": 2803,
+   "y": 3887,
    "nameEn": "Open Bazaar",
    "nameDe": "Offener Basar",
    "icon": "",
@@ -26922,8 +26922,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41174,
-   "x": 1971,
-   "y": 4687,
+   "x": 19,
+   "y": 1920,
    "nameEn": "Philosopher's Grid",
    "nameDe": "Gitter des Philosophen",
    "icon": "",
@@ -26935,8 +26935,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41175,
-   "x": 698,
-   "y": 105,
+   "x": 2735,
+   "y": 772,
    "nameEn": "Borrowed Hours",
    "nameDe": "Geliehene Stunden",
    "icon": "",
@@ -26952,8 +26952,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41176,
-   "x": -3934,
-   "y": 3737,
+   "x": 204,
+   "y": 3352,
    "nameEn": "Long Game",
    "nameDe": "Langes Spiel",
    "icon": "",
@@ -26967,8 +26967,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41177,
-   "x": 1335,
-   "y": 5027,
+   "x": 1199,
+   "y": 4300,
    "nameEn": "Glass Clock",
    "nameDe": "Glasuhr",
    "icon": "",
@@ -26982,8 +26982,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41178,
-   "x": -4539,
-   "y": -3268,
+   "x": -2809,
+   "y": -2153,
    "nameEn": "Perfectionist",
    "nameDe": "Perfektionist",
    "icon": "",
@@ -26997,8 +26997,8 @@ export const TALENT_TREE_DATA = {
   },
   {
    "id": 41179,
-   "x": 4880,
-   "y": -2553,
+   "x": 3479,
+   "y": -3076,
    "nameEn": "Marathon",
    "nameDe": "Marathon",
    "icon": "",
@@ -40590,12 +40590,6 @@ export const TALENT_TREE_DATA = {
    "dotted": false
   },
   {
-   "id": 2283,
-   "from": 323,
-   "to": 41125,
-   "dotted": false
-  },
-  {
    "id": 2284,
    "from": 20100,
    "to": 41126,
@@ -40710,42 +40704,6 @@ export const TALENT_TREE_DATA = {
    "dotted": false
   },
   {
-   "id": 2303,
-   "from": 30743,
-   "to": 41145,
-   "dotted": false
-  },
-  {
-   "id": 2304,
-   "from": 30256,
-   "to": 41146,
-   "dotted": false
-  },
-  {
-   "id": 2305,
-   "from": 30237,
-   "to": 41147,
-   "dotted": false
-  },
-  {
-   "id": 2306,
-   "from": 30564,
-   "to": 41148,
-   "dotted": false
-  },
-  {
-   "id": 2307,
-   "from": 148,
-   "to": 41149,
-   "dotted": false
-  },
-  {
-   "id": 2308,
-   "from": 30330,
-   "to": 41150,
-   "dotted": false
-  },
-  {
    "id": 2309,
    "from": 30215,
    "to": 41151,
@@ -40764,105 +40722,15 @@ export const TALENT_TREE_DATA = {
    "dotted": false
   },
   {
-   "id": 2312,
-   "from": 41123,
-   "to": 41154,
-   "dotted": false
-  },
-  {
-   "id": 2313,
-   "from": 369,
-   "to": 41155,
-   "dotted": false
-  },
-  {
-   "id": 2314,
-   "from": 30186,
-   "to": 41156,
-   "dotted": false
-  },
-  {
    "id": 2315,
    "from": 31426,
    "to": 41157,
    "dotted": false
   },
   {
-   "id": 2316,
-   "from": 31351,
-   "to": 41158,
-   "dotted": false
-  },
-  {
-   "id": 2317,
-   "from": 304,
-   "to": 41159,
-   "dotted": false
-  },
-  {
-   "id": 2318,
-   "from": 19,
-   "to": 41160,
-   "dotted": false
-  },
-  {
-   "id": 2319,
-   "from": 31063,
-   "to": 41161,
-   "dotted": false
-  },
-  {
-   "id": 2320,
-   "from": 31261,
-   "to": 41162,
-   "dotted": false
-  },
-  {
-   "id": 2321,
-   "from": 233,
-   "to": 41163,
-   "dotted": false
-  },
-  {
-   "id": 2322,
-   "from": 20227,
-   "to": 41164,
-   "dotted": false
-  },
-  {
-   "id": 2323,
-   "from": 20225,
-   "to": 41165,
-   "dotted": false
-  },
-  {
-   "id": 2324,
-   "from": 30764,
-   "to": 41166,
-   "dotted": false
-  },
-  {
    "id": 2325,
    "from": 30844,
    "to": 41167,
-   "dotted": false
-  },
-  {
-   "id": 2326,
-   "from": 79,
-   "to": 41168,
-   "dotted": false
-  },
-  {
-   "id": 2327,
-   "from": 41143,
-   "to": 41169,
-   "dotted": false
-  },
-  {
-   "id": 2328,
-   "from": 20118,
-   "to": 41170,
    "dotted": false
   },
   {
@@ -40878,51 +40746,189 @@ export const TALENT_TREE_DATA = {
    "dotted": false
   },
   {
-   "id": 2331,
-   "from": 20162,
-   "to": 41173,
+   "id": 2338,
+   "from": 30979,
+   "to": 41169,
    "dotted": false
   },
   {
-   "id": 2332,
-   "from": 30716,
+   "id": 2339,
+   "from": 41170,
+   "to": 30959,
+   "dotted": false
+  },
+  {
+   "id": 2340,
+   "from": 31183,
+   "to": 41179,
+   "dotted": false
+  },
+  {
+   "id": 2341,
+   "from": 41160,
+   "to": 31070,
+   "dotted": false
+  },
+  {
+   "id": 2342,
+   "from": 41163,
+   "to": 31192,
+   "dotted": false
+  },
+  {
+   "id": 2343,
+   "from": 31061,
+   "to": 41161,
+   "dotted": false
+  },
+  {
+   "id": 2344,
+   "from": 31406,
+   "to": 41125,
+   "dotted": false
+  },
+  {
+   "id": 2345,
+   "from": 31435,
+   "to": 41165,
+   "dotted": false
+  },
+  {
+   "id": 2346,
+   "from": 41158,
+   "to": 31438,
+   "dotted": false
+  },
+  {
+   "id": 2347,
+   "from": 41164,
+   "to": 31438,
+   "dotted": false
+  },
+  {
+   "id": 2348,
+   "from": 31258,
+   "to": 41162,
+   "dotted": false
+  },
+  {
+   "id": 2349,
+   "from": 31343,
+   "to": 41159,
+   "dotted": false
+  },
+  {
+   "id": 2350,
+   "from": 41178,
+   "to": 31461,
+   "dotted": false
+  },
+  {
+   "id": 2352,
+   "from": 30607,
+   "to": 41148,
+   "dotted": false
+  },
+  {
+   "id": 2353,
+   "from": 30338,
+   "to": 41150,
+   "dotted": false
+  },
+  {
+   "id": 2354,
+   "from": 30346,
+   "to": 41155,
+   "dotted": false
+  },
+  {
+   "id": 2355,
+   "from": 41154,
+   "to": 30251,
+   "dotted": false
+  },
+  {
+   "id": 2356,
+   "from": 41146,
+   "to": 30259,
+   "dotted": false
+  },
+  {
+   "id": 2357,
+   "from": 30235,
+   "to": 41147,
+   "dotted": false
+  },
+  {
+   "id": 2358,
+   "from": 41176,
+   "to": 30684,
+   "dotted": false
+  },
+  {
+   "id": 2359,
+   "from": 41149,
+   "to": 30047,
+   "dotted": false
+  },
+  {
+   "id": 2360,
+   "from": 41177,
+   "to": 30708,
+   "dotted": false
+  },
+  {
+   "id": 2361,
+   "from": 30003,
    "to": 41174,
    "dotted": false
   },
   {
-   "id": 2333,
-   "from": 41078,
+   "id": 2362,
+   "from": 41174,
+   "to": 30001,
+   "dotted": false
+  },
+  {
+   "id": 2363,
+   "from": 30782,
+   "to": 41166,
+   "dotted": false
+  },
+  {
+   "id": 2364,
+   "from": 30729,
+   "to": 41173,
+   "dotted": false
+  },
+  {
+   "id": 2365,
+   "from": 41145,
+   "to": 30773,
+   "dotted": false
+  },
+  {
+   "id": 2366,
+   "from": 20101,
    "to": 41175,
    "dotted": false
   },
   {
-   "id": 2334,
-   "from": 30391,
-   "to": 41176,
+   "id": 2367,
+   "from": 41168,
+   "to": 20032,
    "dotted": false
   },
   {
-   "id": 2335,
-   "from": 20170,
-   "to": 41177,
-   "dotted": false
-  },
-  {
-   "id": 2336,
-   "from": 20018,
-   "to": 41178,
-   "dotted": false
-  },
-  {
-   "id": 2337,
-   "from": 239,
-   "to": 41179,
+   "id": 2368,
+   "from": 127,
+   "to": 41156,
    "dotted": false
   }
  ],
  "precomputedLayout": {
   "version": 2,
-  "fingerprint": "5e3c3ae3e06b8b49",
+  "fingerprint": "f7ad769f596c8021",
   "positions": [
    [
     156,
@@ -50586,8 +50592,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     41103,
-    3985,
-    2550
+    4046,
+    2537
    ],
    [
     41104,
@@ -50696,8 +50702,8 @@ export const TALENT_TREE_DATA = {
    ],
    [
     41125,
-    229,
-    -3899
+    208,
+    -3439
    ],
    [
     41126,
@@ -50796,38 +50802,38 @@ export const TALENT_TREE_DATA = {
    ],
    [
     41145,
-    3777,
-    3407
+    1881,
+    1987
    ],
    [
     41146,
-    -3526,
-    2462
+    -3587,
+    2002
    ],
    [
     41147,
-    -1963,
-    3104
+    -1760,
+    2780
    ],
    [
     41148,
-    -3691,
-    -579
+    -3638,
+    -884
    ],
    [
     41149,
-    -3293,
-    4087
+    121,
+    4154
    ],
    [
     41150,
-    -5187,
-    855
+    -4679,
+    1002
    ],
    [
     41151,
-    -1338,
-    2302
+    -1410,
+    2115
    ],
    [
     41152,
@@ -50836,23 +50842,23 @@ export const TALENT_TREE_DATA = {
    ],
    [
     41153,
-    -1878,
-    -1192
+    -1614,
+    -1203
    ],
    [
     41154,
-    -1460,
-    1177
+    -2826,
+    1958
    ],
    [
     41155,
-    -5081,
-    1647
+    -3434,
+    1430
    ],
    [
     41156,
-    -2432,
-    -45
+    -885,
+    -3423
    ],
    [
     41157,
@@ -50861,68 +50867,68 @@ export const TALENT_TREE_DATA = {
    ],
    [
     41158,
-    -2968,
-    -4461
+    -2634,
+    -4413
    ],
    [
     41159,
-    -4137,
-    -3637
+    -3645,
+    -3220
    ],
    [
     41160,
-    4340,
-    -3283
+    1954,
+    -2029
    ],
    [
     41161,
-    1167,
-    -2838
+    1204,
+    -2640
    ],
    [
     41162,
-    -2295,
-    -2518
+    -1870,
+    -2130
    ],
    [
     41163,
-    2571,
-    -2438
+    2432,
+    -1825
    ],
    [
     41164,
-    -2301,
-    -4893
+    -2368,
+    -4492
    ],
    [
     41165,
-    -524,
-    -5064
+    -323,
+    -4535
    ],
    [
     41166,
-    2289,
-    2448
+    2730,
+    1734
    ],
    [
     41167,
-    3300,
-    -287
+    3274,
+    -390
    ],
    [
     41168,
-    1161,
-    1254
+    -2804,
+    887
    ],
    [
     41169,
-    5139,
-    -363
+    4637,
+    -476
    ],
    [
     41170,
-    4924,
-    -1257
+    4394,
+    -1455
    ],
    [
     41171,
@@ -50936,38 +50942,38 @@ export const TALENT_TREE_DATA = {
    ],
    [
     41173,
-    3129,
-    4261
+    2803,
+    3887
    ],
    [
     41174,
-    1971,
-    4687
+    19,
+    1920
    ],
    [
     41175,
-    698,
-    105
+    2735,
+    772
    ],
    [
     41176,
-    -3934,
-    3737
+    204,
+    3352
    ],
    [
     41177,
-    1335,
-    5027
+    1199,
+    4300
    ],
    [
     41178,
-    -4539,
-    -3268
+    -2809,
+    -2153
    ],
    [
     41179,
-    4880,
-    -2553
+    3479,
+    -3076
    ]
   ]
  }

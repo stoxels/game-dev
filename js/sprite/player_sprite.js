@@ -930,11 +930,21 @@ function _updateAvatarFacing(el, direction) {
 export function _setAvatarPos(el, x, y, direction) {
     const w = el.offsetWidth || 72;
     const h = el.offsetHeight || 90;
-    const maxX = window.innerWidth - w - 4;
-    const maxY = window.innerHeight - h - 4;
+    let minX = 4;
+    let minY = 4;
+    let maxX = window.innerWidth - w - 4;
+    let maxY = window.innerHeight - h - 4;
+    // Arena modals (gauntlet) confine the sprite to their own rectangle.
+    const bounds = globalThis._egAvatarBounds;
+    if (bounds) {
+        minX = Math.max(minX, bounds.left);
+        minY = Math.max(minY, bounds.top);
+        maxX = Math.min(maxX, bounds.right - w);
+        maxY = Math.min(maxY, bounds.bottom - h);
+    }
     el.style.bottom = 'auto';
-    el.style.left = Math.max(4, Math.min(maxX, x)) + 'px';
-    el.style.top = Math.max(4, Math.min(maxY, y)) + 'px';
+    el.style.left = Math.max(minX, Math.min(Math.max(minX, maxX), x)) + 'px';
+    el.style.top = Math.max(minY, Math.min(Math.max(minY, maxY), y)) + 'px';
     // Deliberate placement (walk, push, teleport): resize handling must
     // preserve this spot instead of snapping back to the responsive anchor.
     el.dataset.avatarUserPos = '1';

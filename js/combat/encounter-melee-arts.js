@@ -3,6 +3,7 @@
 // encounter-melee-impact.js owns the impact pipeline. Sequenced avatar
 // movement lives in encounter-melee-delivery.js.
 
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _egGetElementCentre } from './combat-class-projectiles.js';
 import { _egMeleeLeapTo } from './encounter-melee-delivery.js';
@@ -178,6 +179,7 @@ function _egMeleeTierArtSequenced(targetId, tier, rawHit, elements, wasCrit) {
                 const victim = others[Math.floor(Math.random() * others.length)];
                 _egShowStatusLabel(victim.id, _egMeleeTierLabel('eg_melee_tier2', 'Sky Leap!'));
                 await _egMeleeLeapTo(victim.id);
+                Audio_Manager.playSFX('art_land_thud');
                 _egMeleeLeapVisual(victim.id, { swingOnly: true });
                 _egDamageTargetById(victim.id, rawHit, elements, hitOpts);
                 if (typeof _egMeleeImpactThump === 'function') {
@@ -233,6 +235,7 @@ export function _egMeleeDashVisual(targetId) {
         if (typeof document === 'undefined') return;
         const avatar = document.getElementById('player-avatar-wrapper');
         const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
+        if (card) Audio_Manager.playSFX('art_dash_strike');
         if (!avatar || !card || typeof avatar.animate !== 'function') return;
         if (typeof window !== 'undefined' && window.matchMedia
             && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -268,6 +271,7 @@ export function _egMeleeLeapVisual(victimId, opts) {
         if (typeof document === 'undefined') return;
         const avatar = document.getElementById('player-avatar-wrapper');
         const card = (victimId != null) ? document.getElementById(`eg-card-${victimId}`) : null;
+        if (card && !(opts && opts.swingOnly)) Audio_Manager.playSFX('art_sky_leap');
         if (avatar && typeof avatar.animate === 'function' && !(opts && opts.swingOnly)) {
             let reduce = false;
             try {
@@ -306,6 +310,7 @@ export function _egMeleeNovaVisual(targetId, grand) {
         if (typeof document === 'undefined') return;
         const card = (targetId != null) ? document.getElementById(`eg-card-${targetId}`) : null;
         if (!card) return;
+        Audio_Manager.playSFX(grand ? 'art_grand_nova' : 'art_nova');
         let icon = '⚔️';
         try {
             const info = (typeof _egGetEquippedWeaponInfo === 'function')

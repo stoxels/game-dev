@@ -16,7 +16,7 @@
 .usp-proj-nature    { filter: drop-shadow(0 0 11px rgba(105,240,174,.96)) drop-shadow(0 0 20px rgba(46,125,50,.52)) drop-shadow(0 0 34px rgba(46,125,50,.20)); }
 .usp-proj-lightning { filter: drop-shadow(0 0 14px rgba(255,235,59,1)) drop-shadow(0 0 26px rgba(255,179,0,.72)) drop-shadow(0 0 44px rgba(255,179,0,.30)); }
 .usp-proj-blade     { filter: drop-shadow(0 0 10px rgba(239,83,80,.96)) drop-shadow(0 0 18px rgba(183,28,28,.62)) drop-shadow(0 0 32px rgba(183,28,28,.24)); }
-.usp-proj-arrow     { filter: drop-shadow(0 0 8px rgba(165,214,167,.92)) drop-shadow(0 0 14px rgba(51,105,30,.44)) drop-shadow(0 0 24px rgba(51,105,30,.16)); }
+.usp-proj-arrow, .usp-proj-barrage { filter: drop-shadow(0 0 8px rgba(165,214,167,.92)) drop-shadow(0 0 14px rgba(51,105,30,.44)) drop-shadow(0 0 24px rgba(51,105,30,.16)); }
 
 /* ── Shared keyframes ─────────────────────────────────────────────── */
 @keyframes usp-flicker { from{opacity:.70} to{opacity:1} }
@@ -317,6 +317,57 @@
     border: 1px solid rgba(255,255,255,.74);
 }
 @keyframes usp-lt-jolt{ from{transform:scale(1)} to{transform:scale(1.04) translateX(.6px)} }
+
+/* ━━━ SPARK (usp_spark) — Path-of-Exile crackling orb ━━━━━━━━━━━━━━━━ */
+/* Signature projectile: a white-hot core wrapped in flickering zigzag
+   arcs, trailing live sparks and jittering erratically off its flight
+   line like a bouncing PoE spark. Built +X; the yellow thunderbolt
+   stays for the rest of the lightning school. Purely additive. */
+.usp-proj-spark{ filter: drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 0 20px rgba(255,235,59,.85)) drop-shadow(0 0 34px rgba(255,171,0,.45)); }
+.usp-p-spark{
+    position:absolute; inset:0;
+    animation: usp-spark-wobble 130ms steps(2) infinite;
+}
+.usp-p-spark-core{
+    position:absolute; left:20px; top:9px; width:12px; height:12px; border-radius:50%;
+    background: radial-gradient(circle, #ffffff 0%, #fffde7 30%, #ffeb3b 58%, rgba(255,152,0,.85) 80%, transparent 100%);
+    box-shadow: 0 0 9px #fff, 0 0 16px #ffeb3b;
+    animation: usp-spark-throb 110ms ease-in-out infinite alternate;
+}
+.usp-p-spark-arc{
+    position:absolute; left:12px; top:2px; width:26px; height:24px;
+    background: linear-gradient(180deg, #ffffff 0%, #ffeb3b 55%, #ff9800 100%);
+    filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 10px #ffeb3b);
+}
+.usp-p-spark-arc-1{
+    clip-path: polygon(48% 0, 30% 30%, 52% 32%, 34% 62%, 56% 60%, 40% 100%, 62% 58%, 42% 56%, 60% 28%, 40% 30%);
+    animation: usp-spark-arc-flip 120ms steps(2) infinite;
+}
+.usp-p-spark-arc-2{
+    clip-path: polygon(60% 0, 74% 34%, 54% 36%, 70% 64%, 50% 62%, 58% 100%, 44% 60%, 62% 58%, 46% 30%, 64% 28%);
+    animation: usp-spark-arc-flip 120ms steps(2) infinite reverse;
+}
+.usp-p-spark-trail{
+    position:absolute; left:0; top:12px; width:22px; height:5px; border-radius:3px;
+    background: linear-gradient(to right, transparent 0%, rgba(255,235,59,.25) 35%, rgba(255,241,118,.8) 75%, #ffffff 100%);
+    filter: blur(.5px);
+}
+.usp-p-spark-mote{
+    position:absolute; width:3px; height:3px; border-radius:50%;
+    background: #fffde7;
+    box-shadow: 0 0 6px #ffeb3b, 0 0 10px rgba(255,235,59,.7);
+    animation: usp-spark-mote .38s ease-out infinite;
+}
+.usp-p-spark-mote-1{ left:16px; top:6px; }
+.usp-p-spark-mote-2{ left:12px; top:20px; animation-delay:.19s; }
+@keyframes usp-spark-wobble{
+    0%{transform:translate(0,0) rotate(0deg)}
+    50%{transform:translate(.8px,-2.2px) rotate(-4deg)}
+    100%{transform:translate(-.8px,2px) rotate(3deg)}
+}
+@keyframes usp-spark-throb{ from{transform:scale(.88)} to{transform:scale(1.12)} }
+@keyframes usp-spark-arc-flip{ 0%{opacity:.55; transform:scaleY(1)} 50%{opacity:1; transform:scaleY(-1)} 100%{opacity:.7; transform:scaleY(1)} }
+@keyframes usp-spark-mote{ 0%{transform:translate(0,0) scale(1); opacity:0} 25%{opacity:1} 100%{transform:translate(-11px,3px) scale(.4); opacity:0} }
 .usp-p-lt-bolt::before{
     content:''; position:absolute; left:62%; top:0; width:1.5px; bottom:8%;
     background: linear-gradient(to bottom, #fff 0%, rgba(255,255,255,.88) 30%, transparent 100%);
@@ -327,6 +378,98 @@
     background: rgba(255,255,255,.92); filter: blur(.4px); opacity:.88;
     box-shadow: 0 0 6px #fff;
 }
+
+/* ━━━ ARC (usp_arc) — Path-of-Exile chaining fork ━━━━━━━━━━━━━━━━━━━━ */
+/* Signature projectile: a fat white-blue bolt with side forks, snapping
+   card-to-card on the 200ms chain leaps. Built +X; the yellow
+   thunderbolt stays for the rest of the lightning school. Purely
+   additive. */
+.usp-proj-arc{ filter: drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 0 22px rgba(130,200,255,.9)) drop-shadow(0 0 38px rgba(60,140,255,.55)); }
+.usp-p-zap-glow{
+    position:absolute; left:2px; top:0; width:40px; height:28px; border-radius:50%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.9) 0%, rgba(150,210,255,.55) 35%, rgba(60,140,255,.28) 60%, transparent 75%);
+    filter: blur(1.5px);
+    animation: usp-zap-flicker 90ms steps(2) infinite;
+}
+.usp-p-zap-trunk{
+    position:absolute; left:4px; top:9px; width:36px; height:10px;
+    background: linear-gradient(to bottom, #ffffff 0%, #d6ecff 30%, #82c8ff 62%, #3c8cff 100%);
+    clip-path: polygon(0 42%, 14% 8%, 24% 40%, 36% 4%, 46% 42%, 60% 0%, 68% 44%, 80% 10%, 88% 46%, 100% 30%, 100% 70%, 86% 60%, 76% 94%, 66% 58%, 54% 100%, 44% 56%, 32% 92%, 24% 54%, 12% 88%, 6% 52%);
+    filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px #82c8ff);
+    animation: usp-zap-jolt 100ms ease-in-out infinite alternate;
+}
+.usp-p-zap-fork{
+    position:absolute; width:14px; height:10px;
+    background: linear-gradient(to bottom, #ffffff 0%, #82c8ff 60%, transparent 100%);
+    filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 8px #82c8ff);
+}
+.usp-p-zap-fork-1{
+    left:14px; top:1px;
+    clip-path: polygon(40% 100%, 55% 40%, 30% 45%, 60% 0, 70% 42%, 48% 45%, 62% 100%);
+    animation: usp-zap-flicker 110ms steps(2) infinite;
+}
+.usp-p-zap-fork-2{
+    left:24px; top:17px;
+    clip-path: polygon(30% 0, 48% 55%, 26% 52%, 52% 100%, 62% 55%, 42% 52%, 58% 0);
+    animation: usp-zap-flicker 110ms steps(2) infinite reverse;
+}
+.usp-p-zap-mote{
+    position:absolute; width:3px; height:3px; border-radius:50%;
+    background: #eaf6ff;
+    box-shadow: 0 0 6px #fff, 0 0 10px rgba(130,200,255,.8);
+    animation: usp-zap-mote .3s ease-out infinite;
+}
+.usp-p-zap-mote-1{ left:18px; top:5px; }
+.usp-p-zap-mote-2{ left:12px; top:21px; animation-delay:.15s; }
+@keyframes usp-zap-flicker{ 0%{opacity:.6} 50%{opacity:1} 100%{opacity:.75} }
+@keyframes usp-zap-jolt{ from{transform:scaleY(1)} to{transform:scaleY(1.18)} }
+@keyframes usp-zap-mote{ 0%{transform:translate(0,0); opacity:0} 30%{opacity:1} 100%{transform:translate(-9px,2px); opacity:0} }
+
+/* ━━━ BALL LIGHTNING (usp_ball_lightning) — grinding crackle orb ━━━━━━ */
+/* Signature projectile: a slow heavy ball of lightning with a crackling
+   shell, two lazy counter-rotating arc bands and spitting spark motes.
+   The shell churns on the 1400ms spin while the orb lumbers in over
+   800ms. Built +X; the yellow thunderbolt stays for the school.
+   Purely additive. */
+.usp-proj-balllightning{ filter: drop-shadow(0 0 12px rgba(255,255,255,.9)) drop-shadow(0 0 24px rgba(255,235,59,.8)) drop-shadow(0 0 42px rgba(255,171,0,.45)); }
+.usp-p-bl-trail{
+    position:absolute; left:0; top:12px; width:20px; height:6px; border-radius:3px;
+    background: linear-gradient(to right, transparent 0%, rgba(255,235,59,.3) 40%, rgba(255,241,118,.85) 78%, #ffffff 100%);
+    filter: blur(.6px);
+}
+.usp-p-bl-shell{
+    position:absolute; left:14px; top:5px; width:20px; height:20px; border-radius:50%;
+    background: radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,253,231,.75) 28%, rgba(255,235,59,.55) 52%, rgba(255,152,0,.4) 72%, transparent 88%);
+    filter: blur(.6px);
+    animation: usp-bl-crackle 130ms steps(2) infinite;
+}
+.usp-p-bl-band{
+    position:absolute; left:13px; top:4px; width:22px; height:22px; border-radius:50%;
+    border:2px solid transparent;
+}
+.usp-p-bl-band-1{
+    border-top-color:#fff; border-right-color:rgba(255,235,59,.9);
+    filter: drop-shadow(0 0 4px #ffeb3b);
+}
+.usp-p-bl-band-2{
+    border-bottom-color:#fff; border-left-color:rgba(255,152,0,.9);
+    filter: drop-shadow(0 0 4px #ff9800);
+}
+.usp-p-bl-core{
+    position:absolute; left:19px; top:10px; width:10px; height:10px; border-radius:50%;
+    background: radial-gradient(circle, #ffffff 0%, #fffde7 45%, #ffeb3b 75%, transparent 100%);
+    box-shadow: 0 0 10px #fff, 0 0 18px #ffeb3b;
+}
+.usp-p-bl-mote{
+    position:absolute; width:3px; height:3px; border-radius:50%;
+    background: #fffde7;
+    box-shadow: 0 0 6px #ffeb3b;
+    animation: usp-bl-mote .45s ease-out infinite;
+}
+.usp-p-bl-mote-1{ left:16px; top:4px; }
+.usp-p-bl-mote-2{ left:13px; top:21px; animation-delay:.22s; }
+@keyframes usp-bl-crackle{ 0%{opacity:.7; transform:scale(1)} 50%{opacity:1; transform:scale(1.08)} 100%{opacity:.8; transform:scale(.96)} }
+@keyframes usp-bl-mote{ 0%{transform:translate(0,0) scale(1); opacity:0} 30%{opacity:1} 100%{transform:translate(-10px,-3px) scale(.4); opacity:0} }
 
 /* ━━━ BLADE — hurled reaver; the only TUMBLING steel ━━━━━━━━━━━━ */
 .usp-p-blade-trail{
@@ -371,6 +514,57 @@
     background: linear-gradient(to bottom, #eceff1 0%, #cfd8dc 22%, #b0bec5 45%, #78909c 72%, #546e7a 100%);
     box-shadow: inset 0 0 3px rgba(255,255,255,.96), 0 0 5px rgba(0,0,0,.48);
 }
+
+/* ━━━ ETHEREAL KNIVES (usp_ethereal_knives) — PoE spirit knives ━━━━━━ */
+/* Five conjured ghost-knives: real knife silhouettes (wrapped grip +
+   crossguard + pointed blade) in pale translucent spirit-steel, each
+   trailing cyan wisp-light. The tumbling crimson reaver stays for the
+   rest of the school. Purely additive. */
+.usp-proj-ethknife{ filter: drop-shadow(0 0 7px rgba(167,255,235,.8)) drop-shadow(0 0 16px rgba(128,222,234,.45)); }
+.usp-p-ek-trail{
+    position:absolute; left:0; top:12px; width:26px; height:6px; border-radius:3px;
+    background: linear-gradient(to right, transparent 0%, rgba(128,222,234,0) 20%, rgba(128,222,234,.35) 50%, rgba(224,255,255,.9) 82%, #ffffff 100%);
+    filter: blur(.45px);
+}
+.usp-p-ek-grip{
+    position:absolute; left:2px; top:11px; width:10px; height:7px; border-radius:2px;
+    background: repeating-linear-gradient(90deg, #263238 0 2px, #455a64 2px 4px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 0 4px rgba(128,222,234,.5);
+}
+.usp-p-ek-pommel{
+    position:absolute; left:0; top:12px; width:3px; height:5px; border-radius:1px;
+    background: linear-gradient(to bottom, #e0f7fa 0%, #80deea 60%, #4dd0e1 100%);
+    box-shadow: 0 0 5px #a7ffeb;
+}
+.usp-p-ek-guard{
+    position:absolute; left:12px; top:7px; width:3px; height:15px; border-radius:1px;
+    background: linear-gradient(to right, #78909c 0%, #eceff1 50%, #78909c 100%);
+    box-shadow: 0 0 4px rgba(236,239,241,.8);
+}
+.usp-p-ek-blade{
+    position:absolute; left:15px; top:8px; width:29px; height:13px;
+    clip-path: polygon(0 28%, 68% 28%, 100% 50%, 68% 72%, 0 72%);
+    background: linear-gradient(to bottom, rgba(255,255,255,.98) 0%, rgba(224,247,250,.95) 25%, rgba(178,223,219,.92) 50%, rgba(128,178,184,.92) 75%, rgba(207,216,220,.95) 100%);
+}
+.usp-p-ek-edge{
+    position:absolute; left:15px; top:15px; width:27px; height:3px;
+    clip-path: polygon(0 0, 72% 0, 96% 100%, 70% 100%, 0 100%);
+    background: linear-gradient(to right, rgba(255,255,255,.95), #ffffff 70%, #ffffff);
+    filter: blur(.2px);
+}
+.usp-p-ek-fuller{
+    position:absolute; left:18px; top:12px; width:17px; height:2px;
+    background: linear-gradient(to right, rgba(255,255,255,.9), rgba(255,255,255,.35));
+}
+.usp-p-ek-mote{
+    position:absolute; width:3px; height:3px; border-radius:50%;
+    background: #e0fffb;
+    box-shadow: 0 0 6px #a7ffeb;
+    animation: usp-ek-mote .5s ease-out infinite;
+}
+.usp-p-ek-mote-1{ left:12px; top:5px; }
+.usp-p-ek-mote-2{ left:9px; top:20px; animation-delay:.25s; }
+@keyframes usp-ek-mote{ 0%{transform:translate(0,0) scale(1); opacity:0} 30%{opacity:1} 100%{transform:translate(-9px,-3px) scale(.4); opacity:0} }
 
 /* ━━━ ARROW — ranger shaft; the only WOOD + STEEL craft ━━━━━━━━ */
 .usp-p-arr-shaft{
@@ -425,6 +619,256 @@
 }
 .usp-p-arr-fletch-top{ top:5px }
 .usp-p-arr-fletch-bot{ top:16px; transform:scaleY(-1) }
+
+/* ━━━ EXPLOSIVE SHOT (usp_explosive_shot) — bomb strapped to an arrow ━━ */
+/* Signature projectile: a ranger shaft with a round black bomb lashed
+   mid-shaft and a burning fuse spark. Built +X; the clean shared shaft
+   stays for the school. */
+.usp-proj-bomb{ filter: drop-shadow(0 0 10px rgba(255,183,3,.85)) drop-shadow(0 0 20px rgba(230,81,0,.55)) drop-shadow(0 0 32px rgba(120,40,0,.35)); }
+.usp-p-bomb-shaft{
+    position:absolute; left:2px; right:9px; top:13px; height:4px; border-radius:2px;
+    background: linear-gradient(to bottom, #d7ccc8 0%, #8d6e63 35%, #5d4037 75%, #3e2723 100%);
+}
+.usp-p-bomb-fletch{
+    position:absolute; left:0; width:11px; height:6px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #66bb6a 45%, #2e7d32 100%);
+    clip-path: polygon(0 100%, 26% 0, 100% 0, 74% 100%);
+}
+.usp-p-bomb-fletch-top{ top:6px }
+.usp-p-bomb-fletch-bot{ top:17px; transform:scaleY(-1) }
+.usp-p-bomb-lash{
+    position:absolute; left:16px; top:9px; width:12px; height:11px; border-radius:2px;
+    background: repeating-linear-gradient(90deg, #3e2723 0 2px, #8d6e63 2px 4px);
+}
+.usp-p-bomb-body{
+    position:absolute; left:14px; top:2px; width:16px; height:16px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #6d6d6d 0%, #2b2b2b 40%, #0a0a0a 100%);
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,.25);
+}
+.usp-p-bomb-cap{
+    position:absolute; left:20px; top:-1px; width:5px; height:4px; border-radius:1px;
+    background: linear-gradient(to bottom, #8d6e63 0%, #4e342e 100%);
+}
+.usp-p-bomb-fuse{
+    position:absolute; left:22px; top:-5px; width:6px; height:5px;
+    border-top:2px solid #a1887f;
+    border-right:2px solid #a1887f;
+    border-top-right-radius:5px;
+}
+.usp-p-bomb-spark{
+    position:absolute; left:27px; top:-8px; width:6px; height:6px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #ffca28 45%, #ff6f00 100%);
+    box-shadow: 0 0 7px #ffca28, 0 0 13px #ff6f00;
+    animation: usp-bomb-spark .18s ease-in-out infinite alternate;
+}
+@keyframes usp-bomb-spark{ from{transform:scale(.75); opacity:.7} to{transform:scale(1.25); opacity:1} }
+.usp-p-bomb-smoke{
+    position:absolute; left:22px; top:-14px; width:8px; height:8px; border-radius:50%;
+    background: radial-gradient(circle, rgba(200,200,200,.7) 0%, transparent 70%);
+    filter: blur(1px);
+    animation: usp-bomb-smoke .6s ease-out infinite;
+}
+@keyframes usp-bomb-smoke{ 0%{transform:translate(0,0) scale(.5); opacity:.8} 100%{transform:translate(-8px,-8px) scale(1.3); opacity:0} }
+.usp-p-bomb-head{
+    position:absolute; left:35px; top:6px; width:0; height:0;
+    border-top:8px solid transparent; border-bottom:8px solid transparent; border-left:15px solid #eceff1;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,.9));
+}
+
+/* ━━━ BLADE BLAST (usp_blade_blast) — hurled greatblade + stuck marker ━ */
+/* Delivery visual: a greatblade with a round bomb lashed on top, hurled
+   flat onto the placed square (built +X); on arrival it sticks in the
+   ground, bomb ticking, until the delayed detonation. Purely additive. */
+.usp-proj-bladeblast{ filter: drop-shadow(0 0 9px rgba(255,255,255,.8)) drop-shadow(0 0 18px rgba(255,183,3,.6)); }
+.usp-p-bb-trail{
+    position:absolute; left:0; top:12px; width:30px; height:6px; border-radius:3px;
+    background: linear-gradient(to right, transparent 0%, rgba(207,216,220,.35) 45%, rgba(255,255,255,.9) 82%, #ffffff 100%);
+    filter: blur(.45px);
+}
+.usp-p-bb-smoke{
+    position:absolute; left:29px; top:11px; width:8px; height:8px; border-radius:50%;
+    background: radial-gradient(circle, rgba(200,200,200,.7) 0%, transparent 70%);
+    filter: blur(1px);
+    animation: usp-bomb-smoke .6s ease-out infinite;
+}
+.usp-p-bb-haft{
+    position:absolute; left:0; top:11px; width:16px; height:9px; border-radius:3px;
+    background: repeating-linear-gradient(90deg, #2b1a12 0 2px, #6d4c41 2px 4px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 1px 2px rgba(0,0,0,.5);
+}
+.usp-p-bb-blade{
+    position:absolute; left:14px; top:4px; width:56px; height:24px;
+    clip-path: polygon(0 20%, 76% 20%, 100% 50%, 76% 80%, 0 80%);
+    background: linear-gradient(to bottom, #ffffff 0%, #eceff1 22%, #b0bec5 48%, #78909c 74%, #455a64 100%);
+    filter: drop-shadow(0 0 4px rgba(255,255,255,.55));
+}
+.usp-p-bb-edge{
+    position:absolute; left:16px; top:14px; width:46px; height:4px;
+    background: linear-gradient(to right, rgba(255,255,255,.25) 0%, rgba(255,255,255,.95) 30%, #ffffff 55%, rgba(255,255,255,.35) 85%);
+    filter: blur(.3px);
+}
+.usp-p-bb-lash{
+    position:absolute; left:13px; top:1px; width:5px; height:30px; border-radius:2px;
+    background: linear-gradient(to bottom, #ffd54f 0%, #8d6e63 30%, #4e342e 70%, #ffd54f 100%);
+    box-shadow: 0 0 5px rgba(255,213,79,.6);
+}
+.usp-p-bb-body{
+    position:absolute; left:22px; top:26px; width:12px; height:12px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #8a8a8a 0%, #3a3a3a 45%, #0a0a0a 100%);
+    box-shadow: inset 1px 1px 3px rgba(255,255,255,.35), 0 0 6px rgba(0,0,0,.6);
+}
+.usp-p-bb-cap{
+    position:absolute; left:26px; top:23px; width:4px; height:4px; border-radius:1px;
+    background: linear-gradient(to bottom, #a1887f 0%, #4e342e 100%);
+}
+.usp-p-bb-fuse{
+    position:absolute; left:28px; top:20px; width:5px; height:5px;
+    border-top:2px solid #bcaaa4;
+    border-right:2px solid #bcaaa4;
+    border-top-right-radius:4px;
+}
+.usp-p-bb-spark{
+    position:absolute; left:31px; top:15px; width:6px; height:6px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #ffca28 45%, #ff6f00 100%);
+    box-shadow: 0 0 7px #ffca28, 0 0 13px #ff6f00;
+    animation: usp-bomb-spark .18s ease-in-out infinite alternate;
+}
+.usp-plant-bb{
+    position:fixed; width:80px; height:100px; margin:-92px 0 0 -40px;
+    pointer-events:none; z-index:1335;
+}
+.usp-plant-dust{
+    position:absolute; left:12px; bottom:0; width:56px; height:16px; border-radius:50%;
+    background: radial-gradient(ellipse at center, rgba(188,170,164,.85) 0%, transparent 70%);
+    filter: blur(1px);
+    animation: usp-plant-dust .5s ease-out infinite;
+}
+@keyframes usp-plant-dust{ 0%{opacity:0; transform:scale(.6)} 30%{opacity:.9} 100%{opacity:.35; transform:scale(1.1)} }
+.usp-plant-blade{
+    position:absolute; left:24px; top:4px; width:26px; height:84px;
+    transform:rotate(16deg);
+    clip-path: polygon(18% 0, 82% 0, 82% 66%, 100% 100%, 0 100%, 18% 66%);
+    background: linear-gradient(to right, #ffffff 0%, #cfd6e4 30%, #78909c 60%, #455a64 100%);
+    filter: drop-shadow(0 0 5px rgba(255,255,255,.6));
+}
+.usp-plant-edge{
+    position:absolute; left:27px; top:60px; width:6px; height:30px;
+    transform:rotate(16deg);
+    background: linear-gradient(to bottom, rgba(255,255,255,.2), #ffffff);
+    filter: blur(.4px);
+}
+.usp-plant-lash{
+    position:absolute; left:38px; top:26px; width:12px; height:10px; border-radius:1px;
+    transform:rotate(16deg);
+    background: repeating-linear-gradient(90deg, #3e2723 0 2px, #8d6e63 2px 4px);
+}
+.usp-plant-bomb{
+    position:absolute; left:46px; top:22px; width:24px; height:24px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #6d6d6d 0%, #2b2b2b 40%, #0a0a0a 100%);
+    box-shadow: inset 2px 2px 5px rgba(255,255,255,.25), 0 0 10px rgba(0,0,0,.6);
+}
+.usp-plant-cap{
+    position:absolute; left:55px; top:18px; width:6px; height:5px; border-radius:1px;
+    background: linear-gradient(to bottom, #8d6e63 0%, #4e342e 100%);
+}
+.usp-plant-fuse{
+    position:absolute; left:58px; top:13px; width:7px; height:6px;
+    border-top:2px solid #a1887f;
+    border-right:2px solid #a1887f;
+    border-top-right-radius:6px;
+}
+.usp-plant-spark{
+    position:absolute; left:63px; top:9px; width:7px; height:7px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #ffca28 45%, #ff6f00 100%);
+    box-shadow: 0 0 8px #ffca28, 0 0 15px #ff6f00;
+    animation: usp-bomb-spark .18s ease-in-out infinite alternate;
+}
+
+/* ━━━ POISON ARROW (usp_serpent_sting) — dripping venom ━━━━━━━━━━━━━━━━ */
+/* Signature projectile: a ranger shaft with a venom-green head, droplets
+   falling off it mid-flight and a sickly trail. Built +X; the clean
+   shared shaft stays for the school. */
+.usp-proj-poison{ filter: drop-shadow(0 0 10px rgba(118,255,3,.85)) drop-shadow(0 0 20px rgba(46,125,50,.55)) drop-shadow(0 0 32px rgba(27,94,32,.35)); }
+.usp-p-poison-trail{
+    position:absolute; left:0; top:11px; width:28px; height:6px; border-radius:3px;
+    background: linear-gradient(to right, transparent 0%, rgba(27,94,32,.45) 30%, rgba(118,255,3,.60) 62%, #d6ffc8 100%);
+    filter: blur(.5px);
+}
+.usp-p-poison-shaft{
+    position:absolute; left:8px; right:13px; top:12px; height:5px; border-radius:2px;
+    background: linear-gradient(to bottom, #d7ccc8 0%, #8d6e63 30%, #5d4037 72%, #3e2723 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 3px rgba(0,0,0,.5);
+}
+.usp-p-poison-wrap{
+    position:absolute; left:23px; top:9px; width:6px; height:10px; border-radius:1px;
+    background: linear-gradient(to bottom, #33691e 0%, #1b5e20 100%);
+    box-shadow: 0 0 5px rgba(118,255,3,.7);
+}
+.usp-p-poison-head{
+    position:absolute; left:31px; top:6px; width:0; height:0;
+    border-top:8px solid transparent; border-bottom:8px solid transparent; border-left:16px solid #76ff03;
+    filter: drop-shadow(0 0 6px rgba(118,255,3,.95)) drop-shadow(1px 0 3px rgba(0,0,0,.55));
+    animation: usp-poison-sheen .4s ease-in-out infinite alternate;
+}
+@keyframes usp-poison-sheen{ from{filter:drop-shadow(0 0 4px rgba(118,255,3,.7))} to{filter:drop-shadow(0 0 9px rgba(214,255,200,.95))} }
+.usp-p-poison-fletch{
+    position:absolute; left:1px; width:13px; height:6px;
+    background: linear-gradient(135deg, #dcedc8 0%, #9ccc65 30%, #558b2f 65%, #33691e 100%);
+    clip-path: polygon(0 100%, 26% 0, 100% 0, 74% 100%);
+}
+.usp-p-poison-fletch-top{ top:5px }
+.usp-p-poison-fletch-bot{ top:16px; transform:scaleY(-1) }
+.usp-p-poison-drip{
+    position:absolute; width:4px; height:4px; border-radius:50% 50% 50% 0;
+    background: radial-gradient(circle at 35% 35%, #d6ffc8 0%, #76ff03 55%, #1b5e20 100%);
+    box-shadow: 0 0 5px rgba(118,255,3,.9);
+    animation: usp-poison-drip .55s ease-in infinite;
+}
+.usp-p-poison-drip-1{ left:30px; top:16px; }
+.usp-p-poison-drip-2{ left:24px; top:18px; animation-delay:.28s; }
+@keyframes usp-poison-drip{ 0%{transform:translate(0,0) scale(.6); opacity:0} 25%{opacity:1} 100%{transform:translate(-8px,10px) scale(1); opacity:0} }
+
+/* ━━━ AIMED SHOT (usp_aimed_shot) — the perfect arrow ━━━━━━━━━━━━━━━━ */
+/* Signature projectile: longer bodkin head, crimson fletching, bowstring
+   recoil at the nock, charge-glare swelling on the head. Built +X; the
+   shared ranger shaft stays for the school. */
+.usp-proj-aimed{ filter: drop-shadow(0 0 10px rgba(255,255,255,.9)) drop-shadow(0 0 18px rgba(229,57,53,.55)) drop-shadow(0 0 30px rgba(229,57,53,.25)); }
+.usp-p-aimed-shaft{
+    position:absolute; left:6px; right:11px; top:13px; height:4px; border-radius:2px;
+    background: linear-gradient(to bottom, #d7ccc8 0%, #8d6e63 35%, #5d4037 75%, #3e2723 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 1px 3px rgba(0,0,0,.5);
+}
+.usp-p-aimed-wrap{
+    position:absolute; left:24px; top:10px; width:6px; height:10px; border-radius:1px;
+    background: linear-gradient(to bottom, #b71c1c 0%, #d32f2f 50%, #7f0000 100%);
+    box-shadow: 0 0 5px rgba(229,57,53,.7);
+}
+.usp-p-aimed-head{
+    position:absolute; left:33px; top:5px; width:0; height:0;
+    border-top:9px solid transparent; border-bottom:9px solid transparent; border-left:20px solid #eceff1;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,.95)) drop-shadow(1px 0 3px rgba(0,0,0,.6));
+}
+.usp-p-aimed-glare{
+    position:absolute; left:38px; top:9px; width:10px; height:10px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, rgba(255,255,255,.85) 45%, transparent 72%);
+    animation: usp-aimed-glare .5s ease-in-out infinite alternate;
+}
+@keyframes usp-aimed-glare{ from{transform:scale(.7); opacity:.6} to{transform:scale(1.2); opacity:1} }
+.usp-p-aimed-fletch{
+    position:absolute; left:0; width:13px; height:6px;
+    background: linear-gradient(135deg, #ffcdd2 0%, #e57373 25%, #c62828 60%, #7f0000 100%);
+    clip-path: polygon(0 100%, 26% 0, 100% 0, 74% 100%);
+    box-shadow: 0 1px 3px rgba(0,0,0,.45);
+}
+.usp-p-aimed-fletch-top{ top:6px }
+.usp-p-aimed-fletch-bot{ top:17px; transform:scaleY(-1) }
+.usp-p-aimed-string{
+    position:absolute; left:-4px; top:13px; width:10px; height:3px;
+    background: linear-gradient(to right, transparent 0%, rgba(255,255,255,.8) 100%);
+    transform-origin:100% 50%;
+    animation: usp-aimed-string .2s ease-out infinite;
+}
+@keyframes usp-aimed-string{ 0%{transform:scaleX(1.4); opacity:1} 100%{transform:scaleX(.5); opacity:.4} }
 
 /* ═══════════════════════════════════════════════════════════════════
    CARD OVERLAYS — impact / nova / telegraph / DoT
@@ -512,6 +956,34 @@
     border:1px solid rgba(255,82,82,.30);
 }
 @keyframes usp-telegraph-pulse{ from{opacity:.52} to{opacity:1} }
+
+/* ━━━ STORM CALL (usp_storm_call) — lightning rune marker ━━━━━━━━━━━━━ */
+/* Signature telegraph: a crackling rune circle etched onto the victim,
+   counting down to the skyfall fork. Purely additive; the generic
+   dashed danger stays for every other delayed spell. */
+.usp-mark-storm{
+    inset:3px; border-radius:10px;
+    border:2px solid rgba(130,200,255,.9);
+    background: radial-gradient(ellipse at 50% 42%, rgba(60,140,255,.30) 0%, transparent 62%), rgba(60,140,255,.08);
+    box-shadow: inset 0 0 20px rgba(130,200,255,.35), 0 0 16px rgba(130,200,255,.35);
+    animation: usp-mark-storm-pulse .3s ease-in-out infinite alternate;
+}
+.usp-mark-storm::before{
+    content:''; position:absolute; left:50%; top:50%; width:40px; height:40px; margin:-20px 0 0 -20px;
+    border-radius:50%; border:2px dashed rgba(234,246,255,.95);
+    box-shadow:0 0 12px rgba(130,200,255,.9), inset 0 0 8px rgba(130,200,255,.6);
+    animation: usp-mark-storm-spin 1.2s linear infinite;
+}
+.usp-mark-storm::after{
+    content:'ϟ'; position:absolute; left:50%; top:50%; transform:translate(-50%,-54%);
+    font-size:24px; color:#fff; text-shadow:0 0 10px #fff, 0 0 22px #82c8ff;
+    animation: usp-mark-storm-flicker 150ms steps(2) infinite;
+}
+@keyframes usp-mark-storm-pulse{ from{opacity:.6} to{opacity:1} }
+@keyframes usp-mark-storm-spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+@keyframes usp-mark-storm-flicker{ 0%{opacity:.65} 50%{opacity:1} 100%{opacity:.8} }
+/* Storm Call shares Arc's fork art for the skyfall - own hook, same bolt. */
+.usp-proj-stormcall{ filter: drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 0 22px rgba(130,200,255,.9)) drop-shadow(0 0 38px rgba(60,140,255,.55)); }
 
 /* DoT tick — rising mote with soft tail */
 .usp-dot{
@@ -617,6 +1089,259 @@
 .usp-move-streak-nature{ background:linear-gradient(90deg, transparent 0%, rgba(105,240,174,.96) 100%); color:#69f0ae; box-shadow:0 0 16px rgba(105,240,174,.74) }
 @keyframes usp-move-streak{ 0%{opacity:0} 14%{opacity:1} 100%{opacity:0} }
 
+/* ━━━ BLINK (usp_blink) — 3-step teleport: depart + travel + arrive ━━━ */
+/* Step 2 (travel) is the existing .usp-move-streak. Steps 1 and 3 are
+   one-shot markers spawned by _uspBlinkFX: the old spot IMPLODES into a
+   void poof (rings collapsing inward, core winking out), the landing spot
+   EXPLODES open (shockwave ring racing outward, spark motes rising, flash
+   decaying). Theme tint rides currentColor like the streak. Purely additive. */
+.usp-blink-depart, .usp-blink-arrive{
+    position:fixed; pointer-events:none; z-index:1250;
+    width:70px; height:70px; margin:0;
+    transform:translate(-50%,-50%);
+    color:#7fd9ff;
+}
+.usp-blink-arcane{ color:#7fd9ff; }
+.usp-blink-shadow{ color:#ce93d8; }
+.usp-blink-blade{ color:#ef5350; }
+.usp-blink-nature{ color:#69f0ae; }
+.usp-blink-depart::before, .usp-blink-depart::after,
+.usp-blink-arrive::before, .usp-blink-arrive::after{
+    content:''; position:absolute; left:50%; top:50%; border-radius:50%;
+}
+/* Depart: outer ring collapses inward … */
+.usp-blink-depart::before{
+    width:64px; height:64px; margin:-32px 0 0 -32px;
+    border:3px solid currentColor;
+    box-shadow:0 0 14px currentColor, inset 0 0 10px currentColor;
+    animation: usp-blink-implode .55s ease-in forwards;
+}
+/* … inner core winks out. */
+.usp-blink-depart::after{
+    width:22px; height:22px; margin:-11px 0 0 -11px;
+    background:currentColor;
+    box-shadow:0 0 16px currentColor, 0 0 34px currentColor;
+    animation: usp-blink-wink .55s ease-in forwards;
+}
+@keyframes usp-blink-implode{ 0%{ transform:scale(1); opacity:1; } 100%{ transform:scale(.05); opacity:0; } }
+@keyframes usp-blink-wink{ 0%{ transform:scale(1); opacity:1; } 40%{ transform:scale(1.25); opacity:1; } 100%{ transform:scale(0); opacity:0; } }
+/* Arrive: shockwave races outward … */
+.usp-blink-arrive::before{
+    width:70px; height:70px; margin:-35px 0 0 -35px;
+    border:3px solid currentColor;
+    box-shadow:0 0 18px currentColor, inset 0 0 12px currentColor;
+    animation: usp-blink-explode .6s ease-out forwards;
+}
+/* … flash core blooms and decays. */
+.usp-blink-arrive::after{
+    width:26px; height:26px; margin:-13px 0 0 -13px;
+    background: radial-gradient(circle, #fff 0%, currentColor 55%, transparent 75%);
+    box-shadow:0 0 20px currentColor, 0 0 44px currentColor;
+    animation: usp-blink-bloom .6s ease-out forwards;
+}
+@keyframes usp-blink-explode{ 0%{ transform:scale(.1); opacity:1; } 100%{ transform:scale(1.5); opacity:0; } }
+@keyframes usp-blink-bloom{ 0%{ transform:scale(.4); opacity:1; } 100%{ transform:scale(1.6); opacity:0; } }
+/* Gallery loop: replay the one-shots forever. */
+.usp-blink-depart.is-loop::before{ animation: usp-blink-implode 1.6s ease-in infinite; }
+.usp-blink-depart.is-loop::after{ animation: usp-blink-wink 1.6s ease-in infinite; }
+.usp-blink-arrive.is-loop::before{ animation: usp-blink-explode 1.6s ease-out infinite; }
+.usp-blink-arrive.is-loop::after{ animation: usp-blink-bloom 1.6s ease-out infinite; }
+
+/* ━━━ SHADOW DASH (usp_dash) — melt into shadow, reform ahead ━━━━━━━ */
+/* Dash glides instead of teleporting, so its 3 steps read differently from
+   Blink's: the hero DISSOLVES (a dark pool spreads where they stood, shadow
+   wisps curling upward) and REFORMS ahead (wisps converging into a rising
+   shadow pillar as the glide lands). Tinted shadow-purple via currentColor.
+   Spawned by _uspBlinkFX for behavior 'dash'. Purely additive. */
+.usp-dash-dissolve, .usp-dash-reform{
+    position:fixed; pointer-events:none; z-index:1250;
+    width:76px; height:76px; margin:0;
+    transform:translate(-50%,-50%);
+}
+.usp-dash-dissolve::before, .usp-dash-dissolve::after,
+.usp-dash-reform::before, .usp-dash-reform::after{
+    content:''; position:absolute; left:50%; border-radius:50%;
+}
+/* Dissolve: dark pool spreads flat … */
+.usp-dash-dissolve::before{
+    top:62%; width:70px; height:22px; margin:0 0 0 -35px;
+    background: radial-gradient(ellipse, rgba(10,6,18,.9) 0%, currentColor 45%, transparent 72%);
+    box-shadow:0 0 18px currentColor;
+    animation: usp-dash-pool .7s ease-out forwards;
+}
+/* … wisps curl upward as the body melts. */
+.usp-dash-dissolve::after{
+    top:50%; width:10px; height:10px; margin:-5px 0 0 -5px;
+    background:currentColor;
+    box-shadow:0 0 12px currentColor, -16px -10px 0 -2px currentColor, 15px -16px 0 -3px currentColor, 2px -26px 0 -4px currentColor;
+    opacity:.8;
+    animation: usp-dash-wisps .7s ease-out forwards;
+}
+@keyframes usp-dash-pool{ 0%{ transform:scale(.2); opacity:0; } 35%{ opacity:1; } 100%{ transform:scale(1.15); opacity:0; } }
+@keyframes usp-dash-wisps{ 0%{ transform:translateY(14px) scale(1); opacity:0; } 30%{ opacity:.9; } 100%{ transform:translateY(-30px) scale(.3); opacity:0; } }
+/* Reform: wisps converge downward … */
+.usp-dash-reform::before{
+    top:50%; width:10px; height:10px; margin:-5px 0 0 -5px;
+    background:currentColor;
+    box-shadow:0 0 12px currentColor, -14px 12px 0 -2px currentColor, 14px 8px 0 -3px currentColor, 0 24px 0 -4px currentColor;
+    opacity:.8;
+    animation: usp-dash-gather .55s ease-in forwards;
+}
+/* … a shadow pillar rises as the glide lands. */
+.usp-dash-reform::after{
+    top:50%; width:26px; height:64px; margin:-32px 0 0 -13px; border-radius:45%;
+    background: linear-gradient(to top, currentColor 0%, rgba(20,10,32,.75) 55%, transparent 100%);
+    box-shadow:0 0 20px currentColor;
+    animation: usp-dash-pillar .55s ease-out forwards;
+}
+@keyframes usp-dash-gather{ 0%{ transform:translateY(-26px) scale(.3); opacity:0; } 40%{ opacity:.9; } 100%{ transform:translateY(10px) scale(1); opacity:0; } }
+@keyframes usp-dash-pillar{ 0%{ transform:scaleY(.1); opacity:0; } 35%{ opacity:1; } 100%{ transform:scaleY(1.1); opacity:0; } }
+/* Gallery loop: replay the one-shots forever. */
+.usp-dash-dissolve.is-loop::before{ animation: usp-dash-pool 1.8s ease-out infinite; }
+.usp-dash-dissolve.is-loop::after{ animation: usp-dash-wisps 1.8s ease-out infinite; }
+.usp-dash-reform.is-loop::before{ animation: usp-dash-gather 1.8s ease-in infinite; }
+.usp-dash-reform.is-loop::after{ animation: usp-dash-pillar 1.8s ease-out infinite; }
+
+/* ━━━ DISENGAGE (usp_disengage) — dust-kick leap away ━━━━━━━━━━━━━━━━ */
+/* A desperate leap, not a teleport: takeoff blasts a dust-kick crater
+   (expanding debris ring + clods flying), landing skids out in a low dust
+   slide. Brute red-brown dust via the blade tint (currentColor). Spawned by
+   _uspBlinkFX for behavior 'disengage'. Purely additive. */
+.usp-leap-kick, .usp-leap-skid{
+    position:fixed; pointer-events:none; z-index:1250;
+    width:80px; height:60px; margin:0;
+    transform:translate(-50%,-50%);
+}
+.usp-leap-kick::before, .usp-leap-kick::after,
+.usp-leap-skid::before, .usp-leap-skid::after{
+    content:''; position:absolute; left:50%; border-radius:50%;
+}
+/* Takeoff: debris ring blasts outward … */
+.usp-leap-kick::before{
+    top:50%; width:70px; height:34px; margin:-17px 0 0 -35px;
+    border:3px solid currentColor;
+    box-shadow:0 0 14px currentColor;
+    opacity:.9;
+    animation: usp-leap-blast .55s ease-out forwards;
+}
+/* … clods fly. */
+.usp-leap-kick::after{
+    top:50%; width:9px; height:9px; margin:-4px 0 0 -4px;
+    background:currentColor;
+    box-shadow:0 0 10px currentColor, -22px -6px 0 -1px currentColor, 20px -10px 0 -2px currentColor, -8px -22px 0 -3px currentColor, 12px -24px 0 -3px currentColor;
+    animation: usp-leap-clods .55s ease-out forwards;
+}
+@keyframes usp-leap-blast{ 0%{ transform:scale(.15); opacity:1; } 100%{ transform:scale(1.25); opacity:0; } }
+@keyframes usp-leap-clods{ 0%{ transform:translateY(8px) scale(1); opacity:1; } 100%{ transform:translateY(-26px) scale(.4); opacity:0; } }
+/* Landing: low dust slide … */
+.usp-leap-skid::before{
+    top:62%; width:74px; height:18px; margin:0 0 0 -37px;
+    background: radial-gradient(ellipse, currentColor 0%, transparent 70%);
+    opacity:.75;
+    animation: usp-leap-slide .6s ease-out forwards;
+}
+/* … settling grit. */
+.usp-leap-skid::after{
+    top:62%; width:8px; height:8px; margin:-4px 0 0 -4px;
+    background:currentColor;
+    box-shadow:0 0 8px currentColor, -18px 2px 0 -2px currentColor, 18px 2px 0 -2px currentColor;
+    animation: usp-leap-settle .6s ease-out forwards;
+}
+@keyframes usp-leap-slide{ 0%{ transform:scale(.3); opacity:.9; } 100%{ transform:scale(1.2); opacity:0; } }
+@keyframes usp-leap-settle{ 0%{ transform:translateY(-10px); opacity:1; } 100%{ transform:translateY(4px); opacity:0; } }
+/* Gallery loop: replay the one-shots forever. */
+.usp-leap-kick.is-loop::before{ animation: usp-leap-blast 1.6s ease-out infinite; }
+.usp-leap-kick.is-loop::after{ animation: usp-leap-clods 1.6s ease-out infinite; }
+.usp-leap-skid.is-loop::before{ animation: usp-leap-slide 1.6s ease-out infinite; }
+.usp-leap-skid.is-loop::after{ animation: usp-leap-settle 1.6s ease-out infinite; }
+
+/* ━━━ WINDSTEP (usp_windstep) — swift tailwind at the feet ━━━━━━━━━━━━━ */
+/* No jump, no teleport — just speed: streaking lines streaming past and
+   light feathers swirling at the feet for the whole 6s buff, tracking the
+   sprite every frame. Lightning-pale via fixed colours. Purely additive. */
+.usp-windstep-tailwind{
+    position:fixed; width:110px; height:90px; margin:0;
+    pointer-events:none; z-index:986;
+    transform:translate(-50%,-50%);
+    animation: usp-windstep-rise .4s ease-out;
+}
+@keyframes usp-windstep-rise{ 0%{ opacity:0; scale:.7; } 100%{ opacity:1; scale:1; } }
+.usp-windstep-swirl{
+    position:absolute; inset:0;
+    animation: usp-windstep-flow 1.2s linear infinite;
+}
+@keyframes usp-windstep-flow{ 0%{ transform:translateX(6px); } 50%{ transform:translateX(-6px); } 100%{ transform:translateX(6px); } }
+.usp-windstep-line{
+    position:absolute; left:50%; height:2px; border-radius:2px;
+    background:linear-gradient(90deg, transparent 0%, rgba(224,242,254,.85) 60%, #fff 100%);
+    box-shadow:0 0 6px rgba(178,223,219,.7);
+    animation: usp-windstep-stream .8s linear infinite;
+}
+.usp-windstep-line-1{ top:22%; width:64px; margin-left:-52px; }
+.usp-windstep-line-2{ top:40%; width:84px; margin-left:-40px; animation-delay:-.2s; }
+.usp-windstep-line-3{ top:58%; width:70px; margin-left:-56px; animation-delay:-.4s; }
+.usp-windstep-line-4{ top:74%; width:56px; margin-left:-34px; animation-delay:-.6s; }
+@keyframes usp-windstep-stream{ 0%{ opacity:0; transform:translateX(18px); } 30%{ opacity:1; } 100%{ opacity:0; transform:translateX(-30px); } }
+.usp-windstep-feather{
+    position:absolute; left:50%; top:62%; width:9px; height:13px; margin:-6px 0 0 -4px;
+    border-radius:60% 10% 60% 10%;
+    background:linear-gradient(135deg, #fff 0%, #b2dfdb 70%, #64b5ac 100%);
+    box-shadow:0 0 5px rgba(224,242,254,.8);
+    animation: usp-windstep-tumble 1.6s ease-in-out infinite;
+}
+.usp-windstep-feather-1{ transform:rotate(-24deg) translate(-26px,4px); }
+.usp-windstep-feather-2{ transform:rotate(18deg) translate(-8px,-6px); animation-delay:-.4s; }
+.usp-windstep-feather-3{ transform:rotate(-12deg) translate(10px,5px); animation-delay:-.8s; }
+.usp-windstep-feather-4{ transform:rotate(28deg) translate(26px,-4px); animation-delay:-1.2s; }
+@keyframes usp-windstep-tumble{ 0%,100%{ translate:0 0; opacity:.65; } 50%{ translate:-8px -10px; opacity:1; } }
+
+/* ━━━ RIFT ANCHOR (usp_rift_anchor) — open rift + homecoming plunge ━━ */
+/* The armed anchor is an OPEN RIFT, not just a pin: a swirling portal ring
+   grinding around the sigil for the whole armed window. The recall landing
+   is a PLUNGE — rings contracting DOWN into the rift as the hero is sucked
+   home, the reverse of Blink's outward burst. Purely additive. */
+.usp-anchor-rift{
+    position:absolute; left:50%; top:100%; width:64px; height:22px; margin:-8px 0 0 -32px;
+    border-radius:50%;
+    border:2px solid rgba(127,217,255,.8);
+    box-shadow:0 0 14px rgba(127,217,255,.7), inset 0 0 8px rgba(127,217,255,.5);
+    background: radial-gradient(ellipse, rgba(10,14,30,.85) 0%, rgba(127,217,255,.25) 55%, transparent 75%);
+    animation: usp-anchor-swirl 2.2s linear infinite;
+}
+@keyframes usp-anchor-swirl{
+    0%{ transform:rotate(0deg) scaleX(1); filter:brightness(.9); }
+    50%{ transform:rotate(180deg) scaleX(.82); filter:brightness(1.25); }
+    100%{ transform:rotate(360deg) scaleX(1); filter:brightness(.9); }
+}
+.usp-anchor-plunge{
+    position:fixed; pointer-events:none; z-index:1250;
+    width:76px; height:76px; margin:0;
+    transform:translate(-50%,-50%);
+    color:#7fd9ff;
+}
+.usp-anchor-plunge::before, .usp-anchor-plunge::after{
+    content:''; position:absolute; left:50%; top:50%; border-radius:50%;
+}
+/* Outer ring contracts INTO the rift … */
+.usp-anchor-plunge::before{
+    width:70px; height:70px; margin:-35px 0 0 -35px;
+    border:3px solid currentColor;
+    box-shadow:0 0 18px currentColor, inset 0 0 12px currentColor;
+    animation: usp-anchor-suck .6s ease-in forwards;
+}
+/* … the core is yanked down and winks out. */
+.usp-anchor-plunge::after{
+    width:24px; height:24px; margin:-12px 0 0 -12px;
+    background: radial-gradient(circle, #fff 0%, currentColor 55%, transparent 78%);
+    box-shadow:0 0 20px currentColor, 0 0 44px currentColor;
+    animation: usp-anchor-yank .6s ease-in forwards;
+}
+@keyframes usp-anchor-suck{ 0%{ transform:scale(1.4); opacity:0; } 35%{ opacity:1; } 100%{ transform:scale(.06); opacity:0; } }
+@keyframes usp-anchor-yank{ 0%{ transform:translateY(-20px) scale(1.2); opacity:0; } 40%{ opacity:1; } 100%{ transform:translateY(14px) scale(.1); opacity:0; } }
+/* Gallery loop: replay the one-shot forever. */
+.usp-anchor-plunge.is-loop::before{ animation: usp-anchor-suck 1.8s ease-in infinite; }
+.usp-anchor-plunge.is-loop::after{ animation: usp-anchor-yank 1.8s ease-in infinite; }
+
 /* Rift Anchor — sigil pin at the feet */
 .usp-anchor-marker{
     position:fixed; pointer-events:none; z-index:1250;
@@ -698,6 +1423,21 @@
 @keyframes spell-charge-ring{ 0%{transform:scale(.68); opacity:.60} 100%{transform:scale(1.32); opacity:0} }
 @keyframes spell-charge-pop{ 0%{opacity:1} 100%{opacity:0; transform:translate(-50%,-50%) scale(2.9)} }
 @keyframes spell-charge-fizzle{ 0%{opacity:.88} 100%{opacity:0; transform:translate(-50%,-50%) scale(.28)} }
+
+/* Ice Spear charge: the orb becomes a condensing spear of ice instead of a
+   ball. The round gradient goes transparent (the halo ring + orbiting
+   charge ring stay), and the 44x28 lance canvas sits centred - the orb's
+   own scale transform (0.45 to 2.1) grows the spear with the hold, and the
+   JS-driven frost filter sharpens it as it condenses. Purely additive. */
+.spell-charge-orb.spell-charge-spear{
+    background: transparent;
+    border-radius: 8px;
+}
+.usp-charge-spear-canvas{
+    position:absolute; left:50%; top:50%; width:44px; height:28px;
+    margin:-14px 0 0 -22px;
+}
+.usp-proj-icespear{ filter: drop-shadow(0 0 10px rgba(180,235,255,.95)) drop-shadow(0 0 22px rgba(79,195,247,.50)); }
 
 /* =========================================================================
    GROUND-TARGETED SPELLS (js/skills/spell-targeting.js)
@@ -788,3 +1528,1877 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 @media (prefers-reduced-motion: reduce) {
     .skill-hotbar-slot.is-toggled { animation: none; }
 }
+
+/* ━━━ PYROBLAST (usp_pyroblast) — WoW-Classic "immense fiery boulder" ━━ */
+/* Signature override: owns its silhouette + 2.4x launch scale while Fireball
+   keeps the shared fire theme untouched. Lumpy molten mass, slow churn,
+   ragged ember trail. Still aims +X in the 44x28 box; the engine scales it. */
+.usp-proj-pyroblast  { filter: drop-shadow(0 0 14px rgba(255,150,30,.98)) drop-shadow(0 0 26px rgba(255,80,0,.65)) drop-shadow(0 0 48px rgba(200,30,0,.35)); }
+.usp-p-pyro-trail{
+    position:absolute; left:-4px; top:7px; width:30px; height:14px;
+    background:
+        radial-gradient(ellipse 60% 50% at 70% 50%, rgba(255,200,60,.90) 0%, rgba(255,110,10,.55) 30%, transparent 65%),
+        linear-gradient(to right, transparent 0%, rgba(180,30,0,.55) 30%, #ff5a00 60%, #ffb300 82%, #ffe9a0 100%);
+    clip-path: polygon(100% 50%, 62% 0, 40% 12%, 22% 6%, 8% 28%, 16% 50%, 8% 72%, 22% 94%, 40% 88%, 62% 100%);
+    filter: blur(.4px);
+    animation: usp-pyro-trail 140ms ease-in-out infinite alternate;
+}
+@keyframes usp-pyro-trail{ from{transform:scaleX(.9)} to{transform:scaleX(1.1) translateX(1px)} }
+.usp-p-pyro-ember{
+    position:absolute; width:4px; height:4px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #ffca28 45%, #ff3d00 100%);
+    box-shadow: 0 0 6px #ff6f00, 0 0 12px #ff3d00;
+    animation: usp-ember 500ms ease-in infinite;
+}
+.usp-p-pyro-ember-1{ left:14px; top:3px }
+.usp-p-pyro-ember-2{ left:10px; top:20px; animation-delay:180ms }
+.usp-p-pyro-ember-3{ left:6px; top:11px; width:3px; height:3px; animation-delay:320ms }
+.usp-p-pyro-body{
+    position:absolute; left:16px; top:1px; width:27px; height:26px;
+    border-radius: 48% 52% 55% 45% / 55% 48% 52% 46%;
+    background:
+        radial-gradient(circle at 34% 30%, #fff8dc 0%, #ffe27a 12%, #ffb300 26%, #ff7a00 44%, #e83b12 62%, #8f1400 80%, #3d0800 100%);
+    box-shadow:
+        inset 0 0 12px rgba(255,255,255,.85),
+        inset -5px -6px 14px rgba(120,15,0,.75),
+        0 0 18px rgba(255,122,0,.95), 0 0 36px rgba(232,59,18,.60);
+    animation: usp-pyro-churn 1.4s linear infinite;
+}
+@keyframes usp-pyro-churn{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.usp-p-pyro-crust{
+    position:absolute; inset:0;
+    border-radius: inherit;
+    background:
+        radial-gradient(ellipse 34% 26% at 68% 62%, rgba(61,8,0,.85) 0%, transparent 70%),
+        radial-gradient(ellipse 26% 30% at 30% 70%, rgba(90,12,0,.80) 0%, transparent 70%),
+        radial-gradient(ellipse 22% 20% at 60% 24%, rgba(143,20,0,.70) 0%, transparent 70%);
+}
+.usp-p-pyro-core{
+    position:absolute; left:8px; top:7px; width:11px; height:11px; border-radius:50%;
+    background: radial-gradient(circle at 38% 34%, #ffffff 0%, #fff6b0 30%, #ffc52e 62%, rgba(255,140,0,0) 78%);
+    box-shadow: 0 0 10px #fff, 0 0 20px #ffc52e;
+    animation: usp-pyro-core 380ms ease-in-out infinite alternate;
+}
+@keyframes usp-pyro-core{ from{transform:scale(1)} to{transform:scale(1.15)} }
+
+/* ━━━ FLAMESTRIKE (usp_flamestrike) — WoW-Classic pillar of flame ━━━━━ */
+/* Signature impact: a column of fire rips up from under the victim's feet
+   and swallows the whole card. Monster cards never clip overflow, so the
+   pillar genuinely rises above the target. Replaces the generic nova ring. */
+.usp-pillar-flamestrike{
+    position:absolute; left:12%; right:12%; bottom:-8%; height:148%;
+    pointer-events:none; z-index:5;
+    transform-origin:50% 100%;
+    animation: usp-pillar-rise .95s cubic-bezier(.16,.84,.32,1) forwards;
+    background:
+        linear-gradient(to top, #fff8dc 0%, #ffe27a 10%, #ffab00 26%, #ff6f00 44%, #e83b12 64%, rgba(143,20,0,.80) 82%, transparent 100%);
+    border-radius: 46% 54% 0 0 / 22% 24% 0 0;
+    filter: blur(.4px) drop-shadow(0 0 14px rgba(255,122,0,.90)) drop-shadow(0 0 30px rgba(232,59,18,.50));
+}
+@keyframes usp-pillar-rise{
+    0%{transform:scaleY(.06); opacity:0}
+    12%{opacity:1}
+    30%{transform:scaleY(1); opacity:1}
+    70%{transform:scaleY(1); opacity:1}
+    100%{transform:scaleY(1.06); opacity:0}
+}
+.usp-pillar-flamestrike::before{
+    content:''; position:absolute; left:22%; right:22%; top:6%; bottom:0;
+    background: linear-gradient(to top, rgba(255,255,255,.95) 0%, rgba(255,240,180,.85) 22%, rgba(255,171,0,.55) 48%, transparent 78%);
+    border-radius: 50% 50% 0 0 / 18% 18% 0 0;
+    filter: blur(1px);
+    animation: usp-pillar-flicker 130ms ease-in-out infinite alternate;
+    transform-origin:50% 100%;
+}
+@keyframes usp-pillar-flicker{ from{transform:scaleX(.92) skewX(-2deg)} to{transform:scaleX(1.08) skewX(2deg)} }
+.usp-pillar-flamestrike::after{
+    content:''; position:absolute; left:-12%; right:-12%; bottom:-4%; height:22%;
+    background: radial-gradient(ellipse at 50% 60%, rgba(255,255,255,.90) 0%, rgba(255,171,0,.75) 30%, rgba(232,59,18,.50) 55%, transparent 75%);
+    filter: blur(2px);
+    animation: usp-pillar-base .95s ease-out forwards;
+}
+@keyframes usp-pillar-base{ 0%{transform:scale(.4); opacity:0} 18%{transform:scale(1.1); opacity:1} 100%{transform:scale(1.25); opacity:0} }
+
+/* ━━━ FLAMEBLAST (usp_flameblast) — charged ring detonation ━━━━━━━━━━━━ */
+/* Signature impact: a ring of flame starts at the outer radius (--blast
+   scales it with the held charge: 0.6 quick tap → 1.5 full charge) and
+   closes inward, then the core detonates white-hot inside. The generic
+   impact flash + nova ring play alongside, so the landing reads as
+   flames erupting from the edge with the explosion in the middle. */
+.usp-flameblast-ring{
+    position:absolute; inset:0; border-radius:10px;
+    pointer-events:none; z-index:5; --blast:1;
+    animation: usp-flameblast-fade 1.1s ease-out forwards;
+}
+.usp-flameblast-ring::before{
+    content:''; position:absolute; left:50%; top:50%;
+    width:calc(76px * var(--blast)); height:calc(76px * var(--blast));
+    margin:calc(-38px * var(--blast)) 0 0 calc(-38px * var(--blast));
+    border-radius:50%; border:4px solid #ffab00;
+    box-shadow:0 0 16px #ff9100, 0 0 34px rgba(255,61,0,.65), inset 0 0 12px rgba(255,171,0,.80), 0 0 6px #fff8dc;
+    animation: usp-flameblast-close .55s cubic-bezier(.3,.7,.4,1) forwards;
+}
+.usp-flameblast-ring::after{
+    content:''; position:absolute; left:50%; top:50%;
+    width:calc(30px * var(--blast)); height:calc(30px * var(--blast));
+    margin:calc(-15px * var(--blast)) 0 0 calc(-15px * var(--blast));
+    border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #ffe27a 22%, #ff9100 48%, rgba(232,59,18,.85) 68%, transparent 76%);
+    box-shadow:0 0 22px #ffb300, 0 0 44px rgba(255,111,0,.70);
+    opacity:0;
+    animation: usp-flameblast-core 1.1s ease-out forwards;
+}
+@keyframes usp-flameblast-close{
+    0%{transform:scale(1); opacity:1; border-color:#ffab00}
+    70%{transform:scale(.28); opacity:1; border-color:#ff6f00}
+    100%{transform:scale(.06); opacity:0; border-color:#fff8dc}
+}
+@keyframes usp-flameblast-core{
+    0%, 38%{opacity:0; transform:scale(.3)}
+    50%{opacity:1; transform:scale(1.25)}
+    100%{opacity:0; transform:scale(1.6)}
+}
+@keyframes usp-flameblast-fade{
+    0%{opacity:1} 70%{opacity:1} 100%{opacity:0}
+}
+
+/* ━━━ RAIN OF FIRE (usp_rain_of_fire) — WoW-Classic downpour ━━━━━━━━━━ */
+/* Zone weather: little flame streaks pouring inside the placed circle.
+   The drop spans the full zone height so translateY % always crosses it,
+   whatever the reticle size is; only the ::before head is visible flame. */
+.usp-rain-drop{
+    position:absolute; top:0; height:100%; width:3px; margin-left:-1px;
+    pointer-events:none;
+    animation: usp-rain-fall .7s linear infinite;
+}
+.usp-rain-drop::before{
+    content:''; position:absolute; top:0; left:0; width:3px; height:14px; border-radius:2px;
+    background: linear-gradient(to bottom, rgba(255,255,255,.95) 0%, #ffd54f 25%, #ff8a00 55%, rgba(232,59,18,.70) 80%, transparent 100%);
+    box-shadow: 0 0 6px rgba(255,180,60,.90), 0 0 12px rgba(255,110,0,.50);
+}
+@keyframes usp-rain-fall{ from{transform:translateY(-12%)} to{transform:translateY(112%)} }
+
+/* ━━━ BLIZZARD (usp_blizzard) — wind-blown ice storm ━━━━━━━━━━━━━━━━━━ */
+/* Same storm system as Rain of Fire, icy and slanted: shards fall along a
+   tilted axis (rotate baked into the keyframes, so head and path share the
+   angle) instead of straight down. The :has rule clips drifting shards to
+   the zone circle - zones never have any other children, so it touches
+   nothing else. */
+.stg-zone:has(> .usp-rain-drop), .stg-zone:has(> .usp-rain-shard), .stg-zone:has(> .usp-rain-arrow), .stg-zone:has(> .usp-fire-tornado){ overflow:hidden; }
+
+/* ━━━ FIRESTORM (usp_firestorm) — tornado of fire ━━━━━━━━━━━━━━━━━━━━━━ */
+/* Signature zone weather: a spinning funnel of flame standing centered in
+   the placed circle - narrow at the ground, wider at the top, with
+   counter-rotating ember bands and a scorching base. */
+.usp-fire-tornado{
+    position:absolute; left:50%; bottom:-6%; width:44%; height:116%;
+    transform:translateX(-50%);
+    pointer-events:none;
+    background:
+        linear-gradient(to top, #fff8dc 0%, #ffe27a 8%, #ffab00 22%, #ff6f00 45%, #e83b12 68%, rgba(143,20,0,.55) 88%, transparent 100%);
+    clip-path: polygon(38% 100%, 62% 100%, 78% 55%, 92% 0, 8% 0, 22% 55%);
+    filter: blur(.6px) drop-shadow(0 0 12px rgba(255,122,0,.85));
+    animation: usp-tornado-sway 1.1s ease-in-out infinite alternate;
+}
+@keyframes usp-tornado-sway{ from{transform:translateX(-54%) skewX(-3deg)} to{transform:translateX(-46%) skewX(3deg)} }
+.usp-fire-tornado::before{
+    content:''; position:absolute; inset:0;
+    background: repeating-conic-gradient(from 0deg at 50% 60%, rgba(255,255,255,.35) 0deg 12deg, transparent 12deg 36deg);
+    filter: blur(2px);
+    animation: usp-tornado-spin .7s linear infinite;
+}
+@keyframes usp-tornado-spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+.usp-fire-tornado::after{
+    content:''; position:absolute; left:-15%; right:-15%; bottom:-3%; height:24%;
+    background: radial-gradient(ellipse at 50% 60%, rgba(255,255,255,.85) 0%, rgba(255,171,0,.7) 35%, rgba(232,59,18,.45) 60%, transparent 78%);
+    filter: blur(2px);
+}
+
+/* ━━━ ARROW VOLLEY (usp_arrow_volley) — raining arrows ━━━━━━━━━━━━━━━━ */
+/* Same storm system as fire/ice rain: full ranger shafts pouring straight
+   down inside the zone. The track spans the zone height so translateY %
+   always crosses it; shaft + head + fletching ride as one falling arrow. */
+.usp-rain-arrow{
+    position:absolute; top:0; height:100%; width:5px; margin-left:-2px;
+    pointer-events:none;
+    animation: usp-rain-fall .7s linear infinite;
+}
+.usp-rain-arrow::before{
+    content:''; position:absolute; top:0; left:1px; width:3px; height:13px;
+    background: linear-gradient(to bottom, #8d6e63 0%, #5d4037 60%, #3e2723 100%);
+}
+.usp-rain-arrow::after{
+    content:''; position:absolute; top:13px; left:-1px; width:7px; height:6px;
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    background: linear-gradient(to bottom, #eceff1 0%, #8b98ad 100%);
+    filter: drop-shadow(0 0 3px rgba(255,255,255,.7));
+}
+.usp-rain-shard{
+    position:absolute; top:0; height:100%; width:3px; margin-left:-1px;
+    pointer-events:none;
+    animation: usp-shard-fall .6s linear infinite;
+}
+.usp-rain-shard::before{
+    content:''; position:absolute; top:0; left:-1px; width:5px; height:16px;
+    clip-path: polygon(50% 0, 100% 55%, 50% 100%, 0 55%);
+    background: linear-gradient(to bottom, rgba(255,255,255,.98) 0%, #b3e5fc 30%, #4fc3f7 60%, rgba(2,119,189,.55) 85%, transparent 100%);
+    box-shadow: 0 0 6px rgba(180,230,255,.95), 0 0 12px rgba(79,195,247,.55);
+}
+@keyframes usp-shard-fall{ from{transform:rotate(16deg) translateY(-12%)} to{transform:rotate(16deg) translateY(112%)} }
+
+/* ━━━ CONE OF COLD (usp_cone_of_cold) — WoW-Classic cone blast ━━━━━━━━━ */
+/* Signature zone blast: an icy wedge flashing out from the caster end of
+   the placed cone, with splinters streaking downrange inside it. Each
+   shard is a full-width track so translateX % always spans the cone,
+   whatever its length is; only the ::before splinter head is visible.
+   Animations loop (gallery replays the blast; in game the burst zone is
+   removed after ~450ms, i.e. a single eruption). */
+.stg-zone:has(> .usp-cone-blast){ overflow:hidden; }
+.usp-cone-blast{
+    position:absolute; left:0; top:0; width:100%; height:100%;
+    pointer-events:none;
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+    background: linear-gradient(to right, rgba(255,255,255,.95) 0%, rgba(200,240,255,.85) 18%, rgba(127,217,255,.55) 45%, rgba(79,195,247,.25) 70%, transparent 100%);
+    transform-origin:0 50%;
+    animation: usp-cone-erupt .45s ease-out infinite;
+}
+@keyframes usp-cone-erupt{ 0%{transform:scaleX(.15); opacity:0} 18%{opacity:1} 45%{transform:scaleX(1); opacity:1} 100%{transform:scaleX(1.04); opacity:0} }
+.usp-cone-shard{
+    position:absolute; left:0; width:100%; height:2px;
+    pointer-events:none;
+    animation: usp-cone-streak .4s ease-out infinite;
+}
+.usp-cone-shard::before{
+    content:''; position:absolute; left:0; top:-2px; width:16px; height:6px;
+    clip-path: polygon(0 50%, 35% 0, 100% 0, 100% 100%, 35% 100%);
+    background: linear-gradient(to right, #ffffff 0%, #b3e5fc 50%, rgba(79,195,247,.10) 100%);
+    box-shadow: 0 0 6px rgba(180,230,255,.90);
+}
+@keyframes usp-cone-streak{ 0%{transform:translateX(-8%); opacity:0} 15%{opacity:1} 75%{opacity:1} 100%{transform:translateX(92%); opacity:0} }
+
+/* ━━━ CRACKLING LANCE (usp_crackling_lance) — rail discharge ━━━━━━━━━━ */
+/* Signature beam eruption: a white-blue trunk as wide as the beam firing
+   from the caster end in one snap, bleeding fork arcs sideways onto the
+   line. Children of the placed zone (like the cone blast), so they die
+   with it - the looping gallery replays the snap; in game it is one
+   discharge over the ~450ms burst. Purely additive. */
+.stg-zone:has(> .usp-lance-trunk){ overflow:hidden; }
+.usp-lance-trunk{
+    position:absolute; left:0; top:8%; width:100%; height:84%;
+    pointer-events:none;
+    background: linear-gradient(to right, #ffffff 0%, #d6ecff 12%, #82c8ff 30%, rgba(60,140,255,.55) 55%, rgba(60,140,255,.12) 85%, transparent 100%);
+    filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 22px #82c8ff);
+    transform-origin:0 50%;
+    animation: usp-lance-erupt .45s ease-out infinite;
+}
+.usp-lance-trunk::before{
+    content:''; position:absolute; left:0; top:50%; width:100%; height:6px; margin-top:-3px;
+    background: linear-gradient(to right, #ffffff 0%, rgba(255,255,255,.9) 60%, transparent 100%);
+    box-shadow: 0 0 12px #fff;
+}
+@keyframes usp-lance-erupt{ 0%{transform:scaleX(.08); opacity:0} 16%{opacity:1} 42%{transform:scaleX(1); opacity:1} 100%{transform:scaleX(1.03); opacity:0} }
+.usp-lance-arc{
+    position:absolute; top:50%; width:26px; height:34px; margin-top:-17px;
+    pointer-events:none;
+    background: linear-gradient(to bottom, transparent 0%, #ffffff 18%, #82c8ff 50%, #ffffff 82%, transparent 100%);
+    clip-path: polygon(42% 0, 58% 0, 52% 32%, 70% 38%, 50% 50%, 68% 62%, 48% 66%, 56% 100%, 44% 100%, 50% 64%, 30% 60%, 48% 48%, 28% 40%, 48% 34%);
+    filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 10px #82c8ff);
+    opacity:0;
+    animation: usp-lance-arc .45s ease-out infinite;
+}
+.usp-lance-arc.is-down{ --flip:-1 }
+@keyframes usp-lance-arc{ 0%{opacity:0; transform:scaleY(var(--flip, 1)) scale(.4)} 30%{opacity:1} 100%{opacity:0; transform:scaleY(var(--flip, 1)) scale(1.15)} }
+
+/* ━━━ METEOR (usp_meteor) — Diablo-2 skyfall rock ━━━━━━━━━━━━━━━━━━━━ */
+/* Signature projectile: a huge burning rock with a long streaming tail.
+   Built aiming +X like every projectile; the engine rotates the whole box
+   onto the near-vertical fall vector and launches it at 3x scale. */
+.usp-proj-meteor    { filter: drop-shadow(0 0 16px rgba(255,150,30,.98)) drop-shadow(0 0 30px rgba(255,80,0,.65)) drop-shadow(0 0 54px rgba(200,30,0,.35)); }
+.usp-p-meteor-tail{
+    position:absolute; left:-4px; top:8px; width:36px; height:12px;
+    background:
+        radial-gradient(ellipse 55% 50% at 72% 50%, rgba(255,220,120,.95) 0%, rgba(255,140,0,.6) 32%, transparent 68%),
+        linear-gradient(to right, transparent 0%, rgba(120,15,0,.6) 22%, #e83b12 48%, #ff7a00 70%, #ffc52e 88%, #fff6d8 100%);
+    clip-path: polygon(100% 50%, 70% 0, 52% 14%, 34% 4%, 20% 24%, 28% 50%, 20% 76%, 34% 96%, 52% 86%, 70% 100%);
+    filter: blur(.4px);
+    animation: usp-meteor-tail 110ms ease-in-out infinite alternate;
+}
+@keyframes usp-meteor-tail{ from{transform:scaleX(.9) skewY(1.5deg)} to{transform:scaleX(1.1) skewY(-1.5deg)} }
+.usp-p-meteor-ember{
+    position:absolute; width:4px; height:4px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #ffca28 45%, #ff3d00 100%);
+    box-shadow: 0 0 6px #ff6f00, 0 0 12px #ff3d00;
+    animation: usp-ember 450ms ease-in infinite;
+}
+.usp-p-meteor-ember-1{ left:12px; top:2px }
+.usp-p-meteor-ember-2{ left:8px; top:22px; animation-delay:200ms }
+.usp-p-meteor-rock{
+    position:absolute; left:22px; top:3px; width:22px; height:22px;
+    border-radius: 42% 58% 55% 45% / 58% 44% 56% 42%;
+    background:
+        radial-gradient(circle at 36% 30%, #6e5a4a 0%, #4a382c 22%, #2a1a12 48%, #120806 72%, #000000 100%);
+    box-shadow:
+        inset -4px -5px 10px rgba(0,0,0,.9),
+        inset 2px 2px 6px rgba(255,150,60,.35),
+        0 0 16px rgba(255,122,0,.9), 0 0 32px rgba(232,59,18,.55);
+    animation: usp-meteor-tumble 550ms linear infinite;
+}
+@keyframes usp-meteor-tumble{ from{transform:rotate(-14deg)} to{transform:rotate(14deg)} }
+.usp-p-meteor-cracks{
+    position:absolute; inset:0;
+    border-radius: inherit;
+    background:
+        linear-gradient(63deg, transparent 42%, rgba(255,200,60,.9) 46%, rgba(255,110,0,.85) 50%, transparent 55%),
+        linear-gradient(155deg, transparent 55%, rgba(255,170,40,.8) 60%, transparent 66%),
+        radial-gradient(circle at 62% 58%, rgba(255,120,10,.75) 0%, transparent 42%);
+}
+.usp-p-meteor-rim{
+    position:absolute; right:-1px; top:15%; width:7px; height:70%; border-radius:50%;
+    background: linear-gradient(to right, rgba(255,140,0,0), #ffe9a8 60%, #ffffff);
+    filter: blur(.6px);
+    box-shadow: 0 0 10px #fff, 0 0 18px #ffc52e;
+}
+
+/* ━━━ MELEE SWING (heroic strike & kin) — swinging sword ━━━━━━━━━━━━━━ */
+/* Signature melee visual: a sword sweeping across an arc toward the aim
+   point, with a slash crescent. The container is rotated onto the aim
+   vector inline; the sweep itself is local. Purely additive. */
+.usp-melee-swing{
+    position:fixed; width:150px; height:150px; margin:-75px 0 0 -75px;
+    pointer-events:none; z-index:1335;
+}
+.usp-sword-arc{
+    position:absolute; inset:6px; border-radius:50%;
+    background: conic-gradient(from -62deg, transparent 0deg, rgba(255,255,255,.95) 34deg, rgba(207,214,228,.55) 62deg, transparent 104deg);
+    -webkit-mask: radial-gradient(closest-side, transparent 70%, #000 71%);
+    mask: radial-gradient(closest-side, transparent 70%, #000 71%);
+    filter: drop-shadow(0 0 6px rgba(255,255,255,.8));
+    animation: usp-sword-arc .38s ease-out infinite;
+}
+@keyframes usp-sword-arc{ 0%{opacity:0} 25%{opacity:1} 100%{opacity:0} }
+.usp-sword{
+    position:absolute; left:50%; top:50%; width:112px; height:34px; margin-top:-17px;
+    transform-origin:0 50%;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,.7)) drop-shadow(0 0 14px rgba(139,152,173,.5));
+    animation: usp-sword-sweep .38s ease-out infinite;
+}
+@keyframes usp-sword-sweep{ 0%{transform:rotate(-52deg)} 60%{transform:rotate(38deg)} 100%{transform:rotate(48deg)} }
+.usp-sword-blade{
+    position:absolute; left:26px; top:13px; width:78px; height:8px;
+    clip-path: polygon(0 22%, 82% 0, 100% 50%, 82% 100%, 0 78%);
+    background: linear-gradient(to bottom, #ffffff 0%, #cfd6e4 30%, #8b98ad 60%, #5a6577 100%);
+}
+.usp-sword-fuller{
+    position:absolute; left:32px; top:16px; width:56px; height:2px;
+    background: rgba(255,255,255,.75);
+}
+.usp-sword-guard{
+    position:absolute; left:20px; top:5px; width:8px; height:24px; border-radius:2px;
+    background: linear-gradient(to right, #8a6a1f 0%, #ffd76b 50%, #8a6a1f 100%);
+}
+.usp-sword-grip{
+    position:absolute; left:8px; top:12px; width:13px; height:10px; border-radius:2px;
+    background: repeating-linear-gradient(45deg, #3e2723 0 2px, #5d4037 2px 4px);
+}
+.usp-sword-pommel{
+    position:absolute; left:2px; top:13px; width:8px; height:8px; border-radius:50%;
+    background: radial-gradient(circle at 35% 35%, #ffe9a8 0%, #b8912f 70%, #6e5410 100%);
+}
+
+/* ━━━ MORTAL STRIKE (usp_mortal_strike) — overhead axe ━━━━━━━━━━━━━━━━━ */
+/* Same swing system as the sword, but the axe is raised high and slammed
+   DOWN: taller arc, heavier crescent, slower sweep with a slam shake.
+   Purely additive. */
+.usp-melee-axe .usp-sword-arc{ display:none; }
+.usp-axe-arc{
+    position:absolute; inset:-6px; border-radius:50%;
+    background: conic-gradient(from -78deg, transparent 0deg, rgba(255,214,107,.35) 30deg, rgba(255,255,255,.95) 52deg, rgba(232,59,18,.55) 78deg, transparent 120deg);
+    -webkit-mask: radial-gradient(closest-side, transparent 62%, #000 63%);
+    mask: radial-gradient(closest-side, transparent 62%, #000 63%);
+    filter: drop-shadow(0 0 8px rgba(255,171,0,.8));
+    animation: usp-sword-arc .5s ease-out infinite;
+}
+.usp-axe{
+    position:absolute; left:50%; top:50%; width:104px; height:110px; margin:-88px 0 0 0;
+    transform-origin:0 88px;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,.6)) drop-shadow(0 0 16px rgba(255,171,0,.45));
+    animation: usp-axe-slam .5s ease-in infinite;
+}
+@keyframes usp-axe-slam{ 0%{transform:rotate(-68deg)} 55%{transform:rotate(46deg)} 75%{transform:rotate(38deg)} 100%{transform:rotate(46deg)} }
+.usp-axe-haft{
+    position:absolute; left:-4px; top:0; width:9px; height:104px; border-radius:4px;
+    background: linear-gradient(to right, #3e2723 0%, #6d4c41 45%, #3e2723 100%);
+}
+.usp-axe-head{
+    position:absolute; left:-22px; top:66px; width:46px; height:30px;
+    clip-path: polygon(38% 0, 100% 8%, 92% 50%, 100% 92%, 38% 100%, 46% 50%);
+    background: linear-gradient(to bottom, #ffffff 0%, #cfd6e4 35%, #8b98ad 65%, #5a6577 100%);
+}
+.usp-axe-edge{
+    position:absolute; left:16px; top:68px; width:7px; height:26px;
+    clip-path: polygon(0 8%, 100% 0, 88% 50%, 100% 100%, 0 92%);
+    background: linear-gradient(to bottom, #fff 0%, #ffe9a8 50%, #fff 100%);
+    box-shadow: 0 0 6px #fff;
+}
+
+/* ━━━ CLEAVE (usp_cleave) — wide multi-hit axe arc ━━━━━━━━━━━━━━━━━━━━━ */
+/* Same swing system: a broad axe sweeping the whole front, trailing three
+   staggered slash crescents to read as one strike hitting many. Purely
+   additive. */
+.usp-melee-cleave .usp-sword-arc{ display:none; }
+.usp-cleave-arc{
+    position:absolute; inset:0; border-radius:50%;
+    -webkit-mask: radial-gradient(closest-side, transparent 64%, #000 65%);
+    mask: radial-gradient(closest-side, transparent 64%, #000 65%);
+    filter: drop-shadow(0 0 6px rgba(255,255,255,.7));
+}
+.usp-cleave-arc-1{
+    background: conic-gradient(from -80deg, transparent 0deg, rgba(255,255,255,.95) 40deg, rgba(207,214,228,.50) 80deg, transparent 130deg);
+    animation: usp-cleave-arc .55s ease-out infinite;
+}
+.usp-cleave-arc-2{
+    background: conic-gradient(from -60deg, transparent 0deg, rgba(255,255,255,.70) 34deg, rgba(207,214,228,.35) 70deg, transparent 115deg);
+    animation: usp-cleave-arc .55s ease-out .09s infinite;
+}
+.usp-cleave-arc-3{
+    background: conic-gradient(from -40deg, transparent 0deg, rgba(255,255,255,.50) 28deg, rgba(207,214,228,.25) 60deg, transparent 100deg);
+    animation: usp-cleave-arc .55s ease-out .18s infinite;
+}
+@keyframes usp-cleave-arc{ 0%{opacity:0} 25%{opacity:1} 100%{opacity:0} }
+.usp-cleave-axe{
+    position:absolute; left:50%; top:50%; width:120px; height:30px; margin-top:-15px;
+    transform-origin:0 50%;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,.65)) drop-shadow(0 0 14px rgba(139,152,173,.45));
+    animation: usp-cleave-sweep .55s ease-out infinite;
+}
+@keyframes usp-cleave-sweep{ 0%{transform:rotate(-72deg)} 60%{transform:rotate(58deg)} 100%{transform:rotate(68deg)} }
+.usp-cleave-haft{
+    position:absolute; left:0; top:12px; width:88px; height:7px; border-radius:3px;
+    background: linear-gradient(to bottom, #3e2723 0%, #6d4c41 45%, #3e2723 100%);
+}
+.usp-cleave-head{
+    position:absolute; left:82px; top:2px; width:34px; height:26px;
+    clip-path: polygon(30% 0, 100% 6%, 92% 50%, 100% 94%, 30% 100%, 38% 50%);
+    background: linear-gradient(to bottom, #ffffff 0%, #cfd6e4 35%, #8b98ad 65%, #5a6577 100%);
+}
+.usp-cleave-edge{
+    position:absolute; left:106px; top:4px; width:7px; height:22px;
+    clip-path: polygon(0 6%, 100% 0, 88% 50%, 100% 100%, 0 94%);
+    background: linear-gradient(to bottom, #fff 0%, #ffe9a8 50%, #fff 100%);
+    box-shadow: 0 0 6px #fff;
+}
+
+/* ━━━ REAP (usp_reap) — reaper scythe harvest ━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* Same swing system: a spectral scythe reaped across the whole front in a
+   full wide arc, trailing staggered harvest crescents and the souls it
+   reaps as wisps. Purely additive. */
+.usp-melee-scythe .usp-sword-arc{ display:none; }
+.usp-scythe-arc{
+    position:absolute; inset:-8px; border-radius:50%;
+    -webkit-mask: radial-gradient(closest-side, transparent 60%, #000 61%);
+    mask: radial-gradient(closest-side, transparent 60%, #000 61%);
+    filter: drop-shadow(0 0 8px rgba(105,240,174,.75));
+}
+.usp-scythe-arc-1{
+    background: conic-gradient(from -86deg, transparent 0deg, rgba(232,255,244,.95) 42deg, rgba(105,240,174,.55) 82deg, transparent 134deg);
+    animation: usp-scythe-arc .6s ease-out infinite;
+}
+.usp-scythe-arc-2{
+    background: conic-gradient(from -64deg, transparent 0deg, rgba(232,255,244,.65) 34deg, rgba(105,240,174,.35) 70deg, transparent 116deg);
+    animation: usp-scythe-arc .6s ease-out .1s infinite;
+}
+@keyframes usp-scythe-arc{ 0%{opacity:0} 25%{opacity:1} 100%{opacity:0} }
+.usp-scythe{
+    position:absolute; left:50%; top:50%; width:132px; height:96px; margin-top:-48px;
+    transform-origin:0 50%;
+    filter: drop-shadow(0 0 6px rgba(232,255,244,.7)) drop-shadow(0 0 16px rgba(105,240,174,.5));
+    animation: usp-scythe-reap .6s ease-out infinite;
+}
+@keyframes usp-scythe-reap{ 0%{transform:rotate(-80deg)} 60%{transform:rotate(60deg)} 100%{transform:rotate(70deg)} }
+.usp-scythe-haft{
+    position:absolute; left:0; top:44px; width:96px; height:7px; border-radius:3px;
+    background: linear-gradient(to bottom, #1a1a1a 0%, #4a4a4a 45%, #1a1a1a 100%);
+}
+.usp-scythe-collar{
+    position:absolute; left:88px; top:41px; width:10px; height:13px; border-radius:2px;
+    background: linear-gradient(to right, #0d3b26 0%, #69f0ae 50%, #0d3b26 100%);
+    box-shadow: 0 0 6px rgba(105,240,174,.9);
+}
+.usp-scythe-blade{
+    position:absolute; left:66px; top:-22px; width:66px; height:66px; border-radius:50%;
+    border:9px solid transparent; border-top-color:#e8fff4; border-right-color:rgba(207,255,229,.85);
+    -webkit-mask: linear-gradient(to bottom, #000 0 55%, transparent 56%);
+    mask: linear-gradient(to bottom, #000 0 55%, transparent 56%);
+    filter: drop-shadow(0 0 5px #fff);
+    transform: rotate(18deg);
+}
+.usp-scythe-edge{
+    position:absolute; left:70px; top:-20px; width:58px; height:58px; border-radius:50%;
+    border:3px solid transparent; border-top-color:#ffffff;
+    -webkit-mask: linear-gradient(to bottom, #000 0 40%, transparent 41%);
+    mask: linear-gradient(to bottom, #000 0 40%, transparent 41%);
+    filter: blur(.4px);
+    transform: rotate(18deg);
+}
+.usp-scythe-wisp{
+    position:absolute; width:7px; height:7px; border-radius:50%;
+    background: radial-gradient(circle, #ffffff 0%, #a7ffeb 55%, transparent 75%);
+    box-shadow: 0 0 8px #a7ffeb;
+    animation: usp-scythe-wisp .6s ease-out infinite;
+}
+.usp-scythe-wisp-1{ left:96px; top:6px; }
+.usp-scythe-wisp-2{ left:110px; top:22px; animation-delay:.12s; }
+@keyframes usp-scythe-wisp{ 0%{opacity:0; transform:translate(6px,-4px) scale(.5)} 35%{opacity:1} 100%{opacity:0; transform:translate(-16px,10px) scale(1.15)} }
+
+/* ━━━ EXECUTE (usp_execute) — oversized executioner greatsword ━━━━━━━━━ */
+/* Same swing system, biggest weapon: a greatsword 1.5x the heroic blade,
+   slammed down overhead with a heavy red-tinged crescent. Purely additive. */
+.usp-melee-greatsword .usp-sword-arc{ display:none; }
+.usp-great-arc{
+    position:absolute; inset:-10px; border-radius:50%;
+    background: conic-gradient(from -74deg, transparent 0deg, rgba(255,255,255,.9) 30deg, rgba(232,59,18,.65) 62deg, rgba(255,255,255,.5) 84deg, transparent 122deg);
+    -webkit-mask: radial-gradient(closest-side, transparent 60%, #000 61%);
+    mask: radial-gradient(closest-side, transparent 60%, #000 61%);
+    filter: drop-shadow(0 0 9px rgba(232,59,18,.75));
+    animation: usp-sword-arc .6s ease-out infinite;
+}
+.usp-greatsword{
+    position:absolute; left:50%; top:50%; width:150px; height:44px; margin-top:-22px;
+    transform-origin:0 50%;
+    filter: drop-shadow(0 0 7px rgba(255,255,255,.7)) drop-shadow(0 0 18px rgba(232,59,18,.45));
+    animation: usp-greatsword-slam .6s ease-in infinite;
+}
+@keyframes usp-greatsword-slam{ 0%{transform:rotate(-64deg)} 50%{transform:rotate(44deg)} 72%{transform:rotate(36deg)} 100%{transform:rotate(44deg)} }
+.usp-great-blade{
+    position:absolute; left:34px; top:16px; width:104px; height:12px;
+    clip-path: polygon(0 22%, 82% 0, 100% 50%, 82% 100%, 0 78%);
+    background: linear-gradient(to bottom, #ffffff 0%, #cfd6e4 30%, #8b98ad 60%, #5a6577 100%);
+}
+.usp-great-fuller{
+    position:absolute; left:42px; top:21px; width:76px; height:2px;
+    background: rgba(255,255,255,.75);
+}
+.usp-great-guard{
+    position:absolute; left:26px; top:6px; width:10px; height:32px; border-radius:2px;
+    background: linear-gradient(to right, #5e1a0c 0%, #e83b12 50%, #5e1a0c 100%);
+}
+.usp-great-grip{
+    position:absolute; left:10px; top:15px; width:17px; height:14px; border-radius:2px;
+    background: repeating-linear-gradient(45deg, #1a1a1a 0 3px, #4a4a4a 3px 6px);
+}
+.usp-great-pommel{
+    position:absolute; left:2px; top:16px; width:10px; height:12px; border-radius:50%;
+    background: radial-gradient(circle at 35% 35%, #ffab91 0%, #b93a12 70%, #5e1a0c 100%);
+}
+
+/* ━━━ WHIRLWIND (usp_whirlwind) — spinning twin blades ━━━━━━━━━━━━━━━━ */
+/* Same swing system, no aimed weapon: twin blades orbit the hero in a full
+   360 spin inside a steel-storm ring. Purely additive. */
+.usp-melee-whirl .usp-sword-arc{ display:none; }
+.usp-whirl-ring{
+    position:absolute; inset:2px; border-radius:50%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,.75) 60deg, rgba(139,152,173,.40) 130deg, transparent 200deg, rgba(255,255,255,.55) 280deg, transparent 340deg);
+    -webkit-mask: radial-gradient(closest-side, transparent 68%, #000 69%);
+    mask: radial-gradient(closest-side, transparent 68%, #000 69%);
+    filter: drop-shadow(0 0 8px rgba(255,255,255,.7));
+    animation: usp-spin-slow .55s linear infinite;
+}
+.usp-whirl-orbit{
+    position:absolute; inset:0;
+    animation: usp-spin-slow .55s linear infinite;
+}
+.usp-whirl-blade{
+    position:absolute; left:50%; top:50%; width:64px; height:10px; margin-top:-5px;
+    transform-origin:0 50%;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,.8));
+}
+.usp-whirl-blade-1{ transform:rotate(20deg); }
+.usp-whirl-blade-2{ transform:rotate(200deg); }
+.usp-whirl-blade::before{
+    content:''; position:absolute; left:6px; top:1px; width:50px; height:8px;
+    clip-path: polygon(0 22%, 82% 0, 100% 50%, 82% 100%, 0 78%);
+    background: linear-gradient(to bottom, #ffffff 0%, #cfd6e4 30%, #8b98ad 60%, #5a6577 100%);
+}
+.usp-whirl-blade::after{
+    content:''; position:absolute; left:0; top:3px; width:7px; height:4px; border-radius:1px;
+    background: linear-gradient(to right, #8a6a1f 0%, #ffd76b 100%);
+}
+
+/* ━━━ REND (usp_rend) — spear thrust ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* Same swing system, third weapon: a spear levelled and driven straight
+   forward in a double lunge, with a thin piercing streak. Purely additive. */
+.usp-melee-spear .usp-sword-arc{ display:none; }
+.usp-spear-line{
+    position:absolute; left:8px; top:50%; width:134px; height:3px; margin-top:-1px;
+    background: linear-gradient(to right, transparent 0%, rgba(255,255,255,.75) 55%, #fff 100%);
+    filter: blur(.4px);
+    animation: usp-spear-line .5s ease-out infinite;
+}
+@keyframes usp-spear-line{ 0%{opacity:0; transform:scaleX(.4); transform-origin:0 50%} 30%{opacity:1} 100%{opacity:0; transform:scaleX(1); transform-origin:0 50%} }
+.usp-spear{
+    position:absolute; left:50%; top:50%; width:120px; height:20px; margin-top:-10px;
+    transform-origin:0 50%;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,.65)) drop-shadow(0 0 12px rgba(139,152,173,.45));
+    animation: usp-spear-thrust .5s ease-out infinite;
+}
+@keyframes usp-spear-thrust{ 0%{transform:translateX(-46px)} 35%{transform:translateX(14px)} 55%{transform:translateX(2px)} 75%{transform:translateX(16px)} 100%{transform:translateX(6px)} }
+.usp-spear-shaft{
+    position:absolute; left:0; top:8px; width:88px; height:5px; border-radius:2px;
+    background: linear-gradient(to bottom, #6d4c41 0%, #8d6e63 45%, #3e2723 100%);
+}
+.usp-spear-wrap{
+    position:absolute; left:66px; top:7px; width:10px; height:7px; border-radius:1px;
+    background: repeating-linear-gradient(90deg, #b8912f 0 2px, #6e5410 2px 4px);
+}
+.usp-spear-head{
+    position:absolute; left:86px; top:4px; width:26px; height:13px;
+    clip-path: polygon(0 50%, 34% 0, 100% 0, 100% 100%, 34% 100%);
+    background: linear-gradient(to bottom, #ffffff 0%, #cfd6e4 40%, #8b98ad 75%, #5a6577 100%);
+}
+.usp-spear-tip{
+    position:absolute; left:108px; top:7px; width:12px; height:7px;
+    clip-path: polygon(0 0, 0 100%, 100% 50%);
+    background: linear-gradient(to right, #cfd6e4 0%, #ffffff 100%);
+    box-shadow: 0 0 6px #fff;
+}
+
+/* ━━━ STORM SMITE (usp_smite) — skyfall judgment bolt ━━━━━━━━━━━━━━━━━━ */
+/* Signature skyfall: a thick bolt with a white-gold core and storm-blue
+   edges, falling from above (engine rotates +X aim onto the fall vector).
+   Arrival crack comes from the lightning impact flash. */
+.usp-proj-stormsmite{ filter: drop-shadow(0 0 12px rgba(255,255,255,.95)) drop-shadow(0 0 22px rgba(255,213,79,.75)) drop-shadow(0 0 38px rgba(64,196,255,.55)); }
+.usp-p-smite-halo{
+    position:absolute; left:2px; top:2px; width:40px; height:24px; border-radius:50%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.85) 0%, rgba(255,213,79,.50) 35%, rgba(64,196,255,.35) 60%, transparent 75%);
+    filter: blur(1.5px);
+    animation: usp-lt-flicker 85ms steps(2) infinite;
+}
+.usp-p-smite-bolt{
+    position:absolute; left:2px; top:8px; width:36px; height:12px;
+    background: linear-gradient(to bottom, #ffffff 0%, #ffecb3 30%, #ffd54f 52%, #40c4ff 78%, #1565c0 100%);
+    clip-path: polygon(0 44%, 14% 16%, 24% 55%, 36% 6%, 47% 60%, 60% 12%, 71% 58%, 82% 30%, 100% 46%, 100% 58%, 82% 46%, 71% 72%, 60% 30%, 47% 76%, 36% 26%, 24% 70%, 14% 36%);
+    filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px #ffd54f);
+}
+.usp-p-smite-arc{
+    position:absolute; height:4px;
+    background: linear-gradient(to bottom, #ffffff 0%, #fff176 60%, #40c4ff 100%);
+    filter: drop-shadow(0 0 4px #fff59d);
+    animation: usp-lb-crackle 120ms steps(2) infinite;
+}
+.usp-p-smite-arc-1{
+    left:8px; top:3px; width:14px;
+    clip-path: polygon(0 60%, 30% 5%, 55% 70%, 80% 0, 100% 55%, 100% 90%, 80% 35%, 55% 100%, 30% 40%);
+}
+.usp-p-smite-arc-2{
+    left:20px; top:22px; width:13px;
+    clip-path: polygon(0 30%, 30% 95%, 55% 25%, 80% 100%, 100% 40%, 100% 70%, 80% 100%, 55% 55%, 30% 100%);
+    animation-delay:.06s;
+}
+
+/* ━━━ SUNFIRE (usp_holy_fire) — golden-white flame burst ━━━━━━━━━━━━━━━ */
+/* Signature opener: sacred-looking flames in fire colors washing the whole
+   card, then the regular fire sizzle burns on. Purely additive. */
+.usp-sunfire-burst{
+    position:absolute; inset:0;
+    pointer-events:none; z-index:5;
+    background:
+        radial-gradient(ellipse at 50% 65%, rgba(255,255,255,.95) 0%, rgba(255,241,118,.85) 22%, rgba(255,183,3,.65) 45%, rgba(230,81,0,.45) 65%, transparent 85%);
+    animation: usp-sunfire-burst .8s ease-out forwards;
+}
+@keyframes usp-sunfire-burst{ 0%{transform:scale(.5); opacity:0; filter:brightness(2)} 20%{opacity:1} 100%{transform:scale(1.15); opacity:0; filter:brightness(1)} }
+.usp-sunfire-burst::before{
+    content:''; position:absolute; left:30%; right:30%; bottom:8%; height:55%;
+    background: linear-gradient(to top, rgba(255,255,255,.9) 0%, rgba(255,213,79,.7) 40%, transparent 100%);
+    clip-path: polygon(50% 0, 72% 30%, 65% 55%, 85% 75%, 60% 88%, 68% 100%, 32% 100%, 40% 88%, 15% 75%, 35% 55%, 28% 30%);
+    filter: blur(1px);
+    animation: usp-sunfire-tongues .8s ease-out forwards;
+}
+@keyframes usp-sunfire-tongues{ 0%{transform:scaleY(.3); opacity:0} 25%{opacity:1} 100%{transform:scaleY(1.1); opacity:0} }
+
+/* ━━━ DESECRATION (usp_consecration) — unholy ground ━━━━━━━━━━━━━━━━━━━ */
+/* Signature opener: a pool of violet-black shadow spreading at the
+   victim's feet, then the regular shadow sizzle consumes on. */
+.usp-desecrate-ground{
+    position:absolute; left:4%; right:4%; bottom:-4%; height:52%;
+    pointer-events:none; z-index:5;
+    background: radial-gradient(ellipse at 50% 70%, rgba(0,0,0,.92) 0%, rgba(26,5,48,.88) 30%, rgba(88,28,135,.70) 55%, rgba(168,85,247,.35) 75%, transparent 92%);
+    border-radius:50%;
+    filter: blur(1px);
+    animation: usp-desecrate 1s ease-out forwards;
+}
+@keyframes usp-desecrate{ 0%{transform:scale(.4); opacity:0} 22%{opacity:1} 70%{opacity:1; transform:scale(1)} 100%{transform:scale(1.08); opacity:0} }
+.usp-desecrate-ground::before{
+    content:''; position:absolute; left:20%; right:20%; top:0; height:45%;
+    background: radial-gradient(ellipse at center, rgba(168,85,247,.55) 0%, transparent 70%);
+    filter: blur(3px);
+    animation: usp-desecrate-wisp 1s ease-out forwards;
+}
+@keyframes usp-desecrate-wisp{ 0%{transform:translateY(8px); opacity:0} 30%{opacity:.9} 100%{transform:translateY(-10px); opacity:0} }
+
+/* ━━━ STARFALL (usp_starfall) — arcane stars from the sky ━━━━━━━━━━━━━━ */
+/* Signature skyfall: a white-hot 4-point star with a sparkle tail. Near-
+   radial, so the near-vertical fall rotation barely matters. The shared
+   spinning orb stays for the arcane school. */
+.usp-proj-starfall{ filter: drop-shadow(0 0 12px rgba(255,255,255,.95)) drop-shadow(0 0 22px rgba(179,136,255,.80)) drop-shadow(0 0 40px rgba(124,77,255,.50)); }
+.usp-p-star-glow{
+    position:absolute; left:8px; top:2px; width:28px; height:24px; border-radius:50%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.90) 0%, rgba(206,147,216,.55) 35%, rgba(124,77,255,.30) 60%, transparent 75%);
+    filter: blur(1px);
+    animation: usp-star-glow 300ms ease-in-out infinite alternate;
+}
+@keyframes usp-star-glow{ from{transform:scale(.94); opacity:.85} to{transform:scale(1.06); opacity:1} }
+.usp-p-star-core{
+    position:absolute; left:13px; top:3px; width:18px; height:22px;
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    background: linear-gradient(to bottom, #ffffff 0%, #f3e5f5 40%, #b388ff 75%, #7c4dff 100%);
+    filter: drop-shadow(0 0 6px #fff);
+    animation: usp-star-twinkle 240ms ease-in-out infinite alternate;
+}
+@keyframes usp-star-twinkle{ from{transform:scale(.92) rotate(-6deg)} to{transform:scale(1.06) rotate(6deg)} }
+.usp-p-star-tail{
+    position:absolute; left:-2px; top:11px; width:16px; height:6px;
+    background: linear-gradient(to right, transparent 0%, rgba(124,77,255,.45) 40%, rgba(225,190,231,.9) 80%, #ffffff 100%);
+    clip-path: polygon(0 50%, 25% 0, 55% 30%, 85% 10%, 100% 40%, 100% 60%, 85% 90%, 55% 70%, 25% 100%);
+    filter: blur(.4px);
+    animation: usp-chaos-trail 130ms ease-in-out infinite alternate;
+}
+.usp-p-star-mote{
+    position:absolute; width:4px; height:4px;
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    background:#f3e5f5;
+    box-shadow: 0 0 5px #ce93d8;
+    animation: usp-msl-mote .5s ease-out infinite;
+}
+.usp-p-star-mote-1{ left:8px; top:4px; }
+.usp-p-star-mote-2{ left:4px; top:19px; animation-delay:.25s; }
+
+/* ━━━ WRATH (usp_wrath) — WoW-Classic Druid nature ball ━━━━━━━━━━━━━━━ */
+/* Signature projectile: a swirling ball of golden-green nature energy with
+   wind bands and drifting leaves. Built pointing +X; the spin is inner
+   only (bands), the ball itself stays aimed. The yellow thunderbolt stays
+   for the lightning school. */
+.usp-proj-wrath{ filter: drop-shadow(0 0 11px rgba(255,241,118,.95)) drop-shadow(0 0 22px rgba(105,240,174,.60)) drop-shadow(0 0 36px rgba(46,125,50,.40)); }
+.usp-p-wrath-trail{
+    position:absolute; left:0; top:11px; width:26px; height:6px; border-radius:3px;
+    background: linear-gradient(to right, transparent 0%, rgba(46,125,50,.35) 30%, rgba(105,240,174,.60) 62%, #fff9c4 100%);
+    filter: blur(.5px);
+}
+.usp-p-wrath-ball{
+    position:absolute; left:22px; top:4px; width:20px; height:20px; border-radius:50%;
+    background:
+        radial-gradient(circle at 32% 30%, #ffffff 0%, #fff9c4 16%, #dcedc8 32%, #9ccc65 50%, #558b2f 70%, #33691e 88%, #1b4312 100%);
+    box-shadow: inset 0 0 10px rgba(255,255,255,.85), 0 0 16px rgba(220,237,200,.8);
+    animation: usp-nat-pulse 700ms ease-in-out infinite alternate;
+}
+.usp-p-wrath-glow{
+    position:absolute; left:5px; top:5px; width:6px; height:6px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, rgba(255,255,255,.9) 45%, transparent 72%);
+    box-shadow: 0 0 8px #fff;
+}
+.usp-p-wrath-band{
+    position:absolute; border-radius:50%;
+}
+.usp-p-wrath-band-1{
+    left:-4px; top:-4px; width:28px; height:28px;
+    border:2px dashed rgba(255,241,118,.85);
+    box-shadow: 0 0 8px rgba(255,241,118,.4);
+}
+.usp-p-wrath-band-2{
+    left:-2px; top:-2px; width:24px; height:24px;
+    border:1px solid rgba(165,214,167,.70);
+    box-shadow: inset 0 0 6px rgba(105,240,174,.35);
+    animation-direction:reverse;
+}
+.usp-p-wrath-leaf{
+    position:absolute; width:7px; height:5px; border-radius:50% 0 52% 0;
+    background: linear-gradient(135deg, #e8f5e9 0%, #66bb6a 50%, #2e7d32 100%);
+    box-shadow: 0 0 4px rgba(105,240,174,.8);
+    animation: usp-leaf-drift 900ms ease-in-out infinite alternate;
+}
+.usp-p-wrath-leaf-1{ left:14px; top:4px; transform:rotate(-22deg); }
+.usp-p-wrath-leaf-2{ left:10px; top:20px; transform:rotate(18deg) scaleX(-1); animation-delay:.3s; }
+
+/* ━━━ LIGHTNING BOLT (usp_lightning_bolt) — WoW-Shaman crackle ━━━━━━━━━ */
+/* Signature projectile: a flat-flying jagged bolt, white-hot core with
+   electric-blue edges and forked arcs jittering off it. Built pointing
+   +X; the shared yellow thunderbolt stays for the school. */
+.usp-proj-lightning-bolt, .usp-proj-chain-lightning{ filter: drop-shadow(0 0 10px rgba(255,255,255,.95)) drop-shadow(0 0 20px rgba(64,196,255,.80)) drop-shadow(0 0 36px rgba(21,101,192,.55)); }
+.usp-p-lb-glow{
+    position:absolute; left:0; top:4px; width:40px; height:20px; border-radius:50%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,.85) 0%, rgba(64,196,255,.50) 35%, transparent 70%);
+    filter: blur(1.5px);
+    animation: usp-lt-flicker 85ms steps(2) infinite;
+}
+.usp-p-lb-main{
+    position:absolute; left:0; top:8px; width:38px; height:12px;
+    background: linear-gradient(to bottom, #ffffff 0%, #e1f5fe 28%, #40c4ff 55%, #1565c0 80%, #0d47a1 100%);
+    clip-path: polygon(0 46%, 12% 18%, 20% 56%, 32% 8%, 42% 60%, 55% 14%, 66% 58%, 78% 30%, 90% 56%, 100% 40%, 100% 60%, 90% 70%, 78% 48%, 66% 76%, 55% 32%, 42% 80%, 32% 28%, 20% 74%, 12% 38%);
+    filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 10px #40c4ff);
+}
+.usp-p-lb-arc{
+    position:absolute; height:5px;
+    background: linear-gradient(to bottom, #ffffff 0%, #80d8ff 60%, #0277bd 100%);
+    filter: drop-shadow(0 0 4px #b3e5fc);
+    animation: usp-lb-crackle 120ms steps(2) infinite;
+}
+.usp-p-lb-arc-1{
+    left:6px; top:3px; width:16px;
+    clip-path: polygon(0 60%, 25% 10%, 50% 70%, 75% 0, 100% 55%, 100% 90%, 75% 35%, 50% 100%, 25% 45%);
+}
+.usp-p-lb-arc-2{
+    left:18px; top:21px; width:15px;
+    clip-path: polygon(0 30%, 25% 90%, 50% 25%, 75% 100%, 100% 40%, 100% 70%, 75% 100%, 50% 55%, 25% 100%);
+    animation-delay:.06s;
+}
+@keyframes usp-lb-crackle{ 0%{opacity:1} 50%{opacity:.25} 100%{opacity:.9} }
+.usp-p-lb-mote{
+    position:absolute; width:2px; height:2px; border-radius:50%;
+    background:#e1f5fe;
+    box-shadow: 0 0 5px #fff, 0 0 9px #40c4ff;
+    animation: usp-msl-mote .4s ease-out infinite;
+}
+.usp-p-lb-mote-1{ left:10px; top:6px; }
+.usp-p-lb-mote-2{ left:24px; top:22px; animation-delay:.2s; }
+
+/* ━━━ CHAOS BOLT (usp_chaos_bolt) — very big fat TBC bolt ━━━━━━━━━━━━━━ */
+/* Signature projectile: a huge churning mass of shadow violet shot through
+   with fel green, dragging ragged tendrils. Built pointing +X; the trail
+   streams behind (-X). The shared shadow orb stays for the school. */
+.usp-proj-chaos{ filter: drop-shadow(0 0 14px rgba(140,60,255,.95)) drop-shadow(0 0 28px rgba(57,255,110,.45)) drop-shadow(0 0 48px rgba(74,20,140,.50)); }
+.usp-p-chaos-body{
+    position:absolute; left:12px; top:1px; width:27px; height:26px;
+    border-radius: 46% 54% 52% 48% / 55% 47% 53% 45%;
+    background:
+        radial-gradient(circle at 38% 32%, #f3e8ff 0%, #b388ff 14%, #7c4dff 30%, #4a148c 52%, #1c0530 74%, #0a0114 100%);
+    box-shadow: inset -5px -6px 12px rgba(0,0,0,.85), inset 3px 3px 8px rgba(180,136,255,.40);
+    animation: usp-chaos-churn 420ms ease-in-out infinite alternate;
+}
+@keyframes usp-chaos-churn{ from{transform:scale(1) rotate(-4deg); border-radius:46% 54% 52% 48% / 55% 47% 53% 45%} to{transform:scale(1.07) rotate(4deg); border-radius:54% 46% 48% 52% / 45% 55% 45% 55%} }
+.usp-p-chaos-fel{
+    position:absolute; inset:0; border-radius:inherit;
+    background:
+        radial-gradient(circle at 68% 62%, rgba(57,255,110,.85) 0%, rgba(0,200,83,.45) 26%, transparent 48%),
+        radial-gradient(circle at 30% 68%, rgba(118,255,3,.55) 0%, transparent 38%),
+        linear-gradient(115deg, transparent 55%, rgba(57,255,110,.50) 62%, transparent 70%);
+    filter: blur(.6px);
+    animation: usp-chaos-fel 300ms ease-in-out infinite alternate;
+}
+@keyframes usp-chaos-fel{ from{opacity:.65; transform:scale(.96)} to{opacity:1; transform:scale(1.04)} }
+.usp-p-chaos-core{
+    position:absolute; left:8px; top:8px; width:10px; height:10px; border-radius:50%;
+    background: radial-gradient(circle, #ffffff 0%, #e9d5ff 35%, rgba(124,77,255,.7) 65%, transparent 100%);
+    animation: usp-chaos-core 380ms ease-in-out infinite alternate;
+}
+@keyframes usp-chaos-core{ from{transform:scale(.9)} to{transform:scale(1.12)} }
+.usp-p-chaos-swirl{
+    position:absolute; left:-3px; top:-3px; width:33px; height:32px; border-radius:50%;
+    border:2px dashed rgba(57,255,110,.75);
+    box-shadow: 0 0 10px rgba(57,255,110,.4), inset 0 0 8px rgba(140,60,255,.35);
+    animation: usp-spin-slow .8s linear infinite;
+}
+.usp-p-chaos-trail{
+    position:absolute; left:-6px; top:9px; width:20px; height:10px;
+    background: linear-gradient(to right, transparent 0%, rgba(74,20,140,.65) 30%, rgba(124,77,255,.8) 62%, #e9d5ff 100%);
+    clip-path: polygon(0 50%, 30% 0, 55% 30%, 80% 5%, 100% 35%, 100% 65%, 80% 95%, 55% 70%, 30% 100%);
+    filter: blur(.5px);
+    animation: usp-chaos-trail 140ms ease-in-out infinite alternate;
+}
+@keyframes usp-chaos-trail{ from{transform:scaleX(.88)} to{transform:scaleX(1.1)} }
+.usp-p-chaos-tendril{
+    position:absolute; width:14px; height:3px; border-radius:2px;
+    background: linear-gradient(to right, transparent 0%, rgba(57,255,110,.8) 60%, #d6ffdc 100%);
+    filter: blur(.4px);
+    animation: usp-chaos-tendril 200ms ease-in-out infinite alternate;
+}
+.usp-p-chaos-tendril-1{ left:-2px; top:5px; transform:rotate(-14deg); }
+.usp-p-chaos-tendril-2{ left:-2px; top:21px; transform:rotate(12deg); animation-delay:.1s; }
+@keyframes usp-chaos-tendril{ from{transform:scaleX(.8); opacity:.6} to{transform:scaleX(1.15); opacity:1} }
+.usp-p-chaos-ember{
+    position:absolute; width:3px; height:3px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #76ff03 50%, #00c853 100%);
+    box-shadow: 0 0 6px rgba(57,255,110,.9);
+    animation: usp-ember 500ms ease-in infinite;
+}
+.usp-p-chaos-ember-1{ left:10px; top:3px; }
+.usp-p-chaos-ember-2{ left:6px; top:23px; animation-delay:.25s; }
+
+/* ━━━ PAIN (usp_shadow_word_pain) — shadowy word ━━━━━━━━━━━━━━━━━━━━━━━ */
+/* Signature opener: a dark word branding the victim, smoky violet aura,
+   rising and fading while the sizzle carries the ticks. Purely additive. */
+.usp-word-pain{
+    position:absolute; left:0; right:0; top:32%;
+    text-align:center; white-space:nowrap;
+    pointer-events:none; z-index:6;
+    font: 700 20px/1 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+    letter-spacing:2px;
+    color:#0d0217;
+    text-shadow: 0 0 6px rgba(88,28,135,.95), 0 0 14px rgba(168,85,247,.80), 0 0 26px rgba(88,28,135,.60);
+    animation: usp-word-pain 1.4s ease-out forwards;
+}
+@keyframes usp-word-pain{ 0%{transform:scale(.6); opacity:0} 18%{opacity:1} 30%{transform:scale(1.05)} 70%{opacity:1} 100%{transform:scale(1.12) translateY(-6px); opacity:0} }
+.usp-word-pain.usp-word-long{ font-size:15px; letter-spacing:1px; }
+
+/* ━━━ DISINTEGRATE (usp_disintegrate) — arcane beam ━━━━━━━━━━━━━━━━━━━━ */
+/* Signature beam: a fixed ray from hero to victim (geometry inline), three
+   nested bands flickering as one. Parts fill the container, so the gallery
+   can demo the same art in a static box. Purely additive. */
+.usp-beam-flash{
+    position:fixed; height:14px; margin-top:-7px;
+    pointer-events:none; z-index:1335;
+    transform-origin:0 50%;
+}
+.usp-beam-flash > div{
+    position:absolute; left:0; width:100%; top:50%;
+    transform:translateY(-50%);
+    animation: usp-beam-flicker .12s ease-in-out infinite alternate;
+}
+.usp-beam-halo{
+    height:13px; border-radius:7px;
+    background: linear-gradient(to right, rgba(255,255,255,.85) 0%, rgba(179,136,255,.60) 25%, rgba(124,77,255,.55) 60%, rgba(179,136,255,.70) 100%);
+    filter: blur(2.5px);
+}
+.usp-beam-mid{
+    height:6px; border-radius:3px;
+    background: linear-gradient(to right, #ffffff 0%, #ce93d8 30%, #7c4dff 65%, #e1bee7 100%);
+    filter: blur(.5px);
+}
+.usp-beam-core{
+    height:2px;
+    background: linear-gradient(to right, #ffffff 0%, rgba(255,255,255,.95) 70%, #ffffff 100%);
+    box-shadow: 0 0 6px #fff;
+}
+@keyframes usp-beam-flicker{ from{opacity:.75} to{opacity:1} }
+
+/* ━━━ INCINERATE (usp_incinerate) — channeled flamethrower cone ━━━━━━━━ */
+/* Signature jet: a cone of fire from hero to victim, NARROW at the caster
+   and WIDE where it washes over the enemy, flickering while it burns.
+   Geometry (left/top/width/rotation) is set inline like the beam; parts
+   fill the container, so the gallery can demo the same art in a static
+   box. Lives ~one channel tick in game, so holding reads as one unbroken
+   stream. Purely additive. */
+.usp-flame-jet{
+    position:fixed; height:34px; margin-top:-17px;
+    pointer-events:none; z-index:1335;
+    transform-origin:0 50%;
+    animation: usp-jet-flicker .13s ease-in-out infinite alternate;
+}
+.usp-jet-halo, .usp-jet-body, .usp-jet-core{
+    position:absolute; left:0; width:100%; top:50%;
+    transform:translateY(-50%);
+    clip-path: polygon(0 42%, 100% 0, 100% 100%, 0 58%);
+    animation: usp-jet-band .13s ease-in-out infinite alternate;
+}
+.usp-jet-halo{
+    height:34px;
+    background: linear-gradient(to right, rgba(255,240,200,.75) 0%, rgba(255,145,0,.55) 30%, rgba(232,59,18,.50) 70%, rgba(255,110,0,.65) 100%);
+    filter: blur(4px);
+}
+.usp-jet-body{
+    height:20px;
+    background: linear-gradient(to right, #fff8dc 0%, #ffd54f 22%, #ff9100 55%, #e83b12 85%, #ff6f00 100%);
+    filter: blur(.8px);
+}
+.usp-jet-core{
+    height:8px;
+    clip-path: polygon(0 30%, 100% 18%, 100% 82%, 0 70%);
+    background: linear-gradient(to right, #ffffff 0%, #fff8dc 40%, #ffd54f 75%, #ffffff 100%);
+    box-shadow: 0 0 8px #fff;
+}
+.usp-jet-ember{
+    position:absolute; top:50%; width:5px; height:5px; margin-top:-2.5px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #ff9100 55%, transparent 75%);
+    box-shadow: 0 0 7px #ff9100;
+    animation: usp-jet-ember-ride .42s linear infinite;
+}
+.usp-jet-ember-1{ animation-delay:0s }
+.usp-jet-ember-2{ animation-delay:-.14s; width:4px; height:4px }
+.usp-jet-ember-3{ animation-delay:-.28s; width:6px; height:6px }
+@keyframes usp-jet-flicker{ from{opacity:.82} to{opacity:1} }
+@keyframes usp-jet-band{
+    from{transform:translateY(-50%) scaleY(.9)}
+    to{transform:translateY(-50%) scaleY(1.1)}
+}
+@keyframes usp-jet-ember-ride{
+    0%{left:6%; opacity:0; transform:translateY(-8px) scale(.5)}
+    18%{opacity:1}
+    100%{left:96%; opacity:0; transform:translateY(10px) scale(1.15)}
+}
+
+/* ━━━ FREEZING PULSE (usp_freezing_pulse) — freezing shockwave ━━━━━━━━━ */
+/* Signature impact: each wave lands as an expanding ring of ice washing
+   out over the victim - a sharp outer rime edge, a trailing inner ring
+   and a pale frost flash that bites and fades. Plays on top of the
+   regular frost impact, so the hit reads as a shockwave, not a bolt.
+   Purely additive. */
+.usp-freeze-wave{
+    position:absolute; inset:0; border-radius:10px;
+    pointer-events:none; z-index:5;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.85) 0%, rgba(179,229,252,.45) 26%, rgba(41,182,246,.28) 46%, transparent 68%);
+    animation: usp-freeze-flash .85s ease-out forwards;
+}
+.usp-freeze-wave::before{
+    content:''; position:absolute; left:50%; top:50%; width:52px; height:52px; margin:-26px 0 0 -26px;
+    border-radius:50%; border:3px solid #e1f5fe;
+    box-shadow:0 0 14px #81d4fa, 0 0 30px rgba(41,182,246,.70), inset 0 0 10px rgba(225,245,254,.80);
+    animation: usp-freeze-ring .85s cubic-bezier(.16,.84,.32,1) forwards;
+}
+.usp-freeze-wave::after{
+    content:''; position:absolute; left:50%; top:50%; width:34px; height:34px; margin:-17px 0 0 -17px;
+    border-radius:50%; border:2px solid rgba(129,212,250,.90);
+    box-shadow:0 0 10px rgba(129,212,250,.80);
+    opacity:0;
+    animation: usp-freeze-ring-inner .85s cubic-bezier(.16,.84,.32,1) forwards;
+}
+@keyframes usp-freeze-ring{
+    0%{transform:scale(.25); opacity:1}
+    100%{transform:scale(2.6); opacity:0}
+}
+@keyframes usp-freeze-ring-inner{
+    0%{transform:scale(.3); opacity:0}
+    25%{opacity:.95}
+    100%{transform:scale(2.0); opacity:0}
+}
+@keyframes usp-freeze-flash{
+    0%{opacity:0}
+    18%{opacity:1}
+    100%{opacity:0}
+}
+
+/* ━━━ COLD SNAP (usp_cold_snap) — flash-freeze ━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* Signature impact: the victim freezes solid in one snap. A sheet of ice
+   crystallizes over the card almost instantly, crack lines radiate from
+   the centre, a crystalline rim bites the edges - then it holds a beat
+   and thaws away. Replaces the generic nova ring. Purely additive. */
+.usp-coldsnap-freeze{
+    position:absolute; inset:0; border-radius:10px;
+    pointer-events:none; z-index:5;
+    background:
+        repeating-linear-gradient(23deg, rgba(255,255,255,.20) 0 2px, transparent 2px 7px),
+        repeating-linear-gradient(-41deg, rgba(179,229,252,.28) 0 2px, transparent 2px 9px),
+        radial-gradient(circle at 50% 46%, rgba(255,255,255,.92) 0%, rgba(225,245,254,.72) 30%, rgba(129,212,250,.55) 58%, rgba(2,119,189,.42) 82%, rgba(1,87,155,.30) 100%);
+    box-shadow: inset 0 0 22px rgba(225,245,254,.85);
+    animation: usp-coldsnap-hold .95s ease-out forwards;
+}
+.usp-coldsnap-freeze::before{
+    content:''; position:absolute; inset:0; border-radius:10px;
+    background: repeating-conic-gradient(from 0deg at 50% 46%, rgba(255,255,255,.85) 0deg 1.2deg, transparent 1.2deg 14deg, rgba(179,229,252,.5) 14deg 15deg, transparent 15deg 29deg);
+    filter: blur(.4px);
+    animation: usp-coldsnap-cracks .95s ease-out forwards;
+}
+.usp-coldsnap-freeze::after{
+    content:''; position:absolute; inset:3px; border-radius:8px;
+    border:2px solid rgba(225,245,254,.95);
+    box-shadow:0 0 14px rgba(129,212,250,.9), inset 0 0 12px rgba(225,245,254,.7);
+    animation: usp-coldsnap-rim .95s ease-out forwards;
+}
+@keyframes usp-coldsnap-hold{
+    0%{opacity:0; transform:scale(.7)}
+    12%{opacity:1; transform:scale(1.04)}
+    22%{transform:scale(1)}
+    62%{opacity:1}
+    100%{opacity:0; transform:scale(1.06)}
+}
+@keyframes usp-coldsnap-cracks{
+    0%{opacity:0; transform:scale(.4) rotate(-8deg)}
+    14%{opacity:1}
+    65%{opacity:1}
+    100%{opacity:0; transform:scale(1.15) rotate(4deg)}
+}
+@keyframes usp-coldsnap-rim{
+    0%{opacity:0}
+    16%{opacity:1}
+    60%{opacity:1}
+    100%{opacity:0}
+}
+
+/* ━━━ MEND WOUNDS (usp_mend_wounds) — circling hearts ━━━━━━━━━━━━━━━ */
+/* Little hearts bloom out of the hero in a circle and curve back in to
+   land as the heal. The square does the 45-degree turn; the WAAPI flight
+   in _uspMendHearts keeps the same rotation on every keyframe. Purely
+   additive. */
+.usp-mend-heart{
+    position:fixed; width:13px; height:13px; margin:0;
+    pointer-events:none; z-index:1335;
+    transform:translate(-50%,-50%) rotate(45deg);
+    background: linear-gradient(135deg, #ff8a80 0%, #f44336 55%, #c62828 100%);
+    filter: drop-shadow(0 0 5px rgba(244,67,54,.85)) drop-shadow(0 0 10px rgba(255,138,128,.5));
+}
+.usp-mend-heart::before, .usp-mend-heart::after{
+    content:''; position:absolute; width:13px; height:13px; border-radius:50%;
+    background: #f44336;
+}
+.usp-mend-heart::before{ left:-6.5px; top:0; }
+.usp-mend-heart::after{ left:0; top:-6.5px; }
+/* Gallery loop: the same out-and-back bloom, replayed forever. */
+.usp-mend-demo{
+    animation: usp-mend-loop 1.6s ease-in-out infinite;
+}
+@keyframes usp-mend-loop{
+    0%{ transform:translate(-50%,-50%) rotate(45deg) scale(.3); opacity:0; }
+    35%{ transform:translate(calc(-50% + var(--hx)), calc(-50% + var(--hy))) rotate(45deg) scale(1.15); opacity:1; }
+    55%{ transform:translate(calc(-50% + var(--hx)), calc(-50% + var(--hy))) rotate(45deg) scale(1); opacity:1; }
+    100%{ transform:translate(-50%,-50%) rotate(45deg) scale(.5); opacity:0; }
+}
+
+/* ━━━ BARRIER (usp_barrier) — permanent absorption bubble ━━━━━━━━━━━━━ */
+/* A blue-ish glass bubble around the hero while the absorption shield
+   holds charge. Full glow at 65%+, steady .is-mid at 30-65%, flickering
+   .is-low under 30%. Purely additive. */
+.usp-barrier-shell{
+    position:fixed; width:150px; height:150px; margin:0;
+    pointer-events:none; z-index:985;
+    transform:translate(-50%,-50%);
+}
+.usp-barrier-glass{
+    position:absolute; inset:0; border-radius:50%;
+    background:
+        radial-gradient(circle at 32% 28%, rgba(255,255,255,.5) 0%, transparent 26%),
+        radial-gradient(circle, rgba(79,195,247,.10) 0%, rgba(41,121,255,.22) 58%, rgba(13,71,161,.38) 78%, transparent 79%);
+    box-shadow:0 0 22px rgba(66,165,245,.55), inset 0 0 26px rgba(144,202,249,.35);
+    animation: usp-barrier-shimmer 4s ease-in-out infinite;
+}
+.usp-barrier-rim{
+    position:absolute; inset:3px; border-radius:50%;
+    border:2px solid rgba(179,229,252,.85);
+    box-shadow:0 0 12px rgba(129,212,250,.8), inset 0 0 10px rgba(129,212,250,.5);
+}
+.usp-barrier-sheen{
+    position:absolute; inset:3px; border-radius:50%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,.35) 24deg, transparent 60deg, transparent 180deg, rgba(255,255,255,.22) 210deg, transparent 250deg);
+    filter:blur(1px);
+    animation: usp-aura-spin 7s linear infinite;
+}
+.usp-barrier-shell.is-mid .usp-barrier-glass{
+    box-shadow:0 0 14px rgba(66,165,245,.4), inset 0 0 18px rgba(144,202,249,.25);
+}
+.usp-barrier-shell.is-mid .usp-barrier-rim{
+    border-color:rgba(144,202,249,.6);
+}
+.usp-barrier-shell.is-low{ animation: usp-barrier-flicker 1.1s steps(2) infinite; }
+.usp-barrier-shell.is-low .usp-barrier-glass{
+    box-shadow:0 0 8px rgba(66,165,245,.3), inset 0 0 12px rgba(144,202,249,.18);
+}
+.usp-barrier-shell.is-low .usp-barrier-rim{ border-color:rgba(144,202,249,.45); }
+@keyframes usp-barrier-shimmer{ 0%,100%{ filter:brightness(.95); } 50%{ filter:brightness(1.12); } }
+@keyframes usp-barrier-flicker{ 0%{ opacity:1; } 50%{ opacity:.55; } 100%{ opacity:.9; } }
+
+/* ━━━ RENEWAL (usp_renewal) — living bloom ━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* A blossom pinned on the hero for the whole heal-over-time: six petals
+   breathing around a golden core, flaring on every HoT tick (.is-tick).
+   Purely additive. */
+.usp-renew-bloom{
+    position:fixed; width:76px; height:76px; margin:0;
+    pointer-events:none; z-index:990;
+    transform:translate(-50%,-50%);
+}
+.usp-renew-glow{
+    position:absolute; inset:0; border-radius:50%;
+    background: radial-gradient(circle, rgba(220,237,200,.4) 0%, rgba(165,214,167,.22) 45%, transparent 70%);
+    animation: usp-renew-breathe 3s ease-in-out infinite;
+}
+.usp-renew-petal{
+    position:absolute; left:50%; top:50%; width:16px; height:30px; margin:-30px 0 0 -8px;
+    transform-origin:8px 30px;
+    border-radius:50% 50% 46% 46% / 62% 62% 38% 38%;
+    background: linear-gradient(to top, #2e7d32 0%, #66bb6a 55%, #c5e1a5 100%);
+    filter: drop-shadow(0 0 4px rgba(165,214,167,.8));
+    animation: usp-renew-breathe 3s ease-in-out infinite;
+}
+.usp-renew-petal-1{ transform:rotate(0deg); }
+.usp-renew-petal-2{ transform:rotate(60deg); }
+.usp-renew-petal-3{ transform:rotate(120deg); }
+.usp-renew-petal-4{ transform:rotate(180deg); }
+.usp-renew-petal-5{ transform:rotate(240deg); }
+.usp-renew-petal-6{ transform:rotate(300deg); }
+.usp-renew-core{
+    position:absolute; left:50%; top:50%; width:16px; height:16px; margin:-8px 0 0 -8px;
+    border-radius:50%;
+    background: radial-gradient(circle at 40% 35%, #fffde7 0%, #ffd54f 55%, #ff8f00 100%);
+    box-shadow: 0 0 10px #ffd54f, 0 0 20px rgba(255,213,79,.6);
+    animation: usp-renew-breathe 3s ease-in-out infinite;
+}
+@keyframes usp-renew-breathe{ 0%,100%{ filter:brightness(.94); } 50%{ filter:brightness(1.1); } }
+.usp-renew-bloom.is-tick .usp-renew-petal{
+    animation: usp-renew-flare .55s ease-out;
+}
+.usp-renew-bloom.is-tick .usp-renew-core{
+    animation: usp-renew-coreflash .55s ease-out;
+}
+@keyframes usp-renew-flare{ 0%{ filter:brightness(1); } 30%{ filter:brightness(1.7); } 100%{ filter:brightness(1); } }
+@keyframes usp-renew-coreflash{ 0%{ transform:scale(1); } 30%{ transform:scale(1.5); } 100%{ transform:scale(1); } }
+
+/* ━━━ BULWARK (usp_bulwark) — circling ring of consecrated stone ━━━━━ */
+/* Lives on the hero for the whole guard buff: six rock plates orbiting a
+   golden ward-ring, re-centred every frame by the tracker. Purely additive. */
+.usp-bulwark-ring{
+    position:fixed; width:130px; height:130px; margin:0;
+    pointer-events:none; z-index:986;
+    transform:translate(-50%,-50%);
+    animation: usp-bulwark-rise .45s ease-out;
+}
+@keyframes usp-bulwark-rise{ 0%{ opacity:0; scale:.7; } 100%{ opacity:1; scale:1; } }
+.usp-bulwark-ground{
+    position:absolute; inset:0; border-radius:50%;
+    background: radial-gradient(circle, transparent 52%, rgba(255,236,179,.14) 62%, rgba(212,175,55,.3) 70%, transparent 74%);
+}
+.usp-bulwark-ward{
+    position:absolute; left:50%; top:50%; width:96px; height:96px; margin:-48px 0 0 -48px;
+    border-radius:50%;
+    border:2px solid rgba(255,224,130,.8);
+    box-shadow:0 0 12px rgba(255,213,79,.55), inset 0 0 10px rgba(255,213,79,.35);
+    animation: usp-bulwark-wardpulse 2.6s ease-in-out infinite;
+}
+@keyframes usp-bulwark-wardpulse{ 0%,100%{ filter:brightness(.92); } 50%{ filter:brightness(1.15); } }
+.usp-bulwark-orbit{
+    position:absolute; inset:0;
+    animation: usp-bulwark-spin 9s linear infinite;
+}
+@keyframes usp-bulwark-spin{ 0%{ transform:rotate(0deg); } 100%{ transform:rotate(360deg); } }
+.usp-bulwark-plate{
+    position:absolute; left:50%; top:50%; width:26px; height:20px; margin:-10px 0 0 -13px;
+    border-radius:38% 62% 55% 45% / 55% 45% 60% 40%;
+    background:
+        linear-gradient(135deg, rgba(255,249,230,.85) 0%, rgba(189,169,128,.9) 35%, rgba(121,106,82,.95) 70%, rgba(74,64,48,.95) 100%);
+    box-shadow:0 0 8px rgba(255,224,130,.6), inset 0 0 5px rgba(62,52,38,.8);
+    border:1px solid rgba(255,236,179,.5);
+}
+.usp-bulwark-plate-1{ transform:rotate(0deg) translateY(-58px) rotate(12deg); }
+.usp-bulwark-plate-2{ transform:rotate(60deg) translateY(-58px) rotate(12deg); }
+.usp-bulwark-plate-3{ transform:rotate(120deg) translateY(-58px) rotate(12deg); }
+.usp-bulwark-plate-4{ transform:rotate(180deg) translateY(-58px) rotate(12deg); }
+.usp-bulwark-plate-5{ transform:rotate(240deg) translateY(-58px) rotate(12deg); }
+.usp-bulwark-plate-6{ transform:rotate(300deg) translateY(-58px) rotate(12deg); }
+
+/* ━━━ WINDWARD (usp_windward) — swift winds circling the hero ━━━━━━━ */
+/* Lives on the hero for the whole evade buff: three arcing gust trails and
+   six drifting wind motes swirling around a faint storm-ring, re-centred
+   every frame by the tracker. Purely additive. */
+.usp-windward-gale{
+    position:fixed; width:140px; height:140px; margin:0;
+    pointer-events:none; z-index:986;
+    transform:translate(-50%,-50%);
+    animation: usp-windward-rise .4s ease-out;
+}
+@keyframes usp-windward-rise{ 0%{ opacity:0; scale:.7; } 100%{ opacity:1; scale:1; } }
+.usp-windward-ring{
+    position:absolute; left:50%; top:50%; width:104px; height:104px; margin:-52px 0 0 -52px;
+    border-radius:50%;
+    border:1px dashed rgba(178,223,219,.55);
+    box-shadow:0 0 10px rgba(128,203,196,.35), inset 0 0 12px rgba(128,203,196,.2);
+    animation: usp-windward-breathe 3s ease-in-out infinite;
+}
+@keyframes usp-windward-breathe{ 0%,100%{ filter:brightness(.92); } 50%{ filter:brightness(1.15); } }
+.usp-windward-swirl{
+    position:absolute; inset:0;
+    animation: usp-windward-spin 5s linear infinite;
+}
+@keyframes usp-windward-spin{ 0%{ transform:rotate(0deg); } 100%{ transform:rotate(360deg); } }
+.usp-windward-gust{
+    position:absolute; left:50%; top:50%; width:56px; height:16px; margin:-8px 0 0 -28px;
+    border-radius:50%;
+    background:
+        radial-gradient(ellipse at 30% 50%, rgba(255,255,255,.85) 0%, transparent 45%),
+        linear-gradient(90deg, transparent 0%, rgba(178,223,219,.15) 25%, rgba(178,223,219,.6) 55%, rgba(255,255,255,.75) 80%, transparent 100%);
+    filter:blur(.4px);
+    animation: usp-windward-streak 1.6s ease-in-out infinite;
+}
+.usp-windward-gust-1{ transform:rotate(0deg) translateY(-52px); }
+.usp-windward-gust-2{ transform:rotate(120deg) translateY(-52px); animation-delay:-.53s; }
+.usp-windward-gust-3{ transform:rotate(240deg) translateY(-52px); animation-delay:-1.06s; }
+@keyframes usp-windward-streak{ 0%,100%{ opacity:.55; } 50%{ opacity:1; } }
+.usp-windward-mote{
+    position:absolute; left:50%; top:50%; width:5px; height:5px; margin:-2px 0 0 -2px;
+    border-radius:50%;
+    background:#e0f2f1;
+    box-shadow:0 0 6px rgba(178,223,219,.9);
+    animation: usp-windward-drift 2.4s ease-in-out infinite;
+}
+.usp-windward-mote-1{ transform:rotate(0deg) translateY(-34px); }
+.usp-windward-mote-2{ transform:rotate(60deg) translateY(-34px); animation-delay:-.4s; }
+.usp-windward-mote-3{ transform:rotate(120deg) translateY(-34px); animation-delay:-.8s; }
+.usp-windward-mote-4{ transform:rotate(180deg) translateY(-34px); animation-delay:-1.2s; }
+.usp-windward-mote-5{ transform:rotate(240deg) translateY(-34px); animation-delay:-1.6s; }
+.usp-windward-mote-6{ transform:rotate(300deg) translateY(-34px); animation-delay:-2s; }
+@keyframes usp-windward-drift{ 0%,100%{ opacity:.4; scale:.8; } 50%{ opacity:1; scale:1.2; } }
+
+/* ━━━ AEGIS WARD (usp_aegis_ward) — prismatic lattice of light ━━━━━━━ */
+/* Guards the hero for the whole ward buff: a rotating hexagonal aegis of
+   golden glass, orbited by crystal shards and crowned by charge pips — one
+   burning diamond per remaining negation. .is-hit flashes white on every
+   absorbed hit; spent pips go dark. Re-centred every frame by the tracker.
+   Purely additive. */
+.usp-aegis-lattice{
+    position:fixed; width:150px; height:160px; margin:0;
+    pointer-events:none; z-index:987;
+    transform:translate(-50%,-50%);
+    animation: usp-aegis-rise .5s ease-out;
+}
+@keyframes usp-aegis-rise{ 0%{ opacity:0; scale:.6; } 60%{ opacity:1; scale:1.06; } 100%{ opacity:1; scale:1; } }
+.usp-aegis-halo{
+    position:absolute; left:50%; top:50%; width:150px; height:150px; margin:-75px 0 0 -75px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(255,248,225,.16) 0%, rgba(255,224,130,.1) 45%, transparent 70%);
+    animation: usp-aegis-breathe 3.2s ease-in-out infinite;
+}
+@keyframes usp-aegis-breathe{ 0%,100%{ filter:brightness(.92); } 50%{ filter:brightness(1.18); } }
+.usp-aegis-hex{
+    position:absolute; left:50%; top:50%; width:104px; height:120px; margin:-60px 0 0 -52px;
+    clip-path:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background:
+        linear-gradient(160deg, rgba(255,255,255,.55) 0%, rgba(255,224,130,.28) 30%, rgba(255,183,77,.18) 60%, rgba(255,143,0,.3) 100%);
+    border:0;
+    box-shadow:0 0 18px rgba(255,213,79,.65), inset 0 0 16px rgba(255,255,255,.4);
+    animation: usp-aegis-spin 14s linear infinite, usp-aegis-breathe 3.2s ease-in-out infinite;
+}
+@keyframes usp-aegis-spin{ 0%{ transform:rotate(0deg); } 100%{ transform:rotate(360deg); } }
+.usp-aegis-orbit{
+    position:absolute; left:50%; top:50%; width:150px; height:150px; margin:-75px 0 0 -75px;
+    animation: usp-aegis-spin-rev 8s linear infinite;
+}
+@keyframes usp-aegis-spin-rev{ 0%{ transform:rotate(360deg); } 100%{ transform:rotate(0deg); } }
+.usp-aegis-shard{
+    position:absolute; left:50%; top:50%; width:12px; height:26px; margin:-13px 0 0 -6px;
+    clip-path:polygon(50% 0%, 100% 60%, 50% 100%, 0% 60%);
+    background: linear-gradient(to bottom, #ffffff 0%, #ffe082 45%, #ff8f00 100%);
+    filter: drop-shadow(0 0 5px rgba(255,213,79,.9));
+    animation: usp-aegis-twinkle 1.8s ease-in-out infinite;
+}
+.usp-aegis-shard-1{ transform:rotate(0deg) translateY(-68px); }
+.usp-aegis-shard-2{ transform:rotate(72deg) translateY(-68px); animation-delay:-.36s; }
+.usp-aegis-shard-3{ transform:rotate(144deg) translateY(-68px); animation-delay:-.72s; }
+.usp-aegis-shard-4{ transform:rotate(216deg) translateY(-68px); animation-delay:-1.08s; }
+.usp-aegis-shard-5{ transform:rotate(288deg) translateY(-68px); animation-delay:-1.44s; }
+@keyframes usp-aegis-twinkle{ 0%,100%{ opacity:.6; scale:.85; } 50%{ opacity:1; scale:1.15; } }
+.usp-aegis-pips{
+    position:absolute; left:50%; top:-6px; transform:translateX(-50%);
+    display:flex; gap:5px;
+}
+.usp-aegis-pip{
+    width:11px; height:11px;
+    transform:rotate(45deg);
+    background: linear-gradient(135deg, #fffde7 0%, #ffd54f 60%, #ff8f00 100%);
+    box-shadow:0 0 8px rgba(255,213,79,.95), 0 0 3px #fff;
+    animation: usp-aegis-breathe 3.2s ease-in-out infinite;
+}
+.usp-aegis-pip.is-spent{
+    background:rgba(120,110,90,.5);
+    box-shadow:none;
+    animation:none;
+}
+.usp-aegis-lattice.is-hit .usp-aegis-hex{
+    animation: usp-aegis-absorb .5s ease-out, usp-aegis-spin 14s linear infinite;
+}
+.usp-aegis-lattice.is-hit .usp-aegis-halo{
+    animation: usp-aegis-absorb .5s ease-out;
+}
+@keyframes usp-aegis-absorb{ 0%{ filter:brightness(1); } 25%{ filter:brightness(2.4); } 100%{ filter:brightness(1); } }
+
+/* ━━━ RETRIBUTION (usp_retribution) — wreath of punishing flame ━━━━━ */
+/* Circles the hero for the whole thorns buff: eight licking flame tongues
+   around a glowing ember ring, cinders rising off the fire. .is-flare
+   bursts the flames brighter on every reflected hit. Re-centred every
+   frame by the tracker. Purely additive. */
+.usp-retrib-wreath{
+    position:fixed; width:140px; height:150px; margin:0;
+    pointer-events:none; z-index:986;
+    transform:translate(-50%,-50%);
+    animation: usp-retrib-rise .45s ease-out;
+}
+@keyframes usp-retrib-rise{ 0%{ opacity:0; scale:.6; } 60%{ opacity:1; scale:1.08; } 100%{ opacity:1; scale:1; } }
+.usp-retrib-glow{
+    position:absolute; left:50%; top:50%; width:140px; height:140px; margin:-70px 0 0 -70px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(255,110,0,.2) 0%, rgba(255,60,0,.1) 45%, transparent 70%);
+    animation: usp-retrib-flicker 1.1s ease-in-out infinite;
+}
+.usp-retrib-ember{
+    position:absolute; left:50%; top:50%; width:100px; height:100px; margin:-50px 0 0 -50px;
+    border-radius:50%;
+    border:2px solid rgba(255,140,0,.7);
+    box-shadow:0 0 14px rgba(255,110,0,.7), inset 0 0 12px rgba(255,60,0,.5);
+    animation: usp-retrib-flicker 1.1s ease-in-out infinite;
+}
+@keyframes usp-retrib-flicker{ 0%,100%{ filter:brightness(.9); } 30%{ filter:brightness(1.2); } 55%{ filter:brightness(.95); } 75%{ filter:brightness(1.12); } }
+.usp-retrib-spin{
+    position:absolute; inset:0;
+    animation: usp-retrib-spin 11s linear infinite;
+}
+@keyframes usp-retrib-spin{ 0%{ transform:rotate(0deg); } 100%{ transform:rotate(360deg); } }
+.usp-retrib-flame{
+    position:absolute; left:50%; top:50%; width:20px; height:38px; margin:-19px 0 0 -10px;
+    transform-origin:10px 19px;
+    border-radius:50% 50% 50% 50% / 68% 68% 32% 32%;
+    background:
+        radial-gradient(ellipse at 50% 82%, #fffde7 0%, rgba(255,241,118,.95) 22%, rgba(255,167,38,.9) 48%, rgba(255,87,34,.75) 72%, transparent 92%);
+    filter: drop-shadow(0 0 6px rgba(255,110,0,.85));
+    animation: usp-retrib-lick .7s ease-in-out infinite;
+}
+.usp-retrib-flame-1{ transform:rotate(0deg) translateY(-56px); }
+.usp-retrib-flame-2{ transform:rotate(45deg) translateY(-56px); animation-delay:-.09s; }
+.usp-retrib-flame-3{ transform:rotate(90deg) translateY(-56px); animation-delay:-.18s; }
+.usp-retrib-flame-4{ transform:rotate(135deg) translateY(-56px); animation-delay:-.27s; }
+.usp-retrib-flame-5{ transform:rotate(180deg) translateY(-56px); animation-delay:-.36s; }
+.usp-retrib-flame-6{ transform:rotate(225deg) translateY(-56px); animation-delay:-.45s; }
+.usp-retrib-flame-7{ transform:rotate(270deg) translateY(-56px); animation-delay:-.54s; }
+.usp-retrib-flame-8{ transform:rotate(315deg) translateY(-56px); animation-delay:-.63s; }
+@keyframes usp-retrib-lick{ 0%,100%{ scale:1 1; } 50%{ scale:.92 1.18; } }
+.usp-retrib-cinder{
+    position:absolute; left:50%; top:50%; width:4px; height:4px; margin:-2px 0 0 -2px;
+    border-radius:50%;
+    background:#ffcc80;
+    box-shadow:0 0 6px rgba(255,140,0,.95);
+    animation: usp-retrib-rise-fade 2.2s ease-out infinite;
+}
+.usp-retrib-cinder-1{ transform:translate(-30px,10px); animation-delay:0s; }
+.usp-retrib-cinder-2{ transform:translate(24px,16px); animation-delay:-.37s; }
+.usp-retrib-cinder-3{ transform:translate(-12px,22px); animation-delay:-.74s; }
+.usp-retrib-cinder-4{ transform:translate(36px,4px); animation-delay:-1.1s; }
+.usp-retrib-cinder-5{ transform:translate(-40px,-2px); animation-delay:-1.47s; }
+.usp-retrib-cinder-6{ transform:translate(8px,26px); animation-delay:-1.84s; }
+@keyframes usp-retrib-rise-fade{ 0%{ opacity:0; translate:0 0; } 20%{ opacity:1; } 100%{ opacity:0; translate:6px -64px; } }
+.usp-retrib-wreath.is-flare .usp-retrib-flame{
+    animation: usp-retrib-burst .5s ease-out, usp-retrib-lick .7s ease-in-out .5s infinite;
+}
+.usp-retrib-wreath.is-flare .usp-retrib-ember,
+.usp-retrib-wreath.is-flare .usp-retrib-glow{
+    animation: usp-retrib-burst .5s ease-out, usp-retrib-flicker 1.1s ease-in-out .5s infinite;
+}
+@keyframes usp-retrib-burst{ 0%{ filter:brightness(1); } 30%{ filter:brightness(2.2); } 100%{ filter:brightness(1); } }
+
+/* ━━━ VORTEX (usp_vortex) — persistent icy aura ━━━━━━━━━━━━━━━━━━━━━━━ */
+/* Lives on the hero for the whole toggle: size set inline from the aura
+   radius (210px -> 420px across), re-centred every frame by the tracker.
+   Frost floor + counter-rotating mist and rime rings + twinkling snow
+   motes. Each per-second detonation flashes .is-pulse on top of the
+   zone burst. Other toggle auras reuse the shell via usp-aura-<theme>.
+   Purely additive. */
+.usp-aura-vortex{
+    position:fixed; margin:0; z-index:990; pointer-events:none;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+}
+.usp-aura-floor{
+    position:absolute; inset:0; border-radius:50%;
+    background: radial-gradient(circle, rgba(225,245,254,.30) 0%, rgba(179,229,252,.20) 42%, rgba(79,195,247,.12) 62%, transparent 74%);
+}
+.usp-aura-mist{
+    position:absolute; inset:6%; border-radius:50%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(179,229,252,.22) 50deg, transparent 110deg, transparent 170deg, rgba(225,245,254,.26) 230deg, transparent 290deg);
+    filter: blur(7px);
+    animation: usp-aura-spin 9s linear infinite;
+}
+.usp-aura-ring{
+    position:absolute; inset:2.5%; border-radius:50%;
+    border:2px dashed rgba(225,245,254,.75);
+    box-shadow:0 0 16px rgba(129,212,250,.55), inset 0 0 22px rgba(129,212,250,.28);
+    animation: usp-aura-spin-rev 14s linear infinite;
+}
+.usp-aura-mote{
+    position:absolute; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%;
+    background: radial-gradient(circle, #fff 0%, #b3e5fc 55%, transparent 78%);
+    box-shadow: 0 0 8px rgba(179,229,252,.9);
+    animation: usp-aura-twinkle 1.6s ease-in-out infinite alternate;
+}
+.usp-aura-mote-1{ left:22%; top:30% }
+.usp-aura-mote-2{ left:74%; top:58%; animation-delay:-.55s }
+.usp-aura-mote-3{ left:48%; top:80%; animation-delay:-1.1s }
+.usp-aura-vortex.is-pulse .usp-aura-floor{
+    animation: usp-aura-flash .48s ease-out;
+}
+.usp-aura-vortex.is-pulse .usp-aura-ring{
+    border-color:#ffffff;
+    box-shadow:0 0 26px rgba(225,245,254,.95), inset 0 0 30px rgba(225,245,254,.5);
+}
+@keyframes usp-aura-spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+@keyframes usp-aura-spin-rev{ from{transform:rotate(0)} to{transform:rotate(-360deg)} }
+@keyframes usp-aura-twinkle{ from{opacity:.35; transform:scale(.7)} to{opacity:1; transform:scale(1.2)} }
+@keyframes usp-aura-flash{ 0%{opacity:.4} 25%{opacity:1} 100%{opacity:.4} }
+
+/* ━━━ BLADE VORTEX (usp_blade_vortex) — six circling blades ━━━━━━━━━━ */
+/* Signature aura: six conjured steel blades orbit the hero inside the
+   mist shell for the whole toggle, flashing white on every per-second
+   pulse detonation (.is-pulse). Purely additive. */
+.usp-aura-vortex.is-blades .usp-aura-mist{ opacity:.55; }
+.usp-aura-orbit{
+    position:absolute; left:50%; top:50%; width:170px; height:170px;
+    margin:-85px 0 0 -85px;
+    animation: usp-orbit-spin 2.4s linear infinite;
+}
+@keyframes usp-orbit-spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+.usp-aura-blade{
+    position:absolute; left:50%; top:50%; width:46px; height:13px; margin:-6px 0 0 0;
+    transform-origin:0 50%;
+    clip-path: polygon(0 28%, 68% 28%, 100% 50%, 68% 72%, 0 72%);
+    background: linear-gradient(to bottom, #ffffff 0%, #cfd8dc 30%, #90a4ae 55%, #546e7a 80%, #37474f 100%);
+    filter: drop-shadow(0 0 5px rgba(255,255,255,.85)) drop-shadow(0 0 10px rgba(239,83,80,.5));
+}
+.usp-aura-blade-1{ transform:rotate(0deg) translateX(72px) rotate(90deg); }
+.usp-aura-blade-2{ transform:rotate(60deg) translateX(72px) rotate(90deg); }
+.usp-aura-blade-3{ transform:rotate(120deg) translateX(72px) rotate(90deg); }
+.usp-aura-blade-4{ transform:rotate(180deg) translateX(72px) rotate(90deg); }
+.usp-aura-blade-5{ transform:rotate(240deg) translateX(72px) rotate(90deg); }
+.usp-aura-blade-6{ transform:rotate(300deg) translateX(72px) rotate(90deg); }
+.usp-aura-vortex.is-pulse .usp-aura-blade{
+    filter: drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 16px rgba(239,83,80,.9));
+}
+
+/* Storm-aura shell (Aura of Storm): the same persistent parts, charged
+   electric instead of icy - crackling gold-violet floor, faster sparking
+   ring, live-spark motes. The per-second flash stays wired through
+   .is-pulse. Purely additive. */
+.usp-aura-lightning .usp-aura-floor{
+    background: radial-gradient(circle, rgba(255,253,231,.32) 0%, rgba(255,235,59,.22) 42%, rgba(124,77,255,.16) 62%, transparent 74%);
+}
+.usp-aura-lightning .usp-aura-mist{
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(255,235,59,.26) 50deg, transparent 110deg, transparent 170deg, rgba(206,147,216,.30) 230deg, transparent 290deg);
+    animation-duration: 5s;
+}
+.usp-aura-lightning .usp-aura-ring{
+    border-color: rgba(255,241,118,.85);
+    box-shadow:0 0 18px rgba(255,235,59,.65), inset 0 0 24px rgba(255,235,59,.30);
+    animation-duration: 6s;
+}
+.usp-aura-lightning .usp-aura-mote{
+    background: radial-gradient(circle, #fff 0%, #ffeb3b 55%, transparent 78%);
+    box-shadow: 0 0 9px rgba(255,235,59,.95);
+    animation-duration:.9s;
+}
+.usp-aura-lightning.is-pulse .usp-aura-ring{
+    border-color:#ffffff;
+    box-shadow:0 0 28px rgba(255,255,255,.95), inset 0 0 32px rgba(255,235,59,.55);
+}
+
+/* Overcharge shell (Discharge hold): the same aura parts, violet-white
+   and angry - a smaller span pinned on the caster only while the 1.6s
+   cast charges. Reuses the aura spin/twinkle/pulse keyframes. Purely
+   additive. */
+.usp-aura-discharge .usp-aura-floor{
+    background: radial-gradient(circle, rgba(255,255,255,.40) 0%, rgba(206,147,216,.30) 42%, rgba(124,77,255,.22) 62%, transparent 74%);
+}
+.usp-aura-discharge .usp-aura-mist{
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(206,147,216,.34) 50deg, transparent 110deg, transparent 170deg, rgba(255,255,255,.30) 230deg, transparent 290deg);
+    animation-duration: 2.2s;
+}
+.usp-aura-discharge .usp-aura-ring{
+    border-color: rgba(234,220,255,.9);
+    box-shadow:0 0 20px rgba(179,136,255,.8), inset 0 0 26px rgba(124,77,255,.4);
+    animation-duration: 3s;
+}
+.usp-aura-discharge .usp-aura-mote{
+    background: radial-gradient(circle, #fff 0%, #ce93d8 55%, transparent 78%);
+    box-shadow: 0 0 9px rgba(206,147,216,.95);
+    animation-duration:.7s;
+}
+#spell-charge-shell{ z-index:1350; }
+
+/* ━━━ BLIGHT (usp_blight) — festering grasp ━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* Signature impact: the opener coats the victim in creeping rot directly
+   (no flight - decay starts ON them). A dark violet-black mass crawls
+   outward while grasping tendril arms curl over the card and ooze beads
+   seed the edges. Each tick seeps fresh rot (usp-blight-seep) so the
+   decay keeps spreading for the full duration. Dark and anchored -
+   Contagion keeps the drifting green cloud. Purely additive. */
+.usp-blight-rot{
+    position:absolute; inset:-8%; border-radius:14px;
+    pointer-events:none; z-index:5;
+    background: radial-gradient(circle at 50% 55%, rgba(46,10,52,.92) 0%, rgba(74,20,140,.72) 32%, rgba(26,10,40,.6) 55%, transparent 78%);
+    animation: usp-blight-creep 1.5s ease-out forwards;
+}
+.usp-blight-rot::before{
+    content:''; position:absolute; inset:-4%; border-radius:14px;
+    background:
+        repeating-conic-gradient(from 12deg at 50% 50%, rgba(142,36,170,.55) 0deg 3deg, transparent 3deg 22deg, rgba(46,10,52,.7) 22deg 25deg, transparent 25deg 44deg),
+        radial-gradient(circle at 50% 50%, transparent 42%, rgba(20,6,28,.75) 72%, transparent 92%);
+    filter: blur(1px);
+    animation: usp-blight-grasp 1.5s ease-out forwards;
+}
+.usp-blight-rot::after{
+    content:''; position:absolute; left:50%; top:50%; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%;
+    background: #ce93d8;
+    box-shadow: -20px -8px 0 2px rgba(142,36,170,.9), 16px -16px 0 1px rgba(206,147,216,.85), -6px 20px 0 2px rgba(106,27,154,.9), 22px 12px 0 1px rgba(142,36,170,.8), 2px -26px 0 2px rgba(206,147,216,.75);
+    filter: blur(.8px);
+    animation: usp-blight-ooze 1.5s ease-out forwards;
+}
+@keyframes usp-blight-creep{
+    0%{opacity:0; transform:scale(.4)}
+    24%{opacity:1; transform:scale(1)}
+    70%{opacity:1; transform:scale(1.18)}
+    100%{opacity:0; transform:scale(1.38)}
+}
+@keyframes usp-blight-grasp{
+    0%{opacity:0; transform:scale(.5) rotate(-14deg)}
+    28%{opacity:1}
+    100%{opacity:0; transform:scale(1.2) rotate(10deg)}
+}
+@keyframes usp-blight-ooze{
+    0%{opacity:0; transform:scale(.5)}
+    30%{opacity:1}
+    100%{opacity:0; transform:scale(1.3) translateY(6px)}
+}
+.usp-blight-seep{
+    position:absolute; inset:-2%; border-radius:12px;
+    pointer-events:none; z-index:5;
+    background: radial-gradient(circle at 50% 55%, rgba(74,20,140,.55) 0%, rgba(46,10,52,.45) 45%, transparent 70%);
+    filter: blur(2px);
+    animation: usp-blight-seep-x .75s ease-out forwards;
+}
+@keyframes usp-blight-seep-x{
+    0%{opacity:0; transform:scale(.65)}
+    30%{opacity:1; transform:scale(1.08)}
+    100%{opacity:0; transform:scale(1.3)}
+}
+
+/* ━━━ SOULREND (usp_soulrend) — reverse soul drain ━━━━━━━━━━━━━━━━━━━━ */
+/* Signature beam: anchored on the VICTIM and rotated toward the hero
+   (geometry inline, like the Disintegrate beam but backwards). A dim
+   violet thread with a soft halo, while pale soul-wisps ride the beam
+   home from the victim end to the hero end. Lives one channel tick, so
+   holding reads as one unbroken drain. Purely additive. */
+.usp-soul-beam{
+    position:fixed; height:12px; margin-top:-6px;
+    pointer-events:none; z-index:1335;
+    transform-origin:0 50%;
+    animation: usp-soul-flicker .16s ease-in-out infinite alternate;
+}
+.usp-soul-halo{
+    position:absolute; left:0; width:100%; top:50%; height:11px;
+    transform:translateY(-50%);
+    border-radius:6px;
+    background: linear-gradient(to right, rgba(225,190,231,.85) 0%, rgba(123,31,162,.5) 30%, rgba(74,20,140,.45) 70%, rgba(225,190,231,.6) 100%);
+    filter: blur(2.5px);
+}
+.usp-soul-thread{
+    position:absolute; left:0; width:100%; top:50%; height:3px;
+    transform:translateY(-50%);
+    border-radius:2px;
+    background: linear-gradient(to right, #f3e5f5 0%, #ba68c8 35%, #7b1fa2 70%, #e1bee7 100%);
+    filter: blur(.4px);
+}
+.usp-soul{
+    position:absolute; top:50%; width:9px; height:9px; margin-top:-4.5px; border-radius:50%;
+    background: radial-gradient(circle, #ffffff 0%, #e1bee7 40%, rgba(186,104,200,.85) 65%, transparent 100%);
+    box-shadow: 0 0 8px #fff, 0 0 14px rgba(186,104,200,.9);
+    animation: usp-soul-ride .5s linear infinite;
+}
+.usp-soul-1{ animation-delay:0s }
+.usp-soul-2{ animation-delay:-.17s; width:7px; height:7px; margin-top:-3.5px }
+.usp-soul-3{ animation-delay:-.34s; width:6px; height:6px; margin-top:-3px }
+@keyframes usp-soul-flicker{ from{opacity:.7} to{opacity:1} }
+@keyframes usp-soul-ride{
+    0%{left:2%; opacity:0; transform:scale(.5)}
+    15%{opacity:1}
+    85%{opacity:1}
+    100%{left:96%; opacity:0; transform:scale(1.1)}
+}
+
+/* ━━━ BANE (usp_bane) — rolling wave of dread ━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* Signature projectile: a violet-black crescent crest rolling ahead of
+   trailing darkness, shedding wisp motes as it flies flat to each
+   victim. Built +X; the shared shadow orb stays for the school.
+   Purely additive. */
+.usp-proj-bane{ filter: drop-shadow(0 0 12px rgba(123,31,162,.95)) drop-shadow(0 0 26px rgba(74,20,140,.7)) drop-shadow(0 0 44px rgba(26,10,40,.6)); }
+.usp-p-dread-trail{
+    position:absolute; left:0; top:10px; width:26px; height:9px; border-radius:5px;
+    background: linear-gradient(to right, transparent 0%, rgba(74,20,140,.55) 35%, rgba(123,31,162,.75) 70%, rgba(225,190,231,.9) 100%);
+    filter: blur(.8px);
+}
+.usp-p-dread-crest{
+    position:absolute; left:20px; top:2px; width:22px; height:24px;
+    background: radial-gradient(circle at 62% 50%, rgba(225,190,231,.95) 0%, rgba(186,104,200,.85) 30%, rgba(123,31,162,.8) 58%, rgba(26,10,40,.9) 82%);
+    clip-path: ellipse(46% 48% at 58% 50%);
+    box-shadow: 0 0 12px rgba(186,104,200,.9);
+    animation: usp-dread-surge .3s ease-in-out infinite alternate;
+}
+.usp-p-dread-tendril{
+    position:absolute; left:6px; width:16px; height:4px; border-radius:2px;
+    background: linear-gradient(to right, transparent 0%, rgba(123,31,162,.7) 60%, rgba(225,190,231,.85) 100%);
+    filter: blur(.6px);
+    animation: usp-dread-lash .34s ease-in-out infinite alternate;
+}
+.usp-p-dread-tendril-1{ top:6px; }
+.usp-p-dread-tendril-2{ top:19px; animation-delay:.17s; }
+.usp-p-dread-mote{
+    position:absolute; width:3px; height:3px; border-radius:50%;
+    background: #e1bee7;
+    box-shadow: 0 0 6px rgba(186,104,200,.9);
+    animation: usp-dread-mote .5s ease-out infinite;
+}
+.usp-p-dread-mote-1{ left:18px; top:5px; }
+.usp-p-dread-mote-2{ left:13px; top:22px; animation-delay:.25s; }
+@keyframes usp-dread-surge{ from{transform:scaleX(1) scaleY(1)} to{transform:scaleX(1.12) scaleY(1.06)} }
+@keyframes usp-dread-lash{ from{transform:translateX(0) scaleX(.85); opacity:.6} to{transform:translateX(2px) scaleX(1.1); opacity:1} }
+@keyframes usp-dread-mote{ 0%{transform:translate(0,0) scale(1); opacity:0} 30%{opacity:1} 100%{transform:translate(-10px,-2px) scale(.4); opacity:0} }
+
+/* ━━━ CONTAGION (usp_contagion) — spreading disease cloud ━━━━━━━━━━━━━ */
+/* Signature impact: the opener blooms a sickly miasma directly on the
+   victim - no flight. Three drifting lobes billow outward while spore
+   dots seed the edges, so the cloud reads as spreading, not landing.
+   Each tick exhales a smaller fresh puff (usp-plague-puff) that keeps
+   the plague alive for the full 5 seconds. Purely additive. */
+.usp-plague-cloud{
+    position:absolute; inset:-10%; border-radius:14px;
+    pointer-events:none; z-index:5;
+    background: radial-gradient(circle at 50% 55%, rgba(220,255,220,.5) 0%, rgba(139,195,74,.5) 26%, rgba(85,139,47,.42) 46%, rgba(46,20,60,.5) 66%, transparent 80%);
+    filter: blur(1px);
+    animation: usp-plague-bloom 1.6s ease-out forwards;
+}
+.usp-plague-cloud::before{
+    content:''; position:absolute; left:8%; top:22%; width:46%; height:52%; border-radius:50%;
+    background: radial-gradient(circle, rgba(220,255,220,.55) 0%, rgba(139,195,74,.45) 45%, transparent 72%);
+    filter: blur(3px);
+    animation: usp-plague-lobe-l 1.6s ease-out forwards;
+}
+.usp-plague-cloud::after{
+    content:''; position:absolute; right:6%; top:14%; width:5px; height:5px; border-radius:50%;
+    background: #e8f5e9;
+    box-shadow: -14px 12px 0 1px rgba(220,255,220,.9), -26px 26px 0 2px rgba(139,195,74,.8), 10px 22px 0 1px rgba(220,255,220,.85), -8px 38px 0 2px rgba(139,195,74,.7), 18px 8px 0 1px rgba(220,255,220,.8);
+    filter: blur(.6px);
+    animation: usp-plague-spores 1.6s ease-out forwards;
+}
+@keyframes usp-plague-bloom{
+    0%{opacity:0; transform:scale(.35)}
+    22%{opacity:1; transform:scale(1)}
+    70%{opacity:.95; transform:scale(1.22)}
+    100%{opacity:0; transform:scale(1.45)}
+}
+@keyframes usp-plague-lobe-l{
+    0%{opacity:0; transform:translate(30%, 12%) scale(.4)}
+    30%{opacity:1}
+    100%{opacity:0; transform:translate(-34%, -10%) scale(1.25)}
+}
+@keyframes usp-plague-spores{
+    0%{opacity:0; transform:translate(0,0)}
+    25%{opacity:1}
+    100%{opacity:0; transform:translate(-16px,14px)}
+}
+.usp-plague-puff{
+    position:absolute; inset:-4%; border-radius:12px;
+    pointer-events:none; z-index:5;
+    background: radial-gradient(circle at 50% 55%, rgba(220,255,220,.45) 0%, rgba(139,195,74,.4) 40%, transparent 70%);
+    filter: blur(2px);
+    animation: usp-plague-puff-x .75s ease-out forwards;
+}
+@keyframes usp-plague-puff-x{
+    0%{opacity:0; transform:scale(.6)}
+    30%{opacity:1; transform:scale(1.1)}
+    100%{opacity:0; transform:scale(1.35)}
+}
+
+/* ━━━ DISCHARGE (usp_discharge) — overcharge detonation ━━━━━━━━━━━━━━━ */
+/* Signature impact: the stored power let loose in one blast. A violet-
+   white core that punches out past the card, a forking arc ring lashing
+   sideways, and rising charge motes - layered over the regular lightning
+   impact and nova. Purely additive. */
+.usp-discharge-blast{
+    position:absolute; inset:-14%; border-radius:14px;
+    pointer-events:none; z-index:5;
+    background: radial-gradient(circle at 50% 50%, #ffffff 0%, #f3e5f5 16%, #ce93d8 34%, rgba(124,77,255,.65) 52%, rgba(74,20,140,.35) 68%, transparent 80%);
+    animation: usp-discharge-blast 1s ease-out forwards;
+}
+.usp-discharge-blast::before{
+    content:''; position:absolute; left:50%; top:50%; width:70px; height:70px; margin:-35px 0 0 -35px;
+    border-radius:50%; border:3px solid #f3e5f5;
+    box-shadow:0 0 18px #fff, 0 0 36px rgba(179,136,255,.9), inset 0 0 12px rgba(255,255,255,.8);
+    animation: usp-discharge-ring 1s cubic-bezier(.16,.84,.32,1) forwards;
+}
+.usp-discharge-blast::after{
+    content:''; position:absolute; left:50%; top:50%; width:8px; height:44px; margin:-22px 0 0 -4px;
+    background: linear-gradient(to bottom, transparent 0%, #ffffff 30%, #ce93d8 55%, #ffffff 80%, transparent 100%);
+    clip-path: polygon(45% 0, 60% 0, 52% 30%, 72% 34%, 50% 50%, 70% 64%, 48% 66%, 56% 100%, 44% 100%, 50% 64%, 28% 62%, 48% 48%, 26% 40%, 48% 32%);
+    filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px #ce93d8);
+    animation: usp-discharge-fork 1s ease-out forwards;
+}
+@keyframes usp-discharge-blast{
+    0%{opacity:0; transform:scale(.4)}
+    14%{opacity:1; transform:scale(1.08)}
+    60%{opacity:1}
+    100%{opacity:0; transform:scale(1.2)}
+}
+@keyframes usp-discharge-ring{
+    0%{transform:scale(.2) rotate(0); opacity:1}
+    100%{transform:scale(2.4) rotate(40deg); opacity:0}
+}
+@keyframes usp-discharge-fork{
+    0%{opacity:0; transform:scale(.5) rotate(0)}
+    20%{opacity:1}
+    100%{opacity:0; transform:scale(1.3) rotate(25deg)}
+}
+
+/* ━━━ ARCANE MISSILES (usp_arcane_missiles) — dart-like bolts ━━━━━━━━━━ */
+/* Signature projectile: a pointed nose, finned body and flickering exhaust
+   plume, flying straight with no spin. Built pointing +X. The shared
+   spinning orb stays the look for the rest of the arcane school. */
+.usp-proj-arcane-missiles{ filter: drop-shadow(0 0 10px rgba(179,136,255,.95)) drop-shadow(0 0 22px rgba(124,77,255,.55)); }
+.usp-p-msl-body{
+    position:absolute; left:9px; top:11px; width:22px; height:6px; border-radius:3px;
+    background: linear-gradient(to bottom, #f3e5f5 0%, #ce93d8 35%, #7c4dff 70%, #4a148c 100%);
+}
+.usp-p-msl-core{
+    position:absolute; left:4px; right:4px; top:2px; height:2px; border-radius:1px;
+    background: rgba(255,255,255,.92);
+    box-shadow: 0 0 4px #fff;
+}
+.usp-p-msl-fin{
+    position:absolute; left:1px; width:7px; height:5px;
+    background: linear-gradient(to right, #7c4dff 0%, #b388ff 100%);
+}
+.usp-p-msl-fin-top{ top:-4px; clip-path:polygon(0 100%, 100% 100%, 100% 0); }
+.usp-p-msl-fin-bot{ bottom:-4px; clip-path:polygon(0 0, 100% 0, 100% 100%); }
+.usp-p-msl-nose{
+    position:absolute; left:29px; top:10px; width:11px; height:8px;
+    clip-path: polygon(0 0, 0 100%, 100% 50%);
+    background: linear-gradient(to right, #ce93d8 0%, #ffffff 100%);
+    box-shadow: 0 0 8px rgba(255,255,255,.9);
+}
+.usp-p-msl-exhaust{
+    position:absolute; left:-3px; top:12px; width:12px; height:4px;
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+    background: linear-gradient(to left, #ffffff 0%, #e1bee7 45%, rgba(124,77,255,.15) 100%);
+    transform-origin:100% 50%;
+    animation: usp-msl-exhaust .16s ease-in-out infinite alternate;
+}
+@keyframes usp-msl-exhaust{ from{transform:scaleX(.75); opacity:.65} to{transform:scaleX(1.2); opacity:1} }
+.usp-p-msl-mote{
+    position:absolute; width:2px; height:2px; border-radius:50%;
+    background:#e1bee7;
+    box-shadow: 0 0 4px #ce93d8;
+    animation: usp-msl-mote .45s ease-out infinite;
+}
+.usp-p-msl-mote-1{ left:12px; top:7px; }
+.usp-p-msl-mote-2{ left:7px; top:20px; animation-delay:.22s; }
+@keyframes usp-msl-mote{ 0%{transform:translateX(0); opacity:0} 25%{opacity:1} 100%{transform:translateX(-9px); opacity:0} }
+
+/* ━━━ ICE LANCE (usp_ice_lance) — a real lance of ice ━━━━━━━━━━━━━━━━━━ */
+/* Signature projectile: a long faceted spike with a needle tip, built
+   pointing +X like every projectile. Frostbolt keeps the shared shard. */
+.usp-proj-icelance{ filter: drop-shadow(0 0 10px rgba(180,235,255,.95)) drop-shadow(0 0 22px rgba(79,195,247,.50)); }
+.usp-p-lance-shaft{
+    position:absolute; left:0; top:11px; width:36px; height:6px;
+    clip-path: polygon(0 38%, 55% 0, 88% 22%, 100% 50%, 88% 78%, 55% 100%, 0 62%);
+    background: linear-gradient(to bottom, #ffffff 0%, #b3e5fc 35%, #4fc3f7 62%, #0277bd 100%);
+}
+.usp-p-lance-facet{
+    position:absolute; left:5px; right:7px; top:1px; height:2px;
+    background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,.95) 40%, rgba(255,255,255,.95) 70%, rgba(255,255,255,0));
+}
+.usp-p-lance-tip{
+    position:absolute; left:30px; top:8px; width:12px; height:12px;
+    background: radial-gradient(circle, #ffffff 0%, rgba(179,229,252,.85) 40%, transparent 70%);
+    animation: usp-lance-tip .3s ease-in-out infinite alternate;
+}
+@keyframes usp-lance-tip{ from{transform:scale(.85); opacity:.8} to{transform:scale(1.1); opacity:1} }
+.usp-p-lance-vapor{
+    position:absolute; left:-4px; top:12px; width:12px; height:4px; border-radius:2px;
+    background: linear-gradient(to right, transparent 0%, rgba(179,229,252,.55) 100%);
+    animation: usp-lance-vapor .28s ease-in-out infinite alternate;
+}
+@keyframes usp-lance-vapor{ from{transform:scaleX(.8); opacity:.5} to{transform:scaleX(1.15); opacity:.9} }
+.usp-p-lance-mote{
+    position:absolute; width:2px; height:2px; border-radius:50%;
+    background: #e1f5fe;
+    box-shadow: 0 0 4px rgba(180,235,255,.9);
+    animation: usp-lance-mote .4s ease-out infinite;
+}
+.usp-p-lance-mote-1{ left:14px; top:8px; }
+.usp-p-lance-mote-2{ left:9px; top:19px; animation-delay:.2s; }
+@keyframes usp-lance-mote{ 0%{transform:translateX(0); opacity:0} 25%{opacity:1} 100%{transform:translateX(-10px); opacity:0} }

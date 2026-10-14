@@ -648,6 +648,9 @@ export const WORLD_BGM = {
 // Maps SFX keys to their audio file paths.
 // Keys are used with playSFX(key) and stopSFX(key) throughout the game.
 
+// Keys that loop until stopSFX(key) is called (see playSFX in audio.js).
+export const SFX_LOOPS = ['charge_loop', 'hz_blizzard_loop', 'hz_cyclone_loop'];
+
 export const SFX = {
     // ── UI ───────────────────────────────────────────────
     button: 'audio/sfx/ui/sfx_button.ogg',
@@ -818,4 +821,72 @@ export const SFX = {
     // cleave sweep sound is added to audio/
     cleave: 'audio/sfx/classes/sfx_diagonal_strike.ogg',
 
+    // ── Activated new sounds (GENERATED) ─────────────────
+    // Wired in code via playSFX(newKey, oldPlaceholderKey); an entry appears
+    // here only once its .ogg exists. Maintained by dev/tools/activate-sfx.mjs
+    // - do not edit between the markers by hand.
+    // <<SFX-ACTIVE-BEGIN>>
+    absorption_broken: 'audio/sfx/combat/sfx_absorption_broken.mp3',
+    absorption_regen: 'audio/sfx/combat/sfx_absorption_regen.mp3',
+    ail_bleed: 'audio/sfx/ailments/sfx_ail_bleed.mp3',
+    ail_blind: 'audio/sfx/ailments/sfx_ail_blind.mp3',
+    ail_chill: 'audio/sfx/ailments/sfx_ail_chill.mp3',
+    ail_confuse: 'audio/sfx/ailments/sfx_ail_confuse.mp3',
+    ail_dot_tick: 'audio/sfx/ailments/sfx_ail_dot_tick.mp3',
+    ail_freeze: 'audio/sfx/ailments/sfx_ail_freeze.mp3',
+    ail_ignite: 'audio/sfx/ailments/sfx_ail_ignite.mp3',
+    ail_poison: 'audio/sfx/ailments/sfx_ail_poison.mp3',
+    ail_polymorph: 'audio/sfx/ailments/sfx_ail_polymorph.mp3',
+    ail_shadow: 'audio/sfx/ailments/sfx_ail_shadow.mp3',
+    ail_shadowburn: 'audio/sfx/ailments/sfx_ail_shadowburn.mp3',
+    ail_shock: 'audio/sfx/ailments/sfx_ail_shock.mp3',
+    ail_stun: 'audio/sfx/ailments/sfx_ail_stun.mp3',
+    art_dash_strike: 'audio/sfx/combat/sfx_art_dash_strike.mp3',
+    art_grand_nova: 'audio/sfx/combat/sfx_art_grand_nova.mp3',
+    art_land_thud: 'audio/sfx/combat/sfx_art_land_thud.mp3',
+    art_nova: 'audio/sfx/combat/sfx_art_nova.mp3',
+    art_sky_leap: 'audio/sfx/combat/sfx_art_sky_leap.mp3',
+    boss_arena_enter: 'audio/sfx/monsters/sfx_boss_arena_enter.mp3',
+    boss_arrive: 'audio/sfx/monsters/sfx_boss_arrive.mp3',
+    boss_beam_charge: 'audio/sfx/bosses/sfx_boss_beam_charge.mp3',
+    boss_beam_fire: 'audio/sfx/bosses/sfx_boss_beam_fire.mp3',
+    boss_clock_tick: 'audio/sfx/bosses/sfx_boss_clock_tick.mp3',
+    boss_telegraph_warn: 'audio/sfx/bosses/sfx_boss_telegraph_warn.mp3',
+    bow_shot: 'audio/sfx/combat/sfx_bow_shot.mp3',
+    charged_shot_release: 'audio/sfx/combat/sfx_charged_shot_release.mp3',
+    charge_loop: 'audio/sfx/combat/sfx_charge_loop.mp3',
+    charge_ready: 'audio/sfx/combat/sfx_charge_ready.mp3',
+    charge_tier_up: 'audio/sfx/combat/sfx_charge_tier_up.mp3',
+    craft_bench_apply: 'audio/sfx/hub/sfx_craft_bench_apply.mp3',
+    currency_apply_success: 'audio/sfx/hub/sfx_currency_apply_success.mp3',
+    essence_apply: 'audio/sfx/hub/sfx_essence_apply.mp3',
+    item_equip: 'audio/sfx/hub/sfx_item_equip.mp3',
+    item_unequip: 'audio/sfx/hub/sfx_item_unequip.mp3',
+    level_up: 'audio/sfx/loot/sfx_level_up.mp3',
+    low_health_warning: 'audio/sfx/combat/sfx_low_health_warning.mp3',
+    mana_empty: 'audio/sfx/spells/sfx_mana_empty.mp3',
+    map_complete: 'audio/sfx/hub/sfx_map_complete.mp3',
+    melee_swing_axe: 'audio/sfx/combat/sfx_melee_swing_axe.mp3',
+    melee_swing_dagger: 'audio/sfx/combat/sfx_melee_swing_dagger.mp3',
+    melee_swing_mace: 'audio/sfx/combat/sfx_melee_swing_mace.mp3',
+    melee_swing_staff: 'audio/sfx/combat/sfx_melee_swing_staff.mp3',
+    melee_swing_sword: 'audio/sfx/combat/sfx_melee_swing_sword.mp3',
+    mistakes_warning: 'audio/sfx/combat/sfx_mistakes_warning.mp3',
+    modal_close: 'audio/sfx/ui/sfx_modal_close.mp3',
+    modal_open: 'audio/sfx/ui/sfx_modal_open.mp3',
+    passive_allocate: 'audio/sfx/loot/sfx_passive_allocate.mp3',
+    passive_keystone_allocate: 'audio/sfx/loot/sfx_passive_keystone_allocate.mp3',
+    passive_refund: 'audio/sfx/loot/sfx_passive_refund.mp3',
+    player_block: 'audio/sfx/combat/sfx_player_block.mp3',
+    player_crit_taken: 'audio/sfx/combat/sfx_player_crit_taken.mp3',
+    player_deflect: 'audio/sfx/combat/sfx_player_deflect.mp3',
+    player_dodge: 'audio/sfx/combat/sfx_player_dodge.mp3',
+    player_fate_negate: 'audio/sfx/combat/sfx_player_fate_negate.mp3',
+    player_miss: 'audio/sfx/combat/sfx_player_miss.mp3',
+    player_parry: 'audio/sfx/combat/sfx_player_parry.mp3',
+    projectile_impact: 'audio/sfx/combat/sfx_projectile_impact.mp3',
+    puzzle_col_complete: 'audio/sfx/puzzle/sfx_puzzle_col_complete.mp3',
+    puzzle_row_complete: 'audio/sfx/puzzle/sfx_puzzle_row_complete.mp3',
+    puzzle_streak_up: 'audio/sfx/puzzle/sfx_puzzle_streak_up.mp3',
+    // <<SFX-ACTIVE-END>>
 };

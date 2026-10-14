@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { _egIsPolymorphActive } from './combat-ailments-core.js';
 import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
@@ -85,6 +86,9 @@ export function _egUpdateDragBonusLabel() {
     const avatar = document.getElementById('player-avatar-wrapper');
     if (!avatar) { _egClearDragBonusLabel(); return; }
 
+    // No monsters on screen = nothing to aim at, so the tier word is just noise.
+    if (!globalThis._egMonsters || globalThis._egMonsters.length === 0) { _egClearDragBonusLabel(); return; }
+
     const tier = (typeof _egGetDragTier === 'function') ? _egGetDragTier(globalThis._egDragChargeStacks) : 0;
     if (tier <= 0) { _egClearDragBonusLabel(); return; }
 
@@ -171,7 +175,7 @@ export function _egReleaseChargedShot() {
     _egClearChargedProjectileVisual();
     // Keep a brief lingering tier label on the avatar through the flight so
     // the player sees that the drag bonus was applied to this shot.
-    if (releaseTier > 0) {
+    if (releaseTier > 0 && globalThis._egMonsters && globalThis._egMonsters.length > 0) {
         const avatar = document.getElementById('player-avatar-wrapper');
         if (avatar) {
             const linger = document.createElement('div');
@@ -211,6 +215,10 @@ export function _egReleaseChargedShot() {
         return;
     }
 
+    // Only a really charged drag (2+ stacks) gets the release sound; a plain
+    // single-cell fill also releases a 1-stack shot and must keep sounding
+    // like just the normal cell-fill click.
+    if (stacks >= 2) Audio_Manager.playSFX('charged_shot_release');
     _egAnimatePlayerProjectile(damage, targetIdAtFire, undefined, undefined, sourceEl, startScale, elements, { isCharged: true, isChargedStacks: stacks, isCrit: wasCrit });
     _egTryMultishot(damage, targetIdAtFire, elements, sourceEl, wasCrit);
 }
@@ -229,6 +237,7 @@ export function _egTryMultishot(damage, primaryTargetId, elements, sourceEl, was
         : primaryTargetId;
     if (!targetId) return;
 
+    Audio_Manager.playSFX('multishot_fire');
     _egAnimatePlayerProjectile(_egSecondaryDamage(damage, 'multishot', stats), targetId, undefined, undefined, sourceEl, 1.2, elements, { isCrit: !!wasCrit });
 }
 
@@ -282,6 +291,7 @@ export function _egRollPlayerMiss(targetId, opts) {
     // the sprite hitbox overlaps a cloud, regardless of accuracy or bonuses.
     if (typeof _egIsPlayerInDarknessCloud === 'function' && _egIsPlayerInDarknessCloud()) {
         _egShowStatusLabel(targetId, t('eg_miss'));
+        Audio_Manager.playSFX('player_miss');
         return true;
     }
 
@@ -295,6 +305,7 @@ export function _egRollPlayerMiss(targetId, opts) {
     if (Math.random() * 100 >= missPct) return false;
 
     _egShowStatusLabel(targetId, t('eg_miss'));
+    Audio_Manager.playSFX('player_miss');
     return true;
 }
 

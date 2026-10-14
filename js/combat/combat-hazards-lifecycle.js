@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { _egIsActive } from './combat-state.js';
 import { EG_HZ_LAYER_Z, _egHzIntensity, _egHzActive, _egHzLayer, _egHzPausedForQuiz, _egHzLava, _egHzLightning, _egHzBlizzard, _egHzDarkness, _egHzArcane, _egHzMeteor, _egHzVolatile, _egHzFrostNova, _egHzFirewall, _egHzCyclone, _egHzDelirium } from './combat-hazards.js';
 import { _egSetHzActive, _egSetHzLayer, _egSetHzPausedForQuiz, _egSetHzLava, _egSetHzLightning, _egSetHzBlizzard, _egSetHzDarkness, _egSetHzArcane, _egSetHzMeteor, _egSetHzVolatile, _egSetHzFrostNova, _egSetHzFirewall, _egSetHzCyclone, _egSetHzDelirium } from './combat-hazards.js';
@@ -67,6 +68,8 @@ export function _egHazardsReset() {
 
 // Tears down every hazard DOM node and state. Safe to call anytime.
 export function _egHazardsCleanup() {
+    Audio_Manager.stopSFX('hz_blizzard_loop');
+    Audio_Manager.stopSFX('hz_cyclone_loop');
     _egSetHzActive(false);
     _egSetHzPausedForQuiz(false);
     _egSetHzLava(null);
@@ -94,6 +97,8 @@ export function _egHazardsCleanup() {
 // is visible so the question remains readable and the player is not
 // damaged by invisible hazards.
 export function _egHazardsHideForQuiz() {
+    Audio_Manager.stopSFX('hz_blizzard_loop');
+    Audio_Manager.stopSFX('hz_cyclone_loop');
     if (!_egHzActive || _egHzPausedForQuiz) return;
     _egSetHzPausedForQuiz(true);
     if (_egHzLayer) _egHzLayer.style.display = 'none';
@@ -103,6 +108,8 @@ export function _egHazardsHideForQuiz() {
 // Re-shows hazard visuals and resumes ticking when the next puzzle launches
 // (or after a standalone interstitial question is dismissed).
 export function _egHazardsShowAfterQuiz() {
+    if (_egHzBlizzard) Audio_Manager.playSFX('hz_blizzard_loop');
+    if (_egHzCyclone) Audio_Manager.playSFX('hz_cyclone_loop');
     if (!_egHzPausedForQuiz) return;
     _egSetHzPausedForQuiz(false);
     if (_egHzLayer) _egHzLayer.style.display = '';

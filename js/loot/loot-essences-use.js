@@ -6,6 +6,7 @@
 // listeners plus the application itself. Orb mode wins any conflict -
 // its listeners register first and the two modes cancel each other.
 
+import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { LANG, t } from '../translation/translations.js';
 import { _dndChipScreenEl } from '../endgame/endgame-hub-drag-and-drop.js';
@@ -118,6 +119,7 @@ export function _egApplyEssenceToItem(item, applyFn, chipEl, keepActive) {
     if (stack.count <= 0) _egEssenceStash[sourceRow][sourceCol] = null;
     _egRenderEssenceCell(sourceRow, sourceCol);
 
+    Audio_Manager.playSFX('essence_apply');
     if (typeof trackAchStat === 'function') try { trackAchStat('egEssencesApplied', 1); } catch(e){}
 
     if (keepActive && stack.count > 0) {

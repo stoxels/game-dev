@@ -128,7 +128,7 @@ export function _egCheckCurrencyDropClaim(row, col) {
     if (added) globalThis.showToast(t('eg_currency_acquired')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name), _egRarityToastColor('currency'));
-    Audio_Manager.playSFX('player_equip_pickup');
+    Audio_Manager.playSFX(isEssence ? 'pickup_essence' : 'pickup_currency', 'player_equip_pickup');
     return true;
 }
 

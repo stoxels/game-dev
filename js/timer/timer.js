@@ -82,17 +82,26 @@ function _getTimerUrgencyClass(secs) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Reference length for the vignette thresholds: the timer the level started
+// with (set by _initTimer in start-level.js). Tiers are a share of this, so
+// they scale with the short campaign timers instead of fixed minute marks.
+// 1800 is the legacy 30-minute default, used until a level has set it.
+let _ltvRefSecs = 1800;
+try { Object.defineProperty(globalThis, '_lowTimeRefSecs', { get() { return _ltvRefSecs; }, set(v) { if (v > 0) _ltvRefSecs = v; }, configurable: true }); } catch (e) {}
+
 // Returns the vignette tier class for the current timerSecs, or '' when
-// above all thresholds. Mirrors _getTimerUrgencyClass()'s breakpoints but
-// drives the full-screen edge effect instead of just the clock text.
-//   'ltv-tier3' - ≤ 120s  (2 min, strongest)
-//   'ltv-tier2' - ≤ 300s  (5 min)
-//   'ltv-tier1' - ≤ 600s  (10 min)
-//   ''          - > 600s
+// above all thresholds. Drives the full-screen edge effect instead of just
+// the clock text.
+//   'ltv-tier3' - <= 1/15 of the starting timer (strongest)
+//   'ltv-tier2' - <= 1/6  of the starting timer
+//   'ltv-tier1' - <= 1/3  of the starting timer
+//   ''          - above that
+// (Same shares the old fixed 2/5/10 min marks had on a 30-minute level.)
 function _getLowTimeVignetteTier(secs) {
-    if (secs <= 120) return 'ltv-tier3';
-    if (secs <= 300) return 'ltv-tier2';
-    if (secs <= 600) return 'ltv-tier1';
+    const ref = _ltvRefSecs;
+    if (secs <= ref / 15) return 'ltv-tier3';
+    if (secs <= ref / 6) return 'ltv-tier2';
+    if (secs <= ref / 3) return 'ltv-tier1';
     return '';
 }
 
@@ -217,8 +226,10 @@ function _showLowTimeWarningBanner(tier) {
     document.body.appendChild(el);
 
     const board = document.getElementById('ptable');
-    if (board) {
-        const r = board.getBoundingClientRect();
+    const r = board ? board.getBoundingClientRect() : null;
+    // A board that is not laid out yet (level just loading in) reports a
+    // 0x0 rect at the origin, which parked the banner in the top-left corner.
+    if (r && r.width > 0 && r.height > 0) {
         el.style.left = (r.left + r.width / 2) + 'px';
         el.style.top = (r.top + r.height / 2) + 'px';
     } else {
@@ -261,6 +272,7 @@ function _maybeShowLowTimeWarning() {
     // out-of-order later (e.g. big penalty jump 400→20 should consume 300+120).
     if (tier === 30) { _lowTimeWarningShown[120] = true; _lowTimeWarningShown[300] = true; }
     else if (tier === 120) { _lowTimeWarningShown[300] = true; }
+    Audio_Manager.playSFX('timer_low_warning');
     _showLowTimeWarningBanner(tier);
 }
 
@@ -615,6 +627,11 @@ function _tickCountdown() {
     if (window._blackSwanActive) timerSecs -= 9;
 
     if (window._chronoFractureActive) timerSecs -= 3;
+
+    // Final-ten-seconds heartbeat (one tick per elapsed second).
+    if (timerSecs >= 1 && timerSecs <= 10 && !globalThis.dead) {
+        Audio_Manager.playSFX('timer_tick_final');
+    }
 }
 
 

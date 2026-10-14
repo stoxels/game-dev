@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../../audio/audio.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkToast } from './shared-boss-abilities.js';
 
@@ -40,6 +41,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 // Touching the bike or any trail segment burns; give it looping room.
 export function _egMechLightCycle(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
+    Audio_Manager.playSFX('boss_tron_cycle');
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const speed = [0, 260, 300, 350][p];
     const segLen = 26, maxSegs = 44;

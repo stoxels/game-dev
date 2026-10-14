@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { renderCell } from '../grid.js';
 import { applyCell } from '../mouse-button-handlers.js';
 import { _egFireProjectile, _egGetElementCentre } from './combat-class-projectiles.js';
@@ -26,6 +27,7 @@ function _egMaybePuzzleAttack(monster) {
     const end = (typeof _egGetElementCentre === 'function') ? _egGetElementCentre(grid) : null;
     if (!start || !end) return false;
 
+    Audio_Manager.playSFX('monster_puzzle_attack');
     _egFireProjectile(monster.emoji, 'eg-proj-monster eg-proj-puzzle', start, end,
         (typeof EG_MONSTER_PROJ_DURATION_MS !== 'undefined') ? EG_MONSTER_PROJ_DURATION_MS : 600,
         'ease-in',
@@ -128,6 +130,7 @@ function _egPuzzleLava() {
 
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'lava', cells });
+    Audio_Manager.playSFX('grid_lava_spawn');
     globalThis.showToast('🌋 The monster scorched the grid - lava cells punish wrong clicks doubly!');
 }
 
@@ -164,6 +167,7 @@ function _egPuzzleIce() {
 
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'ice', cells });
+    Audio_Manager.playSFX('grid_ice_patch');
     globalThis.showToast('🧊 Ice spreads across the grid - clicks may slip!');
 }
 
@@ -187,6 +191,7 @@ function _egPuzzleIceRedirect(row, col) {
     if (neighbours.length === 0) return false;
 
     const [nr, nc] = neighbours[Math.floor(Math.random() * neighbours.length)];
+    Audio_Manager.playSFX('grid_ice_slip');
     globalThis.showToast('🧊 Slippery! Your click slid to another cell.');
     _egSetIceRedirectDepth(_egIceRedirectDepth + 1);
     try {
@@ -305,6 +310,7 @@ function _egOnCorrectCellPuzzleFX(row, col) {
     globalThis.systemMarkedGrid[r][c] = false;
     renderCell(r, c);
     _egSpawnCrossZapFX(r, c);
+    Audio_Manager.playSFX('grid_shock_strip');
     globalThis.showToast('⚡ A spark zapped one of your ✕ marks!');
 }
 
@@ -357,6 +363,7 @@ function _egPuzzleShadowBlackout() {
     });
 
     _egRegisterPuzzleEffect({ type: 'shadowline', line });
+    Audio_Manager.playSFX('grid_veil');
     globalThis.showToast(`🌑 Shadow veils a ${isRow ? 'row' : 'column'} of clue numbers!`);
 }
 

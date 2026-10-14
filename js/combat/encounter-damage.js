@@ -42,6 +42,7 @@ import { STATE } from '../state.js';
 // Called by the onclick handler on monster cards in the rendered panel HTML.
 export function _egSelectTarget(monsterId) {
     if (!_egIsActive()) return;
+    if (globalThis._egTargetId !== monsterId) Audio_Manager.playSFX('target_select');
     globalThis._egTargetId = monsterId;
     _egRenderPanel();
 
@@ -244,6 +245,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     if (!isSpell && !isBossAbility && !chargingMelee && (Number(stats.avoidPhysHitPct) || 0) > 0
         && (!element || element === 'physical') && Math.random() * 100 < Math.min(75, stats.avoidPhysHitPct)) {
         globalThis.showToast(t('eg_dodged'));
+        Audio_Manager.playSFX('player_dodge');
         _egScheduleAbsorptionRegen();
         return 0;
     }

@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { setAchStat, trackAchStat } from '../achievements/achievements.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
@@ -540,6 +541,7 @@ export function _ptHandleDeallocation(id, alloc) {
     if (!_ptIsDeallocatable(id)) return false;
 
     alloc.delete(id);
+    Audio_Manager.playSFX('passive_refund');
     _pt_reachableCache = null;
     _ptSyncBaseAttributes();
     _ptRefundPoint();
@@ -558,6 +560,12 @@ export function _ptHandleAllocation(id, alloc) {
     _pt_reachableCache = null;
     _ptSyncBaseAttributes();
     _ptSpendPoint();
+    {
+        const sk = (globalThis._pt_skills || []).find(s => s && s.id === id);
+        const keystone = !!(sk && ((sk.statKey && String(sk.statKey).startsWith('keystone_'))
+            || (sk.nameEn && String(sk.nameEn).startsWith('Keystone:'))));
+        Audio_Manager.playSFX(keystone ? 'passive_keystone_allocate' : 'passive_allocate');
+    }
     STATE.passiveTreeLastNode = id;
     save();
     _ptRefreshAllStyles(_ptAffectedNodeIds([id]));
@@ -576,6 +584,7 @@ export function _ptRefundAllPoints() {
     if (!refundable.length) return;
 
     refundable.forEach(id => alloc.delete(id));
+    Audio_Manager.playSFX('passive_respec');
     _pt_reachableCache = null;
     _ptSyncBaseAttributes();
 

@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { setAchStat, trackAchStat } from '../achievements/achievements.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { save } from '../state.js';
@@ -738,6 +739,7 @@ export function _egAtlasOnMapCompleted(mapItem) {
         globalThis.showToast(t('eg_atlas_completed_toast')
             .replace('{n}', egAtlasNodeName(node)), '#f5d98a');
 
+        if (newlyUnlocked.length) Audio_Manager.playSFX('atlas_unlock');
         newlyUnlocked.forEach(l => {
             globalThis.showToast(t('eg_atlas_unlocked_toast')
                 .replace('{n}', `${egAtlasNodeName(egAtlasNodeById(l))} (${t('eg_map_tier_tt').replace('{n}', egAtlasNodeById(l).tier)})`), '#7fd67f');

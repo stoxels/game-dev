@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { EG_AIL_IGNITE_DMG_SHARE, EG_AIL_MIN_DOT_DAMAGE } from './combat-ailments-core.js';
 import {
     EG_HZ_LAVA_BLAST_R, EG_HZ_LAVA_EXPLOSION_BASE_DMG_PCT, EG_HZ_LAVA_FUSE_MS,
@@ -39,12 +40,14 @@ export function _egHzCreateLavaPool() {
 export function _egHzTriggerLavaFuse(pool) {
     if (!pool || pool.state !== 'active') return;
     pool.state = 'fusing';
+    Audio_Manager.playSFX('hz_lava_fuse');
     pool.fuseT = EG_HZ_LAVA_FUSE_MS;
     if (pool.el) pool.el.classList.add('eg-hz-lava-fuse');
 }
 
 export function _egHzDetonateLava(pool) {
     if (!pool) return;
+    Audio_Manager.playSFX('hz_lava_detonate');
     const bx = pool.x;
     const by = pool.y;
     const br = pool.r;

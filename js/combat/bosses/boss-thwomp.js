@@ -176,7 +176,7 @@ export function _egThwompArenaInit(monster) {
                 ring.style.width = ring.style.height = (EG_THW_STOMP_R * 2) + 'px';
                 st.quakeRing = ring;
                 _egNkToast('eg_thwomp_quake', '🪨 QUAKE STOMP! Clear the dust ring!');
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('thwomp_slam'); } catch (e) {}
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
             }
         } else if (b.phase === 'stomp-warn') {
             if (b.t >= EG_THW_STOMP_WARN_MS) {
@@ -203,7 +203,7 @@ export function _egThwompArenaInit(monster) {
                     }
                 }
                 _egThwShockRing(st, b.x, b.y, EG_THW_STOMP_R, 0.5);
-                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('thwomp_slam'); } catch (e) {}
+                try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
                 b.phase = 'hover';
                 b.t = 0;
                 _egThwPickHoverSpot(b);
@@ -302,7 +302,7 @@ export function _egThwompArenaInit(monster) {
                             _egNkAbilityHitToast(dealt, 'The Thwomp', 'Mini Slam');
                         }
                         _egThwShockRing(st, mn.x, mn.y, EG_THW_MINI_R, 0.3);
-                        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('thwomp_slam'); } catch (e) {}
+                        try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
                     }
                 }
             });
@@ -359,7 +359,7 @@ export function _egThwCollapse(st, p) {
     }
     st.collapse = { t: 0, marks, next: 0 };
     _egNkToast('eg_thwomp_collapse', '🪨 CEILING COLLAPSE! Watch the rubble marks!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('thwomp_slam'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
 }
 
 
@@ -379,7 +379,7 @@ export function _egThwSiege(st, p) {
     }
     st.siege = { t: 0, minis };
     _egNkToast('eg_thwomp_siege', '🪨 MINI-THWOMP SIEGE! The blocks multiply!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('thwomp_slam'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
 }
 
 
@@ -401,7 +401,7 @@ export function _egThwompGrandSlam(monster) {
     const mark = _egNkEl(run, 'div', 'eg-thw-gs-mark');
     mark.style.width = mark.style.height = (EG_THW_STOMP_R * 1.9) + 'px';
     _egNkToast('eg_thwomp_gs', '🪨 GRAND SLAM! Get out from under the block!');
-    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('thwomp_slam'); } catch (e) {}
+    try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('boss_slam_impact', 'thwomp_slam'); } catch (e) {}
     let t = 0, stage = 'follow', x = 0, y = 0, hit = false, shocked = false;
     const crashEl = _egNkEl(run, 'div', 'eg-thw-crash', '🪨');
     crashEl.style.opacity = '0';

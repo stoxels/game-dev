@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { isEndgameLevel } from '../mouse-button-handlers.js';
 import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
@@ -824,6 +825,7 @@ function setHotbarSlot(slotIndex, skillId) {
 
     STATE.skillHotbar[slotIndex] = skillId;
     save();
+    if (skillId !== null) Audio_Manager.playSFX('hotbar_assign');
     return true;
 }
 

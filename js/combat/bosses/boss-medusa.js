@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../../audio/audio.js';
 import { _egRenderPanel } from '../encounter.js';
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS, _egBossScheduleMechanics } from './boss-framework.js';
 import { _egNkAbilityHitToast, _egNkCircleHit, _egNkDodgeBusy, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
@@ -109,6 +110,7 @@ export const EG_MD_GAZE_SPEED = [0, 260, 320, 390];
 
 export function _egMechMdStoneGaze(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
+    Audio_Manager.playSFX('boss_medusa_gaze');
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(monster && monster.id, true);

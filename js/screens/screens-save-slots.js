@@ -1,3 +1,4 @@
+import { Audio_Manager } from '../audio/audio.js';
 import { SAVE_SLOT_COUNT, getSlotName, getSlotSummary, loadStateFromSlot, setSlotName } from '../state.js';
 import { t } from '../translation/translations.js';
 import { hideModal, showModal, switchScreen } from './screens.js';
@@ -129,6 +130,7 @@ function _attachSlotCardListeners(card, slotNum) {
 // Loads the chosen slot's save data and resumes whatever flow was waiting
 // on a slot pick (set up by showSaveSlotSelect).
 export function onSaveSlotChosen(slotNum) {
+    Audio_Manager.playSFX('save_slot_select');
     loadStateFromSlot(slotNum);
     const cb = window._pendingSaveSlotCallback;
     window._pendingSaveSlotCallback = null;
@@ -274,6 +276,7 @@ function _setResetModalTextForSlot(slotNum) {
 // confirmReset() (save-reset.js) checks window._pendingResetSlot to decide
 // whether to wipe just this slot or perform a full reset.
 function showDeleteSlotConfirm(slotNum) {
+    Audio_Manager.playSFX('save_slot_delete');
     window._pendingResetSlot = slotNum;
     _setResetModalTextForSlot(slotNum);
     showModal('reset-modal');

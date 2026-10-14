@@ -4,6 +4,7 @@
 // re-exports this focused owner for compatibility.
 //------------------------------------------------------------------------
 
+import { Audio_Manager } from '../audio/audio.js';
 import { t } from '../translation/translations.js';
 import { EG_MONSTER_ZONES } from './encounter-constants.js';
 import { _egRenderPanel } from './encounter.js';
@@ -67,6 +68,7 @@ export function _egBuildMonsterOrBoss(defId, level, hpMult = 1) {
 // Initialises boss logic on arrival. Spawn toasts were removed -
 // the monster cards themselves signal that something appeared.
 export function _egNotifyMonsterArrival(monster) {
+    Audio_Manager.playSFX(monster.isBoss ? 'boss_arrive' : monster.isElite ? 'elite_spawn' : 'monster_spawn');
     if (monster.isBoss) {
         globalThis._egBossInit(monster);
     }

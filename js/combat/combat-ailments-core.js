@@ -218,7 +218,14 @@ function _egApplyMonsterAilment(monster, key, dps) {
             }
         } catch (e) { /* base bleed */ }
     }
+    // New application only: refreshes of the same ailment stay silent.
+    const wasActive = _egHasStatus(monster.statuses, key);
     _egApplyStatusToMap(monster.statuses, key, durationS, dps);
+    if (!wasActive) {
+        if (key === 'frozen') Audio_Manager.playSFX('monster_frozen');
+        else if (key === 'blind') Audio_Manager.playSFX('monster_blinded');
+        else if (key === 'confused') Audio_Manager.playSFX('monster_confused');
+    }
     if (key === 'bleed' && monster.statuses.bleed) monster.statuses.bleed.stacks = bleedStacks;
     if (speedMult > 1) monster.statuses[key].tickS = EG_AIL_TICK_INTERVAL_S / speedMult;
     // No application blip on the monster side: elemental hits re-roll and
@@ -233,12 +240,15 @@ function _egApplyMonsterAilment(monster, key, dps) {
 // _egGetMonsterChargeMultiplier). Monsters that avoid ailments may resist it.
 function _egFreezeAllMonsters(durationS) {
     const list = globalThis._egMonsters || [];
+    let froze = false;
     for (const m of list) {
         if (!m || !(m.currentHP > 0)) continue;
         if ((m.avoidAilmentPct || 0) > 0 && Math.random() * 100 < m.avoidAilmentPct) continue;
         if (!m.statuses) m.statuses = {};
         _egApplyStatusToMap(m.statuses, 'frozen', durationS, 0);
+        froze = true;
     }
+    if (froze) Audio_Manager.playSFX('monster_frozen');
 }
 
 // Applies an ailment to the player (or refreshes an existing one).
@@ -286,6 +296,7 @@ function _egStunPlayer(durationS = EG_AIL_STUN_DURATION_S) {
     globalThis._egPlayerStunnedUntil = now + d * 1000;
     try { if (typeof isHoldCasting === 'function' && isHoldCasting()) cancelHoldCast(); } catch (e) { /* best-effort */ }
     globalThis.showToast(t('eg_stunned'));
+    Audio_Manager.playSFX('ail_stun');
     return true;
 }
 
@@ -328,6 +339,10 @@ function _egApplyPlayerAilment(key, dps) {
         + (key === 'frozen' ? Number(playerStats.freezeDurationTakenPct) || 0 : 0);
     if (takenRed > 0) scaled *= Math.max(0.1, 1 - Math.min(90, takenRed) / 100);
     _egApplyStatusToMap(_egPlayerStatuses, key, scaled, dps);
+    const ailSfx = ({ ignite: 'ail_ignite', bleed: 'ail_bleed', poison: 'ail_poison', chill: 'ail_chill',
+        frozen: 'ail_freeze', shocked: 'ail_shock', shadowburn: 'ail_shadowburn', shadow: 'ail_shadow',
+        polymorph: 'ail_polymorph', confused: 'ail_confuse' })[key];
+    if (ailSfx) Audio_Manager.playSFX(ailSfx);
     _egStartPlayerStatusBarTicker();
     _egShowPlayerAilmentOverlay(key);
     if (key === 'ignite') _egStartPlayerFireDrops();
@@ -742,13 +757,14 @@ function _egTryRetaliationWard(element, attacker) {
     let stats = null;
     try { stats = _egComputePlayerStats(); } catch (e) { return false; }
     if (!stats || !attacker || !attacker.statuses) return false;
+    let warded = false;
     if (element === 'fire') {
-        return (Number(stats.retaliationWardIgnite) || 0) > 0 && _egHasStatus(attacker.statuses, 'ignite');
+        warded = (Number(stats.retaliationWardIgnite) || 0) > 0 && _egHasStatus(attacker.statuses, 'ignite');
+    } else if (!element) {
+        warded = (Number(stats.retaliationWardBleed) || 0) > 0 && _egHasStatus(attacker.statuses, 'bleed');
     }
-    if (!element) {
-        return (Number(stats.retaliationWardBleed) || 0) > 0 && _egHasStatus(attacker.statuses, 'bleed');
-    }
-    return false;
+    if (warded) Audio_Manager.playSFX('retaliation_ward');
+    return warded;
 }
 
 function _egRollMonsterHitAilment(element, dealt, attacker) {
@@ -893,6 +909,7 @@ function _egTickAilments() {
         }
     });
     if (playerDot > 0) {
+        Audio_Manager.playSFX('ail_dot_tick');
         _egDealPlayerDotDamage(playerDot, playerIgnoresShield);
     }
 
@@ -1053,6 +1070,7 @@ function _egDropPlayerGround(type) {
     document.body.appendChild(el);
     const effect = { type: type === 'fire' ? 'playerfire' : 'playershadow', x: r.left + r.width / 2, y: r.top + r.height / 2, el };
     _egPuzzleEffects.push(effect);
+    Audio_Manager.playSFX(type === 'fire' ? 'hz_ground_fire_burn' : 'hz_shadow_cloud');
     setTimeout(() => { el.remove(); _egReplacePuzzleEffects(_egPuzzleEffects.filter(e => e !== effect)); }, EG_AIL_PLAYER_GROUND_DURATION_MS);
 }
 function _egStartPlayerFireDrops() {

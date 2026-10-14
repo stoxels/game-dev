@@ -6,6 +6,7 @@
 // target, handles the Mirror copy, bundles extra orbs (Scouring),
 // fires the shift-click chain fallback and consumes the stack.
 
+import { Audio_Manager } from '../audio/audio.js';
 import { trackAchStat } from '../achievements/achievements.js';
 import { t } from '../translation/translations.js';
 import { _egRenderMapStashCell, _egUpdateMapStashTabCounts } from '../endgame/endgame-gate.js';
@@ -22,6 +23,7 @@ export function _egStartCurrencyUse(def, row, col, chipEl) {
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     if (chipEl) chipEl.classList.add('eg-currency-selected');
     document.body.classList.add('eg-currency-use-active');
+    Audio_Manager.playSFX('currency_select');
     globalThis.showToast(t('eg_currency_selected')
         .replace('{icon}', def.icon)
         .replace('{name}', def.name));
@@ -32,7 +34,10 @@ export function _egCancelCurrencyUse(silent) {
     _egPendingCurrencyUse = null;
     document.querySelectorAll('.eg-item-chip').forEach(el => el.classList.remove('eg-currency-selected'));
     document.body.classList.remove('eg-currency-use-active');
-    if (!silent) globalThis.showToast(t('eg_currency_cancelled'));
+    if (!silent) {
+        Audio_Manager.playSFX('currency_cancel');
+        globalThis.showToast(t('eg_currency_cancelled'));
+    }
 }
 
 // Keeps use-mode active after an application (shift-click chaining, like
@@ -73,6 +78,7 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     if (isMap && !mapRule) {
         const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
         globalThis.showToast(msg);
+        Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
@@ -86,6 +92,7 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     if (isMap && defId !== 'mirror_of_kalandra' && !mapRule.canApply(item)) {
         const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
         globalThis.showToast(msg);
+        Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
@@ -98,6 +105,7 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
     if (!isMap && (item.category !== 'equip' || !def.canApply(item))) {
         const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
         globalThis.showToast(msg);
+        Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
         if (typeof _egShowStashInfo === 'function') _egShowStashInfo(msg, { type: 'error' });
         if (chipEl) {
             chipEl.classList.add('eg-slot-reject');
@@ -233,6 +241,7 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         if (!extraStack) {
             const msg = t('eg_currency_cannot_use').replace('{name}', def.name);
             globalThis.showToast(msg);
+        Audio_Manager.playSFX('currency_apply_fail', 'player_equip_not_pickup');
             _egCancelCurrencyUse(true);
             return;
         }
@@ -285,6 +294,7 @@ export function _egApplyCurrencyToItem(item, applyFn, chipEl, keepActive) {
         if (defId === 'orb_blessing') trackAchStat('egBlessingsUsed', 1);
         if (defId === 'mirror_of_kalandra') trackAchStat('egMirrorsUsed', 1);
     } catch(e){}
+    Audio_Manager.playSFX('currency_apply_success');
 
     // Shift-click chaining: keep the orb selected so further shift-clicks
     // re-use it on the next target until the stack runs out.
