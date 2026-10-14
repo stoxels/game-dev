@@ -2606,3 +2606,131 @@ export function _egFlingBurst(x, y, angle) {
         }
     } catch (e) {}
 }
+
+
+//------------------------------------------------------------------------
+//-------------------SHARED FINALE: WAVES OF SAFE / DANGER ZONES-----------
+//------------------------------------------------------------------------
+// A compact, always-avoidable ≤10% finale for the smaller trial bosses
+// (Warden, Cyclops, Weaver, Executioner, Dreadnought, Zenith, Exarch,
+// Arbiter). The boss is immune while it runs; a banner at the top names it
+// and says what to do. Each wave counts down on screen, then strikes:
+//   'shelter' - ONE green circle opens within walking reach (never on you):
+//               everything outside it is hit.
+//   'avoid'   - red circles land on your spot (+ extra ones): be outside.
+// Damage goes through _egNkHit (flash + number). Waves always leave at
+// least the countdown minus ~0.7s reaction to walk (320 px/s avatar).
+// Per-boss look: cfg.cls is added to the banner and zones (CSS colour
+// variable --nk-fin), and the finale fires at most once per boss.
+const EG_NK_FIN_SAFE_R = 115;    // px green shelter radius
+const EG_NK_FIN_DANGER_R = 135;  // px red strike radius
+const EG_NK_FIN_GAP_MS = 900;    // pause between waves
+
+// Starts a passive HP watcher: at ≤10% the finale (cfg) begins once.
+export function _egNkWatchFinale(monster, cfg) {
+    if (!monster || monster._nkFinaleWatch) return;
+    monster._nkFinaleWatch = true;
+    const run = _egNkNewRun(monster.id, true);
+    run.passive = true;
+    _egNkLoop(run, () => {
+        if (monster._nkFinaleDone) return false;
+        if (monster.currentHP > 0 && monster.currentHP <= monster.maxHP * 0.10 && !monster.bossImmune) {
+            _egNkFinaleWaves(monster, cfg);
+            return false;
+        }
+        return true;
+    });
+}
+
+// Runs the finale. cfg: { name (boss display name), title, hint, cls,
+// element, waves: [{ kind: 'shelter'|'avoid', ms, dmg, extra, label }] }
+export function _egNkFinaleWaves(monster, cfg) {
+    if (!monster || monster._nkFinaleDone) return;
+    monster._nkFinaleDone = true;
+    // The finale owns the arena: stop this boss's other active mechanics.
+    Array.from(_egNkRuns.values()).forEach(r => {
+        if (r.bossId === monster.id && !r.passive) { try { _egNkKillRun(r); } catch (e) {} }
+    });
+    const level = monster.level || 1;
+    const run = _egNkNewRun(monster.id, false);
+    run.passive = true;
+    monster.bossImmune = true;
+    const card = document.getElementById('eg-card-' + monster.id);
+    const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
+    if (wrap) wrap.classList.add('eg-nk-shielded');
+    run.onKill = () => {
+        try { monster.bossImmune = false; } catch (e) {}
+        if (wrap) wrap.classList.remove('eg-nk-shielded');
+    };
+    const banner = _egNkEl(run, 'div', 'eg-nk-fin-banner ' + (cfg.cls || ''));
+    banner.innerHTML = '<div class="eg-nk-fin-title"></div><div class="eg-nk-fin-hint"></div>';
+    banner.querySelector('.eg-nk-fin-title').textContent = cfg.title;
+    const hintEl = banner.querySelector('.eg-nk-fin-hint');
+    hintEl.textContent = cfg.hint;
+    _egNkToast(cfg.toastKey || 'eg_nk_finale', cfg.title + ' - ' + cfg.hint, cfg.color);
+
+    const W = () => window.innerWidth, H = () => window.innerHeight;
+    const clamp = (x, y, r) => ({
+        x: Math.max(r + 20, Math.min(W() - r - 20, x)),
+        // keep clear of the inventory bar along the bottom edge
+        y: Math.max(r + 20, Math.min(H() - r - 70, y)),
+    });
+    const pcNow = () => _egNkPlayerCenter() || { x: W() / 2, y: H() / 2 };
+    const waves = cfg.waves || [];
+    let wi = 0, stage = 'gap', t = 0, zones = [], countEls = [], wave = null;
+
+    _egNkLoop(run, (dtS) => {
+        if (!_egNkBossAlive(monster.id)) return false;
+        t += dtS * 1000;
+        if (stage === 'gap') {
+            if (t < EG_NK_FIN_GAP_MS) return true;
+            if (wi >= waves.length) return false;      // done → onKill releases immunity
+            wave = waves[wi++];
+            t = 0; stage = 'count';
+            const pc = pcNow();
+            zones = [];
+            if (wave.kind === 'shelter') {
+                // 170-360 px away: a short walk, never where you already stand.
+                const a = Math.random() * Math.PI * 2, d = 170 + Math.random() * 190;
+                const c = clamp(pc.x + Math.cos(a) * d, pc.y + Math.sin(a) * d, EG_NK_FIN_SAFE_R);
+                zones.push({ ...c, r: EG_NK_FIN_SAFE_R, safe: true });
+            } else {
+                const c = clamp(pc.x, pc.y, EG_NK_FIN_DANGER_R);
+                zones.push({ ...c, r: EG_NK_FIN_DANGER_R, safe: false });
+                for (let i = 0; i < (wave.extra || 0); i++) {
+                    zones.push({ ...clamp(Math.random() * W(), Math.random() * H(), EG_NK_FIN_DANGER_R), r: EG_NK_FIN_DANGER_R, safe: false });
+                }
+            }
+            countEls = zones.map(z => {
+                const el = _egNkEl(run, 'div', 'eg-nk-fin-zone ' + (z.safe ? 'eg-nk-fin-safe ' : 'eg-nk-fin-danger ') + (cfg.cls || ''));
+                el.style.left = Math.round(z.x - z.r) + 'px';
+                el.style.top = Math.round(z.y - z.r) + 'px';
+                el.style.width = el.style.height = (z.r * 2) + 'px';
+                el.innerHTML = '<span class="eg-nk-fin-count"></span>';
+                z.el = el;
+                return el.querySelector('.eg-nk-fin-count');
+            });
+            hintEl.textContent = (wave.kind === 'shelter' ? 'Get INTO the green circle!' : 'Get OUT of the red circles!')
+                + '  (' + wi + '/' + waves.length + ')';
+            return true;
+        }
+        if (stage === 'count') {
+            const left = wave.ms - t;
+            countEls.forEach(c => { if (c) c.textContent = left > 0 ? String(Math.ceil(left / 1000)) : ''; });
+            if (left > 0) return true;
+            const pc = pcNow();
+            const hit = wave.kind === 'shelter'
+                ? !zones.some(z => Math.hypot(pc.x - z.x, pc.y - z.y) < z.r)
+                : zones.some(z => Math.hypot(pc.x - z.x, pc.y - z.y) < z.r);
+            zones.forEach(z => z.el.classList.add('eg-nk-fin-strike'));
+            if (hit) {
+                const dealt = _egNkHit(wave.dmg, cfg.element || null, level);
+                _egNkAbilityHitToast(dealt, cfg.name, wave.label || cfg.title);
+            }
+            const old = zones.map(z => z.el);
+            setTimeout(() => old.forEach(el => { try { el.remove(); } catch (e) {} }), 600);
+            stage = 'gap'; t = 0;
+        }
+        return true;
+    });
+}

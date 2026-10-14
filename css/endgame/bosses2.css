@@ -11575,3 +11575,116 @@ body.eg-shp-flash::after {
     from { filter: drop-shadow(0 0 8px rgba(148, 163, 184, 0.7)); }
     to   { filter: drop-shadow(0 0 18px rgba(203, 213, 225, 1)); }
 }
+
+/* ============================================================
+   SHARED FINALE WAVES (_egNkFinaleWaves) - compact trial bosses.
+   Banner at the top, green shelter / red strike circles with a
+   3-2-1. Per-boss accent via --nk-fin on the modifier class.
+   ============================================================ */
+.eg-nk-fin-banner {
+    position: fixed; left: 50%; top: 64px; transform: translateX(-50%);
+    z-index: 9300; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 22px; border-radius: 14px;
+    background: rgba(2, 6, 23, 0.8);
+    border: 1px solid var(--nk-fin, #fca5a5);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--nk-fin, #fca5a5) 55%, transparent);
+    animation: eg-nk-fin-in 0.4s ease-out;
+}
+@keyframes eg-nk-fin-in { from { opacity: 0; } to { opacity: 1; } }
+.eg-nk-fin-title {
+    font: 900 1.7rem/1.1 system-ui, sans-serif; letter-spacing: 0.14em;
+    color: var(--nk-fin, #fca5a5);
+    text-shadow: 0 0 18px var(--nk-fin, #fca5a5), 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+.eg-nk-fin-hint {
+    font: 700 1.02rem/1.35 system-ui, sans-serif; color: #f8fafc;
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.95); text-align: center; max-width: min(620px, 88vw);
+}
+.eg-nk-fin-zone {
+    position: fixed; z-index: 9002; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
+.eg-nk-fin-safe {
+    border: 4px solid rgba(134, 239, 172, 0.95);
+    background: radial-gradient(circle, rgba(134, 239, 172, 0.30), rgba(134, 239, 172, 0.07) 70%);
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.8), inset 0 0 24px rgba(74, 222, 128, 0.4);
+    animation: eg-nk-fin-pulse 0.6s ease-in-out infinite alternate;
+}
+.eg-nk-fin-danger {
+    border: 4px dashed var(--nk-fin, #f87171);
+    background:
+        repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--nk-fin, #f87171) 30%, transparent) 0 12deg, transparent 12deg 24deg),
+        radial-gradient(circle, color-mix(in srgb, var(--nk-fin, #f87171) 35%, transparent), transparent 72%);
+    box-shadow: 0 0 26px color-mix(in srgb, var(--nk-fin, #f87171) 70%, transparent);
+    animation: eg-nk-fin-pulse 0.35s ease-in-out infinite alternate;
+}
+@keyframes eg-nk-fin-pulse { from { filter: brightness(0.95); } to { filter: brightness(1.35); } }
+.eg-nk-fin-count {
+    font: 900 2.6rem/1 system-ui, sans-serif; color: #fff;
+    text-shadow: 0 0 12px var(--nk-fin, #f87171), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.eg-nk-fin-zone.eg-nk-fin-strike { animation: eg-nk-fin-strike 0.6s ease-out forwards; }
+@keyframes eg-nk-fin-strike {
+    0% { filter: brightness(2.6); transform: scale(1); opacity: 1; }
+    100% { filter: brightness(1); transform: scale(1.25); opacity: 0; }
+}
+/* Per-boss accents */
+.eg-nk-fin-storm { --nk-fin: #fde047; }
+
+/* ============================================================
+   THE WARDEN (boss_warden) - storm totems, arc links
+   ============================================================ */
+.eg-ward-totem {
+    position: fixed; z-index: 9003; pointer-events: none;
+    width: 36px; height: 68px;
+    border-radius: 8px 8px 4px 4px;
+    background:
+        repeating-linear-gradient(180deg, transparent 0 12px, rgba(15, 23, 42, 0.55) 12px 15px),
+        linear-gradient(90deg, #475569, #cbd5e1 45%, #64748b);
+    border: 2px solid rgba(15, 23, 42, 0.85);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
+    animation: eg-ward-rise 0.35s ease-out;
+}
+@keyframes eg-ward-rise { from { transform: translateY(20px) scaleY(0.3); opacity: 0; } to { transform: none; opacity: 1; } }
+.eg-ward-totem-cap {
+    position: absolute; left: 50%; top: -14px; width: 24px; height: 24px; margin-left: -12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #fff, #fde047 40%, #a16207 85%);
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.7);
+}
+.eg-ward-totem-hot .eg-ward-totem-cap {
+    box-shadow: 0 0 18px 6px rgba(250, 204, 21, 0.95), 0 0 40px rgba(56, 189, 248, 0.6);
+    animation: eg-ward-cap 0.2s steps(2) infinite;
+}
+@keyframes eg-ward-cap { from { filter: brightness(1); } to { filter: brightness(1.6); } }
+.eg-ward-zone {
+    position: fixed; z-index: 8998; pointer-events: none; box-sizing: border-box;
+    border-radius: 50%;
+    border: 3px dashed rgba(250, 204, 21, 0.95);
+    background: radial-gradient(circle, rgba(250, 204, 21, 0.10), rgba(250, 204, 21, 0.22) 90%, transparent 100%);
+    animation: eg-ward-zone 0.25s ease-in-out infinite alternate;
+}
+@keyframes eg-ward-zone { from { opacity: 0.6; } to { opacity: 1; } }
+.eg-ward-ring {
+    border-color: rgba(254, 249, 195, 0.95) !important;
+    box-shadow: 0 0 34px rgba(250, 204, 21, 0.9), inset 0 0 40px rgba(56, 189, 248, 0.35) !important;
+}
+.eg-ward-arc {
+    position: fixed; z-index: 8999; pointer-events: none;
+    height: 18px; transform-origin: 0 50%;
+}
+.eg-ward-arc-warn {
+    border-top: 3px dashed rgba(250, 204, 21, 0.95);
+    border-bottom: 3px dashed rgba(250, 204, 21, 0.95);
+    background: rgba(250, 204, 21, 0.10);
+    animation: eg-ward-zone 0.25s ease-in-out infinite alternate;
+}
+.eg-ward-arc-live {
+    background:
+        repeating-linear-gradient(90deg, transparent 0 10px, rgba(255, 255, 255, 0.9) 10px 13px, transparent 13px 22px),
+        linear-gradient(180deg, transparent, #fef08a 30%, #ffffff 50%, #fef08a 70%, transparent);
+    box-shadow: 0 0 20px rgba(250, 204, 21, 1), 0 0 40px rgba(56, 189, 248, 0.6);
+    animation: eg-ward-cap 0.12s steps(2) infinite;
+}
