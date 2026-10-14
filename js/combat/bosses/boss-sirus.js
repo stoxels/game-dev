@@ -1,13 +1,15 @@
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
-import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkDotTick, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
+import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
 //-------------------BOSS: THE STORMCALLER (boss_sirus)--------------------
 //------------------------------------------------------------------------
-// Tier-8 rework "The Eye of the Storm": ion currents charge you, chains
-// hunt the charged, water grounds bolts, and the storm eye's safe cells
-// shelter from everything. PERFECT STORM at ≤10% turns your own stored
-// charge into hunting bullets.
+// Tier-8 rework "The Eye of the Storm": ion fronts sweep the arena (step
+// into each front's TANGENT opening), getting zapped CHARGES you, chain
+// lightning hunts the charged faster (lure it over water), and the storm
+// eye's web of safe cells shelters from the raging storm. PERFECT STORM at
+// ≤10%: closing storm walls (red = get out, green = get in), charged
+// bullets, then one reachable eye before the final strike.
 //------------------------------------------------------------------------
 
 // DEBUG: slow The Stormcaller's timing 2.5x so manual playtests /
@@ -28,19 +30,21 @@ Object.assign(EG_BOSS_MECHANICS, {
     // boss_sirus - "The Eye of the Storm" (rework)
     // Phase 1 (100% → 60%): Ion Current + Probability Shift
     // Phase 2 ( 60% → 30%): immune window; Chain Lightning + Storm Eye join
-    // Phase 3 ( 30% →  0%): pincer currents, faster chains, eye never moves
-    //                        again; at 10% PERFECT STORM begins
+    // Phase 3 ( 30% →  0%): pincer currents, two lightning balls, the storm
+    //                        eye returns once; at 10% PERFECT STORM begins
     boss_sirus: {
         phases: [
+            // Basic attacks stay a steady pressure (the framework floors
+            // them at 13% of max life); the mechanics are the real threat.
             { threshold: 1.00, chargeMax: 12, damageMultiplier: 1.00 },
-            { threshold: 0.60, chargeMax: 9, damageMultiplier: 1.50 },
-            { threshold: 0.30, chargeMax: 6, damageMultiplier: 2.00 },
+            { threshold: 0.60, chargeMax: 12, damageMultiplier: 1.15 },
+            { threshold: 0.30, chargeMax: 11, damageMultiplier: 1.30 },
         ],
         immunityDuration: 2500,
         mechanics: [
-            { name: 'ion_current', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechSirIon' },
+            { name: 'ion_current', intervalBase: 14000, intervalVariance: 3000, handler: '_egMechSirIon' },
             { name: 'probability_shift', intervalBase: 20000, intervalVariance: 5000, handler: '_egMechProbabilityShift' },
-            { name: 'chain_lightning', intervalBase: 21000, intervalVariance: 5000, handler: '_egMechSirChain', phase2Only: true },
+            { name: 'chain_lightning', intervalBase: 16000, intervalVariance: 4000, handler: '_egMechSirChain', phase2Only: true },
             { name: 'storm_eye', intervalBase: 999999999, intervalVariance: 0, handler: '_egMechSirEye', phase2Only: true },
         ],
         onPhaseEnter: _egSirOnPhaseEnter,
@@ -87,21 +91,29 @@ export function _egSirHeal(amount) {
 //------------------------------------------------------------------------
 //-------------------SIGNATURE: ION CURRENT (all fight)---------------------
 //------------------------------------------------------------------------
-// Two glowing ion fronts slide across the arena on telegraphed lanes. Each
-// lane is split by a solid line: the TANGENT - the only instant a lane is
-// safe, between the hot band behind the front and the cool band ahead.
-// Crossing a tangent puts CHARGE on you: 5 stacks max, decaying 1/4s, and
-// while charged you tick to EVERYTHING nearby (aura ticks stronger the
-// more stacks). Phase 3: the fronts close from both sides at once - a
-// pincer.
-export const EG_SIR_ION_N      = [0, 2, 2, 2]; // lanes per cast (pincer = 2×2)
-export const EG_SIR_ION_WARN   = 1500;         // dashed telegraph before the front moves
-export const EG_SIR_ION_SPD    = [0, 190, 215, 245]; // px/s front travel
-export const EG_SIR_ION_HOT    = [0, 6.5, 7.5, 9.0]; // %/s inside the hot band
-export const EG_SIR_TANGENT_MS = 900;          // tangent safe window around crossing
+// Glowing ion fronts sweep the arena from the top edge, one after the
+// other. Each front has ONE opening - the TANGENT - where the current is
+// cool; anywhere else the front zaps you once (a real hit) and puts 2
+// CHARGE stacks on you. Charge decays one stack per 4s and makes the Chain
+// Lightning balls hunt you faster. The first tangent always opens within
+// walking reach; the second one shifts sideways (also within reach) so you
+// must step across. Phase 3: a PINCER - one front from the top, one from
+// the bottom at the same time, sharing a single tangent column.
+export const EG_SIR_ION_N      = [0, 2, 2, 2]; // fronts per cast
+export const EG_SIR_ION_WARN   = 1500;         // telegraph before a front moves
+export const EG_SIR_ION_SPD    = [0, 190, 210, 230]; // px/s front travel
+export const EG_SIR_ION_HOT    = [0, 6.5, 7.5, 9.0]; // (legacy) old DoT %/s - fronts now hit once
+export const EG_SIR_TANGENT_MS = 900;          // (legacy) old tangent window
 export const EG_SIR_CHARGE_MAX = 5;            // charge stacks
 export const EG_SIR_CHARGE_DECAY_MS = 4000;    // stacks fall off one per this
-export const EG_SIR_AURA_DPS   = [0, 2.0, 2.5, 3.0]; // %/s self-aura per stack (at 1..5)
+export const EG_SIR_AURA_DPS   = [0, 2.0, 2.5, 3.0]; // (legacy) old self-aura DoT - removed
+const EG_SIR_ION_DMG    = [0, 0.12, 0.14, 0.16];    // %maxHP when a front catches you
+const EG_SIR_ION_BAND   = 56;                       // front thickness (px)
+const EG_SIR_ION_GAP    = [0, 210, 190, 180];       // tangent opening width (px)
+const EG_SIR_ION_STAGGER = 1600;                    // ms between the two fronts (phase 1-2)
+const EG_SIR_WALK_PX_S  = 320;                      // avatar speed (AVATAR_MOVE_SPEED_PX_PER_SEC)
+const EG_SIR_REACT_MS   = 700;                      // reaction time we always leave the player
+const EG_SIR_BOLT_PER_STACK = 18;                   // px/s extra ball speed per charge stack
 
 // Fight-global charge (read by Chain Lightning + Perfect Storm).
 export let _egSirCharge = 0, _egSirChargeUntil = 0;
@@ -121,7 +133,7 @@ export function _egSirEnsureChip() {
     _egNkLoop(run, () => {
         const stacks = _egSirChargeNow();
         chip.style.display = stacks > 0 ? '' : 'none';
-        chip.textContent = '⚡ CHARGE ' + stacks + '/' + EG_SIR_CHARGE_MAX;
+        chip.textContent = '⚡ CHARGE ' + stacks + '/' + EG_SIR_CHARGE_MAX + ' - the storm hunts you faster';
         chip.classList.toggle('eg-sir-charge-full', stacks >= EG_SIR_CHARGE_MAX);
         return true;
     });
@@ -130,9 +142,35 @@ export function _egSirEnsureChip() {
 // Shared: returns the player's current charge stacks (and applies decay).
 export function _egSirChargeNow() {
     const now = performance.now();
-    if (now >= _egSirChargeUntil) { _egSirCharge = 0; }
-    else while (_egSirCharge > 0 && now >= _egSirChargeUntil - (EG_SIR_CHARGE_MAX - _egSirCharge) * EG_SIR_CHARGE_DECAY_MS) _egSirCharge--;
+    // One stack falls off per EG_SIR_CHARGE_DECAY_MS until the clock runs out.
+    if (now >= _egSirChargeUntil) _egSirCharge = 0;
+    else _egSirCharge = Math.min(_egSirCharge, Math.ceil((_egSirChargeUntil - now) / EG_SIR_CHARGE_DECAY_MS));
     return _egSirCharge;
+}
+
+// Adds charge stacks (capped) and restarts the decay clock.
+function _egSirAddCharge(n) {
+    _egSirCharge = Math.min(EG_SIR_CHARGE_MAX, _egSirChargeNow() + n);
+    _egSirChargeUntil = performance.now() + _egSirCharge * EG_SIR_CHARGE_DECAY_MS;
+}
+
+// Picks a tangent centre the player can walk to before the front arrives:
+// within walk-speed x (time left - reaction), clamped to the screen, and
+// (when there is room) at least `minShift` px away so there is something to do.
+function _egSirReachableX(fromX, msLeft, gapW, minShift) {
+    const W = window.innerWidth;
+    const edge = gapW / 2 + 10;
+    // Never more than ~450px away: the tangent is a step or two, not a sprint.
+    const reach = Math.min(450, Math.max(gapW * 0.5, EG_SIR_WALK_PX_S * Math.max(0, msLeft - EG_SIR_REACT_MS) / 1000 * 0.85));
+    const lo = Math.max(edge, fromX - reach), hi = Math.min(W - edge, fromX + reach);
+    let x = lo + Math.random() * Math.max(0, hi - lo);
+    if (Math.abs(x - fromX) < minShift) {
+        const a1 = fromX + (x < fromX ? -minShift : minShift);
+        const a2 = fromX + (x < fromX ? minShift : -minShift);
+        if (a1 >= lo && a1 <= hi) x = a1;
+        else if (a2 >= lo && a2 <= hi) x = a2;
+    }
+    return Math.max(edge, Math.min(W - edge, x));
 }
 
 export function _egMechSirIon(monster, phase) {
@@ -143,104 +181,90 @@ export function _egMechSirIon(monster, phase) {
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
+    const spd = EG_SIR_ION_SPD[p];
+    const gapW = EG_SIR_ION_GAP[p];
+    const band = EG_SIR_ION_BAND;
+    const warn = EG_SIR_ION_WARN * _EG_SIR_DEBUG_MULT;
+    const pc0 = _egSirPC();
 
-    _egNkToast('eg_mech_sir_ion', '⛈️ ION CURRENT - the fronts split the lanes. Cross at the TANGENT - charge draws the storm!', '#fde047');
+    if (p >= 3) _egNkToast('eg_mech_sir_pincer', '⛈️ ION PINCER - two currents close in. Stand in the shared TANGENT column!', '#fde047');
+    else _egNkToast('eg_mech_sir_ion', '⛈️ ION CURRENT - step into the TANGENT opening of each front!', '#fde047');
 
-    // Lanes: phase 1/2 two horizontal fronts; phase 3 a pincer (a horizontal
-    // pair closing inward + a vertical pair closing inward).
-    const lanes = [];
-    const addLane = (axis, pos, dir) => lanes.push({ axis, pos, dir, el: null, started: false, x: 0, y: 0 });
+    // Fronts: { dir (+1 down, -1 up), y, gapC, startAt, el, gapEl, hit }
+    const fronts = [];
+    const add = (dir, gapC, startAt) => {
+        const el = _egNkEl(run, 'div', 'eg-sir-ion eg-sir-ion-warn ' + (dir > 0 ? 'eg-sir-ion-down' : 'eg-sir-ion-up'));
+        const gapEl = _egNkEl(run, 'div', 'eg-sir-gap ' + (dir > 0 ? 'eg-sir-gap-down' : 'eg-sir-gap-up'), dir > 0 ? '▼ TANGENT ▼' : '▲ TANGENT ▲');
+        fronts.push({ dir, y: dir > 0 ? 0 : H - band, gapC, startAt, el, gapEl, hit: false, moving: false, done: false });
+    };
+    const now0 = performance.now();
     if (p < 3) {
-        addLane('h', H * (0.28 + Math.random() * 0.1), 1);
-        addLane('h', H * (0.62 + Math.random() * 0.1), 1);
+        // Time until front 1 reaches the player's row (if they stand still).
+        const t1 = warn + Math.max(0, pc0.y - band) / spd * 1000;
+        const g1 = _egSirReachableX(pc0.x, t1, gapW, gapW / 2 + 50);
+        const stagger = EG_SIR_ION_STAGGER * _EG_SIR_DEBUG_MULT;
+        const g2 = _egSirReachableX(g1, stagger, gapW, 140);
+        add(1, g1, now0 + warn);
+        add(1, g2, now0 + warn + stagger);
     } else {
-        addLane('h', H * 0.22, 1);
-        addLane('h', H * 0.78, -1);
-        addLane('v', W * 0.22, 1);
-        addLane('v', W * 0.78, -1);
-    }
-    for (const l of lanes) {
-        const el = _egNkEl(run, 'div', 'eg-nk-band eg-sir-ion-warn');
-        if (l.axis === 'h') {
-            el.style.left = '0px'; el.style.top = Math.round(l.pos - 34) + 'px';
-            el.style.width = W + 'px'; el.style.height = '68px';
-        } else {
-            el.style.left = Math.round(l.pos - 34) + 'px'; el.style.top = '0px';
-            el.style.width = '68px'; el.style.height = H + 'px';
-        }
-        l.el = el;
+        // Pincer: the two fronts meet in the middle - whoever is not in the
+        // shared column is caught by at least one of them.
+        const tFirst = warn + Math.min(Math.max(0, pc0.y - band), Math.max(0, H - band - pc0.y)) / spd * 1000;
+        const gc = _egSirReachableX(pc0.x, tFirst, gapW, gapW / 2 + 50);
+        add(1, gc, now0 + warn);
+        add(-1, gc, now0 + warn);
     }
 
-    const tangentAt = performance.now() + EG_SIR_ION_WARN * _EG_SIR_DEBUG_MULT;
-    const hot = EG_SIR_ION_HOT[p];
+    const draw = (f) => {
+        const lo = Math.round(f.gapC - gapW / 2), hi = Math.round(f.gapC + gapW / 2);
+        // The band is one element with a clip-path hole for the tangent, so
+        // the painted band and the hit test (outside the gap) always agree.
+        f.el.style.left = '0px'; f.el.style.width = W + 'px';
+        f.el.style.top = Math.round(f.y) + 'px'; f.el.style.height = band + 'px';
+        f.el.style.clipPath = 'polygon(0 0, ' + lo + 'px 0, ' + lo + 'px 100%, ' + hi + 'px 100%, ' + hi + 'px 0, 100% 0, 100% 100%, 0 100%)';
+        f.gapEl.style.left = lo + 'px'; f.gapEl.style.width = (hi - lo) + 'px';
+        f.gapEl.style.top = Math.round(f.y) + 'px'; f.gapEl.style.height = band + 'px';
+    };
+    fronts.forEach(draw);
+    // The second front (phase 1-2) waits off-board until the first one moves,
+    // so the two telegraphs never stack on top of each other.
+    const hold = p < 3 ? fronts[1] : null;
+    if (hold) { hold.el.style.display = 'none'; hold.gapEl.style.display = 'none'; }
 
     _egNkLoop(run, (dtS, now) => {
         const pc = _egSirPC();
-
-        // Telegraph → the fronts start moving.
-        if (!lanes[0].started && now >= tangentAt) {
-            lanes.forEach(l => { l.started = true; l.el.classList.remove('eg-sir-ion-warn'); l.el.classList.add('eg-sir-ion-front'); });
-            // Each lane gets its own tangent marker (solid line inside the band).
-            lanes.forEach(l => {
-                const tm = _egNkEl(run, 'div', 'eg-sir-tangent');
-                if (l.axis === 'h') {
-                    tm.style.left = '0px'; tm.style.top = Math.round(l.pos - 1) + 'px';
-                    tm.style.width = W + 'px'; tm.style.height = '2px';
-                } else {
-                    tm.style.left = Math.round(l.pos - 1) + 'px'; tm.style.top = '0px';
-                    tm.style.width = '2px'; tm.style.height = H + 'px';
-                }
-                l.tm = tm;
-            });
+        let live = false;
+        for (const f of fronts) {
+            if (f.done) continue;
+            live = true;
+            if (f === hold && fronts[0].moving && f.el.style.display === 'none') {
+                f.el.style.display = ''; f.gapEl.style.display = '';
+            }
+            if (f.el.style.display === 'none') continue;
+            if (!f.moving && now >= f.startAt) {
+                f.moving = true;
+                f.el.classList.remove('eg-sir-ion-warn');
+                f.el.classList.add('eg-sir-ion-front');
+            }
+            if (!f.moving) continue;
+            f.y += f.dir * spd * dtS;
+            draw(f);
+            // One real hit when the band passes over you outside the tangent.
+            const inBand = pc.y > f.y && pc.y < f.y + band;
+            const inGap = pc.x > f.gapC - gapW / 2 + 12 && pc.x < f.gapC + gapW / 2 - 12;
+            if (inBand && !inGap && !f.hit) {
+                f.hit = true;
+                const dealt = _egNkHit(EG_SIR_ION_DMG[p], 'lightning', level);
+                _egNkAbilityHitToast(dealt, 'The Stormcaller', 'Ion Current');
+                _egSirAddCharge(2);
+            }
+            if (f.y < -band - 10 || f.y > H + 10) {
+                f.done = true;
+                try { f.el.remove(); } catch (e) {}
+                try { f.gapEl.remove(); } catch (e) {}
+            }
         }
-
-        if (lanes[0].started) {
-            // Pincer fronts converge toward the far side; single fronts sweep
-            // across. Front position rides its own lane's band.
-            const spd = EG_SIR_ION_SPD[p];
-            for (const l of lanes) {
-                // Move the band (the front IS the band here).
-                l.pos += l.dir * spd * dtS;
-                if (l.axis === 'h') {
-                    l.el.style.top = Math.round(l.pos - 34) + 'px';
-                    if (l.tm) l.tm.style.top = Math.round(l.pos - 1) + 'px';
-                } else {
-                    l.el.style.left = Math.round(l.pos - 34) + 'px';
-                    if (l.tm) l.tm.style.left = Math.round(l.pos - 1) + 'px';
-                }
-            }
-
-            // Hot inside the band, EXCEPT the tangent sliver (±8px around
-            // the lane centre): the one instant a lane is safe - and the
-            // only place that doesn't build charge.
-            let inBand = false, onTangent = false;
-            for (const l of lanes) {
-                const d = l.axis === 'h' ? Math.abs(pc.y - l.pos) : Math.abs(pc.x - l.pos);
-                if (d < 34) inBand = true;
-                if (d < 8) onTangent = true;
-            }
-            if (inBand && !onTangent) {
-                _egNkDotTick(run, hot, dtS, level, 'lightning');
-                // Charge stacks while you stand in the current.
-                _egSirCharge = Math.min(EG_SIR_CHARGE_MAX, _egSirCharge + 1);
-                _egSirChargeUntil = performance.now() + EG_SIR_CHARGE_MAX * EG_SIR_CHARGE_DECAY_MS;
-            } else {
-                run.dotAcc = 0;
-            }
-
-            // Charged aura: while charged you tick to everything nearby.
-            const stacks = _egSirChargeNow();
-            if (stacks > 0) {
-                _egNkDotTick(run, EG_SIR_AURA_DPS[p] * stacks, dtS, level, 'lightning');
-                // The charge HUD lives in the CSS (eg-sir-charge indicator).
-            }
-
-            // Fronts leave the arena → the cast ends.
-            const allOut = lanes.every(l => l.pos < -60 || l.pos > (l.axis === 'h' ? H : W) + 60);
-            if (allOut) return false;
-        }
-
-        return true;
+        return live;
     });
 }
 
@@ -248,64 +272,90 @@ export function _egMechSirIon(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------ACT II: CHAIN LIGHTNING (60%)-------------------------
 //------------------------------------------------------------------------
-// A ⚡ hunting bolt tracks you; you cannot outwalk it, only outposition it.
-// BROKEN BY WATER: blue currents sweep and leave standing water; a bolt
-// that must cross water grounds itself at the shore. Cold pools (shared
-// frozen_cells) always ground the bolt - ice doesn't conduct. Phase 3:
-// TWO bolts.
-export const EG_SIR_BOLT_SPD   = [0, 150, 165, 185]; // px/s hunting bolt
-export const EG_SIR_BOLT_DMG   = [0, 0, 0.16, 0.20]; // %maxHP bolt hit
-export const EG_SIR_BOLT_LIFE  = [0, 0, 9000, 11000]; // ms the bolt hunts
+// Rivers sweep in and leave standing water first; then a ball of chain
+// lightning charges up on the arena edge farthest from you (1.2s
+// telegraph) and hunts you. It is almost as fast as you - faster while you
+// carry CHARGE - so you beat it by luring it across standing water: it
+// grounds itself on the shore. Cold pools (shared frozen_cells) ground it
+// too. Phase 3: TWO balls.
+export const EG_SIR_BOLT_SPD   = [0, 0, 245, 260]; // px/s hunting ball (+18 per charge stack)
+export const EG_SIR_BOLT_DMG   = [0, 0, 0.15, 0.18]; // %maxHP ball hit
+export const EG_SIR_BOLT_LIFE  = [0, 0, 8000, 9000]; // ms the ball hunts
 export const EG_SIR_RIVER_N    = [0, 0, 2, 2];       // water lanes per cast
-export const EG_SIR_RIVER_SPD  = 90;                 // px/s river sweep
+export const EG_SIR_RIVER_SPD  = 90;                 // (legacy) px/s river sweep
 export const EG_SIR_RIVER_W    = 64;                 // standing water width
-export const EG_SIR_GROUND_R   = 30;                 // distance at which the bolt grounds
+export const EG_SIR_GROUND_R   = 30;                 // distance at which the ball grounds
+const EG_SIR_RIVER_MS = 2000;                         // sweep line → standing water
+const EG_SIR_BOLT_CHARGE_MS = 1200;                   // ball charges before it hunts
 
 export function _egMechSirChain(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     _egSirEnsureFinalWatcher(monster);
+    _egSirEnsureChip();
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_sir_chain', '⛈️ CHAIN LIGHTNING - the bolt hunts. Water grounds it - lure it across a river!', '#fde047');
+    _egNkToast('eg_mech_sir_chain', '⛈️ CHAIN LIGHTNING - the ball hunts you. Lure it across the WATER to ground it!', '#fde047');
 
     // ── Water lines: rivers sweep across and LEAVE standing water. ───────
     const rivers = [];
     const nR = EG_SIR_RIVER_N[p];
+    const riverMs = EG_SIR_RIVER_MS * _EG_SIR_DEBUG_MULT;
     for (let i = 0; i < nR; i++) {
         const axis = i === 0 ? 'h' : 'v';
         const sweepEl = _egNkEl(run, 'div', 'eg-sir-river eg-sir-river-sweep');
         const poolEl = _egNkEl(run, 'div', 'eg-sir-river eg-sir-river-pool');
+        const pos = axis === 'h' ? H * (0.32 + Math.random() * 0.36) : W * (0.3 + Math.random() * 0.4);
         if (axis === 'h') {
-            const y = H * (0.3 + 0.4 * (i % 2));
-            sweepEl.style.left = '0px'; sweepEl.style.top = Math.round(y - 3) + 'px';
+            sweepEl.style.left = '0px'; sweepEl.style.top = Math.round(pos - 3) + 'px';
             sweepEl.style.width = W + 'px'; sweepEl.style.height = '6px';
-            poolEl.style.left = '0px'; poolEl.style.top = Math.round(y - EG_SIR_RIVER_W / 2) + 'px';
+            poolEl.style.left = '0px'; poolEl.style.top = Math.round(pos - EG_SIR_RIVER_W / 2) + 'px';
             poolEl.style.width = W + 'px'; poolEl.style.height = EG_SIR_RIVER_W + 'px';
-            poolEl.style.display = 'none';
-            rivers.push({ axis, pos: y, sweepEl, poolEl, poolAt: performance.now() + 2600 * _EG_SIR_DEBUG_MULT });
         } else {
-            const x = W * (0.35 + 0.3 * (i % 2));
-            sweepEl.style.left = Math.round(x - 3) + 'px'; sweepEl.style.top = '0px';
+            sweepEl.style.left = Math.round(pos - 3) + 'px'; sweepEl.style.top = '0px';
             sweepEl.style.width = '6px'; sweepEl.style.height = H + 'px';
-            poolEl.style.left = Math.round(x - EG_SIR_RIVER_W / 2) + 'px'; poolEl.style.top = '0px';
+            poolEl.style.left = Math.round(pos - EG_SIR_RIVER_W / 2) + 'px'; poolEl.style.top = '0px';
             poolEl.style.width = EG_SIR_RIVER_W + 'px'; poolEl.style.height = H + 'px';
-            poolEl.style.display = 'none';
-            rivers.push({ axis, pos: x, sweepEl, poolEl, poolAt: performance.now() + 2600 * _EG_SIR_DEBUG_MULT });
         }
+        poolEl.style.display = 'none';
+        rivers.push({ axis, pos, sweepEl, poolEl, poolAt: performance.now() + riverMs });
     }
 
-    // ── The hunting bolt(s). ─────────────────────────────────────────────
+    // ── The hunting ball(s): spawn on the edge far from you, charge, hunt.
     const nBolts = p >= 3 ? 2 : 1;
     const bolts = [];
+    const pc0 = _egSirPC();
+    const spots = [[60, 60], [W - 60, 60], [60, H - 60], [W - 60, H - 60], [W / 2, 60], [W / 2, H - 60]];
+    spots.sort((a, b) => Math.hypot(b[0] - pc0.x, b[1] - pc0.y) - Math.hypot(a[0] - pc0.x, a[1] - pc0.y));
     for (let i = 0; i < nBolts; i++) {
-        const el = _egNkEl(run, 'div', 'eg-nk-dot eg-sir-bolt', '⚡');
-        bolts.push({ x: (i === 0 ? 60 : W - 60), y: 60 + Math.random() * Math.max(60, H - 120), el, life: EG_SIR_BOLT_LIFE[p] * _EG_SIR_DEBUG_MULT, grounded: false });
+        const [bx, by] = spots[i];
+        const el = _egNkEl(run, 'div', 'eg-nk-dot eg-sir-bolt eg-sir-bolt-charging');
+        el.innerHTML = '<i class="eg-sir-bolt-arc"></i><i class="eg-sir-bolt-core"></i>';
+        el.style.transform = 'translate(' + Math.round(bx - 17) + 'px,' + Math.round(by - 17) + 'px)';
+        bolts.push({
+            x: bx, y: by, el, done: false,
+            huntAt: performance.now() + riverMs + (EG_SIR_BOLT_CHARGE_MS + i * 900) * _EG_SIR_DEBUG_MULT,
+            life: EG_SIR_BOLT_LIFE[p] * _EG_SIR_DEBUG_MULT,
+        });
     }
 
-    performance.now();
+    // Grounding: over standing water or a cold pool, the ball grounds.
+    const groundedBy = (bx, by) => {
+        for (const r of rivers) {
+            if (r.poolEl.style.display === 'none') continue;
+            const d = r.axis === 'h' ? Math.abs(by - r.pos) : Math.abs(bx - r.pos);
+            if (d < EG_SIR_GROUND_R) return r;
+        }
+        const cold = document.querySelectorAll('.eg-frozen-cell, .eg-nk-frozen-cell');
+        for (const c of cold) {
+            const cr = c.getBoundingClientRect();
+            if (bx > cr.left - 10 && bx < cr.right + 10 && by > cr.top - 10 && by < cr.bottom + 10) return c;
+        }
+        return null;
+    };
+
     _egNkLoop(run, (dtS, now) => {
         const pc = _egSirPC();
         const pr = _egNkPlayerRect();
@@ -314,140 +364,163 @@ export function _egMechSirChain(monster, phase) {
         for (const r of rivers) {
             if (r.poolEl.style.display !== 'none') continue;
             if (now < r.poolAt) {
-                // The visible sweep line brightens as it charges.
-                const k = 1 - Math.max(0, (r.poolAt - now) / (2600 * _EG_SIR_DEBUG_MULT));
+                const k = 1 - Math.max(0, (r.poolAt - now) / riverMs);
                 r.sweepEl.style.opacity = String(0.3 + 0.7 * Math.min(1, k));
             } else {
                 r.poolEl.style.display = '';
                 r.sweepEl.style.opacity = '0';
             }
         }
-        // (Rivers keep their pools for the rest of the cast - terrain.)
-
-        // Bolts hunt. Grounding: over standing water or a cold pool, the bolt
-        // grounds itself at the shore (the pool edge nearest the bolt).
-        const groundedBy = (bx, by) => {
-            for (const r of rivers) {
-                if (r.poolEl.style.display === 'none') continue;
-                const d = r.axis === 'h' ? Math.abs(by - r.pos) : Math.abs(bx - r.pos);
-                if (d < EG_SIR_GROUND_R) return r;
-            }
-            // Cold pools (frozen_cells visuals) - check for the tint class.
-            const cold = document.querySelectorAll('.eg-frozen-cell, .eg-nk-frozen-cell');
-            for (const c of cold) {
-                const cr = c.getBoundingClientRect();
-                if (bx > cr.left - 10 && bx < cr.right + 10 && by > cr.top - 10 && by < cr.bottom + 10) return c;
-            }
-            return null;
-        };
 
         let pending = false;
         for (const b of bolts) {
-            if (b.grounded || b.life <= 0) continue;
+            if (b.done) continue;
             pending = true;
+            if (now < b.huntAt) continue;          // still charging at the edge
+            b.el.classList.remove('eg-sir-bolt-charging');
             b.life -= dtS * 1000;
+            const spd = EG_SIR_BOLT_SPD[p] + EG_SIR_BOLT_PER_STACK * _egSirChargeNow();
             const dx = pc.x - b.x, dy = pc.y - b.y;
             const d = Math.hypot(dx, dy) || 1;
-            b.x += (dx / d) * EG_SIR_BOLT_SPD[p] * dtS;
-            b.y += (dy / d) * EG_SIR_BOLT_SPD[p] * dtS;
+            const step = Math.min(d, spd * dtS);
+            b.x += (dx / d) * step;
+            b.y += (dy / d) * step;
             b.el.style.transform = 'translate(' + Math.round(b.x - 17) + 'px,' + Math.round(b.y - 17) + 'px)';
-            // Bolt reaches water → grounds at the shore.
-            const g = groundedBy(b.x, b.y);
-            if (g) {
-                b.grounded = true;
-                b.el.textContent = '💥';
-                const boom = _egNkEl(run, 'div', 'eg-sir-ground');
-                boom.style.left = Math.round(b.x - 46) + 'px';
-                boom.style.top = Math.round(b.y - 46) + 'px';
-                setTimeout(() => { try { boom.remove(); } catch (e) {} }, 600 * _EG_SIR_DEBUG_MULT);
-                continue;
-            }
-            if (pr && _egNkDotHit(b.el, pr, 0)) {
+            let boom = false;
+            if (groundedBy(b.x, b.y)) {
+                boom = true;
+            } else if (pr && _egNkDotHit(b.el, pr, 0)) {
+                boom = true;
                 const dealt = _egNkHit(EG_SIR_BOLT_DMG[p], 'lightning', level);
                 _egNkAbilityHitToast(dealt, 'The Stormcaller', 'Chain Lightning');
-                b.grounded = true; b.el.textContent = '💥';
+            }
+            if (boom || b.life <= 0) {
+                b.done = true;
+                try { b.el.remove(); } catch (e) {}
+                if (boom) {
+                    const fx = _egNkEl(run, 'div', 'eg-sir-ground');
+                    fx.style.left = Math.round(b.x - 46) + 'px';
+                    fx.style.top = Math.round(b.y - 46) + 'px';
+                    setTimeout(() => { try { fx.remove(); } catch (e) {} }, 600 * _EG_SIR_DEBUG_MULT);
+                }
             }
         }
-
-        const boltsDone = bolts.every(b => b.grounded || b.life <= 0);
-        return !boltsDone || pending;
+        return pending;
     });
 }
 
 
 //------------------------------------------------------------------------
-//-------------------ACT II: STORM EYE (60%, once)-------------------------
+//-------------------ACT II: STORM EYE (60% and 30%, once each)------------
 //------------------------------------------------------------------------
-// The Stormcaller descends to the centre in a 4×4 grid of storm cells. He
-// casts 7 hot cells; the SAFE tiles are the ones connected to the eye -
-// the dead zones are the ones he's already charged. Spends phase 3 for
-// phase 1: he NEVER MOVES AGAIN - the finale will have to come to him.
+// The Stormcaller settles into a 4×4 grid of storm cells in the arena
+// centre and holds it (immune). 3-2-1, then the storm rages everywhere
+// OUTSIDE the grid and in the hot cells. The SAFE cells are the web
+// connected to the eye (the eye, its four neighbours and the two far arms
+// of the cross); the pattern is rotated each cast. Standing in the storm
+// is a real hit every 0.7s.
 export const EG_SIR_EYE_N      = 4;     // 4×4 grid
 export const EG_SIR_EYE_HOT    = 7;     // hot cells
-export const EG_SIR_EYE_DPS    = [0, 0, 7.5, 9.0]; // %/s in a hot cell
-export const EG_SIR_EYE_LIFE   = 9000;  // ms the cells live
+export const EG_SIR_EYE_DPS    = [0, 0, 7.5, 9.0]; // %/s in the storm (paid as hits on the touch cooldown)
+export const EG_SIR_EYE_LIFE   = 6500;  // ms the storm rages (after the telegraph)
 export const EG_SIR_EYE_IMMUNE = true;  // he holds the eye: immune while it stands
+const EG_SIR_EYE_WARN_MS = 3000;        // 3-2-1 before the storm rages
 
 export function _egMechSirEye(monster, phase) {
-    if (_egNkDodgeBusy() || _egNkFrozen()) return;
+    // Scheduled once per phase: if another set-piece holds the field, wait
+    // for it instead of losing the eye for the whole phase.
+    if (_egNkDodgeBusy() || _egNkFrozen()) {
+        const tries = (monster && monster._sirEyeTries) || 0;
+        if (monster && tries < 20) {
+            monster._sirEyeTries = tries + 1;
+            setTimeout(() => {
+                if (globalThis._egMonsters && globalThis._egMonsters.includes(monster) && !monster.bossImmune) _egMechSirEye(monster, phase);
+            }, 1500);
+        }
+        return;
+    }
+    if (monster) monster._sirEyeTries = 0;
     _egSirEnsureFinalWatcher(monster);
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
     const level = monster ? monster.level : 1;
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
 
-    _egNkToast('eg_mech_sir_eye', '⛈️ STORM EYE - the eye settles. The cells CONNECTED to it are safe. Stay in the web!', '#fde047');
+    _egNkToast('eg_mech_sir_eye', '⛈️ STORM EYE - get onto the BLUE web cells before the storm breaks!', '#fde047');
 
     // The 4×4 grid, centred.
+    const N = EG_SIR_EYE_N;
     const cell = Math.min(W, H) * 0.15;
-    const gw = EG_SIR_EYE_N * cell, gh = EG_SIR_EYE_N * cell;
+    const gw = N * cell, gh = N * cell;
     const gx = W / 2 - gw / 2, gy = H / 2 - gh / 2;
-    const eyeR = Math.floor(EG_SIR_EYE_N / 2) - 1;   // (1,1) top-left-ish eye cell
-    const eyeC = Math.floor(EG_SIR_EYE_N / 2) - 1;
+    // Base pattern around eye (1,1), rotated by a random quarter turn.
+    const rot = Math.floor(Math.random() * 4);
+    const rotRC = (r, c) => { for (let k = 0; k < rot; k++) { const t = r; r = c; c = N - 1 - t; } return [r, c]; };
     const cells = [];
-    for (let r = 0; r < EG_SIR_EYE_N; r++) {
-        for (let c = 0; c < EG_SIR_EYE_N; c++) {
-            // Safe: the web CONNECTED to the eye - the eye itself, its four
-            // orthogonal neighbours, and the two far arms of the cross.
-            const isEye = (r === eyeR && c === eyeC);
-            const isSafe = isEye || (Math.abs(r - eyeR) + Math.abs(c - eyeC) === 1) || (r === eyeR && c === eyeC + 2) || (c === eyeC && r === eyeR + 2);
-            const el = _egNkEl(run, 'div', 'eg-sir-cell' + (isEye ? ' eg-sir-cell-eye' : isSafe ? ' eg-sir-cell-safe' : ''));
-            el.style.left = Math.round(gx + c * cell + 4) + 'px';
-            el.style.top = Math.round(gy + r * cell + 4) + 'px';
-            el.style.width = Math.round(cell - 8) + 'px';
-            el.style.height = Math.round(cell - 8) + 'px';
-            cells.push({ r, c, hot: false, eye: isEye, safe: isSafe, el });
+    const byKey = {};
+    for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+            const isEye = (r === 1 && c === 1);
+            const isSafe = isEye || (Math.abs(r - 1) + Math.abs(c - 1) === 1) || (r === 1 && c === 3) || (c === 1 && r === 3);
+            const [rr, cc] = rotRC(r, c);
+            const o = { r: rr, c: cc, hot: false, eye: isEye, safe: isSafe, d: Math.abs(r - 1) + Math.abs(c - 1), br: r, bc: c, el: null };
+            cells.push(o); byKey[rr + ',' + cc] = o;
         }
     }
-    // Exactly EG_SIR_EYE_HOT hot cells: the non-web cells CLOSEST to the
-    // eye - the two farthest stay inert (even the storm's charge has
-    // limits, and inert cells read as neither safe nor lethal).
-    cells.filter(c => !c.safe && !c.eye)
-        .map(c => ({ c, d: Math.abs(c.r - eyeR) + Math.abs(c.c - eyeC) }))
-        .sort((a, b) => a.d - b.d || (a.c.r - b.c.r) || (a.c.c - b.c.c))
+    // Exactly EG_SIR_EYE_HOT hot cells: the non-web cells closest to the
+    // eye; the farthest stay inert (harmless, but not part of the web).
+    cells.filter(c => !c.safe)
+        .sort((a, b) => a.d - b.d || (a.br - b.br) || (a.bc - b.bc))
         .slice(0, EG_SIR_EYE_HOT)
-        .forEach(({ c }) => { c.hot = true; c.el.classList.add('eg-sir-cell-hot'); });
+        .forEach(c => { c.hot = true; });
+    cells.forEach(c => {
+        const el = _egNkEl(run, 'div', 'eg-sir-cell' + (c.eye ? ' eg-sir-cell-eye eg-sir-cell-safe' : c.safe ? ' eg-sir-cell-safe' : c.hot ? ' eg-sir-cell-hot eg-sir-cell-arming' : ' eg-sir-cell-inert'));
+        el.style.left = Math.round(gx + c.c * cell + 4) + 'px';
+        el.style.top = Math.round(gy + c.r * cell + 4) + 'px';
+        el.style.width = Math.round(cell - 8) + 'px';
+        el.style.height = Math.round(cell - 8) + 'px';
+        if (c.eye) el.innerHTML = '<span class="eg-sir-eye-count"></span>';
+        c.el = el;
+    });
+    // The storm outside the grid: four bands around it (arming → raging).
+    const storm = [
+        [0, 0, W, gy], [0, gy + gh, W, H - gy - gh], [0, gy, gx, gh], [gx + gw, gy, W - gx - gw, gh],
+    ].map(([l, t, w, h]) => {
+        const el = _egNkEl(run, 'div', 'eg-sir-storm eg-sir-storm-arming');
+        el.style.left = Math.round(l) + 'px'; el.style.top = Math.round(t) + 'px';
+        el.style.width = Math.round(w) + 'px'; el.style.height = Math.round(h) + 'px';
+        return el;
+    });
+    const countEl = cells.find(c => c.eye).el.querySelector('.eg-sir-eye-count');
 
-    // Boss holds the eye: immune while the set-piece stands.
+    // Boss holds the eye: immune while the set-piece stands (released on
+    // every kill path too).
     if (monster && EG_SIR_EYE_IMMUNE) { try { monster.bossImmune = true; } catch (e) {} }
+    run.onKill = () => { if (monster) { try { monster.bossImmune = false; } catch (e) {} } };
 
-    const endAt = performance.now() + EG_SIR_EYE_LIFE * _EG_SIR_DEBUG_MULT;
+    const t0 = performance.now();
+    const warnMs = EG_SIR_EYE_WARN_MS * _EG_SIR_DEBUG_MULT;
+    const endAt = t0 + warnMs + EG_SIR_EYE_LIFE * _EG_SIR_DEBUG_MULT;
+    let raging = false;
     _egNkLoop(run, (dtS, now) => {
-        const pc = _egSirPC();
-        let inHot = false;
-        for (const c of cells) {
-            if (!c.hot) continue;
-            if (pc.x > gx + c.c * cell && pc.x < gx + (c.c + 1) * cell
-                && pc.y > gy + c.r * cell && pc.y < gy + (c.r + 1) * cell) { inHot = true; break; }
+        if (!raging) {
+            const left = warnMs - (now - t0);
+            if (countEl) countEl.textContent = left > 0 ? String(Math.ceil(left / 1000)) : '';
+            if (left <= 0) {
+                raging = true;
+                storm.forEach(el => { el.classList.remove('eg-sir-storm-arming'); el.classList.add('eg-sir-storm-live'); });
+                cells.forEach(c => { if (c.hot) c.el.classList.remove('eg-sir-cell-arming'); if (c.safe) c.el.classList.add('eg-sir-live'); });
+            }
+        } else {
+            const pc = _egSirPC();
+            const c = Math.floor((pc.x - gx) / cell), r = Math.floor((pc.y - gy) / cell);
+            const inGrid = c >= 0 && c < N && r >= 0 && r < N;
+            const here = inGrid ? byKey[r + ',' + c] : null;
+            if (!inGrid || (here && here.hot)) {
+                _egSirTouch(EG_SIR_EYE_DPS[p] / 100 * (EG_SIR_TOUCH_CD_MS / 1000), level, inGrid ? 'Storm Cell' : 'Raging Storm');
+            }
         }
-        if (inHot) _egNkDotTick(run, EG_SIR_EYE_DPS[p], dtS, level, 'lightning');
-        else run.dotAcc = 0;
-
-        if (now >= endAt) {
-            if (monster) { try { monster.bossImmune = false; } catch (e) {} }
-            return false;
-        }
-        return true;
+        return now < endAt;
     });
 }
 
@@ -455,19 +528,26 @@ export function _egMechSirEye(monster, phase) {
 //------------------------------------------------------------------------
 //-------------------FINALE: PERFECT STORM (≤10%, one-shot)----------------
 //------------------------------------------------------------------------
-// Four ion currents enclose a shrinking box; the eye of the box tracks you
-// while it closes; then the STORM GROWS TEETH: your CHARGE becomes
-// bullets - every charged tick fires a hunting bullet at your last
-// position. Die by your own stored charge. Charge bar frozen (gate in
-// _egTickPlayer via _egSirFinalActive).
-export const EG_SIR_FIN_BOXES    = 3;      // enclosing box waves
-export const EG_SIR_FIN_BOX_DMG  = 0.18;   // %maxHP caught inside a closing box
-export const EG_SIR_FIN_BULLET_DMG = 0.14; // %maxHP per bullet hit
-export const EG_SIR_FIN_BULLET_SPD = 260;  // px/s hunting bullets
-export const EG_SIR_FIN_BULLET_DPS = 3.5;  // %/s self-aura per stack inside
-export const EG_SIR_FIN_FAILSAFE_MS = 34000;
+// Three storm walls: each one closes from the arena edge onto a marked
+// square. RED square = the strike lands there - be OUTSIDE it. GREEN
+// square = the eye - be INSIDE it, everything else is struck. They
+// alternate red / green / red. Then the storm grows TEETH: charged bullets
+// fly through the spot you stand on for 6s (faster while you carry
+// charge) - keep moving. Last, THE EYE OPENS: one green circle within
+// reach is the only shelter from the final strike. Boss immune throughout.
+export const EG_SIR_FIN_BOXES    = 3;      // closing storm walls
+export const EG_SIR_FIN_BOX_DMG  = 0.18;   // %maxHP caught by a wall
+export const EG_SIR_FIN_BULLET_DMG = 0.11; // %maxHP per bullet hit
+export const EG_SIR_FIN_BULLET_SPD = 260;  // px/s charged bullets
+export const EG_SIR_FIN_BULLET_DPS = 3.5;  // (legacy) old self-aura DoT - removed
+export const EG_SIR_FIN_FAILSAFE_MS = 45000;
+const EG_SIR_FIN_CLOSE_MS = 4500;          // a wall closes in this long
+const EG_SIR_FIN_TEETH_MS = 6000;          // charged-bullet phase
+const EG_SIR_FIN_EYE_MS   = 3000;          // final strike countdown
+const EG_SIR_FIN_EYE_R    = 110;           // final safe eye radius
+const EG_SIR_FIN_FINAL_DMG = 0.30;         // final strike outside the eye
 
-// Set while the finale runs (read by _egTickPlayer's charge-freeze gate).
+// Set while the finale runs.
 export let _egSirFinal = null;
 
 export function _egSirFinalActive() {
@@ -512,6 +592,14 @@ export function _egSirAfter(g, ms, fn) {
     setTimeout(step, Math.min(120, ms));
 }
 
+// Clamps a point so a box/circle of half-size `h` stays on screen.
+function _egSirClampPt(x, y, h) {
+    return {
+        x: Math.max(h + 20, Math.min(window.innerWidth - h - 20, x)),
+        y: Math.max(h + 20, Math.min(window.innerHeight - h - 20, y)),
+    };
+}
+
 export function _egSirFinalStart(monster) {
     if (_egSirFinal || !monster) return;
 
@@ -526,14 +614,12 @@ export function _egSirFinalStart(monster) {
         monsterId: monster.id,
         finished: false,
         fxRun: null, overlay: null,
-        box: null,           // { l, t, r, b, el, closing: bool }
-        bullets: [],         // { x, y, vx, vy, el }
+        bullets: [],
         wave: 0,
+        teeth: false,
     };
     _egSirFinal = g;
 
-    // Freeze the auto-attack charge bar for the whole set-piece (the gate
-    // lives in _egTickPlayer; this class is the visual twin).
     ['avatar-charge-fill', 'eg-player-charge-bar'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('eg-charge-paused');
@@ -543,21 +629,22 @@ export function _egSirFinalStart(monster) {
     g.fxRun = _egNkNewRun(monster.id, true);
     g.fxRun.passive = true;
 
-    // Countdown overlay.
+    // Banner at the top - the arena below must stay readable.
     const ov = document.createElement('div');
     ov.className = 'eg-sir-cd';
     ov.innerHTML =
         '<div class="eg-sir-cd-label">⛈️ PERFECT STORM</div>' +
-        '<div class="eg-sir-cd-hint">Four ion currents enclose the arena in a shrinking box - stay OUTSIDE it as it closes. Then the storm grows TEETH: your own CHARGE becomes bullets. Empty your charge before the box closes!</div>';
+        '<div class="eg-sir-cd-hint">RED square: get OUT. GREEN square: get IN.</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
+    g.fxRun.els.push(ov);
+    const hintEl = ov.querySelector('.eg-sir-cd-hint');
+    const hint = (txt) => { if (hintEl) hintEl.textContent = txt; };
 
-    _egNkToast('eg_mech_sir_final_cd', '⛈️💀 PERFECT STORM - the currents close in. Your charge is your doom!', '#fde047');
+    _egNkToast('eg_mech_sir_final_cd', '⛈️💀 PERFECT STORM - red square = get out, green square = get in!', '#fde047');
 
-    // Boss immunity for the whole set-piece (released at the end).
     monster.bossImmune = true;
 
-    // The boss card wears the storm glow while the finale runs.
     const card = document.getElementById('eg-card-' + monster.id);
     const wrap = card ? (card.querySelector('.eg-emoji-wrapper') || card) : null;
     if (wrap) {
@@ -567,102 +654,133 @@ export function _egSirFinalStart(monster) {
 
     const level = monster.level || 1;
 
-    // ── Wave: an enclosing box shrinks inward; inside it = hit. ──────────
+    // ── Wave: a storm wall closes onto a marked square. ──────────────────
     const runBoxWave = () => {
         if (g.finished) return;
         g.wave++;
         if (g.wave > EG_SIR_FIN_BOXES) { runTeeth(); return; }
-        _egNkToast('eg_mech_sir_wave', '⛈️ STORM WALL ' + g.wave + '/' + EG_SIR_FIN_BOXES + ' - stay outside the currents!', '#fde047');
+        const getIn = g.wave === 2;
+        _egNkToast(getIn ? 'eg_mech_sir_wave_in' : 'eg_mech_sir_wave', '⛈️ STORM WALL ' + g.wave + '/' + EG_SIR_FIN_BOXES
+            + (getIn ? ' - GREEN: get INTO the eye!' : ' - RED: get OUT of the square!'), getIn ? '#86efac' : '#f87171');
+        hint(getIn ? 'GREEN square: get INSIDE before the wall closes!' : 'RED square: get OUT before the wall closes!');
 
-        // The box starts at the arena edge and shrinks to a centre square.
-        const box = { l: 0, t: 0, r: W, b: H, closing: true };
-        const el = _egNkEl(g.fxRun, 'div', 'eg-sir-box');
-        box.el = el;
-        g.box = box;
-        const shrinkTo = Math.min(W, H) * 0.18;
-        const dur = 5000 * _EG_SIR_DEBUG_MULT;
+        const side = Math.round(Math.min(W, H) * 0.24);
+        const closeMs = EG_SIR_FIN_CLOSE_MS * _EG_SIR_DEBUG_MULT;
+        const pc0 = _egSirPC();
+        let c;
+        if (getIn) {
+            // The eye opens within walking reach (but never right on you).
+            const a = Math.random() * Math.PI * 2, d = 170 + Math.random() * 230;
+            c = _egSirClampPt(pc0.x + Math.cos(a) * d, pc0.y + Math.sin(a) * d, side / 2);
+        } else {
+            // The strike lands where you stand now.
+            c = _egSirClampPt(pc0.x, pc0.y, side / 2);
+        }
+        const tgt = { l: c.x - side / 2, t: c.y - side / 2, r: c.x + side / 2, b: c.y + side / 2 };
+        const mark = _egNkEl(g.fxRun, 'div', 'eg-sir-fin-mark ' + (getIn ? 'eg-sir-fin-safe' : 'eg-sir-fin-danger'));
+        mark.style.left = Math.round(tgt.l) + 'px'; mark.style.top = Math.round(tgt.t) + 'px';
+        mark.style.width = mark.style.height = side + 'px';
+        mark.innerHTML = '<span>' + (getIn ? 'GET IN' : 'GET OUT') + '</span>';
+        const el = _egNkEl(g.fxRun, 'div', 'eg-sir-box' + (getIn ? ' eg-sir-box-in' : ''));
         const t0 = performance.now();
-        _egNkLoop(g.fxRun, (dtS, now) => {
+        const wave = _egNkNewRun(monster.id, false);
+        wave.passive = true;
+        _egNkLoop(wave, (dtS, now) => {
             if (g.finished) return false;
-            if (now - t0 < dur) {
-                const k = (now - t0) / dur;
-                box.l = W * 0.5 * k * (1 - shrinkTo / W);
-                box.t = H * 0.5 * k * (1 - shrinkTo / H);
-                box.r = W - box.l; box.b = H - box.t;
-                el.style.left = Math.round(box.l) + 'px';
-                el.style.top = Math.round(box.t) + 'px';
-                el.style.width = Math.round(box.r - box.l) + 'px';
-                el.style.height = Math.round(box.b - box.t) + 'px';
-                // Inside the box = the currents' charge zone: charge builds.
-                const pc = _egSirPC();
-                if (pc.x > box.l && pc.x < box.r && pc.y > box.t && pc.y < box.b) {
-                    _egSirCharge = Math.min(EG_SIR_CHARGE_MAX, _egSirCharge + 1);
-                    _egSirChargeUntil = performance.now() + EG_SIR_CHARGE_MAX * EG_SIR_CHARGE_DECAY_MS;
-                }
-                return true;
-            }
-            // Box closed: anyone still inside takes the wall.
-            const pc2 = _egSirPC();
-            if (pc2.x > box.l && pc2.x < box.r && pc2.y > box.t && pc2.y < box.b) {
+            const k = Math.min(1, (now - t0) / closeMs);
+            const l = tgt.l * k, t = tgt.t * k, r = W - (W - tgt.r) * k, b = H - (H - tgt.b) * k;
+            el.style.left = Math.round(l) + 'px'; el.style.top = Math.round(t) + 'px';
+            el.style.width = Math.round(r - l) + 'px'; el.style.height = Math.round(b - t) + 'px';
+            if (k < 1) return true;
+            const pc = _egSirPC();
+            const inside = pc.x > tgt.l && pc.x < tgt.r && pc.y > tgt.t && pc.y < tgt.b;
+            if (inside !== getIn) {
                 const dealt = _egNkHit(EG_SIR_FIN_BOX_DMG, 'lightning', level);
                 _egNkAbilityHitToast(dealt, 'The Stormcaller', 'Storm Wall');
             }
-            try { el.remove(); } catch (e) {}
-            g.box = null;
-            return false;   // this inner loop ends; runBoxWave reschedules
+            el.classList.add('eg-sir-box-final');
+            setTimeout(() => { try { el.remove(); } catch (e) {} try { mark.remove(); } catch (e) {} }, 700);
+            return false;
         });
-        _egSirAfter(g, dur + 900 * _EG_SIR_DEBUG_MULT, runBoxWave);
+        _egSirAfter(g, closeMs + 1100 * _EG_SIR_DEBUG_MULT, runBoxWave);
     };
 
-    // ── THE STORM GROWS TEETH: charge becomes bullets. ───────────────────
+    // ── THE STORM GROWS TEETH: charged bullets aim at you. ───────────────
     const runTeeth = () => {
         if (g.finished) return;
-        _egNkToast('eg_mech_sir_teeth', '⛈️🦷 THE STORM GROWS TEETH - your CHARGE is firing at you!', '#f97316');
+        _egNkToast('eg_mech_sir_teeth', '⛈️🦷 THE STORM GROWS TEETH - keep moving, the bullets aim where you stand!', '#f97316');
+        hint('Keep moving - every bullet flies through the spot you stand on.');
         g.teeth = true;
-        // Teeth phase lasts the rest of the set-piece; the main loop below
-        // spawns a bullet per charged tick at your last position.
-        _egSirAfter(g, 6000 * _EG_SIR_DEBUG_MULT, () => {
-            if (g.finished) return;
-            // Final judgement: the whole arena detonates (the storm is
-            // perfect - you were always part of it).
-            document.querySelectorAll('.eg-sir-box').forEach(el => el.classList.add('eg-sir-box-final'));
-            const dealt = _egNkHit(0.30, 'lightning', level);
-            _egNkAbilityHitToast(dealt, 'The Stormcaller', 'Perfect Storm');
-            _egSirAfter(g, 1500 * _EG_SIR_DEBUG_MULT, () => {
-                _egSirFinalEnd(g, monster);
-            });
-        });
+        _egSirAfter(g, EG_SIR_FIN_TEETH_MS * _EG_SIR_DEBUG_MULT, runEye);
     };
 
-    // ── Main finale loop: box waves + teeth bullets + charge aura. ───────
+    // ── THE EYE OPENS: one reachable safe circle, then the final strike. ─
+    const runEye = () => {
+        if (g.finished) return;
+        g.teeth = false;
+        _egNkToast('eg_mech_sir_eye_open', '⛈️💀 THE EYE OPENS - stand in the GREEN circle!', '#86efac');
+        hint('Stand in the GREEN circle before the count runs out!');
+        const pc0 = _egSirPC();
+        const eyeMs = EG_SIR_FIN_EYE_MS * _EG_SIR_DEBUG_MULT;
+        // 3s countdown at 320 px/s minus 0.7s reaction leaves ~730 px of
+        // walking; the eye opens 180-380 px away.
+        const a = Math.random() * Math.PI * 2, d = 180 + Math.random() * 200;
+        const e = _egSirClampPt(pc0.x + Math.cos(a) * d, pc0.y + Math.sin(a) * d, EG_SIR_FIN_EYE_R);
+        const eye = _egNkEl(g.fxRun, 'div', 'eg-sir-fin-eye eg-sir-fin-safe');
+        eye.style.left = Math.round(e.x - EG_SIR_FIN_EYE_R) + 'px';
+        eye.style.top = Math.round(e.y - EG_SIR_FIN_EYE_R) + 'px';
+        eye.style.width = eye.style.height = (EG_SIR_FIN_EYE_R * 2) + 'px';
+        eye.innerHTML = '<span class="eg-sir-eye-count"></span>';
+        const dark = _egNkEl(g.fxRun, 'div', 'eg-sir-fin-dark');
+        dark.style.setProperty('--ex', Math.round(e.x) + 'px');
+        dark.style.setProperty('--ey', Math.round(e.y) + 'px');
+        dark.style.setProperty('--er', EG_SIR_FIN_EYE_R + 'px');
+        const countEl = eye.querySelector('.eg-sir-eye-count');
+        const t0 = performance.now();
+        const tick = () => {
+            if (g.finished) return;
+            const left = eyeMs - (performance.now() - t0);
+            if (countEl) countEl.textContent = left > 0 ? String(Math.ceil(left / 1000)) : '';
+            if (left > 0) { _egSirAfter(g, 100, tick); return; }
+            const pc = _egSirPC();
+            if (Math.hypot(pc.x - e.x, pc.y - e.y) > EG_SIR_FIN_EYE_R) {
+                const dealt = _egNkHit(EG_SIR_FIN_FINAL_DMG, 'lightning', level);
+                _egNkAbilityHitToast(dealt, 'The Stormcaller', 'Perfect Storm');
+            } else {
+                _egNkToast('eg_mech_sir_survived', '⛈️ You rode out the perfect storm!', '#86efac');
+            }
+            dark.classList.add('eg-sir-fin-flash');
+            _egSirAfter(g, 1200 * _EG_SIR_DEBUG_MULT, () => _egSirFinalEnd(g, monster));
+        };
+        tick();
+    };
+
+    // ── Main finale loop: charged bullets during the teeth phase. ────────
     const startAt = performance.now();
     let bulletCd = 0;
     _egNkLoop(g.fxRun, (dtS, now) => {
         if (g.finished) return false;
         const pc = _egSirPC();
-        const stacks = _egSirChargeNow();
-
-        // Teeth: every charged tick fires a hunting bullet at your position.
-        if (g.teeth && stacks > 0 && now >= bulletCd) {
-            bulletCd = now + 450 * _EG_SIR_DEBUG_MULT;
-            const el = _egNkEl(g.fxRun, 'div', 'eg-nk-dot eg-sir-bullet', '●');
-            // The charge discharges BACK at you: bullets spawn on a ring
-            // around your position and hunt it.
+        if (g.teeth && now >= bulletCd) {
+            const charged = _egSirChargeNow() >= 3;
+            bulletCd = now + (charged ? 380 : 520) * _EG_SIR_DEBUG_MULT;
+            const el = _egNkEl(g.fxRun, 'div', 'eg-nk-dot eg-sir-bullet');
+            // Spawned on a ring around you, flying THROUGH the spot you stand on.
             const ang = Math.random() * Math.PI * 2;
-            const ring = Math.min(W, H) * 0.30;
+            const ring = Math.min(W, H) * 0.32;
             g.bullets.push({
                 x: pc.x + Math.cos(ang) * ring, y: pc.y + Math.sin(ang) * ring,
                 vx: -Math.cos(ang) * EG_SIR_FIN_BULLET_SPD, vy: -Math.sin(ang) * EG_SIR_FIN_BULLET_SPD,
-                el, hit: false,
+                el, hit: false, t: 0,
             });
         }
-        // Bullets travel and hit.
+        const pr = _egNkPlayerRect();
         for (let i = g.bullets.length - 1; i >= 0; i--) {
             const b = g.bullets[i];
+            b.t += dtS;
             b.x += b.vx * dtS; b.y += b.vy * dtS;
-            b.el.style.transform = 'translate(' + Math.round(b.x - 7) + 'px,' + Math.round(b.y - 7) + 'px)';
-            const pr = _egNkPlayerRect();
-            const off = b.x < -30 || b.x > W + 30 || b.y < -30 || b.y > H + 30;
+            b.el.style.transform = 'translate(' + Math.round(b.x - 8) + 'px,' + Math.round(b.y - 8) + 'px)';
+            const off = b.t > 4 || b.x < -30 || b.x > W + 30 || b.y < -30 || b.y > H + 30;
             if (off) { try { b.el.remove(); } catch (e) {} g.bullets.splice(i, 1); continue; }
             if (!b.hit && pr && _egNkDotHit(b.el, pr, 0)) {
                 b.hit = true;
@@ -671,8 +789,6 @@ export function _egSirFinalStart(monster) {
                 try { b.el.remove(); } catch (e) {} g.bullets.splice(i, 1);
             }
         }
-
-        // Failsafe: never storm forever.
         if (now - startAt > EG_SIR_FIN_FAILSAFE_MS) { _egSirFinalEnd(g, monster); return false; }
         return true;
     });
@@ -685,8 +801,8 @@ export function _egSirFinalEnd(g, monster) {
     if (!g || g.finished) return;
     g.finished = true;
     try { if (g.fxRun) _egNkKillRun(g.fxRun); } catch (e) {}
-    document.querySelectorAll('.eg-sir-cd, .eg-sir-box, .eg-sir-bullet, .eg-sir-river, .eg-sir-cell, ' +
-        '.eg-sir-ion-warn, .eg-sir-ion-front, .eg-sir-tangent, .eg-sir-bolt, .eg-sir-ground').forEach(el => {
+    document.querySelectorAll('.eg-sir-cd, .eg-sir-box, .eg-sir-bullet, .eg-sir-river, .eg-sir-cell, .eg-sir-storm, ' +
+        '.eg-sir-ion, .eg-sir-gap, .eg-sir-bolt, .eg-sir-ground, .eg-sir-fin-mark, .eg-sir-fin-eye, .eg-sir-fin-dark').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
     const card = document.getElementById('eg-card-' + g.monsterId);
@@ -726,8 +842,8 @@ export function _egSirTeardown() {
             globalThis._egMonsters.forEach(m => { if (m && m.baseId === 'boss_sirus') m.bossImmune = false; });
         }
     } catch (e) {}
-    document.querySelectorAll('.eg-sir-ion-warn, .eg-sir-ion-front, .eg-sir-tangent, .eg-sir-bolt, .eg-sir-ground, ' +
-        '.eg-sir-river, .eg-sir-cell, .eg-sir-box, .eg-sir-bullet, .eg-sir-cd').forEach(el => {
+    document.querySelectorAll('.eg-sir-ion, .eg-sir-gap, .eg-sir-bolt, .eg-sir-ground, .eg-sir-storm, ' +
+        '.eg-sir-river, .eg-sir-cell, .eg-sir-box, .eg-sir-bullet, .eg-sir-cd, .eg-sir-fin-mark, .eg-sir-fin-eye, .eg-sir-fin-dark').forEach(el => {
         try { el.remove(); } catch (e) {}
     });
     document.querySelectorAll('.eg-sir-allin').forEach(el => el.classList.remove('eg-sir-allin'));
