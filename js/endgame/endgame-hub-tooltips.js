@@ -140,6 +140,14 @@ export function _egBuildTooltipBodyHTML(item) {
             const valCls = (atkEff && atkEff.modded) ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
             implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_attack_interval')}: <span class="${valCls}">${interval}s</span></div>`);
         }
+        // Innate bleed: every physical hit has a built-in chance to bleed
+        // (EG_PHYS_INNATE_BLEED_CHANCE_PCT in combat-ailments-core.js - keep
+        // the number in the translation in sync). Only shown for weapons that
+        // actually deal physical damage.
+        const physMax = dmgEff ? (dmgEff.physMax || 0) : (item.damage.max || 0);
+        if (physMax > 0) {
+            implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_innate_bleed')}</div>`);
+        }
     }
     if (item.blockChance) {
         let blockEff = null;
