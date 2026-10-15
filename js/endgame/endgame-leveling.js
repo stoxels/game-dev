@@ -107,8 +107,12 @@ export const EG_LEVELING_CONFIG = {
     // XP scaled ×~0.72 (base 15→12, growth 11.3→8.5) so the sweep ladder is
     // preserved: modded T16 map ≈ 4.3M XP (168 kills × +77% mods), and the
     // sweep still lands T16→95 with ±1-level checkpoint fidelity.
-    xpPerKillBase: 12,
-    xpPerKillGrowth: 8.5,
+    // Trimmed x0.7 (12->8.4, 8.5->6.0): pack sizes grew after the campaign
+    // curve was tuned, so a clean run ended near level 75 instead of the
+    // campaignEndLevel target of 68 (modelled, all kills). xpEndgameScale is
+    // scaled by the same 0.7 below so late-atlas pacing is kept.
+    xpPerKillBase: 8.4,
+    xpPerKillGrowth: 6.0,
     xpPerKillExp: 1.65,
     bossXpMultiplier: 3.5,
 
@@ -123,7 +127,7 @@ export const EG_LEVELING_CONFIG = {
     //   • one full sweep of all 86 atlas regions ends ≈ level 94, leaving
     //     94→100 as the dedicated late grind.
     campaignEndLevel: 68,
-    xpEndgameScale: 90,
+    xpEndgameScale: 63,
     xpEndgamePower: 3,
 
     // PoE-style safe range: monsters up to

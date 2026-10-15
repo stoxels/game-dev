@@ -6,7 +6,6 @@
 import { cur } from '../state.js';
 import { _egCampaignMonsterLevel } from '../endgame/endgame-leveling.js';
 import { EG_MONSTER_DEFS } from './combat-monsters-data.js';
-import { EG_PLAYER_STATS, _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 
 try { Object.defineProperty(globalThis, '_egClearCampaignLevelFields', { get() { return _egClearCampaignLevelFields; }, set(v) { _egClearCampaignLevelFields = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { get() { return _egShouldPrepareCampaignEncounter; }, set(v) { _egShouldPrepareCampaignEncounter = v; }, configurable: true }); } catch (e) {}
@@ -15,32 +14,33 @@ try { Object.defineProperty(globalThis, '_egShouldPrepareCampaignEncounter', { g
 //-------------------CAMPAIGN MONSTER PACK--------------------------------
 //------------------------------------------------------------------------
 // Every campaign level spawns a small, gently-tuned pack of monsters so the
-// player earns XP and loot while solving. Health is budgeted from the
-// puzzle's own "damage economy": each correct fill charges a projectile for
-// EG_PLAYER_STATS.baseDamage, so a level with S solution cells can deal
-// roughly S x baseDamage over a clean solve. Monsters claim a fraction of
-// that, split across the pack, so an un-geared player can still clear them
-// before the puzzle completes.
+// player earns XP and loot while solving. Health is purely LEVEL-driven:
+// each monster survives `hitsToKill` full-power actions (a spell cast or a
+// charged melee strike) of a level-appropriate character. It does not look
+// at the puzzle size, the pack size or the player's gear: projectile reveals,
+// spells and melee are all valid ways to deal damage, so no single one of
+// them may set the budget (the old projectile-only budget made melee and
+// spell builds delete every pack).
 //
 // Campaign packs never respawn and never include bosses.
 export const EG_CAMPAIGN_MONSTER_CONFIG = {
-    earlyHpBudgetFraction: 0.8, // level-1 share; ramps up to hpBudgetFraction (tuning pass 1: big early puzzles were HP spikes)
-    earlyHpRampLevels: 24,       // monster level at which the full share applies
-    hpBudgetFraction: 1.05,   // share of the level's total player damage (~2x, so packs survive ~12 hits each with starter gear instead of ~6)
+    // Per-monster HP = refHit(level) * hitsToKill * early ramp * spread.
+    // refHit anchors [level, best single-action damage] were measured from
+    // real character exports (L7 geared 138, L10 spell build 176, L42 melee
+    // build 370); between anchors it is linear, past the last it keeps
+    // refHitSlopeBeyond per level. L1 is the un-geared base spell (22).
+    refHitAnchors: [[1, 22], [7, 138], [10, 176], [42, 370]],
+    refHitSlopeBeyond: 6,
+    hitsToKill: 3,             // full actions a monster survives
+    earlyHitsFraction: 0.76,   // level-1 share of hitsToKill; ramps to 1 by earlyHpRampLevels
+    earlyHpRampLevels: 24,
     minHp: 18,
-    // Gear awareness (pass 2): the HP budget used to assume the un-geared
-    // base hit, so a level-7 character with a Light Bow (3-4x the base hit)
-    // one- or two-shot everything and late bows (15x) made packs trivial.
-    // The budget now follows the player's EXPECTED projectile hit, raised to
-    // this power so gear still feels strong without deleting the monsters
-    // (1 = monsters always take the same number of hits, 0 = old behaviour).
-    gearScaleExponent: 0.85,
     countBase: 3,
     countPerWorlds: 3,        // +1 monster every N worlds
     countMax: 7,
     // Large puzzles run long, so they get extra monsters: +1 per this many
     // solution cells (up to sizeBonusMax) on top of the world count, beyond
-    // countMax.
+    // countMax. Pack size never changes per-monster HP.
     cellsPerExtraMonster: 35,
     sizeBonusMax: 4,
     minCellsPerMonster: 5,    // small puzzles support fewer monsters
@@ -69,25 +69,19 @@ export function _egEarlyEaseBlend(level) {
     return Math.max(0, Math.min(1, 1 - (Math.max(1, Number(level) || 1) - 1) / (n - 1)));
 }
 
-// Expected (non-random, non-crit) projectile hit of the current character:
-// base + average flat gear damage, with the physical / elemental / generic /
-// projectile "increased" buckets applied the way _egCalcPlayerDamage does.
-function _egExpectedProjectileHit() {
-    const base = (EG_PLAYER_STATS && EG_PLAYER_STATS.baseDamage) || 10;
-    try {
-        const st = _egComputePlayerStats() || {};
-        const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
-        const phys = (base + mid(st.physFlatMin, st.physFlatMax)) * (1 + (Number(st.physIncPct) || 0) / 100);
-        const elem = (mid(st.fireDmgMin, st.fireDmgMax) + mid(st.coldDmgMin, st.coldDmgMax)
-            + mid(st.lightningDmgMin, st.lightningDmgMax) + mid(st.shadowDmgMin, st.shadowDmgMax))
-            * (1 + ((Number(st.elementalDamageIncPct) || 0) + (Number(st.projectileElementalDamageIncPct) || 0)) / 100);
-        const total = (phys + elem)
-            * (1 + (Number(st.damageIncPct) || 0) / 100)
-            * (1 + (Number(st.projectileDamageIncPct) || 0) / 100);
-        return Math.max(base, total);
-    } catch (e) {
-        return base;
+// Best single-action damage of a level-appropriate character (see
+// refHitAnchors). Gear-independent by design.
+function _egCampaignRefHit(level) {
+    const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
+    const pts = cfg.refHitAnchors;
+    const l = Math.max(1, Number(level) || 1);
+    if (l <= pts[0][0]) return pts[0][1];
+    for (let i = 0; i < pts.length - 1; i++) {
+        const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+        if (l <= x1) return y0 + (y1 - y0) * (l - x0) / (x1 - x0);
     }
+    const [xn, yn] = pts[pts.length - 1];
+    return yn + cfg.refHitSlopeBeyond * (l - xn);
 }
 
 // Fields _egPrepareCampaignEncounter stamps onto the level object. Listed so
@@ -150,10 +144,6 @@ export function _egPrepareCampaignEncounter() {
 
     const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
     const cells = _egCountSolutionCells();
-    const baseHit = (typeof EG_PLAYER_STATS !== 'undefined' && EG_PLAYER_STATS.baseDamage) || 10;
-    const gearRatio = Math.max(1, _egExpectedProjectileHit() / baseHit);
-    const perCellDamage = baseHit * Math.pow(gearRatio, cfg.gearScaleExponent);
-
     const world = cur.world || 1;
     let count = cfg.countBase + Math.floor((world - 1) / cfg.countPerWorlds);
     count = Math.max(1, Math.min(cfg.countMax, count));
@@ -163,9 +153,8 @@ export function _egPrepareCampaignEncounter() {
     const level = (typeof _egCampaignMonsterLevel === 'function')
         ? _egCampaignMonsterLevel(cur.gIdx) : 1;
     const ramp = Math.max(0, Math.min(1, (level - 1) / Math.max(1, cfg.earlyHpRampLevels)));
-    const fraction = cfg.earlyHpBudgetFraction + (cfg.hpBudgetFraction - cfg.earlyHpBudgetFraction) * ramp;
-    const budget = cells * perCellDamage * fraction;
-    const perHp = Math.max(cfg.minHp, Math.round(budget / Math.max(1, count)));
+    const hits = cfg.hitsToKill * (cfg.earlyHitsFraction + (1 - cfg.earlyHitsFraction) * ramp);
+    const perHp = Math.max(cfg.minHp, Math.round(_egCampaignRefHit(level) * hits));
     const curveDamage = cfg.damageBase + cfg.damagePerLevel * level;
     const maxHp = Number(globalThis.playerMaxHP) || 0;
     const floorDamage = Math.min(curveDamage * cfg.damageHpCapMult, maxHp * cfg.damageHpShare);
