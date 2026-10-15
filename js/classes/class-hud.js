@@ -324,9 +324,7 @@ function buildHeartbloomTooltip() {
     const manaLine = _buildTooltipManaLine(_getAbilityManaCost('active5'));
     const baseCd = def.cooldownSeconds || 0;
     const cdLine = _buildTooltipCooldownLine(_resolveEffectiveTooltipCooldown('active5', baseCd), baseCd);
-    const endgameNote = !isEndgameLevel()
-        ? `<br><span style="color:#e74c3c;font-size:.85em">⚠ Only usable during endgame maps</span>`
-        : `<br><span style="opacity:.55;font-size:.85em">Endgame only</span>`;
+    const endgameNote = '';
     return `<strong style="color:#ff6b9d">${getLocalName(def)}</strong>`
         + `<br>${getLocalDesc(data)}`
         + `<br>${cdLine}${manaLine}`

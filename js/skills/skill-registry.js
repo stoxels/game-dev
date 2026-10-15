@@ -191,7 +191,7 @@ const SKILL_META = {
         scaling: ['Cooldown Recovery'],
         damage: null,
         castTime: 'instant',
-        endgameOnly: true,
+        endgameOnly: false,
     },
 };
 

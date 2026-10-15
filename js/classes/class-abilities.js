@@ -498,7 +498,7 @@ function _isInstantAbility(slot) {
 function _canFireInstantAbility(slot) {
     if (slot === 'active5') {
         if (!isEndgameLevel()) {
-            globalThis.showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
+            globalThis.showToast('💚 Heartbloom cannot be used here!', '#ff6b9d');
             return false;
         }
         // Also ensure there is at least one eligible cell - otherwise toast and abort
@@ -774,7 +774,7 @@ function toggleActiveAbility(slot) {
 
     // Heartbloom is endgame-only - block entirely outside endgame (HUD also shows locked)
     if (newSlot === 'active5' && !isEndgameLevel()) {
-        globalThis.showToast('💚 Heartbloom only works on endgame maps!', '#ff6b9d');
+        globalThis.showToast('💚 Heartbloom cannot be used here!', '#ff6b9d');
         return;
     }
 

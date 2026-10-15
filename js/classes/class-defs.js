@@ -340,8 +340,8 @@ export const ENDGAME_HEARTBLOOM_DEF = {
     levels: [
         {
             level: 1,
-            descEn: 'Spawn 3 hearts onto the grid. Only usable during endgame maps. Cooldown: 5 minutes.',
-            descDE: 'Lässt 3 Herzen auf dem Spielfeld erscheinen. Nur auf Endgame-Karten nutzbar. Abklingzeit: 5 Minuten.',
+            descEn: 'Spawn 3 hearts onto the grid. Cooldown: 5 minutes.',
+            descDE: 'Lässt 3 Herzen auf dem Spielfeld erscheinen. Abklingzeit: 5 Minuten.',
             effect: { heartCount: 3 }
         }
     ]
