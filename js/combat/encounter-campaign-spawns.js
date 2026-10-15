@@ -53,7 +53,21 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     // damageHpCapMult x the curve so tiny levels never spike.
     damageHpShare: 0.14,
     damageHpCapMult: 4,
+    // Early-game ease (playtest feedback: the first worlds felt rough for
+    // newcomers, yet fixed starter gear overshot for experienced players).
+    // The first monster levels hit softer and wind up slower; both ease
+    // linearly back to 1.0 at earlyEaseLevels, so nothing changes later.
+    earlyEaseLevels: 10,
+    earlyDamageMult: 0.75,    // monster level 1 damage multiplier
+    earlyChargeSlow: 1.3,     // monster level 1 charge-time multiplier
 };
+
+// Multiplier (0..1 blend) for the early-game ease: 1 at monster level 1,
+// falling to 0 at earlyEaseLevels. Exported for the charge path and tests.
+export function _egEarlyEaseBlend(level) {
+    const n = Math.max(2, EG_CAMPAIGN_MONSTER_CONFIG.earlyEaseLevels);
+    return Math.max(0, Math.min(1, 1 - (Math.max(1, Number(level) || 1) - 1) / (n - 1)));
+}
 
 // Expected (non-random, non-crit) projectile hit of the current character:
 // base + average flat gear damage, with the physical / elemental / generic /
@@ -155,7 +169,8 @@ export function _egPrepareCampaignEncounter() {
     const curveDamage = cfg.damageBase + cfg.damagePerLevel * level;
     const maxHp = Number(globalThis.playerMaxHP) || 0;
     const floorDamage = Math.min(curveDamage * cfg.damageHpCapMult, maxHp * cfg.damageHpShare);
-    const damage = Math.max(1, Math.round(Math.max(curveDamage, floorDamage)));
+    const easeDamage = 1 - (1 - cfg.earlyDamageMult) * _egEarlyEaseBlend(level);
+    const damage = Math.max(1, Math.round(Math.max(curveDamage, floorDamage) * easeDamage));
 
     cur.campaignMonsters = true;
     cur.isMonsterLevel = true;

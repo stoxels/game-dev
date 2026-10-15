@@ -1,6 +1,6 @@
 import { EG_MONSTER_DEFS } from './combat-monsters-data.js';
 import { EG_ART } from '../endgame/endgame-art.js';
-import { EG_CAMPAIGN_MONSTER_CONFIG } from './encounter-campaign-spawns.js';
+import { EG_CAMPAIGN_MONSTER_CONFIG, _egEarlyEaseBlend } from './encounter-campaign-spawns.js';
 import { _egApplyMapModsToMonster } from '../endgame/endgame-map-launch.js';
 import { _egIsCampaignRun } from './combat-state.js';
 import { cur } from '../state.js';
@@ -161,7 +161,14 @@ export function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
         damage = Math.max(1, Math.round(dmgTarget * (0.85 + Math.random() * 0.30)));
         const chargeMult = (typeof EG_CAMPAIGN_MONSTER_CONFIG !== 'undefined' && EG_CAMPAIGN_MONSTER_CONFIG.chargeMult)
             ? EG_CAMPAIGN_MONSTER_CONFIG.chargeMult : 1.15;
-        scaledCharge = Math.max(4, def.chargeMax * chargeMult);
+        // Early-game ease: the first monster levels wind up a little slower.
+        let easeCharge = 1;
+        try {
+            if (EG_CAMPAIGN_MONSTER_CONFIG.earlyChargeSlow > 1) {
+                easeCharge = 1 + (EG_CAMPAIGN_MONSTER_CONFIG.earlyChargeSlow - 1) * _egEarlyEaseBlend(lvl);
+            }
+        } catch (e) { easeCharge = 1; }
+        scaledCharge = Math.max(4, def.chargeMax * chargeMult * easeCharge);
     } else {
         // Tier-aware balance: T1 is forgiving (no gear yet), difficulty ramps
         // smoothly so adequate gear feels normal, lacking feels spongy/dangerous,

@@ -105,6 +105,28 @@ export function _egRollModCounts(rarity) {
 //-------------------------MAIN DROP GENERATOR--------------------------
 //----------------------------------------------------------------------
 
+// Early-game armour bias (playtest feedback: newcomers lacked armour in the
+// first worlds, but free starter gear overshot for experienced players).
+// Below this monster level, bases that carry Armour are this much more
+// likely to drop. It is a weighting, not a freebie - the gear still has to
+// be found - and it fades out with the level so later drops are unbiased.
+export const EG_EARLY_ARMOUR_BIAS_MAX_LEVEL = 12;
+export const EG_EARLY_ARMOUR_BIAS_WEIGHT = 3;
+
+export function _egPickBaseWithEarlyArmourBias(eligible, monsterLevel) {
+    if (!(monsterLevel <= EG_EARLY_ARMOUR_BIAS_MAX_LEVEL)) {
+        return eligible[Math.floor(Math.random() * eligible.length)];
+    }
+    const weights = eligible.map(b => ((b.defenses && b.defenses.armour > 0) ? EG_EARLY_ARMOUR_BIAS_WEIGHT : 1));
+    const total = weights.reduce((s, w) => s + w, 0);
+    let roll = Math.random() * total;
+    for (let i = 0; i < eligible.length; i++) {
+        roll -= weights[i];
+        if (roll <= 0) return eligible[i];
+    }
+    return eligible[eligible.length - 1];
+}
+
 // Picks a base type the monster is high enough for, rolls rarity, mods
 // and implicits off it, and assembles the finished item object.
 export function _egGenerateEquipmentDrop(monsterLevel = 1) {
@@ -112,7 +134,7 @@ export function _egGenerateEquipmentDrop(monsterLevel = 1) {
     // ── 1. Pick base type ────────────────────────────────────────────
     let eligible = EG_ALL_BASE_TYPES.filter(b => b.minLevel <= monsterLevel);
     if (eligible.length === 0) eligible = EG_ALL_BASE_TYPES;
-    const base = eligible[Math.floor(Math.random() * eligible.length)];
+    const base = _egPickBaseWithEarlyArmourBias(eligible, monsterLevel);
 
     // ── 2. Roll rarity ───────────────────────────────────────────────
     const rarity = _egRollRarity();

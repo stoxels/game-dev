@@ -432,6 +432,7 @@ export {
     _egBuildCampaignMonsterList,
     _egClearCampaignLevelFields,
     _egCountSolutionCells,
+    _egEarlyEaseBlend,
     _egPrepareCampaignEncounter,
 } from './encounter-campaign-spawns.js';
 
