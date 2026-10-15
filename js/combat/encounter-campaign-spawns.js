@@ -44,15 +44,15 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     cellsPerExtraMonster: 35,
     sizeBonusMax: 4,
     minCellsPerMonster: 5,    // small puzzles support fewer monsters
-    damageBase: 7,            // per-hit damage at monster level 1 (pass 2: was 6)
-    damagePerLevel: 0.38,     // +damage per monster level (pass 2: was 0.32)
-    chargeMult: 1.0,          // campaign monsters wind up as fast as atlas ones (pass 2: was 1.15; player hits already push the bar back)
+    damageBase: 9,            // per-hit damage at monster level 1 (pass 2: was 6)
+    damagePerLevel: 0.62,     // +damage per monster level (pass 2: was 0.32)
+    chargeMult: 0.65,         // campaign monsters wind up as fast as atlas ones (pass 2: was 1.15; player hits already push the bar back)
     // Damage floor as a share of the player's max life: a level-7 character
     // with 280 life, 78 armour and parry could idle next to a lone 10-damage
     // monster forever. Raw hit = max(curve, share * maxHP), capped at
     // damageHpCapMult x the curve so tiny levels never spike.
-    damageHpShare: 0.09,
-    damageHpCapMult: 3,
+    damageHpShare: 0.14,
+    damageHpCapMult: 4,
 };
 
 // Expected (non-random, non-crit) projectile hit of the current character:

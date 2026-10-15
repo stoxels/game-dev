@@ -161,7 +161,7 @@ export function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
         damage = Math.max(1, Math.round(dmgTarget * (0.85 + Math.random() * 0.30)));
         const chargeMult = (typeof EG_CAMPAIGN_MONSTER_CONFIG !== 'undefined' && EG_CAMPAIGN_MONSTER_CONFIG.chargeMult)
             ? EG_CAMPAIGN_MONSTER_CONFIG.chargeMult : 1.15;
-        scaledCharge = Math.max(6, def.chargeMax * chargeMult);
+        scaledCharge = Math.max(4, def.chargeMax * chargeMult);
     } else {
         // Tier-aware balance: T1 is forgiving (no gear yet), difficulty ramps
         // smoothly so adequate gear feels normal, lacking feels spongy/dangerous,
