@@ -91,8 +91,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'single', dmg: [16, 20], manaCost: 16, cooldownSeconds: 4, castTimeSeconds: 1.0,
         tags: ['Spell', 'Fire', 'Projectile'], scalingTags: ['spell', 'fire', 'projectile'],
         nameEn: 'Fireball', nameDE: 'Feuerball',
-        descEn: 'Hurls a searing fireball at the targeted creature, dealing fire damage.',
-        descDE: 'Wirft einen glühenden Feuerball auf das anvisierte Monster und verursacht Feuerschaden.',
+        descEn: 'Hurls a searing fireball at the targeted creature, dealing fire damage. 25% chance to Ignite.',
+        descDE: 'Wirft einen glühenden Feuerball auf das anvisierte Monster und verursacht Feuerschaden. 25% Chance zu entzünden.',
         sfx: 'dofBurn',
     },
     {
@@ -534,8 +534,8 @@ export const UNIVERSAL_SPELL_DEFS = [
         behavior: 'single', dmg: [12, 20], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0,
         tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Ball Lightning', nameDE: 'Kugelblitz',
-        descEn: 'Hurls one crackling ball of lightning that drifts onto the target. Faster with Projectile Speed.',
-        descDE: 'Schleudert eine knisternde Blitzkugel, die auf das Ziel zutreibt. Schneller mit Projektilgeschwindigkeit.',
+        descEn: 'Hurls one crackling ball of lightning that drifts onto the target. 25% chance to Shock. Faster with Projectile Speed.',
+        descDE: 'Schleudert eine knisternde Blitzkugel, die auf das Ziel zutreibt. 25% Chance zu schocken. Schneller mit Projektilgeschwindigkeit.',
         sfx: 'gust_thunder',
     },
     {

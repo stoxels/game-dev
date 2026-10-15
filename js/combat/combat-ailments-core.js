@@ -42,6 +42,11 @@ import { _egGainEnduranceCharge, _egGainPowerCharge, _egAddGroundFireAcc, _egGro
 const EG_AIL_TICK_INTERVAL_S = 1.0;     // DoT tick every second
 const EG_AIL_IGNITE_DURATION_S = 5;
 const EG_AIL_IGNITE_DMG_SHARE = 0.15;   // dps = share of the triggering hit
+// Innate on-hit ailment of signature spells (spell id -> ailment + chance %).
+const EG_SPELL_INNATE_AILMENT = {
+    usp_fireball: { key: 'ignite', pct: 25 },
+    usp_ball_lightning: { key: 'shocked', pct: 25 },
+};
 // Bleed mirrors ignite one-to-one: a physical damage-over-time status with
 // the same base duration and damage share. Like cold hits innately chill,
 // physical hits innately bleed (see _egRollPlayerHitAilments and
@@ -715,6 +720,16 @@ function _egRollPlayerHitAilments(target, amount, elements, opts) {
     }
     if (lightningShare > 0 && stats.shockPct > 0 && Math.random() * 100 < stats.shockPct) {
         _egApplyMonsterAilment(target, 'shocked');
+    }
+    // Signature spells carry an innate ailment chance of their own (stacks
+    // with gear/tree chances; each roll is independent).
+    const spellInnate = (opts && opts.spellId) ? EG_SPELL_INNATE_AILMENT[opts.spellId] : null;
+    if (spellInnate && Math.random() * 100 < spellInnate.pct) {
+        if (spellInnate.key === 'ignite') {
+            _egApplyMonsterAilment(target, 'ignite', Math.max(EG_AIL_MIN_DOT_DAMAGE, amount * EG_AIL_IGNITE_DMG_SHARE) * critDotMult);
+        } else {
+            _egApplyMonsterAilment(target, spellInnate.key);
+        }
     }
     // Endgame achievement - count newly inflicted ailments on this hit
     if (typeof trackAchStat === 'function') try {

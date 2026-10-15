@@ -2255,7 +2255,7 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
     const impact = () => {
         // isPlayerSpell: Spellproof monsters resist magic sources (melee
         // strikes are exempt - see _egApplyTargetResistances).
-        damageFn(monsterId, hit.amount, hit.elements, { isCrit: !!hit.isCrit, isPlayerSpell: true, uspSfx: !!USP_IMPACT_SFX[spell && spell.theme] });
+        damageFn(monsterId, hit.amount, hit.elements, { isCrit: !!hit.isCrit, isPlayerSpell: true, spellId: spell && spell.id, uspSfx: !!USP_IMPACT_SFX[spell && spell.theme] });
         _uspImpact(spell, monsterId, opts);
     };
 
