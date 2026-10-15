@@ -27,6 +27,7 @@ import { EG_FORTIFY_DR_PER_STACK, _egConsumeGhostShroud, _egArmRiposte, _egGainE
 import { _egApplyPlayerParryFeedback, _egGetDualWieldParryChancePct, _egGetParryChancePct, _egIsDualWieldParryActive, _egRollFateNegation, _egTryDeflectProjectile } from './encounter-player-mitigation.js';
 import { _egGetEncounterBaseLevel } from './encounter-spawn-rules.js';
 import { _egApplyPlayerShockAmp, _egRollMonsterHitAilment, _egRollPlayerStunFromHit, _egStunPlayer } from './combat-ailments-core.js';
+import { isHoldCasting } from '../skills/spell-casttime.js';
 import { _egCalcPlayerResistanceReduction } from './combat-calculations-resistances.js';
 import { _egMaybeShowAbsorptionBroken } from './encounter-overlays.js';
 import { _egRenderPanel } from './encounter.js';
@@ -291,7 +292,10 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
             + ((stats.isStaffEquipped ? stats.staffBlockPct : 0) || 0)) * blockMult;
         overcapSpellBonus = Math.max(0, attackRaw - blockCapAttack) * stats.spellBlockPerOvercap;
     }
-    const blockChance = (!isBossAbility && !isBlockLockedOut && (hasShieldEquipped || treeBlock > 0) && !chargingMelee)
+    // A hero busy channelling / winding up a spell (Disintegrate...) has no
+    // hand free to raise a shield: no blocking while a hold-cast is running.
+    const castingSpell = (typeof isHoldCasting === 'function') && isHoldCasting();
+    const blockChance = (!isBossAbility && !isBlockLockedOut && (hasShieldEquipped || treeBlock > 0) && !chargingMelee && !castingSpell)
         ? Math.min(isSpell ? blockCapSpell : blockCapAttack,
             ((isSpell ? stats.spellBlockChance : stats.blockChance) + treeBlock) * blockMult + overcapSpellBonus)
         : 0;
