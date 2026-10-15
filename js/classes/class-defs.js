@@ -337,10 +337,10 @@ export const ENDGAME_HEARTBLOOM_DEF = {
     descCursorDE: 'Lässt 3 Herzen auf dem Spielfeld erscheinen',
     cooldownSeconds: 300,
     manaCost: 50,
-    // One entry per spell rank (1-10): +1 heart every second rank.
+    // One entry per spell rank (1-10): +1 heart per rank (3 at rank 1, 12 at rank 10).
     levels: Array.from({ length: 10 }, (_, i) => {
         const rank = i + 1;
-        const n = 3 + Math.floor(rank / 2);
+        const n = 2 + rank;
         return {
             level: rank,
             descEn: `Spawn ${n} hearts onto the grid. Cooldown: 5 minutes.`,
