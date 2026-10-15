@@ -533,7 +533,7 @@ function _castEnrage(monster) {
         const pos = _msCentre(card);
         if (pos) {
             _msFx('rage', pos.x, pos.y, 1100,
-                '<span class="ms-burst-ring"></span><span class="ms-heal-num ms-rage-num">⚔ ' + (LANG === 'de' ? 'WUT' : 'RAGE') + '</span>');
+                '<span class="ms-burst-ring"></span><span class="ms-heal-num ms-rage-num">⚔ ' + (LANG === 'de' ? 'WÜTEND!' : 'ENRAGED!') + '</span>');
             _msParticles('rage', pos.x, pos.y, 10, '', 48);
         }
         Audio_Manager.playSFX('monster_charge_windup');
