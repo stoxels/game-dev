@@ -123,7 +123,7 @@ export function _egbtGetSpecialPhaseInfo(bossId) {
                 { name: 'Seismic Stride', desc: _egbtTr('eg_boss_test_colo_stride', 'All fight: the Colossus WALKS - two giant footprints slam in sequence, each rolling a SHOCKWAVE RING out to a dashed circle shown beforehand - step outside it. Pure physical: resists do nothing. Phase 3 strides cut diagonally!') },
                 { name: 'Boulder Rain', desc: _egbtTr('eg_boss_test_colo_boulder', 'At 60% HP: the quarries hurl 🪨 boulders that arc in and SHATTER into rolling fragments that keep travelling. Dodge the impact ring AND the fragment lanes!') },
                 { name: 'Granite Golems', desc: _egbtTr('eg_boss_test_colo_golem', 'At 60% HP: two granite golems climb out and slow-push you into telegraphs - moving walls. Body-check one 3× to crumble it early, or they crumble on their own.') },
-                { name: "TITAN'S FALL", desc: _egbtTr('eg_boss_test_colo_final', 'At 10% HP: the titan KNEELS - three JOINT SEALS light up one at a time: body-check the lit seal 3× while rock chutes sweep the arena. Break all three and it collapses; a failed seal answers with a CAVE-IN (only the seal ring is safe)! (charge bar frozen)') },
+                { name: "TITAN'S FALL", desc: _egbtTr('eg_boss_test_colo_final', 'At 10% HP: the titan KNEELS - three JOINT SEALS light up one at a time: drag your hero onto the lit seal 3× (step away between hits) while rock chutes sweep the arena. Break all three and it collapses; a failed seal answers with a CAVE-IN (only the seal ring is safe)! (charge bar frozen)') },
             ];
         case 'boss_swarm':
             return [

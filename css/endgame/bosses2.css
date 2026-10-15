@@ -8422,7 +8422,7 @@ body.eg-shp-flash::after {
     border-radius: 50%;
     border: 3px solid rgba(168, 162, 158, 0.55);
     background: radial-gradient(circle, rgba(120, 113, 108, 0.4) 0%, transparent 70%);
-    opacity: 0.45;
+    opacity: 0.6;
     transition: opacity 0.3s ease, box-shadow 0.3s ease;
 }
 .eg-colo-seal.eg-colo-seal-lit {
@@ -8432,6 +8432,19 @@ body.eg-shp-flash::after {
     box-shadow: 0 0 24px rgba(250, 204, 21, 0.65), inset 0 0 16px rgba(250, 204, 21, 0.4);
     animation: eg-colo-seal-kf 0.9s ease-in-out infinite alternate;
 }
+.eg-colo-seal-n {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; font-weight: 900; color: #fefce8;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.9), 0 0 14px rgba(250, 204, 21, 0.8);
+}
+.eg-colo-seal-cap {
+    display: none; position: absolute; left: 50%; top: 100%; transform: translateX(-50%);
+    margin-top: 6px; white-space: nowrap; font-size: 0.7rem; font-weight: 800;
+    letter-spacing: 0.08em; color: #fde68a; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}
+.eg-colo-seal.eg-colo-seal-lit .eg-colo-seal-cap { display: block; }
+.eg-colo-seal.eg-colo-seal-await { border-color: rgba(248, 113, 113, 0.95); }
+.eg-colo-seal.eg-colo-seal-await .eg-colo-seal-cap { color: #fca5a5; }
 @keyframes eg-colo-seal-kf {
     from { transform: scale(0.95); } to { transform: scale(1.06); }
 }

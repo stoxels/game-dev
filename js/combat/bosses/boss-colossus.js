@@ -472,7 +472,8 @@ export function _egColoFinalStart(monster) {
         if (r.bossId === monster.id) { try { _egNkKillRun(r); } catch (e) {} }
     });
 
-    const W = window.innerWidth, H = window.innerHeight;
+    const W = window.innerWidth || document.documentElement.clientWidth || 1280;
+    const H = window.innerHeight || document.documentElement.clientHeight || 720;
     const g = {
         monsterId: monster.id,
         finished: false,
@@ -498,11 +499,11 @@ export function _egColoFinalStart(monster) {
     ov.className = 'eg-colo-cd';
     ov.innerHTML =
         '<div class="eg-colo-cd-label">🗿 TITAN\u2019S FALL</div>' +
-        '<div class="eg-colo-cd-hint">Ram the lit JOINT SEAL 3 times - step back between rams!</div>';
+        '<div class="eg-colo-cd-hint">Drag your HERO onto the glowing seal, step away, then onto it again - 3 times!</div>';
     document.body.appendChild(ov);
     g.overlay = ov;
 
-    _egNkToast('eg_mech_colo_final_cd', '🗿💀 TITAN\u2019S FALL - ram the lit seal 3 times!', '#d6c8a8');
+    _egNkToast('eg_mech_colo_final_cd', '🗿💀 TITAN\u2019S FALL - drag your hero onto the glowing seal, step away, repeat 3 times!', '#d6c8a8');
     const hintEl = ov.querySelector('.eg-colo-cd-hint');
 
     // Boss immunity for the whole set-piece (released at the end).
@@ -520,19 +521,30 @@ export function _egColoFinalStart(monster) {
 
     // Joint seal positions: shoulder / knee / chest, spread over the arena.
     const sealSpots = [
-        { x: W * 0.26, y: H * 0.30 },   // shoulder
-        { x: W * 0.72, y: H * 0.66 },   // knee
-        { x: W * 0.50, y: H * 0.48 },   // chest
+        { fx: 0.26, fy: 0.30 },   // shoulder
+        { fx: 0.72, fy: 0.66 },   // knee
+        { fx: 0.50, fy: 0.48 },   // chest
     ];
     g.sealEls = sealSpots.map(s => {
         const el = document.createElement('div');
         el.className = 'eg-colo-seal';
-        el.style.left = Math.round(s.x - 46) + 'px';
-        el.style.top = Math.round(s.y - 46) + 'px';
+        el.innerHTML = '<span class="eg-colo-seal-n"></span><span class="eg-colo-seal-cap">DRAG HERO HERE</span>';
         document.body.appendChild(el);
         g.fxRun.els.push(el);
-        return { el, x: s.x, y: s.y, hp: EG_COLO_SEAL_HITS };
+        return { el, fx: s.fx, fy: s.fy, x: 0, y: 0, hp: EG_COLO_SEAL_HITS };
     });
+    // Seal spots follow the LIVE window size (a 0-width read at launch or a
+    // resize mid-fight must never strand a seal off-screen).
+    const placeSeals = () => {
+        const w = window.innerWidth || document.documentElement.clientWidth || 1280;
+        const h = window.innerHeight || document.documentElement.clientHeight || 720;
+        g.sealEls.forEach(s => {
+            s.x = w * s.fx; s.y = h * s.fy;
+            s.el.style.left = Math.round(s.x - 46) + 'px';
+            s.el.style.top = Math.round(s.y - 46) + 'px';
+        });
+    };
+    placeSeals();
 
     // ONE finale loop: lights each seal in turn, runs the body-check crack
     // clock, sweeps rock chutes, and judges the seal (break or CAVE-IN).
@@ -541,6 +553,7 @@ export function _egColoFinalStart(monster) {
         if (g.caveIn) return true;   // the CAVE-IN countdown owns the arena
         const pr = _egNkPlayerRect();
         const pc = _egColoPC();
+        placeSeals();
         const seal = g.sealEls[g.seal];
         if (!seal) return false;
 
@@ -646,11 +659,15 @@ export function _egColoFinalStart(monster) {
         // Seal countdown in the banner.
         if (hintEl) {
             const left = Math.max(0, Math.ceil((EG_COLO_FINALE_SEAL_MS * _EG_COLO_DEBUG_MULT - g.sealTimer) / 1000));
-            hintEl.textContent = 'Seal ' + (g.seal + 1) + '/3 - ram it ' + Math.max(0, seal.hp) + ' more time' + (seal.hp === 1 ? '' : 's') + ' - ' + left + 's left';
+            const step = g.armed ? 'drag your hero ONTO the glowing seal' : 'step AWAY, then back onto the seal';
+            hintEl.textContent = 'Seal ' + (g.seal + 1) + '/3 - ' + step + ' (' + Math.max(0, seal.hp) + ' more) - ' + left + 's left';
         }
         // Keep the lit-seal visuals honest.
         g.sealEls.forEach((s, i) => {
             s.el.classList.toggle('eg-colo-seal-lit', i === g.seal);
+            const n = s.el.querySelector('.eg-colo-seal-n');
+            if (n) n.textContent = i < g.seal ? '✓' : (i > g.seal ? '🔒' : (g.armed ? String(Math.max(0, s.hp)) : '↺'));
+            s.el.classList.toggle('eg-colo-seal-await', i === g.seal && !g.armed);
         });
         return true;
     });
