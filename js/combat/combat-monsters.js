@@ -98,6 +98,38 @@ function _egRoamSpeedFor(monster) {
 // Accepts either a string id (looks up EG_MONSTER_DEFS) or a def object directly.
 // hpMult: optional multiplier for boss max HP only (e.g., 500k HP test mode);
 // damage is left at its normal scaled value.
+// Campaign trials (convergence / ascension) run on the atlas HP curve, which
+// assumes projectile-sized hits. A character whose real power is a charged
+// melee strike or a spell cast then deletes every monster in one or two
+// hits. The trial HP is therefore floored on the player's best action - the
+// larger of an average projectile hit and 60% of a charged melee strike /
+// spell cast (same share the gauntlet uses) - times a small hit count that
+// grows with monster level. Only ever raises HP; never touches bosses.
+const EG_TRIAL_POWER_HIT_SHARE = 0.6;
+const EG_TRIAL_HITS_BASE = 4;
+const EG_TRIAL_HITS_PER_LEVEL = 0.08;
+
+function _egTrialPowerHit() {
+    let best = 5;
+    try {
+        let sum = 0;
+        const n = 4;
+        for (let i = 0; i < n; i++) sum += Number(globalThis._egCalcPlayerDamage()) || 0;
+        best = Math.max(best, sum / n);
+    } catch (e) { /* sample failed */ }
+    try {
+        const st = globalThis._egComputePlayerStats() || {};
+        const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
+        const melee = (mid(st.meleePhysMin, st.meleePhysMax)
+            + mid(st.meleeFireMin, st.meleeFireMax) + mid(st.meleeColdMin, st.meleeColdMax)
+            + mid(st.meleeLightningMin, st.meleeLightningMax) + mid(st.meleeShadowMin, st.meleeShadowMax))
+            * (1 + (Number(st.meleePhysIncPct) || 0) / 100);
+        const spell = ((Number(st.spellDamageFlat) || 0) + 22) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
+        best = Math.max(best, melee * EG_TRIAL_POWER_HIT_SHARE, spell * EG_TRIAL_POWER_HIT_SHARE);
+    } catch (e) { /* stats optional */ }
+    return best;
+}
+
 export function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
     const def = (typeof defOrId === 'string') ? EG_MONSTER_DEFS[defOrId] : defOrId;
 
@@ -141,6 +173,10 @@ export function _egBuildMonster(defOrId, level = 1, hpMult = 1) {
 
         maxHP = Math.round(def.baseHP * hpScale);
         damage = Math.round(def.baseDamage * dmgScale);
+        if (cur && cur.campaignTrial) {
+            const hits = EG_TRIAL_HITS_BASE + EG_TRIAL_HITS_PER_LEVEL * lvl;
+            maxHP = Math.max(maxHP, Math.round(_egTrialPowerHit() * hits * hpMult));
+        }
 
         // Charge bar scales down with level so high-level monsters attack faster.
         // ~62% faster at L90 (0.38x), ~28% faster at L41 (0.72x), clamped to 2.2s minimum.
