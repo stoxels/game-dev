@@ -29,7 +29,7 @@ import { _egPlayerTakeDamage } from './encounter-damage.js';
 import { _egAilmentsCleanup } from './combat-ailments.js';
 import { _egHazardsCleanup } from './combat-hazards-lifecycle.js';
 import { _egStopPickupSpawner } from './combat-grid-pickups-spawner.js';
-import { EG_CAMPAIGN_MONSTER_CONFIG, _egBuildCampaignMonsterList } from './encounter-campaign-spawns.js';
+import { EG_CAMPAIGN_MONSTER_CONFIG, _egBuildCampaignMonsterList, _egEarlyEaseBlend } from './encounter-campaign-spawns.js';
 import { EG_MONSTER_ZONES } from './encounter-constants.js';
 import { _egCancelSpawnTimers, _egStartTickLoop } from './encounter-lifecycle.js';
 import { _egSpawnMonster } from './encounter-monster-spawning.js';
@@ -72,6 +72,17 @@ export const EG_GAUNTLET_CONFIG = {
         brutal: { countMult: 1.7, hpMult: 1.8,  dmgMult: 1.7, gold: 2.6 },
     },
     maxMonstersCap: 24,
+    // Early-game ease (playtest: world 1-4 gauntlet was "impossible" on a
+    // new character). Applies at low monster levels and fades out linearly
+    // with the campaign's early-ease window (EG_CAMPAIGN_MONSTER_CONFIG.
+    // earlyEaseLevels), so later gauntlets are unchanged.
+    earlyCountMult: 0.45,        // monster-count multiplier at monster level 1
+    earlyMinMonsters: 5,         // never fewer than this
+    earlyConcurrent: 3,          // alive at once at monster level 1 (-> maxConcurrent)
+    earlyDamageMult: 0.7,        // extra damage multiplier at monster level 1
+    earlyHitsMult: 0.7,          // monster HP (hits to kill) multiplier at level 1
+    earlyChampionHpMult: 1.8,    // final-wave champion HP multiplier at level 1
+    traitFreeBelowLevel: 6,      // no warded / phased monsters below this level
     // Monster HP follows the player's real power hit (best of projectile,
     // 60% of a charged melee strike and 60% of a spell cast) so spell and
     // melee builds are not facing projectile-sized HP pools.
@@ -256,8 +267,12 @@ function _tierCfg() {
 
 function _planWaves(level) {
     const cfg = EG_GAUNTLET_CONFIG;
-    const base = Math.max(cfg.minMonsters, Math.min(cfg.maxMonsters,
+    const early = _egEarlyEaseBlend(level);
+    let base = Math.max(cfg.minMonsters, Math.min(cfg.maxMonsters,
         Math.round(cfg.monstersBase + level * cfg.monstersPerLevel)));
+    if (early > 0) {
+        base = Math.max(cfg.earlyMinMonsters, Math.round(base * (1 - (1 - cfg.earlyCountMult) * early)));
+    }
     const total = Math.min(cfg.maxMonstersCap, Math.round(base * _tierCfg().countMult));
     const waves = [];
     let left = total;
@@ -706,16 +721,19 @@ function _begin() {
     // Monster budget: HP from the player's own hit strength, damage from
     // the campaign curve, so the fight scales with both world and gear.
     const lvl = Math.max(1, Number(_egCampaignMonsterLevel(cur.gIdx)) || 1);
-    const hits = cfg.hitsToKillBase + cfg.hitsToKillPerLevel * lvl;
+    const early = _egEarlyEaseBlend(lvl);
+    const hits = (cfg.hitsToKillBase + cfg.hitsToKillPerLevel * lvl) * (1 - (1 - cfg.earlyHitsMult) * early);
     const tier = _tierCfg();
     cur.campaignMonsterHp = Math.max(EG_CAMPAIGN_MONSTER_CONFIG.minHp, Math.round(_avgHit() * hits * tier.hpMult));
     const curveDamage = EG_CAMPAIGN_MONSTER_CONFIG.damageBase + EG_CAMPAIGN_MONSTER_CONFIG.damagePerLevel * lvl;
     const floorDamage = Math.min(curveDamage * 3, (Number(globalThis.playerMaxHP) || 0) * cfg.damageHpShare);
-    cur.campaignMonsterDamage = Math.max(1, Math.round(Math.max(curveDamage, floorDamage) * tier.dmgMult));
+    const easeDmg = 1 - (1 - cfg.earlyDamageMult) * early;
+    cur.campaignMonsterDamage = Math.max(1, Math.round(Math.max(curveDamage, floorDamage) * tier.dmgMult * easeDmg));
     cur.monsterLevel = lvl;
     cur.gauntlet = true;
     globalThis._egGauntletFlag = true;
-    globalThis._egGauntletMaxConcurrent = cfg.maxConcurrent;
+    globalThis._egGauntletMaxConcurrent = Math.max(1, Math.round(
+        cfg.maxConcurrent - (cfg.maxConcurrent - cfg.earlyConcurrent) * early));
 
     // The arena owns the monster cards: they render in its own zone, so they
     // are visible above the sealed grid instead of behind it.
@@ -751,6 +769,7 @@ function _begin() {
 // phased monster per wave keeps every wave winnable with mixed tools.
 function _applyTrait(m) {
     const cfg = EG_GAUNTLET_CONFIG;
+    if ((Number(cur && cur.monsterLevel) || 1) < cfg.traitFreeBelowLevel) return;
     const chance = _g.wave >= 3 ? cfg.traitChanceWave3 : (_g.wave === 2 ? cfg.traitChanceWave2 : 0);
     if (!(chance > 0) || m.isBoss || Math.random() >= chance) return;
     const taken = _g.traitsThisWave || (_g.traitsThisWave = {});
@@ -770,7 +789,9 @@ function _makeChampion(m) {
     const cfg = EG_GAUNTLET_CONFIG;
     m.gauntletTrait = 'champion';
     m.isElite = true;
-    m.maxHP = Math.round(m.maxHP * cfg.championHpMult);
+    const earlyChamp = _egEarlyEaseBlend(Number(cur && cur.monsterLevel) || 1);
+    const champMult = cfg.championHpMult - (cfg.championHpMult - cfg.earlyChampionHpMult) * earlyChamp;
+    m.maxHP = Math.round(m.maxHP * champMult);
     m.currentHP = m.maxHP;
     m.damageValue = Math.round((Number(m.damageValue) || 1) * cfg.championDmgMult);
     m.artScale = Math.max(Number(m.artScale) || 1, 1.35);
