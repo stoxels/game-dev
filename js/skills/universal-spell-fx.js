@@ -375,23 +375,20 @@ const USP_SPELL_PROJ = {
                 '</div>';
         },
     },
-    // Ball Lightning - a slow grinding orb of lightning, not a bolt: a
-    // crackling ball with arcing shell bands that lumbers onto the target
-    // (800ms) while the 220ms volley stagger stacks the 4 orbs into a
-    // grinding barrage. The yellow thunderbolt stays for the school.
+    // Ball Lightning - one plain ball of lightning drifting onto the target.
+    // Flies at a calm 1100ms base; speedScales makes the Projectile Speed
+    // stat shorten that flight like it does for ordinary projectiles.
     usp_ball_lightning: {
-        cssClass: 'usp-proj-balllightning', duration: 800, easing: 'ease-out', rotOffset: 0,
-        scale: 1.6, spin: 1400,
+        cssClass: 'usp-proj-balllightning', duration: 1100, easing: 'linear', rotOffset: 0,
+        scale: 1.4, speedScales: true,
         build(root) {
             root.innerHTML =
                 '<div class="egp usp-p-bl">' +
-                    '<div class="usp-p-bl-trail"></div>' +
                     '<div class="usp-p-bl-shell"></div>' +
-                    '<div class="usp-p-bl-band usp-p-bl-band-1 egp-spin"></div>' +
-                    '<div class="usp-p-bl-band usp-p-bl-band-2 egp-spin"></div>' +
+                    '<div class="usp-p-bl-zap usp-p-bl-zap-1"></div>' +
+                    '<div class="usp-p-bl-zap usp-p-bl-zap-2"></div>' +
+                    '<div class="usp-p-bl-zap usp-p-bl-zap-3"></div>' +
                     '<div class="usp-p-bl-core"></div>' +
-                    '<div class="usp-p-bl-mote usp-p-bl-mote-1"></div>' +
-                    '<div class="usp-p-bl-mote usp-p-bl-mote-2"></div>' +
                 '</div>';
         },
     },
@@ -1782,6 +1779,37 @@ function _uspAuraTrack() {
     _uspAuraRaf = requestAnimationFrame(_uspAuraTrack);
 }
 
+// Ice-vortex spiral arms (SVG, 200x200 box) + orbiting shards.
+function _uspVortexMarkup() {
+    const arm = (k, arms, twist) => {
+        let d = '';
+        for (let i = 0; i <= 28; i++) {
+            const t = i / 28;
+            const r = 9 + 88 * t;
+            const a = (k / arms) * Math.PI * 2 + t * twist;
+            d += `${i ? 'L' : 'M'}${(100 + Math.cos(a) * r).toFixed(1)} ${(100 + Math.sin(a) * r).toFixed(1)} `;
+        }
+        return d;
+    };
+    const layer = (cls, arms, twist, wide, narrow) => {
+        let p = '';
+        for (let k = 0; k < arms; k++) {
+            const d = arm(k, arms, twist);
+            p += `<path d="${d}" class="usp-vtx-arm-wide" stroke-width="${wide}"/>` +
+                 `<path d="${d}" class="usp-vtx-arm" stroke-width="${narrow}"/>`;
+        }
+        return `<svg class="usp-vtx-spiral ${cls}" viewBox="0 0 200 200">${p}</svg>`;
+    };
+    let shards = '';
+    const specs = [[34, 2.1, 0], [46, 2.9, 0.4], [58, 3.6, 0.8], [70, 4.4, 0.2], [82, 5.2, 0.6], [40, 2.5, 1.3], [64, 3.9, 1.7], [76, 4.8, 1.1]];
+    specs.forEach(([r, dur, delay], i) => {
+        shards += `<div class="usp-vtx-orbit" style="--d:${dur}s;--o:-${(delay * dur).toFixed(2)}s">` +
+                  `<div class="usp-vtx-shard" style="--r:${r}%;--s:${i % 3 === 0 ? 9 : 6}px"></div></div>`;
+    });
+    return layer('usp-vtx-a', 3, 3.4, 9, 2.6) + layer('usp-vtx-b', 4, 2.6, 5, 1.6) +
+           '<div class="usp-vtx-eye"></div>' + shards;
+}
+
 // Pins the persistent aura visual for a spell (radius in px). Replaces any
 // stale one for the same spell. Best-effort, never throws.
 export function _uspAuraShow(spell, radius) {
@@ -1801,7 +1829,14 @@ export function _uspAuraShow(spell, radius) {
         // toggle. Children of the aura element, so they die with it.
         const isBlades = spell.id === 'usp_blade_vortex';
         if (isBlades) el.classList.add('is-blades');
+        // Vortex - a Path-of-Exile style ice whirlwind: spiral arms of
+        // snow curling in to an eye, with ice shards slung round on
+        // different orbits. Built only for usp_vortex; other toggle
+        // auras keep the shared shell.
+        const isVortex = spell.id === 'usp_vortex';
+        if (isVortex) el.classList.add('is-vortex');
         let orbit = '';
+        if (isVortex) orbit = _uspVortexMarkup();
         if (isBlades) {
             orbit = '<div class="usp-aura-orbit">';
             for (let b = 1; b <= 6; b++) orbit += `<div class="usp-aura-blade usp-aura-blade-${b}"></div>`;
@@ -2234,11 +2269,18 @@ export function _uspFireThemedProjectile(spell, monsterId, hit, opts) {
         centre = { x: centre.x + (-dy / len) * off, y: centre.y + (dx / len) * off };
     }
     const scale = opts.volleyIndex ? 1.1 : (projDef.scale || (opts.isBig ? 1.8 : 1.4));
+    let flightMs = opts.fromSky ? 550 : projDef.duration;
+    if (projDef.speedScales && !opts.fromSky) {
+        try {
+            const pct = Math.max(0, Number(globalThis._egComputePlayerStats().projectileSpeedPct) || 0);
+            flightMs = Math.max(60, Math.round(flightMs / (1 + pct / 100)));
+        } catch (e) { /* no stats - base speed */ }
+    }
     try {
         globalThis._egFireProjectile(
             projDef, projDef.cssClass,
             start, centre,
-            opts.fromSky ? 550 : projDef.duration,
+            flightMs,
             opts.fromSky ? 'ease-in' : projDef.easing,
             impact, null, scale
         );

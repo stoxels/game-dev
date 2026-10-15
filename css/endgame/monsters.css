@@ -335,9 +335,12 @@
     --qi: 0.12;
     position: absolute;
     left: 50%;
-    top: 62%;
-    width: calc(92px + 56px * var(--qi));
-    height: calc(92px + 56px * var(--qi));
+    /* The sprite is the wrapper's LAST child (128px tall) and the bars
+       above it change height (shield bar, charge bar), so anchor to the
+       wrapper's bottom edge: the sprite's centre is always 64px up. */
+    top: calc(100% - 64px);
+    width: calc(120px + 56px * var(--qi));
+    height: calc(120px + 56px * var(--qi));
     border-radius: 50%;
     pointer-events: none;
     z-index: 5;

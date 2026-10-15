@@ -1415,9 +1415,12 @@ export function _charmCellHasDrop(row, col) {
     return _egCharmDrops.has(`${row}-${col}`);
 }
 
-// Weighted pool of player skills a monster can drop a charm for. The player's
-// own class / ascendency / Heartbloom skills are three times as likely as a
-// universal-spell charm so drops stay relevant to the character.
+// Pool of skills a monster can drop a charm for. Class and ascendency
+// actives are PROGRESSION-ONLY: their ranks come from upgrading the spell
+// itself (applyClassUpgrade / applyAscendencyUpgrade -> grantCharm), never
+// from monster or boss drops. So the pool is the universal arsenal plus the
+// endgame Heartbloom skill; Heartbloom stays three times as likely as one
+// universal-spell charm.
 function _charmBuildDropSkillPool() {
     const pool = [];
     let ids = [];
@@ -1425,7 +1428,9 @@ function _charmBuildDropSkillPool() {
     for (const id of ids) {
         const def = getSkillDef(id);
         if (!def) continue;
-        const weight = (def.slotKind === 'universal') ? 1 : 3;
+        const kind = def.slotKind;
+        if (kind === 'base1' || kind === 'base2' || kind === 'asc1' || kind === 'asc2') continue;
+        const weight = (kind === 'universal') ? 1 : 3;
         for (let i = 0; i < weight; i++) pool.push(id);
     }
     return pool;

@@ -531,11 +531,11 @@ export const UNIVERSAL_SPELL_DEFS = [
     },
     {
         id: 'usp_ball_lightning', icon: '🔵', theme: 'lightning', element: 'lightning', damageKind: 'lightning',
-        behavior: 'volley', dmg: [3, 5], count: 4, volleyDelayMs: 220, manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0,
+        behavior: 'single', dmg: [12, 20], manaCost: 42, cooldownSeconds: 18, castTimeSeconds: 1.0,
         tags: ['Spell', 'Lightning', 'Projectile'], scalingTags: ['spell', 'lightning', 'projectile'],
         nameEn: 'Ball Lightning', nameDE: 'Kugelblitz',
-        descEn: 'Hurls 4 slow, crackling orbs that grind through the target one after another.',
-        descDE: 'Schleudert 4 langsame, knisternde Kugeln, die nacheinander durchs Ziel mahlen.',
+        descEn: 'Hurls one crackling ball of lightning that drifts onto the target. Faster with Projectile Speed.',
+        descDE: 'Schleudert eine knisternde Blitzkugel, die auf das Ziel zutreibt. Schneller mit Projektilgeschwindigkeit.',
         sfx: 'gust_thunder',
     },
     {

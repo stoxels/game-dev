@@ -425,51 +425,43 @@
 @keyframes usp-zap-jolt{ from{transform:scaleY(1)} to{transform:scaleY(1.18)} }
 @keyframes usp-zap-mote{ 0%{transform:translate(0,0); opacity:0} 30%{opacity:1} 100%{transform:translate(-9px,2px); opacity:0} }
 
-/* ━━━ BALL LIGHTNING (usp_ball_lightning) — grinding crackle orb ━━━━━━ */
+/* ━━━ BALL LIGHTNING (usp_ball_lightning) — single crackle orb ━━━━━━ */
 /* Signature projectile: a slow heavy ball of lightning with a crackling
    shell, two lazy counter-rotating arc bands and spitting spark motes.
    The shell churns on the 1400ms spin while the orb lumbers in over
    800ms. Built +X; the yellow thunderbolt stays for the school.
    Purely additive. */
 .usp-proj-balllightning{ filter: drop-shadow(0 0 12px rgba(255,255,255,.9)) drop-shadow(0 0 24px rgba(255,235,59,.8)) drop-shadow(0 0 42px rgba(255,171,0,.45)); }
-.usp-p-bl-trail{
-    position:absolute; left:0; top:12px; width:20px; height:6px; border-radius:3px;
-    background: linear-gradient(to right, transparent 0%, rgba(255,235,59,.3) 40%, rgba(255,241,118,.85) 78%, #ffffff 100%);
-    filter: blur(.6px);
-}
 .usp-p-bl-shell{
-    position:absolute; left:14px; top:5px; width:20px; height:20px; border-radius:50%;
-    background: radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,253,231,.75) 28%, rgba(255,235,59,.55) 52%, rgba(255,152,0,.4) 72%, transparent 88%);
-    filter: blur(.6px);
+    position:absolute; left:6px; top:0; width:30px; height:30px; border-radius:50%;
+    background: radial-gradient(circle, #ffffff 0%, rgba(255,253,231,.9) 30%, rgba(255,235,59,.6) 58%, rgba(255,152,0,.3) 78%, transparent 92%);
     animation: usp-bl-crackle 130ms steps(2) infinite;
 }
-.usp-p-bl-band{
-    position:absolute; left:13px; top:4px; width:22px; height:22px; border-radius:50%;
-    border:2px solid transparent;
-}
-.usp-p-bl-band-1{
-    border-top-color:#fff; border-right-color:rgba(255,235,59,.9);
-    filter: drop-shadow(0 0 4px #ffeb3b);
-}
-.usp-p-bl-band-2{
-    border-bottom-color:#fff; border-left-color:rgba(255,152,0,.9);
-    filter: drop-shadow(0 0 4px #ff9800);
-}
 .usp-p-bl-core{
-    position:absolute; left:19px; top:10px; width:10px; height:10px; border-radius:50%;
-    background: radial-gradient(circle, #ffffff 0%, #fffde7 45%, #ffeb3b 75%, transparent 100%);
+    position:absolute; left:15px; top:9px; width:12px; height:12px; border-radius:50%;
+    background: radial-gradient(circle, #ffffff 0%, #fffde7 55%, #ffeb3b 100%);
     box-shadow: 0 0 10px #fff, 0 0 18px #ffeb3b;
 }
-.usp-p-bl-mote{
-    position:absolute; width:3px; height:3px; border-radius:50%;
-    background: #fffde7;
-    box-shadow: 0 0 6px #ffeb3b;
-    animation: usp-bl-mote .45s ease-out infinite;
+/* Electric tendrils: thin bright bars radiating from the centre, each
+   re-aimed and re-lengthened on a stepped flicker so they snap around. */
+.usp-p-bl-zap{
+    position:absolute; left:21px; top:14px; width:20px; height:2px; border-radius:1px;
+    transform-origin:0 50%;
+    background: linear-gradient(to right, #fff 0%, #fffde7 40%, rgba(255,235,59,.0) 100%);
+    box-shadow: 0 0 5px #fff, 0 0 8px #ffeb3b;
+    animation: usp-bl-zap 220ms steps(1) infinite;
 }
-.usp-p-bl-mote-1{ left:16px; top:4px; }
-.usp-p-bl-mote-2{ left:13px; top:21px; animation-delay:.22s; }
-@keyframes usp-bl-crackle{ 0%{opacity:.7; transform:scale(1)} 50%{opacity:1; transform:scale(1.08)} 100%{opacity:.8; transform:scale(.96)} }
-@keyframes usp-bl-mote{ 0%{transform:translate(0,0) scale(1); opacity:0} 30%{opacity:1} 100%{transform:translate(-10px,-3px) scale(.4); opacity:0} }
+.usp-p-bl-zap-1{ animation-delay:0s; }
+.usp-p-bl-zap-2{ animation-delay:-.07s; animation-duration:260ms; }
+.usp-p-bl-zap-3{ animation-delay:-.15s; animation-duration:190ms; }
+@keyframes usp-bl-zap{
+    0%{ transform:rotate(20deg) scaleX(1); opacity:1 }
+    20%{ transform:rotate(95deg) scaleX(.6); opacity:.6 }
+    40%{ transform:rotate(160deg) scaleX(1.1); opacity:1 }
+    60%{ transform:rotate(235deg) scaleX(.5); opacity:.7 }
+    80%{ transform:rotate(300deg) scaleX(1); opacity:1 }
+}
+@keyframes usp-bl-crackle{ 0%{opacity:.8; transform:scale(1)} 50%{opacity:1; transform:scale(1.1)} 100%{opacity:.85; transform:scale(.94)} }
 
 /* ━━━ BLADE — hurled reaver; the only TUMBLING steel ━━━━━━━━━━━━ */
 .usp-p-blade-trail{
@@ -3013,6 +3005,44 @@ body.spell-targeting, body.spell-targeting * { cursor: crosshair !important; }
 @keyframes usp-aura-spin-rev{ from{transform:rotate(0)} to{transform:rotate(-360deg)} }
 @keyframes usp-aura-twinkle{ from{opacity:.35; transform:scale(.7)} to{opacity:1; transform:scale(1.2)} }
 @keyframes usp-aura-flash{ 0%{opacity:.4} 25%{opacity:1} 100%{opacity:.4} }
+
+/* ━━━ VORTEX whirl (usp_vortex) — spiral arms + ice shards ━━━━━━━━━━━ */
+/* Replaces the flat mist/ring of the shared shell for Vortex only: two
+   counter-rotating layers of curling snow arms around a bright eye, and
+   ice shards slung round on different orbits. Purely additive. */
+.usp-aura-vortex.is-vortex .usp-aura-mist,
+.usp-aura-vortex.is-vortex .usp-aura-mote{ display:none; }
+.usp-aura-vortex.is-vortex .usp-aura-ring{
+    border:1px solid rgba(225,245,254,.35); animation:none;
+    box-shadow:0 0 14px rgba(129,212,250,.4), inset 0 0 30px rgba(129,212,250,.2);
+}
+.usp-vtx-spiral{
+    position:absolute; inset:0; width:100%; height:100%; overflow:visible;
+    fill:none; stroke-linecap:round;
+}
+.usp-vtx-a{ animation: usp-aura-spin 3.2s linear infinite; }
+.usp-vtx-b{ animation: usp-aura-spin-rev 5.4s linear infinite; opacity:.85; }
+.usp-vtx-arm-wide{ stroke:rgba(129,212,250,.28); filter: blur(3px); }
+.usp-vtx-arm{ stroke:rgba(240,251,255,.9); filter: drop-shadow(0 0 3px rgba(179,229,252,.9)); }
+.usp-vtx-eye{
+    position:absolute; left:50%; top:50%; width:16%; height:16%; transform:translate(-50%,-50%);
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(255,255,255,.9) 0%, rgba(179,229,252,.5) 45%, transparent 75%);
+    filter: blur(2px);
+}
+.usp-vtx-orbit{
+    position:absolute; inset:0;
+    animation: usp-aura-spin var(--d) linear infinite; animation-delay: var(--o);
+}
+.usp-vtx-shard{
+    position:absolute; left:50%; top:50%;
+    width:var(--s); height:calc(var(--s) * 1.7);
+    transform: translate(-50%,-50%) translateX(var(--r)) rotate(35deg);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    background: linear-gradient(135deg, #ffffff, #81d4fa 70%, #4fc3f7);
+    filter: drop-shadow(0 0 4px rgba(225,245,254,.95));
+}
+.usp-aura-vortex.is-pulse.is-vortex .usp-vtx-a{ filter: brightness(1.8); }
 
 /* ━━━ BLADE VORTEX (usp_blade_vortex) — six circling blades ━━━━━━━━━━ */
 /* Signature aura: six conjured steel blades orbit the hero inside the
