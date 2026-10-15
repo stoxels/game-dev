@@ -12,26 +12,36 @@ import { save } from '../state.js';
 //-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 
-// The player's current gold, seeded from the saved game on load.
-export let _egGoldAmount = (typeof globalThis.STATE !== 'undefined' && globalThis.STATE.egGold) || 0;
+// The balance lives ONLY in the save (STATE.egGold). It used to be copied into
+// a module variable once at import time, which went stale whenever a save slot
+// was loaded or switched (STATE gets replaced): vendors then showed 0 and the
+// next gold gain overwrote the saved balance with the tiny stale one.
+function _goldNow() {
+    const st = globalThis.STATE;
+    return Math.max(0, Math.round(Number(st && st.egGold) || 0));
+}
 
 // Returns the current gold balance.
 export function egGetGold() {
-    return _egGoldAmount;
+    return _goldNow();
 }
 
-// Copies the live balance into the save and writes the game out.
-export function _egSyncGoldToState() {
-    if (typeof globalThis.STATE === 'undefined') return;
-    globalThis.STATE.egGold = _egGoldAmount;
+// Writes the balance into the save and writes the game out.
+function _setGold(value) {
+    if (typeof globalThis.STATE === 'undefined' || !globalThis.STATE) return;
+    globalThis.STATE.egGold = Math.max(0, Math.round(value));
     if (typeof save === 'function') save();
+}
+
+// Kept for callers that only want to persist the current balance.
+export function _egSyncGoldToState() {
+    _setGold(_goldNow());
 }
 
 // Adds gold to the balance (negative amounts are ignored) and records the earning.
 export function _egAddGold(amount) {
     amount = Math.max(0, Math.round(amount));
-    _egGoldAmount += amount;
-    _egSyncGoldToState();
+    _setGold(_goldNow() + amount);
     if (typeof trackAchStat === 'function') try { trackAchStat('egGoldEarned', amount); } catch(e){}
 }
 
@@ -39,9 +49,8 @@ export function _egAddGold(amount) {
 // when the balance is insufficient.
 export function egSpendGold(amount) {
     amount = Math.round(amount);
-    if (amount < 0 || _egGoldAmount < amount) return false;
-    _egGoldAmount -= amount;
-    _egSyncGoldToState();
+    if (amount < 0 || _goldNow() < amount) return false;
+    _setGold(_goldNow() - amount);
     if (typeof trackAchStat === 'function') try { trackAchStat('egGoldSpent', amount); } catch(e){}
     return true;
 }
