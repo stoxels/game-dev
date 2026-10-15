@@ -1812,11 +1812,17 @@ export function _egShowLeaveMapTransition(atlasResult, opts) {
 
     // Failed runs show a reason line (if one was passed) and a green hint
     // that everything collected during the run was kept.
-    const titleText = failed ? (opts.titleText || t('eg_map_failed')) : t('eg_map_cleared');
+    // Campaign trials (convergence / ascension) are not map-device runs: their
+    // leave screen returns to the world map and nothing is "lost" but the try.
+    const isTrial = typeof window !== 'undefined' && window._egTrialReturnWi != null
+        && window._egTrialReturnWi >= 0;
+    const titleText = failed
+        ? (opts.titleText || t(isTrial ? 'eg_trial_failed' : 'eg_map_failed'))
+        : t('eg_map_cleared');
     const subLineHTML = (failed && opts.subText)
         ? `<div class="eg-leave-map-subline">${opts.subText}</div>` : '';
     const keepHintHTML = failed
-        ? `<div class="eg-leave-map-keep-hint">${t('eg_map_failed_keep_hint')}</div>` : '';
+        ? `<div class="eg-leave-map-keep-hint">${t(isTrial ? 'eg_trial_failed_keep_hint' : 'eg_map_failed_keep_hint')}</div>` : '';
 
     el.innerHTML = `
         <div class="eg-leave-map-panel ${failed ? 'eg-leave-map-failed' : ''}">
@@ -1825,7 +1831,7 @@ export function _egShowLeaveMapTransition(atlasResult, opts) {
             ${keepHintHTML}
             ${firstClearHTML}
             <div id="eg-leave-summary-container"></div>
-            <button class="eg-leave-map-return-btn" id="btn-eg-leave-map-return">${t('eg_return_to_nexus')}</button>
+            <button class="eg-leave-map-return-btn" id="btn-eg-leave-map-return">${t(isTrial ? 'eg_return_to_world' : 'eg_return_to_nexus')}</button>
         </div>`;
     el.classList.add('show');
 
