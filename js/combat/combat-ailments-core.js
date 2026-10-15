@@ -1006,6 +1006,21 @@ function _egBuildStatusIconsHTML(statusMap) {
         .join('');
 }
 
+// Ailment key -> card class driving the big on-monster effect (CSS:
+// .eg-ail-* in css/endgame/monsters.css). Flames, lightning, frost... so the
+// state reads at a glance without hunting for the small status chip.
+const EG_AILMENT_CARD_FX = {
+    ignite: 'eg-ail-ignite', shocked: 'eg-ail-shocked', chill: 'eg-ail-chill',
+    frozen: 'eg-ail-frozen', shadowburn: 'eg-ail-shadowburn', poison: 'eg-ail-poison',
+    polymorph: 'eg-ail-polymorph', bleed: 'eg-bleeding',
+};
+const EG_AILMENT_FX_HTML =
+    '<i class="eg-fx-flame f1">🔥</i><i class="eg-fx-flame f2">🔥</i><i class="eg-fx-flame f3">🔥</i>'
+    + '<i class="eg-fx-flame f4">🔥</i><i class="eg-fx-flame f5">🔥</i>'
+    + '<i class="eg-fx-zap z1">⚡</i><i class="eg-fx-zap z2">⚡</i><i class="eg-fx-zap z3">⚡</i><i class="eg-fx-zap z4">⚡</i>'
+    + '<i class="eg-fx-frost r1">❄</i><i class="eg-fx-frost r2">❄</i><i class="eg-fx-frost r3">❄</i>'
+    + '<i class="eg-fx-wisp w1"></i><i class="eg-fx-wisp w2"></i><i class="eg-fx-wisp w3"></i>';
+
 // Per-monster icon strip - cheap DOM update driven by _egUpdateMonsterBars.
 function _egRenderMonsterStatusStrip(m) {
     if (!m || !m.statuses) return;
@@ -1015,12 +1030,22 @@ function _egRenderMonsterStatusStrip(m) {
     if (strip.dataset.sig === sig) return;
     strip.dataset.sig = sig;
     strip.innerHTML = _egBuildStatusIconsHTML(m.statuses);
-    // Bleeding monsters wear a red drip glow + badge on the whole card, so the
-    // DoT reads at a glance without finding the small status chip.
     const card = document.getElementById(`eg-card-${m.id}`);
     if (card) {
-        const bleed = m.statuses.bleed;
-        card.classList.toggle('eg-bleeding', !!(bleed && bleed.until > Date.now()));
+        const now = Date.now();
+        Object.keys(EG_AILMENT_CARD_FX).forEach(key => {
+            const st = m.statuses[key];
+            card.classList.toggle(EG_AILMENT_CARD_FX[key], !!(st && st.until > now));
+        });
+        // Overlay for the animated flames/sparks/frost, parked inside the art
+        // frame so it follows the monster's size (flames sit on its bottom edge).
+        const wrap = card.querySelector('.eg-emoji-wrapper');
+        if (wrap && !wrap.querySelector(':scope > .eg-ail-fx')) {
+            const fx = document.createElement('div');
+            fx.className = 'eg-ail-fx';
+            fx.innerHTML = EG_AILMENT_FX_HTML;
+            wrap.appendChild(fx);
+        }
     }
 }
 

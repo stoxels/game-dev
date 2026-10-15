@@ -50,10 +50,12 @@ const EG_WARDEN_FINALE = {
     toastKey: 'eg_mech_warden_final',
     hint: 'The totems lock the arena - read each circle!',
     waves: [
-        { kind: 'avoid', ms: 2200, dmg: 0.16, extra: 2, label: 'Lockdown Pulse' },
-        { kind: 'shelter', ms: 2800, dmg: 0.22, label: 'Lockdown' },
-        { kind: 'avoid', ms: 2000, dmg: 0.16, extra: 3, label: 'Lockdown Pulse' },
-        { kind: 'shelter', ms: 2600, dmg: 0.28, label: 'Total Lockdown' },
+        // Failing a wave must hurt (the Absorption pool soaks the first
+        // chunk): same punishment band as the Colossus waves.
+        { kind: 'avoid', ms: 2200, dmg: 0.30, extra: 2, label: 'Lockdown Pulse' },
+        { kind: 'shelter', ms: 2800, dmg: 0.38, label: 'Lockdown' },
+        { kind: 'avoid', ms: 2000, dmg: 0.30, extra: 3, label: 'Lockdown Pulse' },
+        { kind: 'shelter', ms: 2600, dmg: 0.46, label: 'Total Lockdown' },
     ],
 };
 
@@ -86,10 +88,10 @@ function _egWardenTotemEl(run, s) {
 export function _egMechTotemPulse(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(1, Math.min(3, Number(phase) || 1));
-    const rounds = [0, 2, 2, 3][p];
-    const warnMs = 1000, expandMs = 350, gapMs = [0, 450, 350, 250][p];
+    const rounds = [0, 3, 3, 4][p];
+    const warnMs = [0, 950, 850, 750][p], expandMs = 300, gapMs = [0, 300, 250, 200][p];
     const blastR = EG_WARDEN_BLAST_R;
-    const dmgPct = [0, 0.11, 0.13, 0.15][p];
+    const dmgPct = [0, 0.28, 0.32, 0.36][p];
     const run = _egNkNewRun(monster && monster.id, true);
     const level = monster ? monster.level : 1;
     const totems = _egWardenSpots().map(s => ({ ...s, el: _egWardenTotemEl(run, s) }));
@@ -147,29 +149,41 @@ export function _egMechTotemPulse(monster, phase) {
 }
 
 
-// 60%: ARC LINK - three totems rise around you, then two (phase 3: all
-// three) lightning arcs snap between totem pairs. Dashed lines show the
-// arcs for 1.2s; the live arc burns for 1.4s - don't stand on a line.
+// 60%: ARC LINK - three totems rise around you, then lightning arcs snap
+// between ALL totem pairs (a fence). Dashed lines show the arcs for 1.1s;
+// then the live fence burns for 2.2s while the triangle spins and CLOSES IN,
+// sweeping its beams across the middle - so standing still inside it is
+// no longer safe: leave the triangle before it contracts onto you.
 export function _egMechWardenArcs(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
     const p = Math.max(2, Math.min(3, Number(phase) || 2));
     const level = monster ? monster.level : 1;
     const run = _egNkNewRun(monster && monster.id, true);
     const spots = _egWardenSpots();
-    spots.forEach(s => _egWardenTotemEl(run, s).classList.add('eg-ward-totem-hot'));
-    const pairs = p >= 3 ? [[0, 1], [1, 2], [2, 0]] : [[0, 1], [1, 2]];
-    const arcs = pairs.map(([a, b]) => {
-        const A = spots[a], B = spots[b];
-        const el = _egNkEl(run, 'div', 'eg-ward-arc eg-ward-arc-warn');
-        const len = Math.hypot(B.x - A.x, B.y - A.y);
-        el.style.left = Math.round(A.x) + 'px';
-        el.style.top = Math.round(A.y - 9) + 'px';
-        el.style.width = Math.round(len) + 'px';
-        el.style.transform = 'rotate(' + Math.atan2(B.y - A.y, B.x - A.x) + 'rad)';
-        return { A, B, el };
+    const cx = spots.reduce((a, s) => a + s.x, 0) / 3, cy = spots.reduce((a, s) => a + s.y, 0) / 3;
+    const base = spots.map(s => ({ a: Math.atan2(s.y - cy, s.x - cx), r: Math.hypot(s.x - cx, s.y - cy) }));
+    const totemEls = spots.map(s => {
+        const el = _egWardenTotemEl(run, s);
+        el.classList.add('eg-ward-totem-hot');
+        return el;
     });
-    _egNkToast('eg_mech_warden_arcs', '🗼⚡ ARC LINK - lightning will snap along the dashed lines. Step off them!', '#fde047');
-    const warnMs = 1200, liveMs = 1400;
+    const pairs = [[0, 1], [1, 2], [2, 0]];
+    const arcs = pairs.map(([a, b]) => {
+        const el = _egNkEl(run, 'div', 'eg-ward-arc eg-ward-arc-warn');
+        return { a, b, el };
+    });
+    const place = () => arcs.forEach(arc => {
+        const A = spots[arc.a], B = spots[arc.b];
+        const len = Math.hypot(B.x - A.x, B.y - A.y);
+        arc.el.style.left = Math.round(A.x) + 'px';
+        arc.el.style.top = Math.round(A.y - 9) + 'px';
+        arc.el.style.width = Math.round(len) + 'px';
+        arc.el.style.transform = 'rotate(' + Math.atan2(B.y - A.y, B.x - A.x) + 'rad)';
+    });
+    place();
+    _egNkToast('eg_mech_warden_arcs', '🗼⚡ ARC LINK - the fence will close in. Get OUT of the triangle and off the lines!', '#fde047');
+    const warnMs = 1100, liveMs = 2200, spin = (p >= 3 ? 1.1 : 0.7);
+    const closeTo = 0.18;                      // triangle shrinks to 18% of its size
     let t = 0, live = false, cd = 0;
     _egNkLoop(run, (dtS) => {
         t += dtS * 1000;
@@ -178,10 +192,20 @@ export function _egMechWardenArcs(monster, phase) {
             arcs.forEach(a => { a.el.classList.remove('eg-ward-arc-warn'); a.el.classList.add('eg-ward-arc-live'); });
         }
         if (live) {
+            const f = Math.min(1, (t - warnMs) / liveMs);
+            const k = 1 - (1 - closeTo) * f;
+            const rot = (t - warnMs) / 1000 * spin;
+            spots.forEach((s, i) => {
+                s.x = cx + Math.cos(base[i].a + rot) * base[i].r * k;
+                s.y = cy + Math.sin(base[i].a + rot) * base[i].r * k;
+                totemEls[i].style.left = Math.round(s.x - 18) + 'px';
+                totemEls[i].style.top = Math.round(s.y - 34) + 'px';
+            });
+            place();
             const c = _egNkPlayerCenter();
-            if (c && t >= cd && arcs.some(a => _egPtSegDist(c.x, c.y, a.A.x, a.A.y, a.B.x, a.B.y) < 9 + 16)) {
-                cd = t + 700;
-                const dealt = _egNkHit([0, 0, 0.13, 0.15][p], 'lightning', level);
+            if (c && t >= cd && arcs.some(a => _egPtSegDist(c.x, c.y, spots[a.a].x, spots[a.a].y, spots[a.b].x, spots[a.b].y) < 9 + 18)) {
+                cd = t + 500;
+                const dealt = _egNkHit([0, 0, 0.24, 0.28][p], 'lightning', level);
                 _egNkAbilityHitToast(dealt, 'The Warden', 'Arc Link');
             }
         }
