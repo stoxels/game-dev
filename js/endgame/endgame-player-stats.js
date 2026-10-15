@@ -758,6 +758,9 @@ export function _egComputePlayerStats() {
         absorptionOnLine: passiveTreeBonuses.absorptionOnLine || 0,
         manaOnLine: passiveTreeBonuses.manaOnLine || 0,
         chargeOnLinePct: passiveTreeBonuses.chargeOnLinePct || 0,
+        enduranceOnLinePct: passiveTreeBonuses.enduranceOnLinePct || 0,
+        frenzyOnLinePct: passiveTreeBonuses.frenzyOnLinePct || 0,
+        powerOnLinePct: passiveTreeBonuses.powerOnLinePct || 0,
         armourPerStreak: passiveTreeBonuses.armourPerStreak || 0,
         // Only counts while no mistake was made this level (block_flawless).
         blockFlawlessPct: (Number(globalThis.mistakeCount) || 0) === 0 ? (passiveTreeBonuses.blockFlawlessPct || 0) : 0,

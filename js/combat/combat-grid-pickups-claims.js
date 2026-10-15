@@ -9,7 +9,7 @@ import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
 import { _egLifeGain } from '../endgame/endgame-leveling.js';
 import { gainMana } from '../classes/class-mana.js';
 import { _renderPlayerHealth } from '../sprite/player_sprite.js';
-import { _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainPowerCharge } from './combat-ailments-state.js';
+import { _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainPowerCharge, _egGetEnduranceCharges, _egGetFrenzyCharges, _egGetPowerCharges } from './combat-ailments-state.js';
 
 // Called from renderCell whenever a cell becomes visually revealed
 // (via an ability, passive ability, or item reveal effect).
@@ -63,14 +63,21 @@ export function _egOnLinesCompleted(lines) {
     if (mana > 0 && globalThis.playerMaxMana > 0) gainMana(mana);
 
     const chance = Math.min(100, s.chargeOnLinePct || 0);
-    if (chance > 0) {
-        const kinds = [
-            () => _egGainEnduranceCharge(s.enduranceChargesMax, s.enduranceDurationPct),
-            () => _egGainFrenzyCharge(s.frenzyChargesMax, s.frenzyDurationPct),
-            () => _egGainPowerCharge(s.powerChargesMax, s.powerDurationPct),
-        ];
-        for (let i = 0; i < n; i++) {
-            if (Math.random() * 100 < chance) kinds[Math.floor(Math.random() * kinds.length)]();
+    // Generic charge_on_line rolls a random kind among those with room under
+    // their cap; the charge-specific nodes roll their own charge.
+    const gainers = [
+        { pct: s.enduranceOnLinePct, room: () => _egGetEnduranceCharges() < Math.max(1, Math.floor(Number(s.enduranceChargesMax) || 0)), gain: () => _egGainEnduranceCharge(s.enduranceChargesMax, s.enduranceDurationPct) },
+        { pct: s.frenzyOnLinePct, room: () => _egGetFrenzyCharges() < Math.max(1, Math.floor(Number(s.frenzyChargesMax) || 0)), gain: () => _egGainFrenzyCharge(s.frenzyChargesMax, s.frenzyDurationPct) },
+        { pct: s.powerOnLinePct, room: () => _egGetPowerCharges() < Math.max(1, Math.floor(Number(s.powerChargesMax) || 0)), gain: () => _egGainPowerCharge(s.powerChargesMax, s.powerDurationPct) },
+    ];
+    for (let i = 0; i < n; i++) {
+        for (const g of gainers) {
+            if ((Number(g.pct) || 0) > 0 && Math.random() * 100 < Math.min(100, g.pct)) g.gain();
+        }
+        if (chance > 0 && Math.random() * 100 < chance) {
+            const open = gainers.filter(g => g.room());
+            const pool = open.length ? open : gainers;
+            pool[Math.floor(Math.random() * pool.length)].gain();
         }
     }
 }

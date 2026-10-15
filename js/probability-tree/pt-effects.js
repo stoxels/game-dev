@@ -618,6 +618,11 @@ export const PT_EFFECT_DEFS = Object.freeze({
     absorption_on_line: { channel: 'absorptionOnLine', en: 'Gain {v} Absorption for each completed Row or Column', de: 'Erhalte {v} Absorption pro abgeschlossener Zeile oder Spalte' },
     mana_on_line: { channel: 'manaOnLine', en: 'Gain {v} Mana for each completed Row or Column', de: 'Erhalte {v} Mana pro abgeschlossener Zeile oder Spalte' },
     charge_on_line: { channel: 'chargeOnLinePct', en: '{v}% Chance to gain a Charge for each completed Row or Column', de: '{v}% Chance auf eine Aufladung pro abgeschlossener Zeile oder Spalte' },
+    // Charge-specific variants: each charge cluster pays out ITS OWN charge
+    // (generic charge_on_line rolls a random kind, ~1/3 each).
+    endurance_on_line: { channel: 'enduranceOnLinePct', en: '{v}% Chance to gain an Endurance Charge for each completed Row or Column', de: '{v}% Chance auf eine Widerstandsladung pro abgeschlossener Zeile oder Spalte' },
+    frenzy_on_line: { channel: 'frenzyOnLinePct', en: '{v}% Chance to gain a Frenzy Charge for each completed Row or Column', de: '{v}% Chance auf eine Raserei-Ladung pro abgeschlossener Zeile oder Spalte' },
+    power_on_line: { channel: 'powerOnLinePct', en: '{v}% Chance to gain a Power Charge for each completed Row or Column', de: '{v}% Chance auf eine Kraftladung pro abgeschlossener Zeile oder Spalte' },
     armour_per_streak: { channel: 'armourPerStreak', en: '+{v} Armour per 10 correct Fills in a row', de: '+{v} Rüstung pro 10 richtigen Füllungen in Folge' },
     block_flawless: { channel: 'blockFlawlessPct', en: '+{v}% Chance to Block while you have made no Mistakes this level', de: '+{v}% Blockchance, solange du in diesem Level keinen Fehler gemacht hast' },
     mistake_heal: { channel: 'mistakeHeal', en: 'Recover {v} Life when you make a Mistake', de: 'Stelle {v} Leben wieder her, wenn du einen Fehler machst' },
@@ -713,6 +718,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
 // against the node WITHOUT these keys.
 export const PT_CROSSOVER_EFFECT_KEYS = Object.freeze([
     'life_on_line', 'absorption_on_line', 'mana_on_line', 'charge_on_line',
+    'endurance_on_line', 'frenzy_on_line', 'power_on_line',
     'armour_per_streak', 'block_flawless', 'mistake_heal', 'damage_per_streak',
     'damage_flawless', 'damage_low_time', 'damage_after_line', 'reveal_projectile_damage',
     'damage_on_mistake', 'time_on_kill', 'time_on_elite', 'freeze_timer_on_stun',
@@ -815,7 +821,7 @@ const PT_EFFECT_ICON_RULES = [
     [/^quick_fill_streak/, '⚡'],
     [/^regen_low_time/, '🩹'],
     [/^mistake_heal/, '💞'],
-    [/^charge_on_line/, '🔋'],
+    [/^(charge|endurance|frenzy|power)_on_line/, '🔋'],
     [/^reveal_projectile_damage/, '🎯'],
     [/^damage_(per_streak|flawless|low_time|after_line|on_mistake)/, '🗡️'],
     [/leech/, '🧛'],

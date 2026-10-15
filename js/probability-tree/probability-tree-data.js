@@ -1716,7 +1716,7 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "block_shield:8",
     "endurance_on_block:25",
-    "charge_on_line:12"
+    "endurance_on_line:12"
    ],
    "tier": "notable"
   },
@@ -3856,7 +3856,7 @@ export const TALENT_TREE_DATA = {
     "endurance_min:1",
     "endurance_on_kill:8",
     "damage_per_endurance:8",
-    "charge_on_line:12"
+    "endurance_on_line:12"
    ],
    "tier": "notable"
   },
@@ -9029,7 +9029,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lesser_resolute_advance_30344",
    "effects": [
     "endurance_duration:20",
-    "charge_on_line:6"
+    "endurance_on_line:6"
    ],
    "tier": "small"
   },
@@ -15240,7 +15240,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_lesser_frenzied_focus_30788",
    "effects": [
     "frenzy_duration:20",
-    "charge_on_line:6"
+    "frenzy_on_line:6"
    ],
    "tier": "small"
   },
@@ -19045,7 +19045,7 @@ export const TALENT_TREE_DATA = {
     "crit_chance_mace:5",
     "stun_chance:5",
     "power_on_stun:10",
-    "charge_on_line:12"
+    "power_on_line:12"
    ],
    "tier": "notable"
   },
@@ -23134,7 +23134,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_power_charge_duration_31401",
    "effects": [
     "power_duration:20",
-    "charge_on_line:6"
+    "power_on_line:6"
    ],
    "tier": "small"
   },
