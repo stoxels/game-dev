@@ -26761,8 +26761,8 @@ export const TALENT_TREE_DATA = {
    "statKey": "keystone_uniform_prior",
    "tier": "keystone",
    "layoutPinned": true,
-   "descEn": "All clue numbers are shuffled between the lines at the start of each level. Every fully completed line restores its true clues.",
-   "descDe": "Alle Hinweiszahlen werden zu Beginn jedes Levels zwischen den Linien gemischt. Jede vollständig abgeschlossene Linie stellt ihre wahren Hinweise wieder her."
+   "descEn": "All clue numbers are shuffled between the lines at the start of each level, but you start with 3 free reveals. Every fully completed line restores its true clues and grants +3 seconds.",
+   "descDe": "Alle Hinweiszahlen werden zu Beginn jedes Levels zwischen den Linien gemischt, aber du beginnst mit 3 kostenlosen Aufdeckungen. Jede vollständig abgeschlossene Linie stellt ihre wahren Hinweise wieder her und gewährt +3 Sekunden."
   },
   {
    "id": 41162,

@@ -619,6 +619,9 @@ export function _ptxRunExpansion() {
         if (!has('keystone_uniform_prior') || !S.clueOriginals) return;
         const store = type === 'row' ? S.clueOriginals.rows : S.clueOriginals.cols;
         if (store[idx]) writeLineSpans(type, idx, store[idx]);
+        // Upside: every line you complete also pays +3 seconds.
+        addSecs(3);
+        toast('❔ Uniform Prior: line solved, clues restored +3s');
     });
 
     //--------------------------------------------------------------------------
@@ -792,7 +795,9 @@ export function _ptxRunExpansion() {
         const colPerm = shuffleArr([...colTexts]);
         for (let c = 0; c < cols; c++) writeLineSpans('col', c, colPerm[c]);
 
-        toast('❔ Uniform Prior: clues scrambled - solve lines to restore them');
+        // Upside: the level opens with 3 free reveals to anchor the shuffled clues.
+        revealTiles(3);
+        toast('❔ Uniform Prior: clues scrambled, 3 free reveals - solve lines to restore them (+3s each)');
     }
 
     function shuffleArr(arr) {
