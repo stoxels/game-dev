@@ -438,7 +438,7 @@ export function _ptTooltipBuildHtml(id) {
         ${typeHtml}
         <div style="font-size:13px;font-weight:bold;color:#66fcf1;margin-bottom:5px;">${name}</div>
         ${desc ? `<div style="color:#bba870;">${desc}</div>` : ''}
-        <div style="margin-top:6px;font-size:10px;letter-spacing:0.5px;color:#7d8da1;">ID ${id}${def && def.statKey ? ' · ' + def.statKey : ''}</div>
+        <div style="margin-top:6px;font-size:10px;letter-spacing:0.5px;color:#7d8da1;">ID ${id}</div>
         ${reworkHtml}
         ${statusHtml}
     `;
