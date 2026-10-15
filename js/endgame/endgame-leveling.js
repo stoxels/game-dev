@@ -869,7 +869,6 @@ export function _egRenderLevelHUD() {
 export function _egBuildLevelBtnTooltipHTML() {
     const lvl = _egGetPlayerLevel();
     const xp = _egGetPlayerXP();
-    const pts = _egGetUnspentPoints();
     const atMax = lvl >= EG_LEVELING_CONFIG.maxLevel;
     const xpLine = atMax
         ? t('eg_lvl_max_level')
@@ -886,9 +885,6 @@ export function _egBuildLevelBtnTooltipHTML() {
     </div>
     <div class="eg-tt-section">
         <div class="eg-tt-mod">${t('eg_lvl_short').replace('{n}', lvl)} · ${xpLine}</div>
-        <div class="eg-tt-mod">${pts > 0
-            ? t('eg_lvl_points_available').replace('{n}', pts)
-            : t('eg_lvl_no_points')}</div>
     </div>
     ${xpTiers ? `<div class="eg-xp-tiers">${xpTiers}</div>` : ''}
     <div class="eg-tt-section">${t('eg_lvl_hint')}</div>
