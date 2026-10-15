@@ -471,6 +471,79 @@ const RIGS = {
         },
     },
     // <<< rig boss_entropy
+    // >>> rig boss_gourmet
+    boss_gourmet: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 8, y: 82, px: 250, py: 330, par: null },
+            { n: 'plateL', x: 5, y: 108, px: 60, py: 255, par: 'body' },
+            { n: 'plateR', x: 338, y: 222, px: 370, py: 300, par: 'body' },
+        ],
+        mechanics: {
+            gourmet_gulp: { anim: 'gou_gulp', ms: () => 2400 },
+            corrupt_cells: { anim: 'gou_corrupt', ms: () => 1900 },
+        },
+    },
+    // <<< rig boss_gourmet
+    // >>> rig boss_exarch
+    boss_exarch: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 158, y: 183, px: 262, py: 330, par: null },
+            { n: 'crown', x: 181, y: 92, px: 262, py: 190, par: 'body' },
+            { n: 'book', x: 13, y: 178, px: 150, py: 310, par: 'body' },
+            { n: 'staff', x: 325, y: 111, px: 385, py: 320, par: 'body' },
+        ],
+        mechanics: {
+            constriction: { anim: 'exa_constrict', ms: () => 2400 },
+            prior_bomb: { anim: 'exa_bomb', ms: () => 1900 },
+        },
+    },
+    // <<< rig boss_exarch
+    // >>> rig boss_gale
+    boss_gale: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 148, y: 96, px: 255, py: 360, par: null },
+            { n: 'cloakL', x: 17, y: 223, px: 190, py: 290, par: 'body' },
+            { n: 'cloakR', x: 343, y: 213, px: 350, py: 300, par: 'body' },
+            { n: 'scrap', x: 378, y: 156, px: 415, py: 210, par: 'body' },
+        ],
+        mechanics: {
+            gale_vault: { anim: 'gal_vault', ms: () => 2100 },
+            probability_shift: { anim: 'gal_shift', ms: () => 1800 },
+        },
+    },
+    // <<< rig boss_gale
+    // >>> rig boss_gambler
+    boss_gambler: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 96, y: 138, px: 255, py: 330, par: null },
+            { n: 'hat', x: 140, y: 4, px: 250, py: 125, par: 'body' },
+            { n: 'cardArm', x: 56, y: 190, px: 190, py: 285, par: 'body' },
+            { n: 'diceArm', x: 314, y: 145, px: 335, py: 278, par: 'body' },
+        ],
+        mechanics: {
+            loaded_dice: { anim: 'gam_dice', ms: () => 1900 },
+            soul_tithe: { anim: 'gam_tithe', ms: () => 2400 },
+        },
+    },
+    // <<< rig boss_gambler
+    // >>> rig boss_executioner
+    boss_executioner: {
+        S: 1, ox: 0, oy: 0,
+        parts: [
+            { n: 'body', x: 138, y: 116, px: 280, py: 330, par: null },
+            { n: 'axe', x: 4, y: 102, px: 350, py: 135, par: 'body' },
+            { n: 'cape', x: 358, y: 254, px: 385, py: 280, par: 'body' },
+        ],
+        mechanics: {
+            axe_pendulum: { anim: 'exe_pendulum', ms: () => 2800 },
+            prior_bomb: { anim: 'exe_bomb', ms: () => 2000 },
+        },
+    },
+    // <<< rig boss_executioner
     boss_guardian: {
         S: 0.382, ox: 1, oy: 115,
         parts: [
@@ -3557,6 +3630,437 @@ Object.assign(FX, {
     },
 });
 // <<< poses boss_entropy
+
+// >>> poses boss_gourmet
+// ---- The Gourmet -----------------------------------------------------------
+// Gourmet Gulp: both platters swing in toward the maw, the body leans in and
+//   gulps; cherries stream into the mouth and a swallow pulse runs down.
+// Corrupt Cells: the platters shake, the body shudders and purple rot spores
+//   spill out over the board.
+Object.assign(POSES, {
+    gou_gulp(P, u) {
+        const swing = ease(Math.min(u / 0.3, 1)) * (1 - ease((u - 0.8) / 0.2));
+        const gulp = Math.sin(Math.max(0, Math.min(1, (u - 0.35) / 0.4)) * Math.PI * 3);
+        P.plateL.rot = 32 * swing; P.plateL.dx = 16 * swing; P.plateL.dy = -6 * swing;
+        P.plateR.rot = -32 * swing; P.plateR.dx = -16 * swing; P.plateR.dy = -6 * swing;
+        P.body.dy = 6 * swing + 6 * Math.max(0, gulp) * (u > 0.35 && u < 0.8 ? 1 : 0);
+        P.body.rot = -2 * swing;
+    },
+    gou_corrupt(P, u) {
+        const env = ease(Math.min(u / 0.15, 1, (1 - u) / 0.2)), w = Math.sin(u * Math.PI * 14);
+        P.plateL.rot = -14 * env + 10 * w * env; P.plateL.dy = -8 * env;
+        P.plateR.rot = 14 * env - 10 * w * env; P.plateR.dy = -8 * env;
+        P.body.dx = 4 * w * env; P.body.rot = 2 * Math.sin(u * Math.PI * 9) * env;
+    },
+});
+Object.assign(FX, {
+    gou_gulp(ctx, u) {
+        const env = Math.min(ease(u / 0.12), 1 - ease((u - 0.85) / 0.15));
+        // cherries fly from both plates into the maw (190, 225)
+        const srcs = [[70, 150], [95, 175], [420, 240], [400, 250]];
+        for (let i = 0; i < 8; i++) {
+            const s = srcs[i % 4], ph = (u * 2.2 + i * 0.13) % 1, k = ease(ph);
+            const x = s[0] + (190 - s[0]) * k, y = s[1] + (225 - s[1]) * k - Math.sin(k * Math.PI) * 30;
+            const r = 11 * (1 - 0.5 * k);
+            ctx.fillStyle = 'rgba(230,40,70,' + (0.95 * env * (1 - k * 0.5)) + ')';
+            ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+            ctx.strokeStyle = 'rgba(255,200,200,' + (0.8 * env) + ')'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(x - 3, y - 3, r * 0.5, 3.4, 4.8); ctx.stroke();
+        }
+        // suction rings converging on the maw
+        for (let i = 0; i < 3; i++) {
+            const ph = (u * 2 + i / 3) % 1, rr = 150 * (1 - ph);
+            ctx.strokeStyle = 'rgba(255,170,220,' + (0.5 * ph * env) + ')'; ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.ellipse(190, 225, rr, rr * 0.7, 0, 0, 7); ctx.stroke();
+        }
+        // swallow pulse down the belly
+        if (u > 0.4 && u < 0.85) {
+            const k = (u - 0.4) / 0.45;
+            ctx.fillStyle = 'rgba(255,120,190,' + (0.45 * (1 - k)) + ')';
+            ctx.beginPath(); ctx.ellipse(210, 280 + k * 90, 40, 25, 0, 0, 7); ctx.fill();
+        }
+        return 0;
+    },
+    gou_corrupt(ctx, u) {
+        const env = Math.min(ease(u / 0.15), 1 - ease((u - 0.8) / 0.2));
+        // dark violet haze from the maw
+        const g = ctx.createRadialGradient(190, 230, 10, 190, 230, 200);
+        g.addColorStop(0, 'rgba(150,40,200,' + (0.5 * env) + ')'); g.addColorStop(1, 'rgba(60,0,90,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(190, 230, 200, 0, 7); ctx.fill();
+        // rot spores flung outward, plus corrupted cell squares on the floor
+        for (let i = 0; i < 14; i++) {
+            const a = i * 2.4, ph = (u * 1.4 + i * 0.07) % 1, d = 40 + ph * 230;
+            const x = 190 + Math.cos(a) * d, y = 230 + Math.sin(a) * d * 0.8 - ph * 30;
+            ctx.fillStyle = 'rgba(' + (i % 2 ? '170,60,230' : '90,20,120') + ',' + (0.85 * (1 - ph) * env) + ')';
+            ctx.beginPath(); ctx.arc(x, y, 9 - ph * 5, 0, 7); ctx.fill();
+        }
+        for (let i = 0; i < 5; i++) {
+            const k = ease((u - 0.3 - i * 0.07) / 0.2);
+            if (k <= 0) continue;
+            const x = 90 + i * 80, y = 450 + (i % 2) * 20;
+            ctx.fillStyle = 'rgba(110,30,150,' + (0.7 * k * env) + ')'; ctx.strokeStyle = 'rgba(220,120,255,' + (0.9 * k * env) + ')'; ctx.lineWidth = 3;
+            ctx.fillRect(x - 24, y - 12, 48, 26); ctx.strokeRect(x - 24, y - 12, 48, 26);
+        }
+        return u > 0.3 && u < 0.4 ? 0.3 * (1 - (u - 0.3) / 0.1) : 0;
+    },
+});
+// <<< poses boss_gourmet
+
+// >>> poses boss_exarch
+// ---- The Exarch ------------------------------------------------------------
+// Constriction: book and staff are thrown wide, then both snap inward while a
+//   ring of fire closes in around the whole figure.
+// Prior Bomb: the staff swings back, the die-crystal charges, then it is
+//   lobbed out as a fused bomb that detonates.
+Object.assign(POSES, {
+    exa_constrict(P, u) {
+        const open = ease(u / 0.3), snap = ease((u - 0.5) / 0.15), rec = ease((u - 0.75) / 0.25);
+        const k = u < 0.5 ? open : 1 - snap * 1.4;
+        const f = (1 - rec);
+        P.book.rot = -30 * k * f; P.book.dx = -14 * k * f; P.book.dy = -8 * k * f;
+        P.staff.rot = 28 * k * f; P.staff.dx = 14 * k * f; P.staff.dy = -8 * k * f;
+        P.crown.rot = 6 * Math.sin(u * 30) * (u < 0.75 ? 1 : 0) * f; P.crown.dy = -6 * open * f;
+        P.body.dy = 3 * snap * f;
+    },
+    exa_bomb(P, u) {
+        const back = ease(u / 0.35), swing = ease((u - 0.4) / 0.12), rec = ease((u - 0.65) / 0.35);
+        const k = (u < 0.4 ? back : 1 - swing * 1.5) * (1 - rec);
+        P.staff.rot = -34 * k; P.staff.dx = -8 * k; P.staff.dy = -6 * k;
+        P.book.rot = 18 * k; P.book.dy = -10 * k;
+        P.crown.rot = -5 * k;
+        P.body.rot = 3 * k;
+    },
+});
+Object.assign(FX, {
+    exa_constrict(ctx, u) {
+        const e = ease(u / 0.9);
+        const r = 330 - 190 * e, a = Math.min(1, u / 0.1) * (1 - ease((u - 0.9) / 0.1));
+        ctx.save();
+        ctx.lineWidth = 14 + 6 * Math.sin(u * 40);
+        ctx.strokeStyle = 'rgba(255,120,30,' + (0.85 * a) + ')';
+        ctx.beginPath(); ctx.arc(256, 300, r, 0, 7); ctx.stroke();
+        ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(255,230,140,' + (0.9 * a) + ')';
+        ctx.beginPath(); ctx.arc(256, 300, r, 0, 7); ctx.stroke();
+        // flame tongues pointing inward
+        for (let i = 0; i < 16; i++) {
+            const an = i / 16 * 6.283 + u * 2, l = 28 + 10 * Math.sin(u * 25 + i);
+            ctx.strokeStyle = 'rgba(255,160,40,' + (0.8 * a) + ')'; ctx.lineWidth = 7;
+            ctx.beginPath();
+            ctx.moveTo(256 + Math.cos(an) * r, 300 + Math.sin(an) * r);
+            ctx.lineTo(256 + Math.cos(an) * (r - l), 300 + Math.sin(an) * (r - l)); ctx.stroke();
+        }
+        // book glow
+        const g = ctx.createRadialGradient(110, 270, 4, 110, 270, 80);
+        g.addColorStop(0, 'rgba(255,170,50,' + (0.6 * a) + ')'); g.addColorStop(1, 'rgba(255,100,20,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(110, 270, 80, 0, 7); ctx.fill();
+        ctx.restore();
+        return u > 0.55 && u < 0.7 ? 0.3 * (1 - Math.abs(u - 0.62) / 0.08) : 0;
+    },
+    exa_bomb(ctx, u) {
+        const charge = ease(u / 0.4);
+        // crystal in the staff head charges
+        const g = ctx.createRadialGradient(420, 215, 4, 420, 215, 20 + 60 * charge);
+        const ca = u < 0.45 ? charge : 0;
+        g.addColorStop(0, 'rgba(180,255,235,' + (0.9 * ca) + ')'); g.addColorStop(1, 'rgba(60,200,180,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(420, 215, 80, 0, 7); ctx.fill();
+        // thrown bomb: arc from the staff to the left-front, then explosion
+        const t = ease((u - 0.45) / 0.35);
+        let fl = 0;
+        if (u >= 0.45 && u < 0.8) {
+            const x = 420 - 330 * t, y = 215 - 150 * Math.sin(t * Math.PI) + 220 * t;
+            ctx.fillStyle = '#2a2a30'; ctx.strokeStyle = '#ff9a2a'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.arc(x, y, 20, 0, 7); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = '#ffd36b'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(x + 8, y - 17); ctx.lineTo(x + 18, y - 30); ctx.stroke();
+            ctx.fillStyle = 'rgba(255,200,60,' + (0.6 + 0.4 * Math.sin(u * 80)) + ')';
+            ctx.beginPath(); ctx.arc(x + 18, y - 31, 6, 0, 7); ctx.fill();
+        } else if (u >= 0.8) {
+            const k = (u - 0.8) / 0.2, x = 90, y = 370;
+            ctx.fillStyle = 'rgba(255,140,30,' + (0.8 * (1 - k)) + ')';
+            ctx.beginPath(); ctx.arc(x, y, 20 + 90 * k, 0, 7); ctx.fill();
+            ctx.strokeStyle = 'rgba(255,240,180,' + (0.9 * (1 - k)) + ')'; ctx.lineWidth = 8 * (1 - k) + 1;
+            ctx.beginPath(); ctx.arc(x, y, 30 + 150 * k, 0, 7); ctx.stroke();
+            fl = 0.35 * (1 - k);
+        }
+        return fl;
+    },
+});
+// <<< poses boss_exarch
+
+// >>> poses boss_gale
+// ---- The Gale --------------------------------------------------------------
+// Gale Vault: the Gale coils low, vaults upward with both cloaks whipping
+//   down, and leaves twin cyclone funnels spinning on either side.
+// Probability Shift: runes and loose pages flicker as numbers reshuffle.
+Object.assign(POSES, {
+    gal_vault(P, u) {
+        const crouch = ease(u / 0.22), leap = ease((u - 0.22) / 0.2), land = ease((u - 0.62) / 0.3);
+        const lift = leap * (1 - land);
+        P.body.dy = 14 * crouch * (1 - leap) - 44 * lift;
+        P.body.rot = -4 * crouch * (1 - leap) + 3 * lift;
+        const flap = Math.sin(u * Math.PI * 6) * 0.5;
+        // cloaks sweep up while coiling, then whip down when launching
+        P.cloakL.rot = 26 * crouch * (1 - leap) - 30 * lift + 8 * flap * lift;
+        P.cloakR.rot = -26 * crouch * (1 - leap) + 30 * lift - 8 * flap * lift;
+        P.cloakL.dy = -6 * crouch * (1 - leap);
+        P.cloakR.dy = -6 * crouch * (1 - leap);
+        P.scrap.rot = 25 * Math.sin(u * Math.PI * 5) * (u > 0.2 ? 1 : 0.3);
+        P.scrap.dy = -30 * lift + 4 * Math.sin(u * 20);
+        P.scrap.dx = 14 * Math.sin(u * 12);
+    },
+    gal_shift(P, u) {
+        const env = ease(Math.min(u / 0.12, 1, (1 - u) / 0.2)), w = Math.sin(u * Math.PI * 8);
+        P.cloakL.rot = 14 * w * env;
+        P.cloakR.rot = -14 * w * env;
+        P.scrap.rot = 30 * Math.sin(u * Math.PI * 11) * env;
+        P.scrap.dx = 12 * w * env; P.scrap.dy = -8 * Math.abs(w) * env;
+        P.body.rot = 2.5 * Math.sin(u * Math.PI * 4) * env;
+        P.body.dy = -5 * Math.abs(w) * env;
+    },
+});
+Object.assign(FX, {
+    gal_vault(ctx, u) {
+        const crouch = ease(u / 0.22), leap = ease((u - 0.22) / 0.2), land = ease((u - 0.62) / 0.3);
+        // gathering wind streaks around the coiling body
+        if (u < 0.3) {
+            ctx.strokeStyle = 'rgba(190,240,255,' + (0.8 * crouch) + ')'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+            for (let i = 0; i < 6; i++) {
+                const a = i * 1.05 + u * 14, r = 150 - 60 * crouch;
+                ctx.beginPath(); ctx.arc(255, 340, r + (i % 2) * 22, a, a + 0.9); ctx.stroke();
+            }
+        }
+        // twin funnels rise on both sides after the launch
+        const fa = ease((u - 0.38) / 0.2) * (1 - 0.5 * ease((u - 0.85) / 0.15));
+        [[70, 400, 1], [450, 400, -1]].forEach(f => {
+            if (fa <= 0) return;
+            for (let k = 0; k < 7; k++) {
+                const t = k / 6, w = (16 + 46 * t) * fa, y = f[1] - 150 * fa * (1 - t);
+                const sw = Math.sin(u * 22 + k * 1.3) * 10 * f[2];
+                ctx.strokeStyle = 'rgba(170,235,250,' + (0.75 * fa) + ')'; ctx.lineWidth = 6;
+                ctx.beginPath(); ctx.ellipse(f[0] + sw, y, w, 9 + 5 * t, 0, 0, 7); ctx.stroke();
+            }
+            ctx.fillStyle = 'rgba(120,200,230,' + (0.18 * fa) + ')';
+            ctx.beginPath(); ctx.moveTo(f[0] - 16, f[1] - 150 * fa); ctx.lineTo(f[0] + 16, f[1] - 150 * fa); ctx.lineTo(f[0] + 62, f[1]); ctx.lineTo(f[0] - 62, f[1]); ctx.closePath(); ctx.fill();
+        });
+        // landing ring
+        if (land > 0 && land < 1) {
+            ctx.strokeStyle = 'rgba(200,250,255,' + (0.7 * (1 - land)) + ')'; ctx.lineWidth = 7 * (1 - land) + 1;
+            ctx.beginPath(); ctx.ellipse(255, 430, 40 + land * 190, 10 + land * 36, 0, 0, 7); ctx.stroke();
+        }
+        return leap > 0.05 && leap < 0.9 ? 0.18 * (1 - leap) : 0;
+    },
+    gal_shift(ctx, u) {
+        const env = ease(Math.min(u / 0.12, 1, (1 - u) / 0.2));
+        const glyphs = ['Σ', 'μ', 'R', 'Δ', 'π', 'σ'];
+        ctx.font = 'bold 36px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        for (let i = 0; i < 7; i++) {
+            const ph = (u * 2.2 + i * 0.14) % 1;
+            const ax = 180 + (i * 47) % 190, ay = 270 + ((i * 59) % 120);
+            const bx = 60 + (i * 71) % 400, by = 120 + ((i * 83) % 300);
+            const out = 1 - ease(ph / 0.35), inn = ease((ph - 0.5) / 0.3);
+            ctx.fillStyle = 'rgba(255,230,120,' + (0.9 * out * env) + ')';
+            ctx.fillText(glyphs[i % 6], ax, ay);
+            ctx.fillStyle = 'rgba(120,255,240,' + (0.9 * inn * env) + ')';
+            ctx.fillText(glyphs[(i + 2) % 6], bx, by);
+        }
+        // little wind swirls near the scrap
+        ctx.strokeStyle = 'rgba(170,235,250,' + (0.6 * env) + ')'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+        for (let i = 0; i < 3; i++) {
+            const a = u * 12 + i * 2.1;
+            ctx.beginPath(); ctx.arc(415, 195, 50 + i * 14, a, a + 1.2); ctx.stroke();
+        }
+        return 0;
+    },
+});
+// <<< poses boss_gale
+
+
+
+
+// >>> poses boss_gambler
+// ---- The Gambler -----------------------------------------------------------
+// Loaded Dice: the dice hand flicks up and tosses the three dice, they tumble
+//   and settle with a gold "rigged" glint while the card hand fans and the hat tips.
+// Soul Tithe: the card hand lifts the ante, the open palm beckons, and violet
+//   soul wisps stream from below into the palm and the EV coin on the chest.
+Object.assign(POSES, {
+    gam_dice(P, u) {
+        const wind = ease(u / 0.2), toss = ease((u - 0.2) / 0.12), rest = ease((u - 0.65) / 0.35);
+        const k = 1 - rest;
+        // wind down, then flick up
+        P.diceArm.rot = (14 * wind * (1 - toss) - 34 * toss) * k;
+        P.diceArm.dy = (8 * wind * (1 - toss) - 12 * toss) * k;
+        P.cardArm.rot = 16 * Math.sin(u * Math.PI * 4) * k * ease(u / 0.1);
+        P.cardArm.dy = -5 * Math.abs(Math.sin(u * Math.PI * 4)) * k;
+        P.hat.rot = -9 * Math.sin(Math.min(1, u / 0.5) * Math.PI) * k;
+        P.hat.dy = -4 * Math.sin(Math.min(1, u / 0.5) * Math.PI) * k;
+        P.body.rot = -2.5 * toss * k;
+        P.body.dy = 3 * wind * k - 4 * toss * k;
+    },
+    gam_tithe(P, u) {
+        const env = ease(Math.min(u / 0.2, 1, (1 - u) / 0.25));
+        const w = Math.sin(u * Math.PI * 6);
+        P.cardArm.rot = 32 * env;
+        P.cardArm.dy = -8 * env;
+        P.diceArm.rot = (-22 + 12 * w) * env;
+        P.diceArm.dy = -10 * env;
+        P.hat.rot = 7 * env + 3 * w * env;
+        P.body.rot = -3 * env;
+        P.body.dy = 4 * env * Math.abs(w);
+    },
+});
+Object.assign(FX, {
+    gam_dice(ctx, u) {
+        // three dice tumble up from the open hand and settle back down
+        const t = (u - 0.2) / 0.65;
+        const starts = [[400, 235], [415, 210], [385, 215]];
+        const ends = [[375, 205], [425, 195], [395, 165]];
+        if (t > 0 && t < 1.1) {
+            for (let i = 0; i < 3; i++) {
+                const tt = Math.min(1, Math.max(0, t - i * 0.06));
+                const arc = Math.sin(tt * Math.PI);
+                const x = starts[i][0] + (ends[i][0] - starts[i][0]) * ease(tt) + (i - 1) * 25 * arc;
+                const y = starts[i][1] + (ends[i][1] - starts[i][1]) * ease(tt) - 150 * arc;
+                const s = 15 + (u > 0.6 ? 3 : 0);
+                ctx.save(); ctx.translate(x, y); ctx.rotate(tt * (6 + i * 2) * (i % 2 ? -1 : 1));
+                ctx.fillStyle = 'rgba(255,248,220,0.95)'; ctx.strokeStyle = 'rgba(30,40,40,0.9)'; ctx.lineWidth = 3;
+                ctx.fillRect(-s, -s, s * 2, s * 2); ctx.strokeRect(-s, -s, s * 2, s * 2);
+                ctx.fillStyle = '#222';
+                const pips = 1 + ((Math.floor(tt * 12) + i * 2) % 6);
+                for (let p = 0; p < Math.min(pips, 5); p++) {
+                    ctx.beginPath(); ctx.arc(((p % 3) - 1) * 9, (Math.floor(p / 3) - 0.5) * 12, 3, 0, 7); ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+        // rigged glint once they land
+        if (u > 0.62) {
+            const k = (u - 0.62) / 0.38;
+            const a = Math.sin(k * Math.PI);
+            const g = ctx.createRadialGradient(400, 200, 4, 400, 200, 90);
+            g.addColorStop(0, 'rgba(255,215,90,' + (0.75 * a) + ')'); g.addColorStop(1, 'rgba(255,190,40,0)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(400, 200, 90, 0, 7); ctx.fill();
+            ctx.strokeStyle = 'rgba(255,240,170,' + a + ')'; ctx.lineWidth = 4;
+            for (let i = 0; i < 4; i++) {
+                const an = i * Math.PI / 2 + 0.6, r1 = 30 + 20 * k, r2 = r1 + 18;
+                ctx.beginPath(); ctx.moveTo(400 + Math.cos(an) * r1, 200 + Math.sin(an) * r1);
+                ctx.lineTo(400 + Math.cos(an) * r2, 200 + Math.sin(an) * r2); ctx.stroke();
+            }
+        }
+        // a few chips scatter from the card hand
+        for (let i = 0; i < 4; i++) {
+            const k = Math.min(1, Math.max(0, (u - 0.3 - i * 0.06) / 0.4));
+            if (k <= 0 || k >= 1) continue;
+            const x = 110 - 40 * k * (i + 1) / 2, y = 230 - 60 * Math.sin(k * Math.PI) + 40 * k;
+            ctx.fillStyle = 'rgba(255,210,80,' + (1 - k) + ')'; ctx.strokeStyle = 'rgba(120,80,0,' + (1 - k) + ')'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.ellipse(x, y, 11, 8, 0, 0, 7); ctx.fill(); ctx.stroke();
+        }
+        return 0;
+    },
+    gam_tithe(ctx, u) {
+        const env = ease(Math.min(u / 0.2, 1, (1 - u) / 0.25));
+        // violet aura around the grasping palm
+        const g = ctx.createRadialGradient(410, 285, 4, 410, 285, 80);
+        g.addColorStop(0, 'rgba(190,110,255,' + (0.6 * env) + ')'); g.addColorStop(1, 'rgba(120,40,200,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(410, 285, 80, 0, 7); ctx.fill();
+        // soul wisps streaming up from below into the palm, then to the chest coin
+        for (let i = 0; i < 7; i++) {
+            const k = ((u * 1.6 + i / 7) % 1);
+            const sx = 120 + i * 50, sy = 470;
+            const tx = i % 2 ? 410 : 310, ty = i % 2 ? 285 : 385;
+            const x = sx + (tx - sx) * ease(k) + Math.sin(k * 9 + i) * 14;
+            const y = sy + (ty - sy) * ease(k);
+            const a = Math.sin(k * Math.PI) * env;
+            ctx.fillStyle = 'rgba(210,150,255,' + (0.85 * a) + ')';
+            ctx.beginPath(); ctx.ellipse(x, y, 7, 11, 0, 0, 7); ctx.fill();
+            ctx.fillStyle = 'rgba(160,90,240,' + (0.35 * a) + ')';
+            ctx.beginPath(); ctx.ellipse(x, y + 14, 4, 12, 0, 0, 7); ctx.fill();
+        }
+        // ante: stack of gold chips floats above the raised card hand
+        for (let i = 0; i < 3; i++) {
+            const y = 170 - i * 9 - 10 * Math.sin(u * 8 + i);
+            ctx.fillStyle = 'rgba(255,205,70,' + (0.95 * env) + ')'; ctx.strokeStyle = 'rgba(110,70,0,' + env + ')'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.ellipse(115, y, 20, 8, 0, 0, 7); ctx.fill(); ctx.stroke();
+        }
+        // chest coin pulses as it drinks
+        const p = 0.5 + 0.5 * Math.sin(u * 30);
+        ctx.strokeStyle = 'rgba(225,170,255,' + (0.7 * env * p) + ')'; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.arc(312, 392, 28 + 6 * p, 0, 7); ctx.stroke();
+        return 0.12 * Math.max(0, 1 - Math.abs(u - 0.5) * 8) * 0;
+    },
+});
+// <<< poses boss_gambler
+
+// >>> poses boss_executioner
+// ---- The Executioner -------------------------------------------------------
+// Axe Pendulum: the great axe is heaved back, then swings like a pendulum
+//   three times across the lower arena, a blade arc glowing beneath it.
+// Prior Bomb: the cape snaps, a chained die is yanked loose and lobbed to the
+//   floor where it detonates.
+Object.assign(POSES, {
+    exe_pendulum(P, u) {
+        const rec = ease((u - 0.88) / 0.12);
+        const sw = u < 0.18 ? -ease(u / 0.18) : -Math.cos((u - 0.18) / 0.7 * Math.PI * 3) * (1 - 0.5 * (u - 0.18));
+        P.axe.rot = 30 * sw * (1 - rec);
+        P.axe.dx = 8 * sw * (1 - rec);
+        P.body.rot = 6 * sw * (1 - rec);
+        P.body.dy = -3 * Math.abs(sw) * (1 - rec);
+        P.cape.rot = -10 * sw * (1 - rec);
+    },
+    exe_bomb(P, u) {
+        const wind = ease(u / 0.3), snap = ease((u - 0.3) / 0.1), rec = ease((u - 0.6) / 0.4);
+        const k = (wind - snap) * (1 - rec);
+        P.cape.rot = (-34 * wind + 62 * snap) * (1 - rec);
+        P.cape.dx = (-8 * wind + 10 * snap) * (1 - rec);
+        P.body.rot = (-6 * wind + 9 * snap) * (1 - rec);
+        P.axe.rot = (-16 * wind + 22 * snap) * (1 - rec);
+        P.body.dy = -3 * k;
+    },
+});
+Object.assign(FX, {
+    exe_pendulum(ctx, u) {
+        const env = ease(Math.min((u - 0.1) / 0.1, 1, (1 - u) / 0.12));
+        if (env <= 0) return 0;
+        const sw = u < 0.18 ? -ease(u / 0.18) : -Math.cos((u - 0.18) / 0.7 * Math.PI * 3) * (1 - 0.5 * (u - 0.18));
+        // pendulum track: arc across the lower arena
+        ctx.strokeStyle = 'rgba(255,90,60,' + (0.55 * env) + ')'; ctx.lineWidth = 6;
+        ctx.setLineDash([16, 12]);
+        ctx.beginPath(); ctx.arc(256, -60, 470, Math.PI * 0.2, Math.PI * 0.8); ctx.stroke();
+        ctx.setLineDash([]);
+        // glowing blade at the current swing position
+        const a = Math.PI / 2 - sw * 0.9, bx = 256 + Math.cos(a) * 470, by = -60 + Math.sin(a) * 470;
+        ctx.strokeStyle = 'rgba(200,200,210,' + (0.5 * env) + ')'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(256, -60); ctx.lineTo(bx, by); ctx.stroke();
+        const g = ctx.createRadialGradient(bx, by, 4, bx, by, 70);
+        g.addColorStop(0, 'rgba(255,120,70,' + (0.8 * env) + ')'); g.addColorStop(1, 'rgba(255,60,30,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(bx, by, 70, 0, 7); ctx.fill();
+        return 0;
+    },
+    exe_bomb(ctx, u) {
+        const t = (u - 0.4) / 0.35;
+        if (t > 0 && t < 1) {
+            const x = 440 - 230 * t, y = 280 + 170 * t - 200 * Math.sin(t * Math.PI);
+            ctx.save(); ctx.translate(x, y); ctx.rotate(t * 9);
+            ctx.fillStyle = '#2a2a30'; ctx.strokeStyle = '#ff7043'; ctx.lineWidth = 4;
+            ctx.fillRect(-18, -18, 36, 36); ctx.strokeRect(-18, -18, 36, 36);
+            ctx.fillStyle = '#ff7043';
+            ctx.beginPath(); ctx.arc(-6, -6, 4, 0, 7); ctx.arc(6, 6, 4, 0, 7); ctx.fill();
+            ctx.restore();
+            ctx.fillStyle = 'rgba(255,200,60,0.9)';
+            ctx.beginPath(); ctx.arc(x + 14, y - 26, 5 + (Math.sin(u * 90) + 1) * 2, 0, 7); ctx.fill();
+        }
+        if (t >= 1) {
+            const k = Math.min(1, (t - 1) / 0.6);
+            ctx.strokeStyle = 'rgba(255,130,60,' + (0.85 * (1 - k)) + ')'; ctx.lineWidth = 7 * (1 - k) + 1;
+            ctx.beginPath(); ctx.ellipse(210, 450, 20 + k * 110, 8 + k * 30, 0, 0, 7); ctx.stroke();
+            ctx.fillStyle = 'rgba(255,200,80,' + (0.8 * (1 - k)) + ')';
+            ctx.beginPath(); ctx.arc(210, 440, 30 * (1 - k) + 6, 0, 7); ctx.fill();
+            return 0.25 * (1 - k);
+        }
+        return 0;
+    },
+});
+// <<< poses boss_executioner
 
 const SHAKE = { slam: (u) => (u >= 0.5 ? 9 * Math.max(0, 1 - (u - 0.5) * 4) : 0) };
 
