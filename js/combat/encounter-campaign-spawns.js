@@ -35,15 +35,15 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     // this power so gear still feels strong without deleting the monsters
     // (1 = monsters always take the same number of hits, 0 = old behaviour).
     gearScaleExponent: 0.85,
-    countBase: 2,
-    countPerWorlds: 4,        // +1 monster every N worlds
-    countMax: 5,
+    countBase: 3,
+    countPerWorlds: 3,        // +1 monster every N worlds
+    countMax: 7,
     // Large puzzles run long, so they get extra monsters: +1 per this many
     // solution cells (up to sizeBonusMax) on top of the world count, beyond
     // countMax.
-    cellsPerExtraMonster: 45,
-    sizeBonusMax: 3,
-    minCellsPerMonster: 6,    // small puzzles support fewer monsters
+    cellsPerExtraMonster: 35,
+    sizeBonusMax: 4,
+    minCellsPerMonster: 5,    // small puzzles support fewer monsters
     damageBase: 7,            // per-hit damage at monster level 1 (pass 2: was 6)
     damagePerLevel: 0.38,     // +damage per monster level (pass 2: was 0.32)
     chargeMult: 1.0,          // campaign monsters wind up as fast as atlas ones (pass 2: was 1.15; player hits already push the bar back)
