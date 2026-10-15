@@ -249,7 +249,7 @@ export function _egCheckLootClaim(row, col) {
         if (typeof _egAddItemToStash === 'function') {
             const prevMute = (typeof window !== 'undefined' ? window._egMuteUniqueToast : false);
             if (typeof window !== 'undefined') window._egMuteUniqueToast = true;
-            _egAddItemToStash(item);
+            _egAddItemToStash(item, { uniqueToInventory: true });
             if (typeof window !== 'undefined') window._egMuteUniqueToast = prevMute;
             item._egStashed = true;
             if (typeof egSaveHubState === 'function') egSaveHubState();
@@ -315,7 +315,7 @@ export function _egFlushRunLootToStash() {
             // Temporarily mute unique toasts by flag
             const prevMute = (typeof window !== 'undefined' ? window._egMuteUniqueToast : false);
             if (isUniq && typeof window !== 'undefined') window._egMuteUniqueToast = true;
-            _egAddItemToStash(item);
+            _egAddItemToStash(item, { uniqueToInventory: true });
             if (typeof window !== 'undefined') window._egMuteUniqueToast = prevMute;
             item._egStashed = true;
             if (isUniq) placedUniq++; else placedInv++;

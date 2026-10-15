@@ -19,7 +19,7 @@ try { Object.defineProperty(globalThis, '_egStashTab', { get() { return _egStash
 try { Object.defineProperty(globalThis, '_egUniqueStash', { get() { return _egUniqueStash; }, set(v) { _egUniqueStash = v; }, configurable: true }); } catch (e) {}
 try { Object.defineProperty(globalThis, '_egUniqueCollected', { get() { return _egUniqueCollected; }, set(v) { _egUniqueCollected = v; }, configurable: true }); } catch (e) {}
 
-import { _egAddUniqueToCollection } from './endgame-hub-uniques.js';
+import { _egAddUniqueToCollection, _egUpdateUniqueTabBadge } from './endgame-hub-uniques.js';
 import { _egBuildInventoryGridHTML, _egRenderInventory, _egRenderInventoryCell, _egUpdateInvCount } from './endgame-hub.js';
 
 
@@ -67,9 +67,20 @@ export function _egFindFreeInvCell() {
     _egEnsureInvRows(r + 1);
     return { r, c: 0 };
 }
-export function _egAddItemToStash(item) {
-    // Uniques never land in the regular inventory - they go to the Unique Collection
-    if (item && item.isUnique && item.baseId) {
+// `opts.uniqueToInventory`: loot pickups keep a unique in the regular
+// inventory (the player moves it to the collection by hand) instead of
+// sending it straight to the Unique Collection, which read as a lost pickup.
+// The unique is still marked discovered so its collection cell un-locks.
+export function _egAddItemToStash(item, opts) {
+    if (item && item.isUnique && item.baseId && opts && opts.uniqueToInventory) {
+        try {
+            if (globalThis._egUniqueCollected && typeof globalThis._egUniqueCollected.add === 'function') {
+                globalThis._egUniqueCollected.add(item.baseId);
+                _egUpdateUniqueTabBadge();
+            }
+        } catch (e) { /* discovery mark is cosmetic */ }
+    } else if (item && item.isUnique && item.baseId) {
+        // Default: uniques go straight to the Unique Collection
         _egAddUniqueToCollection(item);
         return { r: -1, c: -1, unique: true };
     }
