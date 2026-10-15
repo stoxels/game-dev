@@ -1152,7 +1152,7 @@ function _uspBarrierFrame() {
         const avatar = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple');
         if (!(max > 0 && cur > 0)) _uspBarrierRaised = false;
-        if (_uspBarrierRaised && max > 0 && cur > 0 && avatar) {
+        if (_uspBarrierRaised && max > 0 && cur > 0 && avatar && avatar.getBoundingClientRect().width > 0) {
             if (!_uspBarrierEl) {
                 const el = document.createElement('div');
                 el.className = 'usp-barrier-shell';
@@ -1215,16 +1215,17 @@ function _uspBloomTrack() {
             || document.getElementById('player-avatar-simple')
             || document.getElementById('class-hud-drag-handle');
         let c = null;
-        if (avatar) {
+        // Hidden hero (character sheet etc.) = 0x0 rect at (0,0): no centre.
+        if (avatar && avatar.getBoundingClientRect().width > 0) {
             c = (typeof globalThis._egGetElementCentre === 'function')
                 ? globalThis._egGetElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
         }
-        if (c) {
-            for (const id of ids) {
-                const el = _uspBloomEls[id];
-                if (el) { el.style.left = `${c.x}px`; el.style.top = `${c.y}px`; }
-            }
+        for (const id of ids) {
+            const el = _uspBloomEls[id];
+            if (!el) continue;
+            if (c) { el.style.left = `${c.x}px`; el.style.top = `${c.y}px`; el.style.visibility = ''; }
+            else el.style.visibility = 'hidden';
         }
     } catch (e) { /* tracking is cosmetic */ }
     _uspBloomRaf = requestAnimationFrame(_uspBloomTrack);
@@ -1305,16 +1306,17 @@ function _uspBulwarkTrack() {
             || document.getElementById('player-avatar-simple')
             || document.getElementById('class-hud-drag-handle');
         let c = null;
-        if (avatar) {
+        // Hidden hero (character sheet etc.) = 0x0 rect at (0,0): no centre.
+        if (avatar && avatar.getBoundingClientRect().width > 0) {
             c = (typeof globalThis._egGetElementCentre === 'function')
                 ? globalThis._egGetElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
         }
-        if (c) {
-            for (const id of ids) {
-                const el = _uspBulwarkEls[id];
-                if (el) { el.style.left = `${c.x}px`; el.style.top = `${c.y}px`; }
-            }
+        for (const id of ids) {
+            const el = _uspBulwarkEls[id];
+            if (!el) continue;
+            if (c) { el.style.left = `${c.x}px`; el.style.top = `${c.y}px`; el.style.visibility = ''; }
+            else el.style.visibility = 'hidden';
         }
     } catch (e) { /* tracking is cosmetic */ }
     _uspBulwarkRaf = requestAnimationFrame(_uspBulwarkTrack);
@@ -1385,16 +1387,17 @@ function _uspWindwardTrack() {
             || document.getElementById('player-avatar-simple')
             || document.getElementById('class-hud-drag-handle');
         let c = null;
-        if (avatar) {
+        // Hidden hero (character sheet etc.) = 0x0 rect at (0,0): no centre.
+        if (avatar && avatar.getBoundingClientRect().width > 0) {
             c = (typeof globalThis._egGetElementCentre === 'function')
                 ? globalThis._egGetElementCentre(avatar)
                 : (() => { const r = avatar.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })();
         }
-        if (c) {
-            for (const id of ids) {
-                const el = _uspWindwardEls[id];
-                if (el) { el.style.left = `${c.x}px`; el.style.top = `${c.y}px`; }
-            }
+        for (const id of ids) {
+            const el = _uspWindwardEls[id];
+            if (!el) continue;
+            if (c) { el.style.left = `${c.x}px`; el.style.top = `${c.y}px`; el.style.visibility = ''; }
+            else el.style.visibility = 'hidden';
         }
     } catch (e) { /* tracking is cosmetic */ }
     _uspWindwardRaf = requestAnimationFrame(_uspWindwardTrack);
@@ -1755,8 +1758,12 @@ function _uspAuraCentre() {
             || document.getElementById('player-avatar-simple')
             || document.getElementById('class-hud-drag-handle');
         if (!avatar) return null;
-        if (typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(avatar);
+        // Hidden / detached hero (character sheet, inventory...) reports a
+        // 0x0 rect at (0,0): no centre, so the auras hide instead of
+        // snapping to the screen corner.
         const r = avatar.getBoundingClientRect();
+        if (!(r.width > 0) || !(r.height > 0)) return null;
+        if (typeof globalThis._egGetElementCentre === 'function') return globalThis._egGetElementCentre(avatar);
         return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     } catch (e) { return null; }
 }
@@ -1769,11 +1776,11 @@ function _uspAuraTrack() {
     if (!ids.length) return;
     try {
         const c = _uspAuraCentre();
-        if (c) {
-            for (const id of ids) {
-                const el = _uspAuraEls[id];
-                if (el) { el.style.left = `${c.x}px`; el.style.top = `${c.y}px`; }
-            }
+        for (const id of ids) {
+            const el = _uspAuraEls[id];
+            if (!el) continue;
+            if (c) { el.style.left = `${c.x}px`; el.style.top = `${c.y}px`; el.style.visibility = ''; }
+            else el.style.visibility = 'hidden';
         }
     } catch (e) { /* tracking is cosmetic */ }
     _uspAuraRaf = requestAnimationFrame(_uspAuraTrack);

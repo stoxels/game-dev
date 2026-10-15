@@ -53,7 +53,7 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
 export const EG_COLO_FOOT_DMG   = [0, 0.15, 0.17, 0.20]; // %maxHP footprint slam band
-export const EG_COLO_WAVE_DMG   = [0, 0.18, 0.21, 0.25]; // %maxHP shockwave ring
+export const EG_COLO_WAVE_DMG   = [0, 0.32, 0.36, 0.40]; // %maxHP for standing in the dashed circle at the slam
 export const EG_COLO_BOULDER_DMG = 0.16;                 // %maxHP boulder impact
 export const EG_COLO_FRAG_DMG   = 0.12;                  // %maxHP rolling fragment
 export const EG_COLO_GOLEM_DMG  = 0.06;                  // %maxHP golem shove (per ram)
@@ -71,9 +71,9 @@ export const EG_COLO_HIT_CD_MS  = 700;                   // shared touch cooldow
 // Touch damage helper shared by all Colossus hazards. Returns true if a hit
 // was rolled (respects the per-touch cooldown).
 export let _egColoHitCd = 0;
-export function _egColoTouch(pct, level, label) {
+export function _egColoTouch(pct, level, label, force) {
     const now = performance.now();
-    if (now < _egColoHitCd) return false;
+    if (!force && now < _egColoHitCd) return false;
     const pr = _egNkPlayerRect();
     if (!pr) return false;
     _egColoHitCd = now + EG_COLO_HIT_CD_MS;
@@ -182,9 +182,15 @@ export function _egMechSeismicSlam(monster, phase) {
                     ft.slamEl.style.top = Math.round(ft.y - 52) + 'px';
                     _egColoRubble(run, ft.x, ft.y, true);
                     _egColoShake(1);
-                    // Footprint band bites on the slam moment.
-                    if (pr && Math.hypot(pc.x - ft.x, pc.y - ft.y) < 88) {
-                        _egColoTouch(EG_COLO_FOOT_DMG[p], level, 'Footfall');
+                    // Anyone still inside the dashed circle at the slam is
+                    // punished at once (one heavy hit, +footfall bonus when
+                    // standing right under the foot). The expanding ring is
+                    // then purely visual.
+                    const dFoot = Math.hypot(pc.x - ft.x, pc.y - ft.y);
+                    if (pr && dFoot < EG_COLO_WAVE_R) {
+                        const pct = EG_COLO_WAVE_DMG[p] + (dFoot < 88 ? EG_COLO_FOOT_DMG[p] : 0);
+                        _egColoTouch(pct, level, dFoot < 88 ? 'Footfall' : 'Shockwave', true);
+                        ft.hit = true;
                     }
                     ft.waveEl = _egNkEl(run, 'div', 'eg-nk-ring eg-colo-wave');
                     ft.state = 'wave';
@@ -201,8 +207,11 @@ export function _egMechSeismicSlam(monster, phase) {
                 ft.waveEl.style.top = Math.round(ft.y - ft.r) + 'px';
                 ft.waveEl.style.width = Math.round(ft.r * 2) + 'px';
                 ft.waveEl.style.height = Math.round(ft.r * 2) + 'px';
-                if (pr && Math.abs(Math.hypot(pc.x - ft.x, pc.y - ft.y) - ft.r) < 26) {
-                    _egColoTouch(EG_COLO_WAVE_DMG[p], level, 'Shockwave');
+                // Safety net for a player who stepped INTO the circle after
+                // the slam: the ring front still bites once.
+                if (!ft.hit && pr && Math.abs(Math.hypot(pc.x - ft.x, pc.y - ft.y) - ft.r) < 26) {
+                    ft.hit = true;
+                    _egColoTouch(EG_COLO_WAVE_DMG[p] * 0.6, level, 'Shockwave');
                 }
                 if (ft.r >= EG_COLO_WAVE_R) {
                     try { ft.slamEl.remove(); } catch (e) {}
