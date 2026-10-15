@@ -945,8 +945,11 @@ const USP_TOGGLE_SPELLS = {
     },
     usp_vortex: {
         radius: 210, dmg: [2, 4], manaCost: 5, cooldownSeconds: 4,
-        descEn: 'Tap to raise a freezing vortex around you that damages every enemy within reach each second. Tap again to end it. Drains mana while it is active.',
-        descDE: 'Tippe, um einen eisigen Wirbel um dich aufzuziehen, der jede Sekunde jeden Gegner in Reichweite verletzt. Tippe erneut, um ihn zu beenden. Zieht Mana ab, solange er aktiv ist.',
+        // Slower ramp than Disintegrate: the drain per second grows by this
+        // share of the base cost per second the aura has been up, to the cap.
+        costRampPerSecond: 0.25, costRampMax: 5,
+        descEn: 'Tap to raise a freezing vortex around you that damages every enemy within reach each second. Tap again to end it. Drains mana while it is active - and the longer it stays up, the more mana it drains each second.',
+        descDE: 'Tippe, um einen eisigen Wirbel um dich aufzuziehen, der jede Sekunde jeden Gegner in Reichweite verletzt. Tippe erneut, um ihn zu beenden. Zieht Mana ab, solange er aktiv ist - je länger er steht, desto mehr Mana kostet jede Sekunde.',
     },
     usp_consecration: {
         radius: 220, dmg: [2, 4], manaCost: 5, cooldownSeconds: 4,
@@ -1025,7 +1028,12 @@ UNIVERSAL_SPELL_DEFS.forEach((d) => {
     d.schoolTags = (d.tags || []).slice();
     if (USP_TOGGLE_SPELLS[d.id]) {
         _uspConvertSustained(d, USP_TOGGLE_SPELLS[d.id], 'toggle', 'Aura');
-        d.aura = { radius: USP_TOGGLE_SPELLS[d.id].radius, intervalSeconds: 1 };
+        d.aura = {
+            radius: USP_TOGGLE_SPELLS[d.id].radius,
+            intervalSeconds: 1,
+            costRampPerSecond: USP_TOGGLE_SPELLS[d.id].costRampPerSecond || 0,
+            costRampMax: USP_TOGGLE_SPELLS[d.id].costRampMax || 1,
+        };
         d.castTimeSeconds = 0;
     } else if (USP_CHANNEL_SPELLS[d.id]) {
         _uspConvertSustained(d, USP_CHANNEL_SPELLS[d.id], 'channel', 'Channelling');
@@ -2974,10 +2982,17 @@ function _uspPulseAura(spell) {
     if (_uspPlayerDead() || !_uspEncounterLive()) return false;
     try { if (typeof globalThis._gamePaused !== 'undefined' && globalThis._gamePaused) return true; } catch (e) { /* not paused */ }
     const interval = spell.aura.intervalSeconds || 1;
-    if (!payAbilityCost(getUniversalSpellManaCost(spell.id) * interval)) {
+    // Ramping auras (Vortex) cost more per pulse the longer they stay up.
+    const st = _uspAuras[spell.id];
+    const upSec = st ? (st.pulses || 0) * interval : 0;
+    const ramp = spell.aura.costRampPerSecond
+        ? Math.min(spell.aura.costRampMax || 1, 1 + spell.aura.costRampPerSecond * upSec)
+        : 1;
+    if (!payAbilityCost(getUniversalSpellManaCost(spell.id) * interval * ramp)) {
         _uspNoManaToast();
         return false;
     }
+    if (st) st.pulses = (st.pulses || 0) + 1;
     const origin = getAvatarCentre() || { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const shape = resolveGroundShape({ kind: 'circle', radius: spell.aura.radius });
     showSpellZone(shape, origin, origin, spell.theme, 450, 'burst');
@@ -3018,7 +3033,7 @@ function _uspStartAura(spell) {
         _uspNoManaToast();
         return false;
     }
-    _uspAuras[spellId] = { timer: null };
+    _uspAuras[spellId] = { timer: null, pulses: 0 };
     _uspSustainedCastBegan(spell);
     try { _uspAuraShow(spell, spell.aura.radius); } catch (e) { /* visual is cosmetic */ }
     if (!_uspPulseAura(spell)) {
