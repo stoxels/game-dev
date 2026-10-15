@@ -2465,18 +2465,29 @@ function _uspRollCritMult() {
     return 1;
 }
 
+// Flat "+N spell damage" is added to EVERY hit, so it used to dwarf the base
+// roll of the small-hit spells: a 3-5 channel tick with +115 flat dealt ~120
+// per half second, ~5x what a single big cast of the same mana did. Flat
+// damage now scales with the size of the hit it is added to (like PoE's
+// damage effectiveness): full for a big single hit (>= USP_FLAT_FULL_HIT
+// base damage), proportionally less for the many-small-hits spells, never
+// below USP_FLAT_MIN_SHARE.
+const USP_FLAT_FULL_HIT = 20;
+const USP_FLAT_MIN_SHARE = 0.15;
+
 function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     const stats = (typeof globalThis._egComputePlayerStats === 'function')
         ? globalThis._egComputePlayerStats() : {};
     const tree = getUniversalSpellDamageBonus(spell);
     const isPhys = spell.damageKind === 'physical';
+    const flatShare = Math.max(USP_FLAT_MIN_SHARE, Math.min(1, ((dmgMin + dmgMax) / 2) / USP_FLAT_FULL_HIT));
 
     let dmg = dmgMin + Math.random() * (dmgMax - dmgMin);
     if (isPhys) {
-        dmg += ((stats.physFlatMin || 0) + (stats.physFlatMax || 0)) / 2 + (tree.flat || 0);
+        dmg += (((stats.physFlatMin || 0) + (stats.physFlatMax || 0)) / 2 + (tree.flat || 0)) * flatShare;
         dmg *= 1 + ((stats.physIncPct || 0) + (tree.incPct || 0)) / 100;
     } else {
-        dmg += (stats.spellDamageFlat || 0) + (tree.flat || 0);
+        dmg += ((stats.spellDamageFlat || 0) + (tree.flat || 0)) * flatShare;
         // Elemental spells (fire / frost / lightning / arcane - whatever the
         // def's element maps to) additionally ride the character's global
         // "+% increased elemental damage" from the passive tree. Physical
