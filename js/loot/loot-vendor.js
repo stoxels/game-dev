@@ -4,7 +4,7 @@ import { t } from '../translation/translations.js';
 import { _egvBuildEssencesTabHTML, _egvBuildItemsTabHTML } from './loot-vendor-supplies.js';
 import { _egvRefreshGoldDisplay, _egvSetRenderTabContent } from './loot-vendor-shared.js';
 import { _egvEnsureStyles } from './loot-vendor-styles.js';
-import { _egvBuildBaseTabHTML, _egvBuildStarterTabHTML } from './loot-vendor-equipment.js';
+import { _egvBuildBaseTabHTML } from './loot-vendor-equipment.js';
 import { _egvBuildMapsTabHTML, _egvRefreshMapsTabDynamic } from './loot-vendor-maps.js';
 import { _egvBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
 
@@ -26,10 +26,9 @@ import { _egvBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
 // Which tab is open. The last active tab is remembered across visits.
 let _egvActiveTab = 'maps';
 
-// The six vendor tabs, in display order.
+// The vendor tabs, in display order.
 const EG_VENDOR_TABS = [
     { id: 'maps', labelKey: 'eg_vendor_tab_maps' },
-    { id: 'starter', labelKey: 'eg_vendor_tab_starter' },
     { id: 'currency', labelKey: 'eg_vendor_tab_currency' },
     { id: 'essences', labelKey: 'eg_vendor_tab_essences' },
     { id: 'items', labelKey: 'eg_vendor_tab_items' },
@@ -39,7 +38,6 @@ const EG_VENDOR_TABS = [
 // Hint line shown under each tab's content, as a translation key.
 const EG_VENDOR_TAB_HINTS = {
     maps: 'eg_vendor_hint',
-    starter: 'eg_vendor_hint_starter',
     currency: 'eg_vendor_hint_currency',
     essences: 'eg_vendor_hint_essences',
     items: 'eg_vendor_hint_items',
@@ -55,7 +53,7 @@ const EG_VENDOR_TAB_HINTS = {
 function _egvBuildTopbarHTML() {
     return `
 <div class="egn-topbar">
-    <button class="back-btn" onclick="showEndgameNexus()">${t('btn_back')}</button>
+    <button class="back-btn" onclick="goToPreviousScreen()">${t('btn_back')}</button>
     <span class="egn-topbar-title">${t('eg_vendor_title')}</span>
 </div>`;
 }
@@ -97,7 +95,6 @@ function _egvRenderTabContent() {
 
     switch (_egvActiveTab) {
         case 'maps': contentEl.innerHTML = _egvBuildMapsTabHTML(); break;
-        case 'starter': contentEl.innerHTML = _egvBuildStarterTabHTML(); break;
         case 'currency': contentEl.innerHTML = _egvBuildCurrencyTabHTML(); break;
         case 'essences': contentEl.innerHTML = _egvBuildEssencesTabHTML(); break;
         case 'items': contentEl.innerHTML = _egvBuildItemsTabHTML(); break;
@@ -153,11 +150,10 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 export function showEndgameVendor() {
     if (!document.getElementById('screen-endgame-vendor')) _egvCreateScreen();
 
-    // The vendor screen DOM is built once - keep the back button pointed
-    // at the Nexus of Worlds (also heals screens built before the
-    // goToPreviousScreen() -> showEndgameNexus() fix).
+    // The vendor is opened from the mode select screen (launchAtlasVendor),
+    // which pushes that screen onto the history: back pops to it.
     const backBtn = document.querySelector('#screen-endgame-vendor .back-btn');
-    if (backBtn) backBtn.setAttribute('onclick', 'showEndgameNexus()');
+    if (backBtn) backBtn.setAttribute('onclick', 'goToPreviousScreen()');
 
     switchScreen('screen-endgame-vendor');
 

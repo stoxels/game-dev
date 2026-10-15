@@ -381,6 +381,14 @@ export function launchEndgameTestMode() {
     if (typeof globalThis.showEndgameNexus === 'function') globalThis.showEndgameNexus();
 }
 
+// Opens the Atlas Vendor straight from the mode select screen. Gold is earned
+// in the campaign now, so the vendor is no longer an endgame-only door. Back
+// returns to the mode select screen (history entry pushed here).
+export function launchAtlasVendor() {
+    globalThis.screenHistory.push('screen-mode-select');
+    if (typeof globalThis.showEndgameVendor === 'function') globalThis.showEndgameVendor();
+}
+
 // Closes any overlays and active quiz, then navigates to the level select screen.
 // Respects convergence modal and pending class events before transitioning.
 // The tutorial quest is mandatory - a tutorial level must never escape to

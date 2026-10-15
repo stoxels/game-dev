@@ -7,7 +7,7 @@ import { toggleTouchpadMarkMode } from './mouse-button-handlers.js';
 import { clearHover } from './mouse-over.js';
 import { showHS } from './screens/screens-highscore.js';
 import { cancelSlotName, confirmSlotName, showSaveSlotSelect } from './screens/screens-save-slots.js';
-import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
+import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goToPreviousScreen, hideModal, launchAtlasVendor, launchEndgameTestMode, launchExistingGame, showModal, showSetup, showTitle } from './screens/screens.js';
 import { ptGoBack, showPassiveTree, showPassiveTreeAsCharacter } from './probability-tree/probability-tree.js';
 import { showQuestLog } from './inference/inference-ui.js';
 import { _ptRefundAllPoints } from './probability-tree/probability-tree-state-points.js';
@@ -362,6 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-mode-select-back', () => goToPreviousScreen());
     onClick('btn-mode-existing', () => launchExistingGame());
     onClick('btn-mode-endgame-test', () => launchEndgameTestMode());
+    onClick('btn-mode-vendor', () => launchAtlasVendor());
 
 
 

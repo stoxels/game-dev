@@ -16,8 +16,7 @@ import { t } from '../translation/translations.js';
 //=    2. Probability Gate         -> showEndgameGate()                  =
 //=       (endgame-gate.js)                                              =
 //=    3. Atlas of Statistica      -> showEndgameAtlas()                 =
-//=    4. Atlas Vendor            -> showEndgameVendor()                =
-//=       (endgame-vendor.js)                                            =
+//=    (Atlas Vendor moved to the mode select screen - launchAtlasVendor) =
 //=    5. Boss Testing            -> showEndgameBossTest()                 =
 //=       (endgame-boss-test.js)                                       =
 //=                                                                      =
@@ -61,7 +60,6 @@ export function _egnBuildFullScreenHTML() {
         ${_egnBuildDoorHTML('🧙', 'eg_char_sheet_title', 'showEndgameHub()')}
         ${_egnBuildDoorHTML('🎲', 'mg_gate_badge', 'showEndgameGate()')}
         ${_egnBuildDoorHTML('🗺️', 'eg_atlas_title', 'showEndgameAtlas()')}
-        ${_egnBuildDoorHTML('💰', 'eg_vendor_title', 'showEndgameVendor()')}
         ${_egnBuildDoorHTML('💀', 'eg_boss_test_title', 'showEndgameBossTest()')}
     </div>
 </div>`;

@@ -82,7 +82,7 @@ import { _ensureTooltipElement, _trackTooltipToMouse, _hideWorldTooltip, _render
 import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect, confirmSlotName, cancelSlotName } from '../../js/screens/screens-save-slots.js';
 import { WD_WORLD_CONFIGS } from '../../js/screens/screens-world-levels-config.js';
 import { _wdCurrentWi, wdGoBackToMap, _wdSyncSpriteToLevel, showWorldDetail } from '../../js/screens/screens-world-levels.js';
-import { switchScreen, showModal, hideModal, _refreshQuestionModalFlag, hideResultOverlays, _maybeShowConvergenceModal, showTitle, enterNexusFromSetup, showSetup, confirmSetup, launchExistingGame, launchEndgameTestMode, goToLevelSelect, goToPreviousScreen, goToNextLevel } from '../../js/screens/screens.js';
+import { switchScreen, showModal, hideModal, _refreshQuestionModalFlag, hideResultOverlays, _maybeShowConvergenceModal, showTitle, enterNexusFromSetup, showSetup, confirmSetup, launchExistingGame, launchEndgameTestMode, launchAtlasVendor, goToLevelSelect, goToPreviousScreen, goToNextLevel } from '../../js/screens/screens.js';
 import { initWorldProto, showWorldProto } from '../../js/world-proto/world-proto.js';
 import { CLASS_DEFS, CLASS_LIST, CLASS_SPELL_ICONS, ENDGAME_HEARTBLOOM_DEF } from '../../js/classes/class-defs.js';
 import { ASCENDENCY_DEFS, ASCENDENCY_SPELL_ICONS } from '../../js/classes/ascendency-defs.js';
@@ -911,6 +911,7 @@ try { Object.defineProperty(globalThis, "showEndgameGate", { get() { return show
 try { Object.defineProperty(globalThis, "showEndgameHub", { get() { return showEndgameHub; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showEndgameNexus", { get() { return showEndgameNexus; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showEndgameTestHub", { get() { return showEndgameTestHub; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "showEndgameVendor", { get() { return showEndgameVendor; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showGameTooltip", { get() { return showGameTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showItemGainPopup", { get() { return showItemGainPopup; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showLsClassTooltip", { get() { return showLsClassTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
