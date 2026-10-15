@@ -10,7 +10,7 @@ import { _egRenderMapSlot, _egRenderMapStash, _egRenderMapStashCell, _egSwitchMa
 import { _egClearTooltip } from './endgame-hub-tooltips.js';
 import { _egAddUniqueToCollection, _egUpdateUniqueTabBadge } from './endgame-hub-uniques.js';
 import { EG_CURRENCY_COLS, EG_INV_COLS, EG_MAP_STASH_COLS, EG_MAP_STASH_ROWS, EG_MAP_TIER_ROMANS, _egAddItemToStash, _egCurrencyDefForId, _egCurrencyIdForSlot, _egCurrencySlotForId, _egCurrencyStash, _egEnsureInvRows, _egEnsureMapTierRows, _egEquipped, _egFindFreeInvCell, _egFindFreeMapCellForTier, _egGetInvRows, _egGetMapTierGrid, _egInventory, _egMapStash, _egRenderEquipSlot, _egRenderEquipSlots, _egRenderInventory, _egRenderInventoryCell, _egRenderStatsList, _egRenderUniqueStash, _egShowStashInfo, _egStashTab, _egSwitchStashTab, _egUpdateCraftingBenchLauncherSlot, _egUpdateInvCount, egSaveHubState } from './endgame-hub.js';
-import { _egCanEquipInSlot, _egCheckUnequipSlot, _egGetWeaponHands, _egIsTwoHandedWeapon, _egShowRequirementsToast, _egSimulateAndCheck, _egTryAutoUnequipOffhandForTwoHander } from '../loot/loot-requirements.js';
+import { _egCanEquipInSlot, _egCheckMoveAllowed, _egCheckUnequipSlot, _egGetWeaponHands, _egIsTwoHandedWeapon, _egShowRequirementsToast, _egTryAutoUnequipOffhandForTwoHander } from '../loot/loot-requirements.js';
 
 //------------------------------------------------------------------------
 //-------------------ENDGAME HUB DRAG AND DROP---------------------------
@@ -639,7 +639,10 @@ export function _dndDrop(e) {
                 else if (typeof showToast === 'function') globalThis.showToast(msg, '#e74c3c');
                 blocked = true;
             } else {
-                const gate = _egSimulateAndCheck(sim => {
+                // _egCheckMoveAllowed returns { ok, missing } (same gate the
+                // right-click unequip uses). _egSimulateAndCheck returns a bare
+                // array, so reading `.ok` off it always blocked the drag.
+                const gate = _egCheckMoveAllowed(sim => {
                     delete sim[_dnd.sourceSlot];
                     if (displaced) sim[_dnd.sourceSlot] = displaced;
                 });
