@@ -37,6 +37,27 @@ function _egTutorialSuppressesDrops() {
 // its other rules (board caps, free cells, level gates) still apply.
 export const EG_KILL_DROP_CHANCE_NORMAL = 0.6;   // P(something drops) per normal kill
 
+// Late campaign: Tier 1 maps drop from regular monsters in the second half of
+// world 12 and in all of worlds 13 and 14 (the Nexus world). This is the main
+// way into the endgame now that the vendor no longer sells a free map.
+const EG_CAMPAIGN_MAP_DROP_WORLD = 12;   // 1-based first world with map drops (second half only)
+
+function _egCampaignMapDropsOpen() {
+    try {
+        const c = globalThis.cur;
+        const starts = globalThis.WORLD_START_GI;
+        const worlds = globalThis.WORLDS;
+        if (!c || typeof c.gIdx !== 'number' || !Array.isArray(starts) || !worlds) return false;
+        let wi = 0;
+        for (let i = 0; i < starts.length; i++) if (starts[i] <= c.gIdx) wi = i;
+        const world = wi + 1;
+        if (world > EG_CAMPAIGN_MAP_DROP_WORLD) return true;
+        if (world < EG_CAMPAIGN_MAP_DROP_WORLD) return false;
+        const len = (worlds[wi] && worlds[wi].data && worlds[wi].data.length) || 0;
+        return (c.gIdx - starts[wi]) >= Math.floor(len / 2);
+    } catch (e) { return false; }
+}
+
 // Returns the bucket id to drop, or null for "nothing". `rng` is injectable
 // for tests (defaults to Math.random).
 export function _egRollKillDropBucket(opts, rng) {
@@ -53,8 +74,9 @@ export function _egRollKillDropBucket(opts, rng) {
     ];
     // Puzzle items never spawn on Ironman; the passive tree boosts their weight.
     if (!o.ironman) buckets.push(['item', EG_ITEM_DROP_CHANCE_NORMAL * (1 + (Number(o.itemDropPct) || 0) / 100)]);
-    // Maps: endgame only (never campaign) and only from level-55+ monsters.
-    if (!o.campaign && (Number(o.monsterLevel) || 0) >= 55) buckets.push(['map', EG_MAP_DROP_CHANCE_NORMAL]);
+    // Maps: map runs from level-55+ monsters; in the campaign only in the
+    // late worlds (see _egCampaignMapDropsOpen) and always Tier 1.
+    if (o.campaign ? !!o.campaignMapsOpen : (Number(o.monsterLevel) || 0) >= 55) buckets.push(['map', EG_MAP_DROP_CHANCE_NORMAL]);
 
     const total = buckets.reduce((s, b) => s + b[1], 0);
     let roll = rand() * total;
@@ -101,6 +123,7 @@ export function _egHandleNormalMonsterKill(dying) {
             ironman: !!(typeof globalThis.curMods !== 'undefined' && globalThis.curMods && globalThis.curMods.ironman),
             itemDropPct,
             campaign,
+            campaignMapsOpen: campaign && _egCampaignMapDropsOpen(),
             monsterLevel: dying.level,
         });
         switch (bucket) {
@@ -108,7 +131,12 @@ export function _egHandleNormalMonsterKill(dying) {
             case 'item': if (typeof _egSpawnItemDrop === 'function') _egSpawnItemDrop(false, true); break;
             case 'currency': if (typeof _egTryDropCurrency === 'function') _egTryDropCurrency(false, true); break;
             case 'essence': if (typeof _egTryDropEssence === 'function') _egTryDropEssence(false, true); break;
-            case 'map': if (typeof _egTryDropMap === 'function') _egTryDropMap(false, dying.level, true); break;
+            case 'map':
+                if (typeof _egTryDropMap === 'function') {
+                    if (campaign) _egTryDropMap(false, dying.level, true, { campaignTier1: true });
+                    else _egTryDropMap(false, dying.level, true);
+                }
+                break;
             case 'charm': if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(false, dying.level, true); break;
             default: break;
         }

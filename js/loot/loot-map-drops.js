@@ -89,11 +89,14 @@ export function _egAddMapToMapStash(item, tierOverride) {
 // active map's Quantity bonus (EG_MAP_MOD_REWARDS.quantity). Harder maps
 // (more / higher-tier mods) therefore sustain maps much better.
 // force - skip the chance roll (the kill handler already picked this bucket).
-export function _egTryDropMap(isBoss, monsterLevel, force = false) {
+export function _egTryDropMap(isBoss, monsterLevel, force = false, opts = null) {
     // PoE-style: map items only drop from monsters level 55 or higher
     // (allows drops in late campaign: World 13 EXPECTATION PLATEAU and Nexus World)
     const MIN_MONSTER_LEVEL_FOR_MAP_DROPS = 55;
-    if ((monsterLevel || 0) < MIN_MONSTER_LEVEL_FOR_MAP_DROPS) return;
+    // Late-campaign drops (worlds 12-14, gated by the caller) skip the level
+    // gate and are always Tier 1.
+    const campaignTier1 = !!(opts && opts.campaignTier1);
+    if (!campaignTier1 && (monsterLevel || 0) < MIN_MONSTER_LEVEL_FOR_MAP_DROPS) return;
 
     // Resolve Quantity multiplier from the active device map, if any.
     let qtyMult = 1;
@@ -128,7 +131,9 @@ export function _egTryDropMap(isBoss, monsterLevel, force = false) {
     const baseChance = Math.min(1, EG_MAP_DROP_CHANCE_NORMAL * qtyMult);
     if (!force && Math.random() > baseChance) return;
 
-    const map = _egGenerateMapDrop(monsterLevel, null, { atlasNodeId: targetNodeId });
+    const map = campaignTier1
+        ? _egGenerateMapDrop(monsterLevel, 1, null)
+        : _egGenerateMapDrop(monsterLevel, null, { atlasNodeId: targetNodeId });
     if (typeof _egSpawnMapDrop === 'function') _egSpawnMapDrop(map);
 }
 

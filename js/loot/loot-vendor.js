@@ -5,7 +5,6 @@ import { _egvBuildEssencesTabHTML, _egvBuildItemsTabHTML } from './loot-vendor-s
 import { _egvRefreshGoldDisplay, _egvSetRenderTabContent } from './loot-vendor-shared.js';
 import { _egvEnsureStyles } from './loot-vendor-styles.js';
 import { _egvBuildBaseTabHTML } from './loot-vendor-equipment.js';
-import { _egvBuildMapsTabHTML, _egvRefreshMapsTabDynamic } from './loot-vendor-maps.js';
 import { _egvBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
 
 //------------------------------------------------------------------------
@@ -24,11 +23,10 @@ import { _egvBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
 //------------------------------------------------------------------------
 
 // Which tab is open. The last active tab is remembered across visits.
-let _egvActiveTab = 'maps';
+let _egvActiveTab = 'currency';
 
-// The vendor tabs, in display order.
+// The vendor tabs (maps are no longer sold - they drop in the late campaign), in display order.
 const EG_VENDOR_TABS = [
-    { id: 'maps', labelKey: 'eg_vendor_tab_maps' },
     { id: 'currency', labelKey: 'eg_vendor_tab_currency' },
     { id: 'essences', labelKey: 'eg_vendor_tab_essences' },
     { id: 'items', labelKey: 'eg_vendor_tab_items' },
@@ -37,7 +35,6 @@ const EG_VENDOR_TABS = [
 
 // Hint line shown under each tab's content, as a translation key.
 const EG_VENDOR_TAB_HINTS = {
-    maps: 'eg_vendor_hint',
     currency: 'eg_vendor_hint_currency',
     essences: 'eg_vendor_hint_essences',
     items: 'eg_vendor_hint_items',
@@ -94,7 +91,6 @@ function _egvRenderTabContent() {
     if (!contentEl) return;
 
     switch (_egvActiveTab) {
-        case 'maps': contentEl.innerHTML = _egvBuildMapsTabHTML(); break;
         case 'currency': contentEl.innerHTML = _egvBuildCurrencyTabHTML(); break;
         case 'essences': contentEl.innerHTML = _egvBuildEssencesTabHTML(); break;
         case 'items': contentEl.innerHTML = _egvBuildItemsTabHTML(); break;
@@ -163,7 +159,6 @@ export function showEndgameVendor() {
     if (activeBtn) activeBtn.classList.add('egv-tab-active');
 
     _egvRenderTabContent();
-    _egvRefreshMapsTabDynamic();
     _egvRefreshGoldDisplay();
 }
 
