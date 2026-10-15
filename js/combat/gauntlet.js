@@ -40,10 +40,11 @@ import { _egRenderPanel } from './encounter.js';
 //------------------------------------------------------------------------
 
 export const EG_GAUNTLET_CONFIG = {
-    minMonsters: 4,
-    maxMonsters: 9,
-    monstersBase: 3.5,        // total monsters = base + level * perLevel
-    monstersPerLevel: 0.1,
+    minMonsters: 12,
+    maxMonsters: 18,
+    monstersBase: 12,         // total monsters = base + level * perLevel
+    monstersPerLevel: 0.3,
+    maxConcurrent: 9,         // alive at once in the arena (campaign cap is 6)
     waveCount: 3,
     hitsToKillBase: 7,        // monster HP = avg player hit * (base + level * perLevel)
     hitsToKillPerLevel: 0.12,
@@ -70,7 +71,7 @@ export const EG_GAUNTLET_CONFIG = {
         hard:   { countMult: 1.3, hpMult: 1.5,  dmgMult: 1.55, gold: 1.6 },
         brutal: { countMult: 1.7, hpMult: 1.8,  dmgMult: 1.7, gold: 2.6 },
     },
-    maxMonstersCap: 12,
+    maxMonstersCap: 24,
     // Monster HP follows the player's real power hit (best of projectile,
     // 60% of a charged melee strike and 60% of a spell cast) so spell and
     // melee builds are not facing projectile-sized HP pools.
@@ -422,6 +423,10 @@ function _modifierTick() {
     }
 }
 
+// Monster cards are scattered over eight spots across the whole arena
+// (positions in gauntlet.css); spawns pick the emptiest spot at random.
+const _ZONE_IDS = Array.from({ length: 8 }, (_, i) => `ga-zone-${i}`);
+
 function _buildOverlay() {
     const old = document.getElementById('gauntlet-arena');
     if (old) old.remove();
@@ -435,7 +440,7 @@ function _buildOverlay() {
             <span class="ga-wave" id="ga-wave"></span>
             <span class="ga-left" id="ga-left"></span>
         </div>
-        <div class="ga-monsters" id="ga-monster-zone"></div>
+        ${_ZONE_IDS.map((id, i) => `<div class="ga-zone ga-zone-${i}" id="${id}"></div>`).join('')}
         <div class="ga-center" id="ga-center"></div>`;
     // Inside #game-main so the monster zone panels (same stacking context)
     // can be lifted above the arena.
@@ -581,12 +586,13 @@ function _begin() {
     cur.monsterLevel = lvl;
     cur.gauntlet = true;
     globalThis._egGauntletFlag = true;
+    globalThis._egGauntletMaxConcurrent = cfg.maxConcurrent;
 
     // The arena owns the monster cards: they render in its own zone, so they
     // are visible above the sealed grid instead of behind it.
     _g.zones = EG_MONSTER_ZONES.slice();
     EG_MONSTER_ZONES.length = 0;
-    EG_MONSTER_ZONES.push('ga-monster-zone');
+    _ZONE_IDS.forEach(z => EG_MONSTER_ZONES.push(z));
     _g.fighting = true;
 
     // Bring the sprite into the arena and keep it there.

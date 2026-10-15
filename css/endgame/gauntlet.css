@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────────────
    GAUNTLET ARENA (js/combat/gauntlet.js)
    A large centred modal over the sealed puzzle. Monster cards render in the
-   arena's own zone (#ga-monster-zone) while it is open.
+   arena's own zone (.ga-zone-N) while it is open.
    ───────────────────────────────────────────────────────────────────────── */
 
 .gauntlet-arena {
@@ -49,18 +49,26 @@ body.gauntlet-open #puzzle-scaler-wrap { pointer-events: none; }
 }
 .ga-wave, .ga-left { color: #e8dcff; font-size: 12px; text-shadow: none; }
 
-.ga-monsters {
+.ga-zone {
     position: absolute;
-    left: 0; right: 0; top: 40px;
+    width: 28%;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     align-items: flex-start;
     justify-content: center;
-    padding: 0 12px;
     pointer-events: auto;
 }
+/* eight scattered spots: top row, two middle sides, lower row + centre */
+.ga-zone-0 { left: 3%;  top: 40px; }
+.ga-zone-1 { left: 36%; top: 40px; }
+.ga-zone-2 { left: 69%; top: 40px; }
+.ga-zone-3 { left: 3%;  top: 36%; }
+.ga-zone-4 { left: 69%; top: 36%; }
+.ga-zone-5 { left: 3%;  top: 66%; }
+.ga-zone-6 { left: 36%; top: 70%; }
+.ga-zone-7 { left: 69%; top: 66%; }
 
 .ga-center {
     position: absolute;

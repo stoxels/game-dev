@@ -79,7 +79,12 @@ export function _egNotifyMonsterArrival(monster) {
 // hpMult: optional multiplier for boss max HP only (e.g., 500k HP test mode);
 // damage is left at its normal scaled value.
 export function _egSpawnMonster(defId, level, hpMult = 1) {
-    if (globalThis._egMonsters.length >= EG_MAX_CONCURRENT_MONSTERS) return;
+    // The gauntlet arena is roomier than the campaign panels and fields
+    // bigger waves, so it lifts the concurrent-monster cap.
+    const cap = globalThis._egGauntletFlag
+        ? Math.max(EG_MAX_CONCURRENT_MONSTERS, Number(globalThis._egGauntletMaxConcurrent) || 0)
+        : EG_MAX_CONCURRENT_MONSTERS;
+    if (globalThis._egMonsters.length >= cap) return;
 
     const monster = _egBuildMonsterOrBoss(defId, level, hpMult);
     if (!monster) return;
