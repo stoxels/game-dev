@@ -883,8 +883,11 @@ const USP_CHANNEL_SPELLS = {
     },
     usp_disintegrate: {
         tickSeconds: 0.5, dmg: [3, 5], manaCost: 7, cooldownSeconds: 8,
-        descEn: 'Hold the button to focus a beam of disintegrating energy on your target. It strikes every half second and drains mana the whole time. Release to stop.',
-        descDE: 'Halte die Taste, um einen Strahl zersetzender Energie auf dein Ziel zu bündeln. Er trifft alle halbe Sekunde und zieht die ganze Zeit Mana ab. Loslassen beendet den Zauber.',
+        // The longer the beam is held, the hungrier it gets: the per-tick cost
+        // grows by this much of the base cost per second held, up to the cap.
+        costRampPerSecond: 0.6, costRampMax: 8,
+        descEn: 'Hold the button to focus a beam of disintegrating energy on your target. It strikes every half second and drains mana the whole time - and the longer you hold, the more mana it drains each second. Release to stop.',
+        descDE: 'Halte die Taste, um einen Strahl zersetzender Energie auf dein Ziel zu bündeln. Er trifft alle halbe Sekunde und zieht die ganze Zeit Mana ab - je länger du hältst, desto mehr Mana kostet jede Sekunde. Loslassen beendet den Zauber.',
     },
     usp_incinerate: {
         tickSeconds: 0.4, dmg: [2, 4], manaCost: 7, cooldownSeconds: 8,
@@ -1026,7 +1029,11 @@ UNIVERSAL_SPELL_DEFS.forEach((d) => {
         d.castTimeSeconds = 0;
     } else if (USP_CHANNEL_SPELLS[d.id]) {
         _uspConvertSustained(d, USP_CHANNEL_SPELLS[d.id], 'channel', 'Channelling');
-        d.channel = { tickSeconds: USP_CHANNEL_SPELLS[d.id].tickSeconds };
+        d.channel = {
+            tickSeconds: USP_CHANNEL_SPELLS[d.id].tickSeconds,
+            costRampPerSecond: USP_CHANNEL_SPELLS[d.id].costRampPerSecond || 0,
+            costRampMax: USP_CHANNEL_SPELLS[d.id].costRampMax || 1,
+        };
         d.castTimeSeconds = 0;
     } else if (USP_CHARGE_SPELLS[d.id]) {
         // Keeps its castTimeSeconds: that is the time to a FULL charge.
@@ -2912,6 +2919,8 @@ function _uspSustainedCastBegan(spell) {
 // One channel tick: pays mana x tickSeconds and hits the selected monster
 // (else the first living one). Returns false when the channel must end - dead,
 // fight over, nothing to hit, or out of mana.
+const _uspChannelTicksHeld = {};   // spellId -> ticks fired in the current hold
+
 export function fireUniversalChannelTick(spellId, isFirst) {
     const spell = getUniversalSpellDef(spellId);
     if (!spell || !spell.channel) return false;
@@ -2925,12 +2934,19 @@ export function fireUniversalChannelTick(spellId, isFirst) {
     } catch (e) { victim = null; }
     if (!victim) victim = living[0];
 
-    const cost = getUniversalSpellManaCost(spellId) * spell.channel.tickSeconds;
+    // Ramping channels (Disintegrate) cost more per tick the longer the hold.
+    if (isFirst) _uspChannelTicksHeld[spellId] = 0;
+    const heldSec = (_uspChannelTicksHeld[spellId] || 0) * spell.channel.tickSeconds;
+    const ramp = spell.channel.costRampPerSecond
+        ? Math.min(spell.channel.costRampMax || 1, 1 + spell.channel.costRampPerSecond * heldSec)
+        : 1;
+    const cost = getUniversalSpellManaCost(spellId) * spell.channel.tickSeconds * ramp;
     if (!payAbilityCost(cost)) {
         _uspNoManaToast();
         return false;
     }
     if (isFirst) _uspSustainedCastBegan(spell);
+    _uspChannelTicksHeld[spellId] = (_uspChannelTicksHeld[spellId] || 0) + 1;
     _uspStrike(spell, victim.id, spell.dmg[0], spell.dmg[1], { isChannelTick: true });
     return true;
 }
