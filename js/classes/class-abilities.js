@@ -700,7 +700,9 @@ function _fireInstantHeartbloomAbility() {
     // Pay the cost (life under Blood Magic) - abort without firing if it can't be covered.
     if (!payAbilityCost(_getAbilityManaCost('active5'))) return;
 
-    const count = (def.levels[0]?.effect?.heartCount) || 3;
+    // Hearts scale with the spell rank (class-defs: +1 every second rank).
+    const castRank = Math.max(1, getSkillCastRankClampedForSlot('active5') || 1);
+    const count = (def.levels[Math.min(castRank, def.levels.length) - 1]?.effect?.heartCount) || 3;
     const spawned = _spawnHeartbloomHearts(count);
 
     if (spawned > 0) {

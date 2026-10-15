@@ -320,7 +320,8 @@ function buildAscendencySkillTooltip(hudSlot) {
 function buildHeartbloomTooltip() {
     const def = ENDGAME_HEARTBLOOM_DEF;
     if (!def) return '';
-    const data = def.levels[0];
+    const castRank = Math.max(1, getSkillCastRankClampedForSlot('active5') || 1);
+    const data = def.levels[Math.min(castRank, def.levels.length) - 1] || def.levels[0];
     const manaLine = _buildTooltipManaLine(_getAbilityManaCost('active5'));
     const baseCd = def.cooldownSeconds || 0;
     const cdLine = _buildTooltipCooldownLine(_resolveEffectiveTooltipCooldown('active5', baseCd), baseCd);
