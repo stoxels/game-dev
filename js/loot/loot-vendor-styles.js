@@ -171,6 +171,20 @@ export function _egvEnsureStyles() {
         .egv-buy-btn.egv-cannot-afford {
             opacity: 0.45; border-color: var(--border2, #444); color: var(--accent2, #888);
         }
+        /* ── Spell charm cards ───────────────────────────────────────── */
+        .egv-charm-ranks { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        .egv-charm-rank {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            font-family: var(--PX, monospace); font-size: 11px; padding: 6px 2px;
+            border: 1px solid var(--border2, #444); border-radius: 5px;
+            background: rgba(0,0,0,0.35); color: var(--accent2, #bbb);
+        }
+        .egv-charm-rank small { font-size: 9px; letter-spacing: 0; }
+        .egv-charm-buy { cursor: pointer; border-color: var(--accent, #c8a84b); color: #f5d98a; transition: all 0.12s; }
+        .egv-charm-buy:hover { box-shadow: 0 0 10px rgba(200,168,75,0.4); }
+        .egv-charm-buy.egv-charm-short { opacity: 0.5; border-color: #8a4a3a; color: #e0a090; }
+        .egv-charm-owned { border-color: #3f8f5a; color: #86e0a0; background: rgba(30,80,45,0.35); }
+        .egv-charm-locked { opacity: 0.45; }
         .egv-hint {
             font-size: 10px; letter-spacing: 1px; color: rgba(232, 218, 239, 0.55);
             max-width: 520px; text-align: center; line-height: 1.6;

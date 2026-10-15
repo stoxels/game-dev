@@ -3,7 +3,7 @@ import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { MOD_CLASSES, MOD_LABELS, applyClassStatusActiveStyle, applyClassStatusEmptyStyle, buildNextCodeStr, isLevelConvergence, isMaxCleared, renderLevelSelect } from './screens-level-select.js';
 import { showWorldDetail, wdGoBackToMap } from './screens-world-levels.js';
-import { showSetup, switchScreen } from './screens.js';
+import { launchAtlasVendor, showSetup, switchScreen } from './screens.js';
 import { showQuestLog } from '../inference/inference-ui.js';
 import { showPassiveTree } from '../probability-tree/probability-tree.js';
 import { STATE } from '../state.js';
@@ -985,12 +985,13 @@ function _walkSpriteTo(targetWorldIdx, onArrived) {
  * Starts a walk animation that returns the sprite to the home outpost.
  * If a walk is already in progress, queues the return as a redirect.
  */
-function _walkSpriteToHome() {
+function _walkSpriteToHome(onArrived) {
     const sprite = document.getElementById('mv-sprite');
     if (!sprite) return;
 
+    const arrived = (typeof onArrived === 'function') ? onArrived : null;
     if (_mvWalking) {
-        _mvPendingRedirect = { target: 'home', onArrived: null };
+        _mvPendingRedirect = { target: 'home', onArrived: arrived };
         return;
     }
 
@@ -1001,7 +1002,7 @@ function _walkSpriteToHome() {
     }
     if (typeof globalThis._startAvatarWalkAnimation === 'function') globalThis._startAvatarWalkAnimation('mv-sprite-img');
 
-    _continueWalkFromNode(sprite, _mvCurrentWorldIdx, 'home', null);
+    _continueWalkFromNode(sprite, _mvCurrentWorldIdx, 'home', arrived);
 }
 
 
@@ -1579,7 +1580,7 @@ function _buildPathsSVG(canvas) {
 
 /**
  * Creates and returns the Cartographer's Outpost (home) marker element.
- * Clicking it walks the sprite back home.
+ * Clicking it walks the sprite back home and opens the Cartographer's shop.
  *
  * @returns {HTMLElement}
  */
@@ -1591,8 +1592,14 @@ function _buildHomeMarker() {
     marker.textContent = '🛖';
     marker.style.cursor = 'pointer';
     marker.style.pointerEvents = 'auto';
+    // Travelling to the outpost opens the Cartographer's shop on arrival (or
+    // right away when the hero is already standing there).
+    const openShop = () => {
+        launchAtlasVendor('screen-map-view');
+    };
     marker.addEventListener('click', () => {
-        _walkSpriteToHome();
+        if (!_mvWalking && _mvCurrentWorldIdx === null) { openShop(); return; }
+        _walkSpriteToHome(openShop);
     });
     return marker;
 }

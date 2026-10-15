@@ -408,6 +408,7 @@ export function _egCellHasAnyDrop(row, col) {
         || _egCurrencyDrops.has(key)
         || _egItemDrops.has(key)
         || (typeof _egMapDrops !== 'undefined' && _egMapDrops.has(key))
+        || (!!globalThis._egGoldDrops && globalThis._egGoldDrops.has(key))
         || (typeof _charmCellHasDrop === 'function' && _charmCellHasDrop(row, col));
 }
 

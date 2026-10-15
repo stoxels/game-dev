@@ -215,7 +215,7 @@ import '../../js/loot/unique-items.js';
 import { _egvSwitchTab, showEndgameVendor } from '../../js/loot/loot-vendor.js';
 import '../../js/loot/loot-vendor-shared.js';
 import { _egvBuyTierMap } from '../../js/loot/loot-vendor-maps.js';
-import { _egvBuyCurrency, _egvBuyEssence, _egvBuyPuzzleItem } from '../../js/loot/loot-vendor-supplies.js';
+import { _egvBuyCharm, _egvBuyCurrency, _egvBuyEssence, _egvBuyPuzzleItem } from '../../js/loot/loot-vendor-supplies.js';
 import { _egvSetBaseFilter, _egvShowBaseTooltip, _egvHideBaseTooltip, _egvBuyBaseItem } from '../../js/loot/loot-vendor-equipment.js';
 import '../../js/loot/loot-vendor-styles.js';
 import { _egMeleeImpactThump, _egShowWeaponSwing, _egWeaponSwingSound, _egDoWeaponAttack, _initEgWeaponAttackHotkey } from '../../js/combat/combat-weapon-swing.js';
@@ -483,6 +483,7 @@ try { Object.defineProperty(globalThis, "NEXUS_WORLD_INDEX", { get() { return NE
 try { Object.defineProperty(globalThis, "PassiveTracker", { get() { return PassiveTracker; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "REPLAY_GALLERY_ENTRIES", { get() { return REPLAY_GALLERY_ENTRIES; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "SETTINGS", { get() { return SETTINGS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "UNIVERSAL_SPELL_DEFS", { get() { return UNIVERSAL_SPELL_DEFS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "WORLDS", { get() { return WORLDS; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "WORLD_CODES", { get() { return WORLD_CODES; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "WORLD_START_GI", { get() { return WORLD_START_GI; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -714,6 +715,7 @@ try { Object.defineProperty(globalThis, "_eglfSaveModal", { get() { return _eglf
 try { Object.defineProperty(globalThis, "_eglfSetRule", { get() { return _eglfSetRule; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egtPickSeedGi", { get() { return _egtPickSeedGi; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvBuyBaseItem", { get() { return _egvBuyBaseItem; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egvBuyCharm", { get() { return _egvBuyCharm; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvBuyCurrency", { get() { return _egvBuyCurrency; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvBuyEssence", { get() { return _egvBuyEssence; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvBuyPuzzleItem", { get() { return _egvBuyPuzzleItem; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -789,6 +791,7 @@ try { Object.defineProperty(globalThis, "beginRetrySetupRun", { get() { return b
 try { Object.defineProperty(globalThis, "buildInventoryPanel", { get() { return buildInventoryPanel; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "cancelRetrySetupModal", { get() { return cancelRetrySetupModal; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "cellDown", { get() { return cellDown; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "charmKeyFor", { get() { return charmKeyFor; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "checkLockedCodesOnSetup", { get() { return checkLockedCodesOnSetup; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "claimQuest", { get() { return claimQuest; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "closeClassOverlay", { get() { return closeClassOverlay; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -815,9 +818,14 @@ try { Object.defineProperty(globalThis, "finishQuiz", { get() { return finishQui
 try { Object.defineProperty(globalThis, "finishTutorial", { get() { return finishTutorial; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "gainMana", { get() { return gainMana; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getAvatarLastMoveDir", { get() { return getAvatarLastMoveDir; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "getCharmArtForSkill", { get() { return getCharmArtForSkill; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "getCharmByKey", { get() { return getCharmByKey; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getClassPenaltyMultiplier", { get() { return getClassPenaltyMultiplier; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "getGameTooltip", { get() { return getGameTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "getSkillDef", { get() { return getSkillDef; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "getSkillName", { get() { return getSkillName; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "goToPreviousScreen", { get() { return goToPreviousScreen; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "grantCharm", { get() { return grantCharm; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "handleCharmCurrencyTip", { get() { return handleCharmCurrencyTip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "handleCharmEmptySlotTip", { get() { return handleCharmEmptySlotTip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "handleCharmMaxRankToggle", { get() { return handleCharmMaxRankToggle; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -971,6 +979,7 @@ try { globalThis["_egCraftingBenchApply"] = _egCraftingBenchApply; } catch (e) {
 try { globalThis["_egvSwitchTab"] = _egvSwitchTab; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor.js)
 try { globalThis["showEndgameVendor"] = showEndgameVendor; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor.js)
 try { globalThis["_egvBuyTierMap"] = _egvBuyTierMap; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-maps.js)
+try { globalThis["_egvBuyCharm"] = _egvBuyCharm; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)
 try { globalThis["_egvBuyCurrency"] = _egvBuyCurrency; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)
 try { globalThis["_egvBuyEssence"] = _egvBuyEssence; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)
 try { globalThis["_egvBuyPuzzleItem"] = _egvBuyPuzzleItem; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)

@@ -1,7 +1,7 @@
 import { Audio_Manager } from '../audio/audio.js';
 import { switchScreen } from '../screens/screens.js';
 import { t } from '../translation/translations.js';
-import { _egvBuildEssencesTabHTML, _egvBuildItemsTabHTML } from './loot-vendor-supplies.js';
+import { _egvBuildCharmsTabHTML, _egvBuildEssencesTabHTML, _egvBuildItemsTabHTML } from './loot-vendor-supplies.js';
 import { _egvRefreshGoldDisplay, _egvSetRenderTabContent } from './loot-vendor-shared.js';
 import { _egvEnsureStyles } from './loot-vendor-styles.js';
 import { _egvBuildBaseTabHTML } from './loot-vendor-equipment.js';
@@ -12,7 +12,8 @@ import { _egvBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// The gold vendor reached from the Nexus of Worlds screen. This module is the
+// The Cartographer's shop (formerly the Atlas Vendor), reached by travelling
+// back to the Cartographer's Outpost on the overworld map. This module is the
 // shell: it owns the tab bar, the screen layout, the tab registry and the
 // redraw logic. Each tab lives in its own module (maps, supplies, equipment)
 // and the stylesheet is injected once by loot-vendor-styles.js.
@@ -23,10 +24,11 @@ import { _egvBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
 //------------------------------------------------------------------------
 
 // Which tab is open. The last active tab is remembered across visits.
-let _egvActiveTab = 'currency';
+let _egvActiveTab = 'charms';
 
 // The vendor tabs (maps are no longer sold - they drop in the late campaign), in display order.
 const EG_VENDOR_TABS = [
+    { id: 'charms', labelKey: 'eg_vendor_tab_charms' },
     { id: 'currency', labelKey: 'eg_vendor_tab_currency' },
     { id: 'essences', labelKey: 'eg_vendor_tab_essences' },
     { id: 'items', labelKey: 'eg_vendor_tab_items' },
@@ -35,6 +37,7 @@ const EG_VENDOR_TABS = [
 
 // Hint line shown under each tab's content, as a translation key.
 const EG_VENDOR_TAB_HINTS = {
+    charms: 'eg_vendor_hint_charms',
     currency: 'eg_vendor_hint_currency',
     essences: 'eg_vendor_hint_essences',
     items: 'eg_vendor_hint_items',
@@ -91,6 +94,7 @@ function _egvRenderTabContent() {
     if (!contentEl) return;
 
     switch (_egvActiveTab) {
+        case 'charms': contentEl.innerHTML = _egvBuildCharmsTabHTML(); break;
         case 'currency': contentEl.innerHTML = _egvBuildCurrencyTabHTML(); break;
         case 'essences': contentEl.innerHTML = _egvBuildEssencesTabHTML(); break;
         case 'items': contentEl.innerHTML = _egvBuildItemsTabHTML(); break;
@@ -146,8 +150,8 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 export function showEndgameVendor() {
     if (!document.getElementById('screen-endgame-vendor')) _egvCreateScreen();
 
-    // The vendor is opened from the mode select screen (launchAtlasVendor),
-    // which pushes that screen onto the history: back pops to it.
+    // The vendor is opened from the overworld (launchAtlasVendor), which
+    // pushes the screen it came from onto the history: back pops to it.
     const backBtn = document.querySelector('#screen-endgame-vendor .back-btn');
     if (backBtn) backBtn.setAttribute('onclick', 'goToPreviousScreen()');
 

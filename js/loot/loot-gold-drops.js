@@ -3,52 +3,56 @@ import { EG_LOOT_DROP_LIFETIME_MS, _egBuildPickupEligiblePool, _egCancelTrackedE
 import { _egMapLootQuantityMult } from '../endgame/endgame-map-launch.js';
 import { _egIsActive } from '../combat/combat-state.js';
 import { EG_ART } from '../endgame/endgame-art.js';
+import { Audio_Manager } from '../audio/audio.js';
+import { t } from '../translation/translations.js';
+import { _egAddGold } from './loot-gold.js';
 
 //------------------------------------------------------------------------
-//-------------------ENDGAME GOLD COIN DROPS------------------------------
+//-------------------GOLD COIN DROPS---------------------------------------
 //------------------------------------------------------------------------
-// Gold stopped dropping from monsters: it is now an innate map-completion
-// reward. This file keeps the coin machinery and its API so existing call
-// sites keep working.
+// Gold coins are their own loot bucket: a kill rolls "gold" next to
+// equipment / currency / charms (see _egRollKillDropBucket), bosses always
+// drop one, and the amount grows with the monster's level so the campaign
+// pays out more the deeper you go. Claiming works like every other grid
+// drop: fill the cell and the coin is banked straight into the balance.
 //------------------------------------------------------------------------
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & STATE-------------------------------------
 //------------------------------------------------------------------------
 
-// Chance (0-1) that a defeated monster drops a gold coin. Retained from the
-// monster-drop era; the drop itself is no longer rolled.
-export const EG_GOLD_DROP_CHANCE_NORMAL = 0.30;  // 30% per normal monster kill
+// Bucket weight in the one-drop-per-kill roll (equipment 0.35, currency 0.25,
+// charms 0.03, ...): a deliberately rare ~8% of drops.
+export const EG_GOLD_DROP_CHANCE_NORMAL = 0.07;
 export const EG_GOLD_DROP_CHANCE_BOSS = 1.00;    // bosses always drop gold
 
 // Hard cap: how many gold coins may sit on the board at the same time.
-const EG_GOLD_DROP_MAX_ON_BOARD = 4;
+const EG_GOLD_DROP_MAX_ON_BOARD = 2;
 
-// Base gold amount range per claimed coin (before map-tier scaling).
-const EG_GOLD_BASE_MIN = 4;
-const EG_GOLD_BASE_MAX = 9;
+// Coin value = BASE + PER_LEVEL x monster level (+-20% variance). Campaign
+// monsters run from level 1 to ~68, so a coin grows from ~6 to ~110 gold.
+const EG_GOLD_BASE = 4;
+const EG_GOLD_PER_LEVEL = 1.6;
 
 // Boss coins multiply the rolled amount by this factor.
-const EG_GOLD_BOSS_AMOUNT_MULT = 4;
+const EG_GOLD_BOSS_AMOUNT_MULT = 5;
 
 // Live gold coins on the board, keyed by "row-col" to { amount }.
 export const _egGoldDrops = new Map();
+// The grid's drop-collision check (combat-grid-pickups.js) reads the map
+// through the global so the two modules need not import each other.
+try { Object.defineProperty(globalThis, '_egGoldDrops', { get() { return _egGoldDrops; }, configurable: true }); } catch (e) {}
 
 //------------------------------------------------------------------------
 //-------------------AMOUNT ROLLING---------------------------------------
 //------------------------------------------------------------------------
 
-// Rolls one coin's worth of gold, scaled by monster level, map loot bonus,
-// and whether the source was a boss. Kept exported for API compatibility;
-// the monster drop that used it is now a no-op.
+// Rolls one coin's worth of gold from the monster level, the active map's
+// loot quantity bonus, and whether the source was a boss.
 export function _egRollGoldAmount(isBoss, monsterLevel) {
-    let amount = EG_GOLD_BASE_MIN + Math.floor(Math.random() * (EG_GOLD_BASE_MAX - EG_GOLD_BASE_MIN + 1));
+    const level = Math.max(1, Number(monsterLevel) || 1);
+    let amount = (EG_GOLD_BASE + EG_GOLD_PER_LEVEL * level) * (0.8 + Math.random() * 0.4);
 
-    // Higher-level monsters carry richer coins.
-    const levelBonus = Math.max(0, Math.min(20, Math.round((monsterLevel || 1) - 1)) * 0.15);
-    amount *= (1 + levelBonus);
-
-    // Active map's loot quantity bonus also scales gold.
     if (typeof _egMapLootQuantityMult === 'function') {
         amount *= _egMapLootQuantityMult();
     }
@@ -58,10 +62,14 @@ export function _egRollGoldAmount(isBoss, monsterLevel) {
     return Math.max(1, Math.round(amount));
 }
 
-// Gold no longer drops from monsters - it's now an innate map completion
-// reward. This function is kept as a no-op for API compatibility.
-export function _egTryDropGold(isBoss, monsterLevel) {
-    return;
+// Chance-driven coin drop after a kill (bosses always drop). `force` skips
+// the chance roll (the kill handler already picked gold as this creature's
+// one drop). Returns true when a coin landed on the board.
+export function _egTryDropGold(isBoss, monsterLevel, force = false) {
+    if (!_egIsActive()) return false;
+    const chance = isBoss ? EG_GOLD_DROP_CHANCE_BOSS : EG_GOLD_DROP_CHANCE_NORMAL;
+    if (!force && Math.random() > chance) return false;
+    return _egSpawnGoldDrop(_egRollGoldAmount(isBoss, monsterLevel));
 }
 
 //------------------------------------------------------------------------
@@ -87,8 +95,7 @@ function _egRemoveGoldDropOverlay(key) {
     if (span) span.remove();
 }
 
-// Floats a spinning coin over the cell that was just claimed. Kept exported
-// for API compatibility; claiming a coin no longer happens.
+// Floats a spinning coin over the cell that was just claimed.
 export function _egAnimateGoldDropClaim(row, col, drop) {
     const el = document.getElementById(`g-${row}-${col}`);
     if (!el) return;
@@ -108,8 +115,8 @@ export function _egAnimateGoldDropClaim(row, col, drop) {
 
 // Places one gold coin on an eligible grid cell (mirrors _egSpawnCurrencyDrop).
 export function _egSpawnGoldDrop(amount) {
-    if (!_egIsActive() || !(amount > 0)) return;
-    if (_egGoldDrops.size >= EG_GOLD_DROP_MAX_ON_BOARD) return;
+    if (!_egIsActive() || !(amount > 0)) return false;
+    if (_egGoldDrops.size >= EG_GOLD_DROP_MAX_ON_BOARD) return false;
 
     const pool = typeof _egBuildPickupEligiblePool === 'function'
         ? _egBuildPickupEligiblePool()
@@ -117,7 +124,7 @@ export function _egSpawnGoldDrop(amount) {
     const filtered = typeof _egCellHasAnyDrop === 'function'
         ? pool.filter(([r, c]) => !_egCellHasAnyDrop(r, c))
         : pool;
-    if (filtered.length === 0) return;
+    if (filtered.length === 0) return false;
 
     const [r, c] = filtered[Math.floor(Math.random() * filtered.length)];
     const key = `${r}-${c}`;
@@ -141,20 +148,46 @@ export function _egSpawnGoldDrop(amount) {
             _egStartDropExpireCountdown(`eg-gold-drop-${r}-${c}`, lifetimeMs);
         }
     }
+    return true;
 }
 
 //------------------------------------------------------------------------
-//-------------------LEGACY CALL SITES--------------------------------------
-//------------------------------------------------------------------------
-// Gold no longer drops on the grid, so claiming and discarding a coin do
-// nothing. These stay so the shared drop code keeps calling the same names.
+//-------------------CLAIM & DISCARD---------------------------------------
 //------------------------------------------------------------------------
 
-// Always reports "no coin here".
-export function _egCheckGoldDropClaim(row, col) { return false; }
+// Banks the coin on a cell into the gold balance. Called from the shared
+// claim router (mouse-button-handlers.js) when the cell is filled correctly.
+export function _egCheckGoldDropClaim(row, col) {
+    if (!_egIsActive()) return false;
+    const key = `${row}-${col}`;
+    const drop = _egGoldDrops.get(key);
+    if (!drop) return false;
 
-// Does nothing: there is no coin to throw away.
-export function _egDiscardGoldDrop(row, col) {}
+    if (typeof _egCancelTrackedExpiry === 'function') _egCancelTrackedExpiry(_egGoldDrops, key, drop);
+    _egGoldDrops.delete(key);
+    _egRemoveGoldDropOverlay(key);
+    _egAnimateGoldDropClaim(row, col, drop);
+
+    _egAddGold(drop.amount);
+    globalThis.showToast(t('eg_gold_claimed').replace('{n}', drop.amount), '#f5d98a');
+    Audio_Manager.playSFX('pickup_currency', 'player_equip_pickup');
+    return true;
+}
+
+// A wrongly filled cell destroys the coin sitting on it.
+export function _egDiscardGoldDrop(row, col) {
+    if (!_egIsActive()) return;
+    const key = `${row}-${col}`;
+    const drop = _egGoldDrops.get(key);
+    if (!drop) return;
+    if (typeof _egCancelTrackedExpiry === 'function') _egCancelTrackedExpiry(_egGoldDrops, key, drop);
+    _egGoldDrops.delete(key);
+    _egRemoveGoldDropOverlay(key);
+    if (typeof globalThis._egAnimatePickupDiscard === 'function') {
+        globalThis._egAnimatePickupDiscard(row, col, { emoji: '🪙', artId: 'gold' });
+    }
+    Audio_Manager.playSFX('player_equip_not_pickup');
+}
 
 // Clears every coin still on the board.
 export function _egStopGoldDrops() {
@@ -165,5 +198,6 @@ export function _egStopGoldDrops() {
     _egGoldDrops.clear();
 }
 
-// Does nothing: gold is no longer a carried drop type.
+// Coins are not carried into the next level (they would only be a few seconds
+// old); kept so the shared drop code keeps calling the same names.
 export function _egReplaceCarriedGoldDrops(drops) {}

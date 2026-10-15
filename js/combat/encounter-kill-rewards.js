@@ -13,6 +13,7 @@ import { _egDropHeartPickup } from './combat-grid-pickups-spawner.js';
 import { _egSpawnItemDrop } from './combat-grid-pickups-items.js';
 import { _egTryDropMap } from '../loot/loot-map-drops.js';
 import { _egIsCampaignRun } from './combat-state.js';
+import { EG_GOLD_DROP_CHANCE_NORMAL, _egTryDropGold } from '../loot/loot-gold-drops.js';
 
 //------------------------------------------------------------------------
 //-------------------KILL REWARDS-------------------------------------------
@@ -32,8 +33,8 @@ function _egTutorialSuppressesDrops() {
 // single monster could shower several drops and the board filled with loot.
 // Now a kill first rolls "does anything drop" and, if so, picks exactly ONE
 // bucket, weighted by each bucket's own base chance (so the relative
-// frequencies players know are preserved). Charms carry a deliberately small
-// weight. The chosen bucket's own chance roll is skipped (force = true);
+// frequencies players know are preserved). Charms and gold coins carry
+// deliberately small weights. The chosen bucket's own chance roll is skipped (force = true);
 // its other rules (board caps, free cells, level gates) still apply.
 export const EG_KILL_DROP_CHANCE_NORMAL = 0.6;   // P(something drops) per normal kill
 
@@ -71,6 +72,7 @@ export function _egRollKillDropBucket(opts, rng) {
         ['currency', EG_CURRENCY_DROP_CHANCE_NORMAL],
         ['essence', EG_ESSENCE_DROP_CHANCE_NORMAL],
         ['charm', CHARM_DROP_CHANCE_NORMAL],
+        ['gold', EG_GOLD_DROP_CHANCE_NORMAL],
     ];
     // Puzzle items never spawn on Ironman; the passive tree boosts their weight.
     if (!o.ironman) buckets.push(['item', EG_ITEM_DROP_CHANCE_NORMAL * (1 + (Number(o.itemDropPct) || 0) / 100)]);
@@ -138,6 +140,7 @@ export function _egHandleNormalMonsterKill(dying) {
                 }
                 break;
             case 'charm': if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(false, dying.level, true); break;
+            case 'gold': _egTryDropGold(false, dying.level, true); break;
             default: break;
         }
     }
@@ -168,5 +171,7 @@ export function _egHandleBossKill(dying) {
         if (typeof _egTryDropMap === 'function') _egTryDropMap(true, dying.level);
         // Bosses always drop a charm (see skill-charms.js).
         if (typeof _charmTryMonsterDrop === 'function') _charmTryMonsterDrop(true, dying.level);
+        // ...and a boss coin worth several regular ones.
+        _egTryDropGold(true, dying.level, true);
     }
 }

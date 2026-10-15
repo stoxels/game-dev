@@ -303,3 +303,90 @@ export function _egvBuyPuzzleItem(defId) {
     try { trackAchStat('egVendorPurchases', 1); } catch (e) { /* never block a purchase */ }
     _egvRefreshTabContent();
 }
+
+//------------------------------------------------------------------------
+//-------------------SPELL CHARMS TAB---------------------------------------
+//------------------------------------------------------------------------
+//------------------------------------------------------------------------
+
+// The Cartographer sells exactly the ranks a player would otherwise find
+// during the campaign (ranks 1-5; ranks 6+ stay map-only drops). A rank opens
+// up at the monster level it starts dropping at (mirrors
+// CHARM_RANK_MIN_MONSTER_LEVEL in skill-charms.js), so the shop never runs
+// ahead of the road. Prices are gold, sized against campaign coin income.
+const EG_VENDOR_CHARM_RANK_PRICES = [60, 250, 700, 1800, 4200];
+// Minimum player level per rank (index = rank - 1).
+const EG_VENDOR_CHARM_RANK_MIN_LEVEL = [1, 10, 22, 35, 50];
+
+// Live player level for the rank gates (saved level when the HUD hook is absent).
+function _egvPlayerLevel() {
+    try {
+        const lv = Math.round(Number(globalThis._egGetPlayerLevel && globalThis._egGetPlayerLevel()) || 0);
+        if (lv >= 1) return lv;
+    } catch (e) { /* fall back to the saved level */ }
+    return Math.max(1, Math.round(Number(STATE && STATE.playerLevel) || 1));
+}
+
+// One row per universal spell (the arsenal charms drop for), in registry order.
+function _egvCharmSkillIds() {
+    const defs = Array.isArray(globalThis.UNIVERSAL_SPELL_DEFS) ? globalThis.UNIVERSAL_SPELL_DEFS : [];
+    return defs.map(d => d && d.id).filter(id => id && globalThis.getSkillDef(id));
+}
+
+// True when the charm for this skill + rank is already in the inventory.
+function _egvCharmOwned(skillId, rank) {
+    return !!globalThis.getCharmByKey(globalThis.charmKeyFor(skillId, rank));
+}
+
+// Builds one card per spell with a buy button for every sold rank.
+export function _egvBuildCharmsTabHTML() {
+    const lv = _egvPlayerLevel();
+    const gold = egGetGold();
+    const cards = _egvCharmSkillIds().map(id => {
+        const def = globalThis.getSkillDef(id);
+        const art = globalThis.getCharmArtForSkill(id, 1);
+        const icon = art ? `<img class="eg-art-img" src="${art}" alt="" draggable="false">` : (def.icon || '💫');
+        const ranks = EG_VENDOR_CHARM_RANK_PRICES.map((price, i) => {
+            const rank = i + 1;
+            if (_egvCharmOwned(id, rank)) {
+                return `<span class="egv-charm-rank egv-charm-owned">R${rank}<small>${t('eg_vendor_charm_owned')}</small></span>`;
+            }
+            const need = EG_VENDOR_CHARM_RANK_MIN_LEVEL[i];
+            if (lv < need) {
+                return `<span class="egv-charm-rank egv-charm-locked">R${rank}<small>${t('eg_vendor_charm_locked').replace('{n}', need)}</small></span>`;
+            }
+            const cls = gold < price ? ' egv-charm-short' : '';
+            return `<button class="egv-charm-rank egv-charm-buy${cls}" onclick="_egvBuyCharm('${id}', ${rank})">R${rank}<small>🪙 ${price.toLocaleString()}</small></button>`;
+        }).join('');
+        return `
+<div class="egv-card egv-charm-card">
+    <div class="egv-card-top">
+        <div class="egv-card-icon">${icon}</div>
+        <div class="egv-card-info"><div class="egv-card-name">${globalThis.getSkillName(id)}</div></div>
+    </div>
+    <div class="egv-charm-ranks">${ranks}</div>
+</div>`;
+    }).join('');
+    return `<div class="egv-cards">${cards}</div>`;
+}
+
+// Buys one rank's charm; it goes straight into the spell book.
+export function _egvBuyCharm(skillId, rank) {
+    rank = Math.round(Number(rank));
+    const i = rank - 1;
+    const price = EG_VENDOR_CHARM_RANK_PRICES[i];
+    if (!(price > 0) || !globalThis.getSkillDef(skillId)) return;
+    if (_egvCharmOwned(skillId, rank) || _egvPlayerLevel() < EG_VENDOR_CHARM_RANK_MIN_LEVEL[i]) return;
+
+    if (!egSpendGold(price)) {
+        globalThis.showToast(t('eg_vendor_no_gold').replace('{n}', price - egGetGold()));
+        Audio_Manager.playSFX('ui_error', 'player_equip_not_pickup');
+        return;
+    }
+    globalThis.grantCharm(skillId, rank);
+    Audio_Manager.playSFX('gold_spend');
+    globalThis.showToast(t('eg_vendor_bought_charm')
+        .replace('{name}', `${globalThis.getSkillName(skillId)} · ${t('skill_tip_rank')} ${rank}`));
+    try { trackAchStat('egVendorPurchases', 1); } catch (e) { /* never block a purchase */ }
+    _egvRefreshTabContent();
+}

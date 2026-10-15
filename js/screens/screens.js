@@ -381,11 +381,11 @@ export function launchEndgameTestMode() {
     if (typeof globalThis.showEndgameNexus === 'function') globalThis.showEndgameNexus();
 }
 
-// Opens the Atlas Vendor straight from the mode select screen. Gold is earned
-// in the campaign now, so the vendor is no longer an endgame-only door. Back
-// returns to the mode select screen (history entry pushed here).
-export function launchAtlasVendor() {
-    globalThis.screenHistory.push('screen-mode-select');
+// Opens the Cartographer's shop (the old Atlas Vendor). The overworld calls
+// this on arrival at the Cartographer's Outpost; `fromScreen` is the screen
+// Back returns to (defaults to the map view).
+export function launchAtlasVendor(fromScreen) {
+    globalThis.screenHistory.push(typeof fromScreen === 'string' ? fromScreen : 'screen-map-view');
     if (typeof globalThis.showEndgameVendor === 'function') globalThis.showEndgameVendor();
 }
 
