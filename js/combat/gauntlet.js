@@ -106,7 +106,8 @@ export const EG_GAUNTLET_CONFIG = {
     lavaPools: 3,
     lavaRadiusPx: 64,
     lavaTickMs: 700,
-    lavaDamageMult: 0.7,            // of the campaign monster damage per tick
+    lavaDamageMult: 0.7,
+    lavaDriftPxPerSec: 38,          // pools slowly roam the arena (they used to sit still)            // of the campaign monster damage per tick
     shrinkMs: 70000,
     shrinkMinFactor: 0.58,
     shrineRadiusPx: 58,
@@ -389,7 +390,7 @@ const _MODIFIERS = ['lava', 'shrink', 'shrine'];
 
 function _modInfo(id) {
     return {
-        lava:   { icon: '🌋', en: 'Lava pools burn you - stay out of them', de: 'Lavapfützen verbrennen dich - meide sie' },
+        lava:   { icon: '🌋', en: 'Drifting lava pools burn you - keep clear of them', de: 'Wandernde Lavapfützen verbrennen dich - meide sie' },
         shrink: { icon: '🕳', en: 'The floor shrinks as time passes', de: 'Der Boden schrumpft mit der Zeit' },
         shrine: { icon: '✨', en: 'A healing shrine moves around - stand in it to recover', de: 'Ein Heilschrein wandert umher - steh darin, um dich zu erholen' },
     }[id];
@@ -418,8 +419,14 @@ function _setupModifier() {
             el.className = 'ga-lava';
             el.style.cssText = `left:${pos.x - cfg.lavaRadiusPx}px;top:${pos.y - cfg.lavaRadiusPx}px;width:${cfg.lavaRadiusPx * 2}px;height:${cfg.lavaRadiusPx * 2}px`;
             _g.overlay.appendChild(el);
-            _g.hazards.push({ x: pos.x, y: pos.y, el });
+            const ang = Math.random() * Math.PI * 2;
+            _g.hazards.push({
+                x: pos.x, y: pos.y, el,
+                vx: Math.cos(ang) * cfg.lavaDriftPxPerSec,
+                vy: Math.sin(ang) * cfg.lavaDriftPxPerSec,
+            });
         }
+        _g.lavaMovedAt = Date.now();
     } else if (_g.modifier === 'shrink') {
         const safe = document.createElement('div');
         safe.id = 'ga-safe';
@@ -452,6 +459,26 @@ function _modifierTick() {
     const pc = _playerCentreLocal();
     if (!pc) return;
     if (_g.modifier === 'lava') {
+        // Pools drift and bounce off the arena edge.
+        const dt = Math.min(0.5, Math.max(0, (now - (_g.lavaMovedAt || now)) / 1000));
+        _g.lavaMovedAt = now;
+        if (dt > 0) {
+            const r = _arenaRect();
+            const rad = cfg.lavaRadiusPx;
+            const minX = rad + 6, maxX = r.width - rad - 6;
+            const minY = rad + 40, maxY = r.height - rad - 6;
+            _g.hazards.forEach(h => {
+                if (!h.vx && !h.vy) return;
+                h.x += h.vx * dt;
+                h.y += h.vy * dt;
+                if (h.x < minX) { h.x = minX; h.vx = Math.abs(h.vx); }
+                if (h.x > maxX) { h.x = maxX; h.vx = -Math.abs(h.vx); }
+                if (h.y < minY) { h.y = minY; h.vy = Math.abs(h.vy); }
+                if (h.y > maxY) { h.y = maxY; h.vy = -Math.abs(h.vy); }
+                h.el.style.left = `${h.x - rad}px`;
+                h.el.style.top = `${h.y - rad}px`;
+            });
+        }
         const inLava = _g.hazards.some(h => Math.hypot(h.x - pc.x, h.y - pc.y) <= cfg.lavaRadiusPx);
         if (inLava && now - _g.lavaAt >= cfg.lavaTickMs) {
             _g.lavaAt = now;

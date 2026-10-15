@@ -753,6 +753,20 @@ export function _egSpawnNextArenaBoss() {
         globalThis.showToast(t('eg_boss_arrived').replace('{name}', name), '#f87171');
         _egSpawnMonster(entry.id, entry.level || 1, entry.hpMult || 1);
         _egUpdateObjectivesHUD();
+        // Watchdog: if the boss still is not on the field (a refused spawn
+        // must never strand the arena), retry a few times.
+        let tries = 0;
+        const watch = setInterval(() => {
+            tries++;
+            if (!_egIsActive() || !_egBossPhaseActive || _egBossDefeated()
+                || globalThis._egMonsters.some(m => m.isBoss) || tries > 6) {
+                clearInterval(watch);
+                return;
+            }
+            if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
+            _egSpawnMonster(entry.id, entry.level || 1, entry.hpMult || 1);
+            _egUpdateObjectivesHUD();
+        }, 700);
     }, EG_BOSS_SPAWN_DELAY_MS);
 }
 

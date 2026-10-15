@@ -86,7 +86,11 @@ export function _egSpawnMonster(defId, level, hpMult = 1) {
     const cap = globalThis._egGauntletFlag
         ? Math.max(EG_MAX_CONCURRENT_MONSTERS, Number(globalThis._egGauntletMaxConcurrent) || 0)
         : EG_MAX_CONCURRENT_MONSTERS;
-    if (globalThis._egMonsters.length >= cap) return;
+    // Bosses are never refused by the concurrent-monster cap: a full pack of
+    // leftover campaign monsters used to swallow the trial boss silently
+    // (playtest: the world 3 convergence trial showed 0/1 Bosses forever).
+    const isBossDef = !!(typeof EG_BOSS_DEFS !== 'undefined' && globalThis.EG_BOSS_DEFS && globalThis.EG_BOSS_DEFS[defId]);
+    if (!isBossDef && globalThis._egMonsters.length >= cap) return;
 
     const monster = _egBuildMonsterOrBoss(defId, level, hpMult);
     if (!monster) return;
