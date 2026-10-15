@@ -1597,7 +1597,20 @@ function _buildHomeMarker() {
     const openShop = () => {
         launchAtlasVendor('screen-map-view');
     };
+    marker.addEventListener('mouseenter', (e) => {
+        const gold = (STATE && Math.round(Number(STATE.egGold) || 0)) || 0;
+        const tip = _ensureTooltipElement();
+        tip.innerHTML = `<div class="mv-tooltip-title">${t('scr_outpost_title')}</div>`
+            + `<div class="mv-tooltip-sub">${t('scr_outpost_desc')}</div>`
+            + `<div class="mv-tooltip-sub">${t('scr_outpost_gold').replace('{n}', gold.toLocaleString())}</div>`
+            + `<div class="mv-tooltip-sub">${t('scr_outpost_click')}</div>`;
+        tip.classList.add('show');
+        _trackTooltipToMouse(e);
+    });
+    marker.addEventListener('mousemove', _trackTooltipToMouse);
+    marker.addEventListener('mouseleave', () => _hideWorldTooltip());
     marker.addEventListener('click', () => {
+        _hideWorldTooltip();
         if (!_mvWalking && _mvCurrentWorldIdx === null) { openShop(); return; }
         _walkSpriteToHome(openShop);
     });

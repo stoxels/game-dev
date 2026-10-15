@@ -348,19 +348,20 @@ export function _egvBuildCharmsTabHTML() {
         const icon = art ? `<img class="eg-art-img" src="${art}" alt="" draggable="false">` : (def.icon || '💫');
         const ranks = EG_VENDOR_CHARM_RANK_PRICES.map((price, i) => {
             const rank = i + 1;
+            const tip = ` onmouseenter="handleSkillTipRank(event, '${id}', ${rank})" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()"`;
             if (_egvCharmOwned(id, rank)) {
-                return `<span class="egv-charm-rank egv-charm-owned">R${rank}<small>${t('eg_vendor_charm_owned')}</small></span>`;
+                return `<span class="egv-charm-rank egv-charm-owned"${tip}>R${rank}<small>${t('eg_vendor_charm_owned')}</small></span>`;
             }
             const need = EG_VENDOR_CHARM_RANK_MIN_LEVEL[i];
             if (lv < need) {
-                return `<span class="egv-charm-rank egv-charm-locked">R${rank}<small>${t('eg_vendor_charm_locked').replace('{n}', need)}</small></span>`;
+                return `<span class="egv-charm-rank egv-charm-locked"${tip}>R${rank}<small>${t('eg_vendor_charm_locked').replace('{n}', need)}</small></span>`;
             }
             const cls = gold < price ? ' egv-charm-short' : '';
-            return `<button class="egv-charm-rank egv-charm-buy${cls}" onclick="_egvBuyCharm('${id}', ${rank})">R${rank}<small>🪙 ${price.toLocaleString()}</small></button>`;
+            return `<button class="egv-charm-rank egv-charm-buy${cls}"${tip} onclick="_egvBuyCharm('${id}', ${rank})">R${rank}<small>🪙 ${price.toLocaleString()}</small></button>`;
         }).join('');
         return `
 <div class="egv-card egv-charm-card">
-    <div class="egv-card-top">
+    <div class="egv-card-top" onmouseenter="handleSkillTipRank(event, '${id}', 1)" onmousemove="handleSkillTipMove(event)" onmouseleave="handleSkillTipLeave()">
         <div class="egv-card-icon">${icon}</div>
         <div class="egv-card-info"><div class="egv-card-name">${globalThis.getSkillName(id)}</div></div>
     </div>

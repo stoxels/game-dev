@@ -346,7 +346,7 @@ function buildSkillTooltipHTML(skillId, charmKey) {
     return _buildSkillTooltipHTML(skillId, charmKey);
 }
 
-function _buildSkillTooltipHTML(skillId, charmKey) {
+function _buildSkillTooltipHTML(skillId, charmKey, previewRank) {
     const def = getSkillDef(skillId);
     if (!def) return '';
 
@@ -354,7 +354,7 @@ function _buildSkillTooltipHTML(skillId, charmKey) {
     // While the spell's charm is slotted, the charm's rank is the rank the
     // player actually casts at (js/skills/skill-charms.js).
     const charmRank = hovered ? hovered.rank : getCharmSlottedRank(skillId);
-    const rank = charmRank || getSkillLevel(skillId);
+    const rank = previewRank || charmRank || getSkillLevel(skillId);
     const desc = getSkillDesc(skillId);
 
     return `<div class="skl-tip">`
@@ -368,9 +368,9 @@ function _buildSkillTooltipHTML(skillId, charmKey) {
         + `<div class="skl-tip-sep"></div>`
         + `<div class="skl-tip-desc">${desc}</div>`
         + _skillTooltipDamage(def)
-        + (hovered ? '' : _skillTooltipCharmBonus(skillId))
+        + (hovered || previewRank ? '' : _skillTooltipCharmBonus(skillId))
         + _skillTooltipGating(def)
-        + (hovered ? '' : _skillTooltipCharmLock(skillId))
+        + (hovered || previewRank ? '' : _skillTooltipCharmLock(skillId))
         + `</div>`;
 }
 
@@ -440,6 +440,14 @@ export function handleSkillTip(e, skillId, charmKey) {
     const html = isSkillPassive(skillId)
         ? buildPassiveSkillTooltipHTML(skillId)
         : buildSkillTooltipHTML(skillId, charmKey);
+    if (html) showHUDTooltip(html, e);
+}
+
+// Shows the tooltip for a skill AT a given rank, owned or not (the Cartographer's
+// charm shop previews ranks the player has not bought yet).
+export function handleSkillTipRank(e, skillId, rank) {
+    const r = Math.max(1, Math.round(Number(rank) || 1));
+    const html = withPreviewCastRank(skillId, r, () => _buildSkillTooltipHTML(skillId, null, r));
     if (html) showHUDTooltip(html, e);
 }
 
