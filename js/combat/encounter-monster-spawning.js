@@ -22,7 +22,9 @@ import { _egComputePlayerStats, _egFormatStatValue } from '../endgame/endgame-pl
 // Professor's portrait (top-right), so the tutorial monster can never spawn
 // on top of him.
 export function _egAssignRandomSpawnZone(monster) {
-    if (typeof _tqIsTutorialActive === 'function') {
+    // The tutorial's parry arena (gauntlet.js) owns its own zones, so the
+    // bottom-dock rule must not pull its monsters out of the modal.
+    if (typeof _tqIsTutorialActive === 'function' && !globalThis._egParryTutorialForce) {
         try {
             if (globalThis._tqIsTutorialActive()) {
                 monster.zoneId = 'eg-monster-panel';
