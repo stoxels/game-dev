@@ -983,7 +983,11 @@ function _egBuildStatusIconsHTML(statusMap) {
     const now = Date.now();
     return Object.keys(statusMap)
         .filter(key => statusMap[key].until > now)
-        .map(key => `<span class="eg-status-icon st-${key}" data-tip="${globalThis._tipAttr(_egAilmentLabel(key))}">${EG_AILMENT_ICONS[key] || '?'}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`)
+        .map(key => {
+            // Crimson Dance stacks: show the stack count on the bleed chip.
+            const stacks = (key === 'bleed' && statusMap[key].stacks > 1) ? `×${statusMap[key].stacks} ` : '';
+            return `<span class="eg-status-icon st-${key}" data-tip="${globalThis._tipAttr(_egAilmentLabel(key))}">${EG_AILMENT_ICONS[key] || '?'}${stacks}${Math.ceil((statusMap[key].until - now) / 1000)}</span>`;
+        })
         .join('');
 }
 
@@ -996,6 +1000,13 @@ function _egRenderMonsterStatusStrip(m) {
     if (strip.dataset.sig === sig) return;
     strip.dataset.sig = sig;
     strip.innerHTML = _egBuildStatusIconsHTML(m.statuses);
+    // Bleeding monsters wear a red drip glow + badge on the whole card, so the
+    // DoT reads at a glance without finding the small status chip.
+    const card = document.getElementById(`eg-card-${m.id}`);
+    if (card) {
+        const bleed = m.statuses.bleed;
+        card.classList.toggle('eg-bleeding', !!(bleed && bleed.until > Date.now()));
+    }
 }
 
 // Player icon strip above the avatar - created lazily, refreshed per tick.
