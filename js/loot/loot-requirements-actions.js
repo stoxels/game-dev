@@ -102,7 +102,10 @@ export function _egIsItemBlocked(item) {
 }
 
 // Moves an off-hand weapon to the stash when a two-hander is equipped.
-export function _egTryAutoUnequipOffhandForTwoHander() {
+// `avoid` ({r, c}) is a stash cell that must NOT receive the off-hand: while a
+// drag is in flight the dragged item's origin cell is empty but reserved for
+// the weapon it displaces - using it would overwrite (lose) the off-hand.
+export function _egTryAutoUnequipOffhandForTwoHander(avoid) {
     if (typeof _egEquipped === 'undefined' || !_egEquipped.weapon2) return true;
     try {
         const gate = _egCheckUnequipSlot('weapon2');
@@ -114,7 +117,24 @@ export function _egTryAutoUnequipOffhandForTwoHander() {
     const off = _egEquipped.weapon2;
     try {
         if (typeof _egFindFreeInvCell === 'function' && typeof _egInventory !== 'undefined' && _egInventory) {
-            const pos = _egFindFreeInvCell();
+            let pos = null;
+            if (avoid && Number.isInteger(avoid.r) && Number.isInteger(avoid.c)) {
+                for (let r = 0; r < _egInventory.length && !pos; r++) {
+                    if (!Array.isArray(_egInventory[r])) continue;
+                    for (let c = 0; c < _egInventory[r].length; c++) {
+                        if (_egInventory[r][c] || (r === avoid.r && c === avoid.c)) continue;
+                        pos = { r, c };
+                        break;
+                    }
+                }
+            }
+            if (!pos) pos = _egFindFreeInvCell();
+            if (avoid && pos.r === avoid.r && pos.c === avoid.c) {
+                // Only the reserved cell was free: take a fresh row instead.
+                const nr = _egInventory.length;
+                if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(nr + 1);
+                pos = { r: nr, c: 0 };
+            }
             if (typeof _egEnsureInvRows === 'function') _egEnsureInvRows(pos.r + 1);
             _egInventory[pos.r][pos.c] = off;
             delete _egEquipped.weapon2;

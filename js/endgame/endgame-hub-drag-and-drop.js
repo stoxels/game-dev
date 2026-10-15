@@ -748,7 +748,7 @@ export function _dndDropOnEquipSlot(equipSlotEl) {
         // stash instead of rejecting (other hand conflicts still reject).
         if (gate.handError === 'two_handed_blocks_offhand' && slotId === 'weapon1'
             && typeof _egTryAutoUnequipOffhandForTwoHander === 'function'
-            && _egTryAutoUnequipOffhandForTwoHander()) {
+            && _egTryAutoUnequipOffhandForTwoHander(_dnd.sourceZone === 'inv' ? { r: _dnd.sourceRow, c: _dnd.sourceCol } : null)) {
             const retry = _egCanEquipInSlot(_dnd.item, slotId);
             if (!retry.ok) {
                 _egShowRequirementsToast('equip', retry, _dnd.item);
