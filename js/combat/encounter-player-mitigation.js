@@ -46,6 +46,8 @@ export function _egApplyGroundedReduction(rawDamage) {
 // Creates the short-lived HUD label shown after a held or dual-wield parry.
 export function _egApplyPlayerParryFeedback() {
     Audio_Manager.playSFX('player_parry');
+    // Tutorial parry lesson counts every successful parry (set by gauntlet.js).
+    try { if (typeof globalThis._egOnPlayerParry === 'function') globalThis._egOnPlayerParry(); } catch (e) { /* counter optional */ }
     const hud = document.getElementById('player-avatar-wrapper');
     if (!hud) return;
     const label = document.createElement('div');
@@ -71,6 +73,8 @@ export function _egApplyPlayerDeflectFeedback() {
 
 // Returns the held-parry chance: the fixed base plus player gear.
 export function _egGetParryChancePct() {
+    // The tutorial's parry lesson: a held parry always lands.
+    if (globalThis._egParryTutorialForce) return 100;
     const base = (typeof EG_PARRY_BASE_PCT !== 'undefined' ? EG_PARRY_BASE_PCT : 50);
     const gear = (_egComputePlayerStats().parryChancePct || 0);
     return base + gear;

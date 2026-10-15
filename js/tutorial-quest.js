@@ -3,11 +3,12 @@ import { _getPlayerMaxMana, updateClassHUDManaBar } from './classes/class-mana.j
 import { _egOnPause, _egOnResume } from './combat/encounter-tick-support.js';
 import { _egStopEncounter } from './combat/encounter-lifecycle.js';
 import { _egGetTarget } from './combat/encounter-charged-shot.js';
+import { startParryTutorial } from './combat/gauntlet.js';
 import { _egDamageTargetById } from './combat/encounter-monster-damage.js';
 import { _egSpawnMonster } from './combat/encounter-monster-spawning.js';
 import { EG_ALL_BASE_TYPES } from './loot/equipment-base-items.js';
 import { _egCellHasAnyDrop } from './combat/combat-grid-pickups.js';
-import { _egDropHeartPickup } from './combat/combat-grid-pickups-spawner.js';
+import { _egDropHeartPickup, _egStopPickupSpawner } from './combat/combat-grid-pickups-spawner.js';
 import { _egFlushRunLootToStash, _egRenderLootOverlay } from './combat/combat-grid-pickups-loot.js';
 import { _egRenderCurrencyDropOverlay } from './combat/combat-grid-pickups-currency.js';
 import { _egRenderItemDropOverlay } from './combat/combat-grid-pickups-items.js';
@@ -199,6 +200,9 @@ let _tqCandleUsable = false;
 let _tqSpellbookPause = false;
 // True once the current tutorial puzzle was solved (drives solve tasks).
 let _tqPuzzleSolvedFlag = false;
+// Parry lesson (phase p4): set once the training arena reports success (or
+// is torn down), which releases the parry_five task.
+let _tqP4Done = false;
 // Puzzle-1 guided demos: while _tqGridLocked is true, EVERY grid click is
 // swallowed (checkSpecialIntercepts wrap) unless it matches the active demo
 // cell + button - the player can only interact when the Professor asks.
@@ -395,6 +399,8 @@ function _tqFormatLine(textKey) {
         // for the puzzle-3 combat lessons.
         const atkKey = keybindKeyFor('eg-attack');
         if (atkKey) line = line.replace(/\{key_attack\}/g, keybindDisplayLabel(atkKey));
+        const parryKey = keybindKeyFor('eg-parry');
+        if (parryKey) line = line.replace(/\{key_parry\}/g, keybindDisplayLabel(parryKey));
         const tgtKey = keybindKeyFor('cycle-target');
         if (tgtKey) line = line.replace(/\{key_target\}/g, keybindDisplayLabel(tgtKey));
         const sheetKey = keybindKeyFor('char-sheet');
@@ -1228,6 +1234,8 @@ const TQ_TASKS = {
     // Any phase: the current puzzle was solved (checkWin intercept jumps the
     // phase - this predicate only resolves the poll).
     solve_puzzle: () => _tqPuzzleSolvedFlag,
+    // Puzzle 4 (parry lesson): five attacks parried in the training arena.
+    parry_five: () => _tqP4Done,
 };
 
 // Steps per phase (see keys in translations-strings.js).
@@ -1301,6 +1309,13 @@ function _tqStepsFor(phase) {
             { say: 'tq_p3_s9', task: 'solve_puzzle' },
             { say: 'tq_p3_s10', wait: true },
         ];
+        case 'p4': return [
+            // Parry lesson: a stripped-down arena (js/combat/gauntlet.js,
+            // startParryTutorial). The player holds the parry key to block
+            // five monster attacks; nothing needs to be killed.
+            { say: 'tq_p4_s0', task: 'parry_five', fn: () => { _tqP4Done = false; _tqStartParryArena(); } },
+            { say: 'tq_p4_s1', wait: true },
+        ];
         default: return [];
     }
 }
@@ -1324,7 +1339,7 @@ function _tqPhaseSteps() {
 // the step with the right task and, where it matters, the right setup
 // action - so removing or retitling a say key fails loudly at test time.
 const TQ_STEP_INDEX = {};
-for (const phase of ['p1', 'p2', 'p3']) {
+for (const phase of ['p1', 'p2', 'p3', 'p4']) {
     const map = {};
     _tqStepsFor(phase).forEach((st, i) => { if (st.say) map[st.say] = i; });
     TQ_STEP_INDEX[phase] = map;
@@ -1363,6 +1378,15 @@ function _tqRunCurrentPhase() {
         if (st.say && st.wait) return;   // resume via the Continue button
     }
     _tqPhaseFinished();
+}
+
+// Opens the parry training arena; its result releases the parry_five task.
+function _tqStartParryArena() {
+    try {
+        startParryTutorial(() => { _tqP4Done = true; });
+    } catch (e) {
+        _tqP4Done = true;   // never strand the tutorial on an arena failure
+    }
 }
 
 // Starts polling for a task's completion.
@@ -1456,8 +1480,16 @@ function _tqPhaseFinished() {
         showToast('🎓 ' + t('tq_toast_p2_done'));
         setTimeout(() => _tqStartPuzzle(2), 1600);
     } else if (_tqPhase === 'p3') {
+        // Final lesson: the parry training arena, then graduation. The
+        // Professor stays up and the encounter keeps running (p3's solve
+        // handler leaves it alive for exactly this).
+        _tqPhase = 'p4';
+        _tqStepIdx = 0;
+        _tqRunCurrentPhase();
+    } else if (_tqPhase === 'p4') {
         STATE.tutorialDone = true;
         save();
+        try { if (typeof _egStopEncounter === 'function') _egStopEncounter(); } catch (e) {}
         _tqHideProfessor();
         // Final farewell: as the Professor's graduation line closes, the
         // player's character signs off BY NAME (tutorial_farewell bank in
@@ -1622,7 +1654,9 @@ function _tqOnPuzzleSolved() {
     // Phase genuinely finished: freeze everything and jump to the payoff.
     globalThis.dead = true;
     if (typeof stopTimer === 'function') stopTimer();
-    if (typeof _egStopEncounter === 'function') _egStopEncounter();
+    // Puzzle 3 keeps the encounter alive: the parry lesson (p4) reuses it.
+    if (_tqPhase !== 'p3' && typeof _egStopEncounter === 'function') _egStopEncounter();
+    if (_tqPhase === 'p3') { try { _egStopPickupSpawner(); } catch (e) {} }
     // Congratulation reply - the character celebrates the solved puzzle
     // after a natural beat, while the Professor's payoff line is up.
     _tqPlayerReply(5000, 'tutorial_solve');

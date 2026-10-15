@@ -264,7 +264,7 @@ function _egTrialIntroText() {
         finish: de ? 'Danach „Prüfung beenden“ wählen, um die Belohnung zu erhalten.' : 'Then choose "Finish Trial" to claim your reward.',
         rules: (min, mistakes) => (de
             ? `⏱ Zeitlimit ${min} Min · ✖ höchstens ${mistakes} Fehler · stirbst du, endet der Lauf (du kannst es jederzeit erneut versuchen).`
-            : `⏱ ${min} min time limit · ✖ at most ${mistakes} mistakes · if you fall the run ends (you can retry any time).`),
+            : `⏱ ${min} min time limit · ✖ at most ${mistakes} mistakes · if you fail the run ends (you can retry any time).`),
         rewardConv: de ? 'Belohnung (erster Abschluss): +1 Talentpunkt und Erfahrung.' : 'Reward (first clear): +1 passive point and XP.',
         rewardAsc: de
             ? 'Belohnung (erster Abschluss): Kodex der Vollendung, Weltabschluss-Boni und Klassenereignis.'

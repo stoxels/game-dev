@@ -102,7 +102,23 @@ export const EG_GAUNTLET_CONFIG = {
     bruiserStrikes: 10,
 };
 
+// Parry tutorial (tutorial quest, final lesson): a stripped-down arena with
+// three unkillable monsters in three different spots. The player only has to
+// parry a few attacks by holding the parry key - no kills, no waves, no gold.
+export const EG_PARRY_TUTORIAL_CONFIG = {
+    targetParries: 5,
+    monsterCount: 3,
+    zoneIndexes: [1, 5, 7],   // top-centre, bottom-left, bottom-right arena spots
+    monsterId: 'rat',
+    monsterHp: 10000000,      // effectively unkillable - the lesson is not about killing
+    monsterDamage: 3,         // unparried hits only nibble
+    keepHpPct: 0.5,           // life is never allowed below this share
+    resultBannerMs: 1500,
+};
+
 const _g = {
+    parryMode: false,
+    parries: 0,
     active: false,
     level: null,
     waves: [],
@@ -436,7 +452,7 @@ function _buildOverlay() {
     el.innerHTML = `
         <div class="ga-floor"></div>
         <div class="ga-header">
-            <span class="ga-title">⚔ ${_tr('GAUNTLET', 'GAUNTLET')}</span>
+            <span class="ga-title">${_g.parryMode ? `🛡 ${_tr('PARRY TRAINING', 'PARADE-TRAINING')}` : `⚔ ${_tr('GAUNTLET', 'GAUNTLET')}`}</span>
             <span class="ga-wave" id="ga-wave"></span>
             <span class="ga-left" id="ga-left"></span>
         </div>
@@ -465,6 +481,12 @@ function _hud() {
     const w = document.getElementById('ga-wave');
     const l = document.getElementById('ga-left');
     if (w) w.textContent = `${_tr('Wave', 'Welle')} ${Math.min(_g.wave, _g.waves.length)}/${_g.waves.length}`;
+    if (_g.parryMode) {
+        const cfgP = EG_PARRY_TUTORIAL_CONFIG;
+        if (w) w.textContent = '';
+        if (l) l.textContent = `${_tr('Parries', 'Paraden')}: ${Math.min(_g.parries, cfgP.targetParries)}/${cfgP.targetParries}`;
+        return;
+    }
     if (l) {
         const left = _alive() + _g.pending + _g.waves.slice(_g.wave).reduce((s, n) => s + n, 0);
         l.textContent = `${_tr('Monsters left', 'Monster übrig')}: ${left}`;
@@ -512,6 +534,113 @@ export function startGauntlet(onDone) {
     document.body.classList.add('gauntlet-open');
     _hud();
     _renderIntro(lvl);
+}
+
+// Entry point for the tutorial's parry lesson. Same arena shell as a gauntlet
+// but with no intro card, waves, modifiers or rewards. onDone(success) fires
+// once the five parries are in (or the arena is aborted).
+export function startParryTutorial(onDone) {
+    if (_g.active || !cur) { if (typeof onDone === 'function') onDone(false); return; }
+    _g.active = true;
+    _g.parryMode = true;
+    _g.parries = 0;
+    _g.onDone = onDone;
+    _g.level = cur;
+    _g.wave = 0;
+    _g.pending = 0;
+    _g.waves = [];
+    _g.timers = [];
+    _g.modifier = null;
+    _g.hazards = [];
+    _g.pre = {
+        hp: globalThis.playerCurrentHP,
+        mana: globalThis.playerCurrentMana,
+        hpTarget: cur.campaignMonsterHp,
+        dmgTarget: cur.campaignMonsterDamage,
+    };
+    stopTimer();
+    _egCancelSpawnTimers();
+    try { _egStopPickupSpawner(); } catch (e) { /* spawner optional */ }
+    globalThis._egMonsters = [];
+    globalThis._egTargetId = null;
+    _egRenderPanel();
+
+    _buildOverlay();
+    document.body.classList.add('gauntlet-open');
+    _beginParry();
+}
+
+function _beginParry() {
+    const cfg = EG_PARRY_TUTORIAL_CONFIG;
+    _setCenter('');
+    const maxHP = Number(globalThis.playerMaxHP) || 0;
+    if (maxHP > 0) globalThis.playerCurrentHP = Math.max(globalThis.playerCurrentHP, Math.round(maxHP * 0.8));
+    cur.campaignMonsterHp = cfg.monsterHp;
+    cur.campaignMonsterDamage = cfg.monsterDamage;
+    cur.monsterLevel = 1;
+    cur.gauntlet = true;
+    globalThis._egGauntletFlag = true;
+    globalThis._egGauntletMaxConcurrent = cfg.monsterCount;
+    // Held parry always lands here, and every parry is counted.
+    globalThis._egParryTutorialForce = true;
+    globalThis._egOnPlayerParry = () => {
+        if (!_g.parryMode || !_g.fighting) return;
+        _g.parries++;
+        _hud();
+    };
+
+    // Cards render in three fixed arena spots.
+    _g.zones = EG_MONSTER_ZONES.slice();
+    EG_MONSTER_ZONES.length = 0;
+    cfg.zoneIndexes.forEach(i => EG_MONSTER_ZONES.push(_ZONE_IDS[i]));
+    _g.fighting = true;
+
+    const avatar = document.getElementById('player-avatar-wrapper');
+    _layout();
+    if (avatar) {
+        const r = _arenaRect();
+        const w = avatar.offsetWidth || 128;
+        const h = avatar.offsetHeight || 190;
+        avatar.style.display = 'flex';
+        _setAvatarPos(avatar, r.left + r.width / 2 - w / 2, r.top + _CARD_BAND_PX + (r.height - _CARD_BAND_PX) / 2 - h / 2);
+    }
+
+    _g.startedAt = Date.now();
+    _g.lastHp = Number(globalThis.playerCurrentHP) || 0;
+    globalThis.dead = false;
+    _egStartTickLoop();
+    _hud();
+    _parryTopUp(true);
+    _g.poll = setInterval(_tick, 300);
+}
+
+// Keeps exactly monsterCount monsters standing (they are not meant to die).
+function _parryTopUp(staggered) {
+    const cfg = EG_PARRY_TUTORIAL_CONFIG;
+    const missing = cfg.monsterCount - _alive() - _g.pending;
+    for (let i = 0; i < missing; i++) {
+        _g.pending++;
+        _later(() => {
+            _g.pending = Math.max(0, _g.pending - 1);
+            if (!_g.active || !_g.parryMode) return;
+            const before = new Set((globalThis._egMonsters || []).map(m => m.id));
+            _egSpawnMonster(cfg.monsterId, 1);
+            (globalThis._egMonsters || []).forEach(m => { if (!before.has(m.id)) m.noLoot = true; });
+        }, staggered ? 400 + i * 600 : 200);
+    }
+}
+
+function _parryTick() {
+    const cfg = EG_PARRY_TUTORIAL_CONFIG;
+    // Training can never kill the player: life is held above a floor.
+    const maxHP = Number(globalThis.playerMaxHP) || 0;
+    const floor = Math.round(maxHP * cfg.keepHpPct);
+    if (maxHP > 0 && globalThis.playerCurrentHP < floor) {
+        globalThis.playerCurrentHP = floor;
+        if (typeof globalThis._renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
+    }
+    if (_g.parries >= cfg.targetParries) { _finish(true); return; }
+    _parryTopUp(false);
 }
 
 function _goldFor(lvl, challengesMet) {
@@ -702,9 +831,10 @@ function _tick() {
     _syncArenaVisibility();
     // The player left the level / the encounter was torn down: abort quietly.
     if (cur !== _g.level || !_egIsActive()) { _finish(false, 'aborted'); return; }
-    if (globalThis.playerCurrentHP <= 0) { _finish(false, 'defeat'); return; }
+    if (globalThis.playerCurrentHP <= 0 && !_g.parryMode) { _finish(false, 'defeat'); return; }
     _layout();
     _hud();
+    if (_g.parryMode) { _parryTick(); return; }
     const hp = Number(globalThis.playerCurrentHP) || 0;
     if (hp < _g.lastHp - 0.5) _g.damaged = true;
     _g.lastHp = hp;
@@ -786,12 +916,20 @@ function _finish(success, reason) {
         if (typeof done === 'function') done(ok);
     };
 
-    if (reason === 'aborted') { finish(false); return; }
+    if (reason === 'aborted') {
+        _g.parryMode = false;
+        globalThis._egParryTutorialForce = false;
+        globalThis._egOnPlayerParry = null;
+        finish(false);
+        return;
+    }
     if (reason === 'skipped') { finish(false); return; }
 
     Audio_Manager.playSFX(success ? 'win' : 'lose');
     let winHtml = '';
-    if (success) {
+    if (success && _g.parryMode) {
+        winHtml = `<div class="ga-banner ga-win">🛡 ${_tr('PARRY MASTERED!', 'PARADE GEMEISTERT!')}</div>`;
+    } else if (success) {
         const cfg = EG_GAUNTLET_CONFIG;
         const elapsedMs = Date.now() - _g.startedAt;
         const goals = [
@@ -811,5 +949,10 @@ function _finish(success, reason) {
         ? winHtml
         : `<div class="ga-banner ga-lose">${_tr('Gauntlet failed - bonus lost', 'Gauntlet gescheitert - Bonus verloren')}</div>`,
     'ga-flash ga-result');
-    setTimeout(() => finish(success), success ? EG_GAUNTLET_CONFIG.resultBannerMs + 1200 : EG_GAUNTLET_CONFIG.resultBannerMs);
+    const wasParry = _g.parryMode;
+    _g.parryMode = false;
+    globalThis._egParryTutorialForce = false;
+    globalThis._egOnPlayerParry = null;
+    setTimeout(() => finish(success), wasParry ? EG_PARRY_TUTORIAL_CONFIG.resultBannerMs
+        : (success ? EG_GAUNTLET_CONFIG.resultBannerMs + 1200 : EG_GAUNTLET_CONFIG.resultBannerMs));
 }
