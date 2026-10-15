@@ -11,7 +11,7 @@ import { confirmSetup, enterNexusFromSetup, goToLevelSelect, goToNextLevel, goTo
 import { ptGoBack, showPassiveTree, showPassiveTreeAsCharacter } from './probability-tree/probability-tree.js';
 import { showQuestLog } from './inference/inference-ui.js';
 import { _ptRefundAllPoints } from './probability-tree/probability-tree-state-points.js';
-import { STATE } from './state.js';
+import { STATE, save } from './state.js';
 import { cur } from './state.js';
 
 //------------------------------------------------------------------------
@@ -363,6 +363,20 @@ document.addEventListener('DOMContentLoaded', () => {
     onClick('btn-mode-existing', () => launchExistingGame());
     onClick('btn-mode-endgame-test', () => launchEndgameTestMode());
     onClick('btn-mode-vendor', () => launchAtlasVendor());
+    // TEMPORARY TEST BUTTON (see index.html #btn-dev-codex): +999 Codex of
+    // Completion for the selected character. Remove together with the button.
+    onClick('btn-dev-codex', () => {
+        if (!STATE || !Array.isArray(STATE.inventory)) return;
+        const stamp = Date.now();
+        for (let i = 0; i < 999; i++) {
+            STATE.inventory.push({
+                defId: 'artifactComplete',
+                uid: `item_${stamp}_${i}_${Math.random().toString(36).slice(2)}`,
+            });
+        }
+        try { save(); } catch (e) { /* save optional */ }
+        if (typeof globalThis.showToast === 'function') globalThis.showToast('🧪 +999 Codex of Completion');
+    });
 
 
 
