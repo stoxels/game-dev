@@ -54,6 +54,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
 // ── Shared tuning (per-mechanic constants live with their mechanics) ────────
 export const EG_SIR_TOUCH_CD_MS = 700;      // shared touch cooldown
+// NOTE: all damage constants below are BEFORE the global failed-dodge x2
+// (EG_NK_FAIL_MULT in shared-boss-abilities.js).
 
 
 //------------------------------------------------------------------------
@@ -107,7 +109,7 @@ export const EG_SIR_TANGENT_MS = 900;          // (legacy) old tangent window
 export const EG_SIR_CHARGE_MAX = 5;            // charge stacks
 export const EG_SIR_CHARGE_DECAY_MS = 4000;    // stacks fall off one per this
 export const EG_SIR_AURA_DPS   = [0, 2.0, 2.5, 3.0]; // (legacy) old self-aura DoT - removed
-const EG_SIR_ION_DMG    = [0, 0.30, 0.35, 0.40];    // %maxHP when a front catches you
+const EG_SIR_ION_DMG    = [0, 0.15, 0.175, 0.20];    // %maxHP when a front catches you
 const EG_SIR_ION_BAND   = 56;                       // front thickness (px)
 const EG_SIR_ION_GAP    = [0, 210, 190, 180];       // tangent opening width (px)
 const EG_SIR_ION_STAGGER = 1600;                    // ms between the two fronts (phase 1-2)
@@ -279,7 +281,7 @@ export function _egMechSirIon(monster, phase) {
 // grounds itself on the shore. Cold pools (shared frozen_cells) ground it
 // too. Phase 3: TWO balls.
 export const EG_SIR_BOLT_SPD   = [0, 0, 245, 260]; // px/s hunting ball (+18 per charge stack)
-export const EG_SIR_BOLT_DMG   = [0, 0, 0.28, 0.32]; // %maxHP ball hit
+export const EG_SIR_BOLT_DMG   = [0, 0, 0.14, 0.16]; // %maxHP ball hit
 export const EG_SIR_BOLT_LIFE  = [0, 0, 8000, 9000]; // ms the ball hunts
 export const EG_SIR_RIVER_N    = [0, 0, 2, 2];       // water lanes per cast
 export const EG_SIR_RIVER_SPD  = 90;                 // (legacy) px/s river sweep
@@ -421,7 +423,7 @@ export function _egMechSirChain(monster, phase) {
 // is a real hit every 0.7s.
 export const EG_SIR_EYE_N      = 4;     // 4×4 grid
 export const EG_SIR_EYE_HOT    = 7;     // hot cells
-export const EG_SIR_EYE_DPS    = [0, 0, 17, 20]; // %/s in the storm (paid as hits on the touch cooldown)
+export const EG_SIR_EYE_DPS    = [0, 0, 8.5, 10]; // %/s in the storm (paid as hits on the touch cooldown)
 export const EG_SIR_EYE_LIFE   = 6500;  // ms the storm rages (after the telegraph)
 export const EG_SIR_EYE_IMMUNE = true;  // he holds the eye: immune while it stands
 const EG_SIR_EYE_WARN_MS = 3000;        // 3-2-1 before the storm rages
@@ -536,8 +538,8 @@ export function _egMechSirEye(monster, phase) {
 // charge) - keep moving. Last, THE EYE OPENS: one green circle within
 // reach is the only shelter from the final strike. Boss immune throughout.
 export const EG_SIR_FIN_BOXES    = 3;      // closing storm walls
-export const EG_SIR_FIN_BOX_DMG  = 0.38;   // %maxHP caught by a wall
-export const EG_SIR_FIN_BULLET_DMG = 0.18; // %maxHP per bullet hit
+export const EG_SIR_FIN_BOX_DMG  = 0.19;   // %maxHP caught by a wall
+export const EG_SIR_FIN_BULLET_DMG = 0.09; // %maxHP per bullet hit
 export const EG_SIR_FIN_BULLET_SPD = 260;  // px/s charged bullets
 export const EG_SIR_FIN_BULLET_DPS = 3.5;  // (legacy) old self-aura DoT - removed
 export const EG_SIR_FIN_FAILSAFE_MS = 45000;
@@ -545,7 +547,7 @@ const EG_SIR_FIN_CLOSE_MS = 4500;          // a wall closes in this long
 const EG_SIR_FIN_TEETH_MS = 6000;          // charged-bullet phase
 const EG_SIR_FIN_EYE_MS   = 3000;          // final strike countdown
 const EG_SIR_FIN_EYE_R    = 110;           // final safe eye radius
-const EG_SIR_FIN_FINAL_DMG = 0.60;         // final strike outside the eye
+const EG_SIR_FIN_FINAL_DMG = 0.30;         // final strike outside the eye
 
 // Set while the finale runs.
 export let _egSirFinal = null;

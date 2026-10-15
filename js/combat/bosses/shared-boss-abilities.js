@@ -1537,6 +1537,17 @@ export const EG_NK_DAMAGE_TIER = [0.85, 1.20];
 // Tier damage multiplier for a failed-dodge hit/DoT, resolved from the boss
 // level the callers already pass in (the same source _egNkNewRun uses for
 // the timing factor). Unknown/zero levels → factor 1 (unchanged).
+// Failing a telegraphed, avoidable mechanic must hurt: every boss-ability hit
+// (point hits, DoT ticks and blast circles) is multiplied by this, but one
+// hit is never boosted past EG_NK_FAIL_HIT_CAP of max life (a boss that
+// already hits that hard keeps its own value).
+export const EG_NK_FAIL_MULT = 2.0;
+export const EG_NK_FAIL_HIT_CAP = 0.65;
+export function _egNkBoostFailedDodge(raw, maxHp) {
+    const boosted = raw * EG_NK_FAIL_MULT;
+    return Math.min(boosted, Math.max(raw, (Number(maxHp) || 0) * EG_NK_FAIL_HIT_CAP));
+}
+
 export function _egNkTierDamageFactor(level) {
     if (!level || !(level > 0)) return 1;
     return _egBossTierFactor(_egBossTierNorm({ level }), EG_NK_DAMAGE_TIER);
@@ -1931,7 +1942,7 @@ export function _egRunScreenBlast(opts) {
             if (!survived) {
                 // Percentage of max HP - survivable even at full health, but it
                 // stings enough that ignoring the mechanic loses fights.
-                const damage = Math.round(globalThis.playerMaxHP * damagePct);
+                const damage = Math.round(_egNkBoostFailedDodge(globalThis.playerMaxHP * damagePct, globalThis.playerMaxHP));
                 const shielded = _egNkShieldUp();
                 const dealt = typeof _egPlayerTakeDamage === 'function'
                     ? _egPlayerTakeDamage(damage, true, null, null, { isBossAbility: true }) : 0;
@@ -2164,7 +2175,7 @@ export let _egNkLastHitAbsorbed = false;
 // EG_NK_TIER_FACTOR timing curve.
 export function _egNkHit(pct, element, level) {
     const shielded = _egNkShieldUp();
-    const dmg = Math.max(1, Math.round(_egNkMaxHP() * pct * _egNkTierDamageFactor(level)));
+    const dmg = Math.max(1, Math.round(_egNkBoostFailedDodge(_egNkMaxHP() * pct * _egNkTierDamageFactor(level), _egNkMaxHP())));
     const dealt = (typeof _egPlayerTakeDamage === 'function')
         ? _egPlayerTakeDamage(dmg, true, element || null, level || 1, { isBossAbility: true }) : 0;
     _egNkLastHitAbsorbed = shielded && dealt <= 0;
@@ -2196,7 +2207,7 @@ export function _egNkDotTick(run, pctPerSec, dtS, level, element) {
     // the clock.
     const realDt = dtS * ((run && run.tierFactor) || 1);
     const dmgF = _egNkTierDamageFactor(level);
-    run.dotAcc = (run.dotAcc || 0) + (_egNkMaxHP() * pctPerSec * dmgF / 100) * realDt;
+    run.dotAcc = (run.dotAcc || 0) + (_egNkMaxHP() * pctPerSec * dmgF * EG_NK_FAIL_MULT / 100) * realDt;
     const unit = Math.max(1, _egNkMaxHP() * 0.01);
     if (run.dotAcc >= unit) {
         const tick = Math.floor(run.dotAcc);
