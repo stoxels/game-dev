@@ -76,11 +76,21 @@ export const EG_GAUNTLET_CONFIG = {
     // new character). Applies at low monster levels and fades out linearly
     // with the campaign's early-ease window (EG_CAMPAIGN_MONSTER_CONFIG.
     // earlyEaseLevels), so later gauntlets are unchanged.
-    earlyCountMult: 0.45,        // monster-count multiplier at monster level 1
-    earlyMinMonsters: 5,         // never fewer than this
-    earlyConcurrent: 3,          // alive at once at monster level 1 (-> maxConcurrent)
-    earlyDamageMult: 0.7,        // extra damage multiplier at monster level 1
+    earlyCountMult: 0.35,        // monster-count multiplier at monster level 1
+    earlyMinMonsters: 4,         // never fewer than this
+    earlyConcurrent: 2,          // alive at once at monster level 1 (-> maxConcurrent)
+    earlyDamageMult: 0.4,        // extra damage multiplier at monster level 1
     earlyHitsMult: 0.7,          // monster HP (hits to kill) multiplier at level 1
+    // Early HP budget (playtest: a level-2 character deals ~36 per Fireball
+    // and ~4 melee DPS, with mana for only ~4 casts, yet monsters had ~150
+    // HP each - the arena's total HP was far beyond what could be dealt).
+    // At low levels the arena's TOTAL monster HP is capped to what the
+    // character can realistically deal: a few spell casts plus sustained
+    // melee over a short fight. Fades out like the other early eases.
+    earlyManaPerKillPct: 0.25,   // share of max mana refunded per kill at monster level 1
+    earlySpellCasts: 4,
+    earlyMeleeIntervalSec: 4,
+    earlyFightSec: 40,
     earlyChampionHpMult: 1.8,    // final-wave champion HP multiplier at level 1
     traitFreeBelowLevel: 6,      // no warded / phased monsters below this level
     // Monster HP follows the player's real power hit (best of projectile,
@@ -259,6 +269,25 @@ function _avgHit() {
         best = Math.max(best, melee * share, spell * share);
     } catch (e) { /* stats optional */ }
     return Math.max(5, best);
+}
+
+// HP each monster may have so the whole gauntlet stays within what the
+// character can really deal: a few spell casts plus sustained melee.
+function _earlyHpBudgetEach() {
+    const cfg = EG_GAUNTLET_CONFIG;
+    try {
+        const st = _egComputePlayerStats() || {};
+        const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
+        const melee = (mid(st.meleePhysMin, st.meleePhysMax)
+            + mid(st.meleeFireMin, st.meleeFireMax) + mid(st.meleeColdMin, st.meleeColdMax)
+            + mid(st.meleeLightningMin, st.meleeLightningMax) + mid(st.meleeShadowMin, st.meleeShadowMax))
+            * (1 + (Number(st.meleePhysIncPct) || 0) / 100);
+        const spell = ((Number(st.spellDamageFlat) || 0) + 22) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
+        const spellPool = (_g.totalMonsters > 0 ? spell : 0) * cfg.earlySpellCasts;
+        const meleePool = Math.max(5, melee) / cfg.earlyMeleeIntervalSec * cfg.earlyFightSec;
+        const total = Math.max(1, _g.totalMonsters || 1);
+        return (spellPool + meleePool) / total;
+    } catch (e) { return 0; }
 }
 
 function _tierCfg() {
@@ -724,7 +753,12 @@ function _begin() {
     const early = _egEarlyEaseBlend(lvl);
     const hits = (cfg.hitsToKillBase + cfg.hitsToKillPerLevel * lvl) * (1 - (1 - cfg.earlyHitsMult) * early);
     const tier = _tierCfg();
-    cur.campaignMonsterHp = Math.max(EG_CAMPAIGN_MONSTER_CONFIG.minHp, Math.round(_avgHit() * hits * tier.hpMult));
+    let hpEach = Math.round(_avgHit() * hits * tier.hpMult);
+    if (early > 0) {
+        const budgetEach = _earlyHpBudgetEach() * tier.hpMult;
+        if (budgetEach > 0 && budgetEach < hpEach) hpEach = Math.round(hpEach - (hpEach - budgetEach) * early);
+    }
+    cur.campaignMonsterHp = Math.max(EG_CAMPAIGN_MONSTER_CONFIG.minHp, hpEach);
     const curveDamage = EG_CAMPAIGN_MONSTER_CONFIG.damageBase + EG_CAMPAIGN_MONSTER_CONFIG.damagePerLevel * lvl;
     const floorDamage = Math.min(curveDamage * 3, (Number(globalThis.playerMaxHP) || 0) * cfg.damageHpShare);
     const easeDmg = 1 - (1 - cfg.earlyDamageMult) * early;
@@ -755,6 +789,7 @@ function _begin() {
 
     _g.startedAt = Date.now();
     _g.lastHp = Number(globalThis.playerCurrentHP) || 0;
+    _g.lastAlive = null;
     _setupModifier();
 
     globalThis.dead = false;
@@ -859,7 +894,21 @@ function _tick() {
     const hp = Number(globalThis.playerCurrentHP) || 0;
     if (hp < _g.lastHp - 0.5) _g.damaged = true;
     _g.lastHp = hp;
-    if (_g.pending > 0 || _alive() > 0) return;
+    // Early-game mana refund: with a ~4-cast pool the character otherwise
+    // runs dry mid-fight and is left with a ~4 DPS sword (playtest). Each
+    // kill gives mana back; fades out with the other early eases.
+    const aliveNow = _alive();
+    if (_g.lastAlive != null && aliveNow < _g.lastAlive) {
+        const early = _egEarlyEaseBlend(Number(cur && cur.monsterLevel) || 1);
+        const maxMana = Number(globalThis.playerMaxMana) || 0;
+        if (early > 0 && maxMana > 0) {
+            const gain = maxMana * EG_GAUNTLET_CONFIG.earlyManaPerKillPct * early * (_g.lastAlive - aliveNow);
+            globalThis.playerCurrentMana = Math.min(maxMana, (Number(globalThis.playerCurrentMana) || 0) + gain);
+            try { updateClassHUDManaBar(); } catch (e) { /* HUD optional */ }
+        }
+    }
+    _g.lastAlive = aliveNow;
+    if (_g.pending > 0 || aliveNow > 0) return;
     if (_g.wave >= _g.waves.length) { _finish(true); return; }
     const now = Date.now();
     if (!_g.breakUntil) {
