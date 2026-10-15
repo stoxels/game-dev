@@ -226,6 +226,12 @@ export function _egApplyTargetResistances(amount, target, elements, opts) {
     if ((target.spellproofPct || 0) > 0 && opts && opts.isPlayerSpell && !opts.isMelee) {
         amount = Math.max(1, Math.round(amount * (1 - Math.min(90, target.spellproofPct) / 100)));
     }
+    // Meleeproof monsters (Gauntlet "phased"): player MELEE strikes are heavily
+    // reduced, spells and projectiles hit normally. Heavy resistance, never full
+    // immunity (the tutorial ghost's meleeImmune flag is the only hard gate).
+    if ((target.meleeproofPct || 0) > 0 && opts && opts.isMelee) {
+        amount = Math.max(1, Math.round(amount * (1 - Math.min(90, target.meleeproofPct) / 100)));
+    }
     // Crushed (node 331): the target's physical Damage reduction is lowered
     // for the duration; monsters without a resistance table are treated as
     // having 0% so the lowering still amplifies physical hits.

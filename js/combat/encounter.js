@@ -214,7 +214,7 @@ export function _egBuildMonsterCardHTML(m) {
             ${m.isBoss ? '<span class="eg-boss-crown">👑</span>' : ''}
             <span class="eg-monster-emoji-compact${m.isBoss ? ' eg-boss-emoji' : ''}">${EG_ART.html('monster', m.artId || m.baseId, m.emoji)}</span>
             <span class="eg-level-bottom-left">${m.level}</span>
-            ${m.gauntletTrait ? `<span class="ga-trait-badge" title="${m.gauntletTrait === 'warded' ? 'Spell Ward: spells deal far less damage - use melee' : (m.gauntletTrait === 'champion' ? 'Champion: tougher and hits harder' : 'Phased: immune to melee - use spells')}">${m.gauntletTrait === 'warded' ? '🛡' : (m.gauntletTrait === 'champion' ? '👑' : '👻')}</span>` : ''}
+            ${m.gauntletTrait ? `<span class="ga-trait-badge" title="${m.gauntletTrait === 'warded' ? 'Spell Ward: takes 65% less damage from spells - melee works best' : (m.gauntletTrait === 'champion' ? 'Champion: tougher and hits harder' : 'Phased: takes 65% less damage from melee - spells work best')}">${m.gauntletTrait === 'warded' ? '🛡' : (m.gauntletTrait === 'champion' ? '👑' : '👻')}</span>` : ''}
 
             <div class="eg-monster-compact-tooltip">
                 <div class="eg-tooltip-name">${m.name}</div>

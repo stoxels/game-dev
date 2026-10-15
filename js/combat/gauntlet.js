@@ -53,9 +53,12 @@ export const EG_GAUNTLET_CONFIG = {
     startHealPct: 0.5,        // life is topped up to at least this share on entry
     startManaPct: 0.6,
     resultBannerMs: 1700,
-    // Melee purpose: warded monsters shrug off spells, phased monsters shrug
-    // off melee, so both attack kinds are needed. Wave 1 stays plain.
-    wardedSpellReductionPct: 80,
+    // Melee purpose: warded monsters resist spells, phased monsters resist
+    // melee, so both attack kinds are needed. Both are HEAVY resistance, not
+    // immunity - a pure melee or pure magic build can still grind them down.
+    // Wave 1 stays plain.
+    wardedSpellReductionPct: 65,
+    phasedMeleeReductionPct: 65,
     traitChanceWave2: 0.34,
     traitChanceWave3: 0.55,
     pushbackMult: 0.25,          // share of the normal charge pushback a hit applies in the arena
@@ -841,7 +844,7 @@ function _applyTrait(m) {
     taken[`${_g.wave}:${trait}`] = m.id;
     m.gauntletTrait = trait;
     if (trait === 'warded') m.spellproofPct = cfg.wardedSpellReductionPct;
-    else m.meleeImmune = true;
+    else m.meleeproofPct = cfg.phasedMeleeReductionPct;
     try { _egRenderPanel(); } catch (e) { /* panel optional */ }
 }
 
