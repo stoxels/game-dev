@@ -430,7 +430,11 @@ export function _egLaunchTrialRun(wi, kind, opts) {
     level.totalMonsters = baseline.totalMonsters;
     level.hasBoss = baseline.hasBoss;
     level.maxBosses = baseline.maxBosses;
-    if (trialBossId) level.bosses = [{ id: trialBossId }];
+    // The boss level is PINNED to the trial's monster level. Without an
+    // explicit level the spawner rolls one (-2..0 below the base), which made
+    // the same trial's boss HP vary by ~50% between attempts and tuning
+    // data unreadable. Applies to convergence and ascension trials alike.
+    if (trialBossId) level.bosses = [{ id: trialBossId, level: monsterLevel }];
     else delete level.bosses;
     level.requiredPuzzles = baseline.requiredPuzzles;
     level.requiredQuestions = baseline.requiredQuestions;

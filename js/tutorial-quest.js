@@ -35,11 +35,11 @@ import { questStat_revealItemUsed } from './inference/inference-stats.js';
 import { isPuzzleSolved } from './scoring/scoring-core.js';
 import { hideResultOverlays, showSetup } from './screens/screens.js';
 import { _charmMake, _charmRenderOverlay, _egCharmDrops, grantCharm, isSkillCharmUnlocked } from './skills/skill-charms.js';
-import { SKILL_REGISTRY } from './skills/skill-registry.js';
+import { SKILL_REGISTRY, getSkillName } from './skills/skill-registry.js';
 import { closeSpellbook, isSpellbookOpen } from './skills/skill-spellbook.js';
 import { getUniversalSpellManaCost } from './skills/universal-spells.js';
 import { triggerBanter } from './sprite/character-banter.js';
-import { _hidePlayerAvatar, _hidePlayerAvatarSimple } from './sprite/player_sprite.js';
+import { _hidePlayerAvatar, _hidePlayerAvatarSimple, _renderPlayerAvatarSimple } from './sprite/player_sprite.js';
 import { save } from './state.js';
 import { pauseTimer, resumeTimer, stopTimer } from './timer/timer.js';
 import { t } from './translation/translations.js';
@@ -203,6 +203,14 @@ let _tqPuzzleSolvedFlag = false;
 // Parry lesson (phase p4): set once the training arena reports success (or
 // is torn down), which releases the parry_five task.
 let _tqP4Done = false;
+// Graduation chest scene (see "GRADUATION CHEST" below).
+let _tqChestScene = false;        // scene active: grid inert, avatar free to roam
+let _tqChestOpened = false;       // avatar reached the chest, modal was opened
+let _tqChestAllClaimed = false;   // every item in the modal was claimed
+let _tqChestEl = null;
+let _tqChestModalEl = null;
+let _tqChestProxTimer = null;
+const _tqChestClaimed = new Set();
 // Puzzle-1 guided demos: while _tqGridLocked is true, EVERY grid click is
 // swallowed (checkSpecialIntercepts wrap) unless it matches the active demo
 // cell + button - the player can only interact when the Professor asks.
@@ -598,6 +606,7 @@ function _tqTeardownTutorialState() {
     _tqP3DropButton = 1;
     _tqCandleUsable = false;
     _tqSpellbookPause = false;
+    try { _tqRemoveChestScene(true); } catch (e) {}
     _tqUpdateLevelExitButtons();
 }
 
@@ -1003,6 +1012,9 @@ function _tqIsGridInputLocked() {
         if (_tqP2GateOpen) return true;
     }
     if (_tqPhase === 'p3' && _tqP3DropOpen) return true;
+    // Graduation chest scene: the solved board stays inert (no red border -
+    // see _tqIsGridFullyBlocked) while the player walks to the chest.
+    if (_tqChestScene) return true;
     return false;
 }
 
@@ -1012,6 +1024,7 @@ function _tqIsGridInputLocked() {
 // is swallowed.
 function _tqIsGridFullyBlocked() {
     if (typeof cur === 'undefined' || !cur || !cur.isTutorialQuest) return false;
+    if (_tqChestScene) return false;
     if (_tqPhase === 'p2' && (_tqP2HeartOpen || _tqP2GateOpen)) return false;
     if (_tqPhase === 'p3' && _tqP3DropOpen) return false;
     if (_tqGridLocked) return _tqActiveDemo == null;
@@ -1236,6 +1249,10 @@ const TQ_TASKS = {
     solve_puzzle: () => _tqPuzzleSolvedFlag,
     // Puzzle 4 (parry lesson): five attacks parried in the training arena.
     parry_five: () => _tqP4Done,
+    // Graduation chest: the avatar reached the chest (the claim modal opened)
+    // and every item inside has been claimed.
+    chest_opened: () => _tqChestOpened,
+    chest_claimed: () => _tqChestAllClaimed,
 };
 
 // Steps per phase (see keys in translations-strings.js).
@@ -1314,7 +1331,13 @@ function _tqStepsFor(phase) {
             // startParryTutorial). The player holds the parry key to block
             // five monster attacks; nothing needs to be killed.
             { say: 'tq_p4_s0', task: 'parry_five', fn: () => { _tqP4Done = false; _tqStartParryArena(); } },
-            { say: 'tq_p4_s1', wait: true },
+            // Graduation gift: back on the puzzle 3 screen a treasure chest
+            // appears. The player walks to it (movement keys), a claim modal
+            // opens, and every item is clicked to claim (starter bow, plate
+            // vest, greaves + a rank 1 Renewal charm).
+            { say: 'tq_p4_s1', task: 'chest_opened', fn: () => { _tqEnterChestScene(); } },
+            { say: 'tq_p4_s2', task: 'chest_claimed' },
+            { say: 'tq_p4_s3', wait: true },
         ];
         default: return [];
     }
@@ -2304,6 +2327,210 @@ function _tqGrantStarterGearToStash() {
         });
         if (typeof egSaveHubState === 'function') egSaveHubState();
     } catch (e) {}
+}
+
+
+//------------------------------------------------------------------------
+//---------------------------GRADUATION CHEST------------------------------
+//------------------------------------------------------------------------
+// After the parry lesson the player is returned to the (solved) puzzle 3
+// screen and a treasure chest appears. Walking the avatar to it opens a
+// claim modal; every item is claimed with a click. Gear lands straight on
+// the paperdoll when the slot is empty (stash otherwise); the charm lands in
+// the charm inventory (slot it in the spellbook, P). Once everything is
+// claimed the Professor sends the player out into the world.
+
+// The gear is the Cartographers of Chance uniform: the same level-1 bases as
+// the vendor's free starter set, renamed for the story (nameKey) on the
+// claimed item only - the base types themselves are untouched.
+const TQ_CHEST_LOOT = [
+    { kind: 'gear', baseId: 'ranged_1', nameKey: 'tq_uniform_ranged' },
+    { kind: 'gear', baseId: 'chest_str_1', nameKey: 'tq_uniform_chest' },
+    { kind: 'gear', baseId: 'pants_str_1', nameKey: 'tq_uniform_pants' },
+    { kind: 'charm', skillId: 'usp_renewal', rank: 1, icon: '📜' },
+];
+// Treasure chest art (webp converted from the PNG the artist supplied).
+const TQ_CHEST_IMG = 'images/Tutorial/Treasure_Chest.webp';
+// Centre-to-centre distance (px) at which the avatar counts as "at" the chest.
+const TQ_CHEST_REACH_PX = 95;
+
+function _tqChestIconHTML(icon) {
+    const s = String(icon || '📦');
+    return /[/.]/.test(s) ? `<img src="${s}" alt="" draggable="false">` : s;
+}
+
+// The visible avatar sprite (simple one outside encounters, full one inside).
+function _tqChestAvatarEl() {
+    const ids = ['player-avatar-simple', 'player-avatar-wrapper'];
+    for (const id of ids) {
+        const el = document.getElementById(id);
+        if (el && el.style.display !== 'none') return el;
+    }
+    return null;
+}
+
+// The uniform name for a gear entry (translated), falling back to the base name.
+function _tqChestItemName(entry, item) {
+    const label = entry.nameKey ? t(entry.nameKey) : null;
+    return (label && label !== entry.nameKey) ? label : item.name;
+}
+
+// Display data for one loot entry: { icon, name, sub }.
+function _tqChestEntryInfo(entry) {
+    if (entry.kind === 'charm') {
+        let name = entry.skillId;
+        try { name = getSkillName(entry.skillId) || name; } catch (e) {}
+        return { icon: entry.icon, name, sub: t('skill_tip_rank') + ' ' + entry.rank };
+    }
+    const base = EG_ALL_BASE_TYPES.find((b) => b && b.id === entry.baseId);
+    if (!base) return { icon: '📦', name: entry.baseId, sub: '' };
+    const item = _egvBuildBaseItemFromBase(base);
+    return { icon: item.icon, name: _tqChestItemName(entry, item), sub: '' };
+}
+
+// Returns the player to the puzzle 3 screen as a free-roaming scene:
+// encounter off, board inert, avatar visible and steerable, chest spawned.
+function _tqEnterChestScene() {
+    _tqChestOpened = false;
+    _tqChestAllClaimed = false;
+    _tqChestClaimed.clear();
+    _tqChestScene = true;
+    try { if (typeof _egStopEncounter === 'function') _egStopEncounter(); } catch (e) {}
+    globalThis.dead = false;   // the arena/solve left the run "finished"; the sprite is hidden while dead
+    try { _renderPlayerAvatarSimple(); } catch (e) {}
+    _tqRefreshGridLockBorder();
+    _tqSpawnChest();
+}
+
+function _tqSpawnChest() {
+    _tqRemoveChestElOnly();
+    const el = document.createElement('div');
+    el.id = 'tq-chest';
+    el.innerHTML = `<div class="tq-chest-art"><img src="${TQ_CHEST_IMG}" alt="" draggable="false"></div><div class="tq-chest-label">${t('tq_chest_title')}</div>`;
+    document.body.appendChild(el);
+    _tqChestEl = el;
+    try { _tqPointAt('#tq-chest'); } catch (e) {}
+    if (_tqChestProxTimer) clearInterval(_tqChestProxTimer);
+    _tqChestProxTimer = setInterval(_tqChestCheckProximity, 120);
+}
+
+function _tqChestCheckProximity() {
+    if (!_tqChestEl || _tqChestOpened) return;
+    const av = _tqChestAvatarEl();
+    if (!av) return;
+    const a = av.getBoundingClientRect();
+    const c = _tqChestEl.getBoundingClientRect();
+    const dx = (a.left + a.width / 2) - (c.left + c.width / 2);
+    const dy = (a.top + a.height / 2) - (c.top + c.height / 2);
+    if (Math.hypot(dx, dy) <= TQ_CHEST_REACH_PX) _tqOpenChestModal();
+}
+
+function _tqOpenChestModal() {
+    if (_tqChestOpened) return;
+    _tqChestOpened = true;
+    if (_tqChestProxTimer) { clearInterval(_tqChestProxTimer); _tqChestProxTimer = null; }
+    try { _tqClearHighlights(); _tqHidePointerLine(); } catch (e) {}
+    try { Audio_Manager.playSFX('item_equip'); } catch (e) {}
+    const modal = document.createElement('div');
+    modal.id = 'tq-chest-modal';
+    // .modal-bg.show also makes the avatar's movement input stand down.
+    modal.className = 'modal-bg show';
+    const cards = TQ_CHEST_LOOT.map((entry, i) => {
+        const info = _tqChestEntryInfo(entry);
+        return `<button class="tq-chest-item" data-i="${i}">
+                <span class="tq-chest-item-icon">${_tqChestIconHTML(info.icon)}</span>
+                <span class="tq-chest-item-name">${info.name}</span>
+                <span class="tq-chest-item-sub">${info.sub}</span>
+                <span class="tq-chest-item-state">${t('tq_chest_claim')}</span>
+            </button>`;
+    }).join('');
+    modal.innerHTML = `<div class="tq-chest-box">
+            <img class="tq-chest-box-img" src="${TQ_CHEST_IMG}" alt="" draggable="false">
+            <div class="tq-chest-box-title">${t('tq_chest_title')}</div>
+            <div class="tq-chest-box-hint">${t('tq_chest_hint')}</div>
+            <div class="tq-chest-items">${cards}</div>
+        </div>`;
+    document.body.appendChild(modal);
+    _tqChestModalEl = modal;
+    modal.querySelectorAll('.tq-chest-item').forEach((btn) => {
+        btn.addEventListener('click', () => _tqClaimChestItem(Number(btn.dataset.i), btn));
+    });
+}
+
+// Equips (empty slot) or stashes one piece of starter gear.
+function _tqGrantChestGear(entry, idx) {
+    const base = EG_ALL_BASE_TYPES.find((b) => b && b.id === entry.baseId);
+    if (!base) return false;
+    const item = _egvBuildBaseItemFromBase(base);
+    item.id = `${base.id}_chest_${Date.now()}_${idx}`;
+    item.name = _tqChestItemName(entry, item);   // story name (uniform)
+    item.noSellValue = true;          // loot-filter proof, like the starter gear
+    item.isTutorialStarterGear = true;
+    const slotId = item.slotType;     // chest / pants / ranged match the paperdoll slot ids
+    let equipped = false;
+    try {
+        const eq = (globalThis._egEquipped && typeof globalThis._egEquipped === 'object')
+            ? globalThis._egEquipped
+            : (STATE.egEquipped || (STATE.egEquipped = {}));
+        if (!eq[slotId]) { eq[slotId] = item; equipped = true; }
+        STATE.egEquipped = eq;
+    } catch (e) { equipped = false; }
+    if (!equipped && typeof _egAddItemToStash === 'function') {
+        try { _egAddItemToStash(item); } catch (e) {}
+    }
+    try { if (typeof egSaveHubState === 'function') egSaveHubState(); } catch (e) {}
+    try { save(); } catch (e) {}
+    return true;
+}
+
+function _tqClaimChestItem(i, btn) {
+    if (_tqChestClaimed.has(i)) return;
+    const entry = TQ_CHEST_LOOT[i];
+    if (!entry) return;
+    let ok = false;
+    try {
+        if (entry.kind === 'charm') {
+            if (typeof grantCharm === 'function') { grantCharm(entry.skillId, entry.rank); ok = true; }
+        } else {
+            ok = _tqGrantChestGear(entry, i);
+        }
+    } catch (e) { ok = false; }
+    if (!ok) return;   // never mark something claimed that was not granted
+    _tqChestClaimed.add(i);
+    try { Audio_Manager.playSFX('item_equip'); } catch (e) {}
+    if (btn) {
+        btn.classList.add('tq-chest-item-claimed');
+        btn.disabled = true;
+        const st = btn.querySelector('.tq-chest-item-state');
+        if (st) st.textContent = '✔ ' + t('tq_chest_claimed');
+    }
+    if (_tqChestClaimed.size >= TQ_CHEST_LOOT.length) {
+        // Let the last tick of the claimed state show before closing.
+        setTimeout(() => {
+            _tqChestAllClaimed = true;
+            _tqRemoveChestScene();
+        }, 700);
+    }
+}
+
+function _tqRemoveChestElOnly() {
+    if (_tqChestEl) { try { _tqChestEl.remove(); } catch (e) {} _tqChestEl = null; }
+    const stale = document.getElementById('tq-chest');
+    if (stale) stale.remove();
+}
+
+// Removes the chest, the claim modal and the proximity poll. Keeps the
+// claimed flags so the poll that waits for chest_claimed can still resolve,
+// and keeps the scene flag (inert board) until the tutorial is torn down:
+// pass endScene = true to release the board as well.
+function _tqRemoveChestScene(endScene) {
+    if (_tqChestProxTimer) { clearInterval(_tqChestProxTimer); _tqChestProxTimer = null; }
+    _tqRemoveChestElOnly();
+    if (_tqChestModalEl) { try { _tqChestModalEl.remove(); } catch (e) {} _tqChestModalEl = null; }
+    const stale = document.getElementById('tq-chest-modal');
+    if (stale) stale.remove();
+    if (endScene) _tqChestScene = false;
+    try { _tqRefreshGridLockBorder(); } catch (e) {}
 }
 
 

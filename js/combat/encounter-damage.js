@@ -501,5 +501,9 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // 20036) can read its live statuses.
     if (typeof _egRollMonsterHitAilment === 'function') _egRollMonsterHitAilment(element, mitigated, opts && opts.attacker ? opts.attacker : null);
 
+    // Dev fight log (js/dev/dev-testing.js): attributes the HP actually lost.
+    // Read-only observer - absent unless the dev harness registered it.
+    if (typeof globalThis.__fightLogHit === 'function') globalThis.__fightLogHit(mitigated, isSpell, element, isBossAbility, opts && opts.attacker);
+
     return mitigated;
 }

@@ -1,11 +1,27 @@
-import { WORLD_START_GI } from '../levels/levels.js';
+import { ASCENDENCY_LIST } from '../classes/class-cooldown-state.js';
+import { CLASS_LIST } from '../classes/class-defs.js';
+import { ALL, WORLD_START_GI } from '../levels/levels.js';
+import { EG_CURRENCY_COLS, EG_CURRENCY_ROWS, EG_CURRENCY_SLOT_MAP, _egCurrencyDefForId } from '../loot/hub-currency-layout.js';
+import { EG_ESSENCE_COLS, EG_ESSENCE_ROWS, EG_ESSENCE_SLOT_MAP } from '../loot/loot-essences.js';
+import { _egEssenceDefForId } from '../loot/loot-essences-defs.js';
+import { _egIsActive } from '../combat/combat-state.js';
+import { EG_SLOT_ACCEPTS } from '../endgame/endgame-hub-drag-and-drop.js';
+import { EG_ALL_BASE_TYPES } from '../loot/equipment-base-items.js';
+import { EG_SLOT_ICONS } from '../loot/equipment-slot-icons.js';
+import { _egRollModCounts } from '../loot/loot-equipment-generator.js';
+import { _egGetModTable } from '../loot/loot-equipment-mod-tables.js';
+import { _egRollImplicitsForBase } from '../loot/loot-implicits.js';
+import { _egBuildItemName } from '../loot/loot-mod-naming.js';
+import { _egRollMods } from '../loot/loot-mod-application.js';
+import { _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _egQuizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
 import { showToast } from '../puzzle-mechanics/toasts-and-popups.js';
 import { showMapView } from '../screens/screens-map-view.js';
 import { onSaveSlotChosen, renderSaveSlotScreen, showSaveSlotSelect } from '../screens/screens-save-slots.js';
 import { showWorldDetail } from '../screens/screens-world-levels.js';
 import { launchExistingGame, showSetup, showTitle, switchScreen } from '../screens/screens.js';
 import { _doStartLevel } from '../start-level.js';
-import { getActiveSlot, getSlotSummary, save, wipeSlot, STATE } from '../state.js';
+import { SAVE_SLOT_COUNT, buildFreshState, getActiveSlot, getSlotSummary, save, setSlotName, wipeSlot, STATE } from '../state.js';
 import { markSeen } from '../storyline/storyline-progress.js';
 
 //------------------------------------------------------------------------
@@ -244,6 +260,501 @@ export const DevTest = {
     },
 };
 window.DevTest = DevTest;
+
+//------------------------------------------------------------------------
+//-------------------CHEAT: TEST SLOTS (boss-testing roster)---------------
+//------------------------------------------------------------------------
+// One click on the dev mode-select screen ("🧪 Fill 15 Test Slots") writes
+// up to 15 ready-to-play characters into EMPTY save slots: every campaign
+// level + the Nexus unlocked, tutorial done, level-appropriate gear (L3-7 =
+// just the tutorial sword; slots fill up gradually to all 19 by L100), 100M gold, 999 of every orb /
+// shard (Cores tab) and 999 of every essence. Levels run 3 -> 100 and the
+// characters rotate through all three heroes and every class/ascendency, so
+// any boss can be tested at any power level.
+//
+// Slots holding anything are NEVER touched - run it again after wiping some
+// slots to refill them. Trials stay un-cleared on purpose, so their
+// first-clear rewards and boss fights are still testable. The written saves
+// are plain data in the real save format; migrateOldSave() fills the rest
+// when a slot is first loaded.
+
+// Roster levels, low -> high (15 entries = 15 slots).
+const DEV_TEST_SLOT_LEVELS = [3, 8, 12, 18, 24, 30, 36, 42, 50, 58, 66, 75, 85, 95, 100];
+const DEV_TEST_CHARACTERS = ['stox', 'trix', 'syla'];
+const DEV_TEST_GOLD = 100000000;
+const DEV_TEST_STACK = 999;
+
+// Slot key mirror of state.js _slotKey (slot 1 reuses the legacy key).
+function _devTestSlotKey(n) { return n === 1 ? 'stoxels' : `stoxels_slot_${n}`; }
+
+// Fixed-slot stash grid with 999 of every id in `slotMap`.
+function _devTestStash(rows, cols, slotMap, defFor, category, rarity) {
+    const grid = Array.from({ length: rows }, () => Array(cols).fill(null));
+    for (const id of Object.keys(slotMap)) {
+        const pos = slotMap[id];
+        const def = defFor(id);
+        if (!def || !grid[pos.r]) continue;
+        grid[pos.r][pos.c] = { ...def, id, category, rarity, count: DEV_TEST_STACK };
+    }
+    return grid;
+}
+
+// Level-appropriate gear: for each paperdoll slot, the highest-tier base the
+// level qualifies for (preferring the class's attribute archetype or 'any'),
+// rolled through the SAME mod / implicit / naming pipeline as real drops so
+// the items are indistinguishable from found loot. Rarity follows the level:
+// green early, blue mid, purple late - roughly what a player would wear.
+const DEV_TEST_CLASS_ARCHETYPE = { statistician: 'strength', mathmagician: 'intellect', probabilist: 'agility' };
+
+function _devTestRarityForLevel(level) {
+    if (level < 15) return 'uncommon';
+    if (level < 40) return 'rare';
+    return 'epic';
+}
+
+function _devTestMakeItem(base, level, rarity) {
+    const table = _egGetModTable(base);
+    const { prefixCount, suffixCount } = _egRollModCounts(rarity);
+    const mods = (table && prefixCount + suffixCount > 0)
+        ? _egRollMods(prefixCount, suffixCount, table, level, base.defenses) : [];
+    const baseName = base.name;
+    let implicits = [];
+    try { implicits = _egRollImplicitsForBase(base) || []; } catch (e) { implicits = []; }
+    return {
+        id: `${base.id}_${Date.now()}_${Math.floor(Math.random() * 100000)}`,
+        baseId: base.id,
+        name: _egBuildItemName(baseName, rarity, mods),
+        baseName,
+        icon: base.icon || EG_SLOT_ICONS[base.slotType] || '📦',
+        category: 'equip',
+        slotType: base.slotType,
+        archetype: base.archetype,
+        rarity,
+        itemLevel: level,
+        requirements: { ...base.requirements },
+        defenses: { ...base.defenses },
+        ...(base.damage ? { damage: { ...base.damage }, attackIntervalSeconds: base.attackIntervalSeconds } : {}),
+        ...(base.hands ? { hands: base.hands } : {}),
+        ...(base.blockChance ? { blockChance: base.blockChance } : {}),
+        mods,
+        implicits,
+    };
+}
+
+// Order a real player tends to fill the paperdoll in (weapon first, then the
+// armour the tutorial hands out, then everything else).
+const DEV_TEST_SLOT_PRIORITY = [
+    'weapon1', 'chest', 'pants', 'boots', 'head', 'gloves', 'belt', 'weapon2', 'bracers', 'shoulders',
+    'cloak', 'amulet', 'ring1', 'ring2', 'earring1', 'earring2', 'arcane', 'talisman', 'ranged',
+];
+const DEV_TEST_STARTER_SWORD_ID = 'wpn_1h_1'; // the tutorial's starter weapon
+
+// How many paperdoll slots a character of this level realistically has
+// filled: 1 at level 3, all 19 by level 100.
+function _devTestFilledSlotCount(level) {
+    return Math.min(DEV_TEST_SLOT_PRIORITY.length,
+        1 + Math.floor(Math.max(0, level - 3) * (DEV_TEST_SLOT_PRIORITY.length - 1) / 97));
+}
+
+function _devTestGear(level, cls) {
+    // Brand-new characters own only the tutorial's starter sword.
+    if (level < 8) {
+        const sword = EG_ALL_BASE_TYPES.find(b => b.id === DEV_TEST_STARTER_SWORD_ID);
+        if (!sword) return {};
+        const item = _devTestMakeItem(sword, sword.minLevel, 'common');
+        item.noSellValue = true;
+        return { weapon1: item };
+    }
+    const want = DEV_TEST_CLASS_ARCHETYPE[cls] || 'any';
+    const rarity = _devTestRarityForLevel(level);
+    const equipped = {};
+    const slotsBySlotType = {};
+    for (const [slotId, slotType] of Object.entries(EG_SLOT_ACCEPTS)) {
+        (slotsBySlotType[slotType] = slotsBySlotType[slotType] || []).push(slotId);
+    }
+    for (const [slotType, slotIds] of Object.entries(slotsBySlotType)) {
+        let pool = EG_ALL_BASE_TYPES.filter(b => b.slotType === slotType && b.minLevel <= level);
+        if (slotType === 'weapon') pool = pool.filter(b => b.hands !== 2); // 1H main hand so the shield slot stays usable
+        if (!pool.length) continue;
+        const pref = pool.filter(b => b.archetype === want || b.archetype === 'any');
+        const use = pref.length ? pref : pool;
+        const top = Math.max(...use.map(b => b.minLevel));
+        const best = use.filter(b => b.minLevel === top);
+        slotIds.forEach((slotId, i) => {
+            equipped[slotId] = _devTestMakeItem(best[i % best.length], level, rarity);
+        });
+    }
+    const keep = new Set(DEV_TEST_SLOT_PRIORITY.slice(0, _devTestFilledSlotCount(level)));
+    for (const slotId of Object.keys(equipped)) if (!keep.has(slotId)) delete equipped[slotId];
+    return equipped;
+}
+
+// Class variant for roster position i: first 6 = base classes, the rest
+// cycle through the six ascendencies (with their parent base class).
+function _devTestVariant(i) {
+    const asc = CLASS_LIST.flatMap(c => ASCENDENCY_LIST[c].map(a => ({ cls: c, asc: a })));
+    if (i < 6) return { cls: CLASS_LIST[i % CLASS_LIST.length], asc: null };
+    return asc[(i - 6) % asc.length];
+}
+
+function devCheatFillTestSlots() {
+    const empties = [];
+    for (let n = 1; n <= SAVE_SLOT_COUNT; n++) if (getSlotSummary(n).empty) empties.push(n);
+    const targets = empties.slice(0, DEV_TEST_SLOT_LEVELS.length);
+    if (!targets.length) {
+        showToast('🧪 No empty save slots - wipe some first');
+        return 0;
+    }
+    if (typeof window.confirm === 'function' &&
+        !window.confirm(`Create ${targets.length} cheat test characters in empty slots ${targets.join(', ')}?\n(Existing saves are not touched.)`)) {
+        return 0;
+    }
+
+    const allGi = ALL.map((_, gi) => gi);
+    const lvlName = (c) => c.charAt(0).toUpperCase() + c.slice(1);
+    targets.forEach((slotNum, i) => {
+        const level = DEV_TEST_SLOT_LEVELS[i];
+        const { cls, asc } = _devTestVariant(i);
+        const character = DEV_TEST_CHARACTERS[i % DEV_TEST_CHARACTERS.length];
+        const rank = level >= 40 ? 3 : level >= 15 ? 2 : 1;
+
+        const s = buildFreshState();
+        s.passiveTreeAllocated = [];
+        s.playerCharacter = character;
+        s.playerClass = cls;
+        s.playerAscendency = asc;
+        s.tutorialDone = true;
+        s.done = allGi.slice();
+        s.mathGatePassed = allGi.slice();
+        s.nexusUnlocked = true;
+        s.playerLevel = level;
+        s.playerXP = 0;
+        s.passiveTreePoints = level - 1;
+        s.classPassiveLevel = rank;
+        s.classActive1Level = rank;
+        s.classActive2Level = rank;
+        s.classActiveLevel = rank;
+        s.ascendencySkill1Level = asc ? rank : 1;
+        s.ascendencySkill2Level = asc ? rank : 1;
+        s.egGold = DEV_TEST_GOLD;
+        s.egHubVisited = true;
+        s.egCurrencyStash = _devTestStash(EG_CURRENCY_ROWS, EG_CURRENCY_COLS, EG_CURRENCY_SLOT_MAP, _egCurrencyDefForId, 'currency', 'currency');
+        s.egEquipped = _devTestGear(level, cls);
+        s.egEssenceStash = _devTestStash(EG_ESSENCE_ROWS, EG_ESSENCE_COLS, EG_ESSENCE_SLOT_MAP, _egEssenceDefForId, 'essence', 'essence');
+
+        try {
+            localStorage.setItem(_devTestSlotKey(slotNum), JSON.stringify(s));
+            setSlotName(slotNum, `TEST L${level} ${lvlName(character)} ${lvlName(asc || cls)}`);
+        } catch (e) {
+            console.error('[devtest] could not write slot ' + slotNum, e);
+        }
+    });
+
+    try { renderSaveSlotScreen(); } catch (e) { /* screen not built yet */ }
+    showToast(`🧪 ${targets.length} test slots created (${targets.join(', ')})`);
+    return targets.length;
+}
+DevTest.fillTestSlots = devCheatFillTestSlots;
+
+//------------------------------------------------------------------------
+//-------------------FIGHT LOG (boss-balance telemetry)--------------------
+//------------------------------------------------------------------------
+// Records one entry per boss fight - win, loss or left - and exports them
+// as one JSON file ("📊 Export Fight Log" on the dev mode-select screen, or
+// DevTest.fightLog()). Each entry carries the build snapshot, duration,
+// damage taken (total + by source + biggest hits), the HP timeline of
+// player and boss, and time spent in danger, so balance can be tuned from
+// real fights instead of guesses.
+//
+// Pure observer: a 250 ms poll of the live combat globals plus one guarded
+// call from _egPlayerTakeDamage (encounter-damage.js) for attribution.
+// Nothing here changes how a fight plays. Stored in localStorage under
+// FIGHTLOG_KEY, capped at FIGHTLOG_MAX entries.
+
+const FIGHTLOG_KEY = 'stoxels_fightlog';
+const FIGHTLOG_MAX = 60;
+const FIGHTLOG_POLL_MS = 250;
+const FIGHTLOG_SAMPLE_MS = 1000;
+const FIGHTLOG_TOP_HITS = 8;
+
+let _flCur = null; // the fight currently being recorded
+
+function _flRead() {
+    try { return JSON.parse(localStorage.getItem(FIGHTLOG_KEY) || '[]') || []; } catch (e) { return []; }
+}
+function _flWrite(list) {
+    try { localStorage.setItem(FIGHTLOG_KEY, JSON.stringify(list.slice(-FIGHTLOG_MAX))); } catch (e) { /* storage full - log is optional */ }
+}
+
+// Active quiz damage buff as a percentage (stacks x 10); 0 when none.
+function _flQuizBuffPct() {
+    try { return Math.round((_egQuizDamageBuffMult() - 1) * 1000) / 10; } catch (e) { return 0; }
+}
+
+function _flBuildSnapshot() {
+    const S = STATE || {};
+    const sheet = {};
+    try {
+        const stats = _egComputePlayerStats() || {};
+        for (const [k, v] of Object.entries(stats)) {
+            if (typeof v === 'number' && Number.isFinite(v) && v !== 0) sheet[k] = Math.round(v * 100) / 100;
+        }
+    } catch (e) { /* sheet is optional */ }
+    return {
+        slot: getActiveSlot(),
+        character: S.playerCharacter || null,
+        playerClass: S.playerClass || null,
+        ascendency: S.playerAscendency || null,
+        level: S.playerLevel || 1,
+        levelLocked: !!window.__devLevelLock,
+        // Quiz reward buff (+10% damage per correct-answer stack, reset every
+        // run): not part of the stat sheet, but it changes damage dealt a lot.
+        quizDamageBuffPct: _flQuizBuffPct(),
+        maxHP: globalThis.playerMaxHP,
+        maxMana: globalThis.playerMaxMana,
+        gold: S.egGold || 0,
+        skillRanks: {
+            passive: S.classPassiveLevel, active1: S.classActive1Level, active2: S.classActive2Level,
+            asc1: S.ascendencySkill1Level, asc2: S.ascendencySkill2Level,
+        },
+        passivePointsAllocated: S.passiveTreeAllocated ? Array.from(S.passiveTreeAllocated).length : 0,
+        equippedCount: Object.keys(globalThis._egEquipped || S.egEquipped || {}).length,
+        sheet,
+    };
+}
+
+function _flStart(boss) {
+    const trial = (typeof globalThis._egIsTrialRun === 'function') ? globalThis._egIsTrialRun() : null;
+    const now = Date.now();
+    _flCur = {
+        v: 1,
+        at: new Date(now).toISOString(),
+        startedMs: now,
+        lastSampleMs: 0,
+        bossId: boss.id,
+        boss: {
+            name: boss.name || boss.baseId || String(boss.id),
+            baseId: boss.baseId || boss.defId || null,
+            level: boss.level,
+            maxHP: boss.maxHP,
+            element: boss.element || null,
+        },
+        trial: trial ? { kind: trial.kind || null, world: trial.wi != null ? trial.wi + 1 : (trial.world || null) } : null,
+        killsBefore: Number(globalThis._egBossKilledCount) || 0,
+        player: _flBuildSnapshot(),
+        damageTaken: 0,
+        hitCount: 0,
+        bySource: {},
+        topHits: [],
+        timeline: [],
+        lowHPMs: 0,
+        lastPollMs: now,
+        minHPPct: 100,
+        bossHalfAtSec: null,
+    };
+}
+
+function _flFinish(result) {
+    const f = _flCur;
+    _flCur = null;
+    if (!f) return;
+    const endMs = Date.now();
+    const rec = {
+        v: f.v,
+        at: f.at,
+        result,
+        durationSec: Math.round((endMs - f.startedMs) / 100) / 10,
+        boss: f.boss,
+        trial: f.trial,
+        player: f.player,
+        quizDamageBuffPctAtEnd: _flQuizBuffPct(),
+        damageTaken: f.damageTaken,
+        // share of damageTaken that came from ailment DoT (shadow burn etc.)
+        ailmentDamage: f.ailmentDamage || 0,
+        hitCount: f.hitCount,
+        avgHit: f.hitCount ? Math.round((f.damageTaken - (f.ailmentDamage || 0)) / Math.max(1, f.hitCount)) : 0,
+        // damage the boss fight cost, as a share of the player's max life
+        damageTakenPctOfMaxHP: f.player.maxHP ? Math.round(f.damageTaken / f.player.maxHP * 100) : null,
+        minPlayerHPPct: f.minHPPct,
+        secondsBelow30PctHP: Math.round(f.lowHPMs / 100) / 10,
+        bossHalfAtSec: f.bossHalfAtSec,
+        bySource: f.bySource,
+        topHits: f.topHits,
+        timeline: f.timeline, // [tSec, playerHP, absorption, bossHPPct]
+    };
+    const list = _flRead();
+    list.push(rec);
+    _flWrite(list);
+    try {
+        showToast(`📊 Fight logged: ${rec.boss.name} - ${result} in ${rec.durationSec}s (${list.length} stored)`);
+    } catch (e) { /* toast optional */ }
+}
+
+// Attribution hook called from _egPlayerTakeDamage with the HP actually lost.
+window.__fightLogHit = function (amount, isSpell, element, isBossAbility, attacker) {
+    const f = _flCur;
+    if (!f || !(amount > 0)) return;
+    const who = (attacker && (attacker.name || attacker.baseId)) || (isBossAbility ? f.boss.name : 'unknown');
+    const key = `${who}${isBossAbility ? ' (boss ability)' : ''}${isSpell ? ' [spell]' : ''}${element ? ' ' + element : ''}`;
+    const e = f.bySource[key] || (f.bySource[key] = { hits: 0, total: 0 });
+    e.hits++;
+    e.total += amount;
+    f.damageTaken += amount;
+    f.hitCount++;
+    const top = { t: Math.round((Date.now() - f.startedMs) / 100) / 10, amount, src: key };
+    f.topHits.push(top);
+    f.topHits.sort((a, b) => b.amount - a.amount);
+    if (f.topHits.length > FIGHTLOG_TOP_HITS) f.topHits.length = FIGHTLOG_TOP_HITS;
+    f.lastHit = { key, amount, top, at: Date.now(), element };
+};
+
+// Names the hit _egPlayerTakeDamage just recorded: boss abilities report
+// their mechanic ("Void Line", "Null Ray", ...) right after the damage lands,
+// so the generic "(boss ability) [spell]" bucket is split per mechanic.
+window.__fightLogAbility = function (dealt, bossName, abilityName) {
+    const f = _flCur;
+    const last = f && f.lastHit;
+    if (!last || !(dealt > 0) || Date.now() - last.at > 150) return;
+    const src = bossName ? `${bossName} - ${abilityName}` : String(abilityName);
+    const key = `${src}${last.element ? ' ' + last.element : ''}`;
+    const old = f.bySource[last.key];
+    if (old) {
+        old.hits--;
+        old.total -= last.amount;
+        if (old.hits <= 0) delete f.bySource[last.key];
+    }
+    const e = f.bySource[key] || (f.bySource[key] = { hits: 0, total: 0 });
+    e.hits++;
+    e.total += last.amount;
+    last.top.src = key;
+    f.lastHit = null;
+};
+
+// HP lost to ailment damage over time (burn, shadow burn, bleed, poison...):
+// it never passes through _egPlayerTakeDamage, so it needs its own hook.
+window.__fightLogDot = function (amount, keys) {
+    const f = _flCur;
+    if (!f || !(amount > 0)) return;
+    const key = `ailment: ${keys}`;
+    const e = f.bySource[key] || (f.bySource[key] = { hits: 0, total: 0 });
+    e.hits++;
+    e.total += amount;
+    f.damageTaken += amount;
+    f.ailmentDamage = (f.ailmentDamage || 0) + amount;
+};
+
+function _flPoll() {
+    let active = false;
+    try { active = !!_egIsActive(); } catch (e) { active = false; }
+    const monsters = Array.isArray(globalThis._egMonsters) ? globalThis._egMonsters : [];
+
+    if (!_flCur) {
+        if (!active) return;
+        const boss = monsters.find(m => m.isBoss && m.currentHP > 0);
+        if (boss) _flStart(boss);
+        return;
+    }
+
+    const f = _flCur;
+    const now = Date.now();
+    const hp = Number(globalThis.playerCurrentHP) || 0;
+    const maxHP = Number(globalThis.playerMaxHP) || 1;
+    const boss = monsters.find(m => m.id === f.bossId);
+
+    if (hp <= 0) { _flFinish('loss'); return; }
+
+    if (!boss || boss.currentHP <= 0) {
+        const killed = (Number(globalThis._egBossKilledCount) || 0) > f.killsBefore || (boss && boss.currentHP <= 0);
+        _flFinish(killed ? 'win' : 'left');
+        return;
+    }
+    if (!active) { _flFinish('left'); return; }
+
+    // time in danger
+    const dt = now - f.lastPollMs;
+    f.lastPollMs = now;
+    const pct = hp / maxHP * 100;
+    if (pct < 30) f.lowHPMs += dt;
+    if (pct < f.minHPPct) f.minHPPct = Math.round(pct);
+    const bossPct = boss.maxHP ? boss.currentHP / boss.maxHP * 100 : 100;
+    if (f.bossHalfAtSec === null && bossPct <= 50) f.bossHalfAtSec = Math.round((now - f.startedMs) / 100) / 10;
+
+    if (now - f.lastSampleMs >= FIGHTLOG_SAMPLE_MS && f.timeline.length < 900) {
+        f.lastSampleMs = now;
+        f.timeline.push([
+            Math.round((now - f.startedMs) / 100) / 10,
+            Math.round(hp),
+            Math.round(Number(globalThis._egPlayerAbsorptionCurrent) || 0),
+            Math.round(bossPct * 10) / 10,
+        ]);
+    }
+}
+setInterval(_flPoll, FIGHTLOG_POLL_MS);
+
+DevTest.fightLog = function () {
+    const list = _flRead();
+    if (!list.length) { showToast('📊 Fight log is empty - fight a boss first'); return 0; }
+    const blob = new Blob([JSON.stringify({ exportVersion: 1, exportedAt: new Date().toISOString(), game: document.title, fights: list }, null, 1)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `stoxels-fightlog-${list.length}fights.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    showToast(`📊 Fight log exported (${list.length} fights) - send me the file`);
+    return list.length;
+};
+DevTest.clearFightLog = function () {
+    try { localStorage.removeItem(FIGHTLOG_KEY); } catch (e) { /* ignore */ }
+    showToast('📊 Fight log cleared');
+};
+
+//------------------------------------------------------------------------
+//-------------------LEVEL LOCK (constant-level balance tests)-------------
+//------------------------------------------------------------------------
+// While locked, _egAwardXP (endgame-leveling.js) awards nothing, so the
+// character stays at exactly its level through monster kills, trial chains
+// and level clears - fights stay comparable. Persisted across reloads.
+// Button: "🔒 Level Lock" on the dev mode-select screen; console:
+// DevTest.lockLevel(true|false).
+
+const LEVELLOCK_KEY = 'stoxels_devlevellock';
+try { window.__devLevelLock = localStorage.getItem(LEVELLOCK_KEY) === '1'; } catch (e) { window.__devLevelLock = false; }
+
+function _levelLockRenderButton() {
+    const el = document.getElementById('btn-dev-levellock');
+    if (!el) return;
+    const title = el.querySelector('.dms-card-title');
+    if (title) title.textContent = window.__devLevelLock ? '🔒 Level Lock: ON (click to unlock)' : '🔓 Level Lock: OFF (click to lock)';
+}
+
+DevTest.lockLevel = function (on) {
+    window.__devLevelLock = (on === undefined) ? !window.__devLevelLock : !!on;
+    try { localStorage.setItem(LEVELLOCK_KEY, window.__devLevelLock ? '1' : '0'); } catch (e) { /* session-only */ }
+    _levelLockRenderButton();
+    showToast(window.__devLevelLock ? '🔒 Level locked - no XP will be gained' : '🔓 Level unlocked - XP works again');
+    return window.__devLevelLock;
+};
+
+(function _bindLevelLockButton() {
+    const el = document.getElementById('btn-dev-levellock');
+    if (el) el.addEventListener('click', () => DevTest.lockLevel());
+    _levelLockRenderButton();
+})();
+
+(function _bindFightLogButtons() {
+    const exp = document.getElementById('btn-dev-fightlog');
+    if (exp) exp.addEventListener('click', () => DevTest.fightLog());
+    const clr = document.getElementById('btn-dev-fightlog-clear');
+    if (clr) clr.addEventListener('click', () => { if (window.confirm('Clear all stored fight logs?')) DevTest.clearFightLog(); });
+})();
+
+(function _bindTestSlotsButton() {
+    const el = document.getElementById('btn-dev-test-slots');
+    if (el) el.addEventListener('click', devCheatFillTestSlots);
+})();
 
 //------------------------------------------------------------------------
 //-------------------AUTO-BOOT (URL driven)---------------------------------

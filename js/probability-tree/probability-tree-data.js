@@ -26850,10 +26850,13 @@ export const TALENT_TREE_DATA = {
    "nameDe": "Schmetterlingseffekt",
    "icon": "",
    "statKey": "keystone_butterfly_effect",
+   "effects": [
+    "mana_less_pct:20"
+   ],
    "tier": "keystone",
    "layoutPinned": true,
-   "descEn": "Every correct fill has a 10% chance to cause up to 3 correctly-filled orthogonal neighbours to cascade-reveal for free.",
-   "descDe": "Jede korrekte Füllung hat eine 10% Chance, dass bis zu 3 korrekt gefüllte orthogonale Nachbarn kostenlos kaskadenartig aufgedeckt werden."
+   "descEn": "Every correct fill has a 10% chance to cause up to 3 correctly-filled orthogonal neighbours to cascade-reveal for free. 20% less maximum Mana.",
+   "descDe": "Jede korrekte Füllung hat eine 10% Chance, dass bis zu 3 korrekt gefüllte orthogonale Nachbarn kostenlos kaskadenartig aufgedeckt werden. 20% weniger maximales Mana."
   },
   {
    "id": 41169,

@@ -173,7 +173,7 @@ export function _egGetDominantElement(elements) {
 // `opts.isEcho` marks the delayed echo instance so echoes can't chain into
 // further echoes (they still trigger on-hit effects like leech/ailments).
 // `opts.isCharged` marks a drag-paint charged shot (or its ricochet chain)
-// so overkill always ricochets as a smaller projectile.
+// so overkill can ricochet as a smaller projectile (gear chance).
 export function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (!_egIsActive()) return;
 
@@ -359,8 +359,8 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     if (target.isBoss) globalThis._egBossCheckPhase(target);
 
     if (target.currentHP <= 0) {
-        // Charged overkill ricochet - always fires a smaller projectile
-        // carrying the surplus damage to the next monster (chainable).
+        // Charged overkill ricochet - with the gear overkill chance, fires a
+        // smaller projectile carrying the surplus to the next monster (chainable).
         const isChargedHit = !!(opts && opts.isCharged);
         if (isChargedHit) {
             _egTryChargedOverkillRicochet(target, amount, hpBefore, elements, opts);
@@ -376,15 +376,18 @@ export function _egDamageTargetById(monsterId, amount, elements, opts) {
     _egUpdateBars();
 }
 
-// Gear: overkill - on every killing blow with excess damage, transfers the
-// surplus to a random other living monster. overkillPct increases the amount
-// transferred; it is not a chance to transfer.
+// Gear: overkill - overkillPct is the % chance that a killing blow's excess
+// damage carries over to another monster. Nobody spreads overkill without
+// gear; the same roll gates the charged-shot ricochet below.
+function _egRollOverkillSpread() {
+    const chance = Math.min(100, Math.max(0, _egComputePlayerStats().overkillPct || 0));
+    return chance > 0 && Math.random() * 100 < chance;
+}
+
+// On a successful roll, transfers the surplus of a killing blow to a random
+// other living monster (the exact overkill amount).
 export function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCrit, elements) {
-    const stats = _egComputePlayerStats();
-    const overkillPct = Math.max(0, stats.overkillPct || 0);
-    // Excess damage only spreads for characters that invested in Overkill;
-    // otherwise a single spell kill would splash the whole pack unexpectedly.
-    if (overkillPct <= 0) return;
+    if (!_egRollOverkillSpread()) return;
 
     const overkill = (hpBefore != null)
         ? Math.round(appliedDamage - hpBefore)
@@ -394,20 +397,20 @@ export function _egTryOverkillSpread(dyingTarget, appliedDamage, hpBefore, isCri
     const others = globalThis._egMonsters.filter(m => m.id !== dyingTarget.id && m.currentHP > 0);
     if (!others.length) return;
     const victim = others[Math.floor(Math.random() * others.length)];
-    const transferredDamage = Math.round(overkill * (1 + overkillPct / 100));
     Audio_Manager.playSFX('overkill_spread');
-    _egDamageTargetById(victim.id, transferredDamage, elements, { isCrit: !!isCrit });
+    _egDamageTargetById(victim.id, overkill, elements, { isCrit: !!isCrit });
 }
 
 // Drag-paint charged overkill ricochet - when a charged projectile overkills
 // its target, a smaller projectile flies from the dying monster to the next
 // living monster dealing the exact overkill amount. Chains if that hit also
-// overkills (always triggers, no gear check required).
+// overkills (each hop rolls the gear overkill chance again).
 export const EG_CHARGED_RICOCHET_SCALE = 0.62;
 
 export const EG_CHARGED_RICOCHET_DURATION_MS = 350;
 
 export function _egTryChargedOverkillRicochet(dyingTarget, appliedDamage, hpBefore, elements, opts) {
+    if (!_egRollOverkillSpread()) return;
     const overkill = Math.round(appliedDamage - (hpBefore != null ? hpBefore : 0));
     if (overkill <= 0) return;
 

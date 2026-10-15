@@ -142,10 +142,11 @@ export function _egBuildTooltipBodyHTML(item) {
         }
         // Innate bleed: every physical hit has a built-in chance to bleed
         // (EG_PHYS_INNATE_BLEED_CHANCE_PCT in combat-ailments-core.js - keep
-        // the number in the translation in sync). Only shown for weapons that
-        // actually deal physical damage.
+        // the number in the translation in sync). Only shown for MELEE
+        // weapons that actually deal physical damage: bows (slot 'ranged')
+        // are not a bleed weapon and must not advertise it.
         const physMax = dmgEff ? (dmgEff.physMax || 0) : (item.damage.max || 0);
-        if (physMax > 0) {
+        if (physMax > 0 && item.slotType === 'weapon') {
             implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_innate_bleed')}</div>`);
         }
     }

@@ -844,7 +844,7 @@ function _egRollMonsterHitAilment(element, dealt, attacker) {
 // Shadow Burn ignores the shield entirely and burns straight from HP.
 //------------------------------------------------------------------------
 
-function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
+function _egDealPlayerDotDamage(rawAmount, ignoreShield, dotKeys) {
     if (typeof dead !== 'undefined' && globalThis.dead) return;
     // Shadow Inoculation: with Life 1 every damage over time (shadow burn included)
     // must go through Absorption first.
@@ -887,6 +887,8 @@ function _egDealPlayerDotDamage(rawAmount, ignoreShield) {
     }
 
     globalThis.playerCurrentHP = Math.max(0, globalThis.playerCurrentHP - amount);
+    // Dev fight log (js/dev/dev-testing.js): HP lost to ailment DoT.
+    if (typeof globalThis.__fightLogDot === 'function') globalThis.__fightLogDot(amount, dotKeys || 'dot');
     if (typeof _renderPlayerHealth === 'function') globalThis._renderPlayerHealth();
     if (globalThis.playerCurrentHP <= 0 && typeof _egGameOver === 'function') _egGameOver();
 }
@@ -911,12 +913,14 @@ function _egTickAilments() {
     _egExpireFromMap(_egPlayerStatuses, now);
     let playerDot = 0;
     let playerIgnoresShield = false;
+    const playerDotKeys = [];
     Object.keys(_egPlayerStatuses).forEach(key => {
         const st = _egPlayerStatuses[key];
         if (!(st.dps > 0)) return;
         st.acc = (st.acc || 0) + deltaS;
         if (st.acc >= EG_AIL_TICK_INTERVAL_S) {
             st.acc -= EG_AIL_TICK_INTERVAL_S;
+            playerDotKeys.push(key);
             // Bleeding hurts far more while you move: +200% damage.
             const moveMult = (key === 'bleed' && _egIsAvatarMoving()) ? EG_AIL_BLEED_MOVING_MULT : 1;
             playerDot += Math.max(EG_AIL_MIN_DOT_DAMAGE, Math.round(st.dps * moveMult));
@@ -925,7 +929,7 @@ function _egTickAilments() {
     });
     if (playerDot > 0) {
         Audio_Manager.playSFX('ail_dot_tick');
-        _egDealPlayerDotDamage(playerDot, playerIgnoresShield);
+        _egDealPlayerDotDamage(playerDot, playerIgnoresShield, playerDotKeys.join('+'));
     }
 
     // --- Ground-fire damage: standing in burning ground burns the player ---

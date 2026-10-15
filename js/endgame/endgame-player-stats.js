@@ -45,6 +45,7 @@ import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATT
 export const EG_PLAYER_STATS = {
     baseHP: 100, // Starting HP for all monster levels
     baseMana: 60, // Starting mana pool before gear and attribute bonuses
+    baseManaRegen: 1, // Mana regenerated every 5s before gear; shows in the sheet's Mana Regen stat
     baseDamage: 10, // Damage dealt per correct cell fill
     chargePushback: 1.5, // Seconds removed from a monster's charge bar on hit
 };
@@ -617,6 +618,9 @@ export function _egComputePlayerStats() {
         // spellsCostLife / spellCostIncPct are read in class-mana.js.
         healthMorePct: passiveTreeBonuses.healthMorePct || 0,
         manaRemoved: passiveTreeBonuses.manaRemoved || 0,
+        // Butterfly Effect keystone downside: "less" maximum Mana. A multiplier
+        // on the WHOLE pool (base + gear), applied in _getPlayerMaxMana().
+        manaLessPct: passiveTreeBonuses.manaLessPct || 0,
         spellsCostLife: passiveTreeBonuses.spellsCostLife || 0,
         spellCostIncPct: passiveTreeBonuses.spellCostIncPct || 0,
         // Primal Flame keystone (node 350): fire conversion share and the
@@ -719,7 +723,7 @@ export function _egComputePlayerStats() {
         // nodes (effects pipeline, e.g. reworked node 129 Horizon Tracker)
         // seeds the very same bucket gear's life_regen feeds, so tree and
         // gear regen add up in _egTickLifeRegen().
-        lifeRegen: passiveTreeBonuses.lifeRegenFlat || 0, manaRegen: 0, manaRegenIncPct: passiveTreeBonuses.manaRegenIncPct || 0,
+        lifeRegen: passiveTreeBonuses.lifeRegenFlat || 0, manaRegen: EG_PLAYER_STATS.baseManaRegen, manaRegenIncPct: passiveTreeBonuses.manaRegenIncPct || 0,
         // Tree-sourced percentage Life regeneration per second (effects
         // pipeline, e.g. reworked node 30206). _egTickLifeRegen() adds both
         // buckets together each second, scaling this one by the CURRENT
@@ -1932,6 +1936,7 @@ export const EG_STAT_DISPLAY_LABELS = {
     impaleDurationPct: { label: t('eg_stat_impale_duration'), suffix: '%' },
     healthMorePct: { label: t('eg_stat_more_health'), suffix: '%' },
     manaRemoved: { label: t('eg_stat_mana_removed'), suffix: '' },
+    manaLessPct: { label: t('eg_stat_less_mana'), suffix: '%' },
     spellsCostLife: { label: t('eg_stat_spells_cost_life'), suffix: '' },
     spellCostIncPct: { label: t('eg_stat_spell_cost_inc'), suffix: '%' },
     damageToFirePct: { label: t('eg_stat_damage_to_fire'), suffix: '%' },
@@ -2326,7 +2331,7 @@ export const EG_STAT_LAYOUT = {
     defense: [
         { catKey: 'eg_statcat_defences', buckets: ['armour', 'evasion', 'absorption', 'stunAvoidPct', 'parrySpellChancePct'] },
         { catKey: 'eg_statcat_life_mana', buckets: [
-            'health', 'healthMorePct', 'mana', 'manaRemoved', 'spellsCostLife', 'spellCostIncPct', 'lifeRegen', 'lifeRegenRatePct', 'lifeRegenLessPct', 'manaRegen', 'manaRegenIncPct', 'lifeLeechPct', 'lifeLeechMeleePct', 'lifeLeechLessPct', 'absorptionRechargesLife',
+            'health', 'healthMorePct', 'mana', 'manaRemoved', 'manaLessPct', 'spellsCostLife', 'spellCostIncPct', 'lifeRegen', 'lifeRegenRatePct', 'lifeRegenLessPct', 'manaRegen', 'manaRegenIncPct', 'lifeLeechPct', 'lifeLeechMeleePct', 'lifeLeechLessPct', 'absorptionRechargesLife',
             'lifeOnKill', 'manaOnKill', 'absorptionOnKill', 'manaOnMistake',
             'heartHealFlat', 'heartHealIncPct', 'heartSpawnIncPct', 'manaHealFlat', 'manaHealIncPct', 'manaSpawnIncPct', 'wardingHP'] },
         { catKey: 'eg_statcat_block_dodge', buckets: [

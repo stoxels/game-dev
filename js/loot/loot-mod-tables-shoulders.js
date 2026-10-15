@@ -222,7 +222,7 @@ export const EG_MOD_TABLE_SHOULDERS = {
         // Overkill damage bleeds into nearby spawn locations.
         overkill: {
             id: 'overkill',
-            label: '#% increased Overkill Damage transferred to a nearby Monster', labelDe: '#% erhöhter Overkill-Schaden, der auf ein nahes Monster übertragen wird',
+            label: '#% Chance for Overkill Damage to spread to a nearby Monster', labelDe: '#% Chance, dass Overkill-Schaden auf ein nahes Monster übergeht',
             tiers: [
                 { tier: 1, min: 22, max: 30, weight: 80, ilvl: 82 },
                 { tier: 2, min: 13, max: 21, weight: 200, ilvl: 60 },

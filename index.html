@@ -425,6 +425,29 @@
                     <div class="dms-card-desc">Testing only: adds 999 Codex of Completion to your inventory.</div>
                 </button>
 
+                <!-- TEMPORARY TEST BUTTON: fills up to 15 EMPTY save slots with
+                     maxed-out test characters (handler: devCheatFillTestSlots
+                     in js/dev/dev-testing.js). Remove together with it. -->
+                <button class="dms-card" id="btn-dev-test-slots">
+                    <div class="dms-card-title">🧪 Fill 15 Test Slots</div>
+                    <div class="dms-card-desc">Testing only: levels 3-100, level-appropriate gear, all levels unlocked, 100M gold, 999 of every essence and core. Empty slots only.</div>
+                </button>
+
+                <!-- TEMPORARY TEST BUTTONS: boss fight log (see FIGHT LOG
+                     section in js/dev/dev-testing.js). Remove with it. -->
+                <button class="dms-card" id="btn-dev-levellock">
+                    <div class="dms-card-title">🔓 Level Lock: OFF (click to lock)</div>
+                    <div class="dms-card-desc">Testing only: while ON, no XP is gained, so your character stays at its level for fair boss tests.</div>
+                </button>
+                <button class="dms-card" id="btn-dev-fightlog">
+                    <div class="dms-card-title">📊 Export Fight Log</div>
+                    <div class="dms-card-desc">Testing only: downloads every recorded boss fight (build, damage taken, HP timeline) for balance tuning.</div>
+                </button>
+                <button class="dms-card" id="btn-dev-fightlog-clear">
+                    <div class="dms-card-title">🧹 Clear Fight Log</div>
+                    <div class="dms-card-desc">Testing only: deletes the stored fight records.</div>
+                </button>
+
                 <!-- DISABLED FOR NOW (hidden from players; code is intact).
                      To re-enable, remove this comment wrapper - the click
                      handler in js/world-proto/world-proto.js binds itself.

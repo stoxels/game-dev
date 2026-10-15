@@ -477,6 +477,101 @@ body.tq-intermission-active #screen-endgame-hub .eg-topbar .eg-level-btn {
     pointer-events: none;
 }
 #tq-intermission.show { display: flex; }
+/* ── Graduation chest (end of the tutorial) ── */
+#tq-chest {
+    position: fixed;
+    right: 14vw;
+    bottom: 24vh;
+    z-index: 8000;
+    text-align: center;
+    pointer-events: none;
+}
+#tq-chest .tq-chest-art {
+    line-height: 0;
+    filter: drop-shadow(0 0 14px rgba(190, 130, 255, 0.85)) drop-shadow(0 0 30px rgba(120, 220, 255, 0.55));
+    animation: tq-chest-bob 1.6s ease-in-out infinite alternate;
+}
+#tq-chest .tq-chest-art img {
+    width: clamp(150px, 15vw, 230px);
+    height: auto;
+    display: block;
+}
+.tq-chest-box-img {
+    width: clamp(110px, 18vw, 170px);
+    height: auto;
+    margin: -6px auto 8px;
+    display: block;
+    filter: drop-shadow(0 0 12px rgba(190, 130, 255, 0.7));
+}
+#tq-chest .tq-chest-label {
+    margin-top: 4px;
+    color: #f5d98a;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+}
+@keyframes tq-chest-bob {
+    from { transform: translateY(0) scale(1); }
+    to   { transform: translateY(-8px) scale(1.06); }
+}
+#tq-chest-modal { z-index: 8100; }
+.tq-chest-box {
+    max-width: 640px;
+    width: 100%;
+    background: rgba(18, 14, 34, 0.97);
+    border: 2px solid #d4af37;
+    border-radius: 16px;
+    padding: 26px 30px;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+}
+.tq-chest-box-title {
+    color: #d4af37;
+    font-size: 1.35em;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+.tq-chest-box-hint {
+    color: #f0ead6;
+    margin-bottom: 18px;
+}
+.tq-chest-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+}
+.tq-chest-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 8px;
+    background: rgba(40, 32, 70, 0.9);
+    border: 2px solid #8a7a3a;
+    border-radius: 12px;
+    color: #f0ead6;
+    cursor: pointer;
+    font: inherit;
+    transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.tq-chest-item:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: #f5d98a;
+    box-shadow: 0 0 16px rgba(245, 217, 138, 0.6);
+}
+.tq-chest-item-icon { font-size: 2.4rem; line-height: 1; }
+.tq-chest-item-icon img { width: 56px; height: 56px; object-fit: contain; }
+.tq-chest-item-name { font-weight: bold; }
+.tq-chest-item-sub { opacity: 0.7; font-size: 0.85em; min-height: 1.1em; }
+.tq-chest-item-state { color: #f5d98a; font-size: 0.9em; }
+.tq-chest-item-claimed {
+    opacity: 0.55;
+    border-color: #4caf50;
+    cursor: default;
+}
+.tq-chest-item-claimed .tq-chest-item-state { color: #81c784; }
+
 .tq-inter-box {
     pointer-events: none;
     max-width: 560px;

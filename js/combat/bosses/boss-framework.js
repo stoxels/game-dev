@@ -489,6 +489,13 @@ export function _egBossScheduleSingleMechanic(monster, mech, phase) {
                     Audio_Manager.playSFX(cat === 'summon' ? 'boss_summon_adds'
                         : cat === 'grid' ? 'grid_scramble' : 'boss_telegraph_warn');
                 }
+                // Cosmetic cue for the boss-rig animations (js/combat/boss-rig-anim.js).
+                // Fire-and-forget: a listener error must never block the mechanic.
+                try {
+                    document.dispatchEvent(new CustomEvent('eg-boss-mechanic', {
+                        detail: { monsterId: monster.id, mech: mech.name, phase },
+                    }));
+                } catch (e) { /* cosmetic only */ }
                 fn(monster, phase);
             }
         }

@@ -378,6 +378,10 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // Mana / Absorption maxima and increases (Trix hub nodes 134/256/31212/
     // 31213/31214/31217/31230/31244/31478/31479).
     mana_inc_pct: { channel: 'manaIncPct', en: '{v}% increased maximum Mana', de: '{v}% erhöhtes maximales Mana' },
+    // "Less" maximum Mana (Butterfly Effect keystone downside): a separate
+    // multiplier on the whole Mana pool (base + gear), applied in
+    // _getPlayerMaxMana() (class-mana.js) after every increased source.
+    mana_less_pct: { channel: 'manaLessPct', en: '{v}% less maximum Mana', de: '{v}% weniger maximales Mana' },
     absorption_flat: { channel: 'absorptionFlat', en: '+{v} to maximum Absorption', de: '+{v} auf maximale Absorption' },
     absorption_inc_pct: { channel: 'absorptionIncPct', en: '{v}% increased maximum Absorption', de: '{v}% erhöhte maximale Absorption' },
     absorption_regen_rate_pct: { channel: 'absorptionRegenRatePct', en: '{v}% increased Absorption regeneration rate', de: '{v}% erhöhte Absorptionsregenerationsrate' },

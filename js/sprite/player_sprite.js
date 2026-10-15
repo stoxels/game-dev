@@ -257,6 +257,12 @@ export function _renderPlayerAvatarSimple() {
     // Remove the full endgame avatar if switching from a monster level
     const full = document.getElementById('player-avatar-wrapper');
     if (full) full.remove();
+    // ...and its WASD listeners. They used to survive the sprite: the stale
+    // full-avatar keydown handler (registered first) claimed every held key
+    // with elId 'player-avatar-wrapper', the simple avatar's handler then saw
+    // the key as already held and skipped it, and the move tick found no such
+    // element - the hero could not walk after a monster level.
+    _removeFullAvatarWasdListeners();
 
     const withCompanions = _hasCompanions();
     const existing = document.getElementById('player-avatar-simple');

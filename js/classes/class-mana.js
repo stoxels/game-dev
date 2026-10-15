@@ -14,9 +14,8 @@ import { STATE } from '../state.js';
 
 const MANA_REGEN_INTERVAL_MS = 5000;
 
-// Flat regen applied on top of gear manaRegen so the pool always refills
-// outside endgame (story levels have no equipment). Tunable in one place.
-const MANA_BASE_REGEN = 4;
+// The base regen (EG_PLAYER_STATS.baseManaRegen) is part of the computed
+// manaRegen stat, so the character sheet shows exactly what the tick applies.
 
 // Global balance multiplier applied inside _scaleAbilityManaCost so every
 // cost source and tooltip uses the same value. A cost is exactly:
@@ -87,7 +86,10 @@ export function _getPlayerMaxMana() {
     const base = (typeof globalThis.EG_PLAYER_STATS !== 'undefined') ? globalThis.EG_PLAYER_STATS.baseMana : 0;
     const gearBonus = (typeof globalThis._egComputePlayerStats === 'function')
         ? globalThis._egComputePlayerStats().mana : 0;
-    return Math.max(0, Math.round(base + gearBonus));
+    // "Less" maximum Mana (Butterfly Effect keystone downside) multiplies the
+    // whole pool, base included, after every increased source.
+    const lessPct = Math.min(100, Math.max(0, _treeChannel('manaLessPct')));
+    return Math.max(0, Math.round((base + gearBonus) * (1 - lessPct / 100)));
 }
 
 
@@ -293,7 +295,7 @@ function _ensureManaRegenLoop() {
         const stats = (typeof globalThis._egComputePlayerStats === 'function')
             ? globalThis._egComputePlayerStats() : null;
         const regenIncPct = stats ? (stats.manaRegenIncPct || 0) : 0;
-        const regen = (MANA_BASE_REGEN + (stats ? (stats.manaRegen || 0) : 0)) * (1 + regenIncPct / 100);
+        const regen = (stats ? (stats.manaRegen || 0) : 0) * (1 + regenIncPct / 100);
         if (regen > 0 && globalThis.playerMaxMana > 0 && globalThis.playerCurrentMana < globalThis.playerMaxMana) {
             gainMana(regen);
         }

@@ -436,6 +436,7 @@ import { EG_MOD_TABLE_WEAPON2 } from '../../js/loot/loot-mod-tables-weapon2.js';
 import '../../js/loot/loot-mod-tables-rebalance.js';
 import { EG_GEN_SYMBOLS, EG_GEN_SIZES, EG_GEN_BUCKETS, EG_GEN_FONT_STACK, EG_GEN_RANDOM_REVEALS } from '../../js/combat/combat-puzzle-generator-data.js';
 import { EG_CHARGED_RICOCHET_DURATION_MS, EG_CHARGED_RICOCHET_SCALE, EG_ECHO_DELAY_MS, _egApplyHitToMonster, _egDamageTarget, _egDamageTargetById, _egGetDominantElement, _egShowStatusLabel, _egTryChargedOverkillRicochet, _egTryEchoHit, _egTryOverkillSpread } from '../../js/combat/encounter-monster-damage.js';
+import '../../js/combat/boss-rig-anim.js';
 
 //--- PHASE3 pass-through getters: module exports referenced as
 //--- globalThis.X / window.X members by concatenated code. Getter

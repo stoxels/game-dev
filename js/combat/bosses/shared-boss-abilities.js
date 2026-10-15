@@ -2279,6 +2279,8 @@ export function _egNkBossToastColor(bossName) {
 // back to the English literal when t() is unavailable. The absorbed flag is
 // consumed here so it can never leak into a later toast.
 export function _egNkAbilityHitToast(dealt, bossName, abilityName) {
+    // Dev fight log: names the hit that _egPlayerTakeDamage just recorded.
+    if (typeof globalThis.__fightLogAbility === 'function') globalThis.__fightLogAbility(dealt, bossName, abilityName);
     const ability = (bossName ? bossName + '’s ' : '') + abilityName;
     const absorbed = _egNkLastHitAbsorbed;
     _egNkLastHitAbsorbed = false;

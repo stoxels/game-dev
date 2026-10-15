@@ -32,7 +32,7 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     refHitAnchors: [[1, 22], [7, 138], [10, 176], [42, 370]],
     refHitSlopeBeyond: 6,
     hitsToKill: 3,             // full actions a monster survives
-    earlyHitsFraction: 0.45,   // level-1 share of hitsToKill; ramps to 1 by earlyHpRampLevels (fresh melee-first characters deal ~17 per strike)
+    earlyHitsFraction: 0.65,   // level-1 share of hitsToKill; ramps to 1 by earlyHpRampLevels (tutorial now hands out sword, bow, coat, greaves + Renewal)
     earlyHpRampLevels: 24,
     minHp: 18,
     countBase: 3,
@@ -44,8 +44,8 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     cellsPerExtraMonster: 35,
     sizeBonusMax: 4,
     // Early packs stay small whatever the puzzle size: count <= base + ceil(level / divisor)
-    // (3 at L1-4, 4 at L5-8, 5 at L9-12 ... the world count takes over later).
-    earlyCountBase: 2,
+    // (4 at L1-4, 5 at L5-8, 6 at L9-12 ... the world count takes over later).
+    earlyCountBase: 3,
     earlyCountLevelDivisor: 4,
     minCellsPerMonster: 5,    // small puzzles support fewer monsters
     damageBase: 9,            // per-hit damage at monster level 1 (pass 2: was 6)
@@ -58,7 +58,7 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     // The share ramps in from damageHpShareEarly at monster level 1 to
     // damageHpShare at damageHpShareRampLevels, so a fresh character with
     // little life is not chunked by a share sized for a level-7 build.
-    damageHpShareEarly: 0.06,
+    damageHpShareEarly: 0.08,
     damageHpShare: 0.14,
     damageHpShareRampLevels: 12,
     damageHpCapMult: 4,
@@ -67,8 +67,8 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     // The first monster levels hit softer and wind up slower; both ease
     // linearly back to 1.0 at earlyEaseLevels, so nothing changes later.
     earlyEaseLevels: 10,
-    earlyDamageMult: 0.75,    // monster level 1 damage multiplier
-    earlyChargeSlow: 1.3,     // monster level 1 charge-time multiplier
+    earlyDamageMult: 0.9,     // monster level 1 damage multiplier
+    earlyChargeSlow: 1.15,    // monster level 1 charge-time multiplier
 };
 
 // Multiplier (0..1 blend) for the early-game ease: 1 at monster level 1,

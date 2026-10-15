@@ -61,6 +61,9 @@ export const EG_NUL_RECONTRACT  = 12;     // s between lattice re-contractions
 export const EG_NUL_ERASE_MS    = 8000;   // a hypothesis erasure lasts
 export const EG_NUL_RAY_HIT     = 0.14;   // %maxHP crossing a null ray
 export const EG_NUL_RAYS        = 2;      // orbiting eye-beams
+// Warning window before the rays turn dangerous (module-private on purpose:
+// not part of the manifest's export surface).
+const EG_NUL_RAY_WARN_MS = 1800;
 export const EG_NUL_RAY_SPEED   = 0.7;    // rad/s orbit
 export const EG_NUL_STRIKE_HIT  = 0.15;   // %maxHP caught on the strike side
 export const EG_NUL_EXPOSE_R    = 105;    // radius of the safe STAND-HERE ring around the phantom
@@ -385,16 +388,24 @@ export function _egMechNulRays(monster, phase) {
         beams.push({ off: i * Math.PI * 2 / (EG_NUL_RAYS + (p >= 3 ? 1 : 0)), el });
     }
 
+    // Telegraph: the beams first appear as pale dashed warning lines at their
+    // starting angles and do NOT hurt or rotate for EG_NUL_RAY_WARN_MS, so
+    // the player can read where they will sweep and step clear. (Playtest:
+    // the rays used to spin up and hit in the same frame as the toast.)
+    const warnMs = EG_NUL_RAY_WARN_MS * _EG_NUL_DEBUG_MULT;
     let e = 0;
     _egNkLoop(run, (dtS) => {
         e += dtS * 1000;
+        const warning = e < warnMs;
+        const live = warning ? 0 : (e - warnMs);
         const pc = _egNulPC();
         let crossed = false;
         beams.forEach(b => {
-            const a = b.off + (e / 1000) * omega;
+            const a = b.off + (live / 1000) * omega;
+            b.el.classList.toggle('eg-nul-ray-warn', warning);
             b.el.style.transform = 'rotate(' + a + 'rad)';
             const bx = cx + Math.cos(a) * len, by = cy + Math.sin(a) * len;
-            if (_egPtSegDist(pc.x, pc.y, cx, cy, bx, by) < 11 + 9) crossed = true;
+            if (!warning && _egPtSegDist(pc.x, pc.y, cx, cy, bx, by) < 11 + 9) crossed = true;
         });
         if (crossed) {
             if (_egNulTouch(EG_NUL_RAY_HIT, level, 'Null Ray')) {
@@ -402,7 +413,7 @@ export function _egMechNulRays(monster, phase) {
                 _egNkToast('eg_mech_nul_chilled', '🧿❄️ Your charge bar is CHILLED - it fills at half speed!', '#93c5fd');
             }
         }
-        return e < 9000 * _EG_NUL_DEBUG_MULT;
+        return e < warnMs + 9000 * _EG_NUL_DEBUG_MULT;
     });
 }
 
