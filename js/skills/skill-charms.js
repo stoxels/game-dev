@@ -718,10 +718,22 @@ function getCharmUsableSlottedRank(skillId) {
 // slotting a lower-rank charm is a legitimate, cheaper choice.
 //------------------------------------------------------------------------
 
+// Tooltip preview: while set, getSkillCastRankFull answers with this rank for
+// that skill, so every description / damage / cost number built inside
+// withPreviewCastRank describes the HOVERED charm's rank instead of the
+// slotted or trained one. Always cleared again (try/finally).
+let _charmPreview = null;
+export function withPreviewCastRank(skillId, rank, fn) {
+    const prev = _charmPreview;
+    _charmPreview = (skillId && rank) ? { skillId, rank } : prev;
+    try { return fn(); } finally { _charmPreview = prev; }
+}
+
 // Full cast rank (may exceed the authored effect table - see below).
 // An over-level slotted charm does NOT raise the cast rank: the spell falls
 // back to the character's trained rank until the level requirement is met.
 export function getSkillCastRankFull(skillId) {
+    if (_charmPreview && _charmPreview.skillId === skillId) return _spellRankClamp(_charmPreview.rank);
     const slotted = getCharmUsableSlottedRank(skillId);
     if (slotted) return _spellRankClamp(slotted);
     const trained = getSkillLevel(skillId);

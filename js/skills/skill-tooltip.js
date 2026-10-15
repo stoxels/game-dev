@@ -3,7 +3,7 @@ import { LANG, t } from '../translation/translations.js';
 import { _formatCooldown } from '../classes/class-cooldown-state.js';
 import { hideHUDTooltip, moveHUDTooltip, showHUDTooltip } from '../classes/class-hud.js';
 import { _bloodMagicActive } from '../classes/class-mana.js';
-import { CHARM_ORB_DAMAGE_PCT, charmRankMeetsPlayerLevel, getCharmArtForSkill, getCharmByKey, getCharmRankMinPlayerLevel, getCharmSkillOrbBonusPct, getCharmSlottedRank, isSkillCharmUnlocked } from './skill-charms.js';
+import { CHARM_ORB_DAMAGE_PCT, charmRankMeetsPlayerLevel, getCharmArtForSkill, getCharmByKey, getCharmRankMinPlayerLevel, getCharmSkillOrbBonusPct, getCharmSlottedRank, isSkillCharmUnlocked, withPreviewCastRank } from './skill-charms.js';
 import { canAffordSkill, getPassiveSkillDef, getPlayerTraits, getSkillCooldown, getSkillDamage, getSkillDef, getSkillDesc, getSkillLevel, getSkillManaCost, getSkillName, isSkillPassive } from './skill-registry.js';
 import { getSkillCastTimeSeconds } from './spell-casttime.js';
 import { getUniversalSpellCastKind, getUniversalSpellChargeRechargeRemaining, getUniversalSpellCharges, getUniversalSpellDef, getUniversalSpellMovementEstimate, getUniversalSpellSupportEstimate } from './universal-spells.js';
@@ -337,6 +337,16 @@ function _skillTooltipCharmInfo(charm) {
 // is the charm the pointer is over in the charm list: the tooltip then shows
 // THAT charm's rank and requirements instead of the slotted one.
 function buildSkillTooltipHTML(skillId, charmKey) {
+    const hoveredCharm = charmKey ? getCharmByKey(charmKey) : null;
+    // Hovering a charm of another rank than the slotted / trained one: build
+    // the WHOLE tooltip (description, damage, cost) at that charm's rank.
+    if (hoveredCharm && hoveredCharm.skillId === skillId) {
+        return withPreviewCastRank(skillId, hoveredCharm.rank, () => _buildSkillTooltipHTML(skillId, charmKey));
+    }
+    return _buildSkillTooltipHTML(skillId, charmKey);
+}
+
+function _buildSkillTooltipHTML(skillId, charmKey) {
     const def = getSkillDef(skillId);
     if (!def) return '';
 
