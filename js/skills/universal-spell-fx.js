@@ -1795,10 +1795,10 @@ function _uspVortexMarkup() {
         let p = '';
         for (let k = 0; k < arms; k++) {
             const d = arm(k, arms, twist);
-            p += `<path d="${d}" class="usp-vtx-arm-wide" stroke-width="${wide}"/>` +
-                 `<path d="${d}" class="usp-vtx-arm" stroke-width="${narrow}"/>`;
+            p += `<path d="${d}" fill="none" class="usp-vtx-arm-wide" stroke-width="${wide}"/>` +
+                 `<path d="${d}" fill="none" class="usp-vtx-arm" stroke-width="${narrow}"/>`;
         }
-        return `<svg class="usp-vtx-spiral ${cls}" viewBox="0 0 200 200">${p}</svg>`;
+        return `<svg class="usp-vtx-spiral ${cls}" viewBox="0 0 200 200" width="100%" height="100%" fill="none">${p}</svg>`;
     };
     let shards = '';
     const specs = [[34, 2.1, 0], [46, 2.9, 0.4], [58, 3.6, 0.8], [70, 4.4, 0.2], [82, 5.2, 0.6], [40, 2.5, 1.3], [64, 3.9, 1.7], [76, 4.8, 1.1]];
