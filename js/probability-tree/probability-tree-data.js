@@ -19154,7 +19154,7 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "cast_speed_pct:3",
     "spell_crit_chance:2",
-    "time_on_elite:3"
+    "time_added:15"
    ],
    "tier": "small"
   },
