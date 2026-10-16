@@ -309,14 +309,13 @@ export function _egvBuyPuzzleItem(defId) {
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
-// The Cartographer sells exactly the ranks a player would otherwise find
-// during the campaign (ranks 1-5; ranks 6+ stay map-only drops). A rank opens
-// up at the monster level it starts dropping at (mirrors
-// CHARM_RANK_MIN_MONSTER_LEVEL in skill-charms.js), so the shop never runs
-// ahead of the road. Prices are gold, sized against campaign coin income.
-const EG_VENDOR_CHARM_RANK_PRICES = [60, 250, 700, 1800, 4200];
+// The Cartographer sells every rank (1-10). A rank opens up at the player
+// level that can slot it (mirrors CHARM_RANK_MIN_PLAYER_LEVEL in
+// skill-charms.js for ranks 6+), so the shop never runs ahead of the road.
+// Ranks 6-10 are the atlas ranks and carry atlas-sized prices (gold).
+const EG_VENDOR_CHARM_RANK_PRICES = [60, 250, 700, 1800, 4200, 9000, 20000, 44000, 95000, 200000];
 // Minimum player level per rank (index = rank - 1).
-const EG_VENDOR_CHARM_RANK_MIN_LEVEL = [1, 10, 22, 35, 50];
+const EG_VENDOR_CHARM_RANK_MIN_LEVEL = [1, 10, 22, 35, 50, 68, 74, 79, 84, 89];
 
 // Live player level for the rank gates (saved level when the HUD hook is absent).
 function _egvPlayerLevel() {
