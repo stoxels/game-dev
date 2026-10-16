@@ -69,7 +69,7 @@ import { _fxChronoFracture, _useChronoFracture } from '../../js/puzzle-items/chr
 import { playItemEffect } from '../../js/puzzle-items/item-fx-dispatcher.js';
 import { _consumeItem } from '../../js/puzzle-items/use-item.js';
 import { RESHUFFLE_GOAL, RESHUFFLE_MAX_ATTEMPTS, RESHUFFLE_PICK_COUNT, applyReshuffleChoice, attachReshuffleCardHandlers, buildReshuffleCardHtml, buildReshuffleModalElement, checkReshuffleGoalReached, openReshuffleModal, pickReshuffleRewardItems, removeItemFromInventory, reshuffleCount, reshuffleRightClickItem, updateReshuffleCounter } from '../../js/puzzle-item-inventory/puzzle-item-reshuffle.js';
-import { HOARDER_THRESHOLD, ITEM_GAIN_POPUP_FADE_MS, ITEM_GAIN_POPUP_HOLD_MS, RARITY_TIERS, TOAST_DISPLAY_DURATION_MS, TOAST_MAX_VISIBLE, _checkCollectorAchievement, _checkHoarderAchievement, _clearItemGainPopup, _discardToastEntry, _ensureItemGainPopupStyle, _escapeToastHtml, _findInvSlotEl, _hasAllRarityTiers, _itemGainPopupState, _itemGainPopupStyleInjected, _positionItemGainPopup, _removeToast, _scheduleItemGainPopupDismiss, activeToasts, checkInventoryAchievements, puzzleItemIconHtml, resetToastQueue, showHtmlToast, showItemGainPopup, showItemToast, showToast } from '../../js/puzzle-mechanics/toasts-and-popups.js';
+import { HOARDER_THRESHOLD, ITEM_GAIN_POPUP_FADE_MS, ITEM_GAIN_POPUP_HOLD_MS, RARITY_TIERS, TOAST_DISPLAY_DURATION_MS, TOAST_MAX_VISIBLE, _checkCollectorAchievement, _checkHoarderAchievement, _clearItemGainPopup, _discardToastEntry, _ensureItemGainPopupStyle, _escapeToastHtml, _findInvSlotEl, _hasAllRarityTiers, _itemGainPopupState, _itemGainPopupStyleInjected, _positionItemGainPopup, _removeToast, _scheduleItemGainPopupDismiss, activeToasts, checkInventoryAchievements, puzzleItemIconHtml, resetToastQueue, showCombatToast, showHtmlToast, showItemGainPopup, showItemToast, showToast } from '../../js/puzzle-mechanics/toasts-and-popups.js';
 import { primerUseTutor, showPrimerModal, skipPrimer, submitPrimerAnswer } from '../../js/puzzle-items/scouts-primer/scouts-primer.js';
 import { PRIMER_COL_BONUS_TABLE, PRIMER_MAX, PRIMER_ROW_BONUS_TABLE, PRIMER_TIER_COLOURS, applyPerfectPrimerReveal, applyPrimerHeadstart } from '../../js/puzzle-items/scouts-primer/scouts-primer-reveal.js';
 import { _achToastQueue, _drainAchToastQueue, backToAchCategories, buildAchievementsScreen, showAchResetModal, showAchievements } from '../../js/achievements/achievements-ui.js';
@@ -373,7 +373,7 @@ import { EG_INITIAL_SPAWN_STAGGER_STEP_MS, _egCalcSpawnDelay, _egRespawnRandomMo
 import { EG_LIFE_REGEN_INTERVAL_MS, EG_STAGGER_DURATION_MS, _egAttachBossStylesheet, _egCancelSpawnTimers, _egResetEncounterState, _egStartEncounter, _egStartTickLoop, _egStopEncounter, _egStopTickLoop } from '../../js/combat/encounter-lifecycle.js';
 import { _egAnimateMonsterMelee, _egAnimateMonsterProjectile, _egApplyMeleeImpact, _egFireMonsterAttack, _egFlashMonsterAttackCard, _egResolveAttackType, _egRollPreemptiveDodge } from '../../js/combat/encounter-monster-attacks.js';
 import { EG_MONSTER_SPELL_CONFIG, _egMaybeCastMonsterSpell, _egMonsterSpellChance } from '../../js/combat/monster-spells.js';
-import { EG_GAUNTLET_CONFIG, EG_PARRY_TUTORIAL_CONFIG, _egGauntletActive, _egGauntletOnDefeat, _egGauntletPlayable, startGauntlet, startParryTutorial } from '../../js/combat/gauntlet.js';
+import { EG_GAUNTLET_CONFIG, EG_PARRY_TUTORIAL_CONFIG, _egGauntletActive, _egGauntletFighting, _egGauntletSummonRevealCells, _egGauntletOnDefeat, _egGauntletPlayable, startGauntlet, startParryTutorial } from '../../js/combat/gauntlet.js';
 import { _egApplyPlayerBlockFeedback, _egApplyPlayerBlockLockoutFeedback, _egApplyPlayerHitFeedback, _egApplyPlayerMissFeedback, _egBlockLockoutOverlayTimer, _egHideBlockLockoutOverlay, _egShowBlockLockoutOverlay } from '../../js/combat/encounter-monster-attack-feedback.js';
 import { _egAnimatePlayerProjectile, _egConsumeOnHitGearBonus, _egOnMistake, _egReleaseChannelAtMax, _egResolveProjectileImpact, _egTickCorrectCellGearProcs, _egTrackRecentFill } from '../../js/combat/encounter-player-attacks.js';
 import { _egApplyGroundedReduction, _egApplyPlayerDeflectFeedback, _egApplyPlayerParryFeedback, _egGetDeflectChancePct, _egGetDeflectDamagePct, _egGetDualWieldParryChancePct, _egGetParryChancePct, _egIsDualWieldParryActive, _egRollFateNegation, _egRollParry, _egTryDeflectProjectile } from '../../js/combat/encounter-player-mitigation.js';
@@ -582,6 +582,8 @@ try { Object.defineProperty(globalThis, "_egFlushRunLootToStash", { get() { retu
 try { Object.defineProperty(globalThis, "_egFreezeAllMonsters", { get() { return _egFreezeAllMonsters; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGaleCycloneLance", { get() { return _egGaleCycloneLance; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGamblerRoulette", { get() { return _egGamblerRoulette; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egGauntletFighting", { get() { return _egGauntletFighting; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egGauntletSummonRevealCells", { get() { return _egGauntletSummonRevealCells; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGetActiveMapModValue", { get() { return _egGetActiveMapModValue; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGetBossLateHpMult", { get() { return _egGetBossLateHpMult; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egGetElementCentre", { get() { return _egGetElementCentre; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -597,6 +599,7 @@ try { Object.defineProperty(globalThis, "_egIsActive", { get() { return _egIsAct
 try { Object.defineProperty(globalThis, "_egIsCellCorrupted", { get() { return _egIsCellCorrupted; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egIsCellFrozen", { get() { return _egIsCellFrozen; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egIsCellPickupEligible", { get() { return _egIsCellPickupEligible; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egIsConvergenceTrialRun", { get() { return _egIsConvergenceTrialRun; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egIsLavaCell", { get() { return _egIsLavaCell; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egIsMapRun", { get() { return _egIsMapRun; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egIsTrialDone", { get() { return _egIsTrialDone; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -917,6 +920,7 @@ try { Object.defineProperty(globalThis, "showBeat", { get() { return showBeat; }
 try { Object.defineProperty(globalThis, "showClassChange", { get() { return showClassChange; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showClassTooltip", { get() { return showClassTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showCodes", { get() { return showCodes; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "showCombatToast", { get() { return showCombatToast; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showEndgameAtlas", { get() { return showEndgameAtlas; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showEndgameBossTest", { get() { return showEndgameBossTest; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showEndgameGate", { get() { return showEndgameGate; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

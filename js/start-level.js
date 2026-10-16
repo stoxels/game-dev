@@ -27,7 +27,7 @@ import { buildInventoryPanel } from './puzzle-item-inventory/puzzle-item-invento
 import { rarityColors } from './puzzle-items/item-pool.js';
 import { showPrimerModal } from './puzzle-items/scouts-primer/scouts-primer.js';
 import { _fxShieldBorderRemove } from './puzzle-mechanics/fx-helpers.js';
-import { resetToastQueue, showToast } from './puzzle-mechanics/toasts-and-popups.js';
+import { resetToastQueue } from './puzzle-mechanics/toasts-and-popups.js';
 import { resetQuestLevelCounters, resetWitchImmunityLevelCounter } from './inference/inference-stats.js';
 import { isGatedLevel, isMathGatePassed, tryStartGatedLevel } from './quiz-exercise/mathgate.js';
 import { closeQuiz } from './quiz-exercise/quiz.js';
@@ -561,6 +561,29 @@ function _applyWorldBackground(worldNum) {
 
 // Core level startup - runs every subsystem in the correct order.
 // Called directly for ungated levels, or as a callback after the gate check passes.
+// Persistent "unspent Probability Tree points" chip in the top-left HUD
+// (#hud-unspent-points). A light poll keeps it correct wherever points are
+// earned or spent (level-ups, quizzes, trials, the tree itself).
+let _unspentHudTimer = null;
+function _refreshUnspentPointsHud() {
+    const el = document.getElementById('hud-unspent-points');
+    if (!el) return;
+    const pts = (typeof STATE !== 'undefined' && STATE && STATE.passiveTreePoints) || 0;
+    if (pts <= 0) {
+        if (!el.classList.contains('hidden')) { el.classList.add('hidden'); el.dataset.shown = ''; }
+        return;
+    }
+    const treeKey = (typeof keybindDisplayLabel === 'function' && typeof keybindKeyFor === 'function')
+        ? keybindDisplayLabel(keybindKeyFor('passive-tree')) : 'K';
+    const text = `🌿 ${t('hud_unspent_points').replace('{n}', pts).replace('{key}', treeKey)}`;
+    if (el.dataset.shown !== text) { el.textContent = text; el.dataset.shown = text; }
+    el.classList.remove('hidden');
+}
+function _startUnspentPointsHud() {
+    _refreshUnspentPointsHud();
+    if (!_unspentHudTimer) _unspentHudTimer = setInterval(_refreshUnspentPointsHud, 700);
+}
+
 export function _doStartLevel(gi) {
     // 1. Data and grid setup
     _initLevelData(gi);
@@ -630,16 +653,9 @@ export function _doStartLevel(gi) {
         setTimeout(() => triggerBanter('level_start'), 600);
     }
 
-    // Remind the player about unspent Convergence Points (delayed so it
-    // appears after the toast queue reset and screen transition). {key} is
-    // the player's CURRENT Probability Tree binding (K by default).
-    if ((STATE.passiveTreePoints || 0) > 0 && typeof showToast === 'function') {
-        const treeKey = (typeof keybindDisplayLabel === 'function' && typeof keybindKeyFor === 'function')
-            ? keybindDisplayLabel(keybindKeyFor('passive-tree')) : 'K';
-        setTimeout(() => {
-            showToast(`🌿 ${t('toast_unspent_convergence').replace('{n}', STATE.passiveTreePoints).replace('{key}', treeKey)}`);
-        }, 900);
-    }
+    // Unspent Convergence Points are shown as a persistent chip under the
+    // clock / mistakes in the top-left HUD (replaces the old level-start toast).
+    _startUnspentPointsHud();
 
     // 7. Additional passive systems that run after screen transition
     PassiveTracker.init();
