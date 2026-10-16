@@ -579,6 +579,9 @@ function _avatarMoveUiBlocked() {
     // displacement loop, so held keys neither queue nor lurch on release.
     if (typeof _egMeleeHoldActive !== 'undefined' && globalThis._egMeleeHoldActive) return true;
     if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('frozen')) return true;
+    // Stunned: the hero cannot move (attacks and spells are already blocked
+    // while stunned - see _egStunPlayer in combat-ailments-core.js).
+    if (typeof _egPlayerHasAilment === 'function' && _egPlayerHasAilment('stunned')) return true;
     return false;
 }
 
