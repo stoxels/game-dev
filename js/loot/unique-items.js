@@ -18,6 +18,7 @@ export {
     _egApplyUniqueZeroLineAutomark,
     _egBuildUniqueImplicits,
     _egBuildUniqueItem,
+    _egBuildUniqueMods,
     _egGetUniqueSpecialLines,
     _egHasZeroAutomarkEquipped,
     _egHealUniqueItem,
@@ -26,6 +27,8 @@ export {
     _egTryGenerateUniqueDrop,
     _egUniqueFallbackBlockChance,
     _egUniqueFallbackDamage,
+    _egUniqueContentSig,
+    _egUniqueDownsideValue,
     _egUniqueFallbackDefenses,
     _egUniqueStatLabel,
 } from './unique-item-logic.js';

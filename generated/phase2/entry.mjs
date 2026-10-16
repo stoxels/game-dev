@@ -353,8 +353,9 @@ import { DevTest, _devTestNormalizeScale, _devTestParam } from '../../js/dev/dev
 import { pauseGame, unpauseGame } from '../../main.js';
 import '../../js/loot/equipment-slot-icons.js';
 import '../../js/loot/equipment-base-types.js';
+import { EG_UNIQUE_REWORKS, applyUniqueReworks } from '../../js/loot/unique-item-reworks.js';
 import { EG_UNIQUE_DROP_CHANCE, EG_UNIQUE_ITEMS, EG_UNIQUE_ZERO_AUTOMARK_DE, EG_UNIQUE_ZERO_AUTOMARK_EN } from '../../js/loot/unique-item-data.js';
-import { EG_UNIQUE_TWO_HANDED_IDS, _egApplyUniqueZeroLineAutomark, _egBuildUniqueImplicits, _egBuildUniqueItem, _egGetUniqueSpecialLines, _egHasZeroAutomarkEquipped, _egHealUniqueItem, _egInferWeaponHands, _egStrengthenDownsideValue, _egTryGenerateUniqueDrop, _egUniqueFallbackBlockChance, _egUniqueFallbackDamage, _egUniqueFallbackDefenses, _egUniqueStatLabel } from '../../js/loot/unique-item-logic.js';
+import { EG_UNIQUE_TWO_HANDED_IDS, _egApplyUniqueZeroLineAutomark, _egBuildUniqueImplicits, _egBuildUniqueItem, _egBuildUniqueMods, _egGetUniqueSpecialLines, _egHasZeroAutomarkEquipped, _egHealUniqueItem, _egInferWeaponHands, _egStrengthenDownsideValue, _egTryGenerateUniqueDrop, _egUniqueContentSig, _egUniqueDownsideValue, _egUniqueFallbackBlockChance, _egUniqueFallbackDamage, _egUniqueFallbackDefenses, _egUniqueStatLabel } from '../../js/loot/unique-item-logic.js';
 import { EG_INV_COLS, EG_INV_INITIAL_ROWS, EG_INV_ROWS, _egAddItemToStash, _egEnsureInvRows, _egExpandStashByOneRow, _egFindFreeInvCell, _egGetInvCapacity, _egGetInvRows, _egRebuildInventoryGrid } from '../../js/endgame/hub-stash.js';
 import '../../js/loot/hub-currency-layout.js';
 import '../../js/loot/hub-currency-state.js';

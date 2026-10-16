@@ -13,6 +13,7 @@ import { renderCell, updClues } from '../grid.js';
 import { ptHasSkill } from '../probability-tree/probability-tree-state-points.js';
 import { save } from '../state.js';
 import { LANG } from '../translation/translations.js';
+import { ptParseEffectSpec } from '../probability-tree/pt-effects.js';
 import { EG_ALL_BASE_TYPES } from './equipment-base-items.js';
 import { _egRollImplicitsForBase } from './loot-implicits.js';
 import { _egMapLootRarityWeightMult } from '../endgame/endgame-map-launch.js';
@@ -43,6 +44,16 @@ export function _egGetUniqueSpecialLines(itemOrDef) {
         .map(s => ({ en: s.en || s.de, de: s.de || s.en }));
     if (hasZeroAutomark && !out.some(s => s.en === EG_UNIQUE_ZERO_AUTOMARK_EN)) {
         out.push({ en: EG_UNIQUE_ZERO_AUTOMARK_EN, de: EG_UNIQUE_ZERO_AUTOMARK_DE });
+    }
+    // Passive-tree style effects (see `effects` on unique defs): one tooltip
+    // line per spec, generated from the shared effect registry templates.
+    const specs = Array.isArray(itemOrDef.uniqueEffects) ? itemOrDef.uniqueEffects
+        : (Array.isArray(itemOrDef.effects) ? itemOrDef.effects : []);
+    for (const spec of specs) {
+        const parsed = ptParseEffectSpec(spec);
+        if (!parsed) continue;
+        const fill = (tpl) => String(tpl).replace('{v}', String(parsed.value));
+        out.push({ en: fill(parsed.def.en), de: fill(parsed.def.de) });
     }
     return out;
 }
@@ -119,7 +130,10 @@ export function _egApplyUniqueZeroLineAutomark() {
 export function _egUniqueStatLabel(stat) {
     const template = (LANG === 'de') ? (stat.de || stat.en) : (stat.en || stat.de);
     const val = Number(stat.value) || 0;
-    const str = String(template);
+    let str = String(template);
+    // '{a}' = absolute value, for hand-written negative lines like
+    // "{a}% reduced Physical Damage" (value -12 -> "12% reduced ...").
+    if (str.includes('{a}')) str = str.split('{a}').join(String(Math.abs(val)));
     const signed = val >= 0 ? `+${val}` : `${val}`;
     // Templates historically use '+#' / '-#' while the helper also adds a
     // sign - replacing only '#' would produce "++2" / "--30" (e.g. Pebble
@@ -190,6 +204,55 @@ export function _egStrengthenDownsideValue(v) {
     const scaled = v * factor;
     return Math.round(scaled * 10) / 10;
 }
+// Reworked ("v2") uniques author their downside numbers exactly as intended;
+// only legacy defs get the historic +30% strengthening.
+export function _egUniqueDownsideValue(def, v) {
+    return (def && def.v2) ? v : _egStrengthenDownsideValue(v);
+}
+
+// Everything on a unique that must follow its definition when the definition
+// is rebalanced: stat lines, downsides, passive-style effects.
+export function _egUniqueContentSig(def) {
+    return JSON.stringify([
+        def.v2 ? 2 : 1,
+        (def.bonuses || []).map(b => [b.key, b.value]),
+        (def.downsides || []).map(d => [d.key, d.value]),
+        def.effects || [],
+        def.specialLines || [],
+        def.v2 ? (def.defenses || null) : null,
+    ]);
+}
+
+// Builds the unique's mod list (bonus block + one downside mod per downside).
+export function _egBuildUniqueMods(def) {
+    const bonusMod = {
+        familyId: `unique_${def.uniqueId}`,
+        type: 'unique',
+        tier: 0,
+        rolledStats: def.bonuses.map(stat => ({
+            key: stat.key,
+            label: _egUniqueStatLabel(stat),
+            value: stat.value,
+        })),
+    };
+    const downsideMods = (def.downsides || []).map((stat, i) => {
+        const sv = _egUniqueDownsideValue(def, stat.value);
+        const tmp = { ...stat, value: sv };
+        return {
+            familyId: `unique_${def.uniqueId}_down_${i}`,
+            type: 'unique',
+            tier: 0,
+            isDownside: true,
+            rolledStats: [{
+                key: stat.key,
+                label: _egUniqueStatLabel(tmp),
+                value: sv,
+            }],
+        };
+    });
+    return [bonusMod].concat(downsideMods);
+}
+
 export function _egBuildUniqueImplicits(def, defenses) {
     try {
         if (typeof _egRollImplicitsForBase !== 'function') return [];
@@ -236,6 +299,18 @@ export function _egHealUniqueItem(item) {
     let def = null;
     if (typeof EG_UNIQUE_ITEMS !== 'undefined' && Array.isArray(EG_UNIQUE_ITEMS)) {
         def = EG_UNIQUE_ITEMS.find(u => u.uniqueId === item.baseId) || null;
+    }
+    // --- content resync: stat lines / downsides / effects follow the def ---
+    // Stashed copies are snapshots; when a unique is rebalanced its saved
+    // copies must pick up the new numbers (crafting is blocked on uniques, so
+    // the mod list is always exactly what the def says).
+    if (def && Array.isArray(def.bonuses) && item.uniqueSig !== _egUniqueContentSig(def)) {
+        item.mods = _egBuildUniqueMods(def);
+        if (Array.isArray(def.effects) && def.effects.length) item.uniqueEffects = [...def.effects];
+        else delete item.uniqueEffects;
+        if (def.v2 && def.defenses) item.defenses = { armour: def.defenses.armour || 0, evasion: def.defenses.evasion || 0, absorption: def.defenses.absorption || 0 };
+        item.uniqueSig = _egUniqueContentSig(def);
+        changed = true;
     }
     // --- requirements: re-sync attributes after a requirement rebalance ---
     if (def && def.requirements && item.requirements) {
@@ -331,7 +406,7 @@ export function _egHealUniqueItem(item) {
     if (def && Array.isArray(def.downsides) && Array.isArray(item.mods)) {
         for (let i = 0; i < def.downsides.length; i++) {
             const stat = def.downsides[i];
-            const expected = _egStrengthenDownsideValue(stat.value);
+            const expected = _egUniqueDownsideValue(def, stat.value);
             const fid = `unique_${def.uniqueId}_down_${i}`;
             const mod = item.mods.find(m => m.familyId === fid && m.isDownside);
             if (!mod || !mod.rolledStats || !mod.rolledStats[0]) continue;
@@ -354,32 +429,6 @@ export function _egHealUniqueItem(item) {
 export function _egBuildUniqueItem(def, monsterLevel) {
     const name = (LANG === 'de') ? (def.nameDe || def.nameEn) : def.nameEn;
     const icon = def.icon || EG_SLOT_ICONS[def.slotType] || '📦';
-
-    const bonusMod = {
-        familyId: `unique_${def.uniqueId}`,
-        type: 'unique',
-        tier: 0,
-        rolledStats: def.bonuses.map(stat => ({
-            key: stat.key,
-            label: _egUniqueStatLabel(stat),
-            value: stat.value,
-        })),
-    };
-    const downsideMods = (def.downsides || []).map((stat, i) => {
-        const sv = _egStrengthenDownsideValue(stat.value);
-        const tmp = { ...stat, value: sv };
-        return {
-            familyId: `unique_${def.uniqueId}_down_${i}`,
-            type: 'unique',
-            tier: 0,
-            isDownside: true,
-            rolledStats: [{
-                key: stat.key,
-                label: _egUniqueStatLabel(tmp),
-                value: sv,
-            }],
-        };
-    });
 
     // Resolve base stats - use explicit values if present, otherwise fall back
     // to the closest base item so every unique has meaningful armor / damage.
@@ -430,7 +479,9 @@ export function _egBuildUniqueItem(def, monsterLevel) {
         ...(def.hands ? { hands: def.hands } : (def.slotType === 'weapon' ? { hands: 1 } : {})),
         ...(blockChance != null ? { blockChance } : {}),
 
-        mods: [bonusMod].concat(downsideMods),
+        mods: _egBuildUniqueMods(def),
+        ...(Array.isArray(def.effects) && def.effects.length ? { uniqueEffects: [...def.effects] } : {}),
+        uniqueSig: _egUniqueContentSig(def),
         implicits,
 
         flavorEn: def.flavorEn,

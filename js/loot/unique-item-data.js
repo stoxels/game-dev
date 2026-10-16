@@ -19,6 +19,7 @@ import '../endgame/endgame-hub.js';
 import './loot-implicits.js';
 import { egRequirementStatTarget, egScaleRequirements } from './equipment-base-types.js';
 import '../endgame/endgame-map-launch.js';
+import { applyUniqueReworks } from './unique-item-reworks.js';
 
 //------------------------------------------------------------------------
 //-------------------UNIQUE ITEMS (PoE-STYLE)-----------------------------
@@ -6238,6 +6239,10 @@ export const EG_UNIQUE_ITEMS = [
 
 ];
 
+
+// v2 stat rework (see unique-item-reworks.js): replaces stat blocks of the
+// reworked uniques before the requirement curve is applied.
+applyUniqueReworks(EG_UNIQUE_ITEMS);
 
 //========================================================================
 //-------------------UNIQUE STAT REQUIREMENT REBALANCE (2026)-------------
