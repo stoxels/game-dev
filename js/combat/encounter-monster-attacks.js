@@ -45,6 +45,10 @@ export function _egResolveAttackType(monster) {
 // Small chance the attack instead flies to the CENTRE OF THE GRID and inflicts
 // a puzzle ailment based on the monster's element (see endgame-ailments.js).
 export function _egFireMonsterAttack(monster) {
+    // World 1's convergence trial: The Null has no regular attack. He only
+    // shoots the player when a Prior Bomb detonates undefused (see
+    // _egPriorBombExplode in bosses/shared-boss-abilities.js).
+    if (_egIsNullWorld1Trial(monster)) return;
     _egFlashMonsterAttackCard(monster);
     if (typeof _egMaybePuzzleAttack === 'function' && _egMaybePuzzleAttack(monster)) return;
     // The Sprout: his charge-bar attack IS the set-piece - a thorned vine
@@ -150,12 +154,21 @@ export function _egFireMonsterAttack(monster) {
     }
 }
 
+// True for The Null inside the world 1 convergence trial (endgame maps keep
+// his normal attacks).
+function _egIsNullWorld1Trial(monster) {
+    if (!monster || !monster.isBoss || typeof monster.id !== 'string' || !monster.id.startsWith('boss_null')) return false;
+    const tr = typeof globalThis._egIsConvergenceTrialRun === 'function' ? globalThis._egIsConvergenceTrialRun() : null;
+    return !!(tr && tr.wi === 0);
+}
+
 // Launches a projectile from the monster's card to the player HUD.
 // Damage and feedback are applied when the projectile arrives.
+// `dmgMult` scales this one shot (the Null's undefused-bomb strike).
 // While the player is POLYMORPHED, the projectile is confused and flies at
 // another monster instead (friendly fire). With no other monster alive the
 // attack lands on the player as usual.
-export function _egAnimateMonsterProjectile(monster) {
+export function _egAnimateMonsterProjectile(monster, dmgMult = 1) {
     const sourceCard = document.getElementById(`eg-card-${monster.id}`);
     const targetHud = document.getElementById('player-avatar-wrapper');
     if (!sourceCard || !targetHud) return;
@@ -186,7 +199,7 @@ export function _egAnimateMonsterProjectile(monster) {
         // Map mod: monsters may deal double damage (crit)
         const monsterCritMult = (typeof _egRollMonsterCritMult === 'function' ? _egRollMonsterCritMult(monster) : 1);
         const isMonsterCrit = monsterCritMult > 1;
-        const critDmg = monster.damageValue * monsterCritMult;
+        const critDmg = monster.damageValue * monsterCritMult * dmgMult;
         const dealt = _egPlayerTakeDamage(critDmg, false, monster.element, monster.level, { attacker: monster, isProjectile: true });
         if (dealt > 0) {
             _egApplyPlayerHitFeedback(dealt, isMonsterCrit, monster.element);

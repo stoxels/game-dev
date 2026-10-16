@@ -5,6 +5,7 @@ import { t } from '../../translation/translations.js';
 import { _egUpdateObjectivesHUD } from '../encounter-chain.js';
 import { _egPlayerTakeDamage, _egSpawnMonster } from '../encounter.js';
 import { _egApplyPlayerHitFeedback } from '../encounter-monster-attack-feedback.js';
+import { _egAnimateMonsterProjectile } from '../encounter-monster-attacks.js';
 import { _egHzPlayerHitbox, _egHzPlayerRect, _egHzPlayerSpriteRect } from '../combat-hazards.js';
 import { EG_MAP_TIER_MONSTER_LEVELS, EG_MAX_MAP_TIER, _egRollMapTier } from '../../loot/loot-map-config.js';
 import { EG_MAX_CONCURRENT_MONSTERS } from '../combat-monsters.js';
@@ -878,6 +879,20 @@ export function _egPriorBombArmCell(r, c, monsterId, fuseMs) {
 }
 
 
+// World 1 convergence trial: The Null has no regular projectiles, instead an
+// undefused bomb makes him shoot the player once, hard. Other bosses and the
+// endgame are untouched.
+const EG_NULL_BOMB_STRIKE_MULT = 3;
+function _egNullBombStrike(b) {
+    if (!b || !b.monsterId) return;
+    const boss = (globalThis._egMonsters || []).find(m => m.id === b.monsterId);
+    if (!boss || !boss.isBoss || typeof boss.id !== 'string' || !boss.id.startsWith('boss_null')) return;
+    const tr = typeof globalThis._egIsConvergenceTrialRun === 'function' ? globalThis._egIsConvergenceTrialRun() : null;
+    if (!tr || tr.wi !== 0) return;
+    _egAnimateMonsterProjectile(boss, EG_NULL_BOMB_STRIKE_MULT);
+}
+
+
 // Detonation: explosion FX fire at the cell, THEN the fill is removed.
 // Re-validated so an arena transition or mid-fuse refill can never corrupt
 // the new grid; a ghosted cell (grid rebuilt, cell still present) still pops
@@ -885,6 +900,7 @@ export function _egPriorBombArmCell(r, c, monsterId, fuseMs) {
 export function _egPriorBombExplode(b) {
     _egPriorBombDetonationFX(b);
     if (b.fuseEl) b.fuseEl.remove();
+    _egNullBombStrike(b);
     if (!cur || !cur.grid) return;
     if (b.r >= cur.grid.length || b.c >= cur.grid[0].length) return;
     if (globalThis.userGrid[b.r][b.c] !== 1 || globalThis.revealedGrid[b.r][b.c] || cur.grid[b.r][b.c] !== 1) return;
