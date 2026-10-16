@@ -46,7 +46,7 @@ export function _egShowMistakesWarningBanner(remaining) {
     const toastFallback = el.textContent;
     const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
     const toastColors = { 3: '#facc15', 2: '#fb923c', 1: '#f87171', 0: '#ef4444' };
-    if (typeof showToast === 'function') globalThis.showToast(toastText, toastColors[sev] || '#f87171');
+    if (typeof showCombatToast === 'function') globalThis.showCombatToast(toastText, toastColors[sev] || '#f87171');
 
     setTimeout(() => el.remove(), 2500);
 }
@@ -129,7 +129,7 @@ export function _egShowLowHealthWarningBanner() {
     const toastRaw = (typeof t === 'function') ? t(toastKey) : '';
     const toastFallback = el.textContent;
     const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
-    if (typeof showToast === 'function') globalThis.showToast(toastText, '#facc15');
+    if (typeof showCombatToast === 'function') globalThis.showCombatToast(toastText, '#facc15');
 
     setTimeout(() => el.remove(), 2500);
 }
@@ -198,7 +198,7 @@ export function _egShowAbsorptionBrokenBanner() {
     const toastRaw = (typeof t === 'function') ? t(toastKey) : '';
     const toastFallback = el.textContent;
     const toastText = (toastRaw && toastRaw !== toastKey) ? toastRaw : toastFallback;
-    if (typeof showToast === 'function') globalThis.showToast(toastText, '#7dd3fc');
+    if (typeof showCombatToast === 'function') globalThis.showCombatToast(toastText, '#7dd3fc');
 
     setTimeout(() => el.remove(), 2500);
 }

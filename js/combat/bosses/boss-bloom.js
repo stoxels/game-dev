@@ -407,7 +407,7 @@ export function _egMechBlmVeil(monster, phase) {
             veil.classList.add('eg-blm-veil-tinted');
         }
     }
-    globalThis.showToast(t('eg_mech_blm_veil'));
+    globalThis.showCombatToast(t('eg_mech_blm_veil'));
 
     // Wilting state chip: fill = wilt, mistake = regrow.
     let wilt = 0; // 0 = full veil, 100 = fully wilted

@@ -312,7 +312,7 @@ export function _egActivateVeil() {
         parent.appendChild(veil);
     }
     veil.classList.remove('eg-hidden');
-    globalThis.showToast(t('eg_mech_grid_veil'));
+    globalThis.showCombatToast(t('eg_mech_grid_veil'));
 }
 
 

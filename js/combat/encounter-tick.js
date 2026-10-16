@@ -49,7 +49,7 @@ export function _egTickMonster(m) {
             if (m.bossBaseDamage != null) {
                 m.bossBaseDamage = Math.round(m.bossBaseDamage * (1 + enragePct / 100));
             }
-            globalThis.showToast(`😡 ${t('eg_mm_toast_enrage') || 'The Boss is enraged!'}`);
+            globalThis.showCombatToast(`😡 ${t('eg_mm_toast_enrage') || 'The Boss is enraged!'}`);
         }
     }
 

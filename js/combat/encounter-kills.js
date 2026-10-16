@@ -81,7 +81,7 @@ export function _egKillMonster(monsterId) {
         if (Math.random() * 100 < dying.secondWindPct) {
             dying.currentHP = Math.max(1, Math.round((dying.maxHP || 1) * 0.25));
             dying.currentCharge = 0;
-            globalThis.showToast(`✨ ${dying.name || ''} ${t('eg_mm_toast_second_wind') || 'rises again!'}`.trim());
+            globalThis.showCombatToast(`✨ ${dying.name || ''} ${t('eg_mm_toast_second_wind') || 'rises again!'}`.trim());
             return;
         }
     }
@@ -91,7 +91,7 @@ export function _egKillMonster(monsterId) {
     if (dying && dying.explodeOnDeathPct > 0 && typeof _egIsActive === 'function' && _egIsActive()) {
         const blast = Math.max(1, Math.round((dying.maxHP || 0) * dying.explodeOnDeathPct / 100));
         if (blast > 0) {
-            globalThis.showToast(`💥 ${dying.name || ''} ${t('eg_mm_toast_explode') || 'explodes!'} (-${blast})`);
+            globalThis.showCombatToast(`💥 ${dying.name || ''} ${t('eg_mm_toast_explode') || 'explodes!'} (-${blast})`);
             _egPlayerTakeDamage(blast, false, dying.element, dying.level);
             if (typeof dead !== 'undefined' && globalThis.dead) return;
         }

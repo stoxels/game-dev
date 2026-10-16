@@ -63,7 +63,7 @@ export function _egHazardsReset() {
     _egSetHzActive(true);
     _egSetHzPausedForQuiz(false);
     if (_egHzLayer) _egHzLayer.style.display = '';
-    globalThis.showToast(`☠️ Elemental Hazards active: ${active.join(' ')}`);
+    globalThis.showCombatToast(`☠️ Elemental Hazards active: ${active.join(' ')}`);
 }
 
 // Tears down every hazard DOM node and state. Safe to call anytime.

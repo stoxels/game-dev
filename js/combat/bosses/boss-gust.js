@@ -201,7 +201,7 @@ export function _egGustWindToast(side) {
         const raw = t(key);
         if (raw && raw !== key) msg = raw;
     } catch (e) {}
-    if (typeof showToast === 'function') globalThis.showToast(msg);
+    if (typeof showCombatToast === 'function') globalThis.showCombatToast(msg);
 }
 
 

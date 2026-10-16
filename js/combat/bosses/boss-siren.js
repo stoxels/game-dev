@@ -205,7 +205,7 @@ export function _egMechSireWail(monster, phase) {
                         const maxHP = ((typeof _egNkMaxHP === 'function') ? _egNkMaxHP() : 0) || 100;
                         const heal = Math.max(1, Math.round(maxHP * EG_SIRE_ECHO_HEAL));
                         _egSireHeal(heal);
-                        globalThis.showToast('🎵 +' + heal);
+                        globalThis.showCombatToast('🎵 +' + heal);
                         _egSireSplash(ez.x, ez.y, false);
                         try { ez.el.remove(); } catch (e2) {}
                     }

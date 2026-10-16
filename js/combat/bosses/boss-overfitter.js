@@ -275,7 +275,7 @@ export function _egMechPatternBreak(monster, phase) {
     const count = phase >= 3 ? 2 : 1;
     const targets = pool.slice(0, Math.min(count, pool.length));
 
-    globalThis.showToast(t('eg_mech_pattern_break').replace('{n}', targets.length));
+    globalThis.showCombatToast(t('eg_mech_pattern_break').replace('{n}', targets.length));
     targets.forEach(([r, c]) => _egUnfillCell(r, c));
 }
 

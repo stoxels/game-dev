@@ -131,7 +131,7 @@ function _egPuzzleLava() {
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'lava', cells });
     Audio_Manager.playSFX('grid_lava_spawn');
-    globalThis.showToast('🌋 The monster scorched the grid - lava cells punish wrong clicks doubly!');
+    globalThis.showCombatToast('🌋 Lava cells - wrong clicks hurt double!');
 }
 
 function _egIsLavaCell(row, col) {
@@ -168,7 +168,7 @@ function _egPuzzleIce() {
     if (cells.size === 0) return;
     _egRegisterPuzzleEffect({ type: 'ice', cells });
     Audio_Manager.playSFX('grid_ice_patch');
-    globalThis.showToast('🧊 Ice spreads across the grid - clicks may slip!');
+    globalThis.showCombatToast('🧊 Icy grid - clicks may slip!');
 }
 
 function _egIsIceCell(row, col) {
@@ -192,7 +192,7 @@ function _egPuzzleIceRedirect(row, col) {
 
     const [nr, nc] = neighbours[Math.floor(Math.random() * neighbours.length)];
     Audio_Manager.playSFX('grid_ice_slip');
-    globalThis.showToast('🧊 Slippery! Your click slid to another cell.');
+    globalThis.showCombatToast('🧊 Slipped to another cell!');
     _egSetIceRedirectDepth(_egIceRedirectDepth + 1);
     try {
         applyCell(nr, nc); // reuses the same pval → same click type on neighbour
@@ -215,7 +215,7 @@ function _egPuzzleShockedCursor() {
     if (_egPuzzleEffects.some(e => e.type === 'shockcursor')) return;
     _egStartShockedCursor();
     _egRegisterPuzzleEffect({ type: 'shockcursor' });
-    globalThis.showToast('⚡ Your cursor is shocked - reveals may scatter your ✕ marks!');
+    globalThis.showCombatToast('⚡ Shocked - reveals scatter your ✕ marks!');
 }
 
 function _egStartShockedCursor() {
@@ -311,7 +311,7 @@ function _egOnCorrectCellPuzzleFX(row, col) {
     renderCell(r, c);
     _egSpawnCrossZapFX(r, c);
     Audio_Manager.playSFX('grid_shock_strip');
-    globalThis.showToast('⚡ A spark zapped one of your ✕ marks!');
+    globalThis.showCombatToast('⚡ A ✕ mark was zapped!');
 }
 
 
@@ -342,7 +342,7 @@ function _egApplyPuzzleArcaneBomb() {
         _egRemovePuzzleEffect(bomb);
     }, EG_PUZZLE_EFFECT_DURATION_MS);
     _egPuzzleEffects.push(bomb);
-    globalThis.showToast('🔮 An arcane bomb appeared - remove adjacent ✕ marks before it detonates!');
+    globalThis.showCombatToast('🔮 Arcane bomb - clear nearby ✕ marks!');
 }
 
 function _egPuzzleShadowBlackout() {
@@ -364,7 +364,7 @@ function _egPuzzleShadowBlackout() {
 
     _egRegisterPuzzleEffect({ type: 'shadowline', line });
     Audio_Manager.playSFX('grid_veil');
-    globalThis.showToast(`🌑 Shadow veils a ${isRow ? 'row' : 'column'} of clue numbers!`);
+    globalThis.showCombatToast(`🌑 Shadow veils a ${isRow ? 'row' : 'column'}!`);
 }
 
 function _egRestoreLineClues(line) {

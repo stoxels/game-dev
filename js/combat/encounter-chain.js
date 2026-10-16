@@ -171,7 +171,7 @@ export function _egOnPuzzleComplete() {
             const maxHP = (typeof playerMaxHP !== 'undefined' && globalThis.playerMaxHP > 0) ? globalThis.playerMaxHP : 100;
             const dealt = _egPlayerTakeDamage(Math.max(1, Math.round(maxHP * pactPct / 100)), true);
             if (dealt > 0) {
-                globalThis.showToast(`🩸 ${t('eg_mm_toast_blood_pact') || 'Blood Pact!'} (-${dealt})`);
+                globalThis.showCombatToast(`🩸 ${t('eg_mm_toast_blood_pact') || 'Blood Pact!'} (-${dealt})`);
             }
         }
     }
@@ -754,14 +754,14 @@ export function _egSpawnNextArenaBoss() {
                 clearInterval(retry);
                 if (!_egIsActive()) return;
                 if (globalThis._egMonsters.some(m => m.isBoss)) return;
-                globalThis.showToast(t('eg_boss_arrived').replace('{name}', name), '#f87171');
+                globalThis.showCombatToast(t('eg_boss_arrived').replace('{name}', name), '#f87171');
                 _egSpawnMonster(entry.id, entry.level || 1, entry.hpMult || 1);
                 _egUpdateObjectivesHUD();
             }, 200);
             return;
         }
         if (globalThis._egMonsters.some(m => m.isBoss)) return;
-        globalThis.showToast(t('eg_boss_arrived').replace('{name}', name), '#f87171');
+        globalThis.showCombatToast(t('eg_boss_arrived').replace('{name}', name), '#f87171');
         _egSpawnMonster(entry.id, entry.level || 1, entry.hpMult || 1);
         _egUpdateObjectivesHUD();
         // Watchdog: if the boss still is not on the field (a refused spawn

@@ -856,6 +856,41 @@
         animation: toast-fade-out 0.5s ease-in forwards;
     }
 
+/* Combat toast stack: combat / boss messages, centred just above the grid
+   centre (left/bottom set from the grid rect in JS). */
+.combat-toast-stack {
+    position: fixed;
+    left: 50%;
+    bottom: 55%;
+    transform: translateX(-50%);
+    z-index: 16;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: max-content;
+    max-width: min(440px, 92vw);
+    text-align: center;
+    pointer-events: none;
+}
+
+.combat-toast-msg {
+    font-family: var(--PX);
+    font-size: 14px;
+    color: #fff;
+    line-height: 1.3;
+    padding: 3px 12px;
+    border-radius: 6px;
+    background: rgba(8, 6, 14, 0.66);
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    animation: toast-fade-in 0.15s ease-out forwards;
+}
+
+    .combat-toast-msg.combat-toast-out {
+        animation: toast-fade-out 0.45s ease-in forwards;
+    }
+
 /* Puzzle-item art inside toasts (showItemToast/showHtmlToast): scale like
    the emoji it replaces so toast lines never change height. */
 .toast-msg img.eg-art-img {

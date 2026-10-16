@@ -43,9 +43,9 @@ Object.assign(EG_BOSS_MECHANICS, {
         onPhaseEnter(monster, newPhase) {
             try {
                 if (newPhase === 2) {
-                    globalThis.showToast(t('eg_dynamo_phase2') || '⚡ The Dynamo: HORIZONTAL storm pillars online!');
+                    globalThis.showCombatToast(t('eg_dynamo_phase2') || '⚡ The Dynamo: HORIZONTAL storm pillars online!');
                 } else if (newPhase === 3) {
-                    globalThis.showToast(t('eg_dynamo_phase3') || '⚡ The Dynamo: DIAGONAL storm pillars online!');
+                    globalThis.showCombatToast(t('eg_dynamo_phase3') || '⚡ The Dynamo: DIAGONAL storm pillars online!');
                 }
             } catch (e) {}
             return false;
@@ -775,7 +775,7 @@ export function _egRemoveConductor(monsterId) {
 
     try {
         const raw = (typeof t === 'function') ? t('eg_mech_conductor_destroyed') : null;
-        globalThis.showToast(raw && raw !== 'eg_mech_conductor_destroyed'
+        globalThis.showCombatToast(raw && raw !== 'eg_mech_conductor_destroyed'
             ? raw : '⚡ Lightning Conductor destroyed - the network weakens!');
     } catch (e) {}
 }

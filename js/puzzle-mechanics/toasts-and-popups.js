@@ -160,6 +160,72 @@ export function showToast(msg, accentColor) {
     return _appendToastEl(el, msg, accentColor);
 }
 
+// ---- COMBAT TOASTS --------------------------------------------------------
+// Short, high-priority combat / boss-ability messages. They get their own
+// stack just above the centre of the puzzle grid (where the player is
+// looking) instead of the bottom-left log used for loot and system
+// messages. Short-lived and capped so they never bury the puzzle.
+const COMBAT_TOAST_MAX_VISIBLE = 3;
+const COMBAT_TOAST_DISPLAY_MS = 3200;
+const combatToasts = []; // { msg, el, timeoutId }
+
+function _combatToastContainer() {
+    let box = document.getElementById('combat-toast-stack');
+    if (!box) {
+        const host = document.getElementById('toast-stack');
+        if (!host || !host.parentElement) return null;
+        box = document.createElement('div');
+        box.id = 'combat-toast-stack';
+        box.className = 'combat-toast-stack';
+        host.parentElement.appendChild(box);
+    }
+    // Anchor slightly above the grid's centre; fall back to the CSS default.
+    const grid = document.getElementById('ptable');
+    const r = grid ? grid.getBoundingClientRect() : null;
+    if (r && r.width > 40 && r.height > 40) {
+        box.style.left = Math.round(r.left + r.width / 2) + 'px';
+        box.style.bottom = Math.round(window.innerHeight - (r.top + r.height * 0.4)) + 'px';
+    } else {
+        box.style.left = box.style.bottom = '';
+    }
+    return box;
+}
+
+function _dropCombatToast(entry) {
+    clearTimeout(entry.timeoutId);
+    entry.el.remove();
+    const idx = combatToasts.indexOf(entry);
+    if (idx !== -1) combatToasts.splice(idx, 1);
+}
+
+// Same signature as showToast(). Use for combat, boss abilities, ailments,
+// dodge / block / parry results and similar in-fight feedback.
+export function showCombatToast(msg, accentColor) {
+    const box = _combatToastContainer();
+    if (!box) return showToast(msg, accentColor);
+
+    const dup = combatToasts.find(t => t.msg === msg);
+    if (dup) _dropCombatToast(dup);
+
+    const el = document.createElement('div');
+    el.className = 'combat-toast-msg';
+    el.textContent = msg;
+    if (accentColor) el.style.color = accentColor;
+    _playToastSfx(accentColor);
+    box.appendChild(el);
+
+    const entry = { msg, el, timeoutId: null };
+    combatToasts.push(entry);
+    while (combatToasts.length > COMBAT_TOAST_MAX_VISIBLE) _dropCombatToast(combatToasts[0]);
+
+    entry.timeoutId = setTimeout(() => {
+        el.classList.add('combat-toast-out');
+        el.addEventListener('animationend', () => _dropCombatToast(entry), { once: true });
+        setTimeout(() => _dropCombatToast(entry), 700); // safety if no animation runs
+    }, COMBAT_TOAST_DISPLAY_MS);
+    return el;
+}
+
 // Escapes plain text for safe embedding in toast HTML.
 export function _escapeToastHtml(s) {
     return String(s)
@@ -209,6 +275,8 @@ export function resetToastQueue() {
 
     const container = document.getElementById('toast-stack');
     if (container) container.innerHTML = '';
+
+    combatToasts.slice().forEach(_dropCombatToast);
 }
 
 

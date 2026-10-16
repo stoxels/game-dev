@@ -348,7 +348,7 @@ export function _egMechJsJinx(monster, phase) {
                     const maxHP = ((typeof _egNkMaxHP === 'function') ? _egNkMaxHP() : 0) || 100;
                     const heal = Math.max(1, Math.round(maxHP * EG_JS_LUCK_HEAL));
                     _egJsHeal(heal);
-                    globalThis.showToast('💛 +' + heal);
+                    globalThis.showCombatToast('💛 +' + heal);
                     _egJsConfetti(b.x, b.y, false);
                     b.done = true;
                     try { b.el.remove(); } catch (e) {}

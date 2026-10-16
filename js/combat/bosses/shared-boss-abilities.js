@@ -384,7 +384,7 @@ export function _egDispelCorruption(row, col) {
 
     clearTimeout(_egBossCorrupted.get(key).timer);
     _egRemoveCellCorruption(key);
-    globalThis.showToast(t('eg_corruption_dispelled'));
+    globalThis.showCombatToast(t('eg_corruption_dispelled'));
     return true;
 }
 
@@ -407,7 +407,7 @@ export function _egMechCorruptCells(monster, phase) {
 
     const toastKey = cfg.p >= 3 ? 'eg_mech_corrupt_rage'
         : (cfg.p >= 2 ? 'eg_mech_corrupt_spread' : 'eg_mech_corrupt_cells');
-    globalThis.showToast(t(toastKey).replace('{n}', targets.length));
+    globalThis.showCombatToast(t(toastKey).replace('{n}', targets.length));
     targets.forEach(([r, c]) => _egApplyCellCorruption(r, c, cfg));
 }
 
@@ -601,7 +601,7 @@ export function _egMechProbabilityShift(monster, phase) {
     if (p === 1) {
         const n = Math.max(1, Math.round(_egBossTierLerp(EG_SHIFT_ERASE_P1, norm)));
         const targets = shuffled.slice(0, Math.min(n, shuffled.length));
-        globalThis.showToast(t('eg_mech_probability_shift').replace('{n}', targets.length));
+        globalThis.showCombatToast(t('eg_mech_probability_shift').replace('{n}', targets.length));
         targets.forEach(([r, c]) => {
             globalThis.userGrid[r][c] = 0;
             renderCell(r, c);
@@ -612,7 +612,7 @@ export function _egMechProbabilityShift(monster, phase) {
     if (p === 2) {
         const n = Math.max(1, Math.round(_egBossTierLerp(EG_SHIFT_RELOCATE_P2, norm)));
         const targets = shuffled.slice(0, Math.min(n, shuffled.length));
-        globalThis.showToast(t('eg_mech_shift_relocate').replace('{n}', targets.length));
+        globalThis.showCombatToast(t('eg_mech_shift_relocate').replace('{n}', targets.length));
         _egRelocateMarks(targets);
         return;
     }
@@ -622,7 +622,7 @@ export function _egMechProbabilityShift(monster, phase) {
     const relocateN = Math.max(1, Math.round(_egBossTierLerp(EG_SHIFT_RELOCATE_P3, norm)));
     const erase = shuffled.slice(0, Math.min(eraseN, shuffled.length));
     const relocate = shuffled.slice(erase.length, erase.length + relocateN);
-    globalThis.showToast(t('eg_mech_shift_quantum').replace('{n}', relocate.length));
+    globalThis.showCombatToast(t('eg_mech_shift_quantum').replace('{n}', relocate.length));
     erase.forEach(([r, c]) => {
         globalThis.userGrid[r][c] = 0;
         renderCell(r, c);
@@ -760,7 +760,7 @@ export function _egMechSummonAdds(monster, phase) {
     }
     if (summoned > 0) {
         Audio_Manager.playSFX('boss_summon');
-        globalThis.showToast(t('eg_boss_summon').replace('{name}', name).replace('{n}', summoned), '#f87171');
+        globalThis.showCombatToast(t('eg_boss_summon').replace('{name}', name).replace('{n}', summoned), '#f87171');
         if (typeof _egUpdateObjectivesHUD === 'function') _egUpdateObjectivesHUD();
     }
 }
@@ -1034,7 +1034,7 @@ export function _egMechPriorBomb(monster, phase) {
     const targets = pool.slice(0, Math.min(count, pool.length));
     const mid = monster ? monster.id : null;
 
-    globalThis.showToast(t(p >= 3 ? 'eg_mech_prior_bomb_cascade'
+    globalThis.showCombatToast(t(p >= 3 ? 'eg_mech_prior_bomb_cascade'
         : (p >= 2 ? 'eg_mech_prior_bomb_fuse' : 'eg_mech_prior_bomb')).replace('{n}', targets.length));
     targets.forEach(([r, c]) => _egPriorBombArmCell(r, c, mid, fuseMs));
 
@@ -1182,7 +1182,7 @@ export function _egMechClueSwap(monster, phase) {
         * _egBossTierFactor(swapNorm, EG_SWAP_DURATION_F));
     const toastKey = p === 1 ? 'eg_mech_clue_swap'
         : (p === 2 ? 'eg_mech_clue_swap_triple' : 'eg_mech_clue_swap_double');
-    globalThis.showToast(t(toastKey).replace('{n}', duration / 1000));
+    globalThis.showCombatToast(t(toastKey).replace('{n}', duration / 1000));
 
     clearTimeout(globalThis._egClueSwapRestoreTimer);
     globalThis._egActiveClueSwap = { groups };
@@ -1389,7 +1389,7 @@ export function _egFrozenCreepLand(key) {
     if (_egBossFrozen.has(`${tr}-${tc}`)) return;
 
     _egApplyCellFreeze(tr, tc, { p: data.cfg.p, child: true, norm: data.cfg.norm });
-    if (typeof showToast === 'function') globalThis.showToast(t('eg_frozen_spread'));
+    if (typeof showCombatToast === 'function') globalThis.showCombatToast(t('eg_frozen_spread'));
 }
 
 
@@ -1458,7 +1458,7 @@ export function _egMechFrozenCells(monster, phase) {
 
     const toastKey = p >= 3 ? 'eg_mech_frozen_drift'
         : (p >= 2 ? 'eg_mech_frozen_creep' : 'eg_mech_frozen_cells');
-    globalThis.showToast(t(toastKey).replace('{n}', targets.length));
+    globalThis.showCombatToast(t(toastKey).replace('{n}', targets.length));
     targets.forEach(([r, c]) => _egApplyCellFreeze(r, c, { p, child: false, norm }));
 }
 
@@ -1482,7 +1482,7 @@ export function _egMechGridInvert(monster, phase) {
 
     const duration = phase >= 3 ? 9000 : 6000;
     Audio_Manager.playSFX('grid_invert');
-    globalThis.showToast(t('eg_mech_grid_invert').replace('{n}', duration / 1000));
+    globalThis.showCombatToast(t('eg_mech_grid_invert').replace('{n}', duration / 1000));
     globalThis._egGridInvertTimer = setTimeout(_egRemoveGridInvert, duration);
 }
 
@@ -1840,7 +1840,7 @@ export function _egRunScreenBlast(opts) {
     label.style.setProperty('--blast-accent', accent);
     label.textContent = Math.max(1, Math.ceil(warnMs / 1000)); // counts down to impact
 
-    if (opts.toastKey && typeof showToast === 'function') globalThis.showToast(t(opts.toastKey));
+    if (opts.toastKey && typeof showCombatToast === 'function') globalThis.showCombatToast(t(opts.toastKey));
 
     // ── 100ms driver: warning countdown, then hold-window state ─────────────
     state.poll = setInterval(() => {
@@ -1975,7 +1975,7 @@ export function _egRunScreenBlast(opts) {
                     if (dealt > 0) paintStatus('hit', dealt);
                 }
             } else {
-                globalThis.showToast(t('eg_blast_dodged'), '#4ade80');
+                globalThis.showCombatToast(t('eg_blast_dodged'), '#4ade80');
                 paintStatus('ok');
             }
 
@@ -2308,11 +2308,11 @@ export function _egNkAbilityHitToast(dealt, bossName, abilityName) {
                 msg = raw.replace('{ability}', ability).replace('{n}', dealt);
             }
         } catch (e) {}
-        if (typeof showToast === 'function') {
+        if (typeof showCombatToast === 'function') {
             // Text + left stripe tinted by the BOSS's color (element or
             // signature) so overlapping arenas read at a glance.
             const color = _egNkBossToastColor(bossName);
-            const el = globalThis.showToast(msg, color);
+            const el = globalThis.showCombatToast(msg, color);
             if (el) el.style.borderLeft = '3px solid ' + color;
         }
     } else if (absorbed) {
@@ -2325,7 +2325,7 @@ export function _egNkAbilityHitToast(dealt, bossName, abilityName) {
         } catch (e) {}
         // Shield feedback stays uniform blue - the color codes the outcome,
         // not the boss, so an absorbed hit is recognizable on its own.
-        if (typeof showToast === 'function') globalThis.showToast(msg, '#7dd3fc');
+        if (typeof showCombatToast === 'function') globalThis.showCombatToast(msg, '#7dd3fc');
     }
 }
 
@@ -2346,7 +2346,7 @@ export function _egNkToast(key, fallback, color) {
         const m = String(fallback).match(/-?\d+(?:\.\d+)?/);
         if (m) msg = msg.replace('{n}', m[0]);
     }
-    if (typeof showToast === 'function') return globalThis.showToast(msg, color);
+    if (typeof showCombatToast === 'function') return globalThis.showCombatToast(msg, color);
 }
 
 

@@ -23,7 +23,7 @@ import { _egIsActive } from './combat-state.js';
 export function _egRollFateNegation(stats) {
     const pct = stats.fatePct || 0;
     if (pct <= 0 || Math.random() * 100 >= pct) return false;
-    globalThis.showToast(t('eg_fate'));
+    globalThis.showCombatToast(t('eg_fate'));
     Audio_Manager.playSFX('player_fate_negate');
     _egApplyPlayerMissFeedback(true);
     _egScheduleAbsorptionRegen();
@@ -38,7 +38,7 @@ export function _egApplyGroundedReduction(rawDamage) {
     const reduction = Math.min(100, stats.groundedReductionPct || 0);
     if (chance <= 0 || reduction <= 0) return rawDamage;
     if (Math.random() * 100 >= chance) return rawDamage;
-    globalThis.showToast(t('eg_grounded'));
+    globalThis.showCombatToast(t('eg_grounded'));
     Audio_Manager.playSFX('player_grounded');
     return rawDamage * (1 - reduction / 100);
 }
@@ -124,7 +124,7 @@ export function _egRollParry(attacker, isProjectile) {
         : (typeof _egGetDualWieldParryChancePct === 'function' ? _egGetDualWieldParryChancePct() : 15);
     if (chance <= 0) return false;
     if (Math.random() * 100 >= chance) return false;
-    globalThis.showToast((typeof t === 'function' ? t('eg_parried') : 'Parried!'));
+    globalThis.showCombatToast((typeof t === 'function' ? t('eg_parried') : 'Parried!'));
     _egApplyPlayerParryFeedback();
     _egScheduleAbsorptionRegen();
     return true;
@@ -151,12 +151,12 @@ export function _egTryDeflectProjectile(attacker, isProjectile) {
         const projDef = (typeof _egGetProjectileDef === 'function') ? _egGetProjectileDef() : { emoji: '↩️', cssClass: 'eg-proj-player', duration: 300, easing: 'linear' };
         _egFireProjectile(projDef, projDef.cssClass, start, end, 320, 'linear', () => {
             const toastKey = (typeof t === 'function' ? t('eg_deflected') : 'Deflected!');
-            globalThis.showToast(toastKey !== 'eg_deflected' ? toastKey : `↩️ Deflected to ${victim.name || 'another monster'}!`);
+            globalThis.showCombatToast(toastKey !== 'eg_deflected' ? toastKey : `↩️ Deflected to ${victim.name || 'another monster'}!`);
             _egDamageTargetById(victim.id, deflectDamage);
         });
     } else {
         _egDamageTargetById(victim.id, deflectDamage);
-        globalThis.showToast((typeof t === 'function' ? t('eg_deflected') : 'Deflected!'));
+        globalThis.showCombatToast((typeof t === 'function' ? t('eg_deflected') : 'Deflected!'));
     }
     _egApplyPlayerDeflectFeedback();
     return true;

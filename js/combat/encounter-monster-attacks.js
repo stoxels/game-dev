@@ -190,7 +190,7 @@ export function _egAnimateMonsterProjectile(monster, dmgMult = 1) {
         Audio_Manager.playSFX('monster_projectile_hit');
         if (polymorphVictim) {
             // Confused attack hits the other monster - no player mitigation
-            globalThis.showToast(`🌀 ${monster.name || 'The monster'} hit ${polymorphVictim.name} instead!`);
+            globalThis.showCombatToast(`🌀 ${monster.name || 'The monster'} hit ${polymorphVictim.name} instead!`);
             _egDamageTargetById(polymorphVictim.id, monster.damageValue);
             return;
         }
@@ -218,7 +218,7 @@ export function _egApplyMeleeImpact(monster) {
         && typeof _egGetPolymorphVictim === 'function') {
         const victim = _egGetPolymorphVictim(monster.id);
         if (victim) {
-            globalThis.showToast(`🌀 ${monster.name || 'The monster'} struck ${victim.name} instead!`);
+            globalThis.showCombatToast(`🌀 ${monster.name || 'The monster'} struck ${victim.name} instead!`);
             _egDamageTargetById(victim.id, monster.damageValue);
             return;
         }
@@ -255,7 +255,7 @@ export function _egRollPreemptiveDodge(monster) {
     const pct = stats.preemptiveDodgePct || 0;
     if (pct <= 0 || Math.random() * 100 >= pct) return false;
 
-    globalThis.showToast(t('eg_dodged'));
+    globalThis.showCombatToast(t('eg_dodged'));
     _egApplyPlayerMissFeedback();
     return true;
 }

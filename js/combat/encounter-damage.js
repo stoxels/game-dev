@@ -183,7 +183,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
                 const isProjectile = !!(opts && opts.isProjectile);
                 const attacker = opts && opts.attacker ? opts.attacker : null;
                 const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
-                globalThis.showToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
+                globalThis.showCombatToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
                 _egApplyPlayerParryFeedback();
                 _egScheduleAbsorptionRegen();
                 // Sword identity: a successful Parry readies a riposte strike.
@@ -201,7 +201,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         const spellParryChance = Number(stats.parrySpellChancePct) || 0;
         if (spellParryChance > 0 && Math.random() * 100 < spellParryChance) {
             const parryToast = (typeof t === 'function' ? t('eg_parried') : '');
-            globalThis.showToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
+            globalThis.showCombatToast(parryToast && parryToast !== 'eg_parried' ? parryToast : '🗡️ Parried!');
             _egApplyPlayerParryFeedback();
             _egScheduleAbsorptionRegen();
             return 0;
@@ -216,7 +216,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         if (blindSt && blindSt.until > Date.now()) {
             const missPct = Math.min(90, 50 * (1 + (Number(blindSt.effectPct) || 0) / 100));
             if (Math.random() * 100 < missPct) {
-                globalThis.showToast(t('eg_blind_miss'));
+                globalThis.showCombatToast(t('eg_blind_miss'));
                 _egApplyPlayerMissFeedback();
                 _egScheduleAbsorptionRegen();
                 return 0;
@@ -239,7 +239,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
             dodgeChance = Math.min(75, dodgeChance * (1 + stats.windDancerEvadePct / 100));
         }
         if (dodgeChance > 0 && Math.random() * 100 < dodgeChance) {
-            globalThis.showToast(t('eg_dodged'));
+            globalThis.showCombatToast(t('eg_dodged'));
             _egApplyPlayerMissFeedback();
             _egScheduleAbsorptionRegen();
             return 0;
@@ -249,7 +249,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // Aspect of Stone (tree): chance to avoid physical damage from hits.
     if (!isSpell && !isBossAbility && !chargingMelee && !stunned && (Number(stats.avoidPhysHitPct) || 0) > 0
         && (!element || element === 'physical') && Math.random() * 100 < Math.min(75, stats.avoidPhysHitPct)) {
-        globalThis.showToast(t('eg_dodged'));
+        globalThis.showCombatToast(t('eg_dodged'));
         Audio_Manager.playSFX('player_dodge');
         _egScheduleAbsorptionRegen();
         return 0;
@@ -318,7 +318,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         if ((stats.enduranceOnBlockPct || 0) > 0 && Math.random() * 100 < Math.min(100, stats.enduranceOnBlockPct)) {
             _egGainEnduranceCharge(stats.enduranceChargesMax, stats.enduranceDurationPct);
         }
-        globalThis.showToast(t('eg_blocked'));
+        globalThis.showCombatToast(t('eg_blocked'));
         _egApplyPlayerBlockFeedback();
         _egScheduleAbsorptionRegen();
 
@@ -490,7 +490,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
         if (wardHP > 0) {
             globalThis._egWardingUsedThisMap = true;
             globalThis.playerCurrentHP = wardHP;
-            globalThis.showToast(t('eg_warding'));
+            globalThis.showCombatToast(t('eg_warding'));
             Audio_Manager.playSFX('player_shield_damage_taken');
         }
     }

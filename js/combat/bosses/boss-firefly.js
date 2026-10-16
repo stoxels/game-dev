@@ -105,8 +105,8 @@ export function _egFireflyText(key, fallback, vals) {
     return msg;
 }
 export function _egFireflyToast(key, fallback, vals) {
-    if (typeof showToast !== 'function') return;
-    globalThis.showToast(_egFireflyText(key, fallback, vals));
+    if (typeof showCombatToast !== 'function') return;
+    globalThis.showCombatToast(_egFireflyText(key, fallback, vals));
 }
 
 // ── Fight setup ───────────────────────────────────────────────────────────

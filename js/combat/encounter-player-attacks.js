@@ -123,7 +123,7 @@ export function _egOnMistake() {
         if (pct > 0) {
             const maxHP = (typeof playerMaxHP !== 'undefined' && globalThis.playerMaxHP > 0) ? globalThis.playerMaxHP : 100;
             const dealt = _egPlayerTakeDamage(Math.max(1, Math.round(maxHP * pct / 100)), true);
-            if (dealt > 0) globalThis.showToast(`✖️ ${t('eg_mm_toast_mistake_pain') || 'Painful mistake!'} (-${dealt})`);
+            if (dealt > 0) globalThis.showCombatToast(`✖️ ${t('eg_mm_toast_mistake_pain') || 'Painful mistake!'} (-${dealt})`);
         }
     }
 }
@@ -138,7 +138,7 @@ export function _egTickCorrectCellGearProcs() {
         if (globalThis._egArcaneSurgeStreak >= stats.arcaneSurgeStreak) {
             globalThis._egArcaneSurgeStreak = 0;
             const gained = gainMana(stats.arcaneSurgeMana);
-            if (gained > 0) globalThis.showToast(t('eg_arcane_surge').replace('{n}', Math.round(gained)));
+            if (gained > 0) globalThis.showCombatToast(t('eg_arcane_surge').replace('{n}', Math.round(gained)));
         }
     }
 

@@ -236,9 +236,9 @@ export function _egBossTick() {
         }
     });
 
-    if (anyNewlyEnraged && typeof showToast === 'function') {
+    if (anyNewlyEnraged && typeof showCombatToast === 'function') {
         Audio_Manager.playSFX('boss_enrage');
-        globalThis.showToast(t('eg_boss_soft_enrage'));
+        globalThis.showCombatToast(t('eg_boss_soft_enrage'));
     }
 }
 
@@ -367,7 +367,7 @@ export function _egBossClearMechanicTimers(monster) {
 // Shows the phase transition toast and triggers the transition CSS animation on the card.
 export function _egBossPlayTransitionFeedback(monster, newPhase) {
     const label = EG_BOSS_PHASE_NAMES[newPhase] ? t(EG_BOSS_PHASE_NAMES[newPhase]) : t('eg_phase_badge').replace('{n}', newPhase);
-    globalThis.showToast(`⚡ ${monster.name}: ${label}!`);
+    globalThis.showCombatToast(`⚡ ${monster.name}: ${label}!`);
 
     const card = document.getElementById(`eg-card-${monster.id}`);
     if (card) {

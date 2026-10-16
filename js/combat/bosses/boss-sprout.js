@@ -157,14 +157,14 @@ export function _egSproutCellIntercept(row, col) {
         el.classList.add('prune');
         setTimeout(() => { try { el.remove(); } catch (e) {} }, 240);
         try { if (typeof Audio_Manager !== 'undefined' && Audio_Manager.playSFX) Audio_Manager.playSFX('sprout_prune'); } catch (e) {}
-        globalThis.showToast(t('eg_sprout_pruned'));
+        globalThis.showCombatToast(t('eg_sprout_pruned'));
         return true;
     }
     // Bramble Wall: outermost ring of the grid is sealed while it lives.
     if (st.bramble && typeof cur !== 'undefined' && cur && cur.grid) {
         const rows = cur.grid.length, cols = cur.grid[0] ? cur.grid[0].length : 0;
         if (rows && cols && (row === 0 || col === 0 || row === rows - 1 || col === cols - 1)) {
-            globalThis.showToast(t('eg_sprout_bramble_locked'));
+            globalThis.showCombatToast(t('eg_sprout_bramble_locked'));
             return true;
         }
     }

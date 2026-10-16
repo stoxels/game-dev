@@ -229,7 +229,7 @@ function _castFrostNova(monster) {
             if (rect && _egCircleOverlapsRect(centre.x, centre.y, r, rect)) {
                 _msHit(monster, SPELLS.frost_nova.mult, 'cold', true);
             } else if (typeof globalThis.showToast === 'function') {
-                globalThis.showToast(LANG === 'de' ? '💨 Der Frostnova ausgewichen!' : '💨 Dodged the Frost Nova!');
+                globalThis.showCombatToast(LANG === 'de' ? '💨 Der Frostnova ausgewichen!' : '💨 Dodged the Frost Nova!');
             }
         }, cfg.novaTelegraphMs);
     });
@@ -302,7 +302,7 @@ function _castSoulDrain(monster) {
             }
             if (dealt <= 0 && drained <= 0) return;
             if (drained > 0 && typeof globalThis.showToast === 'function') {
-                globalThis.showToast(LANG === 'de' ? `🌑 −${drained} Mana entzogen` : `🌑 −${drained} mana drained`);
+                globalThis.showCombatToast(LANG === 'de' ? `🌑 −${drained} Mana entzogen` : `🌑 −${drained} mana drained`);
             }
             // The stolen essence flows back to the caster as life.
             const heal = Math.max(1, Math.round((dealt + drained) * 0.6));
@@ -405,7 +405,7 @@ function _msGroundStrike(monster, el, x, y, r, teleMs, mult, fall, onResolve) {
 
 function _msDodgeToast() {
     if (typeof globalThis.showToast === 'function') {
-        globalThis.showToast(LANG === 'de' ? '💨 Ausgewichen!' : '💨 Dodged!');
+        globalThis.showCombatToast(LANG === 'de' ? '💨 Ausgewichen!' : '💨 Dodged!');
     }
 }
 

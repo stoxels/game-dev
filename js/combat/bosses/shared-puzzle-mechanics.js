@@ -126,7 +126,7 @@ export function _egResolveFateMark(key, filled) {
             chain.resolved++;
             if (chain.resolved >= chain.budget) {
                 _egFateChain = null;
-                globalThis.showToast(t('eg_fate_chain_done'), '#4ade80');
+                globalThis.showCombatToast(t('eg_fate_chain_done'), '#4ade80');
                 return;
             }
             // The next mark appears shortly - keep the pressure on.
@@ -135,16 +135,16 @@ export function _egResolveFateMark(key, filled) {
                 if (_egFateChain !== chain) return;
                 if (chain.monsterId && typeof _egMonsters !== 'undefined'
                     && !globalThis._egMonsters.some(m => m.id === chain.monsterId)) { _egFateChain = null; return; }
-                if (_egFateSpawnOne(chain.windowMs)) globalThis.showToast(t('eg_fate_next').replace('{n}', left));
+                if (_egFateSpawnOne(chain.windowMs)) globalThis.showCombatToast(t('eg_fate_next').replace('{n}', left));
                 else _egFateChain = null; // no legal cells left - relay over
             }, 650);
             return;
         }
-        globalThis.showToast(t('eg_fate_done'), '#4ade80');
+        globalThis.showCombatToast(t('eg_fate_done'), '#4ade80');
         return;
     }
 
-    globalThis.showToast(t('eg_fate_fail'), '#f87171');
+    globalThis.showCombatToast(t('eg_fate_fail'), '#f87171');
     if (!cur || !cur.grid || typeof _egUnfillCell !== 'function') return;
     const sol = cur.grid;
     const pool = [..._egRecentFills].reverse().filter(([r, c]) =>
@@ -158,7 +158,7 @@ export function _egResolveFateMark(key, filled) {
         clearTimeout(_egFateChain.spawnTimer);
         _egFateChain = null;
         Array.from(_egFateMarks.keys()).forEach(k => _egRemoveFateMark(k));
-        globalThis.showToast(t('eg_fate_break'), '#f87171');
+        globalThis.showCombatToast(t('eg_fate_break'), '#f87171');
     }
 }
 
@@ -198,7 +198,7 @@ export function _egMechFatedCell(monster, phase) {
     if (p === 1) {
         const windowMs = Math.round(6000 * _egBossTierFactor(norm, EG_FATE_WINDOW_F));
         const targets = pool.sort(() => Math.random() - 0.5).slice(0, 1);
-        globalThis.showToast(t('eg_mech_fate').replace('{n}', targets.length).replace('{s}', windowMs / 1000));
+        globalThis.showCombatToast(t('eg_mech_fate').replace('{n}', targets.length).replace('{s}', windowMs / 1000));
         targets.forEach(([r, c]) => _egApplyFateMark(r, c, windowMs));
         return;
     }
@@ -212,7 +212,7 @@ export function _egMechFatedCell(monster, phase) {
         budget, resolved: 0, windowMs, spawnTimer: null,
     };
     const toastKey = p >= 3 ? 'eg_mech_fate_twins' : 'eg_mech_fate_chain';
-    globalThis.showToast(t(toastKey).replace('{s}', windowMs / 1000));
+    globalThis.showCombatToast(t(toastKey).replace('{s}', windowMs / 1000));
     const targets = pool.sort(() => Math.random() - 0.5).slice(0, Math.min(initial, pool.length));
     targets.forEach(([r, c]) => _egApplyFateMark(r, c, windowMs));
 }
@@ -398,7 +398,7 @@ export function _egMechFogBank(monster, phase) {
         if (_egFogSpawnBank(driftMs, durationMs)) spawned++;
     }
     if (spawned > 0) {
-        globalThis.showToast(t(toastKey).replace('{n}', durationMs / 1000));
+        globalThis.showCombatToast(t(toastKey).replace('{n}', durationMs / 1000));
     }
 }
 
@@ -484,7 +484,7 @@ export function _egClueScrambleReshuffle() {
             });
         }
     });
-    if (changed) globalThis.showToast(t('eg_scramble_again'));
+    if (changed) globalThis.showCombatToast(t('eg_scramble_again'));
 }
 
 // TIER-SCALED Clue Scramble knobs: line counts lerp between [tier1, tier16]
@@ -529,7 +529,7 @@ export function _egMechClueScramble(monster, phase) {
     globalThis._egActiveClueScramble = scrambled;
     const toastKey = p >= 3 ? 'eg_mech_scramble_double'
         : (p >= 2 ? 'eg_mech_scramble_deep' : 'eg_mech_scramble');
-    globalThis.showToast(t(toastKey).replace('{n}', duration / 1000));
+    globalThis.showCombatToast(t(toastKey).replace('{n}', duration / 1000));
 
     clearTimeout(_egClueScrambleRestoreTimer);
     clearTimeout(_egClueScrambleReshuffleTimer);

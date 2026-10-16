@@ -162,7 +162,7 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
         const reflectTarget = globalThis._egMonsters.find(m => m.id === targetId);
         if (reflectPct > 0 && reflectTarget) {
             const reflected = Math.max(1, Math.round(dmg * reflectPct / 100));
-            globalThis.showToast(`🪞 ${t('eg_mm_toast_reflect') || 'Reflected!'} (-${reflected})`);
+            globalThis.showCombatToast(`🪞 ${t('eg_mm_toast_reflect') || 'Reflected!'} (-${reflected})`);
             _egPlayerTakeDamage(reflected, false, null);
         }
     }
