@@ -80,14 +80,22 @@ export function _egSimulateAndCheck(mutateFn) {
 }
 
 // Allows moves that do not increase the number of violated requirements.
-export function _egCheckMoveAllowed(mutateFn) {
-    const before = _egSimulateAndCheck(() => {});
-    const after = _egSimulateAndCheck(mutateFn);
+// `baselineFn` (optional) rebuilds the loadout as it stood before the move:
+// a drag lifts an equipped item out of _egEquipped on pickup, so without it
+// the "before" count would already be missing that item and pulling it out
+// (e.g. a cloak carrying +Int for an amulet) would look harmless.
+export function _egCheckMoveAllowed(mutateFn, baselineFn) {
+    const before = _egSimulateAndCheck(baselineFn || (() => {}));
+    const after = _egSimulateAndCheck(sim => {
+        if (baselineFn) baselineFn(sim);
+        mutateFn(sim);
+    });
     return { ok: after.length <= before.length, missing: after };
 }
 
 // Checks whether an item can enter a slot under hand and attribute rules.
-export function _egCanEquipInSlot(item, slotId) {
+// `fromSlot` is the paperdoll slot a dragged item was lifted from (if any).
+export function _egCanEquipInSlot(item, slotId, fromSlot) {
     if (item && item.category === 'equip') {
         const handGate = _egCheckHandCompatibilityInSlot(item, slotId);
         if (!handGate.ok) return handGate;
@@ -96,7 +104,7 @@ export function _egCanEquipInSlot(item, slotId) {
         Object.keys(sim).forEach(k => { if (sim[k] === item) delete sim[k]; });
         delete sim[slotId];
         sim[slotId] = item;
-    });
+    }, fromSlot ? (sim => { if (!sim[fromSlot]) sim[fromSlot] = item; }) : undefined);
 }
 
 // Checks whether removing a slot leaves the remaining loadout valid.

@@ -642,10 +642,13 @@ export function _dndDrop(e) {
                 // _egCheckMoveAllowed returns { ok, missing } (same gate the
                 // right-click unequip uses). _egSimulateAndCheck returns a bare
                 // array, so reading `.ok` off it always blocked the drag.
+                // The carried item was lifted out of _egEquipped on pickup, so
+                // the baseline puts it back (else the "before" loadout is
+                // already missing it and any unequip looks harmless).
                 const gate = _egCheckMoveAllowed(sim => {
                     delete sim[_dnd.sourceSlot];
                     if (displaced) sim[_dnd.sourceSlot] = displaced;
-                });
+                }, sim => { sim[_dnd.sourceSlot] = _dnd.item; });
                 if (!gate.ok) {
                     _egShowRequirementsToast('unequip', gate.missing, _dnd.item.name);
                     blocked = true;
@@ -745,14 +748,15 @@ export function _dndDropOnEquipSlot(equipSlotEl) {
         _dndShowRejectFlash(equipSlotEl);
         return false;
     }
-    const gate = _egCanEquipInSlot(_dnd.item, slotId);
+    const fromSlot = _dnd.sourceZone === 'equip' ? _dnd.sourceSlot : undefined;
+    const gate = _egCanEquipInSlot(_dnd.item, slotId, fromSlot);
     if (!gate.ok) {
         // PoE-style: equipping a 2H weapon auto-unequips the off-hand to the
         // stash instead of rejecting (other hand conflicts still reject).
         if (gate.handError === 'two_handed_blocks_offhand' && slotId === 'weapon1'
             && typeof _egTryAutoUnequipOffhandForTwoHander === 'function'
             && _egTryAutoUnequipOffhandForTwoHander(_dnd.sourceZone === 'inv' ? { r: _dnd.sourceRow, c: _dnd.sourceCol } : null)) {
-            const retry = _egCanEquipInSlot(_dnd.item, slotId);
+            const retry = _egCanEquipInSlot(_dnd.item, slotId, fromSlot);
             if (!retry.ok) {
                 _egShowRequirementsToast('equip', retry, _dnd.item);
                 _dndShowRejectFlash(equipSlotEl);
