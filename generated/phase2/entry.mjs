@@ -216,7 +216,7 @@ import { _egvSwitchTab, showEndgameVendor } from '../../js/loot/loot-vendor.js';
 import '../../js/loot/loot-vendor-shared.js';
 import { _egvBuyTierMap } from '../../js/loot/loot-vendor-maps.js';
 import { _egvBuyCharm, _egvBuyCurrency, _egvBuyEssence, _egvBuyPuzzleItem } from '../../js/loot/loot-vendor-supplies.js';
-import { _egvSetBaseFilter, _egvShowBaseTooltip, _egvHideBaseTooltip, _egvBuyBaseItem } from '../../js/loot/loot-vendor-equipment.js';
+import { _egvSetBaseFilter, _egvSetWeaponTypeFilter, _egvShowBaseTooltip, _egvHideBaseTooltip, _egvBuyBaseItem } from '../../js/loot/loot-vendor-equipment.js';
 import '../../js/loot/loot-vendor-styles.js';
 import { _egMeleeImpactThump, _egShowWeaponSwing, _egWeaponSwingSound, _egDoWeaponAttack, _initEgWeaponAttackHotkey } from '../../js/combat/combat-weapon-swing.js';
 import { EG_WEAPON_SWING_COOLDOWN_MS, EG_WEAPON_SWING_DURATION_MS, _egGetAttackFacing, _egFacingFromVector, _egGetEquippedWeaponInfo, _egMeleeTargetInRange } from '../../js/combat/combat-weapon-swing-config.js';
@@ -724,6 +724,7 @@ try { Object.defineProperty(globalThis, "_egvBuyPuzzleItem", { get() { return _e
 try { Object.defineProperty(globalThis, "_egvBuyTierMap", { get() { return _egvBuyTierMap; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvHideBaseTooltip", { get() { return _egvHideBaseTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvSetBaseFilter", { get() { return _egvSetBaseFilter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "_egvSetWeaponTypeFilter", { get() { return _egvSetWeaponTypeFilter; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvShowBaseTooltip", { get() { return _egvShowBaseTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_egvSwitchTab", { get() { return _egvSwitchTab; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "_endBlackSwan", { get() { return _endBlackSwan; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
@@ -987,6 +988,7 @@ try { globalThis["_egvBuyCurrency"] = _egvBuyCurrency; } catch (e) {} // PHASE3-
 try { globalThis["_egvBuyEssence"] = _egvBuyEssence; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)
 try { globalThis["_egvBuyPuzzleItem"] = _egvBuyPuzzleItem; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-supplies.js)
 try { globalThis["_egvSetBaseFilter"] = _egvSetBaseFilter; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-equipment.js)
+try { globalThis["_egvSetWeaponTypeFilter"] = _egvSetWeaponTypeFilter; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-equipment.js)
 try { globalThis["_egvShowBaseTooltip"] = _egvShowBaseTooltip; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-equipment.js)
 try { globalThis["_egvHideBaseTooltip"] = _egvHideBaseTooltip; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-equipment.js)
 try { globalThis["_egvBuyBaseItem"] = _egvBuyBaseItem; } catch (e) {} // PHASE3-SHIM (js/loot/loot-vendor-equipment.js)

@@ -34,6 +34,23 @@ function _egvBaseItemPrice(base) {
 
 // Slot filter for the Base Items tab; 'all' shows every slot.
 let _egvBaseFilterSlot = 'all';
+// Weapon-type sub-filter (only shown while the slot filter is 'weapon').
+let _egvBaseFilterWeaponType = 'all';
+
+const EG_VENDOR_WEAPON_TYPES = ['sword', 'axe', 'mace', 'dagger', 'wand', 'staff'];
+
+// Weapon family for the sub-filter. The art icon decides it (same rule the
+// swing animations use); sceptres count as maces like in the passive tree.
+function _egvWeaponType(base) {
+    const icon = String(base.icon || '');
+    if (/sceptre|scepter|zepter/i.test(`${base.name || ''} ${base.nameDe || ''}`)) return 'mace';
+    if (icon === '🪓') return 'axe';
+    if (icon === '🔨') return 'mace';
+    if (icon === '🦯') return 'staff';
+    if (icon === '🪄') return 'wand';
+    if (icon === '🗡️') return 'dagger';
+    return 'sword';
+}
 
 //------------------------------------------------------------------------
 //-------------------STARTER GEAR TAB (FREE)-------------------------------
@@ -119,7 +136,24 @@ function _egvBuildReqSummaryText(base) {
 // Applies the slot filter chosen by the Base tab dropdown.
 export function _egvSetBaseFilter(value) {
     _egvBaseFilterSlot = value;
+    _egvBaseFilterWeaponType = 'all';
     _egvRenderBaseListOnly();
+    _egvRefreshWeaponTypeControl();
+}
+
+// Applies the weapon-type sub-filter (swords, axes, maces, ...).
+export function _egvSetWeaponTypeFilter(value) {
+    _egvBaseFilterWeaponType = value;
+    _egvRenderBaseListOnly();
+}
+
+// Shows/hides the weapon-type dropdown to match the slot filter.
+function _egvRefreshWeaponTypeControl() {
+    const wrap = document.getElementById('egv-weapon-type-wrap');
+    if (!wrap) return;
+    wrap.style.display = _egvBaseFilterSlot === 'weapon' ? '' : 'none';
+    const sel = document.getElementById('egv-weapon-type-select');
+    if (sel) sel.value = _egvBaseFilterWeaponType;
 }
 
 // Re-renders only the base item list + filter controls (keeps focus/state).
@@ -140,6 +174,9 @@ function _egvGetFilteredSortedBases() {
 
     if (_egvBaseFilterSlot !== 'all') {
         bases = bases.filter(b => b.slotType === _egvBaseFilterSlot);
+    }
+    if (_egvBaseFilterSlot === 'weapon' && _egvBaseFilterWeaponType !== 'all') {
+        bases = bases.filter(b => _egvWeaponType(b) === _egvBaseFilterWeaponType);
     }
 
     // Auto-sort: highest item level on top (descending). When filtering by
@@ -167,6 +204,16 @@ function _egvBuildBaseFilterOptionsHTML() {
     return options.join('');
 }
 
+// Builds the weapon-type dropdown options.
+function _egvBuildWeaponTypeOptionsHTML() {
+    const options = [`<option value="all"${_egvBaseFilterWeaponType === 'all' ? ' selected' : ''}>${t('eg_vendor_weapon_type_all')}</option>`];
+    EG_VENDOR_WEAPON_TYPES.forEach(wt => {
+        const selected = _egvBaseFilterWeaponType === wt ? ' selected' : '';
+        options.push(`<option value="${wt}"${selected}>${t(`eg_vendor_weapon_type_${wt}`)}</option>`);
+    });
+    return options.join('');
+}
+
 // Builds the filterable, non-starter equipment base list.
 export function _egvBuildBaseTabHTML() {
     return `
@@ -175,6 +222,10 @@ export function _egvBuildBaseTabHTML() {
         <label class="egv-base-control-label">
             <span>${t('eg_vendor_filter_type')}</span>
             <select id="egv-base-filter-select" onchange="_egvSetBaseFilter(this.value)">${_egvBuildBaseFilterOptionsHTML()}</select>
+        </label>
+        <label class="egv-base-control-label" id="egv-weapon-type-wrap"${_egvBaseFilterSlot === 'weapon' ? '' : ' style="display:none"'}>
+            <span>${t('eg_vendor_weapon_type')}</span>
+            <select id="egv-weapon-type-select" onchange="_egvSetWeaponTypeFilter(this.value)">${_egvBuildWeaponTypeOptionsHTML()}</select>
         </label>
     </div>
     <div class="egv-base-list" id="egv-base-list">${_egvBuildBaseListHTML()}</div>

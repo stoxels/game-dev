@@ -152,6 +152,10 @@ let _egMapDef = null;
 // EG_PLAYER_CHARGE_TIME_MULT shortens the result globally.
 export const EG_PLAYER_DEFAULT_ATTACK_INTERVAL = 10;
 export const EG_PLAYER_MIN_ATTACK_INTERVAL = 2; // Lower clamp so charges can't be spammed
+// Hard floor (seconds) on the FINAL time-to-full-charge after every % bonus.
+// Without it, stacked "% increased charge speed" (capped at 100%) reached 0s
+// and the charge bar stopped producing attacks altogether.
+export const EG_PLAYER_ABS_MIN_CHARGE_TIME = 0.65;
 export const EG_PLAYER_MELEE_DAMAGE = 20; // Default flat damage of a fully-charged unarmed strike
 export const EG_PLAYER_MELEE_ANIM_DURATION_MS = 500; // Matches monster melee duration
 // Global melee balance for the manual system: manual strikes land far less

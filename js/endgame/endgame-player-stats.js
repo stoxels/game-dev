@@ -27,7 +27,7 @@ import { EG_MOD_TABLE_WEAPON2 } from '../loot/loot-mod-tables-weapon2.js';
 import { EG_PLAYER_BASE_ATTRIBUTES, _egIsDualWielding, _egIsTwoHandedWeapon } from '../loot/loot-requirements.js';
 import { EG_ONSLAUGHT_SPEED_PCT, _egOnslaughtActive, _egSetRageDecayMult, EG_ENDURANCE_ARMOUR_PER_CHARGE, EG_ENDURANCE_BASE_MAX, EG_ENDURANCE_ELEM_RES_PER_CHARGE, EG_FRENZY_BASE_MAX, EG_FRENZY_DAMAGE_PER_CHARGE, EG_FRENZY_MELEE_SPEED_PER_CHARGE, _egGetEnduranceCharges, _egGetFrenzyCharges, _egGetRage, EG_FORTIFY_BASE_MAX, EG_POWER_BASE_MAX, EG_POWER_CRIT_PER_CHARGE, _egGetFortifyStacks, _egGetPowerCharges } from '../combat/combat-ailments-state.js';
 import { EG_PX_PER_METER, _egGetEquippedWeaponInfo, _egIsMaceOrSceptre } from '../combat/combat-weapon-swing-config.js';
-import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
+import { EG_MELEE_DAMAGE_MULT, EG_PLAYER_CHARGE_TIME_MULT, EG_PLAYER_ABS_MIN_CHARGE_TIME, EG_PLAYER_DEFAULT_ATTACK_INTERVAL, EG_PLAYER_MIN_ATTACK_INTERVAL, _egIsActive } from '../combat/combat-state.js';
 
 //------------------------------------------------------------------------
 //-------------------CONSTANTS & DATA DEFINITIONS-------------------------
@@ -1606,6 +1606,8 @@ export function _egGetPlayerAttackIntervalBreakdown() {
         // Net "reduced Attack Speed" (e.g. unique downsides): longer charge.
         interval = Math.round(interval * (1 + Math.min(-chargeSpeedPct, 100) / 100) * 10000) / 10000;
     }
+    // Never let stacked bonuses reach 0s (no charge = no attacks at all).
+    interval = Math.max(EG_PLAYER_ABS_MIN_CHARGE_TIME, interval);
 
     // Active map run: Temporal Chains - you act #% slower.
     if (typeof _egMapActionSlowMult === 'function') {

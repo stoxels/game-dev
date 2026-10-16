@@ -2107,7 +2107,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 9, str: 0, agi: 36, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 38, max: 76 }, attackIntervalSeconds: 6.3,
+        damage: { min: 28, max: 57 }, attackIntervalSeconds: 6.3,
     },
     {
         id: 'wpn_worn_battle_blade_11', name: 'Worn Battle Blade', nameDe: 'Alt-Kampfklinge',
@@ -2125,7 +2125,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 13, str: 0, agi: 57, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 53, max: 107 }, attackIntervalSeconds: 6.2,
+        damage: { min: 40, max: 80 }, attackIntervalSeconds: 6.2,
     },
     {
         id: 'wpn_iron_arcane_rod_14', name: 'Iron Arcane Rod', nameDe: 'Eisen-Arkanstab',
@@ -2152,7 +2152,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 17, str: 0, agi: 70, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 69, max: 137 }, attackIntervalSeconds: 6,
+        damage: { min: 52, max: 103 }, attackIntervalSeconds: 6,
     },
     {
         id: 'wpn_steel_arcane_rod_18', name: 'Steel Arcane Rod', nameDe: 'Stahl-Arkanstab',
@@ -2179,7 +2179,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 21, str: 0, agi: 84, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 84, max: 168 }, attackIntervalSeconds: 5.9,
+        damage: { min: 63, max: 126 }, attackIntervalSeconds: 5.9,
     },
     {
         id: 'wpn_soldier_battle_blade_23', name: 'Soldier Battle Blade', nameDe: 'Soldaten-Kampfklinge',
@@ -2206,7 +2206,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 25, str: 0, agi: 98, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 99, max: 198 }, attackIntervalSeconds: 5.8,
+        damage: { min: 74, max: 148 }, attackIntervalSeconds: 5.8,
     },
     {
         id: 'wpn_soldier_battle_blade_27', name: 'Soldier Battle Blade', nameDe: 'Soldaten-Kampfklinge',
@@ -2260,7 +2260,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 33, str: 0, agi: 128, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 129, max: 259 }, attackIntervalSeconds: 6.2,
+        damage: { min: 97, max: 194 }, attackIntervalSeconds: 6.2,
     },
     {
         id: 'wpn_golden_arcane_rod_34', name: 'Golden Arcane Rod', nameDe: 'Gold-Arkanstab',
@@ -2296,7 +2296,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 37, str: 0, agi: 144, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 145, max: 289 }, attackIntervalSeconds: 6,
+        damage: { min: 109, max: 217 }, attackIntervalSeconds: 6,
     },
     {
         id: 'wpn_golden_arcane_rod_38', name: 'Golden Arcane Rod', nameDe: 'Gold-Arkanstab',
@@ -2323,7 +2323,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 41, str: 0, agi: 160, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 160, max: 320 }, attackIntervalSeconds: 5.9,
+        damage: { min: 120, max: 240 }, attackIntervalSeconds: 5.9,
     },
     {
         id: 'wpn_runed_arcane_rod_42', name: 'Runed Arcane Rod', nameDe: 'Runen-Arkanstab',
@@ -2359,7 +2359,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 45, str: 0, agi: 177, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 175, max: 350 }, attackIntervalSeconds: 5.8,
+        damage: { min: 131, max: 262 }, attackIntervalSeconds: 5.8,
     },
     {
         id: 'wpn_frost_arcane_rod_46', name: 'Frost Arcane Rod', nameDe: 'Frost-Arkanstab',
@@ -2395,7 +2395,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 49, str: 0, agi: 194, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 190, max: 380 }, attackIntervalSeconds: 6.3,
+        damage: { min: 142, max: 285 }, attackIntervalSeconds: 6.3,
     },
     {
         id: 'wpn_ember_battle_blade_51', name: 'Ember Battle Blade', nameDe: 'Glut-Kampfklinge',
@@ -2413,7 +2413,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 53, str: 0, agi: 212, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 205, max: 411 }, attackIntervalSeconds: 6.2,
+        damage: { min: 154, max: 308 }, attackIntervalSeconds: 6.2,
     },
     {
         id: 'wpn_ember_arcane_rod_54', name: 'Ember Arcane Rod', nameDe: 'Glut-Arkanstab',
@@ -2449,7 +2449,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 57, str: 0, agi: 230, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 221, max: 441 }, attackIntervalSeconds: 6,
+        damage: { min: 166, max: 331 }, attackIntervalSeconds: 6,
     },
     {
         id: 'wpn_dusk_arcane_rod_58', name: 'Dusk Arcane Rod', nameDe: 'Dämmerungs-Arkanstab',
@@ -2485,7 +2485,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 61, str: 0, agi: 249, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 236, max: 472 }, attackIntervalSeconds: 5.9,
+        damage: { min: 177, max: 354 }, attackIntervalSeconds: 5.9,
     },
     {
         id: 'wpn_dawn_battle_blade_63', name: 'Dawn Battle Blade', nameDe: 'Morgen-Kampfklinge',
@@ -2512,7 +2512,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 65, str: 0, agi: 268, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 251, max: 502 }, attackIntervalSeconds: 5.8,
+        damage: { min: 188, max: 376 }, attackIntervalSeconds: 5.8,
     },
     {
         id: 'wpn_dragonbone_battle_blade_67', name: 'Dragonbone Battle Blade', nameDe: 'Drachenknochen-Kampfklinge',
@@ -2539,7 +2539,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 69, str: 0, agi: 288, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 266, max: 532 }, attackIntervalSeconds: 6.3,
+        damage: { min: 200, max: 399 }, attackIntervalSeconds: 6.3,
     },
     {
         id: 'wpn_dragonbone_arcane_rod_70', name: 'Dragonbone Arcane Rod', nameDe: 'Drachenknochen-Arkanstab',
@@ -2575,7 +2575,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 73, str: 0, agi: 309, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 281, max: 563 }, attackIntervalSeconds: 6.2,
+        damage: { min: 211, max: 422 }, attackIntervalSeconds: 6.2,
     },
     {
         id: 'wpn_storm_arcane_rod_74', name: 'Storm Arcane Rod', nameDe: 'Sturm-Arkanstab',
@@ -2611,7 +2611,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 77, str: 0, agi: 330, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 297, max: 593 }, attackIntervalSeconds: 6,
+        damage: { min: 223, max: 445 }, attackIntervalSeconds: 6,
     },
     {
         id: 'wpn_void_arcane_rod_78', name: 'Void Arcane Rod', nameDe: 'Leeren-Arkanstab',
@@ -2647,7 +2647,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 81, str: 0, agi: 351, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 312, max: 624 }, attackIntervalSeconds: 5.9,
+        damage: { min: 234, max: 468 }, attackIntervalSeconds: 5.9,
     },
     {
         id: 'wpn_void_arcane_rod_82', name: 'Void Arcane Rod', nameDe: 'Leeren-Arkanstab',
@@ -2701,7 +2701,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 1,
         requirements: { level: 89, str: 0, agi: 394, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 342, max: 684 }, attackIntervalSeconds: 6.3,
+        damage: { min: 256, max: 513 }, attackIntervalSeconds: 6.3,
     },
     {
         id: 'wpn_godforged_arcane_rod_90', name: 'Godforged Arcane Rod', nameDe: 'Gottgeschmiedet-Arkanstab',
