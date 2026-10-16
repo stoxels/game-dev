@@ -26,7 +26,7 @@ import { _egDamageTargetById } from './encounter-monster-damage.js';
 import { EG_FORTIFY_DR_PER_STACK, _egConsumeGhostShroud, _egArmRiposte, _egGainEnduranceCharge, _egGainFrenzyCharge, _egGainPowerCharge, _egGetFortifyStacks, _egRageOnPlayerHit } from './combat-ailments-state.js';
 import { _egApplyPlayerParryFeedback, _egGetDualWieldParryChancePct, _egGetParryChancePct, _egIsDualWieldParryActive, _egRollFateNegation, _egTryDeflectProjectile } from './encounter-player-mitigation.js';
 import { _egGetEncounterBaseLevel } from './encounter-spawn-rules.js';
-import { _egApplyPlayerShockAmp, _egRollMonsterHitAilment, _egRollPlayerStunFromHit, _egStunPlayer } from './combat-ailments-core.js';
+import { _egApplyPlayerShockAmp, _egPlayerHasAilment, _egRollMonsterHitAilment, _egRollPlayerStunFromHit, _egStunPlayer } from './combat-ailments-core.js';
 import { isHoldCasting } from '../skills/spell-casttime.js';
 import { _egCalcPlayerResistanceReduction } from './combat-calculations-resistances.js';
 import { _egMaybeShowAbsorptionBroken } from './encounter-overlays.js';
@@ -132,6 +132,10 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // (no import cycle back into the weapon-swing module).
     const chargingMelee = (typeof _egMeleeHoldActive !== 'undefined' && !!globalThis._egMeleeHoldActive);
 
+    // A stunned hero is helpless: no parry, deflect, evasion or block (fate and
+    // the Aegis Ward still work - they are luck / a stored charge, not actions).
+    const stunned = _egPlayerHasAilment('stunned');
+
     // Boss special abilities are never negatable - their damage always lands
     // unless the player avoided the ability by movement/position (the
     // telegraphed dodge mechanics are the only boss abilities assigned to be
@@ -167,8 +171,8 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // On a successful projectile parry there is a 5% + gear deflect chance to
     // hit another monster for 30% + gear damage. Dual-wielding two 1H weapons
     // grants the same roll at a 15% + gear base WITHOUT holding the key.
-    const holdingE = (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive);
-    const dualWieldParry = !holdingE
+    const holdingE = !stunned && (typeof _egHoldEPauseActive !== 'undefined' && globalThis._egHoldEPauseActive);
+    const dualWieldParry = !holdingE && !stunned
         && (typeof _egIsDualWieldParryActive === 'function' && _egIsDualWieldParryActive());
     if (!isSpell && !isBossAbility && (holdingE || dualWieldParry)) {
         if (typeof _egIsActive === 'function' && _egIsActive()) {
@@ -223,7 +227,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // Evasion only applies to physical attacks (melee strikes and monster
     // projectiles) - spells, environmental hazards and boss special abilities
     // cannot be dodged. Neither can a hero rooted mid overcharge-charge.
-    if (!isSpell && !isBossAbility && !chargingMelee && !((Number(stats.cannotEvade) || 0) > 0)) {
+    if (!isSpell && !isBossAbility && !chargingMelee && !stunned && !((Number(stats.cannotEvade) || 0) > 0)) {
         const attackerLvl = Number(attackerLevel)
             || (_egGetTarget() && _egGetTarget().level)
             || _egGetEncounterBaseLevel()
@@ -243,7 +247,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     }
 
     // Aspect of Stone (tree): chance to avoid physical damage from hits.
-    if (!isSpell && !isBossAbility && !chargingMelee && (Number(stats.avoidPhysHitPct) || 0) > 0
+    if (!isSpell && !isBossAbility && !chargingMelee && !stunned && (Number(stats.avoidPhysHitPct) || 0) > 0
         && (!element || element === 'physical') && Math.random() * 100 < Math.min(75, stats.avoidPhysHitPct)) {
         globalThis.showToast(t('eg_dodged'));
         Audio_Manager.playSFX('player_dodge');
@@ -295,7 +299,7 @@ export function _egPlayerTakeDamage(amount, isSpell = false, element = null, att
     // A hero busy channelling / winding up a spell (Disintegrate...) has no
     // hand free to raise a shield: no blocking while a hold-cast is running.
     const castingSpell = (typeof isHoldCasting === 'function') && isHoldCasting();
-    const blockChance = (!isBossAbility && !isBlockLockedOut && (hasShieldEquipped || treeBlock > 0) && !chargingMelee && !castingSpell)
+    const blockChance = (!isBossAbility && !isBlockLockedOut && (hasShieldEquipped || treeBlock > 0) && !chargingMelee && !castingSpell && !stunned)
         ? Math.min(isSpell ? blockCapSpell : blockCapAttack,
             ((isSpell ? stats.spellBlockChance : stats.blockChance) + treeBlock) * blockMult + overcapSpellBonus)
         : 0;
