@@ -128,7 +128,7 @@ function _egTrialPowerHit() {
             + mid(st.meleeFireMin, st.meleeFireMax) + mid(st.meleeColdMin, st.meleeColdMax)
             + mid(st.meleeLightningMin, st.meleeLightningMax) + mid(st.meleeShadowMin, st.meleeShadowMax))
             * (1 + (Number(st.meleePhysIncPct) || 0) / 100);
-        const spell = ((Number(st.spellDamageFlat) || 0) + 22 * (function(){const lv=Number(typeof globalThis._egGetPlayerLevel==='function'?globalThis._egGetPlayerLevel():0)||1;return lv<=50?1:Math.pow(25,Math.min(1,(lv-50)/40));})()) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
+        const spell = ((Number(st.spellDamageFlat) || 0) + 22 * (function(){const lv=Number(typeof globalThis._egGetPlayerLevel==='function'?globalThis._egGetPlayerLevel():0)||1;return lv<=50?1:Math.pow(75,Math.min(1,(lv-50)/40));})()) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
         best = Math.max(best, melee * EG_TRIAL_POWER_HIT_SHARE, spell * EG_TRIAL_POWER_HIT_SHARE);
     } catch (e) { /* stats optional */ }
     return best;

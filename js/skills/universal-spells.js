@@ -2611,12 +2611,12 @@ const USP_FLAT_MIN_SHARE = 0.15;
 
 // High-level spell ramp. Spell base damage has no weapon to grow with, so from
 // character level 50 on it is multiplied by a geometric curve: 1x up to level
-// 50 (the campaign anchors stay valid), about 4.3x at 68, 11x at 80 and 25x at 90.
+// 50 (the campaign anchors stay valid), about 7x at 68, 25x at 80 and 75x at 90.
 // Physical (blade / arrow) spells already ride physical weapon damage and are
 // left alone.
 const USP_SPELL_RAMP_FROM_LEVEL = 50;
 const USP_SPELL_RAMP_TO_LEVEL = 90;
-const USP_SPELL_RAMP_MAX = 25;
+const USP_SPELL_RAMP_MAX = 75;
 function _uspSpellLevelRamp(level) {
     let lv = Number(level);
     if (!Number.isFinite(lv)) {
