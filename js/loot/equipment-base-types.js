@@ -3278,7 +3278,7 @@ export const EG_BASE_TYPES_RANGED = [
         minLevel: 62,
         requirements: { level: 62, str: 0, agi: 254, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 232, max: 465 },
+        damage: { min: 501, max: 1004 },
     },
     {
         id: 'ranged_8', name: 'Celestial Longbow', nameDe: 'Himmelslangbogen',
@@ -3286,7 +3286,7 @@ export const EG_BASE_TYPES_RANGED = [
         minLevel: 88,
         requirements: { level: 88, str: 0, agi: 390, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 355, max: 710 },
+        damage: { min: 4060, max: 8119 },
     },
     {
         id: 'ranged_9', name: 'Singularity Bow', nameDe: 'Singularitätsbogen',
@@ -3294,7 +3294,7 @@ export const EG_BASE_TYPES_RANGED = [
         minLevel: 66,
         requirements: { level: 66, str: 0, agi: 273, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 256, max: 512 },
+        damage: { min: 714, max: 1428 },
     },
     // ── Filler – at least 13 more across all level brackets ────────────
     {
@@ -3359,7 +3359,7 @@ export const EG_BASE_TYPES_RANGED = [
         minLevel: 55,
         requirements: { level: 55, str: 0, agi: 221, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 215, max: 430 },
+        damage: { min: 296, max: 593 },
     },
     {
         id: 'ranged_18', name: 'Thunder Bow', nameDe: 'Donnerbogen',
@@ -3367,7 +3367,7 @@ export const EG_BASE_TYPES_RANGED = [
         minLevel: 70,
         requirements: { level: 70, str: 0, agi: 293, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 276, max: 552 },
+        damage: { min: 995, max: 1990 },
     },
     {
         id: 'ranged_19', name: 'Dusk Bow', nameDe: 'Dämmerungsbogen',
@@ -3375,7 +3375,7 @@ export const EG_BASE_TYPES_RANGED = [
         minLevel: 75,
         requirements: { level: 75, str: 0, agi: 319, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 300, max: 600 },
+        damage: { min: 1491, max: 2981 },
     },
     {
         id: 'ranged_20', name: 'Dawn Bow', nameDe: 'Morgengrauenbogen',
@@ -3383,7 +3383,7 @@ export const EG_BASE_TYPES_RANGED = [
         minLevel: 80,
         requirements: { level: 80, str: 0, agi: 346, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 325, max: 650 },
+        damage: { min: 2225, max: 4450 },
     },
     {
         id: 'ranged_21', name: 'Godwood Bow', nameDe: 'Götterholzbogen',
@@ -3391,7 +3391,7 @@ export const EG_BASE_TYPES_RANGED = [
         minLevel: 85,
         requirements: { level: 85, str: 0, agi: 373, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 340, max: 680 },
+        damage: { min: 3208, max: 6415 },
     },
     {
         id: 'ranged_22', name: 'Voidstrike Bow', nameDe: 'Leerenschlagbogen',
@@ -3399,7 +3399,7 @@ export const EG_BASE_TYPES_RANGED = [
         minLevel: 90,
         requirements: { level: 90, str: 0, agi: 398, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 365, max: 730 },
+        damage: { min: 4745, max: 9490 },
     },
 ];
 

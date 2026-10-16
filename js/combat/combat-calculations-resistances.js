@@ -53,12 +53,31 @@ export function _egHasDamageConversion(stats) {
         .some((k) => (Number(stats[k]) || 0) > 0);
 }
 
-export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1) {
+// Strength of the "gain as extra <element>" parts. Path-of-Exile rule: general
+// elemental, the element's own increase and any caller-supplied generic increase
+// all ADD into one bucket. `passed` is either a fire multiplier (legacy number) or
+// { fire, cold, lightning, shadow } multipliers the caller already built that way.
+function _egExtraMults(stats, passed) {
+    const add = (k) => Math.max(0, Number(stats && stats.elementalDamageIncPct) || 0) + Math.max(0, Number(stats && stats[k]) || 0);
+    const d = {
+        fire: 1 + add('fireDamageIncPct') / 100,
+        cold: 1 + add('coldDamageIncPct') / 100,
+        lightning: 1 + add('lightningDamageIncPct') / 100,
+        shadow: 1 + add('shadowDamageIncPct') / 100,
+    };
+    if (passed && typeof passed === 'object') return { ...d, ...passed };
+    if (typeof passed === 'number' && passed !== 1) d.fire = passed;
+    return d;
+}
+
+export function _egApplyDamageConversion(stats, physical, elements, multsArg = 1) {
     const el = elements || {};
+    const mults = _egExtraMults(stats, multsArg);
+    const fireMult = mults.fire;
     // Cold / lightning keystones (Bitter Frost, Roiling Tempest) use the general path.
     if ((Number(stats && stats.damageToColdPct) || 0) > 0 || (Number(stats && stats.onlyColdDamage) || 0) > 0
         || (Number(stats && stats.damageToLightningPct) || 0) > 0 || (Number(stats && stats.onlyLightningDamage) || 0) > 0) {
-        return _egApplyDamageConversionGeneral(stats, physical, el, fireMult);
+        return _egApplyDamageConversionGeneral(stats, physical, el, mults);
     }
     const share = Math.max(0, Math.min(100, Number(stats && stats.damageToFirePct) || 0)) / 100;
     const fireOnly = (Number(stats && stats.onlyFireDamage) || 0) > 0;
@@ -73,9 +92,8 @@ export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1
     // element's own increases; dropped under fire-only like any non-fire part.
     const extraColdPct = Math.max(0, Number(stats && stats.physAsExtraColdPct) || 0);
     const extraLightningPct = Math.max(0, Number(stats && stats.physAsExtraLightningPct) || 0);
-    const elemInc = 1 + Math.max(0, Number(stats && stats.elementalDamageIncPct) || 0) / 100;
-    const coldMult = elemInc * (1 + Math.max(0, Number(stats && stats.coldDamageIncPct) || 0) / 100);
-    const lightningMult = elemInc * (1 + Math.max(0, Number(stats && stats.lightningDamageIncPct) || 0) / 100);
+    const coldMult = mults.cold;
+    const lightningMult = mults.lightning;
     if (share <= 0 && !fireOnly && extraPct <= 0 && extraShadowPct <= 0 && extraColdPct <= 0 && extraLightningPct <= 0) return { physical, elements: el };
     const keep = fireOnly ? 0 : 1 - share;
     const phys = physical || 0;
@@ -88,7 +106,7 @@ export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1
             cold: cold * keep + (fireOnly ? 0 : (phys * extraColdPct / 100) * coldMult),
             lightning: lightning * keep + (fireOnly ? 0 : (phys * extraLightningPct / 100) * lightningMult),
             shadow: fireOnly ? 0 : (el.shadow || 0)
-                + (phys * extraShadowPct / 100) * (1 + Math.max(0, Number(stats && stats.shadowDamageIncPct) || 0) / 100),
+                + (phys * extraShadowPct / 100) * mults.shadow,
         },
     };
 }
@@ -96,15 +114,15 @@ export function _egApplyDamageConversion(stats, physical, elements, fireMult = 1
 // General conversion: fire, then cold, then lightning conversion (each moves its
 // share of every other part), then the only-element drop. Extras survive when
 // their element is the allowed one. Used when a cold / lightning keystone is active.
-function _egApplyDamageConversionGeneral(stats, physical, el, fireMult) {
+function _egApplyDamageConversionGeneral(stats, physical, el, mults) {
+    const fireMult = mults.fire;
     const pct = (k) => Math.max(0, Math.min(100, Number(stats[k]) || 0)) / 100;
     const only = ((Number(stats.onlyFireDamage) || 0) > 0) ? 'fire'
         : ((Number(stats.onlyColdDamage) || 0) > 0) ? 'cold'
         : ((Number(stats.onlyLightningDamage) || 0) > 0) ? 'lightning' : null;
-    const elemInc = 1 + Math.max(0, Number(stats.elementalDamageIncPct) || 0) / 100;
-    const coldMult = elemInc * (1 + Math.max(0, Number(stats.coldDamageIncPct) || 0) / 100);
-    const lightningMult = elemInc * (1 + Math.max(0, Number(stats.lightningDamageIncPct) || 0) / 100);
-    const shadowMult = 1 + Math.max(0, Number(stats.shadowDamageIncPct) || 0) / 100;
+    const coldMult = mults.cold;
+    const lightningMult = mults.lightning;
+    const shadowMult = mults.shadow;
     const p = { phys: physical || 0, fire: el.fire || 0, cold: el.cold || 0, lightning: el.lightning || 0, shadow: el.shadow || 0 };
     const order = [['fire', 'damageToFirePct'], ['cold', 'damageToColdPct'], ['lightning', 'damageToLightningPct']];
     for (const [target, key] of order) {

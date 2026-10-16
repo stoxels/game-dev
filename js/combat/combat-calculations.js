@@ -53,20 +53,6 @@ export function _egCrossoverDamageMult(stats) {
     return 1 + sum;
 }
 
-// High-level balance pass: grid projectiles are rescaled by character level (1x to
-// L50, 13x at L90) because gear alone leaves them well short of the main-action
-// band (about 40-60k at L90). Melee is not rescaled (its heavy/weapon-family tree
-// nodes were lowered instead); spells have their own ramp.
-function _egHighLevelDamageScale(kind) {
-    let lv = 1;
-    try { lv = Number(typeof globalThis._egGetPlayerLevel === 'function' ? globalThis._egGetPlayerLevel() : 1) || 1; } catch (e) { lv = 1; }
-    if (kind === 'projectile') {
-        if (lv <= 50) return 1;
-        return Math.pow(13, Math.min(1, (lv - 50) / 40));
-    }
-    return 1;
-}
-
 export function _egCalcPlayerDamage() {
     const stats = _egComputePlayerStats();
 
@@ -92,7 +78,12 @@ export function _egCalcPlayerDamage() {
     elements.lightning *= 1 + (elemBase + (stats.lightningDamageIncPct || 0)) / 100;
     elements.shadow *= 1 + (elemBase + (stats.shadowDamageIncPct || 0)) / 100;
     // Fire conversion / fire-only (Primal Flame keystone).
-    const converted = _egApplyDamageConversion(stats, dmg, elements, 1 + (elemBase + (stats.fireDamageIncPct || 0)) / 100);
+    const converted = _egApplyDamageConversion(stats, dmg, elements, {
+        fire: 1 + (elemBase + (stats.fireDamageIncPct || 0)) / 100,
+        cold: 1 + (elemBase + (stats.coldDamageIncPct || 0)) / 100,
+        lightning: 1 + (elemBase + (stats.lightningDamageIncPct || 0)) / 100,
+        shadow: 1 + (elemBase + (stats.shadowDamageIncPct || 0)) / 100,
+    });
     dmg = converted.physical;
     _egLastHitElements = converted.elements;
     dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
@@ -112,8 +103,6 @@ export function _egCalcPlayerDamage() {
     _egLastHitWasCrit = critMult > 1;
     _egLastHitCritMult = critMult;
     dmg *= critMult;
-
-    dmg *= _egHighLevelDamageScale('projectile');
 
     // Active map run: apply the "% reduced player Damage" map mod.
     if (typeof _egMapPlayerDamageMult === 'function') dmg *= _egMapPlayerDamageMult();
@@ -217,7 +206,10 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
         shadow: rollEl(stats.meleeShadowMin, stats.meleeShadowMax) * (1 + (elemBase + (stats.shadowDamageIncPct || 0)) / 100),
     };
     // Fire conversion / fire-only (Primal Flame keystone).
-    const converted = _egApplyDamageConversion(stats, dmg, elements, fireMult);
+    const converted = _egApplyDamageConversion(stats, dmg, elements, {
+        fire: fireMult, cold: coldMult, lightning: lightningMult,
+        shadow: 1 + (elemBase + (stats.shadowDamageIncPct || 0)) / 100,
+    });
     dmg = converted.physical;
     _egLastMeleeElements = converted.elements;
     dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;

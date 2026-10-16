@@ -160,7 +160,7 @@ export const EG_PLAYER_MELEE_DAMAGE = 20; // Default flat damage of a fully-char
 export const EG_PLAYER_MELEE_ANIM_DURATION_MS = 500; // Matches monster melee duration
 // Global melee balance for the manual system: manual strikes land far less
 // often than the old auto-strikes did, so the melee channel hits harder.
-export const EG_MELEE_DAMAGE_MULT = 2.0;
+export const EG_MELEE_DAMAGE_MULT = 3.0;
 // Global charge pacing for the manual system (0.65 = ~35% faster than the
 // old auto-strike intervals, which now serve as time-to-full-charge).
 export const EG_PLAYER_CHARGE_TIME_MULT = 0.65;
