@@ -5,7 +5,7 @@ import { _egQuizDamageBuffMult } from '../endgame/endgame-quiz-buffs.js';
 import { EG_PLAYER_MELEE_DAMAGE } from './combat-state.js';
 import { EG_RIPOSTE_BASE_MORE_PCT, _egConsumeRiposte } from './combat-ailments-state.js';
 import { _egGetTarget } from './encounter-charged-shot.js';
-import { _egApplyDamageConversion, _egLeechAbsorption, _egLeechHealMult, _egLeechMana, _egRollElementalBreakdown, _egScaleElements } from './combat-calculations-resistances.js';
+import { _egApplyDamageConversion, _egLeechAbsorption, _egLeechHealMult, _egLeechMana, _egRollElementalBreakdown } from './combat-calculations-resistances.js';
 
 //------------------------------------------------------------------------
 //-------------------PLAYER DAMAGE CALCULATION----------------------------
@@ -22,37 +22,39 @@ export let _egLastHitCritMult = 1;
 // timer, after a line, after a mistake). Returns one multiplier for a single
 // Attack roll; the "next Attack after a mistake" bonus is consumed here.
 export function _egCrossoverDamageMult(stats) {
-    let mult = 1;
+    // Path-of-Exile rule: these lines are all "increased" damage, so they add into
+    // one bucket (returned as 1 + sum) instead of multiplying each other.
+    let sum = 0;
     const flags = globalThis.LEVEL_FLAGS;
 
     const perStreak = Number(stats.damagePerStreakPct) || 0;
     if (perStreak > 0) {
         const steps = Math.floor((Number(flags && flags.fillRun) || 0) / 10);
-        mult *= 1 + (perStreak * steps) / 100;
+        sum += (perStreak * steps) / 100;
     }
 
     const flawless = Number(stats.damageFlawlessPct) || 0;
-    if (flawless > 0 && (Number(globalThis.mistakeCount) || 0) === 0) mult *= 1 + flawless / 100;
+    if (flawless > 0 && (Number(globalThis.mistakeCount) || 0) === 0) sum += flawless / 100;
 
     const lowTime = Number(stats.damageLowTimePct) || 0;
     const startTimer = Number(globalThis._levelStartTimerSecs) || 0;
     if (lowTime > 0 && startTimer > 0 && (Number(globalThis.timerSecs) || 0) < startTimer * 0.25) {
-        mult *= 1 + lowTime / 100;
+        sum += lowTime / 100;
     }
 
     const afterLine = Number(stats.damageAfterLinePct) || 0;
-    if (afterLine > 0 && flags && Number(flags.damageAfterLineUntil) > Date.now()) mult *= 1 + afterLine / 100;
+    if (afterLine > 0 && flags && Number(flags.damageAfterLineUntil) > Date.now()) sum += afterLine / 100;
 
     const onMistake = Number(stats.damageOnMistakePct) || 0;
     if (flags && flags.damageOnMistakePending) {
         flags.damageOnMistakePending = false;
-        if (onMistake > 0) mult *= 1 + onMistake / 100;
+        if (onMistake > 0) sum += onMistake / 100;
     }
-    return mult;
+    return 1 + sum;
 }
 
 // High-level balance pass: grid projectiles are rescaled by character level (1x to
-// L50, 7x at L90) because gear alone leaves them well short of the main-action
+// L50, 13x at L90) because gear alone leaves them well short of the main-action
 // band (about 40-60k at L90). Melee is not rescaled (its heavy/weapon-family tree
 // nodes were lowered instead); spells have their own ramp.
 function _egHighLevelDamageScale(kind) {
@@ -60,7 +62,7 @@ function _egHighLevelDamageScale(kind) {
     try { lv = Number(typeof globalThis._egGetPlayerLevel === 'function' ? globalThis._egGetPlayerLevel() : 1) || 1; } catch (e) { lv = 1; }
     if (kind === 'projectile') {
         if (lv <= 50) return 1;
-        return Math.pow(7, Math.min(1, (lv - 50) / 40));
+        return Math.pow(13, Math.min(1, (lv - 50) / 40));
     }
     return 1;
 }
@@ -68,43 +70,38 @@ function _egHighLevelDamageScale(kind) {
 export function _egCalcPlayerDamage() {
     const stats = _egComputePlayerStats();
 
+    // Path-of-Exile layering: every "increased damage" line that applies to a hit
+    // adds into ONE bucket per damage share (physical / each element); only the
+    // deliberate "more" steps below multiply. Generic damage, projectile damage and
+    // the situational lines apply to both shares.
+    const sitPct = (_egCrossoverDamageMult(stats) - 1) * 100;
+    const genericPct = (stats.damageIncPct || 0) + (stats.projectileDamageIncPct || 0) + sitPct;
+
     let dmg = EG_PLAYER_STATS.baseDamage;
     dmg += stats.physFlatMin + (stats.physFlatMax - stats.physFlatMin) * Math.random();
-    dmg *= (1 + stats.physIncPct / 100);
+    dmg *= (1 + ((stats.physIncPct || 0) + genericPct) / 100);
 
-    // Elemental damage adds after the physical multiplier - it isn't scaled by inc_physical_damage.
-    // "+% increased elemental damage" (passive tree) multiplies the elemental
-    // share of the hit; the physical share above is untouched. The passive tree's
-    // per-element increases (fireDamageIncPct / coldDamageIncPct /
-    // lightningDamageIncPct) stack ON TOP of it for their own element alone. The per-element
-    // breakdown is kept in _egLastHitElements (already increased) so the
-    // impact site can apply the target monster's elemental resistances.
-    // Projectile-only elemental increase (passive tree) stacks additively
-    // with the general one.
-    const elemMult = 1 + ((stats.elementalDamageIncPct || 0) + (stats.projectileElementalDamageIncPct || 0)) / 100;
-    const elements = _egScaleElements(_egRollElementalBreakdown(stats), elemMult);
-    elements.fire *= 1 + (stats.fireDamageIncPct || 0) / 100;
-    elements.cold *= 1 + (stats.coldDamageIncPct || 0) / 100;
-    elements.lightning *= 1 + (stats.lightningDamageIncPct || 0) / 100;
-    elements.shadow *= 1 + (stats.shadowDamageIncPct || 0) / 100;
+    // Elemental damage adds after the physical share. Its bucket is general
+    // elemental + projectile elemental + the element's own increase + generic.
+    // The per-element breakdown is kept in _egLastHitElements (already increased)
+    // so the impact site can apply the target monster's elemental resistances.
+    const elemBase = (stats.elementalDamageIncPct || 0) + (stats.projectileElementalDamageIncPct || 0) + genericPct;
+    const elements = _egRollElementalBreakdown(stats);
+    elements.fire *= 1 + (elemBase + (stats.fireDamageIncPct || 0)) / 100;
+    elements.cold *= 1 + (elemBase + (stats.coldDamageIncPct || 0)) / 100;
+    elements.lightning *= 1 + (elemBase + (stats.lightningDamageIncPct || 0)) / 100;
+    elements.shadow *= 1 + (elemBase + (stats.shadowDamageIncPct || 0)) / 100;
     // Fire conversion / fire-only (Primal Flame keystone).
-    const converted = _egApplyDamageConversion(stats, dmg, elements, elemMult * (1 + (stats.fireDamageIncPct || 0) / 100));
+    const converted = _egApplyDamageConversion(stats, dmg, elements, 1 + (elemBase + (stats.fireDamageIncPct || 0)) / 100);
     dmg = converted.physical;
     _egLastHitElements = converted.elements;
     dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
 
-    // Generic "% increased Damage" (passive tree): one multiplier over the
-    // whole physical + elemental roll, shared with the melee channel.
-    dmg *= 1 + (stats.damageIncPct || 0) / 100;
-    // "% increased Projectile Damage" (passive tree): one multiplier over the
-    // whole physical + elemental roll, applied before the crit multiplier.
-    dmg *= 1 + (stats.projectileDamageIncPct || 0) / 100;
     // Frenzy Charges: a "more" step on projectile damage per live charge.
     dmg *= 1 + (stats.frenzyDamageMorePct || 0) / 100;
     // Residual Plot (Statistician passive node): 15% increased damage for 10
     // seconds after Data Strike (LEVEL_FLAGS.residualPlotUntil, set on cast).
     if (globalThis.LEVEL_FLAGS && Number(globalThis.LEVEL_FLAGS.residualPlotUntil) > Date.now()) dmg *= 1.15;
-    dmg *= _egCrossoverDamageMult(stats);
 
     // Projectile crit chance (passive tree) is added to the base crit chance
     // for this roll only - melee strikes never read it.
@@ -171,10 +168,15 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
         (typeof EG_MELEE_OVERCHARGE_MULT === 'number') ? EG_MELEE_OVERCHARGE_MULT : 1,
         Math.max(0, Number(chargePct) || 0));
 
+    // Path-of-Exile layering: generic melee increase, weapon stance, weapon family,
+    // generic damage, dagger damage and the situational lines are ONE additive bucket
+    // for the physical share (and generic/dagger/situational also feed the elemental
+    // bucket below). Rage, riposte, double damage and crit stay multiplicative.
+    const sitPct = (_egCrossoverDamageMult(stats) - 1) * 100;
+    const genericPct = (stats.damageIncPct || 0) + sitPct + (stats.isDaggerEquipped ? (stats.daggerDamageIncPct || 0) : 0);
     let dmg;
     if (stats.meleePhysMax > 0) {
         dmg = stats.meleePhysMin + (stats.meleePhysMax - stats.meleePhysMin) * Math.random();
-        dmg *= (1 + stats.meleePhysIncPct / 100);
         // Weapon-stance split from the passive tree (melee batch): Heavy
         // with a two-handed weapon equipped, one-handed otherwise (1H +
         // shield, dual-wield or unarmed). Exactly one side applies, on top
@@ -182,7 +184,6 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
         const stanceIncPct = stats.isHeavyWeaponEquipped
             ? (stats.meleePhysHeavyIncPct || 0)
             : (stats.meleePhys1HIncPct || 0);
-        dmg *= (1 + stanceIncPct / 100);
         // Weapon family (sword/axe batch): its own multiplier, only for the
         // matching family of the equipped weapon.
         const familyIncPct = stats.isSwordEquipped ? (stats.meleePhysSwordIncPct || 0)
@@ -190,12 +191,12 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
             : stats.isMaceEquipped ? (stats.meleePhysMaceIncPct || 0)
             : stats.isStaffEquipped ? (stats.staffDamageIncPct || 0)
             : stats.isWandEquipped ? (stats.wandDamageIncPct || 0) : 0;
-        dmg *= (1 + familyIncPct / 100);
+        dmg *= 1 + ((stats.meleePhysIncPct || 0) + stanceIncPct + familyIncPct + genericPct) / 100;
         // Rage (axe notable 369): each Rage is a "more" step on melee damage.
         if ((stats.rage || 0) > 0) dmg *= 1 + (stats.rage * (stats.rageMeleeMorePct || 0)) / 100;
     } else {
         // Unarmed / no weapon damage - flat fallback strike
-        dmg = EG_PLAYER_MELEE_DAMAGE;
+        dmg = EG_PLAYER_MELEE_DAMAGE * (1 + genericPct / 100);
     }
     dmg *= charge;
 
@@ -205,35 +206,26 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // "+% increased elemental damage" from the passive tree and finally by
     // that tree's per-element increases.
     const rollEl = (min, max) => (min > 0 || max > 0) ? (min + Math.random() * (max - min)) * charge : 0;
-    const elemMult = 1 + (stats.elementalDamageIncPct || 0) / 100;
-    const fireMult = elemMult * (1 + (stats.fireDamageIncPct || 0) / 100);
-    const coldMult = elemMult * (1 + (stats.coldDamageIncPct || 0) / 100);
-    const lightningMult = elemMult * (1 + (stats.lightningDamageIncPct || 0) / 100);
+    const elemBase = (stats.elementalDamageIncPct || 0) + genericPct;
+    const fireMult = 1 + (elemBase + (stats.fireDamageIncPct || 0)) / 100;
+    const coldMult = 1 + (elemBase + (stats.coldDamageIncPct || 0)) / 100;
+    const lightningMult = 1 + (elemBase + (stats.lightningDamageIncPct || 0)) / 100;
     const elements = {
         fire: rollEl(stats.meleeFireMin, stats.meleeFireMax) * fireMult,
         cold: rollEl(stats.meleeColdMin, stats.meleeColdMax) * coldMult,
         lightning: rollEl(stats.meleeLightningMin, stats.meleeLightningMax) * lightningMult,
-        shadow: rollEl(stats.meleeShadowMin, stats.meleeShadowMax) * elemMult,
+        shadow: rollEl(stats.meleeShadowMin, stats.meleeShadowMax) * (1 + (elemBase + (stats.shadowDamageIncPct || 0)) / 100),
     };
-    // "% increased Shadow Damage" (passive tree) on the melee shadow share.
-    elements.shadow *= 1 + (stats.shadowDamageIncPct || 0) / 100;
     // Fire conversion / fire-only (Primal Flame keystone).
     const converted = _egApplyDamageConversion(stats, dmg, elements, fireMult);
     dmg = converted.physical;
     _egLastMeleeElements = converted.elements;
     dmg += converted.elements.fire + converted.elements.cold + converted.elements.lightning + converted.elements.shadow;
 
-    // Generic "% increased Damage" (passive tree) over the whole melee hit.
-    dmg *= 1 + (stats.damageIncPct || 0) / 100;
-    dmg *= _egCrossoverDamageMult(stats);
-
     // Sword riposte: the strike after a successful Parry deals more damage.
     if (stats.isSwordEquipped && charge >= 0.5 && _egConsumeRiposte()) {
         dmg *= 1 + (EG_RIPOSTE_BASE_MORE_PCT + (stats.riposteDamagePct || 0)) / 100;
     }
-
-    // "% increased Damage with Daggers" (passive tree) over the whole hit.
-    if (stats.isDaggerEquipped) dmg *= 1 + (stats.daggerDamageIncPct || 0) / 100;
 
     // Mace / Sceptre crit lines (Colossus nodes): scoped to melee strikes
     // with the matching weapon family, added to this roll only.

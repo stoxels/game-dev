@@ -2639,7 +2639,7 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     let dmg = dmgMin + Math.random() * (dmgMax - dmgMin);
     if (isPhys) {
         dmg += (((stats.physFlatMin || 0) + (stats.physFlatMax || 0)) / 2 + (tree.flat || 0)) * flatShare;
-        dmg *= 1 + ((stats.physIncPct || 0) + (tree.incPct || 0)) / 100;
+        dmg *= 1 + ((stats.physIncPct || 0) + (stats.damageIncPct || 0) + (tree.incPct || 0)) / 100;
     } else {
         dmg *= _uspSpellLevelRamp();
         dmg += ((stats.spellDamageFlat || 0) + (tree.flat || 0)) * flatShare;
@@ -2656,7 +2656,7 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
         const coldBonus = (spell.element === 'cold') ? (stats.coldDamageIncPct || 0) : 0;
         const lightningBonus = (spell.element === 'lightning') ? (stats.lightningDamageIncPct || 0) : 0;
         const shadowBonus = (spell.element === 'shadow') ? (stats.shadowDamageIncPct || 0) : 0;
-        dmg *= 1 + ((stats.spellDamageIncPct || 0) + (tree.incPct || 0)
+        dmg *= 1 + ((stats.spellDamageIncPct || 0) + (stats.damageIncPct || 0) + (tree.incPct || 0)
             + (stats.elementalDamageIncPct || 0) + fireBonus + coldBonus + lightningBonus + shadowBonus) / 100;
     }
 
