@@ -738,6 +738,60 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'dofBurn',
     },
 
+    // ── CLEANSE (remove ailments you currently suffer) ───────────────────
+    // A spell removes its ailments only when the monster that inflicted them
+    // was within reach of the charm rank (see USP_CLEANSE_MAX_LEVEL_BY_RANK).
+    {
+        id: 'usp_staunch', icon: '🩸', theme: 'holy', element: 'fire', damageKind: 'holy',
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        cleanses: ['bleed'], cleanseNameEn: 'Bleeding', cleanseNameDe: 'Blutung',
+        tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
+        nameEn: 'Staunch', nameDE: 'Blutstillung',
+        descEn: 'Stops your bleeding at once. Only works while you have it, and only on ailments inflicted by monsters up to the level your charm rank can handle - a low rank cannot cleanse what a higher-level monster inflicted.',
+        descDE: 'Stillt deine Blutung sofort. Wirkt nur, solange du es hast, und nur bei Leiden von Monstern bis zu der Stufe, die dein Anhänger-Rang bewältigt - ein niedriger Rang kann nichts entfernen, was ein höherstufiges Monster verursacht hat.',
+        sfx: 'heart_heals',
+    },
+    {
+        id: 'usp_antidote', icon: '🧪', theme: 'shadow', element: 'shadow', damageKind: 'shadow',
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        cleanses: ['poison'], cleanseNameEn: 'Poison', cleanseNameDe: 'Gift',
+        tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
+        nameEn: 'Antidote', nameDE: 'Gegengift',
+        descEn: 'Purges poison from your blood. Only works while you have it, and only on ailments inflicted by monsters up to the level your charm rank can handle - a low rank cannot cleanse what a higher-level monster inflicted.',
+        descDE: 'Treibt das Gift aus deinem Blut. Wirkt nur, solange du es hast, und nur bei Leiden von Monstern bis zu der Stufe, die dein Anhänger-Rang bewältigt - ein niedriger Rang kann nichts entfernen, was ein höherstufiges Monster verursacht hat.',
+        sfx: 'heart_heals',
+    },
+    {
+        id: 'usp_quench', icon: '💧', theme: 'frost', element: 'cold', damageKind: 'cold',
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        cleanses: ['ignite', 'shadowburn'], cleanseNameEn: 'Burning', cleanseNameDe: 'Brennen',
+        tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
+        nameEn: 'Quench', nameDE: 'Löschen',
+        descEn: 'Douses the flames on you. Only works while you have it, and only on ailments inflicted by monsters up to the level your charm rank can handle - a low rank cannot cleanse what a higher-level monster inflicted.',
+        descDE: 'Löscht die Flammen an dir. Wirkt nur, solange du es hast, und nur bei Leiden von Monstern bis zu der Stufe, die dein Anhänger-Rang bewältigt - ein niedriger Rang kann nichts entfernen, was ein höherstufiges Monster verursacht hat.',
+        sfx: 'heart_heals',
+    },
+    {
+        id: 'usp_thaw', icon: '🔆', theme: 'fire', element: 'fire', damageKind: 'fire',
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        cleanses: ['chill', 'frozen'], cleanseNameEn: 'Chill and Freeze', cleanseNameDe: 'Kälte und Frost',
+        tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
+        nameEn: 'Thaw', nameDE: 'Auftauen',
+        descEn: 'Melts the ice that grips you. Only works while you have it, and only on ailments inflicted by monsters up to the level your charm rank can handle - a low rank cannot cleanse what a higher-level monster inflicted.',
+        descDE: 'Lässt das Eis schmelzen, das dich festhält. Wirkt nur, solange du es hast, und nur bei Leiden von Monstern bis zu der Stufe, die dein Anhänger-Rang bewältigt - ein niedriger Rang kann nichts entfernen, was ein höherstufiges Monster verursacht hat.',
+        sfx: 'heart_heals',
+    },
+    {
+        id: 'usp_purify', icon: '✨', theme: 'holy', element: 'fire', damageKind: 'holy',
+        behavior: 'cleanse', selfCast: true, manaCost: 14, cooldownSeconds: 10,
+        cleanses: ['shocked', 'shadow', 'blind', 'confused', 'polymorph'], cleanseNameEn: 'Shock, Blindness, Confusion and Polymorph', cleanseNameDe: 'Schock, Blindheit, Verwirrung und Verwandlung',
+        tags: ['Spell', 'Holy', 'Support', 'Cleanse'], scalingTags: ['spell', 'holy', 'support'],
+        nameEn: 'Purify', nameDE: 'Läuterung',
+        descEn: 'Burns away shock, shadow blindness, confusion and polymorph. Only works while you have it, and only on ailments inflicted by monsters up to the level your charm rank can handle - a low rank cannot cleanse what a higher-level monster inflicted.',
+        descDE: 'Brennt Schock, Schattenblindheit, Verwirrung und Verwandlung fort. Wirkt nur, solange du es hast, und nur bei Leiden von Monstern bis zu der Stufe, die dein Anhänger-Rang bewältigt - ein niedriger Rang kann nichts entfernen, was ein höherstufiges Monster verursacht hat.',
+        sfx: 'heart_heals',
+    },
+
     // ── GAUNTLET (arena-only self-cast) ────────────────────────────────────
     // Gauntlet arenas have no puzzle grid, so reveal-projectile builds have
     // nothing to reveal there. This conjures temporary reveal cells in the
@@ -1151,7 +1205,24 @@ export function _uspSupportGroupTitle() {
 //------------------------------------------------------------------------
 
 // Behaviours handled as self-casts (no monster target required).
-const USP_SUPPORT_BEHAVIORS = ['heal', 'hot', 'shield', 'guard', 'evade', 'ward', 'thorns', 'gauntlet_reveal'];
+const USP_SUPPORT_BEHAVIORS = ['heal', 'hot', 'shield', 'guard', 'evade', 'ward', 'thorns', 'gauntlet_reveal', 'cleanse'];
+
+// Highest monster level whose ailments a cleanse of each charm rank (index =
+// rank - 1) can remove. Mirrors the monster levels at which the NEXT rank
+// starts dropping (CHARM_RANK_MIN_MONSTER_LEVEL in skill-charms.js), so a
+// rank always handles what the road produced before it; rank 10 handles all.
+const USP_CLEANSE_MAX_LEVEL_BY_RANK = [9, 21, 34, 49, 67, 73, 78, 83, 88, Infinity];
+function _uspCleanseMaxLevel(spell, rank) {
+    const r = Math.max(1, Math.min(10, _uspRankFor(spell.id, rank)));
+    return USP_CLEANSE_MAX_LEVEL_BY_RANK[r - 1];
+}
+// Lowest rank able to cleanse an ailment from a level-`level` monster.
+function _uspCleanseRankFor(level) {
+    for (let i = 0; i < USP_CLEANSE_MAX_LEVEL_BY_RANK.length; i++) {
+        if (USP_CLEANSE_MAX_LEVEL_BY_RANK[i] >= level) return i + 1;
+    }
+    return 10;
+}
 
 // Sweep cadence. Also the paused-clock compensation step (the whole sweep is
 // skipped while paused and every expiry is pushed forward by one tick instead).
@@ -1689,6 +1760,16 @@ function _uspApplySupportSpell(spell) {
             return `${de ? 'Vergeltung' : 'retribution'} ${thornsPct}%`;
         }
 
+        case 'cleanse': {
+            try {
+                if (typeof globalThis._egCleansePlayerAilments === 'function') {
+                    globalThis._egCleansePlayerAilments(spell.cleanses, _uspCleanseMaxLevel(spell));
+                }
+            } catch (e) { /* ailments module not ready */ }
+            _uspSupportCastFX(spell, de ? 'gereinigt' : 'cleansed', 'heal');
+            return `${de ? spell.cleanseNameDe : spell.cleanseNameEn} ${de ? 'entfernt' : 'removed'}`;
+        }
+
         case 'gauntlet_reveal': {
             const n = _uspGauntletCells(spell);
             let made = 0;
@@ -1742,6 +1823,14 @@ export function getUniversalSpellSupportEstimate(spellId) {
         case 'thorns':
             return { kind: 'thorns', thornsPct: _uspCalcThornsPct(spell), seconds: secs, rank,
                 lineEn: `Attackers take ${_uspCalcThornsPct(spell)}% of the damage they deal, for ${secs}s`, lineDe: `Angreifer erleiden ${_uspCalcThornsPct(spell)}% des ausgeteilten Schadens, für ${secs}s` };
+        case 'cleanse': {
+            const maxLv = _uspCleanseMaxLevel(spell);
+            const lim = Number.isFinite(maxLv) ? `monsters up to level ${maxLv}` : 'monsters of any level';
+            const limDe = Number.isFinite(maxLv) ? `Monstern bis Stufe ${maxLv}` : 'Monstern jeder Stufe';
+            return { kind: 'cleanse', maxLevel: maxLv, rank,
+                lineEn: `Removes ${spell.cleanseNameEn} inflicted by ${lim}`,
+                lineDe: `Entfernt ${spell.cleanseNameDe} von ${limDe}` };
+        }
         case 'gauntlet_reveal': {
             const n = _uspGauntletCells(spell);
             return { kind: 'gauntlet_reveal', cells: n, rank,
@@ -3183,6 +3272,32 @@ export function castUniversalSpell(spellId, opts) {
             return false;
         }
         return _uspBeginGroundTargeting(spell);
+    }
+
+    // Cleansing spells need an ailment they can actually remove; refused
+    // casts spend nothing and say why (nothing to cleanse / ailment too strong).
+    if (spell.cleanses) {
+        let plan = { removed: [], blocked: [] };
+        try {
+            if (typeof globalThis._egCleansePlayerAilments === 'function') {
+                plan = globalThis._egCleansePlayerAilments(spell.cleanses, _uspCleanseMaxLevel(spell), true);
+            }
+        } catch (e) { /* ailments module not ready */ }
+        if (!plan.removed.length) {
+            Audio_Manager.playSFX('spell_fizzle');
+            const de = typeof LANG !== 'undefined' && LANG === 'de';
+            let msg;
+            if (plan.blocked.length) {
+                const need = _uspCleanseRankFor(Math.max.apply(null, plan.blocked.map(b => b.level)));
+                msg = de ? `${spell.icon} Zu stark (Lv ${plan.blocked[0].level})! Braucht Rang ${need}`
+                         : `${spell.icon} Too strong (Lv ${plan.blocked[0].level})! Needs rank ${need}`;
+            } else {
+                msg = de ? `${spell.icon} Nichts zu reinigen!` : `${spell.icon} Nothing to cleanse!`;
+            }
+            if (typeof globalThis.showCombatToast === 'function') globalThis.showCombatToast(msg, '#ff8a65');
+            else if (typeof globalThis.showToast === 'function') globalThis.showToast(msg, '#ff8a65');
+            return false;
+        }
     }
 
     // Gauntlet-only spells refuse to cast anywhere else (puzzles, parry

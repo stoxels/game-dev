@@ -118,8 +118,10 @@ const EG_AILMENT_ICONS = {
 // one word in the data and two on screen); everything else title-cases.
 // Tooltip text for a player status chip: the name, plus what makes it special.
 function _egPlayerAilmentTip(key) {
-    if (key === 'bleed') return `${_egAilmentLabel(key)} - deals x${EG_AIL_BLEED_MOVING_MULT} damage while you move`;
-    return _egAilmentLabel(key);
+    const st = _egPlayerStatuses[key];
+    const lvl = st && st.srcLevel ? ` (Lv ${st.srcLevel})` : '';
+    if (key === 'bleed') return `${_egAilmentLabel(key)}${lvl} - deals x${EG_AIL_BLEED_MOVING_MULT} damage while you move`;
+    return `${_egAilmentLabel(key)}${lvl}`;
 }
 
 function _egAilmentLabel(key) {
@@ -316,6 +318,37 @@ function _egRollPlayerStunFromHit(lost) {
     if (chance > 0 && Math.random() * 100 < chance) _egStunPlayer();
 }
 
+// Level of the monster whose hit is being resolved right now (set around
+// _egRollMonsterHitAilment). Hazards and boss mechanics that apply ailments
+// outside a monster hit fall back to the encounter's monster level.
+let _egAilSrcLevel = 0;
+function _egAilmentSourceLevel() {
+    if (_egAilSrcLevel > 0) return _egAilSrcLevel;
+    try {
+        if (typeof globalThis._egGetEncounterBaseLevel === 'function') return Math.max(1, Number(globalThis._egGetEncounterBaseLevel()) || 1);
+    } catch (e) { /* fall through */ }
+    return 1;
+}
+
+// Cleansing: removes the listed ailments from the player when the monster
+// that inflicted them was at most `maxLevel`. Higher-level ailments stay
+// (and are reported as blocked). `dryRun` only reports.
+// Returns { removed: [keys], blocked: [{ key, level }] }.
+export function _egCleansePlayerAilments(keys, maxLevel, dryRun) {
+    const now = Date.now();
+    const removed = [];
+    const blocked = [];
+    (keys || []).forEach(key => {
+        const st = _egPlayerStatuses[key];
+        if (!st || !(st.until > now)) return;
+        const lvl = Number(st.srcLevel) || 1;
+        if (lvl <= maxLevel) removed.push(key);
+        else blocked.push({ key, level: lvl });
+    });
+    if (!dryRun) removed.forEach(key => { _egPlayerStatuses[key].until = now - 1; });
+    return { removed, blocked };
+}
+
 function _egApplyPlayerAilment(key, dps) {
     // Shadow Inoculation: immune to Shadow damage, so shadow-type ailments never land.
     if (key === 'shadow' || key === 'shadowburn' || key === 'poison') {
@@ -348,7 +381,12 @@ function _egApplyPlayerAilment(key, dps) {
         + (key === 'ignite' ? Number(playerStats.igniteDurationTakenPct) || 0 : 0)
         + (key === 'frozen' ? Number(playerStats.freezeDurationTakenPct) || 0 : 0);
     if (takenRed > 0) scaled *= Math.max(0.1, 1 - Math.min(90, takenRed) / 100);
+    // Remember the inflicting monster's level (a refresh can only raise it
+    // while the ailment is still running), so cleansing spells can compare.
+    const prevSt = _egPlayerStatuses[key];
+    const prevLevel = (prevSt && prevSt.until > Date.now()) ? (Number(prevSt.srcLevel) || 0) : 0;
     _egApplyStatusToMap(_egPlayerStatuses, key, scaled, dps);
+    _egPlayerStatuses[key].srcLevel = Math.max(prevLevel, _egAilmentSourceLevel());
     const ailSfx = ({ ignite: 'ail_ignite', bleed: 'ail_bleed', poison: 'ail_poison', chill: 'ail_chill',
         frozen: 'ail_freeze', shocked: 'ail_shock', shadowburn: 'ail_shadowburn', shadow: 'ail_shadow',
         polymorph: 'ail_polymorph', confused: 'ail_confuse' })[key];
@@ -789,6 +827,9 @@ function _egTryRetaliationWard(element, attacker) {
 }
 
 function _egRollMonsterHitAilment(element, dealt, attacker) {
+    // Applications below happen synchronously; the level is cleared right after.
+    _egAilSrcLevel = Number(attacker && attacker.level) || 0;
+    Promise.resolve().then(() => { _egAilSrcLevel = 0; });
     if (!_egIsActive() || !(dealt > 0)) return;
     // Physical hits (no element) can only bleed, and only from a real
     // attacker - self-inflicted physical damage never bleeds you.
