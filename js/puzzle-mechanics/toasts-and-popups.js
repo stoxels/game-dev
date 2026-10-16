@@ -184,11 +184,22 @@ function _combatToastContainer() {
     const r = grid ? grid.getBoundingClientRect() : null;
     if (r && r.width > 40 && r.height > 40) {
         box.style.left = Math.round(r.left + r.width / 2) + 'px';
-        box.style.bottom = Math.round(window.innerHeight - (r.top + r.height * 0.4)) + 'px';
+        // Near the grid's upper border (the stack grows upward from here).
+        box.style.bottom = Math.round(window.innerHeight - (r.top + r.height * 0.3)) + 'px';
     } else {
         box.style.left = box.style.bottom = '';
     }
     return box;
+}
+
+// Colour coding when the caller gave none: green = something went your way
+// (dodge, block, heal, kill), red = you are being hurt, amber = a boss /
+// mechanic announcement.
+function _combatToastColor(msg) {
+    const m = String(msg);
+    if (/dodg|block|parr|deflect|fate negates|negat|heal|\+\d|burned out|crumbled|destroyed|survived|cleansed|removed|dispelled|slain|defeated|hearts|ausgewichen|geblockt|pariert|geheilt/i.test(m)) return '#4ade80';
+    if (/-\d|damage|hits you|struck|drain|enrage|raserei|erased|corrupt|bleed|poison|burn|frozen|shock|stun|bomb|explod|detonat|schaden|entzogen/i.test(m)) return '#f87171';
+    return '#fbbf24';
 }
 
 function _dropCombatToast(entry) {
@@ -210,8 +221,9 @@ export function showCombatToast(msg, accentColor) {
     const el = document.createElement('div');
     el.className = 'combat-toast-msg';
     el.textContent = msg;
-    if (accentColor) el.style.color = accentColor;
-    _playToastSfx(accentColor);
+    const color = accentColor || _combatToastColor(msg);
+    el.style.color = color;
+    _playToastSfx(color);
     box.appendChild(el);
 
     const entry = { msg, el, timeoutId: null };
