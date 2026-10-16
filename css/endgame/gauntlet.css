@@ -208,3 +208,32 @@ body.gauntlet-open #puzzle-scaler-wrap { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
     .gauntlet-arena { animation: none; }
 }
+
+/* Summon Reveal Cells (Gauntlet-only spell): temporary reveal cells that
+   materialise on the arena floor, fire a reveal projectile, then fade. */
+.ga-summon-cell {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 2px solid #8fd3ff;
+    background: radial-gradient(circle at 50% 40%, rgba(160, 220, 255, 0.85), rgba(70, 110, 220, 0.55));
+    box-shadow: 0 0 14px rgba(120, 190, 255, 0.85), inset 0 0 10px rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    transform: scale(0.3);
+    animation: ga-summon-in 0.32s ease-out forwards;
+}
+.ga-summon-cell.ga-summon-fire {
+    animation: ga-summon-out 0.6s ease-in forwards;
+}
+@keyframes ga-summon-in {
+    to { opacity: 1; transform: scale(1); }
+}
+@keyframes ga-summon-out {
+    from { opacity: 1; transform: scale(1); }
+    40% { opacity: 1; transform: scale(1.25); box-shadow: 0 0 26px rgba(200, 235, 255, 1); }
+    to { opacity: 0; transform: scale(0.6); }
+}

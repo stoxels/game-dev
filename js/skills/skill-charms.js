@@ -202,7 +202,10 @@ export const SPELL_RANK_MANA_MULT = [1.00, 1.20, 1.70, 2.70, 3.80, 5.20, 5.80, 6
 //     usp_fireball: [20, 24, 32, 50, 70, 95, 105, 118, 130, 145],
 //     usp_meteor:   [null, null, null, 120, null, null, null, null, null, 520],
 // Keys are skill ids (universal 'usp_*' spells, class abilities, Heartbloom).
-export const SPELL_MANA_COST_OVERRIDES = {};
+export const SPELL_MANA_COST_OVERRIDES = {
+    // Summon Reveal Cells: roughly 8 mana per summoned cell (rank = cells).
+    usp_gauntlet_reveal: [8, 16, 24, 32, 40, 48, 56, 64, 72, 80],
+};
 
 // Relative chance a monster drops each rank's charm. Normal monsters skew hard
 // to low ranks; bosses roll a linear table so high ranks are a boss-farm

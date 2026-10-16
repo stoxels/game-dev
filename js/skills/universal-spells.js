@@ -738,6 +738,23 @@ export const UNIVERSAL_SPELL_DEFS = [
         sfx: 'dofBurn',
     },
 
+    // ── GAUNTLET (arena-only self-cast) ────────────────────────────────────
+    // Gauntlet arenas have no puzzle grid, so reveal-projectile builds have
+    // nothing to reveal there. This conjures temporary reveal cells in the
+    // arena that fire the normal reveal-projectile volley. It never touches a
+    // real puzzle: it cannot be cast outside an arena and the cells are pure
+    // arena decoration that vanish right after they fire. Rank = cell count.
+    {
+        id: 'usp_gauntlet_reveal', icon: '🔎', theme: 'arcane', element: 'shadow', damageKind: 'shadow',
+        behavior: 'gauntlet_reveal', selfCast: true, manaCost: 8, cooldownSeconds: 15,
+        gauntletOnly: true,
+        tags: ['Spell', 'Arcane', 'Support', 'Gauntlet'], scalingTags: ['spell', 'arcane', 'support'],
+        nameEn: 'Summon Reveal Cells', nameDE: 'Aufdeckzellen beschwören',
+        descEn: 'Gauntlet only. Conjures reveal cells in the arena that each fire a reveal projectile at your target - the answer to reveal builds having no puzzle to reveal. One cell per charm rank (1-10); a higher rank costs more mana.',
+        descDE: 'Nur im Gauntlet. Beschwört Aufdeckzellen in der Arena, die jeweils ein Aufdeck-Projektil auf dein Ziel feuern - die Antwort für Aufdeck-Builds, die dort kein Rätsel zum Aufdecken haben. Eine Zelle pro Anhänger-Rang (1-10); höhere Ränge kosten mehr Mana.',
+        sfx: 'arcaneReveal',
+    },
+
     // ── MOVEMENT (repositioning self-casts) ──────────────────────────────
     // No monster target and no damage: these move YOU. They exist because
     // damage against the player is resolved against the SPRITE'S HITBOX
@@ -1134,7 +1151,7 @@ export function _uspSupportGroupTitle() {
 //------------------------------------------------------------------------
 
 // Behaviours handled as self-casts (no monster target required).
-const USP_SUPPORT_BEHAVIORS = ['heal', 'hot', 'shield', 'guard', 'evade', 'ward', 'thorns'];
+const USP_SUPPORT_BEHAVIORS = ['heal', 'hot', 'shield', 'guard', 'evade', 'ward', 'thorns', 'gauntlet_reveal'];
 
 // Sweep cadence. Also the paused-clock compensation step (the whole sweep is
 // skipped while paused and every expiry is pushed forward by one tick instead).
@@ -1586,6 +1603,11 @@ function _uspForceBuffIconRefresh() {
 // Cast application
 // ---------------------------------------------------------------------
 
+// Reveal cells summoned at the slotted charm's rank: one per rank, 1..10.
+function _uspGauntletCells(spell, rank) {
+    return Math.max(1, Math.min(10, _uspRankFor(spell.id, rank)));
+}
+
 // Applies a support spell's effect. Called from castUniversalSpell once the
 // mana and the cooldown are committed. Returns a short toast-ready summary.
 function _uspApplySupportSpell(spell) {
@@ -1667,6 +1689,15 @@ function _uspApplySupportSpell(spell) {
             return `${de ? 'Vergeltung' : 'retribution'} ${thornsPct}%`;
         }
 
+        case 'gauntlet_reveal': {
+            const n = _uspGauntletCells(spell);
+            let made = 0;
+            try {
+                if (typeof globalThis._egGauntletSummonRevealCells === 'function') made = globalThis._egGauntletSummonRevealCells(n);
+            } catch (e) { /* arena vanished mid-cast */ }
+            return `${made} ${de ? (made === 1 ? 'Aufdeckzelle' : 'Aufdeckzellen') : (made === 1 ? 'reveal cell' : 'reveal cells')}`;
+        }
+
         default:
             return '';
     }
@@ -1711,6 +1742,12 @@ export function getUniversalSpellSupportEstimate(spellId) {
         case 'thorns':
             return { kind: 'thorns', thornsPct: _uspCalcThornsPct(spell), seconds: secs, rank,
                 lineEn: `Attackers take ${_uspCalcThornsPct(spell)}% of the damage they deal, for ${secs}s`, lineDe: `Angreifer erleiden ${_uspCalcThornsPct(spell)}% des ausgeteilten Schadens, für ${secs}s` };
+        case 'gauntlet_reveal': {
+            const n = _uspGauntletCells(spell);
+            return { kind: 'gauntlet_reveal', cells: n, rank,
+                lineEn: `Summons ${n} reveal cell${n === 1 ? '' : 's'} - each fires a reveal projectile (Gauntlet only)`,
+                lineDe: `Beschwört ${n} Aufdeckzelle${n === 1 ? '' : 'n'} - jede feuert ein Aufdeck-Projektil (nur Gauntlet)` };
+        }
         default:
             return null;
     }
@@ -3146,6 +3183,20 @@ export function castUniversalSpell(spellId, opts) {
             return false;
         }
         return _uspBeginGroundTargeting(spell);
+    }
+
+    // Gauntlet-only spells refuse to cast anywhere else (puzzles, parry
+    // training, between waves) - before any mana or cooldown is spent.
+    if (spell.gauntletOnly) {
+        let inArena = false;
+        try { inArena = typeof globalThis._egGauntletFighting === 'function' && globalThis._egGauntletFighting(); } catch (e) {}
+        if (!inArena) {
+            Audio_Manager.playSFX('spell_fizzle');
+            const msg = (typeof LANG !== 'undefined' && LANG === 'de') ? '🔎 Nur im Gauntlet nutzbar!' : '🔎 Gauntlet only!';
+            if (typeof globalThis.showCombatToast === 'function') globalThis.showCombatToast(msg, '#ff8a65');
+            else if (typeof globalThis.showToast === 'function') globalThis.showToast(msg, '#ff8a65');
+            return false;
+        }
     }
 
     // Mana (life under Blood Magic) gate - spend nothing on failure.

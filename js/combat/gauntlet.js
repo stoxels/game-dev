@@ -221,6 +221,60 @@ function _installMeleeHooks() {
 }
 _installMeleeHooks();
 
+// True while a real Gauntlet fight is running (not the parry training and not
+// the briefing / between-wave moments). Gauntlet-only spells gate on this.
+export function _egGauntletFighting() {
+    return !!(_g.active && _g.fighting && !_g.parryMode && _g.overlay);
+}
+
+// Gauntlet-only spell support: conjures `count` temporary reveal cells on the
+// arena floor and fires the normal reveal-projectile volley from them (the
+// arena has no puzzle grid, so reveal builds have nothing to reveal here).
+// The cells are plain decoration - they never touch the puzzle grid and are
+// gone right after the volley. Returns how many cells were created.
+const _SUMMON_CELL_PX = 44;
+export function _egGauntletSummonRevealCells(count) {
+    if (!_egGauntletFighting()) return 0;
+    const n = Math.max(1, Math.min(10, Math.round(Number(count) || 1)));
+    const arena = _g.overlay;
+    const w = arena.clientWidth;
+    const h = arena.clientHeight;
+    const padX = 40;
+    const top = _CARD_BAND_PX + 20;
+    const stamp = Date.now();
+    const cells = [];
+    const placed = [];
+    for (let i = 0; i < n; i++) {
+        // Rejection-sample a spot that does not overlap an earlier cell.
+        let x = 0;
+        let y = 0;
+        for (let tries = 0; tries < 12; tries++) {
+            x = padX + Math.random() * Math.max(1, w - padX * 2 - _SUMMON_CELL_PX);
+            y = top + Math.random() * Math.max(1, h - top - 40 - _SUMMON_CELL_PX);
+            if (!placed.some(p => Math.abs(p.x - x) < _SUMMON_CELL_PX + 6 && Math.abs(p.y - y) < _SUMMON_CELL_PX + 6)) break;
+        }
+        placed.push({ x, y });
+        const el = document.createElement('div');
+        el.id = `ga-summon-cell-${stamp}-${i}`;
+        el.className = 'ga-summon-cell';
+        el.style.left = `${Math.round(x)}px`;
+        el.style.top = `${Math.round(y)}px`;
+        el.style.animationDelay = `${i * 40}ms`;
+        arena.appendChild(el);
+        cells.push(el);
+    }
+    // Let the cells materialise, then shoot from them and fade them out.
+    setTimeout(() => {
+        const live = cells.filter(c => c.isConnected).map(c => c.id);
+        if (live.length && typeof globalThis._egOnProgrammaticReveal === 'function') {
+            globalThis._egOnProgrammaticReveal(live, 'ability');
+        }
+        cells.forEach(c => c.classList.add('ga-summon-fire'));
+        setTimeout(() => cells.forEach(c => c.remove()), 700);
+    }, 420);
+    return n;
+}
+
 // True when the current level's gauntlet bonus can actually be played
 // (monsterless runs have no beasts, so the bonus cannot be earned there).
 export function _egGauntletPlayable() {
