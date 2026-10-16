@@ -3207,7 +3207,21 @@ body.eg-cursor-shocked .gc {
 }
 .eg-ail-banner-ignite, .eg-ail-banner-shadowburn { --ail: #ff6b35; }
 .eg-ail-banner-shadowburn { --ail: #9433c7; }
-.eg-ail-banner-bleed { --ail: #d6293a; }
+.eg-ail-banner-bleed { --ail: #d6293a; width: 290px; margin-left: -145px; }
+.eg-ail-banner-sub {
+    font: 900 .7rem monospace;
+    letter-spacing: .08em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.45);
+    color: #ffb4bb;
+}
+.eg-ail-banner.eg-ail-moving { animation: eg-ail-bleed-pulse .55s ease-in-out infinite alternate; }
+.eg-ail-banner.eg-ail-moving .eg-ail-banner-sub { background: #d6293a; color: #fff; }
+@keyframes eg-ail-bleed-pulse {
+    from { box-shadow: 0 0 8px color-mix(in srgb, var(--ail) 45%, transparent); filter: brightness(1); }
+    to   { box-shadow: 0 0 22px var(--ail); filter: brightness(1.35); }
+}
 .eg-ail-banner-poison { --ail: #5fcf3c; }
 .eg-ail-banner-chill, .eg-ail-banner-frozen { --ail: #60c8ff; }
 .eg-ail-banner-shocked { --ail: #fde047; }

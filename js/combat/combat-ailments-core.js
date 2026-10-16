@@ -116,6 +116,12 @@ const EG_AILMENT_ICONS = {
 
 // The display name of an ailment. Only shadowburn needs the mapping (it is
 // one word in the data and two on screen); everything else title-cases.
+// Tooltip text for a player status chip: the name, plus what makes it special.
+function _egPlayerAilmentTip(key) {
+    if (key === 'bleed') return `${_egAilmentLabel(key)} - deals x${EG_AIL_BLEED_MOVING_MULT} damage while you move`;
+    return _egAilmentLabel(key);
+}
+
 function _egAilmentLabel(key) {
     if (key === 'shadowburn') return 'Shadow Burn';
     return String(key || '').charAt(0).toUpperCase() + String(key || '').slice(1);
@@ -409,7 +415,7 @@ function _egRenderPlayerAilmentChips() {
             chip = document.createElement('div');
             chip.id = `eg-status-ail-${key}`;
             chip.className = `eg-status-chip eg-status-chip-${key}`;
-            chip.setAttribute('data-tip', globalThis._tipAttr(_egAilmentLabel(key)));
+            chip.setAttribute('data-tip', globalThis._tipAttr(_egPlayerAilmentTip(key)));
             chip.innerHTML = `
                 <div class="eg-lockout-icon">${EG_AILMENT_ICONS[key] || ''}</div>
                 <div class="eg-lockout-countdown"></div>`;
@@ -1121,7 +1127,7 @@ function _egSyncAilmentBanners() {
             el.className = `eg-ail-banner eg-ail-banner-${key}`;
             el.dataset.key = key;
             el.innerHTML = '<div class="eg-ail-banner-bar"></div>'
-                + `<div class="eg-ail-banner-text"><span class="eg-ail-banner-icon">${EG_AILMENT_ICONS[key] || ''}</span><span class="eg-ail-banner-label"></span></div>`;
+                + `<div class="eg-ail-banner-text"><span class="eg-ail-banner-icon">${EG_AILMENT_ICONS[key] || ''}</span><span class="eg-ail-banner-label"></span>${key === 'bleed' ? `<span class="eg-ail-banner-sub">x${EG_AIL_BLEED_MOVING_MULT} MOVING</span>` : ''}</div>`;
             box.appendChild(el);
         }
         el.style.transform = `translateY(${-idx * EG_AIL_BANNER_STEP_PX}px)`;
@@ -1129,6 +1135,8 @@ function _egSyncAilmentBanners() {
         const total = Math.max(st.totalMs || 0, remaining, 1);
         el.firstChild.style.width = `${Math.max(0, Math.min(100, remaining / total * 100)).toFixed(1)}%`;
         const stacks = st.stacks > 1 ? ` ×${st.stacks}` : '';
+        // Bleed: pulse while the hero moves (the x3 damage is live).
+        if (key === 'bleed') el.classList.toggle('eg-ail-moving', _egIsAvatarMoving());
         const label = el.querySelector('.eg-ail-banner-label');
         const text = EG_AIL_BANNER_TEXT[key] + stacks;
         if (label.textContent !== text) label.textContent = text;
