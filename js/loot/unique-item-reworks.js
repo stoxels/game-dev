@@ -683,7 +683,7 @@ const COMPACT_REWORKS = {
     pebble_of_patience: ['B', 'first_step faster_absorption_regen_start', 'first_step_time:1', ''],
     prayer_beads_of_pending_results: ['M', 'warding faster_absorption_regen_start fate', 'low_life_regen_pct:4 life_pulse:5 absorption_on_line:12', ''],
     rabbits_unlucky_foot: ['M', 'fate', 'lucky_tile_reward:20 cell_on_kill:8', ''],
-    sigil_of_the_unbound_hour: ['W', 'time_added first_step', 'time_on_kill:1 time_on_elite:5 first_step_time:5 damage_low_time:25', ''],
+    sigil_of_the_unbound_hour: ['W', 'time_added first_step', 'time_on_kill:30 time_on_elite:120 first_step_time:5 damage_low_time:25', ''],
 
     // weapons
     apex_predator_fang: ['S', 'crit_chance life_leech inc_physical_damage', 'bleed_chance_melee:20 crit_vs_bleeding:12 crit_multi_vs_bleeding:30', ''],
@@ -883,8 +883,8 @@ function timerFloor(level, tiers) { return level < 20 ? tiers[0] : level < 40 ? 
 const TIMER_FLOORS = {
     first_step_time: [30, 60, 60, 60],
     quiz_time: [60, 60, 90, 120],
-    time_on_kill: [2, 2, 3, 4],
-    time_on_elite: [15, 15, 20, 30],
+    time_on_kill: [10, 10, 15, 20],
+    time_on_elite: [45, 45, 60, 90],
     freeze_timer_on_stun: [3, 3, 3, 4],
 };
 function normalizeTimers(def) {
