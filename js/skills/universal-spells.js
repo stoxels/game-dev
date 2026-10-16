@@ -2522,9 +2522,6 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     const critMult = _uspRollCritMult();
     const isCrit = critMult > 1;
     dmg *= critMult;
-    if (isCrit && typeof globalThis.showToast === 'function') {
-        try { globalThis.showToast('💥 Critical Hit!'); } catch (e) { /* toast is best-effort */ }
-    }
 
     try {
         if (typeof globalThis._egMapPlayerDamageMult === 'function') dmg *= globalThis._egMapPlayerDamageMult();

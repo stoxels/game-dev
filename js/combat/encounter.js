@@ -43,8 +43,8 @@ export function _egShowDamageNumber(monsterId, amount, isCrit, elements) {
     dmgText.style.marginLeft = `${(Math.random() * 18 - 9).toFixed(1)}px`;
     dmgText.style.marginTop = `${(Math.random() * 6 - 3).toFixed(1)}px`;
     card.appendChild(dmgText);
-    // crit numbers linger a touch longer
-    setTimeout(() => dmgText.remove(), isCrit ? EG_DAMAGE_NUMBER_DURATION_MS + 180 : EG_DAMAGE_NUMBER_DURATION_MS);
+    // crit numbers linger longer (matches damage-float-crit, 1.5s)
+    setTimeout(() => dmgText.remove(), isCrit ? EG_DAMAGE_NUMBER_DURATION_MS + 480 : EG_DAMAGE_NUMBER_DURATION_MS);
 }
 
 // Removes and re-adds a CSS flash class to force the animation to restart.

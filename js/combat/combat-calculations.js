@@ -110,8 +110,6 @@ export function _egCalcPlayerDamage() {
 
     dmg = Math.max(1, Math.round(dmg));
 
-    if (critMult > 1 && typeof showToast === 'function') globalThis.showToast('💥 Critical Hit!');
-
     if ((stats.manaLeechAttackPct || 0) > 0) _egLeechMana(stats, dmg, stats.manaLeechAttackPct);
     // Life leech - heal the player for a % of the damage about to be dealt.
     if (stats.lifeLeechPct > 0 && (stats.lifeLeechAsAbsorption || 0) > 0) {
@@ -278,10 +276,6 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     if (typeof _egQuizDamageBuffMult === 'function') dmg *= _egQuizDamageBuffMult();
 
     dmg = Math.max(1, Math.round(dmg));
-
-    // Crit toast only on (near-)full charges - chip-hit crits would spam it
-    // while machine-tapping E.
-    if (critMult > 1 && charge >= 0.99 && typeof showToast === 'function') globalThis.showToast('💥 Critical Hit!');
 
     // Life leech - heal the player for a % of the damage about to be dealt.
     // Melee strikes also add the tree's melee-only leech (lifeLeechMeleePct).
