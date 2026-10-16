@@ -145,7 +145,7 @@ import { EG_BOSS_TEST_TIME_LIMIT, EG_BOSS_TEST_TIER_LEVELS, EG_BOSS_TEST_DEFAULT
 import { _egbtTr, _egbtGetSpecialPhaseInfo } from '../../js/combat/combat-boss-test-phases.js';
 import { _egCleanupBossTestSeedLevel, _egbtPickArenaGi, _egLaunchBossTest } from '../../js/combat/combat-boss-test-launch.js';
 import { _egbtBuildBossTooltipHTML, _egbtShowTooltip, _egbtToggleTestHP, _egbtBossIconHTML, _egbtBuildBossCardHTML, _egbtBuildSections, _egbtBuildSectionHTML, _egbtRenderGrid, _egbtBuildFullScreenHTML, _egbtEnsureStyles } from '../../js/combat/combat-boss-test-ui.js';
-import { EG_CLASS_PROJECTILES, _egGetProjectileDef, _egGetElementCentre, _egFireProjectile } from '../../js/combat/combat-class-projectiles.js';
+import { EG_CLASS_PROJECTILES, _egGetProjectileDef, _egGetElementCentre, _egGetElementRestCentre, _egFireProjectile } from '../../js/combat/combat-class-projectiles.js';
 import { EG_REVEAL_PROJECTILE_DAMAGE_PCT, EG_REVEAL_PROJECTILE_MAX, EG_REVEAL_PROJECTILE_STAGGER_MS, EG_REVEAL_PCT_PER_FLAT_SPELL_DMG, EG_REVEAL_PCT_PER_INC_SPELL_DMG, _egGetRevealProjectileDamagePct, _egOnProgrammaticReveal, _egFlushPendingRevealProjectiles } from '../../js/combat/combat-class-projectiles-reveal.js';
 import { _egLastHitElements, _egLastHitWasCrit, _egLastHitCritMult, _egCrossoverDamageMult, _egCalcPlayerDamage, _egLastMeleeElements, _egLastMeleeWasCrit, _egLastMeleeCritMult, _egCalcPlayerMeleeDamage } from '../../js/combat/combat-calculations.js';
 import { EG_RESIST_CAP_PCT, _egGetPlayerResistCap, EG_ELEMENTS, _egRollElementalBreakdown, _egGetElementalDamageBonus, _egScaleElements, _egApplyTargetResistances, _egCalcPlayerResistanceReduction } from '../../js/combat/combat-calculations-resistances.js';

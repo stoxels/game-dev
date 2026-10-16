@@ -15,7 +15,7 @@ import { t } from '../translation/translations.js';
 import { _egGetTarget, _egRollPlayerMiss, _egUpdateChargedProjectileVisual } from './encounter-charged-shot.js';
 import { _egPlayerTakeDamage } from './encounter-damage.js';
 import { _egDamageTargetById, _egShowStatusLabel } from './encounter-monster-damage.js';
-import { _egFireProjectile, _egGetElementCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
+import { _egFireProjectile, _egGetElementCentre, _egGetElementRestCentre, _egGetProjectileDef } from './combat-class-projectiles.js';
 import { _egCalcPlayerDamage, _egLastHitElements, _egLastHitWasCrit } from './combat-calculations.js';
 import { EG_ELEMENTS, _egScaleElements, _egSecondaryDamage } from './combat-calculations-resistances.js';
 import { _egRestartFlashClass } from './encounter.js';
@@ -214,7 +214,7 @@ export function _egAnimatePlayerProjectile(damage, targetId, row, col, sourceElO
     }
 
     const start = _egGetElementCentre(sourceEl);
-    const end = _egGetElementCentre(targetCard);
+    const end = _egGetElementRestCentre(targetCard);
     // Optional explicit visual: callers like the tutorial Fireball pass
     // opts.projDef so their shot doesn't fall back to the generic/reveal
     // projectile look (see _tqCastFireball in tutorial-quest.js).

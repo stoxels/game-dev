@@ -2,7 +2,6 @@ import { trackAchStat } from '../achievements/achievements.js';
 import { Audio_Manager } from '../audio/audio.js';
 import { _uspBuildSupportStatusIconsHTML, _uspSupportStatusSignature } from '../skills/universal-spells.js';
 import { cancelHoldCast, isHoldCasting } from '../skills/spell-casttime.js';
-import { t } from '../translation/translations.js';
 import { _egMaybeShowAbsorptionBroken } from './encounter-overlays.js';
 import { _egGameOver, _egKillMonster, _egPlayerTakeDamage, _egShowDamageNumber } from './encounter.js';
 import { _egGetActiveMapModValue, _egHasActiveMapMod } from '../endgame/endgame-map-launch.js';
@@ -145,6 +144,7 @@ function _egApplyStatusToMap(statusMap, key, durationS, dps) {
         ? window.DEV_EFFECT_TIME_SCALE : 1;
     statusMap[key] = {
         until: Date.now() + durationS * scale * 1000,
+        totalMs: durationS * scale * 1000,   // banner bar fill reference
         dps: dps || 0,
         acc: (statusMap[key] && statusMap[key].until > Date.now()) ? (statusMap[key].acc || 0) : 0,
     };
@@ -300,7 +300,6 @@ function _egStunPlayer(durationS = EG_AIL_STUN_DURATION_S) {
     globalThis._egPlayerCurrentCharge = 0;
     globalThis._egPlayerStunnedUntil = now + d * 1000;
     try { if (typeof isHoldCasting === 'function' && isHoldCasting()) cancelHoldCast(); } catch (e) { /* best-effort */ }
-    globalThis.showToast(t('eg_stunned'));
     Audio_Manager.playSFX('ail_stun');
     return true;
 }
@@ -349,10 +348,8 @@ function _egApplyPlayerAilment(key, dps) {
         polymorph: 'ail_polymorph', confused: 'ail_confuse' })[key];
     if (ailSfx) Audio_Manager.playSFX(ailSfx);
     _egStartPlayerStatusBarTicker();
-    _egShowPlayerAilmentOverlay(key);
     if (key === 'ignite') _egStartPlayerFireDrops();
     if (key === 'shadow') _egStartPlayerShadowClouds();
-    globalThis.showToast(`${EG_AILMENT_ICONS[key] || ''} ${key === 'shadowburn' ? 'Shadow Burn' : key === 'polymorph' ? 'Polymorph - the encounter turns chaotic!' : key.charAt(0).toUpperCase() + key.slice(1)}!`);
 }
 
 
@@ -386,6 +383,7 @@ function _egStartPlayerStatusBarTicker() {
 // Syncs the ailment chips with _egPlayerStatuses; stops itself when empty.
 function _egRenderPlayerAilmentChips() {
     if (!_egIsActive()) { _egStopPlayerStatusBarTicker(); return; }
+    _egSyncAilmentBanners();
 
     const bar = document.getElementById('eg-player-status-bar');
     if (!bar) {
@@ -433,6 +431,8 @@ function _egStopPlayerStatusBarTicker() {
     }
     const bar = document.getElementById('eg-player-status-bar');
     if (bar) bar.remove();
+    const banners = document.getElementById('eg-ail-banners');
+    if (banners) banners.remove();
 }
 
 // True while the player is polymorphed: monsters attack each other and the
@@ -1070,23 +1070,82 @@ function _egRefreshPlayerStatusIcons() {
     // existing per-tick DOM patch instead of adding a second ticker.
     const supportSig = (typeof _uspSupportStatusSignature === 'function') ? _uspSupportStatusSignature() : '';
     const supportHtml = (typeof _uspBuildSupportStatusIconsHTML === 'function') ? _uspBuildSupportStatusIconsHTML() : '';
-    const sig = `${_egStatusSignature(_egPlayerStatuses)}|${supportSig}`;
+    const sig = supportSig;
     if (strip.dataset.sig === sig) return;
     strip.dataset.sig = sig;
-    strip.innerHTML = supportHtml + _egBuildStatusIconsHTML(_egPlayerStatuses);
+    // Timed ailments are shown as big banners above the sprite instead
+    // (_egSyncAilmentBanners); the strip only carries support-spell buffs.
+    strip.innerHTML = supportHtml;
 }
 
-function _egShowPlayerAilmentOverlay(key) {
-    const text = { ignite: 'BURNING', chill: 'CHILLED', shocked: 'SHOCKED', shadow: 'BLINDED', confused: 'CONFUSED' }[key];
-    if (!text) return;
-    const old = document.getElementById('eg-player-ailment-overlay');
-    if (old) old.remove();
-    const el = document.createElement('div');
-    el.id = 'eg-player-ailment-overlay';
-    el.className = `eg-player-ailment-overlay eg-player-ailment-${key}`;
-    el.textContent = text;
-    document.body.appendChild(el);
-    setTimeout(() => { if (el.isConnected) el.remove(); }, 1800);
+// Big readable ailment banners above the player sprite. One banner per active
+// timed ailment, stacked upward (soonest-ending nearest the sprite), each with
+// a bar that drains right-to-left as the effect runs out. Driven by the
+// 100 ms status ticker; layout/animation is pure CSS (.eg-ail-banner*).
+const EG_AIL_BANNER_TEXT = {
+    ignite: 'BURNING', bleed: 'BLEEDING', poison: 'POISONED', chill: 'CHILLED',
+    frozen: 'FROZEN', shocked: 'SHOCKED', shadowburn: 'SHADOW BURN', shadow: 'BLINDED',
+    polymorph: 'POLYMORPHED', confused: 'CONFUSED', blind: 'BLINDED', stunned: 'STUNNED',
+};
+const EG_AIL_BANNER_MAX = 4;          // more than this collapse into a "+N" chip
+const EG_AIL_BANNER_STEP_PX = 40;     // banner height + gap (keep in sync with CSS)
+
+function _egSyncAilmentBanners() {
+    const hud = document.getElementById('player-avatar-wrapper');
+    if (!hud) return;
+    let box = document.getElementById('eg-ail-banners');
+    if (!box) {
+        box = document.createElement('div');
+        box.id = 'eg-ail-banners';
+        hud.appendChild(box);
+    }
+    const now = Date.now();
+    const live = Object.keys(_egPlayerStatuses)
+        .filter(key => EG_AIL_BANNER_TEXT[key] && _egPlayerStatuses[key].until > now)
+        .sort((a, b) => _egPlayerStatuses[a].until - _egPlayerStatuses[b].until);
+    const shown = live.slice(0, EG_AIL_BANNER_MAX);
+    const hidden = live.length - shown.length;
+
+    // Retire banners whose ailment ended (fade out, then remove).
+    box.querySelectorAll('.eg-ail-banner:not(.leaving)').forEach(el => {
+        if (shown.includes(el.dataset.key)) return;
+        el.classList.add('leaving');
+        setTimeout(() => el.remove(), 320);
+    });
+
+    shown.forEach((key, idx) => {
+        const st = _egPlayerStatuses[key];
+        let el = box.querySelector(`.eg-ail-banner[data-key="${key}"]:not(.leaving)`);
+        if (!el) {
+            el = document.createElement('div');
+            el.className = `eg-ail-banner eg-ail-banner-${key}`;
+            el.dataset.key = key;
+            el.innerHTML = '<div class="eg-ail-banner-bar"></div>'
+                + `<div class="eg-ail-banner-text"><span class="eg-ail-banner-icon">${EG_AILMENT_ICONS[key] || ''}</span><span class="eg-ail-banner-label"></span></div>`;
+            box.appendChild(el);
+        }
+        el.style.transform = `translateY(${-idx * EG_AIL_BANNER_STEP_PX}px)`;
+        const remaining = st.until - now;
+        const total = Math.max(st.totalMs || 0, remaining, 1);
+        el.firstChild.style.width = `${Math.max(0, Math.min(100, remaining / total * 100)).toFixed(1)}%`;
+        const stacks = st.stacks > 1 ? ` ×${st.stacks}` : '';
+        const label = el.querySelector('.eg-ail-banner-label');
+        const text = EG_AIL_BANNER_TEXT[key] + stacks;
+        if (label.textContent !== text) label.textContent = text;
+    });
+
+    let more = box.querySelector('.eg-ail-banner-more');
+    if (hidden > 0) {
+        if (!more) {
+            more = document.createElement('div');
+            more.className = 'eg-ail-banner-more';
+            box.appendChild(more);
+        }
+        more.textContent = `+${hidden}`;
+        more.style.transform = `translateY(${-shown.length * EG_AIL_BANNER_STEP_PX}px)`;
+    } else if (more) {
+        more.remove();
+    }
 }
 
 function _egGetPlayerRectForAilment() {

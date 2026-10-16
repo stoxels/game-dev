@@ -280,7 +280,14 @@ export function _egAnimateMonsterMelee(monster) {
         { transform: 'translate(0px, 0px) scale(1)' }
     ], { duration: EG_MELEE_ANIM_DURATION_MS, easing: 'ease-in-out' });
 
-    anim.onfinish = () => { sourceCard.style.zIndex = ''; };
+    // Flag the lunge so player projectiles aim at the card's resting spot
+    // (see _egGetElementRestCentre) instead of its fast mid-dash position.
+    sourceCard.dataset.egLunging = '1';
+    anim.onfinish = () => {
+        sourceCard.style.zIndex = '';
+        delete sourceCard.dataset.egLunging;
+    };
+    anim.oncancel = anim.onfinish;
 
     // Damage fires at the animation midpoint so it matches the visual impact
     setTimeout(() => _egApplyMeleeImpact(monster), EG_MELEE_ANIM_DURATION_MS / 2);

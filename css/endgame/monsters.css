@@ -1467,9 +1467,6 @@
 
 
 /* Player elemental ailment feedback */
-.eg-player-ailment-overlay { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 9500; pointer-events: none; font: 900 2.2rem monospace; letter-spacing: .18em; text-shadow: 0 0 8px #000, 0 0 18px currentColor; animation: eg-ailment-pop 1.8s ease-out forwards; }
-.eg-player-ailment-ignite { color: #ff6b35; } .eg-player-ailment-chill { color: #8be9ff; } .eg-player-ailment-shocked { color: #ffe66d; } .eg-player-ailment-shadow, .eg-player-ailment-confused { color: #c084fc; }
-@keyframes eg-ailment-pop { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.7); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%,-65%) scale(1.08); } }
 .eg-player-ground { position: fixed; width: 110px; height: 42px; margin: -21px 0 0 -55px; border-radius: 50%; pointer-events: none; z-index: 850; opacity: .8; animation: eg-ground-pulse 1s ease-in-out infinite alternate; }
 .eg-player-ground-fire { width: 82px; height: 82px; margin: -41px 0 0 -41px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(255,180,40,.38), rgba(150,20,0,.22) 62%, transparent 76%); box-shadow: 0 0 18px rgba(255,69,31,.95), 0 0 42px rgba(255,120,20,.75); }
 .eg-player-ground-fire::before { content: '🔥'; font-size: 3.8rem; line-height: 1; filter: drop-shadow(0 0 7px #ff451f); animation: eg-fire-emoji-flicker .55s ease-in-out infinite alternate; }
@@ -3138,3 +3135,77 @@ body.eg-cursor-shocked .gc {
 .eg-monster-card-compact.eg-over-grid .eg-compact-bars {
     opacity: 0.85;
 }
+
+/* Ailment banners above the player sprite (see _egSyncAilmentBanners).
+   Banner height 34px + 6px gap = 40px step (EG_AIL_BANNER_STEP_PX). */
+#eg-ail-banners {
+    position: absolute;
+    left: 50%;
+    top: -26px;
+    width: 0;
+    height: 0;
+    z-index: 30;
+    pointer-events: none;
+}
+.eg-ail-banner {
+    --ail: #ff6b35;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 210px;
+    height: 34px;
+    margin-left: -105px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(8, 8, 14, 0.82);
+    border: 2px solid var(--ail);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--ail) 55%, transparent);
+    transition: transform .28s cubic-bezier(.2, .8, .3, 1), opacity .3s;
+    animation: eg-ail-banner-in .28s ease-out;
+}
+.eg-ail-banner.leaving { opacity: 0; }
+.eg-ail-banner-bar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 100%;
+    background: color-mix(in srgb, var(--ail) 55%, transparent);
+    transition: width .1s linear;
+}
+.eg-ail-banner-text {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font: 900 1.25rem monospace;
+    letter-spacing: .14em;
+    color: #fff;
+    text-shadow: 0 0 4px #000, 0 2px 3px #000;
+    white-space: nowrap;
+}
+.eg-ail-banner-more {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin-left: -105px;
+    padding: 0 8px;
+    height: 26px;
+    line-height: 26px;
+    border-radius: 6px;
+    background: rgba(8, 8, 14, 0.82);
+    color: #fff;
+    font: 900 .95rem monospace;
+    transition: transform .28s;
+}
+.eg-ail-banner-ignite, .eg-ail-banner-shadowburn { --ail: #ff6b35; }
+.eg-ail-banner-shadowburn { --ail: #9433c7; }
+.eg-ail-banner-bleed { --ail: #d6293a; }
+.eg-ail-banner-poison { --ail: #5fcf3c; }
+.eg-ail-banner-chill, .eg-ail-banner-frozen { --ail: #60c8ff; }
+.eg-ail-banner-shocked { --ail: #fde047; }
+.eg-ail-banner-shocked .eg-ail-banner-text, .eg-ail-banner-poison .eg-ail-banner-text { color: #fff; }
+.eg-ail-banner-shadow, .eg-ail-banner-blind, .eg-ail-banner-confused { --ail: #a56bd8; }
+.eg-ail-banner-polymorph { --ail: #4ade80; }
+.eg-ail-banner-stunned { --ail: #ff9ec8; }
+@keyframes eg-ail-banner-in { from { opacity: 0; scale: .7; } to { opacity: 1; scale: 1; } }

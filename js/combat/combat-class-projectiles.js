@@ -87,6 +87,19 @@ export function _egGetElementCentre(el) {
     return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
+// Centre of a monster card ignoring an in-progress melee lunge. The lunge is
+// quicker than a projectile's flight, so aiming at the mid-dash position makes
+// shots land in empty space between the monster and the player.
+export function _egGetElementRestCentre(el) {
+    const c = _egGetElementCentre(el);
+    if (el.dataset && el.dataset.egLunging) {
+        const m = new DOMMatrix(getComputedStyle(el).transform);
+        c.x -= m.m41;
+        c.y -= m.m42;
+    }
+    return c;
+}
+
 export function _egFireProjectile(visual, cssClass, start, end, duration, easing, onArrive, orient, startScale) {
     const proj = document.createElement('div');
     proj.className = `eg-projectile ${cssClass}`;
