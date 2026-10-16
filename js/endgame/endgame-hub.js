@@ -1051,6 +1051,9 @@ export function safeGoBackFromHub() {
 }
 
 export let _egHubGameOverlay = false;
+// Screen the overlay returns to on close: the running puzzle ('screen-game')
+// or, when B was pressed on the world map / level selection, that screen.
+let _egHubReturnScreen = 'screen-game';
 // True only if THIS overlay open paused the game (a pause menu may already
 // have been up when B was pressed - then pause state is left untouched).
 export let _egHubOverlayPaused = false;
@@ -1111,10 +1114,18 @@ export function _egHubShowAvatars() {
 }
 
 // Opens the sheet over a running puzzle (B keybind path).
-export function openHubFromGame() {
+export function openHubFromGame(returnScreen = 'screen-game') {
     _egHubGameOverlay = true;
-    _egHubOverlayPause();
-    _egHubHideAvatars();
+    _egHubReturnScreen = returnScreen;
+    // Only a running puzzle has anything to pause or hide; on the world map
+    // / level selection the sheet simply floats over the screen it came from.
+    const overGame = returnScreen === 'screen-game';
+    if (overGame) {
+        _egHubOverlayPause();
+        _egHubHideAvatars();
+    } else {
+        _egHubOverlayPaused = false;
+    }
     // Safety net: loot claimed this run must already be visible. Claims now
     // stash instantly (see _egCheckLootClaim), but a pending item from an
     // older save or a pre-flush code path would otherwise stay hidden in
@@ -1176,7 +1187,10 @@ export function _egSyncOverlayGearPools() {
 // Closes the overlay and returns to the running puzzle exactly where it was.
 export function closeHubToGame() {
     _egHubGameOverlay = false;
-    if (typeof switchScreen === 'function') switchScreen('screen-game');
+    const returnScreen = _egHubReturnScreen;
+    _egHubReturnScreen = 'screen-game';
+    if (typeof switchScreen === 'function') switchScreen(returnScreen);
+    if (returnScreen !== 'screen-game') return;   // map / level select: nothing to resync
     _egHubShowAvatars();
     // Gear edited mid-puzzle must apply instantly: sync pools first, then
     // repaint every HUD surface that displays damage done/received or pools.

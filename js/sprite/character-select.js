@@ -564,6 +564,22 @@ export function renderLSCharacterAvatar() {
 // tooltip used for world nodes (see screens-map-view.js), populated
 // with this character's traits instead.
 
+// Class / ascendency line of the portrait tooltip (this used to be a badge in
+// the level-select top bar). Coloured like the class, or a muted "No Class".
+function _buildCharacterTooltipClassHtml() {
+    const defs = globalThis.CLASS_DEFS || {};
+    const def = STATE && STATE.playerClass ? defs[STATE.playerClass] : null;
+    if (!def) return `<div class="mv-char-tooltip-class mv-char-tooltip-class-none">${t('scr_no_class')}</div>`;
+    const asc = STATE.playerAscendency && globalThis.ASCENDENCY_DEFS ? globalThis.ASCENDENCY_DEFS[STATE.playerAscendency] : null;
+    const name = (d) => (LANG === 'de' ? d.nameDE : d.nameEn);
+    const line = (d, color) => `<span style="color:${color}">${d.icon} ${name(d)}</span>`;
+    const border = asc ? asc.color : def.color;
+    return `<div class="mv-char-tooltip-class" style="border-color:${border}">`
+        + line(def, def.colorLight)
+        + (asc ? `<span class="mv-char-tooltip-class-sep">|</span>${line(asc, asc.colorLight)}` : '')
+        + `</div>`;
+}
+
 function _buildCharacterTooltipContent(char) {
     const lang = LANG;
     const charName = lang === 'de' ? char.nameDE : char.name;
@@ -585,6 +601,7 @@ function _buildCharacterTooltipContent(char) {
     return `
         <div class="mv-tooltip-title">${charName}</div>
         <div class="mv-tooltip-sub">${tagline}</div>
+        ${_buildCharacterTooltipClassHtml()}
         <div class="mv-char-tooltip-traits">${traitsHtml}</div>
     `;
 }

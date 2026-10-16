@@ -173,15 +173,15 @@
 
 #screen-map-view .ls-title,
 #screen-world-detail .ls-title {
-    flex: 1 1 clamp(140px, 30vw, 500px);
+    flex: 1 1 clamp(120px, 24vw, 500px);
     min-width: 0;
     max-width: 700px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--PX, monospace);
-    font-size: clamp(11px, 2.6vw, 30px);
-    letter-spacing: clamp(1px, 0.5vw, 6px);
+    font-size: clamp(11px, 2.2vw, 30px);
+    letter-spacing: clamp(1px, 0.4vw, 6px);
     color: #f0d090;
     /* Cropped plaque art (banner-title-plaque.webp = the true art bounds of
        banner-title.webp, which was drawn on a 668x373 full-screen canvas and
@@ -221,107 +221,114 @@
     justify-content: flex-end;
 }
 
-/* Class status badge */
-#screen-map-view #mv-class-status,
-#screen-world-detail #wd-class-status {
-    font-family: var(--PX, monospace);
-    font-size: clamp(8px, 1vw, 11px);
-    background: rgba(0, 0, 0, 0.45);
-    border-radius: 5px;
-    padding: 3px 8px;
-    white-space: normal;
-    text-align: center;
-    line-height: 1.4;
-    cursor: help;
+/* ---------------------------------------------------------
+   BUTTON GRID - 2 rows x 3 columns of compact stone slabs
+   (INFERENCE | SPELLBOOK | TREE  /  CHARACTER | SHOP | SETTINGS).
+   Class / ascendency no longer has a badge here: it is shown in
+   the character portrait tooltip.
+   --------------------------------------------------------- */
+
+#screen-map-view .tb-grid,
+#screen-world-detail .tb-grid {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    grid-auto-rows: auto;
+    gap: clamp(3px, 0.5vw, 6px);
     flex-shrink: 1;
-    max-width: 170px; /* two short lines max - keeps the one-row budget */
-    text-shadow: 1px 1px 2px #000;
+    min-width: 0;
 }
 
-    #screen-map-view #mv-class-status:empty,
-    #screen-world-detail #wd-class-status:empty {
-        display: none;
-    }
-
-/*
-   Inference + Probability Tree + Spellbook buttons
-   All use their stone-block background images.
-   Text is pushed to the BOTTOM so the icon graphic at the top
-   of each image stays visible.
-   Spellbook shares the Inference block art (open book icon) -
-   the tree block stays exclusive to TREE.
-*/
-#screen-map-view #mv-btn-quest-log,
-#screen-world-detail #wd-btn-quest-log,
-#screen-map-view #mv-btn-spellbook,
-#screen-world-detail #wd-btn-spellbook,
-#screen-map-view #mv-btn-passive-tree,
-#screen-world-detail #wd-btn-passive-tree {
-    font-family: var(--PX, monospace);
-    font-size: clamp(7px, 0.85vw, 10px);
-    letter-spacing: 1px;
-    color: #f0d090; /* warm gold-cream, visible on dark stone */
-
-    border: none !important;
-    /* Compact enough that status + 3 blocks + back/portrait/ribbon/title
-       all fit ONE row on desktop - at 11vw/200px the added Spellbook button
-       pushed the whole right group onto a second row (double-height bar). */
-    width: clamp(56px, 8vw, 140px);
-    height: auto;
-    aspect-ratio: 2.5 / 1;
-    box-sizing: border-box;
+#screen-map-view .tb-slab,
+#screen-world-detail .tb-slab {
+    position: relative;
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding-bottom: clamp(4px, 1vw, 8px);
-    text-shadow: 1px 1px 3px #000, 0 0 6px rgba(0,0,0,0.9);
-    white-space: normal; /* allow "PROBABILITY TREE" to wrap to two lines */
-    text-align: center;
-    line-height: 1.2;
+    gap: clamp(1px, 0.25vw, 3px);
+    width: clamp(80px, 6.6vw, 124px);
+    height: clamp(42px, 4.6vw, 54px);
+    box-sizing: border-box;
+    padding: 2px 4px 4px;
+    font-family: var(--PX, monospace);
+    letter-spacing: 0.5px;
+    color: #f0d090;
+    text-shadow: 1px 1px 3px #000, 0 0 6px rgba(0, 0, 0, 0.9);
     cursor: pointer;
-    flex-shrink: 1;
-    transition: filter 0.15s;
+    /* carved-stone slab: dark bevelled face, light top edge, black rim */
+    background: linear-gradient(180deg, #4a4752 0%, #35323d 55%, #2b2933 100%);
+    border: 2px solid #15131a !important;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                inset 0 -2px 0 rgba(0, 0, 0, 0.35),
+                0 2px 4px rgba(0, 0, 0, 0.55);
+    transition: filter 0.15s, transform 0.1s;
 }
 
-/* Inference and Spellbook share the open-book block art. */
-#screen-map-view #mv-btn-quest-log,
-#screen-world-detail #wd-btn-quest-log,
-#screen-map-view #mv-btn-spellbook,
-#screen-world-detail #wd-btn-spellbook {
-    background: url('../images/Level_Select_Topbar/Inference-Block.webp') center / 100% 100% no-repeat;
+#screen-map-view .tb-slab:hover,
+#screen-world-detail .tb-slab:hover {
+    filter: brightness(1.25);
 }
 
-#screen-map-view #mv-btn-passive-tree,
-#screen-world-detail #wd-btn-passive-tree {
-    background: url('../images/Level_Select_Topbar/Probability-Tree-Block.webp') center / 100% 100% no-repeat;
-    color: #f0d090 !important; /* override any inline JS color */
+#screen-map-view .tb-slab:active,
+#screen-world-detail .tb-slab:active {
+    transform: translateY(1px);
 }
 
-    #screen-map-view #mv-btn-quest-log:hover,
-    #screen-world-detail #wd-btn-quest-log:hover,
-    #screen-map-view #mv-btn-spellbook:hover,
-    #screen-world-detail #wd-btn-spellbook:hover,
-    #screen-map-view #mv-btn-passive-tree:hover,
-    #screen-world-detail #wd-btn-passive-tree:hover {
-        filter: brightness(1.25);
-    }
+/* Icon: emoji glyph. */
+#screen-map-view .tb-ico,
+#screen-world-detail .tb-ico {
+    display: block;
+    flex: 0 0 auto;
+    height: clamp(16px, 1.9vw, 24px);
+    min-width: clamp(16px, 1.9vw, 24px);
+    font-size: clamp(12px, 1.4vw, 18px);
+    line-height: clamp(16px, 1.9vw, 24px);
+    text-align: center;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.8));
+}
 
-/* Golden frame + glow when there are unspent Convergence Points.
-   Uses outline/box-shadow because the stone-block background sets
-   border: none !important. */
+#screen-map-view .tb-label,
+#screen-world-detail .tb-label {
+    display: block;
+    max-width: 100%;
+    font-size: clamp(6px, calc((6.6vw - 14px) / 10 - 0.5px), 10px);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+/* Golden frame + glow when there are unspent Convergence Points. */
 #screen-map-view #mv-btn-passive-tree.unspent-points,
 #screen-world-detail #wd-btn-passive-tree.unspent-points {
-    outline: 2px solid #ffd700;
-    outline-offset: -3px;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.85);
+    border-color: #ffd700 !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 /* Yellow unspent point count next to the button label */
 #screen-map-view #ptb-point-count-mv,
-#screen-world-detail #ptb-point-count-mv {
+#screen-world-detail #ptb-point-count-mv,
+#screen-world-detail #ptb-point-count-wd {
     color: #ffd700;
     font-weight: bold;
 }
+
+/* Class / ascendency line inside the character portrait tooltip */
+.mv-char-tooltip-class {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 2px;
+    padding: 3px 8px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.35);
+    font-size: 0.95em;
+}
+.mv-char-tooltip-class-none { opacity: 0.6; border-style: dashed; }
+.mv-char-tooltip-class-sep { opacity: 0.45; }
 
 /* Notification badge ("!" dot on Inference button) */
 #screen-map-view #mv-quest-log-badge,
@@ -334,6 +341,14 @@
     padding: 1px 5px;
     margin-left: 4px;
     box-shadow: 0 0 6px rgba(231, 76, 60, 0.8);
+}
+
+#screen-map-view .tb-slab .quest-badge,
+#screen-world-detail .tb-slab .quest-badge {
+    position: absolute;
+    top: -5px;
+    right: -4px;
+    margin: 0;
 }
 
 
@@ -376,25 +391,14 @@
         padding: 8px 10px;
     }
 
-    #screen-map-view #mv-btn-quest-log,
-    #screen-world-detail #wd-btn-quest-log,
-    #screen-map-view #mv-btn-spellbook,
-    #screen-world-detail #wd-btn-spellbook,
-    #screen-map-view #mv-btn-passive-tree,
-    #screen-world-detail #wd-btn-passive-tree {
-        width: clamp(52px, 18vw, 90px);
-        font-size: 7px;
+    #screen-map-view .tb-slab,
+    #screen-world-detail .tb-slab {
+        width: clamp(52px, 17vw, 84px);
     }
 
     #screen-map-view .mv-ribbon-combined,
     #screen-world-detail .mv-ribbon-combined {
         width: clamp(110px, 34vw, 180px);
-    }
-
-    #screen-map-view #mv-class-status,
-    #screen-world-detail #wd-class-status {
-        font-size: 7px;
-        padding: 2px 5px;
     }
 
     #screen-map-view .mv-char-portrait-wrap,
@@ -459,5 +463,31 @@
     #screen-map-view #mv-btn-class-change,
     #screen-world-detail #wd-btn-class-change {
         animation: none;
+    }
+}
+
+
+/* Class-change token button: hangs just under the top bar (top-right) so
+   its appearance never changes the bar's height or wraps the button grid. */
+#screen-map-view .ls-topbar-right,
+#screen-world-detail .ls-topbar-right {
+    position: relative;
+}
+
+#screen-map-view #mv-btn-class-change,
+#screen-world-detail #wd-btn-class-change {
+    position: absolute;
+    top: calc(100% + clamp(10px, 1.4vw, 16px));
+    right: 0;
+    z-index: 6;
+    background: rgba(20, 60, 55, 0.92);
+}
+
+/* Narrow desktops: the 2 x 3 button grid takes more of the row, so the
+   title plaque text shrinks a little to stay inside its banner. */
+@media (max-width: 1150px) {
+    #screen-map-view .ls-title {
+        font-size: clamp(10px, 1.7vw, 30px);
+        letter-spacing: clamp(1px, 0.25vw, 6px);
     }
 }

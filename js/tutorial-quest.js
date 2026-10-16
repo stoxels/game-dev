@@ -3097,6 +3097,9 @@ function restartTutorialQuest() {
 // dropped (the old `typeof` guard silently skipped it). Defer to
 // DOMContentLoaded - by then every module's bindings exist.
 function _tqRegisterCharSheetKeybind() {
+    // Bridge for the top-bar CHARACTER button on the world map / level
+    // selection (those modules must not import the hub directly).
+    globalThis._egOpenCharSheetOverlay = (screenId) => { openHubFromGame(screenId); };
     onKeybindAction('char-sheet', () => {
         // Overlay close: the sheet is open over a running puzzle - B closes
         // it and the puzzle continues exactly where it was.
@@ -3105,6 +3108,16 @@ function _tqRegisterCharSheetKeybind() {
                 && typeof isHubGameOverlay === 'function' && isHubGameOverlay()
                 && typeof closeHubToGame === 'function') {
                 closeHubToGame();
+                return false;
+            }
+        } catch (e) {}
+        // Overlay open from the world map / a world's level selection: the
+        // sheet floats over that screen, B closes it back to the same screen.
+        try {
+            const mapScreen = ['screen-map-view', 'screen-world-detail', 'screen-levels']
+                .find((id) => document.getElementById(id)?.classList.contains('active'));
+            if (mapScreen && typeof openHubFromGame === 'function') {
+                openHubFromGame(mapScreen);
                 return false;
             }
         } catch (e) {}

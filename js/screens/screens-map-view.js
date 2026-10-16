@@ -3,7 +3,7 @@ import { save } from '../state.js';
 import { LANG, t } from '../translation/translations.js';
 import { MOD_CLASSES, MOD_LABELS, applyClassStatusActiveStyle, applyClassStatusEmptyStyle, buildNextCodeStr, isLevelConvergence, isMaxCleared, renderLevelSelect } from './screens-level-select.js';
 import { showWorldDetail, wdGoBackToMap } from './screens-world-levels.js';
-import { launchAtlasVendor, showSetup, switchScreen } from './screens.js';
+import { launchAtlasVendor, showModal, showSetup, switchScreen } from './screens.js';
 import { showQuestLog } from '../inference/inference-ui.js';
 import { showPassiveTree } from '../probability-tree/probability-tree.js';
 import { STATE } from '../state.js';
@@ -1837,6 +1837,7 @@ export function _renderTopBarTreePoints(p = 'mv') {
     // Class-based styling (the stone-block image sets border: none !important,
     // so a golden frame is applied via outline/box-shadow in CSS)
     treeBtn.classList.toggle('unspent-points', hasPoints);
+    const labelHost = treeBtn.querySelector('.tb-label') || treeBtn;
 
     // Yellow point count appended next to the translated label -
     // appended as a sibling so i18n re-renders cannot wipe it
@@ -1844,7 +1845,7 @@ export function _renderTopBarTreePoints(p = 'mv') {
     if (!countEl) {
         countEl = document.createElement('span');
         countEl.id = 'ptb-point-count-' + p;
-        treeBtn.appendChild(countEl);
+        labelHost.appendChild(countEl);
     }
     countEl.textContent = hasPoints ? ` (${points})` : '';
 }
@@ -1859,6 +1860,10 @@ export function _wireTopBarButtons(p = 'mv') {
     const spellbookBtn = document.getElementById(p + '-btn-spellbook');
     const treeBtn = document.getElementById(p + '-btn-passive-tree');
     const changeBtn = document.getElementById(p + '-btn-class-change');
+    const charBtn = document.getElementById(p + '-btn-char-sheet');
+    const shopBtn = document.getElementById(p + '-btn-shop');
+    const settingsBtn = document.getElementById(p + '-btn-settings');
+    const thisScreen = (p === 'wd') ? 'screen-world-detail' : 'screen-map-view';
 
     if (backBtn) {
         backBtn.onclick = (p === 'wd')
@@ -1871,6 +1876,11 @@ export function _wireTopBarButtons(p = 'mv') {
     // re-renders the hotbar as a drag target while it is open.
     if (spellbookBtn) spellbookBtn.onclick = () => { if (typeof globalThis.openSpellbook === 'function') globalThis.openSpellbook(); };
     if (treeBtn) treeBtn.onclick = () => showPassiveTree();
+    // Character sheet floats over this screen (same overlay as the B key, so
+    // Back / B return here); the shop's Back also returns to this screen.
+    if (charBtn) charBtn.onclick = () => { if (typeof globalThis._egOpenCharSheetOverlay === 'function') globalThis._egOpenCharSheetOverlay(thisScreen); };
+    if (shopBtn) shopBtn.onclick = () => launchAtlasVendor(thisScreen);
+    if (settingsBtn) settingsBtn.onclick = () => { globalThis.loadSettingsUI(); showModal('settings-modal'); };
     if (changeBtn) changeBtn.onclick = () => { if (typeof globalThis.showClassChange === 'function') globalThis.showClassChange(); };
 }
 
