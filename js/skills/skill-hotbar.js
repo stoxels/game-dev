@@ -234,6 +234,35 @@ export function _hotbarClasslessHasSpells() {
     return false;
 }
 
+// Slots overlapping the puzzle grid get .over-grid (css/skills.css): the bar
+// paints above the grid so cooldowns stay visible, and those slots turn
+// see-through and click-through. Same idea as the monster cards
+// (_egSyncGridOverlap in combat/encounter.js); the timer stops itself when
+// the bar is hidden. Bar geometry only changes on rebuild/resize, so 250 ms
+// polling is plenty.
+let _hotbarGridTimer = null;
+function _syncHotbarGridOverlap() {
+    const bar = document.getElementById('skill-hotbar');
+    if (!bar || bar.style.display === 'none') {
+        clearInterval(_hotbarGridTimer);
+        _hotbarGridTimer = null;
+        return;
+    }
+    const grid = document.getElementById('ptable');
+    const gr = (grid && !document.body.classList.contains('spellbook-open')) ? grid.getBoundingClientRect() : null;
+    let any = false;
+    bar.querySelectorAll('.skill-hotbar-slot').forEach(slot => {
+        let over = false;
+        if (gr && gr.width > 0 && gr.height > 0) {
+            const r = slot.getBoundingClientRect();
+            over = r.right > gr.left + 2 && r.left < gr.right - 2 && r.bottom > gr.top + 2 && r.top < gr.bottom - 2;
+        }
+        if (over) any = true;
+        slot.classList.toggle('over-grid', over);
+    });
+    bar.classList.toggle('has-over-grid', any);
+}
+
 // Rebuilds the entire hotbar. Cheap enough to call on every HUD rebuild -
 // 10 small slots, no listeners re-attached (delegated handlers only).
 export function renderSkillHotbar() {
@@ -278,6 +307,9 @@ export function renderSkillHotbar() {
     document.body.classList.add('skill-hotbar-visible');
     const barW = bar.offsetWidth || (SKILL_HOTBAR_COLS * 57 + 12);
     document.body.style.setProperty('--skill-hotbar-reserve', (barW + 14) + 'px');
+
+    _syncHotbarGridOverlap();
+    if (!_hotbarGridTimer) _hotbarGridTimer = setInterval(_syncHotbarGridOverlap, 250);
 
 }
 

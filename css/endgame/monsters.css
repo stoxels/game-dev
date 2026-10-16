@@ -211,6 +211,12 @@
     pointer-events: none;
 }
 
+/* The killing blow also adds .eg-flash-damage, whose rule sits later in this file and
+   used to win - the dead card stayed fully visible (last gauntlet monster). Death wins. */
+.eg-monster-card-compact.eg-flash-kill {
+    animation: eg-death 0.8s forwards;
+}
+
 
 
 

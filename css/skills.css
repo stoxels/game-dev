@@ -21,10 +21,12 @@
        game grid both paint above the bar (see below), so an overlap can never
        steal their clicks. */
     bottom: 6px;
-    /* Deliberately NO z-index: the bar lives inside .puzzle-and-sidebar ahead
-       of #puzzle-scaler-wrap, so the grid (a later positioned sibling) paints
-       and hit-tests on top of it where the two overlap. */
-    z-index: auto;
+    /* Paints just above the grid (z 10) like the monster layers (z 12), so the
+       cooldown countdown is never hidden. Slots that overlap the grid get
+       .over-grid (js/skills/skill-hotbar.js): see-through and click-through,
+       so every cell stays clickable. The bar box itself takes no clicks. */
+    z-index: 13;
+    pointer-events: none;
     display: grid;
     grid-template-columns: repeat(var(--skill-hotbar-cols, 5), auto);
     gap: 5px;
@@ -91,6 +93,33 @@ body.question-modal-open .skill-hotbar { display: none !important; }
     transition: border-color .12s, background .12s, transform .06s;
     overflow: hidden;
 }
+
+/* Slots (the bar box is click-through) take clicks again... */
+.skill-hotbar-slot { pointer-events: auto; }
+
+/* ...except where they sit over the puzzle grid: see-through and click-through
+   so the clues and cells underneath stay readable and clickable (hotkeys still
+   cast). The cooldown wash stays legible on top. */
+.skill-hotbar.has-over-grid {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+.skill-hotbar-slot.over-grid {
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.18);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+}
+.skill-hotbar-slot.over-grid .skill-hotbar-icon { opacity: 0.6; }
+.skill-hotbar-slot.over-grid .skill-hotbar-cd {
+    background: rgba(0, 0, 0, 0.4);
+    text-shadow: 0 0 6px #000, 0 0 3px #000, 0 1px 2px #000;
+}
+/* While the spell book is open slots must receive drops, whatever is under them. */
+body.spellbook-open .skill-hotbar-slot.over-grid,
+body:has(#spellbook-overlay.show) .skill-hotbar-slot.over-grid { pointer-events: auto; }
 
 .skill-hotbar-slot:hover {
     border-color: rgba(255, 255, 255, 0.45);
