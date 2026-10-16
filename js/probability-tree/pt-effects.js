@@ -627,7 +627,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     endurance_on_line: { channel: 'enduranceOnLinePct', en: '{v}% Chance to gain an Endurance Charge for each completed Row or Column', de: '{v}% Chance auf eine Widerstandsladung pro abgeschlossener Zeile oder Spalte' },
     frenzy_on_line: { channel: 'frenzyOnLinePct', en: '{v}% Chance to gain a Frenzy Charge for each completed Row or Column', de: '{v}% Chance auf eine Raserei-Ladung pro abgeschlossener Zeile oder Spalte' },
     power_on_line: { channel: 'powerOnLinePct', en: '{v}% Chance to gain a Power Charge for each completed Row or Column', de: '{v}% Chance auf eine Kraftladung pro abgeschlossener Zeile oder Spalte' },
-    armour_per_streak: { channel: 'armourPerStreak', en: '+{v} Armour per 10 correct Fills in a row', de: '+{v} Rüstung pro 10 richtigen Füllungen in Folge' },
+    armour_per_streak: { channel: 'armourPerStreak', en: '+{v} Armour per 10 correct Fills in a row (resets when the puzzle ends)', de: '+{v} Rüstung pro 10 richtigen Füllungen in Folge (endet mit dem Rätsel)' },
     block_flawless: { channel: 'blockFlawlessPct', en: '+{v}% Chance to Block while you have made no Mistakes this level', de: '+{v}% Blockchance, solange du in diesem Level keinen Fehler gemacht hast' },
     mistake_heal: { channel: 'mistakeHeal', en: 'Recover {v} Life when you make a Mistake', de: 'Stelle {v} Leben wieder her, wenn du einen Fehler machst' },
     damage_per_streak: { channel: 'damagePerStreakPct', en: '{v}% increased Damage per 10 correct Fills in a row', de: '{v}% erhöhter Schaden pro 10 richtigen Füllungen in Folge' },
