@@ -556,6 +556,17 @@ export function _egTransitionToChainPuzzle(nextGi, isBossArena) {
     }
     _egUpdateObjectivesHUD();
 
+    // The BOSS ARENA AVAILABLE banner fires when the last objective is done,
+    // right as the puzzle ends - the next puzzle's overlay used to cover it.
+    // Show it again once the new puzzle is loaded (only while still pending).
+    if (_egBossArenaAvailableShown && !_egBossDefeated() && !_egBossPhaseActive) {
+        setTimeout(() => {
+            if (_egIsActive() && _egBossArenaAvailableShown && !_egBossDefeated() && !_egBossPhaseActive) {
+                _egShowBossArenaAvailableBanner();
+            }
+        }, 1200);
+    }
+
     // Re-place carried loot after the new grid DOM is fully built
     if (carriedLoot.length > 0) {
         setTimeout(() => _egReplaceCarriedLootDrops(carriedLoot), 400);
