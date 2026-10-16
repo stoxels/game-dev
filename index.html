@@ -13,7 +13,7 @@
         } catch (e) { /* class absent → default (hosted) styling */ }
     </script>
     <link rel="icon" type="image/png" href="images/favicon.png">
-    <title>STOXELS - v0.30 BETA</title>
+    <title>STOXELS - v0.31 BETA</title>
     <link rel="stylesheet" href="css/base.css?v=3">
     <link rel="stylesheet" href="css/pause.css?v=4">
     <link rel="stylesheet" href="css/settings.css">
@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="css/endgame/objectives_hud.css">
     <link rel="stylesheet" href="css/character-select.css?v=8">
     <link rel="stylesheet" href="css/map-view.css?v=4">
-    <link rel="stylesheet" href="css/map-view-topbar.css?v=17">
+    <link rel="stylesheet" href="css/map-view-topbar.css?v=23">
     <link rel="stylesheet" href="css/quiz-exercises.css?v=5">
     <link rel="stylesheet" href="css/highscore.css?v=5">
     <link rel="stylesheet" href="css/moodle-codes.css?v=3">
@@ -139,7 +139,7 @@
 
             <!-- Expansion logo (EN/DE swapped by setLang) - hover shows expansion history -->
             <img class="title-expansion-logo" id="title-expansion-logo" src="images/Title_Screen/RiseOfTheBeasts_EnglishLogo.webp" alt="Rise of the Beasts">
-            <div class="title-version-line">v0.30 BETA</div>
+            <div class="title-version-line">v0.31 BETA</div>
             <div class="title-ai-disclosure" data-t="scr_ai_disclosure">This game contains AI-generated art, sound, music, and code.</div>
             <div class="title-lang-overlay">
                 <button class="lang-btn active" data-lang="en"><span class="btn-label">EN</span></button>
@@ -1010,27 +1010,29 @@
             </div>
             <span class="ls-title" data-t="ls_title">SELECT LEVEL</span>
 
+            <span class="tb-gold" id="mv-gold-balance" data-tip-t="tip_tb_gold"></span>
+
             <div class="ls-topbar-right">
                 <button class="gtb-btn cc-token-btn" id="mv-btn-class-change" data-t="cls_change_btn_short" style="display:none;">🔄 CHANGE</button>
                 <!-- 2 x 3 button grid. Class / ascendency now lives in the
                      character portrait tooltip (hover the sprite). -->
                 <div class="tb-grid">
-                    <button class="gtb-btn tb-slab tb-slab-inference" id="mv-btn-quest-log">
+                    <button class="gtb-btn tb-slab tb-slab-inference" id="mv-btn-quest-log" data-tip-t="tip_tb_inference">
                         <span class="tb-ico">📜</span><span class="tb-label"><span data-t="btn_inference">INFERENCE</span><span id="mv-quest-log-badge" class="quest-badge" style="display:none;">!</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-spellbook" id="mv-btn-spellbook">
+                    <button class="gtb-btn tb-slab tb-slab-spellbook" id="mv-btn-spellbook" data-tip-t="tip_tb_spellbook">
                         <span class="tb-ico">📖</span><span class="tb-label"><span data-t="btn_spellbook_short">SPELLBOOK</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-tree" id="mv-btn-passive-tree">
+                    <button class="gtb-btn tb-slab tb-slab-tree" id="mv-btn-passive-tree" data-tip-t="tip_tb_tree">
                         <span class="tb-ico">🌳</span><span class="tb-label"><span data-t="tree">TREE</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-char" id="mv-btn-char-sheet">
+                    <button class="gtb-btn tb-slab tb-slab-char" id="mv-btn-char-sheet" data-tip-t="tip_tb_character">
                         <span class="tb-ico">🛡️</span><span class="tb-label"><span data-t="tb_character">CHARACTER</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-shop" id="mv-btn-shop">
+                    <button class="gtb-btn tb-slab tb-slab-shop" id="mv-btn-shop" data-tip-t="tip_tb_shop">
                         <span class="tb-ico">🛖</span><span class="tb-label"><span data-t="tb_shop">SHOP</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-settings" id="mv-btn-settings">
+                    <button class="gtb-btn tb-slab tb-slab-settings" id="mv-btn-settings" data-tip-t="tip_tb_settings">
                         <span class="tb-ico">⚙️</span><span class="tb-label"><span data-t="tb_settings">SETTINGS</span></span>
                     </button>
                 </div>
@@ -1060,27 +1062,29 @@
             <!-- (class-change token button lives in .ls-topbar-right below) -->
             <span class="ls-title" id="wd-title-plaque">WORLD</span>
 
+            <span class="tb-gold" id="wd-gold-balance" data-tip-t="tip_tb_gold"></span>
+
             <div class="ls-topbar-right">
                 <button class="gtb-btn cc-token-btn" id="wd-btn-class-change" data-t="cls_change_btn_short" style="display:none;">🔄 CHANGE</button>
                 <!-- 2 x 3 button grid. Class / ascendency now lives in the
                      character portrait tooltip (hover the sprite). -->
                 <div class="tb-grid">
-                    <button class="gtb-btn tb-slab tb-slab-inference" id="wd-btn-quest-log">
+                    <button class="gtb-btn tb-slab tb-slab-inference" id="wd-btn-quest-log" data-tip-t="tip_tb_inference">
                         <span class="tb-ico">📜</span><span class="tb-label"><span data-t="btn_inference">INFERENCE</span><span id="wd-quest-log-badge" class="quest-badge" style="display:none;">!</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-spellbook" id="wd-btn-spellbook">
+                    <button class="gtb-btn tb-slab tb-slab-spellbook" id="wd-btn-spellbook" data-tip-t="tip_tb_spellbook">
                         <span class="tb-ico">📖</span><span class="tb-label"><span data-t="btn_spellbook_short">SPELLBOOK</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-tree" id="wd-btn-passive-tree">
+                    <button class="gtb-btn tb-slab tb-slab-tree" id="wd-btn-passive-tree" data-tip-t="tip_tb_tree">
                         <span class="tb-ico">🌳</span><span class="tb-label"><span data-t="tree">TREE</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-char" id="wd-btn-char-sheet">
+                    <button class="gtb-btn tb-slab tb-slab-char" id="wd-btn-char-sheet" data-tip-t="tip_tb_character">
                         <span class="tb-ico">🛡️</span><span class="tb-label"><span data-t="tb_character">CHARACTER</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-shop" id="wd-btn-shop">
+                    <button class="gtb-btn tb-slab tb-slab-shop" id="wd-btn-shop" data-tip-t="tip_tb_shop">
                         <span class="tb-ico">🛖</span><span class="tb-label"><span data-t="tb_shop">SHOP</span></span>
                     </button>
-                    <button class="gtb-btn tb-slab tb-slab-settings" id="wd-btn-settings">
+                    <button class="gtb-btn tb-slab tb-slab-settings" id="wd-btn-settings" data-tip-t="tip_tb_settings">
                         <span class="tb-ico">⚙️</span><span class="tb-label"><span data-t="tb_settings">SETTINGS</span></span>
                     </button>
                 </div>

@@ -65,7 +65,7 @@ export const EG_CLASS_PROJECTILES = {
         },
     },
     _default: {
-        cssClass: 'eg-proj-default', duration: 400, easing: 'ease-in', rotOffset: 0,
+        cssClass: 'eg-proj-default', duration: 1000, easing: 'ease-in', rotOffset: 0,
         build(root) { root.innerHTML = '<div class="egp egp-bolt"><div class="egp-bolt-body"></div></div>'; },
     },
 };

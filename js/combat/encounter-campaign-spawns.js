@@ -58,7 +58,7 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     // The share ramps in from damageHpShareEarly at monster level 1 to
     // damageHpShare at damageHpShareRampLevels, so a fresh character with
     // little life is not chunked by a share sized for a level-7 build.
-    damageHpShareEarly: 0.08,
+    damageHpShareEarly: 0.14,   // = damageHpShare: no early ramp (tutorial now hands out gear + Renewal)
     damageHpShare: 0.14,
     damageHpShareRampLevels: 12,
     damageHpCapMult: 4,
@@ -67,8 +67,8 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     // The first monster levels hit softer and wind up slower; both ease
     // linearly back to 1.0 at earlyEaseLevels, so nothing changes later.
     earlyEaseLevels: 10,
-    earlyDamageMult: 0.9,     // monster level 1 damage multiplier
-    earlyChargeSlow: 1.15,    // monster level 1 charge-time multiplier
+    earlyDamageMult: 1.0,     // monster level 1 damage multiplier (1 = ease off; was 0.9)
+    earlyChargeSlow: 1.0,     // monster level 1 charge-time multiplier (1 = ease off; was 1.15)
 };
 
 // Multiplier (0..1 blend) for the early-game ease: 1 at monster level 1,

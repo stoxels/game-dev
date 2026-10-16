@@ -79,7 +79,7 @@
 #screen-map-view #mv-btn-back,
 #screen-world-detail #wd-btn-back {
     font-size: clamp(10px, 1.2vw, 14px);
-    min-width: clamp(96px, 12vw, 160px);
+    min-width: clamp(90px, 9vw, 160px);
     padding: 10px 18px;
 }
 
@@ -134,7 +134,7 @@
     align-items: center;
     justify-content: center;
     background: url('../images/Level_Select_Topbar/score-pts-scroll.webp') center / 100% 100% no-repeat;
-    width: clamp(140px, 20vw, 300px);
+    width: clamp(130px, 15vw, 300px);
     height: auto;
     aspect-ratio: 3.75 / 1;
     box-sizing: border-box;
@@ -173,15 +173,15 @@
 
 #screen-map-view .ls-title,
 #screen-world-detail .ls-title {
-    flex: 1 1 clamp(120px, 24vw, 500px);
+    flex: 1 1 clamp(100px, 13vw, 500px);
     min-width: 0;
     max-width: 700px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--PX, monospace);
-    font-size: clamp(11px, 2.2vw, 30px);
-    letter-spacing: clamp(1px, 0.4vw, 6px);
+    font-size: clamp(11px, 1.9vw, 30px);
+    letter-spacing: clamp(1px, 0.35vw, 6px);
     color: #f0d090;
     /* Cropped plaque art (banner-title-plaque.webp = the true art bounds of
        banner-title.webp, which was drawn on a 668x373 full-screen canvas and
@@ -490,4 +490,34 @@
         font-size: clamp(10px, 1.7vw, 30px);
         letter-spacing: clamp(1px, 0.25vw, 6px);
     }
+}
+
+
+/* Gold balance pill: sits in the free space between the title plaque and the
+   button grid (pushes the grid's side of the row together with the grid). */
+#screen-map-view .tb-gold,
+#screen-world-detail .tb-gold {
+    margin-left: auto;
+    flex: 0 0 auto;
+    padding: clamp(3px, 0.4vw, 6px) clamp(6px, 0.9vw, 16px);
+    font-family: var(--PX, monospace);
+    font-size: clamp(9px, 1.05vw, 15px);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    color: #ffd86b;
+    text-shadow: 1px 1px 2px #000, 0 0 8px rgba(255, 200, 80, 0.35);
+    background: rgba(12, 10, 18, 0.72);
+    border: 2px solid #15131a;
+    border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#screen-map-view .tb-gold:empty,
+#screen-world-detail .tb-gold:empty {
+    display: none;
+}
+
+#screen-map-view .tb-gold:not(:empty) + .ls-topbar-right,
+#screen-world-detail .tb-gold:not(:empty) + .ls-topbar-right {
+    margin-left: 0;
 }

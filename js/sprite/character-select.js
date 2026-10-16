@@ -27,6 +27,8 @@ export const CHARACTERS = {
         nameDE: 'STOX',
         tagline: 'The Analyst',
         taglineDE: 'Der Analytiker',
+        recommended: 'Melee damage focused gameplay',
+        recommendedDE: 'Nahkampfschaden-fokussiertes Spiel',
         background: 'Raised in the Cartographers\' Guild archive, Stox has read every record of the day the Apex broke - and none of it adds up. He\'s out of pages to search, so now he searches in person.',
         backgroundDE: 'Im Archiv der Kartografengilde aufgewachsen, hat Stox jede Aufzeichnung über den Tag gelesen, an dem der Apex zerbrach - und nichts ergibt einen Sinn. Ihm sind die Seiten ausgegangen, also sucht er jetzt selbst.',
         personality: 'Dry, methodical, and quietly relentless. He trusts data over instinct, and a good pattern over a good feeling.',
@@ -59,6 +61,8 @@ export const CHARACTERS = {
         nameDE: 'TRIX',
         tagline: 'The Trickster',
         taglineDE: 'Die Trickserin',
+        recommended: 'Spell damage focused gameplay',
+        recommendedDE: 'Zauberschaden-fokussiertes Spiel',
         background: 'The last of a colony exiled for claiming the Variance Collapse was no accident, Trix grew up alone in a dying observatory deep in the Regression Rift. Now its readings are sliding toward zero, and she\'s come for answers.',
         backgroundDE: 'Als Letzte einer Kolonie, die verbannt wurde, weil sie behauptete, der Varianz-Kollaps sei kein Unfall gewesen, wuchs Trix allein in einem sterbenden Observatorium tief im Regressionsrift auf. Jetzt nähern sich dessen Messwerte der Null, und sie sucht Antworten.',
         personality: 'Cocky, sharp-tongued, and supremely confident - mostly because she\'s usually right.',
@@ -93,6 +97,8 @@ export const CHARACTERS = {
         nameDE: 'SYLA',
         tagline: 'The Naturalist',
         taglineDE: 'Die Naturalistin',
+        recommended: 'Reveal projectile damage focused gameplay',
+        recommendedDE: 'Enthüllungs-Projektilschaden-fokussiertes Spiel',
         background: 'Syla spent years listening to her home forest - until corruption locked inside it for three hundred quiet years began spreading. Her notebooks have the proof. She came to the Outpost to find help.',
         backgroundDE: 'Syla verbrachte Jahre damit, ihrem Heimatwald zuzuhören - bis die Korruption, die dreihundert ruhige Jahre lang darin eingeschlossen war, sich auszubreiten begann. Ihre Notizbücher liefern den Beweis. Sie kam zum Außenposten um Hilfe zu finden.',
         personality: 'Warm, patient, and endlessly forgiving of mistakes - she sees every setback as just part of growing.',
@@ -239,6 +245,8 @@ function _buildCharacterSelectTipContent(char) {
     const labelPersonality = lang === 'de' ? 'Persönlichkeit' : 'Personality';
     const labelStrength = lang === 'de' ? 'Stärke' : 'Strength';
     const labelTraits = lang === 'de' ? 'Fähigkeiten' : 'Traits';
+    const labelRecommended = lang === 'de' ? 'Empfohlen für' : 'Recommended for';
+    const recommended = lang === 'de' ? char.recommendedDE : char.recommended;
 
     const traitsHtml = (char.traits || []).map(tr => {
         const trName = lang === 'de' ? tr.nameDE : tr.nameEn;
@@ -253,6 +261,7 @@ function _buildCharacterSelectTipContent(char) {
 
     return `<div class="mv-tooltip-title" style="color:${char.accentColor}">${charName}</div>`
         + `<div class="mv-tooltip-sub" style="color:${char.accentColor};opacity:.85">${tagline}</div>`
+        + (recommended ? `<div class="csi-tip-section csi-tip-recommended" style="color:${char.accentColor}"><span class="csi-tip-label">${labelRecommended}</span>${recommended}</div>` : '')
         + `<div class="csi-tip-section"><span class="csi-tip-label">${labelBackground}</span>${background}</div>`
         + `<div class="csi-tip-section"><span class="csi-tip-label">${labelPersonality}</span>${personality}</div>`
         + `<div class="csi-tip-section"><span class="csi-tip-label">${labelStrength}</span>${strength}</div>`

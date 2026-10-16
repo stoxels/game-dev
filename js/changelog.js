@@ -13,6 +13,53 @@ export const CHANGELOG_DATA = [
 
 
     {
+        version: "v0.31 BETA",
+        date: "16.10.2026",
+        changes: [
+            {
+                category: ["New Features", "Neue Funktionen"],
+                items: [
+                    ["Ailments on you are now shown as big banners above your character (BURNING, POISONED, STUNNED...) with a bar that drains as the effect runs out. Several ailments stack on top of each other and slide down as they expire.", "Leiden an dir werden jetzt als große Banner über deiner Figur angezeigt (BRENNT, VERGIFTET, BETÄUBT...) mit einem Balken, der sich leert, während der Effekt abläuft. Mehrere Leiden stapeln sich übereinander und rutschen nach unten, wenn sie enden."],
+                    ["The map and world top bars have a new 2 x 3 button grid (Inference, Spellbook, Tree, Character, Shop, Settings), a gold balance next to it, and styled tooltips on all of them. B opens the character sheet on the map screens.", "Die Kopfleisten von Karte und Welt haben ein neues 2 x 3 Tastenfeld (Inferenz, Zauberbuch, Baum, Charakter, Laden, Optionen), daneben das Gold-Guthaben und gestaltete Tooltips für alles. B öffnet auf den Kartenbildschirmen das Charakterblatt."],
+                    ["New tutorial lesson: after puzzle 3 you practise parrying in a training arena against three unkillable monsters.", "Neue Tutorial-Lektion: Nach Rätsel 3 übst du in einer Trainingsarena das Parieren gegen drei unbesiegbare Monster."],
+                    ["All 303 unique items were reworked with stronger stats, passive-tree effects and milder downsides. Unique timer bonuses are now 10-30 seconds per defeated monster, more for bosses and elites.", "Alle 303 einzigartigen Gegenstände wurden überarbeitet: stärkere Werte, Passivbaum-Effekte und mildere Nachteile. Zeitboni von Uniques sind jetzt 10-30 Sekunden pro besiegtem Monster, mehr für Bosse und Elite-Gegner."],
+                    ["The Cartographer shop (formerly Atlas Vendor) now opens when you arrive at the outpost and sells spell charms for your campaign rank. Gold coins are a rare grid drop that scales with monster level. The crafting bench was redesigned with readable costs, and the vendor can filter by weapon type.", "Der Kartografen-Laden (früher Atlas-Händler) öffnet sich bei der Ankunft am Außenposten und verkauft Zauber-Charms passend zu deinem Kampagnenrang. Goldmünzen sind ein seltener Rastertreffer, der mit dem Monsterlevel skaliert. Die Handwerksbank wurde mit lesbaren Kosten überarbeitet, und der Händler kann nach Waffentyp filtern."],
+                    ["Convergence and ascension trials now start with a briefing, and a failed trial shows Trial Failed and returns you to the world map.", "Konvergenz- und Aufstiegsprüfungen beginnen jetzt mit einer Einweisung, und eine gescheiterte Prüfung zeigt Prüfung fehlgeschlagen und führt zurück zur Weltkarte."],
+                    ["Axe and mace bases were added, and the Gauntlet got a full-arena movement area, modifiers, difficulty tiers and a champion.", "Äxte und Streitkolben wurden hinzugefügt, und das Gauntlet bekam eine Arena mit voller Bewegungsfreiheit, Modifikatoren, Schwierigkeitsstufen und einen Champion."],
+                ],
+            },
+            {
+                category: ["Boss Fights", "Bosskämpfe"],
+                items: [
+                    ["36 bosses now have animated ability art (Mech and Guardian, Abyss through Barricade and Bayes, Belt through Entropy, Exarch, Executioner, Gale, Gambler and Gourmet).", "36 Bosse haben jetzt animierte Fähigkeiten-Grafiken (Mech und Wächter, Abgrund bis Barrikade und Bayes, Gürtel bis Entropie, Exarch, Scharfrichter, Gale, Spieler und Feinschmecker)."],
+                    ["Reworked fights with fair, readable dodges and visible blast areas: The Null, Gale, Barrage, Stormcaller, Colossus, Warden, Shaper, Stack, Puddle, Dancer, Creeper and Titan's Fall.", "Überarbeitete Kämpfe mit fairen, lesbaren Ausweichmanövern und sichtbaren Explosionsbereichen: Die Null, Gale, Sperrfeuer, Sturmrufer, Koloss, Wärter, Former, Stapel, Pfütze, Tänzer, Creeper und Titanensturz."],
+                    ["Failed telegraphed dodges now hit twice as hard (capped at 65% of your life), and bosses have a damage floor in the early game.", "Misslungene angekündigte Ausweichmanöver treffen jetzt doppelt so hart (maximal 65% deines Lebens), und Bosse haben im frühen Spiel eine Schadensuntergrenze."],
+                ],
+            },
+            {
+                category: ["Combat & Gameplay", "Kampf & Gameplay"],
+                items: [
+                    ["Monsters now cast spells, face the right way, and are drawn above the grid so you can click through them. Ailments on monsters show big flame, lightning and frost effects, and bleeding monsters get a drip badge with a stack count.", "Monster wirken jetzt Zauber, blicken in die richtige Richtung und werden über dem Raster gezeichnet, sodass du durch sie hindurchklicken kannst. Leiden auf Monstern zeigen große Flammen-, Blitz- und Frosteffekte, und blutende Monster erhalten ein Tropfen-Symbol mit Stapelzahl."],
+                    ["Campaign monster health now depends only on the level, packs are bigger on large puzzles, and per-kill XP was trimmed. Early levels have smaller packs, softer health and drops that favour armour, and early monsters hit at full strength again now that the tutorial hands out gear and a healing-over-time spell.", "Die Gesundheit von Kampagnenmonstern hängt jetzt nur noch vom Level ab, große Rätsel haben größere Gruppen, und die XP pro Kill wurden gekürzt. Frühe Level haben kleinere Gruppen, weniger Leben und Beute mit Rüstungsfokus, und frühe Monster schlagen wieder mit voller Stärke zu, da das Tutorial jetzt Ausrüstung und einen Heilzauber über Zeit verteilt."],
+                    ["Fireball has an innate 25% chance to Ignite and Ball Lightning a 25% chance to Shock. Physical weapon hits innately cause Bleed 10% of the time, now shown in the weapon tooltip.", "Feuerball hat eine angeborene Chance von 25% zu entzünden und Kugelblitz 25% zu schocken. Physische Waffentreffer verursachen von Haus aus zu 10% Blutung, jetzt im Waffen-Tooltip angezeigt."],
+                    ["Disintegrate and Vortex cost more mana the longer you hold them, shields cannot block while you channel, and attack-bar pushback comes only from melee strikes and cannot be locked by spamming.", "Desintegrieren und Wirbel kosten mehr Mana, je länger du sie hältst, Schilde können beim Kanalisieren nicht blocken, und das Zurückstoßen der Angriffsleiste kommt nur noch von Nahkampfschlägen und lässt sich nicht durch Spammen blockieren."],
+                    ["Passive tree tweaks: Study Habit nodes add 30 seconds per correct quiz answer, node 31065 gives a flat +15 seconds, Uniform Prior grants 3 free reveals plus 3 seconds per line, Heartbloom gives +1 heart every rank, and charge-on-line nodes grant their own charge type.", "Passivbaum-Anpassungen: Lerngewohnheit-Knoten geben 30 Sekunden pro richtiger Quiz-Antwort, Knoten 31065 gibt pauschal +15 Sekunden, Gleichverteilter Prior gewährt 3 freie Aufdeckungen plus 3 Sekunden pro Linie, Herzblüte gibt auf jedem Rang +1 Herz, und Aufladung-bei-Linie-Knoten gewähren ihre eigene Aufladungsart."],
+                    ["Swift Fang dagger damage was reduced by 25% and melee charge times have a floor.", "Der Schaden des Schnellen Reißzahns wurde um 25% gesenkt, und für Nahkampf-Aufladezeiten gibt es jetzt eine Untergrenze."],
+                ],
+            },
+            {
+                category: ["Bug Fixes & Technical", "Fehlerbehebungen & Technik"],
+                items: [
+                    ["Fixed 0 gold in the vendor after loading a save, drag-unequipping being rejected, a lost off-hand when equipping a two-hander over dual-wielded weapons, and the equip drag skipping the requirement check.", "Behoben: 0 Gold beim Händler nach dem Laden eines Spielstands, abgelehntes Ablegen per Ziehen, eine verlorene Nebenhand beim Ausrüsten einer Zweihandwaffe über zwei Einhandwaffen und das Umgehen der Anforderungsprüfung beim Ausrüsten per Ziehen."],
+                    ["Fixed a soft-lock in the Laplace finale, a trial boss that could silently fail to appear, and a broken Null boss (rays, hexagon damage, phantom path).", "Behoben: eine Blockade im Laplace-Finale, ein Prüfungsboss, der stillschweigend nicht erscheinen konnte, und ein fehlerhafter Null-Boss (Strahlen, Sechseck-Schaden, Phantompfad)."],
+                    ["Reveal projectiles aimed at a monster that is lunging at you now fly to where it rests instead of into empty space.", "Enthüllungs-Projektile, die auf ein angreifendes Monster zielen, fliegen jetzt zu dessen Ruheposition statt ins Leere."],
+                    ["Unique item pickups now land in your regular inventory, and the trial button shows the right world.", "Aufgesammelte einzigartige Gegenstände landen jetzt im normalen Inventar, und der Prüfungs-Button zeigt die richtige Welt."],
+                ],
+            },
+        ],
+    },
+
+    {
         version: "v0.30 BETA",
         date: "12.10.2026",
         changes: [

@@ -1792,6 +1792,10 @@ export function _renderTopBarScore(p = 'mv') {
     if (scoreEl) {
         scoreEl.textContent = (STATE ? STATE.totalScore : 0);
     }
+    // Gold balance pill (between the title plaque and the button grid) is
+    // refreshed together with the score - both top bars call this on build.
+    const goldEl = document.getElementById(p + '-gold-balance');
+    if (goldEl) goldEl.textContent = '🪙 ' + Math.max(0, Math.round(Number(STATE && STATE.egGold) || 0)).toLocaleString();
 }
 
 /**
