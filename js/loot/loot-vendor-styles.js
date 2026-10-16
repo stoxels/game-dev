@@ -24,6 +24,25 @@ export function _egvEnsureStyles() {
             background: rgba(20, 15, 5, 0.6); border: 1px solid var(--accent, #c8a84b);
             border-radius: 8px; padding: 8px 26px;
         }
+        /* ── Search ──────────────────────────────────────────────────── */
+        .egv-search-row { width: 100%; display: flex; justify-content: center; }
+        .egv-search {
+            width: min(420px, 92%); box-sizing: border-box;
+            font-family: var(--PX, monospace); font-size: 12px; letter-spacing: 1px;
+            padding: 8px 12px; color: #f5d98a;
+            background: rgba(20, 15, 5, 0.6); border: 1px solid var(--border2, #444); border-radius: 6px;
+            outline: none;
+        }
+        .egv-search:focus { border-color: var(--accent, #c8a84b); box-shadow: 0 0 8px rgba(200, 168, 75, 0.3); }
+        .egv-search-title {
+            font-family: var(--PX, monospace); font-size: 11px; letter-spacing: 3px;
+            color: var(--accent, #c8a84b); margin: 10px 0 6px; padding-bottom: 4px;
+            border-bottom: 1px solid rgba(200, 168, 75, 0.35);
+        }
+        .egv-search-section { width: 100%; }
+        .egv-search-none { font-family: var(--PX, monospace); font-size: 12px; color: var(--accent2, #888); padding: 24px 0; }
+        .egv-searching .egv-base-controls { display: none; }
+        .egv-searching .egv-base-wrap, .egv-searching .egv-base-list { max-height: none; }
         /* ── Tabs ────────────────────────────────────────────────────── */
         .egv-tab-bar {
             display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;

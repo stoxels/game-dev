@@ -25,6 +25,9 @@ import { _egvBuildCurrencyTabHTML } from './loot-vendor-supplies.js';
 
 // Which tab is open. The last active tab is remembered across visits.
 let _egvActiveTab = 'charms';
+// Search text. While non-empty the content area shows every tab's cards in
+// one list, filtered to the matches (see _egvApplySearch).
+let _egvQuery = '';
 
 // The vendor tabs (maps are no longer sold - they drop in the late campaign), in display order.
 const EG_VENDOR_TABS = [
@@ -75,6 +78,7 @@ function _egvBuildFullScreenHTML() {
     ${_egvBuildTopbarHTML()}
     <div class="egv-body">
         <div class="egv-gold-balance" id="egv-gold-balance"></div>
+        <div class="egv-search-row"><input type="search" id="egv-search" class="egv-search" autocomplete="off" spellcheck="false" placeholder="${t('eg_vendor_search_ph')}"></div>
         ${_egvBuildTabBarHTML()}
         <div class="egv-tab-content" id="egv-tab-content"></div>
         <div class="egv-hint" id="egv-hint"></div>
@@ -93,6 +97,16 @@ function _egvRenderTabContent() {
     const contentEl = document.getElementById('egv-tab-content');
     if (!contentEl) return;
 
+    if (_egvQuery) {
+        _egvBuildSearchView(contentEl);
+        _egvApplySearch();
+        _egvRefreshGoldDisplay();
+        return;
+    }
+    contentEl.classList.remove('egv-searching');
+    const activeBtn = document.getElementById(`egv-tab-btn-${_egvActiveTab}`);
+    if (activeBtn) activeBtn.classList.add('egv-tab-active');
+
     switch (_egvActiveTab) {
         case 'charms': contentEl.innerHTML = _egvBuildCharmsTabHTML(); break;
         case 'currency': contentEl.innerHTML = _egvBuildCurrencyTabHTML(); break;
@@ -107,11 +121,65 @@ function _egvRenderTabContent() {
     _egvRefreshGoldDisplay();
 }
 
+// Search mode: every tab's cards under its own heading, so one query covers
+// charms, currency, essences, items and base items alike.
+function _egvBuildSearchView(contentEl) {
+    const builders = {
+        charms: _egvBuildCharmsTabHTML, currency: _egvBuildCurrencyTabHTML, essences: _egvBuildEssencesTabHTML,
+        items: _egvBuildItemsTabHTML, base: _egvBuildBaseTabHTML,
+    };
+    contentEl.classList.add('egv-searching');
+    document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
+    contentEl.innerHTML = EG_VENDOR_TABS.map(tab => `
+<div class="egv-search-section">
+    <div class="egv-search-title">${t(tab.labelKey)}</div>
+    ${builders[tab.id]()}
+</div>`).join('') + `<div class="egv-search-none" id="egv-search-none" style="display:none">${t('eg_vendor_search_none')}</div>`;
+    const hintEl = document.getElementById('egv-hint');
+    if (hintEl) hintEl.textContent = t('eg_vendor_hint_search');
+}
+
+// Shows only the cards whose text contains the query, hides empty sections.
+function _egvApplySearch() {
+    const contentEl = document.getElementById('egv-tab-content');
+    if (!contentEl) return;
+    const words = _egvQuery.toLowerCase().split(/\s+/).filter(Boolean);
+    let total = 0;
+    contentEl.querySelectorAll('.egv-search-section').forEach(sec => {
+        let shown = 0;
+        sec.querySelectorAll('.egv-card').forEach(card => {
+            const text = card.textContent.toLowerCase();
+            const hit = words.every(w => text.indexOf(w) !== -1);
+            card.style.display = hit ? '' : 'none';
+            if (hit) shown++;
+        });
+        sec.style.display = shown ? '' : 'none';
+        total += shown;
+    });
+    const none = document.getElementById('egv-search-none');
+    if (none) none.style.display = total ? 'none' : '';
+}
+
+// Search box typing: build the combined view once, then just re-filter.
+function _egvOnSearchInput(value) {
+    const had = !!_egvQuery;
+    _egvQuery = String(value || '').trim();
+    const contentEl = document.getElementById('egv-tab-content');
+    if (!contentEl) return;
+    if (!_egvQuery) { _egvRenderTabContent(); return; }
+    if (!had || !contentEl.classList.contains('egv-searching')) _egvRenderTabContent();
+    else _egvApplySearch();
+}
+
 // Switches to another tab. Called from the generated tab-bar buttons, so the
 // name is an inline handler and must stay reachable as a global.
 export function _egvSwitchTab(tabId) {
     Audio_Manager.playSFX('ui_tab_switch');
     _egvActiveTab = tabId;
+    // Picking a tab leaves search mode.
+    _egvQuery = '';
+    const box = document.getElementById('egv-search');
+    if (box) box.value = '';
     document.querySelectorAll('.egv-tab-btn').forEach(btn => btn.classList.remove('egv-tab-active'));
     const btn = document.getElementById(`egv-tab-btn-${tabId}`);
     if (btn) btn.classList.add('egv-tab-active');
@@ -131,6 +199,13 @@ function _egvCreateScreen() {
     screen.className = 'screen';
     screen.innerHTML = _egvBuildFullScreenHTML();
     document.body.appendChild(screen);
+    const box = screen.querySelector('#egv-search');
+    if (box) {
+        box.addEventListener('input', () => _egvOnSearchInput(box.value));
+        box.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && box.value) { box.value = ''; _egvOnSearchInput(''); e.stopPropagation(); }
+        });
+    }
 }
 
 // Item art arrives asynchronously (images/items/manifest.json is fetched
