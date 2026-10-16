@@ -829,7 +829,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_fearsome_cleave_125",
    "effects": [
-    "melee_phys_axe:30",
+    "melee_phys_axe:12",
     "intimidate_melee:15",
     "intimidate_amp:10"
    ],
@@ -844,7 +844,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_spinecruncher_126",
    "effects": [
-    "melee_phys_mace:30"
+    "melee_phys_mace:12"
    ],
    "tier": "notable"
   },
@@ -1050,7 +1050,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_harvester_of_foes_153",
    "effects": [
-    "melee_phys_axe:30",
+    "melee_phys_axe:12",
     "impale_effect_heavy:12"
    ],
    "tier": "notable"
@@ -1594,7 +1594,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_titan_s_might_191",
    "effects": [
-    "melee_phys_heavy:25",
+    "melee_phys_heavy:10",
     "str_flat:20",
     "melee_charge_speed_pct:5"
    ],
@@ -1813,7 +1813,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_skullcracker_360",
    "effects": [
-    "melee_phys_mace:36",
+    "melee_phys_mace:14",
     "stun_chance_mace_charged:10"
    ],
    "tier": "notable"
@@ -2278,7 +2278,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_axe_fury_369",
    "effects": [
-    "melee_phys_axe:25",
+    "melee_phys_axe:10",
     "axe_charge_speed:8",
     "rage_on_hit_axe:1",
     "rage_effect:1",
@@ -2436,7 +2436,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_ribcage_crusher_99",
    "effects": [
-    "melee_phys_mace:24",
+    "melee_phys_mace:10",
     "melee_charge_speed_pct:6"
    ],
    "tier": "notable"
@@ -2496,7 +2496,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_precision_edge_227",
    "effects": [
-    "melee_phys_sword:20",
+    "melee_phys_sword:8",
     "sword_charge_speed:8",
     "accuracy_sword:200"
    ],
@@ -2618,7 +2618,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_hatchet_master_5",
    "effects": [
-    "melee_phys_axe:24",
+    "melee_phys_axe:10",
     "axe_charge_speed:10"
    ],
    "tier": "notable"
@@ -2788,7 +2788,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_martial_experience_135",
    "effects": [
-    "melee_phys_heavy:30",
+    "melee_phys_heavy:12",
     "life_leech_effect_inc:33"
    ],
    "tier": "notable"
@@ -3306,7 +3306,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_piercing_blade_147",
    "effects": [
-    "melee_phys_sword:35",
+    "melee_phys_sword:14",
     "ignore_phys_reduction:35"
    ],
    "tier": "notable"
@@ -6178,7 +6178,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_brutality_20037",
    "effects": [
-    "melee_phys_heavy:25",
+    "melee_phys_heavy:10",
     "stun_double_chance:10",
     "melee_double_damage_chance:5"
    ],
@@ -6419,7 +6419,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_destroyer_20056",
    "effects": [
-    "melee_phys_heavy:25",
+    "melee_phys_heavy:10",
     "melee_charge_speed_pct:5",
     "stun_duration_heavy:25"
    ],
@@ -6502,7 +6502,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_feller_of_foes_20062",
    "effects": [
-    "melee_phys_axe:30",
+    "melee_phys_axe:12",
     "crit_multi_axe:40"
    ],
    "tier": "notable"
@@ -6631,7 +6631,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_mountain_s_heart_20071",
    "effects": [
-    "melee_phys_mace:30",
+    "melee_phys_mace:12",
     "area_of_effect:15"
    ],
    "tier": "notable"
@@ -6808,7 +6808,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_the_colossus_20086",
    "effects": [
-    "melee_phys_mace:35",
+    "melee_phys_mace:14",
     "crit_multi_mace:20"
    ],
    "tier": "notable"
@@ -7328,7 +7328,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_and_life_leech_speed_30211",
    "effects": [
-    "melee_phys_heavy:12",
+    "melee_phys_heavy:5",
     "life_leech_effect_inc:20"
    ],
    "tier": "small"
@@ -7342,7 +7342,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_and_life_leech_speed_30212",
    "effects": [
-    "melee_phys_heavy:12",
+    "melee_phys_heavy:5",
     "life_leech_effect_inc:20"
    ],
    "tier": "small"
@@ -7356,7 +7356,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_and_leech_30213",
    "effects": [
-    "melee_phys_heavy:12",
+    "melee_phys_heavy:5",
     "life_leech_attack:0.4"
    ],
    "tier": "small"
@@ -7370,7 +7370,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_and_leech_30214",
    "effects": [
-    "melee_phys_heavy:12",
+    "melee_phys_heavy:5",
     "life_leech_attack:0.8"
    ],
    "tier": "small"
@@ -7753,7 +7753,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_30243",
    "effects": [
-    "melee_phys_axe:14"
+    "melee_phys_axe:6"
    ],
    "tier": "small"
   },
@@ -7766,7 +7766,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_impale_chance_30244",
    "effects": [
-    "melee_phys_axe:14",
+    "melee_phys_axe:6",
     "impale_chance_heavy:10"
    ],
    "tier": "small"
@@ -7804,7 +7804,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_breaching_blow_30247",
    "effects": [
-    "melee_phys_heavy:14",
+    "melee_phys_heavy:6",
     "ignore_phys_reduction:15"
    ],
    "tier": "small"
@@ -7818,7 +7818,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lingering_impact_30248",
    "effects": [
-    "melee_phys_heavy:10",
+    "melee_phys_heavy:4",
     "stun_duration_heavy:10"
    ],
    "tier": "small"
@@ -7832,7 +7832,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_staggering_blow_30249",
    "effects": [
-    "melee_phys_heavy:14",
+    "melee_phys_heavy:6",
     "stun_chance_heavy:5"
    ],
    "tier": "small"
@@ -7846,7 +7846,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lingering_impact_30250",
    "effects": [
-    "melee_phys_heavy:14",
+    "melee_phys_heavy:6",
     "stun_duration_heavy:20"
    ],
    "tier": "small"
@@ -8115,7 +8115,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_swordsman_s_edge_30270",
    "effects": [
-    "melee_phys_sword:14"
+    "melee_phys_sword:6"
    ],
    "tier": "travel"
   },
@@ -8128,7 +8128,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_swordsman_s_edge_30271",
    "effects": [
-    "melee_phys_sword:16"
+    "melee_phys_sword:6"
    ],
    "tier": "small"
   },
@@ -8141,7 +8141,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_swift_blade_30272",
    "effects": [
-    "melee_phys_sword:10",
+    "melee_phys_sword:4",
     "sword_charge_speed:4",
     "quick_fill_streak:25"
    ],
@@ -8156,7 +8156,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_swift_blade_30273",
    "effects": [
-    "melee_phys_sword:10",
+    "melee_phys_sword:4",
     "sword_charge_speed:4",
     "quick_fill_streak:25"
    ],
@@ -8171,7 +8171,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_swordsman_s_edge_30274",
    "effects": [
-    "melee_phys_sword:16"
+    "melee_phys_sword:6"
    ],
    "tier": "small"
   },
@@ -8208,7 +8208,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_hewing_rhythm_30277",
    "effects": [
-    "melee_phys_axe:12",
+    "melee_phys_axe:5",
     "axe_charge_speed:3"
    ],
    "tier": "small"
@@ -8222,7 +8222,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_hewing_rhythm_30278",
    "effects": [
-    "melee_phys_axe:12",
+    "melee_phys_axe:5",
     "axe_charge_speed:3"
    ],
    "tier": "small"
@@ -8236,7 +8236,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_hewing_rhythm_30279",
    "effects": [
-    "melee_phys_axe:12",
+    "melee_phys_axe:5",
     "axe_charge_speed:3"
    ],
    "tier": "travel"
@@ -8250,7 +8250,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_axeman_s_might_30280",
    "effects": [
-    "melee_phys_axe:18"
+    "melee_phys_axe:7"
    ],
    "tier": "travel"
   },
@@ -8263,7 +8263,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_axeman_s_might_30281",
    "effects": [
-    "melee_phys_axe:14"
+    "melee_phys_axe:6"
    ],
    "tier": "travel"
   },
@@ -8831,7 +8831,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_bludgeoner_s_might_30329",
    "effects": [
-    "melee_phys_mace:16"
+    "melee_phys_mace:6"
    ],
    "tier": "small"
   },
@@ -8844,7 +8844,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_bludgeoner_s_might_30330",
    "effects": [
-    "melee_phys_mace:16"
+    "melee_phys_mace:6"
    ],
    "tier": "small"
   },
@@ -8857,7 +8857,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_stunning_might_30331",
    "effects": [
-    "melee_phys_mace:16",
+    "melee_phys_mace:6",
     "stun_duration:20"
    ],
    "tier": "small"
@@ -8871,7 +8871,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_stunning_might_30332",
    "effects": [
-    "melee_phys_mace:16",
+    "melee_phys_mace:6",
     "stun_duration:20"
    ],
    "tier": "small"
@@ -8885,7 +8885,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_bludgeoner_s_might_30333",
    "effects": [
-    "melee_phys_mace:14"
+    "melee_phys_mace:6"
    ],
    "tier": "travel"
   },
@@ -8898,7 +8898,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lesser_mountain_s_heart_30334",
    "effects": [
-    "melee_phys_mace:14",
+    "melee_phys_mace:6",
     "area_of_effect:8"
    ],
    "tier": "small"
@@ -8912,7 +8912,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_lesser_mountain_s_heart_30335",
    "effects": [
-    "melee_phys_mace:14",
+    "melee_phys_mace:6",
     "area_of_effect:8"
    ],
    "tier": "small"
@@ -8963,7 +8963,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axeman_s_might_30339",
    "effects": [
-    "melee_phys_axe:18"
+    "melee_phys_axe:7"
    ],
    "tier": "small"
   },
@@ -8976,7 +8976,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axeman_s_might_30340",
    "effects": [
-    "melee_phys_axe:18"
+    "melee_phys_axe:7"
    ],
    "tier": "small"
   },
@@ -9107,7 +9107,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_heavy_blow_30350",
    "effects": [
-    "melee_phys_heavy:16"
+    "melee_phys_heavy:6"
    ],
    "tier": "small"
   },
@@ -9159,7 +9159,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_bludgeoner_s_edge_30354",
    "effects": [
-    "melee_phys_mace:10",
+    "melee_phys_mace:4",
     "crit_chance_mace:3"
    ],
    "tier": "small"
@@ -9293,7 +9293,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_heavy_blow_30364",
    "effects": [
-    "melee_phys_heavy:16"
+    "melee_phys_heavy:6"
    ],
    "tier": "small"
   },
@@ -9672,7 +9672,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mace_damage_and_reduced_enemy_stun_threshold_30393",
    "effects": [
-    "melee_phys_mace:16",
+    "melee_phys_mace:6",
     "stun_chance:5"
    ],
    "tier": "small"
@@ -9686,7 +9686,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mace_damage_and_stun_duration_30394",
    "effects": [
-    "melee_phys_mace:12",
+    "melee_phys_mace:5",
     "stun_duration:10"
    ],
    "tier": "small"
@@ -9700,7 +9700,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mace_damage_and_stun_duration_30395",
    "effects": [
-    "melee_phys_mace:16",
+    "melee_phys_mace:6",
     "stun_double_chance:10"
    ],
    "tier": "small"
@@ -10578,7 +10578,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_critical_strike_chance_30462",
    "effects": [
-    "melee_phys_axe:10",
+    "melee_phys_axe:4",
     "crit_chance_axe:3"
    ],
    "tier": "small"
@@ -10592,7 +10592,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_critical_strike_chance_30463",
    "effects": [
-    "melee_phys_axe:10",
+    "melee_phys_axe:4",
     "crit_chance_axe:3"
    ],
    "tier": "small"
@@ -10606,7 +10606,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_accuracy_30464",
    "effects": [
-    "melee_phys_axe:10",
+    "melee_phys_axe:4",
     "accuracy_rating_pct:10"
    ],
    "tier": "small"
@@ -10620,7 +10620,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_30465",
    "effects": [
-    "melee_phys_axe:12"
+    "melee_phys_axe:5"
    ],
    "tier": "small"
   },
@@ -10646,7 +10646,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_two_handed_melee_damage_30467",
    "effects": [
-    "melee_phys_heavy:14"
+    "melee_phys_heavy:6"
    ],
    "tier": "travel"
   },
@@ -10659,7 +10659,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_and_area_of_effect_30468",
    "effects": [
-    "melee_phys_heavy:12",
+    "melee_phys_heavy:5",
     "area_of_effect:5"
    ],
    "tier": "small"
@@ -10673,7 +10673,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_and_area_of_effect_30469",
    "effects": [
-    "melee_phys_heavy:12",
+    "melee_phys_heavy:5",
     "area_of_effect:5"
    ],
    "tier": "small"
@@ -10687,7 +10687,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_and_attack_speed_30470",
    "effects": [
-    "melee_phys_heavy:12",
+    "melee_phys_heavy:5",
     "melee_charge_speed_pct:3",
     "time_on_elite:3"
    ],
@@ -10702,7 +10702,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_and_attack_speed_30471",
    "effects": [
-    "melee_phys_heavy:12",
+    "melee_phys_heavy:5",
     "melee_charge_speed_pct:3"
    ],
    "tier": "small"
@@ -10853,7 +10853,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mace_damage_and_attack_speed_30482",
    "effects": [
-    "melee_phys_mace:8",
+    "melee_phys_mace:3",
     "melee_charge_speed_pct:3"
    ],
    "tier": "small"
@@ -10867,7 +10867,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mace_damage_and_attack_speed_30483",
    "effects": [
-    "melee_phys_mace:8",
+    "melee_phys_mace:3",
     "melee_charge_speed_pct:3",
     "mark_on_kill:6"
    ],
@@ -10882,7 +10882,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mace_damage_and_area_of_effect_30484",
    "effects": [
-    "melee_phys_mace:10",
+    "melee_phys_mace:4",
     "area_of_effect:8"
    ],
    "tier": "small"
@@ -10896,7 +10896,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mace_damage_and_area_of_effect_30485",
    "effects": [
-    "melee_phys_mace:10",
+    "melee_phys_mace:4",
     "area_of_effect:8"
    ],
    "tier": "small"
@@ -11043,7 +11043,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_30496",
    "effects": [
-    "melee_phys_heavy:12"
+    "melee_phys_heavy:5"
    ],
    "tier": "small"
   },
@@ -11069,7 +11069,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_two_handed_melee_damage_30498",
    "effects": [
-    "melee_phys_heavy:12"
+    "melee_phys_heavy:5"
    ],
    "tier": "small"
   },
@@ -12653,7 +12653,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_brutal_blade_20129",
    "effects": [
     "block_dualshield:6",
-    "melee_phys_sword:24"
+    "melee_phys_sword:10"
    ],
    "tier": "notable"
   },
@@ -13071,7 +13071,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_bladedancer_20165",
    "effects": [
-    "melee_phys_sword:30",
+    "melee_phys_sword:12",
     "melee_range_m:0.3"
    ],
    "tier": "notable"
@@ -14057,7 +14057,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_attack_speed_30698",
    "effects": [
-    "melee_phys_axe:8",
+    "melee_phys_axe:3",
     "axe_charge_speed:4"
    ],
    "tier": "small"
@@ -14071,7 +14071,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_attack_speed_30699",
    "effects": [
-    "melee_phys_axe:8",
+    "melee_phys_axe:3",
     "axe_charge_speed:4"
    ],
    "tier": "small"
@@ -14085,7 +14085,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_axe_damage_and_attack_speed_30700",
    "effects": [
-    "melee_phys_axe:8",
+    "melee_phys_axe:3",
     "axe_charge_speed:4"
    ],
    "tier": "small"
@@ -14349,7 +14349,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_sword_range_30720",
    "effects": [
-    "melee_phys_sword:10",
+    "melee_phys_sword:4",
     "melee_range_m:0.1"
    ],
    "tier": "small"
@@ -14363,7 +14363,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_sword_damage_30721",
    "effects": [
-    "melee_phys_sword:14"
+    "melee_phys_sword:6"
    ],
    "tier": "small"
   },
@@ -15511,7 +15511,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_sword_damage_30808",
    "effects": [
-    "melee_phys_sword:12"
+    "melee_phys_sword:5"
    ],
    "tier": "travel"
   },
@@ -15539,7 +15539,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_sword_damage_and_block_30810",
    "effects": [
     "block_dualshield:2",
-    "melee_phys_sword:12"
+    "melee_phys_sword:5"
    ],
    "tier": "small"
   },
@@ -15553,7 +15553,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_sword_damage_and_block_30811",
    "effects": [
     "block_dualshield:2",
-    "melee_phys_sword:12"
+    "melee_phys_sword:5"
    ],
    "tier": "small"
   },
@@ -15567,7 +15567,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_sword_damage_and_block_30812",
    "effects": [
     "block_dualshield:2",
-    "melee_phys_sword:12"
+    "melee_phys_sword:5"
    ],
    "tier": "small"
   },
@@ -22226,7 +22226,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "travel_mace_damage_31329",
    "effects": [
-    "melee_phys_mace:14"
+    "melee_phys_mace:6"
    ],
    "tier": "travel"
   },

@@ -51,28 +51,18 @@ export function _egCrossoverDamageMult(stats) {
     return mult;
 }
 
-// High-level balance pass: a stacked build's grid projectiles and charged melee
-// strikes are rescaled by character level so every build type lands in the same
-// main-action band (about 40-60k at L90). Projectiles ramp up (1x to L50, 10x at
-// L90: gear alone leaves them ~10x short); melee is trimmed (1x to L50, 0.18x at L68, 0.4x at
-// L90: the passive tree + gear stack overshoots). Spells have their own ramp.
+// High-level balance pass: grid projectiles are rescaled by character level (1x to
+// L50, 7x at L90) because gear alone leaves them well short of the main-action
+// band (about 40-60k at L90). Melee is not rescaled (its heavy/weapon-family tree
+// nodes were lowered instead); spells have their own ramp.
 function _egHighLevelDamageScale(kind) {
     let lv = 1;
     try { lv = Number(typeof globalThis._egGetPlayerLevel === 'function' ? globalThis._egGetPlayerLevel() : 1) || 1; } catch (e) { lv = 1; }
     if (kind === 'projectile') {
         if (lv <= 50) return 1;
-        return Math.pow(10, Math.min(1, (lv - 50) / 40));
+        return Math.pow(7, Math.min(1, (lv - 50) / 40));
     }
-    // Anchors [level, factor], log-interpolated: the tree-stacked melee stack runs far
-    // ahead mid-game (about 100k at L68), so the trim is deepest around T1 and eases off.
-    const A = [[50, 1], [55, 0.6], [68, 0.18], [80, 0.25], [90, 0.4]];
-    if (lv <= A[0][0]) return A[0][1];
-    if (lv >= A[A.length - 1][0]) return A[A.length - 1][1];
-    for (let i = 0; i < A.length - 1; i++) {
-        const [x0, y0] = A[i]; const [x1, y1] = A[i + 1];
-        if (lv <= x1) return Math.exp(Math.log(y0) + (Math.log(y1) - Math.log(y0)) * (lv - x0) / (x1 - x0));
-    }
-    return 0.4;
+    return 1;
 }
 
 export function _egCalcPlayerDamage() {
@@ -294,8 +284,6 @@ export function _egCalcPlayerMeleeDamage(chargePct = 1) {
     // strike to deal twice the damage, independent of the crit roll.
     const doubleChance = Math.min(100, Number(stats.meleeDoubleDamageChancePct) || 0);
     if (doubleChance > 0 && Math.random() * 100 < doubleChance) dmg *= 2;
-
-    dmg *= _egHighLevelDamageScale('melee');
 
     // Active map run: apply the "% reduced Melee Attack Damage" map mod.
     if (typeof _egMapPlayerMeleeMult === 'function') dmg *= _egMapPlayerMeleeMult();
