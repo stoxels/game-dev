@@ -190,12 +190,13 @@ function _egSpawnPickup() {
 // sacrificial zombie add is killed by the player. Unlike the ambient
 // spawner this is a direct on-kill reward, so it may sit on the board next
 // to the ambient pickup (total capped at one extra). Returns true when a
-// heart was placed.
-export function _egDropHeartPickup() {
+// heart was placed. `opts.ignoreCap` (boss health-threshold hearts) skips the
+// on-board cap; the cell rules still apply.
+export function _egDropHeartPickup(opts) {
     if (typeof globalThis.isMonsterless === 'function' && globalThis.isMonsterless()) return false;
     if (!_egIsActive()) return false;
     if (typeof _egPickups === 'undefined' || typeof EG_PICKUP_DEFS === 'undefined') return false;
-    if (_egPickups.size >= EG_PICKUP_MAX_ON_BOARD + 1) return false;
+    if (!(opts && opts.ignoreCap) && _egPickups.size >= EG_PICKUP_MAX_ON_BOARD + 1) return false;
     if (typeof _egBuildPickupEligiblePool !== 'function') return false;
 
     const pool = _egBuildPickupEligiblePool();

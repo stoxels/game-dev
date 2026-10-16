@@ -3,6 +3,7 @@ import { t } from '../../translation/translations.js';
 import { _egRenderPanel } from '../encounter.js';
 import { _egApplyMapModsToMonster, _egGetActiveMapModValue } from '../../endgame/endgame-map-launch.js';
 import { _egBossTimers, _egIsActive } from '../combat-state.js';
+import { _egDropHeartPickup } from '../combat-grid-pickups-spawner.js';
 // NOTE: no imports from per-boss boss files here on purpose (the data
 // table ./boss-teardown-hooks.js is exempt - it imports nothing, so it
 // cannot cycle). The per-boss teardown fns resolve lazily via globalThis
@@ -415,7 +416,27 @@ export function _egBossTransition(monster, newPhase) {
 
 // Checks whether a damage hit should trigger a phase transition and, if so, fires it.
 // Called after every hit on a boss. No-op during existing immunity windows.
+// Hearts dropped onto the grid as a boss falls through these health shares
+// (one burst per threshold, per boss) - a breather in the long fights.
+const EG_BOSS_HEART_THRESHOLDS = [0.75, 0.5, 0.25];
+const EG_BOSS_HEARTS_PER_BURST = 2;
+function _egBossHeartBursts(monster) {
+    if (!monster || !(monster.maxHP > 0) || !(monster.currentHP > 0)) return;
+    const ratio = monster.currentHP / monster.maxHP;
+    const given = monster._heartBursts || 0;
+    let due = 0;
+    while (given + due < EG_BOSS_HEART_THRESHOLDS.length && ratio <= EG_BOSS_HEART_THRESHOLDS[given + due]) due++;
+    if (!due) return;
+    monster._heartBursts = given + due;
+    let placed = 0;
+    for (let i = 0; i < due * EG_BOSS_HEARTS_PER_BURST; i++) {
+        if (_egDropHeartPickup({ ignoreCap: true })) placed++;
+    }
+    if (placed > 0) globalThis.showCombatToast(t('eg_boss_hearts_spawned'), '#f9a8d4');
+}
+
 export function _egBossCheckPhase(monster) {
+    _egBossHeartBursts(monster);
     if (!monster.bossDef || monster.bossImmune) return;
 
     const targetPhase = _egBossCalcTargetPhase(monster);
