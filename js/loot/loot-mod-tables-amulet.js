@@ -187,6 +187,54 @@ export const EG_MOD_TABLE_AMULET = {
                 { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_fire_damage: {
+            id: 'inc_fire_damage',
+            label: '#% increased Fire Damage', labelDe: '#% erhöhter Feuerschaden',
+            tiers: [
+                { tier: 1, min: 24, max: 32, weight: 50, ilvl: 80 },
+                { tier: 2, min: 18, max: 23, weight: 125, ilvl: 62 },
+                { tier: 3, min: 12, max: 17, weight: 250, ilvl: 40 },
+                { tier: 4, min: 7, max: 11, weight: 500, ilvl: 18 },
+                { tier: 5, min: 3, max: 6, weight: 1000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_cold_damage: {
+            id: 'inc_cold_damage',
+            label: '#% increased Cold Damage', labelDe: '#% erhöhter Kälteschaden',
+            tiers: [
+                { tier: 1, min: 24, max: 32, weight: 50, ilvl: 80 },
+                { tier: 2, min: 18, max: 23, weight: 125, ilvl: 62 },
+                { tier: 3, min: 12, max: 17, weight: 250, ilvl: 40 },
+                { tier: 4, min: 7, max: 11, weight: 500, ilvl: 18 },
+                { tier: 5, min: 3, max: 6, weight: 1000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_lightning_damage: {
+            id: 'inc_lightning_damage',
+            label: '#% increased Lightning Damage', labelDe: '#% erhöhter Blitzschaden',
+            tiers: [
+                { tier: 1, min: 24, max: 32, weight: 50, ilvl: 80 },
+                { tier: 2, min: 18, max: 23, weight: 125, ilvl: 62 },
+                { tier: 3, min: 12, max: 17, weight: 250, ilvl: 40 },
+                { tier: 4, min: 7, max: 11, weight: 500, ilvl: 18 },
+                { tier: 5, min: 3, max: 6, weight: 1000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_shadow_damage: {
+            id: 'inc_shadow_damage',
+            label: '#% increased Shadow Damage', labelDe: '#% erhöhter Schattenschaden',
+            tiers: [
+                { tier: 1, min: 24, max: 32, weight: 50, ilvl: 80 },
+                { tier: 2, min: 18, max: 23, weight: 125, ilvl: 62 },
+                { tier: 3, min: 12, max: 17, weight: 250, ilvl: 40 },
+                { tier: 4, min: 7, max: 11, weight: 500, ilvl: 18 },
+                { tier: 5, min: 3, max: 6, weight: 1000, ilvl: 1 }
+            ]
+        },
 },
 
     suffixes: {
@@ -424,6 +472,30 @@ export const EG_MOD_TABLE_AMULET = {
                 { tier: 1, min: 25, max: 35, weight: 120, ilvl: 70 },
                 { tier: 2, min: 14, max: 24, weight: 300, ilvl: 40 },
                 { tier: 3, min: 5, max: 13, weight: 720, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        spell_crit_chance: {
+            id: 'spell_crit_chance',
+            label: '+#% Critical Strike Chance with Spells', labelDe: '+#% kritische Trefferchance mit Zaubern',
+            tiers: [
+                { tier: 1, min: 10, max: 15, weight: 90, ilvl: 80 },
+                { tier: 2, min: 7, max: 9, weight: 220, ilvl: 62 },
+                { tier: 3, min: 4, max: 6, weight: 520, ilvl: 40 },
+                { tier: 4, min: 2, max: 3, weight: 1050, ilvl: 18 },
+                { tier: 5, min: 1, max: 1, weight: 1600, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        spell_crit_multiplier: {
+            id: 'spell_crit_multiplier',
+            label: '+#% to Critical Strike Multiplier with Spells', labelDe: '+#% zum kritischen Schadensmultiplikator mit Zaubern',
+            tiers: [
+                { tier: 1, min: 32, max: 42, weight: 80, ilvl: 80 },
+                { tier: 2, min: 24, max: 31, weight: 180, ilvl: 62 },
+                { tier: 3, min: 15, max: 23, weight: 400, ilvl: 40 },
+                { tier: 4, min: 8, max: 14, weight: 900, ilvl: 18 },
+                { tier: 5, min: 3, max: 7, weight: 1400, ilvl: 1 }
             ]
         },
 }

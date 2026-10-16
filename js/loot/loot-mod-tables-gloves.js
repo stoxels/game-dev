@@ -275,6 +275,66 @@ export const EG_MOD_TABLE_GLOVES = {
                 { tier: 3, min: 2, max: 5, weight: 600, ilvl: 1 }
             ]
         },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_elemental_damage: {
+            id: 'inc_elemental_damage',
+            label: '#% increased Elemental Damage', labelDe: '#% erhöhter Elementarschaden',
+            tiers: [
+                { tier: 1, min: 16, max: 22, weight: 100, ilvl: 80 },
+                { tier: 2, min: 12, max: 15, weight: 250, ilvl: 62 },
+                { tier: 3, min: 8, max: 11, weight: 500, ilvl: 40 },
+                { tier: 4, min: 5, max: 7, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 2, max: 4, weight: 2000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_spell_damage: {
+            id: 'inc_spell_damage',
+            label: '#% increased Spell Damage', labelDe: '#% erhöhter Zauberschaden',
+            tiers: [
+                { tier: 1, min: 18, max: 26, weight: 80, ilvl: 80 },
+                { tier: 2, min: 14, max: 17, weight: 200, ilvl: 62 },
+                { tier: 3, min: 9, max: 13, weight: 400, ilvl: 40 },
+                { tier: 4, min: 5, max: 8, weight: 800, ilvl: 18 },
+                { tier: 5, min: 2, max: 4, weight: 1600, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        spell_damage: {
+            id: 'spell_damage',
+            label: '+# to Spell Damage', labelDe: '+# zu Zauberschaden',
+            tiers: [
+                { tier: 1, min: 44, max: 60, weight: 100, ilvl: 80 },
+                { tier: 2, min: 28, max: 43, weight: 250, ilvl: 62 },
+                { tier: 3, min: 14, max: 27, weight: 500, ilvl: 40 },
+                { tier: 4, min: 6, max: 13, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 2, max: 5, weight: 2000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        projectile_damage: {
+            id: 'projectile_damage',
+            label: '#% increased Projectile Damage', labelDe: '#% erhöhter Projektilschaden',
+            tiers: [
+                { tier: 1, min: 16, max: 22, weight: 100, ilvl: 80 },
+                { tier: 2, min: 12, max: 15, weight: 250, ilvl: 62 },
+                { tier: 3, min: 8, max: 11, weight: 500, ilvl: 40 },
+                { tier: 4, min: 5, max: 7, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 2, max: 4, weight: 2000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_physical_damage: {
+            id: 'inc_physical_damage',
+            label: '#% increased Physical Damage', labelDe: '#% erhöhter physischer Schaden',
+            tiers: [
+                { tier: 1, min: 20, max: 30, weight: 100, ilvl: 80 },
+                { tier: 2, min: 14, max: 19, weight: 250, ilvl: 62 },
+                { tier: 3, min: 9, max: 13, weight: 500, ilvl: 40 },
+                { tier: 4, min: 5, max: 8, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 2, max: 4, weight: 2000, ilvl: 1 }
+            ]
+        },
 },
 
     suffixes: {
@@ -495,6 +555,78 @@ export const EG_MOD_TABLE_GLOVES = {
                 { tier: 2, min: 12, max: 20, weight: 200, ilvl: 58 },
                 { tier: 3, min: 5, max: 11, weight: 500, ilvl: 30 },
                 { tier: 4, min: 2, max: 4, weight: 1000, ilvl: 10 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        pen_fire: {
+            id: 'pen_fire',
+            label: 'Penetrates #% of Fire Resistance', labelDe: 'Durchdringt #% des Feuerwiderstands',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 40, ilvl: 80 },
+                { tier: 2, min: 6, max: 7, weight: 100, ilvl: 62 },
+                { tier: 3, min: 4, max: 5, weight: 200, ilvl: 40 },
+                { tier: 4, min: 2, max: 3, weight: 400, ilvl: 18 },
+                { tier: 5, min: 1, max: 1, weight: 800, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        pen_cold: {
+            id: 'pen_cold',
+            label: 'Penetrates #% of Cold Resistance', labelDe: 'Durchdringt #% des Kältewiderstands',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 40, ilvl: 80 },
+                { tier: 2, min: 6, max: 7, weight: 100, ilvl: 62 },
+                { tier: 3, min: 4, max: 5, weight: 200, ilvl: 40 },
+                { tier: 4, min: 2, max: 3, weight: 400, ilvl: 18 },
+                { tier: 5, min: 1, max: 1, weight: 800, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        pen_lightning: {
+            id: 'pen_lightning',
+            label: 'Penetrates #% of Lightning Resistance', labelDe: 'Durchdringt #% des Blitzwiderstands',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 40, ilvl: 80 },
+                { tier: 2, min: 6, max: 7, weight: 100, ilvl: 62 },
+                { tier: 3, min: 4, max: 5, weight: 200, ilvl: 40 },
+                { tier: 4, min: 2, max: 3, weight: 400, ilvl: 18 },
+                { tier: 5, min: 1, max: 1, weight: 800, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        pen_shadow: {
+            id: 'pen_shadow',
+            label: 'Penetrates #% of Shadow Resistance', labelDe: 'Durchdringt #% des Schattenwiderstands',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 40, ilvl: 80 },
+                { tier: 2, min: 6, max: 7, weight: 100, ilvl: 62 },
+                { tier: 3, min: 4, max: 5, weight: 200, ilvl: 40 },
+                { tier: 4, min: 2, max: 3, weight: 400, ilvl: 18 },
+                { tier: 5, min: 1, max: 1, weight: 800, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        spell_crit_multiplier: {
+            id: 'spell_crit_multiplier',
+            label: '+#% to Critical Strike Multiplier with Spells', labelDe: '+#% zum kritischen Schadensmultiplikator mit Zaubern',
+            tiers: [
+                { tier: 1, min: 32, max: 42, weight: 80, ilvl: 80 },
+                { tier: 2, min: 24, max: 31, weight: 180, ilvl: 62 },
+                { tier: 3, min: 15, max: 23, weight: 400, ilvl: 40 },
+                { tier: 4, min: 8, max: 14, weight: 900, ilvl: 18 },
+                { tier: 5, min: 3, max: 7, weight: 1400, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        cast_speed: {
+            id: 'cast_speed',
+            label: '#% increased Cast Speed', labelDe: '#% erhöhte Zaubergeschwindigkeit',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
+                { tier: 2, min: 5, max: 7, weight: 250, ilvl: 62 },
+                { tier: 3, min: 3, max: 4, weight: 500, ilvl: 40 },
+                { tier: 4, min: 2, max: 2, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 1, max: 1, weight: 1600, ilvl: 1 }
             ]
         },
 }

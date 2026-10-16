@@ -2609,6 +2609,26 @@ function _uspRollCritMult() {
 const USP_FLAT_FULL_HIT = 20;
 const USP_FLAT_MIN_SHARE = 0.15;
 
+// High-level spell ramp. Spell base damage has no weapon to grow with, so from
+// character level 50 on it is multiplied by a geometric curve: 1x up to level
+// 50 (the campaign anchors stay valid), about 4.3x at 68, 11x at 80 and 25x at 90.
+// Physical (blade / arrow) spells already ride physical weapon damage and are
+// left alone.
+const USP_SPELL_RAMP_FROM_LEVEL = 50;
+const USP_SPELL_RAMP_TO_LEVEL = 90;
+const USP_SPELL_RAMP_MAX = 25;
+function _uspSpellLevelRamp(level) {
+    let lv = Number(level);
+    if (!Number.isFinite(lv)) {
+        try {
+            lv = Number(typeof globalThis._egGetPlayerLevel === 'function' ? globalThis._egGetPlayerLevel() : STATE.playerLevel) || 1;
+        } catch (e) { lv = 1; }
+    }
+    if (lv <= USP_SPELL_RAMP_FROM_LEVEL) return 1;
+    const t = Math.min(1, (lv - USP_SPELL_RAMP_FROM_LEVEL) / (USP_SPELL_RAMP_TO_LEVEL - USP_SPELL_RAMP_FROM_LEVEL));
+    return Math.pow(USP_SPELL_RAMP_MAX, t);
+}
+
 function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     const stats = (typeof globalThis._egComputePlayerStats === 'function')
         ? globalThis._egComputePlayerStats() : {};
@@ -2621,6 +2641,7 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
         dmg += (((stats.physFlatMin || 0) + (stats.physFlatMax || 0)) / 2 + (tree.flat || 0)) * flatShare;
         dmg *= 1 + ((stats.physIncPct || 0) + (tree.incPct || 0)) / 100;
     } else {
+        dmg *= _uspSpellLevelRamp();
         dmg += ((stats.spellDamageFlat || 0) + (tree.flat || 0)) * flatShare;
         // Elemental spells (fire / frost / lightning / arcane - whatever the
         // def's element maps to) additionally ride the character's global
@@ -2634,8 +2655,9 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
         const fireBonus = (spell.element === 'fire') ? (stats.fireDamageIncPct || 0) : 0;
         const coldBonus = (spell.element === 'cold') ? (stats.coldDamageIncPct || 0) : 0;
         const lightningBonus = (spell.element === 'lightning') ? (stats.lightningDamageIncPct || 0) : 0;
+        const shadowBonus = (spell.element === 'shadow') ? (stats.shadowDamageIncPct || 0) : 0;
         dmg *= 1 + ((stats.spellDamageIncPct || 0) + (tree.incPct || 0)
-            + (stats.elementalDamageIncPct || 0) + fireBonus + coldBonus + lightningBonus) / 100;
+            + (stats.elementalDamageIncPct || 0) + fireBonus + coldBonus + lightningBonus + shadowBonus) / 100;
     }
 
     // Tree: Area Damage (skills with the Area tag) and Spell Damage over Time (tick hits).
@@ -2704,7 +2726,7 @@ export function getUniversalSpellDamageEstimate(spellId) {
     if (!spell.dmg) return null;
     // Reference values are rank-1; the cast rank scales them
     // (SPELL_RANK_DAMAGE_MULT in skill-charms.js).
-    const rankMult = getSpellRankDamageMultForSkill(spellId);
+    const rankMult = getSpellRankDamageMultForSkill(spellId) * (spell.damageKind === 'physical' ? 1 : _uspSpellLevelRamp());
     const perHitMin = Math.max(1, Math.round(spell.dmg[0] * rankMult));
     const perHitMax = Math.max(1, Math.round(spell.dmg[1] * rankMult));
     let count = 1;

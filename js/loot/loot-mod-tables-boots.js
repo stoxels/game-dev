@@ -291,6 +291,42 @@ export const EG_MOD_TABLE_BOOTS = {
                 { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_elemental_damage: {
+            id: 'inc_elemental_damage',
+            label: '#% increased Elemental Damage', labelDe: '#% erhöhter Elementarschaden',
+            tiers: [
+                { tier: 1, min: 16, max: 22, weight: 100, ilvl: 80 },
+                { tier: 2, min: 12, max: 15, weight: 250, ilvl: 62 },
+                { tier: 3, min: 8, max: 11, weight: 500, ilvl: 40 },
+                { tier: 4, min: 5, max: 7, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 2, max: 4, weight: 2000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        spell_damage: {
+            id: 'spell_damage',
+            label: '+# to Spell Damage', labelDe: '+# zu Zauberschaden',
+            tiers: [
+                { tier: 1, min: 44, max: 60, weight: 100, ilvl: 80 },
+                { tier: 2, min: 28, max: 43, weight: 250, ilvl: 62 },
+                { tier: 3, min: 14, max: 27, weight: 500, ilvl: 40 },
+                { tier: 4, min: 6, max: 13, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 2, max: 5, weight: 2000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_physical_damage: {
+            id: 'inc_physical_damage',
+            label: '#% increased Physical Damage', labelDe: '#% erhöhter physischer Schaden',
+            tiers: [
+                { tier: 1, min: 20, max: 30, weight: 100, ilvl: 80 },
+                { tier: 2, min: 14, max: 19, weight: 250, ilvl: 62 },
+                { tier: 3, min: 9, max: 13, weight: 500, ilvl: 40 },
+                { tier: 4, min: 5, max: 8, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 2, max: 4, weight: 2000, ilvl: 1 }
+            ]
+        },
 },
 
     suffixes: {
@@ -485,6 +521,18 @@ export const EG_MOD_TABLE_BOOTS = {
                 { tier: 3, min: 20, max: 24, weight: 900, ilvl: 35 },
                 { tier: 4, min: 15, max: 19, weight: 1800, ilvl: 15 },
                 { tier: 5, min: 10, max: 14, weight: 3600, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        cast_speed: {
+            id: 'cast_speed',
+            label: '#% increased Cast Speed', labelDe: '#% erhöhte Zaubergeschwindigkeit',
+            tiers: [
+                { tier: 1, min: 8, max: 12, weight: 100, ilvl: 80 },
+                { tier: 2, min: 5, max: 7, weight: 250, ilvl: 62 },
+                { tier: 3, min: 3, max: 4, weight: 500, ilvl: 40 },
+                { tier: 4, min: 2, max: 2, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 1, max: 1, weight: 1600, ilvl: 1 }
             ]
         },
 }

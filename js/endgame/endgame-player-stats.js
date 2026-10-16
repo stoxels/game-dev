@@ -142,6 +142,21 @@ export const EG_STAT_KEY_MAP = {
     inc_spell_damage: { bucket: 'spellDamageIncPct', mode: 'add' },
     cast_speed: { bucket: 'castSpeedPct', mode: 'add' },
 
+    // High-level balance pass: gear sources for damage buckets that used to be
+    // passive-tree only. All buckets already exist and are read by the combat code.
+    inc_elemental_damage: { bucket: 'elementalDamageIncPct', mode: 'add' },
+    inc_fire_damage: { bucket: 'fireDamageIncPct', mode: 'add' },
+    inc_cold_damage: { bucket: 'coldDamageIncPct', mode: 'add' },
+    inc_lightning_damage: { bucket: 'lightningDamageIncPct', mode: 'add' },
+    inc_shadow_damage: { bucket: 'shadowDamageIncPct', mode: 'add' },
+    pen_fire: { bucket: 'penFirePct', mode: 'add' },
+    pen_cold: { bucket: 'penColdPct', mode: 'add' },
+    pen_lightning: { bucket: 'penLightningPct', mode: 'add' },
+    pen_shadow: { bucket: 'penShadowPct', mode: 'add' },
+    projectile_damage: { bucket: 'projectileDamageIncPct', mode: 'add' },
+    spell_crit_chance: { bucket: 'spellCritChancePct', mode: 'add' },
+    spell_crit_multiplier: { bucket: 'spellCritMultiplierPct', mode: 'add' },
+
     // Support analogue of Spell Damage - feeds the magnitude of every SUPPORT
     // spell (heal / HoT / absorption restore). Read by _uspApplyHealingPower()
     // in js/skills/universal-spells.js, which leaves every capped buff axis

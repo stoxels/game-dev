@@ -248,6 +248,66 @@ export const EG_MOD_TABLE_CLOAK = {
                 { tier: 4, min: 2, max: 7, weight: 1080, ilvl: 1 }
             ]
         },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_fire_damage: {
+            id: 'inc_fire_damage',
+            label: '#% increased Fire Damage', labelDe: '#% erhöhter Feuerschaden',
+            tiers: [
+                { tier: 1, min: 24, max: 32, weight: 50, ilvl: 80 },
+                { tier: 2, min: 18, max: 23, weight: 125, ilvl: 62 },
+                { tier: 3, min: 12, max: 17, weight: 250, ilvl: 40 },
+                { tier: 4, min: 7, max: 11, weight: 500, ilvl: 18 },
+                { tier: 5, min: 3, max: 6, weight: 1000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_cold_damage: {
+            id: 'inc_cold_damage',
+            label: '#% increased Cold Damage', labelDe: '#% erhöhter Kälteschaden',
+            tiers: [
+                { tier: 1, min: 24, max: 32, weight: 50, ilvl: 80 },
+                { tier: 2, min: 18, max: 23, weight: 125, ilvl: 62 },
+                { tier: 3, min: 12, max: 17, weight: 250, ilvl: 40 },
+                { tier: 4, min: 7, max: 11, weight: 500, ilvl: 18 },
+                { tier: 5, min: 3, max: 6, weight: 1000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_lightning_damage: {
+            id: 'inc_lightning_damage',
+            label: '#% increased Lightning Damage', labelDe: '#% erhöhter Blitzschaden',
+            tiers: [
+                { tier: 1, min: 24, max: 32, weight: 50, ilvl: 80 },
+                { tier: 2, min: 18, max: 23, weight: 125, ilvl: 62 },
+                { tier: 3, min: 12, max: 17, weight: 250, ilvl: 40 },
+                { tier: 4, min: 7, max: 11, weight: 500, ilvl: 18 },
+                { tier: 5, min: 3, max: 6, weight: 1000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        inc_shadow_damage: {
+            id: 'inc_shadow_damage',
+            label: '#% increased Shadow Damage', labelDe: '#% erhöhter Schattenschaden',
+            tiers: [
+                { tier: 1, min: 24, max: 32, weight: 50, ilvl: 80 },
+                { tier: 2, min: 18, max: 23, weight: 125, ilvl: 62 },
+                { tier: 3, min: 12, max: 17, weight: 250, ilvl: 40 },
+                { tier: 4, min: 7, max: 11, weight: 500, ilvl: 18 },
+                { tier: 5, min: 3, max: 6, weight: 1000, ilvl: 1 }
+            ]
+        },
+        // Added by the high-level balance pass: gives this slot a share of the damage stack.
+        projectile_damage: {
+            id: 'projectile_damage',
+            label: '#% increased Projectile Damage', labelDe: '#% erhöhter Projektilschaden',
+            tiers: [
+                { tier: 1, min: 16, max: 22, weight: 100, ilvl: 80 },
+                { tier: 2, min: 12, max: 15, weight: 250, ilvl: 62 },
+                { tier: 3, min: 8, max: 11, weight: 500, ilvl: 40 },
+                { tier: 4, min: 5, max: 7, weight: 1000, ilvl: 18 },
+                { tier: 5, min: 2, max: 4, weight: 2000, ilvl: 1 }
+            ]
+        },
 },
 
     suffixes: {
