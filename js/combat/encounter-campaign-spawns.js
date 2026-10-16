@@ -29,8 +29,10 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     // real character exports (L7 geared 138, L10 spell build 176, L42 melee
     // build 370); between anchors it is linear, past the last it keeps
     // refHitSlopeBeyond per level. L1 is the un-geared base spell (22).
-    refHitAnchors: [[1, 22], [7, 138], [10, 176], [42, 370]],
-    refHitSlopeBeyond: 6,
+    // Balance pass: anchors past L42 follow the high-level target (average geared
+    // build ~11k per main action at L90, so a campaign monster ~33k).
+    refHitAnchors: [[1, 22], [7, 138], [10, 176], [42, 370], [50, 520], [68, 1200], [80, 4500], [90, 11000]],
+    refHitSlopeBeyond: 300,
     hitsToKill: 3,             // full actions a monster survives
     earlyHitsFraction: 0.65,   // level-1 share of hitsToKill; ramps to 1 by earlyHpRampLevels (tutorial now hands out sword, bow, coat, greaves + Renewal)
     earlyHpRampLevels: 24,

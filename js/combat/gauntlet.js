@@ -322,7 +322,7 @@ function _avgHit() {
             + mid(st.meleeFireMin, st.meleeFireMax) + mid(st.meleeColdMin, st.meleeColdMax)
             + mid(st.meleeLightningMin, st.meleeLightningMax) + mid(st.meleeShadowMin, st.meleeShadowMax))
             * (1 + (Number(st.meleePhysIncPct) || 0) / 100);
-        const spell = ((Number(st.spellDamageFlat) || 0) + 22) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
+        const spell = ((Number(st.spellDamageFlat) || 0) + 22 * (function(){const lv=Number(typeof globalThis._egGetPlayerLevel==='function'?globalThis._egGetPlayerLevel():0)||1;return lv<=50?1:Math.pow(25,Math.min(1,(lv-50)/40));})()) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
         const share = EG_GAUNTLET_CONFIG.powerHitShare;
         best = Math.max(best, melee * share, spell * share);
     } catch (e) { /* stats optional */ }
@@ -340,7 +340,7 @@ function _earlyHpBudgetEach() {
             + mid(st.meleeFireMin, st.meleeFireMax) + mid(st.meleeColdMin, st.meleeColdMax)
             + mid(st.meleeLightningMin, st.meleeLightningMax) + mid(st.meleeShadowMin, st.meleeShadowMax))
             * (1 + (Number(st.meleePhysIncPct) || 0) / 100);
-        const spell = ((Number(st.spellDamageFlat) || 0) + 22) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
+        const spell = ((Number(st.spellDamageFlat) || 0) + 22 * (function(){const lv=Number(typeof globalThis._egGetPlayerLevel==='function'?globalThis._egGetPlayerLevel():0)||1;return lv<=50?1:Math.pow(25,Math.min(1,(lv-50)/40));})()) * (1 + (Number(st.spellDamageIncPct) || 0) / 100);
         const spellPool = (_g.totalMonsters > 0 ? spell : 0) * cfg.earlySpellCasts;
         const meleePool = Math.max(5, melee) / cfg.earlyMeleeIntervalSec * cfg.earlyFightSec;
         const total = Math.max(1, _g.totalMonsters || 1);

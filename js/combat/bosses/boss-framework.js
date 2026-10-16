@@ -48,9 +48,11 @@ export const EG_BOSS_LEVEL_DAMAGE_SCALE = 0.12; // +12% damage per level above 1
 // every ~30 levels from weapon + phys/power creep). A convex multiplier
 // on top of the linear curve keeps early bosses (≈L1-40) almost unchanged
 // but massively inflates HP towards the true endgame (T13-T16, L71-90).
-// Anchors: 1→1.0, 50→1.15, 60→1.7, 75→3.0, 85→4.8, 90→6.0, 95→7.2
-// Result at L87 (T15): ~5.2× the old linear HP (~135k vs ~26k for a 1k base).
-export const EG_BOSS_LATE_HP_ANCHORS = [[1,1.0],[50,1.15],[60,1.7],[75,3.0],[85,4.8],[90,6.0],[95,7.2]];
+// Balance pass (high-level builds hit 10-60k per action): up to L68 (T1) the
+// curve is unchanged (boss ~50k), then it climbs geometrically (x1.135 per
+// level) so an unmodified T16 boss (L90, ~1k base HP) has about 1M HP.
+// Anchors: 1→1.0, 50→1.15, 60→1.7, 68→2.4, 75→5.8, 80→11.2, 85→21.6, 90→38.6, 95→70
+export const EG_BOSS_LATE_HP_ANCHORS = [[1,1.0],[50,1.15],[60,1.7],[68,2.4],[75,5.8],[80,11.2],[85,21.6],[90,38.6],[95,70]];
 
 
 export function _egGetBossLateHpMult(lvl) {
