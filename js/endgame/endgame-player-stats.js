@@ -1240,6 +1240,14 @@ export function _egComputePlayerStats() {
                     const entry = EG_STAT_KEY_MAP[stat.key];
                     if (!entry || stat.value == null) return;
                     const val = Number(stat.value) || 0;
+                    // Legacy uniques stored percent-style values (e.g. -19.5 for
+                    // "19.5% reduced Attack Speed") under attack_speed, which is
+                    // a SECONDS bucket (real rolls are within +-3s). Applied as
+                    // seconds they added ~20s to the charge time (~4x slower).
+                    if (stat.key === 'attack_speed' && Math.abs(val) > 3) {
+                        s.attackSpeedPct += val;
+                        return;
+                    }
                     const meleeBucket = EG_MELEE_BUCKET_MAP[entry.bucket];
                     if (meleeBucket) {
                         if (item.slotType !== 'ranged') s[meleeBucket] += val;
@@ -1594,6 +1602,9 @@ export function _egGetPlayerAttackIntervalBreakdown() {
         + (stats.isWandEquipped ? (stats.wandChargeSpeedPct || 0) : 0);
     if (chargeSpeedPct > 0) {
         interval = Math.round(interval * (1 - Math.min(chargeSpeedPct, 100) / 100) * 10000) / 10000;
+    } else if (chargeSpeedPct < 0) {
+        // Net "reduced Attack Speed" (e.g. unique downsides): longer charge.
+        interval = Math.round(interval * (1 + Math.min(-chargeSpeedPct, 100) / 100) * 10000) / 10000;
     }
 
     // Active map run: Temporal Chains - you act #% slower.

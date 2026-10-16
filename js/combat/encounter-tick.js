@@ -79,6 +79,18 @@ export function _egTickMonster(m) {
     }
 }
 
+// The charge pool is stored in SECONDS, so when the full-charge time changes
+// (equipping/unequipping a speed item, buffs) the stored amount must be
+// rescaled or the bar jumps: a full 100% bar on a slow 20s interval would
+// become 400% once the interval drops to 5s. Keeps the bar's % constant.
+let _egLastChargeMax = 0;
+function _egSyncChargeToInterval(max) {
+    if (_egLastChargeMax > 0 && max > 0 && Math.abs(max - _egLastChargeMax) > 1e-6) {
+        globalThis._egPlayerCurrentCharge = (globalThis._egPlayerCurrentCharge || 0) * (max / _egLastChargeMax);
+    }
+    _egLastChargeMax = max;
+}
+
 // Current charge % (0..5) of the manual melee bar. 1 = fully charged and
 // ready for a full-damage strike; above 1 the strike OVERCHARGES through
 // the weapon-art tiers (2 = dash, 3 = sky leap, 4 = nova, 5 = grand nova -
@@ -88,6 +100,7 @@ export function _egGetPlayerChargePct() {
     if (typeof _egGetPlayerAttackInterval !== 'function') return 0;
     const max = _egGetPlayerAttackInterval();
     if (!max || max <= 0) return 0;
+    _egSyncChargeToInterval(max);
     const cap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
     return Math.min(cap, Math.max(0, globalThis._egPlayerCurrentCharge / max));
 }
@@ -136,6 +149,7 @@ export function _egTickPlayer() {
     if (chargeMult <= 0) return;
     const max = (typeof _egGetPlayerAttackInterval === 'function') ? _egGetPlayerAttackInterval() : 0;
     if (!max || max <= 0) return;
+    _egSyncChargeToInterval(max);
     const overchargeCap = (typeof EG_MELEE_OVERCHARGE_RATIO === 'number') ? EG_MELEE_OVERCHARGE_RATIO : 1;
     if (!globalThis._egMeleeHoldActive) {
         // SoM auto-charge: no held key, no overcharge - refill toward 100%

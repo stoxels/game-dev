@@ -396,12 +396,15 @@ function _updateConvergenceTrialWinButton(gi) {
         btn.className = 'ob y';
         btn.addEventListener('click', () => {
             hideResultOverlays();
-            _egLaunchCampaignTrial(wi);
+            _egLaunchCampaignTrial(Number(btn.dataset.wi));
         });
         target.appendChild(btn);
     }
     const label = t('btn_enter_trial_win');
     btn.textContent = (label && label !== 'btn_enter_trial_win') ? label : '🌿 ENTER CONVERGENCE TRIAL';
+    // The button is created once, so the world must be read at click time
+    // (a closure over `wi` would stay stuck on the first world it was shown for).
+    if (wi !== null) btn.dataset.wi = String(wi);
     btn.style.display = show ? '' : 'none';
     if (show && target.classList && target.classList.contains('ov-btns-col')) {
         target.style.display = '';

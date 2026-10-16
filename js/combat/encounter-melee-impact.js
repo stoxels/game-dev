@@ -15,6 +15,7 @@ import { _egFacingFromVector, _egGetEquippedWeaponInfo, _egMeleeTargetInRange } 
 import { _egMeleeImpactThump, _egShowWeaponSwing, _egWeaponSwingSound } from './combat-weapon-swing.js';
 import { EG_MELEE_OVERCHARGE_MULT, _egMeleeTierArt, _egMeleeTierForCharge } from './encounter-melee-arts.js';
 import { _egRollPlayerMiss } from './encounter-charged-shot.js';
+import { resolveGroundShape } from '../skills/spell-casttime.js';
 
 // Current melee damage: rolls the dedicated melee channel (weapon base
 // range + melee-scoped mods - see _egCalcPlayerMeleeDamage). `chargePct`
@@ -232,7 +233,14 @@ export function _egTryMeleeSplashHit(targetId, dmg = _egCurrentMeleeDamage(), el
         aoePct = Number(stats.meleeAoEPct) || 0;
     } catch (e) { return; }
     if (!(basePx > 0)) return;
-    const radiusPx = basePx * (1 + aoePct / 100);
+    // Scale to the window like spell shapes do: card spacing shrinks with the
+    // viewport (browser zoom-in), a fixed-px radius would then swallow more
+    // of the field for free.
+    let radiusPx = basePx * (1 + aoePct / 100);
+    try {
+        const shape = resolveGroundShape({ kind: 'circle', radius: radiusPx });
+        if (shape && shape.radius > 0) radiusPx = shape.radius;
+    } catch (e) { /* keep the unscaled radius */ }
     if (!(radiusPx > 0)) return;
     const targetCard = typeof document !== 'undefined' ? document.getElementById(`eg-card-${targetId}`) : null;
     if (!targetCard) return;

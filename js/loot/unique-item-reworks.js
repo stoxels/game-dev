@@ -387,7 +387,7 @@ const COMPACT_REWORKS = {
     // amulets
     amulet_of_endless_questions: ['M', 'chance_for_new_question mana_on_kill', 'quiz_retry:25 quiz_time:3', 'time_added -.2'],
     bloodforged_gorget: ['S', 'life_leech inc_physical_damage heart_heal', 'life_on_attack_hit:6 life_recoup_pct:4', ''],
-    bone_whistle: ['B', 'mana_on_kill', 'pickup_lifetime:2', ''],
+    bone_whistle: ['B', 'mana_on_kill', 'pickup_lifetime:7', ''],
     chronomancers_pendant: ['W', 'first_step time_added preemptive_dodge', 'first_step_time:4 damage_low_time:30 regen_low_time:60', 'life_regen -.2'],
     duelists_sigil: ['S', 'crit_chance accuracy', 'damage_flawless:15 crit_multi_flat:20', ''],
     gorget_of_the_gargoyle: ['S', 'block_chance', 'block_pulse:60 endurance_on_block:20 stun_avoid:30', 'attack_speed -.3'],
@@ -540,7 +540,7 @@ const COMPACT_REWORKS = {
     bandage_wraps: ['B', 'life_regen heart_heal', 'heart_spawn_inc:15', ''],
     bloodweave_grips: ['S', 'life_leech life_on_kill heart_heal', 'life_leech_effect_inc:25 life_on_attack_hit:2', ''],
     conductors_gloves: ['S', 'chain lightning_damage_1 lightning_damage_2 accuracy', 'chain_count:1 lightning_damage_inc_pct:25 shock_chance_pct:8', ''],
-    diggers_mitts: ['B', 'strength heart_heal', 'pickup_lifetime:2', ''],
+    diggers_mitts: ['B', 'strength heart_heal', 'pickup_lifetime:7', ''],
     firestarters_wraps: ['B', 'chance_to_ignite', 'fire_damage_inc_pct:10', ''],
     fists_of_falling_stars: ['S', 'fire_damage_1 fire_damage_2 chance_to_blind', 'fire_damage_inc_pct:25 pen_fire:12 area_damage_inc:15', ''],
     fists_of_fumbled_fortune: ['W', 'fate life_leech fire_resist', 'melee_double_damage_chance:12 lucky_tile_reward:30 crit_chance_flat:4', ''],
@@ -664,7 +664,7 @@ const COMPACT_REWORKS = {
     shoulder_pads_of_the_pinball_wizard: ['M', 'pushback splash_damage', 'secondary_damage:20 area_damage_inc:15', ''],
     training_weights: ['B', 'strength', '', ''],
     wings_of_icarus: ['W', 'dodge spell_dodge flat_armour', 'movement_speed_pct:15 onslaught_on_kill:25 onslaught_effect:40', 'flat_health -.3'],
-    yoke_of_small_debts: ['B', 'flat_health', 'pickup_lifetime:2', ''],
+    yoke_of_small_debts: ['B', 'flat_health', 'pickup_lifetime:7', ''],
     yoke_of_titan_taxes: ['S', 'strength flat_armour warding', 'phys_taken_flat:12 armour_if_hit_recently:35 endurance_min:1', ''],
 
     // talismans
