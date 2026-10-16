@@ -2629,6 +2629,33 @@ function _uspSpellLevelRamp(level) {
     return Math.pow(USP_SPELL_RAMP_MAX, t);
 }
 
+// Physical spells are weapon attacks: blade spells (Heroic Strike, Mortal Strike,
+// Whirlwind, Execute...) add a share of the MELEE weapon's damage and ride the melee
+// increases, arrow spells (Aimed Shot, Multi Shot, Barrage...) add a share of the BOW's
+// damage (plus gear flat physical) and ride the physical + projectile increases.
+// The share keeps a rank-10 cast near the elemental spells instead of a full weapon hit.
+const USP_PHYS_WEAPON_EFFECTIVENESS = 0.25;
+function _uspPhysicalWeaponPart(spell, stats, tree) {
+    const mid = (a, b) => ((Number(a) || 0) + (Number(b) || 0)) / 2;
+    const generic = (stats.damageIncPct || 0) + (tree.incPct || 0);
+    if (spell.theme === 'arrow') {
+        return {
+            flat: mid(stats.physFlatMin, stats.physFlatMax) + (tree.flat || 0),
+            incPct: (stats.physIncPct || 0) + (stats.projectileDamageIncPct || 0) + generic,
+        };
+    }
+    const stance = stats.isHeavyWeaponEquipped ? (stats.meleePhysHeavyIncPct || 0) : (stats.meleePhys1HIncPct || 0);
+    const family = stats.isSwordEquipped ? (stats.meleePhysSwordIncPct || 0)
+        : stats.isAxeEquipped ? (stats.meleePhysAxeIncPct || 0)
+        : stats.isMaceEquipped ? (stats.meleePhysMaceIncPct || 0)
+        : stats.isStaffEquipped ? (stats.staffDamageIncPct || 0)
+        : stats.isWandEquipped ? (stats.wandDamageIncPct || 0) : 0;
+    return {
+        flat: mid(stats.meleePhysMin, stats.meleePhysMax) + (tree.flat || 0),
+        incPct: (stats.meleePhysIncPct || 0) + stance + family + generic,
+    };
+}
+
 function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
     const stats = (typeof globalThis._egComputePlayerStats === 'function')
         ? globalThis._egComputePlayerStats() : {};
@@ -2638,8 +2665,9 @@ function calcUniversalSpellHit(spell, dmgMin, dmgMax, hitOpts) {
 
     let dmg = dmgMin + Math.random() * (dmgMax - dmgMin);
     if (isPhys) {
-        dmg += (((stats.physFlatMin || 0) + (stats.physFlatMax || 0)) / 2 + (tree.flat || 0)) * flatShare;
-        dmg *= 1 + ((stats.physIncPct || 0) + (stats.damageIncPct || 0) + (tree.incPct || 0)) / 100;
+        const part = _uspPhysicalWeaponPart(spell, stats, tree);
+        dmg += part.flat * USP_PHYS_WEAPON_EFFECTIVENESS * flatShare;
+        dmg *= 1 + part.incPct / 100;
     } else {
         dmg *= _uspSpellLevelRamp();
         dmg += ((stats.spellDamageFlat || 0) + (tree.flat || 0)) * flatShare;
