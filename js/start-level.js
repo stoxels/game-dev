@@ -320,6 +320,11 @@ export function _initTimer() {
     // contract (the central hook only scales in-level gains).
     addTimeSecs(extSessionBonus, { raw: true });
     addTimeSecs(expValueBonus, { raw: true });
+    // quiz_time earned by answering the level's math gate correctly: the gate
+    // opens before the timer exists, so mathgate.js banks the seconds here.
+    const gateBonus = Number(globalThis._mgGateTimeBonusSecs) || 0;
+    globalThis._mgGateTimeBonusSecs = 0;
+    if (gateBonus > 0) addTimeSecs(gateBonus, { raw: true });
 
     if (ptHasSkill('keystone_dead_reckoning') && !ptHasSkill('keystone_gamblers_ruin')) {
         addTimeSecs(Math.round((globalThis.timerSecs || 0) * 0.3), { raw: true });

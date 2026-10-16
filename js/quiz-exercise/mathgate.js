@@ -630,6 +630,14 @@ function mgHandleCorrectAnswer() {
     trackAchStat('questionsCorrect');
     updateQuestStats('questionCorrect', { source: 'gate' });
 
+    // quiz_time (gear / tree): a correct answer adds seconds to the Timer.
+    // The gate opens before the level timer exists, so bank the seconds; the
+    // level's _initTimer() adds them (see start-level.js).
+    if (typeof globalThis._egComputePlayerStats === 'function') {
+        const secs = Number(globalThis._egComputePlayerStats().quizTimeSecs) || 0;
+        if (secs > 0) globalThis._mgGateTimeBonusSecs = (Number(globalThis._mgGateTimeBonusSecs) || 0) + secs;
+    }
+
     Audio_Manager.playSFX('quizCorrect');
 
     if (typeof _egOnQuestionAnswered === 'function') _egOnQuestionAnswered();

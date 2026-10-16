@@ -875,6 +875,39 @@ function capFate(def) {
     }
 }
 
+// Timer values on uniques. Map timers run for minutes and the passive tree
+// pays out timer seconds in the tens to hundreds, so single-digit seconds on a
+// unique are not noticeable. Values below the floor for the item's level are
+// raised to it (explicitly authored larger values are kept).
+function timerFloor(level, tiers) { return level < 20 ? tiers[0] : level < 40 ? tiers[1] : level < 60 ? tiers[2] : tiers[3]; }
+const TIMER_FLOORS = {
+    first_step_time: [30, 60, 60, 60],
+    quiz_time: [60, 60, 90, 120],
+    time_on_kill: [2, 2, 3, 4],
+    time_on_elite: [15, 15, 20, 30],
+    freeze_timer_on_stun: [3, 3, 3, 4],
+};
+function normalizeTimers(def) {
+    const level = def.minLevel || 1;
+    if (Array.isArray(def.effects)) {
+        def.effects = def.effects.map(spec => {
+            const [key, val] = spec.split(':');
+            const tiers = TIMER_FLOORS[key];
+            if (!tiers) return spec;
+            const floor = timerFloor(level, tiers);
+            return Number(val) < floor ? `${key}:${floor}` : spec;
+        });
+    }
+    for (const b of def.bonuses || []) {
+        // +Puzzle Time lines: regular affixes top out at 60s; uniques pay minutes.
+        if (b.key === 'time_added' && b.value > 0 && b.value < 90) b.value = Math.min(300, Math.max(90, Math.round(b.value * 3 / 5) * 5));
+    }
+    for (const d of def.downsides || []) {
+        // A Puzzle Time downside has to cost minutes to be a cost at all.
+        if (d.key === 'time_added' && d.value < 0 && -d.value < 60) d.value = -timerFloor(level, [90, 90, 120, 150]);
+    }
+}
+
 // Applies the rework table onto the base definition array (mutates entries in
 // place so importers see the reworked stats). Returns the number applied;
 // unknown keep keys are collected in EG_UNIQUE_REWORK_PROBLEMS (tested).
@@ -893,6 +926,7 @@ export function applyUniqueReworks(items) {
             Object.assign(def, rework, { v2: true });
         }
         capFate(def);
+        normalizeTimers(def);
         upgradeBase(def);
         applied++;
     }
