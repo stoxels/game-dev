@@ -363,7 +363,7 @@ export const EG_UNIQUE_REWORKS = {
         // One truth only: your attacks never miss and hit far harder while
         // your Accuracy outclasses your Life, but you can never crit.
         effects: ['never_miss', 'precise_technique:30', 'never_crit'],
-        downsides: [down('reveal_hint', -10)],
+        downsides: [down('reveal_hint', -50)],
     },
 
     axiom_of_emptiness: {
@@ -558,24 +558,24 @@ const COMPACT_REWORKS = {
     thundercore_gauntlet: ['S', 'lightning_damage_1 lightning_damage_2 chance_to_shock', 'lightning_damage_inc_pct:25 shock_effect_inc:20 crit_vs_shocked:8', ''],
 
     // heads
-    astral_cartographers_monocle: ['M', 'reveal_hint fate intelligence', 'cell_on_kill:12 mark_on_kill:12 first_step_time:3', ''],
+    astral_cartographers_monocle: ['M', 'reveal_hint fate intelligence', 'cell_on_kill:12 mark_on_kill:12 first_step_time:60', ''],
     browband_of_the_berserker: ['W', 'inc_physical_damage strength', 'rage_when_hit:3 rage_max_add:15 rage_effect:1', ''],
-    circlet_of_perfect_recall: ['M', 'focus intelligence', 'quiz_retry:25 quiz_time:3 mistake_heal:10', ''],
-    circlet_of_second_chances: ['M', 'mistake_not_count', 'mistake_heal:8 damage_on_mistake:20', ''],
+    circlet_of_perfect_recall: ['M', 'focus intelligence', 'quiz_retry:25 quiz_time:120 mistake_heal:60', ''],
+    circlet_of_second_chances: ['M', 'mistake_not_count', 'mistake_heal:80 damage_on_mistake:20', ''],
     crown_of_quiet_kings: ['M', 'flat_mana intelligence inc_spell_damage', 'cost_efficiency:15 spell_damage_inc_pct:8', ''],
-    crown_of_the_probability_king: ['W', 'fate reveal_hint chance_for_new_question', 'item_drop:25 item_effect:20 lucky_tile_reward:40', 'time_added -.2'],
+    crown_of_the_probability_king: ['W', 'fate reveal_hint chance_for_new_question', 'item_drop:25 item_effect:20 lucky_tile_reward:40', '', { down: ['time_added', -120] }],
     diadem_of_wrong_answers_only: ['M', 'reveal_hint inc_spell_damage intelligence', 'mark_on_kill:15 quiz_hint:30', ''],
     emberheart_circlet: ['S', 'inc_spell_damage chance_to_ignite', 'fire_damage_inc_pct:25 ignite_damage_more:20 cast_speed_fire:15', ''],
     halo_of_static_prayers: ['S', 'warding', 'lightning_damage_inc_pct:20 shock_effect_inc:20 avoid_shock_pct:50', ''],
     helm_of_held_breath: ['S', 'warding', 'stun_avoid:30 endurance_on_kill:10 low_life_regen_pct:3', ''],
     hood_of_loud_silence: ['B', 'spell_dodge', 'stun_avoid:15', ''],
-    hood_of_second_thoughts: ['B', 'mistake_not_count intelligence', 'mistake_heal:6', ''],
-    laurel_of_unending_study: ['M', 'intelligence chance_for_new_question fire_resist', 'quiz_retry:25 quiz_hint:25 quiz_time:3', ''],
-    mathematicians_crown: ['S', 'intelligence reveal_hint fire_resist max_fire_res', 'mark_on_kill:10 first_step_time:3', ''],
+    hood_of_second_thoughts: ['B', 'mistake_not_count intelligence', 'mistake_heal:60', ''],
+    laurel_of_unending_study: ['M', 'intelligence chance_for_new_question fire_resist', 'quiz_retry:25 quiz_hint:25 quiz_time:90', ''],
+    mathematicians_crown: ['S', 'intelligence reveal_hint fire_resist max_fire_res', 'mark_on_kill:10 first_step_time:60', ''],
     mortarboard_of_momentum: ['S', 'crit_chance agility', 'quick_fill_streak:40 damage_per_streak:4 melee_charge_speed_pct:8', ''],
     oversized_helmet: ['B', 'flat_health fire_resist', 'stun_avoid:20', ''],
-    starforged_helm: ['W', 'fire_resist cold_resist lightning_resist shadow_resist max_all_res intelligence', 'all_elemental_res_max:3 pen_elemental:12 elemental_damage_inc_pct:15', ''],
-    thinking_cap_of_overthinking: ['W', 'flat_mana mistake_count mana_regen', 'mistake_heal:12 damage_on_mistake:30 mana_on_line:8', 'focus -.25'],
+    starforged_helm: ['W', 'fire_resist cold_resist lightning_resist shadow_resist max_all_res intelligence', 'pen_elemental:12 elemental_damage_inc_pct:15', '', { set: { max_all_res: 3 } }],
+    thinking_cap_of_overthinking: ['W', 'flat_mana mistake_count mana_regen', 'mistake_heal:60 damage_on_mistake:30 mana_on_line:8', '', { down: ['focus', -20] }],
     tin_can_helm: ['B', 'flat_health intelligence', '', ''],
 
     // pants
@@ -784,7 +784,7 @@ function makeDownside(spec, level) {
 
 // Applies a compact entry to a def; pushes problems (unknown keep keys).
 function generateStats(def, entry, problems) {
-    const [roleCode, keepStr, fxStr, dnStr] = entry;
+    const [roleCode, keepStr, fxStr, dnStr, tweaks] = entry;
     const level = def.minLevel || 1;
     const orig = def.bonuses || [];
     const lines = [];
@@ -797,7 +797,7 @@ function generateStats(def, entry, problems) {
         if (localKind && !((def.defenses || {})[localKind] > 0)) continue;
         lines.push(scaledKeep(o, level));
     }
-    const downside = dnStr ? makeDownside(dnStr, level) : null;
+    let downside = dnStr ? makeDownside(dnStr, level) : null;
     const taken = new Set(lines.map(l => l.key));
     if (downside) taken.add(downside.key);
     const d = def.defenses || {};
@@ -809,6 +809,17 @@ function generateStats(def, entry, problems) {
         if (key === 'inc_absorption' && !d.absorption) continue;
         lines.push(fillerLine(key, frac, level));
         taken.add(key);
+    }
+    if (tweaks && tweaks.set) {
+        for (const k of Object.keys(tweaks.set)) {
+            const line = lines.find(l => l.key === k);
+            if (line) line.value = tweaks.set[k]; else problems.push(`${def.uniqueId}: tweak key "${k}" has no line`);
+        }
+    }
+    if (tweaks && tweaks.down) {
+        const [dk, dv] = tweaks.down;
+        const lab = NEG_LABELS[dk] || LABELS[dk];
+        downside = { key: dk, value: dv, en: lab[0], de: lab[1] };
     }
     def.bonuses = lines;
     def.effects = (fxStr || '').split(' ').filter(Boolean);
@@ -853,6 +864,17 @@ function upgradeBase(def) {
     }
 }
 
+// Fate is very strong: at most 3% per item below level 45, 5% above, so a full
+// set of gear stays around 40-50%.
+function capFate(def) {
+    const cap = (def.minLevel || 1) < 45 ? 3 : 5;
+    for (const b of def.bonuses || []) {
+        if (b.key === 'fate' && b.value > cap) b.value = cap;
+        // Raising a resistance cap is extremely strong: at most +3% per item.
+        if (/^max_.*res$/.test(b.key) && b.value > 3) b.value = 3;
+    }
+}
+
 // Applies the rework table onto the base definition array (mutates entries in
 // place so importers see the reworked stats). Returns the number applied;
 // unknown keep keys are collected in EG_UNIQUE_REWORK_PROBLEMS (tested).
@@ -870,6 +892,7 @@ export function applyUniqueReworks(items) {
             delete def.effects;
             Object.assign(def, rework, { v2: true });
         }
+        capFate(def);
         upgradeBase(def);
         applied++;
     }

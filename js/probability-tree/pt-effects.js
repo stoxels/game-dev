@@ -174,7 +174,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     // (_egCalcPlayerMeleeDamage). One Rage fades per second once 5 seconds
     // passed without being hit or gaining Rage (combat-ailments-state.js).
     rage_on_hit_axe: { channel: 'rageOnHitAxe', en: 'Gain {v} Rage on Hit with Axes', de: 'Erhalte {v} Wut bei Treffern mit Äxten' },
-    rage_effect: { channel: 'rageMeleeMorePct', en: 'Each Rage grants {v}% more melee Damage', de: 'Jede Wut gewährt {v}% mehr Nahkampfschaden' },
+    rage_effect: { channel: 'rageMeleeMorePct', en: 'Each point of Rage grants {v}% more melee Damage', de: 'Jeder Wutpunkt gewährt {v}% mehr Nahkampfschaden' },
     rage_max: { channel: 'rageMax', en: 'Maximum Rage is {v}', de: 'Maximale Wut beträgt {v}' },
     accuracy_sword: { channel: 'accuracySwordFlat', en: '+{v} to Accuracy Rating with Swords', de: '+{v} Präzision mit Schwertern' },
     // Armour pierce (node 147): rolled per player hit in
@@ -468,7 +468,7 @@ export const PT_EFFECT_DEFS = Object.freeze({
     dagger_crit_poison: { channel: 'daggerCritPoisons', flag: true, en: 'Critical Strikes with Daggers Poison the Enemy', de: 'Kritische Treffer mit Dolchen vergiften den Gegner' },
     rage_max_add: { channel: 'rageMax', en: '+{v} to Maximum Rage', de: '+{v} auf maximale Wut' },
     rage_decay: { channel: 'rageDecaySlowerPct', en: 'Inherent loss of Rage is {v}% slower', de: 'Der natürliche Wutverlust ist {v}% langsamer' },
-    rage_armour: { channel: 'ragePerArmourPct', en: 'Every Rage also grants {v}% increased Armour', de: 'Jede Wut gewährt außerdem {v}% erhöhte Rüstung' },
+    rage_armour: { channel: 'ragePerArmourPct', en: 'Every point of Rage also grants {v}% increased Armour', de: 'Jeder Wutpunkt gewährt außerdem {v}% erhöhte Rüstung' },
     rage_when_hit: { channel: 'rageWhenHitAmount', en: 'Gain {v} Rage when Hit by an Enemy', de: 'Erhalte {v} Wut, wenn ein Gegner dich trifft' },
     // Phase C-1 (batch 34): per-charge lines, faster ailments, spell DoT, conditional and
     // shield lines, leech and defence extras.
@@ -639,8 +639,8 @@ export const PT_EFFECT_DEFS = Object.freeze({
     time_on_kill: { channel: 'timeOnKill', en: '+{v} seconds on the Timer for each Monster killed', de: '+{v} Sekunden auf dem Timer für jedes getötete Monster' },
     time_on_elite: { channel: 'timeOnElite', en: '+{v} seconds on the Timer for each Boss or Elite killed', de: '+{v} Sekunden auf dem Timer für jeden getöteten Boss oder Elite' },
     freeze_timer_on_stun: { channel: 'timerFreezeOnStun', en: 'Stunning an enemy pauses the Timer for {v} seconds', de: 'Das Betäuben eines Gegners pausiert den Timer für {v} Sekunden' },
-    cell_on_kill: { channel: 'cellOnKillPct', en: '{v}% Chance that a killed Monster reveals one correct Cell', de: '{v}% Chance, dass ein getötetes Monster eine richtige Zelle aufdeckt' },
-    mark_on_kill: { channel: 'markOnKillPct', en: '{v}% Chance that a killed Monster marks one wrong Cell', de: '{v}% Chance, dass ein getötetes Monster eine falsche Zelle markiert' },
+    cell_on_kill: { channel: 'cellOnKillPct', en: '{v}% Chance that a defeated Monster reveals one correct Cell', de: '{v}% Chance, dass ein besiegtes Monster eine richtige Zelle aufdeckt' },
+    mark_on_kill: { channel: 'markOnKillPct', en: '{v}% Chance that a defeated Monster marks one wrong Cell', de: '{v}% Chance, dass ein besiegtes Monster eine falsche Zelle markiert' },
     quick_fill_streak: { channel: 'quickFillStreakPct', en: 'Correct Fills within 1 second of each other count {v}% more towards Momentum', de: 'Richtige Füllungen im Abstand von höchstens 1 Sekunde zählen {v}% stärker für Schwung' },
     first_step_time: { channel: 'firstStepTreeSecs', en: 'Your first correct Fill each level grants +{v} seconds', de: 'Deine erste richtige Füllung pro Level gewährt +{v} Sekunden' },
     pickup_lifetime: { channel: 'pickupLifetimeSecs', en: 'Heart and Mana pickups stay {v} seconds longer', de: 'Herz- und Manaaufnahmen bleiben {v} Sekunden länger' },
