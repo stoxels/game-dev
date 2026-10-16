@@ -502,6 +502,12 @@ export function _egLapFinalStart(monster) {
     // FX run (passive): holds the finale timeline.
     g.fxRun = _egNkNewRun(monster.id, true);
     g.fxRun.passive = true;
+    // Safety net: if the finale's run ever dies without closing the loop
+    // (tick error, external kill), never leave the Demon immune forever.
+    g.fxRun.onKill = () => {
+        if (g.finished) return;
+        try { _egLapFinalEnd(g, monster); } catch (e) {}
+    };
 
     // Loop overlay (title + loop counter + timer).
     const ov = document.createElement('div');
@@ -674,9 +680,10 @@ export function _egLapFinalPhantom(g, fixedY, isCross, level) {
         ph.style.left = Math.round(x - 16) + 'px';
         ph.style.top = Math.round(y - 16) + 'px';
         const pc = _egLapPC();
+        // Punish only on a real hit (touch cooldown / ghost-form respected) -
+        // punishing every overlapping frame snowballed the loop forever.
         if (Math.hypot(pc.x - x, pc.y - y) < 38) {
-            _egLapFailPunish(g, 'Phantom');
-            _egLapTouch(0.12, level, 'Loop Phantom');
+            if (_egLapTouch(0.12, level, 'Loop Phantom')) _egLapFailPunish(g, 'Phantom');
         }
         if (f >= 1) { try { ph.remove(); } catch (e) {} return false; }
         return true;
@@ -687,8 +694,13 @@ export function _egLapFinalPhantom(g, fixedY, isCross, level) {
 export function _egLapFailPunish(g, label) {
     if (!g || g.finished) return;
     void label;
+    const now = performance.now();
+    if (now < (g.punishCd || 0)) return;   // one punish per ~1.5s at most
+    g.punishCd = now + 1500;
     const was = g.deadline;
-    g.deadline += EG_LAP_FAIL_EXTEND * _EG_LAP_DEBUG_MULT;
+    // Cap the total extension so the next loop (and its node) always arrives.
+    const cap = now + EG_LAP_LOOP_TIME * 1.5 * _EG_LAP_DEBUG_MULT * 1000;
+    g.deadline = Math.min(cap, g.deadline + EG_LAP_FAIL_EXTEND * _EG_LAP_DEBUG_MULT);
     if (g.deadline > was) {
         _egNkToast('eg_mech_lap_extend', '👁️ The loop EXTENDS - the Demon rewrites your mistake!', '#f0abfc');
         // Extra hunter: a phantom that walks a random line right now.
