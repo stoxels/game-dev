@@ -57,6 +57,11 @@ export const EG_MOD_TABLE_WEAPON1 = {
         },
 
         // --- FLAT PHYSICAL DAMAGE ---
+        // Flat added damage tracks the BASE weapon: roughly a quarter of its average
+        // hit at the item level where the tier unlocks. The old ilvl-1 tier added ~21
+        // damage to a 7-17 damage starter weapon (2-3x its own damage), so one early
+        // rare one-shot the whole campaign. Tier 5 (ilvl 1) now adds a few points,
+        // tier 4 unlocks at ilvl 12. The four elemental prefixes below follow the same ladder.
         // The weapon's raw cutting or blunt force - a fixed damage range
         // added to every melee strike. Higher ceiling than bracers since
         // this is the dedicated melee slot and strikes fire less often
@@ -68,7 +73,8 @@ export const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 56, max1: 80, min2: 150, max2: 210, weight: 170, ilvl: 80 },
                 { tier: 2, min1: 34, max1: 54, min2: 96, max2: 148, weight: 380, ilvl: 60 },
                 { tier: 3, min1: 16, max1: 32, min2: 48, max2: 94, weight: 520, ilvl: 35 },
-                { tier: 4, min1: 6, max1: 14, min2: 20, max2: 46, weight: 1050, ilvl: 1 }
+                { tier: 4, min1: 4, max1: 10, min2: 14, max2: 32, weight: 1050, ilvl: 12 },
+                { tier: 5, min1: 1, max1: 3, min2: 4, max2: 9, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -104,7 +110,8 @@ export const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 56, max1: 84, min2: 156, max2: 216, weight: 170, ilvl: 80 },
                 { tier: 2, min1: 34, max1: 54, min2: 100, max2: 154, weight: 380, ilvl: 60 },
                 { tier: 3, min1: 16, max1: 32, min2: 52, max2: 98, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 6, max1: 14, min2: 22, max2: 50, weight: 1000, ilvl: 1 }
+                { tier: 4, min1: 4, max1: 10, min2: 16, max2: 36, weight: 1000, ilvl: 12 },
+                { tier: 5, min1: 1, max1: 3, min2: 5, max2: 11, weight: 1000, ilvl: 1 }
             ]
         },
         cold_damage: {
@@ -114,7 +121,8 @@ export const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 48, max1: 76, min2: 140, max2: 196, weight: 170, ilvl: 80 },
                 { tier: 2, min1: 28, max1: 46, min2: 88, max2: 138, weight: 380, ilvl: 60 },
                 { tier: 3, min1: 14, max1: 26, min2: 44, max2: 86, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 4, max1: 12, min2: 18, max2: 42, weight: 1000, ilvl: 1 }
+                { tier: 4, min1: 3, max1: 8, min2: 13, max2: 30, weight: 1000, ilvl: 12 },
+                { tier: 5, min1: 1, max1: 3, min2: 4, max2: 10, weight: 1000, ilvl: 1 }
             ]
         },
         lightning_damage: {
@@ -125,7 +133,8 @@ export const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 14, max1: 36, min2: 170, max2: 256, weight: 160, ilvl: 80 },
                 { tier: 2, min1: 8, max1: 24, min2: 108, max2: 168, weight: 370, ilvl: 60 },
                 { tier: 3, min1: 4, max1: 14, min2: 56, max2: 106, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 8, min2: 24, max2: 54, weight: 1000, ilvl: 1 }
+                { tier: 4, min1: 1, max1: 6, min2: 17, max2: 38, weight: 1000, ilvl: 12 },
+                { tier: 5, min1: 1, max1: 2, min2: 6, max2: 14, weight: 1000, ilvl: 1 }
             ]
         },
         shadow_damage: {
@@ -137,7 +146,8 @@ export const EG_MOD_TABLE_WEAPON1 = {
                 { tier: 1, min1: 40, max1: 64, min2: 112, max2: 164, weight: 115, ilvl: 82 },
                 { tier: 2, min1: 24, max1: 38, min2: 72, max2: 110, weight: 260, ilvl: 62 },
                 { tier: 3, min1: 12, max1: 22, min2: 36, max2: 70, weight: 370, ilvl: 38 },
-                { tier: 4, min1: 4, max1: 10, min2: 14, max2: 34, weight: 800, ilvl: 1 }
+                { tier: 4, min1: 3, max1: 7, min2: 10, max2: 24, weight: 800, ilvl: 12 },
+                { tier: 5, min1: 1, max1: 2, min2: 4, max2: 9, weight: 800, ilvl: 1 }
             ]
         },
 
