@@ -255,7 +255,7 @@ const SKILL_ICON_OVERRIDES = {
     random_walker_active1: '🌊', random_walker_active2: '🧭',
 };
 
-// Per-skill artwork shipped in images/class_spell_upgrade/ (the same art the
+// Per-skill artwork shipped in images/Class_Spell_Upgrade/ (the same art the
 // class-upgrade screen uses). The hotbar and spell book prefer these over the
 // emoji/`def.icon` fallback whenever an entry exists here. Heartbloom has no
 // artwork yet, so it keeps its glyph. Keyed by skill id.
@@ -284,7 +284,7 @@ const SKILL_UPGRADE_IMAGES = {
 };
 
 // Folder (relative to index.html) holding SKILL_UPGRADE_IMAGES artwork.
-const SKILL_UPGRADE_IMAGE_DIR = 'images/class_spell_upgrade/';
+const SKILL_UPGRADE_IMAGE_DIR = 'images/Class_Spell_Upgrade/';
 
 // Resolves the artwork URL for a skill/passive id, or null when none exists.
 function _skillImageFor(id) {

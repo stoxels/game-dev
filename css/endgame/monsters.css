@@ -29,6 +29,14 @@
     align-items: flex-start;
     flex-wrap: wrap;
     justify-content: center;
+    /* The panel box itself must never take clicks: a card that is click-through
+       over the grid (.eg-over-grid) would otherwise still leave this box (as
+       tall as its widest card + bars) swallowing clicks on the cells beneath,
+       e.g. the bottom-right cell. Only the cards inside take clicks. */
+    pointer-events: none;
+}
+
+#eg-monster-panel > * {
     pointer-events: auto;
 }
 
