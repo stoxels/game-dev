@@ -62,6 +62,9 @@ export const EG_MOD_TABLE_RANGED = {
     prefixes: {
 
         // --- FLAT PHYSICAL DAMAGE ---
+        // Same ladder idea as the melee weapon: flat added damage tracks the base bow
+        // (tier 5 at ilvl 1 adds a point or two, tier 4 unlocks at ilvl 10); the elemental
+        // prefixes below follow it.
         // Lower ceiling than melee weapon since projectiles fire on
         // every correct cell reveal - high frequency compensates.
         flat_physical_damage: {
@@ -71,7 +74,8 @@ export const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 28, max1: 44, min2: 76, max2: 112, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 16, max1: 26, min2: 48, max2: 74, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 8, max1: 14, min2: 24, max2: 46, weight: 520, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 6, min2: 10, max2: 22, weight: 1050, ilvl: 1 }
+                { tier: 4, min1: 1, max1: 3, min2: 6, max2: 14, weight: 1050, ilvl: 10 },
+                { tier: 5, min1: 1, max1: 1, min2: 2, max2: 4, weight: 1050, ilvl: 1 }
             ]
         },
 
@@ -98,7 +102,8 @@ export const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 30, max1: 48, min2: 84, max2: 120, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 18, max1: 28, min2: 52, max2: 82, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 8, max1: 16, min2: 26, max2: 50, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 6, min2: 10, max2: 24, weight: 1000, ilvl: 1 }
+                { tier: 4, min1: 1, max1: 3, min2: 6, max2: 15, weight: 1000, ilvl: 10 },
+                { tier: 5, min1: 1, max1: 1, min2: 2, max2: 5, weight: 1000, ilvl: 1 }
             ]
         },
         cold_damage: {
@@ -108,7 +113,8 @@ export const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 26, max1: 40, min2: 72, max2: 104, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 16, max1: 24, min2: 44, max2: 70, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 8, max1: 16, min2: 22, max2: 42, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 6, min2: 8, max2: 20, weight: 1000, ilvl: 1 }
+                { tier: 4, min1: 1, max1: 3, min2: 5, max2: 13, weight: 1000, ilvl: 10 },
+                { tier: 5, min1: 1, max1: 1, min2: 2, max2: 4, weight: 1000, ilvl: 1 }
             ]
         },
         lightning_damage: {
@@ -118,7 +124,8 @@ export const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 8, max1: 20, min2: 92, max2: 140, weight: 110, ilvl: 80 },
                 { tier: 2, min1: 4, max1: 12, min2: 56, max2: 90, weight: 250, ilvl: 60 },
                 { tier: 3, min1: 2, max1: 8, min2: 28, max2: 54, weight: 500, ilvl: 35 },
-                { tier: 4, min1: 2, max1: 4, min2: 10, max2: 26, weight: 1000, ilvl: 1 }
+                { tier: 4, min1: 1, max1: 3, min2: 6, max2: 16, weight: 1000, ilvl: 10 },
+                { tier: 5, min1: 1, max1: 1, min2: 3, max2: 6, weight: 1000, ilvl: 1 }
             ]
         },
         shadow_damage: {
@@ -128,7 +135,8 @@ export const EG_MOD_TABLE_RANGED = {
                 { tier: 1, min1: 22, max1: 34, min2: 60, max2: 92, weight: 75, ilvl: 82 },
                 { tier: 2, min1: 12, max1: 20, min2: 36, max2: 58, weight: 170, ilvl: 62 },
                 { tier: 3, min1: 6, max1: 10, min2: 18, max2: 34, weight: 370, ilvl: 38 },
-                { tier: 4, min1: 2, max1: 4, min2: 6, max2: 16, weight: 800, ilvl: 1 }
+                { tier: 4, min1: 1, max1: 2, min2: 4, max2: 10, weight: 800, ilvl: 10 },
+                { tier: 5, min1: 1, max1: 1, min2: 2, max2: 4, weight: 800, ilvl: 1 }
             ]
         },
 

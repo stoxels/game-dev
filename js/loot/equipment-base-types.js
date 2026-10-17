@@ -2080,7 +2080,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 3, str: 20, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 58, max: 118 }, attackIntervalSeconds: 11,
+        damage: { min: 29, max: 59 }, attackIntervalSeconds: 11,
     },
     {
         id: 'wpn_worn_battle_blade_7', name: 'Worn Battle Blade', nameDe: 'Alt-Kampfklinge',
@@ -2116,7 +2116,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 11, str: 50, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 174, max: 348 }, attackIntervalSeconds: 10.7,
+        damage: { min: 87, max: 174 }, attackIntervalSeconds: 10.7,
     },
     {
         id: 'wpn_iron_swift_fang_13', name: 'Iron Swift Fang', nameDe: 'Eisen-Flinker Fang',
@@ -2215,7 +2215,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 27, str: 105, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 406, max: 810 }, attackIntervalSeconds: 10.8,
+        damage: { min: 203, max: 405 }, attackIntervalSeconds: 10.8,
     },
     {
         id: 'wpn_soldier_battle_blade_28', name: 'Soldier Battle Blade', nameDe: 'Soldaten-Kampfklinge',
@@ -2278,7 +2278,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 35, str: 136, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 520, max: 1042 }, attackIntervalSeconds: 10.6,
+        damage: { min: 260, max: 521 }, attackIntervalSeconds: 10.6,
     },
     {
         id: 'wpn_golden_battle_blade_36', name: 'Golden Battle Blade', nameDe: 'Gold-Kampfklinge',
@@ -2341,7 +2341,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 43, str: 168, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 636, max: 1272 }, attackIntervalSeconds: 11,
+        damage: { min: 318, max: 636 }, attackIntervalSeconds: 11,
     },
     {
         id: 'wpn_runed_battle_blade_44', name: 'Runed Battle Blade', nameDe: 'Runen-Kampfklinge',
@@ -2404,7 +2404,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 51, str: 203, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 752, max: 1504 }, attackIntervalSeconds: 10.7,
+        damage: { min: 376, max: 752 }, attackIntervalSeconds: 10.7,
     },
     {
         id: 'wpn_ember_swift_fang_53', name: 'Ember Swift Fang', nameDe: 'Glut-Flinker Fang',
@@ -2467,7 +2467,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 59, str: 240, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 868, max: 1734 }, attackIntervalSeconds: 11.1,
+        damage: { min: 434, max: 867 }, attackIntervalSeconds: 11.1,
     },
     {
         id: 'wpn_dusk_battle_blade_60', name: 'Dusk Battle Blade', nameDe: 'Dämmerungs-Kampfklinge',
@@ -2521,7 +2521,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 67, str: 278, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 982, max: 1966 }, attackIntervalSeconds: 10.8,
+        damage: { min: 491, max: 983 }, attackIntervalSeconds: 10.8,
     },
     {
         id: 'wpn_dragonbone_battle_blade_68', name: 'Dragonbone Battle Blade', nameDe: 'Drachenknochen-Kampfklinge',
@@ -2593,7 +2593,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 75, str: 319, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 1098, max: 2196 }, attackIntervalSeconds: 10.6,
+        damage: { min: 549, max: 1098 }, attackIntervalSeconds: 10.6,
     },
     {
         id: 'wpn_storm_battle_blade_76', name: 'Storm Battle Blade', nameDe: 'Sturm-Kampfklinge',
@@ -2665,7 +2665,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 83, str: 362, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 1214, max: 2428 }, attackIntervalSeconds: 11,
+        damage: { min: 607, max: 1214 }, attackIntervalSeconds: 11,
     },
     {
         id: 'wpn_godforged_battle_blade_84', name: 'Godforged Battle Blade', nameDe: 'Gottgeschmiedet-Kampfklinge',
@@ -2924,7 +2924,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 12, str: 51, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 189, max: 377 }, attackIntervalSeconds: 10.7,
+        damage: { min: 95, max: 189 }, attackIntervalSeconds: 10.7,
     },
     {
         id: 'wpn_axe2h_bearded_greataxe_19', name: 'Bearded Greataxe', nameDe: 'Großer Bartaxt',
@@ -2933,7 +2933,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 19, str: 71, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 290, max: 579 }, attackIntervalSeconds: 10.8,
+        damage: { min: 145, max: 290 }, attackIntervalSeconds: 10.8,
     },
     {
         id: 'wpn_axe2h_headsman_axe_34', name: 'Headsman Axe', nameDe: 'Scharfrichteraxt',
@@ -2942,7 +2942,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 34, str: 114, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 506, max: 1013 }, attackIntervalSeconds: 10.6,
+        damage: { min: 253, max: 507 }, attackIntervalSeconds: 10.6,
     },
     {
         id: 'wpn_axe2h_berserker_axe_42', name: 'Berserker Axe', nameDe: 'Berserkeraxt',
@@ -2951,7 +2951,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 42, str: 140, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 622, max: 1243 }, attackIntervalSeconds: 11,
+        damage: { min: 311, max: 622 }, attackIntervalSeconds: 11,
     },
     {
         id: 'wpn_axe2h_warlord_greataxe_56', name: 'Warlord Greataxe', nameDe: 'Kriegsherrenaxt',
@@ -2960,7 +2960,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 56, str: 172, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 825, max: 1648 }, attackIntervalSeconds: 11,
+        damage: { min: 413, max: 824 }, attackIntervalSeconds: 11,
     },
     {
         id: 'wpn_axe2h_stormcleaver_70', name: 'Stormcleaver', nameDe: 'Sturmspalter',
@@ -2969,7 +2969,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 70, str: 212, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 1026, max: 2052 }, attackIntervalSeconds: 10.7,
+        damage: { min: 513, max: 1026 }, attackIntervalSeconds: 10.7,
     },
     {
         id: 'wpn_axe2h_abyssal_greataxe_78', name: 'Abyssal Greataxe', nameDe: 'Abgrund-Großaxt',
@@ -2978,7 +2978,7 @@ EG_BASE_TYPES_WEAPON.push(
         hands: 2,
         requirements: { level: 78, str: 231, agi: 0, int: 0 },
         defenses: { armour: 0, evasion: 0, absorption: 0 },
-        damage: { min: 1142, max: 2283 }, attackIntervalSeconds: 10.8,
+        damage: { min: 571, max: 1142 }, attackIntervalSeconds: 10.8,
     },
 );
 
