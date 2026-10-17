@@ -94,7 +94,7 @@ export function _egEssenceFamilyDisplayName(familyId) {
         shadow_resist: 'Schattenwiderstand', movement_speed: 'Bewegungsgeschwindigkeit',
         time_added: 'Zusätzliche Zeit', mistake_count: 'Erlaubte Fehler', mistake_not_count: 'Fehlerfreiheit', focus: 'Fokus',
         reveal_hint: 'Hinweischance', chance_for_new_question: 'Neue Frage',
-        parry: 'Parade', deflect: 'Umlenkung', deflect_damage: 'Vergeltungsschaden', first_step: 'Erster Schritt', grounded: 'Standfestigkeit',
+        parry: 'Parade', deflect: 'Umlenkung', deflect_damage: 'Vergeltungsschaden', first_step: 'Schonfrist', grounded: 'Standfestigkeit',
         warding: 'Abwehr', accuracy: 'Genauigkeit'
     };
     if (typeof LANG !== 'undefined' && LANG === 'de' && deMap[familyId]) return deMap[familyId];
@@ -218,7 +218,7 @@ export function _egEssenceFamilyDisplayName(familyId) {
         parry: { en: 'Parry', de: 'Parade' },
         deflect: { en: 'Deflect', de: 'Ablenken' },
         deflect_damage: { en: 'Retribution', de: 'Vergeltung' },
-        first_step: { en: 'First Step', de: 'Erster Schritt' },
+        first_step: { en: 'Grace Period', de: 'Schonfrist' },
         grounded: { en: 'Grounded', de: 'Standfestigkeit' },
         warding: { en: 'Warding', de: 'Abwehr' },
         // Other

@@ -3297,7 +3297,7 @@ export const EG_UNIQUE_ITEMS = [
         icon: '🪵', slotType: 'weapon', archetype: 'strength', hands: 1,
         minLevel: 3,
         requirements: { level: 3, str: 12, agi: 0, int: 0 },
-        damage: { min: 33, max: 74 }, attackIntervalSeconds: 6.0,
+        damage: { min: 33, max: 74 }, attackIntervalSeconds: 4.5,
         bonuses: [
             { key: 'inc_physical_damage', value: 20, en: '#% increased Physical Damage', de: '#% erhöhter physischer Schaden' },
             { key: 'crit_chance', value: 6, en: '+#% to Critical Strike Chance', de: '+#% Kritische Trefferchance' }

@@ -29,7 +29,7 @@ import { _egPlayerTakeDamage } from './encounter-damage.js';
 import { _egAilmentsCleanup } from './combat-ailments.js';
 import { _egHazardsCleanup } from './combat-hazards-lifecycle.js';
 import { _egStopPickupSpawner } from './combat-grid-pickups-spawner.js';
-import { EG_CAMPAIGN_MONSTER_CONFIG, _egBuildCampaignMonsterList, _egEarlyEaseBlend } from './encounter-campaign-spawns.js';
+import { EG_CAMPAIGN_MONSTER_CONFIG, _egBuildCampaignMonsterList, _egCampaignRefDamage, _egEarlyEaseBlend } from './encounter-campaign-spawns.js';
 import { EG_MONSTER_ZONES } from './encounter-constants.js';
 import { _egCancelSpawnTimers, _egStartTickLoop } from './encounter-lifecycle.js';
 import { _egSpawnMonster } from './encounter-monster-spawning.js';
@@ -100,8 +100,10 @@ export const EG_GAUNTLET_CONFIG = {
     // 60% of a charged melee strike and 60% of a spell cast) so spell and
     // melee builds are not facing projectile-sized HP pools.
     powerHitShare: 0.6,
-    // Raw monster hit is at least this share of max life (before tier).
-    damageHpShare: 0.11,
+    // Raw monster hit as a share of the campaign's level-driven damage
+    // (before tier). 0.79 keeps the arena where the old "11% of max life"
+    // floor sat next to the campaign's 14%.
+    damageCampaignShare: 0.79,
     goldBase: 30,
     goldPerLevel: 4,
     challengeGoldShare: 0.25,       // extra gold per side challenge, as a share of base
@@ -843,10 +845,9 @@ function _begin() {
         if (budgetEach > 0 && budgetEach < hpEach) hpEach = Math.round(hpEach - (hpEach - budgetEach) * early);
     }
     cur.campaignMonsterHp = Math.max(EG_CAMPAIGN_MONSTER_CONFIG.minHp, hpEach);
-    const curveDamage = EG_CAMPAIGN_MONSTER_CONFIG.damageBase + EG_CAMPAIGN_MONSTER_CONFIG.damagePerLevel * lvl;
-    const floorDamage = Math.min(curveDamage * 3, (Number(globalThis.playerMaxHP) || 0) * cfg.damageHpShare);
+    const levelDamage = _egCampaignRefDamage(lvl) * cfg.damageCampaignShare;
     const easeDmg = 1 - (1 - cfg.earlyDamageMult) * early;
-    cur.campaignMonsterDamage = Math.max(1, Math.round(Math.max(curveDamage, floorDamage) * tier.dmgMult * easeDmg));
+    cur.campaignMonsterDamage = Math.max(1, Math.round(levelDamage * tier.dmgMult * easeDmg));
     cur.monsterLevel = lvl;
     cur.gauntlet = true;
     globalThis._egGauntletFlag = true;

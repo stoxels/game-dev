@@ -15,6 +15,31 @@ import { _egComputePlayerStats, _egFormatStatValue } from '../endgame/endgame-pl
 //------------------------------------------------------------------------
 //------------------------------------------------------------------------
 
+// Built-in spawn grace period (seconds) every new monster gets before it may
+// start charging an attack, so newcomers can read the puzzle first. It is a
+// teaching aid that fades out with progress: campaign worlds 1..13 step from
+// 12s down to 3s, atlas maps tier 1..5 from 2.5s down to 0.5s, tier 6+ (the
+// real endgame) has none. Gear with the Grace Period (first_step) stat adds
+// on top, so endgame players can still buy it back. Bosses, the gauntlet
+// arena and the tutorial keep their own pacing.
+const EG_GRACE_BY_WORLD = [12, 11, 10, 9, 8, 7, 6, 5.5, 5, 4.5, 4, 3.5, 3];
+const EG_GRACE_BY_MAP_TIER = [2.5, 2, 1.5, 1, 0.5];
+function _egBaselineGraceSeconds() {
+    try {
+        if (globalThis._egGauntletFlag) return 0;
+        if (typeof globalThis._tqIsTutorialActive === 'function' && globalThis._tqIsTutorialActive()) return 0;
+        const lvl = globalThis.cur;
+        if (lvl && lvl.campaignMonsters) {
+            const w = Math.max(1, Math.min(EG_GRACE_BY_WORLD.length, Math.round(Number(lvl.world) || 1)));
+            return EG_GRACE_BY_WORLD[w - 1];
+        }
+        const tier = Math.round(Number((globalThis._egActiveMapItem && globalThis._egActiveMapItem.mapTier)
+            || (globalThis._egMapDef && globalThis._egMapDef.mapTier)) || 0);
+        if (tier >= 1 && tier <= EG_GRACE_BY_MAP_TIER.length) return EG_GRACE_BY_MAP_TIER[tier - 1];
+    } catch (e) { /* the grace period is a courtesy, never a blocker */ }
+    return 0;
+}
+
 // Assigns a spawn zone, spreading monsters so cards never pile up and hide
 // each other. Picks among the least-populated zones (random tie-break) so
 // concurrent monsters fan out across the available panels instead of
@@ -96,7 +121,8 @@ export function _egSpawnMonster(defId, level, hpMult = 1) {
     if (!monster) return;
 
     // Gear: first_step - per-monster charge-up grace window after spawning
-    const firstStepSec = _egComputePlayerStats().firstStepSeconds || 0;
+    const firstStepSec = Math.max(0, (_egComputePlayerStats().firstStepSeconds || 0)
+        + (isBossDef ? 0 : _egBaselineGraceSeconds()));
     if (firstStepSec > 0) {
         monster.firstStepUntil = Date.now() + firstStepSec * 1000;
         // Show toast once per map when first_step is active

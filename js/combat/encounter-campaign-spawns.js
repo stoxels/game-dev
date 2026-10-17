@@ -50,20 +50,17 @@ export const EG_CAMPAIGN_MONSTER_CONFIG = {
     earlyCountBase: 3,
     earlyCountLevelDivisor: 4,
     minCellsPerMonster: 5,    // small puzzles support fewer monsters
-    damageBase: 9,            // per-hit damage at monster level 1 (pass 2: was 6)
-    damagePerLevel: 0.62,     // +damage per monster level (pass 2: was 0.32)
+    // Raw per-hit damage is LEVEL-driven, never a share of the player's own
+    // life (that made every point of max life raise the damage taken, so life
+    // never paid off and gear could not be balanced). Anchors are the old
+    // "14% of max life" floor evaluated for a level-appropriate character
+    // (about 150 + 10 life per level), so the reference fight feels the same;
+    // a character with more life or better defences now simply takes less
+    // than before. Linear between anchors, refDamageSlopeBeyond per level
+    // past the last. Retune the anchors, not the formula.
+    refDamageAnchors: [[1, 17], [6, 27], [12, 38], [30, 63], [50, 91], [90, 147]],
+    refDamageSlopeBeyond: 2.5,
     chargeMult: 0.65,         // campaign monsters wind up as fast as atlas ones (pass 2: was 1.15; player hits already push the bar back)
-    // Damage floor as a share of the player's max life: a level-7 character
-    // with 280 life, 78 armour and parry could idle next to a lone 10-damage
-    // monster forever. Raw hit = max(curve, share * maxHP), capped at
-    // damageHpCapMult x the curve so tiny levels never spike.
-    // The share ramps in from damageHpShareEarly at monster level 1 to
-    // damageHpShare at damageHpShareRampLevels, so a fresh character with
-    // little life is not chunked by a share sized for a level-7 build.
-    damageHpShareEarly: 0.14,   // = damageHpShare: no early ramp (tutorial now hands out gear + Renewal)
-    damageHpShare: 0.14,
-    damageHpShareRampLevels: 12,
-    damageHpCapMult: 4,
     // Early-game ease (playtest feedback: the first worlds felt rough for
     // newcomers, yet fixed starter gear overshot for experienced players).
     // The first monster levels hit softer and wind up slower; both ease
@@ -93,6 +90,21 @@ function _egCampaignRefHit(level) {
     }
     const [xn, yn] = pts[pts.length - 1];
     return yn + cfg.refHitSlopeBeyond * (l - xn);
+}
+
+// Raw per-hit damage of a campaign monster at `level` (see refDamageAnchors).
+// Shared with the gauntlet arena, which scales it by its own share.
+export function _egCampaignRefDamage(level) {
+    const cfg = EG_CAMPAIGN_MONSTER_CONFIG;
+    const pts = cfg.refDamageAnchors;
+    const l = Math.max(1, Number(level) || 1);
+    if (l <= pts[0][0]) return pts[0][1];
+    for (let i = 0; i < pts.length - 1; i++) {
+        const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+        if (l <= x1) return y0 + (y1 - y0) * (l - x0) / (x1 - x0);
+    }
+    const [xn, yn] = pts[pts.length - 1];
+    return yn + cfg.refDamageSlopeBeyond * (l - xn);
 }
 
 // Fields _egPrepareCampaignEncounter stamps onto the level object. Listed so
@@ -167,13 +179,8 @@ export function _egPrepareCampaignEncounter() {
     const ramp = Math.max(0, Math.min(1, (level - 1) / Math.max(1, cfg.earlyHpRampLevels)));
     const hits = cfg.hitsToKill * (cfg.earlyHitsFraction + (1 - cfg.earlyHitsFraction) * ramp);
     const perHp = Math.max(cfg.minHp, Math.round(_egCampaignRefHit(level) * hits));
-    const curveDamage = cfg.damageBase + cfg.damagePerLevel * level;
-    const maxHp = Number(globalThis.playerMaxHP) || 0;
-    const shareT = Math.max(0, Math.min(1, (level - 1) / Math.max(1, cfg.damageHpShareRampLevels - 1)));
-    const hpShare = cfg.damageHpShareEarly + (cfg.damageHpShare - cfg.damageHpShareEarly) * shareT;
-    const floorDamage = Math.min(curveDamage * cfg.damageHpCapMult, maxHp * hpShare);
     const easeDamage = 1 - (1 - cfg.earlyDamageMult) * _egEarlyEaseBlend(level);
-    const damage = Math.max(1, Math.round(Math.max(curveDamage, floorDamage) * easeDamage));
+    const damage = Math.max(1, Math.round(_egCampaignRefDamage(level) * easeDamage));
 
     cur.campaignMonsters = true;
     cur.isMonsterLevel = true;

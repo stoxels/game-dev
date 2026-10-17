@@ -430,6 +430,7 @@ export {
     EG_CAMPAIGN_MONSTER_CONFIG,
     EG_CAMPAIGN_STAMPED_FIELDS,
     _egBuildCampaignMonsterList,
+    _egCampaignRefDamage,
     _egClearCampaignLevelFields,
     _egCountSolutionCells,
     _egEarlyEaseBlend,
