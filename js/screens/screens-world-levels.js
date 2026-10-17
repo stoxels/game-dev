@@ -52,7 +52,7 @@ import { STATE } from '../state.js';
 const WD_DEFAULT_IMAGE_ASPECT = 16 / 9;
 
 // How fast the player sprite walks across the canvas, in pixels per second
-const WD_WALK_SPEED_PX_PER_SEC = 80;
+const WD_WALK_SPEED_PX_PER_SEC = 96;
 
 // Fixed reference width used ONLY for speed calculations (per-world aspect
 // ratio applied), so walk speed stays constant regardless of window size.

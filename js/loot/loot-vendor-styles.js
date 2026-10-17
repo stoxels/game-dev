@@ -141,6 +141,16 @@ export function _egvEnsureStyles() {
             border: 1px solid var(--accent, #c8a84b); border-radius: 4px;
             padding: 5px 8px; cursor: pointer;
         }
+        .egv-filter-btn {
+            font-family: var(--PX, monospace); font-size: 11px; letter-spacing: 1px;
+            background: rgba(20, 15, 5, 0.85); color: var(--accent2, #ccc);
+            border: 1px solid var(--border2, #666); border-radius: 4px;
+            padding: 5px 12px; cursor: pointer;
+        }
+        .egv-filter-btn-on {
+            color: var(--accent, #c8a84b); border-color: var(--accent, #c8a84b);
+            background: rgba(200,168,75,0.22);
+        }
         .egv-base-list { width: 100%; }
         .egv-base-list::-webkit-scrollbar { width: 10px; }
         .egv-base-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }

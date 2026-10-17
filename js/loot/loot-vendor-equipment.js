@@ -37,6 +37,30 @@ let _egvBaseFilterSlot = 'all';
 // Weapon-type sub-filter (only shown while the slot filter is 'weapon').
 let _egvBaseFilterWeaponType = 'all';
 
+// "Usable only" toggle: hides bases the player cannot equip right now.
+let _egvBaseFilterUsable = false;
+// Defence-type filter: 'all' or a key from EG_VENDOR_DEFENSE_TYPES.
+let _egvBaseFilterDefense = 'all';
+
+// Defence filter value -> the exact set of defence stats a base must have.
+const EG_VENDOR_DEFENSE_TYPES = {
+    armour: ['armour'],
+    evasion: ['evasion'],
+    absorption: ['absorption'],
+    armour_evasion: ['armour', 'evasion'],
+    armour_absorption: ['armour', 'absorption'],
+    evasion_absorption: ['evasion', 'absorption'],
+};
+
+// True when the base's non-zero defence stats are exactly the chosen set.
+function _egvMatchesDefenseType(base, key) {
+    const want = EG_VENDOR_DEFENSE_TYPES[key];
+    if (!want) return true;
+    const def = base.defenses || {};
+    const have = ['armour', 'evasion', 'absorption'].filter(k => (def[k] || 0) > 0);
+    return have.length === want.length && want.every(k => have.includes(k));
+}
+
 const EG_VENDOR_WEAPON_TYPES = ['sword', 'axe', 'mace', 'dagger', 'wand', 'staff'];
 
 // Weapon family for the sub-filter. The art icon decides it (same rule the
@@ -147,6 +171,20 @@ export function _egvSetWeaponTypeFilter(value) {
     _egvRenderBaseListOnly();
 }
 
+// Toggles the "usable only" filter button.
+export function _egvToggleUsableFilter() {
+    _egvBaseFilterUsable = !_egvBaseFilterUsable;
+    const btn = document.getElementById('egv-usable-btn');
+    if (btn) btn.classList.toggle('egv-filter-btn-on', _egvBaseFilterUsable);
+    _egvRenderBaseListOnly();
+}
+
+// Applies the defence-type dropdown (armour, evasion, absorption, hybrids).
+export function _egvSetDefenseFilter(value) {
+    _egvBaseFilterDefense = value;
+    _egvRenderBaseListOnly();
+}
+
 // Shows/hides the weapon-type dropdown to match the slot filter.
 function _egvRefreshWeaponTypeControl() {
     const wrap = document.getElementById('egv-weapon-type-wrap');
@@ -179,16 +217,22 @@ function _egvGetFilteredSortedBases() {
         bases = bases.filter(b => _egvWeaponType(b) === _egvBaseFilterWeaponType);
     }
 
-    // Auto-sort: highest item level on top (descending). When filtering by
-    // a single slot, this surfaces the best bases for that slot first.
-    // When showing all slots, still group by slot order but with highest
-    // ilvl first within each slot group.
+    if (_egvBaseFilterDefense !== 'all') {
+        bases = bases.filter(b => _egvMatchesDefenseType(b, _egvBaseFilterDefense));
+    }
+    if (_egvBaseFilterUsable) {
+        bases = bases.filter(b => _egvGetMissingRequirements(b).length === 0);
+    }
+
+    // Auto-sort: lowest item level on top (ascending), so players see what
+    // they can use first. When showing all slots, still group by slot order
+    // with the lowest ilvl first within each slot group.
     const slotOrder = _egvGetSlotOrder();
     if (_egvBaseFilterSlot === 'all') {
         bases.sort((a, b) => slotOrder.indexOf(a.slotType) - slotOrder.indexOf(b.slotType)
-            || b.minLevel - a.minLevel);
+            || a.minLevel - b.minLevel);
     } else {
-        bases.sort((a, b) => b.minLevel - a.minLevel);
+        bases.sort((a, b) => a.minLevel - b.minLevel);
     }
     return bases;
 }
@@ -200,6 +244,16 @@ function _egvBuildBaseFilterOptionsHTML() {
     slotOrder.forEach(slot => {
         const selected = _egvBaseFilterSlot === slot ? ' selected' : '';
         options.push(`<option value="${slot}"${selected}>${t(`eg_slot_${slot}`)}</option>`);
+    });
+    return options.join('');
+}
+
+// Builds the defence-type dropdown options.
+function _egvBuildDefenseOptionsHTML() {
+    const options = [`<option value="all"${_egvBaseFilterDefense === 'all' ? ' selected' : ''}>${t('eg_vendor_defense_all')}</option>`];
+    Object.keys(EG_VENDOR_DEFENSE_TYPES).forEach(key => {
+        const selected = _egvBaseFilterDefense === key ? ' selected' : '';
+        options.push(`<option value="${key}"${selected}>${t(`eg_vendor_defense_${key}`)}</option>`);
     });
     return options.join('');
 }
@@ -223,6 +277,11 @@ export function _egvBuildBaseTabHTML() {
             <span>${t('eg_vendor_filter_type')}</span>
             <select id="egv-base-filter-select" onchange="_egvSetBaseFilter(this.value)">${_egvBuildBaseFilterOptionsHTML()}</select>
         </label>
+        <label class="egv-base-control-label">
+            <span>${t('eg_vendor_defense_type')}</span>
+            <select id="egv-defense-select" onchange="_egvSetDefenseFilter(this.value)">${_egvBuildDefenseOptionsHTML()}</select>
+        </label>
+        <button type="button" id="egv-usable-btn" class="egv-filter-btn${_egvBaseFilterUsable ? ' egv-filter-btn-on' : ''}" onclick="_egvToggleUsableFilter()">${t('eg_vendor_usable_only')}</button>
         <label class="egv-base-control-label" id="egv-weapon-type-wrap"${_egvBaseFilterSlot === 'weapon' ? '' : ' style="display:none"'}>
             <span>${t('eg_vendor_weapon_type')}</span>
             <select id="egv-weapon-type-select" onchange="_egvSetWeaponTypeFilter(this.value)">${_egvBuildWeaponTypeOptionsHTML()}</select>

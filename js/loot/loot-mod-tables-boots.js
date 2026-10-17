@@ -511,15 +511,17 @@ export const EG_MOD_TABLE_BOOTS = {
         // Affects WASD travel - crucial for dodging
         // telegraphed hazards like Fire Walls. PoE values: 10–35% in
         // 5% steps; higher tiers are rarer. Caps at ~35% per boot
-        // (only one boot slot, so at most 35%).
+        // (only one boot slot, so at most 35%). Family weight = best eligible
+        // tier weight, so the top tier is weighted high: boots roll this often
+        // at every item level (also lifts the in-puzzle avatar speed).
         movement_speed: {
             id: 'movement_speed',
             label: '#% increased Movement Speed', labelDe: '#% erhöhte Bewegungsgeschwindigkeit',
             tiers: [
-                { tier: 1, min: 30, max: 35, weight: 240, ilvl: 80 },
-                { tier: 2, min: 25, max: 29, weight: 450, ilvl: 60 },
-                { tier: 3, min: 20, max: 24, weight: 900, ilvl: 35 },
-                { tier: 4, min: 15, max: 19, weight: 1800, ilvl: 15 },
+                { tier: 1, min: 30, max: 35, weight: 1500, ilvl: 80 },
+                { tier: 2, min: 25, max: 29, weight: 1800, ilvl: 60 },
+                { tier: 3, min: 20, max: 24, weight: 2400, ilvl: 35 },
+                { tier: 4, min: 15, max: 19, weight: 3000, ilvl: 15 },
                 { tier: 5, min: 10, max: 14, weight: 3600, ilvl: 1 }
             ]
         },

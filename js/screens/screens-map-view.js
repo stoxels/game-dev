@@ -44,7 +44,7 @@ const MAP_IMAGE_ASPECT = 1376 / 768;
 
 // Walking speed of the player sprite, in canvas pixels per second
 // (calibrated for a ~1000px wide canvas).
-const WALK_SPEED_PX_PER_SEC = 60;
+const WALK_SPEED_PX_PER_SEC = 72;
 
 // Minimum duration for a single waypoint-to-waypoint step, in milliseconds.
 // Prevents imperceptibly fast micro-steps on very short segments.
