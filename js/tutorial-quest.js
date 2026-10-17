@@ -123,6 +123,8 @@ const TQ_STARTER_BASE_IDS = ['wpn_1h_1', 'ranged_1', 'chest_str_1', 'pants_str_1
 // in practice the kill - not the cap - ends the combat phase; the cap only
 // remains as a backstop.
 const TQ_P2_FILLS_LIMIT = 12;
+// Puzzle 2 drag lesson: cells that must be painted in ONE stroke.
+const TQ_P2_DRAG_CELLS = 4;
 const TQ_P3 = [
     [0, 0, 1, 0, 0],
     [0, 0, 1, 0, 0],
@@ -236,6 +238,8 @@ let _tqSawMonster = false;
 // so post-kill fills never consume the lesson cap.
 let _tqP2FillsGate = false;
 let _tqP2FillsCount = 0;
+// Best drag-stroke stack seen during the puzzle-2 drag lesson.
+let _tqP2MaxDragStack = 0;
 let _tqP2GateOpen = false;
 let _tqP2GearDropped = false;
 let _tqP2GearClaimed = false;
@@ -1119,6 +1123,14 @@ const TQ_TASKS = {
     // damage-explanation bubble stays up until the player has dealt damage
     // once, then the defeat-the-rat bubble takes over.
     first_fill: () => _tqP2FillsCount > 0 || _tqP2RatDead,
+    // Puzzle 2: the player drag-painted TQ_P2_DRAG_CELLS+ cells in one stroke
+    // (charged shot). The stack counter resets on release, so the best value
+    // seen while polling is kept. Also done when the rat dies first.
+    drag_shot: () => {
+        try { _tqP2MaxDragStack = Math.max(_tqP2MaxDragStack, globalThis._egDragChargeStacks || 0); } catch (e) {}
+        const dead = _tqSawMonster && typeof _egMonsters !== 'undefined' && globalThis._egMonsters.length === 0;
+        return _tqP2MaxDragStack >= TQ_P2_DRAG_CELLS || dead;
+    },
     // Puzzle 2: the rat was defeated (fills only). Stamps the death so the
     // fill count freezes. No random drop is forced here (the engine's own
     // rolls are suppressed for the tutorial - the Professor drops his own
@@ -1285,6 +1297,7 @@ function _tqStepsFor(phase) {
             { say: 'tq_p2_s0', wait: true, fn: () => { _tqGridLocked = true; _tqActiveDemo = null; _tqRefreshGridLockBorder(); } },   // monster appears (board locked - no fighting during the intro)
             { say: 'tq_p2_s1', fn: () => { _tqGridLocked = false; _tqArmFillsGate(); _tqRefreshGridLockBorder(); } },   // dealing damage through grid reveals
             { task: 'first_fill' },   // bubble vanishes on the first correct reveal
+            { say: 'tq_p2_s1c', task: 'drag_shot' },   // drag-paint 4+ cells in one stroke = one bigger charged shot (skipped if the rat dies first)
             { say: 'tq_p2_s1b', task: 'kill_monster' },   // fully defeat the rat
             { say: 'tq_p2_s2', fn: () => { _tqPointAtDrop('.eg-pickup-overlay:not(.eg-loot-overlay)'); } },   // pick the heart up (left-click only)
             { task: 'pick_heart' },
@@ -2123,6 +2136,7 @@ function _tqPointAtGearDrop() {
 // TQ_P2_FILLS_LIMIT solution cells, and the rat's HP budget guarantees the
 // fight is won inside that cap. The count freezes when the rat dies.
 function _tqArmFillsGate() {
+    _tqP2MaxDragStack = 0;
     _tqP2FillsGate = true;
     _tqP2FillsCount = 0;
     _tqP2RatDead = false;

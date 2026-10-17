@@ -7,6 +7,7 @@ import { _egHazardsTick } from './combat-hazards-lifecycle.js';
 import { _egGetActiveMapModValue } from '../endgame/endgame-map-launch.js';
 import { _egGetPlayerAttackInterval } from '../endgame/endgame-player-stats.js';
 import { _egIsActive } from './combat-state.js';
+import { _egUpdateMeleeMarker } from './combat-weapon-swing-config.js';
 import { _egCheckMistakeLimit, _egTickLifeRegen } from './encounter-tick-support.js';
 
 //  endgame-encounter-tick.js
@@ -381,6 +382,7 @@ export function _egTickLoop() {
     if (typeof _gamePaused !== 'undefined' && globalThis._gamePaused) return;
 
     _egCheckMistakeLimit();
+    _egUpdateMeleeMarker();
     _egMaybeShowLowHealthWarning();
 
     globalThis._egBossTick();

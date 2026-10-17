@@ -158,6 +158,10 @@ export function _egBuildTooltipBodyHTML(item) {
         const valCls = bcModded ? 'eg-tt-val eg-tt-val-modified' : 'eg-tt-val';
         implicitLines.push(`<div class="eg-tt-implicit">${t('eg_tt_block_chance')}: <span class="${valCls}">${bcVal}%</span></div>`);
     }
+    // Bows have no fire button - tell the player how the bow actually shoots.
+    if (item.slotType === 'ranged') {
+        implicitLines.push(`<div class="eg-tt-implicit" style="font-style:italic;opacity:0.85;">${t('eg_tt_bow_hint')}</div>`);
+    }
     const implicitHTML = implicitLines.length
         ? `<div class="eg-tt-section">${implicitLines.join('')}</div>`
         : '';

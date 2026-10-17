@@ -42,6 +42,7 @@ export const SETTINGS_DEFAULTS = {
     penaltyFlash: true,         // brief red screen flash on a mistake
     toastDuration: 8,           // seconds an on-screen notification stays visible
     invertMouseButtons: false,  // swap fill (left-click) and mark (right-click)
+    meleeAutoRetarget: false,   // a melee hit on a non-selected monster also selects it
     hidePassiveTrackerInEndgame: false, // hide passive tracker during endgame maps
     lang: 'en',                 // persisted interface language
 };
@@ -58,6 +59,7 @@ const TOGGLE_CONFIGS = [
     { key: 'questionMark', btnId: 'stt-qmark' },
     { key: 'touchpadModeEnabled', btnId: 'stt-touchpad' },
     { key: 'invertMouseButtons', btnId: 'stt-invert' },
+    { key: 'meleeAutoRetarget', btnId: 'stt-meleeretarget' },
     { key: 'lowTimeVignette', btnId: 'stt-ltv' },
     { key: 'lowHealthVignette', btnId: 'stt-lhv' },
     { key: 'penaltyFlash', btnId: 'stt-penflash' },
@@ -272,6 +274,7 @@ export function initSettingsControls() {
     initToggleControl('stt-qmark', 'questionMark', false);
     initToggleControl('stt-touchpad', 'touchpadModeEnabled');
     initToggleControl('stt-invert', 'invertMouseButtons', false);
+    initToggleControl('stt-meleeretarget', 'meleeAutoRetarget', false);
     initToggleControl('stt-ltv', 'lowTimeVignette', false);
     initToggleControl('stt-lhv', 'lowHealthVignette', false);
     initToggleControl('stt-penflash', 'penaltyFlash', false);

@@ -172,6 +172,28 @@ export function _egMeleeFindVictim(preferredId) {
     return best;
 }
 
+// Live "who will my sword hit" marker. The yellow target border belongs to
+// reveal shots and spells; when a melee swing would land on a DIFFERENT
+// monster (the selected one is out of reach, another stands next to the
+// hero) that monster's card gets .eg-card-melee-target. Called every combat
+// tick; only touches the DOM when the marked card actually changes.
+export function _egUpdateMeleeMarker() {
+    let victim = null;
+    try {
+        const info = _egGetEquippedWeaponInfo();
+        if (info.item && info.item.slotType === 'weapon') {
+            const selected = globalThis._egTargetId || null;
+            const v = _egMeleeFindVictim(selected);
+            if (v != null && v !== selected) victim = v;
+        }
+    } catch (e) { victim = null; }
+    const marked = document.querySelectorAll('.eg-card-melee-target');
+    const wanted = victim != null ? document.getElementById(`eg-card-${victim}`) : null;
+    if (marked.length === (wanted ? 1 : 0) && (!wanted || marked[0] === wanted)) return;
+    marked.forEach(el => el.classList.remove('eg-card-melee-target'));
+    if (wanted) wanted.classList.add('eg-card-melee-target');
+}
+
 // Which way the swing should face: toward the monster being struck (or the
 // selected one, when nothing is in reach, so the whiff points at it), else
 // the last walked direction.

@@ -22,9 +22,10 @@ import { _egSetHoldEPauseVisual, _egTickLoop } from './encounter-tick.js';
 import { _egHideMonsterPanel, _egRenderPanel } from './encounter.js';
 import { _egStartPickupSpawner, _egStopPickupSpawner } from './combat-grid-pickups-spawner.js';
 import { _egHazardsCleanup, _egHazardsReset } from './combat-hazards-lifecycle.js';
-import { _egCancelAbsorptionRegen, _egComputePlayerStats } from '../endgame/endgame-player-stats.js';
+import { _egCancelAbsorptionRegen, _egComputePlayerStats, _egGetAllEquippedItems } from '../endgame/endgame-player-stats.js';
 import { _egRecentFills } from './combat-state.js';
 import { cur } from '../state.js';
+import { t } from '../translation/translations.js';
 
 
 
@@ -124,6 +125,19 @@ export function _egAttachBossStylesheet() {
     else setTimeout(_egAttachBossStylesheet, 2500);
 })();
 
+// One-time hint (per save) the first time a fight starts with a bow equipped:
+// the bow has no fire button, it shoots with every correct reveal.
+function _egMaybeShowBowHint() {
+    try {
+        if (typeof globalThis._tqIsTutorialActive === 'function' && globalThis._tqIsTutorialActive()) return;
+        if (typeof globalThis.hasSeen !== 'function' || globalThis.hasSeen('bow_shoot_hint')) return;
+        const hasBow = (_egGetAllEquippedItems() || []).some(it => it && it.slotType === 'ranged');
+        if (!hasBow) return;
+        globalThis.markSeen('bow_shoot_hint');
+        setTimeout(() => { if (globalThis._egEncounterActive) globalThis.showToast(t('eg_bow_hint_toast')); }, 1800);
+    } catch (e) { /* a hint must never break an encounter */ }
+}
+
 // Initialises and begins a full monster encounter for the current level.
 // Called from start-level.js or equivalent when cur.isMonsterLevel is true.
 export function _egStartEncounter() {
@@ -133,6 +147,7 @@ export function _egStartEncounter() {
     _egStartTickLoop();
     _egStartPickupSpawner();
     _egScheduleMonsterSpawns(_egBuildSpawnList());
+    _egMaybeShowBowHint();
     // Absorption starts full, but the shell latches on Barrier casts only - warm the tracker, show nothing yet.
     if (typeof _uspBarrierStart === 'function') { try { _uspBarrierStart(); } catch (e) { /* shell is cosmetic */ } }
     // Flush any auto-reveals that fired before the encounter went live

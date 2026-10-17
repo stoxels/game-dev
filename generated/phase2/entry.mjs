@@ -870,6 +870,7 @@ try { Object.defineProperty(globalThis, "keybindKeyFor", { get() { return keybin
 try { Object.defineProperty(globalThis, "keybindMatches", { get() { return keybindMatches; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "loadSettingsUI", { get() { return loadSettingsUI; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "lvText", { get() { return lvText; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "markSeen", { get() { return markSeen; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "maybeShowCharacterSelect", { get() { return maybeShowCharacterSelect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "mgCalcHintThreshold", { get() { return mgCalcHintThreshold; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "mgCloseToLevelSelect", { get() { return mgCloseToLevelSelect; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

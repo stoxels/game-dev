@@ -81,6 +81,21 @@ export function _egApplyPlayerMeleeImpact(targetId, opts) {
         return;
     }
 
+    // The swing landed on a monster that is NOT the selected (yellow) one:
+    // pulse its card so the player sees who was hit, and (optional setting,
+    // off by default) move the selection onto it.
+    if (targetId !== globalThis._egTargetId) {
+        const hitCard = document.getElementById(`eg-card-${targetId}`);
+        if (hitCard) {
+            hitCard.classList.add('eg-card-melee-hit');
+            setTimeout(() => hitCard.classList.remove('eg-card-melee-hit'), 500);
+        }
+        if (globalThis.SETTINGS && globalThis.SETTINGS.meleeAutoRetarget
+            && typeof globalThis._egSelectTarget === 'function') {
+            globalThis._egSelectTarget(targetId);
+        }
+    }
+
     // Accuracy: the swing can whiff entirely (no gear procs on a miss).
     // A whiffed swing does NOT refund the spent charge.
     if (_egRollPlayerMiss(targetId)) return;

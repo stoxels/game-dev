@@ -220,6 +220,31 @@
 
 
 
+/* Melee marker: the monster the next sword swing would hit when it is NOT
+   the selected (yellow) target. Orange-red outline + a small sword badge. */
+.eg-monster-card-compact.eg-card-melee-target {
+    outline: 2px dashed #ff6a2b;
+    outline-offset: 2px;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(255, 106, 43, 0.6);
+}
+.eg-monster-card-compact.eg-card-melee-target::after {
+    content: '⚔️';
+    position: absolute;
+    top: -6px; right: -6px;
+    font-size: 16px;
+    filter: drop-shadow(0 0 3px #000);
+    pointer-events: none;
+}
+/* Brief pulse on a card that a melee swing just hit without it being selected. */
+.eg-monster-card-compact.eg-card-melee-hit {
+    animation: eg-melee-hit-pulse 0.5s ease-out;
+}
+@keyframes eg-melee-hit-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255, 106, 43, 0.95); filter: brightness(1.6); }
+    100% { box-shadow: 0 0 0 18px rgba(255, 106, 43, 0); filter: brightness(1); }
+}
+
 /* Charge Bar */
 .eg-charge-track {
     width: 100%;
