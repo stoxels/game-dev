@@ -10129,6 +10129,67 @@ body.eg-shp-flash::after {
     z-index: 8652;
 }
 
+/* ── Curtain from the right / bottom: flip the gradient + bright edge ── */
+.eg-bar-curtain-rev {
+    background: linear-gradient(270deg,
+        rgba(255, 107, 53, 0.10) 0%,
+        rgba(255, 107, 53, 0.34) 55%,
+        rgba(255, 214, 102, 0.72) 100%);
+    border-right: none;
+    border-left: 3px solid rgba(255, 214, 102, 0.95);
+}
+.eg-bar-curtain-v.eg-bar-curtain-rev {
+    background: linear-gradient(0deg,
+        rgba(255, 107, 53, 0.10) 0%,
+        rgba(255, 107, 53, 0.34) 55%,
+        rgba(255, 214, 102, 0.72) 100%);
+    border-left: none;
+    border-bottom: none;
+    border-top: 3px solid rgba(255, 214, 102, 0.95);
+}
+
+/* ── Bomb barrage: bomb ring + blast, crate shelter ring ── */
+.eg-bar-bomb-warn {
+    position: fixed;
+    z-index: 8650;
+    pointer-events: none;
+    width: 124px;
+    height: 124px;
+    border-radius: 50%;
+    border: 3px dashed rgba(255, 90, 60, 0.95);
+    background: radial-gradient(circle, rgba(255, 90, 60, 0.22) 0%, rgba(255, 90, 60, 0.10) 70%, transparent 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    animation: eg-bar-bomb-warn-kf 0.4s ease-in-out infinite alternate;
+}
+@keyframes eg-bar-bomb-warn-kf {
+    from { transform: scale(0.94); opacity: 0.65; }
+    to   { transform: scale(1.06); opacity: 1; }
+}
+.eg-bar-bomb-boom {
+    position: fixed;
+    z-index: 8652;
+    pointer-events: none;
+    width: 124px;
+    height: 124px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 214, 102, 0.95);
+    background: radial-gradient(circle, rgba(255, 236, 179, 0.7) 0%, rgba(255, 90, 60, 0.4) 55%, transparent 78%);
+    box-shadow: 0 0 34px rgba(255, 120, 50, 0.9);
+    animation: eg-bar-boom-kf 0.45s ease-out forwards;
+}
+.eg-bar-cover-ring {
+    position: fixed;
+    z-index: 8648;
+    pointer-events: none;
+    border-radius: 50%;
+    box-sizing: border-box;
+    border: 3px dashed rgba(134, 239, 172, 0.9);
+    background: radial-gradient(circle, rgba(134, 239, 172, 0.16) 0%, rgba(134, 239, 172, 0.06) 70%, transparent 100%);
+    box-shadow: 0 0 18px rgba(74, 222, 128, 0.5);
+}
+.eg-bar-crate-hit { filter: brightness(2.2) saturate(1.5); transform: scale(1.1); }
+
 /* ── FINAL BOMBARDMENT: shelling grid tiles ── */
 .eg-bar-strike {
     position: fixed;
@@ -10139,11 +10200,19 @@ body.eg-shp-flash::after {
     background: rgba(255, 107, 53, 0.07);
     transition: background 0.25s ease-out, box-shadow 0.25s ease-out;
 }
+/* The safe tile must read at a glance on a screen full of orange: solid
+   green fill, thick border, outer glow and a SAFE label, drawn ABOVE the
+   neighbouring tiles (their eruption glow used to wash it out). */
 .eg-bar-strike-safe {
-    border-color: rgba(134, 239, 172, 0.85);
-    background: rgba(134, 239, 172, 0.12);
-    box-shadow: inset 0 0 14px rgba(134, 239, 172, 0.3);
+    z-index: 8651;
+    border: 3px solid rgba(134, 239, 172, 1);
+    background: rgba(74, 222, 128, 0.42);
+    box-shadow: 0 0 26px rgba(74, 222, 128, 0.9), inset 0 0 22px rgba(187, 247, 208, 0.55);
+    display: flex; align-items: center; justify-content: center;
+    font: 900 clamp(0.7rem, 1.6vw, 1.15rem)/1 system-ui, sans-serif; letter-spacing: 0.18em;
+    color: #052e16; text-shadow: 0 0 8px rgba(255, 255, 255, 0.95);
 }
+.eg-bar-strike-safe::after { content: 'SAFE'; }
 .eg-bar-safe-pulse {
     animation: eg-bar-safe-pulse-kf 0.9s ease-in-out infinite alternate;
 }

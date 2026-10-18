@@ -2236,7 +2236,7 @@ export function _egNkDotTick(run, pctPerSec, dtS, level, element) {
 
 
 // Failed-dodge feedback toast for a NAMED boss ability, decided by damage:
-//   dealt > 0 → "💥 <boss> <ability> hits you for N damage!"
+//   dealt > 0 → silent (damage taken is never shown in the combat toast)
 //   dealt == 0 + absorption flag (from _egNkHit / the blast engine) →
 //     "🛡️ absorbed by your shield!" - never a misleading "hit for 0".
 //   dealt == 0 without absorption (godmode, inactive encounter) → silent.
@@ -2303,22 +2303,10 @@ export function _egNkAbilityHitToast(dealt, bossName, abilityName, quiet) {
     const absorbed = _egNkLastHitAbsorbed;
     _egNkLastHitAbsorbed = false;
     if (quiet) return;
-    if (dealt > 0) {
-        let msg = '💥 ' + ability + ' hits you for ' + dealt + ' damage!';
-        try {
-            const raw = t('eg_ability_hit');
-            if (raw && raw !== 'eg_ability_hit' && raw.indexOf('{ability}') !== -1) {
-                msg = raw.replace('{ability}', ability).replace('{n}', dealt);
-            }
-        } catch (e) {}
-        if (typeof showCombatToast === 'function') {
-            // Text + left stripe tinted by the BOSS's color (element or
-            // signature) so overlapping arenas read at a glance.
-            const color = _egNkBossToastColor(bossName);
-            const el = globalThis.showCombatToast(msg, color);
-            if (el) el.style.borderLeft = '3px solid ' + color;
-        }
-    } else if (absorbed) {
+    // Damage taken is never shown in the combat toast (the floating hit number on
+    // the avatar already covers it); only the shield-absorbed outcome is toasted.
+    if (dealt > 0) return;
+    if (absorbed) {
         let msg = '🛡️ ' + ability + ' absorbed by your shield!';
         try {
             const raw = t('eg_ability_absorbed');

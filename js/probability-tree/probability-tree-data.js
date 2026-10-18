@@ -598,7 +598,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_golem_s_blood_287",
    "effects": [
     "health_inc_pct:10",
-    "life_regen_pct:1.6"
+    "life_regen_pct:1.28"
    ],
    "tier": "notable"
   },
@@ -696,7 +696,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_smoldering_vigor_95",
    "effects": [
     "ignite_damage_more:10",
-    "life_regen_pct:1.2"
+    "life_regen_pct:0.96"
    ],
    "tier": "notable"
   },
@@ -1291,7 +1291,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "notable_growth_and_decay_15",
    "effects": [
     "dot_inc_pct:12",
-    "life_regen_pct:1"
+    "life_regen_pct:0.8"
    ],
    "tier": "notable"
   },
@@ -1969,7 +1969,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_righteous_army_93",
    "effects": [
-    "life_regen_pct:1"
+    "life_regen_pct:0.8"
    ],
    "tier": "notable"
   },
@@ -2118,7 +2118,7 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "health_inc_pct:7",
     "mana_regen_inc_pct:20",
-    "life_regen_pct:0.8"
+    "life_regen_pct:0.64"
    ],
    "tier": "notable"
   },
@@ -2145,7 +2145,7 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "armour_inc_pct:20",
     "health_inc_pct:5",
-    "life_regen_pct:1"
+    "life_regen_pct:0.8"
    ],
    "tier": "notable"
   },
@@ -2409,7 +2409,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_hardy_constitution_4",
    "effects": [
-    "life_regen_pct:1.8",
+    "life_regen_pct:1.44",
     "str_flat:20"
    ],
    "tier": "notable"
@@ -2704,7 +2704,7 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "armour_inc_pct:20",
     "absorption_inc_pct:10",
-    "life_regen_pct:1",
+    "life_regen_pct:0.8",
     "str_flat:5",
     "int_flat:5"
    ],
@@ -3030,8 +3030,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_quickened_renewal_111",
    "effects": [
-    "life_regen_rate:15",
-    "life_regen_pct:1.8"
+    "life_regen_rate:12",
+    "life_regen_pct:1.44"
    ],
    "tier": "notable"
   },
@@ -3087,8 +3087,8 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_steady_recovery_129",
    "effects": [
-    "life_regen_flat:10",
-    "life_regen_pct:1.2"
+    "life_regen_flat:8",
+    "life_regen_pct:0.96"
    ],
    "tier": "notable"
   },
@@ -3418,7 +3418,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_master_of_the_arena_306",
    "effects": [
-    "life_regen_pct:1",
+    "life_regen_pct:0.8",
     "melee_phys_inc:10",
     "melee_range_m:0.3",
     "str_flat:10"
@@ -4655,7 +4655,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_mana_and_life_regeneration_30055",
    "effects": [
     "mana_regen_inc_pct:15",
-    "life_regen_pct:0.4",
+    "life_regen_pct:0.32",
     "mana_on_line:3"
    ],
    "tier": "small"
@@ -4684,7 +4684,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_mana_and_life_regeneration_30057",
    "effects": [
     "mana_regen_inc_pct:15",
-    "life_regen_pct:0.4"
+    "life_regen_pct:0.32"
    ],
    "tier": "small"
   },
@@ -4698,7 +4698,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_mana_and_life_regeneration_30058",
    "effects": [
     "mana_regen_inc_pct:15",
-    "life_regen_pct:0.4"
+    "life_regen_pct:0.32"
    ],
    "tier": "small"
   },
@@ -5692,7 +5692,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_damage_over_time_multiplier_and_life_regeneration_30125",
    "effects": [
     "dot_inc_pct:3",
-    "life_regen_pct:0.4"
+    "life_regen_pct:0.32"
    ],
    "tier": "small"
   },
@@ -5705,7 +5705,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_mending_30126",
    "effects": [
-    "life_regen_pct:0.8"
+    "life_regen_pct:0.64"
    ],
    "tier": "small"
   },
@@ -6353,7 +6353,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_brink_of_death_20050",
    "effects": [
-    "low_life_regen_pct:4",
+    "low_life_regen_pct:3.2",
     "regen_low_time:40"
    ],
    "tier": "notable"
@@ -7262,7 +7262,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_vital_renewal_30206",
    "effects": [
-    "life_regen_pct:0.8",
+    "life_regen_pct:0.64",
     "mistake_heal:6"
    ],
    "tier": "small"
@@ -7983,7 +7983,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_vital_renewal_30260",
    "effects": [
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ],
    "tier": "small"
   },
@@ -8408,7 +8408,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_vital_renewal_30292",
    "effects": [
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ],
    "tier": "small"
   },
@@ -8421,7 +8421,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_vital_renewal_30293",
    "effects": [
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ],
    "tier": "small"
   },
@@ -9213,7 +9213,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_hearth_fire_30358",
    "effects": [
     "fire_damage_inc_pct:12",
-    "life_regen_pct:0.4",
+    "life_regen_pct:0.32",
     "damage_per_streak:4"
    ],
    "tier": "small"
@@ -9358,7 +9358,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_vital_renewal_30369",
    "effects": [
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ],
    "tier": "small"
   },
@@ -9805,7 +9805,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_regeneration_30403",
    "effects": [
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ],
    "tier": "small"
   },
@@ -9818,7 +9818,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_regeneration_30404",
    "effects": [
-    "life_regen_pct:0.6",
+    "life_regen_pct:0.48",
     "first_step_time:4"
    ],
    "tier": "small"
@@ -11372,7 +11372,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_regeneration_30544",
    "effects": [
-    "life_regen_pct:0.5",
+    "life_regen_pct:0.4",
     "regen_low_time:20"
    ],
    "tier": "small"
@@ -11387,7 +11387,7 @@ export const TALENT_TREE_DATA = {
    "statKey": "small_armour_and_life_regeneration_30545",
    "effects": [
     "armour_inc_pct:10",
-    "life_regen_pct:0.6",
+    "life_regen_pct:0.48",
     "first_step_time:4"
    ],
    "tier": "small"
@@ -12012,7 +12012,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_regeneration_30591",
    "effects": [
-    "life_regen_pct:0.6",
+    "life_regen_pct:0.48",
     "life_on_line:5"
    ],
    "tier": "small"
@@ -12026,7 +12026,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "small_life_regeneration_30592",
    "effects": [
-    "life_regen_pct:0.6",
+    "life_regen_pct:0.48",
     "regen_low_time:20"
    ],
    "tier": "small"
@@ -12240,7 +12240,7 @@ export const TALENT_TREE_DATA = {
    "effects": [
     "health_inc_pct:8",
     "stun_avoid:20",
-    "life_regen_pct:2",
+    "life_regen_pct:1.6",
     "freeze_timer_on_stun:2"
    ],
    "tier": "notable"
@@ -13953,7 +13953,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "time_added:120",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {
@@ -14296,7 +14296,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "mistake_count:2",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {
@@ -14323,7 +14323,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "time_added:120",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {
@@ -17955,7 +17955,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "time_added:120",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {
@@ -17982,7 +17982,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "time_added:120",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {
@@ -18101,7 +18101,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "time_added:120",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {
@@ -18115,7 +18115,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "time_added:120",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {
@@ -18988,7 +18988,7 @@ export const TALENT_TREE_DATA = {
    "icon": "",
    "statKey": "notable_sacrifice_20233",
    "effects": [
-    "life_regen_pct:1",
+    "life_regen_pct:0.8",
     "life_on_line:10"
    ],
    "tier": "notable"
@@ -19419,7 +19419,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "mistake_count:2",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {
@@ -21542,7 +21542,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "mistake_count:2",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {
@@ -21556,7 +21556,7 @@ export const TALENT_TREE_DATA = {
    "tier": "small",
    "effects": [
     "mistake_count:2",
-    "life_regen_pct:0.6"
+    "life_regen_pct:0.48"
    ]
   },
   {

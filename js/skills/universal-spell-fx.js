@@ -1712,10 +1712,45 @@ export function _uspRetributionClear(spellId) {
 const _uspWindstepEls = {};   // spellId -> element
 let _uspWindstepRaf = null;
 
+let _uspWindstepPrev = null;       // last tracked centre (for the trail direction)
+let _uspWindstepTrailAt = 0;      // throttle for the trail streaks
+
+// Spawns one fading wind streak behind the hero (opposite the walking
+// direction) and, now and then, a puff of dust and a drifting feather.
+function _uspWindstepTrail(c, ang, now) {
+    const feetY = c.y + 26;
+    const streak = document.createElement('div');
+    streak.className = 'usp-wsp-trail';
+    streak.style.left = `${c.x}px`;
+    streak.style.top = `${feetY - 18 + Math.random() * 30}px`;
+    streak.style.width = `${46 + Math.random() * 44}px`;
+    streak.style.setProperty('--ang', `${ang + Math.PI}rad`);
+    document.body.appendChild(streak);
+    setTimeout(() => { try { streak.remove(); } catch (x) { /* already gone */ } }, 520);
+    const roll = Math.random();
+    if (roll < 0.28) {
+        const puff = document.createElement('div');
+        puff.className = 'usp-wsp-puff';
+        puff.style.left = `${c.x}px`;
+        puff.style.top = `${feetY}px`;
+        document.body.appendChild(puff);
+        setTimeout(() => { try { puff.remove(); } catch (x) { /* already gone */ } }, 640);
+    } else if (roll > 0.86) {
+        const f = document.createElement('div');
+        f.className = 'usp-wsp-feather';
+        f.style.left = `${c.x}px`;
+        f.style.top = `${c.y}px`;
+        f.style.setProperty('--ang', `${ang + Math.PI}rad`);
+        document.body.appendChild(f);
+        setTimeout(() => { try { f.remove(); } catch (x) { /* already gone */ } }, 900);
+    }
+    void now;
+}
+
 function _uspWindstepTrack() {
     _uspWindstepRaf = null;
     const ids = Object.keys(_uspWindstepEls);
-    if (!ids.length) return;
+    if (!ids.length) { _uspWindstepPrev = null; return; }
     try {
         const avatar = document.getElementById('player-avatar-wrapper')
             || document.getElementById('player-avatar-simple')
@@ -1731,6 +1766,21 @@ function _uspWindstepTrack() {
                 const el = _uspWindstepEls[id];
                 if (el) { el.style.left = `${c.x}px`; el.style.top = `${c.y}px`; }
             }
+            const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+            if (_uspWindstepPrev) {
+                const dx = c.x - _uspWindstepPrev.x;
+                const dy = c.y - _uspWindstepPrev.y;
+                const moving = Math.hypot(dx, dy) > 1.2;
+                for (const id of ids) {
+                    const el = _uspWindstepEls[id];
+                    if (el) el.classList.toggle('is-moving', moving);
+                }
+                if (moving && now - _uspWindstepTrailAt > 46) {
+                    _uspWindstepTrailAt = now;
+                    _uspWindstepTrail(c, Math.atan2(dy, dx), now);
+                }
+            }
+            _uspWindstepPrev = { x: c.x, y: c.y };
         }
     } catch (e) { /* tracking is cosmetic */ }
     _uspWindstepRaf = requestAnimationFrame(_uspWindstepTrack);
@@ -1754,13 +1804,23 @@ export function _uspWindstepTailwind(spell, ms) {
         el.className = 'usp-windstep-tailwind';
         el.style.left = `${c.x}px`;
         el.style.top = `${c.y}px`;
-        let lines = '';
-        for (let l = 1; l <= 4; l++) lines += `<div class="usp-windstep-line usp-windstep-line-${l}"></div>`;
-        let feathers = '';
-        for (let f = 1; f <= 4; f++) feathers += `<div class="usp-windstep-feather usp-windstep-feather-${f}"></div>`;
-        el.innerHTML = '<div class="usp-windstep-swirl">' + lines + feathers + '</div>';
+        // Persistent: a soft wind aura, a swirling ring at the feet and three
+        // feathers orbiting the hero. The trail streaks are spawned per frame
+        // while the hero actually moves (see _uspWindstepTrail).
+        let orbit = '';
+        for (let f = 1; f <= 3; f++) orbit += `<span class="usp-wsp-orbiter usp-wsp-orbiter-${f}"></span>`;
+        el.innerHTML = '<div class="usp-wsp-aura"></div><div class="usp-wsp-ring"></div><div class="usp-wsp-orbit">' + orbit + '</div>';
         document.body.appendChild(el);
+        // Cast burst: a gust ring blasting out from the hero.
+        const burst = document.createElement('div');
+        burst.className = 'usp-wsp-burst';
+        burst.style.left = `${c.x}px`;
+        burst.style.top = `${c.y + 20}px`;
+        burst.innerHTML = '<span class="usp-wsp-burst-ring"></span><span class="usp-wsp-burst-ring usp-wsp-burst-ring-2"></span>';
+        document.body.appendChild(burst);
+        setTimeout(() => { try { burst.remove(); } catch (x) { /* already gone */ } }, 800);
         _uspWindstepEls[spell.id] = el;
+        _uspWindstepPrev = null;
         if (!_uspWindstepRaf) _uspWindstepRaf = requestAnimationFrame(_uspWindstepTrack);
         setTimeout(() => { try { _uspWindstepClear(spell.id); } catch (x) { /* already gone */ } }, Math.max(500, (ms || 6000) + 400));
     } catch (e) { /* tailwind is cosmetic */ }
@@ -2066,6 +2126,22 @@ export function _uspBlinkFX(spell, fromX, fromY, toX, toY, soft) {
         document.body.appendChild(arrive);
         setTimeout(() => { try { arrive.remove(); } catch (e) {} }, isLeap ? 1050 : soft ? 950 : 800);
     } catch (e) { /* arrival is cosmetic */ }
+}
+
+// Leap Strike landing: a stomp ring and a spray of dust at the hero's feet.
+export function _uspLeapImpactFX(x, y) {
+    if (typeof document === 'undefined') return;
+    try {
+        const ring = document.createElement('div');
+        ring.className = 'usp-leap-stomp';
+        ring.style.left = `${x}px`;
+        ring.style.top = `${y}px`;
+        let dust = '';
+        for (let i = 0; i < 7; i++) dust += `<span class="usp-leap-stomp-dust" style="--a:${(i / 7) * 360 + Math.random() * 25}deg"></span>`;
+        ring.innerHTML = '<span class="usp-leap-stomp-ring"></span>' + dust;
+        document.body.appendChild(ring);
+        setTimeout(() => { try { ring.remove(); } catch (e) { /* already gone */ } }, 700);
+    } catch (e) { /* impact is cosmetic */ }
 }
 
 // The armed Rift Anchor's world marker. One at a time (a second anchor

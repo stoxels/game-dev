@@ -1252,40 +1252,104 @@
    light feathers swirling at the feet for the whole 6s buff, tracking the
    sprite every frame. Lightning-pale via fixed colours. Purely additive. */
 .usp-windstep-tailwind{
-    position:fixed; width:110px; height:90px; margin:0;
+    position:fixed; width:150px; height:130px; margin:0;
     pointer-events:none; z-index:986;
     transform:translate(-50%,-50%);
-    animation: usp-windstep-rise .4s ease-out;
+    animation: usp-windstep-rise .45s ease-out;
 }
-@keyframes usp-windstep-rise{ 0%{ opacity:0; scale:.7; } 100%{ opacity:1; scale:1; } }
-.usp-windstep-swirl{
-    position:absolute; inset:0;
-    animation: usp-windstep-flow 1.2s linear infinite;
+@keyframes usp-windstep-rise{ 0%{ opacity:0; scale:.6; } 100%{ opacity:1; scale:1; } }
+/* soft cyan-white wind glow around the hero; brightens while moving */
+.usp-wsp-aura{
+    position:absolute; inset:14px 22px; border-radius:50%;
+    background:radial-gradient(ellipse at 50% 55%, rgba(178,235,242,.34) 0%, rgba(178,235,242,.14) 55%, transparent 78%);
+    box-shadow:0 0 22px rgba(129,212,250,.4);
+    animation: usp-wsp-breathe 1.4s ease-in-out infinite alternate;
 }
-@keyframes usp-windstep-flow{ 0%{ transform:translateX(6px); } 50%{ transform:translateX(-6px); } 100%{ transform:translateX(6px); } }
-.usp-windstep-line{
-    position:absolute; left:50%; height:2px; border-radius:2px;
-    background:linear-gradient(90deg, transparent 0%, rgba(224,242,254,.85) 60%, #fff 100%);
-    box-shadow:0 0 6px rgba(178,223,219,.7);
-    animation: usp-windstep-stream .8s linear infinite;
+.usp-windstep-tailwind.is-moving .usp-wsp-aura{
+    box-shadow:0 0 30px rgba(129,212,250,.75), 0 0 8px rgba(255,255,255,.55);
 }
-.usp-windstep-line-1{ top:22%; width:64px; margin-left:-52px; }
-.usp-windstep-line-2{ top:40%; width:84px; margin-left:-40px; animation-delay:-.2s; }
-.usp-windstep-line-3{ top:58%; width:70px; margin-left:-56px; animation-delay:-.4s; }
-.usp-windstep-line-4{ top:74%; width:56px; margin-left:-34px; animation-delay:-.6s; }
-@keyframes usp-windstep-stream{ 0%{ opacity:0; transform:translateX(18px); } 30%{ opacity:1; } 100%{ opacity:0; transform:translateX(-30px); } }
-.usp-windstep-feather{
-    position:absolute; left:50%; top:62%; width:9px; height:13px; margin:-6px 0 0 -4px;
+@keyframes usp-wsp-breathe{ from{ opacity:.65; transform:scale(.96); } to{ opacity:1; transform:scale(1.06); } }
+/* spinning wind ring on the ground at the feet */
+.usp-wsp-ring{
+    position:absolute; left:50%; bottom:6px; width:78px; height:24px; margin-left:-39px;
+    border-radius:50%;
+    border:2px dashed rgba(224,247,250,.85);
+    border-left-color:transparent; border-right-color:rgba(129,212,250,.9);
+    box-shadow:0 0 10px rgba(178,235,242,.6);
+    animation: usp-wsp-spin 0.9s linear infinite;
+}
+@keyframes usp-wsp-spin{ to{ transform:rotate(360deg); } }
+/* three feathers lazily orbiting the hero */
+.usp-wsp-orbit{ position:absolute; inset:0; animation: usp-wsp-spin 2.6s linear infinite; }
+.usp-wsp-orbiter{
+    position:absolute; left:50%; top:50%; width:9px; height:14px; margin:-7px 0 0 -4px;
     border-radius:60% 10% 60% 10%;
-    background:linear-gradient(135deg, #fff 0%, #b2dfdb 70%, #64b5ac 100%);
-    box-shadow:0 0 5px rgba(224,242,254,.8);
-    animation: usp-windstep-tumble 1.6s ease-in-out infinite;
+    background:linear-gradient(135deg,#fff 0%,#b2ebf2 65%,#4dd0e1 100%);
+    box-shadow:0 0 7px rgba(224,247,250,.95);
 }
-.usp-windstep-feather-1{ transform:rotate(-24deg) translate(-26px,4px); }
-.usp-windstep-feather-2{ transform:rotate(18deg) translate(-8px,-6px); animation-delay:-.4s; }
-.usp-windstep-feather-3{ transform:rotate(-12deg) translate(10px,5px); animation-delay:-.8s; }
-.usp-windstep-feather-4{ transform:rotate(28deg) translate(26px,-4px); animation-delay:-1.2s; }
-@keyframes usp-windstep-tumble{ 0%,100%{ translate:0 0; opacity:.65; } 50%{ translate:-8px -10px; opacity:1; } }
+.usp-wsp-orbiter-1{ transform:rotate(0deg) translate(0,-50px) rotate(25deg); }
+.usp-wsp-orbiter-2{ transform:rotate(120deg) translate(0,-50px) rotate(25deg); }
+.usp-wsp-orbiter-3{ transform:rotate(240deg) translate(0,-50px) rotate(25deg); }
+/* trail streaks left behind while moving (spawned from JS) */
+.usp-wsp-trail{
+    position:fixed; height:3px; margin:0; pointer-events:none; z-index:985;
+    border-radius:3px; transform-origin:0 50%;
+    transform:rotate(var(--ang,3.14rad));
+    background:linear-gradient(90deg, rgba(255,255,255,.95) 0%, rgba(178,235,242,.55) 45%, transparent 100%);
+    box-shadow:0 0 8px rgba(129,212,250,.7);
+    animation: usp-wsp-trail-kf .5s ease-out forwards;
+}
+@keyframes usp-wsp-trail-kf{
+    0%{ opacity:0; scale:.2 1; }
+    20%{ opacity:1; }
+    100%{ opacity:0; scale:1.25 1; }
+}
+.usp-wsp-puff{
+    position:fixed; width:22px; height:22px; margin:-11px 0 0 -11px; pointer-events:none; z-index:984;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(236,250,253,.8) 0%, rgba(178,235,242,.35) 60%, transparent 80%);
+    animation: usp-wsp-puff-kf .6s ease-out forwards;
+}
+@keyframes usp-wsp-puff-kf{ 0%{ opacity:.9; transform:scale(.4); } 100%{ opacity:0; transform:scale(2.2) translateY(-8px); } }
+.usp-wsp-feather{
+    position:fixed; width:9px; height:14px; margin:-7px 0 0 -4px; pointer-events:none; z-index:987;
+    border-radius:60% 10% 60% 10%;
+    background:linear-gradient(135deg,#fff 0%,#b2ebf2 65%,#4dd0e1 100%);
+    box-shadow:0 0 6px rgba(224,247,250,.9);
+    animation: usp-wsp-feather-kf .9s ease-out forwards;
+}
+@keyframes usp-wsp-feather-kf{
+    0%{ opacity:1; transform:translate(0,0) rotate(0deg); }
+    100%{ opacity:0; transform:translate(calc(cos(var(--ang,3.14rad)) * 46px), calc(sin(var(--ang,3.14rad)) * 46px - 22px)) rotate(200deg); }
+}
+/* cast burst: gust rings blasting out of the feet */
+.usp-wsp-burst{ position:fixed; width:0; height:0; pointer-events:none; z-index:985; }
+.usp-wsp-burst-ring{
+    position:absolute; left:-30px; top:-12px; width:60px; height:24px; border-radius:50%;
+    border:3px solid rgba(224,247,250,.95);
+    box-shadow:0 0 16px rgba(129,212,250,.85), inset 0 0 10px rgba(178,235,242,.5);
+    animation: usp-wsp-burst-kf .7s ease-out forwards;
+}
+.usp-wsp-burst-ring-2{ animation-delay:.12s; opacity:0; }
+@keyframes usp-wsp-burst-kf{ 0%{ opacity:1; transform:scale(.3); } 100%{ opacity:0; transform:scale(3.4); } }
+
+/* ━━━ LEAP STRIKE (usp_leap_strike) — landing stomp ━━━━━━━━━━━━━━━━━━━ */
+.usp-leap-stomp{ position:fixed; width:0; height:0; pointer-events:none; z-index:990; }
+.usp-leap-stomp-ring{
+    position:absolute; left:-46px; top:-17px; width:92px; height:34px; border-radius:50%;
+    border:3px solid rgba(255,236,179,.95);
+    background:radial-gradient(ellipse, rgba(255,214,102,.4) 0%, rgba(255,160,60,.18) 60%, transparent 80%);
+    box-shadow:0 0 18px rgba(255,170,70,.85);
+    animation: usp-leap-stomp-kf .55s ease-out forwards;
+}
+@keyframes usp-leap-stomp-kf{ 0%{ opacity:1; transform:scale(.3); } 100%{ opacity:0; transform:scale(2.2); } }
+.usp-leap-stomp-dust{
+    position:absolute; left:-4px; top:-4px; width:9px; height:9px; border-radius:50%;
+    background:radial-gradient(circle, rgba(235,220,190,.95) 0%, rgba(190,160,120,.5) 70%, transparent 100%);
+    transform:rotate(var(--a)) translateX(10px);
+    animation: usp-leap-dust-kf .6s ease-out forwards;
+}
+@keyframes usp-leap-dust-kf{ 0%{ opacity:1; transform:rotate(var(--a)) translateX(8px) scale(.6); } 100%{ opacity:0; transform:rotate(var(--a)) translateX(58px) scale(1.4); } }
 
 /* ━━━ RIFT ANCHOR (usp_rift_anchor) — open rift + homecoming plunge ━━ */
 /* The armed anchor is an OPEN RIFT, not just a pin: a swirling portal ring

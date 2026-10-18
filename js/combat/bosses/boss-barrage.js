@@ -1,4 +1,5 @@
 import { EG_BOSS_DEFS, EG_BOSS_MECHANICS } from './boss-framework.js';
+import { _egBossCorrupted } from '../combat-state.js';
 import { _egNkAbilityHitToast, _egNkDodgeBusy, _egNkDotHit, _egNkEl, _egNkFrozen, _egNkHit, _egNkKillRun, _egNkLoop, _egNkMaxHP, _egNkNewRun, _egNkPlayerCenter, _egNkPlayerRect, _egNkRuns, _egNkToast } from './shared-boss-abilities.js';
 
 //------------------------------------------------------------------------
@@ -30,7 +31,8 @@ Object.assign(EG_BOSS_MECHANICS, {
 
     // boss_barrage - "The War-Machine Brute" (rework)
     // Phase 1 (100% → 60%): Shelling Curtain + Corrupt Cells
-    // Phase 2 ( 60% → 30%): immune window; Supply Drop + Shot Shells join
+    // Phase 2 ( 60% → 30%): immune window; Supply Drop + Shot Shells + Bomb
+    //                        Barrage (hide next to the crates) join
     // Phase 3 ( 30% →  0%): curtain comes from the top as well; at 10% the
     //                        FINAL BOMBARDMENT begins
     boss_barrage: {
@@ -45,6 +47,7 @@ Object.assign(EG_BOSS_MECHANICS, {
             { name: 'corrupt_cells', intervalBase: 15000, intervalVariance: 3500, handler: '_egMechCorruptCells' },
             { name: 'supply_drop', intervalBase: 17000, intervalVariance: 4000, handler: '_egMechBarSupplyDrop', phase2Only: true },
             { name: 'shot_shells', intervalBase: 15000, intervalVariance: 4000, handler: '_egMechBarShotShells', phase2Only: true },
+            { name: 'bomb_barrage', intervalBase: 30000, intervalVariance: 6000, handler: '_egMechBarBombBarrage', phase2Only: true },
         ],
         onPhaseEnter: _egBarOnPhaseEnter,
     },
@@ -90,15 +93,25 @@ export function _egBarHeal(amount) {
 //------------------------------------------------------------------------
 //-------------------SIGNATURE: SHELLING CURTAIN (all fight)---------------
 //------------------------------------------------------------------------
-// A creeping wall of shell splashes advances across the arena each cast.
-// The telegraph stays visible while it rolls - fight INSIDE the barrage.
-// Phase 3: a second curtain sweeps from the top edge simultaneously, so the
-// safe wedge is a moving diagonal.
+// A creeping wall of shell splashes advances across the arena each cast, from
+// the left OR the right edge (random). The telegraph stays visible while it
+// rolls - fight INSIDE the barrage.
+// Phase 3: the wall may also sweep top→bottom or bottom→top.
+// The opening shrinks with every corrupted cell on the grid, so leaving the
+// corruption alone makes the wall nearly impassable - dispel it.
 export const EG_BAR_CURTAIN_W   = 120;        // splash band width (px)
 export const EG_BAR_CURTAIN_DMG = [0, 0.13, 0.15, 0.17];  // %maxHP when the wall catches you
 export const EG_BAR_CURTAIN_ROWS = [0, 4, 6]; // (legacy) splash rows per cast, by phase
-const EG_BAR_CURTAIN_GAP = 260;        // px opening you must be standing in
+const EG_BAR_GAP_MAX = 280;            // px opening with no corruption on the grid
+const EG_BAR_GAP_MIN = 96;             // px opening floor (still passable)
+const EG_BAR_GAP_PER_CORRUPT = 26;     // px the opening shrinks per corrupted cell
 const EG_BAR_CURTAIN_SPEED = 0.30;     // screen widths per second
+
+// Opening size for the current number of corrupted cells.
+export function _egBarCurtainGapSize() {
+    const corrupted = _egBossCorrupted ? _egBossCorrupted.size : 0;
+    return Math.max(EG_BAR_GAP_MIN, EG_BAR_GAP_MAX - corrupted * EG_BAR_GAP_PER_CORRUPT);
+}
 
 export function _egMechBarCurtain(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
@@ -107,26 +120,38 @@ export function _egMechBarCurtain(monster, phase) {
     const W = window.innerWidth, H = window.innerHeight;
     const run = _egNkNewRun(monster && monster.id, true);
     const speed = (W * EG_BAR_CURTAIN_SPEED) * _EG_BAR_DEBUG_MULT;      // px/s sweep speed
-    const fromTop = p >= 3;
+    const dirs = p >= 3 ? ['lr', 'rl', 'tb', 'bt'] : ['lr', 'rl'];
+    const dir = dirs[Math.floor(Math.random() * dirs.length)];
+    const fromTop = dir === 'tb' || dir === 'bt';     // wall runs along the top/bottom axis
+    const reverse = dir === 'rl' || dir === 'bt';     // sweeping against the axis
     const span = fromTop ? W : H;        // length of the wall along its own axis
+    const reach = fromTop ? H : W;       // distance the wall travels
+    const GAP = _egBarCurtainGapSize();
+    const corrupted = _egBossCorrupted ? _egBossCorrupted.size : 0;
 
-    _egNkToast('eg_mech_bar_curtain', '🍎 SHELLING CURTAIN - get into the GAP before the wall reaches you!', '#ff6b35');
+    if (corrupted > 0) {
+        _egNkToast('eg_mech_bar_curtain_corrupt', '🍎 SHELLING CURTAIN - ' + corrupted + ' corrupted cell' + (corrupted > 1 ? 's' : '') + ' shrink the gap - dispel them!', '#ff6b35');
+    } else {
+        _egNkToast('eg_mech_bar_curtain', '🍎 SHELLING CURTAIN - get into the GAP before the wall reaches you!', '#ff6b35');
+    }
 
     // The wall has one opening. Stand inside it when the wall passes.
     const gapC = span * (0.2 + Math.random() * 0.6);
-    const gapLo = gapC - EG_BAR_CURTAIN_GAP / 2;
-    const gapHi = gapC + EG_BAR_CURTAIN_GAP / 2;
+    const gapLo = gapC - GAP / 2;
+    const gapHi = gapC + GAP / 2;
+    const cls = 'eg-bar-curtain' + (fromTop ? ' eg-bar-curtain-v' : '') + (reverse ? ' eg-bar-curtain-rev' : '');
     const pieces = [[0, gapLo], [gapHi, span]].map(([lo, hi]) => ({
-        lo, hi, el: _egNkEl(run, 'div', 'eg-bar-curtain' + (fromTop ? ' eg-bar-curtain-v' : '')),
+        lo, hi, el: _egNkEl(run, 'div', cls),
     }));
     const gapEl = _egNkEl(run, 'div', 'eg-bar-gap' + (fromTop ? ' eg-bar-gap-v' : ''), 'GAP');
 
-    let x = fromTop ? 0 : -EG_BAR_CURTAIN_W;
+    let x = reverse ? reach : -EG_BAR_CURTAIN_W;
+    const sign = reverse ? -1 : 1;
     let hit = false;
     const splashes = [];
     let lastSplash = 0;
     _egNkLoop(run, (dtS, now) => {
-        x += speed * dtS;
+        x += sign * speed * dtS;
         // Splash dots inside the wall for readability (never inside the gap).
         if (now - lastSplash > 90) {
             lastSplash = now;
@@ -158,10 +183,10 @@ export function _egMechBarCurtain(monster, phase) {
         });
         if (fromTop) {
             gapEl.style.left = Math.round(gapLo) + 'px'; gapEl.style.top = Math.round(x) + 'px';
-            gapEl.style.width = EG_BAR_CURTAIN_GAP + 'px'; gapEl.style.height = EG_BAR_CURTAIN_W + 'px';
+            gapEl.style.width = GAP + 'px'; gapEl.style.height = EG_BAR_CURTAIN_W + 'px';
         } else {
             gapEl.style.left = Math.round(x) + 'px'; gapEl.style.top = Math.round(gapLo) + 'px';
-            gapEl.style.width = EG_BAR_CURTAIN_W + 'px'; gapEl.style.height = EG_BAR_CURTAIN_GAP + 'px';
+            gapEl.style.width = EG_BAR_CURTAIN_W + 'px'; gapEl.style.height = GAP + 'px';
         }
         // One real hit (with feedback) if the wall passes over you outside the gap.
         const pc = _egBarPC();
@@ -175,7 +200,7 @@ export function _egMechBarCurtain(monster, phase) {
             _egNkAbilityHitToast(dealt, 'The Barrage', 'Shelling Curtain');
         }
         // Done once the wall crosses the far edge.
-        if (x > (fromTop ? H : W) + EG_BAR_CURTAIN_W) return false;
+        if (reverse ? x < -EG_BAR_CURTAIN_W : x > reach + EG_BAR_CURTAIN_W) return false;
         return true;
     });
 }
@@ -193,6 +218,9 @@ export const EG_BAR_JAMMER_LIFE   = 12000;     // ms a jammer stays live
 export const EG_BAR_JAMMER_SHELL_DMG = [0, 0, 0.09, 0.10];
 export const EG_BAR_JAMMER_SHELL_SPD = 150;    // px/s
 export const EG_BAR_JAMMER_LOB_MS = 2600;      // ms between mortar lobs
+
+// Live supply-drop crates (read by the Bomb Barrage, which uses them as cover).
+export const _egBarCrates = [];
 
 export function _egMechBarSupplyDrop(monster, phase) {
     if (_egNkDodgeBusy() || _egNkFrozen()) return;
@@ -237,6 +265,7 @@ export function _egMechBarSupplyDrop(monster, phase) {
                 s.lastLob = 0;
                 s.born = now;
                 s.dead = false;
+                _egBarCrates.push(s);
             });
         }
         if (!landed) return true;
@@ -248,7 +277,8 @@ export function _egMechBarSupplyDrop(monster, phase) {
             if (s.dead) continue;
             active = true;
             // Player smash: step into the crate to destroy it (heal reward).
-            if (pr && Math.hypot(pc.x - s.x, pc.y - s.y) < 46) {
+            // Not while a bomb barrage runs - then the crates are your cover.
+            if (!_egBarBombLive() && pr && Math.hypot(pc.x - s.x, pc.y - s.y) < 46) {
                 s.dead = true;
                 try { s.jammerEl.remove(); } catch (e) {}
                 _egBarHeal(_egNkMaxHP() * EG_BAR_HEAL_PCT);
@@ -292,8 +322,9 @@ export function _egMechBarSupplyDrop(monster, phase) {
                     }
                 }
             }
-            // Jammers expire after their battery runs dry.
-            if (now - (s.born || 0) > EG_BAR_JAMMER_LIFE * _EG_BAR_DEBUG_MULT) {
+            // Jammers expire after their battery runs dry (never mid-barrage:
+            // they are the player's shelter).
+            if (!_egBarBombLive() && now - (s.born || 0) > EG_BAR_JAMMER_LIFE * _EG_BAR_DEBUG_MULT) {
                 s.dead = true;
                 try { s.jammerEl.remove(); } catch (e) {}
             }
@@ -387,6 +418,160 @@ export function _egMechBarShotShells(monster, phase) {
     });
 }
 export let _egBarShrapCd = 0;
+
+
+//------------------------------------------------------------------------
+//-------------------ACT II: BOMB BARRAGE (60%)----------------------------
+//------------------------------------------------------------------------
+// The boss opens up with a dense rain of telegraphed explosive bombs - too
+// many to simply dodge. The answer is the supply-drop CRATES: standing in a
+// crate's shelter makes you immune to the bombs, but every bomb that lands on
+// a crate chews it up (3 hits and it is gone), so you have to hop between
+// shelters. Sheltering also heals a little each second. If fewer than two
+// crates are standing, the barrage drops cover crates first.
+export const EG_BAR_BOMB_DMG      = [0, 0, 0.12, 0.14];   // %maxHP when a bomb catches you
+export const EG_BAR_BOMB_WARN_MS  = 1050;                 // ring telegraph before the blast
+export const EG_BAR_BOMB_TOTAL    = [0, 0, 26, 38];       // bombs per barrage
+export const EG_BAR_BOMB_EVERY_MS = [0, 0, 250, 190];     // gap between bombs
+const EG_BAR_BOMB_RADIUS   = 62;    // blast radius (px)
+const EG_BAR_COVER_RADIUS  = 112;   // you are safe this close to a live crate
+const EG_BAR_CRATE_HP      = 3;     // bombs a crate soaks up
+const EG_BAR_COVER_DROP_MS = 1100;  // cover crates falling in
+const EG_BAR_COVER_HEAL_PCT = 0.03; // %maxHP restored per second while sheltered
+let _egBarBombRun = null;
+
+// True while a barrage is running (supply-drop crates then act as cover).
+export function _egBarBombLive() {
+    return !!_egBarBombRun && Array.from(_egNkRuns.values()).includes(_egBarBombRun);
+}
+
+export function _egMechBarBombBarrage(monster, phase) {
+    if (_egNkDodgeBusy() || _egNkFrozen() || _egBarBombRun) return;
+    const p = Math.max(2, Math.min(3, Number(phase) || 2));
+    const level = monster ? monster.level : 1;
+    const W = window.innerWidth, H = window.innerHeight;
+    const run = _egNkNewRun(monster && monster.id, true);
+    _egBarBombRun = run;
+
+    // Shelter: the live supply-drop crates, topped up to two with cover crates.
+    for (let i = _egBarCrates.length - 1; i >= 0; i--) if (_egBarCrates[i].dead) _egBarCrates.splice(i, 1);
+    const crates = _egBarCrates.slice();
+    const coverCrates = [];
+    for (let i = crates.length; i < 2; i++) {
+        let sx = W * (0.2 + Math.random() * 0.6);
+        const sy = H * (0.22 + Math.random() * 0.46);
+        if (coverCrates.length && Math.abs(sx - coverCrates[0].x) < 260) sx = coverCrates[0].x + (sx < coverCrates[0].x ? -260 : 260);
+        sx = Math.max(W * 0.1, Math.min(W * 0.9, sx));
+        const warn = _egNkEl(run, 'div', 'eg-bar-drop-warn');
+        warn.style.left = Math.round(sx - 42) + 'px';
+        warn.style.top = Math.round(sy - 42) + 'px';
+        coverCrates.push({ x: sx, y: sy, warn, el: null, ring: null, landed: false, cover: true, dead: false, hp: EG_BAR_CRATE_HP });
+    }
+    _egNkToast('eg_mech_bar_bombs', '💣 BOMB BARRAGE - TAKE COVER next to a crate! Bombs wear the crates down - keep moving between them!', '#ff6b35');
+
+    const ringFor = (c) => {
+        const ring = _egNkEl(run, 'div', 'eg-bar-cover-ring');
+        ring.style.left = Math.round(c.x - EG_BAR_COVER_RADIUS) + 'px';
+        ring.style.top = Math.round(c.y - EG_BAR_COVER_RADIUS) + 'px';
+        ring.style.width = ring.style.height = (EG_BAR_COVER_RADIUS * 2) + 'px';
+        return ring;
+    };
+    crates.forEach(c => { c.hp = EG_BAR_CRATE_HP; c.ring = ringFor(c); });
+
+    const total = EG_BAR_BOMB_TOTAL[p];
+    const every = EG_BAR_BOMB_EVERY_MS[p] * _EG_BAR_DEBUG_MULT;
+    const bombs = [];
+    let t = 0, spawned = 0, nextSpawn = 0, bombCd = 0, finished = false, healAcc = 0;
+
+    const standing = () => crates.concat(coverCrates).filter(c => !c.dead && (!c.cover || c.landed));
+    const sheltered = (pc) => standing().some(c => Math.hypot(pc.x - c.x, pc.y - c.y) < EG_BAR_COVER_RADIUS);
+    const wearCrate = (c) => {
+        c.hp -= 1;
+        if (c.cover && c.el) {
+            c.el.classList.add('eg-bar-crate-hit');
+            setTimeout(() => { try { c.el.classList.remove('eg-bar-crate-hit'); } catch (e) {} }, 220);
+        }
+        if (c.hp <= 0) {
+            c.dead = true;
+            try { if (c.cover && c.el) c.el.remove(); } catch (e) {}
+            try { if (!c.cover && c.jammerEl) c.jammerEl.remove(); } catch (e) {}
+            try { if (c.ring) c.ring.remove(); } catch (e) {}
+        }
+    };
+
+    _egNkLoop(run, (dtS) => {
+        t += dtS * 1000;
+        // Sheltering behind a crate patches you up: a steady trickle of Life
+        // for as long as you stand in its cover (the supplies work for you).
+        if (sheltered(_egBarPC())) {
+            healAcc += dtS;
+            if (healAcc >= 1) {
+                healAcc -= 1;
+                _egBarHeal(_egNkMaxHP() * EG_BAR_COVER_HEAL_PCT);
+            }
+        } else {
+            healAcc = 0;
+        }
+        // Cover crates land after their warning.
+        if (t >= EG_BAR_COVER_DROP_MS * _EG_BAR_DEBUG_MULT) {
+            coverCrates.forEach(c => {
+                if (c.landed) return;
+                c.landed = true;
+                try { c.warn.remove(); } catch (e) {}
+                c.el = _egNkEl(run, 'div', 'eg-bar-jammer eg-bar-cover-crate', '📦');
+                c.el.style.left = Math.round(c.x - 26) + 'px';
+                c.el.style.top = Math.round(c.y - 26) + 'px';
+                c.ring = ringFor(c);
+            });
+        }
+        const ready = t >= (EG_BAR_COVER_DROP_MS + 300) * _EG_BAR_DEBUG_MULT;
+        // Bomb after bomb: every third one is aimed straight at the player.
+        if (ready && spawned < total && t >= nextSpawn) {
+            nextSpawn = t + every;
+            const pc = _egBarPC();
+            const aimed = spawned % 3 === 0;
+            const bx = aimed ? pc.x + (Math.random() * 60 - 30) : W * (0.05 + Math.random() * 0.9);
+            const by = aimed ? pc.y + (Math.random() * 60 - 30) : H * (0.08 + Math.random() * 0.84);
+            const warn = _egNkEl(run, 'div', 'eg-bar-bomb-warn', '💣');
+            warn.style.left = Math.round(bx - EG_BAR_BOMB_RADIUS) + 'px';
+            warn.style.top = Math.round(by - EG_BAR_BOMB_RADIUS) + 'px';
+            bombs.push({ x: bx, y: by, warn, born: t });
+            spawned++;
+        }
+        // Detonations.
+        for (let i = bombs.length - 1; i >= 0; i--) {
+            const b = bombs[i];
+            if (t - b.born < EG_BAR_BOMB_WARN_MS * _EG_BAR_DEBUG_MULT) continue;
+            bombs.splice(i, 1);
+            try { b.warn.remove(); } catch (e) {}
+            const boom = _egNkEl(run, 'div', 'eg-bar-bomb-boom');
+            boom.style.left = Math.round(b.x - EG_BAR_BOMB_RADIUS) + 'px';
+            boom.style.top = Math.round(b.y - EG_BAR_BOMB_RADIUS) + 'px';
+            setTimeout(() => { try { boom.remove(); } catch (e) {} }, 450 * _EG_BAR_DEBUG_MULT);
+            // A crate caught in the blast soaks it up.
+            standing().forEach(c => { if (Math.hypot(b.x - c.x, b.y - c.y) < EG_BAR_BOMB_RADIUS + 22) wearCrate(c); });
+            const pc = _egBarPC();
+            if (_egNkPlayerRect() && Math.hypot(pc.x - b.x, pc.y - b.y) < EG_BAR_BOMB_RADIUS && !sheltered(pc) && t >= bombCd) {
+                bombCd = t + 350;
+                const dealt = _egNkHit(EG_BAR_BOMB_DMG[p], 'fire', level);
+                _egNkAbilityHitToast(dealt, 'The Barrage', 'Explosive Bomb');
+            }
+        }
+        if (spawned >= total && !bombs.length && !finished) {
+            finished = true;
+            coverCrates.forEach(c => {
+                c.dead = true;
+                try { if (c.el) c.el.remove(); } catch (e) {}
+                try { if (c.ring) c.ring.remove(); } catch (e) {}
+                try { c.warn.remove(); } catch (e) {}
+            });
+            crates.forEach(c => { try { if (c.ring) c.ring.remove(); } catch (e) {} });
+            _egBarBombRun = null;
+            return false;
+        }
+        return true;
+    });
+}
 
 
 //------------------------------------------------------------------------
@@ -652,7 +837,10 @@ export function _egBarFinalEnd(g, monster) {
 // removes every run element, overlay and body class this boss ever created.
 export function _egBarTeardown() {
     if (_egBarFinal) { try { _egBarFinalEnd(_egBarFinal, null); } catch (e) {} _egBarFinal = null; }
+    _egBarBombRun = null;
+    _egBarCrates.length = 0;
     document.querySelectorAll('.eg-bar-curtain, .eg-bar-splash, .eg-bar-drop-warn, .eg-bar-jammer, ' +
+        '.eg-bar-bomb-warn, .eg-bar-bomb-boom, .eg-bar-cover-ring, ' +
         '.eg-bar-mortar, .eg-bar-mortar-boom, .eg-bar-shell-warn, .eg-bar-shell-boom, .eg-bar-shrap, ' +
         '.eg-bar-strike, .eg-bar-cd').forEach(el => {
         try { el.remove(); } catch (e) {}
@@ -669,7 +857,7 @@ export function _egBarTeardown() {
 //-------------------PLAYTEST CONSOLE HOOK (dev only)----------------------
 //------------------------------------------------------------------------
 // Tiny console API for playtesting with stretched debug timings:
-//   _EG_BAR_DEBUG.fire('curtain'|'supply'|'shells', phase) - runs one now
+//   _EG_BAR_DEBUG.fire('curtain'|'supply'|'shells'|'bombs', phase) - runs one now
 //   _EG_BAR_DEBUG.final()                                  - FINAL BOMBARDMENT now
 if (typeof window !== 'undefined') {
     window._EG_BAR_DEBUG = {
@@ -679,7 +867,8 @@ if (typeof window !== 'undefined') {
             if (!monster) return 'no barrage alive';
             const fn = name === 'curtain' ? _egMechBarCurtain
                 : name === 'supply' ? _egMechBarSupplyDrop
-                : name === 'shells' ? _egMechBarShotShells : null;
+                : name === 'shells' ? _egMechBarShotShells
+                : name === 'bombs' ? _egMechBarBombBarrage : null;
             if (!fn) return 'unknown: ' + name;
             if (name !== 'curtain' && _egNkDodgeBusy()) return 'BLOCKED: dodge-busy (wait for the field to clear)';
             fn(monster, phase || monster.bossPhase || 1);

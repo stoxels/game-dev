@@ -2553,14 +2553,16 @@ export function _egBuildStatLine(bucket, stats) {
             // Shadow resistance is explicitly out of its scope, and
             // _egCalcPlayerResistanceReduction uses the same split.
             const allElem = (element === 'shadow') ? 0 : Math.max(0, stats.allElementalResist || 0);
-            const total = (stats[bucket] || 0) + allElem;
+            const penalty = (typeof globalThis._egGetResistPenaltyPct === 'function') ? globalThis._egGetResistPenaltyPct() : 0;
+            const total = (stats[bucket] || 0) + allElem - penalty;
             const allElemMax = (element === 'shadow') ? 0 : (stats.allElementalResistMax || 0);
-            if (!total && !(stats[bucket.replace('Resist', 'ResistMax')] || 0) && !stats.allResMax && !allElemMax) return null;
+            if (!total && !penalty && !(stats[bucket.replace('Resist', 'ResistMax')] || 0) && !stats.allResMax && !allElemMax) return null;
             const cap = (typeof EG_RESIST_CAP_PCT !== 'undefined' ? EG_RESIST_CAP_PCT : 75)
                 + Math.max(0, (stats[element + 'ResistMax'] || 0) + (stats.allResMax || 0) + allElemMax);
-            const shown = Math.min(Math.max(0, total), cap);
+            const shown = Math.min(Math.max(-100, total), cap);
             line = { label: EG_STAT_DISPLAY_LABELS[bucket].label, value: `${_egFormatStatValue(shown)}%` };
-            line.resTotal = Math.max(0, total);
+            line.resTotal = Math.max(-100, total);
+            line.resPenalty = penalty;
             line.resCap = cap;
             break;
         }

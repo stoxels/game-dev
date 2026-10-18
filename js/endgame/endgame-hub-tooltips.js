@@ -505,14 +505,21 @@ export function _egGetCompareTip() {
 export function _egShowCompareTooltip(itemOrItems) {
     const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
     const tip = _egGetCompareTip();
-    // Several equipped candidates (rings, earrings, main/off-hand) sit side
-    // by side in one box.
-    tip.style.display = items.length > 1 ? 'flex' : 'block';
-    tip.style.gap = '14px';
-    tip.style.maxWidth = items.length > 1 ? '780px' : '380px';
-    tip.innerHTML = items.map(it => `<div style="max-width:360px">
+    // Columns start as wide as the regular tooltip (same 560px cap the shared
+    // tooltip uses for equipment frames); _egPositionCompareTooltip then fits
+    // them into the room beside it - side by side, or stacked when too tight.
+    const main = document.getElementById('ghud-floating-tip');
+    tip.dataset.naturalW = String(Math.min(560, (main && main.offsetWidth) || 360));
+    tip.style.display = 'flex';
+    tip.style.gap = '12px';
+    tip.style.alignItems = 'flex-start';
+    tip.style.width = 'auto';
+    tip.style.maxWidth = '96vw';
+    tip.innerHTML = items.map(it => `<div class="eg-compare-col" style="min-width:0;flex:0 0 auto">
 <div class="eg-compare-label">${t('eg_tt_currently_equipped')}</div>
 ${_egBuildTooltipBodyHTML(it)}</div>`).join('');
+    // Lift the frame's own narrow cap inside the compare box too.
+    tip.querySelectorAll('.eg-tt-frame').forEach(f => { f.style.maxWidth = 'none'; f.style.margin = '0'; });
     tip.style.opacity = '1';
     _egPositionCompareTooltip();
 }
@@ -524,22 +531,43 @@ export function _egHideCompareTooltip() {
 }
 
 
-// Places the compare tooltip to the right of the main tooltip
-// (flips to the left side when there is not enough room).
+// Places the compare tooltip beside the main tooltip, on whichever side has
+// more room, and sizes its columns to fit that room: side by side when each
+// column can stay readable (>= 250px), otherwise stacked. Several equipped
+// items (main hand + off hand / shield, both rings) therefore never run under
+// the main tooltip or off the screen.
 export function _egPositionCompareTooltip() {
     const main = document.getElementById('ghud-floating-tip');
     const cmp = document.getElementById('eg-compare-tip');
     if (!main || !cmp || cmp.style.opacity !== '1') return;
 
-    let x = main.offsetLeft + main.offsetWidth + 8;
-    if (x + cmp.offsetWidth > window.innerWidth - 8) {
-        x = Math.max(8, main.offsetLeft - cmp.offsetWidth - 8);
+    const MARGIN = 8, CHROME = 28, GAP = 12, MIN_COL = 250;
+    const cols = Array.from(cmp.querySelectorAll('.eg-compare-col'));
+    const n = Math.max(1, cols.length);
+    const natural = Number(cmp.dataset.naturalW) || 360;
+    const mainRight = main.offsetLeft + main.offsetWidth;
+    const roomRight = window.innerWidth - mainRight - MARGIN * 2;
+    const roomLeft = main.offsetLeft - MARGIN * 2;
+    const onRight = roomRight >= roomLeft;
+    const room = Math.max(MIN_COL + CHROME, onRight ? roomRight : roomLeft);
+
+    let colW = Math.floor((room - CHROME - GAP * (n - 1)) / n);
+    let stacked = false;
+    if (n > 1 && colW < MIN_COL) {
+        stacked = true;
+        colW = room - CHROME;
     }
+    colW = Math.max(MIN_COL, Math.min(natural, colW));
+    cmp.style.flexDirection = stacked ? 'column' : 'row';
+    cols.forEach(c => { c.style.width = colW + 'px'; });
+
+    let x = onRight ? mainRight + MARGIN : main.offsetLeft - cmp.offsetWidth - MARGIN;
+    x = Math.max(MARGIN, Math.min(x, window.innerWidth - cmp.offsetWidth - MARGIN));
     cmp.style.left = x + 'px';
     // Keep the compare tooltip fully on screen vertically as well.
-    const clampedTop = Math.max(8, Math.min(
+    const clampedTop = Math.max(MARGIN, Math.min(
         main.offsetTop,
-        window.innerHeight - cmp.offsetHeight - 8
+        window.innerHeight - cmp.offsetHeight - MARGIN
     ));
     cmp.style.top = clampedTop + 'px';
 }

@@ -20,6 +20,66 @@ export function _egGetPlayerResistCap(stats, element) {
 
 export const EG_ELEMENTS = ['fire', 'cold', 'lightning', 'shadow'];
 
+// Campaign resistance penalty (Path of Exile style): -30% to ALL four
+// resistances once the Ascension Trial that opens the ascendency class is
+// cleared (stage 1) and another -30% when World 14 / the Nexus Point is
+// cleared, right before the endgame maps (stage 2), -60% in total. It is
+// subtracted from the uncapped total, so it can push a resistance below 0
+// (the player then takes MORE damage of that element).
+export const EG_RESIST_PENALTY_PER_STAGE = 30;
+export const EG_RESIST_PENALTY_MAX_STAGE = 2;
+export const EG_RESIST_FLOOR_PCT = -100;
+
+export function _egGetResistPenaltyPct() {
+    const s = globalThis.STATE;
+    const stage = Math.max(0, Math.min(EG_RESIST_PENALTY_MAX_STAGE, Number(s && s.resistPenaltyStage) || 0));
+    return stage * EG_RESIST_PENALTY_PER_STAGE;
+}
+
+// Raises the penalty to `stage` (never lowers it) and tells the player once.
+export function _egAdvanceResistPenaltyStage(stage) {
+    const s = globalThis.STATE;
+    if (!s) return false;
+    const target = Math.min(EG_RESIST_PENALTY_MAX_STAGE, Math.max(0, Number(stage) || 0));
+    if ((Number(s.resistPenaltyStage) || 0) >= target) return false;
+    s.resistPenaltyStage = target;
+    if (typeof globalThis.save === 'function') globalThis.save();
+    _egShowResistPenaltyNotice(target);
+    return true;
+}
+
+// Modal notice: what was lost, the new total, and that it can be offset.
+export function _egShowResistPenaltyNotice(stage) {
+    if (typeof document === 'undefined') return;
+    const tr = (k) => (typeof globalThis.t === 'function' ? globalThis.t(k) : k);
+    const total = stage * EG_RESIST_PENALTY_PER_STAGE;
+    setTimeout(() => {
+        const old = document.getElementById('eg-resist-penalty-notice');
+        if (old) old.remove();
+        const wrap = document.createElement('div');
+        wrap.id = 'eg-resist-penalty-notice';
+        wrap.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(6,4,10,0.78);';
+        const box = document.createElement('div');
+        box.style.cssText = 'max-width:520px;margin:16px;padding:26px 30px;border:2px solid #c0482f;border-radius:12px;background:linear-gradient(#241518,#140b0d);color:#f1ddd6;text-align:center;box-shadow:0 0 40px rgba(192,72,47,0.45);font-family:inherit;';
+        const head = document.createElement('div');
+        head.style.cssText = 'font-size:1.35em;font-weight:700;color:#ff8a6a;margin-bottom:10px;';
+        head.textContent = '\u{1F525}\u2744\uFE0F\u26A1\u{1F311} ' + tr('eg_resist_penalty_title_' + stage);
+        const pct = document.createElement('div');
+        pct.style.cssText = 'font-size:2em;font-weight:800;color:#ff5a3c;margin:6px 0 12px;';
+        pct.textContent = '-' + total + '% ' + (globalThis.LANG === 'de' ? 'Widerstände' : 'Resistances');
+        const body = document.createElement('div');
+        body.style.cssText = 'line-height:1.5;margin-bottom:18px;';
+        body.textContent = tr('eg_resist_penalty_body_' + stage);
+        const btn = document.createElement('button');
+        btn.textContent = tr('eg_resist_penalty_btn');
+        btn.style.cssText = 'padding:9px 26px;border-radius:8px;border:1px solid #c0482f;background:#3a1a14;color:#ffd9cc;font-size:1em;cursor:pointer;';
+        btn.onclick = () => wrap.remove();
+        box.append(head, pct, body, btn);
+        wrap.appendChild(box);
+        document.body.appendChild(wrap);
+    }, 600);
+}
+
 // Per-element flat damage roll for one hit. Returns { fire, cold, lightning, shadow }.
 export function _egRollElementalBreakdown(stats) {
     const roll = (min, max) => (min > 0 || max > 0) ? min + Math.random() * (max - min) : 0;
@@ -303,15 +363,16 @@ export function _egCalcPlayerResistanceReduction(amount, stats, element) {
     // shadow resistance, and it still obeys the per-element cap below like any
     // other source. Lightning is a full element, covered here like fire and cold.
     const allElem = Math.max(0, stats.allElementalResist || 0);
+    const penalty = _egGetResistPenaltyPct();
     const resMap = {
-        fire: ((stats.fireResist || 0) + allElem) * resistMult,
-        cold: ((stats.coldResist || 0) + allElem) * resistMult,
-        lightning: ((stats.lightningResist || 0) + allElem) * resistMult,
-        shadow: (stats.shadowResist || 0) * resistMult,
+        fire: ((stats.fireResist || 0) + allElem) * resistMult - penalty,
+        cold: ((stats.coldResist || 0) + allElem) * resistMult - penalty,
+        lightning: ((stats.lightningResist || 0) + allElem) * resistMult - penalty,
+        shadow: (stats.shadowResist || 0) * resistMult - penalty,
     };
     const cap = (typeof _egGetPlayerResistCap === 'function')
         ? _egGetPlayerResistCap(stats, element) : EG_RESIST_CAP_PCT;
-    const resPct = Math.min(cap, Math.max(0, resMap[element] || 0));
+    const resPct = Math.min(cap, Math.max(EG_RESIST_FLOOR_PCT, resMap[element] || 0));
     let reduced = amount * (1 - resPct / 100);
     return reduced;
 }

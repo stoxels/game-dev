@@ -88,6 +88,8 @@ if (typeof _egClearCenterGridBanners !== 'function') {
 // the heal grows with the player's Life pool exactly as advertised.
 export let _egLastLifeRegenAt = 0;
 let _egLastLifePulseAt = 0;
+const EG_LIFE_REGEN_CHUNK_MS = 3000;
+let _egLastMainRegenAt = 0;
 export function _egTickLifeRegen() {
     const now = Date.now();
     if (now - _egLastLifeRegenAt < EG_LIFE_REGEN_INTERVAL_MS) return;
@@ -129,7 +131,13 @@ export function _egTickLifeRegen() {
     // "Less" Life Regeneration rate (Vital Conduit keystone): a multiplier
     // after every increase.
     const regenLess = Math.max(0, 1 - Math.max(0, stats.lifeRegenLessPct || 0) / 100);
-    const regen = ((stats.lifeRegen || 0) + (globalThis.playerMaxHP * regenPct) / 100) * regenRate * regenLess;
+    // Life Regeneration lands in one chunk every EG_LIFE_REGEN_CHUNK_MS (the
+    // per-second rate times the chunk length), not as a trickle every second.
+    const regenDue = now - _egLastMainRegenAt >= EG_LIFE_REGEN_CHUNK_MS;
+    if (regenDue) _egLastMainRegenAt = now;
+    const regen = regenDue
+        ? ((stats.lifeRegen || 0) + (globalThis.playerMaxHP * regenPct) / 100) * regenRate * regenLess * (EG_LIFE_REGEN_CHUNK_MS / 1000)
+        : 0;
     // The Agnostic: while not on full Life, a share of max Mana per second is sacrificed
     // to recover that much Life.
     if ((stats.manaToLifePct || 0) > 0 && globalThis.playerCurrentHP > 0 && globalThis.playerCurrentHP < globalThis.playerMaxHP
@@ -215,6 +223,7 @@ export function _egOnResume() {
     if (typeof window._egEncounterStartAt !== 'undefined' && window._egEncounterStartAt) window._egEncounterStartAt += delta;
     if (typeof _egPlayerBlockLockoutUntil !== 'undefined' && globalThis._egPlayerBlockLockoutUntil) globalThis._egPlayerBlockLockoutUntil += delta;
     if (typeof _egLastLifeRegenAt !== 'undefined' && _egLastLifeRegenAt) _egLastLifeRegenAt += delta;
+    if (_egLastMainRegenAt) _egLastMainRegenAt += delta;
     if (typeof _egPlayerStatuses !== 'undefined' && _egPlayerStatuses) {
         Object.values(_egPlayerStatuses).forEach(st => { if (st.until) st.until += delta; });
     }

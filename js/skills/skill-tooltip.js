@@ -174,7 +174,13 @@ function _skillTooltipDamage(def) {
         }
         return '';
     }
-    if (def.slotKind === 'universal') return _uspTooltipDamage(def, dmg);
+    if (def.slotKind === 'universal') {
+        let html = _uspTooltipDamage(def, dmg);
+        // Damaging movement spells (Leap Strike) also say how far they jump.
+        const mov = getUniversalSpellMovementEstimate(def.id);
+        if (mov) html += _uspTooltipMovement(mov);
+        return html;
+    }
     const range = dmg.perHitMin === dmg.perHitMax
         ? `${dmg.perHitMin}`
         : `${dmg.perHitMin} to ${dmg.perHitMax}`;

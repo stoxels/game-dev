@@ -586,6 +586,15 @@ export function _egGrantAscensionTrialReward(wi) {
             }
         } catch (e) {}
     }
+    // Resistance penalty stage 1 (-30% to all resistances): the trial that
+    // opens the ascendency class selection. Only the FIRST clear counts.
+    try {
+        if (isFirstClear && typeof globalThis._egAdvanceResistPenaltyStage === 'function'
+            && STATE.playerClass && !STATE.playerAscendency
+            && typeof globalThis.isBaseClassMaxed === 'function' && globalThis.isBaseClassMaxed()) {
+            globalThis._egAdvanceResistPenaltyStage(1);
+        }
+    } catch (e) {}
     // World-completion class flow (mirrors checkWorldCompletion in
     // class-ui.js but for the explicit world - `cur` is a trial seed here).
     try {

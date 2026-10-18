@@ -309,9 +309,10 @@ export function _egbtGetSpecialPhaseInfo(bossId) {
             ];
         case 'boss_barrage':
             return [
-                { name: 'Shelling Curtain', desc: _egbtTr('eg_boss_test_bar_curtain', 'All fight: a creeping wall of shell splashes sweeps the arena - the telegraph stays visible while it rolls, so fight INSIDE the barrage and clear cells between shell lines. Phase 3: the curtain also comes from the top - fight the diagonal!') },
+                { name: 'Shelling Curtain', desc: _egbtTr('eg_boss_test_bar_curtain', 'All fight: a creeping wall of shell splashes sweeps the arena - the telegraph stays visible while it rolls, so fight INSIDE the barrage and clear cells between shell lines. The opening shrinks with every corrupted cell - dispel corruption! Phase 3: the wall also comes from the top and bottom - fight the diagonal!') },
                 { name: 'Supply Drop', desc: _egbtTr('eg_boss_test_bar_supply', 'At 60% HP: cargo crates crash down and flip open into artillery JAMMERS that lob slow mortar shells at your last position. Step into a crate to SMASH it (+15% maxHP heal) before it digs in!') },
                 { name: 'Shot Shells', desc: _egbtTr('eg_boss_test_bar_shells', 'At 60% HP: heavy shells fall on telegraphed rings (most aim near where you are) and each burst scatters six hot shrapnel spokes that keep travelling. Read the ring AND the fragment lanes!') },
+                { name: 'Bomb Barrage', desc: _egbtTr('eg_boss_test_bar_bombs', 'At 60% HP: a dense BOMB BARRAGE of telegraphed explosive bombs - too many to simply dodge. Stand next to a supply-drop crate to be shielded; every bomb that lands on a crate wears it down (3 hits), so hop between crates. Crates cannot be smashed during the barrage!') },
                 { name: 'FINAL BOMBARDMENT', desc: _egbtTr('eg_boss_test_bar_final', 'At 10% HP: the whole arena becomes the target zone - three full-screen shelling grids with two safe gaps each, then the ALL-OUT SALVO detonates everything except ONE safe tile. Reach it! (charge bar frozen)') },
             ];
         case 'boss_bloom':

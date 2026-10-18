@@ -552,6 +552,11 @@ export function buildFreshState() {
         // the Nexus screen and the setup-screen "Enter the Nexus" button.
         nexusUnlocked: false,
 
+        // Resistance penalty stage (Path of Exile style): 0 = none, 1 = -30% to all
+        // resistances (Ascension Trial that opens the ascendency class cleared),
+        // 2 = -60% (World 14 / Nexus Point cleared, before the endgame maps).
+        resistPenaltyStage: 0,
+
         // Quests
         questStats: {},
         questsClaimed: [],
@@ -619,6 +624,8 @@ export function _migrateCoreFields(s) {
     if (!s.trialsDone) s.trialsDone = [];
     if (!s.ascensionTrialsDone) s.ascensionTrialsDone = [];
     if (s.nexusUnlocked === undefined) s.nexusUnlocked = false;
+    // Older saves: derive the penalty stage from progress already made.
+    if (s.resistPenaltyStage === undefined) s.resistPenaltyStage = s.nexusUnlocked ? 2 : (s.playerAscendency ? 1 : 0);
 
     // DefId rename: the "Tutor" item family was previously coded as
     // mistakeEraser / mistakeEraser4 / mistakeEraser6 / mistakeEraserAll.

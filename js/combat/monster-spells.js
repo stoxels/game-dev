@@ -29,10 +29,10 @@ import { cur } from '../state.js';
 //------------------------------------------------------------------------
 
 export const EG_MONSTER_SPELL_CONFIG = {
-    baseChance: 0.12,        // cast chance per full charge bar at monster level 1
+    baseChance: 0.16,        // cast chance per full charge bar at monster level 1
     chancePerLevel: 0.004,   // + per monster level (capped at levelCap)
     levelCap: 60,
-    maxChance: 0.36,
+    maxChance: 0.42,
     eliteMult: 1.35,
     gauntletMult: 1.5,       // arenas are spell-heavier
     cooldownMs: 6000,        // per monster, between casts
@@ -62,13 +62,21 @@ const SPELLS = {
     doom_orb:        { el: 'shadow',    mult: 2.0,  en: 'Doom Orb',        de: 'Verderbniskugel' },
     shadow_volley:   { el: 'shadow',    mult: 0.6,  en: 'Shadow Volley',   de: 'Schattensalve' },
     enrage:          { el: 'rage',      mult: 0,    en: 'Enrage',          de: 'Wutanfall' },
+    inferno_ring:    { el: 'fire',      mult: 1.0,  en: 'Ring of Fire',    de: 'Feuerring' },
+    flame_wall:      { el: 'fire',      mult: 0.75, en: 'Wall of Flame',   de: 'Flammenwand' },
+    glacial_spikes:  { el: 'cold',      mult: 0.9,  en: 'Glacial Spikes',  de: 'Gletscherzacken' },
+    frozen_orb:      { el: 'cold',      mult: 1.6,  en: 'Frozen Orb',      de: 'Gefrorene Kugel' },
+    static_field:    { el: 'lightning', mult: 0.8,  en: 'Static Field',    de: 'Statisches Feld' },
+    ball_lightning:  { el: 'lightning', mult: 1.9,  en: 'Ball Lightning',  de: 'Kugelblitz' },
+    void_rift:       { el: 'shadow',    mult: 2.1,  en: 'Void Rift',       de: 'Leerenriss' },
+    grasping_shadows: { el: 'shadow',   mult: 0.85, en: 'Grasping Shadows', de: 'Greifende Schatten' },
 };
 
 const POOLS = {
-    fire: ['fire_bolt', 'meteor', 'ember_rain', 'mend', 'enrage'],
-    cold: ['frost_nova', 'ice_lance', 'hailstorm', 'mend'],
-    lightning: ['chain_lightning', 'thunder_strike', 'enrage'],
-    shadow: ['soul_drain', 'summon', 'doom_orb', 'shadow_volley'],
+    fire: ['fire_bolt', 'meteor', 'ember_rain', 'inferno_ring', 'flame_wall', 'mend', 'enrage'],
+    cold: ['frost_nova', 'ice_lance', 'hailstorm', 'glacial_spikes', 'frozen_orb', 'mend'],
+    lightning: ['chain_lightning', 'thunder_strike', 'static_field', 'ball_lightning', 'enrage'],
+    shadow: ['soul_drain', 'summon', 'doom_orb', 'shadow_volley', 'void_rift', 'grasping_shadows'],
     none: ['mend', 'summon', 'enrage'],
 };
 
@@ -536,6 +544,138 @@ function _castShadowVolley(monster) {
     });
 }
 
+// Seven blasts ring the player's position; the middle stays safe.
+function _castInfernoRing(monster) {
+    _msWindup(monster, 'inferno_ring', EG_MONSTER_SPELL_CONFIG.windupMs + 150, () => {
+        const c = _msCentre(_msPlayerEl());
+        if (!c) return;
+        Audio_Manager.playSFX('monster_charge_windup');
+        const n = 7;
+        const radius = 120;
+        for (let i = 0; i < n; i++) {
+            const a = (i / n) * Math.PI * 2;
+            const x = c.x + Math.cos(a) * radius;
+            const y = c.y + Math.sin(a) * radius;
+            _msTimeout(() => {
+                if (!_msAlive(monster)) return;
+                _msGroundStrike(monster, 'fire', x, y, 44, 1000, SPELLS.inferno_ring.mult, true);
+            }, i * 70);
+        }
+    });
+}
+
+// A horizontal line of fire sweeps across the player's row: step out of it.
+function _castFlameWall(monster) {
+    _msWindup(monster, 'flame_wall', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
+        const c = _msCentre(_msPlayerEl());
+        if (!c) return;
+        const fromLeft = Math.random() < 0.5;
+        for (let i = 0; i < 5; i++) {
+            const x = c.x + (fromLeft ? i - 2 : 2 - i) * 70;
+            _msTimeout(() => {
+                if (!_msAlive(monster)) return;
+                _msGroundStrike(monster, 'fire', x, c.y, 40, 900, SPELLS.flame_wall.mult, false);
+            }, i * 110);
+        }
+    });
+}
+
+// Ice erupts from the caster toward the player in a line of spikes.
+function _castGlacialSpikes(monster) {
+    _msWindup(monster, 'glacial_spikes', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
+        const from = _msCentre(_msCard(monster));
+        const to = _msCentre(_msPlayerEl());
+        if (!from || !to) return;
+        for (let i = 0; i < 5; i++) {
+            const k = 0.3 + i * 0.18;
+            const x = from.x + (to.x - from.x) * k;
+            const y = from.y + (to.y - from.y) * k;
+            _msTimeout(() => {
+                if (!_msAlive(monster)) return;
+                _msGroundStrike(monster, 'cold', x, y, 34, 700, SPELLS.glacial_spikes.mult, false);
+            }, i * 130);
+        }
+    });
+}
+
+// A slow orb of ice that bursts into a wide frost blast when it arrives.
+function _castFrozenOrb(monster) {
+    _msWindup(monster, 'frozen_orb', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
+        const from = _msCentre(_msCard(monster));
+        const to = _msCentre(_msPlayerEl());
+        if (!from || !to) return;
+        Audio_Manager.playSFX('monster_projectile_launch');
+        _msProjectile('ms-orb-cold ms-orb-big', 'ms-trail-cold', from, to, 1100, 'linear', () => {
+            if (!_egIsActive()) return;
+            Audio_Manager.playSFX('monster_charge_windup');
+            _msGroundStrike(monster, 'cold', to.x, to.y, 90, 650, SPELLS.frozen_orb.mult, false);
+        });
+    });
+}
+
+// A wide charged circle that discharges twice in a row.
+function _castStaticField(monster) {
+    _msWindup(monster, 'static_field', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
+        const c = _msCentre(_msPlayerEl());
+        if (!c) return;
+        Audio_Manager.playSFX('monster_charge_windup');
+        _msGroundStrike(monster, 'lightning', c.x, c.y, 118, 1300, SPELLS.static_field.mult, false, () => {
+            if (!_msAlive(monster)) return;
+            _msGroundStrike(monster, 'lightning', c.x, c.y, 118, 450, SPELLS.static_field.mult, false);
+        });
+    });
+}
+
+// A heavy, slow sphere of lightning that hits hard if you do not dodge it.
+function _castBallLightning(monster) {
+    _msWindup(monster, 'ball_lightning', EG_MONSTER_SPELL_CONFIG.windupMs + 100, () => {
+        const from = _msCentre(_msCard(monster));
+        const to = _msCentre(_msPlayerEl());
+        if (!from || !to) return;
+        Audio_Manager.playSFX('monster_projectile_launch');
+        _msProjectile('ms-orb-lightning ms-orb-big', 'ms-trail-lightning', from, to, 1500, 'ease-in-out', () => {
+            Audio_Manager.playSFX('monster_projectile_hit');
+            const hit = _msCentre(_msPlayerEl()) || to;
+            const wrap = document.createElement('div');
+            wrap.innerHTML = _boltSvg({ x: hit.x, y: hit.y - 90 }, hit);
+            const svg = wrap.firstChild;
+            document.body.appendChild(svg);
+            _msTimeout(() => svg.remove(), 300);
+            _msImpact('lightning', hit);
+            _msHit(monster, SPELLS.ball_lightning.mult, 'lightning', true, true);
+        });
+    });
+}
+
+// A large tear in reality that collapses after a long, readable warning.
+function _castVoidRift(monster) {
+    _msWindup(monster, 'void_rift', EG_MONSTER_SPELL_CONFIG.windupMs + 250, () => {
+        const c = _msCentre(_msPlayerEl());
+        if (!c) return;
+        Audio_Manager.playSFX('monster_charge_windup');
+        _msFx('shadow', c.x, c.y, 1500, '<span class="ms-vortex ms-vortex-slow"></span>');
+        _msGroundStrike(monster, 'shadow', c.x, c.y, 105, 1500, SPELLS.void_rift.mult, false, () => {
+            _msFx('shadow', c.x, c.y, 1000, '<span class="ms-vortex"></span>');
+        });
+    });
+}
+
+// Three dark hands grab at wherever the player stands right now.
+function _castGraspingShadows(monster) {
+    _msWindup(monster, 'grasping_shadows', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
+        for (let i = 0; i < 3; i++) {
+            _msTimeout(() => {
+                if (!_msAlive(monster)) return;
+                const c = _msCentre(_msPlayerEl());
+                if (!c) return;
+                _msGroundStrike(monster, 'shadow', c.x, c.y, 46, 900, SPELLS.grasping_shadows.mult, false, () => {
+                    _msFx('shadow', c.x, c.y, 900, '<span class="ms-vortex"></span>');
+                });
+            }, i * 500);
+        }
+    });
+}
+
 // Support: an ally (or the caster) hits harder for a few seconds.
 function _castEnrage(monster) {
     _msWindup(monster, 'enrage', EG_MONSTER_SPELL_CONFIG.windupMs, () => {
@@ -579,6 +719,14 @@ const CASTERS = {
     doom_orb: _castDoomOrb,
     shadow_volley: _castShadowVolley,
     enrage: _castEnrage,
+    inferno_ring: _castInfernoRing,
+    flame_wall: _castFlameWall,
+    glacial_spikes: _castGlacialSpikes,
+    frozen_orb: _castFrozenOrb,
+    static_field: _castStaticField,
+    ball_lightning: _castBallLightning,
+    void_rift: _castVoidRift,
+    grasping_shadows: _castGraspingShadows,
 };
 
 //------------------------------------------------------------------------

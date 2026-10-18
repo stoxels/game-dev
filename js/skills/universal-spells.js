@@ -7,7 +7,7 @@ import { _applyManaCostModifiers, _bloodMagicActive, _scaleAbilityManaCost, canA
 import { getCharmSkillDamageMult, getSkillCastRankFull, getSpellRankDamageMult, getSpellManaCostOverrideForSkill, getSpellRankDamageMultForSkill, getSpellRankManaMultForSkill, isSkillCharmUnlocked, noteCharmCast } from './skill-charms.js';
 import { patchHotbarSlotCooldown, refreshSkillUI, renderSkillHotbar } from './skill-hotbar.js';
 import { SKILL_REGISTRY } from './skill-registry.js';
-import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspArrowFan, _uspAuraClear, _uspAuraPulse, _uspAuraShow, _uspBladeBlastPlant, _uspBarrierRaise, _uspBarrierStart, _uspBulwarkClear, _uspBulwarkWall, _uspWindwardClear, _uspWindwardGale, _uspAegisWardClear, _uspAegisWardHit, _uspAegisWardShow, _uspRetributionClear, _uspRetributionFlare, _uspRetributionShow, _uspWindstepClear, _uspWindstepTailwind, _uspBlinkFX, _uspRenewalBloom, _uspRenewalClear, _uspRenewalPulse, _uspMendHearts, _uspFireThemedProjectile, _uspMeleeSwing, _uspMoveSpriteOffset, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph, _uspZoneBlast, _uspZoneRain } from './universal-spell-fx.js';
+import { _uspAnchorMarkerClear, _uspAnchorMarkerShow, _uspArrowFan, _uspAuraClear, _uspAuraPulse, _uspAuraShow, _uspBladeBlastPlant, _uspBarrierRaise, _uspBarrierStart, _uspBulwarkClear, _uspBulwarkWall, _uspWindwardClear, _uspWindwardGale, _uspAegisWardClear, _uspAegisWardHit, _uspAegisWardShow, _uspRetributionClear, _uspRetributionFlare, _uspRetributionShow, _uspWindstepClear, _uspWindstepTailwind, _uspBlinkFX, _uspRenewalBloom, _uspRenewalClear, _uspRenewalPulse, _uspMendHearts, _uspFireThemedProjectile, _uspMeleeSwing, _uspMoveSpriteOffset, _uspLeapImpactFX, _uspSupportCastFX, _uspSupportPulseFX, _uspTelegraph, _uspZoneBlast, _uspZoneRain } from './universal-spell-fx.js';
 import { beginSpellTargeting, cancelSpellTargeting, getAvatarCentre, getCursorPoint, isSpellTargeting, resolveGroundShape, shapeHitsRect, showSpellZone } from './spell-casttime.js';
 import { updateQuestStats } from '../inference/inference-stats.js';
 import { STATE } from '../state.js';
@@ -970,6 +970,16 @@ export const UNIVERSAL_SPELL_DEFS = [
         nameEn: 'Disengage', nameDE: 'Rückzugssprung',
         descEn: 'Leaps directly AWAY from your cursor and the momentum carries into a short burst of foot speed. The escape tool: it creates distance even when the boss is between you and the exit.',
         descDE: 'Springt direkt VOM CURSOR WEG und der Schwung trägt in einen kurzen Laufschub. Das Fluchttalent: Es schafft Abstand, selbst wenn der Boss zwischen dir und dem Ausgang steht.',
+        sfx: 'classSelected',
+    },
+    {
+        id: 'usp_leap_strike', icon: '🤸', theme: 'blade', element: 'physical', damageKind: 'physical',
+        behavior: 'leap', selfCast: true, dmg: [6, 9], manaCost: 24, cooldownSeconds: 14, castTimeSeconds: 0, glideMs: 460,
+        moveBasePx: 420, movePxPerRank: 25, movePxCap: 600, stagger: 700,
+        tags: ['Spell', 'Physical', 'Movement', 'Leap'], scalingTags: ['spell', 'physical', 'movement'],
+        nameEn: 'Leap Strike', nameDE: 'Sprungschlag',
+        descEn: 'Vault through the air onto your target and land beside it with a stomp: modest physical damage and a brief stagger. Closes distance fast, but it is a long jump - the hit is small and the cooldown is not. If the target is too far, you land short and deal nothing.',
+        descDE: 'Spring durch die Luft zu deinem Ziel und lande mit einem Stampfen neben ihm: mäßiger physischer Schaden und kurzes Taumeln. Überbrückt Distanz schnell, aber es ist ein weiter Sprung - der Treffer ist klein, die Abklingzeit nicht. Ist das Ziel zu weit weg, landest du zu kurz und richtest nichts an.',
         sfx: 'classSelected',
     },
     {
@@ -2007,7 +2017,7 @@ export function getUniversalSpellSupportEstimate(spellId) {
 //------------------------------------------------------------------------
 
 // Behaviours handled as self-casts that reposition the player.
-const USP_MOVEMENT_BEHAVIORS = ['blink', 'dash', 'disengage', 'windstep', 'anchor'];
+const USP_MOVEMENT_BEHAVIORS = ['blink', 'dash', 'disengage', 'windstep', 'anchor', 'leap'];
 
 // The four walking directions, as unit vectors.
 const USP_DIR_VECTORS = {
@@ -2155,6 +2165,55 @@ function _uspGlide(el, fromX, fromY, toX, toY, ms, dir) {
     requestAnimationFrame(step);
 }
 
+// Like _uspGlide, but the sprite hops: it rises and falls on a sine arc over
+// the flight (Leap Strike). `onLand` runs once on the final frame.
+function _uspLeapGlide(el, fromX, fromY, toX, toY, ms, dir, arcPx, onLand) {
+    const seq = ++_uspGlideSeq;
+    const dur = Math.max(120, ms || 460);
+    const t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    let first = true;
+    const step = (now) => {
+        if (seq !== _uspGlideSeq) return;      // superseded by a newer cast
+        const t = Math.min(1, (now - t0) / dur);
+        const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;   // ease in-out
+        const hop = Math.sin(t * Math.PI) * arcPx;
+        _uspAvatarWrite(el, fromX + (toX - fromX) * e, fromY + (toY - fromY) * e - hop,
+            first ? dir : null);
+        first = false;
+        if (t < 1) requestAnimationFrame(step);
+        else if (onLand) onLand();
+    };
+    requestAnimationFrame(step);
+}
+
+// Viewport centre of a living monster's card, or null.
+function _uspMonsterCentre(id) {
+    const card = document.getElementById(`eg-card-${id}`);
+    if (!card || typeof globalThis._egGetElementCentre !== 'function') return null;
+    const r = card.getBoundingClientRect();
+    if (!r.width && !r.height) return null;
+    return globalThis._egGetElementCentre(card);
+}
+
+// The monster a Leap Strike jumps to: the selected one, else the nearest.
+function _uspLeapTarget(from) {
+    let sel = null;
+    try { sel = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null; } catch (e) { sel = null; }
+    if (sel && sel.currentHP > 0) {
+        const c = _uspMonsterCentre(sel.id);
+        if (c) return { mon: sel, c };
+    }
+    let best = null;
+    let bestD = Infinity;
+    for (const m of _uspLivingMonsters()) {
+        const c = _uspMonsterCentre(m.id);
+        if (!c) continue;
+        const d = Math.hypot(c.x - from.x, c.y - from.y);
+        if (d < bestD) { best = { mon: m, c }; bestD = d; }
+    }
+    return best;
+}
+
 // ---------------------------------------------------------------------
 // Rift Anchor state
 // ---------------------------------------------------------------------
@@ -2264,6 +2323,52 @@ function _uspApplyMovementSpell(spell) {
             };
         }
 
+        case 'leap': {
+            const off = _uspMoveSpriteOffset();
+            const from = { x: pos.x + off.x, y: pos.y + off.y };
+            const tgt = _uspLeapTarget(from);
+            if (!tgt) return { text: de ? 'kein Ziel' : 'no target', flavor: 'wasted' };
+            const dx = tgt.c.x - from.x;
+            const dy = tgt.c.y - from.y;
+            const dFull = Math.hypot(dx, dy) || 1;
+            const STOP_SHORT = 80;                       // land beside the target, not on it
+            const maxDist = _uspCalcMoveDistance(spell);
+            const travel = Math.max(0, Math.min(maxDist, dFull - STOP_SHORT));
+            const ux = dx / dFull, uy = dy / dFull;
+            const tx = pos.x + ux * travel;
+            const ty = pos.y + uy * travel;
+            const dir = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'right' : 'left') : (dy >= 0 ? 'down' : 'up');
+            const landDist = dFull - travel;             // centre-to-centre after landing
+            const connects = landDist <= STOP_SHORT + 90;
+            const ms = spell.glideMs || 460;
+            try { _uspBlinkFX(Object.assign({}, spell, { behavior: 'disengage' }), pos.x, pos.y, tx, ty, true); } catch (e) { /* takeoff dust is cosmetic */ }
+            _uspLeapGlide(pos.el, pos.x, pos.y, tx, ty, ms, dir, Math.min(90, 40 + travel * 0.12), () => {
+                try {
+                    if (typeof globalThis._egIsActive === 'function' && !globalThis._egIsActive()) return;
+                } catch (e) { return; }
+                const land = _uspAvatarPos();
+                try { _uspLeapImpactFX(land ? land.x + off.x : tx + off.x, land ? land.y + off.y + 34 : ty + off.y + 34); } catch (e) { /* impact is cosmetic */ }
+                const mon = _uspLivingMonsters().find((m) => m.id === tgt.mon.id);
+                if (!connects || !mon) return;
+                _uspStrike(spell, mon.id, spell.dmg[0], spell.dmg[1], { isMelee: true });
+                if (spell.stagger) {
+                    mon.staggeredUntil = Math.max(mon.staggeredUntil || 0, Date.now() + spell.stagger);
+                    try {
+                        if (typeof globalThis._egShowStatusLabel === 'function') {
+                            globalThis._egShowStatusLabel(mon.id, de ? 'BENOMMEN' : 'STAGGERED');
+                        }
+                    } catch (e) { /* label is cosmetic */ }
+                }
+            });
+            _uspSupportCastFX(spell, `${Math.round(travel)}px`, 'buff');
+            return {
+                text: connects
+                    ? (de ? `Sprung ${Math.round(travel)}px auf ${tgt.mon.name || 'das Ziel'}` : `leapt ${Math.round(travel)}px onto ${tgt.mon.name || 'the target'}`)
+                    : (de ? 'zu kurz gesprungen!' : 'fell short!'),
+                flavor: connects ? 'buff' : 'wasted',
+            };
+        }
+
         case 'windstep': {
             const pct = _uspCalcMoveSpeedPct(spell);
             _uspAddBuff(spell, { speedPct: pct });
@@ -2344,6 +2449,13 @@ export function getUniversalSpellMovementEstimate(spellId) {
             speedPct: pct, seconds: secs, distance: Math.round(320 * (pct / 100) * secs),
             lineEn: `Walk speed +${pct}% for ${secs}s (about +${Math.round(320 * (pct / 100) * secs)}px of travel)`,
             lineDe: `Lauftempo +${pct}% für ${secs}s (etwa +${Math.round(320 * (pct / 100) * secs)}px Strecke)`,
+        });
+    }
+    if (spell.behavior === 'leap') {
+        return Object.assign(base, {
+            distance: dist,
+            lineEn: `Leaps up to ${dist}px onto your target (selected, else nearest) and lands with a stomp. Too far and you land short.`,
+            lineDe: `Springt bis zu ${dist}px auf dein Ziel (gewählt, sonst nächstes) und landet mit einem Stampfen. Zu weit und du landest zu kurz.`,
         });
     }
     if (spell.behavior === 'disengage') {
@@ -2947,7 +3059,7 @@ function _uspCastSfxKey(spell) {
         case 'shield': case 'guard': return 'spell_barrier';
         case 'ward': case 'evade': case 'thorns': return 'spell_buff';
         case 'blink': case 'anchor': return 'spell_blink';
-        case 'dash': case 'disengage': case 'windstep': return 'spell_dash';
+        case 'dash': case 'disengage': case 'windstep': case 'leap': return 'spell_dash';
         default: break;
     }
     switch (spell.id) {
@@ -3557,6 +3669,15 @@ export function castUniversalSpell(spellId, opts) {
     try { target = (typeof globalThis._egGetTarget === 'function') ? globalThis._egGetTarget() : null; } catch (e) {}
     if (!encounterOn || (!(isSupport || isMovement || isGround || isMelee || isToggle) && (living.length === 0 || !target))) {
         _uspNoTargetToast(spell);
+        return false;
+    }
+
+    // Leap Strike jumps TO a monster: with none alive nothing is spent.
+    if (spell.behavior === 'leap' && encounterOn && living.length === 0) {
+        if (typeof globalThis.showToast === 'function') {
+            const de = (typeof LANG !== 'undefined' && LANG === 'de');
+            globalThis.showToast(de ? `🔮 ${spell.nameDE} braucht ein Monster als Ziel!` : `🔮 ${spell.nameEn} needs a monster target!`, '#7fb3ff');
+        }
         return false;
     }
 

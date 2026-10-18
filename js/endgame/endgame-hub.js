@@ -809,7 +809,7 @@ export function _egRenderStatsList() {
 <div class="eg-stats-category">
     <div class="eg-stats-category-title">${cat.title}</div>
     ${cat.lines.map(line => `
-    <div class="eg-stat-row" data-desc-key="${line.descKey}" data-desc-label="${line.label}"${line.resTotal != null ? ` data-res-total="${line.resTotal}" data-res-cap="${line.resCap}"` : ''}>
+    <div class="eg-stat-row" data-desc-key="${line.descKey}" data-desc-label="${line.label}"${line.resTotal != null ? ` data-res-total="${line.resTotal}" data-res-cap="${line.resCap}" data-res-penalty="${line.resPenalty || 0}"` : ''}>
         <span class="eg-stat-name">${line.label}</span>
         <span class="eg-stat-value">${line.value}</span>
     </div>`).join('')}
@@ -847,6 +847,10 @@ export function _egBuildStatDescTooltipHTML(descKey, label, row) {
                 + t('eg_statdesc_res_total').replace('{t}', total.toFixed(0))
                 + (capped ? ` - ${t('eg_statdesc_res_capped').replace('{c}', cap.toFixed(0))}` : '')
                 + `</span>`;
+            const penalty = parseFloat(row.dataset.resPenalty) || 0;
+            if (penalty > 0) {
+                html += `<br><span style="color:#ff8a6a">${t('eg_statdesc_res_penalty').replace('{p}', penalty.toFixed(0))}</span>`;
+            }
         }
         const stats = _egComputePlayerStats();
         // Armour/evasion live values are measured against a representative

@@ -182,16 +182,8 @@ export function _egMechGroundSlam(monster, phase) {
             const pr = _egNkPlayerRect();
             const top = parseFloat(band.style.top) || 0;
             if (pr && pr.bottom > top && pr.top < top + h) {
-                const dealt = _egNkHit(dmgPct, null, level);
-                // Only toast actual damage taken. A fully absorbed hit (shield /
-                // absorption) deals 0 and must not claim a hit for 0 damage -
-                // the shield's own SFX/visual feedback covers that moment.
-                if (dealt > 0) {
-                    // Signature red + stripe - matches the shared colored toasts.
-                    const tel = _egNkToast('eg_mech_slam_hit',
-                        '💥 Brutus’s Ground Slam hits you for ' + dealt + ' damage!', '#f87171');
-                    if (tel) tel.style.borderLeft = '3px solid #f87171';
-                }
+                // Damage taken is not toasted (the floating hit number covers it).
+                _egNkHit(dmgPct, null, level);
             }
         } else if (state === 'hit' && re >= warnMs + lingerMs) {
             if (round + 1 < total) {
