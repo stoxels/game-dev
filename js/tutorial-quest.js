@@ -399,6 +399,17 @@ export function _tqIsTutorialActive() {
 function _tqFormatLine(textKey) {
     let line = t(textKey)
         .replace(/\{character_name\}/g, _tqCharacterDisplayName());
+    // Touch controls showing: name the on-screen joystick / buttons instead of
+    // keyboard keys (js/touch/touch-controls.js sets the root class).
+    if (document.documentElement.classList.contains('touch-controls-on')) {
+        line = line
+            .replace(/\{key_move_up\}\s*\{key_move_left\}\s*\{key_move_down\}\s*\{key_move_right\}/g, t('touch_tq_joystick'))
+            .replace(/\{key_attack\}/g, t('touch_tq_attack'))
+            .replace(/\{key_parry\}/g, t('touch_tq_parry'))
+            .replace(/\{key_target\}/g, t('touch_tq_target'))
+            .replace(/\{key_charsheet\}/g, t('touch_tq_sheet'))
+            .replace(/\{key_spellbook\}/g, t('touch_tq_book'));
+    }
     if (typeof keybindKeyFor === 'function' && typeof keybindDisplayLabel === 'function') {
         ['up', 'left', 'down', 'right'].forEach((dir) => {
             const key = keybindKeyFor(`move-${dir}`) || { up: 'w', left: 'a', down: 's', right: 'd' }[dir];

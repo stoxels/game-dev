@@ -35,7 +35,8 @@ export const SETTINGS_DEFAULTS = {
     axisLock: true,
     protectMarkedCells: true,
     questionMark: false,
-    touchpadModeEnabled: false,
+    touchpadModeEnabled: window.matchMedia?.('(pointer: coarse)').matches ?? false, // Fill/Mark toggle button; ON by default on touch-first devices
+    touchControls: window.matchMedia?.('(pointer: coarse)').matches ?? false, // on-screen joystick; ON by default on touch-first devices
     muteOnFocusLoss: false,     // mute all audio when the window loses focus
     lowTimeVignette: true,      // blue screen edge glow while time is running out
     lowHealthVignette: true,    // red screen edge glow while health is low
@@ -58,6 +59,7 @@ const TOGGLE_CONFIGS = [
     { key: 'protectMarkedCells', btnId: 'stt-protectmarks' },
     { key: 'questionMark', btnId: 'stt-qmark' },
     { key: 'touchpadModeEnabled', btnId: 'stt-touchpad' },
+    { key: 'touchControls', btnId: 'stt-touchcontrols' },
     { key: 'invertMouseButtons', btnId: 'stt-invert' },
     { key: 'meleeAutoRetarget', btnId: 'stt-meleeretarget' },
     { key: 'lowTimeVignette', btnId: 'stt-ltv' },
@@ -273,6 +275,7 @@ export function initSettingsControls() {
     initToggleControl('stt-protectmarks', 'protectMarkedCells', false);
     initToggleControl('stt-qmark', 'questionMark', false);
     initToggleControl('stt-touchpad', 'touchpadModeEnabled');
+    initToggleControl('stt-touchcontrols', 'touchControls', false);
     initToggleControl('stt-invert', 'invertMouseButtons', false);
     initToggleControl('stt-meleeretarget', 'meleeAutoRetarget', false);
     initToggleControl('stt-ltv', 'lowTimeVignette', false);

@@ -319,7 +319,7 @@ import { G, W1, W10, W11, W12, W13, W14, W15, W16, W17, W18, W19, W2, W20, W21, 
 import { ALL, NEXUS_WORLD_INDEX, WORLD_START_GI, getNexusPointGi, isAscensionLevel, isNexusPointLevel, isNexusUnlocked, isNexusWorld, isNexusWorldUnlocked, lvText, setNexusUnlocked } from '../../js/levels/levels.js';
 import { BONUS_QUIZ_POOLS } from '../../js/quiz-exercise/quiz-questions.js';
 import { _quizCalcEliminationChance, answerQuizInput, closeQuiz, finishQuiz, quizUseTutor, showQuiz, skipQuiz } from '../../js/quiz-exercise/quiz.js';
-import { _getWrap, currentZoom, resetZoom, scalePuzzle, zoomInBtn, zoomOutBtn } from '../../js/grid-scaling.js';
+import { _getWrap, currentZoom, resetZoom, scalePuzzle, setPuzzleZoom, zoomInBtn, zoomOutBtn } from '../../js/grid-scaling.js';
 import { WORLD_CODES, checkLockedCodesOnSetup, checkWorldCodes, checkWorldCodesSync, showCodes } from '../../js/codes.js';
 import { _applyCentralTendency, _applyCompletionGlimpse, _applyDeadReckoningStart, _applyDensityMapping, _applyInterquartileVision, _applyMarginalDistribution, _applyNullHypothesis, _applyProbabilisticStartRolls, _applySparseRegion, _applySylaForestAffinity, _deadReckoningApplyClues, _getGridSizeTier, _hideCompletionGlimpseBar, _initLuckyTiles, _revealCellsAndFinalize, triggerSylaFlowerEffect } from '../../js/start-level-passives.js';
 import { _doStartLevel, _setMistakeCounterText } from '../../js/start-level.js';
@@ -382,6 +382,13 @@ import { EG_MELEE_EXECUTE_HP_PCT, EG_MELEE_EXECUTE_MULT, _egAnimatePlayerMelee, 
 import { EG_MELEE_OVERCHARGE_MULT, EG_MELEE_OVERCHARGE_RATE_PER_TIER, EG_MELEE_OVERCHARGE_RATIO, _egMeleeDashVisual, _egMeleeGrandFlash, _egMeleeLeapVisual, _egMeleeNovaVisual, _egMeleeTierArt, _egMeleeTierForCharge, _egMeleeTierLabel, _egOverchargeRateForTier } from '../../js/combat/encounter-melee-arts.js';
 import { EG_MELEE_DELIVERY_ARRIVAL_BEAT_MS, EG_MELEE_DELIVERY_LEAP_MS, EG_MELEE_DELIVERY_OUT_MAX_MS, EG_MELEE_DELIVERY_OUT_MIN_MS, EG_MELEE_DELIVERY_RETURN_MS, _egMeleeDashOut, _egMeleeDeliveryAvailable, _egMeleeGlideHome, _egMeleeLeapTo, _egMeleeRaiseAvatar } from '../../js/combat/encounter-melee-delivery.js';
 import { EG_MELEE_HOLD_VULNERABILITY_MULT, _egCycleTarget, _egPlayerTakeDamage, _egSelectTarget, _initEgTargetHotkeys } from '../../js/combat/encounter-damage.js';
+import '../../js/combat/combat-run-stats.js';
+import '../../js/touch/touch-viewport.js';
+import '../../js/touch/touch-controls.js';
+import '../../js/touch/touch-layout.js';
+import '../../js/touch/touch-longpress.js';
+import '../../js/touch/touch-grid.js';
+import '../../js/touch/touch-clues.js';
 import { _egGameOver, _egKillMonster, _egOnAllMonstersDead, _egUpdateTargetAfterKill } from '../../js/combat/encounter-kills.js';
 import { _egHandleBossKill, _egHandleNormalMonsterKill } from '../../js/combat/encounter-kill-rewards.js';
 import { _egAssignRandomSpawnZone, _egBuildMonsterOrBoss, _egNotifyMonsterArrival, _egSpawnMonster } from '../../js/combat/encounter-monster-spawning.js';
@@ -920,6 +927,7 @@ try { Object.defineProperty(globalThis, "safeGoBackFromHub", { get() { return sa
 try { Object.defineProperty(globalThis, "saveSettings", { get() { return saveSettings; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "scalePuzzle", { get() { return scalePuzzle; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "selDiff", { get() { return selDiff; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
+try { Object.defineProperty(globalThis, "setPuzzleZoom", { get() { return setPuzzleZoom; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showAscendencyTooltip", { get() { return showAscendencyTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showAscendencyUpgradeTooltip", { get() { return showAscendencyUpgradeTooltip; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE
 try { Object.defineProperty(globalThis, "showBeat", { get() { return showBeat; }, configurable: true }); } catch (e) {} // PHASE3-BRIDGE

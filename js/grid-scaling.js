@@ -229,6 +229,15 @@ function _adjustZoom(delta) {
     _applyVerticalCentering(_lastNaturalH * currentZoom);
 }
 
+// setPuzzleZoom - absolute manual zoom (pinch gestures, js/touch/touch-grid.js).
+// Same clamp, manual-zoom flag and re-centering as the +/- buttons.
+export function setPuzzleZoom(z) {
+    manualZoomActive = true;
+    currentZoom = Math.max(ZOOM_MANUAL_MIN, Math.min(z, ZOOM_MANUAL_MAX));
+    _applyZoom();
+    _applyVerticalCentering(_lastNaturalH * currentZoom);
+}
+
 // zoomInBtn / zoomOutBtn - public entry points wired to the zoom-bar buttons.
 export function zoomInBtn() {
     _adjustZoom(ZOOM_SPEED);

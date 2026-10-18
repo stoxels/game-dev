@@ -1,0 +1,261 @@
+/* On-screen joystick (js/touch/touch-controls.js). Hidden unless the
+   "Touch Controls" setting is on AND an avatar is on screen. */
+#touch-move-zone {
+    position: fixed;
+    left: max(12px, env(safe-area-inset-left));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 9000;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    /* Size and opacity come from the layout editor (js/touch/touch-layout.js). */
+    transform: scale(var(--touch-scale, 1));
+    transform-origin: 0 100%;
+    opacity: var(--touch-opacity, 1);
+}
+#touch-move-zone[hidden] { display: none; }
+
+.touch-stick-base {
+    position: absolute;
+    width: 104px;
+    height: 104px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    background: rgba(20, 24, 40, 0.28);
+    pointer-events: none;
+    opacity: 0.55;
+    transition: opacity 0.15s;
+}
+.touch-stick-base.touch-stick-active { opacity: 0.95; }
+
+.touch-stick-knob {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46px;
+    height: 46px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Action buttons: right edge, just above the skill hotbar. The container
+   takes no clicks itself - only the buttons do. */
+#touch-action-cluster {
+    position: fixed;
+    right: max(8px, env(safe-area-inset-right));
+    bottom: 12px;   /* raised above the skill hotbar by touch-controls.js */
+    z-index: 9000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: calc(5px * var(--touch-scale, 1));
+    pointer-events: none;
+    touch-action: none;
+}
+#touch-action-cluster[hidden],
+.touch-btn-group[hidden] { display: none; }
+
+.touch-btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: calc(6px * var(--touch-scale, 1));
+    max-width: calc(260px * var(--touch-scale, 1));
+}
+/* Menu row: toggle on the right, the other buttons open out to its left. */
+.touch-btn-group-menu {
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    max-width: none;
+}
+.touch-btn.touch-btn-collapsible { display: none; }
+#touch-action-cluster.touch-menu-open .touch-btn.touch-btn-collapsible,
+body.touch-editing .touch-btn.touch-btn-collapsible { display: flex; }
+
+.touch-btn {
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    width: calc(44px * var(--touch-scale, 1));
+    height: calc(44px * var(--touch-scale, 1));
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    background: rgba(20, 24, 40, 0.62);
+    color: #fff;
+    opacity: calc(var(--touch-opacity, 1) * 0.8);
+    font-size: calc(19px * var(--touch-scale, 1));
+    line-height: 1;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+.touch-btn.touch-btn-big {
+    width: calc(54px * var(--touch-scale, 1));
+    height: calc(54px * var(--touch-scale, 1));
+    font-size: calc(25px * var(--touch-scale, 1));
+}
+.touch-btn.touch-btn-down {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(0.94);
+    opacity: 1;
+}
+.touch-btn-group-menu .touch-btn {
+    width: calc(40px * var(--touch-scale, 1));
+    height: calc(40px * var(--touch-scale, 1));
+    font-size: calc(17px * var(--touch-scale, 1));
+    opacity: calc(var(--touch-opacity, 1) * 0.7);
+}
+
+/* ---- Layout editor (js/touch/touch-layout.js) ---- */
+body.touch-editing .touch-btn,
+body.touch-editing #touch-move-zone {
+    outline: 2px dashed #ffd24a;
+    outline-offset: 3px;
+    opacity: 1;
+    cursor: grab;
+}
+body.touch-editing .touch-stick-base { opacity: 0.9; }
+.touch-dragging { outline-style: solid !important; z-index: 9100; }
+
+#touch-edit-panel {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9200;
+    width: min(calc(300px * var(--touch-scale, 1)), calc(100vw - 24px));
+    font-size: calc(14px * var(--touch-scale, 1));
+    box-sizing: border-box;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #fff;
+    background: rgba(10, 10, 20, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.touch-edit-hint { font-size: 0.85em; opacity: 0.75; }
+.touch-edit-row {
+    display: grid;
+    grid-template-columns: 5.5em 1fr;
+    align-items: center;
+    gap: 0.7em;
+    font-size: 1em;
+}
+.touch-edit-row input[type="range"] { width: 100%; min-height: 2em; }
+.touch-edit-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+.touch-edit-buttons button {
+    min-height: 2.8em;
+    min-width: 6.3em;
+    padding: 0 1em;
+    font-size: 1em;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    cursor: pointer;
+}
+.touch-edit-buttons .touch-edit-done { background: #2f7d3b; border-color: #5fbf6c; }
+
+/* Long-press label over a touch control (js/touch/touch-longpress.js). */
+.touch-label-bubble {
+    position: fixed;
+    z-index: 9300;
+    max-width: 220px;
+    padding: 0.45em 0.75em;
+    font-size: calc(13px * var(--touch-scale, 1));
+    color: #fff;
+    background: rgba(10, 10, 20, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+/* Cells take finger drags themselves (js/touch/touch-grid.js): no scroll/zoom gestures. */
+.gc { touch-action: none; }
+
+/* Rotate-your-phone hint (js/touch/touch-viewport.js). */
+#touch-rotate-hint {
+    position: fixed;
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%);
+    z-index: 9400;
+    max-width: 90vw;
+    padding: 0.55em 1em;
+    font-size: calc(15px * var(--touch-scale, 1));
+    text-align: center;
+    color: #fff;
+    background: rgba(10, 10, 20, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+}
+
+/* Fill / Mark: the on-screen touch button replaces the game's small native
+   toggle while touch controls are showing. */
+html.touch-controls-on .puzzle-scaler-wrap > .touchpad-mode-btn { display: none; }
+.touch-btn.touch-btn-active { background: var(--red, #c0392b); border-color: #fff; }
+.touch-btn[hidden] { display: none; }
+
+/* Clue rulers for zoomed puzzles (js/touch/touch-clues.js). Read-only; touches
+   go through to the cells underneath. */
+#touch-clue-rows, #touch-clue-cols { position: fixed; inset: 0; z-index: 8000; pointer-events: none; }
+#touch-clue-rows[hidden], #touch-clue-cols[hidden] { display: none; }
+.touch-clue {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    box-sizing: border-box;
+    padding: 0 0.4em;
+    font-family: var(--PX, monospace);
+    color: #fff;
+    background: rgba(8, 10, 22, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    pointer-events: none;
+    white-space: nowrap;
+}
+.touch-clue-col { flex-direction: column; justify-content: flex-end; gap: 0.25em; padding: 0.3em 0; }
+.touch-clue.touch-clue-solved { color: rgba(255, 255, 255, 0.4); }
+
+/* The three boss-ability keys are rarely needed: a smaller row. */
+.touch-btn-group-special .touch-btn {
+    width: calc(38px * var(--touch-scale, 1));
+    height: calc(38px * var(--touch-scale, 1));
+    font-size: calc(16px * var(--touch-scale, 1));
+}
+.touch-btn-group[hidden] { display: none; }
+
+/* Skill hotbar slots are only ~6mm wide on a phone's virtual layout; give
+   touch players bigger targets (never smaller than the desktop 52px). */
+html.touch-controls-on .skill-hotbar-slot {
+    width: max(52px, calc(40px * var(--touch-scale, 1)));
+    height: max(52px, calc(40px * var(--touch-scale, 1)));
+}
+
+/* Touch play: no accidental text selection, callout menus or tap flashes when
+   holding a finger on the page (inputs keep normal text selection). */
+html.touch-controls-on body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+html.touch-controls-on input,
+html.touch-controls-on textarea { -webkit-user-select: text; user-select: text; }
